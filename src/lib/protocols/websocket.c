@@ -53,7 +53,7 @@ static void set_websocket_detected(struct ndpi_detection_module_struct *ndpi_str
       ndpi_search_tcp_or_udp(ndpi_struct, flow);
 
       ndpi_int_reset_protocol(flow);
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBSOCKET, flow->guessed_protocol_id_by_ip, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBSOCKET, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     }
 }
 

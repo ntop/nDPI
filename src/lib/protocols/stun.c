@@ -51,10 +51,12 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   ndpi_confidence_t confidence = NDPI_CONFIDENCE_DPI;
 
-  if(app_proto == NDPI_PROTOCOL_GOOGLE)
-    app_proto = NDPI_PROTOCOL_HANGOUT_DUO;
-  else if(app_proto == NDPI_PROTOCOL_FACEBOOK)
-    app_proto = NDPI_PROTOCOL_FACEBOOK_VOIP;
+  if(app_proto == NDPI_PROTOCOL_UNKNOWN) {
+    if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_GOOGLE)
+      app_proto = NDPI_PROTOCOL_HANGOUT_DUO;
+    else if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_FACEBOOK)
+      app_proto = NDPI_PROTOCOL_FACEBOOK_VOIP;
+  }
 
   if(ndpi_struct->stun_cache == NULL)
     ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
@@ -424,7 +426,7 @@ void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
   NDPI_LOG_DBG(ndpi_struct, "search stun\n");
 
-  app_proto = flow->guessed_protocol_id_by_ip;
+  app_proto = NDPI_PROTOCOL_UNKNOWN;
 
   if(packet->tcp) {
     /* STUN may be encapsulated in TCP packets */

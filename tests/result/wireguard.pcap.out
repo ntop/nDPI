@@ -21,4 +21,4 @@ Patricia protocols:   4/0 (search/found)
 
 WireGuard	2399	734182	1
 
-	1	UDP 139.162.192.157:51820 <-> 192.168.0.14:36116 [proto: 206/WireGuard][Encrypted][Confidence: DPI][cat: VPN/2][1362 pkts/518526 bytes <-> 1037 pkts/215656 bytes][Goodput ratio: 89/80][381.21 sec][bytes ratio: 0.413 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 269/314 10882/13538 1111/1204][Pkt Len c2s/s2c min/avg/max/stddev: 74/74 381/208 1404/1404 362/135][Plen Bins: 0,0,0,35,43,5,2,0,6,2,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]
+	1	UDP 139.162.192.157:51820 <-> 192.168.0.14:36116 [proto: 206/WireGuard][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VPN/2][1362 pkts/518526 bytes <-> 1037 pkts/215656 bytes][Goodput ratio: 89/80][381.21 sec][bytes ratio: 0.413 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 269/314 10882/13538 1111/1204][Pkt Len c2s/s2c min/avg/max/stddev: 74/74 381/208 1404/1404 362/135][Plen Bins: 0,0,0,35,43,5,2,0,6,2,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]

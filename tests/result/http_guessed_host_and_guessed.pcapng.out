@@ -1,7 +1,7 @@
 Guessed flow protos:	1
 
 DPI Packets (TCP):	1	(1.00 pkts/flow)
-Confidence Match by IP      : 1 (flows)
+Confidence Match by port    : 1 (flows)
 Num dissector calls: 126 (126.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
@@ -13,12 +13,12 @@ LRU cache msteams:    0/0/0 (insert/search/found)
 Automa host:          1/0 (search/found)
 Automa domain:        1/0 (search/found)
 Automa tls cert:      0/0 (search/found)
-Automa risk mask:     0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   2/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   3/2 (search/found)
 
-Alibaba	1	123	1
+POP3	1	123	1
 
-	1	TCP 170.33.13.5:110 -> 192.168.0.1:179 [proto: 2.274/POP3.Alibaba][ClearText][Confidence: Match by IP][cat: Email/3][1 pkts/123 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Hostname/SNI: pornhub.com][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (6 HTTP/1.1)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 170.33.13.5:110 -> 192.168.0.1:179 [proto: 2/POP3][IP: 274/Alibaba][ClearText][Confidence: Match by port][cat: Email/3][1 pkts/123 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Hostname/SNI: pornhub.com][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No client to server traffic][PLAIN TEXT (6 HTTP/1.1)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
