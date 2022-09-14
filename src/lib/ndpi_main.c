@@ -5788,17 +5788,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 	confidence = NDPI_CONFIDENCE_DPI_PARTIAL;
       }
 
-      if(flow->host_server_name[0] != '\0') {
-        ndpi_protocol_match_result ret_match;
-
-        ndpi_match_host_subprotocol(ndpi_str, flow, (char *) flow->host_server_name,
-				    strlen((const char *) flow->host_server_name), &ret_match,
-				    NDPI_PROTOCOL_DNS);
-
-        if(ret_match.protocol_id != NDPI_PROTOCOL_UNKNOWN)
-          guessed_host_protocol_id = ret_match.protocol_id;
-      }
-
       *protocol_was_guessed = 1;
       ndpi_set_detected_protocol(ndpi_str, flow, guessed_host_protocol_id, guessed_protocol_id, confidence);
     }
