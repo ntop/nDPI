@@ -15,7 +15,7 @@ LRU cache stun:       6/40/18 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    24/13/9 (insert/search/found)
-Automa host:          85/69 (search/found)
+Automa host:          85/71 (search/found)
 Automa domain:        85/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     21/0 (search/found)
@@ -25,7 +25,7 @@ Patricia risk:        2/0 (search/found)
 Patricia protocols:   125/48 (search/found)
 
 Unknown	4	456	1
-DNS	10	1357	5
+DNS	8	1126	4
 DHCP	7	2323	2
 ntop	40	9816	3
 Skype_TeamsCall	49	10800	4
@@ -34,6 +34,7 @@ ICMP	2	140	1
 TLS	126	55305	7
 Dropbox	2	1054	2
 Skype_Teams	44	21248	3
+Apple	2	231	1
 Spotify	1	82	1
 Microsoft	405	284048	12
 Microsoft365	136	52120	6
@@ -122,7 +123,7 @@ JA3 Host Stats:
 	75	UDP 192.168.1.6:51033 <-> 192.168.1.1:53 [proto: 5.125/DNS.Skype_Teams][IP: 0/Unknown][ClearText][Confidence: DPI][cat: VoIP/10][1 pkts/80 bytes <-> 1 pkts/182 bytes][Goodput ratio: 47/77][0.04 sec][Hostname/SNI: eu-api.asm.skype.com][52.114.75.69][PLAIN TEXT (trafficmanager)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	76	UDP 192.168.1.6:51309 <-> 192.168.1.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/93 bytes <-> 1 pkts/169 bytes][Goodput ratio: 54/75][0.01 sec][Hostname/SNI: skypedataprdcolneu04.cloudapp.net][::][PLAIN TEXT (skypedataprdcolneu04)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	77	UDP 192.168.1.6:62863 <-> 192.168.1.1:53 [proto: 5.250/DNS.Teams][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Collaborative/15][1 pkts/103 bytes <-> 1 pkts/158 bytes][Goodput ratio: 59/73][0.07 sec][Hostname/SNI: emea.ng.msg.teams-msgapi.trafficmanager.net][52.114.108.8][PLAIN TEXT (msgapi)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	78	UDP 192.168.1.6:56634 <-> 192.168.1.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: ConnCheck/30][1 pkts/89 bytes <-> 1 pkts/142 bytes][Goodput ratio: 52/70][0.03 sec][Hostname/SNI: captive.apple.com.edgekey.net][23.50.158.88][PLAIN TEXT (captive)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	78	UDP 192.168.1.6:56634 <-> 192.168.1.1:53 [proto: 5.140/DNS.Apple][IP: 0/Unknown][ClearText][Confidence: DPI][cat: ConnCheck/30][1 pkts/89 bytes <-> 1 pkts/142 bytes][Goodput ratio: 52/70][0.03 sec][Hostname/SNI: captive.apple.com.edgekey.net][23.50.158.88][PLAIN TEXT (captive)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	79	UDP 192.168.1.6:60813 <-> 192.168.1.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/93 bytes <-> 1 pkts/109 bytes][Goodput ratio: 54/61][0.01 sec][Hostname/SNI: skypedataprdcolneu04.cloudapp.net][52.114.77.33][PLAIN TEXT (skypedataprdcolneu04)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	80	TCP 192.168.1.6:58533 -> 149.154.167.91:443 [proto: 91/TLS][IP: 185/Telegram][Encrypted][Confidence: Match by port][cat: Web/5][3 pkts/186 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][4.29 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	81	ICMP 93.71.110.205:0 -> 192.168.1.6:0 [proto: 81/ICMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][0.01 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
