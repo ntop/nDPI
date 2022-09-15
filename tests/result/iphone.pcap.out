@@ -3,9 +3,9 @@ Guessed flow protos:	3
 DPI Packets (TCP):	107	(7.13 pkts/flow)
 DPI Packets (UDP):	55	(1.77 pkts/flow)
 DPI Packets (other):	5	(1.00 pkts/flow)
-Confidence Unknown          : 1 (flows)
+Confidence Match by port    : 1 (flows)
 Confidence DPI              : 50 (flows)
-Num dissector calls: 356 (6.98 diss/flow)
+Num dissector calls: 357 (7.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -22,7 +22,6 @@ Patricia risk mask:   76/0 (search/found)
 Patricia risk:        2/0 (search/found)
 Patricia protocols:   82/10 (search/found)
 
-Unknown	2	120	1
 MDNS	17	7012	5
 SSDP	2	336	2
 DHCP	9	3078	2
@@ -34,6 +33,7 @@ Apple	150	55443	17
 AppleiCloud	217	127654	9
 AppleiTunes	74	25151	8
 Spotify	2	172	1
+NAT-PMP	2	120	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -88,9 +88,6 @@ JA3 Host Stats:
 	46	UDP 169.254.225.216:60538 -> 239.255.255.250:1900 [proto: 12/SSDP][ClearText][Confidence: DPI][cat: System/18][1 pkts/168 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Hostname/SNI: 239.255.255.250:1900][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	47	UDP 192.168.2.1:51411 -> 239.255.255.250:1900 [proto: 12/SSDP][ClearText][Confidence: DPI][cat: System/18][1 pkts/168 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Hostname/SNI: 239.255.255.250:1900][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	48	ICMPV6 [fe80::823:3f17:8298:a29c]:0 -> [ff02::2]:0 [proto: 102/ICMPV6][ClearText][Confidence: DPI][cat: Network/14][2 pkts/132 bytes -> 0 pkts/0 bytes][Goodput ratio: 6/0][4.21 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	49	ICMPV6 [::]:0 -> [ff02::1:ff98:a29c]:0 [proto: 102/ICMPV6][ClearText][Confidence: DPI][cat: Network/14][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 28/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	50	IGMP 192.168.2.17:0 -> 224.0.0.22:0 [proto: 82/IGMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/54 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-
-Undetected flows:
-	1	UDP 192.168.2.1:5351 -> 224.0.0.1:5350 [proto: 0/Unknown][ClearText][Confidence: Unknown][2 pkts/120 bytes -> 0 pkts/0 bytes][Goodput ratio: 30/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	49	UDP 192.168.2.1:5351 -> 224.0.0.1:5350 [proto: 312/NAT-PMP][ClearText][Confidence: Match by port][cat: Network/14][2 pkts/120 bytes -> 0 pkts/0 bytes][Goodput ratio: 30/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	50	ICMPV6 [::]:0 -> [ff02::1:ff98:a29c]:0 [proto: 102/ICMPV6][ClearText][Confidence: DPI][cat: Network/14][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 28/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	51	IGMP 192.168.2.17:0 -> 224.0.0.22:0 [proto: 82/IGMP][ClearText][Confidence: DPI][cat: Network/14][1 pkts/54 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
