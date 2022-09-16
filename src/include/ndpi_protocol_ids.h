@@ -341,6 +341,7 @@ typedef enum {
   NDPI_PROTOCOL_FASTCGI               = 310,
   NDPI_PROTOCOL_FTPS                  = 311,
   NDPI_PROTOCOL_NATPMP                = 312,
+  NDPI_PROTOCOL_SYNCTHING             = 313,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
