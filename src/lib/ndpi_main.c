@@ -94,6 +94,10 @@
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ndpi_md5.h"
 
+#ifdef HAVE_NBPF
+#include "nbpf.h"
+#endif
+
 static int _ndpi_debug_callbacks = 0;
 
 /* #define DGA_DEBUG 1 */
@@ -442,7 +446,7 @@ void ndpi_set_proto_subprotocols(struct ndpi_detection_module_struct *ndpi_str, 
   va_list ap;
   int current_arg = protoId;
   size_t i = 0;
-  
+
   va_start(ap, protoId);
   while (current_arg != NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS) {
     ndpi_str->proto_defaults[protoId].subprotocol_count++;
@@ -464,14 +468,14 @@ void ndpi_set_proto_subprotocols(struct ndpi_detection_module_struct *ndpi_str, 
 
   va_start(ap, protoId);
   current_arg = va_arg(ap, int);
-  
+
   while (current_arg != NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS) {
     if(ndpi_str->proto_defaults[protoId].subprotocols != NULL) {
       ndpi_str->proto_defaults[protoId].subprotocols[i++] = current_arg;
       current_arg = va_arg(ap, int);
     }
   }
-  
+
   va_end(ap);
 }
 
@@ -1922,7 +1926,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           "MpegDash", NDPI_PROTOCOL_CATEGORY_MEDIA,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  /* 
+  /*
      Note: removed RSH port 514 as TCP/514 is often used for syslog and RSH is as such on;y
      if both source and destination ports are 514. So we removed the default for RSH and used with syslog
   */
@@ -4826,7 +4830,7 @@ u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, cons
     }
   }
   //#endif
-    
+
   return(1);
 }
 
@@ -4924,10 +4928,10 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->num_risk_infos) {
       u_int i;
 
-      for(i=0; i<flow->num_risk_infos; i++)      
+      for(i=0; i<flow->num_risk_infos; i++)
 	ndpi_free(flow->risk_infos[i].info);
     }
-    
+
     if(flow->http.url)
       ndpi_free(flow->http.url);
 
@@ -5161,7 +5165,7 @@ static u_int8_t ndpi_is_multi_or_broadcast(struct ndpi_packet_struct *packet) {
       return(1);
   } else if(packet->iphv6) {
     /* IPv6 */
-    
+
     if((ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) & 0xFF000000) == 0xFF000000)
       return(1);
   }
@@ -6272,15 +6276,62 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     ret.master_protocol = flow->detected_protocol_stack[1],
       ret.app_protocol = flow->detected_protocol_stack[0],
       ret.category = flow->category;
+
     return ret;
   } else if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     if(ndpi_init_packet(ndpi_str, flow, current_time_ms, packet_data, packetlen, input_info) != 0)
       return ret;
+
     goto ret_protocols;
   }
 
   if(ndpi_init_packet(ndpi_str, flow, current_time_ms, packet_data, packetlen, input_info) != 0)
     return ret;
+
+#ifdef HAVE_NBPF
+  if((flow->num_processed_pkts == 1) /* first packet of this flow to be analyzed */
+     && (ndpi_str->nbpf_custom_proto[0].tree != NULL)) {
+#if 0
+    const char *filter = "tcp and port 80";
+    nbpf_tree_t *tree  = nbpf_parse(filter, NULL);
+
+    nbpf_free(tree);
+#endif
+    u_int8_t i;
+    nbpf_pkt_info_t t;
+
+    memset(&t, 0, sizeof(t));
+
+    if(packet->iphv6 != NULL) {
+      t.tuple.eth_type = 0x86DD;
+      t.tuple.ip_version = 6;
+      memcpy(&t.tuple.ip_src.v6, &packet->iphv6->ip6_src, 16);
+      memcpy(&t.tuple.ip_dst.v6, &packet->iphv6->ip6_dst, 16);
+    } else {
+      t.tuple.eth_type = 0x0800;
+      t.tuple.ip_version = 4;
+      t.tuple.ip_src.v4 = packet->iph->saddr;
+      t.tuple.ip_dst.v4 = packet->iph->daddr;
+    }
+
+    t.tuple.l3_proto = flow->l4_proto;
+    t.tuple.l4_src_port = packet->tcp ? packet->tcp->source : packet->udp->source;
+    t.tuple.l4_dst_port = packet->tcp ? packet->tcp->dest : packet->udp->dest;
+
+    for(i=0; (i<MAX_NBPF_CUSTOM_PROTO) && (ndpi_str->nbpf_custom_proto[i].tree != NULL); i++) {
+      if(nbpf_match(ndpi_str->nbpf_custom_proto[i].tree, &t)) {
+	/* match found */
+	ret.master_protocol = ret.app_protocol = ndpi_str->nbpf_custom_proto[i].l7_protocol;
+	ndpi_fill_protocol_category(ndpi_str, flow, &ret);
+	ndpi_reconcile_protocols(ndpi_str, flow, &ret);
+	flow->confidence = NDPI_CONFIDENCE_NBPF;
+	
+	return(ret);
+      }
+    }
+  }
+#endif
+
 
   ndpi_connection_tracking(ndpi_str, flow);
 
@@ -6330,9 +6381,10 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   else
     ret.category = flow->category;
 
-  if((flow->num_processed_pkts == 1) && (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN) &&
-     (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) && packet->tcp && (packet->tcp->syn == 0) &&
-     (flow->guessed_protocol_id == 0)) {
+  if((flow->num_processed_pkts == 1) /* first packet of this flow to be analyzed */
+     && (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN)
+     && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) && packet->tcp && (packet->tcp->syn == 0)
+     && (flow->guessed_protocol_id == 0)) {
     u_int8_t protocol_was_guessed;
 
     /*
@@ -6407,7 +6459,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 		u_int8_t i, offset;
 
 		offset = snprintf(str, sizeof(str), "Expected on port ");
-	    
+
 		for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i] != 0); i++) {
 		  int rc = snprintf(&str[offset], sizeof(str)-offset, "%s%u",
 				    (i > 0) ? "," : "", default_ports[i]);
@@ -6448,9 +6500,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
       if(!found) {
 	ndpi_default_ports_tree_node_t *r = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
 									   ntohs(flow->c_port), ntohs(flow->s_port));
-	
+
 	if((r == NULL)
-	   || ((r->proto->protoId != ret.app_protocol) && (r->proto->protoId != ret.master_protocol)))	  
+	   || ((r->proto->protoId != ret.app_protocol) && (r->proto->protoId != ret.master_protocol)))
 	  ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,NULL);
       }
     }
@@ -6472,7 +6524,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
           addr.s_addr = packet->iph->daddr;
           net_risk = ndpi_network_risk_ptree_match(ndpi_str, &addr);
         }
-	
+
         if(net_risk != NDPI_NO_RISK)
           ndpi_set_risk(ndpi_str, flow, net_risk, NULL);
       }
@@ -7550,6 +7602,8 @@ const char *ndpi_confidence_get_name(ndpi_confidence_t confidence)
     return "DPI (cache)";
   case NDPI_CONFIDENCE_DPI:
     return "DPI";
+  case NDPI_CONFIDENCE_NBPF:
+    return "nBPF";
   default:
     return NULL;
   }
@@ -8016,7 +8070,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   /* Add punycode check */
   if(ndpi_strnstr(string_to_match, "xn--", string_to_match_len)) {
     char str[64] = { '\0' };
-      
+
     strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
     ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, str);
   }

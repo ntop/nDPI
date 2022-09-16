@@ -17,7 +17,7 @@ includedir = @includedir@/ndpi
 ifneq ($(OS),Windows_NT)
 CFLAGS     += -fPIC -DPIC
 endif
-CFLAGS     += -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@
+CFLAGS     += -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
 LDFLAGS    += @NDPI_LDFLAGS@
 LIBS       = @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
 

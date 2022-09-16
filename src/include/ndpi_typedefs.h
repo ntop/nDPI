@@ -923,6 +923,7 @@ typedef enum {
   NDPI_CONFIDENCE_DPI_PARTIAL_CACHE,	/* Classification results based on some LRU cache with partial/incomplete DPI information */
   NDPI_CONFIDENCE_DPI_CACHE,		/* Classification results based on some LRU cache (i.e. correlation among sessions) */
   NDPI_CONFIDENCE_DPI,			/* Deep packet inspection */
+  NDPI_CONFIDENCE_NBPF,			/* PF_RING nBPF (custom protocol) */
 
   /*
     IMPORTANT
@@ -1105,6 +1106,13 @@ typedef struct ndpi_list_struct {
   struct ndpi_list_struct *next;
 } ndpi_list;
 
+#ifdef HAVE_NBPF
+typedef struct {
+  void *tree; /* cast to nbpf_filter* */
+  u_int16_t l7_protocol;
+} nbpf_filter;
+#endif
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
 
@@ -1230,6 +1238,10 @@ struct ndpi_detection_module_struct {
   /* Current packet */
   struct ndpi_packet_struct packet;
   const struct ndpi_flow_input_info *input_info;
+
+#ifdef HAVE_NBPF
+  nbpf_filter nbpf_custom_proto[MAX_NBPF_CUSTOM_PROTO];
+#endif
 };
 
 #endif /* NDPI_LIB_COMPILATION */
