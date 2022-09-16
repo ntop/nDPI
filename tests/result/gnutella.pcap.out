@@ -3,11 +3,11 @@ Guessed flow protos:	597
 DPI Packets (TCP):	528	(3.85 pkts/flow)
 DPI Packets (UDP):	1232	(2.01 pkts/flow)
 DPI Packets (other):	10	(1.00 pkts/flow)
-Confidence Unknown          : 595 (flows)
-Confidence Match by port    : 1 (flows)
+Confidence Unknown          : 591 (flows)
+Confidence Match by port    : 5 (flows)
 Confidence Match by IP      : 1 (flows)
 Confidence DPI              : 163 (flows)
-Num dissector calls: 64833 (85.31 diss/flow)
+Num dissector calls: 65349 (85.99 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -24,7 +24,7 @@ Patricia risk mask:   1768/0 (search/found)
 Patricia risk:        2/0 (search/found)
 Patricia protocols:   2577/2 (search/found)
 
-Unknown	1423	119577	595
+Unknown	1419	119401	591
 MDNS	18	1632	2
 NetBIOS	15	1596	1
 SSDP	46	8904	8
@@ -40,6 +40,7 @@ WSD	41	39162	4
 LLMNR	10	770	6
 CiscoVPN	1	66	1
 Tor	1	70	1
+NAT-PMP	4	176	4
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -211,6 +212,10 @@ JA3 Host Stats:
 	163	UDP 10.0.2.15:63717 -> 224.0.0.252:5355 [proto: 154/LLMNR][ClearText][Confidence: DPI][cat: Network/14][1 pkts/71 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Hostname/SNI: msedgewin10][PLAIN TEXT (MSEDGEWIN)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	164	UDP 10.0.2.15:28681 -> 180.149.125.139:6578 [proto: 163/Tor][Encrypted][Confidence: Match by IP][cat: VPN/2][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	165	UDP 10.0.2.15:28681 -> 107.4.56.177:10000 [proto: 161/CiscoVPN][Encrypted][Confidence: Match by port][cat: VPN/2][1 pkts/66 bytes -> 0 pkts/0 bytes][Goodput ratio: 36/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	166	UDP 10.0.2.15:57619 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	167	UDP 10.0.2.15:57620 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	168	UDP 10.0.2.15:57621 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	169	UDP 10.0.2.15:57622 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 Undetected flows:
@@ -805,7 +810,3 @@ Undetected flows:
 	589	UDP 10.0.2.15:28681 -> 196.74.159.56:29271 [proto: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/66 bytes -> 0 pkts/0 bytes][Goodput ratio: 36/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	590	UDP 10.0.2.15:28681 -> 212.68.248.153:27223 [proto: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/66 bytes -> 0 pkts/0 bytes][Goodput ratio: 36/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	591	UDP 10.0.2.15:28681 -> 213.166.132.204:11194 [proto: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/66 bytes -> 0 pkts/0 bytes][Goodput ratio: 36/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	592	UDP 10.0.2.15:57619 -> 10.0.2.2:5351 [proto: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	593	UDP 10.0.2.15:57620 -> 10.0.2.2:5351 [proto: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	594	UDP 10.0.2.15:57621 -> 10.0.2.2:5351 [proto: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	595	UDP 10.0.2.15:57622 -> 10.0.2.2:5351 [proto: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
