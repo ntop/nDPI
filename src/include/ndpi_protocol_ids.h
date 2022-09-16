@@ -342,6 +342,7 @@ typedef enum {
   NDPI_PROTOCOL_FTPS                  = 311,
   NDPI_PROTOCOL_NATPMP                = 312,
   NDPI_PROTOCOL_SYNCTHING             = 313,
+  NDPI_PROTOCOL_CRYNET                = 314,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
