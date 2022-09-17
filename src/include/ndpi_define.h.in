@@ -445,4 +445,6 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 #define ETH_P_PPPoE            0x8864
 #endif
 
+#define MAX_NBPF_CUSTOM_PROTO  8
+
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */
