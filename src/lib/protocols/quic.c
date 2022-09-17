@@ -469,7 +469,7 @@ static int tls13_hkdf_expand_label_context(struct ndpi_detection_module_struct *
 
   memcpy(&info_data[info_len], &context_length, 1);
   info_len += 1;
-  if(context_length) {
+  if(context_length && context_hash != NULL) {
     memcpy(&info_data[info_len], context_hash, context_length);
     info_len += context_length;
   }
