@@ -69,7 +69,6 @@
 /rrdtool/rrd_anomaly
 /rrdtool/rrd_similarity
 /src/include/Makefile
-/src/include/ndpi_api.h
 /src/include/ndpi_config.h
 /src/include/ndpi_define.h
 /src/lib/.deps/

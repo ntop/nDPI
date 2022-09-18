@@ -116,7 +116,7 @@ if test -d ".git" || test -r ".git"; then
 
      A=`git log src/include/ndpi_typedefs.h|wc -l`
      B=`git log src/include/ndpi_protocol_ids.h|wc -l`
-     C=`git log src/include/ndpi_api.h.in|wc -l`
+     C=`git log src/include/ndpi_api.h|wc -l`
      NDPI_API_VERSION=$((A+B+C))
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
@@ -363,7 +363,7 @@ dnl>   ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lcurl"
 dnl>   AC_DEFINE_UNQUOTED(HAVE_CURL, 1, [curl is present])
 dnl> fi
 
-AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile influxdb/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile fuzz/Makefile src/include/ndpi_api.h doc/Doxyfile.cfg])
+AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile influxdb/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile fuzz/Makefile doc/Doxyfile.cfg])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
