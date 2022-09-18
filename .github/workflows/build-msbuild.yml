@@ -20,9 +20,6 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Build solution for release
-        run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Release
-
       - name: Build solution for debug
         run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug
 
@@ -30,5 +27,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts
-          path: x64
+          path: windows/bin
           retention-days: 14

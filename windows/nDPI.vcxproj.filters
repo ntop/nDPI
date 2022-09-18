@@ -228,10 +228,12 @@
     <ClCompile Include="..\src\lib\protocols\tivoconnect.c" />
     <ClCompile Include="..\src\lib\protocols\fastcgi.c" />
     <ClCompile Include="..\src\lib\protocols\kismet.c" />
+    <ClCompile Include="..\src\lib\protocols\syncthing.c" />
+    <ClCompile Include="..\src\lib\protocols\natpmp.c" />
+    <ClCompile Include="..\src\lib\protocols\crynet.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\lib\protocols\btlib.h" />
-    <ClInclude Include="..\src\include\ndpi_define.h" />
     <ClInclude Include="..\src\include\ndpi_includes.h" />
     <ClInclude Include="..\src\include\ndpi_protocol_ids.h" />
     <ClInclude Include="..\src\include\ndpi_protocols.h" />
@@ -284,9 +286,12 @@
     <ClInclude Include="..\src\lib\third_party\include\libinjection_xss.h">
       <Filter>third_party</Filter>
     </ClInclude>
+    <ClInclude Include="src\ndpi_config.h" />
+    <ClInclude Include="src\ndpi_define.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\lib\ndpi_content_match.c.inc" />
+    <None Include="..\.github\workflows\build-msbuild.yml" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="third_party">
