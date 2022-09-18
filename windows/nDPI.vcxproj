@@ -1,20 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -26,26 +14,6 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-    <SpectreMitigation>false</SpectreMitigation>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-    <SpectreMitigation>false</SpectreMitigation>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <SpectreMitigation>false</SpectreMitigation>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
@@ -55,15 +23,6 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -71,54 +30,12 @@
   <PropertyGroup>
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)obj\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
     <OutDir>$(ProjectDir)bin\$(Platform)_$(Configuration)\</OutDir>
-    <IncludePath>$(ProjectDir);$(ProjectDir)dummy\folder\;$(IncludePath)</IncludePath>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(ProjectDir)dummy\folder\;$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <IntDir>$(SolutionDir)obj\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
-    <OutDir>$(ProjectDir)bin\$(Platform)_$(Configuration)\</OutDir>
-    <IncludePath>$(ProjectDir);$(ProjectDir)dummy\folder\;$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src\lib\protocols\;$(ProjectDir)..\src\include\;$(ProjectDir)..\;$(ProjectDir)..\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>false</MinimalRebuild>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeader />
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <StringPooling>false</StringPooling>
-      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <ExceptionHandling>false</ExceptionHandling>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
-      <AssemblyDebug>true</AssemblyDebug>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -147,67 +64,6 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader />
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src\lib\protocols\;$(ProjectDir)..\src\include\;$(ProjectDir)..\;$(ProjectDir)..\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <Optimization>Full</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>true</OmitFramePointers>
-      <StringPooling>true</StringPooling>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <AdditionalUsingDirectories>$(ProjectDir);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <ExceptionHandling>Sync</ExceptionHandling>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src\lib\protocols\;$(ProjectDir)..\src\include\;$(ProjectDir)..\;$(ProjectDir)..\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <Optimization>Full</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>true</OmitFramePointers>
-      <StringPooling>true</StringPooling>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <AdditionalUsingDirectories>$(ProjectDir);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard_C>Default</LanguageStandard_C>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />
     <ClCompile Include="..\src\lib\ndpi_bitmap.c" />
@@ -233,6 +89,7 @@
     <ClCompile Include="..\src\lib\protocols\checkmk.c" />
     <ClCompile Include="..\src\lib\protocols\collectd.c" />
     <ClCompile Include="..\src\lib\protocols\cpha.c" />
+    <ClCompile Include="..\src\lib\protocols\crynet.c" />
     <ClCompile Include="..\src\lib\protocols\csgo.c" />
     <ClCompile Include="..\src\lib\protocols\diameter.c" />
     <ClCompile Include="..\src\lib\protocols\discord.c" />
@@ -255,6 +112,7 @@
     <ClCompile Include="..\src\lib\protocols\modbus.c" />
     <ClCompile Include="..\src\lib\protocols\mongodb.c" />
     <ClCompile Include="..\src\lib\protocols\mpegdash.c" />
+    <ClCompile Include="..\src\lib\protocols\natpmp.c" />
     <ClCompile Include="..\src\lib\protocols\nats.c" />
     <ClCompile Include="..\src\lib\protocols\nest_log_sink.c" />
     <ClCompile Include="..\src\lib\protocols\nintendo.c" />
@@ -269,6 +127,7 @@
     <ClCompile Include="..\src\lib\protocols\soap.c" />
     <ClCompile Include="..\src\lib\protocols\softether.c" />
     <ClCompile Include="..\src\lib\protocols\someip.c" />
+    <ClCompile Include="..\src\lib\protocols\syncthing.c" />
     <ClCompile Include="..\src\lib\protocols\threema.c" />
     <ClCompile Include="..\src\lib\protocols\tinc.c" />
     <ClCompile Include="..\src\lib\protocols\tivoconnect.c" />
@@ -422,7 +281,6 @@
     <ClInclude Include="..\src\include\ndpi_utils.h" />
     <ClInclude Include="..\src\lib\protocols\btlib.h" />
     <ClInclude Include="..\src\lib\third_party\include\ahocorasick.h" />
-    <ClInclude Include="..\src\include\ndpi_define.h" />
     <ClInclude Include="..\src\include\ndpi_includes.h" />
     <ClInclude Include="..\src\lib\third_party\include\gcrypt_light.h" />
     <ClInclude Include="..\src\lib\third_party\include\hll.h" />
@@ -446,8 +304,11 @@
     <ClInclude Include="..\src\lib\third_party\include\uthash.h" />
     <ClInclude Include="arpa\inet.h" />
     <ClInclude Include="src\getopt.h" />
+    <ClInclude Include="src\ndpi_config.h" />
+    <ClInclude Include="src\ndpi_define.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.github\workflows\build-msbuild.yml" />
     <None Include="..\src\lib\ndpi_content_match.c.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

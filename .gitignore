@@ -73,6 +73,7 @@
 /src/include/ndpi_define.h
 /src/lib/.deps/
 /src/lib/Makefile
+/src/lib/libndpi
 /src/lib/libndpi-*.dll
 /src/lib/libndpi.4
 /src/lib/libndpi.a
