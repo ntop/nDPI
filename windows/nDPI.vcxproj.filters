@@ -240,8 +240,6 @@
     <ClInclude Include="..\src\include\ndpi_win32.h" />
     <ClInclude Include="arpa\inet.h" />
     <ClInclude Include="src\getopt.h" />
-    <ClInclude Include="..\src\include\ndpi_api.h" />
-    <ClInclude Include="..\src\include\ndpi_config.h" />
     <ClInclude Include="..\src\include\ndpi_encryption.h" />
     <ClInclude Include="..\src\include\ndpi_main.h" />
     <ClInclude Include="..\src\include\ndpi_utils.h" />
