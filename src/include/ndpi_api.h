@@ -31,11 +31,6 @@
 extern "C" {
 #endif
 
-  /* The #define below is used for apps that dynamically link with nDPI to make
-     sure that datastructures and in sync across versions
-  */
-#define NDPI_API_VERSION                      @NDPI_API_VERSION@
-
 #define SIZEOF_FLOW_STRUCT                    ( sizeof(struct ndpi_flow_struct) )
 
 #define NDPI_DETECTION_ONLY_IPV4              ( 1 << 0 )
