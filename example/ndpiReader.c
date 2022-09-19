@@ -1513,6 +1513,15 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
         }
         break;
 
+      case INFO_NATPMP:
+        if (flow->natpmp.internal_port != 0 && flow->natpmp.ip[0] != '\0')
+        {
+            fprintf(out, "[Result: %u][Internal Port: %u][External Port: %u][External Address: %s]",
+                    flow->natpmp.result_code, flow->natpmp.internal_port, flow->natpmp.external_port,
+                    flow->natpmp.ip);
+        }
+        break;
+
       case INFO_FTP_IMAP_POP_SMTP:
         if (flow->ftp_imap_pop_smtp.username[0] != '\0')
         {

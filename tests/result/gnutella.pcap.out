@@ -4,9 +4,9 @@ DPI Packets (TCP):	528	(3.85 pkts/flow)
 DPI Packets (UDP):	1232	(2.01 pkts/flow)
 DPI Packets (other):	10	(1.00 pkts/flow)
 Confidence Unknown          : 592 (flows)
-Confidence Match by port    : 5 (flows)
-Confidence DPI              : 163 (flows)
-Num dissector calls: 66381 (87.34 diss/flow)
+Confidence Match by port    : 1 (flows)
+Confidence DPI              : 167 (flows)
+Num dissector calls: 65961 (86.79 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -209,10 +209,10 @@ JA3 Host Stats:
 	162	ICMPV6 [::]:0 -> [ff02::1:ffa4:e108]:0 [proto: 102/ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	163	UDP 10.0.2.15:63717 -> 224.0.0.252:5355 [proto: 154/LLMNR][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/71 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Hostname/SNI: msedgewin10][PLAIN TEXT (MSEDGEWIN)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	164	UDP 10.0.2.15:28681 -> 107.4.56.177:10000 [proto: 161/CiscoVPN][IP: 0/Unknown][Encrypted][Confidence: Match by port][cat: VPN/2][1 pkts/66 bytes -> 0 pkts/0 bytes][Goodput ratio: 36/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	165	UDP 10.0.2.15:57619 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	166	UDP 10.0.2.15:57620 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	167	UDP 10.0.2.15:57621 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	168	UDP 10.0.2.15:57622 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	165	UDP 10.0.2.15:57619 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	166	UDP 10.0.2.15:57620 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	167	UDP 10.0.2.15:57621 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	168	UDP 10.0.2.15:57622 -> 10.0.2.2:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 Undetected flows:

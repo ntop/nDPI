@@ -1107,6 +1107,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_snprintf(flow->softether.fqdn, sizeof(flow->softether.fqdn), "%s",
                   flow->ndpi_flow->protos.softether.fqdn);
   }
+  /* NATPMP */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_NATPMP)) {
+    flow->info_type = INFO_NATPMP;
+    flow->natpmp.result_code = flow->ndpi_flow->protos.natpmp.result_code;
+    flow->natpmp.internal_port = flow->ndpi_flow->protos.natpmp.internal_port;
+    flow->natpmp.external_port = flow->ndpi_flow->protos.natpmp.external_port;
+    inet_ntop(AF_INET, &flow->ndpi_flow->protos.natpmp.external_address.ipv4, &flow->natpmp.ip[0], sizeof(flow->natpmp.ip));
+  }
   /* DISCORD */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DISCORD) && !is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) &&
           flow->ndpi_flow->protos.discord.client_ip[0] != '\0') {

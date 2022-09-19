@@ -1475,6 +1475,13 @@ struct ndpi_flow_struct {
       char platform[32];
       char services[48];
     } tivoconnect;
+
+    struct {
+      u_int16_t result_code;
+      u_int16_t internal_port;
+      u_int16_t external_port;
+      ndpi_ip_addr_t external_address;
+    } natpmp;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/

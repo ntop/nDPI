@@ -167,6 +167,7 @@ enum info_type {
     INFO_FTP_IMAP_POP_SMTP,
     INFO_TLS_QUIC_ALPN_VERSION,
     INFO_TLS_QUIC_ALPN_ONLY,
+    INFO_NATPMP,
 };
 
 // flow tracking
@@ -241,6 +242,12 @@ typedef struct ndpi_flow_info {
       char platform[32];
       char services[48];
     } tivoconnect;
+    struct  {
+      uint16_t result_code;
+      uint16_t internal_port;
+      uint16_t external_port;
+      char ip[16];
+    } natpmp;
   };
 
   ndpi_serializer ndpi_flow_serializer;
