@@ -40,7 +40,6 @@
 #include <ws2tcpip.h>
 #include <process.h>
 #include <io.h>
-#define getopt getopt____
 #else
 #include <unistd.h>
 #include <netinet/in.h>
@@ -58,7 +57,9 @@
 #include <math.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifndef _MSC_BUILD
 #include <libgen.h>
+#endif
 #include <errno.h>
 
 #include "reader_util.h"
@@ -5000,8 +5001,9 @@ void compressedBitmapUnitTest() {
 void zscoreUnitTest() {
   u_int32_t values[] = { 1, 3, 3, 4, 5, 2, 6, 7, 30, 16 };
   u_int32_t i;
-  u_int32_t num_outliers, num = sizeof(values) / sizeof(u_int32_t);
-  bool outliers[num], do_trace = false;
+  u_int32_t num_outliers;
+  u_int32_t const num = NDPI_ARRAY_LENGTH(values);
+  bool outliers[NDPI_ARRAY_LENGTH(values)], do_trace = false;
 
   num_outliers = ndpi_find_outliers(values, outliers, num);
 
@@ -5018,11 +5020,7 @@ void zscoreUnitTest() {
 /**
    @brief MAIN FUNCTION
 **/
-#ifdef APP_HAS_OWN_MAIN
-int original_main(int argc, char **argv) {
-#else
   int main(int argc, char **argv) {
-#endif
     int i, skip_unit_tests = 0;
 
 #ifdef DEBUG_TRACE
@@ -5130,7 +5128,20 @@ int original_main(int argc, char **argv) {
     return 0;
   }
 
-#ifdef WIN32
+#ifdef _MSC_BUILD
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
+  if (AttachConsole(ATTACH_PARENT_PROCESS)) {
+    freopen("CONIN$", "r", stdin);
+    freopen("CONOUT$", "w", stdout);
+    freopen("CONOUT$", "w", stderr);
+  }
+
+  return main(__argc, __argv);
+}
+#endif
+
+#if defined(WIN32) && !defined(_MSC_BUILD)
 #ifndef __GNUC__
 #define EPOCHFILETIME (116444736000000000i64)
 #else
