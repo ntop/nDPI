@@ -48,8 +48,18 @@ Remember to use `gmake` and not `make` on FreeBSD
 On MacOS:
 - brew install coreutils gcc git gettext flex bison libtool autoconf automake pkg-config libpcap json-c pcre2 libmaxminddb rrdtool
 
-On Windows (assuming [MSYS2](https://www.msys2.org/) already installed):
-- msys2 -c "pacman --noconfirm -S --needed --overwrite '\*' git mingw-w64-x86\_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86\_64-json-c mingw-w64-x86\_64-crt-git mingw-w64-x86\_64-pcre mingw-w64-x86\_64-libpcap"
+On Windows:
+
+There are three supported ways to build nDPI:
+
+1. MSYS2 (assuming [MSYS2](https://www.msys2.org/) already installed):
+  - msys2 -c "pacman --noconfirm -S --needed --overwrite '\*' git mingw-w64-x86\_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86\_64-json-c mingw-w64-x86\_64-crt-git mingw-w64-x86\_64-pcre mingw-w64-x86\_64-libpcap"
+
+2. Mingw-w64
+
+3. Visual Studio (see `windows/nDPI.sln`)
+
+Note: All Windows versions require [npcap](https://npcap.com/#download) with WinPcap compatibility mode enabled.
 
 ### How To Build The Documentation
 

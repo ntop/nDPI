@@ -20,8 +20,20 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Build solution for debug
+      - name: Download NuGet packages
+        run: msbuild windows/nDPI.sln -t:restore -p:RestorePackagesConfig=true
+
+      - name: Build libnDPI only (debug)
         run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug
+
+      - name: Download Npcap
+        run: Invoke-WebRequest -Uri 'https://npcap.com/dist/npcap-1.71.exe' -OutFile 'C:\npcap-1.71.exe'
+
+      - name: Install Npcap
+        run: C:\npcap-1.71.exe /S /winpcap_mode=yes
+
+      - name: Build ndpiReader (debug)
+        run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug-ndpiReader
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2

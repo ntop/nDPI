@@ -231,6 +231,8 @@
     <ClCompile Include="..\src\lib\protocols\syncthing.c" />
     <ClCompile Include="..\src\lib\protocols\natpmp.c" />
     <ClCompile Include="..\src\lib\protocols\crynet.c" />
+    <ClCompile Include="..\example\ndpiReader.c" />
+    <ClCompile Include="..\example\reader_util.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\lib\protocols\btlib.h" />
@@ -288,10 +290,12 @@
     </ClInclude>
     <ClInclude Include="src\ndpi_config.h" />
     <ClInclude Include="src\ndpi_define.h" />
+    <ClInclude Include="..\example\reader_util.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\lib\ndpi_content_match.c.inc" />
     <None Include="..\.github\workflows\build-msbuild.yml" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="third_party">
