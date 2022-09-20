@@ -6,6 +6,14 @@ udp:5061-5062@SIP
 tcp:860,udp:860,tcp:3260,udp:3260@iSCSI
 tcp:3000@ntop
 
+#
+# nBPF filters (https://github.com/ntop/PF_RING/tree/dev/userland/nbpf))
+#
+# NOTE: they are evaluated in the same order they are defined !
+#
+nbpf:"host 192.168.1.1 and port 80"@HomeRouter
+
+
 #  Subprotocols
 #  Format:
 #  host:"<value>",host:"<value>",.....@<subproto>

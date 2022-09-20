@@ -1240,6 +1240,7 @@ struct ndpi_detection_module_struct {
   const struct ndpi_flow_input_info *input_info;
 
 #ifdef HAVE_NBPF
+  u_int8_t num_nbpf_custom_proto;
   nbpf_filter nbpf_custom_proto[MAX_NBPF_CUSTOM_PROTO];
 #endif
 };

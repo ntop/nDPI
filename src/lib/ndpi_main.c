@@ -3103,6 +3103,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
         ndpi_free(ndpi_str->proto_defaults[i].subprotocols);
     }
 
+    for(i = 0; (i < MAX_NBPF_CUSTOM_PROTO) && (ndpi_str->nbpf_custom_proto[i].tree != NULL); i++)
+      nbpf_free(ndpi_str->nbpf_custom_proto[i].tree);
+    
     /* NDPI_PROTOCOL_TINC */
     if(ndpi_str->tinc_cache)
       cache_free((cache_t)(ndpi_str->tinc_cache));
@@ -3617,6 +3620,37 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
 	value[max_len] = '\0'; /* remove trailing " */
 
       for(i=0; i<max_len; i++) value[i] = tolower(value[i]);
+    } else if(strncmp(attr, "nbpf:", 5) == 0) {
+#ifdef HAVE_NBPF
+      char *filter = &attr[5];
+
+      if(ndpi_str->num_nbpf_custom_proto >= MAX_NBPF_CUSTOM_PROTO) {
+	NDPI_LOG_ERR(ndpi_str, "nBPF: too many protocols");
+	return(-4); /* Too many protocols */
+      }
+      
+      if(filter[0] == '"') {
+	u_int len;
+	
+	filter = &filter[1];
+	len = strlen(filter);
+
+	if(len > 0)
+	  filter[len-1] = '\0';
+      }
+
+      if((ndpi_str->nbpf_custom_proto[ndpi_str->num_nbpf_custom_proto].tree =
+	  nbpf_parse(filter, NULL)) == NULL) {
+	NDPI_LOG_ERR(ndpi_str, "nBPF invalid filter: %s", filter)
+	return(-5); /* Invalid filter */
+      } else
+	ndpi_str->nbpf_custom_proto[ndpi_str->num_nbpf_custom_proto].l7_protocol = subprotocol_id;
+
+    ndpi_str->num_nbpf_custom_proto++;
+#else
+      NDPI_LOG_ERR(ndpi_str, "nDPI compiled without nBPF support: skipping rule");
+      return(-6);
+#endif
     }
 
     if(is_tcp || is_udp) {
@@ -3899,6 +3933,9 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
 
   IP based Subprotocols Format (<value> is IP or CIDR):
   ip:<value>,ip:<value>,.....@<subproto>
+
+  nBPF-based Filters
+  nbpf:"<nBPF filter>@<proto>
 
   Example:
   tcp:80,tcp:3128@HTTP
@@ -6262,12 +6299,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 #ifdef HAVE_NBPF
   if((flow->num_processed_pkts == 1) /* first packet of this flow to be analyzed */
      && (ndpi_str->nbpf_custom_proto[0].tree != NULL)) {
-#if 0
-    const char *filter = "tcp and port 80";
-    nbpf_tree_t *tree  = nbpf_parse(filter, NULL);
-
-    nbpf_free(tree);
-#endif
     u_int8_t i;
     nbpf_pkt_info_t t;
 
@@ -6286,9 +6317,12 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     }
 
     t.tuple.l3_proto = flow->l4_proto;
-    t.tuple.l4_src_port = packet->tcp ? packet->tcp->source : packet->udp->source;
-    t.tuple.l4_dst_port = packet->tcp ? packet->tcp->dest : packet->udp->dest;
 
+    if(packet->tcp)
+      t.tuple.l4_src_port = packet->tcp->source, t.tuple.l4_dst_port = packet->tcp->dest;
+    else if(packet->udp)
+      t.tuple.l4_src_port = packet->udp->source, t.tuple.l4_dst_port = packet->udp->dest;    
+    
     for(i=0; (i<MAX_NBPF_CUSTOM_PROTO) && (ndpi_str->nbpf_custom_proto[i].tree != NULL); i++) {
       if(nbpf_match(ndpi_str->nbpf_custom_proto[i].tree, &t)) {
 	/* match found */
