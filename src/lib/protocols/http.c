@@ -335,22 +335,12 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
 					 struct ndpi_flow_struct *flow,
 					 u_int16_t http_protocol,
 					 ndpi_protocol_category_t category) {
-  u_int16_t master_protocol, app_protocol;
+  u_int16_t master_protocol;
 
 #ifdef HTTP_DEBUG
   printf("=> %s()\n", __FUNCTION__);
 #endif
 
-  app_protocol = flow->guessed_protocol_id_by_ip;
-  /* If no custom protocol has been detected */
-  if((app_protocol == NDPI_PROTOCOL_UNKNOWN)
-     || ((http_protocol != NDPI_PROTOCOL_HTTP) &&
-         (http_protocol != NDPI_PROTOCOL_HTTP_CONNECT) &&
-         (http_protocol != NDPI_PROTOCOL_HTTP_PROXY))
-     )
-    app_protocol = http_protocol;
-
-  // ndpi_int_reset_protocol(flow);
   master_protocol = NDPI_PROTOCOL_HTTP;
   if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
     master_protocol = flow->detected_protocol_stack[1];
@@ -363,7 +353,7 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
      sub-protocol via the (content-matched) subprotocols logic (i.e.
      MPEGDASH, SOAP, ....) */
   if(flow->detected_protocol_stack[1] == 0)
-    ndpi_set_detected_protocol(ndpi_struct, flow, app_protocol,
+    ndpi_set_detected_protocol(ndpi_struct, flow, http_protocol,
 			       master_protocol,
 			       NDPI_CONFIDENCE_DPI);
 

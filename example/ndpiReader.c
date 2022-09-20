@@ -737,7 +737,7 @@ void extcap_capture() {
 void printCSVHeader() {
   if(!csv_fp) return;
 
-  fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,duration,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,server_name_sni,");
+  fprintf(csv_fp, "#flow_id,protocol,first_seen,last_seen,duration,src_ip,src_port,dst_ip,dst_port,ndpi_proto_num,ndpi_proto,proto_by_ip,server_name_sni,");
   fprintf(csv_fp, "c_to_s_pkts,c_to_s_bytes,c_to_s_goodput_bytes,s_to_c_pkts,s_to_c_bytes,s_to_c_goodput_bytes,");
   fprintf(csv_fp, "data_ratio,str_data_ratio,c_to_s_goodput_ratio,s_to_c_goodput_ratio,");
 
@@ -1284,9 +1284,11 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
             ndpi_protocol2id(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                              flow->detected_protocol, buf, sizeof(buf)));
 
-    fprintf(csv_fp, "%s,%s,",
+    fprintf(csv_fp, "%s,%s,%s,",
             ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                                flow->detected_protocol, buf, sizeof(buf)),
+            ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                flow->detected_protocol.protocol_by_ip),
             flow->host_server_name);
 
     fprintf(csv_fp, "%u,%llu,%llu,", flow->src2dst_packets,
@@ -1401,11 +1403,14 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->tunnel_type != ndpi_no_tunnel)
       fprintf(out, "%s:", ndpi_tunnel2str(flow->tunnel_type));
 
-    fprintf(out, "%s/%s]",
+    fprintf(out, "%s/%s][IP: %u/%s]",
 	    ndpi_protocol2id(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			     flow->detected_protocol, buf, sizeof(buf)),
 	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-			       flow->detected_protocol, buf1, sizeof(buf1)));
+			       flow->detected_protocol, buf1, sizeof(buf1)),
+	    flow->detected_protocol.protocol_by_ip,
+	    ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+				flow->detected_protocol.protocol_by_ip));
 
     fprintf(out, "[%s]",
 	    ndpi_is_encrypted_proto(ndpi_thread_info[thread_id].workflow->ndpi_struct,

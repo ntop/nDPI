@@ -21,4 +21,4 @@ Patricia protocols:   2/0 (search/found)
 
 HTTP	1	58	1
 
-	1	TCP 192.168.1.1:31337 -> 192.168.1.2:80 [proto: 7/HTTP][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.1.1:31337 -> 192.168.1.2:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

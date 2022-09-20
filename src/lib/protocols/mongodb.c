@@ -58,7 +58,7 @@ static void set_mongodb_detected(struct ndpi_detection_module_struct *ndpi_struc
     /* If no custom protocol has been detected */
     /* if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) */
     ndpi_int_reset_protocol(flow);
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MONGODB, flow->guessed_protocol_id_by_ip, NDPI_CONFIDENCE_DPI);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MONGODB, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   }
 }
 
