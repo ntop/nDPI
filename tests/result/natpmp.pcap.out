@@ -1,9 +1,8 @@
-Guessed flow protos:	1
+Guessed flow protos:	3
 
-DPI Packets (UDP):	3	(1.00 pkts/flow)
-Confidence Match by port    : 1 (flows)
-Confidence DPI              : 2 (flows)
-Num dissector calls: 108 (36.00 diss/flow)
+DPI Packets (UDP):	7	(2.33 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 3 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -22,6 +21,6 @@ Patricia protocols:   6/0 (search/found)
 
 NAT-PMP	7	368	3
 
-	1	UDP 192.168.2.100:35763 -> 192.168.2.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][4 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 192.168.2.100:59817 -> 192.168.2.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/108 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][0.25 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	3	UDP 192.168.2.100:36845 -> 192.168.2.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.2.100:35763 -> 192.168.2.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][4 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][< 1 sec][Result: 0][Internal Port: 22000][External Port: 20216][External Address: 0.0.0.0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.2.100:59817 -> 192.168.2.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/108 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][0.25 sec][Result: 0][Internal Port: 22000][External Port: 6243][External Address: 0.0.0.0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.2.100:36845 -> 192.168.2.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/44 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

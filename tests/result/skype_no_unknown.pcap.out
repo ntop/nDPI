@@ -1,7 +1,7 @@
-Guessed flow protos:	68
+Guessed flow protos:	69
 
 DPI Packets (TCP):	1080	(14.21 pkts/flow)
-DPI Packets (UDP):	285	(1.53 pkts/flow)
+DPI Packets (UDP):	288	(1.55 pkts/flow)
 DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 44 (flows)
 Confidence Match by port    : 22 (flows)
@@ -108,7 +108,7 @@ JA3 Host Stats:
 	64	UDP 192.168.1.34:13021 -> 174.49.171.224:32011 [proto: 125.38/Skype_Teams.Skype_TeamsCall][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VoIP/10][5 pkts/300 bytes -> 0 pkts/0 bytes][Goodput ratio: 30/0][20.15 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	65	UDP 192.168.1.34:57694 <-> 192.168.1.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/101 bytes <-> 1 pkts/166 bytes][Goodput ratio: 58/74][0.05 sec][Hostname/SNI: db3msgr5011709.gateway.messenger.live.com][::][PLAIN TEXT (MSGR5011709)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	66	UDP [fe80::c62c:3ff:fe06:49fe]:5353 -> [ff02::fb]:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/258 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][0.16 sec][Hostname/SNI: lucas-imac.local][lucas-imac.local][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	67	UDP 192.168.1.34:59052 -> 192.168.1.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][4 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][1.83 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	67	UDP 192.168.1.34:59052 -> 192.168.1.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][4 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][1.83 sec][Result: 0][Internal Port: 13021][External Port: 13021][External Address: 0.0.0.0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	68	UDP 192.168.1.92:138 -> 192.168.1.255:138 [proto: 10.16/NetBIOS.SMBv1][IP: 0/Unknown][ClearText][Confidence: DPI][cat: System/18][1 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][Hostname/SNI: lucas-imac][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT ( EMFFEDEBFDCNEJENEBEDCACACACACA)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	69	TCP 192.168.1.34:51283 <-> 111.221.74.48:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/132 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.30 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	70	UDP 192.168.1.34:59788 <-> 192.168.1.1:53 [proto: 5.125/DNS.Skype_Teams][IP: 0/Unknown][ClearText][Confidence: DPI][cat: VoIP/10][1 pkts/82 bytes <-> 1 pkts/98 bytes][Goodput ratio: 48/57][0.06 sec][Hostname/SNI: e4593.g.akamaiedge.net][23.206.33.166][PLAIN TEXT (akamaiedge)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
