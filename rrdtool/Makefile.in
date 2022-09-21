@@ -3,7 +3,7 @@ INC=-I ../src/include -I/usr/local/include
 LIBDPI=../src/lib/libndpi.a
 CFLAGS+=@NDPI_CFLAGS@
 LDFLAGS+=@NDPI_LDFLAGS@
-LIB=$(LIBDPI) -lm @ADDITIONAL_LIBS@ @LIBRRD@ @LIBS@
+LIB=$(LIBDPI) -lm @ADDITIONAL_LIBS@ @LIBRRD@ @LIBS@ -lpthread
 
 TOOLS=rrd_anomaly rrd_similarity
 
