@@ -13,6 +13,9 @@ AS_IF([test "${with_only_libndpi+set}" = set],[
   EXTRA_TARGETS=""
 ])
 
+PWD=`pwd`
+
+
 AC_ARG_WITH(sanitizer,     AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_WITH(thread-sanitizer, AS_HELP_STRING([--with-thread-sanitizer], [Build with support for thread sanitizer]))
 AC_ARG_WITH(memory-sanitizer, AS_HELP_STRING([--with-memory-sanitizer], [Build with support for memory sanitizer]))
@@ -22,6 +25,7 @@ AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate 
 AC_ARG_WITH(local-libgcrypt,  AS_HELP_STRING([--with-local-libgcrypt], [Build with libgcrypt (if present) instead of the enclosed gcrypt light]))
 AC_ARG_ENABLE(tls-sigs, AS_HELP_STRING([--enable-tls-sigs], [Enable TLS Client signature algorithm dissection. Rarely used, but requires significantly more memory.]))
 AC_ARG_ENABLE(npcap, AS_HELP_STRING([--disable-npcap], [msys2 only: Disable linkage against the wpcap/npcap import library in windows/WpdPack/Lib.]))
+AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom path; default: ${PWD}/../PF_RING/userland/nbpf]),[NBPF_HOME=$withval],[NBPF_HOME=${PWD}/../PF_RING/userland/nbpf])
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
@@ -72,7 +76,6 @@ LT_INIT
 LT_LIB_M
 PKG_PROG_PKG_CONFIG
 
-PWD=`pwd`
 AC_PROG_CC
 
 SYSTEM=`uname -s`
@@ -198,14 +201,15 @@ fi
 
 MACHINE=`uname -m`
 
-AC_MSG_CHECKING([PF_RING nBPF])
-NBPF_HOME=${PWD}/../PF_RING/userland/nbpf
+NBPF_ENABLED=0
+AC_MSG_CHECKING([PF_RING nBPF ($NBPF_HOME)])
 LIBNBPF=${NBPF_HOME}/libnbpf.a
 if test -f ${LIBNBPF}; then :
    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} ${LIBNBPF}"
    ADDITIONAL_INCS="${ADDITIONAL_INCS} -I${NBPF_HOME}"
    AC_DEFINE_UNQUOTED(HAVE_NBPF, "1", [PF_RING nBPF is present])
    AC_MSG_RESULT(yes)
+   NBPF_ENABLED=1
 else
    AC_MSG_RESULT(no)
 fi
@@ -388,6 +392,7 @@ AC_SUBST(GPROF_LIBS)
 AC_SUBST(GPROF_ENABLED)
 AC_SUBST(USE_HOST_LIBGCRYPT)
 AC_SUBST(PCRE_ENABLED)
+AC_SUBST(NBPF_ENABLED)
 AC_SUBST(HANDLE_TLS_SIGS)
 AC_SUBST(DISABLE_NPCAP)
 AC_SUBST(EXE_SUFFIX)

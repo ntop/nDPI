@@ -169,7 +169,7 @@ jobs:
           git diff-index --quiet HEAD -- || true
 
   test:
-    name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }}
+    name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }}
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
@@ -184,6 +184,7 @@ jobs:
         pcre: [""]
         maxminddb: [""]
         msan: [""]
+        nBPF: [""]
         include:
           - compiler: "gcc-7"
             os: ubuntu-latest
@@ -192,6 +193,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
+            nBPF: ""
           - compiler: "gcc-11"
             os: ubuntu-latest
             arch: "x86_64"
@@ -199,6 +201,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
+            nBPF: ""
           - compiler: "clang-7"
             os: ubuntu-latest
             arch: "x86_64"
@@ -206,6 +209,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
+            nBPF: ""
           - compiler: "clang-14"
             os: ubuntu-22.04
             arch: "x86_64"
@@ -213,6 +217,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
+            nBPF: ""
           - compiler: "cc"
             os: ubuntu-latest
             arch: "x86_64"
@@ -220,6 +225,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
+            nBPF: ""
           - compiler: "cc"
             os: ubuntu-latest
             arch: "x86_64"
@@ -227,6 +233,15 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-thread-sanitizer"
+            nBPF: ""
+          - compiler: "cc"
+            os: ubuntu-latest
+            arch: "x86_64"
+            gcrypt: ""
+            pcre: "--with-pcre"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
+            nBPF: "nBPF"
           - compiler: "clang-14"
             os: ubuntu-22.04
             arch: "x86_64"
@@ -234,6 +249,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-memory-sanitizer"
+            nBPF: ""
           - compiler: "cc"
             os: ubuntu-latest
             arch: "x86_64"
@@ -241,6 +257,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
+            nBPF: ""
           - compiler: "cc"
             os: macOS-latest
             arch: "x86_64"
@@ -248,6 +265,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on macos
+            nBPF: ""
           - compiler: "cc"
             os: macos-12
             arch: "x86_64"
@@ -255,6 +273,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on macos
+            nBPF: ""
           - compiler: "cc"
             os: ubuntu-latest
             arch: "arm64"
@@ -262,6 +281,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on arm64
+            nBPF: ""
           - compiler: "cc"
             os: ubuntu-latest
             arch: "armhf"
@@ -269,6 +289,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
+            nBPF: ""
           - compiler: "cc"
             os: ubuntu-latest
             arch: "s390x"
@@ -276,6 +297,7 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: ""
+            nBPF: ""
     steps:
       - name: Setup multiarch/qemu-user-static
         if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.arch, 'x86_64')
@@ -304,6 +326,14 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.maxminddb, '--with-maxminddb')
         run: |
           sudo apt-get install libmaxminddb-dev
+      - name: Install Ubuntu Prerequisites (nBPF)
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.nBPF, 'nBPF')
+        run: |
+          git clone https://github.com/ntop/PF_RING.git ../PF_RING
+          cd ../PF_RING/userland/nbpf
+          ./configure
+          make
+          cd -
       - name: Setup Ubuntu specified compiler (gcc)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'gcc')
         run: |
@@ -428,7 +458,7 @@ jobs:
           make dist
           ./utils/verify_dist_tarball.sh
       - name: Build nDPI [Mingw-w64] (runs only on ubuntu jobs)
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.nBPF, 'nBPF')
         run: |
           make distclean
           ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --host=x86_64-w64-mingw32
