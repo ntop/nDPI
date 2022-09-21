@@ -150,7 +150,7 @@ static int ndpi_search_natpmp_extra(struct ndpi_detection_module_struct *ndpi_st
     case NATPMP_RESPONSE_TCP_MAPPING:
     {
       flow->protos.natpmp.internal_port = ntohs(get_u_int16_t(packet->payload, 8));
-      flow->protos.natpmp.external_port = ntohs(get_u_int16_t(packet->payload, 12));
+      flow->protos.natpmp.external_port = ntohs(get_u_int16_t(packet->payload, 10));
       if (flow->protos.natpmp.internal_port == 0 || flow->protos.natpmp.external_port == 0)
       {
         ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Port Mapping Response: Internal/External port must not 0");
