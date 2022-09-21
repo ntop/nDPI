@@ -3627,7 +3627,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
       char *filter = &attr[5];
 
       if(ndpi_str->num_nbpf_custom_proto >= MAX_NBPF_CUSTOM_PROTO) {
-	NDPI_LOG_ERR(ndpi_str, "nBPF: too many protocols");
+	NDPI_LOG_ERR(ndpi_str, "nBPF: too many protocols\n");
 	return(-4); /* Too many protocols */
       }
       
@@ -3643,14 +3643,14 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
 
       if((ndpi_str->nbpf_custom_proto[ndpi_str->num_nbpf_custom_proto].tree =
 	  nbpf_parse(filter, NULL)) == NULL) {
-	NDPI_LOG_ERR(ndpi_str, "nBPF invalid filter: %s", filter)
+	NDPI_LOG_ERR(ndpi_str, "nBPF invalid filter: %s\n", filter)
 	return(-5); /* Invalid filter */
       } else
 	ndpi_str->nbpf_custom_proto[ndpi_str->num_nbpf_custom_proto].l7_protocol = subprotocol_id;
 
     ndpi_str->num_nbpf_custom_proto++;
 #else
-      NDPI_LOG_ERR(ndpi_str, "nDPI compiled without nBPF support: skipping rule");
+      NDPI_LOG_INFO(ndpi_str, "nDPI compiled without nBPF support: skipping rule\n");
       return(-6);
 #endif
     }

@@ -23,6 +23,8 @@ EXE_SUFFIX=@EXE_SUFFIX@
 GPROF_ENABLED=@GPROF_ENABLED@
 PCRE_ENABLED=@PCRE_ENABLED@
 PCRE_PCAPS="WebattackRCE.pcap"
+NBPF_ENABLED=@NBPF_ENABLED@
+NBPF_PCAPS="h323-overflow.pcap"
 READER="${CMD_PREFIX} ../example/ndpiReader${EXE_SUFFIX} -A -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv"
 
 RC=0
@@ -74,6 +76,14 @@ check_results() {
 	    SKIP_PCAP=0
 	    if [ $PCRE_ENABLED -eq 0 ]; then
 	      for p in $PCRE_PCAPS; do
+	        if [ $f = $p ]; then
+	          SKIP_PCAP=1
+	          break
+	        fi
+	      done
+	    fi
+	    if [ $NBPF_ENABLED -eq 0 ]; then
+	      for p in $NBPF_PCAPS; do
 	        if [ $f = $p ]; then
 	          SKIP_PCAP=1
 	          break
