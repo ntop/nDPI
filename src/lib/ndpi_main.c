@@ -3103,8 +3103,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
         ndpi_free(ndpi_str->proto_defaults[i].subprotocols);
     }
 
+#ifdef HAVE_NBPF
     for(i = 0; (i < MAX_NBPF_CUSTOM_PROTO) && (ndpi_str->nbpf_custom_proto[i].tree != NULL); i++)
       nbpf_free(ndpi_str->nbpf_custom_proto[i].tree);
+#endif
     
     /* NDPI_PROTOCOL_TINC */
     if(ndpi_str->tinc_cache)
