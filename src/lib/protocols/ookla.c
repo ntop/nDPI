@@ -56,9 +56,6 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
 	 && (packet->payload[2] == 0x0A)) {	
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	
-	if(ndpi_struct->ookla_cache == NULL)
-	  ndpi_struct->ookla_cache = ndpi_lru_cache_init(1024);
-	
 	if(ndpi_struct->ookla_cache != NULL) {
 	  /* In order to avoid creating an IPv6 LRU we hash the IPv6 address */
 	  h = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_dst, sizeof(packet->iphv6->ip6_dst));

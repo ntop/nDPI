@@ -1171,9 +1171,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       ookla_found:
         ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_WEB);
 
-	if(ndpi_struct->ookla_cache == NULL)
-	  ndpi_struct->ookla_cache = ndpi_lru_cache_init(1024);
-
 	if(ndpi_struct->ookla_cache != NULL) {
 	  if(packet->iph != NULL) {
 	    if(packet->tcp->source == htons(8080))

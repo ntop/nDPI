@@ -28,8 +28,6 @@
 
 static void cacheMiningHostTwins(struct ndpi_detection_module_struct *ndpi_struct,
 				 u_int32_t host_keys /* network byte order */) {
-  if(ndpi_struct->mining_cache == NULL) ndpi_struct->mining_cache = ndpi_lru_cache_init(1024);
-  
   if(ndpi_struct->mining_cache)
     ndpi_lru_add_to_cache(ndpi_struct->mining_cache, host_keys, NDPI_PROTOCOL_MINING);
 }
