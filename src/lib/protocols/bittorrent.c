@@ -118,9 +118,6 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     flow->extra_packets_func = search_bittorrent_again;
   }
   
-  if(ndpi_struct->bittorrent_cache == NULL)
-    ndpi_struct->bittorrent_cache = ndpi_lru_cache_init(32768);
-
   if(ndpi_struct->bittorrent_cache && packet->iph) {
     u_int32_t key1, key2, i;
 

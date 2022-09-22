@@ -58,9 +58,6 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
       app_proto = NDPI_PROTOCOL_FACEBOOK_VOIP;
   }
 
-  if(ndpi_struct->stun_cache == NULL)
-    ndpi_struct->stun_cache = ndpi_lru_cache_init(1024);
-
   if(ndpi_struct->stun_cache
      && packet->iph
      && (app_proto != NDPI_PROTOCOL_UNKNOWN)
