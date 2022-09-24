@@ -536,6 +536,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 						     NDPI_PROTOCOL_DNS);
 
       /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
+      flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
 
       if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
 	ret.master_protocol = checkDNSSubprotocol(s_port, d_port);
