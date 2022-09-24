@@ -22,5 +22,5 @@ Patricia protocols:   4/4 (search/found)
 
 H323	12	1825	2
 
-	1	UDP 17.2.0.124:2034 <-> 17.2.0.161:1719 [proto: 158/H323][IP: 0/Unknown][ClearText][Confidence: DPI][cat: VoIP/10][3 pkts/665 bytes <-> 7 pkts/853 bytes][Goodput ratio: 81/65][80.21 sec][bytes ratio: -0.124 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 247/336 288/13362 330/70142 42/25418][Pkt Len c2s/s2c min/avg/max/stddev: 80/67 222/122 411/176 139/48][PLAIN TEXT (@333333330)][Plen Bins: 20,20,10,10,30,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 17.2.0.124:2034 <-> 17.2.0.161:1719 [proto: 158/H323][IP: 140/Apple][ClearText][Confidence: DPI][cat: VoIP/10][3 pkts/665 bytes <-> 7 pkts/853 bytes][Goodput ratio: 81/65][80.21 sec][bytes ratio: -0.124 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 247/336 288/13362 330/70142 42/25418][Pkt Len c2s/s2c min/avg/max/stddev: 80/67 222/122 411/176 139/48][PLAIN TEXT (@333333330)][Plen Bins: 20,20,10,10,30,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 17.2.0.124:3032 <-> 17.2.0.122:1720 [proto: 158/H323][IP: 140/Apple][ClearText][Confidence: DPI][cat: VoIP/10][1 pkts/207 bytes <-> 1 pkts/100 bytes][Goodput ratio: 74/46][0.06 sec][PLAIN TEXT (5295672)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
