@@ -6253,6 +6253,8 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
     flow->guessed_protocol_id      = (int16_t) ndpi_guess_protocol_id(ndpi_str, flow, flow->l4_proto, ntohs(flow->c_port), ntohs(flow->s_port), &user_defined_proto);
     flow->guessed_protocol_id_by_ip = ndpi_guess_host_protocol_id(ndpi_str, flow);
 
+    ret->protocol_by_ip = flow->guessed_protocol_id_by_ip;
+
     if(ndpi_str->custom_categories.categories_loaded && packet->iph) {
       if(ndpi_str->ndpi_num_custom_protocols != 0)
 	ndpi_fill_ip_protocol_category(ndpi_str, flow->c_address.v4, flow->s_address.v4, ret);
