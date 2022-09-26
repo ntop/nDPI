@@ -53,32 +53,6 @@ static u_int8_t isHangoutTCPPort(u_int16_t port) {
     return(0);
 }
 
-/* ******************************************* */
-
-static u_int8_t google_ptree_match(struct ndpi_detection_module_struct *ndpi_struct, struct in_addr *pin) {
-  return((ndpi_network_ptree_match(ndpi_struct, pin) == NDPI_PROTOCOL_GOOGLE) ? 1 : 0);
-}
-
-/* ******************************************* */
-
-static u_int8_t is_google_flow(struct ndpi_detection_module_struct *ndpi_struct,
-			       struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  
-  if(packet->iph) {
-    struct in_addr saddr, daddr;
-
-    saddr.s_addr = packet->iph->saddr, daddr.s_addr = packet->iph->daddr;
-    
-    if(google_ptree_match(ndpi_struct, &saddr)
-       || google_ptree_match(ndpi_struct, &daddr)) {
-      return(1);
-    }
-  }
-
-  return(0);
-}
-
 /* ***************************************************************** */
 
 void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
@@ -87,13 +61,13 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "search Hangout\n");
 
-  if((packet->payload_packet_len > 24) && is_google_flow(ndpi_struct, flow)) {
+  if((packet->payload_packet_len > 24) && flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_GOOGLE) {
     int matched_src = 0;
     if(
        ((packet->udp != NULL) && (matched_src = isHangoutUDPPort(ntohs(packet->udp->source))
 				  || isHangoutUDPPort(ntohs(packet->udp->dest))))
        ||
-       ((packet->tcp != NULL) && (isHangoutTCPPort(ntohs(packet->tcp->source))
+       ((packet->tcp != NULL) && (matched_src = isHangoutTCPPort(ntohs(packet->tcp->source))
 				  || isHangoutTCPPort(ntohs(packet->tcp->dest))))) {
       NDPI_LOG_INFO(ndpi_struct, "found Hangout\n");
 
@@ -125,7 +99,7 @@ void init_hangout_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
   ndpi_set_bitmask_protocol_detection("GoogleHangout", ndpi_struct, detection_bitmask, *id,
 				      NDPI_PROTOCOL_HANGOUT_DUO,
 				      ndpi_search_hangout,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION, /* TODO: IPv6? */
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

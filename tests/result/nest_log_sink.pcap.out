@@ -19,7 +19,7 @@ Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   28/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   39/25 (search/found)
+Patricia protocols:   15/13 (search/found)
 
 DNS	15	1612	1
 NestLogSink	759	116848	13

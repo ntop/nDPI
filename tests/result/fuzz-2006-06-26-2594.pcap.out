@@ -21,7 +21,7 @@ Automa risk mask:     38/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   458/0 (search/found)
 Patricia risk:        26/0 (search/found)
-Patricia protocols:   572/0 (search/found)
+Patricia protocols:   502/0 (search/found)
 
 Unknown	30	3356	30
 FTP_CONTROL	36	2569	12
