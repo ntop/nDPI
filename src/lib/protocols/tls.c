@@ -801,7 +801,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
       SHA1Final(flow->protos.tls_quic.sha1_certificate_fingerprint, &srv_cert_fingerprint_ctx);
 
-      flow->l4.tcp.tls.fingerprint_set = 1;
+      flow->protos.tls_quic.fingerprint_set = 1;
 
       uint8_t * sha1 = flow->protos.tls_quic.sha1_certificate_fingerprint;
       const size_t sha1_siz = sizeof(flow->protos.tls_quic.sha1_certificate_fingerprint);
@@ -869,9 +869,10 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
 	   (packet->payload[0] == 0x01) ? "Client" : "Server");
 #endif
 
-    if((flow->protos.tls_quic.ssl_version >= 0x0304 /* TLS 1.3 */)
+    /* Not support for DTLS 1.3 yet, then certificates are always visible in DTLS */
+    if((packet->tcp && flow->protos.tls_quic.ssl_version >= 0x0304 /* TLS 1.3 */)
        && (packet->payload[0] == 0x02 /* Server Hello */)) {
-      flow->l4.tcp.tls.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
+      flow->tls_quic.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
     }
 
     checkTLSSubprotocol(ndpi_struct, flow, packet->payload[0] == 0x01);
@@ -887,7 +888,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
         printf("[TLS] Error processing certificate: %d\n", ret);
 #endif
       }
-      flow->l4.tcp.tls.certificate_processed = 1;
+      flow->tls_quic.certificate_processed = 1;
     }
     break;
 
@@ -1013,7 +1014,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
     if((len > 9)
        && (content_type != 0x17 /* Application Data */)
-       && (!flow->l4.tcp.tls.certificate_processed)) {
+       && (!flow->tls_quic.certificate_processed)) {
       /* Split the element in blocks */
       u_int16_t processed = 5;
 
@@ -1060,9 +1061,9 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	   we are after the handshake. Stop extra processing */
 	flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
 	if(flow->l4.tcp.tls.app_data_seen[!packet->packet_direction] == 1)
-	  flow->l4.tcp.tls.certificate_processed = 1;
+	  flow->tls_quic.certificate_processed = 1;
 
-	if(flow->l4.tcp.tls.certificate_processed) {
+	if(flow->tls_quic.certificate_processed) {
 	  if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
 	    flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] =
 	      (packet->packet_direction == 0) ? (len-5) : -(len-5);
@@ -1093,7 +1094,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
      || ((ndpi_struct->num_tls_blocks_to_follow > 0)
 	 && (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->num_tls_blocks_to_follow))
      || ((ndpi_struct->num_tls_blocks_to_follow == 0)
-	 && (flow->l4.tcp.tls.certificate_processed == 1))
+	 && (flow->tls_quic.certificate_processed == 1))
      ) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] No more blocks\n");
@@ -1189,7 +1190,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
       processed += block_len + 13;
       /* DTLS mid session: no need to further inspect the flow */
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DTLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      flow->l4.tcp.tls.certificate_processed = 1; /* Fake, to avoid extra dissection */
+      flow->tls_quic.certificate_processed = 1; /* Fake, to avoid extra dissection */
       break;
     }
 
@@ -1206,7 +1207,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload = p;
   packet->payload_packet_len = p_len; /* Restore */
 
-  if(no_dtls || change_cipher_found || flow->l4.tcp.tls.certificate_processed) {
+  if(no_dtls || change_cipher_found || flow->tls_quic.certificate_processed) {
     NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
     flow->extra_packets_func = NULL;
     return(0); /* That's all */

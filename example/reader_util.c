@@ -1239,7 +1239,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.tls_quic.server_unsafe_cipher;
     flow->ssh_tls.server_cipher = flow->ndpi_flow->protos.tls_quic.server_cipher;
 
-    if(flow->ndpi_flow->l4.tcp.tls.fingerprint_set) {
+    if(flow->ndpi_flow->protos.tls_quic.fingerprint_set) {
       memcpy(flow->ssh_tls.sha1_cert_fingerprint,
 	     flow->ndpi_flow->protos.tls_quic.sha1_certificate_fingerprint, 20);
       flow->ssh_tls.sha1_cert_fingerprint_set = 1;

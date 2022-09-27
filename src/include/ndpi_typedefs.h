@@ -708,7 +708,6 @@ struct ndpi_flow_tcp_struct {
     message_t message[2]; /* Directions */
 
     /* NDPI_PROTOCOL_TLS */
-    u_int8_t certificate_processed:1, fingerprint_set:1, _pad:6;
     u_int8_t app_data_seen[2];
     u_int8_t num_tls_blocks;
     int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
@@ -1373,6 +1372,10 @@ struct ndpi_flow_struct {
     u_int16_t num_processed_pkts;
   } stun;
 
+  struct {
+    u_int8_t certificate_processed:1, _pad:7;
+  } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
+
   union {
     /* the only fields useful for nDPI and ntopng */
     struct {
@@ -1403,7 +1406,7 @@ struct ndpi_flow_struct {
       char ja3_client[33], ja3_server[33];
       u_int16_t server_cipher;
       u_int8_t sha1_certificate_fingerprint[20];
-      u_int8_t hello_processed:1, subprotocol_detected:1, _pad:6;
+      u_int8_t hello_processed:1, subprotocol_detected:1, fingerprint_set:1, _pad:5;
 
 #ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
       /* Under #ifdef to save memory for those who do not need them */
