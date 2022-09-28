@@ -50,9 +50,6 @@ static void set_websocket_detected(struct ndpi_detection_module_struct *ndpi_str
   /* If no custom protocol has been detected */
   if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
     {
-      ndpi_search_tcp_or_udp(ndpi_struct, flow);
-
-      ndpi_int_reset_protocol(flow);
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBSOCKET, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     }
 }

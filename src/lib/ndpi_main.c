@@ -2273,29 +2273,6 @@ ndpi_risk_enum ndpi_network_risk_ptree_match(struct ndpi_detection_module_struct
 
 /* ******************************************* */
 
-#if 0
-static u_int8_t tor_ptree_match(struct ndpi_detection_module_struct *ndpi_str, struct in_addr *pin) {
-  return((ndpi_network_ptree_match(ndpi_str, pin) == NDPI_PROTOCOL_TOR) ? 1 : 0);
-}
-#endif
-
-/* ******************************************* */
-
-u_int8_t ndpi_is_tor_flow(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &ndpi_str->packet;
-
-  if(packet->tcp != NULL) {
-    if(packet->iph) {
-      if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_TOR)
-	return(1);
-    }
-  }
-
-  return(0);
-}
-
-/* ******************************************* */
-
 static ndpi_patricia_node_t* add_to_ptree(ndpi_patricia_tree_t *tree, int family, void *addr, int bits) {
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
@@ -2581,15 +2558,6 @@ static const char *categories[] = {
 
 /* ******************************************************************** */
 
-#ifdef TEST_LRU_HANDLER
-void test_lru_handler(ndpi_lru_cache_type cache_type, u_int32_t proto, u_int32_t app_proto) {
-
-  printf("[test_lru_handler] %u / %u / %u\n", cache_type, proto, app_proto);
-}
-#endif
-
-/* ******************************************************************** */
-
 struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
   int i;
@@ -2603,10 +2571,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   }
 
   memset(ndpi_str, 0, sizeof(struct ndpi_detection_module_struct));
-
-#ifdef TEST_LRU_HANDLER
-  ndpi_str->ndpi_notify_lru_add_handler_ptr = test_lru_handler;
-#endif
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr) ndpi_debug_printf);

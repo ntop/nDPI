@@ -1096,10 +1096,6 @@ typedef struct ndpi_proto {
 /* PLEASE DO NOT REMOVE OR CHANGE THE ORDER OF WHAT IS DELIMITED BY CFFI.NDPI_MODULE_STRUCT FLAG AS IT IS USED FOR
    PYTHON BINDINGS AUTO GENERATION */
 //CFFI.NDPI_MODULE_STRUCT
-typedef enum {
-  ndpi_stun_cache,
-  ndpi_hangout_cache
-} ndpi_lru_cache_type;
 
 typedef struct ndpi_list_struct {
   char *value;
@@ -1231,8 +1227,6 @@ struct ndpi_detection_module_struct {
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
   u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */ _pad:7;
-
-  void (*ndpi_notify_lru_add_handler_ptr)(ndpi_lru_cache_type cache_type, u_int32_t proto, u_int32_t app_proto);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"
