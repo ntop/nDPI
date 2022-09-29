@@ -5654,6 +5654,19 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     }
     break;
 
+  case NDPI_PROTOCOL_NETFLOW:
+  case NDPI_PROTOCOL_SFLOW:
+  case NDPI_PROTOCOL_RTP:
+  case NDPI_PROTOCOL_COLLECTD:
+    /* Remove NDPI_UNIDIRECTIONAL_TRAFFIC from unidirectional protocols */
+    ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
+    break;
+    
+  case NDPI_PROTOCOL_SYSLOG:
+    if(flow->l4_proto == IPPROTO_UDP)
+      ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC);    
+    break;
+    
   case NDPI_PROTOCOL_SKYPE_TEAMS:
   case NDPI_PROTOCOL_SKYPE_TEAMS_CALL:
     if(flow->is_ipv6 == 0
