@@ -345,7 +345,6 @@ typedef enum {
   NDPI_PROTOCOL_CRYNET                = 314,
   NDPI_PROTOCOL_LINE                  = 315,
 
-
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
 #endif
