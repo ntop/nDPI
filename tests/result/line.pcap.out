@@ -9,12 +9,12 @@ LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/6/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
-LRU cache tls_cert:   0/2/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/2/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-Automa host:          3/0 (search/found)
-Automa domain:        3/0 (search/found)
-Automa tls cert:      1/0 (search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
 Automa risk mask:     1/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   8/0 (search/found)
@@ -22,14 +22,15 @@ Patricia risk:        0/0 (search/found)
 Patricia protocols:   8/6 (search/found)
 
 Unknown	24415	20278902	2
-TLS	108	17787	2
+TLS	71	8307	1
+Line	37	9480	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 10.200.3.125             	 1      
 
 
-	1	TCP 10.200.3.125:58160 <-> 147.92.242.232:443 [proto: 91/TLS][IP: 315/Line][Encrypted][Confidence: DPI][cat: Web/5][16 pkts/4057 bytes <-> 21 pkts/5423 bytes][Goodput ratio: 78/78][70.05 sec][Hostname/SNI: uts-front.line-apps.com][bytes ratio: -0.144 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 5755/2607 29999/29999 11001/7538][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 254/258 627/1514 230/419][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TLSv1.2][JA3C: ca75ea4a95a9164cc96e372d7d075183][ServerNames: *.line-apps.com,line-apps.com][JA3S: 567bb420d39046dbfd1f68b558d86382][Issuer: C=BE, O=GlobalSign nv-sa, CN=GlobalSign RSA OV SSL CA 2018][Subject: C=JP, ST=Tokyo-to, L=Shinjuku-ku, O=LINE Corporation, CN=*.line-apps.com][Certificate SHA-1: 3C:37:D7:AB:BE:E6:5A:A5:BE:14:62:C8:21:8C:BC:E3:3E:A8:3E:96][Firefox][Validity: 2020-08-17 06:21:02 - 2022-11-13 12:00:00][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][Plen Bins: 5,15,5,0,0,15,0,0,5,15,5,0,0,0,0,0,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0]
+	1	TCP 10.200.3.125:58160 <-> 147.92.242.232:443 [proto: 91.315/TLS.Line][IP: 315/Line][Encrypted][Confidence: DPI][cat: Chat/9][16 pkts/4057 bytes <-> 21 pkts/5423 bytes][Goodput ratio: 78/78][70.05 sec][Hostname/SNI: uts-front.line-apps.com][bytes ratio: -0.144 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 5755/2607 29999/29999 11001/7538][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 254/258 627/1514 230/419][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TLSv1.2][JA3C: ca75ea4a95a9164cc96e372d7d075183][ServerNames: *.line-apps.com,line-apps.com][JA3S: 567bb420d39046dbfd1f68b558d86382][Issuer: C=BE, O=GlobalSign nv-sa, CN=GlobalSign RSA OV SSL CA 2018][Subject: C=JP, ST=Tokyo-to, L=Shinjuku-ku, O=LINE Corporation, CN=*.line-apps.com][Certificate SHA-1: 3C:37:D7:AB:BE:E6:5A:A5:BE:14:62:C8:21:8C:BC:E3:3E:A8:3E:96][Firefox][Validity: 2020-08-17 06:21:02 - 2022-11-13 12:00:00][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][Plen Bins: 5,15,5,0,0,15,0,0,5,15,5,0,0,0,0,0,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0]
 	2	TCP 10.200.3.125:57841 <-> 147.92.165.194:443 [proto: 91/TLS][IP: 315/Line][Encrypted][Confidence: DPI][cat: Web/5][30 pkts/3436 bytes <-> 41 pkts/4871 bytes][Goodput ratio: 53/51][85.95 sec][bytes ratio: -0.173 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 34/0 1072/694 14545/14632 3030/2503][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 115/119 350/388 54/101][Plen Bins: 0,52,10,15,0,5,2,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
