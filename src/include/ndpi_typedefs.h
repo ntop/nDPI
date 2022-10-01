@@ -824,6 +824,10 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_IMO */
   u_int8_t imo_last_one_byte_pkt, imo_last_byte;
+
+  /* NDPI_PROTOCOL_LINE_CALL */
+  u_int8_t line_pkts[2];
+  u_int8_t line_base_cnt[2];
 };
 
 /* ************************************************** */

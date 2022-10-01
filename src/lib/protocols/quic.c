@@ -47,6 +47,7 @@ extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_st
 extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
                                    struct ndpi_flow_struct *flow,
                                    const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
+extern int is_valid_rtp_payload_type(uint8_t type);
 
 /* Versions */
 #define V_1		0x00000001
@@ -1607,12 +1608,6 @@ static int eval_extra_processing(struct ndpi_detection_module_struct *ndpi_struc
     return 1;
   }
   return 0;
-}
-
-static int is_valid_rtp_payload_type(uint8_t type)
-{
-  /* https://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
-  return type <= 34 || (type >= 96 && type <= 127);
 }
 
 static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,

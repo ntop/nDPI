@@ -163,6 +163,7 @@
     <ClCompile Include="..\src\lib\protocols\imo.c" />
     <ClCompile Include="..\src\lib\protocols\ipsec.c" />
     <ClCompile Include="..\src\lib\protocols\kismet.c" />
+    <ClCompile Include="..\src\lib\protocols\line.c" />
     <ClCompile Include="..\src\lib\protocols\lisp.c" />
     <ClCompile Include="..\src\lib\protocols\memcached.c" />
     <ClCompile Include="..\src\lib\protocols\mining.c" />
