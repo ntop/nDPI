@@ -1725,6 +1725,8 @@ static ndpi_protocol_match host_match[] =
 
    { "discovery.syncthing.net", "Syncthing", NDPI_PROTOCOL_SYNCTHING, NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { ".line-apps.com",        "Line", NDPI_PROTOCOL_LINE, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif

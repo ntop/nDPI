@@ -89,6 +89,8 @@
 #include "inc_generated/ndpi_asn_alibaba.c.inc"
 #include "inc_generated/ndpi_asn_avast.c.inc"
 #include "inc_generated/ndpi_asn_discord.c.inc"
+#include "inc_generated/ndpi_asn_line.c.inc"
+
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -1994,6 +1996,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
                           "CryNetwork", NDPI_PROTOCOL_CATEGORY_GAME,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LINE,
+                         "Line", NDPI_PROTOCOL_CATEGORY_CHAT,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -2650,6 +2657,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_alibaba_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_avast_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_discord_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_line_protocol_list);
     }
   }
 

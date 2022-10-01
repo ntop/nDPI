@@ -154,6 +154,11 @@ DEST=../src/lib/inc_generated/ndpi_asn_discord.c.inc
 create_list NDPI_PROTOCOL_DISCORD $DEST "AS49544"
 echo "(3) Discord IPs are available in $DEST"
 
+echo "(1) Downloading LINE..."
+DEST=../src/lib/inc_generated/ndpi_asn_line.c.inc
+create_list NDPI_PROTOCOL_LINE $DEST "AS38631"
+echo "(3) Line IPs are available in $DEST"
+
 if [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1
