@@ -915,14 +915,13 @@ typedef struct {
 } ndpi_port_range;
 
 typedef enum {
-  /* Try to have "stable" values (across releases/changes) */
-  NDPI_CONFIDENCE_UNKNOWN           = 0,	/* Unknown classification */
-  NDPI_CONFIDENCE_MATCH_BY_PORT     = 10,	/* Classification obtained looking only at the L4 ports */
-  NDPI_CONFIDENCE_NBPF              = 50,	/* PF_RING nBPF (custom protocol) */
-  NDPI_CONFIDENCE_DPI_PARTIAL       = 100,	/* Classification results based on partial/incomplete DPI information */
-  NDPI_CONFIDENCE_DPI_PARTIAL_CACHE = 110,	/* Classification results based on some LRU cache with partial/incomplete DPI information */
-  NDPI_CONFIDENCE_DPI_CACHE         = 200,	/* Classification results based on some LRU cache (i.e. correlation among sessions) */
-  NDPI_CONFIDENCE_DPI               = 210,	/* Deep packet inspection */
+  NDPI_CONFIDENCE_UNKNOWN           = 0,    /* Unknown classification */
+  NDPI_CONFIDENCE_MATCH_BY_PORT,            /* Classification obtained looking only at the L4 ports */
+  NDPI_CONFIDENCE_NBPF,                     /* PF_RING nBPF (custom protocol) */
+  NDPI_CONFIDENCE_DPI_PARTIAL,              /* Classification results based on partial/incomplete DPI information */
+  NDPI_CONFIDENCE_DPI_PARTIAL_CACHE,        /* Classification results based on some LRU cache with partial/incomplete DPI information */
+  NDPI_CONFIDENCE_DPI_CACHE,                /* Classification results based on some LRU cache (i.e. correlation among sessions) */
+  NDPI_CONFIDENCE_DPI,                      /* Deep packet inspection */
 
   /*
     IMPORTANT
