@@ -662,8 +662,9 @@ ndpi_timer_clear(pkt_timeval *a)
 u_int64_t
 ndpi_timeval_to_milliseconds(pkt_timeval ts)
 {
-  u_int64_t result = ts.tv_usec / 1000 + ts.tv_sec * 1000;
-  return result;
+  u_int64_t sec = ts.tv_sec;
+  u_int64_t usec = ts.tv_usec;
+  return usec / 1000 + sec * 1000;
 }
 
 /**
@@ -674,8 +675,9 @@ ndpi_timeval_to_milliseconds(pkt_timeval ts)
 u_int64_t
 ndpi_timeval_to_microseconds(pkt_timeval ts)
 {
-  u_int64_t result = ts.tv_usec + ts.tv_sec * 1000 * 1000;
-  return result;
+  u_int64_t sec = ts.tv_sec;
+  u_int64_t usec = ts.tv_usec;
+  return usec + sec * 1000 * 1000;;
 }
 
 void
