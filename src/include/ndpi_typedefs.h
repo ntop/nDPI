@@ -650,7 +650,6 @@ struct ndpi_lru_cache {
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
-
   /* NDPI_PROTOCOL_MAIL_SMTP */
   /* NDPI_PROTOCOL_MAIL_POP */
   /* NDPI_PROTOCOL_MAIL_IMAP */
@@ -1242,6 +1241,8 @@ struct ndpi_detection_module_struct {
   u_int8_t num_nbpf_custom_proto;
   nbpf_filter nbpf_custom_proto[MAX_NBPF_CUSTOM_PROTO];
 #endif
+
+  u_int16_t max_payload_track_len;    
 };
 
 #endif /* NDPI_LIB_COMPILATION */
@@ -1554,6 +1555,10 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_TINC */
   u_int8_t tinc_state;
 
+  /* Flow payload */
+  u_int16_t flow_payload_len;
+  char *flow_payload;
+  
   /* 
      Leave this field below at the end
      The field below can be used by third
@@ -1619,6 +1624,7 @@ typedef enum {
     ndpi_dont_load_icloud_private_relay_list  = (1 << 13),
     ndpi_dont_init_risk_ptree      = (1 << 14),
     ndpi_dont_load_cachefly_list   = (1 << 15),
+    ndpi_track_flow_payload        = (1 << 16),
   } ndpi_prefs;
 
 typedef struct {

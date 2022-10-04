@@ -300,6 +300,10 @@ typedef struct ndpi_flow_info {
 #else
   struct ndpi_bin payload_len_bin;
 #endif
+
+  /* Flow payload */
+  u_int16_t flow_payload_len;
+  char *flow_payload;  
 } ndpi_flow_info_t;
 
 

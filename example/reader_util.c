@@ -78,7 +78,7 @@ extern u_int8_t max_num_udp_dissected_pkts /* 24 */, max_num_tcp_dissected_pkts 
 static u_int32_t flow_id = 0;
 
 u_int8_t enable_doh_dot_detection = 0;
-u_int8_t enable_ja3_plus = 0;
+extern ndpi_init_prefs init_prefs;
 
 /* ****************************************************** */
 
@@ -403,7 +403,7 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
 
   /* TODO: just needed here to init ndpi ndpi_malloc wrapper */
-  module = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
+  module = ndpi_init_detection_module(init_prefs);
 
   if(module == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");
@@ -537,7 +537,8 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
   ndpi_free_bin(&flow->payload_len_bin);
 #endif
 
-  if(flow->risk_str) ndpi_free(flow->risk_str);
+  if(flow->risk_str)     ndpi_free(flow->risk_str);
+  if(flow->flow_payload) ndpi_free(flow->flow_payload);
 }
 
 /* ***************************************************** */
@@ -1329,6 +1330,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       if(workflow->__flow_detected_callback != NULL)
 	workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
     }
+   
+    flow->flow_payload = flow->ndpi_flow->flow_payload, flow->flow_payload_len = flow->ndpi_flow->flow_payload_len;
+    flow->ndpi_flow->flow_payload = NULL; /* We'll free the memory */
 
     ndpi_free_flow_info_half(flow);
   }

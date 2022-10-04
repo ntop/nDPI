@@ -96,6 +96,7 @@ u_int8_t verbose = 0, enable_flow_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 static u_int8_t stats_flag = 0;
+ndpi_init_prefs init_prefs = ndpi_no_prefs;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
@@ -120,7 +121,7 @@ static time_t capture_until = 0;
 static u_int32_t num_flows;
 static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 
-extern u_int8_t enable_doh_dot_detection, enable_ja3_plus;
+extern u_int8_t enable_doh_dot_detection;
 extern u_int32_t max_num_packets_per_flow, max_packet_payload_dissection, max_num_reported_top_payloads;
 extern u_int16_t min_pattern_len, max_pattern_len;
 extern void ndpi_self_check_host_match(); /* Self check function */
@@ -310,7 +311,7 @@ void ndpiCheckHostStringMatch(char *testChar) {
   if(!testChar)
     return;
 
-  ndpi_str = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
+  ndpi_str = ndpi_init_detection_module(init_prefs);
   ndpi_finalize_initialization(ndpi_str);
 
   // Display ALL Host strings ie host_match[] ?
@@ -440,7 +441,7 @@ static void help(u_int long_help) {
          "-i <file|device> "
 #endif
          "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
-         "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-H][-D][-e <len>][-t][-v <level>]\n"
+         "          [-p <protos>][-l <loops> [-q][-d][-J][-h][-H][-D][-e <len>][-E][-t][-v <level>]\n"
          "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
          "          [-r <file>][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>][-z]\n"
          "          [-a <mode>]\n\n"
@@ -467,6 +468,7 @@ static void help(u_int long_help) {
          "                            | 2 - List known risks\n"
          "  -d                        | Disable protocol guess and use only DPI\n"
          "  -e <len>                  | Min human readeable string match len. Default %u\n"
+	 "  -E                        | Track flow payload\n"
          "  -q                        | Quiet mode\n"
          "  -F                        | Enable flow stats\n"
          "  -t                        | Dissect GTP/TZSP tunnels\n"
@@ -531,7 +533,7 @@ static void help(u_int long_help) {
 
     NDPI_PROTOCOL_BITMASK all;
 
-    ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
+    ndpi_info_mod = ndpi_init_detection_module(init_prefs);
     printf("\n\nnDPI supported protocols:\n");
     printf("%3s %-22s %-10s %-8s %-12s %s\n",
 	   "Id", "Protocol", "Layer_4", "Nw_Proto", "Breed", "Category");
@@ -659,7 +661,7 @@ void extcap_config() {
   ndpi_proto_defaults_t *proto_defaults;
 #endif
 
-  ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
+  ndpi_info_mod = ndpi_init_detection_module(init_prefs);
 #if 0
   ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
   proto_defaults = ndpi_get_proto_defaults(ndpi_info_mod);
@@ -806,7 +808,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "a:Ab:e:c:C:dDf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "a:Ab:e:Ec:C:dDf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:Jrp:x:w:zq0123:456:7:89:m:T:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -836,6 +838,10 @@ static void parseOptions(int argc, char **argv) {
 
     case 'e':
       human_readeable_string_len = atoi(optarg);
+      break;
+
+    case 'E':
+      init_prefs |= ndpi_track_flow_payload;
       break;
 
     case 'i':
@@ -1053,7 +1059,7 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'z':
-      enable_ja3_plus = 1;
+      init_prefs |= ndpi_enable_ja3_plus;
       break;
 
     default:
@@ -1678,6 +1684,17 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     print_bin(out, "Plen Bins", &flow->payload_len_bin);
 #endif
 
+    if(flow->flow_payload && (flow->flow_payload_len > 0)) {
+      u_int i;
+      
+      printf("[Payload: ");
+
+      for(i=0; i<flow->flow_payload_len; i++)
+	printf("%c", isspace(flow->flow_payload[i]) ? '.' : flow->flow_payload[i]);
+	
+	printf("]");
+    }
+    
     fprintf(out, "\n");
   }
 }
@@ -4336,7 +4353,7 @@ static void dgaUnitTest() {
   };
   int debug = 0, i;
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(init_prefs);
 
   assert(ndpi_str != NULL);
 
@@ -5097,7 +5114,7 @@ void zscoreUnitTest() {
       ac_automata_enable_debug(1);
     parseOptions(argc, argv);
 
-    ndpi_info_mod = ndpi_init_detection_module(enable_ja3_plus ? ndpi_enable_ja3_plus : ndpi_no_prefs);
+    ndpi_info_mod = ndpi_init_detection_module(init_prefs);
 
     if(ndpi_info_mod == NULL) return -1;
 
