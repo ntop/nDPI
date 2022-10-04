@@ -659,7 +659,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
     flow->http.url = ndpi_malloc(len);
     if(flow->http.url) {
-      u_int offset = 0;
+      u_int offset = 0, host_end = 0;
 
       if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_CONNECT) {
 	strncpy(flow->http.url, (char*)packet->http_url_name.ptr,
@@ -668,8 +668,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	flow->http.url[packet->http_url_name.len] = '\0';
       } else {
 	/* Check if we pass through a proxy (usually there is also the Via: ... header) */
-	if(strncmp((char*)packet->http_url_name.ptr, "http://", 7) != 0)
+	if(strncmp((char*)packet->http_url_name.ptr, "http://", 7) != 0) {
 	  strncpy(flow->http.url, (char*)packet->host_line.ptr, offset = packet->host_line.len);
+	  host_end = packet->host_line.len;
+	}
 
 	if((packet->host_line.len == packet->http_url_name.len)
 	   && (strncmp((char*)packet->host_line.ptr,
@@ -684,7 +686,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	flow->http.url[offset] = '\0';
       }
 
-      ndpi_check_http_url(ndpi_struct, flow, &flow->http.url[packet->host_line.len]);
+      ndpi_check_http_url(ndpi_struct, flow, &flow->http.url[host_end]);
     }
 
     flow->http.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
