@@ -628,7 +628,10 @@ static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_stru
 static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow,
 				char *url) {
-  /* Nothing to do */
+  if(strstr(url, "<php>") != NULL /* PHP code in the URL */)
+    ndpi_set_risk(ndpi_struct, flow, NDPI_URL_POSSIBLE_RCE_INJECTION, "PHP code in URL");
+  else if(strncmp(url, "/shell?", 7) == 0)
+    ndpi_set_risk(ndpi_struct, flow, NDPI_URL_POSSIBLE_RCE_INJECTION, "Possible WebShell detected");
 }
 
 /* ************************************************************* */
