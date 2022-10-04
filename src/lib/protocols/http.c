@@ -636,6 +636,47 @@ static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct
 
 /* ************************************************************* */
 
+#define MIN_APACHE_VERSION 2004000 /* 2.4.X  [https://endoflife.date/apache] */
+#define MIN_NGINX_VERSION  1022000 /* 1.22.0 [https://endoflife.date/nginx]  */
+
+static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_struct,
+				   struct ndpi_flow_struct *flow,
+				   const char *server, u_int server_len) {
+  if(server_len > 7) {
+    u_int off;
+  
+    if(strncmp((const char *)server, "ntopng ", 7) == 0) {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+      NDPI_CLR_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+    } else if((strncasecmp(server, "Apache/", off = 7) == 0) /* X.X.X */
+	      || (strncasecmp(server, "nginx/", off = 6) == 0) /* X.X.X */) {
+      u_int i, j, a, b, c;
+      char buf[16] = { '\0' };
+
+      for(i=off, j=0; (i<server_len) && (server[i] != ' ') && (j<sizeof(buf)); i++)
+	buf[j++] = server[i];      
+
+      if(sscanf(buf, "%d.%d.%d", &a, &b, &c) == 3) {
+	u_int32_t version = (a * 1000000) + (b * 1000) + c;
+
+	if((off == 7) && (version < MIN_APACHE_VERSION)) {
+	  char msg[64];
+
+	  snprintf(msg, sizeof(msg), "Obsolete Apache server %s", buf);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
+	} else if((off == 6) && (version < MIN_NGINX_VERSION)) {
+	  char msg[64];
+
+	  snprintf(msg, sizeof(msg), "Obsolete nginx server %s", buf);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
+	}
+      }
+    }
+  }
+}
+
+/* ************************************************************* */
+
 /**
    NOTE
    ndpi_parse_packet_line_info is in ndpi_main.c
@@ -699,13 +740,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
   }
 
-  if(packet->server_line.ptr != NULL && (packet->server_line.len > 7)) {
-    if(strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
-      NDPI_CLR_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
-    }
-  }
-
+  if(packet->server_line.ptr != NULL)
+    ndpi_check_http_server(ndpi_struct, flow, (const char *)packet->server_line.ptr, packet->server_line.len);
+ 
   if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
     ret = http_process_user_agent(ndpi_struct, flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
     /* TODO: Is it correct to avoid setting ua, host_name,... if we have a (Netflix) subclassification? */

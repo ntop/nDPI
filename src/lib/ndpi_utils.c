@@ -1934,6 +1934,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Unidirectional Traffic");
     break;
 
+  case NDPI_HTTP_OBSOLETE_SERVER:
+    return("HTTP Obsolete Server");
+    break;
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

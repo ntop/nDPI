@@ -84,7 +84,9 @@ flow_risks[42] = ProtoField.bool("ndpi.flow_risk.punycode_idn", "IDN Domain Name
 flow_risks[43] = ProtoField.bool("ndpi.flow_risk.error_code_detected", "Error Code Detected", num_bits_flow_risks, nil, bit(11), "nDPI Flow Risk: Error Code Detected")
 flow_risks[44] = ProtoField.bool("ndpi.flow_risk.crawler_bot", "Crawler/Bot Detected", num_bits_flow_risks, nil, bit(12), "nDPI Flow Risk: Crawler/Bot Detected")
 flow_risks[45] = ProtoField.bool("ndpi.flow_risk.anonymous_subscriber", "Anonymous Subscriber", num_bits_flow_risks, nil, bit(13), "nDPI Flow Risk: Anonymous Subscriber")
-flow_risks[46] = ProtoField.bool("ndpi.flow_risk.unidirectional_traffic", "Unidirectional Traffic", num_bits_flow_risks, nil, bit(13), "nDPI Flow Risk: Unidirectional Traffi")
+flow_risks[46] = ProtoField.bool("ndpi.flow_risk.unidirectional_traffic", "Unidirectional Traffic", num_bits_flow_risks, nil, bit(14), "nDPI Flow Risk: Unidirectional Traffi")
+flow_risks[47] = ProtoField.bool("ndpi.flow_risk.http_obsolete_server", "Obsolete HTTP Server", num_bits_flow_risks, nil, bit(15), "nDPI Flow Risk: Obsolete HTTP Server")
+
 
 -- Last one: keep in sync the bitmask when adding new risks!!
 flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(13))
