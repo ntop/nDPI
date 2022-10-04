@@ -55,9 +55,9 @@ void ndpi_search_ipp(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 }
 
 
-void init_ipp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_ipp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("IPP", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IPP", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IPP,
 				      ndpi_search_ipp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

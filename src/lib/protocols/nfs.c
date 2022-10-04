@@ -87,9 +87,9 @@ void ndpi_search_nfs(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 }
 
 
-void init_nfs_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_nfs_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("NFS", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("NFS", ndpi_struct, *id,
 				      NDPI_PROTOCOL_NFS,
 				      ndpi_search_nfs,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

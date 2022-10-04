@@ -46,11 +46,10 @@ void ndpi_search_among_us(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-void init_among_us_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-                             NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_among_us_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
   ndpi_set_bitmask_protocol_detection(
-    "AmongUs", ndpi_struct, detection_bitmask, *id,
+    "AmongUs", ndpi_struct, *id,
     NDPI_PROTOCOL_AMONG_US, ndpi_search_among_us, NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
     SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
   *id += 1;

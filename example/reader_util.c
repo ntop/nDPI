@@ -373,50 +373,67 @@ static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod,
 
 /* ***************************************************** */
 
-static NDPI_PROTOCOL_BITMASK debug_bitmask;
 static char _proto_delim[] = " \t,:;";
-static int parse_debug_proto(struct ndpi_detection_module_struct *ndpi_mod, char *str) {
+int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverted_logic) {
   char *n;
   uint16_t proto;
-  char op=1;
+  char op;
+  struct ndpi_detection_module_struct *module;
+  NDPI_PROTOCOL_BITMASK all;
+
+  if(!inverted_logic)
+   op = 1; /* Default action: add to the bitmask */
+  else
+   op = 0; /* Default action: remove from the bitmask */
+  /* Use a temporary module with all protocols enabled */
+  module = ndpi_init_detection_module(0);
+  if(!module)
+    return 1;
+  NDPI_BITMASK_SET_ALL(all);
+  ndpi_set_protocol_detection_bitmask2(module, &all);
+  ndpi_finalize_initialization(module);
+
   for(n = strtok(str,_proto_delim); n && *n; n = strtok(NULL,_proto_delim)) {
     if(*n == '-') {
-      op = 0;
+      op = !inverted_logic ? 0 : 1;
       n++;
     } else if(*n == '+') {
-      op = 1;
+      op = !inverted_logic ? 1 : 0;
       n++;
     }
     if(!strcmp(n,"all")) {
       if(op)
-	NDPI_BITMASK_SET_ALL(debug_bitmask);
+	NDPI_BITMASK_SET_ALL(*bitmask);
       else
-	NDPI_BITMASK_RESET(debug_bitmask);
+	NDPI_BITMASK_RESET(*bitmask);
       continue;
     }
-    proto = ndpi_get_proto_id(ndpi_mod, n);
+    proto = ndpi_get_proto_id(module, n);
     if(proto == NDPI_PROTOCOL_UNKNOWN && strcmp(n,"unknown") && strcmp(n,"0")) {
       fprintf(stderr,"Invalid protocol %s\n",n);
+      ndpi_exit_detection_module(module);
       return 1;
     }
     if(op)
-      NDPI_BITMASK_ADD(debug_bitmask,proto);
+      NDPI_BITMASK_ADD(*bitmask,proto);
     else
-      NDPI_BITMASK_DEL(debug_bitmask,proto);
+      NDPI_BITMASK_DEL(*bitmask,proto);
   }
+  ndpi_exit_detection_module(module);
   return 0;
 }
 
 /* ***************************************************** */
 
 extern char *_debug_protocols;
-static int _debug_protocols_ok = 0;
 
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle, int do_init_flows_root,
 					 ndpi_serialization_format serialization_format) {
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
+  static NDPI_PROTOCOL_BITMASK debug_bitmask;
+  static int _debug_protocols_ok = 0;
 
   set_ndpi_malloc(ndpi_malloc_wrapper), set_ndpi_free(free_wrapper);
   set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
@@ -443,7 +460,8 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   ndpi_set_log_level(module, nDPI_LogLevel);
 
   if(_debug_protocols != NULL && ! _debug_protocols_ok) {
-    if(parse_debug_proto(module,_debug_protocols))
+    NDPI_BITMASK_RESET(debug_bitmask);
+    if(parse_proto_name_list(_debug_protocols, &debug_bitmask, 0))
       exit(-1);
     _debug_protocols_ok = 1;
   }
