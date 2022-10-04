@@ -1130,6 +1130,19 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	    snprintf(ec, sizeof(ec), "HTTP Error Code %u", flow->http.response_status_code);
 	    ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, ec);
 	  }
+
+	  if(flow->flow_payload) {
+	    char *endl;
+	    
+	    flow->flow_payload[flow->flow_payload_len] = '\0';
+	    if((endl = strrchr(flow->flow_payload, '\r')) == NULL)
+	      endl = strrchr(flow->flow_payload, '\n');
+
+	    if(endl != NULL) {
+	      endl[0] = '\0';
+	      flow->flow_payload_len = endl - flow->flow_payload;
+	    }
+	  }
 	}
 
 	ndpi_parse_packet_line_info(ndpi_struct, flow);
