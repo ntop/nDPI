@@ -1692,7 +1692,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       for(i=0; i<flow->flow_payload_len; i++)
 	printf("%c", isspace(flow->flow_payload[i]) ? '.' : flow->flow_payload[i]);
 	
-	printf("]");
+      printf("]");
     }
     
     fprintf(out, "\n");

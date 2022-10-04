@@ -5277,7 +5277,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     const struct ndpi_tcphdr *tcph = packet->tcp;
     const struct ndpi_udphdr *udph = packet->udp;
 
-    if(packet->payload_packet_len > 0) {
+    if(ndpi_str->max_payload_track_len > 0 && packet->payload_packet_len > 0) {
       /* printf("LEN: %u [%s]\n", packet->payload_packet_len, packet->payload); */
 
       if(flow->flow_payload == NULL)
