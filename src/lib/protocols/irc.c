@@ -391,6 +391,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	  goto detected_irc;
 	}
       }
+
       if ((memcmp(packet->payload, "USER ", 5) == 0)
 	  || (memcmp(packet->payload, "NICK ", 5) == 0)
 	  || (memcmp(packet->payload, "PASS ", 5) == 0)
@@ -402,6 +403,19 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	  || (memcmp(packet->payload, "NOTICE ", 7) == 0)
 	  || (memcmp(packet->payload, "PRIVMSG ", 8) == 0)
 	  || (memcmp(packet->payload, "VERSION ", 8) == 0)) {
+	char *user = ndpi_strnstr((char*)packet->payload, "USER ", packet->payload_packet_len);
+
+	if(user) {
+	  char buf[32], msg[64], *sp;
+
+	  snprintf(buf, sizeof(buf), "%s", &user[5]);
+	  if((sp = strchr(buf, ' ')) != NULL)
+	    sp[0] = '\0';
+	  
+	  snprintf(msg, sizeof(msg), "Found IRC username (%s)", buf);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
+	}
+	
 	NDPI_LOG_DBG2(ndpi_struct,
 		      "USER, NICK, PASS, NOTICE, PRIVMSG one time");
 	if (flow->l4.tcp.irc_stage == 2) {
