@@ -408,7 +408,7 @@ void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struc
 	if(user) {
 	  char buf[32], msg[64], *sp;
 
-	  snprintf(buf, sizeof(buf), "%s", &user[5]);
+	  snprintf(buf, sizeof(buf), "%.*s", packet->payload_packet_len - 5, &user[5]);
 	  if((sp = strchr(buf, ' ')) != NULL)
 	    sp[0] = '\0';
 	  
