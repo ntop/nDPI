@@ -1,6 +1,6 @@
 
 #include <stdint.h>
-#ifndef WIN32
+#if !defined(WIN32) && !defined(_MSC_VER)
 #include <unistd.h>
 #endif
 #include <string.h>

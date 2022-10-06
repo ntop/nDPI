@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#ifndef WIN32
+#if !defined(WIN32) && !defined(_MSC_VER)
 #include <unistd.h>
 #else
 #define __SIZEOF_LONG__ 4

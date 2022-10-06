@@ -48,7 +48,7 @@
 #include <stdlib.h> /* free, atol, calloc */
 #include <string.h> /* memcpy, strchr, strlen */
 #include <sys/types.h> /* BSD: for inet_addr */
-#ifndef WIN32
+#if !defined(WIN32) && !defined(_MSC_VER)
 #include <sys/socket.h> /* BSD, Linux: for inet_addr */
 #include <netinet/in.h> /* BSD, Linux: for inet_addr */
 #include <arpa/inet.h> /* BSD, Linux, Solaris: for inet_addr */

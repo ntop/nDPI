@@ -34,7 +34,7 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_MSC_VER)
 #include "ndpi_win32.h"
 #else
 #include <sys/types.h>

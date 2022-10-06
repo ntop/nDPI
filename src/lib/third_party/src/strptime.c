@@ -35,7 +35,7 @@
 	This file is used to implement the strptime API call that is missing on Windows
 */
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_MSC_VER)
 
 #include "ndpi_main.h"
 
