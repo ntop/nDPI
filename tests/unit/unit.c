@@ -270,6 +270,7 @@ int serializeProtoUnitTest(void)
 
     ndpi_protocol ndpi_proto = { .master_protocol = NDPI_PROTOCOL_TLS,
                                  .app_protocol = NDPI_PROTOCOL_FACEBOOK,
+                                 .protocol_by_ip = NDPI_PROTOCOL_FACEBOOK,
                                  .category = NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK };
     ndpi_risk risks = 0;
     NDPI_SET_BIT(risks, NDPI_MALFORMED_PACKET);
@@ -286,7 +287,7 @@ int serializeProtoUnitTest(void)
       buffer_len = 0;
       buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
 #ifndef WIN32
-      char const * const expected_json_str = "{\"flow_risk\": {\"6\": {\"risk\":\"Self-signed Cert\",\"severity\":\"High\",\"risk_score\": {\"total\":500,\"client\":450,\"server\":50}},\"7\": {\"risk\":\"Obsolete TLS (v1.1 or older)\",\"severity\":\"High\",\"risk_score\": {\"total\":510,\"client\":455,\"server\":55}},\"8\": {\"risk\":\"Weak TLS Cipher\",\"severity\":\"High\",\"risk_score\": {\"total\":250,\"client\":225,\"server\":25}},\"17\": {\"risk\":\"Malformed Packet\",\"severity\":\"Low\",\"risk_score\": {\"total\":260,\"client\":130,\"server\":130}}},\"confidence\": {\"6\":\"DPI\"},\"proto\":\"TLS.Facebook\",\"proto_id\":\"91.119\",\"encrypted\":1,\"breed\":\"Fun\",\"category_id\":6,\"category\":\"SocialNetwork\",\"float\":340282346638528859811704183484516925440.000000,\"double\":680564693277057719623408366969033850880.000000}";
+      char const * const expected_json_str = "{\"flow_risk\": {\"6\": {\"risk\":\"Self-signed Cert\",\"severity\":\"High\",\"risk_score\": {\"total\":500,\"client\":450,\"server\":50}},\"7\": {\"risk\":\"Obsolete TLS (v1.1 or older)\",\"severity\":\"High\",\"risk_score\": {\"total\":510,\"client\":455,\"server\":55}},\"8\": {\"risk\":\"Weak TLS Cipher\",\"severity\":\"High\",\"risk_score\": {\"total\":250,\"client\":225,\"server\":25}},\"17\": {\"risk\":\"Malformed Packet\",\"severity\":\"Low\",\"risk_score\": {\"total\":260,\"client\":130,\"server\":130}}},\"confidence\": {\"6\":\"DPI\"},\"proto\":\"TLS.Facebook\",\"proto_id\":\"91.119\",\"proto_by_ip\":\"Facebook\",\"proto_by_ip_id\":119,\"encrypted\":1,\"breed\":\"Fun\",\"category_id\":6,\"category\":\"SocialNetwork\",\"float\":340282346638528859811704183484516925440.000000,\"double\":680564693277057719623408366969033850880.000000}";
 
       if (strncmp(buffer, expected_json_str, buffer_len) != 0)
       {
@@ -312,7 +313,7 @@ int serializeProtoUnitTest(void)
       }
     } else if (fmt == ndpi_serialization_format_csv)
     {
-      char const * const expected_csv_hdr_str = "risk,severity,total,client,server,risk,severity,total,client,server,risk,severity,total,client,server,risk,severity,total,client,server,6,proto,proto_id,encrypted,breed,category_id,category,float,double";
+      char const * const expected_csv_hdr_str = "risk,severity,total,client,server,risk,severity,total,client,server,risk,severity,total,client,server,risk,severity,total,client,server,6,proto,proto_id,proto_by_ip,proto_by_ip_id,encrypted,breed,category_id,category,float,double";
       buffer_len = 0;
       buffer = ndpi_serializer_get_header(&serializer, &buffer_len);
       assert(buffer != NULL && buffer_len != 0);
@@ -324,7 +325,7 @@ int serializeProtoUnitTest(void)
         printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
       }
 
-      char const * const expected_csv_buf_str = "Self-signed Cert,High,500,450,50,Obsolete TLS (v1.1 or older),High,510,455,55,Weak TLS Cipher,High,250,225,25,Malformed Packet,Low,260,130,130,DPI,TLS.Facebook,91.119,1,Fun,6,SocialNetwork,340282346638528859811704183484516925440.000000,680564693277057719623408366969033850880.000000";
+      char const * const expected_csv_buf_str = "Self-signed Cert,High,500,450,50,Obsolete TLS (v1.1 or older),High,510,455,55,Weak TLS Cipher,High,250,225,25,Malformed Packet,Low,260,130,130,DPI,TLS.Facebook,91.119,Facebook,119,1,Fun,6,SocialNetwork,340282346638528859811704183484516925440.000000,680564693277057719623408366969033850880.000000";
       buffer_len = 0;
       buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
       assert(buffer != NULL && buffer_len != 0);
