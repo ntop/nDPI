@@ -655,7 +655,7 @@ static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_str
       u_int i, j, a, b, c;
       char buf[16] = { '\0' };
 
-      for(i=off, j=0; (i<server_len) && (j<sizeof(buf))
+      for(i=off, j=0; (i<server_len) && (j<sizeof(buf)-1)
 	    && (isdigit(server[i]) || (server[i] == '.')); i++)
 	buf[j++] = server[i];      
 
