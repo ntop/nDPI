@@ -632,6 +632,8 @@ static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct
     ndpi_set_risk(ndpi_struct, flow, NDPI_URL_POSSIBLE_RCE_INJECTION, "PHP code in URL");
   else if(strncmp(url, "/shell?", 7) == 0)
     ndpi_set_risk(ndpi_struct, flow, NDPI_URL_POSSIBLE_RCE_INJECTION, "Possible WebShell detected");
+  else if(strncmp(url, "/.", 2) == 0)
+    ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "URL starting with dot");
 }
 
 /* ************************************************************* */
