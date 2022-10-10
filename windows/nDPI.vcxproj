@@ -332,7 +332,6 @@
     <ClCompile Include="src\getopt.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\win-gettimeofday.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\example\reader_util.h">

@@ -683,24 +683,59 @@ ndpi_timeval_to_microseconds(pkt_timeval ts)
 /* **************************************** */
 
 #if defined(WIN32) || defined(_MSC_VER)
-int gettimeofday(struct timeval* tp, struct timezone* tzp)
+
+/* 
+* Author: Ugo Varetto - ugovaretto@gmail.com
+* This code is distributed under the terms of the Apache Software License version 2.0
+* https://opensource.org/licenses/Apache-2.0
+*/
+
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+#else
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+#endif
+
+#if !defined(__MINGW32__) && !defined(__MINGW64__)
+struct timezone 
 {
-	// Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
-	// This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
-	// until 00:00:00 January 1, 1970 
-	static const uint64_t EPOCH = ((uint64_t)116444736000000000ULL);
+	int  tz_minuteswest; /* minutes W of Greenwich */
+	int  tz_dsttime;     /* type of dst correction */
+};
+#endif
 
-	SYSTEMTIME  system_time;
-	FILETIME    file_time;
-	uint64_t    time;
+int gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+	FILETIME ft;
+	unsigned __int64 tmpres = 0;
+	static int tzflag = 0;
 
-	GetSystemTime(&system_time);
-	SystemTimeToFileTime(&system_time, &file_time);
-	time = ((uint64_t)file_time.dwLowDateTime);
-	time += ((uint64_t)file_time.dwHighDateTime) << 32;
+	if (NULL != tv)
+	{
+		GetSystemTimeAsFileTime(&ft);
 
-	tp->tv_sec = (long)((time - EPOCH) / 10000000L);
-	tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
+		tmpres |= ft.dwHighDateTime;
+		tmpres <<= 32;
+		tmpres |= ft.dwLowDateTime;
+
+		tmpres /= 10;  /*convert into microseconds*/
+					   /*converting file time to unix epoch*/
+		tmpres -= DELTA_EPOCH_IN_MICROSECS; 
+		tv->tv_sec = (long)(tmpres / 1000000UL);
+		tv->tv_usec = (long)(tmpres % 1000000UL);
+	}
+
+	if (NULL != tz)
+	{
+		if (!tzflag)
+		{
+			_tzset();
+			tzflag++;
+		}
+		tz->tz_minuteswest = _timezone / 60;
+		tz->tz_dsttime = _daylight;
+	}
+
 	return 0;
 }
 #endif
