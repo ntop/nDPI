@@ -4,6 +4,8 @@
 * https://opensource.org/licenses/Apache-2.0
 */
 
+#if defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGW64__)
+
 #include <time.h>
 #include <windows.h>
 
@@ -53,3 +55,5 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 	return 0;
 }
+
+#endif

@@ -18,7 +18,8 @@ EXTRA_DIST = README.md README.fuzzer.md CHANGELOG.md CONTRIBUTING.md \
 	python/DEV_GUIDE.md python/dev_requirements.txt python/ndpi_example.py python/ndpi/__init__.py \
 		python/ndpi/ndpi_build.py python/ndpi/ndpi.py python/README.md \
 		python/requirements.txt python/setup.py python/tests.py \
-	sonar-project.properties .github .ci-ignore lgtm.yml
+	sonar-project.properties .github .ci-ignore lgtm.yml \
+	windows/src/win-gettimeofday.c windows/src/getopt.c
 
 
 .PHONY: doc doc-view
