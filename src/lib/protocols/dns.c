@@ -194,6 +194,27 @@ static uint32_t dns_validchar[8] =
 
 /* *********************************************** */
 
+static char* dns_error_code2string(u_int16_t error_code, char *buf, u_int buf_len) {
+  switch(error_code) {
+  case 0: return((char*)"NOERROR");
+  case 1: return((char*)"FORMERR");
+  case 2: return((char*)"SERVFAIL");
+  case 3: return((char*)"NXDOMAIN");
+  case 4: return((char*)"NOTIMP");
+  case 5: return((char*)"REFUSED");
+  case 6: return((char*)"YXDOMAIN");
+  case 7: return((char*)"XRRSET");
+  case 8: return((char*)"NOTAUTH");
+  case 9: return((char*)"NOTZONE");
+    
+  default:
+    snprintf(buf, buf_len, "%u", error_code);
+    return(buf);
+  }
+}
+
+/* *********************************************** */
+  
 static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
 			    struct ndpi_dns_packet_header *dns_header,
@@ -251,12 +272,31 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
     }
   } else {
     /* DNS Reply */
+
+    if(flow->protos.dns.query_type == 0) {
+      /* In case we missed the query packet... */
+
+      while(x+2 < packet->payload_packet_len) {
+	if(packet->payload[x] == '\0') {
+          x++;
+          flow->protos.dns.query_type = get16(&x, packet->payload);
+#ifdef DNS_DEBUG
+          NDPI_LOG_DBG2(ndpi_struct, "query_type=%2d\n", flow->protos.dns.query_type);
+	  printf("[DNS] [request] query_type=%d\n", flow->protos.dns.query_type);
+#endif
+	  break;
+	} else
+	  x++;
+      }
+    }
+    
     flow->protos.dns.reply_code = dns_header->flags & 0x0F;
 
     if(flow->protos.dns.reply_code != 0) {
-      char str[32];
+      char str[32], buf[16];
 
-      snprintf(str, sizeof(str), "DNS Error Code %d", flow->protos.dns.reply_code);
+      snprintf(str, sizeof(str), "DNS Error Code %s",
+	       dns_error_code2string(flow->protos.dns.reply_code, buf, sizeof(buf)));
       ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, str);
     } else {
       if(ndpi_isset_risk(ndpi_struct, flow, NDPI_SUSPICIOUS_DGA_DOMAIN)) {
