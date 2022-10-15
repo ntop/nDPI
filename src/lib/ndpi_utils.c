@@ -1126,6 +1126,9 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_serialize_confidence(serializer, confidence);
   ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
   ndpi_serialize_string_string(serializer, "proto_id", ndpi_protocol2id(ndpi_struct, l7_protocol, buf, sizeof(buf)));
+  ndpi_serialize_string_string(serializer, "proto_by_ip", ndpi_get_proto_name(ndpi_struct,
+                                                                              l7_protocol.protocol_by_ip));
+  ndpi_serialize_string_uint32(serializer, "proto_by_ip_id", l7_protocol.protocol_by_ip);
   ndpi_serialize_string_uint32(serializer, "encrypted", ndpi_is_encrypted_proto(ndpi_struct, l7_protocol));
   ndpi_protocol_breed_t breed =
     ndpi_get_proto_breed(ndpi_struct,
@@ -1279,6 +1282,12 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     }
     break;
 
+  case NDPI_PROTOCOL_COLLECTD:
+    ndpi_serialize_start_of_block(serializer, "collectd");
+    ndpi_serialize_string_string(serializer, "client_username", flow->protos.collectd.client_username);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
   case NDPI_PROTOCOL_DNS:
     ndpi_serialize_start_of_block(serializer, "dns");
     ndpi_serialize_string_uint32(serializer, "num_queries", flow->protos.dns.num_queries);
@@ -1337,6 +1346,22 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_end_of_block(serializer);
     break;
 
+  case NDPI_PROTOCOL_RSH:
+    ndpi_serialize_start_of_block(serializer, "rsh");
+    ndpi_serialize_string_string(serializer, "client_username", flow->protos.rsh.client_username);
+    ndpi_serialize_string_string(serializer, "server_username", flow->protos.rsh.server_username);
+    ndpi_serialize_string_string(serializer, "command", flow->protos.rsh.command);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_SNMP:
+    ndpi_serialize_start_of_block(serializer, "snmp");
+    ndpi_serialize_string_uint32(serializer, "version", flow->protos.snmp.version);
+    ndpi_serialize_string_uint32(serializer, "primitive", flow->protos.snmp.primitive);
+    ndpi_serialize_string_uint32(serializer, "error_status", flow->protos.snmp.error_status);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
   case NDPI_PROTOCOL_STUN:
     ndpi_serialize_start_of_block(serializer, "stun");
     ndpi_serialize_string_uint32(serializer, "num_pkts", flow->stun.num_pkts);
@@ -1351,6 +1376,21 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "telnet");
     ndpi_serialize_string_string(serializer, "username", flow->protos.telnet.username);
     ndpi_serialize_string_string(serializer, "password", flow->protos.telnet.password);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_TFTP:
+    ndpi_serialize_start_of_block(serializer, "tftp");
+    ndpi_serialize_string_string(serializer, "filename", flow->protos.tftp.filename);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_TIVOCONNECT:
+    ndpi_serialize_start_of_block(serializer, "tivoconnect");
+    ndpi_serialize_string_string(serializer, "identity_uuid", flow->protos.tivoconnect.identity_uuid);
+    ndpi_serialize_string_string(serializer, "machine", flow->protos.tivoconnect.machine);
+    ndpi_serialize_string_string(serializer, "platform", flow->protos.tivoconnect.platform);
+    ndpi_serialize_string_string(serializer, "services", flow->protos.tivoconnect.services);
     ndpi_serialize_end_of_block(serializer);
     break;
 
