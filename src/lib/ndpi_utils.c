@@ -1640,7 +1640,7 @@ static int ndpi_is_xss_injection(char* query) {
 #ifdef HAVE_PCRE
 
 static void ndpi_compile_rce_regex() {
-  const char *pcreErrorStr;
+  const char *pcreErrorStr = NULL;
   int pcreErrorOffset;
 
   for(int i = 0; i < N_RCE_REGEX; i++) {
