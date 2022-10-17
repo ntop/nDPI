@@ -1257,6 +1257,26 @@ void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_st
 
 /* **************************************** */
 
+static void tls_subclassify_by_alpn(struct ndpi_detection_module_struct *ndpi_struct,
+				    struct ndpi_flow_struct *flow) {
+  /* Right now we have only one rule so we can keep it trivial */
+
+  if (!flow->protos.tls_quic.alpn)
+    return;
+
+  if(strlen(flow->protos.tls_quic.alpn) > NDPI_STATICSTRING_LEN("anydesk/") &&
+     strncmp(flow->protos.tls_quic.alpn, "anydesk/", NDPI_STATICSTRING_LEN("anydesk/")) == 0) {
+#ifdef DEBUG_TLS
+    printf("Matching ANYDESK via alpn\n");
+#endif
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ANYDESK,
+			       __get_master(ndpi_struct, flow), NDPI_CONFIDENCE_DPI);
+    flow->protos.tls_quic.subprotocol_detected = 1;
+  }
+}
+
+/* **************************************** */
+
 static void tlsCheckUncommonALPN(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
   char * alpn_start = flow->protos.tls_quic.alpn;
@@ -2182,8 +2202,15 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		printf("Client TLS [ALPN: %s][len: %u]\n", alpn_str, alpn_str_len);
 #endif
-		if(flow->protos.tls_quic.alpn == NULL)
+		if(flow->protos.tls_quic.alpn == NULL) {
 		  flow->protos.tls_quic.alpn = ndpi_strdup(alpn_str);
+
+		  /* Without SNI matching we can try to sub-classify the flow via ALPN.
+		     Note that this happens only on very rare cases, not the common ones
+		     ("h2", "http/1.1", ...). Usefull for asymmetric traffic */
+		  if(!flow->protos.tls_quic.subprotocol_detected)
+	            tls_subclassify_by_alpn(ndpi_struct, flow);
+		}
 
 		ndpi_snprintf(ja3.client.alpn, sizeof(ja3.client.alpn), "%s", alpn_str);
 
