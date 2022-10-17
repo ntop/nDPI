@@ -345,6 +345,19 @@ typedef enum {
   NDPI_PROTOCOL_CRYNET                = 314,
   NDPI_PROTOCOL_LINE                  = 315,
   NDPI_PROTOCOL_LINE_CALL             = 316,
+  NDPI_PROTOCOL_APPLETVPLUS           = 317,
+  NDPI_PROTOCOL_DIRECTV               = 318,
+  NDPI_PROTOCOL_HBO                   = 319,
+  NDPI_PROTOCOL_VUDU                  = 320,
+  NDPI_PROTOCOL_SHOWTIME              = 321,
+  NDPI_PROTOCOL_DAILYMOTION           = 322,
+  NDPI_PROTOCOL_LIVESTREAM            = 323,
+  NDPI_PROTOCOL_TENCENTVIDEO          = 324,
+  NDPI_PROTOCOL_IHEARTRADIO           = 325,
+  NDPI_PROTOCOL_TIDAL                 = 326,
+  NDPI_PROTOCOL_TUNEIN                = 327,
+  NDPI_PROTOCOL_SIRIUSXMRADIO         = 328,
+
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
