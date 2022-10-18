@@ -861,6 +861,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
   case 0x02: /* Server Hello */
     processClientServerHello(ndpi_struct, flow, 0);
     flow->protos.tls_quic.hello_processed = 1;
+    flow->protos.tls_quic.ch_direction = (packet->payload[0] == 0x01 ? packet->packet_direction : !packet->packet_direction);
     ndpi_int_tls_add_connection(ndpi_struct, flow);
 
 #ifdef DEBUG_TLS
@@ -882,10 +883,17 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     /* Important: populate the tls union fields only after
      * ndpi_int_tls_add_connection has been called */
     if(flow->protos.tls_quic.hello_processed) {
-      ret = processCertificate(ndpi_struct, flow);
-      if(ret != 1) {
+      /* Only certificates from the server */
+      if(flow->protos.tls_quic.ch_direction != packet->packet_direction) {
+        ret = processCertificate(ndpi_struct, flow);
+        if(ret != 1) {
 #ifdef DEBUG_TLS
-        printf("[TLS] Error processing certificate: %d\n", ret);
+          printf("[TLS] Error processing certificate: %d\n", ret);
+#endif
+        }
+      } else {
+#ifdef DEBUG_TLS
+        printf("[TLS] Certificate from client. Ignoring it\n");
 #endif
       }
       flow->tls_quic.certificate_processed = 1;
