@@ -152,14 +152,18 @@ typedef enum {
   NDPI_RISK_LOW,
   NDPI_RISK_MEDIUM,
   NDPI_RISK_HIGH,
-  NDPI_RISK_SEVERE
+  NDPI_RISK_SEVERE,
+  NDPI_RISK_CRITICAL,
+  NDPI_RISK_EMERGENCY
 } ndpi_risk_severity;
 
 typedef enum {
-  NDPI_SCORE_RISK_LOW    =  10,
-  NDPI_SCORE_RISK_MEDIUM =  50,
-  NDPI_SCORE_RISK_HIGH   = 100,
-  NDPI_SCORE_RISK_SEVERE = 250,
+  NDPI_SCORE_RISK_LOW       =  10,
+  NDPI_SCORE_RISK_MEDIUM    =  50,
+  NDPI_SCORE_RISK_HIGH      = 100,
+  NDPI_SCORE_RISK_SEVERE    = 150,
+  NDPI_SCORE_RISK_CRITICAL  = 200,
+  NDPI_SCORE_RISK_EMERGENCY = 250,
 } ndpi_risk_score;
 
 typedef enum {
@@ -167,7 +171,7 @@ typedef enum {
   CLIENT_LOW_RISK_PERCENTAGE  =  10, /* 90%  server risk */
   CLIENT_FAIR_RISK_PERCENTAGE =  50, /* 50%  server risk */
   CLIENT_HIGH_RISK_PERCENTAGE =  90, /* 10%  server risk */
-  CLIENT_FULL_RISK_PERCENTAGE = 100 /* 0%   server risk */
+  CLIENT_FULL_RISK_PERCENTAGE = 100  /* 0%   server risk */
 } risk_percentage;
 
 typedef enum {

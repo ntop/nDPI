@@ -2003,6 +2003,14 @@ const char* ndpi_severity2str(ndpi_risk_severity s) {
   case NDPI_RISK_SEVERE:
     return("Severe");
     break;
+
+  case NDPI_RISK_CRITICAL:
+    return("Critical");
+    break;
+    
+  case NDPI_RISK_EMERGENCY:
+    return("Emergency");
+    break;
   }
 
   return("");
@@ -2042,6 +2050,14 @@ u_int16_t ndpi_risk2score(ndpi_risk risk,
 
       case NDPI_RISK_SEVERE:
 	val = NDPI_SCORE_RISK_SEVERE;
+	break;
+
+      case NDPI_RISK_CRITICAL:
+	val = NDPI_SCORE_RISK_CRITICAL;
+	break;
+
+      case NDPI_RISK_EMERGENCY:
+	val = NDPI_SCORE_RISK_EMERGENCY;
 	break;
       }
 
