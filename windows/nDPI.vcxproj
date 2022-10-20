@@ -256,6 +256,7 @@
     <ClCompile Include="..\src\lib\protocols\mpegts.c" />
     <ClCompile Include="..\src\lib\protocols\mqtt.c" />
     <ClCompile Include="..\src\lib\protocols\mssql_tds.c" />
+    <ClCompile Include="..\src\lib\protocols\munin.c" />
     <ClCompile Include="..\src\lib\protocols\mysql.c" />
     <ClCompile Include="..\src\lib\protocols\netbios.c" />
     <ClCompile Include="..\src\lib\protocols\netflow.c" />

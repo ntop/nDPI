@@ -1330,7 +1330,7 @@ struct ndpi_flow_struct {
   char flow_extra_info[16];
 
   /* General purpose field used to save mainly hostname/SNI information.
-   * In details it used for: MGCP, COLLECTD, DNS, SSDP and NETBIOS name, HTTP and DHCP hostname,
+   * In details it used for: MGCP, COLLECTD, DNS, SSDP and NETBIOS name, HTTP, MUNIN and DHCP hostname,
    * WHOIS request, TLS/QUIC server name, XIAOMI domain and STUN realm.
    *
    * Please, think *very* hard before increasing its size!
