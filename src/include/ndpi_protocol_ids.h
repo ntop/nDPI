@@ -358,6 +358,7 @@ typedef enum {
   NDPI_PROTOCOL_TUNEIN                = 327,
   NDPI_PROTOCOL_SIRIUSXMRADIO         = 328,
   NDPI_PROTOCOL_MUNIN                 = 329,
+  NDPI_PROTOCOL_ELASTICSEARCH         = 330,
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
