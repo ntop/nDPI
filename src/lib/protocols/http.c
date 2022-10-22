@@ -395,14 +395,28 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
 /* ************************************************************* */
 
 static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-				 struct ndpi_flow_struct *flow) {
+					struct ndpi_flow_struct *flow) {
   u_int16_t master_protocol;
 
   if((flow->l4.tcp.http_stage == 0) || (flow->http.url && flow->http_detected)) {
     char *double_col = strchr((char*)flow->host_server_name, ':');
-
+    int a, b, c, d;
+    
     if(double_col) double_col[0] = '\0';
 
+    if(ndpi_struct->packet.iph
+       && (sscanf(flow->host_server_name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)) {
+      /* IPv4 */
+
+      if(ndpi_struct->packet.iph->daddr != inet_addr(flow->host_server_name)) {
+	char buf[64], msg[128];
+	
+	snprintf(msg, sizeof(msg), "Expected %s, found %s",
+		 ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)), flow->host_server_name);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
+      }
+    }
+    
     master_protocol = NDPI_PROTOCOL_HTTP;
     if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
       master_protocol = flow->detected_protocol_stack[1];
