@@ -3,8 +3,7 @@ Guessed flow protos:	5
 DPI Packets (TCP):	106	(8.15 pkts/flow)
 DPI Packets (UDP):	27	(1.93 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
-Confidence Unknown          : 1 (flows)
-Confidence Match by port    : 3 (flows)
+Confidence Match by port    : 4 (flows)
 Confidence DPI              : 25 (flows)
 Num dissector calls: 550 (18.97 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -23,7 +22,6 @@ Patricia risk mask:   54/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   39/17 (search/found)
 
-Unknown	3	194	1
 DNS	6	1093	3
 MDNS	4	412	1
 ICMP	2	3028	1
@@ -32,6 +30,7 @@ ICMPV6	2	140	1
 Facebook	2	281	1
 Google	31	9113	3
 Viber	295	105504	12
+QUIC	3	194	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -60,13 +59,10 @@ JA3 Host Stats:
 	20	UDP 192.168.0.17:44376 <-> 192.168.0.15:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/82 bytes <-> 1 pkts/183 bytes][Goodput ratio: 48/77][0.03 sec][Hostname/SNI: venetia.iad.appboy.com][151.101.1.130][PLAIN TEXT (venetia)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	21	UDP 192.168.0.17:37418 <-> 192.168.0.15:53 [proto: 5.144/DNS.Viber][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/79 bytes <-> 1 pkts/185 bytes][Goodput ratio: 46/77][0.12 sec][Hostname/SNI: media.cdn.viber.com][54.230.93.96][PLAIN TEXT (cloudfront)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	22	UDP 192.168.0.17:40445 <-> 192.168.0.15:53 [proto: 5.144/DNS.Viber][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/78 bytes <-> 1 pkts/185 bytes][Goodput ratio: 46/77][0.03 sec][Hostname/SNI: dl-media.viber.com][54.230.93.53][PLAIN TEXT (cloudfront)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	23	UDP 192.168.0.17:35331 <-> 192.168.0.15:53 [proto: 5.126/DNS.Google][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/79 bytes <-> 1 pkts/95 bytes][Goodput ratio: 46/55][0.02 sec][Hostname/SNI: app-measurement.com][172.217.23.78][PLAIN TEXT (measurement)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	24	UDP 192.168.0.17:50097 <-> 192.168.0.15:53 [proto: 5.126/DNS.Google][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/90 bytes][Goodput ratio: 43/53][0.00 sec][Hostname/SNI: www.google.com][216.58.205.100][PLAIN TEXT (google)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	25	TCP 192.168.2.100:42900 -> 44.192.202.74:4244 [proto: 144/Viber][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][cat: VoIP/10][1 pkts/162 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	26	ICMPV6 [fe80::3207:4dff:fea3:5fa7]:0 -> [ff02::2]:0 [proto: 102/ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 11/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	27	UDP 192.168.0.17:38190 <-> 18.201.4.3:7987 [proto: 144/Viber][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][cat: VoIP/10][1 pkts/76 bytes <-> 1 pkts/62 bytes][Goodput ratio: 44/32][0.03 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	28	UDP 192.168.0.17:47171 <-> 18.201.4.32:7987 [proto: 144/Viber][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][cat: VoIP/10][1 pkts/76 bytes <-> 1 pkts/62 bytes][Goodput ratio: 44/32][0.03 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-
-Undetected flows:
-	1	UDP 192.168.0.17:41993 <-> 172.217.23.106:443 [proto: 0/Unknown][IP: 126/Google][ClearText][Confidence: Unknown][2 pkts/130 bytes <-> 1 pkts/64 bytes][Goodput ratio: 35/34][0.00 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	23	UDP 192.168.0.17:41993 <-> 172.217.23.106:443 [proto: 188/QUIC][IP: 126/Google][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/130 bytes <-> 1 pkts/64 bytes][Goodput ratio: 35/34][0.00 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	24	UDP 192.168.0.17:35331 <-> 192.168.0.15:53 [proto: 5.126/DNS.Google][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/79 bytes <-> 1 pkts/95 bytes][Goodput ratio: 46/55][0.02 sec][Hostname/SNI: app-measurement.com][172.217.23.78][PLAIN TEXT (measurement)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	25	UDP 192.168.0.17:50097 <-> 192.168.0.15:53 [proto: 5.126/DNS.Google][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/90 bytes][Goodput ratio: 43/53][0.00 sec][Hostname/SNI: www.google.com][216.58.205.100][PLAIN TEXT (google)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	26	TCP 192.168.2.100:42900 -> 44.192.202.74:4244 [proto: 144/Viber][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][cat: VoIP/10][1 pkts/162 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	27	ICMPV6 [fe80::3207:4dff:fea3:5fa7]:0 -> [ff02::2]:0 [proto: 102/ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 11/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	28	UDP 192.168.0.17:38190 <-> 18.201.4.3:7987 [proto: 144/Viber][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][cat: VoIP/10][1 pkts/76 bytes <-> 1 pkts/62 bytes][Goodput ratio: 44/32][0.03 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	29	UDP 192.168.0.17:47171 <-> 18.201.4.32:7987 [proto: 144/Viber][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][cat: VoIP/10][1 pkts/76 bytes <-> 1 pkts/62 bytes][Goodput ratio: 44/32][0.03 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
