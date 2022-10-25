@@ -5412,7 +5412,8 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
       flow->init_finished = 1;
 
-      if(ndpi_str->input_info &&
+      if(tcph != NULL &&
+         ndpi_str->input_info &&
          ndpi_str->input_info->seen_flow_beginning == NDPI_FLOW_BEGINNING_SEEN) {
         flow->l4.tcp.seen_syn = 1;
         flow->l4.tcp.seen_syn_ack = 1;
