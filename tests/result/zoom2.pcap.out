@@ -20,7 +20,7 @@ Automa risk mask:     1/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   10/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   11/8 (search/found)
+Patricia protocols:   5/5 (search/found)
 
 ICMP	27	1890	1
 Zoom	11950	9004950	4

@@ -18,7 +18,7 @@ Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   24/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   26/0 (search/found)
+Patricia protocols:   24/0 (search/found)
 
 MsSQL-TDS	38	16260	12
 

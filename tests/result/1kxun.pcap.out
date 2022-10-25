@@ -5,7 +5,7 @@ DPI Packets (UDP):	120	(1.21 pkts/flow)
 Confidence Unknown          : 14 (flows)
 Confidence Match by port    : 6 (flows)
 Confidence DPI              : 177 (flows)
-Num dissector calls: 4789 (24.31 diss/flow)
+Num dissector calls: 4793 (24.33 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/45/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -20,7 +20,7 @@ Automa risk mask:     18/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   252/0 (search/found)
 Patricia risk:        6/0 (search/found)
-Patricia protocols:   359/38 (search/found)
+Patricia protocols:   337/37 (search/found)
 
 Unknown	24	6428	14
 HTTP	780	1058113	34

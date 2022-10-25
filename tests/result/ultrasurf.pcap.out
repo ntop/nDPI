@@ -17,7 +17,7 @@ Automa risk mask:     0/0 (search/found)
 Automa common alpns:  4/4 (search/found)
 Patricia risk mask:   6/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   8/0 (search/found)
+Patricia protocols:   6/0 (search/found)
 
 TLS	5171	5127023	2
 UltraSurf	2971	2991918	1
