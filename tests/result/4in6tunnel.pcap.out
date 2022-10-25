@@ -14,7 +14,7 @@ Automa host:          1/1 (search/found)
 Automa domain:        1/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
-Automa common alpns:  0/0 (search/found)
+Automa common alpns:  2/2 (search/found)
 Patricia risk mask:   2/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
@@ -26,4 +26,4 @@ JA3 Host Stats:
 	1	 192.168.0.1              	 1      
 
 
-	1	TCP 192.168.0.1:64455 <-> 10.10.10.1:443 [proto: 91.212/TLS.Microsoft][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][2 pkts/520 bytes <-> 2 pkts/1668 bytes][Goodput ratio: 43/82][< 1 sec][Hostname/SNI: www.bing.com][ALPN: h2;http/1.1][TLSv1.2][JA3C: 9e10692f1b7f78228b2d4e424db3a98c][Firefox][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0]
+	1	TCP 192.168.0.1:64455 <-> 10.10.10.1:443 [proto: 91.212/TLS.Microsoft][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][2 pkts/520 bytes <-> 2 pkts/1668 bytes][Goodput ratio: 43/82][< 1 sec][Hostname/SNI: www.bing.com][(Advertised) ALPNs: h2;http/1.1][TLSv1.2][JA3C: 9e10692f1b7f78228b2d4e424db3a98c][Firefox][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0]

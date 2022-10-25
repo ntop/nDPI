@@ -943,7 +943,7 @@ static void ndpi_process_packet(uint8_t * const args,
             {
 	      uint8_t unknown_tls_version = 0;
 	      char buf_ver[16];
-	      printf("[%8llu, %d, %4d][TLS-CLIENT-HELLO] version: %s | sni: %s | alpn: %s\n",
+	      printf("[%8llu, %d, %4d][TLS-CLIENT-HELLO] version: %s | sni: %s | (advertised) ALPNs: %s\n",
 		     workflow->packets_captured,
 		     reader_thread->array_index,
 		     flow_to_process->flow_id,
@@ -951,8 +951,8 @@ static void ndpi_process_packet(uint8_t * const args,
 					  flow_to_process->ndpi_flow->protos.tls_quic.ssl_version,
 					  &unknown_tls_version),
 		     flow_to_process->ndpi_flow->host_server_name,
-		     (flow_to_process->ndpi_flow->protos.tls_quic.alpn != NULL ?
-		      flow_to_process->ndpi_flow->protos.tls_quic.alpn : "-"));
+		     (flow_to_process->ndpi_flow->protos.tls_quic.advertised_alpns != NULL ?
+		      flow_to_process->ndpi_flow->protos.tls_quic.advertised_alpns : "-"));
 	      flow_to_process->tls_client_hello_seen = 1;
             }
 	  if (flow_to_process->tls_server_hello_seen == 0 &&

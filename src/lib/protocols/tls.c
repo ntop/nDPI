@@ -1261,11 +1261,11 @@ static void tls_subclassify_by_alpn(struct ndpi_detection_module_struct *ndpi_st
 				    struct ndpi_flow_struct *flow) {
   /* Right now we have only one rule so we can keep it trivial */
 
-  if (!flow->protos.tls_quic.alpn)
+  if (!flow->protos.tls_quic.advertised_alpns)
     return;
 
-  if(strlen(flow->protos.tls_quic.alpn) > NDPI_STATICSTRING_LEN("anydesk/") &&
-     strncmp(flow->protos.tls_quic.alpn, "anydesk/", NDPI_STATICSTRING_LEN("anydesk/")) == 0) {
+  if(strlen(flow->protos.tls_quic.advertised_alpns) > NDPI_STATICSTRING_LEN("anydesk/") &&
+     strncmp(flow->protos.tls_quic.advertised_alpns, "anydesk/", NDPI_STATICSTRING_LEN("anydesk/")) == 0) {
 #ifdef DEBUG_TLS
     printf("Matching ANYDESK via alpn\n");
 #endif
@@ -1278,9 +1278,10 @@ static void tls_subclassify_by_alpn(struct ndpi_detection_module_struct *ndpi_st
 /* **************************************** */
 
 static void tlsCheckUncommonALPN(struct ndpi_detection_module_struct *ndpi_struct,
-				 struct ndpi_flow_struct *flow) {
-  char * alpn_start = flow->protos.tls_quic.alpn;
+				 struct ndpi_flow_struct *flow,
+				 char *alpn_start) {
   char * comma_or_nul = alpn_start;
+
   do {
     size_t alpn_len;
 
@@ -1555,7 +1556,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  u_int16_t s_offset = offset+4;
 	  u_int16_t tot_alpn_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 	  char alpn_str[256];
-	  u_int8_t alpn_str_len = 0, i;
+	  u_int16_t alpn_str_len = 0, i;
 
 #ifdef DEBUG_TLS
 	  printf("Server TLS [ALPN: block_len=%u/len=%u]\n", extension_len, tot_alpn_len);
@@ -1605,13 +1606,18 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  if(ndpi_normalize_printable_string(alpn_str, alpn_str_len) == 0)
 	    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, alpn_str);
 
-	  if(flow->protos.tls_quic.alpn == NULL)
-	    flow->protos.tls_quic.alpn = ndpi_strdup(alpn_str);
+	  if(flow->protos.tls_quic.negotiated_alpn == NULL)
+	    flow->protos.tls_quic.negotiated_alpn = ndpi_strdup(alpn_str);
 
-	  if(flow->protos.tls_quic.alpn != NULL)
-	    tlsCheckUncommonALPN(ndpi_struct, flow);
+	  /* Check ALPN only if not already checked (client-side) */
+	  if(flow->protos.tls_quic.negotiated_alpn != NULL &&
+	     flow->protos.tls_quic.advertised_alpns == NULL)
+	    tlsCheckUncommonALPN(ndpi_struct, flow, flow->protos.tls_quic.negotiated_alpn);
 
-	  ndpi_snprintf(ja3.server.alpn, sizeof(ja3.server.alpn), "%s", alpn_str);
+	  alpn_str_len = ndpi_min(sizeof(ja3.server.alpn), (size_t)alpn_str_len);
+	  memcpy(ja3.server.alpn, alpn_str, alpn_str_len);
+	  if(alpn_str_len > 0)
+	    ja3.server.alpn[alpn_str_len - 1] = '\0';
 
 	  /* Replace , with - as in JA3 */
 	  for(i=0; ja3.server.alpn[i] != '\0'; i++)
@@ -2164,7 +2170,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int16_t s_offset = offset+extension_offset;
 		u_int16_t tot_alpn_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 		char alpn_str[256];
-		u_int8_t alpn_str_len = 0, i;
+		u_int16_t alpn_str_len = 0, i;
 
 #ifdef DEBUG_TLS
 		printf("Client TLS [ALPN: block_len=%u/len=%u]\n", extension_len, tot_alpn_len);
@@ -2202,8 +2208,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		printf("Client TLS [ALPN: %s][len: %u]\n", alpn_str, alpn_str_len);
 #endif
-		if(flow->protos.tls_quic.alpn == NULL) {
-		  flow->protos.tls_quic.alpn = ndpi_strdup(alpn_str);
+		if(flow->protos.tls_quic.advertised_alpns == NULL) {
+		  flow->protos.tls_quic.advertised_alpns = ndpi_strdup(alpn_str);
+
+		  tlsCheckUncommonALPN(ndpi_struct, flow, flow->protos.tls_quic.advertised_alpns);
 
 		  /* Without SNI matching we can try to sub-classify the flow via ALPN.
 		     Note that this happens only on very rare cases, not the common ones
@@ -2212,7 +2220,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	            tls_subclassify_by_alpn(ndpi_struct, flow);
 		}
 
-		ndpi_snprintf(ja3.client.alpn, sizeof(ja3.client.alpn), "%s", alpn_str);
+                alpn_str_len = ndpi_min(sizeof(ja3.client.alpn), (size_t)alpn_str_len);
+		memcpy(ja3.client.alpn, alpn_str, alpn_str_len);
+		if(alpn_str_len > 0)
+		  ja3.client.alpn[alpn_str_len - 1] = '\0';
 
 		/* Replace , with - as in JA3 */
 		for(i=0; ja3.client.alpn[i] != '\0'; i++)
@@ -2473,7 +2484,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    /* Before returning to the caller we need to make a final check */
 	    if((flow->protos.tls_quic.ssl_version >= 0x0303) /* >= TLSv1.2 */
-	       && (flow->protos.tls_quic.alpn == NULL) /* No ALPN */) {
+	       && (flow->protos.tls_quic.advertised_alpns == NULL) /* No ALPN */) {
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_NOT_CARRYING_HTTPS, "No ALPN");
 	    }
 

@@ -1335,9 +1335,9 @@ static void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   flow->protos.tls_quic.ssl_version = 0x0304;
 
   /* DNS-over-QUIC: ALPN is "doq" or "doq-XXX" (for drafts versions) */
-  if(flow->protos.tls_quic.alpn &&
-     strncmp(flow->protos.tls_quic.alpn, "doq", 3) == 0) {
-    NDPI_LOG_DBG(ndpi_struct, "Found DOQ (ALPN: [%s])\n", flow->protos.tls_quic.alpn);
+  if(flow->protos.tls_quic.advertised_alpns &&
+     strncmp(flow->protos.tls_quic.advertised_alpns, "doq", 3) == 0) {
+    NDPI_LOG_DBG(ndpi_struct, "Found DOQ (ALPN: [%s])\n", flow->protos.tls_quic.advertised_alpns);
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_QUIC, NDPI_CONFIDENCE_DPI);
   }
 }

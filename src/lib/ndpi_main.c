@@ -5070,8 +5070,11 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
       if(flow->protos.tls_quic.server_names)
 	ndpi_free(flow->protos.tls_quic.server_names);
 
-      if(flow->protos.tls_quic.alpn)
-	ndpi_free(flow->protos.tls_quic.alpn);
+      if(flow->protos.tls_quic.advertised_alpns)
+	ndpi_free(flow->protos.tls_quic.advertised_alpns);
+
+      if(flow->protos.tls_quic.negotiated_alpn)
+	ndpi_free(flow->protos.tls_quic.negotiated_alpn);
 
       if(flow->protos.tls_quic.tls_supported_versions)
 	ndpi_free(flow->protos.tls_quic.tls_supported_versions);

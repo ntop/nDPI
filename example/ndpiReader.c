@@ -767,7 +767,7 @@ void printCSVHeader() {
   fprintf(csv_fp, "server_info,");
   fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
   fprintf(csv_fp, "ja3s,tls_server_unsafe,");
-  fprintf(csv_fp, "tls_alpn,tls_supported_versions,");
+  fprintf(csv_fp, "advertised_alpns,negotiated_alpn,tls_supported_versions,");
 #if 0
   fprintf(csv_fp, "tls_issuerDN,tls_subjectDN,");
 #endif
@@ -1341,8 +1341,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
             (flow->ssh_tls.ja3_server[0] != '\0')   ? flow->ssh_tls.ja3_server : "",
             (flow->ssh_tls.ja3_server[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.server_unsafe_cipher) : "0");
 
-    fprintf(csv_fp, "%s,%s,",
-            flow->ssh_tls.tls_alpn                  ? flow->ssh_tls.tls_alpn : "",
+    fprintf(csv_fp, "%s,%s,%s,",
+            flow->ssh_tls.advertised_alpns          ? flow->ssh_tls.advertised_alpns : "",
+            flow->ssh_tls.negotiated_alpn           ? flow->ssh_tls.negotiated_alpn : "",
             flow->ssh_tls.tls_supported_versions    ? flow->ssh_tls.tls_supported_versions : ""
             );
 
@@ -1541,16 +1542,16 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
           }
         }
         break;
-
-      case INFO_TLS_QUIC_ALPN_VERSION:
-        fprintf(out, "[ALPN: %s][TLS Supported Versions: %s]",
-                flow->tls_quic.alpn, flow->tls_quic.tls_supported_versions);
-        break;
-
-      case INFO_TLS_QUIC_ALPN_ONLY:
-        fprintf(out, "[ALPN: %s]", flow->tls_quic.alpn);
-        break;
     }
+
+    if(flow->ssh_tls.advertised_alpns)
+        fprintf(out, "[(Advertised) ALPNs: %s]", flow->ssh_tls.advertised_alpns);
+
+    if(flow->ssh_tls.negotiated_alpn)
+        fprintf(out, "[(Negotiated) ALPN: %s]", flow->ssh_tls.negotiated_alpn);
+
+    if(flow->ssh_tls.tls_supported_versions)
+      fprintf(out, "[TLS Supported Versions: %s]", flow->ssh_tls.tls_supported_versions);
 
     if(flow->flow_extra_info[0] != '\0') fprintf(out, "[%s]", flow->flow_extra_info);
 
@@ -3249,14 +3250,14 @@ static void printFlowsStats() {
                     || (all_flows[i].flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
                     || (all_flows[i].flow->detected_protocol.app_protocol == NDPI_PROTOCOL_DOH_DOT)
                     )
-                   && all_flows[i].flow->ssh_tls.tls_alpn /* ALPN */
+                   && all_flows[i].flow->ssh_tls.advertised_alpns /* ALPN */
                    ) {
                   if(check_bin_doh_similarity(&bins[i], &s))
                     printf("[DoH (%f distance)]", s);
                   else
                     printf("[NO DoH (%f distance)]", s);
                 } else {
-                  if(all_flows[i].flow->ssh_tls.tls_alpn == NULL)
+                  if(all_flows[i].flow->ssh_tls.advertised_alpns == NULL)
                     printf("[NO DoH check: missing ALPN]");
                 }
               }
