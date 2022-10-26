@@ -94,7 +94,7 @@ int mbedtls_aesni_has_support( unsigned int what )
       fclose(fd);
 
       has_aesni_checked = 1;
-      return(found);
+      return(has_aesni_checked);
     }
   } else
     return(cached_has_aesni);
