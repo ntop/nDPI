@@ -46,7 +46,7 @@
 #endif
 
 #if defined(linux) || defined(__linux__)
-static u_int8_t cached_has_aesni = 0. has_aesni_checked = 0;
+static u_int8_t cached_has_aesni = 0, has_aesni_checked = 0;
 #endif
 
 /*
