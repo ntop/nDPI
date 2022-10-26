@@ -94,17 +94,19 @@ int mbedtls_aesni_has_support( unsigned int what )
       fclose(fd);
 
       has_aesni_checked = 1;
-      return(has_aesni_checked);
     }
-  } else
-    return(cached_has_aesni);
+  }
+  
+  return(cached_has_aesni);
 
+#if 0
   if (__get_cpuid(1, &eax, &ebx, &ecx, &edx) == 0)
   {
     return 0;
   }
 
   return ( (ecx & what) != 0 );
+#endif
 #elif defined(WIN32) || defined(WIN64)
   int cpuInfo[4];
 
