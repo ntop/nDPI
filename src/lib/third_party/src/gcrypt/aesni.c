@@ -42,6 +42,10 @@
 #include <intrin.h>
 #endif
 
+#if defined(linux) || defined(__linux__)
+static u_int8_t cached_has_aesni = 0, has_aesni_checked = 0;
+#endif
+
 /*
  * AES-NI support detection routine
  */
@@ -56,7 +60,7 @@ int mbedtls_aesni_has_support( unsigned int what )
 #if defined(linux) || defined(__linux__)
   unsigned int eax, ebx, ecx, edx;
 
-  {
+  if(has_aesni_checked == 0) {
     /*
       NOTE
 
@@ -64,34 +68,33 @@ int mbedtls_aesni_has_support( unsigned int what )
       Example with Intel(R) Celeron(R) CPU N2930 (that has NO AES-NI)
       the code based on __get_cpuid() reports that AES-NI is present
       and thus nDPI crashes on such platform.
-     */
+    */
     FILE *fd = fopen("/proc/cpuinfo", "r");
 
     if(fd != NULL) {
       char *line = NULL;
       size_t len = 0;
-      int found = 0;
+      u_int8_t num_lines = 0;
 
       while(getline(&line, &len, fd) != -1) {
 	if(strstr(line, "aes")) {
 	  /* printf("FOUND %s", line); */
-	  found = 1;
+	  cached_has_aesni = 1;
 	  break;
 	}
+
+	if(++num_lines > 99)
+	  break; /* We giveup */
       }
 
       free(line);
       fclose(fd);
-      return(found);
+
+      has_aesni_checked = 1;
     }
   }
 
-  if (__get_cpuid(1, &eax, &ebx, &ecx, &edx) == 0)
-  {
-    return 0;
-  }
-
-  return ( (ecx & what) != 0 );
+  return(cached_has_aesni);
 #elif defined(WIN32) || defined(WIN64)
   int cpuInfo[4];
 
