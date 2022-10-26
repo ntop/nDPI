@@ -61,8 +61,6 @@ int mbedtls_aesni_has_support( unsigned int what )
 #endif
 
 #if defined(linux) || defined(__linux__)
-  unsigned int eax, ebx, ecx, edx;
-
   if(has_aesni_checked == 0) {
     /*
       NOTE
