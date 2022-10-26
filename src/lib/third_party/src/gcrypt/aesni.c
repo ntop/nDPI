@@ -80,6 +80,7 @@ int mbedtls_aesni_has_support( unsigned int what )
 	}
       }
 
+      free(line);
       fclose(fd);
       return(found);
     }
