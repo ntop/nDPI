@@ -127,6 +127,11 @@ extern u_int16_t min_pattern_len, max_pattern_len;
 extern void ndpi_self_check_host_match(); /* Self check function */
 u_int8_t dump_internal_stats;
 
+struct ndpi_bin malloc_bins;
+int enable_malloc_bins = 0;
+int max_malloc_bins = 14;
+int malloc_size_stats = 0;
+
 struct flow_info {
   struct ndpi_flow_info *flow;
   u_int16_t thread_id;
@@ -506,6 +511,7 @@ static void help(u_int long_help) {
          "  -I                        | Ignore VLAN id for flow hash calculation\n"
          "  -z                        | Enable JA3+\n"
          "  -A                        | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
+         "  -M                        | Memory allocation stats on data-path (only by the library). It works only on single-thread configuration\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -808,7 +814,7 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "a:Ab:e:Ec:C:dDf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:w:zq0123:456:7:89:m:T:U:",
+  while((opt = getopt_long(argc, argv, "a:Ab:e:Ec:C:dDf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:w:zq0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -974,6 +980,11 @@ static void parseOptions(int argc, char **argv) {
       }
       break;
 
+    case 'M':
+      enable_malloc_bins = 1;
+      ndpi_init_bin(&malloc_bins, ndpi_bin_family64, max_malloc_bins);
+      break;
+
     case 'k':
       errno = 0;
       if((serialization_fp = fopen(optarg, "w")) == NULL)
@@ -1109,6 +1120,12 @@ static void parseOptions(int argc, char **argv) {
       if(num_threads > MAX_NUM_READER_THREADS) num_threads = MAX_NUM_READER_THREADS;
       for(thread_id = 1; thread_id < num_threads; thread_id++)
         _pcap_file[thread_id] = _pcap_file[0];
+    }
+
+    if(num_threads > 1 && enable_malloc_bins == 1)
+    {
+      printf("Memory profiling ('-M') is incompatible with multi-thread enviroment");
+      exit(1);
     }
   }
 
@@ -1881,8 +1898,10 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     if((!flow->detection_completed) && flow->ndpi_flow) {
       u_int8_t proto_guessed;
 
+      malloc_size_stats = 1;
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct,
                                                       flow->ndpi_flow, enable_protocol_guess, &proto_guessed);
+      malloc_size_stats = 0;
 
       if(enable_protocol_guess) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
     }
@@ -3528,6 +3547,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       }
 
       if(dump_internal_stats) {
+	char buf[1024];
+
 	if(cumulative_stats.ndpi_flow_count)
 	  printf("\tNum dissector calls:   %-13llu (%.2f diss/flow)\n",
 	         (long long unsigned int)cumulative_stats.num_dissector_calls,
@@ -3587,6 +3608,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	printf("\tPatricia protocols:   %llu/%llu (search/found)\n",
 	       (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_search,
 	       (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_found);
+
+        if(enable_malloc_bins)
+	  printf("\tData-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
       }
     }
 
@@ -3615,6 +3639,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       }
 
       if(dump_internal_stats) {
+	char buf[1024];
+
 	if(cumulative_stats.ndpi_flow_count)
 	  fprintf(results_file, "Num dissector calls: %llu (%.2f diss/flow)\n",
 	          (long long unsigned int)cumulative_stats.num_dissector_calls,
@@ -3674,6 +3700,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	fprintf(results_file, "Patricia protocols:   %llu/%llu (search/found)\n",
 		(long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_search,
 		(long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_found);
+
+	if(enable_malloc_bins)
+	  fprintf(results_file, "Data-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
       }
 
       fprintf(results_file, "\n");
@@ -5149,6 +5178,8 @@ void zscoreUnitTest() {
     if(extcap_dumper) pcap_dump_close(extcap_dumper);
     if(extcap_fifo_h) pcap_close(extcap_fifo_h);
     if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
+    if(enable_malloc_bins)
+      ndpi_free_bin(&malloc_bins);
     if(csv_fp)        fclose(csv_fp);
     ndpi_free(_debug_protocols);
 

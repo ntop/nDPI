@@ -18,6 +18,10 @@ u_int8_t enable_flow_stats = 0;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 ndpi_init_prefs init_prefs = ndpi_track_flow_payload | ndpi_enable_ja3_plus;
+int enable_malloc_bins = 0;
+int malloc_size_stats = 0;
+int max_malloc_bins = 0;
+struct ndpi_bin malloc_bins; /* unused */
 
 int bufferToFile(const char * name, const uint8_t *Data, size_t Size) {
   FILE * fd;

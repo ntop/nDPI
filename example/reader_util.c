@@ -80,6 +80,11 @@ static u_int32_t flow_id = 0;
 u_int8_t enable_doh_dot_detection = 0;
 extern ndpi_init_prefs init_prefs;
 
+extern int malloc_size_stats;
+extern struct ndpi_bin malloc_bins;
+extern int max_malloc_bins;
+extern int enable_malloc_bins;
+
 /* ****************************************************** */
 
 struct flow_id_stats {
@@ -309,6 +314,17 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
 
 extern u_int32_t current_ndpi_memory, max_ndpi_memory;
 
+static u_int32_t __slot_malloc_bins(u_int64_t v)
+{
+  int i;
+
+  /* 0-2,3-4,5-8,9-16,17-32,33-64,65-128,129-256,257-512,513-1024,1025-2048,2049-4096,4097-8192,8193- */
+  for(i=0; i < max_malloc_bins - 1; i++)
+    if((1ULL << (i + 1)) >= v)
+      return i;
+  return i;
+}
+
 /**
  * @brief ndpi_malloc wrapper function
  */
@@ -317,6 +333,9 @@ static void *ndpi_malloc_wrapper(size_t size) {
 
   if(current_ndpi_memory > max_ndpi_memory)
     max_ndpi_memory = current_ndpi_memory;
+
+  if(enable_malloc_bins && malloc_size_stats)
+    ndpi_inc_bin(&malloc_bins, __slot_malloc_bins(size), 1);
 
   return(malloc(size)); /* Don't change to ndpi_malloc !!!!! */
 }
@@ -1620,6 +1639,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     /* Set here any information (easily) available; in this trivial example we don't have any */
     input_info.in_pkt_dir = NDPI_IN_PKT_DIR_UNKNOWN;
     input_info.seen_flow_beginning = NDPI_FLOW_BEGINNING_UNKNOWN;
+    malloc_size_stats = 1;
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							    ipsize, time_ms, &input_info);
@@ -1650,6 +1670,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	process_ndpi_collected_info(workflow, flow);
       }
     }
+    malloc_size_stats = 0;
   }
   
 #if 0
