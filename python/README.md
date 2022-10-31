@@ -22,6 +22,7 @@ sudo make install
 
 ``` bash
 cd python
+# IMPORTANT: nDPI Bindings requires Python version >= 3.7
 python3 -m pip install --upgrade pip
 python3 -m install -r dev_requirements.txt
 python3 -m pip install .
