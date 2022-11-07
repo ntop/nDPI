@@ -182,7 +182,7 @@ typedef struct ndpi_flow_info {
   u_int16_t vlan_id;
   ndpi_packet_tunnel tunnel_type;
   struct ndpi_flow_struct *ndpi_flow;
-  char src_name[48], dst_name[48];
+  char src_name[INET6_ADDRSTRLEN], dst_name[INET6_ADDRSTRLEN];
   u_int8_t ip_version;
   u_int32_t cwr_count, src2dst_cwr_count, dst2src_cwr_count;
   u_int32_t ece_count, src2dst_ece_count, dst2src_ece_count;
