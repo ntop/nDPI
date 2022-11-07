@@ -1516,7 +1516,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		   u_int16_t src_port, u_int16_t dst_port,
 		   ndpi_protocol l7_protocol,
 		   ndpi_serializer *serializer) {
-  char src_name[32] = {'\0'}, dst_name[32] = {'\0'};
+  char src_name[INET6_ADDRSTRLEN] = {'\0'}, dst_name[INET6_ADDRSTRLEN] = {'\0'};
 
   if(ip_version == 4) {
     inet_ntop(AF_INET, &src_v4, src_name, sizeof(src_name));
