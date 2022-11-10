@@ -21,4 +21,4 @@ Patricia protocols:   2/0 (search/found)
 
 IP_PIM	10	920	1
 
-	1	103 192.168.203.234:0 -> 224.0.0.13:0 [proto: 297/IP_PIM][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][10 pkts/920 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][9.01 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 999/0 1001/0 1006/0 2/0][Pkt Len c2s/s2c min/avg/max/stddev: 88/0 92/0 108/0 8/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	PIM 192.168.203.234:0 -> 224.0.0.13:0 [proto: 297/IP_PIM][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][10 pkts/920 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][9.01 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 999/0 1001/0 1006/0 2/0][Pkt Len c2s/s2c min/avg/max/stddev: 88/0 92/0 108/0 8/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
