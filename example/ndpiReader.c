@@ -1150,39 +1150,6 @@ static void parseOptions(int argc, char **argv) {
 
 /* ********************************** */
 
-/**
- * @brief From IPPROTO to string NAME
- */
-static char* ipProto2Name(u_int16_t proto_id) {
-  static char proto[8];
-
-  switch(proto_id) {
-  case IPPROTO_TCP:
-    return("TCP");
-    break;
-  case IPPROTO_UDP:
-    return("UDP");
-    break;
-  case IPPROTO_ICMP:
-    return("ICMP");
-    break;
-  case IPPROTO_ICMPV6:
-    return("ICMPV6");
-    break;
-  case 112:
-    return("VRRP");
-    break;
-  case IPPROTO_IGMP:
-    return("IGMP");
-    break;
-  }
-
-  ndpi_snprintf(proto, sizeof(proto), "%u", proto_id);
-  return(proto);
-}
-
-/* ********************************** */
-
 #if 0
 /**
  * @brief A faster replacement for inet_ntoa().
@@ -1289,6 +1256,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   u_int8_t known_tls;
   char buf[32], buf1[64];
   char buf_ver[16];
+  char l4_proto_name[32];
   u_int i;
 
   if(csv_fp != NULL) {
@@ -1402,7 +1370,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(out, "\t%u(%u)", id, flow->flow_id);
 #endif
 
-    fprintf(out, "\t%s ", ipProto2Name(flow->protocol));
+    fprintf(out, "\t%s ", ndpi_get_ip_proto_name(flow->protocol, l4_proto_name, sizeof(l4_proto_name)));
 
     fprintf(out, "%s%s%s:%u %s %s%s%s:%u ",
 	    (flow->ip_version == 6) ? "[" : "",
@@ -2289,7 +2257,6 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
     u_int16_t thread_id = *(int *)user_data;
     u_int16_t sport, dport;
     char proto[16];
-    int r;
 
     sport = ntohs(flow->src_port), dport = ntohs(flow->dst_port);
 
@@ -2303,7 +2270,7 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
       proto[sizeof(proto) - 1] = '\0';
     }
 
-    if(((r = strcmp(ipProto2Name(flow->protocol), "TCP")) == 0)
+    if(flow->protocol == IPPROTO_TCP
        && (flow->src2dst_packets == 1) && (flow->dst2src_packets == 0)) {
       updateScanners(&scannerHosts, flow->src_ip, flow->ip_version, dport);
     }

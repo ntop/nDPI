@@ -1506,6 +1506,82 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ********************************** */
 
+char *ndpi_get_ip_proto_name(u_int16_t ip_proto, char *name, unsigned int name_len) {
+  if(name == NULL || name_len == 0)
+    return name;
+
+  switch (ip_proto) {
+  case IPPROTO_TCP:
+    snprintf(name, name_len, "TCP");
+    break;
+
+  case IPPROTO_UDP:
+    snprintf(name, name_len, "UDP");
+    break;
+
+  case NDPI_IPSEC_PROTOCOL_ESP:
+    snprintf(name, name_len, "ESP");
+    break;
+
+  case NDPI_IPSEC_PROTOCOL_AH:
+    snprintf(name, name_len, "AH");
+    break;
+
+  case NDPI_GRE_PROTOCOL_TYPE:
+    snprintf(name, name_len, "GRE");
+    break;
+
+  case NDPI_ICMP_PROTOCOL_TYPE:
+    snprintf(name, name_len, "ICMP");
+    break;
+
+  case NDPI_IGMP_PROTOCOL_TYPE:
+    snprintf(name, name_len, "IGMP");
+    break;
+
+  case NDPI_EGP_PROTOCOL_TYPE:
+    snprintf(name, name_len, "EGP");
+    break;
+
+  case NDPI_SCTP_PROTOCOL_TYPE:
+    snprintf(name, name_len, "SCTP");
+    break;
+
+  case NDPI_PGM_PROTOCOL_TYPE:
+    snprintf(name, name_len, "PGM");
+    break;
+
+  case NDPI_OSPF_PROTOCOL_TYPE:
+    snprintf(name, name_len, "OSPF");
+    break;
+
+  case NDPI_IPIP_PROTOCOL_TYPE:
+    snprintf(name, name_len, "IPIP");
+    break;
+
+  case NDPI_ICMPV6_PROTOCOL_TYPE:
+    snprintf(name, name_len, "ICMPV6");
+    break;
+
+  case NDPI_PIM_PROTOCOL_TYPE:
+    snprintf(name, name_len, "PIM");
+    break;
+
+  case 112:
+    snprintf(name, name_len, "VRRP");
+    break;
+
+  default:
+    snprintf(name, name_len, "%d", ip_proto);
+    break;
+  }
+
+  name[name_len - 1] = '\0';
+  return name;
+}
+
+/* ********************************** */
+
 /* NOTE: serializer is initialized by the function */
 int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		   struct ndpi_flow_struct *flow,
@@ -1517,6 +1593,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		   ndpi_protocol l7_protocol,
 		   ndpi_serializer *serializer) {
   char src_name[INET6_ADDRSTRLEN] = {'\0'}, dst_name[INET6_ADDRSTRLEN] = {'\0'};
+  char l4_proto_name[32];
 
   if(ip_version == 4) {
     inet_ntop(AF_INET, &src_v4, src_name, sizeof(src_name));
@@ -1535,23 +1612,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_serialize_string_uint32(serializer, "ip", ip_version);
 
-  switch(l4_protocol) {
-  case IPPROTO_TCP:
-    ndpi_serialize_string_string(serializer, "proto", "TCP");
-    break;
-
-  case IPPROTO_UDP:
-    ndpi_serialize_string_string(serializer, "proto", "UDP");
-    break;
-
-  case IPPROTO_ICMP:
-    ndpi_serialize_string_string(serializer, "proto", "ICMP");
-    break;
-
-  default:
-    ndpi_serialize_string_uint32(serializer, "proto", l4_protocol);
-    break;
-  }
+  ndpi_serialize_string_string(serializer, "proto", ndpi_get_ip_proto_name(l4_protocol, l4_proto_name, sizeof(l4_proto_name)));
 
   return(ndpi_dpi2json(ndpi_struct, flow, l7_protocol, serializer));
 }

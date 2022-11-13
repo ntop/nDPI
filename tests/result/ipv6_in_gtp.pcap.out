@@ -23,5 +23,5 @@ Patricia protocols:   0/0 (search/found)
 IPSec	1	166	1
 RTP	1	150	1
 
-	1	50 [2a01:4c8:c014:144e:1:2:945b:6761]:0 -> [2a01:4c8:f000:f49::4]:0 [VLAN: 2][proto: GTP:79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VPN/2][1 pkts/166 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	ESP [2a01:4c8:c014:144e:1:2:945b:6761]:0 -> [2a01:4c8:f000:f49::4]:0 [VLAN: 2][proto: GTP:79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VPN/2][1 pkts/166 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP [2607:fc20:4052:39e:490a:ea4d:17fe:e09c]:49120 -> [fd00:976a:bc67:193e::7]:25658 [VLAN: 5][proto: GTP:87/RTP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Media/1][1 pkts/150 bytes -> 0 pkts/0 bytes][Goodput ratio: 29/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
