@@ -16,7 +16,7 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -38,7 +38,7 @@ jobs:
           mkdir -vp coverage_report/ndpi_coverage_report
           lcov --directory . --capture --output-file lcov.info
           genhtml -o coverage_report/ndpi_coverage_report lcov.info
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ndpi-coverage-report
           path: coverage_report
@@ -50,11 +50,11 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "3.9"
       - name: Install Ubuntu Prerequisites
@@ -82,11 +82,11 @@ jobs:
     name: Documentation (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "3.9"
       - name: Install Ubuntu Prerequisites
@@ -103,7 +103,7 @@ jobs:
           make doc
           mkdir -vp doc/_build/ndpi-documentation-upload/ndpi-documentation
           mv -v doc/_build/html doc/_build/ndpi-documentation-upload/ndpi-documentation/html
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ndpi-documentation
           path: doc/_build/ndpi-documentation-upload
@@ -116,7 +116,7 @@ jobs:
       GO111MODULE: on
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -139,7 +139,7 @@ jobs:
           mkdir ndpi-performance-upload
           mv -v tests/result/cpu_profile.png ndpi-performance-upload/cpu_profile.png
           mv -v tests/result/heap_profile.png ndpi-performance-upload/heap_profile.png
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ndpi-performance
           path: ndpi-performance-upload
@@ -149,7 +149,7 @@ jobs:
     name: Test Utils (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -303,7 +303,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.arch, 'x86_64')
         run: |
           docker run --rm --privileged multiarch/qemu-user-static:register --reset
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install Ubuntu Prerequisites
