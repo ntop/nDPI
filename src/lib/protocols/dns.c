@@ -477,7 +477,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
     /* Before continuing let's dissect the following queries to see if they are valid */
     for(idx=off, num_queries=0; (num_queries < dns_header.num_queries) && (idx < packet->payload_packet_len);) {
-      u_int16_t i, tot_len = 0;
+      u_int32_t i, tot_len = 0;
 
       for(i=idx; i<packet->payload_packet_len;) {
 	u_int8_t is_ptr = 0, name_len = packet->payload[i]; /* Lenght of the individual name blocks aaa.bbb.com */
