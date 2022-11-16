@@ -1709,6 +1709,7 @@ int ndpi_is_datalink_supported(int datalink_type) {
   case DLT_IEEE802_11_RADIO:
   case DLT_RAW:
   case DLT_PPI:
+  case LINKTYPE_LINUX_SLL2:
     return 1;
   default:
     return 0;
@@ -1872,6 +1873,12 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   case DLT_LINUX_SLL:
     type = (packet[eth_offset+14] << 8) + packet[eth_offset+15];
     ip_offset = 16 + eth_offset;
+    break;
+
+    /* Linux Cooked Capture v2 - 276 */
+  case LINKTYPE_LINUX_SLL2:
+    type = (packet[eth_offset+10] << 8) + packet[eth_offset+11];
+    ip_offset = 20 + eth_offset;
     break;
 
     /* Radiotap link-layer - 127 */

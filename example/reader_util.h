@@ -424,4 +424,8 @@ extern int nDPI_LogLevel;
 #define LOG(...) {}
 #endif
 
+#ifndef LINKTYPE_LINUX_SLL2
+#define LINKTYPE_LINUX_SLL2 276
+#endif
+
 #endif
