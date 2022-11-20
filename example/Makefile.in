@@ -79,7 +79,7 @@ cppcheck:
 	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I$(SRCHOME)/include *.c
 
 clean:
-	/bin/rm -f *.o ndpiReader ndpiSimpleIntegration ndpiReader$(EXE_SUFFIX) ndpiSimpleIntegration$(EXE_SUFFIX) ndpiReader.dpdk
+	/bin/rm -f *.o ndpiReader ndpiSimpleIntegration ndpiReader$(EXE_SUFFIX) ndpiSimpleIntegration$(EXE_SUFFIX) ndpiReader.dpdk libndpiReader.a
 	/bin/rm -f .*.dpdk.cmd .*.o.cmd *.dpdk.map .*.o.d
 	/bin/rm -f _install _postbuild _postinstall _preinstall
 	/bin/rm -rf build

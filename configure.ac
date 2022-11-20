@@ -26,6 +26,7 @@ AC_ARG_WITH(local-libgcrypt,  AS_HELP_STRING([--with-local-libgcrypt], [Build wi
 AC_ARG_ENABLE(tls-sigs, AS_HELP_STRING([--enable-tls-sigs], [Enable TLS Client signature algorithm dissection. Rarely used, but requires significantly more memory.]))
 AC_ARG_ENABLE(npcap, AS_HELP_STRING([--disable-npcap], [msys2 only: Disable linkage against the wpcap/npcap import library in windows/WpdPack/Lib.]))
 AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom path; default: ${PWD}/../PF_RING/userland/nbpf]),[NBPF_HOME=$withval],[NBPF_HOME=${PWD}/../PF_RING/userland/nbpf])
+AC_ARG_WITH(lto-and-gold-linker, AS_HELP_STRING([--with-lto-and-gold-linker], [Build with LTO and Gold linker])])
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [BUILD_FUZZTARGETS=1], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
@@ -42,7 +43,8 @@ AS_IF([test "${with_thread_sanitizer+set}" = set -a "${with_memory_sanitizer+set
 AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set -o "${with_memory_sanitizer+set}" = set],[
   NDPI_CFLAGS="${NDPI_CFLAGS} -O0 -g3"
 ],[
-  NDPI_CFLAGS="${NDPI_CFLAGS} -O2"
+  dnl>  Oss-fuzz doesn't really like any optimizaton flags don't set by itself
+  AS_IF([test "x$enable_fuzztargets" != "xyes"], [NDPI_CFLAGS="${NDPI_CFLAGS} -O2"])
 ])
 AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set -o "${with_memory_sanitizer+set}" = set],[
   AS_IF([test "x$enable_gprof" = "xyes"], [
@@ -166,6 +168,11 @@ AS_IF([test "x${enable_tls_sigs}" = "xyes"],[
 ])
 
 NDPI_CFLAGS="-W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-address-of-packed-member ${NDPI_CFLAGS}"
+
+AS_IF([test "${with_lto_and_gold_linker+set}" = set], [
+       NDPI_CFLAGS="${NDPI_CFLAGS} -flto -fuse-ld=gold -Wno-unused-command-line-argument"
+       NDPI_LDFLAGS="${NDPI_LDFLAGS} ${NDPI_CFLAGS}"
+])
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h math.h float.h])
 AC_CHECK_LIB([m], [sqrt], [], [LIBM="-lm"])
