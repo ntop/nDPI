@@ -1656,6 +1656,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	i += 4 + extension_len, offset += 4 + extension_len;
       } /* for */
 
+      /* If the CH is not available and if "supported_versions" extension is not present in the SH
+         (i.e. (D)TLS <= 1.2), use the version field present in the record layer */
+      if(flow->protos.tls_quic.ssl_version == 0)
+        flow->protos.tls_quic.ssl_version = tls_version;
+
       ja3_str_len = ndpi_snprintf(ja3_str, JA3_STR_LEN, "%u,", ja3.server.tls_handshake_version);
 
       for(i=0; (i<ja3.server.num_cipher) && (JA3_STR_LEN > ja3_str_len); i++) {
