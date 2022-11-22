@@ -3302,9 +3302,8 @@ static ndpi_default_ports_tree_node_t *ndpi_get_guessed_protocol_id(struct ndpi_
   and thus that if have NOT been detected they cannot be guessed
   as they have been excluded
 */
-u_int8_t is_udp_guessable_protocol(u_int16_t l7_guessed_proto) {
+u_int8_t is_udp_not_guessable_protocol(u_int16_t l7_guessed_proto) {
   switch(l7_guessed_proto) {
-  case NDPI_PROTOCOL_QUIC:
   case NDPI_PROTOCOL_SNMP:
   case NDPI_PROTOCOL_NETFLOW:
     /* TODO: add more protocols (if any missing) */
@@ -3330,7 +3329,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
       /* We need to check if the guessed protocol isn't excluded by nDPI */
       if(flow && (proto == IPPROTO_UDP) &&
 	 NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, guessed_proto) &&
-	 is_udp_guessable_protocol(guessed_proto))
+	 is_udp_not_guessable_protocol(guessed_proto))
 	return(NDPI_PROTOCOL_UNKNOWN);
       else {
 	*user_defined_proto = found->customUserProto;
@@ -5930,7 +5929,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     if((guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN)
        && (flow->l4_proto == IPPROTO_UDP) &&
        NDPI_ISSET(&flow->excluded_protocol_bitmask, guessed_protocol_id) &&
-       is_udp_guessable_protocol(guessed_protocol_id))
+       is_udp_not_guessable_protocol(guessed_protocol_id))
       flow->guessed_protocol_id = guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN;
 
     if(guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
@@ -7516,7 +7515,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       if(flow && (proto == IPPROTO_UDP) &&
-	 NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc) && is_udp_guessable_protocol(rc))
+	 NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc) && is_udp_not_guessable_protocol(rc))
 	;
       else {
 	ret.app_protocol = rc,
@@ -7537,7 +7536,7 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
     rc = ndpi_guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       if(flow && (proto == IPPROTO_UDP) &&
-	 NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc) && is_udp_guessable_protocol(rc))
+	 NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc) && is_udp_not_guessable_protocol(rc))
 	;
       else {
 	ret.app_protocol = rc;
