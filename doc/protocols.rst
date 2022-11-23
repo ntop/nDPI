@@ -119,3 +119,14 @@ Mullvad is a VPN service operated by Mullvad VPN AB, based in Sweden
 References: `Main site <https://mullvad.net/>`_.
 
 
+.. _Proto 349:
+
+`NDPI_PROTOCOL_HTTP2`
+=====================
+HTTP/2 (originally named HTTP/2.0) is a major revision of the HTTP network protocol used by the World Wide Web.
+
+References: `RFC <https://datatracker.ietf.org/doc/html/rfc9113>`_.
+
+Notes:
+
+- HTTP/2 is almost always encrypted, i.e. transported over TLS.
