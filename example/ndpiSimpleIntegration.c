@@ -549,7 +549,7 @@ static void ndpi_process_packet(uint8_t * const args,
   uint16_t l4_len = 0;
 
   uint16_t type;
-  int thread_index = INITIAL_THREAD_HASH; // generated with `dd if=/dev/random bs=1024 count=1 |& hd'
+  uint32_t thread_index = INITIAL_THREAD_HASH; // generated with `dd if=/dev/random bs=1024 count=1 |& hd'
 
   if (reader_thread == NULL) {
     return;
