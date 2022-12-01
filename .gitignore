@@ -54,6 +54,8 @@
 /fuzz/fuzz_ndpi_reader_with_main
 /fuzz/fuzz_process_packet
 /fuzz/fuzz_process_packet_with_main
+/fuzz/fuzz_quic_get_crypto_data
+/fuzz/fuzz_quic_get_crypto_data_with_main
 /influxdb/Makefile
 /install-sh
 /libndpi.pc
