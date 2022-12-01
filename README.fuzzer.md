@@ -13,11 +13,11 @@
 ## Testing nDPI with ClusterFuzz Artifacts
 - Download the artifact (example clusterfuzz-testcase-fuzz_process_packet-4992218834796544)
 - Run nDPI against the artifact
-  - Example: ./fuzz/fuzz_process_packet_with_main clusterfuzz-testcase-fuzz_process_packet-4992218834796544 
+  - Example: ./fuzz/fuzz_process_packet clusterfuzz-testcase-fuzz_process_packet-4992218834796544 
 
 The output is the error report
 ```
-  ./fuzz/fuzz_process_packet_with_main /tmp/clusterfuzz-testcase-fuzz_process_packet-4992218834796544 
+  ./fuzz/fuzz_process_packet /tmp/clusterfuzz-testcase-fuzz_process_packet-4992218834796544 
   AddressSanitizer:DEADLYSIGNAL
   =================================================================
   ==11590==ERROR: AddressSanitizer: SEGV on unknown address 0x61a100000087 (pc 0x00000056e6a4 bp 0x7ffd624fa170 sp 0x7ffd624fa090 T0)
@@ -33,7 +33,7 @@ The output is the error report
       #8 0x4c709b in LLVMFuzzerTestOneInput /home/deri/nDPI/fuzz/fuzz_process_packet.c:30:3
       #9 0x4c7640 in main /home/deri/nDPI/fuzz/fuzz_process_packet.c:90:17
       #10 0x7f888e5dabf6 in __libc_start_main /build/glibc-S9d2JN/glibc-2.27/csu/../csu/libc-start.c:310
-      #11 0x41c399 in _start (/home/deri/nDPI/fuzz/fuzz_process_packet_with_main+0x41c399)
+      #11 0x41c399 in _start (/home/deri/nDPI/fuzz/fuzz_process_packet+0x41c399)
 
   AddressSanitizer can not provide additional info.
   SUMMARY: AddressSanitizer: SEGV /home/deri/nDPI/src/lib/protocols/quic.c:203:12 in quic_len
