@@ -137,7 +137,7 @@ struct nDPI_workflow {
 struct nDPI_reader_thread {
   struct nDPI_workflow * workflow;
   pthread_t thread_id;
-  int array_index;
+  uint32_t array_index;
 };
 
 static struct nDPI_reader_thread reader_threads[MAX_READER_THREADS] = {};
