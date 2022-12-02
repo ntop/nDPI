@@ -1,0 +1,59 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ 'dev' ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ 'dev' ]
+  schedule:
+    - cron: '25 19 * * 2'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+      CFLAGS: -Werror
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp', 'python', 'ruby' ]
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo add-apt-repository ppa:longsleep/golang-backports
+          sudo apt-get update
+          sudo apt-get install -y libunwind-dev
+          sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libpcap-dev
+          sudo apt-get install golang-1.16-go libgoogle-perftools-dev graphviz
+          go install github.com/google/pprof@latest
+          sudo ln -s ${HOME}/go/bin/pprof /usr/bin/pprof
+          pprof -h
+      - name: Configure nDPI library
+        run: |
+          ./autogen.sh --enable-gprof --enable-option-checking=fatal --with-pcre --with-maxminddb --enable-tls-sigs
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Build nDPI library
+        run: |
+          make
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
