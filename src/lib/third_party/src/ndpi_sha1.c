@@ -29,6 +29,7 @@ A million repetitions of "a"
 #endif
 #include "ndpi_main.h"
 #include "ndpi_sha1.h"
+#include "../include/secure_memzero.h"
 
 #ifdef WIN32
 #define BYTE_ORDER LITTLE_ENDIAN 
@@ -164,7 +165,7 @@ CHAR64LONG16* block = (const CHAR64LONG16*)buffer;
     /* Wipe variables */
     a = b = c = d = e = 0;
 #ifdef SHA1HANDSOFF
-    memset(block, '\0', sizeof(block));
+    secure_memzero(block, sizeof(block));
 #endif
 }
 
