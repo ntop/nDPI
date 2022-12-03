@@ -290,6 +290,42 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
 
 /* **************************************** */
 
+static u_int32_t make_tls_cert_key(struct ndpi_packet_struct *packet, int is_from_client)
+{
+  u_int32_t key;
+
+  /* Server ip/port */
+  if(packet->iphv6 == NULL) {
+    if(packet->tcp) {
+      if(is_from_client)
+        key = packet->iph->daddr + packet->tcp->dest;
+      else
+        key = packet->iph->saddr + packet->tcp->source;
+    } else {
+      if(is_from_client)
+        key = packet->iph->daddr + packet->udp->dest;
+      else
+        key = packet->iph->saddr + packet->udp->source;
+    }
+  } else {
+    if(packet->tcp) {
+      if(is_from_client)
+        key = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_dst, 16) + packet->tcp->dest;
+      else
+        key = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_src, 16) + packet->tcp->source;
+    } else {
+      if(is_from_client)
+        key = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_dst, 16) + packet->udp->dest;
+      else
+        key = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_src, 16) + packet->udp->source;
+    }
+  }
+
+  return key;
+}
+
+/* **************************************** */
+
 static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow,
 				int is_from_client) {
@@ -298,14 +334,11 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
     /* Subprotocol not yet set */
 
-    if(ndpi_struct->tls_cert_cache && packet->iph && packet->tcp) {
-      u_int32_t key; /* Server ip/port */
+    if(ndpi_struct->tls_cert_cache) {
       u_int16_t cached_proto;
+      u_int32_t key;
 
-      if(is_from_client)
-        key = packet->iph->daddr + packet->tcp->dest;
-      else
-        key = packet->iph->saddr + packet->tcp->source;
+      key = make_tls_cert_key(packet, is_from_client);
 
       if(ndpi_lru_find_cache(ndpi_struct->tls_cert_cache, key,
 			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
@@ -695,8 +728,8 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	flow->category = ndpi_get_proto_category(ndpi_struct, ret);
 	ndpi_check_subprotocol_risk(ndpi_struct, flow, proto_id);
 
-	if(ndpi_struct->tls_cert_cache && packet->iph && packet->tcp) {
-	  u_int32_t key = packet->iph->saddr + packet->tcp->source; /* Server */
+	if(ndpi_struct->tls_cert_cache) {
+	  u_int32_t key = make_tls_cert_key(packet, 0 /* from the server */);
 
 	  ndpi_lru_add_to_cache(ndpi_struct->tls_cert_cache, key, proto_id);
 	}

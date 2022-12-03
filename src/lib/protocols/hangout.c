@@ -73,7 +73,7 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
 
       /* Hangout is over STUN hence the LRU cache is shared */
 
-      if(ndpi_struct->stun_cache && packet->iph) {
+      if(ndpi_struct->stun_cache) {
 	u_int32_t key = get_stun_lru_key(flow, !matched_src);
 
 #ifdef DEBUG_LRU

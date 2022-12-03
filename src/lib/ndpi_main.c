@@ -175,6 +175,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
 
 extern void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
 			    struct ndpi_flow_struct *flow, ndpi_risk_enum r);
+extern u_int32_t make_mining_key(struct ndpi_flow_struct *flow);
 
 /* Forward */
 static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
@@ -5693,6 +5694,19 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
 /* ********************************************************************************* */
 
+static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow) {
+  u_int32_t key;
+
+  if(flow->is_ipv6)
+    key = ndpi_quick_hash(flow->c_address.v6, 16);
+  else
+    key = ntohl(flow->c_address.v4);
+
+  return key;
+}
+
+/* ********************************************************************************* */
+
 static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
 				     struct ndpi_flow_struct *flow,
 				     ndpi_protocol *ret) {
@@ -5715,12 +5729,12 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       (MS Teams uses Skype as transport protocol for voice/video)
     */
   case NDPI_PROTOCOL_MSTEAMS:
-    if(flow->is_ipv6 == 0 && flow->l4_proto == IPPROTO_TCP) {
+    if(flow->l4_proto == IPPROTO_TCP) {
       // printf("====>> NDPI_PROTOCOL_MSTEAMS\n");
 
       if(ndpi_str->msteams_cache)
 	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-			      ntohl(flow->c_address.v4),
+			      make_msteams_key(flow),
 			      (flow->last_packet_time_ms / 1000) & 0xFFFF /* 16 bit */);
     }
     break;
@@ -5740,12 +5754,11 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   case NDPI_PROTOCOL_SKYPE_TEAMS:
   case NDPI_PROTOCOL_SKYPE_TEAMS_CALL:
-    if(flow->is_ipv6 == 0
-       && flow->l4_proto == IPPROTO_UDP
+    if(flow->l4_proto == IPPROTO_UDP
        && ndpi_str->msteams_cache) {
       u_int16_t when;
 
-      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, ntohl(flow->c_address.v4),
+      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, make_msteams_key(flow),
 			     &when, 0 /* Don't remove it as it can be used for other connections */)) {
 	u_int16_t tdiff = ((flow->last_packet_time_ms /1000) & 0xFFFF) - when;
 
@@ -5755,7 +5768,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
 	  /* Refresh cache */
 	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-				ntohl(flow->c_address.v4),
+				make_msteams_key(flow),
 				(flow->last_packet_time_ms / 1000) & 0xFFFF /* 16 bit */);
 	}
       }
@@ -5845,21 +5858,40 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
 
 /* #define ZOOM_CACHE_DEBUG */
 
-static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct,
-					    u_int32_t daddr /* Network byte order */) {
 
-#ifdef ZOOM_CACHE_DEBUG
-  printf("[%s:%u] ndpi_search_into_zoom_cache(%08X, %u)\n",
-	 __FILE__, __LINE__, daddr, dport);
-#endif
+static u_int32_t make_zoom_key(struct ndpi_flow_struct *flow, int server) {
+  u_int32_t key;
+
+  if(server) {
+    if(flow->is_ipv6)
+      key = ndpi_quick_hash(flow->s_address.v6, 16);
+    else
+      key = flow->s_address.v4;
+  } else {
+    if(flow->is_ipv6)
+      key = ndpi_quick_hash(flow->c_address.v6, 16);
+    else
+      key = flow->c_address.v4;
+  }
+
+  return key;
+}
+
+/* ********************************************************************************* */
+
+static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct,
+					    struct ndpi_flow_struct *flow, int server) {
 
   if(ndpi_struct->zoom_cache) {
     u_int16_t cached_proto;
-    u_int8_t found = ndpi_lru_find_cache(ndpi_struct->zoom_cache, daddr, &cached_proto,
+    u_int32_t key;
+
+    key = make_zoom_key(flow, server);
+    u_int8_t found = ndpi_lru_find_cache(ndpi_struct->zoom_cache, key, &cached_proto,
 					 0 /* Don't remove it as it can be used for other connections */);
 
 #ifdef ZOOM_CACHE_DEBUG
-    printf("[Zoom] *** [TCP] SEARCHING host %u [found: %u]\n", daddr, found);
+    printf("[Zoom] *** [TCP] SEARCHING key %u [found: %u]\n", key, found);
 #endif
 
     return(found);
@@ -5871,9 +5903,9 @@ static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct 
 /* ********************************************************************************* */
 
 static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndpi_struct,
-					u_int32_t daddr /* Network byte order */) {
+					struct ndpi_flow_struct *flow) {
   if(ndpi_struct->zoom_cache)
-    ndpi_lru_add_to_cache(ndpi_struct->zoom_cache, daddr, NDPI_PROTOCOL_ZOOM);
+    ndpi_lru_add_to_cache(ndpi_struct->zoom_cache, make_zoom_key(flow, 1), NDPI_PROTOCOL_ZOOM);
 }
 
 /* ********************************************************************************* */
@@ -5901,10 +5933,10 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   /* TODO: this lookup seems in the wrong place here...
      Move it somewhere else (?) or setting flow->guessed_protocol_id directly in the mining dissector? */
-  if(ndpi_str->mining_cache && flow->is_ipv6 == 0) {
+  if(ndpi_str->mining_cache) {
     u_int16_t cached_proto;
 
-    if(ndpi_lru_find_cache(ndpi_str->mining_cache, flow->c_address.v4 + flow->s_address.v4,
+    if(ndpi_lru_find_cache(ndpi_str->mining_cache, make_mining_key(flow),
 			   &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
       ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
       ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
@@ -5982,10 +6014,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       /* This looks like BitTorrent */
       ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
-    } else if((flow->l4_proto == IPPROTO_UDP) /* Zoom/UDP used for video */
-	      && (((ntohs(flow->c_port) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->c_address.v4))
-		  || ((ntohs(flow->s_port) == 8801 /* Zoom port */) && ndpi_search_into_zoom_cache(ndpi_str, flow->s_address.v4))
-		  )) {
+    } else if((flow->l4_proto == IPPROTO_UDP) && /* Zoom/UDP used for video */
+	      ((ntohs(flow->s_port) == 8801 && ndpi_search_into_zoom_cache(ndpi_str, flow, 1)) ||
+	       (ntohs(flow->c_port) == 8801 && ndpi_search_into_zoom_cache(ndpi_str, flow, 0)))) {
       /* This looks like Zoom */
       ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
       ret.app_protocol = NDPI_PROTOCOL_ZOOM;
@@ -6642,9 +6673,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
   /* Zoom cache */
   if((ret.app_protocol == NDPI_PROTOCOL_ZOOM)
-     && (flow->l4_proto == IPPROTO_TCP)
-     && (ndpi_str->packet.iph != NULL))
-    ndpi_add_connection_as_zoom(ndpi_str, ndpi_str->packet.iph->daddr);
+     && (flow->l4_proto == IPPROTO_TCP))
+    ndpi_add_connection_as_zoom(ndpi_str, flow);
 
   return(ret);
 }

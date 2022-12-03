@@ -24,12 +24,27 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MINING
 #include "ndpi_api.h"
 
+
+/* ************************************************************************** */
+
+u_int32_t make_mining_key(struct ndpi_flow_struct *flow) {
+  u_int32_t key;
+
+  /* network byte order */
+  if(flow->is_ipv6)
+    key = ndpi_quick_hash(flow->c_address.v6, 16) + ndpi_quick_hash(flow->s_address.v6, 16);
+  else
+    key = flow->c_address.v4 + flow->s_address.v4;
+
+  return key;
+}
+
 /* ************************************************************************** */
 
 static void cacheMiningHostTwins(struct ndpi_detection_module_struct *ndpi_struct,
-				 u_int32_t host_keys /* network byte order */) {
+				 struct ndpi_flow_struct *flow) {
   if(ndpi_struct->mining_cache)
-    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, host_keys, NDPI_PROTOCOL_MINING);
+    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, make_mining_key(flow), NDPI_PROTOCOL_MINING);
 }
 
 /* ************************************************************************** */
@@ -59,8 +74,7 @@ static void ndpi_search_mining_udp(struct ndpi_detection_module_struct *ndpi_str
     else {
       ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      if(packet->iph) /* TODO: ipv6 */
-        cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
+      cacheMiningHostTwins(ndpi_struct, flow);
       return;
     }
   }
@@ -96,8 +110,7 @@ static void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_str
       if((*to_match == magic) || (*to_match == magic1)) {
        ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	if(packet->iph) /* TODO: ipv6 */
-	  cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
+	cacheMiningHostTwins(ndpi_struct, flow);
 	return;
       }
     }
@@ -108,8 +121,7 @@ static void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_str
       if(isEthPort(ntohs(packet->tcp->dest)) /* Ethereum port */) {
        ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	if(packet->iph) /* TODO: ipv6 */
-	  cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
+	cacheMiningHostTwins(ndpi_struct, flow);
 	return;
       } 
     } else if(ndpi_strnstr((const char *)packet->payload, "{", packet->payload_packet_len)
@@ -127,8 +139,7 @@ static void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_str
       */
       ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      if(packet->iph) /* TODO: ipv6 */
-        cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
+      cacheMiningHostTwins(ndpi_struct, flow);
       return;
     } else if(ndpi_strnstr((const char *)packet->payload, "{", packet->payload_packet_len)
 	      && (ndpi_strnstr((const char *)packet->payload, "\"method\":", packet->payload_packet_len)
@@ -151,8 +162,7 @@ static void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_str
       */
       ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ZCash/Monero");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      if(packet->iph) /* TODO: ipv6 */
-        cacheMiningHostTwins(ndpi_struct, packet->iph->saddr + packet->iph->daddr);
+      cacheMiningHostTwins(ndpi_struct, flow);
       return;
     }
   }
