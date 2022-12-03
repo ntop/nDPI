@@ -6862,7 +6862,7 @@ void ndpi_parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str
        line i slike "GET /....
     */
     
-    if(strchr((char*)packet->line[0].ptr, ':') == NULL)
+    if(memchr((char*)packet->line[0].ptr, ':', packet->line[0].len) == NULL)
       return;
   }
   
