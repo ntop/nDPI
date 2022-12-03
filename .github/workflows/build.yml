@@ -121,7 +121,9 @@ jobs:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
         run: |
+          sudo add-apt-repository ppa:longsleep/golang-backports
           sudo apt-get update
+          sudo apt-get install libunwind-dev
           sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libpcap-dev
           sudo apt-get install golang-1.16-go libgoogle-perftools-dev graphviz
           go install github.com/google/pprof@latest
@@ -186,31 +188,31 @@ jobs:
         msan: [""]
         nBPF: [""]
         include:
-          - compiler: "gcc-7"
-            os: ubuntu-latest
+          - compiler: "gcc-7" # "Oldest" gcc easily available
+            os: ubuntu-20.04
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
-          - compiler: "gcc-11"
-            os: ubuntu-latest
+          - compiler: "gcc-12" # "Newest" gcc easily available
+            os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
-          - compiler: "clang-7"
-            os: ubuntu-latest
+          - compiler: "clang-7" # "Oldest" clang easily available
+            os: ubuntu-20.04
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
-          - compiler: "clang-14"
+          - compiler: "clang-14" # "Newest" clang easily available
             os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
