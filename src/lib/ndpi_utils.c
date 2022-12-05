@@ -131,8 +131,9 @@ void * ndpi_tsearch(const void *vkey, void **vrootp,
     *rootp = q;			/* link new node to old */
     q->key = key;		/* initialize new node */
     q->left = q->right = (ndpi_node *)0;
+    return ((void *)q->key);
   }
-  return ((void *)q->key);
+  return ((void *)0);
 }
 
 /* ****************************************** */

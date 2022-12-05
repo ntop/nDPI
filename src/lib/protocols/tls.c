@@ -146,8 +146,8 @@ static u_int32_t __get_master(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
-void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct,
-				struct ndpi_flow_struct *flow) {
+int ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct,
+			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   message_t *message = &flow->l4.tcp.tls.message[packet->packet_direction];
   u_int avail_bytes;
@@ -166,7 +166,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
     message->buffer = (u_int8_t*)ndpi_malloc(message->buffer_len);
 
     if(message->buffer == NULL)
-      return;
+      return -1;
 
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Allocating %u buffer\n", message->buffer_len);
@@ -179,7 +179,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
     u_int new_len = message->buffer_len + packet->payload_packet_len - avail_bytes + 1;
     void *newbuf  = ndpi_realloc(message->buffer,
 				 message->buffer_len, new_len);
-    if(!newbuf) return;
+    if(!newbuf) return -1;
 
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Enlarging %u -> %u buffer\n", message->buffer_len, new_len);
@@ -223,6 +223,7 @@ void ndpi_search_tls_tcp_memory(struct ndpi_detection_module_struct *ndpi_struct
 #endif
     }
   }
+  return 0;
 }
 
 /* **************************************** */
@@ -973,7 +974,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     return 1; /* Keep working */
   }
 
-  ndpi_search_tls_tcp_memory(ndpi_struct, flow);
+  if(ndpi_search_tls_tcp_memory(ndpi_struct, flow) == -1)
+    return 0; /* Error -> stop */
   message = &flow->l4.tcp.tls.message[packet->packet_direction];
 
   /* Valid TLS Content Types:
@@ -2248,14 +2250,15 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		if(flow->protos.tls_quic.advertised_alpns == NULL) {
 		  flow->protos.tls_quic.advertised_alpns = ndpi_strdup(alpn_str);
+		  if(flow->protos.tls_quic.advertised_alpns) {
+		    tlsCheckUncommonALPN(ndpi_struct, flow, flow->protos.tls_quic.advertised_alpns);
 
-		  tlsCheckUncommonALPN(ndpi_struct, flow, flow->protos.tls_quic.advertised_alpns);
-
-		  /* Without SNI matching we can try to sub-classify the flow via ALPN.
-		     Note that this happens only on very rare cases, not the common ones
-		     ("h2", "http/1.1", ...). Usefull for asymmetric traffic */
-		  if(!flow->protos.tls_quic.subprotocol_detected)
-	            tls_subclassify_by_alpn(ndpi_struct, flow);
+		    /* Without SNI matching we can try to sub-classify the flow via ALPN.
+		       Note that this happens only on very rare cases, not the common ones
+		       ("h2", "http/1.1", ...). Usefull for asymmetric traffic */
+		    if(!flow->protos.tls_quic.subprotocol_detected)
+	              tls_subclassify_by_alpn(ndpi_struct, flow);
+		  }
 		}
 
                 alpn_str_len = ndpi_min(sizeof(ja3.client.alpn), (size_t)alpn_str_len);

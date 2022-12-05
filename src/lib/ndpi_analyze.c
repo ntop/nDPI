@@ -44,6 +44,8 @@ void ndpi_init_data_analysis(struct ndpi_analyze_struct *ret, u_int16_t _max_ser
     len = sizeof(u_int32_t) * ret->num_values_array_len;
     if((ret->values = ndpi_malloc(len)) != NULL)
       memset(ret->values, 0, len);
+    else
+      ret->num_values_array_len = 0;
   }
 }
 
@@ -61,7 +63,7 @@ struct ndpi_analyze_struct* ndpi_alloc_data_analysis(u_int16_t _max_series_len) 
 /* ********************************************************************************* */
 
 void ndpi_free_data_analysis(struct ndpi_analyze_struct *d, u_int8_t free_pointer) {
-  if(d->values) ndpi_free(d->values);
+  if(d && d->values) ndpi_free(d->values);
   if(free_pointer) ndpi_free(d);
 }
 
@@ -85,6 +87,9 @@ void ndpi_reset_data_analysis(struct ndpi_analyze_struct *d) {
   Add a new point to analyze
  */
 void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
+  if(!s)
+    return;
+
   if(s->sum_total == 0)
     s->min_val = s->max_val = value;
   else {
@@ -115,13 +120,15 @@ void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
 
 /* Compute the average on all values */
 float ndpi_data_average(struct ndpi_analyze_struct *s) {
+  if(!s)
+    return(0);
   return((s->num_data_entries == 0) ? 0 : ((float)s->sum_total / (float)s->num_data_entries));
 }
 
 /* ********************************************************************************* */
 
 u_int32_t ndpi_data_last(struct ndpi_analyze_struct *s) {
-  if((s->num_data_entries == 0) || (s->sum_total == 0))
+  if((!s) || (s->num_data_entries == 0) || (s->sum_total == 0))
     return(0);
 
   if(s->next_value_insert_index == 0)
@@ -138,6 +145,8 @@ u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s->max_val); }
 
 /* Compute the variance on all values */
 float ndpi_data_variance(struct ndpi_analyze_struct *s) {
+  if(!s)
+    return(0);
   float v = s->num_data_entries ? ((float)s->stddev.sum_square_total - ((float)s->sum_total * (float)s->sum_total / (float)s->num_data_entries)) / (float)s->num_data_entries : 0.0;
   return((v < 0  /* rounding problem */) ? 0 : v);
 }
@@ -307,6 +316,9 @@ double ndpi_hll_count(struct ndpi_hll *hll) {
 /* ********************************************************************************* */
 
 int ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int16_t num_bins) {
+  if(!b)
+    return(-1);
+
   b->num_bins = num_bins, b->family = f, b->is_empty = 1;
 
   switch(f) {
@@ -337,6 +349,9 @@ int ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int16_t num_bins
 /* ********************************************************************************* */
 
 void ndpi_free_bin(struct ndpi_bin *b) {
+  if(!b || !b->u.bins8)
+    return;
+
   switch(b->family) {
   case ndpi_bin_family8:
     ndpi_free(b->u.bins8);
@@ -358,7 +373,7 @@ void ndpi_free_bin(struct ndpi_bin *b) {
 struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
   struct ndpi_bin *out = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin));
 
-  if(!out) return(NULL);
+  if(!b || !b->u.bins8 || !out) return(NULL);
 
   out->num_bins = b->num_bins, out->family = b->family, out->is_empty = b->is_empty;
 
@@ -402,6 +417,9 @@ struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
 /* ********************************************************************************* */
 
 void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
+  if(!b || !b->u.bins8)
+    return;
+
   if(slot_id >= b->num_bins) slot_id = 0;
 
   switch(b->family) {
@@ -423,6 +441,9 @@ void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
 /* ********************************************************************************* */
 
 void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
+  if(!b || !b->u.bins8)
+    return;
+
   b->is_empty = 0;
 
   if(slot_id >= b->num_bins) slot_id = 0;
@@ -446,6 +467,9 @@ void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
 /* ********************************************************************************* */
 
 u_int64_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id) {
+  if(!b || !b->u.bins8)
+    return(0);
+
   if(slot_id >= b->num_bins) slot_id = 0;
 
   switch(b->family) {
@@ -469,6 +493,9 @@ u_int64_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id) {
 /* ********************************************************************************* */
 
 void ndpi_reset_bin(struct ndpi_bin *b) {
+  if(!b || !b->u.bins8)
+    return;
+
   b->is_empty = 1;
 
   switch(b->family) {
@@ -495,7 +522,7 @@ void ndpi_normalize_bin(struct ndpi_bin *b) {
   u_int16_t i;
   u_int32_t tot = 0;
 
-  if(b->is_empty) return;
+  if(!b || b->is_empty) return;
 
   switch(b->family) {
   case ndpi_bin_family8:
@@ -542,7 +569,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
   u_int16_t i;
   u_int len = 0;
 
-  if(!out_buf) return(out_buf); else out_buf[0] = '\0';
+  if(!b || !out_buf) return(out_buf); else out_buf[0] = '\0';
 
   if(normalize_first)
     ndpi_normalize_bin(b);

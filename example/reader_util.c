@@ -858,7 +858,10 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       struct ndpi_flow_info *newflow = (struct ndpi_flow_info*)ndpi_malloc(sizeof(struct ndpi_flow_info));
 
       if(newflow == NULL) {
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+	/* Avoid too much logging while fuzzing */
 	LOG(NDPI_LOG_ERROR, "[NDPI] %s(1): not enough memory\n", __FUNCTION__);
+#endif
 	return(NULL);
       } else
         workflow->num_allocated_flows++;
@@ -899,12 +902,11 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       }
 
       if((newflow->ndpi_flow = ndpi_flow_malloc(SIZEOF_FLOW_STRUCT)) == NULL) {
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+	/* Avoid too much logging while fuzzing */
 	LOG(NDPI_LOG_ERROR, "[NDPI] %s(2): not enough memory\n", __FUNCTION__);
-#ifdef DIRECTION_BINS
-	ndpi_free_bin(&newflow->payload_len_bin_src2dst), ndpi_free_bin(&newflow->payload_len_bin_dst2src);
-#else
-	ndpi_free_bin(&newflow->payload_len_bin);
 #endif
+	ndpi_flow_info_free_data(newflow);
 	ndpi_free(newflow);
 	return(NULL);
       } else
@@ -916,11 +918,17 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
                                workflow->ndpi_serialization_format) != 0)
       {
         LOG(NDPI_LOG_ERROR, "ndpi serializer init failed\n");
-        exit(-1);
+        ndpi_flow_info_free_data(newflow);
+        ndpi_free(newflow);
+        return(NULL);
       }
     }
 
-      ndpi_tsearch(newflow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp); /* Add */
+      if(ndpi_tsearch(newflow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp) == NULL) { /* Add */
+        ndpi_flow_info_free_data(newflow);
+        ndpi_free(newflow);
+        return(NULL);
+      }
       workflow->stats.ndpi_flow_count++;
       if(*proto == IPPROTO_TCP)
         workflow->stats.flow_count[0]++;
@@ -1099,13 +1107,15 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(flow->ndpi_flow->protos.bittorrent.hash[0] != '\0') {
       flow->bittorent_hash = ndpi_malloc(sizeof(flow->ndpi_flow->protos.bittorrent.hash) * 2 + 1);
-      for(i=0, j = 0; i < sizeof(flow->ndpi_flow->protos.bittorrent.hash); i++) {
-        sprintf(&flow->bittorent_hash[j], "%02x",
-	        flow->ndpi_flow->protos.bittorrent.hash[i]);
+      if(flow->bittorent_hash) {
+        for(i=0, j = 0; i < sizeof(flow->ndpi_flow->protos.bittorrent.hash); i++) {
+          sprintf(&flow->bittorent_hash[j], "%02x",
+	          flow->ndpi_flow->protos.bittorrent.hash[i]);
 
-        j += 2;
+          j += 2;
+        }
+        flow->bittorent_hash[j] = '\0';
       }
-      flow->bittorent_hash[j] = '\0';
     }
   }
   /* TIVOCONNECT */

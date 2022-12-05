@@ -477,8 +477,10 @@ static int tls13_hkdf_expand_label_context(struct ndpi_detection_module_struct *
 #endif
 
   *out = (uint8_t *)ndpi_malloc(out_len);
-  if(!*out)
+  if(!*out) {
+    ndpi_free(info_data);
     return 0;
+  }
   err = hkdf_expand(md, secret->data, secret->data_len, info_data, info_len, *out, out_len);
   ndpi_free(info_data);
 
@@ -655,8 +657,15 @@ static int quic_pp_cipher_prepare(struct ndpi_detection_module_struct *ndpi_stru
 static int quic_ciphers_prepare(struct ndpi_detection_module_struct *ndpi_struct,
 				quic_ciphers *ciphers, int hash_algo, int cipher_algo, int cipher_mode, uint8_t *secret, u_int32_t version)
 {
-  return quic_hp_cipher_prepare(ndpi_struct, &ciphers->hp_cipher, hash_algo, cipher_algo, secret, version) &&
-    quic_pp_cipher_prepare(ndpi_struct, &ciphers->pp_cipher, hash_algo, cipher_algo, cipher_mode, secret, version);
+  int ret;
+
+  ret = quic_hp_cipher_prepare(ndpi_struct, &ciphers->hp_cipher, hash_algo, cipher_algo, secret, version);
+  if(ret != 1)
+    return ret;
+  ret = quic_pp_cipher_prepare(ndpi_struct, &ciphers->pp_cipher, hash_algo, cipher_algo, cipher_mode, secret, version);
+  if(ret != 1)
+    quic_hp_cipher_reset(&ciphers->hp_cipher);
+  return ret;
 }
 /**
  * Given a header protection cipher, a buffer and the packet number offset,
@@ -1013,7 +1022,7 @@ static void update_reasm_buf_bitmap(u_int8_t *buffer_bitmap,
 				    const u_int32_t recv_pos,
 				    const u_int32_t recv_len)
 {
-  if (!recv_len || !buffer_bitmap_size || recv_pos + recv_len > buffer_bitmap_size * 8)
+  if (!recv_len || !buffer_bitmap_size || !buffer_bitmap || recv_pos + recv_len > buffer_bitmap_size * 8)
     return;
   const u_int32_t start_byte = recv_pos / 8;
   const u_int32_t end_byte = (recv_pos + recv_len - 1) / 8;
@@ -1038,6 +1047,9 @@ static int is_reasm_buf_complete(const u_int8_t *buffer_bitmap,
   const u_int32_t remaining_bits = buffer_len % 8;
   u_int32_t i;
 
+  if (!buffer_bitmap)
+    return 0;
+
   for(i = 0; i < complete_bytes; i++)
     if (buffer_bitmap[i] != 0xff)
       return 0;
@@ -1058,7 +1070,8 @@ static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
 
   if(!flow->l4.udp.quic_reasm_buf) {
     flow->l4.udp.quic_reasm_buf = (uint8_t *)ndpi_malloc(max_quic_reasm_buffer_len);
-    flow->l4.udp.quic_reasm_buf_bitmap = (uint8_t *)ndpi_calloc(quic_reasm_buffer_bitmap_len, sizeof(uint8_t));
+    if(!flow->l4.udp.quic_reasm_buf_bitmap)
+      flow->l4.udp.quic_reasm_buf_bitmap = (uint8_t *)ndpi_calloc(quic_reasm_buffer_bitmap_len, sizeof(uint8_t));
     if(!flow->l4.udp.quic_reasm_buf || !flow->l4.udp.quic_reasm_buf_bitmap)
       return -1; /* Memory error */
     flow->l4.udp.quic_reasm_buf_last_pos = 0;
