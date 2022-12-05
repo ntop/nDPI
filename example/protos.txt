@@ -5,6 +5,8 @@ tcp:81,tcp:8181@HTTP
 udp:5061-5062@SIP
 tcp:860,udp:860,tcp:3260,udp:3260@iSCSI
 tcp:3000@ntop
+tcp:9002@Elasticsearch
+tcp:5601@Kibana
 
 #
 # nBPF filters (https://github.com/ntop/PF_RING/tree/dev/userland/nbpf))
