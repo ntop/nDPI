@@ -882,6 +882,17 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	  flow->guessed_category = flow->category = ndpi_http_check_content(ndpi_struct, flow);
 	}
       }
+
+      if((flow->http.server == NULL) && (packet->server_line.len > 0)) {
+	int len = packet->server_line.len + 1;
+	
+	flow->http.server = ndpi_malloc(len);
+	if(flow->http.server) {
+	  strncpy(flow->http.server, (char*)packet->server_line.ptr,
+		  packet->server_line.len);
+	  flow->http.server[packet->server_line.len] = '\0';
+	}
+      }
     }
 
     if(flow->http_detected && packet->content_line.ptr && *(char*)packet->content_line.ptr) {

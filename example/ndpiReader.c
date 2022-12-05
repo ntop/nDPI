@@ -1578,6 +1578,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	fprintf(out, "[Content-Type: %s]", flow->http.content_type);
     }
 
+    if(flow->http.server[0] != '\0')
+      fprintf(out, "[Server: %s]", flow->http.server);
+    
     if(flow->http.user_agent[0] != '\0')
       fprintf(out, "[User-Agent: %s]", flow->http.user_agent);
 

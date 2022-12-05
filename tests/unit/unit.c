@@ -63,8 +63,9 @@ static int verbose = 0;
 /* *********************************************** */
 
 #define FLT_MAX 3.402823466e+38F
+
 int serializerUnitTest() {
-  ndpi_serializer serializer = {0}, deserializer = {0};
+  ndpi_serializer serializer, deserializer;
   int i, loop_id;
   ndpi_serialization_format fmt = {0};
   u_int32_t buffer_len;
@@ -72,6 +73,9 @@ int serializerUnitTest() {
   enum json_tokener_error jerr;
   json_object *j;
 
+  memset(&serializer, 0, sizeof(serializer));
+  memset(&deserializer, 0, sizeof(deserializer));
+  
   for(loop_id=0; loop_id<3; loop_id++) {
     switch(loop_id) {
     case 0:
