@@ -64,7 +64,7 @@ static int verbose = 0;
 
 #define FLT_MAX 3.402823466e+38F
 int serializerUnitTest() {
-  ndpi_serializer serializer, deserializer;
+  ndpi_serializer serializer = {0}, deserializer = {0};
   int i, loop_id;
   ndpi_serialization_format fmt = {0};
   u_int32_t buffer_len;

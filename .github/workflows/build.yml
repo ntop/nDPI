@@ -171,7 +171,7 @@ jobs:
           git diff-index --quiet HEAD -- || true
 
   test:
-    name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }}
+    name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }} ${{matrix.lto_gold_linker}}
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
@@ -183,10 +183,13 @@ jobs:
         arch: ["x86_64"]
         gcrypt: ["--with-local-libgcrypt", ""]
         compiler: ["cc"]
+        ar: ["ar"]
+        ranlib: ["ranlib"]
         pcre: [""]
         maxminddb: [""]
         msan: [""]
         nBPF: [""]
+        lto_gold_linker: [""]
         include:
           - compiler: "gcc-7" # "Oldest" gcc easily available
             os: ubuntu-20.04
@@ -204,6 +207,7 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
+            lto_gold_linker: "--with-lto-and-gold-linker"
           - compiler: "clang-7" # "Oldest" clang easily available
             os: ubuntu-20.04
             arch: "x86_64"
@@ -213,6 +217,8 @@ jobs:
             msan: "--with-sanitizer"
             nBPF: ""
           - compiler: "clang-14" # "Newest" clang easily available
+            ar: "llvm-ar-14"
+            ranlib: "llvm-ranlib-14"
             os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
@@ -220,6 +226,7 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
+            lto_gold_linker: "--with-lto-and-gold-linker"
           - compiler: "cc"
             os: ubuntu-latest
             arch: "x86_64"
@@ -336,12 +343,8 @@ jobs:
           ./configure
           make
           cd -
-      - name: Setup Ubuntu specified compiler (gcc)
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'gcc')
-        run: |
-          sudo apt-get install ${{ matrix.compiler }}
-      - name: Setup Ubuntu specified compiler (clang)
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'clang')
+      - name: Setup Ubuntu specified compiler
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && ! startsWith(matrix.compiler, 'cc')
         run: |
           sudo apt-get install ${{ matrix.compiler }}
       - name: Install Windows msys2 prerequisites
@@ -390,9 +393,9 @@ jobs:
         run: |
           brew install libmaxminddb
       - name: Configure nDPI on Ubuntu
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
         run: |
-          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
+          AR=${{ matrix.ar }} RANLIB=${{ matrix.ranlib }} ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs ${{matrix.lto_gold_linker}}
       - name: Configure nDPI on MacOS
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
@@ -406,14 +409,6 @@ jobs:
         run: |
           msys2 -c 'make all'
           msys2 -c 'ldd ./example/ndpiReader.exe'
-      - name: Configure nDPI with specified GCC version on Ubuntu
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'gcc')
-        run: |
-          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
-      - name: Configure nDPI with specified CLANG on Ubuntu
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'clang')
-        run: |
-          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs
       - name: Build nDPI
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |

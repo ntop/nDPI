@@ -23,25 +23,20 @@ int malloc_size_stats = 0;
 int max_malloc_bins = 0;
 struct ndpi_bin malloc_bins; /* unused */
 
-int bufferToFile(const char * name, const uint8_t *Data, size_t Size) {
-  FILE * fd;
-  if (remove(name) != 0) {
-    if (errno != ENOENT) {
-      perror("remove failed");
-      return -1;
-    }
-  }
-  fd = fopen(name, "wb");
+FILE *bufferToFile(const uint8_t *Data, size_t Size) {
+  FILE *fd;
+  fd = tmpfile();
   if (fd == NULL) {
-    perror("open failed");
-    return -2;
+    perror("Error tmpfile");
+    return NULL;
   }
   if (fwrite (Data, 1, Size, fd) != Size) {
+    perror("Error fwrite");
     fclose(fd);
-    return -3;
+    return NULL;
   }
-  fclose(fd);
-  return 0;
+  rewind(fd);
+  return fd;
 }
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
@@ -51,8 +46,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   int r;
   char errbuf[PCAP_ERRBUF_SIZE];
   NDPI_PROTOCOL_BITMASK all;
-  char * pcap_path = tempnam("/tmp", "fuzz-ndpi-reader");
   u_int i;
+  FILE *fd;
 
   if (prefs == NULL) {
     prefs = calloc(sizeof(struct ndpi_workflow_prefs), 1);
@@ -78,20 +73,19 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_finalize_initialization(workflow->ndpi_struct);
   }
 
-  bufferToFile(pcap_path, Data, Size);
+  fd = bufferToFile(Data, Size);
+  if (fd == NULL)
+    return 0;
 
-  pkts = pcap_open_offline(pcap_path, errbuf);
+  pkts = pcap_fopen_offline(fd, errbuf);
   if (pkts == NULL) {
-    remove(pcap_path);
-    free(pcap_path);
+    fclose(fd);
     return 0;
   }
   if (ndpi_is_datalink_supported(pcap_datalink(pkts)) == 0)
   {
     /* Do not fail if the datalink type is not supported (may happen often during fuzzing). */
     pcap_close(pkts);
-    remove(pcap_path);
-    free(pcap_path);
     return 0;
   }
 
@@ -121,9 +115,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   for(i = 0; i < workflow->prefs.num_roots; i++)
     ndpi_tdestroy(workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
   ndpi_free(workflow->ndpi_flows_root);
-
-  remove(pcap_path);
-  free(pcap_path);
 
   return 0;
 }

@@ -1,7 +1,7 @@
 bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_quic_get_crypto_data
 
 fuzz_process_packet_SOURCES = fuzz_process_packet.c
-fuzz_process_packet_CFLAGS =
+fuzz_process_packet_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
 fuzz_process_packet_LDADD = ../src/lib/libndpi.a
 fuzz_process_packet_LDFLAGS = $(ADDITIONAL_LIBS) $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -13,9 +13,9 @@ fuzz_process_packet_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_process_packet_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c
-fuzz_ndpi_reader_CFLAGS = -I../example/
-fuzz_ndpi_reader_LDADD = ../example/libndpiReader.a ../src/lib/libndpi.a
+fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c ../example/reader_util.c
+fuzz_ndpi_reader_CFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_ndpi_reader_LDADD = ../src/lib/libndpi.a
 fuzz_ndpi_reader_LDFLAGS = $(PCAP_LIB) $(ADDITIONAL_LIBS) $(LIBS)
 if HAS_FUZZLDFLAGS
 fuzz_ndpi_reader_CFLAGS += $(LIB_FUZZING_ENGINE)
@@ -27,9 +27,9 @@ fuzz_ndpi_reader_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_ndpi_reader_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_quic_get_crypto_data_SOURCES = fuzz_quic_get_crypto_data.c
-fuzz_quic_get_crypto_data_CFLAGS = -I../example/
-fuzz_quic_get_crypto_data_LDADD = ../example/libndpiReader.a ../src/lib/libndpi.a
-fuzz_quic_get_crypto_data_LDFLAGS = $(PCAP_LIB) $(ADDITIONAL_LIBS) $(LIBS)
+fuzz_quic_get_crypto_data_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_quic_get_crypto_data_LDADD = ../src/lib/libndpi.a
+fuzz_quic_get_crypto_data_LDFLAGS = $(ADDITIONAL_LIBS) $(LIBS)
 if HAS_FUZZLDFLAGS
 fuzz_quic_get_crypto_data_CFLAGS += $(LIB_FUZZING_ENGINE)
 fuzz_quic_get_crypto_data_LDFLAGS += $(LIB_FUZZING_ENGINE)
