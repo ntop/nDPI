@@ -161,6 +161,11 @@ cache_result cache_add(cache_t cache, void *item, uint32_t item_size) {
 
 
   entry->item = ndpi_malloc(item_size);
+  if(!entry->item) {
+    ndpi_free(entry);
+    ndpi_free(map_entry);
+    return CACHE_MALLOC_ERROR;
+  }
   memcpy(entry->item, item, item_size);
   entry->item_size = item_size;
 

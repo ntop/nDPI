@@ -224,8 +224,10 @@ int ndpi_init_serializer_ll(ndpi_serializer *_serializer,
     /* nothing to do */
 
   } else if (fmt == ndpi_serialization_format_csv) {
-    if (ndpi_init_serializer_buffer(&serializer->header, NDPI_SERIALIZER_DEFAULT_HEADER_SIZE) != 0)
+    if (ndpi_init_serializer_buffer(&serializer->header, NDPI_SERIALIZER_DEFAULT_HEADER_SIZE) != 0) {
+      ndpi_term_serializer(_serializer);
       return(-1);
+    }
 
   } else /* ndpi_serialization_format_tlv */ {
     serializer->buffer.data[0]   = 1; /* version */

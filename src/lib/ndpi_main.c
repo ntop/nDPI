@@ -5100,11 +5100,10 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     }
 
     if(flow->l4_proto == IPPROTO_UDP) {
-      if(flow->l4.udp.quic_reasm_buf){
+      if(flow->l4.udp.quic_reasm_buf)
         ndpi_free(flow->l4.udp.quic_reasm_buf);
-        if(flow->l4.udp.quic_reasm_buf_bitmap)
-          ndpi_free(flow->l4.udp.quic_reasm_buf_bitmap);
-      }
+      if(flow->l4.udp.quic_reasm_buf_bitmap)
+        ndpi_free(flow->l4.udp.quic_reasm_buf_bitmap);
     }
   }
 
