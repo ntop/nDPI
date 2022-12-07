@@ -27,6 +27,7 @@ struct ndpi_bin malloc_bins; /* unused */
 
 static int mem_alloc_state = 0;
 
+__attribute__((no_sanitize("integer")))
 static int fastrand ()
 {
   if(!mem_alloc_state) return 1; /* No failures */
