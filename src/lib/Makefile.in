@@ -11,7 +11,7 @@ RANLIB = @RANLIB@
 #
 # Installation directories
 #
-prefix     = @prefix@
+PREFIX     = @prefix@
 libdir     = @libdir@
 includedir = @includedir@/ndpi
 ifneq ($(OS),Windows_NT)
@@ -91,9 +91,9 @@ cppcheck:
 	cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I ../include *.c protocols/*.c
 
 install: $(NDPI_LIBS)
-	mkdir -p $(DESTDIR)$(libdir)
-	cp $(NDPI_LIBS) $(DESTDIR)$(libdir)/
-	cp -P $(NDPI_LIB_SHARED_BASE) $(DESTDIR)$(libdir)/
-	cp -P $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) $(DESTDIR)$(libdir)/
-	mkdir -p $(DESTDIR)$(includedir)
-	cp ../include/*.h $(DESTDIR)$(includedir)
+	mkdir -p $(DESTDIR)$(PREFIX)$(libdir)
+	cp $(NDPI_LIBS) $(DESTDIR)$(PREFIX)$(libdir)/
+	cp -P $(NDPI_LIB_SHARED_BASE) $(DESTDIR)$(PREFIX)$(libdir)/
+	cp -P $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) $(DESTDIR)$(PREFIX)$(libdir)/
+	mkdir -p $(DESTDIR)$(PREFIX)$(includedir)
+	cp ../include/*.h $(DESTDIR)$(PREFIX)$(includedir)
