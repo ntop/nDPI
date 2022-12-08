@@ -41,6 +41,7 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType) {
   case 13: /* Comfort Noise */
   case 96: /* Dynamic RTP */
   case 97: /* Redundant Audio Data Payload */
+  case 98: /* DynamicRTP-Type-98 (Zoom) */
   case 101: /* DTMF */
   case 103: /* SILK Narrowband */
   case 104: /* SILK Wideband */
@@ -79,41 +80,112 @@ int is_valid_rtp_payload_type(uint8_t type)
 
 /* *************************************************************** */
 
+/*
+  https://github.com/Princeton-Cabernet/zoom-analysis
+  https://citizenlab.ca/2020/04/move-fast-roll-your-own-crypto-a-quick-look-at-the-confidentiality-of-zoom-meetings/
+  https://github.com/marty90/rtc_pcap_cleaners
+ */
+
+PACK_ON struct zoom_sfu_encapsulation {
+  u_int8_t  sfu_type; /* 3/4 = Zoom_0, 5 = RTCP/RTP */
+  u_int16_t sequence_num;
+  u_int32_t unknown;
+  u_int8_t  direction; /* 0 = -> Zoom, 4 = <- Zoom */
+} PACK_OFF;
+
+PACK_ON struct zoom_media_encapsulation {
+  u_int8_t  enc_type; /* 15 = Audio, 16 = Video, 34 = RTCP  */
+  u_int32_t unknown_1, unknown_2;
+  u_int16_t sequence_num;
+  u_int32_t timestamp;
+} PACK_OFF;
+
+#define ZOOM_PORT 8801
+
+static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
+		       const u_int8_t *payload, const u_int16_t payloadLen,
+		       u_int8_t *is_rtp, u_int8_t *zoom_stream_type,
+		       u_int16_t *payload_offset) {
+  u_int16_t header_offset = sizeof(struct zoom_sfu_encapsulation) + sizeof(struct zoom_media_encapsulation);
+
+  if(payloadLen < header_offset)
+    return(0);
+
+  if((sport == ZOOM_PORT) || (dport == ZOOM_PORT)) {
+    struct zoom_sfu_encapsulation *enc = (struct zoom_sfu_encapsulation*)payload;
+
+    /* traceEvent(TRACE_NORMAL, "==> %u <-> %u [type: %u]", sport, dport, enc->sfu_type); */
+
+    if((enc->sfu_type >= 3) && (enc->sfu_type <= 5)) {
+      struct zoom_media_encapsulation *enc = (struct zoom_media_encapsulation*)(&payload[sizeof(struct zoom_sfu_encapsulation)]);
+
+      *is_rtp = ((enc->enc_type == 15) || (enc->enc_type == 16)) ? 1 : 0, *zoom_stream_type = enc->enc_type;
+
+      *payload_offset = (enc->enc_type == 16) ? 32 /* video streams have a long zoom_media_encapsulation header */
+	: ((enc->enc_type == 15) ? 27 : header_offset);
+      return(1);
+    }
+  }
+
+  return(0);
+}
+
+/* *************************************************************** */
+
 static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
-			    const u_int8_t * payload, const u_int16_t payload_len) {
+			    u_int8_t * payload, u_int16_t payload_len) {
   u_int8_t payloadType, payload_type;
-  u_int16_t d_port = ntohs(ndpi_struct->packet.udp->dest);
-  
+  u_int16_t s_port = ntohs(ndpi_struct->packet.udp->source), d_port = ntohs(ndpi_struct->packet.udp->dest), payload_offset;
+  u_int8_t is_rtp, zoom_stream_type, is_zoom = 0;
+
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
   if((payload_len < 2)
      || (d_port == 5355 /* LLMNR_PORT */)
-     || (d_port == 5353 /* MDNS_PORT */)     
+     || (d_port == 5353 /* MDNS_PORT */)
      || flow->stun.num_binding_requests
      ) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
+  if(isZoom(s_port, d_port, payload, payload_len,
+	    &is_rtp, &zoom_stream_type, &payload_offset)) {
+    if(payload_offset < payload_len) {
+      payload_len -= payload_offset;
+      payload = &payload[payload_offset];
+      is_zoom = 1;
+    }
+  }
+
   payload_type = payload[1] & 0x7F;
-  
+
   /* Check whether this is an RTP flow */
   if((payload_len >= 12)
-     && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */
+     && (((payload[0] & 0xFF) == 0x80)
+	 || ((payload[0] & 0xFF) == 0xA0)
+	 || ((payload[0] & 0xFF) == 0x90)
+	 ) /* RTP magic byte [1] */
      && ((payload_type < 72) || (payload_type > 76))
      && (is_valid_rtp_payload_type(payload_type))
-    ) {
+     ) {
     if(flow->l4.udp.line_pkts[0] >= 2 && flow->l4.udp.line_pkts[1] >= 2) {
       /* It seems that it is a LINE stuff; let its dissector to evaluate */
       return;
     } else {
       NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, flow, 
+				 is_zoom ? NDPI_PROTOCOL_ZOOM : NDPI_PROTOCOL_UNKNOWN,
+				 NDPI_PROTOCOL_RTP,
+				 NDPI_CONFIDENCE_DPI);
       return;
     }
   } else if((payload_len >= 12)
-	    && (((payload[0] & 0xFF) == 0x80) || ((payload[0] & 0xFF) == 0xA0)) /* RTP magic byte[1] */
+	    && (((payload[0] & 0xFF) == 0x80)
+		|| ((payload[0] & 0xFF) == 0xA0)
+		|| ((payload[0] & 0xFF) == 0x90)
+		) /* RTP magic byte[1] */
 	    && (payloadType = isValidMSRTPType(payload[1] & 0xFF))) {
     if(payloadType == 1 /* RTP */) {
       NDPI_LOG_INFO(ndpi_struct, "Found Skype for Business (former MS Lync)\n");
@@ -133,15 +205,15 @@ static void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, st
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t source = ntohs(packet->udp->source);
   u_int16_t dest = ntohs(packet->udp->dest);
-  
+
   // printf("==> %s()\n", __FUNCTION__);
-  
+
   /* printf("*** %s(pkt=%d)\n", __FUNCTION__, flow->packet_counter); */
 
   if((source != 30303) && (dest != 30303 /* Avoid to mix it with Ethereum that looks alike */)
      && (dest > 1023)
      )
-    ndpi_rtp_search(ndpi_struct, flow, packet->payload, packet->payload_packet_len);
+    ndpi_rtp_search(ndpi_struct, flow, (u_int8_t*)packet->payload, packet->payload_packet_len);
   else
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
