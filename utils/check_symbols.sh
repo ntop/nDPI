@@ -19,7 +19,7 @@ for line in `nm -P -u "${NDPI_LIB}"`; do
     fi
 
     #printf '%s\n' "${line}"
-    FOUND_SYMBOL="$(printf '%s' "${line}" | grep '^\(malloc\|calloc\|realloc\|free\|printf\|fprintf\|isdigit\|isalpha\|isalnum\|isspace\|isprint\|ispunct\)$' || true)"
+    FOUND_SYMBOL="$(printf '%s' "${line}" | grep '^\(malloc\|calloc\|realloc\|free\|fprintf\|isdigit\|isalpha\|isalnum\|isspace\|isprint\|ispunct\)$' || true)"
 
     if [ ! -z "${FOUND_SYMBOL}" ]; then
         SKIP=0

@@ -122,7 +122,7 @@ static u_int8_t isZoom(struct ndpi_flow_struct *flow,
   if((sport == ZOOM_PORT) || (dport == ZOOM_PORT)) {
     struct zoom_sfu_encapsulation *enc = (struct zoom_sfu_encapsulation*)payload;
 
-    /* printf("==> %u <-> %u [type: %u]\n", sport, dport, enc->sfu_type); */
+    printf("==> %u <-> %u [type: %u]\n", sport, dport, enc->sfu_type);
 
     if((enc->sfu_type >= 3) && (enc->sfu_type <= 5)) {
       struct zoom_media_encapsulation *enc = (struct zoom_media_encapsulation*)(&payload[sizeof(struct zoom_sfu_encapsulation)]);

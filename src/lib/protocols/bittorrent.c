@@ -87,6 +87,7 @@ static u_int8_t is_utpv1_pkt(const u_int8_t *payload, u_int payload_len) {
   if((h->window_size == 0) && (payload_len != sizeof(struct ndpi_utp_hdr)))
     return(0);
 
+
   return(1);
 }
 
@@ -209,7 +210,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
 
   if(flow->packet_counter == 2 && packet->payload_packet_len > 20) {
     if(memcmp(&packet->payload[0], BITTORRENT_PROTO_STRING, 19) == 0) {
-      NDPI_LOG_INFO(ndpi_struct, "found BT: plain\n");
+      NDPI_LOG_INFO(ndpi_struct, "found BT: plain 1\n");
       ndpi_add_connection_as_bittorrent(ndpi_struct, flow, 19, 1, NDPI_CONFIDENCE_DPI);
       return 1;
     }
@@ -219,7 +220,7 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
     /* test for match 0x13+BITTORRENT_PROTO_STRING */
     if(packet->payload[0] == 0x13) {
       if(memcmp(&packet->payload[1], BITTORRENT_PROTO_STRING, 19) == 0) {
-	NDPI_LOG_INFO(ndpi_struct, "found BT: plain\n");
+	NDPI_LOG_INFO(ndpi_struct, "found BT: plain 2\n");
 	ndpi_add_connection_as_bittorrent(ndpi_struct, flow, 20, 1, NDPI_CONFIDENCE_DPI);
 	return 1;
       }
@@ -557,6 +558,7 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 		    && (packet->payload[4]== 0x0)) {
 	    /* Heuristic */
 	    bt_proto = ndpi_strnstr((const char *)&packet->payload[20], BITTORRENT_PROTO_STRING, packet->payload_packet_len-20);
+		  printf("%s:%d\n", __func__, __LINE__);
 	    goto bittorrent_found;
 	    /* CSGO/DOTA conflict */
 	  } else if((v0_flags < 6 /* ST_NUM_STATES */) && (v0_extension < 3 /* EXT_NUM_EXT */)) {
@@ -567,10 +569,12 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 
 	    if((ts < (now+86400)) && (ts > (now-86400))) {
 	      bt_proto = ndpi_strnstr((const char *)&packet->payload[20], BITTORRENT_PROTO_STRING, packet->payload_packet_len-20);
+		  printf("%s:%d\n", __func__, __LINE__);
 	      goto bittorrent_found;
 	    }
 	  } else if(ndpi_strnstr((const char *)&packet->payload[20], BITTORRENT_PROTO_STRING, packet->payload_packet_len-20)
 		    ) {
+		  printf("%s:%d\n", __func__, __LINE__);
 	    goto bittorrent_found;
 	  }
 
@@ -590,6 +594,7 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 	     || ndpi_strnstr((const char *)packet->payload, "d1:rd2:id20:", packet->payload_packet_len)
 	     || (bt_proto = ndpi_strnstr((const char *)packet->payload, BITTORRENT_PROTO_STRING, packet->payload_packet_len))
 	     ) {
+		  printf("%s:%d\n", __func__, __LINE__);
 	  bittorrent_found:
 	    if(bt_proto != NULL && ((u_int8_t *)&bt_proto[27] - packet->payload +
 				    sizeof(flow->protos.bittorrent.hash)) < packet->payload_packet_len) {
@@ -597,7 +602,7 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 	      flow->extra_packets_func = NULL; /* Nothing else to do */
 	    }
 
-	    NDPI_LOG_INFO(ndpi_struct, "found BT: plain\n");
+	    NDPI_LOG_INFO(ndpi_struct, "found BT: plain 3\n");
 	    ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0, NDPI_CONFIDENCE_DPI);
 	    return;
 	  }
