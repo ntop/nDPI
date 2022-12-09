@@ -100,7 +100,7 @@ PACK_ON struct zoom_sfu_encapsulation {
 } PACK_OFF;
 
 PACK_ON struct zoom_media_encapsulation {
-  u_int8_t  enc_type; /* 15 = Audio, 16 = Video, 34 = RTCP  */
+  u_int8_t  enc_type; /* 13/30 = Screen Share, 15 = Audio, 16 = Video, 33/34/35 = RTCP  */
   u_int32_t unknown_1, unknown_2;
   u_int16_t sequence_num;
   u_int32_t timestamp;
@@ -128,6 +128,12 @@ static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
       *zoom_stream_type = enc->enc_type;
       
       switch(enc->enc_type) {
+      case 13: /* Screen Share */
+      case 30: /* Screen Share */
+	*is_rtp = 0;
+	*payload_offset = 27;
+	break;
+	
       case 15: /* Audio */
 	*is_rtp = 0;
 	*payload_offset = 27;
@@ -137,8 +143,10 @@ static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
 	*is_rtp = 1;
 	*payload_offset = 32;
 	break;
-	
+
+      case 33: /* RTCP */
       case 34: /* RTCP */
+      case 35: /* RTCP */
 	*is_rtp = 1;
 	*payload_offset = 36;
 	break;
@@ -184,6 +192,11 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
       */
 
       switch(zoom_stream_type) {
+      case 13: /* Screen Share */
+      case 30: /* Screen Share */
+	flow->protos.rtp.stream_type = rtp_screen_share;
+	break;
+	
       case 15: /* Audio */
 	flow->protos.rtp.stream_type = rtp_audio;
 	break;

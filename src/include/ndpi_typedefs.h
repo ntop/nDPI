@@ -1281,8 +1281,9 @@ struct ndpi_risk_information {
 enum ndpi_rtp_stream_type {
   rtp_unknown = 0,
   rtp_audio,
-  rtp_video,
+  rtp_video,  
   rtp_audio_video,
+  rtp_screen_share
 };
 
 struct ndpi_flow_struct {

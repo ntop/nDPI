@@ -1533,6 +1533,10 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	const char *what;
 	
 	switch(flow->rtp.stream_type) {
+	case rtp_screen_share:
+	  what = "screen_share";
+	  break;
+	  
 	case rtp_audio:
 	  what = "audio";
 	  break;
