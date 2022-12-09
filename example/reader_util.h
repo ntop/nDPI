@@ -166,6 +166,7 @@ enum info_type {
     INFO_TIVOCONNECT,
     INFO_FTP_IMAP_POP_SMTP,
     INFO_NATPMP,
+    INFO_RTP
 };
 
 // flow tracking
@@ -273,6 +274,10 @@ typedef struct ndpi_flow_info {
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;
   } ssh_tls;
+
+  struct {
+    enum ndpi_rtp_stream_type stream_type;
+  } rtp;
 
   struct {
     char url[256], request_content_type[64], content_type[64], user_agent[256], server[128];

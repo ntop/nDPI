@@ -1278,6 +1278,13 @@ struct ndpi_risk_information {
   char *info;  
 };
 
+enum ndpi_rtp_stream_type {
+  rtp_unknown = 0,
+  rtp_audio,
+  rtp_video,
+  rtp_audio_video,
+};
+
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
 
@@ -1387,6 +1394,10 @@ struct ndpi_flow_struct {
       ndpi_ip_addr_t rsp_addr; /* The first address in a DNS response packet */
     } dns;
 
+    struct {
+      enum ndpi_rtp_stream_type stream_type;
+    } rtp;
+    
     struct {
       u_int8_t request_code;
       u_int8_t version;

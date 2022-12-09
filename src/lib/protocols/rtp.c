@@ -31,7 +31,7 @@
 
 /* http://www.myskypelab.com/2014/05/microsoft-lync-wireshark-plugin.html */
 
-static u_int8_t isValidMSRTPType(u_int8_t payloadType) {
+static u_int8_t isValidMSRTPType(u_int8_t payloadType, enum ndpi_rtp_stream_type *s_type) {
   switch(payloadType) {
   case 0: /* G.711 u-Law */
   case 3: /* GSM 6.10 */
@@ -52,11 +52,16 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType) {
   case 116: /* G.726 */
   case 117: /* G.722 */
   case 118: /* Comfort Noise Wideband */
+    *s_type = rtp_audio;
+    return(1 /* RTP */);
+    break;
+    
   case 34: /* H.263 [MS-H26XPF] */
   case 121: /* RT Video */
   case 122: /* H.264 [MS-H264PF] */
   case 123: /* H.264 FEC [MS-H264PF] */
   case 127: /* x-data */
+    *s_type = rtp_video;
     return(1 /* RTP */);
     break;
 
@@ -64,6 +69,7 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType) {
   case 201: /* RTCP PACKET RECEIVER */
   case 202: /* RTCP Source Description */
   case 203: /* RTCP Bye */
+    *s_type = rtp_unknown;
     return(2 /* RTCP */);
     break;
 
@@ -119,10 +125,29 @@ static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
     if((enc->sfu_type >= 3) && (enc->sfu_type <= 5)) {
       struct zoom_media_encapsulation *enc = (struct zoom_media_encapsulation*)(&payload[sizeof(struct zoom_sfu_encapsulation)]);
 
-      *is_rtp = ((enc->enc_type == 15) || (enc->enc_type == 16)) ? 1 : 0, *zoom_stream_type = enc->enc_type;
+      *zoom_stream_type = enc->enc_type;
+      
+      switch(enc->enc_type) {
+      case 15: /* Audio */
+	*is_rtp = 0;
+	*payload_offset = 27;
+	break;
+	
+      case 16: /* Video */
+	*is_rtp = 1;
+	*payload_offset = 32;
+	break;
+	
+      case 34: /* RTCP */
+	*is_rtp = 1;
+	*payload_offset = 36;
+	break;
 
-      *payload_offset = (enc->enc_type == 16) ? 32 /* video streams have a long zoom_media_encapsulation header */
-	: ((enc->enc_type == 15) ? 27 : header_offset);
+      default:
+	*is_rtp = 0;
+	break;
+      }
+      
       return(1);
     }
   }
@@ -137,7 +162,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    u_int8_t * payload, u_int16_t payload_len) {
   u_int8_t payloadType, payload_type;
   u_int16_t s_port = ntohs(ndpi_struct->packet.udp->source), d_port = ntohs(ndpi_struct->packet.udp->dest), payload_offset;
-  u_int8_t is_rtp, zoom_stream_type, is_zoom = 0;
+  u_int8_t is_rtp, zoom_stream_type;
 
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
@@ -153,9 +178,32 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   if(isZoom(s_port, d_port, payload, payload_len,
 	    &is_rtp, &zoom_stream_type, &payload_offset)) {
     if(payload_offset < payload_len) {
-      payload_len -= payload_offset;
-      payload = &payload[payload_offset];
-      is_zoom = 1;
+      /*
+	payload_len -= payload_offset;
+	payload = &payload[payload_offset];
+      */
+
+      switch(zoom_stream_type) {
+      case 15: /* Audio */
+	flow->protos.rtp.stream_type = rtp_audio;
+	break;
+	
+      case 16: /* Video */
+	flow->protos.rtp.stream_type = rtp_video;
+	break;
+
+      default:
+	flow->protos.rtp.stream_type = rtp_unknown;
+	break;
+      }
+
+      /* printf("->>> %u\n", zoom_stream_type); */
+      
+      ndpi_set_detected_protocol(ndpi_struct, flow, 
+				 NDPI_PROTOCOL_ZOOM,
+				 NDPI_PROTOCOL_RTP,
+				 NDPI_CONFIDENCE_DPI);
+      return;
     }
   }
 
@@ -175,9 +223,10 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
       return;
     } else {
       NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
+
+      isValidMSRTPType(payload_type, &flow->protos.rtp.stream_type);
       ndpi_set_detected_protocol(ndpi_struct, flow, 
-				 is_zoom ? NDPI_PROTOCOL_ZOOM : NDPI_PROTOCOL_UNKNOWN,
-				 NDPI_PROTOCOL_RTP,
+				 NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP,
 				 NDPI_CONFIDENCE_DPI);
       return;
     }
@@ -186,7 +235,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 		|| ((payload[0] & 0xFF) == 0xA0)
 		|| ((payload[0] & 0xFF) == 0x90)
 		) /* RTP magic byte[1] */
-	    && (payloadType = isValidMSRTPType(payload[1] & 0xFF))) {
+	    && (payloadType = isValidMSRTPType(payload[1] & 0xFF, &flow->protos.rtp.stream_type))) {
     if(payloadType == 1 /* RTP */) {
       NDPI_LOG_INFO(ndpi_struct, "Found Skype for Business (former MS Lync)\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);

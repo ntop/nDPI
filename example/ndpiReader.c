@@ -1527,6 +1527,32 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
           }
         }
         break;
+
+    case INFO_RTP:
+      if(flow->rtp.stream_type != rtp_unknown) {
+	const char *what;
+	
+	switch(flow->rtp.stream_type) {
+	case rtp_audio:
+	  what = "audio";
+	  break;
+	  
+	case rtp_video:
+	  what = "video";
+	  break;
+	  
+	case rtp_audio_video:
+	  what = "audio/video";
+	  break;
+
+	default:
+	  what = NULL;
+	  break;
+	}
+	
+	if(what)
+	  fprintf(out, "[RTP Stream Type: %s]", what);
+      }
     }
 
     if(flow->ssh_tls.advertised_alpns)
