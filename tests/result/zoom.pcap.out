@@ -1,18 +1,19 @@
 Guessed flow protos:	5
 
 DPI Packets (TCP):	110	(7.86 pkts/flow)
-DPI Packets (UDP):	29	(1.71 pkts/flow)
+DPI Packets (UDP):	23	(1.35 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
 Confidence Match by port    : 2 (flows)
 Confidence DPI              : 31 (flows)
-Num dissector calls: 1076 (32.61 diss/flow)
+Num dissector calls: 703 (21.30 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       7/0/0 (insert/search/found)
-LRU cache stun:       0/18/0 (insert/search/found)
+LRU cache stun:       2/8/4 (insert/search/found)
 LRU cache tls_cert:   0/2/0 (insert/search/found)
 LRU cache mining:     0/2/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  3/0/0 (insert/search/found)
 Automa host:          25/20 (search/found)
 Automa domain:        24/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -30,11 +31,10 @@ SSDP	1	168	1
 DHCP	1	321	1
 ntop	20	4265	1
 IMAPS	2	226	1
-STUN	18	1440	3
 ICMP	3	210	2
 TLS	18	6953	2
 Spotify	1	86	1
-Zoom	617	352565	16
+Zoom	635	354005	19
 GoogleServices	4	1060	1
 
 JA3 Host Stats: 
@@ -57,9 +57,9 @@ JA3 Host Stats:
 	13	TCP 192.168.1.117:53867 <-> 104.199.65.42:80 [proto: 7/HTTP][IP: 126/Google][ClearText][Confidence: Match by port][cat: Web/5][4 pkts/710 bytes <-> 2 pkts/242 bytes][Goodput ratio: 63/45][0.09 sec][bytes ratio: 0.492 (Upload)][IAT c2s/s2c min/avg/max/stddev: 30/64 31/64 32/64 1/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/121 178/121 329/121 115/0][Plen Bins: 0,50,0,0,0,25,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	14	UDP 192.168.1.117:61731 <-> 109.94.160.99:8801 [proto: 189/Zoom][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Video/26][4 pkts/372 bytes <-> 4 pkts/290 bytes][Goodput ratio: 55/39][0.11 sec][bytes ratio: 0.124 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/35 28/27 49/47 18/20][Pkt Len c2s/s2c min/avg/max/stddev: 55/60 93/72 151/93 40/14][PLAIN TEXT (replace)][Plen Bins: 50,25,12,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	UDP 192.168.1.117:60620 <-> 109.94.160.99:8801 [proto: 189/Zoom][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Video/26][4 pkts/408 bytes <-> 3 pkts/222 bytes][Goodput ratio: 59/41][1.24 sec][bytes ratio: 0.295 (Upload)][IAT c2s/s2c min/avg/max/stddev: 7/31 413/16 1209/31 563/16][Pkt Len c2s/s2c min/avg/max/stddev: 55/60 102/74 149/85 33/10][PLAIN TEXT (replace)][Plen Bins: 28,57,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	16	UDP 192.168.1.117:23903 <-> 162.255.37.14:3478 [proto: 78/STUN][IP: 189/Zoom][ClearText][Confidence: DPI][cat: Network/14][3 pkts/258 bytes <-> 3 pkts/222 bytes][Goodput ratio: 51/43][0.19 sec][bytes ratio: 0.075 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/9 10/9 10/9 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/74 86/74 86/74 0/0][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	17	UDP 192.168.1.117:23903 <-> 162.255.38.14:3478 [proto: 78/STUN][IP: 189/Zoom][ClearText][Confidence: DPI][cat: Network/14][3 pkts/258 bytes <-> 3 pkts/222 bytes][Goodput ratio: 51/43][0.18 sec][bytes ratio: 0.075 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/9 10/10 10/10 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/74 86/74 86/74 0/0][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	18	UDP 192.168.1.117:23903 <-> 162.255.38.14:3479 [proto: 78/STUN][IP: 189/Zoom][ClearText][Confidence: DPI][cat: Network/14][3 pkts/258 bytes <-> 3 pkts/222 bytes][Goodput ratio: 51/43][0.18 sec][bytes ratio: 0.075 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/9 10/10 10/10 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/74 86/74 86/74 0/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	16	UDP 192.168.1.117:23903 <-> 162.255.37.14:3478 [proto: 78.189/STUN.Zoom][IP: 189/Zoom][ClearText][Confidence: DPI][cat: Video/26][3 pkts/258 bytes <-> 3 pkts/222 bytes][Goodput ratio: 51/43][0.19 sec][bytes ratio: 0.075 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/9 10/9 10/9 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/74 86/74 86/74 0/0][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	17	UDP 192.168.1.117:23903 <-> 162.255.38.14:3478 [proto: 78.189/STUN.Zoom][IP: 189/Zoom][ClearText][Confidence: DPI][cat: Video/26][3 pkts/258 bytes <-> 3 pkts/222 bytes][Goodput ratio: 51/43][0.18 sec][bytes ratio: 0.075 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/9 10/10 10/10 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/74 86/74 86/74 0/0][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	18	UDP 192.168.1.117:23903 <-> 162.255.38.14:3479 [proto: 78.189/STUN.Zoom][IP: 189/Zoom][ClearText][Confidence: DPI][cat: Video/26][3 pkts/258 bytes <-> 3 pkts/222 bytes][Goodput ratio: 51/43][0.18 sec][bytes ratio: 0.075 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/9 10/10 10/10 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/74 86/74 86/74 0/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	UDP 192.168.1.117:137 -> 192.168.1.255:137 [proto: 10/NetBIOS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: System/18][3 pkts/330 bytes -> 0 pkts/0 bytes][Goodput ratio: 62/0][< 1 sec][Hostname/SNI: workgroup][PLAIN TEXT ( FHEPFCELEHFCEPFFFACACACACACACA)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	20	UDP 192.168.0.1:68 -> 255.255.255.255:67 [proto: 18/DHCP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/321 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][< 1 sec][Hostname/SNI: tl-sg116e][DHCP Fingerprint: 1,3][DHCP Class Ident: TL-SG116E][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	21	TCP 192.168.1.117:54341 -> 62.149.152.153:993 [proto: 51/IMAPS][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Email/3][2 pkts/226 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][3.59 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -631,6 +631,7 @@ typedef enum {
   NDPI_LRUCACHE_TLS_CERT,
   NDPI_LRUCACHE_MINING,
   NDPI_LRUCACHE_MSTEAMS,
+  NDPI_LRUCACHE_STUN_ZOOM,
 
   NDPI_LRUCACHE_MAX	/* Last one! */
 } lru_cache_type;
@@ -1208,6 +1209,8 @@ struct ndpi_detection_module_struct {
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
   u_int32_t stun_cache_num_entries;
+  struct ndpi_lru_cache *stun_zoom_cache;
+  u_int32_t stun_zoom_cache_num_entries;
 
   /* NDPI_PROTOCOL_TLS and subprotocols */
   struct ndpi_lru_cache *tls_cert_cache;

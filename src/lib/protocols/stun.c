@@ -31,6 +31,7 @@
 
 // #define DEBUG_STUN 1
 // #define DEBUG_LRU  1
+// #define DEBUG_ZOOM_LRU  1
 
 #define STUN_HDR_LEN   20 /* STUN message header length, Classic-STUN (RFC 3489) and STUN (RFC 8489) both */
 
@@ -48,6 +49,36 @@ u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
     else
       return ntohl(flow->c_address.v4) + ntohs(flow->c_port);
   }
+}
+
+/* ************************************************************ */
+
+int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct,
+                                struct ndpi_flow_struct *flow)
+{
+  u_int16_t when;
+  u_int32_t key;
+
+  if(ndpi_struct->stun_zoom_cache &&
+     flow->l4_proto == IPPROTO_UDP) {
+    key = get_stun_lru_key(flow, 0); /* Src */
+#ifdef DEBUG_ZOOM_LRU
+    printf("[LRU ZOOM] Search %u [src_port %u]\n", key, ntohs(flow->c_port));
+#endif
+
+    if(ndpi_lru_find_cache(ndpi_struct->stun_zoom_cache, key,
+                           &when, 0 /* Don't remove it as it can be used for other connections */)) {
+      u_int16_t tdiff = ((flow->last_packet_time_ms /1000) & 0xFFFF) - when;
+
+#ifdef DEBUG_ZOOM_LRU
+      printf("[LRU ZOOM] Found, diff %d\n", tdiff);
+#endif
+
+      if(tdiff < 60 /* sec */)
+        return 1;
+    }
+  }
+  return 0;
 }
 
 /* ************************************************************ */
@@ -105,6 +136,18 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
 	}
       }
     }
+  }
+
+  /* TODO: extend to other protocols? */
+  if(ndpi_struct->stun_zoom_cache &&
+     app_proto == NDPI_PROTOCOL_ZOOM &&
+     flow->l4_proto == IPPROTO_UDP) {
+    u_int32_t key = get_stun_lru_key(flow, 0); /* Src */
+#ifdef DEBUG_ZOOM_LRU
+    printf("[LRU ZOOM] ADDING %u [src_port %u]\n", key, ntohs(flow->c_port));
+#endif
+    ndpi_lru_add_to_cache(ndpi_struct->stun_zoom_cache, key,
+                         (flow->last_packet_time_ms / 1000) & 0xFFFF /* 16 bit */);
   }
 
   ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, NDPI_PROTOCOL_STUN, confidence);
@@ -278,6 +321,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #endif
 
         switch(attribute) {
+	case 0x0101:
 	case 0x0103:
           *app_proto = NDPI_PROTOCOL_ZOOM;
           return(NDPI_IS_STUN);

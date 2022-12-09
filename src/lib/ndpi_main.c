@@ -176,6 +176,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
 extern void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
 			    struct ndpi_flow_struct *flow, ndpi_risk_enum r);
 extern u_int32_t make_mining_key(struct ndpi_flow_struct *flow);
+extern int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
 /* Forward */
 static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
@@ -2787,6 +2788,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->tls_cert_cache_num_entries = 1024;
   ndpi_str->mining_cache_num_entries = 1024;
   ndpi_str->msteams_cache_num_entries = 1024;
+  ndpi_str->stun_zoom_cache_num_entries = 1024;
 
   ndpi_str->opportunistic_tls_smtp_enabled = 1;
   ndpi_str->opportunistic_tls_imap_enabled = 1;
@@ -2907,6 +2909,13 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
     if(!ndpi_str->msteams_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->msteams_cache_num_entries);
+    }
+  }
+  if(ndpi_str->stun_zoom_cache_num_entries > 0) {
+    ndpi_str->stun_zoom_cache = ndpi_lru_cache_init(ndpi_str->stun_zoom_cache_num_entries);
+    if(!ndpi_str->stun_zoom_cache) {
+      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
+                   ndpi_str->stun_zoom_cache_num_entries);
     }
   }
 
@@ -3182,6 +3191,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->stun_cache)
       ndpi_lru_free_cache(ndpi_str->stun_cache);
+
+    if(ndpi_str->stun_zoom_cache)
+      ndpi_lru_free_cache(ndpi_str->stun_zoom_cache);
 
     if(ndpi_str->tls_cert_cache)
       ndpi_lru_free_cache(ndpi_str->tls_cert_cache);
@@ -6020,6 +6032,10 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       /* This looks like Zoom */
       ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
       ret.app_protocol = NDPI_PROTOCOL_ZOOM;
+    } else if(stun_search_into_zoom_cache(ndpi_str, flow)) {
+      /* This looks like Zoom */
+      ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
+      ret.app_protocol = flow->detected_protocol_stack[0];
     }
   }
 
@@ -8437,6 +8453,9 @@ int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_LRUCACHE_MSTEAMS:
     ndpi_lru_get_stats(ndpi_struct->msteams_cache, stats);
     return 0;
+  case NDPI_LRUCACHE_STUN_ZOOM:
+    ndpi_lru_get_stats(ndpi_struct->stun_zoom_cache, stats);
+    return 0;
   default:
     return -1;
   }
@@ -8468,6 +8487,9 @@ int ndpi_set_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_LRUCACHE_MSTEAMS:
     ndpi_struct->msteams_cache_num_entries = num_entries;
     return 0;
+  case NDPI_LRUCACHE_STUN_ZOOM:
+    ndpi_struct->stun_zoom_cache_num_entries = num_entries;
+    return 0;
   default:
     return -1;
   }
@@ -8498,6 +8520,9 @@ int ndpi_get_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
     return 0;
   case NDPI_LRUCACHE_MSTEAMS:
     *num_entries = ndpi_struct->msteams_cache_num_entries;
+    return 0;
+  case NDPI_LRUCACHE_STUN_ZOOM:
+    *num_entries = ndpi_struct->stun_zoom_cache_num_entries;
     return 0;
   default:
     return -1;
