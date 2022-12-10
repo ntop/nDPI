@@ -709,8 +709,6 @@ struct ndpi_flow_tcp_struct {
   u_int32_t telnet_stage:2;			// 0 - 2
 
   struct {
-    message_t message[2]; /* Directions */
-
     /* NDPI_PROTOCOL_TLS */
     u_int8_t app_data_seen[2];
     u_int8_t num_tls_blocks;
@@ -1384,6 +1382,7 @@ struct ndpi_flow_struct {
   } stun;
 
   struct {
+    message_t message[2]; /* Directions */
     u_int8_t certificate_processed:1, _pad:7;
   } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
