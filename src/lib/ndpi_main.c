@@ -9105,6 +9105,9 @@ char *ndpi_user_agent_set(struct ndpi_flow_struct *flow,
     /* Already set: ignore double set */
     return NULL;
   }
+  if(value_len == 0) {
+    return NULL;
+  }
 
   flow->http.user_agent = ndpi_malloc(value_len + 1);
   if(flow->http.user_agent != NULL) {
