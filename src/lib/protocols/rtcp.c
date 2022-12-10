@@ -45,9 +45,10 @@ void ndpi_search_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
       len = packet->payload[2+offset] * 256 + packet->payload[2+offset+1];
       rtcp_section_len = (len + 1) * 4;
       
-      if(((offset+rtcp_section_len) > packet->payload_packet_len) || (rtcp_section_len == 0) || (len == 0))
-	goto exclude_rtcp;
-      else
+      if(((offset+rtcp_section_len) > packet->payload_packet_len) || (rtcp_section_len == 0) || (len == 0)) {
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	return;
+      } else
 	offset += rtcp_section_len;
     }
     
@@ -63,10 +64,6 @@ void ndpi_search_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
 
     if(flow->packet_counter > 3)
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-  } else {
-  exclude_rtcp:
-    
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 

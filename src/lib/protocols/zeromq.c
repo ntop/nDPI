@@ -37,8 +37,6 @@ static void ndpi_check_zmq(struct ndpi_detection_module_struct *ndpi_struct, str
   u_char p1[] =  { 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7f };
   u_char p2[] =  { 0x28, 0x66, 0x6c, 0x6f, 0x77, 0x00 };
 
-  if(payload_len == 0) return; /* Shouldn't happen */
-
   /* Break after 17 packets. */
   if(flow->packet_counter > 17) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

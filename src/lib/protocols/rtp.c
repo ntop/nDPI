@@ -114,6 +114,7 @@ static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
 		       u_int16_t *payload_offset) {
   u_int16_t header_offset = sizeof(struct zoom_sfu_encapsulation) + sizeof(struct zoom_media_encapsulation);
 
+  *payload_offset = 0;
   if(payloadLen < header_offset)
     return(0);
 

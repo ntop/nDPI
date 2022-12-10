@@ -238,12 +238,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   if((dns_header->flags & FLAGS_MASK) == 0x0000)
     *is_query = 1;
   /* 0x8000 RESPONSE */
-  else if((dns_header->flags & FLAGS_MASK) == 0x8000)
+  else
     *is_query = 0;
-  else {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid DNS Flags");
-    return(1 /* invalid */);
-  }
 
   if(*is_query) {
     /* DNS Request */
@@ -448,9 +444,6 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     s_port = ntohs(packet->tcp->source);
     d_port = ntohs(packet->tcp->dest);
     payload_offset = 2;
-  } else {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
   }
 
   if(((s_port == DNS_PORT) || (d_port == DNS_PORT)

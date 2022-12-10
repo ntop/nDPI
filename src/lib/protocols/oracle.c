@@ -56,8 +56,6 @@ void ndpi_search_oracle(struct ndpi_detection_module_struct *ndpi_struct, struct
       NDPI_LOG_INFO(ndpi_struct, "found oracle\n");
       ndpi_int_oracle_add_connection(ndpi_struct, flow);
     }
-  } else {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 

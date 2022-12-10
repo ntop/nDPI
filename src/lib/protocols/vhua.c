@@ -39,10 +39,7 @@ static void ndpi_int_vhua_add_connection(struct ndpi_detection_module_struct *nd
 
 static void ndpi_check_vhua(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int32_t payload_len = packet->payload_packet_len;
   u_char p0[] =  { 0x05, 0x14, 0x3a, 0x05, 0x08, 0xf8, 0xa1, 0xb1, 0x03 };
-
-  if(payload_len == 0) return; /* Shouldn't happen */
 
   /* Break after 3 packets. */
   if((flow->packet_counter > 3)

@@ -108,21 +108,12 @@ void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "search SOME/IP\n");
 
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
-    return;
-  }
- 
   //we extract the Message ID and Request ID and check for special cases later
   u_int32_t message_id = ntohl(someip_data_cover_32(&packet->payload[0]));
   u_int32_t request_id = ntohl(someip_data_cover_32(&packet->payload[8]));
 
   NDPI_LOG_DBG2(ndpi_struct, "====>>>> SOME/IP Message ID: %08x [len: %u]\n",
 	   message_id, packet->payload_packet_len);
-  if (packet->payload_packet_len < 16) {
-    NDPI_LOG_DBG(ndpi_struct, "Excluding SOME/IP .. mandatory header not found\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
-    return;
-  }
 
   //####Maximum packet size in SOMEIP depends on the carrier protocol, and I'm not certain how well enforced it is, so let's leave that for round 2####
 

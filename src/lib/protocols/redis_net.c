@@ -32,10 +32,7 @@ static void ndpi_int_redis_add_connection(struct ndpi_detection_module_struct *n
 
 static void ndpi_check_redis(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int32_t payload_len = packet->payload_packet_len;
   
-  if(payload_len == 0) return; /* Shouldn't happen */
-
   /* Break after 20 packets. */
   if(flow->packet_counter > 20) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
