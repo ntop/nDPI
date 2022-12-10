@@ -1,4 +1,5 @@
 #include "ndpi_api.h"
+#include "fuzz_common_code.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -11,14 +12,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   uint8_t protocol_was_guessed;
 
   if (ndpi_info_mod == NULL) {
-    ndpi_info_mod = ndpi_init_detection_module(ndpi_enable_ja3_plus);
-    NDPI_PROTOCOL_BITMASK all, debug_bitmask;
-    NDPI_BITMASK_SET_ALL(all);
-    NDPI_BITMASK_SET_ALL(debug_bitmask);
-    ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
-    ndpi_set_log_level(ndpi_info_mod, 4);
-    ndpi_set_debug_bitmask(ndpi_info_mod, debug_bitmask);
-    ndpi_finalize_initialization(ndpi_info_mod);
+    fuzz_init_detection_module(&ndpi_info_mod, 0);
+
     ndpi_init_serializer(&json_serializer, ndpi_serialization_format_json);
     ndpi_init_serializer(&csv_serializer, ndpi_serialization_format_csv);
   }

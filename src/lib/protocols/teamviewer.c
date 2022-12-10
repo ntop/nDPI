@@ -63,8 +63,6 @@ void ndpi_search_teamview(struct ndpi_detection_module_struct *ndpi_struct, stru
     }
   }
 
-  if(packet->payload_packet_len == 0) return;
-
   if (packet->udp != NULL) {
     if (packet->payload_packet_len > 13) {
       if (packet->payload[0] == 0x00 && packet->payload[11] == 0x17 && packet->payload[12] == 0x24) { /* byte 0 is a counter/seq number, and at the start is 0 */

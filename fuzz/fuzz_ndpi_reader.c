@@ -85,6 +85,13 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     // enable all protocols
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
+
+    ndpi_load_protocols_file(workflow->ndpi_struct, "protos.txt");
+    ndpi_load_categories_file(workflow->ndpi_struct, "categories.txt", NULL);
+    ndpi_load_risk_domain_file(workflow->ndpi_struct, "risky_domains.txt");
+    ndpi_load_malicious_ja3_file(workflow->ndpi_struct, "ja3_fingerprints.csv");
+    ndpi_load_malicious_sha1_file(workflow->ndpi_struct, "sha1_fingerprints.csv");
+
     memset(workflow->stats.protocol_counter, 0,
 	   sizeof(workflow->stats.protocol_counter));
     memset(workflow->stats.protocol_counter_bytes, 0,

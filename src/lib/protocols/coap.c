@@ -109,10 +109,6 @@ void ndpi_search_coap (struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   struct ndpi_coap_hdr * h = (struct ndpi_coap_hdr*) packet->payload;
 
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
-    return;
-  }
-
   // search for udp packet
   if(packet->udp != NULL) {
     u_int16_t s_port = ntohs(packet->udp->source);

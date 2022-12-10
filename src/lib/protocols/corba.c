@@ -42,8 +42,6 @@ void ndpi_search_corba(struct ndpi_detection_module_struct *ndpi_struct, struct 
       NDPI_LOG_INFO(ndpi_struct, "found corba\n");
       ndpi_int_corba_add_connection(ndpi_struct, flow);
     }
-  } else {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 

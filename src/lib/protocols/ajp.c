@@ -116,10 +116,6 @@ void ndpi_search_ajp(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
-    return;
-  }
-
   NDPI_LOG_DBG(ndpi_struct, "search AJP\n");
   ndpi_check_ajp(ndpi_struct, flow);
 

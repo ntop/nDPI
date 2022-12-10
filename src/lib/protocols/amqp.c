@@ -68,8 +68,6 @@ void ndpi_search_amqp(struct ndpi_detection_module_struct *ndpi_struct, struct n
 				}
 			}
 		}
-	} else {
-		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	}
 }
 

@@ -106,7 +106,7 @@ void ndpi_search_memcached(
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *offset = packet->payload;
   u_int16_t length = packet->payload_packet_len;
-  u_int8_t *matches;
+  u_int8_t *matches = NULL;
 
   NDPI_LOG_DBG(ndpi_struct, "search memcached\n");
 
@@ -133,10 +133,6 @@ void ndpi_search_memcached(
     offset += MEMCACHED_UDP_HDR_LEN;
     length -= MEMCACHED_UDP_HDR_LEN;
     matches = &flow->l4.udp.memcached_matches;
-  }
-  else {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
   }
 
   /* grep MCD memcached.c |\

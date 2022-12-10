@@ -102,11 +102,6 @@ void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_struct, str
       return;
     }
 
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
-    {
-      return;
-    }
-
   NDPI_LOG_DBG(ndpi_struct, "search WEBSOCKET\n");
   ndpi_check_websocket(ndpi_struct, flow);
 
