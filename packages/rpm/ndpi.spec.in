@@ -51,7 +51,7 @@ PATH=/usr/bin:/bin:/usr/sbin:/sbin
 %define includedir    /usr/include/ndpi
 %{?el7:%define libdir /lib}
 %{?el8:%define libdir /usr/lib64}
-%{?el9:%define libdir /lib64}
+%{?el9:%define libdir /usr/lib64}
 %define bindir        /usr/bin
 
 %install
