@@ -2309,6 +2309,9 @@ static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_stru
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
+  if(!ndpi_str->protocols_ptree)
+    return((u_int64_t)-1);
+
   /* Make sure all in network byte order otherwise compares wont work */
   ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree, &prefix);
@@ -2642,10 +2645,16 @@ void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str) {
 
     memset(&ac_pattern, 0, sizeof(ac_pattern));
     ac_pattern.astring      = ndpi_strdup((char*)common_alpns[i]);
+    if(!ac_pattern.astring) {
+      NDPI_LOG_ERR(ndpi_str, "Unable to add %s [mem alloc error]\n", common_alpns[i]);
+      continue;
+    }
     ac_pattern.length       = strlen(common_alpns[i]);
 
-    if(ac_automata_add(ndpi_str->common_alpns_automa.ac_automa, &ac_pattern) != ACERR_SUCCESS)
-      printf("%s(): unable to add %s\n", __FUNCTION__, common_alpns[i]);
+    if(ac_automata_add(ndpi_str->common_alpns_automa.ac_automa, &ac_pattern) != ACERR_SUCCESS) {
+      ndpi_free(ac_pattern.astring);
+      NDPI_LOG_ERR(ndpi_str, "Unable to add %s\n", common_alpns[i]);
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_quic_get_crypto_data
+bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_quic_get_crypto_data fuzz_config
 
 fuzz_process_packet_SOURCES = fuzz_process_packet.c fuzz_common_code.c
 fuzz_process_packet_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
@@ -26,7 +26,7 @@ fuzz_ndpi_reader_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader.c ../example/reader_util.c
+fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c
 fuzz_ndpi_reader_alloc_fail_CFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
 fuzz_ndpi_reader_alloc_fail_LDADD = ../src/lib/libndpi.a
 fuzz_ndpi_reader_alloc_fail_LDFLAGS = $(PCAP_LIB) $(ADDITIONAL_LIBS) $(LIBS)
@@ -52,6 +52,21 @@ fuzz_quic_get_crypto_data_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS)
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_quic_get_crypto_data_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_config_SOURCES = fuzz_config.cpp fuzz_common_code.c
+fuzz_config_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_config_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_config_LDADD = ../src/lib/libndpi.a
+fuzz_config_LDFLAGS = $(ADDITIONAL_LIBS) $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_config_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_config_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_config_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_config_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_config_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
 # required for Google oss-fuzz
 # see https://github.com/google/oss-fuzz/tree/master/projects/ndpi
 testpcaps := $(wildcard ../tests/pcap/*.pcap*)
@@ -74,6 +89,7 @@ distdir:
 	find . -type f -name '*.c' \
 		-o -name '*.am' \
 		-o -name '*.h' \
+		-o -name '*.cpp' \
 		-o -name '*.bin' | xargs -I'{}' cp '{}' '$(distdir)/{}'
 
 all: corpus
