@@ -136,7 +136,7 @@ static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
 	break;
 	
       case 15: /* Audio */
-	*is_rtp = 0;
+	*is_rtp = 1;
 	*payload_offset = 27;
 	break;
 	
