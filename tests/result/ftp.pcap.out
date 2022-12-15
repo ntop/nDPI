@@ -3,7 +3,7 @@ Guessed flow protos:	1
 DPI Packets (TCP):	49	(16.33 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 669 (223.00 diss/flow)
+Num dissector calls: 612 (204.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
