@@ -150,7 +150,7 @@ static u_int16_t checkDNSSubprotocol(u_int16_t sport, u_int16_t dport) {
 
 /* *********************************************** */
 
-static u_int16_t get16(int *i, const u_int8_t *payload) {
+static u_int16_t get16(u_int *i, const u_int8_t *payload) {
   u_int16_t v = *(u_int16_t*)&payload[*i];
 
   (*i) += 2;
@@ -187,10 +187,9 @@ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
   print join(',', map { sprintf "0x%08x",$_ } @M),"\n";
 */
 
-static uint32_t dns_validchar[8] =
-  {
-   0x00000000,0x03ff2000,0x87fffffe,0x07fffffe,0,0,0,0
-  };
+static uint32_t dns_validchar[8] = {
+  0x00000000,0x03ff2000,0x87fffffe,0x07fffffe,0,0,0,0
+};
 
 /* *********************************************** */
 
@@ -214,13 +213,63 @@ static char* dns_error_code2string(u_int16_t error_code, char *buf, u_int buf_le
 }
 
 /* *********************************************** */
+
+static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
+				   u_int *off /* payload offset */,
+				   char *_hostname, u_int max_len,
+				   u_int *_hostname_len) {
+  u_int8_t hostname_is_valid = 1;
+  u_int j = 0;
+  
+  max_len--;
+
+  while((j < max_len)
+	&& ((*off) < packet->payload_packet_len)
+	&& (packet->payload[(*off)] != '\0')) {
+    u_int8_t c, cl = packet->payload[(*off)++];
+
+    if(((cl & 0xc0) != 0) || // we not support compressed names in query
+       ((*off) + cl  >= packet->payload_packet_len)) {
+      j = 0;
+      break;
+    }
+
+    if(j && (j < max_len)) _hostname[j++] = '.';
+
+    while((j < max_len) && (cl != 0)) {
+      u_int32_t shift;
+
+      c = packet->payload[(*off)++];
+      shift = ((u_int32_t) 1) << (c & 0x1f);
+
+      if((dns_validchar[c >> 5] & shift)) {
+	_hostname[j++] = tolower(c);
+      } else {
+	if (isprint(c) == 0) {
+	  hostname_is_valid = 0;
+	  _hostname[j++] = '?';
+	} else {
+	  _hostname[j++] = '_';
+	}
+      }
+
+      cl--;
+    }
+  }
+
+  _hostname[j] = '\0', *_hostname_len = j;
+  
+  return(hostname_is_valid);
+}
+
+/* *********************************************** */
   
 static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
 			    struct ndpi_dns_packet_header *dns_header,
-			    int payload_offset, u_int8_t *is_query) {
+			    u_int payload_offset, u_int8_t *is_query) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  int x = payload_offset;
+  u_int x = payload_offset;
 
   memcpy(dns_header, (struct ndpi_dns_packet_header*)&packet->payload[x],
 	 sizeof(struct ndpi_dns_packet_header));
@@ -371,9 +420,19 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		continue; /* Skip CNAME */
 	      }
 
-	      if((((rsp_type == 0x1) && (data_len == 4)) /* A */
-		  || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
-		  )) {
+	      if(rsp_type == 0x0C /* PTR */) {
+		u_int16_t ptr_len = (packet->payload[x-2] << 8) + packet->payload[x-1];
+
+		if((x + ptr_len) <= packet->payload_packet_len) {
+		  u_int len;
+		  
+		  ndpi_grab_dns_name(packet, &x,
+				     flow->protos.dns.ptr_domain_name,
+				     sizeof(flow->protos.dns.ptr_domain_name), &len);
+		}
+	      } else if((((rsp_type == 0x1) && (data_len == 4)) /* A */
+			 || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
+			 )) {
 		memcpy(&flow->protos.dns.rsp_addr, packet->payload + x, data_len);
 	      }
 	    }
@@ -451,7 +510,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       || (d_port == LLMNR_PORT))
      && (packet->payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset)) {
     struct ndpi_dns_packet_header dns_header;
-    int j = 0, max_len, off;
+    u_int len, off;
     int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query);
     ndpi_protocol ret;
     u_int num_queries, idx;
@@ -520,46 +579,14 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       }
     } /* for */
 
-    u_int8_t hostname_is_valid = 1;
-    max_len = sizeof(_hostname)-1;
-    while((j < max_len) && (off < packet->payload_packet_len) && (packet->payload[off] != '\0')) {
-      uint8_t c, cl = packet->payload[off++];
+    u_int8_t hostname_is_valid = ndpi_grab_dns_name(packet, &off, _hostname, sizeof(_hostname), &len);
 
-      if(((cl & 0xc0) != 0) || // we not support compressed names in query
-	 (off + cl  >= packet->payload_packet_len)) {
-	j = 0;
-	break;
-      }
-
-      if(j && (j < max_len)) _hostname[j++] = '.';
-
-      while((j < max_len) && (cl != 0)) {
-	u_int32_t shift;
-
-        c = packet->payload[off++];
-        shift = ((u_int32_t) 1) << (c & 0x1f);
-        if((dns_validchar[c >> 5] & shift)) {
-          _hostname[j++] = tolower(c);
-	} else {
-          if (isprint(c) == 0) {
-            hostname_is_valid = 0;
-            _hostname[j++] = '?';
-	  } else {
-            _hostname[j++] = '_';
-          }
-	}
-	cl--;
-      }
-    }
-
-    _hostname[j] = '\0';
-
-    ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, j);
+    ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len);
 
     if (hostname_is_valid == 0)
       ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, NULL);    
 
-    if(j > 0) {
+    if(len > 0) {
       ndpi_protocol_match_result ret_match;
 
       ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
