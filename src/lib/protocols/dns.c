@@ -105,13 +105,10 @@ static u_int16_t checkPort(u_int16_t port) {
   switch(port) {
   case DNS_PORT:
     return(NDPI_PROTOCOL_DNS);
-    break;
   case LLMNR_PORT:
     return(NDPI_PROTOCOL_LLMNR);
-    break;
   case MDNS_PORT:
     return(NDPI_PROTOCOL_MDNS);
-    break;
   }
 
   return(0);

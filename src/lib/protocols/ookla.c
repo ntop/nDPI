@@ -100,10 +100,8 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
   } else {
     if(sport == ookla_port)
       addr = packet->iph->saddr;
-    else if(dport == ookla_port)
-      addr = packet->iph->daddr;
     else
-      goto ookla_exclude;
+      addr = packet->iph->daddr;
 
 #ifdef OOKLA_DEBUG
     printf("=>>>>>>>> [OOKLA IPv4] Searching %u\n", addr);
