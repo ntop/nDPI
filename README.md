@@ -1,7 +1,7 @@
 ![ntop][ntopng_logo] ![ntop][ntop_logo]
 # nDPI
 
-[![Build Status](https://img.shields.io/github/workflow/status/ntop/nDPI/Build/dev?logo=github)](https://github.com/ntop/nDPI/actions?query=workflow%3ABuild)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/ntop/nDPI/workflow/build.yml?branch=dev&logo=github)](https://github.com/ntop/nDPI/actions?query=workflow%3ABuild)
 [![Code Quality: Cpp](https://img.shields.io/lgtm/grade/cpp/g/ntop/nDPI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ntop/nDPI/context:cpp)
 [![Total Alerts](https://img.shields.io/lgtm/alerts/g/ntop/nDPI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ntop/nDPI/alerts)
 [![Fuzzing Status](https://oss-fuzz-build-logs.storage.googleapis.com/badges/ndpi.svg)](https://bugs.chromium.org/p/oss-fuzz/issues/list?sort=-opened&can=1&q=proj:ndpi)
