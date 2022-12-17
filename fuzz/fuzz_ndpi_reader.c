@@ -8,6 +8,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#ifdef ENABLE_PCAP_L7_MUTATOR
+#include "pl7m.h"
+#endif
+
 struct ndpi_workflow_prefs *prefs = NULL;
 struct ndpi_workflow *workflow = NULL;
 struct ndpi_global_context *g_ctx;
@@ -22,6 +26,13 @@ extern void ndpi_report_payload_stats(FILE *out);
 
 #ifdef CRYPT_FORCE_NO_AESNI
 extern int force_no_aesni;
+#endif
+
+#ifdef ENABLE_PCAP_L7_MUTATOR
+size_t LLVMFuzzerCustomMutator(uint8_t *Data, size_t Size,
+                               size_t MaxSize, unsigned int Seed) {
+  return pl7m_mutator(Data, Size, MaxSize, Seed);
+}
 #endif
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
