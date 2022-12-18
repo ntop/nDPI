@@ -1795,10 +1795,9 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ***************************************************************** */
 
-void init_quic_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-			 NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_quic_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("QUIC", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("QUIC", ndpi_struct, *id,
 				      NDPI_PROTOCOL_QUIC, ndpi_search_quic,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);

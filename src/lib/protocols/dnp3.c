@@ -55,9 +55,9 @@ void ndpi_search_dnp3_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 /* ******************************************************** */
 
 void init_dnp3_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-			 u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
+			 u_int32_t *id) {
 	
-  ndpi_set_bitmask_protocol_detection("DNP3", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("DNP3", ndpi_struct, *id,
 				      NDPI_PROTOCOL_DNP3,
 				      ndpi_search_dnp3_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

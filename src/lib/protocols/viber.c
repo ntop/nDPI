@@ -86,9 +86,9 @@ void ndpi_search_viber(struct ndpi_detection_module_struct *ndpi_struct, struct 
 }
 
 
-void init_viber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) 
+void init_viber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id) 
 {
-  ndpi_set_bitmask_protocol_detection("Viber", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Viber", ndpi_struct, *id,
 				      NDPI_PROTOCOL_VIBER,
 				      ndpi_search_viber,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

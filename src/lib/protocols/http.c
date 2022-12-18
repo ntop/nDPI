@@ -1522,9 +1522,8 @@ char* ndpi_get_http_content_type(struct ndpi_detection_module_struct *ndpi_struc
 }
 
 
-void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-			 NDPI_PROTOCOL_BITMASK *detection_bitmask) {
-  ndpi_set_bitmask_protocol_detection("HTTP",ndpi_struct, detection_bitmask, *id,
+void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id) {
+  ndpi_set_bitmask_protocol_detection("HTTP",ndpi_struct, *id,
 				      NDPI_PROTOCOL_HTTP,
 				      ndpi_search_http_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

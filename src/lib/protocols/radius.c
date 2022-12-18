@@ -76,9 +76,9 @@ void ndpi_search_radius(struct ndpi_detection_module_struct *ndpi_struct, struct
 }
 
 
-void init_radius_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_radius_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("Radius", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Radius", ndpi_struct, *id,
 				      NDPI_PROTOCOL_RADIUS,
 				      ndpi_search_radius,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,

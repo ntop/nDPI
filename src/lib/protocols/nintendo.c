@@ -55,8 +55,8 @@ void ndpi_search_nintendo(struct ndpi_detection_module_struct *ndpi_struct, stru
 }
 
 void init_nintendo_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-			     u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
-  ndpi_set_bitmask_protocol_detection("Nintendo", ndpi_struct, detection_bitmask, *id,
+			     u_int32_t *id) {
+  ndpi_set_bitmask_protocol_detection("Nintendo", ndpi_struct, *id,
 				      NDPI_PROTOCOL_NINTENDO,
 				      ndpi_search_nintendo,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,

@@ -122,10 +122,9 @@ static void ndpi_search_z3950(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ***************************************************************** */
 
-void init_z3950_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-                          NDPI_PROTOCOL_BITMASK *detection_bitmask) {
+void init_z3950_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id) {
   ndpi_set_bitmask_protocol_detection("Z3950",
-                                      ndpi_struct, detection_bitmask, *id,
+                                      ndpi_struct, *id,
                                       NDPI_PROTOCOL_Z3950,
                                       ndpi_search_z3950,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

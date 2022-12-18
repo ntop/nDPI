@@ -66,11 +66,10 @@ void ndpi_search_dnscrypt(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-void init_dnscrypt_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-                             NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_dnscrypt_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
   ndpi_set_bitmask_protocol_detection(
-    "DNScrypt", ndpi_struct, detection_bitmask, *id,
+    "DNScrypt", ndpi_struct, *id,
     NDPI_PROTOCOL_DNSCRYPT, ndpi_search_dnscrypt, NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
     SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
   *id += 1;

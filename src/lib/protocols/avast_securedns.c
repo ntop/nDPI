@@ -53,11 +53,10 @@ static void ndpi_search_avast_securedns(struct ndpi_detection_module_struct *ndp
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void init_avast_securedns_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-                                    NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_avast_securedns_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
   ndpi_set_bitmask_protocol_detection("AVAST SecureDNS",
-                                      ndpi_struct, detection_bitmask, *id,
+                                      ndpi_struct, *id,
                                       NDPI_PROTOCOL_AVAST_SECUREDNS,
                                       ndpi_search_avast_securedns,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,

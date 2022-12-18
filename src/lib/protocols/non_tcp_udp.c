@@ -100,13 +100,13 @@ void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
 }
 
 
-void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
   
   /* always add non tcp/udp if one protocol is compiled in */
   NDPI_SAVE_AS_BITMASK(ndpi_struct->callback_buffer[*id].detection_bitmask, NDPI_PROTOCOL_UNKNOWN);
 
-  ndpi_set_bitmask_protocol_detection("IPSec", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IPSec", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IPSEC,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -114,7 +114,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_GRE", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_GRE", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_GRE,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -122,7 +122,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_ICMP", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_ICMP", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_ICMP,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -130,7 +130,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_IGMP", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_IGMP", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_IGMP,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -138,7 +138,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_EGP", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_EGP", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_EGP,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -146,7 +146,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_SCTP", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_SCTP", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_SCTP,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -154,7 +154,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_PGM", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_PGM", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_PGM,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -162,7 +162,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_OSPF", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_OSPF", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_OSPF,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -170,7 +170,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_IP_IN_IP", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_IP_IN_IP", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_IP_IN_IP,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -178,7 +178,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_ICMPV6", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_ICMPV6", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_ICMPV6,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
@@ -186,7 +186,7 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 
-  ndpi_set_bitmask_protocol_detection("IP_PIM", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("IP_PIM", ndpi_struct, *id,
 				      NDPI_PROTOCOL_IP_PIM,
 				      ndpi_search_in_non_tcp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,

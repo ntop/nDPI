@@ -74,9 +74,9 @@ void ndpi_search_ayiya(struct ndpi_detection_module_struct *ndpi_struct, struct 
 }
 
 
-void init_ayiya_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_ayiya_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("Ayiya", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Ayiya", ndpi_struct, *id,
 				      NDPI_PROTOCOL_AYIYA,
 				      ndpi_search_ayiya,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,

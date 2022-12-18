@@ -91,9 +91,9 @@ void ndpi_search_ssdp(struct ndpi_detection_module_struct *ndpi_struct, struct n
 }
 
 
-void init_ssdp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_ssdp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("SSDP", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("SSDP", ndpi_struct, *id,
 				      NDPI_PROTOCOL_SSDP,
 				      ndpi_search_ssdp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,

@@ -117,9 +117,9 @@ void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, struct n
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void init_h323_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_h323_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("H323", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("H323", ndpi_struct, *id,
 				      NDPI_PROTOCOL_H323,
 				      ndpi_search_h323,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

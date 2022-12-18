@@ -137,11 +137,10 @@ void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_struct,
 
 
 void init_cassandra_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                              u_int32_t *id,
-                              NDPI_PROTOCOL_BITMASK *detection_bitmask) {
+                              u_int32_t *id) {
 
   ndpi_set_bitmask_protocol_detection("Cassandra",
-                                      ndpi_struct, detection_bitmask,
+                                      ndpi_struct,
                                       *id,
                                       NDPI_PROTOCOL_CASSANDRA,
                                       ndpi_search_cassandra,
