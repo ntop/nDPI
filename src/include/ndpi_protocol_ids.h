@@ -359,6 +359,7 @@ typedef enum {
   NDPI_PROTOCOL_SIRIUSXMRADIO         = 328,
   NDPI_PROTOCOL_MUNIN                 = 329,
   NDPI_PROTOCOL_ELASTICSEARCH         = 330,
+  NDPI_PROTOCOL_TUYA_LP               = 331, /* TUYA LAN Protocol; IoT OS: https://github.com/tuya/tuya-iotos-embeded-sdk-wifi-ble-bk7231n */
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
