@@ -242,7 +242,6 @@ extern "C" {
    *
    * @par label                    = string for the protocol name
    * @par ndpi_struct              = the detection module
-   * @par detection_bitmask        = the protocol bitmask
    * @par idx                      = the index of the callback_buffer
    * @par func                     = function pointer of the protocol search
    * @par ndpi_selection_bitmask   = the protocol selected bitmask
@@ -252,7 +251,6 @@ extern "C" {
    */
   void ndpi_set_bitmask_protocol_detection(char *label,
 					   struct ndpi_detection_module_struct *ndpi_struct,
-					   const NDPI_PROTOCOL_BITMASK *detection_bitmask,
 					   const u_int32_t idx,
 					   u_int16_t ndpi_protocol_id,
 					   void (*func) (struct ndpi_detection_module_struct *,

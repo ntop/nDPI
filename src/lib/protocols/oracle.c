@@ -60,9 +60,9 @@ void ndpi_search_oracle(struct ndpi_detection_module_struct *ndpi_struct, struct
 }
 
 
-void init_oracle_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_oracle_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("Oracle", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Oracle", ndpi_struct, *id,
 				      NDPI_PROTOCOL_ORACLE,
 				      ndpi_search_oracle,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

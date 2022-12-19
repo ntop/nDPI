@@ -95,9 +95,9 @@ void ndpi_search_apple_push(struct ndpi_detection_module_struct *ndpi_struct, st
 }
 
 
-void init_apple_push_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_apple_push_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("APPLE_PUSH", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("APPLE_PUSH", ndpi_struct, *id,
 				      NDPI_PROTOCOL_APPLE_PUSH,
 				      ndpi_search_apple_push,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

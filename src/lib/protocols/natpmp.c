@@ -188,9 +188,9 @@ void ndpi_search_natpmp(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 void init_natpmp_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                           u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+                           u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("NAT-PMP", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("NAT-PMP", ndpi_struct, *id,
     NDPI_PROTOCOL_NATPMP,
     ndpi_search_natpmp,
     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,

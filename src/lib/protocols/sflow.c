@@ -54,9 +54,9 @@ void ndpi_search_sflow(struct ndpi_detection_module_struct *ndpi_struct, struct 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void init_sflow_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_sflow_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("sFlow", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("sFlow", ndpi_struct, *id,
 				      NDPI_PROTOCOL_SFLOW,
 				      ndpi_search_sflow,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,

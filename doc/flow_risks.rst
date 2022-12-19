@@ -213,7 +213,7 @@ This risk is triggered when a TLS fatal alert is detected in the TLS flow. See `
 
 NDPI_SUSPICIOUS_ENTROPY
 =======================
-This risk is used to detect suspicious data carried in ICMP packets whose entropy (used to measure how data is distributed, hence to indirectly guess the type of data carried on) is suspicious and thus that it can indicate a data leak.
+This risk is used to detect suspicious data carried in ICMP packets whose entropy (used to measure how data is distributed, hence to indirectly guess the type of data carried on) is suspicious and thus that it can indicate a data leak. Suspicious values indicate random entropy or entropy that is similar to encrypted traffic. In the latter case, this can be a suspicious data exfiltration symptom.
 
 .. _Risk 036:
 

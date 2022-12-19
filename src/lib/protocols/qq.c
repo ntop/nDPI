@@ -58,10 +58,9 @@ void ndpi_search_qq(struct ndpi_detection_module_struct *ndpi_struct, struct ndp
 }
 
 
-void init_qq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id,
-                       NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_qq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("QQ", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("QQ", ndpi_struct, *id,
 				      NDPI_PROTOCOL_QQ,
 				      ndpi_search_qq,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,

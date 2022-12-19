@@ -93,9 +93,9 @@ void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct, struct
 }
 
 
-void init_dcerpc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_dcerpc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("RPC", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("RPC", ndpi_struct, *id,
 				      NDPI_PROTOCOL_RPC,
 				      ndpi_search_dcerpc,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

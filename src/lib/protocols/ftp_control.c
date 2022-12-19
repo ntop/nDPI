@@ -685,8 +685,8 @@ void ndpi_search_ftp_control(struct ndpi_detection_module_struct *ndpi_struct,
 /* *************************************************************** */
 
 void init_ftp_control_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-				u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask) {
-  ndpi_set_bitmask_protocol_detection("FTP_CONTROL", ndpi_struct, detection_bitmask, *id,
+				u_int32_t *id) {
+  ndpi_set_bitmask_protocol_detection("FTP_CONTROL", ndpi_struct, *id,
 				      NDPI_PROTOCOL_FTP_CONTROL,
 				      ndpi_search_ftp_control,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
