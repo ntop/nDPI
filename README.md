@@ -80,9 +80,10 @@ The entire procedure of adding new protocols in detail:
 4. Add a new entry for the search function for the new protocol in: `src/include/ndpi_protocols.h`
 5. Choose (do not change anything) a selection bitmask from: `src/include/ndpi_define.h`
 6. Set protocol default ports in `ndpi_init_protocol_defaults` in: `src/lib/ndpi_main.c`
-7. `./autogen.sh`
-8. `make`
-9. `make check`
+7. Be sure to have nBPF support, cloning `PF_RING` in the same directory where you cloned `nDPI`: `git clone https://github.com/ntop/PF_RING/ && cd PF_RING/userland/nbpf && ./configure && make`
+8. From the `nDPI` root directory, `./autogen.sh --with-pcre` (nBPF and PCRE are usually optional, but they are needed to run/update *all* the unit tests)
+9. `make`
+10. `make check`
 
 ### How to use nDPI to Block Selected Traffic
 
