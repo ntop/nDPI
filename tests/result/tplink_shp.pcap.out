@@ -1,0 +1,32 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	8	(1.00 pkts/flow)
+Confidence DPI              : 8 (flows)
+Num dissector calls: 8 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   16/0 (search/found)
+
+TPLINK_SHP	251	17821	8
+
+	1	UDP 192.168.242.40:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: IoT-Scada/31][32 pkts/2272 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1860.44 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 58157/0 60014/0 62682/0 801/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.242.41:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: IoT-Scada/31][32 pkts/2272 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1860.44 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 59941/0 60012/0 60058/0 30/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.242.99:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: IoT-Scada/31][32 pkts/2272 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1860.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 59882/0 59999/0 60106/0 30/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.168.242.32:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: IoT-Scada/31][31 pkts/2201 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1800.38 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 58230/0 60051/0 62779/0 652/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 192.168.242.33:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: IoT-Scada/31][31 pkts/2201 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1800.39 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 59881/0 60012/0 60114/0 55/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 192.168.242.38:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: IoT-Scada/31][31 pkts/2201 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1800.34 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 59845/0 60007/0 60125/0 58/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 192.168.242.98:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: IoT-Scada/31][31 pkts/2201 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1800.10 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 59943/0 60002/0 60077/0 25/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 192.168.242.122:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: IoT-Scada/31][31 pkts/2201 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1800.02 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 57393/0 60000/0 62604/0 825/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
