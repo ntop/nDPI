@@ -79,9 +79,9 @@ void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
 /* ***************************************************** */
   
 void init_munin_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                          u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+                          u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("Munin", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("Munin", ndpi_struct, *id,
 				      NDPI_PROTOCOL_MUNIN,
 				      ndpi_search_munin,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

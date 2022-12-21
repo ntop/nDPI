@@ -87,9 +87,9 @@ void ndpi_search_rtmp(struct ndpi_detection_module_struct *ndpi_struct, struct n
 }
 
 
-void init_rtmp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_rtmp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("RTMP", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("RTMP", ndpi_struct, *id,
 				      NDPI_PROTOCOL_RTMP,
 				      ndpi_search_rtmp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,

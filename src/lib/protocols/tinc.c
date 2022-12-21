@@ -140,9 +140,9 @@ void ndpi_search_tinc(struct ndpi_detection_module_struct* ndpi_struct, struct n
   }
 }
 
-void init_tinc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_tinc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("TINC", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("TINC", ndpi_struct, *id,
 				      NDPI_PROTOCOL_TINC,
 				      ndpi_search_tinc,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION, /* TODO: IPv6? */

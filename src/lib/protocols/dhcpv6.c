@@ -56,9 +56,9 @@ void ndpi_search_dhcpv6_udp(struct ndpi_detection_module_struct *ndpi_struct, st
 }
 
 
-void init_dhcpv6_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id, NDPI_PROTOCOL_BITMASK *detection_bitmask)
+void init_dhcpv6_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("DHCPV6", ndpi_struct, detection_bitmask, *id,
+  ndpi_set_bitmask_protocol_detection("DHCPV6", ndpi_struct, *id,
 				      NDPI_PROTOCOL_DHCPV6,
 				      ndpi_search_dhcpv6_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP_WITH_PAYLOAD,

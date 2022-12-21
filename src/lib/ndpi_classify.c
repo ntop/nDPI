@@ -635,8 +635,8 @@ ndpi_timer_sub(const pkt_timeval *a,
                const pkt_timeval *b,
                pkt_timeval *result)
 {
-  result->tv_sec = a->tv_sec - b->tv_sec;
-  result->tv_usec = a->tv_usec - b->tv_usec;
+  result->tv_sec = (unsigned long long)a->tv_sec - (unsigned long long)b->tv_sec;
+  result->tv_usec = (unsigned long long)a->tv_usec - (unsigned long long)b->tv_usec;
   if(result->tv_usec < 0) {
     --result->tv_sec;
     result->tv_usec += 1000000;

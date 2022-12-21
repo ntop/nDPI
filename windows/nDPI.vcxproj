@@ -306,6 +306,8 @@
     <ClCompile Include="..\src\lib\protocols\teredo.c" />
     <ClCompile Include="..\src\lib\protocols\tftp.c" />
     <ClCompile Include="..\src\lib\protocols\thunder.c" />
+    <ClCompile Include="..\src\lib\protocols\tplink_shp.c" />
+    <ClCompile Include="..\src\lib\protocols\tuya_lp.c" />
     <ClCompile Include="..\src\lib\protocols\tvuplayer.c" />
     <ClCompile Include="..\src\lib\protocols\ubntac2.c" />
     <ClCompile Include="..\src\lib\protocols\usenet.c" />
