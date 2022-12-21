@@ -604,7 +604,7 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
 			   ndpi_default_ports_tree_node_t **root,
                            const char *_func,
 			   int _line) {
-  u_int16_t port;
+  u_int32_t port;
 
   for(port = range->port_low; port <= range->port_high; port++) {
     ndpi_default_ports_tree_node_t *node =
