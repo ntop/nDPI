@@ -206,7 +206,7 @@ void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
       if(flow->l4.tcp.mail_pop_stage > 0) {
 	
 	if((flow->l4.tcp.ftp_imap_pop_smtp.password[0] != '\0')
-	   || (flow->l4.tcp.mail_pop_stage > 3)) {
+	   || (flow->l4.tcp.mail_pop_stage >= 3)) {
 	  ndpi_int_mail_pop_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_POP);
 	  if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0')
 	    popInitExtraPacketProcessing(flow);
