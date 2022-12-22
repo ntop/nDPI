@@ -563,8 +563,6 @@ static int ndpi_ftp_control_check_response(struct ndpi_flow_struct *flow,
   printf("%s() [%.*s]\n", __FUNCTION__, (int)payload_len, payload);
 #endif
 
-  if(payload_len == 0) return(1);
-
   switch(payload[0]) {
   case '1':
   case '2':
@@ -573,14 +571,12 @@ static int ndpi_ftp_control_check_response(struct ndpi_flow_struct *flow,
     if(flow->l4.tcp.ftp_imap_pop_smtp.auth_found == 1)
       flow->l4.tcp.ftp_imap_pop_smtp.auth_tls = 1;
     return(1);
-    break;
 
   case '4':
   case '5':
     flow->l4.tcp.ftp_imap_pop_smtp.auth_failed = 1;
     flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
     return(1);
-    break;
   }
 
   return 0;

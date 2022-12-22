@@ -51,9 +51,6 @@ __forceinline static
 #endif
 u_int8_t ndpi_int_is_sopcast_tcp(const u_int8_t * payload, const u_int16_t payload_len)
 {
-  if (payload_len != 54)
-    return 0;
-
   if (payload[2] != payload[3] - 4 && payload[2] != payload[3] + 4)
     return 0;
 
