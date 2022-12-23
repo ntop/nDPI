@@ -218,6 +218,8 @@ static ndpi_prefix_t * ndpi_New_Prefix2 (int family, void *dest, int bitlen, ndp
     default_bitlen = sizeof(struct in6_addr) * 8;
     if(prefix == NULL) {
       prefix = (ndpi_prefix_t*)ndpi_calloc(1, sizeof (ndpi_prefix_t));
+      if(!prefix)
+        return (NULL);
       dynamic_allocated++;
     }
     memcpy (&prefix->add.sin6, dest, sizeof(struct in6_addr));
@@ -232,7 +234,9 @@ static ndpi_prefix_t * ndpi_New_Prefix2 (int family, void *dest, int bitlen, ndp
 	//prefix4_t size incorrect on NT
 	prefix = ndpi_calloc(1, sizeof (ndpi_prefix_t)); 
 #endif /* NT */
-		
+	if(!prefix)
+	  return (NULL);
+
 	dynamic_allocated++;
       }
       memcpy (&prefix->add.sin, dest, sizeof(struct in_addr));
@@ -298,6 +302,8 @@ ndpi_patricia_tree_t *
 ndpi_patricia_new (u_int16_t maxbits)
 {
   ndpi_patricia_tree_t *patricia = (ndpi_patricia_tree_t*)ndpi_calloc(1, sizeof *patricia);
+  if(!patricia)
+    return (NULL);
 
   patricia->maxbits = maxbits;
   patricia->head = NULL;
@@ -536,7 +542,9 @@ ndpi_patricia_search_best2 (ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefi
   u_int16_t bitlen;
   int cnt = 0;
 
-  assert (patricia);
+  if(patricia == NULL)
+    return (NULL);
+
   assert (prefix);
   assert (prefix->bitlen <= patricia->maxbits);
 
@@ -653,8 +661,14 @@ ndpi_patricia_lookup (ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefix)
 
   if(patricia->head == NULL) {
     node = (ndpi_patricia_node_t*)ndpi_calloc(1, sizeof *node);
+    if(!node)
+      return NULL;
     node->bit = prefix->bitlen;
     node->prefix = ndpi_Ref_Prefix (prefix);
+    if(!node->prefix) {
+      ndpi_free(node);
+      return NULL;
+    }
     node->parent = NULL;
     node->l = node->r = NULL;
     node->data = NULL;
@@ -757,6 +771,9 @@ ndpi_patricia_lookup (ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefix)
       return (node);
     }
     node->prefix = ndpi_Ref_Prefix (prefix);
+    if(!node->prefix) {
+      return NULL;
+    }
 #ifdef PATRICIA_DEBUG
     fprintf (stderr, "patricia_lookup: new node #1 %s/%d (glue mod)\n",
 	     ndpi_prefix_toa (prefix), prefix->bitlen);
@@ -769,6 +786,10 @@ ndpi_patricia_lookup (ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefix)
   if(!new_node) return NULL;
   new_node->bit = prefix->bitlen;
   new_node->prefix = ndpi_Ref_Prefix (prefix);
+  if(!new_node->prefix) {
+    ndpi_free(new_node);
+    return NULL;
+  }
   new_node->parent = NULL;
   new_node->l = new_node->r = NULL;
   new_node->data = NULL;
@@ -820,7 +841,12 @@ ndpi_patricia_lookup (ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefix)
   else {
     glue = (ndpi_patricia_node_t*)ndpi_calloc(1, sizeof *glue);
 
-    if(!glue) return(NULL);
+    if(!glue) {
+      ndpi_Deref_Prefix(new_node->prefix);
+      ndpi_DeleteEntry (new_node);
+      patricia->num_active_node--;
+      return(NULL);
+    }
     glue->bit = differ_bit;
     glue->prefix = NULL;
     glue->parent = node->parent;
