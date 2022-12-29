@@ -6447,8 +6447,10 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   struct ndpi_packet_struct *packet;
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
   u_int32_t num_calls = 0;
-  ndpi_protocol ret = { 0 };
+  ndpi_protocol ret;
 
+  memset(&ret, 0, sizeof(ret));
+  
   if(!flow || !ndpi_str)
     return(ret);
 

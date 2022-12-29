@@ -2355,8 +2355,9 @@ static u_int8_t ndpi_check_hostname_risk_exception(struct ndpi_detection_module_
     
     if(automa->ac_automa) {
       AC_TEXT_t ac_input_text;
-      AC_REP_t match = {0};
-      
+      AC_REP_t match;
+
+      memset(&match, 0, sizeof(match));
       ac_input_text.astring = hostname, ac_input_text.length = strlen(hostname);
       ac_input_text.option = 0;
       
@@ -2666,8 +2667,9 @@ u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
 
   if(automa->ac_automa) {
     AC_TEXT_t ac_input_text;
-    AC_REP_t match = {0};
+    AC_REP_t match;
 
+    memset(&match, 0, sizeof(match));
     ac_input_text.astring = (char*)alpn_to_check, ac_input_text.length = alpn_to_check_len;
     ac_input_text.option = 0;
 
