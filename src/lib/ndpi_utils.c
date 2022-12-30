@@ -2044,6 +2044,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("HTTP Obsolete Server");
     break;
 
+  case NDPI_PERIODIC_FLOW:
+    return("Periodic Flow");
+    break;
+    
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

@@ -120,8 +120,9 @@ typedef enum {
   NDPI_UNIDIRECTIONAL_TRAFFIC, /* NOTE: as nDPI can detect a protocol with one packet, make sure
 				  your app will clear this risk if future packets (not sent to nDPI)
 				  are received in the opposite direction */
-
   NDPI_HTTP_OBSOLETE_SERVER,
+  NDPI_PERIODIC_FLOW, /* Set in case a flow repeats at a specific pace [used by apps on top of nDPI] */
+  
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;

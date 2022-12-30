@@ -291,3 +291,9 @@ risk is not triggered for multicast/broadcast destinations.
 NDPI_HTTP_OBSOLETE_SERVER
 ===================================
 This risk is generated whenever a HTTP server uses an obsolete HTTP server version.
+
+.. _Risk 048:
+
+NDPI_PERIODIC_FLOW
+==================
+This risk is generated whenever a flow is observed at a specific periodic pace (e.g. every 10 seconds).
