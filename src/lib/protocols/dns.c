@@ -412,8 +412,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  rsp_ttl  = ntohl(*((u_int32_t*)&packet->payload[x+2]));
 
 	  if(rsp_ttl == 0)
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, "DNS Record with zero TTL");
-
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_MINOR_ISSUES, "DNS Record with zero TTL");
+	  
 #ifdef DNS_DEBUG
 	  printf("[DNS] TTL = %u\n", rsp_ttl);
 	  printf("[DNS] [response] response_type=%d\n", rsp_type);

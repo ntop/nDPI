@@ -122,6 +122,7 @@ typedef enum {
 				  are received in the opposite direction */
   NDPI_HTTP_OBSOLETE_SERVER,
   NDPI_PERIODIC_FLOW, /* Set in case a flow repeats at a specific pace [used by apps on top of nDPI] */
+  NDPI_MINOR_ISSUES, /* Generic packet issues (e.g. DNS with 0 TTL) */
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */

@@ -2005,7 +2005,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_DNS_LARGE_PACKET:
     return("Large DNS Packet (512+ bytes)");
-
+    
   case NDPI_DNS_FRAGMENTED:
     return("Fragmented DNS Message");
 
@@ -2047,6 +2047,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_PERIODIC_FLOW:
     return("Periodic Flow");
     break;
+
+  case NDPI_MINOR_ISSUES:
+    return("Minor Issues");
     
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);

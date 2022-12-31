@@ -297,3 +297,9 @@ This risk is generated whenever a HTTP server uses an obsolete HTTP server versi
 NDPI_PERIODIC_FLOW
 ==================
 This risk is generated whenever a flow is observed at a specific periodic pace (e.g. every 10 seconds).
+
+.. _Risk 049:
+
+NDPI_MINOR_ISSUES
+=====================
+Minor packet/flow issues (e.g. DNS traffic with zero TTL) have been detected.
