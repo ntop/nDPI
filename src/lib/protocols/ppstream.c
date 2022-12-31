@@ -56,24 +56,25 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	  || (packet->payload_packet_len == get_l16(packet->payload, 0))
 	  || (packet->payload_packet_len >= 6 && packet->payload_packet_len - 6 == get_l16(packet->payload, 0)))) {
 	/* check 43 and */
-	if(packet->payload[2] == 0x43) {
-	  if(packet->payload[5] == 0xff &&
-	     packet->payload[6] == 0x00 &&
-	     packet->payload[7] == 0x01 &&
-	     packet->payload[8] == 0x00 &&
-	     packet->payload[9] == 0x00 &&
-	     packet->payload[10] == 0x00 &&
-	     packet->payload[11] == 0x00 &&
-	     packet->payload[12] == 0x00 &&
-	     packet->payload[13] == 0x00 &&
-	     packet->payload[14] == 0x00) {
+	  if(packet->payload[2] == 0x43) {
+	    if(packet->payload[5] == 0xff &&
+	       packet->payload[6] == 0x00 &&
+	       packet->payload[7] == 0x01 &&
+	       packet->payload[8] == 0x00 &&
+	       packet->payload[9] == 0x00 &&
+	       packet->payload[10] == 0x00 &&
+	       packet->payload[11] == 0x00 &&
+	       packet->payload[12] == 0x00 &&
+	       packet->payload[13] == 0x00 &&
+	       packet->payload[14] == 0x00) {
 
 	    /* increase count pkt ppstream over udp */
 	    flow->l4.udp.ppstream_stage++;
 	    
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
-	  }       
+	    }       
+	  }
 	  /* check 44 */
 	  else if(packet->payload[2] == 0x44) {
 	    /** b1 71 **/
@@ -190,7 +191,6 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
 	  }
-	}
       }
       /* No port detection */
       if(packet->payload_packet_len > 17) {
