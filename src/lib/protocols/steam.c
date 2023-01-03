@@ -243,7 +243,7 @@ static void ndpi_check_steam_udp3(struct ndpi_detection_module_struct *ndpi_stru
     }
 
     /* This is a packet in another direction. Check if we find the proper response. */
-    if ((payload_len == 0) || ((payload_len == 8) && (packet->payload[0] == 0x3a) && (packet->payload[1] == 0x18) && (packet->payload[2] == 0x00) && (packet->payload[3] == 0x00))) {
+    if ((payload_len == 8) && (packet->payload[0] == 0x3a) && (packet->payload[1] == 0x18) && (packet->payload[2] == 0x00) && (packet->payload[3] == 0x00)) {
       NDPI_LOG_INFO(ndpi_struct, "found STEAM\n");
       ndpi_int_steam_add_connection(ndpi_struct, flow);
     } else {
@@ -280,10 +280,6 @@ void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct, struct 
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
-
-    /* skip marked packets */
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_STEAM)
-      return;   
 
     NDPI_LOG_DBG(ndpi_struct, "search STEAM\n");
     ndpi_check_steam_http(ndpi_struct, flow);

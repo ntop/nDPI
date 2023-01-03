@@ -264,9 +264,10 @@ extern "C" {
    *
    * @par ndpi_struct        = the detection module
    * @par detection_bitmask  = the protocol bitmask to set
+   * @return 0 if ok, -1 if error
    *
    */
-  void ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *ndpi_struct,
+  int ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *ndpi_struct,
 					    const NDPI_PROTOCOL_BITMASK * detection_bitmask);
 
   /**

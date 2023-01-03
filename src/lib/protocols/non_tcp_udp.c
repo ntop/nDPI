@@ -40,13 +40,6 @@
 void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
 				*ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-
-  if (packet->iph == NULL) {
-    if (packet->iphv6 == NULL)
-      return;
-  }
-
   switch (flow->l4_proto) {
   case NDPI_IPSEC_PROTOCOL_ESP:
   case NDPI_IPSEC_PROTOCOL_AH:

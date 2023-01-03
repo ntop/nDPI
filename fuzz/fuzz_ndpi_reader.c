@@ -1,5 +1,6 @@
 #include "reader_util.h"
 #include "ndpi_api.h"
+#include "fuzz_common_code.h"
 
 #include <pcap/pcap.h>
 
@@ -22,27 +23,6 @@ int enable_malloc_bins = 0;
 int malloc_size_stats = 0;
 int max_malloc_bins = 0;
 struct ndpi_bin malloc_bins; /* unused */
-
-#ifdef ENABLE_MEM_ALLOC_FAILURES
-
-static int mem_alloc_state = 0;
-
-__attribute__((no_sanitize("integer")))
-static int fastrand ()
-{
-  if(!mem_alloc_state) return 1; /* No failures */
-  mem_alloc_state = (214013 * mem_alloc_state + 2531011);
-  return (mem_alloc_state >> 16) & 0x7FFF;
-}
-
-static void *malloc_wrapper(size_t size) {
-  return (fastrand () % 16) ? malloc (size) : NULL;
-}
-static void free_wrapper(void *freeable) {
-  free(freeable);
-}
-
-#endif
 
 FILE *bufferToFile(const uint8_t *Data, size_t Size) {
   FILE *fd;
@@ -99,16 +79,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     memset(workflow->stats.protocol_flows, 0,
 	   sizeof(workflow->stats.protocol_flows));
     ndpi_finalize_initialization(workflow->ndpi_struct);
-#ifdef ENABLE_MEM_ALLOC_FAILURES
-    set_ndpi_malloc(malloc_wrapper);
-    set_ndpi_free(free_wrapper);
-    /* Don't fail memory allocations until init phase is done */
-#endif
   }
-
 #ifdef ENABLE_MEM_ALLOC_FAILURES
-  mem_alloc_state = Size;
+  /* Don't fail memory allocations until init phase is done */
+  set_mem_alloc_state(Size);
 #endif
+
 
   fd = bufferToFile(Data, Size);
   if (fd == NULL)

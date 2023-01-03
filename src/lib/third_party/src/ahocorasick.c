@@ -223,9 +223,14 @@ void ac_automata_enable_debug (int debug) {
 AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
 {
   unsigned int i;
-  AC_NODE_t * n = thiz->root;
+  AC_NODE_t * n;
   AC_NODE_t * next;
   AC_ALPHABET_t alpha;
+
+  if(!thiz || !patt || !patt->astring)
+    return ACERR_ERROR;
+
+  n = thiz->root;
 
   if(!thiz->automata_open)
     return ACERR_AUTOMATA_CLOSED;
@@ -469,7 +474,7 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
       } else {
           curr = next;
           position++;
-          if(curr->final) {
+          if(curr->final && curr->matched_patterns) {
               /* select best match */
               match->match_map = ac_automata_exact_match(curr->matched_patterns,position,txt);
               if(match->match_map) {
@@ -555,6 +560,9 @@ static AC_ERROR_t ac_automata_release_node(AC_AUTOMATA_t * thiz,
     return ACERR_SUCCESS;
 }
 void ac_automata_release (AC_AUTOMATA_t * thiz, uint8_t free_pattern) {
+
+    if(!thiz)
+      return;
 
     ac_automata_walk(thiz,ac_automata_release_node,NULL,free_pattern ? (void *)1:NULL);
 
@@ -1013,8 +1021,11 @@ static int node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str,int is_e
   if (thiz->matched_patterns && node_has_matchstr(thiz, str))
     return 0;
 
-  if(!thiz->matched_patterns)
+  if(!thiz->matched_patterns) {
     thiz->matched_patterns = node_resize_mp(thiz->matched_patterns);
+    if(!thiz->matched_patterns)
+      return 1;
+  }
 
   /* Manage memory */
   if (thiz->matched_patterns->num >= thiz->matched_patterns->max) {

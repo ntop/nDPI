@@ -155,6 +155,8 @@ extern "C" {
   void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 		     struct ndpi_flow_struct *flow, ndpi_risk_enum r,
 		     char *risk_message);
+  void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
+		       struct ndpi_flow_struct *flow, ndpi_risk_enum r);    
   int ndpi_isset_risk(struct ndpi_detection_module_struct *ndpi_str,
 		      struct ndpi_flow_struct *flow, ndpi_risk_enum r);
   int ndpi_is_printable_buffer(uint8_t const * const buf, size_t len);

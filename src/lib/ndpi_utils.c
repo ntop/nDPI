@@ -2005,7 +2005,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_DNS_LARGE_PACKET:
     return("Large DNS Packet (512+ bytes)");
-
+    
   case NDPI_DNS_FRAGMENTED:
     return("Fragmented DNS Message");
 
@@ -2044,6 +2044,13 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("HTTP Obsolete Server");
     break;
 
+  case NDPI_PERIODIC_FLOW:
+    return("Periodic Flow");
+    break;
+
+  case NDPI_MINOR_ISSUES:
+    return("Minor Issues");
+    
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2309,6 +2316,9 @@ static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_stru
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
+  if(!ndpi_str->protocols_ptree)
+    return((u_int64_t)-1);
+
   /* Make sure all in network byte order otherwise compares wont work */
   ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree, &prefix);
@@ -2352,8 +2362,9 @@ static u_int8_t ndpi_check_hostname_risk_exception(struct ndpi_detection_module_
     
     if(automa->ac_automa) {
       AC_TEXT_t ac_input_text;
-      AC_REP_t match = {0};
-      
+      AC_REP_t match;
+
+      memset(&match, 0, sizeof(match));
       ac_input_text.astring = hostname, ac_input_text.length = strlen(hostname);
       ac_input_text.option = 0;
       
@@ -2642,10 +2653,16 @@ void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str) {
 
     memset(&ac_pattern, 0, sizeof(ac_pattern));
     ac_pattern.astring      = ndpi_strdup((char*)common_alpns[i]);
+    if(!ac_pattern.astring) {
+      NDPI_LOG_ERR(ndpi_str, "Unable to add %s [mem alloc error]\n", common_alpns[i]);
+      continue;
+    }
     ac_pattern.length       = strlen(common_alpns[i]);
 
-    if(ac_automata_add(ndpi_str->common_alpns_automa.ac_automa, &ac_pattern) != ACERR_SUCCESS)
-      printf("%s(): unable to add %s\n", __FUNCTION__, common_alpns[i]);
+    if(ac_automata_add(ndpi_str->common_alpns_automa.ac_automa, &ac_pattern) != ACERR_SUCCESS) {
+      ndpi_free(ac_pattern.astring);
+      NDPI_LOG_ERR(ndpi_str, "Unable to add %s\n", common_alpns[i]);
+    }
   }
 }
 
@@ -2657,8 +2674,9 @@ u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
 
   if(automa->ac_automa) {
     AC_TEXT_t ac_input_text;
-    AC_REP_t match = {0};
+    AC_REP_t match;
 
+    memset(&match, 0, sizeof(match));
     ac_input_text.astring = (char*)alpn_to_check, ac_input_text.length = alpn_to_check_len;
     ac_input_text.option = 0;
 

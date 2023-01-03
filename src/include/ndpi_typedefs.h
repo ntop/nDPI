@@ -120,8 +120,10 @@ typedef enum {
   NDPI_UNIDIRECTIONAL_TRAFFIC, /* NOTE: as nDPI can detect a protocol with one packet, make sure
 				  your app will clear this risk if future packets (not sent to nDPI)
 				  are received in the opposite direction */
-
   NDPI_HTTP_OBSOLETE_SERVER,
+  NDPI_PERIODIC_FLOW, /* Set in case a flow repeats at a specific pace [used by apps on top of nDPI] */
+  NDPI_MINOR_ISSUES, /* Generic packet issues (e.g. DNS with 0 TTL) */
+  
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;
@@ -730,14 +732,8 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_DOFUS */
   u_int32_t dofus_stage:1;
 
-  /* NDPI_PROTOCOL_FIESTA */
-  u_int32_t fiesta_stage:2;
-
   /* NDPI_PROTOCOL_WORLDOFWARCRAFT */
   u_int32_t wow_stage:2;
-
-  /* NDPI_PROTOCOL_SHOUTCAST */
-  u_int32_t shoutcast_stage:2;
 
   /* NDPI_PROTOCOL_RTP */
   u_int32_t rtp_special_packets_seen:1;
@@ -761,9 +757,6 @@ struct ndpi_flow_tcp_struct {
   u_int8_t prev_zmq_pkt_len;
   u_char prev_zmq_pkt[10];
 
-  /* NDPI_PROTOCOL_PPSTREAM */
-  u_int32_t ppstream_stage:3;
-
   /* NDPI_PROTOCOL_MEMCACHED */
   u_int8_t memcached_matches;
 
@@ -782,9 +775,6 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_TFTP */
   u_int32_t tftp_stage:2;
-
-  /* NDPI_PROTOCOL_AIMINI */
-  u_int32_t aimini_stage:5;
 
   /* NDPI_PROTOCOL_XBOX */
   u_int32_t xbox_stage:1;
@@ -1393,7 +1383,7 @@ struct ndpi_flow_struct {
     /* the only fields useful for nDPI and ntopng */
     struct {
       u_int8_t num_queries, num_answers, reply_code, is_query;
-      u_int16_t query_type, query_class, rsp_type;
+      u_int16_t query_type, query_class, rsp_type, edns0_udp_payload_size;
       ndpi_ip_addr_t rsp_addr; /* The first address in a DNS response packet (A and AAAA) */
       char ptr_domain_name[64 /* large enough but smaller than { } tls */];
     } dns;
@@ -1533,9 +1523,6 @@ struct ndpi_flow_struct {
   u_int8_t bittorrent_stage;		      // can be 0 - 255
   u_int8_t bt_check_performed : 1;
 
-  /* NDPI_PROTOCOL_DIRECTCONNECT */
-  u_int8_t directconnect_stage:2;	      // 0 - 1
-
   /* NDPI_PROTOCOL_HTTP */
   u_int8_t http_detected:1;
 
@@ -1544,12 +1531,6 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_ZATTOO */
   u_int8_t zattoo_stage:3;
-
-  /* NDPI_PROTOCOL_THUNDER */
-  u_int8_t thunder_stage:2;		        // 0 - 3
-
-  /* NDPI_PROTOCOL_FLORENSIA */
-  u_int8_t florensia_stage:1;
 
   /* NDPI_PROTOCOL_SOCKS */
   u_int8_t socks5_stage:2, socks4_stage:2;      // 0 - 3
