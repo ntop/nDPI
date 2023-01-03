@@ -474,7 +474,7 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
       } else {
           curr = next;
           position++;
-          if(curr->final) {
+          if(curr->final && curr->matched_patterns) {
               /* select best match */
               match->match_map = ac_automata_exact_match(curr->matched_patterns,position,txt);
               if(match->match_map) {

@@ -354,7 +354,9 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       /* This is a good reply: we dissect it both for request and response */
       
       if(dns_header->num_queries > 0) {
+#ifdef DNS_DEBUG
 	u_int16_t rsp_type;
+#endif
 	u_int16_t num;
 
 	for(num = 0; num < dns_header->num_queries; num++) {
@@ -374,7 +376,12 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	    break;
 	  }
 
+	  /* To avoid warning: variable ‘rsp_type’ set but not used [-Wunused-but-set-variable] */
+#ifdef DNS_DEBUG
 	  rsp_type = get16(&x, packet->payload);
+#else
+	  get16(&x, packet->payload);
+#endif
 
 #ifdef DNS_DEBUG
 	  printf("[DNS] [response (query)] response_type=%d\n", rsp_type);
@@ -483,8 +490,9 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  as we need to update the 'x' offset
 	*/
 	if(dns_header->authority_rrs > 0) {
+#ifdef DNS_DEBUG
 	  u_int16_t rsp_type;
-	  u_int32_t rsp_ttl;
+#endif
 	  u_int16_t num;
 
 	  for(num = 0; num < dns_header->authority_rrs; num++) {
@@ -504,8 +512,12 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	      break;
 	    }
 
+	    /* To avoid warning: variable ‘rsp_type’ set but not used [-Wunused-but-set-variable] */
+#ifdef DNS_DEBUG
 	    rsp_type = get16(&x, packet->payload);
-	    rsp_ttl  = ntohl(*((u_int32_t*)&packet->payload[x+2]));
+#else
+	    get16(&x, packet->payload);
+#endif
 
 #ifdef DNS_DEBUG
 	    printf("[DNS] [RRS response] response_type=%d\n", rsp_type);
