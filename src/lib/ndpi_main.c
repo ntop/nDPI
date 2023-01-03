@@ -538,6 +538,12 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   name = ndpi_strdup(protoName);
+  if(!name) {
+#ifdef DEBUG
+    NDPI_LOG_ERR(ndpi_str, "[NDPI] %s/protoId=%d: mem allocation error\n", protoName, protoId);
+#endif
+    return;
+  }
 
   if(ndpi_str->proto_defaults[protoId].protoName)
     ndpi_free(ndpi_str->proto_defaults[protoId].protoName);
