@@ -76,7 +76,7 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	    }       
 	  }
 	  /* check 44 */
-	  else if(packet->payload[2] == 0x44) {
+	  else if(packet->payload[2] == 0x44 && packet->payload_packet_len > 20) {
 	    /** b1 71 **/
 	    if(packet->payload[3] == 0xb1 && packet->payload[4] == 0x71) {
 	      if(packet->payload[13] == 0x00 &&
@@ -156,7 +156,8 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	    }
 	  }
 	  /** check 55 (1) **/
-	  else if(packet->payload[2] == 0x55 && (packet->payload[13] == 0x1b &&
+	  else if(packet->payload_packet_len > 20 &&
+		  packet->payload[2] == 0x55 && (packet->payload[13] == 0x1b &&
 						 packet->payload[14] == 0xa0 &&
 						 packet->payload[15] == 0x00 &&
 						 packet->payload[16] == 0x00 &&
@@ -172,7 +173,8 @@ void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	    return;
 	  }
 	  /** check 55 (2) **/
-	  else if(packet->payload[2] == 0x55 && packet->payload[1] == 0x00 &&
+	  else if(packet->payload_packet_len > 20 &&
+		  packet->payload[2] == 0x55 && packet->payload[1] == 0x00 &&
 		  (packet->payload[5] == 0x00 &&
 		   packet->payload[6] == 0x00 &&
 		   packet->payload[7] == 0x00 &&
