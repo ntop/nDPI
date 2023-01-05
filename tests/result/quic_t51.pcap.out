@@ -20,11 +20,11 @@ Patricia risk mask:   2/0 (search/found)
 Patricia risk:        2/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 
-Google	642	573718	1
+Google	12	9296	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 187.227.136.152          	 1      
 
 
-	1	UDP 187.227.136.152:55356 <-> 211.247.147.90:443 [proto: 188.126/QUIC.Google][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][171 pkts/29017 bytes <-> 471 pkts/544701 bytes][Goodput ratio: 75/96][90.07 sec][Hostname/SNI: www.google.com][(Advertised) ALPNs: h3-T051][TLS Supported Versions: TLSv1.3][bytes ratio: -0.899 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 690/100 24967/10162 3186/822][Pkt Len c2s/s2c min/avg/max/stddev: 75/67 170/1156 1392/1392 256/481][User-Agent: dev Chrome/86.0.4240.9 Windows NT 6.1; Win64; x64][TLSv1.3][JA3C: 92e76078d514999cd950474995dab2b5][PLAIN TEXT (OO RJ/ Q)][Plen Bins: 11,29,2,1,0,2,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,0,0,0,0,0]
+	1	UDP 187.227.136.152:55356 <-> 211.247.147.90:443 [proto: 188.126/QUIC.Google][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][6 pkts/3140 bytes <-> 6 pkts/6156 bytes][Goodput ratio: 92/96][0.24 sec][Hostname/SNI: www.google.com][(Advertised) ALPNs: h3-T051][TLS Supported Versions: TLSv1.3][bytes ratio: -0.324 (Download)][IAT c2s/s2c min/avg/max/stddev: 2/0 47/47 113/110 46/49][Pkt Len c2s/s2c min/avg/max/stddev: 75/68 523/1026 1392/1392 614/501][User-Agent: dev Chrome/86.0.4240.9 Windows NT 6.1; Win64; x64][TLSv1.3][JA3C: 92e76078d514999cd950474995dab2b5][Plen Bins: 8,25,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,41,0,0,0,0,0]
