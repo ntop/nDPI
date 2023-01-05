@@ -20,11 +20,11 @@ Patricia risk mask:   2/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 
-QUIC	923	1311986	1
+QUIC	10	7663	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.56.1             	 1      
 
 
-	1	UDP 192.168.56.1:34229 <-> 192.168.56.198:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][34 pkts/6729 bytes <-> 889 pkts/1305257 bytes][Goodput ratio: 79/97][0.02 sec][(Advertised) ALPNs: h3-34;hq-34;h3-33;hq-33;h3-32;hq-32;h3-31;hq-31;h3-29;hq-29;h3-30;hq-30;h3-28;hq-28;h3-27;hq-27;h3;hq-interop][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][bytes ratio: -0.990 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 2/0 1/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/73 198/1468 1482/1482 306/131][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **][Risk Score: 100][Risk Info: No server to client traffic][TLSv1.3][JA3C: c0ce40fbb78cbf86a14e6a38b26d6ede][PLAIN TEXT (V/vUIx)][Plen Bins: 0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,94,0,0]
+	1	UDP 192.168.56.1:34229 <-> 192.168.56.198:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][5 pkts/3543 bytes <-> 5 pkts/4120 bytes][Goodput ratio: 94/95][0.00 sec][(Advertised) ALPNs: h3-34;hq-34;h3-33;hq-33;h3-32;hq-32;h3-31;hq-31;h3-29;hq-29;h3-30;hq-30;h3-28;hq-28;h3-27;hq-27;h3;hq-interop][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][bytes ratio: -0.075 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 2/0 1/0][Pkt Len c2s/s2c min/avg/max/stddev: 97/97 709/824 1482/1482 569/511][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **][Risk Score: 100][Risk Info: No server to client traffic][TLSv1.3][JA3C: c0ce40fbb78cbf86a14e6a38b26d6ede][Plen Bins: 0,20,0,0,0,10,0,0,0,0,0,0,10,10,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,20,0,0]
