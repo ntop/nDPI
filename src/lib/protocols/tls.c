@@ -247,7 +247,7 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
 			      char *rdnSeqBuf, u_int *rdnSeqBuf_offset,
 			      u_int rdnSeqBuf_len,
 			      const char *label) {
-  u_int8_t str_len = packet->payload[offset+4], is_printable = 1;
+  u_int8_t str_len, is_printable = 1;
   char *str;
   u_int len;
 
@@ -258,6 +258,10 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
 #endif
     return -1;
   }
+  if((offset+4) >= packet->payload_packet_len)
+    return(-1);
+
+  str_len = packet->payload[offset+4];
 
   // packet is truncated... further inspection is not needed
   if((offset+4+str_len) >= packet->payload_packet_len)
@@ -356,9 +360,9 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
 /* **************************************** */
 
 /* See https://blog.catchpoint.com/2017/05/12/dissecting-tls-using-wireshark/ */
-static void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct,
-				       struct ndpi_flow_struct *flow,
-				       u_int16_t p_offset, u_int16_t certificate_len) {
+void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow,
+				u_int16_t p_offset, u_int16_t certificate_len) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t num_found = 0, i;
   char buffer[64] = { '\0' }, rdnSeqBuf[2048];
@@ -427,7 +431,6 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 #endif
     } else if((packet->payload[i] == 0x30) && (packet->payload[i+1] == 0x1e) && (packet->payload[i+2] == 0x17)) {
       /* Certificate Validity */
-      u_int8_t len = packet->payload[i+3];
       u_int offset = i+4;
 
       if(num_found == 0) {
@@ -450,8 +453,10 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
 	rdn_len = 0; /* Reset buffer */
       }
 
-      if((offset+len) < packet->payload_packet_len) {
+      if(i + 3 < certificate_len &&
+	 (offset+packet->payload[i+3]) < packet->payload_packet_len) {
 	char utcDate[32];
+        u_int8_t len = packet->payload[i+3];
 
 #ifdef DEBUG_TLS
 	u_int j;
@@ -568,7 +573,7 @@ static void processCertificateElements(struct ndpi_detection_module_struct *ndpi
       i += 3 /* skip the initial patten 55 1D 11 */;
 
       /* skip the first type, 0x04 == BIT STRING, and jump to it's length */
-      if(packet->payload[i] == 0x04) i++; else i += 4; /* 4 bytes, with the last byte set to 04 */
+      if(i < packet->payload_packet_len && packet->payload[i] == 0x04) i++; else i += 4; /* 4 bytes, with the last byte set to 04 */
 
       if(i < packet->payload_packet_len) {
 	i += (packet->payload[i] & 0x80) ? (packet->payload[i] & 0x7F) : 0; /* skip BIT STRING length */
