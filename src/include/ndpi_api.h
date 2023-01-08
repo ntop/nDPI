@@ -1031,6 +1031,11 @@ extern "C" {
   int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
 				 u_int16_t proto);
 
+  int ndpi_set_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
+                                       u_int16_t proto, u_int32_t value);
+  u_int32_t ndpi_get_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
+                                             u_int16_t proto);
+
   /**
    * Find a protocol id associated with a string automata
    *

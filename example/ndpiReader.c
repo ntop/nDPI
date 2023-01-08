@@ -96,6 +96,7 @@ u_int8_t verbose = 0, enable_flow_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 char *_disabled_protocols = NULL;
+int aggressiveness[NDPI_MAX_SUPPORTED_PROTOCOLS];
 static u_int8_t stats_flag = 0;
 ndpi_init_prefs init_prefs = ndpi_no_prefs;
 u_int8_t human_readeable_string_len = 5;
@@ -515,6 +516,7 @@ static void help(u_int long_help) {
          "  -z                        | Enable JA3+\n"
          "  -A                        | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
          "  -M                        | Memory allocation stats on data-path (only by the library). It works only on single-thread configuration\n"
+         "  -Z proto:value            | Set this value of aggressiveness for this protocol (0 to disable it). This flag can be used multiple times\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -797,7 +799,7 @@ void printCSVHeader() {
  */
 static void parseOptions(int argc, char **argv) {
   int option_idx = 0;
-  int opt;
+  int opt, i;
 #ifndef USE_DPDK
   char *__pcap_file = NULL;
   int thread_id, do_capture = 0;
@@ -818,7 +820,10 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  while((opt = getopt_long(argc, argv, "a:Ab:B:e:Ec:C:dDf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:w:zq0123:456:7:89:m:MT:U:",
+  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++)
+    aggressiveness[i] = -1; /* Use the default value */
+
+  while((opt = getopt_long(argc, argv, "a:Ab:B:e:Ec:C:dDf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:w:zZ:q0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -949,6 +954,35 @@ static void parseOptions(int argc, char **argv) {
       ndpi_free(_disabled_protocols);
       _disabled_protocols = ndpi_strdup(optarg);
       break;
+
+    case 'Z': /* proto_name:aggr_value */
+      {
+        struct ndpi_detection_module_struct *module_tmp;
+        NDPI_PROTOCOL_BITMASK all;
+        char *saveptr, *tmp_str, *proto_str, *aggr_str;
+
+        /* Use a temporary module with all protocols enabled */
+        module_tmp = ndpi_init_detection_module(0);
+        if(!module_tmp)
+          break;
+        NDPI_BITMASK_SET_ALL(all);
+        ndpi_set_protocol_detection_bitmask2(module_tmp, &all);
+        ndpi_finalize_initialization(module_tmp);
+
+        tmp_str = ndpi_strdup(optarg);
+        if(tmp_str) {
+          proto_str = strtok_r(tmp_str, ":", &saveptr);
+          if(proto_str) {
+            aggr_str = strtok_r(NULL, ":", &saveptr);
+            if(aggr_str) {
+              aggressiveness[ndpi_get_protocol_id(module_tmp, proto_str)] = atoi(aggr_str);
+            }
+          }
+        }
+        ndpi_free(tmp_str);
+        ndpi_exit_detection_module(module_tmp);
+        break;
+      }
 
     case 'h':
       help(0);
@@ -2413,6 +2447,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_workflow_prefs prefs;
+  int i;
 
   memset(&prefs, 0, sizeof(prefs));
   prefs.decode_tunnels = decode_tunnels;
@@ -2471,6 +2506,12 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   ndpi_set_lru_cache_size(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			  NDPI_LRUCACHE_BITTORRENT, 32768);
   /* Enable/disable LRU caches TTL here */
+
+  /* Set aggressiviness here */
+  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
+    if(aggressiveness[i] != -1)
+      ndpi_set_protocol_aggressiveness(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, aggressiveness[i]);
+  }
 
   ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 

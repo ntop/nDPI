@@ -46,6 +46,9 @@ static const char* binary_file_ext[] = {
 					NULL
 };
 
+extern void ookla_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
+                               struct ndpi_flow_struct *flow);
+
 static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow);
 
@@ -436,6 +439,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
           || (strstr(flow->http.url, ":8080/upload?n=0.") != NULL))) {
 	/* This looks like Ookla speedtest */
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
+	ookla_add_to_cache(ndpi_struct, flow);
       }
     }
 
@@ -1217,30 +1221,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
         return;
       }
 
-      if((packet->payload_packet_len == 3) && memcmp(packet->payload, "HI\n", 3) == 0) {
-	/* This looks like Ookla: we don't give up with HTTP yet */
-        flow->l4.tcp.http_stage = 1;
-	return;
-      }
-
-      if((packet->payload_packet_len == 40) && (flow->l4.tcp.http_stage == 0)) {
-        /*
-	  -> QR O06L0072-6L91-4O43-857J-K8OO172L6L51
-	  <- QNUUX 2.5 2017-08-15.1314.4jn12m5
-	  -> MXFWUXJM 31625365
-	*/
-
-        if((packet->payload[2] == ' ')
-	   && (packet->payload[11] == '-')
-	   && (packet->payload[16] == '-')
-	   && (packet->payload[21] == '-')
-	   && (packet->payload[26] == '-')
-	   && (packet->payload[39] == 0x0A)
-	   )
-	  flow->l4.tcp.http_stage = 1;
-	return;
-      }
-
       if((packet->payload_packet_len == 23) && (memcmp(packet->payload, "<policy-file-request/>", 23) == 0)) {
         /*
           <policy-file-request/>
@@ -1251,25 +1231,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
         */
       ookla_found:
         ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_WEB);
-
-	if(ndpi_struct->ookla_cache != NULL) {
-	  if(packet->iph != NULL) {
-	    if(packet->tcp->source == htons(8080))
-	      ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->saddr, 1 /* dummy */, ndpi_get_current_time(flow));
-	    else
-	      ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, packet->iph->daddr, 1 /* dummy */, ndpi_get_current_time(flow));
-	  } else if(packet->iphv6 != NULL) {
-	    u_int32_t h;
-
-	    if(packet->tcp->source == htons(8080))
-	      h = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_src, sizeof(packet->iphv6->ip6_src));
-	    else
-	      h = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_dst, sizeof(packet->iphv6->ip6_dst));
-
-	    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, h, 1 /* dummy */, ndpi_get_current_time(flow));
-	  }
-	}
-
+        ookla_add_to_cache(ndpi_struct, flow);
         return;
       }
 
@@ -1388,18 +1350,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     http_bitmask_exclude_other(flow);
   } else if((flow->l4.tcp.http_stage == 1) || (flow->l4.tcp.http_stage == 2)) {
     NDPI_LOG_DBG2(ndpi_struct, "HTTP stage %u: \n", flow->l4.tcp.http_stage);
-
-    if((packet->payload_packet_len == 34) && (flow->l4.tcp.http_stage == 1)) {
-      if((packet->payload[5] == ' ') && (packet->payload[9] == ' ')) {
-	goto ookla_found;
-      }
-    }
-
-    if((packet->payload_packet_len > 6) && memcmp(packet->payload, "HELLO ", 6) == 0) {
-      /* This looks like Ookla */
-      goto ookla_found;
-    } else
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_OOKLA);
 
     /**
        At first check, if this is for sure a response packet
