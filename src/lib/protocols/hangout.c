@@ -80,7 +80,7 @@ void ndpi_search_hangout(struct ndpi_detection_module_struct *ndpi_struct,
 	printf("[LRU] ADDING %u / %u.%u\n", key, NDPI_PROTOCOL_STUN, NDPI_PROTOCOL_HANGOUT_DUO);
 #endif
 
-	ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, NDPI_PROTOCOL_HANGOUT_DUO);
+	ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, NDPI_PROTOCOL_HANGOUT_DUO, flow->last_packet_time_ms / 1000);
       }
       
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HANGOUT_DUO,
