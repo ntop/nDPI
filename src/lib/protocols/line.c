@@ -65,8 +65,13 @@ void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
         if((u_int8_t)(flow->l4.udp.line_base_cnt[packet->packet_direction] +
                       flow->l4.udp.line_pkts[packet->packet_direction]) == packet->payload[3]) {
           flow->l4.udp.line_pkts[packet->packet_direction] += 1;
-          if(flow->l4.udp.line_pkts[0] >= 4 && flow->l4.udp.line_pkts[1] >= 4)
-            ndpi_int_line_add_connection(ndpi_struct, flow);
+          if(flow->l4.udp.line_pkts[0] >= 4 && flow->l4.udp.line_pkts[1] >= 4) {
+            /* To avoid false positives: usually "base pkt numbers" per-direction are different */
+            if(flow->l4.udp.line_base_cnt[0] != flow->l4.udp.line_base_cnt[1])
+              ndpi_int_line_add_connection(ndpi_struct, flow);
+            else
+              NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	  }
           return;
         }
       }

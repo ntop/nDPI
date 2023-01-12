@@ -70,7 +70,8 @@ void ndpi_search_discord(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  if (flow->packet_counter >= 5)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void init_discord_dissector(struct ndpi_detection_module_struct *ndpi_struct,

@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	2	(2.00 pkts/flow)
+DPI Packets (UDP):	3	(3.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 106 (106.00 diss/flow)
+Num dissector calls: 142 (142.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -17,9 +17,9 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   2/0 (search/found)
-Patricia risk:        0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia risk:        2/0 (search/found)
+Patricia protocols:   2/1 (search/found)
 
-sFlow	9	1702	1
+Discord	40	4040	1
 
-	1	UDP 172.21.35.17:1027 -> 172.21.35.199:6343 [proto: 129/sFlow][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][9 pkts/1702 bytes -> 0 pkts/0 bytes][Goodput ratio: 78/0][109.01 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 6002/0 13626/0 19002/0 4554/0][Pkt Len c2s/s2c min/avg/max/stddev: 186/0 189/0 214/0 9/0][PLAIN TEXT (abcdefghijklmnopq)][Plen Bins: 0,0,0,0,88,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 66.22.242.132:50001 <-> 5.36.141.228:54935 [VLAN: 1][proto: 58/Discord][IP: 58/Discord][Encrypted][Confidence: DPI][cat: Collaborative/15][30 pkts/3110 bytes <-> 10 pkts/930 bytes][Goodput ratio: 43/37][24.00 sec][bytes ratio: 0.540 (Upload)][IAT c2s/s2c min/avg/max/stddev: 42/77 846/1740 1000/4217 343/1555][Pkt Len c2s/s2c min/avg/max/stddev: 72/68 104/93 110/118 14/25][Plen Bins: 25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
