@@ -8859,6 +8859,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
     if((!name)
        || (strchr(name, '_') != NULL)
+       || (strchr(name, '-') != NULL)
        || (ndpi_ends_with(name, "in-addr.arpa"))
        || (ndpi_ends_with(name, "ip6.arpa"))
        /* Ignore TLD .local .lan and .home */
