@@ -643,17 +643,25 @@ static AC_ERROR_t dump_node_common(AC_AUTOMATA_t * thiz,
     dump_node_header(n,ai);
     if (n->matched_patterns && n->matched_patterns->num && n->final) {
         char lbuf[512];
-        int nl = 0,j;
+        int nl = 0,j,ret;
 
         nl = ndpi_snprintf(lbuf,sizeof(lbuf),"'%.100s' N:%d{",rstr,n->matched_patterns->num);
         for (j=0; j<n->matched_patterns->num; j++) {
             AC_PATTERN_t *sid = &n->matched_patterns->patterns[j];
-            if(j) nl += ndpi_snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,", ");
-            nl += ndpi_snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,"%d %c%.100s%c",
+            if(j) {
+                ret = ndpi_snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,", ");
+                if (ret < 0 || (unsigned int)ret >= sizeof(lbuf)-nl-1)
+                    break;
+                nl += (unsigned int)ret;
+            }
+            ret = ndpi_snprintf(&lbuf[nl],sizeof(lbuf)-nl-1,"%d %c%.100s%c",
                             sid->rep.number & 0x3fff,
                             sid->rep.number & 0x8000 ? '^':' ',
                             sid->astring,
                             sid->rep.number & 0x4000 ? '$':' ');
+            if (ret < 0 || (unsigned int)ret >= sizeof(lbuf)-nl-1)
+                break;
+            nl += (unsigned int)ret;
         }
         fprintf(ai->file,"%s}\n",lbuf);
       }
@@ -700,6 +708,7 @@ void ac_automata_dump(AC_AUTOMATA_t * thiz, FILE *file) {
   fprintf(ai.file,"---\n mem size %zu avg node size %d, node one char %d, <=8c %d, >8c %d, range %d\n---DUMP-END-\n",
               ai.memcnt,(int)ai.memcnt/(thiz->all_nodes_num+1),(int)ai.node_oc,(int)ai.node_8c,(int)ai.node_xc,(int)ai.node_xr);
 #endif
+  acho_free(ai.bufstr);
 }
 #endif
 

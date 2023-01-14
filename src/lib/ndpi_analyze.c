@@ -70,15 +70,22 @@ void ndpi_free_data_analysis(struct ndpi_analyze_struct *d, u_int8_t free_pointe
 /* ********************************************************************************* */
 
 void ndpi_reset_data_analysis(struct ndpi_analyze_struct *d) {
-  u_int32_t *values_bkp = d->values;
-  u_int32_t num_values_array_len_bpk = d->num_values_array_len;
+  u_int32_t *values_bkp;
+  u_int32_t num_values_array_len_bpk;
+
+  if(!d)
+    return;
+
+  values_bkp = d->values;
+  num_values_array_len_bpk = d->num_values_array_len;
 
   memset(d, 0, sizeof(struct ndpi_analyze_struct));
 
   d->values = values_bkp;
   d->num_values_array_len = num_values_array_len_bpk;
 
-  memset(d->values, 0, sizeof(u_int32_t)*d->num_values_array_len);
+  if(d->values)
+    memset(d->values, 0, sizeof(u_int32_t)*d->num_values_array_len);
 }
 
 /* ********************************************************************************* */
@@ -178,7 +185,7 @@ float ndpi_data_mean(struct ndpi_analyze_struct *s) {
 
 /* Compute the average only on the sliding window */
 float ndpi_data_window_average(struct ndpi_analyze_struct *s) {
-  if(s->num_values_array_len) {
+  if(s && s->num_values_array_len) {
     float   sum = 0.0;
     u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
 
@@ -197,7 +204,7 @@ float ndpi_data_window_average(struct ndpi_analyze_struct *s) {
 
 /* Compute the variance only on the sliding window */
 float ndpi_data_window_variance(struct ndpi_analyze_struct *s) {
-  if(s->num_values_array_len) {
+  if(s && s->num_values_array_len) {
     float   sum = 0.0, avg = ndpi_data_window_average(s);
     u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
 
@@ -225,12 +232,15 @@ float ndpi_data_window_stddev(struct ndpi_analyze_struct *s) {
   Compute entropy on the last sliding window values
 */
 float ndpi_data_entropy(struct ndpi_analyze_struct *s) {
-  if(s->num_values_array_len) {
+  if(s && s->num_values_array_len) {
     int i;
     float sum = 0.0, total = 0.0;
 
     for(i=0; i<s->num_values_array_len; i++)
       total += s->values[i];
+
+    if(fpclassify(total) == FP_ZERO)
+      return(0);
 
     for (i=0; i<s->num_values_array_len; i++) {
       float tmp = (float)s->values[i] / (float)total;
@@ -247,7 +257,7 @@ float ndpi_data_entropy(struct ndpi_analyze_struct *s) {
 /* ********************************************************************************* */
 
 void ndpi_data_print_window_values(struct ndpi_analyze_struct *s) {
-  if(s->num_values_array_len) {
+  if(s && s->num_values_array_len) {
     u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
 
     for(i=0; i<n; i++)
@@ -371,9 +381,12 @@ void ndpi_free_bin(struct ndpi_bin *b) {
 /* ********************************************************************************* */
 
 struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
-  struct ndpi_bin *out = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin));
+  struct ndpi_bin *out;
 
-  if(!b || !b->u.bins8 || !out) return(NULL);
+  if(!b || !b->u.bins8) return(NULL);
+
+  out = (struct ndpi_bin*)ndpi_malloc(sizeof(struct ndpi_bin));
+  if(!out) return(NULL);
 
   out->num_bins = b->num_bins, out->family = b->family, out->is_empty = b->is_empty;
 
@@ -417,7 +430,7 @@ struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b) {
 /* ********************************************************************************* */
 
 void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
-  if(!b || !b->u.bins8)
+  if(!b || !b->u.bins8 || b->num_bins == 0)
     return;
 
   if(slot_id >= b->num_bins) slot_id = 0;
@@ -441,7 +454,7 @@ void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
 /* ********************************************************************************* */
 
 void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
-  if(!b || !b->u.bins8)
+  if(!b || !b->u.bins8 || b->num_bins == 0)
     return;
 
   b->is_empty = 0;
@@ -467,7 +480,7 @@ void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
 /* ********************************************************************************* */
 
 u_int64_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id) {
-  if(!b || !b->u.bins8)
+  if(!b || !b->u.bins8 || b->num_bins == 0)
     return(0);
 
   if(slot_id >= b->num_bins) slot_id = 0;
@@ -669,7 +682,7 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2,
   }
 #else
   {
-    u_int32_t sum = 0;
+    double sum = 0;
 
     for(i=0; i<b1->num_bins; i++) {
       u_int32_t a = ndpi_get_bin_value(b1, i);
@@ -713,6 +726,9 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
   u_int16_t num_cluster_elems[MAX_NUM_CLUSTERS] = { 0 };
 
   srand(time(NULL));
+
+  if(!bins || num_bins == 0 || !cluster_ids || num_clusters == 0)
+    return(-1);
 
   if(num_clusters > num_bins)         num_clusters = num_bins;
   if(num_clusters > MAX_NUM_CLUSTERS) num_clusters = MAX_NUM_CLUSTERS;
@@ -917,6 +933,9 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 */
 
 int ndpi_alloc_rsi(struct ndpi_rsi_struct *s, u_int16_t num_learning_values) {
+  if(!s || num_learning_values == 0)
+    return(-1);
+
   memset(s, 0, sizeof(struct ndpi_rsi_struct));
 
   s->empty  = 1, s->num_values = num_learning_values;
@@ -1061,6 +1080,9 @@ int ndpi_hw_init(struct ndpi_hw_struct *hw,
 		 double alpha, double beta, double gamma, float significance) {
   memset(hw, 0, sizeof(struct ndpi_hw_struct));
 
+  if(num_periods == 65535) /* To avoid overflow */
+    return(-1);
+
   hw->params.num_season_periods = num_periods + 1;
   hw->params.alpha      = alpha;
   hw->params.beta       = beta;
@@ -1195,6 +1217,9 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t _value, double 
 */
 
 int ndpi_jitter_init(struct ndpi_jitter_struct *s, u_int16_t num_learning_values) {
+  if(!s)
+    return(-1);
+
   memset(s, 0, sizeof(struct ndpi_jitter_struct));
 
   if(num_learning_values < 2) num_learning_values = 2;
@@ -1255,6 +1280,9 @@ float ndpi_jitter_add_value(struct ndpi_jitter_struct *s, const float value) {
 */
 
 int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance) {
+  if(!ses)
+    return(-1);
+
   memset(ses, 0, sizeof(struct ndpi_ses_struct));
 
   ses->params.alpha = alpha;
@@ -1282,7 +1310,7 @@ int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance)
    0                Too early: we're still in the learning phase. Output values are zero.
    1                Normal processing: forecast and confidence_band are meaningful
 */
-int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const u_int64_t _value, double *forecast, double *confidence_band) {
+int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const double _value, double *forecast, double *confidence_band) {
   double value = (double)_value, error, sq_error;
   int rc;
 
@@ -1329,6 +1357,11 @@ void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha) {
   float alpha, best_alpha;
   double sse, lowest_sse;
   int trace = 0;
+
+  if(!values || num_values == 0) {
+    *ret_alpha = 0;
+    return;
+  }
 
   lowest_sse = 0, best_alpha = 0;
 
@@ -1382,6 +1415,9 @@ void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha) {
 */
 
 int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance) {
+  if(!des)
+    return(-1);
+
   memset(des, 0, sizeof(struct ndpi_des_struct));
 
   des->params.alpha = alpha;
@@ -1410,7 +1446,7 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
    0                Too early: we're still in the learning phase. Output values are zero.
    1                Normal processing: forecast and confidence_band are meaningful
 */
-int ndpi_des_add_value(struct ndpi_des_struct *des, const u_int64_t _value, double *forecast, double *confidence_band) {
+int ndpi_des_add_value(struct ndpi_des_struct *des, const double _value, double *forecast, double *confidence_band) {
   double value = (double)_value, error, sq_error;
   int rc;
 
@@ -1459,6 +1495,12 @@ void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, fl
   float alpha, best_alpha, best_beta, beta = 0;
   double sse, lowest_sse;
   int trace = 0;
+
+  if(!values || num_values == 0) {
+    *ret_alpha = 0;
+    *ret_beta = 0;
+    return;
+  }
 
   lowest_sse = 0, best_alpha = 0, best_beta = 0;
 
@@ -1513,7 +1555,10 @@ u_int ndpi_find_outliers(u_int32_t *values, bool *outliers, u_int32_t num_values
   u_int i, ret = 0;
   float mean, stddev, low_threshold = -2.5, high_threshold = 2.5;
   struct ndpi_analyze_struct a;
-  
+
+  if(!values || !outliers || num_values == 0)
+    return(ret);
+
   ndpi_init_data_analysis(&a, 3 /* this is the window so we do not need to store values and 3 is enough */);
 
   /* Add values */
@@ -1522,7 +1567,12 @@ u_int ndpi_find_outliers(u_int32_t *values, bool *outliers, u_int32_t num_values
 
   mean    = ndpi_data_mean(&a);
   stddev  = ndpi_data_stddev(&a);
-  
+
+  if(fpclassify(stddev) == FP_ZERO) {
+    ndpi_free_data_analysis(&a, 0);
+    return(ret);
+  }
+
   /* Process values */
   for(i=0; i<num_values; i++) {
     float z_score = (((float)values[i]) - mean) / stddev;

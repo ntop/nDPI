@@ -18,6 +18,10 @@
  along with multifast.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _AC_TYPES_H_
 #define _AC_TYPES_H_
 
@@ -273,4 +277,8 @@ void            ac_automata_enable_debug (int debug);
 void            ac_automata_dump     (AC_AUTOMATA_t * thiz, FILE *);
 #endif
 void            ac_automata_get_stats(AC_AUTOMATA_t * thiz, struct ac_stats *stats);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
