@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	4	(4.00 pkts/flow)
-Confidence DPI              : 1 (flows)
-Num dissector calls: 145 (145.00 diss/flow)
+DPI Packets (UDP):	6	(3.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 253 (126.50 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -16,10 +16,11 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia protocols:   4/0 (search/found)
 
-WireGuard	2399	734182	1
+WireGuard	52	12740	2
 
-	1	UDP 139.162.192.157:51820 <-> 192.168.0.14:36116 [proto: 206/WireGuard][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VPN/2][1362 pkts/518526 bytes <-> 1037 pkts/215656 bytes][Goodput ratio: 89/80][381.21 sec][bytes ratio: 0.413 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 269/314 10882/13538 1111/1204][Pkt Len c2s/s2c min/avg/max/stddev: 74/74 381/208 1404/1404 362/135][Plen Bins: 0,0,0,35,43,5,2,0,6,2,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]
+	1	UDP 139.162.192.157:51820 <-> 192.168.0.14:36116 [proto: 206/WireGuard][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VPN/2][18 pkts/5428 bytes <-> 12 pkts/2568 bytes][Goodput ratio: 86/80][9.40 sec][bytes ratio: 0.358 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 414/661 5525/5525 1367/1721][Pkt Len c2s/s2c min/avg/max/stddev: 138/138 302/214 842/314 223/80][Plen Bins: 0,0,0,41,23,0,0,0,16,3,3,0,0,0,0,0,3,0,0,3,3,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.9.0.1:43462 <-> 10.9.0.2:51820 [proto: 206/WireGuard][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VPN/2][12 pkts/3100 bytes <-> 10 pkts/1644 bytes][Goodput ratio: 84/74][140.28 sec][bytes ratio: 0.307 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 1369/17528 10176/138081 3139/45567][Pkt Len c2s/s2c min/avg/max/stddev: 74/122 258/164 1494/330 375/58][Plen Bins: 0,9,22,18,41,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0]

@@ -86,6 +86,7 @@
     <ClCompile Include="..\src\lib\protocols\steam.c" />
     <ClCompile Include="..\src\lib\protocols\stun.c" />
     <ClCompile Include="..\src\lib\protocols\syslog.c" />
+    <ClCompile Include="..\src\lib\protocols\tailscale.c" />
     <ClCompile Include="..\src\lib\protocols\tcp_udp.c" />
     <ClCompile Include="..\src\lib\protocols\teamspeak.c" />
     <ClCompile Include="..\src\lib\protocols\teamviewer.c" />
