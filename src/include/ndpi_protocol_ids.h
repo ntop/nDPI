@@ -94,7 +94,7 @@ typedef enum {
   NDPI_PROTOCOL_OCSP                  = 63,
   NDPI_PROTOCOL_VXLAN                 = 64,
   NDPI_PROTOCOL_IRC                   = 65,
-  NDPI_PROTOCOL_FREE_66               = 66, /* FREE */
+  NDPI_PROTOCOL_MERAKI_CLOUD          = 66,
   NDPI_PROTOCOL_JABBER                = 67,
   NDPI_PROTOCOL_NATS                  = 68,
   NDPI_PROTOCOL_AMONG_US              = 69,

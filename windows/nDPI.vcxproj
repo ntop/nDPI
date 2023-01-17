@@ -167,6 +167,7 @@
     <ClCompile Include="..\src\lib\protocols\line.c" />
     <ClCompile Include="..\src\lib\protocols\lisp.c" />
     <ClCompile Include="..\src\lib\protocols\memcached.c" />
+    <ClCompile Include="..\src\lib\protocols\merakicloud.c" />
     <ClCompile Include="..\src\lib\protocols\mining.c" />
     <ClCompile Include="..\src\lib\protocols\modbus.c" />
     <ClCompile Include="..\src\lib\protocols\mongodb.c" />

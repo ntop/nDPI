@@ -454,6 +454,8 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   char *bt_proto = NULL;
 
+  NDPI_LOG_DBG(ndpi_struct, "Search bittorrent\n");
+
   /* This is broadcast */
   if(packet->iph) {
     if((packet->iph->saddr == 0xFFFFFFFF) || (packet->iph->daddr == 0xFFFFFFFF))
@@ -491,7 +493,7 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 	wireshark/epan/dissectors/packet-bt-utp.c
       */
 
-      if(packet->payload_packet_len >= 23 /* min header size */) {
+      if(packet->payload_packet_len >= 20 /* min header size */) {
 	if(
 	   (strncmp((const char*)packet->payload, bt_search, strlen(bt_search)) == 0)
 	   || (strncmp((const char*)packet->payload, bt_search1, strlen(bt_search1)) == 0)

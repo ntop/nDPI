@@ -78,6 +78,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
     if (flow->packet_counter > max_packets - 1)
     {
       ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+      return;
     }
     for (i = 0; i < NDPI_ARRAY_LENGTH(valid_patterns); ++i)
     {
@@ -86,6 +87,8 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
         return;
       }
     }
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
   }
 
   /* search for jabber here */
@@ -93,7 +96,7 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
   if (packet->payload_packet_len >= NDPI_STATICSTRING_LEN("<presence ") &&
       memcmp(packet->payload, "<presence ", NDPI_STATICSTRING_LEN("<presence ")) == 0 &&
       ndpi_strnstr((const char *)&packet->payload[0],
-                   "xmlns='http://jabber.org/protocol/caps'", packet->payload_packet_len) != NULL)
+                   "xmlns='http://jabber.org/protocol/", packet->payload_packet_len) != NULL)
   {
     ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
     return;
@@ -128,14 +131,12 @@ void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, st
 
       /* search for subprotocols */
       check_content_type_and_change_protocol(ndpi_struct, flow, 13);
-      return;
     }
-  }
-
-  if (flow->packet_counter > max_packets) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  return;
 }
 
 
