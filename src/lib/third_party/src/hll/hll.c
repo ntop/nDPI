@@ -71,6 +71,13 @@ static __inline u_int8_t _hll_rank(u_int32_t hash, u_int8_t bits) {
   [i: 19] 524288 bytes [StdError: 0.14%]
 */
 int hll_init(struct ndpi_hll *hll, u_int8_t bits) {
+  if(!hll) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  memset(hll, '\0', sizeof(*hll));
+
   if(bits < 4 || bits > 20) {
     errno = ERANGE;
     return -1;

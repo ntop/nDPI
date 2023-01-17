@@ -2104,7 +2104,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
 #define MATCH_DEBUG_INFO(fmt, ...) if(txt->option & AC_FEATURE_DEBUG) printf(fmt, ##__VA_ARGS__)
 
-static int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
+/* No static because it is used by fuzzer, too */
+int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
   AC_PATTERN_t *pattern = m->patterns;
   int i,start,end = m->position;
 

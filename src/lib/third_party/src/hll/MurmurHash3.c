@@ -16,7 +16,9 @@ u_int32_t MurmurHash3_x86_32(const void *key, u_int32_t len, u_int32_t seed) {
 
   const u_int32_t c1 = 0xcc9e2d51;
   const u_int32_t c2 = 0x1b873593;
-  const u_int32_t *blocks = (const u_int32_t *)(data + nblocks * 4);
+  const u_int32_t *blocks = NULL;
+  if(data && len) /* To avoid UBSAN warning: runtime error: applying zero offset to null pointer */
+    blocks = (const u_int32_t *)(data + nblocks * 4);
 
   for(i = -nblocks; i; i++)
     {
@@ -31,7 +33,9 @@ u_int32_t MurmurHash3_x86_32(const void *key, u_int32_t len, u_int32_t seed) {
       h1 = h1 * 5 + 0xe6546b64;
     }
 
-  const u_int8_t * tail = (const u_int8_t *)(data + nblocks * 4);
+  const u_int8_t * tail = NULL;
+  if(data && len) /* To avoid UBSAN warning: runtime error: applying zero offset to null pointer */
+    tail = (const u_int8_t *)(data + nblocks * 4);
 
   u_int32_t k1 = 0;
 
