@@ -6,7 +6,9 @@
 
 struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 static ndpi_serializer json_serializer = {};
+static ndpi_serializer json_cloned_serializer = {};
 static ndpi_serializer csv_serializer = {};
+static ndpi_serializer csv_cloned_serializer = {};
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   uint8_t protocol_was_guessed;
@@ -15,7 +17,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     fuzz_init_detection_module(&ndpi_info_mod, 0);
 
     ndpi_init_serializer(&json_serializer, ndpi_serialization_format_json);
+    ndpi_init_serializer(&json_cloned_serializer, ndpi_serialization_format_json);
     ndpi_init_serializer(&csv_serializer, ndpi_serialization_format_csv);
+    ndpi_init_serializer(&csv_cloned_serializer, ndpi_serialization_format_csv);
   }
 
   struct ndpi_flow_struct *ndpi_flow = ndpi_flow_malloc(SIZEOF_FLOW_STRUCT);
@@ -26,7 +30,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_detection_giveup(ndpi_info_mod, ndpi_flow, 1, &protocol_was_guessed);
 
   ndpi_reset_serializer(&json_serializer);
+  ndpi_reset_serializer(&json_cloned_serializer);
   ndpi_reset_serializer(&csv_serializer);
+  ndpi_reset_serializer(&csv_cloned_serializer);
   if (protocol_was_guessed == 0)
   {
     ndpi_dpi2json(ndpi_info_mod, ndpi_flow, detected_protocol, &json_serializer);
@@ -35,6 +41,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_dpi2json(ndpi_info_mod, ndpi_flow, guessed_protocol, &json_serializer);
     ndpi_dpi2json(ndpi_info_mod, ndpi_flow, guessed_protocol, &csv_serializer);
   }
+  ndpi_deserialize_clone_all(&json_serializer, &csv_cloned_serializer);
+  ndpi_deserialize_clone_all(&csv_serializer, &json_cloned_serializer);
   ndpi_free_flow(ndpi_flow);
 
   return 0;
