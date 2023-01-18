@@ -992,12 +992,15 @@ extern "C" {
   void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l);
   void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_mod, NDPI_PROTOCOL_BITMASK debug_bitmask);
 
+  /* Simple helper to get current time, in sec */
+  u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow);
+
   /* LRU cache */
-  struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries);
+  struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl);
   void ndpi_lru_free_cache(struct ndpi_lru_cache *c);
   u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
-			       u_int16_t *value, u_int8_t clean_key_when_found);
-  void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value);
+			       u_int16_t *value, u_int8_t clean_key_when_found, u_int32_t now_sec);
+  void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value, u_int32_t now_sec);
   void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *stats);
 
   int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
@@ -1010,6 +1013,13 @@ extern "C" {
   int ndpi_set_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
 			      lru_cache_type cache_type,
 			      u_int32_t num_entries);
+
+  int ndpi_set_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
+			     lru_cache_type cache_type,
+			     u_int32_t ttl);
+  int ndpi_get_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
+			     lru_cache_type cache_type,
+			     u_int32_t *ttl);
 
   int ndpi_set_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
 				 u_int16_t proto, int value);

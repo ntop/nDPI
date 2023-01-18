@@ -23,7 +23,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.remaining_bytes() < 4 + /* ndpi_init_detection_module() */
 				     NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
 				     5 + /* files */
-				     (NDPI_LRUCACHE_MAX * 3) + /* LRU caches */
+				     (NDPI_LRUCACHE_MAX * 5) + /* LRU caches */
 				     2 + 1 + 4 + /* ndpi_set_detection_preferences() */
 				     7 + /* Opportunistic tls */
 				     29 /* Min real data: ip length + udp length + 1 byte */)
@@ -60,8 +60,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
     ndpi_set_lru_cache_size(ndpi_info_mod, static_cast<lru_cache_type>(i),
-			    fuzzed_data.ConsumeIntegralInRange(0, (1 << 24) - 1));
+			    fuzzed_data.ConsumeIntegralInRange(0, (1 << 16) - 1));
     ndpi_get_lru_cache_size(ndpi_info_mod, static_cast<lru_cache_type>(i), &num);
+
+    ndpi_set_lru_cache_ttl(ndpi_info_mod, static_cast<lru_cache_type>(i),
+			   fuzzed_data.ConsumeIntegralInRange(0, (1 << 24) - 1));
+    ndpi_get_lru_cache_ttl(ndpi_info_mod, static_cast<lru_cache_type>(i), &num);
   }
 
   if(fuzzed_data.ConsumeBool())

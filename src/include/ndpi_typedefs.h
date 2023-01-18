@@ -641,6 +641,7 @@ typedef enum {
 struct ndpi_lru_cache_entry {
   u_int32_t key; /* Store the whole key to avoid ambiguities */
   u_int32_t is_full:1, value:16, pad:15;
+  u_int32_t timestamp; /* sec */
 };
 
 struct ndpi_lru_cache_stats {
@@ -651,6 +652,7 @@ struct ndpi_lru_cache_stats {
 
 struct ndpi_lru_cache {
   u_int32_t num_entries;
+  u_int32_t ttl;
   struct ndpi_lru_cache_stats stats;
   struct ndpi_lru_cache_entry *entries;
 };
@@ -1187,32 +1189,40 @@ struct ndpi_detection_module_struct {
   /* NDPI_PROTOCOL_OOKLA */
   struct ndpi_lru_cache *ookla_cache;
   u_int32_t ookla_cache_num_entries;
+  u_int32_t ookla_cache_ttl;
 
   /* NDPI_PROTOCOL_BITTORRENT */
   struct ndpi_lru_cache *bittorrent_cache;
   u_int32_t bittorrent_cache_num_entries;
+  u_int32_t bittorrent_cache_ttl;
 
   /* NDPI_PROTOCOL_ZOOM */
   struct ndpi_lru_cache *zoom_cache;
   u_int32_t zoom_cache_num_entries;
+  u_int32_t zoom_cache_ttl;
 
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
   u_int32_t stun_cache_num_entries;
+  u_int32_t stun_cache_ttl;
   struct ndpi_lru_cache *stun_zoom_cache;
   u_int32_t stun_zoom_cache_num_entries;
+  u_int32_t stun_zoom_cache_ttl;
 
   /* NDPI_PROTOCOL_TLS and subprotocols */
   struct ndpi_lru_cache *tls_cert_cache;
   u_int32_t tls_cert_cache_num_entries;
+  int32_t tls_cert_cache_ttl;
   
   /* NDPI_PROTOCOL_MINING and subprotocols */
   struct ndpi_lru_cache *mining_cache;
   u_int32_t mining_cache_num_entries;
+  u_int32_t mining_cache_ttl;
 
   /* NDPI_PROTOCOL_MSTEAMS */
   struct ndpi_lru_cache *msteams_cache;
   u_int32_t msteams_cache_num_entries;
+  u_int32_t msteams_cache_ttl;
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 

@@ -2864,6 +2864,15 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->msteams_cache_num_entries = 1024;
   ndpi_str->stun_zoom_cache_num_entries = 1024;
 
+  ndpi_str->ookla_cache_ttl = 0;
+  ndpi_str->bittorrent_cache_ttl = 0;
+  ndpi_str->zoom_cache_ttl = 0;
+  ndpi_str->stun_cache_ttl = 0;
+  ndpi_str->tls_cert_cache_ttl = 0;
+  ndpi_str->mining_cache_ttl = 0;
+  ndpi_str->msteams_cache_ttl = 60; /* sec */
+  ndpi_str->stun_zoom_cache_ttl = 60; /* sec */
+
   ndpi_str->opportunistic_tls_smtp_enabled = 1;
   ndpi_str->opportunistic_tls_imap_enabled = 1;
   ndpi_str->opportunistic_tls_pop_enabled = 1;
@@ -2932,56 +2941,64 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   ndpi_add_domain_risk_exceptions(ndpi_str);
 
   if(ndpi_str->ookla_cache_num_entries > 0) {
-    ndpi_str->ookla_cache = ndpi_lru_cache_init(ndpi_str->ookla_cache_num_entries);
+    ndpi_str->ookla_cache = ndpi_lru_cache_init(ndpi_str->ookla_cache_num_entries,
+                                                ndpi_str->ookla_cache_ttl);
     if(!ndpi_str->ookla_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->ookla_cache_num_entries);
     }
   }
   if(ndpi_str->bittorrent_cache_num_entries > 0) {
-    ndpi_str->bittorrent_cache = ndpi_lru_cache_init(ndpi_str->bittorrent_cache_num_entries);
+    ndpi_str->bittorrent_cache = ndpi_lru_cache_init(ndpi_str->bittorrent_cache_num_entries,
+                                                     ndpi_str->bittorrent_cache_ttl);
     if(!ndpi_str->bittorrent_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->bittorrent_cache_num_entries);
     }
   }
   if(ndpi_str->zoom_cache_num_entries > 0) {
-    ndpi_str->zoom_cache = ndpi_lru_cache_init(ndpi_str->zoom_cache_num_entries);
+    ndpi_str->zoom_cache = ndpi_lru_cache_init(ndpi_str->zoom_cache_num_entries,
+                                               ndpi_str->zoom_cache_ttl);
     if(!ndpi_str->zoom_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->zoom_cache_num_entries);
     }
   }
   if(ndpi_str->stun_cache_num_entries > 0) {
-    ndpi_str->stun_cache = ndpi_lru_cache_init(ndpi_str->stun_cache_num_entries);
+    ndpi_str->stun_cache = ndpi_lru_cache_init(ndpi_str->stun_cache_num_entries,
+                                               ndpi_str->stun_cache_ttl);
     if(!ndpi_str->stun_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->stun_cache_num_entries);
     }
   }
   if(ndpi_str->tls_cert_cache_num_entries > 0) {
-    ndpi_str->tls_cert_cache = ndpi_lru_cache_init(ndpi_str->tls_cert_cache_num_entries);
+    ndpi_str->tls_cert_cache = ndpi_lru_cache_init(ndpi_str->tls_cert_cache_num_entries,
+                                                   ndpi_str->tls_cert_cache_ttl);
     if(!ndpi_str->tls_cert_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->tls_cert_cache_num_entries);
     }
   }
   if(ndpi_str->mining_cache_num_entries > 0) {
-    ndpi_str->mining_cache = ndpi_lru_cache_init(ndpi_str->mining_cache_num_entries);
+    ndpi_str->mining_cache = ndpi_lru_cache_init(ndpi_str->mining_cache_num_entries,
+                                                 ndpi_str->mining_cache_ttl);
     if(!ndpi_str->mining_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->mining_cache_num_entries);
     }
   }
   if(ndpi_str->msteams_cache_num_entries > 0) {
-    ndpi_str->msteams_cache = ndpi_lru_cache_init(ndpi_str->msteams_cache_num_entries);
+    ndpi_str->msteams_cache = ndpi_lru_cache_init(ndpi_str->msteams_cache_num_entries,
+                                                  ndpi_str->msteams_cache_ttl);
     if(!ndpi_str->msteams_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->msteams_cache_num_entries);
     }
   }
   if(ndpi_str->stun_zoom_cache_num_entries > 0) {
-    ndpi_str->stun_zoom_cache = ndpi_lru_cache_init(ndpi_str->stun_zoom_cache_num_entries);
+    ndpi_str->stun_zoom_cache = ndpi_lru_cache_init(ndpi_str->stun_zoom_cache_num_entries,
+                                                    ndpi_str->stun_zoom_cache_ttl);
     if(!ndpi_str->stun_zoom_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->stun_zoom_cache_num_entries);
@@ -5806,7 +5823,8 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       if(ndpi_str->msteams_cache)
 	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
 			      make_msteams_key(flow),
-			      (flow->last_packet_time_ms / 1000) & 0xFFFF /* 16 bit */);
+			      0 /* dummy */,
+			      ndpi_get_current_time(flow));
     }
     break;
 
@@ -5827,21 +5845,18 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   case NDPI_PROTOCOL_SKYPE_TEAMS_CALL:
     if(flow->l4_proto == IPPROTO_UDP
        && ndpi_str->msteams_cache) {
-      u_int16_t when;
+      u_int16_t dummy;
 
       if(ndpi_lru_find_cache(ndpi_str->msteams_cache, make_msteams_key(flow),
-			     &when, 0 /* Don't remove it as it can be used for other connections */)) {
-	u_int16_t tdiff = ((flow->last_packet_time_ms /1000) & 0xFFFF) - when;
-
-	if(tdiff < 60 /* sec */) {
-	  // printf("====>> NDPI_PROTOCOL_SKYPE(_CALL) -> NDPI_PROTOCOL_MSTEAMS [%u]\n", tdiff);
+			     &dummy, 0 /* Don't remove it as it can be used for other connections */,
+			     ndpi_get_current_time(flow))) {
 	  ret->app_protocol = NDPI_PROTOCOL_MSTEAMS;
 
 	  /* Refresh cache */
 	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
 				make_msteams_key(flow),
-				(flow->last_packet_time_ms / 1000) & 0xFFFF /* 16 bit */);
-	}
+				0 /* dummy */,
+				ndpi_get_current_time(flow));
       }
     }
     break;
@@ -5906,9 +5921,9 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
     key1 = ndpi_ip_port_hash_funct(saddr, sport), key2 = ndpi_ip_port_hash_funct(daddr, dport);
 
     found =
-      ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, saddr+daddr, &cached_proto, 0 /* Don't remove it as it can be used for other connections */)
-      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0     /* Don't remove it as it can be used for other connections */)
-      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0     /* Don't remove it as it can be used for other connections */);
+      ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, saddr+daddr, &cached_proto, 0 /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(flow))
+      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(flow))
+      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(flow));
 
 #ifdef BITTORRENT_CACHE_DEBUG
     if(ndpi_struct->packet.udp)
@@ -5959,7 +5974,8 @@ static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct 
 
     key = make_zoom_key(flow, server);
     u_int8_t found = ndpi_lru_find_cache(ndpi_struct->zoom_cache, key, &cached_proto,
-					 0 /* Don't remove it as it can be used for other connections */);
+					 0 /* Don't remove it as it can be used for other connections */,
+					 ndpi_get_current_time(flow));
 
 #ifdef ZOOM_CACHE_DEBUG
     printf("[Zoom] *** [TCP] SEARCHING key %u [found: %u]\n", key, found);
@@ -5976,7 +5992,7 @@ static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct 
 static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow) {
   if(ndpi_struct->zoom_cache)
-    ndpi_lru_add_to_cache(ndpi_struct->zoom_cache, make_zoom_key(flow, 1), NDPI_PROTOCOL_ZOOM);
+    ndpi_lru_add_to_cache(ndpi_struct->zoom_cache, make_zoom_key(flow, 1), NDPI_PROTOCOL_ZOOM, ndpi_get_current_time(flow));
 }
 
 /* ********************************************************************************* */
@@ -6007,7 +6023,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     u_int16_t cached_proto;
 
     if(ndpi_lru_find_cache(ndpi_str->mining_cache, make_mining_key(flow),
-			   &cached_proto, 0 /* Don't remove it as it can be used for other connections */)) {
+			   &cached_proto, 0 /* Don't remove it as it can be used for other connections */,
+			   ndpi_get_current_time(flow))) {
       ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
       ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
       ndpi_fill_protocol_category(ndpi_str, flow, &ret);
@@ -8409,13 +8426,23 @@ void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_str, u_int l){
 
 /* ******************************************************************** */
 
+u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow)
+{
+  if(flow)
+    return flow->last_packet_time_ms / 1000;
+  return 0;
+}
+
+/* ******************************************************************** */
+
 /* LRU cache */
-struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries) {
+struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl) {
   struct ndpi_lru_cache *c = (struct ndpi_lru_cache *) ndpi_calloc(1, sizeof(struct ndpi_lru_cache));
 
   if(!c)
     return(NULL);
 
+  c->ttl = ttl;
   c->entries = (struct ndpi_lru_cache_entry *) ndpi_calloc(num_entries, sizeof(struct ndpi_lru_cache_entry));
 
   if(!c->entries) {
@@ -8433,11 +8460,13 @@ void ndpi_lru_free_cache(struct ndpi_lru_cache *c) {
 }
 
 u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
-			     u_int16_t *value, u_int8_t clean_key_when_found) {
+			     u_int16_t *value, u_int8_t clean_key_when_found, u_int32_t now_sec) {
   u_int32_t slot = key % c->num_entries;
 
   c->stats.n_search++;
-  if(c->entries[slot].is_full && c->entries[slot].key == key) {
+  if(c->entries[slot].is_full && c->entries[slot].key == key &&
+     now_sec >= c->entries[slot].timestamp &&
+     (c->ttl == 0 || now_sec - c->entries[slot].timestamp <= c->ttl)) {
     *value = c->entries[slot].value;
     if(clean_key_when_found)
       c->entries[slot].is_full = 0;
@@ -8447,11 +8476,11 @@ u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
     return(0);
 }
 
-void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value) {
+void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value, u_int32_t now_sec) {
   u_int32_t slot = key % c->num_entries;
 
   c->stats.n_insert++;
-  c->entries[slot].is_full = 1, c->entries[slot].key = key, c->entries[slot].value = value;
+  c->entries[slot].is_full = 1, c->entries[slot].key = key, c->entries[slot].value = value, c->entries[slot].timestamp = now_sec;
 }
 
 void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *stats) {
@@ -8571,6 +8600,80 @@ int ndpi_get_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
     return 0;
   case NDPI_LRUCACHE_STUN_ZOOM:
     *num_entries = ndpi_struct->stun_zoom_cache_num_entries;
+    return 0;
+  default:
+    return -1;
+  }
+}
+
+int ndpi_set_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
+			   lru_cache_type cache_type,
+			   u_int32_t ttl)
+{
+  if(!ndpi_struct)
+    return -1;
+
+  switch(cache_type) {
+  case NDPI_LRUCACHE_OOKLA:
+    ndpi_struct->ookla_cache_ttl = ttl;
+    return 0;
+  case NDPI_LRUCACHE_BITTORRENT:
+    ndpi_struct->bittorrent_cache_ttl = ttl;
+    return 0;
+  case NDPI_LRUCACHE_ZOOM:
+    ndpi_struct->zoom_cache_ttl = ttl;
+    return 0;
+  case NDPI_LRUCACHE_STUN:
+    ndpi_struct->stun_cache_ttl = ttl;
+    return 0;
+  case NDPI_LRUCACHE_TLS_CERT:
+    ndpi_struct->tls_cert_cache_ttl = ttl;
+    return 0;
+  case NDPI_LRUCACHE_MINING:
+    ndpi_struct->mining_cache_ttl = ttl;
+    return 0;
+  case NDPI_LRUCACHE_MSTEAMS:
+    ndpi_struct->msteams_cache_ttl = ttl;
+    return 0;
+  case NDPI_LRUCACHE_STUN_ZOOM:
+    ndpi_struct->stun_zoom_cache_ttl = ttl;
+    return 0;
+  default:
+    return -1;
+  }
+}
+
+int ndpi_get_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
+			   lru_cache_type cache_type,
+			   u_int32_t *ttl)
+{
+  if(!ndpi_struct || !ttl)
+    return -1;
+
+  switch(cache_type) {
+  case NDPI_LRUCACHE_OOKLA:
+    *ttl = ndpi_struct->ookla_cache_ttl;
+    return 0;
+  case NDPI_LRUCACHE_BITTORRENT:
+    *ttl = ndpi_struct->bittorrent_cache_ttl;
+    return 0;
+  case NDPI_LRUCACHE_ZOOM:
+    *ttl = ndpi_struct->zoom_cache_ttl;
+    return 0;
+  case NDPI_LRUCACHE_STUN:
+    *ttl = ndpi_struct->stun_cache_ttl;
+    return 0;
+  case NDPI_LRUCACHE_TLS_CERT:
+    *ttl = ndpi_struct->tls_cert_cache_ttl;
+    return 0;
+  case NDPI_LRUCACHE_MINING:
+    *ttl = ndpi_struct->mining_cache_ttl;
+    return 0;
+  case NDPI_LRUCACHE_MSTEAMS:
+    *ttl = ndpi_struct->msteams_cache_ttl;
+    return 0;
+  case NDPI_LRUCACHE_STUN_ZOOM:
+    *ttl = ndpi_struct->stun_zoom_cache_ttl;
     return 0;
   default:
     return -1;
