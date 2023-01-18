@@ -68,7 +68,7 @@ int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct
 
     if(ndpi_lru_find_cache(ndpi_struct->stun_zoom_cache, key,
                            &dummy, 0 /* Don't remove it as it can be used for other connections */,
-			   flow->last_packet_time_ms / 1000)) {
+			   ndpi_get_current_time(flow))) {
 #ifdef DEBUG_ZOOM_LRU
       printf("[LRU ZOOM] Found");
 #endif
@@ -100,7 +100,7 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
 
     if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key,
 			   &cached_proto, 0 /* Don't remove it as it can be used for other connections */,
-			   flow->last_packet_time_ms / 1000)) {
+			   ndpi_get_current_time(flow))) {
 #ifdef DEBUG_LRU
       printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key, cached_proto, proto, app_proto);
 #endif
@@ -113,7 +113,7 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
 
       if(ndpi_lru_find_cache(ndpi_struct->stun_cache, key_rev,
 			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */,
-			     flow->last_packet_time_ms / 1000)) {
+			     ndpi_get_current_time(flow))) {
 #ifdef DEBUG_LRU
 	printf("[LRU] FOUND %u / %u: no need to cache %u.%u\n", key_rev, cached_proto, proto, app_proto);
 #endif
@@ -130,8 +130,8 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
 		 ntohs(packet->udp->source), ntohs(packet->udp->dest));
 #endif
 
-	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto, flow->last_packet_time_ms / 1000);
-	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key_rev, app_proto, flow->last_packet_time_ms / 1000);
+	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto, ndpi_get_current_time(flow));
+	  ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key_rev, app_proto, ndpi_get_current_time(flow));
 	}
       }
     }
@@ -146,7 +146,7 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
     printf("[LRU ZOOM] ADDING %u [src_port %u]\n", key, ntohs(flow->c_port));
 #endif
     ndpi_lru_add_to_cache(ndpi_struct->stun_zoom_cache, key,
-                          0 /* dummy */, flow->last_packet_time_ms / 1000);
+                          0 /* dummy */, ndpi_get_current_time(flow));
   }
 
   ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, NDPI_PROTOCOL_STUN, confidence);
@@ -234,7 +234,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     u_int32_t key = get_stun_lru_key(flow, 0);
     int rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto,
                                  0 /* Don't remove it as it can be used for other connections */,
-				 flow->last_packet_time_ms / 1000);
+				 ndpi_get_current_time(flow));
 
 #ifdef DEBUG_LRU
     printf("[LRU] Searching %u\n", key);
@@ -244,7 +244,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       key = get_stun_lru_key(flow, 1);
       rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto,
                                0 /* Don't remove it as it can be used for other connections */,
-			       flow->last_packet_time_ms / 1000);
+			       ndpi_get_current_time(flow));
 
 #ifdef DEBUG_LRU
       printf("[LRU] Searching %u\n", key);

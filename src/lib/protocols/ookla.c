@@ -63,7 +63,7 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
 #ifdef OOKLA_DEBUG
 	  printf("=>>>>>>>> [OOKLA IPv6] Adding %u\n", h);
 #endif
-	  ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, h, 1 /* dummy */, flow->last_packet_time_ms / 1000);
+	  ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, h, 1 /* dummy */, ndpi_get_current_time(flow));
 	}
 	return;
       } else {
@@ -80,7 +80,7 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
 #endif
 	  
 	  if(ndpi_lru_find_cache(ndpi_struct->ookla_cache, h, &dummy, 0 /* Don't remove it as it can be used for other connections */,
-				 flow->last_packet_time_ms / 1000)) {
+				 ndpi_get_current_time(flow))) {
 	    NDPI_LOG_INFO(ndpi_struct, "found ookla tcp connection\n");
 	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
 #ifdef OOKLA_DEBUG
@@ -112,7 +112,7 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
       u_int16_t dummy;
     
       if(ndpi_lru_find_cache(ndpi_struct->ookla_cache, addr, &dummy, 0 /* Don't remove it as it can be used for other connections */,
-			     flow->last_packet_time_ms / 1000)) {
+			     ndpi_get_current_time(flow))) {
 	NDPI_LOG_INFO(ndpi_struct, "found ookla tcp connection\n");
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
 #ifdef OOKLA_DEBUG

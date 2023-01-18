@@ -992,6 +992,9 @@ extern "C" {
   void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l);
   void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_mod, NDPI_PROTOCOL_BITMASK debug_bitmask);
 
+  /* Simple helper to get current time, in sec */
+  u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow);
+
   /* LRU cache */
   struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl);
   void ndpi_lru_free_cache(struct ndpi_lru_cache *c);

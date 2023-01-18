@@ -5824,7 +5824,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
 			      make_msteams_key(flow),
 			      0 /* dummy */,
-			      flow->last_packet_time_ms / 1000);
+			      ndpi_get_current_time(flow));
     }
     break;
 
@@ -5849,14 +5849,14 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
       if(ndpi_lru_find_cache(ndpi_str->msteams_cache, make_msteams_key(flow),
 			     &dummy, 0 /* Don't remove it as it can be used for other connections */,
-			     flow->last_packet_time_ms / 1000)) {
+			     ndpi_get_current_time(flow))) {
 	  ret->app_protocol = NDPI_PROTOCOL_MSTEAMS;
 
 	  /* Refresh cache */
 	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
 				make_msteams_key(flow),
 				0 /* dummy */,
-				flow->last_packet_time_ms / 1000);
+				ndpi_get_current_time(flow));
       }
     }
     break;
@@ -5921,9 +5921,9 @@ int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_
     key1 = ndpi_ip_port_hash_funct(saddr, sport), key2 = ndpi_ip_port_hash_funct(daddr, dport);
 
     found =
-      ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, saddr+daddr, &cached_proto, 0 /* Don't remove it as it can be used for other connections */, flow->last_packet_time_ms / 1000)
-      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, flow->last_packet_time_ms / 1000)
-      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, flow->last_packet_time_ms / 1000);
+      ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, saddr+daddr, &cached_proto, 0 /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(flow))
+      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(flow))
+      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(flow));
 
 #ifdef BITTORRENT_CACHE_DEBUG
     if(ndpi_struct->packet.udp)
@@ -5975,7 +5975,7 @@ static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct 
     key = make_zoom_key(flow, server);
     u_int8_t found = ndpi_lru_find_cache(ndpi_struct->zoom_cache, key, &cached_proto,
 					 0 /* Don't remove it as it can be used for other connections */,
-					 flow->last_packet_time_ms / 1000);
+					 ndpi_get_current_time(flow));
 
 #ifdef ZOOM_CACHE_DEBUG
     printf("[Zoom] *** [TCP] SEARCHING key %u [found: %u]\n", key, found);
@@ -5992,7 +5992,7 @@ static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct 
 static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow) {
   if(ndpi_struct->zoom_cache)
-    ndpi_lru_add_to_cache(ndpi_struct->zoom_cache, make_zoom_key(flow, 1), NDPI_PROTOCOL_ZOOM, flow->last_packet_time_ms / 1000);
+    ndpi_lru_add_to_cache(ndpi_struct->zoom_cache, make_zoom_key(flow, 1), NDPI_PROTOCOL_ZOOM, ndpi_get_current_time(flow));
 }
 
 /* ********************************************************************************* */
@@ -6024,7 +6024,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
     if(ndpi_lru_find_cache(ndpi_str->mining_cache, make_mining_key(flow),
 			   &cached_proto, 0 /* Don't remove it as it can be used for other connections */,
-			   flow->last_packet_time_ms / 1000)) {
+			   ndpi_get_current_time(flow))) {
       ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
       ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
       ndpi_fill_protocol_category(ndpi_str, flow, &ret);
@@ -8422,6 +8422,15 @@ void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_str, NDPI_
 
 void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_str, u_int l){
   ndpi_str->ndpi_log_level = l;
+}
+
+/* ******************************************************************** */
+
+u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow)
+{
+  if(flow)
+    return flow->last_packet_time_ms / 1000;
+  return 0;
 }
 
 /* ******************************************************************** */

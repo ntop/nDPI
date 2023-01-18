@@ -44,7 +44,7 @@ u_int32_t make_mining_key(struct ndpi_flow_struct *flow) {
 static void cacheMiningHostTwins(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
   if(ndpi_struct->mining_cache)
-    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, make_mining_key(flow), NDPI_PROTOCOL_MINING, flow->last_packet_time_ms / 1000);
+    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, make_mining_key(flow), NDPI_PROTOCOL_MINING, ndpi_get_current_time(flow));
 }
 
 /* ************************************************************************** */
