@@ -1,0 +1,25 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	10	(10.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 220 (220.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 5/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+
+BitTorrent	100	96898	1
+
+	1	TCP 192.168.122.34:48987 <-> 178.71.206.1:6881 [proto: 37/BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Download/7][33 pkts/2895 bytes <-> 67 pkts/94003 bytes][Goodput ratio: 38/96][0.31 sec][bytes ratio: -0.940 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 7/4 33/64 11/12][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 88/1403 525/1494 98/324][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][BT Hash: 0f6b9cd2b7da4de9b6c846203920e3da49cdb795][PLAIN TEXT (BitTorrent protocol)][Plen Bins: 0,4,1,0,0,0,1,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,88,0,0]

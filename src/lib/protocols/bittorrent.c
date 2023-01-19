@@ -154,8 +154,6 @@ static u_int8_t ndpi_int_search_bittorrent_tcp_zero(struct ndpi_detection_module
   u_int16_t a = 0;
 
   if(packet->payload_packet_len == 1 && packet->payload[0] == 0x13) {
-    /* reset stage back to 0 so we will see the next packet here too */
-    flow->bittorrent_stage = 0;
     return 0;
   }
 
@@ -418,17 +416,7 @@ static void ndpi_int_search_bittorrent_tcp(struct ndpi_detection_module_struct *
     return;
   }
 
-  if(flow->bittorrent_stage == 0 && packet->payload_packet_len != 0) {
-    /* exclude stage 0 detection from next run */
-    flow->bittorrent_stage = 1;
-    if(ndpi_int_search_bittorrent_tcp_zero(ndpi_struct, flow) != 0) {
-      NDPI_LOG_DBG2(ndpi_struct, "stage 0 has detected something, returning\n");
-      return;
-    }
-
-    NDPI_LOG_DBG2(ndpi_struct, "stage 0 has no direct detection, fall through\n");
-  }
-  return;
+  ndpi_int_search_bittorrent_tcp_zero(ndpi_struct, flow);
 }
 
 /* ************************************* */
