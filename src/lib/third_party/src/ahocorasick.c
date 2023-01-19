@@ -259,7 +259,7 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
   if(thiz->max_str_len < patt->length)
      thiz->max_str_len = patt->length;
 
-  if(n->final) {
+  if(n->final && n->matched_patterns) {
     patt->rep.number = n->matched_patterns->patterns[0].rep.number;
     return ACERR_DUPLICATE_PATTERN;
   }
@@ -372,7 +372,7 @@ static AC_ERROR_t ac_finalize_node(AC_AUTOMATA_t * thiz,AC_NODE_t * n, int idx, 
 AC_ERROR_t ac_automata_finalize (AC_AUTOMATA_t * thiz) {
 
     AC_ERROR_t r = ACERR_SUCCESS;
-    if(!thiz->automata_open) return r;
+    if(!thiz || !thiz->automata_open) return r;
 
     ac_automata_traverse_setfailure (thiz);
     thiz->id=0;
@@ -438,6 +438,8 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
   AC_NODE_t *curr;
   AC_NODE_t *next;
   AC_ALPHABET_t *apos;
+
+  if(!thiz || !txt) return -1;
 
   thiz->stats.n_search++;
 
@@ -687,6 +689,8 @@ static void dump_node_str(AC_AUTOMATA_t * thiz, AC_NODE_t * node,
 
 void ac_automata_dump(AC_AUTOMATA_t * thiz, FILE *file) {
   struct aho_dump_info ai;
+
+  if(!thiz) return;
 
   memset((char *)&ai,0,sizeof(ai));
   ai.file = file ? file : stdout;

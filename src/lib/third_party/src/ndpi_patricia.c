@@ -321,7 +321,9 @@ ndpi_patricia_new (u_int16_t maxbits)
 void
 ndpi_Clear_Patricia (ndpi_patricia_tree_t *patricia, ndpi_void_fn_t func)
 {
-  assert (patricia);
+  if(!patricia)
+    return;
+
   if(patricia->head) {
 
     ndpi_patricia_node_t *Xstack[PATRICIA_MAXBITS+1];
@@ -377,6 +379,9 @@ void
 ndpi_patricia_process (ndpi_patricia_tree_t *patricia, ndpi_void_fn2_t func)
 {
   ndpi_patricia_node_t *node;
+
+  if (!patricia)
+    return;
   assert (func);
 
   PATRICIA_WALK (patricia->head, node) {
@@ -451,7 +456,7 @@ ndpi_patricia_walk_inorder(ndpi_patricia_node_t *node, ndpi_void_fn3_t func, voi
 
 size_t
 ndpi_patricia_walk_tree_inorder(ndpi_patricia_tree_t *patricia, ndpi_void_fn3_t func, void *data) {
-  if (patricia->head == NULL)
+  if (patricia == NULL || patricia->head == NULL)
     return 0;
 
   return ndpi_patricia_walk_inorder(patricia->head, func, data);
@@ -464,7 +469,8 @@ ndpi_patricia_search_exact (ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefi
   u_char *addr;
   u_int16_t bitlen;
 
-  assert (patricia);
+  if (!patricia)
+    return (NULL);
   assert (prefix);
   assert (prefix->bitlen <= patricia->maxbits);
 
@@ -650,12 +656,14 @@ ndpi_patricia_lookup (ndpi_patricia_tree_t *patricia, ndpi_prefix_t *prefix)
   u_int16_t bitlen, check_bit, differ_bit;
   int i, j;
 
+  if(!patricia)
+    return (NULL);
+
 #ifdef PATRICIA_DEBUG
   fprintf (stderr, "patricia_lookup() %s/%d (head)\n", 
 	   ndpi_prefix_toa (prefix), prefix->bitlen);
 #endif /* PATRICIA_DEBUG */
 
-    assert (patricia);
   assert (prefix);
   assert (prefix->bitlen <= patricia->maxbits);
 
@@ -888,7 +896,8 @@ ndpi_patricia_remove (ndpi_patricia_tree_t *patricia, ndpi_patricia_node_t *node
 {
   ndpi_patricia_node_t *parent, *child;
 
-  assert (patricia);
+  if(!patricia)
+    return;
   assert (node);
 
   if(node->r && node->l) {

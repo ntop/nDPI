@@ -57,8 +57,8 @@ fuzz_quic_get_crypto_data_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS)
     $(fuzz_quic_get_crypto_data_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_config_SOURCES = fuzz_config.cpp fuzz_common_code.c
-fuzz_config_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
-fuzz_config_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_config_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_config_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 fuzz_config_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_config_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -72,8 +72,8 @@ fuzz_config_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_config_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_bins_SOURCES = fuzz_alg_bins.cpp fuzz_common_code.c
-fuzz_alg_bins_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
-fuzz_alg_bins_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_alg_bins_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_alg_bins_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 fuzz_alg_bins_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_alg_bins_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -87,8 +87,8 @@ fuzz_alg_bins_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_alg_bins_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_hll_SOURCES = fuzz_alg_hll.cpp fuzz_common_code.c
-fuzz_alg_hll_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
-fuzz_alg_hll_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_alg_hll_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_alg_hll_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 fuzz_alg_hll_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_alg_hll_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -102,8 +102,8 @@ fuzz_alg_hll_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_alg_hll_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_hw_rsi_outliers_da_SOURCES = fuzz_alg_hw_rsi_outliers_da.cpp fuzz_common_code.c
-fuzz_alg_hw_rsi_outliers_da_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
-fuzz_alg_hw_rsi_outliers_da_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_alg_hw_rsi_outliers_da_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_alg_hw_rsi_outliers_da_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 fuzz_alg_hw_rsi_outliers_da_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_alg_hw_rsi_outliers_da_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -117,8 +117,8 @@ fuzz_alg_hw_rsi_outliers_da_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAG
     $(fuzz_alg_hw_rsi_outliers_da_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_jitter_SOURCES = fuzz_alg_jitter.cpp fuzz_common_code.c
-fuzz_alg_jitter_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
-fuzz_alg_jitter_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_alg_jitter_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_alg_jitter_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 fuzz_alg_jitter_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_alg_jitter_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -132,8 +132,8 @@ fuzz_alg_jitter_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_alg_jitter_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_ses_des_SOURCES = fuzz_alg_ses_des.cpp fuzz_common_code.c
-fuzz_alg_ses_des_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
-fuzz_alg_ses_des_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_alg_ses_des_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_alg_ses_des_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 fuzz_alg_ses_des_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_alg_ses_des_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -147,8 +147,8 @@ fuzz_alg_ses_des_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_alg_ses_des_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_patricia_SOURCES = fuzz_ds_patricia.cpp fuzz_common_code.c
-fuzz_ds_patricia_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
-fuzz_ds_patricia_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_ds_patricia_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_ds_patricia_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 fuzz_ds_patricia_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ds_patricia_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -162,8 +162,8 @@ fuzz_ds_patricia_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_ds_patricia_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_ahocorasick_SOURCES = fuzz_ds_ahocorasick.cpp fuzz_common_code.c
-fuzz_ds_ahocorasick_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
-fuzz_ds_ahocorasick_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -DENABLE_MEM_ALLOC_FAILURES
+fuzz_ds_ahocorasick_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_ds_ahocorasick_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 fuzz_ds_ahocorasick_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ds_ahocorasick_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -191,6 +191,11 @@ files_corpus_fuzz_quic_get_crypto_data :=  $(wildcard corpus/fuzz_quic_get_crypt
 
 fuzz_quic_get_crypto_data_seed_corpus.zip: $(files_corpus_fuzz_quic_get_crypto_data)
 	zip -j fuzz_quic_get_crypto_data_seed_corpus.zip $(files_corpus_fuzz_quic_get_crypto_data)
+
+files_corpus_fuzz_config :=  $(wildcard corpus/fuzz_config/*)
+
+fuzz_config_seed_corpus.zip: $(files_corpus_fuzz_config)
+	zip -j fuzz_config_seed_corpus.zip $(files_corpus_fuzz_config)
 
 files_corpus_fuzz_ds_patricia :=  $(wildcard corpus/fuzz_ds_patricia/*)
 
@@ -227,7 +232,7 @@ files_corpus_fuzz_alg_jitter :=  $(wildcard corpus/fuzz_alg_jitter/*)
 fuzz_alg_jitter_seed_corpus.zip: $(files_corpus_fuzz_alg_jitter)
 	zip -j fuzz_alg_jitter_seed_corpus.zip $(files_corpus_fuzz_alg_jitter)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip
 
 distdir:
 	find . -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
@@ -236,6 +241,7 @@ distdir:
 		-o -name '*.h' \
 		-o -name '*.cpp' \
 		-o -path './corpus/fuzz_quic_get_crypto_data/*' \
+		-o -path './corpus/fuzz_config/*' \
 		-o -path './corpus/fuzz_alg_ses_des/*' \
 		-o -path './corpus/fuzz_alg_bins/*' \
 		-o -path './corpus/fuzz_alg_hll/*' \

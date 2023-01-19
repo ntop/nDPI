@@ -9,9 +9,6 @@
 
 extern "C" int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match);
 
-
-struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   u_int16_t i, num_iteration, is_added = 0;
@@ -30,11 +27,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if (fuzzed_data.remaining_bytes() < 1024)
     return -1;
 
-  /* We don't really need the detection module, but this way we can enable
-     memory allocation failures */
-  if (ndpi_info_mod == NULL) {
-    fuzz_init_detection_module(&ndpi_info_mod, 0);
-  }
+  /* To allow memory allocation failures */
+  fuzz_set_alloc_callbacks_and_seed(size);
 
   if (fuzzed_data.ConsumeBool())
     mc = ac_domain_match_handler;

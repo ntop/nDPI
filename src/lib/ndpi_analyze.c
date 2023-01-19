@@ -145,8 +145,8 @@ u_int32_t ndpi_data_last(struct ndpi_analyze_struct *s) {
 }
 
 /* Return min/max on all values */
-u_int32_t ndpi_data_min(struct ndpi_analyze_struct *s) { return(s->min_val); }
-u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s->max_val); }
+u_int32_t ndpi_data_min(struct ndpi_analyze_struct *s) { return(s ? s->min_val : 0); }
+u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s ? s->max_val : 0); }
 
 /* ********************************************************************************* */
 
@@ -582,7 +582,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
   u_int16_t i;
   u_int len = 0;
 
-  if(!b || !out_buf) return(out_buf); else out_buf[0] = '\0';
+  if(!b || !b->u.bins8 || !out_buf) return(out_buf); else out_buf[0] = '\0';
 
   if(normalize_first)
     ndpi_normalize_bin(b);
@@ -592,7 +592,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
     for(i=0; i<b->num_bins; i++) {
       int rc = ndpi_snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins8[i]);
 
-      if(rc < 0) break;
+      if(rc < 0 || (u_int)rc >= out_buf_len-len) break;
       len += rc;
     }
     break;
@@ -601,7 +601,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
     for(i=0; i<b->num_bins; i++) {
       int rc = ndpi_snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins16[i]);
 
-      if(rc < 0) break;
+      if(rc < 0 || (u_int)rc >= out_buf_len-len) break;
       len += rc;
     }
     break;
@@ -610,7 +610,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
     for(i=0; i<b->num_bins; i++) {
       int rc = ndpi_snprintf(&out_buf[len], out_buf_len-len, "%s%u", (i > 0) ? "," : "", b->u.bins32[i]);
 
-      if(rc < 0) break;
+      if(rc < 0 || (u_int)rc >= out_buf_len-len) break;
       len += rc;
     }
     break;
@@ -619,7 +619,7 @@ char* ndpi_print_bin(struct ndpi_bin *b, u_int8_t normalize_first, char *out_buf
     for(i=0; i<b->num_bins; i++) {
       int rc = ndpi_snprintf(&out_buf[len], out_buf_len-len, "%s%llu", (i > 0) ? "," : "", (unsigned long long)b->u.bins64[i]);
 
-      if(rc < 0) break;
+      if(rc < 0 || (u_int)rc >= out_buf_len-len) break;
       len += rc;
     }
     break;
@@ -655,7 +655,10 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2,
 			  u_int8_t normalize_first, float similarity_max_threshold) {
   u_int16_t i;
   float threshold = similarity_max_threshold*similarity_max_threshold;
-  
+
+  if(!b1 || !b2)
+    return(-1);
+
   if(
      // (b1->family != b2->family) ||
      (b1->num_bins != b2->num_bins))
