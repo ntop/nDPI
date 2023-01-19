@@ -494,14 +494,13 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 	wireshark/epan/dissectors/packet-bt-utp.c
       */
 
-      if(packet->payload_packet_len >= 20 /* min header size */) {
 	if(
-	   (strncmp((const char*)packet->payload, bt_search, strlen(bt_search)) == 0)
-	   || (strncmp((const char*)packet->payload, bt_search1, strlen(bt_search1)) == 0)
+	   (packet->payload_packet_len > 22 && strncmp((const char*)packet->payload, bt_search, strlen(bt_search)) == 0) ||
+	   (packet->payload_packet_len > 12 && strncmp((const char*)packet->payload, bt_search1, strlen(bt_search1)) == 0)
 	   ) {
 	  ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 1, NDPI_CONFIDENCE_DPI);
 	  return;
-	} else {
+	} else if(packet->payload_packet_len >= 20) {
 	  /* Check if this is protocol v0 */
 	  u_int8_t v0_extension = packet->payload[17];
 	  u_int8_t v0_flags     = packet->payload[18];
@@ -534,7 +533,6 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 	  }
 
 	}
-      }
 
       flow->bittorrent_stage++;
 
