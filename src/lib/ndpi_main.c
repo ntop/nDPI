@@ -2116,7 +2116,7 @@ int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
      * the length of the pattern is longer than that of the previous one.
      * Skip shorter (less precise) templates.
      */
-    if(!(m->match_map & (1 << i)))
+    if(!(m->match_map & (1u << i)))
       continue;
     start = end - pattern->length;
 
