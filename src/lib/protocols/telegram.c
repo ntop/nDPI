@@ -43,8 +43,8 @@ static u_int8_t is_telegram_port_range(u_int16_t port) {
   return(0);
 }
 
-void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struct,
-			  struct ndpi_flow_struct *flow) {
+static void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struct,
+				 struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search telegram\n");

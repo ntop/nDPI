@@ -162,8 +162,8 @@ static int ndpi_search_natpmp_extra(struct ndpi_detection_module_struct *ndpi_st
   return 1;
 }
 
-void ndpi_search_natpmp(struct ndpi_detection_module_struct *ndpi_struct,
-                        struct ndpi_flow_struct *flow)
+static void ndpi_search_natpmp(struct ndpi_detection_module_struct *ndpi_struct,
+                               struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
   enum natpmp_type natpmp_type;

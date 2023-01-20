@@ -62,7 +62,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }  
 }
 
-void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+static void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t const max_packets = 4;

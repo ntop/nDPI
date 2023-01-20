@@ -132,7 +132,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void ndpi_search_tinc(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow) {
+static void ndpi_search_tinc(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow) {
   NDPI_LOG_DBG(ndpi_struct, "tinc detection\n");
 
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_TINC) {

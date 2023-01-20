@@ -38,8 +38,8 @@ static void ndpi_int_munin_add_connection(struct ndpi_detection_module_struct * 
 
 /* ***************************************************** */
 
-void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
-                       struct ndpi_flow_struct *flow)
+static void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
+                              struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
   static char const munin_prefix[] = "# munin node at ";

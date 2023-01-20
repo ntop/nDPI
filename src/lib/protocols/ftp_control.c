@@ -668,8 +668,8 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
 
 /* *************************************************************** */
 
-void ndpi_search_ftp_control(struct ndpi_detection_module_struct *ndpi_struct,
-			     struct ndpi_flow_struct *flow) {
+static void ndpi_search_ftp_control(struct ndpi_detection_module_struct *ndpi_struct,
+				    struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search FTP_CONTROL\n");
 
   /* skip marked packets */

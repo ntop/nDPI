@@ -246,7 +246,7 @@ static uint16_t gquic_get_u16(const uint8_t *buf, uint32_t version)
 }
 
 
-char *__gcry_err(gpg_error_t err, char *buf, size_t buflen)
+static char *__gcry_err(gpg_error_t err, char *buf, size_t buflen)
 {
   gpg_strerror_r(err, buf, buflen);
   /* I am not sure if the string will be always null-terminated...

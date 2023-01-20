@@ -92,8 +92,8 @@ static u_int32_t someip_data_cover_32(const u_int8_t *data)
 /**
  * Dissector function that searches SOME/IP headers
  */
-void ndpi_search_someip (struct ndpi_detection_module_struct *ndpi_struct,
-			 struct ndpi_flow_struct *flow)
+static void ndpi_search_someip(struct ndpi_detection_module_struct *ndpi_struct,
+			       struct ndpi_flow_struct *flow)
 {
   const struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   

@@ -27,7 +27,7 @@ const u_int16_t ookla_port = 8080;
 
 /* ************************************************************* */
 
-void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow) {
+static void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow) {
   struct ndpi_packet_struct* packet = &ndpi_struct->packet;
   u_int32_t addr = 0;
   u_int16_t sport, dport;

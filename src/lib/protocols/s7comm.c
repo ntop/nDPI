@@ -24,8 +24,8 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_S7COMM
 #include "ndpi_api.h"
 
-void ndpi_search_s7comm_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-                            struct ndpi_flow_struct *flow) {
+static void ndpi_search_s7comm_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+                                   struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   NDPI_LOG_DBG(ndpi_struct, "search S7\n");
   u_int16_t s7comm_port = htons(102); 

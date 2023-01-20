@@ -56,7 +56,7 @@ static void ndpi_check_amazon_video(struct ndpi_detection_module_struct *ndpi_st
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void ndpi_search_amazon_video(struct ndpi_detection_module_struct *ndpi_struct,
+static void ndpi_search_amazon_video(struct ndpi_detection_module_struct *ndpi_struct,
 			      struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search amazon_video\n");
 

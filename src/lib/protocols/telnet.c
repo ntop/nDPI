@@ -184,8 +184,8 @@ u_int8_t search_iac(struct ndpi_detection_module_struct *ndpi_struct,
 /* ************************************************************************ */
 
 /* this detection also works asymmetrically */
-void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-			    struct ndpi_flow_struct *flow) {
+static void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+				   struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search telnet\n");
 
   if(search_iac(ndpi_struct, flow) == 1) {

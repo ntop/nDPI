@@ -82,8 +82,8 @@ static int64_t get_var_int(const unsigned char *buf, int buf_len, u_int8_t *num_
 /**
  * Dissector function that searches Mqtt headers
  */
-void ndpi_search_mqtt (struct ndpi_detection_module_struct *ndpi_struct,
-		struct ndpi_flow_struct *flow)
+static void ndpi_search_mqtt(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow)
 {
 	u_int8_t pt,flags, rl_len;
 	int64_t rl;
