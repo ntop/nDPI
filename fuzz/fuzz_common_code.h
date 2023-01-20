@@ -8,14 +8,13 @@ extern "C"
 {
 #endif
 
-#ifdef ENABLE_MEM_ALLOC_FAILURES
-void *malloc_wrapper(size_t size);
-void free_wrapper(void *freeable);
-void set_mem_alloc_state(int value);
-#endif
-
 void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_mod,
 				int enable_log);
+
+/* To allow memory allocation failures */
+void fuzz_set_alloc_callbacks(void);
+void fuzz_set_alloc_seed(int seed);
+void fuzz_set_alloc_callbacks_and_seed(int seed);
 
 #ifdef __cplusplus
 }

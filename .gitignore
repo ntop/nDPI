@@ -65,6 +65,7 @@
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_seed_corpus.zip
 /fuzz/fuzz_quic_get_crypto_data_seed_corpus.zip
+/fuzz/fuzz_config_seed_corpus.zip
 /fuzz/fuzz_alg_ses_des_seed_corpus.zip
 /fuzz/fuzz_alg_bins_seed_corpus.zip
 /fuzz/fuzz_alg_hll_seed_corpus.zip

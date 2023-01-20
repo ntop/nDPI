@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include "fuzzer/FuzzedDataProvider.h"
 
-struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   u_int16_t i, num_iteration, num_learning_values;
@@ -17,11 +15,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.remaining_bytes() < 1024)
     return -1;
 
-  /* We don't really need the detection module, but this way we can enable
-     memory allocation failures */
-  if (ndpi_info_mod == NULL) {
-    fuzz_init_detection_module(&ndpi_info_mod, 0);
-  }
+  /* To allow memory allocation failures */
+  fuzz_set_alloc_callbacks_and_seed(size);
 
   num_learning_values = fuzzed_data.ConsumeIntegral<u_int16_t>();
   rc = ndpi_jitter_init(&s, num_learning_values);

@@ -29,11 +29,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 				     29 /* Min real data: ip length + udp length + 1 byte */)
     return -1;
 
-#ifdef ENABLE_MEM_ALLOC_FAILURES
-  set_ndpi_malloc(malloc_wrapper);
-  set_ndpi_free(free_wrapper);
-  set_mem_alloc_state(size);
-#endif
+  /* To allow memory allocation failures */
+  fuzz_set_alloc_callbacks_and_seed(size);
 
   ndpi_info_mod = ndpi_init_detection_module(fuzzed_data.ConsumeIntegral<u_int32_t>());
 

@@ -61,6 +61,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     prefs->max_ndpi_flows = 16 * 1024 * 1024;
     prefs->quiet_mode = 0;
 
+#ifdef ENABLE_MEM_ALLOC_FAILURES
+    fuzz_set_alloc_callbacks();
+#endif
+
     workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json);
     // enable all protocols
     NDPI_BITMASK_SET_ALL(all);
@@ -80,11 +84,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 	   sizeof(workflow->stats.protocol_flows));
     ndpi_finalize_initialization(workflow->ndpi_struct);
   }
+
 #ifdef ENABLE_MEM_ALLOC_FAILURES
   /* Don't fail memory allocations until init phase is done */
-  set_mem_alloc_state(Size);
+  fuzz_set_alloc_seed(Size);
 #endif
-
 
   fd = bufferToFile(Data, Size);
   if (fd == NULL)
