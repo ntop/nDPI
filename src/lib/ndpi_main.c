@@ -3469,16 +3469,12 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
     case NDPI_IPSEC_PROTOCOL_ESP:
     case NDPI_IPSEC_PROTOCOL_AH:
       return(NDPI_PROTOCOL_IPSEC);
-      break;
     case NDPI_GRE_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_GRE);
-      break;
     case NDPI_PGM_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_PGM);
-      break;
     case NDPI_PIM_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_PIM);
-      break;
     case NDPI_ICMP_PROTOCOL_TYPE:
       if(flow) {
         flow->entropy = 0.0f;
@@ -3514,22 +3510,16 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	}
       }
       return(NDPI_PROTOCOL_IP_ICMP);
-      break;
     case NDPI_IGMP_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_IGMP);
-      break;
     case NDPI_EGP_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_EGP);
-      break;
     case NDPI_SCTP_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_SCTP);
-      break;
     case NDPI_OSPF_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_OSPF);
-      break;
     case NDPI_IPIP_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_IP_IN_IP);
-      break;
     case NDPI_ICMPV6_PROTOCOL_TYPE:
       if(flow) {
 	/* Run some basic consistency tests */
@@ -3547,10 +3537,8 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 	}
       }
       return(NDPI_PROTOCOL_IP_ICMPV6);
-      break;
     case 112:
       return(NDPI_PROTOCOL_IP_VRRP);
-      break;
     }
   }
 
@@ -7648,6 +7636,9 @@ ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct
   ndpi_protocol ret = NDPI_PROTOCOL_NULL;
   u_int8_t user_defined_proto;
 
+  if(!ndpi_str)
+    return ret;
+
 #ifdef BITTORRENT_CACHE_DEBUG
   printf("[%s:%u] ndpi_guess_undetected_protocol(%08X, %u, %08X, %u) [flow: %p]\n",
 	 __FILE__, __LINE__, shost, sport, dhost, dport, flow);
@@ -7944,31 +7935,22 @@ char *ndpi_get_proto_breed_name(struct ndpi_detection_module_struct *ndpi_str,
   switch(breed_id) {
   case NDPI_PROTOCOL_SAFE:
     return("Safe");
-    break;
   case NDPI_PROTOCOL_ACCEPTABLE:
     return("Acceptable");
-    break;
   case NDPI_PROTOCOL_FUN:
     return("Fun");
-    break;
   case NDPI_PROTOCOL_UNSAFE:
     return("Unsafe");
-    break;
   case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
     return("Potentially Dangerous");
-    break;
   case NDPI_PROTOCOL_TRACKER_ADS:
     return("Tracker/Ads");
-    break;
   case NDPI_PROTOCOL_DANGEROUS:
     return("Dangerous");
-    break;
   case NDPI_PROTOCOL_UNRATED:
     return("Unrated");
-    break;
   default:
     return("???");
-    break;
   }
 }
 

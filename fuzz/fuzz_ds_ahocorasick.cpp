@@ -59,10 +59,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     ac_pattern.astring = value_dup;
     ac_pattern.length = strlen(value_dup);
-    ac_pattern.rep.number = 0;
+    ac_pattern.rep.number = fuzzed_data.ConsumeIntegral<u_int16_t>();
     ac_pattern.rep.category = 0;
     ac_pattern.rep.breed = 0;
     ac_pattern.rep.level = fuzzed_data.ConsumeIntegralInRange(0, 2);
+    ac_pattern.rep.from_start = fuzzed_data.ConsumeBool();
     ac_pattern.rep.at_end = fuzzed_data.ConsumeBool();
     ac_pattern.rep.dot = memchr(value_dup, '.', strlen(value_dup)) != NULL;
 

@@ -23,7 +23,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.remaining_bytes() < 4 + /* ndpi_init_detection_module() */
 				     NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
 				     5 + /* files */
-				     (NDPI_LRUCACHE_MAX * 5) + /* LRU caches */
+				     ((NDPI_LRUCACHE_MAX + 1) * 5) + /* LRU caches */
 				     2 + 1 + 4 + /* ndpi_set_detection_preferences() */
 				     7 + /* Opportunistic tls */
 				     29 /* Min real data: ip length + udp length + 1 byte */)
@@ -55,7 +55,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool())
     ndpi_load_malicious_sha1_file(ndpi_info_mod, "sha1_fingerprints.csv");
 
-  for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+  for(i = 0; i < NDPI_LRUCACHE_MAX + 1; i++) { /* + 1 to test invalid type */
     ndpi_set_lru_cache_size(ndpi_info_mod, static_cast<lru_cache_type>(i),
 			    fuzzed_data.ConsumeIntegralInRange(0, (1 << 16) - 1));
     ndpi_get_lru_cache_size(ndpi_info_mod, static_cast<lru_cache_type>(i), &num);
@@ -98,14 +98,20 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   assert(pkt.size() >= 29); /* To be sure check on fuzzed_data.remaining_bytes() at the beginning is right */
   ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, NULL);
   ndpi_detection_giveup(ndpi_info_mod, &flow, 1, &protocol_was_guessed);
+  /* ndpi_guess_undetected_protocol() is a "strange" function (since is ipv4 only)
+     but it is exported by the library and it is used by ntopng. Try fuzzing it, here */
+  if(!flow.is_ipv6)
+    ndpi_guess_undetected_protocol(ndpi_info_mod, &flow, flow.l4_proto,
+                                   flow.c_address.v4, flow.s_address.v4,
+                                   flow.c_port, flow.s_port);
   ndpi_free_flow_data(&flow);
 
   /* Get some final stats */
-  for(i = 0; i < NDPI_LRUCACHE_MAX; i++)
+  for(i = 0; i < NDPI_LRUCACHE_MAX + 1; i++) /* + 1 to test invalid type */
     ndpi_get_lru_cache_stats(ndpi_info_mod, static_cast<lru_cache_type>(i), &lru_stats);
-  for(i = 0; i < NDPI_PTREE_MAX; i++)
+  for(i = 0; i < NDPI_PTREE_MAX + 1; i++) /* + 1 to test invalid type */
     ndpi_get_patricia_stats(ndpi_info_mod, static_cast<ptree_type>(i), &patricia_stats);
-  for(i = 0; i < NDPI_AUTOMA_MAX; i++)
+  for(i = 0; i < NDPI_AUTOMA_MAX + 1; i++) /* + 1 to test invalid type */
     ndpi_get_automa_stats(ndpi_info_mod, static_cast<automa_type>(i), &automa_stats);
 
   ndpi_exit_detection_module(ndpi_info_mod);

@@ -1,8 +1,8 @@
-bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_quic_get_crypto_data fuzz_config
+bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_quic_get_crypto_data fuzz_config fuzz_community_id
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des
 #Data structures
-bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick
+bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree
 
 fuzz_process_packet_SOURCES = fuzz_process_packet.c fuzz_common_code.c
 fuzz_process_packet_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
@@ -70,6 +70,21 @@ endif
 fuzz_config_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_config_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_community_id_SOURCES = fuzz_community_id.cpp fuzz_common_code.c
+fuzz_community_id_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_community_id_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_community_id_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_community_id_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_community_id_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_community_id_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_community_id_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_community_id_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_community_id_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_bins_SOURCES = fuzz_alg_bins.cpp fuzz_common_code.c
 fuzz_alg_bins_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
@@ -176,6 +191,36 @@ fuzz_ds_ahocorasick_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_ahocorasick_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_ds_libcache_SOURCES = fuzz_ds_libcache.cpp fuzz_common_code.c
+fuzz_ds_libcache_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_ds_libcache_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_ds_libcache_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_ds_libcache_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_ds_libcache_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_libcache_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_libcache_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_ds_libcache_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_ds_libcache_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_ds_tree_SOURCES = fuzz_ds_tree.cpp fuzz_common_code.c
+fuzz_ds_tree_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_ds_tree_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_ds_tree_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_ds_tree_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_ds_tree_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_tree_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_tree_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_ds_tree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_ds_tree_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
 
 # required for Google oss-fuzz
 # see https://github.com/google/oss-fuzz/tree/master/projects/ndpi
@@ -196,6 +241,11 @@ files_corpus_fuzz_config :=  $(wildcard corpus/fuzz_config/*)
 
 fuzz_config_seed_corpus.zip: $(files_corpus_fuzz_config)
 	zip -j fuzz_config_seed_corpus.zip $(files_corpus_fuzz_config)
+
+files_corpus_fuzz_community_id :=  $(wildcard corpus/fuzz_community_id/*)
+
+fuzz_community_id_seed_corpus.zip: $(files_corpus_fuzz_community_id)
+	zip -j fuzz_community_id_seed_corpus.zip $(files_corpus_fuzz_community_id)
 
 files_corpus_fuzz_ds_patricia :=  $(wildcard corpus/fuzz_ds_patricia/*)
 
@@ -232,7 +282,25 @@ files_corpus_fuzz_alg_jitter :=  $(wildcard corpus/fuzz_alg_jitter/*)
 fuzz_alg_jitter_seed_corpus.zip: $(files_corpus_fuzz_alg_jitter)
 	zip -j fuzz_alg_jitter_seed_corpus.zip $(files_corpus_fuzz_alg_jitter)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip
+files_corpus_fuzz_ds_libcache :=  $(wildcard corpus/fuzz_ds_libcache/*)
+
+fuzz_ds_libcache_seed_corpus.zip: $(files_corpus_fuzz_ds_libcache)
+	zip -j fuzz_ds_libcache_seed_corpus.zip $(files_corpus_fuzz_ds_libcache)
+
+files_corpus_fuzz_ds_tree :=  $(wildcard corpus/fuzz_ds_tree/*)
+
+fuzz_ds_tree_seed_corpus.zip: $(files_corpus_fuzz_ds_tree)
+	zip -j fuzz_ds_tree_seed_corpus.zip $(files_corpus_fuzz_ds_tree)
+
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip
+
+#Create dictionaries exactly as expected by oss-fuzz.
+#This way, if we need to change/update/add something,
+#we don't need to update scripts in oss-fuzz repository
+dictionaries:
+	cp dictionary.dict fuzz_ndpi_reader.dict
+	cp dictionary.dict fuzz_ndpi_reader_alloc_fail.dict
+	cp dictionary.dict fuzz_process_packet.dict
 
 distdir:
 	find . -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
@@ -240,14 +308,18 @@ distdir:
 		-o -name '*.am' \
 		-o -name '*.h' \
 		-o -name '*.cpp' \
+		-o -name '*.dict' \
 		-o -path './corpus/fuzz_quic_get_crypto_data/*' \
 		-o -path './corpus/fuzz_config/*' \
+		-o -path './corpus/fuzz_community_id/*' \
 		-o -path './corpus/fuzz_alg_ses_des/*' \
 		-o -path './corpus/fuzz_alg_bins/*' \
 		-o -path './corpus/fuzz_alg_hll/*' \
 		-o -path './corpus/fuzz_alg_jitter/*' \
 		-o -path './corpus/fuzz_alg_hw_rsi_outliers_da/*' \
 		-o -path './corpus/fuzz_ds_ahocorasick/*' \
+		-o -path './corpus/fuzz_ds_libcache/*' \
+		-o -path './corpus/fuzz_ds_tree/*' \
 		-o -path './corpus/fuzz_ds_patricia/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 
-all: corpus
+all: corpus dictionaries

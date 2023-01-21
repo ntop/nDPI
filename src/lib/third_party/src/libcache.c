@@ -58,12 +58,12 @@ struct cache {
   cache_entry_map *map;
 };
 
-struct cache_entry_map {
+struct cache_entry_map_ {
   cache_entry entry;
   cache_entry_map next;
 };
 
-struct cache_entry {
+struct cache_entry_ {
   void *item;
   uint32_t item_size;
   cache_entry prev;
@@ -89,10 +89,10 @@ void cache_touch_entry(cache_t cache, cache_entry entry) {
 
 
 cache_entry cache_entry_new(void) {
-  return (cache_entry) ndpi_calloc(sizeof(struct cache_entry), 1);
+  return (cache_entry) ndpi_calloc(sizeof(struct cache_entry_), 1);
 }
 cache_entry_map cache_entry_map_new(void) {
-  return (cache_entry_map) ndpi_calloc(sizeof(struct cache_entry_map), 1);
+  return (cache_entry_map) ndpi_calloc(sizeof(struct cache_entry_map_), 1);
 }
 
 cache_t cache_new(uint32_t cache_max_size) {
@@ -192,7 +192,7 @@ cache_result cache_add(cache_t cache, void *item, uint32_t item_size) {
       cache_entry_map hash_entry_map = cache->map[hash];
       while(hash_entry_map) {
         if(tail->item_size == hash_entry_map->entry->item_size &&
-            !memcmp(tail->item, hash_entry_map->entry->item, item_size)) {
+            !memcmp(tail->item, hash_entry_map->entry->item, tail->item_size)) {
           break;
         }
         

@@ -128,8 +128,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
           ndpi_patricia_remove(p, node);
       }
     } else {
-      if(fuzzed_data.remaining_bytes() > 128) {
-        std::vector<u_int8_t>data = fuzzed_data.ConsumeBytes<u_int8_t>(128);
+      if(fuzzed_data.remaining_bytes() > 16) {
+        std::vector<u_int8_t>data = fuzzed_data.ConsumeBytes<u_int8_t>(16);
 	ip = data.data();
         ip_len = fuzzed_data.ConsumeIntegralInRange(0, 128);
         ndpi_fill_prefix_v6(&prefix, (const struct in6_addr *)ip, ip_len, 128);

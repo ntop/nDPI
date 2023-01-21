@@ -61,7 +61,8 @@ ip:54.80.47.130@AmazonPrime
 # For IPs, the flow risk is put in AND (source IP mask OR destination IP mask)
 # For Flows with a hostname (e.g. TLS) the risk is also put in AND with the host_risk_mask
 #ip_risk_mask:192.168.1.0/24=0
-#ip_risk_mask:10.196.157.228=0
+ip_risk_mask:10.10.120.0/24=0
+ip_risk_mask:10.196.157.228=0
 host_risk_mask:".home"=0
 
 

@@ -488,16 +488,12 @@ u_int64_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id) {
   switch(b->family) {
   case ndpi_bin_family8:
     return(b->u.bins8[slot_id]);
-    break;
   case ndpi_bin_family16:
     return(b->u.bins16[slot_id]);
-    break;
   case ndpi_bin_family32:
     return(b->u.bins32[slot_id]);
-    break;
   case ndpi_bin_family64:
     return(b->u.bins64[slot_id]);
-    break;
   }
 
   return(0);
