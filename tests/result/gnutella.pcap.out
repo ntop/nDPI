@@ -22,7 +22,7 @@ Automa risk mask:     4/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   1768/0 (search/found)
 Patricia risk:        2/0 (search/found)
-Patricia protocols:   1803/1 (search/found)
+Patricia protocols:   1804/0 (search/found)
 
 Unknown	1420	119471	592
 MDNS	18	1632	2
@@ -737,7 +737,7 @@ Undetected flows:
 	518	UDP 10.0.2.15:28681 -> 175.39.219.223:13482 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	519	UDP 10.0.2.15:28681 -> 175.39.219.223:31728 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	520	UDP 10.0.2.15:28681 -> 175.182.21.156:13732 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	521	UDP 10.0.2.15:28681 -> 180.149.125.139:6578 [proto: 0/Unknown][IP: 163/Tor][ClearText][Confidence: Unknown][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	521	UDP 10.0.2.15:28681 -> 180.149.125.139:6578 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	522	UDP 10.0.2.15:28681 -> 180.218.135.222:49867 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	523	UDP 10.0.2.15:28681 -> 182.155.128.228:3227 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	524	UDP 10.0.2.15:28681 -> 182.155.128.228:3256 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

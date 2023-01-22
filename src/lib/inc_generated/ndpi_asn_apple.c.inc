@@ -29,7 +29,6 @@ static ndpi_network ndpi_protocol_apple_protocol_list[] = {
  { 0x8BB28000 /* 139.178.128.0/18 */, 18, NDPI_PROTOCOL_APPLE },
  { 0x90B20000 /* 144.178.0.0/19 */, 19, NDPI_PROTOCOL_APPLE },
  { 0x90B22000 /* 144.178.32.0/24 */, 24, NDPI_PROTOCOL_APPLE },
- { 0x90B22400 /* 144.178.36.0/22 */, 22, NDPI_PROTOCOL_APPLE },
  { 0x90B23000 /* 144.178.48.0/20 */, 20, NDPI_PROTOCOL_APPLE },
  /* End */
  { 0x0, 0, 0 }
