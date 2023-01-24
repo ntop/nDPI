@@ -61,6 +61,7 @@
 /fuzz/fuzz_alg_ses_des
 /fuzz/fuzz_config
 /fuzz/fuzz_community_id
+/fuzz/fuzz_serialization
 /fuzz/fuzz_ds_patricia
 /fuzz/fuzz_ds_libcache
 /fuzz/fuzz_ds_tree
@@ -70,6 +71,7 @@
 /fuzz/fuzz_quic_get_crypto_data_seed_corpus.zip
 /fuzz/fuzz_config_seed_corpus.zip
 /fuzz/fuzz_community_id_seed_corpus.zip
+/fuzz/fuzz_serialization_seed_corpus.zip
 /fuzz/fuzz_alg_ses_des_seed_corpus.zip
 /fuzz/fuzz_alg_bins_seed_corpus.zip
 /fuzz/fuzz_alg_hll_seed_corpus.zip

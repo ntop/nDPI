@@ -1253,6 +1253,16 @@ extern "C" {
    * @param serializer The serializer handle
    * @param key The field name or ID
    * @param value The field value
+   * @param format The float value format
+   * @return 0 on success, a negative number otherwise
+   */
+  int ndpi_serialize_uint32_double(ndpi_serializer *serializer, u_int32_t key, double value, const char *format /* e.f. "%.2f" */);
+
+  /**
+   * Serialize a 32-bit unsigned int key and a double value
+   * @param serializer The serializer handle
+   * @param key The field name or ID
+   * @param value The field value
    * @param format The double value format
    * @return 0 on success, a negative number otherwise
    */
@@ -1275,6 +1285,16 @@ extern "C" {
    * @return 0 on success, a negative number otherwise
    */
   int ndpi_serialize_uint32_boolean(ndpi_serializer *serializer, u_int32_t key, u_int8_t value);
+
+  /**
+   * Serialize a 32-bit unsigned int and an unterminated string value
+   * @param serializer The serializer handle
+   * @param key The field name or ID
+   * @param value The field value
+   * @param vlen The value length
+   * @return 0 on success, a negative number otherwise
+   */
+  int ndpi_serialize_uint32_binary(ndpi_serializer *serializer, u_int32_t key, const char *_value, u_int16_t vlen);
 
   /**
    * Serialize an unterminated string key and a 32-bit signed int value
