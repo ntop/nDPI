@@ -88,6 +88,7 @@ flow_risks[46] = ProtoField.bool("ndpi.flow_risk.unidirectional_traffic", "Unidi
 flow_risks[47] = ProtoField.bool("ndpi.flow_risk.http_obsolete_server", "Obsolete HTTP Server", num_bits_flow_risks, nil, bit(15), "nDPI Flow Risk: Obsolete HTTP Server")
 flow_risks[48] = ProtoField.bool("ndpi.flow_risk.periodic_flow", "Periodic Flow", num_bits_flow_risks, nil, bit(16), "nDPI Flow Risk: Periodic Flow")
 flow_risks[49] = ProtoField.bool("ndpi.flow_risk.minor_issues", "Minor flow issues", num_bits_flow_risks, nil, bit(17), "nDPI Flow Risk: Minor flow issues")
+flow_risks[50] = ProtoField.bool("ndpi.flow_risk.tcp_issues", "TCP connection issues", num_bits_flow_risks, nil, bit(18), "nDPI Flow Risk: TCP connection issues")
 
 -- Last one: keep in sync the bitmask when adding new risks!!
 flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(13))

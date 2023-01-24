@@ -168,6 +168,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_HTTP_OBSOLETE_SERVER,                  NDPI_RISK_MEDIUM, CLIENT_LOW_RISK_PERCENTAGE,  NDPI_SERVER_ACCOUNTABLE },
   { NDPI_PERIODIC_FLOW,                         NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE,  NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_MINOR_ISSUES,                          NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE,  NDPI_BOTH_ACCOUNTABLE   },
+  { NDPI_TCP_ISSUES,                            NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY   }
@@ -5460,25 +5461,42 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     packet->packet_lines_parsed_complete = 0;
 
     if(tcph != NULL) {
+      u_int8_t flags = ((u_int8_t*)tcph)[13];
+      
+      if(flags == 0)
+	ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP NULL scan");
+      else if(flags == (TH_FIN | TH_PUSH | TH_URG))
+	ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP XMAS scan");
+      
       if(!ndpi_str->direction_detect_disable)
 	packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
 
-      if(ndpi_str->input_info == NULL ||
-         ndpi_str->input_info->seen_flow_beginning == NDPI_FLOW_BEGINNING_UNKNOWN) {
-        if(tcph->syn != 0 && tcph->ack == 0 && flow->l4.tcp.seen_syn == 0 && flow->l4.tcp.seen_syn_ack == 0 &&
-           flow->l4.tcp.seen_ack == 0) {
-          flow->l4.tcp.seen_syn = 1;
-        } else {
-          if(tcph->syn != 0 && tcph->ack != 0 && flow->l4.tcp.seen_syn == 1 && flow->l4.tcp.seen_syn_ack == 0 &&
-             flow->l4.tcp.seen_ack == 0) {
-            flow->l4.tcp.seen_syn_ack = 1;
-          } else {
-            if(tcph->syn == 0 && tcph->ack == 1 && flow->l4.tcp.seen_syn == 1 && flow->l4.tcp.seen_syn_ack == 1 &&
-               flow->l4.tcp.seen_ack == 0) {
-              flow->l4.tcp.seen_ack = 1;
-            }
-          }
-        }
+      if(packet->packet_direction == 0 /* cli -> srv */) {
+	if(flags == TH_FIN)
+	  ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP FIN scan");
+	
+	flow->l4.tcp.cli2srv_tcp_flags |= flags;
+      } else
+	flow->l4.tcp.srv2cli_tcp_flags |= flags;      
+      
+      if((ndpi_str->input_info == NULL)
+	 || ndpi_str->input_info->seen_flow_beginning == NDPI_FLOW_BEGINNING_UNKNOWN) {
+	if(tcph->syn != 0 && tcph->ack == 0 && flow->l4.tcp.seen_syn == 0
+	   && flow->l4.tcp.seen_syn_ack == 0 &&
+	   flow->l4.tcp.seen_ack == 0) {
+	  flow->l4.tcp.seen_syn = 1;
+	} else {
+	  if(tcph->syn != 0 && tcph->ack != 0 && flow->l4.tcp.seen_syn == 1
+	     && flow->l4.tcp.seen_syn_ack == 0 &&
+	     flow->l4.tcp.seen_ack == 0) {
+	    flow->l4.tcp.seen_syn_ack = 1;
+	  } else {
+	    if(tcph->syn == 0 && tcph->ack == 1 && flow->l4.tcp.seen_syn == 1 && flow->l4.tcp.seen_syn_ack == 1 &&
+	       flow->l4.tcp.seen_ack == 0) {
+	      flow->l4.tcp.seen_ack = 1;
+	    }
+	  }
+	}
       }
 
       if(flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0 ||
@@ -5525,7 +5543,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       if(tcph->rst) {
 	flow->next_tcp_seq_nr[0] = 0;
 	flow->next_tcp_seq_nr[1] = 0;
-      }
+      }      
     } else if(udph != NULL) {
       if(!ndpi_str->direction_detect_disable)
 	packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
@@ -5537,11 +5555,11 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       flow->init_finished = 1;
 
       if(tcph != NULL &&
-         ndpi_str->input_info &&
-         ndpi_str->input_info->seen_flow_beginning == NDPI_FLOW_BEGINNING_SEEN) {
-        flow->l4.tcp.seen_syn = 1;
-        flow->l4.tcp.seen_syn_ack = 1;
-        flow->l4.tcp.seen_ack = 1;
+	 ndpi_str->input_info &&
+	 ndpi_str->input_info->seen_flow_beginning == NDPI_FLOW_BEGINNING_SEEN) {
+	flow->l4.tcp.seen_syn = 1;
+	flow->l4.tcp.seen_syn_ack = 1;
+	flow->l4.tcp.seen_ack = 1;
       }
 
       /* Client/Server direction */
@@ -5549,70 +5567,74 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       s_port = 0;
       d_port = 0;
       if(tcph != NULL) {
-        s_port = tcph->source;
-        d_port = tcph->dest;
+	s_port = tcph->source;
+	d_port = tcph->dest;
       } else if(udph != NULL) {
-        s_port = udph->source;
-        d_port = udph->dest;
+	s_port = udph->source;
+	d_port = udph->dest;
       }
 
       if(ndpi_str->input_info &&
-         ndpi_str->input_info->in_pkt_dir != NDPI_IN_PKT_DIR_UNKNOWN) {
-        if(ndpi_str->input_info->in_pkt_dir == NDPI_IN_PKT_DIR_C_TO_S)
-          flow->client_packet_direction = packet->packet_direction;
-        else
-          flow->client_packet_direction = !packet->packet_direction;
+	 ndpi_str->input_info->in_pkt_dir != NDPI_IN_PKT_DIR_UNKNOWN) {
+	if(ndpi_str->input_info->in_pkt_dir == NDPI_IN_PKT_DIR_C_TO_S)
+	  flow->client_packet_direction = packet->packet_direction;
+	else
+	  flow->client_packet_direction = !packet->packet_direction;
       } else {
-        if(tcph && tcph->syn) {
-          if(tcph->ack == 0) {
-            flow->client_packet_direction = packet->packet_direction;
-          } else {
-            flow->client_packet_direction = !packet->packet_direction;
-          }
-        } else if(ntohs(s_port) > 1024 && ntohs(d_port) < 1024) {
-          flow->client_packet_direction = packet->packet_direction;
-        } else if(ntohs(s_port) < 1024 && ntohs(d_port) > 1024) {
-          flow->client_packet_direction = !packet->packet_direction;
-        } else {
-          flow->client_packet_direction = packet->packet_direction;
-        }
+	if(tcph && tcph->syn) {
+	  if(tcph->ack == 0) {
+	    flow->client_packet_direction = packet->packet_direction;
+	  } else {
+	    flow->client_packet_direction = !packet->packet_direction;
+	  }
+	} else if(ntohs(s_port) > 1024 && ntohs(d_port) < 1024) {
+	  flow->client_packet_direction = packet->packet_direction;
+	} else if(ntohs(s_port) < 1024 && ntohs(d_port) > 1024) {
+	  flow->client_packet_direction = !packet->packet_direction;
+	} else {
+	  flow->client_packet_direction = packet->packet_direction;
+	}
       }
 
       if(ndpi_current_pkt_from_client_to_server(packet, flow)) {
-        if(flow->is_ipv6 == 0) {
-          flow->c_address.v4 = packet->iph->saddr;
-          flow->s_address.v4 = packet->iph->daddr;
-        } else {
-          memcpy(flow->c_address.v6, &packet->iphv6->ip6_src, 16);
-          memcpy(flow->s_address.v6, &packet->iphv6->ip6_dst, 16);
-        }
-        flow->c_port = s_port;
-        flow->s_port = d_port;
+	if(flow->is_ipv6 == 0) {
+	  flow->c_address.v4 = packet->iph->saddr;
+	  flow->s_address.v4 = packet->iph->daddr;
+	} else {
+	  memcpy(flow->c_address.v6, &packet->iphv6->ip6_src, 16);
+	  memcpy(flow->s_address.v6, &packet->iphv6->ip6_dst, 16);
+	}
+	flow->c_port = s_port;
+	flow->s_port = d_port;
       } else {
-        if(flow->is_ipv6 == 0) {
-          flow->c_address.v4 = packet->iph->daddr;
-          flow->s_address.v4 = packet->iph->saddr;
-        } else {
-          memcpy(flow->c_address.v6, &packet->iphv6->ip6_dst, 16);
-          memcpy(flow->s_address.v6, &packet->iphv6->ip6_src, 16);
-        }
-        flow->c_port = d_port;
-        flow->s_port = s_port;
+	if(flow->is_ipv6 == 0) {
+	  flow->c_address.v4 = packet->iph->daddr;
+	  flow->s_address.v4 = packet->iph->saddr;
+	} else {
+	  memcpy(flow->c_address.v6, &packet->iphv6->ip6_dst, 16);
+	  memcpy(flow->s_address.v6, &packet->iphv6->ip6_src, 16);
+	}
+	flow->c_port = d_port;
+	flow->s_port = s_port;
       }
     }
 
     if(flow->packet_counter < MAX_PACKET_COUNTER && packet->payload_packet_len) {
       flow->packet_counter++;
     }
-    if(flow->packet_direction_counter[packet->packet_direction] < MAX_PACKET_COUNTER &&
-       packet->payload_packet_len) {
+
+    if(flow->all_packets_counter < MAX_PACKET_COUNTER)
+      flow->all_packets_counter++;
+    
+    if((flow->packet_direction_counter[packet->packet_direction] < MAX_PACKET_COUNTER)
+       /* && packet->payload_packet_len */) {
       flow->packet_direction_counter[packet->packet_direction]++;
     }
 
     if(flow->packet_direction_complete_counter[packet->packet_direction] < MAX_PACKET_COUNTER) {
       flow->packet_direction_complete_counter[packet->packet_direction]++;
     }
-
+    
     if(ndpi_is_multi_or_broadcast(packet))
       ; /* multicast or broadcast */
     else {
@@ -6030,6 +6052,31 @@ static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndp
 
 /* ********************************************************************************* */
 
+/*
+  NOTE:
+
+  This function is called only by ndpi_detection_giveup() as it checks
+  flows that have anomalous conditions such as SYN+RST ACK+RST....
+  As these conditions won't happen with nDPI protocol-detected protocols
+  it is not necessary to call this function elsewhere
+ */
+static void ndpi_check_tcp_flags(struct ndpi_detection_module_struct *ndpi_str,
+				 struct ndpi_flow_struct *flow) {
+#if 0
+  printf("[TOTAL] %u / %u [tot: %u]\n", flow->packet_direction_counter[0], flow->packet_direction_counter[1], flow->all_packets_counter);
+#endif
+  
+  if((flow->l4.tcp.cli2srv_tcp_flags & TH_SYN)
+     && (flow->l4.tcp.srv2cli_tcp_flags & TH_RST)
+     && (flow->all_packets_counter < 5 /* Ignore connections terminated by RST but that exchanged data */)
+     )
+    ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "Connection refused");
+  else if((flow->l4.tcp.srv2cli_tcp_flags & TH_RST) && (flow->packet_direction_counter[1 /* server -> client */] == 1))
+    ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP probing attempt");
+}
+
+/* ********************************************************************************* */
+
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 				    u_int8_t enable_guess, u_int8_t *protocol_was_guessed) {
   ndpi_protocol ret = NDPI_PROTOCOL_NULL;
@@ -6042,6 +6089,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if(!ndpi_str || !flow)
     return(ret);
 
+  if(flow->l4_proto == IPPROTO_TCP)
+    ndpi_check_tcp_flags(ndpi_str, flow);
+  
   /* Init defaults */
   ret.master_protocol = flow->detected_protocol_stack[1];
   ret.app_protocol = flow->detected_protocol_stack[0];

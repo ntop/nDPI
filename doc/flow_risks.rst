@@ -301,5 +301,11 @@ This risk is generated whenever a flow is observed at a specific periodic pace (
 .. _Risk 049:
 
 NDPI_MINOR_ISSUES
-=====================
+=================
 Minor packet/flow issues (e.g. DNS traffic with zero TTL) have been detected.
+
+.. _Risk 050:
+
+NDPI_TCP_ISSUES
+===============
+Relevant TCP connection issues such as connection refused, scan, or probe attempt.

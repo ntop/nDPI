@@ -2051,6 +2051,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_MINOR_ISSUES:
     return("Minor Issues");
     
+  case NDPI_TCP_ISSUES:
+    return("TCP Connection Issues");
+    
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
