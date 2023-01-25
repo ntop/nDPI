@@ -2304,6 +2304,9 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
+  if(!ndpi_str->protocols_ptree)
+    return(NDPI_PROTOCOL_UNKNOWN);
+
   if(ndpi_str->ndpi_num_custom_protocols == 0) {
     /*
       In case we don't have defined any custom protocol we check the ptree
