@@ -39,8 +39,10 @@
 #endif
 
 #include <time.h>
+
 #ifndef WIN32
 #include <unistd.h>
+#include <netinet/tcp.h> /* TCP flags */
 #endif
 
 #if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
