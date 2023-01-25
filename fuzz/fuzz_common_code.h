@@ -8,8 +8,7 @@ extern "C"
 {
 #endif
 
-void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_mod,
-				int enable_log);
+void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_mod);
 
 /* To allow memory allocation failures */
 void fuzz_set_alloc_callbacks(void);

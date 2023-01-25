@@ -23,15 +23,19 @@ SOFTWARE.
  *
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #ifndef __DESELMO_LIBCACHE_H__
 #define __DESELMO_LIBCACHE_H__
 
 #include <stdint.h>
 
-typedef struct cache_entry *cache_entry;
+typedef struct cache_entry_ *cache_entry;
 
-typedef struct cache_entry_map *cache_entry_map;
+typedef struct cache_entry_map_ *cache_entry_map;
 
 /**
  * @brief Codes representing the result of some functions
@@ -106,4 +110,8 @@ void cache_free(cache_t cache);
 cache_entry cache_entry_new(void);
 cache_entry_map cache_entry_map_new(void);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

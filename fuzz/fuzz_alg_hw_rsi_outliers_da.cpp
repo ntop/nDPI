@@ -46,7 +46,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   alpha = fuzzed_data.ConsumeFloatingPointInRange<double>(0, 1);
   beta = fuzzed_data.ConsumeFloatingPointInRange<double>(0, 1);
   gamma = fuzzed_data.ConsumeFloatingPointInRange<double>(0, 1);
-  significance = fuzzed_data.ConsumeFloatingPointInRange<float>(0, 1);
+  significance = fuzzed_data.ConsumeFloatingPointInRange<float>(0, 1.1);
   rc_hw = ndpi_hw_init(&hw, num_periods, additive_seeasonal,
                        alpha, beta, gamma, significance);
   /* Init RSI */
