@@ -43,8 +43,8 @@ static void ndpi_int_tplink_shp_add_connection(struct ndpi_detection_module_stru
 
 /* ***************************************************** */
 
-void ndpi_search_tplink_shp(struct ndpi_detection_module_struct *ndpi_struct,
-                               struct ndpi_flow_struct *flow)
+static void ndpi_search_tplink_shp(struct ndpi_detection_module_struct *ndpi_struct,
+                                   struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 

@@ -2361,17 +2361,6 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
 
 /* *********************************************** */
 
-/**
- * @brief On Protocol Discover - demo callback
- */
-static void on_protocol_discovered(struct ndpi_workflow * workflow,
-                                   struct ndpi_flow_info * flow,
-                                   void * udata) {
-  ;
-}
-
-/* *********************************************** */
-
 #if 0
 /**
  * @brief Print debug
@@ -2429,11 +2418,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
                                                             serialization_format);
-
-  /* Preferences */
-  ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow,
-                                           on_protocol_discovered,
-                                           (void *)(uintptr_t)thread_id);
 
   /* Protocols to enable/disable. Default: everything is enabled */
   NDPI_BITMASK_SET_ALL(enabled_bitmask);

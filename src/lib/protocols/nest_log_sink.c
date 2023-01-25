@@ -33,9 +33,8 @@
 #define NEST_LOG_SINK_MIN_LEN       8
 #define NEST_LOG_SINK_MIN_MATCH     3
 
-void ndpi_search_nest_log_sink(
-        struct ndpi_detection_module_struct *ndpi_struct,
-        struct ndpi_flow_struct *flow)
+static void ndpi_search_nest_log_sink(struct ndpi_detection_module_struct *ndpi_struct,
+                                      struct ndpi_flow_struct *flow)
 {
     struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 

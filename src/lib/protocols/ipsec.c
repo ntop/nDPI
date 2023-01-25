@@ -126,8 +126,8 @@ static enum isakmp_type ndpi_int_check_isakmp_v2(struct ndpi_packet_struct const
   return isakmp_type;
 }
 
-void ndpi_search_ipsec(struct ndpi_detection_module_struct *ndpi_struct,
-                       struct ndpi_flow_struct *flow)
+static void ndpi_search_ipsec(struct ndpi_detection_module_struct *ndpi_struct,
+                              struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
   u_int16_t isakmp_offset = 0;

@@ -30,8 +30,8 @@
 
 /* ******************************************************** */
 
-void ndpi_search_dnp3_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-			  struct ndpi_flow_struct *flow) {
+static void ndpi_search_dnp3_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+				 struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search DNP3\n");

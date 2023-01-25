@@ -31,8 +31,8 @@
 #define HSRP_PORT	1985
 #define HSRP_PORT_V6	2029
 
-void ndpi_search_hsrp(struct ndpi_detection_module_struct *ndpi_struct,
-		      struct ndpi_flow_struct *flow) {
+static void ndpi_search_hsrp(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t port_to_match;
 

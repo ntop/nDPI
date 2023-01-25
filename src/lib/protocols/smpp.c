@@ -38,8 +38,8 @@ static  u_int8_t ndpi_check_overflow(u_int32_t current_length, u_int32_t total_l
     return (current_length > 0 && current_length > INT_MAX - total_lenth);
 }
 
-void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct, 
-                          struct ndpi_flow_struct* flow)
+static void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struct,
+                                 struct ndpi_flow_struct* flow)
 {
   struct ndpi_packet_struct* packet = &ndpi_struct->packet;
 

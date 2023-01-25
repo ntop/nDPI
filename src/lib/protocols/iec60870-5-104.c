@@ -28,8 +28,8 @@
 
 #include "ndpi_api.h"
 
-void ndpi_search_iec60870_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-                            struct ndpi_flow_struct *flow) {
+static void ndpi_search_iec60870_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+                                     struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   /* Check connection over TCP */

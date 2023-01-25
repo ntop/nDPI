@@ -103,7 +103,9 @@ char *gpg_strerror_r(gcry_error_t err,char *buf, size_t buflen) {
 }
 
 int gcry_control (int ctl,int val) {
-    if(ctl == GCRYCTL_INITIALIZATION_FINISHED) return GPG_ERR_NO_ERROR;
+    if(ctl == GCRYCTL_INITIALIZATION_FINISHED ||
+       (ctl == 1 && val == 0) /* GCRYCTL_INITIALIZATION_FINISHED_P */)
+        return GPG_ERR_NO_ERROR;
     return MBEDTLS_ERR_NOT_SUPPORT;
 }
 

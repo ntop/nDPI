@@ -105,8 +105,8 @@ static bool ndpi_check_valid_cassandra_flags(uint8_t flags)
   return (flags & 0xF0) == 0;
 }
 
-void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_struct,
-                           struct ndpi_flow_struct *flow)
+static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_struct,
+                                  struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 

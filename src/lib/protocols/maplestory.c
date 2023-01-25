@@ -34,7 +34,7 @@ static void ndpi_int_maplestory_add_connection(struct ndpi_detection_module_stru
 }
 
 
-void ndpi_search_maplestory(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+static void ndpi_search_maplestory(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	

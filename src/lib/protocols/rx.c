@@ -76,8 +76,8 @@ struct ndpi_rx_header {
 
 
 
-void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
-                   struct ndpi_flow_struct *flow)
+static void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
+                          struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
@@ -202,8 +202,8 @@ void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-void ndpi_search_rx(struct ndpi_detection_module_struct *ndpi_struct,
-                    struct ndpi_flow_struct *flow)
+static void ndpi_search_rx(struct ndpi_detection_module_struct *ndpi_struct,
+                           struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_DBG(ndpi_struct, "search RX\n");
   if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RX) {

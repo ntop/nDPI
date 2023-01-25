@@ -105,7 +105,7 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
   }
 }
 
-void ndpi_search_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+static void ndpi_search_skype(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_DBG(ndpi_struct, "search skype\n");
 

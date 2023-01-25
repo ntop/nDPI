@@ -55,8 +55,8 @@ static int ndpi_int_sd_rtn_dissect_sni(struct ndpi_flow_struct * const flow,
   return 0;
 }
 
-void ndpi_search_sd_rtn(struct ndpi_detection_module_struct *ndpi_struct,
-                        struct ndpi_flow_struct *flow)
+static void ndpi_search_sd_rtn(struct ndpi_detection_module_struct *ndpi_struct,
+                               struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
 

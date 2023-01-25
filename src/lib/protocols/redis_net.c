@@ -73,7 +73,7 @@ static void ndpi_check_redis(struct ndpi_detection_module_struct *ndpi_struct, s
     return; /* Too early */
 }
 
-void ndpi_search_redis(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static void ndpi_search_redis(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search Redis\n");
 
   /* skip marked packets */

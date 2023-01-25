@@ -66,7 +66,7 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
   }
 }
 
-void ndpi_search_radius(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+static void ndpi_search_radius(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_DBG(ndpi_struct, "search radius\n");
 

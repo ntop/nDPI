@@ -17,8 +17,8 @@ static void ndpi_int_rtcp_add_connection(struct ndpi_detection_module_struct
 			     NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
-void ndpi_search_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
-		      struct ndpi_flow_struct *flow)
+static void ndpi_search_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t dport = 0, sport = 0;

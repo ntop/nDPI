@@ -33,8 +33,8 @@ struct ndpi_drda_hdr {
 };
 
 
-void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
-		      struct ndpi_flow_struct *flow)
+static void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct * packet = &ndpi_struct->packet;
   u_int16_t payload_len = packet->payload_packet_len;

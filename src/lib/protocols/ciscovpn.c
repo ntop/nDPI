@@ -35,7 +35,7 @@ static void ndpi_int_ciscovpn_add_connection(struct ndpi_detection_module_struct
 
 /* ****************************************************************** */
 
-void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+static void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t udport = 0, usport = 0;

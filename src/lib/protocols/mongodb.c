@@ -119,8 +119,8 @@ static void ndpi_check_mongodb(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-void ndpi_search_mongodb(struct ndpi_detection_module_struct *ndpi_struct,
-			 struct ndpi_flow_struct *flow)
+static void ndpi_search_mongodb(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow)
 {
   // Break after 6 packets.
   if(flow->packet_counter > 6) {

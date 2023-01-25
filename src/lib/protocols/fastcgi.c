@@ -154,8 +154,8 @@ static int fcgi_parse_params(struct ndpi_flow_struct * const flow,
   return 0;
 }
 
-void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct,
-                         struct ndpi_flow_struct *flow)
+static void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct,
+                                struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
   struct FCGI_Header const * fcgi_hdr;
