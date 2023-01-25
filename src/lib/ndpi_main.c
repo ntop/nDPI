@@ -42,7 +42,15 @@
 
 #ifndef WIN32
 #include <unistd.h>
-#include <netinet/tcp.h> /* TCP flags */
+#endif
+
+#ifndef TH_FIN
+#define TH_FIN        0x01
+#define TH_SYN        0x02
+#define TH_RST        0x04
+#define TH_PUSH       0x08
+#define TH_ACK        0x10
+#define TH_URG        0x20
 #endif
 
 #if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
@@ -171,7 +179,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_PERIODIC_FLOW,                         NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE,  NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_MINOR_ISSUES,                          NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE,  NDPI_BOTH_ACCOUNTABLE   },
   { NDPI_TCP_ISSUES,                            NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
-  
+
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY   }
 };
@@ -4834,7 +4842,7 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 		       ndpi_str->callback_buffer_size_non_tcp_udp,
 		       sizeof(struct ndpi_call_function_struct));
   if(!all_cb) return 1;
-  
+
   ndpi_str->callback_buffer_tcp_payload = all_cb;
   all_cb += ndpi_str->callback_buffer_size_tcp_payload;
   ndpi_str->callback_buffer_tcp_no_payload = all_cb;
@@ -5452,23 +5460,23 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     if(tcph != NULL) {
       u_int8_t flags = ((u_int8_t*)tcph)[13];
-      
+
       if(flags == 0)
 	ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP NULL scan");
       else if(flags == (TH_FIN | TH_PUSH | TH_URG))
 	ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP XMAS scan");
-      
+
       if(!ndpi_str->direction_detect_disable)
 	packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
 
       if(packet->packet_direction == 0 /* cli -> srv */) {
 	if(flags == TH_FIN)
 	  ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP FIN scan");
-	
+
 	flow->l4.tcp.cli2srv_tcp_flags |= flags;
       } else
-	flow->l4.tcp.srv2cli_tcp_flags |= flags;      
-      
+	flow->l4.tcp.srv2cli_tcp_flags |= flags;
+
       if((ndpi_str->input_info == NULL)
 	 || ndpi_str->input_info->seen_flow_beginning == NDPI_FLOW_BEGINNING_UNKNOWN) {
 	if(tcph->syn != 0 && tcph->ack == 0 && flow->l4.tcp.seen_syn == 0
@@ -5533,7 +5541,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       if(tcph->rst) {
 	flow->next_tcp_seq_nr[0] = 0;
 	flow->next_tcp_seq_nr[1] = 0;
-      }      
+      }
     } else if(udph != NULL) {
       if(!ndpi_str->direction_detect_disable)
 	packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
@@ -5615,7 +5623,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     if(flow->all_packets_counter < MAX_PACKET_COUNTER)
       flow->all_packets_counter++;
-    
+
     if((flow->packet_direction_counter[packet->packet_direction] < MAX_PACKET_COUNTER)
        /* && packet->payload_packet_len */) {
       flow->packet_direction_counter[packet->packet_direction]++;
@@ -5624,7 +5632,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(flow->packet_direction_complete_counter[packet->packet_direction] < MAX_PACKET_COUNTER) {
       flow->packet_direction_complete_counter[packet->packet_direction]++;
     }
-    
+
     if(ndpi_is_multi_or_broadcast(packet))
       ; /* multicast or broadcast */
     else {
@@ -6055,7 +6063,7 @@ static void ndpi_check_tcp_flags(struct ndpi_detection_module_struct *ndpi_str,
 #if 0
   printf("[TOTAL] %u / %u [tot: %u]\n", flow->packet_direction_counter[0], flow->packet_direction_counter[1], flow->all_packets_counter);
 #endif
-  
+
   if((flow->l4.tcp.cli2srv_tcp_flags & TH_SYN)
      && (flow->l4.tcp.srv2cli_tcp_flags & TH_RST)
      && (flow->all_packets_counter < 5 /* Ignore connections terminated by RST but that exchanged data */)
@@ -6081,7 +6089,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   if(flow->l4_proto == IPPROTO_TCP)
     ndpi_check_tcp_flags(ndpi_str, flow);
-  
+
   /* Init defaults */
   ret.master_protocol = flow->detected_protocol_stack[1];
   ret.app_protocol = flow->detected_protocol_stack[0];
@@ -6517,7 +6525,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
   ndpi_protocol ret;
 
   memset(&ret, 0, sizeof(ret));
-  
+
   if(!flow || !ndpi_str)
     return(ret);
 
@@ -6964,7 +6972,7 @@ u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t *str, u_int16_t max_chars_to_re
 
 void ndpi_parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
-  
+
   /* First line of a HTTP response parsing. Expected a "HTTP/1.? ???" */
   if(packet->parsed_lines == 0 && packet->line[0].len >= NDPI_STATICSTRING_LEN("HTTP/1.X 200 ") &&
      strncasecmp((const char *) packet->line[0].ptr, "HTTP/1.", NDPI_STATICSTRING_LEN("HTTP/1.")) == 0 &&
@@ -6990,15 +6998,15 @@ void ndpi_parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str
   }
 
   if((packet->parsed_lines == 0) && (packet->line[0].len > 0)) {
-    /* 
+    /*
        Check if the file contains a : otherwise ignore the line as this
        line i slike "GET /....
     */
-    
+
     if(memchr((char*)packet->line[0].ptr, ':', packet->line[0].len) == NULL)
       return;
   }
-  
+
   /* "Server:" header line in HTTP response */
   if(packet->line[packet->parsed_lines].len > NDPI_STATICSTRING_LEN("Server:") + 1 &&
      strncasecmp((const char *) packet->line[packet->parsed_lines].ptr,
@@ -7234,7 +7242,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
 	(u_int16_t)(((size_t) &packet->payload[a]) - ((size_t) packet->line[packet->parsed_lines].ptr));
 
       ndpi_parse_single_packet_line(ndpi_str, flow);
-      
+
       if(packet->line[packet->parsed_lines].len == 0) {
 	packet->empty_line_position = a;
 	packet->empty_line_position_set = 1;
