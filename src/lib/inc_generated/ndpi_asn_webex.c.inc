@@ -21,6 +21,7 @@
 
 
 static ndpi_network ndpi_protocol_webex_protocol_list[] = {
+ { 0x0826D800 /* 8.38.216.0/24 */, 24, NDPI_PROTOCOL_WEBEX },
  { 0x17590000 /* 23.89.0.0/17 */, 17, NDPI_PROTOCOL_WEBEX },
  { 0x17598000 /* 23.89.128.0/19 */, 19, NDPI_PROTOCOL_WEBEX },
  { 0x1759A000 /* 23.89.160.0/20 */, 20, NDPI_PROTOCOL_WEBEX },
@@ -32,6 +33,7 @@ static ndpi_network ndpi_protocol_webex_protocol_list[] = {
  { 0x42A32000 /* 66.163.32.0/19 */, 19, NDPI_PROTOCOL_WEBEX },
  { 0x451AA000 /* 69.26.160.0/19 */, 19, NDPI_PROTOCOL_WEBEX },
  { 0x721DC000 /* 114.29.192.0/19 */, 19, NDPI_PROTOCOL_WEBEX },
+ { 0x8BB15800 /* 139.177.88.0/22 */, 22, NDPI_PROTOCOL_WEBEX },
  { 0x8BB15C00 /* 139.177.92.0/23 */, 23, NDPI_PROTOCOL_WEBEX },
  { 0x96FD8000 /* 150.253.128.0/17 */, 17, NDPI_PROTOCOL_WEBEX },
  { 0xAA480000 /* 170.72.0.0/17 */, 17, NDPI_PROTOCOL_WEBEX },
