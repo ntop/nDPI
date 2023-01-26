@@ -656,6 +656,7 @@ int cmpFlows(const void *_a, const void *_b) {
   if(htons(fa->src_port) < htons(fb->src_port)) return(-1); else { if(htons(fa->src_port) > htons(fb->src_port)) return(1); }
   if(htonl(fa->dst_ip)   < htonl(fb->dst_ip)  ) return(-1); else { if(htonl(fa->dst_ip)   > htonl(fb->dst_ip)  ) return(1); }
   if(htons(fa->dst_port) < htons(fb->dst_port)) return(-1); else { if(htons(fa->dst_port) > htons(fb->dst_port)) return(1); }
+  if(fa->vlan_id < fb->vlan_id) return(-1); else { if(fa->vlan_id > fb->vlan_id) return(1); }
   return(0);
 }
 
