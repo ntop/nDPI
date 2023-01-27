@@ -65,7 +65,7 @@ static int verbose = 0;
 #define FLT_MAX 3.402823466e+38F
 
 int serializerUnitTest() {
-  ndpi_serializer serializer, deserializer;
+  ndpi_serializer serializer, serializer_cloned, deserializer;
   int i, loop_id;
   ndpi_serialization_format fmt = {0};
   u_int32_t buffer_len;
@@ -74,6 +74,7 @@ int serializerUnitTest() {
   json_object *j;
 
   memset(&serializer, 0, sizeof(serializer));
+  memset(&serializer_cloned, 0, sizeof(serializer_cloned));
   memset(&deserializer, 0, sizeof(deserializer));
   
   for(loop_id=0; loop_id<3; loop_id++) {
@@ -234,6 +235,18 @@ int serializerUnitTest() {
 
 	ndpi_deserialize_next(&deserializer);
       }
+
+      /* Converting from TLV to JSON */
+
+      assert(ndpi_init_deserializer(&deserializer, &serializer) != -1);
+      assert(ndpi_init_serializer(&serializer_cloned, ndpi_serialization_format_json) != -1);
+      assert(ndpi_deserialize_clone_all(&deserializer, &serializer_cloned) == 0);
+
+      buffer = ndpi_serializer_get_buffer(&serializer_cloned, &buffer_len);
+      if(verbose)
+        printf("TLV->JSON: %s\n", buffer);
+
+      ndpi_term_serializer(&serializer_cloned);
     }
 
     ndpi_term_serializer(&serializer);

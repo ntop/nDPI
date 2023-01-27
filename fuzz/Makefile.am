@@ -1,4 +1,4 @@
-bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_quic_get_crypto_data fuzz_config fuzz_community_id
+bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des
 #Data structures
@@ -85,6 +85,21 @@ endif
 fuzz_community_id_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_community_id_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_serialization_SOURCES = fuzz_serialization.cpp fuzz_common_code.c
+fuzz_serialization_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_serialization_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+fuzz_serialization_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_serialization_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_serialization_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_serialization_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_serialization_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_serialization_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_serialization_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_bins_SOURCES = fuzz_alg_bins.cpp fuzz_common_code.c
 fuzz_alg_bins_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
@@ -242,6 +257,11 @@ files_corpus_fuzz_config :=  $(wildcard corpus/fuzz_config/*)
 fuzz_config_seed_corpus.zip: $(files_corpus_fuzz_config)
 	zip -j fuzz_config_seed_corpus.zip $(files_corpus_fuzz_config)
 
+files_corpus_fuzz_serialization :=  $(wildcard corpus/fuzz_serialization/*)
+
+fuzz_serialization_seed_corpus.zip: $(files_corpus_fuzz_serialization)
+	zip -j fuzz_serialization_seed_corpus.zip $(files_corpus_fuzz_serialization)
+
 files_corpus_fuzz_community_id :=  $(wildcard corpus/fuzz_community_id/*)
 
 fuzz_community_id_seed_corpus.zip: $(files_corpus_fuzz_community_id)
@@ -292,7 +312,7 @@ files_corpus_fuzz_ds_tree :=  $(wildcard corpus/fuzz_ds_tree/*)
 fuzz_ds_tree_seed_corpus.zip: $(files_corpus_fuzz_ds_tree)
 	zip -j fuzz_ds_tree_seed_corpus.zip $(files_corpus_fuzz_ds_tree)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip
 
 #Create dictionaries exactly as expected by oss-fuzz.
 #This way, if we need to change/update/add something,
@@ -311,6 +331,7 @@ distdir:
 		-o -name '*.dict' \
 		-o -path './corpus/fuzz_quic_get_crypto_data/*' \
 		-o -path './corpus/fuzz_config/*' \
+		-o -path './corpus/fuzz_serialization/*' \
 		-o -path './corpus/fuzz_community_id/*' \
 		-o -path './corpus/fuzz_alg_ses_des/*' \
 		-o -path './corpus/fuzz_alg_bins/*' \
