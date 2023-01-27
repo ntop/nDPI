@@ -1641,7 +1641,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	flow->has_human_readeable_strings = 0;
     }
   } else { // flow is NULL
-    workflow->stats.total_discarded_bytes++;
+    workflow->stats.total_discarded_bytes += header->len;
     return(nproto);
   }
 
