@@ -30,10 +30,6 @@
 #include "../include/MurmurHash3.h"
 #include "../include/hll.h"
 
-u_int32_t _hll_hash(const struct ndpi_hll *hll) {
-  return MurmurHash3_x86_32(hll->registers, (u_int32_t)hll->size, 0);
-}
-
 /* Count the number of leading zero's */
 static __inline u_int8_t _hll_rank(u_int32_t hash, u_int8_t bits) {
   u_int8_t i;

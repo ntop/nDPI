@@ -4034,7 +4034,7 @@ static void ndpi_process_packet(u_char *args,
     trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
     crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
-    *crc = ethernet_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer));
+    *crc = ndpi_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer));
     h.caplen += delta, h.len += delta;
 
 #ifdef DEBUG_TRACE

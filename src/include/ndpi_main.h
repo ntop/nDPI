@@ -125,6 +125,8 @@ extern "C" {
 
   extern u_int8_t ndpi_is_proto(ndpi_protocol proto, u_int16_t p);
 
+  extern void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
 					     const char **file, const char **func, u_int32_t * line);

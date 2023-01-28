@@ -339,6 +339,8 @@ u_int32_t ndpi_detection_get_sizeof_ndpi_flow_udp_struct(void) {
 /* *********************************************************************************** */
 
 char *ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_str, u_int id) {
+  if(!ndpi_str)
+    return NULL;
   return((id >= ndpi_str->ndpi_num_supported_protocols) ? NULL : ndpi_str->proto_defaults[id].protoName);
 }
 
@@ -346,10 +348,16 @@ char *ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_str, u_int 
 
 u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_str, const char *name) {
   u_int16_t i, num = ndpi_get_num_supported_protocols(ndpi_str);
+  char *p;
 
-  for(i = 0; i < num; i++)
-    if(strcasecmp(ndpi_get_proto_by_id(ndpi_str, i), name) == 0)
+  if(!ndpi_str || !name)
+    return(NDPI_PROTOCOL_UNKNOWN);
+
+  for(i = 0; i < num; i++) {
+    p = ndpi_get_proto_by_id(ndpi_str, i);
+    if(p && strcasecmp(p, name) == 0)
       return(i);
+  }
 
   return(NDPI_PROTOCOL_UNKNOWN);
 }
@@ -402,7 +410,7 @@ void ndpi_set_proto_breed(struct ndpi_detection_module_struct *ndpi_str,
 			  u_int16_t protoId, ndpi_protocol_breed_t breed) {
   if(!ndpi_is_valid_protoId(protoId))
     return;
-  else
+  else if(ndpi_str)
     ndpi_str->proto_defaults[protoId].protoBreed = breed;
 }
 
@@ -412,7 +420,7 @@ void ndpi_set_proto_category(struct ndpi_detection_module_struct *ndpi_str, u_in
                              ndpi_protocol_category_t protoCategory) {
   if(!ndpi_is_valid_protoId(protoId))
     return;
-  else
+  else if(ndpi_str)
     ndpi_str->proto_defaults[protoId].protoCategory = protoCategory;
 }
 
@@ -2167,6 +2175,8 @@ int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
 /* ******************************************************************** */
 
 u_int16_t ndpi_patricia_get_maxbits(ndpi_patricia_tree_t *tree) {
+  if(!tree)
+    return 0;
   return(tree->maxbits);
 }
 
@@ -3261,7 +3271,7 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
     ndpi_patricia_node_t *node;
 
     /* Make sure all in network byte order otherwise compares wont work */
-    ndpi_fill_prefix_v4(&prefix, &pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+    ndpi_fill_prefix_v4(&prefix, &pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses)->maxbits);
     node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
 
     if(node) {
@@ -3560,7 +3570,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 /* ******************************************************************** */
 
 u_int ndpi_get_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_str) {
-  return(ndpi_str->ndpi_num_supported_protocols);
+  return(ndpi_str ? ndpi_str->ndpi_num_supported_protocols : 0);
 }
 
 /* ******************************************************************** */
@@ -6354,14 +6364,14 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
     else {
       /* Make sure all in network byte order otherwise compares wont work */
       ndpi_fill_prefix_v4(&prefix, (struct in_addr *) &saddr, 32,
-			  ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+			  ((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses)->maxbits);
       node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
     }
 
     if(!node) {
       if(daddr != 0) {
 	ndpi_fill_prefix_v4(&prefix, (struct in_addr *) &daddr, 32,
-			    ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+			    ((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses)->maxbits);
 	node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
       }
     }
@@ -7843,7 +7853,7 @@ int ndpi_is_custom_category(ndpi_protocol_category_t category) {
 void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_str,
 			    ndpi_protocol_category_t category,
 			    char *name) {
-  if(!name)
+  if(!ndpi_str || !name)
     return;
 
   switch(category) {
@@ -8853,9 +8863,14 @@ void ndpi_ptree_destroy(ndpi_ptree_t *tree) {
 int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr,
 		      u_int8_t bits, u_int64_t user_data) {
   u_int8_t is_v6 = ndpi_is_ipv6(addr);
-  ndpi_patricia_tree_t *ptree = is_v6 ? tree->v6 : tree->v4;
+  ndpi_patricia_tree_t *ptree;
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
+
+  if(!tree)
+    return(-4);
+
+  ptree = is_v6 ? tree->v6 : tree->v4;
 
   if(bits > ptree->maxbits)
     return(-1);
@@ -8887,10 +8902,16 @@ int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr,
 int ndpi_ptree_match_addr(ndpi_ptree_t *tree,
 			  const ndpi_ip_addr_t *addr, u_int64_t *user_data) {
   u_int8_t is_v6 = ndpi_is_ipv6(addr);
-  ndpi_patricia_tree_t *ptree = is_v6 ? tree->v6 : tree->v4;
+  ndpi_patricia_tree_t *ptree;
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
-  int bits = ptree->maxbits;
+  int bits;
+
+  if(!tree)
+    return(-2);
+
+  ptree = is_v6 ? tree->v6 : tree->v4;
+  bits = ptree->maxbits;
 
   if(is_v6)
     ndpi_fill_prefix_v6(&prefix, (const struct in6_addr *) &addr->ipv6, bits, ptree->maxbits);
