@@ -1465,7 +1465,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     flow = get_ndpi_flow_info(workflow, IPVERSION, vlan_id,
 			      tunnel_type, iph, NULL,
 			      ip_offset, ipsize,
-			      ntohs(iph->tot_len) - (iph->ihl * 4),
+			      ntohs(iph->tot_len) ? (ntohs(iph->tot_len) - (iph->ihl * 4)) : ipsize - (iph->ihl * 4) /* TSO */,
 			      iph->ihl * 4,
 			      &tcph, &udph, &sport, &dport,
 			      &proto,
@@ -2228,7 +2228,8 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
 	    offset += msg_len;
 
-	    if((offset + 32 < header->caplen)) {
+	    if((offset + 32 < header->caplen) &&
+	       (packet[offset + 1] == 0x08)) {
 	      /* IEEE 802.11 Data */
 	      offset += 24;
 	      /* LLC header is 8 bytes */
