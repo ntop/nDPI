@@ -1,5 +1,125 @@
 # CHANGELOG
 
+#### nDPI 4.6 (Jan 2023)
+
+## New Features
+ 
+  - New support for custom BPF protocol definition using nBPF (see example/protos.txt)
+
+## New Supported Protocols and Services
+
+ - Add protocol detection for:
+   - Activision
+   - AliCloud server access
+   - AVAST
+   - CryNetwork
+   - Discord
+   - EDNS
+   - Elasticsearch
+   - FastCGI
+   - Kismet
+   - Line App and Line Voip valls
+   - Meraki Cloud
+   - Munin
+   - NATPMP
+   - Syncthing
+   - TP-LINK Smart Home
+   - TUYA LAN
+   - SoftEther VPN
+   - Tailscale
+   - TiVoConnect
+
+## Improvements
+
+ - Improve protocol detection for:
+   - Anydesk
+   - Bittorrent (fix confidence, detection over TCP)
+   - DNS, add ability to decode DNS PTR records used for reverse address resolution
+   - DTLS (handle certificate fragments)
+   - Facebook Voip calls
+   - FastCGI (dissect PARAMS)
+   - FortiClient (update default ports)
+   - Zoom
+     - Add Zoom screen share detection
+     - Add detection of Zoom peer-to-peer flows in STUN
+   - Hangout/Duo Voip calls detection, optimize lookups in the protocol tree
+   - HTTP
+     - Handling of HTTP-Proxy and HTTP-Connect
+     - HTTP subclassification
+     - Check for empty/missing user-agent in HTTP
+   - IRC (credentials check)
+   - Jabber/XMPP
+   - Kerberos (support for Krb-Error messages)
+   - LDAP
+   - MGCP
+   - MONGODB (avoid false positives)
+   - Postgres
+   - POP3
+   - QUIC (support for 0-RTT packets received before the initial)
+   - Snapchat Voip calls
+   - SIP
+   - SNMP
+   - SMB (support for messages split into multiple TCP segments)
+   - SMTP (support for X-ANONYMOUSTLS command)
+   - STUN
+   - SKYPE (improve detection over UDP, remove detection over TCP)
+   - Teamspeak3 (License/Weblist detection)
+   - Threema Messenger
+   - TINC (avoid processing SYN packets)
+   - TLS
+     - improve reassembler
+     - handling of ALPN(s) and subclassification
+     - ignore invalid Content Type values
+   - WindowsUpdate
+ - Add flow risk:
+   - NDPI_HTTP_OBSOLETE_SERVER
+   - NDPI_MINOR_ISSUES (generic/relevant information about issues found on traffic)
+   - NDPI_HTTP_OBSOLETE_SERVER (Apache and nginx are supported)
+   - NDPI_PERIODIC_FLOW (reserved bit to be used by apps based on nDPI)
+   - NDPI_TCP_ISSUES
+ - Improve detection of WebShell and PHP code in HTTP URLs that is reported via flow risk
+ - Improve DGA detection
+ - Improve AES-NI check
+ - Improve nDPI JSON serialization
+ - Improve export/print of L4 protocol information
+ - Improve connection refused detection
+ - Add statistics for Patricia tree, Ahocarasick automa, LRU cache
+ - Add a generic (optional and configurable) expiration logic in LRU caches
+ - Add RTP stream type in flow metadata
+ - LRU cache is now IPv6 aware
+
+## Tools
+
+ - ndpiReader
+   - Add support for Linux Cooked Capture v2
+   - Fix packet dissection (CAPWAP and TSO)
+   - Fix Discarded bytes statistics
+
+## Fixes
+
+ - Fix classification by-port
+ - Fix exclusion of DTLS protocol
+ - Fix undefined-behaviour in ahocorasick callback
+ - Fix infinite loop when a custom rule has port 65535
+ - Fix undefined-behavior when setting empty user-agent
+ - Fix infinite loop in DNS dissector (due to an integer overflow)
+ - Fix JSON export of IPv6 addresses
+ - Fix memory corruptions in Bittorrent, HTTP, SoftEther, Florensia, QUIC, IRC, TFTP dissectors
+ - Fix stop of extra dissection in HTTP, Bittorrent, Kerberos
+ - Fix signed integer overflow in ASN1/BER dissector
+ - Fix char/uchar bug in ahocorasick
+ - Fix endianess in IP-Port lookup
+ - Fix FastCGI memory allocation issue
+ - Fix metadata extraction in NAT-PMP
+ - Fix invalid unidirectional traffic alert for unidirectional protocols (e.g. sFlow)
+
+## Misc
+
+ - Support for Rocky Linux 9
+ - Enhance fuzzers to test nDPI configurations, memory allocation failures, serialization/deserialization, algorithms and data structures
+ - GitHub Actions: update to Node.js 16
+ - Size of LRU caches is now configurable
+
 #### nDPI 4.4 (July 2022)
 
 ## New Features
