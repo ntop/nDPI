@@ -5,6 +5,8 @@
 ## New Features
  
   - New support for custom BPF protocol definition using nBPF (see example/protos.txt)
+  - Improved dissection performace
+  - Added fuzzing all over
 
 ## New Supported Protocols and Services
 
