@@ -5,7 +5,7 @@
 ## New Features
  
   - New support for custom BPF protocol definition using nBPF (see example/protos.txt)
-  - Improved dissection performace
+  - Improved dissection performance
   - Added fuzzing all over
 
 ## New Supported Protocols and Services
@@ -20,7 +20,7 @@
    - Elasticsearch
    - FastCGI
    - Kismet
-   - Line App and Line Voip valls
+   - Line App and Line VoIP calls
    - Meraki Cloud
    - Munin
    - NATPMP
