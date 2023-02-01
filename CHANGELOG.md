@@ -1,6 +1,6 @@
 # CHANGELOG
 
-#### nDPI 4.6 (Jan 2023)
+#### nDPI 4.6 (Feb 2023)
 
 ## New Features
  
