@@ -164,6 +164,11 @@ DEST=../src/lib/inc_generated/ndpi_asn_vk.c.inc
 create_list NDPI_PROTOCOL_VK $DEST "AS47541"
 echo "(3) VK IPs are available in $DEST"
 
+echo "(1) Downloading Yandex..."
+DEST=../src/lib/inc_generated/ndpi_asn_yandex.c.inc
+create_list NDPI_PROTOCOL_YANDEX $DEST "AS13238"
+echo "(3) Yandex IPs are available in $DEST"
+
 if [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1

@@ -1,0 +1,30 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	10	(10.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+
+YandexMusic	227	195856	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.249            	 1      
+
+
+	1	TCP 192.168.1.249:40218 <-> 213.180.204.186:443 [proto: 91.34/TLS.YandexMusic][IP: 25/Yandex][Encrypted][Confidence: DPI][cat: Music/25][119 pkts/55149 bytes <-> 108 pkts/140707 bytes][Goodput ratio: 86/95][22.99 sec][Hostname/SNI: music.yandex.kz][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.437 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 184/105 8840/2659 942/342][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 463/1303 1464/4260 550/1087][TLSv1.2][JA3C: cd08e31494f9531f560d64c695473da9][ServerNames: *.music.yandex.ru,music-partner.yandex.ru,music.yandex,music.yandex.by,music.yandex.uz,music.ya.ru,music.yandex.kz,music.yandex.com,music.yandex.ru][JA3S: 4ef1b297bb817d8212165a86308bac5f][Issuer: C=BE, O=GlobalSign nv-sa, CN=GlobalSign RSA OV SSL CA 2018][Subject: C=RU, ST=Moscow, L=Moscow, O=Yandex LLC, CN=*.music.yandex.ru][Certificate SHA-1: 84:6E:A1:68:E5:3B:10:C1:87:75:43:D8:F2:39:C3:4D:E9:9F:DC:88][Chrome][Validity: 2023-01-10 21:05:02 - 2023-07-11 20:59:59][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,6,4,0,0,0,0,1,3,0,0,3,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,0,0,0,26]

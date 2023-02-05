@@ -1,0 +1,32 @@
+Guessed flow protos:	2
+
+DPI Packets (TCP):	40	(13.33 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 3 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          3/3 (search/found)
+Automa domain:        3/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  6/6 (search/found)
+Patricia risk mask:   6/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   3/3 (search/found)
+
+YandexMarket	81	41162	3
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.249            	 1      
+
+
+	1	TCP 192.168.1.249:40870 -> 87.250.251.22:443 [proto: 91.56/TLS.YandexMarket][IP: 25/Yandex][Encrypted][Confidence: DPI][cat: Shopping/27][56 pkts/38422 bytes -> 0 pkts/0 bytes][Goodput ratio: 90/0][4.02 sec][Hostname/SNI: fenek.market.yandex.ru][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 78/0 1713/0 265/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 686/0 1464/0 619/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.2][JA3C: cd08e31494f9531f560d64c695473da9][Chrome][Plen Bins: 2,2,5,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,21,2,2,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,59,0,0,0,0]
+	2	TCP 192.168.1.249:40878 -> 87.250.251.22:443 [proto: 91.56/TLS.YandexMarket][IP: 25/Yandex][Encrypted][Confidence: DPI][cat: Shopping/27][14 pkts/1469 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][0.09 sec][Hostname/SNI: fenek.market.yandex.ru][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 8/0 40/0 12/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 105/0 583/0 134/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.2][JA3C: cd08e31494f9531f560d64c695473da9][Chrome][Plen Bins: 0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 192.168.1.249:40856 -> 87.250.251.22:443 [proto: 91.56/TLS.YandexMarket][IP: 25/Yandex][Encrypted][Confidence: DPI][cat: Shopping/27][11 pkts/1271 bytes -> 0 pkts/0 bytes][Goodput ratio: 47/0][0.10 sec][Hostname/SNI: fenek.market.yandex.ru][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 11/0 44/0 16/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 116/0 583/0 150/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.2][JA3C: cd08e31494f9531f560d64c695473da9][Chrome][Plen Bins: 0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -1,0 +1,30 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+
+YandexDirect	885	1922405	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.249            	 1      
+
+
+	1	TCP 192.168.1.249:58832 <-> 87.250.250.134:443 [proto: 91.99/TLS.YandexDirect][IP: 25/Yandex][Encrypted][Confidence: DPI][cat: Advertisement/101][409 pkts/30635 bytes <-> 476 pkts/1891770 bytes][Goodput ratio: 9/98][16.47 sec][Hostname/SNI: direct.yandex.kz][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.968 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 48/41 6431/6436 455/417][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 75/3974 1454/19638 75/3392][TLSv1.3][JA3C: cd08e31494f9531f560d64c695473da9][JA3S: 15af977ce25de452b96affa2addb1036][Chrome][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,0,0,0,74]
