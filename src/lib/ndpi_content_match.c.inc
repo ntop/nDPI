@@ -1830,6 +1830,8 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "CN=www.update.microsoft.com",     NDPI_PROTOCOL_WINDOWS_UPDATE },
   { "CN=*.tunnelbear.com",             NDPI_PROTOCOL_TUNNELBEAR },
   { "CN=cloudflareclient.com",         NDPI_PROTOCOL_CLOUDFLARE_WARP },
+  { "O=V Kontakte LLC",                NDPI_PROTOCOL_VK },
+  { "O=Yandex LLC",                    NDPI_PROTOCOL_YANDEX },
 
   { NULL, 0 }
 };
