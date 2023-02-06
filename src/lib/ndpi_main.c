@@ -102,7 +102,7 @@
 #include "inc_generated/ndpi_asn_line.c.inc"
 #include "inc_generated/ndpi_asn_vk.c.inc"
 #include "inc_generated/ndpi_asn_yandex.c.inc"
-
+#include "inc_generated/ndpi_asn_yandex_cloud.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -2748,6 +2748,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_line_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_vk_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_yandex_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_yandex_cloud_protocol_list);
     }
 
     if(prefs & ndpi_track_flow_payload)
