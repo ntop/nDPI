@@ -27,4 +27,4 @@ JA3 Host Stats:
 	1	 192.168.13.203           	 1      
 
 
-	1	UDP 192.168.13.203:40739 -> 192.168.13.57:56515 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][2 pkts/394 bytes -> 0 pkts/0 bytes][Goodput ratio: 78/0][< 1 sec][Risk: ** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **** Unidirectional Traffic **][Risk Score: 70][Risk Info: No client to server traffic / No ALPN][DTLSv1.2][JA3C: bd743610892cec1efed851b2b5efd4f5][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.13.203:40739 -> 192.168.13.57:56515 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][2 pkts/394 bytes -> 0 pkts/0 bytes][Goodput ratio: 78/0][< 1 sec][Risk: ** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **** Unidirectional Traffic **][Risk Score: 70][Risk Info: No server to client traffic / No ALPN][DTLSv1.2][JA3C: bd743610892cec1efed851b2b5efd4f5][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
