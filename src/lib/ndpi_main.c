@@ -5626,7 +5626,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       flow->all_packets_counter++;
 
     if((flow->packet_direction_counter[packet->packet_direction] < MAX_PACKET_COUNTER)
-       /* && packet->payload_packet_len */) {
+       && packet->payload_packet_len) {
       flow->packet_direction_counter[packet->packet_direction]++;
     }
 
@@ -6062,7 +6062,7 @@ static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndp
 static void ndpi_check_tcp_flags(struct ndpi_detection_module_struct *ndpi_str,
 				 struct ndpi_flow_struct *flow) {
 #if 0
-  printf("[TOTAL] %u / %u [tot: %u]\n", flow->packet_direction_counter[0], flow->packet_direction_counter[1], flow->all_packets_counter);
+  printf("[TOTAL] %u / %u [tot: %u]\n", flow->packet_direction_complete_counter[0], flow->packet_direction_complete_counter[1], flow->all_packets_counter);
 #endif
 
   if((flow->l4.tcp.cli2srv_tcp_flags & TH_SYN)
@@ -6075,7 +6075,7 @@ static void ndpi_check_tcp_flags(struct ndpi_detection_module_struct *ndpi_str,
 	  && (flow->all_packets_counter < 5 /* Ignore connections terminated by RST but that exchanged data (3WH + RST) */)
      )
     ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "Connection refused (client)");
-  else if((flow->l4.tcp.srv2cli_tcp_flags & TH_RST) && (flow->packet_direction_counter[1 /* server -> client */] == 1))
+  else if((flow->l4.tcp.srv2cli_tcp_flags & TH_RST) && (flow->packet_direction_complete_counter[1 /* server -> client */] == 1))
     ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP probing attempt");
 }
 
