@@ -1798,6 +1798,16 @@ static ndpi_protocol_match host_match[] =
    { "vkuseraudio.net",                  "VK", NDPI_PROTOCOL_VK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "vkuservideo.net",                  "VK", NDPI_PROTOCOL_VK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "yandex.",                          "Yandex", NDPI_PROTOCOL_YANDEX, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "yastatic.net",                     "Yandex", NDPI_PROTOCOL_YANDEX, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "mail.yandex.",                     "YandexMail", NDPI_PROTOCOL_YANDEX_MAIL, NDPI_PROTOCOL_CATEGORY_MAIL, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "music.yandex.",                    "YandexMusic", NDPI_PROTOCOL_YANDEX_MUSIC, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "market.yandex.",                   "YandexMarket", NDPI_PROTOCOL_YANDEX_MARKET, NDPI_PROTOCOL_CATEGORY_SHOPPING, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "disk.yandex.",                     "YandexDisk", NDPI_PROTOCOL_YANDEX_DISK, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "cloud.yandex.",                    "YandexCloud", NDPI_PROTOCOL_YANDEX_CLOUD, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "metrika.yandex.",                  "YandexMetrika", NDPI_PROTOCOL_YANDEX_METRIKA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "direct.yandex.",                   "YandexDirect", NDPI_PROTOCOL_YANDEX_DIRECT, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif
@@ -1820,6 +1830,8 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "CN=www.update.microsoft.com",     NDPI_PROTOCOL_WINDOWS_UPDATE },
   { "CN=*.tunnelbear.com",             NDPI_PROTOCOL_TUNNELBEAR },
   { "CN=cloudflareclient.com",         NDPI_PROTOCOL_CLOUDFLARE_WARP },
+  { "O=V Kontakte LLC",                NDPI_PROTOCOL_VK },
+  { "O=Yandex LLC",                    NDPI_PROTOCOL_YANDEX },
 
   { NULL, 0 }
 };

@@ -53,7 +53,7 @@ typedef enum {
   NDPI_PROTOCOL_VK                    = 22,
   NDPI_PROTOCOL_MAIL_POPS             = 23,
   NDPI_PROTOCOL_TAILSCALE             = 24,
-  NDPI_PROTOCOL_FREE_25               = 25, /* FREE */
+  NDPI_PROTOCOL_YANDEX                = 25,
   NDPI_PROTOCOL_NTOP                  = 26,
   NDPI_PROTOCOL_COAP                  = 27,
   NDPI_PROTOCOL_VMWARE                = 28,
@@ -61,8 +61,8 @@ typedef enum {
   NDPI_PROTOCOL_DTLS                  = 30,
   NDPI_PROTOCOL_UBNTAC2               = 31, /* Ubiquity UBNT AirControl = 2 */
   NDPI_PROTOCOL_KONTIKI               = 32,
-  NDPI_PROTOCOL_FREE_33               = 33, /* FREE */
-  NDPI_PROTOCOL_FREE_34               = 34, /* FREE */
+  NDPI_PROTOCOL_YANDEX_MAIL           = 33,
+  NDPI_PROTOCOL_YANDEX_MUSIC          = 34,
   NDPI_PROTOCOL_GNUTELLA              = 35,
   NDPI_PROTOCOL_EDONKEY               = 36,
   NDPI_PROTOCOL_BITTORRENT            = 37,
@@ -84,13 +84,13 @@ typedef enum {
   NDPI_PROTOCOL_CPHA                  = 53,
   NDPI_PROTOCOL_PPSTREAM              = 54,
   NDPI_PROTOCOL_ZATTOO                = 55,
-  NDPI_PROTOCOL_FREE_56               = 56, /* FREE */
-  NDPI_PROTOCOL_FREE_57               = 57, /* FREE */
+  NDPI_PROTOCOL_YANDEX_MARKET         = 56,
+  NDPI_PROTOCOL_YANDEX_DISK           = 57,
   NDPI_PROTOCOL_DISCORD               = 58,
   NDPI_PROTOCOL_TVUPLAYER             = 59,
   NDPI_PROTOCOL_MONGODB               = 60,
   NDPI_PROTOCOL_PLURALSIGHT           = 61,
-  NDPI_PROTOCOL_FREE_62               = 62, /* FREE */
+  NDPI_PROTOCOL_YANDEX_CLOUD          = 62,
   NDPI_PROTOCOL_OCSP                  = 63,
   NDPI_PROTOCOL_VXLAN                 = 64,
   NDPI_PROTOCOL_IRC                   = 65,
@@ -126,8 +126,8 @@ typedef enum {
   NDPI_PROTOCOL_IAX                   = 95,
   NDPI_PROTOCOL_TFTP                  = 96,
   NDPI_PROTOCOL_AFP                   = 97,
-  NDPI_PROTOCOL_FREE_98               = 98, /* FREE */
-  NDPI_PROTOCOL_FREE_99               = 99, /* FREE */
+  NDPI_PROTOCOL_YANDEX_METRIKA        = 98,
+  NDPI_PROTOCOL_YANDEX_DIRECT         = 99,
   NDPI_PROTOCOL_SIP                   = 100,
   NDPI_PROTOCOL_TRUPHONE              = 101,
   NDPI_PROTOCOL_IP_ICMPV6             = 102,
