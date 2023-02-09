@@ -170,17 +170,6 @@ static void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct,
       ZATTOO_DETECTED;
       return;
       
-    } else if(flow->zattoo_stage == 5 + packet->packet_direction && (packet->payload_packet_len == 125)) {
-
-      NDPI_LOG_INFO(ndpi_struct, "found zattoo\n");
-      ZATTOO_DETECTED;
-      return;
-      
-    } else if(flow->zattoo_stage == 6 - packet->packet_direction && packet->payload_packet_len == 1412) {
-
-      NDPI_LOG_INFO(ndpi_struct, "found zattoo\n");
-      ZATTOO_DETECTED;
-      return;
     }
     
     NDPI_LOG_DBG2(ndpi_struct,

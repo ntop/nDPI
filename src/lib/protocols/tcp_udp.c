@@ -53,10 +53,12 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
 {
   u_int16_t sport, dport;
   u_int proto;
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  struct ndpi_packet_struct *packet;
 
-  if(flow->host_server_name[0] != '\0')
+  if(!ndpi_struct || !flow || flow->host_server_name[0] != '\0')
     return;
+
+  packet = &ndpi_struct->packet;
 
   if(packet->udp) sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
   else if(packet->tcp) sport = ntohs(packet->tcp->source), dport = ntohs(packet->tcp->dest);

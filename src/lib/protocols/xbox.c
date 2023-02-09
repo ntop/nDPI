@@ -91,13 +91,7 @@ static void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, s
 	return;
     }
 #endif
-
-    /* exclude here all non matched udp traffic, exclude here tcp only if http has been excluded, because xbox could use http */
-    if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_HTTP) != 0) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    }
   }
-  /* to not exclude tcp traffic here, done by http code... */
 }
 
 

@@ -49,7 +49,6 @@ u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struc
 				 u_int32_t saddr, u_int32_t daddr,
 				 u_int16_t sport, u_int16_t dport);
 
-void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
 void init_diameter_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_afp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);

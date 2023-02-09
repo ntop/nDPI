@@ -49,6 +49,10 @@
 static u_int8_t cached_has_aesni = 0, has_aesni_checked = 0;
 #endif
 
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+int force_no_aesni = 0;
+#endif
+
 /*
  * AES-NI support detection routine
  */
@@ -58,6 +62,11 @@ int mbedtls_aesni_has_support( unsigned int what )
 #  if __has_feature(memory_sanitizer)
      return 0;
 #  endif
+#endif
+
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+  if(force_no_aesni == 1)
+    return 0;
 #endif
 
 #if defined(linux) || defined(__linux__)

@@ -74,12 +74,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_data_stddev(a);
   ndpi_data_min(a);
   ndpi_data_max(a);
+  ndpi_data_last(a);
   ndpi_data_window_average(a);
   ndpi_data_window_variance(a);
   ndpi_data_window_stddev(a);
   ndpi_data_entropy(a);
   ndpi_reset_data_analysis(a);
-  ndpi_data_last(a);
 
   /* Data ratio */
   if (num_values > 1)

@@ -56,7 +56,7 @@ fuzzy_testing() {
 	cp ../example/risky_domains.txt .
 	cp ../example/ja3_fingerprints.csv .
 	cp ../example/sha1_fingerprints.csv .
-	../fuzz/fuzz_ndpi_reader -dict=..fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" pcap/
+	../fuzz/fuzz_ndpi_reader -dict=../fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" pcap/
 	rm -f protos.txt categories.txt risky_domains.txt ja3_fingerprints.csv sha1_fingerprints.csv
     fi
 }

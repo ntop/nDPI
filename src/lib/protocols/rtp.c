@@ -54,7 +54,6 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType, enum ndpi_rtp_stream_type
   case 118: /* Comfort Noise Wideband */
     *s_type = rtp_audio;
     return(1 /* RTP */);
-    break;
     
   case 34: /* H.263 [MS-H26XPF] */
   case 121: /* RT Video */
@@ -63,7 +62,6 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType, enum ndpi_rtp_stream_type
   case 127: /* x-data */
     *s_type = rtp_video;
     return(1 /* RTP */);
-    break;
 
   case 200: /* RTCP PACKET SENDER */
   case 201: /* RTCP PACKET RECEIVER */
@@ -71,7 +69,6 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType, enum ndpi_rtp_stream_type
   case 203: /* RTCP Bye */
     *s_type = rtp_unknown;
     return(2 /* RTCP */);
-    break;
 
   default:
     return(0);

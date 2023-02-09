@@ -8,7 +8,8 @@
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   u_int16_t i, num_iteration;
-  struct ndpi_hll hll;
+  struct ndpi_hll *hll;
+  int rc;
 
   /* Just to have some data */
   if(fuzzed_data.remaining_bytes() < 2048)
@@ -17,25 +18,31 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
-  ndpi_hll_init(&hll, fuzzed_data.ConsumeIntegral<u_int16_t>());
+  hll = (struct ndpi_hll *)ndpi_malloc(sizeof(*hll));
 
-  num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
-  for (i = 0; i < num_iteration; i++)
-    ndpi_hll_add_number(&hll, fuzzed_data.ConsumeIntegral<u_int32_t>());
+  rc = ndpi_hll_init(hll, fuzzed_data.ConsumeIntegral<u_int8_t>());
 
-  ndpi_hll_count(&hll);
+  if (rc == 0) {
+    num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
+    for (i = 0; i < num_iteration; i++)
+      ndpi_hll_add_number(hll, fuzzed_data.ConsumeIntegral<u_int32_t>());
 
-  ndpi_hll_reset(&hll);
+    ndpi_hll_count(hll);
 
-  num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
-  for (i = 0; i < num_iteration; i++) {
-    std::vector<int8_t>data = fuzzed_data.ConsumeBytes<int8_t>(fuzzed_data.ConsumeIntegral<u_int8_t>());
-    ndpi_hll_add(&hll, (char *)data.data(), data.size());
+    ndpi_hll_reset(hll);
+
+    num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
+    for (i = 0; i < num_iteration; i++) {
+      std::vector<int8_t>data = fuzzed_data.ConsumeBytes<int8_t>(fuzzed_data.ConsumeIntegral<u_int8_t>());
+      ndpi_hll_add(hll, (char *)data.data(), data.size());
+    }
+
+    ndpi_hll_count(hll);
+
+    ndpi_hll_destroy(hll);
   }
 
-  ndpi_hll_count(&hll);
-
-  ndpi_hll_destroy(&hll);
+  ndpi_free(hll);
 
   return 0;
 }

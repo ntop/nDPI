@@ -199,7 +199,7 @@ void ndpi_serializer_skip_header(ndpi_serializer *_serializer) {
 
 static int ndpi_init_serializer_buffer(ndpi_private_serializer_buffer *buffer, u_int32_t buffer_size) {
   buffer->initial_size = buffer->size = buffer_size;
-  buffer->data = (u_int8_t *) calloc(buffer->size, sizeof(u_int8_t));
+  buffer->data = (u_int8_t *)ndpi_calloc(buffer->size, sizeof(u_int8_t));
   if(buffer->data == NULL)
     return(-1);
 
@@ -2246,6 +2246,8 @@ int ndpi_serialize_end_of_list(ndpi_serializer *_serializer) {
 
     serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_LIST;
   } else {
+    if(serializer->status.buffer.size_used == serializer->buffer.size)
+      return(-1);
     serializer->buffer.data[serializer->status.buffer.size_used++] = ndpi_serialization_end_of_list;
   }
 

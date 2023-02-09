@@ -13,7 +13,7 @@ static int __compare(const void *a, const void *b)
   entry_a = (u_int32_t *)a;
   entry_b = (u_int32_t *)b;
 
-  return entry_a == entry_b ? 0 : (entry_a < entry_b ? -1 : +1);
+  return *entry_a == *entry_b ? 0 : (*entry_a < *entry_b ? -1 : +1);
 }
 static void __free(void * const node)
 {
@@ -22,15 +22,14 @@ static void __free(void * const node)
 }
 static void __walk(const void *a, ndpi_VISIT which, int depth, void *user_data)
 {
-  assert(user_data == NULL);
-  assert(a);
+  assert(user_data == NULL && a);
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   u_int16_t i, num_iteration, is_added = 0;
   void *root = NULL;
-  u_int32_t *entry, value_added, e;
+  u_int32_t *entry, value_added, e, *e2;
 
   /* Just to have some data */
   if (fuzzed_data.remaining_bytes() < 1024)
@@ -80,11 +79,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   for (i = 0; i < num_iteration; i++) {
     e = fuzzed_data.ConsumeIntegral<u_int32_t>();
 
-    ndpi_tdelete(&e, &root, __compare);
+    e2 = (u_int32_t *)ndpi_tdelete(&e, &root, __compare);
+    ndpi_free(e2);
   }
   /* Delete of an added node */
   if (is_added) {
-    ndpi_tdelete(&value_added, &root, __compare);
+    e2 = (u_int32_t *)ndpi_tdelete(&value_added, &root, __compare);
+    ndpi_free(e2);
   }
 
   ndpi_twalk(root, __walk, NULL);

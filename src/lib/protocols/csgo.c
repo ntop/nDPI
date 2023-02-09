@@ -62,12 +62,6 @@ static void ndpi_search_csgo(struct ndpi_detection_module_struct* ndpi_struct, s
       return;
     }
 
-    if(packet->payload_packet_len >= 36 && w == 0x56533031ul) {
-      NDPI_LOG_INFO( ndpi_struct, "found csgo udp\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CSGO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      return;
-    }
-
     if(packet->payload_packet_len >= 36 && w == 0x01007364) {
       uint32_t w2 = htonl(get_u_int32_t(packet->payload, 4));
       if(w2 == 0x70696e67) {

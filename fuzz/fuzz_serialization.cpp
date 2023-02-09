@@ -32,7 +32,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if (fmt == ndpi_serialization_format_csv)
     ndpi_serializer_set_csv_separator(&serializer, ',');
 
-  num_iteration = fuzzed_data.ConsumeIntegralInRange(0, 16);
+  num_iteration = fuzzed_data.ConsumeIntegralInRange(0, 8);
   for (i = 0; i < num_iteration; i++) {
     memset(kbuf, '\0', sizeof(kbuf)); /* It is also used as binary key */
     snprintf(kbuf, sizeof(kbuf), "Key %d", i);
@@ -50,15 +50,24 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_serialize_uint32_boolean(&serializer, i, fuzzed_data.ConsumeIntegral<int8_t>());
 
     ndpi_serialize_string_uint32(&serializer, kbuf, fuzzed_data.ConsumeIntegral<u_int32_t>());
+    ndpi_serialize_string_uint32_format(&serializer, kbuf, fuzzed_data.ConsumeIntegral<u_int32_t>(), "%d");
     ndpi_serialize_string_int32(&serializer, kbuf, fuzzed_data.ConsumeIntegral<int32_t>());
     ndpi_serialize_string_uint64(&serializer, kbuf, fuzzed_data.ConsumeIntegral<u_int64_t>());
     ndpi_serialize_string_int64(&serializer, kbuf, fuzzed_data.ConsumeIntegral<int64_t>());
     ndpi_serialize_string_float(&serializer, kbuf, fuzzed_data.ConsumeFloatingPoint<float>(), "%f");
     if (fmt != ndpi_serialization_format_tlv)
       ndpi_serialize_string_double(&serializer, kbuf, fuzzed_data.ConsumeFloatingPoint<double>(), "%lf");
+    d = fuzzed_data.ConsumeBytes<char>(16);
+    if (d.size())
+      ndpi_serialize_string_binary(&serializer, kbuf, d.data(), d.size());
     ndpi_serialize_string_string(&serializer, kbuf, fuzzed_data.ConsumeBytesAsString(8).c_str());
+    d = fuzzed_data.ConsumeBytes<char>(16);
+    if (d.size())
+      ndpi_serialize_string_raw(&serializer, kbuf, d.data(), d.size());
     ndpi_serialize_string_boolean(&serializer, kbuf, fuzzed_data.ConsumeIntegral<int8_t>());
 
+    if (fuzzed_data.ConsumeBool())
+      snprintf(kbuf, sizeof(kbuf), "%d", i); /* To trigger OPTIMIZE_NUMERIC_KEYS */
     ndpi_serialize_binary_uint32(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<u_int32_t>());
     ndpi_serialize_binary_int32(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<int32_t>());
     ndpi_serialize_binary_uint64(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<u_int64_t>());
@@ -68,7 +77,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       ndpi_serialize_binary_double(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeFloatingPoint<double>(), "%lf");
     ndpi_serialize_binary_boolean(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<int8_t>());
     d = fuzzed_data.ConsumeBytes<char>(16);
-    ndpi_serialize_binary_binary(&serializer, kbuf, sizeof(kbuf), d.data(), d.size());
+    if (d.size())
+      ndpi_serialize_binary_binary(&serializer, kbuf, sizeof(kbuf), d.data(), d.size());
 
     if ((i & 0x3) == 0x3)
       ndpi_serialize_end_of_record(&serializer);
@@ -76,11 +86,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   ndpi_serializer_create_snapshot(&serializer);
 
+  if (fuzzed_data.ConsumeBool())
+    ndpi_serializer_skip_header(&serializer);
+
   if (fuzzed_data.ConsumeBool()) {
     ndpi_serialize_start_of_block(&serializer, "Block");
     memset(kbuf, '\0', sizeof(kbuf)); /* It is also used as binary key */
     snprintf(kbuf, sizeof(kbuf), "K-Ignored");
-    ndpi_serialize_uint32_uint32(&serializer, i, fuzzed_data.ConsumeIntegral<u_int32_t>());
+    ndpi_serialize_uint32_uint32(&serializer, fuzzed_data.ConsumeIntegral<u_int32_t>(), fuzzed_data.ConsumeIntegral<u_int32_t>());
     ndpi_serialize_string_string(&serializer, kbuf, fuzzed_data.ConsumeBytesAsString(8).c_str());
     ndpi_serialize_string_float(&serializer, kbuf, fuzzed_data.ConsumeFloatingPoint<float>(), "%f");
     ndpi_serialize_binary_boolean(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<int8_t>());
@@ -98,12 +111,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_serialize_end_of_block(&serializer);
   }
 
+  if (fmt == ndpi_serialization_format_json) {
+    if (fuzzed_data.ConsumeBool()) {
+      d = fuzzed_data.ConsumeBytes<char>(8);
+      if (d.size())
+        ndpi_serialize_raw_record(&serializer, (u_char *)d.data(), d.size());
+    }
+  }
+
   if (fuzzed_data.ConsumeBool())
     ndpi_serializer_rollback_snapshot(&serializer);
 
-  if (fmt == ndpi_serialization_format_json) {
-
-    ndpi_serialize_start_of_list(&serializer, "List");
+  rc = ndpi_serialize_start_of_list(&serializer, "List");
+  if (rc == 0) {
 
     num_iteration = fuzzed_data.ConsumeIntegralInRange(0, 8);
     for (i = 0; i < num_iteration; i++) {
@@ -117,18 +137,32 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     ndpi_serialize_end_of_list(&serializer);
     ndpi_serialize_string_string(&serializer, "Last", "Ok");
-  } else if (fmt == ndpi_serialization_format_csv) {
+  }
+
+  if (fmt == ndpi_serialization_format_csv) {
     ndpi_serializer_get_header(&serializer, &buffer_len);
     ndpi_serializer_get_buffer(&serializer, &buffer_len);
-  } else {
+  } else if (fmt == ndpi_serialization_format_tlv) {
     /* Conversion from tlv to json */
     rc = ndpi_init_deserializer(&deserializer, &serializer);
     if (rc == 0) {
       rc = ndpi_init_serializer_ll(&serializer_cloned, ndpi_serialization_format_json, fuzzed_data.ConsumeIntegralInRange(0, 2048));
       if (rc == 0) {
         ndpi_deserialize_clone_all(&deserializer, &serializer_cloned);
+	ndpi_serializer_get_format(&serializer_cloned);
         ndpi_serializer_get_buffer(&serializer_cloned, &buffer_len);
-        ndpi_term_serializer(&serializer_cloned);
+	ndpi_serializer_get_buffer_len(&serializer_cloned);
+	ndpi_serializer_get_internal_buffer_size(&serializer_cloned);
+	ndpi_term_serializer(&serializer_cloned);
+      }
+    }
+
+    rc = ndpi_init_deserializer(&deserializer, &serializer);
+    if (rc == 0) {
+      rc = ndpi_init_serializer_ll(&serializer_cloned, ndpi_serialization_format_tlv, fuzzed_data.ConsumeIntegralInRange(0, 2048));
+      if (rc == 0) {
+        ndpi_deserialize_clone_item(&deserializer, &serializer_cloned);
+	ndpi_term_serializer(&serializer_cloned);
       }
     }
   }

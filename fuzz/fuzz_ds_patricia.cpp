@@ -6,20 +6,13 @@
 #include <assert.h>
 #include "fuzzer/FuzzedDataProvider.h"
 
-static void free_ptree_data(void *data) {
-  /* Nothing to do */
-  assert(data);
-}
 static void process_ptree_data(ndpi_prefix_t *prefix, void *data) {
   /* Nothing to do */
-  assert(prefix);
-  assert(data == NULL);
+  assert(prefix && data == NULL);
 }
 static void process3_ptree_data(ndpi_patricia_node_t *node, void *data, void *user_data) {
   /* Nothing to do */
-  assert(node);
-  assert(data == NULL);
-  assert(user_data == NULL);
+  assert(node && data == NULL && user_data == NULL);
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
@@ -47,6 +40,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   p = ndpi_patricia_new(maxbits);
 
+  ndpi_patricia_get_maxbits(p);
   ndpi_patricia_process(p, process_ptree_data);
   ndpi_patricia_walk_tree_inorder(p, process3_ptree_data, NULL);
 
@@ -64,11 +58,18 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 	if (node && is_added == 0 && fuzzed_data.ConsumeBool()) {
           is_added = 1;
           prefix_added = prefix;
+	  /* Some random operations on this node */
+          ndpi_patricia_get_node_prefix(node);
+          ndpi_patricia_get_node_bits(node);
+          ndpi_patricia_set_node_data(node, NULL);
+          assert(ndpi_patricia_get_node_data(node) == NULL);
+          ndpi_patricia_set_node_u64(node, 0);
+          assert(ndpi_patricia_get_node_u64(node) == 0);
 	}
       }
     } else {
-      if(fuzzed_data.remaining_bytes() > 128) {
-        std::vector<u_int8_t>data = fuzzed_data.ConsumeBytes<u_int8_t>(128);
+      if(fuzzed_data.remaining_bytes() > 16) {
+        std::vector<u_int8_t>data = fuzzed_data.ConsumeBytes<u_int8_t>(16);
 	ip = data.data();
         ip_len = fuzzed_data.ConsumeIntegralInRange(0, 128);
         ndpi_fill_prefix_v6(&prefix, (const struct in6_addr *)ip, ip_len, 128);
@@ -77,6 +78,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 	if (node && is_added == 0 && fuzzed_data.ConsumeBool()) {
           is_added = 1;
           prefix_added = prefix;
+	  /* Some random operations on this node */
+          ndpi_patricia_get_node_prefix(node);
+          ndpi_patricia_get_node_bits(node);
+          ndpi_patricia_set_node_data(node, NULL);
+          assert(ndpi_patricia_get_node_data(node) == NULL);
+          ndpi_patricia_set_node_u64(node, 0);
+          assert(ndpi_patricia_get_node_u64(node) == 0);
 	}
       }
     }
@@ -99,8 +107,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
           ndpi_patricia_remove(p, node);
       }
     } else {
-      if(fuzzed_data.remaining_bytes() > 128) {
-        std::vector<u_int8_t>data = fuzzed_data.ConsumeBytes<u_int8_t>(128);
+      if(fuzzed_data.remaining_bytes() > 16) {
+        std::vector<u_int8_t>data = fuzzed_data.ConsumeBytes<u_int8_t>(16);
 	ip = data.data();
         ip_len = fuzzed_data.ConsumeIntegralInRange(0, 128);
         ndpi_fill_prefix_v6(&prefix, (const struct in6_addr *)ip, ip_len, 128);
@@ -149,8 +157,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_patricia_walk_tree_inorder(p_cloned, process3_ptree_data, NULL);
 
 
-  ndpi_patricia_destroy(p, free_ptree_data);
-  ndpi_patricia_destroy(p_cloned, free_ptree_data);
+  ndpi_patricia_destroy(p, NULL);
+  ndpi_patricia_destroy(p_cloned, NULL);
 
   return 0;
 }

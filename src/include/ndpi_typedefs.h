@@ -769,9 +769,6 @@ struct ndpi_flow_tcp_struct {
 /* ************************************************** */
 
 struct ndpi_flow_udp_struct {
-  /* NDPI_PROTOCOL_PPSTREAM */
-  u_int32_t ppstream_stage:3;		  // 0 - 7
-
   /* NDPI_PROTOCOL_HALFLIFE2 */
   u_int32_t halflife2_stage:2;		  // 0 - 2
 

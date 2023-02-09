@@ -90,10 +90,6 @@ ts3_license_weblist:
     ndpi_int_teamspeak_add_connection(ndpi_struct, flow);
     return;
   }
-  if (flow->packet_counter >= 3)
-  {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-  }
 }
 
 void init_teamspeak_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)

@@ -326,7 +326,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	case 0x0103:
           *app_proto = NDPI_PROTOCOL_ZOOM;
           return(NDPI_IS_STUN);
-	  break;
 	  
         case 0x4000:
         case 0x4001:
@@ -334,7 +333,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
           /* These are the only messages apparently whatsapp voice can use */
           *app_proto = NDPI_PROTOCOL_WHATSAPP_CALL;
           return(NDPI_IS_STUN);
-          break;
 
         case 0x0014: /* Realm */
 	  {
@@ -406,7 +404,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
           *app_proto = NDPI_PROTOCOL_SKYPE_TEAMS_CALL;
           return(NDPI_IS_STUN);
-          break;
 
         case 0x8070: /* Implementation Version */
           if(len == 4 && ((offset+7) < payload_length)
@@ -424,7 +421,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
         case 0xFF03:
           *app_proto = NDPI_PROTOCOL_HANGOUT_DUO;
           return(NDPI_IS_STUN);
-          break;
 
         default:
 #ifdef DEBUG_STUN

@@ -68,9 +68,6 @@ static void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	       packet->payload[13] == 0x00 &&
 	       packet->payload[14] == 0x00) {
 
-	    /* increase count pkt ppstream over udp */
-	    flow->l4.udp.ppstream_stage++;
-	    
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
 	    }       
@@ -92,9 +89,6 @@ static void ndpi_search_ppstream(struct ndpi_detection_module_struct
 		     packet->payload[19] == 0x00 &&
 		     packet->payload[20] == 0x00) {
 
-		    /* increase count pkt ppstream over udp */
-		    flow->l4.udp.ppstream_stage++;
-
 		    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 		    return;
 		  }
@@ -105,9 +99,6 @@ static void ndpi_search_ppstream(struct ndpi_detection_module_struct
 		     packet->payload[19] == 0xff &&
 		     packet->payload[20] == 0xff) {
 
-		    /* increase count pkt ppstream over udp */
-		    flow->l4.udp.ppstream_stage++;
-		  
 		    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 		    return;
 		  }
@@ -128,9 +119,6 @@ static void ndpi_search_ppstream(struct ndpi_detection_module_struct
 		 packet->payload[19] == 0x00 &&
 		 packet->payload[20] == 0x00) {
 
-		/* increase count pkt ppstream over udp */
-		flow->l4.udp.ppstream_stage++;
-
 		ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 		return;
 	      }
@@ -147,9 +135,6 @@ static void ndpi_search_ppstream(struct ndpi_detection_module_struct
 		 packet->payload[100] == 0x61 &&
 		 packet->payload[101] == 0x6d) {
 
-		/* increase count pkt ppstream over udp */
-		flow->l4.udp.ppstream_stage++;
-	      
 		ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 		return;
 	      }
@@ -165,9 +150,6 @@ static void ndpi_search_ppstream(struct ndpi_detection_module_struct
 						 packet->payload[18] == 0x00 &&
 						 packet->payload[19] == 0x00 &&
 						 packet->payload[20] == 0x00 )) {
-
-	    /* increase count pkt ppstream over udp */
-	    flow->l4.udp.ppstream_stage++;
 
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
@@ -187,9 +169,6 @@ static void ndpi_search_ppstream(struct ndpi_detection_module_struct
 		   packet->payload[19] == 0x00 &&
 		   packet->payload[20] == 0x00 )) {
 
-	    /* increase count pkt ppstream over udp */
-	    flow->l4.udp.ppstream_stage++;
-	  
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
 	  }
@@ -200,9 +179,6 @@ static void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	if(packet->payload[1] == 0x80 || packet->payload[1] == 0x84 ) {
 	  if(packet->payload[3] == packet->payload[4]) {
 
-	    /* increase count pkt ppstream over udp */
-	    flow->l4.udp.ppstream_stage++;
-	  
 	    ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	    return;
 	  }
@@ -211,9 +187,6 @@ static void ndpi_search_ppstream(struct ndpi_detection_module_struct
 	else if(packet->payload[1] == 0x53 && packet->payload[3] == 0x00 &&
 		(packet->payload[0] == 0x08 || packet->payload[0] == 0x0c)) {
 
-	  /* increase count pkt ppstream over udp */
-	  flow->l4.udp.ppstream_stage++;
-	
 	  ndpi_int_ppstream_add_connection(ndpi_struct, flow);
 	  return;
 	}

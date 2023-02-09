@@ -13,19 +13,30 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_flow_struct flow;
   u_int8_t protocol_was_guessed;
   u_int32_t i, num;
-  u_int16_t random_proto;
+  u_int16_t random_proto, bool_value;
   int random_value;
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_lru_cache_stats lru_stats;
   struct ndpi_patricia_tree_stats patricia_stats;
   struct ndpi_automa_stats automa_stats;
+  int cat;
+  u_int16_t pid;
+  char *protoname;
+  char catname[] = "name";
+  struct ndpi_flow_input_info input_info;
+  ndpi_proto p;
+
 
   if(fuzzed_data.remaining_bytes() < 4 + /* ndpi_init_detection_module() */
 				     NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
 				     5 + /* files */
 				     ((NDPI_LRUCACHE_MAX + 1) * 5) + /* LRU caches */
-				     2 + 1 + 4 + /* ndpi_set_detection_preferences() */
+				     2 + 1 + 5 + /* ndpi_set_detection_preferences() */
 				     7 + /* Opportunistic tls */
+				     2 + /* Pid */
+				     2 + /* Category */
+				     1 + /* Bool value */
+				     2 + /* input_info */
 				     29 /* Min real data: ip length + udp length + 1 byte */)
     return -1;
 
@@ -73,7 +84,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
                                    0 /* unused */);
   if(fuzzed_data.ConsumeBool())
     ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_max_packets_to_process,
-                                   fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)));
+                                   fuzzed_data.ConsumeIntegralInRange(0, (1 << 24)));
 
   ndpi_set_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_SMTP, fuzzed_data.ConsumeBool());
   ndpi_get_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_SMTP);
@@ -91,19 +102,49 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   ndpi_finalize_initialization(ndpi_info_mod);
 
+  /* Random protocol configuration */
+  pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_supported_protocols(ndpi_info_mod) + 1);
+  protoname = ndpi_get_proto_by_id(ndpi_info_mod, pid);
+  if (protoname) {
+    assert(ndpi_get_proto_by_name(ndpi_info_mod, protoname) == pid);
+  }
+  ndpi_set_proto_breed(ndpi_info_mod, pid, NDPI_PROTOCOL_SAFE);
+  ndpi_set_proto_category(ndpi_info_mod, pid, NDPI_PROTOCOL_CATEGORY_MEDIA);
+  ndpi_is_subprotocol_informative(ndpi_info_mod, pid);
+
+  /* Custom category configuration */
+  cat = fuzzed_data.ConsumeIntegralInRange(static_cast<int>(NDPI_PROTOCOL_CATEGORY_CUSTOM_1),
+                                           static_cast<int>(NDPI_PROTOCOL_CATEGORY_CUSTOM_5 + 1)); /* + 1 to trigger invalid cat */
+  ndpi_category_set_name(ndpi_info_mod, static_cast<ndpi_protocol_category_t>(cat), catname);
+  ndpi_is_custom_category(static_cast<ndpi_protocol_category_t>(cat));
+  ndpi_category_get_name(ndpi_info_mod, static_cast<ndpi_protocol_category_t>(cat));
+  ndpi_get_category_id(ndpi_info_mod, catname);
+
+  ndpi_get_num_supported_protocols(ndpi_info_mod);
 
   /* Basic code to try testing this "config" */
+  bool_value = fuzzed_data.ConsumeBool();
+  input_info.in_pkt_dir = !!fuzzed_data.ConsumeBool();
+  input_info.seen_flow_beginning = !!fuzzed_data.ConsumeBool();
   memset(&flow, 0, sizeof(flow));
   std::vector<uint8_t>pkt = fuzzed_data.ConsumeRemainingBytes<uint8_t>();
   assert(pkt.size() >= 29); /* To be sure check on fuzzed_data.remaining_bytes() at the beginning is right */
-  ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, NULL);
-  ndpi_detection_giveup(ndpi_info_mod, &flow, 1, &protocol_was_guessed);
+  ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, &input_info);
+  p = ndpi_detection_giveup(ndpi_info_mod, &flow, 1, &protocol_was_guessed);
+  assert(p.master_protocol == ndpi_get_flow_masterprotocol(ndpi_info_mod, &flow));
+  assert(p.app_protocol == ndpi_get_flow_appprotocol(ndpi_info_mod, &flow));
+  assert(p.category == ndpi_get_flow_category(ndpi_info_mod, &flow));
+  ndpi_get_lower_proto(p);
+  ndpi_get_upper_proto(p);
   /* ndpi_guess_undetected_protocol() is a "strange" function (since is ipv4 only)
      but it is exported by the library and it is used by ntopng. Try fuzzing it, here */
   if(!flow.is_ipv6)
-    ndpi_guess_undetected_protocol(ndpi_info_mod, &flow, flow.l4_proto,
+    ndpi_guess_undetected_protocol(ndpi_info_mod, bool_value ? &flow : NULL,
+                                   flow.l4_proto,
                                    flow.c_address.v4, flow.s_address.v4,
                                    flow.c_port, flow.s_port);
+  /* Another "strange" function: fuzz it here, for lack of a better alternative */
+  ndpi_search_tcp_or_udp(ndpi_info_mod, &flow);
   ndpi_free_flow_data(&flow);
 
   /* Get some final stats */
