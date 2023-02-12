@@ -36,7 +36,6 @@
 #include "ndpi_encryption.h"
 
 #include "third_party/include/roaring.h"
-#include "third_party/src/roaring.cc"
 
 /* ******************************************* */
 
