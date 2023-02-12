@@ -142,6 +142,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if (fmt == ndpi_serialization_format_csv) {
     ndpi_serializer_get_header(&serializer, &buffer_len);
     ndpi_serializer_get_buffer(&serializer, &buffer_len);
+    ndpi_serializer_set_buffer_len(&serializer, fuzzed_data.ConsumeIntegral<u_int32_t>());
   } else if (fmt == ndpi_serialization_format_tlv) {
     /* Conversion from tlv to json */
     rc = ndpi_init_deserializer(&deserializer, &serializer);
@@ -154,6 +155,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 	ndpi_serializer_get_buffer_len(&serializer_cloned);
 	ndpi_serializer_get_internal_buffer_size(&serializer_cloned);
 	ndpi_term_serializer(&serializer_cloned);
+	assert(ndpi_deserialize_get_format(&deserializer) == ndpi_serialization_format_tlv);
       }
     }
 

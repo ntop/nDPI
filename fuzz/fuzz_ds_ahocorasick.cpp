@@ -13,6 +13,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   u_int16_t i, num_iteration, is_added = 0;
   AC_AUTOMATA_t *a;
+  void *a2;
   MATCH_CALLBACK_f mc;
   struct ac_stats stats;
   AC_PATTERN_t ac_pattern;
@@ -20,8 +21,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   AC_REP_t match;
   AC_TEXT_t ac_input_text;
   FILE *f;
+  u_int16_t protocol_id;
+  ndpi_protocol_category_t category;
+  ndpi_protocol_breed_t breed;
 
   /* TODO: real string instead of random bytes */
+
+  /* Use both APIs */
 
   /* Just to have some data */
   if (fuzzed_data.remaining_bytes() < 1024)
@@ -36,6 +42,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     mc = NULL;
 
   a = ac_automata_init(mc);
+  a2 = ndpi_init_automa();
 
   if (fuzzed_data.ConsumeBool())
     ac_automata_feature(a, AC_FEATURE_DEBUG);
@@ -77,10 +84,18 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
           is_added = 1;
       }
     }
+
+    value_dup = ndpi_strdup(value.c_str());
+    if (!value_dup)
+      continue;
+    if (ndpi_add_string_to_automa(a2, value_dup) != 0)
+      ndpi_free(value_dup);
   }
 
-  if (fuzzed_data.ConsumeBool())
+  if (fuzzed_data.ConsumeBool()) {
     ac_automata_finalize(a);
+    ndpi_finalize_automa(a2);
+  }
 
   /* "Random" search */
   num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
@@ -96,6 +111,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ac_automata_search(a, &ac_input_text, &match);
 
     ndpi_free(value_dup);
+
+    ndpi_match_string(a2, (char *)value.c_str());
+    ndpi_match_string_protocol_id(a2, (char *)value.c_str(), strlen(value.c_str()),
+                                  &protocol_id, &category, &breed);
   }
   /* Search of an added node */
   if (is_added) {
@@ -104,6 +123,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ac_input_text.option = 0;
 
     ac_automata_search(a, &ac_input_text, &match);
+
+    ndpi_match_string(a2, value_added);
+    ndpi_match_string_protocol_id(a2, value_added, strlen(value_added),
+                                  &protocol_id, &category, &breed);
+
     ndpi_free(value_added);
   }
 
@@ -114,6 +138,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ac_automata_get_stats(a, &stats);
 
   ac_automata_release(a, 1);
+  ndpi_free_automa(a2);
 
   return 0;
 }

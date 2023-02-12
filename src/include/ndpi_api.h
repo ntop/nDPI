@@ -896,7 +896,7 @@ extern "C" {
    * @par     The automata initialized with ndpi_init_automa();
    * @par     The (sub)string to search (malloc'ed memory)
    * @par     The number associated with this string
-   * @return  0 in case of no error, or -1 if an error occurred.
+   * @return  0 in case of no error, or -2 if the string has been already addeed, or -1 if an error occurred.
    *
    */
   int ndpi_add_string_value_to_automa(void *_automa, char *str, u_int32_t num);
