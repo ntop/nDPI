@@ -167,6 +167,7 @@
     <ClCompile Include="..\src\lib\protocols\z3950.c" />
     <ClCompile Include="..\src\lib\protocols\zabbix.c" />
     <ClCompile Include="..\src\lib\third_party\src\ahocorasick.c">
+    <ClCompile Include="..\src\lib\third_party\src\roaring.c">
       <Filter>third_party</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lib\third_party\src\ndpi_sha1.c">
