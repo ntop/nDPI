@@ -1742,7 +1742,7 @@ extern "C" {
   void ndpi_serialize_confidence(ndpi_serializer *serializer, ndpi_confidence_t confidence);
   void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
                             ndpi_serializer *serializer,
-                            ndpi_risk_enum risk,
+                            ndpi_risk risk,
                             ndpi_confidence_t confidence,
                             ndpi_protocol l7_protocol);
   const char* ndpi_risk2str(ndpi_risk_enum risk);
