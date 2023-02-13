@@ -5448,7 +5448,8 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       else if(flags == (TH_FIN | TH_PUSH | TH_URG))
 	ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP XMAS scan");
 
-      if(!ndpi_str->direction_detect_disable)
+      if(!ndpi_str->direction_detect_disable &&
+         (tcph->source != tcph->dest))
 	packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
 
       if(packet->packet_direction == 0 /* cli -> srv */) {
@@ -5525,7 +5526,8 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	flow->next_tcp_seq_nr[1] = 0;
       }
     } else if(udph != NULL) {
-      if(!ndpi_str->direction_detect_disable)
+      if(!ndpi_str->direction_detect_disable &&
+         (udph->source != udph->dest))
 	packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
     }
 
@@ -5618,9 +5620,9 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     if(ndpi_is_multi_or_broadcast(packet))
       ; /* multicast or broadcast */
     else {
-      if(flow->packet_direction_complete_counter[0] == 0)
+      if(flow->packet_direction_complete_counter[flow->client_packet_direction] == 0)
 	ndpi_set_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No client to server traffic"); /* Should never happen */
-      else if(flow->packet_direction_complete_counter[1] == 0)
+      else if(flow->packet_direction_complete_counter[!flow->client_packet_direction] == 0)
 	ndpi_set_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No server to client traffic");
       else {
 	ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
