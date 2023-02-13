@@ -179,7 +179,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: ["ubuntu-latest", "ubuntu-22.04", "macOS-latest", "macos-12", "windows-latest"]
+        # ubuntu-latest == ubuntu-22.04
+        # macOS-latest == macos-12
+        os: ["ubuntu-latest", "ubuntu-20.04", "macOS-latest", "macos-11", "windows-latest"]
         arch: ["x86_64"]
         gcrypt: ["--with-local-libgcrypt", ""]
         compiler: ["cc"]
