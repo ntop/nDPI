@@ -159,6 +159,17 @@ extern "C" {  // portability definitions are in global scope, not a namespace
 #ifdef CROARING_DISABLE_X64
 #undef CROARING_IS_X64
 #endif
+
+
+#if (defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5)) || (__GNUC__ < 5)
+  /* RH 7 don't have atomic includes */
+#undef CROARING_IS_X64
+#undef ALLOW_UNALIGNED
+#define ALLOW_UNALIGNED
+#endif
+
+
+
 // we include the intrinsic header
 #if !CROARING_REGULAR_VISUAL_STUDIO
 /* Non-Microsoft C/C++-compatible compiler */
@@ -403,11 +414,13 @@ static inline int hamming(uint64_t x) {
 #define CROARING_UNTARGET_REGION
 #endif
 
+#ifndef ALLOW_UNALIGNED
 // Allow unaligned memory access
 #if defined(__GNUC__) || defined(__clang__)
 #define ALLOW_UNALIGNED __attribute__((no_sanitize("alignment")))
 #else
 #define ALLOW_UNALIGNED
+#endif
 #endif
 
 #if defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__)
@@ -643,6 +656,17 @@ static inline uint32_t croaring_detect_supported_architectures() {
     return buffer;
 }
 #else // CROARING_VISUAL_STUDIO
+
+
+#if (defined(__GNUC_RH_RELEASE__) && (__GNUC_RH_RELEASE__ != 5)) || (__GNUC__ < 5)
+#define ROARING_DISABLE_AVX
+#undef __AVX2__
+/* CentOS 7 */
+static inline uint32_t croaring_detect_supported_architectures() {
+  return(dynamic_croaring_detect_supported_architectures());
+}
+#else
+
 #include <stdatomic.h>
 static inline uint32_t croaring_detect_supported_architectures() {
     // we use an atomic for thread safety
@@ -653,6 +677,7 @@ static inline uint32_t croaring_detect_supported_architectures() {
     }
     return buffer;
 }
+#endif
 #endif // CROARING_REGULAR_VISUAL_STUDIO
 
 #ifdef ROARING_DISABLE_AVX
@@ -1178,16 +1203,17 @@ extern "C" { namespace roaring { namespace internal {
  */
 static inline void bitset_set_range(uint64_t *words, uint32_t start,
                                     uint32_t end) {
+
     if (start == end) return;
     uint32_t firstword = start / 64;
-    uint32_t endword = (end - 1) / 64;
+    uint32_t endword = (end - 1) / 64, i;
     if (firstword == endword) {
         words[firstword] |= ((~UINT64_C(0)) << (start % 64)) &
                              ((~UINT64_C(0)) >> ((~end + 1) % 64));
         return;
     }
     words[firstword] |= (~UINT64_C(0)) << (start % 64);
-    for (uint32_t i = firstword + 1; i < endword; i++) {
+    for (i = firstword + 1; i < endword; i++) {
         words[i] = ~UINT64_C(0);
     }
     words[endword] |= (~UINT64_C(0)) >> ((~end + 1) % 64);
@@ -1201,14 +1227,14 @@ static inline int bitset_lenrange_cardinality(const uint64_t *words,
                                               uint32_t start,
                                               uint32_t lenminusone) {
     uint32_t firstword = start / 64;
-    uint32_t endword = (start + lenminusone) / 64;
+    uint32_t endword = (start + lenminusone) / 64, i;
     if (firstword == endword) {
         return hamming(words[firstword] &
                        ((~UINT64_C(0)) >> ((63 - lenminusone) % 64))
                            << (start % 64));
     }
     int answer = hamming(words[firstword] & ((~UINT64_C(0)) << (start % 64)));
-    for (uint32_t i = firstword + 1; i < endword; i++) {
+    for (i = firstword + 1; i < endword; i++) {
         answer += hamming(words[i]);
     }
     answer +=
@@ -1223,7 +1249,7 @@ static inline int bitset_lenrange_cardinality(const uint64_t *words,
 static inline bool bitset_lenrange_empty(const uint64_t *words, uint32_t start,
                                          uint32_t lenminusone) {
     uint32_t firstword = start / 64;
-    uint32_t endword = (start + lenminusone) / 64;
+    uint32_t endword = (start + lenminusone) / 64, i;
     if (firstword == endword) {
         return (words[firstword] & ((~UINT64_C(0)) >> ((63 - lenminusone) % 64))
               << (start % 64)) == 0;
@@ -1231,7 +1257,7 @@ static inline bool bitset_lenrange_empty(const uint64_t *words, uint32_t start,
     if (((words[firstword] & ((~UINT64_C(0)) << (start%64)))) != 0) {
         return false;
     }
-    for (uint32_t i = firstword + 1; i < endword; i++) {
+    for ( i = firstword + 1; i < endword; i++) {
         if (words[i] != 0) {
             return false;
         }
@@ -1249,7 +1275,7 @@ static inline bool bitset_lenrange_empty(const uint64_t *words, uint32_t start,
 static inline void bitset_set_lenrange(uint64_t *words, uint32_t start,
                                        uint32_t lenminusone) {
     uint32_t firstword = start / 64;
-    uint32_t endword = (start + lenminusone) / 64;
+    uint32_t endword = (start + lenminusone) / 64, i;
     if (firstword == endword) {
         words[firstword] |= ((~UINT64_C(0)) >> ((63 - lenminusone) % 64))
                              << (start % 64);
@@ -1257,7 +1283,7 @@ static inline void bitset_set_lenrange(uint64_t *words, uint32_t start,
     }
     uint64_t temp = words[endword];
     words[firstword] |= (~UINT64_C(0)) << (start % 64);
-    for (uint32_t i = firstword + 1; i < endword; i += 2)
+    for ( i = firstword + 1; i < endword; i += 2)
         words[i] = words[i + 1] = ~UINT64_C(0);
     words[endword] =
         temp | (~UINT64_C(0)) >> (((~start + 1) - lenminusone - 1) % 64);
@@ -1270,9 +1296,9 @@ static inline void bitset_flip_range(uint64_t *words, uint32_t start,
                                      uint32_t end) {
     if (start == end) return;
     uint32_t firstword = start / 64;
-    uint32_t endword = (end - 1) / 64;
+    uint32_t endword = (end - 1) / 64, i;
     words[firstword] ^= ~((~UINT64_C(0)) << (start % 64));
-    for (uint32_t i = firstword; i < endword; i++) {
+    for ( i = firstword; i < endword; i++) {
         words[i] = ~words[i];
     }
     words[endword] ^= ((~UINT64_C(0)) >> ((~end + 1) % 64));
@@ -1285,14 +1311,14 @@ static inline void bitset_reset_range(uint64_t *words, uint32_t start,
                                       uint32_t end) {
     if (start == end) return;
     uint32_t firstword = start / 64;
-    uint32_t endword = (end - 1) / 64;
+    uint32_t endword = (end - 1) / 64, i;
     if (firstword == endword) {
         words[firstword] &= ~(((~UINT64_C(0)) << (start % 64)) &
                                ((~UINT64_C(0)) >> ((~end + 1) % 64)));
         return;
     }
     words[firstword] &= ~((~UINT64_C(0)) << (start % 64));
-    for (uint32_t i = firstword + 1; i < endword; i++) {
+    for ( i = firstword + 1; i < endword; i++) {
         words[i] = UINT64_C(0);
     }
     words[endword] &= ~((~UINT64_C(0)) >> ((~end + 1) % 64));
@@ -2077,6 +2103,7 @@ inline bool array_container_contains(const array_container_t *arr,
     //    return binarySearch(arr->array, arr->cardinality, pos) >= 0;
     // binary search with fallback to linear search for short ranges
     int32_t low = 0;
+    int i;
     const uint16_t * carr = (const uint16_t *) arr->array;
     int32_t high = arr->cardinality - 1;
     //    while (high - low >= 0) {
@@ -2092,7 +2119,7 @@ inline bool array_container_contains(const array_container_t *arr,
         }
     }
 
-    for (int i=low; i <= high; i++) {
+    for (i=low; i <= high; i++) {
         uint16_t v = carr[i];
         if (v == pos) {
             return true;
@@ -2175,14 +2202,15 @@ static inline void array_container_add_range_nvals(array_container_t *array,
                                                    uint32_t min, uint32_t max,
                                                    int32_t nvals_less,
                                                    int32_t nvals_greater) {
-    int32_t union_cardinality = nvals_less + (max - min + 1) + nvals_greater;
+  int32_t union_cardinality = nvals_less + (max - min + 1) + nvals_greater;
+  uint32_t i;
     if (union_cardinality > array->capacity) {
         array_container_grow(array, union_cardinality, true);
     }
     memmove(&(array->array[union_cardinality - nvals_greater]),
             &(array->array[array->cardinality - nvals_greater]),
             nvals_greater * sizeof(uint16_t));
-    for (uint32_t i = 0; i <= max - min; i++) {
+    for ( i = 0; i <= max - min; i++) {
         array->array[nvals_less + i] = min + i;
     }
     array->cardinality = union_cardinality;
@@ -2412,7 +2440,7 @@ static inline bool bitset_container_get_range(const bitset_container_t *bitset,
 
     const uint32_t start = pos_start >> 6;
     const uint32_t end = pos_end >> 6;
-
+    uint16_t i;
     const uint64_t first = ~((1ULL << (pos_start & 0x3F)) - 1);
     const uint64_t last = (1ULL << (pos_end & 0x3F)) - 1;
 
@@ -2424,7 +2452,7 @@ static inline bool bitset_container_get_range(const bitset_container_t *bitset,
         return false;
     }
 
-    for (uint16_t i = start + 1; (i < BITSET_CONTAINER_SIZE_IN_WORDS) && (i < end); ++i){
+    for (i = start + 1; (i < BITSET_CONTAINER_SIZE_IN_WORDS) && (i < end); ++i){
 
         if (bitset->words[i] != UINT64_C(0xFFFFFFFFFFFFFFFF)) return false;
     }
@@ -2476,7 +2504,8 @@ int bitset_container_compute_cardinality(const bitset_container_t *bitset);
 static inline bool bitset_container_empty(
     const bitset_container_t *bitset) {
   if (bitset->cardinality == BITSET_UNKNOWN_CARDINALITY) {
-      for (int i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i ++) {
+    int i;
+      for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i ++) {
           if((bitset->words[i]) != 0) return false;
       }
       return true;
@@ -2970,14 +2999,14 @@ inline bool run_container_contains(const run_container_t *run, uint16_t pos) {
 static inline bool run_container_contains_range(const run_container_t *run,
                                                 uint32_t pos_start, uint32_t pos_end) {
     uint32_t count = 0;
-    int32_t index = interleavedBinarySearch(run->runs, run->n_runs, pos_start);
+    int32_t index = interleavedBinarySearch(run->runs, run->n_runs, pos_start), i;
     if (index < 0) {
         index = -index - 2;
         if ((index == -1) || ((pos_start - run->runs[index].value) > run->runs[index].length)){
             return false;
         }
     }
-    for (int32_t i = index; i < run->n_runs; ++i) {
+    for (i = index; i < run->n_runs; ++i) {
         const uint32_t stop = run->runs[i].value + run->runs[i].length;
         if (run->runs[i].value >= pos_end) break;
         if (stop >= pos_end) {
@@ -9600,7 +9629,8 @@ CROARING_UNTARGET_REGION
 size_t bitset_extract_setbits(const uint64_t *words, size_t length,
                               uint32_t *out, uint32_t base) {
     int outpos = 0;
-    for (size_t i = 0; i < length; ++i) {
+    size_t i;
+    for (i = 0; i < length; ++i) {
         uint64_t w = words[i];
         while (w != 0) {
             uint64_t t = w & (~w + 1); // on x64, should compile to BLSI (careful: the Intel compiler seems to fail)
@@ -9621,7 +9651,9 @@ size_t bitset_extract_intersection_setbits_uint16(const uint64_t * __restrict__ 
                                                   size_t length, uint16_t *out,
                                                   uint16_t base) {
     int outpos = 0;
-    for (size_t i = 0; i < length; ++i) {
+    size_t i;
+
+    for (i = 0; i < length; ++i) {
         uint64_t w = words1[i] & words2[i];
         while (w != 0) {
             uint64_t t = w & (~w + 1);
@@ -9713,7 +9745,8 @@ CROARING_UNTARGET_REGION
 size_t bitset_extract_setbits_uint16(const uint64_t *words, size_t length,
                                      uint16_t *out, uint16_t base) {
     int outpos = 0;
-    for (size_t i = 0; i < length; ++i) {
+    size_t i;
+    for (i = 0; i < length; ++i) {
         uint64_t w = words[i];
         while (w != 0) {
             uint64_t t = w & (~w + 1);
@@ -10057,9 +10090,10 @@ array_container_t *array_container_create() {
 /* Create a new array containing all values in [min,max). */
 array_container_t * array_container_create_range(uint32_t min, uint32_t max) {
     array_container_t * answer = array_container_create_given_capacity(max - min + 1);
+    uint32_t k;
     if(answer == NULL) return answer;
     answer->cardinality = 0;
-    for(uint32_t k = min; k < max; k++) {
+    for(k = min; k < max; k++) {
       answer->array[answer->cardinality++] = k;
     }
     return answer;
@@ -10089,8 +10123,9 @@ void array_container_offset(const array_container_t *c,
 
     lo_cap = count_less(c->array, c->cardinality, top);
     if (loc && lo_cap) {
+      int i;
         lo = array_container_create_given_capacity(lo_cap);
-        for (int i = 0; i < lo_cap; ++i) {
+        for (i = 0; i < lo_cap; ++i) {
             array_container_add(lo, c->array[i] + offset);
         }
         *loc = (container_t*)lo;
@@ -10098,8 +10133,9 @@ void array_container_offset(const array_container_t *c,
 
     hi_cap = c->cardinality - lo_cap;
     if (hic && hi_cap) {
+      int i;
         hi = array_container_create_given_capacity(hi_cap);
-        for (int i = lo_cap; i < c->cardinality; ++i) {
+        for (i = lo_cap; i < c->cardinality; ++i) {
             array_container_add(hi, c->array[i] + offset);
         }
         *hic = (container_t*)hi;
@@ -10184,7 +10220,8 @@ void array_container_copy(const array_container_t *src,
 
 void array_container_add_from_range(array_container_t *arr, uint32_t min,
                                     uint32_t max, uint16_t step) {
-    for (uint32_t value = min; value < max; value += step) {
+  uint32_t value;
+    for (value = min; value < max; value += step) {
         array_container_append(arr, value);
     }
 }
@@ -10378,9 +10415,9 @@ void array_container_intersection_inplace(array_container_t *src_1,
 ALLOW_UNALIGNED
 int array_container_to_uint32_array(void *vout, const array_container_t *cont,
                                     uint32_t base) {
-    int outpos = 0;
+  int outpos = 0, i;
     uint32_t *out = (uint32_t *)vout;
-    for (int i = 0; i < cont->cardinality; ++i) {
+    for (i = 0; i < cont->cardinality; ++i) {
         const uint32_t val = base + cont->array[i];
         memcpy(out + outpos, &val,
                sizeof(uint32_t));  // should be compiled as a MOV on x64
@@ -10390,13 +10427,14 @@ int array_container_to_uint32_array(void *vout, const array_container_t *cont,
 }
 
 void array_container_printf(const array_container_t *v) {
+  int i;
     if (v->cardinality == 0) {
         printf("{}");
         return;
     }
     printf("{");
     printf("%d", v->array[0]);
-    for (int i = 1; i < v->cardinality; ++i) {
+    for (i = 1; i < v->cardinality; ++i) {
         printf(",%d", v->array[i]);
     }
     printf("}");
@@ -10404,11 +10442,13 @@ void array_container_printf(const array_container_t *v) {
 
 void array_container_printf_as_uint32_array(const array_container_t *v,
                                             uint32_t base) {
+  int i;
+
     if (v->cardinality == 0) {
         return;
     }
     printf("%u", v->array[0] + base);
-    for (int i = 1; i < v->cardinality; ++i) {
+    for (i = 1; i < v->cardinality; ++i) {
         printf(",%u", v->array[i] + base);
     }
 }
@@ -10418,7 +10458,8 @@ int32_t array_container_number_of_runs(const array_container_t *ac) {
     // Can SIMD work here?
     int32_t nr_runs = 0;
     int32_t prev = -2;
-    for (const uint16_t *p = ac->array; p != ac->array + ac->cardinality; ++p) {
+    uint16_t *p;
+    for (p = ac->array; p != ac->array + ac->cardinality; ++p) {
         if (*p != prev + 1) nr_runs++;
         prev = *p;
     }
@@ -10472,7 +10513,8 @@ int32_t array_container_read(int32_t cardinality, array_container_t *container,
 
 bool array_container_iterate(const array_container_t *cont, uint32_t base,
                              roaring_iterator iterator, void *ptr) {
-    for (int i = 0; i < cont->cardinality; i++)
+  int i;
+    for (i = 0; i < cont->cardinality; i++)
         if (!iterator(cont->array[i] + base, ptr)) return false;
     return true;
 }
@@ -10480,7 +10522,8 @@ bool array_container_iterate(const array_container_t *cont, uint32_t base,
 bool array_container_iterate64(const array_container_t *cont, uint32_t base,
                                roaring_iterator64 iterator, uint64_t high_bits,
                                void *ptr) {
-    for (int i = 0; i < cont->cardinality; i++)
+  int i;
+    for (i = 0; i < cont->cardinality; i++)
         if (!iterator(high_bits | (uint64_t)(cont->array[i] + base), ptr))
             return false;
     return true;
@@ -10565,11 +10608,13 @@ void bitset_container_add_from_range(bitset_container_t *bitset, uint32_t min,
     if (step == 0) return;   // refuse to crash
     if ((64 % step) == 0) {  // step divides 64
         uint64_t mask = 0;   // construct the repeated mask
-        for (uint32_t value = (min % step); value < 64; value += step) {
+	uint32_t value;
+        for (value = (min % step); value < 64; value += step) {
             mask |= ((uint64_t)1 << value);
         }
         uint32_t firstword = min / 64;
         uint32_t endword = (max - 1) / 64;
+	uint32_t i;
         bitset->cardinality = (max - min + step - 1) / step;
         if (firstword == endword) {
             bitset->words[firstword] |=
@@ -10578,11 +10623,12 @@ void bitset_container_add_from_range(bitset_container_t *bitset, uint32_t min,
             return;
         }
         bitset->words[firstword] = mask & ((~UINT64_C(0)) << (min % 64));
-        for (uint32_t i = firstword + 1; i < endword; i++)
+        for (i = firstword + 1; i < endword; i++)
             bitset->words[i] = mask;
         bitset->words[endword] = mask & ((~UINT64_C(0)) >> ((~max + 1) % 64));
     } else {
-        for (uint32_t value = min; value < max; value += step) {
+      uint32_t value;
+        for (value = min; value < max; value += step) {
             bitset_container_add(bitset, value);
         }
     }
@@ -10634,8 +10680,9 @@ void bitset_container_offset(const bitset_container_t *c,
         if (i == 0) {
             memcpy(bc->words+b, c->words, 8*end);
         } else {
+	  uint32_t k;
             bc->words[b] = c->words[0] << i;
-            for (uint32_t k = 1; k < end; ++k) {
+            for (k = 1; k < end; ++k) {
                 val = c->words[k] << i;
                 val |= c->words[k-1] >> (64 - i);
                 bc->words[b+k] = val;
@@ -10666,7 +10713,9 @@ void bitset_container_offset(const bitset_container_t *c,
     if (i == 0) {
         memcpy(bc->words, c->words+end, 8*b);
     } else {
-        for (uint32_t k = end; k < 1024; ++k) {
+      uint32_t k;
+
+        for ( k = end; k < 1024; ++k) {
             val = c->words[k] << i;
 	    val |= c->words[k-1] >> (64 - i);
 	    bc->words[k-end] = val;
@@ -10695,7 +10744,8 @@ bool bitset_container_intersect(const bitset_container_t *src_1,
 	// could vectorize, but this is probably already quite fast in practice
     const uint64_t * __restrict__ words_1 = src_1->words;
     const uint64_t * __restrict__ words_2 = src_2->words;
-	for (int i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i ++) {
+    int i;
+	for ( i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i ++) {
         if((words_1[i] & words_2[i]) != 0) return true;
     }
     return false;
@@ -10759,8 +10809,8 @@ int bitset_container_compute_cardinality(const bitset_container_t *bitset) {
 /* Get the number of bits set (force computation) */
 int bitset_container_compute_cardinality(const bitset_container_t *bitset) {
     const uint64_t *words = bitset->words;
-    int32_t sum = 0;
-    for (int i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i += 4) {
+    int32_t sum = 0, i;
+    for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i += 4) {
         sum += hamming(words[i]);
         sum += hamming(words[i + 1]);
         sum += hamming(words[i + 2]);
@@ -11122,7 +11172,8 @@ int bitset_container_##opname(const bitset_container_t *src_1,            \
     const uint64_t * __restrict__ words_2 = src_2->words;                 \
     uint64_t *out = dst->words;                                           \
     int32_t sum = 0;                                                      \
-    for (size_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i += 2) {      \
+    size_t i;                                                             \
+    for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i += 2) {      \
         const uint64_t word_1 = (words_1[i])opsymbol(words_2[i]),         \
                        word_2 = (words_1[i + 1])opsymbol(words_2[i + 1]); \
         out[i] = word_1;                                                  \
@@ -11139,7 +11190,8 @@ int bitset_container_##opname##_nocard(const bitset_container_t *src_1,   \
     const uint64_t * __restrict__ words_1 = src_1->words;                 \
     const uint64_t * __restrict__ words_2 = src_2->words;                 \
     uint64_t *out = dst->words;                                           \
-    for (size_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i++) {         \
+    size_t i;                                                             \
+    for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i++) {         \
         out[i] = (words_1[i])opsymbol(words_2[i]);                        \
     }                                                                     \
     dst->cardinality = BITSET_UNKNOWN_CARDINALITY;                        \
@@ -11150,7 +11202,8 @@ int bitset_container_##opname##_justcard(const bitset_container_t *src_1, \
     const uint64_t * __restrict__ words_1 = src_1->words;                 \
     const uint64_t * __restrict__ words_2 = src_2->words;                 \
     int32_t sum = 0;                                                      \
-    for (size_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i += 2) {      \
+    size_t i;                                                             \
+    for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i += 2) {      \
         const uint64_t word_1 = (words_1[i])opsymbol(words_2[i]),         \
                        word_2 = (words_1[i + 1])opsymbol(words_2[i + 1]); \
         sum += hamming(word_1);                                    \
@@ -11200,7 +11253,8 @@ void bitset_container_printf(const bitset_container_t * v) {
 	printf("{");
 	uint32_t base = 0;
 	bool iamfirst = true;// TODO: rework so that this is not necessary yet still readable
-	for (int i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i) {
+	int i;
+	for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i) {
 		uint64_t w = v->words[i];
 		while (w != 0) {
 			uint64_t t = w & (~w + 1);
@@ -11224,7 +11278,8 @@ void bitset_container_printf(const bitset_container_t * v) {
  */
 void bitset_container_printf_as_uint32_array(const bitset_container_t * v, uint32_t base) {
 	bool iamfirst = true;// TODO: rework so that this is not necessary yet still readable
-	for (int i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i) {
+	int i;
+	for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i) {
 		uint64_t w = v->words[i];
 		while (w != 0) {
 			uint64_t t = w & (~w + 1);
@@ -11244,10 +11299,10 @@ void bitset_container_printf_as_uint32_array(const bitset_container_t * v, uint3
 
 // TODO: use the fast lower bound, also
 int bitset_container_number_of_runs(bitset_container_t *bc) {
-  int num_runs = 0;
+  int num_runs = 0, i;
   uint64_t next_word = bc->words[0];
-
-  for (int i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS-1; ++i) {
+  
+  for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS-1; ++i) {
     uint64_t word = next_word;
     next_word = bc->words[i+1];
     num_runs += hamming((~word) & (word << 1)) + ( (word >> 63) & ~next_word);
@@ -11276,7 +11331,8 @@ int32_t bitset_container_read(int32_t cardinality, bitset_container_t *container
 }
 
 bool bitset_container_iterate(const bitset_container_t *cont, uint32_t base, roaring_iterator iterator, void *ptr) {
-  for (int32_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
+  int32_t i;
+  for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
     uint64_t w = cont->words[i];
     while (w != 0) {
       uint64_t t = w & (~w + 1);
@@ -11290,7 +11346,8 @@ bool bitset_container_iterate(const bitset_container_t *cont, uint32_t base, roa
 }
 
 bool bitset_container_iterate64(const bitset_container_t *cont, uint32_t base, roaring_iterator64 iterator, uint64_t high_bits, void *ptr) {
-  for (int32_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
+  int32_t i;
+  for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
     uint64_t w = cont->words[i];
     while (w != 0) {
       uint64_t t = w & (~w + 1);
@@ -11349,7 +11406,8 @@ bool bitset_container_is_subset(const bitset_container_t *container1,
             return false;
         }
     }
-    for(int32_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
+    int32_t i;
+    for(i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
 		if((container1->words[i] & container2->words[i]) != container1->words[i]) {
 			return false;
 		}
@@ -11365,7 +11423,8 @@ bool bitset_container_select(const bitset_container_t *container, uint32_t *star
     }
     const uint64_t *words = container->words;
     int32_t size;
-    for (int i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i += 1) {
+    int i;
+    for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i += 1) {
         size = hamming(words[i]);
         if(rank <= *start_rank + size) {
             uint64_t w = container->words[i];
@@ -11391,7 +11450,8 @@ bool bitset_container_select(const bitset_container_t *container, uint32_t *star
 
 /* Returns the smallest value (assumes not empty) */
 uint16_t bitset_container_minimum(const bitset_container_t *container) {
-  for (int32_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
+  int32_t i;
+  for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
     uint64_t w = container->words[i];
     if (w != 0) {
       int r = __builtin_ctzll(w);
@@ -11403,7 +11463,8 @@ uint16_t bitset_container_minimum(const bitset_container_t *container) {
 
 /* Returns the largest value (assumes not empty) */
 uint16_t bitset_container_maximum(const bitset_container_t *container) {
-  for (int32_t i = BITSET_CONTAINER_SIZE_IN_WORDS - 1; i > 0; --i ) {
+  int32_t i;
+  for (i = BITSET_CONTAINER_SIZE_IN_WORDS - 1; i > 0; --i ) {
     uint64_t w = container->words[i];
     if (w != 0) {
       int r = __builtin_clzll(w);
@@ -11417,8 +11478,8 @@ uint16_t bitset_container_maximum(const bitset_container_t *container) {
 int bitset_container_rank(const bitset_container_t *container, uint16_t x) {
   // credit: aqrit
   int sum = 0;
-  int i = 0;
-  for (int end = x / 64; i < end; i++){
+  int i = 0, end;
+  for (end = x / 64; i < end; i++){
     sum += hamming(container->words[i]);
   }
   uint64_t lastword = container->words[i];
@@ -11717,15 +11778,16 @@ extern "C" { namespace roaring { namespace internal {
 // types.
 bitset_container_t *bitset_container_from_array(const array_container_t *ac) {
     bitset_container_t *ans = bitset_container_create();
-    int limit = array_container_cardinality(ac);
-    for (int i = 0; i < limit; ++i) bitset_container_set(ans, ac->array[i]);
+    int limit = array_container_cardinality(ac), i;
+    for (i = 0; i < limit; ++i) bitset_container_set(ans, ac->array[i]);
     return ans;
 }
 
 bitset_container_t *bitset_container_from_run(const run_container_t *arr) {
     int card = run_container_cardinality(arr);
     bitset_container_t *answer = bitset_container_create();
-    for (int rlepos = 0; rlepos < arr->n_runs; ++rlepos) {
+    int rlepos;
+    for (rlepos = 0; rlepos < arr->n_runs; ++rlepos) {
         rle16_t vl = arr->runs[rlepos];
         bitset_set_lenrange(answer->words, vl.value, vl.length);
     }
@@ -11737,11 +11799,12 @@ array_container_t *array_container_from_run(const run_container_t *arr) {
     array_container_t *answer =
         array_container_create_given_capacity(run_container_cardinality(arr));
     answer->cardinality = 0;
-    for (int rlepos = 0; rlepos < arr->n_runs; ++rlepos) {
+    int rlepos;
+    for (rlepos = 0; rlepos < arr->n_runs; ++rlepos) {
         int run_start = arr->runs[rlepos].value;
         int run_end = run_start + arr->runs[rlepos].length;
-
-        for (int run_value = run_start; run_value <= run_end; ++run_value) {
+	int run_value;
+        for (run_value = run_start; run_value <= run_end; ++run_value) {
             answer->array[answer->cardinality++] = (uint16_t)run_value;
         }
     }
@@ -11771,10 +11834,10 @@ run_container_t *run_container_from_array(const array_container_t *c) {
     int32_t n_runs = array_container_number_of_runs(c);
     run_container_t *answer = run_container_create_given_capacity(n_runs);
     int prev = -2;
-    int run_start = -1;
+    int run_start = -1, i;
     int32_t card = c->cardinality;
     if (card == 0) return answer;
-    for (int i = 0; i < card; ++i) {
+    for (i = 0; i < card; ++i) {
         const uint16_t cur_val = c->array[i];
         if (cur_val != prev + 1) {
             // new run starts; flush old one, if any
@@ -11801,11 +11864,13 @@ container_t *convert_to_bitset_or_array_container(
 ){
     if (card <= DEFAULT_MAX_SIZE) {
         array_container_t *answer = array_container_create_given_capacity(card);
+	int rlepos;
         answer->cardinality = 0;
-        for (int rlepos = 0; rlepos < rc->n_runs; ++rlepos) {
+        for (rlepos = 0; rlepos < rc->n_runs; ++rlepos) {
             uint16_t run_start = rc->runs[rlepos].value;
             uint16_t run_end = run_start + rc->runs[rlepos].length;
-            for (uint16_t run_value = run_start; run_value < run_end;
+	    uint16_t run_value;
+            for (run_value = run_start; run_value < run_end;
                  ++run_value) {
                 answer->array[answer->cardinality++] = run_value;
             }
@@ -11817,7 +11882,8 @@ container_t *convert_to_bitset_or_array_container(
         return answer;
     }
     bitset_container_t *answer = bitset_container_create();
-    for (int rlepos = 0; rlepos < rc->n_runs; ++rlepos) {
+    int rlepos;
+    for (rlepos = 0; rlepos < rc->n_runs; ++rlepos) {
         uint16_t run_start = rc->runs[rlepos].value;
         bitset_set_lenrange(answer->words, run_start, rc->runs[rlepos].length);
     }
@@ -11857,11 +11923,12 @@ container_t *convert_run_to_efficient_container(
         // to array
         array_container_t *answer = array_container_create_given_capacity(card);
         answer->cardinality = 0;
-        for (int rlepos = 0; rlepos < c->n_runs; ++rlepos) {
+	int rlepos;
+        for (rlepos = 0; rlepos < c->n_runs; ++rlepos) {
             int run_start = c->runs[rlepos].value;
             int run_end = run_start + c->runs[rlepos].length;
-
-            for (int run_value = run_start; run_value <= run_end; ++run_value) {
+	    int run_value;
+            for (run_value = run_start; run_value <= run_end; ++run_value) {
                 answer->array[answer->cardinality++] = (uint16_t)run_value;
             }
         }
@@ -11871,8 +11938,8 @@ container_t *convert_run_to_efficient_container(
 
     // else to bitset
     bitset_container_t *answer = bitset_container_create();
-
-    for (int rlepos = 0; rlepos < c->n_runs; ++rlepos) {
+    int rlepos;
+    for (rlepos = 0; rlepos < c->n_runs; ++rlepos) {
         int start = c->runs[rlepos].value;
         int end = start + c->runs[rlepos].length;
         bitset_set_range(answer->words, start, end + 1);
@@ -11928,9 +11995,11 @@ container_t *convert_run_optimize(
         run_container_t *answer = run_container_create_given_capacity(n_runs);
         int prev = -2;
         int run_start = -1;
+	int i;
 
         assert(card > 0);
-        for (int i = 0; i < card; ++i) {
+	
+        for (i = 0; i < card; ++i) {
             uint16_t cur_val = c_qua_array->array[i];
             if (cur_val != prev + 1) {
                 // new run starts; flush old one, if any
@@ -12015,7 +12084,8 @@ container_t *container_from_run_range(
     bitset_container_t *bitset = bitset_container_create();
     *typecode_after = BITSET_CONTAINER_TYPE;
     int32_t union_cardinality = 0;
-    for (int32_t i = 0; i < run->n_runs; ++i) {
+    int32_t i;
+    for (i = 0; i < run->n_runs; ++i) {
         uint32_t rle_min = run->runs[i].value;
         uint32_t rle_max = rle_min + run->runs[i].length;
         bitset_set_lenrange(bitset->words, rle_min, rle_max - rle_min);
@@ -12064,7 +12134,8 @@ void array_bitset_container_andnot(const array_container_t *src_1,
     }
     int32_t newcard = 0;
     const int32_t origcard = src_1->cardinality;
-    for (int i = 0; i < origcard; ++i) {
+    int i;
+    for (i = 0; i < origcard; ++i) {
         uint16_t key = src_1->array[i];
         dst->array[newcard] = key;
         newcard += 1 - bitset_container_contains(src_2, key);
@@ -12147,9 +12218,11 @@ bool run_bitset_container_andnot(
         // must be an array
         array_container_t *answer = array_container_create_given_capacity(card);
         answer->cardinality = 0;
-        for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+	int32_t rlepos;
+        for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
             rle16_t rle = src_1->runs[rlepos];
-            for (int run_value = rle.value; run_value <= rle.value + rle.length;
+	    int run_value;
+            for (run_value = rle.value; run_value <= rle.value + rle.length;
                  ++run_value) {
                 if (!bitset_container_get(src_2, (uint16_t)run_value)) {
                     answer->array[answer->cardinality++] = (uint16_t)run_value;
@@ -12163,7 +12236,8 @@ bool run_bitset_container_andnot(
         bitset_container_t *answer = bitset_container_clone(src_2);
 
         uint32_t last_pos = 0;
-        for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+	int32_t rlepos;
+        for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
             rle16_t rle = src_1->runs[rlepos];
 
             uint32_t start = rle.value;
@@ -12216,9 +12290,10 @@ bool bitset_run_container_andnot(
 ){
     // follows Java implementation
     bitset_container_t *result = bitset_container_create();
-
+    int32_t rlepos;
     bitset_container_copy(src_1, result);
-    for (int32_t rlepos = 0; rlepos < src_2->n_runs; ++rlepos) {
+    
+    for (rlepos = 0; rlepos < src_2->n_runs; ++rlepos) {
         rle16_t rle = src_2->runs[rlepos];
         bitset_reset_range(result->words, rle.value,
                            rle.value + rle.length + UINT32_C(1));
@@ -12247,7 +12322,7 @@ bool bitset_run_container_iandnot(
 ){
     *dst = src_1;
 
-    for (int32_t rlepos = 0; rlepos < src_2->n_runs; ++rlepos) {
+    int32_t rlepos; for (rlepos = 0; rlepos < src_2->n_runs; ++rlepos) {
         rle16_t rle = src_2->runs[rlepos];
         bitset_reset_range(src_1->words, rle.value,
                            rle.value + rle.length + UINT32_C(1));
@@ -12277,7 +12352,7 @@ static int run_array_array_subtract(const run_container_t *rc,
     int32_t in_array_pos =
         -1;  // since advanceUntil always assumes we start the search AFTER this
 
-    for (int rlepos = 0; rlepos < rc->n_runs; rlepos++) {
+    int rlepos; for (rlepos = 0; rlepos < rc->n_runs; rlepos++) {
         int32_t start = rc->runs[rlepos].value;
         int32_t end = start + rc->runs[rlepos].length + 1;
 
@@ -12285,17 +12360,17 @@ static int run_array_array_subtract(const run_container_t *rc,
                                     a_in->cardinality, (uint16_t)start);
 
         if (in_array_pos >= a_in->cardinality) {  // run has no items subtracted
-            for (int32_t i = start; i < end; ++i)
+            int32_t i; for (i = start; i < end; ++i)
                 a_out->array[out_card++] = (uint16_t)i;
         } else {
             uint16_t next_nonincluded = a_in->array[in_array_pos];
             if (next_nonincluded >= end) {
                 // another case when run goes unaltered
-                for (int32_t i = start; i < end; ++i)
+                int32_t i; for (i = start; i < end; ++i)
                     a_out->array[out_card++] = (uint16_t)i;
                 in_array_pos--;  // ensure we see this item again if necessary
             } else {
-                for (int32_t i = start; i < end; ++i)
+                int32_t i; for (i = start; i < end; ++i)
                     if (i != next_nonincluded)
                         a_out->array[out_card++] = (uint16_t)i;
                     else  // 0 should ensure  we don't match
@@ -12440,7 +12515,7 @@ void array_run_container_andnot(const array_container_t *src_1,
 
     uint16_t val = 0;
     int dest_card = 0;
-    for (int i = 0; i < src_1->cardinality; ++i) {
+    int i; for (i = 0; i < src_1->cardinality; ++i) {
         val = src_1->array[i];
         if (val < run_start)
             dst->array[dest_card++] = val;
@@ -12581,7 +12656,7 @@ bool array_container_equal_bitset(const array_container_t* container1,
         }
     }
     int32_t pos = 0;
-    for (int32_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i) {
+    int32_t i; for (i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i) {
         uint64_t w = container2->words[i];
         while (w != 0) {
             uint64_t t = w & (~w + 1);
@@ -12604,7 +12679,7 @@ bool run_container_equals_array(const run_container_t* container1,
     if (run_container_cardinality(container1) != container2->cardinality)
         return false;
     int32_t pos = 0;
-    for (int i = 0; i < container1->n_runs; ++i) {
+    int i; for (i = 0; i < container1->n_runs; ++i) {
         const uint32_t run_start = container1->runs[i].value;
         const uint32_t le = container1->runs[i].length;
 
@@ -12632,7 +12707,7 @@ bool run_container_equals_bitset(const run_container_t* container1,
         return false;
     }
 
-    for (int32_t i = 0; i < container1->n_runs; i++) {
+    int32_t i; for (i = 0; i < container1->n_runs; i++) {
         uint32_t begin = container1->runs[i].value;
         if (container1->runs[i].length) {
             uint32_t end = begin + container1->runs[i].length + 1;
@@ -12674,7 +12749,7 @@ void array_bitset_container_intersection(const array_container_t *src_1,
     }
     int32_t newcard = 0;  // dst could be src_1
     const int32_t origcard = src_1->cardinality;
-    for (int i = 0; i < origcard; ++i) {
+    int i; for (i = 0; i < origcard; ++i) {
         uint16_t key = src_1->array[i];
         // this branchless approach is much faster...
         dst->array[newcard] = key;
@@ -12700,7 +12775,7 @@ int array_bitset_container_intersection_cardinality(
     const array_container_t *src_1, const bitset_container_t *src_2) {
     int32_t newcard = 0;
     const int32_t origcard = src_1->cardinality;
-    for (int i = 0; i < origcard; ++i) {
+    int i; for (i = 0; i < origcard; ++i) {
         uint16_t key = src_1->array[i];
         newcard += bitset_container_contains(src_2, key);
     }
@@ -12711,7 +12786,7 @@ int array_bitset_container_intersection_cardinality(
 bool array_bitset_container_intersect(const array_container_t *src_1,
                                          const bitset_container_t *src_2) {
 	const int32_t origcard = src_1->cardinality;
-	for (int i = 0; i < origcard; ++i) {
+	int i; for (i = 0; i < origcard; ++i) {
 	        uint16_t key = src_1->array[i];
 	        if(bitset_container_contains(src_2, key)) return true;
 	}
@@ -12785,10 +12860,10 @@ bool run_bitset_container_intersection(
         if (*dst == NULL) {
             return false;
         }
-        for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+        int32_t rlepos; for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
             rle16_t rle = src_1->runs[rlepos];
             uint32_t endofrun = (uint32_t)rle.value + rle.length;
-            for (uint32_t runValue = rle.value; runValue <= endofrun;
+            uint32_t runValue; for (runValue = rle.value; runValue <= endofrun;
                  ++runValue) {
                 answer->array[answer->cardinality] = (uint16_t)runValue;
                 answer->cardinality +=
@@ -12800,7 +12875,7 @@ bool run_bitset_container_intersection(
     if (*dst == src_2) {  // we attempt in-place
         bitset_container_t *answer = CAST_bitset(*dst);
         uint32_t start = 0;
-        for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+        int32_t rlepos; for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
             const rle16_t rle = src_1->runs[rlepos];
             uint32_t end = rle.value;
             bitset_reset_range(src_2->words, start, end);
@@ -12829,7 +12904,7 @@ bool run_bitset_container_intersection(
             return true;
         }
         uint32_t start = 0;
-        for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+        int32_t rlepos; for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
             const rle16_t rle = src_1->runs[rlepos];
             uint32_t end = rle.value;
             bitset_reset_range(answer->words, start, end);
@@ -12895,7 +12970,7 @@ int run_bitset_container_intersection_cardinality(
         return bitset_container_cardinality(src_2);
     }
     int answer = 0;
-    for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+    int32_t rlepos; for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
         rle16_t rle = src_1->runs[rlepos];
         answer +=
             bitset_lenrange_cardinality(src_2->words, rle.value, rle.length);
@@ -12942,7 +13017,7 @@ bool run_bitset_container_intersect(const run_container_t *src_1,
 	   if( run_container_is_full(src_1) ) {
 		   return !bitset_container_empty(src_2);
 	   }
-       for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+       int32_t rlepos; for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
            rle16_t rle = src_1->runs[rlepos];
            if(!bitset_lenrange_empty(src_2->words, rle.value,rle.length)) return true;
        }
@@ -13372,7 +13447,7 @@ bool array_container_is_subset_bitset(const array_container_t* container1,
             return false;
         }
     }
-    for (int i = 0; i < container1->cardinality; ++i) {
+    int i; for (i = 0; i < container1->cardinality; ++i) {
         if (!bitset_container_contains(container2, container1->array[i])) {
             return false;
         }
@@ -13385,7 +13460,7 @@ bool run_container_is_subset_array(const run_container_t* container1,
     if (run_container_cardinality(container1) > container2->cardinality)
         return false;
     int32_t start_pos = -1, stop_pos = -1;
-    for (int i = 0; i < container1->n_runs; ++i) {
+    int i; for (i = 0; i < container1->n_runs; ++i) {
         int32_t start = container1->runs[i].value;
         int32_t stop = start + container1->runs[i].length;
         start_pos = advanceUntil(container2->array, stop_pos,
@@ -13440,10 +13515,10 @@ bool run_container_is_subset_bitset(const run_container_t* container1,
             return false;
         }
     }
-    for (int i = 0; i < container1->n_runs; ++i) {
+    int i; for (i = 0; i < container1->n_runs; ++i) {
         uint32_t run_start = container1->runs[i].value;
         uint32_t le = container1->runs[i].length;
-        for (uint32_t j = run_start; j <= run_start + le; ++j) {
+        uint32_t j;for ( j = run_start; j <= run_start + le; ++j) {
             if (!bitset_container_contains(container2, j)) {
                 return false;
             }
@@ -13540,7 +13615,7 @@ void run_bitset_container_union(const run_container_t *src_1,
                                 bitset_container_t *dst) {
     assert(!run_container_is_full(src_1));  // catch this case upstream
     if (src_2 != dst) bitset_container_copy(src_2, dst);
-    for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+    int32_t rlepos; for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
         rle16_t rle = src_1->runs[rlepos];
         bitset_set_lenrange(dst->words, rle.value, rle.length);
     }
@@ -13552,7 +13627,7 @@ void run_bitset_container_lazy_union(const run_container_t *src_1,
                                      bitset_container_t *dst) {
     assert(!run_container_is_full(src_1));  // catch this case upstream
     if (src_2 != dst) bitset_container_copy(src_2, dst);
-    for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+    int32_t rlepos; for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
         rle16_t rle = src_1->runs[rlepos];
         bitset_set_lenrange(dst->words, rle.value, rle.length);
     }
@@ -13861,7 +13936,7 @@ bool run_bitset_container_xor(
     bitset_container_t *result = bitset_container_create();
 
     bitset_container_copy(src_2, result);
-    for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+    int32_t rlepos; for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
         rle16_t rle = src_1->runs[rlepos];
         bitset_flip_range(result->words, rle.value,
                           rle.value + rle.length + UINT32_C(1));
@@ -13886,7 +13961,7 @@ void run_bitset_container_lazy_xor(const run_container_t *src_1,
                                    const bitset_container_t *src_2,
                                    bitset_container_t *dst) {
     if (src_2 != dst) bitset_container_copy(src_2, dst);
-    for (int32_t rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
+    int32_t rlepos; for (rlepos = 0; rlepos < src_1->n_runs; ++rlepos) {
         rle16_t rle = src_1->runs[rlepos];
         bitset_flip_range(dst->words, rle.value,
                           rle.value + rle.length + UINT32_C(1));
@@ -14326,7 +14401,7 @@ void run_container_offset(const run_container_t *c,
         lo = run_container_create_given_capacity(lo_cap);
         memcpy(lo->runs, c->runs, lo_cap*sizeof(rle16_t));
         lo->n_runs = lo_cap;
-        for (int i = 0; i < lo_cap; ++i) {
+        int i; for (i = 0; i < lo_cap; ++i) {
             lo->runs[i].value += offset;
         }
         *loc = (container_t*)lo;
@@ -14336,7 +14411,7 @@ void run_container_offset(const run_container_t *c,
         hi = run_container_create_given_capacity(hi_cap);
         memcpy(hi->runs, c->runs+pivot, hi_cap*sizeof(rle16_t));
         hi->n_runs = hi_cap;
-        for (int i = 0; i < hi_cap; ++i) {
+        int i; for (i = 0; i < hi_cap; ++i) {
             hi->runs[i].value += offset;
         }
         *hic = (container_t*)hi;
@@ -14816,10 +14891,10 @@ int run_container_to_uint32_array(void *vout, const run_container_t *cont,
                                   uint32_t base) {
     int outpos = 0;
     uint32_t *out = (uint32_t *)vout;
-    for (int i = 0; i < cont->n_runs; ++i) {
+    int i; for (i = 0; i < cont->n_runs; ++i) {
         uint32_t run_start = base + cont->runs[i].value;
         uint16_t le = cont->runs[i].length;
-        for (int j = 0; j <= le; ++j) {
+        int j;for (j = 0; j <= le; ++j) {
             uint32_t val = run_start + j;
             memcpy(out + outpos, &val,
                    sizeof(uint32_t));  // should be compiled as a MOV on x64
@@ -14833,7 +14908,7 @@ int run_container_to_uint32_array(void *vout, const run_container_t *cont,
  * Print this container using printf (useful for debugging).
  */
 void run_container_printf(const run_container_t *cont) {
-    for (int i = 0; i < cont->n_runs; ++i) {
+    int i; for (i = 0; i < cont->n_runs; ++i) {
         uint16_t run_start = cont->runs[i].value;
         uint16_t le = cont->runs[i].length;
         printf("[%d,%d]", run_start, run_start + le);
@@ -14851,12 +14926,12 @@ void run_container_printf_as_uint32_array(const run_container_t *cont,
         uint32_t run_start = base + cont->runs[0].value;
         uint16_t le = cont->runs[0].length;
         printf("%u", run_start);
-        for (uint32_t j = 1; j <= le; ++j) printf(",%u", run_start + j);
+        uint32_t j;for ( j = 1; j <= le; ++j) printf(",%u", run_start + j);
     }
-    for (int32_t i = 1; i < cont->n_runs; ++i) {
+    int32_t i; for (i = 1; i < cont->n_runs; ++i) {
         uint32_t run_start = base + cont->runs[i].value;
         uint16_t le = cont->runs[i].length;
-        for (uint32_t j = 0; j <= le; ++j) printf(",%u", run_start + j);
+        uint32_t j;for ( j = 0; j <= le; ++j) printf(",%u", run_start + j);
     }
 }
 
@@ -14885,11 +14960,11 @@ int32_t run_container_read(int32_t cardinality, run_container_t *container,
 
 bool run_container_iterate(const run_container_t *cont, uint32_t base,
                            roaring_iterator iterator, void *ptr) {
-    for (int i = 0; i < cont->n_runs; ++i) {
+    int i; for (i = 0; i < cont->n_runs; ++i) {
         uint32_t run_start = base + cont->runs[i].value;
         uint16_t le = cont->runs[i].length;
 
-        for (int j = 0; j <= le; ++j)
+        int j;for (j = 0; j <= le; ++j)
             if (!iterator(run_start + j, ptr)) return false;
     }
     return true;
@@ -14898,11 +14973,11 @@ bool run_container_iterate(const run_container_t *cont, uint32_t base,
 bool run_container_iterate64(const run_container_t *cont, uint32_t base,
                              roaring_iterator64 iterator, uint64_t high_bits,
                              void *ptr) {
-    for (int i = 0; i < cont->n_runs; ++i) {
+    int i; for (i = 0; i < cont->n_runs; ++i) {
         uint32_t run_start = base + cont->runs[i].value;
         uint16_t le = cont->runs[i].length;
 
-        for (int j = 0; j <= le; ++j)
+        int j;for (j = 0; j <= le; ++j)
             if (!iterator(high_bits | (uint64_t)(run_start + j), ptr))
                 return false;
     }
@@ -14988,7 +15063,7 @@ void run_container_smart_append_exclusive(run_container_t *src,
 bool run_container_select(const run_container_t *container,
                           uint32_t *start_rank, uint32_t rank,
                           uint32_t *element) {
-    for (int i = 0; i < container->n_runs; i++) {
+    int i; for (i = 0; i < container->n_runs; i++) {
         uint16_t length = container->runs[i].length;
         if (rank <= *start_rank + length) {
             uint16_t value = container->runs[i].value;
@@ -15003,7 +15078,7 @@ bool run_container_select(const run_container_t *container,
 int run_container_rank(const run_container_t *container, uint16_t x) {
     int sum = 0;
     uint32_t x32 = x;
-    for (int i = 0; i < container->n_runs; i++) {
+    int i; for (i = 0; i < container->n_runs; i++) {
         uint32_t startpoint = container->runs[i].value;
         uint32_t length = container->runs[i].length;
         uint32_t endpoint = length + startpoint;
@@ -15082,7 +15157,7 @@ int run_container_cardinality(const run_container_t *run) {
 
     /* by initializing with n_runs, we omit counting the +1 for each pair. */
     int sum = n_runs;
-    for (int k = 0; k < n_runs; ++k) {
+    int k; for ( k = 0; k < n_runs; ++k) {
         sum += runs[k].length;
     }
 
@@ -15352,7 +15427,7 @@ roaring_bitmap_t *roaring_bitmap_of(size_t n_args, ...) {
 
     memset(&context, 0, sizeof(context));
     va_start(ap, n_args);
-    for (size_t i = 0; i < n_args; i++) {
+    size_t i; for ( i = 0; i < n_args; i++) {
         uint32_t val = va_arg(ap, uint32_t);
         roaring_bitmap_add_bulk(answer, &context, val);
     }
@@ -15377,7 +15452,7 @@ roaring_bitmap_t *roaring_bitmap_from_range(uint64_t min, uint64_t max,
     if (max <= min) return NULL;
     roaring_bitmap_t *answer = roaring_bitmap_create();
     if (step >= (1 << 16)) {
-        for (uint32_t value = (uint32_t)min; value < max; value += step) {
+        uint32_t value; for ( value = (uint32_t)min; value < max; value += step) {
             roaring_bitmap_add(answer, value);
         }
         return answer;
@@ -15421,7 +15496,7 @@ void roaring_bitmap_add_range_closed(roaring_bitmap_t *r, uint32_t min, uint32_t
 
     int32_t src = prefix_length + common_length - 1;
     int32_t dst = ra->size - suffix_length - 1;
-    for (uint32_t key = max_key; key != min_key-1; key--) { // beware of min_key==0
+    uint32_t key; for ( key = max_key; key != min_key-1; key--) { // beware of min_key==0
         uint32_t container_min = (min_key == key) ? (min & 0xffff) : 0;
         uint32_t container_max = (max_key == key) ? (max & 0xffff) : 0xffff;
         container_t* new_container;
@@ -15493,7 +15568,7 @@ void roaring_bitmap_printf(const roaring_bitmap_t *r) {
     const roaring_array_t *ra = &r->high_low_container;
 
     printf("{");
-    for (int i = 0; i < ra->size; ++i) {
+    int i; for (i = 0; i < ra->size; ++i) {
         container_printf_as_uint32_array(ra->containers[i], ra->typecodes[i],
                                          ((uint32_t)ra->keys[i]) << 16);
 
@@ -15508,7 +15583,7 @@ void roaring_bitmap_printf_describe(const roaring_bitmap_t *r) {
     const roaring_array_t *ra = &r->high_low_container;
 
     printf("{");
-    for (int i = 0; i < ra->size; ++i) {
+    int i; for (i = 0; i < ra->size; ++i) {
         printf("%d: %s (%d)", ra->keys[i],
                get_full_container_name(ra->containers[i], ra->typecodes[i]),
                container_get_cardinality(ra->containers[i], ra->typecodes[i]));
@@ -15559,7 +15634,7 @@ void roaring_bitmap_statistics(const roaring_bitmap_t *r,
     stat->max_value = mms.max;
     stat->sum_value = mms.sum;
 
-    for (int i = 0; i < ra->size; ++i) {
+    int i; for (i = 0; i < ra->size; ++i) {
         uint8_t truetype =
             get_container_type(ra->containers[i], ra->typecodes[i]);
         uint32_t card =
@@ -15765,7 +15840,7 @@ void roaring_bitmap_remove_many(roaring_bitmap_t *r, size_t n_args,
         return;
     }
     int32_t pos = -1; // position of the container used in the previous iteration
-    for (size_t i = 0; i < n_args; i++) {
+    size_t i; for ( i = 0; i < n_args; i++) {
         uint16_t key = (uint16_t)(vals[i] >> 16);
         if (pos < 0 || key != r->high_low_container.keys[pos]) {
             pos = ra_get_index(&r->high_low_container, key);
@@ -15846,7 +15921,7 @@ roaring_bitmap_t *roaring_bitmap_or_many(size_t number,
     }
     roaring_bitmap_t *answer =
         roaring_bitmap_lazy_or(x[0], x[1], LAZY_OR_BITSET_CONVERSION);
-    for (size_t i = 2; i < number; i++) {
+    size_t i; for ( i = 2; i < number; i++) {
         roaring_bitmap_lazy_or_inplace(answer, x[i], LAZY_OR_BITSET_CONVERSION);
     }
     roaring_bitmap_repair_after_lazy(answer);
@@ -15865,7 +15940,7 @@ roaring_bitmap_t *roaring_bitmap_xor_many(size_t number,
         return roaring_bitmap_copy(x[0]);
     }
     roaring_bitmap_t *answer = roaring_bitmap_lazy_xor(x[0], x[1]);
-    for (size_t i = 2; i < number; i++) {
+    size_t i; for ( i = 2; i < number; i++) {
         roaring_bitmap_lazy_xor_inplace(answer, x[i]);
     }
     roaring_bitmap_repair_after_lazy(answer);
@@ -16420,7 +16495,7 @@ uint64_t roaring_bitmap_get_cardinality(const roaring_bitmap_t *r) {
     const roaring_array_t *ra = &r->high_low_container;
 
     uint64_t card = 0;
-    for (int i = 0; i < ra->size; ++i)
+    int i; for (i = 0; i < ra->size; ++i)
         card += container_get_cardinality(ra->containers[i], ra->typecodes[i]);
     return card;
 }
@@ -16501,7 +16576,7 @@ bool roaring_bitmap_range_uint32_array(const roaring_bitmap_t *r,
 */
 bool roaring_bitmap_run_optimize(roaring_bitmap_t *r) {
     bool answer = false;
-    for (int i = 0; i < r->high_low_container.size; i++) {
+    int i; for (i = 0; i < r->high_low_container.size; i++) {
         uint8_t type_original, type_after;
         ra_unshare_container_at_index(
             &r->high_low_container, i);  // TODO: this introduces extra cloning!
@@ -16518,7 +16593,7 @@ bool roaring_bitmap_run_optimize(roaring_bitmap_t *r) {
 
 size_t roaring_bitmap_shrink_to_fit(roaring_bitmap_t *r) {
     size_t answer = 0;
-    for (int i = 0; i < r->high_low_container.size; i++) {
+    int i; for (i = 0; i < r->high_low_container.size; i++) {
         uint8_t type_original;
         container_t *c = ra_get_container_at_index(&r->high_low_container, i,
                                                    &type_original);
@@ -16534,7 +16609,7 @@ size_t roaring_bitmap_shrink_to_fit(roaring_bitmap_t *r) {
  */
 bool roaring_bitmap_remove_run_compression(roaring_bitmap_t *r) {
     bool answer = false;
-    for (int i = 0; i < r->high_low_container.size; i++) {
+    int i; for (i = 0; i < r->high_low_container.size; i++) {
         uint8_t type_original, type_after;
         container_t *c = ra_get_container_at_index(&r->high_low_container, i,
                                                    &type_original);
@@ -16637,7 +16712,7 @@ roaring_bitmap_t *roaring_bitmap_deserialize(const void *buf) {
         roaring_bulk_context_t context;
 
 	memset(&context, 0, sizeof(context));
-        for (uint32_t i = 0; i < card; i++) {
+        uint32_t i; for ( i = 0; i < card; i++) {
             // elems may not be aligned, read with memcpy
             uint32_t elem;
             memcpy(&elem, elems + i, sizeof(elem));
@@ -16654,7 +16729,7 @@ bool roaring_iterate(const roaring_bitmap_t *r, roaring_iterator iterator,
                      void *ptr) {
     const roaring_array_t *ra = &r->high_low_container;
 
-    for (int i = 0; i < ra->size; ++i)
+    int i; for (i = 0; i < ra->size; ++i)
         if (!container_iterate(ra->containers[i], ra->typecodes[i],
                                ((uint32_t)ra->keys[i]) << 16,
                                iterator, ptr)) {
@@ -16667,7 +16742,7 @@ bool roaring_iterate64(const roaring_bitmap_t *r, roaring_iterator64 iterator,
                        uint64_t high_bits, void *ptr) {
     const roaring_array_t *ra = &r->high_low_container;
 
-    for (int i = 0; i < ra->size; ++i)
+    int i; for (i = 0; i < ra->size; ++i)
         if (!container_iterate64(
                 ra->containers[i], ra->typecodes[i],
                 ((uint32_t)ra->keys[i]) << 16, iterator,
@@ -17045,7 +17120,7 @@ uint32_t roaring_read_uint32_iterator(roaring_uint32_iterator_t *it, uint32_t* b
       case ARRAY_CONTAINER_TYPE:
         acont = const_CAST_array(it->container);
         num_values = minimum_uint32(acont->cardinality - it->in_container_index, count - ret);
-        for (uint32_t i = 0; i < num_values; i++) {
+        uint32_t i; for ( i = 0; i < num_values; i++) {
           buf[i] = it->highbits | acont->array[it->in_container_index + i];
         }
         buf += num_values;
@@ -17062,7 +17137,7 @@ uint32_t roaring_read_uint32_iterator(roaring_uint32_iterator_t *it, uint32_t* b
         do {
           uint32_t largest_run_value = it->highbits | (rcont->runs[it->run_index].value + rcont->runs[it->run_index].length);
           num_values = minimum_uint32(largest_run_value - it->current_value + 1, count - ret);
-          for (uint32_t i = 0; i < num_values; i++) {
+          uint32_t i; for ( i = 0; i < num_values; i++) {
             buf[i] = it->current_value + i;
           }
           it->current_value += num_values; // this can overflow to zero: UINT32_MAX+1=0
@@ -17108,12 +17183,12 @@ bool roaring_bitmap_equals(const roaring_bitmap_t *r1,
     if (ra1->size != ra2->size) {
         return false;
     }
-    for (int i = 0; i < ra1->size; ++i) {
+    int i; for (i = 0; i < ra1->size; ++i) {
         if (ra1->keys[i] != ra2->keys[i]) {
             return false;
         }
     }
-    for (int i = 0; i < ra1->size; ++i) {
+    for (i = 0; i < ra1->size; ++i) {
         bool areequal = container_equals(ra1->containers[i],
                                          ra1->typecodes[i],
                                          ra2->containers[i],
@@ -17299,7 +17374,7 @@ roaring_bitmap_t *roaring_bitmap_flip(const roaring_bitmap_t *x1,
 
         if (lb_end != 0xFFFF) --hb_end;  // later we'll handle the partial block
 
-        for (uint32_t hb = hb_start; hb <= hb_end; ++hb) {
+        uint32_t hb; for ( hb = hb_start; hb <= hb_end; ++hb) {
             insert_fully_flipped_container(&ans->high_low_container,
                                            &x1->high_low_container, hb);
         }
@@ -17345,7 +17420,7 @@ void roaring_bitmap_flip_inplace(roaring_bitmap_t *x1, uint64_t range_start,
 
         if (lb_end != 0xFFFF) --hb_end;
 
-        for (uint32_t hb = hb_start; hb <= hb_end; ++hb) {
+        uint32_t hb; for ( hb = hb_start; hb <= hb_end; ++hb) {
             inplace_fully_flip_container(&x1->high_low_container, hb);
         }
         // handle a partial final container
@@ -17414,7 +17489,7 @@ roaring_bitmap_t *roaring_bitmap_add_offset(const roaring_bitmap_t *bm,
     if (in_offset == 0) {
         ans_ra = &answer->high_low_container;
 
-        for (int i = 0, j = 0; i < length; ++i) {
+        int i, j; for (i = 0, j = 0; i < length; ++i) {
             int64_t key = ra_get_key_at_index(bm_ra, i);
             key += container_offset;
 
@@ -17434,7 +17509,7 @@ roaring_bitmap_t *roaring_bitmap_add_offset(const roaring_bitmap_t *bm,
     container_t *lo, *hi, **lo_ptr, **hi_ptr;
     int64_t k;
 
-    for (int i = 0; i < length; ++i) {
+    int i; for (i = 0; i < length; ++i) {
         lo = hi = NULL;
         lo_ptr = hi_ptr = NULL;
 
@@ -17807,7 +17882,7 @@ void roaring_bitmap_lazy_xor_inplace(roaring_bitmap_t *x1,
 void roaring_bitmap_repair_after_lazy(roaring_bitmap_t *r) {
     roaring_array_t *ra = &r->high_low_container;
 
-    for (int i = 0; i < ra->size; ++i) {
+    int i; for (i = 0; i < ra->size; ++i) {
         const uint8_t old_type = ra->typecodes[i];
         container_t *old_c = ra->containers[i];
         uint8_t new_type = old_type;
@@ -17826,7 +17901,7 @@ void roaring_bitmap_repair_after_lazy(roaring_bitmap_t *r) {
 uint64_t roaring_bitmap_rank(const roaring_bitmap_t *bm, uint32_t x) {
     uint64_t size = 0;
     uint32_t xhigh = x >> 16;
-    for (int i = 0; i < bm->high_low_container.size; i++) {
+    int i; for (i = 0; i < bm->high_low_container.size; i++) {
         uint32_t key = bm->high_low_container.keys[i];
         if (xhigh > key) {
             size +=
@@ -18065,7 +18140,7 @@ bool roaring_bitmap_contains_range(const roaring_bitmap_t *r, uint64_t range_sta
     if (!container_contains_range(c, 0, lb_re, type)) {
         return false;
     }
-    for (int32_t i = is + 1; i < ie; ++i) {
+    int32_t i; for (i = is + 1; i < ie; ++i) {
         c = ra_get_container_at_index(&r->high_low_container, i, &type);
         if (!container_is_full(c, type) ) {
           return false;
@@ -18115,7 +18190,7 @@ bool roaring_bitmap_is_strict_subset(const roaring_bitmap_t *r1,
 size_t roaring_bitmap_frozen_size_in_bytes(const roaring_bitmap_t *rb) {
     const roaring_array_t *ra = &rb->high_low_container;
     size_t num_bytes = 0;
-    for (int32_t i = 0; i < ra->size; i++) {
+    int32_t i; for (i = 0; i < ra->size; i++) {
         switch (ra->typecodes[i]) {
             case BITSET_CONTAINER_TYPE: {
                 num_bytes += BITSET_CONTAINER_SIZE_IN_WORDS * sizeof(uint64_t);
@@ -18158,7 +18233,7 @@ void roaring_bitmap_frozen_serialize(const roaring_bitmap_t *rb, char *buf) {
     size_t bitset_zone_size = 0;
     size_t run_zone_size = 0;
     size_t array_zone_size = 0;
-    for (int32_t i = 0; i < ra->size; i++) {
+    int32_t i; for (i = 0; i < ra->size; i++) {
         switch (ra->typecodes[i]) {
             case BITSET_CONTAINER_TYPE: {
                 bitset_zone_size +=
@@ -18189,7 +18264,7 @@ void roaring_bitmap_frozen_serialize(const roaring_bitmap_t *rb, char *buf) {
     uint8_t *typecode_zone = (uint8_t *)arena_alloc(&buf, ra->size);
     uint32_t *header_zone = (uint32_t *)arena_alloc(&buf, 4);
 
-    for (int32_t i = 0; i < ra->size; i++) {
+     for (i = 0; i < ra->size; i++) {
         uint16_t count;
         switch (ra->typecodes[i]) {
             case BITSET_CONTAINER_TYPE: {
@@ -18265,7 +18340,7 @@ roaring_bitmap_frozen_view(const char *buf, size_t length) {
     size_t bitset_zone_size = 0;
     size_t run_zone_size = 0;
     size_t array_zone_size = 0;
-    for (int32_t i = 0; i < num_containers; i++) {
+    int32_t i; for (i = 0; i < num_containers; i++) {
         switch (typecodes[i]) {
             case BITSET_CONTAINER_TYPE:
                 num_bitset_containers++;
@@ -18321,7 +18396,7 @@ roaring_bitmap_frozen_view(const char *buf, size_t length) {
     assert(rb ==
            (roaring_bitmap_t *)((char *)rb->high_low_container.containers -
                                 sizeof(roaring_bitmap_t)));
-    for (int32_t i = 0; i < num_containers; i++) {
+     for (i = 0; i < num_containers; i++) {
         switch (typecodes[i]) {
             case BITSET_CONTAINER_TYPE: {
                 bitset_container_t *bitset = (bitset_container_t *)
@@ -18402,7 +18477,7 @@ roaring_bitmap_t *roaring_bitmap_portable_deserialize_frozen(const char *buf) {
     int32_t num_run_containers = 0;
     int32_t num_array_containers = 0;
 
-    for (int32_t i = 0; i < num_containers; i++) {
+    int32_t i; for (i = 0; i < num_containers; i++) {
         uint16_t tmp;
         memcpy(&tmp, descriptive_headers + 2*i+1, sizeof(tmp));
         uint32_t cardinality = tmp + 1;
@@ -18454,7 +18529,7 @@ roaring_bitmap_t *roaring_bitmap_portable_deserialize_frozen(const char *buf) {
     rb->high_low_container.keys = keys;
     rb->high_low_container.typecodes = typecodes;
 
-    for (int32_t i = 0; i < num_containers; i++) {
+    for (i = 0; i < num_containers; i++) {
         uint16_t tmp;
         memcpy(&tmp, descriptive_headers + 2*i+1, sizeof(tmp));
         int32_t cardinality = tmp + 1;
@@ -18647,7 +18722,7 @@ bool ra_overwrite(const roaring_array_t *source, roaring_array_t *dest,
     memcpy(dest->keys, source->keys, dest->size * sizeof(uint16_t));
     // we go through the containers, turning them into shared containers...
     if (copy_on_write) {
-        for (int32_t i = 0; i < dest->size; ++i) {
+        int32_t i; for (i = 0; i < dest->size; ++i) {
             source->containers[i] = get_copy_of_container(
                 source->containers[i], &source->typecodes[i], copy_on_write);
         }
@@ -18659,11 +18734,11 @@ bool ra_overwrite(const roaring_array_t *source, roaring_array_t *dest,
     } else {
         memcpy(dest->typecodes, source->typecodes,
                dest->size * sizeof(uint8_t));
-        for (int32_t i = 0; i < dest->size; i++) {
+        int32_t i; for (i = 0; i < dest->size; i++) {
             dest->containers[i] =
                 container_clone(source->containers[i], source->typecodes[i]);
             if (dest->containers[i] == NULL) {
-                for (int32_t j = 0; j < i; j++) {
+	      int32_t j; for ( j = 0; j < i; j++) {
                     container_free(dest->containers[j], dest->typecodes[j]);
                 }
                 ra_clear_without_containers(dest);
@@ -18675,7 +18750,7 @@ bool ra_overwrite(const roaring_array_t *source, roaring_array_t *dest,
 }
 
 void ra_clear_containers(roaring_array_t *ra) {
-    for (int32_t i = 0; i < ra->size; ++i) {
+    int32_t i; for (i = 0; i < ra->size; ++i) {
         container_free(ra->containers[i], ra->typecodes[i]);
     }
 }
@@ -18752,7 +18827,7 @@ void ra_append_copy(roaring_array_t *ra, const roaring_array_t *sa,
 
 void ra_append_copies_until(roaring_array_t *ra, const roaring_array_t *sa,
                             uint16_t stopping_key, bool copy_on_write) {
-    for (int32_t i = 0; i < sa->size; ++i) {
+    int32_t i; for (i = 0; i < sa->size; ++i) {
         if (sa->keys[i] >= stopping_key) break;
         ra_append_copy(ra, sa, i, copy_on_write);
     }
@@ -18762,7 +18837,7 @@ void ra_append_copy_range(roaring_array_t *ra, const roaring_array_t *sa,
                           int32_t start_index, int32_t end_index,
                           bool copy_on_write) {
     extend_array(ra, end_index - start_index);
-    for (int32_t i = start_index; i < end_index; ++i) {
+    int32_t i; for (i = start_index; i < end_index; ++i) {
         const int32_t pos = ra->size;
         ra->keys[pos] = sa->keys[i];
         if (copy_on_write) {
@@ -18793,7 +18868,7 @@ void ra_append_move_range(roaring_array_t *ra, roaring_array_t *sa,
                           int32_t start_index, int32_t end_index) {
     extend_array(ra, end_index - start_index);
 
-    for (int32_t i = start_index; i < end_index; ++i) {
+    int32_t i; for (i = start_index; i < end_index; ++i) {
         const int32_t pos = ra->size;
 
         ra->keys[pos] = sa->keys[i];
@@ -18808,7 +18883,7 @@ void ra_append_range(roaring_array_t *ra, roaring_array_t *sa,
                      bool copy_on_write) {
     extend_array(ra, end_index - start_index);
 
-    for (int32_t i = start_index; i < end_index; ++i) {
+    int32_t i; for (i = start_index; i < end_index; ++i) {
         const int32_t pos = ra->size;
         ra->keys[pos] = sa->keys[i];
         if (copy_on_write) {
@@ -18939,7 +19014,7 @@ void ra_shift_tail(roaring_array_t *ra, int32_t count, int32_t distance) {
 
 void ra_to_uint32_array(const roaring_array_t *ra, uint32_t *ans) {
     size_t ctr = 0;
-    for (int32_t i = 0; i < ra->size; ++i) {
+    int32_t i; for (i = 0; i < ra->size; ++i) {
         int num_added = container_to_uint32_array(
             ans + ctr, ra->containers[i], ra->typecodes[i],
             ((uint32_t)ra->keys[i]) << 16);
@@ -18959,7 +19034,7 @@ bool ra_range_uint32_array(const roaring_array_t *ra, size_t offset, size_t limi
     uint32_t *t_ans = NULL;
     size_t cur_len = 0;
 
-    for (int i = 0; i < ra->size; ++i) {
+    int i; for (i = 0; i < ra->size; ++i) {
 
         const container_t *c = container_unwrap_shared(
                                         ra->containers[i], &ra->typecodes[i]);
@@ -19031,7 +19106,7 @@ bool ra_range_uint32_array(const roaring_array_t *ra, size_t offset, size_t limi
 }
 
 bool ra_has_run_container(const roaring_array_t *ra) {
-    for (int32_t k = 0; k < ra->size; ++k) {
+    int32_t k; for ( k = 0; k < ra->size; ++k) {
         if (get_container_type(ra->containers[k], ra->typecodes[k]) ==
             RUN_CONTAINER_TYPE)
             return true;
@@ -19055,7 +19130,7 @@ uint32_t ra_portable_header_size(const roaring_array_t *ra) {
 size_t ra_portable_size_in_bytes(const roaring_array_t *ra) {
     size_t count = ra_portable_header_size(ra);
 
-    for (int32_t k = 0; k < ra->size; ++k) {
+    int32_t k; for ( k = 0; k < ra->size; ++k) {
         count += container_size_in_bytes(ra->containers[k], ra->typecodes[k]);
     }
     return count;
@@ -19073,7 +19148,7 @@ size_t ra_portable_serialize(const roaring_array_t *ra, char *buf) {
         uint32_t s = (ra->size + 7) / 8;
         uint8_t *bitmapOfRunContainers = (uint8_t *)roaring_calloc(s, 1);
         assert(bitmapOfRunContainers != NULL);  // todo: handle
-        for (int32_t i = 0; i < ra->size; ++i) {
+        int32_t i; for (i = 0; i < ra->size; ++i) {
             if (get_container_type(ra->containers[i], ra->typecodes[i]) ==
                 RUN_CONTAINER_TYPE) {
                 bitmapOfRunContainers[i / 8] |= (1 << (i % 8));
@@ -19097,7 +19172,7 @@ size_t ra_portable_serialize(const roaring_array_t *ra, char *buf) {
 
         startOffset = 4 + 4 + 4 * ra->size + 4 * ra->size;
     }
-    for (int32_t k = 0; k < ra->size; ++k) {
+    int32_t k; for ( k = 0; k < ra->size; ++k) {
         memcpy(buf, &ra->keys[k], sizeof(ra->keys[k]));
         buf += sizeof(ra->keys[k]);
         // get_cardinality returns a value in [1,1<<16], subtracting one
@@ -19109,7 +19184,7 @@ size_t ra_portable_serialize(const roaring_array_t *ra, char *buf) {
     }
     if ((!hasrun) || (ra->size >= NO_OFFSET_THRESHOLD)) {
         // writing the containers offsets
-        for (int32_t k = 0; k < ra->size; k++) {
+        int32_t k; for ( k = 0; k < ra->size; k++) {
             memcpy(buf, &startOffset, sizeof(startOffset));
             buf += sizeof(startOffset);
             startOffset =
@@ -19117,7 +19192,7 @@ size_t ra_portable_serialize(const roaring_array_t *ra, char *buf) {
                 container_size_in_bytes(ra->containers[k], ra->typecodes[k]);
         }
     }
-    for (int32_t k = 0; k < ra->size; ++k) {
+     for ( k = 0; k < ra->size; ++k) {
         buf += container_write(ra->containers[k], ra->typecodes[k], buf);
     }
     return buf - initbuf;
@@ -19173,7 +19248,7 @@ size_t ra_portable_deserialize_size(const char *buf, const size_t maxbytes) {
         buf += size * 4;
     }
     // Reading the containers
-    for (int32_t k = 0; k < size; ++k) {
+    int32_t k; for ( k = 0; k < size; ++k) {
         uint16_t tmp;
         memcpy(&tmp, keyscards + 2*k+1, sizeof(tmp));
         uint32_t thiscard = tmp + 1;
@@ -19280,7 +19355,7 @@ bool ra_portable_deserialize(roaring_array_t *answer, const char *buf, const siz
         return false;
     }
 
-    for (int32_t k = 0; k < size; ++k) {
+    int32_t k; for ( k = 0; k < size; ++k) {
         uint16_t tmp;
         memcpy(&tmp, keyscards + 2*k, sizeof(tmp));
         answer->keys[k] = tmp;
@@ -19297,7 +19372,7 @@ bool ra_portable_deserialize(roaring_array_t *answer, const char *buf, const siz
         buf += size * 4;
     }
     // Reading the containers
-    for (int32_t k = 0; k < size; ++k) {
+     for ( k = 0; k < size; ++k) {
         uint16_t tmp;
         memcpy(&tmp, keyscards + 2*k+1, sizeof(tmp));
         uint32_t thiscard = tmp + 1;
@@ -19461,14 +19536,17 @@ static roaring_pq_t *create_pq(const roaring_bitmap_t **arr, uint32_t length) {
     roaring_pq_t *answer = (roaring_pq_t *)roaring_malloc(alloc_size);
     answer->elements = (roaring_pq_element_t *)(answer + 1);
     answer->size = length;
-    for (uint32_t i = 0; i < length; i++) {
+    uint32_t i; for ( i = 0; i < length; i++) {
         answer->elements[i].bitmap = (roaring_bitmap_t *)arr[i];
         answer->elements[i].is_temporary = false;
         answer->elements[i].size =
             roaring_bitmap_portable_size_in_bytes(arr[i]);
     }
-    for (int32_t i = (length >> 1); i >= 0; i--) {
+    {
+      int i;
+      for (i = (length >> 1); i >= 0; i--) {
         percolate_down(answer, i);
+      }
     }
     return answer;
 }
