@@ -1522,9 +1522,9 @@ struct ndpi_flow_struct {
   /* Only packets with L5 data (ie no TCP SYN, pure ACKs, ...) */
   u_int16_t packet_counter;		      // can be 0 - 65000
   u_int16_t packet_direction_counter[2];
-  u_int16_t all_packets_counter; /* All packets even those without payload */
-  
-  /* Every packets */
+
+  /* All packets even those without payload */
+  u_int16_t all_packets_counter;
   u_int16_t packet_direction_complete_counter[2];      // can be 0 - 65000
 
   /* NDPI_PROTOCOL_BITTORRENT */
