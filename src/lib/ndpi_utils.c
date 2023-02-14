@@ -1117,7 +1117,7 @@ void ndpi_serialize_confidence(ndpi_serializer *serializer,
 
 void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
                           ndpi_serializer *serializer,
-                          ndpi_risk_enum risk,
+                          ndpi_risk risk,
                           ndpi_confidence_t confidence,
                           ndpi_protocol l7_protocol)
 {
