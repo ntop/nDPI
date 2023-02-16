@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "fuzzer/FuzzedDataProvider.h"
 
+extern "C" void ndpi_self_check_host_match(); /* Self check function */
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
@@ -24,12 +25,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char *protoname;
   char catname[] = "name";
   struct ndpi_flow_input_info input_info;
-  ndpi_proto p;
+  ndpi_proto p, p2;
+  char out[128];
 
 
   if(fuzzed_data.remaining_bytes() < 4 + /* ndpi_init_detection_module() */
 				     NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
-				     5 + /* files */
+				     1 + /* TLS cert expire */
+				     6 + /* files */
 				     ((NDPI_LRUCACHE_MAX + 1) * 5) + /* LRU caches */
 				     2 + 1 + 5 + /* ndpi_set_detection_preferences() */
 				     7 + /* Opportunistic tls */
@@ -37,7 +40,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 				     2 + /* Category */
 				     1 + /* Bool value */
 				     2 + /* input_info */
-				     29 /* Min real data: ip length + udp length + 1 byte */)
+				     21 /* Min real data: ip length + 1 byte of L4 header */)
     return -1;
 
   /* To allow memory allocation failures */
@@ -55,6 +58,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_info_mod = NULL;
   }
 
+  ndpi_set_tls_cert_expire_days(ndpi_info_mod, fuzzed_data.ConsumeIntegral<u_int8_t>());
+
   if(fuzzed_data.ConsumeBool())
     ndpi_load_protocols_file(ndpi_info_mod, "protos.txt");
   if(fuzzed_data.ConsumeBool())
@@ -65,6 +70,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_load_malicious_ja3_file(ndpi_info_mod, "ja3_fingerprints.csv");
   if(fuzzed_data.ConsumeBool())
     ndpi_load_malicious_sha1_file(ndpi_info_mod, "sha1_fingerprints.csv");
+  /* Note that this function is not used by ndpiReader */
+  if(fuzzed_data.ConsumeBool())
+    ndpi_load_ipv4_ptree(ndpi_info_mod, "ipv4_addresses.txt", NDPI_PROTOCOL_TLS);
 
   for(i = 0; i < NDPI_LRUCACHE_MAX + 1; i++) { /* + 1 to test invalid type */
     ndpi_set_lru_cache_size(ndpi_info_mod, static_cast<lru_cache_type>(i),
@@ -121,6 +129,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_category_id(ndpi_info_mod, catname);
 
   ndpi_get_num_supported_protocols(ndpi_info_mod);
+  ndpi_get_ndpi_num_custom_protocols(ndpi_info_mod);
+
+  ndpi_self_check_host_match();
 
   /* Basic code to try testing this "config" */
   bool_value = fuzzed_data.ConsumeBool();
@@ -128,7 +139,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   input_info.seen_flow_beginning = !!fuzzed_data.ConsumeBool();
   memset(&flow, 0, sizeof(flow));
   std::vector<uint8_t>pkt = fuzzed_data.ConsumeRemainingBytes<uint8_t>();
-  assert(pkt.size() >= 29); /* To be sure check on fuzzed_data.remaining_bytes() at the beginning is right */
+  assert(pkt.size() >= 21); /* To be sure check on fuzzed_data.remaining_bytes() at the beginning is right */
   ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, &input_info);
   p = ndpi_detection_giveup(ndpi_info_mod, &flow, 1, &protocol_was_guessed);
   assert(p.master_protocol == ndpi_get_flow_masterprotocol(ndpi_info_mod, &flow));
@@ -136,15 +147,24 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   assert(p.category == ndpi_get_flow_category(ndpi_info_mod, &flow));
   ndpi_get_lower_proto(p);
   ndpi_get_upper_proto(p);
+  ndpi_get_flow_error_code(&flow);
+  ndpi_get_flow_risk_info(&flow, out, sizeof(out), 1);
+  ndpi_get_flow_ndpi_proto(ndpi_info_mod, &flow, &p2);
+  ndpi_is_proto(p, NDPI_PROTOCOL_TLS);
   /* ndpi_guess_undetected_protocol() is a "strange" function (since is ipv4 only)
      but it is exported by the library and it is used by ntopng. Try fuzzing it, here */
-  if(!flow.is_ipv6)
-    ndpi_guess_undetected_protocol(ndpi_info_mod, bool_value ? &flow : NULL,
-                                   flow.l4_proto,
-                                   flow.c_address.v4, flow.s_address.v4,
-                                   flow.c_port, flow.s_port);
-  /* Another "strange" function: fuzz it here, for lack of a better alternative */
-  ndpi_search_tcp_or_udp(ndpi_info_mod, &flow);
+  if(!ndpi_is_protocol_detected(ndpi_info_mod, p)) {
+    if(!flow.is_ipv6) {
+      ndpi_guess_undetected_protocol(ndpi_info_mod, bool_value ? &flow : NULL,
+                                     flow.l4_proto,
+                                     flow.c_address.v4, flow.s_address.v4,
+                                     flow.c_port, flow.s_port);
+      /* Another "strange" function (ipv4 only): fuzz it here, for lack of a better alternative */
+      ndpi_find_ipv4_category_userdata(ndpi_info_mod, flow.c_address.v4);
+    }
+    /* Another "strange" function: fuzz it here, for lack of a better alternative */
+    ndpi_search_tcp_or_udp(ndpi_info_mod, &flow);
+  }
   ndpi_free_flow_data(&flow);
 
   /* Get some final stats */
@@ -154,6 +174,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_patricia_stats(ndpi_info_mod, static_cast<ptree_type>(i), &patricia_stats);
   for(i = 0; i < NDPI_AUTOMA_MAX + 1; i++) /* + 1 to test invalid type */
     ndpi_get_automa_stats(ndpi_info_mod, static_cast<automa_type>(i), &automa_stats);
+
+
+  ndpi_revision();
+  ndpi_get_api_version();
+  ndpi_get_gcrypt_version();
 
   ndpi_exit_detection_module(ndpi_info_mod);
 

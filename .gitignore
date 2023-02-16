@@ -60,6 +60,7 @@
 /fuzz/fuzz_alg_jitter
 /fuzz/fuzz_alg_crc32_md5
 /fuzz/fuzz_alg_ses_des
+/fuzz/fuzz_alg_bytestream
 /fuzz/fuzz_config
 /fuzz/fuzz_community_id
 /fuzz/fuzz_serialization
@@ -68,6 +69,7 @@
 /fuzz/fuzz_ds_tree
 /fuzz/fuzz_ds_ptree
 /fuzz/fuzz_ds_ahocorasick
+/fuzz/fuzz_libinjection
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_seed_corpus.zip
 /fuzz/fuzz_quic_get_crypto_data_seed_corpus.zip
@@ -80,11 +82,13 @@
 /fuzz/fuzz_alg_jitter_seed_corpus.zip
 /fuzz/fuzz_alg_crc32_md5_seed_corpus.zip
 /fuzz/fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip
+/fuzz/fuzz_alg_bytestream_seed_corpus.zip
 /fuzz/fuzz_ds_patricia_seed_corpus.zip
 /fuzz/fuzz_ds_libcache_seed_corpus.zip
 /fuzz/fuzz_ds_tree_seed_corpus.zip
 /fuzz/fuzz_ds_ptree_seed_corpus.zip
 /fuzz/fuzz_ds_ahocorasick_seed_corpus.zip
+/fuzz/fuzz_libinjection_seed_corpus.zip
 /fuzz/fuzz_*.dict
 /influxdb/Makefile
 /install-sh

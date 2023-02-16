@@ -11,10 +11,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   u_int16_t i, num_iteration;
   ndpi_ptree_t *t;
-  ndpi_ip_addr_t addr, addr_added;
+  ndpi_ip_addr_t addr, addr2, addr_added;
   u_int8_t bits;
   int rc, is_added = 0;
   u_int64_t user_data;
+  char buf_ip[256];
 
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
@@ -36,6 +37,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       addr.ipv4 = fuzzed_data.ConsumeIntegral<u_int32_t>();
       bits = fuzzed_data.ConsumeIntegralInRange(0, 32);
     };
+
+    /* Not really ptree stuff, but this seem the right place to fuzz these `ndpi_ip_addr_t` functions */
+    ndpi_parse_ip_string(ndpi_get_ip_string(&addr, buf_ip, sizeof(buf_ip)), &addr2);
 
     rc = ndpi_ptree_insert(t, &addr, bits, 0);
     /* Keep one random node really added */

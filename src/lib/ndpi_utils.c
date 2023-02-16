@@ -91,7 +91,7 @@ _Static_assert(sizeof(struct ndpi_str_hash) == sizeof(struct ndpi_str_hash_priva
 int ndpi_check_punycode_string(char * buffer , int len) {
   int i = 0;
 
-  while(i++ < len) {
+  while(i++ < len - 3) {
     if((buffer[i] == 'x')
        && (buffer[i+1] == 'n')
        && (buffer[i+2] == '-')
@@ -2717,7 +2717,8 @@ u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
 
 void ndpi_set_tls_cert_expire_days(struct ndpi_detection_module_struct *ndpi_str,
 				   u_int8_t num_days) {
-  ndpi_str->tls_certificate_expire_in_x_days = num_days;
+  if(ndpi_str)
+    ndpi_str->tls_certificate_expire_in_x_days = num_days;
 }
 
 /* ******************************************* */

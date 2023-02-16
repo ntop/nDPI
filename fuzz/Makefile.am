@@ -1,8 +1,10 @@
 bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization
 #Alghoritms
-bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5
+bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream
 #Data structures
 bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree
+#Third party
+bin_PROGRAMS += fuzz_libinjection
 
 fuzz_process_packet_SOURCES = fuzz_process_packet.c fuzz_common_code.c
 fuzz_process_packet_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
@@ -174,6 +176,19 @@ fuzz_alg_crc32_md5_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_alg_crc32_md5_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_alg_bytestream_SOURCES = fuzz_alg_bytestream.c
+fuzz_alg_bytestream_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_alg_bytestream_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_alg_bytestream_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_alg_bytestream_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_alg_bytestream_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_alg_bytestream_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_alg_bytestream_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
 fuzz_alg_ses_des_SOURCES = fuzz_alg_ses_des.cpp fuzz_common_code.c
 fuzz_alg_ses_des_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
 fuzz_alg_ses_des_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
@@ -264,6 +279,20 @@ fuzz_ds_ptree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_ptree_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_libinjection_SOURCES = fuzz_libinjection.c
+fuzz_libinjection_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_libinjection_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_libinjection_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_libinjection_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_libinjection_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_libinjection_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_libinjection_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+
 
 # required for Google oss-fuzz
 # see https://github.com/google/oss-fuzz/tree/master/projects/ndpi
@@ -350,8 +379,18 @@ files_corpus_fuzz_ds_ptree :=  $(wildcard corpus/fuzz_ds_ptree/*)
 fuzz_ds_ptree_seed_corpus.zip: $(files_corpus_fuzz_ds_ptree)
 	zip -j fuzz_ds_ptree_seed_corpus.zip $(files_corpus_fuzz_ds_ptree)
 
+files_corpus_fuzz_alg_bytestream :=  $(wildcard corpus/fuzz_alg_bytestream/*)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip
+fuzz_alg_bytestream_seed_corpus.zip: $(files_corpus_fuzz_alg_bytestream)
+	zip -j fuzz_alg_bytestream_seed_corpus.zip $(files_corpus_fuzz_alg_bytestream)
+
+files_corpus_fuzz_libinjection :=  $(wildcard corpus/fuzz_libinjection/*)
+
+fuzz_libinjection_seed_corpus.zip: $(files_corpus_fuzz_libinjection)
+	zip -j fuzz_libinjection_seed_corpus.zip $(files_corpus_fuzz_libinjection)
+
+
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip
 
 #Create dictionaries exactly as expected by oss-fuzz.
 #This way, if we need to change/update/add something,
@@ -368,16 +407,19 @@ distdir:
 		-o -name '*.h' \
 		-o -name '*.cpp' \
 		-o -name '*.dict' \
+		-o -name 'ipv4_addresses.txt' \
 		-o -path './corpus/fuzz_quic_get_crypto_data/*' \
 		-o -path './corpus/fuzz_config/*' \
 		-o -path './corpus/fuzz_serialization/*' \
 		-o -path './corpus/fuzz_community_id/*' \
+		-o -path './corpus/fuzz_libinjection/*' \
 		-o -path './corpus/fuzz_alg_ses_des/*' \
 		-o -path './corpus/fuzz_alg_bins/*' \
 		-o -path './corpus/fuzz_alg_hll/*' \
 		-o -path './corpus/fuzz_alg_jitter/*' \
 		-o -path './corpus/fuzz_alg_crc32_md5/*' \
 		-o -path './corpus/fuzz_alg_hw_rsi_outliers_da/*' \
+		-o -path './corpus/fuzz_alg_bytestream/*' \
 		-o -path './corpus/fuzz_ds_ahocorasick/*' \
 		-o -path './corpus/fuzz_ds_libcache/*' \
 		-o -path './corpus/fuzz_ds_tree/*' \
