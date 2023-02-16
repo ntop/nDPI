@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 SSDP	4	864	1
 
-	1	UDP 192.168.242.50:56446 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: System/18][4 pkts/864 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][3.00 sec][Hostname/SNI: 239.255.255.250:1900][User-Agent: Google Chrome/99.0.4844.74 Mac OS X][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.242.50:56446 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][4 pkts/864 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][3.00 sec][Hostname/SNI: 239.255.255.250:1900][User-Agent: Google Chrome/99.0.4844.74 Mac OS X][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

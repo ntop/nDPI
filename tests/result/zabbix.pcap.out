@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 Zabbix	10	715	1
 
-	1	TCP 192.168.67.98:57162 <-> 192.168.67.25:10050 [proto: 248/Zabbix][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][5 pkts/361 bytes <-> 5 pkts/354 bytes][Goodput ratio: 6/5][0.01 sec][bytes ratio: 0.010 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/1 1/2 4/4 2/2][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 72/71 89/82 9/6][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.67.98:57162 <-> 192.168.67.25:10050 [proto: 248/Zabbix][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][5 pkts/361 bytes <-> 5 pkts/354 bytes][Goodput ratio: 6/5][0.01 sec][bytes ratio: 0.010 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/1 1/2 4/4 2/2][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 72/71 89/82 9/6][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

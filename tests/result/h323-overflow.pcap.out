@@ -25,4 +25,4 @@ Unknown	1	58	1
 
 
 Undetected flows:
-	1	TCP 192.168.1.1:31337 -> 192.168.1.2:80 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: nBPF][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.1.1:31337 -> 192.168.1.2:80 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: nBPF][DPI packets: 1][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

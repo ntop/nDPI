@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 DHCP	1	342	1
 
-	1	UDP 192.168.155.104:68 -> 255.255.255.255:67 [proto: 18/DHCP][IP: 0/Unknown][ClearText][Confidence: Match by port][cat: Network/14][1 pkts/342 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][< 1 sec][PLAIN TEXT (MK03862)][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.155.104:68 -> 255.255.255.255:67 [proto: 18/DHCP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 1][cat: Network/14][1 pkts/342 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][< 1 sec][PLAIN TEXT (MK03862)][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

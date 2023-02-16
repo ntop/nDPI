@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 DNScrypt	6	2380	1
 
-	1	UDP 192.168.2.100:46858 <-> 212.47.228.136:443 [proto: 208/DNScrypt][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Network/14][3 pkts/1662 bytes <-> 3 pkts/718 bytes][Goodput ratio: 92/82][5137.13 sec][bytes ratio: 0.397 (Upload)][IAT c2s/s2c min/avg/max/stddev: 300005/300005 2568548/2568547 4837091/4837089 2268543/2268542][Pkt Len c2s/s2c min/avg/max/stddev: 554/154 554/239 554/282 0/60][PLAIN TEXT (OYy Tp)][Plen Bins: 0,0,0,16,0,0,0,33,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.2.100:46858 <-> 212.47.228.136:443 [proto: 208/DNScrypt][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: Network/14][3 pkts/1662 bytes <-> 3 pkts/718 bytes][Goodput ratio: 92/82][5137.13 sec][bytes ratio: 0.397 (Upload)][IAT c2s/s2c min/avg/max/stddev: 300005/300005 2568548/2568547 4837091/4837089 2268543/2268542][Pkt Len c2s/s2c min/avg/max/stddev: 554/154 554/239 554/282 0/60][PLAIN TEXT (OYy Tp)][Plen Bins: 0,0,0,16,0,0,0,33,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

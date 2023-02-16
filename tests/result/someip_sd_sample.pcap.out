@@ -22,5 +22,5 @@ Patricia protocols:   4/0 (search/found)
 
 SOMEIP	6	660	2
 
-	1	UDP 192.168.88.77:30490 <-> 192.168.88.73:30490 [proto: 229/SOMEIP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: RPC/16][2 pkts/228 bytes <-> 2 pkts/204 bytes][Goodput ratio: 49/43][0.80 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 192.168.88.73:30490 -> 235.2.3.5:30490 [proto: 229/SOMEIP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: RPC/16][2 pkts/228 bytes -> 0 pkts/0 bytes][Goodput ratio: 49/0][0.80 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.88.77:30490 <-> 192.168.88.73:30490 [proto: 229/SOMEIP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][2 pkts/228 bytes <-> 2 pkts/204 bytes][Goodput ratio: 49/43][0.80 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.88.73:30490 -> 235.2.3.5:30490 [proto: 229/SOMEIP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][2 pkts/228 bytes -> 0 pkts/0 bytes][Goodput ratio: 49/0][0.80 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

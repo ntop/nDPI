@@ -206,6 +206,7 @@ typedef struct ndpi_flow_info {
   ndpi_protocol detected_protocol;
   ndpi_confidence_t confidence;
   u_int16_t num_dissector_calls;
+  u_int16_t dpi_packets;
 
   // Flow data analysis
   pkt_timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;

@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 TLS	26	12163	1
 
-	1	TCP 188.75.184.20:49542 <-> 251.182.120.32:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][cat: Web/5][13 pkts/9962 bytes <-> 13 pkts/2201 bytes][Goodput ratio: 93/67][84.45 sec][bytes ratio: 0.638 (Upload)][IAT c2s/s2c min/avg/max/stddev: 186/186 7406/5844 21467/15787 7157/5701][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 766/169 1328/189 433/46][Plen Bins: 0,0,0,0,51,0,0,0,0,9,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,9,9,0,0,0,4,0,0,4,0,4,0,0,0,0,0,0,0,0]
+	1	TCP 188.75.184.20:49542 <-> 251.182.120.32:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 26][cat: Web/5][13 pkts/9962 bytes <-> 13 pkts/2201 bytes][Goodput ratio: 93/67][84.45 sec][bytes ratio: 0.638 (Upload)][IAT c2s/s2c min/avg/max/stddev: 186/186 7406/5844 21467/15787 7157/5701][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 766/169 1328/189 433/46][Plen Bins: 0,0,0,0,51,0,0,0,0,9,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,9,9,0,0,0,4,0,0,4,0,4,0,0,0,0,0,0,0,0]

@@ -25,4 +25,4 @@ Unknown	5	850	1
 
 
 Undetected flows:
-	1	UDP 10.10.100.25:62367 -> 10.10.101.2:17000 [VLAN: 505][proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][5 pkts/850 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][121572.07 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.10.100.25:62367 -> 10.10.101.2:17000 [VLAN: 505][proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 5][5 pkts/850 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][121572.07 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

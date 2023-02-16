@@ -22,5 +22,5 @@ Patricia protocols:   0/0 (search/found)
 
 VRRP	10	820	2
 
-	1	VRRP [fe80::1]:0 -> [ff02::12]:0 [VLAN: 36][proto: 73/VRRP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][9 pkts/738 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][73.79 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 8603/0 9223/0 10004/0 503/0][Pkt Len c2s/s2c min/avg/max/stddev: 82/0 82/0 82/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	VRRP [fe80::2]:0 -> [ff02::12]:0 [VLAN: 36][proto: 73/VRRP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/82 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	VRRP [fe80::1]:0 -> [ff02::12]:0 [VLAN: 36][proto: 73/VRRP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][9 pkts/738 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][73.79 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 8603/0 9223/0 10004/0 503/0][Pkt Len c2s/s2c min/avg/max/stddev: 82/0 82/0 82/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	VRRP [fe80::2]:0 -> [ff02::12]:0 [VLAN: 36][proto: 73/VRRP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/82 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

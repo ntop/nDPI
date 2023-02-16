@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 MySQL	4	367	1
 
-	1	TCP 192.168.1.105:8738 <-> 10.42.18.198:3306 [proto: 20/MySQL][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Database/11][2 pkts/140 bytes <-> 2 pkts/227 bytes][Goodput ratio: 0/38][0.00 sec][PLAIN TEXT (DDDDDD)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.1.105:8738 <-> 10.42.18.198:3306 [proto: 20/MySQL][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Database/11][2 pkts/140 bytes <-> 2 pkts/227 bytes][Goodput ratio: 0/38][0.00 sec][PLAIN TEXT (DDDDDD)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 TiVoConnect	2	422	1
 
-	1	UDP 98.245.242.69:2190 -> 255.255.255.255:2190 [proto: 308/TiVoConnect][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/422 bytes -> 0 pkts/0 bytes][Goodput ratio: 79/0][0.00 sec][UUID: 4d696e69-444c-164e-9d41-1459c099c04][Machine: R7000P][Platform: pc/minidlna][Services: TiVoMediaServer:8200/http][PLAIN TEXT (TiVoConnect)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 98.245.242.69:2190 -> 255.255.255.255:2190 [proto: 308/TiVoConnect][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/422 bytes -> 0 pkts/0 bytes][Goodput ratio: 79/0][0.00 sec][UUID: 4d696e69-444c-164e-9d41-1459c099c04][Machine: R7000P][Platform: pc/minidlna][Services: TiVoMediaServer:8200/http][PLAIN TEXT (TiVoConnect)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
