@@ -177,9 +177,10 @@ static int dissect_softether_host_fqdn(struct ndpi_flow_struct *flow,
   u_int8_t const *payload = packet->payload;
   u_int16_t payload_len = packet->payload_packet_len;
   u_int32_t tuple_count;
-  size_t value_siz;
+  size_t value_siz, hostname_len, fqdn_len;
   struct softether_value val1, val2;
   uint8_t got_hostname = 0, got_fqdn = 0;
+  const char *hostname_ptr = NULL, *fqdn_ptr = NULL;
 
   if(payload_len < 4)
     return 1;
@@ -208,20 +209,16 @@ static int dissect_softether_host_fqdn(struct ndpi_flow_struct *flow,
 
     if(got_hostname == 1) {
       if(val1.type == VALUE_STR && val1.value_size > 0) {
-	size_t len = ndpi_min(val1.value_size, sizeof(flow->protos.softether.hostname) - 1);
-	      
-	strncpy(flow->protos.softether.hostname, val1.value.ptr.value_str, len);
-	flow->protos.softether.hostname[len] = '\0';
+	hostname_len = ndpi_min(val1.value_size, sizeof(flow->protos.softether.hostname) - 1);
+	hostname_ptr = val1.value.ptr.value_str;
       }
 	  
       got_hostname = 0;
     }
     if(got_fqdn == 1) {
       if(val1.type == VALUE_STR && val1.value_size > 0)  {
-	size_t len = ndpi_min(val1.value_size, sizeof(flow->protos.softether.fqdn) - 1);
-	      
-	strncpy(flow->protos.softether.fqdn, val1.value.ptr.value_str, len);
-	flow->protos.softether.fqdn[len] = '\0';
+	fqdn_len = ndpi_min(val1.value_size, sizeof(flow->protos.softether.fqdn) - 1);
+	fqdn_ptr = val1.value.ptr.value_str;
       }
 	  
       got_fqdn = 0;
@@ -239,6 +236,15 @@ static int dissect_softether_host_fqdn(struct ndpi_flow_struct *flow,
   if(payload_len != 0 || tuple_count != 0)
     return 1;
 
+  /* Ok, write to `flow->protos.softether` */
+  if(hostname_ptr) {
+    strncpy(flow->protos.softether.hostname, hostname_ptr, hostname_len);
+    flow->protos.softether.hostname[hostname_len] = '\0';
+  }
+  if(fqdn_ptr) {
+    strncpy(flow->protos.softether.fqdn, fqdn_ptr, fqdn_len);
+    flow->protos.softether.fqdn[fqdn_len] = '\0';
+  }
   return 0;
 }
 
@@ -308,7 +314,7 @@ static void ndpi_search_softether(struct ndpi_detection_module_struct *ndpi_stru
       return;
     }
   }
-    
+
   if(packet->payload_packet_len >= 99) {
     if(dissect_softether_host_fqdn(flow, packet) == 0) {
       ndpi_int_softether_add_connection(ndpi_struct, flow);
