@@ -69,6 +69,10 @@ union ndpi_patricia_node_value_t {
   /* User-defined values */
   union {
     struct {
+      u_int16_t user_value, additional_user_value;
+    } uv16[2];
+      
+    struct {
       u_int32_t user_value, additional_user_value;
     } uv32;
     

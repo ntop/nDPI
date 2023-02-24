@@ -2300,7 +2300,7 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
   ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->protocols_ptree, &prefix);
 
-  return(node ? node->value.u.uv32.user_value : NDPI_PROTOCOL_UNKNOWN);
+  return(node ? node->value.u.uv16[0].user_value : NDPI_PROTOCOL_UNKNOWN);
 }
 
 /* ******************************************* */
@@ -2332,11 +2332,15 @@ u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndp
   node = ndpi_patricia_search_best(ndpi_str->protocols_ptree, &prefix);
 
   if(node) {
-    if((node->value.u.uv32.additional_user_value == 0)
-       || (node->value.u.uv32.additional_user_value == port))
-      return(node->value.u.uv32.user_value);
+    int i;
+    
+    for(i=0; i<2; i++) {
+      if((node->value.u.uv16[i].additional_user_value == 0)
+	 || (node->value.u.uv16[i].additional_user_value == port))
+	return(node->value.u.uv16[i].user_value);
+    }
   }
-
+  
   return(NDPI_PROTOCOL_UNKNOWN);
 }
 
@@ -2352,7 +2356,7 @@ ndpi_risk_enum ndpi_network_risk_ptree_match(struct ndpi_detection_module_struct
   node = ndpi_patricia_search_best(ndpi_str->ip_risk_ptree, &prefix);
 
   if(node)
-    return((ndpi_risk_enum)node->value.u.uv32.user_value);
+    return((ndpi_risk_enum)node->value.u.uv16[0].user_value);
 
   return(NDPI_NO_RISK);
 }
@@ -2366,7 +2370,7 @@ static ndpi_patricia_node_t* add_to_ptree(ndpi_patricia_tree_t *tree, int family
   ndpi_fill_prefix_v4(&prefix, (struct in_addr *) addr, bits, tree->maxbits);
 
   node = ndpi_patricia_lookup(tree, &prefix);
-  if(node) memset(&node->value, 0, sizeof(node->value));
+  /* if(node) memset(&node->value, 0, sizeof(node->value)); */
 
   return(node);
 }
@@ -2417,8 +2421,18 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 
       pin.s_addr = inet_addr(addr);
       if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, cidr ? atoi(cidr) : 32 /* bits */)) != NULL) {
-	node->value.u.uv32.user_value = protocol_id, node->value.u.uv32.additional_user_value = 0 /* port */;
-	num_loaded++;
+	u_int i, found = 0;
+	
+	for(i=0; i<2; i++) {
+	  if(node->value.u.uv16[i].user_value == 0) {
+	    node->value.u.uv16[i].user_value = protocol_id, node->value.u.uv16[i].additional_user_value =  0 /* port */;
+	    found = 1;
+	    break;
+	  }
+	}
+
+	if(found)
+	  num_loaded++;
       }
     }
   }
@@ -2486,7 +2500,16 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   inet_pton(AF_INET, value, &pin);
 
   if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits)) != NULL) {
-    node->value.u.uv32.user_value = protocol_id, node->value.u.uv32.additional_user_value = htons(port);
+    int i;
+
+    for(i=0; i<2; i++) {
+      if(node->value.u.uv16[i].user_value == 0) {
+	node->value.u.uv16[i].user_value = protocol_id, node->value.u.uv16[i].additional_user_value = htons(port);
+	return(0);
+      }
+    }
+
+    return(-1); /* All slots are full */
   }
 
   return(0);
@@ -3478,9 +3501,9 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
         flow->entropy = 0.0f;
 	/* Run some basic consistency tests */
 
-	if(packet->payload_packet_len < sizeof(struct ndpi_icmphdr))
+	if(packet->payload_packet_len < sizeof(struct ndpi_icmphdr)) {
 	  ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, NULL);
-	else {
+	} else {
 	  u_int8_t icmp_type = (u_int8_t)packet->payload[0];
 	  u_int8_t icmp_code = (u_int8_t)packet->payload[1];
 
@@ -3838,8 +3861,10 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
       else
 	removeDefaultPort(&range, def, is_tcp ? &ndpi_str->tcpRoot : &ndpi_str->udpRoot);
     } else if(is_ip) {
-      /* NDPI_PROTOCOL_TOR */
-      ndpi_add_host_ip_subprotocol(ndpi_str, value, subprotocol_id);
+      int rc = ndpi_add_host_ip_subprotocol(ndpi_str, value, subprotocol_id);
+
+      if(rc != 0)
+	return(rc);
     } else {
       if(do_add)
 	ndpi_add_host_url_subprotocol(ndpi_str, value, subprotocol_id, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
@@ -4177,7 +4202,8 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
     else
       buffer[i - 1] = '\0';
 
-    ndpi_handle_rule(ndpi_str, buffer, 1);
+    if(ndpi_handle_rule(ndpi_str, buffer, 1) != 0)
+      printf("Discarded duplicated rule %s\n", buffer);
   }
 
   rc = 0;
