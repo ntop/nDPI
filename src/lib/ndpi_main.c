@@ -5952,7 +5952,8 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 			       NDPI_CONFIDENCE_DPI_PARTIAL);
       break;
     }
-
+    break;
+      
     /* Generic container for google subprotocols */
   case NDPI_PROTOCOL_GOOGLE:
     switch(flow->guessed_protocol_id_by_ip) {
