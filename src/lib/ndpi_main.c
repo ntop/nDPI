@@ -7511,6 +7511,7 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, s
   ndpi_protocol ret;
   
   ndpi_int_change_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol, confidence);
+  ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
   ndpi_reconcile_protocols(ndpi_str, flow, &ret);
 }
 
