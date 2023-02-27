@@ -2676,20 +2676,20 @@ static void printRiskStats() {
 
 /*function to use in HASH_SORT function in verbose == 4 to order in creasing order to delete host with the leatest occurency*/
 static int hash_stats_sort_to_order(void *_a, void *_b) {
-	struct hash_stats *a = (struct hash_stats*)_a;
-	struct hash_stats *b = (struct hash_stats*)_b;
-	
-	return (a->occurency - b->occurency);
+  struct hash_stats *a = (struct hash_stats*)_a;
+  struct hash_stats *b = (struct hash_stats*)_b;
+  
+  return (a->occurency - b->occurency);
 }
 
 /* *********************************************** */
 
 /*function to use in HASH_SORT function in verbose == 4 to print in decreasing order*/
 static int hash_stats_sort_to_print(void *_a, void *_b) {
-	struct hash_stats *a = (struct hash_stats*)_a;
-	struct hash_stats *b = (struct hash_stats*)_b;
-	
-	return (b->occurency - a->occurency);
+  struct hash_stats *a = (struct hash_stats*)_a;
+  struct hash_stats *b = (struct hash_stats*)_b;
+  
+  return (b->occurency - a->occurency);
 }
 
 /* *********************************************** */
