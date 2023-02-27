@@ -2,7 +2,8 @@ Guessed flow protos:	4
 
 DPI Packets (TCP):	229	(5.20 pkts/flow)
 DPI Packets (UDP):	3	(1.00 pkts/flow)
-Confidence Match by port    : 4 (flows)
+Confidence Match by port    : 1 (flows)
+Confidence DPI (partial)    : 3 (flows)
 Confidence DPI              : 43 (flows)
 Num dissector calls: 54 (1.15 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -11,7 +12,7 @@ LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/8/0 (insert/search/found)
 LRU cache mining:     0/4/0 (insert/search/found)
-LRU cache msteams:    1/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/0/0 (insert/search/found)
 Automa host:          47/42 (search/found)
 Automa domain:        47/0 (search/found)
@@ -22,7 +23,7 @@ Patricia risk mask:   106/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   73/33 (search/found)
 
-HTTP	14	1040	4
+HTTP	2	148	1
 Outlook	9	5954	1
 Xbox	4	2245	1
 TikTok	31	10560	1
@@ -52,17 +53,19 @@ Pastebin	4	2225	1
 LinkedIn	9	5994	1
 SoundCloud	4	2225	1
 AmazonVideo	4	2225	1
-Bloomberg	13	8181	2
+Bloomberg	21	8777	3
 Teams	8	5391	1
 AppleSiri	4	2245	1
 Activision	9	6455	1
 Likee	112	78845	1
 GitLab	4	2225	1
+AmazonAWS	2	148	1
 Vimeo	25	7256	1
 Fuze	31	10555	1
 Badoo	4	2145	1
 AccuWeather	30	8562	1
 GoogleClassroom	1	1292	1
+GoogleCloud	2	148	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -116,7 +119,7 @@ JA3 Host Stats:
 	41	TCP 192.168.1.128:46084 <-> 146.75.62.167:443 [proto: 91.195/TLS.Twitch][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Video/26][2 pkts/657 bytes <-> 2 pkts/1480 bytes][Goodput ratio: 79/90][0.05 sec][Hostname/SNI: gql.twitch.tv][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][TLSv1.3][JA3C: 579ccef312d18482fc42e2b822ca2430][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0]
 	42	UDP 192.168.1.123:59102 -> 216.58.209.46:443 [proto: 188.281/QUIC.GoogleClassroom][IP: 126/Google][Encrypted][Confidence: DPI][cat: Collaborative/15][1 pkts/1292 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Hostname/SNI: classroom.google.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][User-Agent: Chrome/97.0.4692.99 Windows NT 10.0; Win64; x64][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.3][JA3C: a27a03a8478393fe7f8958648bb71ff4][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
 	43	TCP 192.168.12.169:46160 <-> 69.171.250.20:443 [proto: 91.157/TLS.Messenger][IP: 119/Facebook][Encrypted][Confidence: DPI][cat: Chat/9][2 pkts/521 bytes <-> 2 pkts/356 bytes][Goodput ratio: 73/61][0.02 sec][Hostname/SNI: edge-mqtt.facebook.com][(Advertised) ALPNs: h2;h2-fb][TLS Supported Versions: TLSv1.3;TLSv1.3 (Fizz)][TLSv1.3 (Fizz)][JA3C: 44dab16d680ef93487bc16ad23b3ffb1][JA3S: fcb2d4d0991292272fcb1e464eedfd43][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	44	TCP 192.168.1.128:39036 <-> 69.191.252.15:80 [proto: 7/HTTP][IP: 246/Bloomberg][ClearText][Confidence: Match by port][cat: Web/5][7 pkts/518 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][65.08 sec][bytes ratio: 0.738 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1012/0 10830/0 33535/0 11329/0][Pkt Len c2s/s2c min/avg/max/stddev: 74/78 74/78 74/78 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	45	TCP 192.168.1.128:44954 <-> 34.96.123.111:80 [proto: 7/HTTP][IP: 284/GoogleCloud][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/74 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.01 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	44	TCP 192.168.1.128:39036 <-> 69.191.252.15:80 [proto: 7.246/HTTP.Bloomberg][IP: 246/Bloomberg][ClearText][Confidence: DPI (partial)][cat: Network/14][7 pkts/518 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][65.08 sec][bytes ratio: 0.738 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1012/0 10830/0 33535/0 11329/0][Pkt Len c2s/s2c min/avg/max/stddev: 74/78 74/78 74/78 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	45	TCP 192.168.1.128:44954 <-> 34.96.123.111:80 [proto: 7.284/HTTP.GoogleCloud][IP: 284/GoogleCloud][ClearText][Confidence: DPI (partial)][cat: Cloud/13][1 pkts/74 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.01 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	46	TCP 192.168.1.128:45936 <-> 208.85.40.158:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/74 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.17 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	47	TCP 192.168.1.128:52070 <-> 18.65.82.67:80 [proto: 7/HTTP][IP: 265/AmazonAWS][ClearText][Confidence: Match by port][cat: Web/5][1 pkts/74 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.02 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	47	TCP 192.168.1.128:52070 <-> 18.65.82.67:80 [proto: 7.265/HTTP.AmazonAWS][IP: 265/AmazonAWS][ClearText][Confidence: DPI (partial)][cat: Cloud/13][1 pkts/74 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.02 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -2,7 +2,7 @@ Guessed flow protos:	1
 
 DPI Packets (TCP):	43	(5.38 pkts/flow)
 DPI Packets (UDP):	3	(1.00 pkts/flow)
-Confidence Match by port    : 1 (flows)
+Confidence DPI (partial)    : 1 (flows)
 Confidence DPI              : 10 (flows)
 Num dissector calls: 48 (4.36 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -23,10 +23,11 @@ Patricia risk:        0/0 (search/found)
 Patricia protocols:   19/1 (search/found)
 
 SMBv1	1	252	1
-TLS	220	93832	5
+TLS	219	93772	4
 DHCPV6	6	906	1
 Dropbox	10	1860	1
 Tor	112	39736	3
+Azure	1	60	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -43,4 +44,4 @@ JA3 Host Stats:
 	8	UDP 192.168.1.1:17500 -> 192.168.1.255:17500 [proto: 121/Dropbox][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Cloud/13][10 pkts/1860 bytes -> 0 pkts/0 bytes][Goodput ratio: 77/0][600.89 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 30033/0 66765/0 360548/0 103868/0][Pkt Len c2s/s2c min/avg/max/stddev: 186/0 186/0 186/0 0/0][PLAIN TEXT ( 676879976)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	9	UDP [fe80::c583:1972:5728:7323]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][6 pkts/906 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][31.41 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1227/0 6282/0 16006/0 5400/0][Pkt Len c2s/s2c min/avg/max/stddev: 151/0 151/0 151/0 0/0][PLAIN TEXT (Endian)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	10	UDP 192.168.1.252:138 -> 192.168.1.255:138 [proto: 10.16/NetBIOS.SMBv1][IP: 0/Unknown][ClearText][Confidence: DPI][cat: System/18][1 pkts/252 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][< 1 sec][Hostname/SNI: endian-pc][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT ( EFEOEEEJEBEOCNFAEDCACACACACACA)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	11	TCP 192.168.1.252:51104 -> 157.56.30.46:443 [proto: 91/TLS][IP: 276/Azure][Encrypted][Confidence: Match by port][cat: Web/5][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	11	TCP 192.168.1.252:51104 -> 157.56.30.46:443 [proto: 91.276/TLS.Azure][IP: 276/Azure][Encrypted][Confidence: DPI (partial)][cat: Cloud/13][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

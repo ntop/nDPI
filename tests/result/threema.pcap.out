@@ -1,8 +1,8 @@
 Guessed flow protos:	2
 
 DPI Packets (TCP):	66	(11.00 pkts/flow)
-Confidence Unknown          : 2 (flows)
 Confidence DPI              : 4 (flows)
+Confidence Match by IP      : 2 (flows)
 Num dissector calls: 1186 (197.67 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/6/0 (insert/search/found)
@@ -21,15 +21,11 @@ Patricia risk mask:   12/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   6/6 (search/found)
 
-Unknown	26	2494	2
-Threema	57	9084	4
+Threema	83	11578	6
 
 	1	TCP 192.168.2.100:50484 <-> 185.88.236.110:5222 [proto: 305/Threema][IP: 305/Threema][Encrypted][Confidence: DPI][cat: Chat/9][9 pkts/1998 bytes <-> 6 pkts/1066 bytes][Goodput ratio: 70/62][30.23 sec][bytes ratio: 0.304 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/28 347/6958 2277/27743 788/12000][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 222/178 801/534 238/162][Plen Bins: 0,33,22,0,0,11,0,0,0,0,0,0,11,0,11,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.2.100:50298 <-> 185.88.236.110:5222 [proto: 305/Threema][IP: 305/Threema][Encrypted][Confidence: DPI][cat: Chat/9][10 pkts/2025 bytes <-> 5 pkts/548 bytes][Goodput ratio: 67/38][46.73 sec][bytes ratio: 0.574 (Upload)][IAT c2s/s2c min/avg/max/stddev: 3/31 5838/33 46525/38 15378/3][Pkt Len c2s/s2c min/avg/max/stddev: 66/74 202/110 510/146 167/24][Plen Bins: 0,44,11,0,0,11,0,0,0,11,0,11,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.2.100:50618 <-> 185.88.236.110:5222 [proto: 305/Threema][IP: 305/Threema][Encrypted][Confidence: DPI][cat: Chat/9][9 pkts/879 bytes <-> 6 pkts/1079 bytes][Goodput ratio: 31/62][5.39 sec][bytes ratio: -0.102 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/28 52/1686 209/4996 67/2340][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 98/180 257/661 59/217][Plen Bins: 0,40,20,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	TCP 192.168.2.100:50500 <-> 185.88.236.110:5222 [proto: 305/Threema][IP: 305/Threema][Encrypted][Confidence: DPI][cat: Chat/9][8 pkts/813 bytes <-> 4 pkts/676 bytes][Goodput ratio: 34/60][61.48 sec][bytes ratio: 0.092 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 2/31 290/32 1612/32 591/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 102/169 257/390 61/131][Plen Bins: 0,40,20,0,0,20,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-
-Undetected flows:
-	1	TCP 192.168.2.100:50718 <-> 185.88.236.110:5222 [proto: 0/Unknown][IP: 305/Threema][ClearText][Confidence: Unknown][8 pkts/775 bytes <-> 5 pkts/472 bytes][Goodput ratio: 31/28][73.43 sec][bytes ratio: 0.243 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/28 12233/29 73277/30 27300/1][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 97/94 257/146 62/33][Plen Bins: 0,50,25,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	TCP 192.168.2.100:50860 <-> 185.88.236.110:5222 [proto: 0/Unknown][IP: 305/Threema][ClearText][Confidence: Unknown][8 pkts/775 bytes <-> 5 pkts/472 bytes][Goodput ratio: 31/28][60.00 sec][bytes ratio: 0.243 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/29 9996/31 59845/33 22293/2][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 97/94 257/146 62/33][Plen Bins: 0,50,25,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	TCP 192.168.2.100:50718 <-> 185.88.236.110:5222 [proto: 305/Threema][IP: 305/Threema][Encrypted][Confidence: Match by IP][cat: Chat/9][8 pkts/775 bytes <-> 5 pkts/472 bytes][Goodput ratio: 31/28][73.43 sec][bytes ratio: 0.243 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/28 12233/29 73277/30 27300/1][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 97/94 257/146 62/33][Plen Bins: 0,50,25,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	TCP 192.168.2.100:50860 <-> 185.88.236.110:5222 [proto: 305/Threema][IP: 305/Threema][Encrypted][Confidence: Match by IP][cat: Chat/9][8 pkts/775 bytes <-> 5 pkts/472 bytes][Goodput ratio: 31/28][60.00 sec][bytes ratio: 0.243 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/29 9996/31 59845/33 22293/2][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 97/94 257/146 62/33][Plen Bins: 0,50,25,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

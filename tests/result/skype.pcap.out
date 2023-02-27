@@ -4,7 +4,8 @@ DPI Packets (TCP):	1554	(16.02 pkts/flow)
 DPI Packets (UDP):	337	(1.76 pkts/flow)
 DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 59 (flows)
-Confidence Match by port    : 28 (flows)
+Confidence Match by port    : 27 (flows)
+Confidence DPI (partial)    : 1 (flows)
 Confidence DPI              : 206 (flows)
 Num dissector calls: 26899 (91.81 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -13,7 +14,7 @@ LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   1/2/0 (insert/search/found)
 LRU cache mining:     0/87/0 (insert/search/found)
-LRU cache msteams:    0/171/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/0/0 (insert/search/found)
 Automa host:          181/167 (search/found)
 Automa domain:        181/0 (search/found)
@@ -32,9 +33,10 @@ SSDP	101	38156	6
 Skype_TeamsCall	152	10704	144
 ICMP	8	656	1
 IGMP	5	258	4
-TLS	474	53625	33
+TLS	471	53457	32
 Dropbox	22	11968	4
 Skype_Teams	613	222206	31
+Apple	3	168	1
 AppleiCloud	88	20520	2
 Spotify	5	430	1
 Microsoft	14	1302	2
@@ -132,7 +134,7 @@ JA3 Host Stats:
 	85	UDP 192.168.1.34:51879 <-> 192.168.1.1:53 [proto: 5.125/DNS.Skype_Teams][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/82 bytes <-> 1 pkts/98 bytes][Goodput ratio: 48/57][0.05 sec][Hostname/SNI: e4593.g.akamaiedge.net][23.206.33.166][PLAIN TEXT (akamaiedge)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	86	UDP 192.168.1.34:63321 <-> 192.168.1.1:53 [proto: 5.125/DNS.Skype_Teams][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/82 bytes <-> 1 pkts/98 bytes][Goodput ratio: 48/57][0.05 sec][Hostname/SNI: e4593.g.akamaiedge.net][23.206.33.166][PLAIN TEXT (akamaiedge)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	87	UDP 192.168.1.34:64085 <-> 192.168.1.1:53 [proto: 5.125/DNS.Skype_Teams][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/82 bytes <-> 1 pkts/98 bytes][Goodput ratio: 48/57][0.06 sec][Hostname/SNI: e7768.b.akamaiedge.net][23.223.73.34][PLAIN TEXT (akamaiedge)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	88	TCP 192.168.1.34:50024 <-> 17.172.100.36:443 [proto: 91/TLS][IP: 140/Apple][Encrypted][Confidence: Match by port][cat: Web/5][2 pkts/108 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.15 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	88	TCP 192.168.1.34:50024 <-> 17.172.100.36:443 [proto: 91.140/TLS.Apple][IP: 140/Apple][Encrypted][Confidence: DPI (partial)][cat: Web/5][2 pkts/108 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.15 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	89	IGMP 192.168.0.254:0 -> 224.0.0.1:0 [proto: 82/IGMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/92 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][125.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	90	UDP 192.168.1.34:13021 -> 64.4.23.145:40024 [proto: 125.38/Skype_Teams.Skype_TeamsCall][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VoIP/10][1 pkts/79 bytes -> 0 pkts/0 bytes][Goodput ratio: 46/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	91	UDP 192.168.1.34:13021 -> 65.55.223.26:40004 [proto: 125.38/Skype_Teams.Skype_TeamsCall][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VoIP/10][1 pkts/79 bytes -> 0 pkts/0 bytes][Goodput ratio: 46/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

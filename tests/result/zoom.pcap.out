@@ -3,7 +3,7 @@ Guessed flow protos:	5
 DPI Packets (TCP):	110	(7.86 pkts/flow)
 DPI Packets (UDP):	23	(1.35 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
-Confidence Match by port    : 2 (flows)
+Confidence DPI (partial)    : 2 (flows)
 Confidence DPI              : 31 (flows)
 Num dissector calls: 650 (19.70 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -24,7 +24,6 @@ Patricia risk:        0/0 (search/found)
 Patricia protocols:   51/15 (search/found)
 
 DNS	2	205	1
-HTTP	6	952	1
 MDNS	1	87	1
 NetBIOS	3	330	1
 SSDP	1	168	1
@@ -32,10 +31,12 @@ DHCP	1	321	1
 ntop	20	4265	1
 IMAPS	2	226	1
 ICMP	3	210	2
-TLS	18	6953	2
+TLS	16	6839	1
+Google	6	952	1
 Spotify	1	86	1
 Zoom	635	354005	19
 GoogleServices	4	1060	1
+AmazonAWS	2	114	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -54,7 +55,7 @@ JA3 Host Stats:
 	10	TCP 192.168.1.117:53872 <-> 35.186.224.53:443 [proto: 91/TLS][IP: 284/GoogleCloud][Encrypted][Confidence: DPI][cat: Web/5][8 pkts/2017 bytes <-> 8 pkts/4822 bytes][Goodput ratio: 74/89][0.07 sec][bytes ratio: -0.410 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 10/10 58/45 22/16][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 252/603 1434/1484 447/585][Plen Bins: 0,12,25,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,25,0,0,0]
 	11	TCP 192.168.1.117:54863 <-> 167.99.215.164:4434 [proto: 91.26/TLS.ntop][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Network/14][10 pkts/2198 bytes <-> 10 pkts/2067 bytes][Goodput ratio: 69/68][5.26 sec][Hostname/SNI: dati.ntop.org][bytes ratio: 0.031 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 645/740 5003/5003 1647/1741][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 220/207 932/1292 283/364][Risk: ** Known Proto on Non Std Port **** TLS (probably) Not Carrying HTTPS **][Risk Score: 60][Risk Info: No ALPN][TLSv1.2][JA3C: a795593605a13211941d44505b4d1e39][JA3S: dd4b012f7a008e741554bd0a4ed12920][Firefox][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][Plen Bins: 16,0,0,0,34,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0]
 	12	TCP 192.168.1.117:54854 -> 172.217.21.72:443 [proto: 91.239/TLS.GoogleServices][IP: 126/Google][Encrypted][Confidence: DPI][cat: Web/5][4 pkts/1060 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][6.46 sec][Hostname/SNI: www.googletagmanager.com][(Advertised) ALPNs: h2;h2-16;h2-15;h2-14;spdy/3.1;spdy/3;http/1.1][Risk: ** Obsolete TLS (v1.1 or older) **** Unidirectional Traffic **][Risk Score: 110][Risk Info: No server to client traffic / TLSv1][TLSv1][JA3C: d78489b860c8bf7838a6ff0b4d131541][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	13	TCP 192.168.1.117:53867 <-> 104.199.65.42:80 [proto: 7/HTTP][IP: 126/Google][ClearText][Confidence: Match by port][cat: Web/5][4 pkts/710 bytes <-> 2 pkts/242 bytes][Goodput ratio: 63/45][0.09 sec][bytes ratio: 0.492 (Upload)][IAT c2s/s2c min/avg/max/stddev: 30/64 31/64 32/64 1/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/121 178/121 329/121 115/0][Plen Bins: 0,50,0,0,0,25,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	TCP 192.168.1.117:53867 <-> 104.199.65.42:80 [proto: 7.126/HTTP.Google][IP: 126/Google][ClearText][Confidence: DPI (partial)][cat: Web/5][4 pkts/710 bytes <-> 2 pkts/242 bytes][Goodput ratio: 63/45][0.09 sec][bytes ratio: 0.492 (Upload)][IAT c2s/s2c min/avg/max/stddev: 30/64 31/64 32/64 1/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/121 178/121 329/121 115/0][Plen Bins: 0,50,0,0,0,25,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	14	UDP 192.168.1.117:61731 <-> 109.94.160.99:8801 [proto: 189/Zoom][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Video/26][4 pkts/372 bytes <-> 4 pkts/290 bytes][Goodput ratio: 55/39][0.11 sec][bytes ratio: 0.124 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/35 28/27 49/47 18/20][Pkt Len c2s/s2c min/avg/max/stddev: 55/60 93/72 151/93 40/14][PLAIN TEXT (replace)][Plen Bins: 50,25,12,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	UDP 192.168.1.117:60620 <-> 109.94.160.99:8801 [proto: 189/Zoom][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Video/26][4 pkts/408 bytes <-> 3 pkts/222 bytes][Goodput ratio: 59/41][1.24 sec][bytes ratio: 0.295 (Upload)][IAT c2s/s2c min/avg/max/stddev: 7/31 413/16 1209/31 563/16][Pkt Len c2s/s2c min/avg/max/stddev: 55/60 102/74 149/85 33/10][PLAIN TEXT (replace)][Plen Bins: 28,57,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	16	UDP 192.168.1.117:23903 <-> 162.255.37.14:3478 [proto: 78.189/STUN.Zoom][IP: 189/Zoom][ClearText][Confidence: DPI][cat: Video/26][3 pkts/258 bytes <-> 3 pkts/222 bytes][Goodput ratio: 51/43][0.19 sec][bytes ratio: 0.075 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/9 10/9 10/9 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/74 86/74 86/74 0/0][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -71,7 +72,7 @@ JA3 Host Stats:
 	27	UDP 192.168.1.117:62988 <-> 192.168.1.1:53 [proto: 5.189/DNS.Zoom][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/72 bytes <-> 1 pkts/88 bytes][Goodput ratio: 41/52][0.04 sec][Hostname/SNI: www3.zoom.us][52.202.62.236][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	28	UDP 192.168.1.117:64352 <-> 192.168.1.1:53 [proto: 5.189/DNS.Zoom][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/71 bytes <-> 1 pkts/87 bytes][Goodput ratio: 40/51][0.04 sec][Hostname/SNI: log.zoom.us][52.202.62.238][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	29	ICMP 192.168.1.117:0 -> 162.255.38.14:0 [proto: 81/ICMP][IP: 189/Zoom][ClearText][Confidence: DPI][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][0.01 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	30	TCP 192.168.1.117:54798 <-> 13.225.84.182:443 [proto: 91/TLS][IP: 265/AmazonAWS][Encrypted][Confidence: Match by port][cat: Web/5][1 pkts/54 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.04 sec][Risk: ** TCP Connection Issues **][Risk Score: 50][Risk Info: TCP probing attempt][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	30	TCP 192.168.1.117:54798 <-> 13.225.84.182:443 [proto: 91.265/TLS.AmazonAWS][IP: 265/AmazonAWS][Encrypted][Confidence: DPI (partial)][cat: Cloud/13][1 pkts/54 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.04 sec][Risk: ** TCP Connection Issues **][Risk Score: 50][Risk Info: TCP probing attempt][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	UDP 192.168.1.117:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Hostname/SNI: _spotify-connect._tcp.local][_spotify-connect._tcp.local][PLAIN TEXT (spotify)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	UDP 192.168.1.117:57621 -> 192.168.1.255:57621 [proto: 156/Spotify][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Music/25][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][PLAIN TEXT (SpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	ICMP 192.168.1.117:0 -> 192.168.1.1:0 [proto: 81/ICMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

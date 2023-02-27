@@ -4,7 +4,7 @@ DPI Packets (TCP):	105	(6.56 pkts/flow)
 DPI Packets (UDP):	33	(1.94 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
-Confidence Match by port    : 1 (flows)
+Confidence DPI (partial)    : 1 (flows)
 Confidence DPI              : 33 (flows)
 Num dissector calls: 565 (16.14 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -29,10 +29,10 @@ DNS	26	2980	4
 MDNS	5	983	3
 NTP	8	720	4
 IGMP	2	92	2
-TLS	136	54497	5
+TLS	134	54389	4
 Apple	2	273	1
 Microsoft	121	47561	14
-Azure	2	306	1
+Azure	4	414	2
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -70,7 +70,7 @@ JA3 Host Stats:
 	29	UDP 192.168.1.121:50288 <-> 17.253.54.251:123 [proto: 9/NTP][IP: 140/Apple][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	30	UDP 192.168.1.121:56865 <-> 17.253.54.251:123 [proto: 9/NTP][IP: 140/Apple][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	UDP 192.168.1.121:65099 <-> 17.253.54.251:123 [proto: 9/NTP][IP: 140/Apple][ClearText][Confidence: DPI][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	32	TCP 192.168.1.121:52746 <-> 52.149.21.60:443 [proto: 91/TLS][IP: 276/Azure][Encrypted][Confidence: Match by port][cat: Web/5][1 pkts/54 bytes <-> 1 pkts/54 bytes][Goodput ratio: 0/0][0.18 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	32	TCP 192.168.1.121:52746 <-> 52.149.21.60:443 [proto: 91.276/TLS.Azure][IP: 276/Azure][Encrypted][Confidence: DPI (partial)][cat: Cloud/13][1 pkts/54 bytes <-> 1 pkts/54 bytes][Goodput ratio: 0/0][0.18 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	IGMP 192.168.1.139:0 -> 224.0.0.2:0 [proto: 82/IGMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/46 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	34	IGMP 192.168.1.139:0 -> 224.0.0.251:0 [proto: 82/IGMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/46 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 

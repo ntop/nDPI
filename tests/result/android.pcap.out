@@ -3,9 +3,9 @@ Guessed flow protos:	7
 DPI Packets (TCP):	147	(5.25 pkts/flow)
 DPI Packets (UDP):	52	(1.68 pkts/flow)
 DPI Packets (other):	4	(1.00 pkts/flow)
-Confidence Unknown          : 1 (flows)
-Confidence Match by port    : 2 (flows)
+Confidence DPI (partial)    : 2 (flows)
 Confidence DPI              : 60 (flows)
+Confidence Match by IP      : 1 (flows)
 Num dissector calls: 257 (4.08 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/9/0 (insert/search/found)
@@ -24,19 +24,17 @@ Patricia risk mask:   104/0 (search/found)
 Patricia risk:        2/0 (search/found)
 Patricia protocols:   89/29 (search/found)
 
-Unknown	2	148	1
 DNS	2	216	1
-HTTP	3	214	1
 MDNS	2	174	2
 NTP	2	180	1
 SSDP	2	336	2
 DHCP	14	4772	2
 DataSaver	113	26168	13
-TLS	25	2946	5
+TLS	24	2872	4
 ICMPV6	7	578	4
 DHCPV6	2	228	1
 Dropbox	3	1656	1
-Google	183	59019	15
+Google	189	59455	18
 Apple	13	1958	2
 Spotify	3	258	1
 PlayStore	59	22749	4
@@ -78,7 +76,7 @@ JA3 Host Stats:
 	29	UDP 192.168.2.1:57621 -> 192.168.2.255:57621 [proto: 156/Spotify][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Music/25][3 pkts/258 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][60.02 sec][PLAIN TEXT (SpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	30	UDP [fe80::4e6a:f6ff:fe9f:f627]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/228 bytes -> 0 pkts/0 bytes][Goodput ratio: 45/0][2.16 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	UDP 192.168.2.16:35825 <-> 192.168.2.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/76 bytes <-> 1 pkts/140 bytes][Goodput ratio: 44/70][0.04 sec][Hostname/SNI: time.android.com][216.239.35.8][PLAIN TEXT (android)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	32	TCP 192.168.2.16:36850 <-> 173.194.79.114:80 [proto: 7/HTTP][IP: 126/Google][ClearText][Confidence: Match by port][cat: Web/5][2 pkts/140 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.04 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	32	TCP 192.168.2.16:36850 <-> 173.194.79.114:80 [proto: 7.126/HTTP.Google][IP: 126/Google][ClearText][Confidence: DPI (partial)][cat: Web/5][2 pkts/140 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.04 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	UDP 192.168.2.16:35689 <-> 192.168.2.1:53 [proto: 5.239/DNS.GoogleServices][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/94 bytes <-> 1 pkts/110 bytes][Goodput ratio: 55/61][0.04 sec][Hostname/SNI: semanticlocation-pa.googleapis.com][172.217.20.74][PLAIN TEXT (semanticlocation)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	34	UDP 192.168.2.16:47081 <-> 192.168.2.1:53 [proto: 5.126/DNS.Google][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/89 bytes <-> 1 pkts/105 bytes][Goodput ratio: 52/59][0.04 sec][Hostname/SNI: connectivitycheck.gstatic.com][172.217.18.3][PLAIN TEXT (connectivitycheck)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	35	UDP 192.168.2.16:36613 <-> 192.168.2.1:53 [proto: 5.228/DNS.PlayStore][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/86 bytes <-> 1 pkts/102 bytes][Goodput ratio: 51/58][0.00 sec][Hostname/SNI: android.clients.google.com][216.239.38.120][PLAIN TEXT (android)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -103,13 +101,10 @@ JA3 Host Stats:
 	54	UDP 192.168.2.16:39008 <-> 192.168.2.1:53 [proto: 5.239/DNS.GoogleServices][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/76 bytes <-> 1 pkts/92 bytes][Goodput ratio: 44/54][0.00 sec][Hostname/SNI: mtalk.google.com][216.239.38.120][PLAIN TEXT (google)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	55	UDP 192.168.2.16:32832 <-> 192.168.2.1:53 [proto: 5.126/DNS.Google][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/90 bytes][Goodput ratio: 43/53][< 1 sec][Hostname/SNI: www.google.com][216.239.38.120][PLAIN TEXT (google)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	56	UDP 192.168.2.16:40580 <-> 192.168.2.1:53 [proto: 5.126/DNS.Google][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/90 bytes][Goodput ratio: 43/53][0.00 sec][Hostname/SNI: www.google.com][216.239.38.120][PLAIN TEXT (google)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	57	ICMPV6 [fe80::4e6a:f6ff:fe9f:f627]:0 -> [ff02::2]:0 [proto: 102/ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 11/0][4.26 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	58	TCP 95.101.24.53:443 -> 192.168.2.17:50677 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 26/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	59	UDP 169.254.225.216:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Hostname/SNI: _spotify-connect._tcp.local][_spotify-connect._tcp.local][PLAIN TEXT (spotify)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	60	UDP 192.168.2.1:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Hostname/SNI: _spotify-connect._tcp.local][_spotify-connect._tcp.local][PLAIN TEXT (spotify)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	61	ICMPV6 [::]:0 -> [ff02::1:ff9f:f627]:0 [proto: 102/ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	62	TCP 192.168.2.16:43652 -> 172.217.20.76:443 [proto: 91/TLS][IP: 126/Google][Encrypted][Confidence: Match by port][cat: Web/5][1 pkts/74 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-
-Undetected flows:
-	1	TCP 192.168.2.16:49510 -> 216.239.38.120:5228 [proto: 0/Unknown][IP: 126/Google][ClearText][Confidence: Unknown][2 pkts/148 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][1.02 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	57	TCP 192.168.2.16:49510 -> 216.239.38.120:5228 [proto: 126/Google][IP: 126/Google][Encrypted][Confidence: Match by IP][cat: Web/5][2 pkts/148 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][1.02 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	58	ICMPV6 [fe80::4e6a:f6ff:fe9f:f627]:0 -> [ff02::2]:0 [proto: 102/ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 11/0][4.26 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	59	TCP 95.101.24.53:443 -> 192.168.2.17:50677 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Web/5][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 26/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	60	UDP 169.254.225.216:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Hostname/SNI: _spotify-connect._tcp.local][_spotify-connect._tcp.local][PLAIN TEXT (spotify)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	61	UDP 192.168.2.1:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Hostname/SNI: _spotify-connect._tcp.local][_spotify-connect._tcp.local][PLAIN TEXT (spotify)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	62	ICMPV6 [::]:0 -> [ff02::1:ff9f:f627]:0 [proto: 102/ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	63	TCP 192.168.2.16:43652 -> 172.217.20.76:443 [proto: 91.126/TLS.Google][IP: 126/Google][Encrypted][Confidence: DPI (partial)][cat: Web/5][1 pkts/74 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

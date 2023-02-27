@@ -2,7 +2,8 @@ Guessed flow protos:	3
 
 DPI Packets (TCP):	217	(3.88 pkts/flow)
 DPI Packets (UDP):	18	(1.00 pkts/flow)
-Confidence Match by port    : 3 (flows)
+Confidence Match by port    : 1 (flows)
+Confidence DPI (partial)    : 2 (flows)
 Confidence DPI              : 71 (flows)
 Num dissector calls: 539 (7.28 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -22,7 +23,9 @@ Patricia risk mask:   152/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   124/29 (search/found)
 
-Mining	2000	216111	74
+Mining	1997	215877	72
+AmazonAWS	1	78	1
+GoogleCloud	2	156	1
 
 	1	TCP 192.168.1.184:56626 <-> 178.128.195.220:30303 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Mining/99][32 pkts/3294 bytes <-> 37 pkts/3156 bytes][Goodput ratio: 36/21][0.16 sec][ETH][bytes ratio: 0.021 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 2/4 42/62 8/14][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 103/85 612/470 105/69][Risk: ** Unsafe Protocol **][Risk Score: 10][Plen Bins: 62,21,0,3,3,0,0,0,3,0,0,0,3,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.1.184:56638 <-> 209.250.240.205:30303 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Mining/99][34 pkts/3347 bytes <-> 28 pkts/2774 bytes][Goodput ratio: 34/32][0.15 sec][ETH][bytes ratio: 0.094 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 5/3 43/41 12/10][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 98/99 481/560 79/95][Risk: ** Unsafe Protocol **][Risk Score: 10][Plen Bins: 43,29,0,14,3,3,0,0,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -96,5 +99,5 @@ Mining	2000	216111	74
 	70	UDP 60.191.32.71:30303 -> 192.168.1.184:30303 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Mining/99][1 pkts/171 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][ETH][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	71	UDP 192.168.1.184:30303 -> 106.12.39.168:30333 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Mining/99][1 pkts/170 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][ETH][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	72	TCP 192.168.1.184:56625 -> 5.1.83.226:30303 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: Match by port][cat: Mining/99][2 pkts/156 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][1.10 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	73	TCP 192.168.1.184:56637 -> 35.233.197.131:30303 [proto: 42/Mining][IP: 284/GoogleCloud][ClearText][Confidence: Match by port][cat: Mining/99][2 pkts/156 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][1.11 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	74	TCP 192.168.1.184:56644 -> 13.230.108.42:30303 [proto: 42/Mining][IP: 265/AmazonAWS][ClearText][Confidence: Match by port][cat: Mining/99][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	73	TCP 192.168.1.184:56637 -> 35.233.197.131:30303 [proto: 42.284/Mining.GoogleCloud][IP: 284/GoogleCloud][ClearText][Confidence: DPI (partial)][cat: Cloud/13][2 pkts/156 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][1.11 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	74	TCP 192.168.1.184:56644 -> 13.230.108.42:30303 [proto: 42.265/Mining.AmazonAWS][IP: 265/AmazonAWS][ClearText][Confidence: DPI (partial)][cat: Cloud/13][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
