@@ -2333,14 +2333,14 @@ u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndp
 
   if(node) {
     int i;
-    
+
     for(i=0; i<2; i++) {
       if((node->value.u.uv16[i].additional_user_value == 0)
 	 || (node->value.u.uv16[i].additional_user_value == port))
 	return(node->value.u.uv16[i].user_value);
     }
   }
-  
+
   return(NDPI_PROTOCOL_UNKNOWN);
 }
 
@@ -2422,7 +2422,7 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
       pin.s_addr = inet_addr(addr);
       if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, cidr ? atoi(cidr) : 32 /* bits */)) != NULL) {
 	u_int i, found = 0;
-	
+
 	for(i=0; i<2; i++) {
 	  if(node->value.u.uv16[i].user_value == 0) {
 	    node->value.u.uv16[i].user_value = protocol_id, node->value.u.uv16[i].additional_user_value =  0 /* port */;
@@ -5866,6 +5866,8 @@ static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow) {
 static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
 				     struct ndpi_flow_struct *flow,
 				     ndpi_protocol *ret) {
+  u_int i;
+  
   /* This function can NOT access &ndpi_str->packet since it is called also from ndpi_detection_giveup() */
 
 #if 0
@@ -5937,10 +5939,40 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     if(flow->l4_proto == IPPROTO_TCP) /* TCP only */
       ndpi_set_risk(ndpi_str, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found AnyDesk"); /* Remote assistance */
     break;
+
+    /* Generic container for microsoft subprotocols */
+  case NDPI_PROTOCOL_MICROSOFT:
+    switch(flow->guessed_protocol_id_by_ip) {
+    case NDPI_PROTOCOL_MICROSOFT_365:
+    case NDPI_PROTOCOL_MS_ONE_DRIVE:
+    case NDPI_PROTOCOL_MS_OUTLOOK:
+    case NDPI_PROTOCOL_SKYPE_TEAMS:
+      ndpi_int_change_protocol(ndpi_str, flow,
+			       flow->guessed_protocol_id_by_ip, NDPI_PROTOCOL_UNKNOWN,
+			       NDPI_CONFIDENCE_DPI_PARTIAL);
+      break;
+    }
+
+    /* Generic container for google subprotocols */
+  case NDPI_PROTOCOL_GOOGLE:
+    switch(flow->guessed_protocol_id_by_ip) {
+    case NDPI_PROTOCOL_GOOGLE_CLOUD:
+      ndpi_int_change_protocol(ndpi_str, flow,
+			       flow->guessed_protocol_id_by_ip, NDPI_PROTOCOL_UNKNOWN,
+			       NDPI_CONFIDENCE_DPI_PARTIAL);
+      
+      break;
+    }
+    break;
+    
+  case NDPI_PROTOCOL_UNKNOWN:
+    break;
   } /* switch */
 
-  if(flow) {
-    switch(ndpi_get_proto_breed(ndpi_str, ret->app_protocol)) {
+  ret->master_protocol = flow->detected_protocol_stack[1], ret->app_protocol = flow->detected_protocol_stack[0];
+  
+  for(i=0; i<2; i++) {
+    switch(ndpi_get_proto_breed(ndpi_str, flow->detected_protocol_stack[i])) {
     case NDPI_PROTOCOL_UNSAFE:
     case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
     case NDPI_PROTOCOL_DANGEROUS:
@@ -6111,8 +6143,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     ndpi_check_tcp_flags(ndpi_str, flow);
 
   /* Init defaults */
-  ret.master_protocol = flow->detected_protocol_stack[1];
-  ret.app_protocol = flow->detected_protocol_stack[0];
+  ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
   ret.protocol_by_ip = flow->guessed_protocol_id_by_ip;
   ret.category = flow->category;
 
@@ -6147,6 +6178,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
     ret.app_protocol = flow->detected_protocol_stack[0];
   }
+  
   /* Does it looks like Zoom? */
   if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
      flow->l4_proto == IPPROTO_UDP && /* Zoom/UDP used for video */
@@ -6155,6 +6187,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
     ret.app_protocol = flow->detected_protocol_stack[0];
   }
+  
   /* Does it looks like Zoom (via STUN)? */
   if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
      stun_search_into_zoom_cache(ndpi_str, flow)) {
@@ -6177,6 +6210,23 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
       ret.app_protocol = flow->detected_protocol_stack[0];
     }
   }
+
+
+  if((flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN)
+     && ((ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) || (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN))) {
+    
+    if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+      ndpi_int_change_protocol(ndpi_str, flow,
+			       flow->guessed_protocol_id_by_ip, ret.master_protocol,
+			       NDPI_CONFIDENCE_MATCH_BY_IP);
+    else
+      /* master_protocol == NDPI_PROTOCOL_UNKNOWN) */
+      ndpi_int_change_protocol(ndpi_str, flow,
+			       flow->guessed_protocol_id_by_ip, ret.app_protocol,
+			       NDPI_CONFIDENCE_DPI_PARTIAL);
+    
+    ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+  }  
 
   if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
     *protocol_was_guessed = 1;
@@ -6830,7 +6880,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     flow->fail_with_unknown = 1;
   flow->num_dissector_calls += num_calls;
 
-  ndpi_reconcile_protocols(ndpi_str, flow, &ret);
+  /* ndpi_reconcile_protocols(ndpi_str, flow, &ret); */
 
   /* Zoom cache */
   if((ret.app_protocol == NDPI_PROTOCOL_ZOOM)
@@ -7457,7 +7507,10 @@ void ndpi_set_detected_protocol_keeping_master(struct ndpi_detection_module_stru
 void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 				u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
 				ndpi_confidence_t confidence) {
+  ndpi_protocol ret;
+  
   ndpi_int_change_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol, confidence);
+  ndpi_reconcile_protocols(ndpi_str, flow, &ret);
 }
 
 /* ********************************************************************************* */
@@ -7881,18 +7934,28 @@ const char *ndpi_confidence_get_name(ndpi_confidence_t confidence)
   switch(confidence) {
   case NDPI_CONFIDENCE_UNKNOWN:
     return "Unknown";
+
   case NDPI_CONFIDENCE_MATCH_BY_PORT:
     return "Match by port";
+
   case NDPI_CONFIDENCE_DPI_PARTIAL:
     return "DPI (partial)";
+
   case NDPI_CONFIDENCE_DPI_PARTIAL_CACHE:
     return "DPI (partial cache)";
+
   case NDPI_CONFIDENCE_DPI_CACHE:
     return "DPI (cache)";
+
   case NDPI_CONFIDENCE_DPI:
     return "DPI";
+
   case NDPI_CONFIDENCE_NBPF:
     return "nBPF";
+
+  case NDPI_CONFIDENCE_MATCH_BY_IP:
+    return "Match by IP";
+
   default:
     return NULL;
   }

@@ -918,14 +918,13 @@ typedef enum {
   NDPI_CONFIDENCE_DPI_PARTIAL_CACHE,        /* Classification results based on some LRU cache with partial/incomplete DPI information */
   NDPI_CONFIDENCE_DPI_CACHE,                /* Classification results based on some LRU cache (i.e. correlation among sessions) */
   NDPI_CONFIDENCE_DPI,                      /* Deep packet inspection */
-
+  NDPI_CONFIDENCE_MATCH_BY_IP,              /* Classification obtained looking only at the IP addresses */
+  
   /*
     IMPORTANT
 
     Please keep in sync with
-
     ndpi_confidence_get_name()
-
     in ndpi_main.c
   */
 
