@@ -22,5 +22,5 @@ Patricia protocols:   4/0 (search/found)
 
 SCTP	4	340	2
 
-	1	SCTP 10.28.6.43:0 <-> 10.28.6.44:0 [proto: 84/SCTP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/138 bytes <-> 1 pkts/62 bytes][Goodput ratio: 0/0][< 1 sec][PLAIN TEXT (MEGACO/2 )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	SCTP 10.28.6.42:0 <-> 10.28.6.44:0 [proto: 84/SCTP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/70 bytes <-> 1 pkts/70 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	SCTP 10.28.6.43:0 <-> 10.28.6.44:0 [proto: 84/SCTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/138 bytes <-> 1 pkts/62 bytes][Goodput ratio: 0/0][< 1 sec][PLAIN TEXT (MEGACO/2 )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	SCTP 10.28.6.42:0 <-> 10.28.6.44:0 [proto: 84/SCTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/70 bytes <-> 1 pkts/70 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

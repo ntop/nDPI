@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 AFP	16	1218	1
 
-	1	TCP 192.168.27.57:64987 <-> 192.168.27.139:548 [proto: 97/AFP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: DataTransfer/4][12 pkts/836 bytes <-> 4 pkts/382 bytes][Goodput ratio: 5/31][1.09 sec][bytes ratio: 0.373 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 109/0 1086/0 326/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 70/96 88/116 8/21][Plen Bins: 60,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.27.57:64987 <-> 192.168.27.139:548 [proto: 97/AFP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: DataTransfer/4][12 pkts/836 bytes <-> 4 pkts/382 bytes][Goodput ratio: 5/31][1.09 sec][bytes ratio: 0.373 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 109/0 1086/0 326/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 70/96 88/116 8/21][Plen Bins: 60,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

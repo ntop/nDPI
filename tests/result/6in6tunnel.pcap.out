@@ -25,4 +25,4 @@ Unknown	2	212	1
 
 
 Undetected flows:
-	1	UDP [dead::beef]:30000 -> [cafe::babe]:13000 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][2 pkts/212 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][0.00 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP [dead::beef]:30000 -> [cafe::babe]:13000 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 2][2 pkts/212 bytes -> 0 pkts/0 bytes][Goodput ratio: 4/0][0.00 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

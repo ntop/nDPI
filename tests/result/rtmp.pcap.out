@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 RTMP	26	8368	1
 
-	1	TCP 192.168.43.1:1177 <-> 192.168.43.128:1935 [proto: 174/RTMP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Media/1][12 pkts/4108 bytes <-> 14 pkts/4260 bytes][Goodput ratio: 84/82][1.04 sec][bytes ratio: -0.018 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 83/75 334/230 119/85][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 342/304 1514/1514 531/465][PLAIN TEXT (ace@nAt)][Plen Bins: 7,21,14,0,7,7,0,0,0,7,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,21,0,0]
+	1	TCP 192.168.43.1:1177 <-> 192.168.43.128:1935 [proto: 174/RTMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 8][cat: Media/1][12 pkts/4108 bytes <-> 14 pkts/4260 bytes][Goodput ratio: 84/82][1.04 sec][bytes ratio: -0.018 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 83/75 334/230 119/85][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 342/304 1514/1514 531/465][PLAIN TEXT (ace@nAt)][Plen Bins: 7,21,14,0,7,7,0,0,0,7,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,21,0,0]

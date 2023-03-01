@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 SMTP	95	23157	1
 
-	1	TCP 194.7.248.153:2127 <-> 172.16.114.207:25 [proto: 3/SMTP][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Email/3][51 pkts/19311 bytes <-> 44 pkts/3846 bytes][Goodput ratio: 86/37][0.23 sec][Hostname/SNI: pigeon.eyrie.af.mil][bytes ratio: 0.668 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/1 5/6 67/68 12/15][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 379/87 1514/138 562/15][PLAIN TEXT (220 pigeon.eyrie.af.mil ESMTP S)][Plen Bins: 8,78,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,10,0,0]
+	1	TCP 194.7.248.153:2127 <-> 172.16.114.207:25 [proto: 3/SMTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 11][cat: Email/3][51 pkts/19311 bytes <-> 44 pkts/3846 bytes][Goodput ratio: 86/37][0.23 sec][Hostname/SNI: pigeon.eyrie.af.mil][bytes ratio: 0.668 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/1 5/6 67/68 12/15][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 379/87 1514/138 562/15][PLAIN TEXT (220 pigeon.eyrie.af.mil ESMTP S)][Plen Bins: 8,78,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,10,0,0]

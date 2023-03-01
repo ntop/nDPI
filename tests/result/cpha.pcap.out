@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 CPHA	1	96	1
 
-	1	UDP 0.0.0.0:8116 -> 172.21.3.0:8116 [VLAN: 21][proto: 53/CPHA][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][1 pkts/96 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 0.0.0.0:8116 -> 172.21.3.0:8116 [VLAN: 21][proto: 53/CPHA][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/96 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

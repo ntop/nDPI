@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 AmongUs	1	57	1
 
-	1	UDP 10.0.0.1:64260 -> 172.105.251.170:22023 [proto: 69/AmongUs][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Game/8][1 pkts/57 bytes -> 0 pkts/0 bytes][Goodput ratio: 26/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.0.0.1:64260 -> 172.105.251.170:22023 [proto: 69/AmongUs][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/57 bytes -> 0 pkts/0 bytes][Goodput ratio: 26/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

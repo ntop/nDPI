@@ -1425,6 +1425,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 #if 0
     fprintf(out, "[Num calls: %d]", flow->num_dissector_calls);
 #endif
+    fprintf(out, "[DPI packets: %d]", flow->dpi_packets);
 
     if(flow->detected_protocol.category != 0)
       fprintf(out, "[cat: %s/%u]",

@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 MerakiCloud	44	6049	1
 
-	1	UDP 2.36.234.133:47301 <-> 209.206.59.34:7351 [proto: 66/MerakiCloud][IP: 0/Unknown][ClearText][Confidence: DPI][cat: Network/14][22 pkts/3603 bytes <-> 22 pkts/2446 bytes][Goodput ratio: 74/62][400.21 sec][bytes ratio: 0.191 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 198/199 19165/19166 25000/25010 10520/10521][Pkt Len c2s/s2c min/avg/max/stddev: 154/88 164/111 197/190 18/43][Plen Bins: 0,38,0,38,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 2.36.234.133:47301 <-> 209.206.59.34:7351 [proto: 66/MerakiCloud][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][22 pkts/3603 bytes <-> 22 pkts/2446 bytes][Goodput ratio: 74/62][400.21 sec][bytes ratio: 0.191 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 198/199 19165/19166 25000/25010 10520/10521][Pkt Len c2s/s2c min/avg/max/stddev: 154/88 164/111 197/190 18/43][Plen Bins: 0,38,0,38,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

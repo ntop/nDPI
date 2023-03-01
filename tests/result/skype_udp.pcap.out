@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 Skype_Teams	5	339	1
 
-	1	UDP 192.168.1.2:35990 <-> 24.224.190.149:39262 [proto: 125/Skype_Teams][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: VoIP/10][4 pkts/279 bytes <-> 1 pkts/60 bytes][Goodput ratio: 40/30][72.51 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.1.2:35990 <-> 24.224.190.149:39262 [proto: 125/Skype_Teams][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: VoIP/10][4 pkts/279 bytes <-> 1 pkts/60 bytes][Goodput ratio: 40/30][72.51 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

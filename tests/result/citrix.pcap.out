@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 Citrix	100	11332	1
 
-	1	TCP 21.0.0.8:45225 <-> 22.0.0.7:1494 [proto: 132/Citrix][IP: 0/Unknown][Encrypted][Confidence: DPI][cat: Network/14][75 pkts/8236 bytes <-> 25 pkts/3096 bytes][Goodput ratio: 47/52][1.60 sec][bytes ratio: 0.454 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/58 108/222 22/81][Pkt Len c2s/s2c min/avg/max/stddev: 64/64 110/124 913/595 117/118][PLAIN TEXT (32.EXE)][Plen Bins: 64,22,3,2,1,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 21.0.0.8:45225 <-> 22.0.0.7:1494 [proto: 132/Citrix][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: Network/14][75 pkts/8236 bytes <-> 25 pkts/3096 bytes][Goodput ratio: 47/52][1.60 sec][bytes ratio: 0.454 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/58 108/222 22/81][Pkt Len c2s/s2c min/avg/max/stddev: 64/64 110/124 913/595 117/118][PLAIN TEXT (32.EXE)][Plen Bins: 64,22,3,2,1,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

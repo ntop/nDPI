@@ -1662,6 +1662,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       workflow->stats.dpi_packet_count[1]++;
     else
       workflow->stats.dpi_packet_count[2]++;
+    flow->dpi_packets++;
 
     memset(&input_info, '\0', sizeof(input_info)); /* To be sure to set to "unknown" any fields */
     /* Set here any information (easily) available; in this trivial example we don't have any */
