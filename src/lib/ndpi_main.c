@@ -2454,10 +2454,10 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
     pin.s_addr = htonl(host_list[i].network);
     if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL) {
       /* Two main cases:
-         1) ip -> protocol: uv32.user_value = protocol; uv32.additional_user_value = 0;
-         2) ip -> risk: uv32.user_value = risk; uv32.additional_user_value = 0;
+         1) ip -> protocol: uv16[0].user_value = protocol; uv16[0].additional_user_value = 0;
+         2) ip -> risk: uv16[0].user_value = risk; uv16[0].additional_user_value = 0;
       */
-      node->value.u.uv32.user_value = host_list[i].value, node->value.u.uv32.additional_user_value = 0;
+      node->value.u.uv16[0].user_value = host_list[i].value, node->value.u.uv16[0].additional_user_value = 0;
     }
   }
 }
