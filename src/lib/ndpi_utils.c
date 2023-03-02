@@ -1928,8 +1928,8 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_HTTP_SUSPICIOUS_USER_AGENT:
     return("HTTP Susp User-Agent");
 
-  case NDPI_HTTP_NUMERIC_IP_HOST:
-    return("HTTP Numeric IP");
+  case NDPI_NUMERIC_IP_HOST:
+    return("HTTP/TLS/QUIC Numeric Hostname/SNI");
 
   case NDPI_HTTP_SUSPICIOUS_URL:
     return("HTTP Susp URL");
@@ -2053,7 +2053,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     
   case NDPI_TCP_ISSUES:
     return("TCP Connection Issues");
-    
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

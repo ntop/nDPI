@@ -73,9 +73,9 @@ HTTP only: this risk is triggered whenever the user agent contains suspicious ch
 
 .. _Risk 012:
 
-NDPI_HTTP_NUMERIC_IP_HOST
+NDPI_NUMERIC_IP_HOST
 =========================
-HTTP only: this risk is triggered whenever we're accessing a host using its IP rather than its symbolic name. Example http://1.2.3.4.
+This risk is triggered whenever a HTTP/TLS/QUIC connection is using a literal IPv4 or IPv6 address as ServerName (TLS/QUIC; example: SNI=1.2.3.4) or as Hostname (HTTP; example: http://1.2.3.4.).
 
 .. _Risk 013:
 

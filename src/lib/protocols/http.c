@@ -634,7 +634,7 @@ static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_stru
     char str[64];
 
     snprintf(str, sizeof(str), "Found host %s", buf);
-    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_NUMERIC_IP_HOST, str);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST, str);
   }
 }
 
@@ -916,7 +916,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
         strstr(flow->http.url, "download.windowsupdate.com/")) &&
        ndpi_strnstr((const char *)packet->user_agent_line.ptr, "Microsoft-Delivery-Optimization/",
                     packet->user_agent_line.len) &&
-       ndpi_isset_risk(ndpi_struct, flow, NDPI_HTTP_NUMERIC_IP_HOST)) {
+       ndpi_isset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST)) {
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WINDOWS_UPDATE, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
     }
   }
