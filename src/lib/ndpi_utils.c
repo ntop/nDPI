@@ -2416,6 +2416,23 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
     if(host && (host[0] != '\0')) {
       /* Check host exception */
       ndpi_check_hostname_risk_exception(ndpi_str, flow, host);
+
+      if(flow->risk_mask == 0) {
+	u_int i;
+	
+	/*
+	  Might be that the exception applied when some risks
+	  were already triggered: we need to clean them up
+	*/
+	for(i=0; i<flow->num_risk_infos; i++) {
+	  if(flow->risk_infos[i].info != NULL) {
+	    free(flow->risk_infos[i].info);
+	    flow->risk_infos[i].info = NULL;
+	  }
+	}
+	
+	flow->num_risk_infos = 0;
+      }
       
       /* Used to avoid double checks (e.g. in DNS req/rsp) */
       flow->host_risk_mask_evaluated = 1;
@@ -2449,14 +2466,16 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
     
     ndpi_handle_risk_exceptions(ndpi_str, flow);
 
-    if(risk_message != NULL) {
-      if(flow->num_risk_infos < MAX_NUM_RISK_INFOS) {
-	char *s = ndpi_strdup(risk_message);
+    if(flow->risk != 0 /* check if it has been masked */) {
+      if(risk_message != NULL) {
+	if(flow->num_risk_infos < MAX_NUM_RISK_INFOS) {
+	  char *s = ndpi_strdup(risk_message);
 
-	if(s != NULL) {
-	  flow->risk_infos[flow->num_risk_infos].id = r;
-	  flow->risk_infos[flow->num_risk_infos].info = s;
-	  flow->num_risk_infos++;
+	  if(s != NULL) {
+	    flow->risk_infos[flow->num_risk_infos].id = r;
+	    flow->risk_infos[flow->num_risk_infos].info = s;
+	    flow->num_risk_infos++;
+	  }
 	}
       }
     }
