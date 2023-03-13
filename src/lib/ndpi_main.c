@@ -2197,12 +2197,15 @@ int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PTREE_RISK_MASK:
     ndpi_patricia_get_stats((ndpi_patricia_tree_t *)ndpi_struct->ip_risk_mask_ptree, stats);
     return 0;
+    
   case NDPI_PTREE_RISK:
     ndpi_patricia_get_stats((ndpi_patricia_tree_t *)ndpi_struct->ip_risk_ptree, stats);
     return 0;
+    
   case NDPI_PTREE_PROTOCOLS:
     ndpi_patricia_get_stats((ndpi_patricia_tree_t *)ndpi_struct->protocols_ptree, stats);
     return 0;
+    
   default:
     return -1;
   }
@@ -2356,9 +2359,13 @@ u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndp
   node = ndpi_patricia_search_best(ndpi_str->protocols_ptree, &prefix);
 
   if(node) {
-    if((node->value.u.uv32.additional_user_value == 0)
-       || (node->value.u.uv32.additional_user_value == port))
-      return(node->value.u.uv32.user_value);
+    int i;
+
+    for(i=0; i<UV16_MAX_USER_VALUES; i++) {
+      if((node->value.u.uv16[i].additional_user_value == 0)
+	 || (node->value.u.uv16[i].additional_user_value == port))
+	return(node->value.u.uv16[i].user_value);
+    }
   }
 
   return(NDPI_PROTOCOL_UNKNOWN);
@@ -2438,8 +2445,18 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 
       pin.s_addr = inet_addr(addr);
       if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, cidr ? atoi(cidr) : 32 /* bits */)) != NULL) {
-	node->value.u.uv32.user_value = protocol_id, node->value.u.uv32.additional_user_value = 0 /* port */;
-	num_loaded++;
+	u_int i, found = 0;
+
+	for(i=0; i<UV16_MAX_USER_VALUES; i++) {
+	  if(node->value.u.uv16[i].user_value == 0) {
+	    node->value.u.uv16[i].user_value = protocol_id, node->value.u.uv16[i].additional_user_value =  0 /* port */;
+	    found = 1;
+	    break;
+	  }
+	}
+
+	if(found)
+	  num_loaded++;
       }
     }
   }
@@ -2460,9 +2477,10 @@ static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
 
     pin.s_addr = htonl(host_list[i].network);
     if((node = add_to_ptree(ptree, AF_INET, &pin, host_list[i].cidr /* bits */)) != NULL) {
-      /* Two main cases:
-         1) ip -> protocol: uv32.user_value = protocol; uv32.additional_user_value = 0;
-         2) ip -> risk: uv32.user_value = risk; uv32.additional_user_value = 0;
+      /*
+	Two main cases:
+	1) ip -> protocol: uv16[0].user_value = protocol; uv16[0].additional_user_value = 0;
+	2) ip -> risk: uv16[0].user_value = risk; uv16[0].additional_user_value = 0;
       */
       node->value.u.uv32.user_value = host_list[i].value, node->value.u.uv32.additional_user_value = 0;
     }
@@ -2507,7 +2525,16 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   inet_pton(AF_INET, value, &pin);
 
   if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits)) != NULL) {
-    node->value.u.uv32.user_value = protocol_id, node->value.u.uv32.additional_user_value = htons(port);
+    int i;
+
+    for(i=0; i<UV16_MAX_USER_VALUES; i++) {
+      if(node->value.u.uv16[i].user_value == 0) {
+	node->value.u.uv16[i].user_value = protocol_id, node->value.u.uv16[i].additional_user_value = htons(port);
+	return(0);
+      }
+    }
+
+    return(-1); /* All slots are full */
   }
 
   return(0);

@@ -64,10 +64,16 @@
 #ifndef _NDPI_PATRICIA_TYPEDEF_H_
 #define _NDPI_PATRICIA_TYPEDEF_H_
 
-/* pointer to usr data (ex. route flap info) */
+#define UV16_MAX_USER_VALUES  2
+
+/* pointer to user data (ex. route flap info) */
 union ndpi_patricia_node_value_t { 
   /* User-defined values */
   union {
+    struct {
+      u_int16_t user_value, additional_user_value;
+    } uv16[UV16_MAX_USER_VALUES];
+      
     struct {
       u_int32_t user_value, additional_user_value;
     } uv32;
