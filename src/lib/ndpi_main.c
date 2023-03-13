@@ -2164,22 +2164,22 @@ void ndpi_patricia_get_stats(ndpi_patricia_tree_t *tree, struct ndpi_patricia_tr
 /* ******************************************************************** */
 
 int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
-                          ptree_type ptree_type,
-                          struct ndpi_patricia_tree_stats *stats) {
+			    ptree_type ptree_type,
+			    struct ndpi_patricia_tree_stats *stats) {
   if(!ndpi_struct || !stats)
     return -1;
 
   switch(ptree_type) {
   case NDPI_PTREE_RISK_MASK:
-    ndpi_patricia_get_stats((ndpi_patricia_tree_t *)ndpi_struct->ip_risk_mask_ptree, stats);
+    ndpi_patricia_get_stats(ndpi_struct->ip_risk_mask_ptree, stats);
     return 0;
     
   case NDPI_PTREE_RISK:
-    ndpi_patricia_get_stats((ndpi_patricia_tree_t *)ndpi_struct->ip_risk_ptree, stats);
+    ndpi_patricia_get_stats(ndpi_struct->ip_risk_ptree, stats);
     return 0;
     
   case NDPI_PTREE_PROTOCOLS:
-    ndpi_patricia_get_stats((ndpi_patricia_tree_t *)ndpi_struct->protocols_ptree, stats);
+    ndpi_patricia_get_stats(ndpi_struct->protocols_ptree, stats);
     return 0;
     
   default:
@@ -2336,11 +2336,26 @@ u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndp
 
   if(node) {
     int i;
-
+    struct patricia_uv16_list *item;
+    
     for(i=0; i<UV16_MAX_USER_VALUES; i++) {
       if((node->value.u.uv16[i].additional_user_value == 0)
 	 || (node->value.u.uv16[i].additional_user_value == port))
 	return(node->value.u.uv16[i].user_value);
+    }
+
+    /*
+      If we're here it means that we don't have
+      enough room for our custom value so we need
+      to check the custom_user_data pointer.
+    */
+    item = (struct patricia_uv16_list*)node->data;
+
+    while(item != NULL) {
+      if(item->value.additional_user_value == port)
+	return(item->value.user_value);
+      else
+	item = item->next;
     }
   }
 
@@ -2505,14 +2520,32 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 
   if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits)) != NULL) {
     int i;
-
+    struct patricia_uv16_list *item;
+    
     for(i=0; i<UV16_MAX_USER_VALUES; i++) {
       if(node->value.u.uv16[i].user_value == 0) {
 	node->value.u.uv16[i].user_value = protocol_id, node->value.u.uv16[i].additional_user_value = htons(port);
+	
 	return(0);
       }
-    }
+    } /* for */
 
+    /*
+      If we're here it means that we don't have
+      enough room for our custom value
+    */
+    item = (struct patricia_uv16_list*)ndpi_malloc(sizeof(struct patricia_uv16_list));
+
+    if(item != NULL) {
+      item->value.user_value = protocol_id,
+	item->value.additional_user_value = htons(port),
+	item->next = (struct patricia_uv16_list*)node->data;
+      
+      node->data = item;
+
+      return(0);
+    }
+    
     return(-1); /* All slots are full */
   }
 
@@ -3295,7 +3328,14 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
 /* *********************************************** */
 
 static void free_ptree_data(void *data) {
-  ;
+  struct patricia_uv16_list *item = (struct patricia_uv16_list *)data;
+
+  while(item != NULL) {
+    struct patricia_uv16_list *next = item->next;
+    
+    free(item);
+    item = next;
+  }
 }
 
 /* ****************************************************** */
@@ -3315,7 +3355,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     for(i = 0; (i < MAX_NBPF_CUSTOM_PROTO) && (ndpi_str->nbpf_custom_proto[i].tree != NULL); i++)
       nbpf_free(ndpi_str->nbpf_custom_proto[i].tree);
 #endif
-
+    
     /* NDPI_PROTOCOL_TINC */
     if(ndpi_str->tinc_cache)
       cache_free((cache_t)(ndpi_str->tinc_cache));
@@ -3348,10 +3388,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
       ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree, free_ptree_data);
 
     if(ndpi_str->ip_risk_mask_ptree)
-      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree, free_ptree_data);
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree, NULL);
 
     if(ndpi_str->ip_risk_ptree)
-      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree, free_ptree_data);
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree, NULL);
 
     if(ndpi_str->udpRoot != NULL) ndpi_tdestroy(ndpi_str->udpRoot, ndpi_free);
     if(ndpi_str->tcpRoot != NULL) ndpi_tdestroy(ndpi_str->tcpRoot, ndpi_free);

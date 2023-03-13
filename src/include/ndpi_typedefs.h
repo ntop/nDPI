@@ -1,7 +1,7 @@
 /*
  * ndpi_typedefs.h
  *
- * Copyright (C) 2011-22 - ntop.org
+ * Copyright (C) 2011-23 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -1156,18 +1156,18 @@ struct ndpi_detection_module_struct {
     risky_domain_automa, tls_cert_subject_automa,
     host_risk_mask_automa, common_alpns_automa;
   /* IMPORTANT: please, whenever you add a new automa:
-       * update ndpi_finalize_initialization()
-       * update automa_type above
-  */
+   * update ndpi_finalize_initialization()
+   * update automa_type above
+   */
 
   ndpi_str_hash *malicious_ja3_hashmap, *malicious_sha1_hashmap;
 
   ndpi_list *trusted_issuer_dn;
-  
-  void *ip_risk_mask_ptree;
-  void *ip_risk_ptree;
-  /* IP-based protocol detection */
-  void *protocols_ptree;
+
+  /* Patricia trees */
+  ndpi_patricia_tree_t *ip_risk_mask_ptree;
+  ndpi_patricia_tree_t *ip_risk_ptree; 
+  ndpi_patricia_tree_t *protocols_ptree;  /* IP-based protocol detection */
   
   /* *** If you add a new Patricia tree, please update ptree_type above! *** */
 
