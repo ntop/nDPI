@@ -1756,6 +1756,7 @@ static bool ndpi_is_valid_vxlan(const struct pcap_pkthdr *header, const u_char *
     u_int offset = ip_offset + ip_len + sizeof(struct ndpi_udphdr);
     struct vxlan_packet_header *vxlan = (struct vxlan_packet_header *)&packet[offset];
 
+
     if((udp->dest == vxlan_dst_port || udp->source == vxlan_dst_port) &&
       (vxlan->flags[0] == expected_flags) && (vxlan->flags[1] == 0x0) &&
       (vxlan->flags[2] == 0x0) && (vxlan->flags[3] == 0x0) &&
