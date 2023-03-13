@@ -5088,116 +5088,116 @@ void zscoreUnitTest() {
 /**
    @brief MAIN FUNCTION
 **/
-  int main(int argc, char **argv) {
-    int i, skip_unit_tests = 0;
+int main(int argc, char **argv) {
+  int i, skip_unit_tests = 0;
 
 #ifdef DEBUG_TRACE
-    trace = fopen("/tmp/ndpiReader.log", "a");
+  trace = fopen("/tmp/ndpiReader.log", "a");
 
-    if(trace) {
-      int i;
+  if(trace) {
+    int i;
 
-      fprintf(trace, " #### %s #### \n", __FUNCTION__);
-      fprintf(trace, " #### [argc: %u] #### \n", argc);
+    fprintf(trace, " #### %s #### \n", __FUNCTION__);
+    fprintf(trace, " #### [argc: %u] #### \n", argc);
 
-      for(i=0; i<argc; i++)
-	fprintf(trace, " #### [%d] [%s]\n", i, argv[i]);
-    }
+    for(i=0; i<argc; i++)
+      fprintf(trace, " #### [%d] [%s]\n", i, argv[i]);
+  }
 #endif
 
 
-    if(ndpi_get_api_version() != NDPI_API_VERSION) {
-      printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
-      return(-1);
-    }
+  if(ndpi_get_api_version() != NDPI_API_VERSION) {
+    printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
+    return(-1);
+  }
 
-    if(!skip_unit_tests) {
+  if(!skip_unit_tests) {
 #ifndef DEBUG_TRACE
-      /* Skip tests when debugging */
+    /* Skip tests when debugging */
 
 #ifdef HW_TEST
-      hwUnitTest2();
+    hwUnitTest2();
 #endif
 
 #ifdef STRESS_TEST
-      desUnitStressTest();
-      exit(0);
+    desUnitStressTest();
+    exit(0);
 #endif
 
-      zscoreUnitTest();
-      sesUnitTest();
-      desUnitTest();
+    zscoreUnitTest();
+    sesUnitTest();
+    desUnitTest();
 
-      /* Internal checks */
-      // binUnitTest();
-      //hwUnitTest();
-      jitterUnitTest();
-      rsiUnitTest();
-      hashUnitTest();
-      dgaUnitTest();
-      hllUnitTest();
-      bitmapUnitTest();
-      automataUnitTest();
-      analyzeUnitTest();
-      ndpi_self_check_host_match();
-      analysisUnitTest();
-      compressedBitmapUnitTest();
+    /* Internal checks */
+    // binUnitTest();
+    //hwUnitTest();
+    jitterUnitTest();
+    rsiUnitTest();
+    hashUnitTest();
+    dgaUnitTest();
+    hllUnitTest();
+    bitmapUnitTest();
+    automataUnitTest();
+    analyzeUnitTest();
+    ndpi_self_check_host_match();
+    analysisUnitTest();
+    compressedBitmapUnitTest();
 #endif
-    }
+  }
 
-    gettimeofday(&startup_time, NULL);
-    memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
+  gettimeofday(&startup_time, NULL);
+  memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
 
-    if(getenv("AHO_DEBUG"))
-      ac_automata_enable_debug(1);
-    parseOptions(argc, argv);
+  if(getenv("AHO_DEBUG"))
+    ac_automata_enable_debug(1);
+  parseOptions(argc, argv);
 
-    ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  ndpi_info_mod = ndpi_init_detection_module(init_prefs);
 
-    if(ndpi_info_mod == NULL) return -1;
+  if(ndpi_info_mod == NULL) return -1;
 
-    if(domain_to_check) {
-      ndpiCheckHostStringMatch(domain_to_check);
-      exit(0);
-    }
+  if(domain_to_check) {
+    ndpiCheckHostStringMatch(domain_to_check);
+    exit(0);
+  }
 
-    if(!quiet_mode) {
-      printf("\n-----------------------------------------------------------\n"
-	     "* NOTE: This is demo app to show *some* nDPI features.\n"
-	     "* In this demo we have implemented only some basic features\n"
-	     "* just to show you what you can do with the library. Feel \n"
-	     "* free to extend it and send us the patches for inclusion\n"
-	     "------------------------------------------------------------\n\n");
+  if(!quiet_mode) {
+    printf("\n-----------------------------------------------------------\n"
+	   "* NOTE: This is demo app to show *some* nDPI features.\n"
+	   "* In this demo we have implemented only some basic features\n"
+	   "* just to show you what you can do with the library. Feel \n"
+	   "* free to extend it and send us the patches for inclusion\n"
+	   "------------------------------------------------------------\n\n");
 
-      printf("Using nDPI (%s) [%d thread(s)]\n", ndpi_revision(), num_threads);
+    printf("Using nDPI (%s) [%d thread(s)]\n", ndpi_revision(), num_threads);
 
-      const char *gcrypt_ver = ndpi_get_gcrypt_version();
-      if(gcrypt_ver)
-	printf("Using libgcrypt version %s\n", gcrypt_ver);
-    }
+    const char *gcrypt_ver = ndpi_get_gcrypt_version();
+    if(gcrypt_ver)
+      printf("Using libgcrypt version %s\n", gcrypt_ver);
+  }
 
-    signal(SIGINT, sigproc);
+  signal(SIGINT, sigproc);
 
-    for(i=0; i<num_loops; i++)
-      test_lib();
+  for(i=0; i<num_loops; i++)
+    test_lib();
 
-    if(results_path)  ndpi_free(results_path);
-    if(results_file)  fclose(results_file);
-    if(extcap_dumper) pcap_dump_close(extcap_dumper);
-    if(extcap_fifo_h) pcap_close(extcap_fifo_h);
-    if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
-    if(enable_malloc_bins)
-      ndpi_free_bin(&malloc_bins);
-    if(csv_fp)        fclose(csv_fp);
-    ndpi_free(_debug_protocols);
-    ndpi_free(_disabled_protocols);
+  if(results_path)  ndpi_free(results_path);
+  if(results_file)  fclose(results_file);
+  if(extcap_dumper) pcap_dump_close(extcap_dumper);
+  if(extcap_fifo_h) pcap_close(extcap_fifo_h);
+  if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
+  if(enable_malloc_bins)
+    ndpi_free_bin(&malloc_bins);
+  if(csv_fp)        fclose(csv_fp);
+  ndpi_free(_debug_protocols);
+  ndpi_free(_disabled_protocols);
 
 #ifdef DEBUG_TRACE
-    if(trace) fclose(trace);
+  if(trace) fclose(trace);
 #endif
-
-    return 0;
-  }
+  
+  return 0;
+}
 
 #ifdef _MSC_BUILD
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)

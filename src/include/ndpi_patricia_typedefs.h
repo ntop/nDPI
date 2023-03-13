@@ -66,20 +66,26 @@
 
 #define UV16_MAX_USER_VALUES  2
 
+struct patricia_uv16 {
+  u_int16_t user_value, additional_user_value;
+};
+
+struct patricia_uv16_list {
+  struct patricia_uv16 value;
+  struct patricia_uv16_list *next;
+};
+
+struct patricia_uv32 {
+  u_int32_t user_value, additional_user_value;
+};
+
 /* pointer to user data (ex. route flap info) */
 union ndpi_patricia_node_value_t { 
   /* User-defined values */
   union {
-    struct {
-      u_int16_t user_value, additional_user_value;
-    } uv16[UV16_MAX_USER_VALUES];
-      
-    struct {
-      u_int32_t user_value, additional_user_value;
-    } uv32;
-    
-    u_int64_t uv64;
-    
+    struct patricia_uv16 uv16[UV16_MAX_USER_VALUES];      
+    struct patricia_uv32 uv32;    
+    u_int64_t uv64;    
     void *user_data;
   } u;
 };
