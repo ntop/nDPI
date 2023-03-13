@@ -1,1 +1,1 @@
-1 and "a" < "b"
+SELECT character varying '1';

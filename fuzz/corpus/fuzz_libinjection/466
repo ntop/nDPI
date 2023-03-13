@@ -1,0 +1,1 @@
+SELECT 1 NOT LIKE 2;

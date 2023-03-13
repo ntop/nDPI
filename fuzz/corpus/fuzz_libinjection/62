@@ -1,0 +1,1 @@
+select 1 not IN (2,3,4);

@@ -1,1 +1,1 @@
-{``.``.id} UNION SELECT table_name from information_schemas LIMIT 1
+select +++ (1);

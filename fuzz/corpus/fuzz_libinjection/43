@@ -1,1 +1,1 @@
-1 /*!anything*/
+select foobar();

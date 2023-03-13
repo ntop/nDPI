@@ -1,1 +1,1 @@
-foo - (1) UNION SELECT 1
+select current_user();

@@ -1,1 +1,1 @@
-1 and "a"
+SELECT '1'::money, 2;

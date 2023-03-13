@@ -1,0 +1,1 @@
+SELECT NOT 1;

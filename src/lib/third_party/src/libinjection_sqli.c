@@ -18,7 +18,7 @@
 #include "libinjection_sqli.h"
 #include "libinjection_sqli_data.h"
 
-#define LIBINJECTION_VERSION "3.9.2"
+#define LIBINJECTION_VERSION "3.9.2.60-8e70-dirty"
 
 #define LIBINJECTION_SQLI_TOKEN_SIZE  sizeof(((stoken_t*)(0))->val)
 #define LIBINJECTION_SQLI_MAX_TOKENS  5
@@ -503,12 +503,7 @@ static size_t parse_slash(struct libinjection_sqli_state * sf)
      * skip over initial '/x'
      */
     ptr = memchr2(cur + 2, slen - (pos + 2), '*', '/');
-
-    /*
-     * (ptr == NULL) causes false positive in cppcheck 1.61
-     * casting to type seems to fix it
-     */
-    if (ptr == (const char*) NULL) {
+    if (ptr == NULL) {
         /* till end of line */
         clen = slen - pos;
     } else {
@@ -525,7 +520,10 @@ static size_t parse_slash(struct libinjection_sqli_state * sf)
      *  are an automatic black ban!
      */
 
-    if(ptr && (memchr2(cur + 2, (size_t)(ptr - (cur + 1)), '/', '*') !=  NULL)) {
+    if (
+        ptr != NULL &&
+        memchr2(cur + 2, (size_t)(ptr - (cur + 1)), '/', '*') !=  NULL
+    ) {
         ctype = TYPE_EVIL;
     } else if (is_mysql_comment(cs, slen, pos)) {
         ctype = TYPE_EVIL;
@@ -599,6 +597,16 @@ static size_t parse_operator2(struct libinjection_sqli_state * sf)
     }
 }
 
+#ifndef __clang_analyzer__
+/* Code not to be analyzed by clang.
+ * 
+ * Why we do this? Because there is a false positive here:
+ * libinjection_sqli.c:608:13: warning: Out of bound memory access (access exceeds upper limit of memory block) [alpha.security.ArrayBoundV2]
+ *       if (*ptr != '\\') {
+ *           ^~~~
+ * Specifically, this function deals with non-null terminated char arrays. This can be added
+ * as prerequisite, and is not written clearly. But the math in the for below holds.
+ */ 
 /*
  * Ok!   "  \"   "  one backslash = escaped!
  *       " \\"   "  two backslash = not escaped!
@@ -616,6 +624,7 @@ static int is_backslash_escaped(const char* end, const char* start)
 
     return (end - ptr) & 1;
 }
+#endif
 
 static size_t is_double_delim_escaped(const char* cur,  const char* end)
 {
@@ -1066,9 +1075,9 @@ static size_t parse_money(struct libinjection_sqli_state *sf)
             }
 
             /* we have $foobar$ ... find it again */
-            strend = my_memmem(cs+xlen+2, slen - (pos+xlen+2), cs + pos, xlen+2);
+            strend = my_memmem(cs+pos+xlen+2, slen - (pos+xlen+2), cs + pos, xlen+2);
 
-            if (strend == NULL || ((size_t)(strend - cs) < (pos+xlen+2))) {
+            if (strend == NULL) {
                 /* fell off edge */
                 st_assign(sf->current, TYPE_STRING, pos+xlen+2, slen - pos - xlen - 2, cs+pos+xlen+2);
                 sf->current->str_open = '$';
@@ -1197,12 +1206,12 @@ static size_t parse_number(struct libinjection_sqli_state * sf)
  * without having to regenerated the SWIG (or other binding) in minor
  * releases.
  */
-const char* libinjection_version()
+const char* libinjection_version(void)
 {
     return LIBINJECTION_VERSION;
 }
 
-int libinjection_sqli_tokenize(struct libinjection_sqli_state * sf)
+int libinjection_sqli_tokenize(struct libinjection_sqli_state *sf)
 {
     pt2Function fnptr;
     size_t *pos = &sf->pos;
@@ -2309,12 +2318,12 @@ int libinjection_is_sqli(struct libinjection_sqli_state * sql_state)
     return FALSE;
 }
 
-int libinjection_sqli(const char* input, size_t slen, char fingerprint[])
+int libinjection_sqli(const char* s, size_t slen, char fingerprint[])
 {
     int issqli;
     struct libinjection_sqli_state state;
 
-    libinjection_sqli_init(&state, input, slen, 0);
+    libinjection_sqli_init(&state, s, slen, 0);
     issqli = libinjection_is_sqli(&state);
     if (issqli) {
         strcpy(fingerprint, state.fingerprint);

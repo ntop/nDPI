@@ -1,1 +1,1 @@
-1" UNION ALL SELECT --1 FROM FOO
+select user;
