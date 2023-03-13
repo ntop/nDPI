@@ -1744,6 +1744,7 @@ int ndpi_is_datalink_supported(int datalink_type) {
     return 0;
   }
 }
+
 struct vxlan_packet_header {
   u_int8_t flags[4]; /* the first byte is flags, other three are reserved */
   u_int8_t vni[4];   /* the first three bytes are VNI, the last byte is reserved */
@@ -1756,7 +1757,6 @@ static bool ndpi_is_valid_vxlan(const struct pcap_pkthdr *header, const u_char *
     u_int offset = ip_offset + ip_len + sizeof(struct ndpi_udphdr);
     struct vxlan_packet_header *vxlan = (struct vxlan_packet_header *)&packet[offset];
 
-
     if((udp->dest == vxlan_dst_port || udp->source == vxlan_dst_port) &&
       (vxlan->flags[0] == expected_flags) && (vxlan->flags[1] == 0x0) &&
       (vxlan->flags[2] == 0x0) && (vxlan->flags[3] == 0x0) &&
@@ -1766,7 +1766,8 @@ static bool ndpi_is_valid_vxlan(const struct pcap_pkthdr *header, const u_char *
   }
   return false;
 }
-static int ndpi_skip_vxlan(u_int16_t ip_offset, u_int16_t ip_len){
+
+static inline u_int ndpi_skip_vxlan(u_int16_t ip_offset, u_int16_t ip_len){
   return ip_offset + ip_len + sizeof(struct ndpi_udphdr) + sizeof(struct vxlan_packet_header);
 }
 
