@@ -119,6 +119,7 @@
     <ClCompile Include="..\src\lib\ndpi_community_id.c" />
     <ClCompile Include="..\src\lib\ndpi_geoip.c" />
     <ClCompile Include="..\src\lib\ndpi_main.c" />
+    <ClCompile Include="..\src\lib\ndpi_memory.c" />
     <ClCompile Include="..\src\lib\ndpi_serializer.c" />
     <ClCompile Include="..\src\lib\ndpi_utils.c" />
     <ClCompile Include="..\src\lib\protocols\ajp.c" />
