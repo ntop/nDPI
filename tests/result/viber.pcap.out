@@ -14,7 +14,7 @@ LRU cache tls_cert:   0/6/0 (insert/search/found)
 LRU cache mining:     0/4/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/1/0 (insert/search/found)
-Automa host:          31/13 (search/found)
+Automa host:          31/15 (search/found)
 Automa domain:        31/0 (search/found)
 Automa tls cert:      2/0 (search/found)
 Automa risk mask:     0/0 (search/found)
@@ -23,11 +23,12 @@ Patricia risk mask:   54/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   39/17 (search/found)
 
-DNS	6	1093	3
+DNS	4	716	2
 MDNS	4	412	1
 ICMP	2	3028	1
 TLS	90	32622	4
 ICMPV6	2	140	1
+ADS_Analytic_Track	2	377	1
 Facebook	2	281	1
 Google	34	9307	4
 Viber	295	105504	12
@@ -55,7 +56,7 @@ JA3 Host Stats:
 	15	TCP 192.168.0.17:33744 <-> 18.201.4.3:443 [proto: 91.265/TLS.AmazonAWS][IP: 265/AmazonAWS][Encrypted][Confidence: DPI (partial)][DPI packets: 6][cat: Cloud/13][4 pkts/272 bytes <-> 2 pkts/140 bytes][Goodput ratio: 0/0][5.72 sec][bytes ratio: 0.320 (Upload)][IAT c2s/s2c min/avg/max/stddev: 34/0 1907/0 5652/0 2648/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68/70 74/74 3/4][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	16	TCP 192.168.0.17:45424 <-> 18.201.4.32:443 [proto: 91.265/TLS.AmazonAWS][IP: 265/AmazonAWS][Encrypted][Confidence: DPI (partial)][DPI packets: 6][cat: Cloud/13][4 pkts/272 bytes <-> 2 pkts/140 bytes][Goodput ratio: 0/0][7.27 sec][bytes ratio: 0.320 (Upload)][IAT c2s/s2c min/avg/max/stddev: 34/0 2422/0 7191/0 3372/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68/70 74/74 3/4][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	17	UDP 192.168.0.17:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][4 pkts/412 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][20.01 sec][Hostname/SNI: _805741c9._sub._googlecast._tcp.local][_805741c9._sub._googlecast._tcp.local][PLAIN TEXT (805741C)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	18	UDP 192.168.0.17:35283 <-> 192.168.0.15:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/303 bytes][Goodput ratio: 43/86][0.00 sec][Hostname/SNI: app.adjust.com][178.162.219.58][PLAIN TEXT (adjust)][Plen Bins: 0,50,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	18	UDP 192.168.0.17:35283 <-> 192.168.0.15:53 [proto: 5.107/DNS.ADS_Analytic_Track][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/303 bytes][Goodput ratio: 43/86][0.00 sec][Hostname/SNI: app.adjust.com][178.162.219.58][PLAIN TEXT (adjust)][Plen Bins: 0,50,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	UDP 192.168.0.17:45743 <-> 192.168.0.15:53 [proto: 5.119/DNS.Facebook][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/78 bytes <-> 1 pkts/203 bytes][Goodput ratio: 46/79][0.00 sec][Hostname/SNI: graph.facebook.com][31.13.86.8][PLAIN TEXT (facebook)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	20	UDP 192.168.0.17:44376 <-> 192.168.0.15:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/82 bytes <-> 1 pkts/183 bytes][Goodput ratio: 48/77][0.03 sec][Hostname/SNI: venetia.iad.appboy.com][151.101.1.130][PLAIN TEXT (venetia)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	21	UDP 192.168.0.17:37418 <-> 192.168.0.15:53 [proto: 5.144/DNS.Viber][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/79 bytes <-> 1 pkts/185 bytes][Goodput ratio: 46/77][0.12 sec][Hostname/SNI: media.cdn.viber.com][54.230.93.96][PLAIN TEXT (cloudfront)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

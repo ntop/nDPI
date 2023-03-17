@@ -1808,6 +1808,59 @@ static ndpi_protocol_match host_match[] =
    { "metrika.yandex.",                  "YandexMetrika", NDPI_PROTOCOL_YANDEX_METRIKA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "direct.yandex.",                   "YandexDirect", NDPI_PROTOCOL_YANDEX_DIRECT, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   /*
+      ADS/tracking/analytic
+    */
+   /* Smaato is a digital ad tech platform and ad server */
+   { ".smaato.net",                      "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".smaato.com",                      "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* MoPub, a Twitter company, provides monetization solutions */
+   { ".mopub.com",                       "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* AppsFlyer is a SaaS mobile marketing analytics and attribution platform */
+   { ".appsflyer.com",                   "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Adjust is the mobile marketing platform for marketers around the world */
+   { ".adjust.com",                      "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Helpshift enables brands to deliver superior digital customer service digital channels*/
+   { ".helpshift.com",                   "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* AppLovin is a mobile marketing platform */
+   { ".applovin.com",                    "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* AdRight is an innovative online advertising network */
+   { ".adright.com",                     "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* MGID: Native Visitors Acquisition for Advertisers */
+   { ".mgid.com",                        "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* InMobi is the world's leading mobile marketing and advertising platform provider */
+   { ".inmobi.com",                      "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* AdColony - Elevating mobile advertising */
+   { ".adcolony.com",                    "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Supersonicads: App monetization done right */
+   { ".supersonicads.com",               "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Criteo is an advertising company that provides online display advertisements */
+   { ".criteo.net",                      "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".criteo.com",                      "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Flurry is an American mobile analytics, monetization, and advertising company */
+   { ".flurry.com",                      "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Taboola is the world's leading discovery & native advertising platform */
+   { ".taboola.com",                     "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Market research community, a leading global market research effort that studies and reports on Internet trends and behavior. */
+   { ".scorecardresearch.com",           "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Magnite Inc. (formerly Rubicon Project) is an American online advertising technology firm */
+   { ".rubiconproject.com",              "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Adnxs.com is run by AppNexus, a company that provides technology, data and analytics to help companies buy and sell online display advertising  */
+   { ".adnxs.com",                       "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* PubMatic, Inc. is a company that develops and implements online advertising software */
+   { ".pubmatic.com",                    "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* “OpenX’s unified monetization platform */
+   { ".openx.net",                       "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* AddThis share buttons, targeting tools and content recommendations help you get more likes, shares and followers */
+   { ".addthis.com",                     "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".addthisedge.com",                 "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* NEXAGE offers a mobile advertising platform that provides private and public exchanges */
+   { ".nexage.com",                      "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* RadiumOne (formerly GWallet) is a digital advertising company */
+   { ".gwallet.com",                     "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Kochava is the industry leader for mobile app attribution and mobile app analytics */
+   { ".kochava.com",                     "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif
@@ -1901,57 +1954,6 @@ static ndpi_category_match category_match[] = {
    { "139.104.212.0/24",                NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "139.104.216.0/24",                NDPI_PROTOCOL_CATEGORY_STREAMING },
    { "139.104.217.0/24",                NDPI_PROTOCOL_CATEGORY_STREAMING },
-
-   /*
-      ADS and tracking
-    */
-   /* Smaato is a digital ad tech platform and ad server */
-   { ".smaato.net",                   CUSTOM_CATEGORY_ADVERTISEMENT },
-   { ".smaato.com",                   CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* MoPub, a Twitter company, provides monetization solutions */
-   { ".mopub.com",                    CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* AppsFlyer is a SaaS mobile marketing analytics and attribution platform */
-   { ".appsflyer.com",                CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* Adjust is the mobile marketing platform for marketers around the world */
-   { ".adjust.com",                   CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* Helpshift enables brands to deliver superior digital customer service digital channels*/
-   { ".helpshift.com",                CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* AppLovin is a mobile marketing platform */
-   { ".applovin.com",                 CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* AdRight is an innovative online advertising network */
-   { ".adright.com",                  CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* MGID: Native Visitors Acquisition for Advertisers */
-   { ".mgid.com",                     CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* InMobi is the world's leading mobile marketing and advertising platform provider */
-   { ".inmobi.com",                   CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* AdColony - Elevating mobile advertising */
-   { ".adcolony.com",                 CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* Supersonicads: App monetization done right */
-   { ".supersonicads.com",            CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* Criteo is an advertising company that provides online display advertisements */
-   { ".criteo.net",                   CUSTOM_CATEGORY_ADVERTISEMENT },
-   { ".criteo.com",                   CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* Flurry is an American mobile analytics, monetization, and advertising company */
-   { ".flurry.com",                   CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* Taboola is the world's leading discovery & native advertising platform */
-   { ".taboola.com",                  CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* Market research community, a leading global market research effort that studies and reports on Internet trends and behavior. */
-   { ".scorecardresearch.com",        CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* Magnite Inc. (formerly Rubicon Project) is an American online advertising technology firm */
-   { ".rubiconproject.com",           CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* Adnxs.com is run by AppNexus, a company that provides technology, data and analytics to help companies buy and sell online display advertising  */
-   { ".adnxs.com",                    CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* PubMatic, Inc. is a company that develops and implements online advertising software */
-   { ".pubmatic.com",                 CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* “OpenX’s unified monetization platform */
-   { ".openx.net",                    CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* AddThis share buttons, targeting tools and content recommendations help you get more likes, shares and followers */
-   { ".addthis.com",                  CUSTOM_CATEGORY_ADVERTISEMENT },
-   { ".addthisedge.com",              CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* NEXAGE offers a mobile advertising platform that provides private and public exchanges */
-   { ".nexage.com",                   CUSTOM_CATEGORY_ADVERTISEMENT },
-   /* RadiumOne (formerly GWallet) is a digital advertising company */
-   { ".gwallet.com",                  CUSTOM_CATEGORY_ADVERTISEMENT },
 
    { NULL, 0 }
 };
