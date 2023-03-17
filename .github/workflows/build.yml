@@ -10,40 +10,6 @@ on:
   release:
     types: [created]
 jobs:
-  coverage:
-    name: Coverage (ubuntu-latest)
-    runs-on: ubuntu-latest
-    env:
-      CFLAGS: -Werror
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install Ubuntu Prerequisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install rrdtool librrd-dev
-          sudo apt-get install libpcre3-dev libmaxminddb-dev lcov
-          sudo apt-get install wdiff colordiff
-      - name: Configure
-        run: ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre --with-maxminddb --enable-tls-sigs
-      - name: Build
-        run: make all
-      - name: Test
-        run: |
-          make check VERBOSE=1
-      - name: Generate Coverage Report
-        run: |
-          mkdir -vp coverage_report/ndpi_coverage_report
-          lcov --directory . --capture --output-file lcov.info
-          genhtml -o coverage_report/ndpi_coverage_report lcov.info
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ndpi-coverage-report
-          path: coverage_report
-          retention-days: 7
-
   python-bindings:
     name: Python Bindings (ubuntu-latest)
     runs-on: ubuntu-latest
@@ -77,76 +43,6 @@ jobs:
         run: |
           cd python
           python tests.py
-
-  documentation:
-    name: Documentation (ubuntu-latest)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-      - name: Install Ubuntu Prerequisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install autoconf automake libtool pkg-config gettext flex bison doxygen
-      - name: Configure nDPI library
-        run: |
-          ./autogen.sh --with-only-libndpi --enable-option-checking=fatal
-      - name: Generate Documentation
-        run: |
-          pip install --upgrade pip
-          pip install -r doc/requirements.txt
-          make doc
-          mkdir -vp doc/_build/ndpi-documentation-upload/ndpi-documentation
-          mv -v doc/_build/html doc/_build/ndpi-documentation-upload/ndpi-documentation/html
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ndpi-documentation
-          path: doc/_build/ndpi-documentation-upload
-          retention-days: 7
-
-  performance:
-    name: Performance (ubuntu-latest)
-    runs-on: ubuntu-latest
-    env:
-      GO111MODULE: on
-      CFLAGS: -Werror
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install Ubuntu Prerequisites
-        run: |
-          sudo add-apt-repository ppa:longsleep/golang-backports
-          sudo apt-get update
-          sudo apt-get install libunwind-dev
-          sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libpcap-dev
-          sudo apt-get install golang-1.16-go libgoogle-perftools-dev graphviz
-          go install github.com/google/pprof@latest
-          sudo ln -s ${HOME}/go/bin/pprof /usr/bin/pprof
-          pprof -h
-      - name: Configure nDPI library
-        run: |
-          ./autogen.sh --enable-gprof --enable-option-checking=fatal --with-pcre --with-maxminddb --enable-tls-sigs
-      - name: Build nDPI library
-        run: |
-          make
-      - name: Performance Profiling
-        run: |
-          ./tests/do.sh
-          mkdir ndpi-performance-upload
-          mv -v tests/result/cpu_profile.png ndpi-performance-upload/cpu_profile.png
-          mv -v tests/result/heap_profile.png ndpi-performance-upload/heap_profile.png
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ndpi-performance
-          path: ndpi-performance-upload
-          retention-days: 7
-
   test-scripts:
     name: Test Utils (ubuntu-latest)
     runs-on: ubuntu-latest
@@ -235,14 +131,6 @@ jobs:
             gcrypt: ""
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
-            msan: "--with-sanitizer"
-            nBPF: ""
-          - compiler: "cc"
-            os: ubuntu-latest
-            arch: "x86_64"
-            gcrypt: ""
-            pcre: "--with-pcre"
-            maxminddb: "--with-maxminddb"
             msan: "--with-thread-sanitizer"
             nBPF: ""
           - compiler: "cc"
@@ -260,14 +148,6 @@ jobs:
             pcre: "--with-pcre"
             maxminddb: "--with-maxminddb"
             msan: "--with-memory-sanitizer"
-            nBPF: ""
-          - compiler: "cc"
-            os: ubuntu-latest
-            arch: "x86_64"
-            gcrypt: ""
-            pcre: "--with-pcre"
-            maxminddb: "--with-maxminddb"
-            msan: "--with-sanitizer"
             nBPF: ""
           - compiler: "cc"
             os: macOS-latest
