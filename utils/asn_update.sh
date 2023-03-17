@@ -174,6 +174,16 @@ DEST=../src/lib/inc_generated/ndpi_asn_yandex_cloud.c.inc
 create_list NDPI_PROTOCOL_YANDEX_CLOUD $DEST "AS210656" "AS200350"
 echo "(3) Yandex Cloud IPs are available in $DEST"
 
+echo "(1) Downloading Disney+..." #Only "Disney Streaming Services"
+DEST=../src/lib/inc_generated/ndpi_asn_disney_plus.c.inc
+create_list NDPI_PROTOCOL_DISNEYPLUS $DEST "AS400805" "AS398849" "AS22604" "AS11251"
+echo "(3) Disney+ IPs are available in $DEST"
+
+echo "(1) Downloading Hulu..."
+DEST=../src/lib/inc_generated/ndpi_asn_hulu.c.inc
+create_list NDPI_PROTOCOL_HULU $DEST "AS23286"
+echo "(3) Hulu IPs are available in $DEST"
+
 if [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1
