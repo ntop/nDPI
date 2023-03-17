@@ -1,17 +1,17 @@
-Guessed flow protos:	1
+Guessed flow protos:	0
 
 DPI Packets (TCP):	1	(1.00 pkts/flow)
-Confidence DPI (partial)    : 1 (flows)
-Num dissector calls: 116 (116.00 diss/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 13 (13.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/0/0 (insert/search/found)
-Automa host:          1/0 (search/found)
+Automa host:          1/1 (search/found)
 Automa domain:        1/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     1/0 (search/found)
@@ -20,6 +20,6 @@ Patricia risk mask:   2/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   1/1 (search/found)
 
-Alibaba	1	123	1
+AdultContent	1	123	1
 
-	1	TCP 170.33.13.5:110 -> 192.168.0.1:179 [proto: 2.274/POP3.Alibaba][IP: 274/Alibaba][ClearText][Confidence: DPI (partial)][DPI packets: 1][cat: Email/3][1 pkts/123 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Hostname/SNI: pornhub.com][Risk: ** Unsafe Protocol **** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 70][Risk Info: No client to server traffic / TCP probing attempt][PLAIN TEXT (6 HTTP/1.1)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 170.33.13.5:110 -> 192.168.0.1:179 [proto: 7.108/HTTP.AdultContent][IP: 274/Alibaba][ClearText][Confidence: DPI][DPI packets: 1][cat: AdultContent/34][1 pkts/123 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Hostname/SNI: pornhub.com][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No client to server traffic / Expected on port 80][PLAIN TEXT (6 HTTP/1.1)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

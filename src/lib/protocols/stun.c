@@ -357,6 +357,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	      } else if(strstr(flow->host_server_name, "facebook") != NULL) {
 		*app_proto = NDPI_PROTOCOL_FACEBOOK_VOIP;
 		return(NDPI_IS_STUN);
+	      } else if(strstr(flow->host_server_name, "stripcdn.com") != NULL) {
+		*app_proto = NDPI_PROTOCOL_ADULT_CONTENT;
+		return(NDPI_IS_STUN);
 	      }
 	    }
 	  }

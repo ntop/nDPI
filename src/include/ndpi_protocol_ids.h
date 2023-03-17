@@ -136,7 +136,7 @@ typedef enum {
   NDPI_PROTOCOL_CROSSFIRE             = 105,
   NDPI_PROTOCOL_DOFUS                 = 106,
   NDPI_PROTOCOL_ADS_ANALYTICS_TRACK   = 107, /* Generic id for advertisement/analytics/tracking stuff */
-  NDPI_PROTOCOL_FREE_108              = 108, /* FREE */
+  NDPI_PROTOCOL_ADULT_CONTENT         = 108,
   NDPI_PROTOCOL_GUILDWARS             = 109,
   NDPI_PROTOCOL_AMAZON_ALEXA          = 110,
   NDPI_PROTOCOL_KERBEROS              = 111,
