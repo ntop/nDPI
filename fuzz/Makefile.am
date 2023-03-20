@@ -1,4 +1,4 @@
-bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization
+bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream
 #Data structures
@@ -292,7 +292,18 @@ fuzz_libinjection_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_libinjection_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-
+fuzz_tls_certificate_SOURCES = fuzz_tls_certificate.c fuzz_common_code.c
+fuzz_tls_certificate_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_tls_certificate_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_tls_certificate_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_tls_certificate_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_tls_certificate_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_tls_certificate_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_tls_certificate_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 # required for Google oss-fuzz
 # see https://github.com/google/oss-fuzz/tree/master/projects/ndpi
@@ -389,8 +400,12 @@ files_corpus_fuzz_libinjection :=  $(wildcard corpus/fuzz_libinjection/*)
 fuzz_libinjection_seed_corpus.zip: $(files_corpus_fuzz_libinjection)
 	zip -j fuzz_libinjection_seed_corpus.zip $(files_corpus_fuzz_libinjection)
 
+files_corpus_fuzz_tls_certificate :=  $(wildcard corpus/fuzz_tls_certificate/*)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip
+fuzz_tls_certificate_seed_corpus.zip: $(files_corpus_fuzz_tls_certificate)
+	zip -j fuzz_tls_certificate_seed_corpus.zip $(files_corpus_fuzz_tls_certificate)
+
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip
 
 #Create dictionaries exactly as expected by oss-fuzz.
 #This way, if we need to change/update/add something,
@@ -399,6 +414,7 @@ dictionaries:
 	cp dictionary.dict fuzz_ndpi_reader.dict
 	cp dictionary.dict fuzz_ndpi_reader_alloc_fail.dict
 	cp dictionary.dict fuzz_process_packet.dict
+	cp dictionary_tls_certificate.dict fuzz_tls_certificate.dict
 
 distdir:
 	find . -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
@@ -413,6 +429,7 @@ distdir:
 		-o -path './corpus/fuzz_serialization/*' \
 		-o -path './corpus/fuzz_community_id/*' \
 		-o -path './corpus/fuzz_libinjection/*' \
+		-o -path './corpus/fuzz_tls_certificate/*' \
 		-o -path './corpus/fuzz_alg_ses_des/*' \
 		-o -path './corpus/fuzz_alg_bins/*' \
 		-o -path './corpus/fuzz_alg_hll/*' \
