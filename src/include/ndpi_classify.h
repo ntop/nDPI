@@ -68,15 +68,15 @@ extern float parameters_splt[NUM_PARAMETERS_SPLT_LOGREG];
 /* Classifier functions */
 float ndpi_classify(const unsigned short *pkt_len, const pkt_timeval *pkt_time,
        const unsigned short *pkt_len_twin, const pkt_timeval *pkt_time_twin,
-       pkt_timeval start_time, pkt_timeval start_time_twin, uint32_t max_num_pkt_len,
-       uint16_t sp, uint16_t dp, uint32_t op, uint32_t ip, uint32_t np_o, uint32_t np_i,
-       uint32_t ob, uint32_t ib, uint16_t use_bd, const uint32_t *bd, const uint32_t *bd_t);
+       pkt_timeval start_time, pkt_timeval start_time_twin, u_int32_t max_num_pkt_len,
+       u_int16_t sp, u_int16_t dp, u_int32_t op, u_int32_t ip, u_int32_t np_o, u_int32_t np_i,
+       u_int32_t ob, u_int32_t ib, u_int16_t use_bd, const u_int32_t *bd, const u_int32_t *bd_t);
 
-void ndpi_merge_splt_arrays(const uint16_t *pkt_len, const pkt_timeval *pkt_time,
-       const uint16_t *pkt_len_twin, const pkt_timeval *pkt_time_twin,
+void ndpi_merge_splt_arrays(const u_int16_t *pkt_len, const pkt_timeval *pkt_time,
+       const u_int16_t *pkt_len_twin, const pkt_timeval *pkt_time_twin,
        pkt_timeval start_time, pkt_timeval start_time_twin,
-       uint16_t s_idx, uint16_t r_idx,
-       uint16_t *merged_lens, uint16_t *merged_times);
+       u_int16_t s_idx, u_int16_t r_idx,
+       u_int16_t *merged_lens, u_int16_t *merged_times);
 
 void ndpi_update_params(classifier_type_codes_t param_type, const char *param_file);
 
@@ -87,6 +87,6 @@ void ndpi_timer_sub(const pkt_timeval *a, const pkt_timeval *b, pkt_timeval *res
 void ndpi_timer_clear(pkt_timeval *a);
 u_int64_t ndpi_timeval_to_milliseconds(pkt_timeval ts);
 u_int64_t ndpi_timeval_to_microseconds(pkt_timeval ts);
-void ndpi_log_timestamp(char *log_ts, uint32_t log_ts_len);
+void ndpi_log_timestamp(char *log_ts, u_int32_t log_ts_len);
 
 #endif /* NDPI_CLASSIFY_H */

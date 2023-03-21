@@ -1905,6 +1905,8 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
   u_int16_t thread_id = *((u_int16_t *) user_data), proto;
 
+  if(flow == NULL) return;
+  
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if((!flow->detection_completed) && flow->ndpi_flow) {
       u_int8_t proto_guessed;
@@ -1921,6 +1923,8 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
     proto = flow->detected_protocol.app_protocol ? flow->detected_protocol.app_protocol : flow->detected_protocol.master_protocol;
 
+    proto = ndpi_map_user_proto_id_to_ndpi_id(ndpi_thread_info[thread_id].workflow->ndpi_struct, proto);
+    
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter[proto]       += flow->src2dst_packets + flow->dst2src_packets;
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[proto] += flow->src2dst_bytes + flow->dst2src_bytes;
     ndpi_thread_info[thread_id].workflow->stats.protocol_flows[proto]++;
@@ -3733,7 +3737,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       if(!quiet_mode) {
 	printf("\t%-20s packets: %-13llu bytes: %-13llu "
 	       "flows: %-13u\n",
-	       ndpi_get_proto_name(ndpi_thread_info[0].workflow->ndpi_struct, i),
+	       ndpi_get_proto_name(ndpi_thread_info[0].workflow->ndpi_struct,
+				   ndpi_map_ndpi_id_to_user_proto_id(ndpi_thread_info[0].workflow->ndpi_struct, i)),
 	       (long long unsigned int)cumulative_stats.protocol_counter[i],
 	       (long long unsigned int)cumulative_stats.protocol_counter_bytes[i],
 	       cumulative_stats.protocol_flows[i]);

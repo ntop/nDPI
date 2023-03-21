@@ -978,6 +978,11 @@ extern "C" {
 				     ndpi_detection_preference pref,
 				     int value);
 
+  u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct *ndpi_str,
+					      u_int16_t user_proto_id);
+  u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct *ndpi_str,
+					      u_int16_t ndpi_proto_id);
+
   /* Tells to called on what l4 protocol given application protocol can be found */
   ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t ndpi_proto_id);
   const char* ndpi_get_l4_proto_name(ndpi_l4_proto_info proto);
@@ -1091,7 +1096,7 @@ extern "C" {
 				  const u_int8_t *src, u_int src_len);
   u_char* ndpi_base64_decode(const u_char *src, size_t len, size_t *out_len);
   char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len); /* NOTE: caller MUST free the returned pointer */
-  void ndpi_string_sha1_hash(const uint8_t *message, size_t len, u_char *hash /* 20-bytes */);
+  void ndpi_string_sha1_hash(const u_int8_t *message, size_t len, u_char *hash /* 20-bytes */);
 
   int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 			   const char *path, u_int16_t protocol_id);
@@ -1890,7 +1895,7 @@ extern "C" {
 
   ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b);
   void ndpi_bitmap_iterator_free(ndpi_bitmap* b);
-  bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, uint32_t *value);
+  bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, u_int32_t *value);
 
   /* ******************************* */
 

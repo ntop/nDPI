@@ -516,13 +516,13 @@ struct ndpi_icmphdr {
 
 PACK_ON
 struct ndpi_icmp6hdr {
-  uint8_t     icmp6_type;   /* type field */
-  uint8_t     icmp6_code;   /* code field */
-  uint16_t    icmp6_cksum;  /* checksum field */
+  u_int8_t     icmp6_type;   /* type field */
+  u_int8_t     icmp6_code;   /* code field */
+  u_int16_t    icmp6_cksum;  /* checksum field */
   union {
-    uint32_t  icmp6_un_data32[1]; /* type-specific field */
-    uint16_t  icmp6_un_data16[2]; /* type-specific field */
-    uint8_t   icmp6_un_data8[4];  /* type-specific field */
+    u_int32_t  icmp6_un_data32[1]; /* type-specific field */
+    u_int16_t  icmp6_un_data16[2]; /* type-specific field */
+    u_int8_t   icmp6_un_data8[4];  /* type-specific field */
   } icmp6_dataun;
 } PACK_OFF;
 
@@ -1228,6 +1228,7 @@ struct ndpi_detection_module_struct {
   int opportunistic_tls_pop_enabled;
   int opportunistic_tls_ftp_enabled;
 
+  u_int16_t ndpi_to_user_proto_id[NDPI_MAX_NUM_CUSTOM_PROTOCOLS]; /* custom protocolId mapping */
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
   u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */ _pad:7;
