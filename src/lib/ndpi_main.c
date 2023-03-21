@@ -200,12 +200,13 @@ extern u_int32_t make_mining_key(struct ndpi_flow_struct *flow);
 extern int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
 /* Forward */
-static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
-			   ndpi_port_range *range, ndpi_proto_defaults_t *def,
-			   u_int8_t customUserProto, ndpi_default_ports_tree_node_t **root,
-                           const char *_func, int _line);
+static int addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
+			  ndpi_port_range *range, ndpi_proto_defaults_t *def,
+			  u_int8_t customUserProto, ndpi_default_ports_tree_node_t **root,
+			  const char *_func, int _line);
+static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def,
+			     ndpi_default_ports_tree_node_t **root);
 
-static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def, ndpi_default_ports_tree_node_t **root);
 static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet);
 static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 				     u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
@@ -559,13 +560,13 @@ void ndpi_default_ports_tree_node_t_walker(const void *node, const ndpi_VISIT wh
 
 /* ******************************************************************** */
 
-static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
-                           ndpi_port_range *range,
-                           ndpi_proto_defaults_t *def,
-			   u_int8_t customUserProto,
-			   ndpi_default_ports_tree_node_t **root,
-                           const char *_func,
-			   int _line) {
+static int addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
+			  ndpi_port_range *range,
+			  ndpi_proto_defaults_t *def,
+			  u_int8_t customUserProto,
+			  ndpi_default_ports_tree_node_t **root,
+			  const char *_func,
+			  int _line) {
   u_int32_t port;
 
   for(port = range->port_low; port <= range->port_high; port++) {
@@ -588,14 +589,18 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
       ndpi_free(node);
       break;
     }
+    
     if(ret != node) {
       NDPI_LOG_DBG(ndpi_str, "[NDPI] %s:%d found duplicate for port %u: overwriting it with new value\n",
 		   _func, _line, port);
 
       ret->proto = def;
       ndpi_free(node);
+      return(-1); /* Duplicates found */
     }
   }
+
+  return(0);
 }
 
 /* ****************************************************** */
@@ -606,7 +611,8 @@ static void addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
   This function must be called with a semaphore set, this in order to avoid
   changing the datastructures while using them
 */
-static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def, ndpi_default_ports_tree_node_t **root) {
+static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def,
+			     ndpi_default_ports_tree_node_t **root) {
   ndpi_default_ports_tree_node_t node;
   u_int16_t port;
 
@@ -614,9 +620,11 @@ static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def,
     ndpi_default_ports_tree_node_t *ret;
 
     node.proto = def, node.default_port = port;
-    ret = (ndpi_default_ports_tree_node_t *) ndpi_tdelete(
-							  &node, (void *) root, ndpi_default_ports_tree_node_t_cmp); /* Add it to the tree */
-
+    
+    ret = (ndpi_default_ports_tree_node_t *)
+      ndpi_tdelete(&node, (void *) root,
+		   ndpi_default_ports_tree_node_t_cmp); /* Add it to the tree */
+    
     if(ret != NULL) {
       ndpi_free((ndpi_default_ports_tree_node_t *) ret);
       return(0);
@@ -3663,7 +3671,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
   char *at, *proto, *elem;
   ndpi_proto_defaults_t *def;
   u_int subprotocol_id, i;
-  int id;
+  int id, ret = 0;
 
   at = strrchr(rule, '@');
   if(at == NULL) {
@@ -3806,17 +3814,20 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
 
     if(is_tcp || is_udp) {
       u_int p_low, p_high;
-
+      int rc;
+      
       if(sscanf(value, "%u-%u", &p_low, &p_high) == 2)
 	range.port_low = p_low, range.port_high = p_high;
       else
 	range.port_low = range.port_high = atoi(&elem[4]);
 
       if(do_add)
-	addDefaultPort(ndpi_str, &range, def, 1 /* Custom user proto */,
+	rc = addDefaultPort(ndpi_str, &range, def, 1 /* Custom user proto */,
 		       is_tcp ? &ndpi_str->tcpRoot : &ndpi_str->udpRoot, __FUNCTION__, __LINE__);
       else
-	removeDefaultPort(&range, def, is_tcp ? &ndpi_str->tcpRoot : &ndpi_str->udpRoot);
+	rc = removeDefaultPort(&range, def, is_tcp ? &ndpi_str->tcpRoot : &ndpi_str->udpRoot);
+
+      if(rc != 0) ret = rc;
     } else if(is_ip) {
       int rc = ndpi_add_host_ip_subprotocol(ndpi_str, value, subprotocol_id);
 
@@ -3831,7 +3842,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str, char *rule, 
     }
   }
 
-  return(0);
+  return(ret);
 }
 
 /* ******************************************************************** */
