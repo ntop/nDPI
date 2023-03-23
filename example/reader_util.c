@@ -1746,7 +1746,7 @@ int ndpi_is_datalink_supported(int datalink_type) {
 }
 
 static bool ndpi_is_valid_vxlan(const struct pcap_pkthdr *header, const u_char *packet, u_int16_t ip_offset, u_int16_t ip_len){
-  if(header->caplen < ip_offset + ip_len + sizeof(struct ndpi_vxlanhdr)) {
+  if(header->caplen < ip_offset + ip_len + sizeof(struct ndpi_udphdr) + sizeof(struct ndpi_vxlanhdr)) {
     return false;
   }
   u_int32_t vxlan_dst_port  = ntohs(4789);
