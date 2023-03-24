@@ -91,12 +91,16 @@ static void ndpi_search_thrift_tcp_udp(struct ndpi_detection_module_struct *ndpi
     if (packet->payload_packet_len > 5)
     {
 	/* Check Thrift over HTTP */
-	if ((packet->content_line.ptr != NULL) && 
-	    (memcmp(packet->content_line.ptr, "application/vnd.apache.thrift", 29) == 0))
+	if (packet->content_line.ptr != NULL)
 	{
-	    NDPI_LOG_INFO(ndpi_struct, "found Apache Thrift over HTTP\n");
-	    ndpi_int_thrift_add_connection(ndpi_struct, flow);
-	    return;
+	    if ((LINE_ENDS(packet->content_line, "application/vnd.apache.thrift.binary") != 0) || 
+		(LINE_ENDS(packet->content_line, "application/vnd.apache.thrift.compact") != 0) ||
+		(LINE_ENDS(packet->content_line, "application/vnd.apache.thrift.json") != 0))
+	    {
+		NDPI_LOG_INFO(ndpi_struct, "found Apache Thrift over HTTP\n");
+		ndpi_int_thrift_add_connection(ndpi_struct, flow);
+		return;
+	    }
 	}
 
 	/* Is it old binary version? */
