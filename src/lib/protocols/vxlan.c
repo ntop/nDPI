@@ -26,27 +26,26 @@
 
 /* This code handles VXLAN as per RFC 7348 */
 
-struct vxlan_header {
-  u_int8_t flags[4]; /* the first byte is flags, other three are reserved */
-  u_int8_t vni[4];   /* the first three bytes are VNI, the last byte is reserved */
-};
-
 static void ndpi_check_vxlan(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int32_t payload_len = packet->payload_packet_len;
 
-  if((packet->udp != NULL) && (payload_len >= sizeof(struct vxlan_header))) {
+  if((packet->udp != NULL) && (packet->payload_packet_len >= sizeof(struct ndpi_vxlanhdr))) {
+
+    /*
+    *rfc-7348 vxlan header
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |R|R|R|R|I|R|R|R|            Reserved                           |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                VXLAN Network Identifier (VNI) |   Reserved    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    */
     u_int32_t vxlan_dst_port  = ntohs(4789);
-    u_int32_t expected_flags = 0x08; /* only one bit should be set in the first byte */
-
-    struct vxlan_header *vxlan = (struct vxlan_header *)packet->payload;
-
+    struct ndpi_vxlanhdr *vxlanhdr = (struct ndpi_vxlanhdr *)packet->payload;
     if((packet->udp->dest == vxlan_dst_port) &&
-      (vxlan->flags[0] == expected_flags) && (vxlan->flags[1] == 0x0) &&
-      (vxlan->flags[2] == 0x0) && (vxlan->flags[3] == 0x0) &&
-      (vxlan->vni[3] == 0x0)) {
-
+      (vxlanhdr->flags == ntohs(0x0800)) &&
+      (vxlanhdr->groupPolicy == 0x0) &&
+      (vxlanhdr->reserved == 0x0)) {
       NDPI_LOG_INFO(ndpi_struct, "found vxlan\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VXLAN, NDPI_PROTOCOL_VXLAN, NDPI_CONFIDENCE_DPI);
       return;
