@@ -41,11 +41,11 @@ static void ndpi_check_vxlan(struct ndpi_detection_module_struct *ndpi_struct, s
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     */
     u_int32_t vxlan_dst_port  = ntohs(4789);
+    struct ndpi_vxlanhdr *vxlanhdr = (struct ndpi_vxlanhdr *)packet->payload;
     if((packet->udp->dest == vxlan_dst_port) &&
-      (packet->payload[0] == 0x8) && (packet->payload[1] == 0x0) &&
-      (packet->payload[2] == 0x0) && (packet->payload[3] == 0x0) &&
-      (packet->payload[7] == 0x0)) {
-
+      (vxlanhdr->flags == ntohs(0x0800)) &&
+      (vxlanhdr->groupPolicy == 0x0) &&
+      (vxlanhdr->reserved == 0x0)) {
       NDPI_LOG_INFO(ndpi_struct, "found vxlan\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VXLAN, NDPI_PROTOCOL_VXLAN, NDPI_CONFIDENCE_DPI);
       return;

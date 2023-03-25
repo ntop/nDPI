@@ -532,7 +532,8 @@ PACK_ON
 struct ndpi_vxlanhdr {
   u_int16_t flags;
   u_int16_t groupPolicy;
-  u_int32_t vni;
+  u_int8_t vni[3];
+  u_int8_t reserved;
 } PACK_OFF;
 
 /* ************************************************************ */
