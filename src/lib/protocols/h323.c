@@ -68,9 +68,9 @@ static void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, s
 	  }
 	}
 
-	flow->l4.tcp.h323_valid_packets++;
+	flow->h323_valid_packets++;
 
-	if(flow->l4.tcp.h323_valid_packets >= 2) {
+	if(flow->h323_valid_packets >= 2) {
 	  NDPI_LOG_INFO(ndpi_struct, "found H323 broadcast\n");
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_H323, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	}
@@ -103,9 +103,12 @@ static void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, s
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_H323, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       } else if(packet->payload_packet_len >= 20 && packet->payload_packet_len <= 117) {
-	NDPI_LOG_INFO(ndpi_struct, "found H323 broadcast\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_H323, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	return;
+	/* This check is quite generic: let's check another packet...*/
+	flow->h323_valid_packets++;
+	if(flow->h323_valid_packets >= 2) {
+	  NDPI_LOG_INFO(ndpi_struct, "found H323 broadcast\n");
+	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_H323, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	}
       } else {
 	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 	return;
