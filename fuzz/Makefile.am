@@ -5,6 +5,8 @@ bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_
 bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree
 #Third party
 bin_PROGRAMS += fuzz_libinjection
+#Internal crypto
+bin_PROGRAMS += fuzz_gcrypt_light
 
 fuzz_process_packet_SOURCES = fuzz_process_packet.c fuzz_common_code.c
 fuzz_process_packet_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
@@ -304,6 +306,21 @@ endif
 fuzz_tls_certificate_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_tls_certificate_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_gcrypt_light_SOURCES = fuzz_gcrypt_light.cpp fuzz_common_code.c
+fuzz_gcrypt_light_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -I ../src/lib/third_party/include/
+fuzz_gcrypt_light_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -I ../src/lib/third_party/include/
+fuzz_gcrypt_light_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_gcrypt_light_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_gcrypt_light_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_gcrypt_light_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_gcrypt_light_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_gcrypt_light_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_gcrypt_light_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 # required for Google oss-fuzz
 # see https://github.com/google/oss-fuzz/tree/master/projects/ndpi
