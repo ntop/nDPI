@@ -537,6 +537,9 @@ struct ndpi_vxlanhdr {
   u_int8_t reserved;
 } PACK_OFF;
 
+#ifndef IPPROTO_GRE
+#define IPPROTO_GRE 47
+#endif
 
 #define NDPI_GRE_CSUM        ntohs(0x8000)
 #define NDPI_GRE_ROUTING     ntohs(0x4000)
@@ -556,11 +559,10 @@ struct ndpi_vxlanhdr {
 #define NDPI_GRE_IS_REC(f)		((f) & NDPI_GRE_REC)
 #define NDPI_GRE_IS_FLAGS(f)		((f) & NDPI_GRE_FLAGS)
 #define NDPI_GRE_IS_ACK(f)		((f) & NDPI_GRE_ACK)
+#define NDPI_GRE_IS_VERSION_0(f) (((f) & NDPI_GRE_VERSION) == ntohs(0x0000))
+#define NDPI_GRE_IS_VERSION_1(f) (((f) & NDPI_GRE_VERSION) == ntohs(0x0001))
 
-#define NDPI_GRE_VERSION_0 ntohs(0x0000)
-#define NDPI_GRE_VERSION_1 ntohs(0x0001)
 #define NDPI_GRE_PROTO_PPP ntohs(0x880b)
-#define NDPI_GRE_PPTP_KEY_MASK ntohs(0xffff)
 #define NDPI_PPP_HDRLEN	4	/* octets for standard ppp header */
 
 /* +++++++++++++++++++++++ GRE basic header +++++++++++++++++++++++ */
@@ -568,7 +570,7 @@ PACK_ON
 struct ndpi_gre_basehdr {
 	uint16_t flags;
 	uint16_t protocol;
-}PACK_OFF;
+} PACK_OFF;
 
 /* ************************************************************ */
 

@@ -1793,7 +1793,7 @@ static inline u_int ndpi_skip_vxlan(u_int16_t ip_offset, u_int16_t ip_len){
 
 static uint32_t ndpi_is_valid_gre_tunnel(const struct pcap_pkthdr *header, 
                 const u_char *packet, const u_int16_t ip_offset, 
-                const u_int16_t ip_len){
+                const u_int16_t ip_len) {
   if(header->caplen < ip_offset + ip_len + sizeof(struct ndpi_gre_basehdr))
     return 0; /* Too short for GRE header*/
   uint32_t offset = ip_offset + ip_len;
@@ -1811,26 +1811,24 @@ static uint32_t ndpi_is_valid_gre_tunnel(const struct pcap_pkthdr *header,
   if(NDPI_GRE_IS_REC(grehdr->flags))
     return 0;
   /*GRE rfc 2890 that update 1701*/
-  if((grehdr->flags & NDPI_GRE_VERSION) == NDPI_GRE_VERSION_0){
-    if(NDPI_GRE_IS_CSUM(grehdr->flags)){
+  if(NDPI_GRE_IS_VERSION_0(grehdr->flags)) {
+    if(NDPI_GRE_IS_CSUM(grehdr->flags)) {
       if(header->caplen < offset + 4)
         return 0;
       /*checksum field and offset field*/
       offset += 4;
     }
-    if(NDPI_GRE_IS_KEY(grehdr->flags)){
+    if(NDPI_GRE_IS_KEY(grehdr->flags)) {
       if(header->caplen < offset + 4)
         return 0;
       offset += 4;
     }
-    if(NDPI_GRE_IS_SEQ(grehdr->flags)){
+    if(NDPI_GRE_IS_SEQ(grehdr->flags)) {
       if(header->caplen < offset + 4)
         return 0;
       offset += 4;
     }
-  }
-  /*rfc-2637 section 4.1 enhanced gre*/
-  else if((grehdr->flags & NDPI_GRE_VERSION) == NDPI_GRE_VERSION_1){
+  } else if(NDPI_GRE_IS_VERSION_1(grehdr->flags)) { /*rfc-2637 section 4.1 enhanced gre*/
     if(NDPI_GRE_IS_CSUM(grehdr->flags))
       return 0;
     if(NDPI_GRE_IS_ROUTING(grehdr->flags))
@@ -1845,19 +1843,17 @@ static uint32_t ndpi_is_valid_gre_tunnel(const struct pcap_pkthdr *header,
     if(header->caplen < offset + 4)
       return 0;
     offset += 4;
-    if(NDPI_GRE_IS_SEQ(grehdr->flags)){
+    if(NDPI_GRE_IS_SEQ(grehdr->flags)) {
       if(header->caplen < offset + 4)
         return 0;
       offset += 4;
     }
-    if(NDPI_GRE_IS_ACK(grehdr->flags)){
+    if(NDPI_GRE_IS_ACK(grehdr->flags)) {
       if(header->caplen < offset + 4)
         return 0;
       offset += 4;
     }
-  }
-  /*support only ver 0, 1*/
-  else{
+  } else { /*support only ver 0, 1*/
     return 0;
   }
   return offset;
@@ -2367,29 +2363,24 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 	      goto datalink_check;
       }
     }
-  }
-  else if(workflow->prefs.decode_tunnels && (proto == IPPROTO_GRE)){
+  } else if(workflow->prefs.decode_tunnels && (proto == IPPROTO_GRE)) {
     if(header->caplen < ip_offset + ip_len + sizeof(struct ndpi_gre_basehdr))
       return(nproto); /* Too short for GRE header*/
     u_int32_t offset = 0;
-    if((offset = ndpi_is_valid_gre_tunnel(header, packet, ip_offset, ip_len))){
+    if((offset = ndpi_is_valid_gre_tunnel(header, packet, ip_offset, ip_len))) {
       tunnel_type = ndpi_gre_tunnel;
       struct ndpi_gre_basehdr *grehdr = (struct ndpi_gre_basehdr*)&packet[ip_offset + ip_len];
-      if(grehdr->protocol == ntohs(0x0800) || grehdr->protocol == ntohs(0x86DD)){ 
+      if(grehdr->protocol == ntohs(ETH_P_IP) || grehdr->protocol == ntohs(ETH_P_IPV6)) { 
         ip_offset = offset;
         goto iph_check; 
-      }
-      // ppp protocol
-      else if(grehdr->protocol ==  NDPI_GRE_PROTO_PPP) { 
+      } else if(grehdr->protocol ==  NDPI_GRE_PROTO_PPP) {  // ppp protocol
         ip_offset = offset + NDPI_PPP_HDRLEN; 
         goto iph_check;
-      }
-      else{
+      } else {
         eth_offset = offset;
         goto datalink_check;
       }
-    }
-    else{
+    } else {
       return(nproto);
     }
   }
