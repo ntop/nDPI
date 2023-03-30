@@ -23,111 +23,92 @@
 
 #include "ndpi_api.h"
 
+/* #define DEBUG_OOKLA_LRU */
+
 const u_int16_t ookla_port = 8080;
 
 /* ************************************************************* */
 
-static void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow) {
-  struct ndpi_packet_struct* packet = &ndpi_struct->packet;
-  u_int32_t addr = 0;
-  u_int16_t sport, dport;
-    
+static u_int32_t get_ookla_key(struct ndpi_flow_struct *flow)
+{
+  if(flow->is_ipv6)
+    return ndpi_quick_hash(flow->c_address.v6, 16);
+  else
+    return ntohl(flow->c_address.v4);
+}
+
+/* ************************************************************* */
+
+int ookla_search_into_cache(struct ndpi_detection_module_struct *ndpi_struct,
+                            struct ndpi_flow_struct *flow)
+{
+  u_int32_t key;
+  u_int16_t dummy;
+
+  if(ndpi_struct->ookla_cache) {
+    key = get_ookla_key(flow);
+#ifdef DEBUG_OOKLA_LRU
+    printf("[LRU OOKLA] Search %u\n", key);
+#endif
+
+    if(ndpi_lru_find_cache(ndpi_struct->ookla_cache, key,
+                           &dummy, 0 /* Don't remove it as it can be used for other connections */,
+			   ndpi_get_current_time(flow))) {
+#ifdef DEBUG_OOKLA_LRU
+      printf("[LRU OOKLA] Found\n");
+#endif
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/* ************************************************************* */
+
+void ookla_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
+                        struct ndpi_flow_struct *flow)
+{
+  u_int32_t key;
+
+  if(ndpi_struct->ookla_cache) {
+    key = get_ookla_key(flow);
+#ifdef DEBUG_OOKLA_LRU
+    printf("[LRU OOKLA] ADDING %u\n", key);
+#endif
+    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, key, 1 /* dummy */,
+                          ndpi_get_current_time(flow));
+  }
+
+}
+
+/* ************************************************************* */
+
+void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
   NDPI_LOG_DBG(ndpi_struct, "Ookla detection\n");
 
-  if(packet->tcp)
-    sport = ntohs(packet->tcp->source), dport = htons(packet->tcp->dest);
-  else
-    sport = ntohs(packet->udp->source), dport = htons(packet->udp->dest);
+  if(ntohs(flow->s_port) != ookla_port && ntohs(flow->c_port) != ookla_port) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
 
-  if((sport != ookla_port) && (dport != ookla_port)) {
-#ifdef OOKLA_DEBUG
-    printf("=>>>>>>>> [OOKLA IPv6] Skipping flow [%u -> %u]\n", sport, dport);
-#endif
-    goto ookla_exclude;
+  if(flow->packet_counter == 1 &&
+     packet->payload_packet_len >= NDPI_STATICSTRING_LEN("HI") &&
+     memcmp(packet->payload, "HI", NDPI_STATICSTRING_LEN("HI")) == 0) {
+    flow->ookla_stage = 1;
+    return;
+  }
+  if(flow->packet_counter == 2 &&
+     flow->ookla_stage == 1 &&
+     packet->payload_packet_len >= NDPI_STATICSTRING_LEN("HELLO") &&
+     memcmp(packet->payload, "HELLO", NDPI_STATICSTRING_LEN("HELLO")) == 0) {
+    NDPI_LOG_INFO(ndpi_struct, "found ookla (Hi + Hello)\n");
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+    ookla_add_to_cache(ndpi_struct, flow);
+    return;
   }
   
-  if(packet->iphv6 != NULL) {
-    if((dport == ookla_port) && (packet->payload_packet_len >= 3)) {
-      u_int32_t h;
-      
-      if((packet->payload_packet_len == 3)
-	 && (packet->payload[0] == 0x48) /* HI\n */
-	 && (packet->payload[1] == 0x49)
-	 && (packet->payload[2] == 0x0A)) {	
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	
-	if(ndpi_struct->ookla_cache != NULL) {
-	  /* In order to avoid creating an IPv6 LRU we hash the IPv6 address */
-	  h = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_dst, sizeof(packet->iphv6->ip6_dst));
-
-#ifdef OOKLA_DEBUG
-	  printf("=>>>>>>>> [OOKLA IPv6] Adding %u\n", h);
-#endif
-	  ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, h, 1 /* dummy */, ndpi_get_current_time(flow));
-	}
-	return;
-      } else {
-	if(sport == ookla_port)
-	  h = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_src, sizeof(packet->iphv6->ip6_src));
-	else
-	  h = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_dst, sizeof(packet->iphv6->ip6_dst));
-	
-	if(ndpi_struct->ookla_cache != NULL) {
-	  u_int16_t dummy;
-
-#ifdef OOKLA_DEBUG
-	  printf("=>>>>>>>> [OOKLA IPv6] Searching %u\n", h);
-#endif
-	  
-	  if(ndpi_lru_find_cache(ndpi_struct->ookla_cache, h, &dummy, 0 /* Don't remove it as it can be used for other connections */,
-				 ndpi_get_current_time(flow))) {
-	    NDPI_LOG_INFO(ndpi_struct, "found ookla tcp connection\n");
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
-#ifdef OOKLA_DEBUG
-	    printf("=>>>>> Found %u\n", h);
-#endif
-	    return;
-	  } else {
-#ifdef OOKLA_DEBUG
-	    printf("=>>>>> NOT Found %u\n", h);
-#endif
-	  }
-	}
-      }
-    } else {
-
-      goto ookla_exclude;
-    }
-  } else {
-    if(sport == ookla_port)
-      addr = packet->iph->saddr;
-    else
-      addr = packet->iph->daddr;
-
-#ifdef OOKLA_DEBUG
-    printf("=>>>>>>>> [OOKLA IPv4] Searching %u\n", addr);
-#endif
-    
-    if(ndpi_struct->ookla_cache != NULL) {
-      u_int16_t dummy;
-    
-      if(ndpi_lru_find_cache(ndpi_struct->ookla_cache, addr, &dummy, 0 /* Don't remove it as it can be used for other connections */,
-			     ndpi_get_current_time(flow))) {
-	NDPI_LOG_INFO(ndpi_struct, "found ookla tcp connection\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
-#ifdef OOKLA_DEBUG
-	printf("=>>>>> Found %u\n", addr);
-#endif
-	return;
-      } else {
-#ifdef OOKLA_DEBUG
-	printf("=>>>>> NOT Found %u\n", addr);
-#endif
-      }
-    }
-  }
-  
- ookla_exclude:
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 

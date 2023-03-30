@@ -108,6 +108,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_set_opportunistic_tls(ndpi_info_mod, random_proto, random_value);
   ndpi_get_opportunistic_tls(ndpi_info_mod, random_proto);
 
+  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
+    ndpi_set_protocol_aggressiveness(ndpi_info_mod, i, random_value);
+    ndpi_get_protocol_aggressiveness(ndpi_info_mod, i);
+  }
+
   ndpi_finalize_initialization(ndpi_info_mod);
 
   /* Random protocol configuration */

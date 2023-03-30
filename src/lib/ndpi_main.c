@@ -198,6 +198,10 @@ extern void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
 			    struct ndpi_flow_struct *flow, ndpi_risk_enum r);
 extern u_int32_t make_mining_key(struct ndpi_flow_struct *flow);
 extern int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+extern void ookla_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
+                               struct ndpi_flow_struct *flow);
+extern int ookla_search_into_cache(struct ndpi_detection_module_struct *ndpi_struct,
+                                   struct ndpi_flow_struct *flow);
 
 /* Forward */
 static int addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
@@ -2932,7 +2936,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->msteams_cache_num_entries = 1024;
   ndpi_str->stun_zoom_cache_num_entries = 1024;
 
-  ndpi_str->ookla_cache_ttl = 0;
+  ndpi_str->ookla_cache_ttl = 120; /* sec */
   ndpi_str->bittorrent_cache_ttl = 0;
   ndpi_str->zoom_cache_ttl = 0;
   ndpi_str->stun_cache_ttl = 0;
@@ -2945,6 +2949,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->opportunistic_tls_imap_enabled = 1;
   ndpi_str->opportunistic_tls_pop_enabled = 1;
   ndpi_str->opportunistic_tls_ftp_enabled = 1;
+
+  ndpi_str->aggressiveness_ookla = NDPI_AGGRESSIVENESS_OOKLA_TLS;
 
   for(i = 0; i < NUM_CUSTOM_CATEGORIES; i++)
     ndpi_snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
@@ -6254,6 +6260,13 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     ret.app_protocol = flow->detected_protocol_stack[0];
   }
 
+  /* Does it looks like Ookla? */
+  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
+     ntohs(flow->s_port) == 8080 && ookla_search_into_cache(ndpi_str, flow)) {
+    ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
+    ret.app_protocol = flow->detected_protocol_stack[0];
+  }
+
   /* Classification by-port is the last resort */
   if(enable_guess && ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
 
@@ -8052,6 +8065,9 @@ const char *ndpi_confidence_get_name(ndpi_confidence_t confidence)
   case NDPI_CONFIDENCE_MATCH_BY_IP:
     return "Match by IP";
 
+  case NDPI_CONFIDENCE_DPI_AGGRESSIVE:
+    return "DPI (aggressive)";
+
   default:
     return NULL;
   }
@@ -8572,6 +8588,11 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
     ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol, NDPI_CONFIDENCE_DPI);
     if(!category_depends_on_master(master_protocol))
       ndpi_int_change_category(ndpi_struct, flow, ret_match.protocol_category);
+
+    if(subproto == NDPI_PROTOCOL_OOKLA) {
+	ookla_add_to_cache(ndpi_struct, flow);
+    }
+
     return(1);
   } else
     return(0);
@@ -9639,6 +9660,39 @@ int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
     return ndpi_struct->opportunistic_tls_pop_enabled;
   case NDPI_PROTOCOL_FTP_CONTROL:
     return ndpi_struct->opportunistic_tls_ftp_enabled;
+  default:
+    return -1;
+  }
+}
+
+/* ******************************************************************** */
+
+int ndpi_set_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
+                                     u_int16_t proto, u_int32_t value)
+{
+  if(!ndpi_struct)
+    return -1;
+
+  switch(proto) {
+  case NDPI_PROTOCOL_OOKLA:
+    ndpi_struct->aggressiveness_ookla = value;
+    return 0;
+  default:
+    return -1;
+  }
+}
+
+/* ******************************************************************** */
+
+u_int32_t ndpi_get_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
+                                           u_int16_t proto)
+{
+  if(!ndpi_struct)
+    return -1;
+
+  switch(proto) {
+  case NDPI_PROTOCOL_OOKLA:
+    return ndpi_struct->aggressiveness_ookla;
   default:
     return -1;
   }

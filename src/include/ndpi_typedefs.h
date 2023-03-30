@@ -659,6 +659,14 @@ struct ndpi_lru_cache {
   struct ndpi_lru_cache_entry *entries;
 };
 
+
+/* Aggressiveness values */
+
+#define NDPI_AGGRESSIVENESS_DISABLED			0x00 /* For all protocols */
+
+/* Ookla */
+#define NDPI_AGGRESSIVENESS_OOKLA_TLS			0x01 /* Enable detection over TLS (using ookla cache) */
+
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
@@ -920,7 +928,8 @@ typedef enum {
   NDPI_CONFIDENCE_DPI_CACHE,                /* Classification results based on some LRU cache (i.e. correlation among sessions) */
   NDPI_CONFIDENCE_DPI,                      /* Deep packet inspection */
   NDPI_CONFIDENCE_MATCH_BY_IP,              /* Classification obtained looking only at the IP addresses */
-  
+  NDPI_CONFIDENCE_DPI_AGGRESSIVE,           /* Aggressive DPI: it might be a false positive */
+
   /*
     IMPORTANT
 
@@ -1228,6 +1237,8 @@ struct ndpi_detection_module_struct {
   int opportunistic_tls_imap_enabled;
   int opportunistic_tls_pop_enabled;
   int opportunistic_tls_ftp_enabled;
+
+  u_int32_t aggressiveness_ookla;
 
   u_int16_t ndpi_to_user_proto_id[NDPI_MAX_NUM_CUSTOM_PROTOCOLS]; /* custom protocolId mapping */
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
@@ -1562,6 +1573,10 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_Z3950 */
   u_int8_t z3950_stage : 2; // 0-3
+
+  /* NDPI_PROTOCOL_OOKLA */
+  u_int8_t ookla_stage : 1;
+
 
   /* NDPI_PROTOCOL_OPENVPN */
   u_int8_t ovpn_session_id[8];

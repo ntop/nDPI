@@ -33,6 +33,8 @@ extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_st
 extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
                                    struct ndpi_flow_struct *flow,
                                    const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
+extern int ookla_search_into_cache(struct ndpi_detection_module_struct* ndpi_struct,
+                                   struct ndpi_flow_struct* flow);
 /* QUIC/GQUIC stuff */
 extern int quic_len(const uint8_t *buf, uint64_t *value);
 extern int quic_len_buffer_still_required(uint8_t value);
@@ -1153,8 +1155,27 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] No more blocks\n");
 #endif
-    flow->extra_packets_func = NULL;
-    return(0); /* That's all */
+    /* An ookla flow? */
+    if((ndpi_struct->aggressiveness_ookla & NDPI_AGGRESSIVENESS_OOKLA_TLS) && /* Feature enabled */
+       (!something_went_wrong &&
+        flow->tls_quic.certificate_processed == 1 &&
+        flow->protos.tls_quic.hello_processed == 1) && /* TLS handshake found without errors */
+       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS && /* No IMAPS/FTPS/... */
+       flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN && /* No sub-classification */
+       ntohs(flow->s_port) == 8080 && /* Ookla port */
+       ookla_search_into_cache(ndpi_struct, flow)) {
+      NDPI_LOG_INFO(ndpi_struct, "found ookla (cache over TLS)\n");
+      /* Even if a LRU cache is involved, NDPI_CONFIDENCE_DPI_AGGRESSIVE seems more
+         suited than NDPI_CONFIDENCE_DPI_CACHE */
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_TLS, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
+      /* TLS over port 8080 usually triggers that risk; clear it */
+      ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+      flow->extra_packets_func = NULL;
+      return(0); /* That's all */
+    } else {
+      flow->extra_packets_func = NULL;
+      return(0); /* That's all */
+    }
   } else
     return(1);
 }
