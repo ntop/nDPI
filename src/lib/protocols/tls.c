@@ -673,7 +673,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 		    if(flow->protos.tls_quic.server_names == NULL)
 		      flow->protos.tls_quic.server_names = ndpi_strdup(dNSName),
 			flow->protos.tls_quic.server_names_len = strlen(dNSName);
-		    else {
+		    else if((u_int16_t)(flow->protos.tls_quic.server_names_len + dNSName_len + 1) > flow->protos.tls_quic.server_names_len) {
 		      u_int16_t newstr_len = flow->protos.tls_quic.server_names_len + dNSName_len + 1;
 		      char *newstr = (char*)ndpi_realloc(flow->protos.tls_quic.server_names,
 							 flow->protos.tls_quic.server_names_len+1, newstr_len+1);
