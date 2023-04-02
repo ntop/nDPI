@@ -368,6 +368,7 @@ typedef struct ndpi_workflow {
   /* allocated by prefs */
   void **ndpi_flows_root;
   struct ndpi_detection_module_struct *ndpi_struct;
+  struct ndpi_global_context *g_ctx;
   u_int32_t num_allocated_flows;
 
   /* CSV,TLV,JSON serialization interface */

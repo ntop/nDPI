@@ -31,6 +31,7 @@ PCRE_PCAPS="WebattackRCE.pcap"
 NBPF_ENABLED=@NBPF_ENABLED@
 NBPF_PCAPS="h323-overflow.pcap"
 READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja3_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -q -K JSON -k /dev/null -t -v 2"
+READER="${READER} --lru-cache-scope=ookla:1 --lru-cache-size=ookla:1024 --lru-cache-ttl=ookla:120" #Global, 2 min
 
 RC=0
 

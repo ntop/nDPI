@@ -190,6 +190,7 @@ AS_IF([test "${with_lto_and_gold_linker+set}" = set], [
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h math.h float.h])
 AC_CHECK_LIB([m], [sqrt], [], [LIBM="-lm"])
+AC_CHECK_LIB([pthread], [pthread_mutex_init], [], [LIBM="-lpthread"])
 AC_CHECK_LIB([rrd], [rrd_fetch_r], [LIBRRD=-lrrd])
 
 if test "x$ac_cv_lib_rrd_rrd_fetch_r" = xyes; then :

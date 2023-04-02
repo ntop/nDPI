@@ -12,8 +12,6 @@ struct ndpi_workflow_prefs *prefs = NULL;
 struct ndpi_workflow *workflow = NULL;
 
 int nDPI_LogLevel = 0;
-char *_debug_protocols = NULL;
-u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
 u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0;
 u_int8_t enable_flow_stats = 1;
 u_int8_t human_readeable_string_len = 5;

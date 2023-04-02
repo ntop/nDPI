@@ -177,6 +177,41 @@ extern "C" {
 				ndpi_protocol_match *match);
 
   /**
+   * Returns a new initialized global context.
+   *
+   * @par g_conf = global configuration
+   * @return  the initialized global context
+   *
+   */
+  struct ndpi_global_context *ndpi_global_init(const struct ndpi_global_config *g_conf);
+
+  /**
+   * Deinit a properly initialized global context.
+   *
+   * @par g_ctx = global context to free/deinit
+   *
+   */
+  void ndpi_global_deinit(struct ndpi_global_context *g_ctx);
+
+  /**
+   * Finalize the initialization of the global context.
+   *
+   * @par g_ctx = global context
+   *
+   */
+  int ndpi_global_finalize(struct ndpi_global_context *g_ctx);
+
+  /**
+   * Associate a global context to a detection module. MUST be called before `ndpi_finalize_initialization()`
+   *
+   * @par g_ctx = global context
+   * @par ndpi_str = the struct created for the protocol detection
+   *
+   */
+  int ndpi_bind_global_context(struct ndpi_global_context *g_ctx,
+			       struct ndpi_detection_module_struct *ndpi_str);
+
+  /**
    * Returns a new initialized detection module
    * Note that before you can use it you can still load
    * hosts and do other things. As soon as you are ready to use
@@ -1008,35 +1043,50 @@ extern "C" {
   u_int ndpi_get_ndpi_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_detection_module_size(void);
-  void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l);
-  void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_mod, NDPI_PROTOCOL_BITMASK debug_bitmask);
+
+  void ndpi_set_log_level(struct ndpi_global_context *g_ctx, u_int l);
+  void ndpi_set_debug_bitmask(struct ndpi_global_context *g_ctx, NDPI_PROTOCOL_BITMASK debug_bitmask);
+  void set_ndpi_debug_function(struct ndpi_global_context *g_ctx,
+			       ndpi_debug_function_ptr ndpi_debug_printf);
 
   /* Simple helper to get current time, in sec */
   u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow);
 
   /* LRU cache */
-  struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl);
+  struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl, int shared);
   void ndpi_lru_free_cache(struct ndpi_lru_cache *c);
   u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
 			       u_int16_t *value, u_int8_t clean_key_when_found, u_int32_t now_sec);
   void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value, u_int32_t now_sec);
   void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *stats);
 
-  int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
+  int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
+			       struct ndpi_detection_module_struct *ndpi_struct,
 			       lru_cache_type cache_type,
 			       struct ndpi_lru_cache_stats *stats);
 
-  int ndpi_get_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
+  int ndpi_get_lru_cache_scope(struct ndpi_global_context *g_ctx,
+			       lru_cache_type cache_type,
+			       lru_cache_scope *scope);
+  int ndpi_set_lru_cache_scope(struct ndpi_global_context *g_ctx,
+			       lru_cache_type cache_type,
+			       lru_cache_scope scope);
+
+  int ndpi_get_lru_cache_size(struct ndpi_global_context *g_ctx,
+			      struct ndpi_detection_module_struct *ndpi_struct,
 			      lru_cache_type cache_type,
 			      u_int32_t *num_entries);
-  int ndpi_set_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
+  int ndpi_set_lru_cache_size(struct ndpi_global_context *g_ctx,
+			      struct ndpi_detection_module_struct *ndpi_struct,
 			      lru_cache_type cache_type,
 			      u_int32_t num_entries);
 
-  int ndpi_set_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
+  int ndpi_set_lru_cache_ttl(struct ndpi_global_context *g_ctx,
+			     struct ndpi_detection_module_struct *ndpi_struct,
 			     lru_cache_type cache_type,
 			     u_int32_t ttl);
-  int ndpi_get_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
+  int ndpi_get_lru_cache_ttl(struct ndpi_global_context *g_ctx,
+			     struct ndpi_detection_module_struct *ndpi_struct,
 			     lru_cache_type cache_type,
 			     u_int32_t *ttl);
 
@@ -1082,8 +1132,7 @@ extern "C" {
   void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
   void set_ndpi_flow_malloc(void* (*__ndpi_flow_malloc)(size_t size));
   void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr));
-  void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str,
-			       ndpi_debug_function_ptr ndpi_debug_printf);
+
   u_int16_t ndpi_get_api_version(void);
   const char *ndpi_get_gcrypt_version(void);
 

@@ -164,12 +164,12 @@
 #define MAX_DEFAULT_PORTS                                        5
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
- #define NDPI_LOG(proto, m, log_level, args...)		                                 \
+ /* Global log, expected to be called only from global context code */
+ #define NDPI_GLOG(g_ctx, log_level, args...)		                                 \
   {								                         \
-    struct ndpi_detection_module_struct *mod = (struct ndpi_detection_module_struct*) m; \
-    if(mod && mod->ndpi_log_level >= log_level) {	                                 \
-      if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-        (*(mod->ndpi_debug_printf))(proto, mod, log_level, __FILE__, __FUNCTION__, __LINE__, args); \
+    if(g_ctx && g_ctx->ndpi_log_level >= log_level) {	                                 \
+      if(g_ctx != NULL && g_ctx->ndpi_debug_printf != NULL)		                         \
+        (*(g_ctx->ndpi_debug_printf))(NDPI_PROTOCOL_UNKNOWN, g_ctx, log_level, __FILE__, __FUNCTION__, __LINE__, args); \
     } \
   }
 
@@ -186,38 +186,38 @@
  #endif
 
  #define NDPI_LOG_ERR(mod, args...)		                                 \
-  if(mod && mod->ndpi_log_level >= NDPI_LOG_ERROR) {	                         \
-    if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-      (*(mod->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod, NDPI_LOG_ERROR , __FILE__, __FUNCTION__, __LINE__, args); \
+  if(mod && mod->g_ctx && mod->g_ctx->ndpi_log_level >= NDPI_LOG_ERROR) {	                         \
+    if(mod->g_ctx->ndpi_debug_printf != NULL)		                         \
+      (*(mod->g_ctx->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod->g_ctx, NDPI_LOG_ERROR , __FILE__, __FUNCTION__, __LINE__, args); \
   }
 
  #define NDPI_LOG_INFO(mod, args...)		                                 \
-  if(mod && mod->ndpi_log_level >= NDPI_LOG_TRACE) {	                         \
-    if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-      (*(mod->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod, NDPI_LOG_TRACE , __FILE__, __FUNCTION__, __LINE__, args); \
+  if(mod && mod->g_ctx && mod->g_ctx->ndpi_log_level >= NDPI_LOG_TRACE) {	                         \
+    if(mod->g_ctx->ndpi_debug_printf != NULL)		                         \
+      (*(mod->g_ctx->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod->g_ctx, NDPI_LOG_TRACE , __FILE__, __FUNCTION__, __LINE__, args); \
   }
 
  #define NDPI_LOG_DBG(mod, args...)		                                 \
-  if(mod && mod->ndpi_log_level >= NDPI_LOG_DEBUG) {	                         \
-    if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-      (*(mod->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod, NDPI_LOG_DEBUG , __FILE__, __FUNCTION__, __LINE__, args); \
+  if(mod && mod->g_ctx && mod->g_ctx->ndpi_log_level >= NDPI_LOG_DEBUG) {	                         \
+    if(mod->g_ctx->ndpi_debug_printf != NULL)		                         \
+      (*(mod->g_ctx->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod->g_ctx, NDPI_LOG_DEBUG , __FILE__, __FUNCTION__, __LINE__, args); \
   }
 
  #define NDPI_LOG_DBG2(mod, args...)		                                 \
-  if(mod && mod->ndpi_log_level >= NDPI_LOG_DEBUG_EXTRA) {	                         \
-    if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-      (*(mod->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod, NDPI_LOG_DEBUG_EXTRA , __FILE__, __FUNCTION__, __LINE__, args); \
+  if(mod && mod->g_ctx && mod->g_ctx->ndpi_log_level >= NDPI_LOG_DEBUG_EXTRA) {	                         \
+    if(mod->g_ctx->ndpi_debug_printf != NULL)		                         \
+      (*(mod->g_ctx->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod->g_ctx, NDPI_LOG_DEBUG_EXTRA , __FILE__, __FUNCTION__, __LINE__, args); \
   }
 
 #else							/* not defined NDPI_ENABLE_DEBUG_MESSAGES */
 # ifdef WIN32
-# define NDPI_LOG(...) {}
+# define NDPI_GLOG(...) {}
 # define NDPI_LOG_ERR(...) {}
 # define NDPI_LOG_INFO(...) {}
 # define NDPI_LOG_DBG(...) {}
 # define NDPI_LOG_DBG2(...) {}
 # else
-# define NDPI_LOG(proto, mod, log_level, args...) { /* printf(args); */ }
+# define NDPI_GLOG(mod, log_level, args...) { /* printf(args); */ }
 # ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 #  define NDPI_LOG_ERR(mod, args...)  { printf(args); }
 # else

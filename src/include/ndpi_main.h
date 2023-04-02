@@ -125,11 +125,6 @@ extern "C" {
 
   extern void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
-					     const char **file, const char **func, u_int32_t * line);
-#endif
-
   /** Checks when the @p payload starts with the string literal @p str.
    * When the string is larger than the payload, check fails.
    * @return non-zero if check succeeded

@@ -91,7 +91,7 @@ static u_int8_t ignore_vlanid = 0;
 u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
 int nDPI_LogLevel = 0;
-char *_debug_protocols = NULL;
+static char *_debug_protocols = NULL;
 char *_disabled_protocols = NULL;
 int aggressiveness[NDPI_MAX_SUPPORTED_PROTOCOLS];
 static u_int8_t stats_flag = 0;
@@ -132,6 +132,7 @@ int malloc_size_stats = 0;
 
 static int lru_cache_sizes[NDPI_LRUCACHE_MAX];
 static int lru_cache_ttls[NDPI_LRUCACHE_MAX];
+static int lru_cache_scopes[NDPI_LRUCACHE_MAX];
 
 struct flow_info {
   struct ndpi_flow_info *flow;
@@ -245,7 +246,7 @@ typedef struct ndpi_id {
 } ndpi_id_t;
 
 // used memory counters
-u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
+static u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
 #ifdef USE_DPDK
 static int dpdk_port_id = 0, dpdk_run_capture = 1;
 #endif
@@ -351,7 +352,8 @@ void ndpiCheckHostStringMatch(char *testChar) {
 /**
  * @brief Set main components necessary to the detection
  */
-static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle);
+static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
+                           struct ndpi_global_context *g_ctx);
 
 /**
  * @brief Get flow byte distribution mean and variance
@@ -513,6 +515,7 @@ static void help(u_int long_help) {
          "  -Z proto:value            | Set this value of aggressiveness for this protocol (0 to disable it). This flag can be used multiple times\n"
          "  --lru-cache-size=NAME:size    | Specify the size for this LRU cache (0 to disable it). This flag can be used multiple times\n"
          "  --lru-cache-ttl=NAME:size     | Specify the TTL [in seconds] for this LRU cache (0 to disable it). This flag can be used multiple times\n"
+	 "  --lru-cache-scope=NAME:scope  | Specify the scope for this LRU cache (0: local; 1: global). This flag can be used multiple times\n" 
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -565,6 +568,8 @@ static void help(u_int long_help) {
 
 #define OPTLONG_VALUE_LRU_CACHE_SIZE	1000
 #define OPTLONG_VALUE_LRU_CACHE_TTL	1001
+#define OPTLONG_VALUE_LRU_CACHE_SCOPE	1002
+
 
 static struct option longopts[] = {
   /* mandatory extcap options */
@@ -608,6 +613,7 @@ static struct option longopts[] = {
 
   { "lru-cache-size", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_SIZE},
   { "lru-cache-ttl", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_TTL},
+  { "lru-cache-scope", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_SCOPE},
 
   {0, 0, 0, 0}
 };
@@ -860,7 +866,7 @@ static void parseOptions(int argc, char **argv) {
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 #endif
-  int cache_idx, cache_size, cache_ttl;
+  int cache_idx, cache_size, cache_ttl, cache_scope;
 
 #ifdef USE_DPDK
   {
@@ -879,6 +885,7 @@ static void parseOptions(int argc, char **argv) {
   for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
     lru_cache_sizes[i] = -1; /* Use the default value */
     lru_cache_ttls[i] = -1; /* Use the default value */
+    lru_cache_scopes[i] = -1; /* Use the default value */
   }
 
   while((opt = getopt_long(argc, argv, "a:Ab:B:e:Ec:C:dDFf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:w:zZ:q0123:456:7:89:m:MT:U:",
@@ -1188,6 +1195,14 @@ static void parseOptions(int argc, char **argv) {
         exit(1);
       }
       lru_cache_ttls[cache_idx] = cache_ttl;
+      break;
+
+    case OPTLONG_VALUE_LRU_CACHE_SCOPE:
+      if(parse_cache_param(optarg, &cache_idx, &cache_scope) == -1) {
+        printf("Invalid parameter [%s]\n", optarg);
+        exit(1);
+      }
+      lru_cache_scopes[cache_idx] = cache_scope;
       break;
 
     default:
@@ -2547,10 +2562,12 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 /**
  * @brief Setup for detection begin
  */
-static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
+static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
+                           struct ndpi_global_context *g_ctx) {
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_workflow_prefs prefs;
   int i;
+  lru_cache_scope scope;
 
   memset(&prefs, 0, sizeof(prefs));
   prefs.decode_tunnels = decode_tunnels;
@@ -2571,6 +2588,9 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   }
 
   ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &enabled_bitmask);
+
+  ndpi_thread_info[thread_id].workflow->g_ctx = g_ctx;
+  ndpi_bind_global_context(g_ctx, ndpi_thread_info[thread_id].workflow->ndpi_struct);
 
   // clear memory for results
   memset(ndpi_thread_info[thread_id].workflow->stats.protocol_counter, 0,
@@ -2605,18 +2625,20 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   if(_maliciousSHA1Path)
     ndpi_load_malicious_sha1_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _maliciousSHA1Path);
 
-  /* Enable/disable/configure LRU caches size here */
+  /* If necessary, configure LOCAL LRU caches here */
   for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
-    if(lru_cache_sizes[i] != -1)
-      ndpi_set_lru_cache_size(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-			      i, lru_cache_sizes[i]);
-  }
-
-  /* Enable/disable LRU caches TTL here */
-  for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
-    if(lru_cache_ttls[i] != -1)
-      ndpi_set_lru_cache_ttl(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-			     i, lru_cache_ttls[i]);
+    if(ndpi_get_lru_cache_scope(ndpi_thread_info[thread_id].workflow->g_ctx,
+                                i, &scope) == 0 &&
+       scope == NDPI_LRUCACHE_SCOPE_LOCAL) {
+      if(lru_cache_sizes[i] != -1)
+        ndpi_set_lru_cache_size(ndpi_thread_info[thread_id].workflow->g_ctx,
+                                ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                i, lru_cache_sizes[i]);
+      if(lru_cache_ttls[i] != -1)
+        ndpi_set_lru_cache_ttl(ndpi_thread_info[thread_id].workflow->g_ctx,
+                               ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                               i, lru_cache_ttls[i]);
+    }
   }
 
   /* Set aggressiviness here */
@@ -3532,6 +3554,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   int thread_id;
   char buf[32];
   long long unsigned int breed_stats[NUM_BREEDS] = { 0 };
+  lru_cache_scope scope;
 
   memset(&cumulative_stats, 0, sizeof(cumulative_stats));
 
@@ -3587,10 +3610,16 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     /* LRU caches */
     for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
       struct ndpi_lru_cache_stats s;
-      ndpi_get_lru_cache_stats(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &s);
-      cumulative_stats.lru_stats[i].n_insert += s.n_insert;
-      cumulative_stats.lru_stats[i].n_search += s.n_search;
-      cumulative_stats.lru_stats[i].n_found += s.n_found;
+      if(ndpi_get_lru_cache_scope(ndpi_thread_info[thread_id].workflow->g_ctx, i, &scope) == 0) {
+        if(scope == NDPI_LRUCACHE_SCOPE_LOCAL ||
+           (scope == NDPI_LRUCACHE_SCOPE_GLOBAL && thread_id == 0)) {
+          ndpi_get_lru_cache_stats(ndpi_thread_info[thread_id].workflow->g_ctx,
+                                   ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &s);
+          cumulative_stats.lru_stats[i].n_insert += s.n_insert;
+          cumulative_stats.lru_stats[i].n_search += s.n_search;
+          cumulative_stats.lru_stats[i].n_found += s.n_found;
+	}
+      }
     }
 
     /* Automas */
@@ -4362,6 +4391,42 @@ void * processing_thread(void *_thread_id) {
   return NULL;
 }
 
+static u_int32_t __slot_malloc_bins(u_int64_t v)
+{
+  int i;
+
+  /* 0-2,3-4,5-8,9-16,17-32,33-64,65-128,129-256,257-512,513-1024,1025-2048,2049-4096,4097-8192,8193- */
+  for(i=0; i < max_malloc_bins - 1; i++)
+    if((1ULL << (i + 1)) >= v)
+      return i;
+  return i;
+}
+
+/**
+ * @brief ndpi_malloc wrapper function
+ */
+static void *ndpi_malloc_wrapper(size_t size) {
+  current_ndpi_memory += size;
+
+  if(current_ndpi_memory > max_ndpi_memory)
+    max_ndpi_memory = current_ndpi_memory;
+
+  if(enable_malloc_bins && malloc_size_stats)
+    ndpi_inc_bin(&malloc_bins, __slot_malloc_bins(size), 1);
+
+  return(malloc(size)); /* Don't change to ndpi_malloc !!!!! */
+}
+
+/* ***************************************************** */
+
+/**
+ * @brief free wrapper function
+ */
+static void free_wrapper(void *freeable) {
+  free(freeable); /* Don't change to ndpi_free !!!!! */
+}
+
+/* ***************************************************** */
 
 /**
  * @brief Begin, process, end detection process
@@ -4373,6 +4438,49 @@ void test_lib() {
 #else
   long thread_id;
 #endif
+  struct ndpi_global_config g_conf;
+  struct ndpi_global_context *g_ctx;
+  NDPI_PROTOCOL_BITMASK debug_bitmask;
+  lru_cache_scope scope;
+  int i;
+
+  set_ndpi_malloc(ndpi_malloc_wrapper), set_ndpi_free(free_wrapper);
+  set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
+
+  memset(&g_conf, '\0', sizeof(g_conf));
+
+  g_ctx = ndpi_global_init(&g_conf);
+  if(!g_ctx) {
+    fprintf(stderr, "Error ndpi_global_init\n");
+    exit(-1);
+  }
+
+  if(_debug_protocols != NULL) {
+    NDPI_BITMASK_RESET(debug_bitmask);
+    if(parse_proto_name_list(_debug_protocols, &debug_bitmask, 0))
+      exit(-1);
+    ndpi_set_debug_bitmask(g_ctx, debug_bitmask);
+  }
+  ndpi_set_log_level(g_ctx, nDPI_LogLevel);
+
+  /* Configure LRU caches scope here (by default, caches are local) */
+  for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+    if(lru_cache_scopes[i] == 1)
+      ndpi_set_lru_cache_scope(g_ctx, i, NDPI_LRUCACHE_SCOPE_GLOBAL);
+  }
+
+  /* If necessary, configure GLOBAL LRU caches here */
+  for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+    if(ndpi_get_lru_cache_scope(g_ctx, i, &scope) == 0 &&
+       scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(lru_cache_sizes[i] != -1)
+        ndpi_set_lru_cache_size(g_ctx, NULL, i, lru_cache_sizes[i]);
+      if(lru_cache_ttls[i] != -1)
+        ndpi_set_lru_cache_ttl(g_ctx, NULL, i, lru_cache_ttls[i]);
+    }
+  }
+
+  ndpi_global_finalize(g_ctx);
 
 #ifdef DEBUG_TRACE
   if(trace) fprintf(trace, "Num threads: %d\n", num_threads);
@@ -4386,7 +4494,7 @@ void test_lib() {
 #endif
 
     cap = openPcapFileOrDevice(thread_id, (const u_char*)_pcap_file[thread_id]);
-    setupDetection(thread_id, cap);
+    setupDetection(thread_id, cap, g_ctx);
   }
 
   gettimeofday(&begin, NULL);
@@ -4446,6 +4554,8 @@ void test_lib() {
 
     terminateDetection(thread_id);
   }
+
+  ndpi_global_deinit(g_ctx);
 }
 
 /* *********************************************** */

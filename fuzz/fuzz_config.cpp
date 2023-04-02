@@ -27,6 +27,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_proto p, p2;
   char out[128];
   char log_ts[32];
+  struct ndpi_global_context *g_ctx;
+  struct ndpi_global_config g_conf;
 
 
   if(fuzzed_data.remaining_bytes() < 4 + /* ndpi_init_detection_module() */
@@ -47,6 +49,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
+  /* TODO */
+  g_ctx = ndpi_global_init(&g_conf);
+  ndpi_global_finalize(g_ctx);
+
   ndpi_info_mod = ndpi_init_detection_module(fuzzed_data.ConsumeIntegral<u_int32_t>());
 
   NDPI_BITMASK_RESET(enabled_bitmask);
@@ -58,6 +64,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_exit_detection_module(ndpi_info_mod);
     ndpi_info_mod = NULL;
   }
+
+  ndpi_bind_global_context(g_ctx, ndpi_info_mod);
 
   ndpi_set_tls_cert_expire_days(ndpi_info_mod, fuzzed_data.ConsumeIntegral<u_int8_t>());
 
@@ -76,13 +84,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_load_ipv4_ptree(ndpi_info_mod, "ipv4_addresses.txt", NDPI_PROTOCOL_TLS);
 
   for(i = 0; i < NDPI_LRUCACHE_MAX + 1; i++) { /* + 1 to test invalid type */
-    ndpi_set_lru_cache_size(ndpi_info_mod, static_cast<lru_cache_type>(i),
+    ndpi_set_lru_cache_size(g_ctx, ndpi_info_mod, static_cast<lru_cache_type>(i),
 			    fuzzed_data.ConsumeIntegralInRange(0, (1 << 16) - 1));
-    ndpi_get_lru_cache_size(ndpi_info_mod, static_cast<lru_cache_type>(i), &num);
+    ndpi_get_lru_cache_size(g_ctx, ndpi_info_mod, static_cast<lru_cache_type>(i), &num);
 
-    ndpi_set_lru_cache_ttl(ndpi_info_mod, static_cast<lru_cache_type>(i),
+    ndpi_set_lru_cache_ttl(g_ctx, ndpi_info_mod, static_cast<lru_cache_type>(i),
 			   fuzzed_data.ConsumeIntegralInRange(0, (1 << 24) - 1));
-    ndpi_get_lru_cache_ttl(ndpi_info_mod, static_cast<lru_cache_type>(i), &num);
+    ndpi_get_lru_cache_ttl(g_ctx, ndpi_info_mod, static_cast<lru_cache_type>(i), &num);
   }
 
   /* TODO: stub for geo stuff */
@@ -202,7 +210,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   /* Get some final stats */
   for(i = 0; i < NDPI_LRUCACHE_MAX + 1; i++) /* + 1 to test invalid type */
-    ndpi_get_lru_cache_stats(ndpi_info_mod, static_cast<lru_cache_type>(i), &lru_stats);
+    ndpi_get_lru_cache_stats(g_ctx, ndpi_info_mod, static_cast<lru_cache_type>(i), &lru_stats);
   for(i = 0; i < NDPI_PTREE_MAX + 1; i++) /* + 1 to test invalid type */
     ndpi_get_patricia_stats(ndpi_info_mod, static_cast<ptree_type>(i), &patricia_stats);
   for(i = 0; i < NDPI_AUTOMA_MAX + 1; i++) /* + 1 to test invalid type */
@@ -224,6 +232,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_free_geoip(ndpi_info_mod);
 
   ndpi_exit_detection_module(ndpi_info_mod);
+
+  ndpi_global_deinit(g_ctx);
 
   return 0;
 }

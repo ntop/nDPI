@@ -467,8 +467,8 @@ void ndpi_exclude_protocol(struct ndpi_detection_module_struct *ndpi_str, struct
                            u_int16_t protocol_id, const char *_file, const char *_func, int _line) {
   if(ndpi_is_valid_protoId(protocol_id)) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    if(ndpi_str && ndpi_str->ndpi_log_level >= NDPI_LOG_DEBUG && ndpi_str->ndpi_debug_printf != NULL) {
-      (*(ndpi_str->ndpi_debug_printf))(protocol_id, ndpi_str, NDPI_LOG_DEBUG, _file, _func, _line, "exclude %s\n",
+    if(ndpi_str && ndpi_str->g_ctx && ndpi_str->g_ctx->ndpi_log_level >= NDPI_LOG_DEBUG && ndpi_str->g_ctx->ndpi_debug_printf != NULL) {
+      (*(ndpi_str->g_ctx->ndpi_debug_printf))(protocol_id, ndpi_str->g_ctx, NDPI_LOG_DEBUG, _file, _func, _line, "exclude %s\n",
 				       ndpi_get_proto_name(ndpi_str, protocol_id));
     }
 #endif
@@ -2589,32 +2589,32 @@ void set_ndpi_flow_free(void (*__ndpi_flow_free)(void *ptr)) {
   _ndpi_flow_free = __ndpi_flow_free;
 }
 
-void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *ndpi_str, ndpi_log_level_t log_level,
-                       const char *file_name, const char *func_name, int line_number, const char *format, ...) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
+static void ndpi_debug_printf_default(unsigned int proto, struct ndpi_global_context *g_ctx, ndpi_log_level_t log_level,
+                                      const char *file_name, const char *func_name, unsigned int line_number, const char *format, ...) {
   va_list args;
 #define MAX_STR_LEN 250
   char str[MAX_STR_LEN];
-  if(ndpi_str != NULL && log_level > NDPI_LOG_ERROR && proto > 0 && proto < NDPI_MAX_SUPPORTED_PROTOCOLS &&
-     !NDPI_ISSET(&ndpi_str->debug_bitmask, proto))
+  if(g_ctx && log_level > NDPI_LOG_ERROR && proto > 0 && proto < NDPI_MAX_SUPPORTED_PROTOCOLS &&
+     !NDPI_ISSET(&g_ctx->debug_bitmask, proto))
     return;
   va_start(args, format);
   ndpi_vsnprintf(str, sizeof(str) - 1, format, args);
   va_end(args);
 
-  if(ndpi_str != NULL) {
+  if(g_ctx != NULL) {
     printf("%s:%s:%-3d - [%u]: %s", file_name, func_name, line_number, proto, str);
   } else {
     printf("Proto: %u, %s", proto, str);
   }
-#endif
 }
+#endif
 
 /* ****************************************** */
 
-void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi_debug_function_ptr ndpi_debug_printf) {
+void set_ndpi_debug_function(struct ndpi_global_context *g_ctx, ndpi_debug_function_ptr ndpi_debug_printf) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
+  g_ctx->ndpi_debug_printf = ndpi_debug_printf;
 #endif
 }
 
@@ -2740,6 +2740,77 @@ _Static_assert(sizeof(categories) / sizeof(char *) == NDPI_PROTOCOL_NUM_CATEGORI
 
 /* ******************************************************************** */
 
+struct ndpi_global_context *ndpi_global_init(const struct ndpi_global_config *g_conf) {
+  struct ndpi_global_context *g_ctx = ndpi_calloc(1, sizeof(struct ndpi_global_context));
+
+  if(g_ctx == NULL)
+    return(NULL);
+
+  /* Default values */
+
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  g_ctx->ndpi_debug_printf = ndpi_debug_printf_default;
+#endif
+
+  g_ctx->ookla_cache_is_global = 0;
+  g_ctx->ookla_global_cache_num_entries = 1024;
+  g_ctx->ookla_global_cache_ttl = 120;
+
+  return g_ctx;
+}
+
+/* ******************************************************************** */
+
+void ndpi_global_deinit(struct ndpi_global_context *g_ctx) {
+
+  if(g_ctx) {
+    if(g_ctx->ookla_global_cache)
+      ndpi_lru_free_cache(g_ctx->ookla_global_cache);
+
+    ndpi_free(g_ctx);
+  }
+}
+
+/* ******************************************************************** */
+
+int ndpi_global_finalize(struct ndpi_global_context *g_ctx) {
+
+  if(!g_ctx)
+    return -1;
+
+  if(g_ctx->finalized == 1) {
+    NDPI_GLOG(g_ctx, NDPI_LOG_ERROR, "Global context already finalized\n");
+    return -2;
+  }
+  g_ctx->finalized = 1;
+
+  if(g_ctx->ookla_cache_is_global &&
+     g_ctx->ookla_global_cache_num_entries > 0) {
+    g_ctx->ookla_global_cache = ndpi_lru_cache_init(g_ctx->ookla_global_cache_num_entries,
+                                                    g_ctx->ookla_global_cache_ttl, 1);
+    if(!g_ctx->ookla_global_cache) {
+      NDPI_GLOG(g_ctx, NDPI_LOG_ERROR, "Error allocating lru global cache (num_entries %u)\n",
+                g_ctx->ookla_global_cache_num_entries);
+    }
+  }
+
+  NDPI_GLOG(g_ctx, NDPI_LOG_DEBUG, "Global ctx finalized\n");
+
+  return 0;
+}
+
+/* ******************************************************************** */
+
+int ndpi_bind_global_context(struct ndpi_global_context *g_ctx,
+			       struct ndpi_detection_module_struct *ndpi_str) {
+  if(!ndpi_str)
+    return -1;
+  ndpi_str->g_ctx = g_ctx;
+  return 0;
+}
+
+/* ******************************************************************** */
+
 struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
   int i;
@@ -2753,11 +2824,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   }
 
   memset(ndpi_str, 0, sizeof(struct ndpi_detection_module_struct));
-
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr) ndpi_debug_printf);
-  NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
-#endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
   if(prefs & ndpi_enable_ja3_plus)
     ndpi_str->enable_ja3_plus = 1;
@@ -2973,7 +3039,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     return(NULL);
   }
 
-  ndpi_str->ookla_cache_num_entries = 1024;
+  ndpi_str->ookla_local_cache_num_entries = 1024;
   ndpi_str->bittorrent_cache_num_entries = 32768;
   ndpi_str->zoom_cache_num_entries = 512;
   ndpi_str->stun_cache_num_entries = 1024;
@@ -2982,7 +3048,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->msteams_cache_num_entries = 1024;
   ndpi_str->stun_zoom_cache_num_entries = 1024;
 
-  ndpi_str->ookla_cache_ttl = 120; /* sec */
+  ndpi_str->ookla_local_cache_ttl = 120; /* sec */
   ndpi_str->bittorrent_cache_ttl = 0;
   ndpi_str->zoom_cache_ttl = 0;
   ndpi_str->stun_cache_ttl = 0;
@@ -3065,17 +3131,19 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
 
   ndpi_add_domain_risk_exceptions(ndpi_str);
 
-  if(ndpi_str->ookla_cache_num_entries > 0) {
-    ndpi_str->ookla_cache = ndpi_lru_cache_init(ndpi_str->ookla_cache_num_entries,
-                                                ndpi_str->ookla_cache_ttl);
+  if(ndpi_str->g_ctx && ndpi_str->g_ctx->ookla_cache_is_global) {
+    ndpi_str->ookla_cache = ndpi_str->g_ctx->ookla_global_cache;
+  } else if(ndpi_str->ookla_local_cache_num_entries > 0) {
+    ndpi_str->ookla_cache = ndpi_lru_cache_init(ndpi_str->ookla_local_cache_num_entries,
+                                                ndpi_str->ookla_local_cache_ttl, 0);
     if(!ndpi_str->ookla_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->ookla_cache_num_entries);
+                   ndpi_str->ookla_local_cache_num_entries);
     }
   }
   if(ndpi_str->bittorrent_cache_num_entries > 0) {
     ndpi_str->bittorrent_cache = ndpi_lru_cache_init(ndpi_str->bittorrent_cache_num_entries,
-                                                     ndpi_str->bittorrent_cache_ttl);
+                                                     ndpi_str->bittorrent_cache_ttl, 0);
     if(!ndpi_str->bittorrent_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->bittorrent_cache_num_entries);
@@ -3083,7 +3151,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   }
   if(ndpi_str->zoom_cache_num_entries > 0) {
     ndpi_str->zoom_cache = ndpi_lru_cache_init(ndpi_str->zoom_cache_num_entries,
-                                               ndpi_str->zoom_cache_ttl);
+                                               ndpi_str->zoom_cache_ttl, 0);
     if(!ndpi_str->zoom_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->zoom_cache_num_entries);
@@ -3091,7 +3159,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   }
   if(ndpi_str->stun_cache_num_entries > 0) {
     ndpi_str->stun_cache = ndpi_lru_cache_init(ndpi_str->stun_cache_num_entries,
-                                               ndpi_str->stun_cache_ttl);
+                                               ndpi_str->stun_cache_ttl, 0);
     if(!ndpi_str->stun_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->stun_cache_num_entries);
@@ -3099,7 +3167,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   }
   if(ndpi_str->tls_cert_cache_num_entries > 0) {
     ndpi_str->tls_cert_cache = ndpi_lru_cache_init(ndpi_str->tls_cert_cache_num_entries,
-                                                   ndpi_str->tls_cert_cache_ttl);
+                                                   ndpi_str->tls_cert_cache_ttl, 0);
     if(!ndpi_str->tls_cert_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->tls_cert_cache_num_entries);
@@ -3107,7 +3175,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   }
   if(ndpi_str->mining_cache_num_entries > 0) {
     ndpi_str->mining_cache = ndpi_lru_cache_init(ndpi_str->mining_cache_num_entries,
-                                                 ndpi_str->mining_cache_ttl);
+                                                 ndpi_str->mining_cache_ttl, 0);
     if(!ndpi_str->mining_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->mining_cache_num_entries);
@@ -3115,7 +3183,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   }
   if(ndpi_str->msteams_cache_num_entries > 0) {
     ndpi_str->msteams_cache = ndpi_lru_cache_init(ndpi_str->msteams_cache_num_entries,
-                                                  ndpi_str->msteams_cache_ttl);
+                                                  ndpi_str->msteams_cache_ttl, 0);
     if(!ndpi_str->msteams_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->msteams_cache_num_entries);
@@ -3123,7 +3191,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   }
   if(ndpi_str->stun_zoom_cache_num_entries > 0) {
     ndpi_str->stun_zoom_cache = ndpi_lru_cache_init(ndpi_str->stun_zoom_cache_num_entries,
-                                                    ndpi_str->stun_zoom_cache_ttl);
+                                                    ndpi_str->stun_zoom_cache_ttl, 0);
     if(!ndpi_str->stun_zoom_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->stun_zoom_cache_num_entries);
@@ -3408,7 +3476,8 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->tinc_cache)
       cache_free((cache_t)(ndpi_str->tinc_cache));
 
-    if(ndpi_str->ookla_cache)
+    if((ndpi_str->g_ctx == NULL || !ndpi_str->g_ctx->ookla_cache_is_global) &&
+       ndpi_str->ookla_cache)
       ndpi_lru_free_cache(ndpi_str->ookla_cache);
 
     if(ndpi_str->bittorrent_cache)
@@ -7726,24 +7795,6 @@ u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi
   return(0);
 }
 
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-/* ********************************************************************************* */
-
-void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_str, const char **file,
-					   const char **func, u_int32_t *line) {
-  *file = "";
-  *func = "";
-
-  if(ndpi_str->ndpi_debug_print_file != NULL)
-    *file = ndpi_str->ndpi_debug_print_file;
-
-  if(ndpi_str->ndpi_debug_print_function != NULL)
-    *func = ndpi_str->ndpi_debug_print_function;
-
-  *line = ndpi_str->ndpi_debug_print_line;
-}
-#endif
-
 /* ********************************************************************************* */
 
 u_int8_t ndpi_detection_get_l4(const u_int8_t *l3, u_int16_t l3_len, const u_int8_t **l4_return,
@@ -8855,14 +8906,18 @@ u_int ndpi_get_ndpi_detection_module_size() {
   return(sizeof(struct ndpi_detection_module_struct));
 }
 
-void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_str, NDPI_PROTOCOL_BITMASK debug_bitmask) {
+void ndpi_set_debug_bitmask(struct ndpi_global_context *g_ctx, NDPI_PROTOCOL_BITMASK debug_bitmask) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  ndpi_str->debug_bitmask = debug_bitmask;
+  if(g_ctx)
+    g_ctx->debug_bitmask = debug_bitmask;
 #endif
 }
 
-void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_str, u_int l){
-  ndpi_str->ndpi_log_level = l;
+void ndpi_set_log_level(struct ndpi_global_context *g_ctx, u_int l) {
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  if(g_ctx)
+    g_ctx->ndpi_log_level = l;
+#endif
 }
 
 /* ******************************************************************** */
@@ -8877,13 +8932,20 @@ u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow)
 /* ******************************************************************** */
 
 /* LRU cache */
-struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl) {
+struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl, int shared) {
   struct ndpi_lru_cache *c = (struct ndpi_lru_cache *) ndpi_calloc(1, sizeof(struct ndpi_lru_cache));
 
   if(!c)
     return(NULL);
 
-  c->ttl = ttl;
+  c->ttl = ttl & 0x7FFFFFFF;
+  c->shared = !!shared;
+  if(c->shared) {
+    if(pthread_mutex_init(&c->mutex, NULL) != 0) {
+      ndpi_free(c);
+      return(NULL);
+    }
+  }
   c->entries = (struct ndpi_lru_cache_entry *) ndpi_calloc(num_entries, sizeof(struct ndpi_lru_cache_entry));
 
   if(!c->entries) {
@@ -8900,9 +8962,26 @@ void ndpi_lru_free_cache(struct ndpi_lru_cache *c) {
   ndpi_free(c);
 }
 
+static void __lru_cache_lock(struct ndpi_lru_cache *c)
+{
+  if(c->shared) {
+    pthread_mutex_lock(&c->mutex);
+  }
+}
+
+static void __lru_cache_unlock(struct ndpi_lru_cache *c)
+{
+  if(c->shared) {
+    pthread_mutex_unlock(&c->mutex);
+  }
+}
+
 u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
 			     u_int16_t *value, u_int8_t clean_key_when_found, u_int32_t now_sec) {
   u_int32_t slot = key % c->num_entries;
+  u_int8_t ret;
+
+  __lru_cache_lock(c);
 
   c->stats.n_search++;
   if(c->entries[slot].is_full && c->entries[slot].key == key &&
@@ -8912,16 +8991,24 @@ u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
     if(clean_key_when_found)
       c->entries[slot].is_full = 0;
     c->stats.n_found++;
-    return(1);
+    ret = 1;
   } else
-    return(0);
+    ret = 0;
+
+  __lru_cache_unlock(c);
+
+  return ret;
 }
 
 void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value, u_int32_t now_sec) {
   u_int32_t slot = key % c->num_entries;
 
+  __lru_cache_lock(c);
+
   c->stats.n_insert++;
   c->entries[slot].is_full = 1, c->entries[slot].key = key, c->entries[slot].value = value, c->entries[slot].timestamp = now_sec;
+
+  __lru_cache_unlock(c);
 }
 
 void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *stats) {
@@ -8936,16 +9023,23 @@ void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *s
   }
 }
 
-int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
+int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
+			     struct ndpi_detection_module_struct *ndpi_struct,
 			     lru_cache_type cache_type,
 			     struct ndpi_lru_cache_stats *stats)
 {
-  if(!ndpi_struct || !stats)
+  lru_cache_scope cache_scope;
+
+  if(!stats || (!ndpi_struct && !g_ctx))
     return -1;
+  if(ndpi_get_lru_cache_scope(g_ctx, cache_type, &cache_scope) != 0)
+    return -1;
+  if(cache_scope == NDPI_LRUCACHE_SCOPE_LOCAL && !ndpi_struct)
+    return -2;
 
   switch(cache_type) {
   case NDPI_LRUCACHE_OOKLA:
-    ndpi_lru_get_stats(ndpi_struct->ookla_cache, stats);
+    ndpi_lru_get_stats(ndpi_struct ? ndpi_struct->ookla_cache : g_ctx->ookla_global_cache, stats);
     return 0;
   case NDPI_LRUCACHE_BITTORRENT:
     ndpi_lru_get_stats(ndpi_struct->bittorrent_cache, stats);
@@ -8973,16 +9067,74 @@ int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-int ndpi_set_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
-			    lru_cache_type cache_type,
-			    u_int32_t num_entries)
+int ndpi_get_lru_cache_scope(struct ndpi_global_context *g_ctx,
+			     lru_cache_type cache_type,
+			     lru_cache_scope *scope)
 {
-  if(!ndpi_struct)
+  if(!scope)
+    return -1;
+
+  *scope = NDPI_LRUCACHE_SCOPE_LOCAL;
+
+  /* Without global context all caches are local */
+  if(!g_ctx)
+    return 0;
+
+  switch(cache_type) {
+  case NDPI_LRUCACHE_OOKLA:
+    if(g_ctx->ookla_cache_is_global)
+      *scope = NDPI_LRUCACHE_SCOPE_GLOBAL;
+    return 0;
+  case NDPI_LRUCACHE_BITTORRENT:
+  case NDPI_LRUCACHE_ZOOM:
+  case NDPI_LRUCACHE_STUN:
+  case NDPI_LRUCACHE_TLS_CERT:
+  case NDPI_LRUCACHE_MINING:
+  case NDPI_LRUCACHE_MSTEAMS:
+  case NDPI_LRUCACHE_STUN_ZOOM:
+    return 0; /* TODO */
+  default:
+    return -1;
+  }
+}
+
+int ndpi_set_lru_cache_scope(struct ndpi_global_context *g_ctx,
+			     lru_cache_type cache_type,
+			     lru_cache_scope scope)
+{
+  if(!g_ctx || !scope)
     return -1;
 
   switch(cache_type) {
   case NDPI_LRUCACHE_OOKLA:
-    ndpi_struct->ookla_cache_num_entries = num_entries;
+    g_ctx->ookla_cache_is_global = scope == NDPI_LRUCACHE_SCOPE_GLOBAL ? 1 : 0;
+    return 0;
+  /* TODO */
+  default:
+    return -1;
+  }
+}
+
+int ndpi_set_lru_cache_size(struct ndpi_global_context *g_ctx,
+			    struct ndpi_detection_module_struct *ndpi_struct,
+			    lru_cache_type cache_type,
+			    u_int32_t num_entries)
+{
+  lru_cache_scope cache_scope;
+
+  if(ndpi_get_lru_cache_scope(g_ctx, cache_type, &cache_scope) != 0)
+    return -1;
+  if(cache_scope == NDPI_LRUCACHE_SCOPE_LOCAL && !ndpi_struct)
+    return -2;
+  if(cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL && g_ctx->finalized)
+    return -2;
+
+  switch(cache_type) {
+  case NDPI_LRUCACHE_OOKLA:
+    if(cache_scope == NDPI_LRUCACHE_SCOPE_LOCAL)
+      ndpi_struct->ookla_local_cache_num_entries = num_entries;
+    else
+      g_ctx->ookla_global_cache_num_entries = num_entries;
     return 0;
   case NDPI_LRUCACHE_BITTORRENT:
     ndpi_struct->bittorrent_cache_num_entries = num_entries;
@@ -9010,16 +9162,24 @@ int ndpi_set_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-int ndpi_get_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
+int ndpi_get_lru_cache_size(struct ndpi_global_context *g_ctx,
+			    struct ndpi_detection_module_struct *ndpi_struct,
 			    lru_cache_type cache_type,
 			    u_int32_t *num_entries)
 {
-  if(!ndpi_struct)
+  lru_cache_scope cache_scope;
+
+  if(!num_entries || ndpi_get_lru_cache_scope(g_ctx, cache_type, &cache_scope) != 0)
     return -1;
+  if(cache_scope == NDPI_LRUCACHE_SCOPE_LOCAL && !ndpi_struct)
+    return -2;
 
   switch(cache_type) {
   case NDPI_LRUCACHE_OOKLA:
-    *num_entries = ndpi_struct->ookla_cache_num_entries;
+    if(cache_scope == NDPI_LRUCACHE_SCOPE_LOCAL)
+      *num_entries = ndpi_struct->ookla_local_cache_num_entries;
+    else
+      *num_entries = g_ctx->ookla_global_cache_num_entries;
     return 0;
   case NDPI_LRUCACHE_BITTORRENT:
     *num_entries = ndpi_struct->bittorrent_cache_num_entries;
@@ -9047,16 +9207,26 @@ int ndpi_get_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-int ndpi_set_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
+int ndpi_set_lru_cache_ttl(struct ndpi_global_context *g_ctx,
+			   struct ndpi_detection_module_struct *ndpi_struct,
 			   lru_cache_type cache_type,
 			   u_int32_t ttl)
 {
-  if(!ndpi_struct)
+  lru_cache_scope cache_scope;
+
+  if(ndpi_get_lru_cache_scope(g_ctx, cache_type, &cache_scope) != 0)
     return -1;
+  if(cache_scope == NDPI_LRUCACHE_SCOPE_LOCAL && !ndpi_struct)
+    return -2;
+  if(cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL && g_ctx->finalized)
+    return -2;
 
   switch(cache_type) {
   case NDPI_LRUCACHE_OOKLA:
-    ndpi_struct->ookla_cache_ttl = ttl;
+    if(cache_scope == NDPI_LRUCACHE_SCOPE_LOCAL)
+      ndpi_struct->ookla_local_cache_ttl = ttl;
+    else
+      g_ctx->ookla_global_cache_ttl = ttl;
     return 0;
   case NDPI_LRUCACHE_BITTORRENT:
     ndpi_struct->bittorrent_cache_ttl = ttl;
@@ -9084,16 +9254,24 @@ int ndpi_set_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-int ndpi_get_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
+int ndpi_get_lru_cache_ttl(struct ndpi_global_context *g_ctx,
+			   struct ndpi_detection_module_struct *ndpi_struct,
 			   lru_cache_type cache_type,
 			   u_int32_t *ttl)
 {
-  if(!ndpi_struct || !ttl)
+  lru_cache_scope cache_scope;
+
+  if(!ttl || ndpi_get_lru_cache_scope(g_ctx, cache_type, &cache_scope) != 0)
     return -1;
+  if(cache_scope == NDPI_LRUCACHE_SCOPE_LOCAL && !ndpi_struct)
+    return -2;
 
   switch(cache_type) {
   case NDPI_LRUCACHE_OOKLA:
-    *ttl = ndpi_struct->ookla_cache_ttl;
+    if(cache_scope == NDPI_LRUCACHE_SCOPE_LOCAL)
+      *ttl = ndpi_struct->ookla_local_cache_ttl;
+    else
+      *ttl = g_ctx->ookla_global_cache_ttl;
     return 0;
   case NDPI_LRUCACHE_BITTORRENT:
     *ttl = ndpi_struct->bittorrent_cache_ttl;

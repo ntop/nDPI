@@ -338,45 +338,6 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
 
 /* ***************************************************** */
 
-extern u_int32_t current_ndpi_memory, max_ndpi_memory;
-
-static u_int32_t __slot_malloc_bins(u_int64_t v)
-{
-  int i;
-
-  /* 0-2,3-4,5-8,9-16,17-32,33-64,65-128,129-256,257-512,513-1024,1025-2048,2049-4096,4097-8192,8193- */
-  for(i=0; i < max_malloc_bins - 1; i++)
-    if((1ULL << (i + 1)) >= v)
-      return i;
-  return i;
-}
-
-/**
- * @brief ndpi_malloc wrapper function
- */
-static void *ndpi_malloc_wrapper(size_t size) {
-  current_ndpi_memory += size;
-
-  if(current_ndpi_memory > max_ndpi_memory)
-    max_ndpi_memory = current_ndpi_memory;
-
-  if(enable_malloc_bins && malloc_size_stats)
-    ndpi_inc_bin(&malloc_bins, __slot_malloc_bins(size), 1);
-
-  return(malloc(size)); /* Don't change to ndpi_malloc !!!!! */
-}
-
-/* ***************************************************** */
-
-/**
- * @brief free wrapper function
- */
-static void free_wrapper(void *freeable) {
-  free(freeable); /* Don't change to ndpi_free !!!!! */
-}
-
-/* ***************************************************** */
-
 static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod, const char *name) {
   uint16_t proto_id;
   char *e;
@@ -451,20 +412,12 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
 
 /* ***************************************************** */
 
-extern char *_debug_protocols;
-
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle, int do_init_flows_root,
 					 ndpi_serialization_format serialization_format) {
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
-  static NDPI_PROTOCOL_BITMASK debug_bitmask;
-  static int _debug_protocols_ok = 0;
 
-  set_ndpi_malloc(ndpi_malloc_wrapper), set_ndpi_free(free_wrapper);
-  set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
-
-  /* TODO: just needed here to init ndpi ndpi_malloc wrapper */
   module = ndpi_init_detection_module(init_prefs);
 
   if(module == NULL) {
@@ -484,17 +437,6 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   workflow->ndpi_struct = module;
 
   ndpi_set_user_data(module, workflow);
-
-  ndpi_set_log_level(module, nDPI_LogLevel);
-
-  if(_debug_protocols != NULL && ! _debug_protocols_ok) {
-    NDPI_BITMASK_RESET(debug_bitmask);
-    if(parse_proto_name_list(_debug_protocols, &debug_bitmask, 0))
-      exit(-1);
-    _debug_protocols_ok = 1;
-  }
-  if(_debug_protocols_ok)
-    ndpi_set_debug_bitmask(module, debug_bitmask);
 
   if(do_init_flows_root)
     workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));
@@ -963,10 +905,10 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       if (ndpi_init_serializer(&newflow->ndpi_flow_serializer,
                                workflow->ndpi_serialization_format) != 0)
       {
-        LOG(NDPI_LOG_ERROR, "ndpi serializer init failed\n");
-        ndpi_flow_info_free_data(newflow);
-        ndpi_free(newflow);
-        return(NULL);
+	  LOG(NDPI_LOG_ERROR, "ndpi serializer init failed\n");
+          ndpi_flow_info_free_data(newflow);
+          ndpi_free(newflow);
+          return(NULL);
       }
     }
 

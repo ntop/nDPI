@@ -24,6 +24,9 @@
 #ifndef __NDPI_TYPEDEFS_H__
 #define __NDPI_TYPEDEFS_H__
 
+#define HAVE_STRUCT_TIMESPEC
+#include <pthread.h>
+
 #include "ndpi_define.h"
 #include "ndpi_protocol_ids.h"
 #include "ndpi_utils.h"
@@ -242,10 +245,10 @@ typedef struct ndpi_protocol_bitmask_struct {
   ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS];
 } ndpi_protocol_bitmask_struct_t;
 
-struct ndpi_detection_module_struct;
+struct ndpi_global_context;
 
 /* NDPI_DEBUG_FUNCTION_PTR (cast) */
-typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol, struct ndpi_detection_module_struct *module_struct,
+typedef void (*ndpi_debug_function_ptr) (u_int32_t protocol, struct ndpi_global_context *g_ctx,
 					 ndpi_log_level_t log_level, const char *file,
 					 const char *func, unsigned line,
 					 const char *format, ...);
@@ -699,6 +702,11 @@ typedef enum {
   NDPI_LRUCACHE_MAX	/* Last one! */
 } lru_cache_type;
 
+typedef enum {
+  NDPI_LRUCACHE_SCOPE_LOCAL = 0,
+  NDPI_LRUCACHE_SCOPE_GLOBAL,
+} lru_cache_scope;
+
 struct ndpi_lru_cache_entry {
   u_int32_t key; /* Store the whole key to avoid ambiguities */
   u_int32_t is_full:1, value:16, pad:15;
@@ -713,7 +721,8 @@ struct ndpi_lru_cache_stats {
 
 struct ndpi_lru_cache {
   u_int32_t num_entries;
-  u_int32_t ttl;
+  u_int32_t ttl : 31, shared : 1;
+  pthread_mutex_t mutex;
   struct ndpi_lru_cache_stats stats;
   struct ndpi_lru_cache_entry *entries;
 };
@@ -959,6 +968,11 @@ struct ndpi_packet_struct {
     packet_direction:1, empty_line_position_set:1, http_check_content:1, pad:4;
 };
 
+struct ndpi_global_config {
+  int unused; /* TODO: c doesn't really like empty structures. Placeholder: to be removed */
+};
+
+struct ndpi_global_context;
 struct ndpi_detection_module_struct;
 struct ndpi_flow_struct;
 
@@ -1178,6 +1192,22 @@ typedef struct {
 } nbpf_filter;
 #endif
 
+struct ndpi_global_context {
+
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  ndpi_debug_function_ptr ndpi_debug_printf;
+  NDPI_PROTOCOL_BITMASK debug_bitmask;
+  ndpi_log_level_t ndpi_log_level; /* default error */
+#endif
+
+  int ookla_cache_is_global;
+  u_int32_t ookla_global_cache_num_entries;
+  u_int32_t ookla_global_cache_ttl;
+  struct ndpi_lru_cache *ookla_global_cache;
+
+  int finalized;
+};
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
 
@@ -1186,7 +1216,7 @@ struct ndpi_detection_module_struct {
   u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
   u_int8_t tls_certificate_expire_in_x_days;
-  
+
   void *user_data;
   char custom_category_labels[NUM_CUSTOM_CATEGORIES][CUSTOM_CATEGORY_LABEL_LEN];
 
@@ -1203,17 +1233,6 @@ struct ndpi_detection_module_struct {
   u_int32_t callback_buffer_size_non_tcp_udp;
 
   ndpi_default_ports_tree_node_t *tcpRoot, *udpRoot;
-
-  ndpi_log_level_t ndpi_log_level; /* default error */
-
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  /* debug callback, only set when debug is used */
-  ndpi_debug_function_ptr ndpi_debug_printf;
-  const char *ndpi_debug_print_file;
-  const char *ndpi_debug_print_function;
-  u_int32_t ndpi_debug_print_line;
-  NDPI_PROTOCOL_BITMASK debug_bitmask;
-#endif
 
   /* misc parameters */
   u_int32_t tcp_max_retransmission_window_size;
@@ -1253,13 +1272,15 @@ struct ndpi_detection_module_struct {
 
   u_int8_t ip_version_limit;
 
+  struct ndpi_global_context *g_ctx;
+
   /* NDPI_PROTOCOL_TINC */
   struct cache *tinc_cache;
 
   /* NDPI_PROTOCOL_OOKLA */
   struct ndpi_lru_cache *ookla_cache;
-  u_int32_t ookla_cache_num_entries;
-  u_int32_t ookla_cache_ttl;
+  u_int32_t ookla_local_cache_num_entries;
+  u_int32_t ookla_local_cache_ttl;
 
   /* NDPI_PROTOCOL_BITTORRENT */
   struct ndpi_lru_cache *bittorrent_cache;
