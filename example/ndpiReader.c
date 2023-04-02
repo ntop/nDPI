@@ -253,7 +253,7 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 
 void test_lib(); /* Forward */
 
-extern void ndpi_report_payload_stats();
+extern void ndpi_report_payload_stats(int print);
 extern int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverted_logic);
 
 /* ********************************** */
@@ -2746,7 +2746,7 @@ static void printFlowsStats() {
   FILE *out = results_file ? results_file : stdout;
 
   if(enable_payload_analyzer)
-    ndpi_report_payload_stats();
+    ndpi_report_payload_stats(1);
 
   for(thread_id = 0; thread_id < num_threads; thread_id++)
     total_flows += ndpi_thread_info[thread_id].workflow->num_allocated_flows;
