@@ -27,12 +27,17 @@ AC_ARG_ENABLE(tls-sigs, AS_HELP_STRING([--enable-tls-sigs], [Enable TLS Client s
 AC_ARG_ENABLE(npcap, AS_HELP_STRING([--disable-npcap], [msys2 only: Disable linkage against the wpcap/npcap import library in windows/WpdPack/Lib.]))
 AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom path; default: ${PWD}/../PF_RING/userland/nbpf]),[NBPF_HOME=$withval],[NBPF_HOME=${PWD}/../PF_RING/userland/nbpf])
 AC_ARG_WITH(lto-and-gold-linker, AS_HELP_STRING([--with-lto-and-gold-linker], [Build with LTO and Gold linker]))
+AC_ARG_ENABLE(debug-build, AS_HELP_STRING([--enable-debug-build], [Enable debug build (`-g` flag)]),[enable_debugbuild=$enableval],[enable_debugbuild=no])
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [
   BUILD_FUZZTARGETS=1
   NDPI_CFLAGS="${NDPI_CFLAGS} -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION"
 ], [BUILD_FUZZTARGETS=0])
 AM_CONDITIONAL([BUILD_FUZZTARGETS], [test "x$enable_fuzztargets" = "xyes"])
+
+AS_IF([test "x$enable_debugbuild" = "xyes"], [
+  NDPI_CFLAGS="${NDPI_CFLAGS} -g"
+])
 
 AS_IF([test "${with_sanitizer+set}" = set -a "${with_thread_sanitizer+set}" = set],[
   AC_MSG_ERROR([Configure options `--with-sanitizer' and `--with_thread_sanitizer' can not used at the same time.])
