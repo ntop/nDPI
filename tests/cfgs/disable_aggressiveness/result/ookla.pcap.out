@@ -1,0 +1,37 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	46	(7.67 pkts/flow)
+Confidence DPI (partial cache): 1 (flows)
+Confidence DPI              : 5 (flows)
+Num dissector calls: 488 (81.33 diss/flow)
+LRU cache ookla:      6/1/1 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/2/0 (insert/search/found)
+LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          2/1 (search/found)
+Automa domain:        2/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  4/4 (search/found)
+Patricia risk mask:   12/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   11/1 (search/found)
+
+TLS	29	23166	1
+Ookla	84	15245	5
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.128            	 2      
+
+
+	1	TCP 192.168.1.128:35830 <-> 89.96.108.170:8080 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 6][cat: Web/5][21 pkts/21216 bytes <-> 8 pkts/1950 bytes][Goodput ratio: 93/72][0.32 sec][Hostname/SNI: spd-pub-mi-01-01.fastwebnet.it][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: 0.832 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 17/61 274/280 62/109][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 1010/244 1514/387 612/138][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 443][TLSv1.3][JA3C: c279b0189edb9269da7bc43dea5e0c36][JA3S: fcb2d4d0991292272fcb1e464eedfd43][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,4,0,0,0,0,4,9,0,9,0,0,0,0,0,4,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,55,0,0]
+	2	TCP 192.168.1.128:48854 <-> 104.16.209.12:443 [proto: 91.191/TLS.Ookla][IP: 220/Cloudflare][Encrypted][Confidence: DPI][DPI packets: 6][cat: Network/14][8 pkts/1620 bytes <-> 6 pkts/3818 bytes][Goodput ratio: 67/89][0.06 sec][Hostname/SNI: www.speedtest.net][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.404 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 7/5 18/15 7/6][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 202/636 583/1514 181/646][TLSv1.3][JA3C: 579ccef312d18482fc42e2b822ca2430][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Firefox][Cipher: TLS_AES_128_GCM_SHA256][PLAIN TEXT (@oTAgOeedtest.net)][Plen Bins: 0,0,14,0,0,14,0,0,0,0,14,0,0,0,0,0,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,0,0]
+	3	TCP 192.168.1.7:51207 <-> 46.44.253.187:80 [proto: 7.191/HTTP.Ookla][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 12][cat: Network/14][12 pkts/2238 bytes <-> 8 pkts/2082 bytes][Goodput ratio: 64/74][5.33 sec][bytes ratio: 0.036 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/4 528/47 5005/84 1493/28][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 186/260 430/523 168/194][Risk: ** HTTP Susp User-Agent **** HTTP Obsolete Server **][Risk Score: 150][Risk Info: Obsolete Apache server 2.2.22 / Empty or missing User-Agent][PLAIN TEXT (GET /crossdomain.xml HTTP/1.1)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,12,75,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 192.168.1.192:51156 <-> 89.96.108.170:8080 [proto: 191/Ookla][IP: 0/Unknown][ClearText][Confidence: DPI (partial cache)][DPI packets: 10][cat: Network/14][6 pkts/591 bytes <-> 4 pkts/1784 bytes][Goodput ratio: 32/85][0.05 sec][bytes ratio: -0.502 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 9/10 15/20 6/8][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 98/446 143/1514 31/617][PLAIN TEXT (gKRZvA)][Plen Bins: 0,40,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0]
+	5	TCP 192.168.1.7:51215 <-> 46.44.253.187:8080 [proto: 191/Ookla][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Network/14][19 pkts/1421 bytes <-> 11 pkts/920 bytes][Goodput ratio: 11/20][0.80 sec][bytes ratio: 0.214 (Upload)][IAT c2s/s2c min/avg/max/stddev: 26/0 44/75 103/137 23/41][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 75/84 85/100 9/8][PLAIN TEXT ( 6HELLO 2.4 2016)][Plen Bins: 94,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	TCP 192.168.1.192:37790 <-> 185.157.229.246:8080 [proto: 191/Ookla][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Network/14][6 pkts/454 bytes <-> 4 pkts/317 bytes][Goodput ratio: 11/14][0.06 sec][bytes ratio: 0.178 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 12/5 46/9 17/4][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 76/79 106/108 14/17][PLAIN TEXT (HELLO 2.9 )][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

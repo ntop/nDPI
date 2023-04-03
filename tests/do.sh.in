@@ -25,11 +25,9 @@ PCRE_ENABLED=@PCRE_ENABLED@
 PCRE_PCAPS="WebattackRCE.pcap"
 NBPF_ENABLED=@NBPF_ENABLED@
 NBPF_PCAPS="h323-overflow.pcap"
-READER="${CMD_PREFIX} ../example/ndpiReader${EXE_SUFFIX} -A -p ../example/protos.txt -c ../example/categories.txt -r ../example/risky_domains.txt -j ../example/ja3_fingerprints.csv -S ../example/sha1_fingerprints.csv"
+READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja3_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -q -K JSON -k /dev/null -t -v 2"
 
 RC=0
-PCAPS=`cd pcap; /bin/ls *.pcap *.pcapng *.cap`
-FAILURES=()
 
 if [ ! -x "../example/ndpiReader${EXE_SUFFIX}" ]; then
   echo "$0: Missing ../example/ndpiReader${EXE_SUFFIX}"
@@ -57,7 +55,7 @@ fuzzy_testing() {
 	cp ../example/risky_domains.txt .
 	cp ../example/ja3_fingerprints.csv .
 	cp ../example/sha1_fingerprints.csv .
-	../fuzz/fuzz_ndpi_reader -dict=../fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" pcap/
+	../fuzz/fuzz_ndpi_reader -dict=../fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" cfgs/default/pcap/
 	rm -f protos.txt categories.txt risky_domains.txt ja3_fingerprints.csv sha1_fingerprints.csv
     fi
 }
@@ -67,7 +65,7 @@ build_results() {
 	#echo $f
 	# create result files if not present
 	if [ ! -f result/$f.out ]; then
-	    CMD="$READER -q -k /dev/null -t -i pcap/$f -w result/$f.out -v 2"
+	    CMD="$READER -i pcap/$f -w result/$f.out $READER_EXTRA_PARAM"
 	    $CMD
 	fi
     done
@@ -103,7 +101,7 @@ check_results() {
 	    fi
 
 	if [ -f result/$f.out ]; then
-	    CMD="$READER -q -K JSON -k /dev/null -t -i pcap/$f -w /tmp/reader.$$.out -v 2"
+	    CMD="$READER -i pcap/$f -w /tmp/reader.$$.out $READER_EXTRA_PARAM"
 	    CPUPROFILE=./result/$f.cprof HEAPPROFILE=./result/$f $CMD
 	    CMD_RET=$?
 	    if [ $CMD_RET -eq 0 ]; then
@@ -134,19 +132,33 @@ check_results() {
 
     if [ ${GPROF_ENABLED} -eq 1 ]; then
       GPROF_ARGS='-nodecount 100 -nodefraction 0 -symbolize=fastlocal'
-      ${GPROF} -top ${GPROF_ARGS} ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
-      ${GPROF} -png -output ./result/cpu_profile.png ${GPROF_ARGS} ../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
-      ${GPROF} -top ${GPROF_ARGS} -sample_index=alloc_space  ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
-      ${GPROF} -png -output ./result/heap_profile.png ${GPROF_ARGS} -sample_index=alloc_space ../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
+      ${GPROF} -top ${GPROF_ARGS} ../../../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -png -output ./result/cpu_profile.png ${GPROF_ARGS} ../../../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -top ${GPROF_ARGS} -sample_index=alloc_space  ../../../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
+      ${GPROF} -png -output ./result/heap_profile.png ${GPROF_ARGS} -sample_index=alloc_space ../../../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
     fi
 }
 
 if [ $FUZZY_TESTING_ENABLED -eq 1 ]; then
     fuzzy_testing
 fi
-build_results
-check_results $*
 
-test ${RC} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
-test ${RC} -ne 0 && echo "Failed: ${FAILURES[@]}"
+for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
+    cd ./cfgs/"$(basename $d)"
+
+    PCAPS=`cd pcap; /bin/ls *.*cap*`
+    FAILURES=()
+    [ -f config.txt ] && READER_EXTRA_PARAM=$(< config.txt)
+
+    echo "Run configuration \""$(basename $d)"\" [$READER_EXTRA_PARAM]"
+
+    build_results
+    check_results $*
+
+    test ${RC} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
+    test ${RC} -ne 0 && echo "Failed: ${FAILURES[@]}"
+
+    cd ../../
+done
+
 exit $RC

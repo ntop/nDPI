@@ -337,7 +337,7 @@ fuzz_gcrypt_light_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 
 # required for Google oss-fuzz
 # see https://github.com/google/oss-fuzz/tree/master/projects/ndpi
-testpcaps := $(wildcard ../tests/pcap/*.pcap*)
+testpcaps := $(wildcard ../tests/cfgs/default/pcap/*.pcap*)
 
 fuzz_ndpi_reader_seed_corpus.zip: $(testpcaps)
 	zip -j fuzz_ndpi_reader_seed_corpus.zip $(testpcaps)
