@@ -266,16 +266,17 @@ void print_payload_stat(struct payload_stats *p) {
 
 /* ***************************************************** */
 
-void ndpi_report_payload_stats() {
+void ndpi_report_payload_stats(int print) {
   struct payload_stats *p, *tmp;
   u_int num = 0;
 
-  printf("\n\nPayload Analysis\n");
+  if(print)
+    printf("\n\nPayload Analysis\n");
 
   HASH_SORT(pstats, payload_stats_sort_asc);
 
   HASH_ITER(hh, pstats, p, tmp) {
-    if(num <= max_num_reported_top_payloads)
+    if(print && num <= max_num_reported_top_payloads)
       print_payload_stat(p);
 
     ndpi_free(p->pattern);
