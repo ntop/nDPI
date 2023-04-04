@@ -1,1 +1,1 @@
-1--sp_password
+select password();

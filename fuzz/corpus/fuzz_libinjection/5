@@ -1,1 +1,1 @@
-205.174.165.68/dv/vulnerabilities/sqli/?id=1%27+and+1%3D1+union+select+null%2C+table_name+from+information_schema.tables%23&Submit=Submit
+- /* foo */ ( /* bar */ -SELECT 1 );

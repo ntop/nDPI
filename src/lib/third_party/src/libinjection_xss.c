@@ -20,7 +20,7 @@ static int is_black_tag(const char* s, size_t len);
 static int is_black_url(const char* s, size_t len);
 static int cstrcasecmp_with_null(const char *a, const char *b, size_t n);
 static int html_decode_char_at(const char* src, size_t len, size_t* consumed);
-static int htmlencode_startswith(const char* prefix, const char *src, size_t n);
+static int htmlencode_startswith(const char *a/* prefix */, const char *b /* src */, size_t n);
 
 
 typedef struct stringtype {
@@ -509,22 +509,31 @@ int libinjection_is_xss(const char* s, size_t len, int flags)
 
 /*
  * wrapper
+ *
+ *
+ * const char* s: is expected to be a null terminated string.
+ * size_t len: should represent the length of the string
+ *             without the null terminator - strlen(s). 
+ * 
+ * Further info:
+ *   - https://github.com/client9/libinjection/issues/150
+ *
  */
-int libinjection_xss(const char* s, size_t len)
+int libinjection_xss(const char* s, size_t slen)
 {
-    if (libinjection_is_xss(s, len, DATA_STATE)) {
+    if (libinjection_is_xss(s, slen, DATA_STATE)) {
         return 1;
     }
-    if (libinjection_is_xss(s, len, VALUE_NO_QUOTE)) {
+    if (libinjection_is_xss(s, slen, VALUE_NO_QUOTE)) {
         return 1;
     }
-    if (libinjection_is_xss(s, len, VALUE_SINGLE_QUOTE)) {
+    if (libinjection_is_xss(s, slen, VALUE_SINGLE_QUOTE)) {
         return 1;
     }
-    if (libinjection_is_xss(s, len, VALUE_DOUBLE_QUOTE)) {
+    if (libinjection_is_xss(s, slen, VALUE_DOUBLE_QUOTE)) {
         return 1;
     }
-    if (libinjection_is_xss(s, len, VALUE_BACK_QUOTE)) {
+    if (libinjection_is_xss(s, slen, VALUE_BACK_QUOTE)) {
         return 1;
     }
 

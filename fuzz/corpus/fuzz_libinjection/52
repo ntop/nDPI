@@ -1,1 +1,1 @@
-1 UNION
+SELECT float @@version;

