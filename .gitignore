@@ -71,6 +71,7 @@
 /fuzz/fuzz_ds_ahocorasick
 /fuzz/fuzz_libinjection
 /fuzz/fuzz_tls_certificate
+/fuzz/fuzz_gcrypt_light
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_seed_corpus.zip
 /fuzz/fuzz_quic_get_crypto_data_seed_corpus.zip

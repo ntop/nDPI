@@ -1,4 +1,8 @@
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef GCRY_LIGHT_H
 #define GCRY_LIGHT_H
 
@@ -83,5 +87,9 @@ gcry_error_t gcry_cipher_decrypt (gcry_cipher_hd_t h, void *out, size_t outsize,
 size_t       gcry_cipher_get_algo_keylen (int algo);
 
 #endif /* GCRY_LIGHT_H */
+
+#ifdef __cplusplus
+}
+#endif
 
 /* vim: set ts=4 sw=4 et foldmethod=marker foldmarker={{{{,}}}}: */
