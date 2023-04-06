@@ -1344,6 +1344,13 @@ static ndpi_protocol_match host_match[] =
    { "metrika.yandex.",                  "YandexMetrika", NDPI_PROTOCOL_YANDEX_METRIKA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "direct.yandex.",                   "YandexDirect", NDPI_PROTOCOL_YANDEX_DIRECT, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "riotgames.com",                    "RiotGames", NDPI_PROTOCOL_RIOTGAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
+   { "pvp.net",                          "RiotGames", NDPI_PROTOCOL_RIOTGAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
+   { "a17.d.a.kamai.net",                "RiotGames", NDPI_PROTOCOL_RIOTGAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
+   { "a11.d.akamai.net",                 "RiotGames", NDPI_PROTOCOL_RIOTGAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
+   { "a248.e.akamai.net",                "RiotGames", NDPI_PROTOCOL_RIOTGAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
+   { "riotcdn.net",                      "RiotGames", NDPI_PROTOCOL_RIOTGAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
+
    /*
       ADS/tracking/analytic
     */
@@ -1478,6 +1485,8 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "CN=cloudflareclient.com",         NDPI_PROTOCOL_CLOUDFLARE_WARP },
   { "O=V Kontakte LLC",                NDPI_PROTOCOL_VK },
   { "O=Yandex LLC",                    NDPI_PROTOCOL_YANDEX },
+  { "O=Riot Games, Inc.",              NDPI_PROTOCOL_RIOTGAMES   },
+  { "O=Riot Games Inc",                NDPI_PROTOCOL_RIOTGAMES   },
 
   { NULL, 0 }
 };
