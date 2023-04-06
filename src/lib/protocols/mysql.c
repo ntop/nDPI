@@ -65,7 +65,9 @@ static void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_stru
       }
 #else
         if(strncmp((const char*)&packet->payload[packet->payload_packet_len-22],
-		   "mysql_", 6) == 0) {
+		   "mysql_", 6) == 0 ||
+           strncmp((const char*)&packet->payload[packet->payload_packet_len-22],
+		   "caching_", 8) == 0) {
 	  NDPI_LOG_INFO(ndpi_struct, "found MySQL\n");
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MYSQL,  NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	  return;
