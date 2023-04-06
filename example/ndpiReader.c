@@ -3473,16 +3473,29 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     cumulative_stats.num_dissector_calls += ndpi_thread_info[thread_id].workflow->stats.num_dissector_calls;
 
     /* LRU caches */
-    for(i = 0; i < NDPI_LRUCACHE_MAX; i++)
-      ndpi_get_lru_cache_stats(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &cumulative_stats.lru_stats[i]);
+    for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+      struct ndpi_lru_cache_stats s;
+      ndpi_get_lru_cache_stats(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &s);
+      cumulative_stats.lru_stats[i].n_insert += s.n_insert;
+      cumulative_stats.lru_stats[i].n_search += s.n_search;
+      cumulative_stats.lru_stats[i].n_found += s.n_found;
+    }
 
     /* Automas */
-    for(i = 0; i < NDPI_AUTOMA_MAX; i++)
-      ndpi_get_automa_stats(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &cumulative_stats.automa_stats[i]);
+    for(i = 0; i < NDPI_AUTOMA_MAX; i++) {
+     struct ndpi_automa_stats s;
+      ndpi_get_automa_stats(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &s);
+      cumulative_stats.automa_stats[i].n_search += s.n_search;
+      cumulative_stats.automa_stats[i].n_found += s.n_found;
+    }
 
     /* Patricia trees */
-    for(i = 0; i < NDPI_PTREE_MAX; i++)
-      ndpi_get_patricia_stats(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &cumulative_stats.patricia_stats[i]);
+    for(i = 0; i < NDPI_PTREE_MAX; i++) {
+      struct ndpi_patricia_tree_stats s;
+      ndpi_get_patricia_stats(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &s);
+      cumulative_stats.patricia_stats[i].n_search += s.n_search;
+      cumulative_stats.patricia_stats[i].n_found += s.n_found;
+    }
   }
 
   if(cumulative_stats.total_wire_bytes == 0)
