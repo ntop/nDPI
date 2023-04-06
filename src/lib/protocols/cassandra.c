@@ -119,7 +119,7 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
         ndpi_check_valid_cassandra_opcode(get_u_int8_t(packet->payload, 4)) &&
         ntohl(get_u_int32_t(packet->payload, 5)) <= CASSANDRA_MAX_BODY_SIZE &&
         ntohl(get_u_int32_t(packet->payload, 5)) >= (uint32_t) (packet->payload_packet_len - CASSANDRA_HEADER_LEN) &&
-        flow->l4.tcp.h323_valid_packets == 0 /* To avoid clashing with H323 */ &&
+        flow->h323_valid_packets == 0 /* To avoid clashing with H323 */ &&
         flow->socks4_stage == 0 /* To avoid clashing with SOCKS */) {
       if (flow->packet_counter > 3)
       {
