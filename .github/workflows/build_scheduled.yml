@@ -1,3 +1,4 @@
+name: Scheduled builds
 on:
   workflow_dispatch:
   schedule:
@@ -56,7 +57,7 @@ jobs:
           sudo apt-get install autoconf automake libtool pkg-config gettext flex bison doxygen
       - name: Configure nDPI library
         run: |
-          ./autogen.sh --with-only-libndpi --enable-option-checking=fatal
+          ./autogen.sh --with-only-libndpi --enable-option-checking=fatal --enable-debug-build
       - name: Generate Documentation
         run: |
           pip install --upgrade pip
