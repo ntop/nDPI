@@ -81,6 +81,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_data_entropy(a);
   ndpi_reset_data_analysis(a);
 
+  ndpi_hw_reset(&hw);
+
   /* Data ratio */
   if (num_values > 1)
     ndpi_data_ratio2str(ndpi_data_ratio(values[0], values[1]));

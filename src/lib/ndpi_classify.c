@@ -268,9 +268,11 @@ ndpi_merge_splt_arrays (const uint16_t *pkt_len, const pkt_timeval *pkt_time,
                         uint16_t *merged_lens, uint16_t *merged_times)
 {
   int s,r;
-  pkt_timeval ts_start = { 0, 0 }; /* initialize to avoid spurious warnings */
+  pkt_timeval ts_start;
   pkt_timeval tmp, tmp_r;
   pkt_timeval start_m;
+
+  ndpi_timer_clear(&ts_start);
 
   if(r_idx + s_idx == 0) {
     return ;
@@ -677,7 +679,7 @@ ndpi_timeval_to_microseconds(pkt_timeval ts)
 {
   u_int64_t sec = ts.tv_sec;
   u_int64_t usec = ts.tv_usec;
-  return usec + sec * 1000 * 1000;;
+  return usec + sec * 1000 * 1000;
 }
 
 /* **************************************** */

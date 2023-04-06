@@ -45,6 +45,10 @@
 
 #include "ndpi_includes.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* constants */
 #define NUM_PARAMETERS_SPLT_LOGREG 208
 #define NUM_PARAMETERS_BD_LOGREG 464
@@ -88,5 +92,9 @@ void ndpi_timer_clear(pkt_timeval *a);
 u_int64_t ndpi_timeval_to_milliseconds(pkt_timeval ts);
 u_int64_t ndpi_timeval_to_microseconds(pkt_timeval ts);
 void ndpi_log_timestamp(char *log_ts, u_int32_t log_ts_len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* NDPI_CLASSIFY_H */

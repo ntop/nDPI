@@ -5,7 +5,7 @@
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char *query;
-  char fingerprint[8];
+  struct libinjection_sqli_state state;
 
   /* No memory allocations involved */
 
@@ -15,11 +15,25 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   memcpy(query, data, size);
   query[size] = '\0';
 
-  libinjection_sqli(query, strlen(query), fingerprint);
+
+  libinjection_sqli_init(&state, query, strlen(query), 0); /* Default: FLAG_QUOTE_NONE | FLAG_SQL_ANSI */
+  libinjection_is_sqli(&state);
+  libinjection_sqli_init(&state, query, strlen(query), FLAG_QUOTE_SINGLE | FLAG_SQL_ANSI);
+  libinjection_is_sqli(&state);
+  libinjection_sqli_init(&state, query, strlen(query), FLAG_QUOTE_DOUBLE | FLAG_SQL_ANSI);
+  libinjection_is_sqli(&state);
+  libinjection_sqli_init(&state, query, strlen(query), FLAG_QUOTE_NONE | FLAG_SQL_MYSQL);
+  libinjection_is_sqli(&state);
+  libinjection_sqli_init(&state, query, strlen(query), FLAG_QUOTE_SINGLE | FLAG_SQL_MYSQL);
+  libinjection_is_sqli(&state);
+  libinjection_sqli_init(&state, query, strlen(query), FLAG_QUOTE_DOUBLE | FLAG_SQL_MYSQL);
+  libinjection_is_sqli(&state);
 
   libinjection_xss(query, strlen(query));
 
   free(query);
+
+  libinjection_version();
 
   return 0;
 }

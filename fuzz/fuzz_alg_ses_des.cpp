@@ -45,5 +45,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       ndpi_des_add_value(&d, value, &forecast, &confidence_band);
   }
 
+  ndpi_ses_reset(&s);
+  ndpi_des_reset(&d);
+
   return 0;
 }

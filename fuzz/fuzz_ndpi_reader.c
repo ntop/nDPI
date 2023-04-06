@@ -21,7 +21,7 @@ u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Sign
 ndpi_init_prefs init_prefs = ndpi_track_flow_payload | ndpi_enable_ja3_plus;
 int enable_malloc_bins = 1;
 int malloc_size_stats = 0;
-int max_malloc_bins = 0;
+int max_malloc_bins = 14;
 struct ndpi_bin malloc_bins; /* unused */
 
 extern void ndpi_report_payload_stats(int print);
