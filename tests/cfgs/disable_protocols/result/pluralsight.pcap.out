@@ -1,0 +1,35 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	33	(5.50 pkts/flow)
+Confidence DPI              : 6 (flows)
+Num dissector calls: 6 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/12/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          17/0 (search/found)
+Automa domain:        17/0 (search/found)
+Automa tls cert:      4/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  12/12 (search/found)
+Patricia risk mask:   12/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   8/4 (search/found)
+
+TLS	44	29652	6
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.128            	 1      
+
+
+	1	TCP 192.168.1.128:42642 <-> 54.69.188.18:443 [proto: 91/TLS][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][DPI packets: 7][cat: Web/5][3 pkts/849 bytes <-> 6 pkts/6252 bytes][Goodput ratio: 76/94][0.57 sec][Hostname/SNI: pluralsight.com][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.761 (Download)][IAT c2s/s2c min/avg/max/stddev: 188/0 191/76 194/194 3/93][Pkt Len c2s/s2c min/avg/max/stddev: 74/74 283/1042 583/1514 218/605][TLSv1.2][JA3C: cd08e31494f9531f560d64c695473da9][ServerNames: *.pluralsight.com,pluralsight.com][JA3S: 8d2a028aa94425f76ced7826b1f39039][Issuer: C=US, ST=Arizona, L=Scottsdale, O=GoDaddy.com, Inc., OU=http://certs.godaddy.com/repository/, CN=Go Daddy Secure Certificate Authority - G2][Subject: OU=Domain Control Validated, CN=*.pluralsight.com][Certificate SHA-1: 31:0B:3D:03:7A:6A:F8:86:8F:CE:62:30:E9:A2:F1:47:E5:6C:3D:F7][Chrome][Validity: 2020-05-02 16:02:08 - 2022-07-01 23:42:28][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,0,14,0,0,0,0,14,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,42,0,0]
+	2	TCP 192.168.1.128:42782 <-> 146.75.62.208:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 6][cat: Web/5][3 pkts/816 bytes <-> 6 pkts/5407 bytes][Goodput ratio: 75/93][0.05 sec][Hostname/SNI: pluralsight2.imgix.net][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.738 (Download)][IAT c2s/s2c min/avg/max/stddev: 15/0 17/7 19/19 2/9][Pkt Len c2s/s2c min/avg/max/stddev: 74/74 272/901 583/1406 223/547][TLSv1.2][JA3C: cd08e31494f9531f560d64c695473da9][ServerNames: *.imgix.com,*.imgix.net,imgix.com,imgix.net][JA3S: 16c0b3e6a7b8173c16d944cfeaeee9cf][Issuer: C=BE, O=GlobalSign nv-sa, CN=GlobalSign Atlas R3 DV TLS CA 2020][Subject: CN=*.imgix.com][Certificate SHA-1: C6:A8:D1:F3:16:08:C6:7F:9F:58:B9:3B:87:A6:A1:75:BC:67:F8:8D][Chrome][Validity: 2021-05-10 23:09:57 - 2022-06-11 23:09:56][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,14,0,0,0,0,0,14,0,0,0,0,0,0,0,14,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,0,0,0,0,0,0]
+	3	TCP 192.168.1.128:42790 <-> 146.75.62.208:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 6][cat: Web/5][3 pkts/816 bytes <-> 6 pkts/5407 bytes][Goodput ratio: 75/93][0.06 sec][Hostname/SNI: pluralsight.imgix.net][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.738 (Download)][IAT c2s/s2c min/avg/max/stddev: 18/0 23/8 28/22 5/10][Pkt Len c2s/s2c min/avg/max/stddev: 74/74 272/901 583/1406 223/547][TLSv1.2][JA3C: cd08e31494f9531f560d64c695473da9][ServerNames: *.imgix.com,*.imgix.net,imgix.com,imgix.net][JA3S: 16c0b3e6a7b8173c16d944cfeaeee9cf][Issuer: C=BE, O=GlobalSign nv-sa, CN=GlobalSign Atlas R3 DV TLS CA 2020][Subject: CN=*.imgix.com][Certificate SHA-1: C6:A8:D1:F3:16:08:C6:7F:9F:58:B9:3B:87:A6:A1:75:BC:67:F8:8D][Chrome][Validity: 2021-05-10 23:09:57 - 2022-06-11 23:09:56][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,14,0,0,0,0,0,14,0,0,0,0,0,0,0,14,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,0,0,0,0,0,0]
+	4	TCP 192.168.1.128:42618 <-> 18.203.201.56:443 [proto: 91/TLS][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][DPI packets: 6][cat: Web/5][3 pkts/849 bytes <-> 6 pkts/4806 bytes][Goodput ratio: 76/92][0.13 sec][Hostname/SNI: stt.pluralsight.com][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.700 (Download)][IAT c2s/s2c min/avg/max/stddev: 41/0 44/17 46/45 2/20][Pkt Len c2s/s2c min/avg/max/stddev: 74/73 283/801 583/1514 218/713][TLSv1.2][JA3C: cd08e31494f9531f560d64c695473da9][ServerNames: stt.pluralsight.com][JA3S: c4b2785a87896e19d37eee932070cb22][Issuer: C=US, O=DigiCert Inc, CN=DigiCert TLS RSA SHA256 2020 CA1][Subject: C=US, ST=California, L=San Jose, O=Adobe Systems Incorporated, CN=stt.pluralsight.com][Certificate SHA-1: C5:A3:DE:6D:71:B1:15:77:EC:86:38:E6:30:1C:F5:AC:18:9D:BE:82][Chrome][Validity: 2021-10-01 00:00:00 - 2022-10-01 23:59:59][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 14,14,0,14,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,0,0]
+	5	TCP 192.168.1.128:44770 <-> 104.17.209.240:443 [proto: 91/TLS][IP: 220/Cloudflare][Encrypted][Confidence: DPI][DPI packets: 4][cat: Web/5][2 pkts/645 bytes <-> 2 pkts/1580 bytes][Goodput ratio: 80/92][0.04 sec][Hostname/SNI: zn6qzq6caaucudesr-pluralsight.siteintercept.qualtrics.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][TLSv1.3][JA3C: cd08e31494f9531f560d64c695473da9][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
+	6	TCP 192.168.1.128:48948 <-> 104.19.162.127:443 [proto: 91/TLS][IP: 220/Cloudflare][Encrypted][Confidence: DPI][DPI packets: 4][cat: Web/5][2 pkts/645 bytes <-> 2 pkts/1580 bytes][Goodput ratio: 80/92][0.05 sec][Hostname/SNI: www.pluralsight.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][TLSv1.3][JA3C: cd08e31494f9531f560d64c695473da9][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]

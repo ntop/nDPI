@@ -1,0 +1,29 @@
+Guessed flow protos:	3
+
+DPI Packets (TCP):	20	(6.67 pkts/flow)
+Confidence Match by port    : 2 (flows)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 346 (115.33 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/6/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/2/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   6/0 (search/found)
+Patricia risk:        2/0 (search/found)
+Patricia protocols:   6/0 (search/found)
+
+HTTP	19	9442	2
+Microsoft	1	1506	1
+
+	1	TCP 192.168.2.100:50100 <-> 23.2.213.165:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 14][cat: Web/5][7 pkts/4746 bytes <-> 7 pkts/752 bytes][Goodput ratio: 92/39][5.01 sec][bytes ratio: 0.726 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 989/1236 2486/2486 1098/1096][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 678/107 1506/362 717/104][PLAIN TEXT (POST /fwlink/)][Plen Bins: 0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,0,0]
+	2	TCP 185.32.192.30:80 <-> 85.154.114.113:56028 [VLAN: 808][proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 5][cat: Web/5][3 pkts/2487 bytes <-> 2 pkts/1457 bytes][Goodput ratio: 92/92][0.34 sec][PLAIN TEXT (xml version)][Plen Bins: 0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+	3	TCP 192.168.2.100:50100 -> 23.2.213.165:4176 [proto: 7.212/HTTP.Microsoft][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Cloud/13][1 pkts/1506 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][Hostname/SNI: go.microsoft.com][URL: go.microsoft.com/fwlink/?LinkID=252669&clcid=0x409][StatusCode: 0][Req Content-Type: text/xml][User-Agent: MICROSOFT_DEVICE_METADATA_RETRIEVAL_CLIENT][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic][PLAIN TEXT (POST /fwlink/)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0]
