@@ -1206,6 +1206,17 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t _value, double 
   }
 }
 
+/* *********************************************************** */
+
+void ndpi_hw_reset(struct ndpi_hw_struct *hw) {
+  hw->prev_error.sum_square_error = 0, hw->prev_error.num_values_rollup = 0;
+  hw->num_values = 0;
+  hw->u = hw->v = hw->sum_square_error = 0;
+
+  memset(&hw->y, 0, (hw->params.num_season_periods * sizeof(u_int64_t)));
+  memset(&hw->s, 0, (hw->params.num_season_periods * sizeof(double)));
+}
+
 /* ********************************************************************************* */
 /* ********************************************************************************* */
 
@@ -1348,6 +1359,14 @@ int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const double _value, double 
 
 /* *********************************************************** */
 
+void ndpi_ses_reset(struct ndpi_ses_struct *ses) {
+  ses->prev_error.sum_square_error = 0, ses->prev_error.num_values_rollup = 0;
+  ses->num_values = 0;
+  ses->sum_square_error = ses->last_forecast = ses->last_value = 0;
+}
+
+/* *********************************************************** */
+
 /*
   Computes the best alpha value using the specified values used for training
 */
@@ -1428,6 +1447,14 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
   return(0);
 }
 
+/* *********************************************************** */
+
+void ndpi_des_reset(struct ndpi_des_struct *des) {
+  des->prev_error.sum_square_error = 0, des->prev_error.num_values_rollup = 0;
+  des->num_values = 0;
+  des->sum_square_error = des->last_forecast = des->last_trend = des->last_value = 0;
+}
+  
 /* *********************************************************** */
 
 /*

@@ -1714,13 +1714,15 @@ extern "C" {
 		    double alpha, double beta, double gamma, float significance);
   void ndpi_hw_free(struct ndpi_hw_struct *hw);
   int  ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t value, double *forecast,  double *confidence_band);
-
+  void ndpi_hw_reset(struct ndpi_hw_struct *hw);
+  
   /* ******************************* */
 
   int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance);
   int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const double _value, double *forecast, double *confidence_band);
   void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha);
-
+  void ndpi_ses_reset(struct ndpi_ses_struct *ses);
+  
   /* ******************************* */
 
   u_int32_t ndpi_crc32(const void* data, size_t n_bytes);
@@ -1730,7 +1732,8 @@ extern "C" {
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
   int ndpi_des_add_value(struct ndpi_des_struct *des, const double _value, double *forecast, double *confidence_band);
   void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, float *ret_beta);
-
+  void ndpi_des_reset(struct ndpi_des_struct *des);
+  
   /* ******************************* */
 
   int   ndpi_jitter_init(struct ndpi_jitter_struct *hw, u_int16_t num_periods);

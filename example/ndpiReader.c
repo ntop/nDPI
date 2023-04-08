@@ -1,7 +1,7 @@
 /*
  * ndpiReader.c
  *
- * Copyright (C) 2011-22 - ntop.org
+ * Copyright (C) 2011-23 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -158,7 +158,7 @@ typedef struct node_a {
 
 // struct to add more statitcs in function printFlowStats
 typedef struct hash_stats{
-  char* domain_name;  
+  char* domain_name;
   int occurency;       /* how many time domain name occury in the flow */
   UT_hash_handle hh;   /* hashtable to collect the stats */
 }hash_stats;
@@ -1575,20 +1575,20 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     case INFO_RTP:
       if(flow->rtp.stream_type != rtp_unknown) {
 	const char *what;
-	
+
 	switch(flow->rtp.stream_type) {
 	case rtp_screen_share:
 	  what = "screen_share";
 	  break;
-	  
+
 	case rtp_audio:
 	  what = "audio";
 	  break;
-	  
+
 	case rtp_video:
 	  what = "video";
 	  break;
-	  
+
 	case rtp_audio_video:
 	  what = "audio/video";
 	  break;
@@ -1597,7 +1597,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	  what = NULL;
 	  break;
 	}
-	
+
 	if(what)
 	  fprintf(out, "[RTP Stream Type: %s]", what);
       }
@@ -1654,7 +1654,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->http.server[0] != '\0')
       fprintf(out, "[Server: %s]", flow->http.server);
-    
+
     if(flow->http.user_agent[0] != '\0')
       fprintf(out, "[User-Agent: %s]", flow->http.user_agent);
 
@@ -1749,15 +1749,15 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->flow_payload && (flow->flow_payload_len > 0)) {
       u_int i;
-      
+
       printf("[Payload: ");
 
       for(i=0; i<flow->flow_payload_len; i++)
 	printf("%c", isspace(flow->flow_payload[i]) ? '.' : flow->flow_payload[i]);
-	
+
       printf("]");
     }
-    
+
     fprintf(out, "\n");
   }
 }
@@ -1940,7 +1940,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   u_int16_t thread_id = *((u_int16_t *) user_data), proto;
 
   if(flow == NULL) return;
-  
+
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if((!flow->detection_completed) && flow->ndpi_flow) {
       u_int8_t proto_guessed;
@@ -1958,7 +1958,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     proto = flow->detected_protocol.app_protocol ? flow->detected_protocol.app_protocol : flow->detected_protocol.master_protocol;
 
     proto = ndpi_map_user_proto_id_to_ndpi_id(ndpi_thread_info[thread_id].workflow->ndpi_struct, proto);
-    
+
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter[proto]       += flow->src2dst_packets + flow->dst2src_packets;
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[proto] += flow->src2dst_bytes + flow->dst2src_bytes;
     ndpi_thread_info[thread_id].workflow->stats.protocol_flows[proto]++;
@@ -2489,10 +2489,10 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
       label = &label[1];
     else
       label = _customCategoryFilePath;
-    
+
     ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath, label);
   }
-  
+
   if(_riskyDomainFilePath)
     ndpi_load_risk_domain_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _riskyDomainFilePath);
 
@@ -2724,7 +2724,7 @@ static void printRiskStats() {
 static int hash_stats_sort_to_order(void *_a, void *_b) {
   struct hash_stats *a = (struct hash_stats*)_a;
   struct hash_stats *b = (struct hash_stats*)_b;
-  
+
   return (a->occurency - b->occurency);
 }
 
@@ -2734,7 +2734,7 @@ static int hash_stats_sort_to_order(void *_a, void *_b) {
 static int hash_stats_sort_to_print(void *_a, void *_b) {
   struct hash_stats *a = (struct hash_stats*)_a;
   struct hash_stats *b = (struct hash_stats*)_b;
-  
+
   return (b->occurency - a->occurency);
 }
 
@@ -3102,15 +3102,15 @@ static void printFlowsStats() {
 		struct hash_stats *hostsHashT = NULL;
 		struct hash_stats *host_iter = NULL;
 		struct hash_stats *tmp = NULL;
-		int len_max = 0;    
-		      
+		int len_max = 0;
+
 	      	for (i = 0; i<num_flows; i++) {
-			
+
 		if(all_flows[i].flow->host_server_name[0] != '\0') {
-		
+
 			int len = strlen(all_flows[i].flow->host_server_name);
 			len_max = ndpi_max(len,len_max);
-				
+
 			struct hash_stats *hostFound;
 			HASH_FIND_STR(hostsHashT, all_flows[i].flow->host_server_name, hostFound);
 
@@ -3121,28 +3121,28 @@ static void printFlowsStats() {
 				if (HASH_COUNT(hostsHashT) == len_table_max) {
 				  int i=0;
 				  while (i<=toDelete) {
-					
+
 				    HASH_ITER(hh, hostsHashT, host_iter, tmp) {
 				      HASH_DEL(hostsHashT,host_iter);
 				      free(host_iter);
-				      i++;		
-				    }	
+				      i++;
+				    }
 				  }
-				      	
-				}			
+
+				}
 				HASH_ADD_KEYPTR(hh, hostsHashT, newHost->domain_name, strlen(newHost->domain_name), newHost);
-			}	
+			}
 			else
 			  hostFound->occurency++;
-			
-			
+
+
 		}
-		
+
 		if(all_flows[i].flow->ssh_tls.server_info[0] != '\0') {
-		
+
 			int len = strlen(all_flows[i].flow->host_server_name);
 			len_max = ndpi_max(len,len_max);
-				
+
 			struct hash_stats *hostFound;
 		  	HASH_FIND_STR(hostsHashT, all_flows[i].flow->ssh_tls.server_info, hostFound);
 
@@ -3150,41 +3150,41 @@ static void printFlowsStats() {
 		    		struct hash_stats *newHost = (struct hash_stats*)ndpi_malloc(sizeof(hash_stats));
 	      	    		newHost->domain_name = all_flows[i].flow->ssh_tls.server_info;
 		    		newHost->occurency = 1;
-	    
+
 	    			if ((HASH_COUNT(hostsHashT)) == len_table_max) {
 				  int i=0;
 				  while (i<toDelete) {
-		
+
 				    HASH_ITER(hh, hostsHashT, host_iter, tmp) {
 			 	     HASH_DEL(hostsHashT,host_iter);
 			  	    ndpi_free(host_iter);
-			   	   i++;		
+			   	   i++;
 			 	   }
-				  }	
-	      			
-	      	
+				  }
+
+
 	    			}
 				HASH_ADD_KEYPTR(hh, hostsHashT, newHost->domain_name, strlen(newHost->domain_name), newHost);
 			}
 			else
 			  hostFound->occurency++;
-			
-			
-		}	
-		
+
+
+		}
+
 		//sort the table by the least occurency
 		HASH_SORT(hostsHashT, hash_stats_sort_to_order);
 	}
 
 	//sort the table in decreasing order to print
       	HASH_SORT(hostsHashT, hash_stats_sort_to_print);
-      	
+
 	//print the element of the hash table
    	int j;
 	HASH_ITER(hh, hostsHashT, host_iter, tmp) {
-		
+
 		printf("\t%s", host_iter->domain_name);
-		//to print the occurency in aligned column	    	
+		//to print the occurency in aligned column
 		int diff = len_max-strlen(host_iter->domain_name);
 	    	for (j = 0; j <= diff+5;j++)
 	    		printf (" ");
@@ -3197,7 +3197,7 @@ static void printFlowsStats() {
 	   HASH_DEL(hostsHashT, host_iter);
 	   ndpi_free(host_iter);
 	}
-	    
+
   }
 
     /* Print all flows stats */
@@ -4030,7 +4030,7 @@ static void ndpi_process_packet(u_char *args,
   if(packet_checked == NULL) {
     return ;
   }
-  
+
   memcpy(packet_checked, packet, header->caplen);
   p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked, &flow_risk);
 
@@ -4880,6 +4880,7 @@ void sesUnitTest() {
   FILE *fd = fopen("/tmp/ses_result.csv", "w");
 
   assert(ndpi_ses_init(&ses, alpha, 0.05) == 0);
+  ndpi_ses_reset(&ses);
 
   if(trace) {
     printf("\nSingle Exponential Smoothing [alpha: %.1f]\n", alpha);
@@ -4952,6 +4953,7 @@ void desUnitTest() {
   FILE *fd = fopen("/tmp/des_result.csv", "w");
 
   assert(ndpi_des_init(&des, alpha, beta, 0.05) == 0);
+  ndpi_des_reset(&des);
 
   if(trace) {
     printf("\nDouble Exponential Smoothing [alpha: %.1f][beta: %.1f]\n", alpha, beta);
@@ -4994,6 +4996,7 @@ void desUnitStressTest() {
   double init_value = time(NULL) % 1000;
 
   assert(ndpi_des_init(&des, alpha, beta, 0.05) == 0);
+  ndpi_des_reset(&des);
 
   if(trace) {
     printf("\nDouble Exponential Smoothing [alpha: %.1f][beta: %.1f]\n", alpha, beta);
@@ -5042,6 +5045,7 @@ void hwUnitTest3() {
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.5, beta = 0.5, gamma = 0.1;
   assert(ndpi_hw_init(&hw, num_learning_points, 0 /* 0=multiplicative, 1=additive */, alpha, beta, gamma, 0.05) == 0);
+  ndpi_hw_reset(&hw);
 
   if(trace)
     printf("\nHolt-Winters [alpha: %.1f][beta: %.1f][gamma: %.1f]\n", alpha, beta, gamma);
@@ -5137,7 +5141,7 @@ void zscoreUnitTest() {
 
   if(do_trace) {
     printf("outliers: %u\n", num_outliers);
-    
+
     for(i=0; i<num; i++)
       printf("%u %s\n", values[i], outliers[i] ? "OUTLIER" : "OK");
   }
@@ -5255,7 +5259,7 @@ int main(int argc, char **argv) {
 #ifdef DEBUG_TRACE
   if(trace) fclose(trace);
 #endif
-  
+
   return 0;
 }
 
