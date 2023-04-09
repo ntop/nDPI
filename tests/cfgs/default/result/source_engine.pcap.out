@@ -1,0 +1,41 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	17	(1.00 pkts/flow)
+Confidence DPI              : 17 (flows)
+Num dissector calls: 17 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   34/0 (search/found)
+Patricia risk:        28/0 (search/found)
+Patricia protocols:   34/0 (search/found)
+
+Source_Engine	17	1139	17
+
+	1	UDP 118.149.186.147:21285 -> 206.125.246.214:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 140.151.209.84:8335 -> 206.125.246.214:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 151.182.246.17:17890 -> 206.125.246.221:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 151.182.246.17:52464 -> 206.125.246.217:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 165.165.117.188:48822 -> 206.125.246.211:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 167.166.182.152:53321 -> 206.125.246.212:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 174.134.158.83:47464 -> 206.125.246.217:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 197.114.186.247:38846 -> 206.125.246.222:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 197.114.186.247:41194 -> 206.125.246.214:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	UDP 197.114.186.247:64888 -> 206.125.246.213:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	11	UDP 222.158.181.242:58235 -> 206.125.246.222:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	12	UDP 222.204.159.87:20595 -> 206.125.246.211:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	UDP 237.117.153.178:24647 -> 206.125.246.215:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	14	UDP 237.117.185.247:41251 -> 206.125.246.219:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	15	UDP 237.139.153.112:3722 -> 206.125.246.219:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	16	UDP 252.141.177.26:21572 -> 206.125.246.216:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	17	UDP 252.187.173.26:42155 -> 206.125.246.211:27015 [proto: 333/Source_Engine][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
