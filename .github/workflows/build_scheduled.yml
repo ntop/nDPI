@@ -101,8 +101,11 @@ jobs:
         run: |
           ./tests/do.sh
           mkdir ndpi-performance-upload
-          mv -v tests/result/cpu_profile.png ndpi-performance-upload/cpu_profile.png
-          mv -v tests/result/heap_profile.png ndpi-performance-upload/heap_profile.png
+          for d in $(find ./tests/cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
+            PROFILE="$(basename $d)"
+            mv -v tests/cfgs/${PROFILE}/result/cpu_profile.png ndpi-performance-upload/${PROFILE}_cpu_profile.png
+            mv -v tests/cfgs/${PROFILE}/result/heap_profile.png ndpi-performance-upload/${PROFILE}_heap_profile.png
+          done
       - uses: actions/upload-artifact@v3
         with:
           name: ndpi-performance
