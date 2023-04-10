@@ -362,6 +362,7 @@ typedef enum {
   NDPI_PROTOCOL_TUYA_LP               = 331, /* TUYA LAN Protocol; IoT OS: https://github.com/tuya/tuya-iotos-embeded-sdk-wifi-ble-bk7231n */
   NDPI_PROTOCOL_TPLINK_SHP            = 332, /* TP-LINK Smart Home Protocol */
   NDPI_PROTOCOL_SOURCE_ENGINE         = 333,
+  NDPI_PROTOCOL_BACNET                = 334,
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
