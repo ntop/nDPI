@@ -4267,7 +4267,7 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
       buffer[i - 1] = '\0';
 
     if(ndpi_handle_rule(ndpi_str, buffer, 1) != 0)
-      printf("Discarded duplicated rule %s\n", buffer);
+      NDPI_LOG_INFO(ndpi_str, "Discraded rule '%s'\n", buffer);
   }
 
   rc = 0;
