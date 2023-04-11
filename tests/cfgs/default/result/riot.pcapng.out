@@ -1,0 +1,32 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	7	(3.50 pkts/flow)
+Confidence DPI (partial)    : 1 (flows)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 174 (87.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   1/1/0 (insert/search/found)
+LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          4/0 (search/found)
+Automa domain:        4/0 (search/found)
+Automa tls cert:      1/1 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  1/1 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   2/2 (search/found)
+
+AmazonAWS	3	4242	1
+RiotGames	4	4338	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+
+
+	1	TCP 35.234.85.218:443 -> 192.168.26.22:51949 [proto: 91.302/TLS.RiotGames][IP: 284/GoogleCloud][Encrypted][Confidence: DPI][DPI packets: 4][cat: Game/8][4 pkts/4338 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][0.00 sec][(Negotiated) ALPN: h2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][TLSv1.2][ServerNames: embed.rgpub.io,sites.rgpub.io,*.embed.rgpub.io,*.sites.rgpub.io][JA3S: 827b71c134bd28975c2d605a06ef00ef][Issuer: C=US, O=IdenTrust, OU=HydrantID Trusted Certificate Service, CN=HydrantID Server CA O1][Subject: CN=embed.rgpub.io, O=Riot Games Inc, L=Los Angeles, ST=California, C=US][Certificate SHA-1: CE:85:16:DF:E3:42:05:16:39:97:1F:6B:7A:53:22:22:C8:DD:66:44][Validity: 2022-12-08 19:52:14 - 2024-01-07 19:51:14][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0,0,0,0,0,0,0]
+	2	TCP 52.41.135.135:443 -> 192.168.26.22:51817 [proto: 91.265/TLS.AmazonAWS][IP: 265/AmazonAWS][Encrypted][Confidence: DPI (partial)][DPI packets: 3][cat: Cloud/13][3 pkts/4242 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (DigiCert Inc1)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,66,0,0,0,0]
