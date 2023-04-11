@@ -322,11 +322,6 @@ void ndpiCheckHostStringMatch(char *testChar) {
   ndpi_str = ndpi_init_detection_module(init_prefs);
   ndpi_finalize_initialization(ndpi_str);
 
-  // Display ALL Host strings ie host_match[] ?
-  // void ac_automata_display (AC_AUTOMATA_t * thiz, char repcast);
-  //
-  // ac_automata_display( module->host_automa.ac_automa, 'n');
-
   testRes =  ndpi_match_string_subprotocol(ndpi_str,
                                            testChar, strlen(testChar), &match);
 

@@ -306,8 +306,8 @@ void ndpi_add_user_proto_id_mapping(struct ndpi_detection_module_struct *ndpi_st
   if(ndpi_proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS)
     return; /* Nothing to map */
 
-#ifdef DEBUG
-  printf("*** %u (>= %u)-> %u\n",
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  NDPI_LOG_DBG2(ndpi_str, "[DEBUG] *** %u (>= %u)-> %u\n",
 	 ndpi_proto_id, NDPI_MAX_SUPPORTED_PROTOCOLS,
 	 user_proto_id);
 #endif
@@ -321,8 +321,8 @@ void ndpi_add_user_proto_id_mapping(struct ndpi_detection_module_struct *ndpi_st
 u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct *ndpi_str,
 					    u_int16_t user_proto_id) {
 
-#ifdef DEBUG
-  printf("***** %s(%u)\n", __FUNCTION__, user_proto_id);
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  NDPI_LOG_DBG2(ndpi_str, "[DEBUG] ***** %s(%u)\n", __FUNCTION__, user_proto_id);
 #endif
   
   if(user_proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS)
@@ -348,8 +348,8 @@ u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct 
 /* Map an internal nDPI protocol id to a custom user protocol */
 u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct *ndpi_str,
 						   u_int16_t ndpi_proto_id) {
-#ifdef DEBUG
-  printf("***** %s(%u)\n", __FUNCTION__, ndpi_proto_id);
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  NDPI_LOG_DBG2(ndpi_str, "[DEBUG] ***** %s(%u)\n", __FUNCTION__, ndpi_proto_id);
 #endif
   
   if(ndpi_proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS)
@@ -547,24 +547,18 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
   int j;
 
   if(!ndpi_is_valid_protoId(protoId)) {
-#ifdef DEBUG
     NDPI_LOG_ERR(ndpi_str, "[NDPI] %s/protoId=%d: INTERNAL ERROR\n", protoName, protoId);
-#endif
     return;
   }
 
   if(ndpi_str->proto_defaults[protoId].protoName != NULL) {
-#ifdef DEBUG
-    NDPI_LOG_ERR(ndpi_str, "[NDPI] %s/protoId=%d: already initialized. Ignoring it\n", protoName, protoId);
-#endif
+    NDPI_LOG_DBG2(ndpi_str, "[NDPI] %s/protoId=%d: already initialized. Ignoring it\n", protoName, protoId);
     return;
   }
 
   name = ndpi_strdup(protoName);
   if(!name) {
-#ifdef DEBUG
     NDPI_LOG_ERR(ndpi_str, "[NDPI] %s/protoId=%d: mem allocation error\n", protoName, protoId);
-#endif
     return;
   }
 
@@ -819,7 +813,7 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
 					 char *value, int protocol_id,
                                          ndpi_protocol_category_t category,
 					 ndpi_protocol_breed_t breed, u_int8_t level) {
-#ifndef DEBUG
+#ifndef NDPI_ENABLE_DEBUG_MESSAGES
   NDPI_LOG_DBG2(ndpi_str, "[NDPI] Adding [%s][%d]\n", value, protocol_id);
 #endif
 
@@ -954,9 +948,6 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
   ndpi_enable_loaded_categories(ndpi_str);
 
-#ifdef MATCH_DEBUG
-  // ac_automata_display(ndpi_str->host_automa.ac_automa, 'n');
-#endif
   if(!ndpi_xgrams_inited) {
     ndpi_xgrams_inited = 1;
     ndpi_xgrams_init(bigrams_bitmap,sizeof(bigrams_bitmap),
@@ -2572,7 +2563,7 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
   va_end(args);
 
   if(ndpi_str != NULL) {
-    printf("%s:%s:%-3d - [%s]: %s", file_name, func_name, line_number, ndpi_get_proto_name(ndpi_str, proto), str);
+    printf("%s:%s:%-3d - [%u]: %s", file_name, func_name, line_number, proto, str);
   } else {
     printf("Proto: %u, %s", proto, str);
   }
@@ -4299,7 +4290,7 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
     Compare specify protocol bitmask with main detection bitmask
   */
   if(is_proto_enabled(ndpi_str, ndpi_protocol_id)) {
-#ifdef DEBUG
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
     NDPI_LOG_DBG2(ndpi_str,
 		  "[NDPI] ndpi_set_bitmask_protocol_detection: %s : [callback_buffer] idx= %u, [proto_defaults] "
 		  "protocol_id=%u\n",
@@ -4309,7 +4300,7 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
     if(ndpi_str->proto_defaults[ndpi_protocol_id].protoIdx != 0) {
       NDPI_LOG_DBG2(ndpi_str, "[NDPI] Internal error: protocol %s/%u has been already registered\n", label,
 		    ndpi_protocol_id);
-#ifdef DEBUG
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
     } else {
       NDPI_LOG_DBG2(ndpi_str, "[NDPI] Adding %s with protocol id %d\n", label, ndpi_protocol_id);
 #endif
@@ -8463,7 +8454,7 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
   if(matching_protocol_id < 0)
     return NDPI_PROTOCOL_UNKNOWN;
 
-#ifdef DEBUG
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
   {
     char m[256];
     int len = ndpi_min(sizeof(m), string_to_match_len);
@@ -8489,7 +8480,7 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
     return(flow->detected_protocol_stack[0]);
   }
 
-#ifdef DEBUG
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
   {
     char m[256];
     int len = ndpi_min(sizeof(m), string_to_match_len);
@@ -8982,11 +8973,11 @@ int ndpi_get_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
 */
 u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_str,
 					struct ndpi_flow_struct *flow) {
-#if 0
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
   u_int16_t proto =
     flow->detected_protocol_stack[1] ? flow->detected_protocol_stack[1] : flow->detected_protocol_stack[0];
 
-  printf("[DEBUG] %s(%u.%u): %u\n", __FUNCTION__,
+  NDPI_LOG_DBG2(ndpi_str, "[DEBUG] %s(%u.%u): %u\n", __FUNCTION__,
 	 flow->detected_protocol_stack[0],
 	 flow->detected_protocol_stack[1],
 	 proto);
