@@ -7848,11 +7848,7 @@ u_int16_t ndpi_get_upper_proto(ndpi_protocol proto) {
 /* ****************************************************** */
 
 static ndpi_protocol ndpi_internal_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_str,
-							     struct ndpi_flow_struct *flow, u_int8_t proto,
-							     u_int32_t shost /* host byte order */, u_int16_t sport,
-							     u_int32_t dhost /* host byte order */, u_int16_t dport) {
-  u_int32_t rc;
-  struct in_addr addr;
+							     struct ndpi_flow_struct *flow, u_int8_t proto) {
   ndpi_protocol ret = NDPI_PROTOCOL_NULL;
   u_int8_t user_defined_proto;
 
@@ -7860,79 +7856,33 @@ static ndpi_protocol ndpi_internal_guess_undetected_protocol(struct ndpi_detecti
     return(ret);
 
 #ifdef BITTORRENT_CACHE_DEBUG
-  printf("[%s:%u] ndpi_guess_undetected_protocol(%08X, %u, %08X, %u) [flow: %p]\n",
-	 __FILE__, __LINE__, shost, sport, dhost, dport, flow);
+  printf("[%s:%u] [flow: %p] proto %u\n", __FILE__, __LINE__, flow, proto);
 #endif
 
-  if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
-    rc = ndpi_search_tcp_or_udp_raw(ndpi_str, flow, proto, shost, dhost, sport, dport);
+  if(flow && ((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP))) {
 
-    if(rc != NDPI_PROTOCOL_UNKNOWN) {
-      if(flow && (proto == IPPROTO_UDP) &&
-	 NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc) && is_udp_not_guessable_protocol(rc))
-	;
-      else {
-	ret.app_protocol = rc,
-	  ret.master_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
-
-	if(ret.app_protocol == ret.master_protocol)
-	  ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
-
-#ifdef BITTORRENT_CACHE_DEBUG
-	printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
-#endif
-
-	ret.category = ndpi_get_proto_category(ndpi_str, ret);
-	return(ret);
+    if(flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
+      if(flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
+        ret.master_protocol = flow->guessed_protocol_id;
+        ret.app_protocol = flow->guessed_protocol_id_by_ip;
+      } else {
+        ret.app_protocol = flow->guessed_protocol_id;
       }
+    } else {
+      ret.app_protocol = flow->guessed_protocol_id_by_ip;
     }
 
-    rc = ndpi_guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
-    if(rc != NDPI_PROTOCOL_UNKNOWN) {
-      if(flow && (proto == IPPROTO_UDP) &&
-	 NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, rc) && is_udp_not_guessable_protocol(rc))
-	;
-      else {
-	ret.app_protocol = rc;
-
-	if(rc == NDPI_PROTOCOL_TLS)
-	  goto check_guessed_skype;
-	else {
-#ifdef BITTORRENT_CACHE_DEBUG
-	  printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
-#endif
-
-	  ret.category = ndpi_get_proto_category(ndpi_str, ret);
-	  return(ret);
-	}
-      }
-    }
-
-    if(ndpi_search_into_bittorrent_cache(ndpi_str, NULL /* flow */,
-					 htonl(shost), htons(sport),
-					 htonl(dhost), htons(dport))) {
+    if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
+       !flow->is_ipv6 && /* TODO */
+       ndpi_search_into_bittorrent_cache(ndpi_str, flow,
+					 flow->c_address.v4, flow->c_port,
+					 flow->s_address.v4, flow->s_port)) {
       /* This looks like BitTorrent */
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
-      ret.category = ndpi_get_proto_category(ndpi_str, ret);
-
-#ifdef BITTORRENT_CACHE_DEBUG
-      printf("[%s:%u] Guessed %u.%u\n", __FILE__, __LINE__, ret.master_protocol, ret.app_protocol);
-#endif
-
-      return(ret);
     }
-
-  check_guessed_skype:
-    addr.s_addr = htonl(shost);
-    if(ndpi_network_ptree_match(ndpi_str, &addr) == NDPI_PROTOCOL_SKYPE_TEAMS) {
-      ret.app_protocol = NDPI_PROTOCOL_SKYPE_TEAMS;
-    } else {
-      addr.s_addr = htonl(dhost);
-      if(ndpi_network_ptree_match(ndpi_str, &addr) == NDPI_PROTOCOL_SKYPE_TEAMS)
-	ret.app_protocol = NDPI_PROTOCOL_SKYPE_TEAMS;
-    }
-  } else
-    ret.app_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
+  } else {
+    ret.app_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, 0, 0, &user_defined_proto);
+  }
 
   ret.category = ndpi_get_proto_category(ndpi_str, ret);
 
@@ -7946,11 +7896,8 @@ static ndpi_protocol ndpi_internal_guess_undetected_protocol(struct ndpi_detecti
 /* ****************************************************** */
 
 ndpi_protocol ndpi_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_str,
-					     struct ndpi_flow_struct *flow, u_int8_t proto,
-					     u_int32_t shost /* host byte order */, u_int16_t sport,
-					     u_int32_t dhost /* host byte order */, u_int16_t dport) {
-  ndpi_protocol p = ndpi_internal_guess_undetected_protocol(ndpi_str, flow, proto,
-							    shost, sport, dhost, dport);
+					     struct ndpi_flow_struct *flow, u_int8_t proto) {
+  ndpi_protocol p = ndpi_internal_guess_undetected_protocol(ndpi_str, flow, proto);
 
   p.master_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.master_protocol),
     p.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.app_protocol);

@@ -156,14 +156,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_flow_risk_info(&flow, out, sizeof(out), 1);
   ndpi_get_flow_ndpi_proto(ndpi_info_mod, &flow, &p2);
   ndpi_is_proto(p, NDPI_PROTOCOL_TLS);
-  /* ndpi_guess_undetected_protocol() is a "strange" function (since is ipv4 only)
-     but it is exported by the library and it is used by ntopng. Try fuzzing it, here */
+  /* ndpi_guess_undetected_protocol() is a "strange" function. Try fuzzing it, here */
   if(!ndpi_is_protocol_detected(ndpi_info_mod, p)) {
+    ndpi_guess_undetected_protocol(ndpi_info_mod, bool_value ? &flow : NULL,
+                                   flow.l4_proto);
     if(!flow.is_ipv6) {
-      ndpi_guess_undetected_protocol(ndpi_info_mod, bool_value ? &flow : NULL,
-                                     flow.l4_proto,
-                                     flow.c_address.v4, flow.s_address.v4,
-                                     flow.c_port, flow.s_port);
       /* Another "strange" function (ipv4 only): fuzz it here, for lack of a better alternative */
       ndpi_find_ipv4_category_userdata(ndpi_info_mod, flow.c_address.v4);
     }

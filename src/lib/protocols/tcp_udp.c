@@ -25,17 +25,10 @@
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
 				 u_int8_t protocol,
-				 u_int32_t saddr, u_int32_t daddr, /* host endianess */
-				 u_int16_t sport, u_int16_t dport) /* host endianess */
+				 u_int32_t saddr, u_int32_t daddr) /* host endianess */
 {
   u_int16_t rc;
   struct in_addr host;
-
-  if(protocol == IPPROTO_UDP) {
-    if((sport == dport) && (sport == 17500)) {
-      return(NDPI_PROTOCOL_DROPBOX);
-    }
-  }
 
   if(flow)
     return(flow->guessed_protocol_id_by_ip);
@@ -51,7 +44,6 @@ u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struc
 
 void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  u_int16_t sport, dport;
   u_int proto;
   struct ndpi_packet_struct *packet;
 
@@ -59,10 +51,6 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
     return;
 
   packet = &ndpi_struct->packet;
-
-  if(packet->udp) sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
-  else if(packet->tcp) sport = ntohs(packet->tcp->source), dport = ntohs(packet->tcp->dest);
-  else sport = dport = 0;
   
   if(packet->iph /* IPv4 Only: we need to support packet->iphv6 at some point */) {
     proto = ndpi_search_tcp_or_udp_raw(ndpi_struct,
@@ -70,8 +58,7 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
 				       packet->iph ? packet->iph->protocol :
 				       packet->iphv6->ip6_hdr.ip6_un1_nxt,
 				       ntohl(packet->iph->saddr), 
-				       ntohl(packet->iph->daddr),
-				       sport, dport);
+				       ntohl(packet->iph->daddr));
 
     if(proto != NDPI_PROTOCOL_UNKNOWN)
       ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_MATCH_BY_PORT);
