@@ -818,7 +818,7 @@ static void parseOptions(int argc, char **argv) {
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++)
     aggressiveness[i] = -1; /* Use the default value */
 
-  while((opt = getopt_long(argc, argv, "a:Ab:B:e:Ec:C:dDf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:w:zZ:q0123:456:7:89:m:MT:U:",
+  while((opt = getopt_long(argc, argv, "a:Ab:B:e:Ec:C:dDFf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:w:zZ:q0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");

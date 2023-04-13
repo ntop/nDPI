@@ -983,7 +983,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
 	*src_to_dst_direction = 1;
     }
     if(enable_flow_stats) {
-      if(src_to_dst_direction) {
+      if(*src_to_dst_direction) {
         if(rflow->entropy->src2dst_pkt_count < max_num_packets_per_flow) {
           rflow->entropy->src2dst_pkt_len[rflow->entropy->src2dst_pkt_count] = l4_data_len;
           rflow->entropy->src2dst_pkt_time[rflow->entropy->src2dst_pkt_count] = when;
