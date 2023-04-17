@@ -5605,8 +5605,9 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	}
       } else if(packet->payload_packet_len > 0) {
 	/* check tcp sequence counters */
-	if(((u_int32_t)(ntohl(tcph->seq) - flow->next_tcp_seq_nr[packet->packet_direction])) >
-	   ndpi_str->tcp_max_retransmission_window_size) {
+	int32_t seq_diff = (int32_t)(ntohl(tcph->seq) - flow->next_tcp_seq_nr[packet->packet_direction]);
+
+	if(seq_diff < -8 || seq_diff > (int32_t)ndpi_str->tcp_max_retransmission_window_size) {
 	  packet->tcp_retransmission = 1;
 
 	  /* CHECK IF PARTIAL RETRY IS HAPPENING */
@@ -5615,7 +5616,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	    if(flow->num_processed_pkts > 1) /* See also (***) above */
 	      flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
 	  }
-	}
+	} 
 	else {
 	  flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
 	}

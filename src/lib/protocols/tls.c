@@ -960,6 +960,22 @@ static void ndpi_looks_like_tls(struct ndpi_detection_module_struct *ndpi_struct
     flow->guessed_protocol_id = __get_master(ndpi_struct, flow);
 }
 
+static int tcp_ack_padding(struct ndpi_packet_struct *packet) {
+    const struct ndpi_tcphdr *tcph = packet->tcp;
+    if(tcph && tcph->ack && !tcph->syn &&
+        packet->payload_packet_len < 8 ) {
+            int i;
+            for(i=0; i < packet->payload_packet_len; i++) 
+                if(packet->payload[i] != 0)
+                    return 0;
+#ifdef DEBUG_TLS
+            printf("[TLS] Empty payload %d bytes\n",packet->payload_packet_len);
+#endif
+            return 1;
+    }
+    return 0;
+}    
+
 /* **************************************** */
 
 static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
@@ -977,7 +993,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
      generic "extra function" code doesn't honour protocol bitmask.
      TODO: handle that in ndpi_main.c for all the protocols */
   if(packet->payload_packet_len == 0 ||
-     packet->tcp_retransmission) {
+     packet->tcp_retransmission ||
+     tcp_ack_padding(packet)) {
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Ack or retransmission %d/%d. Skip\n",
            packet->payload_packet_len, packet->tcp_retransmission);
