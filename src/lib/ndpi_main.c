@@ -4914,7 +4914,7 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   init_oicq_dissector(ndpi_str, &a);
 
   /* Heroes of the Storm */
-  init_hots_dissector(ndpi_str, &a, detection_bitmask);
+  init_hots_dissector(ndpi_str, &a);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
