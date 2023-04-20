@@ -30,14 +30,14 @@
 static void ndpi_hots_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HOTS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-  NDPI_LOG_INFO(ndpi_struct, "found \"Heroes of the Storm\" packet\n");
+  NDPI_LOG_INFO(ndpi_struct, "found Heroes of the Storm packet\n");
 }
 
 void ndpi_search_hots(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  NDPI_LOG_DBG(ndpi_struct, "search \"Heroes of the Storm\"\n");
+  NDPI_LOG_DBG(ndpi_struct, "search Heroes of the Storm\n");
 
   if (packet->udp != NULL) {
     if (packet->udp->dest == ntohs(3724) || packet->udp->source == ntohs(3724)) {
@@ -50,7 +50,6 @@ void ndpi_search_hots(struct ndpi_detection_module_struct *ndpi_struct, struct n
                packet->payload[6] == 0x00 && packet->payload[7] == 0x00 && packet->payload[8] == 0x00 &&
                packet->payload[9] == 0x00 && packet->payload[10] == 0x00 && packet->payload[11] == 0x00 &&
                packet->payload[12] == 0x00 && packet->payload[13] == 0x00)) {
-                 NDPI_LOG_INFO(ndpi_struct, "found \"Heroes of the Storm\"\n");
                  ndpi_hots_add_connection(ndpi_struct, flow);
                  return;
           }
