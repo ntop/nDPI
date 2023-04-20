@@ -363,6 +363,7 @@ typedef enum {
   NDPI_PROTOCOL_TPLINK_SHP            = 332, /* TP-LINK Smart Home Protocol */
   NDPI_PROTOCOL_SOURCE_ENGINE         = 333,
   NDPI_PROTOCOL_BACNET                = 334,
+  NDPI_PROTOCOL_OICQ                  = 335,
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS

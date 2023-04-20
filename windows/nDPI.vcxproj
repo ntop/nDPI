@@ -261,6 +261,7 @@
     <ClCompile Include="..\src\lib\protocols\noe.c" />
     <ClCompile Include="..\src\lib\protocols\non_tcp_udp.c" />
     <ClCompile Include="..\src\lib\protocols\ntp.c" />
+    <ClCompile Include="..\src\lib\protocols\oicq.c" />
     <ClCompile Include="..\src\lib\protocols\openvpn.c" />
     <ClCompile Include="..\src\lib\protocols\oracle.c" />
     <ClCompile Include="..\src\lib\protocols\postgres.c" />
