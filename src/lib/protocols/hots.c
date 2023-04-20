@@ -39,20 +39,18 @@ void ndpi_search_hots(struct ndpi_detection_module_struct *ndpi_struct, struct n
 
   NDPI_LOG_DBG(ndpi_struct, "search Heroes of the Storm\n");
 
-  if (packet->udp != NULL) {
-    if (packet->udp->dest == ntohs(3724) || packet->udp->source == ntohs(3724)) {
-      if (packet->payload_packet_len >= 20 && packet->payload_packet_len <= 122) {
-        if (packet->payload[14] == 0x40 && packet->payload[15] == 0x00) {
-          if ((packet->payload[2] == 0x03 && packet->payload[3] == 0x00) ||
-              (packet->payload[2] == 0x34 && packet->payload[3] == 0x00) ||
-              (packet->payload[0] == 0x00 && packet->payload[1] == 0x00 && packet->payload[2] == 0x00 &&
-               packet->payload[3] == 0x00 && packet->payload[4] == 0x00 && packet->payload[5] == 0x00 &&
-               packet->payload[6] == 0x00 && packet->payload[7] == 0x00 && packet->payload[8] == 0x00 &&
-               packet->payload[9] == 0x00 && packet->payload[10] == 0x00 && packet->payload[11] == 0x00 &&
-               packet->payload[12] == 0x00 && packet->payload[13] == 0x00)) {
-                 ndpi_hots_add_connection(ndpi_struct, flow);
-                 return;
-          }
+  if (packet->udp->dest == ntohs(3724) || packet->udp->source == ntohs(3724)) {
+    if (packet->payload_packet_len >= 20 && packet->payload_packet_len <= 122) {
+      if (packet->payload[14] == 0x40 && packet->payload[15] == 0x00) {
+        if ((packet->payload[2] == 0x03 && packet->payload[3] == 0x00) ||
+            (packet->payload[2] == 0x34 && packet->payload[3] == 0x00) ||
+            (packet->payload[0] == 0x00 && packet->payload[1] == 0x00 && packet->payload[2] == 0x00 &&
+             packet->payload[3] == 0x00 && packet->payload[4] == 0x00 && packet->payload[5] == 0x00 &&
+             packet->payload[6] == 0x00 && packet->payload[7] == 0x00 && packet->payload[8] == 0x00 &&
+             packet->payload[9] == 0x00 && packet->payload[10] == 0x00 && packet->payload[11] == 0x00 &&
+             packet->payload[12] == 0x00 && packet->payload[13] == 0x00)) {
+               ndpi_hots_add_connection(ndpi_struct, flow);
+               return;
         }
       }
     }
