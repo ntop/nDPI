@@ -125,7 +125,11 @@
 #include "inc_generated/ndpi_asn_epicgames.c.inc"
 #include "inc_generated/ndpi_asn_nvidia.c.inc"
 #include "inc_generated/ndpi_asn_roblox.c.inc"
-
+#include "inc_generated/ndpi_domains_ms_office365_match.c.inc"
+#include "inc_generated/ndpi_domains_ms_onedrive_match.c.inc"
+#include "inc_generated/ndpi_domains_ms_outlook_match.c.inc"
+#include "inc_generated/ndpi_domains_ms_teams_match.c.inc"
+#include "inc_generated/ndpi_domains_ms_azure_match.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -970,6 +974,17 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
   for(i = 0; host_match[i].string_to_match != NULL; i++)
     ndpi_init_protocol_match(ndpi_str, &host_match[i]);
+
+  for(i = 0; teams_host_match[i].string_to_match != NULL; i++)
+    ndpi_init_protocol_match(ndpi_str, &teams_host_match[i]);
+  for(i = 0; outlook_host_match[i].string_to_match != NULL; i++)
+    ndpi_init_protocol_match(ndpi_str, &outlook_host_match[i]);
+  for(i = 0; ms_onedrive_host_match[i].string_to_match != NULL; i++)
+    ndpi_init_protocol_match(ndpi_str, &ms_onedrive_host_match[i]);
+  for(i = 0; microsoft365_host_match[i].string_to_match != NULL; i++)
+    ndpi_init_protocol_match(ndpi_str, &microsoft365_host_match[i]);
+  for(i = 0; azure_host_match[i].string_to_match != NULL; i++)
+    ndpi_init_protocol_match(ndpi_str, &azure_host_match[i]);
 
   /* ************************ */
 
@@ -2407,6 +2422,22 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Paltalk", NDPI_PROTOCOL_CATEGORY_CHAT,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MS_OUTLOOK,
+                          "Outlook", NDPI_PROTOCOL_CATEGORY_MAIL,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_MICROSOFT,
+                          "Microsoft", NDPI_PROTOCOL_CATEGORY_CLOUD,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MICROSOFT_365,
+                          "Microsoft365", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MS_ONE_DRIVE,
+                          "MS_OneDrive", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"

@@ -8,8 +8,8 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/3/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    4/3/0 (insert/search/found)
-Automa host:          40/13 (search/found)
+LRU cache fpc_dns:    3/3/0 (insert/search/found)
+Automa host:          40/11 (search/found)
 Automa domain:        39/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     11/2 (search/found)
@@ -22,7 +22,7 @@ Patricia protocols:   76/14 (search/found)
 Patricia protocols IPv6: 6/0 (search/found)
 
 Unknown	306	72708	3
-DNS	8	716	4
+DNS	10	1000	5
 MDNS	282	60976	9
 NetBIOS	3	276	1
 SSDP	15	2709	5
@@ -33,11 +33,10 @@ Dropbox	6	2228	3
 Google	6	5708	2
 Spotify	9	742	2
 Telegram	908	185304	12
-Microsoft	2	284	1
 GoogleServices	2	186	1
 
-Safe                             7 780           3            
-Acceptable                    1243 262352        39           
+Safe                             5 496           2            
+Acceptable                    1245 262636        40           
 Fun                              9 742           2            
 Dangerous                        1 243           1            
 Unrated                        306 72708         3            
@@ -74,7 +73,7 @@ Unrated                        306 72708         3
 	30	UDP 192.168.1.53:54306 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][2 pkts/336 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][2.00 sec][Hostname/SNI: 239.255.255.250:1900][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	UDP 192.168.1.77:5353 -> 192.168.1.53:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 8/MDNS, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/320 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][< 1 sec][Hostname/SNI: _companion-link._tcp.local][_companion-link._tcp.local][PLAIN TEXT (companion)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	UDP 192.168.1.77:54595 <-> 192.168.1.1:53 [proto: 5.26/DNS.ntop][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.26/DNS.ntop, Confidence: DPI][DPI packets: 3][cat: Network/14][2 pkts/166 bytes <-> 1 pkts/136 bytes][Goodput ratio: 49/69][8.49 sec][Hostname/SNI: b._dns-sd._udp.ntop.org][0.0.0.0][Risk: ** Error Code **][Risk Score: 10][Risk Info: DNS Error Code NXDOMAIN][PLAIN TEXT (postmaster)][Plen Bins: 0,66,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	33	UDP 192.168.1.77:52118 <-> 192.168.1.1:53 [proto: 5.212/DNS.Microsoft][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.212/DNS.Microsoft, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/75 bytes <-> 1 pkts/209 bytes][Goodput ratio: 43/80][0.01 sec][Hostname/SNI: in.appcenter.ms][20.44.78.251][PLAIN TEXT (appcenter)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	33	UDP 192.168.1.77:52118 <-> 192.168.1.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/75 bytes <-> 1 pkts/209 bytes][Goodput ratio: 43/80][0.01 sec][Hostname/SNI: in.appcenter.ms][20.44.78.251][PLAIN TEXT (appcenter)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	34	UDP 192.168.1.77:137 -> 192.168.1.255:137 [proto: 10/NetBIOS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 10/NetBIOS, Confidence: DPI][DPI packets: 1][cat: System/18][3 pkts/276 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][< 1 sec][Hostname/SNI: workgroup][PLAIN TEXT ( FHEPFCELEHFCEPFFFACACACACACACA)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	35	UDP 192.168.1.43:138 -> 192.168.1.255:138 [proto: 10.16/NetBIOS.SMBv1][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 10.16/NetBIOS.SMBv1, Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/243 bytes -> 0 pkts/0 bytes][Goodput ratio: 82/0][< 1 sec][Hostname/SNI: desktop-rb5t12g][PLAIN TEXT ( EEEFFDELFEEPFACNFCECDFFEDBDCEH)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	36	UDP 192.168.1.77:58615 <-> 192.168.1.1:53 [proto: 5.121/DNS.Dropbox][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.121/DNS.Dropbox, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/81 bytes <-> 1 pkts/123 bytes][Goodput ratio: 48/65][0.03 sec][Hostname/SNI: telemetry.dropbox.com][162.125.19.9][PLAIN TEXT (telemetry)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
