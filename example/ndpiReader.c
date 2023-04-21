@@ -126,7 +126,6 @@ static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 extern u_int8_t enable_doh_dot_detection;
 extern u_int32_t max_num_packets_per_flow, max_packet_payload_dissection, max_num_reported_top_payloads;
 extern u_int16_t min_pattern_len, max_pattern_len;
-extern void ndpi_self_check_host_match(); /* Self check function */
 u_int8_t dump_internal_stats;
 
 struct ndpi_bin malloc_bins;
@@ -827,7 +826,7 @@ static void parseOptions(int argc, char **argv) {
     switch (opt) {
     case 'a':
       ndpi_generate_options(atoi(optarg));
-      break;
+      exit(0);
 
     case 'A':
       dump_internal_stats = 1;
@@ -5198,7 +5197,7 @@ int main(int argc, char **argv) {
     bitmapUnitTest();
     automataUnitTest();
     analyzeUnitTest();
-    ndpi_self_check_host_match();
+    ndpi_self_check_host_match(stderr);
     analysisUnitTest();
     compressedBitmapUnitTest();
 #endif

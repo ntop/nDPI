@@ -118,7 +118,7 @@ do {                                                                            
 /* malloc failures result in lost memory, hash tables are unusable */
 
 #ifndef uthash_fatal
-#define uthash_fatal(msg) exit(-1)        /* fatal OOM error */
+#define uthash_fatal(msg) abort()         /* fatal OOM error */
 #endif
 
 #define HASH_RECORD_OOM(oomed) uthash_fatal("out of memory")
@@ -513,7 +513,7 @@ do {                                                                            
  */
 #ifdef HASH_DEBUG
 #include <stdio.h>   /* fprintf, stderr */
-#define HASH_OOPS(...) do { fprintf(stderr, __VA_ARGS__); exit(-1); } while (0)
+#define HASH_OOPS(...) do { fprintf(stderr, __VA_ARGS__); abort(); } while (0)
 #define HASH_FSCK(hh,head,where)                                                 \
 do {                                                                             \
   struct UT_hash_handle *_thh;                                                   \

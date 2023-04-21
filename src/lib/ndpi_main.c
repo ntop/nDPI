@@ -611,20 +611,6 @@ static int ndpi_default_ports_tree_node_t_cmp(const void *a, const void *b) {
 
 /* ******************************************************************** */
 
-void ndpi_default_ports_tree_node_t_walker(const void *node, const ndpi_VISIT which, const int depth) {
-  ndpi_default_ports_tree_node_t *f = *(ndpi_default_ports_tree_node_t **) node;
-
-  printf("<%d>Walk on node %s (%u)\n", depth,
-	 which == ndpi_preorder ?
-	 "ndpi_preorder" :
-	 which == ndpi_postorder ?
-	 "ndpi_postorder" :
-	 which == ndpi_endorder ? "ndpi_endorder" : which == ndpi_leaf ? "ndpi_leaf" : "unknown",
-	 f->default_port);
-}
-
-/* ******************************************************************** */
-
 static int addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
 			  ndpi_port_range *range,
 			  ndpi_proto_defaults_t *def,
@@ -875,16 +861,19 @@ void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str,
 /* ******************************************************************** */
 
 /* Self check function to be called only for testing purposes */
-void ndpi_self_check_host_match() {
+void ndpi_self_check_host_match(FILE *error_out) {
   u_int32_t i, j;
 
   for(i = 0; host_match[i].string_to_match != NULL; i++) {
     for(j = 0; host_match[j].string_to_match != NULL; j++) {
       if((i != j) && (strcmp(host_match[i].string_to_match, host_match[j].string_to_match) == 0)) {
-	printf("[INTERNAL ERROR]: Duplicate string detected '%s' [id: %u, id %u]\n",
-	       host_match[i].string_to_match, i, j);
-	printf("\nPlease fix host_match[] in ndpi_content_match.c.inc\n");
-	exit(0);
+        if (error_out != NULL) {
+          fprintf(error_out,
+                  "[NDPI] INTERNAL ERROR duplicate string detected '%s' [id: %u, id %u]\n",
+                  host_match[i].string_to_match, i, j);
+          fprintf(error_out, "\nPlease fix host_match[] in ndpi_content_match.c.inc\n");
+        }
+        abort();
       }
     }
   }
@@ -895,20 +884,34 @@ void ndpi_self_check_host_match() {
 #define XGRAMS_C 26
 static int ndpi_xgrams_inited = 0;
 static unsigned int bigrams_bitmap[(XGRAMS_C*XGRAMS_C+31)/32];
-static unsigned int imposible_bigrams_bitmap[(XGRAMS_C*XGRAMS_C+31)/32];
+static unsigned int impossible_bigrams_bitmap[(XGRAMS_C*XGRAMS_C+31)/32];
 static unsigned int trigrams_bitmap[(XGRAMS_C*XGRAMS_C*XGRAMS_C+31)/32];
 
 
-static void ndpi_xgrams_init(unsigned int *dst,size_t dn, const char **src,size_t sn, unsigned int l) {
+static void ndpi_xgrams_init(struct ndpi_detection_module_struct *ndpi_str,
+                             unsigned int *dst, size_t dn,
+                             const char **src, size_t sn,
+                             unsigned int l)
+{
   unsigned int i,j,c;
   for(i=0;i < sn && src[i]; i++) {
     for(j=0,c=0; j < l; j++) {
       unsigned char a = (unsigned char)src[i][j];
-      if(a < 'a' || a > 'z') { printf("%u: c%u %c\n",i,j,a); abort(); }
+      if(a < 'a' || a > 'z') {
+        NDPI_LOG_ERR(ndpi_str,
+                     "[NDPI] INTERNAL ERROR ndpi_xgrams_init %u: c%u %c\n",
+                     i,j,a);
+        abort();
+      }
       c *= XGRAMS_C;
       c += a - 'a';
     }
-    if(src[i][l]) { printf("%u: c[%d] != 0\n",i,l); abort(); }
+    if(src[i][l]) {
+      NDPI_LOG_ERR(ndpi_str,
+                   "[NDPI] INTERNAL ERROR ndpi_xgrams_init %u: c[%d] != 0\n",
+                   i,l);
+      abort();
+    }
     if((c >> 3) >= dn) abort();
     dst[c >> 5] |= 1u << (c & 0x1f);
   }
@@ -950,12 +953,12 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
   if(!ndpi_xgrams_inited) {
     ndpi_xgrams_inited = 1;
-    ndpi_xgrams_init(bigrams_bitmap,sizeof(bigrams_bitmap),
+    ndpi_xgrams_init(ndpi_str,bigrams_bitmap,sizeof(bigrams_bitmap),
 		     ndpi_en_bigrams,sizeof(ndpi_en_bigrams)/sizeof(ndpi_en_bigrams[0]), 2);
 
-    ndpi_xgrams_init(imposible_bigrams_bitmap,sizeof(imposible_bigrams_bitmap),
+    ndpi_xgrams_init(ndpi_str,impossible_bigrams_bitmap,sizeof(impossible_bigrams_bitmap),
 		     ndpi_en_impossible_bigrams,sizeof(ndpi_en_impossible_bigrams)/sizeof(ndpi_en_impossible_bigrams[0]), 2);
-    ndpi_xgrams_init(trigrams_bitmap,sizeof(trigrams_bitmap),
+    ndpi_xgrams_init(ndpi_str,trigrams_bitmap,sizeof(trigrams_bitmap),
 		     ndpi_en_trigrams,sizeof(ndpi_en_trigrams)/sizeof(ndpi_en_trigrams[0]), 3);
   }
 }
@@ -6184,9 +6187,7 @@ static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndp
  */
 static void ndpi_check_tcp_flags(struct ndpi_detection_module_struct *ndpi_str,
 				 struct ndpi_flow_struct *flow) {
-#if 0
-  printf("[TOTAL] %u / %u [tot: %u]\n", flow->packet_direction_complete_counter[0], flow->packet_direction_complete_counter[1], flow->all_packets_counter);
-#endif
+  // printf("[TOTAL] %u / %u [tot: %u]\n", flow->packet_direction_complete_counter[0], flow->packet_direction_complete_counter[1], flow->all_packets_counter);
 
   if((flow->l4.tcp.cli2srv_tcp_flags & TH_SYN)
      && (flow->l4.tcp.srv2cli_tcp_flags & TH_RST)
@@ -8271,8 +8272,6 @@ void ndpi_generate_options(u_int opt) {
     printf("WARNING: option -a out of range\n");
     break;
   }
-
-  exit(0);
 }
 
 /* ****************************************************** */
@@ -8577,7 +8576,7 @@ int ndpi_match_bigram(const char *str) {
 }
 
 int ndpi_match_impossible_bigram(const char *str) {
-  return ndpi_match_xgram(imposible_bigrams_bitmap, 2, str);
+  return ndpi_match_xgram(impossible_bigrams_bitmap, 2, str);
 }
 
 /* ****************************************************** */

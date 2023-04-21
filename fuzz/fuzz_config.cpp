@@ -6,8 +6,6 @@
 #include <assert.h>
 #include "fuzzer/FuzzedDataProvider.h"
 
-extern "C" void ndpi_self_check_host_match(); /* Self check function */
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   struct ndpi_detection_module_struct *ndpi_info_mod;
@@ -136,7 +134,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_num_supported_protocols(ndpi_info_mod);
   ndpi_get_ndpi_num_custom_protocols(ndpi_info_mod);
 
-  ndpi_self_check_host_match();
+  ndpi_self_check_host_match(stderr);
 
   /* Basic code to try testing this "config" */
   bool_value = fuzzed_data.ConsumeBool();
