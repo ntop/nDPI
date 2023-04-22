@@ -79,6 +79,7 @@ void init_hsrp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 void init_guildwars_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_h323_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_halflife2_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_hots_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_iax_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_icecast_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);

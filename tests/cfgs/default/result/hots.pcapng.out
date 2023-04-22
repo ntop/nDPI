@@ -1,0 +1,27 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	3	(1.00 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 330 (110.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   6/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   5/3 (search/found)
+
+Heroes_of_the_Storm	100	10145	3
+
+	1	UDP 24.105.57.16:3724 -> 192.168.0.73:50609 [proto: 336/Heroes_of_the_Storm][IP: 213/Starcraft][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][40 pkts/4753 bytes -> 0 pkts/0 bytes][Goodput ratio: 65/0][1.26 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 32/0 62/0 18/0][Pkt Len c2s/s2c min/avg/max/stddev: 62/0 119/0 164/0 34/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 22,0,47,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 24.105.57.183:1119 -> 192.168.0.73:50609 [proto: 336/Heroes_of_the_Storm][IP: 213/Starcraft][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][25 pkts/2978 bytes -> 0 pkts/0 bytes][Goodput ratio: 65/0][0.94 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 6/0 38/0 63/0 22/0][Pkt Len c2s/s2c min/avg/max/stddev: 62/0 119/0 158/0 21/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 4,24,40,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.0.73:54598 <-> 24.105.56.13:3724 [proto: 336/Heroes_of_the_Storm][IP: 213/Starcraft][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][14 pkts/908 bytes <-> 21 pkts/1506 bytes][Goodput ratio: 35/41][92.43 sec][bytes ratio: -0.248 (Download)][IAT c2s/s2c min/avg/max/stddev: 3/17 42/51 66/63 22/16][Pkt Len c2s/s2c min/avg/max/stddev: 62/62 65/72 66/74 2/5][Plen Bins: 51,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
