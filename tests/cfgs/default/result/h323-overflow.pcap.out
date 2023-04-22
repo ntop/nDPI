@@ -1,8 +1,8 @@
 Guessed flow protos:	1
 
 DPI Packets (TCP):	1	(1.00 pkts/flow)
-Confidence Match by port    : 1 (flows)
-Num dissector calls: 116 (116.00 diss/flow)
+Confidence nBPF             : 1 (flows)
+Num dissector calls: 0 (0.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -16,10 +16,13 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia protocols:   0/0 (search/found)
 
-HTTP	1	58	1
+Unknown	1	58	1
 
-	1	TCP 192.168.1.1:31337 -> 192.168.1.2:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 1][cat: Web/5][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	TCP 192.168.1.1:31337 -> 192.168.1.2:80 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: nBPF][DPI packets: 1][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
