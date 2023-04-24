@@ -36,11 +36,11 @@ static void ndpi_hots_add_connection(struct ndpi_detection_module_struct *ndpi_s
 void ndpi_search_hots(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  int i, ports[4] = {1119, 1120, 3724, 6113};
 
   NDPI_LOG_DBG(ndpi_struct, "search Heroes of the Storm\n");
 
-  int ports[4] = {1119, 1120, 3724, 6113};
-  for (int i = 0; i < 4; i++) {
+  for (i = 0; i < 4; i++) {
     if (packet->udp->dest == ntohs(ports[i]) || packet->udp->source == ntohs(ports[i])) {
       if (packet->payload_packet_len >= 20 && packet->payload_packet_len <= 122) {
         if (packet->payload[14] == 0x40 && packet->payload[15] == 0x00) {
