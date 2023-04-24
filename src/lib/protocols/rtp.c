@@ -165,8 +165,8 @@ static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
 
 static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
-			    u_int8_t * payload, u_int16_t payload_len) {
-  u_int8_t payloadType, payload_type;
+			    const u_int8_t * payload, u_int16_t payload_len) {
+  u_int8_t payload_type;
   u_int16_t s_port = ntohs(ndpi_struct->packet.udp->source), d_port = ntohs(ndpi_struct->packet.udp->dest), payload_offset;
   u_int8_t is_rtp, zoom_stream_type;
 
@@ -241,17 +241,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 				 NDPI_CONFIDENCE_DPI);
       return;
     }
-  } else if((payload_len >= 12)
-	    && (((payload[0] & 0xFF) == 0x80)
-		|| ((payload[0] & 0xFF) == 0xA0)
-		|| ((payload[0] & 0xFF) == 0x90)
-		) /* RTP magic byte[1] */
-	    && (payloadType = isValidMSRTPType(payload[1] & 0xFF, &flow->protos.rtp.stream_type))) {
-    if(payloadType == 1 /* RTP */) {
-      NDPI_LOG_INFO(ndpi_struct, "Found Skype for Business (former MS Lync)\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      return;
-    }
   }
 
   /* No luck this time */
@@ -273,7 +262,7 @@ static void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, st
   if((source != 30303) && (dest != 30303 /* Avoid to mix it with Ethereum that looks alike */)
      && (dest > 1023)
      )
-    ndpi_rtp_search(ndpi_struct, flow, (u_int8_t*)packet->payload, packet->payload_packet_len);
+    ndpi_rtp_search(ndpi_struct, flow, packet->payload, packet->payload_packet_len);
   else
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
