@@ -5737,9 +5737,6 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* VIBER */
   init_viber_dissector(ndpi_str, &a);
 
-  /* SKYPE */
-  init_skype_dissector(ndpi_str, &a);
-
   /* BITTORRENT */
   init_bittorrent_dissector(ndpi_str, &a);
 

@@ -623,7 +623,6 @@ void init_shoutcast_dissector(struct ndpi_detection_module_struct *ndpi_struct, 
 void init_sip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_imo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_skinny_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_skype_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_smb_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_snmp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_socrates_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
