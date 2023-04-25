@@ -28,10 +28,25 @@
 
 #include "ndpi_api.h"
 
+#define RTP_MIN_HEADER	12
+#define RTCP_MIN_HEADER	8
 
-/* http://www.myskypelab.com/2014/05/microsoft-lync-wireshark-plugin.html */
+enum {
+  NO_RTP_RTCP = 0,
+  IS_RTP = 1,
+  IS_RTCP = 2,
+};
 
-static u_int8_t isValidMSRTPType(u_int8_t payloadType, enum ndpi_rtp_stream_type *s_type) {
+/* https://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
+int is_valid_rtp_payload_type(uint8_t type)
+{
+  if(!(type <= 34 || (type >= 96 && type <= 127)))
+    return 0;
+  return 1;
+}
+
+u_int8_t rtp_get_stream_type(u_int8_t payloadType, enum ndpi_rtp_stream_type *s_type)
+{
   switch(payloadType) {
   case 0: /* G.711 u-Law */
   case 3: /* GSM 6.10 */
@@ -71,14 +86,14 @@ static u_int8_t isValidMSRTPType(u_int8_t payloadType, enum ndpi_rtp_stream_type
     return(2 /* RTCP */);
 
   default:
+    *s_type = rtp_unknown;
     return(0);
   }
 }
 
-int is_valid_rtp_payload_type(uint8_t type)
+static int is_valid_rtcp_payload_type(uint8_t type)
 {
-  /* https://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
-  return type <= 34 || (type >= 96 && type <= 127);
+  return (type >= 192 && type <= 213);
 }
 
 /* *************************************************************** */
@@ -165,25 +180,83 @@ static u_int8_t isZoom(struct ndpi_flow_struct *flow,
   return(0);
 }
 
+int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
+		   struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int8_t padding, csrc_count, ext_header;
+  u_int16_t ext_len;
+  u_int32_t min_len;
+  const u_int8_t *payload = packet->payload;
+  const u_int16_t payload_len = packet->payload_packet_len;
+
+  if(payload_len < 2)
+    return NO_RTP_RTCP;
+
+  if((payload[0] & 0xC0) != 0x80) { /* Version 2 */
+    NDPI_LOG_DBG(ndpi_struct, "Not version 2\n");
+    return NO_RTP_RTCP;
+  }
+
+  if(is_valid_rtp_payload_type(payload[1] & 0x7F) &&
+     payload_len >= RTP_MIN_HEADER) {
+    /* RTP */
+    csrc_count = payload[0] & 0x0F;
+    padding = payload[0] & 0x20;
+    ext_header =  !!(payload[0] & 0x10);
+    min_len = RTP_MIN_HEADER + 4 * csrc_count + 4 * ext_header;
+    if(ext_header) {
+      if(min_len > payload_len) {
+        NDPI_LOG_DBG(ndpi_struct, "Too short (a) %d vs %d\n", min_len, payload_len);
+        return NO_RTP_RTCP;
+      }
+      ext_len = ntohs(*(unsigned short *)&payload[min_len - 2]);
+      min_len += ext_len * 4;
+    }
+    if(min_len > payload_len) {
+      NDPI_LOG_DBG(ndpi_struct, "Too short (b) %d vs %d\n", min_len, payload_len);
+      return NO_RTP_RTCP;
+    }
+    /* TODO: this check doesn't work if we have multiple RTP packets in the
+       same UDP datagram */
+    if(padding &&
+       min_len + payload[payload_len - 1] > payload_len) {
+      NDPI_LOG_DBG(ndpi_struct, "Invalid padding len %d\n", payload[payload_len - 1]);
+      return NO_RTP_RTCP;
+    }
+    return IS_RTP;
+  } else if(is_valid_rtcp_payload_type(payload[1]) &&
+            payload_len >= RTCP_MIN_HEADER) {
+    min_len = (ntohs(*(unsigned short *)&payload[2]) + 1) * 4;
+    if(min_len > payload_len) {
+      NDPI_LOG_DBG(ndpi_struct, "Too short (c) %d vs %d\n", min_len, payload_len);
+      return NO_RTP_RTCP;
+    }
+    return IS_RTCP;
+  }
+  NDPI_LOG_DBG(ndpi_struct, "not RTP/RTCP\n");
+  return NO_RTP_RTCP;
+}
+
 /* *************************************************************** */
 
 static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
-			    struct ndpi_flow_struct *flow,
-			    const u_int8_t * payload, u_int16_t payload_len) {
-  u_int8_t payload_type;
-  u_int16_t s_port = ntohs(ndpi_struct->packet.udp->source), d_port = ntohs(ndpi_struct->packet.udp->dest), payload_offset;
+			    struct ndpi_flow_struct *flow) {
   u_int8_t is_rtp, zoom_stream_type;
+  u_int16_t s_port = ntohs(ndpi_struct->packet.udp->source), d_port = ntohs(ndpi_struct->packet.udp->dest), payload_offset;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  const u_int8_t *payload = packet->payload;
+  const u_int16_t payload_len = packet->payload_packet_len;
 
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
-  if((payload_len < 2)
-     || (d_port == 5355 /* LLMNR_PORT */)
-     || (d_port == 5353 /* MDNS_PORT */)
-     ) {
+  if(d_port == 5355 || /* LLMNR_PORT */
+     d_port == 5353    /* MDNS_PORT */) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
+  /* TODO: should we move zoom stuff in a new, separated dissector? */
   if(isZoom(flow, s_port, d_port, payload, payload_len,
 	    &is_rtp, &zoom_stream_type, &payload_offset)) {
     if(payload_offset < payload_len) {
@@ -221,42 +294,51 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  payload_type = payload[1] & 0x7F;
+  /* * Let some "unknown" packets at the beginning
+     * search for 3 consecutive RTP/RTCP packets
+   */
 
-  /* Check whether this is an RTP flow */
-  if((payload_len >= 12)
-     && (((payload[0] & 0xFF) == 0x80)
-	 || ((payload[0] & 0xFF) == 0xA0)
-	 || ((payload[0] & 0xFF) == 0x90)
-	 ) /* RTP magic byte [1] */
-     && ((payload_type < 72) || (payload_type > 76))
-     && (is_valid_rtp_payload_type(payload_type))
-     ) {
-    if(flow->l4.udp.line_pkts[0] >= 2 && flow->l4.udp.line_pkts[1] >= 2) {
-      /* It seems that it is a LINE stuff; let its dissector to evaluate */
-      return;
-    } else {
-      isValidMSRTPType(payload_type, &flow->protos.rtp.stream_type);
+  if(flow->packet_counter > 3 &&
+     flow->l4.udp.rtp_stage == 0) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
 
-      /* Previous pkts were STUN */
-      if(flow->stun.num_binding_requests > 0 ||
-         flow->stun.num_processed_pkts > 0) {
-        NDPI_LOG_INFO(ndpi_struct, "Found RTP (previous traffic was STUN)\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow,
-				   NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_STUN,
-				   NDPI_CONFIDENCE_DPI);
+  is_rtp = is_rtp_or_rtcp(ndpi_struct, flow);
+  if(is_rtp == IS_RTP) {
+    if(flow->l4.udp.rtp_stage == 2) {
+      if(flow->l4.udp.line_pkts[0] >= 2 && flow->l4.udp.line_pkts[1] >= 2) {
+        /* It seems that it is a LINE stuff; let its dissector to evaluate */
+      } else if(flow->l4.udp.epicgames_stage > 0) {
+        /* It seems that it is a EpicGames stuff; let its dissector to evaluate */
       } else {
-        NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow,
-				   NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP,
-				   NDPI_CONFIDENCE_DPI);
+        rtp_get_stream_type(payload[1] & 0x7F, &flow->protos.rtp.stream_type);
+
+	/* Previous pkts were STUN */
+        if(flow->stun.num_binding_requests > 0 ||
+           flow->stun.num_processed_pkts > 0) {
+          NDPI_LOG_INFO(ndpi_struct, "Found RTP (previous traffic was STUN)\n");
+          ndpi_set_detected_protocol(ndpi_struct, flow,
+                                     NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_STUN,
+                                     NDPI_CONFIDENCE_DPI);
+        } else {
+          NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
+          ndpi_set_detected_protocol(ndpi_struct, flow,
+                                     NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP,
+                                     NDPI_CONFIDENCE_DPI);
+	}
       }
       return;
     }
+    flow->l4.udp.rtp_stage += 1;
+  } else if(is_rtp == IS_RTCP && flow->l4.udp.rtp_stage > 0) {
+    /* RTCP after (some) RTP. Keep looking for RTP */
+  } else {
+    if(flow->l4.udp.rtp_stage) {
+      flow->l4.udp.rtp_stage = 0;
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    }
   }
-
-  /* No luck this time */
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 /* *************************************************************** */
@@ -274,7 +356,7 @@ static void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, st
   if((source != 30303) && (dest != 30303 /* Avoid to mix it with Ethereum that looks alike */)
      && (dest > 1023)
      )
-    ndpi_rtp_search(ndpi_struct, flow, packet->payload, packet->payload_packet_len);
+    ndpi_rtp_search(ndpi_struct, flow);
   else
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
