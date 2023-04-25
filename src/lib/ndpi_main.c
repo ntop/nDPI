@@ -2962,6 +2962,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   ndpi_str->aggressiveness_ookla = NDPI_AGGRESSIVENESS_OOKLA_TLS;
 
+  if(prefs & ndpi_enable_tcp_ack_payload_heuristic)
+    ndpi_str->tcp_ack_paylod_heuristic = 1;
+
   for(i = 0; i < NUM_CUSTOM_CATEGORIES; i++)
     ndpi_snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
 	     (unsigned int) (i + 1));
@@ -5509,6 +5512,20 @@ static u_int8_t ndpi_is_multi_or_broadcast(struct ndpi_packet_struct *packet) {
 
 /* ************************************************ */
 
+static int tcp_ack_padding(struct ndpi_packet_struct *packet) {
+  const struct ndpi_tcphdr *tcph = packet->tcp;
+  if(tcph && tcph->ack && !tcph->psh &&
+     packet->payload_packet_len < 8 &&
+     packet->payload_packet_len > 1 /* To avoid TCP keep-alives */) {
+    int i;
+    for(i = 0; i < packet->payload_packet_len; i++)
+      if(packet->payload[i] != 0)
+        return 0;
+    return 1;
+  }
+  return 0;
+}
+
 void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 			      struct ndpi_flow_struct *flow) {
   if(!flow) {
@@ -5597,7 +5614,10 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	}
       }
 
-      if(flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0 ||
+      if(ndpi_str->tcp_ack_paylod_heuristic && tcp_ack_padding(packet)) {
+        NDPI_LOG_DBG2(ndpi_str, "TCP ACK with zero padding. Ignoring\n");
+        packet->tcp_retransmission = 1;
+      } else if(flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0 ||
 	 (tcph->syn && flow->packet_counter == 0)) {
 	/* initialize tcp sequence counters */
 	/* the ack flag needs to be set to get valid sequence numbers from the other

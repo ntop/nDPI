@@ -1273,6 +1273,8 @@ struct ndpi_detection_module_struct {
 
   u_int32_t aggressiveness_ookla;
 
+  int tcp_ack_paylod_heuristic;
+
   u_int16_t ndpi_to_user_proto_id[NDPI_MAX_NUM_CUSTOM_PROTOCOLS]; /* custom protocolId mapping */
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
@@ -1691,6 +1693,17 @@ typedef enum {
     ndpi_dont_init_risk_ptree      = (1 << 14),
     ndpi_dont_load_cachefly_list   = (1 << 15),
     ndpi_track_flow_payload        = (1 << 16),
+    /* In some networks, there are some anomalous TCP flows where
+       the smallest ACK packets have some kind of zero padding.
+       It looks like the IP and TCP headers in those frames wrongly consider the
+       0x00 Ethernet padding bytes as part of the TCP payload.
+       While this kind of packets is perfectly valid per-se, in some conditions
+       they might be treated by the TCP reassembler logic as (partial) overlaps,
+       deceiving the classification engine.
+       Add an heuristic to detect these packets and to ignore them, allowing
+       correct detection/classification.
+       See #1946 for other details */
+    ndpi_enable_tcp_ack_payload_heuristic = (1 << 17),
   } ndpi_prefs;
 
 typedef struct {
