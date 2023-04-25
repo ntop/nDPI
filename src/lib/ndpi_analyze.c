@@ -1096,6 +1096,7 @@ int ndpi_hw_init(struct ndpi_hw_struct *hw,
 
   if((hw->s = (double*)ndpi_calloc(hw->params.num_season_periods, sizeof(double))) == NULL) {
     ndpi_free(hw->y);
+    hw->y = NULL;
     return(-1);
   }
 
@@ -1213,8 +1214,10 @@ void ndpi_hw_reset(struct ndpi_hw_struct *hw) {
   hw->num_values = 0;
   hw->u = hw->v = hw->sum_square_error = 0;
 
-  memset(&hw->y, 0, (hw->params.num_season_periods * sizeof(u_int64_t)));
-  memset(&hw->s, 0, (hw->params.num_season_periods * sizeof(double)));
+  if(hw->y)
+    memset(hw->y, 0, (hw->params.num_season_periods * sizeof(u_int64_t)));
+  if(hw->s)
+    memset(hw->s, 0, (hw->params.num_season_periods * sizeof(double)));
 }
 
 /* ********************************************************************************* */

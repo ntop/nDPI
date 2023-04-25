@@ -2018,39 +2018,30 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_POSSIBLE_EXPLOIT:
     return("Possible Exploit");
-    break;
 
   case NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE:
     return("TLS Cert About To Expire");
-    break;
 
   case NDPI_PUNYCODE_IDN:
     return("IDN Domain Name");
-    break;
 
   case NDPI_ERROR_CODE_DETECTED:
     return("Error Code");
-    break;
 
   case NDPI_HTTP_CRAWLER_BOT:
     return("Crawler/Bot");
-    break;
 
   case NDPI_ANONYMOUS_SUBSCRIBER:
     return("Anonymous Subscriber");
-    break;
 
   case NDPI_UNIDIRECTIONAL_TRAFFIC:
     return("Unidirectional Traffic");
-    break;
 
   case NDPI_HTTP_OBSOLETE_SERVER:
     return("HTTP Obsolete Server");
-    break;
 
   case NDPI_PERIODIC_FLOW:
     return("Periodic Flow");
-    break;
 
   case NDPI_MINOR_ISSUES:
     return("Minor Issues");
@@ -2070,27 +2061,21 @@ const char* ndpi_severity2str(ndpi_risk_severity s) {
   switch(s) {
   case NDPI_RISK_LOW:
     return("Low");
-    break;
 
   case NDPI_RISK_MEDIUM:
     return("Medium");
-    break;
 
   case NDPI_RISK_HIGH:
     return("High");
-    break;
 
   case NDPI_RISK_SEVERE:
     return("Severe");
-    break;
 
   case NDPI_RISK_CRITICAL:
     return("Critical");
-    break;
     
   case NDPI_RISK_EMERGENCY:
     return("Emergency");
-    break;
   }
 
   return("");
@@ -2367,7 +2352,7 @@ static u_int8_t ndpi_check_hostname_risk_exception(struct ndpi_detection_module_
     ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
     u_int8_t ret = 0;
     
-    if(automa->ac_automa) {
+    if(automa && automa->ac_automa) {
       AC_TEXT_t ac_input_text;
       AC_REP_t match;
 
@@ -2879,6 +2864,9 @@ u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *nd
 					 u_int num_params,
 					 ndpi_risk_params params[]) {
   u_int i;
+
+  if(!ndpi_str)
+    return(0);
 
   for(i=0; i<num_params; i++) {
     switch(params[i].id) {

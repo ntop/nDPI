@@ -47,8 +47,8 @@ fuzz_ndpi_reader_alloc_fail_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAG
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_alloc_fail_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_payload_analyzer_SOURCES = fuzz_ndpi_reader.c ../example/reader_util.c
-fuzz_ndpi_reader_payload_analyzer_CFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -DENABLE_PAYLOAD_ANALYZER
+fuzz_ndpi_reader_payload_analyzer_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c
+fuzz_ndpi_reader_payload_analyzer_CFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -DENABLE_MEM_ALLOC_FAILURES -DENABLE_PAYLOAD_ANALYZER
 fuzz_ndpi_reader_payload_analyzer_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_payload_analyzer_LDFLAGS = $(PCAP_LIB) $(LIBS)
 if HAS_FUZZLDFLAGS

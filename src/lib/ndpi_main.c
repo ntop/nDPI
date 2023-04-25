@@ -2287,7 +2287,7 @@ u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_str
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
-  if(!ndpi_str->protocols_ptree)
+  if(!ndpi_str || !ndpi_str->protocols_ptree)
     return(NDPI_PROTOCOL_UNKNOWN);
 
   if(ndpi_str->ndpi_num_custom_protocols == 0) {
@@ -2318,7 +2318,7 @@ u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndp
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
-  if(!ndpi_str->protocols_ptree)
+  if(!ndpi_str || !ndpi_str->protocols_ptree)
     return(NDPI_PROTOCOL_UNKNOWN);
 
   if(ndpi_str->ndpi_num_custom_protocols == 0) {
@@ -7498,8 +7498,12 @@ void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_s
 
 u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi_str,
 				       u_int16_t counter) {
-  struct ndpi_packet_struct *packet = &ndpi_str->packet;
+  struct ndpi_packet_struct *packet;
 
+  if(!ndpi_str)
+    return(0);
+
+  packet = &ndpi_str->packet;
   NDPI_LOG_DBG2(ndpi_str, "called ndpi_check_for_email_address\n");
 
   if(packet->payload_packet_len > counter && ((packet->payload[counter] >= 'a' && packet->payload[counter] <= 'z') ||
@@ -8983,7 +8987,7 @@ const char *ndpi_get_l4_proto_name(ndpi_l4_proto_info proto) {
 
 ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct,
 					  u_int16_t ndpi_proto_id) {
-  if(ndpi_proto_id < ndpi_struct->ndpi_num_supported_protocols) {
+  if(ndpi_struct && ndpi_proto_id < ndpi_struct->ndpi_num_supported_protocols) {
     u_int16_t idx = ndpi_struct->proto_defaults[ndpi_proto_id].protoIdx;
     NDPI_SELECTION_BITMASK_PROTOCOL_SIZE bm = ndpi_struct->callback_buffer[idx].ndpi_selection_bitmask;
 
