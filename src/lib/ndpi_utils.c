@@ -2468,6 +2468,26 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 	}
       }
     }
+  } else if(risk_message) {
+    u_int8_t i;
+
+    for(i = 0; i < flow->num_risk_infos; i++)
+      if(flow->risk_infos[i].id == r)
+        return;
+
+    /* Risk already set without any details, but now we have a specific risk_message
+       that we want to save.
+       This might happen with NDPI_HTTP_CRAWLER_BOT which might have been set early via
+       IP matching (no details) and now via UA matching (with message). */
+    if(flow->num_risk_infos < MAX_NUM_RISK_INFOS) {
+      char *s = ndpi_strdup(risk_message);
+
+      if(s != NULL) {
+        flow->risk_infos[flow->num_risk_infos].id = r;
+        flow->risk_infos[flow->num_risk_infos].info = s;
+        flow->num_risk_infos++;
+      }
+    }
   }
 }
 

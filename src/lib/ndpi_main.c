@@ -73,6 +73,7 @@
 #include "inc_generated/ndpi_ms_skype_teams_match.c.inc"
 #include "inc_generated/ndpi_google_match.c.inc"
 #include "inc_generated/ndpi_google_cloud_match.c.inc"
+#include "inc_generated/ndpi_crawlers_match.c.inc"
 #include "inc_generated/ndpi_icloud_private_relay_match.c.inc"
 #include "inc_generated/ndpi_asn_telegram.c.inc"
 #include "inc_generated/ndpi_asn_apple.c.inc"
@@ -2836,6 +2837,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     if((ndpi_str->ip_risk_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL) {
       if(!(prefs & ndpi_dont_load_icloud_private_relay_list)) {
         ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_protocol_list);
+      if(!(prefs & ndpi_dont_load_crawlers_list))
+        ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_http_crawler_bot_protocol_list);
       }
     }
   }
