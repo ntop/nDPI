@@ -7899,7 +7899,6 @@ static ndpi_protocol ndpi_internal_guess_undetected_protocol(struct ndpi_detecti
 #endif
 
   if(flow && ((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP))) {
-
     if(flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
       if(flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
         ret.master_protocol = flow->guessed_protocol_id;
