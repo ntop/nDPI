@@ -551,6 +551,8 @@ static void help(u_int long_help) {
 
     printf("\n\nnDPI supported risks:\n");
     ndpi_dump_risks_score();
+
+    ndpi_exit_detection_module(ndpi_info_mod);
   }
 
   exit(!long_help);
