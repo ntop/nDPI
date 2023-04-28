@@ -1,7 +1,7 @@
 /*
  * ndpi_analyze.c
  *
- * Copyright (C) 2019-22 - ntop.org
+ * Copyright (C) 2019-23 - ntop.org and contributors
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library.
@@ -127,8 +127,9 @@ void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
 
 /* Compute the average on all values */
 float ndpi_data_average(struct ndpi_analyze_struct *s) {
-  if(!s)
+  if((!s) || (s->num_data_entries == 0))
     return(0);
+  
   return((s->num_data_entries == 0) ? 0 : ((float)s->sum_total / (float)s->num_data_entries));
 }
 
@@ -154,7 +155,9 @@ u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s ? s->max_val :
 float ndpi_data_variance(struct ndpi_analyze_struct *s) {
   if(!s)
     return(0);
-  float v = s->num_data_entries ? ((float)s->stddev.sum_square_total - ((float)s->sum_total * (float)s->sum_total / (float)s->num_data_entries)) / (float)s->num_data_entries : 0.0;
+  float v = s->num_data_entries ?
+    ((float)s->stddev.sum_square_total - ((float)s->sum_total * (float)s->sum_total / (float)s->num_data_entries)) / (float)s->num_data_entries : 0.0;
+  
   return((v < 0  /* rounding problem */) ? 0 : v);
 }
 
@@ -226,7 +229,7 @@ float ndpi_data_window_stddev(struct ndpi_analyze_struct *s) {
   return(sqrt(ndpi_data_window_variance(s)));
 }
 
-  /* ********************************************************************************* */
+/* ********************************************************************************* */
 
 /*
   Compute entropy on the last sliding window values
