@@ -1006,11 +1006,6 @@ static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *nd
   return 0;
 }
 
-static void http_bitmask_exclude_other(struct ndpi_flow_struct *flow)
-{
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_XBOX);
-}
-
 /* *********************************************************************************************** */
 
 /* Trick to speed-up detection */
@@ -1243,7 +1238,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
 
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-      http_bitmask_exclude_other(flow);
       return;
     } else {
       /* This check is required as RTSP is pretty similiar to HTTP (prevent false-positives). */
@@ -1347,7 +1341,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
     check_content_type_and_change_protocol(ndpi_struct, flow);
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    http_bitmask_exclude_other(flow);
   } else if((flow->l4.tcp.http_stage == 1) || (flow->l4.tcp.http_stage == 2)) {
     NDPI_LOG_DBG2(ndpi_struct, "HTTP stage %u: \n", flow->l4.tcp.http_stage);
 
@@ -1375,7 +1368,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
           /* stop parsing here */
           NDPI_LOG_DBG2(ndpi_struct, "exclude HTTP: PACKET DOES NOT HAVE A LINE STRUCTURE\n");
 	  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-          http_bitmask_exclude_other(flow);
           return;
         }
       }
@@ -1432,7 +1424,6 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
   /* Break after 20 packets. */
   if(flow->packet_counter > 20) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    http_bitmask_exclude_other(flow);
     return;
   }
 
