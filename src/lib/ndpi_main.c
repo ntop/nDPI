@@ -7947,7 +7947,10 @@ ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_str
     return ret;
 
   if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
-    rc = ndpi_search_tcp_or_udp_raw(ndpi_str, flow, proto, shost, dhost);
+    if(shost && dhost)
+      rc = ndpi_search_tcp_or_udp_raw(ndpi_str, flow, proto, shost, dhost);
+    else
+      rc = NDPI_PROTOCOL_UNKNOWN;
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       ret.app_protocol = rc,
