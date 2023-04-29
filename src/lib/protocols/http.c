@@ -51,6 +51,8 @@ extern void ookla_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
 
 static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow);
+static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_struct,
+				   struct ndpi_flow_struct *flow);
 
 /* *********************************************** */
 
@@ -101,6 +103,9 @@ static void ndpi_analyze_content_signature(struct ndpi_detection_module_struct *
 
 static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  if(packet->payload_packet_len == 0 || packet->tcp_retransmission)
+    return 1;
 
   ndpi_search_http_tcp(ndpi_struct, flow);
 
@@ -339,8 +344,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 
 static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
-					 u_int16_t http_protocol,
-					 ndpi_protocol_category_t category) {
+					 u_int16_t http_protocol) {
   u_int16_t master_protocol;
 
 #ifdef HTTP_DEBUG
@@ -401,53 +405,124 @@ static void setHttpUserAgent(struct ndpi_detection_module_struct *ndpi_struct,
 /* ************************************************************* */
 
 static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-					struct ndpi_flow_struct *flow) {
+					struct ndpi_flow_struct *flow,
+					int hostname_just_set) {
   u_int16_t master_protocol;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  if((flow->l4.tcp.http_stage == 0) || (flow->http.url && flow->http_detected)) {
-    char *double_col = strchr((char*)flow->host_server_name, ':');
-    int a, b, c, d;
-    
-    if(double_col) double_col[0] = '\0';
+  master_protocol = NDPI_PROTOCOL_HTTP;
+  if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
+    master_protocol = flow->detected_protocol_stack[1];
+  else if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_CONNECT ||
+          flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_PROXY)
+    master_protocol = flow->detected_protocol_stack[0];
 
-    if(ndpi_struct->packet.iph
-       && (sscanf(flow->host_server_name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)) {
-      /* IPv4 */
+  if(packet->server_line.len > 7 &&
+     strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+    ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+  }
 
-      if(ndpi_struct->packet.iph->daddr != inet_addr(flow->host_server_name)) {
-	char buf[64], msg[128];
-	
-	snprintf(msg, sizeof(msg), "Expected %s, found %s",
-		 ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)), flow->host_server_name);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
+  /* Matching on Content-Type.
+      OCSP:  application/ocsp-request, application/ocsp-response
+  */
+  /* We overwrite any previous sub-classification (example: via hostname) */
+  if(packet->content_line.len > 17 &&
+     strncmp((const char *)packet->content_line.ptr, "application/ocsp-", 17) == 0) {
+    NDPI_LOG_DBG2(ndpi_struct, "Found OCSP\n");
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OCSP, master_protocol, NDPI_CONFIDENCE_DPI);
+  }
+
+  if(flow->http.method == NDPI_HTTP_METHOD_RPC_IN_DATA ||
+     flow->http.method == NDPI_HTTP_METHOD_RPC_OUT_DATA) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RPC, master_protocol, NDPI_CONFIDENCE_DPI);
+  }
+
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+     hostname_just_set && flow->host_server_name[0] != '\0') {
+    ndpi_match_hostname_protocol(ndpi_struct, flow,
+				 master_protocol,
+				 flow->host_server_name,
+				 strlen(flow->host_server_name));
+  }
+ 
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+     packet->http_origin.len > 0) {
+    ndpi_protocol_match_result ret_match;
+    char *ptr, *origin_hostname;
+    size_t origin_hostname_len;
+
+    /* Origin syntax:
+        Origin: null
+        Origin: <scheme>://<hostname>
+        Origin: <scheme>://<hostname>:<port>
+    Try extracting hostname */
+
+    ptr = ndpi_strnstr((const char *)packet->http_origin.ptr, "://", packet->http_origin.len);
+    if(ptr) {
+      origin_hostname = ptr + 3;
+      origin_hostname_len = packet->http_origin.len - (ptr - (char *)packet->http_origin.ptr) - 3;
+      ptr = ndpi_strnstr(origin_hostname, ":", origin_hostname_len);
+      if(ptr) {
+        origin_hostname_len = ptr - origin_hostname;
+      }
+      NDPI_LOG_DBG2(ndpi_struct, "Origin: [%.*s] -> [%.*s]\n", packet->http_origin.len, packet->http_origin.ptr,
+		    (int)origin_hostname_len, origin_hostname);
+      /* We already checked hostname...*/
+      if(strncmp(origin_hostname, flow->host_server_name, origin_hostname_len) != 0) {
+        ndpi_match_host_subprotocol(ndpi_struct, flow,
+				    origin_hostname,
+				    origin_hostname_len,
+				    &ret_match,
+				    master_protocol);
       }
     }
-    
-    master_protocol = NDPI_PROTOCOL_HTTP;
-    if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
-      master_protocol = flow->detected_protocol_stack[1];
-    else if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_CONNECT ||
-            flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP_PROXY)
-      master_protocol = flow->detected_protocol_stack[0];
+  }
 
-    if(ndpi_match_hostname_protocol(ndpi_struct, flow,
-				    master_protocol,
-				    flow->host_server_name,
-				    strlen(flow->host_server_name)) == 0) {
-      if(flow->http.url &&
-         ((strstr(flow->http.url, ":8080/downloading?n=0.") != NULL)
-          || (strstr(flow->http.url, ":8080/upload?n=0.") != NULL))) {
-	/* This looks like Ookla speedtest */
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
-	ookla_add_to_cache(ndpi_struct, flow);
-      }
-    }
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+     flow->http.url &&
+     ((strstr(flow->http.url, ":8080/downloading?n=0.") != NULL) ||
+      (strstr(flow->http.url, ":8080/upload?n=0.") != NULL))) {
+    /* This looks like Ookla speedtest */
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
+    ookla_add_to_cache(ndpi_struct, flow);
+  }
 
-    if (flow->http.url != NULL &&
-        strstr(flow->http.url, "micloud.xiaomi.net") != NULL)
-    {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_XIAOMI, master_protocol, NDPI_CONFIDENCE_DPI);
-    }
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+     flow->http.url != NULL &&
+     strstr(flow->http.url, "micloud.xiaomi.net") != NULL) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_XIAOMI, master_protocol, NDPI_CONFIDENCE_DPI);
+  }
+
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+     packet->referer_line.len > 0 &&
+     ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
+    ookla_add_to_cache(ndpi_struct, flow);
+  }
+
+  /* WindowsUpdate over some kind of CDN */
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+     flow->http.user_agent && flow->http.url &&
+     (strstr(flow->http.url, "delivery.mp.microsoft.com/") ||
+      strstr(flow->http.url, "download.windowsupdate.com/")) &&
+     strstr(flow->http.user_agent, "Microsoft-Delivery-Optimization/") &&
+     ndpi_isset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST)) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WINDOWS_UPDATE, master_protocol, NDPI_CONFIDENCE_DPI);
+  }
+
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+     packet->payload_packet_len >= 23 &&
+     memcmp(packet->payload, "<policy-file-request/>", 23) == 0) {
+    /*
+      <policy-file-request/>
+      <cross-domain-policy>
+      <allow-access-from domain="*.ookla.com" to-ports="8080"/>
+      <allow-access-from domain="*.speedtest.net" to-ports="8080"/>
+      </cross-domain-policy>
+     */
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
+    ookla_add_to_cache(ndpi_struct, flow);
   }
 }
 
@@ -547,9 +622,9 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
 
 /* ************************************************************* */
 
-int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
-			    struct ndpi_flow_struct *flow,
-			    const u_int8_t *ua_ptr, u_int16_t ua_ptr_len) {
+void http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow,
+			     const u_int8_t *ua_ptr, u_int16_t ua_ptr_len) {
   /**
       Format examples:
       Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ....
@@ -612,11 +687,10 @@ int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
   if(ndpi_user_agent_set(flow, ua_ptr, ua_ptr_len) != NULL)
     ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent, ua_ptr_len);
   else
-    NDPI_LOG_DBG2(ndpi_struct, "Could not set HTTP user agent\n");  
+    NDPI_LOG_DBG2(ndpi_struct, "Could not set HTTP user agent (already set?)\n");
 
   NDPI_LOG_DBG2(ndpi_struct, "User Agent Type line found %.*s\n",
 		ua_ptr_len, ua_ptr);
-  return 0;
 }
 
 /* ************************************************************* */
@@ -666,11 +740,8 @@ static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_str
   if(server_len > 7) {
     u_int off;
   
-    if(strncmp((const char *)server, "ntopng ", 7) == 0) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
-      NDPI_CLR_BIT(flow->risk, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
-    } else if((strncasecmp(server, "Apache/", off = 7) == 0) /* X.X.X */
-	      || (strncasecmp(server, "nginx/", off = 6) == 0) /* X.X.X */) {
+    if((strncasecmp(server, "Apache/", off = 7) == 0) /* X.X.X */
+	|| (strncasecmp(server, "nginx/", off = 6) == 0) /* X.X.X */) {
       u_int i, j, a, b, c;
       char buf[16] = { '\0' };
 
@@ -703,10 +774,8 @@ static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_str
 static void check_content_type_and_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 						   struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  int ret;
-
-  if(flow->http_detected && (flow->http.response_status_code != 0))
-    return;
+  u_int len;
+  int hostname_just_set = 0;
 
   if((flow->http.url == NULL)
      && (packet->http_url_name.len > 0)
@@ -748,101 +817,42 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
       ndpi_check_http_url(ndpi_struct, flow, &flow->http.url[host_end]);
     }
+  }
 
+  if(packet->http_method.ptr != NULL)
     flow->http.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
 					     (u_int16_t)packet->http_method.len);
-
-    if((flow->http.method == NDPI_HTTP_METHOD_RPC_IN_DATA)
-       || (flow->http.method == NDPI_HTTP_METHOD_RPC_OUT_DATA)) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RPC, flow->detected_protocol_stack[0], NDPI_CONFIDENCE_DPI);
-      check_content_type_and_change_protocol(ndpi_struct, flow);
-    }
-  }
 
   if(packet->server_line.ptr != NULL)
     ndpi_check_http_server(ndpi_struct, flow, (const char *)packet->server_line.ptr, packet->server_line.len);
  
-  if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0) {
-    ret = http_process_user_agent(ndpi_struct, flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
-    /* TODO: Is it correct to avoid setting ua, host_name,... if we have a (Netflix) subclassification? */
-    if(ret != 0)
-      return;
+  if(packet->user_agent_line.ptr != NULL) {
+    http_process_user_agent(ndpi_struct, flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
   }
 
-  /* check for host line */
-  if(packet->host_line.ptr != NULL) {
-    u_int len;
-
-    NDPI_LOG_DBG2(ndpi_struct, "HOST line found %.*s\n",
-		  packet->host_line.len, packet->host_line.ptr);
-
-    /* Copy result for nDPI apps */
-    ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len);
-
-    if(strlen(flow->host_server_name) > 0) {
-      if(ndpi_is_valid_hostname(flow->host_server_name,
-				strlen(flow->host_server_name)) == 0) {
-	char str[128];
-
-	snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
-
-	/* This looks like an attack */
-	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, NULL);
-      }
-    }
-
-    if(packet->forwarded_line.ptr) {
-      if(flow->http.nat_ip == NULL) {
-        len = packet->forwarded_line.len;
-        flow->http.nat_ip = ndpi_malloc(len + 1);
-        if(flow->http.nat_ip != NULL) {
-          strncpy(flow->http.nat_ip, (char*)packet->forwarded_line.ptr, len);
-          flow->http.nat_ip[len] = '\0';
-        }
-      }
-    }
-
-    ndpi_http_parse_subprotocol(ndpi_struct, flow);
-
-    if(strlen(flow->host_server_name) > 0) {
-      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0);
-    }
-
-    if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
-       && (flow->http_detected)
-       && (packet->http_origin.len > 0)) {
-      ndpi_protocol_match_result ret_match;
-
-      ndpi_match_host_subprotocol(ndpi_struct, flow,
-				  (char *)packet->http_origin.ptr,
-				  packet->http_origin.len,
-				  &ret_match,
-				  NDPI_PROTOCOL_HTTP);
-    }
-
-    if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
-      if((flow->detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP)
-	 && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP_CONNECT)
-	 && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP_PROXY)) {
-	NDPI_LOG_INFO(ndpi_struct, "found HTTP/%s\n",
-		      ndpi_get_proto_name(ndpi_struct, flow->detected_protocol_stack[0]));
-	ndpi_int_http_add_connection(ndpi_struct, flow, flow->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
-	return; /* We have identified a sub-protocol so we're done */
+  if(packet->forwarded_line.ptr != NULL) {
+    if(flow->http.nat_ip == NULL) {
+      len = packet->forwarded_line.len;
+      flow->http.nat_ip = ndpi_malloc(len + 1);
+      if(flow->http.nat_ip != NULL) {
+        strncpy(flow->http.nat_ip, (char*)packet->forwarded_line.ptr, len);
+        flow->http.nat_ip[len] = '\0';
       }
     }
   }
 
-  if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
-    flow->guessed_protocol_id = NDPI_PROTOCOL_HTTP;
-
-  /* check for accept line */
-  if(packet->accept_line.ptr != NULL) {
-    NDPI_LOG_DBG2(ndpi_struct, "Accept line found %.*s\n",
-		  packet->accept_line.len, packet->accept_line.ptr);
+  if(packet->server_line.ptr != NULL) {
+    if(flow->http.server == NULL) {
+      len = packet->server_line.len + 1;
+      flow->http.server = ndpi_malloc(len);
+      if(flow->http.server) {
+        strncpy(flow->http.server, (char*)packet->server_line.ptr,
+                packet->server_line.len);
+	flow->http.server[packet->server_line.len] = '\0';
+      }
+    }
   }
 
-  /* check for authorization line */
   if(packet->authorization_line.ptr != NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "Authorization line found %.*s\n",
 		  packet->authorization_line.len, packet->authorization_line.ptr);
@@ -856,7 +866,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
   }
 
-  if(packet->content_line.ptr != NULL && packet->content_line.len != 0) {
+  if(packet->content_line.ptr != NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "Content Type line found %.*s\n",
 		  packet->content_line.len, packet->content_line.ptr);
 
@@ -886,54 +896,67 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	  flow->guessed_category = flow->category = ndpi_http_check_content(ndpi_struct, flow);
 	}
       }
-
-      if((flow->http.server == NULL) && (packet->server_line.len > 0)) {
-	int len = packet->server_line.len + 1;
-	
-	flow->http.server = ndpi_malloc(len);
-	if(flow->http.server) {
-	  strncpy(flow->http.server, (char*)packet->server_line.ptr,
-		  packet->server_line.len);
-	  flow->http.server[packet->server_line.len] = '\0';
-	}
-      }
-    }
-
-    if(flow->http_detected && packet->content_line.ptr && *(char*)packet->content_line.ptr) {
-      /* Matching on Content-Type.
-          OCSP:  application/ocsp-request, application/ocsp-response
-       */
-      if(packet->content_line.len > 17 &&
-         strncmp((const char *)packet->content_line.ptr, "application/ocsp-", 17) == 0) {
-        NDPI_LOG_DBG2(ndpi_struct, "Found OCSP\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OCSP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
-      }
     }
   }
 
-  if(packet->user_agent_line.ptr != NULL && packet->user_agent_line.len != 0 &&
-     flow->http.url) {
-    /* WindowsUpdate over some kind of CDN */
-    if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
-       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP &&
-       (strstr(flow->http.url, "delivery.mp.microsoft.com/") ||
-        strstr(flow->http.url, "download.windowsupdate.com/")) &&
-       ndpi_strnstr((const char *)packet->user_agent_line.ptr, "Microsoft-Delivery-Optimization/",
-                    packet->user_agent_line.len) &&
-       ndpi_isset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST)) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WINDOWS_UPDATE, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+  /* check for host line (only if we don't already have an hostname) */
+  if(packet->host_line.ptr != NULL && flow->host_server_name[0] == '\0') {
+
+    NDPI_LOG_DBG2(ndpi_struct, "HOST line found %.*s\n",
+		  packet->host_line.len, packet->host_line.ptr);
+
+    /* Copy result for nDPI apps */
+    ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len);
+
+    if(strlen(flow->host_server_name) > 0) {
+      char *double_col;
+      int a, b, c, d;
+
+      hostname_just_set = 1;
+
+      if(ndpi_is_valid_hostname(flow->host_server_name,
+				strlen(flow->host_server_name)) == 0) {
+	char str[128];
+
+	snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
+
+	/* This looks like an attack */
+	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, NULL);
+      }
+
+      double_col = strchr((char*)flow->host_server_name, ':');
+      if(double_col) double_col[0] = '\0';
+      if(ndpi_struct->packet.iph
+         && (sscanf(flow->host_server_name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)) {
+        /* IPv4 */
+
+        if(ndpi_struct->packet.iph->daddr != inet_addr(flow->host_server_name)) {
+	  char buf[64], msg[128];
+
+	  snprintf(msg, sizeof(msg), "Expected %s, found %s",
+		   ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)), flow->host_server_name);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
+        }
+      }
     }
+
   }
+
+  ndpi_http_parse_subprotocol(ndpi_struct, flow, hostname_just_set);
+
+  if(hostname_just_set && strlen(flow->host_server_name) > 0) {
+    ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0);
+  }
+
+  if(flow->guessed_protocol_id == NDPI_PROTOCOL_UNKNOWN)
+    flow->guessed_protocol_id = NDPI_PROTOCOL_HTTP;
 
   if(ndpi_get_http_method(ndpi_struct, flow) != NDPI_HTTP_METHOD_UNKNOWN) {
-    ndpi_int_http_add_connection(ndpi_struct, flow, flow->detected_protocol_stack[0], NDPI_PROTOCOL_CATEGORY_WEB);
+    ndpi_int_http_add_connection(ndpi_struct, flow, flow->detected_protocol_stack[0]);
   }
-}
 
-/* ************************************************************* */
-
-static void check_http_payload(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  /* Add here your payload code check */
+  ndpi_check_http_header(ndpi_struct, flow);
 }
 
 /* ************************************************************* */
@@ -1133,6 +1156,45 @@ static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_str
   }
 }
 
+static void parse_response_code(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  char buf[4];
+  char ec[48];
+
+  if(packet->payload_packet_len >= 12) {
+    /* Set server HTTP response code */
+    strncpy(buf, (char*)&packet->payload[9], 3);
+    buf[3] = '\0';
+
+    flow->http.response_status_code = atoi(buf);
+    NDPI_LOG_DBG2(ndpi_struct, "Response code %d\n", flow->http.response_status_code);
+
+    /* https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
+    if((flow->http.response_status_code < 100) || (flow->http.response_status_code > 509))
+      flow->http.response_status_code = 0; /* Out of range */
+
+    if(flow->http.response_status_code >= 400) {
+      snprintf(ec, sizeof(ec), "HTTP Error Code %u", flow->http.response_status_code);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, ec);
+
+      if(flow->http.url != NULL) {
+        /* Let's check for Wordpress */
+        char *slash = strchr(flow->http.url, '/');
+
+	if(slash != NULL &&
+           (((flow->http.method == NDPI_HTTP_METHOD_POST) && (strncmp(slash, "/wp-admin/", 10) == 0))
+	    || ((flow->http.method == NDPI_HTTP_METHOD_GET) && (strncmp(slash, "/wp-content/uploads/", 20) == 0))
+	   )) {
+          /* Example of popular exploits https://www.wordfence.com/blog/2022/05/millions-of-attacks-target-tatsu-builder-plugin/ */
+          ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Possible Wordpress Exploit");
+	}
+      }
+    }
+  }
+}
+
 /*************************************************************************************************/
 
 static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
@@ -1148,8 +1210,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
   }
 
   /* Check if we so far detected the protocol in the request or not. */
-  if((packet->payload_packet_len > 0) /* Needed in case of extra packet processing */
-     && (flow->l4.tcp.http_stage == 0)) {
+  if(flow->l4.tcp.http_stage == 0) {
     /* Expected a request */
     flow->http_detected = 0;
 
@@ -1163,70 +1224,25 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       if(packet->payload_packet_len >= 7 && strncasecmp((const char *)packet->payload, "HTTP/1.", 7) == 0) {
         NDPI_LOG_INFO(ndpi_struct, "found HTTP response\n");
 
-	if(packet->payload_packet_len >= 12) {
-	  char buf[4];
+	parse_response_code(ndpi_struct, flow);
 
-	  /* Set server HTTP response code */
-	  strncpy(buf, (char*)&packet->payload[9], 3);
-	  buf[3] = '\0';
-
-	  flow->http.response_status_code = atoi(buf);
-
-	  /* https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
-	  if((flow->http.response_status_code < 100) || (flow->http.response_status_code > 509))
-	    flow->http.response_status_code = 0; /* Out of range */
-	  else if(flow->http.response_status_code >= 400) {
-	    char ec[48];
+	if(flow->flow_payload) {
+	  char *endl;
 	    
-	    if(flow->http.url != NULL) {
-	      /* Let's check for Wordpress */
-	      char *slash = strchr(flow->http.url, '/');
+	  flow->flow_payload[flow->flow_payload_len] = '\0';
+	  if((endl = strrchr(flow->flow_payload, '\r')) == NULL)
+	    endl = strrchr(flow->flow_payload, '\n');
 
-	      if(slash != NULL &&
-		 (((flow->http.method == NDPI_HTTP_METHOD_POST) && (strncmp(slash, "/wp-admin/", 10) == 0))
-		 || ((flow->http.method == NDPI_HTTP_METHOD_GET) && (strncmp(slash, "/wp-content/uploads/", 20) == 0))		 
-		 )) {
-		/* Example of popular exploits https://www.wordfence.com/blog/2022/05/millions-of-attacks-target-tatsu-builder-plugin/ */
-		ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Possible Wordpress Exploit");
-	      }
-	    }
-
-	    snprintf(ec, sizeof(ec), "HTTP Error Code %u", flow->http.response_status_code);
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, ec);
-	  }
-
-	  if(flow->flow_payload) {
-	    char *endl;
-	    
-	    flow->flow_payload[flow->flow_payload_len] = '\0';
-	    if((endl = strrchr(flow->flow_payload, '\r')) == NULL)
-	      endl = strrchr(flow->flow_payload, '\n');
-
-	    if(endl != NULL) {
-	      endl[0] = '\0';
-	      flow->flow_payload_len = endl - flow->flow_payload;
-	    }
+	  if(endl != NULL) {
+	    endl[0] = '\0';
+	    flow->flow_payload_len = endl - flow->flow_payload;
 	  }
 	}
 
 	ndpi_parse_packet_line_info(ndpi_struct, flow);
         check_content_type_and_change_protocol(ndpi_struct, flow);
 	ndpi_validate_http_content(ndpi_struct, flow);
-        ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
-        return;
-      }
-
-      if((packet->payload_packet_len == 23) && (memcmp(packet->payload, "<policy-file-request/>", 23) == 0)) {
-        /*
-          <policy-file-request/>
-          <cross-domain-policy>
-          <allow-access-from domain="*.ookla.com" to-ports="8080"/>
-          <allow-access-from domain="*.speedtest.net" to-ports="8080"/>
-          </cross-domain-policy>
-        */
-      ookla_found:
-        ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_CATEGORY_WEB);
-        ookla_add_to_cache(ndpi_struct, flow);
+        ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
         return;
       }
 
@@ -1247,7 +1263,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
         NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
         return;
       } else {
-        ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
+        ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
       }
     }
 
@@ -1255,14 +1271,10 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 		  "Filename HTTP found: %d, we look for line info..\n", filename_start);
 
     ndpi_parse_packet_line_info(ndpi_struct, flow);
-    ndpi_check_http_header(ndpi_struct, flow);
 
     if(packet->parsed_lines <= 1) {
       NDPI_LOG_DBG2(ndpi_struct,
 		    "Found just one line, we will look further for the next packet...\n");
-
-      packet->http_method.ptr = packet->line[0].ptr;
-      packet->http_method.len = filename_start - 1;
 
       /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
       flow->l4.tcp.http_stage = packet->packet_direction + 1; // packet_direction 0: stage 1, packet_direction 1: stage 2
@@ -1287,12 +1299,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	flow->http.request_version = 1;
       else
 	flow->http.request_version = 0;
-
-      /* Check for Ookla */
-      if((packet->referer_line.len > 0)
-	 && ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
-	goto ookla_found;
-      }
 
       if((packet->http_url_name.len > 7)
 	 && (!strncasecmp((const char*) packet->http_url_name.ptr, "http://", 7))) {
@@ -1328,7 +1334,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	  u_int proto = flow->detected_protocol_stack[1] ? flow->detected_protocol_stack[1] : flow->detected_protocol_stack[0];
 
 	  if(proto == NDPI_PROTOCOL_UNKNOWN) proto = NDPI_PROTOCOL_HTTP;
-	  ndpi_int_http_add_connection(ndpi_struct, flow, proto, NDPI_PROTOCOL_CATEGORY_WEB);
+	  ndpi_int_http_add_connection(ndpi_struct, flow, proto);
 	  flow->http_detected = 1;
 	  NDPI_LOG_DBG2(ndpi_struct,
 			"HTTP START Found, we will look further for the response...\n");
@@ -1350,10 +1356,6 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
        otherwise check the second packet for the HTTP request
     */
     if((flow->l4.tcp.http_stage - packet->packet_direction) == 1) { /* Expected a response package */
-
-      if(flow->http_detected)
-        return;
-
       NDPI_LOG_DBG2(ndpi_struct,
 		    " SECOND PAYLOAD TRAFFIC FROM CLIENT, FIRST PACKET MIGHT HAVE BEEN HTTP...UNKNOWN TRAFFIC, HERE FOR HTTP again.. \n");
 
@@ -1371,12 +1373,20 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
           return;
         }
       }
+
+      /* The previous pkt was a valid HTTP request and this one is in the same direction:
+         splitted request? Try to extract more metadata */
+      if(flow->http_detected) {
+        check_content_type_and_change_protocol(ndpi_struct, flow);
+      }
+
       // http://www.slideshare.net/DSPIP/rtsp-analysis-wireshark
-      if(packet->line[0].len >= 9
+      if(!flow->http_detected
+	 && packet->line[0].len >= 9
 	 && strncasecmp((const char *)&packet->line[0].ptr[packet->line[0].len - 9], " HTTP/1.", 8) == 0) {
 
         NDPI_LOG_INFO(ndpi_struct, "found HTTP\n");
-        ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
+        ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
         check_content_type_and_change_protocol(ndpi_struct, flow);
 
         NDPI_LOG_DBG2(ndpi_struct,
@@ -1398,19 +1408,17 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
     if((packet->parsed_lines == 1) && (packet->packet_direction == 1 /* server -> client */)) {
       /* In Apache if you do "GET /\n\n" the response comes without any header */
       NDPI_LOG_INFO(ndpi_struct, "found HTTP. (apache)\n");
-      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP, NDPI_PROTOCOL_CATEGORY_WEB);
+      ndpi_int_http_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_HTTP);
       check_content_type_and_change_protocol(ndpi_struct, flow);
       return;
     }
 
+    parse_response_code(ndpi_struct, flow);
+
     /* Parse packet line and we look for the subprotocols */
     ndpi_parse_packet_line_info(ndpi_struct, flow);
     check_content_type_and_change_protocol(ndpi_struct, flow);
-
-    if(packet->empty_line_position_set != 0 || flow->l4.tcp.http_empty_line_seen == 1) {
-      NDPI_LOG_DBG2(ndpi_struct, "empty line. check_http_payload\n");
-      check_http_payload(ndpi_struct, flow);
-    }
+    ndpi_validate_http_content(ndpi_struct, flow);
 
     flow->l4.tcp.http_stage = 0;
     return;

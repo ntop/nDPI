@@ -1,0 +1,25 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	5	(5.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 12 (12.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/0 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk:        2/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+
+HTTP	115	76310	1
+
+	1	TCP 254.125.135.128:21359 <-> 66.152.103.45:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: Web/5][76 pkts/67448 bytes <-> 39 pkts/8862 bytes][Goodput ratio: 93/71][386.83 sec][Hostname/SNI: va.origin.startappservice.com][bytes ratio: 0.768 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2/234 4719/10214 59840/59845 10187/13183][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 887/227 1454/424 557/96][StatusCode: 200][User-Agent: Mozil][PLAIN TEXT (WGET /tracking/adImpression)][Plen Bins: 0,0,0,2,26,0,6,1,13,1,4,6,0,1,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,0,0,0,0]

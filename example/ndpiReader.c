@@ -1638,15 +1638,20 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       if(risk != NDPI_NO_RISK)
 	NDPI_SET_BIT(flow->risk, risk);
 
-      fprintf(out, "[URL: %s][StatusCode: %u]",
-	      flow->http.url, flow->http.response_status_code);
-
-      if(flow->http.request_content_type[0] != '\0')
-	fprintf(out, "[Req Content-Type: %s]", flow->http.request_content_type);
-
-      if(flow->http.content_type[0] != '\0')
-	fprintf(out, "[Content-Type: %s]", flow->http.content_type);
+      fprintf(out, "[URL: %s]", flow->http.url);
     }
+
+    if(flow->http.response_status_code)
+      fprintf(out, "[StatusCode: %u]", flow->http.response_status_code);
+
+    if(flow->http.request_content_type[0] != '\0')
+      fprintf(out, "[Req Content-Type: %s]", flow->http.request_content_type);
+
+    if(flow->http.content_type[0] != '\0')
+      fprintf(out, "[Content-Type: %s]", flow->http.content_type);
+
+    if(flow->http.nat_ip[0] != '\0')
+      fprintf(out, "[Nat-IP: %s]", flow->http.nat_ip);
 
     if(flow->http.server[0] != '\0')
       fprintf(out, "[Server: %s]", flow->http.server);
