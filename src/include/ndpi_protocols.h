@@ -58,8 +58,6 @@ void init_armagetron_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 void init_amqp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_bgp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_bittorrent_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
-				      u_int32_t saddr, u_int16_t sport, u_int32_t daddr, u_int16_t dport);
 void init_lisp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_teredo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_ciscovpn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
