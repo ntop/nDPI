@@ -1746,12 +1746,12 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->flow_payload && (flow->flow_payload_len > 0)) {
       u_int i;
 
-      printf("[Payload: ");
+      fprintf(out, "[Payload: ");
 
       for(i=0; i<flow->flow_payload_len; i++)
-	printf("%c", isspace(flow->flow_payload[i]) ? '.' : flow->flow_payload[i]);
+	fprintf(out, "%c", isspace(flow->flow_payload[i]) ? '.' : flow->flow_payload[i]);
 
-      printf("]");
+      fprintf(out, "]");
     }
 
     fprintf(out, "\n");
