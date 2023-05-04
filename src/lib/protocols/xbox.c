@@ -39,7 +39,6 @@ static void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, s
 	
   /*
    * XBOX UDP DETCTION ONLY
-   * the xbox TCP detection is done by http code
    * this detection also works for asymmetric xbox udp traffic
    */
   if(packet->udp != NULL) {
