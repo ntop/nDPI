@@ -28,6 +28,8 @@ RETVAL=$(( RETVAL + $? ))
 RETVAL=$(( RETVAL + $? ))
 ./icloud_private_relay_ip_addresses_download.sh
 RETVAL=$(( RETVAL + $? ))
+./crawlers_ip_addresses_download.sh
+RETVAL=$(( RETVAL + $? ))
 
 ./asn_update.sh
 RETVAL=$(( RETVAL + $? ))
