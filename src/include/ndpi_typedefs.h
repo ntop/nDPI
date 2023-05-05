@@ -741,7 +741,7 @@ struct ndpi_flow_tcp_struct {
   u_int32_t usenet_stage:2;
 
   /* NDPI_PROTOCOL_HTTP */
-  u_int32_t http_stage:2;
+  u_int32_t http_stage:3;
 
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int32_t gnutella_stage:2;		       // 0 - 2
@@ -1580,9 +1580,6 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_BITTORRENT */
   u_int8_t bittorrent_stage;		      // can be 0 - 255
   u_int8_t bt_check_performed : 1;
-
-  /* NDPI_PROTOCOL_HTTP */
-  u_int8_t http_detected:1;
 
   /* NDPI_PROTOCOL_RTSP */
   u_int8_t rtsprdt_stage:2;

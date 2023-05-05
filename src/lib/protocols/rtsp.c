@@ -55,6 +55,11 @@ static void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct *ndpi_s
        LINE_ENDS(packet->content_line, "application/x-rtsp-tunnelled") != 0))
   {
     ndpi_int_rtsp_add_connection(ndpi_struct, flow);
+
+    /* Extract some metadata HTTP-like */
+    if(packet->user_agent_line.ptr != NULL)
+      ndpi_user_agent_set(flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
+
     return;
   }
 

@@ -59,6 +59,10 @@ static void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struc
     /* this case works asymmetrically */
     if (packet->payload_packet_len > 17 && memcmp(packet->payload, "GNUTELLA CONNECT/", 17) == 0) {
       ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
+      /* Extract some metadata HTTP-like */
+      ndpi_parse_packet_line_info(ndpi_struct, flow);
+      if(packet->user_agent_line.ptr != NULL)
+        ndpi_user_agent_set(flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
       return;
     }
 
@@ -73,6 +77,9 @@ static void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struc
 	    || (packet->line[c].len > 36 && memcmp(packet->line[c].ptr,
 						   "Content-Type: application/x-gnutella-", 37) == 0)) {
 	  ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
+	  /* Extract some metadata HTTP-like */
+	  if(packet->user_agent_line.ptr != NULL)
+	    ndpi_user_agent_set(flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
 	  return;
 	}
       }
@@ -84,6 +91,9 @@ static void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struc
 	  || (packet->accept_line.ptr != NULL && packet->accept_line.len > 24
 	      && memcmp(packet->accept_line.ptr, "application n/x-gnutella", 24) == 0)) {
 	ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
+	/* Extract some metadata HTTP-like */
+	if(packet->user_agent_line.ptr != NULL)
+	  ndpi_user_agent_set(flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
       }
 
     }
