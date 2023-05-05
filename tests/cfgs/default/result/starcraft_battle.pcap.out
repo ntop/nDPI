@@ -1,6 +1,6 @@
-Guessed flow protos:	14
+Guessed flow protos:	15
 
-DPI Packets (TCP):	164	(4.32 pkts/flow)
+DPI Packets (TCP):	165	(4.34 pkts/flow)
 DPI Packets (UDP):	36	(2.77 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by port    : 8 (flows)
@@ -76,7 +76,7 @@ Starcraft	236	51494	6
 	40	TCP 192.168.1.100:3486 <-> 199.38.164.156:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 4][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/120 bytes][Goodput ratio: 0/0][0.12 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	41	UDP 192.168.1.100:58844 <-> 192.168.1.254:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/86 bytes <-> 1 pkts/124 bytes][Goodput ratio: 51/66][0.05 sec][Hostname/SNI: 40.186.239.80.in-addr.arpa][::][PLAIN TEXT (attens)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	42	TCP 192.168.1.100:3484 <-> 173.194.113.224:443 [proto: 91.126/TLS.Google][IP: 126/Google][Encrypted][Confidence: DPI (partial)][DPI packets: 3][cat: Web/5][2 pkts/108 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.03 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	43	TCP 192.168.1.100:2759 <-> 64.233.184.188:5228 [proto: 126/Google][IP: 126/Google][Encrypted][Confidence: Match by IP][DPI packets: 1][cat: Web/5][1 pkts/55 bytes <-> 1 pkts/66 bytes][Goodput ratio: 2/0][0.05 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	43	TCP 192.168.1.100:2759 <-> 64.233.184.188:5228 [proto: 126/Google][IP: 126/Google][Encrypted][Confidence: Match by IP][DPI packets: 2][cat: Web/5][1 pkts/55 bytes <-> 1 pkts/66 bytes][Goodput ratio: 2/0][0.05 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	44	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 91.126/TLS.Google][IP: 126/Google][Encrypted][Confidence: DPI (partial)][DPI packets: 2][cat: Web/5][1 pkts/55 bytes <-> 1 pkts/66 bytes][Goodput ratio: 2/0][0.04 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	45	IGMP 192.168.1.107:0 -> 224.0.0.22:0 [proto: 82/IGMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/120 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][3.18 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	46	UDP 192.168.1.100:53146 <-> 5.42.180.154:1119 [proto: 213/Starcraft][IP: 213/Starcraft][ClearText][Confidence: DPI (partial)][DPI packets: 2][cat: Game/8][1 pkts/44 bytes <-> 1 pkts/60 bytes][Goodput ratio: 4/3][0.05 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

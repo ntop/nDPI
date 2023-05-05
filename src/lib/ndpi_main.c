@@ -6845,23 +6845,6 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   else
     ret.category = flow->category;
 
-  if((flow->num_processed_pkts == 1) /* first packet of this flow to be analyzed */
-     && (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN)
-     && (ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) && packet->tcp && (packet->tcp->syn == 0)
-     && (flow->guessed_protocol_id == 0)) {
-    u_int8_t protocol_was_guessed;
-
-    /*
-      This is a TCP flow
-      - whose first packet is NOT a SYN
-      - no protocol has been detected
-
-      We don't see how future packets can match anything
-      hence we giveup here
-    */
-    ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
-  }
-
   if((!flow->risk_checked)
      && ((ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) || (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN))
      ) {
