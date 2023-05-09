@@ -789,6 +789,7 @@ static ndpi_protocol_match host_match[] =
    { ".s-msft.com",                                           "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM_OS, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".msftstatic.com",                                       "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM_OS, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".msftauth.net",                                         "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM_OS, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".msauth.net",                                           "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM_OS, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".nelreports.net",                                       "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_SYSTEM_OS, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".webtrends.com",                                        "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".msecnd.net",                                           "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -845,6 +846,8 @@ static ndpi_protocol_match host_match[] =
    { "teams.office.net",                 "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "teams.office.com",                 "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "statics.teams.cdn.live.net",       "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".mstea.ms",                        "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "aka.ms",                           "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { ".storage.live.com",               "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE,NDPI_PROTOCOL_CATEGORY_CLOUD,  NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "skyapi.live.net",                 "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -878,6 +881,8 @@ static ndpi_protocol_match host_match[] =
    { ".northghost.com",                      "HotspotShield",    NDPI_PROTOCOL_HOTSPOT_SHIELD, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { ".webex.com",                              "Webex",           NDPI_PROTOCOL_WEBEX, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".webexcontent.com",                       "Webex",           NDPI_PROTOCOL_WEBEX, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
    { ".zoom.us",                                "Zoom",            NDPI_PROTOCOL_ZOOM,  NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { ".ocsdomain.com",                          "OCS",             NDPI_PROTOCOL_OCS, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -906,6 +911,7 @@ static ndpi_protocol_match host_match[] =
    { "mail.live.com",                           "Microsoft365",    NDPI_PROTOCOL_MICROSOFT_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "office.live.com",                         "Microsoft365",    NDPI_PROTOCOL_MICROSOFT_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".onenote.",                               "Microsoft365",    NDPI_PROTOCOL_MICROSOFT_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".cloud.microsoft",                        "Microsoft365",    NDPI_PROTOCOL_MICROSOFT_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "cloudflare.com",      "Cloudflare",       NDPI_PROTOCOL_CLOUDFLARE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
@@ -1405,6 +1411,13 @@ static ndpi_protocol_match host_match[] =
    { ".gwallet.com",                     "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
    /* Kochava is the industry leader for mobile app attribution and mobile app analytics */
    { ".kochava.com",                     "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Adobe analytics */
+   { "assets.adobedtm.com",              "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "commerce.adobedtm.com",            "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Chartboost is a San Francisco-based mobile game in-app programmatic advertising and monetization platform */
+   { ".chartboost.com",                  "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Vungle is an ad network */
+   { ".vungle.com",                      "ADS_Analytic_Track", NDPI_PROTOCOL_ADS_ANALYTICS_TRACK, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "xvideos.",                         "AdultContent", NDPI_PROTOCOL_ADULT_CONTENT, NDPI_PROTOCOL_CATEGORY_ADULT_CONTENT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "pornhub.com",                      "AdultContent", NDPI_PROTOCOL_ADULT_CONTENT, NDPI_PROTOCOL_CATEGORY_ADULT_CONTENT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
