@@ -607,8 +607,8 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
     Amazon-Route53-Health-Check-Service (ref 68784dad-be98-49e4-a63c-9fbbe2816d7c; report http://amzn.to/1vsZADi)
     Anonymous Crawler/1.0 (Webcrawler developed with StormCrawler; http://example.com/; webcrawler@example.com)
    */
-  if((strstr(ua, "+http") != NULL)
-     || (strstr(ua, " http") != NULL)
+  if((strstr(ua, "+http:") != NULL)
+     || (strstr(ua, " http:") != NULL)
      || ndpi_strncasestr(ua, "Crawler", ua_len)
      || ndpi_strncasestr(ua, "Bot", ua_len) /* bot/robot */
      ) {

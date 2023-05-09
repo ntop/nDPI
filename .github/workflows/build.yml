@@ -53,7 +53,7 @@ jobs:
       - name: Install Ubuntu Prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install python3-netaddr git
+          sudo apt-get install python3-netaddr git whois
       - name: Run Scripts
         run: |
           echo 'Running ./utils/bitcoinnodes.sh'
