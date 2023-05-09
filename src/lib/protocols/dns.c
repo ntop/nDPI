@@ -214,7 +214,8 @@ static char* dns_error_code2string(u_int16_t error_code, char *buf, u_int buf_le
 static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 				   u_int *off /* payload offset */,
 				   char *_hostname, u_int max_len,
-				   u_int *_hostname_len) {
+				   u_int *_hostname_len,
+				   u_int8_t ignore_checks) {
   u_int8_t hostname_is_valid = 1;
   u_int j = 0;
 
@@ -234,22 +235,27 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
     if(j && (j < max_len)) _hostname[j++] = '.';
 
     while((j < max_len) && (cl != 0)) {
-      u_int32_t shift;
-
       c = packet->payload[(*off)++];
-      shift = ((u_int32_t) 1) << (c & 0x1f);
 
-      if((dns_validchar[c >> 5] & shift)) {
+      if(ignore_checks)
 	_hostname[j++] = tolower(c);
-      } else {
-	if (isprint(c) == 0) {
-	  hostname_is_valid = 0;
-	  _hostname[j++] = '?';
+      else {
+	u_int32_t shift;
+      
+	shift = ((u_int32_t) 1) << (c & 0x1f);
+
+	if((dns_validchar[c >> 5] & shift)) {
+	  _hostname[j++] = tolower(c);
 	} else {
-	  _hostname[j++] = '_';
+	  if (isprint(c) == 0) {
+	    hostname_is_valid = 0;
+	    _hostname[j++] = '?';
+	  } else {
+	    _hostname[j++] = '_';
+	  }
 	}
       }
-
+      
       cl--;
     }
   }
@@ -264,7 +270,8 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
 			    struct ndpi_dns_packet_header *dns_header,
-			    u_int payload_offset, u_int8_t *is_query) {
+			    u_int payload_offset, u_int8_t *is_query,
+			    u_int8_t ignore_checks) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int x = payload_offset;
 
@@ -452,7 +459,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
 		    ndpi_grab_dns_name(packet, &x,
 				       flow->protos.dns.ptr_domain_name,
-				     sizeof(flow->protos.dns.ptr_domain_name), &len);
+				       sizeof(flow->protos.dns.ptr_domain_name), &len,
+				       ignore_checks);
 		    found = 1;
 		  }
 		}
@@ -615,7 +623,7 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int payload_offset;
-  u_int8_t is_query;
+  u_int8_t is_query, is_mdns;
   u_int16_t s_port = 0, d_port = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
@@ -643,13 +651,15 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     payload_offset = 2;
   }
 
+  is_mdns = ((s_port == MDNS_PORT) || (d_port == MDNS_PORT)) ? 1 : 0;
+  
   if(((s_port == DNS_PORT) || (d_port == DNS_PORT)
-      || (s_port == MDNS_PORT) || (d_port == MDNS_PORT)
+      || is_mdns
       || (d_port == LLMNR_PORT))
      && (packet->payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset)) {
     struct ndpi_dns_packet_header dns_header;
     u_int len, off;
-    int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query);
+    int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query, is_mdns);
     ndpi_protocol ret;
     u_int num_queries, idx;
     char _hostname[256];
@@ -717,7 +727,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       }
     } /* for */
 
-    u_int8_t hostname_is_valid = ndpi_grab_dns_name(packet, &off, _hostname, sizeof(_hostname), &len);
+    u_int8_t hostname_is_valid = ndpi_grab_dns_name(packet, &off, _hostname, sizeof(_hostname), &len, is_mdns);
 
     ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len);
 
