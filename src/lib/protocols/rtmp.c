@@ -40,8 +40,8 @@ static void ndpi_check_rtmp(struct ndpi_detection_module_struct *ndpi_struct, st
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
   
-  /* Break after 20 packets. */
-  if (flow->packet_counter > 20) {
+  /* Break after 13 packets. */
+  if (flow->packet_counter > 13) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
@@ -50,7 +50,10 @@ static void ndpi_check_rtmp(struct ndpi_detection_module_struct *ndpi_struct, st
   if(flow->rtmp_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "RTMP stage 0: \n");
      
-    if ((payload_len >= 4) && ((packet->payload[0] == 0x03) || (packet->payload[0] == 0x06))) {
+    if ((payload_len >= 9) &&
+	((packet->payload[0] == 0x03) || (packet->payload[0] == 0x06)) &&
+	/* https://en.wikipedia.org/w/index.php?title=Real-Time_Messaging_Protocol&section=12#Handshake */
+	get_u_int32_t(packet->payload, 5) == 0) {
       NDPI_LOG_DBG2(ndpi_struct, "Possible RTMP request detected, we will look further for the response\n");
        
       /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */

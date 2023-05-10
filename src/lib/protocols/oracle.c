@@ -50,13 +50,17 @@ static void ndpi_search_oracle(struct ndpi_detection_module_struct *ndpi_struct,
 		 && (packet->payload[3] == 0x00)))) {
       NDPI_LOG_INFO(ndpi_struct, "found oracle\n");
       ndpi_int_oracle_add_connection(ndpi_struct, flow);
+      return;
     } else if (packet->payload_packet_len == 213 && packet->payload[0] == 0x00 &&
                packet->payload[1] == 0xd5 && packet->payload[2] == 0x00 &&
                packet->payload[3] == 0x00 ) {
       NDPI_LOG_INFO(ndpi_struct, "found oracle\n");
       ndpi_int_oracle_add_connection(ndpi_struct, flow);
+      return;
     }
   }
+  if(flow->packet_counter > 5)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

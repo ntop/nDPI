@@ -491,7 +491,8 @@ static void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, s
     return;
   }
 
-  if(flow->stun.num_pkts >= MAX_NUM_STUN_PKTS)
+  if(flow->stun.num_pkts >= MAX_NUM_STUN_PKTS ||
+     flow->packet_counter > 10)
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
   if(flow->packet_counter > 0) {

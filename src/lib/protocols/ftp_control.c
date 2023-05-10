@@ -37,6 +37,7 @@ extern void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *
 static void ndpi_int_ftp_control_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 						struct ndpi_flow_struct *flow) {
 
+  NDPI_LOG_INFO(ndpi_struct, "found FTP_CONTROL\n");
   flow->host_server_name[0] = '\0'; /* Remove any data set by other dissectors (eg. SMTP) */
   ndpi_set_detected_protocol(ndpi_struct, flow,
 			     NDPI_PROTOCOL_FTP_CONTROL, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);

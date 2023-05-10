@@ -74,7 +74,6 @@ static void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct
 	
 	ndpi_int_ubntac2_add_connection(ndpi_struct, flow);
       }
-      return;
     }
   }
 

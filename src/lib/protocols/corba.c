@@ -41,8 +41,11 @@ static void ndpi_search_corba(struct ndpi_detection_module_struct *ndpi_struct, 
        memcmp(packet->payload, "GIOP", 4) == 0) {
       NDPI_LOG_INFO(ndpi_struct, "found corba\n");
       ndpi_int_corba_add_connection(ndpi_struct, flow);
+      return;
     }
   }
+  if(flow->packet_counter > 5)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

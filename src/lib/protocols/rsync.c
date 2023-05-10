@@ -40,17 +40,20 @@ static void ndpi_search_rsync(struct ndpi_detection_module_struct *ndpi_struct, 
   if(packet->tcp) {
     NDPI_LOG_DBG2(ndpi_struct, "calculating RSYNC over tcp\n");
     /*
-     * Should match: memcmp(packet->payload, "@RSYNCD: 28", 14) == 0)
+     * Should match: memcmp(packet->payload, "@RSYNCD:", 8) == 0)
      */
-    if (packet->payload_packet_len == 12 && packet->payload[0] == 0x40 &&
+    if (packet->payload_packet_len >= 8 && packet->payload[0] == 0x40 &&
 	packet->payload[1] == 0x52 && packet->payload[2] == 0x53 &&
 	packet->payload[3] == 0x59 && packet->payload[4] == 0x4e &&
 	packet->payload[5] == 0x43 && packet->payload[6] == 0x44 &&
 	packet->payload[7] == 0x3a ) {
       NDPI_LOG_INFO(ndpi_struct, "found rsync\n");
       ndpi_int_rsync_add_connection(ndpi_struct, flow);
+      return;
     }
   }
+  if(flow->packet_counter > 5)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

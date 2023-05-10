@@ -44,8 +44,11 @@ static void ndpi_search_nats_tcp(struct ndpi_detection_module_struct *ndpi_struc
   /* Check connection over TCP */
   NDPI_LOG_DBG(ndpi_struct, "search NATS\n");
 
-  if(packet->tcp && (packet->payload_packet_len > 4)) {
+  if(packet->tcp) {
     int i;
+
+    if(packet->payload_packet_len <= 4)
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 
     for(i=0; commands[i] != NULL; i++) {
       int len = ndpi_min(strlen(commands[i]), packet->payload_packet_len);

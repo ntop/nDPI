@@ -37,6 +37,9 @@ static void ndpi_search_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
       NDPI_LOG_INFO(ndpi_struct, "found rtcp\n");
       ndpi_int_rtcp_add_connection(ndpi_struct, flow);
     }
+
+    if(flow->packet_counter > 3)
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   } else if(packet->udp != NULL) {
     /* Let's check first the RTCP packet length */
     u_int16_t len, offset = 0, rtcp_section_len;

@@ -40,6 +40,8 @@ static void ndpi_search_checkmk(struct ndpi_detection_module_struct *ndpi_struct
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
+  NDPI_LOG_DBG(ndpi_struct, "search Checkmk\n");
+
   if (packet->payload_packet_len >= 15) {
 
     if(packet->payload_packet_len > 128) {
@@ -48,6 +50,8 @@ static void ndpi_search_checkmk(struct ndpi_detection_module_struct *ndpi_struct
 	the initial connection, we need to discard these packets
 	as they are not an indication that this flow is not AFP
       */
+      if(flow->packet_counter > 6)
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
 
@@ -58,13 +62,13 @@ static void ndpi_search_checkmk(struct ndpi_detection_module_struct *ndpi_struct
     if (packet->payload_packet_len >= 15 && packet->payload_packet_len < 100
         && memcmp(packet->payload, "<<<check_mk>>>", 14) == 0) {
 
-      NDPI_LOG(NDPI_PROTOCOL_CHECKMK, ndpi_struct, NDPI_LOG_DEBUG, "Check_MK: Flow detected.\n");
+      NDPI_LOG_DBG(ndpi_struct, "Check_MK: Flow detected.\n");
       ndpi_int_checkmk_add_connection(ndpi_struct, flow);
       return;
     }
   }
 
-  NDPI_LOG(NDPI_PROTOCOL_CHECKMK, ndpi_struct, NDPI_LOG_DEBUG, "Check_MK excluded.\n");
+  NDPI_LOG_DBG(ndpi_struct, "Check_MK excluded.\n");
   NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_CHECKMK);
 }
 

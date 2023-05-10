@@ -83,6 +83,9 @@ static void ndpi_search_viber(struct ndpi_detection_module_struct *ndpi_struct, 
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
+
+  if(flow->packet_counter > 3)
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
