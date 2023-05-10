@@ -5961,31 +5961,45 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
 /* ********************************************************************************* */
 
-static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow) {
+static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_client) {
   u_int32_t key;
 
-  if(flow->is_ipv6)
-    key = ndpi_quick_hash(flow->c_address.v6, 16);
-  else
-    key = ntohl(flow->c_address.v4);
-
+  if(use_client) {
+    if(flow->is_ipv6)
+      key = ndpi_quick_hash(flow->c_address.v6, 16);
+    else
+      key = ntohl(flow->c_address.v4);
+  } else {
+    if(flow->is_ipv6)
+      key = ndpi_quick_hash(flow->s_address.v6, 16);
+    else
+      key = ntohl(flow->s_address.v4);
+  }
+  
   return key;
 }
 
 /* ********************************************************************************* */
 
-static void ndpi_reconcile_msteams(struct ndpi_detection_module_struct *ndpi_str,
-				   struct ndpi_flow_struct *flow) {
+static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi_str,
+				       struct ndpi_flow_struct *flow) {
   if((flow->l4_proto == IPPROTO_UDP) && (ndpi_str->packet.udp != NULL)) {
     u_int16_t sport = ntohs(ndpi_str->packet.udp->source);
     u_int16_t dport = ntohs(ndpi_str->packet.udp->dest);
+    u_int8_t  s_match = ((sport >= 3478) && (sport <= 3481)) ? 1 : 0;
+    u_int8_t  d_match = ((dport >= 3478) && (dport <= 3481)) ? 1 : 0;
     
-    if(
-      ((sport >= 3478) && (sport <= 3481))
-      || ((dport >= 3478) && (dport <= 3481))) {	
+    if(s_match || d_match) {
       ndpi_int_change_protocol(ndpi_str, flow,
 			       NDPI_PROTOCOL_SKYPE_TEAMS, flow->detected_protocol_stack[1],
 			       NDPI_CONFIDENCE_DPI_PARTIAL);
+
+      if(ndpi_str->msteams_cache)
+	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
+			      make_msteams_key(flow, s_match ? 0 /* server */ : 1 /* client */),
+			      0 /* dummy */,
+			      ndpi_get_current_time(flow));
+
     }
   }  
 }
@@ -6012,7 +6026,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   switch(ret->app_protocol) {
   case NDPI_PROTOCOL_MICROSOFT_AZURE:
-    ndpi_reconcile_msteams(ndpi_str, flow);
+    ndpi_reconcile_msteams_udp(ndpi_str, flow);
     break;
     
     /*
@@ -6025,7 +6039,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
       if(ndpi_str->msteams_cache)
 	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-			      make_msteams_key(flow),
+			      make_msteams_key(flow, 1 /* client */),
 			      0 /* dummy */,
 			      ndpi_get_current_time(flow));
     }
@@ -6033,7 +6047,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   case NDPI_PROTOCOL_STUN:
     if(flow && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE))
-      ndpi_reconcile_msteams(ndpi_str, flow);
+      ndpi_reconcile_msteams_udp(ndpi_str, flow);
     break;
       
   case NDPI_PROTOCOL_NETFLOW:
@@ -6049,20 +6063,42 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
     break;
 
+  case NDPI_PROTOCOL_TLS:
+    /*
+      When Teams is unable to communicate via UDP
+      it switches to TLS.TCP. Let's try to catch it
+    */
+    if(flow
+       && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE)
+       && (ret->master_protocol == NDPI_PROTOCOL_UNKNOWN)
+       && ndpi_str->msteams_cache
+      ) {
+      u_int16_t dummy;
+      
+      if(ndpi_lru_find_cache(ndpi_str->msteams_cache,
+			     make_msteams_key(flow, 1 /* client */),
+			     &dummy, 0 /* Don't remove it as it can be used for other connections */,
+			     ndpi_get_current_time(flow))) {
+	ndpi_int_change_protocol(ndpi_str, flow,
+				 NDPI_PROTOCOL_SKYPE_TEAMS, flow->detected_protocol_stack[1],
+				 NDPI_CONFIDENCE_DPI_PARTIAL);
+      }      
+    }
+    break;
+    
   case NDPI_PROTOCOL_SKYPE_TEAMS:
   case NDPI_PROTOCOL_SKYPE_TEAMS_CALL:
-    if(flow->l4_proto == IPPROTO_UDP
-       && ndpi_str->msteams_cache) {
+    if(flow->l4_proto == IPPROTO_UDP && ndpi_str->msteams_cache) {
       u_int16_t dummy;
 
-      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, make_msteams_key(flow),
+      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, make_msteams_key(flow, 1 /* client */),
 			     &dummy, 0 /* Don't remove it as it can be used for other connections */,
 			     ndpi_get_current_time(flow))) {
 	  ret->app_protocol = NDPI_PROTOCOL_MSTEAMS;
 
 	  /* Refresh cache */
 	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-				make_msteams_key(flow),
+				make_msteams_key(flow, 1 /* client */),
 				0 /* dummy */,
 				ndpi_get_current_time(flow));
       }
