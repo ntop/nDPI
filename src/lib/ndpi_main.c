@@ -5974,6 +5974,24 @@ static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow) {
 
 /* ********************************************************************************* */
 
+static void ndpi_reconcile_msteams(struct ndpi_detection_module_struct *ndpi_str,
+				   struct ndpi_flow_struct *flow) {
+  if((flow->l4_proto == IPPROTO_UDP) && (ndpi_str->packet.udp != NULL)) {
+    u_int16_t sport = ntohs(ndpi_str->packet.udp->source);
+    u_int16_t dport = ntohs(ndpi_str->packet.udp->dest);
+    
+    if(
+      ((sport >= 3478) && (sport <= 3481))
+      || ((dport >= 3478) && (dport <= 3481))) {	
+      ndpi_int_change_protocol(ndpi_str, flow,
+			       NDPI_PROTOCOL_SKYPE_TEAMS, flow->detected_protocol_stack[1],
+			       NDPI_CONFIDENCE_DPI_PARTIAL);
+    }
+  }  
+}
+
+/* ********************************************************************************* */
+
 static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
 				     struct ndpi_flow_struct *flow,
 				     ndpi_protocol *ret) {
@@ -5993,12 +6011,16 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   // printf("====>> %u.%u [%u]\n", ret->master_protocol, ret->app_protocol, flow->detected_protocol_stack[0]);
 
   switch(ret->app_protocol) {
+  case NDPI_PROTOCOL_MICROSOFT_AZURE:
+    ndpi_reconcile_msteams(ndpi_str, flow);
+    break;
+    
     /*
       Skype for a host doing MS Teams means MS Teams
       (MS Teams uses Skype as transport protocol for voice/video)
     */
   case NDPI_PROTOCOL_MSTEAMS:
-    if(flow->l4_proto == IPPROTO_TCP) {
+    if(flow && (flow->l4_proto == IPPROTO_TCP)) {
       // printf("====>> NDPI_PROTOCOL_MSTEAMS\n");
 
       if(ndpi_str->msteams_cache)
@@ -6009,6 +6031,11 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     }
     break;
 
+  case NDPI_PROTOCOL_STUN:
+    if(flow && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE))
+      ndpi_reconcile_msteams(ndpi_str, flow);
+    break;
+      
   case NDPI_PROTOCOL_NETFLOW:
   case NDPI_PROTOCOL_SFLOW:
   case NDPI_PROTOCOL_RTP:
