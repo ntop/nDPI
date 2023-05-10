@@ -5983,9 +5983,12 @@ static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_cl
 
 static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi_str,
 				       struct ndpi_flow_struct *flow) {
-  if((flow->l4_proto == IPPROTO_UDP) && (ndpi_str->packet.udp != NULL)) {
-    u_int16_t sport = ntohs(ndpi_str->packet.udp->source);
-    u_int16_t dport = ntohs(ndpi_str->packet.udp->dest);
+
+  /* This function can NOT access &ndpi_str->packet since it is called also from ndpi_detection_giveup(), via ndpi_reconcile_protocols() */
+
+  if(flow->l4_proto == IPPROTO_UDP) {
+    u_int16_t sport = ntohs(flow->c_port);
+    u_int16_t dport = ntohs(flow->s_port);
     u_int8_t  s_match = ((sport >= 3478) && (sport <= 3481)) ? 1 : 0;
     u_int8_t  d_match = ((dport >= 3478) && (dport <= 3481)) ? 1 : 0;
     
@@ -6080,7 +6083,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 			     &dummy, 0 /* Don't remove it as it can be used for other connections */,
 			     ndpi_get_current_time(flow))) {
 	ndpi_int_change_protocol(ndpi_str, flow,
-				 NDPI_PROTOCOL_SKYPE_TEAMS, flow->detected_protocol_stack[1],
+				 NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_TLS,
 				 NDPI_CONFIDENCE_DPI_PARTIAL);
       }      
     }
