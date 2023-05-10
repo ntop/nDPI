@@ -502,7 +502,7 @@ static ndpi_network host_protocol_list[] = {
 
 
   /* Teamviewer
-   router1.teamviewer.com... router16.teamviewer.com 
+   router1.teamviewer.com... router16.teamviewer.com
    TODO: are we able to autogenerate this list (like the other Teamviewer IPs)?
   */
   { 0x25FCE044 /* 37.252.224.68 */, 30, NDPI_PROTOCOL_TEAMVIEWER },
@@ -1237,7 +1237,10 @@ static ndpi_protocol_match host_match[] =
 
    { "deezer.com",                              "Deezer",           NDPI_PROTOCOL_DEEZER, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
-   /* Microsoft + Azure */
+   /*
+     Microsoft + Azure
+     https://learn.microsoft.com/en-us/windows/privacy/manage-windows-1903-endpoints
+   */
    { ".wpc.v0cdn.net",                                        "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".gfx.ms",                                               "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".aka.ms",                                               "Microsoft",        NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -1303,6 +1306,10 @@ static ndpi_protocol_match host_match[] =
    { "teams-msgapi.trafficmanager.net",  "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "teams.office.net",                 "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "teams.office.com",                 "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "statics.teams.cdn.live.net",       "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".mstea.ms",                        "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "aka.ms",                           "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "teams.events.data.microsoft.com",  "Teams",         NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { ".storage.live.com",               "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE,NDPI_PROTOCOL_CATEGORY_CLOUD,  NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "skyapi.live.net",                 "MS_OneDrive",  NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -1364,6 +1371,8 @@ static ndpi_protocol_match host_match[] =
    { "mail.live.com",                           "Microsoft365",    NDPI_PROTOCOL_MICROSOFT_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "office.live.com",                         "Microsoft365",    NDPI_PROTOCOL_MICROSOFT_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".onenote.",                               "Microsoft365",    NDPI_PROTOCOL_MICROSOFT_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".cloud.microsoft",                        "Microsoft365",    NDPI_PROTOCOL_MICROSOFT_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "whiteboard.microsoft.com",                "Microsoft365",    NDPI_PROTOCOL_MICROSOFT_365, NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "cloudflare.com",      "Cloudflare",       NDPI_PROTOCOL_CLOUDFLARE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
@@ -1787,7 +1796,7 @@ static ndpi_protocol_match host_match[] =
 
    { "siriusxm.ca",                      "SiriusXMRadio", NDPI_PROTOCOL_SIRIUSXMRADIO, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "siriusxm.com",                     "SiriusXMRadio", NDPI_PROTOCOL_SIRIUSXMRADIO, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   
+
    { "tailscale.com",                    "Tailscale", NDPI_PROTOCOL_TAILSCALE, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
@@ -1935,4 +1944,3 @@ static ndpi_category_match category_match[] = {
 
    { NULL, 0 }
 };
-
