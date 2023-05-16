@@ -3345,7 +3345,7 @@ static void free_ptree_data(void *data) {
   while(item != NULL) {
     struct patricia_uv16_list *next = item->next;
 
-    free(item);
+    ndpi_free(item);
     item = next;
   }
 }

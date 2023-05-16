@@ -432,13 +432,13 @@ void ndpi_term_serializer(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
   if(serializer->buffer.data) {
-    free(serializer->buffer.data);
+    ndpi_free(serializer->buffer.data);
     serializer->buffer.size = 0;
     serializer->buffer.data = NULL;
   }
 
   if(serializer->header.data) {
-    free(serializer->header.data);
+    ndpi_free(serializer->header.data);
     serializer->header.size = 0;
     serializer->header.data = NULL;
   }
