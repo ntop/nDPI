@@ -7232,20 +7232,6 @@ void ndpi_parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str
     packet->http_response.ptr = &packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.1 ")];
     packet->http_response.len = packet->line[0].len - NDPI_STATICSTRING_LEN("HTTP/1.1 ");
     packet->http_num_headers++;
-
-    /* Set server HTTP response code */
-    if(packet->payload_packet_len >= 12) {
-      char buf[4];
-
-      /* Set server HTTP response code */
-      strncpy(buf, (char *) &packet->payload[9], 3);
-      buf[3] = '\0';
-
-      flow->http.response_status_code = atoi(buf);
-      /* https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
-      if((flow->http.response_status_code < 100) || (flow->http.response_status_code > 509))
-	flow->http.response_status_code = 0; /* Out of range */
-    }
   }
 
   if((packet->parsed_lines == 0) && (packet->line[0].len > 0)) {
