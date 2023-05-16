@@ -93,7 +93,7 @@ void ndpi_reset_data_analysis(struct ndpi_analyze_struct *d) {
 /*
   Add a new point to analyze
  */
-void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
+void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int64_t value) {
   if(!s)
     return;
 

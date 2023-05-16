@@ -1505,7 +1505,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       if(flow->iat_flow
 	 && (tdiff.tv_sec >= 0) /* Discard backward time */
 	 ) {
-	u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
+	u_int64_t ms = ndpi_timeval_to_milliseconds(tdiff);
 
 	if(ms > 0)
 	  ndpi_data_add_value(flow->iat_flow, ms);
@@ -1521,7 +1521,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	if(flow->iat_c_to_s
 	   && (tdiff.tv_sec >= 0) /* Discard backward time */
 	   ) {
-	  u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
+	  u_int64_t ms = ndpi_timeval_to_milliseconds(tdiff);
 
 	  ndpi_data_add_value(flow->iat_c_to_s, ms);
 	}
@@ -1540,7 +1540,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	ndpi_timer_sub(&when, &flow->dst2src_last_pkt_time, &tdiff);
 
 	if(flow->iat_s_to_c) {
-	  u_int32_t ms = ndpi_timeval_to_milliseconds(tdiff);
+	  u_int64_t ms = ndpi_timeval_to_milliseconds(tdiff);
 
 	  ndpi_data_add_value(flow->iat_s_to_c, ms);
 	}
