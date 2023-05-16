@@ -212,7 +212,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
       
       ndpi_set_detected_protocol(ndpi_struct, flow, 
 				 NDPI_PROTOCOL_ZOOM,
-				 NDPI_PROTOCOL_RTP,
+				 NDPI_PROTOCOL_SRTP,
 				 NDPI_CONFIDENCE_DPI);
       return;
     }

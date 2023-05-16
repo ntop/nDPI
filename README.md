@@ -82,6 +82,7 @@ The entire procedure of adding new protocols in detail:
 8. From the `nDPI` root directory, `./autogen.sh --with-pcre` (nBPF and PCRE are usually optional, but they are needed to run/update *all* the unit tests)
 9. `make`
 10. `make check`
+11. Update the documentation, adding this new protocol to `doc/protocols.rst`
 
 ### How to use nDPI to Block Selected Traffic
 
