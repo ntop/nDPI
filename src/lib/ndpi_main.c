@@ -6375,7 +6375,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     ret.app_protocol = flow->detected_protocol_stack[0];
   }
 
-  /* Classification by-port is the last resort */
+  /* Classification by-port */
   if(enable_guess && ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
 
     /* Ignore guessed protocol if they have been discarded */
@@ -6391,21 +6391,14 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     }
   }
 
+  /* Classification by-ip, as last effort */
+  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
+     flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
 
-  if((flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN)
-     && ((ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) || (ret.master_protocol == NDPI_PROTOCOL_UNKNOWN))) {
-
-    if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
       ndpi_int_change_protocol(ndpi_str, flow,
 			       flow->guessed_protocol_id_by_ip, ret.master_protocol,
 			       NDPI_CONFIDENCE_MATCH_BY_IP);
-    else
-      /* master_protocol == NDPI_PROTOCOL_UNKNOWN) */
-      ndpi_int_change_protocol(ndpi_str, flow,
-			       flow->guessed_protocol_id_by_ip, ret.app_protocol,
-			       NDPI_CONFIDENCE_DPI_PARTIAL);
-
-    ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
+      ret.app_protocol = flow->detected_protocol_stack[0];
   }
 
   if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN) {

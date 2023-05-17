@@ -3,7 +3,7 @@ Guessed flow protos:	1
 DPI Packets (TCP):	288	(6.13 pkts/flow)
 DPI Packets (UDP):	27	(2.08 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
-Confidence DPI (partial)    : 1 (flows)
+Confidence Match by port    : 1 (flows)
 Confidence DPI              : 60 (flows)
 Num dissector calls: 375 (6.15 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -27,8 +27,8 @@ DNS	4	386	2
 HTTP	814	494949	18
 SSDP	16	2648	1
 IGMP	1	60	1
+TLS	2	126	1
 NetFlix	956	508247	38
-AmazonAWS	2	126	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -94,5 +94,5 @@ JA3 Host Stats:
 	57	UDP 192.168.1.7:57719 <-> 192.168.1.1:53 [proto: 5.133/DNS.NetFlix][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/85 bytes <-> 1 pkts/137 bytes][Goodput ratio: 50/69][0.02 sec][Hostname/SNI: sha2.san.akam.nflximg.net][104.86.97.179][PLAIN TEXT (akamaiedge)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	58	UDP 192.168.1.7:57093 <-> 192.168.1.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/81 bytes <-> 1 pkts/113 bytes][Goodput ratio: 48/62][0.02 sec][Hostname/SNI: a1907.dscg.akamai.net][184.25.204.10][PLAIN TEXT (akamai)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	59	UDP 192.168.1.7:51728 <-> 192.168.1.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/80 bytes <-> 1 pkts/112 bytes][Goodput ratio: 47/62][0.02 sec][Hostname/SNI: a803.dscg.akamai.net][184.25.204.24][PLAIN TEXT (akamai)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	60	TCP 192.168.1.7:52929 -> 52.24.87.6:443 [proto: 91.265/TLS.AmazonAWS][IP: 265/AmazonAWS][Encrypted][Confidence: DPI (partial)][DPI packets: 2][cat: Cloud/13][2 pkts/126 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][14.20 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	60	TCP 192.168.1.7:52929 -> 52.24.87.6:443 [proto: 91/TLS][IP: 265/AmazonAWS][Encrypted][Confidence: Match by port][DPI packets: 2][cat: Web/5][2 pkts/126 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][14.20 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	61	IGMP 192.168.1.7:0 -> 239.255.255.250:0 [proto: 82/IGMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

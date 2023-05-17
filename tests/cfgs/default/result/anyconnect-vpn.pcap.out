@@ -4,8 +4,7 @@ DPI Packets (TCP):	131	(5.95 pkts/flow)
 DPI Packets (UDP):	82	(2.22 pkts/flow)
 DPI Packets (other):	10	(1.00 pkts/flow)
 Confidence Unknown          : 2 (flows)
-Confidence Match by port    : 5 (flows)
-Confidence DPI (partial)    : 1 (flows)
+Confidence Match by port    : 6 (flows)
 Confidence DPI              : 61 (flows)
 Num dissector calls: 851 (12.33 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -35,10 +34,9 @@ Outlook	2	305	1
 DTLS	29	6109	1
 ICMP	2	126	2
 IGMP	8	378	6
-TLS	326	86782	12
+TLS	328	86914	13
 ICMPV6	18	2964	2
 Slack	29	4979	2
-Google	2	132	1
 AJP	5	390	1
 Apple	2	297	1
 CiscoVPN	3	198	1
@@ -107,7 +105,7 @@ JA3 Host Stats:
 	56	UDP 10.0.0.227:51990 <-> 75.75.75.75:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/75 bytes <-> 1 pkts/91 bytes][Goodput ratio: 43/53][0.04 sec][Hostname/SNI: mail.viasat.com][8.37.103.196][PLAIN TEXT (viasat)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	57	UDP 10.0.0.227:57253 <-> 75.75.75.75:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/71 bytes <-> 1 pkts/87 bytes][Goodput ratio: 40/51][0.02 sec][Hostname/SNI: mozilla.org][63.245.208.195][PLAIN TEXT (mozilla)][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	58	UDP 10.0.0.227:58155 <-> 75.75.76.76:53 [proto: 5.118/DNS.Slack][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/69 bytes <-> 1 pkts/85 bytes][Goodput ratio: 39/50][0.03 sec][Hostname/SNI: slack.com][99.86.34.156][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	59	TCP 10.0.0.227:56874 <-> 74.125.197.188:443 [proto: 91.126/TLS.Google][IP: 126/Google][Encrypted][Confidence: DPI (partial)][DPI packets: 2][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.04 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	59	TCP 10.0.0.227:56874 <-> 74.125.197.188:443 [proto: 91/TLS][IP: 126/Google][Encrypted][Confidence: Match by port][DPI packets: 2][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.04 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	60	IGMP 10.0.0.213:0 -> 224.0.0.2:0 [proto: 82/IGMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/92 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][13.31 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	61	IGMP 10.0.0.213:0 -> 224.0.0.251:0 [proto: 82/IGMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/92 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][13.31 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	62	ICMP 10.0.0.227:0 -> 75.75.76.76:0 [proto: 81/ICMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 39/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

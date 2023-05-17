@@ -1,7 +1,7 @@
 Guessed flow protos:	2
 
 DPI Packets (TCP):	10	(3.33 pkts/flow)
-Confidence DPI (partial)    : 1 (flows)
+Confidence Match by port    : 1 (flows)
 Confidence DPI              : 2 (flows)
 Num dissector calls: 118 (39.33 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -21,9 +21,8 @@ Patricia risk mask:   6/0 (search/found)
 Patricia risk:        2/0 (search/found)
 Patricia protocols:   4/2 (search/found)
 
-TLS	7	1827	1
+TLS	8	1891	2
 Crashlytics	3	560	1
-GoTo	1	64	1
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -32,4 +31,4 @@ JA3 Host Stats:
 
 	1	TCP 192.168.10.101:3967 <-> 206.33.61.113:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 6][cat: Web/5][4 pkts/330 bytes <-> 3 pkts/1497 bytes][Goodput ratio: 31/89][0.08 sec][bytes ratio: -0.639 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/38 25/19 58/38 24/19][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 82/499 156/905 43/346][Risk: ** Obsolete TLS (v1.1 or older) **][Risk Score: 100][Risk Info: TLSv1][TLSv1][JA3S: 53611273a714cb4789c8222932efd5a7 (INSECURE)][Cipher: TLS_RSA_WITH_RC4_128_MD5][Plen Bins: 0,0,0,33,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 10.191.139.17:58552 <-> 54.221.224.45:443 [VLAN: 2][proto: GTP:91.275/TLS.Crashlytics][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][DPI packets: 3][cat: DataTransfer/4][2 pkts/442 bytes <-> 1 pkts/118 bytes][Goodput ratio: 41/0][0.23 sec][Hostname/SNI: e.crashlytics.com][(Advertised) ALPNs: ][Risk: ** Uncommon TLS ALPN **** TLS Susp Extn **][Risk Score: 150][TLSv1.2][JA3C: 9d5430e6dfce44459702b74d790df353][Firefox][PLAIN TEXT (e.crashlytics.com)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	3	TCP 74.80.160.99:3258 -> 67.217.77.28:443 [proto: 91.293/TLS.GoTo][IP: 293/GoTo][Encrypted][Confidence: DPI (partial)][DPI packets: 1][cat: VoIP/10][1 pkts/64 bytes -> 0 pkts/0 bytes][Goodput ratio: 15/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 74.80.160.99:3258 -> 67.217.77.28:443 [proto: 91/TLS][IP: 293/GoTo][Encrypted][Confidence: Match by port][DPI packets: 1][cat: Web/5][1 pkts/64 bytes -> 0 pkts/0 bytes][Goodput ratio: 15/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

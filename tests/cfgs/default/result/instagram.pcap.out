@@ -4,8 +4,7 @@ DPI Packets (TCP):	219	(7.30 pkts/flow)
 DPI Packets (UDP):	10	(1.43 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
-Confidence Match by port    : 6 (flows)
-Confidence DPI (partial)    : 1 (flows)
+Confidence Match by port    : 7 (flows)
 Confidence DPI              : 30 (flows)
 Num dissector calls: 1311 (34.50 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -26,10 +25,9 @@ Patricia risk:        0/0 (search/found)
 Patricia protocols:   60/16 (search/found)
 
 Unknown	1	66	1
-HTTP	116	91784	6
+HTTP	156	130772	7
 ICMP	5	510	1
 TLS	103	62597	5
-Facebook	40	38988	1
 Dropbox	5	725	2
 Instagram	576	391376	22
 
@@ -45,7 +43,7 @@ JA3 Host Stats:
 	4	TCP 192.168.0.103:44379 <-> 82.85.26.186:80 [proto: 7.211/HTTP.Instagram][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 9][cat: SocialNetwork/6][41 pkts/3392 bytes <-> 40 pkts/50024 bytes][Goodput ratio: 15/95][7.88 sec][Hostname/SNI: photos-e.ak.instagram.com][bytes ratio: -0.873 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 244/12 7254/372 1261/66][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 83/1251 325/1484 56/507][URL: photos-e.ak.instagram.com/hphotos-ak-xaf1/t51.2885-15/e35/11379148_1449120228745316_607477962_n.jpg?se=7][User-Agent: Instagram 7.1.1 Android (19/4.4.2; 480dpi; 1080x1920; samsung; GT-I9505; jflte; qcom; it_IT)][PLAIN TEXT (GET /hphotos)][Plen Bins: 2,0,9,0,0,0,2,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,82,0,0,0]
 	5	TCP 192.168.0.103:57936 <-> 82.85.26.162:80 [proto: 7.211/HTTP.Instagram][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: SocialNetwork/6][24 pkts/1837 bytes <-> 34 pkts/48383 bytes][Goodput ratio: 14/95][0.51 sec][Hostname/SNI: photos-g.ak.instagram.com][bytes ratio: -0.927 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 28/0 321/2 76/1][Pkt Len c2s/s2c min/avg/max/stddev: 66/186 77/1423 319/1484 51/249][URL: photos-g.ak.instagram.com/hphotos-ak-xaf1/t51.2885-15/e15/11386524_110257619317430_379513654_n.jpg][StatusCode: 200][Content-Type: image/jpeg][User-Agent: Instagram 7.1.1 Android (19/4.4.2; 480dpi; 1080x1920; samsung; GT-I9505; jflte; qcom; it_IT)][PLAIN TEXT (GET /hphotos)][Plen Bins: 0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,91,0,0,0]
 	6	TCP 192.168.0.103:33936 <-> 31.13.93.52:443 [proto: 91/TLS][IP: 119/Facebook][Encrypted][Confidence: DPI][DPI packets: 3][cat: Web/5][34 pkts/5555 bytes <-> 34 pkts/40133 bytes][Goodput ratio: 60/94][10.06 sec][bytes ratio: -0.757 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 364/362 7669/7709 1462/1472][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 163/1180 1431/1464 318/495][Plen Bins: 0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,2,0,0,0,0,0,5,0,2,0,0,0,0,0,0,2,0,0,0,2,76,0,0,0,0]
-	7	TCP 31.13.86.52:80 <-> 192.168.0.103:58216 [proto: 7.119/HTTP.Facebook][IP: 119/Facebook][ClearText][Confidence: DPI (partial)][DPI packets: 18][cat: SocialNetwork/6][26 pkts/38064 bytes <-> 14 pkts/924 bytes][Goodput ratio: 95/0][0.02 sec][bytes ratio: 0.953 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/1 1/2 0/1][Pkt Len c2s/s2c min/avg/max/stddev: 1464/66 1464/66 1464/66 0/0][PLAIN TEXT (dnlN/L)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0]
+	7	TCP 31.13.86.52:80 <-> 192.168.0.103:58216 [proto: 7/HTTP][IP: 119/Facebook][ClearText][Confidence: Match by port][DPI packets: 18][cat: Web/5][26 pkts/38064 bytes <-> 14 pkts/924 bytes][Goodput ratio: 95/0][0.02 sec][bytes ratio: 0.953 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/1 1/2 0/1][Pkt Len c2s/s2c min/avg/max/stddev: 1464/66 1464/66 1464/66 0/0][PLAIN TEXT (dnlN/L)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0]
 	8	TCP 2.22.236.51:80 <-> 192.168.0.103:44151 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 23][cat: Web/5][25 pkts/37100 bytes <-> 24 pkts/1584 bytes][Goodput ratio: 96/0][0.04 sec][bytes ratio: 0.918 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 7/7 2/2][Pkt Len c2s/s2c min/avg/max/stddev: 1484/66 1484/66 1484/66 0/0][PLAIN TEXT (inOCIM)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0]
 	9	TCP 192.168.0.103:33976 <-> 77.67.29.17:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 19][cat: Web/5][14 pkts/924 bytes <-> 20 pkts/28115 bytes][Goodput ratio: 0/95][7.36 sec][bytes ratio: -0.936 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 735/0 7321/3 2195/1][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 66/1406 66/1484 0/309][PLAIN TEXT (dGQaNFV)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,94,0,0,0]
 	10	TCP 92.122.48.138:80 <-> 192.168.0.103:41562 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 18][cat: Web/5][16 pkts/22931 bytes <-> 9 pkts/594 bytes][Goodput ratio: 95/0][0.02 sec][bytes ratio: 0.950 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 5/4 1/1][Pkt Len c2s/s2c min/avg/max/stddev: 671/66 1433/66 1484/66 197/0][PLAIN TEXT (DD.DOo)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,93,0,0,0]

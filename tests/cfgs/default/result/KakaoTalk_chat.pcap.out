@@ -3,8 +3,7 @@ Guessed flow protos:	8
 DPI Packets (TCP):	166	(8.74 pkts/flow)
 DPI Packets (UDP):	36	(2.00 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
-Confidence Match by port    : 4 (flows)
-Confidence DPI (partial)    : 1 (flows)
+Confidence Match by port    : 5 (flows)
 Confidence DPI              : 33 (flows)
 Num dissector calls: 522 (13.74 diss/flow)
 LRU cache ookla:      0/1/0 (insert/search/found)
@@ -25,11 +24,10 @@ Patricia risk:        0/0 (search/found)
 Patricia protocols:   63/15 (search/found)
 
 DNS	2	217	1
-HTTP	1	56	1
+HTTP	15	840	2
 ICMP	1	147	1
 TLS	37	5258	7
 Facebook	211	51558	11
-Google	14	784	1
 HTTP_Proxy	26	3926	1
 KakaoTalk	55	9990	15
 
@@ -50,7 +48,7 @@ JA3 Host Stats:
 	10	TCP 10.24.82.188:58964 <-> 54.255.253.199:5223 [proto: 91/TLS][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][DPI packets: 6][cat: Web/5][3 pkts/290 bytes <-> 3 pkts/1600 bytes][Goodput ratio: 27/87][0.31 sec][bytes ratio: -0.693 (Download)][IAT c2s/s2c min/avg/max/stddev: 15/5 107/56 199/108 92/52][Pkt Len c2s/s2c min/avg/max/stddev: 68/68 97/533 146/1456 35/652][Risk: ** Known Proto on Non Std Port **** Obsolete TLS (v1.1 or older) **][Risk Score: 150][Risk Info: TLSv1][TLSv1][JA3C: d9ce50c62ab1fd5932da3c6b6d406c65][Plen Bins: 0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0]
 	11	TCP 10.24.82.188:37557 <-> 31.13.68.84:80 [proto: 7.119/HTTP.Facebook][IP: 119/Facebook][ClearText][Confidence: DPI][DPI packets: 7][cat: SocialNetwork/6][5 pkts/487 bytes <-> 6 pkts/627 bytes][Goodput ratio: 38/45][21.97 sec][Hostname/SNI: www.facebook.com][bytes ratio: -0.126 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 40/40 115/102 264/210 106/77][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 97/104 243/339 73/105][URL: www.facebook.com/mobile/status.php][StatusCode: 204][User-Agent: Dalvik/1.6.0 (Linux; U; Android 4.4.4; MI 3W MIUI/V6.4.3.0.KXDMICB)][PLAIN TEXT (GET /mobile/status.php HTTP/1.1)][Plen Bins: 0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	12	TCP 10.24.82.188:37553 <-> 31.13.68.84:80 [proto: 7.119/HTTP.Facebook][IP: 119/Facebook][ClearText][Confidence: DPI][DPI packets: 7][cat: SocialNetwork/6][5 pkts/487 bytes <-> 5 pkts/571 bytes][Goodput ratio: 38/49][21.81 sec][Hostname/SNI: www.facebook.com][bytes ratio: -0.079 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 43/38 5452/101 21457/215 9241/81][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 97/114 243/339 73/112][URL: www.facebook.com/mobile/status.php][StatusCode: 204][User-Agent: Dalvik/1.6.0 (Linux; U; Android 4.4.4; MI 3W MIUI/V6.4.3.0.KXDMICB)][PLAIN TEXT (GET /mobile/status.php HTTP/1.1)][Plen Bins: 0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	13	TCP 216.58.221.10:80 <-> 10.24.82.188:35922 [proto: 7.126/HTTP.Google][IP: 126/Google][ClearText][Confidence: DPI (partial)][DPI packets: 14][cat: Web/5][7 pkts/392 bytes <-> 7 pkts/392 bytes][Goodput ratio: 0/0][25.75 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 136/98 3845/3844 13075/13111 4719/4735][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 56/56 56/56 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	TCP 216.58.221.10:80 <-> 10.24.82.188:35922 [proto: 7/HTTP][IP: 126/Google][ClearText][Confidence: Match by port][DPI packets: 14][cat: Web/5][7 pkts/392 bytes <-> 7 pkts/392 bytes][Goodput ratio: 0/0][25.75 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 136/98 3845/3844 13075/13111 4719/4735][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 56/56 56/56 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	14	TCP 10.24.82.188:42332 <-> 210.103.240.15:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 5][cat: Web/5][2 pkts/112 bytes <-> 3 pkts/168 bytes][Goodput ratio: 0/0][13.28 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	TCP 31.13.68.73:443 <-> 10.24.82.188:47007 [proto: 91/TLS][IP: 119/Facebook][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][2 pkts/139 bytes <-> 2 pkts/112 bytes][Goodput ratio: 19/0][0.03 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	16	UDP 10.24.82.188:57816 <-> 10.188.1.1:53 [proto: 5.193/DNS.KakaoTalk][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/78 bytes <-> 1 pkts/166 bytes][Goodput ratio: 43/73][0.04 sec][Hostname/SNI: katalk.kakao.com][110.76.142.34][PLAIN TEXT (katalk)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

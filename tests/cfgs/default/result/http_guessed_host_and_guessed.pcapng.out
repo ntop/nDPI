@@ -1,7 +1,7 @@
 Guessed flow protos:	1
 
 DPI Packets (TCP):	1	(1.00 pkts/flow)
-Confidence DPI (partial)    : 1 (flows)
+Confidence Match by port    : 1 (flows)
 Num dissector calls: 116 (116.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
@@ -20,6 +20,6 @@ Patricia risk mask:   2/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   1/1 (search/found)
 
-Alibaba	1	123	1
+POP3	1	123	1
 
-	1	TCP 170.33.13.5:110 -> 192.168.0.1:179 [proto: 2.274/POP3.Alibaba][IP: 274/Alibaba][ClearText][Confidence: DPI (partial)][DPI packets: 1][cat: Email/3][1 pkts/123 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 70][Risk Info: No client to server traffic / TCP probing attempt][PLAIN TEXT (6 HTTP/1.1)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 170.33.13.5:110 -> 192.168.0.1:179 [proto: 2/POP3][IP: 274/Alibaba][ClearText][Confidence: Match by port][DPI packets: 1][cat: Email/3][1 pkts/123 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 70][Risk Info: No client to server traffic / TCP probing attempt][PLAIN TEXT (6 HTTP/1.1)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
