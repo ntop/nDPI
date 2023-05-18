@@ -1914,6 +1914,7 @@ extern "C" {
 
   void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and);
   void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or);
+  void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor);
 
   ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b);
   void ndpi_bitmap_iterator_free(ndpi_bitmap* b);

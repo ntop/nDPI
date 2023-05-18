@@ -115,6 +115,13 @@ void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or) {
 
 /* ******************************************* */
 
+/* b = b ^ b_xor */
+void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor) {
+  roaring_bitmap_xor_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_xor);
+}
+
+/* ******************************************* */
+
 ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
   return(roaring_create_iterator((ndpi_bitmap*)b));
 }
