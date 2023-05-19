@@ -1833,6 +1833,22 @@ extern "C" {
 
   /* ******************************* */
 
+  /*
+   * Predicts a value using simple linear regression
+   * Z-Score = (Value - Mean) / StdDev
+   *
+   * @par    values          = pointer to the individual values to be analyzed [in]
+   * @par    num_values      = number of 'values' [in]
+   * @par    predict_periods = number of periods for which we want to make the prediction [in]
+   * @par    prediction      = predicted value after 'predict_periods' [out]
+   *
+   * @return The number of outliers found
+  */
+  int ndpi_predict_linear(u_int32_t *values, u_int32_t num_values,
+			  u_int32_t predict_periods, u_int32_t *prediction);
+
+  /* ******************************* */
+
   u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long);
 
   /* ******************************* */

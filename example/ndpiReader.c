@@ -5150,6 +5150,20 @@ void zscoreUnitTest() {
 
 /* *********************************************** */
 
+void linearUnitTest() {
+  u_int32_t values[] = {15, 27, 38, 49, 68, 72, 90, 150, 175, 203};
+  u_int32_t prediction;
+  u_int32_t const num = NDPI_ARRAY_LENGTH(values);
+  bool do_trace = false;
+  int rc = ndpi_predict_linear(values, num, 2*num, &prediction);
+  
+  if(do_trace) {
+    printf("[rc: %d][predicted value: %u]\n", rc, prediction);
+  }
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -5189,6 +5203,7 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    linearUnitTest();
     zscoreUnitTest();
     sesUnitTest();
     desUnitTest();

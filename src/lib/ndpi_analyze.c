@@ -129,7 +129,7 @@ void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int32_t value) {
 float ndpi_data_average(struct ndpi_analyze_struct *s) {
   if((!s) || (s->num_data_entries == 0))
     return(0);
-  
+
   return((s->num_data_entries == 0) ? 0 : ((float)s->sum_total / (float)s->num_data_entries));
 }
 
@@ -157,7 +157,7 @@ float ndpi_data_variance(struct ndpi_analyze_struct *s) {
     return(0);
   float v = s->num_data_entries ?
     ((float)s->stddev.sum_square_total - ((float)s->sum_total * (float)s->sum_total / (float)s->num_data_entries)) / (float)s->num_data_entries : 0.0;
-  
+
   return((v < 0  /* rounding problem */) ? 0 : v);
 }
 
@@ -176,8 +176,8 @@ float ndpi_data_stddev(struct ndpi_analyze_struct *s) {
 
 /* ********************************************************************************* */
 
-/* 
-   Compute the mean on all values 
+/*
+   Compute the mean on all values
    NOTE: In statistics, there is no difference between the mean and average
 */
 float ndpi_data_mean(struct ndpi_analyze_struct *s) {
@@ -695,7 +695,7 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2,
 
       if(threshold && (sum > threshold))
 	return(-2); /* Sorry they are not similar */
-	 
+
       // printf("%u/%u) [a: %u][b: %u][sum: %u]\n", i, b1->num_bins, a, b, sum);
     }
 
@@ -1144,7 +1144,7 @@ int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t _value, double 
     double prev_u, prev_v, prev_s, value  = (double)_value;
     double sq, error, sq_error;
     u_int observations;
-    
+
     if(hw->num_values == hw->params.num_season_periods) {
       double avg = ndpi_avg_inline(hw->y, hw->params.num_season_periods);
       u_int i;
@@ -1391,7 +1391,7 @@ void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha) {
 
   for(alpha=0.1; alpha<0.99; alpha += 0.05) {
     struct ndpi_ses_struct ses;
-      
+
     ndpi_ses_init(&ses, alpha, 0.05);
 
     if(trace)
@@ -1446,7 +1446,7 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
 
   des->params.alpha = alpha;
   des->params.beta = beta;
-	
+
   if((significance < 0) || (significance > 1)) significance = 0.05;
   des->params.ro         = ndpi_normal_cdf_inverse(1 - (significance / 2.));
 
@@ -1460,7 +1460,7 @@ void ndpi_des_reset(struct ndpi_des_struct *des) {
   des->num_values = 0;
   des->sum_square_error = des->last_forecast = des->last_trend = des->last_value = 0;
 }
-  
+
 /* *********************************************************** */
 
 /*
@@ -1488,15 +1488,15 @@ int ndpi_des_add_value(struct ndpi_des_struct *des, const double _value, double 
     *forecast = (des->params.alpha * value) + ((1 - des->params.alpha) * (des->last_forecast + des->last_trend));
     des->last_trend = (des->params.beta * (*forecast - des->last_forecast)) + ((1 - des->params.beta) * des->last_trend);
   }
-  
+
   error  = value - *forecast;
   sq_error =  error * error;
   des->sum_square_error += sq_error, des->prev_error.sum_square_error += sq_error;
-  
+
   if(des->num_values > 0) {
     u_int observations = (des->num_values < MAX_SQUARE_ERROR_ITERATIONS) ? (des->num_values + 1) : ((des->num_values % MAX_SQUARE_ERROR_ITERATIONS) + MAX_SQUARE_ERROR_ITERATIONS + 1);
     double sq = sqrt(des->sum_square_error / observations);
-    
+
     *confidence_band = des->params.ro * sq;
     rc = 1;
   } else
@@ -1508,12 +1508,12 @@ int ndpi_des_add_value(struct ndpi_des_struct *des, const double _value, double 
     des->sum_square_error = des->prev_error.sum_square_error;
     des->prev_error.num_values_rollup = 0, des->prev_error.sum_square_error = 0;
   }
-  
+
 #ifdef DES_DEBUG
   printf("[num_values: %u][[error: %.3f][forecast: %.3f][trend: %.3f[sqe: %.3f][sq: %.3f][confidence_band: %.3f]\n",
 	 des->num_values, error, *forecast, des->last_trend, des->sum_square_error, sq, *confidence_band);
 #endif
-  
+
   return(rc);
 }
 
@@ -1539,7 +1539,7 @@ void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, fl
   for(beta=0.1; beta<0.99; beta += 0.05) {
     for(alpha=0.1; alpha<0.99; alpha += 0.05) {
       struct ndpi_des_struct des;
-      
+
       ndpi_des_init(&des, alpha, beta, 0.05);
 
       if(trace)
@@ -1594,7 +1594,7 @@ u_int ndpi_find_outliers(u_int32_t *values, bool *outliers, u_int32_t num_values
   ndpi_init_data_analysis(&a, 3 /* this is the window so we do not need to store values and 3 is enough */);
 
   /* Add values */
-  for(i=0; i<num_values; i++) 
+  for(i=0; i<num_values; i++)
     ndpi_data_add_value(&a, values[i]);
 
   mean    = ndpi_data_mean(&a);
@@ -1613,17 +1613,52 @@ u_int ndpi_find_outliers(u_int32_t *values, bool *outliers, u_int32_t num_values
     if(is_outlier) ret++;
     outliers[i] = is_outlier;
   }
-  
+
   ndpi_free_data_analysis(&a, 0);
 
   return(ret);
 }
 
-/* ************************************************************/
+/* ********************************************************************************* */
+
+/*
+  Simple Linear regression [https://en.wikipedia.org/wiki/Simple_linear_regression]
+  https://www.tutorialspoint.com/c-program-to-compute-linear-regression
+*/
+int ndpi_predict_linear(u_int32_t *values, u_int32_t num_values,
+			u_int32_t predict_periods, u_int32_t *prediction) {
+  u_int i;
+  float m, c, d;
+  float sumx = 0, sumx_square = 0, sumy = 0, sumxy = 0;
+
+  for(i = 0; i < num_values; i++) {
+    float y = values[i];
+    float x = i + 1;
+
+    sumx   = sumx+x;
+    sumx_square = sumx_square + (x * x);
+    sumy   = sumy + y;
+    sumxy  = sumxy + (x * y);
+  }
+
+  d = (num_values * sumx_square) - (sumx * sumx);
+
+  if(d == 0) return(-1);
+
+  m = ((num_values * sumxy) - (sumx * sumy))  / d; /* beta  */
+  c = ((sumy * sumx_square) - (sumx * sumxy)) / d; /* alpha */
+
+  *prediction = c + (m * (predict_periods + num_values - 1));
+
+  return(0);
+}
+
+/* ********************************************************************************* */
 
 /* ********************************************************** */
 /*       http://home.thep.lu.se/~bjorn/crc/crc32_fast.c       */
 /* ********************************************************** */
+
 
 static uint32_t crc32_for_byte(uint32_t r) {
   int j;
@@ -1632,6 +1667,8 @@ static uint32_t crc32_for_byte(uint32_t r) {
     r = ((r & 1) ? 0 : (uint32_t)0xEDB88320L) ^ r >> 1;
   return r ^ (uint32_t)0xFF000000L;
 }
+
+/* ********************************************************************************* */
 
 /* Any unsigned integer type with at least 32 bits may be used as
  * accumulator type for fast crc32-calulation, but unsigned long is
@@ -1651,6 +1688,8 @@ static void init_tables(uint32_t* table, uint32_t* wtable) {
     }
 }
 
+/* ********************************************************************************* */
+
 static void __crc32(const void* data, size_t n_bytes, uint32_t* crc) {
   static uint32_t table[0x100], wtable[0x100*sizeof(accum_t)];
   size_t n_accum = n_bytes/sizeof(accum_t);
@@ -1666,6 +1705,8 @@ static void __crc32(const void* data, size_t n_bytes, uint32_t* crc) {
   for(i = n_accum*sizeof(accum_t); i < n_bytes; ++i)
     *crc = table[(uint8_t)*crc ^ ((uint8_t*)data)[i]] ^ *crc >> 8;
 }
+
+/* ********************************************************************************* */
 
 u_int32_t ndpi_crc32(const void* data, size_t n_bytes) {
   u_int32_t crc = 0;
