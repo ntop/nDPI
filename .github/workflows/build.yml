@@ -300,12 +300,18 @@ jobs:
       - name: Print nDPI long help
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
-         ./example/ndpiReader -H
+          ./example/ndpiReader -H
       - name: Install nDPI
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
           make install DESTDIR=$(realpath _install)
           ls -alhHR _install
+      - name: Test nDPI [SYMBOLS]
+        if: (startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'mac')) && startsWith(matrix.arch, 'x86_64')
+        run: |
+          ./utils/check_symbols.sh || { FAILED=$?; echo "::error file=${NDPI_LIB}::Unwanted libc symbols found: ${FAILED}. Please make sure to use only ndpi_malloc/ndpi_calloc/ndpi_realloc/ndpi_free wrapper instead of malloc/calloc/realloc/free."; false; }
+        env:
+          NDPI_LIB: src/lib/libndpi.a
       - name: Test nDPI [DIFF]
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |

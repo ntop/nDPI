@@ -22,7 +22,7 @@
 /****************************/
 
 #define mbedtls_calloc    ndpi_calloc
-#define mbedtls_free       ndpi_free
+#define mbedtls_free      ndpi_free
 
 #include "gcrypt_light.h"
 

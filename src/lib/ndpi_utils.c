@@ -1738,7 +1738,7 @@ static void ndpi_compile_rce_regex() {
 #endif
   }
 
-  free((void *)pcreErrorStr);
+  ndpi_free((void *)pcreErrorStr);
 }
 
 static int ndpi_is_rce_injection(char* query) {
@@ -2253,7 +2253,7 @@ void ndpi_hash_free(ndpi_str_hash **h, void (*cleanup_func)(ndpi_str_hash *h))
     {
       cleanup_func((ndpi_str_hash *)current);
     }
-    free(current);
+    ndpi_free(current);
   }
 
   *h = NULL;
@@ -2415,7 +2415,7 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
 	*/
 	for(i=0; i<flow->num_risk_infos; i++) {
 	  if(flow->risk_infos[i].info != NULL) {
-	    free(flow->risk_infos[i].info);
+	    ndpi_free(flow->risk_infos[i].info);
 	    flow->risk_infos[i].info = NULL;
 	  }
 	}

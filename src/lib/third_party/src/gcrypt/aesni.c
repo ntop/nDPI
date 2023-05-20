@@ -97,7 +97,7 @@ int mbedtls_aesni_has_support( unsigned int what )
 	  break; /* We giveup */
       }
 
-      free(line);
+      ndpi_free(line);
       fclose(fd);
 
       has_aesni_checked = 1;
