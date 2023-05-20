@@ -1121,6 +1121,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     if(flow->ndpi_flow->protos.dhcp.class_ident[0] != '\0')
       flow->dhcp_class_ident = ndpi_strdup(flow->ndpi_flow->protos.dhcp.class_ident);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_BITTORRENT) &&
+            !is_ndpi_proto(flow, NDPI_PROTOCOL_DNS) &&
             !is_ndpi_proto(flow, NDPI_PROTOCOL_TLS)) {
     u_int j;
 
