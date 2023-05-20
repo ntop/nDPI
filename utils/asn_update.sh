@@ -184,6 +184,16 @@ DEST=../src/lib/inc_generated/ndpi_asn_hulu.c.inc
 create_list NDPI_PROTOCOL_HULU $DEST "AS23286"
 echo "(3) Hulu IPs are available in $DEST"
 
+echo "(1) Downloading EpicGames.."
+DEST=../src/lib/inc_generated/ndpi_asn_epicgames.c.inc
+create_list NDPI_PROTOCOL_EPICGAMES $DEST "AS4356" "AS397645" "AS395701" "AS393326"
+echo "(3) EpicGames IPs are available in $DEST"
+
+echo "(1) Downloading Nvidia..."
+DEST=../src/lib/inc_generated/ndpi_asn_nvidia.c.inc
+create_list NDPI_PROTOCOL_NVIDIA $DEST "AS60977" "AS50889" "AS20347" "AS11414"
+echo "(3) Nvidia IPs are available in $DEST"
+
 if [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1
