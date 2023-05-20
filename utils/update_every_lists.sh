@@ -34,5 +34,8 @@ RETVAL=$(( RETVAL + $? ))
 ./asn_update.sh
 RETVAL=$(( RETVAL + $? ))
 
+./gambling_sites_download.sh
+RETVAL=$(( RETVAL + $? ))
+
 test ${RETVAL} -ne 0 && printf '%s: %s\n' "${0}" "${RETVAL} script(s) failed"
 exit ${RETVAL}

@@ -367,6 +367,7 @@ typedef enum {
   NDPI_PROTOCOL_HOTS                  = 336, /* Heroes of the Storm */
   NDPI_PROTOCOL_FACEBOOK_REEL_STORY   = 337,
   NDPI_PROTOCOL_SRTP                  = 338,
+  NDPI_PROTOCOL_GAMBLING              = 339,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

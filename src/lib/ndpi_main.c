@@ -71,6 +71,7 @@
 #include "inc_generated/ndpi_ms_onedrive_match.c.inc"
 #include "inc_generated/ndpi_ms_outlook_match.c.inc"
 #include "inc_generated/ndpi_ms_skype_teams_match.c.inc"
+#include "inc_generated/ndpi_gambling_match.c.inc"
 #include "inc_generated/ndpi_google_match.c.inc"
 #include "inc_generated/ndpi_google_cloud_match.c.inc"
 #include "inc_generated/ndpi_crawlers_match.c.inc"
@@ -927,6 +928,9 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
   for(i = 0; host_match[i].string_to_match != NULL; i++)
     ndpi_init_protocol_match(ndpi_str, &host_match[i]);
+
+  for(i = 0; ndpi_protocol_gambling_hostname_list[i].string_to_match != NULL; i++)
+    ndpi_init_protocol_match(ndpi_str, &ndpi_protocol_gambling_hostname_list[i]);
 
   /* ************************ */
 
