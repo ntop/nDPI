@@ -1,0 +1,25 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	2	(2.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          2/2 (search/found)
+Automa domain:        2/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+
+BitTorrent	2	160	1
+
+	1	UDP 10.0.2.15:59751 <-> 10.0.2.3:53 [proto: 5.37/DNS.BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/72 bytes <-> 1 pkts/88 bytes][Goodput ratio: 41/52][0.00 sec][Hostname/SNI: utorrent.com][98.143.146.7][PLAIN TEXT (utorrent)][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
