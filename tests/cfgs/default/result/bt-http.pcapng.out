@@ -1,0 +1,25 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	7	(7.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 15 (15.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 5/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/0 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+
+BitTorrent	14	1492	1
+
+	1	TCP 192.168.1.128:46882 <-> 176.31.225.118:80 [proto: 7.37/HTTP.BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 7][cat: Download/7][12 pkts/1038 bytes <-> 2 pkts/454 bytes][Goodput ratio: 36/75][57.56 sec][Hostname/SNI: tracker.trackerfix.com][bytes ratio: 0.391 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 5384/0 28927/0 8989/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 86/227 424/394 102/167][URL: tracker.trackerfix.com/announce?info_hash=%aa7i%c4S%0d%de%06%24%18s%da%d4%3a%b5%cc%ec%2c%e6%22&peer_id=-TR2940-chho92c56pul&port=51413&uploaded=0&downloaded=0&left=282050560&numwant=80&key=3b5502cc&compact=1&supportcrypto=1&requirecrypto=1&event=started][User-Agent: Transmission/2.94][PLAIN TEXT (GET /announce)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
