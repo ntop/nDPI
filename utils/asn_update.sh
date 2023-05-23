@@ -141,7 +141,7 @@ echo "(3) Threema IPs are available in $DEST"
 
 echo "(1) Downloading AliBaba..."
 DEST=../src/lib/inc_generated/ndpi_asn_alibaba.c.inc
-create_list NDPI_PROTOCOL_ALIBABA $DEST "AS134963"
+create_list NDPI_PROTOCOL_ALIBABA $DEST "AS59055" "AS59054" "AS59053" "AS59052" "AS59051" "AS59028" "AS45104" "AS45103" "AS45102" "AS37963" "AS34947" "AS211914" "AS134963"
 echo "(3) AliBaba IPs are available in $DEST"
 
 echo "(1) Downloading AVAST..."
