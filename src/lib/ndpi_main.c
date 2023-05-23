@@ -2871,22 +2871,27 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
+  
   ndpi_str->host_risk_mask_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   if(!ndpi_str->host_risk_mask_automa.ac_automa) {
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
+  
   ndpi_str->common_alpns_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   if(!ndpi_str->common_alpns_automa.ac_automa) {
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
+  
   load_common_alpns(ndpi_str);
+  
   ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(NULL);
   if(!ndpi_str->tls_cert_subject_automa.ac_automa) {
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
+  
   ndpi_str->malicious_ja3_hashmap = NULL; /* Initialized on demand */
   ndpi_str->malicious_sha1_hashmap = NULL; /* Initialized on demand */
   ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
@@ -3191,18 +3196,23 @@ int ndpi_get_automa_stats(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_AUTOMA_HOST:
     ndpi_automa_get_stats(ndpi_struct->host_automa.ac_automa, stats);
     return 0;
+    
   case NDPI_AUTOMA_DOMAIN:
     ndpi_automa_get_stats(ndpi_struct->risky_domain_automa.ac_automa, stats);
     return 0;
+    
   case NDPI_AUTOMA_TLS_CERT:
     ndpi_automa_get_stats(ndpi_struct->tls_cert_subject_automa.ac_automa, stats);
     return 0;
+    
   case NDPI_AUTOMA_RISK_MASK:
     ndpi_automa_get_stats(ndpi_struct->host_risk_mask_automa.ac_automa, stats);
     return 0;
+    
   case NDPI_AUTOMA_COMMON_ALPNS:
     ndpi_automa_get_stats(ndpi_struct->common_alpns_automa.ac_automa, stats);
     return 0;
+    
   default:
     return -1;
   }
@@ -4974,12 +4984,16 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   return 0;
 }
 
+/* ******************************************************************** */
+
 static inline int ndpi_proto_cb_tcp_payload(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
     return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
 	     (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
 	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
               NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0;
 }
+
+/* ******************************************************************** */
 
 static inline int ndpi_proto_cb_tcp_nopayload(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
     return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
@@ -4990,12 +5004,16 @@ static inline int ndpi_proto_cb_tcp_nopayload(const struct ndpi_detection_module
 	       NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD) == 0;
 }
 
+/* ******************************************************************** */
+
 static inline int ndpi_proto_cb_udp(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
     return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
 	     (NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP |
 	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
 	      NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0;
 }
+
+/* ******************************************************************** */
 
 static inline int ndpi_proto_cb_other(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
     return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
@@ -5007,8 +5025,10 @@ static inline int ndpi_proto_cb_other(const struct ndpi_detection_module_struct 
 	       NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC) != 0;
 }
 
+/* ******************************************************************** */
+
 static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndpi_str,
-	  const NDPI_PROTOCOL_BITMASK *dbm, int count_only) {
+					const NDPI_PROTOCOL_BITMASK *dbm, int count_only) {
   uint32_t a;
 
   /* now build the specific buffer for tcp, udp and non_tcp_udp */
@@ -5067,6 +5087,8 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
     ndpi_str->callback_buffer_size_non_tcp_udp++;
   }
 }
+
+/* ******************************************************************** */
 
 /* handle extension headers in IPv6 packets
  * arguments:
@@ -5142,6 +5164,8 @@ int ndpi_handle_ipv6_extension_headers(u_int16_t l3len, const u_int8_t **l4ptr,
   return(0);
 }
 
+/* ******************************************************************** */
+
 /* Used by dns.c */
 u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize) {
   /*
@@ -5163,6 +5187,8 @@ u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, cons
 
   return(1);
 }
+
+/* ******************************************************************** */
 
 /*
   extract the l4 payload, if available
@@ -5286,7 +5312,7 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
 
-    if(flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
+   if(flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
        flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_SMTPS) ||
