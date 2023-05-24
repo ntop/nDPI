@@ -133,7 +133,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   f = fopen("/dev/null", "w");
   ac_automata_dump(a, f);
-  fclose(f);
+  if (f)
+    fclose(f);
 
   ac_automata_get_stats(a, &stats);
 

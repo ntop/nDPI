@@ -2509,6 +2509,9 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   u_int16_t port = 0; /* Format ip:8.248.73.247:443 */
   char *double_column;
 
+  if(!ndpi_str->protocols_ptree)
+    return(-1);
+
   if(ptr) {
     ptr[0] = '\0';
     ptr++;
@@ -3673,6 +3676,9 @@ char *strsep(char **sp, char *sep) {
 int ndpi_add_ip_risk_mask(struct ndpi_detection_module_struct *ndpi_str,
 			  char *ip, ndpi_risk mask) {
   char *saveptr, *addr = strtok_r(ip, "/", &saveptr);
+
+  if(!ndpi_str->ip_risk_mask_ptree)
+    return(-3);
 
   if(addr) {
     char *cidr = strtok_r(NULL, "\n", &saveptr);
@@ -6483,6 +6489,9 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
   char *ptr;
   char ipbuf[64];
 
+  if(!ndpi_str->custom_categories.ipAddresses_shadow)
+    return(-1);
+
   strncpy(ipbuf, ip_address_and_mask, sizeof(ipbuf));
   ipbuf[sizeof(ipbuf) - 1] = '\0';
 
@@ -6618,7 +6627,9 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
 
   ret->custom_category_userdata = NULL;
 
-  if(ndpi_str->custom_categories.categories_loaded) {
+  if(ndpi_str->custom_categories.categories_loaded &&
+     ndpi_str->custom_categories.ipAddresses) {
+
     ndpi_prefix_t prefix;
     ndpi_patricia_node_t *node;
 

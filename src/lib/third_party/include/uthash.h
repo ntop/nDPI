@@ -101,7 +101,7 @@ do {                                                                            
 #endif
 
 #ifndef HASH_NONFATAL_OOM
-#define HASH_NONFATAL_OOM 0
+#define HASH_NONFATAL_OOM 1
 #endif
 
 #if HASH_NONFATAL_OOM

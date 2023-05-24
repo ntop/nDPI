@@ -116,14 +116,14 @@ u_int16_t max_pattern_len = 8;
 
 /* *********************************************************** */
 
-void ndpi_analyze_payload(struct ndpi_flow_info *flow,
-			  u_int8_t src_to_dst_direction,
-			  u_int8_t *payload,
-			  u_int16_t payload_len,
-			  u_int32_t packet_id) {
-  struct payload_stats *ret;
-  struct flow_id_stats *f;
-  struct packet_id_stats *p;
+int ndpi_analyze_payload(struct ndpi_flow_info *flow,
+			 u_int8_t src_to_dst_direction,
+			 u_int8_t *payload,
+			 u_int16_t payload_len,
+			 u_int32_t packet_id) {
+  struct payload_stats *ret, *ret_found;
+  struct flow_id_stats *f, *f_found;
+  struct packet_id_stats *p, *p_found;
 
 #ifdef DEBUG_PAYLOAD
   u_int16_t i;
@@ -135,11 +135,11 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
   HASH_FIND(hh, pstats, payload, payload_len, ret);
   if(ret == NULL) {
     if((ret = (struct payload_stats*)ndpi_calloc(1, sizeof(struct payload_stats))) == NULL)
-      return; /* OOM */
+      return -1; /* OOM */
 
     if((ret->pattern = (u_int8_t*)ndpi_malloc(payload_len)) == NULL) {
       ndpi_free(ret);
-      return;
+      return -1;
     }
 
     memcpy(ret->pattern, payload, payload_len);
@@ -147,6 +147,13 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
     ret->num_occurrencies = 1;
 
     HASH_ADD(hh, pstats, pattern[0], payload_len, ret);
+
+    HASH_FIND(hh, pstats, payload, payload_len, ret_found);
+    if(ret_found == NULL) { /* The insertion failed (because of a memory allocation error) */
+      ndpi_free(ret->pattern);
+      ndpi_free(ret);
+      return -1;
+    }
 
 #ifdef DEBUG_PAYLOAD
     printf("Added element [total: %u]\n", HASH_COUNT(pstats));
@@ -159,20 +166,32 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
   HASH_FIND_INT(ret->flows, &flow->flow_id, f);
   if(f == NULL) {
     if((f = (struct flow_id_stats*)ndpi_calloc(1, sizeof(struct flow_id_stats))) == NULL)
-      return; /* OOM */
+      return -1; /* OOM */
 
     f->flow_id = flow->flow_id;
     HASH_ADD_INT(ret->flows, flow_id, f);
+
+    HASH_FIND_INT(ret->flows, &flow->flow_id, f_found);
+    if(f_found == NULL) { /* The insertion failed (because of a memory allocation error) */
+      ndpi_free(f);
+      return -1;
+    }
   }
 
   HASH_FIND_INT(ret->packets, &packet_id, p);
   if(p == NULL) {
     if((p = (struct packet_id_stats*)ndpi_calloc(1, sizeof(struct packet_id_stats))) == NULL)
-      return; /* OOM */
+      return -1; /* OOM */
     p->packet_id = packet_id;
 
     HASH_ADD_INT(ret->packets, packet_id, p);
+
+    HASH_FIND_INT(ret->packets, &packet_id, p_found);
+    if(p_found == NULL) { /* The insertion failed (because of a memory allocation error) */
+      ndpi_free(p);
+    }
   }
+  return 0;
 }
 
 /* *********************************************************** */
@@ -199,7 +218,12 @@ void ndpi_payload_analyzer(struct ndpi_flow_info *flow,
   for(i=0; i<scan_len; i++) {
     for(j=min_pattern_len; j <= max_pattern_len; j++) {
       if((i+j) < payload_len) {
-	ndpi_analyze_payload(flow, src_to_dst_direction, &payload[i], j, packet_id);
+	if(ndpi_analyze_payload(flow, src_to_dst_direction, &payload[i], j, packet_id) == -1) {
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+          /* Avoid too much logging while fuzzing */
+          LOG(NDPI_LOG_ERROR, "Error ndpi_analyze_payload (allocation failure)\n");
+#endif
+	}
       }
     }
   }
@@ -960,6 +984,12 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       if(enable_flow_stats) {
         newflow->entropy = ndpi_calloc(1, sizeof(struct ndpi_entropy));
         newflow->last_entropy = ndpi_calloc(1, sizeof(struct ndpi_entropy));
+        if(!newflow->entropy || !newflow->last_entropy) {
+          ndpi_tdelete(newflow, &workflow->ndpi_flows_root[idx], ndpi_workflow_node_cmp);
+          ndpi_flow_info_free_data(newflow);
+          ndpi_free(newflow);
+          return(NULL);
+        }
         newflow->entropy->src2dst_pkt_len[newflow->entropy->src2dst_pkt_count] = l4_data_len;
         newflow->entropy->src2dst_pkt_time[newflow->entropy->src2dst_pkt_count] = when;
         if(newflow->entropy->src2dst_pkt_count == 0) {
