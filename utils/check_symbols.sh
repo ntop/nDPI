@@ -24,7 +24,21 @@ for line in `nm -P -u "${NDPI_LIB}"`; do
     if [ ! -z "${FOUND_SYMBOL}" ]; then
         SKIP=0
         case "${CURRENT_OBJECT}" in
-            '[ndpi_utils.o]'|'[ndpi_memory.o]'|'[roaring.o]') SKIP=1 ;;
+            '[roaring.o]')
+                case "${FOUND_SYMBOL}" in
+                    'malloc'|'calloc'|'realloc'|'free') SKIP=1 ;;
+                esac
+            ;;
+            '[ndpi_utils.o]'|'[ndpi_memory.o]'|'[roaring.o]')
+                case "${FOUND_SYMBOL}" in
+                    'malloc'|'calloc'|'free') SKIP=1 ;;
+                esac
+            ;;
+            '[gcrypt_light.o]')
+                case "${FOUND_SYMBOL}" in
+                    'free') SKIP=1 ;;
+                esac
+            ;;
         esac
 
         if [ ${SKIP} -eq 0 ]; then
