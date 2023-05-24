@@ -97,7 +97,7 @@ int mbedtls_aesni_has_support( unsigned int what )
 	  break; /* We giveup */
       }
 
-      free(line);
+      free(line); // Do not replace with ndpi_free(). See `man 3 getline`.
       fclose(fd);
 
       has_aesni_checked = 1;
