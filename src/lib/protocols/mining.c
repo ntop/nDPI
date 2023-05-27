@@ -98,23 +98,6 @@ static void ndpi_search_mining_tcp(struct ndpi_detection_module_struct *ndpi_str
 
   /* Check connection over TCP */
   if(packet->payload_packet_len > 10) {
-    if(packet->tcp->source == htons(8333) ||
-       packet->tcp->dest == htons(8333)) {
-      /*
-	Bitcoin
-	
-	bitcoin.magic == 0xf9beb4d9 || bitcoin.magic == 0xfabfb5da
-      */
-      u_int32_t magic = htonl(0xf9beb4d9), magic1 = htonl(0xfabfb5da), *to_match = (u_int32_t*)packet->payload;
-      
-      if((*to_match == magic) || (*to_match == magic1)) {
-       ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "ETH");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MINING, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	cacheMiningHostTwins(ndpi_struct, flow);
-	return;
-      }
-    }
-
     if((packet->payload_packet_len > 300)
        && (packet->payload_packet_len < 600)
        && (packet->payload[2] == 0x04)) {

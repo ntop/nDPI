@@ -1058,6 +1058,11 @@ typedef enum {
   CUSTOM_CATEGORY_ANTIMALWARE      = 105,
   
   /*
+    Crypto Currency e.g Bitcoin, Litecoin, Etherum ..et.
+  */
+  NDPI_PROTOCOL_CATEGORY_CRYPTO_CURRENCY = 106,
+  
+  /*
     IMPORTANT
 
     Please keep in sync with

@@ -70,7 +70,7 @@ typedef enum {
   NDPI_PROTOCOL_SIGNAL                = 39,
   NDPI_PROTOCOL_MEMCACHED             = 40, /* Memcached */
   NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */
-  NDPI_PROTOCOL_MINING                = 42, /* Bitcoin, Ethereum, ZCash, Monero */
+  NDPI_PROTOCOL_MINING                = 42, /*Ethereum, ZCash, Monero */
   NDPI_PROTOCOL_NEST_LOG_SINK         = 43, /* Nest Log Sink (Nest Protect) */
   NDPI_PROTOCOL_MODBUS                = 44, /* Modbus */
   NDPI_PROTOCOL_WHATSAPP_CALL         = 45, /* WhatsApp video ad audio calls go here */
@@ -371,6 +371,7 @@ typedef enum {
   NDPI_PROTOCOL_EPICGAMES             = 340,
   NDPI_PROTOCOL_GEFORCENOW            = 341,
   NDPI_PROTOCOL_NVIDIA                = 342,
+  NDPI_PROTOCOL_BITCOIN               = 343, 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
