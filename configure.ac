@@ -87,6 +87,8 @@ LT_LIB_M
 PKG_PROG_PKG_CONFIG
 
 AC_PROG_CC
+AC_PROG_CPP_WERROR
+AC_C_INLINE
 
 SYSTEM=`uname -s`
 if test $SYSTEM = "Darwin"; then

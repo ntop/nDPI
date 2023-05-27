@@ -1,6 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+set -e
 
 cd "$(dirname "${0}")" || exit 1
+. ./common.sh || exit 1
 
 DEST=../src/lib/inc_generated/ndpi_tor_match.c.inc
 LIST=/tmp/tor.list
@@ -13,14 +16,13 @@ ORIGIN="https://check.torproject.org/torbulkexitlist"
 
 echo "(1) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
-if [ $http_response != "200" ]; then
-    echo "Error $http_response: you probably need to update the list url!"
-    exit 1
-fi
+check_http_response "${http_response}"
+is_file_empty "${LIST}"
 
 echo "(2) Processing IP addresses..."
 ./ipaddr2list.py $LIST NDPI_PROTOCOL_TOR > $DEST
-rm -f $LIST
+rm -f "${LIST}"
+is_file_empty "${DEST}"
 
 echo "(3) TOR IPs are available in $DEST"
 exit 0

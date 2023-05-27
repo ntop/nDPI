@@ -1,8 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
 
 cd "$(dirname "${0}")" || exit 1
+. ./common.sh || exit 1
 
 DEST=../src/lib/inc_generated/ndpi_google_cloud_match.c.inc
 TMP=/tmp/google_c.json

@@ -39,11 +39,13 @@ print("""/*
 
 print("static ndpi_protocol_match "+proto.lower()+"_hostname_list[] = {")
 
+lines = 0
 with open(sys.argv[1]) as fp:
     for cnt, line in enumerate(fp):
         line = line.rstrip()
 
         if(line != ""):
+            lines += 1
             x = line.split("/")
 
             if(len(x) == 2):
@@ -57,3 +59,7 @@ with open(sys.argv[1]) as fp:
 print(" /* End */")
 print(" { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL }")
 print("};")
+
+if lines == 0:
+    sys.stderr.write(f'File {sys.argv[1]} is empty.\n')
+    sys.exit(1)
