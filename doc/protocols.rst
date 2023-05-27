@@ -8,7 +8,7 @@ Work in progress!
 .. _Proto 338:
 
 `NDPI_PROTOCOL_SRTP`: SRTP (Secure Real-time Transport Protocol)
-==============================================================
+================================================================
 The Secure Real-time Transport Protocol (SRTP) is a profile for Real-time Transport Protocol (RTP) intended to provide encryption, message authentication, integrity, and replay attack protection to the RTP data.
 
 References: `RFC3711 <https://datatracker.ietf.org/doc/html/rfc3711>`_.
@@ -17,3 +17,30 @@ Notes:
 
 - You can think of SRTP simply as the "encrypted" version of RTP, something like HTTPS vs HTTP;
 - It is not usually possible to tell RTP from SRTP. nDPI generally uses the former and it uses the latter only when it is really sure that the media stream has been encrypted.
+
+
+.. _Proto 340:
+
+`NDPI_PROTOCOL_EPICGAMES`
+=========================
+Epic Games is a video game company developing the Unreal Engine and some successful games as Fortnite and Gears of War.
+
+References: `Main site <https://store.epicgames.com/en-US/>`_ `Fortnite <https://www.fortnite.com/>`_.
+
+
+.. _Proto 341:
+
+`NDPI_PROTOCOL_GEFORCENOW`
+==========================
+GeForce Now is the brand used by Nvidia for its cloud gaming service.
+
+References: `Main site <https://www.nvidia.com/en-us/geforce-now/>`_.
+
+
+.. _Proto 342:
+
+`NDPI_PROTOCOL_NVIDIA`
+======================
+Generic web traffic from Nvidia sites.
+
+References: `Main site <https://www.nvidia.com>`_.

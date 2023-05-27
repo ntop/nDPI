@@ -368,6 +368,9 @@ typedef enum {
   NDPI_PROTOCOL_FACEBOOK_REEL_STORY   = 337,
   NDPI_PROTOCOL_SRTP                  = 338,
   NDPI_PROTOCOL_GAMBLING              = 339,
+  NDPI_PROTOCOL_EPICGAMES             = 340,
+  NDPI_PROTOCOL_GEFORCENOW            = 341,
+  NDPI_PROTOCOL_NVIDIA                = 342,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

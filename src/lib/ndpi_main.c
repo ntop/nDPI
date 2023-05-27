@@ -107,6 +107,8 @@
 #include "inc_generated/ndpi_asn_yandex_cloud.c.inc"
 #include "inc_generated/ndpi_asn_disney_plus.c.inc"
 #include "inc_generated/ndpi_asn_hulu.c.inc"
+#include "inc_generated/ndpi_asn_epicgames.c.inc"
+#include "inc_generated/ndpi_asn_nvidia.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -2835,6 +2837,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_yandex_cloud_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_disneyplus_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_hulu_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_epicgames_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_nvidia_protocol_list);
     }
 
     if(prefs & ndpi_track_flow_payload)
@@ -4941,6 +4945,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* Heroes of the Storm */
   init_hots_dissector(ndpi_str, &a);
+
+  /* EpicGames */
+  init_epicgames_dissector(ndpi_str, &a);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"

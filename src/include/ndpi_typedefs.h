@@ -822,6 +822,10 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_QUIC */
   u_int32_t quic_0rtt_found:1;
 
+  /* NDPI_PROTOCOL_EPICGAMES */
+  u_int32_t epicgames_stage:1;
+  u_int32_t epicgames_word;
+
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_crc[4];
 
