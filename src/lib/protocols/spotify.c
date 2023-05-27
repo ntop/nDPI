@@ -72,10 +72,7 @@ static void ndpi_search_spotify(struct ndpi_detection_module_struct *ndpi_struct
 {
   NDPI_LOG_DBG(ndpi_struct, "search spotify\n");
 
-  /* skip marked packets */
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SPOTIFY) {
-    ndpi_check_spotify(ndpi_struct, flow);
-  }
+  ndpi_check_spotify(ndpi_struct, flow);
 }
 
 

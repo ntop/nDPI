@@ -67,7 +67,7 @@ static void ndpi_check_gtp(struct ndpi_detection_module_struct *ndpi_struct, str
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  if((packet->udp != NULL) && (payload_len > sizeof(struct gtp_header_generic))) {
+  if(payload_len > sizeof(struct gtp_header_generic)) {
     u_int32_t gtp_u  = ntohs(2152);
     u_int32_t gtp_c  = ntohs(2123);
     u_int32_t gtp_prime = ntohs(3386);
@@ -122,9 +122,7 @@ static void ndpi_search_gtp(struct ndpi_detection_module_struct *ndpi_struct, st
 {
   NDPI_LOG_DBG(ndpi_struct, "search gtp\n");
 
-  /* skip marked packets */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_GTP)
-    ndpi_check_gtp(ndpi_struct, flow);
+  ndpi_check_gtp(ndpi_struct, flow);
 }
 
 

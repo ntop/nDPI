@@ -76,12 +76,7 @@ static void ndpi_search_lisp(struct ndpi_detection_module_struct *ndpi_struct, s
 {
   NDPI_LOG_DBG(ndpi_struct, "search lisp\n");
 
-  /* skip marked packets */
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_LISP) {
- 
-      ndpi_check_lisp(ndpi_struct, flow);
-   
-  }
+  ndpi_check_lisp(ndpi_struct, flow);
 }
 
 

@@ -30,7 +30,7 @@ static void ndpi_check_vxlan(struct ndpi_detection_module_struct *ndpi_struct, s
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  if((packet->udp != NULL) && (packet->payload_packet_len >= sizeof(struct ndpi_vxlanhdr))) {
+  if(packet->payload_packet_len >= sizeof(struct ndpi_vxlanhdr)) {
 
     /*
     *rfc-7348 vxlan header
@@ -60,9 +60,7 @@ static void ndpi_search_vxlan(struct ndpi_detection_module_struct *ndpi_struct, 
 {
   NDPI_LOG_DBG(ndpi_struct, "search vxlan\n");
 
-  /* skip marked packets */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_VXLAN)
-    ndpi_check_vxlan(ndpi_struct, flow);
+  ndpi_check_vxlan(ndpi_struct, flow);
 }
 
 void init_vxlan_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)

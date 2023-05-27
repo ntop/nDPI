@@ -17,17 +17,15 @@ static void ndpi_check_bjnp(struct ndpi_detection_module_struct *ndpi_struct, st
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  if(packet->udp != NULL) {
-    if(payload_len > 4) {
-      if((memcmp((const char *)packet->payload, "BJNP", 4) == 0)
-	 || (memcmp((const char *)packet->payload, "BNJB", 4) == 0)
-	 || (memcmp((const char *)packet->payload, "BJNB", 4) == 0)
-	 || (memcmp((const char *)packet->payload, "MFNP", 4) == 0)
-	 ) {
-	    NDPI_LOG_INFO(ndpi_struct, "found bjnp\n");
-	    ndpi_int_bjnp_add_connection(ndpi_struct, flow, 0);
-	    return;
-	  }
+  if(payload_len > 4) {
+    if((memcmp((const char *)packet->payload, "BJNP", 4) == 0)
+       || (memcmp((const char *)packet->payload, "BNJB", 4) == 0)
+       || (memcmp((const char *)packet->payload, "BJNB", 4) == 0)
+       || (memcmp((const char *)packet->payload, "MFNP", 4) == 0)
+      ) {
+      NDPI_LOG_INFO(ndpi_struct, "found bjnp\n");
+      ndpi_int_bjnp_add_connection(ndpi_struct, flow, 0);
+      return;
     }
   }
 
@@ -38,10 +36,7 @@ static void ndpi_search_bjnp(struct ndpi_detection_module_struct *ndpi_struct, s
 {
   NDPI_LOG_DBG(ndpi_struct, "search bjnp\n");
 
-  /* skip marked packets */
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_BJNP) {
-    ndpi_check_bjnp(ndpi_struct, flow);
-  }
+  ndpi_check_bjnp(ndpi_struct, flow);
 }
 
 

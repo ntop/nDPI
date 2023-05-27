@@ -61,9 +61,7 @@ static void ndpi_search_citrix(struct ndpi_detection_module_struct *ndpi_struct,
 {
   NDPI_LOG_DBG(ndpi_struct, "search citrix\n");
 
-  /* skip marked packets */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_CITRIX)
-    ndpi_check_citrix(ndpi_struct, flow);
+  ndpi_check_citrix(ndpi_struct, flow);
 }
 
 
