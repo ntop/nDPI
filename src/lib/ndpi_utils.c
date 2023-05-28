@@ -91,13 +91,14 @@ _Static_assert(sizeof(struct ndpi_str_hash) == sizeof(struct ndpi_str_hash_priva
 int ndpi_check_punycode_string(char * buffer , int len) {
   int i = 0;
 
-  while(i++ < len - 3) {
+  while(i < len - 3) {
     if((buffer[i] == 'x')
        && (buffer[i+1] == 'n')
        && (buffer[i+2] == '-')
        && (buffer[i+3] == '-'))
       // is a punycode string
       return(1);
+    i++;
   }
 
   // not a punycode string
