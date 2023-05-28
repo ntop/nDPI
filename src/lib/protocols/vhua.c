@@ -43,7 +43,6 @@ static void ndpi_check_vhua(struct ndpi_detection_module_struct *ndpi_struct, st
 
   /* Break after 3 packets. */
   if((flow->packet_counter > 3)
-     || (packet->udp == NULL)
      || (packet->payload_packet_len < sizeof(p0))) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   } else if(memcmp(packet->payload, p0, sizeof(p0)) == 0) {
@@ -54,10 +53,7 @@ static void ndpi_check_vhua(struct ndpi_detection_module_struct *ndpi_struct, st
 static void ndpi_search_vhua(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search VHUA\n");
 
-  /* skip marked packets */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_VHUA) {
-    ndpi_check_vhua(ndpi_struct, flow);
-  }
+  ndpi_check_vhua(ndpi_struct, flow);
 }
 
 

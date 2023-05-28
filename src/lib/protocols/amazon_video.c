@@ -60,9 +60,7 @@ static void ndpi_search_amazon_video(struct ndpi_detection_module_struct *ndpi_s
 			      struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search amazon_video\n");
 
-  /* skip marked packets */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_AMAZON_VIDEO)
-    ndpi_check_amazon_video(ndpi_struct, flow);
+  ndpi_check_amazon_video(ndpi_struct, flow);
 }
 
 

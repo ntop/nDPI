@@ -84,10 +84,7 @@ static void ndpi_check_zmq(struct ndpi_detection_module_struct *ndpi_struct, str
 static void ndpi_search_zmq(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search ZMQ\n");
 
-  /* skip marked packets */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_ZMQ) {
-    ndpi_check_zmq(ndpi_struct, flow);
-  }
+  ndpi_check_zmq(ndpi_struct, flow);
 }
 
 

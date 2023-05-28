@@ -40,28 +40,24 @@ static void ndpi_int_dropbox_add_connection(struct ndpi_detection_module_struct 
 static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
+  u_int16_t dropbox_port = htons(DB_LSP_PORT);
 
-  if(packet->udp != NULL) {
-    u_int16_t dropbox_port = htons(DB_LSP_PORT);
-
-    if(packet->udp->dest == dropbox_port) {    
-      if(packet->udp->source == dropbox_port) {	
-	if(payload_len > 10) {
-	  if(ndpi_strnstr((const char *)packet->payload, "\"host_int\"", payload_len) != NULL) {	    
-	    NDPI_LOG_INFO(ndpi_struct, "found dropbox\n");
-	    ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
-	    return;
-	  }
+  if(packet->udp->dest == dropbox_port) {    
+    if(packet->udp->source == dropbox_port) {	
+      if(payload_len > 10) {
+        if(ndpi_strnstr((const char *)packet->payload, "\"host_int\"", payload_len) != NULL) {	    
+          NDPI_LOG_INFO(ndpi_struct, "found dropbox\n");
+          ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
+          return;
 	}
-      } else {
-	if(payload_len > 10) {
-	  if(ndpi_strnstr((const char *)packet->payload, "Bus17Cmd", payload_len) != NULL) {	    
-	    NDPI_LOG_INFO(ndpi_struct, "found dropbox\n");
-	    ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
-	    return;
-	  }
+      }
+    } else {
+      if(payload_len > 10) {
+        if(ndpi_strnstr((const char *)packet->payload, "Bus17Cmd", payload_len) != NULL) {	    
+          NDPI_LOG_INFO(ndpi_struct, "found dropbox\n");
+          ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
+          return;
 	}
       }
     }
@@ -74,10 +70,7 @@ static void ndpi_search_dropbox(struct ndpi_detection_module_struct *ndpi_struct
 {
   NDPI_LOG_DBG(ndpi_struct, "search dropbox\n");
 
-  /* skip marked packets */
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_DROPBOX) {
-    ndpi_check_dropbox(ndpi_struct, flow);
-  }
+  ndpi_check_dropbox(ndpi_struct, flow);
 }
 
 

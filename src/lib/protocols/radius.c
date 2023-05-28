@@ -41,8 +41,7 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
   // const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  if(packet->udp != NULL &&
-     (packet->udp->dest == htons(RADIUS_PORT) || packet->udp->source == htons(RADIUS_PORT) ||
+  if((packet->udp->dest == htons(RADIUS_PORT) || packet->udp->source == htons(RADIUS_PORT) ||
       packet->udp->dest == htons(RADIUS_PORT_ACC) || packet->udp->source == htons(RADIUS_PORT_ACC) ||
       packet->udp->dest == htons(RADIUS_PORT_ACC_ALTERNATIVE) || packet->udp->source == htons(RADIUS_PORT_ACC_ALTERNATIVE))) {
     struct radius_header *h = (struct radius_header*)packet->payload;
@@ -69,9 +68,7 @@ static void ndpi_search_radius(struct ndpi_detection_module_struct *ndpi_struct,
 {
   NDPI_LOG_DBG(ndpi_struct, "search radius\n");
 
-  /* skip marked packets */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RADIUS)
-    ndpi_check_radius(ndpi_struct, flow);
+  ndpi_check_radius(ndpi_struct, flow);
 }
 
 

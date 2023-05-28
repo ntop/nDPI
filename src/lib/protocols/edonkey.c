@@ -201,10 +201,7 @@ static void ndpi_check_edonkey(struct ndpi_detection_module_struct *ndpi_struct,
 static void ndpi_search_edonkey(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search EDONKEY\n");
 
-  /* skip marked packets */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_EDONKEY) {
-    ndpi_check_edonkey(ndpi_struct, flow);
-  }
+  ndpi_check_edonkey(ndpi_struct, flow);
 }
 
 
