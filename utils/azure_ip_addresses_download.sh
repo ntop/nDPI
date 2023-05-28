@@ -1,8 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
 
 cd "$(dirname "${0}")" || exit 1
+. ./common.sh || exit 1
 
 DEST=../src/lib/inc_generated/ndpi_azure_match.c.inc
 LINK_TMP=/tmp/azure_link.txt
@@ -14,30 +15,25 @@ LINK_ORIGIN="https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519
 
 echo "(1) Downloading file... ${LINK_ORIGIN}"
 http_response=$(curl -s -o ${LINK_TMP} -w "%{http_code}" ${LINK_ORIGIN})
-if [ "${http_response}" != "200" ]; then
-    echo "Error $http_response: you probably need to update the link origin url!"
-    exit 1
-fi
+check_http_response "${http_response}"
+is_file_empty "${LINK_TMP}"
 
-ORIGIN="$(grep -E 'ServiceTags_Public_[[:digit:]]+.json' ${LINK_TMP} | grep -o -E 'href=\"[^"]+' | sed 's/href="//' | uniq)"
+ORIGIN="$(grep -E 'ServiceTags_Public_[[:digit:]]+.json' ${LINK_TMP} | grep -o -E 'href="[^"]+' | sed 's/href="//' | uniq)"
 rm -f ${LINK_TMP}
-if [ -z "${ORIGIN}" ]; then
-    echo "Error ${LINK_ORIGIN} does not contain the url format!"
-    exit 1
-fi
+is_str_empty "${ORIGIN}" "${LINK_ORIGIN} does not contain the url format!"
 
 echo "(2) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
-if [ "${http_response}" != "200" ]; then
-    echo "Error $http_response: you probably need to update the list url!"
-    exit 1
-fi
+check_http_response "${http_response}"
+is_file_empty "${TMP}"
 
 echo "(3) Processing IP addresses..."
 # Note: the last "grep -v :" is used to skip IPv6 addresses
 tr -d '\r' < $TMP | grep / | tr -d '"' | tr -d " " | tr -d "," | grep -v : > $LIST
+is_file_empty "${LIST}"
 ./ipaddr2list.py $LIST NDPI_PROTOCOL_MICROSOFT_AZURE > $DEST
 rm -f $TMP $LIST
+is_file_empty "${DEST}"
 
 echo "(4) Microsoft Azure IPs are available in $DEST"
 exit 0

@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e
 
 FAILED_ASN=0
 TOTAL_ASN=0
@@ -28,6 +30,7 @@ function create_list() {
 }
 
 cd "$(dirname "${0}")" || exit 1
+. ./common.sh || exit 1
 
 echo "(1) Downloading Apple routes..."
 DEST="../src/lib/inc_generated/ndpi_asn_apple.c.inc"
@@ -194,7 +197,7 @@ DEST=../src/lib/inc_generated/ndpi_asn_nvidia.c.inc
 create_list NDPI_PROTOCOL_NVIDIA $DEST "AS60977" "AS50889" "AS20347" "AS11414"
 echo "(3) Nvidia IPs are available in $DEST"
 
-if [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
+if [ ${TOTAL_ASN} -eq 0 -o ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1
 else

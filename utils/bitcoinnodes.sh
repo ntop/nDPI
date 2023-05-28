@@ -1,10 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # List all the current bittorrent nodes
 #
 
 set -e
 
+cd "$(dirname "${0}")" || exit 1
+. ./common.sh || exit 1
+
 # NOTE: JQ can be found at https://stedolan.github.io/jq/
 
-curl -s -H "Accept: application/json; indent=4" https://bitnodes.io/api/v1/snapshots/latest/ | jq -r '.nodes|keys[] as $k | "\($k)"' | grep -v onion | grep -v ']' | cut -d ':' -f 1
+RESULT="$(curl -s -H "Accept: application/json; indent=4" https://bitnodes.io/api/v1/snapshots/latest/ | jq -r '.nodes|keys[] as $k | "\($k)"' | grep -v onion | grep -v ']' | cut -d ':' -f 1)"
+is_str_empty "${RESULT}" "String empty, please review this script."

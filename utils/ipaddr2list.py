@@ -40,11 +40,13 @@ print("""/*
 
 print("static ndpi_network "+proto.lower()+"_protocol_list[] = {")
 
+lines = 0
 with open(sys.argv[1]) as fp:
     for cnt, line in enumerate(fp):
         line = line.rstrip()
 
         if(line != ""):
+            lines += 1
             x = line.split("/")
 
             if(len(x) == 2):
@@ -60,3 +62,6 @@ with open(sys.argv[1]) as fp:
 print(" /* End */")
 print(" { 0x0, 0, 0 }")
 print("};")
+
+if lines == 0:
+    sys.stderr.write(f'{sys.argv[0]}: File {sys.argv[1]} is empty.\n')

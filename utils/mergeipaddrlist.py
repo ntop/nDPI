@@ -16,5 +16,11 @@ ipFile = open(sys.argv[1])
 ipAddresses = list(ipFile.readlines())
 ipAddresses = sorted(ipAddresses)
 cidrs = netaddr.cidr_merge(ipAddresses)
+
+lines = 0
 for cidr in cidrs:
+    lines += 1
     print(cidr)
+
+if lines == 0:
+    sys.stderr.write(f'{sys.argv[0]}: file {sys.argv[1]} is empty\n')
