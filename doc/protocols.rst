@@ -44,3 +44,12 @@ References: `Main site <https://www.nvidia.com/en-us/geforce-now/>`_.
 Generic web traffic from Nvidia sites.
 
 References: `Main site <https://www.nvidia.com>`_.
+
+
+.. _Proto 343:
+
+`NDPI_PROTOCOL_BITCOIN`
+======================
+Bitcoin is one of the most common crypto currencies.
+
+References: `Main site <https://en.bitcoin.it/wiki/Protocol_documentation>`_.

@@ -31,38 +31,27 @@
 #define SIG_NET_MAGIC            0x0A03CF40
 #define NAME_COIN_NET_MAGIC      0xF9BEB4FE
 
-static void ndpi_check_bitcoin(struct ndpi_detection_module_struct *ndpi_struct,
+static void ndpi_search_bitcoin(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow) {
+  NDPI_LOG_DBG(ndpi_struct, "search BITCOIN\n");
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  if(packet->tcp != NULL) {
-    if(packet->payload_packet_len >= 4) {
-      if(packet->tcp->source == htons(8333) ||
-         packet->tcp->dest == htons(8333)) {
-        u_int32_t *to_match = (u_int32_t*)packet->payload;
-
-        if((*to_match == MAIN_NET_MAGIC) || (*to_match == TEST_NET_MAGIC) || (*to_match == TEST_3_NET_MAGIC) ||
-           (*to_match == SIG_NET_MAGIC) || (*to_match == NAME_COIN_NET_MAGIC)) {
-           ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s", "BITCOIN");
-	        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITCOIN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-            NDPI_LOG_INFO(ndpi_struct, "found BITCOIN\n");
-	        return;
-        }
+  if(packet->payload_packet_len >= 4) {
+    if(packet->tcp->source == htons(8333) ||
+      packet->tcp->dest == htons(8333)) {
+      u_int32_t ntoh_to_match = ntohl(*(u_int32_t*)packet->payload);  
+      switch (ntoh_to_match) {
+        case MAIN_NET_MAGIC:
+        case TEST_NET_MAGIC:
+        case TEST_3_NET_MAGIC:
+        case SIG_NET_MAGIC:
+        case NAME_COIN_NET_MAGIC:
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BITCOIN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+          NDPI_LOG_INFO(ndpi_struct, "found BITCOIN\n");
+          return;
       }
-
     }
   }
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-}
-
-/* ************************************************************************** */
-
-static void ndpi_search_bitcoin(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  NDPI_LOG_DBG(ndpi_struct, "search BITCOIN\n");
-
-  /* skip marked packets */
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_BITCOIN) {
-    ndpi_check_bitcoin(ndpi_struct, flow);
-  }
 }
 
 /* ************************************************************************** */

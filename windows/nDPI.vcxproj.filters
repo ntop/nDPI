@@ -5,6 +5,7 @@
     <ClCompile Include="..\src\lib\protocols\bjnp.c" />
     <ClCompile Include="..\src\lib\protocols\armagetron.c" />
     <ClCompile Include="..\src\lib\protocols\bgp.c" />
+    <ClCompile Include="..\src\lib\protocols\bitcoin.c" />
     <ClCompile Include="..\src\lib\protocols\bittorrent.c" />
     <ClCompile Include="..\src\lib\protocols\btlib.c" />
     <ClCompile Include="..\src\lib\protocols\ciscovpn.c" />
