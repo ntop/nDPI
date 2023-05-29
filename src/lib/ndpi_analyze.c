@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <math.h>
 #include <float.h> /* FLT_EPSILON */
 #include "ndpi_api.h"
@@ -264,8 +265,8 @@ void ndpi_data_print_window_values(struct ndpi_analyze_struct *s) {
     u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
 
     for(i=0; i<n; i++)
-      printf("[%u: %llu]", i, s->values[i]);
-
+      printf("[%u: %" PRIu64 "]", i, s->values[i]);
+    
     printf("\n");
   }
 }
