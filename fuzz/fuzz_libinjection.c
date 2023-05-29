@@ -12,6 +12,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* Libinjection: it wants null-terminated string */
 
   query = malloc(size + 1);
+  if (!query)
+    return 0;
   memcpy(query, data, size);
   query[size] = '\0';
 

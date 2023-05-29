@@ -2288,6 +2288,7 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, void *va
 {
   struct ndpi_str_hash_private **h_priv = (struct ndpi_str_hash_private **)h;
   struct ndpi_str_hash_private *new = ndpi_calloc(1, sizeof(*new));
+  struct ndpi_str_hash_private *found;
   unsigned int hash_value;
 
   if (new == NULL)
@@ -2299,6 +2300,14 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, void *va
   new->hash = hash_value;
   new->value = value;
   HASH_ADD_INT(*h_priv, hash, new);
+
+  HASH_FIND_INT(*h_priv, &hash_value, found);
+  if (found == NULL) /* The insertion failed (because of a memory allocation error) */
+  {
+    ndpi_free(new);
+    return 1;
+  }
+
   return 0;
 }
 
