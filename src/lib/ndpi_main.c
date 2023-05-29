@@ -6432,16 +6432,15 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
      flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
 
-      ndpi_int_change_protocol(ndpi_str, flow,
-			       flow->guessed_protocol_id_by_ip, ret.master_protocol,
-			       NDPI_CONFIDENCE_MATCH_BY_IP);
+      ndpi_set_detected_protocol(ndpi_str, flow,
+			         flow->guessed_protocol_id_by_ip, ret.master_protocol,
+			         NDPI_CONFIDENCE_MATCH_BY_IP);
       ret.app_protocol = flow->detected_protocol_stack[0];
   }
 
   if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
     *protocol_was_guessed = 1;
     ndpi_fill_protocol_category(ndpi_str, flow, &ret);
-    ndpi_reconcile_protocols(ndpi_str, flow, &ret);
   }
 
   return(ret);
