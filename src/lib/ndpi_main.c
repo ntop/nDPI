@@ -2860,9 +2860,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->max_packets_to_process = NDPI_DEFAULT_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT;
 
   NDPI_BITMASK_SET_ALL(ndpi_str->detection_bitmask);
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
   ndpi_str->user_data = NULL;
-#endif
 
   ndpi_str->tcp_max_retransmission_window_size = NDPI_DEFAULT_MAX_TCP_RETRANSMISSION_WINDOW_SIZE;
   ndpi_str->tls_certificate_expire_in_x_days = 30; /* NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE flow risk */
@@ -9789,4 +9787,21 @@ u_int32_t ndpi_get_protocol_aggressiveness(struct ndpi_detection_module_struct *
   default:
     return -1;
   }
+}
+
+/* ******************************************************************** */
+
+void ndpi_set_user_data(struct ndpi_detection_module_struct *ndpi_str, void *user_data)
+{
+  if (ndpi_str->user_data != NULL)
+  {
+    NDPI_LOG_ERR(ndpi_str, "%s", "User data is already set. Overwriting.")
+  }
+
+  ndpi_str->user_data = user_data;
+}
+
+void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
+{
+  return ndpi_str->user_data;
 }

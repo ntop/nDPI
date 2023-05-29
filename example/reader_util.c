@@ -459,6 +459,8 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   workflow->prefs       = *prefs;
   workflow->ndpi_struct = module;
 
+  ndpi_set_user_data(module, workflow);
+
   ndpi_set_log_level(module, nDPI_LogLevel);
 
   if(_debug_protocols != NULL && ! _debug_protocols_ok) {
