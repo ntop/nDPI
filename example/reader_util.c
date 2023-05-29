@@ -126,6 +126,7 @@ void ndpi_analyze_payload(struct ndpi_flow_info *flow,
   struct packet_id_stats *p;
 
 #ifdef DEBUG_PAYLOAD
+  u_int16_t i;
   for(i=0; i<payload_len; i++)
     printf("%c", isprint(payload[i]) ? payload[i] : '.');
   printf("\n");
@@ -216,68 +217,68 @@ static int payload_stats_sort_asc(void *_a, void *_b) {
 
 /* ***************************************************** */
 
-void print_payload_stat(struct payload_stats *p) {
+static void print_payload_stat(struct payload_stats *p, FILE *out) {
   u_int i;
   struct flow_id_stats *s, *tmp;
   struct packet_id_stats *s1, *tmp1;
 
-  printf("\t[");
+  fprintf(out, "\t[");
 
   for(i=0; i<p->pattern_len; i++) {
-    printf("%c", isprint(p->pattern[i]) ? p->pattern[i] : '.');
+    fprintf(out, "%c", isprint(p->pattern[i]) ? p->pattern[i] : '.');
   }
 
-  printf("]");
-  for(; i<16; i++) printf(" ");
-  printf("[");
+  fprintf(out, "]");
+  for(; i<16; i++) fprintf(out, " ");
+  fprintf(out, "[");
 
   for(i=0; i<p->pattern_len; i++) {
-    printf("%s%02X", (i > 0) ? " " : "", isprint(p->pattern[i]) ? p->pattern[i] : '.');
+    fprintf(out, "%s%02X", (i > 0) ? " " : "", isprint(p->pattern[i]) ? p->pattern[i] : '.');
   }
 
-  printf("]");
+  fprintf(out, "]");
 
-  for(; i<16; i++) printf("  ");
-  for(i=p->pattern_len; i<max_pattern_len; i++) printf(" ");
+  for(; i<16; i++) fprintf(out, "  ");
+  for(i=p->pattern_len; i<max_pattern_len; i++) fprintf(out, " ");
 
-  printf("[len: %u][num_occurrencies: %u][flowId: ",
-	 p->pattern_len, p->num_occurrencies);
+  fprintf(out, "[len: %u][num_occurrencies: %u][flowId: ",
+	  p->pattern_len, p->num_occurrencies);
 
   i = 0;
   HASH_ITER(hh, p->flows, s, tmp) {
-    printf("%s%u", (i > 0) ? " " : "", s->flow_id);
+    fprintf(out, "%s%u", (i > 0) ? " " : "", s->flow_id);
     i++;
   }
 
-  printf("][packetIds: ");
+  fprintf(out, "][packetIds: ");
 
   /* ******************************** */
 
   i = 0;
   HASH_ITER(hh, p->packets, s1, tmp1) {
-    printf("%s%u", (i > 0) ? " " : "", s1->packet_id);
+    fprintf(out, "%s%u", (i > 0) ? " " : "", s1->packet_id);
     i++;
   }
 
-  printf("]\n");
+  fprintf(out, "]\n");
 
 
 }
 
 /* ***************************************************** */
 
-void ndpi_report_payload_stats(int print) {
+void ndpi_report_payload_stats(FILE *out) {
   struct payload_stats *p, *tmp;
   u_int num = 0;
 
-  if(print)
-    printf("\n\nPayload Analysis\n");
+  if(out)
+    fprintf(out, "\n\nPayload Analysis\n");
 
   HASH_SORT(pstats, payload_stats_sort_asc);
 
   HASH_ITER(hh, pstats, p, tmp) {
-    if(print && num <= max_num_reported_top_payloads)
-      print_payload_stat(p);
+    if(out && num <= max_num_reported_top_payloads)
+      print_payload_stat(p, out);
 
     ndpi_free(p->pattern);
 
@@ -711,20 +712,20 @@ ndpi_flow_update_byte_dist_mean_var(ndpi_flow_info_t *flow, const void *x,
 
 /* ***************************************************** */
 
-float ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
+double ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
 				       unsigned int num_bytes)
 {
   int i;
-  float sum = 0.0;
+  double sum = 0.0;
 
   for(i=0; i<256; i++) {
-    float tmp = (float) byte_count[i] / (float) num_bytes;
+    double tmp = (double) byte_count[i] / (double) num_bytes;
 
     if(tmp > FLT_EPSILON) {
       sum -= tmp * logf(tmp);
     }
   }
-  return(sum / logf(2.0));
+  return(sum / log(2.0));
 }
 
 /* ***************************************************** */
@@ -1584,7 +1585,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
           flow->entropy->score = ndpi_classify(flow->entropy->src2dst_pkt_len, flow->entropy->src2dst_pkt_time,
 					      flow->entropy->dst2src_pkt_len, flow->entropy->dst2src_pkt_time,
 					      flow->entropy->src2dst_start, flow->entropy->dst2src_start,
-					      max_num_packets_per_flow, flow->src_port, flow->dst_port,
+					      max_num_packets_per_flow, ntohs(flow->src_port), ntohs(flow->dst_port),
 					      flow->src2dst_packets, flow->dst2src_packets,
 					      flow->entropy->src2dst_opackets, flow->entropy->dst2src_opackets,
 					      flow->entropy->src2dst_l4_bytes, flow->entropy->dst2src_l4_bytes, 1,
@@ -1592,7 +1593,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	else
 	  flow->entropy->score = ndpi_classify(flow->entropy->src2dst_pkt_len, flow->entropy->src2dst_pkt_time,
 					      NULL, NULL, flow->entropy->src2dst_start, flow->entropy->src2dst_start,
-					      max_num_packets_per_flow, flow->src_port, flow->dst_port,
+					      max_num_packets_per_flow, ntohs(flow->src_port), ntohs(flow->dst_port),
 					      flow->src2dst_packets, 0,
 					      flow->entropy->src2dst_opackets, 0,
 					      flow->entropy->src2dst_l4_bytes, 0, 1,

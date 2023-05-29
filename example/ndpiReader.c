@@ -252,7 +252,7 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 
 void test_lib(); /* Forward */
 
-extern void ndpi_report_payload_stats(int print);
+extern void ndpi_report_payload_stats(FILE *out);
 extern int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverted_logic);
 
 /* ********************************** */
@@ -420,10 +420,10 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
       if(csv_fp) {
         fprintf(csv_fp, ",%.3f,%.3f,%.3f,%.3f", mean, variance, entropy, entropy * num_bytes);
       } else {
-        fprintf(out, "[byte_dist_mean: %f", mean);
-        fprintf(out, "][byte_dist_std: %f]", variance);
-        fprintf(out, "[entropy: %f]", entropy);
-        fprintf(out, "[total_entropy: %f]", entropy * num_bytes);
+        fprintf(out, "[byte_dist_mean: %.3f", mean);
+        fprintf(out, "][byte_dist_std: %.3f]", variance);
+        fprintf(out, "[entropy: %.3f]", entropy);
+        fprintf(out, "[total_entropy: %.3f]", entropy * num_bytes);
       }
     } else {
       if(csv_fp)
@@ -2747,7 +2747,7 @@ static void printFlowsStats() {
   FILE *out = results_file ? results_file : stdout;
 
   if(enable_payload_analyzer)
-    ndpi_report_payload_stats(1);
+    ndpi_report_payload_stats(out);
 
   for(thread_id = 0; thread_id < num_threads; thread_id++)
     total_flows += ndpi_thread_info[thread_id].workflow->num_allocated_flows;

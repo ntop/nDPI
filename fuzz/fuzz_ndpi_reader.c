@@ -24,7 +24,7 @@ int malloc_size_stats = 0;
 int max_malloc_bins = 14;
 struct ndpi_bin malloc_bins; /* unused */
 
-extern void ndpi_report_payload_stats(int print);
+extern void ndpi_report_payload_stats(FILE *out);
 
 #ifdef CRYPT_FORCE_NO_AESNI
 extern int force_no_aesni;
@@ -152,7 +152,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   ndpi_free(workflow->ndpi_flows_root);
   /* Free payload analyzer data, without printing */
   if(enable_payload_analyzer)
-    ndpi_report_payload_stats(0);
+    ndpi_report_payload_stats(NULL);
 
   return 0;
 }
