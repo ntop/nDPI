@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <math.h>
 #include <float.h> /* FLT_EPSILON */
 #include "ndpi_api.h"
@@ -41,7 +42,7 @@ void ndpi_init_data_analysis(struct ndpi_analyze_struct *ret, u_int16_t _max_ser
   ret->num_values_array_len = _max_series_len;
 
   if(ret->num_values_array_len > 0) {
-    len = sizeof(u_int32_t) * ret->num_values_array_len;
+    len = sizeof(u_int64_t) * ret->num_values_array_len;
     if((ret->values = ndpi_malloc(len)) != NULL)
       memset(ret->values, 0, len);
     else
@@ -70,7 +71,7 @@ void ndpi_free_data_analysis(struct ndpi_analyze_struct *d, u_int8_t free_pointe
 /* ********************************************************************************* */
 
 void ndpi_reset_data_analysis(struct ndpi_analyze_struct *d) {
-  u_int32_t *values_bkp;
+  u_int64_t *values_bkp;
   u_int32_t num_values_array_len_bpk;
 
   if(!d)
@@ -85,7 +86,7 @@ void ndpi_reset_data_analysis(struct ndpi_analyze_struct *d) {
   d->num_values_array_len = num_values_array_len_bpk;
 
   if(d->values)
-    memset(d->values, 0, sizeof(u_int32_t)*d->num_values_array_len);
+    memset(d->values, 0, sizeof(u_int64_t)*d->num_values_array_len);
 }
 
 /* ********************************************************************************* */
@@ -135,7 +136,7 @@ float ndpi_data_average(struct ndpi_analyze_struct *s) {
 
 /* ********************************************************************************* */
 
-u_int32_t ndpi_data_last(struct ndpi_analyze_struct *s) {
+u_int64_t ndpi_data_last(struct ndpi_analyze_struct *s) {
   if((!s) || (s->num_data_entries == 0) || (s->num_values_array_len == 0))
     return(0);
 
@@ -264,8 +265,8 @@ void ndpi_data_print_window_values(struct ndpi_analyze_struct *s) {
     u_int16_t i, n = ndpi_min(s->num_data_entries, s->num_values_array_len);
 
     for(i=0; i<n; i++)
-      printf("[%u: %u]", i, s->values[i]);
-
+      printf("[%u: %" PRIu64 "]", i, s->values[i]);
+    
     printf("\n");
   }
 }
