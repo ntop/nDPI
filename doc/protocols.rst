@@ -53,3 +53,9 @@ References: `Main site <https://www.nvidia.com>`_.
 Bitcoin is one of the most common crypto currencies.
 
 References: `Main site <https://en.bitcoin.it/wiki/Protocol_documentation>`_.
+
+Notes:
+
+- Not each crypto exchange is a mining, it could be a normal transaction, sending or receving.
+- Bitcoin network protocol covers the broader set of rules that govern how all nodes in the network communicate and sync with each others blocks and transactions. 
+- On the other hand mining protocols are more specific and deal directly with how miners interact with the network and participate in the mining process.
