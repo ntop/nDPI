@@ -7,6 +7,11 @@ if [ "${NDPI_DISABLE_FUZZY}" = "1" ]; then
    FUZZY_TESTING_ENABLED=0
 fi
 
+FORCE_UPDATING_UTESTS_RESULTS=0
+if [ "${NDPI_FORCE_UPDATING_UTESTS_RESULTS}" = "1" ]; then
+   FORCE_UPDATING_UTESTS_RESULTS=1
+fi
+
 #Remember: valgrind and *SAN are incompatible!
 CMD_PREFIX="${CMD_PREFIX}"
 if [ "${NDPI_TESTS_WINE}" = "1" ]; then
@@ -124,6 +129,9 @@ check_results() {
 		  fi
 		  RC=$(( RC + 1 ))
 		  FAILURES+=("$f.out")
+		  if [ $FORCE_UPDATING_UTESTS_RESULTS -eq 1 ]; then
+		    cp /tmp/reader.$$.out result/$f.out
+		  fi
 	    fi
 
 	    /bin/rm -f /tmp/reader.$$.out
