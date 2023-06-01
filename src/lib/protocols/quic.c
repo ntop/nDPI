@@ -38,8 +38,9 @@
    * https://groups.google.com/a/chromium.org/g/proto-quic/c/OAVgFqw2fko/m/jCbjP0AVAAAJ
    * https://groups.google.com/a/chromium.org/g/proto-quic/c/OAVgFqw2fko/m/-NYxlh88AgAJ
    * https://docs.google.com/document/d/1FcpCJGTDEMblAs-Bm5TYuqhHyUqeWpqrItw2vkMFsdY/edit
-   * https://tools.ietf.org/html/draft-ietf-quic-tls-29
-   * https://tools.ietf.org/html/draft-ietf-quic-transport-29
+   * https://www.rfc-editor.org/rfc/rfc9001.txt [Using TLS over QUIC]
+   * https://www.rfc-editor.org/rfc/rfc9000.txt [v1]
+   * https://www.rfc-editor.org/rfc/rfc9369.txt [v2]
    */
 
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
@@ -50,6 +51,7 @@ extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_str
 extern int is_valid_rtp_payload_type(uint8_t type);
 
 /* Versions */
+#define V_2		0x6b3343cf
 #define V_1		0x00000001
 #define V_Q024		0x51303234
 #define V_Q025		0x51303235
@@ -84,7 +86,7 @@ static int is_version_quic(uint32_t version)
     ((version & 0xFFFFFF00) == 0xFF000000) /* IETF Drafts*/ ||
     ((version & 0xFFFFF000) == 0xfaceb000) /* Facebook */ ||
     ((version & 0x0F0F0F0F) == 0x0a0a0a0a) /* Forcing Version Negotiation */ ||
-    (version == 0x709A50C4);               /* V2 IETF Drafts */
+    (version == V_2);
 }
 static int is_version_valid(uint32_t version)
 {
@@ -116,8 +118,7 @@ static uint8_t get_u8_quic_ver(uint32_t version)
     return 29;
 
   /* QUIC Version 2 */
-  /* For the time being use 100 as a number for V2 and let see how v2 drafts evolve */
-  if (version == 0x709A50C4)
+  if (version == V_2)
     return 100;
 
   return 0;
@@ -198,7 +199,7 @@ static int is_version_with_v1_labels(uint32_t version)
 }
 static int is_version_quic_v2(uint32_t version)
 {
-  return version == 0x709A50C4;
+  return version == V_2;
 }
 
 int quic_len(const uint8_t *buf, uint64_t *value)
@@ -876,8 +877,8 @@ static int quic_derive_initial_secrets(struct ndpi_detection_module_struct *ndpi
     0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a
   };
   static const uint8_t handshake_salt_v2_draft_00[20] = {
-    0xa7, 0x07, 0xc2, 0x03, 0xa5, 0x9b, 0x47, 0x18, 0x4a, 0x1d,
-    0x62, 0xca, 0x57, 0x04, 0x06, 0xea, 0x7a, 0xe3, 0xe5, 0xd3
+    0x0d, 0xed, 0xe3, 0xde, 0xf7, 0x00, 0xa6, 0xdb, 0x81, 0x93,
+    0x81, 0xbe, 0x6e, 0x26, 0x9d, 0xcb, 0xf9, 0xbd, 0x2e, 0xd9
   };
   gcry_error_t err;
   uint8_t secret[HASH_SHA2_256_LENGTH];
