@@ -1,0 +1,30 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	1	(1.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 59 (59.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/0 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  1/1 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   0/0 (search/found)
+
+QUIC	19	12970	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 ::1                      	 1      
+
+
+	1	UDP [::1]:42086 <-> [::1]:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][8 pkts/2734 bytes <-> 11 pkts/10236 bytes][Goodput ratio: 81/93][0.54 sec][Hostname/SNI: test][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: -0.578 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 90/44 251/100 114/43][Pkt Len c2s/s2c min/avg/max/stddev: 119/119 342/931 1296/2098 370/669][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][TLSv1.3][JA3C: 5e685944fc983af5eabcc813add3dca1][Plen Bins: 0,26,0,0,5,15,0,0,0,5,0,0,0,10,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,21,0,5]
