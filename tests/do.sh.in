@@ -156,6 +156,7 @@ for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
 
     PCAPS=`cd pcap; /bin/ls *.*cap*`
     FAILURES=()
+    READER_EXTRA_PARAM=""
     [ -f config.txt ] && READER_EXTRA_PARAM=$(< config.txt)
 
     echo "Run configuration \""$(basename $d)"\" [$READER_EXTRA_PARAM]"
