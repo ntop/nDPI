@@ -1000,7 +1000,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   while(!something_went_wrong) {
-    u_int16_t len, p_len;
+    u_int32_t len;
+    u_int16_t p_len;
     const u_int8_t *p;
     u_int8_t content_type;
 
