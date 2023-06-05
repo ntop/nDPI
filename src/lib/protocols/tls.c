@@ -1073,7 +1073,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
        && (content_type != 0x17 /* Application Data */)
        && (!flow->tls_quic.certificate_processed)) {
       /* Split the element in blocks */
-      u_int16_t processed = 5;
+      u_int32_t processed = 5;
 
       while((processed+4) <= len) {
 	const u_int8_t *block = (const u_int8_t *)&message->buffer[processed];
