@@ -133,6 +133,9 @@ int enable_malloc_bins = 0;
 int max_malloc_bins = 14;
 int malloc_size_stats = 0;
 
+static int lru_cache_sizes[NDPI_LRUCACHE_MAX];
+static int lru_cache_ttls[NDPI_LRUCACHE_MAX];
+
 struct flow_info {
   struct ndpi_flow_info *flow;
   u_int16_t thread_id;
@@ -511,10 +514,14 @@ static void help(u_int long_help) {
          "  -A                        | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
          "  -M                        | Memory allocation stats on data-path (only by the library). It works only on single-thread configuration\n"
          "  -Z proto:value            | Set this value of aggressiveness for this protocol (0 to disable it). This flag can be used multiple times\n"
+         "  --lru-cache-size=NAME:size    | Specify the size for this LRU cache (0 to disable it). This flag can be used multiple times\n"
+         "  --lru-cache-ttl=NAME:size     | Specify the TTL [in seconds] for this LRU cache (0 to disable it). This flag can be used multiple times\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
          max_num_reported_top_payloads, max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts);
+
+  printf("\nLRU Cache names: ookla, bittorrent, zoom, stun, tls_cert, mining, msteams, stun_zoom\n");
 
 #ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
@@ -559,6 +566,9 @@ static void help(u_int long_help) {
 }
 
 
+#define OPTLONG_VALUE_LRU_CACHE_SIZE	1000
+#define OPTLONG_VALUE_LRU_CACHE_TTL	1001
+
 static struct option longopts[] = {
   /* mandatory extcap options */
   { "extcap-interfaces", no_argument, NULL, '0'},
@@ -598,6 +608,9 @@ static struct option longopts[] = {
   { "payload-analysis", required_argument, NULL, 'P'},
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
+
+  { "lru-cache-size", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_SIZE},
+  { "lru-cache-ttl", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_TTL},
 
   {0, 0, 0, 0}
 };
@@ -788,6 +801,52 @@ void printCSVHeader() {
   fprintf(csv_fp, "\n");
 }
 
+static int cache_idx_from_name(const char *name)
+{
+  if(strcmp(name, "ookla") == 0)
+    return NDPI_LRUCACHE_OOKLA;
+  if(strcmp(name, "bittorrent") == 0)
+    return NDPI_LRUCACHE_BITTORRENT;
+  if(strcmp(name, "zoom") == 0)
+    return NDPI_LRUCACHE_ZOOM;
+  if(strcmp(name, "stun") == 0)
+    return NDPI_LRUCACHE_STUN;
+  if(strcmp(name, "tls_cert") == 0)
+    return NDPI_LRUCACHE_TLS_CERT;
+  if(strcmp(name, "mining") == 0)
+    return NDPI_LRUCACHE_MINING;
+  if(strcmp(name, "msteams") == 0)
+    return NDPI_LRUCACHE_MSTEAMS;
+  if(strcmp(name, "stun_zoom") == 0)
+    return NDPI_LRUCACHE_STUN_ZOOM;
+  return -1;
+}
+
+static int parse_cache_param(char *param, int *cache_idx, int *param_value)
+{
+  char *saveptr, *tmp_str, *cache_str, *param_str;
+  int idx;
+
+  tmp_str = ndpi_strdup(param);
+  if(tmp_str) {
+    cache_str = strtok_r(tmp_str, ":", &saveptr);
+    if(cache_str) {
+      param_str = strtok_r(NULL, ":", &saveptr);
+      if(param_str) {
+        idx = cache_idx_from_name(cache_str);
+        if(idx >= 0) {
+          *cache_idx = idx;
+          *param_value = atoi(param_str);
+          ndpi_free(tmp_str);
+	  return 0;
+	}
+      }
+    }
+  }
+  ndpi_free(tmp_str);
+  return -1;
+}
+
 /* ********************************** */
 
 /**
@@ -804,6 +863,7 @@ static void parseOptions(int argc, char **argv) {
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 #endif
+  int cache_idx, cache_size, cache_ttl;
 
 #ifdef USE_DPDK
   {
@@ -818,6 +878,11 @@ static void parseOptions(int argc, char **argv) {
 
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++)
     aggressiveness[i] = -1; /* Use the default value */
+
+  for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+    lru_cache_sizes[i] = -1; /* Use the default value */
+    lru_cache_ttls[i] = -1; /* Use the default value */
+  }
 
   while((opt = getopt_long(argc, argv, "a:Ab:B:e:Ec:C:dDFf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:w:zZ:q0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
@@ -1110,6 +1175,22 @@ static void parseOptions(int argc, char **argv) {
 
     case 'z':
       init_prefs |= ndpi_enable_ja3_plus;
+      break;
+
+    case OPTLONG_VALUE_LRU_CACHE_SIZE:
+      if(parse_cache_param(optarg, &cache_idx, &cache_size) == -1) {
+        printf("Invalid parameter [%s]\n", optarg);
+        exit(1);
+      }
+      lru_cache_sizes[cache_idx] = cache_size;
+      break;
+
+    case OPTLONG_VALUE_LRU_CACHE_TTL:
+      if(parse_cache_param(optarg, &cache_idx, &cache_ttl) == -1) {
+        printf("Invalid parameter [%s]\n", optarg);
+        exit(1);
+      }
+      lru_cache_ttls[cache_idx] = cache_ttl;
       break;
 
     default:
@@ -2504,9 +2585,18 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
     ndpi_load_malicious_sha1_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _maliciousSHA1Path);
 
   /* Enable/disable/configure LRU caches size here */
-  ndpi_set_lru_cache_size(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-			  NDPI_LRUCACHE_BITTORRENT, 32768);
+  for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+    if(lru_cache_sizes[i] != -1)
+      ndpi_set_lru_cache_size(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+			      i, lru_cache_sizes[i]);
+  }
+
   /* Enable/disable LRU caches TTL here */
+  for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+    if(lru_cache_ttls[i] != -1)
+      ndpi_set_lru_cache_ttl(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+			     i, lru_cache_ttls[i]);
+  }
 
   /* Set aggressiviness here */
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {

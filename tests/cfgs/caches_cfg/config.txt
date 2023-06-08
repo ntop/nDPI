@@ -1,0 +1,1 @@
+--lru-cache-size=ookla:0 --lru-cache-ttl=msteams:1
