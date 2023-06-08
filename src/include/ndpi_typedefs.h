@@ -1596,6 +1596,11 @@ struct ndpi_flow_struct {
       u_int16_t external_port;
       ndpi_ip_addr_t external_address;
     } natpmp;
+
+    struct {
+      u_int8_t message_type;
+      char method[64];
+    } thrift;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/

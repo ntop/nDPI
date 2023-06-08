@@ -39,6 +39,8 @@ struct ndpi_coap_hdr
   u_int8_t version:2, type:2, tkl:4;
 #elif defined(__LITTLE_ENDIAN__)
   u_int8_t tkl:4, type:2, version:2;
+#else
+#error "Missing endian macro definitions."
 #endif
   u_int8_t code;
   u_int16_t message_id; //if needed, remember to convert in host number
