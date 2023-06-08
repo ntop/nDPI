@@ -59,3 +59,12 @@ Notes:
 - Not each crypto exchange is a mining, it could be a normal transaction, sending or receving.
 - Bitcoin network protocol covers the broader set of rules that govern how all nodes in the network communicate and sync with each others blocks and transactions. 
 - On the other hand mining protocols are more specific and deal directly with how miners interact with the network and participate in the mining process.
+
+
+.. _Proto 344:
+
+`NDPI_PROTOCOL_PROTONVPN`
+========================
+Proton VPN is a VPN service operated by the Swiss company Proton AG, the company behind the email service Proton Mail
+
+References: `Main site https://protonvpn.com/`
