@@ -1710,6 +1710,7 @@ typedef enum {
        See #1946 for other details */
     ndpi_enable_tcp_ack_payload_heuristic = (1 << 17),
     ndpi_dont_load_crawlers_list = (1 << 18),
+    ndpi_dont_load_protonvpn_list = (1 << 19),
   } ndpi_prefs;
 
 typedef struct {

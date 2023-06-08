@@ -372,6 +372,7 @@ typedef enum {
   NDPI_PROTOCOL_GEFORCENOW            = 341,
   NDPI_PROTOCOL_NVIDIA                = 342,
   NDPI_PROTOCOL_BITCOIN               = 343, 
+  NDPI_PROTOCOL_PROTONVPN             = 344,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

@@ -1,0 +1,33 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	11	(11.00 pkts/flow)
+DPI Packets (UDP):	2	(2.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 127 (63.50 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   3/1 (search/found)
+
+WireGuard	14	2060	1
+ProtonVPN	26	8061	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.0.2.15                	 1      
+
+
+	1	TCP 10.0.2.15:37810 <-> 185.159.159.148:443 [proto: 91.344/TLS.ProtonVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 11][cat: VPN/2][12 pkts/1454 bytes <-> 14 pkts/6607 bytes][Goodput ratio: 52/88][0.09 sec][Hostname/SNI: vpn-api.proton.me][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][bytes ratio: -0.639 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 8/5 22/21 9/7][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 121/472 358/1514 88/611][Risk: ** TLS Cert Expired **][Risk Score: 100][Risk Info: 29/May/2023 13:13:28 - 27/Aug/2023 13:13:27][TLSv1.2][JA3C: 6f5e62edfa5933b1332ddf8b9fb3ef9d][ServerNames: *.pr.tn,*.proton.me,*.storage.proton.me,pr.tn,proton.me][JA3S: 16c0b3e6a7b8173c16d944cfeaeee9cf][Issuer: C=US, O=Let's Encrypt, CN=R3][Subject: CN=proton.me][Certificate SHA-1: AC:31:4E:05:15:6C:29:0B:D7:4F:31:3D:DE:CA:0F:C8:FF:E9:C6:4D][Safari][Validity: 2023-05-29 13:13:28 - 2023-08-27 13:13:27][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,31,15,0,0,7,0,0,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7,0,15,0,0]
+	2	UDP 10.0.2.15:57701 <-> 217.23.3.76:443 [proto: 206/WireGuard][IP: 344/ProtonVPN][Encrypted][Confidence: DPI][DPI packets: 2][cat: VPN/2][9 pkts/1246 bytes <-> 5 pkts/814 bytes][Goodput ratio: 70/74][0.09 sec][bytes ratio: 0.210 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/11 11/17 24/25 9/6][Pkt Len c2s/s2c min/avg/max/stddev: 74/122 138/163 190/218 30/39][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 51820][PLAIN TEXT (F/WNBO)][Plen Bins: 0,7,28,42,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

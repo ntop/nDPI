@@ -21,7 +21,7 @@ function is_file_empty()
         exit 1
     fi
 
-    if [ `cat "${file}" | wc -l` -eq 0 ]; then
+    if [ `cat "${file}" | wc -c` -eq 0 ]; then
         printf '%s error: %s\n' "${0}" "file ${file} empty!" >&2
         exit 1
     fi
