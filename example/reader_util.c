@@ -1392,6 +1392,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   {
     if (ndpi_flow2json(workflow->ndpi_struct, flow->ndpi_flow,
                        flow->ip_version, flow->protocol,
+		       flow->vlan_id,
                        flow->src_ip, flow->dst_ip,
                        &flow->src_ip6, &flow->dst_ip6,
                        flow->src_port, flow->dst_port,

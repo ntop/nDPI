@@ -1589,6 +1589,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 		   struct ndpi_flow_struct *flow,
 		   u_int8_t ip_version,
 		   u_int8_t l4_protocol,
+		   u_int16_t vlan_id,
 		   u_int32_t src_v4, u_int32_t dst_v4,
 		   struct ndpi_in6_addr *src_v6, struct ndpi_in6_addr *dst_v6,
 		   u_int16_t src_port, u_int16_t dst_port,
@@ -1607,6 +1608,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_patchIPv6Address(src_name), ndpi_patchIPv6Address(dst_name);
   }
 
+  if(vlan_id != 0) ndpi_serialize_string_uint32(serializer, "vlan_id", vlan_id);
   ndpi_serialize_string_string(serializer, "src_ip", src_name);
   ndpi_serialize_string_string(serializer, "dest_ip", dst_name);
   if(src_port) ndpi_serialize_string_uint32(serializer, "src_port", ntohs(src_port));
