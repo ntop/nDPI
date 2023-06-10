@@ -862,6 +862,9 @@ struct ndpi_flow_udp_struct {
   u_int32_t epicgames_stage:1;
   u_int32_t epicgames_word;
 
+  /* NDPI_PROTOCOL_RAKNET */
+  u_int32_t raknet_custom:1;
+
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_crc[4];
 

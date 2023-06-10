@@ -77,3 +77,16 @@ References: `Main site https://protonvpn.com/`
 Apache Thrift is a generic data interchange framework that supports a bunch of different languages and platforms.
 
 References: `Official site <https://thrift.apache.org>`_ `Github <https://github.com/apache/thrift>`_.
+
+
+.. _Proto 346:
+
+`NDPI_PROTOCOL_ROBLOX`
+=====================
+Roblox is an online game platform and game creation system.
+
+References: `Main site <https://www.roblox.com/>`_.
+
+Notes:
+
+- Since Roblox games use a custom version of the RakNet protocol, some Roblox flows might be classified as RakNet.
