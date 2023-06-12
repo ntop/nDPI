@@ -78,7 +78,7 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
         const uint8_t id_flags_iv_crc_len = 11;
         const uint8_t crc_len = sizeof(flow->l4.udp.skype_crc);
         const uint8_t crc_offset = id_flags_iv_crc_len - crc_len;
-
+	
         /* Look for two pkts with the same crc */
         if((payload_len >= id_flags_iv_crc_len) &&
            (packet->payload[2] == 0x02 /* Payload flag */ )) {
@@ -87,8 +87,13 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
           } else {
             if(memcmp(flow->l4.udp.skype_crc, &packet->payload[crc_offset], crc_len) == 0) {
               NDPI_LOG_INFO(ndpi_struct, "found SKYPE_TEAMS\n");
-              ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-              return;
+
+	      /* As there is some heuristic we need to double check before detecting the protocol */
+	      if((flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE)
+		 || (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_SKYPE_TEAMS)) {		
+		ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+		return;
+	      }
             }
           }
           /* No idea if the two pkts need to be consecutive; in doubt wait for some more pkts */
