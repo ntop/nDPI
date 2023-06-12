@@ -8489,7 +8489,8 @@ char *ndpi_strnstr(const char *s, const char *find, size_t slen) {
 /* ****************************************************** */
 
 /*
- * Same as ndpi_strnstr but case-insensitive
+ * Same as ndpi_strnstr but case-insensitive.
+ * Please note that this function is *NOT* equivalent to strncasecmp().
  */
 const char * ndpi_strncasestr(const char *str1, const char *str2, size_t len) {
   size_t str1_len = strnlen(str1, len);
