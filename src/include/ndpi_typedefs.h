@@ -31,6 +31,20 @@
 /* Used by both nDPI core and patricia code under third-party */
 #include "ndpi_patricia_typedefs.h"
 
+#ifndef NDPI_CFFI_PREPROCESSING
+#ifndef u_char
+typedef unsigned char u_char;
+#endif
+
+#ifndef u_short
+typedef unsigned short u_short;
+#endif
+
+#ifndef u_int
+typedef unsigned int u_int;
+#endif
+#endif
+
 /* NDPI_LOG_LEVEL */
 typedef enum {
 	      NDPI_LOG_ERROR,
