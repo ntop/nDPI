@@ -29,6 +29,8 @@ AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom p
 AC_ARG_WITH(lto-and-gold-linker, AS_HELP_STRING([--with-lto-and-gold-linker], [Build with LTO and Gold linker]))
 AC_ARG_ENABLE(debug-build, AS_HELP_STRING([--enable-debug-build], [Enable debug build (`-g` flag)]),[enable_debugbuild=$enableval],[enable_debugbuild=no])
 
+NDPI_CFLAGS="${NDPI_CFLAGS} -D_DEFAULT_SOURCE=1 -D_GNU_SOURCE=1"
+
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [
   BUILD_FUZZTARGETS=1
   NDPI_CFLAGS="${NDPI_CFLAGS} -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION"

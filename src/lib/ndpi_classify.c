@@ -41,8 +41,6 @@
  *
  */
 
-#define _GNU_SOURCE
-
 #include <stdio.h>
 #include <ctype.h>
 // #include <sys/time.h>
