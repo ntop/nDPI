@@ -28,7 +28,7 @@ static ndpi_network ndpi_protocol_vk_protocol_list[] = {
  { 0x57F08000 /* 87.240.128.0/18 */, 18, NDPI_PROTOCOL_VK },
  { 0x5DBAE000 /* 93.186.224.0/20 */, 20, NDPI_PROTOCOL_VK },
  { 0x5F8EC000 /* 95.142.192.0/20 */, 20, NDPI_PROTOCOL_VK },
- { 0x5FD50000 /* 95.213.0.0/18 */, 18, NDPI_PROTOCOL_VK },
+ { 0x5FD50000 /* 95.213.0.0/17 */, 17, NDPI_PROTOCOL_VK },
  { 0xB920F800 /* 185.32.248.0/22 */, 22, NDPI_PROTOCOL_VK },
  /* End */
  { 0x0, 0, 0 }
