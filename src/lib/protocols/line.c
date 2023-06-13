@@ -42,10 +42,38 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "searching LineCall\n");
 
+  if(packet->iph && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_LINE)) {
+    /*
+      The heuristic below (coming from reverse engineering packet traces)
+      will apply only to IPv4 and Line IP addresses. This is to avoid puttin
+      false positives in other nDPI-decoded protocols.
+    */
+
+    if ((packet->payload_packet_len == 110 &&
+	 ndpi_struct->packet.payload[0] == 0xB6 &&  ndpi_struct->packet.payload[1] == 0x18 && ndpi_struct->packet.payload[2] == 0x00 && ndpi_struct->packet.payload[3] == 0x6A) ||
+	(packet->payload_packet_len >= 738 && (ndpi_struct->packet.payload[0] == 0xDA || ndpi_struct->packet.payload[0] == 0xDB) &&
+	 ndpi_struct->packet.payload[4] == 0x06 && ndpi_struct->packet.payload[5] == 0x02) ||
+	(packet->payload_packet_len >= 150 && (ndpi_struct->packet.payload[0] == 0xD9 || ndpi_struct->packet.payload[0] == 0xD8) &&
+	 ((ndpi_struct->packet.payload[1] & 0xF0) == 0x90 || (ndpi_struct->packet.payload[1] & 0xF0) == 0xD0 || (ndpi_struct->packet.payload[1] & 0xF0) == 0xE0) && ndpi_struct->packet.payload[4] == 0x06 &&
+	 ndpi_struct->packet.payload[5] == 0x02)) {
+      ndpi_int_line_add_connection(ndpi_struct, flow);
+      return;
+    }
+
+    if ((packet->payload_packet_len == 46 && ntohl(get_u_int32_t(packet->payload, 0)) == 0xb6130006) ||
+	(packet->payload_packet_len == 8 && ntohl(get_u_int32_t(packet->payload, 0)) == 0xb6070004) ||
+	(packet->payload_packet_len == 16 && ntohl(get_u_int32_t(packet->payload, 0)) == 0xb609000c) ||
+	(ndpi_struct->packet.payload[0] == 0xD0 &&
+	 (ndpi_struct->packet.payload[1] == 0xB3 || ndpi_struct->packet.payload[1] == 0xB4
+	  || ndpi_struct->packet.payload[1] == 0xDA || ndpi_struct->packet.payload[1] == 0xDB))) {
+      ndpi_int_line_add_connection(ndpi_struct, flow);
+      return;
+    }
+  }
+
   /* Some "random" UDP packets before the standard RTP stream:
      it seems that the 4th bytes of these packets is some kind of packet
      number. Look for 4 packets per direction with consecutive numbers. */
-
   if(packet->payload_packet_len > 10) {
     if(flow->l4.udp.line_pkts[packet->packet_direction] == 0) {
       flow->l4.udp.line_base_cnt[packet->packet_direction] = packet->payload[3];
