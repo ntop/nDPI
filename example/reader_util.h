@@ -214,30 +214,36 @@ typedef struct ndpi_flow_info {
     *pktlen_c_to_s, *pktlen_s_to_c;
 
   enum info_type info_type;
+
   union {
     char info[256];
+    
     struct {
       unsigned char auth_failed;
       char username[127];
       char password[128];
     } ftp_imap_pop_smtp;
+    
     struct {
       char domain[85];
       char hostname[85];
       char username[86];
     } kerberos;
+    
     struct {
       char ip[16];
       char port[6];
       char hostname[48];
       char fqdn[48];
     } softether;
+    
     struct {
       char identity_uuid[36];
       char machine[48];
       char platform[32];
       char services[48];
     } tivoconnect;
+    
     struct  {
       uint16_t result_code;
       uint16_t internal_port;
@@ -289,6 +295,8 @@ typedef struct ndpi_flow_info {
     char *username, *password;
   } telnet;
 
+  ndpi_multimedia_flow_type multimedia_flow_type;
+  
   void *src_id, *dst_id;
 
   struct ndpi_entropy *entropy;

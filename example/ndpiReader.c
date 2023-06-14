@@ -1522,6 +1522,30 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				flow->detected_protocol.protocol_by_ip));
 
+    if(flow->multimedia_flow_type != ndpi_multimedia_unknown_flow) {
+      const char *content;
+      
+      switch(flow->multimedia_flow_type) {
+      case ndpi_multimedia_audio_flow:
+	content = "Audio";
+	break;
+	
+      case ndpi_multimedia_video_flow:
+	content = "Video";
+	break;
+	
+      case ndpi_multimedia_screen_sharing_flow:
+	content = "Screen Sharing";
+	break;
+
+      default:
+	content = "???";
+	break;
+      }
+      
+      fprintf(out, "[Stream Content: %s]", content);	      
+    }
+    
     fprintf(out, "[%s]",
 	    ndpi_is_encrypted_proto(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				    flow->detected_protocol) ? "Encrypted" : "ClearText");

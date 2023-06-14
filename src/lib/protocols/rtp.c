@@ -105,7 +105,8 @@ PACK_ON struct zoom_media_encapsulation {
 
 #define ZOOM_PORT 8801
 
-static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
+static u_int8_t isZoom(struct ndpi_flow_struct *flow,
+		       u_int16_t sport, u_int16_t dport,
 		       const u_int8_t *payload, const u_int16_t payloadLen,
 		       u_int8_t *is_rtp, u_int8_t *zoom_stream_type,
 		       u_int16_t *payload_offset) {
@@ -118,7 +119,7 @@ static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
   if((sport == ZOOM_PORT) || (dport == ZOOM_PORT)) {
     struct zoom_sfu_encapsulation *enc = (struct zoom_sfu_encapsulation*)payload;
 
-    /* traceEvent(TRACE_NORMAL, "==> %u <-> %u [type: %u]", sport, dport, enc->sfu_type); */
+    /* printf("==> %u <-> %u [type: %u]\n", sport, dport, enc->sfu_type); */
 
     if((enc->sfu_type >= 3) && (enc->sfu_type <= 5)) {
       struct zoom_media_encapsulation *enc = (struct zoom_media_encapsulation*)(&payload[sizeof(struct zoom_sfu_encapsulation)]);
@@ -130,16 +131,19 @@ static u_int8_t isZoom(u_int16_t sport, u_int16_t dport,
       case 30: /* Screen Share */
 	*is_rtp = 0;
 	*payload_offset = 27;
+	flow->zoom.flow_type = ndpi_multimedia_screen_sharing_flow;
 	break;
 	
       case 15: /* Audio */
 	*is_rtp = 1;
 	*payload_offset = 27;
+	flow->zoom.flow_type = ndpi_multimedia_audio_flow;
 	break;
 	
       case 16: /* Video */
 	*is_rtp = 1;
 	*payload_offset = 32;
+	flow->zoom.flow_type = ndpi_multimedia_video_flow;
 	break;
 
       case 33: /* RTCP */
@@ -181,7 +185,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if(isZoom(s_port, d_port, payload, payload_len,
+  if(isZoom(flow, s_port, d_port, payload, payload_len,
 	    &is_rtp, &zoom_stream_type, &payload_offset)) {
     if(payload_offset < payload_len) {
       /*

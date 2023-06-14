@@ -2889,27 +2889,27 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
-  
+
   ndpi_str->host_risk_mask_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   if(!ndpi_str->host_risk_mask_automa.ac_automa) {
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
-  
+
   ndpi_str->common_alpns_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   if(!ndpi_str->common_alpns_automa.ac_automa) {
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
-  
+
   load_common_alpns(ndpi_str);
-  
+
   ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(NULL);
   if(!ndpi_str->tls_cert_subject_automa.ac_automa) {
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
-  
+
   ndpi_str->malicious_ja3_hashmap = NULL; /* Initialized on demand */
   ndpi_str->malicious_sha1_hashmap = NULL; /* Initialized on demand */
   ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
@@ -3214,23 +3214,23 @@ int ndpi_get_automa_stats(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_AUTOMA_HOST:
     ndpi_automa_get_stats(ndpi_struct->host_automa.ac_automa, stats);
     return 0;
-    
+
   case NDPI_AUTOMA_DOMAIN:
     ndpi_automa_get_stats(ndpi_struct->risky_domain_automa.ac_automa, stats);
     return 0;
-    
+
   case NDPI_AUTOMA_TLS_CERT:
     ndpi_automa_get_stats(ndpi_struct->tls_cert_subject_automa.ac_automa, stats);
     return 0;
-    
+
   case NDPI_AUTOMA_RISK_MASK:
     ndpi_automa_get_stats(ndpi_struct->host_risk_mask_automa.ac_automa, stats);
     return 0;
-    
+
   case NDPI_AUTOMA_COMMON_ALPNS:
     ndpi_automa_get_stats(ndpi_struct->common_alpns_automa.ac_automa, stats);
     return 0;
-    
+
   default:
     return -1;
   }
@@ -6036,7 +6036,7 @@ static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_cl
     else
       key = ntohl(flow->s_address.v4);
   }
-  
+
   return key;
 }
 
@@ -6052,7 +6052,7 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
     u_int16_t dport = ntohs(flow->s_port);
     u_int8_t  s_match = ((sport >= 3478) && (sport <= 3481)) ? 1 : 0;
     u_int8_t  d_match = ((dport >= 3478) && (dport <= 3481)) ? 1 : 0;
-    
+
     if(s_match || d_match) {
       ndpi_int_change_protocol(ndpi_str, flow,
 			       NDPI_PROTOCOL_SKYPE_TEAMS, flow->detected_protocol_stack[1],
@@ -6065,7 +6065,7 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 			      ndpi_get_current_time(flow));
 
     }
-  }  
+  }
 }
 
 /* ********************************************************************************* */
@@ -6077,22 +6077,13 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   /* This function can NOT access &ndpi_str->packet since it is called also from ndpi_detection_giveup() */
 
-#if 0
-  if(flow) {
-    /* Do not go for DNS when there is an application protocol. Example DNS.Apple */
-    if((flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
-       && (flow->detected_protocol_stack[0] /* app */ != flow->detected_protocol_stack[1] /* major */))
-      NDPI_CLR_BIT(flow->risk, NDPI_SUSPICIOUS_DGA_DOMAIN);
-  }
-#endif
-
   // printf("====>> %u.%u [%u]\n", ret->master_protocol, ret->app_protocol, flow->detected_protocol_stack[0]);
 
   switch(ret->app_protocol) {
   case NDPI_PROTOCOL_MICROSOFT_AZURE:
     ndpi_reconcile_msteams_udp(ndpi_str, flow);
     break;
-    
+
     /*
       Skype for a host doing MS Teams means MS Teams
       (MS Teams uses Skype as transport protocol for voice/video)
@@ -6113,7 +6104,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     if(flow && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE))
       ndpi_reconcile_msteams_udp(ndpi_str, flow);
     break;
-      
+
   case NDPI_PROTOCOL_NETFLOW:
   case NDPI_PROTOCOL_SFLOW:
   case NDPI_PROTOCOL_RTP:
@@ -6138,7 +6129,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
        && ndpi_str->msteams_cache
       ) {
       u_int16_t dummy;
-      
+
       if(ndpi_lru_find_cache(ndpi_str->msteams_cache,
 			     make_msteams_key(flow, 1 /* client */),
 			     &dummy, 0 /* Don't remove it as it can be used for other connections */,
@@ -6146,10 +6137,10 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 	ndpi_int_change_protocol(ndpi_str, flow,
 				 NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_TLS,
 				 NDPI_CONFIDENCE_DPI_PARTIAL);
-      }      
+      }
     }
     break;
-    
+
   case NDPI_PROTOCOL_SKYPE_TEAMS:
   case NDPI_PROTOCOL_SKYPE_TEAMS_CALL:
     if(flow->l4_proto == IPPROTO_UDP && ndpi_str->msteams_cache) {
@@ -6165,6 +6156,32 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 				make_msteams_key(flow, 1 /* client */),
 				0 /* dummy */,
 				ndpi_get_current_time(flow));
+      }
+    }
+
+    if(ret->app_protocol == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
+      struct ndpi_packet_struct *packet = &ndpi_str->packet;
+
+      if((packet != NULL) && (packet->udp != NULL)) {
+	u_int16_t sport = ntohs(packet->udp->source);
+	u_int16_t dport = ntohs(packet->udp->dest);
+
+	/*
+	  https://extremeportal.force.com/ExtrArticleDetail?an=000101782
+
+	  Audio:   UDP 50000-50019; 3478; 3479
+	  Video:   UDP 50020-50039; 3480
+	  Sharing: UDP 50040-50059; 3481
+	*/
+
+	if((dport == 3478) || (dport == 3479) || ((sport >= 50000) && (sport <= 50019)))
+	  flow->skype_teams.flow_type = ndpi_multimedia_audio_flow;
+	else if((dport == 3480) || ((sport >= 50020) && (sport <= 50039)))
+	  flow->skype_teams.flow_type = ndpi_multimedia_video_flow;
+	else if((dport == 3481) || ((sport >= 50040) && (sport <= 50059)))
+	  flow->skype_teams.flow_type = ndpi_multimedia_screen_sharing_flow;
+	else
+	  flow->skype_teams.flow_type = ndpi_multimedia_unknown_flow;
       }
     }
     break;
@@ -8057,7 +8074,7 @@ ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_str
       return(ret);
     }
   }
-  
+
   return(ndpi_guess_undetected_protocol(ndpi_str, flow, proto));
 }
 

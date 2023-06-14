@@ -54,10 +54,17 @@ typedef enum {
 } ndpi_log_level_t;
 
 typedef enum {
-	      ndpi_l4_proto_unknown = 0,
-	      ndpi_l4_proto_tcp_only,
-	      ndpi_l4_proto_udp_only,
-	      ndpi_l4_proto_tcp_and_udp,
+  ndpi_multimedia_unknown_flow = 0,
+  ndpi_multimedia_audio_flow,
+  ndpi_multimedia_video_flow,
+  ndpi_multimedia_screen_sharing_flow,
+} ndpi_multimedia_flow_type;
+
+typedef enum {
+  ndpi_l4_proto_unknown = 0,
+  ndpi_l4_proto_tcp_only,
+  ndpi_l4_proto_udp_only,
+  ndpi_l4_proto_tcp_and_udp,
 } ndpi_l4_proto_info;
 
 typedef enum {
@@ -1436,6 +1443,14 @@ struct ndpi_flow_struct {
     char *detected_os; /* Via HTTP/QUIC User-Agent */
     char *nat_ip; /* Via HTTP X-Forwarded-For */
   } http;
+
+  struct {
+    ndpi_multimedia_flow_type flow_type;
+  } skype_teams;
+
+  struct {
+    ndpi_multimedia_flow_type flow_type;
+  } zoom;
 
   /*
      Put outside of the union to avoid issues in case the protocol
