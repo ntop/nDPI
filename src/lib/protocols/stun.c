@@ -32,8 +32,43 @@
 // #define DEBUG_STUN 1
 // #define DEBUG_LRU  1
 // #define DEBUG_ZOOM_LRU  1
+// #define DEBUG_MONITORING 1
 
 #define STUN_HDR_LEN   20 /* STUN message header length, Classic-STUN (RFC 3489) and STUN (RFC 8489) both */
+
+static int stun_monitoring(struct ndpi_detection_module_struct *ndpi_struct,
+                           struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int8_t first_byte;
+
+#ifdef DEBUG_MONITORING
+  printf("[STUN-MON] Packet counter %d\n", flow->packet_counter);
+#endif
+
+  if(packet->payload_packet_len == 0)
+    return 1;
+
+  first_byte = packet->payload[0];
+
+  /* draft-ietf-avtcore-rfc7983bis */
+  if(first_byte >= 128 && first_byte <= 191) { /* TODO: should we tell RTP from RTCP? */
+    NDPI_LOG_INFO(ndpi_struct, "Found RTP over STUN\n");
+    if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
+      /* STUN/SUBPROTO -> SUBPROTO/RTP */
+      ndpi_set_detected_protocol(ndpi_struct, flow,
+                                 NDPI_PROTOCOL_RTP, flow->detected_protocol_stack[0],
+                                 NDPI_CONFIDENCE_DPI);
+    } else {
+      /* STUN -> STUN/RTP */
+      ndpi_set_detected_protocol(ndpi_struct, flow,
+                                 NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_STUN,
+                                 NDPI_CONFIDENCE_DPI);
+    }
+    return 0; /* Stop */
+  }
+  return 1; /* Keep going */
+}
 
 /* ************************************************************ */
 
@@ -150,6 +185,17 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
   }
 
   ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, NDPI_PROTOCOL_STUN, confidence);
+
+  if(ndpi_struct->monitoring_stun_pkts_to_process > 0 &&
+     flow->l4_proto == IPPROTO_UDP /* TODO: support TCP. We need to pay some attention because:
+                                      * multiple msg in the same TCP segment
+                                      * same msg split across multiple segments */) {
+    if((ndpi_struct->monitoring_stun_flags & NDPI_MONITORING_STUN_SUBCLASSIFIED) ||
+       app_proto == NDPI_PROTOCOL_UNKNOWN /* No-subclassification */) {
+      flow->max_extra_packets_to_check = ndpi_struct->monitoring_stun_pkts_to_process;
+      flow->extra_packets_func = stun_monitoring;
+    }
+  }
 }
 
 typedef enum {
@@ -497,6 +543,8 @@ static void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, s
 
   if(flow->packet_counter > 0) {
     /* This might be a RTP stream: let's make sure we check it */
+    /* At this point the flow has not been fully classified as STUN yet */
+    NDPI_LOG_DBG(ndpi_struct, "re-enable RTP\n");
     NDPI_CLR(&flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP);
   }
 }

@@ -12,7 +12,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_detection_module_struct *ndpi_info_mod;
   struct ndpi_flow_struct flow;
   u_int8_t protocol_was_guessed;
-  u_int32_t i, num;
+  u_int32_t i, num, num2;
   u_int16_t random_proto, bool_value;
   int random_value;
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
@@ -35,6 +35,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 				     6 + /* files */
 				     ((NDPI_LRUCACHE_MAX + 1) * 5) + /* LRU caches */
 				     2 + 1 + 4 + /* ndpi_set_detection_preferences() */
+				     1 + 3 + 1 + /* Monitoring */
 				     7 + /* Opportunistic tls */
 				     2 + /* Pid */
 				     2 + /* Category */
@@ -97,6 +98,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool())
     ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_max_packets_to_process,
                                    fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)));
+
+  if(fuzzed_data.ConsumeBool()) {
+    ndpi_set_monitoring_state(ndpi_info_mod, NDPI_PROTOCOL_STUN,
+                              fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)),
+                              fuzzed_data.ConsumeIntegralInRange(0, 7));
+    ndpi_get_monitoring_state(ndpi_info_mod, NDPI_PROTOCOL_STUN, &num, &num2);
+  }
 
   ndpi_set_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_SMTP, fuzzed_data.ConsumeBool());
   ndpi_get_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_SMTP);
