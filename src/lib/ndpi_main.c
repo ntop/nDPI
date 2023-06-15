@@ -6160,11 +6160,9 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     }
 
     if(ret->app_protocol == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
-      struct ndpi_packet_struct *packet = &ndpi_str->packet;
-
-      if((packet != NULL) && (packet->udp != NULL)) {
-	u_int16_t sport = ntohs(packet->udp->source);
-	u_int16_t dport = ntohs(packet->udp->dest);
+      if(flow->l4_proto == IPPROTO_UDP) {
+	u_int16_t sport = ntohs(flow->c_port);
+	u_int16_t dport = ntohs(flow->s_port);
 
 	/*
 	  https://extremeportal.force.com/ExtrArticleDetail?an=000101782
