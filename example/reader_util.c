@@ -1372,10 +1372,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     }
   }
 
-  if(is_ndpi_proto(flow, NDPI_PROTOCOL_ZOOM))
-    flow->multimedia_flow_type = flow->ndpi_flow->zoom.flow_type;
-  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SKYPE_TEAMS_CALL))
-    flow->multimedia_flow_type = flow->ndpi_flow->skype_teams.flow_type;
+  flow->multimedia_flow_type = flow->ndpi_flow->flow_type;
   
   /* HTTP metadata are "global" not in `flow->ndpi_flow->protos` union; for example, we can have
      HTTP/BitTorrent and in that case we want to export also HTTP attributes */

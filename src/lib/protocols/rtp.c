@@ -131,19 +131,19 @@ static u_int8_t isZoom(struct ndpi_flow_struct *flow,
       case 30: /* Screen Share */
 	*is_rtp = 0;
 	*payload_offset = 27;
-	flow->zoom.flow_type = ndpi_multimedia_screen_sharing_flow;
+	flow->flow_type = ndpi_multimedia_screen_sharing_flow;
 	break;
 	
       case 15: /* Audio */
 	*is_rtp = 1;
 	*payload_offset = 27;
-	flow->zoom.flow_type = ndpi_multimedia_audio_flow;
+	flow->flow_type = ndpi_multimedia_audio_flow;
 	break;
 	
       case 16: /* Video */
 	*is_rtp = 1;
 	*payload_offset = 32;
-	flow->zoom.flow_type = ndpi_multimedia_video_flow;
+	flow->flow_type = ndpi_multimedia_video_flow;
 	break;
 
       case 33: /* RTCP */

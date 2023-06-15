@@ -6070,6 +6070,51 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 
 /* ********************************************************************************* */
 
+static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_detection_module_struct *ndpi_str,
+						struct ndpi_flow_struct *flow,
+						u_int16_t sport, u_int16_t dport) {
+  
+  /*
+    https://extremeportal.force.com/ExtrArticleDetail?an=000101782
+    
+    Audio:   UDP 50000-50019; 3478; 3479
+    Video:   UDP 50020-50039; 3480
+	Sharing: UDP 50040-50059; 3481
+  */
+  
+  if((dport == 3478) || (dport == 3479) || ((sport >= 50000) && (sport <= 50019)))
+    flow->flow_type = ndpi_multimedia_audio_flow;
+  else if((dport == 3480) || ((sport >= 50020) && (sport <= 50039)))
+    flow->flow_type = ndpi_multimedia_video_flow;
+  else if((dport == 3481) || ((sport >= 50040) && (sport <= 50059)))
+    flow->flow_type = ndpi_multimedia_screen_sharing_flow;
+  else {
+    flow->flow_type = ndpi_multimedia_unknown_flow;
+    return(0);
+  }
+  
+  return(1);
+}
+
+/* ********************************************************************************* */
+
+static void ndpi_reconcile_msteams_call_udp(struct ndpi_detection_module_struct *ndpi_str,
+					    struct ndpi_flow_struct *flow) {
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
+    struct ndpi_packet_struct *packet = &ndpi_str->packet;
+
+    if((packet != NULL) && (packet->udp != NULL)) {
+      u_int16_t sport = ntohs(packet->udp->source);
+      u_int16_t dport = ntohs(packet->udp->dest);
+
+      if(ndpi_reconcile_msteams_call_udp_port(ndpi_str, flow, sport, dport) == 0)
+	ndpi_reconcile_msteams_call_udp_port(ndpi_str, flow, dport, sport);
+    }
+  }
+}
+
+/* ********************************************************************************* */
+
 static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
 				     struct ndpi_flow_struct *flow,
 				     ndpi_protocol *ret) {
@@ -6159,29 +6204,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       }
     }
 
-    if(ret->app_protocol == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
-      if(flow->l4_proto == IPPROTO_UDP) {
-	u_int16_t sport = ntohs(flow->c_port);
-	u_int16_t dport = ntohs(flow->s_port);
-
-	/*
-	  https://extremeportal.force.com/ExtrArticleDetail?an=000101782
-
-	  Audio:   UDP 50000-50019; 3478; 3479
-	  Video:   UDP 50020-50039; 3480
-	  Sharing: UDP 50040-50059; 3481
-	*/
-
-	if((dport == 3478) || (dport == 3479) || ((sport >= 50000) && (sport <= 50019)))
-	  flow->skype_teams.flow_type = ndpi_multimedia_audio_flow;
-	else if((dport == 3480) || ((sport >= 50020) && (sport <= 50039)))
-	  flow->skype_teams.flow_type = ndpi_multimedia_video_flow;
-	else if((dport == 3481) || ((sport >= 50040) && (sport <= 50059)))
-	  flow->skype_teams.flow_type = ndpi_multimedia_screen_sharing_flow;
-	else
-	  flow->skype_teams.flow_type = ndpi_multimedia_unknown_flow;
-      }
-    }
+    ndpi_reconcile_msteams_call_udp(ndpi_str, flow);
     break;
 
   case NDPI_PROTOCOL_RDP:

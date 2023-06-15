@@ -1444,13 +1444,7 @@ struct ndpi_flow_struct {
     char *nat_ip; /* Via HTTP X-Forwarded-For */
   } http;
 
-  struct {
-    ndpi_multimedia_flow_type flow_type;
-  } skype_teams;
-
-  struct {
-    ndpi_multimedia_flow_type flow_type;
-  } zoom;
+  ndpi_multimedia_flow_type flow_type;
 
   /*
      Put outside of the union to avoid issues in case the protocol
