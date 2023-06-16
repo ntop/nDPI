@@ -7,7 +7,7 @@ nDPI provides a set of threat detection features available through NDPI_RISK det
 
 As part of these features, we provide DGA detection.
 
-Domain generation algorithms (DGA) are algorithms seen in various families of malware that are used
+[Domain generation algorithms (DGA)](https://en.wikipedia.org/wiki/Domain_generation_algorithm) are algorithms seen in various families of malware that are used
  to periodically generate a large number of domain names that can be used as rendezvous points with 
  their command and control servers.
  
