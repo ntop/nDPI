@@ -6101,11 +6101,9 @@ static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_detection_module_str
 static void ndpi_reconcile_msteams_call_udp(struct ndpi_detection_module_struct *ndpi_str,
 					    struct ndpi_flow_struct *flow) {
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
-    struct ndpi_packet_struct *packet = &ndpi_str->packet;
-
-    if((packet != NULL) && (packet->udp != NULL)) {
-      u_int16_t sport = ntohs(packet->udp->source);
-      u_int16_t dport = ntohs(packet->udp->dest);
+    if(flow->l4_proto == IPPROTO_UDP) {
+      u_int16_t sport = ntohs(flow->c_port);
+      u_int16_t dport = ntohs(flow->s_port);
 
       if(ndpi_reconcile_msteams_call_udp_port(ndpi_str, flow, sport, dport) == 0)
 	ndpi_reconcile_msteams_call_udp_port(ndpi_str, flow, dport, sport);
