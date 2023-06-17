@@ -221,9 +221,7 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     return(NDPI_IS_NOT_STUN);
   }
 
-  if(payload_length >= 512) {
-    return(NDPI_IS_NOT_STUN);
-  } else if(payload_length < STUN_HDR_LEN) {
+  if(payload_length < STUN_HDR_LEN) {
     /* This looks like an invalid packet */
 
     if(flow->stun.num_pkts > 0) {
@@ -245,7 +243,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
     return(NDPI_IS_NOT_STUN);  
   
   /* https://www.iana.org/assignments/stun-parameters/stun-parameters.xhtml */
-  if(((msg_type & 0x3EEF) > 0x000B) && (msg_type != 0x0800)) {
+  if(((msg_type & 0x3EEF) > 0x000B) &&
+     (msg_type != 0x0800 && msg_type != 0x0801 && msg_type != 0x0802)) {
 #ifdef DEBUG_STUN
     printf("[STUN] msg_type = %04X\n", msg_type);
 #endif
@@ -328,18 +327,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   flow->stun.num_pkts++;
 
-  if((payload[0] == 0x80 && payload_length < 512 && ((msg_len+20) <= payload_length))) {
-    *app_proto = NDPI_PROTOCOL_WHATSAPP_CALL;
-    return(NDPI_IS_STUN); /* This is WhatsApp Call */
-  } else if((payload[0] == 0x90) && (((msg_len+11) == payload_length) ||
-				     (flow->stun.num_binding_requests >= 4))) {
-    *app_proto = NDPI_PROTOCOL_WHATSAPP_CALL;
-    return(NDPI_IS_STUN); /* This is WhatsApp Call */
-  }
-
-  if(payload[0] != 0x80 && (msg_len + 20) > payload_length)
-    return(NDPI_IS_NOT_STUN);
-
   flow->guessed_protocol_id = NDPI_PROTOCOL_STUN;
 
   if(payload_length == (msg_len+20)) {
@@ -376,6 +363,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
         case 0x4000:
         case 0x4001:
         case 0x4002:
+        case 0x4003:
+        case 0x4004:
+        case 0x4007:
           /* These are the only messages apparently whatsapp voice can use */
           *app_proto = NDPI_PROTOCOL_WHATSAPP_CALL;
           return(NDPI_IS_STUN);
@@ -482,7 +472,9 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
       }
 
       goto stun_found;
-    } else if(msg_type == 0x0800) {
+    } else if(msg_type == 0x0800 ||
+              msg_type == 0x0801 ||
+              msg_type == 0x0802) {
       *app_proto = NDPI_PROTOCOL_WHATSAPP_CALL;
       return(NDPI_IS_STUN);
     }
@@ -497,11 +489,12 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 stun_found:
   flow->stun.num_processed_pkts++;
 
-#ifdef DEBUG_STUN
-  printf("==>> NDPI_PROTOCOL_WHATSAPP_CALL\n");
-#endif
-  
   rc = (flow->stun.num_pkts < MAX_NUM_STUN_PKTS) ? NDPI_IS_NOT_STUN : NDPI_IS_STUN;
+
+#ifdef DEBUG_STUN
+  printf("stun.num_pkts %d, stun.num_processed_pkts %d, rc: %d\n",
+         flow->stun.num_pkts, flow->stun.num_processed_pkts, rc);
+#endif
 
   return rc;
 }
