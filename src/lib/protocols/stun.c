@@ -208,7 +208,7 @@ typedef enum {
 static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow,
 					   const u_int8_t * payload,
-					   const u_int16_t payload_length,
+					   u_int16_t payload_length,
 					   u_int16_t *app_proto) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t msg_type, msg_len;
@@ -238,6 +238,18 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 
   msg_type = ntohs(*((u_int16_t*)payload));
   msg_len  = ntohs(*((u_int16_t*)&payload[2]));
+
+  /* With tcp, we might have multiple msg in the same TCP pkt.
+     Parse only the first one. TODO */
+  if(packet->tcp) {
+    if(msg_len + 20 > payload_length)
+      return(NDPI_IS_NOT_STUN);
+    /* Let's hope that classic-stun is no more used over TCP */
+    if(ntohl(*((u_int32_t *)&payload[4])) != 0x2112A442)
+      return(NDPI_IS_NOT_STUN);
+
+    payload_length = msg_len + 20;
+  }
 
   if((msg_type == 0) || ((msg_len+20) != payload_length))
     return(NDPI_IS_NOT_STUN);  
@@ -508,26 +520,24 @@ static void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, s
 
   app_proto = NDPI_PROTOCOL_UNKNOWN;
 
-  if(packet->tcp) {
-    /* STUN may be encapsulated in TCP packets */
-    if((packet->payload_packet_len >= 22)
-       && ((ntohs(get_u_int16_t(packet->payload, 0)) + 2) == packet->payload_packet_len)) {
-      /* TODO there could be several STUN packets in a single TCP packet so maybe the detection could be
-       * improved by checking only the STUN packet of given length */
+  /* STUN may be encapsulated in TCP packets with a special TCP framing described in RFC 4571 */
+  if(packet->tcp &&
+     packet->payload_packet_len >= 22 &&
+     ((ntohs(get_u_int16_t(packet->payload, 0)) + 2) == packet->payload_packet_len)) {
+    /* TODO there could be several STUN packets in a single TCP packet so maybe the detection could be
+     * improved by checking only the STUN packet of given length */
 
-      if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2,
-			     packet->payload_packet_len - 2, &app_proto) == NDPI_IS_STUN) {
-        ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
-        return;
-      }
+    if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2,
+			   packet->payload_packet_len - 2, &app_proto) == NDPI_IS_STUN) {
+      ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
+      return;
     }
-  }
-
-  /* UDP */
-  if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
-			 packet->payload_packet_len, &app_proto) == NDPI_IS_STUN) {
-    ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
-    return;
+  } else { /* UDP or TCP without framing */
+    if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
+			   packet->payload_packet_len, &app_proto) == NDPI_IS_STUN) {
+      ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
+      return;
+    }
   }
 
   if(flow->stun.num_pkts >= MAX_NUM_STUN_PKTS ||
