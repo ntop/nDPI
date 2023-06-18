@@ -1,13 +1,13 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	4	(4.00 pkts/flow)
+DPI Packets (TCP):	7	(3.50 pkts/flow)
 DPI Packets (UDP):	17	(5.67 pkts/flow)
-Confidence DPI              : 4 (flows)
-Num dissector calls: 582 (145.50 diss/flow)
+Confidence DPI              : 5 (flows)
+Num dissector calls: 588 (117.60 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
-LRU cache stun:       4/34/0 (insert/search/found)
+LRU cache stun:       6/38/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
@@ -17,10 +17,11 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     1/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   6/0 (search/found)
+Patricia risk mask:   8/0 (search/found)
 Patricia risk:        2/0 (search/found)
-Patricia protocols:   4/2 (search/found)
+Patricia protocols:   6/2 (search/found)
 
+Skype_TeamsCall	15	2124	1
 STUN	62	7620	2
 GoogleHangoutDuo	33	6292	1
 FacebookVoip	75	10554	1
@@ -29,3 +30,4 @@ FacebookVoip	75	10554	1
 	2	UDP 192.168.12.169:49153 <-> 142.250.82.99:3478 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 4][cat: VoIP/10][18 pkts/2856 bytes <-> 15 pkts/3436 bytes][Goodput ratio: 74/82][2.12 sec][bytes ratio: -0.092 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 8/0 88/153 699/625 177/222][Pkt Len c2s/s2c min/avg/max/stddev: 107/76 159/229 588/1240 107/297][PLAIN TEXT (BwlkYDtFJ)][Plen Bins: 0,6,57,21,6,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0]
 	3	UDP [3516:bf0b:fc53:75e7:70af:f67f:8e49:f603]:56880 <-> [2a38:e156:8167:a333:face:b00c::24d9]:3478 [proto: 78/STUN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 11][cat: Network/14][21 pkts/1722 bytes <-> 21 pkts/2226 bytes][Goodput ratio: 24/41][191.49 sec][bytes ratio: -0.128 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 2/2 9451/9451 10358/10358 2441/2441][Pkt Len c2s/s2c min/avg/max/stddev: 82/106 82/106 82/106 0/0][PLAIN TEXT (WOBTrOXR)][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	TCP 87.47.100.17:3478 <-> 54.1.57.155:37257 [proto: 78/STUN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][9 pkts/1494 bytes <-> 11 pkts/2178 bytes][Goodput ratio: 60/67][0.95 sec][Hostname/SNI: apps-host.com][bytes ratio: -0.186 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 104/96 267/252 102/93][Pkt Len c2s/s2c min/avg/max/stddev: 74/94 166/198 234/354 41/65][PLAIN TEXT (Unauthorized)][Plen Bins: 10,0,15,21,42,5,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	TCP 10.77.110.51:41588 <-> 10.206.50.239:42000 [VLAN: 1611][proto: 78.38/STUN.Skype_TeamsCall][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 3][cat: VoIP/10][7 pkts/1006 bytes <-> 8 pkts/1118 bytes][Goodput ratio: 58/57][1.05 sec][bytes ratio: -0.053 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 189/134 369/399 144/153][Pkt Len c2s/s2c min/avg/max/stddev: 70/64 144/140 164/172 31/43][Plen Bins: 0,0,25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
