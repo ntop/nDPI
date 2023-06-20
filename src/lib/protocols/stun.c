@@ -332,8 +332,8 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
         case 0x4002:
           /* These are the only messages apparently whatsapp voice can use */
           *app_proto = NDPI_PROTOCOL_WHATSAPP_CALL;
-          //return(NDPI_IS_STUN); //necessary because the allocate success response packets (from the PCAP file) don't come through TODO: figure out why
-          break;
+          return(NDPI_IS_STUN); //necessary because the allocate success response packets (from the PCAP file) don't come through TODO: figure out why
+          //break;
         case 0x0014: /* Realm */
 	  {
 	    u_int16_t realm_len = ntohs(*((u_int16_t*)&payload[offset+2]));
