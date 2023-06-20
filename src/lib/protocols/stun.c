@@ -35,8 +35,6 @@
 
 #define STUN_HDR_LEN   20 /* STUN message header length, Classic-STUN (RFC 3489) and STUN (RFC 8489) both */
 
-void print_xor_mapped_address(const uint8_t* payload,u_int16_t payload_packet_len);
-
 /* ************************************************************ */
 
 u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
@@ -426,7 +424,30 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
         case 0xFF03:
           *app_proto = NDPI_PROTOCOL_HANGOUT_DUO;
           return(NDPI_IS_STUN);
-
+        case 0x0020: //XOR_MAPPED_ADDRESS (https://datatracker.ietf.org/doc/html/rfc5389#section-15.2)
+        {
+          //xored address
+          u_int32_t xored_address = ntohl(*(u_int32_t *)&payload[offset + 8]);
+          // xored port
+          u_int16_t xored_port = ntohs(*(u_int16_t *)&payload[offset + 6]);
+          // decode the magic cookie field is used to perform the xoring
+          u_int32_t magic_cookie = ntohl(*(u_int32_t *)&payload[4]);
+          // the first 16 most significant bits are used to xor the port
+          u_int16_t magic_cookie_16 = (magic_cookie & 0xffff0000) >> 16;
+          printf("decoded port [ %hu ]\n", (magic_cookie_16 ^ xored_port));
+          //get ip address type
+          u_int8_t ip_type = payload[offset + 5];
+          if (ip_type == 0x01) //IPV4
+          {
+            // the entire cookie is used to xor the IPV 4 address
+            u_int32_t decoded_ip = magic_cookie ^ xored_address;
+            // print human readable IPV4
+            char ipv4[16];
+            snprintf(ipv4, sizeof(ipv4), "%u.%u.%u.%u", (decoded_ip & 0xff000000) >> 24, (decoded_ip & 0x00ff0000) >> 16, (decoded_ip & 0x0000ff00) >> 8, (decoded_ip & 0x000000ff));
+            printf("decoded IPv4 [ %s ]\n", ipv4);
+            break;
+          }
+        }
         default:
 #ifdef DEBUG_STUN
           printf("==> %04X\n", attribute);
@@ -481,7 +502,6 @@ static void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, s
       if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload + 2,
 			     packet->payload_packet_len - 2, &app_proto) == NDPI_IS_STUN) {
         ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
-        print_xor_mapped_address(packet->payload+2,packet->payload_packet_len-2);
         return;
       }
     }
@@ -491,7 +511,6 @@ static void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, s
   if(ndpi_int_check_stun(ndpi_struct, flow, packet->payload,
 			 packet->payload_packet_len, &app_proto) == NDPI_IS_STUN) {
     ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
-    print_xor_mapped_address(packet->payload,packet->payload_packet_len);
     return;
   }
 
@@ -504,51 +523,6 @@ static void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, s
     NDPI_CLR(&flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP);
   }
 }
-void print_xor_mapped_address(const uint8_t* payload,u_int16_t payload_packet_len){
-    u_int16_t msg_type = ntohs(*((u_int16_t*)payload));
-    u_int16_t msg_len = ntohs(*((u_int16_t*)&payload[2]));
-    //printf("message type %x\n",msg_type);
-    //0x0103 Allocate success response 
-    if (payload_packet_len == (msg_len + 20) && msg_type == 0x0103)
-    {
-      uint16_t offset = 20;
-      while((offset+4) < payload_packet_len){
-        u_int16_t attribute = ntohs(*((u_int16_t*)&payload[offset]));
-        u_int16_t len = ntohs(*((u_int16_t*)&payload[offset+2]));
-        u_int16_t x = (len + 4) % 4;
-
-        if(x)
-          len += 4-x;
-
-        //printf("attribute : %x\n",attribute);
-        if(attribute == 0x0020){//XOR-MAPPED ADDRESS: https://datatracker.ietf.org/doc/html/rfc5389#section-15.2
-          // xored ip address
-          u_int32_t xored_address = ntohl(*(u_int32_t *)&payload[offset + 8]);
-          // xpred port
-          u_int16_t xored_port = ntohs(*(u_int16_t *)&payload[offset + 6]);
-          // decode the magic cookie field is used to perform the xoring
-          u_int32_t magic_cookie = ntohl(*(u_int32_t *)&payload[4]);
-          // the first 16 most significant bits are used to xor the port
-          u_int16_t magic_cookie_16 = (magic_cookie & 0xffff0000) >> 16;
-          printf("decoded port [ %hu ]\n", (magic_cookie_16 ^ xored_port));
-          //get ip address type
-          u_int8_t ip_type = payload[offset + 5];
-          if (ip_type == 0x01) //IPV4
-          {
-            // the entire cookie is used to xor the IPV 4 address
-            u_int32_t decoded_ip = magic_cookie ^ xored_address;
-            // print human readable IPV4
-            char ipv4[16];
-            snprintf(ipv4, sizeof(ipv4), "%u.%u.%u.%u", (decoded_ip & 0xff000000) >> 24, (decoded_ip & 0x00ff0000) >> 16, (decoded_ip & 0x0000ff00) >> 8, (decoded_ip & 0x000000ff));
-            printf("decoded IPv4 [ %s ]\n", ipv4);
-            break;
-          }
-        }
-        offset += len + 4;
-      }
-      return;
-    }
-  }
 
 
 void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id) {
