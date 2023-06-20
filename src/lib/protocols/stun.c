@@ -434,17 +434,16 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
           u_int32_t magic_cookie = ntohl(*(u_int32_t *)&payload[4]);
           // the first 16 most significant bits are used to xor the port
           u_int16_t magic_cookie_16 = (magic_cookie & 0xffff0000) >> 16;
-          printf("decoded port [ %hu ]\n", (magic_cookie_16 ^ xored_port));
+          u_int16_t port = magic_cookie_16 ^ xored_port;
+          flow->decoded_xored_port = port;
+          //printf("decoded port [ %hu ]\n", (magic_cookie_16 ^ xored_port));
           //get ip address type
           u_int8_t ip_type = payload[offset + 5];
           if (ip_type == 0x01) //IPV4
           {
             // the entire cookie is used to xor the IPV 4 address
             u_int32_t decoded_ip = magic_cookie ^ xored_address;
-            // print human readable IPV4
-            char ipv4[16];
-            snprintf(ipv4, sizeof(ipv4), "%u.%u.%u.%u", (decoded_ip & 0xff000000) >> 24, (decoded_ip & 0x00ff0000) >> 16, (decoded_ip & 0x0000ff00) >> 8, (decoded_ip & 0x000000ff));
-            printf("decoded IPv4 [ %s ]\n", ipv4);
+            flow->decoded_xored_ipv4 = decoded_ip;
             break;
           }
         }

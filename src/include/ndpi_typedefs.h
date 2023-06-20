@@ -1662,6 +1662,10 @@ struct ndpi_flow_struct {
      party dissectors for storing private data
    */
   u_int8_t priv_data[16];
+
+  //stun XOR_MAPPED_ADDRESS
+  u_int16_t decoded_xored_port;
+  u_int32_t decoded_xored_ipv4;
 };
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
