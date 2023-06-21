@@ -329,7 +329,9 @@ u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct 
 					    u_int16_t user_proto_id) {
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
+#if 0 /* Too much verbose... */
   NDPI_LOG_DBG2(ndpi_str, "[DEBUG] ***** %s(%u)\n", __FUNCTION__, user_proto_id);
+#endif
 #endif
 
   if(user_proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS)
@@ -356,7 +358,9 @@ u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct 
 u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct *ndpi_str,
 						   u_int16_t ndpi_proto_id) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
+#if 0 /* Too much verbose... */
   NDPI_LOG_DBG2(ndpi_str, "[DEBUG] ***** %s(%u)\n", __FUNCTION__, ndpi_proto_id);
+#endif
 #endif
 
   if(ndpi_proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS)
@@ -2995,6 +2999,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->opportunistic_tls_imap_enabled = 1;
   ndpi_str->opportunistic_tls_pop_enabled = 1;
   ndpi_str->opportunistic_tls_ftp_enabled = 1;
+
+  ndpi_str->monitoring_stun_pkts_to_process = 4;
+  ndpi_str->monitoring_stun_flags = 0;
 
   ndpi_str->aggressiveness_ookla = NDPI_AGGRESSIVENESS_OOKLA_TLS;
 
@@ -9770,6 +9777,42 @@ int ndpi_seen_flow_beginning(const struct ndpi_flow_struct *flow)
       flow->l4.tcp.seen_ack == 0))
     return 0;
   return 1;
+}
+
+/* ******************************************************************** */
+
+int ndpi_set_monitoring_state(struct ndpi_detection_module_struct *ndpi_struct,
+			      u_int16_t proto, u_int32_t num_pkts, u_int32_t flags)
+{
+  if(!ndpi_struct || num_pkts > 0xFFFF)
+    return -1;
+
+  switch(proto) {
+  case NDPI_PROTOCOL_STUN:
+    ndpi_struct->monitoring_stun_pkts_to_process = num_pkts;
+    ndpi_struct->monitoring_stun_flags = flags;
+    return 0;
+  default:
+    return -1;
+  }
+}
+
+/* ******************************************************************** */
+
+int ndpi_get_monitoring_state(struct ndpi_detection_module_struct *ndpi_struct,
+			      u_int16_t proto, u_int32_t *num_pkts, u_int32_t *flags)
+{
+  if(!ndpi_struct || !num_pkts || !flags)
+    return -1;
+
+  switch(proto) {
+  case NDPI_PROTOCOL_STUN:
+    *num_pkts = ndpi_struct->monitoring_stun_pkts_to_process;
+    *flags = ndpi_struct->monitoring_stun_flags;
+    return 0;
+  default:
+    return -1;
+  }
 }
 
 /* ******************************************************************** */

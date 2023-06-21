@@ -726,6 +726,12 @@ struct ndpi_lru_cache {
 /* Ookla */
 #define NDPI_AGGRESSIVENESS_OOKLA_TLS			0x01 /* Enable detection over TLS (using ookla cache) */
 
+
+/* Monitoring flags */
+
+/* Stun */
+#define NDPI_MONITORING_STUN_SUBCLASSIFIED		0x01 /* Monitor STUN flows even if we have a valid sub-protocol */
+
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
@@ -1300,6 +1306,9 @@ struct ndpi_detection_module_struct {
   int opportunistic_tls_imap_enabled;
   int opportunistic_tls_pop_enabled;
   int opportunistic_tls_ftp_enabled;
+
+  u_int32_t monitoring_stun_pkts_to_process;
+  u_int32_t monitoring_stun_flags;
 
   u_int32_t aggressiveness_ookla;
 

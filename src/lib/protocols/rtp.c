@@ -179,7 +179,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   if((payload_len < 2)
      || (d_port == 5355 /* LLMNR_PORT */)
      || (d_port == 5353 /* MDNS_PORT */)
-     || flow->stun.num_binding_requests
      ) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
@@ -237,12 +236,21 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
       /* It seems that it is a LINE stuff; let its dissector to evaluate */
       return;
     } else {
-      NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
-
       isValidMSRTPType(payload_type, &flow->protos.rtp.stream_type);
-      ndpi_set_detected_protocol(ndpi_struct, flow, 
-				 NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP,
-				 NDPI_CONFIDENCE_DPI);
+
+      /* Previous pkts were STUN */
+      if(flow->stun.num_binding_requests > 0 ||
+         flow->stun.num_processed_pkts > 0) {
+        NDPI_LOG_INFO(ndpi_struct, "Found RTP (previous traffic was STUN)\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow,
+				   NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_STUN,
+				   NDPI_CONFIDENCE_DPI);
+      } else {
+        NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow,
+				   NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP,
+				   NDPI_CONFIDENCE_DPI);
+      }
       return;
     }
   }
