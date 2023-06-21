@@ -271,6 +271,11 @@ static void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struc
 	return;
       }
     }
+    if (packet->payload_packet_len >= 4 && memcmp(packet->payload, "GND\x10", 4) == 0) {
+      NDPI_LOG_DBG2(ndpi_struct, "detected gnutella udp, GND (2)\n");
+      ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
+      return;
+    }
 
     if ((packet->payload_packet_len == 32)
 	&& memcmp(&packet->payload[16], "\x31\x01\x00\x09\x00\x00\x00", 7) == 0) {
