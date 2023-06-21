@@ -30,6 +30,8 @@
 extern char *strptime(const char *s, const char *format, struct tm *tm);
 extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow, uint32_t quic_version);
+static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
+				    struct ndpi_flow_struct *flow);
 extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
                                    struct ndpi_flow_struct *flow,
                                    const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
@@ -1188,6 +1190,36 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
+int is_dtls(const u_int8_t *buf, u_int32_t buf_len, u_int32_t *block_len) {
+  if(buf_len <= 13)
+    return 0;
+
+  if((buf[0] != 0x16 && buf[0] != 0x14 && buf[0] != 0x17) || /* Handshake, change-cipher-spec, Application-Data */
+     !((buf[1] == 0xfe && buf[2] == 0xff) || /* Versions */
+       (buf[1] == 0xfe && buf[2] == 0xfd) ||
+       (buf[1] == 0x01 && buf[2] == 0x00))) {
+#ifdef DEBUG_TLS
+    printf("[TLS] DTLS invalid block 0x%x or old version 0x%x-0x%x-0x%x\n",
+           buf[0], buf[1], buf[2], buf[3]);
+#endif
+    return 0;
+  }
+  *block_len = ntohs(*((u_int16_t*)&buf[11]));
+#ifdef DEBUG_TLS
+  printf("[TLS] DTLS block len: %d\n", *block_len);
+#endif
+  if(*block_len == 0 || (*block_len + 12 >= buf_len)) { /* We might have multiple DTLS records */
+#ifdef DEBUG_TLS
+    printf("[TLS] DTLS invalid block len %d (buf_len %d)\n",
+           *block_len, buf_len);
+#endif
+    return 0;
+  }
+  return 1;
+}
+
+/* **************************************** */
+
 static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
@@ -1210,29 +1242,23 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
     u_int32_t block_len;
     const u_int8_t *block = (const u_int8_t *)&p[processed];
 
-    if((block[0] != 0x16 && block[0] != 0x14 && block[0] != 0x17) || /* Handshake, change-cipher-spec, Application-Data */
-       !((block[1] == 0xfe && block[2] == 0xff) ||
-         (block[1] == 0xfe && block[2] == 0xfd) ||
-         (block[1] == 0x01 && block[2] == 0x00))) {
+    if(!is_dtls(block, p_len, &block_len)) {
+      if(processed == 0 && /* First block */
+         flow->stun.maybe_dtls == 1) {
+	/* Sometimes STUN packets are interleaved with TLS ones. Ignore STUN ones
+	   since we already are after STUN dissection and we are interested only on
+	   TLS stuff right now */
 #ifdef DEBUG_TLS
-      printf("[TLS] DTLS invalid block 0x%x or old version 0x%x-0x%x-0x%x\n",
-             block[0], block[1], block[2], block[3]);
+        printf("Probably a stun packet. Keep going with TLS on next packets\n");
 #endif
+        /* Note that we can immediately "return" because, being the first block,
+	   we don't need to restore packet->payload and packet->payload_packet_len */
+        return(1); /* Keep working */
+      }
       no_dtls = 1;
       break;
     }
-    block_len = ntohs(*((u_int16_t*)&block[11]));
-#ifdef DEBUG_TLS
-    printf("[TLS] DTLS block len: %d\n", block_len);
-#endif
-    if(block_len == 0 || (processed + block_len + 12 >= p_len)) {
-#ifdef DEBUG_TLS
-      printf("[TLS] DTLS invalid block len %d (processed %d, p_len %d)\n",
-             block_len, processed, p_len);
-#endif
-      no_dtls = 1;
-      break;
-    }
+
     /* We process only handshake msgs */
     if(block[0] == 0x16) {
       if(processed + block_len + 13 > p_len) {
@@ -1358,8 +1384,9 @@ static void tlsInitExtraPacketProcessing(struct ndpi_detection_module_struct *nd
 					 struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  /* At most 12 packets should almost always be enough to find the server certificate if it's there */
-  flow->max_extra_packets_to_check = 12 + (ndpi_struct->num_tls_blocks_to_follow*4);
+  /* At most 12 packets should almost always be enough to find the server certificate if it's there.
+     Exception: DTLS traffic with fragments, retransmissions and STUN packets */
+  flow->max_extra_packets_to_check = ((packet->udp != NULL) ? 20 : 12) + (ndpi_struct->num_tls_blocks_to_follow*4);
   flow->extra_packets_func = (packet->udp != NULL) ? ndpi_search_tls_udp : ndpi_search_tls_tcp;
 }
 
@@ -1384,6 +1411,24 @@ void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_st
 }
 
 /* **************************************** */
+
+void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
+		   struct ndpi_flow_struct *flow)
+{
+#ifdef DEBUG_TLS
+  printf("Switching to TLS\n");
+#endif
+
+  /* Reset reassemblers */
+  if(flow->tls_quic.message[0].buffer)
+    ndpi_free(flow->tls_quic.message[0].buffer);
+  memset(&flow->tls_quic.message[0], '\0', sizeof(flow->tls_quic.message[0]));
+  if(flow->tls_quic.message[1].buffer)
+    ndpi_free(flow->tls_quic.message[1].buffer);
+  memset(&flow->tls_quic.message[1], '\0', sizeof(flow->tls_quic.message[1]));
+
+  ndpi_search_tls_wrapper(ndpi_struct, flow);
+}
 
 static void tls_subclassify_by_alpn(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow) {

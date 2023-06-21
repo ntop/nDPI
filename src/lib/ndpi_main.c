@@ -3004,6 +3004,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->opportunistic_tls_imap_enabled = 1;
   ndpi_str->opportunistic_tls_pop_enabled = 1;
   ndpi_str->opportunistic_tls_ftp_enabled = 1;
+  ndpi_str->opportunistic_tls_stun_enabled = 1;
 
   ndpi_str->monitoring_stun_pkts_to_process = 4;
   ndpi_str->monitoring_stun_flags = 0;
@@ -9846,6 +9847,9 @@ int ndpi_set_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_FTP_CONTROL:
     ndpi_struct->opportunistic_tls_ftp_enabled = value;
     return 0;
+  case NDPI_PROTOCOL_STUN:
+    ndpi_struct->opportunistic_tls_stun_enabled = value;
+    return 0;
   default:
     return -1;
   }
@@ -9868,6 +9872,8 @@ int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
     return ndpi_struct->opportunistic_tls_pop_enabled;
   case NDPI_PROTOCOL_FTP_CONTROL:
     return ndpi_struct->opportunistic_tls_ftp_enabled;
+  case NDPI_PROTOCOL_STUN:
+    return ndpi_struct->opportunistic_tls_stun_enabled;
   default:
     return -1;
   }

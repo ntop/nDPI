@@ -1560,6 +1560,10 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "O=Riot Games, Inc.",              NDPI_PROTOCOL_RIOTGAMES   },
   { "O=Riot Games Inc",                NDPI_PROTOCOL_RIOTGAMES   },
 
+  { "CN=hangouts",                     NDPI_PROTOCOL_HANGOUT_DUO },
+  { "CN=Snapchat Inc.",                NDPI_PROTOCOL_SNAPCHAT_CALL },
+  { "CN=NVIDIA GameStream",            NDPI_PROTOCOL_GEFORCENOW },
+
   { NULL, 0 }
 };
 
