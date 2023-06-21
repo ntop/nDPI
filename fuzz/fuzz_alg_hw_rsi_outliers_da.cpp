@@ -16,10 +16,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int8_t additive_seeasonal;
   double alpha, beta, gamma, forecast, confidence_band;
   float significance;
-  u_int32_t *values;
+  u_int32_t *values, predict_periods;
+  u_int32_t prediction;
   bool *outliers;
 
-  /* Use the same (integral) dataset to peform: RSI, Data analysis, HW and outliers */
+  /* Use the same (integral) dataset to peform: RSI, Data analysis, HW, outliers
+     and linear regression */
 
   /* Just to have some data */
   if(fuzzed_data.remaining_bytes() < 1024)
@@ -57,6 +59,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   max_series_len = fuzzed_data.ConsumeIntegral<u_int16_t>();
   a = ndpi_alloc_data_analysis(max_series_len);
 
+  /* Init Linear Regression */
+  predict_periods = fuzzed_data.ConsumeIntegral<u_int8_t>();
+
   /* Calculate! */
   for (i = 0; i < num_values; i++) {
     if (rc_hw == 0)
@@ -66,6 +71,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_data_add_value(a, values[i]);
   }
   ndpi_find_outliers(values, outliers, num_values);
+  ndpi_predict_linear(values, num_values, predict_periods, &prediction);
 
   /* Data analysis stuff */
   ndpi_data_average(a);

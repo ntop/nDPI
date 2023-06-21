@@ -68,6 +68,7 @@
 /fuzz/fuzz_ds_libcache
 /fuzz/fuzz_ds_tree
 /fuzz/fuzz_ds_ptree
+/fuzz/fuzz_ds_hash
 /fuzz/fuzz_ds_ahocorasick
 /fuzz/fuzz_libinjection
 /fuzz/fuzz_tls_certificate

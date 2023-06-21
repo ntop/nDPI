@@ -1627,31 +1627,24 @@ const char* ndpi_tunnel2str(ndpi_packet_tunnel tt) {
   switch(tt) {
   case ndpi_no_tunnel:
     return("No-Tunnel");
-    break;
 
   case ndpi_gtp_tunnel:
     return("GTP");
-    break;
 
   case ndpi_capwap_tunnel:
     return("CAPWAP");
-    break;
 
   case ndpi_tzsp_tunnel:
     return("TZSP");
-    break;
 
   case ndpi_l2tp_tunnel:
     return("L2TP");
-    break;
 
   case ndpi_vxlan_tunnel:
     return("VXLAN");
-    break;
 
   case ndpi_gre_tunnel:
     return("GRE");
-    break;
   }
 
   return("");
