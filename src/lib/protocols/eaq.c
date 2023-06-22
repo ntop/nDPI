@@ -51,7 +51,6 @@ static void ndpi_search_eaq(struct ndpi_detection_module_struct *ndpi_struct, st
         ((sport != EAQ_DEFAULT_PORT) && (dport != EAQ_DEFAULT_PORT)) )
 	    break;
       
-    if(packet->udp != NULL) {
       u_int32_t seq = (packet->payload[0] * 1000) + (packet->payload[1] * 100) + (packet->payload[2] * 10) + packet->payload[3];
 
       if(flow->l4.udp.eaq_pkt_id == 0)
@@ -71,7 +70,7 @@ static void ndpi_search_eaq(struct ndpi_detection_module_struct *ndpi_struct, st
         return;
       } else
 	return;
-    }
+
   } while(0);
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
