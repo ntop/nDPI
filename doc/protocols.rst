@@ -68,3 +68,12 @@ Notes:
 Proton VPN is a VPN service operated by the Swiss company Proton AG, the company behind the email service Proton Mail
 
 References: `Main site https://protonvpn.com/`
+
+
+.. _Proto 345:
+
+`NDPI_PROTOCOL_THRIFT`
+========================
+Apache Thrift is a generic data interchange framework that supports a bunch of different languages and platforms.
+
+References: `Official site <https://thrift.apache.org>`_ `Github <https://github.com/apache/thrift>`_.

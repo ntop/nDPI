@@ -373,6 +373,7 @@ typedef enum {
   NDPI_PROTOCOL_NVIDIA                = 342,
   NDPI_PROTOCOL_BITCOIN               = 343, 
   NDPI_PROTOCOL_PROTONVPN             = 344,
+  NDPI_PROTOCOL_APACHE_THRIFT         = 345,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

@@ -1121,10 +1121,15 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  flow->tls_quic.certificate_processed = 1;
 
 	if(flow->tls_quic.certificate_processed) {
-	  if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow)
-	    flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] =
-	      (packet->packet_direction == 0) ? (len-5) : (-(int16_t)(len - 5));
+	  if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow) {
+	    int16_t blen = len-5;
 
+	    /* Use positive values for c->s e negative for s->c */
+	    if(packet->packet_direction != 0) blen = -blen;
+	    
+	    flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] = blen;
+	  }
+	  
 #ifdef DEBUG_TLS_BLOCKS
 	  printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
 		 len-5, flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->num_tls_blocks_to_follow);
