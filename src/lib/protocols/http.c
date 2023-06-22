@@ -1437,7 +1437,6 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 ndpi_http_method ndpi_get_http_method(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow) {
   if(!flow) {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, (char*)"Unknown HTTP Method");
     return(NDPI_HTTP_METHOD_UNKNOWN);
   } else
     return(flow->http.method);
