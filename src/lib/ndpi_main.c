@@ -4258,6 +4258,8 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
       num++;
   }
 
+  fclose(fd);
+
   return num;
 }
 
