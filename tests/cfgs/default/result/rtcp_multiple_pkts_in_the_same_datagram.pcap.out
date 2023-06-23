@@ -1,15 +1,15 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	4	(4.00 pkts/flow)
+DPI Packets (UDP):	1	(1.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 166 (166.00 diss/flow)
+Num dissector calls: 57 (57.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
-LRU cache msteams:    0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
@@ -17,9 +17,9 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   2/0 (search/found)
-Patricia risk:        0/0 (search/found)
+Patricia risk:        2/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 
-Skype_TeamsCall	5	339	1
+RTCP	5	740	1
 
-	1	UDP 192.168.1.2:35990 <-> 24.224.190.149:39262 [proto: 125.38/Skype_Teams.Skype_TeamsCall][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: VoIP/10][4 pkts/279 bytes <-> 1 pkts/60 bytes][Goodput ratio: 40/30][72.51 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 217.12.244.34:25963 <-> 217.12.247.98:31601 [proto: 165/RTCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][3 pkts/468 bytes <-> 2 pkts/272 bytes][Goodput ratio: 72/67][8.04 sec][PLAIN TEXT (931534)][Plen Bins: 0,0,40,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

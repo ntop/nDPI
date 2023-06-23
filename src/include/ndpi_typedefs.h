@@ -807,9 +807,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_WORLDOFWARCRAFT */
   u_int32_t wow_stage:2;
 
-  /* NDPI_PROTOCOL_RTP */
-  u_int32_t rtp_special_packets_seen:1;
-
   /* NDPI_PROTOCOL_MAIL_POP */
   u_int32_t mail_pop_stage:2;
 
@@ -847,6 +844,9 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_XBOX */
   u_int32_t xbox_stage:1;
+
+  /* NDPI_PROTOCOL_RTP */
+  u_int32_t rtp_stage:2;
 
   /* NDPI_PROTOCOL_QUIC */
   u_int32_t quic_0rtt_found:1;
