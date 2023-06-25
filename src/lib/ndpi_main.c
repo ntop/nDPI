@@ -4757,9 +4757,6 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* GIT */
   init_git_dissector(ndpi_str, &a);
 
-  /* HANGOUT */
-  init_hangout_dissector(ndpi_str, &a);
-
   /* DRDA */
   init_drda_dissector(ndpi_str, &a);
 

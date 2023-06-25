@@ -31,7 +31,6 @@
     <ClCompile Include="..\src\lib\protocols\guildwars.c" />
     <ClCompile Include="..\src\lib\protocols\h323.c" />
     <ClCompile Include="..\src\lib\protocols\halflife2_and_mods.c" />
-    <ClCompile Include="..\src\lib\protocols\hangout.c" />
     <ClCompile Include="..\src\lib\protocols\http.c" />
     <ClCompile Include="..\src\lib\protocols\iax.c" />
     <ClCompile Include="..\src\lib\protocols\icecast.c" />

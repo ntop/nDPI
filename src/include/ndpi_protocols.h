@@ -173,7 +173,6 @@ void init_mqtt_dissector (struct ndpi_detection_module_struct *ndpi_struct,u_int
 void init_someip_dissector (struct ndpi_detection_module_struct *ndpi_struct,u_int32_t *id);
 void init_rx_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_git_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_hangout_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_drda_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_bjnp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_smpp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
