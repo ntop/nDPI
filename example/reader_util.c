@@ -1273,11 +1273,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_snprintf(flow->kerberos.username,
                   sizeof(flow->kerberos.username),
                   "%s", flow->ndpi_flow->protos.kerberos.username);
-  }
-  /* RTP */
-  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_RTP)) {
-    flow->info_type = INFO_RTP;
-    flow->rtp.stream_type = flow->ndpi_flow->protos.rtp.stream_type;
   /* COLLECTD */
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_COLLECTD)) {
     flow->info_type = INFO_GENERIC;
@@ -1372,7 +1367,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     }
   }
 
-  flow->multimedia_flow_type = flow->ndpi_flow->flow_type;
+  flow->multimedia_flow_type = flow->ndpi_flow->flow_multimedia_type;
   
   /* HTTP metadata are "global" not in `flow->ndpi_flow->protos` union; for example, we can have
      HTTP/BitTorrent and in that case we want to export also HTTP attributes */

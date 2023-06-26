@@ -1363,14 +1363,6 @@ struct ndpi_risk_information {
   char *info;  
 };
 
-enum ndpi_rtp_stream_type {
-  rtp_unknown = 0,
-  rtp_audio,
-  rtp_video,  
-  rtp_audio_video,
-  rtp_screen_share
-};
-
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
 
@@ -1453,7 +1445,7 @@ struct ndpi_flow_struct {
     char *nat_ip; /* Via HTTP X-Forwarded-For */
   } http;
 
-  ndpi_multimedia_flow_type flow_type;
+  ndpi_multimedia_flow_type flow_multimedia_type;
 
   /*
      Put outside of the union to avoid issues in case the protocol
@@ -1484,10 +1476,6 @@ struct ndpi_flow_struct {
       char ptr_domain_name[64 /* large enough but smaller than { } tls */];
     } dns;
 
-    struct {
-      enum ndpi_rtp_stream_type stream_type;
-    } rtp;
-    
     struct {
       u_int8_t request_code;
       u_int8_t version;
