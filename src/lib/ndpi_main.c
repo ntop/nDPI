@@ -6097,13 +6097,13 @@ static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_detection_module_str
   */
   
   if((dport == 3478) || (dport == 3479) || ((sport >= 50000) && (sport <= 50019)))
-    flow->flow_type = ndpi_multimedia_audio_flow;
+    flow->flow_multimedia_type = ndpi_multimedia_audio_flow;
   else if((dport == 3480) || ((sport >= 50020) && (sport <= 50039)))
-    flow->flow_type = ndpi_multimedia_video_flow;
+    flow->flow_multimedia_type = ndpi_multimedia_video_flow;
   else if((dport == 3481) || ((sport >= 50040) && (sport <= 50059)))
-    flow->flow_type = ndpi_multimedia_screen_sharing_flow;
+    flow->flow_multimedia_type = ndpi_multimedia_screen_sharing_flow;
   else {
-    flow->flow_type = ndpi_multimedia_unknown_flow;
+    flow->flow_multimedia_type = ndpi_multimedia_unknown_flow;
     return(0);
   }
   

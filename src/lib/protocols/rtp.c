@@ -45,7 +45,7 @@ int is_valid_rtp_payload_type(uint8_t type)
   return 1;
 }
 
-u_int8_t rtp_get_stream_type(u_int8_t payloadType, enum ndpi_rtp_stream_type *s_type)
+u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_type)
 {
   switch(payloadType) {
   case 0: /* G.711 u-Law */
@@ -67,7 +67,7 @@ u_int8_t rtp_get_stream_type(u_int8_t payloadType, enum ndpi_rtp_stream_type *s_
   case 116: /* G.726 */
   case 117: /* G.722 */
   case 118: /* Comfort Noise Wideband */
-    *s_type = rtp_audio;
+    *s_type = ndpi_multimedia_audio_flow;
     return(1 /* RTP */);
     
   case 34: /* H.263 [MS-H26XPF] */
@@ -75,18 +75,18 @@ u_int8_t rtp_get_stream_type(u_int8_t payloadType, enum ndpi_rtp_stream_type *s_
   case 122: /* H.264 [MS-H264PF] */
   case 123: /* H.264 FEC [MS-H264PF] */
   case 127: /* x-data */
-    *s_type = rtp_video;
+    *s_type = ndpi_multimedia_video_flow;
     return(1 /* RTP */);
 
   case 200: /* RTCP PACKET SENDER */
   case 201: /* RTCP PACKET RECEIVER */
   case 202: /* RTCP Source Description */
   case 203: /* RTCP Bye */
-    *s_type = rtp_unknown;
+    *s_type = ndpi_multimedia_unknown_flow;
     return(2 /* RTCP */);
 
   default:
-    *s_type = rtp_unknown;
+    *s_type = ndpi_multimedia_unknown_flow;
     return(0);
   }
 }
@@ -146,19 +146,19 @@ static u_int8_t isZoom(struct ndpi_flow_struct *flow,
       case 30: /* Screen Share */
 	*is_rtp = 0;
 	*payload_offset = 27;
-	flow->flow_type = ndpi_multimedia_screen_sharing_flow;
+	flow->flow_multimedia_type = ndpi_multimedia_screen_sharing_flow;
 	break;
 	
       case 15: /* Audio */
 	*is_rtp = 1;
 	*payload_offset = 27;
-	flow->flow_type = ndpi_multimedia_audio_flow;
+	flow->flow_multimedia_type = ndpi_multimedia_audio_flow;
 	break;
 	
       case 16: /* Video */
 	*is_rtp = 1;
 	*payload_offset = 32;
-	flow->flow_type = ndpi_multimedia_video_flow;
+	flow->flow_multimedia_type = ndpi_multimedia_video_flow;
 	break;
 
       case 33: /* RTCP */
@@ -265,25 +265,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 	payload = &payload[payload_offset];
       */
 
-      switch(zoom_stream_type) {
-      case 13: /* Screen Share */
-      case 30: /* Screen Share */
-	flow->protos.rtp.stream_type = rtp_screen_share;
-	break;
-	
-      case 15: /* Audio */
-	flow->protos.rtp.stream_type = rtp_audio;
-	break;
-	
-      case 16: /* Video */
-	flow->protos.rtp.stream_type = rtp_video;
-	break;
-
-      default:
-	flow->protos.rtp.stream_type = rtp_unknown;
-	break;
-      }
-
       /* printf("->>> %u\n", zoom_stream_type); */
       
       ndpi_set_detected_protocol(ndpi_struct, flow, 
@@ -312,7 +293,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
       } else if(flow->l4.udp.epicgames_stage > 0) {
         /* It seems that it is a EpicGames stuff; let its dissector to evaluate */
       } else {
-        rtp_get_stream_type(payload[1] & 0x7F, &flow->protos.rtp.stream_type);
+        rtp_get_stream_type(payload[1] & 0x7F, &flow->flow_multimedia_type);
 
 	/* Previous pkts were STUN */
         if(flow->stun.num_binding_requests > 0 ||
