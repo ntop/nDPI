@@ -38,12 +38,16 @@
 
 extern void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
 			  struct ndpi_flow_struct *flow);
+extern int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
+                          struct ndpi_flow_struct *flow);
+extern u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_type);
 extern int is_dtls(const u_int8_t *buf, u_int32_t buf_len, u_int32_t *block_len);
 
 static int stun_monitoring(struct ndpi_detection_module_struct *ndpi_struct,
                            struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  int rtp_rtcp;
   u_int8_t first_byte;
 
 #ifdef DEBUG_MONITORING
@@ -56,22 +60,67 @@ static int stun_monitoring(struct ndpi_detection_module_struct *ndpi_struct,
   first_byte = packet->payload[0];
 
   /* draft-ietf-avtcore-rfc7983bis */
-  if(first_byte >= 128 && first_byte <= 191) { /* TODO: should we tell RTP from RTCP? */
-    NDPI_LOG_INFO(ndpi_struct, "Found RTP over STUN\n");
-    if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
-      /* STUN/SUBPROTO -> SUBPROTO/RTP */
-      ndpi_set_detected_protocol(ndpi_struct, flow,
-                                 NDPI_PROTOCOL_RTP, flow->detected_protocol_stack[0],
-                                 NDPI_CONFIDENCE_DPI);
+  if(first_byte <= 3) {
+#ifdef DEBUG_MONITORING
+    printf("[STUN-MON] Still STUN\n");
+#endif
+    return 1;
+  } else if(first_byte <= 19) {
+#ifdef DEBUG_MONITORING
+    printf("[STUN-MON] DROP or ZRTP range. Unexpected but keep looking\n");
+#endif
+    return 1;
+  } else if(first_byte <= 63) {
+#ifdef DEBUG_MONITORING
+    printf("[STUN-MON] DTLS\n");
+#endif
+    /* TODO */
+    return 1;
+  } else if(first_byte <= 127) {
+#ifdef DEBUG_MONITORING
+    printf("[STUN-MON] QUIC or TURN range. Unexpected but keep looking\n");
+#endif
+    return 1;
+  } else if(first_byte <= 191) {
+
+    rtp_rtcp = is_rtp_or_rtcp(ndpi_struct, flow);
+    if(rtp_rtcp == IS_RTP) {
+#ifdef DEBUG_MONITORING
+      printf("[STUN-MON] RTP (dir %d)\n", packet->packet_direction);
+#endif
+      NDPI_LOG_INFO(ndpi_struct, "Found RTP over STUN\n");
+
+      rtp_get_stream_type(packet->payload[1] & 0x7F, &flow->flow_multimedia_type);
+
+      if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
+        /* STUN/SUBPROTO -> SUBPROTO/RTP */
+        ndpi_set_detected_protocol(ndpi_struct, flow,
+                                   NDPI_PROTOCOL_RTP, flow->detected_protocol_stack[0],
+                                   NDPI_CONFIDENCE_DPI);
+      } else {
+        /* STUN -> STUN/RTP */
+        ndpi_set_detected_protocol(ndpi_struct, flow,
+                                   NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_STUN,
+                                   NDPI_CONFIDENCE_DPI);
+      }
+      return 0; /* Stop */
+    } else if(rtp_rtcp == IS_RTCP) {
+#ifdef DEBUG_MONITORING
+      printf("[STUN-MON] RTCP\n");
+#endif
+      return 1;
     } else {
-      /* STUN -> STUN/RTP */
-      ndpi_set_detected_protocol(ndpi_struct, flow,
-                                 NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_STUN,
-                                 NDPI_CONFIDENCE_DPI);
+#ifdef DEBUG_MONITORING
+      printf("[STUN-MON] Unexpected\n");
+#endif
+      return 1;
     }
-    return 0; /* Stop */
+  } else {
+#ifdef DEBUG_MONITORING
+    printf("[STUN-MON] QUIC range. Unexpected but keep looking\n");
+#endif
+    return 1;
   }
-  return 1; /* Keep going */
 }
 
 /* ************************************************************ */

@@ -671,6 +671,12 @@ typedef enum {
   NDPI_PTREE_MAX	/* Last one! */
 } ptree_type;
 
+enum {
+  NO_RTP_RTCP = 0,
+  IS_RTP = 1,
+  IS_RTCP = 2,
+};
+
 typedef enum {
   NDPI_AUTOMA_HOST = 0,
   NDPI_AUTOMA_DOMAIN,

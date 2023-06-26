@@ -31,12 +31,6 @@
 #define RTP_MIN_HEADER	12
 #define RTCP_MIN_HEADER	8
 
-enum {
-  NO_RTP_RTCP = 0,
-  IS_RTP = 1,
-  IS_RTCP = 2,
-};
-
 /* https://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml */
 int is_valid_rtp_payload_type(uint8_t type)
 {
