@@ -1306,6 +1306,7 @@ struct ndpi_detection_module_struct {
   int opportunistic_tls_imap_enabled;
   int opportunistic_tls_pop_enabled;
   int opportunistic_tls_ftp_enabled;
+  int opportunistic_tls_stun_enabled;
 
   u_int32_t monitoring_stun_pkts_to_process;
   u_int32_t monitoring_stun_flags;
@@ -1458,8 +1459,7 @@ struct ndpi_flow_struct {
   } kerberos_buf;
 
   struct {
-    u_int8_t num_pkts, num_binding_requests;
-    u_int16_t num_processed_pkts;
+    u_int8_t num_pkts, num_binding_requests, num_processed_pkts, maybe_dtls;
   } stun;
 
   struct {

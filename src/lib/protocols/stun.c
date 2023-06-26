@@ -36,6 +36,10 @@
 
 #define STUN_HDR_LEN   20 /* STUN message header length, Classic-STUN (RFC 3489) and STUN (RFC 8489) both */
 
+extern void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
+			  struct ndpi_flow_struct *flow);
+extern int is_dtls(const u_int8_t *buf, u_int32_t buf_len, u_int32_t *block_len);
+
 static int stun_monitoring(struct ndpi_detection_module_struct *ndpi_struct,
                            struct ndpi_flow_struct *flow)
 {
@@ -212,12 +216,38 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 					   u_int16_t *app_proto) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t msg_type, msg_len;
+  u_int32_t unused;
   int rc;
   
   if(packet->iph &&
      ((packet->iph->daddr == 0xFFFFFFFF /* 255.255.255.255 */) ||
      ((ntohl(packet->iph->daddr) & 0xF0000000) == 0xE0000000 /* A multicast address */))) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return(NDPI_IS_NOT_STUN);
+  }
+
+  /* If we're here it's because this does not look like STUN anymore
+     as this was a flow that started as STUN and turned into something
+     else. Let's investigate what is that about */
+  if(flow->stun.num_pkts > 0 && is_dtls(payload, payload_length, &unused)) {
+#ifdef DEBUG_STUN
+    printf("[STUN] DTLS?\n");
+#endif
+    /* Switching to TLS dissector is tricky, because we are calling one dissector
+       from another one, and that is not a common operation...
+       Additionally:
+       * at that point protocol stack is still empty
+       * we have room for only two protocols in flow->detected_protocol_stack[] so
+         we can't have something like STUN/DTLS/SNAPCHAT_CALL
+       * the easiest solution is skipping STUN, and let TLS dissector to set both
+         master (i.e. DTLS) and subprotocol (if any) */
+    if(ndpi_struct->opportunistic_tls_stun_enabled) {
+      flow->stun.maybe_dtls = 1;
+      switch_to_tls(ndpi_struct, flow);
+    }
+    /* We don't want to mess up with TLS classification/results but we don't want to
+       exclude STUN right away to keep trying it in the case that this packet is
+       not a real DTLS one */
     return(NDPI_IS_NOT_STUN);
   }
 
@@ -260,29 +290,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 #ifdef DEBUG_STUN
     printf("[STUN] msg_type = %04X\n", msg_type);
 #endif
-
-    /*
-      If we're here it's because this does not look like STUN anymore
-      as this was a flow that started as STUN and turned into something
-      else. Let's investigate what is that about
-    */
-    if(payload[0] == 0x16) {
-      /* Let's check if this is DTLS used by some socials */
-      struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-      u_int16_t total_len, version = htons(*((u_int16_t*) &packet->payload[1]));
-
-      switch (version) {
-      case 0xFEFF: /* DTLS 1.0 */
-      case 0xFEFD: /* DTLS 1.2 */
-	total_len = ntohs(*((u_int16_t*) &packet->payload[11])) + 13;
-
-	if(payload_length == total_len) {
-	  flow->guessed_protocol_id = NDPI_PROTOCOL_DTLS;
-	  return(NDPI_IS_NOT_STUN);
-	}
-      }
-    }
-
     return(NDPI_IS_NOT_STUN);
   }
 
