@@ -6055,7 +6055,8 @@ static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_cl
 /* ********************************************************************************* */
 
 static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi_str,
-				       struct ndpi_flow_struct *flow) {
+				       struct ndpi_flow_struct *flow,
+				       u_int16_t master) {
 
   /* This function can NOT access &ndpi_str->packet since it is called also from ndpi_detection_giveup(), via ndpi_reconcile_protocols() */
 
@@ -6067,8 +6068,10 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 
     if(s_match || d_match) {
       ndpi_int_change_protocol(ndpi_str, flow,
-			       NDPI_PROTOCOL_SKYPE_TEAMS, flow->detected_protocol_stack[1],
-			       NDPI_CONFIDENCE_DPI_PARTIAL);
+			       NDPI_PROTOCOL_SKYPE_TEAMS, master,
+			       /* Keep the same confidence */
+			       flow->confidence);
+
 
       if(ndpi_str->msteams_cache)
 	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
@@ -6136,7 +6139,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   switch(ret->app_protocol) {
   case NDPI_PROTOCOL_MICROSOFT_AZURE:
-    ndpi_reconcile_msteams_udp(ndpi_str, flow);
+    ndpi_reconcile_msteams_udp(ndpi_str, flow, flow->detected_protocol_stack[1]);
     break;
 
     /*
@@ -6157,7 +6160,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   case NDPI_PROTOCOL_STUN:
     if(flow && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE))
-      ndpi_reconcile_msteams_udp(ndpi_str, flow);
+      ndpi_reconcile_msteams_udp(ndpi_str, flow, NDPI_PROTOCOL_STUN);
     break;
 
   case NDPI_PROTOCOL_NETFLOW:
