@@ -125,10 +125,34 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
   ndpi_confidence_t confidence = NDPI_CONFIDENCE_DPI;
 
   if(app_proto == NDPI_PROTOCOL_UNKNOWN) {
-    if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_GOOGLE)
-      app_proto = NDPI_PROTOCOL_HANGOUT_DUO;
-    else if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_FACEBOOK)
-      app_proto = NDPI_PROTOCOL_FACEBOOK_VOIP;
+    /* https://support.google.com/a/answer/1279090?hl=en */
+    if((ntohs(flow->c_port) >= 19302 && ntohs(flow->c_port) <= 19309) ||
+       ntohs(flow->c_port) == 3478 ||
+       (ntohs(flow->s_port) >= 19302 && ntohs(flow->s_port) <= 19309) ||
+       ntohs(flow->s_port) == 3478) {
+      if(flow->is_ipv6) {
+	u_int64_t pref1 = 0x2001486048640005; /* 2001:4860:4864:5::/64 */
+	u_int64_t pref2 = 0x2001486048640006; /* 2001:4860:4864:6::/64 */
+
+        if(memcmp(&flow->c_address.v6, &pref1, sizeof(pref1)) == 0 ||
+           memcmp(&flow->c_address.v6, &pref2, sizeof(pref2)) == 0 ||
+           memcmp(&flow->s_address.v6, &pref1, sizeof(pref1)) == 0 ||
+           memcmp(&flow->s_address.v6, &pref2, sizeof(pref2)) == 0) {
+          app_proto = NDPI_PROTOCOL_HANGOUT_DUO;
+	}
+      } else {
+        u_int32_t c_address, s_address;
+
+	c_address = ntohl(flow->c_address.v4);
+	s_address = ntohl(flow->s_address.v4);
+        if((c_address & 0xFFFFFFF0) == 0x4a7dfa00 || /* 74.125.250.0/24 */
+           (c_address & 0xFFFFFFF0) == 0x8efa5200 || /* 142.250.82.0/24 */
+           (s_address & 0xFFFFFFF0) == 0x4a7dfa00 ||
+           (s_address & 0xFFFFFFF0) == 0x8efa5200) {
+          app_proto = NDPI_PROTOCOL_HANGOUT_DUO;
+	}
+      }
+    }
   }
 
   if(ndpi_struct->stun_cache
