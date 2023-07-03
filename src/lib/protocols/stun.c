@@ -498,15 +498,6 @@ static ndpi_int_stun_t ndpi_int_check_stun(struct ndpi_detection_module_struct *
 	  }
 	  break;
 
-        case 0xC057: /* Messeger */
-          if(msg_type == 0x0001) {
-            if((msg_len == 100) || (msg_len == 104)) {
-              *app_proto = NDPI_PROTOCOL_FACEBOOK_VOIP;
-              return(NDPI_IS_STUN);
-            }
-          }
-          break;
-
         case 0x8054: /* Candidate Identifier */
           if((len == 4)
              && ((offset+7) < payload_length)
