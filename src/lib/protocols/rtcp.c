@@ -42,7 +42,7 @@ static void ndpi_search_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   } else if(packet->udp != NULL) {
     /* Let's check first the RTCP packet length */
-    u_int16_t len, offset = 0, rtcp_section_len;
+    u_int32_t len, offset = 0, rtcp_section_len;
     
     while(offset + 3 < packet->payload_packet_len) {
       len = packet->payload[2+offset] * 256 + packet->payload[2+offset+1];
