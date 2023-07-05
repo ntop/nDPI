@@ -73,7 +73,7 @@ static int is_diameter(struct ndpi_packet_struct *packet)
       diameter->flags == DIAMETER_ERROR ||
       diameter->flags == DIAMETER_RETRASM)) {
 
-    u_int16_t com_code = diameter->com_code[2] + (diameter->com_code[1] << 8) + (diameter->com_code[0] << 8);
+    u_int32_t com_code = diameter->com_code[2] + (diameter->com_code[1] << 8) + (diameter->com_code[0] << 8);
     
      if(com_code == AC || com_code == AS ||
 	com_code == CC || com_code == CE ||
