@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	5	(1.00 pkts/flow)
+DPI Packets (UDP):	7	(1.40 pkts/flow)
 Confidence DPI              : 5 (flows)
-Num dissector calls: 7 (1.40 diss/flow)
+Num dissector calls: 134 (26.80 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -24,7 +24,7 @@ RTP	1330	182702	1
 SIP	92	52851	3
 Megaco	130	23570	1
 
-	1	UDP 10.35.60.100:15580 <-> 10.23.1.52:16756 [proto: 87/RTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Media/1][159 pkts/33872 bytes <-> 1171 pkts/148830 bytes][Goodput ratio: 80/66][37.44 sec][RTP Stream Type: audio][bytes ratio: -0.629 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 20/30 81/286 7/49][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 213/127 214/214 12/32][PLAIN TEXT (UUUUUU)][Plen Bins: 0,0,50,0,0,49,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.35.60.100:15580 <-> 10.23.1.52:16756 [proto: 87/RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][DPI packets: 3][cat: Media/1][159 pkts/33872 bytes <-> 1171 pkts/148830 bytes][Goodput ratio: 80/66][37.44 sec][bytes ratio: -0.629 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 20/30 81/286 7/49][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 213/127 214/214 12/32][PLAIN TEXT (UUUUUU)][Plen Bins: 0,0,50,0,0,49,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 10.35.40.25:5060 <-> 10.35.40.200:5060 [proto: 100/SIP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][22 pkts/13254 bytes <-> 24 pkts/13218 bytes][Goodput ratio: 93/92][83.79 sec][bytes ratio: 0.001 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 3385/1643 27628/17187 8177/4202][Pkt Len c2s/s2c min/avg/max/stddev: 425/304 602/551 923/894 205/186][PLAIN TEXT (INVITE sip)][Plen Bins: 0,0,0,0,0,0,0,0,4,0,8,4,22,18,4,0,8,0,0,0,0,0,0,4,8,4,4,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 10.35.40.22:2944 <-> 10.23.1.42:2944 [proto: 181/Megaco][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][65 pkts/7788 bytes <-> 65 pkts/15782 bytes][Goodput ratio: 65/83][109.25 sec][bytes ratio: -0.339 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1409/1356 4370/4370 1953/1909][Pkt Len c2s/s2c min/avg/max/stddev: 77/101 120/243 583/561 107/94][PLAIN TEXT (555282713)][Plen Bins: 0,48,0,23,0,1,1,21,0,0,1,0,0,0,0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	UDP 10.35.60.72:5060 <-> 10.35.60.100:5060 [proto: 100/SIP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][11 pkts/6627 bytes <-> 12 pkts/6609 bytes][Goodput ratio: 93/92][83.79 sec][bytes ratio: 0.001 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/19 7451/3699 27579/17188 10544/5458][Pkt Len c2s/s2c min/avg/max/stddev: 425/304 602/551 923/894 205/186][PLAIN TEXT (INVITE sip)][Plen Bins: 0,0,0,0,0,0,0,0,4,0,8,4,22,18,4,0,8,0,0,0,0,0,0,4,8,4,4,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

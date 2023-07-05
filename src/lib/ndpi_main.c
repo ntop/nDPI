@@ -2229,10 +2229,7 @@ int ndpi_fill_prefix_v4(ndpi_prefix_t *p, const struct in_addr *a, int b, int mb
     return(-1);
 
   memset(p, 0, sizeof(ndpi_prefix_t));
-  memcpy(&p->add.sin, a, (mb + 7) / 8);
-  p->family = AF_INET;
-  p->bitlen = b;
-  p->ref_count = 0;
+  p->add.sin.s_addr = a->s_addr, p->family = AF_INET, p->bitlen = b, p->ref_count = 0;
 
   return(0);
 }
@@ -3004,6 +3001,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->opportunistic_tls_imap_enabled = 1;
   ndpi_str->opportunistic_tls_pop_enabled = 1;
   ndpi_str->opportunistic_tls_ftp_enabled = 1;
+  ndpi_str->opportunistic_tls_stun_enabled = 1;
 
   ndpi_str->monitoring_stun_pkts_to_process = 4;
   ndpi_str->monitoring_stun_flags = 0;
@@ -4759,9 +4757,6 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* GIT */
   init_git_dissector(ndpi_str, &a);
 
-  /* HANGOUT */
-  init_hangout_dissector(ndpi_str, &a);
-
   /* DRDA */
   init_drda_dissector(ndpi_str, &a);
 
@@ -6060,7 +6055,8 @@ static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_cl
 /* ********************************************************************************* */
 
 static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi_str,
-				       struct ndpi_flow_struct *flow) {
+				       struct ndpi_flow_struct *flow,
+				       u_int16_t master) {
 
   /* This function can NOT access &ndpi_str->packet since it is called also from ndpi_detection_giveup(), via ndpi_reconcile_protocols() */
 
@@ -6072,8 +6068,10 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 
     if(s_match || d_match) {
       ndpi_int_change_protocol(ndpi_str, flow,
-			       NDPI_PROTOCOL_SKYPE_TEAMS, flow->detected_protocol_stack[1],
-			       NDPI_CONFIDENCE_DPI_PARTIAL);
+			       NDPI_PROTOCOL_SKYPE_TEAMS, master,
+			       /* Keep the same confidence */
+			       flow->confidence);
+
 
       if(ndpi_str->msteams_cache)
 	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
@@ -6100,13 +6098,13 @@ static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_detection_module_str
   */
   
   if((dport == 3478) || (dport == 3479) || ((sport >= 50000) && (sport <= 50019)))
-    flow->flow_type = ndpi_multimedia_audio_flow;
+    flow->flow_multimedia_type = ndpi_multimedia_audio_flow;
   else if((dport == 3480) || ((sport >= 50020) && (sport <= 50039)))
-    flow->flow_type = ndpi_multimedia_video_flow;
+    flow->flow_multimedia_type = ndpi_multimedia_video_flow;
   else if((dport == 3481) || ((sport >= 50040) && (sport <= 50059)))
-    flow->flow_type = ndpi_multimedia_screen_sharing_flow;
+    flow->flow_multimedia_type = ndpi_multimedia_screen_sharing_flow;
   else {
-    flow->flow_type = ndpi_multimedia_unknown_flow;
+    flow->flow_multimedia_type = ndpi_multimedia_unknown_flow;
     return(0);
   }
   
@@ -6141,7 +6139,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   switch(ret->app_protocol) {
   case NDPI_PROTOCOL_MICROSOFT_AZURE:
-    ndpi_reconcile_msteams_udp(ndpi_str, flow);
+    ndpi_reconcile_msteams_udp(ndpi_str, flow, flow->detected_protocol_stack[1]);
     break;
 
     /*
@@ -6162,7 +6160,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   case NDPI_PROTOCOL_STUN:
     if(flow && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE))
-      ndpi_reconcile_msteams_udp(ndpi_str, flow);
+      ndpi_reconcile_msteams_udp(ndpi_str, flow, NDPI_PROTOCOL_STUN);
     break;
 
   case NDPI_PROTOCOL_NETFLOW:
@@ -9846,6 +9844,9 @@ int ndpi_set_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_FTP_CONTROL:
     ndpi_struct->opportunistic_tls_ftp_enabled = value;
     return 0;
+  case NDPI_PROTOCOL_STUN:
+    ndpi_struct->opportunistic_tls_stun_enabled = value;
+    return 0;
   default:
     return -1;
   }
@@ -9868,6 +9869,8 @@ int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
     return ndpi_struct->opportunistic_tls_pop_enabled;
   case NDPI_PROTOCOL_FTP_CONTROL:
     return ndpi_struct->opportunistic_tls_ftp_enabled;
+  case NDPI_PROTOCOL_STUN:
+    return ndpi_struct->opportunistic_tls_stun_enabled;
   default:
     return -1;
   }

@@ -671,6 +671,12 @@ typedef enum {
   NDPI_PTREE_MAX	/* Last one! */
 } ptree_type;
 
+enum {
+  NO_RTP_RTCP = 0,
+  IS_RTP = 1,
+  IS_RTCP = 2,
+};
+
 typedef enum {
   NDPI_AUTOMA_HOST = 0,
   NDPI_AUTOMA_DOMAIN,
@@ -807,9 +813,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_WORLDOFWARCRAFT */
   u_int32_t wow_stage:2;
 
-  /* NDPI_PROTOCOL_RTP */
-  u_int32_t rtp_special_packets_seen:1;
-
   /* NDPI_PROTOCOL_MAIL_POP */
   u_int32_t mail_pop_stage:2;
 
@@ -847,6 +850,9 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_XBOX */
   u_int32_t xbox_stage:1;
+
+  /* NDPI_PROTOCOL_RTP */
+  u_int32_t rtp_stage:2;
 
   /* NDPI_PROTOCOL_QUIC */
   u_int32_t quic_0rtt_found:1;
@@ -1306,6 +1312,7 @@ struct ndpi_detection_module_struct {
   int opportunistic_tls_imap_enabled;
   int opportunistic_tls_pop_enabled;
   int opportunistic_tls_ftp_enabled;
+  int opportunistic_tls_stun_enabled;
 
   u_int32_t monitoring_stun_pkts_to_process;
   u_int32_t monitoring_stun_flags;
@@ -1361,14 +1368,6 @@ struct tls_heuristics {
 struct ndpi_risk_information {
   ndpi_risk_enum id;
   char *info;  
-};
-
-enum ndpi_rtp_stream_type {
-  rtp_unknown = 0,
-  rtp_audio,
-  rtp_video,  
-  rtp_audio_video,
-  rtp_screen_share
 };
 
 struct ndpi_flow_struct {
@@ -1453,7 +1452,7 @@ struct ndpi_flow_struct {
     char *nat_ip; /* Via HTTP X-Forwarded-For */
   } http;
 
-  ndpi_multimedia_flow_type flow_type;
+  ndpi_multimedia_flow_type flow_multimedia_type;
 
   /*
      Put outside of the union to avoid issues in case the protocol
@@ -1466,8 +1465,7 @@ struct ndpi_flow_struct {
   } kerberos_buf;
 
   struct {
-    u_int8_t num_pkts, num_binding_requests;
-    u_int16_t num_processed_pkts;
+    u_int8_t num_pkts, num_binding_requests, num_processed_pkts, maybe_dtls;
   } stun;
 
   struct {
@@ -1484,10 +1482,6 @@ struct ndpi_flow_struct {
       char ptr_domain_name[64 /* large enough but smaller than { } tls */];
     } dns;
 
-    struct {
-      enum ndpi_rtp_stream_type stream_type;
-    } rtp;
-    
     struct {
       u_int8_t request_code;
       u_int8_t version;
