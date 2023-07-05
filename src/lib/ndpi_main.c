@@ -8629,7 +8629,7 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   {
     char m[256];
-    int len = ndpi_min(sizeof(m), string_to_match_len);
+    u_int len = ndpi_min(sizeof(m), string_to_match_len);
 
     if (len >= sizeof(m)) len--;
 
@@ -8657,7 +8657,7 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   {
     char m[256];
-    int len = ndpi_min(sizeof(m), string_to_match_len);
+    u_int len = ndpi_min(sizeof(m), string_to_match_len);
 	
     if (len >= sizeof(m)) len--;
 
