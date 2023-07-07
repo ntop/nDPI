@@ -291,9 +291,24 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
       if(packet->content_disposition_line.len > attachment_len) {
 	u_int8_t filename_len = packet->content_disposition_line.len - attachment_len;
 	int i;
-
-  flow->http.filename = ndpi_malloc(filename_len-1);
-  flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len, filename_len);
+  
+  if(packet->content_disposition_line.ptr[attachment_len] == '\"'){
+    if(packet->content_disposition_line.ptr[packet->content_disposition_line.len-1] != '\"'){
+      //case: filename="file_name
+      flow->http.filename = ndpi_malloc(filename_len-2);
+      flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-3);
+    }
+    else{
+      //case: filename="file_name"
+      flow->http.filename = ndpi_malloc(filename_len-3);    
+      flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-2);
+    }
+  }
+  else{
+    //case: filename=file_name
+    flow->http.filename = ndpi_malloc(filename_len-1);
+    flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len, filename_len);
+  }
 
 	if(filename_len > ATTACHMENT_LEN) {
 	  attachment_len += filename_len-ATTACHMENT_LEN-1;
