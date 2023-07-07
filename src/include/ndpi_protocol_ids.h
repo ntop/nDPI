@@ -375,6 +375,7 @@ typedef enum {
   NDPI_PROTOCOL_PROTONVPN             = 344,
   NDPI_PROTOCOL_APACHE_THRIFT         = 345,
   NDPI_PROTOCOL_ROBLOX                = 346,
+  NDPI_PROTOCOL_SERVICE_LOCATION      = 347,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

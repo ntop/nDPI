@@ -1608,6 +1608,11 @@ struct ndpi_flow_struct {
       u_int8_t message_type;
       char method[64];
     } thrift;
+
+    struct {
+      u_int8_t url_count;
+      char url[4][48];
+    } slp;
   } protos;
 
   /*** ALL protocol specific 64 bit variables here ***/
