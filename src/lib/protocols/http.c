@@ -288,6 +288,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     if(packet->content_disposition_line.len > 0) {
       u_int8_t attachment_len = sizeof("attachment; filename");
 
+    strcpy(packet->content_disposition_line.ptr, "attachment; filename=\"wejifnejrfne.exe");
       if(packet->content_disposition_line.len > attachment_len) {
 	u_int8_t filename_len = packet->content_disposition_line.len - attachment_len;
 	int i;
@@ -296,7 +297,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     if(packet->content_disposition_line.ptr[packet->content_disposition_line.len-1] != '\"'){
       //case: filename="file_name
       flow->http.filename = ndpi_malloc(filename_len-2);
-      flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-3);
+      flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-1);
     }
     else{
       //case: filename="file_name"
