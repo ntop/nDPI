@@ -5348,6 +5348,9 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->http.server)
       ndpi_free(flow->http.server);
 
+    if(flow->http.filename)
+      ndpi_free(flow->http.filename);
+
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
 

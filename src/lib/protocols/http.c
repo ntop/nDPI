@@ -276,7 +276,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
 		ndpi_set_binary_application_transfer(ndpi_struct, flow, str);
 		NDPI_LOG_INFO(ndpi_struct, "Found executable HTTP transfer");
-		return(flow->category);
+		//return(flow->category);
 	      }
 	    }
 	  }
@@ -291,6 +291,17 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
       if(packet->content_disposition_line.len > attachment_len) {
 	u_int8_t filename_len = packet->content_disposition_line.len - attachment_len;
 	int i;
+  if(packet->content_disposition_line.ptr[attachment_len] == '\"'){
+    //case: filename="file_name"
+    flow->http.filename = (char*)malloc((filename_len-3)*sizeof(char));
+    flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-2);
+  }
+  else{
+    //case: filename=file_name
+    flow->http.filename = (char*)malloc((filename_len-1)*sizeof(char));
+    flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len, filename_len);
+  }
+
 
 	if(filename_len > ATTACHMENT_LEN) {
 	  attachment_len += filename_len-ATTACHMENT_LEN-1;
@@ -1291,6 +1302,10 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->http.nat_ip) {
     ndpi_free(flow->http.nat_ip);
     flow->http.nat_ip = NULL;
+  }
+  if(flow->http.filename) {
+    ndpi_free(flow->http.filename);
+    flow->http.filename = NULL;
   }
 
   /* Reset flow risks. We should reset only those risks triggered by

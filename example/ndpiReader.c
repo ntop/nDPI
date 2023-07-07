@@ -1769,6 +1769,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->http.user_agent[0] != '\0')
       fprintf(out, "[User-Agent: %s]", flow->http.user_agent);
 
+    if(flow->http.filename[0] != '\0')
+      fprintf(out, "[Filename: %s]", flow->http.filename);
+
     if(flow->risk) {
       u_int i;
       u_int16_t cli_score, srv_score;

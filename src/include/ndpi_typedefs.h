@@ -1450,6 +1450,7 @@ struct ndpi_flow_struct {
     char *url, *content_type /* response */, *request_content_type /* e.g. for POST */, *user_agent, *server;
     char *detected_os; /* Via HTTP/QUIC User-Agent */
     char *nat_ip; /* Via HTTP X-Forwarded-For */
+    char *filename; /* Via HTTP Content-Disposition */
   } http;
 
   ndpi_multimedia_flow_type flow_multimedia_type;
