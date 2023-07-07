@@ -288,7 +288,6 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     if(packet->content_disposition_line.len > 0) {
       u_int8_t attachment_len = sizeof("attachment; filename");
 
-    strcpy(packet->content_disposition_line.ptr, "attachment; filename=\"wejifnejrfne.exe");
       if(packet->content_disposition_line.len > attachment_len) {
 	u_int8_t filename_len = packet->content_disposition_line.len - attachment_len;
 	int i;
