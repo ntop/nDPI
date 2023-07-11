@@ -51,7 +51,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       if(fuzzed_data.remaining_bytes() > 4) {
         std::vector<u_int8_t>data = fuzzed_data.ConsumeBytes<u_int8_t>(4);
 	ip = data.data();
-        ip_len = fuzzed_data.ConsumeIntegralInRange(0, 32);
+        ip_len = fuzzed_data.ConsumeIntegralInRange(0, 33); /* 33 to force error */
         ndpi_fill_prefix_v4(&prefix, (struct in_addr *)ip, ip_len, 32);
         node = ndpi_patricia_lookup(p, &prefix);
         /* Keep one random node really added */
@@ -71,7 +71,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       if(fuzzed_data.remaining_bytes() > 16) {
         std::vector<u_int8_t>data = fuzzed_data.ConsumeBytes<u_int8_t>(16);
 	ip = data.data();
-        ip_len = fuzzed_data.ConsumeIntegralInRange(0, 128);
+        ip_len = fuzzed_data.ConsumeIntegralInRange(0, 129); /* 129 to force error */
         ndpi_fill_prefix_v6(&prefix, (const struct in6_addr *)ip, ip_len, 128);
         node = ndpi_patricia_lookup(p, &prefix);
         /* Keep one random node really added */

@@ -656,9 +656,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 			     dNSName);
 #endif
 
-		      if(flow->host_server_name[0] == '\0') {
-			matched_name = 1;	/* No SNI */
-		      } else if(dNSName[0] == '*') {
+		      if(dNSName[0] == '*') {
 			char * label = strstr(flow->host_server_name, &dNSName[1]);
 
 			if(label != NULL) {

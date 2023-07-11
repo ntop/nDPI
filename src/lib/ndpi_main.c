@@ -334,6 +334,9 @@ u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct 
 #endif
 #endif
 
+  if(!ndpi_str)
+    return(0);
+
   if(user_proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS)
     return(user_proto_id);
   else {
@@ -362,6 +365,9 @@ u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct 
   NDPI_LOG_DBG2(ndpi_str, "[DEBUG] ***** %s(%u)\n", __FUNCTION__, ndpi_proto_id);
 #endif
 #endif
+
+  if(!ndpi_str)
+    return(0);
 
   if(ndpi_proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS)
     return(ndpi_proto_id);
@@ -713,7 +719,6 @@ static u_int8_t ndpi_is_middle_string_char(char c) {
   case '.':
   case '-':
     return(1);
-    break;
 
   default:
     return(0);
@@ -2225,10 +2230,11 @@ int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
 /* ****************************************************** */
 
 int ndpi_fill_prefix_v4(ndpi_prefix_t *p, const struct in_addr *a, int b, int mb) {
+  memset(p, 0, sizeof(ndpi_prefix_t));
+
   if(b < 0 || b > mb)
     return(-1);
 
-  memset(p, 0, sizeof(ndpi_prefix_t));
   p->add.sin.s_addr = a->s_addr, p->family = AF_INET, p->bitlen = b, p->ref_count = 0;
 
   return(0);
@@ -2237,6 +2243,8 @@ int ndpi_fill_prefix_v4(ndpi_prefix_t *p, const struct in_addr *a, int b, int mb
 /* ******************************************* */
 
 int ndpi_fill_prefix_v6(ndpi_prefix_t *prefix, const struct in6_addr *addr, int bits, int maxbits) {
+  memset(prefix, 0, sizeof(ndpi_prefix_t));
+
   if(bits < 0 || bits > maxbits)
     return -1;
 
@@ -8165,11 +8173,9 @@ int ndpi_is_custom_category(ndpi_protocol_category_t category) {
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_4:
   case NDPI_PROTOCOL_CATEGORY_CUSTOM_5:
     return(1);
-    break;
 
   default:
     return(0);
-    break;
   }
 }
 
@@ -9166,19 +9172,15 @@ const char *ndpi_get_l4_proto_name(ndpi_l4_proto_info proto) {
   switch(proto) {
   case ndpi_l4_proto_unknown:
     return("");
-    break;
 
   case ndpi_l4_proto_tcp_only:
     return("TCP");
-    break;
 
   case ndpi_l4_proto_udp_only:
     return("UDP");
-    break;
 
   case ndpi_l4_proto_tcp_and_udp:
     return("TCP/UDP");
-    break;
   }
 
   return("");
@@ -9913,6 +9915,11 @@ u_int32_t ndpi_get_protocol_aggressiveness(struct ndpi_detection_module_struct *
 
 void ndpi_set_user_data(struct ndpi_detection_module_struct *ndpi_str, void *user_data)
 {
+  if (ndpi_str == NULL)
+  {
+    return;
+  }
+
   if (ndpi_str->user_data != NULL)
   {
     NDPI_LOG_ERR(ndpi_str, "%s", "User data is already set. Overwriting.")
@@ -9923,5 +9930,7 @@ void ndpi_set_user_data(struct ndpi_detection_module_struct *ndpi_str, void *use
 
 void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
 {
-  return ndpi_str->user_data;
+  if(ndpi_str)
+    return ndpi_str->user_data;
+  return NULL;
 }

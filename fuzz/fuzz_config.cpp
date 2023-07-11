@@ -35,7 +35,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 				     6 + /* files */
 				     ((NDPI_LRUCACHE_MAX + 1) * 5) + /* LRU caches */
 				     2 + 1 + 4 + /* ndpi_set_detection_preferences() */
-				     1 + 3 + 1 + /* Monitoring */
+				     1 + 3 + 1 + 3 + /* Monitoring */
 				     7 + /* Opportunistic tls */
 				     2 + /* Pid */
 				     2 + /* Category */
@@ -50,6 +50,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   ndpi_info_mod = ndpi_init_detection_module(fuzzed_data.ConsumeIntegral<u_int32_t>());
 
+  set_ndpi_debug_function(ndpi_info_mod, NULL);
+
   NDPI_BITMASK_RESET(enabled_bitmask);
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS ; i++) {
     if(fuzzed_data.ConsumeBool())
@@ -59,6 +61,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_exit_detection_module(ndpi_info_mod);
     ndpi_info_mod = NULL;
   }
+
+  ndpi_set_user_data(ndpi_info_mod, (void *)0xabcdabcd); /* Random pointer */
+  ndpi_set_user_data(ndpi_info_mod, (void *)0xabcdabcd); /* Twice to trigger overwriting */
+  ndpi_get_user_data(ndpi_info_mod);
 
   ndpi_set_tls_cert_expire_days(ndpi_info_mod, fuzzed_data.ConsumeIntegral<u_int8_t>());
 
@@ -99,12 +105,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_max_packets_to_process,
                                    fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)));
 
+  ndpi_set_detection_preferences(ndpi_info_mod, static_cast<ndpi_detection_preference>(0xFF), 0xFF); /* Invalid preference */
+
   if(fuzzed_data.ConsumeBool()) {
     ndpi_set_monitoring_state(ndpi_info_mod, NDPI_PROTOCOL_STUN,
                               fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)),
                               fuzzed_data.ConsumeIntegralInRange(0, 7));
     ndpi_get_monitoring_state(ndpi_info_mod, NDPI_PROTOCOL_STUN, &num, &num2);
   }
+
+  random_proto = fuzzed_data.ConsumeIntegralInRange(0, (1 << 16) - 1);
+  random_value = fuzzed_data.ConsumeIntegralInRange(0,2);
+  ndpi_set_monitoring_state(ndpi_info_mod, random_proto, random_value, random_value);
+  ndpi_get_monitoring_state(ndpi_info_mod, random_proto, &num, &num2);
 
   ndpi_set_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_SMTP, fuzzed_data.ConsumeBool());
   ndpi_get_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_SMTP);
@@ -128,17 +141,24 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_finalize_initialization(ndpi_info_mod);
 
   /* Random protocol configuration */
-  pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_supported_protocols(ndpi_info_mod) + 1);
+  pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
   protoname = ndpi_get_proto_by_id(ndpi_info_mod, pid);
   if (protoname) {
     assert(ndpi_get_proto_by_name(ndpi_info_mod, protoname) == pid);
   }
+  ndpi_map_user_proto_id_to_ndpi_id(ndpi_info_mod, pid);
+  ndpi_map_ndpi_id_to_user_proto_id(ndpi_info_mod, pid);
   ndpi_set_proto_breed(ndpi_info_mod, pid, NDPI_PROTOCOL_SAFE);
   ndpi_set_proto_category(ndpi_info_mod, pid, NDPI_PROTOCOL_CATEGORY_MEDIA);
+  ndpi_is_subprotocol_informative(ndpi_info_mod, pid);
+  ndpi_get_proto_breed(ndpi_info_mod, pid);
+
+  ndpi_get_proto_by_name(ndpi_info_mod, NULL); /* Error */
+  ndpi_get_proto_by_name(ndpi_info_mod, "foo"); /* Invalid protocol */
 
   /* Custom category configuration */
   cat = fuzzed_data.ConsumeIntegralInRange(static_cast<int>(NDPI_PROTOCOL_CATEGORY_CUSTOM_1),
-                                           static_cast<int>(NDPI_PROTOCOL_CATEGORY_CUSTOM_5 + 1)); /* + 1 to trigger invalid cat */
+                                           static_cast<int>(NDPI_PROTOCOL_NUM_CATEGORIES + 1)); /* + 1 to trigger invalid cat */
   ndpi_category_set_name(ndpi_info_mod, static_cast<ndpi_protocol_category_t>(cat), catname);
   ndpi_is_custom_category(static_cast<ndpi_protocol_category_t>(cat));
   ndpi_category_get_name(ndpi_info_mod, static_cast<ndpi_protocol_category_t>(cat));
@@ -190,6 +210,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       ndpi_find_ipv4_category_userdata(ndpi_info_mod, flow.c_address.v4);
 
       ndpi_search_tcp_or_udp_raw(ndpi_info_mod, NULL, 0, ntohl(flow.c_address.v4), ntohl(flow.s_address.v4));
+
+      ndpi_guess_undetected_protocol_v4(ndpi_info_mod, bool_value ? &flow : NULL,
+                                        flow.l4_proto,
+                                        flow.c_address.v4, flow.c_port,
+                                        flow.s_address.v4, flow.s_port);
     }
     /* Another "strange" function: fuzz it here, for lack of a better alternative */
     ndpi_search_tcp_or_udp(ndpi_info_mod, &flow);

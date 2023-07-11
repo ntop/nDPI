@@ -78,6 +78,10 @@ static int html_decode_char_at(const char* src, size_t len, size_t* consumed)
         return '&';
     }
 
+    if (len < 4) {
+        return (unsigned char)(*(src+1));
+    }
+
     if (*(src+2) == 'x' || *(src+2) == 'X') {
         ch = (unsigned char) (*(src+3));
         ch = gsHexDecodeMap[ch];
