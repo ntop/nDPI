@@ -276,7 +276,6 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
 		ndpi_set_binary_application_transfer(ndpi_struct, flow, str);
 		NDPI_LOG_INFO(ndpi_struct, "Found executable HTTP transfer");
-		//return(flow->category);
 	      }
 	    }
 	  }
@@ -296,21 +295,27 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     if(packet->content_disposition_line.ptr[packet->content_disposition_line.len-1] != '\"'){
       //case: filename="file_name
       flow->http.filename = ndpi_malloc(filename_len);
-      flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-1);
-      flow->http.filename[filename_len-1] = '\0';
+      if(flow->http.filename != NULL){
+        flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-1);
+        flow->http.filename[filename_len-1] = '\0';
+      }
     }
     else{
       //case: filename="file_name"
-      flow->http.filename = ndpi_malloc(filename_len-1);    
-      flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-2);
-      flow->http.filename[filename_len-2] = '\0';
+      flow->http.filename = ndpi_malloc(filename_len-1);   
+      if(flow->http.filename != NULL){ 
+        flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-2);
+        flow->http.filename[filename_len-2] = '\0';
+      }
     }
   }
   else{
     //case: filename=file_name
     flow->http.filename = ndpi_malloc(filename_len+1);
-    flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len, filename_len);
-    flow->http.filename[filename_len] = '\0';
+    if(flow->http.filename != NULL){
+      flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len, filename_len);
+      flow->http.filename[filename_len] = '\0';
+    }
   }
 
 	if(filename_len > ATTACHMENT_LEN) {
