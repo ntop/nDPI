@@ -295,19 +295,22 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
   if(packet->content_disposition_line.ptr[attachment_len] == '\"'){
     if(packet->content_disposition_line.ptr[packet->content_disposition_line.len-1] != '\"'){
       //case: filename="file_name
-      flow->http.filename = ndpi_malloc(filename_len-2);
+      flow->http.filename = ndpi_malloc(filename_len);
       flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-1);
+      flow->http.filename[filename_len-1] = '\0';
     }
     else{
       //case: filename="file_name"
-      flow->http.filename = ndpi_malloc(filename_len-3);    
+      flow->http.filename = ndpi_malloc(filename_len-1);    
       flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-2);
+      flow->http.filename[filename_len-2] = '\0';
     }
   }
   else{
     //case: filename=file_name
-    flow->http.filename = ndpi_malloc(filename_len-1);
+    flow->http.filename = ndpi_malloc(filename_len+1);
     flow->http.filename = strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len, filename_len);
+    flow->http.filename[filename_len] = '\0';
   }
 
 	if(filename_len > ATTACHMENT_LEN) {
