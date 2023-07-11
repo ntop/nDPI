@@ -1382,6 +1382,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_snprintf(flow->http.server, sizeof(flow->http.server), "%s", flow->ndpi_flow->http.server ? flow->ndpi_flow->http.server : "");
     ndpi_snprintf(flow->http.request_content_type, sizeof(flow->http.request_content_type), "%s", flow->ndpi_flow->http.request_content_type ? flow->ndpi_flow->http.request_content_type : "");
     ndpi_snprintf(flow->http.nat_ip, sizeof(flow->http.nat_ip), "%s", flow->ndpi_flow->http.nat_ip ? flow->ndpi_flow->http.nat_ip : "");
+    ndpi_snprintf(flow->http.filename, sizeof(flow->http.filename), "%s", flow->ndpi_flow->http.filename ? flow->ndpi_flow->http.filename : "");
   }
 
   ndpi_snprintf(flow->http.user_agent,
