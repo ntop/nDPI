@@ -300,7 +300,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	      flow->http.filename[filename_len-1] = '\0';
 	    }
 	  }
-	  else{
+	  else if(filename_len >= 2) {
 	    //case: filename="file_name"
 	    flow->http.filename = ndpi_malloc(filename_len-1);
 
@@ -310,8 +310,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	      flow->http.filename[filename_len-2] = '\0';
 	    }
 	  }
-	}
-	else{
+	} else {
 	  //case: filename=file_name
 	  flow->http.filename = ndpi_malloc(filename_len+1);
 
