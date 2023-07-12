@@ -72,6 +72,7 @@
 /fuzz/fuzz_ds_ahocorasick
 /fuzz/fuzz_libinjection
 /fuzz/fuzz_tls_certificate
+/fuzz/fuzz_dga
 /fuzz/fuzz_gcrypt_light
 /fuzz/fuzz_ndpi_reader_payload_analyzer
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
@@ -94,6 +95,7 @@
 /fuzz/fuzz_ds_ahocorasick_seed_corpus.zip
 /fuzz/fuzz_libinjection_seed_corpus.zip
 /fuzz/fuzz_tls_certificate_seed_corpus.zip
+/fuzz/fuzz_dga_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip
 /fuzz/fuzz_*.dict
 /influxdb/Makefile
