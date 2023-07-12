@@ -1756,7 +1756,8 @@ typedef enum {
   ndpi_serialization_format_unknown = 0,
   ndpi_serialization_format_tlv,
   ndpi_serialization_format_json,
-  ndpi_serialization_format_csv
+  ndpi_serialization_format_csv,
+  ndpi_serialization_format_multiline_json
 } ndpi_serialization_format;
 
 /* Note:
@@ -1821,6 +1822,7 @@ typedef struct {
   ndpi_serialization_format fmt;
   char csv_separator[2];
   u_int8_t has_snapshot;
+  u_int8_t multiline_json_array;
   ndpi_private_serializer_status snapshot;
 } ndpi_private_serializer;
 
