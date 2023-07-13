@@ -287,7 +287,8 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     if(packet->content_disposition_line.len > 0) {
       u_int8_t attachment_len = sizeof("attachment; filename");
 
-      if(packet->content_disposition_line.len > attachment_len) {
+      if(packet->content_disposition_line.len > attachment_len &&
+         strncmp((char *)packet->content_disposition_line.ptr, "attachment; filename", 20) == 0) {
 	u_int8_t filename_len = packet->content_disposition_line.len - attachment_len;
 	int i;
 
