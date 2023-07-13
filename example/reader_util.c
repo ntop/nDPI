@@ -111,8 +111,8 @@ struct payload_stats *pstats = NULL;
 u_int32_t max_num_packets_per_flow      = 10; /* ETTA requires min 10 pkts for record. */
 u_int32_t max_packet_payload_dissection = 128;
 u_int32_t max_num_reported_top_payloads = 25;
-u_int16_t min_pattern_len = 4;
-u_int16_t max_pattern_len = 8;
+u_int16_t min_pattern_len               = 4;
+u_int16_t max_pattern_len               = 8;
 
 /* *********************************************************** */
 
@@ -861,7 +861,7 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
   flow.src_ip = iph->saddr, flow.dst_ip = iph->daddr;
   flow.src_port = htons(*sport), flow.dst_port = htons(*dport);
   flow.hashval = hashval = flow.protocol + ntohl(flow.src_ip) + ntohl(flow.dst_ip) 
-	  + ntohs(flow.src_port) + ntohs(flow.dst_port);
+    + ntohs(flow.src_port) + ntohs(flow.dst_port);
 
 #if 0
   {

@@ -41,7 +41,7 @@ endif
 BUILD_MINGW    		 = @BUILD_MINGW@
 
 ifeq ($(OS),Darwin)
-CC=clang
+CC=clang -fno-color-diagnostics
 SONAME_FLAG=
 else
 ifneq ($(BUILD_MINGW),)

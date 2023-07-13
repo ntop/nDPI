@@ -1897,6 +1897,12 @@ struct ndpi_hll {
   u_int8_t *registers;
 };
 
+struct ndpi_cm_sketch {
+  u_int16_t num_hashes;       /* depth: Number of hash tables   */
+  u_int32_t num_hash_buckets; /* Number pf nuckets of each hash */
+  u_int32_t *tables;
+};
+
 /* **************************************** */
 
 enum ndpi_bin_family {
