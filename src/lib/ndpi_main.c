@@ -4316,7 +4316,8 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
     char *line = buffer;
     int line_len = buffer_len;
 
-    while((line = fgets(line, line_len, fd)) != NULL && line[strlen(line) - 1] != '\n') {
+    while(((line = fgets(line, line_len, fd)) != NULL)
+	  && (line[strlen(line) - 1] != '\n')) {
       i = strlen(line);
       old_buffer = buffer;
       old_buffer_len = buffer_len;
@@ -4332,7 +4333,7 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
 
       line = &buffer[i];
       line_len = chunk_len;
-    }
+    } /* while */
 
     if(!line) /* safety check */
       break;
@@ -4340,8 +4341,18 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
     i = strlen(buffer);
     if((i <= 1) || (buffer[0] == '#'))
       continue;
-    else
+    else {
       buffer[i - 1] = '\0';
+      i--;
+
+      if((i > 0) && (buffer[i-1] == '\r'))
+	buffer[i - 1] = '\0';
+
+      if(buffer[0] == '\0')
+	continue;
+    }
+
+    /* printf("Processing: \"%s\"\n", buffer); */
 
     if(ndpi_handle_rule(ndpi_str, buffer, 1) != 0)
       NDPI_LOG_INFO(ndpi_str, "Discraded rule '%s'\n", buffer);
@@ -6099,15 +6110,15 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_detection_module_struct *ndpi_str,
 						struct ndpi_flow_struct *flow,
 						u_int16_t sport, u_int16_t dport) {
-  
+
   /*
     https://extremeportal.force.com/ExtrArticleDetail?an=000101782
-    
+
     Audio:   UDP 50000-50019; 3478; 3479
     Video:   UDP 50020-50039; 3480
 	Sharing: UDP 50040-50059; 3481
   */
-  
+
   if((dport == 3478) || (dport == 3479) || ((sport >= 50000) && (sport <= 50019)))
     flow->flow_multimedia_type = ndpi_multimedia_audio_flow;
   else if((dport == 3480) || ((sport >= 50020) && (sport <= 50039)))
@@ -6118,7 +6129,7 @@ static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_detection_module_str
     flow->flow_multimedia_type = ndpi_multimedia_unknown_flow;
     return(0);
   }
-  
+
   return(1);
 }
 
