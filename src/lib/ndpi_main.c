@@ -6079,7 +6079,6 @@ static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_cl
 static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi_str,
 				       struct ndpi_flow_struct *flow,
 				       u_int16_t master) {
-
   /* This function can NOT access &ndpi_str->packet since it is called also from ndpi_detection_giveup(), via ndpi_reconcile_protocols() */
 
   if(flow->l4_proto == IPPROTO_UDP) {
@@ -6159,6 +6158,12 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   // printf("====>> %u.%u [%u]\n", ret->master_protocol, ret->app_protocol, flow->detected_protocol_stack[0]);
 
+  if((flow->risk != 0) && (flow->risk != flow->risk_shadow)) {
+    /* Trick to avoid evaluating exceptions when nothing changed */
+    ndpi_handle_risk_exceptions(ndpi_str, flow);
+    flow->risk_shadow = flow->risk;
+  }
+  
   switch(ret->app_protocol) {
   case NDPI_PROTOCOL_MICROSOFT_AZURE:
     ndpi_reconcile_msteams_udp(ndpi_str, flow, flow->detected_protocol_stack[1]);

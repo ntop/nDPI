@@ -1432,7 +1432,7 @@ struct ndpi_flow_struct {
   u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
   u_int8_t risk_checked:1, ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, tree_risk_checked:1, _notused:4;
   ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
-  ndpi_risk risk; /* Issues found with this flow [bitmask of ndpi_risk] */
+  ndpi_risk risk, risk_shadow; /* Issues found with this flow [bitmask of ndpi_risk] */
   struct ndpi_risk_information risk_infos[MAX_NUM_RISK_INFOS]; /* String that contains information about the risks found */
   u_int8_t num_risk_infos;
   

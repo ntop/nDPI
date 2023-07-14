@@ -1082,6 +1082,8 @@ extern "C" {
   void ndpi_set_tls_cert_expire_days(struct ndpi_detection_module_struct *ndpi_str,
 				     u_int8_t days);
 
+  void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
+				   struct ndpi_flow_struct *flow);
 
   /* Utility functions to set ndpi malloc/free/print wrappers */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
