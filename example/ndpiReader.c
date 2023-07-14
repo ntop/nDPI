@@ -269,32 +269,36 @@ FILE *trace = NULL;
 
 #define NUM_DOH_BINS 2
 
-struct ndpi_bin doh_ndpi_bins[NUM_DOH_BINS];
+static struct ndpi_bin doh_ndpi_bins[NUM_DOH_BINS];
 
-u_int8_t doh_centroids[NUM_DOH_BINS][PLEN_NUM_BINS] = {
+static u_int8_t doh_centroids[NUM_DOH_BINS][PLEN_NUM_BINS] = {
   { 23,25,3,0,26,0,0,0,0,0,0,0,0,0,2,0,0,15,3,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
   { 35,30,21,0,0,0,2,4,0,0,5,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
 };
 
-float doh_max_distance = 35.5;
+static float doh_max_distance = 35.5;
 
-void init_doh_bins() {
+static void init_doh_bins() {
   u_int i;
 
   for(i=0; i<NUM_DOH_BINS; i++) {
     ndpi_init_bin(&doh_ndpi_bins[i], ndpi_bin_family8, PLEN_NUM_BINS);
+    ndpi_free_bin(&doh_ndpi_bins[i]); /* Hack: we use static bins (see below), so we need to free the dynamic ones just allocated */
     doh_ndpi_bins[i].u.bins8 = doh_centroids[i];
   }
 }
 
 /* *********************************************** */
 
-u_int check_bin_doh_similarity(struct ndpi_bin *bin, float *similarity) {
+static u_int check_bin_doh_similarity(struct ndpi_bin *bin, float *similarity) {
   u_int i;
   float lowest_similarity = 9999999999.0f;
 
   for(i=0; i<NUM_DOH_BINS; i++) {
     *similarity = ndpi_bin_similarity(&doh_ndpi_bins[i], bin, 0, 0);
+
+    if(*similarity < 0) /* Error */
+      return(0);
 
     if(*similarity <= doh_max_distance)
       return(1);
@@ -3402,7 +3406,7 @@ static void printFlowsStats() {
 
           ndpi_cluster_bins(bins, num_flow_bins, num_bin_clusters, cluster_ids, centroids);
 
-          printf("\n"
+          fprintf(out, "\n"
                  "\tBin clusters\n"
                  "\t------------\n");
 
@@ -3416,23 +3420,23 @@ static void printFlowsStats() {
               if(cluster_ids[i] != j) continue;
 
               if(num_printed == 0) {
-                printf("\tCluster %u [", j);
+                fprintf(out, "\tCluster %u [", j);
                 print_bin(out, NULL, &centroids[j]);
-                printf("]\n");
+                fprintf(out, "]\n");
               }
 
-              printf("\t%u\t%-10s\t%s:%u <-> %s:%u\t[",
-                     i,
-                     ndpi_protocol2name(ndpi_thread_info[0].workflow->ndpi_struct,
-                                        all_flows[i].flow->detected_protocol, buf, sizeof(buf)),
-                     all_flows[i].flow->src_name,
-                     ntohs(all_flows[i].flow->src_port),
-                     all_flows[i].flow->dst_name,
-                     ntohs(all_flows[i].flow->dst_port));
+              fprintf(out, "\t%u\t%-10s\t%s:%u <-> %s:%u\t[",
+                      i,
+                      ndpi_protocol2name(ndpi_thread_info[0].workflow->ndpi_struct,
+                                         all_flows[i].flow->detected_protocol, buf, sizeof(buf)),
+                      all_flows[i].flow->src_name,
+                      ntohs(all_flows[i].flow->src_port),
+                      all_flows[i].flow->dst_name,
+                      ntohs(all_flows[i].flow->dst_port));
 
               print_bin(out, NULL, &bins[i]);
-              printf("][similarity: %f]",
-                     (similarity = ndpi_bin_similarity(&centroids[j], &bins[i], 0, 0)));
+              fprintf(out, "][similarity: %f]",
+                      (similarity = ndpi_bin_similarity(&centroids[j], &bins[i], 0, 0)));
 
               if(all_flows[i].flow->host_server_name[0] != '\0')
                 fprintf(out, "[%s]", all_flows[i].flow->host_server_name);
@@ -3445,23 +3449,23 @@ static void printFlowsStats() {
                    && all_flows[i].flow->ssh_tls.advertised_alpns /* ALPN */
                    ) {
                   if(check_bin_doh_similarity(&bins[i], &s))
-                    printf("[DoH (%f distance)]", s);
+                    fprintf(out, "[DoH (%f distance)]", s);
                   else
-                    printf("[NO DoH (%f distance)]", s);
+                    fprintf(out, "[NO DoH (%f distance)]", s);
                 } else {
                   if(all_flows[i].flow->ssh_tls.advertised_alpns == NULL)
-                    printf("[NO DoH check: missing ALPN]");
+                    fprintf(out, "[NO DoH check: missing ALPN]");
                 }
               }
 
-              printf("\n");
+              fprintf(out, "\n");
               num_printed++;
               if(similarity > max_similarity) max_similarity = similarity;
             }
 
             if(num_printed) {
-              printf("\tMax similarity: %f\n", max_similarity);
-              printf("\n");
+              fprintf(out, "\tMax similarity: %f\n", max_similarity);
+              fprintf(out, "\n");
             }
           }
 
@@ -5412,6 +5416,14 @@ int main(int argc, char **argv) {
   if(domain_to_check) {
     ndpiCheckHostStringMatch(domain_to_check);
     exit(0);
+  }
+
+  if(enable_doh_dot_detection) {
+    init_doh_bins();
+    /* Clusters are not really used in DoH/DoT detection, but because of how
+       the code has been written, we need to enable also clustering feature */
+    if(num_bin_clusters == 0)
+      num_bin_clusters = 1;
   }
 
   if(!quiet_mode) {
