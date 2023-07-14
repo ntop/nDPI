@@ -941,8 +941,9 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   for(i = 0; host_match[i].string_to_match != NULL; i++)
     ndpi_init_protocol_match(ndpi_str, &host_match[i]);
 
-  for(i = 0; ndpi_protocol_gambling_hostname_list[i].string_to_match != NULL; i++)
-    ndpi_init_protocol_match(ndpi_str, &ndpi_protocol_gambling_hostname_list[i]);
+  if(ndpi_str->enable_load_gambling_list)
+    for(i = 0; ndpi_protocol_gambling_hostname_list[i].string_to_match != NULL; i++)
+      ndpi_init_protocol_match(ndpi_str, &ndpi_protocol_gambling_hostname_list[i]);
 
   /* ************************ */
 
@@ -2775,6 +2776,10 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   if(prefs & ndpi_enable_ja3_plus)
     ndpi_str->enable_ja3_plus = 1;
+
+  ndpi_str->enable_load_gambling_list = 1;
+  if(prefs & ndpi_dont_load_gambling_list)
+    ndpi_str->enable_load_gambling_list = 0;
 
   if(!(prefs & ndpi_dont_init_libgcrypt)) {
     if(!gcry_control (GCRYCTL_INITIALIZATION_FINISHED_P)) {
