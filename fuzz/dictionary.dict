@@ -7,7 +7,7 @@
 #FTP_DATA
 
 "RIFF"
-"MZ"
+"MZ\x00"
 "OggS"
 "PK\x03\x04"
 "\x00\x00\x01\xBA"
