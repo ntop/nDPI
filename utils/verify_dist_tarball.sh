@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-EXCLUDE_PATTERN="(.*\.m4$|Makefile$|Makefile\.in$|utils/verify_dist_tarball\.sh|^packages/debian/.*|^packages/debian|^test-driver|^config\.guess|^config\.sub|^compile|^configure|/|depcomp|.gitattributes|.gitignore|install-sh|ltmain.sh|missing|src/include/ndpi_config\.h\.in)$"
+EXCLUDE_PATTERN="(.*\.m4$|Makefile$|Makefile\.in$|utils/verify_dist_tarball\.sh|^packages/debian/.*|^packages/debian|^test-driver|^config\.guess|^config\.sub|^compile|^configure|/|depcomp|.gitattributes|.gitignore|install-sh|ltmain.sh|missing|src/include/ndpi_config\.h\.in|tests/pcap|tests/result)$"
 
 set -x
 set -e
