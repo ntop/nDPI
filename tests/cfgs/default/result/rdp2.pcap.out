@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	6	(3.00 pkts/flow)
-Confidence DPI              : 2 (flows)
-Num dissector calls: 261 (130.50 diss/flow)
+DPI Packets (UDP):	8	(2.67 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 373 (124.33 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -18,9 +18,10 @@ Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   0/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   4/0 (search/found)
+Patricia protocols:   6/0 (search/found)
 
-RDP	33	6343	2
+RDP	39	11371	3
 
-	1	UDP 10.50.181.210:60355 <-> 10.50.73.36:3389 [VLAN: 1108][proto: 88/RDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: RemoteAccess/12][4 pkts/1907 bytes <-> 3 pkts/1468 bytes][Goodput ratio: 90/90][0.13 sec][bytes ratio: 0.130 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/7 41/48 80/90 31/42][Pkt Len c2s/s2c min/avg/max/stddev: 199/64 477/489 1278/1278 463/558][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][PLAIN TEXT (drcsalgfc)][Plen Bins: 14,0,14,0,28,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,0,0,0,0,0,0,0,0,0]
-	2	UDP 10.8.37.100:51652 <-> 10.100.2.87:3389 [VLAN: 1308][proto: 88/RDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RemoteAccess/12][12 pkts/1418 bytes <-> 14 pkts/1550 bytes][Goodput ratio: 60/58][0.73 sec][bytes ratio: -0.044 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 80/65 428/261 140/94][Pkt Len c2s/s2c min/avg/max/stddev: 64/60 118/111 384/148 82/26][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][Plen Bins: 19,46,19,11,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.122.181:54759 <-> 192.168.122.2:3389 [proto: 88/RDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: RemoteAccess/12][4 pkts/2694 bytes <-> 2 pkts/2334 bytes][Goodput ratio: 94/96][1.76 sec][bytes ratio: 0.072 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/1649 550/1649 1011/1649 418/0][Pkt Len c2s/s2c min/avg/max/stddev: 184/1060 674/1167 1274/1274 494/107][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][PLAIN TEXT (OKBI.HARDENING.COM)][Plen Bins: 0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.50.181.210:60355 <-> 10.50.73.36:3389 [VLAN: 1108][proto: 88/RDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: RemoteAccess/12][4 pkts/1907 bytes <-> 3 pkts/1468 bytes][Goodput ratio: 90/90][0.13 sec][bytes ratio: 0.130 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/7 41/48 80/90 31/42][Pkt Len c2s/s2c min/avg/max/stddev: 199/64 477/489 1278/1278 463/558][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][PLAIN TEXT (drcsalgfc)][Plen Bins: 14,0,14,0,28,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,0,0,0,0,0,0,0,0,0]
+	3	UDP 10.8.37.100:51652 <-> 10.100.2.87:3389 [VLAN: 1308][proto: 88/RDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RemoteAccess/12][12 pkts/1418 bytes <-> 14 pkts/1550 bytes][Goodput ratio: 60/58][0.73 sec][bytes ratio: -0.044 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 80/65 428/261 140/94][Pkt Len c2s/s2c min/avg/max/stddev: 64/60 118/111 384/148 82/26][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][Plen Bins: 19,46,19,11,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

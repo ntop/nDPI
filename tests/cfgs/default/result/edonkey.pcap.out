@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	2	(2.00 pkts/flow)
+DPI Packets (TCP):	5	(5.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 112 (112.00 diss/flow)
+Num dissector calls: 120 (120.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -17,9 +17,9 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   0/0 (search/found)
-Patricia risk:        0/0 (search/found)
+Patricia risk:        2/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 
-RDP	6	5028	1
+eDonkey	17	2016	1
 
-	1	UDP 192.168.122.181:54759 <-> 192.168.122.2:3389 [proto: 88/RDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: RemoteAccess/12][4 pkts/2694 bytes <-> 2 pkts/2334 bytes][Goodput ratio: 94/96][1.76 sec][bytes ratio: 0.072 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/1649 550/1649 1011/1649 418/0][Pkt Len c2s/s2c min/avg/max/stddev: 184/1060 674/1167 1274/1274 494/107][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][PLAIN TEXT (OKBI.HARDENING.COM)][Plen Bins: 0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0]
+	1	TCP 201.15.177.227:1754 <-> 135.192.214.240:7551 [proto: 36/eDonkey][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: Download/7][6 pkts/598 bytes <-> 11 pkts/1418 bytes][Goodput ratio: 41/56][57.40 sec][bytes ratio: -0.407 (Download)][IAT c2s/s2c min/avg/max/stddev: 5/91 5347/4749 12107/12106 5400/4962][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 100/129 178/186 55/63][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (VeryCD)][Plen Bins: 0,0,0,25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

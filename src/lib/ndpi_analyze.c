@@ -1760,6 +1760,7 @@ struct ndpi_cm_sketch *ndpi_cm_sketch_init(u_int16_t num_hashes) {
 #endif
 
   if(num_hashes < 2) num_hashes = 2;
+  num_hashes = ndpi_nearest_power_of_two(num_hashes);
 
   sketch->num_hashes = num_hashes;
   sketch->num_hash_buckets = num_hashes * NDPI_COUNT_MIN_SKETCH_NUM_BUCKETS;  

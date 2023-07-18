@@ -22,6 +22,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   if (data[0] % 2 == 0)
     ndpi_dga_function = ndpi_custom_dga_fn;
+  else
+    ndpi_dga_function = NULL;
 
   name = ndpi_malloc(size + 1);
   if (name) {
