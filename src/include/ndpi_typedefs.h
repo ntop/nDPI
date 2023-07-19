@@ -1521,6 +1521,11 @@ struct ndpi_flow_struct {
         u_int16_t cipher_suite;
         char *esni;
       } encrypted_sni;
+
+      struct {
+        u_int16_t version;
+      } encrypted_ch;
+
       ndpi_cipher_weakness server_unsafe_cipher;
     } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 

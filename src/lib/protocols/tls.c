@@ -1538,7 +1538,9 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
     /* Groups */
     1035, 10794, 16696, 23130, 31354, 35466, 51914,
     /* Ciphers */
-    102, 129, 52243, 52244, 57363, 65279, 65413
+    102, 129, 52243, 52244, 57363, 65279, 65413,
+    /* ECH */
+    65037
   };
   size_t const allowed_non_iana_extensions_size = sizeof(allowed_non_iana_extensions) /
     sizeof(allowed_non_iana_extensions[0]);
@@ -2537,6 +2539,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    }
 		  }
 		}
+	      } else if(extension_id == 65037 /* ECH: latest drafts */) {
+#ifdef DEBUG_TLS
+		printf("Client TLS: ECH version 0x%x\n", extension_id;
+#endif
+		/* Beginning with draft-08, the version is the same as the code point
+		   for the "encrypted_client_hello" extension. */
+		flow->protos.tls_quic.encrypted_ch.version = extension_id;
 	      } else if(extension_id == 65445 || /* QUIC transport parameters (drafts version) */
 		        extension_id == 57) { /* QUIC transport parameters (final version) */
 		u_int16_t s_offset = offset+extension_offset;
