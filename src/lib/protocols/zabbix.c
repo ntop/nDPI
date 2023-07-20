@@ -37,13 +37,12 @@ static void ndpi_int_zabbix_add_connection(struct ndpi_detection_module_struct *
 static void ndpi_search_zabbix(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int8_t tomatch[] = { 'Z', 'B', 'X', 'D', 0x1 };
+  u_int8_t tomatch[] = { 'Z', 'B', 'X', 'D' };
 
   NDPI_LOG_DBG(ndpi_struct, "search Zabbix\n");
 
-  if(packet &&
-     (packet->payload_packet_len > 4)
-     && (memcmp(packet->payload, tomatch, 5) == 0))    
+  if((packet->payload_packet_len >= 4)
+     && (memcmp(packet->payload, tomatch, 4) == 0))
     ndpi_int_zabbix_add_connection(ndpi_struct, flow);
   else
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
