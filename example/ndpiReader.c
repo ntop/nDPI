@@ -1819,6 +1819,10 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
               ndpi_cipher2str(flow->ssh_tls.encrypted_sni.cipher_suite, unknown_cipher));
     }
 
+    if(flow->ssh_tls.encrypted_ch.version != 0) {
+      fprintf(out, "[ECH: version 0x%x]", flow->ssh_tls.encrypted_ch.version);
+    }
+
     if(flow->ssh_tls.sha1_cert_fingerprint_set) {
       fprintf(out, "[Certificate SHA-1: ");
       for(i=0; i<20; i++)

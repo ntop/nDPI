@@ -276,6 +276,10 @@ typedef struct ndpi_flow_info {
       char *esni;
     } encrypted_sni;    
 
+    struct {
+      u_int16_t version;
+    } encrypted_ch;
+
     time_t notBefore, notAfter;
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;

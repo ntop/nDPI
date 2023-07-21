@@ -1339,6 +1339,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       flow->ssh_tls.encrypted_sni.cipher_suite = flow->ndpi_flow->protos.tls_quic.encrypted_sni.cipher_suite;
     }
 
+    flow->ssh_tls.encrypted_ch.version = flow->ndpi_flow->protos.tls_quic.encrypted_ch.version;
+
     if(flow->ndpi_flow->protos.tls_quic.tls_supported_versions) {
       if((flow->ssh_tls.tls_supported_versions = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.tls_supported_versions)) != NULL)
 	correct_csv_data_field(flow->ssh_tls.tls_supported_versions);
