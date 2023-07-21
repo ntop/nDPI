@@ -46,6 +46,43 @@ static size_t raknet_dissect_ip(struct ndpi_packet_struct * const packet, size_t
   return (packet->payload[offset] == 0x04 ? 4 : 16);
 }
 
+static int is_custom_version(struct ndpi_detection_module_struct *ndpi_struct,
+                             struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  unsigned char magic[] = { 0x00, 0xFF, 0xFF, 0x00, 0xFE, 0xFE, 0xFE, 0xFE,
+                            0xFD, 0xFD, 0xFD, 0xFD, 0x12, 0x34, 0x56, 0x78 };
+
+  if (packet->payload_packet_len >= 1200) /* Full MTU packet */
+  {
+    /* Offset 32 has been found only in the traces; the other ones are present
+       also in the Raknet heuristic in Wireshark */
+    if (memcmp(magic, &packet->payload[1], sizeof(magic)) == 0 ||
+        memcmp(magic, &packet->payload[9], sizeof(magic)) == 0 ||
+        memcmp(magic, &packet->payload[17], sizeof(magic)) == 0 ||
+        memcmp(magic, &packet->payload[32], sizeof(magic)) == 0)
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static void exclude_proto(struct ndpi_detection_module_struct *ndpi_struct,
+                          struct ndpi_flow_struct *flow)
+{
+  if (flow->l4.udp.raknet_custom == 1)
+  {
+    NDPI_LOG_INFO(ndpi_struct, "found RakNet (custom version)\n");
+    /* Classify as Raknet or as Roblox?
+       This pattern ha been observed with Roblox games but it might be used by
+       other protocols too. Keep the generic classification, for the time being */
+    ndpi_int_raknet_add_connection(ndpi_struct, flow);
+  } else {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  }
+}
+
 /* Reference: https://wiki.vg/Raknet_Protocol */
 static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
                                struct ndpi_flow_struct *flow)
@@ -55,9 +92,23 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "search RakNet\n");
 
-  if (packet->udp == NULL || packet->payload_packet_len < 7)
+  /* There are two "versions" of Raknet:
+     * plaintext one: we need multiple packets for classification and for extracting metadata
+     * custom/encrypted one: an extension used by Roblox games (and others?).
+       Only the first pkt is required.
+     The main issue is that these two versions "overlap", i.e. some plaintext flows might be wrongly
+     identified as encrypted one (losing their metadata).
+     Solution: check for the custoom/encrypted version, cache the result and use it only if/when the
+     standard detection ends.
+  */
+  if (flow->packet_counter == 1)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    flow->l4.udp.raknet_custom = is_custom_version(ndpi_struct, flow);
+  }
+
+  if (packet->payload_packet_len < 7)
+  {
+    exclude_proto(ndpi_struct, flow);
     return;
   }
 
@@ -68,7 +119,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x00: /* Connected Ping */
       if (packet->payload_packet_len != 8)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
       required_packets = 6;
@@ -78,7 +129,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x02: /* Unconnected Ping */
       if (packet->payload_packet_len != 32)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
       required_packets = 6;
@@ -87,7 +138,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x03: /* Connected Pong */
       if (packet->payload_packet_len != 16)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
       required_packets = 6;
@@ -97,7 +148,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
       if (packet->payload_packet_len < 18 ||
           packet->payload[17] > 10 /* maximum supported protocol version */)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
       required_packets = 6;
@@ -107,7 +158,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
       if (packet->payload_packet_len != 28 ||
           packet->payload[25] > 0x01 /* connection uses encryption: bool -> 0x00 or 0x01 */)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
 
@@ -115,7 +166,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
         u_int16_t mtu_size = ntohs(get_u_int16_t(packet->payload, 26));
         if (mtu_size > 1500 /* Max. supported MTU, see: http://www.jenkinssoftware.com/raknet/manual/programmingtips.html */)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          exclude_proto(ndpi_struct, flow);
           return;
         }
       }
@@ -128,7 +179,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
           !((ip_addr_offset == 16 && packet->payload_packet_len == 46) ||
             (ip_addr_offset == 4 && packet->payload_packet_len == 34)))
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
 
@@ -136,7 +187,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
           u_int16_t mtu_size = ntohs(get_u_int16_t(packet->payload, 20 + ip_addr_offset));
           if (mtu_size > 1500 /* Max. supported MTU, see: http://www.jenkinssoftware.com/raknet/manual/programmingtips.html */)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            exclude_proto(ndpi_struct, flow);
             return;
           }
       }
@@ -148,7 +199,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
           !((ip_addr_offset == 16 && packet->payload_packet_len == 47) ||
             (ip_addr_offset == 4 && packet->payload_packet_len == 35)))
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
 
@@ -156,7 +207,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
           u_int16_t mtu_size = ntohs(get_u_int16_t(packet->payload, 28 + ip_addr_offset));
           if (mtu_size > 1500 /* Max. supported MTU, see: http://www.jenkinssoftware.com/raknet/manual/programmingtips.html */)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            exclude_proto(ndpi_struct, flow);
             return;
           }
       }
@@ -179,7 +230,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
         ip_addr_offset += 16;
         if (ip_addr_offset != packet->payload_packet_len)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          exclude_proto(ndpi_struct, flow);
           return;
         }
       }
@@ -207,7 +258,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
           u_int8_t msg_flags = get_u_int8_t(packet->payload, frame_offset);
           if ((msg_flags & 0x0F) != 0)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            exclude_proto(ndpi_struct, flow);
             return;
           }
 
@@ -215,7 +266,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
           msg_size /= 8;
           if (msg_size == 0)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            exclude_proto(ndpi_struct, flow);
             break;
           }
 
@@ -245,7 +296,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
         {
           ndpi_int_raknet_add_connection(ndpi_struct, flow);
         } else {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          exclude_proto(ndpi_struct, flow);
         }
         return;
       }
@@ -254,7 +305,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x09: /* Connection Request */
       if (packet->payload_packet_len != 16)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
       required_packets = 6;
@@ -268,7 +319,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
       if (packet->payload_packet_len != 25 ||
           packet->payload[17] > 10)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
       break;
@@ -276,7 +327,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x1c: /* Unconnected Pong */
       if (packet->payload_packet_len < 35)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        exclude_proto(ndpi_struct, flow);
         return;
       }
 
@@ -285,7 +336,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
 
         if (motd_len == 0 || motd_len + 35 != packet->payload_packet_len)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          exclude_proto(ndpi_struct, flow);
           return;
         }
       }
@@ -305,7 +356,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
           {
             record_offset += 4;
           } else {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            exclude_proto(ndpi_struct, flow);
             return;
           }
         } while (++record_index < record_count &&
@@ -315,7 +366,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
         {
           ndpi_int_raknet_add_connection(ndpi_struct, flow);
         } else {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          exclude_proto(ndpi_struct, flow);
         }
         return;
       }
@@ -326,7 +377,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
       break;
 
     default: /* Invalid RakNet packet */
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      exclude_proto(ndpi_struct, flow);
       return;
   }
 

@@ -202,6 +202,11 @@ DEST=../src/lib/inc_generated/ndpi_asn_nvidia.c.inc
 create_list NDPI_PROTOCOL_NVIDIA $DEST "" "AS60977" "AS50889" "AS20347" "AS11414"
 echo "(3) Nvidia IPs are available in $DEST"
 
+echo "(1) Downloading Roblox..."
+DEST=../src/lib/inc_generated/ndpi_asn_roblox.c.inc
+create_list NDPI_PROTOCOL_ROBLOX $DEST "" "AS22697"
+echo "(3) Roblox IPs are available in $DEST"
+
 if [ ${TOTAL_ASN} -eq 0 -o ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1

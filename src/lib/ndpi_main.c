@@ -110,6 +110,7 @@
 #include "inc_generated/ndpi_asn_hulu.c.inc"
 #include "inc_generated/ndpi_asn_epicgames.c.inc"
 #include "inc_generated/ndpi_asn_nvidia.c.inc"
+#include "inc_generated/ndpi_asn_roblox.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -2108,6 +2109,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Thrift", NDPI_PROTOCOL_CATEGORY_RPC,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ROBLOX,
+			  "Roblox", NDPI_PROTOCOL_CATEGORY_GAME,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
@@ -2874,6 +2879,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_hulu_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_epicgames_protocol_list);
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_nvidia_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_roblox_protocol_list);
     }
 
     if(prefs & ndpi_track_flow_payload)

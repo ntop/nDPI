@@ -1396,6 +1396,9 @@ static ndpi_protocol_match host_match[] =
    { "proton.me",                        "ProtonVPN", NDPI_PROTOCOL_PROTONVPN, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "protonvpn.com",                    "ProtonVPN", NDPI_PROTOCOL_PROTONVPN, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "roblox.com",                       "Roblox", NDPI_PROTOCOL_ROBLOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "rbxcdn.com",                       "Roblox", NDPI_PROTOCOL_ROBLOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
    /*
       ADS/tracking/analytic
     */
