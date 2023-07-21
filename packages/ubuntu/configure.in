@@ -35,6 +35,12 @@ if test ".${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = ".yes" &&
       GEOIP_DEP=", libmaxminddb0"
 fi
 
+if test -f /usr/bin/debsigs; then
+  SIGN_CMD="/usr/bin/debsigs"
+else
+  SIGN_CMD="dpkg-sig"
+fi
+
 AC_CONFIG_FILES([Makefile debian/changelog debian/files debian/control])
 
 AC_SUBST(NDPI_VERS)
@@ -45,5 +51,6 @@ AC_SUBST(DATE)
 AC_SUBST(KERNEL)
 AC_SUBST(GIT_REVISION)
 AC_SUBST(MAJOR_RELEASE)
+AC_SUBST(SIGN_CMD)
 
 AC_OUTPUT
