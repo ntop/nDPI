@@ -167,14 +167,36 @@ extern "C" {
 					  u_int16_t port /* network byte order */);
 
   /**
-   * Init single protocol match
+   * Creates a protocol match that does not contain any hostnames.
+   *
+   * @par hostname_list      = the desired hostname list form which the first entry is used to create the match
+   * @par empty_app_protocol = the resulting protocol match that does contain all information except the hostname
+   *
+   * @return 0 on success, 1 otherwise
+   */
+  int ndpi_init_empty_app_protocol(ndpi_protocol_match const * const hostname_list,
+                                   ndpi_protocol_match * const empty_app_protocol);
+
+  /**
+   * Init single protocol match.
+   *
+   * @par ndpi_mod  = the struct created for the protocol detection
+   * @par match     = the struct passed to match the protocol
+   *
+   * @return 0 on success, 1 otherwise
+   */
+  int ndpi_init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
+                             ndpi_protocol_match const * const match);
+
+  /**
+   * Init single protocol match and adds it to the Aho-Corasick automata.
    *
    * @par ndpi_mod  = the struct created for the protocol detection
    * @par match     = the struct passed to match the protocol
    *
    */
   void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
-				ndpi_protocol_match *match);
+                                ndpi_protocol_match const * const match);
 
   /**
    * Returns a new initialized detection module
