@@ -840,39 +840,63 @@ static int ndpi_remove_host_url_subprotocol(struct ndpi_detection_module_struct 
 
 /* ******************************************************************** */
 
-void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str,
-			      ndpi_protocol_match *match) {
+int ndpi_init_empty_app_protocol(ndpi_protocol_match const * const hostname_list,
+                                 ndpi_protocol_match * const empty_app_protocol) {
+  if (hostname_list[0].proto_name == NULL)
+    return 1;
+
+  memset(empty_app_protocol, 0, sizeof(*empty_app_protocol));
+  empty_app_protocol->proto_name = hostname_list[0].proto_name;
+  empty_app_protocol->protocol_id = hostname_list[0].protocol_id;
+  empty_app_protocol->protocol_category = hostname_list[0].protocol_category;
+  empty_app_protocol->protocol_breed = hostname_list[0].protocol_breed;
+  empty_app_protocol->level = hostname_list[0].level;
+
+  return 0;
+}
+
+int ndpi_init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
+                           ndpi_protocol_match const * const match) {
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
 
   if(ndpi_str->proto_defaults[match->protocol_id].protoName == NULL) {
     ndpi_str->proto_defaults[match->protocol_id].protoName = ndpi_strdup(match->proto_name);
     if(!ndpi_str->proto_defaults[match->protocol_id].protoName)
-      return;
+      return 1;
     ndpi_str->proto_defaults[match->protocol_id].isAppProtocol = 1;
     ndpi_str->proto_defaults[match->protocol_id].protoId = match->protocol_id;
     ndpi_str->proto_defaults[match->protocol_id].protoCategory = match->protocol_category;
     ndpi_str->proto_defaults[match->protocol_id].protoBreed = match->protocol_breed;
 
     ndpi_set_proto_defaults(ndpi_str,
-			    ndpi_str->proto_defaults[match->protocol_id].isClearTextProto,
-			    ndpi_str->proto_defaults[match->protocol_id].isAppProtocol,
-			    ndpi_str->proto_defaults[match->protocol_id].protoBreed,
-			    ndpi_str->proto_defaults[match->protocol_id].protoId,
-			    ndpi_str->proto_defaults[match->protocol_id].protoName,
-			    ndpi_str->proto_defaults[match->protocol_id].protoCategory,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+                ndpi_str->proto_defaults[match->protocol_id].isClearTextProto,
+                ndpi_str->proto_defaults[match->protocol_id].isAppProtocol,
+                ndpi_str->proto_defaults[match->protocol_id].protoBreed,
+                ndpi_str->proto_defaults[match->protocol_id].protoId,
+                ndpi_str->proto_defaults[match->protocol_id].protoName,
+                ndpi_str->proto_defaults[match->protocol_id].protoCategory,
+                ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   }
 
   if(!is_proto_enabled(ndpi_str, match->protocol_id)) {
     NDPI_LOG_DBG(ndpi_str, "[NDPI] Skip protocol match for %s/protoId=%d: disabled\n",
-		 match->string_to_match, match->protocol_id);
-    return;
+         match->string_to_match, match->protocol_id);
+    return 1;
   }
 
-  ndpi_add_host_url_subprotocol(ndpi_str, match->string_to_match,
+  return 0;
+}
+
+/* ******************************************************************** */
+
+void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str,
+                              ndpi_protocol_match const * const match) {
+	if (ndpi_init_app_protocol(ndpi_str, match) == 0) {
+		ndpi_add_host_url_subprotocol(ndpi_str, match->string_to_match,
 				match->protocol_id, match->protocol_category,
 				match->protocol_breed, match->level);
+	}
 }
 
 /* ******************************************************************** */
@@ -945,6 +969,14 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   if(ndpi_str->enable_load_gambling_list)
     for(i = 0; ndpi_protocol_gambling_hostname_list[i].string_to_match != NULL; i++)
       ndpi_init_protocol_match(ndpi_str, &ndpi_protocol_gambling_hostname_list[i]);
+  else {
+    ndpi_protocol_match gambling_match;
+    if (ndpi_init_empty_app_protocol(ndpi_protocol_gambling_hostname_list, &gambling_match) != 0 ||
+        ndpi_init_app_protocol(ndpi_str, &gambling_match) != 0) {
+      NDPI_LOG_ERR(ndpi_str,
+        "[NDPI] INTERNAL ERROR could not initialize empty gambling app protocol\n");
+    }
+  }
 
   /* ************************ */
 
