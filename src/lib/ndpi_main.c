@@ -6595,7 +6595,7 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
   if(!ndpi_str->custom_categories.ipAddresses_shadow)
     return(-1);
 
-  strncpy(ipbuf, ip_address_and_mask, sizeof(ipbuf));
+  strncpy(ipbuf, ip_address_and_mask, sizeof(ipbuf) - 1);
   ipbuf[sizeof(ipbuf) - 1] = '\0';
 
   ptr = strrchr(ipbuf, '/');
