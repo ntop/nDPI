@@ -1831,3 +1831,42 @@ void ndpi_cm_sketch_destroy(struct ndpi_cm_sketch *sketch) {
   ndpi_free(sketch->tables);
   ndpi_free(sketch);
 }
+
+/* ********************************************************************************* */
+/* ********************************************************************************* */
+
+/* Popcount, short for "population count," is a computer programming term that refers to
+   the number of set bits (bits with a value of 1) in a binary representation of a given
+   data word or integer. In other words, it is the count of all the 1s present in the
+   binary representation of a number.
+   For example, consider the number 45, which is represented in binary as 101101.
+   The popcount of 45 would be 4 because there are four 1s in its binary representation.
+*/
+
+int ndpi_popcount_init(struct ndpi_popcount *h)
+{
+  if(h) {
+    memset(h, '\0', sizeof(*h));
+    return 0;
+  }
+  return -1;
+}
+
+/* ********************************************************************************* */
+
+void ndpi_popcount_count(struct ndpi_popcount *h, const u_int8_t *buf, u_int32_t buf_len)
+{
+  u_int32_t i;
+
+  if(!h)
+    return;
+
+  /* Trivial alg. TODO: there are lots of better, more performant algorithms */
+
+  for(i = 0; i < buf_len / 4; i++)
+    h->pop_count += __builtin_popcount(*(u_int32_t *)(buf + i * 4));
+  for(i = 0; i < buf_len % 4; i++)
+    h->pop_count += __builtin_popcount(buf[buf_len - (buf_len % 4) + i]);
+
+  h->tot_bytes_count += buf_len;
+}

@@ -145,7 +145,8 @@ typedef enum {
   NDPI_HTTP_OBSOLETE_SERVER,
   NDPI_PERIODIC_FLOW,          /* Set in case a flow repeats at a specific pace [used by apps on top of nDPI] */
   NDPI_MINOR_ISSUES,           /* Generic packet issues (e.g. DNS with 0 TTL) */
-  NDPI_TCP_ISSUES,             /* TCP issues such as connection failed, probing or scan */
+  NDPI_TCP_ISSUES,             /* 50 */ /* TCP issues such as connection failed, probing or scan */
+  NDPI_FULLY_ENCRYPTED,        /* This (unknown) session is fully encrypted */
 
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
@@ -1323,6 +1324,7 @@ struct ndpi_detection_module_struct {
   u_int32_t aggressiveness_ookla;
 
   int tcp_ack_paylod_heuristic;
+  int fully_encrypted_based_on_first_pkt_heuristic;
 
   u_int16_t ndpi_to_user_proto_id[NDPI_MAX_NUM_CUSTOM_PROTOCOLS]; /* custom protocolId mapping */
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
@@ -1379,7 +1381,8 @@ struct ndpi_flow_struct {
   /* init parameter, internal used to set up timestamp,... */
   u_int16_t guessed_protocol_id, guessed_protocol_id_by_ip, guessed_category, guessed_header_category;
   u_int8_t l4_proto, protocol_id_already_guessed:1, fail_with_unknown:1,
-    init_finished:1, client_packet_direction:1, packet_direction:1, is_ipv6:1, _pad1: 2;
+    init_finished:1, client_packet_direction:1, packet_direction:1, is_ipv6:1, first_pkt_fully_encrypted:1, _pad1: 1;
+
   u_int16_t num_dissector_calls;
   ndpi_confidence_t confidence; /* ndpi_confidence_t */
 
@@ -1753,6 +1756,11 @@ typedef enum {
     ndpi_dont_load_crawlers_list = (1 << 18),
     ndpi_dont_load_protonvpn_list = (1 << 19),
     ndpi_dont_load_gambling_list = (1 << 20),
+    /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
+       the payload is encrypted in an attempt to “look like nothing”.
+       This heuristic only analyzes the first packet of the flow.
+       See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
+    ndpi_disable_fully_encrypted_heuristic = (1 << 21),
   } ndpi_prefs;
 
 typedef struct {
@@ -1910,6 +1918,11 @@ struct ndpi_cm_sketch {
   u_int16_t num_hashes;       /* depth: Number of hash tables   */
   u_int32_t num_hash_buckets; /* Number pf nuckets of each hash */
   u_int32_t *tables;
+};
+
+struct ndpi_popcount {
+  u_int64_t pop_count;       /* Number of bits set to 1 found so far */
+  u_int64_t tot_bytes_count; /* Total number of bytes processed so far */
 };
 
 /* **************************************** */
