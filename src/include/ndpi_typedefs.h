@@ -1761,6 +1761,7 @@ typedef enum {
        This heuristic only analyzes the first packet of the flow.
        See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
     ndpi_disable_fully_encrypted_heuristic = (1 << 21),
+    ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 22),
   } ndpi_prefs;
 
 typedef struct {
