@@ -2561,6 +2561,98 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 }
 #endif
 
+/**
+ * @brief From IPPROTO to string NAME
+ */
+static char* ipProto2Name(u_int16_t proto_id) {
+  static char proto[8];
+
+  switch(proto_id) {
+  case IPPROTO_TCP:
+    return("TCP");
+    break;
+  case IPPROTO_UDP:
+    return("UDP");
+    break;
+  case IPPROTO_ICMP:
+    return("ICMP");
+    break;
+  case IPPROTO_ICMPV6:
+    return("ICMPV6");
+    break;
+  case 112:
+    return("VRRP");
+    break;
+  case IPPROTO_IGMP:
+    return("IGMP");
+    break;
+  }
+
+  snprintf(proto, sizeof(proto), "%u", proto_id);
+  return(proto);
+}
+
+void dump_packet(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow)
+{
+	struct stat sb;
+	
+	/* dump packet into a file
+	*/
+	char srcip[64], dstip[64];
+	char app_name[64];
+	char dir[128], tmpdir[128], cmd[256], ueip_str[64], timestamp[64], stime[30], date[64];
+	struct tm tm;
+	uint32_t ueip;
+	u_int8_t is_main_proto = 0;
+	char completedfile[256], tmpfile[256];
+	int res;
+	//char	szquery[512];
+
+	time_t firsttime, now;
+	firsttime = flow->first_seen_ms / TICK_RESOLUTION;
+	localtime_r(&firsttime, &tm);
+	
+	strftime(stime, sizeof(stime), "%T", &tm );
+	snprintf(date, sizeof(date), "%d.%d.%d %s", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, stime);
+
+	now = time(NULL);
+	
+	if (flow->ip_version==4) {
+		inet_ntop(AF_INET, &flow->src_ip, srcip, sizeof(srcip));
+		inet_ntop(AF_INET, &flow->dst_ip, dstip, sizeof(dstip));
+	}
+	else {
+		sprintf(srcip, "[%s]", flow->src_name);
+		sprintf(dstip, "[%s]", flow->dst_name);
+		return;
+	}
+	ndpi_protocol2name(workflow->ndpi_struct, flow->detected_protocol, app_name, sizeof(app_name));
+
+	if (flow->detected_protocol.app_protocol==NDPI_PROTOCOL_HTTP || flow->detected_protocol.master_protocol==NDPI_PROTOCOL_HTTP) {
+	  printf("--> [%s] %s:%d <--> %s:%d %s url=%s, content-type=%s, user-agent=%s, resp-code=%d\n", ipProto2Name(flow->protocol),
+	  srcip, ntohs(flow->src_port), dstip, ntohs(flow->dst_port),
+	  app_name, flow->http.url, flow->http.content_type, flow->http.user_agent, flow->http.response_status_code);
+	}
+	else {
+	  printf("--> [%s] %s:%d <--> %s:%d app=%s <%s> \n", ipProto2Name(flow->protocol),
+	  srcip, ntohs(flow->src_port), dstip, ntohs(flow->dst_port), 
+	  app_name, flow->human_readeable_string_buffer);
+	}
+	
+}
+
+/**
+ * @brief On Protocol Discover - demo callback
+ */
+static void on_protocol_discovered(struct ndpi_workflow * workflow,
+				   struct ndpi_flow_info * flow,
+				   void * udata) {
+	
+	dump_packet(workflow, flow);
+
+  ;
+}
+
 /* *********************************************** */
 
 /**
@@ -2589,6 +2681,14 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
       exit(-1);
   }
 
+   /* Preferences */
+  ndpi_workflow_set_flow_detected_callback(ndpi_thread_info[thread_id].workflow,
+					   on_protocol_discovered,
+					   (void *)(uintptr_t)thread_id);
+  ndpi_workflow_set_flow_giveup_callback(ndpi_thread_info[thread_id].workflow,
+					   on_protocol_discovered,
+					   (void *)(uintptr_t)(thread_id+1000));
+  
   ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &enabled_bitmask);
 
   // clear memory for results

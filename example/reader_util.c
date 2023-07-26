@@ -1412,6 +1412,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->flow_payload = flow->ndpi_flow->flow_payload, flow->flow_payload_len = flow->ndpi_flow->flow_payload_len;
     flow->ndpi_flow->flow_payload = NULL; /* We'll free the memory */
 
+	if(is_ndpi_proto(flow, NDPI_PROTOCOL_UNKNOWN)) {
+      if(workflow->__flow_giveup_callback != NULL)
+	    workflow->__flow_giveup_callback(workflow, flow, workflow->__flow_giveup_udata);
+    } else {
+      if(workflow->__flow_detected_callback != NULL)
+	    workflow->__flow_detected_callback(workflow, flow, workflow->__flow_detected_udata);
+    }
+	
     ndpi_free_flow_info_half(flow);
   }
 }
