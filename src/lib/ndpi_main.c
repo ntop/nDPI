@@ -186,6 +186,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_PERIODIC_FLOW,                         NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE,  NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_MINOR_ISSUES,                          NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE,  NDPI_BOTH_ACCOUNTABLE   },
   { NDPI_TCP_ISSUES,                            NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
+  { NDPI_FULLY_ENCRYPTED,                       NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY   }
@@ -3062,6 +3063,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   if(prefs & ndpi_enable_tcp_ack_payload_heuristic)
     ndpi_str->tcp_ack_paylod_heuristic = 1;
 
+  if(!(prefs & ndpi_disable_fully_encrypted_heuristic))
+    ndpi_str->fully_encrypted_based_on_first_pkt_heuristic = 1;
+
   for(i = 0; i < NUM_CUSTOM_CATEGORIES; i++)
     ndpi_snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
 	     (unsigned int) (i + 1));
@@ -5655,6 +5659,60 @@ static u_int8_t ndpi_is_multi_or_broadcast(struct ndpi_packet_struct *packet) {
 
 /* ************************************************ */
 
+static int fully_enc_heuristic(struct ndpi_detection_module_struct *ndpi_str,
+                               struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_str->packet;
+  struct ndpi_popcount popcount;
+  float ratio;
+  unsigned int i, len, cnt, cnt_consecutives = 0;
+
+  if(flow->l4_proto == IPPROTO_TCP &&
+     ndpi_seen_flow_beginning(flow)) {
+    /* See original paper, Algorithm 1, for the reference numbers */
+
+    /* Ex1 */
+    ndpi_popcount_init(&popcount);
+    ndpi_popcount_count(&popcount, packet->payload, packet->payload_packet_len);
+    ratio = (float)popcount.pop_count / (float)popcount.tot_bytes_count;
+    if(ratio <= 3.4 || ratio >= 4.6) {
+      return 0;
+    }
+
+    /* Ex2 */
+    len = ndpi_min(6, packet->payload_packet_len);
+    cnt = 0;
+    for(i = 0; i < len; i++) {
+      if(ndpi_isprint(packet->payload[i]))
+        cnt += 1;
+    }
+    if(cnt == len) {
+      return 0;
+    }
+
+    /* Ex3 */
+    cnt = 0;
+    for(i = 0; i < packet->payload_packet_len; i++) {
+      if(ndpi_isprint(packet->payload[i])) {
+        cnt += 1;
+        cnt_consecutives += 1;
+        if(cnt_consecutives >= 20) { /* Ex4 */
+          return 0;;
+        }
+      } else {
+        cnt_consecutives = 0;
+      }
+    }
+    if((float)cnt / packet->payload_packet_len > 0.5) {
+      return 0;
+    }
+
+    return 1;
+  }
+  return 0;
+}
+
+/* ************************************************ */
+
 static int tcp_ack_padding(struct ndpi_packet_struct *packet) {
   const struct ndpi_tcphdr *tcph = packet->tcp;
   if(tcph && tcph->ack && !tcph->psh &&
@@ -6553,6 +6611,12 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     ret.app_protocol = flow->detected_protocol_stack[0];
   }
 
+  /* TODO: not sure about the best "order" among fully encrypted logic, classification by-port and classification by-ip...*/
+  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
+     flow->first_pkt_fully_encrypted == 1) {
+    ndpi_set_risk(ndpi_str, flow, NDPI_FULLY_ENCRYPTED, NULL);
+  }
+
   /* Classification by-port */
   if(enable_guess && ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
 
@@ -7228,6 +7292,12 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   if((ret.app_protocol == NDPI_PROTOCOL_ZOOM)
      && (flow->l4_proto == IPPROTO_TCP))
     ndpi_add_connection_as_zoom(ndpi_str, flow);
+
+  if(ndpi_str->fully_encrypted_based_on_first_pkt_heuristic &&
+     ret.app_protocol == NDPI_PROTOCOL_UNKNOWN && /* Only for unknown traffic */
+     flow->packet_counter == 1 && packet->payload_packet_len > 0) {
+   flow->first_pkt_fully_encrypted = fully_enc_heuristic(ndpi_str, flow);
+  }
 
   return(ret);
 }

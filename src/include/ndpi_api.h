@@ -1843,6 +1843,13 @@ extern "C" {
   
   /* ******************************* */
 
+  /* PopCount [count how many bits are set to 1] */
+
+  int ndpi_popcount_init(struct ndpi_popcount *h);
+  void ndpi_popcount_count(struct ndpi_popcount *h, const u_int8_t *buf, u_int32_t buf_len);
+
+  /* ******************************* */
+
   int  ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int16_t num_bins);
   void ndpi_free_bin(struct ndpi_bin *b);
   struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b);

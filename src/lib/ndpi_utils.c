@@ -2045,6 +2045,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_TCP_ISSUES:
     return("TCP Connection Issues");
 
+  case NDPI_FULLY_ENCRYPTED:
+    return("Fully encrypted flow");
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
