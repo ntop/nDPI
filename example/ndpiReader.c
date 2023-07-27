@@ -2629,7 +2629,13 @@ void dump_packet(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow)
 
 	time_t firsttime;
 	firsttime = flow->first_seen_ms / TICK_RESOLUTION;
-	localtime_r(&firsttime, &tm);
+    struct tm result;
+#ifdef WIN32
+      struct tm * tm_ptr = localtime(&firsttime);
+      result = *tm_ptr;
+#else
+      localtime_r(&firsttime, &result);
+#endif
 	
 	strftime(stime, sizeof(stime), "%T", &tm );
 	snprintf(date, sizeof(date), "%d.%d.%d %s", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, stime);
