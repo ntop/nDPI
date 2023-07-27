@@ -24,7 +24,7 @@ cut -d ',' -f 1 $TMP | grep -v ':' > $LIST
 is_file_empty "${LIST}"
 ./mergeipaddrlist.py $LIST > $LIST_MERGED
 is_file_empty "${LIST_MERGED}"
-./ipaddr2list.py $LIST_MERGED NDPI_ANONYMOUS_SUBSCRIBER > $DEST
+./ipaddr2list.py $LIST_MERGED NDPI_ANONYMOUS_SUBSCRIBER "_icloud_private_relay" > $DEST
 is_file_empty "${DEST}"
 rm -f "${TMP}" "${LIST}" "${LIST_MERGED}"
 

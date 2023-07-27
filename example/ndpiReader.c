@@ -86,6 +86,7 @@ static FILE *csv_fp                 = NULL; /**< for CSV export */
 static FILE *serialization_fp       = NULL; /**< for TLV,CSV,JSON export */
 static ndpi_serialization_format serialization_format = ndpi_serialization_format_unknown;
 static char* domain_to_check = NULL;
+static char* ip_port_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
 u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
@@ -348,6 +349,56 @@ void ndpiCheckHostStringMatch(char *testChar) {
 	   ndpi_category_get_name( ndpi_str, match.protocol_category));
   } else
     printf("Match NOT Found for string: %s\n\n", testChar );
+
+  ndpi_exit_detection_module(ndpi_str);
+}
+
+/* *********************************************** */
+
+static void ndpiCheckIPMatch(char *testChar) {
+  struct ndpi_detection_module_struct *ndpi_str;
+  u_int16_t ret = NDPI_PROTOCOL_UNKNOWN;
+  u_int16_t port = 0;
+  char *saveptr, *ip_str, *port_str;
+  struct in_addr addr;
+  char appBufStr[64];
+  ndpi_protocol detected_protocol;
+  NDPI_PROTOCOL_BITMASK all;
+
+  if(!testChar)
+    return;
+
+  ndpi_str = ndpi_init_detection_module(init_prefs);
+  NDPI_BITMASK_SET_ALL(all);
+  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
+
+  if(_protoFilePath != NULL)
+    ndpi_load_protocols_file(ndpi_str, _protoFilePath);
+
+  ndpi_finalize_initialization(ndpi_str);
+
+  ip_str = strtok_r(testChar, ":", &saveptr);
+  if(!ip_str)
+    return;
+
+  addr.s_addr = inet_addr(ip_str);
+  port_str = strtok_r(NULL, "\n", &saveptr);
+  if(port_str)
+    port = atoi(port_str);
+  ret = ndpi_network_port_ptree_match(ndpi_str, &addr, htons(port));
+
+  if(ret != NDPI_PROTOCOL_UNKNOWN) {
+    memset(&detected_protocol, 0, sizeof(ndpi_protocol));
+    detected_protocol.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, ret);
+
+    ndpi_protocol2name(ndpi_str, detected_protocol, appBufStr,
+                       sizeof(appBufStr));
+
+    printf("Match Found for IP %s, port %d -> %s (%d)\n",
+	   ip_str, port, appBufStr, detected_protocol.app_protocol);
+  } else {
+    printf("Match NOT Found for IP: %s\n", testChar);
+  }
 
   ndpi_exit_detection_module(ndpi_str);
 }
@@ -914,7 +965,7 @@ static void parseOptions(int argc, char **argv) {
     lru_cache_ttls[i] = -1; /* Use the default value */
   }
 
-  while((opt = getopt_long(argc, argv, "a:Ab:B:e:Ec:C:dDFf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:w:zZ:q0123:456:7:89:m:MT:U:",
+  while((opt = getopt_long(argc, argv, "a:Ab:B:e:Ec:C:dDFf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:X:w:zZ:q0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -1198,6 +1249,10 @@ static void parseOptions(int argc, char **argv) {
       domain_to_check = optarg;
       break;
 
+    case 'X':
+      ip_port_to_check = optarg;
+      break;
+
     case 'U':
       max_num_udp_dissected_pkts = atoi(optarg);
       if(max_num_udp_dissected_pkts < 3) max_num_udp_dissected_pkts = 3;
@@ -1264,7 +1319,7 @@ static void parseOptions(int argc, char **argv) {
     extcap_capture();
   }
 
-  if(!domain_to_check) {
+  if(!domain_to_check && !ip_port_to_check) {
     if(_pcap_file[0] == NULL)
       help(0);
 
@@ -5419,6 +5474,10 @@ int main(int argc, char **argv) {
 
   if(domain_to_check) {
     ndpiCheckHostStringMatch(domain_to_check);
+    exit(0);
+  }
+  if(ip_port_to_check) {
+    ndpiCheckIPMatch(ip_port_to_check);
     exit(0);
   }
 
