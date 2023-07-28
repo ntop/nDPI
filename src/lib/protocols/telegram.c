@@ -67,7 +67,7 @@ static void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struc
     /*
       The latest telegram protocol
       - contains a sequence of 12 consecutive 0xFF packets
-      - it uses low UDP ports in the 500 ramge
+      - it uses low UDP ports in the 500 range
      */
 
     if(packet->payload_packet_len >= 40) {
