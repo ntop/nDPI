@@ -99,3 +99,14 @@ Notes:
 The Service Location Protocol is a service discovery protocol that allows computers and other devices to find services in a local area network without prior configuration.
 
 References: `SLPv1 <https://datatracker.ietf.org/doc/html/rfc2165>`_ `SLPv2 <https://datatracker.ietf.org/doc/html/rfc2608>`_.
+
+
+.. _Proto 348:
+
+`NDPI_PROTOCOL_MULLVAD`
+========================
+Mullvad is a VPN service operated by Mullvad VPN AB, based in Sweden
+
+References: `Main site https://mullvad.net/`
+
+
