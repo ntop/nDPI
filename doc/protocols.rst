@@ -90,3 +90,13 @@ References: `Main site <https://www.roblox.com/>`_.
 Notes:
 
 - Since Roblox games use a custom version of the RakNet protocol, some Roblox flows might be classified as RakNet.
+
+
+.. _Proto 347:
+
+`NDPI_PROTOCOL_MULLVAD`
+========================
+Mullvad is a VPN service operated by Mullvad VPN AB, based in Sweden
+
+References: `Main site https://mullvad.net/`
+
