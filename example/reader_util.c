@@ -1228,6 +1228,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       /* For consistency across platforms replace :0: with :: */
       ndpi_patchIPv6Address(flow->info);
     }
+    if(flow->ndpi_flow->protos.dns.geolocation_iata_code[0] != '\0')
+      strcpy(flow->dns.geolocation_iata_code, flow->ndpi_flow->protos.dns.geolocation_iata_code);
   }
   /* MDNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_MDNS)) {

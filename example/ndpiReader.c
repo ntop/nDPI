@@ -1779,6 +1779,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->flow_extra_info[0] != '\0') fprintf(out, "[%s]", flow->flow_extra_info);
 
+    if(flow->dns.geolocation_iata_code[0] != '\0') fprintf(out, "[GeoLocation: %s]", flow->dns.geolocation_iata_code);
+
     if((flow->src2dst_packets+flow->dst2src_packets) > 5) {
       if(flow->iat_c_to_s && flow->iat_s_to_c) {
 	float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);

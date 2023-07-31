@@ -294,6 +294,10 @@ typedef struct ndpi_flow_info {
     char *username, *password;
   } telnet;
 
+  struct {
+    char geolocation_iata_code[4];
+  } dns;
+
   ndpi_multimedia_flow_type multimedia_flow_type;
   
   void *src_id, *dst_id;
