@@ -36,7 +36,7 @@ void fuzz_set_alloc_callbacks_and_seed(int seed)
 
 void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_mod)
 {
-  ndpi_init_prefs prefs = ndpi_enable_ja3_plus;
+  ndpi_init_prefs prefs = 0;
   NDPI_PROTOCOL_BITMASK all;
   NDPI_PROTOCOL_BITMASK debug_bitmask;
 

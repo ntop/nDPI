@@ -37,6 +37,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 				     2 + 1 + 4 + /* ndpi_set_detection_preferences() */
 				     1 + 3 + 1 + 3 + /* Monitoring */
 				     7 + /* Opportunistic tls */
+				     2 * 21 + /* Cfgs */
 				     2 + /* Pid */
 				     2 + /* Category */
 				     1 + /* Tunnel */
@@ -137,6 +138,51 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_protocol_aggressiveness(ndpi_info_mod, i, random_value);
     ndpi_get_protocol_aggressiveness(ndpi_info_mod, i);
   }
+
+  /* Cfgs */
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "amazonaws", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "azure", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "cachefly", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "cloudflare", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "gambling", "domain_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "google", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "googlecloud", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "microsoft", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "mining", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "mullvad", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "protonvpn", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "tor", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "tls", "ja3_plus.enable", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "tls", "metadata.sha1_fingerprint.enable", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "whatsapp", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "zoom", "ip_list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, NULL, "asn_lists.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk.anonymous_subscriber.list.protonvpn.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk.crawler_bot.list.load", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
+  /* Wrong */
+  if(fuzzed_data.ConsumeBool())
+    ndpi_set_config(ndpi_info_mod, "xxx", "xxx", std::to_string(fuzzed_data.ConsumeIntegralInRange(0,2)).c_str());
 
   ndpi_finalize_initialization(ndpi_info_mod);
 

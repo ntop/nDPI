@@ -1247,6 +1247,33 @@ typedef struct {
 } nbpf_filter;
 #endif
 
+struct ndpi_detection_module_config_struct {
+  /* IP lists */
+  char ip_list_amazonaws_enabled;
+  char ip_list_azure_enabled;
+  char ip_list_cachefly_enabled;
+  char ip_list_cloudflare_enabled;
+  char ip_list_google_enabled;
+  char ip_list_googlecloud_enabled;
+  char ip_list_microsoft_enabled;
+  char ip_list_mining_enabled;
+  char ip_list_mullvad_enabled;
+  char ip_list_protonvpn_enabled;
+  char ip_list_tor_enabled;
+  char ip_list_whatsapp_enabled;
+  char ip_list_zoom_enabled;
+
+  char asn_lists_enabled;
+
+  char risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
+  char risk_anonymous_subscriber_list_protonvpn_enabled;
+  char risk_crawler_bot_list_enabled;
+
+  /* TLS */
+  char sha1_fingerprint_enabled;
+  char ja3_plus_enabled;
+};
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
 
@@ -1325,6 +1352,8 @@ struct ndpi_detection_module_struct {
   } custom_categories;
 
   u_int8_t ip_version_limit;
+
+  struct ndpi_detection_module_config_struct cfg;
 
   /* NDPI_PROTOCOL_TINC */
   struct cache *tinc_cache;
@@ -1791,22 +1820,8 @@ typedef u_int32_t ndpi_init_prefs;
 
 typedef enum {
     ndpi_no_prefs                  = 0,
-    ndpi_dont_load_tor_list        = (1 << 0),
     ndpi_dont_init_libgcrypt       = (1 << 1),
-    ndpi_enable_ja3_plus           = (1 << 2),
-    ndpi_dont_load_azure_list      = (1 << 3),
-    ndpi_dont_load_whatsapp_list   = (1 << 4),
-    ndpi_dont_load_amazon_aws_list = (1 << 5),
-    ndpi_dont_load_ethereum_list   = (1 << 6),
-    ndpi_dont_load_zoom_list       = (1 << 7),
-    ndpi_dont_load_cloudflare_list = (1 << 8),
-    ndpi_dont_load_microsoft_list  = (1 << 9),
-    ndpi_dont_load_google_list     = (1 << 10),
-    ndpi_dont_load_google_cloud_list = (1 << 11),
-    ndpi_dont_load_asn_lists       = (1 << 12),
-    ndpi_dont_load_icloud_private_relay_list  = (1 << 13),
     ndpi_dont_init_risk_ptree      = (1 << 14),
-    ndpi_dont_load_cachefly_list   = (1 << 15),
     ndpi_track_flow_payload        = (1 << 16),
     /* In some networks, there are some anomalous TCP flows where
        the smallest ACK packets have some kind of zero padding.
@@ -1819,15 +1834,11 @@ typedef enum {
        correct detection/classification.
        See #1946 for other details */
     ndpi_enable_tcp_ack_payload_heuristic = (1 << 17),
-    ndpi_dont_load_crawlers_list = (1 << 18),
-    ndpi_dont_load_protonvpn_list = (1 << 19),
     /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
        the payload is encrypted in an attempt to “look like nothing”.
        This heuristic only analyzes the first packet of the flow.
        See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
-    ndpi_disable_fully_encrypted_heuristic = (1 << 20),
-    ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 21),
-    ndpi_dont_load_mullvad_list = (1 << 22),
+    ndpi_disable_fully_encrypted_heuristic = (1 << 21),
   } ndpi_prefs;
 
 typedef struct {

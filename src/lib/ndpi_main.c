@@ -2843,9 +2843,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
-  if(prefs & ndpi_enable_ja3_plus)
-    ndpi_str->enable_ja3_plus = 1;
-
   if(!(prefs & ndpi_dont_init_libgcrypt)) {
     if(!gcry_control (GCRYCTL_INITIALIZATION_FINISHED_P)) {
       const char *gcrypt_ver = gcry_check_version(NULL);
@@ -2864,103 +2861,40 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL) {
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_cachefly_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_cachefly_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_tor_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_tor_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_azure_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_azure_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_whatsapp_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_whatsapp_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_amazon_aws_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_amazon_aws_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_ethereum_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_mining_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_zoom_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_zoom_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_cloudflare_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_cloudflare_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_microsoft_list)) {
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_365_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ms_one_drive_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ms_outlook_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_skype_teams_protocol_list);
-    }
-
-    if(!(prefs & ndpi_dont_load_google_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_google_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_google_cloud_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_google_cloud_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_protonvpn_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_protonvpn_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_mullvad_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_mullvad_protocol_list);
-
-    if(!(prefs & ndpi_dont_load_asn_lists)) {
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_telegram_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_apple_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_twitter_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_netflix_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_webex_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_teamviewer_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_facebook_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_tencent_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_opendns_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_dropbox_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_starcraft_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ubuntuone_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_twitch_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_hotspot_shield_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_github_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_steam_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_bloomberg_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_citrix_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_edgecast_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_goto_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_riotgames_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_threema_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_alibaba_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_avast_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_discord_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_line_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_vk_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_yandex_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_yandex_cloud_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_disneyplus_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_hulu_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_epicgames_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_nvidia_protocol_list);
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_roblox_protocol_list);
-    }
-
-    if(prefs & ndpi_track_flow_payload)
-      ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
   }
+
+  if(prefs & ndpi_track_flow_payload)
+    ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
 
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
 
   if(!(prefs & ndpi_dont_init_risk_ptree)) {
-    if((ndpi_str->ip_risk_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL) {
-      if(!(prefs & ndpi_dont_load_icloud_private_relay_list))
-        ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list);
-      if(!(prefs & ndpi_dont_load_protonvpn_exit_nodes_list))
-        ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_protonvpn_protocol_list);
-      if(!(prefs & ndpi_dont_load_crawlers_list))
-        ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_http_crawler_bot_protocol_list);
-    }
+    ndpi_str->ip_risk_ptree = ndpi_patricia_new(32 /* IPv4 */);
   }
+
+  ndpi_str->cfg.ip_list_amazonaws_enabled = 1;
+  ndpi_str->cfg.ip_list_azure_enabled = 1;
+  ndpi_str->cfg.ip_list_cachefly_enabled = 1;
+  ndpi_str->cfg.ip_list_cloudflare_enabled = 1;
+  ndpi_str->cfg.ip_list_google_enabled = 1;
+  ndpi_str->cfg.ip_list_googlecloud_enabled = 1;
+  ndpi_str->cfg.ip_list_microsoft_enabled = 1;
+  ndpi_str->cfg.ip_list_mining_enabled = 1;
+  ndpi_str->cfg.ip_list_mullvad_enabled = 1;
+  ndpi_str->cfg.ip_list_protonvpn_enabled = 1;
+  ndpi_str->cfg.ip_list_tor_enabled = 1;
+  ndpi_str->cfg.ip_list_whatsapp_enabled = 1;
+  ndpi_str->cfg.ip_list_zoom_enabled = 1;
+
+  ndpi_str->cfg.asn_lists_enabled = 1;
+
+  ndpi_str->cfg.risk_anonymous_subscriber_list_icloudprivaterelay_enabled = 1;
+  ndpi_str->cfg.risk_anonymous_subscriber_list_protonvpn_enabled = 1;
+  ndpi_str->cfg.risk_crawler_bot_list_enabled = 1;
+
+  ndpi_str->cfg.sha1_fingerprint_enabled = 1;
+  ndpi_str->cfg.ja3_plus_enabled = 0;
+
 
   ndpi_str->max_packets_to_process = NDPI_DEFAULT_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT;
 
@@ -3172,6 +3106,102 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
 
   if(!ndpi_str)
     return;
+
+  /* IP lists */
+
+  if(ndpi_str->protocols_ptree) {
+    if(ndpi_str->cfg.ip_list_amazonaws_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_amazon_aws_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_azure_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_azure_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_cachefly_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_cachefly_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_cloudflare_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_cloudflare_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_google_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_google_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_googlecloud_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_google_cloud_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_microsoft_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_365_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ms_one_drive_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ms_outlook_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_skype_teams_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_mining_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_mining_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_protonvpn_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_protonvpn_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_tor_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_tor_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_whatsapp_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_whatsapp_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_zoom_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_zoom_protocol_list);
+    }
+    if(ndpi_str->cfg.ip_list_mullvad_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_mullvad_protocol_list);
+    }
+
+    if(ndpi_str->cfg.asn_lists_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_telegram_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_apple_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_twitter_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_netflix_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_webex_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_teamviewer_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_facebook_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_tencent_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_opendns_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_dropbox_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_starcraft_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ubuntuone_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_twitch_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_hotspot_shield_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_github_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_steam_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_bloomberg_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_citrix_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_edgecast_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_goto_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_riotgames_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_threema_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_alibaba_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_avast_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_discord_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_line_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_vk_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_yandex_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_yandex_cloud_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_disneyplus_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_hulu_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_epicgames_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_nvidia_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_roblox_protocol_list);
+    }
+  }
+
+  if(ndpi_str->ip_risk_ptree) {
+    if(ndpi_str->cfg.risk_anonymous_subscriber_list_icloudprivaterelay_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list);
+    }
+    if(ndpi_str->cfg.risk_anonymous_subscriber_list_protonvpn_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_protonvpn_protocol_list);
+    }
+    if(ndpi_str->cfg.risk_crawler_bot_list_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_http_crawler_bot_protocol_list);
+    }
+  }
 
   ndpi_add_domain_risk_exceptions(ndpi_str);
 
@@ -10271,4 +10301,76 @@ void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
   if(ndpi_str)
     return ndpi_str->user_data;
   return NULL;
+}
+
+/* ******************************************************************** */
+
+static int _set_cfg_enable_disable(void *_variable, const char *value)
+{
+  char *variable = (char *)_variable;
+
+  if(strcmp(value, "1") == 0) {
+    *variable = 1;
+    return 0;
+  }
+  if(strcmp(value, "0") == 0) {
+    *variable = 0;
+    return 0;
+  }
+  return -1;
+}
+
+typedef int (*cfg_fn)(void *variable, const char *value);
+
+int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
+		    const char *proto, const char *param, const char *value)
+{
+  if(!ndpi_str || !param || !value)
+    return -2;
+
+  struct cfgs {
+    char *proto;
+    char *param;
+    cfg_fn fn;
+    void *variable;
+  } cfgs[] = {
+    /* Per-protocol */
+
+    { "amazonaws",     "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_amazonaws_enabled },
+    { "azure",         "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_azure_enabled },
+    { "cachefly",      "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_cachefly_enabled },
+    { "cloudflare",    "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_cloudflare_enabled },
+    { "google",        "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_google_enabled },
+    { "googlecloud",   "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_googlecloud_enabled },
+    { "microsoft",     "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_microsoft_enabled },
+    { "mining",        "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_mining_enabled },
+    { "mullvad",       "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_mullvad_enabled },
+    { "protonvpn",     "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_protonvpn_enabled },
+    { "tor",           "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_tor_enabled },
+    { "tls",           "ja3_plus.enable",                         _set_cfg_enable_disable, &ndpi_str->cfg.ja3_plus_enabled },
+    { "tls",           "metadata.sha1_fingerprint.enable",        _set_cfg_enable_disable, &ndpi_str->cfg.sha1_fingerprint_enabled },
+    { "whatsapp",      "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_whatsapp_enabled },
+    { "zoom",          "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_zoom_enabled },
+
+    /* Global */
+
+    { NULL,            "asn_lists.load",                                              _set_cfg_enable_disable, &ndpi_str->cfg.asn_lists_enabled },
+    { NULL,            "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", _set_cfg_enable_disable, &ndpi_str->cfg.risk_anonymous_subscriber_list_icloudprivaterelay_enabled },
+    { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          _set_cfg_enable_disable, &ndpi_str->cfg.risk_anonymous_subscriber_list_protonvpn_enabled },
+    { NULL,            "flow_risk.crawler_bot.list.load",                             _set_cfg_enable_disable, &ndpi_str->cfg.risk_crawler_bot_list_enabled },
+
+    { NULL, NULL, NULL, NULL },
+  };
+  const struct cfgs *c;
+
+  NDPI_LOG_ERR(ndpi_str, "[%s][%s][%s]\n", proto, param, value);
+
+  for(c = &cfgs[0]; c && c->param; c++) {
+    if(((proto == NULL && c->proto == NULL) ||
+	(proto && c->proto && strcmp(proto, c->proto) == 0)) &&
+       strcmp(param, c->param) == 0) {
+      return c->fn(c->variable, value);
+    }
+  }
+  return -3;
 }

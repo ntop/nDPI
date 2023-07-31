@@ -2154,6 +2154,12 @@ extern "C" {
    */
   void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str);
 
+
+  int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
+		      const char *proto, const char *param, const char *value);
+  char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
+			const char *proto, const char *param);
+
 #ifdef __cplusplus
 }
 #endif

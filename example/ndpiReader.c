@@ -96,6 +96,16 @@ u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_cluster
 u_int8_t verbose = 0, enable_flow_stats = 0;
 int stun_monitoring_pkts_to_process = -1; /* Default */
 int stun_monitoring_flags = -1; /* Default */
+
+struct cfg {
+  char *proto;
+  char *param;
+  char *value;
+};
+#define MAX_NUM_CFGS 16
+static struct cfg cfgs[MAX_NUM_CFGS];
+static int num_cfgs = 0;
+
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 char *_disabled_protocols = NULL;
@@ -594,6 +604,7 @@ static void help(u_int long_help) {
          "  --lru-cache-ttl=NAME:size        | Specify the TTL [in seconds] for this LRU cache (0 to disable it). This flag can be used multiple times\n"
          "  --stun-monitoring=<pkts>:<flags> | Configure STUN monitoring: keep monitoring STUN session for <pkts> more pkts looking for RTP\n"
          "                                   | (0:0 to disable the feature); set the specified features in <flags>\n"
+         "  --cfg=proto,param,value          | Configure the specific attribute of this protocol\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -649,6 +660,8 @@ static void help(u_int long_help) {
 
 #define OPTLONG_VALUE_STUN_MONITORING	2000
 
+#define OPTLONG_VALUE_CFG		3000
+
 static struct option longopts[] = {
   /* mandatory extcap options */
   { "extcap-interfaces", no_argument, NULL, '0'},
@@ -693,6 +706,8 @@ static struct option longopts[] = {
   { "lru-cache-size", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_SIZE},
   { "lru-cache-ttl", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_TTL},
   { "stun-monitoring", required_argument, NULL, OPTLONG_VALUE_STUN_MONITORING},
+
+  { "cfg", required_argument, NULL, OPTLONG_VALUE_CFG},
 
   {0, 0, 0, 0}
 };
@@ -950,6 +965,37 @@ static int parse_two_unsigned_integer(char *param, u_int32_t *num1, u_int32_t *n
   return -1;
 }
 
+static int parse_three_strings(char *param, char **s1, char **s2, char **s3)
+{
+  char *saveptr, *tmp_str, *s1_str, *s2_str, *s3_str;
+
+  tmp_str = ndpi_strdup(param);
+  if(tmp_str) {
+    s1_str = strtok_r(tmp_str, ",", &saveptr);
+    if(s1_str) {
+      s2_str = strtok_r(NULL, ",", &saveptr);
+      if(s2_str) {
+        s3_str = strtok_r(NULL, ",", &saveptr);
+        if(s3_str) {
+          *s1 = ndpi_strdup(s1_str);
+          *s2 = ndpi_strdup(s2_str);
+          *s3 = ndpi_strdup(s3_str);
+          ndpi_free(tmp_str);
+          if(!s1 || !s2 || !s3) {
+            ndpi_free(s1);
+            ndpi_free(s2);
+            ndpi_free(s3);
+            return -1;
+          }
+          return 0;
+        }
+      }
+    }
+  }
+  ndpi_free(tmp_str);
+  return -1;
+}
+
 /* ********************************** */
 
 /**
@@ -968,6 +1014,7 @@ static void parseOptions(int argc, char **argv) {
 #endif
   int cache_idx, cache_size, cache_ttl;
   u_int32_t num_pkts, flags;
+  char *s1, *s2, *s3;
 
 #ifdef USE_DPDK
   {
@@ -1288,7 +1335,20 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'z':
-      init_prefs |= ndpi_enable_ja3_plus;
+      if(num_cfgs < MAX_NUM_CFGS) {
+        cfgs[num_cfgs].proto = ndpi_strdup("tls");
+        cfgs[num_cfgs].param = ndpi_strdup("ja3_plus.enable");
+        cfgs[num_cfgs].value = ndpi_strdup("1");
+        if(cfgs[num_cfgs].proto &&
+           cfgs[num_cfgs].param &&
+           cfgs[num_cfgs].value) {
+	  num_cfgs++;
+	} else {
+           ndpi_free(cfgs[num_cfgs].proto);
+           ndpi_free(cfgs[num_cfgs].param);
+           ndpi_free(cfgs[num_cfgs].value);
+	}
+      }
       break;
 
     case OPTLONG_VALUE_LRU_CACHE_SIZE:
@@ -1314,6 +1374,18 @@ static void parseOptions(int argc, char **argv) {
       }
       stun_monitoring_pkts_to_process = num_pkts;
       stun_monitoring_flags = flags;
+      break;
+
+    case OPTLONG_VALUE_CFG:
+      if(num_cfgs >= MAX_NUM_CFGS ||
+	 parse_three_strings(optarg, &s1, &s2, &s3) == -1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
+      cfgs[num_cfgs].proto = s1;
+      cfgs[num_cfgs].param = s2;
+      cfgs[num_cfgs].value = s3;
+      num_cfgs++;
       break;
 
     default:
@@ -2660,7 +2732,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_workflow_prefs prefs;
-  int i;
+  int i, rc;
 
   memset(&prefs, 0, sizeof(prefs));
   prefs.decode_tunnels = decode_tunnels;
@@ -2737,6 +2809,14 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
     if(aggressiveness[i] != -1)
       ndpi_set_protocol_aggressiveness(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, aggressiveness[i]);
+  }
+
+  for(i = 0; i < num_cfgs; i++) {
+    rc = ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
+    if (rc != 0)
+      fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
+	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
   }
 
   if(stun_monitoring_pkts_to_process != -1 &&
@@ -5657,6 +5737,12 @@ int main(int argc, char **argv) {
   
   ndpi_free(_debug_protocols);
   ndpi_free(_disabled_protocols);
+
+  for(i = 0; i < num_cfgs; i++) {
+    ndpi_free(cfgs[i].proto);
+    ndpi_free(cfgs[i].param);
+    ndpi_free(cfgs[i].value);
+  }
 
 #ifdef DEBUG_TRACE
   if(trace) fclose(trace);
