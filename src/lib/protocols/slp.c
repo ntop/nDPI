@@ -144,6 +144,7 @@ static int slp_dissect_url_entries(struct ndpi_detection_module_struct *ndpi_str
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
   struct slp_url_entry const *url_entry;
   uint16_t url_entries_count;
+  size_t i;
 
   if (packet->payload_packet_len <= url_entries_offset + sizeof(uint16_t)) {
     return 1;
@@ -151,7 +152,7 @@ static int slp_dissect_url_entries(struct ndpi_detection_module_struct *ndpi_str
   url_entries_count = ntohs(*(uint16_t *)&packet->payload[url_entries_offset]);
   url_entries_offset += sizeof(uint16_t);
 
-  for (size_t i = 0; i < ndpi_min(url_entries_count, NDPI_ARRAY_LENGTH(flow->protos.slp.url)); ++i) {
+  for (i = 0; i < ndpi_min(url_entries_count, NDPI_ARRAY_LENGTH(flow->protos.slp.url)); ++i) {
     if (packet->payload_packet_len < url_entries_offset + sizeof(*url_entry)) {
       return 1;
     }
@@ -171,7 +172,8 @@ static int slp_dissect_url_entries(struct ndpi_detection_module_struct *ndpi_str
 
     // handle Authentication Blocks
     uint8_t num_auths = packet->payload[url_entries_offset++];
-    for (size_t j = 0; j < num_auths; ++j) {
+    size_t j;
+    for (j = 0; j < num_auths; ++j) {      
       size_t auth_block_offset = url_entries_offset + 2;
       if (packet->payload_packet_len <= auth_block_offset + 2) {
         return 1;

@@ -1200,15 +1200,20 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
   /* SERVICE_LOCATION */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SERVICE_LOCATION)) {
+    size_t i;
+    
     flow->info_type = INFO_GENERIC;
     flow->info[0] = 0;
     if (flow->ndpi_flow->protos.slp.url_count > 0)
       strncat(flow->info, "URL(s): ", sizeof(flow->info));
-    for (size_t i = 0; i < flow->ndpi_flow->protos.slp.url_count; ++i) {
+
+    for (i = 0; i < flow->ndpi_flow->protos.slp.url_count; ++i) {
       size_t length = strlen(flow->info);
+      
       strncat(flow->info + length, flow->ndpi_flow->protos.slp.url[i],
               sizeof(flow->info) - length);
       length = strlen(flow->info);
+
       if (i < (size_t)flow->ndpi_flow->protos.slp.url_count - 1)
         strncat(flow->info + length, ", ", sizeof(flow->info) - length);
     }
