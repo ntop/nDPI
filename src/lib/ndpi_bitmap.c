@@ -51,7 +51,13 @@ void ndpi_bitmap_free(ndpi_bitmap* b) {
 
 /* ******************************************* */
 
-u_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b) {
+ndpi_bitmap* ndpi_bitmap_copy(ndpi_bitmap* b) {
+  return(roaring_bitmap_copy(b));
+}
+
+/* ******************************************* */
+
+U_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b) {
   return(roaring_bitmap_get_cardinality((const roaring_bitmap_t *)b));
 }
 

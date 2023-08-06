@@ -1967,6 +1967,7 @@ extern "C" {
 
   ndpi_bitmap* ndpi_bitmap_alloc(void);
   void ndpi_bitmap_free(ndpi_bitmap* b);
+  ndpi_bitmap* ndpi_bitmap_copy(ndpi_bitmap* b);
   u_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b);
   void ndpi_bitmap_set(ndpi_bitmap* b, u_int32_t value);
   void ndpi_bitmap_unset(ndpi_bitmap* b, u_int32_t value);
