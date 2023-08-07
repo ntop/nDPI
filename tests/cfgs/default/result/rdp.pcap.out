@@ -16,10 +16,10 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 
-RDP	2010	622743	1
+RDP	20	3658	1
 
-	1	TCP 172.16.2.185:52494 <-> 192.168.2.142:3389 [proto: 88/RDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RemoteAccess/12][936 pkts/58890 bytes <-> 1074 pkts/563853 bytes][Goodput ratio: 30/92][7.55 sec][bytes ratio: -0.811 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/5 850/850 40/38][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 63/525 622/1317 44/511][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][PLAIN TEXT (192.168.2.142)][Plen Bins: 1,63,22,5,1,0,0,0,0,0,0,1,0,0,1,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0]
+	1	TCP 172.16.2.185:52494 <-> 192.168.2.142:3389 [proto: 88/RDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RemoteAccess/12][13 pkts/1677 bytes <-> 7 pkts/1981 bytes][Goodput ratio: 64/84][0.37 sec][bytes ratio: -0.083 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/43 25/56 45/86 20/16][Pkt Len c2s/s2c min/avg/max/stddev: 44/56 129/283 616/1223 152/394][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][PLAIN TEXT (192.168.2.142)][Plen Bins: 16,16,16,16,0,8,0,0,0,8,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0]

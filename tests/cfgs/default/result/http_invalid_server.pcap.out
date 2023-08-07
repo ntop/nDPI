@@ -1,0 +1,25 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 13 (13.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/0 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+
+OCSP	12	1301	1
+
+	1	TCP 192.168.1.29:51536 <-> 143.204.14.183:80 [proto: 7.63/HTTP.OCSP][IP: 265/AmazonAWS][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][7 pkts/556 bytes <-> 5 pkts/745 bytes][Goodput ratio: 15/55][0.04 sec][Hostname/SNI: ocsp.rootg2.amazontrust.com][bytes ratio: -0.145 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 5/4 12/12 6/6][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 79/149 148/468 28/160][URL: ocsp.rootg2.amazontrust.com/][StatusCode: 200][Content-Type: application/ocsp-response][Server: ¯\_(ツ)_/¯][User-Agent: **][Risk: ** HTTP Susp User-Agent **** HTTP Susp Header **][Risk Score: 200][Risk Info: Suspicious Log4J / Suspicious Agent][PLAIN TEXT (GET / HTTP/1.1)][Plen Bins: 33,0,33,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -1,0 +1,37 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	24	(24.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/2/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+
+TLS	120	14592	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.253            	 1      
+
+
+	1	TCP 192.168.1.253:35996 <-> 1.1.1.1:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 24][cat: Web/5][61 pkts/5381 bytes <-> 59 pkts/9211 bytes][Goodput ratio: 35/63][122.79 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.262 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1965/1934 15360/15360 4993/4853][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 88/156 315/1514 41/267][Risk: ** Missing SNI TLS Extn **][Risk Score: 50][TLSv1.3][JA3C: 7c1e207beb00684bbbe144f1b0abe1d5][JA3S: d75f9129bb5d05492a65ff78e081bcb2][Firefox][Cipher: TLS_CHACHA20_POLY1305_SHA256][Plen Bins: 24,32,24,0,1,7,3,5,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+	Bin clusters
+	------------
+	Cluster 0 [24;32;24;0;1;7;3;5;0;0;1;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0]
+	0	TLS       	192.168.1.253:35996 <-> 1.1.1.1:443	[24;32;24;0;1;7;3;5;0;0;1;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0][similarity: 0.000000][DoH (14.247807 distance)]
+	Max similarity: 0.000000
+

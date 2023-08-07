@@ -6,12 +6,16 @@ import socket, struct
 # This scripts is mainly used to create "ip -> protocols" lists.
 # However it is also used to create "ip -> risk" lists
 proto = "NDPI_PROTOCOL_XYX"
+append_name = ""
 if len (sys.argv) < 2 :
-    print("Usage: ipaddr2list.py <file> <protocol>")
+    print("Usage: ipaddr2list.py <file> <protocol> [<append_name>]")
     sys.exit (1)
 
-if len (sys.argv) == 3:
+if len (sys.argv) >= 3:
     proto = sys.argv[2]
+
+if len (sys.argv) >= 4:
+    append_name = sys.argv[3]
 
 
 
@@ -38,7 +42,7 @@ print("""/*
 
 """)
 
-print("static ndpi_network "+proto.lower()+"_protocol_list[] = {")
+print("static ndpi_network "+proto.lower()+append_name+"_protocol_list[] = {")
 
 lines = 0
 with open(sys.argv[1]) as fp:

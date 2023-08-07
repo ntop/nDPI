@@ -52,6 +52,7 @@ ip:54.80.47.130@AmazonPrime
 
 ip:3.3.3.3:443@CustomProtocolA
 ip:3.3.3.3:444@CustomProtocolB
+ip:3.3.3.3:446@CustomProtocolC=400
 
 #
 # Risk Exceptions

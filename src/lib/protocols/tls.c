@@ -656,9 +656,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 			     dNSName);
 #endif
 
-		      if(flow->host_server_name[0] == '\0') {
-			matched_name = 1;	/* No SNI */
-		      } else if(dNSName[0] == '*') {
+		      if(dNSName[0] == '*') {
 			char * label = strstr(flow->host_server_name, &dNSName[1]);
 
 			if(label != NULL) {
@@ -1540,7 +1538,9 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
     /* Groups */
     1035, 10794, 16696, 23130, 31354, 35466, 51914,
     /* Ciphers */
-    102, 129, 52243, 52244, 57363, 65279, 65413
+    102, 129, 52243, 52244, 57363, 65279, 65413,
+    /* ECH */
+    65037
   };
   size_t const allowed_non_iana_extensions_size = sizeof(allowed_non_iana_extensions) /
     sizeof(allowed_non_iana_extensions[0]);
@@ -2250,10 +2250,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		tot_signature_algorithms_len = ndpi_min((sizeof(ja3.client.signature_algorithms) / 2) - 1, tot_signature_algorithms_len);
 
 #ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
-		flow->protos.tls_quic.num_tls_signature_algorithms = ndpi_min(tot_signature_algorithms_len / 2, MAX_NUM_TLS_SIGNATURE_ALGORITHMS);
+		size_t size = ndpi_min(tot_signature_algorithms_len / 2, MAX_NUM_TLS_SIGNATURE_ALGORITHMS);
 
-		memcpy(flow->protos.tls_quic.client_signature_algorithms,
-		       &packet->payload[s_offset], 2 /* 16 bit */*flow->protos.tls_quic.num_tls_signature_algorithms);
+		if (s_offset + 2 * size <= packet->payload_packet_len) {
+			flow->protos.tls_quic.num_tls_signature_algorithms = size;
+			memcpy(flow->protos.tls_quic.client_signature_algorithms,
+			       &packet->payload[s_offset], 2 /* 16 bit */ * size);
+		}
 #endif
 
 		for(i=0; i<tot_signature_algorithms_len && s_offset+i<total_len; i++) {
@@ -2536,6 +2539,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    }
 		  }
 		}
+	      } else if(extension_id == 65037 /* ECH: latest drafts */) {
+#ifdef DEBUG_TLS
+		printf("Client TLS: ECH version 0x%x\n", extension_id;
+#endif
+		/* Beginning with draft-08, the version is the same as the code point
+		   for the "encrypted_client_hello" extension. */
+		flow->protos.tls_quic.encrypted_ch.version = extension_id;
 	      } else if(extension_id == 65445 || /* QUIC transport parameters (drafts version) */
 		        extension_id == 57) { /* QUIC transport parameters (final version) */
 		u_int16_t s_offset = offset+extension_offset;

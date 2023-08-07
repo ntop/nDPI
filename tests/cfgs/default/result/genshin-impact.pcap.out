@@ -17,7 +17,7 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   12/0 (search/found)
+Patricia risk mask:   6/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   6/6 (search/found)
 

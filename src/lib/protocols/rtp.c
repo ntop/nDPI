@@ -62,7 +62,7 @@ u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_
   case 117: /* G.722 */
   case 118: /* Comfort Noise Wideband */
     *s_type = ndpi_multimedia_audio_flow;
-    return(1 /* RTP */);
+    return(1);
     
   case 34: /* H.263 [MS-H26XPF] */
   case 121: /* RT Video */
@@ -70,14 +70,7 @@ u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_
   case 123: /* H.264 FEC [MS-H264PF] */
   case 127: /* x-data */
     *s_type = ndpi_multimedia_video_flow;
-    return(1 /* RTP */);
-
-  case 200: /* RTCP PACKET SENDER */
-  case 201: /* RTCP PACKET RECEIVER */
-  case 202: /* RTCP Source Description */
-  case 203: /* RTCP Bye */
-    *s_type = ndpi_multimedia_unknown_flow;
-    return(2 /* RTCP */);
+    return(1);
 
   default:
     *s_type = ndpi_multimedia_unknown_flow;

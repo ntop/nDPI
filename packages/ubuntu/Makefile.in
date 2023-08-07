@@ -19,7 +19,7 @@ ndpi:
 	@find ./debian/ndpi-tmp -name "*~" -exec /bin/rm {} ';'
 	@find ./debian/ndpi-dev-tmp -name "*~" -exec /bin/rm {} ';'
 	dpkg-buildpackage -rfakeroot -d -us -uc
-	dpkg-sig --sign builder -k D1EB60BE ../ndpi*deb
+	@SIGN_CMD@ --sign builder -k D1EB60BE ../ndpi*deb
 	@\rm -f ../ndpi*dsc ../ndpi*.gz ../ndpi*changes
 	@/bin/mv ../ndpi*deb .
 	@echo

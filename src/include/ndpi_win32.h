@@ -78,4 +78,9 @@ typedef unsigned       __int64 u_int64_t;
 /* https://stackoverflow.com/questions/7993050/multiplatform-atomic-increment */
 #define __sync_fetch_and_add(a,b)       InterlockedExchangeAdd ((a), b)
 
+#if defined(WIN32) || defined(WIN64)
+#include <intrin.h>
+#define __builtin_popcount __popcnt
+#endif
+
 #endif /* __NDPI_WIN32_H__ */

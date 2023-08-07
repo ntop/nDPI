@@ -547,7 +547,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  u_int16_t num;
 
 	  for(num = 0; num < dns_header->additional_rrs; num++) {
-	    u_int16_t data_len;
+	    u_int16_t data_len, rdata_len, opt_code, opt_len;
+	    const unsigned char *opt;
 
 	    if((x+6) > packet->payload_packet_len) {
 	      break;
@@ -576,6 +577,34 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	      printf("[DNS] [response] edns0_udp_payload_size: %u\n", flow->protos.dns.edns0_udp_payload_size);
 #endif
 	      x += 6;
+
+	      rdata_len = ntohs(*((u_int16_t *)&packet->payload[x]));
+#ifdef DNS_DEBUG
+	      printf("[DNS] [response] rdata len: %u\n", rdata_len);
+#endif
+	      if(rdata_len > 0 &&
+		 x + 6 <= packet->payload_packet_len) {
+		opt_code = ntohs(*((u_int16_t *)&packet->payload[x + 2]));
+		opt_len = ntohs(*((u_int16_t *)&packet->payload[x + 4]));
+		opt = &packet->payload[x + 6];
+		/* TODO: parse the TLV list */
+		if(opt_code == 0x03 &&
+		   opt_len <= rdata_len + 4 &&
+		   opt_len > 6 &&
+		   x + 6 + opt_len <= packet->payload_packet_len) {
+#ifdef DNS_DEBUG
+		  printf("[DNS] NSID: [%.*s]\n", opt_len, opt);
+#endif
+		  if(memcmp(opt, "gpdns-", 6) == 0) {
+#ifdef DNS_DEBUG
+		    printf("[DNS] NSID Airport code [%.*s]\n", opt_len - 6, opt + 6);
+#endif
+		    memcpy(flow->protos.dns.geolocation_iata_code, opt + 6,
+			   ndpi_min(opt_len - 6, (int)sizeof(flow->protos.dns.geolocation_iata_code) - 1));
+		  }
+		}
+
+	      }
 	    } else {
 	      x += 6;
 	    }

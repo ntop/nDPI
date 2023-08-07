@@ -41,6 +41,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   else
     mc = NULL;
 
+  ac_automata_enable_debug(0);
+
   a = ac_automata_init(mc);
   a2 = ndpi_init_automa();
 

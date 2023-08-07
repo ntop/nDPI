@@ -1,5 +1,5 @@
 nDPI Protocols List
-####################
+###################
 
 This page provides the list of the protocols/applications supported by nDPI. For each protocol there is a brief description, some links to further, more detailed information and, optionally, some notes that might be useful when handling such a protocol (from the application/integrator point of view)
 
@@ -49,7 +49,7 @@ References: `Main site <https://www.nvidia.com>`_.
 .. _Proto 343:
 
 `NDPI_PROTOCOL_BITCOIN`
-======================
+=======================
 Bitcoin is one of the most common crypto currencies.
 
 References: `Main site <https://en.bitcoin.it/wiki/Protocol_documentation>`_.
@@ -64,7 +64,7 @@ Notes:
 .. _Proto 344:
 
 `NDPI_PROTOCOL_PROTONVPN`
-========================
+=========================
 Proton VPN is a VPN service operated by the Swiss company Proton AG, the company behind the email service Proton Mail
 
 References: `Main site https://protonvpn.com/`
@@ -73,7 +73,40 @@ References: `Main site https://protonvpn.com/`
 .. _Proto 345:
 
 `NDPI_PROTOCOL_THRIFT`
-========================
+======================
 Apache Thrift is a generic data interchange framework that supports a bunch of different languages and platforms.
 
 References: `Official site <https://thrift.apache.org>`_ `Github <https://github.com/apache/thrift>`_.
+
+
+.. _Proto 346:
+
+`NDPI_PROTOCOL_ROBLOX`
+======================
+Roblox is an online game platform and game creation system.
+
+References: `Main site <https://www.roblox.com/>`_.
+
+Notes:
+
+- Since Roblox games use a custom version of the RakNet protocol, some Roblox flows might be classified as RakNet.
+
+
+.. _Proto 347:
+
+`NDPI_PROTOCOL_SERVICE_LOCATION`
+================================
+The Service Location Protocol is a service discovery protocol that allows computers and other devices to find services in a local area network without prior configuration.
+
+References: `SLPv1 <https://datatracker.ietf.org/doc/html/rfc2165>`_ `SLPv2 <https://datatracker.ietf.org/doc/html/rfc2608>`_.
+
+
+.. _Proto 348:
+
+`NDPI_PROTOCOL_MULLVAD`
+========================
+Mullvad is a VPN service operated by Mullvad VPN AB, based in Sweden
+
+References: `Main site https://mullvad.net/`
+
+

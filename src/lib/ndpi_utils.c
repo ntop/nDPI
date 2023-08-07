@@ -821,7 +821,7 @@ static const char* ndpi_get_flow_info_by_proto_id(struct ndpi_flow_struct const 
         return flow->host_server_name;
       break;
   }
-  
+
   return NULL;
 }
 
@@ -831,8 +831,8 @@ const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
                                ndpi_protocol const * const l7_protocol) {
   char const * const app_protocol_info = ndpi_get_flow_info_by_proto_id(flow, l7_protocol->app_protocol);
 
-  if(app_protocol_info != NULL)  
-    return app_protocol_info;  
+  if(app_protocol_info != NULL)
+    return app_protocol_info;
 
   return ndpi_get_flow_info_by_proto_id(flow, l7_protocol->master_protocol);
 }
@@ -1627,31 +1627,24 @@ const char* ndpi_tunnel2str(ndpi_packet_tunnel tt) {
   switch(tt) {
   case ndpi_no_tunnel:
     return("No-Tunnel");
-    break;
 
   case ndpi_gtp_tunnel:
     return("GTP");
-    break;
 
   case ndpi_capwap_tunnel:
     return("CAPWAP");
-    break;
 
   case ndpi_tzsp_tunnel:
     return("TZSP");
-    break;
 
   case ndpi_l2tp_tunnel:
     return("L2TP");
-    break;
 
   case ndpi_vxlan_tunnel:
     return("VXLAN");
-    break;
 
   case ndpi_gre_tunnel:
     return("GRE");
-    break;
   }
 
   return("");
@@ -2012,7 +2005,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_DNS_LARGE_PACKET:
     return("Large DNS Packet (512+ bytes)");
-    
+
   case NDPI_DNS_FRAGMENTED:
     return("Fragmented DNS Message");
 
@@ -2048,9 +2041,12 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_MINOR_ISSUES:
     return("Minor Issues");
-    
+
   case NDPI_TCP_ISSUES:
     return("TCP Connection Issues");
+
+  case NDPI_FULLY_ENCRYPTED:
+    return("Fully encrypted flow");
 
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
@@ -2076,7 +2072,7 @@ const char* ndpi_severity2str(ndpi_risk_severity s) {
 
   case NDPI_RISK_CRITICAL:
     return("Critical");
-    
+
   case NDPI_RISK_EMERGENCY:
     return("Emergency");
   }
@@ -2340,7 +2336,7 @@ u_int8_t ndpi_check_issuerdn_risk_exception(struct ndpi_detection_module_struct 
 					    char *issuerDN) {
   if(issuerDN != NULL) {
     ndpi_list *head = ndpi_str->trusted_issuer_dn;
-    
+
     while(head != NULL) {
       if(strcmp(issuerDN, head->value) == 0)
 	return(1); /* This is a trusted DN */
@@ -2348,7 +2344,7 @@ u_int8_t ndpi_check_issuerdn_risk_exception(struct ndpi_detection_module_struct 
 	head = head->next;
     }
   }
-  
+
   return(0 /* no exception */);
 }
 
@@ -2363,7 +2359,7 @@ static u_int8_t ndpi_check_hostname_risk_exception(struct ndpi_detection_module_
   else {
     ndpi_automa *automa = &ndpi_str->host_risk_mask_automa;
     u_int8_t ret = 0;
-    
+
     if(automa && automa->ac_automa) {
       AC_TEXT_t ac_input_text;
       AC_REP_t match;
@@ -2371,13 +2367,13 @@ static u_int8_t ndpi_check_hostname_risk_exception(struct ndpi_detection_module_
       memset(&match, 0, sizeof(match));
       ac_input_text.astring = hostname, ac_input_text.length = strlen(hostname);
       ac_input_text.option = 0;
-      
+
       if(ac_automata_search(automa->ac_automa, &ac_input_text, &match) > 0) {
 	if(flow) flow->risk_mask &= match.number64;
 	ret = 1;
       }
     }
-    
+
     return(ret);
   }
 }
@@ -2390,37 +2386,34 @@ static u_int8_t ndpi_check_ipv4_exception(struct ndpi_detection_module_struct *n
 					  u_int32_t addr) {
   struct in_addr pin;
   u_int64_t r;
-  
+
   pin.s_addr = addr;
   r = ndpi_host_ip_risk_ptree_match(ndpi_str, &pin);
-  
+
   if(flow) flow->risk_mask &= r;
-  
+
   return((r != (u_int64_t)-1) ? 1 : 0);
 }
 
 /* ********************************************************************************* */
 
-static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
-					struct ndpi_flow_struct *flow) {
-  char *host;
-
+void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
+				 struct ndpi_flow_struct *flow) {
   if(flow->risk == 0) return; /* Nothing to do */
 
-  host = ndpi_get_flow_name(flow);
-
-  if((!flow->host_risk_mask_evaluated) && (!flow->ip_risk_mask_evaluated)) {
+  if((!flow->host_risk_mask_evaluated) && (!flow->ip_risk_mask_evaluated))
     flow->risk_mask = (u_int64_t)-1; /* No mask */
-  }
 
   if(!flow->host_risk_mask_evaluated) {
+    char *host = ndpi_get_flow_name(flow);
+
     if(host && (host[0] != '\0')) {
       /* Check host exception */
       ndpi_check_hostname_risk_exception(ndpi_str, flow, host);
 
       if(flow->risk_mask == 0) {
 	u_int i;
-	
+
 	/*
 	  Might be that the exception applied when some risks
 	  were already triggered: we need to clean them up
@@ -2431,10 +2424,10 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
 	    flow->risk_infos[i].info = NULL;
 	  }
 	}
-	
+
 	flow->num_risk_infos = 0;
       }
-      
+
       /* Used to avoid double checks (e.g. in DNS req/rsp) */
       flow->host_risk_mask_evaluated = 1;
     }
@@ -2458,14 +2451,16 @@ static void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndp
 void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 		   struct ndpi_flow_struct *flow, ndpi_risk_enum r,
 		   char *risk_message) {
+
   /* Check if the risk is not yet set */
   if(!ndpi_isset_risk(ndpi_str, flow, r)) {
     ndpi_risk v = 1ull << r;
-    
+
     // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
     flow->risk |= v;
-    
-    ndpi_handle_risk_exceptions(ndpi_str, flow);
+
+    /* Will be handled by ndpi_reconcile_protocols() */
+    // ndpi_handle_risk_exceptions(ndpi_str, flow);
 
     if(flow->risk != 0 /* check if it has been masked */) {
       if(risk_message != NULL) {
@@ -2581,15 +2576,15 @@ int ndpi_is_valid_hostname(char * const str, size_t len) {
        || (str[i] == '_')
        || (str[i] == ':')
        )
-      continue; /* Used in hostnames */    
-    else if((ndpi_isprint(str[i]) == 0)       
+      continue; /* Used in hostnames */
+    else if((ndpi_isprint(str[i]) == 0)
 	    || ndpi_isspace(str[i])
 	    || ndpi_ispunct(str[i])
 	    ) {
       return(0);
     }
   }
-  
+
   return(1);
 }
 
@@ -2770,7 +2765,7 @@ u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow) {
 
   case NDPI_PROTOCOL_HTTP:
     return(flow->http.response_status_code);
- 
+
   case NDPI_PROTOCOL_SNMP:
     return(flow->protos.snmp.error_status);
  }
@@ -2830,7 +2825,7 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 			      char *out, u_int out_len,
 			      u_int8_t use_json) {
   u_int i, offset = 0;
-  
+
   if((out == NULL)
      || (flow == NULL)
      || (flow->num_risk_infos == 0))
@@ -2840,15 +2835,15 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
     ndpi_serializer serializer;
     u_int32_t buffer_len;
     char *buffer;
-    
+
     if(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) == -1)
       return(NULL);
 
     for(i=0; i<flow->num_risk_infos; i++)
       ndpi_serialize_uint32_string(&serializer,
-				   flow->risk_infos[i].id, 
-				   flow->risk_infos[i].info);  
-    
+				   flow->risk_infos[i].id,
+				   flow->risk_infos[i].info);
+
     buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
 
     if(buffer && (buffer_len > 0)) {
@@ -2857,28 +2852,28 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
       strncpy(out, buffer, l);
       out[l] = '\0';
     }
-    
+
     ndpi_term_serializer(&serializer);
 
     return(out);
   } else {
     out[0] = '\0', out_len--;
-    
+
     for(i=0; (i<flow->num_risk_infos) && (out_len > offset); i++) {
       int rc = snprintf(&out[offset], out_len-offset, "%s%s",
 			(i == 0) ? "" : " / ",
 			flow->risk_infos[i].info);
-      
+
       if(rc <= 0)
 	break;
       else
 	offset += rc;
     }
-    
+
     if(offset > out_len) offset = out_len;
-    
+
     out[offset] = '\0';
-  
+
     return(out[0] == '\0' ? NULL : out);
   }
 }
@@ -2886,7 +2881,7 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 /* ******************************************* */
 /*
   This function checks if a flow having the specified risk
-  parameters is an exception (i.e. the flow risk should not 
+  parameters is an exception (i.e. the flow risk should not
   be triggered) or not.
 
   You can use this function to check if a flow that
@@ -2906,7 +2901,7 @@ u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *nd
       if(ndpi_check_hostname_risk_exception(ndpi_str, NULL, (char*)params[i].value))
 	return(1);
       break;
-      
+
     case NDPI_PARAM_ISSUER_DN:
       if(ndpi_check_issuerdn_risk_exception(ndpi_str, (char*)params[i].value))
 	return(1);
@@ -2927,7 +2922,7 @@ u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *nd
       break;
     }
   }
-  
+
   return(0);
 }
 
@@ -2996,3 +2991,18 @@ char* ndpi_intoav4(unsigned int addr, char* buf, u_int16_t bufLen) {
   return(cp);
 }
 
+/* ******************************************* */
+
+/* Find the nearest (>=) value of x */
+u_int32_t ndpi_nearest_power_of_two(u_int32_t x) {
+  x--;
+
+  x |= x >> 1;
+  x |= x >> 2;
+  x |= x >> 4;
+  x |= x >> 8;
+  x |= x >> 16;
+
+  x++;
+  return(x);
+}

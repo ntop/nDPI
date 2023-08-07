@@ -5,7 +5,7 @@ DPI Packets (UDP):	136	(3.09 pkts/flow)
 Confidence Unknown          : 29 (flows)
 Confidence Match by port    : 2 (flows)
 Confidence DPI              : 76 (flows)
-Num dissector calls: 5442 (50.86 diss/flow)
+Num dissector calls: 5471 (51.13 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/93/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -17,9 +17,9 @@ LRU cache stun_zoom:  0/29/0 (insert/search/found)
 Automa host:          58/18 (search/found)
 Automa domain:        58/0 (search/found)
 Automa tls cert:      0/0 (search/found)
-Automa risk mask:     43/2 (search/found)
+Automa risk mask:     1/1 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   194/0 (search/found)
+Patricia risk mask:   136/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   211/3 (search/found)
 
@@ -31,7 +31,7 @@ OCSP	2	1093	1
 Cybersec	28	29201	2
 
 	1	TCP 192.168.115.8:50491 <-> 223.26.106.66:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 9][cat: Web/5][1 pkts/426 bytes <-> 26 pkts/33872 bytes][Goodput ratio: 87/96][0.02 sec][Hostname/SNI: 223.26.106.66][bytes ratio: -0.975 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/3 0/1][Pkt Len c2s/s2c min/avg/max/stddev: 426/1022 426/1303 426/1314 0/56][URL: 223.26.106.66/videos/v0/20160625/a5/bf/8de9bb946972a88589d1667862292130.f4v?key=07eef1821e2379d3136ffe16082185ba2&src=iqiyi.com&&tn=137719&uuid=76a3085a-57760844-de][User-Agent: QY-Player-Windows/2.0.102][Risk: ** HTTP/TLS/QUIC Numeric Hostname/SNI **][Risk Score: 10][Risk Info: Found host 223.26.106.66][PLAIN TEXT (GET /videos/v)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,93,0,0,0,0,0,0,0,0]
-	2	TCP 192.168.115.8:50486 <-> 77.234.40.96:80 [proto: 7.283/HTTP.Cybersec][IP: 307/AVAST][ClearText][Confidence: DPI][DPI packets: 9][cat: Download/7][11 pkts/11023 bytes <-> 12 pkts/14869 bytes][Goodput ratio: 95/96][13.04 sec][Hostname/SNI: bcu.ff.avast.com][bytes ratio: -0.149 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 68/0 307/0 127/0][Pkt Len c2s/s2c min/avg/max/stddev: 231/536 1002/1239 1314/1314 434/215][URL: bcu.ff.avast.com/bc2][StatusCode: 200][Req Content-Type: application/x-enc][Content-Type: application/octet-stream][Server: nginx/1.8.0][User-Agent: {D699054D-1699-47D2-9B2B-E96F438C1160}][Risk: ** HTTP Susp User-Agent **** HTTP Obsolete Server **][Risk Score: 150][Risk Info: Suspicious Log4J / Obsolete nginx server 1.8.0 / Found mime exe octet-stream][PLAIN TEXT (POST /bc2 HTTP/1.1)][Plen Bins: 0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,4,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,75,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.115.8:50486 <-> 77.234.40.96:80 [proto: 7.283/HTTP.Cybersec][IP: 307/AVAST][ClearText][Confidence: DPI][DPI packets: 9][cat: Download/7][11 pkts/11023 bytes <-> 12 pkts/14869 bytes][Goodput ratio: 95/96][13.04 sec][Hostname/SNI: bcu.ff.avast.com][bytes ratio: -0.149 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 68/0 307/0 127/0][Pkt Len c2s/s2c min/avg/max/stddev: 231/536 1002/1239 1314/1314 434/215][URL: bcu.ff.avast.com/bc2][StatusCode: 200][Req Content-Type: application/x-enc][Content-Type: application/octet-stream][Server: nginx/1.8.0][User-Agent: {D699054D-1699-47D2-9B2B-E96F438C1160}][Risk: ** Binary App Transfer **** HTTP Susp User-Agent **** HTTP Obsolete Server **][Risk Score: 300][Risk Info: Suspicious Log4J / Obsolete nginx server 1.8.0 / Found mime exe octet-stream][PLAIN TEXT (POST /bc2 HTTP/1.1)][Plen Bins: 0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,4,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,75,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.115.8:50778 <-> 223.26.106.20:80 [proto: 7.54/HTTP.PPStream][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Streaming/17][1 pkts/303 bytes <-> 9 pkts/11826 bytes][Goodput ratio: 82/96][0.09 sec][Hostname/SNI: preimage1.qiyipic.com][bytes ratio: -0.950 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/4 0/30 0/10][Pkt Len c2s/s2c min/avg/max/stddev: 303/1314 303/1314 303/1314 0/0][URL: preimage1.qiyipic.com/preimage/20160506/f0/1f/v_110359998_m_611_160_90_1.jpg?no=1][StatusCode: 200][Content-Type: image/jpeg][Server: QWS][User-Agent: Qiyi List Client PC 5.2.15.2240][PLAIN TEXT (GET /preimage/20160506/f0/1)][Plen Bins: 0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,0,0,0,0,0,0,0,0]
 	4	UDP 192.168.5.38:1900 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][18 pkts/9327 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][6.36 sec][Hostname/SNI: 239.255.255.250:1900][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 46/0 393/0 2654/0 855/0][Pkt Len c2s/s2c min/avg/max/stddev: 473/0 518/0 553/0 30/0][PLAIN TEXT (NOTIFY )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,66,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	5	TCP 192.168.115.8:50780 <-> 223.26.106.20:80 [proto: 7.54/HTTP.PPStream][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Streaming/17][1 pkts/303 bytes <-> 4 pkts/5256 bytes][Goodput ratio: 82/96][0.06 sec][Hostname/SNI: preimage1.qiyipic.com][URL: preimage1.qiyipic.com/preimage/20160506/f0/1f/v_110359998_m_611_160_90_2.jpg?no=2][StatusCode: 200][Content-Type: image/jpeg][Server: QWS][User-Agent: Qiyi List Client PC 5.2.15.2240][PLAIN TEXT (GET /preimage/20160506/f0/1)][Plen Bins: 0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,80,0,0,0,0,0,0,0,0]

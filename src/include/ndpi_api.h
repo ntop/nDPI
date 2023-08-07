@@ -167,14 +167,36 @@ extern "C" {
 					  u_int16_t port /* network byte order */);
 
   /**
-   * Init single protocol match
+   * Creates a protocol match that does not contain any hostnames.
+   *
+   * @par hostname_list      = the desired hostname list form which the first entry is used to create the match
+   * @par empty_app_protocol = the resulting protocol match that does contain all information except the hostname
+   *
+   * @return 0 on success, 1 otherwise
+   */
+  int ndpi_init_empty_app_protocol(ndpi_protocol_match const * const hostname_list,
+                                   ndpi_protocol_match * const empty_app_protocol);
+
+  /**
+   * Init single protocol match.
+   *
+   * @par ndpi_mod  = the struct created for the protocol detection
+   * @par match     = the struct passed to match the protocol
+   *
+   * @return 0 on success, 1 otherwise
+   */
+  int ndpi_init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
+                             ndpi_protocol_match const * const match);
+
+  /**
+   * Init single protocol match and adds it to the Aho-Corasick automata.
    *
    * @par ndpi_mod  = the struct created for the protocol detection
    * @par match     = the struct passed to match the protocol
    *
    */
   void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_mod,
-				ndpi_protocol_match *match);
+                                ndpi_protocol_match const * const match);
 
   /**
    * Returns a new initialized detection module
@@ -1082,6 +1104,8 @@ extern "C" {
   void ndpi_set_tls_cert_expire_days(struct ndpi_detection_module_struct *ndpi_str,
 				     u_int8_t days);
 
+  void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
+				   struct ndpi_flow_struct *flow);
 
   /* Utility functions to set ndpi malloc/free/print wrappers */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
@@ -1747,7 +1771,8 @@ extern "C" {
   /* ******************************* */
 
   u_int32_t ndpi_crc32(const void* data, size_t n_bytes);
-
+  u_int32_t ndpi_nearest_power_of_two(u_int32_t x);
+  
   /* ******************************* */
 
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
@@ -1793,7 +1818,7 @@ extern "C" {
   
   /* ******************************* */
 
-  /* HyperLogLog cardinality estimator */
+  /* HyperLogLog cardinality estimator [count unique items] */
 
   /* Memory lifecycle */
   int ndpi_hll_init(struct ndpi_hll *hll, u_int8_t bits);
@@ -1806,6 +1831,22 @@ extern "C" {
 
   /* Get cardinality estimation */
   double ndpi_hll_count(struct ndpi_hll *hll);
+
+  /* ******************************* */
+
+  /* Count-Min Sketch [count how many times a value has been observed] */
+
+  struct ndpi_cm_sketch *ndpi_cm_sketch_init(u_int16_t depth);
+  void ndpi_cm_sketch_add(struct ndpi_cm_sketch *sketch, u_int32_t element);
+  u_int32_t ndpi_cm_sketch_count(struct ndpi_cm_sketch *sketch, u_int32_t element);
+  void ndpi_cm_sketch_destroy(struct ndpi_cm_sketch *sketch);
+  
+  /* ******************************* */
+
+  /* PopCount [count how many bits are set to 1] */
+
+  int ndpi_popcount_init(struct ndpi_popcount *h);
+  void ndpi_popcount_count(struct ndpi_popcount *h, const u_int8_t *buf, u_int32_t buf_len);
 
   /* ******************************* */
 
@@ -1926,6 +1967,7 @@ extern "C" {
 
   ndpi_bitmap* ndpi_bitmap_alloc(void);
   void ndpi_bitmap_free(ndpi_bitmap* b);
+  ndpi_bitmap* ndpi_bitmap_copy(ndpi_bitmap* b);
   u_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b);
   void ndpi_bitmap_set(ndpi_bitmap* b, u_int32_t value);
   void ndpi_bitmap_unset(ndpi_bitmap* b, u_int32_t value);

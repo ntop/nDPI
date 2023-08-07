@@ -19,7 +19,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
-  fmt = static_cast<ndpi_serialization_format>(fuzzed_data.ConsumeIntegralInRange(1, 3));
+  fmt = static_cast<ndpi_serialization_format>(fuzzed_data.ConsumeIntegralInRange(1, 4));
 
   if (fuzzed_data.ConsumeBool())
     rc = ndpi_init_serializer(&serializer, fmt);

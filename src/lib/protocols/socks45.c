@@ -90,7 +90,8 @@ static void ndpi_check_socks5(struct ndpi_detection_module_struct *ndpi_struct, 
   if(flow->socks5_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "SOCKS5 stage 0: \n");
 
-    if((payload_len == 3) && (packet->payload[0] == 0x05) && (packet->payload[1] == 0x01) && (packet->payload[2] == 0x00)) {
+    if(((payload_len == 3) && (packet->payload[0] == 0x05) && (packet->payload[1] == 0x01) && (packet->payload[2] == 0x00)) ||
+       ((payload_len == 4) && (packet->payload[0] == 0x05) && (packet->payload[1] == 0x02) && (packet->payload[2] == 0x00) && (packet->payload[3] == 0x01))) {
       NDPI_LOG_DBG2(ndpi_struct, "Possible SOCKS5 request detected, we will look further for the response\n");
 
       /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */

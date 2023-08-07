@@ -276,7 +276,6 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
 		ndpi_set_binary_application_transfer(ndpi_struct, flow, str);
 		NDPI_LOG_INFO(ndpi_struct, "Found executable HTTP transfer");
-		return(flow->category);
 	      }
 	    }
 	  }
@@ -288,9 +287,41 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     if(packet->content_disposition_line.len > 0) {
       u_int8_t attachment_len = sizeof("attachment; filename");
 
-      if(packet->content_disposition_line.len > attachment_len) {
+      if(packet->content_disposition_line.len > attachment_len &&
+         strncmp((char *)packet->content_disposition_line.ptr, "attachment; filename", 20) == 0) {
 	u_int8_t filename_len = packet->content_disposition_line.len - attachment_len;
 	int i;
+
+	if(packet->content_disposition_line.ptr[attachment_len] == '\"') {
+	  if(packet->content_disposition_line.ptr[packet->content_disposition_line.len-1] != '\"') {
+	    //case: filename="file_name
+	    if(filename_len >= 2) {
+	      flow->http.filename = ndpi_malloc(filename_len);
+	      if(flow->http.filename != NULL) {
+	        strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1, filename_len-1);
+	        flow->http.filename[filename_len-1] = '\0';
+	      }
+	    }
+	  }
+	  else if(filename_len >= 2) {
+	    //case: filename="file_name"
+	    flow->http.filename = ndpi_malloc(filename_len-1);
+
+	    if(flow->http.filename != NULL) {
+	      strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len+1,
+		      filename_len-2);
+	      flow->http.filename[filename_len-2] = '\0';
+	    }
+	  }
+	} else {
+	  //case: filename=file_name
+	  flow->http.filename = ndpi_malloc(filename_len+1);
+
+	  if(flow->http.filename != NULL) {
+	    strncpy(flow->http.filename, (char*)packet->content_disposition_line.ptr+attachment_len, filename_len);
+	    flow->http.filename[filename_len] = '\0';
+	  }
+	}
 
 	if(filename_len > ATTACHMENT_LEN) {
 	  attachment_len += filename_len-ATTACHMENT_LEN-1;
@@ -418,7 +449,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 				 flow->host_server_name,
 				 strlen(flow->host_server_name));
   }
- 
+
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
      packet->http_origin.len > 0) {
     ndpi_protocol_match_result ret_match;
@@ -507,8 +538,8 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
   char *double_slash;
 
   if((!ua) || (ua[0] == '\0'))
-    return;  
-  
+    return;
+
   if (ua_len > 12)
   {
     size_t i, upper_case_count = 0;
@@ -712,28 +743,38 @@ static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct
 static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
 				   const char *server, u_int server_len) {
-  if(server_len > 7) {
-    u_int off;
-  
-    if((strncasecmp(server, "Apache/", off = 7) == 0) /* X.X.X */
-	|| (strncasecmp(server, "nginx/", off = 6) == 0) /* X.X.X */) {
-      u_int i, j, a, b, c;
-      char buf[16] = { '\0' };
+  if(server[0] != '\0') {
+    if(server_len > 7) {
+      u_int off, i;
 
-      for(i=off, j=0; (i<server_len) && (j<sizeof(buf)-1)
-	    && (isdigit(server[i]) || (server[i] == '.')); i++)
-	buf[j++] = server[i];      
+      if((strncasecmp(server, "Apache/", off = 7) == 0) /* X.X.X */
+	 || (strncasecmp(server, "nginx/", off = 6) == 0) /* X.X.X */) {
+	u_int j, a, b, c;
+	char buf[16] = { '\0' };
 
-      if(sscanf(buf, "%d.%d.%d", &a, &b, &c) == 3) {
-	u_int32_t version = (a * 1000000) + (b * 1000) + c;
-	char msg[64];
-	
-	if((off == 7) && (version < MIN_APACHE_VERSION)) {
-	  snprintf(msg, sizeof(msg), "Obsolete Apache server %s", buf);
-	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
-	} else if((off == 6) && (version < MIN_NGINX_VERSION)) {
-	  snprintf(msg, sizeof(msg), "Obsolete nginx server %s", buf);
-	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
+	for(i=off, j=0; (i<server_len) && (j<sizeof(buf)-1)
+	      && (isdigit(server[i]) || (server[i] == '.')); i++)
+	  buf[j++] = server[i];
+
+	if(sscanf(buf, "%d.%d.%d", &a, &b, &c) == 3) {
+	  u_int32_t version = (a * 1000000) + (b * 1000) + c;
+	  char msg[64];
+
+	  if((off == 7) && (version < MIN_APACHE_VERSION)) {
+	    snprintf(msg, sizeof(msg), "Obsolete Apache server %s", buf);
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
+	  } else if((off == 6) && (version < MIN_NGINX_VERSION)) {
+	    snprintf(msg, sizeof(msg), "Obsolete nginx server %s", buf);
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
+	  }
+	}
+      }
+
+      /* Check server content */
+      for(i=0; i<server_len; i++) {
+	if(!isprint(server[i])) {
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, "Suspicious Agent");
+	  break;
 	}
       }
     }
@@ -800,7 +841,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
   if(packet->server_line.ptr != NULL)
     ndpi_check_http_server(ndpi_struct, flow, (const char *)packet->server_line.ptr, packet->server_line.len);
- 
+
   if(packet->user_agent_line.ptr != NULL) {
     http_process_user_agent(ndpi_struct, flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
   }
@@ -1013,14 +1054,14 @@ static const char* suspicious_http_header_keys_T[] = { "TLS_version", NULL};
 static const char* suspicious_http_header_keys_U[] = { "Uuid", NULL};
 static const char* suspicious_http_header_keys_X[] = { "X-Hire-Me", NULL};
 
-static int is_a_suspicious_header(const char* suspicious_headers[], struct ndpi_int_one_line_struct packet_line){
+static int is_a_suspicious_header(const char* suspicious_headers[], struct ndpi_int_one_line_struct packet_line) {
   int i;
   unsigned int header_len;
   const u_int8_t* header_limit;
 
   if((header_limit = memchr(packet_line.ptr, ':', packet_line.len))) {
     header_len = header_limit - packet_line.ptr;
-    for(i=0; suspicious_headers[i] != NULL; i++){
+    for(i=0; suspicious_headers[i] != NULL; i++) {
       if(!strncasecmp((const char*) packet_line.ptr,
 		      suspicious_headers[i], header_len))
 	return 1;
@@ -1040,7 +1081,7 @@ static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_str
   for(i=0; (i < packet->parsed_lines)
 	&& (packet->line[i].ptr != NULL)
 	&& (packet->line[i].len > 0); i++) {
-    switch(packet->line[i].ptr[0]){
+    switch(packet->line[i].ptr[0]) {
     case 'A':
       if(is_a_suspicious_header(suspicious_http_header_keys_A, packet->line[i])) {
 	char str[64];
@@ -1291,6 +1332,10 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->http.nat_ip) {
     ndpi_free(flow->http.nat_ip);
     flow->http.nat_ip = NULL;
+  }
+  if(flow->http.filename) {
+    ndpi_free(flow->http.filename);
+    flow->http.filename = NULL;
   }
 
   /* Reset flow risks. We should reset only those risks triggered by

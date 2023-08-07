@@ -266,7 +266,7 @@ void ndpi_data_print_window_values(struct ndpi_analyze_struct *s) {
 
     for(i=0; i<n; i++)
       printf("[%u: %" PRIu64 "]", i, s->values[i]);
-    
+
     printf("\n");
   }
 }
@@ -1714,4 +1714,159 @@ u_int32_t ndpi_crc32(const void* data, size_t n_bytes) {
 
   __crc32(data, n_bytes, &crc);
   return crc;
+}
+
+/* ********************************************************************************* */
+/* ********************************************************************************* */
+
+/*
+  Count-Min Sketch: Memory Usage
+
+  https://florian.github.io/count-min-sketch/
+  https://medium.com/@nehasingh18.9/count-min-sketch-for-beginners-f1e441bbe7a4
+  https://sites.google.com/site/countminsketch/code
+
+  [Depth: 8][Total memory: 1040]
+  [Depth: 16][Total memory: 2064]
+  [Depth: 32][Total memory: 4112]
+  [Depth: 64][Total memory: 8208]
+  [Depth: 256][Total memory: 32784]
+  [Depth: 512][Total memory: 65552]
+  [Depth: 1024][Total memory: 131088]
+  [Depth: 2048][Total memory: 262160]
+  [Depth: 4096][Total memory: 524304]
+  [Depth: 8192][Total memory: 1048592]
+*/
+
+#define NDPI_COUNT_MIN_SKETCH_NUM_BUCKETS  1024
+
+// #define DEBUG
+
+struct ndpi_cm_sketch *ndpi_cm_sketch_init(u_int16_t num_hashes) {
+#ifdef DEBUG
+  u_int32_t tot_mem;
+#endif
+  u_int32_t len;
+  struct ndpi_cm_sketch *sketch;
+
+  len = sizeof(struct ndpi_cm_sketch);
+  sketch = (struct ndpi_cm_sketch*)ndpi_malloc(len);
+
+  if(!sketch)
+    return(NULL);
+
+#ifdef DEBUG
+    tot_mem = len;
+#endif
+
+  if(num_hashes < 2) num_hashes = 2;
+  num_hashes = ndpi_nearest_power_of_two(num_hashes);
+
+  sketch->num_hashes = num_hashes;
+  sketch->num_hash_buckets = num_hashes * NDPI_COUNT_MIN_SKETCH_NUM_BUCKETS;  
+  sketch->num_hash_buckets = ndpi_nearest_power_of_two(sketch->num_hash_buckets)-1,
+
+  len = num_hashes * NDPI_COUNT_MIN_SKETCH_NUM_BUCKETS * sizeof(u_int32_t);
+  sketch->tables = (u_int32_t*)ndpi_calloc(num_hashes, NDPI_COUNT_MIN_SKETCH_NUM_BUCKETS * sizeof(u_int32_t));
+
+#ifdef DEBUG
+  tot_mem += len;
+#endif
+
+#ifdef DEBUG
+  printf("[Num_Hashes: %u][Total memory: %u]\n", num_hashes, tot_mem);
+#endif
+
+  if(!sketch->tables) {
+    ndpi_free(sketch);
+    return(NULL);
+  }
+
+  return(sketch);
+}
+
+/* ********************************************************************************* */
+
+#define ndpi_simple_hash(value, seed) (value * seed)
+
+/* ********************************************************************************* */
+
+void ndpi_cm_sketch_add(struct ndpi_cm_sketch *sketch, u_int32_t element) {
+  u_int32_t idx;
+
+  for(idx = 1; idx <= sketch->num_hashes; idx++) {
+    u_int32_t hashval = ndpi_simple_hash(element, idx) & sketch->num_hash_buckets;
+
+    sketch->tables[hashval]++;
+
+#ifdef DEBUG
+    printf("ndpi_add_sketch_add() [hash: %d][num_hash_buckets: %u][hashval: %d][value: %d]\n",
+	   idx, sketch->num_hash_buckets, hashval, sketch->tables[hashval]);
+#endif
+  }
+}
+
+/* ********************************************************************************* */
+
+u_int32_t ndpi_cm_sketch_count(struct ndpi_cm_sketch *sketch, u_int32_t element) {
+  u_int32_t min_value = INT_MAX, idx;
+
+  for(idx = 1; idx <= sketch->num_hashes; idx++) {
+    u_int32_t hashval = ndpi_simple_hash(element, idx) & sketch->num_hash_buckets;
+
+#ifdef DEBUG
+    printf("ndpi_add_sketch_add() [hash: %d][num_hash_buckets: %u][hashval: %d][value: %d]\n",
+	   idx, sketch->num_hash_buckets, hashval, sketch->tables[hashval]);
+#endif
+    
+    min_value = ndpi_min(min_value, sketch->tables[hashval]);
+  }
+
+  return(min_value);
+}
+
+/* ********************************************************************************* */
+
+void ndpi_cm_sketch_destroy(struct ndpi_cm_sketch *sketch) {
+  ndpi_free(sketch->tables);
+  ndpi_free(sketch);
+}
+
+/* ********************************************************************************* */
+/* ********************************************************************************* */
+
+/* Popcount, short for "population count," is a computer programming term that refers to
+   the number of set bits (bits with a value of 1) in a binary representation of a given
+   data word or integer. In other words, it is the count of all the 1s present in the
+   binary representation of a number.
+   For example, consider the number 45, which is represented in binary as 101101.
+   The popcount of 45 would be 4 because there are four 1s in its binary representation.
+*/
+
+int ndpi_popcount_init(struct ndpi_popcount *h)
+{
+  if(h) {
+    memset(h, '\0', sizeof(*h));
+    return 0;
+  }
+  return -1;
+}
+
+/* ********************************************************************************* */
+
+void ndpi_popcount_count(struct ndpi_popcount *h, const u_int8_t *buf, u_int32_t buf_len)
+{
+  u_int32_t i;
+
+  if(!h)
+    return;
+
+  /* Trivial alg. TODO: there are lots of better, more performant algorithms */
+
+  for(i = 0; i < buf_len / 4; i++)
+    h->pop_count += __builtin_popcount(*(u_int32_t *)(buf + i * 4));
+  for(i = 0; i < buf_len % 4; i++)
+    h->pop_count += __builtin_popcount(buf[buf_len - (buf_len % 4) + i]);
+
+  h->tot_bytes_count += buf_len;
 }

@@ -31,9 +31,7 @@ jobs:
           make check VERBOSE=1
       - name: Generate Coverage Report
         run: |
-          mkdir -vp coverage_report/ndpi_coverage_report
-          lcov --directory . --capture --output-file lcov.info
-          genhtml -o coverage_report/ndpi_coverage_report lcov.info
+          make coverage
       - uses: actions/upload-artifact@v3
         with:
           name: ndpi-coverage-report
