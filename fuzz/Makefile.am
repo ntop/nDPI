@@ -1,4 +1,4 @@
-bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga
+bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream
 #Data structures
@@ -412,6 +412,32 @@ fuzz_dga_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_dga_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_is_stun_udp_SOURCES = fuzz_is_stun.c fuzz_common_code.c
+fuzz_is_stun_udp_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_is_stun_udp_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_is_stun_udp_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_is_stun_udp_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_is_stun_udp_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_is_stun_udp_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_is_stun_udp_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_is_stun_tcp_SOURCES = fuzz_is_stun.c fuzz_common_code.c
+fuzz_is_stun_tcp_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DSTUN_TCP
+fuzz_is_stun_tcp_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_is_stun_tcp_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_is_stun_tcp_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_is_stun_tcp_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_is_stun_tcp_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_is_stun_tcp_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
 fuzz_gcrypt_light_SOURCES = fuzz_gcrypt_light.cpp fuzz_common_code.c
 fuzz_gcrypt_light_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -I ../src/lib/third_party/include/
 fuzz_gcrypt_light_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -I ../src/lib/third_party/include/
@@ -555,9 +581,16 @@ fuzz_serialization_seed_corpus.zip: $(files_corpus_fuzz_serialization)
 	zip -j fuzz_serialization_seed_corpus.zip $(files_corpus_fuzz_serialization)
 
 files_corpus_fuzz_community_id :=  $(wildcard corpus/fuzz_community_id/*)
-
 fuzz_community_id_seed_corpus.zip: $(files_corpus_fuzz_community_id)
 	zip -j fuzz_community_id_seed_corpus.zip $(files_corpus_fuzz_community_id)
+
+files_corpus_fuzz_is_stun_udp :=  $(wildcard corpus/fuzz_is_stun_udp/*)
+fuzz_is_stun_udp_seed_corpus.zip: $(files_corpus_fuzz_is_stun_udp)
+	zip -j fuzz_is_stun_udp_seed_corpus.zip $(files_corpus_fuzz_is_stun_udp)
+
+files_corpus_fuzz_is_stun_tcp :=  $(wildcard corpus/fuzz_is_stun_tcp/*)
+fuzz_is_stun_tcp_seed_corpus.zip: $(files_corpus_fuzz_is_stun_tcp)
+	zip -j fuzz_is_stun_tcp_seed_corpus.zip $(files_corpus_fuzz_is_stun_tcp)
 
 files_corpus_fuzz_ds_patricia :=  $(wildcard corpus/fuzz_ds_patricia/*)
 fuzz_ds_patricia_seed_corpus.zip: $(files_corpus_fuzz_ds_patricia)
@@ -639,7 +672,7 @@ files_corpus_fuzz_ds_domain_classify :=  $(wildcard corpus/fuzz_ds_domain_classi
 fuzz_ds_domain_classify_seed_corpus.zip: $(files_corpus_fuzz_ds_domain_classify)
 	zip -j fuzz_ds_domain_classify_seed_corpus.zip $(files_corpus_fuzz_ds_domain_classify)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip
 	cp corpus/fuzz_*seed_corpus.zip .
 
 #Create dictionaries exactly as expected by oss-fuzz.
@@ -672,6 +705,8 @@ distdir:
 		-o -path './corpus/fuzz_readerutils_workflow/*' \
 		-o -path './corpus/fuzz_readerutils_parseprotolist/*' \
 		-o -path './corpus/fuzz_config/*' \
+		-o -path './corpus/fuzz_is_stun_udp/*' \
+		-o -path './corpus/fuzz_is_stun_tcp/*' \
 		-o -path './corpus/fuzz_serialization/*' \
 		-o -path './corpus/fuzz_community_id/*' \
 		-o -path './corpus/fuzz_libinjection/*' \

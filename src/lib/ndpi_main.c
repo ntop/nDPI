@@ -2175,6 +2175,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			        "ETHEREUM", NDPI_PROTOCOL_CATEGORY_CRYPTO_CURRENCY,
 			        ndpi_build_default_ports(ports_a, 30303, 0, 0, 0, 0) /* TCP */,
 			        ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TELEGRAM_VOIP,
+			  "TelegramVoip", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -7048,14 +7053,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN)
     return(ret);
 
-  if((flow->guessed_protocol_id == NDPI_PROTOCOL_STUN) ||
-     (enable_guess &&
-      flow->stun.num_binding_requests > 0 &&
-      flow->stun.num_processed_pkts > 0)) {
-    ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_STUN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL);
-    ret.app_protocol = flow->detected_protocol_stack[0];
-  }
-
   /* Check some caches */
 
   /* Does it looks like BitTorrent? */
@@ -8544,6 +8541,14 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, s
   ndpi_int_change_protocol(ndpi_str, flow, upper_detected_protocol, lower_detected_protocol, confidence);
   ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
   ndpi_reconcile_protocols(ndpi_str, flow, &ret);
+}
+
+/* ********************************************************************************* */
+
+void ndpi_reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+  flow->detected_protocol_stack[1] = NDPI_PROTOCOL_UNKNOWN;
+  flow->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
+  flow->confidence = NDPI_CONFIDENCE_UNKNOWN;
 }
 
 /* ********************************************************************************* */
