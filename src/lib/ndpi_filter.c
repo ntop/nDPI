@@ -35,6 +35,9 @@
 #include "ndpi_includes.h"
 #include "ndpi_encryption.h"
 
+#define malloc ndpi_malloc
+#define free  ndpi_free
+
 #include "third_party/include/binaryfusefilter.h"
 
 /* ******************************************* */
