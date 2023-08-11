@@ -1996,6 +1996,7 @@ extern "C" {
 
   ndpi_filter* ndpi_filter_alloc(uint32_t elements_number);
   bool         ndpi_filter_add(ndpi_filter *f, uint64_t value); /* returns true on success, false on failure */
+  bool         ndpi_filter_add_multi(ndpi_filter *f, uint64_t *values, u_int32_t num_values); /* Add multiple values */
   bool         ndpi_filter_contains(ndpi_filter *f, uint64_t value); /* returns true on success, false on failure */
   void         ndpi_filter_free(ndpi_filter *f);
   

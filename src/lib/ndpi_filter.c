@@ -68,6 +68,18 @@ bool ndpi_filter_add(ndpi_filter *f, uint64_t value) {
 
 /* ******************************************* */
 
+bool ndpi_filter_add_multi(ndpi_filter *f, uint64_t *values, u_int32_t num_values) {
+  if(!f)
+    return(false);
+  else {
+    binary_fuse8_t *filter = (binary_fuse8_t*)f;
+    
+    return(binary_fuse8_populate(values, num_values, filter));
+  }
+}
+
+/* ******************************************* */
+
 bool ndpi_filter_contains(ndpi_filter *f, uint64_t value) {
   if(!f)
     return(false);
