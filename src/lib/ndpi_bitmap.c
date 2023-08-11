@@ -1,5 +1,5 @@
 /*
- * ndpi_utils.c
+ * ndpi_bitmap.c
  *
  * Copyright (C) 2011-23 - ntop.org and contributors
  *

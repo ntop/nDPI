@@ -1965,6 +1965,8 @@ extern "C" {
 
   /* ******************************* */
 
+  /* Based on https://roaringbitmap.org */
+  
   ndpi_bitmap* ndpi_bitmap_alloc(void);
   void ndpi_bitmap_free(ndpi_bitmap* b);
   ndpi_bitmap* ndpi_bitmap_copy(ndpi_bitmap* b);
@@ -1985,6 +1987,18 @@ extern "C" {
   void ndpi_bitmap_iterator_free(ndpi_bitmap* b);
   bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, u_int32_t *value);
 
+  /* ******************************* */
+  /*
+    Bloom-filter on steroids
+    
+    Based on https://github.com/FastFilter/xor_singleheader
+  */
+
+  ndpi_filter* ndpi_filter_alloc(uint32_t elements_number);
+  bool         ndpi_filter_add(ndpi_filter *f, uint64_t value); /* returns true on success, false on failure */
+  bool         ndpi_filter_contains(ndpi_filter *f, uint64_t value); /* returns true on success, false on failure */
+  void         ndpi_filter_free(ndpi_filter *f);
+  
   /* ******************************* */
 
   char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,

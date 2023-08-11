@@ -5323,6 +5323,24 @@ void compressedBitmapUnitTest() {
 
 /* *********************************************** */
 
+void filterUnitTest() {
+  ndpi_filter* f = ndpi_filter_alloc(10000);
+  u_int32_t v, i;
+  
+  assert(f);
+
+  srand(time(NULL));
+  
+  for(i=0; i<1000; i++)
+    assert(ndpi_filter_add(f, v = rand()));
+
+  assert(ndpi_filter_contains(f, v));
+  
+  ndpi_filter_free(f);
+}
+
+/* *********************************************** */
+
 void zscoreUnitTest() {
   u_int32_t values[] = { 1, 3, 3, 4, 5, 2, 6, 7, 30, 16 };
   u_int32_t i;
@@ -5455,6 +5473,7 @@ int main(int argc, char **argv) {
     dgaUnitTest();
     hllUnitTest();
     bitmapUnitTest();
+    filterUnitTest();
     automataUnitTest();
     analyzeUnitTest();
     ndpi_self_check_host_match(stderr);
