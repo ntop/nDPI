@@ -152,7 +152,7 @@ static inline uint32_t binary_fuse8_hash(int index, uint64_t hash,
     uint64_t h = binary_fuse_mulhi(hash, filter->SegmentCountLength);
     h += index * filter->SegmentLength;
     // keep the lower 36 bits
-    uint64_t hh = hash & ((1UL << 36) - 1);
+    uint64_t hh = hash & ((((uint64_t)1UL( << 36) - 1);
     // index 0: right shift by 36; index 1: right shift by 18; index 2: no shift
     h ^= (size_t)((hh >> (36 - 18 * index)) & filter->SegmentLengthMask);
     return h;
@@ -469,7 +469,7 @@ static inline uint32_t binary_fuse16_hash(int index, uint64_t hash,
     uint64_t h = binary_fuse_mulhi(hash, filter->SegmentCountLength);
     h += index * filter->SegmentLength;
     // keep the lower 36 bits
-    uint64_t hh = hash & ((1UL << 36) - 1);
+    uint64_t hh = hash & ((((uint64_t)1UL) << 36) - 1);
     // index 0: right shift by 36; index 1: right shift by 18; index 2: no shift
     h ^= (size_t)((hh >> (36 - 18 * index)) & filter->SegmentLengthMask);
     return h;
