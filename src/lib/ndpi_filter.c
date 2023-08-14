@@ -34,7 +34,7 @@
 #include "ndpi_includes.h"
 #include "ndpi_encryption.h"
 
-#include "third_party/src/hll/MurmurHash3.c"
+#include "third_party/include/MurmurHash3.h"
 
 /* ******************************************* */
 

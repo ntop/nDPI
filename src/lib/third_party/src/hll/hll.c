@@ -26,7 +26,9 @@
 #include <string.h>
 
 #include <stdio.h>
-
+#include <ndpi_api.h>
+#include <ndpi_main.h>
+#include "ndpi_typedefs.h"
 #include "../include/MurmurHash3.h"
 #include "../include/hll.h"
 

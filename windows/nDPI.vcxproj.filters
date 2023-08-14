@@ -120,6 +120,7 @@
     <ClCompile Include="..\src\lib\ndpi_community_id.c" />
     <ClCompile Include="..\src\lib\ndpi_geoip.c" />
     <ClCompile Include="..\src\lib\ndpi_main.c" />
+    <ClCompile Include="..\src\lib\ndpi_filter.c" />
     <ClCompile Include="..\src\lib\ndpi_memory.c" />
     <ClCompile Include="..\src\lib\ndpi_serializer.c" />
     <ClCompile Include="..\src\lib\ndpi_utils.c" />
@@ -200,6 +201,12 @@
       <Filter>third_party</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lib\third_party\src\strptime.c">
+      <Filter>third_party</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lib\third_party\src\hll\MurmurHash3.c" />
+      <Filter>third_party</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lib\third_party\src\hll\hll.c" />
       <Filter>third_party</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lib\protocols\tocaboca.c" />
