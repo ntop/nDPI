@@ -1329,6 +1329,10 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
       processed += block_len + 13;
       /* DTLS mid session: no need to further inspect the flow */
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DTLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+
+      ndpi_protocol ret = { __get_master(ndpi_struct, flow), NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN /* unused */, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
+      flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+
       flow->tls_quic.certificate_processed = 1; /* Fake, to avoid extra dissection */
       break;
     }
