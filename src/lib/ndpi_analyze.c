@@ -299,7 +299,6 @@ const char* ndpi_data_ratio2str(float ratio) {
 /* ********************************************************************************* */
 
 #include "third_party/src/hll/hll.c"
-#include "third_party/src/hll/MurmurHash3.c"
 
 int ndpi_hll_init(struct ndpi_hll *hll, u_int8_t bits) {
   return(hll_init(hll, bits));

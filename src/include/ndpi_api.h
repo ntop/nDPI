@@ -1989,16 +1989,17 @@ extern "C" {
 
   /* ******************************* */
   /*
-    Bloom-filter on steroids
-    
-    Based on https://github.com/FastFilter/xor_singleheader
+    Bloom-filter on steroids based on ndpi_bitmap
   */
 
-  ndpi_filter* ndpi_filter_alloc(uint32_t elements_number);
-  bool         ndpi_filter_add(ndpi_filter *f, uint64_t value); /* returns true on success, false on failure */
-  bool         ndpi_filter_add_multi(ndpi_filter *f, uint64_t *values, u_int32_t num_values); /* Add multiple values */
-  bool         ndpi_filter_contains(ndpi_filter *f, uint64_t value); /* returns true on success, false on failure */
+  ndpi_filter* ndpi_filter_alloc();
+  bool         ndpi_filter_add(ndpi_filter *f, u_int32_t value); /* returns true on success, false on failure */
+  bool         ndpi_filter_add_string(ndpi_filter *f, char *string); /* returns true on success, false on failure */
+  bool         ndpi_filter_contains(ndpi_filter *f, u_int32_t value); /* returns true on success, false on failure */
+  bool         ndpi_filter_contains_string(ndpi_filter *f, char *string); /* returns true on success, false on failure */
   void         ndpi_filter_free(ndpi_filter *f);
+  size_t       ndpi_filter_size(ndpi_filter *f);
+  u_int32_t    ndpi_filter_cardinality(ndpi_filter *f);
   
   /* ******************************* */
 

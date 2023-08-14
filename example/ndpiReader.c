@@ -5324,7 +5324,7 @@ void compressedBitmapUnitTest() {
 /* *********************************************** */
 
 void filterUnitTest() {
-  ndpi_filter* f = ndpi_filter_alloc(10000);
+  ndpi_filter* f = ndpi_filter_alloc();
   u_int32_t v, i;
   
   assert(f);

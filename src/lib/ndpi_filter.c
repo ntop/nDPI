@@ -27,7 +27,6 @@
 #include <math.h>
 #include <sys/types.h>
 
-
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
 #include "ndpi_config.h"
@@ -35,71 +34,77 @@
 #include "ndpi_includes.h"
 #include "ndpi_encryption.h"
 
-#define malloc  ndpi_malloc
-#define calloc  ndpi_calloc
-#define realloc ndpi_realloc
-#define free    ndpi_free
-
-#include "third_party/include/binaryfusefilter.h"
+#include "third_party/src/hll/MurmurHash3.c"
 
 /* ******************************************* */
 
-ndpi_filter* ndpi_filter_alloc(uint32_t elements_number) {
-  binary_fuse8_t *filter = (binary_fuse8_t*)ndpi_malloc(sizeof(binary_fuse8_t));
-  
-  if(filter == NULL) return(NULL);
-  
-  if(!binary_fuse8_allocate(elements_number, filter)) {
-    ndpi_free(filter);
-    return(NULL);
-  } else
-    return((ndpi_filter*)filter);
+ndpi_filter* ndpi_filter_alloc() {
+  return((ndpi_filter*)ndpi_bitmap_alloc());
 }
 
 /* ******************************************* */
 
-bool ndpi_filter_add(ndpi_filter *f, uint64_t value) {
+bool ndpi_filter_add(ndpi_filter *f, u_int32_t value) {
   if(!f)
     return(false);
   else {
-    binary_fuse8_t *filter = (binary_fuse8_t*)f;
-    
-    return(binary_fuse8_populate(&value, 1, filter));
+    ndpi_bitmap *filter = (ndpi_bitmap*)f;
+
+    ndpi_bitmap_set(filter, value);
+    return(true);
   }
 }
 
 /* ******************************************* */
 
-bool ndpi_filter_add_multi(ndpi_filter *f, uint64_t *values, u_int32_t num_values) {
+bool ndpi_filter_add_string(ndpi_filter *f, char *string) {
+  return(ndpi_filter_add(f, MurmurHash(string, strlen(string), 0xD6DFE7)));
+}
+
+/* ******************************************* */
+
+bool ndpi_filter_contains(ndpi_filter *f, u_int32_t value) {
   if(!f)
     return(false);
   else {
-    binary_fuse8_t *filter = (binary_fuse8_t*)f;
+    ndpi_bitmap *filter = (ndpi_bitmap*)f;
     
-    return(binary_fuse8_populate(values, num_values, filter));
+    return(ndpi_bitmap_isset(filter, value));
   }
 }
 
 /* ******************************************* */
 
-bool ndpi_filter_contains(ndpi_filter *f, uint64_t value) {
-  if(!f)
-    return(false);
-  else {
-    binary_fuse8_t *filter = (binary_fuse8_t*)f;
-    
-    return(binary_fuse8_contain(value, filter));
-  }
+bool ndpi_filter_contains_string(ndpi_filter *f, char *string) {
+  return(ndpi_filter_contains(f, MurmurHash(string, strlen(string), 0xD6DFE7)));
 }
 
 /* ******************************************* */
 
 void ndpi_filter_free(ndpi_filter *f) {
   if(f != NULL) {
-    binary_fuse8_t *filter = (binary_fuse8_t*)f;
+    ndpi_bitmap *filter = (ndpi_bitmap*)f;
     
-    binary_fuse8_free(filter);
-    ndpi_free(filter);
+    ndpi_bitmap_free(filter);
   }
+}
+
+  /* ******************************************* */
+
+size_t ndpi_filter_size(ndpi_filter *f) {
+  if(f != NULL) {
+    char *buf;
+    size_t s = ndpi_bitmap_serialize(f, &buf);
+    
+    if(buf) free(buf);
+    return(s);
+  } else
+    return(0);
+}
+
+  /* ******************************************* */
+
+u_int32_t ndpi_filter_cardinality(ndpi_filter *f) {
+  return(f ? ndpi_bitmap_cardinality(f) : 0);
 }
 
