@@ -30,6 +30,7 @@
 #include <float.h> /* FLT_EPSILON */
 #include "ndpi_api.h"
 #include "ndpi_config.h"
+#include "third_party/include/hll.h"
 
 /* ********************************************************************************* */
 
@@ -297,8 +298,6 @@ const char* ndpi_data_ratio2str(float ratio) {
 
 /* ********************************************************************************* */
 /* ********************************************************************************* */
-
-#include "third_party/src/hll/hll.c"
 
 int ndpi_hll_init(struct ndpi_hll *hll, u_int8_t bits) {
   return(hll_init(hll, bits));
