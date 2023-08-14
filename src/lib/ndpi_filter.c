@@ -96,7 +96,7 @@ size_t ndpi_filter_size(ndpi_filter *f) {
     char *buf;
     size_t s = ndpi_bitmap_serialize(f, &buf);
     
-    if(buf) free(buf);
+    if(buf) ndpi_free(buf);
     return(s);
   } else
     return(0);
