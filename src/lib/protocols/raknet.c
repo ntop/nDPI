@@ -300,7 +300,6 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
         }
         return;
       }
-      break;
 
     case 0x09: /* Connection Request */
       if (packet->payload_packet_len != 16)
@@ -370,7 +369,6 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
         }
         return;
       }
-      break;
 
     case 0xfe: /* Game Packet */
       required_packets = 8;

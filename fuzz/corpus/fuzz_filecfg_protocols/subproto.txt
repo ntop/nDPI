@@ -1,0 +1,3 @@
+host:"disneyplus.com",host:"cdn.registerdisney.go.com",host:"disney-portal.my.onetrust.com",host:"disneyplus.bn5x.net",host:"disney-plus.net"@DisneyPlus
+host:"*.lvlt.dash.us.aiv-cdn.net.c.footprint.net"@AmazonVideo
+host:"api-global.netflix.com"@Netflix

@@ -583,7 +583,9 @@ ndpi_update_params (classifier_type_codes_t param_type, const char *param_file)
     break;
 
   default:
+#if 0
     printf("error: unknown paramerter type (%d)", param_type);
+#endif
     break;
   }
 }

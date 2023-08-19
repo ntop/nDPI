@@ -15,6 +15,8 @@ void fuzz_set_alloc_callbacks(void);
 void fuzz_set_alloc_seed(int seed);
 void fuzz_set_alloc_callbacks_and_seed(int seed);
 
+FILE *buffer_to_file(const uint8_t *data, size_t size);
+
 #ifdef __cplusplus
 }
 #endif

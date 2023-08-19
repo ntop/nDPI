@@ -7,6 +7,8 @@ bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tr
 bin_PROGRAMS += fuzz_libinjection
 #Internal crypto
 bin_PROGRAMS += fuzz_gcrypt_light
+#Configuration files
+bin_PROGRAMS += fuzz_filecfg_protocols
 
 fuzz_process_packet_SOURCES = fuzz_process_packet.c fuzz_common_code.c
 fuzz_process_packet_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
@@ -21,7 +23,7 @@ fuzz_process_packet_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_process_packet_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c ../example/reader_util.c
+fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c
 fuzz_ndpi_reader_CFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS)
 fuzz_ndpi_reader_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_LDFLAGS = $(PCAP_LIB) $(LIBS)
@@ -378,6 +380,20 @@ fuzz_gcrypt_light_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_gcrypt_light_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_filecfg_protocols_SOURCES = fuzz_filecfg_protocols.c fuzz_common_code.c
+fuzz_filecfg_protocols_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_filecfg_protocols_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_filecfg_protocols_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_filecfg_protocols_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_filecfg_protocols_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_filecfg_protocols_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_filecfg_protocols_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+
 # required for Google oss-fuzz
 # see https://github.com/google/oss-fuzz/tree/master/projects/ndpi
 testpcaps := $(wildcard ../tests/cfgs/default/pcap/*.pcap*)
@@ -481,7 +497,12 @@ files_corpus_fuzz_tls_certificate :=  $(wildcard corpus/fuzz_tls_certificate/*)
 fuzz_tls_certificate_seed_corpus.zip: $(files_corpus_fuzz_tls_certificate)
 	zip -j fuzz_tls_certificate_seed_corpus.zip $(files_corpus_fuzz_tls_certificate)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip
+files_corpus_fuzz_filecfg_protocols :=  $(wildcard corpus/fuzz_filecfg_protocols/*)
+
+fuzz_filecfg_protocols_seed_corpus.zip: $(files_corpus_fuzz_filecfg_protocols)
+	zip -j fuzz_filecfg_protocols_seed_corpus.zip $(files_corpus_fuzz_filecfg_protocols)
+
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip
 	cp corpus/fuzz_*seed_corpus.zip .
 
 #Create dictionaries exactly as expected by oss-fuzz.
@@ -502,8 +523,11 @@ distdir:
 		-o -name '*.cpp' \
 		-o -name '*.dict' \
 		-o -name 'ipv4_addresses.txt' \
+		-o -name 'bd_param.txt' \
+		-o -name 'splt_param.txt' \
 		-o -path './corpus/fuzz_*.zip' \
 		-o -path './corpus/fuzz_quic_get_crypto_data/*' \
+		-o -path './corpus/fuzz_filecfg_protocols/*' \
 		-o -path './corpus/fuzz_config/*' \
 		-o -path './corpus/fuzz_serialization/*' \
 		-o -path './corpus/fuzz_community_id/*' \

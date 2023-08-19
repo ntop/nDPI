@@ -192,7 +192,6 @@ static uint32_t dns_validchar[8] = {
 
 static char* dns_error_code2string(u_int16_t error_code, char *buf, u_int buf_len) {
   switch(error_code) {
-  case 0: return((char*)"NOERROR");
   case 1: return((char*)"FORMERR");
   case 2: return((char*)"SERVFAIL");
   case 3: return((char*)"NXDOMAIN");
