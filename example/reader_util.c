@@ -469,14 +469,14 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
 
   if(module == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");
-    exit(-1);
+    return NULL;
   }
 
   workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
   if(workflow == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");
     ndpi_free(module);
-    exit(-1);
+    return NULL;
   }
 
   workflow->pcap_handle = pcap_handle;

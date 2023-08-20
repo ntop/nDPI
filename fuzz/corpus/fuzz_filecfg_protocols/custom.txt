@@ -1,0 +1,9 @@
+ip:213.75.170.11/32:443@CustomProtocol
+ip:8.248.73.247:443@AmazonPrime
+ip:54.80.47.130@AmazonPrime
+
+ip:3.3.3.3:443@CustomProtocolA
+ip:3.3.3.3:444@CustomProtocolB
+ip:3.3.3.3:446@CustomProtocolC=400
+ip:3.3.3.3:447@CustomProtocolD=1
+ip:3.3.3.3:448@CustomProtocolD=4000

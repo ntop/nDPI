@@ -76,6 +76,7 @@
 /fuzz/fuzz_ds_cmsketch
 /fuzz/fuzz_gcrypt_light
 /fuzz/fuzz_ndpi_reader_payload_analyzer
+/fuzz/fuzz_filecfg_protocols
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_seed_corpus.zip
 /fuzz/fuzz_quic_get_crypto_data_seed_corpus.zip
@@ -96,6 +97,7 @@
 /fuzz/fuzz_ds_ahocorasick_seed_corpus.zip
 /fuzz/fuzz_libinjection_seed_corpus.zip
 /fuzz/fuzz_tls_certificate_seed_corpus.zip
+/fuzz/fuzz_filecfg_protocols_seed_corpus.zip
 /fuzz/fuzz_dga_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip
 /fuzz/fuzz_*.dict

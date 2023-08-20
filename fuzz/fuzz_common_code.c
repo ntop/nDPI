@@ -58,3 +58,8 @@ void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_
     ndpi_finalize_initialization(*ndpi_info_mod);
   }
 }
+
+FILE *buffer_to_file(const uint8_t *data, size_t size)
+{
+  return fmemopen((void *)data, size, "rw");
+}

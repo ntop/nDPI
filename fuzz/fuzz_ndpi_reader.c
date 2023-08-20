@@ -30,22 +30,6 @@ extern void ndpi_report_payload_stats(FILE *out);
 extern int force_no_aesni;
 #endif
 
-FILE *bufferToFile(const uint8_t *Data, size_t Size) {
-  FILE *fd;
-  fd = tmpfile();
-  if (fd == NULL) {
-    perror("Error tmpfile");
-    return NULL;
-  }
-  if (fwrite (Data, 1, Size, fd) != Size) {
-    perror("Error fwrite");
-    fclose(fd);
-    return NULL;
-  }
-  rewind(fd);
-  return fd;
-}
-
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   pcap_t * pkts;
   const u_char *pkt;
@@ -106,10 +90,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
 #ifdef ENABLE_MEM_ALLOC_FAILURES
   /* Don't fail memory allocations until init phase is done */
-  fuzz_set_alloc_seed(Size);
+  fuzz_set_alloc_callbacks_and_seed(Size);
 #endif
 
-  fd = bufferToFile(Data, Size);
+  fd = buffer_to_file(Data, Size);
   if (fd == NULL)
     return 0;
 
@@ -158,6 +142,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   /* Free payload analyzer data, without printing */
   if(enable_payload_analyzer)
     ndpi_report_payload_stats(NULL);
+
+#ifdef ENABLE_PAYLOAD_ANALYZER
+  ndpi_update_params(SPLT_PARAM_TYPE, "splt_param.txt");
+  ndpi_update_params(BD_PARAM_TYPE, "bd_param.txt");
+  ndpi_update_params(2, ""); /* invalid */
+#endif
 
   return 0;
 }

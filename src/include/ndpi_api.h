@@ -756,11 +756,14 @@ extern "C" {
    * @par     ndpi_mod = the detection module
    * @par     path     = the path of the file
    * @return  0 if the file is loaded correctly;
-   *          -1 else
+   *          -1 generic error
+   *          -2 memory allocation error
    *
    */
   int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod,
 			       const char* path);
+  int ndpi_load_protocols_file2(struct ndpi_detection_module_struct *ndpi_mod,
+			        FILE *fd);
 
   /**
    * Add an IP-address based risk mask

@@ -2608,7 +2608,8 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
     }
   }
 
-  inet_pton(AF_INET, value, &pin);
+  if(inet_pton(AF_INET, value, &pin) != 1)
+    return(-1);
 
   if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits)) != NULL) {
     int i;
@@ -2653,7 +2654,7 @@ void set_ndpi_flow_free(void (*__ndpi_flow_free)(void *ptr)) {
 }
 
 void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *ndpi_str, ndpi_log_level_t log_level,
-                       const char *file_name, const char *func_name, int line_number, const char *format, ...) {
+                       const char *file_name, const char *func_name, unsigned int line_number, const char *format, ...) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   va_list args;
 #define MAX_STR_LEN 250
@@ -4351,26 +4352,37 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
 
 */
 int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
+  int rc;
   FILE *fd;
-  char *buffer, *old_buffer;
-  int chunk_len = 1024, buffer_len = chunk_len, old_buffer_len;
-  int i, rc = -1;
 
   if(!ndpi_str || !path)
     return(-1);
 
   fd = fopen(path, "r");
-
   if(fd == NULL) {
     NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
-    goto error;
+    return -1;
   }
 
-  buffer = ndpi_malloc(buffer_len);
+  rc = ndpi_load_protocols_file2(ndpi_str, fd);
 
+  fclose(fd);
+
+  return rc;
+}
+
+int ndpi_load_protocols_file2(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
+  char *buffer, *old_buffer;
+  int chunk_len = 1024, buffer_len = chunk_len, old_buffer_len;
+  int i;
+
+  if(!ndpi_str || !fd)
+    return -1;
+
+  buffer = ndpi_malloc(buffer_len);
   if(buffer == NULL) {
     NDPI_LOG_ERR(ndpi_str, "Memory allocation failure\n");
-    goto close_fd;
+    return -2;
   }
 
   while(1) {
@@ -4378,6 +4390,7 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
     int line_len = buffer_len;
 
     while(((line = fgets(line, line_len, fd)) != NULL)
+	  && strlen(line) > 0
 	  && (line[strlen(line) - 1] != '\n')) {
       i = strlen(line);
       old_buffer = buffer;
@@ -4385,11 +4398,10 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
       buffer_len += chunk_len;
 
       buffer = ndpi_realloc(old_buffer, old_buffer_len, buffer_len);
-
       if(buffer == NULL) {
 	NDPI_LOG_ERR(ndpi_str, "Memory allocation failure\n");
 	ndpi_free(old_buffer);
-	goto close_fd;
+	return -2;
       }
 
       line = &buffer[i];
@@ -4419,15 +4431,9 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
       NDPI_LOG_INFO(ndpi_str, "Discraded rule '%s'\n", buffer);
   }
 
-  rc = 0;
-
   ndpi_free(buffer);
 
- close_fd:
-  fclose(fd);
-
- error:
-  return(rc);
+  return 0;
 }
 
 /* ******************************************************************** */
@@ -9027,12 +9033,14 @@ u_int ndpi_get_ndpi_detection_module_size() {
 
 void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_str, NDPI_PROTOCOL_BITMASK debug_bitmask) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  ndpi_str->debug_bitmask = debug_bitmask;
+  if(ndpi_str)
+    ndpi_str->debug_bitmask = debug_bitmask;
 #endif
 }
 
 void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_str, u_int l){
-  ndpi_str->ndpi_log_level = l;
+  if(ndpi_str)
+    ndpi_str->ndpi_log_level = l;
 }
 
 /* ******************************************************************** */
