@@ -165,6 +165,11 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
         }
         break;
 
+    case 0x06:
+        /* Option Acknowledgment (OACK) */
+        /* No fixed lengths as it can include the options from the request. */
+        break;
+
     default:
         NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
         return;
