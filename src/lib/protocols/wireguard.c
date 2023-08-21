@@ -98,6 +98,12 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
      */
     flow->l4.udp.wireguard_stage = 1 + packet->packet_direction;
     flow->l4.udp.wireguard_peer_index[packet->packet_direction] = sender_index;
+
+    if(flow->num_processed_pkts > 1) {
+      /* This looks like a retransmission and probably this communication is blocked hence let's stop here */
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WIREGUARD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      return;
+    } 
     /* need more packets before deciding */
   } else if (message_type == WG_TYPE_HANDSHAKE_RESPONSE && packet->payload_packet_len == 92) {
     if (flow->l4.udp.wireguard_stage == 2 - packet->packet_direction) {
@@ -107,6 +113,7 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
        * matches the index in the handshake initiation.
        */
       u_int32_t receiver_index = get_u_int32_t(payload, 8);
+
       if (receiver_index == flow->l4.udp.wireguard_peer_index[1 - packet->packet_direction]) {
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WIREGUARD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       } else {
