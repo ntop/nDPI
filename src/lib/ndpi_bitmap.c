@@ -114,6 +114,13 @@ void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and) {
 
 /* ******************************************* */
 
+/* b = b & !b_and */
+void ndpi_bitmap_andnot(ndpi_bitmap* a, ndpi_bitmap* b_and) {
+  roaring_bitmap_andnot_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_and);
+}
+
+/* ******************************************* */
+
 /* b = b | b_or */
 void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or) {
   roaring_bitmap_or_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_or);

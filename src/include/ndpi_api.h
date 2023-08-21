@@ -1983,6 +1983,7 @@ extern "C" {
   ndpi_bitmap* ndpi_bitmap_deserialize(char *buf);
 
   void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and);
+  void ndpi_bitmap_andnot(ndpi_bitmap* a, ndpi_bitmap* b_and);
   void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or);
   void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor);
 
