@@ -4001,17 +4001,19 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       is_ip = 1, value = &attr[3];
     else if(strncmp(attr, "host:", 5) == 0) {
       /* host:"<value>",host:"<value>",.....@<subproto> */
-      u_int i, max_len;
-
       value = &attr[5];
       if(value[0] == '"')
 	value++; /* remove leading " */
 
-      max_len = strlen(value) - 1;
-      if(value[max_len] == '"')
-	value[max_len] = '\0'; /* remove trailing " */
-
-      for(i=0; i<max_len; i++) value[i] = tolower(value[i]);
+      if(value[0] != '\0') {
+	u_int i, max_len = strlen(value) - 1;
+	
+	if(value[max_len] == '"')
+	  value[max_len] = '\0'; /* remove trailing " */
+	
+	for(i=0; i<max_len; i++)
+	  value[i] = tolower(value[i]);
+      }
     } else if(strncmp(attr, "nbpf:", 5) == 0) {
 #ifdef HAVE_NBPF
       char *filter = &attr[5];
