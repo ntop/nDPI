@@ -84,6 +84,16 @@ AS_IF([test "x${enable_code_coverage}" = "xyes"],[
 
 AS_IF([test "${enable_npcap+set}" = set],[DISABLE_NPCAP=1],[DISABLE_NPCAP=0])
 
+AC_MSG_CHECKING([whether to do DNS subprotocol inspection])
+AC_ARG_WITH(no-dns-subprotocol-inspection, AS_HELP_STRING([--with-no-dns-subprotocol-inspection], [Build with no support Disable DNS subprotocol inspection]))
+if test "${with_no_dns_subprotocol_inspection+set}" = set; then :
+  AC_DEFINE(DNS_SUBPROTOCOL_INSPECTION, 0, [DNS subprotocol inspection is OFF])
+  AC_MSG_RESULT(no)
+else
+  AC_DEFINE(DNS_SUBPROTOCOL_INSPECTION, 1, [DNS subprotocol inspection is ON])
+  AC_MSG_RESULT(yes)
+fi
+
 LT_INIT
 LT_LIB_M
 PKG_PROG_PKG_CONFIG

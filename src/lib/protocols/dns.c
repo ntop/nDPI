@@ -700,6 +700,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       return;
     }
 
+#ifdef DNS_SUBPROTOCOL_INSPECTION
     /* extract host name server */
     off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
 
@@ -800,6 +801,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
     flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
       flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
+#endif /* DNS_SUBPROTOCOL_INSPECTION */
 
 #ifdef DNS_DEBUG
     NDPI_LOG_DBG2(ndpi_struct, "[num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
