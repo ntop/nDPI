@@ -96,7 +96,6 @@ size_t ndpi_bitmap_serialize(ndpi_bitmap* b, char **buf) {
   if((*buf) == NULL) return(0);
 
   return(roaring_bitmap_serialize(r, *buf));
-  
 }
 
 /* ******************************************* */
