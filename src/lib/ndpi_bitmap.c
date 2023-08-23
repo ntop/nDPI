@@ -134,6 +134,12 @@ void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor) {
 
 /* ******************************************* */
 
+void ndpi_bitmap_optimize(ndpi_bitmap* a) {
+  roaring_bitmap_run_optimize(a);
+}
+
+/* ******************************************* */
+
 ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
   return(roaring_create_iterator((ndpi_bitmap*)b));
 }
@@ -141,7 +147,13 @@ ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
 /* ******************************************* */
 
 void ndpi_bitmap_iterator_free(ndpi_bitmap* b) {
-  return(roaring_free_uint32_iterator((ndpi_bitmap*)b));
+  roaring_free_uint32_iterator((ndpi_bitmap*)b);
+}
+
+/* ******************************************* */
+
+bool ndpi_bitmap_is_empty(ndpi_bitmap* b) {
+  return(roaring_bitmap_is_empty((ndpi_bitmap*)b));
 }
 
 /* ******************************************* */
