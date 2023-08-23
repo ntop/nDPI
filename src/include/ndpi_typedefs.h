@@ -2021,6 +2021,10 @@ typedef void ndpi_bitmap;
 typedef void ndpi_bitmap_iterator;
 typedef void ndpi_filter;
 
+typedef struct {
+  ndpi_filter *filter[2 /* direct and reverse */];
+} ndpi_string_search;
+
 /* **************************************** */
 
 #endif /* __NDPI_TYPEDEFS_H__ */

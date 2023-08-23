@@ -2009,6 +2009,20 @@ extern "C" {
   
   /* ******************************* */
 
+  /*
+    Efficient (space and speed) probabilitic datastructure
+    for exact string searching with a false positive rate
+    of 5 * 10 ^ -8
+  */
+  ndpi_string_search* ndpi_string_search_alloc();
+  void                ndpi_string_search_free(ndpi_string_search *s);
+  u_int32_t           ndpi_string_search_size(ndpi_string_search *s);
+  bool                ndpi_string_search_add(ndpi_string_search *s, char *string);
+  bool                ndpi_string_search_contains(ndpi_string_search *s, char *string);
+  u_int32_t           ndpi_string_search_cardinality(ndpi_string_search *f);
+  
+  /* ******************************* */
+
   char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 				char *out, u_int out_len,
 				u_int8_t use_json);
