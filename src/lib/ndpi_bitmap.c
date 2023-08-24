@@ -45,6 +45,12 @@ ndpi_bitmap* ndpi_bitmap_alloc() {
 
 /* ******************************************* */
 
+ndpi_bitmap* ndpi_bitmap_alloc_size(u_int32_t size) {
+  return((ndpi_bitmap*)roaring_bitmap_create_with_capacity(size));
+}
+
+/* ******************************************* */
+
 void ndpi_bitmap_free(ndpi_bitmap* b) {
   roaring_bitmap_free((const roaring_bitmap_t *)b);
 }
@@ -108,28 +114,42 @@ ndpi_bitmap* ndpi_bitmap_deserialize(char *buf) {
 
 /* b = b & b_and */
 void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and) {
-  roaring_bitmap_and_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_and);
+  roaring_bitmap_and_inplace((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_and);
+}
+
+/* ******************************************* */
+
+/* b = b & b_and */
+ndpi_bitmap* ndpi_bitmap_and_alloc(ndpi_bitmap* a, ndpi_bitmap* b_and) {
+  return((ndpi_bitmap*)roaring_bitmap_and((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_and));
 }
 
 /* ******************************************* */
 
 /* b = b & !b_and */
 void ndpi_bitmap_andnot(ndpi_bitmap* a, ndpi_bitmap* b_and) {
-  roaring_bitmap_andnot_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_and);
+  roaring_bitmap_andnot_inplace((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_and);
 }
 
 /* ******************************************* */
 
 /* b = b | b_or */
 void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or) {
-  roaring_bitmap_or_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_or);
+  roaring_bitmap_or_inplace((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_or);
+}
+
+/* ******************************************* */
+
+/* b = b | b_or */
+ndpi_bitmap* ndpi_bitmap_or_alloc(ndpi_bitmap* a, ndpi_bitmap* b_or) {
+  return((ndpi_bitmap*)roaring_bitmap_or((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_or));
 }
 
 /* ******************************************* */
 
 /* b = b ^ b_xor */
 void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor) {
-  roaring_bitmap_xor_inplace((ndpi_bitmap*)a, (ndpi_bitmap*)b_xor);
+  roaring_bitmap_xor_inplace((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_xor);
 }
 
 /* ******************************************* */
@@ -141,19 +161,19 @@ void ndpi_bitmap_optimize(ndpi_bitmap* a) {
 /* ******************************************* */
 
 ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
-  return(roaring_create_iterator((ndpi_bitmap*)b));
+  return(roaring_create_iterator((roaring_bitmap_t*)b));
 }
 
 /* ******************************************* */
 
 void ndpi_bitmap_iterator_free(ndpi_bitmap* b) {
-  roaring_free_uint32_iterator((ndpi_bitmap*)b);
+  roaring_free_uint32_iterator((roaring_bitmap_t*)b);
 }
 
 /* ******************************************* */
 
 bool ndpi_bitmap_is_empty(ndpi_bitmap* b) {
-  return(roaring_bitmap_is_empty((ndpi_bitmap*)b));
+  return(roaring_bitmap_is_empty((roaring_bitmap_t*)b));
 }
 
 /* ******************************************* */

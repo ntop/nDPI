@@ -1971,6 +1971,7 @@ extern "C" {
   /* Based on https://roaringbitmap.org */
   
   ndpi_bitmap* ndpi_bitmap_alloc(void);
+  ndpi_bitmap* ndpi_bitmap_alloc_size(u_int32_t size);
   void ndpi_bitmap_free(ndpi_bitmap* b);
   ndpi_bitmap* ndpi_bitmap_copy(ndpi_bitmap* b);
   u_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b);
@@ -1984,8 +1985,10 @@ extern "C" {
   ndpi_bitmap* ndpi_bitmap_deserialize(char *buf);
 
   void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and);
+  ndpi_bitmap* ndpi_bitmap_and_alloc(ndpi_bitmap* a, ndpi_bitmap* b_and);
   void ndpi_bitmap_andnot(ndpi_bitmap* a, ndpi_bitmap* b_and);
   void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or);
+  ndpi_bitmap* ndpi_bitmap_ot_alloc(ndpi_bitmap* a, ndpi_bitmap* b_and);
   void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor);
   void ndpi_bitmap_optimize(ndpi_bitmap* a);
   
