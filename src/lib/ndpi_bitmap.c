@@ -167,7 +167,7 @@ ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
 /* ******************************************* */
 
 void ndpi_bitmap_iterator_free(ndpi_bitmap* b) {
-  roaring_free_uint32_iterator((roaring_bitmap_t*)b);
+  roaring_free_uint32_iterator((roaring_uint32_iterator_t*)b);
 }
 
 /* ******************************************* */
