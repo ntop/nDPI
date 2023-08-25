@@ -375,6 +375,8 @@ if test "${with_maxminddb+set}" = set; then :
   fi
 fi
 
+AC_DEFINE_UNQUOTED(NDPI_BASE_DIR, "${PWD}", [nDPI base directory])
+
 dnl> Curl
 dnl> AC_CHECK_LIB([curl], [curl_easy_perform])
 dnl> if test ${ac_cv_lib_curl_curl_easy_perform} = "no"; then
@@ -419,4 +421,5 @@ AC_SUBST(DISABLE_NPCAP)
 AC_SUBST(EXE_SUFFIX)
 AC_SUBST(NDPI_CFLAGS)
 AC_SUBST(NDPI_LDFLAGS)
+AC_SUBST(NDPI_BASE_DIR)
 AC_OUTPUT

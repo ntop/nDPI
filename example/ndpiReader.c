@@ -5419,6 +5419,28 @@ void sketchUnitTest() {
 
 /* *********************************************** */
 
+void domainSearchUnitTest() {
+  ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
+  char *domain = "ntop.org";
+  
+  assert(sc);
+
+  ndpi_domain_classify_add(sc, CUSTOM_CATEGORY_MALWARE, domain);
+
+  assert(ndpi_domain_classify_contains(sc, domain));
+
+#if 0
+  printf("Added %u domains\n",
+	 ndpi_domain_classify_add_domains(sc, NDPI_PROTOCOL_GAMBLING,
+					  NDPI_BASE_DIR "/lists/gambling.list"));
+  printf("Size: %u\n", ndpi_domain_classify_size(sc));
+#endif
+  
+  ndpi_domain_classify_free(sc);
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -5458,6 +5480,7 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    domainSearchUnitTest();
     sketchUnitTest();
     linearUnitTest();
     zscoreUnitTest();

@@ -2025,6 +2025,11 @@ typedef struct {
   ndpi_filter *filter[2 /* direct and reverse */];
 } ndpi_string_search;
 
+
+#define MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS  6
+
+typedef void ndpi_domain_classify;
+
 /* **************************************** */
 
 #endif /* __NDPI_TYPEDEFS_H__ */

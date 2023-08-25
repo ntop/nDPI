@@ -2011,7 +2011,7 @@ extern "C" {
   u_int32_t    ndpi_filter_cardinality(ndpi_filter *f);
   
   /* ******************************* */
-
+ 
   /*
     Efficient (space and speed) probabilitic datastructure
     for exact string searching with a false positive rate
@@ -2023,6 +2023,23 @@ extern "C" {
   bool                ndpi_string_search_add(ndpi_string_search *s, char *string);
   bool                ndpi_string_search_contains(ndpi_string_search *s, char *string);
   u_int32_t           ndpi_string_search_cardinality(ndpi_string_search *f);
+
+  /* ******************************* */
+
+  /*
+    Efficient (space and speed) probabilitic datastructure
+    for substring domain matching and classification
+  */
+
+  ndpi_domain_classify* ndpi_domain_classify_alloc();
+  void                  ndpi_domain_classify_free(ndpi_domain_classify *s);
+  u_int32_t             ndpi_domain_classify_size(ndpi_domain_classify *s);
+  bool                  ndpi_domain_classify_add(ndpi_domain_classify *s,
+						 u_int16_t classification_id, char *domain);
+  u_int32_t             ndpi_domain_classify_add_domains(ndpi_domain_classify *_s,
+							 u_int16_t classification_id,
+							 char *file_path);
+  u_int16_t             ndpi_domain_classify_contains(ndpi_domain_classify *s, char *domain);
   
   /* ******************************* */
 
