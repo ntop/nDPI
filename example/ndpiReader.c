@@ -5421,19 +5421,30 @@ void sketchUnitTest() {
 
 void domainSearchUnitTest() {
   ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
+  const char *fname = NDPI_BASE_DIR "/lists/gambling.list";
   char *domain = "ntop.org";
+  u_int32_t num_domains;
   
   assert(sc);
 
-  ndpi_domain_classify_add(sc, CUSTOM_CATEGORY_MALWARE, domain);
-
+  ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, domain);
   assert(ndpi_domain_classify_contains(sc, domain));
 
-#if 0
-  printf("Added %u domains\n",
-	 ndpi_domain_classify_add_domains(sc, NDPI_PROTOCOL_GAMBLING,
-					  NDPI_BASE_DIR "/lists/gambling.list"));
-  printf("Size: %u\n", ndpi_domain_classify_size(sc));
+  num_domains = ndpi_domain_classify_add_domains(sc, NDPI_PROTOCOL_GAMBLING, (char*)fname);
+  assert(num_domains == 35370);
+  /* Subdomain check */
+  assert(ndpi_domain_classify_contains(sc, "blog.ntop.org") == NDPI_PROTOCOL_NTOP);
+  assert(ndpi_domain_classify_contains(sc, "0grand-casino.com") == NDPI_PROTOCOL_GAMBLING);
+  
+#ifdef DEBUG_TRACE
+  struct stat st;
+  
+  if(stat(fname, &st) == 0) {
+    u_int32_t s = ndpi_domain_classify_size(sc);
+    
+    printf("Size: %u [%.1f %% of the original filename size]\n",
+	   s, (float)(s * 100) / (float)st.st_size);
+  }
 #endif
   
   ndpi_domain_classify_free(sc);
