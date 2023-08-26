@@ -228,6 +228,8 @@ void ndpi_domain_classify_free(ndpi_domain_classify *_s) {
     } else
       break;
   }
+
+  ndpi_free(s);
 }
 
 /* ********************************************************** */
