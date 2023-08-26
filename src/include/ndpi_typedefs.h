@@ -31,6 +31,8 @@
 /* Used by both nDPI core and patricia code under third-party */
 #include "ndpi_patricia_typedefs.h"
 
+#define USE_LEGACY_AHO_CORASICK
+
 #ifndef NDPI_CFFI_PREPROCESSING
 #ifndef u_char
 typedef unsigned char u_char;
@@ -1170,6 +1172,8 @@ typedef struct ndpi_proto {
 #define NUM_CUSTOM_CATEGORIES      5
 #define CUSTOM_CATEGORY_LABEL_LEN 32
 
+typedef void ndpi_domain_classify;
+
 #ifdef NDPI_LIB_COMPILATION
 
 /* Needed to have access to HAVE_* defines */
@@ -1200,7 +1204,7 @@ struct ndpi_detection_module_struct {
   u_int64_t current_ts;
   u_int16_t max_packets_to_process;
   u_int16_t num_tls_blocks_to_follow;
-  u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, enable_load_gambling_list:1, _notused:5;
+  u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
   u_int8_t tls_certificate_expire_in_x_days;
   
   void *user_data;
@@ -1262,7 +1266,11 @@ struct ndpi_detection_module_struct {
   /* *** If you add a new Patricia tree, please update ptree_type above! *** */
 
   struct {
+#ifdef USE_LEGACY_AHO_CORASICK
     ndpi_automa hostnames, hostnames_shadow;
+#else
+    ndpi_domain_classify *sc_hostnames, *sc_hostnames_shadow;
+#endif
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
     u_int8_t categories_loaded;
   } custom_categories;
@@ -1761,14 +1769,13 @@ typedef enum {
     ndpi_enable_tcp_ack_payload_heuristic = (1 << 17),
     ndpi_dont_load_crawlers_list = (1 << 18),
     ndpi_dont_load_protonvpn_list = (1 << 19),
-    ndpi_dont_load_gambling_list = (1 << 20),
     /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
        the payload is encrypted in an attempt to “look like nothing”.
        This heuristic only analyzes the first packet of the flow.
        See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
-    ndpi_disable_fully_encrypted_heuristic = (1 << 21),
-    ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 22),
-    ndpi_dont_load_mullvad_list = (1 << 23),
+    ndpi_disable_fully_encrypted_heuristic = (1 << 20),
+    ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 21),
+    ndpi_dont_load_mullvad_list = (1 << 22),
   } ndpi_prefs;
 
 typedef struct {
@@ -2027,8 +2034,6 @@ typedef struct {
 
 
 #define MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS  6
-
-typedef void ndpi_domain_classify;
 
 /* **************************************** */
 

@@ -71,7 +71,6 @@
 #include "inc_generated/ndpi_ms_onedrive_match.c.inc"
 #include "inc_generated/ndpi_ms_outlook_match.c.inc"
 #include "inc_generated/ndpi_ms_skype_teams_match.c.inc"
-#include "inc_generated/ndpi_gambling_match.c.inc"
 #include "inc_generated/ndpi_google_match.c.inc"
 #include "inc_generated/ndpi_google_cloud_match.c.inc"
 #include "inc_generated/ndpi_crawlers_match.c.inc"
@@ -969,22 +968,9 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   for(i = 0; host_match[i].string_to_match != NULL; i++)
     ndpi_init_protocol_match(ndpi_str, &host_match[i]);
 
-  if(ndpi_str->enable_load_gambling_list)
-    for(i = 0; ndpi_protocol_gambling_hostname_list[i].string_to_match != NULL; i++)
-      ndpi_init_protocol_match(ndpi_str, &ndpi_protocol_gambling_hostname_list[i]);
-  else {
-    ndpi_protocol_match gambling_match;
-    if (ndpi_init_empty_app_protocol(ndpi_protocol_gambling_hostname_list, &gambling_match) != 0 ||
-        ndpi_init_app_protocol(ndpi_str, &gambling_match) != 0) {
-      NDPI_LOG_ERR(ndpi_str,
-        "[NDPI] INTERNAL ERROR could not initialize empty gambling app protocol\n");
-    }
-  }
-
   /* ************************ */
 
   for(i = 0; tls_certificate_match[i].string_to_match != NULL; i++) {
-
 #if 0
     printf("%s() %s / %u\n", __FUNCTION__,
 	   tls_certificate_match[i].string_to_match,
@@ -2136,6 +2122,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "BITCOIN", NDPI_PROTOCOL_CATEGORY_CRYPTO_CURRENCY,
 			  ndpi_build_default_ports(ports_a, 8333, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GAMBLING,
+			  "Gambling", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PROTONVPN,
 			  "ProtonVPN", NDPI_PROTOCOL_CATEGORY_VPN,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -2820,15 +2810,11 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr) ndpi_debug_printf);
-  NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
+  NDPI_BITMASK_RESET(ndpi_str->debug_!bitmask);
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
   if(prefs & ndpi_enable_ja3_plus)
     ndpi_str->enable_ja3_plus = 1;
-
-  ndpi_str->enable_load_gambling_list = 1;
-  if(prefs & ndpi_dont_load_gambling_list)
-    ndpi_str->enable_load_gambling_list = 0;
 
   if(!(prefs & ndpi_dont_init_libgcrypt)) {
     if(!gcry_control (GCRYCTL_INITIALIZATION_FINISHED_P)) {
@@ -2988,28 +2974,40 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
   ndpi_str->trusted_issuer_dn = NULL;
 
+#ifdef USE_LEGACY_AHO_CORASICK
   ndpi_str->custom_categories.hostnames.ac_automa = ac_automata_init(ac_domain_match_handler);
   if(!ndpi_str->custom_categories.hostnames.ac_automa) {
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
+  
   ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_domain_match_handler);
   if(!ndpi_str->custom_categories.hostnames_shadow.ac_automa) {
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
 
+  if(ndpi_str->custom_categories.hostnames.ac_automa)
+    ac_automata_feature(ndpi_str->custom_categories.hostnames.ac_automa, AC_FEATURE_LC);
+
+  if(ndpi_str->custom_categories.hostnames_shadow.ac_automa)
+    ac_automata_feature(ndpi_str->custom_categories.hostnames_shadow.ac_automa, AC_FEATURE_LC);
+
+  if(ndpi_str->custom_categories.hostnames.ac_automa)
+    ac_automata_name(ndpi_str->custom_categories.hostnames.ac_automa, "ccat", 0);
+
+  if(ndpi_str->custom_categories.hostnames_shadow.ac_automa)
+    ac_automata_name(ndpi_str->custom_categories.hostnames_shadow.ac_automa, "ccat_sh", 0);
+#else
+  ndpi_str->custom_categories.sc_hostnames        = ndpi_domain_classify_alloc();
+  ndpi_str->custom_categories.sc_hostnames_shadow = ndpi_domain_classify_alloc();
+#endif
+  
   ndpi_str->custom_categories.ipAddresses = ndpi_patricia_new(32 /* IPv4 */);
   ndpi_str->custom_categories.ipAddresses_shadow = ndpi_patricia_new(32 /* IPv4 */);
 
   if(ndpi_str->host_automa.ac_automa)
     ac_automata_feature(ndpi_str->host_automa.ac_automa,AC_FEATURE_LC);
-
-  if(ndpi_str->custom_categories.hostnames.ac_automa)
-    ac_automata_feature(ndpi_str->custom_categories.hostnames.ac_automa,AC_FEATURE_LC);
-
-  if(ndpi_str->custom_categories.hostnames_shadow.ac_automa)
-    ac_automata_feature(ndpi_str->custom_categories.hostnames_shadow.ac_automa,AC_FEATURE_LC);
 
   if(ndpi_str->tls_cert_subject_automa.ac_automa)
     ac_automata_feature(ndpi_str->tls_cert_subject_automa.ac_automa,AC_FEATURE_LC);
@@ -3024,12 +3022,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   /* Needed ac_automata_enable_debug(1) for show debug */
   if(ndpi_str->host_automa.ac_automa)
     ac_automata_name(ndpi_str->host_automa.ac_automa,"host",AC_FEATURE_DEBUG);
-
-  if(ndpi_str->custom_categories.hostnames.ac_automa)
-    ac_automata_name(ndpi_str->custom_categories.hostnames.ac_automa,"ccat",0);
-
-  if(ndpi_str->custom_categories.hostnames_shadow.ac_automa)
-    ac_automata_name(ndpi_str->custom_categories.hostnames_shadow.ac_automa,"ccat_sh",0);
 
   if(ndpi_str->tls_cert_subject_automa.ac_automa)
     ac_automata_name(ndpi_str->tls_cert_subject_automa.ac_automa,"tls_cert",AC_FEATURE_DEBUG);
@@ -3401,11 +3393,22 @@ int ndpi_match_string_value(void *automa, char *string_to_match,
 int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
 			       char *name, u_int name_len,
                                ndpi_protocol_category_t *category) {
+#ifdef USE_LEGACY_AHO_CORASICK
   u_int32_t id;
   int rc = ndpi_match_string_common(ndpi_str->custom_categories.hostnames.ac_automa,
 				    name, name_len, &id, category, NULL);
   if(rc < 0) return rc;
   return(id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
+#else  
+  u_int16_t rc = ndpi_domain_classify_contains(ndpi_str->custom_categories.sc_hostnames, name);
+
+  if(rc == 0)
+    return(-1); /* Not found */
+  else {
+    *category = (ndpi_protocol_category_t)rc;
+    return(0);
+  }
+#endif
 }
 
 /* *********************************************** */
@@ -3541,6 +3544,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->malicious_sha1_hashmap != NULL)
       ndpi_hash_free(&ndpi_str->malicious_sha1_hashmap, NULL);
 
+#ifdef USE_LEGACY_AHO_CORASICK
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
 			  1 /* free patterns strings memory */);
@@ -3548,7 +3552,11 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->custom_categories.hostnames_shadow.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames_shadow.ac_automa,
 			  1 /* free patterns strings memory */);
-
+#else
+    ndpi_domain_classify_free(ndpi_str->custom_categories.sc_hostnames_shadow);
+    ndpi_domain_classify_free(ndpi_str->custom_categories.sc_hostnames);
+#endif
+    
     if(ndpi_str->custom_categories.ipAddresses != NULL)
       ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
 
@@ -6746,7 +6754,7 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
 int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
 				const char *name_to_add,
 				ndpi_protocol_category_t category) {
-
+#ifdef USE_LEGACY_AHO_CORASICK
   if(ndpi_str->custom_categories.hostnames_shadow.ac_automa == NULL)
     return(-1);
 
@@ -6756,6 +6764,10 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
   return ndpi_string_to_automa(ndpi_str,
 			       (AC_AUTOMATA_t *)ndpi_str->custom_categories.hostnames_shadow.ac_automa,
 			       name_to_add,category,category, 0, 0, 1); /* at_end */
+#else
+  return(ndpi_domain_classify_add(ndpi_str->custom_categories.sc_hostnames_shadow,
+				  (u_int16_t)category, (char*)name_to_add) ? 0 : -1);
+#endif
 }
 
 /* ********************************************************************************* */
@@ -6793,6 +6805,7 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
     ndpi_load_category(ndpi_str, category_match[i].string_to_match,
 		       category_match[i].protocol_category, built_in);
 
+#ifdef USE_LEGACY_AHO_CORASICK
   /* Free */
   ac_automata_release((AC_AUTOMATA_t *) ndpi_str->custom_categories.hostnames.ac_automa,
 		      1 /* free patterns strings memory */);
@@ -6810,7 +6823,12 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
     ac_automata_feature(ndpi_str->custom_categories.hostnames_shadow.ac_automa,AC_FEATURE_LC);
     ac_automata_name(ndpi_str->custom_categories.hostnames_shadow.ac_automa,"ccat_sh",0);
   }
-
+#else
+  ndpi_domain_classify_free(ndpi_str->custom_categories.sc_hostnames);
+  ndpi_str->custom_categories.sc_hostnames        = ndpi_str->custom_categories.sc_hostnames_shadow;
+  ndpi_str->custom_categories.sc_hostnames_shadow = ndpi_domain_classify_alloc();
+#endif
+  
   if(ndpi_str->custom_categories.ipAddresses != NULL)
     ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
 
