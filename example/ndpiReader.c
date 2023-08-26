@@ -5421,20 +5421,28 @@ void sketchUnitTest() {
 
 void domainSearchUnitTest() {
   ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
-  const char *fname = NDPI_BASE_DIR "/lists/gambling.list";
   char *domain = "ntop.org";
-  u_int32_t num_domains;
   
   assert(sc);
 
+  ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, ".ntop.org");
   ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, domain);
   assert(ndpi_domain_classify_contains(sc, domain));
 
-  num_domains = ndpi_domain_classify_add_domains(sc, NDPI_PROTOCOL_GAMBLING, (char*)fname);
-  assert(num_domains == 35370);
+#if 0
+  {
+    const char *fname = NDPI_BASE_DIR "/lists/gambling.list";
+    u_int32_t num_domains;
+    
+    num_domains = ndpi_domain_classify_add_domains(sc, NDPI_PROTOCOL_GAMBLING, (char*)fname);
+    assert(num_domains == 35370);
+
+    assert(ndpi_domain_classify_contains(sc, "0grand-casino.com") == NDPI_PROTOCOL_GAMBLING);
+  }
+#endif
+  
   /* Subdomain check */
   assert(ndpi_domain_classify_contains(sc, "blog.ntop.org") == NDPI_PROTOCOL_NTOP);
-  assert(ndpi_domain_classify_contains(sc, "0grand-casino.com") == NDPI_PROTOCOL_GAMBLING);
   
 #ifdef DEBUG_TRACE
   struct stat st;

@@ -48,6 +48,8 @@ typedef struct {
   ndpi_domain_classify_t *class[MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS];
 } ndpi_domain_classifications_t;
 
+//#define DEBUG
+
 /* ********************************************************** */
 
 static void ndpi_domain_search_free(ndpi_domain_search *search) {
@@ -126,9 +128,15 @@ static inline u_int32_t ndpi_hash_string(char *domain) {
 /* NOTE: domain will be modified: copy it if necessary */
 static bool ndpi_domain_search_add(ndpi_domain_search *search, char *domain) {
   char *elem;
-  u_int32_t bitmap_id = 0;
+  u_int32_t bitmap_id = 0, len;
   bool quit = false;
-  
+
+  if(domain == NULL)              return(false);
+  if((len = strlen(domain)) == 0) return(false);
+  if(domain[len-1] == '.') domain[len-1] = '0';
+
+  if(domain[0] == '.') ++domain;
+
   elem = strrchr(domain, '.');
   while(elem) {
     u_int32_t h;
@@ -256,7 +264,7 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *_s,
   u_int32_t i;
   ndpi_domain_classifications_t *s = (ndpi_domain_classifications_t*)_s;
   char buf[256];
-  
+
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->class[i] != NULL) {
       if(s->class[i]->class_id == class_id) {
@@ -278,7 +286,11 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *_s,
     return(false);
 
   snprintf(buf, sizeof(buf), "%s", domain);
-  
+
+#ifdef DEBUG
+  printf("[add] %s @ %u\n", domain, class_id);
+#endif
+
   return(ndpi_domain_search_add(s->class[i]->domains, buf));
 }
 
@@ -292,7 +304,7 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *_s,
   char buf[256];
   FILE *fd;
   char *line;
-  
+
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->class[i] != NULL) {
       if(s->class[i]->class_id == class_id) {
@@ -314,11 +326,11 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *_s,
     return(false);
 
   /* *************************************** */
-   
+
   fd = fopen(file_path, "r");
   if(fd == NULL)
     return(false);
-  
+
   while((line = fgets(buf, sizeof(buf), fd)) != NULL) {
     u_int len;
 
@@ -335,8 +347,8 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *_s,
 
     if(ndpi_domain_search_add(s->class[i]->domains, line))
       num_added++;
-  }      
-  
+  }
+
   fclose(fd);
 
   return(num_added);
@@ -346,18 +358,34 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *_s,
 
 u_int16_t ndpi_domain_classify_contains(ndpi_domain_classify *_s,
 					char *domain) {
-  u_int32_t i;
+  u_int32_t i, len;
   ndpi_domain_classifications_t *s = (ndpi_domain_classifications_t*)_s;
-  char buf[256];
-  
-  snprintf(buf, sizeof(buf), "%s", domain);
-  
+
+  if(!domain)                     return(0);
+  if((len = strlen(domain)) == 0) return(0);
+
+  /* This is a number or a numeric IP or similar */
+  if(isdigit(domain[len-1]) && isdigit(domain[0]))
+    return(0);
+
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->class[i] != NULL) {
-      if(ndpi_domain_search_contains(s->class[i]->domains, buf))
+      char buf[256];
+      
+      snprintf(buf, sizeof(buf), "%s", domain);
+      
+      if(ndpi_domain_search_contains(s->class[i]->domains, buf)) {
+#ifdef DEBUG
+	printf("[search] %s = %d\n", domain, s->class[i]->class_id);
+#endif
 	return(s->class[i]->class_id);
+      }
     }
   }
+
+#ifdef DEBUG
+  printf("[search] %s NOT FOUND\n", domain);
+#endif
 
   return(0);
 }

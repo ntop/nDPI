@@ -2033,7 +2033,7 @@ typedef struct {
 } ndpi_string_search;
 
 
-#define MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS  6
+#define MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS  16
 
 /* **************************************** */
 
