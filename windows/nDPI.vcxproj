@@ -126,6 +126,7 @@
     <ClCompile Include="..\src\lib\ndpi_bitmap.c" />
     <ClCompile Include="..\src\lib\ndpi_classify.c" />
     <ClCompile Include="..\src\lib\ndpi_community_id.c" />
+    <ClCompile Include="..\src\lib\ndpi_domain_classify.c" />
     <ClCompile Include="..\src\lib\ndpi_geoip.c" />
     <ClCompile Include="..\src\lib\ndpi_main.c" />
     <ClCompile Include="..\src\lib\ndpi_filter.c" />

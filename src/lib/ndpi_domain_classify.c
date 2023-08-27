@@ -94,7 +94,7 @@ static u_int32_t ndpi_domain_search_size(ndpi_domain_search *search) {
     char *buf;
 
     total_len += ndpi_bitmap_serialize(search->bitmap[i], &buf);
-    free(buf);
+    ndpi_free(buf);
   }
 
   return(total_len);
