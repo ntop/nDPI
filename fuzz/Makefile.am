@@ -521,10 +521,11 @@ distdir:
 		-o -name '*.am' \
 		-o -name '*.h' \
 		-o -name '*.cpp' \
-		-o -name '*.dict' \
 		-o -name 'ipv4_addresses.txt' \
 		-o -name 'bd_param.txt' \
 		-o -name 'splt_param.txt' \
+		-o -path './dictionary.dict' \
+		-o -path './dictionary_tls_certificate.dict' \
 		-o -path './corpus/fuzz_*.zip' \
 		-o -path './corpus/fuzz_quic_get_crypto_data/*' \
 		-o -path './corpus/fuzz_filecfg_protocols/*' \
