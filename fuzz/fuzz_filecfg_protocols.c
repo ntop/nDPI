@@ -19,7 +19,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 			  ndpi_dont_init_risk_ptree |
 			  ndpi_dont_load_cachefly_list |
 			  ndpi_dont_load_protonvpn_list |
-			  ndpi_dont_load_gambling_list |
 			  ndpi_dont_load_mullvad_list;
   NDPI_PROTOCOL_BITMASK all;
   NDPI_PROTOCOL_BITMASK debug_bitmask;
