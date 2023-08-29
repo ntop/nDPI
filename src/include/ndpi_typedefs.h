@@ -31,7 +31,7 @@
 /* Used by both nDPI core and patricia code under third-party */
 #include "ndpi_patricia_typedefs.h"
 
-#define USE_LEGACY_AHO_CORASICK
+// #define USE_LEGACY_AHO_CORASICK
 
 #ifndef NDPI_CFFI_PREPROCESSING
 #ifndef u_char
@@ -1101,6 +1101,9 @@ typedef enum {
     Crypto Currency e.g Bitcoin, Litecoin, Etherum ..et.
   */
   NDPI_PROTOCOL_CATEGORY_CRYPTO_CURRENCY = 106,
+
+  /* Gambling websites */
+  NDPI_PROTOCOL_CATEGORY_GAMBLING = 107,
   
   /*
     IMPORTANT

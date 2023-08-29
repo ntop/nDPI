@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <dirent.h>
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
@@ -2122,10 +2123,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "BITCOIN", NDPI_PROTOCOL_CATEGORY_CRYPTO_CURRENCY,
 			  ndpi_build_default_ports(ports_a, 8333, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GAMBLING,
-			  "Gambling", NDPI_PROTOCOL_CATEGORY_WEB,
-			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PROTONVPN,
 			  "ProtonVPN", NDPI_PROTOCOL_CATEGORY_VPN,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -2147,6 +2144,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE,
+			  "Free", NDPI_PROTOCOL_CATEGORY_WEB,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -2783,6 +2784,7 @@ static const char *categories[] = {
   "Allowed_Site",
   "Antimalware",
   "Crypto_Currency",
+  "Gambling"
 };
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
@@ -4144,10 +4146,116 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   fclose(fd);
-  ndpi_enable_loaded_categories(ndpi_str);
+
+  /*
+    Not necessay to call ndpi_enable_loaded_categories() as
+    ndpi_set_protocol_detection_bitmask2() will do that
+  */
+  /* ndpi_enable_loaded_categories(ndpi_str); */
 
   return(num);
 }
+
+/* ******************************************************************** */
+
+/*
+  Loads a file (separated by <cr>) of domain names associated with the
+  specified category
+*/
+int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
+			    char *path, ndpi_protocol_category_t category_id) {
+  char buffer[256], *line;
+  FILE *fd;
+  u_int num_loaded = 0;
+ 
+  if(!ndpi_str || !path || !ndpi_str->protocols_ptree)
+    return(-1);
+
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  printf("Loading %s [proto %d]\n", path, category_id);
+#endif
+  
+  fd = fopen(path, "r");
+
+  if(fd == NULL) {
+    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
+    return(-1);
+  }
+
+  while(1) {
+    int len;
+    
+    line = fgets(buffer, sizeof(buffer), fd);
+
+    if(line == NULL)
+      break;
+
+    len = strlen(line);
+
+    if((len <= 1) || (line[0] == '#'))
+      continue;
+
+    if(ndpi_load_category(ndpi_str, line, category_id, NULL) > 0)
+      num_loaded++;    
+  }
+
+  fclose(fd);
+  return(num_loaded);
+}
+ 
+/* ******************************************************************** */
+
+/*
+  Load files (whose name is <categoryid>_<label>.<extension>) stored
+  in a directory and bind each domain to the specified category.
+
+  It can be used to load all files store in the lists/ directory
+
+  It returns the number of loaded files or -1 in case of failure
+*/
+int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
+			     char *dir_path) {
+  DIR *dirp = opendir(dir_path);
+  struct dirent *dp;
+  int rc = 0;
+  
+  if (dirp == NULL)
+    return(-1);
+  
+  while((dp = readdir(dirp)) != NULL) {
+    char *underscore, *extn;
+    
+    if(dp->d_name[0] == '.') continue;
+    extn = strrchr(dp->d_name, '.');
+
+    if((extn == NULL) || strcmp(extn, ".list"))
+      continue;
+    
+    /* Check if the format is <proto it>_<string>.<extension> */
+    if((underscore = strchr(dp->d_name, '_')) != NULL) {
+      ndpi_protocol_category_t proto_id;
+      
+      underscore[0] = '\0';
+      proto_id = (ndpi_protocol_category_t)atoi(dp->d_name);
+
+      if((proto_id > 0) && (proto_id < NDPI_LAST_IMPLEMENTED_PROTOCOL)) {
+	/* Valid file */
+	char path[256];
+
+	underscore[0] = '_';
+	snprintf(path, sizeof(path), "%s/%s", dir_path, dp->d_name);
+
+	ndpi_load_category_file(ndpi_str, path, proto_id);
+	rc++;
+      }	
+    }
+  }
+  
+  (void)closedir(dirp);
+
+  return(rc);
+}
+
 
 /* ******************************************************************** */
 

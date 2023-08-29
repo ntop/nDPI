@@ -48,7 +48,8 @@ typedef struct {
   ndpi_domain_classify_t *class[MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS];
 } ndpi_domain_classifications_t;
 
-//#define DEBUG
+// #define DEBUG_ADD
+// #define DEBUG_CONTAINS
 
 /* ********************************************************** */
 
@@ -133,7 +134,14 @@ static bool ndpi_domain_search_add(ndpi_domain_search *search, char *domain) {
 
   if(domain == NULL)              return(false);
   if((len = strlen(domain)) == 0) return(false);
-  if(domain[len-1] == '.') domain[len-1] = '0';
+
+  len--;
+  while((len > 0)
+	&& ((domain[len] == '.')
+	    || (domain[len] == '\n')
+	    || (domain[len] == '\r'))
+	)
+    domain[len--] = '\0';
 
   if(domain[0] == '.') ++domain;
 
@@ -178,7 +186,9 @@ static bool ndpi_domain_search_contains(ndpi_domain_search *search, char *domain
   u_int32_t bitmap_id = 0;
   bool quit = false;
 
-  elem = strrchr(domain, '.');
+  if((elem = strrchr(domain, '.')) == NULL)
+    return(false); /* This does not look like a domain */
+  
   while(elem) {
     u_int32_t h;
 
@@ -263,8 +273,12 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *_s,
 			      char *domain) {
   u_int32_t i;
   ndpi_domain_classifications_t *s = (ndpi_domain_classifications_t*)_s;
-  char buf[256];
+  char buf[256], *dot = strrchr(domain, '.');
 
+  if(!dot) return(false);
+  if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))
+    return(false);
+  
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->class[i] != NULL) {
       if(s->class[i]->class_id == class_id) {
@@ -277,7 +291,7 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *_s,
 	return(false);
 
       s->class[i]->class_id = class_id;
-      s->class[i]->domains     =  ndpi_domain_search_alloc();
+      s->class[i]->domains  =  ndpi_domain_search_alloc();
       break;
     }
   }
@@ -287,7 +301,7 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *_s,
 
   snprintf(buf, sizeof(buf), "%s", domain);
 
-#ifdef DEBUG
+#ifdef DEBUG_ADD
   printf("[add] %s @ %u\n", domain, class_id);
 #endif
 
@@ -356,18 +370,48 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *_s,
 
 /* ********************************************************** */
 
+static bool is_valid_domain_char(u_char c) {
+  if(((c >= 'A')&& (c <= 'Z'))
+     || ((c >= 'a')&& (c <= 'z'))
+     || ((c >= '0')&& (c <= '9'))
+     || (c == '_')
+     || (c == '-')
+     || (c == '.'))
+    return(true);
+  else
+    return(false);
+}
+
+/* ********************************************************** */
+
 u_int16_t ndpi_domain_classify_contains(ndpi_domain_classify *_s,
 					char *domain) {
   u_int32_t i, len;
   ndpi_domain_classifications_t *s = (ndpi_domain_classifications_t*)_s;
+  char *dot;
 
-  if(!domain)                     return(0);
-  if((len = strlen(domain)) == 0) return(0);
+  if(!domain)                                             return(0);
+  if((len = strlen(domain)) == 0)                         return(0);
+  if((dot = strrchr(domain, '.')) == NULL)                return(0);
+  if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local"))) return(0);
 
   /* This is a number or a numeric IP or similar */
-  if(isdigit(domain[len-1]) && isdigit(domain[0]))
-    return(0);
+  if(isdigit(domain[len-1]) && isdigit(domain[0])) {
+#ifdef DEBUG_CONTAINS
+    printf("[contains] %s INVALID\n", domain);
+#endif
 
+    return(0);
+  }
+  
+  if(!is_valid_domain_char(domain[0])) {
+#ifdef DEBUG_CONTAINS
+    printf("[contains] %s INVALID\n", domain);
+#endif
+
+    return(0);
+  }
+  
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->class[i] != NULL) {
       char buf[256];
@@ -375,16 +419,16 @@ u_int16_t ndpi_domain_classify_contains(ndpi_domain_classify *_s,
       snprintf(buf, sizeof(buf), "%s", domain);
       
       if(ndpi_domain_search_contains(s->class[i]->domains, buf)) {
-#ifdef DEBUG
-	printf("[search] %s = %d\n", domain, s->class[i]->class_id);
+#ifdef DEBUG_CONTAINS
+	printf("[contains] %s = %d\n", domain, s->class[i]->class_id);
 #endif
 	return(s->class[i]->class_id);
       }
     }
   }
 
-#ifdef DEBUG
-  printf("[search] %s NOT FOUND\n", domain);
+#ifdef DEBUG_CONTAINS
+  printf("[contains] %s NOT FOUND\n", domain);
 #endif
 
   return(0);

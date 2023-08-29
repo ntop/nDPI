@@ -5,7 +5,8 @@ set -e
 cd "$(dirname "${0}")" || exit 1
 . ./common.sh || exit 1
 
-LIST=../lists/gambling.list
+# NDPI_PROTOCOL_CATEGORY_GAMBLING = 107
+LIST=../lists/107_gambling.list
 
 printf '(1) %s\n' "Scraping Illegal Gambling Sites (Belgium)"
 DOMAINS="$(curl -s 'https://www.gamingcommission.be/en/gaming-commission/illegal-games-of-chance/list-of-illegal-gambling-sites' | sed -n 's/^<td[^>]\+>\(.\+\.[a-zA-Z0-9]\+\)\(\|\/.*[^<]*\)<\/td>/\1/gp' || exit 1)"

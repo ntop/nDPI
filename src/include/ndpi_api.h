@@ -808,6 +808,30 @@ extern "C" {
   int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path, void *user_data);
 
   /**
+   * Loads a file (separated by <cr>) of domain names associated with the specified category
+   *
+   * @par     ndpi_mod    = the detection module
+   * @par     path        = the path of the file
+   * @par     category_id = Id of the category to which domains will be associated
+   * @return  0 if the file is loaded correctly;
+   *          -1 else
+   */
+  int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
+			      char* path, ndpi_protocol_category_t category_id);
+  
+  /**
+   * Load files (whose name is <categoryid>_<label>.<extension>) stored
+   * in a directory and bind each domain to the specified category.
+   *
+   * @par     ndpi_mod    = the detection module
+   * @par     path        = the path of the file
+   * @return  0 if the file is loaded correctly;
+   *          -1 else
+   */
+  int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
+			       char* path);
+
+  /**
    * Read a file and load the list of risky domains
    *
    * @par     ndpi_mod = the detection module

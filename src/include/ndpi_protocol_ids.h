@@ -367,7 +367,7 @@ typedef enum {
   NDPI_PROTOCOL_HOTS                  = 336, /* Heroes of the Storm */
   NDPI_PROTOCOL_FACEBOOK_REEL_STORY   = 337,
   NDPI_PROTOCOL_SRTP                  = 338,
-  NDPI_PROTOCOL_GAMBLING              = 339,
+  NDPI_PROTOCOL_FREE                  = 339, /* Formerly used by gambling now a category. It can be reused in the future */
   NDPI_PROTOCOL_EPICGAMES             = 340,
   NDPI_PROTOCOL_GEFORCENOW            = 341,
   NDPI_PROTOCOL_NVIDIA                = 342,
