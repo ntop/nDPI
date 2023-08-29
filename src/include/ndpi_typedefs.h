@@ -921,6 +921,10 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_LINE_CALL */
   u_int8_t line_pkts[2];
   u_int8_t line_base_cnt[2];
+
+  /* NDPI_PROTOCOL_TFTP */
+  u_int16_t tftp_data_num;
+  u_int16_t tftp_ack_num;
 };
 
 /* ************************************************** */

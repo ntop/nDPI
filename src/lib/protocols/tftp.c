@@ -40,6 +40,8 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int16_t block_num;
+  u_int16_t prev_num;
 
   NDPI_LOG_DBG(ndpi_struct, "search TFTP\n");
 
@@ -137,9 +139,18 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
 
     case 0x03:
         /* Data (DATA) */
-        if (packet->payload_packet_len > 4 /* DATA header size */ + 512 /* max. block size */)
+        if (packet->payload_packet_len <= 4 /* min DATA header size */)
         {
           NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          return;
+        }
+        /* First 2 bytes were opcode so next 16 bits are the block number.
+         * This should increment every packet but give some leeway for midstream and packet loss. */
+        block_num = ntohs(get_u_int16_t(packet->payload, 2));
+        prev_num = flow->l4.udp.tftp_data_num;
+        flow->l4.udp.tftp_data_num = block_num;
+        if (!(block_num == prev_num + 1 || (prev_num != 0 && block_num == prev_num)))
+        {
           return;
         }
         break;
@@ -149,6 +160,15 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
         if (packet->payload_packet_len != 4 /* ACK has a fixed packet size */)
         {
           NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          return;
+        }
+        /* First 2 bytes were opcode so next 16 bits are the block number.
+         * This should increment every packet but give some leeway for midstream and packet loss. */
+        block_num = ntohs(get_u_int16_t(packet->payload, 2));
+        prev_num = flow->l4.udp.tftp_ack_num;
+        flow->l4.udp.tftp_ack_num = block_num;
+        if (!(block_num == prev_num + 1 || (block_num == prev_num)))
+        {
           return;
         }
         break;
