@@ -19,6 +19,8 @@ EXTRA_DIST = README.md README.fuzzer.md CHANGELOG.md CONTRIBUTING.md \
 		python/ndpi/ndpi_build.py python/ndpi/ndpi.py python/README.md \
 		python/requirements.txt python/setup.py python/tests.py \
 	lists/107_gambling.list \
+	lists/107_gambling_custom.list \
+	lists/README.md
 	sonar-project.properties .github .ci-ignore
 
 doc:
