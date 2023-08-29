@@ -4238,9 +4238,9 @@ int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
       underscore[0] = '\0';
       proto_id = (ndpi_protocol_category_t)atoi(dp->d_name);
 
-      if((proto_id > 0) && (proto_id < NDPI_LAST_IMPLEMENTED_PROTOCOL)) {
+      if((proto_id > 0) && (proto_id < (u_int16_t)NDPI_LAST_IMPLEMENTED_PROTOCOL)) {
 	/* Valid file */
-	char path[256];
+	char path[512];
 
 	underscore[0] = '_';
 	snprintf(path, sizeof(path), "%s/%s", dir_path, dp->d_name);
