@@ -2078,6 +2078,20 @@ extern "C" {
   
   /* ******************************* */
 
+  /*
+    Similar to ndpi_filter but based on binary search and with the
+    ability to store a category per value (as ndpi_domain_classify)
+  */
+  ndpi_binary_bitmap* ndpi_binary_bitmap_alloc();
+  bool ndpi_binary_bitmap_set(ndpi_binary_bitmap *b, u_int32_t value, u_int8_t category);
+  bool ndpi_binary_bitmap_compress(ndpi_binary_bitmap *b);
+  bool ndpi_binary_bitmap_isset(ndpi_binary_bitmap *b, u_int32_t value, u_int8_t *out_category);
+  void ndpi_binary_bitmap_free(ndpi_binary_bitmap *b);
+  u_int32_t ndpi_binary_bitmap_size(ndpi_binary_bitmap *b);
+  u_int32_t ndpi_binary_bitmap_cardinality(ndpi_binary_bitmap *b);
+  
+  /* ******************************* */
+
   char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 				char *out, u_int out_len,
 				u_int8_t use_json);

@@ -32,8 +32,6 @@
 
 #include "ndpi_config.h"
 #include "ndpi_api.h"
-#include "ndpi_includes.h"
-#include "ndpi_encryption.h"
 
 typedef struct {
   ndpi_bitmap *bitmap[NUM_DOMAIN_BITMAPS];
@@ -410,3 +408,4 @@ u_int16_t ndpi_domain_classify_contains(ndpi_domain_classify *_s,
 
   return(0);
 }
+

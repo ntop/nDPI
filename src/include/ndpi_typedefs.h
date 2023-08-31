@@ -2033,6 +2033,18 @@ typedef void ndpi_filter;
 
 #define MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS  16
 
+PACK_ON
+struct ndpi_binary_bitmap_entry {
+  u_int32_t value;
+  u_int8_t category;
+} PACK_OFF;
+    
+typedef struct {
+  u_int32_t num_allocated_entries, num_used_entries;
+  struct ndpi_binary_bitmap_entry *entries;
+  bool is_compressed;
+} ndpi_binary_bitmap;
+
 /* **************************************** */
 
 #endif /* __NDPI_TYPEDEFS_H__ */
