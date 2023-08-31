@@ -1992,7 +1992,10 @@ extern "C" {
 
   /* ******************************* */
 
-  /* Based on https://roaringbitmap.org */
+  /*
+    Bitmap based on compressed bitmaps
+    implemented by https://roaringbitmap.org
+  */
   
   ndpi_bitmap* ndpi_bitmap_alloc(void);
   ndpi_bitmap* ndpi_bitmap_alloc_size(u_int32_t size);
@@ -2023,6 +2026,27 @@ extern "C" {
   /* ******************************* */
   /*
     Bloom-filter on steroids based on ndpi_bitmap
+
+    The main difference with respect to bloom filters
+    is that here the filter cardinality is 2^32 and thus
+    not limited as in blooms. This combined with compression
+    of ndpi_bitmap creates a memory savvy datastructure at the
+    price of little performance penalty due to using a
+    compressed datastucture.
+
+    The result is a datatructure with few false positives
+    (see https://hur.st/bloomfilter/) computed as
+
+    p = (1 - e(-((k * n)/m)))^k
+
+    number of hash function (k)
+    false positive rate (p)
+    number of item (n)
+    the number of bits (m)
+
+    As in our case m = 2^32, k = 1, for n = 1000000
+    (see https://hur.st/bloomfilter/?n=1000000&p=&m=4294967296&k=1)
+    p = 2.3 x 10^-4
   */
 
   ndpi_filter* ndpi_filter_alloc();
