@@ -58,7 +58,7 @@ bool ndpi_filter_add(ndpi_filter *f, u_int32_t value) {
 /* ******************************************* */
 
 bool ndpi_filter_add_string(ndpi_filter *f, char *string) {
-  return(ndpi_filter_add(f, MurmurHash(string, strlen(string), 0xD6DFE7)));
+  return(ndpi_filter_add(f, ndpi_hash_string(string)));
 }
 
 /* ******************************************* */
@@ -76,7 +76,7 @@ bool ndpi_filter_contains(ndpi_filter *f, u_int32_t value) {
 /* ******************************************* */
 
 bool ndpi_filter_contains_string(ndpi_filter *f, char *string) {
-  return(ndpi_filter_contains(f, MurmurHash(string, strlen(string), 0xD6DFE7)));
+  return(ndpi_filter_contains(f, ndpi_hash_string(string)));
 }
 
 /* ******************************************* */

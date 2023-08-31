@@ -1799,7 +1799,8 @@ extern "C" {
 
   u_int32_t ndpi_crc32(const void* data, size_t n_bytes);
   u_int32_t ndpi_nearest_power_of_two(u_int32_t x);
-  
+  u_int32_t ndpi_hash_string(char *str);
+    
   /* ******************************* */
 
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
@@ -2058,20 +2059,6 @@ extern "C" {
   size_t       ndpi_filter_size(ndpi_filter *f);
   u_int32_t    ndpi_filter_cardinality(ndpi_filter *f);
   
-  /* ******************************* */
- 
-  /*
-    Efficient (space and speed) probabilitic datastructure
-    for exact string searching with a false positive rate
-    of 5 * 10 ^ -8
-  */
-  ndpi_string_search* ndpi_string_search_alloc();
-  void                ndpi_string_search_free(ndpi_string_search *s);
-  u_int32_t           ndpi_string_search_size(ndpi_string_search *s);
-  bool                ndpi_string_search_add(ndpi_string_search *s, char *string);
-  bool                ndpi_string_search_contains(ndpi_string_search *s, char *string);
-  u_int32_t           ndpi_string_search_cardinality(ndpi_string_search *f);
-
   /* ******************************* */
 
   /*

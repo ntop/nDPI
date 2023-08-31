@@ -103,29 +103,6 @@ static u_int32_t ndpi_domain_search_size(ndpi_domain_search *search) {
 
 /* ********************************************************** */
 
-/*
-  https://en.wikipedia.org/wiki/Jenkins_hash_function
-
-  See also http://burtleburtle.net/bob/hash/spooky.html
-*/
-static inline u_int32_t ndpi_hash_string(char *domain) {
-  u_int32_t hash, i;
-
-  for(hash = i = 0; domain[i] != '\0'; ++i) {
-    hash += domain[i];
-    hash += (hash << 10);
-    hash ^= (hash >> 6);
-  }
-
-  hash += (hash << 3);
-  hash ^= (hash >> 11);
-  hash += (hash << 15);
-
-  return(hash);
-}
-
-/* ********************************************************** */
-
 /* NOTE: domain will be modified: copy it if necessary */
 static bool ndpi_domain_search_add(ndpi_domain_search *search, char *domain) {
   char *elem;
