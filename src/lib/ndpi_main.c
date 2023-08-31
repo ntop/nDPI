@@ -2982,7 +2982,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
-  
+
   ndpi_str->custom_categories.hostnames_shadow.ac_automa = ac_automata_init(ac_domain_match_handler);
   if(!ndpi_str->custom_categories.hostnames_shadow.ac_automa) {
     ndpi_exit_detection_module(ndpi_str);
@@ -3004,7 +3004,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->custom_categories.sc_hostnames        = ndpi_domain_classify_alloc();
   ndpi_str->custom_categories.sc_hostnames_shadow = ndpi_domain_classify_alloc();
 #endif
-  
+
   ndpi_str->custom_categories.ipAddresses = ndpi_patricia_new(32 /* IPv4 */);
   ndpi_str->custom_categories.ipAddresses_shadow = ndpi_patricia_new(32 /* IPv4 */);
 
@@ -3401,8 +3401,16 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
 				    name, name_len, &id, category, NULL);
   if(rc < 0) return rc;
   return(id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
-#else  
-  u_int16_t rc = ndpi_domain_classify_contains(ndpi_str->custom_categories.sc_hostnames, name);
+#else
+  char buf[128];
+  u_int16_t rc;
+  u_int max_len = sizeof(buf)-1;
+    
+  if(name_len > max_len) name_len = max_len;
+  strncpy(buf, name, name_len);
+  buf[name_len] = '\0';
+  
+  rc = ndpi_domain_classify_contains(ndpi_str->custom_categories.sc_hostnames, buf);
 
   if(rc == 0)
     return(-1); /* Not found */
@@ -3558,7 +3566,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     ndpi_domain_classify_free(ndpi_str->custom_categories.sc_hostnames_shadow);
     ndpi_domain_classify_free(ndpi_str->custom_categories.sc_hostnames);
 #endif
-    
+
     if(ndpi_str->custom_categories.ipAddresses != NULL)
       ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
 
@@ -4017,10 +4025,10 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 
       if(value[0] != '\0') {
 	u_int i, max_len = strlen(value) - 1;
-	
+
 	if(value[max_len] == '"')
 	  value[max_len] = '\0'; /* remove trailing " */
-	
+
 	for(i=0; i<max_len; i++)
 	  value[i] = tolower(value[i]);
       }
@@ -4167,14 +4175,14 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
   char buffer[256], *line;
   FILE *fd;
   u_int num_loaded = 0;
- 
+
   if(!ndpi_str || !path || !ndpi_str->protocols_ptree)
     return(-1);
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   printf("Loading %s [proto %d]\n", path, category_id);
 #endif
-  
+
   fd = fopen(path, "r");
 
   if(fd == NULL) {
@@ -4184,7 +4192,7 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
 
   while(1) {
     int len;
-    
+
     line = fgets(buffer, sizeof(buffer), fd);
 
     if(line == NULL)
@@ -4196,13 +4204,13 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
       continue;
 
     if(ndpi_load_category(ndpi_str, line, category_id, NULL) > 0)
-      num_loaded++;    
+      num_loaded++;
   }
 
   fclose(fd);
   return(num_loaded);
 }
- 
+
 /* ******************************************************************** */
 
 /*
@@ -4218,23 +4226,23 @@ int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
   DIR *dirp = opendir(dir_path);
   struct dirent *dp;
   int rc = 0;
-  
+
   if (dirp == NULL)
     return(-1);
-  
+
   while((dp = readdir(dirp)) != NULL) {
     char *underscore, *extn;
-    
+
     if(dp->d_name[0] == '.') continue;
     extn = strrchr(dp->d_name, '.');
 
     if((extn == NULL) || strcmp(extn, ".list"))
       continue;
-    
+
     /* Check if the format is <proto it>_<string>.<extension> */
     if((underscore = strchr(dp->d_name, '_')) != NULL) {
       ndpi_protocol_category_t proto_id;
-      
+
       underscore[0] = '\0';
       proto_id = (ndpi_protocol_category_t)atoi(dp->d_name);
 
@@ -4247,10 +4255,10 @@ int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
 
 	ndpi_load_category_file(ndpi_str, path, proto_id);
 	rc++;
-      }	
+      }
     }
   }
-  
+
   (void)closedir(dirp);
 
   return(rc);
@@ -6405,7 +6413,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     ndpi_handle_risk_exceptions(ndpi_str, flow);
     flow->risk_shadow = flow->risk;
   }
-  
+
   switch(ret->app_protocol) {
   case NDPI_PROTOCOL_MICROSOFT_AZURE:
     ndpi_reconcile_msteams_udp(ndpi_str, flow, flow->detected_protocol_stack[1]);
@@ -6936,7 +6944,7 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
   ndpi_str->custom_categories.sc_hostnames        = ndpi_str->custom_categories.sc_hostnames_shadow;
   ndpi_str->custom_categories.sc_hostnames_shadow = ndpi_domain_classify_alloc();
 #endif
-  
+
   if(ndpi_str->custom_categories.ipAddresses != NULL)
     ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
 
