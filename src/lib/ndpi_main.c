@@ -9602,18 +9602,6 @@ int ndpi_ptree_match_addr(ndpi_ptree_t *tree,
 
 /* ******************************************************************** */
 
-/* Based on djb2 hash - http://www.cse.yorku.ca/~oz/hash.html */
-u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len) {
-  u_int32_t hash = 5381, i;
-
-  for(i=0; i<str_len; i++)
-    hash = ((hash << 5) + hash) + str[i]; /* hash * 33 + str[i] */
-
-  return hash;
-}
-
-/* ******************************************************************** */
-
 void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]) {
   ndpi_MD5_CTX ctx;
 

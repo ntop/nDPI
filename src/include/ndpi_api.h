@@ -1193,9 +1193,6 @@ extern "C" {
 
   char *ndpi_get_ip_proto_name(u_int16_t ip_proto, char *name, unsigned int name_len);
 
-  void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]);
-  u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len);
-
   const char* ndpi_http_method2str(ndpi_http_method m);
   ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len);
 
@@ -1797,10 +1794,16 @@ extern "C" {
   
   /* ******************************* */
 
+  void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]);
   u_int32_t ndpi_crc32(const void* data, size_t n_bytes);
   u_int32_t ndpi_nearest_power_of_two(u_int32_t x);
+
+  /* ******************************* */
+  
+  u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len);
   u_int32_t ndpi_hash_string(char *str);
-    
+  u_int32_t ndpi_hash_string_len(char *str, u_int len);
+  
   /* ******************************* */
 
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
