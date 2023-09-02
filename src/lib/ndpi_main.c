@@ -4206,6 +4206,9 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
     while((line[len] == '\n') || (line[len] == '\r'))
       line[len--] = '\0';
 	  
+    while((line[0] == '-') || (line[0] == '.'))
+      line++;
+	  
     if(ndpi_load_category(ndpi_str, line, category_id, NULL) > 0)
       num_loaded++;
   }
