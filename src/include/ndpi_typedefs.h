@@ -1175,7 +1175,32 @@ typedef struct ndpi_proto {
 #define NUM_CUSTOM_CATEGORIES      5
 #define CUSTOM_CATEGORY_LABEL_LEN 32
 
-typedef void ndpi_domain_classify;
+typedef void ndpi_bitmap;
+typedef void ndpi_bitmap_iterator;
+typedef void ndpi_filter;
+
+/* Save memory limiting the key to 56 bit */
+#define SAVE_BINARY_BITMAP_MEMORY
+
+PACK_ON
+struct ndpi_binary_bitmap_entry {
+#ifdef SAVE_BINARY_BITMAP_MEMORY
+  u_int64_t value:56, category:8;
+#else
+  u_int64_t value;
+  u_int8_t category;
+#endif
+} PACK_OFF;
+    
+typedef struct {
+  u_int32_t num_allocated_entries, num_used_entries;
+  struct ndpi_binary_bitmap_entry *entries;
+  bool is_compressed;
+} ndpi_binary_bitmap;
+
+typedef struct {
+  ndpi_binary_bitmap *bitmap;
+} ndpi_domain_classify;
 
 #ifdef NDPI_LIB_COMPILATION
 
@@ -2024,26 +2049,6 @@ struct ndpi_des_struct {
 
 /* Prototype used to define custom DGA detection function */
 typedef int (*ndpi_custom_dga_predict_fctn)(const char* domain, int domain_length);
-
-/* **************************************** */
-
-typedef void ndpi_bitmap;
-typedef void ndpi_bitmap_iterator;
-typedef void ndpi_filter;
-
-#define MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS  16
-
-PACK_ON
-struct ndpi_binary_bitmap_entry {
-  u_int32_t value;
-  u_int8_t category;
-} PACK_OFF;
-    
-typedef struct {
-  u_int32_t num_allocated_entries, num_used_entries;
-  struct ndpi_binary_bitmap_entry *entries;
-  bool is_compressed;
-} ndpi_binary_bitmap;
 
 /* **************************************** */
 

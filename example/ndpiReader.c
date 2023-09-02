@@ -5432,15 +5432,35 @@ void sketchUnitTest() {
 
 /* *********************************************** */
 
+void binaryBitmapUnitTest() {
+  ndpi_binary_bitmap *b = ndpi_binary_bitmap_alloc();
+  u_int64_t hashval = 8149764909040470312;
+  u_int8_t category = 33;
+  
+  ndpi_binary_bitmap_set(b, hashval, category);
+  ndpi_binary_bitmap_set(b, hashval+1, category);
+  category = 0;
+  assert(ndpi_binary_bitmap_isset(b, hashval, &category));
+  assert(category == 33);
+  ndpi_binary_bitmap_free(b);
+}
+
+/* *********************************************** */
+
 void domainSearchUnitTest() {
   ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
   char *domain = "ntop.org";
+  u_int8_t class_id;
   
   assert(sc);
 
   ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, ".ntop.org");
   ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, domain);
-  assert(ndpi_domain_classify_contains(sc, domain));
+  assert(ndpi_domain_classify_contains(sc, &class_id, domain));
+
+  ndpi_domain_classify_add(sc, NDPI_PROTOCOL_CATEGORY_GAMBLING, "123vc.club");
+  assert(ndpi_domain_classify_contains(sc, &class_id, "123vc.club"));
+  assert(class_id == NDPI_PROTOCOL_CATEGORY_GAMBLING);
 
 #if 0
   {
@@ -5455,7 +5475,8 @@ void domainSearchUnitTest() {
 #endif
   
   /* Subdomain check */
-  assert(ndpi_domain_classify_contains(sc, "blog.ntop.org") == NDPI_PROTOCOL_NTOP);
+  assert(ndpi_domain_classify_contains(sc, &class_id, "blog.ntop.org"));
+  assert(class_id == NDPI_PROTOCOL_NTOP);
   
 #ifdef DEBUG_TRACE
   struct stat st;
@@ -5475,12 +5496,13 @@ void domainSearchUnitTest() {
 
 void domainSearchUnitTest2() {
   ndpi_domain_classify *c = ndpi_domain_classify_alloc();
-  u_int16_t class_id = 9;
+  u_int8_t class_id = 9;
 
   ndpi_domain_classify_add(c, class_id, "ntop.org");
   ndpi_domain_classify_add(c, class_id, "apple.com");
 
-  assert(ndpi_domain_classify_contains(c,"ntop.com") == 0);
+  assert(!ndpi_domain_classify_contains(c, &class_id, "ntop.com"));
+  
   ndpi_domain_classify_free(c);
 }
 
@@ -5525,6 +5547,7 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    binaryBitmapUnitTest();
     domainSearchUnitTest();
     domainSearchUnitTest2();
     sketchUnitTest();

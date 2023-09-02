@@ -1802,6 +1802,7 @@ extern "C" {
   
   u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len);
   u_int32_t ndpi_hash_string(char *str);
+  u_int32_t ndpi_rev_hash_string(char *str);
   u_int32_t ndpi_hash_string_len(char *str, u_int len);
   
   /* ******************************* */
@@ -2073,11 +2074,13 @@ extern "C" {
   void                  ndpi_domain_classify_free(ndpi_domain_classify *s);
   u_int32_t             ndpi_domain_classify_size(ndpi_domain_classify *s);
   bool                  ndpi_domain_classify_add(ndpi_domain_classify *s,
-						 u_int16_t classification_id, char *domain);
-  u_int32_t             ndpi_domain_classify_add_domains(ndpi_domain_classify *_s,
-							 u_int16_t classification_id,
+						 u_int8_t class_id, char *domain);
+  u_int32_t             ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
+							 u_int8_t class_id,
 							 char *file_path);
-  u_int16_t             ndpi_domain_classify_contains(ndpi_domain_classify *s, char *domain);
+  bool                  ndpi_domain_classify_contains(ndpi_domain_classify *s,
+						      u_int8_t *class_id /* out */,
+						      char *domain);
   
   /* ******************************* */
 
@@ -2086,9 +2089,9 @@ extern "C" {
     ability to store a category per value (as ndpi_domain_classify)
   */
   ndpi_binary_bitmap* ndpi_binary_bitmap_alloc();
-  bool ndpi_binary_bitmap_set(ndpi_binary_bitmap *b, u_int32_t value, u_int8_t category);
+  bool ndpi_binary_bitmap_set(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t category);
   bool ndpi_binary_bitmap_compress(ndpi_binary_bitmap *b);
-  bool ndpi_binary_bitmap_isset(ndpi_binary_bitmap *b, u_int32_t value, u_int8_t *out_category);
+  bool ndpi_binary_bitmap_isset(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t *out_category);
   void ndpi_binary_bitmap_free(ndpi_binary_bitmap *b);
   u_int32_t ndpi_binary_bitmap_size(ndpi_binary_bitmap *b);
   u_int32_t ndpi_binary_bitmap_cardinality(ndpi_binary_bitmap *b);

@@ -1,6 +1,9 @@
 AR=@AR@
 CC=@CC@
 CXX=@CXX@
+ifeq ($(OS),Darwin)
+CC=clang -fno-color-diagnostics
+endif
 BUILD_MINGW=@BUILD_MINGW@
 BUILD_MINGW_X64=@BUILD_MINGW_X64@
 DISABLE_NPCAP=@DISABLE_NPCAP@

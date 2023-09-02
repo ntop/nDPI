@@ -3403,21 +3403,19 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
   return(id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
 #else
   char buf[128];
-  u_int16_t rc;
+  u_int8_t class_id;
   u_int max_len = sizeof(buf)-1;
     
   if(name_len > max_len) name_len = max_len;
   strncpy(buf, name, name_len);
   buf[name_len] = '\0';
   
-  rc = ndpi_domain_classify_contains(ndpi_str->custom_categories.sc_hostnames, buf);
-
-  if(rc == 0)
-    return(-1); /* Not found */
-  else {
-    *category = (ndpi_protocol_category_t)rc;
+  if(ndpi_domain_classify_contains(ndpi_str->custom_categories.sc_hostnames,
+				   &class_id, buf)) {
+    *category = (ndpi_protocol_category_t)class_id;
     return(0);
-  }
+  } else    
+    return(-1); /* Not found */
 #endif
 }
 
@@ -4202,7 +4200,12 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
 
     if((len <= 1) || (line[0] == '#'))
       continue;
+    else
+      len--;
 
+    while((line[len] == '\n') || (line[len] == '\r'))
+      line[len--] = '\0';
+	  
     if(ndpi_load_category(ndpi_str, line, category_id, NULL) > 0)
       num_loaded++;
   }

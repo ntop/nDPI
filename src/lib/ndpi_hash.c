@@ -62,6 +62,28 @@ u_int32_t ndpi_hash_string(char *str) {
 
 /* ******************************************************************** */
 
+u_int32_t ndpi_rev_hash_string(char *str) {
+  u_int32_t hash, i;
+  int len = strlen(str);
+
+  if(len == 0) return(0);
+  len--;
+  
+  for(hash = i = 0; len >= 0; len--) {
+    hash += str[len];
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+  }
+
+  hash += (hash << 3);
+  hash ^= (hash >> 11);
+  hash += (hash << 15);
+
+  return(hash);
+}
+
+/* ******************************************************************** */
+
 /* Same as above but with strings with lenght */
 u_int32_t ndpi_hash_string_len(char *str, u_int len) {
   u_int32_t hash, i;
