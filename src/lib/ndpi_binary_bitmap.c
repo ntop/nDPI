@@ -146,6 +146,7 @@ bool ndpi_binary_bitmap_isset(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t *
 						   ndpi_binary_bitmap_entry_compare);
     
     if(rc != NULL) *out_category = rc->category;
+    
     return(rc == NULL ? false : true);
   } else
     return(false);

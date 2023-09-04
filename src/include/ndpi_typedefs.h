@@ -1176,6 +1176,7 @@ typedef struct ndpi_proto {
 #define CUSTOM_CATEGORY_LABEL_LEN 32
 
 typedef void ndpi_bitmap;
+typedef void ndpi_bitmap64;
 typedef void ndpi_bitmap_iterator;
 typedef void ndpi_filter;
 

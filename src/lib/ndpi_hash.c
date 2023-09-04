@@ -48,6 +48,21 @@ u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len) {
 
 /* ******************************************************************** */
 
+/* Based on Daniel Lemire code */
+u_int64_t ndpi_quick_hash64(char *str, u_int str_len) {
+  u_int64_t h = 0;
+  u_int i;
+  
+  for(i=0; i<str_len; i++)
+    h = (h * 177) + str[i];
+
+  h ^= strlen(str);
+  
+  return h;
+}
+
+/* ******************************************************************** */
+
 /*
   https://en.wikipedia.org/wiki/Jenkins_hash_function
 

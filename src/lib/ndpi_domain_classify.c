@@ -27,10 +27,12 @@
 #include "ndpi_config.h"
 #include "ndpi_api.h"
 
-// #define DEBUG_ADD
-// #define DEBUG_CONTAINS
+#if 0
+#define DEBUG_ADD
+#define DEBUG_CONTAINS
+#endif
 
-// #define USE_BINARY_BITMAP
+#define USE_BINARY_BITMAP
 
 #ifdef USE_BINARY_BITMAP
 
@@ -72,12 +74,8 @@ u_int32_t ndpi_domain_classify_size(ndpi_domain_classify *c) {
 bool ndpi_domain_classify_add(ndpi_domain_classify *c,
 			      u_int8_t class_id,
 			      char *domain) {
-  u_int64_t hash1, hash2, hash;
+  u_int64_t hash;
   char *dot = strrchr(domain, '.');
-
-#ifdef DEBUG_ADD
-  printf("[add] Trying to add %s\n", domain);
-#endif
 
   if(!dot) return(false);
   if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))
@@ -86,15 +84,15 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *c,
   /* Skip heading dots */
   while(domain[0] == '.') domain++;
 
-  hash1 = ndpi_hash_string(domain), hash2 = ndpi_rev_hash_string(domain);
-  hash = (hash1 << 32) | hash2;
+  hash = ndpi_quick_hash64(domain, strlen(domain));  
 
 #ifdef DEBUG_ADD
   printf("[add] %s @ %u [hash: %llu]\n", domain, class_id, hash);
 
-  if(ndpi_binary_bitmap_isset(c->bitmap, hash, class_id)) {
+#if 0
+  if(ndpi_binary_bitmap_isset(c->bitmap, hash, &class_id))
     printf("[add] False positive %s @ %u [hash: %llu]\n", domain, class_id, hash);
-  }
+#endif
 #endif
 
   return(ndpi_binary_bitmap_set(c->bitmap, hash, class_id));
@@ -184,11 +182,10 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *c,
   elem = domain;
 
   while(true) {
-    u_int64_t hash1, hash2, hash;
+    u_int64_t hash;
 
-    hash1 = ndpi_hash_string(elem), hash2 = ndpi_rev_hash_string(elem);
-    hash = (hash1 << 32) | hash2;
-
+    hash = ndpi_quick_hash64(elem, strlen(elem));
+    
 #ifdef DEBUG_CONTAINS
     printf("[contains] Searching %s [hash: %llu]\n", elem, hash);
 #endif
@@ -314,7 +311,7 @@ static bool ndpi_domain_search_add(ndpi_domain_search *search, char *domain) {
     if(elem[0] == '.') elem = &elem[1];
 
     h = ndpi_hash_string(elem);
-
+    
     if(elem == domain) {
       /* We're adding the beginning of the domain, hence the last token before quitting */
       h += END_OF_TOKENS_DELIMITER;
@@ -368,7 +365,7 @@ static bool ndpi_domain_search_contains(ndpi_domain_search *search, char *domain
     if(elem[0] == '.') elem = &elem[1];
 
     h = ndpi_hash_string(elem);
-
+    
     if(!ndpi_bitmap_isset(search->bitmap[bitmap_id], h + hsum)) {
       /* Exact match does not work, so let's see if a partial match works instead */
 
