@@ -25,6 +25,15 @@
 #include "ndpi_config.h"
 #include "ndpi_api.h"
 
+#include "third_party/include/MurmurHash3.h"
+
+/* ******************************************************************** */
+
+/* Based on djb2 hash - http://www.cse.yorku.ca/~oz/hash.html */
+u_int32_t ndpi_murmur_hash(char *str, u_int str_len) {
+  return(MurmurHash((void*)str, str_len, 0x87654321));
+}
+
 /* ******************************************************************** */
 
 /* Based on djb2 hash - http://www.cse.yorku.ca/~oz/hash.html */

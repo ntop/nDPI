@@ -1804,6 +1804,7 @@ extern "C" {
   u_int32_t ndpi_hash_string(char *str);
   u_int32_t ndpi_rev_hash_string(char *str);
   u_int32_t ndpi_hash_string_len(char *str, u_int len);
+  u_int32_t ndpi_murmur_hash(char *str, u_int str_len);
   
   /* ******************************* */
 

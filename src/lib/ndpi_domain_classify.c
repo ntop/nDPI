@@ -52,7 +52,7 @@ ndpi_domain_classify* ndpi_domain_classify_alloc() {
   if(!search) return(NULL);
 
   if((search->bitmap = ndpi_binary_bitmap_alloc()) == NULL)
-    goto toobad;  
+    goto toobad;
 
   return(search);
 
@@ -74,19 +74,27 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *c,
 			      char *domain) {
   u_int64_t hash1, hash2, hash;
   char *dot = strrchr(domain, '.');
-  
+
+#ifdef DEBUG_ADD
+  printf("[add] Trying to add %s\n", domain);
+#endif
+
   if(!dot) return(false);
   if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))
     return(false);
 
   /* Skip heading dots */
   while(domain[0] == '.') domain++;
-  
+
   hash1 = ndpi_hash_string(domain), hash2 = ndpi_rev_hash_string(domain);
   hash = (hash1 << 32) | hash2;
 
 #ifdef DEBUG_ADD
   printf("[add] %s @ %u [hash: %llu]\n", domain, class_id, hash);
+
+  if(ndpi_binary_bitmap_isset(c->bitmap, hash, class_id)) {
+    printf("[add] False positive %s @ %u [hash: %llu]\n", domain, class_id, hash);
+  }
 #endif
 
   return(ndpi_binary_bitmap_set(c->bitmap, hash, class_id));
@@ -119,7 +127,7 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *_c,
       else
 	line[len] = '\0';
     }
-    
+
     if(ndpi_domain_classify_add(_c, class_id, line))
       num_added++;
   }
@@ -164,7 +172,7 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *c,
 
     return(false);
   }
-  
+
   if(!is_valid_domain_char(domain[0])) {
 #ifdef DEBUG_CONTAINS
     printf("[contains] %s INVALID\n", domain);
@@ -180,7 +188,7 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *c,
 
     hash1 = ndpi_hash_string(elem), hash2 = ndpi_rev_hash_string(elem);
     hash = (hash1 << 32) | hash2;
-    
+
 #ifdef DEBUG_CONTAINS
     printf("[contains] Searching %s [hash: %llu]\n", elem, hash);
 #endif
@@ -310,7 +318,18 @@ static bool ndpi_domain_search_add(ndpi_domain_search *search, char *domain) {
     if(elem == domain) {
       /* We're adding the beginning of the domain, hence the last token before quitting */
       h += END_OF_TOKENS_DELIMITER;
+
+#ifdef DEBUG_ADD
+      if(ndpi_bitmap_isset(search->bitmap[bitmap_id], h + hsum))
+	printf("[add] False positive while adding %s (%s) [%u][bitmap_id: %u]\n",
+	       elem, domain, h + hsum, bitmap_id);
+#endif
     }
+
+#ifdef DEBUG_ADD
+    printf("[add] Trying to add %s [%s][%u][bitmap_id: %u]\n",
+	   elem, domain, h + hsum, bitmap_id);
+#endif
 
     ndpi_bitmap_set(search->bitmap[bitmap_id], h + hsum);
 
@@ -342,7 +361,7 @@ static bool ndpi_domain_search_contains(ndpi_domain_search *search, char *domain
 
   if((elem = strrchr(domain, '.')) == NULL)
     return(false); /* This does not look like a domain */
-  
+
   while(elem) {
     u_int32_t h;
 
@@ -432,7 +451,7 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *_s,
   if(!dot) return(false);
   if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))
     return(false);
-  
+
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->class[i] != NULL) {
       if(s->class[i]->class_id == class_id) {
@@ -558,7 +577,7 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *_s,
 
     return(false);
   }
-  
+
   if(!is_valid_domain_char(domain[0])) {
 #ifdef DEBUG_CONTAINS
     printf("[contains] %s INVALID\n", domain);
@@ -566,13 +585,13 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *_s,
 
     return(false);
   }
-  
+
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->class[i] != NULL) {
       char buf[256];
-      
+
       snprintf(buf, sizeof(buf), "%s", domain);
-      
+
       if(ndpi_domain_search_contains(s->class[i]->domains, buf)) {
 #ifdef DEBUG_CONTAINS
 	printf("[contains] %s = %d\n", domain, s->class[i]->class_id);
