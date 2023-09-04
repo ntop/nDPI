@@ -1181,7 +1181,7 @@ typedef void ndpi_bitmap_iterator;
 typedef void ndpi_filter;
 
 /* Save memory limiting the key to 56 bit */
-#define SAVE_BINARY_BITMAP_MEMORY
+//#define SAVE_BINARY_BITMAP_MEMORY
 
 PACK_ON
 struct ndpi_binary_bitmap_entry {

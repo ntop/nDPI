@@ -83,7 +83,11 @@ static int ndpi_binary_bitmap_entry_compare(const void *_a, const void *_b) {
   struct ndpi_binary_bitmap_entry *a = (struct ndpi_binary_bitmap_entry*)_a;
   struct ndpi_binary_bitmap_entry *b = (struct ndpi_binary_bitmap_entry*)_b;
 
-  return(a->value > b->value) - (a->value < b->value);
+  // return(a->value > b->value) - (a->value < b->value);
+
+  if (a->value < b->value) return -1;
+  else if (a->value > b->value) return 1;
+  else return 0;
 }
 
 /* ********************************************************** */
@@ -139,14 +143,13 @@ bool ndpi_binary_bitmap_isset(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t *
     struct ndpi_binary_bitmap_entry *rc;
     struct ndpi_binary_bitmap_entry tofind;
 
-    tofind.value = value;
-    rc = (struct ndpi_binary_bitmap_entry*)bsearch(&tofind, b->entries,						   
+    tofind.value = value;    rc = (struct ndpi_binary_bitmap_entry*)bsearch(&tofind, b->entries,						  
 						   b->num_used_entries,
 						   sizeof(struct ndpi_binary_bitmap_entry),
-						   ndpi_binary_bitmap_entry_compare);
-    
-    if(rc != NULL) *out_category = rc->category;
-    
+						   ndpi_binary_bitmap_entry_compare);    
+    if(rc != NULL)
+      *out_category = rc->category;
+        
     return(rc == NULL ? false : true);
   } else
     return(false);

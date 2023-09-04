@@ -155,8 +155,9 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *c,
 				   u_int8_t *class_id /* out */,
 				   char *domain) {
   u_int32_t len;
-  char *dot, *elem;
-
+  char *dot;
+  u_int64_t hash;
+  
   if(!domain)                                             return(false);
   if((len = strlen(domain)) == 0)                         return(false);
   if((dot = strrchr(domain, '.')) == NULL)                return(false);
@@ -179,28 +180,17 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *c,
     return(false);
   }
 
-  elem = domain;
-
-  while(true) {
-    u_int64_t hash;
-
-    hash = ndpi_quick_hash64(elem, strlen(elem));
+   hash = ndpi_quick_hash64(domain, strlen(domain));
     
 #ifdef DEBUG_CONTAINS
-    printf("[contains] Searching %s [hash: %llu]\n", elem, hash);
+  printf("[contains] Searching %s [hash: %llu]\n", domain, hash);
 #endif
 
-    if(ndpi_binary_bitmap_isset(c->bitmap, hash, class_id)) {
+  if(ndpi_binary_bitmap_isset(c->bitmap, hash, class_id)) {
 #ifdef DEBUG_CONTAINS
-      printf("[contains] %s = %d\n", domain, *class_id);
+    printf("[contains] %s = %d\n", domain, *class_id);
 #endif
-      return(true);
-    }
-
-    if((elem = strchr(elem, '.')) == NULL)
-      break;
-    else
-      elem = &elem[1];
+    return(true);
   }
 
 #ifdef DEBUG_CONTAINS
