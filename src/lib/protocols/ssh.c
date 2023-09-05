@@ -481,7 +481,11 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	    printf("]\n");
 	  }
 #endif
-	  for(i=0; i<16; i++) sprintf(&flow->protos.ssh.hassh_client[i*2], "%02X", fingerprint_client[i] & 0xFF);
+	  for(i=0; i<16; i++)
+	    snprintf(&flow->protos.ssh.hassh_client[i*2],
+		     sizeof(flow->protos.ssh.hassh_client) - (i*2),
+		     "%02X", fingerprint_client[i] & 0xFF);
+	  
 	  flow->protos.ssh.hassh_client[32] = '\0';
 	} else {
 	  u_char fingerprint_server[16];
@@ -500,7 +504,10 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	  }
 #endif
 
-	  for(i=0; i<16; i++) sprintf(&flow->protos.ssh.hassh_server[i*2], "%02X", fingerprint_server[i] & 0xFF);
+	  for(i=0; i<16; i++)
+	    snprintf(&flow->protos.ssh.hassh_server[i*2],
+		     sizeof(flow->protos.ssh.hassh_server) - (i*2),
+		     "%02X", fingerprint_server[i] & 0xFF);
 	  flow->protos.ssh.hassh_server[32] = '\0';
 	}
 

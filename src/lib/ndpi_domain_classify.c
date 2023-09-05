@@ -128,7 +128,8 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
 
   while((line = fgets(buf, sizeof(buf), fd)) != NULL) {
     u_int len;
-
+    u_int64_t hash;
+    
     if((line[0] == '#') ||  (line[0] == '\0'))
       continue;
     else {
@@ -140,8 +141,9 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
 	line[len] = '\0';
     }
 
-    if(ndpi_bitmap64_set(s->classes[i].domains,
-			 ndpi_quick_hash64(line, strlen(line))))
+    hash = ndpi_quick_hash64(line, strlen(line));
+
+    if(ndpi_bitmap64_set(s->classes[i].domains, hash))			 
       num_added++;
   }
 
@@ -170,7 +172,6 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
 				   u_int8_t *class_id /* out */,
 				   char *domain) {
   u_int32_t i, len;
-  u_int64_t hash;
   char *dot, *elem;
 
   if(!domain)                                             return(false);
@@ -198,7 +199,7 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
   elem = domain;
   
   while(elem != NULL) {
-    hash = ndpi_quick_hash64(elem, strlen(elem));
+    u_int64_t hash = ndpi_quick_hash64(elem, strlen(elem));
     
     for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
       if(s->classes[i].class_id != 0) {
