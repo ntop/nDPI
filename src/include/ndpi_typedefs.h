@@ -1199,8 +1199,13 @@ typedef struct {
   bool is_compressed;
 } ndpi_binary_bitmap;
 
+#define MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS          16
+
 typedef struct {
-  ndpi_binary_bitmap *bitmap;
+  struct {
+    u_int16_t class_id;
+    ndpi_bitmap64 *domains;
+  } classes[MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS];
 } ndpi_domain_classify;
 
 #ifdef NDPI_LIB_COMPILATION

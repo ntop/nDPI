@@ -2037,12 +2037,13 @@ extern "C" {
     on https://github.com/FastFilter/xor_singleheader/tree/master
    */
 
-  ndpi_bitmap64* ndpi_bitmap64_alloc_size(u_int32_t size);
-  void ndpi_bitmap64_free(ndpi_bitmap64* b);
-  void ndpi_bitmap64_set(ndpi_bitmap64* b, u_int64_t value);
-  bool ndpi_bitmap64_isset(ndpi_bitmap64* b, u_int64_t value);
+  ndpi_bitmap64* ndpi_bitmap64_alloc();
+  bool ndpi_bitmap64_set(ndpi_bitmap64 *b, u_int64_t value);
+  bool ndpi_bitmap64_compress(ndpi_bitmap64 *b);
+  bool ndpi_bitmap64_isset(ndpi_bitmap64 *b, u_int64_t value);
+  void ndpi_bitmap64_free(ndpi_bitmap64 *b);
   u_int32_t ndpi_bitmap64_size(ndpi_bitmap64 *b);
-  
+
   /* ******************************* */
   /*
     Bloom-filter on steroids based on ndpi_bitmap
@@ -2110,6 +2111,9 @@ extern "C" {
   void ndpi_binary_bitmap_free(ndpi_binary_bitmap *b);
   u_int32_t ndpi_binary_bitmap_size(ndpi_binary_bitmap *b);
   u_int32_t ndpi_binary_bitmap_cardinality(ndpi_binary_bitmap *b);
+
+  /* ******************************* */
+
   
   /* ******************************* */
 
