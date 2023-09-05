@@ -288,7 +288,8 @@ static inline bool binary_fuse8_populate(const uint64_t *keys, uint32_t size,
     return false;
   }
   reverseOrder[size] = 1;
-  for (int loop = 0; true; ++loop) {
+  int loop;
+  for (loop = 0; true; ++loop) {
     if (loop + 1 > XOR_MAX_ITERATIONS) {
       // The probability of this happening is lower than the
       // the cosmic-ray probability (i.e., a cosmic ray corrupts your system),
@@ -304,14 +305,15 @@ static inline bool binary_fuse8_populate(const uint64_t *keys, uint32_t size,
       return true;
     }
 
-    for (uint32_t i = 0; i < block; i++) {
+    uint32_t i;
+    for (i = 0; i < block; i++) {
       // important : i * size would overflow as a 32-bit number in some
       // cases.
       startPos[i] = ((uint64_t)i * size) >> blockBits;
     }
 
     uint64_t maskblock = block - 1;
-    for (uint32_t i = 0; i < size; i++) {
+    for (i = 0; i < size; i++) {
       uint64_t hash = binary_fuse_murmur64(keys[i] + filter->Seed);
       uint64_t segment_index = hash >> (64 - blockBits);
       while (reverseOrder[startPos[segment_index]] != 0) {
@@ -323,7 +325,7 @@ static inline bool binary_fuse8_populate(const uint64_t *keys, uint32_t size,
     }
     int error = 0;
     uint32_t duplicates = 0;
-    for (uint32_t i = 0; i < size; i++) {
+    for ( i = 0; i < size; i++) {
       uint64_t hash = reverseOrder[i];
       uint32_t h0 = binary_fuse8_hash(0, hash, filter);
       t2count[h0] += 4;
@@ -366,7 +368,7 @@ static inline bool binary_fuse8_populate(const uint64_t *keys, uint32_t size,
     // End of key addition
     uint32_t Qsize = 0;
     // Add sets with one key to the queue.
-    for (uint32_t i = 0; i < capacity; i++) {
+    for (i = 0; i < capacity; i++) {
       alone[Qsize] = i;
       Qsize += ((t2count[i] >> 2) == 1) ? 1 : 0;
     }
@@ -413,7 +415,8 @@ static inline bool binary_fuse8_populate(const uint64_t *keys, uint32_t size,
     filter->Seed = binary_fuse_rng_splitmix64(&rng_counter);
   }
 
-  for (uint32_t i = size - 1; i < size; i--) {
+  uint32_t i;
+  for (i = size - 1; i < size; i--) {
     // the hash of the key we insert next
     uint64_t hash = reverseOrder[i];
     uint8_t xor2 = binary_fuse8_fingerprint(hash);
@@ -572,7 +575,8 @@ static inline bool binary_fuse16_populate(const uint64_t *keys, uint32_t size,
     return false;
   }
   reverseOrder[size] = 1;
-  for (int loop = 0; true; ++loop) {
+  int loop;
+  for (loop = 0; true; ++loop) {
     if (loop + 1 > XOR_MAX_ITERATIONS) {
       // The probability of this happening is lower than the
       // the cosmic-ray probability (i.e., a cosmic ray corrupts your system),
@@ -588,14 +592,15 @@ static inline bool binary_fuse16_populate(const uint64_t *keys, uint32_t size,
       return true;
     }
 
-    for (uint32_t i = 0; i < block; i++) {
+    uint32_t i;
+    for (i = 0; i < block; i++) {
       // important : i * size would overflow as a 32-bit number in some
       // cases.
       startPos[i] = ((uint64_t)i * size) >> blockBits;
     }
 
     uint64_t maskblock = block - 1;
-    for (uint32_t i = 0; i < size; i++) {
+    for (i = 0; i < size; i++) {
       uint64_t hash = binary_fuse_murmur64(keys[i] + filter->Seed);
       uint64_t segment_index = hash >> (64 - blockBits);
       while (reverseOrder[startPos[segment_index]] != 0) {
@@ -607,7 +612,7 @@ static inline bool binary_fuse16_populate(const uint64_t *keys, uint32_t size,
     }
     int error = 0;
     uint32_t duplicates = 0;
-    for (uint32_t i = 0; i < size; i++) {
+    for (i = 0; i < size; i++) {
       uint64_t hash = reverseOrder[i];
       uint32_t h0 = binary_fuse16_hash(0, hash, filter);
       t2count[h0] += 4;
@@ -650,7 +655,7 @@ static inline bool binary_fuse16_populate(const uint64_t *keys, uint32_t size,
     // End of key addition
     uint32_t Qsize = 0;
     // Add sets with one key to the queue.
-    for (uint32_t i = 0; i < capacity; i++) {
+    for (i = 0; i < capacity; i++) {
       alone[Qsize] = i;
       Qsize += ((t2count[i] >> 2) == 1) ? 1 : 0;
     }
@@ -697,7 +702,8 @@ static inline bool binary_fuse16_populate(const uint64_t *keys, uint32_t size,
     filter->Seed = binary_fuse_rng_splitmix64(&rng_counter);
   }
 
-  for (uint32_t i = size - 1; i < size; i--) {
+  uint32_t i;
+  for ( i = size - 1; i < size; i--) {
     // the hash of the key we insert next
     uint64_t hash = reverseOrder[i];
     uint16_t xor2 = binary_fuse16_fingerprint(hash);
