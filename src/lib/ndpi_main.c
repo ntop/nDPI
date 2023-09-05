@@ -4178,7 +4178,7 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
     return(-1);
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  printf("Loading %s [proto %d]\n", path, category_id);
+  // printf("Loading %s [proto %d]\n", path, category_id);
 #endif
 
   fd = fopen(path, "r");
