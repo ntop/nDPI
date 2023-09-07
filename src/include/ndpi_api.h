@@ -98,10 +98,10 @@ extern "C" {
    *
    * @par    flow    = the flow to analyze
    * @return the error code or 0 otherwise
-   *                        
+   *
    */
   u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow);
-  
+
   /**
    * nDPI personal allocation and free functions
    **/
@@ -818,7 +818,7 @@ extern "C" {
    */
   int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
 			      char* path, ndpi_protocol_category_t category_id);
-  
+
   /**
    * Load files (whose name is <categoryid>_<label>.<extension>) stored
    * in a directory and bind each domain to the specified category.
@@ -1784,14 +1784,14 @@ extern "C" {
   void ndpi_hw_free(struct ndpi_hw_struct *hw);
   int  ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t value, double *forecast,  double *confidence_band);
   void ndpi_hw_reset(struct ndpi_hw_struct *hw);
-  
+
   /* ******************************* */
 
   int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance);
   int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const double _value, double *forecast, double *confidence_band);
   void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha);
   void ndpi_ses_reset(struct ndpi_ses_struct *ses);
-  
+
   /* ******************************* */
 
   void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]);
@@ -1799,21 +1799,21 @@ extern "C" {
   u_int32_t ndpi_nearest_power_of_two(u_int32_t x);
 
   /* ******************************* */
-  
+
   u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len);
   u_int64_t ndpi_quick_hash64(char *str, u_int str_len);
   u_int32_t ndpi_hash_string(char *str);
   u_int32_t ndpi_rev_hash_string(char *str);
   u_int32_t ndpi_hash_string_len(char *str, u_int len);
   u_int32_t ndpi_murmur_hash(char *str, u_int str_len);
-    
+
   /* ******************************* */
 
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
   int ndpi_des_add_value(struct ndpi_des_struct *des, const double _value, double *forecast, double *confidence_band);
   void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, float *ret_beta);
   void ndpi_des_reset(struct ndpi_des_struct *des);
-  
+
   /* ******************************* */
 
   int   ndpi_jitter_init(struct ndpi_jitter_struct *hw, u_int16_t num_periods);
@@ -1845,11 +1845,11 @@ extern "C" {
 			    u_int16_t *client_score, u_int16_t *server_score);
 
   u_int8_t ndpi_check_issuerdn_risk_exception(struct ndpi_detection_module_struct *ndpi_str,
-					      char *issuerDN);    
+					      char *issuerDN);
   u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 					   u_int num_params,
 					   ndpi_risk_params params[]);
-  
+
   /* ******************************* */
 
   /* HyperLogLog cardinality estimator [count unique items] */
@@ -1874,7 +1874,7 @@ extern "C" {
   void ndpi_cm_sketch_add(struct ndpi_cm_sketch *sketch, u_int32_t element);
   u_int32_t ndpi_cm_sketch_count(struct ndpi_cm_sketch *sketch, u_int32_t element);
   void ndpi_cm_sketch_destroy(struct ndpi_cm_sketch *sketch);
-  
+
   /* ******************************* */
 
   /* PopCount [count how many bits are set to 1] */
@@ -2002,8 +2002,12 @@ extern "C" {
   /*
     Bitmap based on compressed bitmaps
     implemented by https://roaringbitmap.org
+
+    This is
+    - NOT a probabilistic datastructure (i.e. no false positives)
+    - mutable (i.e. you can add values at any time)
   */
-  
+
   ndpi_bitmap* ndpi_bitmap_alloc(void);
   ndpi_bitmap* ndpi_bitmap_alloc_size(u_int32_t size);
   void ndpi_bitmap_free(ndpi_bitmap* b);
@@ -2025,7 +2029,7 @@ extern "C" {
   ndpi_bitmap* ndpi_bitmap_ot_alloc(ndpi_bitmap* a, ndpi_bitmap* b_and);
   void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor);
   void ndpi_bitmap_optimize(ndpi_bitmap* a);
-  
+
   ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b);
   void ndpi_bitmap_iterator_free(ndpi_bitmap* b);
   bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, u_int32_t *value);
@@ -2035,6 +2039,11 @@ extern "C" {
   /*
     Bitmap with 64 bit values based
     on https://github.com/FastFilter/xor_singleheader/tree/master
+
+    This is
+    - a probabilistic datastructure !!! (i.e. be prepared to false positives)
+    - immutable (i.e. adding keys after a search (i.e. ndpi_bitmap64_isset)
+      is not allowed
    */
 
   ndpi_bitmap64* ndpi_bitmap64_alloc();
@@ -2045,6 +2054,7 @@ extern "C" {
   u_int32_t ndpi_bitmap64_size(ndpi_bitmap64 *b);
 
   /* ******************************* */
+
   /*
     Bloom-filter on steroids based on ndpi_bitmap
 
@@ -2078,7 +2088,7 @@ extern "C" {
   void         ndpi_filter_free(ndpi_filter *f);
   size_t       ndpi_filter_size(ndpi_filter *f);
   u_int32_t    ndpi_filter_cardinality(ndpi_filter *f);
-  
+
   /* ******************************* */
 
   /*
@@ -2097,7 +2107,7 @@ extern "C" {
   bool                  ndpi_domain_classify_contains(ndpi_domain_classify *s,
 						      u_int8_t *class_id /* out */,
 						      char *domain);
-  
+
   /* ******************************* */
 
   /*
@@ -2114,7 +2124,7 @@ extern "C" {
 
   /* ******************************* */
 
-  
+
   /* ******************************* */
 
   char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,

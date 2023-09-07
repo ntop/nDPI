@@ -84,12 +84,12 @@ bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
 
     /* Now remove duplicates */
     u_int64_t old_value = b->entries[0], new_len = 1;
-    
+
     for(i=1; i<b->num_used_entries; i++) {
       if(b->entries[i] != old_value) {
 	if(new_len != i)
 	  memcpy(&b->entries[new_len], &b->entries[i], sizeof(u_int64_t));
-	
+
 	old_value = b->entries[i];
 	new_len++;
       } else {
@@ -97,21 +97,21 @@ bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
 	printf("Skipping duplicate hash %lluu [id: %u/%u]\n",
 	       b->entries[i].value, i, b->num_used_entries);
 #endif
-      }    
+      }
     }
-    
+
     b->num_used_entries = b->num_allocated_entries = new_len;
   }
 
   if(binary_fuse16_allocate(b->num_used_entries, &b->bitmap)) {
-    if(binary_fuse16_populate(b->entries, b->num_used_entries, &b->bitmap)) {    
+    if(binary_fuse16_populate(b->entries, b->num_used_entries, &b->bitmap)) {
       ndpi_free(b->entries), b->num_used_entries = b->num_allocated_entries = 0;
       b->entries = NULL;
     } else
       return(false);
   } else
     return(false);
-      
+
   b->is_compressed = true;
 
   return(true);
@@ -121,7 +121,17 @@ bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
 
 bool ndpi_bitmap64_set(ndpi_bitmap64 *_b, u_int64_t value) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
-  
+
+  if(b->is_compressed) {
+    /*
+      We need to discard the filter and start over as this
+      datastructure is immutable
+    */
+
+    binary_fuse16_free(&b->bitmap);
+    /* No need to call b->is_compressed = false; as it will be set below */
+  }
+
   if(b->num_used_entries >= b->num_allocated_entries) {
     u_int64_t *rc;
     u_int32_t new_len = b->num_allocated_entries + NDPI_BITMAP64_REALLOC_SIZE;
@@ -144,7 +154,7 @@ bool ndpi_bitmap64_set(ndpi_bitmap64 *_b, u_int64_t value) {
 
 bool ndpi_bitmap64_isset(ndpi_bitmap64 *_b, u_int64_t value) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
-  
+
   if(!b->is_compressed) ndpi_bitmap64_compress(b);
 
   return(binary_fuse16_contain(value, &b->bitmap));
@@ -154,12 +164,12 @@ bool ndpi_bitmap64_isset(ndpi_bitmap64 *_b, u_int64_t value) {
 
 void ndpi_bitmap64_free(ndpi_bitmap64 *_b) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
-  
+
   if(b->entries)        ndpi_free(b->entries);
 
   if(b->is_compressed)
     binary_fuse16_free(&b->bitmap);
-  
+
   ndpi_free(b);
 }
 
@@ -167,6 +177,6 @@ void ndpi_bitmap64_free(ndpi_bitmap64 *_b) {
 
 u_int32_t ndpi_bitmap64_size(ndpi_bitmap64 *_b) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
-  
+
   return(sizeof(ndpi_bitmap64) + binary_fuse16_size_in_bytes(&b->bitmap));
 }
