@@ -2050,6 +2050,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_FULLY_ENCRYPTED:
     return("Fully encrypted flow");
 
+  case NDPI_TLS_ALPN_SNI_MISMATCH:
+    return("ALPN/SNI Mismatch");
+    break;
+    
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

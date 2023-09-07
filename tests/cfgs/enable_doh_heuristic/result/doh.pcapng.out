@@ -27,7 +27,7 @@ JA3 Host Stats:
 	1	 192.168.1.253            	 1      
 
 
-	1	TCP 192.168.1.253:35996 <-> 1.1.1.1:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 24][cat: Web/5][61 pkts/5381 bytes <-> 59 pkts/9211 bytes][Goodput ratio: 35/63][122.79 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.262 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1965/1934 15360/15360 4993/4853][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 88/156 315/1514 41/267][Risk: ** Missing SNI TLS Extn **][Risk Score: 50][TLSv1.3][JA3C: 7c1e207beb00684bbbe144f1b0abe1d5][JA3S: d75f9129bb5d05492a65ff78e081bcb2][Firefox][Cipher: TLS_CHACHA20_POLY1305_SHA256][Plen Bins: 24,32,24,0,1,7,3,5,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.1.253:35996 <-> 1.1.1.1:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 24][cat: Web/5][61 pkts/5381 bytes <-> 59 pkts/9211 bytes][Goodput ratio: 35/63][122.79 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.262 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1965/1934 15360/15360 4993/4853][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 88/156 315/1514 41/267][Risk: ** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 100][TLSv1.3][JA3C: 7c1e207beb00684bbbe144f1b0abe1d5][JA3S: d75f9129bb5d05492a65ff78e081bcb2][Firefox][Cipher: TLS_CHACHA20_POLY1305_SHA256][Plen Bins: 24,32,24,0,1,7,3,5,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 	Bin clusters
 	------------

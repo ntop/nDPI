@@ -309,3 +309,15 @@ Minor packet/flow issues (e.g. DNS traffic with zero TTL) have been detected.
 NDPI_TCP_ISSUES
 ===============
 Relevant TCP connection issues such as connection refused, scan, or probe attempt.
+
+.. _Risk 051
+
+NDPI_FULLY_ENCRYPTED
+====================
+Flow with Unknown protocol containing encrypted traffic.
+
+.. _Risk 052
+
+NDPI_TLS_ALPN_SNI_MISMATCH
+=========================
+Invalid TLS ALPN/SNI mismatch. For instance ALPN advertises the flow as h2 (HTTP/2.0) and no SNI is reported.

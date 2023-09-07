@@ -149,7 +149,8 @@ typedef enum {
   NDPI_MINOR_ISSUES,           /* Generic packet issues (e.g. DNS with 0 TTL) */
   NDPI_TCP_ISSUES,             /* 50 */ /* TCP issues such as connection failed, probing or scan */
   NDPI_FULLY_ENCRYPTED,        /* This (unknown) session is fully encrypted */
-
+  NDPI_TLS_ALPN_SNI_MISMATCH,  /* Invalid ALPN/SNI combination */
+  
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;
