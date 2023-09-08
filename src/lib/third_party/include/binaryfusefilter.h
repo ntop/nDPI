@@ -29,7 +29,11 @@ static inline uint64_t binary_fuse_mix_split(uint64_t key, uint64_t seed) {
   return binary_fuse_murmur64(key + seed);
 }
 static inline uint64_t binary_fuse_rotl64(uint64_t n, unsigned int c) {
+#ifdef _WIN32
+    return(_rotr64(n, c));
+#else
   return (n << (c & 63)) | (n >> ((-c) & 63));
+#endif
 }
 static inline uint32_t binary_fuse_reduce(uint32_t hash, uint32_t n) {
   // http://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
