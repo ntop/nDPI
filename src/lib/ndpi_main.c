@@ -896,11 +896,11 @@ int ndpi_init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
 
 void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str,
                               ndpi_protocol_match const * const match) {
-	if (ndpi_init_app_protocol(ndpi_str, match) == 0) {
-		ndpi_add_host_url_subprotocol(ndpi_str, match->string_to_match,
-				match->protocol_id, match->protocol_category,
-				match->protocol_breed, match->level);
-	}
+  if (ndpi_init_app_protocol(ndpi_str, match) == 0) {
+    ndpi_add_host_url_subprotocol(ndpi_str, match->string_to_match,
+				  match->protocol_id, match->protocol_category,
+				  match->protocol_breed, match->level);
+  }
 }
 
 /* ******************************************************************** */
@@ -2144,9 +2144,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Mullvad", NDPI_PROTOCOL_CATEGORY_VPN,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-
-  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE,
-			  "Free", NDPI_PROTOCOL_CATEGORY_WEB,
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_OPERA_VPN,
+			  "OperaVPN", NDPI_PROTOCOL_CATEGORY_VPN,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
