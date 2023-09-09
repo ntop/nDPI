@@ -76,6 +76,9 @@ bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
   u_int32_t i;
 
+  if(!b)
+    return(false);
+
   if(b->num_used_entries > 0) {
     if(b->num_used_entries > 1)
       qsort(b->entries, b->num_used_entries,
@@ -122,6 +125,9 @@ bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
 bool ndpi_bitmap64_set(ndpi_bitmap64 *_b, u_int64_t value) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
 
+  if(!b)
+    return(false);
+
   if(b->is_compressed) {
     /*
       We need to discard the filter and start over as this
@@ -155,6 +161,9 @@ bool ndpi_bitmap64_set(ndpi_bitmap64 *_b, u_int64_t value) {
 bool ndpi_bitmap64_isset(ndpi_bitmap64 *_b, u_int64_t value) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
 
+  if(!b)
+    return(false);
+
   if(!b->is_compressed) ndpi_bitmap64_compress(b);
 
   return(binary_fuse16_contain(value, &b->bitmap));
@@ -164,6 +173,9 @@ bool ndpi_bitmap64_isset(ndpi_bitmap64 *_b, u_int64_t value) {
 
 void ndpi_bitmap64_free(ndpi_bitmap64 *_b) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
+
+  if(!b)
+    return;
 
   if(b->entries)        ndpi_free(b->entries);
 
@@ -177,6 +189,9 @@ void ndpi_bitmap64_free(ndpi_bitmap64 *_b) {
 
 u_int32_t ndpi_bitmap64_size(ndpi_bitmap64 *_b) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
+
+  if(!b)
+    return(0);
 
   return(sizeof(ndpi_bitmap64) + binary_fuse16_size_in_bytes(&b->bitmap));
 }

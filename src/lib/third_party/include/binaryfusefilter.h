@@ -157,7 +157,7 @@ static inline uint32_t binary_fuse8_hash(int index, uint64_t hash,
     uint64_t h = binary_fuse_mulhi(hash, filter->SegmentCountLength);
     h += index * filter->SegmentLength;
     // keep the lower 36 bits
-    uint64_t hh = hash & ((1UL << 36) - 1);
+    uint64_t hh = hash & ((1ULL << 36) - 1);
     // index 0: right shift by 36; index 1: right shift by 18; index 2: no shift
     h ^= (size_t)((hh >> (36 - 18 * index)) & filter->SegmentLengthMask);
     return h;
@@ -477,7 +477,7 @@ static inline uint32_t binary_fuse16_hash(int index, uint64_t hash,
     uint64_t h = binary_fuse_mulhi(hash, filter->SegmentCountLength);
     h += index * filter->SegmentLength;
     // keep the lower 36 bits
-    uint64_t hh = hash & ((1UL << 36) - 1);
+    uint64_t hh = hash & ((1ULL << 36) - 1);
     // index 0: right shift by 36; index 1: right shift by 18; index 2: no shift
     h ^= (size_t)((hh >> (36 - 18 * index)) & filter->SegmentLengthMask);
     return h;
@@ -522,7 +522,7 @@ static inline bool binary_fuse16_allocate(uint32_t size,
   filter->ArrayLength =
       (filter->SegmentCount + arity - 1) * filter->SegmentLength;
   filter->SegmentCountLength = filter->SegmentCount * filter->SegmentLength;
-  filter->Fingerprints = (uint16_t*)ndpi_malloc(filter->ArrayLength * sizeof(uint16_t));
+  filter->Fingerprints = (uint16_t*)ndpi_calloc(filter->ArrayLength, sizeof(uint16_t));
   return filter->Fingerprints != NULL;
 }
 

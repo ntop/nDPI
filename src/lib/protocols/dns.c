@@ -772,7 +772,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
     dot = strchr(_hostname, '.');
     if(dot) {
-      unsigned long first_element_len = (unsigned long)dot - (unsigned long)_hostname;
+      uintptr_t first_element_len = dot - _hostname;
 
       if(first_element_len > 32) {
 	/*

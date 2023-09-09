@@ -43,6 +43,9 @@ ndpi_domain_classify* ndpi_domain_classify_alloc() {
 void ndpi_domain_classify_free(ndpi_domain_classify *s) {
   u_int32_t i;
 
+  if(!s)
+    return;
+
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->classes[i].domains != NULL) {
       ndpi_bitmap64_free(s->classes[i].domains);
@@ -86,6 +89,8 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
     } else if(s->classes[i].class_id == 0) {
       s->classes[i].class_id = class_id;
       s->classes[i].domains  = ndpi_bitmap64_alloc();
+      if(!s->classes[i].domains)
+        s->classes[i].class_id = 0;
       break;
     }
   }
@@ -113,6 +118,8 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
     } else if(s->classes[i].class_id == 0) {
       s->classes[i].class_id = class_id;
       s->classes[i].domains  = ndpi_bitmap64_alloc();
+      if(!s->classes[i].domains)
+        s->classes[i].class_id = 0;
       break;
     }
   }
