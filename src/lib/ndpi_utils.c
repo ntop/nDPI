@@ -2012,7 +2012,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Fragmented DNS Message");
 
   case NDPI_INVALID_CHARACTERS:
-    return("Text With Non-Printable Chars");
+    return("Non-Printable/Invalid Chars Detected");
 
   case NDPI_POSSIBLE_EXPLOIT:
     return("Possible Exploit");

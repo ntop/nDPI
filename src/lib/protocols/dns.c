@@ -175,7 +175,11 @@ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
   }
 }
 /*
-  allowed chars for dns names A-Z 0-9 _ -
+  See
+  - RFC 1035
+  - https://learn.microsoft.com/en-us/troubleshoot/windows-server/identity/naming-conventions-for-computer-domain-site-ou
+  
+  Allowed chars for dns names A-Z 0-9 _ -
   Perl script for generation map:
   my @M;
   for(my $ch=0; $ch < 256; $ch++) {
@@ -246,8 +250,11 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 	if((dns_validchar[c >> 5] & shift)) {
 	  _hostname[j++] = tolower(c);
 	} else {
+	  /* printf("---?? '%c'\n", c); */
+	  
+	  hostname_is_valid = 0;
+	  
 	  if (isprint(c) == 0) {
-	    hostname_is_valid = 0;
 	    _hostname[j++] = '?';
 	  } else {
 	    _hostname[j++] = '_';
