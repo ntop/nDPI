@@ -141,7 +141,8 @@ This risk indicates that the protocol used is insecure and that a secure protoco
 
 NDPI_DNS_SUSPICIOUS_TRAFFIC
 ===========================
-This risk is returned when DNS traffic returns an unexpected/obsolete `record type <https://en.wikipedia.org/wiki/List_of_DNS_record_types>`_.
+This risk is returned when DNS traffic returns an unexpected/obsolete `record type <https://en.wikipedia.org/wiki/List_of_DNS_record_types>`_
+or when a suspicious query with a very long host name is detected.
 
 .. _Risk 024:
 

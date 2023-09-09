@@ -693,6 +693,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       || (d_port == LLMNR_PORT))
      && (packet->payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset)) {
     struct ndpi_dns_packet_header dns_header;
+    char *dot;
     u_int len, off;
     int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query, is_mdns);
     ndpi_protocol ret;
@@ -769,6 +770,21 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     if (hostname_is_valid == 0)
       ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, NULL);
 
+    dot = strchr(_hostname, '.');
+    if(dot) {
+      unsigned long first_element_len = (unsigned long)dot - (unsigned long)_hostname;
+
+      if(first_element_len > 32) {
+	/*
+	  The lenght of the first element in the query is very long
+	  and this might be an issue or indicate an exfiltration
+	*/
+
+	/* printf("**** %lu [%s][%s]\n", first_element_len, dot, _hostname); */
+	ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, NULL);
+      }
+    }
+    
     if(len > 0) {
       ndpi_protocol_match_result ret_match;
 
