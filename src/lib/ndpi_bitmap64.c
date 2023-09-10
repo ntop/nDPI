@@ -79,6 +79,9 @@ bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
   if(!b)
     return(false);
 
+  if(b->is_compressed)
+    return(true);
+
   if(b->num_used_entries > 0) {
     if(b->num_used_entries > 1)
       qsort(b->entries, b->num_used_entries,
@@ -110,10 +113,13 @@ bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
     if(binary_fuse16_populate(b->entries, b->num_used_entries, &b->bitmap)) {
       ndpi_free(b->entries), b->num_used_entries = b->num_allocated_entries = 0;
       b->entries = NULL;
-    } else
+    } else {
+      binary_fuse16_free(&b->bitmap);
       return(false);
-  } else
+    }
+  } else {
     return(false);
+  }
 
   b->is_compressed = true;
 
@@ -145,7 +151,10 @@ bool ndpi_bitmap64_set(ndpi_bitmap64 *_b, u_int64_t value) {
     rc = (u_int64_t*)ndpi_realloc(b->entries,
 				  sizeof(u_int64_t)*b->num_allocated_entries,
 				  sizeof(u_int64_t)*new_len);
-    if(rc == NULL) return(false);
+    if(rc == NULL) {
+      b->is_compressed = false;
+      return(false);
+    }
 
     b->entries = rc, b->num_allocated_entries = new_len;
   }
@@ -165,6 +174,8 @@ bool ndpi_bitmap64_isset(ndpi_bitmap64 *_b, u_int64_t value) {
     return(false);
 
   if(!b->is_compressed) ndpi_bitmap64_compress(b);
+  if(!b->is_compressed)
+    return(false);
 
   return(binary_fuse16_contain(value, &b->bitmap));
 }

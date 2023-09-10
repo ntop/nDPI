@@ -68,6 +68,9 @@ void ndpi_domain_classify_free(ndpi_domain_classify *s) {
 u_int32_t ndpi_domain_classify_size(ndpi_domain_classify *s) {
   u_int32_t i, tot_len = sizeof(ndpi_domain_classify);
 
+  if(!s)
+    return(0);
+
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->classes[i].domains != NULL) {
       tot_len += ndpi_bitmap64_size(s->classes[i].domains);
@@ -82,9 +85,14 @@ u_int32_t ndpi_domain_classify_size(ndpi_domain_classify *s) {
 
 bool ndpi_domain_classify_add(ndpi_domain_classify *s,
 			      u_int8_t class_id,
-			      char *domain) {
+			      const char *domain) {
   u_int32_t i;
-  char *dot = strrchr(domain, '.');
+  char *dot;
+
+  if(!s || !domain)
+    return(false);
+  
+  dot = strrchr(domain, '.');
 
   if(!dot) return(false);
   if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))
@@ -184,11 +192,11 @@ static bool is_valid_domain_char(u_char c) {
 
 bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
 				   u_int8_t *class_id /* out */,
-				   char *domain) {
+				   const char *domain) {
   u_int32_t i, len;
-  char *dot, *elem;
+  const char *dot, *elem;
 
-  if(!domain)                                             return(false);
+  if(!domain || !s)                                       return(false);
   if((len = strlen(domain)) == 0)                         return(false);
   if((dot = strrchr(domain, '.')) == NULL)                return(false);
   if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local"))) return(false);

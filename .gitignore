@@ -70,6 +70,8 @@
 /fuzz/fuzz_ds_ptree
 /fuzz/fuzz_ds_hash
 /fuzz/fuzz_ds_ahocorasick
+/fuzz/fuzz_ds_bitmap64
+/fuzz/fuzz_ds_domain_classify
 /fuzz/fuzz_libinjection
 /fuzz/fuzz_tls_certificate
 /fuzz/fuzz_dga
@@ -97,6 +99,8 @@
 /fuzz/fuzz_ds_tree_seed_corpus.zip
 /fuzz/fuzz_ds_ptree_seed_corpus.zip
 /fuzz/fuzz_ds_ahocorasick_seed_corpus.zip
+/fuzz/fuzz_ds_bitmap64_seed_corpus.zip
+/fuzz/fuzz_ds_domain_classify_seed_corpus.zip
 /fuzz/fuzz_libinjection_seed_corpus.zip
 /fuzz/fuzz_tls_certificate_seed_corpus.zip
 /fuzz/fuzz_filecfg_protocols_seed_corpus.zip
