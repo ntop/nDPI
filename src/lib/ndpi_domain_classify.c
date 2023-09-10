@@ -33,8 +33,12 @@
 #endif
 
 ndpi_domain_classify* ndpi_domain_classify_alloc() {
-  ndpi_domain_classify *cat = (ndpi_domain_classify*)ndpi_calloc(1, sizeof(ndpi_domain_classify));
-
+  int i;
+  ndpi_domain_classify *cat = (ndpi_domain_classify*)ndpi_malloc(sizeof(ndpi_domain_classify));
+  
+  for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++)
+    cat->classes[i].class_id = 0, cat->classes[i].domains = NULL;
+    
   return((ndpi_domain_classify*)cat);
 }
 
