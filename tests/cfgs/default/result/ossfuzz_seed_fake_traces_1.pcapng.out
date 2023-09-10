@@ -19,7 +19,7 @@ Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   16/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   20/0 (search/found)
+Patricia protocols:   20/1 (search/found)
 
 Gnutella	4	333	2
 PPStream	1	141	1
@@ -36,4 +36,4 @@ Starcraft	12	2687	5
 	7	TCP 192.168.1.128:1 -> 12.129.206.130:1119 [proto: 213/Starcraft][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	8	TCP 192.168.1.128:1 -> 12.129.236.254:1119 [proto: 213/Starcraft][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	9	TCP 192.168.1.128:1 -> 121.254.200.130:1119 [proto: 213/Starcraft][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	10	TCP 192.168.1.128:1 -> 202.9.66.76:1119 [proto: 213/Starcraft][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	TCP 192.168.1.128:1 -> 202.9.66.76:1119 [proto: 213/Starcraft][IP: 213/Starcraft][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
