@@ -1800,12 +1800,12 @@ extern "C" {
 
   /* ******************************* */
 
-  u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len);
-  u_int64_t ndpi_quick_hash64(char *str, u_int str_len);
-  u_int32_t ndpi_hash_string(char *str);
-  u_int32_t ndpi_rev_hash_string(char *str);
-  u_int32_t ndpi_hash_string_len(char *str, u_int len);
-  u_int32_t ndpi_murmur_hash(char *str, u_int str_len);
+  u_int32_t ndpi_quick_hash(const unsigned char *str, u_int str_len);
+  u_int64_t ndpi_quick_hash64(const char *str, u_int str_len);
+  u_int32_t ndpi_hash_string(const char *str);
+  u_int32_t ndpi_rev_hash_string(const char *str);
+  u_int32_t ndpi_hash_string_len(const char *str, u_int len);
+  u_int32_t ndpi_murmur_hash(const char *str, u_int str_len);
 
   /* ******************************* */
 
@@ -2100,13 +2100,13 @@ extern "C" {
   void                  ndpi_domain_classify_free(ndpi_domain_classify *s);
   u_int32_t             ndpi_domain_classify_size(ndpi_domain_classify *s);
   bool                  ndpi_domain_classify_add(ndpi_domain_classify *s,
-						 u_int8_t class_id, char *domain);
+						 u_int8_t class_id, const char *domain);
   u_int32_t             ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
 							 u_int8_t class_id,
 							 char *file_path);
   bool                  ndpi_domain_classify_contains(ndpi_domain_classify *s,
 						      u_int8_t *class_id /* out */,
-						      char *domain);
+						      const char *domain);
 
   /* ******************************* */
 

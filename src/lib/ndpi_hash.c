@@ -30,14 +30,14 @@
 /* ******************************************************************** */
 
 /* Based on djb2 hash - http://www.cse.yorku.ca/~oz/hash.html */
-u_int32_t ndpi_murmur_hash(char *str, u_int str_len) {
+u_int32_t ndpi_murmur_hash(const char *str, u_int str_len) {
   return(MurmurHash((void*)str, str_len, 0x87654321));
 }
 
 /* ******************************************************************** */
 
 /* Based on djb2 hash - http://www.cse.yorku.ca/~oz/hash.html */
-u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len) {
+u_int32_t ndpi_quick_hash(const unsigned char *str, u_int str_len) {
   u_int32_t hash = 5381, i;
 
   for(i=0; i<str_len; i++)
@@ -49,7 +49,7 @@ u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len) {
 /* ******************************************************************** */
 
 /* Based on Daniel Lemire code */
-u_int64_t ndpi_quick_hash64(char *str, u_int str_len) {
+u_int64_t ndpi_quick_hash64(const char *str, u_int str_len) {
   u_int64_t h = 0;
   u_int i;
   
@@ -68,7 +68,7 @@ u_int64_t ndpi_quick_hash64(char *str, u_int str_len) {
 
   See also http://burtleburtle.net/bob/hash/spooky.html
 */
-u_int32_t ndpi_hash_string(char *str) {
+u_int32_t ndpi_hash_string(const char *str) {
   u_int32_t hash, i;
 
   for(hash = i = 0; str[i] != '\0'; ++i) {
@@ -86,7 +86,7 @@ u_int32_t ndpi_hash_string(char *str) {
 
 /* ******************************************************************** */
 
-u_int32_t ndpi_rev_hash_string(char *str) {
+u_int32_t ndpi_rev_hash_string(const char *str) {
   u_int32_t hash, i;
   int len = strlen(str);
 
@@ -109,7 +109,7 @@ u_int32_t ndpi_rev_hash_string(char *str) {
 /* ******************************************************************** */
 
 /* Same as above but with strings with lenght */
-u_int32_t ndpi_hash_string_len(char *str, u_int len) {
+u_int32_t ndpi_hash_string_len(const char *str, u_int len) {
   u_int32_t hash, i;
 
   for(hash = i = 0; i< len; ++i) {
