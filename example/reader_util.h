@@ -93,6 +93,10 @@ extern int dpdk_port_deinit(int port);
 #define SERIALIZATION_BUFSIZ     (8192 * 2)
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // inner hash table (ja3 -> security state)
 typedef struct ndpi_ja3_info {
   char * ja3;
@@ -408,6 +412,7 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow);
 void ndpi_flow_info_freer(void *node);
 const char* print_cipher_id(u_int32_t cipher);
 double ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256], unsigned int num_bytes);
+int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverted_logic);
 
 extern int nDPI_LogLevel;
 
@@ -423,6 +428,10 @@ extern int nDPI_LogLevel;
 
 #ifndef LINKTYPE_LINUX_SLL2
 #define LINKTYPE_LINUX_SLL2 276
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif
