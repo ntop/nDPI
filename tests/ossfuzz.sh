@@ -60,3 +60,5 @@ cp example/sha1_fingerprints.csv $OUT/
 cp fuzz/ipv4_addresses.txt $OUT/
 cp fuzz/bd_param.txt $OUT/
 cp fuzz/splt_param.txt $OUT/
+mkdir -p $OUT/lists
+cp lists/*.list $OUT/lists
