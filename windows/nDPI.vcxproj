@@ -126,13 +126,16 @@
     <ClCompile Include="..\src\lib\ndpi_bitmap.c" />
     <ClCompile Include="..\src\lib\ndpi_classify.c" />
     <ClCompile Include="..\src\lib\ndpi_community_id.c" />
-    <ClCompile Include="..\src\lib\ndpi_domain_classify.c" />
     <ClCompile Include="..\src\lib\ndpi_geoip.c" />
     <ClCompile Include="..\src\lib\ndpi_main.c" />
     <ClCompile Include="..\src\lib\ndpi_filter.c" />
     <ClCompile Include="..\src\lib\ndpi_memory.c" />
     <ClCompile Include="..\src\lib\ndpi_serializer.c" />
     <ClCompile Include="..\src\lib\ndpi_utils.c" />
+    <ClCompile Include="..\src\lib\ndpi_binary_bitmap.c" />
+    <ClCompile Include="..\src\lib\ndpi_hash.c" />
+    <ClCompile Include="..\src\lib\ndpi_domain_classify.c" />
+    <ClCompile Include="..\src\lib\ndpi_bitmap64.c" />
     <ClCompile Include="..\src\lib\protocols\activision.c" />
     <ClCompile Include="..\src\lib\protocols\afp.c" />
     <ClCompile Include="..\src\lib\protocols\ajp.c" />
@@ -377,6 +380,7 @@
     </ClInclude>
     <ClInclude Include="src\ndpi_config.h" />
     <ClInclude Include="src\ndpi_define.h" />
+    <ClInclude Include="src\dirent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.github\workflows\build-msbuild.yml" />

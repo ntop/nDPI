@@ -124,6 +124,10 @@
     <ClCompile Include="..\src\lib\ndpi_memory.c" />
     <ClCompile Include="..\src\lib\ndpi_serializer.c" />
     <ClCompile Include="..\src\lib\ndpi_utils.c" />
+    <ClCompile Include="..\src\lib\ndpi_binary_bitmap.c" />
+    <ClCompile Include="..\src\lib\ndpi_hash.c" />
+    <ClCompile Include="..\src\lib\ndpi_domain_classify.c" />
+    <ClCompile Include="..\src\lib\ndpi_bitmap64.c" />
     <ClCompile Include="..\src\lib\protocols\ajp.c" />
     <ClCompile Include="..\src\lib\protocols\amazon_video.c" />
     <ClCompile Include="..\src\lib\protocols\among_us.c" />
@@ -245,6 +249,7 @@
     <ClInclude Include="..\src\include\ndpi_win32.h" />
     <ClInclude Include="arpa\inet.h" />
     <ClInclude Include="src\getopt.h" />
+    <ClInclude Include="src\dirent.h" />
     <ClInclude Include="..\src\include\ndpi_encryption.h" />
     <ClInclude Include="..\src\include\ndpi_main.h" />
     <ClInclude Include="..\src\include\ndpi_utils.h" />

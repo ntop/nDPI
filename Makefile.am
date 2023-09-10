@@ -20,7 +20,7 @@ EXTRA_DIST = README.md README.fuzzer.md CHANGELOG.md CONTRIBUTING.md \
 		python/requirements.txt python/setup.py python/tests.py \
 	lists/107_gambling.list \
 	lists/107_gambling_custom.list \
-	lists/README.md
+	lists/README.md \
 	sonar-project.properties .github .ci-ignore
 
 doc:
