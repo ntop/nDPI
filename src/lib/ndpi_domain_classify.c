@@ -91,7 +91,10 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
 
   if(!s || !domain)
     return(false);
-  
+
+  /* Skip initial string . in domain names */
+  while(domain[0] == '.') domain++;
+
   dot = strrchr(domain, '.');
 
   if(!dot) return(false);

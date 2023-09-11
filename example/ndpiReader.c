@@ -5453,7 +5453,7 @@ void domainSearchUnitTest() {
   u_int8_t class_id;
   
   assert(sc);
-
+    
   ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, ".ntop.org");
   ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, domain);
   assert(ndpi_domain_classify_contains(sc, &class_id, domain));
