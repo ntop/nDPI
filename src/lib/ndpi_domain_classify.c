@@ -179,6 +179,22 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
 
 /* ********************************************************** */
 
+bool ndpi_domain_classify_finalize(ndpi_domain_classify *s) {
+  u_int32_t i;
+
+  if(!s)
+    return(false);
+
+  for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
+    if(s->classes[i].class_id != 0) {
+      ndpi_bitmap64_compress(s->classes[i].domains);
+    }
+  }
+  return(true);
+}
+
+/* ********************************************************** */
+
 static bool is_valid_domain_char(u_char c) {
   if(((c >= 'A')&& (c <= 'Z'))
      || ((c >= 'a')&& (c <= 'z'))

@@ -6959,6 +6959,7 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
   }
 #else
   ndpi_domain_classify_free(ndpi_str->custom_categories.sc_hostnames);
+  ndpi_domain_classify_finalize(ndpi_str->custom_categories.sc_hostnames_shadow);
   ndpi_str->custom_categories.sc_hostnames        = ndpi_str->custom_categories.sc_hostnames_shadow;
   ndpi_str->custom_categories.sc_hostnames_shadow = ndpi_domain_classify_alloc();
 #endif

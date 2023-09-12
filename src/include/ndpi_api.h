@@ -2104,6 +2104,7 @@ extern "C" {
   u_int32_t             ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
 							 u_int8_t class_id,
 							 char *file_path);
+  bool                  ndpi_domain_classify_finalize(ndpi_domain_classify *s);
   bool                  ndpi_domain_classify_contains(ndpi_domain_classify *s,
 						      u_int8_t *class_id /* out */,
 						      const char *domain);
