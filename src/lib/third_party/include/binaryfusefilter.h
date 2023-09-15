@@ -216,7 +216,7 @@ static inline bool binary_fuse8_allocate(uint32_t size,
     filter->SegmentLength = 262144;
   }
   filter->SegmentLengthMask = filter->SegmentLength - 1;
-  double sizeFactor = binary_fuse_calculate_size_factor(arity, size);
+  double sizeFactor = size <= 1 ? 0 : binary_fuse_calculate_size_factor(arity, size);
   uint32_t capacity = size <= 1 ? 0 : (uint32_t)(round((double)size * sizeFactor));
   uint32_t initSegmentCount =
       (capacity + filter->SegmentLength - 1) / filter->SegmentLength -

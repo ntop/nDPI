@@ -33,6 +33,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
   }
 
+  ndpi_domain_classify_add_domains(d, NDPI_PROTOCOL_UNKNOWN, "random_list.list");
+
+  if (fuzzed_data.ConsumeBool())
+    ndpi_domain_classify_finalize(d);
+
   /* "Random" search */
   num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
   for (i = 0; i < num_iteration; i++) {

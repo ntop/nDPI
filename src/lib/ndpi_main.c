@@ -122,8 +122,6 @@
 #include "nbpf.h"
 #endif
 
-static int _ndpi_debug_callbacks = 0;
-
 /* #define DGA_DEBUG 1 */
 /* #define MATCH_DEBUG 1 */
 
@@ -5307,11 +5305,10 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
     if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_tcp_payload(ndpi_str,a)) continue;
     if(!count_only) {
-      if(_ndpi_debug_callbacks)
-	  NDPI_LOG_DBG2(ndpi_str, "callback_buffer_tcp_payload, adding buffer %u as entry %u\n", a,
-		        ndpi_str->callback_buffer_size_tcp_payload);
-          memcpy(&ndpi_str->callback_buffer_tcp_payload[ndpi_str->callback_buffer_size_tcp_payload],
-	         &ndpi_str->callback_buffer[a], sizeof(struct ndpi_call_function_struct));
+      NDPI_LOG_DBG2(ndpi_str, "callback_buffer_tcp_payload, adding buffer %u as entry %u\n", a,
+		    ndpi_str->callback_buffer_size_tcp_payload);
+      memcpy(&ndpi_str->callback_buffer_tcp_payload[ndpi_str->callback_buffer_size_tcp_payload],
+	     &ndpi_str->callback_buffer[a], sizeof(struct ndpi_call_function_struct));
     }
     ndpi_str->callback_buffer_size_tcp_payload++;
   }
@@ -5319,11 +5316,10 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
     if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_tcp_nopayload(ndpi_str,a)) continue;
     if(!count_only) {
-      if(_ndpi_debug_callbacks)
-	  NDPI_LOG_DBG2( ndpi_str,
-                        "\tcallback_buffer_tcp_no_payload, additional adding buffer %u to no_payload process\n", a);
-	  memcpy(&ndpi_str->callback_buffer_tcp_no_payload[ndpi_str->callback_buffer_size_tcp_no_payload],
-	         &ndpi_str->callback_buffer[a], sizeof(struct ndpi_call_function_struct));
+      NDPI_LOG_DBG2(ndpi_str,
+                    "\tcallback_buffer_tcp_no_payload, additional adding buffer %u to no_payload process\n", a);
+      memcpy(&ndpi_str->callback_buffer_tcp_no_payload[ndpi_str->callback_buffer_size_tcp_no_payload],
+	     &ndpi_str->callback_buffer[a], sizeof(struct ndpi_call_function_struct));
     }
     ndpi_str->callback_buffer_size_tcp_no_payload++;
   }
@@ -5333,8 +5329,7 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
     if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_udp(ndpi_str,a)) continue;
     if(!count_only) {
-      if(_ndpi_debug_callbacks)
-	 NDPI_LOG_DBG2(ndpi_str, "callback_buffer_size_udp: adding buffer : %u\n", a);
+      NDPI_LOG_DBG2(ndpi_str, "callback_buffer_size_udp: adding buffer : %u\n", a);
 
       memcpy(&ndpi_str->callback_buffer_udp[ndpi_str->callback_buffer_size_udp], &ndpi_str->callback_buffer[a],
 	     sizeof(struct ndpi_call_function_struct));
@@ -5347,8 +5342,7 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
     if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_other(ndpi_str,a)) continue;
     if(!count_only) {
-      if(_ndpi_debug_callbacks)
-	NDPI_LOG_DBG2(ndpi_str, "callback_buffer_non_tcp_udp: adding buffer : %u\n", a);
+      NDPI_LOG_DBG2(ndpi_str, "callback_buffer_non_tcp_udp: adding buffer : %u\n", a);
 
       memcpy(&ndpi_str->callback_buffer_non_tcp_udp[ndpi_str->callback_buffer_size_non_tcp_udp],
 	     &ndpi_str->callback_buffer[a], sizeof(struct ndpi_call_function_struct));

@@ -4,7 +4,7 @@ bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_
 #Data structures
 bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64 fuzz_ds_domain_classify
 #Third party
-bin_PROGRAMS += fuzz_libinjection
+bin_PROGRAMS += fuzz_libinjection fuzz_binaryfusefilter
 #Internal crypto
 bin_PROGRAMS += fuzz_gcrypt_light
 #Configuration files
@@ -371,6 +371,21 @@ fuzz_libinjection_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_libinjection_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_binaryfusefilter_SOURCES = fuzz_binaryfusefilter.cpp fuzz_common_code.c
+fuzz_binaryfusefilter_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_binaryfusefilter_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_binaryfusefilter_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_binaryfusefilter_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_binaryfusefilter_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_binaryfusefilter_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_binaryfusefilter_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_binaryfusefilter_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_binaryfusefilter_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
 fuzz_tls_certificate_SOURCES = fuzz_tls_certificate.c fuzz_common_code.c
 fuzz_tls_certificate_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
 fuzz_tls_certificate_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
@@ -584,6 +599,7 @@ distdir:
 		-o -name 'ipv4_addresses.txt' \
 		-o -name 'bd_param.txt' \
 		-o -name 'splt_param.txt' \
+		-o -name 'random_list.list' \
 		-o -path './dictionary.dict' \
 		-o -path './dictionary_tls_certificate.dict' \
 		-o -path './corpus/fuzz_*.zip' \
