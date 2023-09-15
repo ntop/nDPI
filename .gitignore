@@ -73,6 +73,7 @@
 /fuzz/fuzz_ds_bitmap64
 /fuzz/fuzz_ds_domain_classify
 /fuzz/fuzz_libinjection
+/fuzz/fuzz_binaryfusefilter
 /fuzz/fuzz_tls_certificate
 /fuzz/fuzz_dga
 /fuzz/fuzz_ds_cmsketch
