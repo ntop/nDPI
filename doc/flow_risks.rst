@@ -220,7 +220,7 @@ This risk is used to detect suspicious data carried in ICMP packets whose entrop
 
 NDPI_CLEAR_TEXT_CREDENTIALS
 ===========================
-Clear text protocols are not bad per-se, but they should be avoided when they carry credentials as they can be intercepted by malicious users. This risk is triggered whenever clear text protocols (e.g. FTP, HTTP, IMAP...) contain credentials in clear text (read it as nDPI does not trigger this risk for HTTP connections that do not carry credentials).
+Clear text protocols are not intrinsically bad, but they should be avoided when they carry credentials as they can be intercepted by malicious users. This risk is triggered whenever clear text protocols (e.g. FTP, HTTP, IMAP...) contain credentials in clear text (read it as nDPI does not trigger this risk for HTTP connections that do not carry credentials).
 
 .. _Risk 037:
 
