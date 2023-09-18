@@ -2046,7 +2046,7 @@ extern "C" {
       is not allowed
    */
 
-  ndpi_bitmap64* ndpi_bitmap64_alloc();
+  ndpi_bitmap64* ndpi_bitmap64_alloc(void);
   bool ndpi_bitmap64_set(ndpi_bitmap64 *b, u_int64_t value);
   bool ndpi_bitmap64_compress(ndpi_bitmap64 *b);
   bool ndpi_bitmap64_isset(ndpi_bitmap64 *b, u_int64_t value);
@@ -2080,7 +2080,7 @@ extern "C" {
     p = 2.3 x 10^-4
   */
 
-  ndpi_filter* ndpi_filter_alloc();
+  ndpi_filter* ndpi_filter_alloc(void);
   bool         ndpi_filter_add(ndpi_filter *f, u_int32_t value); /* returns true on success, false on failure */
   bool         ndpi_filter_add_string(ndpi_filter *f, char *string); /* returns true on success, false on failure */
   bool         ndpi_filter_contains(ndpi_filter *f, u_int32_t value); /* returns true on success, false on failure */
@@ -2096,7 +2096,7 @@ extern "C" {
     for substring domain matching and classification
   */
 
-  ndpi_domain_classify* ndpi_domain_classify_alloc();
+  ndpi_domain_classify* ndpi_domain_classify_alloc(void);
   void                  ndpi_domain_classify_free(ndpi_domain_classify *s);
   u_int32_t             ndpi_domain_classify_size(ndpi_domain_classify *s);
   bool                  ndpi_domain_classify_add(ndpi_domain_classify *s,
@@ -2115,7 +2115,7 @@ extern "C" {
     Similar to ndpi_filter but based on binary search and with the
     ability to store a category per value (as ndpi_domain_classify)
   */
-  ndpi_binary_bitmap* ndpi_binary_bitmap_alloc();
+  ndpi_binary_bitmap* ndpi_binary_bitmap_alloc(void);
   bool ndpi_binary_bitmap_set(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t category);
   bool ndpi_binary_bitmap_compress(ndpi_binary_bitmap *b);
   bool ndpi_binary_bitmap_isset(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t *out_category);
