@@ -25,6 +25,9 @@ E * ndpi_typedefs.h
 #define __NDPI_TYPEDEFS_H__
 
 #include "ndpi_define.h"
+#ifndef NDPI_CFFI_PREPROCESSING
+#include "ndpi_includes.h"
+#endif
 #include "ndpi_protocol_ids.h"
 #include "ndpi_utils.h"
 
@@ -45,6 +48,12 @@ typedef unsigned short u_short;
 #ifndef u_int
 typedef unsigned int u_int;
 #endif
+#endif
+
+#ifdef __APPLE__
+typedef unsigned char u_char;
+typedef unsigned short u_short;
+typedef unsigned int u_int;
 #endif
 
 /* NDPI_LOG_LEVEL */

@@ -43,6 +43,8 @@ typedef __kernel_size_t size_t;
 #include "ndpi_api.h"
 #include "ahocorasick.h"
 
+#include "../../ndpi_replace_printf.h"
+
 /* TODO: For different depth of node, number of outgoing edges differs
    considerably, It is efficient to use different chunk size for 
    different depths */
@@ -482,6 +484,7 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
               if(match->match_map) {
                   match->match_counter++; /* we have a matching */
 #ifndef __KERNEL__
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
                   if(debug) {
                       int i;
                       AC_PATTERN_t *patterns = curr->matched_patterns->patterns;
@@ -494,6 +497,7 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
                               patterns[i].rep.number);
                       }
                   }
+#endif
 #endif
                   if(thiz->match_handler) {
                       /* We check 'next' to find out if we came here after a alphabet
@@ -521,6 +525,7 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
       if(txt->match.matched[i]) {
             *param = (txt->match.matched[i])->rep;
 #ifndef __KERNEL__
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
             if(debug) {
                 AC_PATTERN_t *pattern = txt->match.matched[i];
                 printf("best match: %c%.*s%c [%u]\n",
@@ -529,6 +534,7 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
                           pattern->rep.at_end ? '$':' ',
                           pattern->rep.number);
             }
+#endif
 #endif
             thiz->stats.n_found++;
             return 1;

@@ -32,6 +32,8 @@
 #include "ndpi_config.h"
 #include "third_party/include/hll.h"
 
+#include "ndpi_replace_printf.h"
+
 /* ********************************************************************************* */
 
 void ndpi_init_data_analysis(struct ndpi_analyze_struct *ret, u_int16_t _max_series_len) {
@@ -726,6 +728,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
   float *bin_score;
   u_int16_t num_cluster_elems[MAX_NUM_CLUSTERS] = { 0 };
 
+  (void)out_buf;
   srand(time(NULL));
 
   if(!bins || num_bins == 0 || !cluster_ids || num_clusters == 0)

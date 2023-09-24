@@ -728,21 +728,22 @@ extern "C" {
    *
    * @par  ndpi_mod = the detection module
    */
-  void ndpi_dump_protocols(struct ndpi_detection_module_struct *mod);
+  void ndpi_dump_protocols(struct ndpi_detection_module_struct *mod, FILE *dump_out);
 
   /**
    * Generate Options list used in OPNsense firewall plugin
    *
    * @par  opt = The Option list to generate
+   * @par  dump_out = Output stream for generated options
    */
-  void ndpi_generate_options(u_int opt);
+  void ndpi_generate_options(u_int opt, FILE *dump_out);
 
   /**
    * Write the list of the scores and their associated risks
    *
-   * @par  ndpi_mod = the detection module
+   * @par  dump_out = Output stream for dumped risk scores
    */
-  void ndpi_dump_risks_score(void);
+  void ndpi_dump_risks_score(FILE *dump_out);
 
   /**
    * Read a file and load the protocols

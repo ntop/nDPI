@@ -71,8 +71,10 @@ bool ndpi_binary_bitmap_set(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t cat
     b->entries = rc, b->num_allocated_entries = new_len;
   }
 
+#ifdef PRINT_DUPLICATED_HASHS
   if(value == 0)
     printf("[add] ZERO hash !!!\n");
+#endif
   
   b->entries[b->num_used_entries].value = value,
     b->entries[b->num_used_entries].category = category;

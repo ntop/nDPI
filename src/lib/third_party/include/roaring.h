@@ -259,10 +259,13 @@ static inline void roaring_bitmap_set_copy_on_write(roaring_bitmap_t* r,
 
 roaring_bitmap_t *roaring_bitmap_add_offset(const roaring_bitmap_t *bm,
                                             int64_t offset);
+
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /**
  * Describe the inner structure of the bitmap.
  */
 void roaring_bitmap_printf_describe(const roaring_bitmap_t *r);
+#endif
 
 /**
  * Creates a new bitmap from a list of uint32_t integers
@@ -286,10 +289,12 @@ roaring_bitmap_t *roaring_bitmap_copy(const roaring_bitmap_t *r);
 bool roaring_bitmap_overwrite(roaring_bitmap_t *dest,
                               const roaring_bitmap_t *src);
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /**
  * Print the content of the bitmap.
  */
 void roaring_bitmap_printf(const roaring_bitmap_t *r);
+#endif
 
 /**
  * Computes the intersection between two bitmaps and returns new bitmap. The

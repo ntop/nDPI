@@ -17,12 +17,12 @@ includedir = @includedir@/ndpi
 ifneq ($(OS),Windows_NT)
 CFLAGS     += -fPIC -DPIC
 endif
-CFLAGS     += -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
+CFLAGS     += -I. -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
 LDFLAGS    += @NDPI_LDFLAGS@
 LIBS       = @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
 
 OBJECTS   = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) $(patsubst third_party/src/hll/%.c, third_party/src/hll/%.o, $(wildcard third_party/src/hll/*.c)) $(patsubst ./%.c, ./%.o, $(wildcard ./*.c))
-HEADERS   = $(wildcard ../include/*.h)
+HEADERS   = $(wildcard ../include/*.h) $(wildcard ../include/*.h)
 NDPI_VERSION_MAJOR   = @NDPI_MAJOR@
 NDPI_LIB_STATIC      = libndpi.a
 NDPI_LIB_SHARED_BASE = libndpi.so

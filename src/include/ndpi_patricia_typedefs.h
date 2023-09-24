@@ -64,6 +64,10 @@
 #ifndef _NDPI_PATRICIA_TYPEDEF_H_
 #define _NDPI_PATRICIA_TYPEDEF_H_
 
+#ifndef NDPI_CFFI_PREPROCESSING
+#include "ndpi_includes.h"
+#endif
+
 #define UV16_MAX_USER_VALUES  2
 
 struct patricia_uv16 {
