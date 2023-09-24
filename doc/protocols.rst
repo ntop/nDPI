@@ -113,7 +113,7 @@ References: `SLPv1 <https://datatracker.ietf.org/doc/html/rfc2165>`_ and `SLPv2 
 .. _Proto 348:
 
 `NDPI_PROTOCOL_MULLVAD`
-========================
+=======================
 Mullvad is a VPN service operated by Mullvad VPN AB, based in Sweden
 
 References: `Main site <https://mullvad.net/>`_.
@@ -130,3 +130,12 @@ References: `RFC <https://datatracker.ietf.org/doc/html/rfc9113>`_.
 Notes:
 
 - HTTP/2 is almost always encrypted, i.e. transported over TLS.
+
+
+.. _Proto 350:
+
+`NDPI_PROTOCOL_HAPROXY`
+=======================
+HAProxy is a free and open source software that provides a high availability load balancer and reverse proxy for TCP and HTTP-based applications that spreads requests across multiple servers.
+
+References: `Main site: <https://www.haproxy.org>`_.
