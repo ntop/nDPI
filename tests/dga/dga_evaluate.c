@@ -36,10 +36,32 @@ void help() {
   exit(0);
 }
 
-
 /* *********************************************** */
 
-extern int ndpi_verbose_dga_detection;
+static int verbose_dga_detection = 0;
+
+static void ndpi_dbg_fn(u_int32_t protocol,
+                        struct ndpi_detection_module_struct *module_struct,
+                        ndpi_log_level_t log_level, const char *file,
+                        const char *func, unsigned line,
+                        const char *format, ...)
+{
+  assert(protocol == NDPI_PROTOCOL_UNKNOWN);
+  assert(module_struct != NULL);
+  assert(log_level == NDPI_LOG_DEBUG_EXTRA);
+
+  (void)file;
+  (void)func;
+  (void)line;
+
+  if (verbose_dga_detection) {
+    va_list vl;
+
+    va_start(vl, format);
+    vprintf(format, vl);
+    va_end(vl);
+  }
+}
 
 int main(int argc, char **argv) {
   FILE *fd;
@@ -59,7 +81,7 @@ int main(int argc, char **argv) {
     verbose = 1;
     
     if(argv[3] != NULL)
-      ndpi_verbose_dga_detection = 1;
+      verbose_dga_detection = 1;
   }
   
   if (ndpi_get_api_version() != NDPI_API_VERSION) {
@@ -73,6 +95,8 @@ int main(int argc, char **argv) {
   assert(ndpi_str != NULL);
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
+  ndpi_set_log_level(ndpi_str, NDPI_LOG_DEBUG_EXTRA);
+  set_ndpi_debug_function(ndpi_str, ndpi_dbg_fn);
   ndpi_finalize_initialization(ndpi_str);
   assert(ndpi_str != NULL);
 

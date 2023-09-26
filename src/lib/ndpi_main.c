@@ -26,6 +26,10 @@
 #include <sys/types.h>
 #include <dirent.h>
 
+#ifdef __APPLE__
+#include <netinet/ip.h>
+#endif
+
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
 #include "ndpi_config.h"
@@ -36,7 +40,7 @@
 #ifdef USE_HOST_LIBGCRYPT
 #include <gcrypt.h>
 #else
-#include <gcrypt_light.h>
+#include "gcrypt_light.h"
 #endif
 
 #include <time.h>
@@ -122,10 +126,7 @@
 #include "nbpf.h"
 #endif
 
-/* #define DGA_DEBUG 1 */
 /* #define MATCH_DEBUG 1 */
-
-u_int ndpi_verbose_dga_detection = 0;
 
 /* ****************************************** */
 
@@ -2169,7 +2170,11 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 
 /* ****************************************************** */
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 #define MATCH_DEBUG_INFO(fmt, ...) if(txt->option & AC_FEATURE_DEBUG) printf(fmt, ##__VA_ARGS__)
+#else
+#define MATCH_DEBUG_INFO(fmt, ...)
+#endif
 
 /* No static because it is used by fuzzer, too */
 int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
@@ -2659,7 +2664,7 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
   ndpi_vsnprintf(str, sizeof(str) - 1, format, args);
   va_end(args);
 
-  if(ndpi_str != NULL) {
+  if(ndpi_str != NULL || (file_name != NULL && func_name != NULL)) {
     printf("%s:%s:%-3d - [%u]: %s", file_name, func_name, line_number, proto, str);
   } else {
     printf("Proto: %u, %s", proto, str);
@@ -8734,13 +8739,13 @@ int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_str, char *ca
 
 /* ****************************************************** */
 
-void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_str) {
+void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_str, FILE *dump_out) {
   int i;
 
-  if(!ndpi_str) return;
+  if(!ndpi_str || !dump_out) return;
 
   for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++)
-    printf("%3d %-22s %-10s %-8s %-12s %s\n",
+    fprintf(dump_out, "%3d %-22s %-10s %-8s %-12s %s\n",
 	   i, ndpi_str->proto_defaults[i].protoName,
 	   ndpi_get_l4_proto_name(ndpi_get_l4_proto_info(ndpi_str, i)),
 	   ndpi_str->proto_defaults[i].isAppProtocol ? "" : "X",
@@ -8752,11 +8757,12 @@ void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_str) {
 
 /* Helper function used to generate Options fields in OPNsense */
 
-void ndpi_generate_options(u_int opt) {
+void ndpi_generate_options(u_int opt, FILE *options_out) {
   struct ndpi_detection_module_struct *ndpi_str;
   NDPI_PROTOCOL_BITMASK all;
   u_int i;
 
+  if (!options_out) return;
   ndpi_str = ndpi_init_detection_module(ndpi_no_prefs);
 
   NDPI_BITMASK_SET_ALL(all);
@@ -8766,8 +8772,8 @@ void ndpi_generate_options(u_int opt) {
   case 0: /* List known protocols */
     {
       for(i = 1 /* Skip unknown */; i < ndpi_str->ndpi_num_supported_protocols; i++) {
-	printf("            <Option%d value=\"%u\">%s</Option%d>\n",
-	       i, i, ndpi_str->proto_defaults[i].protoName, i);
+        fprintf(options_out, "            <Option%d value=\"%u\">%s</Option%d>\n",
+               i, i, ndpi_str->proto_defaults[i].protoName, i);
       }
     }
     break;
@@ -8778,8 +8784,8 @@ void ndpi_generate_options(u_int opt) {
 	const char *name = ndpi_category_get_name(ndpi_str, i);
 
 	if((name != NULL) && (name[0] != '\0')) {
-	  printf("            <Option%d value=\"%u\">%s</Option%d>\n",
-		 i, i, name, i);
+      fprintf(options_out, "            <Option%d value=\"%u\">%s</Option%d>\n",
+              i, i, name, i);
 	}
       }
     }
@@ -8788,26 +8794,26 @@ void ndpi_generate_options(u_int opt) {
   case 2: /* List known risks */
     {
       for(i = 1 /* Skip no risk */; i < NDPI_MAX_RISK; i++) {
-	ndpi_risk_enum r = (ndpi_risk_enum)i;
+        ndpi_risk_enum r = (ndpi_risk_enum)i;
 
-	printf("            <Option%d value=\"%u\">%s</Option%d>\n",
-	       i, i, ndpi_risk2str(r), i);
+        fprintf(options_out, "            <Option%d value=\"%u\">%s</Option%d>\n",
+                i, i, ndpi_risk2str(r), i);
       }
     }
     break;
 
   default:
-    printf("WARNING: option -a out of range\n");
+    fprintf(options_out, "%s\n", "WARNING: option -a out of range");
     break;
   }
 }
 
 /* ****************************************************** */
 
-void ndpi_dump_risks_score() {
+void ndpi_dump_risks_score(FILE *risk_out) {
   u_int i;
 
-  printf("%3s %-48s %-8s %s %-8s %-8s\n",
+  fprintf(risk_out, "%3s %-48s %-8s %s %-8s %-8s\n",
 	 "Id", "Risk", "Severity", "Score", "CliScore", "SrvScore");
 
   for(i = 1; i < NDPI_MAX_RISK; i++) {
@@ -8818,7 +8824,7 @@ void ndpi_dump_risks_score() {
     u_int16_t client_score, server_score;
     u_int16_t score = ndpi_risk2score(risk, &client_score, &server_score);
 
-    printf("%3d %-48s %-8s %-8u %-8u %-8u\n",
+    fprintf(risk_out, "%3d %-48s %-8s %-8u %-8u %-8u\n",
 	   i, ndpi_risk2str(r),
 	   ndpi_severity2str(s),
 	   score,
@@ -9645,7 +9651,8 @@ static int enough(int a, int b) {
 
 /* ******************************************************************** */
 
-u_int8_t ndpi_ends_with(char *str, char *ends) {
+u_int8_t ndpi_ends_with(struct ndpi_detection_module_struct *ndpi_struct,
+                        char *str, char *ends) {
   u_int str_len = str ? strlen(str) : 0;
   u_int8_t ends_len = strlen(ends);
   u_int8_t rc;
@@ -9655,9 +9662,7 @@ u_int8_t ndpi_ends_with(char *str, char *ends) {
 
   rc = (strncmp(&str[str_len-ends_len], ends, ends_len) != 0) ? 0 : 1;
 
-#ifdef DGA_DEBUG
-  printf("[DGA] %s / %s [rc: %u]\n", str, ends, rc);
-#endif
+  NDPI_LOG_DBG2(ndpi_struct, "[DGA] %s / %s [rc: %u]\n", str, ends, rc);
 
   return(rc);
 }
@@ -9714,12 +9719,12 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     if((!name)
        || (strchr(name, '_') != NULL)
        || (strchr(name, '-') != NULL)
-       || (ndpi_ends_with(name, "in-addr.arpa"))
-       || (ndpi_ends_with(name, "ip6.arpa"))
+       || (ndpi_ends_with(ndpi_str, name, "in-addr.arpa"))
+       || (ndpi_ends_with(ndpi_str, name, "ip6.arpa"))
        /* Ignore TLD .local .lan and .home */
-       || (ndpi_ends_with(name, ".local"))
-       || (ndpi_ends_with(name, ".lan"))
-       || (ndpi_ends_with(name, ".home"))
+       || (ndpi_ends_with(ndpi_str, name, ".local"))
+       || (ndpi_ends_with(ndpi_str, name, ".lan"))
+       || (ndpi_ends_with(ndpi_str, name, ".home"))
        )
       return(0);
 
@@ -9741,8 +9746,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     if(strncmp(name, "www.", 4) == 0)
       name = &name[4];
 
-    if(ndpi_verbose_dga_detection)
-      printf("[DGA check] %s\n", name);
+    NDPI_LOG_DBG2(ndpi_str, "[DGA] check %s\n", name);
 
     len = strlen(name);
 
@@ -9756,8 +9760,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       len = ndpi_snprintf(tmp, max_tmp_len, "%s", name);
       if(len < 0) {
 
-	if(ndpi_verbose_dga_detection)
-	  printf("[DGA] Too short");
+	  NDPI_LOG_DBG2(ndpi_str, "[DGA] too short");
 
 	return(0);
       } else
@@ -9826,14 +9829,13 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       }
 
       if(num_dots == 0) /* Doesn't look like a domain name */
-	return(0);
+        return(0);
 
       if(curr_domain_element_len > max_domain_element_len)
-	max_domain_element_len = curr_domain_element_len;
+        max_domain_element_len = curr_domain_element_len;
 
-      if(ndpi_verbose_dga_detection)
-	printf("[DGA] [max_num_char_repetitions: %u][max_domain_element_len: %u]\n",
-	       max_num_char_repetitions, max_domain_element_len);
+      NDPI_LOG_DBG2(ndpi_str, "[DGA] [max_num_char_repetitions: %u][max_domain_element_len: %u]\n",
+                    max_num_char_repetitions, max_domain_element_len);
 
       if(
 	 (is_hostname
@@ -9855,8 +9857,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	  ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN, name);
 	}
 
-	if(ndpi_verbose_dga_detection)
-	  printf("[DGA] Found!");
+	NDPI_LOG_DBG2(ndpi_str, "[DGA] Found!");
 
 	return(1);
       }
@@ -9878,8 +9879,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	if(strlen(word) < 5) continue;
 
-	if(ndpi_verbose_dga_detection)
-	  printf("-> word(%s) [%s][len: %u]\n", word, name, (unsigned int)strlen(word));
+	NDPI_LOG_DBG2(ndpi_str, "[DGA] word(%s) [%s][len: %u]\n", word, name, (unsigned int)strlen(word));
 
 	trigram_char_skip = 0;
 
@@ -9917,12 +9917,10 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	  num_bigram_checks++;
 
-	  if(ndpi_verbose_dga_detection)
-	    printf("-> Checking %c%c\n", word[i], word[i+1]);
+	  NDPI_LOG_DBG2(ndpi_str, "[DGA] checking %c%c\n", word[i], word[i+1]);
 
 	  if(ndpi_match_impossible_bigram(&word[i])) {
-	    if(ndpi_verbose_dga_detection)
-	      printf("IMPOSSIBLE %s\n", &word[i]);
+	    NDPI_LOG_DBG2(ndpi_str, "[DGA] IMPOSSIBLE %s\n", &word[i]);
 
 	    num_impossible++;
 	  } else {
@@ -9935,8 +9933,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	  }
 
 	  if((num_trigram_dots < 2) && (word[i+2] != '\0')) {
-	    if(ndpi_verbose_dga_detection)
-	      printf("***> %s [trigram_char_skip: %u]\n", &word[i], trigram_char_skip);
+	    NDPI_LOG_DBG2(ndpi_str, "[DGA] %s [trigram_char_skip: %u]\n", &word[i], trigram_char_skip);
 
 	    if(ndpi_is_trigram_char(word[i]) && ndpi_is_trigram_char(word[i+1]) && ndpi_is_trigram_char(word[i+2])) {
 	      if(trigram_char_skip) {
@@ -9946,8 +9943,8 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 		if(ndpi_match_trigram(&word[i]))
 		  num_trigram_found++, trigram_char_skip = 2 /* 1 char overlap */;
-		else if(ndpi_verbose_dga_detection)
-		  printf("[NDPI] NO Trigram %c%c%c\n", word[i], word[i+1], word[i+2]);
+		else
+		  NDPI_LOG_DBG2(ndpi_str, "[DGA] NO Trigram %c%c%c\n", word[i], word[i+1], word[i+2]);
 
 		/* Count vowels */
 		num_trigram_vowels += ndpi_is_vowel(word[i]) + ndpi_is_vowel(word[i+1]) + ndpi_is_vowel(word[i+2]);
@@ -9965,11 +9962,9 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	  max_num_consecutive_digits_first_word = num_consecutive_digits;
       } /* for */
 
-      if(ndpi_verbose_dga_detection)
-	printf("[NDPI] max_num_consecutive_digits_first_word=%u\n", max_num_consecutive_digits_first_word);
+    NDPI_LOG_DBG2(ndpi_str, "[DGA] max_num_consecutive_digits_first_word=%u\n", max_num_consecutive_digits_first_word);
 
-      if(ndpi_verbose_dga_detection)
-	printf("[%s][num_found: %u][num_impossible: %u][num_digits: %u][num_bigram_checks: %u][num_vowels: %u/%u][num_trigram_vowels: %u][num_trigram_found: %u/%u][vowels: %u][rc: %u]\n",
+	NDPI_LOG_DBG2(ndpi_str, "[DGA] [%s][num_found: %u][num_impossible: %u][num_digits: %u][num_bigram_checks: %u][num_vowels: %u/%u][num_trigram_vowels: %u][num_trigram_found: %u/%u][vowels: %u][rc: %u]\n",
 	       name, num_found, num_impossible, num_digits, num_bigram_checks, num_vowels, len, num_trigram_vowels,
 	       num_trigram_checked, num_trigram_found, num_vowels, rc);
 
@@ -10000,17 +9995,14 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
       /* Skip names whose first word item has at least 3 consecutive digits */
       if(max_num_consecutive_digits_first_word > 2)
-	rc = 0;
+        rc = 0;
 
-      if(ndpi_verbose_dga_detection) {
-	if(rc)
-	  printf("DGA %s [num_found: %u][num_impossible: %u]\n",
-		 name, num_found, num_impossible);
-      }
+      if(rc)
+	    NDPI_LOG_DBG2(ndpi_str, "[DGA] %s [num_found: %u][num_impossible: %u]\n",
+		              name, num_found, num_impossible);
     }
 
-    if(ndpi_verbose_dga_detection)
-      printf("[DGA] Result: %u\n", rc);
+    NDPI_LOG_DBG2(ndpi_str, "[DGA] Result: %u\n", rc);
 
     if(rc && flow)
       ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN, name);

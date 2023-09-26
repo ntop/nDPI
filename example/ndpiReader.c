@@ -40,6 +40,7 @@
 #else
 #include <unistd.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 #include <sys/socket.h>
 #include <sys/mman.h>
 #endif
@@ -612,10 +613,10 @@ static void help(u_int long_help) {
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
 
-    ndpi_dump_protocols(ndpi_info_mod);
+    ndpi_dump_protocols(ndpi_info_mod, stdout);
 
     printf("\n\nnDPI supported risks:\n");
-    ndpi_dump_risks_score();
+    ndpi_dump_risks_score(stdout);
 
     ndpi_exit_detection_module(ndpi_info_mod);
   }
@@ -977,7 +978,7 @@ static void parseOptions(int argc, char **argv) {
 
     switch (opt) {
     case 'a':
-      ndpi_generate_options(atoi(optarg));
+      ndpi_generate_options(atoi(optarg), stdout);
       exit(0);
 
     case 'A':

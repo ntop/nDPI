@@ -62,7 +62,7 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
   /*
     Check known exceptions
   */
-  if(ndpi_ends_with((char*)flow->host_server_name, ".windowsupdate.com"))
+  if(ndpi_ends_with(ndpi_struct, (char*)flow->host_server_name, ".windowsupdate.com"))
     ;
   else
     ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER, msg);
