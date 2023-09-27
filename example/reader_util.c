@@ -1147,9 +1147,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   ndpi_snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 		flow->ndpi_flow->host_server_name);
 
-  ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s",
-		flow->ndpi_flow->flow_extra_info);
-
+  if(is_ndpi_proto(flow, NDPI_PROTOCOL_MINING)) {
+    ndpi_snprintf(flow->mining.currency, sizeof(flow->mining.currency), "%s",
+		  flow->ndpi_flow->protos.mining.currency);
+  }
+  
   flow->risk = flow->ndpi_flow->risk;
 
   if(is_ndpi_proto(flow, NDPI_PROTOCOL_DHCP)) {

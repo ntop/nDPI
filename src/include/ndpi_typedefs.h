@@ -1480,9 +1480,6 @@ struct ndpi_flow_struct {
   /* Some protocols calculate the entropy. */
   float entropy;
 
-  /* Place textual flow info here */
-  char flow_extra_info[16];
-
   /* General purpose field used to save mainly hostname/SNI information.
    * In details it used for: MGCP, COLLECTD, DNS, SSDP and NETBIOS name, HTTP, MUNIN and DHCP hostname,
    * WHOIS request, TLS/QUIC server name, XIAOMI domain and STUN realm.
@@ -1561,6 +1558,10 @@ struct ndpi_flow_struct {
       char hostname[48];
       char fqdn[48];
     } softether;
+
+    struct {
+      char currency[16];
+    } mining;  
 
     struct {
       char *server_names, *advertised_alpns, *negotiated_alpn, *tls_supported_versions, *issuerDN, *subjectDN;

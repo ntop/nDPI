@@ -257,12 +257,15 @@ typedef struct ndpi_flow_info {
 
   ndpi_serializer ndpi_flow_serializer;
 
-  char flow_extra_info[16];
   char host_server_name[80]; /* Hostname/SNI */
   char *bittorent_hash;
   char *dhcp_fingerprint;
   char *dhcp_class_ident;
   ndpi_risk risk;
+
+  struct {
+    char currency[16];
+  } mining;
   
   struct {
     u_int16_t ssl_version;

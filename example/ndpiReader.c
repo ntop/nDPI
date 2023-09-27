@@ -1787,7 +1787,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_tls.tls_supported_versions)
       fprintf(out, "[TLS Supported Versions: %s]", flow->ssh_tls.tls_supported_versions);
 
-    if(flow->flow_extra_info[0] != '\0') fprintf(out, "[%s]", flow->flow_extra_info);
+    if(flow->mining.currency[0] != '\0') fprintf(out, "[currency: %s]", flow->mining.currency);
 
     if(flow->dns.geolocation_iata_code[0] != '\0') fprintf(out, "[GeoLocation: %s]", flow->dns.geolocation_iata_code);
 
