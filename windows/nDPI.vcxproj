@@ -166,6 +166,7 @@
     <ClCompile Include="..\src\lib\protocols\fastcgi.c" />
     <ClCompile Include="..\src\lib\protocols\fix.c" />
     <ClCompile Include="..\src\lib\protocols\genshin_impact.c" />
+    <ClCompile Include="..\src\lib\protocols\haproxy.c" />
     <ClCompile Include="..\src\lib\protocols\hpvirtgrp.c" />
     <ClCompile Include="..\src\lib\protocols\hsrp.c" />
     <ClCompile Include="..\src\lib\protocols\i3d.c" />

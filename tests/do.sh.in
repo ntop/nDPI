@@ -164,8 +164,8 @@ for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
     build_results
     check_results $*
 
-    test ${RC} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
-    test ${RC} -ne 0 && echo "Failed: ${FAILURES[@]}"
+    test ${#FAILURES} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
+    test ${#FAILURES} -ne 0 && echo "Failed: ${FAILURES[@]}"
 
     cd ../../
 done

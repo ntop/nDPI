@@ -2543,7 +2543,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 	      } else if(extension_id == 65037 /* ECH: latest drafts */) {
 #ifdef DEBUG_TLS
-		printf("Client TLS: ECH version 0x%x\n", extension_id;
+		printf("Client TLS: ECH version 0x%x\n", extension_id);
 #endif
 		/* Beginning with draft-08, the version is the same as the code point
 		   for the "encrypted_client_hello" extension. */
