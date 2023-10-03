@@ -2668,11 +2668,15 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
   ndpi_vsnprintf(str, sizeof(str) - 1, format, args);
   va_end(args);
 
+  /* While fuzzing, we want to test log code, but we don't want to log anything! */
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
   if(ndpi_str != NULL || (file_name != NULL && func_name != NULL)) {
     printf("%s:%s:%-3d - [%u]: %s", file_name, func_name, line_number, proto, str);
   } else {
     printf("Proto: %u, %s", proto, str);
   }
+#endif
+
 #endif
 }
 
