@@ -868,7 +868,7 @@ void printCSVHeader() {
 
   /* Flow info */
   fprintf(csv_fp, "server_info,");
-  fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
+  fprintf(csv_fp, "tls_version,quic_version,ja3c,tls_client_unsafe,");
   fprintf(csv_fp, "ja3s,tls_server_unsafe,");
   fprintf(csv_fp, "advertised_alpns,negotiated_alpn,tls_supported_versions,");
 #if 0
@@ -1499,6 +1499,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   u_int8_t known_tls;
   char buf[32], buf1[64];
   char buf_ver[16];
+  char buf2_ver[16];
   char l4_proto_name[32];
   u_int i;
 
@@ -1562,8 +1563,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(csv_fp, "%s,",
             (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
 
-    fprintf(csv_fp, "%s,%s,%s,%s,%s,",
+    fprintf(csv_fp, "%s,%s,%s,%s,%s,%s,",
             (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(buf_ver, sizeof(buf_ver), flow->ssh_tls.ssl_version, &known_tls) : "0",
+            (flow->ssh_tls.quic_version != 0)       ? ndpi_quic_version2str(buf2_ver, sizeof(buf2_ver), flow->ssh_tls.quic_version) : "0",
             (flow->ssh_tls.ja3_client[0] != '\0')   ? flow->ssh_tls.ja3_client : "",
             (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "0",
             (flow->ssh_tls.ja3_server[0] != '\0')   ? flow->ssh_tls.ja3_server : "",
@@ -1881,6 +1883,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(buf_ver, sizeof(buf_ver),
 										 flow->ssh_tls.ssl_version, &known_tls));
+
+    if(flow->ssh_tls.quic_version != 0) fprintf(out, "[QUIC ver: %s]", ndpi_quic_version2str(buf_ver, sizeof(buf_ver),
+										 flow->ssh_tls.quic_version));
 
     if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
 

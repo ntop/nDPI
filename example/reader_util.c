@@ -1317,6 +1317,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	  || ((is_quic = is_ndpi_proto(flow, NDPI_PROTOCOL_QUIC)))
 	  ) {
     flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.tls_quic.ssl_version;
+    flow->ssh_tls.quic_version = flow->ndpi_flow->protos.tls_quic.quic_version;
 
     if(flow->ndpi_flow->protos.tls_quic.server_names_len > 0 && flow->ndpi_flow->protos.tls_quic.server_names)
       flow->ssh_tls.server_names = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.server_names);

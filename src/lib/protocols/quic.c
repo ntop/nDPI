@@ -207,6 +207,47 @@ static int is_version_quic_v2(uint32_t version)
   return version == V_2;
 }
 
+char *ndpi_quic_version2str(char *buf, int buf_len, u_int32_t version) {
+
+  if(buf == NULL || buf_len <= 1)
+    return NULL;
+
+  switch(version) {
+  case V_2: strncpy(buf, "V-2", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_1: strncpy(buf, "V-1", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q024: strncpy(buf, "Q024", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q025: strncpy(buf, "Q025", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q030: strncpy(buf, "Q030", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q033: strncpy(buf, "Q033", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q034: strncpy(buf, "Q034", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q035: strncpy(buf, "Q035", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q037: strncpy(buf, "Q037", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q039: strncpy(buf, "Q039", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q043: strncpy(buf, "Q043", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q046: strncpy(buf, "Q046", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_Q050: strncpy(buf, "Q050", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_T050: strncpy(buf, "T050", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_T051: strncpy(buf, "T051", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_MVFST_22: strncpy(buf, "MVFST-22", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_MVFST_27: strncpy(buf, "MVFST-27", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case V_MVFST_EXP: strncpy(buf, "MVFST-EXP", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  }
+
+  if(is_version_forcing_vn(version)) {
+    strncpy(buf, "Ver-Negotiation", buf_len);
+    buf[buf_len - 1] = '\0';
+    return buf;
+  }
+  if(((version & 0xFFFFFF00) == 0xFF000000)) {
+    snprintf(buf, buf_len, "Draft-%d", version & 0x000000FF);
+    buf[buf_len - 1] = '\0';
+    return buf;
+  }
+
+  ndpi_snprintf(buf, buf_len, "Unknown (%04X)", version);
+  return buf;
+}
+
 int quic_len(const uint8_t *buf, uint64_t *value)
 {
   *value = buf[0];
@@ -1149,7 +1190,6 @@ static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_s
 
 const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow,
-			       uint32_t version,
 			       u_int8_t *clear_payload, uint32_t clear_payload_len,
 			       uint64_t *crypto_data_len)
 {
@@ -1157,6 +1197,7 @@ const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
   uint32_t counter;
   uint8_t first_nonzero_payload_byte, offset_len;
   uint64_t unused, frag_offset, frag_len;
+  u_int32_t version = flow->protos.tls_quic.quic_version;
 
   counter = 0;
   while(counter < clear_payload_len && clear_payload[counter] == 0)
@@ -1330,8 +1371,7 @@ static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_stru
 
 void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
 		 struct ndpi_flow_struct *flow,
-		 const u_int8_t *crypto_data, uint32_t crypto_data_len,
-		 uint32_t version)
+		 const u_int8_t *crypto_data, uint32_t crypto_data_len)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
@@ -1343,7 +1383,7 @@ void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload = crypto_data;
   packet->payload_packet_len = crypto_data_len;
 
-  processClientServerHello(ndpi_struct, flow, version);
+  processClientServerHello(ndpi_struct, flow, flow->protos.tls_quic.quic_version);
   flow->protos.tls_quic.hello_processed = 1; /* Allow matching of custom categories */
 
   /* Restore */
@@ -1614,8 +1654,10 @@ static int may_be_initial_pkt(struct ndpi_detection_module_struct *ndpi_struct,
 /* ***************************************************************** */
 
 static int eval_extra_processing(struct ndpi_detection_module_struct *ndpi_struct,
-				 struct ndpi_flow_struct *flow, u_int32_t version)
+				 struct ndpi_flow_struct *flow)
 {
+  u_int32_t version = flow->protos.tls_quic.quic_version;
+
   /* For the time being we need extra processing in two cases only:
      1) to detect Snapchat calls, i.e. RTP/RTCP multiplxed with QUIC.
         Two cases:
@@ -1846,6 +1888,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_INFO(ndpi_struct, "found QUIC\n");
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  flow->protos.tls_quic.quic_version = version;
 
   /*
    * 3) Skip not supported versions
@@ -1883,7 +1926,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   /*
    * 5) Extract Crypto Data from the Payload
    */
-  crypto_data = get_crypto_data(ndpi_struct, flow, version,
+  crypto_data = get_crypto_data(ndpi_struct, flow,
 				clear_payload, clear_payload_len,
 				&crypto_data_len);
 
@@ -1894,7 +1937,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
     if(!is_version_with_tls(version)) {
       process_chlo(ndpi_struct, flow, crypto_data, crypto_data_len);
     } else {
-      process_tls(ndpi_struct, flow, crypto_data, crypto_data_len, version);
+      process_tls(ndpi_struct, flow, crypto_data, crypto_data_len);
     }
   }
   if(is_version_with_encrypted_header(version)) {
@@ -1904,7 +1947,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   /*
    * 7) We need to process other packets than (the first) ClientHello/CHLO?
    */
-  if(eval_extra_processing(ndpi_struct, flow, version)) {
+  if(eval_extra_processing(ndpi_struct, flow)) {
     flow->max_extra_packets_to_check = 24; /* TODO */
     flow->extra_packets_func = ndpi_search_quic_extra;
   } else if(!crypto_data) {

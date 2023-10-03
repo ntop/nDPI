@@ -22,4 +22,4 @@ Patricia protocols:   2/0 (search/found)
 
 QUIC	1	1280	1
 
-	1	UDP 255.255.255.255:8224 -> 255.255.255.32:8224 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1280 bytes -> 0 pkts/0 bytes][Goodput ratio: 98/0][< 1 sec][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **][Risk Score: 100][PLAIN TEXT (         )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+	1	UDP 255.255.255.255:8224 -> 255.255.255.32:8224 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1280 bytes -> 0 pkts/0 bytes][Goodput ratio: 98/0][< 1 sec][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **][Risk Score: 100][QUIC ver: Q024][PLAIN TEXT (         )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]

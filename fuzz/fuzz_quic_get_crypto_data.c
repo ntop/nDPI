@@ -9,7 +9,6 @@ struct ndpi_flow_struct *flow = NULL;
 
 extern const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow,
-				      uint32_t version,
 				      u_int8_t *clear_payload, uint32_t clear_payload_len,
 				      uint64_t *crypto_data_len);
 extern void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
@@ -49,8 +48,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   memset(flow, '\0', sizeof(*flow));
   flow->detected_protocol_stack[0] = NDPI_PROTOCOL_QUIC;
   flow->l4_proto = IPPROTO_UDP;
+  flow->protos.tls_quic.quic_version = version;
 
-  crypto_data = get_crypto_data(ndpi_info_mod, flow, version, (u_int8_t *)Data + 4, Size - 4, &crypto_data_len);
+  crypto_data = get_crypto_data(ndpi_info_mod, flow, (u_int8_t *)Data + 4, Size - 4, &crypto_data_len);
 
   if(crypto_data) {
     if(!is_version_with_tls(version)) {
