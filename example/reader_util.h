@@ -290,6 +290,8 @@ typedef struct ndpi_flow_info {
     time_t notBefore, notAfter;
     u_int16_t server_cipher;
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;
+
+    u_int32_t quic_version;
   } ssh_tls;
 
   struct {

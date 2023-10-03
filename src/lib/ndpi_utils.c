@@ -1244,6 +1244,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 		  ndpi_serializer *serializer) {
   char buf[64];
   char const *host_server_name;
+  char quic_version[16];
 
   if(flow == NULL) return(-1);
 
@@ -1441,6 +1442,10 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "quic");
     if(flow->http.user_agent)
       ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
+
+    ndpi_quic_version2str(quic_version, sizeof(quic_version),
+                          flow->protos.tls_quic.quic_version);
+    ndpi_serialize_string_string(serializer, "quic_version", quic_version);
 
     ndpi_tls2json(serializer, flow);
 

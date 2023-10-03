@@ -1591,6 +1591,8 @@ struct ndpi_flow_struct {
       } encrypted_ch;
 
       ndpi_cipher_weakness server_unsafe_cipher;
+
+      u_int32_t quic_version;
     } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
     struct {
@@ -1749,8 +1751,8 @@ struct ndpi_flow_struct {
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 210,
-               "Size of the struct member protocols increased to more than 210 bytes, "
+_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 216,
+               "Size of the struct member protocols increased to more than 216 bytes, "
                "please check if this change is necessary.");
 _Static_assert(sizeof(struct ndpi_flow_struct) <= 968,
                "Size of the flow struct increased to more than 968 bytes, "
