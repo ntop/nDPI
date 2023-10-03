@@ -6,7 +6,7 @@ bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tr
 #Third party
 bin_PROGRAMS += fuzz_libinjection fuzz_binaryfusefilter
 #Internal crypto
-bin_PROGRAMS += fuzz_gcrypt_light
+bin_PROGRAMS += fuzz_gcrypt_light fuzz_gcrypt_aes fuzz_gcrypt_gcm
 #Configuration files
 bin_PROGRAMS += fuzz_filecfg_protocols
 #Reader utils
@@ -427,6 +427,36 @@ fuzz_gcrypt_light_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_gcrypt_light_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_gcrypt_aes_SOURCES = fuzz_gcrypt_aes.cpp
+fuzz_gcrypt_aes_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -I ../src/lib/third_party/include/
+fuzz_gcrypt_aes_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -I ../src/lib/third_party/include/
+fuzz_gcrypt_aes_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_gcrypt_aes_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_gcrypt_aes_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_gcrypt_aes_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_gcrypt_aes_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_gcrypt_aes_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_gcrypt_aes_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_gcrypt_gcm_SOURCES = fuzz_gcrypt_gcm.cpp
+fuzz_gcrypt_gcm_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -I ../src/lib/third_party/include/
+fuzz_gcrypt_gcm_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -I ../src/lib/third_party/include/
+fuzz_gcrypt_gcm_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_gcrypt_gcm_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_gcrypt_gcm_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_gcrypt_gcm_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_gcrypt_gcm_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_gcrypt_gcm_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_gcrypt_gcm_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
 fuzz_filecfg_protocols_SOURCES = fuzz_filecfg_protocols.c fuzz_common_code.c
 fuzz_filecfg_protocols_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
 fuzz_filecfg_protocols_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
@@ -441,8 +471,8 @@ fuzz_filecfg_protocols_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_filecfg_protocols_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_readerutils_workflow_SOURCES = fuzz_readerutils_workflow.cpp fuzz_common_code.c ../example/reader_util.c
-fuzz_readerutils_workflow_CXXFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS)
-fuzz_readerutils_workflow_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_readerutils_workflow_CXXFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -DDISABLE_CUSTOM_ALLOCATOR_ON_READERUTILS
+fuzz_readerutils_workflow_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DDISABLE_CUSTOM_ALLOCATOR_ON_READERUTILS
 fuzz_readerutils_workflow_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_readerutils_workflow_LDFLAGS = $(PCAP_LIB) $(LIBS)
 if HAS_FUZZLDFLAGS

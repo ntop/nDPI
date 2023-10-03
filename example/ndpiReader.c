@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <float.h> /* FLT_EPSILON */
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
 #include <windows.h>
@@ -407,6 +408,22 @@ static void ndpiCheckIPMatch(char *testChar) {
 
 /********************** FUNCTIONS ********************* */
 
+static double ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
+					       unsigned int num_bytes)
+{
+  int i;
+  double sum = 0.0;
+
+  for(i=0; i<256; i++) {
+    double tmp = (double) byte_count[i] / (double) num_bytes;
+
+    if(tmp > FLT_EPSILON) {
+      sum -= tmp * logf(tmp);
+    }
+  }
+  return(sum / log(2.0));
+}
+
 /**
  * @brief Set main components necessary to the detection
  */
@@ -433,6 +450,8 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
    * Sum up the byte_count array for outbound and inbound flows,
    * if this flow is bidirectional
    */
+  /* TODO: we could probably use ndpi_data_* generic functions to simplify the code and
+     to get rid of `ndpi_flow_get_byte_count_entropy()` */
   if (!flow->bidirectional) {
     array = last_entropy->src2dst_byte_count;
     num_bytes = last_entropy->src2dst_l4_bytes;

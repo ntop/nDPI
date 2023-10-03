@@ -33,7 +33,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
   }
 
-  ndpi_domain_classify_add_domains(d, NDPI_PROTOCOL_UNKNOWN, "random_list.list");
+  ndpi_domain_classify_add_domains(d,
+				   fuzzed_data.ConsumeIntegralInRange(0, NDPI_LAST_IMPLEMENTED_PROTOCOL - 1),
+				   (char *)"random_list.list");
 
   if (fuzzed_data.ConsumeBool())
     ndpi_domain_classify_finalize(d);
