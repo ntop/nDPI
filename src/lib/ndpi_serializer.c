@@ -2937,9 +2937,6 @@ int ndpi_deserialize_value_double(ndpi_deserializer *_deserializer,
   size = ndpi_deserialize_get_single_size(deserializer, et, deserializer->status.buffer.size_used + expected);
   if(size < 0) return(-2);
 
-  if(et != ndpi_serialization_double)
-    return(-1);
-
   ndpi_deserialize_single_double(deserializer, deserializer->status.buffer.size_used + expected, value);
 
   return(0);
