@@ -30,7 +30,7 @@ PCRE_ENABLED=@PCRE_ENABLED@
 PCRE_PCAPS="WebattackRCE.pcap"
 NBPF_ENABLED=@NBPF_ENABLED@
 NBPF_PCAPS="h323-overflow.pcap"
-READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja3_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -q -K JSON -k /dev/null -t -v 2"
+READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja3_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -G ../../../lists -q -K JSON -k /dev/null -t -v 2"
 
 RC=0
 
@@ -164,8 +164,8 @@ for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
     build_results
     check_results $*
 
-    test ${RC} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
-    test ${RC} -ne 0 && echo "Failed: ${FAILURES[@]}"
+    test ${#FAILURES} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
+    test ${#FAILURES} -ne 0 && echo "Failed: ${FAILURES[@]}"
 
     cd ../../
 done

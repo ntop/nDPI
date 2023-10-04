@@ -197,10 +197,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_http_method2str(flow.http.method);
   ndpi_get_l4_proto_name(ndpi_get_l4_proto_info(ndpi_info_mod, p.app_protocol));
   ndpi_is_subprotocol_informative(ndpi_info_mod, p.app_protocol);
-  ndpi_get_http_method(ndpi_info_mod, &flow);
+  ndpi_get_http_method(ndpi_info_mod, bool_value ? &flow : NULL);
   ndpi_get_http_url(ndpi_info_mod, &flow);
   ndpi_get_http_content_type(ndpi_info_mod, &flow);
   ndpi_check_for_email_address(ndpi_info_mod, 0);
+  ndpi_get_flow_name(bool_value ? &flow : NULL);
   /* ndpi_guess_undetected_protocol() is a "strange" function. Try fuzzing it, here */
   if(!ndpi_is_protocol_detected(ndpi_info_mod, p)) {
     ndpi_guess_undetected_protocol(ndpi_info_mod, bool_value ? &flow : NULL,

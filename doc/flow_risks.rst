@@ -141,7 +141,8 @@ This risk indicates that the protocol used is insecure and that a secure protoco
 
 NDPI_DNS_SUSPICIOUS_TRAFFIC
 ===========================
-This risk is returned when DNS traffic returns an unexpected/obsolete `record type <https://en.wikipedia.org/wiki/List_of_DNS_record_types>`_.
+This risk is returned when DNS traffic returns an unexpected/obsolete `record type <https://en.wikipedia.org/wiki/List_of_DNS_record_types>`_
+or when a suspicious query with a very long host name is detected.
 
 .. _Risk 024:
 
@@ -219,7 +220,7 @@ This risk is used to detect suspicious data carried in ICMP packets whose entrop
 
 NDPI_CLEAR_TEXT_CREDENTIALS
 ===========================
-Clear text protocols are not bad per-se, but they should be avoided when they carry credentials as they can be intercepted by malicious users. This risk is triggered whenever clear text protocols (e.g. FTP, HTTP, IMAP...) contain credentials in clear text (read it as nDPI does not trigger this risk for HTTP connections that do not carry credentials).
+Clear text protocols are not intrinsically bad, but they should be avoided when they carry credentials as they can be intercepted by malicious users. This risk is triggered whenever clear text protocols (e.g. FTP, HTTP, IMAP...) contain credentials in clear text (read it as nDPI does not trigger this risk for HTTP connections that do not carry credentials).
 
 .. _Risk 037:
 
@@ -309,3 +310,15 @@ Minor packet/flow issues (e.g. DNS traffic with zero TTL) have been detected.
 NDPI_TCP_ISSUES
 ===============
 Relevant TCP connection issues such as connection refused, scan, or probe attempt.
+
+.. _Risk 051
+
+NDPI_FULLY_ENCRYPTED
+====================
+Flow with Unknown protocol containing encrypted traffic.
+
+.. _Risk 052
+
+NDPI_TLS_ALPN_SNI_MISMATCH
+=========================
+Invalid TLS ALPN/SNI mismatch. For instance ALPN advertises the flow as h2 (HTTP/2.0) and no SNI is reported.

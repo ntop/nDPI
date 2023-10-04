@@ -26,7 +26,9 @@
 #include <string.h>
 
 #include <stdio.h>
-
+#include <ndpi_api.h>
+#include <ndpi_main.h>
+#include "ndpi_typedefs.h"
 #include "../include/MurmurHash3.h"
 #include "../include/hll.h"
 
@@ -117,7 +119,7 @@ static __inline int _hll_add_hash(struct ndpi_hll *hll, u_int32_t hash) {
 
 /* Return: 0 = nothing changed, 1 = ranking changed */
 int hll_add(struct ndpi_hll *hll, const void *buf, size_t size) {
-  u_int32_t hash = MurmurHash3_x86_32((const char *)buf, (u_int32_t)size, 0x5f61767a);
+  u_int32_t hash = MurmurHash((const char *)buf, (u_int32_t)size, 0x5f61767a);
 
   return(_hll_add_hash(hll, hash));
 }

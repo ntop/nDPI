@@ -176,7 +176,7 @@ gcry_error_t gcry_cipher_open (gcry_cipher_hd_t *handle,
 struct gcry_cipher_hd *r = 0;
 size_t s_len = ROUND_SIZE8(sizeof(struct gcry_cipher_hd));;
 
-    if(flags || algo != GCRY_CIPHER_AES128 || !( mode == GCRY_CIPHER_MODE_ECB || mode == GCRY_CIPHER_MODE_GCM)) return MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE;
+    if(flags || algo != GCRY_CIPHER_AES128) return MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE;
 
     switch(mode) {
         case GCRY_CIPHER_MODE_ECB:

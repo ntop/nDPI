@@ -175,7 +175,11 @@ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
   }
 }
 /*
-  allowed chars for dns names A-Z 0-9 _ -
+  See
+  - RFC 1035
+  - https://learn.microsoft.com/en-us/troubleshoot/windows-server/identity/naming-conventions-for-computer-domain-site-ou
+  
+  Allowed chars for dns names A-Z 0-9 _ -
   Perl script for generation map:
   my @M;
   for(my $ch=0; $ch < 256; $ch++) {
@@ -192,7 +196,6 @@ static uint32_t dns_validchar[8] = {
 
 static char* dns_error_code2string(u_int16_t error_code, char *buf, u_int buf_len) {
   switch(error_code) {
-  case 0: return((char*)"NOERROR");
   case 1: return((char*)"FORMERR");
   case 2: return((char*)"SERVFAIL");
   case 3: return((char*)"NXDOMAIN");
@@ -247,8 +250,11 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 	if((dns_validchar[c >> 5] & shift)) {
 	  _hostname[j++] = tolower(c);
 	} else {
+	  /* printf("---?? '%c'\n", c); */
+	  
+	  hostname_is_valid = 0;
+	  
 	  if (isprint(c) == 0) {
-	    hostname_is_valid = 0;
 	    _hostname[j++] = '?';
 	  } else {
 	    _hostname[j++] = '_';
@@ -687,6 +693,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       || (d_port == LLMNR_PORT))
      && (packet->payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset)) {
     struct ndpi_dns_packet_header dns_header;
+    char *dot;
     u_int len, off;
     int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query, is_mdns);
     ndpi_protocol ret;
@@ -763,6 +770,21 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     if (hostname_is_valid == 0)
       ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, NULL);
 
+    dot = strchr(_hostname, '.');
+    if(dot) {
+      uintptr_t first_element_len = dot - _hostname;
+
+      if(first_element_len > 32) {
+	/*
+	  The lenght of the first element in the query is very long
+	  and this might be an issue or indicate an exfiltration
+	*/
+
+	/* printf("**** %lu [%s][%s]\n", first_element_len, dot, _hostname); */
+	ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, NULL);
+      }
+    }
+    
     if(len > 0) {
       ndpi_protocol_match_result ret_match;
 

@@ -1428,6 +1428,8 @@ void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_search_tls_wrapper(ndpi_struct, flow);
 }
 
+/* **************************************** */
+
 static void tls_subclassify_by_alpn(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow) {
   /* Right now we have only one rule so we can keep it trivial */
@@ -2541,7 +2543,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 	      } else if(extension_id == 65037 /* ECH: latest drafts */) {
 #ifdef DEBUG_TLS
-		printf("Client TLS: ECH version 0x%x\n", extension_id;
+		printf("Client TLS: ECH version 0x%x\n", extension_id);
 #endif
 		/* Beginning with draft-08, the version is the same as the code point
 		   for the "encrypted_client_hello" extension. */
@@ -2709,8 +2711,25 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	       ) {
 	      /* This is a bit suspicious */
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_MISSING_SNI, NULL);
-	    }
+	      
+	      if(flow->protos.tls_quic.advertised_alpns != NULL) {
+		char buf[256], *tmp, *item;
 
+		snprintf(buf, sizeof(buf), "%s", flow->protos.tls_quic.advertised_alpns);
+
+		item = strtok_r(buf, ",", &tmp);
+		
+		while(item != NULL) {
+		  if(item[0] == 'h') {
+		    /* Example 'h2' */
+		    ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_ALPN_SNI_MISMATCH, NULL);
+		    break;
+		  } else
+		    item = strtok_r(NULL, ",", &tmp);
+		}
+	      }
+	    }
+	    
 	    return(2 /* Client Certificate */);
 	  } else {
 #ifdef DEBUG_TLS

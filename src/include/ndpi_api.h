@@ -98,10 +98,10 @@ extern "C" {
    *
    * @par    flow    = the flow to analyze
    * @return the error code or 0 otherwise
-   *                        
+   *
    */
   u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow);
-  
+
   /**
    * nDPI personal allocation and free functions
    **/
@@ -728,21 +728,22 @@ extern "C" {
    *
    * @par  ndpi_mod = the detection module
    */
-  void ndpi_dump_protocols(struct ndpi_detection_module_struct *mod);
+  void ndpi_dump_protocols(struct ndpi_detection_module_struct *mod, FILE *dump_out);
 
   /**
    * Generate Options list used in OPNsense firewall plugin
    *
    * @par  opt = The Option list to generate
+   * @par  dump_out = Output stream for generated options
    */
-  void ndpi_generate_options(u_int opt);
+  void ndpi_generate_options(u_int opt, FILE *dump_out);
 
   /**
    * Write the list of the scores and their associated risks
    *
-   * @par  ndpi_mod = the detection module
+   * @par  dump_out = Output stream for dumped risk scores
    */
-  void ndpi_dump_risks_score(void);
+  void ndpi_dump_risks_score(FILE *dump_out);
 
   /**
    * Read a file and load the protocols
@@ -756,11 +757,14 @@ extern "C" {
    * @par     ndpi_mod = the detection module
    * @par     path     = the path of the file
    * @return  0 if the file is loaded correctly;
-   *          -1 else
+   *          -1 generic error
+   *          -2 memory allocation error
    *
    */
   int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod,
 			       const char* path);
+  int ndpi_load_protocols_file2(struct ndpi_detection_module_struct *ndpi_mod,
+			        FILE *fd);
 
   /**
    * Add an IP-address based risk mask
@@ -803,6 +807,30 @@ extern "C" {
    *          -1 else
    */
   int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path, void *user_data);
+
+  /**
+   * Loads a file (separated by <cr>) of domain names associated with the specified category
+   *
+   * @par     ndpi_mod    = the detection module
+   * @par     path        = the path of the file
+   * @par     category_id = Id of the category to which domains will be associated
+   * @return  0 if the file is loaded correctly;
+   *          -1 else
+   */
+  int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
+			      char* path, ndpi_protocol_category_t category_id);
+
+  /**
+   * Load files (whose name is <categoryid>_<label>.<extension>) stored
+   * in a directory and bind each domain to the specified category.
+   *
+   * @par     ndpi_mod    = the detection module
+   * @par     path        = the path of the file
+   * @return  0 if the file is loaded correctly;
+   *          -1 else
+   */
+  int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
+			       char* path);
 
   /**
    * Read a file and load the list of risky domains
@@ -1165,9 +1193,6 @@ extern "C" {
 		     ndpi_serializer *serializer);
 
   char *ndpi_get_ip_proto_name(u_int16_t ip_proto, char *name, unsigned int name_len);
-
-  void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]);
-  u_int32_t ndpi_quick_hash(unsigned char *str, u_int str_len);
 
   const char* ndpi_http_method2str(ndpi_http_method m);
   ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len);
@@ -1760,26 +1785,36 @@ extern "C" {
   void ndpi_hw_free(struct ndpi_hw_struct *hw);
   int  ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t value, double *forecast,  double *confidence_band);
   void ndpi_hw_reset(struct ndpi_hw_struct *hw);
-  
+
   /* ******************************* */
 
   int ndpi_ses_init(struct ndpi_ses_struct *ses, double alpha, float significance);
   int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const double _value, double *forecast, double *confidence_band);
   void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha);
   void ndpi_ses_reset(struct ndpi_ses_struct *ses);
-  
+
   /* ******************************* */
 
+  void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]);
   u_int32_t ndpi_crc32(const void* data, size_t n_bytes);
   u_int32_t ndpi_nearest_power_of_two(u_int32_t x);
-  
+
+  /* ******************************* */
+
+  u_int32_t ndpi_quick_hash(const unsigned char *str, u_int str_len);
+  u_int64_t ndpi_quick_hash64(const char *str, u_int str_len);
+  u_int32_t ndpi_hash_string(const char *str);
+  u_int32_t ndpi_rev_hash_string(const char *str);
+  u_int32_t ndpi_hash_string_len(const char *str, u_int len);
+  u_int32_t ndpi_murmur_hash(const char *str, u_int str_len);
+
   /* ******************************* */
 
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
   int ndpi_des_add_value(struct ndpi_des_struct *des, const double _value, double *forecast, double *confidence_band);
   void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, float *ret_beta);
   void ndpi_des_reset(struct ndpi_des_struct *des);
-  
+
   /* ******************************* */
 
   int   ndpi_jitter_init(struct ndpi_jitter_struct *hw, u_int16_t num_periods);
@@ -1811,11 +1846,11 @@ extern "C" {
 			    u_int16_t *client_score, u_int16_t *server_score);
 
   u_int8_t ndpi_check_issuerdn_risk_exception(struct ndpi_detection_module_struct *ndpi_str,
-					      char *issuerDN);    
+					      char *issuerDN);
   u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 					   u_int num_params,
 					   ndpi_risk_params params[]);
-  
+
   /* ******************************* */
 
   /* HyperLogLog cardinality estimator [count unique items] */
@@ -1840,7 +1875,7 @@ extern "C" {
   void ndpi_cm_sketch_add(struct ndpi_cm_sketch *sketch, u_int32_t element);
   u_int32_t ndpi_cm_sketch_count(struct ndpi_cm_sketch *sketch, u_int32_t element);
   void ndpi_cm_sketch_destroy(struct ndpi_cm_sketch *sketch);
-  
+
   /* ******************************* */
 
   /* PopCount [count how many bits are set to 1] */
@@ -1965,10 +2000,21 @@ extern "C" {
 
   /* ******************************* */
 
+  /*
+    Bitmap based on compressed bitmaps
+    implemented by https://roaringbitmap.org
+
+    This is
+    - NOT a probabilistic datastructure (i.e. no false positives)
+    - mutable (i.e. you can add values at any time)
+  */
+
   ndpi_bitmap* ndpi_bitmap_alloc(void);
+  ndpi_bitmap* ndpi_bitmap_alloc_size(u_int32_t size);
   void ndpi_bitmap_free(ndpi_bitmap* b);
   ndpi_bitmap* ndpi_bitmap_copy(ndpi_bitmap* b);
   u_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b);
+  bool ndpi_bitmap_is_empty(ndpi_bitmap* b);
   void ndpi_bitmap_set(ndpi_bitmap* b, u_int32_t value);
   void ndpi_bitmap_unset(ndpi_bitmap* b, u_int32_t value);
   bool ndpi_bitmap_isset(ndpi_bitmap* b, u_int32_t value);
@@ -1978,12 +2024,108 @@ extern "C" {
   ndpi_bitmap* ndpi_bitmap_deserialize(char *buf);
 
   void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and);
+  ndpi_bitmap* ndpi_bitmap_and_alloc(ndpi_bitmap* a, ndpi_bitmap* b_and);
+  void ndpi_bitmap_andnot(ndpi_bitmap* a, ndpi_bitmap* b_and);
   void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or);
+  ndpi_bitmap* ndpi_bitmap_ot_alloc(ndpi_bitmap* a, ndpi_bitmap* b_and);
   void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor);
+  void ndpi_bitmap_optimize(ndpi_bitmap* a);
 
   ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b);
   void ndpi_bitmap_iterator_free(ndpi_bitmap* b);
   bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, u_int32_t *value);
+
+  /* ******************************* */
+
+  /*
+    Bitmap with 64 bit values based
+    on https://github.com/FastFilter/xor_singleheader/tree/master
+
+    This is
+    - a probabilistic datastructure !!! (i.e. be prepared to false positives)
+    - immutable (i.e. adding keys after a search (i.e. ndpi_bitmap64_isset)
+      is not allowed
+   */
+
+  ndpi_bitmap64* ndpi_bitmap64_alloc(void);
+  bool ndpi_bitmap64_set(ndpi_bitmap64 *b, u_int64_t value);
+  bool ndpi_bitmap64_compress(ndpi_bitmap64 *b);
+  bool ndpi_bitmap64_isset(ndpi_bitmap64 *b, u_int64_t value);
+  void ndpi_bitmap64_free(ndpi_bitmap64 *b);
+  u_int32_t ndpi_bitmap64_size(ndpi_bitmap64 *b);
+
+  /* ******************************* */
+
+  /*
+    Bloom-filter on steroids based on ndpi_bitmap
+
+    The main difference with respect to bloom filters
+    is that here the filter cardinality is 2^32 and thus
+    not limited as in blooms. This combined with compression
+    of ndpi_bitmap creates a memory savvy datastructure at the
+    price of little performance penalty due to using a
+    compressed datastucture.
+
+    The result is a datatructure with few false positives
+    (see https://hur.st/bloomfilter/) computed as
+
+    p = (1 - e(-((k * n)/m)))^k
+
+    number of hash function (k)
+    false positive rate (p)
+    number of item (n)
+    the number of bits (m)
+
+    As in our case m = 2^32, k = 1, for n = 1000000
+    (see https://hur.st/bloomfilter/?n=1000000&p=&m=4294967296&k=1)
+    p = 2.3 x 10^-4
+  */
+
+  ndpi_filter* ndpi_filter_alloc(void);
+  bool         ndpi_filter_add(ndpi_filter *f, u_int32_t value); /* returns true on success, false on failure */
+  bool         ndpi_filter_add_string(ndpi_filter *f, char *string); /* returns true on success, false on failure */
+  bool         ndpi_filter_contains(ndpi_filter *f, u_int32_t value); /* returns true on success, false on failure */
+  bool         ndpi_filter_contains_string(ndpi_filter *f, char *string); /* returns true on success, false on failure */
+  void         ndpi_filter_free(ndpi_filter *f);
+  size_t       ndpi_filter_size(ndpi_filter *f);
+  u_int32_t    ndpi_filter_cardinality(ndpi_filter *f);
+
+  /* ******************************* */
+
+  /*
+    Efficient (space and speed) probabilitic datastructure
+    for substring domain matching and classification
+  */
+
+  ndpi_domain_classify* ndpi_domain_classify_alloc(void);
+  void                  ndpi_domain_classify_free(ndpi_domain_classify *s);
+  u_int32_t             ndpi_domain_classify_size(ndpi_domain_classify *s);
+  bool                  ndpi_domain_classify_add(ndpi_domain_classify *s,
+						 u_int8_t class_id, const char *domain);
+  u_int32_t             ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
+							 u_int8_t class_id,
+							 char *file_path);
+  bool                  ndpi_domain_classify_finalize(ndpi_domain_classify *s);
+  bool                  ndpi_domain_classify_contains(ndpi_domain_classify *s,
+						      u_int8_t *class_id /* out */,
+						      const char *domain);
+
+  /* ******************************* */
+
+  /*
+    Similar to ndpi_filter but based on binary search and with the
+    ability to store a category per value (as ndpi_domain_classify)
+  */
+  ndpi_binary_bitmap* ndpi_binary_bitmap_alloc(void);
+  bool ndpi_binary_bitmap_set(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t category);
+  bool ndpi_binary_bitmap_compress(ndpi_binary_bitmap *b);
+  bool ndpi_binary_bitmap_isset(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t *out_category);
+  void ndpi_binary_bitmap_free(ndpi_binary_bitmap *b);
+  u_int32_t ndpi_binary_bitmap_size(ndpi_binary_bitmap *b);
+  u_int32_t ndpi_binary_bitmap_cardinality(ndpi_binary_bitmap *b);
+
+  /* ******************************* */
+
 
   /* ******************************* */
 

@@ -51,6 +51,8 @@
 #include "ndpi_classify.h"
 #include "ndpi_includes.h"
 
+#include "ndpi_replace_printf.h"
+
 /** finds the minimum value between to inputs */
 #ifndef min
 #define min(a,b)				\
@@ -583,7 +585,9 @@ ndpi_update_params (classifier_type_codes_t param_type, const char *param_file)
     break;
 
   default:
+#if 0
     printf("error: unknown paramerter type (%d)", param_type);
+#endif
     break;
   }
 }

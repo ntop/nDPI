@@ -19,11 +19,21 @@ for line in `nm -P -u "${NDPI_LIB}"`; do
     fi
 
     #printf '%s\n' "${line}"
-    FOUND_SYMBOL="$(printf '%s' "${line}" | grep '^\(malloc\|calloc\|realloc\|free\)$' || true)"
+    FOUND_SYMBOL="$(printf '%s' "${line}" | grep '^\(malloc\|calloc\|realloc\|free\|printf\|fprintf\)$' || true)"
 
     if [ ! -z "${FOUND_SYMBOL}" ]; then
         SKIP=0
         case "${CURRENT_OBJECT}" in
+            '[ndpi_main.o]')
+                case "${FOUND_SYMBOL}" in
+                    'printf'|'fprintf') SKIP=1 ;;
+                esac
+            ;;
+            '[ahocorasick.o]'|'[ndpi_serializer.o]')
+                case "${FOUND_SYMBOL}" in
+                    'fprintf') SKIP=1 ;;
+                esac
+            ;;
             '[roaring.o]')
                 case "${FOUND_SYMBOL}" in
                     'malloc'|'calloc'|'realloc'|'free') SKIP=1 ;;

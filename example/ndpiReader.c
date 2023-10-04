@@ -40,6 +40,7 @@
 #else
 #include <unistd.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 #include <sys/socket.h>
 #include <sys/mman.h>
 #endif
@@ -80,6 +81,7 @@ static char *_customCategoryFilePath= NULL; /**< Custom categories file path  */
 static char *_maliciousJA3Path      = NULL; /**< Malicious JA3 signatures */
 static char *_maliciousSHA1Path     = NULL; /**< Malicious SSL certificate SHA1 fingerprints */
 static char *_riskyDomainFilePath   = NULL; /**< Risky domain files */
+static char *_categoriesDirPath     = NULL; /**< Directory containing domain files */
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 static FILE *csv_fp                 = NULL; /**< for CSV export */
@@ -543,6 +545,7 @@ static void help(u_int long_help) {
          "  -r <path>                 | Load risky domain file\n"
          "  -j <path>                 | Load malicious JA3 fingeprints\n"
          "  -S <path>                 | Load malicious SSL certificate SHA1 fingerprints\n"
+	 "  -G <dir>                  | Bind domain names to categories loading files from <dir>\n"
          "  -w <path>                 | Write test output on the specified file. This is useful for\n"
          "                            | testing purposes in order to compare results across runs\n"
          "  -h                        | This help\n"
@@ -610,10 +613,10 @@ static void help(u_int long_help) {
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
 
-    ndpi_dump_protocols(ndpi_info_mod);
+    ndpi_dump_protocols(ndpi_info_mod, stdout);
 
     printf("\n\nnDPI supported risks:\n");
-    ndpi_dump_risks_score();
+    ndpi_dump_risks_score(stdout);
 
     ndpi_exit_detection_module(ndpi_info_mod);
   }
@@ -647,6 +650,7 @@ static struct option longopts[] = {
   { "filter", required_argument, NULL, 'f'},
   { "flow-stats", required_argument, NULL, 'F'},
   { "cpu-bind", required_argument, NULL, 'g'},
+  { "load-categories", required_argument, NULL, 'G'},
   { "loops", required_argument, NULL, 'l'},
   { "num-threads", required_argument, NULL, 'n'},
   { "ignore-vlanid", no_argument, NULL, 'I'},
@@ -965,7 +969,8 @@ static void parseOptions(int argc, char **argv) {
     lru_cache_ttls[i] = -1; /* Use the default value */
   }
 
-  while((opt = getopt_long(argc, argv, "a:Ab:B:e:Ec:C:dDFf:g:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:X:w:zZ:q0123:456:7:89:m:MT:U:",
+  while((opt = getopt_long(argc, argv,
+			   "a:Ab:B:e:Ec:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:X:w:zZ:q0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -973,7 +978,7 @@ static void parseOptions(int argc, char **argv) {
 
     switch (opt) {
     case 'a':
-      ndpi_generate_options(atoi(optarg));
+      ndpi_generate_options(atoi(optarg), stdout);
       exit(0);
 
     case 'A':
@@ -1034,6 +1039,10 @@ static void parseOptions(int argc, char **argv) {
       break;
 #endif
 #endif
+
+    case 'G':
+      _categoriesDirPath = optarg;
+      break;
 
     case 'l':
       num_loops = atoi(optarg);
@@ -1107,6 +1116,7 @@ static void parseOptions(int argc, char **argv) {
         module_tmp = ndpi_init_detection_module(0);
         if(!module_tmp)
           break;
+	
         NDPI_BITMASK_SET_ALL(all);
         ndpi_set_protocol_detection_bitmask2(module_tmp, &all);
         ndpi_finalize_initialization(module_tmp);
@@ -1777,7 +1787,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_tls.tls_supported_versions)
       fprintf(out, "[TLS Supported Versions: %s]", flow->ssh_tls.tls_supported_versions);
 
-    if(flow->flow_extra_info[0] != '\0') fprintf(out, "[%s]", flow->flow_extra_info);
+    if(flow->mining.currency[0] != '\0') fprintf(out, "[currency: %s]", flow->mining.currency);
 
     if(flow->dns.geolocation_iata_code[0] != '\0') fprintf(out, "[GeoLocation: %s]", flow->dns.geolocation_iata_code);
 
@@ -2646,6 +2656,30 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
       exit(-1);
   }
 
+  if(_categoriesDirPath)
+    ndpi_load_categories_dir(ndpi_thread_info[thread_id].workflow->ndpi_struct, _categoriesDirPath);
+  
+  if(_riskyDomainFilePath)
+    ndpi_load_risk_domain_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _riskyDomainFilePath);
+
+  if(_maliciousJA3Path)
+    ndpi_load_malicious_ja3_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _maliciousJA3Path);
+
+  if(_maliciousSHA1Path)
+    ndpi_load_malicious_sha1_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _maliciousSHA1Path);
+  
+  if(_customCategoryFilePath) {
+    char *label = strrchr(_customCategoryFilePath, '/');
+
+    if(label != NULL)
+      label = &label[1];
+    else
+      label = _customCategoryFilePath;
+
+    ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath, label);
+  }
+
+  /* Make sure to load lists before finalizing the initialization */
   ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &enabled_bitmask);
 
   // clear memory for results
@@ -2660,26 +2694,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _protoFilePath);
-
-  if(_customCategoryFilePath) {
-    char *label = strrchr(_customCategoryFilePath, '/');
-
-    if(label != NULL)
-      label = &label[1];
-    else
-      label = _customCategoryFilePath;
-
-    ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath, label);
-  }
-
-  if(_riskyDomainFilePath)
-    ndpi_load_risk_domain_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _riskyDomainFilePath);
-
-  if(_maliciousJA3Path)
-    ndpi_load_malicious_ja3_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _maliciousJA3Path);
-
-  if(_maliciousSHA1Path)
-    ndpi_load_malicious_sha1_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _maliciousSHA1Path);
 
   /* Enable/disable/configure LRU caches size here */
   for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
@@ -5323,6 +5337,24 @@ void compressedBitmapUnitTest() {
 
 /* *********************************************** */
 
+void filterUnitTest() {
+  ndpi_filter* f = ndpi_filter_alloc();
+  u_int32_t v, i;
+  
+  assert(f);
+
+  srand(time(NULL));
+  
+  for(i=0; i<1000; i++)
+    assert(ndpi_filter_add(f, v = rand()));
+
+  assert(ndpi_filter_contains(f, v));
+  
+  ndpi_filter_free(f);
+}
+
+/* *********************************************** */
+
 void zscoreUnitTest() {
   u_int32_t values[] = { 1, 3, 3, 4, 5, 2, 6, 7, 30, 16 };
   u_int32_t i;
@@ -5401,6 +5433,82 @@ void sketchUnitTest() {
 
 /* *********************************************** */
 
+void binaryBitmapUnitTest() {
+  ndpi_binary_bitmap *b = ndpi_binary_bitmap_alloc();
+  u_int64_t hashval = 8149764909040470312;
+  u_int8_t category = 33;
+  
+  ndpi_binary_bitmap_set(b, hashval, category);
+  ndpi_binary_bitmap_set(b, hashval+1, category);
+  category = 0;
+  assert(ndpi_binary_bitmap_isset(b, hashval, &category));
+  assert(category == 33);
+  ndpi_binary_bitmap_free(b);
+}
+
+/* *********************************************** */
+
+void domainSearchUnitTest() {
+  ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
+  char *domain = "ntop.org";
+  u_int8_t class_id;
+  
+  assert(sc);
+    
+  ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, ".ntop.org");
+  ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, domain);
+  assert(ndpi_domain_classify_contains(sc, &class_id, domain));
+
+  ndpi_domain_classify_add(sc, NDPI_PROTOCOL_CATEGORY_GAMBLING, "123vc.club");
+  assert(ndpi_domain_classify_contains(sc, &class_id, "123vc.club"));
+  assert(class_id == NDPI_PROTOCOL_CATEGORY_GAMBLING);
+
+#if 0
+  {
+    const char *fname = NDPI_BASE_DIR "/lists/gambling.list";
+    u_int32_t num_domains;
+    
+    num_domains = ndpi_domain_classify_add_domains(sc, NDPI_PROTOCOL_GAMBLING, (char*)fname);
+    assert(num_domains == 35370);
+
+    assert(ndpi_domain_classify_contains(sc, "0grand-casino.com") == NDPI_PROTOCOL_GAMBLING);
+  }
+#endif
+  
+  /* Subdomain check */
+  assert(ndpi_domain_classify_contains(sc, &class_id, "blog.ntop.org"));
+  assert(class_id == NDPI_PROTOCOL_NTOP);
+  
+#ifdef DEBUG_TRACE
+  struct stat st;
+  
+  if(stat(fname, &st) == 0) {
+    u_int32_t s = ndpi_domain_classify_size(sc);
+    
+    printf("Size: %u [%.1f %% of the original filename size]\n",
+	   s, (float)(s * 100) / (float)st.st_size);
+  }
+#endif
+  
+  ndpi_domain_classify_free(sc);
+}
+
+/* *********************************************** */
+
+void domainSearchUnitTest2() {
+  ndpi_domain_classify *c = ndpi_domain_classify_alloc();
+  u_int8_t class_id = 9;
+
+  ndpi_domain_classify_add(c, class_id, "ntop.org");
+  ndpi_domain_classify_add(c, class_id, "apple.com");
+
+  assert(!ndpi_domain_classify_contains(c, &class_id, "ntop.com"));
+  
+  ndpi_domain_classify_free(c);
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -5440,6 +5548,9 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    binaryBitmapUnitTest();
+    domainSearchUnitTest();
+    domainSearchUnitTest2();
     sketchUnitTest();
     linearUnitTest();
     zscoreUnitTest();
@@ -5455,6 +5566,7 @@ int main(int argc, char **argv) {
     dgaUnitTest();
     hllUnitTest();
     bitmapUnitTest();
+    filterUnitTest();
     automataUnitTest();
     analyzeUnitTest();
     ndpi_self_check_host_match(stderr);

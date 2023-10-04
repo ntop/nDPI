@@ -63,7 +63,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)..\src\lib\protocols\;$(ProjectDir)..\src\include\;$(ProjectDir)..\;$(ProjectDir)..\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\lib\;$(ProjectDir)..\src\lib\protocols\;$(ProjectDir)..\src\include\;$(ProjectDir)..\;$(ProjectDir)..\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDPI_LIB_COMPILATION;WIN32;_WIN64;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -91,7 +91,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-ndpiReader|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)..\src\lib\protocols\;$(ProjectDir)..\src\include\;$(ProjectDir)..\;$(ProjectDir)..\src\lib\third_party\include\;$(ProjectDir)..\windows\WpdPack\Include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\lib\;$(ProjectDir)..\src\lib\protocols\;$(ProjectDir)..\src\include\;$(ProjectDir)..\;$(ProjectDir)..\src\lib\third_party\include\;$(ProjectDir)..\windows\WpdPack\Include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>PTW32_STATIC_LIB;STATIC_GETOPT;NDPI_LIB_COMPILATION;HAVE_STRUCT_TIMESPEC;WIN32;_WIN64;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -128,9 +128,14 @@
     <ClCompile Include="..\src\lib\ndpi_community_id.c" />
     <ClCompile Include="..\src\lib\ndpi_geoip.c" />
     <ClCompile Include="..\src\lib\ndpi_main.c" />
+    <ClCompile Include="..\src\lib\ndpi_filter.c" />
     <ClCompile Include="..\src\lib\ndpi_memory.c" />
     <ClCompile Include="..\src\lib\ndpi_serializer.c" />
     <ClCompile Include="..\src\lib\ndpi_utils.c" />
+    <ClCompile Include="..\src\lib\ndpi_binary_bitmap.c" />
+    <ClCompile Include="..\src\lib\ndpi_hash.c" />
+    <ClCompile Include="..\src\lib\ndpi_domain_classify.c" />
+    <ClCompile Include="..\src\lib\ndpi_bitmap64.c" />
     <ClCompile Include="..\src\lib\protocols\activision.c" />
     <ClCompile Include="..\src\lib\protocols\afp.c" />
     <ClCompile Include="..\src\lib\protocols\ajp.c" />
@@ -161,6 +166,7 @@
     <ClCompile Include="..\src\lib\protocols\fastcgi.c" />
     <ClCompile Include="..\src\lib\protocols\fix.c" />
     <ClCompile Include="..\src\lib\protocols\genshin_impact.c" />
+    <ClCompile Include="..\src\lib\protocols\haproxy.c" />
     <ClCompile Include="..\src\lib\protocols\hpvirtgrp.c" />
     <ClCompile Include="..\src\lib\protocols\hsrp.c" />
     <ClCompile Include="..\src\lib\protocols\i3d.c" />
@@ -236,6 +242,7 @@
     <ClCompile Include="..\src\lib\protocols\halflife2_and_mods.c" />
     <ClCompile Include="..\src\lib\protocols\hots.c" />
     <ClCompile Include="..\src\lib\protocols\http.c" />
+    <ClCompile Include="..\src\lib\protocols\http2.c" />
     <ClCompile Include="..\src\lib\protocols\iax.c" />
     <ClCompile Include="..\src\lib\protocols\icecast.c" />
     <ClCompile Include="..\src\lib\protocols\ipp.c" />
@@ -331,6 +338,8 @@
     <ClCompile Include="..\src\lib\third_party\src\ndpi_sha1.c" />
     <ClCompile Include="..\src\lib\third_party\src\sha1-fast.c" />
     <ClCompile Include="..\src\lib\third_party\src\strptime.c" />
+    <ClCompile Include="..\src\lib\third_party\src\hll\MurmurHash3.c" />
+    <ClCompile Include="..\src\lib\third_party\src\hll\hll.c" />
     <ClCompile Include="src\getopt.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -344,6 +353,7 @@
     <ClInclude Include="..\src\include\ndpi_main.h" />
     <ClInclude Include="..\src\include\ndpi_patricia_typedefs.h" />
     <ClInclude Include="..\src\include\ndpi_utils.h" />
+    <ClInclude Include="..\src\lib\ndpi_replace_printf.h" />
     <ClInclude Include="..\src\lib\protocols\btlib.h" />
     <ClInclude Include="..\src\lib\third_party\include\ahocorasick.h" />
     <ClInclude Include="..\src\include\ndpi_includes.h" />
@@ -373,6 +383,7 @@
     </ClInclude>
     <ClInclude Include="src\ndpi_config.h" />
     <ClInclude Include="src\ndpi_define.h" />
+    <ClInclude Include="src\dirent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.github\workflows\build-msbuild.yml" />

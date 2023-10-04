@@ -367,7 +367,7 @@ typedef enum {
   NDPI_PROTOCOL_HOTS                  = 336, /* Heroes of the Storm */
   NDPI_PROTOCOL_FACEBOOK_REEL_STORY   = 337,
   NDPI_PROTOCOL_SRTP                  = 338,
-  NDPI_PROTOCOL_GAMBLING              = 339,
+  NDPI_PROTOCOL_OPERA_VPN             = 339,
   NDPI_PROTOCOL_EPICGAMES             = 340,
   NDPI_PROTOCOL_GEFORCENOW            = 341,
   NDPI_PROTOCOL_NVIDIA                = 342,
@@ -377,6 +377,8 @@ typedef enum {
   NDPI_PROTOCOL_ROBLOX                = 346,
   NDPI_PROTOCOL_SERVICE_LOCATION      = 347,
   NDPI_PROTOCOL_MULLVAD               = 348,
+  NDPI_PROTOCOL_HTTP2                 = 349,
+  NDPI_PROTOCOL_HAPROXY               = 350,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

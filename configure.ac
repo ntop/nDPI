@@ -19,6 +19,7 @@ PWD=`pwd`
 AC_ARG_WITH(sanitizer, AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_WITH(thread-sanitizer, AS_HELP_STRING([--with-thread-sanitizer], [Build with support for thread sanitizer]))
 AC_ARG_WITH(memory-sanitizer, AS_HELP_STRING([--with-memory-sanitizer], [Build with support for memory sanitizer]))
+AC_ARG_WITH(macos-memory-sanitizer, AS_HELP_STRING([--with-macos-memory-sanitizer], [Build with support for memory sanitizer macOS]))
 AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz targets]),[enable_fuzztargets=$enableval],[enable_fuzztargets=no])
 AC_ARG_ENABLE(gprof, AS_HELP_STRING([--enable-gprof], [Enable CPU/HEAP profiling with gperftools]),[enable_gprof=$enableval],[enable_gprof=no])
 AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
@@ -75,6 +76,11 @@ AS_IF([test "${with_thread_sanitizer+set}" = set],[
 AS_IF([test "${with_memory_sanitizer+set}" = set],[
   NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer"
   NDPI_LDFLAGS="${NDPI_LDFLAGS} -fsanitize=memory"
+])
+
+AS_IF([test "${with_macos_memory_sanitizer+set}" = set],[
+  NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize=address -fno-omit-frame-pointer -fsanitize=signed-integer-overflow -fno-sanitize-recover=address"
+  NDPI_LDFLAGS="${NDPI_LDFLAGS} -fsanitize=address"
 ])
 
 AS_IF([test "x${enable_code_coverage}" = "xyes"],[
@@ -375,6 +381,8 @@ if test "${with_maxminddb+set}" = set; then :
   fi
 fi
 
+AC_DEFINE_UNQUOTED(NDPI_BASE_DIR, "${PWD}", [nDPI base directory])
+
 dnl> Curl
 dnl> AC_CHECK_LIB([curl], [curl_easy_perform])
 dnl> if test ${ac_cv_lib_curl_curl_easy_perform} = "no"; then
@@ -419,4 +427,5 @@ AC_SUBST(DISABLE_NPCAP)
 AC_SUBST(EXE_SUFFIX)
 AC_SUBST(NDPI_CFLAGS)
 AC_SUBST(NDPI_LDFLAGS)
+AC_SUBST(NDPI_BASE_DIR)
 AC_OUTPUT

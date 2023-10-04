@@ -32,6 +32,7 @@
     <ClCompile Include="..\src\lib\protocols\h323.c" />
     <ClCompile Include="..\src\lib\protocols\halflife2_and_mods.c" />
     <ClCompile Include="..\src\lib\protocols\http.c" />
+    <ClCompile Include="..\src\lib\protocols\http2.c" />
     <ClCompile Include="..\src\lib\protocols\iax.c" />
     <ClCompile Include="..\src\lib\protocols\icecast.c" />
     <ClCompile Include="..\src\lib\protocols\ipp.c" />
@@ -120,9 +121,14 @@
     <ClCompile Include="..\src\lib\ndpi_community_id.c" />
     <ClCompile Include="..\src\lib\ndpi_geoip.c" />
     <ClCompile Include="..\src\lib\ndpi_main.c" />
+    <ClCompile Include="..\src\lib\ndpi_filter.c" />
     <ClCompile Include="..\src\lib\ndpi_memory.c" />
     <ClCompile Include="..\src\lib\ndpi_serializer.c" />
     <ClCompile Include="..\src\lib\ndpi_utils.c" />
+    <ClCompile Include="..\src\lib\ndpi_binary_bitmap.c" />
+    <ClCompile Include="..\src\lib\ndpi_hash.c" />
+    <ClCompile Include="..\src\lib\ndpi_domain_classify.c" />
+    <ClCompile Include="..\src\lib\ndpi_bitmap64.c" />
     <ClCompile Include="..\src\lib\protocols\ajp.c" />
     <ClCompile Include="..\src\lib\protocols\amazon_video.c" />
     <ClCompile Include="..\src\lib\protocols\among_us.c" />
@@ -202,6 +208,12 @@
     <ClCompile Include="..\src\lib\third_party\src\strptime.c">
       <Filter>third_party</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\lib\third_party\src\hll\MurmurHash3.c" />
+      <Filter>third_party</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lib\third_party\src\hll\hll.c" />
+      <Filter>third_party</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\lib\protocols\tocaboca.c" />
     <ClCompile Include="..\src\lib\protocols\raknet.c" />
     <ClCompile Include="..\src\lib\protocols\sd_rtn.c" />
@@ -238,6 +250,7 @@
     <ClInclude Include="..\src\include\ndpi_win32.h" />
     <ClInclude Include="arpa\inet.h" />
     <ClInclude Include="src\getopt.h" />
+    <ClInclude Include="src\dirent.h" />
     <ClInclude Include="..\src\include\ndpi_encryption.h" />
     <ClInclude Include="..\src\include\ndpi_main.h" />
     <ClInclude Include="..\src\include\ndpi_utils.h" />

@@ -40,6 +40,7 @@
 #else
 #include <unistd.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 #endif
 
 #include "reader_util.h"
@@ -436,7 +437,7 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
     }
     proto = ndpi_get_proto_id(module, n);
     if(proto == NDPI_PROTOCOL_UNKNOWN && strcmp(n,"unknown") && strcmp(n,"0")) {
-      fprintf(stderr,"Invalid protocol %s\n",n);
+      LOG(NDPI_LOG_ERROR, "Invalid protocol %s\n", n);
       ndpi_exit_detection_module(module);
       return 1;
     }
@@ -469,14 +470,14 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
 
   if(module == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");
-    exit(-1);
+    return NULL;
   }
 
   workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
   if(workflow == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");
-    ndpi_free(module);
-    exit(-1);
+    ndpi_exit_detection_module(module);
+    return NULL;
   }
 
   workflow->pcap_handle = pcap_handle;
@@ -489,8 +490,11 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
 
   if(_debug_protocols != NULL && ! _debug_protocols_ok) {
     NDPI_BITMASK_RESET(debug_bitmask);
-    if(parse_proto_name_list(_debug_protocols, &debug_bitmask, 0))
-      exit(-1);
+    if(parse_proto_name_list(_debug_protocols, &debug_bitmask, 0)) {
+      ndpi_exit_detection_module(module);
+      ndpi_free(workflow);
+      return NULL;
+    }
     _debug_protocols_ok = 1;
   }
   if(_debug_protocols_ok)
@@ -1143,9 +1147,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   ndpi_snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
 		flow->ndpi_flow->host_server_name);
 
-  ndpi_snprintf(flow->flow_extra_info, sizeof(flow->flow_extra_info), "%s",
-		flow->ndpi_flow->flow_extra_info);
-
+  if(is_ndpi_proto(flow, NDPI_PROTOCOL_MINING)) {
+    ndpi_snprintf(flow->mining.currency, sizeof(flow->mining.currency), "%s",
+		  flow->ndpi_flow->protos.mining.currency);
+  }
+  
   flow->risk = flow->ndpi_flow->risk;
 
   if(is_ndpi_proto(flow, NDPI_PROTOCOL_DHCP)) {

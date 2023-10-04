@@ -26,6 +26,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
+  gcry_control(fuzzed_data.ConsumeIntegralInRange(0, 2),
+               fuzzed_data.ConsumeIntegralInRange(0, 1));
+
   /* MD */
 
   if(fuzzed_data.ConsumeBool())
@@ -73,19 +76,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if (!enc_out)
     return 0;
 
+  h = NULL;
   rc = gcry_cipher_open(&h, algo, mode, flags);
-  if (rc == 0) {
-    rc = gcry_cipher_setkey(h, key2.data(), key2.size());
-    if (rc == 0) {
-      if(fuzzed_data.ConsumeBool()) { /* To trigger MBEDTLS_ERR_CIPHER_BAD_KEY */
-        rc = gcry_cipher_setkey(h, key2.data(), key2.size());
-      } else {
-        rc = gcry_cipher_encrypt(h, enc_out, src.size(), src.data(), src.size());
-      }
-    }
-    gcry_cipher_ctl(h, 0, NULL, 0);
-    gcry_cipher_close(h);
-  }
+  gpg_strerror_r(rc, buf_err, sizeof(buf_err));
+  if(fuzzed_data.ConsumeBool())
+    gcry_cipher_setkey(h, key2.data(), key2.size());
+  if(fuzzed_data.ConsumeBool()) /* To trigger MBEDTLS_ERR_CIPHER_BAD_KEY */
+    gcry_cipher_setkey(h, key2.data(), key2.size());
+  rc = gcry_cipher_decrypt(h, enc_out, src.size(), src.data(), src.size());
+  gpg_strerror_r(rc, buf_err, sizeof(buf_err));
+  rc = gcry_cipher_encrypt(h, enc_out, src.size(), src.data(), src.size());
+  gcry_cipher_ctl(h, 0, NULL, 0);
+  gcry_cipher_close(h);
+
   gpg_strerror_r(rc, buf_err, sizeof(buf_err));
 
   /* GCM */
@@ -97,25 +100,29 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   auth_len = fuzzed_data.ConsumeIntegralInRange(0, 257); /* 257 is an invalid value */
   std::vector<u_int8_t>auth = fuzzed_data.ConsumeBytes<u_int8_t>(auth_len);
 
+  h = NULL;
   rc = gcry_cipher_open(&h, algo, mode, flags);
-  if (rc == 0) {
+  gpg_strerror_r(rc, buf_err, sizeof(buf_err));
+  if(fuzzed_data.ConsumeBool()) {
     rc = gcry_cipher_setkey(h, key2.data(), key2.size());
-    if (rc == 0) {
-      gcry_cipher_reset(h);
-      rc = gcry_cipher_setiv(h, iv.data(), iv.size());
-      if (rc == 0) {
-        if(fuzzed_data.ConsumeBool()) { /* To trigger MBEDTLS_ERR_CIPHER_BAD_KEY */
-          rc = gcry_cipher_setiv(h, iv.data(), iv.size());
-        } else {
-          rc = gcry_cipher_authenticate(h, auth.data(), auth.size());
-          if (rc == 0) {
-            rc =  gcry_cipher_decrypt(h, enc_out, src.size(), src.data(), src.size());
-          }
-        }
-      }
-    }
-    gcry_cipher_close(h);
+    gpg_strerror_r(rc, buf_err, sizeof(buf_err));
   }
+  if(fuzzed_data.ConsumeBool())
+    gcry_cipher_reset(h);
+  rc = gcry_cipher_setiv(h, iv.data(), iv.size());
+  gpg_strerror_r(rc, buf_err, sizeof(buf_err));
+  if(fuzzed_data.ConsumeBool()) { /* To trigger MBEDTLS_ERR_CIPHER_BAD_KEY */
+    rc = gcry_cipher_setiv(h, iv.data(), iv.size());
+  } else {
+    rc = gcry_cipher_authenticate(h, auth.data(), auth.size());
+    if (rc == 0) {
+      rc = gcry_cipher_encrypt(h, enc_out, src.size(), src.data(), src.size());
+      gpg_strerror_r(rc, buf_err, sizeof(buf_err));
+      rc = gcry_cipher_decrypt(h, enc_out, src.size(), src.data(), src.size());
+    }
+  }
+  gcry_cipher_close(h);
+
   gpg_strerror_r(rc, buf_err, sizeof(buf_err));
 
   ndpi_free(enc_out);

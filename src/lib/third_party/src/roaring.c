@@ -1912,6 +1912,7 @@ int array_container_to_uint32_array(void *vout, const array_container_t *cont,
 /* Compute the number of runs */
 int32_t array_container_number_of_runs(const array_container_t *ac);
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /*
  * Print this container using printf (useful for debugging).
  */
@@ -1923,6 +1924,7 @@ void array_container_printf(const array_container_t *v);
  */
 void array_container_printf_as_uint32_array(const array_container_t *v,
                                             uint32_t base);
+#endif
 
 /**
  * Return the serialized size in bytes of a container having cardinality "card".
@@ -2631,6 +2633,7 @@ int bitset_container_to_uint32_array(uint32_t *out,
                                      const bitset_container_t *bc,
                                      uint32_t base);
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /*
  * Print this container using printf (useful for debugging).
  */
@@ -2642,6 +2645,7 @@ void bitset_container_printf(const bitset_container_t *v);
  */
 void bitset_container_printf_as_uint32_array(const bitset_container_t *v,
                                              uint32_t base);
+#endif
 
 /**
  * Return the serialized size in bytes of a container.
@@ -3154,6 +3158,7 @@ void run_container_xor(const run_container_t *src_1,
 int run_container_to_uint32_array(void *vout, const run_container_t *cont,
                                   uint32_t base);
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /*
  * Print this container using printf (useful for debugging).
  */
@@ -3165,6 +3170,7 @@ void run_container_printf(const run_container_t *v);
  */
 void run_container_printf_as_uint32_array(const run_container_t *v,
                                           uint32_t base);
+#endif
 
 /**
  * Return the serialized size in bytes of a container having "num_runs" runs.
@@ -4290,6 +4296,12 @@ int run_run_container_ixor(
 #include <stdbool.h>
 #include <stdio.h>
 
+#ifndef WIN32
+#include "ndpi_config.h"
+
+#define NDPI_REPLACE_FPRINTF
+#include "../../ndpi_replace_printf.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" { namespace roaring { namespace internal {
@@ -4696,6 +4708,7 @@ static inline int32_t container_size_in_bytes(
     return 0;  // unreached
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /**
  * print the container (useful for debugging), requires a  typecode
  */
@@ -4707,6 +4720,7 @@ void container_printf(const container_t *container, uint8_t typecode);
  */
 void container_printf_as_uint32_array(const container_t *container,
                                       uint8_t typecode, uint32_t base);
+#endif
 
 /**
  * Checks whether a container is not empty, requires a  typecode
@@ -10423,6 +10437,7 @@ int array_container_to_uint32_array(void *vout, const array_container_t *cont,
     return outpos;
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 void array_container_printf(const array_container_t *v) {
   int i;
     if (v->cardinality == 0) {
@@ -10449,6 +10464,7 @@ void array_container_printf_as_uint32_array(const array_container_t *v,
         printf(",%u", v->array[i] + base);
     }
 }
+#endif
 
 /* Compute the number of runs */
 int32_t array_container_number_of_runs(const array_container_t *ac) {
@@ -11243,6 +11259,7 @@ int bitset_container_to_uint32_array(
 #endif
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /*
  * Print this container using printf (useful for debugging).
  */
@@ -11292,6 +11309,7 @@ void bitset_container_printf_as_uint32_array(const bitset_container_t * v, uint3
 		base += 64;
 	}
 }
+#endif
 
 
 // TODO: use the fast lower bound, also
@@ -11561,6 +11579,11 @@ void container_free(container_t *c, uint8_t type) {
     }
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+void run_container_printf(const run_container_t *cont);
+void run_container_printf_as_uint32_array(const run_container_t *cont,
+                                          uint32_t base);
+
 void container_printf(const container_t *c, uint8_t type) {
     c = container_unwrap_shared(c, &type);
     switch (type) {
@@ -11600,6 +11623,7 @@ void container_printf_as_uint32_array(
             __builtin_unreachable();
     }
 }
+#endif
 
 extern inline bool container_nonzero_cardinality(
         const container_t *c, uint8_t typecode);
@@ -14901,6 +14925,7 @@ int run_container_to_uint32_array(void *vout, const run_container_t *cont,
     return outpos;
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /*
  * Print this container using printf (useful for debugging).
  */
@@ -14931,6 +14956,7 @@ void run_container_printf_as_uint32_array(const run_container_t *cont,
         uint32_t j;for ( j = 0; j <= le; ++j) printf(",%u", run_start + j);
     }
 }
+#endif
 
 int32_t run_container_write(const run_container_t *container, char *buf) {
     uint16_t cast_16 = container->n_runs;
@@ -15561,6 +15587,7 @@ void roaring_bitmap_remove_range_closed(roaring_bitmap_t *r, uint32_t min, uint3
 extern inline void roaring_bitmap_add_range(roaring_bitmap_t *r, uint64_t min, uint64_t max);
 extern inline void roaring_bitmap_remove_range(roaring_bitmap_t *r, uint64_t min, uint64_t max);
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 void roaring_bitmap_printf(const roaring_bitmap_t *r) {
     const roaring_array_t *ra = &r->high_low_container;
 
@@ -15596,6 +15623,7 @@ void roaring_bitmap_printf_describe(const roaring_bitmap_t *r) {
     }
     printf("}");
 }
+#endif
 
 typedef struct min_max_sum_s {
     uint32_t min;

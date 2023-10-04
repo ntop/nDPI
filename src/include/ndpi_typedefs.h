@@ -1,5 +1,5 @@
 /*
- * ndpi_typedefs.h
+E * ndpi_typedefs.h
  *
  * Copyright (C) 2011-23 - ntop.org
  *
@@ -25,11 +25,16 @@
 #define __NDPI_TYPEDEFS_H__
 
 #include "ndpi_define.h"
+#ifndef NDPI_CFFI_PREPROCESSING
+#include "ndpi_includes.h"
+#endif
 #include "ndpi_protocol_ids.h"
 #include "ndpi_utils.h"
 
 /* Used by both nDPI core and patricia code under third-party */
 #include "ndpi_patricia_typedefs.h"
+
+// #define USE_LEGACY_AHO_CORASICK
 
 #ifndef NDPI_CFFI_PREPROCESSING
 #ifndef u_char
@@ -43,6 +48,12 @@ typedef unsigned short u_short;
 #ifndef u_int
 typedef unsigned int u_int;
 #endif
+#endif
+
+#ifdef __APPLE__
+typedef unsigned char u_char;
+typedef unsigned short u_short;
+typedef unsigned int u_int;
 #endif
 
 /* NDPI_LOG_LEVEL */
@@ -147,7 +158,8 @@ typedef enum {
   NDPI_MINOR_ISSUES,           /* Generic packet issues (e.g. DNS with 0 TTL) */
   NDPI_TCP_ISSUES,             /* 50 */ /* TCP issues such as connection failed, probing or scan */
   NDPI_FULLY_ENCRYPTED,        /* This (unknown) session is fully encrypted */
-
+  NDPI_TLS_ALPN_SNI_MISMATCH,  /* Invalid ALPN/SNI combination */
+  
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;
@@ -622,6 +634,19 @@ struct ndpi_flow_input_info {
   unsigned char seen_flow_beginning;
 };
 
+/* Save memory limiting the key to 56 bit */
+//#define SAVE_BINARY_BITMAP_MEMORY
+
+PACK_ON
+struct ndpi_binary_bitmap_entry {
+#ifdef SAVE_BINARY_BITMAP_MEMORY
+  u_int64_t value:56, category:8;
+#else
+  u_int64_t value;
+  u_int8_t category;
+#endif
+} PACK_OFF;
+
 /* ******************* ********************* ****************** */
 /* ************************************************************ */
 
@@ -905,6 +930,10 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_LINE_CALL */
   u_int8_t line_pkts[2];
   u_int8_t line_base_cnt[2];
+
+  /* NDPI_PROTOCOL_TFTP */
+  u_int16_t tftp_data_num;
+  u_int16_t tftp_ack_num;
 };
 
 /* ************************************************** */
@@ -1099,6 +1128,9 @@ typedef enum {
     Crypto Currency e.g Bitcoin, Litecoin, Etherum ..et.
   */
   NDPI_PROTOCOL_CATEGORY_CRYPTO_CURRENCY = 106,
+
+  /* Gambling websites */
+  NDPI_PROTOCOL_CATEGORY_GAMBLING = 107,
   
   /*
     IMPORTANT
@@ -1170,6 +1202,26 @@ typedef struct ndpi_proto {
 #define NUM_CUSTOM_CATEGORIES      5
 #define CUSTOM_CATEGORY_LABEL_LEN 32
 
+typedef void ndpi_bitmap;
+typedef void ndpi_bitmap64;
+typedef void ndpi_bitmap_iterator;
+typedef void ndpi_filter;
+    
+typedef struct {
+  u_int32_t num_allocated_entries, num_used_entries;
+  struct ndpi_binary_bitmap_entry *entries;
+  bool is_compressed;
+} ndpi_binary_bitmap;
+
+#define MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS          16
+
+typedef struct {
+  struct {
+    u_int16_t class_id;
+    ndpi_bitmap64 *domains;
+  } classes[MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS];
+} ndpi_domain_classify;
+
 #ifdef NDPI_LIB_COMPILATION
 
 /* Needed to have access to HAVE_* defines */
@@ -1200,7 +1252,7 @@ struct ndpi_detection_module_struct {
   u_int64_t current_ts;
   u_int16_t max_packets_to_process;
   u_int16_t num_tls_blocks_to_follow;
-  u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, enable_load_gambling_list:1, _notused:5;
+  u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
   u_int8_t tls_certificate_expire_in_x_days;
   
   void *user_data;
@@ -1262,7 +1314,11 @@ struct ndpi_detection_module_struct {
   /* *** If you add a new Patricia tree, please update ptree_type above! *** */
 
   struct {
+#ifdef USE_LEGACY_AHO_CORASICK
     ndpi_automa hostnames, hostnames_shadow;
+#else
+    ndpi_domain_classify *sc_hostnames, *sc_hostnames_shadow;
+#endif
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
     u_int8_t categories_loaded;
   } custom_categories;
@@ -1424,9 +1480,6 @@ struct ndpi_flow_struct {
   /* Some protocols calculate the entropy. */
   float entropy;
 
-  /* Place textual flow info here */
-  char flow_extra_info[16];
-
   /* General purpose field used to save mainly hostname/SNI information.
    * In details it used for: MGCP, COLLECTD, DNS, SSDP and NETBIOS name, HTTP, MUNIN and DHCP hostname,
    * WHOIS request, TLS/QUIC server name, XIAOMI domain and STUN realm.
@@ -1505,6 +1558,10 @@ struct ndpi_flow_struct {
       char hostname[48];
       char fqdn[48];
     } softether;
+
+    struct {
+      char currency[16];
+    } mining;  
 
     struct {
       char *server_names, *advertised_alpns, *negotiated_alpn, *tls_supported_versions, *issuerDN, *subjectDN;
@@ -1761,14 +1818,13 @@ typedef enum {
     ndpi_enable_tcp_ack_payload_heuristic = (1 << 17),
     ndpi_dont_load_crawlers_list = (1 << 18),
     ndpi_dont_load_protonvpn_list = (1 << 19),
-    ndpi_dont_load_gambling_list = (1 << 20),
     /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
        the payload is encrypted in an attempt to “look like nothing”.
        This heuristic only analyzes the first packet of the flow.
        See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
-    ndpi_disable_fully_encrypted_heuristic = (1 << 21),
-    ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 22),
-    ndpi_dont_load_mullvad_list = (1 << 23),
+    ndpi_disable_fully_encrypted_heuristic = (1 << 20),
+    ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 21),
+    ndpi_dont_load_mullvad_list = (1 << 22),
   } ndpi_prefs;
 
 typedef struct {
@@ -2014,11 +2070,6 @@ struct ndpi_des_struct {
 
 /* Prototype used to define custom DGA detection function */
 typedef int (*ndpi_custom_dga_predict_fctn)(const char* domain, int domain_length);
-
-/* **************************************** */
-
-typedef void ndpi_bitmap;
-typedef void ndpi_bitmap_iterator;
 
 /* **************************************** */
 

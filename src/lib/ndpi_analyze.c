@@ -30,6 +30,9 @@
 #include <float.h> /* FLT_EPSILON */
 #include "ndpi_api.h"
 #include "ndpi_config.h"
+#include "third_party/include/hll.h"
+
+#include "ndpi_replace_printf.h"
 
 /* ********************************************************************************* */
 
@@ -297,9 +300,6 @@ const char* ndpi_data_ratio2str(float ratio) {
 
 /* ********************************************************************************* */
 /* ********************************************************************************* */
-
-#include "third_party/src/hll/hll.c"
-#include "third_party/src/hll/MurmurHash3.c"
 
 int ndpi_hll_init(struct ndpi_hll *hll, u_int8_t bits) {
   return(hll_init(hll, bits));
@@ -728,6 +728,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
   float *bin_score;
   u_int16_t num_cluster_elems[MAX_NUM_CLUSTERS] = { 0 };
 
+  (void)out_buf;
   srand(time(NULL));
 
   if(!bins || num_bins == 0 || !cluster_ids || num_clusters == 0)
