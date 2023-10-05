@@ -47,6 +47,8 @@
 #ifndef WIN32
 #include <unistd.h>
 #include <dirent.h>
+#else
+#include "dirent.h"
 #endif
 
 #ifndef TH_FIN
