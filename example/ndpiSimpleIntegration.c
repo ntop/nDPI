@@ -1137,7 +1137,7 @@ static void sighandler(int signum)
 int main(int argc, char ** argv)
 {
   if (argc == 0) {
-    printf("usage: ndpiSimpleIntegration Mdevice name>\n");
+    printf("usage: ndpiSimpleIntegration <device name>\n");
     return 1;
   }
   
