@@ -2709,7 +2709,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 			     i, lru_cache_ttls[i]);
   }
 
-  /* Set aggressiviness here */
+  /* Set aggressiveness here */
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
     if(aggressiveness[i] != -1)
       ndpi_set_protocol_aggressiveness(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, aggressiveness[i]);
