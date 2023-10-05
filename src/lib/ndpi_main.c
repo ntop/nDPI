@@ -48,7 +48,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #else
-#include "dirent.h"
+#include "third_party/include/windows/dirent.h"
 #endif
 
 #ifndef TH_FIN
