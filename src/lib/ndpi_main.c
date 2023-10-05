@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
-#include <dirent.h>
 
 #ifdef __APPLE__
 #include <netinet/ip.h>
@@ -47,6 +46,7 @@
 
 #ifndef WIN32
 #include <unistd.h>
+#include <dirent.h>
 #endif
 
 #ifndef TH_FIN
