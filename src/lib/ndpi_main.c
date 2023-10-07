@@ -1031,13 +1031,6 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
     ndpi_str->skip_tls_blocks_until_change_cipher = 1;
     break;
 
-  case ndpi_pref_max_packets_to_process:
-    if(value > 0xFFFF) {
-      return(-1);
-    }
-    ndpi_str->max_packets_to_process = value;
-    break;
-
   default:
     return(-1);
   }
@@ -2895,8 +2888,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->cfg.sha1_fingerprint_enabled = 1;
   ndpi_str->cfg.ja3_plus_enabled = 0;
 
-
-  ndpi_str->max_packets_to_process = NDPI_DEFAULT_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT;
+  ndpi_str->cfg.max_packets_to_process = NDPI_DEFAULT_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT;
 
   NDPI_BITMASK_SET_ALL(ndpi_str->detection_bitmask);
   ndpi_str->user_data = NULL;
@@ -7292,7 +7284,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     return(ret);
   }
 
-  if(ndpi_str->max_packets_to_process > 0 && flow->num_processed_pkts >= ndpi_str->max_packets_to_process) {
+  if(ndpi_str->cfg.max_packets_to_process > 0 && flow->num_processed_pkts >= ndpi_str->cfg.max_packets_to_process) {
     flow->extra_packets_func = NULL; /* To allow ndpi_extra_dissection_possible() to fail */
     flow->fail_with_unknown = 1;
     return(ret); /* Avoid spending too much time with this flow */
@@ -10320,6 +10312,29 @@ static int _set_cfg_enable_disable(void *_variable, const char *value)
   return -1;
 }
 
+static int _set_cfg_int(void *_variable, const char *value)
+{
+  int *variable = (int *)_variable;
+  char *endptr;
+  long val;
+
+  errno = 0;    /* To distinguish success/failure after call */
+  val = strtol(value, &endptr, 10);
+
+  /* Check for various possible errors */
+  if((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) ||
+     (errno != 0 && val == 0)) {
+    return -1;
+  }
+  if (endptr == value) {
+    /* No digits were found */
+    return -1;
+  }
+  /* If we got here, strtol() successfully parsed a number */
+  *variable = val;
+  return 0;
+}
+
 typedef int (*cfg_fn)(void *variable, const char *value);
 
 int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
@@ -10359,6 +10374,8 @@ int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
     { NULL,            "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", _set_cfg_enable_disable, &ndpi_str->cfg.risk_anonymous_subscriber_list_icloudprivaterelay_enabled },
     { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          _set_cfg_enable_disable, &ndpi_str->cfg.risk_anonymous_subscriber_list_protonvpn_enabled },
     { NULL,            "flow_risk.crawler_bot.list.load",                             _set_cfg_enable_disable, &ndpi_str->cfg.risk_crawler_bot_list_enabled },
+    /* An example of integer configuration */
+    { NULL,            "packets_limit_per_flow",                                      _set_cfg_int,            &ndpi_str->cfg.max_packets_to_process },
 
     { NULL, NULL, NULL, NULL },
   };

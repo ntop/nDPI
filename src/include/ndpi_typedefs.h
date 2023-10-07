@@ -1153,7 +1153,6 @@ typedef enum {
 
 typedef enum {
    ndpi_pref_direction_detect_disable = 0,
-   ndpi_pref_max_packets_to_process,
    ndpi_pref_enable_tls_block_dissection, /* nDPI considers only those blocks past the certificate exchange */
 } ndpi_detection_preference;
 
@@ -1269,6 +1268,8 @@ struct ndpi_detection_module_config_struct {
   char risk_anonymous_subscriber_list_protonvpn_enabled;
   char risk_crawler_bot_list_enabled;
 
+  int max_packets_to_process;
+
   /* TLS */
   char sha1_fingerprint_enabled;
   char ja3_plus_enabled;
@@ -1278,7 +1279,6 @@ struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
 
   u_int64_t current_ts;
-  u_int16_t max_packets_to_process;
   u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
   u_int8_t tls_certificate_expire_in_x_days;

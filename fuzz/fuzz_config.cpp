@@ -102,9 +102,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool())
     ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_enable_tls_block_dissection,
                                    0 /* unused */);
+  /* TODO */
+#if 0
   if(fuzzed_data.ConsumeBool())
     ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_max_packets_to_process,
                                    fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)));
+#endif
 
   ndpi_set_detection_preferences(ndpi_info_mod, static_cast<ndpi_detection_preference>(0xFF), 0xFF); /* Invalid preference */
 

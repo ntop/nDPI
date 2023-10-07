@@ -967,28 +967,33 @@ static int parse_two_unsigned_integer(char *param, u_int32_t *num1, u_int32_t *n
 
 static int parse_three_strings(char *param, char **s1, char **s2, char **s3)
 {
-  char *saveptr, *tmp_str, *s1_str, *s2_str, *s3_str;
+  char *saveptr, *tmp_str, *s1_str, *s2_str = NULL, *s3_str;
 
   tmp_str = ndpi_strdup(param);
   if(tmp_str) {
-    s1_str = strtok_r(tmp_str, ",", &saveptr);
-    if(s1_str) {
-      s2_str = strtok_r(NULL, ",", &saveptr);
-      if(s2_str) {
-        s3_str = strtok_r(NULL, ",", &saveptr);
-        if(s3_str) {
-          *s1 = ndpi_strdup(s1_str);
-          *s2 = ndpi_strdup(s2_str);
-          *s3 = ndpi_strdup(s3_str);
-          ndpi_free(tmp_str);
-          if(!s1 || !s2 || !s3) {
-            ndpi_free(s1);
-            ndpi_free(s2);
-            ndpi_free(s3);
-            return -1;
-          }
-          return 0;
+    if(param[0] == ',') { /* First parameter might be missing */
+      s1_str = NULL;
+      s2_str = strtok_r(tmp_str, ",", &saveptr);
+    } else {
+      s1_str = strtok_r(tmp_str, ",", &saveptr);
+      if(s1_str) {
+        s2_str = strtok_r(NULL, ",", &saveptr);
+      }
+    }
+    if(s2_str) {
+      s3_str = strtok_r(NULL, ",", &saveptr);
+      if(s3_str) {
+        *s1 = ndpi_strdup(s1_str);
+        *s2 = ndpi_strdup(s2_str);
+        *s3 = ndpi_strdup(s3_str);
+        ndpi_free(tmp_str);
+        if(!s1 || !s2 || !s3) {
+          ndpi_free(s1);
+          ndpi_free(s2);
+          ndpi_free(s3);
+          return -1;
         }
+        return 0;
       }
     }
   }
