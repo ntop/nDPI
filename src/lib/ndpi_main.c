@@ -10348,6 +10348,7 @@ int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
     { "protonvpn",     "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_protonvpn_enabled },
     { "tor",           "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_tor_enabled },
     { "tls",           "ja3_plus.enable",                         _set_cfg_enable_disable, &ndpi_str->cfg.ja3_plus_enabled },
+    /* An example of metadata configuration (yes/no) */
     { "tls",           "metadata.sha1_fingerprint.enable",        _set_cfg_enable_disable, &ndpi_str->cfg.sha1_fingerprint_enabled },
     { "whatsapp",      "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_whatsapp_enabled },
     { "zoom",          "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_zoom_enabled },
