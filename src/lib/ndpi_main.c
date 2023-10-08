@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <stddef.h>
 
 #ifdef __APPLE__
 #include <netinet/ip.h>
@@ -234,6 +235,8 @@ static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_s
 static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str);
 static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndpi_str,
 	  const NDPI_PROTOCOL_BITMASK *dbm, int count_only);
+
+static void set_default_config(struct ndpi_detection_module_config_struct *cfg);
 
 /* ****************************************** */
 
@@ -2865,30 +2868,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     ndpi_str->ip_risk_ptree = ndpi_patricia_new(32 /* IPv4 */);
   }
 
-  ndpi_str->cfg.ip_list_amazonaws_enabled = 1;
-  ndpi_str->cfg.ip_list_azure_enabled = 1;
-  ndpi_str->cfg.ip_list_cachefly_enabled = 1;
-  ndpi_str->cfg.ip_list_cloudflare_enabled = 1;
-  ndpi_str->cfg.ip_list_google_enabled = 1;
-  ndpi_str->cfg.ip_list_googlecloud_enabled = 1;
-  ndpi_str->cfg.ip_list_microsoft_enabled = 1;
-  ndpi_str->cfg.ip_list_mining_enabled = 1;
-  ndpi_str->cfg.ip_list_mullvad_enabled = 1;
-  ndpi_str->cfg.ip_list_protonvpn_enabled = 1;
-  ndpi_str->cfg.ip_list_tor_enabled = 1;
-  ndpi_str->cfg.ip_list_whatsapp_enabled = 1;
-  ndpi_str->cfg.ip_list_zoom_enabled = 1;
-
-  ndpi_str->cfg.asn_lists_enabled = 1;
-
-  ndpi_str->cfg.risk_anonymous_subscriber_list_icloudprivaterelay_enabled = 1;
-  ndpi_str->cfg.risk_anonymous_subscriber_list_protonvpn_enabled = 1;
-  ndpi_str->cfg.risk_crawler_bot_list_enabled = 1;
-
-  ndpi_str->cfg.sha1_fingerprint_enabled = 1;
-  ndpi_str->cfg.ja3_plus_enabled = 0;
-
-  ndpi_str->cfg.max_packets_to_process = NDPI_DEFAULT_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT;
+  set_default_config(&ndpi_str->cfg);
 
   NDPI_BITMASK_SET_ALL(ndpi_str->detection_bitmask);
   ndpi_str->user_data = NULL;
@@ -10297,22 +10277,24 @@ void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
 
 /* ******************************************************************** */
 
-static int _set_cfg_enable_disable(void *_variable, const char *value)
+static int _set_param_enable_disable(void *_variable, const char *value)
 {
-  char *variable = (char *)_variable;
+  int *variable = (int *)_variable;
 
-  if(strcmp(value, "1") == 0) {
+  if(strcmp(value, "1") == 0 ||
+     strcmp(value, "enable") == 0) {
     *variable = 1;
     return 0;
   }
-  if(strcmp(value, "0") == 0) {
+  if(strcmp(value, "0") == 0 ||
+     strcmp(value, "disable") == 0) {
     *variable = 0;
     return 0;
   }
   return -1;
 }
 
-static int _set_cfg_int(void *_variable, const char *value)
+static int _set_param_int(void *_variable, const char *value)
 {
   int *variable = (int *)_variable;
   char *endptr;
@@ -10335,60 +10317,155 @@ static int _set_cfg_int(void *_variable, const char *value)
   return 0;
 }
 
+/* It can be used for CFG_PARAM_ENABLE_DISABLE parameters, too */
+static char *_get_param_int(void *_variable, char *buf, int buf_len)
+{
+  int *variable = (int *)_variable;
+
+  snprintf(buf, buf_len, "%d", *variable);
+  buf[buf_len - 1] = '\0';
+  return buf;
+}
+
+
 typedef int (*cfg_fn)(void *variable, const char *value);
+
+enum cfg_param_type {
+  CFG_PARAM_ENABLE_DISABLE = 0,
+  CFG_PARAM_INT            = 1,
+};
+
+#define __OFF(a)	offsetof(struct ndpi_detection_module_config_struct, a)
+
+static const struct cfg_param {
+  char *proto;
+  char *param;
+  char *default_value;
+  enum cfg_param_type type;
+  int offset;
+} cfg_params[] = {
+  /* Per-protocol parameters */
+
+  { "amazonaws",     "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_amazonaws_enabled) },
+  { "azure",         "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_azure_enabled) },
+  { "cachefly",      "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_cachefly_enabled) },
+  { "cloudflare",    "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_cloudflare_enabled) },
+  { "google",        "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_google_enabled) },
+  { "googlecloud",   "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_googlecloud_enabled) },
+  { "microsoft",     "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_microsoft_enabled) },
+  { "mining",        "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_mining_enabled) },
+  { "mullvad",       "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_mullvad_enabled) },
+  { "protonvpn",     "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_protonvpn_enabled) },
+  { "tor",           "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_tor_enabled) },
+  { "tls",           "ja3_plus.enable",                         "0", CFG_PARAM_ENABLE_DISABLE, __OFF(ja3_plus_enabled) },
+  /* An example of metadata configuration (yes/no) */
+  { "tls",           "metadata.sha1_fingerprint.enable",        "1", CFG_PARAM_ENABLE_DISABLE, __OFF(sha1_fingerprint_enabled) },
+  { "whatsapp",      "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_whatsapp_enabled) },
+  { "zoom",          "ip_list.load",                            "1", CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_zoom_enabled) },
+
+  /* Global parameters */
+
+  { NULL,            "asn_lists.load",                                              "1",  CFG_PARAM_ENABLE_DISABLE, __OFF(asn_lists_enabled) },
+  { NULL,            "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", "1",  CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_icloudprivaterelay_enabled) },
+  { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          "1",  CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_protonvpn_enabled) },
+  { NULL,            "flow_risk.crawler_bot.list.load",                             "1",  CFG_PARAM_ENABLE_DISABLE, __OFF(risk_crawler_bot_list_enabled) },
+  /* An example of integer configuration */
+  { NULL,            "packets_limit_per_flow",                                      "32", CFG_PARAM_INT,            __OFF(max_packets_to_process) },
+
+  { NULL, NULL, NULL, 0, -1 },
+};
+
+#undef __OFF
+
+static void set_default_config(struct ndpi_detection_module_config_struct *cfg)
+{
+  const struct cfg_param *c;
+
+  for(c = &cfg_params[0]; c && c->param; c++) {
+    switch(c->type) {
+    case CFG_PARAM_ENABLE_DISABLE:
+      _set_param_enable_disable((void *)((char *)cfg + c->offset), c->default_value);
+      break;
+    case CFG_PARAM_INT:
+      _set_param_int((void *)((char *)cfg + c->offset), c->default_value);
+      break;
+    }
+  }
+}
 
 int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
 		    const char *proto, const char *param, const char *value)
 {
+  const struct cfg_param *c;
+
   if(!ndpi_str || !param || !value)
     return -2;
 
-  struct cfgs {
-    char *proto;
-    char *param;
-    cfg_fn fn;
-    void *variable;
-  } cfgs[] = {
-    /* Per-protocol */
+  NDPI_LOG_ERR(ndpi_str, "Set [%s][%s][%s]\n", proto, param, value);
 
-    { "amazonaws",     "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_amazonaws_enabled },
-    { "azure",         "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_azure_enabled },
-    { "cachefly",      "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_cachefly_enabled },
-    { "cloudflare",    "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_cloudflare_enabled },
-    { "google",        "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_google_enabled },
-    { "googlecloud",   "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_googlecloud_enabled },
-    { "microsoft",     "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_microsoft_enabled },
-    { "mining",        "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_mining_enabled },
-    { "mullvad",       "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_mullvad_enabled },
-    { "protonvpn",     "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_protonvpn_enabled },
-    { "tor",           "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_tor_enabled },
-    { "tls",           "ja3_plus.enable",                         _set_cfg_enable_disable, &ndpi_str->cfg.ja3_plus_enabled },
-    /* An example of metadata configuration (yes/no) */
-    { "tls",           "metadata.sha1_fingerprint.enable",        _set_cfg_enable_disable, &ndpi_str->cfg.sha1_fingerprint_enabled },
-    { "whatsapp",      "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_whatsapp_enabled },
-    { "zoom",          "ip_list.load",                            _set_cfg_enable_disable, &ndpi_str->cfg.ip_list_zoom_enabled },
-
-    /* Global */
-
-    { NULL,            "asn_lists.load",                                              _set_cfg_enable_disable, &ndpi_str->cfg.asn_lists_enabled },
-    { NULL,            "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", _set_cfg_enable_disable, &ndpi_str->cfg.risk_anonymous_subscriber_list_icloudprivaterelay_enabled },
-    { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          _set_cfg_enable_disable, &ndpi_str->cfg.risk_anonymous_subscriber_list_protonvpn_enabled },
-    { NULL,            "flow_risk.crawler_bot.list.load",                             _set_cfg_enable_disable, &ndpi_str->cfg.risk_crawler_bot_list_enabled },
-    /* An example of integer configuration */
-    { NULL,            "packets_limit_per_flow",                                      _set_cfg_int,            &ndpi_str->cfg.max_packets_to_process },
-
-    { NULL, NULL, NULL, NULL },
-  };
-  const struct cfgs *c;
-
-  NDPI_LOG_ERR(ndpi_str, "[%s][%s][%s]\n", proto, param, value);
-
-  for(c = &cfgs[0]; c && c->param; c++) {
+  for(c = &cfg_params[0]; c && c->param; c++) {
     if(((proto == NULL && c->proto == NULL) ||
 	(proto && c->proto && strcmp(proto, c->proto) == 0)) &&
        strcmp(param, c->param) == 0) {
-      return c->fn(c->variable, value);
+
+      switch(c->type) {
+      case CFG_PARAM_ENABLE_DISABLE:
+        return _set_param_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), value);
+      case CFG_PARAM_INT:
+        return _set_param_int((void *)((char *)&ndpi_str->cfg + c->offset), value);
+      }
     }
   }
   return -3;
+}
+
+char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
+		      const char *proto, const char *param, char *buf, int buf_len)
+{
+  const struct cfg_param *c;
+
+  if(!ndpi_str || !param || !buf || buf_len <= 0)
+    return NULL;
+
+  NDPI_LOG_ERR(ndpi_str, "Get [%s][%s]\n", proto, param);
+
+  for(c = &cfg_params[0]; c && c->param; c++) {
+    if(((proto == NULL && c->proto == NULL) ||
+	(proto && c->proto && strcmp(proto, c->proto) == 0)) &&
+       strcmp(param, c->param) == 0) {
+
+      switch(c->type) {
+      case CFG_PARAM_ENABLE_DISABLE:
+      case CFG_PARAM_INT:
+        return _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), buf, buf_len);
+      }
+    }
+  }
+  return NULL;
+}
+
+char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
+		       FILE *fd)
+{
+  const struct cfg_param *c;
+  char buf[64];
+
+  if(!ndpi_str || !fd)
+    return NULL;
+
+  NDPI_LOG_ERR(ndpi_str, "Dump\n");
+
+  fprintf(fd, "Configuration:\n");
+
+  for(c = &cfg_params[0]; c && c->param; c++) {
+    switch(c->type) {
+    case CFG_PARAM_ENABLE_DISABLE:
+    case CFG_PARAM_INT:
+      fprintf(fd, " *) %s.%s: %s [%s]\n",
+              c->proto, c->param,
+              _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), buf, sizeof(buf)),
+	      c->default_value);
+    }
+  }
+  return NULL;
 }

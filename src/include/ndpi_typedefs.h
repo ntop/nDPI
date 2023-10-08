@@ -1248,31 +1248,31 @@ typedef struct {
 
 struct ndpi_detection_module_config_struct {
   /* IP lists */
-  char ip_list_amazonaws_enabled;
-  char ip_list_azure_enabled;
-  char ip_list_cachefly_enabled;
-  char ip_list_cloudflare_enabled;
-  char ip_list_google_enabled;
-  char ip_list_googlecloud_enabled;
-  char ip_list_microsoft_enabled;
-  char ip_list_mining_enabled;
-  char ip_list_mullvad_enabled;
-  char ip_list_protonvpn_enabled;
-  char ip_list_tor_enabled;
-  char ip_list_whatsapp_enabled;
-  char ip_list_zoom_enabled;
+  int ip_list_amazonaws_enabled;
+  int ip_list_azure_enabled;
+  int ip_list_cachefly_enabled;
+  int ip_list_cloudflare_enabled;
+  int ip_list_google_enabled;
+  int ip_list_googlecloud_enabled;
+  int ip_list_microsoft_enabled;
+  int ip_list_mining_enabled;
+  int ip_list_mullvad_enabled;
+  int ip_list_protonvpn_enabled;
+  int ip_list_tor_enabled;
+  int ip_list_whatsapp_enabled;
+  int ip_list_zoom_enabled;
 
-  char asn_lists_enabled;
+  int asn_lists_enabled;
 
-  char risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
-  char risk_anonymous_subscriber_list_protonvpn_enabled;
-  char risk_crawler_bot_list_enabled;
+  int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
+  int risk_anonymous_subscriber_list_protonvpn_enabled;
+  int risk_crawler_bot_list_enabled;
 
   int max_packets_to_process;
 
   /* TLS */
-  char sha1_fingerprint_enabled;
-  char ja3_plus_enabled;
+  int sha1_fingerprint_enabled;
+  int ja3_plus_enabled;
 };
 
 struct ndpi_detection_module_struct {

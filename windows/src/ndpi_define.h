@@ -152,7 +152,6 @@
 
 /* misc definitions */
 #define NDPI_DEFAULT_MAX_TCP_RETRANSMISSION_WINDOW_SIZE 0x10000
-#define NDPI_DEFAULT_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT   32
 
 /* TODO: rebuild all memory areas to have a more aligned memory block here */
 
