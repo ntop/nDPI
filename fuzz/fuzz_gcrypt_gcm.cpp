@@ -20,7 +20,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   int key_len, rc_e, rc_d;
   mbedtls_cipher_id_t cipher;
   unsigned char *tag;
-  int iv_len, tag_len, input_length;
+  int iv_len, tag_len, input_length, force_auth_tag_error;
 
   /* No real memory allocations involved */
 
@@ -28,6 +28,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 				     1 + 64 + /* iv */
 				     1 + /* tag_len */
 				     1 + 64 + /* input */
+				     1 + /* force_auth_tag_error */
 				     1 /* useless data: to be able to add the check with assert */)
     return -1;
 
@@ -55,6 +56,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   output = (unsigned char *)malloc(input_length);
   decrypted = (unsigned char *)malloc(input_length);
 
+  force_auth_tag_error = fuzzed_data.ConsumeBool();
+
   cipher = static_cast<mbedtls_cipher_id_t>(fuzzed_data.ConsumeIntegralInRange(0, (int)MBEDTLS_CIPHER_ID_CHACHA20));
 
   assert(fuzzed_data.remaining_bytes() > 0);
@@ -74,6 +77,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 				     output,
 				     tag_len, tag);
     if(rc_e == 0) {
+      if(force_auth_tag_error && tag_len > 0 && tag[0] != 0) {
+        tag[0] = 0;
+      } else {
+        force_auth_tag_error = 0;
+      }
+
       rc_d = mbedtls_gcm_auth_decrypt(gcm_d_ctx,
 				      input.size(),
 				      iv.data(), iv.size(),
@@ -81,8 +90,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 				      tag, tag_len,
 				      output,
 				      decrypted);
-      if (rc_d == 0)
+      if(rc_d == 0)
         assert(memcmp(input.data(), decrypted, input.size()) == 0);
+      if(force_auth_tag_error)
+        assert(rc_d == MBEDTLS_ERR_GCM_AUTH_FAILED);
     }
   }
 

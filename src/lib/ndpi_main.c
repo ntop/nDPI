@@ -8777,6 +8777,7 @@ void ndpi_generate_options(u_int opt, FILE *options_out) {
 
   if (!options_out) return;
   ndpi_str = ndpi_init_detection_module(ndpi_no_prefs);
+  if (!ndpi_str) return;
 
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
@@ -8819,6 +8820,8 @@ void ndpi_generate_options(u_int opt, FILE *options_out) {
     fprintf(options_out, "%s\n", "WARNING: option -a out of range");
     break;
   }
+
+  ndpi_exit_detection_module(ndpi_str);
 }
 
 /* ****************************************************** */
@@ -9701,7 +9704,6 @@ static int ndpi_is_vowel(char c) {
   case 'y': // Not a real vowel...
   case 'x': // Not a real vowel...
     return(1);
-    break;
 
   default:
     return(0);

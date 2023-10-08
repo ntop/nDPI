@@ -626,6 +626,7 @@ distdir:
 		-o -name '*.am' \
 		-o -name '*.h' \
 		-o -name '*.cpp' \
+		-o -name '*.options' \
 		-o -name 'ipv4_addresses.txt' \
 		-o -name 'bd_param.txt' \
 		-o -name 'splt_param.txt' \

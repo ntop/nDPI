@@ -191,7 +191,13 @@ int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
     if( aes_init_done == 0 )
     {
         aes_gen_tables();
+
+        /* Allow to test both aesni and not aesni data path when fuzzing.
+           We can call aes_gen_tables() at every iteration without any issues
+           (performances asides) */
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
         aes_init_done = 1;
+#endif
     }
 
     ctx->rk = RK = ctx->buf;

@@ -51,6 +51,8 @@ ls fuzz/fuzz* | grep -v "\." | while read i; do cp $i $OUT/; done
 cp fuzz/*.dict $OUT/
 # Copy seed corpus
 cp fuzz/*.zip $OUT/
+# Copy options
+cp fuzz/*.options $OUT/
 # Copy configuration files
 cp example/protos.txt $OUT/
 cp example/categories.txt $OUT/
