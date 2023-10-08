@@ -172,7 +172,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_ndpi_num_custom_protocols(ndpi_info_mod);
   ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
 
-  ndpi_self_check_host_match(stderr);
+  ndpi_self_check_host_match(stdout);
+
+  ndpi_dump_protocols(ndpi_info_mod, stdout);
+  ndpi_generate_options(fuzzed_data.ConsumeIntegralInRange(0, 4), stdout);
+  ndpi_dump_risks_score(stdout);
 
   /* Basic code to try testing this "config" */
   bool_value = fuzzed_data.ConsumeBool();
