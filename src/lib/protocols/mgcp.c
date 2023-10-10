@@ -1,7 +1,7 @@
 /*
  * mgcp.c
  *
- * Copyright (C) 2017-22 - ntop.org
+ * Copyright (C) 2017-23 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -50,7 +50,9 @@ static void ndpi_search_mgcp(struct ndpi_detection_module_struct *ndpi_struct, s
     if (packet->payload_packet_len < 8) break;
 
     /* packet must end with 0x0d0a or with 0x0a */
-    if (packet->payload[packet->payload_packet_len - 1] != 0x0a) break;
+    if (packet->payload[packet->payload_packet_len - 1] != 0x0a &&
+        packet->payload[packet->payload_packet_len - 1] != 0x0d)
+      break;
 
     if (packet->payload[0] != 'A' && packet->payload[0] != 'C' && packet->payload[0] != 'D' &&
         packet->payload[0] != 'E' && packet->payload[0] != 'M' && packet->payload[0] != 'N' &&
