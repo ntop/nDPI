@@ -1512,10 +1512,10 @@ int ndpi_serialize_string_int32(ndpi_serializer *_serializer,
     }
 
     ndpi_serialize_csv_pre(serializer);
-    needed--;
+    /* needed--; */
 
     rc = ndpi_snprintf((char*)&serializer->buffer.data[serializer->status.buffer.size_used],
-    needed, "%u", value);
+		       needed, "%u", value);
 
     if(rc < 0 || (u_int)rc >= buff_diff)
       return(-1);
