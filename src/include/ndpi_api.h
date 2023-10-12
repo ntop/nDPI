@@ -1026,6 +1026,7 @@ extern "C" {
   void* ndpi_find_ipv4_category_userdata(struct ndpi_detection_module_struct *ndpi_str,
 					 u_int32_t saddr);
   int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
+				     struct ndpi_flow_struct *flow,
 				     u_int32_t saddr,
 				     u_int32_t daddr,
 				     ndpi_protocol *ret);

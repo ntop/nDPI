@@ -322,3 +322,9 @@ Flow with Unknown protocol containing encrypted traffic.
 NDPI_TLS_ALPN_SNI_MISMATCH
 =========================
 Invalid TLS ALPN/SNI mismatch. For instance ALPN advertises the flow as h2 (HTTP/2.0) and no SNI is reported.
+
+.. _Risk 053
+
+NDPI_MALWARE_CONTACTED
+======================
+Client contacted a server host labelled as malware.

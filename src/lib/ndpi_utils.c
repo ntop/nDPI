@@ -2061,6 +2061,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("ALPN/SNI Mismatch");
     break;
     
+  case NDPI_MALWARE_HOST_CONTACTED:
+    return("Client contacted a malware host");
+    break;
+    
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
