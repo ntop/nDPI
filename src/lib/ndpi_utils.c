@@ -2059,7 +2059,6 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_TLS_ALPN_SNI_MISMATCH:
     return("ALPN/SNI Mismatch");
-    break;
     
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);

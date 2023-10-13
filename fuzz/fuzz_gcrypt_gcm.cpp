@@ -37,7 +37,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   aes_e_ctx = (mbedtls_aes_context *)malloc(sizeof(mbedtls_aes_context));
   aes_d_ctx = (mbedtls_aes_context *)malloc(sizeof(mbedtls_aes_context));
 
-  /* Not sure if it is really necessary... */
   force_no_aesni = 0;
   if(fuzzed_data.ConsumeBool())
     force_no_aesni = 1;

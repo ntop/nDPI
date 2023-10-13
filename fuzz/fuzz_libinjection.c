@@ -5,6 +5,7 @@
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct libinjection_sqli_state state;
+  char fingerprint[8];
 
   /* No memory allocations involved */
 
@@ -20,6 +21,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   libinjection_is_sqli(&state);
   libinjection_sqli_init(&state, (char *)data, size, FLAG_QUOTE_DOUBLE | FLAG_SQL_MYSQL);
   libinjection_is_sqli(&state);
+
+  libinjection_sqli((char *)data, size, fingerprint);
 
   libinjection_xss((char *)data, size);
 
