@@ -80,6 +80,7 @@
 /fuzz/fuzz_gcrypt_light
 /fuzz/fuzz_gcrypt_aes
 /fuzz/fuzz_gcrypt_gcm
+/fuzz/fuzz_gcrypt_cipher
 /fuzz/fuzz_ndpi_reader_payload_analyzer
 /fuzz/fuzz_filecfg_protocols
 /fuzz/fuzz_readerutils_workflow

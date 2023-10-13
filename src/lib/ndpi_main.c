@@ -5881,7 +5881,7 @@ static int fully_enc_heuristic(struct ndpi_detection_module_struct *ndpi_str,
         cnt += 1;
         cnt_consecutives += 1;
         if(cnt_consecutives >= 20) { /* Ex4 */
-          return 0;;
+          return 0;
         }
       } else {
         cnt_consecutives = 0;

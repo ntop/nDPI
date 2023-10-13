@@ -2059,7 +2059,6 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_TLS_ALPN_SNI_MISMATCH:
     return("ALPN/SNI Mismatch");
-    break;
     
   case NDPI_MALWARE_HOST_CONTACTED:
     return("Client contacted a malware host");

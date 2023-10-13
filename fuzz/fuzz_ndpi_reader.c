@@ -141,7 +141,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   ndpi_free(workflow->ndpi_flows_root);
   /* Free payload analyzer data, without printing */
   if(enable_payload_analyzer)
-    ndpi_report_payload_stats(NULL);
+    ndpi_report_payload_stats(stdout);
 
 #ifdef ENABLE_PAYLOAD_ANALYZER
   ndpi_update_params(SPLT_PARAM_TYPE, "splt_param.txt");
