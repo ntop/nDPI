@@ -4298,6 +4298,7 @@ int run_run_container_ixor(
 
 #ifndef WIN32
 #include "ndpi_config.h"
+#include "ndpi_typedefs.h"
 
 #define NDPI_REPLACE_FPRINTF
 #include "../../ndpi_replace_printf.h"
