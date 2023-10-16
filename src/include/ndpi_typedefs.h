@@ -144,7 +144,7 @@ typedef enum {
   NDPI_DNS_LARGE_PACKET,
   NDPI_DNS_FRAGMENTED,
   NDPI_INVALID_CHARACTERS,
-  NDPI_POSSIBLE_EXPLOIT, /* Log4J, Wordpress and other exploits */
+  NDPI_POSSIBLE_EXPLOIT, /* 40 */ /* Log4J, Wordpress and other exploits */
   NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE,
   NDPI_PUNYCODE_IDN, /* https://en.wikipedia.org/wiki/Punycode */
   NDPI_ERROR_CODE_DETECTED,
