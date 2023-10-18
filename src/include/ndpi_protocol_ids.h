@@ -379,6 +379,7 @@ typedef enum {
   NDPI_PROTOCOL_MULLVAD               = 348,
   NDPI_PROTOCOL_HTTP2                 = 349,
   NDPI_PROTOCOL_HAPROXY               = 350,
+  NDPI_PROTOCOL_RMCP                  = 351,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
