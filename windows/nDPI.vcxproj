@@ -281,6 +281,7 @@
     <ClCompile Include="..\src\lib\protocols\radius.c" />
     <ClCompile Include="..\src\lib\protocols\rdp.c" />
     <ClCompile Include="..\src\lib\protocols\redis_net.c" />
+    <ClCompile Include="..\src\lib\protocols\rmcp.c" />
     <ClCompile Include="..\src\lib\protocols\rsync.c" />
     <ClCompile Include="..\src\lib\protocols\rtcp.c" />
     <ClCompile Include="..\src\lib\protocols\rtmp.c" />
