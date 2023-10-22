@@ -149,6 +149,7 @@
     <ClCompile Include="..\src\lib\protocols\bacnet.c" />
     <ClCompile Include="..\src\lib\protocols\bitcoin.c" />
     <ClCompile Include="..\src\lib\protocols\bjnp.c" />
+    <ClCompile Include="..\src\lib\protocols\can.c" />
     <ClCompile Include="..\src\lib\protocols\capwap.c" />
     <ClCompile Include="..\src\lib\protocols\cassandra.c" />
     <ClCompile Include="..\src\lib\protocols\checkmk.c" />
