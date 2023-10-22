@@ -27,6 +27,7 @@
 
 #include "ndpi_api.h"
 
+PACK_ON
 struct rmcp_header {
   uint8_t version;
   uint8_t reserved;
@@ -40,7 +41,7 @@ struct rmcp_header {
 #else
 #error "Missing endian macro definitions."
 #endif
-};
+} PACK_OFF;
 
 static void ndpi_int_rmcp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
                                          struct ndpi_flow_struct *flow)
