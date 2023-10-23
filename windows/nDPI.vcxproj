@@ -277,6 +277,7 @@
     <ClCompile Include="..\src\lib\protocols\postgres.c" />
     <ClCompile Include="..\src\lib\protocols\ppstream.c" />
     <ClCompile Include="..\src\lib\protocols\pptp.c" />
+    <ClCompile Include="..\src\lib\protocols\protobuf.c" />
     <ClCompile Include="..\src\lib\protocols\qq.c" />
     <ClCompile Include="..\src\lib\protocols\quic.c" />
     <ClCompile Include="..\src\lib\protocols\radius.c" />
