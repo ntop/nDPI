@@ -3,10 +3,10 @@ What is nDPI
 
 nDPI is a DPI (Deep Packet Inspection) toolkit able to:
 
-- Detect application protocol on traffic flows
-- Analize encrypted traffic flows via ET (Encrypted Traffic Analysis)
-- Extract selected protocol metadata from traffic
-- Implement APIs for analysing traffic
+- Detect application protocol on traffic flows.
+- Analize encrypted traffic flows via ET (Encrypted Traffic Analysis).
+- Extract selected protocol metadata from traffic.
+- Implement APIs for analysing traffic.
 
 Releases and Features
 ---------------------
