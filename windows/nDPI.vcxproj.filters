@@ -23,6 +23,7 @@
     <ClCompile Include="..\src\lib\protocols\eaq.c" />
     <ClCompile Include="..\src\lib\protocols\edonkey.c" />
     <ClCompile Include="..\src\lib\protocols\epicgames.c" />
+    <ClCompile Include="..\src\lib\protocols\ethereum.c" />
     <ClCompile Include="..\src\lib\protocols\ftp_control.c" />
     <ClCompile Include="..\src\lib\protocols\ftp_data.c" />
     <ClCompile Include="..\src\lib\protocols\git.c" />

@@ -1265,7 +1265,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MINING,
 			  "Mining", CUSTOM_CATEGORY_MINING,
-			  ndpi_build_default_ports(ports_a, 30303, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NEST_LOG_SINK,
 			  "NestLogSink", NDPI_PROTOCOL_CATEGORY_CLOUD,
@@ -2171,6 +2171,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
               "Protobuf", NDPI_PROTOCOL_CATEGORY_NETWORK,
               ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
               ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ETHEREUM,
+			        "ETHEREUM", NDPI_PROTOCOL_CATEGORY_CRYPTO_CURRENCY,
+			        ndpi_build_default_ports(ports_a, 30303, 0, 0, 0, 0) /* TCP */,
+			        ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -2885,7 +2889,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_amazon_aws_protocol_list);
 
     if(!(prefs & ndpi_dont_load_ethereum_list))
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_mining_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ethereum_protocol_list);
 
     if(!(prefs & ndpi_dont_load_zoom_list))
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_zoom_protocol_list);
@@ -5256,6 +5260,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* Protobuf */
   init_protobuf_dissector(ndpi_str, &a);
+
+    /* ETHEREUM */
+  init_ethereum_dissector(ndpi_str, &a);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"

@@ -162,6 +162,7 @@
     <ClCompile Include="..\src\lib\protocols\dnp3.c" />
     <ClCompile Include="..\src\lib\protocols\dnscrypt.c" />
     <ClCompile Include="..\src\lib\protocols\elastic_search.c" />
+    <ClCompile Include="..\src\lib\protocols\ethereum.c" />
     <ClCompile Include="..\src\lib\protocols\ethernet_ip.c" />
     <ClCompile Include="..\src\lib\protocols\epicgames.c" />
     <ClCompile Include="..\src\lib\protocols\fastcgi.c" />
