@@ -157,3 +157,12 @@ References: `Protocol Specs: <https://www.dmtf.org/sites/default/files/standards
 Controller Area Network (CAN) is used extensively in automotive applications, with in excess of 400 million CAN enabled microcontrollers manufactured each year.
 
 References: `Protocol Specs: <https://www.iso.org/standard/63648.html>`_.
+
+
+.. _Proto 353:
+
+`NDPI_PROTOCOL_PROTOBUF`
+========================
+Protocol Buffers (Protobuf) is a free and open-source cross-platform data format used to serialize structured data.
+
+References: `Encoding: <https://protobuf.dev/programming-guides/encoding>`_.

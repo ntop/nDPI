@@ -381,6 +381,7 @@ typedef enum {
   NDPI_PROTOCOL_HAPROXY               = 350,
   NDPI_PROTOCOL_RMCP                  = 351,
   NDPI_PROTOCOL_CAN                   = 352,
+  NDPI_PROTOCOL_PROTOBUF              = 353,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
