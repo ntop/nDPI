@@ -19,6 +19,8 @@ http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${LIST}"
 
+#TODO: TOR relays don't support ipv6 yet
+
 echo "(2) Processing IP addresses..."
 ./ipaddr2list.py $LIST NDPI_PROTOCOL_TOR > $DEST
 rm -f "${LIST}"

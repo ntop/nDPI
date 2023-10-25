@@ -8,6 +8,7 @@ cd "$(dirname "${0}")" || exit 1
 DEST=../src/lib/inc_generated/ndpi_google_cloud_match.c.inc
 TMP=/tmp/google_c.json
 LIST=/tmp/google_c.list
+LIST6=/tmp/google_c.list6
 ORIGIN="https://www.gstatic.com/ipranges/cloud.json"
 
 
@@ -19,9 +20,11 @@ if [ "$http_response" != "200" ]; then
 fi
 
 echo "(2) Processing IP addresses..."
-jq -r '.prefixes | .[].ipv4Prefix  | select( . != null )' $TMP > $LIST # TODO: ipv6
-./ipaddr2list.py $LIST NDPI_PROTOCOL_GOOGLE_CLOUD > $DEST
-rm -f $TMP $LIST
+jq -r '.prefixes | .[].ipv4Prefix  | select( . != null )' $TMP > $LIST
+jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP > $LIST6
+./ipaddr2list.py $LIST NDPI_PROTOCOL_GOOGLE_CLOUD $LIST6 > $DEST
+
+rm -f $TMP $LIST $LIST6
 
 echo "(3) Google Cloud IPs are available in $DEST"
 exit 0

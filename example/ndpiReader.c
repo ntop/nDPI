@@ -3901,6 +3901,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       printf("\tPatricia protocols:   %llu/%llu (search/found)\n",
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_search,
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_found);
+      printf("\tPatricia protocols IPv6: %llu/%llu (search/found)\n",
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_search,
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_found);
 
       if(enable_malloc_bins)
 	printf("\tData-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
@@ -3997,6 +4000,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       fprintf(results_file, "Patricia protocols:   %llu/%llu (search/found)\n",
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_search,
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_found);
+      fprintf(results_file, "Patricia protocols IPv6: %llu/%llu (search/found)\n",
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_search,
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_found);
 
       if(enable_malloc_bins)
 	fprintf(results_file, "Data-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));

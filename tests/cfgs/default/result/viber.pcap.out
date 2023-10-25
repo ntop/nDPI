@@ -22,6 +22,7 @@ Automa common alpns:  9/9 (search/found)
 Patricia risk mask:   28/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   39/17 (search/found)
+Patricia protocols IPv6: 2/0 (search/found)
 
 DNS	4	716	2
 MDNS	4	412	1

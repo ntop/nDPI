@@ -28,3 +28,12 @@ static ndpi_network ndpi_protocol_ubuntuone_protocol_list[] = {
  /* End */
  { 0x0, 0, 0 }
 };
+
+static ndpi_network6 ndpi_protocol_ubuntuone_protocol_list_6[] = {
+ { "2001:67c:1560::", 47, NDPI_PROTOCOL_UBUNTUONE },
+ { "2001:67c:1562::", 48, NDPI_PROTOCOL_UBUNTUONE },
+ { "2620:2d:4000::", 46, NDPI_PROTOCOL_UBUNTUONE },
+ { "2620:2d:4006::", 47, NDPI_PROTOCOL_UBUNTUONE },
+ /* End */
+ { NULL, 0, 0 }
+};

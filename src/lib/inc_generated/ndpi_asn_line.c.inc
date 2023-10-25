@@ -38,3 +38,9 @@ static ndpi_network ndpi_protocol_line_protocol_list[] = {
  /* End */
  { 0x0, 0, 0 }
 };
+
+static ndpi_network6 ndpi_protocol_line_protocol_list_6[] = {
+ { "2400:dcc0::", 32, NDPI_PROTOCOL_LINE },
+ /* End */
+ { NULL, 0, 0 }
+};

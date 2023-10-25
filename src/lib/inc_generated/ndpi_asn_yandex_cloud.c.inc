@@ -30,9 +30,14 @@ static ndpi_network ndpi_protocol_yandex_cloud_protocol_list[] = {
  { 0x9EA00000 /* 158.160.0.0/16 */, 16, NDPI_PROTOCOL_YANDEX_CLOUD },
  { 0xB29AC000 /* 178.154.192.0/18 */, 18, NDPI_PROTOCOL_YANDEX_CLOUD },
  { 0xB9CEA400 /* 185.206.164.0/22 */, 22, NDPI_PROTOCOL_YANDEX_CLOUD },
- { 0xBC486800 /* 188.72.104.0/24 */, 24, NDPI_PROTOCOL_YANDEX_CLOUD },
  { 0xC120D800 /* 193.32.216.0/22 */, 22, NDPI_PROTOCOL_YANDEX_CLOUD },
  { 0xD91CE000 /* 217.28.224.0/20 */, 20, NDPI_PROTOCOL_YANDEX_CLOUD },
  /* End */
  { 0x0, 0, 0 }
+};
+
+static ndpi_network6 ndpi_protocol_yandex_cloud_protocol_list_6[] = {
+ { "2a0d:d6c0::", 31, NDPI_PROTOCOL_YANDEX_CLOUD },
+ /* End */
+ { NULL, 0, 0 }
 };
