@@ -176,7 +176,8 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
           return;
         }
 #ifdef DEBUG_PROTOBUF
-        printf("[VARINT: %llu]", (unsigned long long int)value);
+        printf("[VARINT: %llu / %llx]", (unsigned long long int)value,
+               (unsigned long long int)value);
 #endif
         break;
       }
@@ -187,8 +188,14 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
           return;
         }
 #ifdef DEBUG_PROTOBUF
-        uint64_t value = ndpi_ntohll(*(uint64_t *)&packet->payload[offset]);
-        printf("[I64: %llu]", (unsigned long long int)value);
+        union {
+          int64_t as_i64;
+          uint64_t as_u64;
+          double as_double;
+        } value;
+        value.as_u64 = le64toh(*(uint64_t *)&packet->payload[offset]);
+        printf("[I64: %lld / %llu / %lf]", (long long int)value.as_i64,
+               (unsigned long long int)value.as_u64, value.as_double);
 #endif
         offset += 8;
         break;
@@ -227,8 +234,13 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
           break;
         }
 #ifdef DEBUG_PROTOBUF
-        uint32_t value = ntohl(*(uint32_t *)&packet->payload[offset]);
-        printf("[I32: %u]", value);
+        union {
+          int32_t as_i32;
+          uint32_t as_u32;
+          float as_float;
+        } value;
+        value.as_u32 = le32toh(*(uint32_t *)&packet->payload[offset]);
+        printf("[I32: %d / %u / %f]", value.as_i32, value.as_u32, value.as_float);
 #endif
         offset += 4;
         break;
