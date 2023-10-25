@@ -2503,6 +2503,7 @@ void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 		   struct ndpi_flow_struct *flow, ndpi_risk_enum r,
 		   char *risk_message) {
+  if(!flow) return;
 
   /* Check if the risk is not yet set */
   if(!ndpi_isset_risk(ndpi_str, flow, r)) {
