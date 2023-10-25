@@ -56,8 +56,6 @@ jobs:
           sudo apt-get install python3-netaddr git whois libxml2-utils
       - name: Run Scripts
         run: |
-          echo 'Running ./utils/bitcoinnodes.sh'
-          ./utils/bitcoinnodes.sh >/dev/null
           echo 'Running ./utils/get_routes_by_asn.sh AS714'
           ./utils/get_routes_by_asn.sh AS714 >/dev/null
           echo 'Running ./utils/update_every_lists.sh'

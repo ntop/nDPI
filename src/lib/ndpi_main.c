@@ -85,6 +85,7 @@
 #include "inc_generated/ndpi_protonvpn_in_match.c.inc"
 #include "inc_generated/ndpi_protonvpn_out_match.c.inc"
 #include "inc_generated/ndpi_mullvad_match.c.inc"
+#include "inc_generated/ndpi_bitcoin_match.c.inc"
 #include "inc_generated/ndpi_asn_telegram.c.inc"
 #include "inc_generated/ndpi_asn_apple.c.inc"
 #include "inc_generated/ndpi_asn_twitter.c.inc"
@@ -2915,6 +2916,9 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
     if(!(prefs & ndpi_dont_load_mullvad_list))
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_mullvad_protocol_list);
+
+    if(!(prefs & ndpi_dont_load_bitcoin_list))
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_bitcoin_protocol_list);
 
     if(!(prefs & ndpi_dont_load_asn_lists)) {
       ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_telegram_protocol_list);

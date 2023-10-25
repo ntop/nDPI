@@ -1828,6 +1828,7 @@ typedef enum {
     ndpi_disable_fully_encrypted_heuristic = (1 << 20),
     ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 21),
     ndpi_dont_load_mullvad_list = (1 << 22),
+    ndpi_dont_load_bitcoin_list = (1 << 23),
   } ndpi_prefs;
 
 typedef struct {
