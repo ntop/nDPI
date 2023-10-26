@@ -694,6 +694,7 @@ typedef enum {
   NDPI_PTREE_RISK_MASK = 0,
   NDPI_PTREE_RISK,
   NDPI_PTREE_PROTOCOLS,
+  NDPI_PTREE_PROTOCOLS6,
 
   NDPI_PTREE_MAX	/* Last one! */
 } ptree_type;
@@ -1311,6 +1312,7 @@ struct ndpi_detection_module_struct {
   ndpi_patricia_tree_t *ip_risk_mask_ptree;
   ndpi_patricia_tree_t *ip_risk_ptree; 
   ndpi_patricia_tree_t *protocols_ptree;  /* IP-based protocol detection */
+  ndpi_patricia_tree_t *protocols_ptree6;
   
   /* *** If you add a new Patricia tree, please update ptree_type above! *** */
 
@@ -1786,6 +1788,12 @@ typedef struct {
   u_int8_t cidr;
   u_int16_t value;
 } ndpi_network;
+
+typedef struct {
+  char *network;
+  u_int8_t cidr;
+  u_int16_t value;
+} ndpi_network6;
 
 typedef u_int32_t ndpi_init_prefs;
 

@@ -21,6 +21,7 @@ Automa common alpns:  3/3 (search/found)
 Patricia risk mask:   2/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   9/7 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 Jabber	11	890	1
 TLS	5	294	2

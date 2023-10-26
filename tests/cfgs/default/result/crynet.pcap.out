@@ -19,6 +19,7 @@ Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   14/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   14/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 CryNetwork	105	14077	7
 

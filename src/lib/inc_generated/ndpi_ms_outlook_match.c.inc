@@ -40,3 +40,26 @@ static ndpi_network ndpi_protocol_ms_outlook_protocol_list[] = {
  /* End */
  { 0x0, 0, 0 }
 };
+
+static ndpi_network6 ndpi_protocol_ms_outlook_protocol_list_6[] = {
+ { "2603:1006::", 40, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2603:1016::", 36, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2603:1026::", 36, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2603:1036::", 36, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2603:1046::", 36, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2603:1056::", 36, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:4::152", 128, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:4::153", 128, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:8f0::", 46, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:900::", 46, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:a92::152", 128, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:a92::153", 128, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:c::10", 128, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:c::11", 128, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:d::10", 128, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2620:1ec:d::11", 128, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2a01:111:f400::", 48, NDPI_PROTOCOL_MS_OUTLOOK },
+ { "2a01:111:f403::", 48, NDPI_PROTOCOL_MS_OUTLOOK },
+ /* End */
+ { NULL, 0, 0 }
+};

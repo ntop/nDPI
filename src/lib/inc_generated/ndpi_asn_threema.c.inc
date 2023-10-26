@@ -33,3 +33,11 @@ static ndpi_network ndpi_protocol_threema_protocol_list[] = {
  /* End */
  { 0x0, 0, 0 }
 };
+
+static ndpi_network6 ndpi_protocol_threema_protocol_list_6[] = {
+ { "2001:67c:2f98::", 48, NDPI_PROTOCOL_THREEMA },
+ { "2a02:418::", 29, NDPI_PROTOCOL_THREEMA },
+ { "2a05:9a80::", 29, NDPI_PROTOCOL_THREEMA },
+ /* End */
+ { NULL, 0, 0 }
+};

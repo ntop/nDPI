@@ -165,6 +165,9 @@ extern "C" {
   u_int16_t ndpi_network_port_ptree_match(struct ndpi_detection_module_struct *ndpi_struct,
 					  struct in_addr *pin /* network byte order */,
 					  u_int16_t port /* network byte order */);
+  u_int16_t ndpi_network_port_ptree6_match(struct ndpi_detection_module_struct *ndpi_struct,
+					   struct in6_addr *pin,
+					   u_int16_t port /* network byte order */);
 
   /**
    * Creates a protocol match that does not contain any hostnames.

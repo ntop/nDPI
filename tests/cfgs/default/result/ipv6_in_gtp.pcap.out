@@ -21,6 +21,7 @@ Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia protocols:   0/0 (search/found)
+Patricia protocols IPv6: 4/0 (search/found)
 
 Unknown	1	150	1
 IPSec	1	166	1

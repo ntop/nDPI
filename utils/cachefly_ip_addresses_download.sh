@@ -8,7 +8,7 @@ cd "$(dirname "${0}")" || exit 1
 DEST=../src/lib/inc_generated/ndpi_cachefly_match.c.inc
 LIST=/tmp/cachefly.list
 ORIGIN='https://cachefly.cachefly.net/ips/cdn.txt'
-
+#TODO: ipv6. Is there any ipv6 list?
 
 echo "(1) Downloading file..."
 http_response=$(curl -s -o "${LIST}" -w "%{http_code}" "${ORIGIN}")

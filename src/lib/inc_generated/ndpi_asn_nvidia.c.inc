@@ -46,7 +46,6 @@ static ndpi_network ndpi_protocol_nvidia_protocol_list[] = {
  { 0x5054A000 /* 80.84.160.0/20 */, 20, NDPI_PROTOCOL_NVIDIA },
  { 0x551D0E00 /* 85.29.14.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  { 0x551D1200 /* 85.29.18.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
- { 0x59F8ED00 /* 89.248.237.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  { 0x6706D300 /* 103.6.211.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  { 0x70D98000 /* 112.217.128.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  { 0x79C82D00 /* 121.200.45.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
@@ -54,7 +53,13 @@ static ndpi_network ndpi_protocol_nvidia_protocol_list[] = {
  { 0xC1F63300 /* 193.246.51.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  { 0xD8E47000 /* 216.228.112.0/20 */, 20, NDPI_PROTOCOL_NVIDIA },
  { 0xD9C7D100 /* 217.199.209.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
- { 0xD9C7DE00 /* 217.199.222.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  /* End */
  { 0x0, 0, 0 }
+};
+
+static ndpi_network6 ndpi_protocol_nvidia_protocol_list_6[] = {
+ { "2604:a140:1500::", 47, NDPI_PROTOCOL_NVIDIA },
+ { "2604:a140:f000::", 48, NDPI_PROTOCOL_NVIDIA },
+ /* End */
+ { NULL, 0, 0 }
 };
