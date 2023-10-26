@@ -2289,6 +2289,10 @@ int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_patricia_get_stats(ndpi_struct->ip_risk_ptree, stats);
     return 0;
 
+  case NDPI_PTREE_RISK6:
+    ndpi_patricia_get_stats(ndpi_struct->ip_risk_ptree6, stats);
+    return 0;
+
   case NDPI_PTREE_PROTOCOLS:
     ndpi_patricia_get_stats(ndpi_struct->protocols_ptree, stats);
     return 0;
@@ -2533,6 +2537,23 @@ ndpi_risk_enum ndpi_network_risk_ptree_match(struct ndpi_detection_module_struct
   /* Make sure all in network byte order otherwise compares wont work */
   ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->ip_risk_ptree, &prefix);
+
+  if(node)
+    return((ndpi_risk_enum)node->value.u.uv16[0].user_value);
+
+  return(NDPI_NO_RISK);
+}
+
+/* ******************************************* */
+
+ndpi_risk_enum ndpi_network_risk_ptree_match6(struct ndpi_detection_module_struct *ndpi_str,
+					      struct in6_addr *pin) {
+  ndpi_prefix_t prefix;
+  ndpi_patricia_node_t *node;
+
+  /* Make sure all in network byte order otherwise compares wont work */
+  ndpi_fill_prefix_v6(&prefix, pin, 128, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree6)->maxbits);
+  node = ndpi_patricia_search_best(ndpi_str->ip_risk_ptree6, &prefix);
 
   if(node)
     return((ndpi_risk_enum)node->value.u.uv16[0].user_value);
@@ -3105,18 +3126,24 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
 
   if(!(prefs & ndpi_dont_init_risk_ptree)) {
-    /* TODO: ipv6 ip_risk_ptree */
-    /* To disable warnings */
-    (void)ndpi_anonymous_subscriber_icloud_private_relay_protocol_list_6;
-    (void)ndpi_http_crawler_bot_protocol_list_6;
-    (void)ndpi_anonymous_subscriber_protonvpn_protocol_list_6;
-    if((ndpi_str->ip_risk_ptree = ndpi_patricia_new(32 /* IPv4 */)) != NULL) {
-      if(!(prefs & ndpi_dont_load_icloud_private_relay_list))
-        ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list);
-      if(!(prefs & ndpi_dont_load_protonvpn_exit_nodes_list))
-        ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_protonvpn_protocol_list);
-      if(!(prefs & ndpi_dont_load_crawlers_list))
-        ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_http_crawler_bot_protocol_list);
+
+    if((ndpi_str->ip_risk_ptree = ndpi_patricia_new(32 /* IPv4 */)) == NULL ||
+       (ndpi_str->ip_risk_ptree6 = ndpi_patricia_new(128 /* IPv6 */)) == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating tree\n");
+      ndpi_exit_detection_module(ndpi_str);
+      return NULL;
+    }
+    if(!(prefs & ndpi_dont_load_icloud_private_relay_list)) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list);
+      ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk_ptree6, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list_6);
+    }
+    if(!(prefs & ndpi_dont_load_protonvpn_exit_nodes_list)) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_protonvpn_protocol_list);
+      ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk_ptree6, ndpi_anonymous_subscriber_protonvpn_protocol_list_6);
+    }
+    if(!(prefs & ndpi_dont_load_crawlers_list)) {
+      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_http_crawler_bot_protocol_list);
+      ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk_ptree6, ndpi_http_crawler_bot_protocol_list_6);
     }
   }
 
@@ -3715,6 +3742,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->ip_risk_ptree)
       ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree, NULL);
+
+    if(ndpi_str->ip_risk_ptree6)
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree6, NULL);
 
     if(ndpi_str->udpRoot != NULL) ndpi_tdestroy(ndpi_str->udpRoot, ndpi_free);
     if(ndpi_str->tcpRoot != NULL) ndpi_tdestroy(ndpi_str->tcpRoot, ndpi_free);
@@ -7652,25 +7682,29 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     flow->risk_checked = 1;
   }
   if(!flow->tree_risk_checked) {
-    if(ndpi_str->ip_risk_ptree) {
-      /* TODO: ipv6 */
-      if(packet->iph &&
-         ndpi_is_public_ipv4(ntohl(packet->iph->saddr)) &&
-         ndpi_is_public_ipv4(ntohl(packet->iph->daddr))) {
-        struct in_addr addr;
-        ndpi_risk_enum net_risk;
+    ndpi_risk_enum net_risk = NDPI_NO_RISK;
 
-        addr.s_addr = packet->iph->saddr;
-        net_risk = ndpi_network_risk_ptree_match(ndpi_str, &addr);
-        if(net_risk == NDPI_NO_RISK) {
-          addr.s_addr = packet->iph->daddr;
-          net_risk = ndpi_network_risk_ptree_match(ndpi_str, &addr);
-        }
+    /* Right now, all the 3 supported risks are only about the *client* ip.
+       Don't check the server ip, to try avoiding false positives */
 
-        if(net_risk != NDPI_NO_RISK)
-          ndpi_set_risk(ndpi_str, flow, net_risk, NULL);
-      }
+    if(ndpi_str->ip_risk_ptree &&
+       packet->iph &&
+       ndpi_is_public_ipv4(ntohl(packet->iph->saddr)) &&
+       ndpi_is_public_ipv4(ntohl(packet->iph->daddr))) {
+      struct in_addr addr;
+
+      addr.s_addr = flow->c_address.v4;
+      net_risk = ndpi_network_risk_ptree_match(ndpi_str, &addr);
+    } else if(ndpi_str->ip_risk_ptree6 &&
+              packet->iphv6) { /* TODO: some checks on "local" addresses? */
+      struct in6_addr addr;
+
+      addr = *(struct in6_addr *)&flow->c_address.v6;
+      net_risk = ndpi_network_risk_ptree_match6(ndpi_str, &addr);
     }
+    if(net_risk != NDPI_NO_RISK)
+      ndpi_set_risk(ndpi_str, flow, net_risk, NULL);
+
     flow->tree_risk_checked = 1;
   }
 
