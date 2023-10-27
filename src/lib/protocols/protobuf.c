@@ -26,20 +26,21 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_PROTOBUF
 //#define DEBUG_PROTOBUF
 #define PROTOBUF_MIN_ELEMENTS 2
-#define PROTOBUF_MAX_ELEMENTS 8
+#define PROTOBUF_MAX_ELEMENTS 32
+#define PROTOBUF_REQUIRED_ELEMENTS 8
 #define PROTOBUF_MIN_PACKETS 4
 #define PROTOBUF_MAX_PACKETS 8
 
 #include "ndpi_api.h"
 
-enum protobuf_tag {
-  TAG_INVALID = -1,
-  TAG_VARINT = 0,
-  TAG_I64,
-  TAG_LEN,
-  TAG_SGROUP, // deprecated
-  TAG_EGROUP, // deprecated
-  TAG_I32
+enum protobuf_type {
+  PT_INVALID = -1,
+  PT_VARINT = 0,
+  PT_I64,
+  PT_LEN,
+  PT_SGROUP, // deprecated
+  PT_EGROUP, // deprecated
+  PT_I32
 };
 
 static void ndpi_int_protobuf_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
@@ -49,32 +50,24 @@ static void ndpi_int_protobuf_add_connection(struct ndpi_detection_module_struct
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PROTOBUF, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
-static enum protobuf_tag
-protobuf_dissect_wire_type(struct ndpi_packet_struct const * const packet,
-                           size_t * const offset,
-                           uint8_t * const field_number)
+static enum protobuf_type
+protobuf_dissect_tag(uint64_t tag, uint64_t * const field_number)
 {
-  if (packet->payload_packet_len < *offset + 1)
-  {
-    return TAG_INVALID;
-  }
-
-  uint8_t const wire_type = packet->payload[*offset] & 0x07; // field number ignored
-  *field_number = packet->payload[*offset] >> 3;
+  uint8_t const wire_type = tag & 0x07;
+  *field_number = tag >> 3;
 
   switch (wire_type)
   {
-    case TAG_VARINT:
-    case TAG_I64:
-    case TAG_LEN:
-    case TAG_SGROUP:
-    case TAG_EGROUP:
-    case TAG_I32:
-      (*offset)++;
+    case PT_VARINT:
+    case PT_I64:
+    case PT_LEN:
+    case PT_SGROUP:
+    case PT_EGROUP:
+    case PT_I32:
       return wire_type;
   }
 
-  return TAG_INVALID;
+  return PT_INVALID;
 }
 
 static int
@@ -107,28 +100,6 @@ protobuf_dissect_varint(struct ndpi_packet_struct const * const packet,
   return 0;
 }
 
-static int protobuf_validate_field_number(uint32_t * const saved_field_numbers,
-                                          uint8_t field_number,
-                                          enum protobuf_tag tag)
-{
-  uint32_t shifted_field_number;
-
-  if (field_number > 31 || field_number == 0)
-  {
-    return -1;
-  }
-
-  shifted_field_number = 1u << (field_number - 1);
-  if (tag != TAG_LEN
-      && (*saved_field_numbers & shifted_field_number) != 0)
-  {
-    return -1;
-  }
-
-  *saved_field_numbers |= shifted_field_number;
-  return 0;
-}
-
 static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struct,
                                  struct ndpi_flow_struct *flow)
 {
@@ -136,7 +107,6 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
 
   NDPI_LOG_DBG(ndpi_struct, "search Protobuf\n");
 
-  uint32_t field_numbers_used = 0;
   size_t protobuf_elements = 0;
   size_t protobuf_len_elements = 0;
   size_t offset = 0;
@@ -148,26 +118,27 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
 #ifdef DEBUG_PROTOBUF
     printf(" ");
 #endif
-    uint8_t field_number;
-    enum protobuf_tag tag = protobuf_dissect_wire_type(packet, &offset,
-                                                       &field_number);
-    if (tag == TAG_INVALID)
+    uint64_t tag;
+    // A Protobuf tag has a type and a field number stored as u32 varint.
+    if (protobuf_dissect_varint(packet, &offset, &tag) != 0)
     {
       break;
     }
-    if (protobuf_validate_field_number(&field_numbers_used, field_number,
-                                       tag) != 0)
+
+    uint64_t field_number;
+    enum protobuf_type type = protobuf_dissect_tag(tag, &field_number);
+    if (type == PT_INVALID || field_number == 0 || field_number > (UINT_MAX >> 3))
     {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
 
 #ifdef DEBUG_PROTOBUF
-    printf("[id: %u]", field_number);
+    printf("[id: %llu]", (unsigned long long int)field_number);
 #endif
-    switch (tag)
+    switch (type)
     {
-      case TAG_VARINT:
+      case PT_VARINT:
       {
         uint64_t value;
         if (protobuf_dissect_varint(packet, &offset, &value) != 0)
@@ -181,7 +152,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
 #endif
         break;
       }
-      case TAG_I64: {
+      case PT_I64: {
         if (packet->payload_packet_len < offset + sizeof(uint64_t))
         {
           NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -200,9 +171,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
         offset += 8;
         break;
       }
-      case TAG_LEN:
-      case TAG_SGROUP:
-      case TAG_EGROUP:
+      case PT_LEN:
       {
         uint64_t length;
         if (protobuf_dissect_varint(packet, &offset, &length) != 0)
@@ -223,11 +192,16 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
         offset += length;
         protobuf_len_elements++;
 #ifdef DEBUG_PROTOBUF
-        printf("[LEN/SGROUP/EGROUP length: %llu]", (unsigned long long int)length);
+        printf("[LEN length: %llu]", (unsigned long long int)length);
 #endif
         break;
       }
-      case TAG_I32: {
+      case PT_SGROUP:
+      case PT_EGROUP:
+        // Start/End groups are deprecated and therefor ignored to reduce false positives.
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        return;
+      case PT_I32: {
         if (packet->payload_packet_len < offset + sizeof(uint32_t))
         {
           NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -245,17 +219,23 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
         offset += 4;
         break;
       }
-      case TAG_INVALID:
+      case PT_INVALID:
         break;
     }
   } while (++protobuf_elements < PROTOBUF_MAX_ELEMENTS);
 
 #ifdef DEBUG_PROTOBUF
-  printf("\n");
+  printf(" [offset: %llu][length: %u][elems: %llu][len_elems: %llu]\n",
+         (unsigned long long int)offset, packet->payload_packet_len,
+         (unsigned long long int)protobuf_elements,
+         (unsigned long long int)protobuf_len_elements);
 #endif
-  if ((protobuf_elements == PROTOBUF_MAX_ELEMENTS && protobuf_len_elements > 0)
+  if ((protobuf_elements >= PROTOBUF_REQUIRED_ELEMENTS && protobuf_len_elements > 0)
       || (flow->packet_counter >= PROTOBUF_MIN_PACKETS && protobuf_elements >= PROTOBUF_MIN_ELEMENTS))
   {
+#ifdef DEBUG_PROTOBUF
+    printf("Protobuf found after %u packets.\n", flow->packet_counter);
+#endif
     ndpi_int_protobuf_add_connection(ndpi_struct, flow);
     return;
   }
