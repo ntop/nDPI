@@ -18,6 +18,7 @@ Automa risk mask:     33/0 (search/found)
 Automa common alpns:  68/68 (search/found)
 Patricia risk mask:   66/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   68/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 

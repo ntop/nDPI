@@ -61,7 +61,7 @@ is_file_empty "${LIST}"
     jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP2
     jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP3
     jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP_BING
-    grep route6 $TMP_FB | tr -d 'route6:^ '
+    grep route6 $TMP_FB | cut -c9- | tr -d ' '
 } > $LIST6
 is_file_empty "${LIST6}"
 ./ipaddr2list.py $LIST NDPI_HTTP_CRAWLER_BOT $LIST6 > $DEST
