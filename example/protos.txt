@@ -74,6 +74,8 @@ ipv6:[fe80::76ac:b9ff:fe6c:c124]:12718@CustomProtocolH
 #ip_risk_mask:192.168.1.0/24=0
 ip_risk_mask:10.10.120.0/24=0
 ip_risk_mask:10.196.157.228=0
+ipv6_risk_mask:[fe80::356b:e047:3695:0]/112=0
+ipv6_risk_mask:[fe80::7c0:e74e:87c3:5d93]=0
 host_risk_mask:".home"=0
 
 
