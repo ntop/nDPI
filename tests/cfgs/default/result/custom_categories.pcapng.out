@@ -1,0 +1,32 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	26	(13.00 pkts/flow)
+DPI Packets (other):	1	(1.00 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 23 (7.67 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 2/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   2/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 4/0 (search/found)
+
+IPSec	1	346	1
+SSH	84	14188	2
+
+	1	TCP [2001:db8:1::1]:64720 <-> [2001:db8:200::1]:20868 [proto: 92/SSH][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 16][cat: Malware/100][32 pkts/3639 bytes <-> 30 pkts/6335 bytes][Goodput ratio: 24/59][5.34 sec][Hostname/SNI: SSH-1.5-1.2.26][bytes ratio: -0.270 (Download)][IAT c2s/s2c min/avg/max/stddev: 13/74 184/193 1212/1436 234/283][Pkt Len c2s/s2c min/avg/max/stddev: 86/86 114/211 250/1294 47/257][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Server: SSH-1.5-1.2.26][Plen Bins: 69,6,0,0,11,2,0,0,2,0,0,0,0,0,2,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 172.26.219.44:58639 <-> 172.30.69.103:22 [proto: 92/SSH][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 10][cat: Malware/100][11 pkts/2011 bytes <-> 11 pkts/2203 bytes][Goodput ratio: 63/67][0.11 sec][Hostname/SNI: SSH-1.99-OpenSSH_4.3][bytes ratio: -0.046 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 7/7 39/41 12/13][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 183/200 1026/770 270/223][Risk: ** SSH Obsolete Cli Vers/Cipher **** SSH Obsolete Ser Vers/Cipher **** Client contacted a malware host **][Risk Score: 300][Risk Info: Client contacted malware host / Found cipher arcfour128 / Found cipher arcfour128][HASSH-C: D6593B3202A30B2AA9793A00F8647A0A][Server: SSH-2.0-OpenSSH_6.1][HASSH-S: 500033A73A293E7C36743693D0D4596B][Plen Bins: 31,15,15,0,15,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	ESP [2a01:e34:ef6f:4340:94be:5dac:c20a:d2a0]:0 -> [2001:1670:8:40a6:a08e:332b:aa69:18dc]:0 [VLAN: 121][proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Malware/100][1 pkts/346 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **** Client contacted a malware host **][Risk Score: 160][Risk Info: No server to client traffic / Client contacted malware host][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
