@@ -63,10 +63,15 @@ int mbedtls_aesni_has_support( unsigned int what )
      return 0;
 #  endif
 #endif
-
+     
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
   if(force_no_aesni == 1)
     return 0;
+#endif
+
+#if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
+  /* In FreeBSD we don't have a reliable way to check AES-NI so better disable it */
+  return(0);
 #endif
 
 #if defined(linux) || defined(__linux__)
@@ -114,6 +119,7 @@ int mbedtls_aesni_has_support( unsigned int what )
 
   return ( (ecx & what) != 0 );
 #endif
+
 #elif defined(WIN32) || defined(WIN64)
   int cpuInfo[4];
 
