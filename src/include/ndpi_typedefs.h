@@ -1327,6 +1327,7 @@ struct ndpi_detection_module_struct {
     ndpi_domain_classify *sc_hostnames, *sc_hostnames_shadow;
 #endif
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
+    void *ipAddresses6, *ipAddresses6_shadow; /* Patricia IPv6*/
     u_int8_t categories_loaded;
   } custom_categories;
 

@@ -3267,6 +3267,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
 
   ndpi_str->custom_categories.ipAddresses = ndpi_patricia_new(32 /* IPv4 */);
   ndpi_str->custom_categories.ipAddresses_shadow = ndpi_patricia_new(32 /* IPv4 */);
+  ndpi_str->custom_categories.ipAddresses6 = ndpi_patricia_new(128 /* IPv6 */);
+  ndpi_str->custom_categories.ipAddresses6_shadow = ndpi_patricia_new(128 /* IPv6 */);
 
   if(ndpi_str->host_automa.ac_automa)
     ac_automata_feature(ndpi_str->host_automa.ac_automa,AC_FEATURE_LC);
@@ -3294,7 +3296,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   if(ndpi_str->common_alpns_automa.ac_automa)
     ac_automata_name(ndpi_str->common_alpns_automa.ac_automa,"content",AC_FEATURE_DEBUG);
 
-  if((ndpi_str->custom_categories.ipAddresses == NULL) || (ndpi_str->custom_categories.ipAddresses_shadow == NULL)) {
+  if((ndpi_str->custom_categories.ipAddresses == NULL) || (ndpi_str->custom_categories.ipAddresses_shadow == NULL) ||
+     (ndpi_str->custom_categories.ipAddresses6 == NULL) || (ndpi_str->custom_categories.ipAddresses6_shadow == NULL)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating Patricia trees\n");
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
@@ -3686,6 +3689,9 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
 				   ndpi_protocol_category_t *id) {
   char ipbuf[64], *ptr;
   struct in_addr pin;
+  struct in6_addr pin6;
+  ndpi_prefix_t prefix;
+  ndpi_patricia_node_t *node;
   u_int cp_len = ndpi_min(sizeof(ipbuf) - 1, name_len);
 
   if(!ndpi_str->custom_categories.categories_loaded)
@@ -3694,8 +3700,9 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
   if(cp_len > 0) {
     memcpy(ipbuf, name_or_ip, cp_len);
     ipbuf[cp_len] = '\0';
-  } else
+  } else {
     ipbuf[0] = '\0';
+  }
 
   ptr = strrchr(ipbuf, '/');
 
@@ -3703,9 +3710,7 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
     ptr[0] = '\0';
 
   if(inet_pton(AF_INET, ipbuf, &pin) == 1) {
-    /* Search IP */
-    ndpi_prefix_t prefix;
-    ndpi_patricia_node_t *node;
+    /* Search IPv4 */
 
     /* Make sure all in network byte order otherwise compares wont work */
     ndpi_fill_prefix_v4(&prefix, &pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses)->maxbits);
@@ -3713,10 +3718,18 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
 
     if(node) {
       *id = node->value.u.uv32.user_value;
-
       return(0);
     }
+    return(-1);
+  } else if(inet_pton(AF_INET6, ipbuf, &pin6) == 1) {
+    /* Search IPv6 */
+    ndpi_fill_prefix_v6(&prefix, &pin6, 128, ((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6)->maxbits);
+    node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses6, &prefix);
 
+    if(node) {
+      *id = node->value.u.uv32.user_value;
+      return(0);
+    }
     return(-1);
   } else {
     /* Search Host */
@@ -3826,6 +3839,12 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->custom_categories.ipAddresses_shadow != NULL)
       ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses_shadow, free_ptree_data);
+
+    if(ndpi_str->custom_categories.ipAddresses6 != NULL)
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6, free_ptree_data);
+
+    if(ndpi_str->custom_categories.ipAddresses6_shadow != NULL)
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6_shadow, free_ptree_data);
 
     if(ndpi_str->host_risk_mask_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->host_risk_mask_automa.ac_automa,
@@ -4384,19 +4403,32 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
  */
 int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str,
 			      const char *path, void *user_data) {
-  char buffer[512], *line, *name, *category, *saveptr;
+  int rc;
   FILE *fd;
-  int len, num = 0;
 
   if(!ndpi_str || !path)
     return(-1);
 
   fd = fopen(path, "r");
-
   if(fd == NULL) {
     NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
-    return(-1);
+    return -1;
   }
+
+  rc = ndpi_load_categories_file2(ndpi_str, fd, user_data);
+
+  fclose(fd);
+
+  return rc;
+}
+
+int ndpi_load_categories_file2(struct ndpi_detection_module_struct *ndpi_str,
+			       FILE *fd, void *user_data) {
+  char buffer[512], *line, *name, *category, *saveptr;
+  int len, num = 0;
+
+  if(!ndpi_str || !fd)
+    return(-1);
 
   while(1) {
     line = fgets(buffer, sizeof(buffer), fd);
@@ -4425,8 +4457,6 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str,
       }
     }
   }
-
-  fclose(fd);
 
   /*
     Not necessay to call ndpi_enable_loaded_categories() as
@@ -7139,14 +7169,16 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
 			  const char *ip_address_and_mask,
 			  ndpi_protocol_category_t category,
 			  void *user_data) {
-  ndpi_patricia_node_t *node;
-  struct in_addr pin;
-  int bits = 32;
+  ndpi_patricia_node_t *node = NULL;
+  int bits = 32, is_ipv6 = 0;
   char *ptr;
-  char ipbuf[64];
+  char ipbuf[128];
 
-  if(!ndpi_str->custom_categories.ipAddresses_shadow)
-    return(-1);
+  if(ip_address_and_mask[0] == '[') {
+    is_ipv6 = 1;
+    bits = 128;
+    ip_address_and_mask++; /* Strip '[' */
+  }
 
   strncpy(ipbuf, ip_address_and_mask, sizeof(ipbuf) - 1);
   ipbuf[sizeof(ipbuf) - 1] = '\0';
@@ -7158,13 +7190,31 @@ int ndpi_load_ip_category(struct ndpi_detection_module_struct *ndpi_str,
     if(atoi(ptr) >= 0 && atoi(ptr) <= 32)
       bits = atoi(ptr);
   }
+  ptr = strrchr(ipbuf, ']');
+  if(ptr)
+    *ptr = '\0'; /* Strip ']' */
 
-  if(inet_pton(AF_INET, ipbuf, &pin) != 1) {
-    NDPI_LOG_DBG2(ndpi_str, "Invalid ip/ip+netmask: %s\n", ip_address_and_mask);
+  if(!is_ipv6 && ndpi_str->custom_categories.ipAddresses_shadow) {
+    struct in_addr pin;
+
+    if(inet_pton(AF_INET, ipbuf, &pin) != 1) {
+      NDPI_LOG_DBG2(ndpi_str, "Invalid ip4/ip4+netmask: %s\n", ip_address_and_mask);
+      return(-1);
+    }
+    node = add_to_ptree(ndpi_str->custom_categories.ipAddresses_shadow, AF_INET, &pin, bits);
+  } else if(is_ipv6 && ndpi_str->custom_categories.ipAddresses6_shadow) {
+    struct in6_addr pin6;
+
+    if(inet_pton(AF_INET6, ipbuf, &pin6) != 1) {
+      NDPI_LOG_DBG2(ndpi_str, "Invalid ip6/ip6+netmask: %s\n", ip_address_and_mask);
+      return(-1);
+    }
+    node = add_to_ptree(ndpi_str->custom_categories.ipAddresses6_shadow, AF_INET6, &pin6, bits);
+  } else {
     return(-1);
   }
 
-  if((node = add_to_ptree(ndpi_str->custom_categories.ipAddresses_shadow, AF_INET, &pin, bits)) != NULL) {
+  if(node != NULL) {
     node->value.u.uv32.user_value = (u_int16_t)category, node->value.u.uv32.additional_user_value = 0;
     node->custom_user_data = user_data;
   }
@@ -7260,8 +7310,14 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
   if(ndpi_str->custom_categories.ipAddresses != NULL)
     ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses, free_ptree_data);
 
+  if(ndpi_str->custom_categories.ipAddresses6 != NULL)
+    ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6, free_ptree_data);
+
   ndpi_str->custom_categories.ipAddresses = ndpi_str->custom_categories.ipAddresses_shadow;
   ndpi_str->custom_categories.ipAddresses_shadow = ndpi_patricia_new(32 /* IPv4 */);
+
+  ndpi_str->custom_categories.ipAddresses6 = ndpi_str->custom_categories.ipAddresses6_shadow;
+  ndpi_str->custom_categories.ipAddresses6_shadow = ndpi_patricia_new(128 /* IPv6 */);
 
   ndpi_str->custom_categories.categories_loaded = 1;
 
@@ -7287,6 +7343,26 @@ void* ndpi_find_ipv4_category_userdata(struct ndpi_detection_module_struct *ndpi
 
   return(node ? node->custom_user_data : NULL);
 }
+
+/* ********************************************************************************* */
+
+void* ndpi_find_ipv6_category_userdata(struct ndpi_detection_module_struct *ndpi_str,
+				       struct in6_addr *saddr) {
+  ndpi_patricia_node_t *node;
+
+  if(!saddr || !ndpi_str || !ndpi_str->custom_categories.ipAddresses6)
+    node = NULL;
+  else {
+    ndpi_prefix_t prefix;
+
+    ndpi_fill_prefix_v6(&prefix, saddr, 128,
+			((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6)->maxbits);
+    node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses6, &prefix);
+  }
+
+  return(node ? node->custom_user_data : NULL);
+}
+
 
 /* ********************************************************************************* */
 
@@ -7333,6 +7409,52 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
 	ndpi_set_risk(ndpi_str, flow, NDPI_MALWARE_HOST_CONTACTED, "Client contacted malware host");
       }
       
+      return(1);
+    }
+  }
+
+  ret->category = ndpi_get_proto_category(ndpi_str, *ret);
+
+  return(0);
+}
+
+/* ********************************************************************************* */
+
+int ndpi_fill_ip6_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
+				    struct ndpi_flow_struct *flow,
+				    struct in6_addr *saddr, struct in6_addr *daddr,
+				    ndpi_protocol *ret) {
+  bool match_client = true;
+
+  ret->custom_category_userdata = NULL;
+
+  if(ndpi_str->custom_categories.categories_loaded &&
+     ndpi_str->custom_categories.ipAddresses6) {
+
+    ndpi_prefix_t prefix;
+    ndpi_patricia_node_t *node;
+
+    ndpi_fill_prefix_v6(&prefix, saddr, 128,
+                        ((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6)->maxbits);
+    node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses6, &prefix);
+
+    if(node == NULL) {
+      ndpi_fill_prefix_v6(&prefix, daddr, 128,
+                          ((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6)->maxbits);
+      node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses6, &prefix);
+      match_client = false;
+    } else {
+      match_client = true;
+    }
+
+    if(node) {
+      ret->category = (ndpi_protocol_category_t) node->value.u.uv32.user_value;
+      ret->custom_category_userdata = node->custom_user_data;
+
+      if((ret->category == CUSTOM_CATEGORY_MALWARE) && (match_client == false)) {
+	ndpi_set_risk(ndpi_str, flow, NDPI_MALWARE_HOST_CONTACTED, "Client contacted malware host");
+      }
+
       return(1);
     }
   }
@@ -7442,9 +7564,11 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
 
     ret->protocol_by_ip = flow->guessed_protocol_id_by_ip;
 
-    if(ndpi_str->custom_categories.categories_loaded && packet->iph) {
-      if(ndpi_str->ndpi_num_custom_protocols != 0)
+    if(ndpi_str->custom_categories.categories_loaded) {
+      if(packet->iph)
 	ndpi_fill_ip_protocol_category(ndpi_str, flow, flow->c_address.v4, flow->s_address.v4, ret);
+      else
+        ndpi_fill_ip6_protocol_category(ndpi_str, flow, (struct in6_addr *)flow->c_address.v6, (struct in6_addr *)flow->s_address.v6, ret);
       flow->guessed_header_category = ret->category;
     } else
       flow->guessed_header_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;

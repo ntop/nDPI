@@ -810,6 +810,7 @@ extern "C" {
    *          -1 else
    */
   int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path, void *user_data);
+  int ndpi_load_categories_file2(struct ndpi_detection_module_struct *ndpi_str, FILE *fd, void *user_data);
 
   /**
    * Loads a file (separated by <cr>) of domain names associated with the specified category
@@ -1028,11 +1029,17 @@ extern "C" {
   int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_struct);
   void* ndpi_find_ipv4_category_userdata(struct ndpi_detection_module_struct *ndpi_str,
 					 u_int32_t saddr);
+  void* ndpi_find_ipv6_category_userdata(struct ndpi_detection_module_struct *ndpi_str,
+					 struct in6_addr *saddr);
   int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
 				     struct ndpi_flow_struct *flow,
 				     u_int32_t saddr,
 				     u_int32_t daddr,
 				     ndpi_protocol *ret);
+  int ndpi_fill_ip6_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
+				      struct ndpi_flow_struct *flow,
+				      struct in6_addr *saddr, struct in6_addr *daddr,
+				      ndpi_protocol *ret);
   int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 char *name, u_int name_len, ndpi_protocol_category_t *id);
   void ndpi_fill_protocol_category(struct ndpi_detection_module_struct *ndpi_struct,
