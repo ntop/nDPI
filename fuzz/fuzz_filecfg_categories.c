@@ -35,7 +35,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_set_debug_bitmask(ndpi_struct, debug_bitmask);
 
   fd = buffer_to_file(data, size);
-  ndpi_load_categories_file2(ndpi_struct, fd, NULL);
+  ndpi_load_categories_file_fd(ndpi_struct, fd, NULL);
   if(fd)
     fclose(fd);
 
