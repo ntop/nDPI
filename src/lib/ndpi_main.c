@@ -47,6 +47,7 @@
 #ifndef WIN32
 #include <unistd.h>
 #include <dirent.h>
+#include <netdb.h>
 #else
 #include "third_party/include/windows/dirent.h"
 #endif
