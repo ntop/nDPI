@@ -4415,15 +4415,15 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str,
     return -1;
   }
 
-  rc = ndpi_load_categories_file2(ndpi_str, fd, user_data);
+  rc = ndpi_load_categories_file_fd(ndpi_str, fd, user_data);
 
   fclose(fd);
 
   return rc;
 }
 
-int ndpi_load_categories_file2(struct ndpi_detection_module_struct *ndpi_str,
-			       FILE *fd, void *user_data) {
+int ndpi_load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str,
+			         FILE *fd, void *user_data) {
   char buffer[512], *line, *name, *category, *saveptr;
   int len, num = 0;
 
@@ -4801,14 +4801,14 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
     return -1;
   }
 
-  rc = ndpi_load_protocols_file2(ndpi_str, fd);
+  rc = ndpi_load_protocols_file_fd(ndpi_str, fd);
 
   fclose(fd);
 
   return rc;
 }
 
-int ndpi_load_protocols_file2(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
+int ndpi_load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
   char *buffer, *old_buffer;
   int chunk_len = 1024, buffer_len = chunk_len, old_buffer_len;
   int i;
