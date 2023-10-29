@@ -2697,13 +2697,22 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 					char *value, u_int16_t protocol_id) {
   ndpi_patricia_node_t *node;
   struct in_addr pin;
+  struct in6_addr pin6;
   int bits = 32;
+  int is_ipv6 = 0;
   char *ptr = strrchr(value, '/');
-  u_int16_t port = 0; /* Format ip:8.248.73.247:443 */
-  char *double_column;
+  u_int16_t port = 0; /* Format ip:8.248.73.247 */
+                      /* Format ipv6:[fe80::76ac:b9ff:fe6c:c124]/64 */
+  char *double_column = NULL;
 
   if(!ndpi_str->protocols_ptree)
     return(-1);
+
+  if(value[0] == '[') {
+    is_ipv6 = 1;
+    bits = 128;
+    value += 1;
+  }
 
   if(ptr) {
     ptr[0] = '\0';
@@ -2714,14 +2723,32 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
       port = atoi(&double_column[1]);
     }
 
-    if(atoi(ptr) >= 0 && atoi(ptr) <= 32)
-      bits = atoi(ptr);
+    if(!is_ipv6) {
+      if(atoi(ptr) >= 0 && atoi(ptr) <= 32)
+        bits = atoi(ptr);
+    } else {
+      if(atoi(ptr) >= 0 && atoi(ptr) <= 128)
+        bits = atoi(ptr);
+
+      ptr = strrchr(value, ']');
+      if(ptr)
+        *ptr = '\0';
+    }
   } else {
     /*
       Let's check if there is the port defined
       Example: ip:8.248.73.247:443@AmazonPrime
+      Example: ipv6:[fe80::76ac:b9ff:fe6c:c124]:36818@CustomProtocolF
     */
-    double_column = strrchr(value, ':');
+    if(!is_ipv6) {
+      double_column = strrchr(value, ':');
+    } else {
+      ptr = strrchr(value, ']');
+      if(ptr) {
+        double_column = strrchr(ptr, ':');
+        *ptr = '\0';
+      }
+    }
 
     if(double_column) {
       double_column[0] = '\0';
@@ -2729,10 +2756,17 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
     }
   }
 
-  if(inet_pton(AF_INET, value, &pin) != 1)
-    return(-1);
+  if(!is_ipv6) {
+    if(inet_pton(AF_INET, value, &pin) != 1)
+      return(-1);
+    node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits);
+  } else {
+    if(inet_pton(AF_INET6, value, &pin6) != 1)
+      return(-1);
+    node = add_to_ptree(ndpi_str->protocols_ptree6, AF_INET6, &pin6, bits);
+  }
 
-  if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits)) != NULL) {
+  if(node != NULL) {
     int i;
     struct patricia_uv16_list *item;
 
@@ -4227,6 +4261,8 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       is_tcp = 1, value = &attr[4];
     else if(strncmp(attr, "udp:", 4) == 0)
       is_udp = 1, value = &attr[4];
+    else if(strncmp(attr, "ipv6:", 5) == 0)
+      is_ip = 1, value = &attr[5];
     else if(strncmp(attr, "ip:", 3) == 0)
       is_ip = 1, value = &attr[3];
     else if(strncmp(attr, "host:", 5) == 0) {
