@@ -46,7 +46,6 @@ host:"api-global.netflix.com"@Netflix
 #    detected as <L7 proto>.Google but only
 #    as <L7 proto>
 #
-
 ip:213.75.170.11/32:443@CustomProtocol
 ip:8.248.73.247:443@AmazonPrime
 ip:54.80.47.130@AmazonPrime
@@ -60,6 +59,12 @@ ipv6:[247f:855b:5e16:3caf::]/64:100@CustomProtocolE
 ipv6:[247f:855b:5e16:3caf::]/64@CustomProtocolF
 ipv6:[fe80::76ac:b9ff:fe6c:c124]:12717@CustomProtocolG
 ipv6:[fe80::76ac:b9ff:fe6c:c124]:12718@CustomProtocolH
+
+#
+# You can use symbolic IP addreses if you want
+#
+ip:www.ntop.org@ntop
+ipv6:www.ntop.org@ntop
 
 #
 # Risk Exceptions

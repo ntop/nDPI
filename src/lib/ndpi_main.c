@@ -191,7 +191,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_TCP_ISSUES,                            NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_FULLY_ENCRYPTED,                       NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_TLS_ALPN_SNI_MISMATCH,                 NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
-  { NDPI_MALWARE_HOST_CONTACTED,                NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },  
+  { NDPI_MALWARE_HOST_CONTACTED,                NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY   }
@@ -2698,17 +2698,19 @@ static void ndpi_init_ptree_ipv6(struct ndpi_detection_module_struct *ndpi_str,
 /* ******************************************* */
 
 static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
-					char *value, u_int16_t protocol_id) {
+					char *value, u_int16_t protocol_id,
+					u_int8_t is_ipv6) {
   ndpi_patricia_node_t *node;
   struct in_addr pin;
   struct in6_addr pin6;
   int bits = 32;
-  int is_ipv6 = 0;
   char *ptr = strrchr(value, '/');
   u_int16_t port = 0; /* Format ip:8.248.73.247 */
                       /* Format ipv6:[fe80::76ac:b9ff:fe6c:c124]/64 */
   char *double_column = NULL;
-
+  struct hostent *h;
+  bool value_ready = false;
+  
   if(!ndpi_str->protocols_ptree)
     return(-1);
 
@@ -2741,6 +2743,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   } else {
     /*
       Let's check if there is the port defined
+
       Example: ip:8.248.73.247:443@AmazonPrime
       Example: ipv6:[fe80::76ac:b9ff:fe6c:c124]:36818@CustomProtocolF
     */
@@ -2761,12 +2764,41 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   }
 
   if(!is_ipv6) {
-    if(inet_pton(AF_INET, value, &pin) != 1)
-      return(-1);
+    /* Check if the IP address is symbolic or numeric */
+    unsigned int d[4];
+    char tail[16] = { '\0' };
+    int c = sscanf(value, "%3u.%3u.%3u.%3u%s", &d[0], &d[1], &d[2], &d[3], tail);
+
+    if ((c != 4) || tail[0]) {
+      /* This might be a symbolic IPv4 address */
+
+      if((h = gethostbyname2(value, AF_INET)) != NULL) {
+	memcpy(&pin, h->h_addr_list[0], sizeof(pin));
+	value_ready = true;
+      }
+    }
+
+    if(!value_ready) {
+      if(inet_pton(AF_INET, value, &pin) != 1)
+	return(-1);
+    }
+
     node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, bits);
   } else {
-    if(inet_pton(AF_INET6, value, &pin6) != 1)
-      return(-1);
+    if(strchr(value, ':') == NULL) {
+      /* This might be a symbolic IPv6 address */
+
+      if((h = gethostbyname2(value, AF_INET6)) != NULL) {
+	memcpy(&pin6, h->h_addr_list[0], sizeof(pin6));
+	value_ready = true;
+      }
+    }
+
+    if(!value_ready) {
+      if(inet_pton(AF_INET6, value, &pin6) != 1)
+	return(-1);
+    }
+    
     node = add_to_ptree(ndpi_str->protocols_ptree6, AF_INET6, &pin6, bits);
   }
 
@@ -3668,16 +3700,16 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
   char buf[128];
   u_int8_t class_id;
   u_int max_len = sizeof(buf)-1;
-    
+
   if(name_len > max_len) name_len = max_len;
   memcpy(buf, name, name_len);
   buf[name_len] = '\0';
-  
+
   if(ndpi_domain_classify_contains(ndpi_str->custom_categories.sc_hostnames,
 				   &class_id, buf)) {
     *category = (ndpi_protocol_category_t)class_id;
     return(0);
-  } else    
+  } else
     return(-1); /* Not found */
 #endif
 }
@@ -4300,13 +4332,14 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
     char *attr = elem, *value = NULL;
     ndpi_port_range range;
     int is_tcp = 0, is_udp = 0, is_ip = 0;
+    u_int8_t is_ipv6_ip = 0;
 
     if(strncmp(attr, "tcp:", 4) == 0)
       is_tcp = 1, value = &attr[4];
     else if(strncmp(attr, "udp:", 4) == 0)
       is_udp = 1, value = &attr[4];
     else if(strncmp(attr, "ipv6:", 5) == 0)
-      is_ip = 1, value = &attr[5];
+      is_ip = 1, is_ipv6_ip = 1, value = &attr[5];
     else if(strncmp(attr, "ip:", 3) == 0)
       is_ip = 1, value = &attr[3];
     else if(strncmp(attr, "host:", 5) == 0) {
@@ -4374,7 +4407,7 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 
       if(rc != 0) ret = rc;
     } else if(is_ip) {
-      int rc = ndpi_add_host_ip_subprotocol(ndpi_str, value, subprotocol_id);
+      int rc = ndpi_add_host_ip_subprotocol(ndpi_str, value, subprotocol_id, is_ipv6_ip);
 
       if(rc != 0)
 	return(rc);
@@ -4510,10 +4543,10 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
 
     while((line[len] == '\n') || (line[len] == '\r'))
       line[len--] = '\0';
-	  
+
     while((line[0] == '-') || (line[0] == '.'))
       line++;
-	  
+
     if(ndpi_load_category(ndpi_str, line, category_id, NULL) > 0)
       num_loaded++;
   }
@@ -7372,7 +7405,7 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
 				   u_int32_t saddr, u_int32_t daddr,
 				   ndpi_protocol *ret) {
   bool match_client = true;
-  
+
   ret->custom_category_userdata = NULL;
 
   if(ndpi_str->custom_categories.categories_loaded &&
@@ -7408,7 +7441,7 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
       if((ret->category == CUSTOM_CATEGORY_MALWARE) && (match_client == false)) {
 	ndpi_set_risk(ndpi_str, flow, NDPI_MALWARE_HOST_CONTACTED, "Client contacted malware host");
       }
-      
+
       return(1);
     }
   }
@@ -7674,7 +7707,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
   if(flow->num_processed_pkts == 1) {
     /* first packet of this flow to be analyzed */
-    
+
 #ifdef HAVE_NBPF
     if(ndpi_str->nbpf_custom_proto[0].tree != NULL) {
       u_int8_t i;
@@ -7715,7 +7748,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     }
 #endif
   }
-  
+
   ndpi_connection_tracking(ndpi_str, flow);
 
   /* build ndpi_selection packet bitmask */
@@ -7763,7 +7796,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     ndpi_fill_protocol_category(ndpi_str, flow, &ret);
   else
     ret.category = flow->category;
-    
+
   if((!flow->risk_checked)
      && ((ret.master_protocol != NDPI_PROTOCOL_UNKNOWN) || (ret.app_protocol != NDPI_PROTOCOL_UNKNOWN))
      ) {
@@ -10188,7 +10221,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
       u_int i, j, max_tmp_len = sizeof(tmp)-1;
 
       len = ndpi_snprintf(tmp, max_tmp_len, "%s", name);
-      
+
       if(len < 0) {
 	NDPI_LOG_DBG2(ndpi_str, "[DGA] too short");
 	return(0);
@@ -10298,7 +10331,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
       for(word = strtok_r(tmp, ".", &tok_tmp); ; word = strtok_r(NULL, ".", &tok_tmp)) {
 	u_int num_consecutive_digits = 0, word_len;
-	
+
 	if(!word) break; else num_word++;
 
 	num_words++;
@@ -10310,7 +10343,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	if((word_len < 10) && (ndpi_ends_with(ndpi_str, word, "cdn") /* Content Delivery Network ? */))
 	  continue; /* Ignore names (not too long) that end with cdn [ ssl.p.jwpcdn.com or www.awxcdn.com ] */
-	
+
 	NDPI_LOG_DBG2(ndpi_str, "[DGA] word(%s) [%s][len: %u]\n", word, name, (unsigned int)strlen(word));
 
 	trigram_char_skip = 0;
