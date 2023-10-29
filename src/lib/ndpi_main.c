@@ -2285,6 +2285,10 @@ int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_patricia_get_stats(ndpi_struct->ip_risk_mask_ptree, stats);
     return 0;
 
+  case NDPI_PTREE_RISK_MASK6:
+    ndpi_patricia_get_stats(ndpi_struct->ip_risk_mask_ptree6, stats);
+    return 0;
+
   case NDPI_PTREE_RISK:
     ndpi_patricia_get_stats(ndpi_struct->ip_risk_ptree, stats);
     return 0;
@@ -3158,6 +3162,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
 
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
+  ndpi_str->ip_risk_mask_ptree6 = ndpi_patricia_new(128 /* IPv6 */);
 
   if(!(prefs & ndpi_dont_init_risk_ptree)) {
 
@@ -3774,6 +3779,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->ip_risk_mask_ptree)
       ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree, NULL);
 
+    if(ndpi_str->ip_risk_mask_ptree6)
+      ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree6, NULL);
+
     if(ndpi_str->ip_risk_ptree)
       ndpi_patricia_destroy((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree, NULL);
 
@@ -4030,26 +4038,42 @@ char *strsep(char **sp, char *sep) {
 
 int ndpi_add_ip_risk_mask(struct ndpi_detection_module_struct *ndpi_str,
 			  char *ip, ndpi_risk mask) {
-  char *saveptr, *addr = strtok_r(ip, "/", &saveptr);
+  char *cidr, *saveptr, *addr = strtok_r(ip, "/", &saveptr);
+  int is_ipv6 = 0;
+  ndpi_patricia_node_t *node = NULL;
 
-  if(!ndpi_str->ip_risk_mask_ptree)
-    return(-3);
+  if(!addr || strlen(addr) == 0)
+    return(-2);
 
-  if(addr) {
-    char *cidr = strtok_r(NULL, "\n", &saveptr);
+  if(ip[0] == '[') {
+    is_ipv6 = 1;
+    addr += 1;
+    addr[strlen(addr) - 1] = '\0'; /* strip ']' */
+  }
+
+  cidr = strtok_r(NULL, "\n", &saveptr);
+
+  if(!is_ipv6 && ndpi_str->ip_risk_mask_ptree) {
     struct in_addr pin;
-    ndpi_patricia_node_t *node;
 
     pin.s_addr = inet_addr(addr);
-    /* FIX: Add IPv6 support */
-    if((node = add_to_ptree(ndpi_str->ip_risk_mask_ptree, AF_INET,
-			    &pin, cidr ? atoi(cidr) : 32 /* bits */)) != NULL) {
-      node->value.u.uv64 = (u_int64_t)mask;
-      return(0);
-    } else
-      return(-1);
-  } else
+    node = add_to_ptree(ndpi_str->ip_risk_mask_ptree, AF_INET,
+			&pin, cidr ? atoi(cidr) : 32 /* bits */);
+  } else if(is_ipv6 && ndpi_str->ip_risk_mask_ptree6) {
+    struct in6_addr pin6;
+
+    inet_pton(AF_INET6, addr, &pin6);
+    node = add_to_ptree(ndpi_str->ip_risk_mask_ptree6, AF_INET6,
+			&pin6, cidr ? atoi(cidr) : 128 /* bits */);
+  } else {
     return(-2);
+  }
+
+  if(node) {
+    node->value.u.uv64 = (u_int64_t)mask;
+    return(0);
+  }
+  return(-1);
 }
 
 /* ******************************************************************** */
@@ -4173,7 +4197,8 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       if(value) {
 	ndpi_risk risk_mask = (ndpi_risk)atoll(value);
 
-	if(!strcmp(rule_type, "ip_risk_mask")) {
+	if(!strcmp(rule_type, "ip_risk_mask") ||
+	   !strcmp(rule_type, "ipv6_risk_mask")) {
 	  return(ndpi_add_ip_risk_mask(ndpi_str, key, risk_mask));
 	} else if(!strcmp(rule_type, "host_risk_mask")) {
 	  return(ndpi_add_host_risk_mask(ndpi_str, key, risk_mask));

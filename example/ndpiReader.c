@@ -3895,6 +3895,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       printf("\tPatricia risk mask:   %llu/%llu (search/found)\n",
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK].n_search,
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK].n_found);
+      printf("\tPatricia risk mask IPv6: %llu/%llu (search/found)\n",
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK6].n_search,
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK6].n_found);
       printf("\tPatricia risk:        %llu/%llu (search/found)\n",
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK].n_search,
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK].n_found);
@@ -3997,6 +4000,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       fprintf(results_file, "Patricia risk mask:   %llu/%llu (search/found)\n",
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK].n_search,
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK].n_found);
+      fprintf(results_file, "Patricia risk mask IPv6: %llu/%llu (search/found)\n",
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK6].n_search,
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK6].n_found);
       fprintf(results_file, "Patricia risk:        %llu/%llu (search/found)\n",
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK].n_search,
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK].n_found);
