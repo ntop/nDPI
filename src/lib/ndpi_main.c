@@ -2768,7 +2768,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
     /* Check if the IP address is symbolic or numeric */
     unsigned int d[4];
     char tail[16] = { '\0' };
-    int c = sscanf(value, "%3u.%3u.%3u.%3u%s", &d[0], &d[1], &d[2], &d[3], tail);
+    int c = sscanf(value, "%3u.%3u.%3u.%3u%15s", &d[0], &d[1], &d[2], &d[3], tail);
 
     if ((c != 4) || tail[0]) {
       /* This might be a symbolic IPv4 address */
