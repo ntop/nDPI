@@ -6264,6 +6264,22 @@ static int fully_enc_heuristic(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ************************************************ */
 
+int ndpi_current_pkt_from_client_to_server(const struct ndpi_detection_module_struct *ndpi_str,
+					   const struct ndpi_flow_struct *flow)
+{
+  return ndpi_str->packet.packet_direction == flow->client_packet_direction;
+}
+
+/* ******************************************************************** */
+
+int ndpi_current_pkt_from_server_to_client(const struct ndpi_detection_module_struct *ndpi_str,
+					   const struct ndpi_flow_struct *flow)
+{
+  return ndpi_str->packet.packet_direction != flow->client_packet_direction;
+}
+
+/* ******************************************************************** */
+
 static int tcp_ack_padding(struct ndpi_packet_struct *packet) {
   const struct ndpi_tcphdr *tcph = packet->tcp;
   if(tcph && tcph->ack && !tcph->psh &&
@@ -6467,7 +6483,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	}
       }
 
-      if(ndpi_current_pkt_from_client_to_server(packet, flow)) {
+      if(ndpi_current_pkt_from_client_to_server(ndpi_str, flow)) {
 	if(flow->is_ipv6 == 0) {
 	  flow->c_address.v4 = packet->iph->saddr;
 	  flow->s_address.v4 = packet->iph->daddr;
@@ -8708,86 +8724,6 @@ int NDPI_PROTOCOL_IP_is_set(const ndpi_ip_addr_t *ip) {
 
 /* ********************************************************************************* */
 
-/* check if the source ip address in packet and ip are equal */
-/* NTOP */
-int ndpi_packet_src_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t *ip) {
-  /* IPv6 */
-  if(packet->iphv6 != NULL) {
-    if(packet->iphv6->ip6_src.u6_addr.u6_addr32[0] == ip->ipv6.u6_addr.u6_addr32[0] &&
-       packet->iphv6->ip6_src.u6_addr.u6_addr32[1] == ip->ipv6.u6_addr.u6_addr32[1] &&
-       packet->iphv6->ip6_src.u6_addr.u6_addr32[2] == ip->ipv6.u6_addr.u6_addr32[2] &&
-       packet->iphv6->ip6_src.u6_addr.u6_addr32[3] == ip->ipv6.u6_addr.u6_addr32[3])
-      return(1);
-    //else
-    return(0);
-  }
-
-  /* IPv4 */
-  if(packet->iph->saddr == ip->ipv4)
-    return(1);
-  return(0);
-}
-
-/* ********************************************************************************* */
-
-/* check if the destination ip address in packet and ip are equal */
-int ndpi_packet_dst_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t *ip) {
-  /* IPv6 */
-  if(packet->iphv6 != NULL) {
-    if(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0] == ip->ipv6.u6_addr.u6_addr32[0] &&
-       packet->iphv6->ip6_dst.u6_addr.u6_addr32[1] == ip->ipv6.u6_addr.u6_addr32[1] &&
-       packet->iphv6->ip6_dst.u6_addr.u6_addr32[2] == ip->ipv6.u6_addr.u6_addr32[2] &&
-       packet->iphv6->ip6_dst.u6_addr.u6_addr32[3] == ip->ipv6.u6_addr.u6_addr32[3])
-      return(1);
-    //else
-    return(0);
-  }
-
-  /* IPv4 */
-  if(packet->iph->saddr == ip->ipv4)
-    return(1);
-
-  return(0);
-}
-
-/* ********************************************************************************* */
-
-/* get the source ip address from packet and put it into ip */
-/* NTOP */
-void ndpi_packet_src_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t *ip) {
-  NDPI_PROTOCOL_IP_clear(ip);
-
-  /* IPv6 */
-  if(packet->iphv6 != NULL) {
-    ip->ipv6.u6_addr.u6_addr32[0] = packet->iphv6->ip6_src.u6_addr.u6_addr32[0];
-    ip->ipv6.u6_addr.u6_addr32[1] = packet->iphv6->ip6_src.u6_addr.u6_addr32[1];
-    ip->ipv6.u6_addr.u6_addr32[2] = packet->iphv6->ip6_src.u6_addr.u6_addr32[2];
-    ip->ipv6.u6_addr.u6_addr32[3] = packet->iphv6->ip6_src.u6_addr.u6_addr32[3];
-  } else {
-    /* IPv4 */
-    ip->ipv4 = packet->iph->saddr;
-  }
-}
-
-/* ********************************************************************************* */
-
-/* get the destination ip address from packet and put it into ip */
-/* NTOP */
-void ndpi_packet_dst_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t *ip) {
-  NDPI_PROTOCOL_IP_clear(ip);
-
-  if(packet->iphv6 != NULL) {
-    ip->ipv6.u6_addr.u6_addr32[0] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[0];
-    ip->ipv6.u6_addr.u6_addr32[1] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[1];
-    ip->ipv6.u6_addr.u6_addr32[2] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[2];
-    ip->ipv6.u6_addr.u6_addr32[3] = packet->iphv6->ip6_dst.u6_addr.u6_addr32[3];
-
-  } else
-    ip->ipv4 = packet->iph->daddr;
-}
-
-/* ********************************************************************************* */
-
 u_int8_t ndpi_is_ipv6(const ndpi_ip_addr_t *ip) {
   return(ip->ipv6.u6_addr.u6_addr32[1] != 0 || ip->ipv6.u6_addr.u6_addr32[2] != 0 ||
 	 ip->ipv6.u6_addr.u6_addr32[3] != 0);
@@ -10562,22 +10498,6 @@ char *ndpi_user_agent_set(struct ndpi_flow_struct *flow,
   }
 
   return flow->http.user_agent;
-}
-
-/* ******************************************************************** */
-
-int ndpi_current_pkt_from_client_to_server(const struct ndpi_packet_struct *packet,
-					   const struct ndpi_flow_struct *flow)
-{
-  return packet->packet_direction == flow->client_packet_direction;
-}
-
-/* ******************************************************************** */
-
-int ndpi_current_pkt_from_server_to_client(const struct ndpi_packet_struct *packet,
-					   const struct ndpi_flow_struct *flow)
-{
-  return packet->packet_direction != flow->client_packet_direction;
 }
 
 /* ******************************************************************** */
