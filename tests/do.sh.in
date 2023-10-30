@@ -26,7 +26,7 @@ CMD_COLORDIFF="$(which colordiff)"
 
 EXE_SUFFIX=@EXE_SUFFIX@
 GPROF_ENABLED=@GPROF_ENABLED@
-PCRE_ENABLED=@PCRE_ENABLED@
+PCRE2_ENABLED=@PCRE2_ENABLED@
 PCRE_PCAPS="WebattackRCE.pcap"
 NBPF_ENABLED=@NBPF_ENABLED@
 NBPF_PCAPS="h323-overflow.pcap"
@@ -84,7 +84,7 @@ check_results() {
 		[ $SKIP_PCAP = 1 ] && continue
 	    fi
 	    SKIP_PCAP=0
-	    if [ $PCRE_ENABLED -eq 0 ]; then
+	    if [ $PCRE2_ENABLED -eq 0 ]; then
 	      for p in $PCRE_PCAPS; do
 	        if [ $f = $p ]; then
 	          SKIP_PCAP=1

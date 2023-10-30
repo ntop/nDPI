@@ -42,7 +42,7 @@ jobs:
           pprof -h
       - name: Configure nDPI library
         run: |
-          ./autogen.sh --enable-gprof --enable-option-checking=fatal --with-pcre --with-maxminddb --enable-tls-sigs --enable-debug-messages
+          ./autogen.sh --enable-gprof --enable-option-checking=fatal --with-pcre2 --with-maxminddb --enable-tls-sigs --enable-debug-messages
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2

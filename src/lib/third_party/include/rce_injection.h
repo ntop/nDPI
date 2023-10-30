@@ -1,4 +1,4 @@
-#ifdef HAVE_PCRE
+#ifdef HAVE_PCRE2
 
 #ifndef NDPI_RCE_H
 #define NDPI_RCE_H
@@ -8,7 +8,7 @@
 #define N_RCE_REGEX 7
 
 /* Compiled regex */
-static struct pcre_struct *comp_rx[N_RCE_REGEX];
+static struct pcre2_struct *comp_rx[N_RCE_REGEX];
 
 static unsigned int initialized_comp_rx = 0;
 
@@ -615,4 +615,4 @@ static const char *pwsh_commands[] = {
   "-PSConsoleFile"
 };
 
-#endif //HAVE_PCRE
+#endif //HAVE_PCRE2

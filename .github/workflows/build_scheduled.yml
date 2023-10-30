@@ -23,7 +23,7 @@ jobs:
           sudo apt-get install libpcre3-dev libmaxminddb-dev lcov
           sudo apt-get install wdiff colordiff
       - name: Configure
-        run: ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre --with-maxminddb --enable-tls-sigs
+        run: ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre2 --with-maxminddb --enable-tls-sigs
       - name: Build
         run: make all
       - name: Test
@@ -91,7 +91,7 @@ jobs:
           pprof -h
       - name: Configure nDPI library
         run: |
-          ./autogen.sh --enable-gprof --enable-option-checking=fatal --with-pcre --with-maxminddb --enable-tls-sigs
+          ./autogen.sh --enable-gprof --enable-option-checking=fatal --with-pcre2 --with-maxminddb --enable-tls-sigs
       - name: Build nDPI library
         run: |
           make

@@ -359,14 +359,14 @@ AS_IF([test "${with_local_libgcrypt+set}" = set],[
   AC_DEFINE_UNQUOTED(USE_HOST_LIBGCRYPT, 1, [Use locally installed libgcrypt instead of builtin gcrypt-light])
 ])
 
-dnl> PCRE
-PCRE_ENABLED=0
-AC_ARG_WITH(pcre, AS_HELP_STRING([--with-pcre], [Enable nDPI build with libpcre]))
-if test "${with_pcre+set}" = set; then :
-  AC_CHECK_LIB(pcre, pcre_compile, AC_DEFINE_UNQUOTED(HAVE_PCRE, 1, [libpcre(-dev) is present]))
-  if test "x$ac_cv_lib_pcre_pcre_compile" = xyes; then :
-    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lpcre"
-    PCRE_ENABLED=1
+dnl> PCRE2
+PCRE2_ENABLED=0
+AC_ARG_WITH(pcre2, AS_HELP_STRING([--with-pcre2], [Enable nDPI build with libpcre2]))
+if test "${with_pcre2+set}" = set; then :
+  AC_CHECK_LIB(pcre2-8, pcre2_compile_8, AC_DEFINE_UNQUOTED(HAVE_PCRE2, 1, [libpcre2(-dev) is present]))
+  if test "x$ac_cv_lib_pcre2_8_pcre2_compile_8" = xyes; then :
+    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lpcre2-8"
+    PCRE2_ENABLED=1
   fi
 fi
 
@@ -420,7 +420,7 @@ AC_SUBST(GPROF_CFLAGS)
 AC_SUBST(GPROF_LIBS)
 AC_SUBST(GPROF_ENABLED)
 AC_SUBST(USE_HOST_LIBGCRYPT)
-AC_SUBST(PCRE_ENABLED)
+AC_SUBST(PCRE2_ENABLED)
 AC_SUBST(NBPF_ENABLED)
 AC_SUBST(HANDLE_TLS_SIGS)
 AC_SUBST(DISABLE_NPCAP)
