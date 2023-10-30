@@ -2714,9 +2714,9 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   u_int16_t port = 0; /* Format ip:8.248.73.247 */
                       /* Format ipv6:[fe80::76ac:b9ff:fe6c:c124]/64 */
   char *double_column = NULL;
-  struct hostent *h;
   bool value_ready = false;
-  
+  struct addrinfo hints, *result, *rp;
+
   if(!ndpi_str->protocols_ptree)
     return(-1);
 
@@ -2769,18 +2769,32 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
     }
   }
 
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = is_ipv6 ? AF_INET6 : AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_CANONNAME;
+
   if(!is_ipv6) {
     /* Check if the IP address is symbolic or numeric */
     unsigned int d[4];
     char tail[16] = { '\0' };
-    int c = sscanf(value, "%3u.%3u.%3u.%3u%15s", &d[0], &d[1], &d[2], &d[3], tail);
+    int c = sscanf(value, "%3u.%3u.%3u.%3u%15s",
+		   &d[0], &d[1], &d[2], &d[3], tail);
 
     if ((c != 4) || tail[0]) {
       /* This might be a symbolic IPv4 address */
 
-      if((h = gethostbyname2(value, AF_INET)) != NULL) {
-	memcpy(&pin, h->h_addr_list[0], sizeof(pin));
-	value_ready = true;
+      if(getaddrinfo(value, NULL, &hints, &result) != 0)
+	return(-1);
+
+      for(rp = result; rp != NULL; rp = rp->ai_next) {
+	if(rp->ai_family == AF_INET) {
+	  struct sockaddr_in *addr = (struct sockaddr_in *)rp->ai_addr;
+
+	  memcpy(&pin, &(addr->sin_addr), sizeof(struct in_addr));
+	  value_ready = true;
+	  break;
+	}
       }
     }
 
@@ -2794,9 +2808,17 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
     if(strchr(value, ':') == NULL) {
       /* This might be a symbolic IPv6 address */
 
-      if((h = gethostbyname2(value, AF_INET6)) != NULL) {
-	memcpy(&pin6, h->h_addr_list[0], sizeof(pin6));
-	value_ready = true;
+      if(getaddrinfo(value, NULL, &hints, &result) != 0)
+	return(-1);
+
+      for(rp = result; rp != NULL; rp = rp->ai_next) {
+	if(rp->ai_family == AF_INET6) {
+	  struct sockaddr_in6 *addr = (struct sockaddr_in6 *)rp->ai_addr;
+
+	  memcpy(&pin6, &(addr->sin6_addr), sizeof(struct in6_addr));
+	  value_ready = true;
+	  break;
+	}
       }
     }
 
@@ -2804,7 +2826,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
       if(inet_pton(AF_INET6, value, &pin6) != 1)
 	return(-1);
     }
-    
+
     node = add_to_ptree(ndpi_str->protocols_ptree6, AF_INET6, &pin6, bits);
   }
 
