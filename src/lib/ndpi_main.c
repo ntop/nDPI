@@ -2796,6 +2796,8 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 	  break;
 	}
       }
+
+      freeaddrinfo(result);
     }
 
     if(!value_ready) {
@@ -2820,6 +2822,8 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 	  break;
 	}
       }
+
+      freeaddrinfo(result);
     }
 
     if(!value_ready) {
