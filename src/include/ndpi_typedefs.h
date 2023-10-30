@@ -1533,7 +1533,7 @@ struct ndpi_flow_struct {
   } kerberos_buf;
 
   struct {
-    u_int8_t num_pkts, num_binding_requests, num_processed_pkts, maybe_dtls;
+    u_int8_t maybe_dtls;
   } stun;
 
   struct {

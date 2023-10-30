@@ -180,3 +180,12 @@ References: `Main site <https://ethereum.org/en/developers/docs/intro-to-ethereu
 Notes:
 
 - same as Bitcoin, not each crypto exchange is a mining, it could be a normal transaction, sending or receving or even blockchain exploration.
+
+
+.. _Proto 355:
+
+`NDPI_PROTOCOL_TELEGRAM_VOIP`
+============================
+Audio/video calls made using the Telegram app.
+
+References: `Wikipedia <https://en.wikipedia.org/wiki/Telegram_(software)/>`_.

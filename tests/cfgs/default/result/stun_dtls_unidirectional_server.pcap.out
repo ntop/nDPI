@@ -1,0 +1,32 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	3	(3.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 6 (6.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/4/0 (insert/search/found)
+LRU cache tls_cert:   0/1/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      1/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        1/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+DTLS	6	1563	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+
+
+	1	UDP 33.35.223.103:540 -> 26.83.9.81:57567 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 3][6 pkts/1563 bytes -> 0 pkts/0 bytes][Goodput ratio: 84/0][1.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 232/0 299/0 116/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/0 260/0 958/0 312/0][Risk: ** Known Proto on Non Std Port **** Self-signed Cert **** Unidirectional Traffic **][Risk Score: 160][Risk Info: No client to server traffic / CN=LiveFoundry Inc.][DTLSv1.0][JA3S: 1974c5c625e99dc22d0477079a54aed3][Issuer: CN=LiveFoundry Inc.][Subject: CN=LiveFoundry Inc.][Certificate SHA-1: 23:F4:E7:42:93:22:91:BB:A3:54:70:97:94:2A:DE:AF:26:61:18:98][Validity: 2015-08-27 09:07:05 - 2016-08-27 09:07:05][Cipher: TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA][PLAIN TEXT (LiveFoundry Inc.0)][Plen Bins: 0,0,67,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

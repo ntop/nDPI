@@ -1,0 +1,33 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	4	(4.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 6 (6.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/4/0 (insert/search/found)
+LRU cache tls_cert:   0/1/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        1/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+DTLS	6	1708	1
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 26.83.9.81               	 1      
+
+
+	1	UDP 26.83.9.81:57567 -> 33.35.223.103:540 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][6 pkts/1708 bytes -> 0 pkts/0 bytes][Goodput ratio: 85/0][1.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 232/0 299/0 116/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/0 285/0 873/0 267/0][Risk: ** Known Proto on Non Std Port **** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **** Unidirectional Traffic **][Risk Score: 120][Risk Info: No server to client traffic / No ALPN][DTLSv1.0][JA3C: f5eee7bc59657db39e2b9cdd401d78b7][PLAIN TEXT (ugPnBzE)][Plen Bins: 0,0,16,51,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

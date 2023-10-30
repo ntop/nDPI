@@ -1373,16 +1373,6 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_end_of_block(serializer);
     break;
 
-  case NDPI_PROTOCOL_STUN:
-    ndpi_serialize_start_of_block(serializer, "stun");
-    ndpi_serialize_string_uint32(serializer, "num_pkts", flow->stun.num_pkts);
-    ndpi_serialize_string_uint32(serializer, "num_binding_requests",
-                                 flow->stun.num_binding_requests);
-    ndpi_serialize_string_uint32(serializer, "num_processed_pkts",
-                                 flow->stun.num_processed_pkts);
-    ndpi_serialize_end_of_block(serializer);
-    break;
-
   case NDPI_PROTOCOL_TELNET:
     ndpi_serialize_start_of_block(serializer, "telnet");
     ndpi_serialize_string_string(serializer, "username", flow->protos.telnet.username);
