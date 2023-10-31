@@ -2,13 +2,14 @@ Guessed flow protos:	1
 
 DPI Packets (TCP):	22	(22.00 pkts/flow)
 DPI Packets (UDP):	13	(1.00 pkts/flow)
-Confidence DPI              : 13 (flows)
+Confidence DPI (cache)      : 2 (flows)
+Confidence DPI              : 11 (flows)
 Confidence Match by IP      : 1 (flows)
-Num dissector calls: 395 (28.21 diss/flow)
+Num dissector calls: 390 (27.86 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
-LRU cache stun:       2/16/12 (insert/search/found)
+LRU cache stun:       14/2/2 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/1/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
@@ -19,8 +20,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   14/0 (search/found)
-Patricia risk:        2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        1/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   22/6 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 SSDP	8	1377	3
 DHCP	2	684	1
@@ -30,9 +34,9 @@ WhatsApp	133	20568	1
 Spotify	1	86	1
 
 	1	UDP 192.168.2.12:53688 <-> 31.13.86.48:3478 [proto: 78.45/STUN.WhatsAppCall][IP: 119/Facebook][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][347 pkts/223797 bytes <-> 146 pkts/24878 bytes][Goodput ratio: 93/75][22.48 sec][bytes ratio: 0.800 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 44/77 2891/3013 278/400][Pkt Len c2s/s2c min/avg/max/stddev: 48/44 645/170 1181/1095 402/174][PLAIN TEXT (hw3@PydH)][Plen Bins: 11,29,10,5,5,0,0,0,0,0,0,0,0,0,14,0,3,0,0,0,0,0,0,0,0,1,1,0,1,3,2,0,2,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 192.168.2.12:53688 <-> 91.252.56.51:32641 [proto: 78.45/STUN.WhatsAppCall][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][72 pkts/48848 bytes <-> 35 pkts/22821 bytes][Goodput ratio: 94/94][3.05 sec][bytes ratio: 0.363 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 47/19 707/132 139/32][Pkt Len c2s/s2c min/avg/max/stddev: 68/68 678/652 1160/1140 376/376][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][PLAIN TEXT (dBXAnF)][Plen Bins: 1,8,0,8,2,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1,5,5,14,2,5,1,8,4,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.2.12:53688 <-> 91.252.56.51:32641 [proto: 78.45/STUN.WhatsAppCall][IP: 0/Unknown][ClearText][Confidence: DPI (cache)][DPI packets: 1][cat: VoIP/10][72 pkts/48848 bytes <-> 35 pkts/22821 bytes][Goodput ratio: 94/94][3.05 sec][bytes ratio: 0.363 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 47/19 707/132 139/32][Pkt Len c2s/s2c min/avg/max/stddev: 68/68 678/652 1160/1140 376/376][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][PLAIN TEXT (dBXAnF)][Plen Bins: 1,8,0,8,2,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,8,1,5,5,14,2,5,1,8,4,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.2.12:49355 <-> 157.240.20.53:5222 [proto: 142/WhatsApp][IP: 142/WhatsApp][Encrypted][Confidence: Match by IP][DPI packets: 22][cat: Chat/9][66 pkts/8810 bytes <-> 67 pkts/11758 bytes][Goodput ratio: 50/62][27.94 sec][bytes ratio: -0.143 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 365/429 6456/7033 1181/1216][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 133/175 1454/1454 183/248][PLAIN TEXT (AaPKuGR)][Plen Bins: 2,50,0,5,13,17,0,0,2,0,0,1,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0]
-	4	UDP 192.168.2.12:53688 -> 1.60.78.64:59491 [proto: 78.45/STUN.WhatsAppCall][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][18 pkts/1548 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][10.75 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 618/0 631/0 695/0 17/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/0 86/0 86/0 0/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.168.2.12:53688 -> 1.60.78.64:59491 [proto: 78.45/STUN.WhatsAppCall][IP: 0/Unknown][ClearText][Confidence: DPI (cache)][DPI packets: 1][cat: VoIP/10][18 pkts/1548 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][10.75 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 618/0 631/0 695/0 17/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/0 86/0 86/0 0/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	5	UDP 192.168.2.1:17500 -> 192.168.2.255:17500 [proto: 121/Dropbox][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Cloud/13][2 pkts/764 bytes -> 0 pkts/0 bytes][Goodput ratio: 89/0][< 1 sec][PLAIN TEXT (version)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	6	UDP 0.0.0.0:68 -> 255.255.255.255:67 [proto: 18/DHCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/684 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][8.20 sec][Hostname/SNI: lucas-imac][DHCP Fingerprint: 1,121,3,6,15,119,252,95,44,46][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	7	UDP 192.168.2.12:53688 <-> 157.240.196.62:3478 [proto: 78.45/STUN.WhatsAppCall][IP: 119/Facebook][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][3 pkts/504 bytes <-> 2 pkts/172 bytes][Goodput ratio: 75/51][22.48 sec][Plen Bins: 0,40,0,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

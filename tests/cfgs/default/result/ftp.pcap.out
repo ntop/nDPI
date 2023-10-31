@@ -3,7 +3,7 @@ Guessed flow protos:	1
 DPI Packets (TCP):	39	(13.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 512 (170.67 diss/flow)
+Num dissector calls: 518 (172.67 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -18,8 +18,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   6/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 Unknown	1115	1122198	1
 FTP_CONTROL	68	5571	1

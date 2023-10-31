@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	2	(2.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 59 (59.00 diss/flow)
+Num dissector calls: 57 (57.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -17,8 +17,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  18/18 (search/found)
 Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 2/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   1/0 (search/found)
 Patricia protocols:   0/0 (search/found)
+Patricia protocols IPv6: 2/0 (search/found)
 
 QUIC	4	3998	1
 
@@ -27,4 +30,4 @@ JA3 Host Stats:
 	1	 ::1                      	 1      
 
 
-	1	UDP [::1]:58822 <-> [::1]:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/1410 bytes][Goodput ratio: 95/91][0.01 sec][(Advertised) ALPNs: h3-34;hq-34;h3-33;hq-33;h3-32;hq-32;h3-31;hq-31;h3-29;hq-29;h3-30;hq-30;h3-28;hq-28;h3-27;hq-27;h3;hq-interop][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 150][Risk Info: No server to client traffic][TLSv1.3][JA3C: 0299b052ace53a14c3a04aceb5efd247][Plen Bins: 0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0,0,0,0,0,0,0]
+	1	UDP [::1]:58822 <-> [::1]:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: Web/5][2 pkts/2588 bytes <-> 2 pkts/1410 bytes][Goodput ratio: 95/91][0.01 sec][(Advertised) ALPNs: h3-34;hq-34;h3-33;hq-33;h3-32;hq-32;h3-31;hq-31;h3-29;hq-29;h3-30;hq-30;h3-28;hq-28;h3-27;hq-27;h3;hq-interop][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 150][Risk Info: No server to client traffic][TLSv1.3][QUIC ver: V-1][JA3C: 0299b052ace53a14c3a04aceb5efd247][Plen Bins: 0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0,0,0,0,0,0,0]

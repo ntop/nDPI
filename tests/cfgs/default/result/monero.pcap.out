@@ -17,10 +17,13 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 Mining	319	166676	2
 
-	1	TCP 192.168.2.148:46838 <-> 94.23.199.191:3333 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Mining/99][159 pkts/143155 bytes <-> 113 pkts/13204 bytes][Goodput ratio: 93/43][1091.42 sec][currency: ZCash/Monero][bytes ratio: 0.831 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 7234/8131 71734/71815 15224/15291][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 900/117 1514/376 709/99][Risk: ** Known Proto on Non Std Port **** Unsafe Protocol **][Risk Score: 60][PLAIN TEXT (method)][Plen Bins: 28,2,0,1,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,29,0,0]
-	2	TCP 192.168.2.148:53846 <-> 116.211.167.195:3333 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Mining/99][24 pkts/4455 bytes <-> 23 pkts/5862 bytes][Goodput ratio: 70/78][1065.16 sec][currency: ZCash/Monero][bytes ratio: -0.136 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 46166/51528 195463/195463 61020/65306][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 186/255 1498/364 395/138][Risk: ** Known Proto on Non Std Port **** Unsafe Protocol **][Risk Score: 60][PLAIN TEXT (method)][Plen Bins: 4,13,4,8,0,0,0,0,0,61,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0]
+	1	TCP 192.168.2.148:46838 <-> 94.23.199.191:3333 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Mining/99][159 pkts/143155 bytes <-> 113 pkts/13204 bytes][Goodput ratio: 93/43][1091.42 sec][currency: ZCash/Monero][bytes ratio: 0.831 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 7234/8131 71734/71815 15224/15291][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 900/117 1514/376 709/99][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (method)][Plen Bins: 28,2,0,1,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,29,0,0]
+	2	TCP 192.168.2.148:53846 <-> 116.211.167.195:3333 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Mining/99][24 pkts/4455 bytes <-> 23 pkts/5862 bytes][Goodput ratio: 70/78][1065.16 sec][currency: ZCash/Monero][bytes ratio: -0.136 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 46166/51528 195463/195463 61020/65306][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 186/255 1498/364 395/138][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (method)][Plen Bins: 4,13,4,8,0,0,0,0,0,61,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0]

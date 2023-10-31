@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (TCP):	26	(13.00 pkts/flow)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 147 (73.50 diss/flow)
+Num dissector calls: 150 (75.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -17,8 +17,11 @@ Automa tls cert:      1/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   1/0 (search/found)
 Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 2/0 (search/found)
 
 SMTPS	33	6429	1
 Google	36	8403	1

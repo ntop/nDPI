@@ -17,9 +17,12 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   2/0 (search/found)
-Patricia risk:        2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        1/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 DoH_DoT	2	1464	1
 
-	1	UDP 51.120.20.202:49241 <-> 72.119.217.29:443 [proto: 188.196/QUIC.DoH_DoT][IP: 276/Azure][Encrypted][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/1392 bytes <-> 1 pkts/72 bytes][Goodput ratio: 97/41][0.05 sec][Hostname/SNI: dns.google.com][PLAIN TEXT (dns.google.com)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0]
+	1	UDP 51.120.20.202:49241 <-> 72.119.217.29:443 [proto: 188.196/QUIC.DoH_DoT][IP: 276/Azure][Encrypted][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/1392 bytes <-> 1 pkts/72 bytes][Goodput ratio: 97/41][0.05 sec][Hostname/SNI: dns.google.com][QUIC ver: Q043][PLAIN TEXT (dns.google.com)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0]

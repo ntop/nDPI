@@ -1496,14 +1496,12 @@ int ndpi_serialize_string_int32(ndpi_serializer *_serializer,
   if(serializer->fmt == ndpi_serialization_format_csv) {
     /* Key is ignored */
     u_int32_t buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
-    u_int16_t needed = 11 /* 10 (billion) + CVS separator */;
+    u_int16_t needed = 12 /* 10 (billion) + CVS separator + \0 */;
     int rc;
 
     if(buff_diff < needed) {
       if(ndpi_extend_serializer_buffer(&serializer->buffer, needed - buff_diff) < 0)
-	return(-1);
-      else
-	buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
+	return(-1);     	
     }
 
     if(!(serializer->status.flags & NDPI_SERIALIZER_STATUS_HDR_DONE)) {
@@ -1512,14 +1510,16 @@ int ndpi_serialize_string_int32(ndpi_serializer *_serializer,
     }
 
     ndpi_serialize_csv_pre(serializer);
-    needed--;
+    buff_diff = serializer->buffer.size - serializer->status.buffer.size_used;
 
     rc = ndpi_snprintf((char*)&serializer->buffer.data[serializer->status.buffer.size_used],
-    needed, "%u", value);
+		       buff_diff, "%u", value);
 
     if(rc < 0 || (u_int)rc >= buff_diff)
       return(-1);
+    
     serializer->status.buffer.size_used += rc;
+    
     return(0);
   } else
 #endif

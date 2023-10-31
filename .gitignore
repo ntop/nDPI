@@ -76,10 +76,16 @@
 /fuzz/fuzz_binaryfusefilter
 /fuzz/fuzz_tls_certificate
 /fuzz/fuzz_dga
+/fuzz/fuzz_is_stun_udp
+/fuzz/fuzz_is_stun_tcp
 /fuzz/fuzz_ds_cmsketch
 /fuzz/fuzz_gcrypt_light
+/fuzz/fuzz_gcrypt_aes
+/fuzz/fuzz_gcrypt_gcm
+/fuzz/fuzz_gcrypt_cipher
 /fuzz/fuzz_ndpi_reader_payload_analyzer
 /fuzz/fuzz_filecfg_protocols
+/fuzz/fuzz_filecfg_categories
 /fuzz/fuzz_readerutils_workflow
 /fuzz/fuzz_readerutils_parseprotolist
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
@@ -87,6 +93,8 @@
 /fuzz/fuzz_quic_get_crypto_data_seed_corpus.zip
 /fuzz/fuzz_config_seed_corpus.zip
 /fuzz/fuzz_community_id_seed_corpus.zip
+/fuzz/fuzz_is_stun_udp_seed_corpus.zip
+/fuzz/fuzz_is_stun_tcp_seed_corpus.zip
 /fuzz/fuzz_serialization_seed_corpus.zip
 /fuzz/fuzz_alg_ses_des_seed_corpus.zip
 /fuzz/fuzz_alg_bins_seed_corpus.zip
@@ -105,6 +113,7 @@
 /fuzz/fuzz_libinjection_seed_corpus.zip
 /fuzz/fuzz_tls_certificate_seed_corpus.zip
 /fuzz/fuzz_filecfg_protocols_seed_corpus.zip
+/fuzz/fuzz_filecfg_categories_seed_corpus.zip
 /fuzz/fuzz_dga_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip
 /fuzz/fuzz_readerutils_workflow_seed_corpus.zip

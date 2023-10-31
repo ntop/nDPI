@@ -1,5 +1,279 @@
 # CHANGELOG
 
+#### nDPI 4.8 (Oct 2023)
+
+## Major Changes
+- Reworked lists implementation that decreased memory usage of orders of magnitude
+- Improved code robustness via extensive code fuzzing
+- Various improvements to overall library performance
+- Extended IPv6 support
+
+## New Supported Protocols and Services
+	
+ - Add "Heroes of the Storm" video game signature detection. (#1949)
+ - Add Apache Thrift protocol dissector. (#2007)
+ - Add Remote Management Control Protocol (RMCP).
+ - Add Service Location Protocol dissector. (#2036)
+ - Add VK detection (#1880)
+ - Add Yandex services detection (#1882)
+ - Add a new protocol id for generic Adult Content traffic (#1906)
+ - Add a new protocol id for generic advertisement/analytics/tracking stuff (#1904)
+ - Add bitcoing protocol dissector. (#1992)
+ - Add detection of Roblox games (#2054)
+ - Add support for (un-encrypted) HTTP/2 (#2087)
+ - Add support for Epic Games and GeForceNow/Nvidia (#1990)
+ - Add support for SRTP (#1977)
+ - Added BACnet dissector. (#1940)
+ - Added HAProxy protocol. (#2088)
+ - Added OICQ dissector. (#1950)
+ - Added OperaVPN detection
+- ProtonVPN: add basic detection (#2006)
+ - Added detection of Facebook Reels and Stories
+ - Add an heuristic to detect fully encrypted flows (#2058)
+ - Added NDPI_MALWARE_HOST_CONTACTED flow risk
+ - Added NDPI_TLS_ALPN_SNI_MISMATCH flow risk
+
+## Improvements
+
+ - Improve protocol detection for:
+ - FreeBSD compilation fix (C) update
+ - Gnutella: improve detection (#2019)
+ - H323: fix false positives (#1916)
+ - HTTP: fix another memory access error (#2049)
+ - HTTP: fix extraction of filename (#2046)
+ - HTTP: fix heap-buffer-overflow (#2044)
+ - HTTP: improve extraction of metadata and of flow risks (#1959)
+ - HTTP: remove useless code about XBOX (#1958)
+ - HTTP: rework state machine (#1966)
+ - Hangout: detect Hangout/Duo/GoogleMeet/... in the STUN code (#2025)
+ - Enhance DNS risk for long hostnames (> 32)
+ - Enhanced MS teams STUN/Azure detection
+ - Enhanced custom port definition and improved error reporting in case of duplications
+ - Improve detection of Alibaba flows (#1991)
+ - Improve detection of crawler/bot traffic (#1956)
+ - Improve detection of crawlers/bots (#1968)
+ - Improved MGCP detection by allowing '\r' as line feed.
+ - Improved MS Teams detection with heuristic
+ - Improved Steam detection by adding steamdiscover pattern. (#2105)
+ - Improved Wireguard detection
+ - Improved checks for duplicated entries in protocols file
+ - Improved classification further reducing memory used
+ - Improved detection of invalid chars in DNS names
+ - Improved domain search tet unit
+ - Improved helper scripts. (#1986)
+ - MS Teams enhancement
+ - MySql: improve detection (#1928)
+ - zabbix: improve detection (#2055)
+	
+## Tools
+
+ - ndpiReader: allow to configure LRU caches TTL and size (#2004)
+ - ndpiReader: fix VXLAN de-tunneling (#1913)
+ - ndpiReader: fix export of DNS/BitTorrent attributes (#1985)
+ - ndpiReader: fix export of HTTP attributes (#1982)
+ - ndpiReader: fix flow stats (#1943)
+ - ndpiReader: fix print of flow payload (#1960)
+ - ndpiReader: improve printing of payload statistics (#1989)
+ - ndpiReader: print how many packets (per flow) were needed to perform full DPI (#1891)
+ - ndpireader: fix detection of DoH traffic based on packet distributions (#2045)
+
+## Misc
+ - ARM compilation fix
+ - Add `ndpi_domain_classify_finalize()` function (#2084)
+ - Add a configuration knob to enable/disable loading of gambling list (#2047)
+ - Add a new flow risk about literal IP addresses used as SNI (#1892)
+ - Add an heuristic to detect/ignore some anomalous TCP ACK packets (#1948)
+ - Add another example of custom rules (#1923)
+ - Add support for multiline json
+ - Add support for roaring_bitmap_xor_inplace (#1983)
+ - Add support for vxlan decapsulation (#1441) (#1900)
+ - Added Source Engine dissector. (#1937)
+ - Added `lists/gambling.list` to extra dist.
+ - Added `slackb.com` SNI. (#2067)
+ - Added ability to define an unlimited number of custom rules IP:port for the same IP (it used tobe limited to 2)
+ - Added check to avoid skype heuristic false positives
+ - Added comment
+ - Added coverage targets to `Makefile.am` for convenience. (#2039)
+ - Added fix for better handling exceptions rollback in case of later match
+ - Added hyperlink
+ - Added ndpi_binary_bitmap data structure
+ - Added ndpi_bitmap64 support
+ - Added ndpi_bitmap_andnot API call
+ - Added ndpi_bitmap_copy() API call
+ - Added ndpi_bitmap_is_empty() and ndpi_bitmap_optimize() API calls
+ - Added ndpi_domain_classify_XXX(0 API
+ - Added ndpi_filter_add_multi() API call
+ - Added ndpi_murmur_hash to the nDPI API
+ - Added new API calls for implementing Bloom-filter like data structures
+ - Added printf/fprintf replacement for some internal modules. (#1974)
+ - Added scripts to auto generate hostname/SNI *.inc files. (#1984)
+ - Added sub-domain classification fix
+ - Added the ability to define custom protocols with arbitrary Ids in proto.txt
+ - Added vlan_id in ndpi_flow2json() prototype
+ - Adds new pcap for testing "funny" HTTP servers
+ - All protocols should be excluded sooner or later (#1969)
+ - Allow init of app protocols w/o any hostnames set. (#2057)
+ - Avoid calling `ndpi_reconcile_protocols()` twice in `ndpi_detection_giveup()` (#1996)
+ - Boundary check
+ - CI: fix `Performance` job (#1936)
+ - Centos7 fixes
+ - Changed logging callback function sig. (#2000)
+ - Changes for supporting more efficient sub-string matching
+ - Classification fixes
+ - DNS: extract geolocation information, if available (#2065)
+ - Debian 12 fixes
+ - Disabled query string validation in MDNS in order to avoid zapping chars that in DNS (instead) are not permitted
+ - DisneyPlus/Hulu ip lists should be auto-generated (#1905)
+ - Extend content list of Microsoft protocols (#1930)
+ - Extend content-match list (#1967)
+ - Fix LRU/Patricia/Automa stats in `ndpiReader` with multiple threads (#1934)
+ - Fix MS Teams detection with heuristic (#1972)
+ - Fix access to packet/flow information (#2013)
+ - Fix an heap-buffer-overflow (#1994)
+ - Fix classification-by-ip in `ndpi_detection_giveup` (#1981)
+ - Fix compilation (#2011)
+ - Fix compilation in CI jobs (#2048)
+ - Fix compilation on Windows (#2072)
+ - Fix compilation with GCC-7 and latest RoaringBitmap code (#1886)
+ - Fix detection of packet direction and NDPI_UNIDIRECTIONAL_TRAFFIC risk (#1883)
+ - Fix export/serialization of `flow->risk` (#1885)
+ - Fix for buffer overflow in serialization
+ - Fix insert of ip addresses into patricia tree(s) (#1895)
+ - Fix missing u_char, u_short and u_int typedefs for some platforms e.g.: (#2009)
+ - Fix packet counters (#1884)
+ - Fix some errors found by fuzzers (#2078)
+ - Fix some memory errors triggered by allocation failures (#1995)
+ - Fix some prototypes (#2085)
+ - Fix string truncation. (#2056)
+ - Fixed OpenWRT arm related build issues. (#2104)
+ - Fixed heap-buffer-overflow issue
+ - Fixed heap-overflow if compiled with `--enable-tls-sigs`. (#2038)
+ - Fixed invalid use of ndpi_free(). Sorry, my fault. (#1988)
+ - Fixed missing AS_HELP_STRING in configure.ac. (#1893)
+ - Fixed two OpenWRT arm related build issues. (#2103)
+ - Fixes matches with domain name strings that start with a dot
+ - Fixes risk mask exception handling while improving the overall performance
+ - Implemented Count-Min Sketch [count how many times a value has been observed]
+ - Implemented Zoom/Teams stream type detection
+ - Implemented ndpi_XXX_reset() API calls whre XXX is ses, des, hw
+ - Implemented ndpi_predict_linear() for predicting a timeseries value overtime
+ - Improved debug output. (#1951)
+ - Improved invalid logging via printf().
+ - Improved line protocol dissection with heuristic
+ - Improved missing usage of nDPIs malloc wrapper. Fixes #1978. (#1979)
+ - Improved protocol detection exploiting IP-based guess Reworked ndpi_reconcile_protocols() that is now called only in front of a match (less overhead)
+ - Improvement for reducing false positives
+ - Included Gambling website data from the Polish `hazard.mf.gov.pl` list (#2041)
+ - Keep master protocol in `ndpi_reconcile_protocols`
+ - Leak fix
+ - Language fix
+ - Line: fix heap-buffer-overflow error (#2015)
+ - Made VK protocol detection more strict
+ - Make Bittorrent LRU cache IPv6 aware. (#1909)
+ - Merged new and old version of ndpi_domain_classify.c code
+ - Mullvad VPN service added (based on entry node IP addresses) (#2062)
+ - Numeric truncation at `ndpi_analyze.c` at lines 101, 104, 107, 110 (#1999)
+ - Numeric truncation at `tls.c:1010` (#2005)
+ - Ookla: rework detection (#1922)
+ - Optimizes and fixes possible out0of0boundary write in ndpi_fill_prefix_v4()
+ - ProtonVPN: split the ip list (#2060)
+ - QUIC: add support for QUIC version 2
+ - QUIC: export QUIC version as metadata
+ - QUIC: fix a memory access error
+ - QUIC: fix dissection of packets forcing VN
+ - RDP: improve detection over UDP (#2043)
+ - RTP: remove dead-code (#1953)
+ - RTP: rework code (#2021)
+ - Refreshed ASN lists Enhanced the Line IP list with https://ipinfo.io/AS23576/125.209.252.0/24 used by line
+ - Remove some useless checks (#1993)
+ - Remove special handling of some TCP flows without SYN (#1965)
+ - Removed overlapping port
+ - Renamed HTTP/2 to HTTP2 as the '/' can have side effects with applications sitting on top of nDPI
+ - Replaces free() with ndpi_free()
+ - Rework CI jobs to try reducing CI duration (#1903)
+ - Reworked domain classification based on binary filters
+ - Reworked initialization
+ - Reworked ndpi_filter_xxx implementation using compressed bitmaps
+ - Reworked teams handling
+ - RiotGames: add detection of flows (#1935)
+ - STUN: add dissection of DTLS handshake (#2018)
+ - STUN: avoid FacebookVoip false positives (#2029)
+ - STUN: fix Skype/MsTeams detection and monitoring logic (#2028)
+ - STUN: fix detection of Google Voip apps (#2031)
+ - STUN: fix detection over TCP
+ - STUN: improve WhatsappCall detection
+ - STUN: keep monitoring/processing STUN flows (#2012)
+ - STUN: tell RTP from RTCP while in monitoring state (#2027)
+ - Serialization fix
+ - Set _DEFAULT_SOURCE and _GNU_SOURCE globally. (#2010)
+ - Simplify `ndpi_internal_guess_undetected_protocol()` (#1941)
+ - Simplify the report of streaming multimedia info (#2026)
+ - SoftEther: fix invalid memory access
+ - Swap from Aho-Corasick to an experimental/home-grown algorithm that uses a probabilistic approach for handling Internet domain names.
+ - Sync unit tests results
+ - Sync unit tests results
+ - Sync unit tests results (#1962)
+ - Sync utests results (#1887)
+ - TLS: add basic, basic, detection of Encrypted ClientHello (#2053)
+ - TLS: fix another interger overflow in certificate processing (#1915)
+ - TLS: fix parsing of certificate elements (#1910)
+ - Test files for riit games
+ - Test multiple `ndpiReader` configurations (#1931)
+ - Thrift: fix heap-buffer-overflow (#2024)
+ - Update GitHub runners versions (#1889)
+ - Update every ip lists (#2079)
+ - Update libinjection code (#1918)
+ - Update protocols documentation (#2081)
+ - Update roaring bitmap code
+ - Updated line test result
+ - Updated pcap detection results after Facebook Reel/Stories support
+ - Updated results
+ - Updated results after the latest changes
+ - Win include change
+ - Windows code rework
+ - Windows compilation fixes
+ - Windows warning checks
+ - add 2 ns from fdn.fr to DoH section (#1964)
+ - add support for gre decapsulation (#1442) (#1921)
+ - added bimap and/or with allocation
+ - added feature to extract filename from http attachment (#2037)
+ - added new domain names (#2002)
+ - configure: add an option to enable debug build, i.e `-g` (#1929)
+ - fix Stack overflow caused by invalid write in ndpi_automa_match_strin…  (#2035)
+ - fixed numeric truncation error
+ - fixed numeric truncation error in diameter.c (#2034)
+ - fixed numeric truncation error in kerberos.c (#2032)
+ - fixed numeric truncation error in ndpi_main.c:6837 (#1998)
+ - fixed numeric truncation error in rtcp.c (#2033)
+ - fuzz: add a new fuzzer to test TLS certificates (#1901)
+ - fuzz: add a new fuzzer triggering the payload analyzer function(s) (#1926)
+ - fuzz: add fuzzer for DGA detection code (#2042)
+ - fuzz: add fuzzer to test internal gcrypt code (#1920)
+ - fuzz: add fuzzers to test bitmap64 and domain_classify data structures (#2082)
+ - fuzz: add fuzzers to test reader_util code (#2080)
+ - fuzz: extend coverage (#2073)
+ - fuzz: extend fuzz coverage (#1888)
+ - fuzz: extend fuzzers coverage (#1952)
+ - fuzz: extend fuzzing coverage (#2040)
+ - fuzz: extend fuzzing coverage (#2052)
+ - fuzz: extend fuzzing coverage (#2083)
+ - fuzz: simplify fuzzers dependencies in CIFuzz (#1896)
+ - fuzz: some improvements and add two new fuzzers (#1881)
+ - fuzzing: extend fuzzing coverage
+ - in case of failure, failing result files are not listed
+ - minor fixes (#2023)
+ - oss-fuzz: sync build script with upstream
+ - remove redefinition to vxlanhdr struct in vxlan dissector (#1911)
+ - removed useless call of ndpi_set_risk func (#2022)
+ - tests: add an option to force the overwrite of the unit tests results (#2001)
+ - tests: restore some old paths as symbolic links (#2050)
+ - tftp: check for Option Acknowledgements
+ - tftp: check incrementation for DATA and ACK packets
+ - tftp: rework request checking to account for options
+ - tftp: update pcap results
+ - version of dirent.c that is liked by both VC++ and MinGW
+
+
 #### nDPI 4.6 (Feb 2023)
 
 ## New Features

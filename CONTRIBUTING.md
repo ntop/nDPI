@@ -24,4 +24,10 @@ Please keep all code, comments, issues and pull requests in English, otherwise t
 - If there is an open issue for the bug, ensure the description of the pull request contains `Fixes #issue_number`.
 - Ensure the pull request passes CI testing. Any pull request which fails CI will be **ignored**.
 
+## Before you submit your code
+
+As we want to make sure that we can incorporate your changes in nDPI, we ask all contributors to read and sign the
+[Contributor License Agreement](https://github.com/ntop/legal/blob/main/individual-contributor-licence-agreement.md)
+that guarantees that your code is original and royalty-free to keep nDPI free and available for everybody,
+
 Finally, thank you for your contributions.

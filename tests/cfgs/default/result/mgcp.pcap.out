@@ -1,0 +1,32 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	5	(1.00 pkts/flow)
+Confidence DPI              : 5 (flows)
+Num dissector calls: 85 (17.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   10/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        3/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   10/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+MGCP	23	2731	5
+
+	1	UDP 10.10.228.72:2427 <-> 10.10.244.2:2427 [proto: 94/MGCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][6 pkts/1254 bytes <-> 6 pkts/418 bytes][Goodput ratio: 79/40][6.26 sec][Hostname/SNI: vg224][bytes ratio: 0.500 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 884/884 3523/3523 1524/1523][Pkt Len c2s/s2c min/avg/max/stddev: 60/57 209/70 846/104 285/19][PLAIN TEXT (RSIP 262662134 )][Plen Bins: 41,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 172.16.1.116:2427 <-> 172.16.1.119:2427 [proto: 94/MGCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][4 pkts/370 bytes <-> 4 pkts/395 bytes][Goodput ratio: 54/57][80.75 sec][Hostname/SNI: gateway44.myplace.com][bytes ratio: -0.033 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 9/36 26914/26914 76721/76695 35257/35238][Pkt Len c2s/s2c min/avg/max/stddev: 61/98 92/99 103/101 18/1][PLAIN TEXT (RQNT 1 )][Plen Bins: 12,87,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 67.232.180.250:38238 -> 186.112.128.179:2427 [proto: 94/MGCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][1 pkts/98 bytes -> 0 pkts/0 bytes][Goodput ratio: 57/0][< 1 sec][Hostname/SNI: gateway44.myplace.com][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (RQNT 1 )][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 92.173.166.213:51954 -> 83.250.239.33:2427 [proto: 94/MGCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][1 pkts/98 bytes -> 0 pkts/0 bytes][Goodput ratio: 57/0][< 1 sec][Hostname/SNI: gateway44.myplace.com][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (RQNT 1 )][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 187.43.37.188:40798 -> 196.167.59.124:2427 [proto: 94/MGCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][1 pkts/98 bytes -> 0 pkts/0 bytes][Goodput ratio: 57/0][< 1 sec][Hostname/SNI: gateway44.myplace.com][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (RQNT 1 )][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

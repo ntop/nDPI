@@ -54,7 +54,7 @@ static void ndpi_search_crynet(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if (ntohs(get_u_int16_t(packet->payload, 3)) != 0x08ed ||
+  if (packet->payload[0] != 0x3c ||
       packet->payload[16] != 0x01 ||
       packet->payload[20] != 0x07 ||
       ntohs(get_u_int16_t(packet->payload, 24)) != 0x0307)

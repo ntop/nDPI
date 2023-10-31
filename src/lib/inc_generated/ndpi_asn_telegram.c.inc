@@ -32,3 +32,12 @@ static ndpi_network ndpi_protocol_telegram_protocol_list[] = {
  /* End */
  { 0x0, 0, 0 }
 };
+
+static ndpi_network6 ndpi_protocol_telegram_protocol_list_6[] = {
+ { "2001:67c:4e8::", 48, NDPI_PROTOCOL_TELEGRAM },
+ { "2001:b28:f23c::", 47, NDPI_PROTOCOL_TELEGRAM },
+ { "2001:b28:f23f::", 48, NDPI_PROTOCOL_TELEGRAM },
+ { "2a0a:f280:203::", 48, NDPI_PROTOCOL_TELEGRAM },
+ /* End */
+ { NULL, 0, 0 }
+};

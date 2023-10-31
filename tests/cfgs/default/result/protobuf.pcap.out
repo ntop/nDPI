@@ -1,0 +1,32 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	26	(5.20 pkts/flow)
+Confidence DPI              : 5 (flows)
+Num dissector calls: 694 (138.80 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   10/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Protobuf	60	4446	5
+
+	1	TCP 127.0.0.1:52392 <-> 127.0.0.1:12345 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][11 pkts/890 bytes <-> 9 pkts/498 bytes][Goodput ratio: 32/0][70.00 sec][bytes ratio: 0.282 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/10000 6667/8333 10000/10000 4714/3727][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 81/55 122/66 31/4][PLAIN TEXT (AAAABBBBX)][Plen Bins: 42,0,57,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 127.0.0.1:39786 <-> 127.0.0.1:12345 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][5 pkts/832 bytes <-> 3 pkts/174 bytes][Goodput ratio: 66/0][10.00 sec][bytes ratio: 0.654 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 2500/0 10000/0 4330/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 166/58 604/66 219/6][PLAIN TEXT (Lorem ipsum dolor sit amet)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 127.0.0.1:51680 <-> 127.0.0.1:12345 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 10][cat: Network/14][9 pkts/588 bytes <-> 7 pkts/390 bytes][Goodput ratio: 15/0][50.00 sec][bytes ratio: 0.202 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/10000 5714/7500 10000/10000 4949/4330][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 65/56 72/66 8/4][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 127.0.0.1:59030 <-> 127.0.0.1:12345 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][5 pkts/377 bytes <-> 3 pkts/174 bytes][Goodput ratio: 25/0][3.00 sec][bytes ratio: 0.368 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 750/0 3000/0 1299/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 75/58 149/66 37/6][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	TCP 127.0.0.1:42358 <-> 127.0.0.1:12345 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][5 pkts/349 bytes <-> 3 pkts/174 bytes][Goodput ratio: 19/0][< 1 sec][bytes ratio: 0.335 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 70/58 121/66 26/6][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

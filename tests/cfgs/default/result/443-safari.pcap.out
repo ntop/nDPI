@@ -17,8 +17,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  7/7 (search/found)
 Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 ntop	41	19929	1
 
@@ -27,4 +30,4 @@ JA3 Host Stats:
 	1	 192.168.1.13             	 1      
 
 
-	1	TCP 192.168.1.13:53031 <-> 178.62.197.130:443 [proto: 91.26/TLS.ntop][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 7][cat: Network/14][21 pkts/2195 bytes <-> 20 pkts/17734 bytes][Goodput ratio: 36/93][1.10 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;h2-16;h2-15;h2-14;spdy/3.1;spdy/3;http/1.1][(Negotiated) ALPN: h2][bytes ratio: -0.780 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 51/47 695/695 167/168][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 105/887 394/1506 83/661][TLSv1.2][JA3C: a69708a64f853c3bcc214c2c5faf84f3][ServerNames: www.ntop.org][JA3S: f9fcb52580329fb6a9b61d7542087b90][Issuer: C=US, O=Let's Encrypt, CN=Let's Encrypt Authority X3][Subject: CN=www.ntop.org][Certificate SHA-1: DB:A7:E4:3E:6D:BB:21:AB:68:47:35:E8:0B:8F:15:DF:DB:C7:C9:6F][Safari][Validity: 2019-12-17 01:17:28 - 2020-03-16 01:17:28][Cipher: TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256][Plen Bins: 8,21,4,4,0,0,0,4,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,4,0,0,0,0,40,0,0]
+	1	TCP 192.168.1.13:53031 <-> 178.62.197.130:443 [proto: 91.26/TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][DPI packets: 7][cat: Network/14][21 pkts/2195 bytes <-> 20 pkts/17734 bytes][Goodput ratio: 36/93][1.10 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;h2-16;h2-15;h2-14;spdy/3.1;spdy/3;http/1.1][(Negotiated) ALPN: h2][bytes ratio: -0.780 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 51/47 695/695 167/168][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 105/887 394/1506 83/661][TLSv1.2][JA3C: a69708a64f853c3bcc214c2c5faf84f3][ServerNames: www.ntop.org][JA3S: f9fcb52580329fb6a9b61d7542087b90][Issuer: C=US, O=Let's Encrypt, CN=Let's Encrypt Authority X3][Subject: CN=www.ntop.org][Certificate SHA-1: DB:A7:E4:3E:6D:BB:21:AB:68:47:35:E8:0B:8F:15:DF:DB:C7:C9:6F][Safari][Validity: 2019-12-17 01:17:28 - 2020-03-16 01:17:28][Cipher: TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256][Plen Bins: 8,21,4,4,0,0,0,4,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,4,0,0,0,0,40,0,0]

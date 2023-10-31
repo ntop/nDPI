@@ -246,6 +246,10 @@ void init_apache_thrift_dissector(struct ndpi_detection_module_struct *ndpi_stru
 void init_slp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_http2_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_haproxy_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_rmcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_can_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_protobuf_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_ethereum_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 /* ndpi_main.c */
 extern u_int32_t ndpi_ip_port_hash_funct(u_int32_t ip, u_int16_t port);

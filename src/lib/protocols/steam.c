@@ -254,6 +254,21 @@ static void ndpi_check_steam_udp3(struct ndpi_detection_module_struct *ndpi_stru
   }
 }
 
+static void ndpi_check_steamdiscover(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  const u_int32_t payload_len = packet->payload_packet_len;
+  const u_int64_t signature = ndpi_ntohll(0xffffffff214c5fa0);
+
+  if (payload_len < 8)
+    return;
+
+  if (get_u_int64_t(packet->payload, 0) != signature)
+    return;
+
+  NDPI_LOG_INFO(ndpi_struct, "found STEAM (steamdiscover)\n");
+  ndpi_int_steam_add_connection(ndpi_struct, flow);
+}
+
 static void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
@@ -274,6 +289,8 @@ static void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct, 
       return;   
 	
     ndpi_check_steam_udp3(ndpi_struct, flow);
+
+    ndpi_check_steamdiscover(ndpi_struct, flow);
   } else {
     /* Break after 10 packets. */
     if(flow->packet_counter > 10) {

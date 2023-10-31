@@ -29,3 +29,15 @@ static ndpi_network ndpi_protocol_skype_teams_protocol_list[] = {
  /* End */
  { 0x0, 0, 0 }
 };
+
+static ndpi_network6 ndpi_protocol_skype_teams_protocol_list_6[] = {
+ { "2603:1027::", 48, NDPI_PROTOCOL_SKYPE_TEAMS },
+ { "2603:1037::", 48, NDPI_PROTOCOL_SKYPE_TEAMS },
+ { "2603:1047::", 48, NDPI_PROTOCOL_SKYPE_TEAMS },
+ { "2603:1057::", 48, NDPI_PROTOCOL_SKYPE_TEAMS },
+ { "2603:1063::", 38, NDPI_PROTOCOL_SKYPE_TEAMS },
+ { "2620:1ec:40::", 42, NDPI_PROTOCOL_SKYPE_TEAMS },
+ { "2620:1ec:6::", 48, NDPI_PROTOCOL_SKYPE_TEAMS },
+ /* End */
+ { NULL, 0, 0 }
+};

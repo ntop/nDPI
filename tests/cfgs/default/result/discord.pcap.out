@@ -3,7 +3,7 @@ Guessed flow protos:	0
 DPI Packets (TCP):	5	(5.00 pkts/flow)
 DPI Packets (UDP):	60	(1.82 pkts/flow)
 Confidence DPI              : 34 (flows)
-Num dissector calls: 4060 (119.41 diss/flow)
+Num dissector calls: 4102 (120.65 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -18,8 +18,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  2/2 (search/found)
 Patricia risk mask:   12/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   34/34 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 Discord	411	98410	34
 

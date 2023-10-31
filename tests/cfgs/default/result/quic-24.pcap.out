@@ -17,8 +17,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  1/1 (search/found)
 Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 QUIC	15	8000	1
 
@@ -27,4 +30,4 @@ JA3 Host Stats:
 	1	 10.9.0.1                 	 1      
 
 
-	1	UDP 10.9.0.1:41436 <-> 10.9.0.2:443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][7 pkts/4672 bytes <-> 8 pkts/3328 bytes][Goodput ratio: 94/90][30.04 sec][Hostname/SNI: localhost][(Advertised) ALPNs: h3-24][TLS Supported Versions: TLSv1.3][bytes ratio: 0.168 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 6006/4 30007/12 12000/4][Pkt Len c2s/s2c min/avg/max/stddev: 82/81 667/416 1294/1294 562/406][TLSv1.3][JA3C: b3e43d74f4b790abca2f5fe7dd06e7cf][Firefox][PLAIN TEXT (Udwn.wf)][Plen Bins: 0,34,0,6,6,0,0,0,6,0,6,0,0,0,0,6,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0]
+	1	UDP 10.9.0.1:41436 <-> 10.9.0.2:443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][7 pkts/4672 bytes <-> 8 pkts/3328 bytes][Goodput ratio: 94/90][30.04 sec][Hostname/SNI: localhost][(Advertised) ALPNs: h3-24][TLS Supported Versions: TLSv1.3][bytes ratio: 0.168 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 6006/4 30007/12 12000/4][Pkt Len c2s/s2c min/avg/max/stddev: 82/81 667/416 1294/1294 562/406][TLSv1.3][QUIC ver: Draft-24][JA3C: b3e43d74f4b790abca2f5fe7dd06e7cf][Firefox][PLAIN TEXT (Udwn.wf)][Plen Bins: 0,34,0,6,6,0,0,0,6,0,6,0,0,0,0,6,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0]

@@ -1244,6 +1244,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 		  ndpi_serializer *serializer) {
   char buf[64];
   char const *host_server_name;
+  char quic_version[16];
 
   if(flow == NULL) return(-1);
 
@@ -1372,16 +1373,6 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_end_of_block(serializer);
     break;
 
-  case NDPI_PROTOCOL_STUN:
-    ndpi_serialize_start_of_block(serializer, "stun");
-    ndpi_serialize_string_uint32(serializer, "num_pkts", flow->stun.num_pkts);
-    ndpi_serialize_string_uint32(serializer, "num_binding_requests",
-                                 flow->stun.num_binding_requests);
-    ndpi_serialize_string_uint32(serializer, "num_processed_pkts",
-                                 flow->stun.num_processed_pkts);
-    ndpi_serialize_end_of_block(serializer);
-    break;
-
   case NDPI_PROTOCOL_TELNET:
     ndpi_serialize_start_of_block(serializer, "telnet");
     ndpi_serialize_string_string(serializer, "username", flow->protos.telnet.username);
@@ -1441,6 +1432,10 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "quic");
     if(flow->http.user_agent)
       ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
+
+    ndpi_quic_version2str(quic_version, sizeof(quic_version),
+                          flow->protos.tls_quic.quic_version);
+    ndpi_serialize_string_string(serializer, "quic_version", quic_version);
 
     ndpi_tls2json(serializer, flow);
 
@@ -2054,6 +2049,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_TLS_ALPN_SNI_MISMATCH:
     return("ALPN/SNI Mismatch");
+    
+  case NDPI_MALWARE_HOST_CONTACTED:
+    return("Client contacted a malware host");
     break;
     
   default:
@@ -2324,12 +2322,32 @@ static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_stru
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
-  if(!ndpi_str->protocols_ptree)
+  if(!ndpi_str->ip_risk_mask_ptree)
     return((u_int64_t)-1);
 
   /* Make sure all in network byte order otherwise compares wont work */
-  ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->protocols_ptree)->maxbits);
+  ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree, &prefix);
+
+  if(node)
+    return(node->value.u.uv64);
+  else
+    return((u_int64_t)-1);
+}
+
+/* ********************************************************************************* */
+
+static u_int64_t ndpi_host_ip_risk_ptree_match6(struct ndpi_detection_module_struct *ndpi_str,
+					        struct in6_addr *pin6) {
+  ndpi_prefix_t prefix;
+  ndpi_patricia_node_t *node;
+
+  if(!ndpi_str->ip_risk_mask_ptree6)
+    return((u_int64_t)-1);
+
+  /* Make sure all in network byte order otherwise compares wont work */
+  ndpi_fill_prefix_v6(&prefix, pin6, 128, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree6)->maxbits);
+  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree6, &prefix);
 
   if(node)
     return(node->value.u.uv64);
@@ -2405,6 +2423,20 @@ static u_int8_t ndpi_check_ipv4_exception(struct ndpi_detection_module_struct *n
 
 /* ********************************************************************************* */
 
+static u_int8_t ndpi_check_ipv6_exception(struct ndpi_detection_module_struct *ndpi_str,
+					  struct ndpi_flow_struct *flow,
+					  struct in6_addr *addr) {
+  u_int64_t r;
+
+  r = ndpi_host_ip_risk_ptree_match6(ndpi_str, addr);
+
+  if(flow) flow->risk_mask &= r;
+
+  return((r != (u_int64_t)-1) ? 1 : 0);
+}
+
+/* ********************************************************************************* */
+
 void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 				 struct ndpi_flow_struct *flow) {
   if(flow->risk == 0) return; /* Nothing to do */
@@ -2441,11 +2473,13 @@ void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
     }
   }
 
-  /* TODO: add IPv6 support */
   if(!flow->ip_risk_mask_evaluated) {
     if(flow->is_ipv6 == 0) {
       ndpi_check_ipv4_exception(ndpi_str, flow, flow->c_address.v4 /* Client */);
       ndpi_check_ipv4_exception(ndpi_str, flow, flow->s_address.v4 /* Server */);
+    } else {
+      ndpi_check_ipv6_exception(ndpi_str, flow, (struct in6_addr *)&flow->c_address.v6 /* Client */);
+      ndpi_check_ipv6_exception(ndpi_str, flow, (struct in6_addr *)&flow->s_address.v6 /* Server */);
     }
 
     flow->ip_risk_mask_evaluated = 1;
@@ -2459,6 +2493,7 @@ void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 		   struct ndpi_flow_struct *flow, ndpi_risk_enum r,
 		   char *risk_message) {
+  if(!flow) return;
 
   /* Check if the risk is not yet set */
   if(!ndpi_isset_risk(ndpi_str, flow, r)) {

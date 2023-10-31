@@ -139,3 +139,53 @@ Notes:
 HAProxy is a free and open source software that provides a high availability load balancer and reverse proxy for TCP and HTTP-based applications that spreads requests across multiple servers.
 
 References: `Main site: <https://www.haproxy.org>`_.
+
+
+.. _Proto 351:
+
+`NDPI_PROTOCOL_RMCP`
+====================
+The Intelligent Platform Management Interface (IPMI) is a set of computer interface specifications for an autonomous computer subsystem that provides management and monitoring capabilities independently of the host system's CPU, firmware (BIOS or UEFI) and operating system.
+
+References: `Protocol Specs: <https://www.dmtf.org/sites/default/files/standards/documents/DSP0114.pdf>`_.
+
+
+.. _Proto 352:
+
+`NDPI_PROTOCOL_CAN`
+===================
+Controller Area Network (CAN) is used extensively in automotive applications, with in excess of 400 million CAN enabled microcontrollers manufactured each year.
+
+References: `Protocol Specs: <https://www.iso.org/standard/63648.html>`_.
+
+
+.. _Proto 353:
+
+`NDPI_PROTOCOL_PROTOBUF`
+========================
+Protocol Buffers (Protobuf) is a free and open-source cross-platform data format used to serialize structured data.
+
+References: `Encoding: <https://protobuf.dev/programming-guides/encoding>`_.
+
+
+.. _Proto 354:
+
+`NDPI_PROTOCOL_ETHEREUM`
+=======================
+Ethereum is a decentralized, open-source blockchain with smart contract functionality.
+
+References: `Main site <https://ethereum.org/en/developers/docs/intro-to-ethereum/>`_.
+
+
+Notes:
+
+- same as Bitcoin, not each crypto exchange is a mining, it could be a normal transaction, sending or receving or even blockchain exploration.
+
+
+.. _Proto 355:
+
+`NDPI_PROTOCOL_TELEGRAM_VOIP`
+============================
+Audio/video calls made using the Telegram app.
+
+References: `Wikipedia <https://en.wikipedia.org/wiki/Telegram_(software)/>`_.

@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	12	(3.00 pkts/flow)
 Confidence DPI              : 4 (flows)
-Num dissector calls: 598 (149.50 diss/flow)
+Num dissector calls: 606 (151.50 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -17,8 +17,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   4/4 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 EpicGames	81	11186	4
 

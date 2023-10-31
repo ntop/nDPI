@@ -149,6 +149,7 @@
     <ClCompile Include="..\src\lib\protocols\bacnet.c" />
     <ClCompile Include="..\src\lib\protocols\bitcoin.c" />
     <ClCompile Include="..\src\lib\protocols\bjnp.c" />
+    <ClCompile Include="..\src\lib\protocols\can.c" />
     <ClCompile Include="..\src\lib\protocols\capwap.c" />
     <ClCompile Include="..\src\lib\protocols\cassandra.c" />
     <ClCompile Include="..\src\lib\protocols\checkmk.c" />
@@ -161,6 +162,7 @@
     <ClCompile Include="..\src\lib\protocols\dnp3.c" />
     <ClCompile Include="..\src\lib\protocols\dnscrypt.c" />
     <ClCompile Include="..\src\lib\protocols\elastic_search.c" />
+    <ClCompile Include="..\src\lib\protocols\ethereum.c" />
     <ClCompile Include="..\src\lib\protocols\ethernet_ip.c" />
     <ClCompile Include="..\src\lib\protocols\epicgames.c" />
     <ClCompile Include="..\src\lib\protocols\fastcgi.c" />
@@ -276,11 +278,13 @@
     <ClCompile Include="..\src\lib\protocols\postgres.c" />
     <ClCompile Include="..\src\lib\protocols\ppstream.c" />
     <ClCompile Include="..\src\lib\protocols\pptp.c" />
+    <ClCompile Include="..\src\lib\protocols\protobuf.c" />
     <ClCompile Include="..\src\lib\protocols\qq.c" />
     <ClCompile Include="..\src\lib\protocols\quic.c" />
     <ClCompile Include="..\src\lib\protocols\radius.c" />
     <ClCompile Include="..\src\lib\protocols\rdp.c" />
     <ClCompile Include="..\src\lib\protocols\redis_net.c" />
+    <ClCompile Include="..\src\lib\protocols\rmcp.c" />
     <ClCompile Include="..\src\lib\protocols\rsync.c" />
     <ClCompile Include="..\src\lib\protocols\rtcp.c" />
     <ClCompile Include="..\src\lib\protocols\rtmp.c" />

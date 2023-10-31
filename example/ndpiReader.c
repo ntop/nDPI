@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <float.h> /* FLT_EPSILON */
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
 #include <windows.h>
@@ -407,6 +408,22 @@ static void ndpiCheckIPMatch(char *testChar) {
 
 /********************** FUNCTIONS ********************* */
 
+static double ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
+					       unsigned int num_bytes)
+{
+  int i;
+  double sum = 0.0;
+
+  for(i=0; i<256; i++) {
+    double tmp = (double) byte_count[i] / (double) num_bytes;
+
+    if(tmp > FLT_EPSILON) {
+      sum -= tmp * logf(tmp);
+    }
+  }
+  return(sum / log(2.0));
+}
+
 /**
  * @brief Set main components necessary to the detection
  */
@@ -433,6 +450,8 @@ flowGetBDMeanandVariance(struct ndpi_flow_info* flow) {
    * Sum up the byte_count array for outbound and inbound flows,
    * if this flow is bidirectional
    */
+  /* TODO: we could probably use ndpi_data_* generic functions to simplify the code and
+     to get rid of `ndpi_flow_get_byte_count_entropy()` */
   if (!flow->bidirectional) {
     array = last_entropy->src2dst_byte_count;
     num_bytes = last_entropy->src2dst_l4_bytes;
@@ -849,7 +868,7 @@ void printCSVHeader() {
 
   /* Flow info */
   fprintf(csv_fp, "server_info,");
-  fprintf(csv_fp, "tls_version,ja3c,tls_client_unsafe,");
+  fprintf(csv_fp, "tls_version,quic_version,ja3c,tls_client_unsafe,");
   fprintf(csv_fp, "ja3s,tls_server_unsafe,");
   fprintf(csv_fp, "advertised_alpns,negotiated_alpn,tls_supported_versions,");
 #if 0
@@ -1480,6 +1499,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   u_int8_t known_tls;
   char buf[32], buf1[64];
   char buf_ver[16];
+  char buf2_ver[16];
   char l4_proto_name[32];
   u_int i;
 
@@ -1543,8 +1563,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(csv_fp, "%s,",
             (flow->ssh_tls.server_info[0] != '\0')  ? flow->ssh_tls.server_info : "");
 
-    fprintf(csv_fp, "%s,%s,%s,%s,%s,",
+    fprintf(csv_fp, "%s,%s,%s,%s,%s,%s,",
             (flow->ssh_tls.ssl_version != 0)        ? ndpi_ssl_version2str(buf_ver, sizeof(buf_ver), flow->ssh_tls.ssl_version, &known_tls) : "0",
+            (flow->ssh_tls.quic_version != 0)       ? ndpi_quic_version2str(buf2_ver, sizeof(buf2_ver), flow->ssh_tls.quic_version) : "0",
             (flow->ssh_tls.ja3_client[0] != '\0')   ? flow->ssh_tls.ja3_client : "",
             (flow->ssh_tls.ja3_client[0] != '\0')   ? is_unsafe_cipher(flow->ssh_tls.client_unsafe_cipher) : "0",
             (flow->ssh_tls.ja3_server[0] != '\0')   ? flow->ssh_tls.ja3_server : "",
@@ -1862,6 +1883,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(buf_ver, sizeof(buf_ver),
 										 flow->ssh_tls.ssl_version, &known_tls));
+
+    if(flow->ssh_tls.quic_version != 0) fprintf(out, "[QUIC ver: %s]", ndpi_quic_version2str(buf_ver, sizeof(buf_ver),
+										 flow->ssh_tls.quic_version));
 
     if(flow->ssh_tls.client_hassh[0] != '\0') fprintf(out, "[HASSH-C: %s]", flow->ssh_tls.client_hassh);
 
@@ -3871,12 +3895,21 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       printf("\tPatricia risk mask:   %llu/%llu (search/found)\n",
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK].n_search,
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK].n_found);
+      printf("\tPatricia risk mask IPv6: %llu/%llu (search/found)\n",
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK6].n_search,
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK6].n_found);
       printf("\tPatricia risk:        %llu/%llu (search/found)\n",
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK].n_search,
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK].n_found);
+      printf("\tPatricia risk IPv6:   %llu/%llu (search/found)\n",
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK6].n_search,
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK6].n_found);
       printf("\tPatricia protocols:   %llu/%llu (search/found)\n",
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_search,
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_found);
+      printf("\tPatricia protocols IPv6: %llu/%llu (search/found)\n",
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_search,
+	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_found);
 
       if(enable_malloc_bins)
 	printf("\tData-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
@@ -3967,12 +4000,21 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       fprintf(results_file, "Patricia risk mask:   %llu/%llu (search/found)\n",
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK].n_search,
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK].n_found);
+      fprintf(results_file, "Patricia risk mask IPv6: %llu/%llu (search/found)\n",
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK6].n_search,
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK_MASK6].n_found);
       fprintf(results_file, "Patricia risk:        %llu/%llu (search/found)\n",
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK].n_search,
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK].n_found);
+      fprintf(results_file, "Patricia risk IPv6:   %llu/%llu (search/found)\n",
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK6].n_search,
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_RISK6].n_found);
       fprintf(results_file, "Patricia protocols:   %llu/%llu (search/found)\n",
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_search,
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS].n_found);
+      fprintf(results_file, "Patricia protocols IPv6: %llu/%llu (search/found)\n",
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_search,
+	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_found);
 
       if(enable_malloc_bins)
 	fprintf(results_file, "Data-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));

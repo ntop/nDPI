@@ -17,8 +17,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  1/1 (search/found)
 Patricia risk mask:   2/0 (search/found)
-Patricia risk:        2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        1/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 QUIC	1	1230	1
 
@@ -27,4 +30,4 @@ JA3 Host Stats:
 	1	 193.167.0.252            	 1      
 
 
-	1	UDP 193.167.0.252:44083 -> 193.167.100.100:443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1230 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Hostname/SNI: server4][(Advertised) ALPNs: hq-29][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.3][JA3C: fe94e313a5d76fb687c85443cdfa8170][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 193.167.0.252:44083 -> 193.167.100.100:443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1230 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Hostname/SNI: server4][(Advertised) ALPNs: hq-29][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.3][QUIC ver: Draft-29][JA3C: fe94e313a5d76fb687c85443cdfa8170][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0]

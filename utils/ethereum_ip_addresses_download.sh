@@ -17,12 +17,12 @@ check_http_response "${http_response}"
 is_file_empty "${TMP}"
 
 echo "(2) Processing IP addresses..."
-grep 'enode' $TMP | grep -v '^/' | grep ':' | cut -d '@' -f 2 | cut -d ':' -f 1 > $LIST
+grep 'enode' $TMP | grep -v '^/' | grep ':' | cut -d '@' -f 2 | cut -d ':' -f 1 > $LIST #no ipv6 in this list
 is_file_empty "${LIST}"
 
-./ipaddr2list.py $LIST NDPI_PROTOCOL_MINING > $DEST
+./ipaddr2list.py $LIST NDPI_PROTOCOL_ETHEREUM > $DEST
 rm -f $TMP $LIST
 is_file_empty "${DEST}"
 
-echo "(3) Ethereum/Mining IPs are available in $DEST"
+echo "(3) Ethereum IPs are available in $DEST"
 exit 0

@@ -19,8 +19,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     11/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   40/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   27/27 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 DNS	2	144	2
 HTTP	13	1019	2

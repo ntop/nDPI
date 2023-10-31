@@ -1,3 +1,6 @@
 #  Format: name\tcategory_id
 internetbadguys.com	100
 144.139.247.220	100
+172.30.69.0/24	100
+[2001:1670:8:40a6:a08e:332b:aa69:18dc]	100
+[2001:db8:1::1]/127	100

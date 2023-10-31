@@ -84,7 +84,7 @@ static void xorbytes3e( unsigned char *output, unsigned char *buf,
 	n -= LBLOCKSIZE;
     }
     while(n) {
-	*output++ = *input++ ^ *ectr++;
+	*output = *input++ ^ *ectr++;
 	*buf++ ^= *output++;
 	n--;
     }

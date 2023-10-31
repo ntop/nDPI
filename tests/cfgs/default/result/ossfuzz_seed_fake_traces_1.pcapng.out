@@ -1,11 +1,11 @@
 Guessed flow protos:	0
 
 DPI Packets (TCP):	8	(1.33 pkts/flow)
-DPI Packets (UDP):	13	(3.25 pkts/flow)
+DPI Packets (UDP):	9	(2.25 pkts/flow)
 Confidence DPI              : 10 (flows)
-Num dissector calls: 706 (70.60 diss/flow)
+Num dissector calls: 690 (69.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/9/0 (insert/search/found)
+LRU cache bittorrent: 0/6/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
@@ -18,16 +18,20 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   16/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   20/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 Gnutella	4	333	2
 PPStream	1	141	1
 Steam	2	68	1
 HalfLife2	2	96	1
-Starcraft	12	2687	5
+Starcraft	4	200	4
+Protobuf	8	2487	1
 
-	1	UDP 127.0.0.1:1119 -> 127.0.0.1:1120 [proto: 213/Starcraft][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 8][cat: Game/8][8 pkts/2487 bytes -> 0 pkts/0 bytes][Goodput ratio: 91/0][204.53 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 8008/0 29219/0 105424/0 32476/0][Pkt Len c2s/s2c min/avg/max/stddev: 48/0 311/0 576/0 250/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 37,0,12,0,0,0,0,0,0,0,0,0,0,0,0,12,0,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 127.0.0.1:1119 -> 127.0.0.1:1120 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][8 pkts/2487 bytes -> 0 pkts/0 bytes][Goodput ratio: 91/0][204.53 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 8008/0 29219/0 105424/0 32476/0][Pkt Len c2s/s2c min/avg/max/stddev: 48/0 311/0 576/0 250/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 37,0,12,0,0,0,0,0,0,0,0,0,0,0,0,12,0,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.1.128:1 -> 1.2.3.4:10 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Download/7][2 pkts/170 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 70][Risk Info: TCP NULL scan / No server to client traffic][Plen Bins: 50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.1.128:1 -> 1.2.3.4:11 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Download/7][2 pkts/163 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][293.20 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 70][Risk Info: TCP NULL scan / No server to client traffic][Plen Bins: 50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	UDP 127.0.0.1:17788 -> 127.0.0.1:17788 [proto: 54/PPStream][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Streaming/17][1 pkts/141 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (PPStream)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

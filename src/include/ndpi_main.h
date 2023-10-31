@@ -84,6 +84,9 @@ extern "C" {
 				  u_int16_t lower_detected_protocol,
 				  ndpi_confidence_t confidence);
 
+  void ndpi_reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
+				    struct ndpi_flow_struct *flow);
+
   void ndpi_set_detected_protocol_keeping_master(struct ndpi_detection_module_struct *ndpi_str,
 						 struct ndpi_flow_struct *flow,
 						 u_int16_t detected_protocol,

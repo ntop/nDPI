@@ -3,7 +3,7 @@ Guessed flow protos:	4
 DPI Packets (UDP):	21	(1.00 pkts/flow)
 Confidence Match by port    : 4 (flows)
 Confidence DPI              : 17 (flows)
-Num dissector calls: 465 (22.14 diss/flow)
+Num dissector calls: 473 (22.52 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/12/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -18,8 +18,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   42/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   42/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 TocaBoca	77	15576	21
 

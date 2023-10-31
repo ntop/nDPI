@@ -21,7 +21,7 @@ check_http_response "${http_response}"
 is_file_empty "${TMP}"
 
 echo "(3) Processing IP addresses..."
-unzip -p /tmp/wa.zip "WhatsApp IPs (IPv4 Only) 2022-07-26 - 2022-07-30.txt" > "${LIST}"
+unzip -p /tmp/wa.zip "WhatsApp IPs (IPv4 Only) 2022-07-26 - 2022-07-30.txt" > "${LIST}" #TODO: ipv6
 is_file_empty "${LIST}"
 ./ipaddr2list.py "${LIST}" NDPI_PROTOCOL_WHATSAPP > "${DEST}"
 rm -f "${TMP}" "${LIST}"

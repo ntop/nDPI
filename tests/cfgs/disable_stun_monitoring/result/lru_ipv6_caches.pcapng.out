@@ -1,14 +1,14 @@
 Guessed flow protos:	3
 
 DPI Packets (TCP):	9	(3.00 pkts/flow)
-DPI Packets (UDP):	35	(3.89 pkts/flow)
+DPI Packets (UDP):	36	(4.00 pkts/flow)
 Confidence DPI (cache)      : 6 (flows)
 Confidence DPI              : 6 (flows)
-Num dissector calls: 765 (63.75 diss/flow)
+Num dissector calls: 755 (62.92 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 25/12/4 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
-LRU cache stun:       2/18/4 (insert/search/found)
+LRU cache stun:       6/8/0 (insert/search/found)
 LRU cache tls_cert:   1/3/2 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
@@ -19,8 +19,11 @@ Automa tls cert:      1/1 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  3/3 (search/found)
 Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 22/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   12/0 (search/found)
 Patricia protocols:   0/0 (search/found)
+Patricia protocols IPv6: 24/0 (search/found)
 
 BitTorrent	25	4546	5
 WhatsAppCall	24	3996	3
@@ -31,7 +34,7 @@ JA3 Host Stats:
 		 IP Address                  	 # JA3C     
 
 
-	1	UDP [32fb:f967:681e:e96b:face:b00c::74fd]:3478 <-> [20ed:470f:6f73:ce60:60be:8b4f:df37:b080]:45658 [proto: 78/STUN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 11][cat: Network/14][14 pkts/1612 bytes <-> 16 pkts/1838 bytes][Goodput ratio: 46/46][2.71 sec][bytes ratio: -0.066 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 12/1 188/155 778/396 231/147][Pkt Len c2s/s2c min/avg/max/stddev: 84/84 115/115 214/206 44/39][PLAIN TEXT (4/WtFTidwfa)][Plen Bins: 46,23,16,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP [32fb:f967:681e:e96b:face:b00c::74fd]:3478 <-> [20ed:470f:6f73:ce60:60be:8b4f:df37:b080]:45658 [proto: 78/STUN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 12][cat: Network/14][14 pkts/1612 bytes <-> 16 pkts/1838 bytes][Goodput ratio: 46/46][2.71 sec][bytes ratio: -0.066 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 12/1 188/155 778/396 231/147][Pkt Len c2s/s2c min/avg/max/stddev: 84/84 115/115 214/206 44/39][PLAIN TEXT (4/WtFTidwfa)][Plen Bins: 46,23,16,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP [2001:db8:200::1]:443 -> [2001:db8:1::1]:44144 [proto: 91.220/TLS.Cloudflare][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 3][cat: Web/5][3 pkts/2954 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][0.16 sec][(Negotiated) ALPN: h2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][TLSv1.2][ServerNames: *.bikroy.com,sni.cloudflaressl.com,bikroy.com][JA3S: 9ebc57def2efb523f25c77af13aa6d48][Issuer: C=US, O=Cloudflare, Inc., CN=Cloudflare Inc ECC CA-3][Subject: C=US, ST=California, L=San Francisco, O=Cloudflare, Inc., CN=sni.cloudflaressl.com][Certificate SHA-1: FA:93:76:9C:39:4D:08:97:FA:8F:CE:80:E4:7A:8F:8E:CF:71:30:A0][Validity: 2021-06-29 00:00:00 - 2022-06-28 23:59:59][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	3	TCP [2001:db8:200::1]:443 -> [2001:db8:1::1]:44150 [proto: 91.220/TLS.Cloudflare][IP: 0/Unknown][Encrypted][Confidence: DPI (cache)][DPI packets: 3][cat: Web/5][3 pkts/2954 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][0.15 sec][(Negotiated) ALPN: h2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][TLSv1.2][ServerNames: *.bikroy.com,sni.cloudflaressl.com,bikroy.com][JA3S: 9ebc57def2efb523f25c77af13aa6d48][Issuer: C=US, O=Cloudflare, Inc., CN=Cloudflare Inc ECC CA-3][Subject: C=US, ST=California, L=San Francisco, O=Cloudflare, Inc., CN=sni.cloudflaressl.com][Certificate SHA-1: FA:93:76:9C:39:4D:08:97:FA:8F:CE:80:E4:7A:8F:8E:CF:71:30:A0][Validity: 2021-06-29 00:00:00 - 2022-06-28 23:59:59][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
 	4	TCP [2001:db8:200::1]:443 -> [2001:db8:1::1]:44192 [proto: 91.220/TLS.Cloudflare][IP: 0/Unknown][Encrypted][Confidence: DPI (cache)][DPI packets: 3][cat: Web/5][3 pkts/2954 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][0.15 sec][(Negotiated) ALPN: h2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][TLSv1.2][ServerNames: *.bikroy.com,sni.cloudflaressl.com,bikroy.com][JA3S: 9ebc57def2efb523f25c77af13aa6d48][Issuer: C=US, O=Cloudflare, Inc., CN=Cloudflare Inc ECC CA-3][Subject: C=US, ST=California, L=San Francisco, O=Cloudflare, Inc., CN=sni.cloudflaressl.com][Certificate SHA-1: FA:93:76:9C:39:4D:08:97:FA:8F:CE:80:E4:7A:8F:8E:CF:71:30:A0][Validity: 2021-06-29 00:00:00 - 2022-06-28 23:59:59][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]

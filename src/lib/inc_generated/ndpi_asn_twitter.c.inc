@@ -42,3 +42,11 @@ static ndpi_network ndpi_protocol_twitter_protocol_list[] = {
  /* End */
  { 0x0, 0, 0 }
 };
+
+static ndpi_network6 ndpi_protocol_twitter_protocol_list_6[] = {
+ { "2400:6680:f000::", 36, NDPI_PROTOCOL_TWITTER },
+ { "2606:1f80:f000::", 36, NDPI_PROTOCOL_TWITTER },
+ { "2a04:9d40:f000::", 36, NDPI_PROTOCOL_TWITTER },
+ /* End */
+ { NULL, 0, 0 }
+};

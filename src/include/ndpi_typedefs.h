@@ -144,7 +144,7 @@ typedef enum {
   NDPI_DNS_LARGE_PACKET,
   NDPI_DNS_FRAGMENTED,
   NDPI_INVALID_CHARACTERS,
-  NDPI_POSSIBLE_EXPLOIT, /* Log4J, Wordpress and other exploits */
+  NDPI_POSSIBLE_EXPLOIT, /* 40 */ /* Log4J, Wordpress and other exploits */
   NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE,
   NDPI_PUNYCODE_IDN, /* https://en.wikipedia.org/wiki/Punycode */
   NDPI_ERROR_CODE_DETECTED,
@@ -159,7 +159,8 @@ typedef enum {
   NDPI_TCP_ISSUES,             /* 50 */ /* TCP issues such as connection failed, probing or scan */
   NDPI_FULLY_ENCRYPTED,        /* This (unknown) session is fully encrypted */
   NDPI_TLS_ALPN_SNI_MISMATCH,  /* Invalid ALPN/SNI combination */
-  
+  NDPI_MALWARE_HOST_CONTACTED, /* Flow client contacted a malware host */
+				 
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;
@@ -691,8 +692,11 @@ typedef enum {
 
 typedef enum {
   NDPI_PTREE_RISK_MASK = 0,
+  NDPI_PTREE_RISK_MASK6,
   NDPI_PTREE_RISK,
+  NDPI_PTREE_RISK6,
   NDPI_PTREE_PROTOCOLS,
+  NDPI_PTREE_PROTOCOLS6,
 
   NDPI_PTREE_MAX	/* Last one! */
 } ptree_type;
@@ -1308,8 +1312,11 @@ struct ndpi_detection_module_struct {
 
   /* Patricia trees */
   ndpi_patricia_tree_t *ip_risk_mask_ptree;
+  ndpi_patricia_tree_t *ip_risk_mask_ptree6;
   ndpi_patricia_tree_t *ip_risk_ptree; 
+  ndpi_patricia_tree_t *ip_risk_ptree6;
   ndpi_patricia_tree_t *protocols_ptree;  /* IP-based protocol detection */
+  ndpi_patricia_tree_t *protocols_ptree6;
   
   /* *** If you add a new Patricia tree, please update ptree_type above! *** */
 
@@ -1320,6 +1327,7 @@ struct ndpi_detection_module_struct {
     ndpi_domain_classify *sc_hostnames, *sc_hostnames_shadow;
 #endif
     void *ipAddresses, *ipAddresses_shadow; /* Patricia */
+    void *ipAddresses6, *ipAddresses6_shadow; /* Patricia IPv6*/
     u_int8_t categories_loaded;
   } custom_categories;
 
@@ -1525,7 +1533,7 @@ struct ndpi_flow_struct {
   } kerberos_buf;
 
   struct {
-    u_int8_t num_pkts, num_binding_requests, num_processed_pkts, maybe_dtls;
+    u_int8_t maybe_dtls;
   } stun;
 
   struct {
@@ -1591,6 +1599,8 @@ struct ndpi_flow_struct {
       } encrypted_ch;
 
       ndpi_cipher_weakness server_unsafe_cipher;
+
+      u_int32_t quic_version;
     } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
     struct {
@@ -1749,8 +1759,8 @@ struct ndpi_flow_struct {
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 210,
-               "Size of the struct member protocols increased to more than 210 bytes, "
+_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 216,
+               "Size of the struct member protocols increased to more than 216 bytes, "
                "please check if this change is necessary.");
 _Static_assert(sizeof(struct ndpi_flow_struct) <= 968,
                "Size of the flow struct increased to more than 968 bytes, "
@@ -1783,6 +1793,12 @@ typedef struct {
   u_int8_t cidr;
   u_int16_t value;
 } ndpi_network;
+
+typedef struct {
+  char *network;
+  u_int8_t cidr;
+  u_int16_t value;
+} ndpi_network6;
 
 typedef u_int32_t ndpi_init_prefs;
 

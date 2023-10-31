@@ -70,6 +70,8 @@ static void aes_gen_tables( void )
 #if defined(MBEDTLS_AESNI_C) && defined(MBEDTLS_HAVE_X86_64)
     if( mbedtls_aesni_has_support( MBEDTLS_AESNI_AES ) )
         aes_aesni_has_support = 1;
+    else
+        aes_aesni_has_support = 0;
 #endif
 
     /*
@@ -191,7 +193,13 @@ int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
     if( aes_init_done == 0 )
     {
         aes_gen_tables();
+
+        /* Allow to test both aesni and not aesni data path when fuzzing.
+           We can call aes_gen_tables() at every iteration without any issues
+           (performances asides) */
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
         aes_init_done = 1;
+#endif
     }
 
     ctx->rk = RK = ctx->buf;

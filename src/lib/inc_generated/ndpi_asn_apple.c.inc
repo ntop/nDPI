@@ -27,6 +27,17 @@ static ndpi_network ndpi_protocol_apple_protocol_list[] = {
  { 0x41C71600 /* 65.199.22.0/23 */, 23, NDPI_PROTOCOL_APPLE },
  { 0x8BB28000 /* 139.178.128.0/18 */, 18, NDPI_PROTOCOL_APPLE },
  { 0x90B20000 /* 144.178.0.0/18 */, 18, NDPI_PROTOCOL_APPLE },
+ { 0xD10E5000 /* 209.14.80.0/22 */, 22, NDPI_PROTOCOL_APPLE },
  /* End */
  { 0x0, 0, 0 }
+};
+
+static ndpi_network6 ndpi_protocol_apple_protocol_list_6[] = {
+ { "2403:300::", 32, NDPI_PROTOCOL_APPLE },
+ { "2620:0:1b00::", 48, NDPI_PROTOCOL_APPLE },
+ { "2620:149::", 32, NDPI_PROTOCOL_APPLE },
+ { "2a01:b740::", 32, NDPI_PROTOCOL_APPLE },
+ { "2a01:b747::", 32, NDPI_PROTOCOL_APPLE },
+ /* End */
+ { NULL, 0, 0 }
 };

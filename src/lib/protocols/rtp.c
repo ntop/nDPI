@@ -282,19 +282,10 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
       } else {
         rtp_get_stream_type(payload[1] & 0x7F, &flow->flow_multimedia_type);
 
-	/* Previous pkts were STUN */
-        if(flow->stun.num_binding_requests > 0 ||
-           flow->stun.num_processed_pkts > 0) {
-          NDPI_LOG_INFO(ndpi_struct, "Found RTP (previous traffic was STUN)\n");
-          ndpi_set_detected_protocol(ndpi_struct, flow,
-                                     NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_STUN,
-                                     NDPI_CONFIDENCE_DPI);
-        } else {
-          NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
-          ndpi_set_detected_protocol(ndpi_struct, flow,
-                                     NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP,
-                                     NDPI_CONFIDENCE_DPI);
-	}
+        NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow,
+                                   NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP,
+                                   NDPI_CONFIDENCE_DPI);
       }
       return;
     }

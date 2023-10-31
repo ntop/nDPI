@@ -7,15 +7,18 @@ TOTAL_ASN=0
 
 function processing_list() {
 	local LIST_MERGED="/tmp/list_m"
+	local LIST_MERGED6="/tmp/list_m6"
 
 	echo "(2) Processing IP addresses..."
 	./mergeipaddrlist.py "$1" > $LIST_MERGED
-	./ipaddr2list.py "$LIST_MERGED" "$2" > "$3"
+	./mergeipaddrlist.py "$2" > $LIST_MERGED6
+	./ipaddr2list.py "$LIST_MERGED" "$3" "$LIST_MERGED6" > "$4"
 	rm -f $LIST_MERGED
 }
 
 function create_list() {
 	LIST=/tmp/list
+	LIST6=/tmp/list6
 
 	for i in "${@:4}"; do
 		TOTAL_ASN=$(( TOTAL_ASN + 1 ))
@@ -23,15 +26,20 @@ function create_list() {
 			echo "Could not fetch route for ${i} (${1})"
 			FAILED_ASN=$(( FAILED_ASN + 1 ))
 		fi
+		if ! ./get_routes6_by_asn.sh "$i" >> $LIST6; then
+			echo "Could not fetch route6 for ${i} (${1})"
+			FAILED_ASN=$(( FAILED_ASN + 1 ))
+		fi
 	done
 
+	#TODO: ipv6 addresses
 	if [ ! -z "$3" ];  then
 	    # Split comma separated list of additional networks to add
 	    echo "$3" | tr "," "\n" >> $LIST
 	fi
 
-	processing_list "$LIST" "$1" "$2"
-	rm -f $LIST
+	processing_list "$LIST" "$LIST6" "$1" "$2"
+	rm -f $LIST $LIST6
 }
 
 cd "$(dirname "${0}")" || exit 1

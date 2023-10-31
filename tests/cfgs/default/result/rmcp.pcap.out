@@ -1,0 +1,33 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	6	(1.00 pkts/flow)
+Confidence DPI              : 6 (flows)
+Num dissector calls: 6 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   12/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        5/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   12/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+RMCP	6	380	6
+
+	1	UDP 64.240.55.240:57984 -> 30.144.16.67:623 [proto: 351/RMCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/65 bytes -> 0 pkts/0 bytes][Goodput ratio: 35/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 123.212.25.229:49531 -> 171.47.173.23:623 [proto: 351/RMCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/65 bytes -> 0 pkts/0 bytes][Goodput ratio: 35/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 127.36.88.103:34698 -> 164.114.97.252:623 [proto: 351/RMCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/65 bytes -> 0 pkts/0 bytes][Goodput ratio: 35/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 129.222.153.30:58065 -> 190.219.142.148:623 [proto: 351/RMCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/65 bytes -> 0 pkts/0 bytes][Goodput ratio: 35/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 54.229.154.152:59937 -> 14.85.79.172:623 [proto: 351/RMCP][IP: 265/AmazonAWS][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 137.141.61.18:59937 -> 82.132.4.178:623 [proto: 351/RMCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

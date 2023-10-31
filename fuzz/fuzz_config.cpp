@@ -172,7 +172,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_ndpi_num_custom_protocols(ndpi_info_mod);
   ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
 
-  ndpi_self_check_host_match(stderr);
+  ndpi_self_check_host_match(stdout);
+
+  ndpi_dump_protocols(ndpi_info_mod, stdout);
+  ndpi_generate_options(fuzzed_data.ConsumeIntegralInRange(0, 4), stdout);
+  ndpi_dump_risks_score(stdout);
 
   /* Basic code to try testing this "config" */
   bool_value = fuzzed_data.ConsumeBool();
@@ -216,6 +220,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
                                         flow.l4_proto,
                                         flow.c_address.v4, flow.c_port,
                                         flow.s_address.v4, flow.s_port);
+    } else {
+      ndpi_find_ipv6_category_userdata(ndpi_info_mod, (struct in6_addr *)flow.c_address.v6);
     }
     /* Another "strange" function: fuzz it here, for lack of a better alternative */
     ndpi_search_tcp_or_udp(ndpi_info_mod, &flow);

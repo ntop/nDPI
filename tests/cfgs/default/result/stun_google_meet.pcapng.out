@@ -1,12 +1,13 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	15	(2.50 pkts/flow)
-Confidence DPI              : 6 (flows)
-Num dissector calls: 640 (106.67 diss/flow)
+DPI Packets (UDP):	10	(1.67 pkts/flow)
+Confidence DPI (cache)      : 2 (flows)
+Confidence DPI              : 4 (flows)
+Num dissector calls: 26 (4.33 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
-LRU cache stun:       4/36/8 (insert/search/found)
+LRU cache stun:       12/10/2 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
@@ -16,15 +17,18 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   12/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   6/6 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 GoogleHangoutDuo	214	33707	6
 
-	1	UDP 192.168.12.156:38152 <-> 142.250.82.76:19305 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 3][cat: VoIP/10][28 pkts/4034 bytes <-> 46 pkts/12188 bytes][Goodput ratio: 71/84][0.87 sec][bytes ratio: -0.503 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 30/10 205/154 50/29][Pkt Len c2s/s2c min/avg/max/stddev: 87/79 144/265 587/1245 89/180][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (HrRgpad)][Plen Bins: 0,8,37,9,4,0,0,0,38,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.12.156:38152 <-> 142.250.82.76:19305 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][28 pkts/4034 bytes <-> 46 pkts/12188 bytes][Goodput ratio: 71/84][0.87 sec][bytes ratio: -0.503 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 30/10 205/154 50/29][Pkt Len c2s/s2c min/avg/max/stddev: 87/79 144/265 587/1245 89/180][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][PLAIN TEXT (HrRgpad)][Plen Bins: 0,8,37,9,4,0,0,0,38,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.12.156:38152 <-> 142.250.82.76:3478 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][55 pkts/7402 bytes <-> 24 pkts/3525 bytes][Goodput ratio: 69/71][6.63 sec][bytes ratio: 0.355 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/2 109/184 402/761 143/224][Pkt Len c2s/s2c min/avg/max/stddev: 87/82 135/147 423/579 69/115][PLAIN TEXT (HrRgpad)][Plen Bins: 0,39,34,15,0,1,0,0,5,1,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	3	UDP 192.168.12.156:45400 <-> 142.250.82.76:3478 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 3][cat: VoIP/10][17 pkts/2694 bytes <-> 16 pkts/1696 bytes][Goodput ratio: 73/60][54.70 sec][bytes ratio: 0.227 (Upload)][IAT c2s/s2c min/avg/max/stddev: 90/78 3250/2028 17905/6554 4698/2127][Pkt Len c2s/s2c min/avg/max/stddev: 158/106 158/106 166/106 2/0][PLAIN TEXT (HrRgpad)][Plen Bins: 0,0,48,51,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	4	UDP 192.168.12.156:38152 <-> 74.125.128.127:19302 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 3][cat: VoIP/10][6 pkts/372 bytes <-> 6 pkts/444 bytes][Goodput ratio: 32/43][50.12 sec][bytes ratio: -0.088 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10019/10019 10022/10021 10026/10025 3/3][Pkt Len c2s/s2c min/avg/max/stddev: 62/74 62/74 62/74 0/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (kAGNNzv)][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	5	UDP 192.168.12.156:45400 <-> 74.125.128.127:19302 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 3][cat: VoIP/10][6 pkts/372 bytes <-> 6 pkts/444 bytes][Goodput ratio: 32/43][50.12 sec][bytes ratio: -0.088 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10020/10019 10022/10021 10026/10025 3/3][Pkt Len c2s/s2c min/avg/max/stddev: 62/74 62/74 62/74 0/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (tcEcaq476)][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	6	UDP 192.168.12.156:45400 <-> 142.250.82.76:19305 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 2][cat: VoIP/10][2 pkts/324 bytes <-> 2 pkts/212 bytes][Goodput ratio: 74/60][0.63 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (ByyD/CC)][Plen Bins: 0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.12.156:45400 <-> 142.250.82.76:3478 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][17 pkts/2694 bytes <-> 16 pkts/1696 bytes][Goodput ratio: 73/60][54.70 sec][bytes ratio: 0.227 (Upload)][IAT c2s/s2c min/avg/max/stddev: 90/78 3250/2028 17905/6554 4698/2127][Pkt Len c2s/s2c min/avg/max/stddev: 158/106 158/106 166/106 2/0][PLAIN TEXT (HrRgpad)][Plen Bins: 0,0,48,51,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.168.12.156:38152 <-> 74.125.128.127:19302 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI (cache)][DPI packets: 3][cat: Network/14][6 pkts/372 bytes <-> 6 pkts/444 bytes][Goodput ratio: 32/43][50.12 sec][bytes ratio: -0.088 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10019/10019 10022/10021 10026/10025 3/3][Pkt Len c2s/s2c min/avg/max/stddev: 62/74 62/74 62/74 0/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (kAGNNzv)][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 192.168.12.156:45400 <-> 74.125.128.127:19302 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI (cache)][DPI packets: 3][cat: Network/14][6 pkts/372 bytes <-> 6 pkts/444 bytes][Goodput ratio: 32/43][50.12 sec][bytes ratio: -0.088 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10020/10019 10022/10021 10026/10025 3/3][Pkt Len c2s/s2c min/avg/max/stddev: 62/74 62/74 62/74 0/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (tcEcaq476)][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 192.168.12.156:45400 <-> 142.250.82.76:19305 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][2 pkts/324 bytes <-> 2 pkts/212 bytes][Goodput ratio: 74/60][0.63 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][PLAIN TEXT (ByyD/CC)][Plen Bins: 0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

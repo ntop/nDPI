@@ -17,8 +17,11 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  2/2 (search/found)
 Patricia risk mask:   4/0 (search/found)
-Patricia risk:        4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        2/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 Snapchat	2	2784	2
 
@@ -28,5 +31,5 @@ JA3 Host Stats:
 	2	 245.161.134.177          	 1      
 
 
-	1	UDP 134.53.36.43:34917 -> 142.104.38.30:443 [proto: 188.199/QUIC.Snapchat][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: SocialNetwork/6][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Hostname/SNI: app-analytics-v2.snapchat.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.3][JA3C: 1b4b6c50fef204e06798d3fc7cb272fe][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
-	2	UDP 245.161.134.177:27636 -> 77.242.114.14:443 [proto: 188.199/QUIC.Snapchat][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: SocialNetwork/6][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Hostname/SNI: gcp.api.snapchat.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.3][JA3C: c570fdf41c8bf336ac9442888680bf3a][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+	1	UDP 134.53.36.43:34917 -> 142.104.38.30:443 [proto: 188.199/QUIC.Snapchat][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: SocialNetwork/6][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Hostname/SNI: app-analytics-v2.snapchat.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.3][QUIC ver: V-1][JA3C: 1b4b6c50fef204e06798d3fc7cb272fe][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+	2	UDP 245.161.134.177:27636 -> 77.242.114.14:443 [proto: 188.199/QUIC.Snapchat][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: SocialNetwork/6][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Hostname/SNI: gcp.api.snapchat.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TLSv1.3][QUIC ver: V-1][JA3C: c570fdf41c8bf336ac9442888680bf3a][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]

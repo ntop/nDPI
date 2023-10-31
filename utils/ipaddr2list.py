@@ -8,15 +8,14 @@ import socket, struct
 proto = "NDPI_PROTOCOL_XYX"
 append_name = ""
 if len (sys.argv) < 2 :
-    print("Usage: ipaddr2list.py <file> <protocol> [<append_name>]")
+    print("Usage: ipaddr2list.py <file> <protocol> [file6] [<append_name>]")
     sys.exit (1)
 
 if len (sys.argv) >= 3:
     proto = sys.argv[2]
 
-if len (sys.argv) >= 4:
-    append_name = sys.argv[3]
-
+if len (sys.argv) >= 5:
+    append_name = sys.argv[4]
 
 
 print("""/*
@@ -65,6 +64,33 @@ with open(sys.argv[1]) as fp:
 
 print(" /* End */")
 print(" { 0x0, 0, 0 }")
+print("};")
+
+print("");
+print("static ndpi_network6 "+proto.lower()+append_name+"_protocol_list_6[] = {")
+
+if(len (sys.argv) >= 4):
+
+    with open(sys.argv[3]) as fp:
+        for cnt, line in enumerate(fp):
+            line = line.rstrip()
+
+            if(line != ""):
+                lines += 1
+                x = line.split("/")
+
+                if(len(x) == 2):
+                    ipaddr = x[0]
+                    cidr   = x[1]
+                else:
+                    ipaddr = line
+                    cidr = "128"
+
+                if(ipaddr != ""):
+                    print(" { \""+ipaddr+"\", "+cidr+", "+proto+" },")
+
+print(" /* End */")
+print(" { NULL, 0, 0 }")
 print("};")
 
 if lines == 0:

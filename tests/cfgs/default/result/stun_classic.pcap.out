@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	5	(5.00 pkts/flow)
+DPI Packets (UDP):	3	(3.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 169 (169.00 diss/flow)
+Num dissector calls: 6 (6.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -16,10 +16,13 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
 RTP	22	1624	1
 
-	1	UDP 172.16.63.224:55050 <-> 172.16.63.21:13958 [proto: 78.87/STUN.RTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: Media/1][9 pkts/662 bytes <-> 13 pkts/962 bytes][Goodput ratio: 43/43][0.23 sec][bytes ratio: -0.185 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/0 32/17 101/42 32/11][Pkt Len c2s/s2c min/avg/max/stddev: 70/74 74/74 74/74 1/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 4,95,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 172.16.63.224:55050 <-> 172.16.63.21:13958 [proto: 78.87/STUN.RTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 3][cat: Network/14][9 pkts/662 bytes <-> 13 pkts/962 bytes][Goodput ratio: 43/43][0.23 sec][bytes ratio: -0.185 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/0 32/17 101/42 32/11][Pkt Len c2s/s2c min/avg/max/stddev: 70/74 74/74 74/74 1/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 4,95,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -39,3 +39,8 @@ static ndpi_network ndpi_protocol_riotgames_protocol_list[] = {
  /* End */
  { 0x0, 0, 0 }
 };
+
+static ndpi_network6 ndpi_protocol_riotgames_protocol_list_6[] = {
+ /* End */
+ { NULL, 0, 0 }
+};

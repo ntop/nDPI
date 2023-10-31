@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	4	(1.00 pkts/flow)
-Confidence DPI              : 4 (flows)
-Num dissector calls: 400 (100.00 diss/flow)
+DPI Packets (UDP):	7	(1.00 pkts/flow)
+Confidence DPI              : 7 (flows)
+Num dissector calls: 686 (98.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -16,13 +16,19 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   8/0 (search/found)
+Patricia risk mask:   14/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia protocols:   8/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   14/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
 
-CryNetwork	60	8045	4
+CryNetwork	105	14077	7
 
-	1	UDP 192.168.2.100:56970 <-> 84.16.230.222:28665 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][14 pkts/1901 bytes <-> 1 pkts/175 bytes][Goodput ratio: 69/76][0.77 sec][bytes ratio: 0.831 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 61/0 262/0 85/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 136/175 267/175 69/0][Plen Bins: 0,40,33,0,6,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 192.168.2.100:55645 <-> 78.159.98.94:28375 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][14 pkts/1881 bytes <-> 1 pkts/175 bytes][Goodput ratio: 69/76][0.49 sec][bytes ratio: 0.830 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 38/0 201/0 51/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 134/175 267/175 70/0][Plen Bins: 0,46,26,0,6,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	3	UDP 192.168.2.100:56333 <-> 37.58.56.245:20250 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][13 pkts/1634 bytes <-> 2 pkts/350 bytes][Goodput ratio: 67/76][0.49 sec][bytes ratio: 0.647 (Upload)][IAT c2s/s2c min/avg/max/stddev: 5/0 41/0 169/0 43/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 126/175 267/175 61/0][Plen Bins: 0,40,33,0,13,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	4	UDP 192.168.2.100:61837 <-> 78.159.118.97:25383 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][14 pkts/1754 bytes <-> 1 pkts/175 bytes][Goodput ratio: 66/76][0.44 sec][bytes ratio: 0.819 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 34/0 112/0 26/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 125/175 283/175 65/0][Plen Bins: 0,46,33,0,6,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.2.100:55460 <-> 78.159.118.143:21931 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][12 pkts/1562 bytes <-> 3 pkts/525 bytes][Goodput ratio: 68/76][0.94 sec][bytes ratio: 0.497 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/48 88/48 266/48 102/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 130/175 267/175 62/0][Plen Bins: 0,33,33,0,20,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.2.100:56970 <-> 84.16.230.222:28665 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][14 pkts/1901 bytes <-> 1 pkts/175 bytes][Goodput ratio: 69/76][0.77 sec][bytes ratio: 0.831 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 61/0 262/0 85/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 136/175 267/175 69/0][Plen Bins: 0,40,33,0,6,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.2.100:55645 <-> 78.159.98.94:28375 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][14 pkts/1881 bytes <-> 1 pkts/175 bytes][Goodput ratio: 69/76][0.49 sec][bytes ratio: 0.830 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 38/0 201/0 51/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 134/175 267/175 70/0][Plen Bins: 0,46,26,0,6,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.168.2.100:60224 <-> 78.159.106.139:28343 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][13 pkts/1682 bytes <-> 2 pkts/350 bytes][Goodput ratio: 67/76][0.67 sec][bytes ratio: 0.656 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 58/0 210/0 72/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 129/175 283/175 66/0][Plen Bins: 0,40,33,0,13,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 192.168.2.100:56333 <-> 37.58.56.245:20250 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][13 pkts/1634 bytes <-> 2 pkts/350 bytes][Goodput ratio: 67/76][0.49 sec][bytes ratio: 0.647 (Upload)][IAT c2s/s2c min/avg/max/stddev: 5/0 41/0 169/0 43/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 126/175 267/175 61/0][Plen Bins: 0,40,33,0,13,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 192.168.2.100:61837 <-> 78.159.118.97:25383 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][14 pkts/1754 bytes <-> 1 pkts/175 bytes][Goodput ratio: 66/76][0.44 sec][bytes ratio: 0.819 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 34/0 112/0 26/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 125/175 283/175 65/0][Plen Bins: 0,46,33,0,6,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 192.168.2.100:60751 <-> 84.16.248.143:30098 [proto: 314/CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][14 pkts/1738 bytes <-> 1 pkts/175 bytes][Goodput ratio: 66/76][0.47 sec][bytes ratio: 0.817 (Upload)][IAT c2s/s2c min/avg/max/stddev: 5/0 36/0 145/0 34/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 124/175 267/175 59/0][Plen Bins: 0,46,33,0,6,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
