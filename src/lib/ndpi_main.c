@@ -2770,7 +2770,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   }
 
   memset(&hints, 0, sizeof(struct addrinfo));
-  hints.ai_family = is_ipv6 ? AF_INET6 : AF_INET;
+  hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags = AI_CANONNAME;
 
@@ -2793,6 +2793,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 
 	  memcpy(&pin, &(addr->sin_addr), sizeof(struct in_addr));
 	  value_ready = true;
+          bits = 32;
 	  break;
 	}
       }
@@ -2819,6 +2820,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 
 	  memcpy(&pin6, &(addr->sin6_addr), sizeof(struct in6_addr));
 	  value_ready = true;
+          bits = 128;
 	  break;
 	}
       }
@@ -3057,6 +3059,12 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
        simply avoid any logs at all */
     return(NULL);
   }
+
+#ifdef WIN32
+  /* Required to use getaddrinfo on Windows */
+  WSADATA wsaData;
+  WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
 
   memset(ndpi_str, 0, sizeof(struct ndpi_detection_module_struct));
 
@@ -3943,6 +3951,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 	    ndpi_free(ndpi_str->callback_buffer_tcp_payload);
     ndpi_free(ndpi_str);
   }
+
+#ifdef WIN32
+  WSACleanup();
+#endif
 }
 
 /* ****************************************************** */
