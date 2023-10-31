@@ -1733,8 +1733,11 @@ static void ndpi_compile_rce_regex() {
 #endif
   }
 
-  ndpi_free((void *)pcreErrorStr);
+  if(pcreErrorStr != NULL)
+    ndpi_free((void *)pcreErrorStr);
 }
+
+/* ********************************** */
 
 static int ndpi_is_rce_injection(char* query) {
   if(!initialized_comp_rx) {
