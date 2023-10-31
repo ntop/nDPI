@@ -384,6 +384,7 @@ typedef enum {
   NDPI_PROTOCOL_PROTOBUF              = 353,
   NDPI_PROTOCOL_ETHEREUM              = 354, 
   NDPI_PROTOCOL_TELEGRAM_VOIP         = 355,
+  NDPI_PROTOCOL_SINA_WEIBO	      = 356,	
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
