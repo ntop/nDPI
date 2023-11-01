@@ -62,12 +62,12 @@
 
 // #define DEBUG_REASSEMBLY
 
-#ifdef HAVE_PCRE
-#include <pcre.h>
+#ifdef HAVE_PCRE2
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 
-struct pcre_struct {
-  pcre *compiled;
-  pcre_extra *optimized;
+struct pcre2_struct {
+  pcre2_code *compiled;
 };
 #endif
 
@@ -1702,18 +1702,19 @@ static int ndpi_is_xss_injection(char* query) {
 
 /* ********************************** */
 
-#ifdef HAVE_PCRE
+#ifdef HAVE_PCRE2
 
 static void ndpi_compile_rce_regex() {
-  const char *pcreErrorStr = NULL;
-  int pcreErrorOffset;
+  PCRE2_UCHAR pcreErrorStr[128];
+  PCRE2_SIZE pcreErrorOffset;
+  int pcreErrorCode;
 
   for(int i = 0; i < N_RCE_REGEX; i++) {
-    comp_rx[i] = (struct pcre_struct*)ndpi_malloc(sizeof(struct pcre_struct));
+    comp_rx[i] = (struct pcre2_struct*)ndpi_malloc(sizeof(struct pcre2_struct));
 
-    comp_rx[i]->compiled = pcre_compile(rce_regex[i], 0, &pcreErrorStr,
+    comp_rx[i]->compiled = pcre2_compile((PCRE2_SPTR)rce_regex[i], PCRE2_ZERO_TERMINATED, 0, &pcreErrorCode,
                                         &pcreErrorOffset, NULL);
-
+    pcre2_get_error_message(pcreErrorCode, pcreErrorStr, 128);
     if(comp_rx[i]->compiled == NULL) {
 #ifdef DEBUG
       NDPI_LOG_ERR(ndpi_str, "ERROR: Could not compile '%s': %s\n", rce_regex[i],
@@ -1723,18 +1724,16 @@ static void ndpi_compile_rce_regex() {
       continue;
     }
 
-    comp_rx[i]->optimized = pcre_study(comp_rx[i]->compiled, 0, &pcreErrorStr);
+    pcreErrorCode = pcre2_jit_compile(comp_rx[i]->compiled, PCRE2_JIT_COMPLETE);
 
 #ifdef DEBUG
-    if(pcreErrorStr != NULL) {
-      NDPI_LOG_ERR(ndpi_str, "ERROR: Could not study '%s': %s\n", rce_regex[i],
+    if(pcreErrorCode < 0) {
+      pcre2_get_error_message(pcreErrorCode, pcreErrorStr, 128);
+      NDPI_LOG_ERR(ndpi_str, "ERROR: Could not jit compile '%s': %s\n", rce_regex[i],
                    pcreErrorStr);
     }
 #endif
   }
-
-  if(pcreErrorStr != NULL)
-    ndpi_free((void *)pcreErrorStr);
 }
 
 /* ********************************** */
@@ -1745,17 +1744,17 @@ static int ndpi_is_rce_injection(char* query) {
     initialized_comp_rx = 1;
   }
 
+  pcre2_match_data *pcreMatchData;
   int pcreExecRet;
-  int subStrVec[30];
 
   for(int i = 0; i < N_RCE_REGEX; i++) {
     unsigned int length = strlen(query);
 
-    pcreExecRet = pcre_exec(comp_rx[i]->compiled,
-                            comp_rx[i]->optimized,
-                            query, length, 0, 0, subStrVec, 30);
-
-    if(pcreExecRet >= 0) {
+    pcreMatchData = pcre2_match_data_create_from_pattern(comp_rx[i]->compiled, NULL);
+    pcreExecRet = pcre2_match(comp_rx[i]->compiled,
+                            (PCRE2_SPTR)query, length, 0, 0, pcreMatchData, NULL);
+    pcre2_match_data_free(pcreMatchData);
+    if(pcreExecRet > 0) {
       return 1;
     }
 #ifdef DEBUG
@@ -1845,7 +1844,7 @@ ndpi_risk_enum ndpi_validate_url(char *url) {
 	    rc = NDPI_URL_POSSIBLE_XSS;
 	  else if(ndpi_is_sql_injection(decoded))
 	    rc = NDPI_URL_POSSIBLE_SQL_INJECTION;
-#ifdef HAVE_PCRE
+#ifdef HAVE_PCRE2
 	  else if(ndpi_is_rce_injection(decoded))
 	    rc = NDPI_URL_POSSIBLE_RCE_INJECTION;
 #endif

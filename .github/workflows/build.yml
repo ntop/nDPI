@@ -93,7 +93,7 @@ jobs:
             os: ubuntu-20.04
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
@@ -101,7 +101,7 @@ jobs:
             os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
@@ -110,7 +110,7 @@ jobs:
             os: ubuntu-20.04
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
@@ -120,7 +120,7 @@ jobs:
             os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
@@ -129,7 +129,7 @@ jobs:
             os: ubuntu-latest
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-thread-sanitizer"
             nBPF: ""
@@ -137,7 +137,7 @@ jobs:
             os: ubuntu-latest
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: "nBPF"
@@ -145,7 +145,7 @@ jobs:
             os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-memory-sanitizer"
             nBPF: ""
@@ -153,7 +153,7 @@ jobs:
             os: macOS-latest
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on macos
             nBPF: ""
@@ -161,7 +161,7 @@ jobs:
             os: macos-12
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on macos
             nBPF: ""
@@ -169,7 +169,7 @@ jobs:
             os: ubuntu-latest
             arch: "arm64"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "" # Disable sanitizer on arm64
             nBPF: ""
@@ -177,7 +177,7 @@ jobs:
             os: ubuntu-latest
             arch: "armhf"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
@@ -185,7 +185,7 @@ jobs:
             os: ubuntu-latest
             arch: "s390x"
             gcrypt: ""
-            pcre: "--with-pcre"
+            pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: ""
             nBPF: ""
@@ -209,8 +209,8 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
         run: |
           sudo apt-get install libgcrypt20-dev
-      - name: Install Ubuntu Prerequisites (libpcre)
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.pcre, '--with-pcre')
+      - name: Install Ubuntu Prerequisites (libpcre2)
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.pcre, '--with-pcre2')
         run: |
           sudo apt-get install libpcre3-dev
       - name: Install Ubuntu Prerequisites (maxminddb)
@@ -266,8 +266,8 @@ jobs:
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
         run: |
           brew install libgcrypt
-      - name: Install MacOS Prerequisites (libpcre)
-        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.pcre, '--with-pcre')
+      - name: Install MacOS Prerequisites (libpcre2)
+        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.pcre, '--with-pcre2')
         run: |
           brew install pcre
       - name: Install MacOS Prerequisites (maxminddb)
