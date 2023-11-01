@@ -186,6 +186,16 @@ Notes:
 
 `NDPI_PROTOCOL_TELEGRAM_VOIP`
 ============================
-Audio/video calls made using the Telegram app.
+Audio/video calls made using the telegram app.
 
-References: `Wikipedia <https://en.wikipedia.org/wiki/Telegram_(software)/>`_.
+References: `Wikipedia <https://en.wikipedia.org/wiki/telegram_(software)/>`_.
+
+
+.. _Proto 356:
+
+`NDPI_PROTOCOL_SINA_WEIBO`
+============================
+Chinese microblogging (weibo) website.
+
+References: `Wikipedia <https://en.wikipedia.org/wiki/Sina_Weibo>`_.
+
