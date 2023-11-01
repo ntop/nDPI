@@ -36,6 +36,8 @@ RETVAL=$(( RETVAL + $? ))
 
 ./gambling_sites_download.sh
 RETVAL=$(( RETVAL + $? ))
+./malicious_sites_download.sh
+RETVAL=$(( RETVAL + $? ))
 ./mullvad_ip_addresses_download.sh
 RETVAL=$(( RETVAL + $? ))
 ./protonvpn_ip_addresses_download.sh
