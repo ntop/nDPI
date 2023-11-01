@@ -2051,11 +2051,10 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_TLS_ALPN_SNI_MISMATCH:
     return("ALPN/SNI Mismatch");
-    
+
   case NDPI_MALWARE_HOST_CONTACTED:
     return("Client contacted a malware host");
-    break;
-    
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2197,35 +2196,6 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
   }
 
   return(NDPI_HTTP_METHOD_UNKNOWN);
-}
-
-/* ******************************************************************** */
-
-#define ROR64(x,r) (((x)>>(r))|((x)<<(64-(r))))
-
-/*
-  'in_16_bytes_long` points to some 16 byte memory data to be hashed;
-  two independent 64-bit linear congruential generators are applied
-  results are mixed, scrambled and cast to 32-bit
-*/
-u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long) {
-  u_int64_t a = *(u_int64_t*)(in_16_bytes_long + 0);
-  u_int64_t c = *(u_int64_t*)(in_16_bytes_long + 8);
-
-  // multipliers are taken from sprng.org, addends are prime
-  a = a * 0x2c6fe96ee78b6955 + 0x9af64480a3486659;
-  c = c * 0x369dea0f31a53f85 + 0xd0c6225445b76b5b;
-
-  // mix results
-  a += c;
-
-  // final scramble
-  a ^= ROR64(a, 13) ^ ROR64(a, 7);
-
-  // down-casting, also taking advantage of upper half
-  a ^= a >> 32;
-
-  return((u_int32_t)a);
 }
 
 /* ******************************************************************** */

@@ -15,6 +15,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_murmur_hash((const char *)data, size);
   ndpi_quick_hash(data, size);
 
+  if(size >= 16)
+    ndpi_quick_16_byte_hash(data);
+
   str = ndpi_malloc(size + 1);
   if(str) {
     memcpy(str, data, size);
