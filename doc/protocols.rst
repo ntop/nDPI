@@ -184,7 +184,7 @@ Notes:
 
 .. _proto 355:
 
-`ndpi_protocol_telegram_voip`
+`NDPI_PROTOCOL_TELEGRAM_VOIP`
 ============================
 audio/video calls made using the telegram app.
 
@@ -193,7 +193,7 @@ references: `wikipedia <https://en.wikipedia.org/wiki/telegram_(software)/>`_.
 
 .. _proto 356:
 
-`ndpi_protocol_sina_weibo`
+`NDPI_PROTOCOL_SINA_WEIBO`
 ============================
 Chinese microblogging (weibo) website.
 
