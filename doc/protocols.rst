@@ -182,10 +182,20 @@ Notes:
 - same as Bitcoin, not each crypto exchange is a mining, it could be a normal transaction, sending or receving or even blockchain exploration.
 
 
-.. _Proto 355:
+.. _proto 355:
 
-`NDPI_PROTOCOL_TELEGRAM_VOIP`
+`ndpi_protocol_telegram_voip`
 ============================
-Audio/video calls made using the Telegram app.
+audio/video calls made using the telegram app.
 
-References: `Wikipedia <https://en.wikipedia.org/wiki/Telegram_(software)/>`_.
+references: `wikipedia <https://en.wikipedia.org/wiki/telegram_(software)/>`_.
+
+
+.. _proto 356:
+
+`ndpi_protocol_sina_weibo`
+============================
+Chinese microblogging (weibo) website.
+
+references: `wikipedia <https://en.wikipedia.org/wiki/Sina_Weibo>`_.
+
