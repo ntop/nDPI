@@ -262,7 +262,18 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
      thiz->max_str_len = patt->length;
 
   if(n->final && n->matched_patterns) {
+    /*
+      In this case an existing pattern exists and thus we overwrite
+      the previous protocol value with this one
+    */
+
+#if 1
+    /* nDPI code */
+    n->matched_patterns->patterns[0].rep.number = patt->rep.number;
+#else
+    /* original code */
     patt->rep.number = n->matched_patterns->patterns[0].rep.number;
+#endif
     return ACERR_DUPLICATE_PATTERN;
   }
 
