@@ -18,6 +18,7 @@ EXTRA_DIST = README.md README.fuzzer.md CHANGELOG.md CONTRIBUTING.md \
 	python/DEV_GUIDE.md python/dev_requirements.txt python/ndpi_example.py python/ndpi/__init__.py \
 		python/ndpi/ndpi_build.py python/ndpi/ndpi.py python/README.md \
 		python/requirements.txt python/setup.py python/tests.py \
+	lists/100_malware.list \
 	lists/107_gambling.list \
 	lists/107_gambling_custom.list \
 	lists/README.md \

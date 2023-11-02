@@ -2680,8 +2680,13 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
       exit(-1);
   }
 
-  if(_categoriesDirPath)
-    ndpi_load_categories_dir(ndpi_thread_info[thread_id].workflow->ndpi_struct, _categoriesDirPath);
+  if(_categoriesDirPath) {
+    int failed_files = ndpi_load_categories_dir(ndpi_thread_info[thread_id].workflow->ndpi_struct, _categoriesDirPath);
+    if (failed_files < 0) {
+      fprintf(stderr, "Failed to parse all *.list files in: %s\n", _categoriesDirPath);
+      exit(-1);
+    }
+  }
   
   if(_riskyDomainFilePath)
     ndpi_load_risk_domain_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _riskyDomainFilePath);
@@ -2700,7 +2705,11 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
     else
       label = _customCategoryFilePath;
 
-    ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath, label);
+    int failed_lines = ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath, label);
+    if (failed_lines < 0) {
+      fprintf(stderr, "Failed to parse custom categories file: %s\n", _customCategoryFilePath);
+      exit(-1);
+    }
   }
 
   /* Make sure to load lists before finalizing the initialization */
@@ -5505,18 +5514,6 @@ void domainSearchUnitTest() {
   assert(ndpi_domain_classify_contains(sc, &class_id, "123vc.club"));
   assert(class_id == NDPI_PROTOCOL_CATEGORY_GAMBLING);
 
-#if 0
-  {
-    const char *fname = NDPI_BASE_DIR "/lists/gambling.list";
-    u_int32_t num_domains;
-    
-    num_domains = ndpi_domain_classify_add_domains(sc, NDPI_PROTOCOL_GAMBLING, (char*)fname);
-    assert(num_domains == 35370);
-
-    assert(ndpi_domain_classify_contains(sc, "0grand-casino.com") == NDPI_PROTOCOL_GAMBLING);
-  }
-#endif
-  
   /* Subdomain check */
   assert(ndpi_domain_classify_contains(sc, &class_id, "blog.ntop.org"));
   assert(class_id == NDPI_PROTOCOL_NTOP);

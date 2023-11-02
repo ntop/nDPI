@@ -64,4 +64,5 @@ cp fuzz/bd_param.txt $OUT/
 cp fuzz/splt_param.txt $OUT/
 cp fuzz/random_list.list $OUT/
 mkdir -p $OUT/lists
-cp lists/*.list $OUT/lists
+# Ignore a huge list to speed up init time
+find lists/*.list ! -name 100_malware.list -exec cp -t $OUT/lists/ {} +
