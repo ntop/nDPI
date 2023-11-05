@@ -26,6 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DNS
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define FLAGS_MASK 0x8000
 
@@ -37,8 +38,6 @@
 
 #define PKT_LEN_ALERT 512
 
-/* ndpi_main.c */
-extern u_int8_t ndpi_iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize);
 
 static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow);
@@ -869,7 +868,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
       /* 0: fragmented; 1: not fragmented */
       if((flags & 0x20)
-	 || (ndpi_iph_is_valid_and_not_fragmented(packet->iph, packet->l3_packet_len) == 0)) {
+	 || (iph_is_valid_and_not_fragmented(packet->iph, packet->l3_packet_len) == 0)) {
 	ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_FRAGMENTED, NULL);
       }
     } else if(packet->iphv6 != NULL) {

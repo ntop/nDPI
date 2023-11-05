@@ -22,6 +22,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DRDA
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 struct ndpi_drda_hdr {
   u_int16_t length;

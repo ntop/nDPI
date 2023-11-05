@@ -26,6 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_APPLE_PUSH
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 static int is_apple_push_addr(const struct ndpi_packet_struct *packet)
 {

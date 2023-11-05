@@ -26,6 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_CAN
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 PACK_ON
 struct can_hdr {

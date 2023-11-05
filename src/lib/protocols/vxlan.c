@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_VXLAN
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* This code handles VXLAN as per RFC 7348 */
 

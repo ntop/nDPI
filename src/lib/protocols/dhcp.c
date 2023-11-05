@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DHCP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* freeradius/src/lib/dhcp.c */
 #define DHCP_CHADDR_LEN	6

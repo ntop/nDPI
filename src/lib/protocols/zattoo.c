@@ -25,6 +25,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_ZATTOO
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 	
 #if !defined(WIN32)
 static inline

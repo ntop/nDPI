@@ -26,6 +26,7 @@
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_WORLD_OF_KUNG_FU
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 static void ndpi_int_world_of_kung_fu_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

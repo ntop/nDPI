@@ -28,6 +28,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_BITTORRENT
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define BITTORRENT_PROTO_STRING          "BitTorrent protocol"
 
@@ -40,8 +41,6 @@ struct ndpi_utp_hdr {
   u_int16_t sequence_nr, ack_nr;
 };
 
-extern int ndpi_search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struct,
-                                             struct ndpi_flow_struct *flow);
 
 /* Forward declaration */
 static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_struct,
@@ -467,7 +466,7 @@ static u_int8_t is_port(u_int16_t a, u_int16_t b, u_int16_t what) {
 static void ndpi_skip_bittorrent(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
 				 struct ndpi_packet_struct *packet) {
-  if(ndpi_search_into_bittorrent_cache(ndpi_struct, flow))
+  if(search_into_bittorrent_cache(ndpi_struct, flow))
     ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0, NDPI_CONFIDENCE_DPI_CACHE);
   else
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

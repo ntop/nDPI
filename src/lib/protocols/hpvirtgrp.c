@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HPVIRTGRP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 static void ndpi_int_hpvirtgrp_add_connection(

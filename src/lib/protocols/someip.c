@@ -26,6 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SOMEIP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 enum SOMEIP_MESSAGE_TYPES {
   SOMEIP_REQUEST = 0x00,

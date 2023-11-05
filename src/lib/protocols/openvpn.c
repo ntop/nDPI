@@ -24,6 +24,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_OPENVPN
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /*
  * OpenVPN TCP / UDP Detection - 128/160 hmac

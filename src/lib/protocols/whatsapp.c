@@ -22,6 +22,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_WHATSAPP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define WA_SEQ(seq) { .sequence_size = NDPI_ARRAY_LENGTH(seq) - 1 /* '\0' */, \
                       .sequence = seq }

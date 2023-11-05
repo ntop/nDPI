@@ -34,6 +34,7 @@
 #include "ndpi_api.h"
 #include "ndpi_includes.h"
 #include "ndpi_encryption.h"
+#include "ndpi_private.h"
 
 #include "ahocorasick.h"
 #include "libcache.h"

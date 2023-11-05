@@ -27,6 +27,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TFTP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* see: https://datatracker.ietf.org/doc/html/rfc1350 */
 

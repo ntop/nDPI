@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_GENSHIN_IMPACT
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 static void ndpi_int_genshin_impact_add_connection(

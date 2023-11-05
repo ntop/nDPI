@@ -22,6 +22,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SKYPE_TEAMS
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 static int is_port(u_int16_t a, u_int16_t b, u_int16_t c) {
   return(((a == c) || (b == c)) ? 1 : 0);

@@ -27,6 +27,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_WIREGUARD
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /*
  * See https://www.wireguard.com/protocol/ for protocol reference.

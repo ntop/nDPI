@@ -24,6 +24,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_STARCRAFT
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 /* Sender or receiver are one of the known login portals? */

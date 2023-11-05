@@ -26,6 +26,7 @@
 #include "ndpi_protocol_ids.h"
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define set_protocol_and_bmask(nprot)					\
   {									\

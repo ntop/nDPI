@@ -20,6 +20,7 @@
 
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,

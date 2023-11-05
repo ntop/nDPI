@@ -24,6 +24,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_FASTCGI
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* Reference: http://www.mit.edu/~yandros/doc/specs/fcgi-spec.html */
 

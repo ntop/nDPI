@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 static void ndpi_int_avast_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
                                           struct ndpi_flow_struct *flow)

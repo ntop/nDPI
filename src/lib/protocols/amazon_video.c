@@ -26,6 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_AMAZON_VIDEO
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 static void ndpi_check_amazon_video(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow) {

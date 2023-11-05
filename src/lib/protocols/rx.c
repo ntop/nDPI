@@ -28,6 +28,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RX
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* See http://web.mit.edu/kolya/afs/rx/rx-spec for protocol description. */
 

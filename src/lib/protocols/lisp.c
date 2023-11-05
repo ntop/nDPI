@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_LISP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define LISP_PORT  4341 /* Only UDP */
 #define LISP_PORT1 4342 /* TCP and UDP */

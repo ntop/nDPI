@@ -24,6 +24,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_CAPWAP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define NDPI_CAPWAP_CONTROL_PORT 5246
 #define NDPI_CAPWAP_DATA_PORT    5247

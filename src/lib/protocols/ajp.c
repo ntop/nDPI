@@ -25,6 +25,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_AJP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 enum ajp_direction {
   AJP_SERVER_TO_CONTAINER = 0x1234,

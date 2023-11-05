@@ -30,6 +30,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_EAQ
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define EAQ_DEFAULT_PORT   6000
 #define EAQ_DEFAULT_SIZE     16
