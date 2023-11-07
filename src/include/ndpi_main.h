@@ -107,11 +107,6 @@ extern "C" {
   extern void ndpi_set_proto_subprotocols(struct ndpi_detection_module_struct *ndpi_mod,
 				      int protoId, ...);
 
-  extern int ndpi_packet_src_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t * ip);
-  extern int ndpi_packet_dst_ip_eql(const struct ndpi_packet_struct *packet, const ndpi_ip_addr_t * ip);
-  extern void ndpi_packet_src_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t * ip);
-  extern void ndpi_packet_dst_ip_get(const struct ndpi_packet_struct *packet, ndpi_ip_addr_t * ip);
-
   extern int ndpi_parse_ip_string(const char *ip_str, ndpi_ip_addr_t *parsed_ip);
   extern char *ndpi_get_ip_string(const ndpi_ip_addr_t * ip, char *buf, u_int buf_len);
   extern u_int8_t ndpi_is_ipv6(const ndpi_ip_addr_t *ip);
@@ -177,8 +172,6 @@ extern "C" {
 
   int64_t ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len);
   char* ndpi_intoav4(unsigned int addr, char* buf, u_int16_t bufLen);
-  int ndpi_current_pkt_from_client_to_server(const struct ndpi_packet_struct *packet, const struct ndpi_flow_struct *flow);
-  int ndpi_current_pkt_from_server_to_client(const struct ndpi_packet_struct *packet, const struct ndpi_flow_struct *flow);
   int ndpi_seen_flow_beginning(const struct ndpi_flow_struct *flow);
 
 #ifdef __cplusplus
