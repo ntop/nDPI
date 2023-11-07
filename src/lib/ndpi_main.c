@@ -7781,6 +7781,8 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     if(ndpi_init_packet(ndpi_str, flow, current_time_ms, packet_data, packetlen, input_info) != 0)
       return(ret);
 
+    ndpi_connection_tracking(ndpi_str, flow);
+
     goto ret_protocols;
   }
 
