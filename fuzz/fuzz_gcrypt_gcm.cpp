@@ -20,13 +20,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   int key_len, rc_e, rc_d;
   mbedtls_cipher_id_t cipher;
   unsigned char *tag;
-  int iv_len, tag_len, input_length, force_auth_tag_error;
+  int iv_len, tag_len, ad_len, input_length, force_auth_tag_error;
 
   /* No real memory allocations involved */
 
   if(fuzzed_data.remaining_bytes() < 1 + 4 + 512 / 8 +
 				     1 + 64 + /* iv */
 				     1 + /* tag_len */
+				     1 + 17 + /* ad */
 				     1 + 64 + /* input */
 				     1 + /* force_auth_tag_error */
 				     1 /* useless data: to be able to add the check with assert */)
@@ -50,6 +51,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   tag_len = fuzzed_data.ConsumeIntegralInRange(0, 17);
   tag = (unsigned char *)malloc(tag_len);
 
+  ad_len = fuzzed_data.ConsumeIntegralInRange(0, 17);
+  std::vector<u_int8_t>ad = fuzzed_data.ConsumeBytes<uint8_t>(ad_len);
+
   input_length = fuzzed_data.ConsumeIntegralInRange(16, 64);
   std::vector<unsigned char>input = fuzzed_data.ConsumeBytes<u_int8_t>(input_length);
   output = (unsigned char *)malloc(input_length);
@@ -71,7 +75,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     rc_e = mbedtls_gcm_crypt_and_tag(gcm_e_ctx, MBEDTLS_GCM_ENCRYPT,
 				     input.size(),
 				     iv.data(), iv.size(),
-				     NULL, 0, /* TODO */
+				     ad.data(), ad.size(),
 				     input.data(),
 				     output,
 				     tag_len, tag);
@@ -85,7 +89,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       rc_d = mbedtls_gcm_auth_decrypt(gcm_d_ctx,
 				      input.size(),
 				      iv.data(), iv.size(),
-				      NULL, 0, /* TODO */
+				      ad.data(), ad.size(),
 				      tag, tag_len,
 				      output,
 				      decrypted);

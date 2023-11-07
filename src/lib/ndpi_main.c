@@ -224,8 +224,6 @@ static int addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
 			  ndpi_port_range *range, ndpi_proto_defaults_t *def,
 			  u_int8_t customUserProto, ndpi_default_ports_tree_node_t **root,
 			  const char *_func, int _line);
-static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def,
-			     ndpi_default_ports_tree_node_t **root);
 
 static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet);
 static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
@@ -474,7 +472,6 @@ u_int8_t ndpi_is_subprotocol_informative(struct ndpi_detection_module_struct *nd
     /* All dissectors that have calls to ndpi_match_host_subprotocol() */
   case NDPI_PROTOCOL_DNS:
     return(1);
-    break;
 
   default:
     return(0);
@@ -683,37 +680,6 @@ static int addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
 /* ****************************************************** */
 
 /*
-  NOTE
-
-  This function must be called with a semaphore set, this in order to avoid
-  changing the datastructures while using them
-*/
-static int removeDefaultPort(ndpi_port_range *range, ndpi_proto_defaults_t *def,
-			     ndpi_default_ports_tree_node_t **root) {
-  ndpi_default_ports_tree_node_t node;
-  u_int16_t port;
-
-  for(port = range->port_low; port <= range->port_high; port++) {
-    ndpi_default_ports_tree_node_t *ret;
-
-    node.proto = def, node.default_port = port;
-
-    ret = (ndpi_default_ports_tree_node_t *)
-      ndpi_tdelete(&node, (void *) root,
-		   ndpi_default_ports_tree_node_t_cmp); /* Add it to the tree */
-
-    if(ret != NULL) {
-      ndpi_free((ndpi_default_ports_tree_node_t *) ret);
-      return(0);
-    }
-  }
-
-  return(-1);
-}
-
-/* ****************************************************** */
-
-/*
   This is a function used to see if we need to
   add a trailer $ in case the string is complete
   or is a string that can be matched in the
@@ -831,19 +797,6 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
   return ndpi_string_to_automa(ndpi_str, (AC_AUTOMATA_t *)ndpi_str->host_automa.ac_automa,
 			       value, protocol_id, category, breed, level, 1);
 
-}
-
-/* ****************************************************** */
-
-/*
-  NOTE
-
-  This function must be called with a semaphore set, this in order to avoid
-  changing the datastructures while using them
-*/
-static int ndpi_remove_host_url_subprotocol(struct ndpi_detection_module_struct *ndpi_str, char *value, int protocol_id) {
-  NDPI_LOG_ERR(ndpi_str, "[NDPI] Missing implementation for proto %s/%d\n", value, protocol_id);
-  return(-1);
 }
 
 /* ******************************************************************** */
@@ -4014,15 +3967,8 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
     if(found != NULL) {
       u_int16_t guessed_proto = found->proto->protoId;
 
-      /* We need to check if the guessed protocol isn't excluded by nDPI */
-      if(flow && (proto == IPPROTO_UDP) &&
-	 NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, guessed_proto) &&
-	 is_udp_not_guessable_protocol(guessed_proto))
-	return(NDPI_PROTOCOL_UNKNOWN);
-      else {
-	*user_defined_proto = found->customUserProto;
-	return(guessed_proto);
-      }
+      *user_defined_proto = found->customUserProto;
+      return(guessed_proto);
     }
   } else {
     /* No TCP/UDP */
@@ -4264,8 +4210,8 @@ int ndpi_add_trusted_issuer_dn(struct ndpi_detection_module_struct *ndpi_str, ch
 }
 /* ******************************************************************** */
 
-int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
-		     char *rule, u_int8_t do_add) {
+static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
+		            char *rule) {
   char *at, *proto, *elem;
   ndpi_proto_defaults_t *def;
   u_int subprotocol_id, i;
@@ -4330,11 +4276,6 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
     def = NULL;
 
   if(def == NULL) {
-    if(!do_add) {
-      /* We need to remove a rule */
-      NDPI_LOG_ERR(ndpi_str, "Unable to find protocol '%s': skipping rule '%s'\n", proto, rule);
-      return(-3);
-    } else {
       ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
       char *equal = strchr(proto, '=');
       u_int16_t user_proto_id = ndpi_str->ndpi_num_supported_protocols;
@@ -4371,7 +4312,6 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       def = &ndpi_str->proto_defaults[ndpi_str->ndpi_num_supported_protocols];
       subprotocol_id = ndpi_str->ndpi_num_supported_protocols;
       ndpi_str->ndpi_num_supported_protocols++, ndpi_str->ndpi_num_custom_protocols++;
-    }
   }
 
   while((elem = strsep(&rule, ",")) != NULL) {
@@ -4445,11 +4385,8 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       else
 	range.port_low = range.port_high = atoi(&elem[4]);
 
-      if(do_add)
-	rc = addDefaultPort(ndpi_str, &range, def, 1 /* Custom user proto */,
+      rc = addDefaultPort(ndpi_str, &range, def, 1 /* Custom user proto */,
 		       is_tcp ? &ndpi_str->tcpRoot : &ndpi_str->udpRoot, __FUNCTION__, __LINE__);
-      else
-	rc = removeDefaultPort(&range, def, is_tcp ? &ndpi_str->tcpRoot : &ndpi_str->udpRoot);
 
       if(rc != 0) ret = rc;
     } else if(is_ip) {
@@ -4458,11 +4395,8 @@ int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       if(rc != 0)
 	return(rc);
     } else {
-      if(do_add)
-	ndpi_add_host_url_subprotocol(ndpi_str, value, subprotocol_id, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
-				      NDPI_PROTOCOL_ACCEPTABLE, 0);
-      else
-	ndpi_remove_host_url_subprotocol(ndpi_str, value, subprotocol_id);
+      ndpi_add_host_url_subprotocol(ndpi_str, value, subprotocol_id, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
+				    NDPI_PROTOCOL_ACCEPTABLE, 0);
     }
   }
 
@@ -4971,7 +4905,7 @@ int ndpi_load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, F
 
     /* printf("Processing: \"%s\"\n", buffer); */
 
-    if(ndpi_handle_rule(ndpi_str, buffer, 1) != 0)
+    if(ndpi_handle_rule(ndpi_str, buffer) != 0)
       NDPI_LOG_INFO(ndpi_str, "Discraded rule '%s'\n", buffer);
   }
 

@@ -57,6 +57,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_hash_find_entry(h, value_added.data(), value_added.size(), &value);
   }
 
+  if (fuzzed_data.ConsumeBool())
+    ndpi_hash_free(NULL, cleanup_func);
   ndpi_hash_free(&h, cleanup_func);
 
   return 0;

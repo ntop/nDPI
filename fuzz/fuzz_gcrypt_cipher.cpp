@@ -67,28 +67,34 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   rc_e = mbedtls_cipher_setkey(ctx_e, key.data(), key.size() * 8, MBEDTLS_ENCRYPT);
   rc_d = mbedtls_cipher_setkey(ctx_d, key.data(), key.size() * 8, MBEDTLS_DECRYPT);
   if(rc_e == 0 && rc_d == 0) {
-    rc_e = mbedtls_cipher_set_iv(ctx_e, iv.data(), iv.size());
-    rc_d = mbedtls_cipher_set_iv(ctx_d, iv.data(), iv.size());
-    if(rc_e == 0 && rc_d == 0) {
-      mbedtls_cipher_reset(ctx_e);
-      mbedtls_cipher_reset(ctx_d);
 
-      rc_e = mbedtls_cipher_update(ctx_e, input.data(), input.size(), output, &output_size);
-      if(rc_e == 0) {
-	rc_e = mbedtls_cipher_finish(ctx_e, NULL, &output_size2);
+    if(fuzzed_data.ConsumeBool()) {
+      rc_e = mbedtls_cipher_crypt(ctx_e, iv.data(), iv.size(),
+                                  input.data(), input.size(), output, &output_size);
+    } else {
+      rc_e = mbedtls_cipher_set_iv(ctx_e, iv.data(), iv.size());
+      rc_d = mbedtls_cipher_set_iv(ctx_d, iv.data(), iv.size());
+      if(rc_e == 0 && rc_d == 0) {
+        mbedtls_cipher_reset(ctx_e);
+        mbedtls_cipher_reset(ctx_d);
+
+        rc_e = mbedtls_cipher_update(ctx_e, input.data(), input.size(), output, &output_size);
         if(rc_e == 0) {
+	  rc_e = mbedtls_cipher_finish(ctx_e, NULL, &output_size2);
+          if(rc_e == 0) {
 
-          rc_d = mbedtls_cipher_update(ctx_d, output, output_size, decrypted, &decrypted_size);
-          if(rc_d == 0) {
-            rc_d = mbedtls_cipher_finish(ctx_d, NULL, &output_size2);
-            /* TODO: decryption doesn't work with no-aesni data path!
-	       Note that with MASAN, aesni is always disabled */
+            rc_d = mbedtls_cipher_update(ctx_d, output, output_size, decrypted, &decrypted_size);
+            if(rc_d == 0) {
+              rc_d = mbedtls_cipher_finish(ctx_d, NULL, &output_size2);
+              /* TODO: decryption doesn't work with no-aesni data path!
+	         Note that with MASAN, aesni is always disabled */
 #if 0
-	    if(rc_d == 0) {
-              assert(input.size() == decrypted_size);
-              assert(memcmp(input.data(), decrypted, decrypted_size) == 0);
-            }
+	      if(rc_d == 0) {
+                assert(input.size() == decrypted_size);
+                assert(memcmp(input.data(), decrypted, decrypted_size) == 0);
+              }
 #endif
+	    }
           }
         }
       }
