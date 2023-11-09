@@ -28,6 +28,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_AFP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 struct afpHeader {
   u_int8_t flags, command;

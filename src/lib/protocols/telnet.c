@@ -28,6 +28,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TELNET
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* #define TELNET_DEBUG 1 */
 

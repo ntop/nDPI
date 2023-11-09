@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_IPSEC
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 enum isakmp_type {
   ISAKMP_INVALID = 0,

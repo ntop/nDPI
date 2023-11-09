@@ -27,9 +27,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_ICECAST
 
 #include "ndpi_api.h"
-
-extern int ndpi_current_pkt_from_client_to_server(const struct ndpi_detection_module_struct *ndpi_str, const struct ndpi_flow_struct *flow);
-extern int ndpi_current_pkt_from_server_to_client(const struct ndpi_detection_module_struct *ndpi_str, const struct ndpi_flow_struct *flow);
+#include "ndpi_private.h"
 
 static void ndpi_int_icecast_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -63,12 +61,12 @@ static void ndpi_search_icecast_tcp(struct ndpi_detection_module_struct *ndpi_st
     }
   }
 
-  if(ndpi_current_pkt_from_client_to_server(ndpi_struct, flow)
+  if(current_pkt_from_client_to_server(ndpi_struct, flow)
       && (flow->packet_counter < 10)) {
     return;
   }
 
-  if(ndpi_current_pkt_from_server_to_client(ndpi_struct, flow)) {
+  if(current_pkt_from_server_to_client(ndpi_struct, flow)) {
     /* server answer, now test Server for Icecast */
 
     ndpi_parse_packet_line_info(ndpi_struct, flow);

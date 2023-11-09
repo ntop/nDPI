@@ -27,6 +27,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SSH
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 #include "ndpi_md5.h"
 
 #include <string.h>

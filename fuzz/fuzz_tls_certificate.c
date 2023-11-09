@@ -1,14 +1,10 @@
-#define NDPI_LIB_COMPILATION
-
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 #include "fuzz_common_code.h"
 
 #include <stdint.h>
 #include <stdio.h>
 
-extern void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct,
-				       struct ndpi_flow_struct *flow,
-				       u_int16_t p_offset, u_int16_t certificate_len);
 struct ndpi_tcphdr tcph;
 struct ndpi_iphdr iph;
 struct ndpi_ipv6hdr iphv6;

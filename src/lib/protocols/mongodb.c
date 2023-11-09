@@ -25,6 +25,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MONGODB
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* https://docs.mongodb.com/manual/reference/mongodb-wire-protocol/ */
 

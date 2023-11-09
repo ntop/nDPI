@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TEREDO
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* https://en.wikipedia.org/wiki/Teredo_tunneling */
 static void ndpi_search_teredo(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

@@ -27,6 +27,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SSDP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 static void ssdp_parse_lines(struct ndpi_detection_module_struct

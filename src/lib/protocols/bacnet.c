@@ -26,6 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_BACNET
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 // BVLC (BACnet Virtual Link Control) Annex is part of BVLL (BACnet Virtual Link Layer).
 // See: https://www.ashrae.org/file%20library/technical%20resources/standards%20and%20guidelines/standards%20addenda/135-1995_addendum-a.pdf

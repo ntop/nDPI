@@ -24,6 +24,7 @@
 #include "ndpi_protocol_ids.h"
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_CASSANDRA
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define CASSANDRA_HEADER_LEN 9
 #define CASSANDRA_MAX_BODY_SIZE 268435456 //256MB (256 * 1024^2)

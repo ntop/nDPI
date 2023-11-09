@@ -27,6 +27,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DIAMETER
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 // Header Flags possibile values

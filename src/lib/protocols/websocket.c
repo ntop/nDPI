@@ -25,6 +25,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_WEBSOCKET
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 enum websocket_opcode
   {

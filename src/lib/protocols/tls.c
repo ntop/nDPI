@@ -26,21 +26,11 @@
 #include "ndpi_md5.h"
 #include "ndpi_sha1.h"
 #include "ndpi_encryption.h"
+#include "ndpi_private.h"
 
-extern char *strptime(const char *s, const char *format, struct tm *tm);
-extern int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
-				    struct ndpi_flow_struct *flow, uint32_t quic_version);
+
 static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow);
-extern int http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
-                                   struct ndpi_flow_struct *flow,
-                                   const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
-extern int ookla_search_into_cache(struct ndpi_detection_module_struct* ndpi_struct,
-                                   struct ndpi_flow_struct* flow);
-/* QUIC/GQUIC stuff */
-extern int quic_len(const uint8_t *buf, uint64_t *value);
-extern int quic_len_buffer_still_required(uint8_t value);
-extern int is_version_with_var_int_transport_params(uint32_t version);
 
 // #define DEBUG_TLS_MEMORY       1
 // #define DEBUG_TLS              1

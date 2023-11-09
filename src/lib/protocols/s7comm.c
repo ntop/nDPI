@@ -23,6 +23,7 @@
 #include "ndpi_protocol_ids.h"
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_S7COMM
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 static void ndpi_search_s7comm_tcp(struct ndpi_detection_module_struct *ndpi_struct,
                                    struct ndpi_flow_struct *flow) {

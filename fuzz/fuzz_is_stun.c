@@ -1,6 +1,5 @@
-#define NDPI_LIB_COMPILATION
-
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 #include "fuzz_common_code.h"
 
 static struct ndpi_detection_module_struct *ndpi_struct = NULL;

@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SNMP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* #define SNMP_DEBUG */
 

@@ -28,6 +28,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_POSTGRES
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 static void ndpi_int_postgres_add_connection(struct ndpi_detection_module_struct

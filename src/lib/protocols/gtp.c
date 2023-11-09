@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_GTP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 /* This code handles: GTP-U (port 2152), GTP-C (v1 and v2; port 2123) and GTP-PRIME

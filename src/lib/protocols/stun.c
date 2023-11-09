@@ -26,18 +26,12 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_STUN
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 // #define DEBUG_LRU  1
 // #define DEBUG_ZOOM_LRU  1
 
 #define STUN_HDR_LEN   20 /* STUN message header length, Classic-STUN (RFC 3489) and STUN (RFC 8489) both */
-
-extern void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
-			  struct ndpi_flow_struct *flow);
-extern int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
-                          struct ndpi_flow_struct *flow);
-extern u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_type);
-extern int is_dtls(const u_int8_t *buf, u_int32_t buf_len, u_int32_t *block_len);
 
 static u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 static u_int32_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port);

@@ -32,6 +32,7 @@
 #define PROTOBUF_MAX_PACKETS 8
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 enum protobuf_type {
   PT_INVALID = -1,

@@ -28,6 +28,7 @@
 #define NDPI_CURRENT_PROTO      NDPI_PROTOCOL_NEST_LOG_SINK
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define NEST_LOG_SINK_PORT          11095
 #define NEST_LOG_SINK_MIN_LEN       8

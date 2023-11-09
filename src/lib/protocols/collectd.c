@@ -24,6 +24,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_COLLECTD
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define COLLECTD_MIN_BLOCKS_REQUIRED 3
 #define COLLECTD_MAX_BLOCKS_TO_DISSECT 5

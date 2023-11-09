@@ -26,6 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TPLINK_SHP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define _TPLSHP_MIN_LEN     2
 #define _TPLSHP_TCP_LEN_HDR 4

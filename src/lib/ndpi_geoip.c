@@ -27,6 +27,7 @@
 #include <stdint.h>
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 #include "ndpi_config.h"
 
 #ifdef HAVE_MAXMINDDB

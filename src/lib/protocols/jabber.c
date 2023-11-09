@@ -27,6 +27,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_JABBER
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 struct jabber_string {
   char *string;

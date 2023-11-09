@@ -23,6 +23,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RADIUS
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 #define RADIUS_PORT 			1812
 #define RADIUS_PORT_ACC 		1813

@@ -22,6 +22,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_TAILSCALE
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /* https://github.com/tailscale/tailscale/blob/main/disco/disco.go
  * https://tailscale.com/kb/1082/firewall-ports/

@@ -91,9 +91,6 @@ NDPI_CDEF = subprocess.run(["gcc",
                            ).stdout.decode('utf-8',
                                            errors='ignore')
 
-NDPI_MODULE_STRUCT_CDEF = NDPI_CDEF.split("//CFFI.NDPI_MODULE_STRUCT")[1]
-
-
 NDPI_PACKED = subprocess.run(["gcc",
                               "-DNDPI_LIB_COMPILATION", "-DNDPI_CFFI_PREPROCESSING",
                               "-E", "-x", "c", "-P", "-C",
@@ -104,7 +101,7 @@ NDPI_PACKED = subprocess.run(["gcc",
 
 NDPI_PACKED_STRUCTURES = NDPI_PACKED.split("//CFFI.NDPI_PACKED_STRUCTURES")[1]
 
-NDPI_SOURCE = NDPI_INCLUDES + NDPI_MODULE_STRUCT_CDEF + NDPI_HELPERS
+NDPI_SOURCE = NDPI_INCLUDES + NDPI_HELPERS
 
 
 ffi_builder.set_source("_ndpi",

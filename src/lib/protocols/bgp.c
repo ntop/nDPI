@@ -26,6 +26,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_BGP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 
 /* this detection also works asymmetrically */

@@ -28,6 +28,7 @@
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_HTTP
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 static const char* binary_file_mimes_e[] = { "exe", NULL };
 static const char* binary_file_mimes_j[] = { "java-vm", NULL };
@@ -45,9 +46,6 @@ static const char* binary_file_ext[] = {
 					"cab",
 					NULL
 };
-
-extern void ookla_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
-                               struct ndpi_flow_struct *flow);
 
 static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow);

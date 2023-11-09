@@ -65,7 +65,7 @@ fuzz_ndpi_reader_payload_analyzer_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTO
     $(fuzz_ndpi_reader_payload_analyzer_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_quic_get_crypto_data_SOURCES = fuzz_quic_get_crypto_data.c fuzz_common_code.c
-fuzz_quic_get_crypto_data_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_quic_get_crypto_data_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_quic_get_crypto_data_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_quic_get_crypto_data_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -387,7 +387,7 @@ fuzz_binaryfusefilter_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_binaryfusefilter_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_tls_certificate_SOURCES = fuzz_tls_certificate.c fuzz_common_code.c
-fuzz_tls_certificate_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_tls_certificate_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_tls_certificate_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_tls_certificate_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -413,7 +413,7 @@ fuzz_dga_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_dga_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_is_stun_udp_SOURCES = fuzz_is_stun.c fuzz_common_code.c
-fuzz_is_stun_udp_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_is_stun_udp_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_is_stun_udp_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_is_stun_udp_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
@@ -426,7 +426,7 @@ fuzz_is_stun_udp_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_is_stun_udp_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_is_stun_tcp_SOURCES = fuzz_is_stun.c fuzz_common_code.c
-fuzz_is_stun_tcp_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DSTUN_TCP
+fuzz_is_stun_tcp_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION -DSTUN_TCP
 fuzz_is_stun_tcp_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_is_stun_tcp_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS

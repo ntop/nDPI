@@ -23,6 +23,7 @@
 #include "ndpi_protocol_ids.h"
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_BITCOIN
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 
 /*https://en.bitcoin.it/wiki/Protocol_documentation*/
 #define MAIN_NET_MAGIC           0xF9BEB4D9

@@ -7,7 +7,6 @@
     <ClCompile Include="..\src\lib\protocols\bgp.c" />
     <ClCompile Include="..\src\lib\protocols\bitcoin.c" />
     <ClCompile Include="..\src\lib\protocols\bittorrent.c" />
-    <ClCompile Include="..\src\lib\protocols\btlib.c" />
     <ClCompile Include="..\src\lib\protocols\ciscovpn.c" />
     <ClCompile Include="..\src\lib\protocols\citrix.c" />
     <ClCompile Include="..\src\lib\protocols\coap.c" />
@@ -242,7 +241,6 @@
     <ClCompile Include="..\example\reader_util.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\lib\protocols\btlib.h" />
     <ClInclude Include="..\src\include\ndpi_includes.h" />
     <ClInclude Include="..\src\include\ndpi_protocol_ids.h" />
     <ClInclude Include="..\src\include\ndpi_protocols.h" />
@@ -260,6 +258,7 @@
     <ClInclude Include="..\src\lib\third_party\include\rce_injection.h" />
     <ClInclude Include="..\src\lib\third_party\include\roaring.h" />
     <ClInclude Include="..\src\lib\third_party\include\uthash.h" />
+    <ClInclude Include="..\src\lib\ndpi_private.h" />
     <ClInclude Include="..\src\lib\third_party\include\ahocorasick.h">
       <Filter>third_party</Filter>
     </ClInclude>
