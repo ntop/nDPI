@@ -150,8 +150,8 @@ u_int64_t ndpi_data_last(struct ndpi_analyze_struct *s) {
 }
 
 /* Return min/max on all values */
-u_int32_t ndpi_data_min(struct ndpi_analyze_struct *s) { return(s ? s->min_val : 0); }
-u_int32_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s ? s->max_val : 0); }
+u_int64_t ndpi_data_min(struct ndpi_analyze_struct *s) { return(s ? s->min_val : 0); }
+u_int64_t ndpi_data_max(struct ndpi_analyze_struct *s) { return(s ? s->max_val : 0); }
 
 /* ********************************************************************************* */
 
