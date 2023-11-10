@@ -736,24 +736,33 @@ static void ndpi_process_packet(uint8_t * const args,
   print_packet_info(reader_thread, header, l4_len, &flow);
 #endif
 
-  /* calculate flow hash for btree find, search(insert) */
-  if (flow.l3_type == L3_IP) {
-    if (ndpi_flowv4_flow_hash(flow.l4_protocol, flow.ip_tuple.v4.src, flow.ip_tuple.v4.dst,
-			      flow.src_port, flow.dst_port, 0, 0,
-			      (uint8_t *)&flow.hashval, sizeof(flow.hashval)) != 0)
+  {
+    uint64_t tmp[4] = {};
+
+    /* calculate flow hash for btree find, search(insert) */
+    if (flow.l3_type == L3_IP) {
+      if (ndpi_flowv4_flow_hash(flow.l4_protocol, flow.ip_tuple.v4.src, flow.ip_tuple.v4.dst,
+          flow.src_port, flow.dst_port, 0, 0,
+          (uint8_t *)&tmp[0], sizeof(tmp)) != 0)
       {
-	flow.hashval = flow.ip_tuple.v4.src + flow.ip_tuple.v4.dst; // fallback
+        flow.hashval = flow.ip_tuple.v4.src + flow.ip_tuple.v4.dst; // fallback
+      } else {
+        flow.hashval = tmp[0] + tmp[1] + tmp[2] + tmp[3];
       }
-  } else if (flow.l3_type == L3_IP6) {
-    if (ndpi_flowv6_flow_hash(flow.l4_protocol, &ip6->ip6_src, &ip6->ip6_dst,
-			      flow.src_port, flow.dst_port, 0, 0,
-			      (uint8_t *)&flow.hashval, sizeof(flow.hashval)) != 0)
+    } else if (flow.l3_type == L3_IP6) {
+      if (ndpi_flowv6_flow_hash(flow.l4_protocol, &ip6->ip6_src, &ip6->ip6_dst,
+          flow.src_port, flow.dst_port, 0, 0,
+          (uint8_t *)&tmp[0], sizeof(tmp)) != 0)
       {
-	flow.hashval = flow.ip_tuple.v6.src[0] + flow.ip_tuple.v6.src[1];
-	flow.hashval += flow.ip_tuple.v6.dst[0] + flow.ip_tuple.v6.dst[1];
+        flow.hashval = flow.ip_tuple.v6.src[0] + flow.ip_tuple.v6.src[1];
+        flow.hashval += flow.ip_tuple.v6.dst[0] + flow.ip_tuple.v6.dst[1];
+      } else {
+        flow.hashval = tmp[0] + tmp[1] + tmp[2] + tmp[3];
       }
+    }
+
+    flow.hashval += flow.l4_protocol + flow.src_port + flow.dst_port;
   }
-  flow.hashval += flow.l4_protocol + flow.src_port + flow.dst_port;
 
   hashed_index = flow.hashval % workflow->max_active_flows;
   tree_result = ndpi_tfind(&flow, &workflow->ndpi_flows_active[hashed_index], ndpi_workflow_node_cmp);
