@@ -335,6 +335,15 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
   return 0;
 }
 
+static u_int32_t __get_master(struct ndpi_flow_struct *flow) {
+
+  if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
+    return flow->detected_protocol_stack[1];
+  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+    return flow->detected_protocol_stack[0];
+  return NDPI_PROTOCOL_STUN;
+}
+
 static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow)
 {
@@ -343,6 +352,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t first_byte;
   u_int16_t app_proto = NDPI_PROTOCOL_UNKNOWN;
   u_int32_t unused;
+  int first_dtls_pkt = 0;
 
   NDPI_LOG_DBG2(ndpi_struct, "Packet counter %d protos %d/%d\n", flow->packet_counter,
                 flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
@@ -370,24 +380,50 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "DROP or ZRTP range. Unexpected\n");
   } else if(first_byte <= 63) {
     NDPI_LOG_DBG(ndpi_struct, "DTLS\n");
-    if(is_dtls(packet->payload, packet->payload_packet_len, &unused) &&
-       flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN /* No previous subclassification */) {
+
+    if(ndpi_struct->opportunistic_tls_stun_enabled &&
+       is_dtls(packet->payload, packet->payload_packet_len, &unused)) {
+
+      /* Process this DTLS packet via TLS/DTLS code but keep using STUN dissection.
+         This way we can keep demultiplexing DTLS/STUN/RTP */
+
       /* Switching to TLS dissector is tricky, because we are calling one dissector
          from another one, and that is not a common operation...
          Additionally:
-         * at that point protocol stack is already set to STUN
+         * at that point protocol stack is already set to STUN or STUN/XXX
          * we have room for only two protocols in flow->detected_protocol_stack[] so
            we can't have something like STUN/DTLS/SNAPCHAT_CALL
-         * the easiest (!?) solution is to remove STUN, and let TLS dissector to set both
-           master (i.e. DTLS) and subprotocol (if any) */
-      if(ndpi_struct->opportunistic_tls_stun_enabled) {
-        /* TODO: right way? It is a bit scary... do we need to reset something else too? */
-        ndpi_reset_detected_protocol(ndpi_struct, flow);
-        ndpi_int_change_category(ndpi_struct, flow, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED);
+         * the easiest (!?) solution is to remove everything, and let the TLS dissector
+	   to set both master (i.e. DTLS) and subprotocol (if any) */
 
-        flow->stun.maybe_dtls = 1;
-        NDPI_LOG_DBG(ndpi_struct, "Switch to TLS\n");
-        switch_to_tls(ndpi_struct, flow);
+      if(packet->tcp) {
+        /* TODO: TLS code assumes that DTLS is only over UDP */
+        NDPI_LOG_DBG(ndpi_struct, "Ignoring DTLS over TCP\n");
+      } else {
+        if(flow->tls_quic.certificate_processed == 1) {
+          NDPI_LOG_DBG(ndpi_struct, "Interesting DTLS stuff already processed. Ignoring\n");
+        } else {
+          if(flow->stun.maybe_dtls == 0) {
+            /* First DTLS packet of the flow */
+            first_dtls_pkt = 1;
+
+            /* TODO: right way? It is a bit scary... do we need to reset something else too? */
+            ndpi_reset_detected_protocol(ndpi_struct, flow);
+            ndpi_int_change_category(ndpi_struct, flow, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED);
+
+            /* Give room for DTLS handshake, where we might have
+               retransmissions and fragments */
+            flow->max_extra_packets_to_check += 10;
+            flow->stun.maybe_dtls = 1;
+	  }
+          NDPI_LOG_DBG(ndpi_struct, "Switch to TLS (%d/%d)\n",
+                       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+
+	  switch_to_tls(ndpi_struct, flow, first_dtls_pkt);
+
+	  NDPI_LOG_DBG(ndpi_struct, "(%d/%d)\n",
+                       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+        }
       }
     }
   } else if(first_byte <= 127) {
@@ -402,14 +438,19 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
       rtp_get_stream_type(packet->payload[1] & 0x7F, &flow->flow_multimedia_type);
 
       if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
-        /* STUN/SUBPROTO -> SUBPROTO/RTP */
-        ndpi_set_detected_protocol(ndpi_struct, flow,
-                                   NDPI_PROTOCOL_RTP, flow->detected_protocol_stack[0],
-                                   NDPI_CONFIDENCE_DPI);
+        if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DTLS) {
+          /* Keep DTLS/SUBPROTO since we already wrote to flow->protos.tls_quic */
+        } else {
+          /* STUN/SUBPROTO -> SUBPROTO/RTP */
+          ndpi_set_detected_protocol(ndpi_struct, flow,
+                                     NDPI_PROTOCOL_RTP, flow->detected_protocol_stack[0],
+                                     NDPI_CONFIDENCE_DPI);
+        }
       } else {
-        /* STUN -> STUN/RTP */
+        /* STUN -> STUN/RTP, or
+           DTLS -> DTLS/RTP */
         ndpi_set_detected_protocol(ndpi_struct, flow,
-                                   NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_STUN,
+                                   NDPI_PROTOCOL_RTP, __get_master(flow),
                                    NDPI_CONFIDENCE_DPI);
       }
       return 0; /* Stop */
@@ -522,7 +563,7 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN ||
      app_proto != NDPI_PROTOCOL_UNKNOWN) {
     NDPI_LOG_DBG(ndpi_struct, "Setting %d\n", app_proto);
-    ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, NDPI_PROTOCOL_STUN, confidence);
+    ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, __get_master(flow), confidence);
   }
 
   /* This is quite complex. We want extra dissection for:
