@@ -5,6 +5,15 @@ This page provides the list of the protocols/applications supported by nDPI. For
 
 Work in progress!
 
+.. _Proto 96:
+
+`NDPI_PROTOCOL_TFTP`
+====================
+TFTP is a very simple protocol used to transfer files. It is from this that its name comes, Trivial File Transfer Protocol or TFTP.
+
+References: `RFC1350 <https://datatracker.ietf.org/doc/html/rfc1350>`_ and `RFC2347 <https://datatracker.ietf.org/doc/html/rfc2347>`_ and `RFC2349 <https://datatracker.ietf.org/doc/html/rfc2349>`_
+
+
 .. _Proto 338:
 
 `NDPI_PROTOCOL_SRTP`
