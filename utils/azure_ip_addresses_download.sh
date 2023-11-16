@@ -10,6 +10,8 @@ LINK_TMP=/tmp/azure_link.txt
 TMP=/tmp/azure.json
 LIST=/tmp/azure.list
 LIST6=/tmp/azure.list6
+LIST_MERGED=/tmp/azure.list_m
+LIST6_MERGED=/tmp/azure.list6_m
 # https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519
 # Azure links have the format https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_<date>.json
 LINK_ORIGIN="https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519"
@@ -31,12 +33,16 @@ is_file_empty "${TMP}"
 echo "(3) Processing IP addresses..."
 tr -d '\r' < $TMP | grep / | tr -d '"' | tr -d " " | tr -d "," | grep -v : > $LIST
 is_file_empty "${LIST}"
+./mergeipaddrlist.py $LIST > $LIST_MERGED
+is_file_empty "${LIST_MERGED}"
 tr -d '\r' < $TMP | grep / | tr -d '"' | tr -d " " | tr -d "," | grep : > $LIST6
 is_file_empty "${LIST6}"
-./ipaddr2list.py $LIST NDPI_PROTOCOL_MICROSOFT_AZURE $LIST6 > $DEST
+./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
+is_file_empty "${LIST6_MERGED}"
+./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_MICROSOFT_AZURE $LIST6_MERGED > $DEST
 is_file_empty "${DEST}"
 
-rm -f $TMP $LIST $LIST6
+rm -f ${TMP} ${LIST} ${LIST6} ${LIST_MERGED} ${LIST_MERGED6}
 
 echo "(4) Microsoft Azure IPs are available in $DEST"
 exit 0

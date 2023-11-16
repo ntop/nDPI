@@ -8,6 +8,7 @@ cd "$(dirname "${0}")" || exit 1
 DEST=../src/lib/inc_generated/ndpi_ethereum_match.c.inc
 TMP=/tmp/ethereum
 LIST=/tmp/ethereum.list
+LIST_MERGED=/tmp/ethereum.list_m
 ORIGIN="https://raw.githubusercontent.com/ethereum/go-ethereum/master/params/bootnodes.go"
 
 
@@ -19,9 +20,11 @@ is_file_empty "${TMP}"
 echo "(2) Processing IP addresses..."
 grep 'enode' $TMP | grep -v '^/' | grep ':' | cut -d '@' -f 2 | cut -d ':' -f 1 > $LIST #no ipv6 in this list
 is_file_empty "${LIST}"
+./mergeipaddrlist.py $LIST > $LIST_MERGED
+is_file_empty "${LIST_MERGED}"
 
-./ipaddr2list.py $LIST NDPI_PROTOCOL_ETHEREUM > $DEST
-rm -f $TMP $LIST
+./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_ETHEREUM > $DEST
+rm -f $TMP $LIST $LIST_MERGED
 is_file_empty "${DEST}"
 
 echo "(3) Ethereum IPs are available in $DEST"

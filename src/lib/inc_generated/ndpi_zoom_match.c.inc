@@ -331,9 +331,9 @@ static ndpi_network ndpi_protocol_zoom_protocol_list[] = {
 };
 
 static ndpi_network6 ndpi_protocol_zoom_protocol_list_6[] = {
- { "2620:123:2000::", 40, NDPI_PROTOCOL_ZOOM },
+ { "2407:30c0::", 32, NDPI_PROTOCOL_ZOOM },
  { "2600:9000:2600::", 48, NDPI_PROTOCOL_ZOOM },
- { "2407:30C0::", 32, NDPI_PROTOCOL_ZOOM },
+ { "2620:123:2000::", 40, NDPI_PROTOCOL_ZOOM },
  /* End */
  { NULL, 0, 0 }
 };
