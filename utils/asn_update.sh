@@ -130,11 +130,6 @@ DEST=../src/lib/inc_generated/ndpi_asn_bloomberg.c.inc
 create_list NDPI_PROTOCOL_BLOOMBERG $DEST "" "AS8188" "AS58850" "AS33220" "AS33181" "AS199559" "AS17063" "AS13908" "AS10361"
 echo "(3) Bloomberg IPs are available in $DEST"
 
-echo "(1) Downloading Citrix routes..."
-DEST=../src/lib/inc_generated/ndpi_asn_citrix.c.inc
-create_list NDPI_PROTOCOL_CITRIX $DEST "" "AS395424" "AS21866" "AS213380" "AS20104" "AS16815"
-echo "(3) Citrix IPs are available in $DEST"
-
 echo "(1) Downloading Edgecast routes..."
 DEST=../src/lib/inc_generated/ndpi_asn_edgecast.c.inc
 create_list NDPI_PROTOCOL_EDGECAST $DEST "" "AS15133"
