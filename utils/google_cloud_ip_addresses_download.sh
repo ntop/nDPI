@@ -9,6 +9,8 @@ DEST=../src/lib/inc_generated/ndpi_google_cloud_match.c.inc
 TMP=/tmp/google_c.json
 LIST=/tmp/google_c.list
 LIST6=/tmp/google_c.list6
+LIST_MERGED=/tmp/google_c.list_m
+LIST6_MERGED=/tmp/google_c.list6_m
 ORIGIN="https://www.gstatic.com/ipranges/cloud.json"
 
 
@@ -21,10 +23,16 @@ fi
 
 echo "(2) Processing IP addresses..."
 jq -r '.prefixes | .[].ipv4Prefix  | select( . != null )' $TMP > $LIST
+is_file_empty "${LIST}"
+./mergeipaddrlist.py $LIST > $LIST_MERGED
+is_file_empty "${LIST_MERGED}"
 jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP > $LIST6
-./ipaddr2list.py $LIST NDPI_PROTOCOL_GOOGLE_CLOUD $LIST6 > $DEST
+is_file_empty "${LIST6}"
+./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
+is_file_empty "${LIST6_MERGED}"
+./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_GOOGLE_CLOUD $LIST6_MERGED > $DEST
 
-rm -f $TMP $LIST $LIST6
+rm -f $TMP $LIST $LIST6 $LIST_MERGED $LIST6_MERGED
 
 echo "(3) Google Cloud IPs are available in $DEST"
 exit 0
