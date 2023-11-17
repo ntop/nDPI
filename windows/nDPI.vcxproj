@@ -361,7 +361,6 @@
     <ClInclude Include="..\src\include\ndpi_encryption.h" />
     <ClInclude Include="..\src\include\ndpi_main.h" />
     <ClInclude Include="..\src\include\ndpi_patricia_typedefs.h" />
-    <ClInclude Include="..\src\include\ndpi_utils.h" />
     <ClInclude Include="..\src\lib\ndpi_replace_printf.h" />
     <ClInclude Include="..\src\lib\third_party\include\ahocorasick.h" />
     <ClInclude Include="..\src\include\ndpi_includes.h" />
@@ -377,7 +376,6 @@
     <ClInclude Include="..\src\lib\third_party\include\ndpi_md5.h" />
     <ClInclude Include="..\src\lib\third_party\include\ndpi_patricia.h" />
     <ClInclude Include="..\src\include\ndpi_protocol_ids.h" />
-    <ClInclude Include="..\src\include\ndpi_protocols.h" />
     <ClInclude Include="..\src\include\ndpi_typedefs.h" />
     <ClInclude Include="..\src\include\ndpi_unix.h" />
     <ClInclude Include="..\src\include\ndpi_win32.h" />

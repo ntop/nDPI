@@ -108,14 +108,14 @@ u_int32_t make_bittorrent_host_key(struct ndpi_flow_struct *flow, int client, in
   /* network byte order */
   if(flow->is_ipv6) {
     if(client)
-      key = ndpi_ip_port_hash_funct(ndpi_quick_hash(flow->c_address.v6, 16), htons(ntohs(flow->c_port) + offset));
+      key = ip_port_hash_funct(ndpi_quick_hash(flow->c_address.v6, 16), htons(ntohs(flow->c_port) + offset));
     else
-      key = ndpi_ip_port_hash_funct(ndpi_quick_hash(flow->s_address.v6, 16), flow->s_port);
+      key = ip_port_hash_funct(ndpi_quick_hash(flow->s_address.v6, 16), flow->s_port);
   } else {
     if(client)
-      key = ndpi_ip_port_hash_funct(flow->c_address.v4, htons(ntohs(flow->c_port) + offset));
+      key = ip_port_hash_funct(flow->c_address.v4, htons(ntohs(flow->c_port) + offset));
     else
-      key = ndpi_ip_port_hash_funct(flow->s_address.v4, flow->s_port);
+      key = ip_port_hash_funct(flow->s_address.v4, flow->s_port);
   }
 
   return key;

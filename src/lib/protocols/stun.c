@@ -408,8 +408,8 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
             first_dtls_pkt = 1;
 
             /* TODO: right way? It is a bit scary... do we need to reset something else too? */
-            ndpi_reset_detected_protocol(ndpi_struct, flow);
-            ndpi_int_change_category(ndpi_struct, flow, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED);
+            reset_detected_protocol(ndpi_struct, flow);
+            change_category(ndpi_struct, flow, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED);
 
             /* Give room for DTLS handshake, where we might have
                retransmissions and fragments */

@@ -33,11 +33,7 @@
 #include "ndpi_protocol_ids.h"
 #include "ndpi_typedefs.h"
 #include "ndpi_api.h"
-#include "ndpi_protocols.h"
 
-/* used by ndpi_set_proto_subprotocols */
-#define NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS (-1)
-#define NDPI_PROTOCOL_MATCHED_BY_CONTENT (-2)
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,12 +50,8 @@ extern "C" {
   int NDPI_BITMASK_IS_EMPTY(NDPI_PROTOCOL_BITMASK a);
   void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a);
 
-  extern u_int8_t ndpi_net_match(u_int32_t ip_to_check,
-				 u_int32_t net,
-				 u_int32_t num_bits);
 
-  extern u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
-				 u_int32_t net, u_int32_t num_bits);
+
 
   u_int16_t ntohs_ndpi_bytestream_to_number(const u_int8_t * str,
 					    u_int16_t max_chars_to_read,
@@ -78,34 +70,8 @@ extern "C" {
   u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t * str, u_int16_t max_chars_to_read,
 				    u_int16_t * bytes_read);
 
-  void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-				  struct ndpi_flow_struct *flow,
-				  u_int16_t upper_detected_protocol,
-				  u_int16_t lower_detected_protocol,
-				  ndpi_confidence_t confidence);
-
-  void ndpi_reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-				    struct ndpi_flow_struct *flow);
-
-  void ndpi_set_detected_protocol_keeping_master(struct ndpi_detection_module_struct *ndpi_str,
-						 struct ndpi_flow_struct *flow,
-						 u_int16_t detected_protocol,
-						 ndpi_confidence_t confidence);
-
-  extern void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struct,
-					  struct ndpi_flow_struct *flow);
-  extern void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_struct,
-					      struct ndpi_flow_struct *flow);
-
-  extern u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi_struct,
-                                                u_int16_t counter);
-
-  extern void ndpi_int_change_category(struct ndpi_detection_module_struct *ndpi_struct,
-				       struct ndpi_flow_struct *flow,
-				       ndpi_protocol_category_t protocol_category);
-
   extern void ndpi_set_proto_subprotocols(struct ndpi_detection_module_struct *ndpi_mod,
-				      int protoId, ...);
+                                     int protoId, ...);
 
   extern int ndpi_parse_ip_string(const char *ip_str, ndpi_ip_addr_t *parsed_ip);
   extern char *ndpi_get_ip_string(const ndpi_ip_addr_t * ip, char *buf, u_int buf_len);
@@ -114,19 +80,9 @@ extern "C" {
   extern char* ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_mod, u_int id);
   u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_mod, const char *name);
 
-  extern u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
-					  struct ndpi_flow_struct *flow,
-					  u_int8_t proto, u_int16_t sport, u_int16_t dport,
-					  u_int8_t *user_defined_proto);
-
   extern u_int8_t ndpi_is_proto(ndpi_protocol proto, u_int16_t p);
 
   extern void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
-
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_struct,
-					     const char **file, const char **func, u_int32_t * line);
-#endif
 
   /** Checks when the @p payload starts with the string literal @p str.
    * When the string is larger than the payload, check fails.
@@ -149,7 +105,7 @@ extern "C" {
 			       u_int16_t protoId, char *protoName,
 			       ndpi_protocol_category_t protoCategory,
 			       ndpi_port_range *tcpDefPorts,
-			       ndpi_port_range *udpDefPorts);    
+			       ndpi_port_range *udpDefPorts);
   void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 		     struct ndpi_flow_struct *flow, ndpi_risk_enum r,
 		     char *risk_message);
@@ -161,18 +117,7 @@ extern "C" {
   int ndpi_normalize_printable_string(char * const str, size_t len);
   int ndpi_is_valid_hostname(char * const str, size_t len);
 #define NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(entropy) (entropy > 7.0f)
-  float ndpi_entropy(u_int8_t const * const buf, size_t len);
-  u_int16_t ndpi_calculate_icmp4_checksum(u_int8_t const * const buf, size_t len);
-  void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str);
-  u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
-			    const char *alpn_to_check, u_int alpn_to_check_len);    
-
-  char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
-  char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
-
-  int64_t ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len);
-  char* ndpi_intoav4(unsigned int addr, char* buf, u_int16_t bufLen);
-  int ndpi_seen_flow_beginning(const struct ndpi_flow_struct *flow);
+  float ndpi_entropy(u_int8_t const * const buf, size_t len); 
 
 #ifdef __cplusplus
 }

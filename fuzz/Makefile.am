@@ -78,8 +78,8 @@ fuzz_quic_get_crypto_data_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS)
     $(fuzz_quic_get_crypto_data_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_config_SOURCES = fuzz_config.cpp fuzz_common_code.c
-fuzz_config_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
-fuzz_config_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_config_CXXFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_config_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_config_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_config_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
