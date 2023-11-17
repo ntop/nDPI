@@ -50,9 +50,7 @@ static ndpi_network ndpi_protocol_nvidia_protocol_list[] = {
  { 0x70D98000 /* 112.217.128.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  { 0x79C82D00 /* 121.200.45.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  { 0xB9884400 /* 185.136.68.0/22 */, 22, NDPI_PROTOCOL_NVIDIA },
- { 0xC1F63300 /* 193.246.51.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  { 0xD8E47000 /* 216.228.112.0/20 */, 20, NDPI_PROTOCOL_NVIDIA },
- { 0xD9C7D100 /* 217.199.209.0/24 */, 24, NDPI_PROTOCOL_NVIDIA },
  /* End */
  { 0x0, 0, 0 }
 };

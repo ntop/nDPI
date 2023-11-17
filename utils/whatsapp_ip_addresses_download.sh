@@ -8,6 +8,7 @@ cd "$(dirname "${0}")" || exit 1
 DEST=../src/lib/inc_generated/ndpi_whatsapp_match.c.inc
 TMP=/tmp/wa.zip
 LIST=/tmp/wa.list
+LIST_MERGED=/tmp/wa.list_m
 IP_LINK_URL='https://developers.facebook.com/docs/whatsapp/guides/network-requirements/'
 
 
@@ -23,8 +24,10 @@ is_file_empty "${TMP}"
 echo "(3) Processing IP addresses..."
 unzip -p /tmp/wa.zip "WhatsApp IPs (IPv4 Only) 2022-07-26 - 2022-07-30.txt" > "${LIST}" #TODO: ipv6
 is_file_empty "${LIST}"
-./ipaddr2list.py "${LIST}" NDPI_PROTOCOL_WHATSAPP > "${DEST}"
-rm -f "${TMP}" "${LIST}"
+./mergeipaddrlist.py $LIST > $LIST_MERGED
+is_file_empty "${LIST_MERGED}"
+./ipaddr2list.py "${LIST_MERGED}" NDPI_PROTOCOL_WHATSAPP > "${DEST}"
+rm -f "${TMP}" "${LIST}" "${LIST_MERGED}"
 is_file_empty "${DEST}"
 
 echo "(4) WhatsApp IPs are available in $DEST"
