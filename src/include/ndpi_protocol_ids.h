@@ -100,7 +100,7 @@ typedef enum {
   NDPI_PROTOCOL_AMONG_US              = 69,
   NDPI_PROTOCOL_YAHOO                 = 70,
   NDPI_PROTOCOL_DISNEYPLUS            = 71,
-  NDPI_PROTOCOL_GOOGLE_PLUS           = 72,
+  NDPI_PROTOCOL_FREE_72               = 72,
   NDPI_PROTOCOL_IP_VRRP               = 73,
   NDPI_PROTOCOL_STEAM                 = 74,
   NDPI_PROTOCOL_HALFLIFE2             = 75,
@@ -386,6 +386,7 @@ typedef enum {
   NDPI_PROTOCOL_TELEGRAM_VOIP         = 355,
   NDPI_PROTOCOL_SINA_WEIBO            = 356,
   NDPI_PROTOCOL_TESLA_SERVICES        = 357,
+  NDPI_PROTOCOL_PTPV2                 = 358,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
