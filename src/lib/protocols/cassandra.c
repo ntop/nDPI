@@ -66,7 +66,7 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
     return;
   }
   
-  if (flow->packet_counter > 12) {
+  if (flow->packet_direction_counter[packet->packet_direction] > 2) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
