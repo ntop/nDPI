@@ -74,7 +74,9 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
   /* Looking for a 'STARTUP' message from the client,
    * which should always contain the CQL_VERSION string
    */
-  if (packet->payload[4] == 0x01 && (strncmp((char *)&packet->payload[13], "CQL_VERSION", 11) == 0))
+  if (packet->payload_packet_len > 24 && 
+      (packet->payload[4] == 0x01 && 
+      (strncmp((char *)&packet->payload[13], "CQL_VERSION", 11) == 0)))
   {
     NDPI_LOG_INFO(ndpi_struct, "found Cassandra CQL\n");
     ndpi_int_cassandra_add_connection(ndpi_struct, flow);
