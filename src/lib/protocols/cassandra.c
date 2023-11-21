@@ -54,7 +54,7 @@ static void ndpi_int_cassandra_add_connection(struct ndpi_detection_module_struc
 static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_struct,
                                   struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search Cassandra CQL\n");
 
@@ -74,8 +74,7 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
   /* Looking for a 'STARTUP' message from the client,
    * which should always contain the CQL_VERSION string
    */
-  if (packet->payload[4] == 0x01 && 
-      (memcmp(&packet->payload[13], "CQL_VERSION", NDPI_STATICSTRING_LEN("CQL_VERSION")) == 0))
+  if (packet->payload[4] == 0x01 && (strncmp((char *)&packet->payload[13], "CQL_VERSION", 11) == 0))
   {
     NDPI_LOG_INFO(ndpi_struct, "found Cassandra CQL\n");
     ndpi_int_cassandra_add_connection(ndpi_struct, flow);
