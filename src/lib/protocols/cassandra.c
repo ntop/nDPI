@@ -1,7 +1,10 @@
 /*
  * cassandra.c
  *
- * Copyright (C) 2021 by Lucas Santos <lfneiva.santos@gmail.com>
+ * Apache Cassandra CQL Binary protocol
+ * 
+ * Copyright (C) 2023 - ntop.org
+ * Copyright (C) 2023 - V.G <jacendi@protonmail.com>
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -18,92 +21,34 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
+ * 
  */
 
-#include <stdbool.h>
 #include "ndpi_protocol_ids.h"
+
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_CASSANDRA
+
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
-#define CASSANDRA_HEADER_LEN 9
-#define CASSANDRA_MAX_BODY_SIZE 268435456 //256MB (256 * 1024^2)
-
-enum cassandra_version
+static inline int ndpi_validate_cassandra_response(u_int8_t response)
 {
-  CASSANDRA_V1_REQUEST = 0x01,
-  CASSANDRA_V1_RESPONSE = 0x81,
-  CASSANDRA_V2_REQUEST = 0x02,
-  CASSANDRA_V2_RESPONSE = 0x82,
-  CASSANDRA_V3_REQUEST = 0x03,
-  CASSANDRA_V3_RESPONSE = 0x83,
-  CASSANDRA_V4_REQUEST = 0x04,
-  CASSANDRA_V4_RESPONSE = 0x84
-};
-
-enum cassandra_opcode
-{
-  CASSANDRA_ERROR = 0x00,
-  CASSANDRA_STARTUP = 0x01,
-  CASSANDRA_READY = 0x02,
-  CASSANDRA_AUTHENTICATE = 0x03,
-  CASSANDRA_OPTIONS = 0x05,
-  CASSANDRA_SUPPORTED = 0x06,
-  CASSANDRA_QUERY = 0x07,
-  CASSANDRA_RESULT = 0x08,
-  CASSANDRA_PREPARE = 0x09,
-  CASSANDRA_EXECUTE = 0x0A,
-  CASSANDRA_REGISTER = 0x0B,
-  CASSANDRA_EVENT = 0x0C,
-  CASSANDRA_BATCH = 0x0D,
-  CASSANDRA_AUTH_CHALLENGE = 0x0E,
-  CASSANDRA_AUTH_RESPONSE = 0x0F,
-  CASSANDRA_AUTH_SUCCESS = 0x10
-};
-
-static bool ndpi_check_valid_cassandra_version(uint8_t version)
-{
-  switch(version) {
-    case CASSANDRA_V1_REQUEST:
-    case CASSANDRA_V1_RESPONSE:
-    case CASSANDRA_V2_REQUEST:
-    case CASSANDRA_V2_RESPONSE:
-    case CASSANDRA_V3_REQUEST:
-    case CASSANDRA_V3_RESPONSE:
-    case CASSANDRA_V4_REQUEST:
-    case CASSANDRA_V4_RESPONSE:
-      return true;
-  }
-  return false;
+  return (response >= 0x81 && response <= 0x84) ? 1 : -1;
 }
 
-static bool ndpi_check_valid_cassandra_opcode(uint8_t opcode)
+static inline int ndpi_validate_cassandra_request(u_int8_t request)
 {
-  switch (opcode) {
-    case CASSANDRA_ERROR:
-    case CASSANDRA_STARTUP:
-    case CASSANDRA_READY:
-    case CASSANDRA_AUTHENTICATE:
-    case CASSANDRA_OPTIONS:
-    case CASSANDRA_SUPPORTED:
-    case CASSANDRA_QUERY:
-    case CASSANDRA_RESULT:
-    case CASSANDRA_PREPARE:
-    case CASSANDRA_EXECUTE:
-    case CASSANDRA_REGISTER:
-    case CASSANDRA_EVENT:
-    case CASSANDRA_BATCH:
-    case CASSANDRA_AUTH_CHALLENGE:
-    case CASSANDRA_AUTH_RESPONSE:
-    case CASSANDRA_AUTH_SUCCESS:
-      return true;
-  }
-  return false;
+  return (request >= 0x01 && request <= 0x04) ? 1 : -1;
 }
 
-static bool ndpi_check_valid_cassandra_flags(uint8_t flags)
+static void ndpi_int_cassandra_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+                                              struct ndpi_flow_struct *flow)
 {
-  return (flags & 0xF0) == 0;
+  NDPI_LOG_INFO(ndpi_struct, "found Cassandra CQL\n");
+
+  ndpi_set_detected_protocol(ndpi_struct, flow,
+                             NDPI_PROTOCOL_CASSANDRA, NDPI_PROTOCOL_UNKNOWN,
+                             NDPI_CONFIDENCE_DPI);
 }
 
 static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_struct,
@@ -111,31 +56,33 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  NDPI_LOG_DBG(ndpi_struct, "search Cassandra\n");
+  NDPI_LOG_DBG(ndpi_struct, "search Cassandra CQL\n");
 
-  if (packet->tcp) {
-    if (packet->payload_packet_len >= CASSANDRA_HEADER_LEN &&
-        ndpi_check_valid_cassandra_version(get_u_int8_t(packet->payload, 0)) &&
-        ndpi_check_valid_cassandra_flags(get_u_int8_t(packet->payload, 1)) &&
-        ndpi_check_valid_cassandra_opcode(get_u_int8_t(packet->payload, 4)) &&
-        ntohl(get_u_int32_t(packet->payload, 5)) <= CASSANDRA_MAX_BODY_SIZE &&
-        ntohl(get_u_int32_t(packet->payload, 5)) >= (uint32_t) (packet->payload_packet_len - CASSANDRA_HEADER_LEN) &&
-        flow->h323_valid_packets == 0 /* To avoid clashing with H323 */ &&
-        flow->socks4_stage == 0 /* To avoid clashing with SOCKS */) {
-      if (flow->packet_counter > 3)
-      {
-        NDPI_LOG_INFO(ndpi_struct, "found Cassandra\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CASSANDRA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      }
-      return;
-    }
+  if (packet->payload_packet_len < 9 ||
+      (!ndpi_validate_cassandra_response(packet->payload[0]) ||
+       !ndpi_validate_cassandra_request(packet->payload[0])))
+  {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
   }
-
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  
+  if (flow->packet_direction_counter[packet->packet_direction] > 2) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
+  
+  /* Looking for a 'STARTUP' message from the client,
+   * which should always contain the CQL_VERSION string
+   */
+  if (packet->payload_packet_len > 24 && 
+      (packet->payload[4] == 0x01 && 
+      (strncmp((char *)&packet->payload[13], "CQL_VERSION", 11) == 0)))
+  {
+    NDPI_LOG_INFO(ndpi_struct, "found Cassandra CQL\n");
+    ndpi_int_cassandra_add_connection(ndpi_struct, flow);
+    return;
+  }
 }
-
-/* ********************************* */
-
 
 void init_cassandra_dissector(struct ndpi_detection_module_struct *ndpi_struct,
                               u_int32_t *id) {
