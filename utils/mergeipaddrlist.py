@@ -14,6 +14,7 @@ if len(sys.argv) < 2:
 
 ipFile = open(sys.argv[1])
 ipAddresses = list(ipFile.readlines())
+ipAddresses = [x.replace("\n","") for x in ipAddresses]
 ipAddresses = sorted(ipAddresses)
 cidrs = netaddr.cidr_merge(ipAddresses)
 
