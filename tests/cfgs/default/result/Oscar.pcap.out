@@ -1,8 +1,8 @@
 Guessed flow protos:	1
 
-DPI Packets (TCP):	21	(21.00 pkts/flow)
+DPI Packets (TCP):	25	(25.00 pkts/flow)
 Confidence Match by port    : 1 (flows)
-Num dissector calls: 250 (250.00 diss/flow)
+Num dissector calls: 262 (262.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -25,4 +25,4 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 TLS	71	9386	1
 
-	1	TCP 10.30.29.3:63357 <-> 178.237.24.249:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 21][cat: Web/5][38 pkts/3580 bytes <-> 33 pkts/5806 bytes][Goodput ratio: 42/68][72.45 sec][bytes ratio: -0.237 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 2392/2607 58175/58215 10382/11142][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 94/176 369/1414 75/257][Risk: ** Fully encrypted flow **][Risk Score: 50][Plen Bins: 7,58,5,5,0,0,5,2,2,7,0,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0]
+	1	TCP 10.30.29.3:63357 <-> 178.237.24.249:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 25][cat: Web/5][38 pkts/3580 bytes <-> 33 pkts/5806 bytes][Goodput ratio: 42/68][72.45 sec][bytes ratio: -0.237 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 2392/2607 58175/58215 10382/11142][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 94/176 369/1414 75/257][Risk: ** Fully encrypted flow **][Risk Score: 50][Plen Bins: 7,58,5,5,0,0,5,2,2,7,0,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0]
