@@ -54,7 +54,7 @@ static void ndpi_search_hart_ip(struct ndpi_detection_module_struct *ndpi_struct
 
 void init_hart_ip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("HART-IP", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("HART_IP", ndpi_struct, *id,
               NDPI_PROTOCOL_HART_IP,
               ndpi_search_hart_ip,
               NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
