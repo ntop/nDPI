@@ -54,21 +54,6 @@ static void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct, s
       u_int16_t len = ntohs(t->len);
 
       if(packet->payload_packet_len == len) {
-	/*
-	  We need to check if this packet is in reality
-	  a RDP (Remote Desktop) packet encapsulated on TPTK
-	*/
-
-	if(packet->payload[4] == (packet->payload_packet_len - sizeof(struct tpkt) - 1)) {
-	  /* ISO 8073/X.224 */
-	  if((packet->payload[5] == 0xE0 /* CC Connect Request */)
-	     || (packet->payload[5] == 0xD0 /* CC Connect Confirm */)) {
-	    NDPI_LOG_INFO(ndpi_struct, "found RDP\n");
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RDP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	    return;
-	  }
-	}
-
 	flow->h323_valid_packets++;
 
 	if(flow->h323_valid_packets >= 2) {
