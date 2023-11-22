@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	6	(6.00 pkts/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 152 (152.00 diss/flow)
+Num dissector calls: 1 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -11,8 +11,8 @@ LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/0/0 (insert/search/found)
-Automa host:          1/0 (search/found)
-Automa domain:        1/0 (search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
@@ -23,6 +23,6 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-FastCGI	102	72243	1
+RDP	30	4151	1
 
-	1	TCP 10.0.0.9:38254 <-> 10.0.0.11:9000 [proto: 310/FastCGI][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Network/14][48 pkts/4271 bytes <-> 54 pkts/67972 bytes][Goodput ratio: 26/95][3.42 sec][Hostname/SNI: api.openstreetmap.org][bytes ratio: -0.882 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 38/81 1257/2019 204/358][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 89/1259 1121/1514 151/523][User-Agent: dummy_agent   dummy_agent][PLAIN TEXT (SCRIPT)][Plen Bins: 7,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,85,0,0]
+	1	TCP 10.150.9.21:1685 <-> 10.157.4.161:3389 [proto: 88/RDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RemoteAccess/12][17 pkts/2567 bytes <-> 13 pkts/1584 bytes][Goodput ratio: 63/54][0.67 sec][bytes ratio: 0.237 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 44/54 234/331 66/93][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 151/122 573/440 162/126][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found RDP][PLAIN TEXT (Cookie)][Plen Bins: 59,16,4,0,0,0,0,0,0,0,4,0,12,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
