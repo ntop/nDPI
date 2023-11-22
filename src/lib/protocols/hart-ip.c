@@ -31,7 +31,6 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
-PACK_ON
 struct hart_ip_hdr {
   u_int8_t version;
   u_int8_t msg_type;
@@ -39,7 +38,7 @@ struct hart_ip_hdr {
   u_int8_t status;
   u_int16_t seq_num;
   u_int16_t msg_len;
-} PACK_OFF;
+};
 
 enum hart_ip_msg_type {
   REQUEST_MSG,
