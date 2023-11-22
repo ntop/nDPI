@@ -46,17 +46,34 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search RDP\n");
 
   if (packet->tcp != NULL) {
-    if (packet->payload_packet_len > 10
-	&& get_u_int8_t(packet->payload, 0) > 0
-	&& get_u_int8_t(packet->payload, 0) < 4 && get_u_int16_t(packet->payload, 2) == ntohs(packet->payload_packet_len)
-	&& get_u_int8_t(packet->payload, 4) == packet->payload_packet_len - 5
-	&& get_u_int8_t(packet->payload, 5) == 0xe0
-	&& get_u_int16_t(packet->payload, 6) == 0 && get_u_int16_t(packet->payload, 8) == 0 && get_u_int8_t(packet->payload, 10) == 0) {
-      ndpi_int_rdp_add_connection(ndpi_struct, flow);
+    /* Searching for a RDP Negotiation request from a client */
+    if(current_pkt_from_client_to_server(ndpi_struct, flow) &&
+       packet->payload_packet_len == 19)
+    {
+      if ((packet->payload[0] == 0x03) && (packet->payload[3] == 0x13) &&
+          (packet->payload[5] == 0xE0) && (packet->payload[11] == 0x01) &&
+          (packet->payload[13] == 0x08))
+      {
+        ndpi_int_rdp_add_connection(ndpi_struct, flow);
+        return;
+      }
+    }
+    /* Searching for a RDP Negotiation response from the server */
+    if(current_pkt_from_server_to_client(ndpi_struct, flow) &&
+       packet->payload_packet_len == 19)
+    {
+      if ((packet->payload[0] == 0x03) && (packet->payload[3] == 0x13) &&
+          (packet->payload[5] == 0xD0) && (packet->payload[11] == 0x02) &&
+          (packet->payload[13] == 0x08))
+      {
+        ndpi_int_rdp_add_connection(ndpi_struct, flow);
+        return;
+      }
+    }
+    if(flow->packet_counter > 4) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
-
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   } else if(packet->udp != NULL) {
     u_int16_t s_port = ntohs(packet->udp->source);
     u_int16_t d_port = ntohs(packet->udp->dest);
