@@ -222,6 +222,6 @@ References: `Protocol Specs: <https://standards.ieee.org/ieee/1588/4355/>`_.
 
 `NDPI_PROTOCOL_HART_IP`
 ============================
-IEEE 1588-2008 Precision Time Protocol (PTP) Version 2.
+Highway Addressable Remote Transducer over IP
 
 References: `Protocol Specs: <https://library.fieldcommgroup.org/20085/TS20085>`_.
