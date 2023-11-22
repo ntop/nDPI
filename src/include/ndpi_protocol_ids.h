@@ -100,7 +100,7 @@ typedef enum {
   NDPI_PROTOCOL_AMONG_US              = 69,
   NDPI_PROTOCOL_YAHOO                 = 70,
   NDPI_PROTOCOL_DISNEYPLUS            = 71,
-  NDPI_PROTOCOL_FREE_72               = 72,
+  NDPI_PROTOCOL_HART_IP               = 72,
   NDPI_PROTOCOL_IP_VRRP               = 73,
   NDPI_PROTOCOL_STEAM                 = 74,
   NDPI_PROTOCOL_HALFLIFE2             = 75,

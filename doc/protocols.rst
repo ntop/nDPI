@@ -216,3 +216,12 @@ References: `Wikipedia <https://en.wikipedia.org/wiki/Sina_Weibo>`_.
 IEEE 1588-2008 Precision Time Protocol (PTP) Version 2.
 
 References: `Protocol Specs: <https://standards.ieee.org/ieee/1588/4355/>`_.
+
+
+.. _Proto 72:
+
+`NDPI_PROTOCOL_HART_IP`
+============================
+Highway Addressable Remote Transducer over IP
+
+References: `Main site: <https://www.fieldcommgroup.org/technologies/HART-IP>`_.
