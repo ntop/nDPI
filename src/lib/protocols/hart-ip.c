@@ -39,8 +39,8 @@ static void ndpi_search_hart_ip(struct ndpi_detection_module_struct *ndpi_struct
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search HART-IP\n");
-  
-  if ((packet->payload_packet_len > 8) && (packet->payload[0] == 0x01) &&
+
+  if ((packet->payload_packet_len >= 8) && (packet->payload[0] == 0x01) &&
       (packet->payload[1] <= 0x03 || packet->payload[1] == 0x0F) &&
       (packet->payload[2] <= 0x03) &&
       (ntohs(get_u_int16_t(packet->payload, 6)) == packet->payload_packet_len))
