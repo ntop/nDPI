@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	8	(8.00 pkts/flow)
+DPI Packets (TCP):	3	(3.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 155 (155.00 diss/flow)
+Num dissector calls: 1 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -23,6 +23,6 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-RTMP	26	8368	1
+H323	10	939	1
 
-	1	TCP 192.168.43.1:1177 <-> 192.168.43.128:1935 [proto: 174/RTMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 8][cat: Media/1][12 pkts/4108 bytes <-> 14 pkts/4260 bytes][Goodput ratio: 84/82][1.04 sec][bytes ratio: -0.018 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 83/75 334/230 119/85][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 342/304 1514/1514 531/465][PLAIN TEXT (ace@nAt)][Plen Bins: 7,21,14,0,7,7,0,0,0,7,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,21,0,0]
+	1	TCP 10.1.6.18:1720 <-> 10.1.3.143:32803 [proto: 158/H323][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 3][cat: VoIP/10][5 pkts/509 bytes <-> 5 pkts/430 bytes][Goodput ratio: 44/37][1.04 sec][bytes ratio: 0.084 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 60/17 261/261 627/627 217/225][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 102/86 151/214 35/64][PLAIN TEXT (m.jemec)][Plen Bins: 0,0,50,25,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
