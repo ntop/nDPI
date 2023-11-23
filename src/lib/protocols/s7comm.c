@@ -30,7 +30,6 @@
 #include "ndpi_private.h"
 
 #define TPKT_PORT               102
-#define S7COMM_HEADER_LEN       10
 #define S7COMM_MAGIC_BYTE       0x32
 #define S7COMM_PLUS_MAGIC_BYTE  0x72
 
@@ -47,7 +46,7 @@ static void ndpi_search_s7comm(struct ndpi_detection_module_struct *ndpi_struct,
 
     /* S7Comm uses a default TPKT port 102 */
     if (((sport == TPKT_PORT) || (dport == TPKT_PORT)) &&
-        (packet->payload_packet_len > 17)) /* TPKT+COPT+S7Comm header lengths */
+        (packet->payload_packet_len > 17)) /* TPKT+COTP+S7Comm header lengths */
     {
       if ((packet->payload[0] == 0x03) && (packet->payload[1] == 0x00) &&
           (ntohs(get_u_int16_t(packet->payload, 2)) == packet->payload_packet_len))
