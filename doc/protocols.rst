@@ -225,3 +225,13 @@ References: `Wikipedia <https://en.wikipedia.org/wiki/Sina_Weibo>`_.
 IEEE 1588-2008 Precision Time Protocol (PTP) Version 2.
 
 References: `Protocol Specs: <https://standards.ieee.org/ieee/1588/4355/>`_.
+
+
+.. _Proto 359:
+
+`NDPI_PROTOCOL_S7COMM_PLUS`
+============================
+A proprietary protocol from Siemens used for data exchange between PLCs and access PLC data via SCADA systems.
+Completely different from classic S7Comm, but also uses TPKT/COTP as a transport.
+
+References: `Unofficial description: <https://plc4x.apache.org/protocols/s7/s7comm-plus.html>`_.

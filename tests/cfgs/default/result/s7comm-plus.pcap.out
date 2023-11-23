@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	6	(6.00 pkts/flow)
+DPI Packets (TCP):	9	(9.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 1 (1.00 diss/flow)
+Num dissector calls: 172 (172.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -23,6 +23,6 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   4/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-s7comm	79	10271	1
+S7CommPlus	79	10271	1
 
-	1	TCP 192.168.25.177:53162 <-> 192.168.25.131:102 [proto: 249/s7comm][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Network/14][54 pkts/6194 bytes <-> 25 pkts/4077 bytes][Goodput ratio: 53/65][7.11 sec][bytes ratio: 0.206 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 122/276 995/964 315/396][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 115/163 395/351 76/132][PLAIN TEXT (SIMATIC)][Plen Bins: 42,6,28,3,1,0,3,0,0,12,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.25.177:53162 <-> 192.168.25.131:102 [proto: 359/S7CommPlus][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 9][cat: IoT-Scada/31][54 pkts/6194 bytes <-> 25 pkts/4077 bytes][Goodput ratio: 53/65][7.11 sec][bytes ratio: 0.206 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 122/276 995/964 315/396][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 115/163 395/351 76/132][PLAIN TEXT (SIMATIC)][Plen Bins: 42,6,28,3,1,0,3,0,0,12,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
