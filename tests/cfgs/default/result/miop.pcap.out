@@ -2,7 +2,7 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	1	(1.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 60 (60.00 diss/flow)
+Num dissector calls: 56 (56.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -16,13 +16,13 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
-Patricia risk:        1/0 (search/found)
+Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-QUIC	1	1280	1
+Corba	10	3020	1
 
-	1	UDP 255.255.255.255:8224 -> 255.255.255.32:8224 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1280 bytes -> 0 pkts/0 bytes][Goodput ratio: 98/0][< 1 sec][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **][Risk Score: 100][QUIC ver: Q024][PLAIN TEXT (         )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0]
+	1	UDP 10.95.28.46:34477 -> 10.95.28.46:15984 [proto: 168/Corba][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][10 pkts/3020 bytes -> 0 pkts/0 bytes][Goodput ratio: 86/0][0.06 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/0 49/0 15/0][Pkt Len c2s/s2c min/avg/max/stddev: 302/0 302/0 302/0 0/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (10.95.28.46)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
