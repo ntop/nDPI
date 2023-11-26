@@ -52,13 +52,8 @@ static void ndpi_search_s7comm(struct ndpi_detection_module_struct *ndpi_struct,
           (ntohs(get_u_int16_t(packet->payload, 2)) == packet->payload_packet_len))
       {
           if (packet->payload[7] == S7COMM_PLUS_MAGIC_BYTE) {
-            const u_int8_t s7comm_plus_trail1[] = { 0x00, 0x00, 0x72, 0x01, 0x00, 0x00 };
-            const u_int8_t s7comm_plus_trail2[] = { 0x00, 0x00, 0x72, 0x02, 0x00, 0x00 };
-            const u_int8_t trail_offset = packet->payload_packet_len - sizeof(s7comm_plus_trail1);
-
-            if ((memcmp(&(packet->payload[trail_offset]), s7comm_plus_trail1, 
-                sizeof(s7comm_plus_trail1)) == 0) || (memcmp(&(packet->payload[trail_offset]),
-                s7comm_plus_trail2, sizeof(s7comm_plus_trail2)) == 0))
+            const u_int16_t trail_byte_offset = packet->payload_packet_len - 4;
+            if (packet->payload[trail_byte_offset] == S7COMM_PLUS_MAGIC_BYTE)
             {
               NDPI_LOG_INFO(ndpi_struct, "found S7CommPlus\n");
               ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM_PLUS, 
