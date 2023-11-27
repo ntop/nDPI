@@ -391,6 +391,7 @@ typedef enum {
   NDPI_PROTOCOL_OPC_UA                = 360,
   NDPI_PROTOCOL_S7COMM_PLUS           = 361,
   NDPI_PROTOCOL_FINS                  = 362,
+  NDPI_PROTOCOL_ETHERSIO              = 363,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
