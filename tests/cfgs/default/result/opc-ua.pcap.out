@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	33	(33.00 pkts/flow)
+DPI Packets (TCP):	5	(5.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 154 (154.00 diss/flow)
+Num dissector calls: 1 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -23,6 +23,6 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Telnet	87	7418	1
+OPC-UA	381	45578	1
 
-	1	TCP 192.168.0.2:1550 <-> 192.168.0.1:23 [proto: 77/Telnet][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 33][cat: RemoteAccess/12][43 pkts/3135 bytes <-> 44 pkts/4283 bytes][Goodput ratio: 9/32][39.57 sec][Username: fake][bytes ratio: -0.155 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1130/544 14699/8799 2838/1502][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 73/97 151/554 17/76][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (bam.zing.org)][Plen Bins: 70,6,19,0,2,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 127.0.0.1:57420 <-> 127.0.0.1:4840 [proto: 360/OPC-UA][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: IoT-Scada/31][191 pkts/23255 bytes <-> 190 pkts/22323 bytes][Goodput ratio: 54/52][0.01 sec][bytes ratio: 0.020 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 122/117 222/664 68/84][PLAIN TEXT (opc.tcp)][Plen Bins: 0,0,26,23,45,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
