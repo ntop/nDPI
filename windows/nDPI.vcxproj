@@ -335,6 +335,7 @@
     <ClCompile Include="..\src\lib\protocols\hart-ip.c" />
     <ClCompile Include="..\src\lib\protocols\rtps.c" />
     <ClCompile Include="..\src\lib\protocols\opc-ua.c" />
+    <ClCompile Include="..\src\lib\protocols\fins.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />

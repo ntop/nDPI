@@ -254,6 +254,7 @@ void init_ptpv2_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
 void init_hart_ip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_rtps_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_opc_ua_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_fins_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 /* ndpi_main.c */
 extern u_int32_t ndpi_ip_port_hash_funct(u_int32_t ip, u_int16_t port);
