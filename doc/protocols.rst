@@ -229,6 +229,15 @@ References: `Protocol Specs: <https://standards.ieee.org/ieee/1588/4355/>`_.
 
 .. _Proto 359:
 
+`NDPI_PROTOCOL_RTPS`
+============================
+Real-Time Publish Subscribe Protocol
+
+References: `Protocol Specs: <https://www.omg.org/spec/DDSI-RTPS/>`_.
+
+
+.. _Proto 360:
+
 `NDPI_PROTOCOL_OPC_UA`
 ============================
 IEC62541 OPC Unified Architecture

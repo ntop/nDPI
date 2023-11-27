@@ -333,6 +333,7 @@
     <ClCompile Include="..\src\lib\protocols\zeromq.c" />
     <ClCompile Include="..\src\lib\protocols\ptpv2.c" />
     <ClCompile Include="..\src\lib\protocols\hart-ip.c" />
+    <ClCompile Include="..\src\lib\protocols\rtps.c" />
     <ClCompile Include="..\src\lib\protocols\opc-ua.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
