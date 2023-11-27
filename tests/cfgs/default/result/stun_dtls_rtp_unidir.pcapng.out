@@ -1,0 +1,29 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	10	(5.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 12 (6.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       6/20/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+STUN	43	10358	2
+
+	1	UDP 10.1.0.3:5853 -> 10.10.0.1:2808 [proto: 78/STUN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: Network/14][18 pkts/5384 bytes -> 0 pkts/0 bytes][Goodput ratio: 86/0][7.17 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 386/0 4001/0 979/0][Pkt Len c2s/s2c min/avg/max/stddev: 102/0 299/0 750/0 221/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic][PLAIN TEXT (Coturn)][Plen Bins: 0,5,5,5,34,22,0,0,0,5,0,0,0,0,0,5,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.10.0.1:65226 -> 10.1.0.3:57730 [proto: 78/STUN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: Network/14][25 pkts/4974 bytes -> 0 pkts/0 bytes][Goodput ratio: 79/0][7.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 324/0 4001/0 904/0][Pkt Len c2s/s2c min/avg/max/stddev: 78/0 199/0 478/0 92/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic][PLAIN TEXT (username1)][Plen Bins: 0,8,16,16,32,0,4,8,0,12,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

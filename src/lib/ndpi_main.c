@@ -9889,15 +9889,10 @@ int ndpi_get_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
 */
 u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_str,
 					struct ndpi_flow_struct *flow) {
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  u_int16_t proto =
-    flow->detected_protocol_stack[1] ? flow->detected_protocol_stack[1] : flow->detected_protocol_stack[0];
-
-  NDPI_LOG_DBG2(ndpi_str, "[DEBUG] %s(%u.%u): %u\n", __FUNCTION__,
+  NDPI_LOG_DBG2(ndpi_str, "Protos (%u.%u): %d\n",
 	 flow->detected_protocol_stack[0],
 	 flow->detected_protocol_stack[1],
-	 proto);
-#endif
+	 !!flow->extra_packets_func);
 
   if(!flow->extra_packets_func)
     return(0);

@@ -298,7 +298,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
                                 struct ndpi_flow_struct *flow,
                                 u_int16_t p_offset, u_int16_t certificate_len);
 void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
-			  struct ndpi_flow_struct *flow);
+			  struct ndpi_flow_struct *flow, int first_dtls_pkt);
 int is_dtls(const u_int8_t *buf, u_int32_t buf_len, u_int32_t *block_len);
 void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow);

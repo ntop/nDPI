@@ -1,0 +1,28 @@
+Guessed flow protos:	0
+
+DPI Packets (UDP):	1	(1.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 6 (6.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       2/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+GoogleHangoutDuo	39	8413	1
+
+	1	UDP 192.168.12.156:37967 <-> 142.250.82.76:19305 [proto: 78.201/STUN.GoogleHangoutDuo][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][25 pkts/4202 bytes <-> 14 pkts/4211 bytes][Goodput ratio: 75/86][0.88 sec][bytes ratio: -0.001 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 37/35 203/107 47/36][Pkt Len c2s/s2c min/avg/max/stddev: 103/82 168/301 587/1245 125/320][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][PLAIN TEXT (ShSURJhNF)][Plen Bins: 0,5,47,30,2,0,0,0,0,0,0,0,0,2,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0]
