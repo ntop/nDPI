@@ -1,8 +1,9 @@
 Guessed flow protos:	0
 
-DPI Packets (TCP):	12	(4.00 pkts/flow)
-Confidence DPI              : 3 (flows)
-Num dissector calls: 189 (63.00 diss/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+DPI Packets (UDP):	1	(1.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 119 (59.50 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -16,15 +17,14 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   6/0 (search/found)
+Patricia protocols:   4/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Corba	22	3681	3
+Corba	28	26656	2
 
-	1	TCP 10.101.0.2:8727 <-> 10.102.0.2:1049 [proto: 168/Corba][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RPC/16][5 pkts/854 bytes <-> 4 pkts/713 bytes][Goodput ratio: 66/68][0.00 sec][bytes ratio: 0.090 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 171/178 437/311 149/118][PLAIN TEXT (RootPOA)][Plen Bins: 0,0,0,0,0,25,0,25,25,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	TCP 10.101.0.2:8726 <-> 10.102.0.2:900 [proto: 168/Corba][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RPC/16][4 pkts/504 bytes <-> 3 pkts/670 bytes][Goodput ratio: 53/74][0.00 sec][bytes ratio: -0.141 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/1 1/1 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 126/223 322/548 113/230][PLAIN TEXT (omg.org/SendingContext/CodeBase)][Plen Bins: 0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	3	TCP 10.101.0.2:8728 <-> 10.102.0.2:61191 [proto: 168/Corba][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RPC/16][4 pkts/558 bytes <-> 2 pkts/382 bytes][Goodput ratio: 58/69][0.00 sec][bytes ratio: 0.187 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/62 140/191 376/320 137/129][PLAIN TEXT (RootPOA)][Plen Bins: 0,0,0,0,0,0,0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 127.0.1.1:42717 <-> 127.0.1.1:56899 [proto: 168/Corba][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RPC/16][11 pkts/19044 bytes <-> 7 pkts/4592 bytes][Goodput ratio: 96/90][2.27 sec][bytes ratio: 0.611 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2/30 247/444 1024/1047 412/491][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 1731/656 4162/4095 1891/1404][PLAIN TEXT (pIGIOP)][Plen Bins: 0,0,22,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,66]
+	2	UDP 10.95.28.46:34477 -> 10.95.28.46:15984 [proto: 168/Corba][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][10 pkts/3020 bytes -> 0 pkts/0 bytes][Goodput ratio: 86/0][0.06 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/0 49/0 15/0][Pkt Len c2s/s2c min/avg/max/stddev: 302/0 302/0 302/0 0/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (10.95.28.46)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

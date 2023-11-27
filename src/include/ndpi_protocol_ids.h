@@ -387,7 +387,9 @@ typedef enum {
   NDPI_PROTOCOL_SINA_WEIBO            = 356,
   NDPI_PROTOCOL_TESLA_SERVICES        = 357,
   NDPI_PROTOCOL_PTPV2                 = 358,
-  NDPI_PROTOCOL_S7COMM_PLUS           = 359,
+  NDPI_PROTOCOL_RTPS                  = 359,
+  NDPI_PROTOCOL_OPC_UA                = 360,
+  NDPI_PROTOCOL_S7COMM_PLUS           = 361,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

@@ -1,0 +1,28 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	5	(5.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+OPC-UA	381	45578	1
+
+	1	TCP 127.0.0.1:57420 <-> 127.0.0.1:4840 [proto: 360/OPC-UA][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: IoT-Scada/31][191 pkts/23255 bytes <-> 190 pkts/22323 bytes][Goodput ratio: 54/52][0.01 sec][bytes ratio: 0.020 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 122/117 222/664 68/84][PLAIN TEXT (opc.tcp)][Plen Bins: 0,0,26,23,45,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
