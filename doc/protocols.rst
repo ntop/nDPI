@@ -225,3 +225,12 @@ References: `Wikipedia <https://en.wikipedia.org/wiki/Sina_Weibo>`_.
 IEEE 1588-2008 Precision Time Protocol (PTP) Version 2.
 
 References: `Protocol Specs: <https://standards.ieee.org/ieee/1588/4355/>`_.
+
+
+.. _Proto 359:
+
+`NDPI_PROTOCOL_RTPS`
+============================
+Real-Time Publish Subscribe Protocol
+
+References: `Protocol Specs: <https://www.omg.org/spec/DDSI-RTPS/>`_.
