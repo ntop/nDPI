@@ -243,3 +243,13 @@ References: `Protocol Specs: <https://www.omg.org/spec/DDSI-RTPS/>`_.
 IEC62541 OPC Unified Architecture
 
 References: `Protocol Specs: <https://reference.opcfoundation.org/>`_.
+
+
+.. _Proto 361:
+
+`NDPI_PROTOCOL_S7COMM_PLUS`
+============================
+A proprietary protocol from Siemens used for data exchange between PLCs and access PLC data via SCADA systems.
+Completely different from classic S7Comm, but also uses TPKT/COTP as a transport.
+
+References: `Unofficial description: <https://plc4x.apache.org/protocols/s7/s7comm-plus.html>`_.

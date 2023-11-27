@@ -1,8 +1,9 @@
 /*
  * s7comm.c
  *
- * Copyright (C) 2011-22 - ntop.org
- * 
+ * Copyright (C) 2023 - ntop.org
+ * Copyright (C) 2023 - V.G <jacendi@protonmail.com>
+ *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
  *
@@ -20,40 +21,70 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
+ 
 #include "ndpi_protocol_ids.h"
+
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_S7COMM
+
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
-static void ndpi_search_s7comm_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-                                   struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  NDPI_LOG_DBG(ndpi_struct, "search S7\n");
-  u_int16_t s7comm_port = htons(102); 
-  if(packet->tcp) {
-    
-    if((packet->payload_packet_len >= 2) && (packet->payload[0]==0x03)&&(packet->payload[1]==0x00)&&((packet->tcp->dest == s7comm_port) || (packet->tcp->source == s7comm_port))) {
-      NDPI_LOG_INFO(ndpi_struct, "found S7\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+#define TPKT_PORT               102
+#define S7COMM_MAGIC_BYTE       0x32
+#define S7COMM_PLUS_MAGIC_BYTE  0x72
 
-      return;
-      
+static void ndpi_search_s7comm(struct ndpi_detection_module_struct *ndpi_struct,
+                               struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
+
+  NDPI_LOG_DBG(ndpi_struct, "search S7comm\n");
+
+  if (packet->tcp) {
+    u_int16_t sport = ntohs(packet->tcp->source);
+    u_int16_t dport = ntohs(packet->tcp->dest);
+
+    /* S7Comm uses a default TPKT port 102 */
+    if (((sport == TPKT_PORT) || (dport == TPKT_PORT)) &&
+        (packet->payload_packet_len > 17)) /* TPKT+COTP+S7Comm header lengths */
+    {
+      if ((packet->payload[0] == 0x03) && (packet->payload[1] == 0x00) &&
+          (ntohs(get_u_int16_t(packet->payload, 2)) == packet->payload_packet_len))
+      {
+          if (packet->payload[7] == S7COMM_PLUS_MAGIC_BYTE) {
+            const u_int16_t trail_byte_offset = packet->payload_packet_len - 4;
+            if (packet->payload[trail_byte_offset] == S7COMM_PLUS_MAGIC_BYTE)
+            {
+              NDPI_LOG_INFO(ndpi_struct, "found S7CommPlus\n");
+              ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM_PLUS, 
+                                         NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+              return;
+            }
+          } else if (packet->payload[7] == S7COMM_MAGIC_BYTE) {
+            if (((packet->payload[8] <= 0x03) || (packet->payload[8] == 0x07)) &&
+                (get_u_int16_t(packet->payload, 9) == 0))
+            {
+              NDPI_LOG_INFO(ndpi_struct, "found S7Comm\n");
+              ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM, 
+                                         NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+              return;
+            }
+          }
+	  return;
+      }
     }
   }
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-   
 }
 
-void init_s7comm_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                           u_int32_t *id) {
-      
-  ndpi_set_bitmask_protocol_detection("S7COMM", ndpi_struct, *id,
-				      NDPI_PROTOCOL_S7COMM,
-				      ndpi_search_s7comm_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+void init_s7comm_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+{
+  ndpi_set_bitmask_protocol_detection("S7Comm", ndpi_struct, *id,
+                                      NDPI_PROTOCOL_S7COMM,
+                                      ndpi_search_s7comm,
+                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+                                      ADD_TO_DETECTION_BITMASK);
   *id += 1;
 }
-
