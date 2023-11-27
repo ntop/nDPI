@@ -1231,18 +1231,6 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
     const u_int8_t *block = (const u_int8_t *)&p[processed];
 
     if(!is_dtls(block, p_len, &block_len)) {
-      if(processed == 0 && /* First block */
-         flow->stun.maybe_dtls == 1) {
-	/* Sometimes STUN packets are interleaved with TLS ones. Ignore STUN ones
-	   since we already are after STUN dissection and we are interested only on
-	   TLS stuff right now */
-#ifdef DEBUG_TLS
-        printf("Probably a stun packet. Keep going with TLS on next packets\n");
-#endif
-        /* Note that we can immediately "return" because, being the first block,
-	   we don't need to restore packet->payload and packet->payload_packet_len */
-        return(1); /* Keep working */
-      }
       no_dtls = 1;
       break;
     }
@@ -1332,6 +1320,7 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
       change_cipher_found = 1;
       processed += block_len + 13;
+      flow->tls_quic.certificate_processed = 1; /* Fake, to avoid extra dissection */
       break;
     } else {
 #ifdef DEBUG_TLS
@@ -1359,7 +1348,6 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(no_dtls || change_cipher_found || flow->tls_quic.certificate_processed) {
     NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
-    flow->extra_packets_func = NULL;
     return(0); /* That's all */
   } else {
     return(1); /* Keep working */
@@ -1401,19 +1389,21 @@ void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_st
 /* **************************************** */
 
 void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
-		   struct ndpi_flow_struct *flow)
+		   struct ndpi_flow_struct *flow, int first_time)
 {
 #ifdef DEBUG_TLS
   printf("Switching to TLS\n");
 #endif
 
-  /* Reset reassemblers */
-  if(flow->tls_quic.message[0].buffer)
-    ndpi_free(flow->tls_quic.message[0].buffer);
-  memset(&flow->tls_quic.message[0], '\0', sizeof(flow->tls_quic.message[0]));
-  if(flow->tls_quic.message[1].buffer)
-    ndpi_free(flow->tls_quic.message[1].buffer);
-  memset(&flow->tls_quic.message[1], '\0', sizeof(flow->tls_quic.message[1]));
+  if(first_time) {
+    /* Reset reassemblers */
+    if(flow->tls_quic.message[0].buffer)
+      ndpi_free(flow->tls_quic.message[0].buffer);
+    memset(&flow->tls_quic.message[0], '\0', sizeof(flow->tls_quic.message[0]));
+    if(flow->tls_quic.message[1].buffer)
+      ndpi_free(flow->tls_quic.message[1].buffer);
+    memset(&flow->tls_quic.message[1], '\0', sizeof(flow->tls_quic.message[1]));
+  }
 
   ndpi_search_tls_wrapper(ndpi_struct, flow);
 }
@@ -1498,8 +1488,9 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
   protocol = __get_master(ndpi_struct, flow);
 
   ndpi_set_detected_protocol(ndpi_struct, flow, protocol, protocol, NDPI_CONFIDENCE_DPI);
-
-  tlsInitExtraPacketProcessing(ndpi_struct, flow);
+  /* We don't want to ovewrite STUN extra dissection, if enabled */
+  if(!flow->extra_packets_func)
+    tlsInitExtraPacketProcessing(ndpi_struct, flow);
 }
 
 /* **************************************** */
