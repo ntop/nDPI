@@ -239,7 +239,8 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
   if(d_port == 5355 || /* LLMNR_PORT */
-     d_port == 5353    /* MDNS_PORT */) {
+     d_port == 5353 || /* MDNS_PORT */
+     d_port == 9600    /* FINS_PORT */) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }

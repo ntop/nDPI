@@ -253,3 +253,12 @@ A proprietary protocol from Siemens used for data exchange between PLCs and acce
 Completely different from classic S7Comm, but also uses TPKT/COTP as a transport.
 
 References: `Unofficial description: <https://plc4x.apache.org/protocols/s7/s7comm-plus.html>`_.
+
+
+.. _Proto 362:
+
+`NDPI_PROTOCOL_FINS`
+============================
+Factory Interface Network Service (FINS) is a network protocol used by Omron PLCs.
+
+References: `Protocol Specs: <https://assets.omron.eu/downloads/manual/en/v4/w421_cj1w-etn21_cs1w-etn21_ethernet_units_-_construction_of_applications_operation_manual_en.pdf>`_.

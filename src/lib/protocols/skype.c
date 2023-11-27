@@ -64,6 +64,9 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	     )
 	  && (packet->payload[0] != 0x30) /* Avoid invalid SNMP detection */
 	  && (packet->payload[0] != 0x00) /* Avoid invalid CAPWAP detection */
+    && (packet->payload[0] != 0x80) /* Avoid invalid FINS detection */
+    && (packet->payload[0] != 0xC0) /* Avoid invalid FINS detection */
+    && (packet->payload[0] != 0xC1) /* Avoid invalid FINS detection */
 	  && (packet->payload[2] == 0x02))) {
 
 	if(is_port(sport, dport, 8801)) {
