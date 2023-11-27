@@ -82,7 +82,9 @@ static void ndpi_search_fins(struct ndpi_detection_module_struct *ndpi_struct,
       goto not_fins;
     }
     
-    if ((fins->dna > 0x7F) || (fins->sna > 0x7F)) {
+    if ((fins->dna > 0x7F)  || (fins->sna > 0x7F) ||
+        (fins->gct != 0x02) || (fins->rsv != 0)) 
+    {
       goto not_fins;
     }
 
