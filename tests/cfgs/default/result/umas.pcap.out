@@ -1,0 +1,28 @@
+Guessed flow protos:	0
+
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+UMAS	191	29046	1
+
+	1	TCP 192.168.63.100:7718 <-> 192.168.63.253:502 [proto: 44.364/Modbus.UMAS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: IoT-Scada/31][94 pkts/6876 bytes <-> 97 pkts/22170 bytes][Goodput ratio: 26/76][0.77 sec][bytes ratio: -0.527 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/1 8/8 183/183 21/20][Pkt Len c2s/s2c min/avg/max/stddev: 54/64 73/229 315/315 36/105][PLAIN TEXT (PU 311 10)][Plen Bins: 57,1,5,2,0,1,0,4,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
