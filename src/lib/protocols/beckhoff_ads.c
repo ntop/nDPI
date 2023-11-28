@@ -82,14 +82,12 @@ static void ndpi_search_beckhoff_ads(struct ndpi_detection_module_struct *ndpi_s
     if (le32toh(ams->length) == ams_data_len) {
       /* Just additional checks to avoid potential 
        * false positives */
-      if ((le32toh(ams->state_flags) != 0x0004) &&
-          (le32toh(ams->state_flags) != 0x0005))
+      if ((ams->state_flags != 0x0004) && (ams->state_flags != 0x0005))
       {
         goto not_beckhoff_ads;
       }
       
-      if ((le32toh(ams->command_id) > 0x0009) ||
-          ((le32toh(ams->error_code) > 0x0000001E)))
+      if ((ams->command_id > 0x0009) || (ams->error_code > 0x0000001E))
       {
         goto not_beckhoff_ads;
       }
