@@ -50,7 +50,7 @@ static void ndpi_search_modbus_tcp(struct ndpi_detection_module_struct *ndpi_str
         /* Check Modbus function code. 0x5A (90) is reserved for UMAS protocol */
         if (packet->payload[7] == 0x5A) {
           NDPI_LOG_INFO(ndpi_struct, "found Schneider Electric UMAS\n");
-          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MODBUS, NDPI_PROTOCOL_UMAS, NDPI_CONFIDENCE_DPI);
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UMAS, NDPI_PROTOCOL_MODBUS, NDPI_CONFIDENCE_DPI);
           return;
         }
 
