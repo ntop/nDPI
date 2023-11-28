@@ -271,3 +271,12 @@ References: `Protocol Specs: <https://assets.omron.eu/downloads/manual/en/v4/w42
 Ether-S-I/O is a proprietary protocol used by Saia-Burgess's PLCs.
 
 References: `Wireshark wiki: <https://wiki.wireshark.org/EtherSIO.md>`_.
+
+
+.. _Proto 364:
+
+`NDPI_PROTOCOL_UMAS`
+============================
+UMAS is a proprietary Schneider Electric protocol based on Modbus. It's used in Modicon M580 and Modicon M340 CPU-based PLCs.
+
+References: `Unofficial article: <https://ics-cert.kaspersky.com/publications/reports/2022/09/29/the-secrets-of-schneider-electrics-umas-protocol/>`_.
