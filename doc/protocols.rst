@@ -280,3 +280,12 @@ References: `Wireshark wiki: <https://wiki.wireshark.org/EtherSIO.md>`_.
 UMAS is a proprietary Schneider Electric protocol based on Modbus. It's used in Modicon M580 and Modicon M340 CPU-based PLCs.
 
 References: `Unofficial article: <https://ics-cert.kaspersky.com/publications/reports/2022/09/29/the-secrets-of-schneider-electrics-umas-protocol/>`_.
+
+
+.. _Proto 365:
+
+`NDPI_PROTOCOL_BECKHOFF_ADS`
+============================
+Automation Device Specification is the protocol used for interfacing with Beckhoff PLCs via TwinCAT.
+
+References: `Protocol Specs: <https://infosys.beckhoff.com/english.php?content=../content/1033/tc3_ads_intro/115847307.html>`_.
