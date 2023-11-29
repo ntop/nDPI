@@ -37,6 +37,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   int r;
   char errbuf[PCAP_ERRBUF_SIZE];
   NDPI_PROTOCOL_BITMASK all;
+  NDPI_PROTOCOL_BITMASK debug_bitmask;
   u_int i;
   FILE *fd;
 
@@ -59,6 +60,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     // enable all protocols
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
+
+    NDPI_BITMASK_SET_ALL(debug_bitmask);
+    ndpi_set_log_level(workflow->ndpi_struct, 4);
+    ndpi_set_debug_bitmask(workflow->ndpi_struct, debug_bitmask);
 
     ndpi_load_protocols_file(workflow->ndpi_struct, "protos.txt");
     ndpi_load_categories_file(workflow->ndpi_struct, "categories.txt", NULL);
