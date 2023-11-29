@@ -3978,8 +3978,8 @@ u_int8_t is_udp_not_guessable_protocol(u_int16_t l7_guessed_proto) {
 
 /* ****************************************************** */
 
-u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-                                 u_int8_t proto, u_int16_t sport, u_int16_t dport, u_int8_t *user_defined_proto) {
+static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                                   u_int8_t proto, u_int16_t sport, u_int16_t dport, u_int8_t *user_defined_proto) {
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
   *user_defined_proto = 0; /* Default */
 
@@ -4032,7 +4032,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 		ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_ENTROPY, str);
 	    }
 
-	    u_int16_t chksm = ndpi_calculate_icmp4_checksum(packet->payload, packet->payload_packet_len);
+	    u_int16_t chksm = icmp4_checksum(packet->payload, packet->payload_packet_len);
 	    if(chksm) {
 	      ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, NULL);
 	    }
@@ -6988,7 +6988,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
 /* ********************************************************************************* */
 
-u_int32_t ndpi_ip_port_hash_funct(u_int32_t ip, u_int16_t port) {
+u_int32_t ip_port_hash_funct(u_int32_t ip, u_int16_t port) {
   return(ip + 3 * port);
 }
 
@@ -7646,9 +7646,9 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
     u_int8_t user_defined_proto;
 
     /* guess protocol */
-    flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_str, flow, flow->l4_proto,
-								 ntohs(flow->c_port), ntohs(flow->s_port),
-								 &user_defined_proto);
+    flow->guessed_protocol_id = (int16_t) guess_protocol_id(ndpi_str, flow, flow->l4_proto,
+							    ntohs(flow->c_port), ntohs(flow->s_port),
+							    &user_defined_proto);
     flow->guessed_protocol_id_by_ip = ndpi_guess_host_protocol_id(ndpi_str, flow);
 
     ret->protocol_by_ip = flow->guessed_protocol_id_by_ip;
@@ -8500,8 +8500,8 @@ void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_s
 
 /* ********************************************************************************* */
 
-u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi_str,
-				       u_int16_t counter) {
+u_int16_t check_for_email_address(struct ndpi_detection_module_struct *ndpi_str,
+				  u_int16_t counter) {
   struct ndpi_packet_struct *packet;
 
   if(!ndpi_str)
@@ -8582,24 +8582,6 @@ u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi
   return(0);
 }
 
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-/* ********************************************************************************* */
-
-void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_str, const char **file,
-					   const char **func, u_int32_t *line) {
-  *file = "";
-  *func = "";
-
-  if(ndpi_str->ndpi_debug_print_file != NULL)
-    *file = ndpi_str->ndpi_debug_print_file;
-
-  if(ndpi_str->ndpi_debug_print_function != NULL)
-    *func = ndpi_str->ndpi_debug_print_function;
-
-  *line = ndpi_str->ndpi_debug_print_line;
-}
-#endif
-
 /* ********************************************************************************* */
 
 u_int8_t ndpi_detection_get_l4(const u_int8_t *l3, u_int16_t l3_len, const u_int8_t **l4_return,
@@ -8637,7 +8619,7 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, s
 
 /* ********************************************************************************* */
 
-void ndpi_reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+void reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
   flow->detected_protocol_stack[1] = NDPI_PROTOCOL_UNKNOWN;
   flow->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
   flow->confidence = NDPI_CONFIDENCE_UNKNOWN;
@@ -8706,8 +8688,8 @@ static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_s
 
 /* ********************************************************************************* */
 
-void ndpi_int_change_category(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-			      ndpi_protocol_category_t protocol_category) {
+void change_category(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+		     ndpi_protocol_category_t protocol_category) {
   flow->category = protocol_category;
 }
 
@@ -8828,7 +8810,7 @@ static ndpi_protocol ndpi_internal_guess_undetected_protocol(struct ndpi_detecti
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
     }
   } else {
-    ret.app_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, 0, 0, &user_defined_proto);
+    ret.app_protocol = guess_protocol_id(ndpi_str, flow, proto, 0, 0, &user_defined_proto);
   }
 
   ret.category = ndpi_get_proto_category(ndpi_str, ret);
@@ -8863,12 +8845,12 @@ ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_str
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       ret.app_protocol = rc,
-	ret.master_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
+	ret.master_protocol = guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
 
       if(ret.app_protocol == ret.master_protocol)
 	ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     } else {
-      ret.app_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto),
+      ret.app_protocol = guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto),
 	ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     }
 
@@ -9528,7 +9510,7 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
     ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol, NDPI_CONFIDENCE_DPI);
     if(!category_depends_on_master(master_protocol))
-      ndpi_int_change_category(ndpi_struct, flow, ret_match.protocol_category);
+      change_category(ndpi_struct, flow, ret_match.protocol_category);
 
     if(subproto == NDPI_PROTOCOL_OOKLA) {
 	ookla_add_to_cache(ndpi_struct, flow);
@@ -10094,8 +10076,8 @@ static int enough(int a, int b) {
 
 /* ******************************************************************** */
 
-u_int8_t ndpi_ends_with(struct ndpi_detection_module_struct *ndpi_struct,
-                        char *str, char *ends) {
+u_int8_t ends_with(struct ndpi_detection_module_struct *ndpi_struct,
+                   char *str, char *ends) {
   u_int str_len = str ? strlen(str) : 0;
   u_int8_t ends_len = strlen(ends);
   u_int8_t rc;
@@ -10161,12 +10143,12 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     if((!name)
        || (strchr(name, '_') != NULL)
        || (strchr(name, '-') != NULL)
-       || (ndpi_ends_with(ndpi_str, name, "in-addr.arpa"))
-       || (ndpi_ends_with(ndpi_str, name, "ip6.arpa"))
+       || (ends_with(ndpi_str, name, "in-addr.arpa"))
+       || (ends_with(ndpi_str, name, "ip6.arpa"))
        /* Ignore TLD .local .lan and .home */
-       || (ndpi_ends_with(ndpi_str, name, ".local"))
-       || (ndpi_ends_with(ndpi_str, name, ".lan"))
-       || (ndpi_ends_with(ndpi_str, name, ".home"))
+       || (ends_with(ndpi_str, name, ".local"))
+       || (ends_with(ndpi_str, name, ".lan"))
+       || (ends_with(ndpi_str, name, ".home"))
        )
       return(0);
 
@@ -10320,7 +10302,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	if((word_len = strlen(word)) < 5) continue;
 
-	if((word_len < 10) && (ndpi_ends_with(ndpi_str, word, "cdn") /* Content Delivery Network ? */))
+	if((word_len < 10) && (ends_with(ndpi_str, word, "cdn") /* Content Delivery Network ? */))
 	  continue; /* Ignore names (not too long) that end with cdn [ ssl.p.jwpcdn.com or www.awxcdn.com ] */
 
 	NDPI_LOG_DBG2(ndpi_str, "[DGA] word(%s) [%s][len: %u]\n", word, name, (unsigned int)strlen(word));

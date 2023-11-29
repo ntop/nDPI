@@ -242,18 +242,6 @@ extern "C" {
   void ndpi_free_flow(struct ndpi_flow_struct *flow);
 
   /**
-   * Enables cache support.
-   * In nDPI is used for some protocol (i.e. Skype)
-   *
-   * @par ndpi_mod  = the struct created for the protocol detection
-   * @par host      = string for the host name
-   * @par port      = unsigned int for the port number
-   *
-   */
-  void ndpi_enable_cache(struct ndpi_detection_module_struct *ndpi_mod,
-			 char* host, u_int port);
-
-  /**
    * Destroys the detection module
    *
    * @par ndpi_struct  = the struct to clearing for the detection module
@@ -2163,6 +2151,29 @@ extern "C" {
    *
    */
   void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str);
+
+  /* ******************************* */
+
+  /* Can't call libc functions from kernel space, define some stub instead */
+
+#define ndpi_isalpha(ch) (((ch) >= 'a' && (ch) <= 'z') || ((ch) >= 'A' && (ch) <= 'Z'))
+#define ndpi_isdigit(ch) ((ch) >= '0' && (ch) <= '9')
+#define ndpi_isalnum(ch) (ndpi_isalpha(ch) != 0 || ndpi_isdigit(ch) != 0)
+#define ndpi_isspace(ch) (((ch) >= '\t' && (ch) <= '\r') || ((ch) == ' '))
+#define ndpi_isprint(ch) ((ch) >= 0x20 && (ch) <= 0x7e)
+#define ndpi_ispunct(ch) (((ch) >= '!' && (ch) <= '/') ||   \
+              ((ch) >= ':' && (ch) <= '@') ||   \
+              ((ch) >= '[' && (ch) <= '`') ||   \
+              ((ch) >= '{' && (ch) <= '~'))
+
+  /* ******************************* */
+
+  int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args);
+  int ndpi_snprintf(char * str, size_t size, char const * format, ...);
+  struct tm *ndpi_gmtime_r(const time_t *timep,
+                           struct tm *result);
+
+  /* ******************************* */
 
 #ifdef __cplusplus
 }

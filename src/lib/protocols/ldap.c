@@ -47,7 +47,7 @@ static void ndpi_search_ldap(struct ndpi_detection_module_struct *ndpi_struct, s
 
   if(packet->payload_packet_len > 1 &&
      packet->payload[0] == 0x30) {
-    length = ndpi_asn1_ber_decode_length(&packet->payload[1], packet->payload_packet_len - 1, &length_len);
+    length = asn1_ber_decode_length(&packet->payload[1], packet->payload_packet_len - 1, &length_len);
     NDPI_LOG_DBG(ndpi_struct, "length %d (%d bytes)\n", length, length_len);
     if(length > 0 &&
        packet->payload_packet_len > 1 + length_len + 1 &&

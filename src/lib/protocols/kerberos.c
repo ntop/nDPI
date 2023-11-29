@@ -45,9 +45,9 @@ static int krb_decode_asn1_length(struct ndpi_detection_module_struct *ndpi_stru
   int64_t length;
   u_int16_t value_len;
 
-  length = ndpi_asn1_ber_decode_length(&packet->payload[*kasn1_offset],
-				       packet->payload_packet_len - *kasn1_offset,
-				       &value_len);
+  length = asn1_ber_decode_length(&packet->payload[*kasn1_offset],
+				  packet->payload_packet_len - *kasn1_offset,
+				  &value_len);
 
   if (length == -1 ||
       packet->payload_packet_len < *kasn1_offset + value_len + length)
