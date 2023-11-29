@@ -96,7 +96,6 @@ static int fcgi_parse_params(struct ndpi_flow_struct * const flow,
     { "HTTP_HOST", &packet->host_line },
     { "HTTP_ACCEPT", &packet->accept_line },
     { "HTTP_USER_AGENT", &packet->user_agent_line },
-    { "HTTP_ACCEPT_ENCODING", &packet->http_transfer_encoding },
     { "SERVER_SOFTWARE", &packet->server_line },
     { "REQUEST_METHOD", &packet->http_method }
   };

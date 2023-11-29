@@ -7588,14 +7588,13 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
     packet->authorization_line.len = 0, packet->authorization_line.ptr = NULL,
     packet->content_line.ptr = NULL, packet->content_line.len = 0, packet->accept_line.ptr = NULL,
     packet->accept_line.len = 0, packet->user_agent_line.ptr = NULL, packet->user_agent_line.len = 0,
-    packet->http_url_name.ptr = NULL, packet->http_url_name.len = 0, packet->http_encoding.ptr = NULL,
-    packet->http_encoding.len = 0, packet->http_transfer_encoding.ptr = NULL, packet->http_transfer_encoding.len = 0,
-    packet->http_contentlen.ptr = NULL, packet->http_contentlen.len = 0, packet->content_disposition_line.ptr = NULL,
-    packet->content_disposition_line.len = 0, packet->http_cookie.ptr = NULL,
-    packet->http_cookie.len = 0, packet->http_origin.len = 0, packet->http_origin.ptr = NULL,
-    packet->http_x_session_type.ptr = NULL, packet->http_x_session_type.len = 0, packet->server_line.ptr = NULL,
+    packet->http_url_name.ptr = NULL, packet->http_url_name.len = 0,
+    packet->content_disposition_line.ptr = NULL,
+    packet->content_disposition_line.len = 0,
+    packet->http_origin.len = 0, packet->http_origin.ptr = NULL,
+    packet->server_line.ptr = NULL,
     packet->server_line.len = 0, packet->http_method.ptr = NULL, packet->http_method.len = 0,
-    packet->http_response.ptr = NULL, packet->http_response.len = 0, packet->http_num_headers = 0,
+    packet->http_response.ptr = NULL, packet->http_response.len = 0,
     packet->forwarded_line.ptr = NULL, packet->forwarded_line.len = 0;
 }
 
@@ -8171,206 +8170,116 @@ u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t *str, u_int16_t max_chars_to_re
 
 /* ********************************************************************************* */
 
-void ndpi_parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+struct header_line {
+  char *name;
+  struct ndpi_int_one_line_struct *line;
+};
+
+static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow)
+{
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
+  struct ndpi_int_one_line_struct *line;
+  size_t length;
+  struct header_line *hs = NULL;
+  struct header_line *h;
+  /* Some bogus response doesn't have the space after ":". Skip leading spaces later...  */
+  struct header_line headers_a[] = { { "Accept:", &packet->accept_line },
+                                     { "Authorization:", &packet->authorization_line },
+                                     { NULL, NULL} };
+  struct header_line headers_u[] = { { "User-agent:", &packet->user_agent_line },
+                                     { NULL, NULL} };
+  struct header_line headers_c[] = { { "Content-Disposition:", &packet->content_disposition_line },
+                                     { "Content-type:", &packet->content_line },
+                                     { NULL, NULL} };
+  struct header_line headers_o[] = { { "Origin:", &packet->http_origin },
+                                     { NULL, NULL} };
+  struct header_line headers_h[] = { { "Host:", &packet->host_line },
+                                     { NULL, NULL} };
+  struct header_line headers_x[] = { { "X-Forwarded-For:", &packet->forwarded_line },
+                                     { NULL, NULL} };
+  struct header_line headers_r[] = { { "Referer:", &packet->referer_line },
+                                     { NULL, NULL} };
+  struct header_line headers_s[] = { { "Server:", &packet->server_line },
+                                     { NULL, NULL} };
+
+
+  line = &packet->line[packet->parsed_lines];
+  if(line->len == 0)
+    return;
 
   /* First line of a HTTP response parsing. Expected a "HTTP/1.? ???" */
-  if(packet->parsed_lines == 0 && packet->line[0].len >= NDPI_STATICSTRING_LEN("HTTP/1.X 200 ") &&
-     strncasecmp((const char *) packet->line[0].ptr, "HTTP/1.", NDPI_STATICSTRING_LEN("HTTP/1.")) == 0 &&
-     packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] > '0' && /* response code between 000 and 699 */
-     packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] < '6') {
-    packet->http_response.ptr = &packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.1 ")];
-    packet->http_response.len = packet->line[0].len - NDPI_STATICSTRING_LEN("HTTP/1.1 ");
-    packet->http_num_headers++;
+  if(packet->parsed_lines == 0 && line->len >= NDPI_STATICSTRING_LEN("HTTP/1.X 200 ") &&
+     strncasecmp((const char *)line->ptr, "HTTP/1.", NDPI_STATICSTRING_LEN("HTTP/1.")) == 0 &&
+     line->ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] > '0' && /* response code between 000 and 699 */
+     line->ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] < '6') {
+    packet->http_response.ptr = &line->ptr[NDPI_STATICSTRING_LEN("HTTP/1.1 ")];
+    packet->http_response.len = line->len - NDPI_STATICSTRING_LEN("HTTP/1.1 ");
+    return;
   }
-
-  if((packet->parsed_lines == 0) && (packet->line[0].len > 0)) {
+  if(packet->parsed_lines == 0 && line->len > 0) {
     /*
        Check if the file contains a : otherwise ignore the line as this
        line i slike "GET /....
     */
-
-    if(memchr((char*)packet->line[0].ptr, ':', packet->line[0].len) == NULL)
+    if(memchr((char *)line->ptr, ':', line->len) == NULL)
       return;
   }
 
-  /* "Server:" header line in HTTP response */
-  if(packet->line[packet->parsed_lines].len > NDPI_STATICSTRING_LEN("Server:") + 1 &&
-     strncasecmp((const char *) packet->line[packet->parsed_lines].ptr,
-		 "Server:", NDPI_STATICSTRING_LEN("Server:")) == 0) {
-    // some stupid clients omit a space and place the servername directly after the colon
-    if(packet->line[packet->parsed_lines].ptr[NDPI_STATICSTRING_LEN("Server:")] == ' ') {
-      packet->server_line.ptr =
-	&packet->line[packet->parsed_lines].ptr[NDPI_STATICSTRING_LEN("Server:") + 1];
-      packet->server_line.len =
-	packet->line[packet->parsed_lines].len - (NDPI_STATICSTRING_LEN("Server:") + 1);
-    } else {
-      packet->server_line.ptr = &packet->line[packet->parsed_lines].ptr[NDPI_STATICSTRING_LEN("Server:")];
-      packet->server_line.len = packet->line[packet->parsed_lines].len - NDPI_STATICSTRING_LEN("Server:");
-    }
-    packet->http_num_headers++;
-  } else
-    /* "Host:" header line in HTTP request */
-    if(packet->line[packet->parsed_lines].len > 6 &&
-       strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Host:", 5) == 0) {
-      // some stupid clients omit a space and place the hostname directly after the colon
-      if(packet->line[packet->parsed_lines].ptr[5] == ' ') {
-	packet->host_line.ptr = &packet->line[packet->parsed_lines].ptr[6];
-	packet->host_line.len = packet->line[packet->parsed_lines].len - 6;
-      } else {
-	packet->host_line.ptr = &packet->line[packet->parsed_lines].ptr[5];
-	packet->host_line.len = packet->line[packet->parsed_lines].len - 5;
+  switch(line->ptr[0]) {
+  case 'a':
+  case 'A':
+    hs = headers_a;
+    break;
+  case 'c':
+  case 'C':
+    hs = headers_c;
+    break;
+  case 'h':
+  case 'H':
+    hs = headers_h;
+    break;
+  case 'o':
+  case 'O':
+    hs = headers_o;
+    break;
+  case 'r':
+  case 'R':
+    hs = headers_r;
+    break;
+  case 's':
+  case 'S':
+    hs = headers_s;
+    break;
+  case 'u':
+  case 'U':
+    hs = headers_u;
+    break;
+  case 'x':
+  case 'X':
+    hs = headers_x;
+    break;
+  default:
+    return;
+  }
+
+  for(h = &hs[0]; h->name; h++) {
+    length = strlen(h->name);
+    if(line->len > length &&
+       strncasecmp((const char *)line->ptr, h->name, length) == 0) {
+      h->line->ptr = &line->ptr[length];
+      h->line->len = line->len - length;
+
+      /* Stripping leading spaces */
+      while(h->line->len > 0 && h->line->ptr[0] == ' ') {
+        h->line->len--;
+        h->line->ptr++;
       }
-      packet->http_num_headers++;
-    } else
-      /* "X-Forwarded-For:" header line in HTTP request. Commonly used for HTTP proxies. */
-      if(packet->line[packet->parsed_lines].len > 17 &&
-	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "X-Forwarded-For:", 16) == 0) {
-	// some stupid clients omit a space and place the hostname directly after the colon
-	if(packet->line[packet->parsed_lines].ptr[16] == ' ') {
-	  packet->forwarded_line.ptr = &packet->line[packet->parsed_lines].ptr[17];
-	  packet->forwarded_line.len = packet->line[packet->parsed_lines].len - 17;
-	} else {
-	  packet->forwarded_line.ptr = &packet->line[packet->parsed_lines].ptr[16];
-	  packet->forwarded_line.len = packet->line[packet->parsed_lines].len - 16;
-	}
-	packet->http_num_headers++;
-      } else
+      if(h->line->len == 0)
+        h->line->ptr = NULL;
 
-	/* "Authorization:" header line in HTTP. */
-	if(packet->line[packet->parsed_lines].len > 15 &&
-	   (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Authorization: ", 15) == 0)) {
-	  packet->authorization_line.ptr = &packet->line[packet->parsed_lines].ptr[15];
-	  packet->authorization_line.len = packet->line[packet->parsed_lines].len - 15;
-
-	  while((packet->authorization_line.len > 0) && (packet->authorization_line.ptr[0] == ' '))
-	    packet->authorization_line.len--, packet->authorization_line.ptr++;
-	  if(packet->authorization_line.len == 0)
-	    packet->authorization_line.ptr = NULL;
-
-	  packet->http_num_headers++;
-	} else
-	  /* "Accept:" header line in HTTP request. */
-	  if(packet->line[packet->parsed_lines].len > 8 &&
-	     strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Accept: ", 8) == 0) {
-	    packet->accept_line.ptr = &packet->line[packet->parsed_lines].ptr[8];
-	    packet->accept_line.len = packet->line[packet->parsed_lines].len - 8;
-	    packet->http_num_headers++;
-	  } else
-	    /* "Referer:" header line in HTTP request. */
-	    if(packet->line[packet->parsed_lines].len > 9 &&
-	       strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Referer: ", 9) == 0) {
-	      packet->referer_line.ptr = &packet->line[packet->parsed_lines].ptr[9];
-	      packet->referer_line.len = packet->line[packet->parsed_lines].len - 9;
-	      packet->http_num_headers++;
-	    } else
-	      /* "User-Agent:" header line in HTTP request. */
-	      if(packet->line[packet->parsed_lines].len > 12 &&
-		 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "User-agent: ", 12) == 0) {
-		packet->user_agent_line.ptr = &packet->line[packet->parsed_lines].ptr[12];
-		packet->user_agent_line.len = packet->line[packet->parsed_lines].len - 12;
-		packet->http_num_headers++;
-	      } else
-		/* "Content-Encoding:" header line in HTTP response (and request?). */
-		if(packet->line[packet->parsed_lines].len > 18 &&
-		   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Encoding: ", 18) == 0) {
-		  packet->http_encoding.ptr = &packet->line[packet->parsed_lines].ptr[18];
-		  packet->http_encoding.len = packet->line[packet->parsed_lines].len - 18;
-		  packet->http_num_headers++;
-		} else
-		  /* "Transfer-Encoding:" header line in HTTP. */
-		  if(packet->line[packet->parsed_lines].len > 19 &&
-		     strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Transfer-Encoding: ", 19) == 0) {
-		    packet->http_transfer_encoding.ptr = &packet->line[packet->parsed_lines].ptr[19];
-		    packet->http_transfer_encoding.len = packet->line[packet->parsed_lines].len - 19;
-		    packet->http_num_headers++;
-		  } else
-		    /* "Content-Length:" header line in HTTP. */
-		    if(packet->line[packet->parsed_lines].len > 16 &&
-		       strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "content-length: ", 16) == 0) {
-		      packet->http_contentlen.ptr = &packet->line[packet->parsed_lines].ptr[16];
-		      packet->http_contentlen.len = packet->line[packet->parsed_lines].len - 16;
-		      packet->http_num_headers++;
-		    } else
-		      /* "Content-Disposition"*/
-		      if(packet->line[packet->parsed_lines].len > 21 &&
-			 ((strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Disposition: ", 21) == 0))) {
-			packet->content_disposition_line.ptr = &packet->line[packet->parsed_lines].ptr[21];
-			packet->content_disposition_line.len = packet->line[packet->parsed_lines].len - 21;
-			packet->http_num_headers++;
-		      } else
-			/* "Cookie:" header line in HTTP. */
-			if(packet->line[packet->parsed_lines].len > 8 &&
-			   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Cookie: ", 8) == 0) {
-			  packet->http_cookie.ptr = &packet->line[packet->parsed_lines].ptr[8];
-			  packet->http_cookie.len = packet->line[packet->parsed_lines].len - 8;
-			  packet->http_num_headers++;
-			} else
-			  /* "Origin:" header line in HTTP. */
-			  if(packet->line[packet->parsed_lines].len > 8 &&
-			     strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Origin: ", 8) == 0) {
-			    packet->http_origin.ptr = &packet->line[packet->parsed_lines].ptr[8];
-			    packet->http_origin.len = packet->line[packet->parsed_lines].len - 8;
-			    packet->http_num_headers++;
-			  } else
-			    /* "X-Session-Type:" header line in HTTP. */
-			    if(packet->line[packet->parsed_lines].len > 16 &&
-			       strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "X-Session-Type: ", 16) == 0) {
-			      packet->http_x_session_type.ptr = &packet->line[packet->parsed_lines].ptr[16];
-			      packet->http_x_session_type.len = packet->line[packet->parsed_lines].len - 16;
-			      packet->http_num_headers++;
-			    } else
-			      /* Identification and counting of other HTTP headers.
-			       * We consider the most common headers, but there are many others,
-			       * which can be seen at references below:
-			       * - https://tools.ietf.org/html/rfc7230
-			       * - https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
-			       */
-			      if((packet->line[packet->parsed_lines].len > 6 &&
-				  (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Date: ", 6) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Vary: ", 6) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "ETag: ", 6) == 0)) ||
-				 (packet->line[packet->parsed_lines].len > 8 &&
-				  strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Pragma: ", 8) == 0) ||
-				 (packet->line[packet->parsed_lines].len > 9 &&
-				  strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Expires: ", 9) == 0) ||
-				 (packet->line[packet->parsed_lines].len > 12 &&
-				  (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Set-Cookie: ", 12) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Keep-Alive: ", 12) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Connection: ", 12) == 0)) ||
-				 (packet->line[packet->parsed_lines].len > 15 &&
-				  (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Last-Modified: ", 15) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Accept-Ranges: ", 15) == 0)) ||
-				 (packet->line[packet->parsed_lines].len > 17 &&
-				  (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Accept-Language: ", 17) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Accept-Encoding: ", 17) == 0)) ||
-				 (packet->line[packet->parsed_lines].len > 27 &&
-				  strncasecmp((const char *) packet->line[packet->parsed_lines].ptr,
-					      "Upgrade-Insecure-Requests: ", 27) == 0)) {
-				/* Just count. In the future, if needed, this if can be splited to parse these headers */
-				packet->http_num_headers++;
-			      } else
-				/* "Content-Type:" header line in HTTP. */
-				if(packet->line[packet->parsed_lines].len > 14 &&
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0 ) {
-				  packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
-				  packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
-
-				  while((packet->content_line.len > 0) && (packet->content_line.ptr[0] == ' '))
-				    packet->content_line.len--, packet->content_line.ptr++;
-				  if(packet->content_line.len == 0)
-				    packet->content_line.ptr = NULL;;
-
-				  packet->http_num_headers++;
-				} else
-
-				  /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
-				  if((packet->content_line.len == 0) && (packet->line[packet->parsed_lines].len > 13) &&
-				     (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0)) {
-				    packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[13];
-				    packet->content_line.len = packet->line[packet->parsed_lines].len - 13;
-				    packet->http_num_headers++;
-				  }
+      break;
+    }
+  }
 
   if(packet->content_line.len > 0) {
     /* application/json; charset=utf-8 */
@@ -8385,6 +8294,8 @@ void ndpi_parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str
     }
   }
 }
+
+
 
 /* ********************************************************************************* */
 
@@ -8428,7 +8339,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
       packet->line[packet->parsed_lines].len =
 	(u_int16_t)(((size_t) &packet->payload[a]) - ((size_t) packet->line[packet->parsed_lines].ptr));
 
-      ndpi_parse_single_packet_line(ndpi_str, flow);
+      parse_single_packet_line(ndpi_str, flow);
 
       if(packet->line[packet->parsed_lines].len == 0) {
 	packet->empty_line_position = a;
@@ -8451,7 +8362,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
       (u_int16_t)(((size_t) &packet->payload[packet->payload_packet_len]) -
 		  ((size_t) packet->line[packet->parsed_lines].ptr));
 
-    ndpi_parse_single_packet_line(ndpi_str, flow);
+    parse_single_packet_line(ndpi_str, flow);
     packet->parsed_lines++;
   }
 }
