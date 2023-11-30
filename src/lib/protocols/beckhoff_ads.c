@@ -38,10 +38,19 @@ struct ams_tcp_hdr {
 } PACK_OFF;
 
 struct ams_hdr {
+#if defined(__LITTLE_ENDIAN__)
   u_int64_t target_netid : 48;
   u_int64_t target_port : 16;
   u_int64_t source_netid : 48;
   u_int64_t source_port : 16;
+#elif defined(__BIG_ENDIAN__)
+  u_int64_t target_port : 16;
+  u_int64_t target_netid : 48;
+  u_int64_t source_port : 16;
+  u_int64_t source_netid : 48;
+#else
+#error "Missing endian macro definitions."
+#endif
   u_int16_t command_id;
   u_int16_t state_flags;
   u_int32_t length;
@@ -82,12 +91,14 @@ static void ndpi_search_beckhoff_ads(struct ndpi_detection_module_struct *ndpi_s
     if (le32toh(ams->length) == ams_data_len) {
       /* Just additional checks to avoid potential 
        * false positives */
-      if ((ams->state_flags != 0x0004) && (ams->state_flags != 0x0005))
+      if ((le16toh(ams->state_flags) != 0x0004) && 
+          (le16toh(ams->state_flags) != 0x0005))
       {
         goto not_beckhoff_ads;
       }
       
-      if ((ams->command_id > 0x0009) || (ams->error_code > 0x0000001E))
+      if ((le16toh(ams->command_id) > 0x0009) || 
+          (le32toh(ams->error_code) > 0x0000001E))
       {
         goto not_beckhoff_ads;
       }
