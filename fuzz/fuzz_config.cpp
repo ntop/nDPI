@@ -1,4 +1,5 @@
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 #include "ndpi_classify.h"
 #include "fuzz_common_code.h"
 
@@ -204,7 +205,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_http_method(ndpi_info_mod, bool_value ? &flow : NULL);
   ndpi_get_http_url(ndpi_info_mod, &flow);
   ndpi_get_http_content_type(ndpi_info_mod, &flow);
-  ndpi_check_for_email_address(ndpi_info_mod, 0);
+  check_for_email_address(ndpi_info_mod, 0);
   ndpi_get_flow_name(bool_value ? &flow : NULL);
   /* ndpi_guess_undetected_protocol() is a "strange" function. Try fuzzing it, here */
   if(!ndpi_is_protocol_detected(ndpi_info_mod, p)) {

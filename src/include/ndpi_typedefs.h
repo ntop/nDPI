@@ -29,7 +29,6 @@ E * ndpi_typedefs.h
 #include "ndpi_includes.h"
 #endif
 #include "ndpi_protocol_ids.h"
-#include "ndpi_utils.h"
 
 /* Used by both nDPI core and patricia code under third-party */
 #include "ndpi_patricia_typedefs.h"
@@ -235,11 +234,6 @@ typedef enum {
    ndpi_leaf
 } ndpi_VISIT;
 
-/* NDPI_NODE */
-typedef struct node_t {
-  char *key;
-  struct node_t *left, *right;
-} ndpi_node;
 
 /* NDPI_MASK_SIZE */
 typedef u_int32_t ndpi_ndpi_mask;
@@ -634,9 +628,6 @@ struct ndpi_flow_input_info {
   unsigned char in_pkt_dir;
   unsigned char seen_flow_beginning;
 };
-
-/* Save memory limiting the key to 56 bit */
-//#define SAVE_BINARY_BITMAP_MEMORY
 
 PACK_ON
 struct ndpi_binary_bitmap_entry {
@@ -1501,16 +1492,6 @@ typedef struct {
   ndpi_protocol_breed_t protocol_breed;
   int level; /* NDPI_PROTOCOL_DEFAULT_LEVEL (0) by default */
 } ndpi_protocol_match;
-
-typedef struct {
-  char *string_to_match;
-  ndpi_protocol_category_t protocol_category;
-} ndpi_category_match;
-
-typedef struct {
-  char *string_to_match;
-  u_int16_t protocol_id;
-} ndpi_tls_cert_name_match;
 
 typedef struct {
   u_int32_t network;

@@ -250,7 +250,6 @@
   <ItemGroup>
     <ClInclude Include="..\src\include\ndpi_includes.h" />
     <ClInclude Include="..\src\include\ndpi_protocol_ids.h" />
-    <ClInclude Include="..\src\include\ndpi_protocols.h" />
     <ClInclude Include="..\src\include\ndpi_typedefs.h" />
     <ClInclude Include="..\src\include\ndpi_unix.h" />
     <ClInclude Include="..\src\include\ndpi_win32.h" />
@@ -259,7 +258,6 @@
     <ClInclude Include="src\dirent.h" />
     <ClInclude Include="..\src\include\ndpi_encryption.h" />
     <ClInclude Include="..\src\include\ndpi_main.h" />
-    <ClInclude Include="..\src\include\ndpi_utils.h" />
     <ClInclude Include="..\src\lib\third_party\include\gcrypt_light.h" />
     <ClInclude Include="..\src\lib\third_party\include\MurmurHash3.h" />
     <ClInclude Include="..\src\lib\third_party\include\rce_injection.h" />

@@ -3982,8 +3982,8 @@ u_int8_t is_udp_not_guessable_protocol(u_int16_t l7_guessed_proto) {
 
 /* ****************************************************** */
 
-u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-                                 u_int8_t proto, u_int16_t sport, u_int16_t dport, u_int8_t *user_defined_proto) {
+static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                                   u_int8_t proto, u_int16_t sport, u_int16_t dport, u_int8_t *user_defined_proto) {
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
   *user_defined_proto = 0; /* Default */
 
@@ -4036,7 +4036,7 @@ u_int16_t ndpi_guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, 
 		ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_ENTROPY, str);
 	    }
 
-	    u_int16_t chksm = ndpi_calculate_icmp4_checksum(packet->payload, packet->payload_packet_len);
+	    u_int16_t chksm = icmp4_checksum(packet->payload, packet->payload_packet_len);
 	    if(chksm) {
 	      ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, NULL);
 	    }
@@ -6995,7 +6995,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
 /* ********************************************************************************* */
 
-u_int32_t ndpi_ip_port_hash_funct(u_int32_t ip, u_int16_t port) {
+u_int32_t ip_port_hash_funct(u_int32_t ip, u_int16_t port) {
   return(ip + 3 * port);
 }
 
@@ -7114,12 +7114,12 @@ static void ndpi_check_tcp_flags(struct ndpi_detection_module_struct *ndpi_str,
 
   if((flow->l4.tcp.cli2srv_tcp_flags & TH_SYN)
      && (flow->l4.tcp.srv2cli_tcp_flags & TH_RST)
-     && (flow->all_packets_counter < 5 /* Ignore connections terminated by RST but that exchanged data (3WH + RST) */)
+     && (flow->packet_counter == 0 /* Ignore connections terminated by RST but that exchanged data (3WH + RST) */)
      )
     ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "Connection refused (server)");
   else if((flow->l4.tcp.cli2srv_tcp_flags & TH_SYN)
 	  && (flow->l4.tcp.cli2srv_tcp_flags & TH_RST)
-	  && (flow->all_packets_counter < 5 /* Ignore connections terminated by RST but that exchanged data (3WH + RST) */)
+	  && (flow->packet_counter == 0 /* Ignore connections terminated by RST but that exchanged data (3WH + RST) */)
      )
     ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "Connection refused (client)");
   else if((flow->l4.tcp.srv2cli_tcp_flags & TH_RST) && (flow->packet_direction_complete_counter[1 /* server -> client */] == 1))
@@ -7595,14 +7595,13 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
     packet->authorization_line.len = 0, packet->authorization_line.ptr = NULL,
     packet->content_line.ptr = NULL, packet->content_line.len = 0, packet->accept_line.ptr = NULL,
     packet->accept_line.len = 0, packet->user_agent_line.ptr = NULL, packet->user_agent_line.len = 0,
-    packet->http_url_name.ptr = NULL, packet->http_url_name.len = 0, packet->http_encoding.ptr = NULL,
-    packet->http_encoding.len = 0, packet->http_transfer_encoding.ptr = NULL, packet->http_transfer_encoding.len = 0,
-    packet->http_contentlen.ptr = NULL, packet->http_contentlen.len = 0, packet->content_disposition_line.ptr = NULL,
-    packet->content_disposition_line.len = 0, packet->http_cookie.ptr = NULL,
-    packet->http_cookie.len = 0, packet->http_origin.len = 0, packet->http_origin.ptr = NULL,
-    packet->http_x_session_type.ptr = NULL, packet->http_x_session_type.len = 0, packet->server_line.ptr = NULL,
+    packet->http_url_name.ptr = NULL, packet->http_url_name.len = 0,
+    packet->content_disposition_line.ptr = NULL,
+    packet->content_disposition_line.len = 0,
+    packet->http_origin.len = 0, packet->http_origin.ptr = NULL,
+    packet->server_line.ptr = NULL,
     packet->server_line.len = 0, packet->http_method.ptr = NULL, packet->http_method.len = 0,
-    packet->http_response.ptr = NULL, packet->http_response.len = 0, packet->http_num_headers = 0,
+    packet->http_response.ptr = NULL, packet->http_response.len = 0,
     packet->forwarded_line.ptr = NULL, packet->forwarded_line.len = 0;
 }
 
@@ -7653,9 +7652,9 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
     u_int8_t user_defined_proto;
 
     /* guess protocol */
-    flow->guessed_protocol_id = (int16_t) ndpi_guess_protocol_id(ndpi_str, flow, flow->l4_proto,
-								 ntohs(flow->c_port), ntohs(flow->s_port),
-								 &user_defined_proto);
+    flow->guessed_protocol_id = (int16_t) guess_protocol_id(ndpi_str, flow, flow->l4_proto,
+							    ntohs(flow->c_port), ntohs(flow->s_port),
+							    &user_defined_proto);
     flow->guessed_protocol_id_by_ip = ndpi_guess_host_protocol_id(ndpi_str, flow);
 
     ret->protocol_by_ip = flow->guessed_protocol_id_by_ip;
@@ -8178,206 +8177,116 @@ u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t *str, u_int16_t max_chars_to_re
 
 /* ********************************************************************************* */
 
-void ndpi_parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+struct header_line {
+  char *name;
+  struct ndpi_int_one_line_struct *line;
+};
+
+static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow)
+{
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
+  struct ndpi_int_one_line_struct *line;
+  size_t length;
+  struct header_line *hs = NULL;
+  struct header_line *h;
+  /* Some bogus response doesn't have the space after ":". Skip leading spaces later...  */
+  struct header_line headers_a[] = { { "Accept:", &packet->accept_line },
+                                     { "Authorization:", &packet->authorization_line },
+                                     { NULL, NULL} };
+  struct header_line headers_u[] = { { "User-agent:", &packet->user_agent_line },
+                                     { NULL, NULL} };
+  struct header_line headers_c[] = { { "Content-Disposition:", &packet->content_disposition_line },
+                                     { "Content-type:", &packet->content_line },
+                                     { NULL, NULL} };
+  struct header_line headers_o[] = { { "Origin:", &packet->http_origin },
+                                     { NULL, NULL} };
+  struct header_line headers_h[] = { { "Host:", &packet->host_line },
+                                     { NULL, NULL} };
+  struct header_line headers_x[] = { { "X-Forwarded-For:", &packet->forwarded_line },
+                                     { NULL, NULL} };
+  struct header_line headers_r[] = { { "Referer:", &packet->referer_line },
+                                     { NULL, NULL} };
+  struct header_line headers_s[] = { { "Server:", &packet->server_line },
+                                     { NULL, NULL} };
+
+
+  line = &packet->line[packet->parsed_lines];
+  if(line->len == 0)
+    return;
 
   /* First line of a HTTP response parsing. Expected a "HTTP/1.? ???" */
-  if(packet->parsed_lines == 0 && packet->line[0].len >= NDPI_STATICSTRING_LEN("HTTP/1.X 200 ") &&
-     strncasecmp((const char *) packet->line[0].ptr, "HTTP/1.", NDPI_STATICSTRING_LEN("HTTP/1.")) == 0 &&
-     packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] > '0' && /* response code between 000 and 699 */
-     packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] < '6') {
-    packet->http_response.ptr = &packet->line[0].ptr[NDPI_STATICSTRING_LEN("HTTP/1.1 ")];
-    packet->http_response.len = packet->line[0].len - NDPI_STATICSTRING_LEN("HTTP/1.1 ");
-    packet->http_num_headers++;
+  if(packet->parsed_lines == 0 && line->len >= NDPI_STATICSTRING_LEN("HTTP/1.X 200 ") &&
+     strncasecmp((const char *)line->ptr, "HTTP/1.", NDPI_STATICSTRING_LEN("HTTP/1.")) == 0 &&
+     line->ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] > '0' && /* response code between 000 and 699 */
+     line->ptr[NDPI_STATICSTRING_LEN("HTTP/1.X ")] < '6') {
+    packet->http_response.ptr = &line->ptr[NDPI_STATICSTRING_LEN("HTTP/1.1 ")];
+    packet->http_response.len = line->len - NDPI_STATICSTRING_LEN("HTTP/1.1 ");
+    return;
   }
-
-  if((packet->parsed_lines == 0) && (packet->line[0].len > 0)) {
+  if(packet->parsed_lines == 0 && line->len > 0) {
     /*
        Check if the file contains a : otherwise ignore the line as this
        line i slike "GET /....
     */
-
-    if(memchr((char*)packet->line[0].ptr, ':', packet->line[0].len) == NULL)
+    if(memchr((char *)line->ptr, ':', line->len) == NULL)
       return;
   }
 
-  /* "Server:" header line in HTTP response */
-  if(packet->line[packet->parsed_lines].len > NDPI_STATICSTRING_LEN("Server:") + 1 &&
-     strncasecmp((const char *) packet->line[packet->parsed_lines].ptr,
-		 "Server:", NDPI_STATICSTRING_LEN("Server:")) == 0) {
-    // some stupid clients omit a space and place the servername directly after the colon
-    if(packet->line[packet->parsed_lines].ptr[NDPI_STATICSTRING_LEN("Server:")] == ' ') {
-      packet->server_line.ptr =
-	&packet->line[packet->parsed_lines].ptr[NDPI_STATICSTRING_LEN("Server:") + 1];
-      packet->server_line.len =
-	packet->line[packet->parsed_lines].len - (NDPI_STATICSTRING_LEN("Server:") + 1);
-    } else {
-      packet->server_line.ptr = &packet->line[packet->parsed_lines].ptr[NDPI_STATICSTRING_LEN("Server:")];
-      packet->server_line.len = packet->line[packet->parsed_lines].len - NDPI_STATICSTRING_LEN("Server:");
-    }
-    packet->http_num_headers++;
-  } else
-    /* "Host:" header line in HTTP request */
-    if(packet->line[packet->parsed_lines].len > 6 &&
-       strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Host:", 5) == 0) {
-      // some stupid clients omit a space and place the hostname directly after the colon
-      if(packet->line[packet->parsed_lines].ptr[5] == ' ') {
-	packet->host_line.ptr = &packet->line[packet->parsed_lines].ptr[6];
-	packet->host_line.len = packet->line[packet->parsed_lines].len - 6;
-      } else {
-	packet->host_line.ptr = &packet->line[packet->parsed_lines].ptr[5];
-	packet->host_line.len = packet->line[packet->parsed_lines].len - 5;
+  switch(line->ptr[0]) {
+  case 'a':
+  case 'A':
+    hs = headers_a;
+    break;
+  case 'c':
+  case 'C':
+    hs = headers_c;
+    break;
+  case 'h':
+  case 'H':
+    hs = headers_h;
+    break;
+  case 'o':
+  case 'O':
+    hs = headers_o;
+    break;
+  case 'r':
+  case 'R':
+    hs = headers_r;
+    break;
+  case 's':
+  case 'S':
+    hs = headers_s;
+    break;
+  case 'u':
+  case 'U':
+    hs = headers_u;
+    break;
+  case 'x':
+  case 'X':
+    hs = headers_x;
+    break;
+  default:
+    return;
+  }
+
+  for(h = &hs[0]; h->name; h++) {
+    length = strlen(h->name);
+    if(line->len > length &&
+       strncasecmp((const char *)line->ptr, h->name, length) == 0) {
+      h->line->ptr = &line->ptr[length];
+      h->line->len = line->len - length;
+
+      /* Stripping leading spaces */
+      while(h->line->len > 0 && h->line->ptr[0] == ' ') {
+        h->line->len--;
+        h->line->ptr++;
       }
-      packet->http_num_headers++;
-    } else
-      /* "X-Forwarded-For:" header line in HTTP request. Commonly used for HTTP proxies. */
-      if(packet->line[packet->parsed_lines].len > 17 &&
-	 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "X-Forwarded-For:", 16) == 0) {
-	// some stupid clients omit a space and place the hostname directly after the colon
-	if(packet->line[packet->parsed_lines].ptr[16] == ' ') {
-	  packet->forwarded_line.ptr = &packet->line[packet->parsed_lines].ptr[17];
-	  packet->forwarded_line.len = packet->line[packet->parsed_lines].len - 17;
-	} else {
-	  packet->forwarded_line.ptr = &packet->line[packet->parsed_lines].ptr[16];
-	  packet->forwarded_line.len = packet->line[packet->parsed_lines].len - 16;
-	}
-	packet->http_num_headers++;
-      } else
+      if(h->line->len == 0)
+        h->line->ptr = NULL;
 
-	/* "Authorization:" header line in HTTP. */
-	if(packet->line[packet->parsed_lines].len > 15 &&
-	   (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Authorization: ", 15) == 0)) {
-	  packet->authorization_line.ptr = &packet->line[packet->parsed_lines].ptr[15];
-	  packet->authorization_line.len = packet->line[packet->parsed_lines].len - 15;
-
-	  while((packet->authorization_line.len > 0) && (packet->authorization_line.ptr[0] == ' '))
-	    packet->authorization_line.len--, packet->authorization_line.ptr++;
-	  if(packet->authorization_line.len == 0)
-	    packet->authorization_line.ptr = NULL;
-
-	  packet->http_num_headers++;
-	} else
-	  /* "Accept:" header line in HTTP request. */
-	  if(packet->line[packet->parsed_lines].len > 8 &&
-	     strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Accept: ", 8) == 0) {
-	    packet->accept_line.ptr = &packet->line[packet->parsed_lines].ptr[8];
-	    packet->accept_line.len = packet->line[packet->parsed_lines].len - 8;
-	    packet->http_num_headers++;
-	  } else
-	    /* "Referer:" header line in HTTP request. */
-	    if(packet->line[packet->parsed_lines].len > 9 &&
-	       strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Referer: ", 9) == 0) {
-	      packet->referer_line.ptr = &packet->line[packet->parsed_lines].ptr[9];
-	      packet->referer_line.len = packet->line[packet->parsed_lines].len - 9;
-	      packet->http_num_headers++;
-	    } else
-	      /* "User-Agent:" header line in HTTP request. */
-	      if(packet->line[packet->parsed_lines].len > 12 &&
-		 strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "User-agent: ", 12) == 0) {
-		packet->user_agent_line.ptr = &packet->line[packet->parsed_lines].ptr[12];
-		packet->user_agent_line.len = packet->line[packet->parsed_lines].len - 12;
-		packet->http_num_headers++;
-	      } else
-		/* "Content-Encoding:" header line in HTTP response (and request?). */
-		if(packet->line[packet->parsed_lines].len > 18 &&
-		   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Encoding: ", 18) == 0) {
-		  packet->http_encoding.ptr = &packet->line[packet->parsed_lines].ptr[18];
-		  packet->http_encoding.len = packet->line[packet->parsed_lines].len - 18;
-		  packet->http_num_headers++;
-		} else
-		  /* "Transfer-Encoding:" header line in HTTP. */
-		  if(packet->line[packet->parsed_lines].len > 19 &&
-		     strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Transfer-Encoding: ", 19) == 0) {
-		    packet->http_transfer_encoding.ptr = &packet->line[packet->parsed_lines].ptr[19];
-		    packet->http_transfer_encoding.len = packet->line[packet->parsed_lines].len - 19;
-		    packet->http_num_headers++;
-		  } else
-		    /* "Content-Length:" header line in HTTP. */
-		    if(packet->line[packet->parsed_lines].len > 16 &&
-		       strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "content-length: ", 16) == 0) {
-		      packet->http_contentlen.ptr = &packet->line[packet->parsed_lines].ptr[16];
-		      packet->http_contentlen.len = packet->line[packet->parsed_lines].len - 16;
-		      packet->http_num_headers++;
-		    } else
-		      /* "Content-Disposition"*/
-		      if(packet->line[packet->parsed_lines].len > 21 &&
-			 ((strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Disposition: ", 21) == 0))) {
-			packet->content_disposition_line.ptr = &packet->line[packet->parsed_lines].ptr[21];
-			packet->content_disposition_line.len = packet->line[packet->parsed_lines].len - 21;
-			packet->http_num_headers++;
-		      } else
-			/* "Cookie:" header line in HTTP. */
-			if(packet->line[packet->parsed_lines].len > 8 &&
-			   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Cookie: ", 8) == 0) {
-			  packet->http_cookie.ptr = &packet->line[packet->parsed_lines].ptr[8];
-			  packet->http_cookie.len = packet->line[packet->parsed_lines].len - 8;
-			  packet->http_num_headers++;
-			} else
-			  /* "Origin:" header line in HTTP. */
-			  if(packet->line[packet->parsed_lines].len > 8 &&
-			     strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Origin: ", 8) == 0) {
-			    packet->http_origin.ptr = &packet->line[packet->parsed_lines].ptr[8];
-			    packet->http_origin.len = packet->line[packet->parsed_lines].len - 8;
-			    packet->http_num_headers++;
-			  } else
-			    /* "X-Session-Type:" header line in HTTP. */
-			    if(packet->line[packet->parsed_lines].len > 16 &&
-			       strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "X-Session-Type: ", 16) == 0) {
-			      packet->http_x_session_type.ptr = &packet->line[packet->parsed_lines].ptr[16];
-			      packet->http_x_session_type.len = packet->line[packet->parsed_lines].len - 16;
-			      packet->http_num_headers++;
-			    } else
-			      /* Identification and counting of other HTTP headers.
-			       * We consider the most common headers, but there are many others,
-			       * which can be seen at references below:
-			       * - https://tools.ietf.org/html/rfc7230
-			       * - https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
-			       */
-			      if((packet->line[packet->parsed_lines].len > 6 &&
-				  (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Date: ", 6) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Vary: ", 6) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "ETag: ", 6) == 0)) ||
-				 (packet->line[packet->parsed_lines].len > 8 &&
-				  strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Pragma: ", 8) == 0) ||
-				 (packet->line[packet->parsed_lines].len > 9 &&
-				  strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Expires: ", 9) == 0) ||
-				 (packet->line[packet->parsed_lines].len > 12 &&
-				  (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Set-Cookie: ", 12) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Keep-Alive: ", 12) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Connection: ", 12) == 0)) ||
-				 (packet->line[packet->parsed_lines].len > 15 &&
-				  (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Last-Modified: ", 15) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Accept-Ranges: ", 15) == 0)) ||
-				 (packet->line[packet->parsed_lines].len > 17 &&
-				  (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Accept-Language: ", 17) == 0 ||
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Accept-Encoding: ", 17) == 0)) ||
-				 (packet->line[packet->parsed_lines].len > 27 &&
-				  strncasecmp((const char *) packet->line[packet->parsed_lines].ptr,
-					      "Upgrade-Insecure-Requests: ", 27) == 0)) {
-				/* Just count. In the future, if needed, this if can be splited to parse these headers */
-				packet->http_num_headers++;
-			      } else
-				/* "Content-Type:" header line in HTTP. */
-				if(packet->line[packet->parsed_lines].len > 14 &&
-				   strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-Type: ", 14) == 0 ) {
-				  packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[14];
-				  packet->content_line.len = packet->line[packet->parsed_lines].len - 14;
-
-				  while((packet->content_line.len > 0) && (packet->content_line.ptr[0] == ' '))
-				    packet->content_line.len--, packet->content_line.ptr++;
-				  if(packet->content_line.len == 0)
-				    packet->content_line.ptr = NULL;;
-
-				  packet->http_num_headers++;
-				} else
-
-				  /* "Content-Type:" header line in HTTP AGAIN. Probably a bogus response without space after ":" */
-				  if((packet->content_line.len == 0) && (packet->line[packet->parsed_lines].len > 13) &&
-				     (strncasecmp((const char *) packet->line[packet->parsed_lines].ptr, "Content-type:", 13) == 0)) {
-				    packet->content_line.ptr = &packet->line[packet->parsed_lines].ptr[13];
-				    packet->content_line.len = packet->line[packet->parsed_lines].len - 13;
-				    packet->http_num_headers++;
-				  }
+      break;
+    }
+  }
 
   if(packet->content_line.len > 0) {
     /* application/json; charset=utf-8 */
@@ -8392,6 +8301,8 @@ void ndpi_parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str
     }
   }
 }
+
+
 
 /* ********************************************************************************* */
 
@@ -8435,7 +8346,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
       packet->line[packet->parsed_lines].len =
 	(u_int16_t)(((size_t) &packet->payload[a]) - ((size_t) packet->line[packet->parsed_lines].ptr));
 
-      ndpi_parse_single_packet_line(ndpi_str, flow);
+      parse_single_packet_line(ndpi_str, flow);
 
       if(packet->line[packet->parsed_lines].len == 0) {
 	packet->empty_line_position = a;
@@ -8458,7 +8369,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
       (u_int16_t)(((size_t) &packet->payload[packet->payload_packet_len]) -
 		  ((size_t) packet->line[packet->parsed_lines].ptr));
 
-    ndpi_parse_single_packet_line(ndpi_str, flow);
+    parse_single_packet_line(ndpi_str, flow);
     packet->parsed_lines++;
   }
 }
@@ -8507,8 +8418,8 @@ void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_s
 
 /* ********************************************************************************* */
 
-u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi_str,
-				       u_int16_t counter) {
+u_int16_t check_for_email_address(struct ndpi_detection_module_struct *ndpi_str,
+				  u_int16_t counter) {
   struct ndpi_packet_struct *packet;
 
   if(!ndpi_str)
@@ -8589,24 +8500,6 @@ u_int16_t ndpi_check_for_email_address(struct ndpi_detection_module_struct *ndpi
   return(0);
 }
 
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-/* ********************************************************************************* */
-
-void ndpi_debug_get_last_log_function_line(struct ndpi_detection_module_struct *ndpi_str, const char **file,
-					   const char **func, u_int32_t *line) {
-  *file = "";
-  *func = "";
-
-  if(ndpi_str->ndpi_debug_print_file != NULL)
-    *file = ndpi_str->ndpi_debug_print_file;
-
-  if(ndpi_str->ndpi_debug_print_function != NULL)
-    *func = ndpi_str->ndpi_debug_print_function;
-
-  *line = ndpi_str->ndpi_debug_print_line;
-}
-#endif
-
 /* ********************************************************************************* */
 
 u_int8_t ndpi_detection_get_l4(const u_int8_t *l3, u_int16_t l3_len, const u_int8_t **l4_return,
@@ -8644,7 +8537,7 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, s
 
 /* ********************************************************************************* */
 
-void ndpi_reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+void reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
   flow->detected_protocol_stack[1] = NDPI_PROTOCOL_UNKNOWN;
   flow->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
   flow->confidence = NDPI_CONFIDENCE_UNKNOWN;
@@ -8713,8 +8606,8 @@ static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_s
 
 /* ********************************************************************************* */
 
-void ndpi_int_change_category(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-			      ndpi_protocol_category_t protocol_category) {
+void change_category(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+		     ndpi_protocol_category_t protocol_category) {
   flow->category = protocol_category;
 }
 
@@ -8835,7 +8728,7 @@ static ndpi_protocol ndpi_internal_guess_undetected_protocol(struct ndpi_detecti
       ret.app_protocol = NDPI_PROTOCOL_BITTORRENT;
     }
   } else {
-    ret.app_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, 0, 0, &user_defined_proto);
+    ret.app_protocol = guess_protocol_id(ndpi_str, flow, proto, 0, 0, &user_defined_proto);
   }
 
   ret.category = ndpi_get_proto_category(ndpi_str, ret);
@@ -8870,12 +8763,12 @@ ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_str
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       ret.app_protocol = rc,
-	ret.master_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
+	ret.master_protocol = guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
 
       if(ret.app_protocol == ret.master_protocol)
 	ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     } else {
-      ret.app_protocol = ndpi_guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto),
+      ret.app_protocol = guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto),
 	ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     }
 
@@ -9535,7 +9428,7 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
     ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol, NDPI_CONFIDENCE_DPI);
     if(!category_depends_on_master(master_protocol))
-      ndpi_int_change_category(ndpi_struct, flow, ret_match.protocol_category);
+      change_category(ndpi_struct, flow, ret_match.protocol_category);
 
     if(subproto == NDPI_PROTOCOL_OOKLA) {
 	ookla_add_to_cache(ndpi_struct, flow);
@@ -10101,8 +9994,8 @@ static int enough(int a, int b) {
 
 /* ******************************************************************** */
 
-u_int8_t ndpi_ends_with(struct ndpi_detection_module_struct *ndpi_struct,
-                        char *str, char *ends) {
+u_int8_t ends_with(struct ndpi_detection_module_struct *ndpi_struct,
+                   char *str, char *ends) {
   u_int str_len = str ? strlen(str) : 0;
   u_int8_t ends_len = strlen(ends);
   u_int8_t rc;
@@ -10168,12 +10061,12 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     if((!name)
        || (strchr(name, '_') != NULL)
        || (strchr(name, '-') != NULL)
-       || (ndpi_ends_with(ndpi_str, name, "in-addr.arpa"))
-       || (ndpi_ends_with(ndpi_str, name, "ip6.arpa"))
+       || (ends_with(ndpi_str, name, "in-addr.arpa"))
+       || (ends_with(ndpi_str, name, "ip6.arpa"))
        /* Ignore TLD .local .lan and .home */
-       || (ndpi_ends_with(ndpi_str, name, ".local"))
-       || (ndpi_ends_with(ndpi_str, name, ".lan"))
-       || (ndpi_ends_with(ndpi_str, name, ".home"))
+       || (ends_with(ndpi_str, name, ".local"))
+       || (ends_with(ndpi_str, name, ".lan"))
+       || (ends_with(ndpi_str, name, ".home"))
        )
       return(0);
 
@@ -10327,7 +10220,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	if((word_len = strlen(word)) < 5) continue;
 
-	if((word_len < 10) && (ndpi_ends_with(ndpi_str, word, "cdn") /* Content Delivery Network ? */))
+	if((word_len < 10) && (ends_with(ndpi_str, word, "cdn") /* Content Delivery Network ? */))
 	  continue; /* Ignore names (not too long) that end with cdn [ ssl.p.jwpcdn.com or www.awxcdn.com ] */
 
 	NDPI_LOG_DBG2(ndpi_str, "[DGA] word(%s) [%s][len: %u]\n", word, name, (unsigned int)strlen(word));

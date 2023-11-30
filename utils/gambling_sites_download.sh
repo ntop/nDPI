@@ -9,7 +9,7 @@ cd "$(dirname "${0}")" || exit 1
 LIST=../lists/107_gambling.list
 
 printf '(1) %s\n' "Scraping Illegal Gambling Sites (Belgium)"
-DOMAINS="$(curl -s 'https://www.gamingcommission.be/en/gaming-commission/illegal-games-of-chance/list-of-illegal-gambling-sites' | sed -n 's/^<td[^>]\+>\(.\+\.[a-zA-Z0-9]\+\)\(\|\/.*[^<]*\)<\/td>/\1/gp' || exit 1)"
+DOMAINS="$(curl -s 'https://www.gamingcommission.be/en/gaming-commission/illegal-games-of-chance/list-of-illegal-gambling-sites' | sed -n 's/<td[^>]\+>\([a-zA-Z0-9]\+\.[\.a-zA-Z0-9]\+\)<\/td>/###\1###/gp' | grep -oE '###[^#]+###' | tr -d '#' || exit 1)"
 is_str_empty "${DOMAINS}" "Please check gambling sites URL and sed REGEX."
 
 printf '(2) %s\n' "Downloading Gambling Sites (Poland)"

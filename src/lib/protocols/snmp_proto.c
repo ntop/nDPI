@@ -72,7 +72,7 @@ static void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
     u_int16_t len_length = 0, offset;
     int64_t len;
 
-    len = ndpi_asn1_ber_decode_length(&packet->payload[1], packet->payload_packet_len - 1, &len_length);
+    len = asn1_ber_decode_length(&packet->payload[1], packet->payload_packet_len - 1, &len_length);
 
     if(len > 2 &&
        1 + len_length + len == packet->payload_packet_len &&
@@ -106,10 +106,10 @@ static void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
           if(snmp_primitive == 2 /* Get Response */ &&
              snmp_primitive_offset + 1 < packet->payload_packet_len) {
             offset = snmp_primitive_offset + 1;
-            ndpi_asn1_ber_decode_length(&packet->payload[offset], packet->payload_packet_len - offset, &len_length);
+            asn1_ber_decode_length(&packet->payload[offset], packet->payload_packet_len - offset, &len_length);
             offset += len_length + 1;
             if(offset < packet->payload_packet_len) {
-              len = ndpi_asn1_ber_decode_length(&packet->payload[offset], packet->payload_packet_len - offset, &len_length);
+              len = asn1_ber_decode_length(&packet->payload[offset], packet->payload_packet_len - offset, &len_length);
 
               u_int8_t error_status_offset = offset + len_length + len + 2;
 

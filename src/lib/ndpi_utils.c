@@ -271,8 +271,8 @@ u_int8_t ndpi_net_match(u_int32_t ip_to_check,
   return(((ip_to_check & mask) == (net & mask)) ? 1 : 0);
 }
 
-u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
-			u_int32_t net, u_int32_t num_bits)
+u_int8_t ips_match(u_int32_t src, u_int32_t dst,
+		   u_int32_t net, u_int32_t num_bits)
 {
   return(ndpi_net_match(src, net, num_bits) || ndpi_net_match(dst, net, num_bits));
 }
@@ -2635,7 +2635,7 @@ static inline uint16_t get_n16bit(uint8_t const * cbuf) {
   return r;
 }
 
-u_int16_t ndpi_calculate_icmp4_checksum(const u_int8_t * buf, size_t len) {
+u_int16_t icmp4_checksum(const u_int8_t * buf, size_t len) {
   u_int32_t checksum = 0;
 
   /*
@@ -2944,7 +2944,7 @@ u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *nd
 
 /* ******************************************* */
 
-int64_t ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len)
+int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len)
 {
   unsigned int value, i;
 
