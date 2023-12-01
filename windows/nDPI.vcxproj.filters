@@ -120,6 +120,7 @@
     <ClCompile Include="..\src\lib\protocols\fins.c" />
     <ClCompile Include="..\src\lib\protocols\ethersio.c" />
     <ClCompile Include="..\src\lib\protocols\beckhoff_ads.c" />
+    <ClCompile Include="..\src\lib\protocols\iso9506-1-mms.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />

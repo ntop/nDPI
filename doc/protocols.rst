@@ -289,3 +289,13 @@ References: `Unofficial article: <https://ics-cert.kaspersky.com/publications/re
 Automation Device Specification is the protocol used for interfacing with Beckhoff PLCs via TwinCAT.
 
 References: `Protocol Specs: <https://infosys.beckhoff.com/english.php?content=../content/1033/tc3_ads_intro/115847307.html>`_.
+
+
+.. _Proto 366:
+
+`NDPI_PROTOCOL_ISO9506_1_MMS`
+============================
+The international standard MMS (Manufacturing Message Specification) is an OSI application layer messaging protocol origionally designed for the remote control and monitoring of devices such as Remote Terminal Units (RTU), 
+Programmable Logic Controllers (PLC), Numerical Controllers (NC), or Robot Controllers (RC).
+
+References: `Paid Specs: <https://www.iso.org/ru/standard/37079.html>`_.
