@@ -38,6 +38,8 @@ static u_int32_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port);
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
 					 u_int app_proto);
+static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
+                             struct ndpi_flow_struct *flow);
 
 
 static u_int16_t search_into_cache(struct ndpi_detection_module_struct *ndpi_struct,
@@ -133,6 +135,8 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
   int off;
   const u_int8_t *payload = packet->payload;
   u_int16_t payload_length = packet->payload_packet_len;
+  const u_int8_t *orig_payload;
+  u_int16_t orig_payload_length;
   u_int32_t magic_cookie;
 
   if(payload_length < STUN_HDR_LEN) {
@@ -306,6 +310,22 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       *app_proto = NDPI_PROTOCOL_HANGOUT_DUO;
       return 1;
 
+    case 0x0013:
+      NDPI_LOG_DBG(ndpi_struct, "DATA attribute\n");
+
+      orig_payload = packet->payload;
+      orig_payload_length = packet->payload_packet_len;
+      packet->payload = payload + off + 4;
+      packet->payload_packet_len = payload_length - off - 4;
+
+      stun_search_again(ndpi_struct, flow);
+      NDPI_LOG_DBG(ndpi_struct, "End recursion\n");
+
+      packet->payload = orig_payload;
+      packet->payload_packet_len = orig_payload_length;
+
+      break;
+
     default:
       NDPI_LOG_DBG2(ndpi_struct, "Unknown attribute %04X\n", attribute);
       break;
@@ -326,7 +346,7 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
   /* We have a sub-classification */
 
   if((ndpi_struct->monitoring_stun_flags & NDPI_MONITORING_STUN_SUBCLASSIFIED) &&
-     flow->detected_protocol_stack[1] != NDPI_PROTOCOL_RTP)
+     flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RTP)
     return 1;
 
   /* Looking for XOR-PEER-ADDRESS metadata; TODO: other protocols? */
