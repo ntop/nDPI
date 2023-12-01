@@ -625,6 +625,7 @@ void init_opc_ua_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
 void init_fins_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_ethersio_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_beckhoff_ads_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_iso9506_1_mms_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 

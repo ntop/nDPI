@@ -338,6 +338,7 @@
     <ClCompile Include="..\src\lib\protocols\fins.c" />
     <ClCompile Include="..\src\lib\protocols\ethersio.c" />
     <ClCompile Include="..\src\lib\protocols\beckhoff_ads.c" />
+    <ClCompile Include="..\src\lib\protocols\iso9506-1-mms.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />
