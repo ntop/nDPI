@@ -1511,7 +1511,6 @@ typedef enum {
     ndpi_no_prefs                  = 0,
     ndpi_dont_load_tor_list        = (1 << 0),
     ndpi_dont_init_libgcrypt       = (1 << 1),
-    ndpi_enable_ja3_plus           = (1 << 2),
     ndpi_dont_load_azure_list      = (1 << 3),
     ndpi_dont_load_whatsapp_list   = (1 << 4),
     ndpi_dont_load_amazon_aws_list = (1 << 5),
