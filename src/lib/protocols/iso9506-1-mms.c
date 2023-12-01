@@ -58,9 +58,9 @@ static void ndpi_search_iso9506_1_mms(struct ndpi_detection_module_struct *ndpi_
           (packet->payload[8] == (packet->payload_packet_len - 9)))
       {
         /* Search for a MMS signature in initiate request from client */
-        if ((get_u_int16_t(packet->payload, packet->payload_packet_len-37) == 0x280) ||
-            (get_u_int16_t(packet->payload, packet->payload_packet_len-38) == 0x380) ||
-            (get_u_int16_t(packet->payload, packet->payload_packet_len-40) == 0x280))
+        if ((get_u_int16_t(packet->payload, packet->payload_packet_len-37) == le16toh(0x280)) ||
+            (get_u_int16_t(packet->payload, packet->payload_packet_len-38) == le16toh(0x380)) ||
+            (get_u_int16_t(packet->payload, packet->payload_packet_len-40) == le16toh(0x280)))
         {
           ndpi_int_iso9506_1_mms_add_connection(ndpi_struct, flow);
           return;
