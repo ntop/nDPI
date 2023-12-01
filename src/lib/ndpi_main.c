@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <stddef.h>
 
 #ifdef __APPLE__
 #include <netinet/ip.h>
@@ -222,6 +223,8 @@ static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_s
 static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str);
 static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndpi_str,
 	  const NDPI_PROTOCOL_BITMASK *dbm, int count_only);
+
+static void set_default_config(struct ndpi_detection_module_config_struct *cfg);
 
 /* ****************************************** */
 
@@ -972,13 +975,6 @@ int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str
     */
     ndpi_str->num_tls_blocks_to_follow = NDPI_MAX_NUM_TLS_APPL_BLOCKS;
     ndpi_str->skip_tls_blocks_until_change_cipher = 1;
-    break;
-
-  case ndpi_pref_max_packets_to_process:
-    if(value > 0xFFFF) {
-      return(-1);
-    }
-    ndpi_str->max_packets_to_process = value;
     break;
 
   default:
@@ -3241,7 +3237,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     }
   }
 
-  ndpi_str->max_packets_to_process = NDPI_DEFAULT_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT;
+  set_default_config(&ndpi_str->cfg);
 
   NDPI_BITMASK_SET_ALL(ndpi_str->detection_bitmask);
   ndpi_str->user_data = NULL;
@@ -7745,7 +7741,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     return(ret);
   }
 
-  if(ndpi_str->max_packets_to_process > 0 && flow->num_processed_pkts >= ndpi_str->max_packets_to_process) {
+  if(ndpi_str->cfg.max_packets_to_process > 0 && flow->num_processed_pkts >= ndpi_str->cfg.max_packets_to_process) {
     flow->extra_packets_func = NULL; /* To allow ndpi_extra_dissection_possible() to fail */
     flow->fail_with_unknown = 1;
     return(ret); /* Avoid spending too much time with this flow */
@@ -10560,5 +10556,193 @@ void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
 {
   if(ndpi_str)
     return ndpi_str->user_data;
+  return NULL;
+}
+
+/* ******************************************************************** */
+
+static int _set_param_enable_disable(void *_variable, const char *value)
+{
+  int *variable = (int *)_variable;
+
+  if(strcmp(value, "1") == 0 ||
+     strcmp(value, "enable") == 0) {
+    *variable = 1;
+    return 0;
+  }
+  if(strcmp(value, "0") == 0 ||
+     strcmp(value, "disable") == 0) {
+    *variable = 0;
+    return 0;
+  }
+  return -1;
+}
+
+static int _set_param_int(void *_variable, const char *value, const char *min_value, const char *max_value)
+{
+  int *variable = (int *)_variable;
+  char *endptr;
+  long val;
+
+  errno = 0;    /* To distinguish success/failure after call */
+  val = strtol(value, &endptr, 10);
+
+  /* Check for various possible errors */
+  if((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) ||
+     (errno != 0 && val == 0)) {
+    return -1;
+  }
+  if (endptr == value) {
+    /* No digits were found */
+    return -1;
+  }
+  /* If we got here, strtol() successfully parsed a number */
+  *variable = val;
+
+  /* Min and max values are set in the code, so we can convert them
+     to integers without too many checks...*/
+  if(min_value && max_value &&
+     (val < atoi(min_value) || val > atoi(max_value)))
+    return -1;
+
+  return 0;
+}
+
+/* It can be used for CFG_PARAM_ENABLE_DISABLE parameters, too */
+static char *_get_param_int(void *_variable, char *buf, int buf_len)
+{
+  int *variable = (int *)_variable;
+
+  snprintf(buf, buf_len, "%d", *variable);
+  buf[buf_len - 1] = '\0';
+  return buf;
+}
+
+
+typedef int (*cfg_fn)(void *variable, const char *value);
+
+enum cfg_param_type {
+  CFG_PARAM_ENABLE_DISABLE = 0,
+  CFG_PARAM_INT            = 1,
+};
+
+#define __OFF(a)	offsetof(struct ndpi_detection_module_config_struct, a)
+
+static const struct cfg_param {
+  char *proto;
+  char *param;
+  char *default_value;
+  char *min_value;
+  char *max_value;
+  enum cfg_param_type type;
+  int offset;
+} cfg_params[] = {
+  /* Per-protocol parameters */
+
+  /* An example of metadata configuration (yes/no) */
+  { "tls",           "metadata.sha1_fingerprint.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_sha1_fingerprint_enabled) },
+
+  /* Global parameters */
+
+  /* An example of integer configuration */
+  { NULL,            "packets_limit_per_flow",                  "32", "0", "255", CFG_PARAM_INT, __OFF(max_packets_to_process) },
+
+  { NULL, NULL, NULL, NULL, NULL, 0, -1 },
+};
+
+#undef __OFF
+
+static void set_default_config(struct ndpi_detection_module_config_struct *cfg)
+{
+  const struct cfg_param *c;
+
+  for(c = &cfg_params[0]; c && c->param; c++) {
+    switch(c->type) {
+    case CFG_PARAM_ENABLE_DISABLE:
+      _set_param_enable_disable((void *)((char *)cfg + c->offset), c->default_value);
+      break;
+    case CFG_PARAM_INT:
+      _set_param_int((void *)((char *)cfg + c->offset), c->default_value, c->min_value, c->max_value);
+      break;
+    }
+  }
+}
+
+int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
+		    const char *proto, const char *param, const char *value)
+{
+  const struct cfg_param *c;
+
+  if(!ndpi_str || !param || !value)
+    return -2;
+
+  NDPI_LOG_DBG(ndpi_str, "Set [%s][%s][%s]\n", proto, param, value);
+
+  for(c = &cfg_params[0]; c && c->param; c++) {
+    if(((proto == NULL && c->proto == NULL) ||
+	(proto && c->proto && strcmp(proto, c->proto) == 0)) &&
+       strcmp(param, c->param) == 0) {
+
+      switch(c->type) {
+      case CFG_PARAM_ENABLE_DISABLE:
+        return _set_param_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), value);
+      case CFG_PARAM_INT:
+        return _set_param_int((void *)((char *)&ndpi_str->cfg + c->offset), value, c->min_value, c->max_value);
+      }
+    }
+  }
+  return -3;
+}
+
+char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
+		      const char *proto, const char *param, char *buf, int buf_len)
+{
+  const struct cfg_param *c;
+
+  if(!ndpi_str || !param || !buf || buf_len <= 0)
+    return NULL;
+
+  NDPI_LOG_ERR(ndpi_str, "Get [%s][%s]\n", proto, param);
+
+  for(c = &cfg_params[0]; c && c->param; c++) {
+    if(((proto == NULL && c->proto == NULL) ||
+	(proto && c->proto && strcmp(proto, c->proto) == 0)) &&
+       strcmp(param, c->param) == 0) {
+
+      switch(c->type) {
+      case CFG_PARAM_ENABLE_DISABLE:
+      case CFG_PARAM_INT:
+        return _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), buf, buf_len);
+      }
+    }
+  }
+  return NULL;
+}
+
+char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
+		       FILE *fd)
+{
+  const struct cfg_param *c;
+  char buf[64];
+
+  if(!ndpi_str || !fd)
+    return NULL;
+
+  fprintf(fd, " Protocol (empty/NULL for global knobs), parameter, value, [default value], [min value, max_value]\n");
+
+  for(c = &cfg_params[0]; c && c->param; c++) {
+    switch(c->type) {
+    case CFG_PARAM_ENABLE_DISABLE:
+    case CFG_PARAM_INT:
+      fprintf(fd, " *) %s %s: %s [%s]",
+              c->proto ? c->proto : "NULL",
+              c->param,
+              _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), buf, sizeof(buf)),
+	      c->default_value);
+      if(c->min_value && c->max_value)
+        fprintf(fd, " [%s-%s]", c->min_value, c->max_value);
+      fprintf(fd, "\n");
+    }
+  }
   return NULL;
 }

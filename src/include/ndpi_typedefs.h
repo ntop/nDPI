@@ -1068,7 +1068,6 @@ typedef enum {
 
 typedef enum {
    ndpi_pref_direction_detect_disable = 0,
-   ndpi_pref_max_packets_to_process,
    ndpi_pref_enable_tls_block_dissection, /* nDPI considers only those blocks past the certificate exchange */
 } ndpi_detection_preference;
 
@@ -1152,6 +1151,14 @@ struct tls_heuristics {
 struct ndpi_risk_information {
   ndpi_risk_enum id;
   char *info;  
+};
+
+struct ndpi_detection_module_config_struct {
+  int max_packets_to_process;
+
+  /* TLS */
+  int tls_sha1_fingerprint_enabled;
+
 };
 
 struct ndpi_flow_struct {

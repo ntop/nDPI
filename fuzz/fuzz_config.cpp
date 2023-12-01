@@ -35,7 +35,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 				     1 + /* TLS cert expire */
 				     6 + /* files */
 				     ((NDPI_LRUCACHE_MAX + 1) * 5) + /* LRU caches */
-				     2 + 1 + 4 + /* ndpi_set_detection_preferences() */
+				     2 + 1 + /* ndpi_set_detection_preferences() */
 				     1 + 3 + 1 + 3 + /* Monitoring */
 				     7 + /* Opportunistic tls */
 				     2 + /* Pid */
@@ -66,6 +66,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_set_user_data(ndpi_info_mod, (void *)0xabcdabcd); /* Random pointer */
   ndpi_set_user_data(ndpi_info_mod, (void *)0xabcdabcd); /* Twice to trigger overwriting */
   ndpi_get_user_data(ndpi_info_mod);
+
+  /* TODO: ndpi_config_set */
 
   ndpi_set_tls_cert_expire_days(ndpi_info_mod, fuzzed_data.ConsumeIntegral<u_int8_t>());
 
@@ -102,9 +104,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool())
     ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_enable_tls_block_dissection,
                                    0 /* unused */);
-  if(fuzzed_data.ConsumeBool())
-    ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_max_packets_to_process,
-                                   fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)));
 
   ndpi_set_detection_preferences(ndpi_info_mod, static_cast<ndpi_detection_preference>(0xFF), 0xFF); /* Invalid preference */
 

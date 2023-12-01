@@ -126,7 +126,6 @@ struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
 
   u_int64_t current_ts;
-  u_int16_t max_packets_to_process;
   u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
   u_int8_t tls_certificate_expire_in_x_days;
@@ -203,6 +202,8 @@ struct ndpi_detection_module_struct {
   } custom_categories;
 
   u_int8_t ip_version_limit;
+
+  struct ndpi_detection_module_config_struct cfg;
 
   /* NDPI_PROTOCOL_TINC */
   struct cache *tinc_cache;
