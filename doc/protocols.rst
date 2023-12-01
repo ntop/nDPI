@@ -299,3 +299,12 @@ The international standard MMS (Manufacturing Message Specification) is an OSI a
 Programmable Logic Controllers (PLC), Numerical Controllers (NC), or Robot Controllers (RC).
 
 References: `Paid Specs: <https://www.iso.org/ru/standard/37079.html>`_.
+
+
+.. _Proto 367:
+
+`NDPI_PROTOCOL_IEEE_C37118`
+============================
+IEEE Standard for Synchrophasor Data Transfer for Power Systems
+
+References: `Paid Specs: <https://standards.ieee.org/ieee/C37.118.1/4902/>`_.
