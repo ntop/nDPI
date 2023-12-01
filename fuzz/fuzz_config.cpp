@@ -32,12 +32,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   if(fuzzed_data.remaining_bytes() < 4 + /* ndpi_init_detection_module() */
 				     NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
-				     1 + /* TLS cert expire */
 				     6 + /* files */
 				     ((NDPI_LRUCACHE_MAX + 1) * 5) + /* LRU caches */
-				     2 + 1 + /* ndpi_set_detection_preferences() */
 				     1 + 3 + 1 + 3 + /* Monitoring */
-				     7 + /* Opportunistic tls */
 				     2 + /* Pid */
 				     2 + /* Category */
 				     1 + /* Tunnel */
@@ -69,8 +66,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   /* TODO: ndpi_config_set */
 
-  ndpi_set_tls_cert_expire_days(ndpi_info_mod, fuzzed_data.ConsumeIntegral<u_int8_t>());
-
   if(fuzzed_data.ConsumeBool())
     ndpi_load_protocols_file(ndpi_info_mod, "protos.txt");
   if(fuzzed_data.ConsumeBool())
@@ -98,15 +93,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* TODO: stub for geo stuff */
   ndpi_load_geoip(ndpi_info_mod, NULL, NULL);
 
-  if(fuzzed_data.ConsumeBool())
-    ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_direction_detect_disable,
-                                   fuzzed_data.ConsumeBool());
-  if(fuzzed_data.ConsumeBool())
-    ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_enable_tls_block_dissection,
-                                   0 /* unused */);
-
-  ndpi_set_detection_preferences(ndpi_info_mod, static_cast<ndpi_detection_preference>(0xFF), 0xFF); /* Invalid preference */
-
   if(fuzzed_data.ConsumeBool()) {
     ndpi_set_monitoring_state(ndpi_info_mod, NDPI_PROTOCOL_STUN,
                               fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)),
@@ -118,25 +104,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   random_value = fuzzed_data.ConsumeIntegralInRange(0,2);
   ndpi_set_monitoring_state(ndpi_info_mod, random_proto, random_value, random_value);
   ndpi_get_monitoring_state(ndpi_info_mod, random_proto, &num, &num2);
-
-  ndpi_set_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_SMTP, fuzzed_data.ConsumeBool());
-  ndpi_get_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_SMTP);
-  ndpi_set_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_IMAP, fuzzed_data.ConsumeBool());
-  ndpi_get_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_IMAP);
-  ndpi_set_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_POP, fuzzed_data.ConsumeBool());
-  ndpi_get_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_MAIL_POP);
-  ndpi_set_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_FTP_CONTROL, fuzzed_data.ConsumeBool());
-  ndpi_get_opportunistic_tls(ndpi_info_mod, NDPI_PROTOCOL_FTP_CONTROL);
-
-  random_proto = fuzzed_data.ConsumeIntegralInRange(0, (1 << 16) - 1);
-  random_value = fuzzed_data.ConsumeIntegralInRange(0,2); /* Only 0-1 are valid values */
-  ndpi_set_opportunistic_tls(ndpi_info_mod, random_proto, random_value);
-  ndpi_get_opportunistic_tls(ndpi_info_mod, random_proto);
-
-  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
-    ndpi_set_protocol_aggressiveness(ndpi_info_mod, i, random_value);
-    ndpi_get_protocol_aggressiveness(ndpi_info_mod, i);
-  }
 
   ndpi_finalize_initialization(ndpi_info_mod);
 

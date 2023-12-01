@@ -174,7 +174,7 @@ static void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
     if(packet->payload[0] == '+' && flow->l4.tcp.mail_imap_starttls == 1) {
       NDPI_LOG_DBG2(ndpi_struct, "starttls detected\n");
       ndpi_int_mail_pop_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_POPS);
-      if(ndpi_struct->opportunistic_tls_pop_enabled) {
+      if(ndpi_struct->cfg.pop_opportunistic_tls_enabled) {
         NDPI_LOG_DBG(ndpi_struct, "Switching to [%d/%d]\n",
 		     flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
 	/* We are done (in POP dissector): delegating TLS... */

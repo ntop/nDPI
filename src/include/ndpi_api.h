@@ -1036,9 +1036,6 @@ extern "C" {
   int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
 				     char *name_or_ip, u_int name_len,
 				     ndpi_protocol_category_t *id);
-  int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
-				     ndpi_detection_preference pref,
-				     int value);
 
   u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct *ndpi_str,
 					      u_int16_t user_proto_id);
@@ -1089,16 +1086,6 @@ extern "C" {
 			     lru_cache_type cache_type,
 			     u_int32_t *ttl);
 
-  int ndpi_set_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
-				 u_int16_t proto, int value);
-  int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
-				 u_int16_t proto);
-
-  int ndpi_set_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
-                                       u_int16_t proto, u_int32_t value);
-  u_int32_t ndpi_get_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
-                                             u_int16_t proto);
-
   int ndpi_set_monitoring_state(struct ndpi_detection_module_struct *ndpi_struct,
                                 u_int16_t proto, u_int32_t num_pkts, u_int32_t flags);
   int ndpi_get_monitoring_state(struct ndpi_detection_module_struct *ndpi_struct,
@@ -1119,17 +1106,6 @@ extern "C" {
 				    u_int16_t *protocol_id,
 				    ndpi_protocol_category_t *category,
 				    ndpi_protocol_breed_t *breed);
-
-  /**
-   * Specifies the threshold used to trigger the NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE
-   * flow risk that by default is set to 30 days
-   *
-   * @par    ndpi_struct  = the struct created for the protocol detection
-   * @par    days         = the number of days threshold for emitting the alert
-   *
-   */
-  void ndpi_set_tls_cert_expire_days(struct ndpi_detection_module_struct *ndpi_str,
-				     u_int8_t days);
 
   void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 				   struct ndpi_flow_struct *flow);

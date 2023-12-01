@@ -958,34 +958,6 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
 /* ******************************************************************** */
 
-int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str, ndpi_detection_preference pref,
-                                   int value) {
-  if(!ndpi_str)
-    return -1;
-
-  switch(pref) {
-  case ndpi_pref_direction_detect_disable:
-    ndpi_str->direction_detect_disable = (u_int8_t) value;
-    break;
-
-  case ndpi_pref_enable_tls_block_dissection:
-    /*
-      If this option is enabled only the TLS Application data blocks past the
-      certificate negotiation are considered
-    */
-    ndpi_str->num_tls_blocks_to_follow = NDPI_MAX_NUM_TLS_APPL_BLOCKS;
-    ndpi_str->skip_tls_blocks_until_change_cipher = 1;
-    break;
-
-  default:
-    return(-1);
-  }
-
-  return(0);
-}
-
-/* ******************************************************************** */
-
 static void ndpi_validate_protocol_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
@@ -3209,9 +3181,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_roblox_protocol_list_6);
   }
 
-  if(prefs & ndpi_track_flow_payload)
-    ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
-
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
   ndpi_str->ip_risk_mask_ptree6 = ndpi_patricia_new(128 /* IPv6 */);
 
@@ -3243,7 +3212,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->user_data = NULL;
 
   ndpi_str->tcp_max_retransmission_window_size = NDPI_DEFAULT_MAX_TCP_RETRANSMISSION_WINDOW_SIZE;
-  ndpi_str->tls_certificate_expire_in_x_days = 30; /* NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE flow risk */
 
   ndpi_str->ndpi_num_supported_protocols = NDPI_MAX_SUPPORTED_PROTOCOLS;
   ndpi_str->ndpi_num_custom_protocols = 0;
@@ -3372,22 +3340,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   ndpi_str->msteams_cache_ttl = 60; /* sec */
   ndpi_str->stun_zoom_cache_ttl = 60; /* sec */
 
-  ndpi_str->opportunistic_tls_smtp_enabled = 1;
-  ndpi_str->opportunistic_tls_imap_enabled = 1;
-  ndpi_str->opportunistic_tls_pop_enabled = 1;
-  ndpi_str->opportunistic_tls_ftp_enabled = 1;
-  ndpi_str->opportunistic_tls_stun_enabled = 1;
-
   ndpi_str->monitoring_stun_pkts_to_process = 4;
   ndpi_str->monitoring_stun_flags = 0;
-
-  ndpi_str->aggressiveness_ookla = NDPI_AGGRESSIVENESS_OOKLA_TLS;
-
-  if(prefs & ndpi_enable_tcp_ack_payload_heuristic)
-    ndpi_str->tcp_ack_paylod_heuristic = 1;
-
-  if(!(prefs & ndpi_disable_fully_encrypted_heuristic))
-    ndpi_str->fully_encrypted_based_on_first_pkt_heuristic = 1;
 
   for(i = 0; i < NUM_CUSTOM_CATEGORIES; i++)
     ndpi_snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
@@ -3533,6 +3487,14 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   }
 
   ndpi_str->ac_automa_finalized = 1;
+
+  if(ndpi_str->cfg.tls_app_blocks_tracking_enabled) {
+    ndpi_str->num_tls_blocks_to_follow = NDPI_MAX_NUM_TLS_APPL_BLOCKS;
+    ndpi_str->skip_tls_blocks_until_change_cipher = 1;
+  }
+
+  if(ndpi_str->cfg.track_payload_enabled)
+    ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
 }
 
 /* *********************************************** */
@@ -6339,7 +6301,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     packet->tcp_retransmission = 0, packet->packet_direction = 0;
 
-    if(ndpi_str->direction_detect_disable) {
+    if(!ndpi_str->cfg.direction_detect_enabled) {
       packet->packet_direction = flow->packet_direction;
     } else {
       if(iph != NULL && ntohl(iph->saddr) < ntohl(iph->daddr))
@@ -6364,7 +6326,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       else if(flags == (TH_FIN | TH_PUSH | TH_URG))
 	ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP XMAS scan");
 
-      if(!ndpi_str->direction_detect_disable &&
+      if(ndpi_str->cfg.direction_detect_enabled &&
          (tcph->source != tcph->dest))
 	packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
 
@@ -6396,7 +6358,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	}
       }
 
-      if(ndpi_str->tcp_ack_paylod_heuristic && tcp_ack_padding(packet)) {
+      if(ndpi_str->cfg.tcp_ack_paylod_heuristic && tcp_ack_padding(packet)) {
         NDPI_LOG_DBG2(ndpi_str, "TCP ACK with zero padding. Ignoring\n");
         packet->tcp_retransmission = 1;
       } else if(flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0 ||
@@ -6445,7 +6407,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	flow->next_tcp_seq_nr[1] = 0;
       }
     } else if(udph != NULL) {
-      if(!ndpi_str->direction_detect_disable &&
+      if(ndpi_str->cfg.direction_detect_enabled &&
          (udph->source != udph->dest))
 	packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
     }
@@ -8005,7 +7967,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
      && (flow->l4_proto == IPPROTO_TCP))
     ndpi_add_connection_as_zoom(ndpi_str, flow);
 
-  if(ndpi_str->fully_encrypted_based_on_first_pkt_heuristic &&
+  if(ndpi_str->cfg.fully_encrypted_heuristic &&
      ret.app_protocol == NDPI_PROTOCOL_UNKNOWN && /* Only for unknown traffic */
      flow->packet_counter == 1 && packet->payload_packet_len > 0) {
    flow->first_pkt_fully_encrypted = fully_enc_heuristic(ndpi_str, flow);
@@ -10451,92 +10413,6 @@ int ndpi_get_monitoring_state(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ******************************************************************** */
 
-int ndpi_set_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
-			       u_int16_t proto, int value)
-{
-  if(!ndpi_struct || (value != 0 && value != 1))
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_MAIL_SMTP:
-    ndpi_struct->opportunistic_tls_smtp_enabled = value;
-    return 0;
-  case NDPI_PROTOCOL_MAIL_IMAP:
-    ndpi_struct->opportunistic_tls_imap_enabled = value;
-    return 0;
-  case NDPI_PROTOCOL_MAIL_POP:
-    ndpi_struct->opportunistic_tls_pop_enabled = value;
-    return 0;
-  case NDPI_PROTOCOL_FTP_CONTROL:
-    ndpi_struct->opportunistic_tls_ftp_enabled = value;
-    return 0;
-  case NDPI_PROTOCOL_STUN:
-    ndpi_struct->opportunistic_tls_stun_enabled = value;
-    return 0;
-  default:
-    return -1;
-  }
-}
-
-/* ******************************************************************** */
-
-int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
-			       u_int16_t proto)
-{
-  if(!ndpi_struct)
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_MAIL_SMTP:
-    return ndpi_struct->opportunistic_tls_smtp_enabled;
-  case NDPI_PROTOCOL_MAIL_IMAP:
-    return ndpi_struct->opportunistic_tls_imap_enabled;
-  case NDPI_PROTOCOL_MAIL_POP:
-    return ndpi_struct->opportunistic_tls_pop_enabled;
-  case NDPI_PROTOCOL_FTP_CONTROL:
-    return ndpi_struct->opportunistic_tls_ftp_enabled;
-  case NDPI_PROTOCOL_STUN:
-    return ndpi_struct->opportunistic_tls_stun_enabled;
-  default:
-    return -1;
-  }
-}
-
-/* ******************************************************************** */
-
-int ndpi_set_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
-                                     u_int16_t proto, u_int32_t value)
-{
-  if(!ndpi_struct)
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_OOKLA:
-    ndpi_struct->aggressiveness_ookla = value;
-    return 0;
-  default:
-    return -1;
-  }
-}
-
-/* ******************************************************************** */
-
-u_int32_t ndpi_get_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
-                                           u_int16_t proto)
-{
-  if(!ndpi_struct)
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_OOKLA:
-    return ndpi_struct->aggressiveness_ookla;
-  default:
-    return -1;
-  }
-}
-
-/* ******************************************************************** */
-
 void ndpi_set_user_data(struct ndpi_detection_module_struct *ndpi_str, void *user_data)
 {
   if (ndpi_str == NULL)
@@ -10585,7 +10461,7 @@ static int _set_param_int(void *_variable, const char *value, const char *min_va
   long val;
 
   errno = 0;    /* To distinguish success/failure after call */
-  val = strtol(value, &endptr, 10);
+  val = strtol(value, &endptr, 0);
 
   /* Check for various possible errors */
   if((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) ||
@@ -10639,13 +10515,32 @@ static const struct cfg_param {
 } cfg_params[] = {
   /* Per-protocol parameters */
 
+  { "tls",           "certificate_expiration_threshold",        "30", "0", "365", CFG_PARAM_INT, __OFF(tls_certificate_expire_in_x_days) },
+  { "tls",           "application_blocks_tracking.enable",      "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_app_blocks_tracking_enabled) },
   /* An example of metadata configuration (yes/no) */
   { "tls",           "metadata.sha1_fingerprint.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_sha1_fingerprint_enabled) },
+
+  { "smtp",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled) },
+
+  { "imap",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(imap_opportunistic_tls_enabled) },
+
+  { "pop",           "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(pop_opportunistic_tls_enabled) },
+
+  { "ftp",           "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ftp_opportunistic_tls_enabled) },
+
+  { "stun",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_opportunistic_tls_enabled) },
+
+  { "ookla",         "aggressiveness",                          "0x01", "0", "1", CFG_PARAM_INT, __OFF(ookla_aggressiveness) },
+
 
   /* Global parameters */
 
   /* An example of integer configuration */
   { NULL,            "packets_limit_per_flow",                  "32", "0", "255", CFG_PARAM_INT, __OFF(max_packets_to_process) },
+  { NULL,            "flow.direction_detection.enable",         "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(direction_detect_enabled) },
+  { NULL,            "flow.track_payload.enable",               "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(track_payload_enabled) },
+  { NULL,            "tcp_ack_payload_heuristic.enable",        "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_ack_paylod_heuristic) },
+  { NULL,            "fully_encrypted_heuristic.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic) },
 
   { NULL, NULL, NULL, NULL, NULL, 0, -1 },
 };

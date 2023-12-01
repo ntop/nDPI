@@ -109,9 +109,8 @@ static int num_cfgs = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 char *_disabled_protocols = NULL;
-int aggressiveness[NDPI_MAX_SUPPORTED_PROTOCOLS];
 static u_int8_t stats_flag = 0;
-ndpi_init_prefs init_prefs = ndpi_no_prefs | ndpi_enable_tcp_ack_payload_heuristic;
+ndpi_init_prefs init_prefs = ndpi_no_prefs;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
@@ -558,7 +557,6 @@ static void help(u_int long_help) {
          "                            | 2 - List known risks\n"
          "  -d                        | Disable protocol guess and use only DPI\n"
          "  -e <len>                  | Min human readeable string match len. Default %u\n"
-	 "  -E                        | Track flow payload\n"
          "  -q                        | Quiet mode\n"
          "  -F                        | Enable flow stats\n"
          "  -t                        | Dissect GTP/TZSP tunnels\n"
@@ -599,7 +597,6 @@ static void help(u_int long_help) {
          "  -z                        | Enable JA3+\n"
          "  -A                        | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
          "  -M                        | Memory allocation stats on data-path (only by the library). It works only on single-thread configuration\n"
-         "  -Z proto:value            | Set this value of aggressiveness for this protocol (0 to disable it). This flag can be used multiple times\n"
          "  --lru-cache-size=NAME:size       | Specify the size for this LRU cache (0 to disable it). This flag can be used multiple times\n"
          "  --lru-cache-ttl=NAME:size        | Specify the TTL [in seconds] for this LRU cache (0 to disable it). This flag can be used multiple times\n"
          "  --stun-monitoring=<pkts>:<flags> | Configure STUN monitoring: keep monitoring STUN session for <pkts> more pkts looking for RTP\n"
@@ -1034,16 +1031,13 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++)
-    aggressiveness[i] = -1; /* Use the default value */
-
   for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
     lru_cache_sizes[i] = -1; /* Use the default value */
     lru_cache_ttls[i] = -1; /* Use the default value */
   }
 
   while((opt = getopt_long(argc, argv,
-			   "a:Ab:B:e:Ec:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:X:w:zZ:q0123:456:7:89:m:MT:U:",
+			   "a:Ab:B:e:c:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:X:w:zq0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -1073,10 +1067,6 @@ static void parseOptions(int argc, char **argv) {
 
     case 'e':
       human_readeable_string_len = atoi(optarg);
-      break;
-
-    case 'E':
-      init_prefs |= ndpi_track_flow_payload;
       break;
 
     case 'i':
@@ -1178,36 +1168,6 @@ static void parseOptions(int argc, char **argv) {
       ndpi_free(_disabled_protocols);
       _disabled_protocols = ndpi_strdup(optarg);
       break;
-
-    case 'Z': /* proto_name:aggr_value */
-      {
-        struct ndpi_detection_module_struct *module_tmp;
-        NDPI_PROTOCOL_BITMASK all;
-        char *saveptr, *tmp_str, *proto_str, *aggr_str;
-
-        /* Use a temporary module with all protocols enabled */
-        module_tmp = ndpi_init_detection_module(0);
-        if(!module_tmp)
-          break;
-	
-        NDPI_BITMASK_SET_ALL(all);
-        ndpi_set_protocol_detection_bitmask2(module_tmp, &all);
-        ndpi_finalize_initialization(module_tmp);
-
-        tmp_str = ndpi_strdup(optarg);
-        if(tmp_str) {
-          proto_str = strtok_r(tmp_str, ":", &saveptr);
-          if(proto_str) {
-            aggr_str = strtok_r(NULL, ":", &saveptr);
-            if(aggr_str) {
-              aggressiveness[ndpi_get_protocol_id(module_tmp, proto_str)] = atoi(aggr_str);
-            }
-          }
-        }
-        ndpi_free(tmp_str);
-        ndpi_exit_detection_module(module_tmp);
-        break;
-      }
 
     case 'h':
       help(0);
@@ -2817,11 +2777,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 			     i, lru_cache_ttls[i]);
   }
 
-  /* Set aggressiviness here */
-  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
-    if(aggressiveness[i] != -1)
-      ndpi_set_protocol_aggressiveness(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, aggressiveness[i]);
-  }
+  ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
 
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct,
@@ -2836,10 +2792,10 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
     ndpi_set_monitoring_state(ndpi_thread_info[thread_id].workflow->ndpi_struct, NDPI_PROTOCOL_STUN,
                               stun_monitoring_pkts_to_process, stun_monitoring_flags);
 
-  ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
-
   if(enable_doh_dot_detection)
-    ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 1);
+    ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, "tls", "application_blocks_tracking.enable", "1");
+
+  ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 }
 
 /* *********************************************** */

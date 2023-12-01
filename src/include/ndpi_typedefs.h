@@ -748,7 +748,7 @@ struct ndpi_lru_cache {
 
 /* Aggressiveness values */
 
-#define NDPI_AGGRESSIVENESS_DISABLED			0x00 /* For all protocols */
+#define NDPI_AGGRESSIVENESS_DISABLED                   0x00 /* For all protocols */
 
 /* Ookla */
 #define NDPI_AGGRESSIVENESS_OOKLA_TLS			0x01 /* Enable detection over TLS (using ookla cache) */
@@ -1066,11 +1066,6 @@ typedef enum {
   NDPI_PROTOCOL_ANY_CATEGORY /* Used to handle wildcards */
 } ndpi_protocol_category_t;
 
-typedef enum {
-   ndpi_pref_direction_detect_disable = 0,
-   ndpi_pref_enable_tls_block_dissection, /* nDPI considers only those blocks past the certificate exchange */
-} ndpi_detection_preference;
-
 /* ntop extensions */
 typedef struct ndpi_proto_defaults {
   char *protoName;
@@ -1155,10 +1150,41 @@ struct ndpi_risk_information {
 
 struct ndpi_detection_module_config_struct {
   int max_packets_to_process;
+  int direction_detect_enabled;
+ /* In some networks, there are some anomalous TCP flows where
+    the smallest ACK packets have some kind of zero padding.
+    It looks like the IP and TCP headers in those frames wrongly consider the
+    0x00 Ethernet padding bytes as part of the TCP payload.
+    While this kind of packets is perfectly valid per-se, in some conditions
+    they might be treated by the TCP reassembler logic as (partial) overlaps,
+    deceiving the classification engine.
+    Add an heuristic to detect these packets and to ignore them, allowing
+    correct detection/classification.
+    See #1946 for other details */
+  int tcp_ack_paylod_heuristic;
+  /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
+     the payload is encrypted in an attempt to “look like nothing”.
+     This heuristic only analyzes the first packet of the flow.
+     See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
+  int fully_encrypted_heuristic;
+  int track_payload_enabled;
 
   /* TLS */
+  int tls_certificate_expire_in_x_days;
+  int tls_app_blocks_tracking_enabled;
   int tls_sha1_fingerprint_enabled;
 
+  int smtp_opportunistic_tls_enabled;
+
+  int imap_opportunistic_tls_enabled;
+
+  int pop_opportunistic_tls_enabled;
+
+  int ftp_opportunistic_tls_enabled;
+
+  int stun_opportunistic_tls_enabled;
+
+  int ookla_aggressiveness;
 };
 
 struct ndpi_flow_struct {
@@ -1532,25 +1558,8 @@ typedef enum {
     ndpi_dont_load_icloud_private_relay_list  = (1 << 13),
     ndpi_dont_init_risk_ptree      = (1 << 14),
     ndpi_dont_load_cachefly_list   = (1 << 15),
-    ndpi_track_flow_payload        = (1 << 16),
-    /* In some networks, there are some anomalous TCP flows where
-       the smallest ACK packets have some kind of zero padding.
-       It looks like the IP and TCP headers in those frames wrongly consider the
-       0x00 Ethernet padding bytes as part of the TCP payload.
-       While this kind of packets is perfectly valid per-se, in some conditions
-       they might be treated by the TCP reassembler logic as (partial) overlaps,
-       deceiving the classification engine.
-       Add an heuristic to detect these packets and to ignore them, allowing
-       correct detection/classification.
-       See #1946 for other details */
-    ndpi_enable_tcp_ack_payload_heuristic = (1 << 17),
     ndpi_dont_load_crawlers_list = (1 << 18),
     ndpi_dont_load_protonvpn_list = (1 << 19),
-    /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
-       the payload is encrypted in an attempt to “look like nothing”.
-       This heuristic only analyzes the first packet of the flow.
-       See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
-    ndpi_disable_fully_encrypted_heuristic = (1 << 20),
     ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 21),
     ndpi_dont_load_mullvad_list = (1 << 22),
   } ndpi_prefs;

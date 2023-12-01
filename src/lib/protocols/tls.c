@@ -536,7 +536,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	      snprintf(str, sizeof(str), "%s - %s", b, e);
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERTIFICATE_EXPIRED, str); /* Certificate expired */
 	    } else if((time_sec > flow->protos.tls_quic.notBefore)
-		      && (time_sec > (flow->protos.tls_quic.notAfter - (ndpi_struct->tls_certificate_expire_in_x_days * 86400)))) {
+		      && (time_sec > (flow->protos.tls_quic.notAfter - (ndpi_struct->cfg.tls_certificate_expire_in_x_days * 86400)))) {
 	      char str[96], b[32], e[32];
 	      struct tm result;	      
 	      time_t theTime;
@@ -1154,7 +1154,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     printf("*** [TLS Block] No more blocks\n");
 #endif
     /* An ookla flow? */
-    if((ndpi_struct->aggressiveness_ookla & NDPI_AGGRESSIVENESS_OOKLA_TLS) && /* Feature enabled */
+    if((ndpi_struct->cfg.ookla_aggressiveness & NDPI_AGGRESSIVENESS_OOKLA_TLS) && /* Feature enabled */
        (!something_went_wrong &&
         flow->tls_quic.certificate_processed == 1 &&
         flow->protos.tls_quic.hello_processed == 1) && /* TLS handshake found without errors */

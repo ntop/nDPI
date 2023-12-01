@@ -128,7 +128,6 @@ struct ndpi_detection_module_struct {
   u_int64_t current_ts;
   u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
-  u_int8_t tls_certificate_expire_in_x_days;
   
   void *user_data;
   char custom_category_labels[NUM_CUSTOM_CATEGORIES][CUSTOM_CATEGORY_LABEL_LEN];
@@ -248,24 +247,11 @@ struct ndpi_detection_module_struct {
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
-  int opportunistic_tls_smtp_enabled;
-  int opportunistic_tls_imap_enabled;
-  int opportunistic_tls_pop_enabled;
-  int opportunistic_tls_ftp_enabled;
-  int opportunistic_tls_stun_enabled;
-
   u_int32_t monitoring_stun_pkts_to_process;
   u_int32_t monitoring_stun_flags;
 
-  u_int32_t aggressiveness_ookla;
-
-  int tcp_ack_paylod_heuristic;
-  int fully_encrypted_based_on_first_pkt_heuristic;
-
   u_int16_t ndpi_to_user_proto_id[NDPI_MAX_NUM_CUSTOM_PROTOCOLS]; /* custom protocolId mapping */
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
-
-  u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */ _pad:7;
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"
