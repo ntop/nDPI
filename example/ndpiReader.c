@@ -92,7 +92,7 @@ static char* domain_to_check = NULL;
 static char* ip_port_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
-u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
+u_int8_t enable_realtime_output = 0, enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
@@ -520,7 +520,7 @@ static void help(u_int long_help) {
          "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
          "          [-p <protos>][-l <loops> [-q][-d][-h][-H][-D][-e <len>][-E][-t][-v <level>]\n"
          "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
-         "          [-r <file>][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>]\n"
+         "          [-r <file>][-R][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>]\n"
          "          [-a <mode>][-B proto_list]\n\n"
          "Usage:\n"
          "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
@@ -559,6 +559,7 @@ static void help(u_int long_help) {
          "  -c <path>                 | Load custom categories from the specified file\n"
          "  -C <path>                 | Write output in CSV format on the specified file\n"
          "  -r <path>                 | Load risky domain file\n"
+         "  -R                        | Print detected realtime protocols\n"
          "  -j <path>                 | Load malicious JA3 fingeprints\n"
          "  -S <path>                 | Load malicious SSL certificate SHA1 fingerprints\n"
 	 "  -G <dir>                  | Bind domain names to categories loading files from <dir>\n"
@@ -978,7 +979,7 @@ static void parseOptions(int argc, char **argv) {
   }
 
   while((opt = getopt_long(argc, argv,
-			   "a:Ab:B:e:Ec:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:s:tu:v:V:n:rp:x:X:w:Z:q0123:456:7:89:m:MT:U:",
+			   "a:Ab:B:e:Ec:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:Rs:tu:v:V:n:rp:x:X:w:Z:q0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -1079,6 +1080,10 @@ static void parseOptions(int argc, char **argv) {
 
     case 'r':
       _riskyDomainFilePath = optarg;
+      break;
+
+    case 'R':
+      enable_realtime_output =1;
       break;
 
     case 's':
@@ -2646,6 +2651,79 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 
 /* *********************************************** */
 
+static int is_realtime_protocol(ndpi_protocol proto)
+{
+  static u_int16_t const realtime_protos[] = {
+    NDPI_PROTOCOL_YOUTUBE,
+    NDPI_PROTOCOL_YOUTUBE_UPLOAD,
+    NDPI_PROTOCOL_TIKTOK,
+    NDPI_PROTOCOL_GOOGLE,
+    NDPI_PROTOCOL_GOOGLE_CLASSROOM,
+    NDPI_PROTOCOL_GOOGLE_CLOUD,
+    NDPI_PROTOCOL_GOOGLE_DOCS,
+    NDPI_PROTOCOL_GOOGLE_DRIVE,
+    NDPI_PROTOCOL_GOOGLE_MAPS,
+    NDPI_PROTOCOL_GOOGLE_SERVICES
+  };
+  u_int16_t i;
+
+  for (i = 0; i < NDPI_ARRAY_LENGTH(realtime_protos); i++) {
+    if (proto.app_protocol == realtime_protos[i]
+        || proto.master_protocol == realtime_protos[i])
+    {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+static void dump_realtime_protocol(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow)
+{
+  FILE *out = results_file ? results_file : stdout;
+  char srcip[64], dstip[64];
+  char ip_proto[64], app_name[64];
+  char date[64];
+  int ret = is_realtime_protocol(flow->detected_protocol);
+  time_t firsttime = flow->first_seen_ms;
+  struct tm result;
+
+  if (ndpi_gmtime_r(&firsttime, &result) != NULL)
+  {
+    strftime(date, sizeof(date), "%d.%m.%y %H:%M:%S", &result);
+  } else {
+    snprintf(date, sizeof(date), "%s", "Unknown");
+  }
+
+  if (flow->ip_version==4) {
+    inet_ntop(AF_INET, &flow->src_ip, srcip, sizeof(srcip));
+    inet_ntop(AF_INET, &flow->dst_ip, dstip, sizeof(dstip));
+  } else {
+    snprintf(srcip, sizeof(srcip), "[%s]", flow->src_name);
+    snprintf(dstip, sizeof(dstip), "[%s]", flow->dst_name);
+  }
+
+  ndpi_protocol2name(workflow->ndpi_struct, flow->detected_protocol, app_name, sizeof(app_name));
+
+  if (ret == 1) {
+    fprintf(out, "Detected Realtime protocol %s --> [%s] %s:%d <--> %s:%d app=%s <%s>\n",
+            date, ndpi_get_ip_proto_name(flow->protocol, ip_proto, sizeof(ip_proto)),
+            srcip, ntohs(flow->src_port), dstip, ntohs(flow->dst_port),
+            app_name, flow->human_readeable_string_buffer);
+  }
+}
+
+static void on_protocol_discovered(struct ndpi_workflow * workflow,
+                                   struct ndpi_flow_info * flow,
+                                   void * userdata)
+{
+  (void)userdata;
+  if (enable_realtime_output != 0)
+    dump_realtime_protocol(workflow, flow);
+}
+
+/* *********************************************** */
+
 /**
  * @brief Setup for detection begin
  */
@@ -2703,6 +2781,9 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
       exit(-1);
     }
   }
+
+  ndpi_workflow_set_flow_callback(ndpi_thread_info[thread_id].workflow,
+                                  on_protocol_discovered, NULL);
 
   /* Make sure to load lists before finalizing the initialization */
   ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &enabled_bitmask);

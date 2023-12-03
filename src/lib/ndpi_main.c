@@ -4138,7 +4138,7 @@ static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str
 	}
       }
       return(NDPI_PROTOCOL_IP_ICMPV6);
-    case 112:
+    case NDPI_VRRP_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_VRRP);
     }
   }
