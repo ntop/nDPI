@@ -72,16 +72,18 @@ static const u_int16_t crc16_ccitt_false_table[256] = {
 };
 
 static inline u_int16_t __crc16(u_int16_t crc, const void *data, size_t n_bytes) {
+  u_int8_t* b = (u_int8_t*)data;
   while (n_bytes--) {
-    crc = (crc << 8) ^ crc16_ccitt_false_table[(crc >> 8) ^ *(u_int8_t*)data++];
+    crc = (crc << 8) ^ crc16_ccitt_false_table[(crc >> 8) ^ *b++];
   }
   return crc;
 }
 
 u_int16_t ndpi_crc16_ccit(const void* data, size_t n_bytes) {
   u_int16_t crc = 0;
+  u_int8_t* b = (u_int8_t*)data;
   while (n_bytes--) {
-    crc = (crc >> 8) ^ crc16_ccitt_table[(crc ^ *(u_int8_t*)data++) & 0xFF];
+    crc = (crc >> 8) ^ crc16_ccitt_table[(crc ^ *b++) & 0xFF];
   }
   return crc;
 }
