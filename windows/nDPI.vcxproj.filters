@@ -186,6 +186,9 @@
     <ClCompile Include="..\src\lib\third_party\src\roaring.c">
       <Filter>third_party</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\lib\third_party\src\ndpi_crc.c">
+      <Filter>third_party</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\lib\third_party\src\ndpi_sha1.c">
       <Filter>third_party</Filter>
     </ClCompile>
@@ -266,6 +269,9 @@
     <ClInclude Include="..\src\lib\third_party\include\uthash.h" />
     <ClInclude Include="..\src\lib\ndpi_private.h" />
     <ClInclude Include="..\src\lib\third_party\include\ahocorasick.h">
+      <Filter>third_party</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lib\third_party\include\ndpi_crc.h">
       <Filter>third_party</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lib\third_party\include\ndpi_patricia.h">

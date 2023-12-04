@@ -345,6 +345,7 @@
     <ClCompile Include="..\src\lib\third_party\src\libinjection_sqli.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_xss.c" />
     <ClCompile Include="..\src\lib\third_party\src\ndpi_md5.c" />
+    <ClCompile Include="..\src\lib\third_party\src\ndpi_crc.c" />
     <ClCompile Include="..\src\lib\third_party\src\ndpi_patricia.c" />
     <ClCompile Include="..\src\lib\third_party\src\ndpi_sha1.c" />
     <ClCompile Include="..\src\lib\third_party\src\sha1-fast.c" />
@@ -377,6 +378,7 @@
     <ClInclude Include="..\src\lib\third_party\include\MurmurHash3.h" />
     <ClInclude Include="..\src\lib\third_party\include\ndpi_md5.h" />
     <ClInclude Include="..\src\lib\third_party\include\ndpi_patricia.h" />
+    <ClInclude Include="..\src\lib\third_party\include\ndpi_crc.h" />
     <ClInclude Include="..\src\include\ndpi_protocol_ids.h" />
     <ClInclude Include="..\src\include\ndpi_typedefs.h" />
     <ClInclude Include="..\src\include\ndpi_unix.h" />
