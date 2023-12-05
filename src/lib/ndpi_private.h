@@ -128,7 +128,7 @@ struct ndpi_detection_module_struct {
   u_int64_t current_ts;
   u_int16_t max_packets_to_process;
   u_int16_t num_tls_blocks_to_follow;
-  u_int8_t skip_tls_blocks_until_change_cipher:1, enable_ja3_plus:1, _notused:6;
+  u_int8_t skip_tls_blocks_until_change_cipher:1, _notused:7;
   u_int8_t tls_certificate_expire_in_x_days;
   
   void *user_data;
@@ -626,6 +626,7 @@ void init_fins_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 void init_ethersio_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_beckhoff_ads_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_iso9506_1_mms_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_ieee_c37118_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 
