@@ -397,6 +397,7 @@ typedef enum {
   NDPI_PROTOCOL_ISO9506_1_MMS         = 366,
   NDPI_PROTOCOL_IEEE_C37118           = 367,
   NDPI_PROTOCOL_ETHERSBUS             = 368,
+  NDPI_PROTOCOL_MONERO                = 369,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

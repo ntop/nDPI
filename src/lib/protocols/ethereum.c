@@ -36,7 +36,7 @@ enum ether_disc_packet_type {
 
 /* ************************************************************************** */
 
-static u_int32_t ndpi_ether_make_lru_cache_key(struct ndpi_flow_struct *flow) {
+u_int32_t mining_make_lru_cache_key(struct ndpi_flow_struct *flow) {
   u_int32_t key;
 
   /* network byte order */
@@ -53,7 +53,7 @@ static u_int32_t ndpi_ether_make_lru_cache_key(struct ndpi_flow_struct *flow) {
 static void ndpi_ether_cache_connection(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
   if(ndpi_struct->mining_cache)
-    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, ndpi_ether_make_lru_cache_key(flow), NDPI_PROTOCOL_ETHEREUM, ndpi_get_current_time(flow));
+    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, mining_make_lru_cache_key(flow), NDPI_PROTOCOL_ETHEREUM, ndpi_get_current_time(flow));
 }
 
 /* ************************************************************************** */
