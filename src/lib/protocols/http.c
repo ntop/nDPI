@@ -1471,7 +1471,8 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
       flow->host_server_name[0] != '\0'&&
       flow->http.response_status_code != 0) ||
      (!ndpi_struct->cfg.http_parse_response_enabled &&
-      flow->host_server_name[0] != '\0')) {
+      (flow->host_server_name[0] != '\0' ||
+       flow->http.response_status_code != 0))) {
     flow->extra_packets_func = NULL; /* We're good now */
 
     if(flow->initial_binary_bytes_len) ndpi_analyze_content_signature(ndpi_struct, flow);
