@@ -31,20 +31,6 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
-static u_int16_t crc16(const u_int8_t* data, size_t n_bytes)
-{
-  u_int16_t crc = 0xFFFF;
-  
-  while (n_bytes--) {
-    crc ^= *data++ << 8;
-    for (u_int8_t i = 0; i < 8; i++) {
-      crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
-    }
-  }
-  
-  return crc & 0xFFFF;
-}
-
 static void ndpi_int_ieee_c37118_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
                                             struct ndpi_flow_struct *flow)
 {
@@ -70,7 +56,7 @@ static void ndpi_search_ieee_c37118(struct ndpi_detection_module_struct *ndpi_st
     u_int16_t crc = ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len-2));
 
     if ((frame_size == packet->payload_packet_len) &&
-        (crc == crc16(packet->payload, packet->payload_packet_len-2)))
+        (crc == ndpi_crc16_ccit_false(packet->payload, packet->payload_packet_len-2)))
     {
       ndpi_int_ieee_c37118_add_connection(ndpi_struct, flow);
       return;
