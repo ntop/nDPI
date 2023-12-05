@@ -2166,6 +2166,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "ISO9506-1-MMS", NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IEEE_C37118,
+			  "IEEE-C37118", NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
+			  ndpi_build_default_ports(ports_a, 4712, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 4713, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -5616,6 +5620,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* Manufacturing Message Specification */
   init_iso9506_1_mms_dissector(ndpi_str, &a);
+
+  /* IEEE C37.118 Synchrophasor Protocol */
+  init_ieee_c37118_dissector(ndpi_str, &a);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
