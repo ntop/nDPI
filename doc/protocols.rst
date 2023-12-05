@@ -308,3 +308,12 @@ References: `Paid Specs: <https://www.iso.org/ru/standard/37079.html>`_.
 IEEE Standard for Synchrophasor Data Transfer for Power Systems
 
 References: `Paid Specs: <https://standards.ieee.org/ieee/C37.118.1/4902/>`_.
+
+
+.. _Proto 368:
+
+`NDPI_PROTOCOL_ETHERSBUS`
+============================
+Ether-S-Bus is a proprietary protocol used for the communication with and between PLCs manufactured by Saia-Burgess Controls Ltd.
+
+References: `Wireshark wiki: <https://wiki.wireshark.org/EtherSBus>`_.
