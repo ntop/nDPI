@@ -1184,6 +1184,11 @@ struct ndpi_detection_module_config_struct {
 
   int stun_opportunistic_tls_enabled;
 
+  int dns_subclassification_enabled;
+  int dns_parse_response_enabled;
+
+  int http_parse_response_enabled;
+
   int ookla_aggressiveness;
 };
 
