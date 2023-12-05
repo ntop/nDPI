@@ -798,6 +798,7 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_HTTP */
   u_int32_t http_stage:3;
+  u_int32_t http_asymmetric_stage:2;
 
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int32_t gnutella_stage:2;		       // 0 - 2
