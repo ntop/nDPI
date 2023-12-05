@@ -3323,24 +3323,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     return(NULL);
   }
 
-  ndpi_str->ookla_cache_num_entries = 1024;
-  ndpi_str->bittorrent_cache_num_entries = 32768;
-  ndpi_str->zoom_cache_num_entries = 512;
-  ndpi_str->stun_cache_num_entries = 1024;
-  ndpi_str->tls_cert_cache_num_entries = 1024;
-  ndpi_str->mining_cache_num_entries = 1024;
-  ndpi_str->msteams_cache_num_entries = 1024;
-  ndpi_str->stun_zoom_cache_num_entries = 1024;
-
-  ndpi_str->ookla_cache_ttl = 120; /* sec */
-  ndpi_str->bittorrent_cache_ttl = 0;
-  ndpi_str->zoom_cache_ttl = 0;
-  ndpi_str->stun_cache_ttl = 0;
-  ndpi_str->tls_cert_cache_ttl = 0;
-  ndpi_str->mining_cache_ttl = 0;
-  ndpi_str->msteams_cache_ttl = 60; /* sec */
-  ndpi_str->stun_zoom_cache_ttl = 60; /* sec */
-
   ndpi_str->monitoring_stun_pkts_to_process = 4;
   ndpi_str->monitoring_stun_flags = 0;
 
@@ -3408,68 +3390,68 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
 
   ndpi_add_domain_risk_exceptions(ndpi_str);
 
-  if(ndpi_str->ookla_cache_num_entries > 0) {
-    ndpi_str->ookla_cache = ndpi_lru_cache_init(ndpi_str->ookla_cache_num_entries,
-                                                ndpi_str->ookla_cache_ttl);
+  if(ndpi_str->cfg.ookla_cache_num_entries > 0) {
+    ndpi_str->ookla_cache = ndpi_lru_cache_init(ndpi_str->cfg.ookla_cache_num_entries,
+                                                ndpi_str->cfg.ookla_cache_ttl);
     if(!ndpi_str->ookla_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->ookla_cache_num_entries);
+                   ndpi_str->cfg.ookla_cache_num_entries);
     }
   }
-  if(ndpi_str->bittorrent_cache_num_entries > 0) {
-    ndpi_str->bittorrent_cache = ndpi_lru_cache_init(ndpi_str->bittorrent_cache_num_entries,
-                                                     ndpi_str->bittorrent_cache_ttl);
+  if(ndpi_str->cfg.bittorrent_cache_num_entries > 0) {
+    ndpi_str->bittorrent_cache = ndpi_lru_cache_init(ndpi_str->cfg.bittorrent_cache_num_entries,
+                                                     ndpi_str->cfg.bittorrent_cache_ttl);
     if(!ndpi_str->bittorrent_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->bittorrent_cache_num_entries);
+                   ndpi_str->cfg.bittorrent_cache_num_entries);
     }
   }
-  if(ndpi_str->zoom_cache_num_entries > 0) {
-    ndpi_str->zoom_cache = ndpi_lru_cache_init(ndpi_str->zoom_cache_num_entries,
-                                               ndpi_str->zoom_cache_ttl);
+  if(ndpi_str->cfg.zoom_cache_num_entries > 0) {
+    ndpi_str->zoom_cache = ndpi_lru_cache_init(ndpi_str->cfg.zoom_cache_num_entries,
+                                               ndpi_str->cfg.zoom_cache_ttl);
     if(!ndpi_str->zoom_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->zoom_cache_num_entries);
+                   ndpi_str->cfg.zoom_cache_num_entries);
     }
   }
-  if(ndpi_str->stun_cache_num_entries > 0) {
-    ndpi_str->stun_cache = ndpi_lru_cache_init(ndpi_str->stun_cache_num_entries,
-                                               ndpi_str->stun_cache_ttl);
+  if(ndpi_str->cfg.stun_cache_num_entries > 0) {
+    ndpi_str->stun_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_cache_num_entries,
+                                               ndpi_str->cfg.stun_cache_ttl);
     if(!ndpi_str->stun_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->stun_cache_num_entries);
+                   ndpi_str->cfg.stun_cache_num_entries);
     }
   }
-  if(ndpi_str->tls_cert_cache_num_entries > 0) {
-    ndpi_str->tls_cert_cache = ndpi_lru_cache_init(ndpi_str->tls_cert_cache_num_entries,
-                                                   ndpi_str->tls_cert_cache_ttl);
+  if(ndpi_str->cfg.tls_cert_cache_num_entries > 0) {
+    ndpi_str->tls_cert_cache = ndpi_lru_cache_init(ndpi_str->cfg.tls_cert_cache_num_entries,
+                                                   ndpi_str->cfg.tls_cert_cache_ttl);
     if(!ndpi_str->tls_cert_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->tls_cert_cache_num_entries);
+                   ndpi_str->cfg.tls_cert_cache_num_entries);
     }
   }
-  if(ndpi_str->mining_cache_num_entries > 0) {
-    ndpi_str->mining_cache = ndpi_lru_cache_init(ndpi_str->mining_cache_num_entries,
-                                                 ndpi_str->mining_cache_ttl);
+  if(ndpi_str->cfg.mining_cache_num_entries > 0) {
+    ndpi_str->mining_cache = ndpi_lru_cache_init(ndpi_str->cfg.mining_cache_num_entries,
+                                                 ndpi_str->cfg.mining_cache_ttl);
     if(!ndpi_str->mining_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->mining_cache_num_entries);
+                   ndpi_str->cfg.mining_cache_num_entries);
     }
   }
-  if(ndpi_str->msteams_cache_num_entries > 0) {
-    ndpi_str->msteams_cache = ndpi_lru_cache_init(ndpi_str->msteams_cache_num_entries,
-                                                  ndpi_str->msteams_cache_ttl);
+  if(ndpi_str->cfg.msteams_cache_num_entries > 0) {
+    ndpi_str->msteams_cache = ndpi_lru_cache_init(ndpi_str->cfg.msteams_cache_num_entries,
+                                                  ndpi_str->cfg.msteams_cache_ttl);
     if(!ndpi_str->msteams_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->msteams_cache_num_entries);
+                   ndpi_str->cfg.msteams_cache_num_entries);
     }
   }
-  if(ndpi_str->stun_zoom_cache_num_entries > 0) {
-    ndpi_str->stun_zoom_cache = ndpi_lru_cache_init(ndpi_str->stun_zoom_cache_num_entries,
-                                                    ndpi_str->stun_zoom_cache_ttl);
+  if(ndpi_str->cfg.stun_zoom_cache_num_entries > 0) {
+    ndpi_str->stun_zoom_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_zoom_cache_num_entries,
+                                                    ndpi_str->cfg.stun_zoom_cache_ttl);
     if(!ndpi_str->stun_zoom_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->stun_zoom_cache_num_entries);
+                   ndpi_str->cfg.stun_zoom_cache_num_entries);
     }
   }
 
@@ -9630,154 +9612,6 @@ int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-int ndpi_set_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
-			    lru_cache_type cache_type,
-			    u_int32_t num_entries)
-{
-  if(!ndpi_struct)
-    return -1;
-
-  switch(cache_type) {
-  case NDPI_LRUCACHE_OOKLA:
-    ndpi_struct->ookla_cache_num_entries = num_entries;
-    return 0;
-  case NDPI_LRUCACHE_BITTORRENT:
-    ndpi_struct->bittorrent_cache_num_entries = num_entries;
-    return 0;
-  case NDPI_LRUCACHE_ZOOM:
-    ndpi_struct->zoom_cache_num_entries = num_entries;
-    return 0;
-  case NDPI_LRUCACHE_STUN:
-    ndpi_struct->stun_cache_num_entries = num_entries;
-    return 0;
-  case NDPI_LRUCACHE_TLS_CERT:
-    ndpi_struct->tls_cert_cache_num_entries = num_entries;
-    return 0;
-  case NDPI_LRUCACHE_MINING:
-    ndpi_struct->mining_cache_num_entries = num_entries;
-    return 0;
-  case NDPI_LRUCACHE_MSTEAMS:
-    ndpi_struct->msteams_cache_num_entries = num_entries;
-    return 0;
-  case NDPI_LRUCACHE_STUN_ZOOM:
-    ndpi_struct->stun_zoom_cache_num_entries = num_entries;
-    return 0;
-  default:
-    return -1;
-  }
-}
-
-int ndpi_get_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
-			    lru_cache_type cache_type,
-			    u_int32_t *num_entries)
-{
-  if(!ndpi_struct)
-    return -1;
-
-  switch(cache_type) {
-  case NDPI_LRUCACHE_OOKLA:
-    *num_entries = ndpi_struct->ookla_cache_num_entries;
-    return 0;
-  case NDPI_LRUCACHE_BITTORRENT:
-    *num_entries = ndpi_struct->bittorrent_cache_num_entries;
-    return 0;
-  case NDPI_LRUCACHE_ZOOM:
-    *num_entries = ndpi_struct->zoom_cache_num_entries;
-    return 0;
-  case NDPI_LRUCACHE_STUN:
-    *num_entries = ndpi_struct->stun_cache_num_entries;
-    return 0;
-  case NDPI_LRUCACHE_TLS_CERT:
-    *num_entries = ndpi_struct->tls_cert_cache_num_entries;
-    return 0;
-  case NDPI_LRUCACHE_MINING:
-    *num_entries = ndpi_struct->mining_cache_num_entries;
-    return 0;
-  case NDPI_LRUCACHE_MSTEAMS:
-    *num_entries = ndpi_struct->msteams_cache_num_entries;
-    return 0;
-  case NDPI_LRUCACHE_STUN_ZOOM:
-    *num_entries = ndpi_struct->stun_zoom_cache_num_entries;
-    return 0;
-  default:
-    return -1;
-  }
-}
-
-int ndpi_set_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
-			   lru_cache_type cache_type,
-			   u_int32_t ttl)
-{
-  if(!ndpi_struct)
-    return -1;
-
-  switch(cache_type) {
-  case NDPI_LRUCACHE_OOKLA:
-    ndpi_struct->ookla_cache_ttl = ttl;
-    return 0;
-  case NDPI_LRUCACHE_BITTORRENT:
-    ndpi_struct->bittorrent_cache_ttl = ttl;
-    return 0;
-  case NDPI_LRUCACHE_ZOOM:
-    ndpi_struct->zoom_cache_ttl = ttl;
-    return 0;
-  case NDPI_LRUCACHE_STUN:
-    ndpi_struct->stun_cache_ttl = ttl;
-    return 0;
-  case NDPI_LRUCACHE_TLS_CERT:
-    ndpi_struct->tls_cert_cache_ttl = ttl;
-    return 0;
-  case NDPI_LRUCACHE_MINING:
-    ndpi_struct->mining_cache_ttl = ttl;
-    return 0;
-  case NDPI_LRUCACHE_MSTEAMS:
-    ndpi_struct->msteams_cache_ttl = ttl;
-    return 0;
-  case NDPI_LRUCACHE_STUN_ZOOM:
-    ndpi_struct->stun_zoom_cache_ttl = ttl;
-    return 0;
-  default:
-    return -1;
-  }
-}
-
-int ndpi_get_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
-			   lru_cache_type cache_type,
-			   u_int32_t *ttl)
-{
-  if(!ndpi_struct || !ttl)
-    return -1;
-
-  switch(cache_type) {
-  case NDPI_LRUCACHE_OOKLA:
-    *ttl = ndpi_struct->ookla_cache_ttl;
-    return 0;
-  case NDPI_LRUCACHE_BITTORRENT:
-    *ttl = ndpi_struct->bittorrent_cache_ttl;
-    return 0;
-  case NDPI_LRUCACHE_ZOOM:
-    *ttl = ndpi_struct->zoom_cache_ttl;
-    return 0;
-  case NDPI_LRUCACHE_STUN:
-    *ttl = ndpi_struct->stun_cache_ttl;
-    return 0;
-  case NDPI_LRUCACHE_TLS_CERT:
-    *ttl = ndpi_struct->tls_cert_cache_ttl;
-    return 0;
-  case NDPI_LRUCACHE_MINING:
-    *ttl = ndpi_struct->mining_cache_ttl;
-    return 0;
-  case NDPI_LRUCACHE_MSTEAMS:
-    *ttl = ndpi_struct->msteams_cache_ttl;
-    return 0;
-  case NDPI_LRUCACHE_STUN_ZOOM:
-    *ttl = ndpi_struct->stun_zoom_cache_ttl;
-    return 0;
-  default:
-    return -1;
-  }
-}
-
 /* ******************************************************************** */
 
 /*
@@ -10550,6 +10384,32 @@ static const struct cfg_param {
   { NULL,            "flow.track_payload.enable",               "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(track_payload_enabled) },
   { NULL,            "tcp_ack_payload_heuristic.enable",        "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_ack_paylod_heuristic) },
   { NULL,            "fully_encrypted_heuristic.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic) },
+
+  /* LRU caches */
+
+  { NULL,            "lru.ookla.size",                          "1024", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_num_entries) },
+  { NULL,            "lru.ookla.ttl",                           "120", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_ttl) },
+
+  { NULL,            "lru.bittorrent.size",                     "32768", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_num_entries) },
+  { NULL,            "lru.bittorrent.ttl",                      "0", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_ttl) },
+
+  { NULL,            "lru.zoom.size",                           "512", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_num_entries) },
+  { NULL,            "lru.zoom.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_ttl) },
+
+  { NULL,            "lru.stun.size",                           "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_num_entries) },
+  { NULL,            "lru.stun.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_ttl) },
+
+  { NULL,            "lru.tls_cert.size",                       "1024", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_num_entries) },
+  { NULL,            "lru.tls_cert.ttl",                        "0", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_ttl) },
+
+  { NULL,            "lru.mining.size",                         "1024", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_num_entries) },
+  { NULL,            "lru.mining.ttl",                          "0", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_ttl) },
+
+  { NULL,            "lru.msteams.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries) },
+  { NULL,            "lru.msteams.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_ttl) },
+
+  { NULL,            "lru.stun_zoom.size",                      "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_zoom_cache_num_entries) },
+  { NULL,            "lru.stun_zoom.ttl",                       "60", "0", "16777215", CFG_PARAM_INT, __OFF(stun_zoom_cache_ttl) },
 
   { NULL, NULL, NULL, NULL, NULL, 0, -1 },
 };

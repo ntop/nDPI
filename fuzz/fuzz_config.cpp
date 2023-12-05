@@ -33,7 +33,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.remaining_bytes() < 4 + /* ndpi_init_detection_module() */
 				     NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
 				     6 + /* files */
-				     ((NDPI_LRUCACHE_MAX + 1) * 5) + /* LRU caches */
 				     1 + 3 + 1 + 3 + /* Monitoring */
 				     2 + /* Pid */
 				     2 + /* Category */
@@ -79,16 +78,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* Note that this function is not used by ndpiReader */
   if(fuzzed_data.ConsumeBool())
     ndpi_load_ipv4_ptree(ndpi_info_mod, "ipv4_addresses.txt", NDPI_PROTOCOL_TLS);
-
-  for(i = 0; i < NDPI_LRUCACHE_MAX + 1; i++) { /* + 1 to test invalid type */
-    ndpi_set_lru_cache_size(ndpi_info_mod, static_cast<lru_cache_type>(i),
-			    fuzzed_data.ConsumeIntegralInRange(0, (1 << 16) - 1));
-    ndpi_get_lru_cache_size(ndpi_info_mod, static_cast<lru_cache_type>(i), &num);
-
-    ndpi_set_lru_cache_ttl(ndpi_info_mod, static_cast<lru_cache_type>(i),
-			   fuzzed_data.ConsumeIntegralInRange(0, (1 << 24) - 1));
-    ndpi_get_lru_cache_ttl(ndpi_info_mod, static_cast<lru_cache_type>(i), &num);
-  }
 
   /* TODO: stub for geo stuff */
   ndpi_load_geoip(ndpi_info_mod, NULL, NULL);

@@ -1169,7 +1169,28 @@ struct ndpi_detection_module_config_struct {
   int fully_encrypted_heuristic;
   int track_payload_enabled;
 
-  /* TLS */
+
+  /* LRU caches */
+
+  int ookla_cache_num_entries;
+  int ookla_cache_ttl;
+  int bittorrent_cache_num_entries;
+  int bittorrent_cache_ttl;
+  int zoom_cache_num_entries;
+  int zoom_cache_ttl;
+  int stun_cache_num_entries;
+  int stun_cache_ttl;
+  int tls_cert_cache_num_entries;
+  int tls_cert_cache_ttl;
+  int mining_cache_num_entries;
+  int mining_cache_ttl;
+  int msteams_cache_num_entries;
+  int msteams_cache_ttl;
+  int stun_zoom_cache_num_entries;
+  int stun_zoom_cache_ttl;
+
+  /* Protocols */
+
   int tls_certificate_expire_in_x_days;
   int tls_app_blocks_tracking_enabled;
   int tls_sha1_fingerprint_enabled;
