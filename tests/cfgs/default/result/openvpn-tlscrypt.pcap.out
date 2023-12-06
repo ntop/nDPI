@@ -2,27 +2,27 @@ Guessed flow protos:	0
 
 DPI Packets (UDP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 173 (173.00 diss/flow)
+Num dissector calls: 156 (156.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
-LRU cache msteams:    0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
-Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
-Patricia protocols IPv6: 0/0 (search/found)
+Patricia risk IPv6:   1/0 (search/found)
+Patricia protocols:   0/0 (search/found)
+Patricia protocols IPv6: 2/0 (search/found)
 
-Skype_TeamsCall	5	339	1
+OpenVPN	13	5354	1
 
-	1	UDP 192.168.1.2:35990 <-> 24.224.190.149:39262 [proto: 125.38/Skype_Teams.Skype_TeamsCall][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: VoIP/10][4 pkts/279 bytes <-> 1 pkts/60 bytes][Goodput ratio: 40/30][72.51 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP [::1]:56256 <-> [::1]:1194 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: VPN/2][7 pkts/3253 bytes <-> 6 pkts/2101 bytes][Goodput ratio: 89/85][0.02 sec][bytes ratio: 0.215 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 3/3 11/9 4/4][Pkt Len c2s/s2c min/avg/max/stddev: 114/114 465/350 1228/1033 382/314][Plen Bins: 0,31,7,0,0,0,7,15,0,0,0,7,0,0,0,0,7,0,0,0,7,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0]
