@@ -3009,7 +3009,7 @@ static void free_ptree_data(void *data) {
 
 /* ******************************************************************** */
 
-struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs) {
+struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
   int i;
 
@@ -3033,22 +3033,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr) ndpi_debug_printf);
   NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
-
-  if(!(prefs & ndpi_dont_init_libgcrypt)) {
-    if(!gcry_control (GCRYCTL_INITIALIZATION_FINISHED_P)) {
-      const char *gcrypt_ver = gcry_check_version(NULL);
-      if(!gcrypt_ver) {
-        NDPI_LOG_ERR(ndpi_str, "Error initializing libgcrypt\n");
-        ndpi_free(ndpi_str);
-        return NULL;
-      }
-      NDPI_LOG_DBG(ndpi_str, "Libgcrypt %s\n", gcrypt_ver);
-      /* Tell Libgcrypt that initialization has completed. */
-      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
-    }
-  } else {
-    NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
-  }
 
   if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) == NULL ||
      (ndpi_str->protocols_ptree6 = ndpi_patricia_new(128 /* IPv6 */)) == NULL) {
@@ -3248,6 +3232,20 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
 
   if(!ndpi_str)
     return;
+
+  if(ndpi_str->cfg.libgcrypt_init) {
+    if(!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P)) {
+      const char *gcrypt_ver = gcry_check_version(NULL);
+      if(!gcrypt_ver) {
+        NDPI_LOG_ERR(ndpi_str, "Error initializing libgcrypt\n");
+      }
+      NDPI_LOG_DBG(ndpi_str, "Libgcrypt %s\n", gcrypt_ver);
+      /* Tell Libgcrypt that initialization has completed. */
+      gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
+    }
+  } else {
+    NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
+  }
 
   if(ndpi_str->cfg.ip_lists_enabled) {
     if(ndpi_str->cfg.ip_list_amazonaws_enabled) {
@@ -9068,7 +9066,7 @@ void ndpi_generate_options(u_int opt, FILE *options_out) {
   u_int i;
 
   if (!options_out) return;
-  ndpi_str = ndpi_init_detection_module(ndpi_no_prefs);
+  ndpi_str = ndpi_init_detection_module();
   if (!ndpi_str) return;
 
   NDPI_BITMASK_SET_ALL(all);
@@ -10407,6 +10405,7 @@ static const struct cfg_param {
   { NULL,            "flow.track_payload.enable",               "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(track_payload_enabled) },
   { NULL,            "tcp_ack_payload_heuristic.enable",        "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_ack_paylod_heuristic) },
   { NULL,            "fully_encrypted_heuristic.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic) },
+  { NULL,            "libgcrypt.init",                          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(libgcrypt_init) },
 
   { NULL,            "asn_lists.load",                          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(asn_lists_enabled) },
   { NULL,            "ip_lists.load",                           "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ip_lists_enabled) },

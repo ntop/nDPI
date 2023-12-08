@@ -79,7 +79,6 @@ extern u_int8_t max_num_udp_dissected_pkts /* 24 */, max_num_tcp_dissected_pkts 
 static u_int32_t flow_id = 0;
 
 u_int8_t enable_doh_dot_detection = 0;
-extern ndpi_init_prefs init_prefs;
 
 extern int malloc_size_stats;
 extern struct ndpi_bin malloc_bins;
@@ -410,7 +409,7 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
   else
    op = 0; /* Default action: remove from the bitmask */
   /* Use a temporary module with all protocols enabled */
-  module = ndpi_init_detection_module(0);
+  module = ndpi_init_detection_module();
   if(!module)
     return 1;
   NDPI_BITMASK_SET_ALL(all);
@@ -466,7 +465,7 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
 #endif
 
   /* TODO: just needed here to init ndpi ndpi_malloc wrapper */
-  module = ndpi_init_detection_module(init_prefs);
+  module = ndpi_init_detection_module();
 
   if(module == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");

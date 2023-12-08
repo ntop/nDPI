@@ -36,12 +36,11 @@ void fuzz_set_alloc_callbacks_and_seed(int seed)
 
 void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_mod)
 {
-  ndpi_init_prefs prefs = ndpi_no_prefs;
   NDPI_PROTOCOL_BITMASK all;
   NDPI_PROTOCOL_BITMASK debug_bitmask;
 
   if(*ndpi_info_mod == NULL) {
-    *ndpi_info_mod = ndpi_init_detection_module(prefs);
+    *ndpi_info_mod = ndpi_init_detection_module();
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(*ndpi_info_mod, &all);
 

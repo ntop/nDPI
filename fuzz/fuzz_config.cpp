@@ -30,8 +30,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char log_ts[32];
 
 
-  if(fuzzed_data.remaining_bytes() < 4 + /* ndpi_init_detection_module() */
-				     NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
+  if(fuzzed_data.remaining_bytes() < NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
 				     6 + /* files */
 				     1 + 3 + 1 + 3 + /* Monitoring */
 				     2 + /* Pid */
@@ -45,7 +44,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
-  ndpi_info_mod = ndpi_init_detection_module(fuzzed_data.ConsumeIntegral<u_int32_t>());
+  ndpi_info_mod = ndpi_init_detection_module();
 
   set_ndpi_debug_function(ndpi_info_mod, NULL);
 

@@ -1168,7 +1168,7 @@ struct ndpi_detection_module_config_struct {
      See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
   int fully_encrypted_heuristic;
   int track_payload_enabled;
-
+  int libgcrypt_init;
 
   /* LRU caches */
 
@@ -1583,13 +1583,6 @@ typedef struct {
   u_int8_t cidr;
   u_int16_t value;
 } ndpi_network6;
-
-typedef u_int32_t ndpi_init_prefs;
-
-typedef enum {
-    ndpi_no_prefs                  = 0,
-    ndpi_dont_init_libgcrypt       = (1 << 1),
-} ndpi_prefs;
 
 typedef struct {
   u_int32_t protocol_id;

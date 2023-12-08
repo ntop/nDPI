@@ -373,7 +373,7 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  ndpi_info_mod = ndpi_init_detection_module(ndpi_no_prefs);
+  ndpi_info_mod = ndpi_init_detection_module();
 
   if (ndpi_info_mod == NULL)
     return -1;

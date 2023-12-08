@@ -110,7 +110,6 @@ int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 char *_disabled_protocols = NULL;
 static u_int8_t stats_flag = 0;
-ndpi_init_prefs init_prefs = ndpi_no_prefs;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
@@ -334,7 +333,7 @@ void ndpiCheckHostStringMatch(char *testChar) {
   if(!testChar)
     return;
 
-  ndpi_str = ndpi_init_detection_module(init_prefs);
+  ndpi_str = ndpi_init_detection_module();
   ndpi_finalize_initialization(ndpi_str);
 
   testRes =  ndpi_match_string_subprotocol(ndpi_str,
@@ -377,7 +376,7 @@ static void ndpiCheckIPMatch(char *testChar) {
   if(!testChar)
     return;
 
-  ndpi_str = ndpi_init_detection_module(init_prefs);
+  ndpi_str = ndpi_init_detection_module();
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
@@ -602,7 +601,7 @@ static void help(u_int long_help) {
          max_num_reported_top_payloads, max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts);
 
   NDPI_PROTOCOL_BITMASK all;
-  ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  ndpi_info_mod = ndpi_init_detection_module();
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
 
@@ -765,7 +764,7 @@ void extcap_config() {
   ndpi_proto_defaults_t *proto_defaults;
 #endif
 
-  ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  ndpi_info_mod = ndpi_init_detection_module();
 #if 0
   ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
   proto_defaults = ndpi_get_proto_defaults(ndpi_info_mod);
@@ -4649,7 +4648,7 @@ static void dgaUnitTest() {
   };
   int debug = 0, i;
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(init_prefs);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module();
 
   assert(ndpi_str != NULL);
 
@@ -5563,7 +5562,7 @@ int main(int argc, char **argv) {
     ac_automata_enable_debug(1);
   parseOptions(argc, argv);
 
-  ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  ndpi_info_mod = ndpi_init_detection_module();
 
   if(ndpi_info_mod == NULL) return -1;
 
