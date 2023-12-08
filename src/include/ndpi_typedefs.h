@@ -1534,8 +1534,7 @@ struct ndpi_flow_struct {
 
 
   /* NDPI_PROTOCOL_OPENVPN */
-  u_int8_t ovpn_session_id[8];
-  u_int8_t ovpn_counter;
+  u_int8_t ovpn_session_id[2][8];
 
   /* NDPI_PROTOCOL_TINC */
   u_int8_t tinc_state;

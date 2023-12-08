@@ -1,8 +1,8 @@
 Guessed flow protos:	0
 
-DPI Packets (UDP):	3	(3.00 pkts/flow)
+DPI Packets (UDP):	2	(2.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 157 (157.00 diss/flow)
+Num dissector calls: 123 (123.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -23,6 +23,6 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Discord	40	4040	1
+OpenVPN	944	303931	1
 
-	1	UDP 66.22.242.132:50001 <-> 5.36.141.228:54935 [VLAN: 1][proto: 58/Discord][IP: 58/Discord][Encrypted][Confidence: DPI][DPI packets: 3][cat: Collaborative/15][30 pkts/3110 bytes <-> 10 pkts/930 bytes][Goodput ratio: 43/37][24.00 sec][bytes ratio: 0.540 (Upload)][IAT c2s/s2c min/avg/max/stddev: 42/77 846/1740 1000/4217 343/1555][Pkt Len c2s/s2c min/avg/max/stddev: 72/68 104/93 110/118 14/25][Plen Bins: 25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 3.111.166.78:51146 <-> 85.134.13.165:1194 [proto: 159/OpenVPN][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][DPI packets: 2][cat: VPN/2][594 pkts/138399 bytes <-> 350 pkts/165532 bytes][Goodput ratio: 82/91][73.25 sec][bytes ratio: -0.089 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 101/181 5093/5107 502/713][Pkt Len c2s/s2c min/avg/max/stddev: 60/64 233/473 1490/1487 273/526][PLAIN TEXT (New York1)][Plen Bins: 18,1,1,72,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0]
