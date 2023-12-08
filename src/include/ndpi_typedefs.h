@@ -1211,6 +1211,27 @@ struct ndpi_detection_module_config_struct {
   int http_parse_response_enabled;
 
   int ookla_aggressiveness;
+
+  int ip_lists_enabled;
+  int ip_list_amazonaws_enabled;
+  int ip_list_azure_enabled;
+  int ip_list_cachefly_enabled;
+  int ip_list_cloudflare_enabled;
+  int ip_list_google_enabled;
+  int ip_list_googlecloud_enabled;
+  int ip_list_microsoft_enabled;
+  int ip_list_ethereum_enabled;
+  int ip_list_mullvad_enabled;
+  int ip_list_protonvpn_enabled;
+  int ip_list_tor_enabled;
+  int ip_list_whatsapp_enabled;
+  int ip_list_zoom_enabled;
+  int asn_lists_enabled;
+
+  int flow_risk_lists_enabled;
+  int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
+  int risk_anonymous_subscriber_list_protonvpn_enabled;
+  int risk_crawler_bot_list_enabled;
 };
 
 struct ndpi_flow_struct {
@@ -1568,26 +1589,8 @@ typedef u_int32_t ndpi_init_prefs;
 
 typedef enum {
     ndpi_no_prefs                  = 0,
-    ndpi_dont_load_tor_list        = (1 << 0),
     ndpi_dont_init_libgcrypt       = (1 << 1),
-    ndpi_dont_load_azure_list      = (1 << 3),
-    ndpi_dont_load_whatsapp_list   = (1 << 4),
-    ndpi_dont_load_amazon_aws_list = (1 << 5),
-    ndpi_dont_load_ethereum_list   = (1 << 6),
-    ndpi_dont_load_zoom_list       = (1 << 7),
-    ndpi_dont_load_cloudflare_list = (1 << 8),
-    ndpi_dont_load_microsoft_list  = (1 << 9),
-    ndpi_dont_load_google_list     = (1 << 10),
-    ndpi_dont_load_google_cloud_list = (1 << 11),
-    ndpi_dont_load_asn_lists       = (1 << 12),
-    ndpi_dont_load_icloud_private_relay_list  = (1 << 13),
-    ndpi_dont_init_risk_ptree      = (1 << 14),
-    ndpi_dont_load_cachefly_list   = (1 << 15),
-    ndpi_dont_load_crawlers_list = (1 << 18),
-    ndpi_dont_load_protonvpn_list = (1 << 19),
-    ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 21),
-    ndpi_dont_load_mullvad_list = (1 << 22),
-  } ndpi_prefs;
+} ndpi_prefs;
 
 typedef struct {
   u_int32_t protocol_id;
