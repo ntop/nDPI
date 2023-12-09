@@ -10573,14 +10573,3 @@ void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
     return ndpi_str->user_data;
   return NULL;
 }
-
-/* ******************************************************************** */
-
-int tpkt_verify_hdr(const struct ndpi_packet_struct * const packet)
-{
-  return ((packet->tcp != NULL) && (packet->payload_packet_len > 4) &&
-          (packet->payload[0] == 3) && (packet->payload[1] == 0) &&
-          (get_u_int16_t(packet->payload,2) == htons(packet->payload_packet_len)));
-}
-
-/* ******************************************************************** */
