@@ -1099,12 +1099,6 @@ extern "C" {
   u_int32_t ndpi_get_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
                                              u_int16_t proto);
 
-  int ndpi_set_monitoring_state(struct ndpi_detection_module_struct *ndpi_struct,
-                                u_int16_t proto, u_int32_t num_pkts, u_int32_t flags);
-  int ndpi_get_monitoring_state(struct ndpi_detection_module_struct *ndpi_struct,
-                                u_int16_t proto, u_int32_t *num_pkts, u_int32_t *flags);
-
-
   /**
    * Find a protocol id associated with a string automata
    *

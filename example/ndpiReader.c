@@ -94,8 +94,6 @@ static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
 u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
-int stun_monitoring_pkts_to_process = -1; /* Default */
-int stun_monitoring_flags = -1; /* Default */
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 char *_disabled_protocols = NULL;
@@ -591,8 +589,6 @@ static void help(u_int long_help) {
          "  -Z proto:value            | Set this value of aggressiveness for this protocol (0 to disable it). This flag can be used multiple times\n"
          "  --lru-cache-size=NAME:size       | Specify the size for this LRU cache (0 to disable it). This flag can be used multiple times\n"
          "  --lru-cache-ttl=NAME:size        | Specify the TTL [in seconds] for this LRU cache (0 to disable it). This flag can be used multiple times\n"
-         "  --stun-monitoring=<pkts>:<flags> | Configure STUN monitoring: keep monitoring STUN session for <pkts> more pkts looking for RTP\n"
-         "                                   | (0:0 to disable the feature); set the specified features in <flags>\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -646,8 +642,6 @@ static void help(u_int long_help) {
 #define OPTLONG_VALUE_LRU_CACHE_SIZE	1000
 #define OPTLONG_VALUE_LRU_CACHE_TTL	1001
 
-#define OPTLONG_VALUE_STUN_MONITORING	2000
-
 static struct option longopts[] = {
   /* mandatory extcap options */
   { "extcap-interfaces", no_argument, NULL, '0'},
@@ -691,7 +685,6 @@ static struct option longopts[] = {
 
   { "lru-cache-size", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_SIZE},
   { "lru-cache-ttl", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_TTL},
-  { "stun-monitoring", required_argument, NULL, OPTLONG_VALUE_STUN_MONITORING},
 
   {0, 0, 0, 0}
 };
@@ -966,7 +959,6 @@ static void parseOptions(int argc, char **argv) {
 #endif
 #endif
   int cache_idx, cache_size, cache_ttl;
-  u_int32_t num_pkts, flags;
 
 #ifdef USE_DPDK
   {
@@ -1300,15 +1292,6 @@ static void parseOptions(int argc, char **argv) {
         exit(1);
       }
       lru_cache_ttls[cache_idx] = cache_ttl;
-      break;
-
-    case OPTLONG_VALUE_STUN_MONITORING:
-      if(parse_two_unsigned_integer(optarg, &num_pkts, &flags) == -1) {
-        printf("Invalid parameter [%s]\n", optarg);
-        exit(1);
-      }
-      stun_monitoring_pkts_to_process = num_pkts;
-      stun_monitoring_flags = flags;
       break;
 
     default:
@@ -2751,11 +2734,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
     if(aggressiveness[i] != -1)
       ndpi_set_protocol_aggressiveness(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, aggressiveness[i]);
   }
-
-  if(stun_monitoring_pkts_to_process != -1 &&
-     stun_monitoring_flags != -1)
-    ndpi_set_monitoring_state(ndpi_thread_info[thread_id].workflow->ndpi_struct, NDPI_PROTOCOL_STUN,
-                              stun_monitoring_pkts_to_process, stun_monitoring_flags);
 
   ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 

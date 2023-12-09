@@ -253,9 +253,6 @@ struct ndpi_detection_module_struct {
   int opportunistic_tls_ftp_enabled;
   int opportunistic_tls_stun_enabled;
 
-  u_int32_t monitoring_stun_pkts_to_process;
-  u_int32_t monitoring_stun_flags;
-
   u_int32_t aggressiveness_ookla;
 
   int tcp_ack_paylod_heuristic;
