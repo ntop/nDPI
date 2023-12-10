@@ -1,5 +1,3 @@
-Guessed flow protos:	0
-
 DPI Packets (TCP):	92	(6.13 pkts/flow)
 DPI Packets (UDP):	5	(1.67 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)

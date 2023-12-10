@@ -1,5 +1,3 @@
-Guessed flow protos:	1
-
 DPI Packets (TCP):	17	(8.50 pkts/flow)
 Confidence DPI              : 2 (flows)
 Num dissector calls: 131 (65.50 diss/flow)
