@@ -745,6 +745,8 @@ struct ndpi_lru_cache {
   struct ndpi_lru_cache_entry *entries;
 };
 
+#define NDPI_GIVEUP_GUESS_BY_PORT	0x01
+#define NDPI_GIVEUP_GUESS_BY_IP		0x02
 
 /* Aggressiveness values */
 
@@ -1169,6 +1171,7 @@ struct ndpi_detection_module_config_struct {
   int fully_encrypted_heuristic;
   int track_payload_enabled;
   int libgcrypt_init;
+  int guess_on_giveup;
 
   /* LRU caches */
 

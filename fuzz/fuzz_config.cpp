@@ -142,7 +142,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   assert(pkt.size() >= 21); /* To be sure check on fuzzed_data.remaining_bytes() at the beginning is right */
 
   ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, &input_info);
-  p = ndpi_detection_giveup(ndpi_info_mod, &flow, 1, &protocol_was_guessed);
+  p = ndpi_detection_giveup(ndpi_info_mod, &flow, &protocol_was_guessed);
 
   assert(p.master_protocol == ndpi_get_flow_masterprotocol(ndpi_info_mod, &flow));
   assert(p.app_protocol == ndpi_get_flow_appprotocol(ndpi_info_mod, &flow));

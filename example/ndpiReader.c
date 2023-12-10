@@ -92,7 +92,7 @@ static char* domain_to_check = NULL;
 static char* ip_port_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
-u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
+u_int8_t enable_protocol_guess = NDPI_GIVEUP_GUESS_BY_PORT | NDPI_GIVEUP_GUESS_BY_IP, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
 int stun_monitoring_pkts_to_process = -1; /* Default */
 int stun_monitoring_flags = -1; /* Default */
@@ -551,7 +551,7 @@ static void help(u_int long_help) {
          "                            | 0 - List known protocols\n"
          "                            | 1 - List known categories\n"
          "                            | 2 - List known risks\n"
-         "  -d                        | Disable protocol guess and use only DPI\n"
+         "  -d                        | Disable protocol guess (by ip and by port) and use only DPI. It is a shortcut to --cfg=,NULL,guess_on_giveup,0\n"
          "  -e <len>                  | Min human readeable string match len. Default %u\n"
          "  -q                        | Quiet mode\n"
          "  -F                        | Enable flow stats\n"
@@ -940,6 +940,19 @@ static int parse_three_strings(char *param, char **s1, char **s2, char **s3)
   return -1;
 }
 
+int __add_cfg(char *proto, char *param, char *value)
+{
+  if(num_cfgs >= MAX_NUM_CFGS) {
+    printf("Too many parameter! [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+    return -1;
+  }
+  cfgs[num_cfgs].proto = proto;
+  cfgs[num_cfgs].param = param;
+  cfgs[num_cfgs].value = value;
+  num_cfgs++;
+  return 0;
+}
+
 /* ********************************** */
 
 /**
@@ -993,6 +1006,10 @@ static void parseOptions(int argc, char **argv) {
 
     case 'd':
       enable_protocol_guess = 0;
+      if(__add_cfg(NULL, "guess_on_giveup", "0") == 1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
     case 'D':
@@ -1245,15 +1262,11 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case OPTLONG_VALUE_CFG:
-      if(num_cfgs >= MAX_NUM_CFGS ||
-	 parse_three_strings(optarg, &s1, &s2, &s3) == -1) {
+      if(parse_three_strings(optarg, &s1, &s2, &s3) == -1 ||
+	 __add_cfg(s1, s2, s3) == -1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
-      cfgs[num_cfgs].proto = s1;
-      cfgs[num_cfgs].param = s2;
-      cfgs[num_cfgs].value = s3;
-      num_cfgs++;
       break;
 
     default:
@@ -2109,10 +2122,10 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
       malloc_size_stats = 1;
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct,
-                                                      flow->ndpi_flow, enable_protocol_guess, &proto_guessed);
+                                                      flow->ndpi_flow, &proto_guessed);
       malloc_size_stats = 0;
 
-      if(enable_protocol_guess) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
+      if(proto_guessed) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
     }
 
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
