@@ -37,23 +37,18 @@ static void ndpi_int_h323_add_connection(struct ndpi_detection_module_struct *nd
 static void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow)
 {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  const struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
   u_int16_t dport = 0, sport = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search H323\n");
 
   /* TPKT header length + Q.931 header length without IE */
-  if ((packet->payload_packet_len) > 10 && (packet->tcp != NULL)) {
-    if ((packet->payload[0] == 0x03) && 
-        (packet->payload[1] == 0x00) &&
-        (ntohs(get_u_int16_t(packet->payload, 2)) == packet->payload_packet_len))
-    {
+  if (tpkt_verify_hdr(packet) && (packet->payload_packet_len > 10)) {
       /* Check Q.931 Protocol Discriminator and call reference value length */
       if ((packet->payload[4] == 0x08) && ((packet->payload[5] & 0xF) <= 3)) {
         ndpi_int_h323_add_connection(ndpi_struct, flow);
         return;
       }
-    }
   } else if (packet->udp != NULL) {
     sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
     NDPI_LOG_DBG2(ndpi_struct, "calculated dport over udp\n");

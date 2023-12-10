@@ -40,39 +40,29 @@ static void ndpi_search_s7comm(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "search S7comm\n");
 
-  if (packet->tcp) {
-    u_int16_t sport = ntohs(packet->tcp->source);
-    u_int16_t dport = ntohs(packet->tcp->dest);
-
-    /* S7Comm uses a default TPKT port 102 */
-    if (((sport == TPKT_PORT) || (dport == TPKT_PORT)) &&
-        (packet->payload_packet_len > 17)) /* TPKT+COTP+S7Comm header lengths */
-    {
-      if ((packet->payload[0] == 0x03) && (packet->payload[1] == 0x00) &&
-          (ntohs(get_u_int16_t(packet->payload, 2)) == packet->payload_packet_len))
+  if (tpkt_verify_hdr(packet) && (packet->payload_packet_len > 17) &&
+      ((packet->tcp->source == htons(TPKT_PORT)) ||
+       (packet->tcp->dest == htons(TPKT_PORT))))
+  {
+    if (packet->payload[7] == S7COMM_PLUS_MAGIC_BYTE) {
+      const u_int16_t trail_byte_offset = packet->payload_packet_len - 4;
+      if (packet->payload[trail_byte_offset] == S7COMM_PLUS_MAGIC_BYTE) {
+        NDPI_LOG_INFO(ndpi_struct, "found S7CommPlus\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM_PLUS, 
+                                   NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+        return;
+      } 
+    } else if (packet->payload[7] == S7COMM_MAGIC_BYTE) {
+      if (((packet->payload[8] <= 0x03) || (packet->payload[8] == 0x07)) &&
+          (get_u_int16_t(packet->payload, 9) == 0))
       {
-          if (packet->payload[7] == S7COMM_PLUS_MAGIC_BYTE) {
-            const u_int16_t trail_byte_offset = packet->payload_packet_len - 4;
-            if (packet->payload[trail_byte_offset] == S7COMM_PLUS_MAGIC_BYTE)
-            {
-              NDPI_LOG_INFO(ndpi_struct, "found S7CommPlus\n");
-              ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM_PLUS, 
-                                         NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-              return;
-            }
-          } else if (packet->payload[7] == S7COMM_MAGIC_BYTE) {
-            if (((packet->payload[8] <= 0x03) || (packet->payload[8] == 0x07)) &&
-                (get_u_int16_t(packet->payload, 9) == 0))
-            {
-              NDPI_LOG_INFO(ndpi_struct, "found S7Comm\n");
-              ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM, 
-                                         NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-              return;
-            }
-          }
-	  return;
+        NDPI_LOG_INFO(ndpi_struct, "found S7Comm\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM, 
+                                   NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+        return;
       }
     }
+    return;
   }
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

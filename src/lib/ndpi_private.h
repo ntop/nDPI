@@ -417,7 +417,8 @@ u_int32_t make_mining_key(struct ndpi_flow_struct *flow);
 /* Stun */
 int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
-
+/* TPKT */
+int tpkt_verify_hdr(const struct ndpi_packet_struct * const packet);
 
 /* Protocols init */
 void init_diameter_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
