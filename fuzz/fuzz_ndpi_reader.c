@@ -57,9 +57,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 #endif
 
     workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json);
-    // enable all protocols
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
 
     NDPI_BITMASK_SET_ALL(debug_bitmask);
     ndpi_set_log_level(workflow->ndpi_struct, 4);
@@ -70,6 +67,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_load_risk_domain_file(workflow->ndpi_struct, "risky_domains.txt");
     ndpi_load_malicious_ja3_file(workflow->ndpi_struct, "ja3_fingerprints.csv");
     ndpi_load_malicious_sha1_file(workflow->ndpi_struct, "sha1_fingerprints.csv");
+
+    // enable all protocols
+    NDPI_BITMASK_SET_ALL(all);
+    ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
 
     ndpi_set_detection_preferences(workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 0 /* unused */);
 

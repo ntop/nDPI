@@ -1414,9 +1414,6 @@ static void tls_subclassify_by_alpn(struct ndpi_detection_module_struct *ndpi_st
 				    struct ndpi_flow_struct *flow) {
   /* Right now we have only one rule so we can keep it trivial */
 
-  if (!flow->protos.tls_quic.advertised_alpns)
-    return;
-
   if(strlen(flow->protos.tls_quic.advertised_alpns) > NDPI_STATICSTRING_LEN("anydesk/") &&
      strncmp(flow->protos.tls_quic.advertised_alpns, "anydesk/", NDPI_STATICSTRING_LEN("anydesk/")) == 0) {
 #ifdef DEBUG_TLS

@@ -5,8 +5,8 @@
 
 #define MBEDTLS_CHECK_RETURN_TYPICAL
 #define MBEDTLS_INTERNAL_VALIDATE_RET( cond, ret )  do { } while( 0 )
-#include "../src/lib/third_party/include/gcrypt/cipher.h"
-#include "../src/lib/third_party/include/gcrypt/aes.h"
+#include "gcrypt/cipher.h"
+#include "gcrypt/aes.h"
 
 extern int force_no_aesni;
 

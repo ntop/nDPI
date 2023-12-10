@@ -7,6 +7,8 @@
 ################################################################
 #
 # Listingdate,SHA1,Listingreason
+#The first entry (and only the first one) is fake. It is used to trigger the risk in the tests
+1970-01-01 00:00:00,0DDB34F875632C7E1EC09D75827F82D2336DFEB6, Fake
 2022-07-02 07:02:11,3784422d67a6ae0c82d60eeaf3850960a9896cb2,AsyncRAT C&C
 2022-07-01 18:28:10,a0d78b3ddb27cd4f110a0292cab800beadaf9bd2,AsyncRAT C&C
 2022-07-01 09:44:14,4c319ec8b5a66a256a0137d70cd0f9a76bb23fd7,AsyncRAT C&C
