@@ -1,1 +1,0 @@
---stun-monitoring=20:1

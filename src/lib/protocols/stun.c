@@ -345,9 +345,8 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
 
   /* We have a sub-classification */
 
-  if((ndpi_struct->monitoring_stun_flags & NDPI_MONITORING_STUN_SUBCLASSIFIED) &&
-     flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RTP)
-    return 1;
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_RTP)
+    return 0;
 
   /* Looking for XOR-PEER-ADDRESS metadata; TODO: other protocols? */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP)
@@ -614,25 +613,22 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
     ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, __get_master(flow), confidence);
   }
 
-  /* This is quite complex. We want extra dissection for:
+  /* We want extra dissection for:
      * sub-classification
-     * metadata extraction in general
-       * Telegram: we need more packets to find all XOR-PEER-ADDRESS attributes
-     * monitoring, i.e. looking for RTP
-     And all these cases might overlap...
+     * metadata extraction or looking for RTP
+     The latter is enabled only without sub-classification or for Telegram
+     (to find all XOR-PEER-ADDRESS attributes)
   */
   if(!flow->extra_packets_func) {
     if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN /* No-subclassification */ ||
-       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP /* Metadata. TODO: other protocols? */ ||
-       (ndpi_struct->monitoring_stun_pkts_to_process > 0 &&
-        (ndpi_struct->monitoring_stun_flags & NDPI_MONITORING_STUN_SUBCLASSIFIED))) {
+       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP /* Metadata. TODO: other protocols? */) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
 
       if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP) {
         flow->max_extra_packets_to_check = 10; /* Looking for metadata. There are no really RTP packets
 						  in Telegram flows, so no need to enable monitoring for them */
       } else {
-        flow->max_extra_packets_to_check = ndpi_max(4, ndpi_struct->monitoring_stun_pkts_to_process);
+        flow->max_extra_packets_to_check = 4;
         flow->extra_packets_func = stun_search_again;
       }
     }

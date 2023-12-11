@@ -74,9 +74,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     ndpi_set_detection_preferences(workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 0 /* unused */);
 
-    ndpi_set_monitoring_state(workflow->ndpi_struct, NDPI_PROTOCOL_STUN,
-                              10, NDPI_MONITORING_STUN_SUBCLASSIFIED);
-
     memset(workflow->stats.protocol_counter, 0,
 	   sizeof(workflow->stats.protocol_counter));
     memset(workflow->stats.protocol_counter_bytes, 0,
