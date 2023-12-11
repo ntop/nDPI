@@ -56,9 +56,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 #endif
 
     workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json);
-    // enable all protocols
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
 
     NDPI_BITMASK_SET_ALL(debug_bitmask);
     ndpi_set_log_level(workflow->ndpi_struct, 4);
@@ -73,6 +70,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "flow.track_payload.enable", "1");
     ndpi_set_config(workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
     ndpi_set_config(workflow->ndpi_struct, "tls", "application_blocks_tracking.enable", "1");
+
+    // enable all protocols
+    NDPI_BITMASK_SET_ALL(all);
+    ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
 
     ndpi_set_monitoring_state(workflow->ndpi_struct, NDPI_PROTOCOL_STUN,
                               10, NDPI_MONITORING_STUN_SUBCLASSIFIED);

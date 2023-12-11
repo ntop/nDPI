@@ -41,15 +41,13 @@ static void ndpi_int_rdp_add_connection(struct ndpi_detection_module_struct *ndp
 
 static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  const struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
 	
   NDPI_LOG_DBG(ndpi_struct, "search RDP\n");
 
   if (packet->tcp != NULL) {
     if(packet->payload_packet_len > 13 &&
-       /* TPKT */
-       packet->payload[0] == 0x03 && packet->payload[1] == 0x00 &&
-       ntohs(*(uint16_t *)&packet->payload[2]) == packet->payload_packet_len &&
+       tpkt_verify_hdr(packet) &&
        /* COTP */
        packet->payload[4] == packet->payload_packet_len - 5) {
 

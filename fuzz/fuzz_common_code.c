@@ -41,8 +41,6 @@ void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_
 
   if(*ndpi_info_mod == NULL) {
     *ndpi_info_mod = ndpi_init_detection_module();
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(*ndpi_info_mod, &all);
 
     NDPI_BITMASK_SET_ALL(debug_bitmask);
     ndpi_set_log_level(*ndpi_info_mod, 4);
@@ -54,6 +52,9 @@ void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_
     ndpi_load_risk_domain_file(*ndpi_info_mod, "risky_domains.txt");
     ndpi_load_malicious_ja3_file(*ndpi_info_mod, "ja3_fingerprints.csv");
     ndpi_load_malicious_sha1_file(*ndpi_info_mod, "sha1_fingerprints.csv");
+
+    NDPI_BITMASK_SET_ALL(all);
+    ndpi_set_protocol_detection_bitmask2(*ndpi_info_mod, &all);
 
     ndpi_finalize_initialization(*ndpi_info_mod);
   }

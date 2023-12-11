@@ -3,7 +3,7 @@
 #include "fuzzer/FuzzedDataProvider.h"
 
 #define MBEDTLS_CHECK_RETURN_TYPICAL
-#include "../src/lib/third_party/include/gcrypt/aes.h"
+#include "gcrypt/aes.h"
 
 extern int force_no_aesni;
 

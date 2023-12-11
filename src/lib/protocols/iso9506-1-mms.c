@@ -47,9 +47,7 @@ static void ndpi_search_iso9506_1_mms(struct ndpi_detection_module_struct *ndpi_
 
   NDPI_LOG_DBG(ndpi_struct, "search ISO 9506-1 MMS\n");
   
-  if ((packet->payload_packet_len > 60) && (packet->payload[0] == 3) &&
-      (packet->payload[1] == 0) && 
-      (get_u_int16_t(packet->payload, 2) == htons(packet->payload_packet_len)))
+  if ((packet->payload_packet_len > 60) && tpkt_verify_hdr(packet))
   {
     if (current_pkt_from_client_to_server(ndpi_struct, flow)) {
       /* Check COTP and ISO 8327-1 headers */

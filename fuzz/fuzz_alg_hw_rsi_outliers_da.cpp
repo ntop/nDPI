@@ -74,6 +74,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_predict_linear(values, num_values, predict_periods, &prediction);
 
   /* Data analysis stuff */
+  ndpi_data_print_window_values(a);
   ndpi_data_average(a);
   ndpi_data_mean(a);
   ndpi_data_variance(a);
