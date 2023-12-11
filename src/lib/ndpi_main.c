@@ -10341,12 +10341,45 @@ static char *_get_param_int(void *_variable, char *buf, int buf_len)
   return buf;
 }
 
+static int _set_param_string(void *_variable, const char *value)
+{
+  char **variable = (char **)_variable;
+
+  *variable = ndpi_strdup(value);
+  if(!*variable)
+    return -1;
+  return 0;
+}
+
+/* It can be used for CFG_PARAM_FILENAME parameters, too */
+static char *_get_param_string(void *_variable, char *buf, int buf_len)
+{
+  char **variable = (char **)_variable;
+
+  snprintf(buf, buf_len, "%s", *variable);
+  buf[buf_len - 1] = '\0';
+  return buf;
+}
+
+static int _set_param_filename(void *_variable, const char *value)
+{
+  char **variable = (char **)_variable;
+
+  if(access(value, F_OK) != 0)
+    return -1;
+  *variable = ndpi_strdup(value);
+  if(!*variable)
+    return -1;
+  return 0;
+}
 
 typedef int (*cfg_fn)(void *variable, const char *value);
 
 enum cfg_param_type {
   CFG_PARAM_ENABLE_DISABLE = 0,
   CFG_PARAM_INT            = 1,
+  CFG_PARAM_STRING         = 2,
+  CFG_PARAM_FILENAME       = 3, /* Like string, but we check also if the file exists */
 };
 
 #define __OFF(a)	offsetof(struct ndpi_detection_module_config_struct, a)
@@ -10418,6 +10451,12 @@ static const struct cfg_param {
   { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_protonvpn_enabled) },
   { NULL,            "flow_risk.crawler_bot.list.load",                             "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_crawler_bot_list_enabled) },
 
+  { NULL,            "filename.protocols",                      NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_protocols) },
+  { NULL,            "filename.catecories",                     NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_categories) },
+  { NULL,            "filename.malicious_sha1",                 NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_malicious_sha1) },
+  { NULL,            "filename.malicious_ja3",                  NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_malicious_ja3) },
+  { NULL,            "filename.risk_domains",                   NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_risk_domains) },
+
   /* LRU caches */
 
   { NULL,            "lru.ookla.size",                          "1024", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_num_entries) },
@@ -10461,6 +10500,12 @@ static void set_default_config(struct ndpi_detection_module_config_struct *cfg)
     case CFG_PARAM_INT:
       _set_param_int((void *)((char *)cfg + c->offset), c->default_value, c->min_value, c->max_value);
       break;
+    case CFG_PARAM_STRING:
+      _set_param_string((void *)((char *)cfg + c->offset), c->default_value);
+      break;
+    case CFG_PARAM_FILENAME:
+      _set_param_filename((void *)((char *)cfg + c->offset), c->default_value);
+      break;
     }
   }
 }
@@ -10485,6 +10530,10 @@ int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
         return _set_param_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), value);
       case CFG_PARAM_INT:
         return _set_param_int((void *)((char *)&ndpi_str->cfg + c->offset), value, c->min_value, c->max_value);
+      case CFG_PARAM_STRING:
+        return _set_param_string((void *)((char *)&ndpi_str->cfg + c->offset), value);
+      case CFG_PARAM_FILENAME:
+        return _set_param_filename((void *)((char *)&ndpi_str->cfg + c->offset), value);
       }
     }
   }
@@ -10510,6 +10559,9 @@ char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
       case CFG_PARAM_ENABLE_DISABLE:
       case CFG_PARAM_INT:
         return _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), buf, buf_len);
+      case CFG_PARAM_STRING:
+      case CFG_PARAM_FILENAME:
+        return _get_param_string((void *)((char *)&ndpi_str->cfg + c->offset), buf, buf_len);
       }
     }
   }
@@ -10539,6 +10591,16 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
       if(c->min_value && c->max_value)
         fprintf(fd, " [%s-%s]", c->min_value, c->max_value);
       fprintf(fd, "\n");
+      break;
+    case CFG_PARAM_STRING:
+    case CFG_PARAM_FILENAME:
+      fprintf(fd, " *) %s %s: %s [%s]",
+              c->proto ? c->proto : "NULL",
+              c->param,
+	      _get_param_string((void *)((char *)&ndpi_str->cfg + c->offset), buf, sizeof(buf)),
+	      c->default_value);
+      fprintf(fd, "\n");
+      break;
     }
   }
   return NULL;

@@ -1173,6 +1173,12 @@ struct ndpi_detection_module_config_struct {
   int libgcrypt_init;
   int guess_on_giveup;
 
+  char *filename_protocols;
+  char *filename_categories;
+  char *filename_malicious_sha1;
+  char *filename_malicious_ja3;
+  char *filename_risk_domains;
+
   /* LRU caches */
 
   int ookla_cache_num_entries;
