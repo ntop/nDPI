@@ -708,6 +708,7 @@ float ndpi_bin_similarity(struct ndpi_bin *b1, struct ndpi_bin *b2,
 
 /* ********************************************************************************* */
 
+//#define DEBUG_CLUSTER_BINS
 #define MAX_NUM_CLUSTERS  128
 
 /*
@@ -723,7 +724,7 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 		      u_int8_t num_clusters, u_int16_t *cluster_ids,
 		      struct ndpi_bin *centroids) {
   u_int16_t i, j, max_iterations = 25, num_iterations, num_moves;
-  u_int8_t verbose = 0, alloc_centroids = 0;
+  u_int8_t alloc_centroids = 0;
   char out_buf[256];
   float *bin_score;
   u_int16_t num_cluster_elems[MAX_NUM_CLUSTERS] = { 0 };
@@ -737,8 +738,9 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
   if(num_clusters > num_bins)         num_clusters = num_bins;
   if(num_clusters > MAX_NUM_CLUSTERS) num_clusters = MAX_NUM_CLUSTERS;
 
-  if(verbose)
-    printf("Distributing %u bins over %u clusters\n", num_bins, num_clusters);
+#ifdef DEBUG_CLUSTER_BINS
+  printf("Distributing %u bins over %u clusters\n", num_bins, num_clusters);
+#endif
 
   if((bin_score = (float*)ndpi_calloc(num_bins, sizeof(float))) == NULL)
     return(-2);
@@ -764,10 +766,11 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 
     cluster_ids[i] = cluster_id;
 
-    if(verbose)
-      printf("Initializing cluster %u for bin %u: %s\n",
-	     cluster_id, i,
-	     ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)));
+#ifdef DEBUG_CLUSTER_BINS
+    printf("Initializing cluster %u for bin %u: %s\n",
+	   cluster_id, i,
+	   ndpi_print_bin(&bins[i], 0, out_buf, sizeof(out_buf)));
+#endif
 
     num_cluster_elems[cluster_id]++;
   }
@@ -780,12 +783,12 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
     /* Compute the centroids for each cluster */
     memset(bin_score, 0, num_bins*sizeof(float));
 
-    if(verbose) {
-      printf("\nIteration %u\n", num_iterations);
+#ifdef DEBUG_CLUSTER_BINS
+    printf("\nIteration %u\n", num_iterations);
 
-      for(j=0; j<num_clusters; j++)
-	printf("Cluster %u: %u bins\n", j, num_cluster_elems[j]);
-    }
+    for(j=0; j<num_clusters; j++)
+      printf("Cluster %u: %u bins\n", j, num_cluster_elems[j]);
+#endif
 
     for(i=0; i<num_clusters; i++)
       ndpi_reset_bin(&centroids[i]);
@@ -799,9 +802,10 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
     for(i=0; i<num_clusters; i++) {
       ndpi_normalize_bin(&centroids[i]);
 
-      if(verbose)
-	printf("Centroid [%u] %s\n", i,
-	       ndpi_print_bin(&centroids[i], 0, out_buf, sizeof(out_buf)));
+#ifdef DEBUG_CLUSTER_BINS
+      printf("Centroid [%u] %s\n", i,
+	     ndpi_print_bin(&centroids[i], 0, out_buf, sizeof(out_buf)));
+#endif
     }
 
     /* Now let's check if there are bins to move across clusters */
@@ -812,9 +816,10 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
       float best_similarity, current_similarity = 0;
       u_int8_t cluster_id = 0;
 
-      if(verbose)
-	printf("Analysing bin %u [cluster: %u]\n",
-	       i, cluster_ids[i]);
+#ifdef DEBUG_CLUSTER_BINS
+      printf("Analysing bin %u [cluster: %u]\n",
+	     i, cluster_ids[i]);
+#endif
 
 #ifdef COSINE_SIMILARITY
       best_similarity = -1;
@@ -832,8 +837,9 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
 	if(j == cluster_ids[i])
 	  current_similarity = similarity;
 
-	if(verbose)
-	  printf("Bin %u / centroid %u [similarity: %f]\n", i, j, similarity);
+#ifdef DEBUG_CLUSTER_BINS
+	printf("Bin %u / centroid %u [similarity: %f]\n", i, j, similarity);
+#endif
 
 #ifdef COSINE_SIMILARITY
 	if(similarity > best_similarity) {
@@ -857,9 +863,10 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
       bin_score[i] = best_similarity;
 
       if(cluster_ids[i] != cluster_id) {
-	if(verbose)
-	  printf("Moved bin %u from cluster %u -> %u [similarity: %f]\n",
-		 i, cluster_ids[i], cluster_id, best_similarity);
+#ifdef DEBUG_CLUSTER_BINS
+	printf("Moved bin %u from cluster %u -> %u [similarity: %f]\n",
+	       i, cluster_ids[i], cluster_id, best_similarity);
+#endif
 
 	num_cluster_elems[cluster_ids[i]]--;
 	num_cluster_elems[cluster_id]++;
@@ -872,10 +879,10 @@ int ndpi_cluster_bins(struct ndpi_bin *bins, u_int16_t num_bins,
     if(num_moves == 0)
       break;
 
-    if(verbose) {
-      for(j=0; j<num_clusters; j++)
-	printf("Cluster %u: %u bins\n", j, num_cluster_elems[j]);
-    }
+#ifdef DEBUG_CLUSTER_BINS
+    for(j=0; j<num_clusters; j++)
+      printf("Cluster %u: %u bins\n", j, num_cluster_elems[j]);
+#endif
 
 #if 0
     for(j=0; j<num_clusters; j++) {
@@ -1382,7 +1389,6 @@ void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha) {
   u_int i;
   float alpha, best_alpha;
   double sse, lowest_sse;
-  int trace = 0;
 
   if(!values || num_values == 0) {
     *ret_alpha = 0;
@@ -1396,8 +1402,9 @@ void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha) {
 
     ndpi_ses_init(&ses, alpha, 0.05);
 
-    if(trace)
-      printf("\nDouble Exponential Smoothing [alpha: %.2f]\n", alpha);
+#ifdef SES_DEBUG
+    printf("\nDouble Exponential Smoothing [alpha: %.2f]\n", alpha);
+#endif
 
     sse = 0;
 
@@ -1408,8 +1415,9 @@ void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha) {
       if(ndpi_ses_add_value(&ses, values[i], &prediction, &confidence_band) != 0) {
 	diff = fabs(prediction-values[i]);
 
-	if(trace)
-	  printf("%2u)\t%12.3f\t%.3f\t%.3f\n", i, values[i], prediction, diff);
+#ifdef SES_DEBUG
+	printf("%2u)\t%12.3f\t%.3f\t%.3f\n", i, values[i], prediction, diff);
+#endif
 
 	sse += diff*diff;
       }
@@ -1422,13 +1430,15 @@ void ndpi_ses_fitting(double *values, u_int32_t num_values, float *ret_alpha) {
 	lowest_sse = sse, best_alpha = alpha;
     }
 
-    if(trace)
-      printf("[alpha: %.2f] - SSE: %.2f [BEST: alpha: %.2f/SSE: %.2f]\n", alpha, sse,
-	     best_alpha, lowest_sse);
+#ifdef SES_DEBUG
+    printf("[alpha: %.2f] - SSE: %.2f [BEST: alpha: %.2f/SSE: %.2f]\n", alpha, sse,
+	   best_alpha, lowest_sse);
+#endif
   } /* for (alpha) */
 
-  if(trace)
-    printf("BEST [alpha: %.2f][SSE: %.2f]\n", best_alpha, lowest_sse);
+#ifdef SES_DEBUG
+  printf("BEST [alpha: %.2f][SSE: %.2f]\n", best_alpha, lowest_sse);
+#endif
 
   *ret_alpha = best_alpha;
 }
@@ -1528,7 +1538,6 @@ void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, fl
   u_int i;
   float alpha, best_alpha, best_beta, beta = 0;
   double sse, lowest_sse;
-  int trace = 0;
 
   if(!values || num_values == 0) {
     *ret_alpha = 0;
@@ -1544,8 +1553,9 @@ void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, fl
 
       ndpi_des_init(&des, alpha, beta, 0.05);
 
-      if(trace)
-	printf("\nDouble Exponential Smoothing [alpha: %.2f][beta: %.2f]\n", alpha, beta);
+#ifdef DES_DEBUG
+      printf("\nDouble Exponential Smoothing [alpha: %.2f][beta: %.2f]\n", alpha, beta);
+#endif
 
       sse = 0;
 
@@ -1556,8 +1566,9 @@ void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, fl
 	if(ndpi_des_add_value(&des, values[i], &prediction, &confidence_band) != 0) {
 	  diff = fabs(prediction-values[i]);
 
-	  if(trace)
-	    printf("%2u)\t%12.3f\t%.3f\t%.3f\n", i, values[i], prediction, diff);
+#ifdef DES_DEBUG
+	  printf("%2u)\t%12.3f\t%.3f\t%.3f\n", i, values[i], prediction, diff);
+#endif
 
 	  sse += diff*diff;
 	}
@@ -1570,14 +1581,16 @@ void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, fl
 	  lowest_sse = sse, best_alpha = alpha, best_beta = beta;
       }
 
-      if(trace)
-	printf("[alpha: %.2f][beta: %.2f] - SSE: %.2f [BEST: alpha: %.2f/beta: %.2f/SSE: %.2f]\n", alpha, beta, sse,
-	       best_alpha, best_beta, lowest_sse);
+#ifdef DES_DEBUG
+      printf("[alpha: %.2f][beta: %.2f] - SSE: %.2f [BEST: alpha: %.2f/beta: %.2f/SSE: %.2f]\n", alpha, beta, sse,
+	     best_alpha, best_beta, lowest_sse);
+#endif
     } /* for (alpha) */
   } /* for (beta) */
 
-  if(trace)
-    printf("BEST [alpha: %.2f][beta: %.2f][SSE: %.2f]\n", best_alpha, best_beta, lowest_sse);
+#ifdef DES_DEBUG
+  printf("BEST [alpha: %.2f][beta: %.2f][SSE: %.2f]\n", best_alpha, best_beta, lowest_sse);
+#endif
 
   *ret_alpha = best_alpha, *ret_beta = best_beta;
 }
