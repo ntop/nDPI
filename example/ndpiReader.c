@@ -1006,7 +1006,7 @@ static void parseOptions(int argc, char **argv) {
 
     case 'd':
       enable_protocol_guess = 0;
-      if(__add_cfg(NULL, "guess_on_giveup", "0") == 1) {
+      if(__add_cfg(NULL, ndpi_strdup("guess_on_giveup"), ndpi_strdup("0")) == 1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }

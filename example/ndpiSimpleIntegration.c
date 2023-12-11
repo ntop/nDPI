@@ -874,7 +874,7 @@ static void ndpi_process_packet(uint8_t * const args,
     flow_to_process->guessed_protocol =
       ndpi_detection_giveup(workflow->ndpi_struct,
 			    flow_to_process->ndpi_flow,
-			    1, &protocol_was_guessed);
+			    &protocol_was_guessed);
     if (protocol_was_guessed != 0) {
       printf("[%8llu, %d, %4d][GUESSED] protocol: %s | app protocol: %s | category: %s\n",
 	     workflow->packets_captured,
