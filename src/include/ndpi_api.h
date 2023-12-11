@@ -754,8 +754,6 @@ extern "C" {
    */
   int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod,
 			       const char* path);
-  int ndpi_load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_mod,
-			          FILE *fd);
 
   /**
    * Add an IP-address based risk mask
@@ -798,7 +796,6 @@ extern "C" {
    *          -1 else
    */
   int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path, void *user_data);
-  int ndpi_load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd, void *user_data);
 
   /**
    * Loads a file (separated by <cr>) of domain names associated with the specified category

@@ -36,12 +36,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_set_debug_bitmask(ndpi_struct, debug_bitmask);
 
   fd = buffer_to_file(data, size);
-  load_categories_file_fd(ndpi_struct, fd, NULL);
+  load_risk_domain_file_fd(ndpi_struct, fd);
   if(fd)
     fclose(fd);
 
   /* We don't really need to call ndpi_finalize_initialization */
-
+ 
   ndpi_exit_detection_module(ndpi_struct);
   return 0;
 }

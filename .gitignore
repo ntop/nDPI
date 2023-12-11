@@ -86,6 +86,9 @@
 /fuzz/fuzz_ndpi_reader_payload_analyzer
 /fuzz/fuzz_filecfg_protocols
 /fuzz/fuzz_filecfg_categories
+/fuzz/fuzz_filecfg_malicious_sha1
+/fuzz/fuzz_filecfg_malicious_ja3
+/fuzz/fuzz_filecfg_risk_domains
 /fuzz/fuzz_readerutils_workflow
 /fuzz/fuzz_readerutils_parseprotolist
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
@@ -114,6 +117,9 @@
 /fuzz/fuzz_tls_certificate_seed_corpus.zip
 /fuzz/fuzz_filecfg_protocols_seed_corpus.zip
 /fuzz/fuzz_filecfg_categories_seed_corpus.zip
+/fuzz/fuzz_filecfg_malicious_sha1_seed_corpus.zip
+/fuzz/fuzz_filecfg_malicious_ja3_seed_corpus.zip
+/fuzz/fuzz_filecfg_risk_domains_seed_corpus.zip
 /fuzz/fuzz_dga_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip
 /fuzz/fuzz_readerutils_workflow_seed_corpus.zip
