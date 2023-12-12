@@ -234,9 +234,6 @@ struct ndpi_detection_module_struct {
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
-  u_int32_t monitoring_stun_pkts_to_process;
-  u_int32_t monitoring_stun_flags;
-
   u_int16_t ndpi_to_user_proto_id[NDPI_MAX_NUM_CUSTOM_PROTOCOLS]; /* custom protocolId mapping */
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
@@ -331,6 +328,12 @@ u_int32_t ip_port_hash_funct(u_int32_t ip, u_int16_t port);
 char* ndpi_intoav4(unsigned int addr, char* buf, u_int16_t bufLen);
 
 u_int16_t icmp4_checksum(u_int8_t const * const buf, size_t len);
+
+int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_mod, FILE *fd);
+int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd, void *user_data);
+int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
+int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
+int load_risk_domain_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 
 
 /* TLS */

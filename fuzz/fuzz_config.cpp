@@ -13,7 +13,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_detection_module_struct *ndpi_info_mod;
   struct ndpi_flow_struct flow;
   u_int8_t protocol_was_guessed;
-  u_int32_t i, num, num2;
+  u_int32_t i, num;
   u_int16_t random_proto, bool_value;
   int random_value;
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
@@ -32,7 +32,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   if(fuzzed_data.remaining_bytes() < NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
 				     6 + /* files */
-				     1 + 3 + 1 + 3 + /* Monitoring */
 				     2 + /* Pid */
 				     2 + /* Category */
 				     1 + /* Tunnel */
@@ -80,18 +79,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   /* TODO: stub for geo stuff */
   ndpi_load_geoip(ndpi_info_mod, NULL, NULL);
-
-  if(fuzzed_data.ConsumeBool()) {
-    ndpi_set_monitoring_state(ndpi_info_mod, NDPI_PROTOCOL_STUN,
-                              fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)),
-                              fuzzed_data.ConsumeIntegralInRange(0, 7));
-    ndpi_get_monitoring_state(ndpi_info_mod, NDPI_PROTOCOL_STUN, &num, &num2);
-  }
-
-  random_proto = fuzzed_data.ConsumeIntegralInRange(0, (1 << 16) - 1);
-  random_value = fuzzed_data.ConsumeIntegralInRange(0,2);
-  ndpi_set_monitoring_state(ndpi_info_mod, random_proto, random_value, random_value);
-  ndpi_get_monitoring_state(ndpi_info_mod, random_proto, &num, &num2);
 
   ndpi_finalize_initialization(ndpi_info_mod);
 

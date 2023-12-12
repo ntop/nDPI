@@ -75,9 +75,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
 
-    ndpi_set_monitoring_state(workflow->ndpi_struct, NDPI_PROTOCOL_STUN,
-                              10, NDPI_MONITORING_STUN_SUBCLASSIFIED);
-
     memset(workflow->stats.protocol_counter, 0,
 	   sizeof(workflow->stats.protocol_counter));
     memset(workflow->stats.protocol_counter_bytes, 0,

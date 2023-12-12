@@ -94,8 +94,6 @@ static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
 u_int8_t enable_protocol_guess = NDPI_GIVEUP_GUESS_BY_PORT | NDPI_GIVEUP_GUESS_BY_IP, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
-int stun_monitoring_pkts_to_process = -1; /* Default */
-int stun_monitoring_flags = -1; /* Default */
 
 struct cfg {
   char *proto;
@@ -592,8 +590,6 @@ static void help(u_int long_help) {
          "  -I                        | Ignore VLAN id for flow hash calculation\n"
          "  -A                        | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
          "  -M                        | Memory allocation stats on data-path (only by the library). It works only on single-thread configuration\n"
-         "  --stun-monitoring=<pkts>:<flags> | Configure STUN monitoring: keep monitoring STUN session for <pkts> more pkts looking for RTP\n"
-         "                                   | (0:0 to disable the feature); set the specified features in <flags>\n"
          "  --cfg=proto,param,value          | Configure the specific attribute of this protocol\n"
          ,
          human_readeable_string_len,
@@ -645,8 +641,6 @@ static void help(u_int long_help) {
 }
 
 
-#define OPTLONG_VALUE_STUN_MONITORING	2000
-
 #define OPTLONG_VALUE_CFG		3000
 
 static struct option longopts[] = {
@@ -689,8 +683,6 @@ static struct option longopts[] = {
   { "payload-analysis", required_argument, NULL, 'P'},
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
-
-  { "stun-monitoring", required_argument, NULL, OPTLONG_VALUE_STUN_MONITORING},
 
   { "cfg", required_argument, NULL, OPTLONG_VALUE_CFG},
 
@@ -969,7 +961,6 @@ static void parseOptions(int argc, char **argv) {
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 #endif
-  u_int32_t num_pkts, flags;
   char *s1, *s2, *s3;
 
 #ifdef USE_DPDK
@@ -1250,15 +1241,6 @@ static void parseOptions(int argc, char **argv) {
     case 'U':
       max_num_udp_dissected_pkts = atoi(optarg);
       if(max_num_udp_dissected_pkts < 3) max_num_udp_dissected_pkts = 3;
-      break;
-
-    case OPTLONG_VALUE_STUN_MONITORING:
-      if(parse_two_unsigned_integer(optarg, &num_pkts, &flags) == -1) {
-        printf("Invalid parameter [%s]\n", optarg);
-        exit(1);
-      }
-      stun_monitoring_pkts_to_process = num_pkts;
-      stun_monitoring_flags = flags;
       break;
 
     case OPTLONG_VALUE_CFG:
@@ -2699,11 +2681,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
       fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
 	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
   }
-
-  if(stun_monitoring_pkts_to_process != -1 &&
-     stun_monitoring_flags != -1)
-    ndpi_set_monitoring_state(ndpi_thread_info[thread_id].workflow->ndpi_struct, NDPI_PROTOCOL_STUN,
-                              stun_monitoring_pkts_to_process, stun_monitoring_flags);
 
   if(enable_doh_dot_detection)
     ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, "tls", "application_blocks_tracking.enable", "1");

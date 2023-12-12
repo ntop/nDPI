@@ -3168,9 +3168,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
     return(NULL);
   }
 
-  ndpi_str->monitoring_stun_pkts_to_process = 4;
-  ndpi_str->monitoring_stun_flags = 0;
-
   for(i = 0; i < NUM_CUSTOM_CATEGORIES; i++)
     ndpi_snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
 	     (unsigned int) (i + 1));
@@ -4403,15 +4400,15 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str,
     return -1;
   }
 
-  rc = ndpi_load_categories_file_fd(ndpi_str, fd, user_data);
+  rc = load_categories_file_fd(ndpi_str, fd, user_data);
 
   fclose(fd);
 
   return rc;
 }
 
-int ndpi_load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str,
-			         FILE *fd, void *user_data) {
+int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str,
+			    FILE *fd, void *user_data) {
   char buffer[512], *line, *name, *category, *saveptr;
   int len, num = 0;
 
@@ -4621,19 +4618,31 @@ static int ndpi_load_risky_domain(struct ndpi_detection_module_struct *ndpi_str,
  *  - you can add a .<domain name> to avoid mismatches
  */
 int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
-  char buffer[128], *line;
+  int rc;
   FILE *fd;
-  int len, num = 0;
 
   if(!ndpi_str || !path)
     return(-1);
 
   fd = fopen(path, "r");
-
   if(fd == NULL) {
     NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
-    return(-1);
+    return -1;
   }
+
+  rc = load_risk_domain_file_fd(ndpi_str, fd);
+
+  fclose(fd);
+
+  return rc;
+}
+
+int load_risk_domain_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
+  char buffer[128], *line;
+  int len, num = 0;
+
+  if(!ndpi_str || !fd)
+    return(-1);
 
   while(1) {
     line = fgets(buffer, sizeof(buffer), fd);
@@ -4652,8 +4661,6 @@ int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, co
       num++;
   }
 
-  fclose(fd);
-
   if(ndpi_str->risky_domain_automa.ac_automa)
     ac_automata_finalize((AC_AUTOMATA_t *)ndpi_str->risky_domain_automa.ac_automa);
 
@@ -4669,21 +4676,33 @@ int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, co
  *
  */
 int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
-  char buffer[128], *line;
+  int rc;
   FILE *fd;
-  int len, num = 0;
 
   if(!ndpi_str || !path)
     return(-1);
-  if(ndpi_str->malicious_ja3_hashmap == NULL && ndpi_hash_init(&ndpi_str->malicious_ja3_hashmap) != 0)
-    return(-1);
 
   fd = fopen(path, "r");
-
   if(fd == NULL) {
     NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
-    return(-1);
+    return -1;
   }
+
+  rc = load_malicious_ja3_file_fd(ndpi_str, fd);
+
+  fclose(fd);
+
+  return rc;
+}
+
+int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
+  char buffer[128], *line;
+  int len, num = 0;
+
+  if(!ndpi_str || !fd)
+    return(-1);
+  if(ndpi_str->malicious_ja3_hashmap == NULL && ndpi_hash_init(&ndpi_str->malicious_ja3_hashmap) != 0)
+    return(-1);
 
   while(1) {
     char *comma;
@@ -4714,8 +4733,6 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
       num++;
   }
 
-  fclose(fd);
-
   return(num);
 }
 
@@ -4731,23 +4748,36 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
  */
 int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str, const char *path)
 {
-  char buffer[128];
-  char *first_comma, *second_comma;
+  int rc;
   FILE *fd;
-  size_t i, len;
-  int num = 0;
 
   if(!ndpi_str || !path)
     return(-1);
-  if(ndpi_str->malicious_sha1_hashmap == NULL && ndpi_hash_init(&ndpi_str->malicious_sha1_hashmap) != 0)
-    return(-1);
 
   fd = fopen(path, "r");
-
   if(fd == NULL) {
     NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
     return -1;
   }
+
+  rc = load_malicious_sha1_file_fd(ndpi_str, fd);
+
+  fclose(fd);
+
+  return rc;
+}
+
+int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd)
+{
+  char buffer[128];
+  char *first_comma, *second_comma;
+  size_t i, len;
+  int num = 0;
+
+  if(!ndpi_str || !fd)
+    return(-1);
+  if(ndpi_str->malicious_sha1_hashmap == NULL && ndpi_hash_init(&ndpi_str->malicious_sha1_hashmap) != 0)
+    return(-1);
 
   while (fgets(buffer, sizeof(buffer), fd) != NULL) {
     len = strlen(buffer);
@@ -4778,8 +4808,6 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
     if(ndpi_hash_add_entry(&ndpi_str->malicious_sha1_hashmap, first_comma, second_comma - first_comma, NULL) == 0)
       num++;
   }
-
-  fclose(fd);
 
   return num;
 }
@@ -4817,14 +4845,14 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
     return -1;
   }
 
-  rc = ndpi_load_protocols_file_fd(ndpi_str, fd);
+  rc = load_protocols_file_fd(ndpi_str, fd);
 
   fclose(fd);
 
   return rc;
 }
 
-int ndpi_load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
+int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
   char *buffer, *old_buffer;
   int chunk_len = 1024, buffer_len = chunk_len, old_buffer_len;
   int i;
@@ -10220,42 +10248,6 @@ int ndpi_seen_flow_beginning(const struct ndpi_flow_struct *flow)
       flow->l4.tcp.seen_ack == 0))
     return 0;
   return 1;
-}
-
-/* ******************************************************************** */
-
-int ndpi_set_monitoring_state(struct ndpi_detection_module_struct *ndpi_struct,
-			      u_int16_t proto, u_int32_t num_pkts, u_int32_t flags)
-{
-  if(!ndpi_struct || num_pkts > 0xFFFF)
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_STUN:
-    ndpi_struct->monitoring_stun_pkts_to_process = num_pkts;
-    ndpi_struct->monitoring_stun_flags = flags;
-    return 0;
-  default:
-    return -1;
-  }
-}
-
-/* ******************************************************************** */
-
-int ndpi_get_monitoring_state(struct ndpi_detection_module_struct *ndpi_struct,
-			      u_int16_t proto, u_int32_t *num_pkts, u_int32_t *flags)
-{
-  if(!ndpi_struct || !num_pkts || !flags)
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_STUN:
-    *num_pkts = ndpi_struct->monitoring_stun_pkts_to_process;
-    *flags = ndpi_struct->monitoring_stun_flags;
-    return 0;
-  default:
-    return -1;
-  }
 }
 
 /* ******************************************************************** */

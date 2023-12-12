@@ -755,12 +755,6 @@ struct ndpi_lru_cache {
 /* Ookla */
 #define NDPI_AGGRESSIVENESS_OOKLA_TLS			0x01 /* Enable detection over TLS (using ookla cache) */
 
-
-/* Monitoring flags */
-
-/* Stun */
-#define NDPI_MONITORING_STUN_SUBCLASSIFIED		0x01 /* Monitor STUN flows even if we have a valid sub-protocol */
-
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
@@ -800,6 +794,7 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_HTTP */
   u_int32_t http_stage:3;
+  u_int32_t http_asymmetric_stage:2;
 
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int32_t gnutella_stage:2;		       // 0 - 2
