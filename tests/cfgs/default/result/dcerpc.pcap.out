@@ -1,5 +1,3 @@
-Guessed flow protos:	0
-
 DPI Packets (UDP):	4	(1.00 pkts/flow)
 Confidence DPI              : 4 (flows)
 Num dissector calls: 188 (47.00 diss/flow)
