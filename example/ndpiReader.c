@@ -2150,7 +2150,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
                                                       flow->ndpi_flow, enable_protocol_guess, &proto_guessed);
       malloc_size_stats = 0;
 
-      if(enable_protocol_guess) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
+      if(proto_guessed) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
     }
 
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
@@ -3804,7 +3804,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       printf("\tTraffic duration:      %.3f sec\n", traffic_duration/1000000);
     }
 
-    if(enable_protocol_guess)
+    if(cumulative_stats.guessed_flow_protocols)
       printf("\tGuessed flow protos:   %-13u\n", cumulative_stats.guessed_flow_protocols);
 
     if(cumulative_stats.flow_count[0])
@@ -3908,7 +3908,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   }
 
   if(results_file) {
-    if(enable_protocol_guess)
+    if(cumulative_stats.guessed_flow_protocols)
       fprintf(results_file, "Guessed flow protos:\t%u\n\n", cumulative_stats.guessed_flow_protocols);
 
     if(cumulative_stats.flow_count[0])

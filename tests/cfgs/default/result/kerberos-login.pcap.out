@@ -1,5 +1,3 @@
-Guessed flow protos:	0
-
 DPI Packets (TCP):	11	(11.00 pkts/flow)
 DPI Packets (UDP):	12	(1.00 pkts/flow)
 Confidence DPI              : 13 (flows)
