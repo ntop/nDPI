@@ -122,7 +122,6 @@ static struct bpf_program *bpf_cfilter = NULL;
 static time_t capture_for = 0;
 static time_t capture_until = 0;
 static u_int32_t num_flows;
-static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 
 extern u_int8_t enable_doh_dot_detection;
 extern u_int32_t max_num_packets_per_flow, max_packet_payload_dissection, max_num_reported_top_payloads;
@@ -617,8 +616,7 @@ static void help(u_int long_help) {
            sizeof(((struct ndpi_flow_struct *)0)->protos));
 
     NDPI_PROTOCOL_BITMASK all;
-
-    ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+    struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
     printf("\n\nnDPI supported protocols:\n");
     printf("%3s %-22s %-10s %-8s %-12s %s\n",
 	   "Id", "Protocol", "Layer_4", "Nw_Proto", "Breed", "Category");
@@ -756,7 +754,7 @@ void extcap_config() {
   ndpi_proto_defaults_t *proto_defaults;
 #endif
 
-  ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
 #if 0
   ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
   proto_defaults = ndpi_get_proto_defaults(ndpi_info_mod);
@@ -1256,9 +1254,13 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case '9':
+    {
+      struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
       extcap_packet_filter = ndpi_get_proto_by_name(ndpi_info_mod, optarg);
       if(extcap_packet_filter == NDPI_PROTOCOL_UNKNOWN) extcap_packet_filter = atoi(optarg);
+      ndpi_exit_detection_module(ndpi_info_mod);
       break;
+    }
 
     case 'T':
       max_num_tcp_dissected_pkts = atoi(optarg);
@@ -5605,10 +5607,6 @@ int main(int argc, char **argv) {
     ac_automata_enable_debug(1);
   parseOptions(argc, argv);
 
-  ndpi_info_mod = ndpi_init_detection_module(init_prefs);
-
-  if(ndpi_info_mod == NULL) return -1;
-
   if(domain_to_check) {
     ndpiCheckHostStringMatch(domain_to_check);
     exit(0);
@@ -5650,7 +5648,6 @@ int main(int argc, char **argv) {
   if(results_file)  fclose(results_file);
   if(extcap_dumper) pcap_dump_close(extcap_dumper);
   if(extcap_fifo_h) pcap_close(extcap_fifo_h);
-  if(ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
   if(enable_malloc_bins) ndpi_free_bin(&malloc_bins);
   if(csv_fp)        fclose(csv_fp);
   
