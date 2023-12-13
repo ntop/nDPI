@@ -13,9 +13,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_detection_module_struct *ndpi_info_mod;
   struct ndpi_flow_struct flow;
   u_int8_t protocol_was_guessed;
-  u_int32_t i, num;
-  u_int16_t random_proto, bool_value;
-  int random_value;
+  u_int32_t i;
+  u_int16_t bool_value;
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_lru_cache_stats lru_stats;
   struct ndpi_patricia_tree_stats patricia_stats;
@@ -64,15 +63,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* TODO: ndpi_config_set */
 
   if(fuzzed_data.ConsumeBool())
-    ndpi_load_protocols_file(ndpi_info_mod, "protos.txt");
+    ndpi_set_config(ndpi_info_mod, NULL, "filename.protocols", "protos.txt");
   if(fuzzed_data.ConsumeBool())
-    ndpi_load_categories_file(ndpi_info_mod, "categories.txt", NULL);
+    ndpi_set_config(ndpi_info_mod, NULL, "filename.categories", "categories.txt");
   if(fuzzed_data.ConsumeBool())
-    ndpi_load_risk_domain_file(ndpi_info_mod, "risky_domains.txt");
+    ndpi_set_config(ndpi_info_mod, NULL, "filename.risky_domains", "risky_domains.txt");
   if(fuzzed_data.ConsumeBool())
-    ndpi_load_malicious_ja3_file(ndpi_info_mod, "ja3_fingerprints.csv");
+    ndpi_set_config(ndpi_info_mod, NULL, "filename.malicious_ja3", "ja3_fingerprints.csv");
   if(fuzzed_data.ConsumeBool())
-    ndpi_load_malicious_sha1_file(ndpi_info_mod, "sha1_fingerprints.csv");
+    ndpi_set_config(ndpi_info_mod, NULL, "filename.malicious_sha1", "sha1_fingerprints.csv");
   /* Note that this function is not used by ndpiReader */
   if(fuzzed_data.ConsumeBool())
     ndpi_load_ipv4_ptree(ndpi_info_mod, "ipv4_addresses.txt", NDPI_PROTOCOL_TLS);

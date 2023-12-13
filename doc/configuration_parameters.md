@@ -19,6 +19,7 @@ TODO
 | NULL         | "filename.malicious_sha1"                 | NULL          | NULL      | NULL      | Name of the file to load with the list of malicious JA3 fingerprints |
 | NULL         | "filename.malicious_ja3"                  | NULL          | NULL      | NULL      | Name of the file to load with the list of malicious SSL certificate SHA1 fingerprints |
 | NULL         | "filename.risk_domains"                   | NULL          | NULL      | NULL      | Name of the file to load with the list of risky domains |
+| NULL         | "dirname.domains"                         | NULL          | NULL      | NULL      | Load files (whose name is $categoryid\_$label.$extension) stored in the specified directory and bind each domain to the specified category |
 | NULL         | "asn_lists.load"                          | 1             | NULL      | NULL      | Enable/disable loading of every IP addresses lists used for (sub)classification and based on BGP information |
 | NULL         | "ip_lists.load"                           | 1             | NULL      | NULL      | Enable/disable loading of every IP addresses lists used for (sub)classification |
 | NULL         | "flow_risk_lists.load"                    | 1             | NULL      | NULL      | Enable/disable loading of every IP addresses lists used to check any flow risks |

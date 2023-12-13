@@ -1172,7 +1172,8 @@ struct ndpi_detection_module_config_struct {
   char *filename_categories;
   char *filename_malicious_sha1;
   char *filename_malicious_ja3;
-  char *filename_risk_domains;
+  char *filename_risky_domains;
+  char *dirname_domains;
 
   /* LRU caches */
 

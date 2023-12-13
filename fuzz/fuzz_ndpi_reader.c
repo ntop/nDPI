@@ -61,11 +61,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_log_level(workflow->ndpi_struct, 4);
     ndpi_set_debug_bitmask(workflow->ndpi_struct, debug_bitmask);
 
-    ndpi_load_protocols_file(workflow->ndpi_struct, "protos.txt");
-    ndpi_load_categories_file(workflow->ndpi_struct, "categories.txt", NULL);
-    ndpi_load_risk_domain_file(workflow->ndpi_struct, "risky_domains.txt");
-    ndpi_load_malicious_ja3_file(workflow->ndpi_struct, "ja3_fingerprints.csv");
-    ndpi_load_malicious_sha1_file(workflow->ndpi_struct, "sha1_fingerprints.csv");
+    ndpi_set_config(workflow->ndpi_struct, NULL, "dirname.domains", "./lists/");
+    ndpi_set_config(workflow->ndpi_struct, NULL, "filename.protocols", "protos.txt");
+    ndpi_set_config(workflow->ndpi_struct, NULL, "filename.categories", "categories.txt");
+    ndpi_set_config(workflow->ndpi_struct, NULL, "filename.risky_domains", "risky_domains.txt");
+    ndpi_set_config(workflow->ndpi_struct, NULL, "filename.malicious_ja3", "ja3_fingerprints.csv");
+    ndpi_set_config(workflow->ndpi_struct, NULL, "filename.malicious_sha1", "sha1_fingerprints.csv");
 
     ndpi_set_config(workflow->ndpi_struct, NULL, "flow.track_payload.enable", "1");
     ndpi_set_config(workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");

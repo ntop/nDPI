@@ -77,12 +77,6 @@ static FILE *playlist_fp[MAX_NUM_READER_THREADS] = { NULL }; /**< Ingress playli
 static FILE *results_file           = NULL;
 static char *results_path           = NULL;
 static char * bpfFilter             = NULL; /**< bpf filter  */
-static char *_protoFilePath         = NULL; /**< Protocol file path */
-static char *_customCategoryFilePath= NULL; /**< Custom categories file path  */
-static char *_maliciousJA3Path      = NULL; /**< Malicious JA3 signatures */
-static char *_maliciousSHA1Path     = NULL; /**< Malicious SSL certificate SHA1 fingerprints */
-static char *_riskyDomainFilePath   = NULL; /**< Risky domain files */
-static char *_categoriesDirPath     = NULL; /**< Directory containing domain files */
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 static FILE *csv_fp                 = NULL; /**< for CSV export */
@@ -369,16 +363,23 @@ static void ndpiCheckIPMatch(char *testChar) {
   char appBufStr[64];
   ndpi_protocol detected_protocol;
   NDPI_PROTOCOL_BITMASK all;
+  int i, rc;
 
   if(!testChar)
     return;
 
   ndpi_str = ndpi_init_detection_module();
+
+  for(i = 0; i < num_cfgs; i++) {
+    rc = ndpi_set_config(ndpi_str,
+			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
+    if (rc != 0)
+      fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
+	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
+  }
+
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
-
-  if(_protoFilePath != NULL)
-    ndpi_load_protocols_file(ndpi_str, _protoFilePath);
 
   ndpi_finalize_initialization(ndpi_str);
 
@@ -533,7 +534,7 @@ static void help(u_int long_help) {
          "  -f <BPF filter>           | Specify a BPF filter for filtering selected traffic\n"
          "  -s <duration>             | Maximum capture duration in seconds (live traffic capture only)\n"
          "  -m <duration>             | Split analysis duration in <duration> max seconds\n"
-         "  -p <file>.protos          | Specify a protocol file (eg. protos.txt)\n"
+         "  -p <file>.protos          | Specify a protocol file (eg. protos.txt). It is a shortcut to --cfg=,NULL,filename.protocols,<filename>\n"
          "  -l <num loops>            | Number of detection loops (test only)\n"
          "  -n <num threads>          | Number of threads. Default: number of interfaces in -i.\n"
          "                            | Ignored with pcap files.\n"
@@ -562,10 +563,10 @@ static void help(u_int long_help) {
          "                            | Default: %u:%u:%u:%u:%u\n"
          "  -c <path>                 | Load custom categories from the specified file\n"
          "  -C <path>                 | Write output in CSV format on the specified file\n"
-         "  -r <path>                 | Load risky domain file\n"
-         "  -j <path>                 | Load malicious JA3 fingeprints\n"
-         "  -S <path>                 | Load malicious SSL certificate SHA1 fingerprints\n"
-	 "  -G <dir>                  | Bind domain names to categories loading files from <dir>\n"
+         "  -r <path>                 | Load risky domain file. It is a shortcut to --cfg=,NULL,filename.risky_domains,<path>\n"
+         "  -j <path>                 | Load malicious JA3 fingeprints. It is a shortcut to --cfg=,NULL,filename.malicious_ja3,<path>\n"
+         "  -S <path>                 | Load malicious SSL certificate SHA1 fingerprints. It is a shortcut to --cfg=,NULL,filename.malicious_sha1,<path>\n"
+	 "  -G <dir>                  | Bind domain names to categories loading files from <dir>. It is a shortcut to --cfg=,NULL,dirname.categories,<dir>\n"
          "  -w <path>                 | Write test output on the specified file. This is useful for\n"
          "                            | testing purposes in order to compare results across runs\n"
          "  -h                        | This help\n"
@@ -599,6 +600,7 @@ static void help(u_int long_help) {
   struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
+  ndpi_finalize_initialization(ndpi_info_mod);
 
   printf("\nProtocols configuration parameters:\n");
   ndpi_dump_config(ndpi_info_mod, stdout);
@@ -1020,11 +1022,17 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'j':
-      _maliciousJA3Path = optarg;
+      if(__add_cfg(NULL, ndpi_strdup("filename.malicious_ja3"), ndpi_strdup(optarg)) == 1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
     case 'S':
-      _maliciousSHA1Path = optarg;
+      if(__add_cfg(NULL, ndpi_strdup("filename.malicious_sha1"), ndpi_strdup(optarg)) == 1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
     case 'm':
@@ -1045,7 +1053,10 @@ static void parseOptions(int argc, char **argv) {
 #endif
 
     case 'G':
-      _categoriesDirPath = optarg;
+      if(__add_cfg(NULL, ndpi_strdup("dirname.domains"), ndpi_strdup(optarg)) == 1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
     case 'l':
@@ -1057,11 +1068,17 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'p':
-      _protoFilePath = optarg;
+      if(__add_cfg(NULL, ndpi_strdup("filename.protocols"), ndpi_strdup(optarg)) == 1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
     case 'c':
-      _customCategoryFilePath = optarg;
+      if(__add_cfg(NULL, ndpi_strdup("filename.categories"), ndpi_strdup(optarg)) == 1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
     case 'C':
@@ -1074,7 +1091,10 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'r':
-      _riskyDomainFilePath = optarg;
+      if(__add_cfg(NULL, ndpi_strdup("filename.risky_domains"), ndpi_strdup(optarg)) == 1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
     case 's':
@@ -2627,41 +2647,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
       exit(-1);
   }
 
-  if(_categoriesDirPath) {
-    int failed_files = ndpi_load_categories_dir(ndpi_thread_info[thread_id].workflow->ndpi_struct, _categoriesDirPath);
-    if (failed_files < 0) {
-      fprintf(stderr, "Failed to parse all *.list files in: %s\n", _categoriesDirPath);
-      exit(-1);
-    }
-  }
-  
-  if(_riskyDomainFilePath)
-    ndpi_load_risk_domain_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _riskyDomainFilePath);
-
-  if(_maliciousJA3Path)
-    ndpi_load_malicious_ja3_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _maliciousJA3Path);
-
-  if(_maliciousSHA1Path)
-    ndpi_load_malicious_sha1_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _maliciousSHA1Path);
-  
-  if(_customCategoryFilePath) {
-    char *label = strrchr(_customCategoryFilePath, '/');
-
-    if(label != NULL)
-      label = &label[1];
-    else
-      label = _customCategoryFilePath;
-
-    int failed_lines = ndpi_load_categories_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _customCategoryFilePath, label);
-    if (failed_lines < 0) {
-      fprintf(stderr, "Failed to parse custom categories file: %s\n", _customCategoryFilePath);
-      exit(-1);
-    }
-  }
-
-  /* Make sure to load lists before finalizing the initialization */
-  ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &enabled_bitmask);
-
   // clear memory for results
   memset(ndpi_thread_info[thread_id].workflow->stats.protocol_counter, 0,
          sizeof(ndpi_thread_info[thread_id].workflow->stats.protocol_counter));
@@ -2671,9 +2656,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
          sizeof(ndpi_thread_info[thread_id].workflow->stats.protocol_flows));
   memset(ndpi_thread_info[thread_id].workflow->stats.flow_confidence, 0,
          sizeof(ndpi_thread_info[thread_id].workflow->stats.flow_confidence));
-
-  if(_protoFilePath != NULL)
-    ndpi_load_protocols_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _protoFilePath);
 
   ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
 
@@ -2687,6 +2669,9 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   if(enable_doh_dot_detection)
     ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, "tls", "application_blocks_tracking.enable", "1");
+
+  /* Make sure to load lists before finalizing the initialization */
+  ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &enabled_bitmask);
 
   ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 }

@@ -224,7 +224,11 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str);
 static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndpi_str,
 	  const NDPI_PROTOCOL_BITMASK *dbm, int count_only);
 
+static int load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
+			       char *dir_path);
+
 static void set_default_config(struct ndpi_detection_module_config_struct *cfg);
+static void free_config(struct ndpi_detection_module_config_struct *cfg);
 
 /* ****************************************** */
 
@@ -941,8 +945,6 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   }
 
   /* ************************ */
-
-  ndpi_enable_loaded_categories(ndpi_str);
 
   if(!ndpi_xgrams_inited) {
     ndpi_xgrams_inited = 1;
@@ -3224,11 +3226,13 @@ static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct 
 
 /* *********************************************** */
 
-void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
+int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
+  int rc;
+  FILE *fd;
 
   if(!ndpi_str)
-    return;
+    return -1;
 
   if(ndpi_str->cfg.libgcrypt_init) {
     if(!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P)) {
@@ -3243,6 +3247,81 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
   } else {
     NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
   }
+
+  if(ndpi_str->cfg.dirname_domains) {
+    rc = load_categories_dir(ndpi_str, ndpi_str->cfg.dirname_domains);
+    if(rc < 0)
+      NDPI_LOG_ERR(ndpi_str, "Error loadind directory %s: %d\n",
+                   ndpi_str->cfg.dirname_domains, rc);
+  }
+
+  if(ndpi_str->cfg.filename_protocols) {
+    fd = fopen(ndpi_str->cfg.filename_protocols, "r");
+    if(fd == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
+                   ndpi_str->cfg.filename_protocols, strerror(errno));
+      return -1;
+    }
+    rc = load_protocols_file_fd(ndpi_str, fd);
+    fclose(fd);
+    if(rc < 0)
+      NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
+                   ndpi_str->cfg.filename_protocols, rc);
+  }
+  if(ndpi_str->cfg.filename_categories) {
+    fd = fopen(ndpi_str->cfg.filename_categories, "r");
+    if(fd == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
+                   ndpi_str->cfg.filename_categories, strerror(errno));
+      return -1;
+    }
+    rc = load_categories_file_fd(ndpi_str, fd, NULL /* TODO */);
+    fclose(fd);
+    if(rc < 0)
+      NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
+                   ndpi_str->cfg.filename_categories, rc);
+  }
+  if(ndpi_str->cfg.filename_malicious_sha1) {
+    fd = fopen(ndpi_str->cfg.filename_malicious_sha1, "r");
+    if(fd == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
+                   ndpi_str->cfg.filename_malicious_sha1, strerror(errno));
+      return -1;
+    }
+    rc = load_malicious_sha1_file_fd(ndpi_str, fd);
+    fclose(fd);
+    if(rc < 0)
+      NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
+                   ndpi_str->cfg.filename_malicious_sha1, rc);
+  }
+  if(ndpi_str->cfg.filename_malicious_ja3) {
+    fd = fopen(ndpi_str->cfg.filename_malicious_ja3, "r");
+    if(fd == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
+                   ndpi_str->cfg.filename_malicious_ja3, strerror(errno));
+      return -1;
+    }
+    rc = load_malicious_ja3_file_fd(ndpi_str, fd);
+    fclose(fd);
+    if(rc < 0)
+      NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
+                   ndpi_str->cfg.filename_malicious_ja3, rc);
+  }
+  if(ndpi_str->cfg.filename_risky_domains) {
+    fd = fopen(ndpi_str->cfg.filename_risky_domains, "r");
+    if(fd == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
+                   ndpi_str->cfg.filename_risky_domains, strerror(errno));
+      return -1;
+    }
+    rc = load_risk_domain_file_fd(ndpi_str, fd);
+    fclose(fd);
+    if(rc < 0)
+      NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
+                   ndpi_str->cfg.filename_risky_domains, rc);
+  }
+
+  ndpi_enable_loaded_categories(ndpi_str);
 
   if(ndpi_str->cfg.ip_lists_enabled) {
     if(ndpi_str->cfg.ip_list_amazonaws_enabled) {
@@ -3456,7 +3535,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
     }
   }
 
-  if(ndpi_str->ac_automa_finalized) return;
+  if(ndpi_str->ac_automa_finalized) return 0;
 
   ndpi_automa * const automa[] = { &ndpi_str->host_automa,
                                    &ndpi_str->tls_cert_subject_automa,
@@ -3479,6 +3558,8 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
 
   if(ndpi_str->cfg.track_payload_enabled)
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
+
+  return 0;
 }
 
 /* *********************************************** */
@@ -3874,6 +3955,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 	    ndpi_free(ndpi_str->callback_buffer);
     if(ndpi_str->callback_buffer_tcp_payload)
 	    ndpi_free(ndpi_str->callback_buffer_tcp_payload);
+
+    free_config(&ndpi_str->cfg);
+
     ndpi_free(ndpi_str);
   }
 
@@ -4380,33 +4464,12 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 /*
  * Format:
  *
- * <host|ip>	<category_id>
+ * <host|ip>   <category_id>
  *
  * Notes:
  *  - host and category are separated by a single TAB
  *  - empty lines or lines starting with # are ignored
  */
-int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str,
-			      const char *path, void *user_data) {
-  int rc;
-  FILE *fd;
-
-  if(!ndpi_str || !path)
-    return(-1);
-
-  fd = fopen(path, "r");
-  if(fd == NULL) {
-    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
-    return -1;
-  }
-
-  rc = load_categories_file_fd(ndpi_str, fd, user_data);
-
-  fclose(fd);
-
-  return rc;
-}
-
 int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str,
 			    FILE *fd, void *user_data) {
   char buffer[512], *line, *name, *category, *saveptr;
@@ -4539,8 +4602,8 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
 
   It returns the number of loaded files or -1 in case of failure
 */
-int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
-			     char *dir_path) {
+static int load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
+			       char *dir_path) {
   DIR *dirp = opendir(dir_path);
   struct dirent *dp;
   int failed_files = 0;
@@ -4617,26 +4680,6 @@ static int ndpi_load_risky_domain(struct ndpi_detection_module_struct *ndpi_str,
  * Notes:
  *  - you can add a .<domain name> to avoid mismatches
  */
-int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
-  int rc;
-  FILE *fd;
-
-  if(!ndpi_str || !path)
-    return(-1);
-
-  fd = fopen(path, "r");
-  if(fd == NULL) {
-    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
-    return -1;
-  }
-
-  rc = load_risk_domain_file_fd(ndpi_str, fd);
-
-  fclose(fd);
-
-  return rc;
-}
-
 int load_risk_domain_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
   char buffer[128], *line;
   int len, num = 0;
@@ -4675,26 +4718,6 @@ int load_risk_domain_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE
  * <ja3 hash>[,<other info>]
  *
  */
-int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
-  int rc;
-  FILE *fd;
-
-  if(!ndpi_str || !path)
-    return(-1);
-
-  fd = fopen(path, "r");
-  if(fd == NULL) {
-    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
-    return -1;
-  }
-
-  rc = load_malicious_ja3_file_fd(ndpi_str, fd);
-
-  fclose(fd);
-
-  return rc;
-}
-
 int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
   char buffer[128], *line;
   int len, num = 0;
@@ -4746,27 +4769,6 @@ int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FI
  * <other info>,<sha1 hash>[,<other info>[...]]
  *
  */
-int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str, const char *path)
-{
-  int rc;
-  FILE *fd;
-
-  if(!ndpi_str || !path)
-    return(-1);
-
-  fd = fopen(path, "r");
-  if(fd == NULL) {
-    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
-    return -1;
-  }
-
-  rc = load_malicious_sha1_file_fd(ndpi_str, fd);
-
-  fclose(fd);
-
-  return rc;
-}
-
 int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd)
 {
   char buffer[128];
@@ -4832,26 +4834,6 @@ int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, F
   udp:139@NETBIOS
 
 */
-int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {
-  int rc;
-  FILE *fd;
-
-  if(!ndpi_str || !path)
-    return(-1);
-
-  fd = fopen(path, "r");
-  if(fd == NULL) {
-    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
-    return -1;
-  }
-
-  rc = load_protocols_file_fd(ndpi_str, fd);
-
-  fclose(fd);
-
-  return rc;
-}
-
 int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
   char *buffer, *old_buffer;
   int chunk_len = 1024, buffer_len = chunk_len, old_buffer_len;
@@ -10357,6 +10339,11 @@ static int _set_param_filename(void *_variable, const char *value)
 {
   char **variable = (char **)_variable;
 
+  if(value == NULL) { /* Valid value */
+    *variable = NULL;
+    return 0;
+  }
+
   if(access(value, F_OK) != 0)
     return -1;
   *variable = ndpi_strdup(value);
@@ -10444,10 +10431,11 @@ static const struct cfg_param {
   { NULL,            "flow_risk.crawler_bot.list.load",                             "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_crawler_bot_list_enabled) },
 
   { NULL,            "filename.protocols",                      NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_protocols) },
-  { NULL,            "filename.catecories",                     NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_categories) },
+  { NULL,            "filename.categories",                     NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_categories) },
   { NULL,            "filename.malicious_sha1",                 NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_malicious_sha1) },
   { NULL,            "filename.malicious_ja3",                  NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_malicious_ja3) },
-  { NULL,            "filename.risk_domains",                   NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_risk_domains) },
+  { NULL,            "filename.risky_domains",                  NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_risky_domains) },
+  { NULL,            "dirname.domains",                         NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(dirname_domains) },
 
   /* LRU caches */
 
@@ -10497,6 +10485,24 @@ static void set_default_config(struct ndpi_detection_module_config_struct *cfg)
       break;
     case CFG_PARAM_FILENAME:
       _set_param_filename((void *)((char *)cfg + c->offset), c->default_value);
+      break;
+    }
+  }
+}
+
+static void free_config(struct ndpi_detection_module_config_struct *cfg)
+{
+  const struct cfg_param *c;
+
+  for(c = &cfg_params[0]; c && c->param; c++) {
+    switch(c->type) {
+    case CFG_PARAM_ENABLE_DISABLE:
+    case CFG_PARAM_INT:
+      /* Nothing to do */
+      break;
+    case CFG_PARAM_STRING:
+    case CFG_PARAM_FILENAME:
+      ndpi_free(*(char **)((char *)cfg + c->offset));
       break;
     }
   }

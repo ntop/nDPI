@@ -221,8 +221,10 @@ extern "C" {
    *
    * @par ndpi_str = the struct created for the protocol detection
    *
+   * @return 0 on success
+   *
    */
-  void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str);
+  int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str);
 
   /**
    * Frees the dynamic memory allocated members in the specified flow
@@ -734,25 +736,6 @@ extern "C" {
   void ndpi_dump_risks_score(FILE *dump_out);
 
   /**
-   * Read a file and load the protocols
-   *
-   * Format: <tcp|udp>:<port>,<tcp|udp>:<port>,.....@<proto>
-   *
-   * Example:
-   * tcp:80,tcp:3128@HTTP
-   * udp:139@NETBIOS
-   *
-   * @par     ndpi_mod = the detection module
-   * @par     path     = the path of the file
-   * @return  0 if the file is loaded correctly;
-   *          -1 generic error
-   *          -2 memory allocation error
-   *
-   */
-  int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_mod,
-			       const char* path);
-
-  /**
    * Add an IP-address based risk mask
    *
    * @par     ndpi_mod = the detection module
@@ -782,70 +765,6 @@ extern "C" {
    * @return  0 if the rule is loaded correctly; < 0 in case an error is detected
    */
   int ndpi_add_trusted_issuer_dn(struct ndpi_detection_module_struct *ndpi_mod, char *dn);
-
-  /**
-   * Read a file and load the categories
-   *
-   * @par     ndpi_mod = the detection module
-   * @par     path     = the path of the file
-   * @par     user_data = pointer to some user data value
-   * @return  0 if the file is loaded correctly;
-   *          -1 else
-   */
-  int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str, const char* path, void *user_data);
-
-  /**
-   * Loads a file (separated by <cr>) of domain names associated with the specified category
-   *
-   * @par     ndpi_mod    = the detection module
-   * @par     path        = the path of the file
-   * @par     category_id = Id of the category to which domains will be associated
-   * @return  0 if the file is loaded correctly;
-   *          -1 else
-   */
-  int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
-			      char* path, ndpi_protocol_category_t category_id);
-
-  /**
-   * Load files (whose name is <categoryid>_<label>.<extension>) stored
-   * in a directory and bind each domain to the specified category.
-   *
-   * @par     ndpi_mod    = the detection module
-   * @par     path        = the path of the file
-   * @return  0 if the file is loaded correctly;
-   *          -1 else
-   */
-  int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
-			       char* path);
-
-  /**
-   * Read a file and load the list of risky domains
-   *
-   * @par     ndpi_mod = the detection module
-   * @par     path     = the path of the file
-   * @return  0 if the file is loaded correctly;
-   *          -1 else
-   */
-  int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, const char* path);
-
-  /**
-   * Read a file and load the list of malicious JA3 signatures
-   *
-   * @par     ndpi_mod = the detection module
-   * @par     path     = the path of the file
-   * @return  0 if the file is loaded correctly;
-   *          -1 else
-   */
-  int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, const char *path);
-
-  /**
-   * Read a file and load the list of malicious SSL certificate SHA1 fingerprints.
-   * @par     ndpi_mod = the detection module
-   * @par     path     = the path of the file
-   * @return  0 if the file is loaded correctly;
-   *          -1 else
-   */
-  int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str, const char *path);
 
   /**
    * Get the total number of the supported protocols
