@@ -317,3 +317,10 @@ References: `Paid Specs: <https://standards.ieee.org/ieee/C37.118.1/4902/>`_.
 Ether-S-Bus is a proprietary protocol used for the communication with and between PLCs manufactured by Saia-Burgess Controls Ltd.
 
 References: `Wireshark wiki: <https://wiki.wireshark.org/EtherSBus>`_.
+
+
+.. _Proto 369:
+
+`NDPI_PROTOCOL_MONERO`
+======================
+Monero is a private and decentralized cryptocurrency with focus on confidentiality and security.

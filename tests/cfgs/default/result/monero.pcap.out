@@ -1,12 +1,12 @@
-DPI Packets (TCP):	8	(4.00 pkts/flow)
-Confidence DPI              : 2 (flows)
-Num dissector calls: 52 (26.00 diss/flow)
+DPI Packets (TCP):	16	(4.00 pkts/flow)
+Confidence DPI              : 4 (flows)
+Num dissector calls: 520 (130.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     2/0/0 (insert/search/found)
+LRU cache mining:     4/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
@@ -18,10 +18,12 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   4/0 (search/found)
+Patricia protocols:   8/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Mining	319	166676	2
+Monero	60	61276	4
 
-	1	TCP 192.168.2.148:46838 <-> 94.23.199.191:3333 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Mining/99][159 pkts/143155 bytes <-> 113 pkts/13204 bytes][Goodput ratio: 93/43][1091.42 sec][currency: ZCash/Monero][bytes ratio: 0.831 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 7234/8131 71734/71815 15224/15291][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 900/117 1514/376 709/99][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (method)][Plen Bins: 28,2,0,1,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,29,0,0]
-	2	TCP 192.168.2.148:53846 <-> 116.211.167.195:3333 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Mining/99][24 pkts/4455 bytes <-> 23 pkts/5862 bytes][Goodput ratio: 70/78][1065.16 sec][currency: ZCash/Monero][bytes ratio: -0.136 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 46166/51528 195463/195463 61020/65306][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 186/255 1498/364 395/138][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (method)][Plen Bins: 4,13,4,8,0,0,0,0,0,61,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0]
+	1	TCP 192.168.2.100:48882 <-> 159.69.36.66:18080 [proto: 369/Monero][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Crypto_Currency/106][10 pkts/907 bytes <-> 5 pkts/14808 bytes][Goodput ratio: 32/98][0.05 sec][bytes ratio: -0.885 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/6 25/19 10/8][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 91/2962 349/7314 86/2751][PLAIN TEXT (network)][Plen Bins: 0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75]
+	2	TCP 192.168.2.100:39378 <-> 78.56.22.89:18080 [proto: 369/Monero][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Crypto_Currency/106][7 pkts/709 bytes <-> 8 pkts/14970 bytes][Goodput ratio: 42/97][0.11 sec][bytes ratio: -0.910 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 21/9 54/50 26/18][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 101/1871 349/2958 101/1201][PLAIN TEXT (network)][Plen Bins: 0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,0,57]
+	3	TCP 192.168.2.100:38004 <-> 100.42.27.58:18085 [proto: 369/Monero][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Crypto_Currency/106][5 pkts/577 bytes <-> 10 pkts/15078 bytes][Goodput ratio: 51/96][0.23 sec][bytes ratio: -0.926 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 75/14 115/110 53/36][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 115/1508 349/2958 117/915][PLAIN TEXT (network)][Plen Bins: 0,0,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,66,0,22]
+	4	TCP 192.168.2.100:42810 <-> 62.210.127.86:18080 [proto: 369/Monero][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Crypto_Currency/106][7 pkts/709 bytes <-> 8 pkts/13518 bytes][Goodput ratio: 42/97][< 1 sec][bytes ratio: -0.900 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 10/4 25/24 12/9][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 101/1690 349/2958 101/1130][PLAIN TEXT (network)][Plen Bins: 0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,0,42]
