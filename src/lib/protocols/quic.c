@@ -1491,11 +1491,31 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
-static int may_be_0rtt(struct ndpi_detection_module_struct *ndpi_struct,
-		       struct ndpi_flow_struct *flow)
+static int may_be_gquic_rej(struct ndpi_detection_module_struct *ndpi_struct,
+			    struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  uint32_t version;
+  void *ptr;
+
+  /* Common case: msg from server default port */
+  if(packet->udp->source != ntohs(443))
+    return 0;
+  /* GQUIC. Common case: cid length 8, no version, packet number length 1 */
+  if(packet->payload[0] != 0x08)
+    return 0;
+  if(packet->payload_packet_len < 1 + 8 + 1 + 12 /* Message auth hash */ + 16 /* Arbitrary length */)
+    return 0;
+  /* Search for "REJ" tag in the first 16 bytes after the hash */
+  ptr = memchr(&packet->payload[1 + 8 + 1 + 12], 'R', 16 - 3);
+  if(ptr && memcmp(ptr, "REJ", 3) == 0)
+    return 1;
+  return 0;
+}
+
+static int may_be_0rtt(struct ndpi_detection_module_struct *ndpi_struct,
+		       struct ndpi_flow_struct *flow, uint32_t *version)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t first_byte;
   u_int8_t pub_bit1, pub_bit2, pub_bit3, pub_bit4;
   u_int8_t dest_conn_id_len, source_conn_id_len;
@@ -1512,23 +1532,23 @@ static int may_be_0rtt(struct ndpi_detection_module_struct *ndpi_struct,
   pub_bit3 = ((first_byte & 0x20) != 0);
   pub_bit4 = ((first_byte & 0x10) != 0);
 
-  version = ntohl(*((u_int32_t *)&packet->payload[1]));
+  *version = ntohl(*((u_int32_t *)&packet->payload[1]));
 
   /* IETF versions, Long header, fixed bit (ignore QUIC-bit-greased case), 0RTT */
 
-  if(!(is_version_quic(version) &&
+  if(!(is_version_quic(*version) &&
        pub_bit1 && pub_bit2)) {
     NDPI_LOG_DBG2(ndpi_struct, "Invalid header or version\n");
     return 0;
   }
-  if(!is_version_quic_v2(version) &&
+  if(!is_version_quic_v2(*version) &&
      (pub_bit3 != 0 || pub_bit4 != 1)) {
-    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x not 0-RTT Packet\n", version);
+    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x not 0-RTT Packet\n", *version);
     return 0;
   }
-  if(is_version_quic_v2(version) &&
+  if(is_version_quic_v2(*version) &&
      (pub_bit3 != 1 || pub_bit4 != 0)) {
-    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x not 0-RTT Packet\n", version);
+    NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x not 0-RTT Packet\n", *version);
     return 0;
   }
 
@@ -1546,7 +1566,7 @@ static int may_be_0rtt(struct ndpi_detection_module_struct *ndpi_struct,
   if(dest_conn_id_len > QUIC_MAX_CID_LENGTH ||
      source_conn_id_len > QUIC_MAX_CID_LENGTH) {
     NDPI_LOG_DBG2(ndpi_struct, "Version 0x%x invalid CIDs length %u %u\n",
-                  version, dest_conn_id_len, source_conn_id_len);
+                  *version, dest_conn_id_len, source_conn_id_len);
     return 0;
   }
 
@@ -1847,16 +1867,18 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
    *    CHLO/ClientHello message and we need (only) it to sub-classify
    *    the flow.
    *    Detecting QUIC sessions where the first captured packet is not a
-   *    CHLO/CH is VERY hard. Let try only 1 easy case:
+   *    CHLO/CH is VERY hard. Let try only 2 easy cases:
    *    * out-of-order 0-RTT, i.e 0-RTT packets received before the Initial;
    *      in that case, keep looking for the Initial
+   *    * with only GQUIC packets from server (usefull with unidirectional
+   *      captures) look for Rejection packet
    *    Avoid the generic cases and let's see if anyone complains...
    */
 
   is_initial_quic = may_be_initial_pkt(ndpi_struct, &version);
   if(!is_initial_quic) {
     if(!is_ch_reassembler_pending(flow)) { /* Better safe than sorry */
-      ret = may_be_0rtt(ndpi_struct, flow);
+      ret = may_be_0rtt(ndpi_struct, flow, &version);
       if(ret == 1) {
         NDPI_LOG_DBG(ndpi_struct, "Found 0-RTT, keep looking for Initial\n");
         flow->l4.udp.quic_0rtt_found = 1;
@@ -1864,13 +1886,22 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
           /* We haven't still found an Initial.. give up */
           NDPI_LOG_INFO(ndpi_struct, "QUIC 0RTT\n");
           ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+          flow->protos.tls_quic.quic_version = version;
         }
         return;
       } else if(flow->l4.udp.quic_0rtt_found == 1) {
         /* Unknown packet (probably an Handshake one) after a 0-RTT */
         NDPI_LOG_INFO(ndpi_struct, "QUIC 0RTT (without Initial)\n");
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+        flow->protos.tls_quic.quic_version = 0; /* unknown */
         return;
+      }
+      ret = may_be_gquic_rej(ndpi_struct, flow);
+      if(ret == 1) {
+        NDPI_LOG_INFO(ndpi_struct, "GQUIC REJ\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+        flow->protos.tls_quic.quic_version = 0; /* unknown */
+	return;
       }
     }
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
