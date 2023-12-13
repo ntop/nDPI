@@ -388,14 +388,15 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
                                  struct ndpi_flow_struct *flow);
 
 
-/* Mining */
-u_int32_t make_mining_key(struct ndpi_flow_struct *flow);
-
 /* Stun */
 int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
 /* TPKT */
 int tpkt_verify_hdr(const struct ndpi_packet_struct * const packet);
+
+/* Mining Protocols (Ethereum, Monero, ...) */
+u_int32_t mining_make_lru_cache_key(struct ndpi_flow_struct *flow);
+
 
 /* Protocols init */
 void init_diameter_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
@@ -446,6 +447,7 @@ void init_megaco_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
 void init_mgcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mining_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mms_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_monero_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_nats_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mpegts_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mssql_tds_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);

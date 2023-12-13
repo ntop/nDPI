@@ -2144,6 +2144,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Ether-S-Bus", NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 5050, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MONERO,
+              "Monero", NDPI_PROTOCOL_CATEGORY_CRYPTO_CURRENCY,
+              ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+              ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -5581,6 +5585,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Ether-S-Bus */
   init_ethersbus_dissector(ndpi_str, &a);
 
+  /* Monero Protocol */
+  init_monero_dissector(ndpi_str, &a);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
@@ -7131,7 +7138,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   /* Does it looks like some Mining protocols? */
   if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
      ndpi_str->mining_cache &&
-     ndpi_lru_find_cache(ndpi_str->mining_cache, make_mining_key(flow),
+     ndpi_lru_find_cache(ndpi_str->mining_cache, mining_make_lru_cache_key(flow),
 			 &cached_proto, 0 /* Don't remove it as it can be used for other connections */,
 			 ndpi_get_current_time(flow))) {
     ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);

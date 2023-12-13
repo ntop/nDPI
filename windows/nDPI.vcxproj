@@ -260,6 +260,7 @@
     <ClCompile Include="..\src\lib\protocols\maplestory.c" />
     <ClCompile Include="..\src\lib\protocols\megaco.c" />
     <ClCompile Include="..\src\lib\protocols\mgcp.c" />
+    <ClCompile Include="..\src\lib\protocols\monero.c" />
     <ClCompile Include="..\src\lib\protocols\mpegts.c" />
     <ClCompile Include="..\src\lib\protocols\mqtt.c" />
     <ClCompile Include="..\src\lib\protocols\mssql_tds.c" />
