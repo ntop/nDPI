@@ -1175,6 +1175,8 @@ struct ndpi_detection_module_config_struct {
   char *filename_risky_domains;
   char *dirname_domains;
 
+  NDPI_PROTOCOL_BITMASK detection_bitmask;
+
   /* LRU caches */
 
   int ookla_cache_num_entries;

@@ -30,7 +30,7 @@
 
 #define set_protocol_and_bmask(nprot)					\
   {									\
-    if (NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->detection_bitmask,nprot) != 0) \
+    if (NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_struct->cfg.detection_bitmask,nprot) != 0) \
       {									\
 	ndpi_set_detected_protocol(ndpi_struct, flow,			\
 				   nprot, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);		\

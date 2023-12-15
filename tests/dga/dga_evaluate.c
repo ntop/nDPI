@@ -91,11 +91,8 @@ int main(int argc, char **argv) {
   }
 
   /* Initialize nDPI detection module*/
-  NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module();
   assert(ndpi_str != NULL);
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
   ndpi_set_log_level(ndpi_str, NDPI_LOG_DEBUG_EXTRA);
   set_ndpi_debug_function(ndpi_str, ndpi_dbg_fn);
   ndpi_finalize_initialization(ndpi_str);

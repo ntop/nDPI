@@ -274,17 +274,6 @@ extern "C" {
 					   u_int8_t b_add_detection_bitmask);
 
   /**
-   * Sets the protocol bitmask2
-   *
-   * @par ndpi_struct        = the detection module
-   * @par detection_bitmask  = the protocol bitmask to set
-   * @return 0 if ok, -1 if error
-   *
-   */
-  int ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *ndpi_struct,
-					    const NDPI_PROTOCOL_BITMASK * detection_bitmask);
-
-  /**
    *  Function to be called before we give up with detection for a given flow.
    *  This function reduces the NDPI_UNKNOWN_PROTOCOL detection
    *

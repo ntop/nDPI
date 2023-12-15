@@ -402,7 +402,6 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
   uint16_t proto;
   char op;
   struct ndpi_detection_module_struct *module;
-  NDPI_PROTOCOL_BITMASK all;
 
   if(!inverted_logic)
    op = 1; /* Default action: add to the bitmask */
@@ -412,8 +411,6 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
   module = ndpi_init_detection_module();
   if(!module)
     return 1;
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(module, &all);
   ndpi_finalize_initialization(module);
 
   for(n = strtok(str,_proto_delim); n && *n; n = strtok(NULL,_proto_delim)) {

@@ -100,7 +100,6 @@ static int num_cfgs = 0;
 
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
-char *_disabled_protocols = NULL;
 static u_int8_t stats_flag = 0;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
@@ -255,7 +254,6 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 void test_lib(); /* Forward */
 
 extern void ndpi_report_payload_stats(FILE *out);
-extern int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverted_logic);
 
 /* ********************************** */
 
@@ -362,7 +360,6 @@ static void ndpiCheckIPMatch(char *testChar) {
   struct in_addr addr;
   char appBufStr[64];
   ndpi_protocol detected_protocol;
-  NDPI_PROTOCOL_BITMASK all;
   int i, rc;
 
   if(!testChar)
@@ -377,9 +374,6 @@ static void ndpiCheckIPMatch(char *testChar) {
       fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
 	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
   }
-
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
   ndpi_finalize_initialization(ndpi_str);
 
@@ -596,10 +590,7 @@ static void help(u_int long_help) {
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
          max_num_reported_top_payloads, max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts);
 
-  NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
   ndpi_finalize_initialization(ndpi_info_mod);
 
   printf("\nProtocols configuration parameters:\n");
@@ -933,15 +924,15 @@ static int parse_three_strings(char *param, char **s1, char **s2, char **s3)
   return -1;
 }
 
-int __add_cfg(char *proto, char *param, char *value)
+int __add_cfg(char *proto, char *param, char *value, int dup)
 {
   if(num_cfgs >= MAX_NUM_CFGS) {
     printf("Too many parameter! [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
     return -1;
   }
-  cfgs[num_cfgs].proto = proto;
-  cfgs[num_cfgs].param = param;
-  cfgs[num_cfgs].value = value;
+  cfgs[num_cfgs].proto = ndpi_strdup(proto);
+  cfgs[num_cfgs].param = ndpi_strdup(param);
+  cfgs[num_cfgs].value = ndpi_strdup(value);
   num_cfgs++;
   return 0;
 }
@@ -998,7 +989,7 @@ static void parseOptions(int argc, char **argv) {
 
     case 'd':
       enable_protocol_guess = 0;
-      if(__add_cfg(NULL, ndpi_strdup("guess_on_giveup"), ndpi_strdup("0")) == 1) {
+      if(__add_cfg(NULL, "guess_on_giveup", "0", 1) == 1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
@@ -1022,14 +1013,14 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'j':
-      if(__add_cfg(NULL, ndpi_strdup("filename.malicious_ja3"), ndpi_strdup(optarg)) == 1) {
+      if(__add_cfg(NULL, "filename.malicious_ja3", optarg, 1) == 1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
       break;
 
     case 'S':
-      if(__add_cfg(NULL, ndpi_strdup("filename.malicious_sha1"), ndpi_strdup(optarg)) == 1) {
+      if(__add_cfg(NULL, "filename.malicious_sha1", optarg, 1) == 1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
@@ -1053,7 +1044,7 @@ static void parseOptions(int argc, char **argv) {
 #endif
 
     case 'G':
-      if(__add_cfg(NULL, ndpi_strdup("dirname.domains"), ndpi_strdup(optarg)) == 1) {
+      if(__add_cfg(NULL, "dirname.domains", optarg, 1) == 1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
@@ -1068,14 +1059,14 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'p':
-      if(__add_cfg(NULL, ndpi_strdup("filename.protocols"), ndpi_strdup(optarg)) == 1) {
+      if(__add_cfg(NULL, "filename.protocols", optarg, 1) == 1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
       break;
 
     case 'c':
-      if(__add_cfg(NULL, ndpi_strdup("filename.categories"), ndpi_strdup(optarg)) == 1) {
+      if(__add_cfg(NULL, "filename.categories", optarg, 1) == 1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
@@ -1091,7 +1082,7 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'r':
-      if(__add_cfg(NULL, ndpi_strdup("filename.risky_domains"), ndpi_strdup(optarg)) == 1) {
+      if(__add_cfg(NULL, "filename.risky_domains", optarg, 1) == 1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
@@ -1126,9 +1117,25 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'B':
-      ndpi_free(_disabled_protocols);
-      _disabled_protocols = ndpi_strdup(optarg);
+    {
+      char *n;
+      char *str = ndpi_strdup(optarg);
+      int inverted_logic;
+
+      for(n = strtok(str, ","); n && *n; n = strtok(NULL, ",")) {
+        inverted_logic = 0;
+        if(*n == '-') {
+          inverted_logic = 1;
+          n++;
+        }
+        if(__add_cfg(n, "enable", inverted_logic ? "1" : "0", 1) == 1) {
+          printf("Invalid parameter [%s] [num:%d/%d]\n", n, num_cfgs, MAX_NUM_CFGS);
+          exit(1);
+        }
+      }
+      ndpi_free(str);
       break;
+    }
 
     case 'h':
       help(0);
@@ -1268,7 +1275,7 @@ static void parseOptions(int argc, char **argv) {
 
     case OPTLONG_VALUE_CFG:
       if(parse_three_strings(optarg, &s1, &s2, &s3) == -1 ||
-	 __add_cfg(s1, s2, s3) == -1) {
+	 __add_cfg(s1, s2, s3, 0) == -1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
@@ -2625,7 +2632,6 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
  * @brief Setup for detection begin
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
-  NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_workflow_prefs prefs;
   int i, rc;
 
@@ -2639,13 +2645,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
                                                             serialization_format);
-
-  /* Protocols to enable/disable. Default: everything is enabled */
-  NDPI_BITMASK_SET_ALL(enabled_bitmask);
-  if(_disabled_protocols != NULL) {
-    if(parse_proto_name_list(_disabled_protocols, &enabled_bitmask, 1))
-      exit(-1);
-  }
 
   // clear memory for results
   memset(ndpi_thread_info[thread_id].workflow->stats.protocol_counter, 0,
@@ -2669,9 +2668,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   if(enable_doh_dot_detection)
     ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, "tls", "application_blocks_tracking.enable", "1");
-
-  /* Make sure to load lists before finalizing the initialization */
-  ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &enabled_bitmask);
 
   ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 }
@@ -4625,17 +4621,9 @@ static void dgaUnitTest() {
     NULL
   };
   int debug = 0, i;
-  NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module();
-
   assert(ndpi_str != NULL);
-
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
-
   ndpi_finalize_initialization(ndpi_str);
-
-  assert(ndpi_str != NULL);
 
   for(i=0; non_dga[i] != NULL; i++) {
     if(debug) printf("Checking non DGA %s\n", non_dga[i]);
@@ -5585,7 +5573,6 @@ int main(int argc, char **argv) {
   if(csv_fp)        fclose(csv_fp);
   
   ndpi_free(_debug_protocols);
-  ndpi_free(_disabled_protocols);
 
   for(i = 0; i < num_cfgs; i++) {
     ndpi_free(cfgs[i].proto);

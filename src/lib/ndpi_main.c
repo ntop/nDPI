@@ -495,7 +495,7 @@ static int is_proto_enabled(struct ndpi_detection_module_struct *ndpi_str, int p
   /* Custom protocols are always enabled */
   if(protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS)
     return 1;
-  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_str->detection_bitmask, protoId) == 0)
+  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_str->cfg.detection_bitmask, protoId) == 0)
     return 0;
   return 1;
 }
@@ -3060,7 +3060,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
 
   set_default_config(&ndpi_str->cfg);
 
-  NDPI_BITMASK_SET_ALL(ndpi_str->detection_bitmask);
   ndpi_str->user_data = NULL;
 
   ndpi_str->tcp_max_retransmission_window_size = NDPI_DEFAULT_MAX_TCP_RETRANSMISSION_WINDOW_SIZE;
@@ -3250,6 +3249,13 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     }
   } else {
     NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
+  }
+
+  ndpi_init_protocol_defaults(ndpi_str);
+
+  if(ndpi_callback_init(ndpi_str)) {
+    NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating callbacks\n");
+    return -1;
   }
 
   if(ndpi_str->cfg.dirname_domains) {
@@ -4512,9 +4518,8 @@ int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str,
 
   /*
     Not necessay to call ndpi_enable_loaded_categories() as
-    ndpi_set_protocol_detection_bitmask2() will do that
+    ndpi_finalize_initialization() will do that
   */
-  /* ndpi_enable_loaded_categories(ndpi_str); */
 
   return(num);
 }
@@ -4965,7 +4970,7 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
 
 static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
-  NDPI_PROTOCOL_BITMASK *detection_bitmask = &ndpi_str->detection_bitmask;
+  NDPI_PROTOCOL_BITMASK *detection_bitmask = &ndpi_str->cfg.detection_bitmask;
   struct call_function_struct *all_cb = NULL;
   u_int32_t a = 0;
 
@@ -6001,26 +6006,6 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->flow_payload != NULL)
       ndpi_free(flow->flow_payload);
   }
-}
-
-/* ************************************************ */
-
-int ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *ndpi_str,
-                                          const NDPI_PROTOCOL_BITMASK *dbm) {
-  if(!ndpi_str)
-    return -1;
-
-  NDPI_BITMASK_SET(ndpi_str->detection_bitmask, *dbm);
-
-  ndpi_init_protocol_defaults(ndpi_str);
-
-  ndpi_enabled_callbacks_init(ndpi_str,dbm,0);
-
-  if(ndpi_callback_init(ndpi_str)) {
-    NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating callbacks\n");
-    return -1;
-  }
-  return 0;
 }
 
 /* ************************************************ */
@@ -9081,15 +9066,12 @@ void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_str, FILE *du
 
 void ndpi_generate_options(u_int opt, FILE *options_out) {
   struct ndpi_detection_module_struct *ndpi_str;
-  NDPI_PROTOCOL_BITMASK all;
   u_int i;
 
   if (!options_out) return;
   ndpi_str = ndpi_init_detection_module();
   if (!ndpi_str) return;
-
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
+  ndpi_finalize_initialization(ndpi_str);
 
   switch(opt) {
   case 0: /* List known protocols */
@@ -10265,6 +10247,26 @@ void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
 
 /* ******************************************************************** */
 
+static u_int16_t __get_proto_id(const char *proto_name)
+{
+  struct ndpi_detection_module_struct *module;
+  u_int16_t proto_id;
+
+  /* Use a temporary module with all protocols enabled */
+  module = ndpi_init_detection_module();
+  if(!module)
+    return -1;
+  /* Try to be fast: we need only the protocol name -> protocol id mapping! */
+  ndpi_set_config(module, NULL, "asn_lists.load", "0");
+  ndpi_set_config(module, NULL, "ip_lists.load", "0");
+  ndpi_set_config(module, NULL, "flow_risk_lists.load", "0");
+  ndpi_finalize_initialization(module);
+  proto_id = ndpi_get_proto_by_name(module, proto_name);
+  ndpi_exit_detection_module(module);
+
+  return proto_id;
+}
+
 static int _set_param_enable_disable(void *_variable, const char *value)
 {
   int *variable = (int *)_variable;
@@ -10359,6 +10361,56 @@ static int _set_param_filename(void *_variable, const char *value)
   return 0;
 }
 
+static char *_get_param_protocol_enable_disable(void *_variable, const char *proto, char *buf, int buf_len)
+{
+  NDPI_PROTOCOL_BITMASK *bitmask = (NDPI_PROTOCOL_BITMASK *)_variable;
+  u_int16_t proto_id;
+
+  proto_id = __get_proto_id(proto);
+  if(proto_id == NDPI_PROTOCOL_UNKNOWN)
+    return NULL;
+
+  snprintf(buf, buf_len, "%d", !!NDPI_ISSET(bitmask, proto_id));
+  buf[buf_len - 1] = '\0';
+  return buf;
+}
+
+static int _set_param_protocol_enable_disable(void *_variable, const char *value, const char *proto)
+{
+  NDPI_PROTOCOL_BITMASK *bitmask = (NDPI_PROTOCOL_BITMASK *)_variable;
+  u_int16_t proto_id;
+
+  if(strcmp(proto, "any") == 0) {
+    if(strcmp(value, "1") == 0 ||
+       strcmp(value, "enable") == 0) {
+      NDPI_BITMASK_SET_ALL(*bitmask);
+      return 0;
+    }
+    if(strcmp(value, "0") == 0 ||
+       strcmp(value, "disable") == 0) {
+      NDPI_BITMASK_RESET(*bitmask);
+      return 0;
+    }
+  }
+
+  proto_id = __get_proto_id(proto);
+  if(proto_id == NDPI_PROTOCOL_UNKNOWN)
+    return -1;
+
+  if(strcmp(value, "1") == 0 ||
+     strcmp(value, "enable") == 0) {
+    NDPI_BITMASK_ADD(*bitmask, proto_id);
+    return 0;
+  }
+  if(strcmp(value, "0") == 0 ||
+     strcmp(value, "disable") == 0) {
+    NDPI_BITMASK_DEL(*bitmask, proto_id);
+    return 0;
+  }
+  return -1;
+}
+
+
 typedef int (*cfg_fn)(void *variable, const char *value);
 
 enum cfg_param_type {
@@ -10366,6 +10418,7 @@ enum cfg_param_type {
   CFG_PARAM_INT            = 1,
   CFG_PARAM_STRING         = 2,
   CFG_PARAM_FILENAME       = 3, /* Like string, but we check also if the file exists */
+  CFG_PARAM_PROTOCOL_ENABLE_DISABLE = 4,
 };
 
 #define __OFF(a)	offsetof(struct ndpi_detection_module_config_struct, a)
@@ -10417,6 +10470,7 @@ static const struct cfg_param {
   { "whatsapp",      "ip_list.load",                            "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_whatsapp_enabled) },
   { "zoom",          "ip_list.load",                            "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_zoom_enabled) },
 
+  { "$PROTO_NAME",   "enable",                                  "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(detection_bitmask) },
 
   /* Global parameters */
 
@@ -10493,6 +10547,12 @@ static void set_default_config(struct ndpi_detection_module_config_struct *cfg)
     case CFG_PARAM_FILENAME:
       _set_param_filename((void *)((char *)cfg + c->offset), c->default_value);
       break;
+    case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
+      if(strcmp(c->default_value, "1") == 0)
+        NDPI_BITMASK_SET_ALL(*(NDPI_PROTOCOL_BITMASK *)((char *)cfg + c->offset));
+      else
+        NDPI_BITMASK_RESET(*(NDPI_PROTOCOL_BITMASK *)((char *)cfg + c->offset));
+      break;
     }
   }
 }
@@ -10505,6 +10565,7 @@ static void free_config(struct ndpi_detection_module_config_struct *cfg)
     switch(c->type) {
     case CFG_PARAM_ENABLE_DISABLE:
     case CFG_PARAM_INT:
+    case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
       /* Nothing to do */
       break;
     case CFG_PARAM_STRING:
@@ -10526,9 +10587,12 @@ int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
   NDPI_LOG_DBG(ndpi_str, "Set [%s][%s][%s]\n", proto, param, value);
 
   for(c = &cfg_params[0]; c && c->param; c++) {
-    if(((proto == NULL && c->proto == NULL) ||
-	(proto && c->proto && strcmp(proto, c->proto) == 0)) &&
-       strcmp(param, c->param) == 0) {
+    if((((proto == NULL && c->proto == NULL) ||
+	 (proto && c->proto && strcmp(proto, c->proto) == 0)) &&
+        strcmp(param, c->param) == 0) ||
+       (proto && c->proto &&
+	strcmp(c->proto, "$PROTO_NAME") == 0 &&
+	strcmp(param, c->param) == 0)) {
 
       switch(c->type) {
       case CFG_PARAM_ENABLE_DISABLE:
@@ -10539,6 +10603,8 @@ int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
         return _set_param_string((void *)((char *)&ndpi_str->cfg + c->offset), value);
       case CFG_PARAM_FILENAME:
         return _set_param_filename((void *)((char *)&ndpi_str->cfg + c->offset), value);
+      case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
+        return _set_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), value, proto);
       }
     }
   }
@@ -10567,6 +10633,8 @@ char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
       case CFG_PARAM_STRING:
       case CFG_PARAM_FILENAME:
         return _get_param_string((void *)((char *)&ndpi_str->cfg + c->offset), buf, buf_len);
+      case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
+        return _get_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), proto, buf, buf_len);
       }
     }
   }
@@ -10603,6 +10671,14 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
               c->proto ? c->proto : "NULL",
               c->param,
 	      _get_param_string((void *)((char *)&ndpi_str->cfg + c->offset), buf, sizeof(buf)),
+	      c->default_value);
+      fprintf(fd, "\n");
+      break;
+    case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
+      fprintf(fd, " *) %s %s: %s [all %s]",
+              c->proto ? c->proto : "NULL",
+              c->param,
+              _get_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), "any", buf, sizeof(buf)),
 	      c->default_value);
       fprintf(fd, "\n");
       break;

@@ -35,7 +35,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   struct pcap_pkthdr *header;
   int r;
   char errbuf[PCAP_ERRBUF_SIZE];
-  NDPI_PROTOCOL_BITMASK all;
   NDPI_PROTOCOL_BITMASK debug_bitmask;
   u_int i;
   FILE *fd;
@@ -71,10 +70,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "flow.track_payload.enable", "1");
     ndpi_set_config(workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
     ndpi_set_config(workflow->ndpi_struct, "tls", "application_blocks_tracking.enable", "1");
-
-    // enable all protocols
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
 
     memset(workflow->stats.protocol_counter, 0,
 	   sizeof(workflow->stats.protocol_counter));

@@ -26,11 +26,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_workflow_prefs prefs;
   pcap_t *pcap_handle;
   ndpi_serialization_format serialization_format;
-  NDPI_PROTOCOL_BITMASK enabled_bitmask;
   ndpi_risk flow_risk;
   const u_char *pkt;
   struct pcap_pkthdr *header;
-  int r, rc;
+  int r;
   char errbuf[PCAP_ERRBUF_SIZE];
   FILE *fd;
   u_int8_t debug_protos_index;
@@ -89,19 +88,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   w = ndpi_workflow_init(&prefs, pcap_handle, 1, serialization_format);
   if(w) {
-    NDPI_BITMASK_SET_ALL(enabled_bitmask);
-    rc = ndpi_set_protocol_detection_bitmask2(w->ndpi_struct, &enabled_bitmask);
-    if(rc == 0) {
-      ndpi_set_config(w->ndpi_struct, NULL, "flow.track_payload.enable", "1");
-      ndpi_set_config(w->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
-      ndpi_finalize_initialization(w->ndpi_struct);
+    ndpi_set_config(w->ndpi_struct, NULL, "flow.track_payload.enable", "1");
+    ndpi_set_config(w->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
+    ndpi_finalize_initialization(w->ndpi_struct);
 
-      header = NULL;
+    header = NULL;
+    r = pcap_next_ex(pcap_handle, &header, &pkt);
+    while (r > 0) {
+      ndpi_workflow_process_packet(w, header, pkt, &flow_risk);
       r = pcap_next_ex(pcap_handle, &header, &pkt);
-      while (r > 0) {
-        ndpi_workflow_process_packet(w, header, pkt, &flow_risk);
-        r = pcap_next_ex(pcap_handle, &header, &pkt);
-      }
     }
 
     ndpi_workflow_free(w);

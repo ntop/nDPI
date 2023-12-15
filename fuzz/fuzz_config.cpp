@@ -51,10 +51,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     if(fuzzed_data.ConsumeBool())
       NDPI_BITMASK_ADD(enabled_bitmask, i);
   }
-  if(ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &enabled_bitmask) == -1) {
-    ndpi_exit_detection_module(ndpi_info_mod);
-    ndpi_info_mod = NULL;
-  }
+  /* TODO: ndpi_config_set protocls enabled/disabled */
 
   ndpi_set_user_data(ndpi_info_mod, (void *)0xabcdabcd); /* Random pointer */
   ndpi_set_user_data(ndpi_info_mod, (void *)0xabcdabcd); /* Twice to trigger overwriting */
