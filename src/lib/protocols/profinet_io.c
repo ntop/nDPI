@@ -49,15 +49,24 @@ static void ndpi_search_profinet_io(struct ndpi_detection_module_struct *ndpi_st
   if ((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DCERPC) &&
       (packet->udp != NULL) && (packet->payload_packet_len > 43))
   {
-    u_int64_t object_uuid = 0;
+    u_int8_t byte_order = (packet->payload[4] >> 4) & 0xF;
+    u_int32_t time_low = 0;
+    u_int16_t time_mid = 0;
+    u_int16_t time_hi_and_version = 0;
 
-    if ((packet->payload[4] >> 4) & 0xF) {
-      object_uuid = le64toh(get_u_int64_t(packet->payload, 8));
-    } else {
-      object_uuid = ndpi_ntohll(get_u_int64_t(packet->payload, 8));
+    if (byte_order == 0) { /* Big Endian */
+      time_low = ntohl(get_u_int32_t(packet->payload, 8));
+      time_mid = ntohs(get_u_int16_t(packet->payload, 12));
+      time_hi_and_version = ntohs(get_u_int16_t(packet->payload, 14));
+    } else { /* Little Endian */
+      time_low = le32toh(get_u_int32_t(packet->payload, 8));
+      time_mid = le16toh(get_u_int16_t(packet->payload, 12));
+      time_hi_and_version = le16toh(get_u_int16_t(packet->payload, 14));
     }
 
-    if (object_uuid = 0xDEA00006C9711D1) {
+    if ((time_low == 0xDEA00000) && (time_mid == 0x6C97) && 
+        (time_hi_and_version == 0x11D1))
+    {
       ndpi_int_profinet_io_add_connection(ndpi_struct, flow);
       return;
     }
