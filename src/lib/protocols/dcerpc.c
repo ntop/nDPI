@@ -23,7 +23,7 @@
 
 #include "ndpi_protocol_ids.h"
 
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RPC
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_DCERPC
 
 #include "ndpi_api.h"
 #include "ndpi_private.h"
@@ -32,7 +32,7 @@
 static void ndpi_int_dcerpc_add_connection(struct ndpi_detection_module_struct
 					     *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RPC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DCERPC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 static bool is_connection_oriented_dcerpc(struct ndpi_packet_struct *packet, struct ndpi_flow_struct *flow)
@@ -96,8 +96,8 @@ static void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_dcerpc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("RPC", ndpi_struct, *id,
-				      NDPI_PROTOCOL_RPC,
+  ndpi_set_bitmask_protocol_detection("DCERPC", ndpi_struct, *id,
+				      NDPI_PROTOCOL_DCERPC,
 				      ndpi_search_dcerpc,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,

@@ -324,3 +324,21 @@ References: `Wireshark wiki: <https://wiki.wireshark.org/EtherSBus>`_.
 `NDPI_PROTOCOL_MONERO`
 ======================
 Monero is a private and decentralized cryptocurrency with focus on confidentiality and security.
+
+
+.. _Proto 370:
+
+`NDPI_PROTOCOL_DCERPC`
+======================
+DCE/RPC is a specification for a remote procedure call mechanism that defines both APIs and an over-the-network protocol.
+
+References: `Wireshark wiki: <https://wiki.wireshark.org/DCE/RPC>`_.
+
+
+.. _Proto 371:
+
+`NDPI_PROTOCOL_PROFINET_IO`
+======================
+PROFINET/IO is a field bus protocol based on connectionless DCE/RPC.
+
+References: `Protocol Specs: <https://www.profibus.com/download/profinet-specification>`_.

@@ -1,6 +1,6 @@
-DPI Packets (UDP):	3	(3.00 pkts/flow)
+DPI Packets (UDP):	1	(1.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 158 (158.00 diss/flow)
+Num dissector calls: 48 (48.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -14,13 +14,13 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
-Patricia risk:        1/0 (search/found)
+Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   2/1 (search/found)
+Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Discord	40	4040	1
+PROFINET_IO	2	516	1
 
-	1	UDP 66.22.242.132:50001 <-> 5.36.141.228:54935 [VLAN: 1][proto: 58/Discord][IP: 58/Discord][Encrypted][Confidence: DPI][DPI packets: 3][cat: Collaborative/15][30 pkts/3110 bytes <-> 10 pkts/930 bytes][Goodput ratio: 43/37][24.00 sec][bytes ratio: 0.540 (Upload)][IAT c2s/s2c min/avg/max/stddev: 42/77 846/1740 1000/4217 343/1555][Pkt Len c2s/s2c min/avg/max/stddev: 72/68 104/93 110/118 14/25][Plen Bins: 25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.10.0.150:1566 <-> 10.10.0.129:34964 [proto: 370.371/DCERPC.PROFINET_IO][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][1 pkts/206 bytes <-> 1 pkts/310 bytes][Goodput ratio: 79/86][0.00 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
