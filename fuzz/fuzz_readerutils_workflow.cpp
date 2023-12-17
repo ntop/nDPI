@@ -90,13 +90,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(w) {
     ndpi_set_config(w->ndpi_struct, NULL, "flow.track_payload.enable", "1");
     ndpi_set_config(w->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
-    ndpi_finalize_initialization(w->ndpi_struct);
+    if(ndpi_finalize_initialization(w->ndpi_struct) == 0) {
 
-    header = NULL;
-    r = pcap_next_ex(pcap_handle, &header, &pkt);
-    while (r > 0) {
-      ndpi_workflow_process_packet(w, header, pkt, &flow_risk);
+      header = NULL;
       r = pcap_next_ex(pcap_handle, &header, &pkt);
+      while (r > 0) {
+        ndpi_workflow_process_packet(w, header, pkt, &flow_risk);
+        r = pcap_next_ex(pcap_handle, &header, &pkt);
+      }
     }
 
     ndpi_workflow_free(w);

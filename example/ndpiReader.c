@@ -254,6 +254,7 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 void test_lib(); /* Forward */
 
 extern void ndpi_report_payload_stats(FILE *out);
+extern int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverted_logic);
 
 /* ********************************** */
 
@@ -930,9 +931,9 @@ int __add_cfg(char *proto, char *param, char *value, int dup)
     printf("Too many parameter! [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
     return -1;
   }
-  cfgs[num_cfgs].proto = ndpi_strdup(proto);
-  cfgs[num_cfgs].param = ndpi_strdup(param);
-  cfgs[num_cfgs].value = ndpi_strdup(value);
+  cfgs[num_cfgs].proto = dup ? ndpi_strdup(proto) : proto;
+  cfgs[num_cfgs].param = dup ? ndpi_strdup(param) : param;
+  cfgs[num_cfgs].value = dup ? ndpi_strdup(value) : value;
   num_cfgs++;
   return 0;
 }
