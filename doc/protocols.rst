@@ -342,3 +342,12 @@ References: `Wireshark wiki: <https://wiki.wireshark.org/DCE/RPC>`_.
 PROFINET/IO is a field bus protocol based on connectionless DCE/RPC.
 
 References: `Protocol Specs: <https://www.profibus.com/download/profinet-specification>`_.
+
+
+.. _Proto 372:
+
+`NDPI_PROTOCOL_HISLIP`
+======================
+High-Speed LAN Instrument Protocol (HiSLIP) is a protocol for remote instrument control of LAN-based test and measurement instruments.
+
+References: `Protocol Specs: <https://www.ivifoundation.org/downloads/Protocol%20Specifications/IVI-6.1_HiSLIP-2.0-2020-04-23.pdf>`_.
