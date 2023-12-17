@@ -343,6 +343,7 @@
     <ClCompile Include="..\src\lib\protocols\ieee-c37118.c" />
     <ClCompile Include="..\src\lib\protocols\ethersbus.c" />
     <ClCompile Include="..\src\lib\protocols\profinet_io.c" />
+    <ClCompile Include="..\src\lib\protocols\hislip.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />

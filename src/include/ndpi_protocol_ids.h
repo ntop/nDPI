@@ -400,6 +400,7 @@ typedef enum {
   NDPI_PROTOCOL_MONERO                = 369,
   NDPI_PROTOCOL_DCERPC                = 370,
   NDPI_PROTOCOL_PROFINET_IO           = 371,
+  NDPI_PROTOCOL_HISLIP                = 372,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
