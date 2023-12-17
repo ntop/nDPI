@@ -48,7 +48,7 @@ static void ndpi_search_hislip(struct ndpi_detection_module_struct *ndpi_struct,
 
   if ((packet->payload_packet_len >= 16) &&
       (memcmp(packet->payload, "HS", 2) == 0) && ((packet->payload[2] - 26) < 0x65) &&
-      (ndpi_ntohll(get_u_int64_t(packet->payload, 8)) == (packet->payload_packet_len - 16)))
+      (ndpi_ntohll(get_u_int64_t(packet->payload, 8)) == (u_int64_t)(packet->payload_packet_len - 16)))
   {
     ndpi_int_hislip_add_connection(ndpi_struct, flow);
     return;
