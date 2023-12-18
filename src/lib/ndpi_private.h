@@ -636,6 +636,7 @@ void init_ieee_c37118_dissector(struct ndpi_detection_module_struct *ndpi_struct
 void init_ethersbus_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_profinet_io_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_hislip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_uftp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 

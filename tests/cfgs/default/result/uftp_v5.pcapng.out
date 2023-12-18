@@ -1,0 +1,38 @@
+DPI Packets (UDP):	13	(1.00 pkts/flow)
+Confidence DPI              : 13 (flows)
+Num dissector calls: 13 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   8/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   26/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+UFTP	246	175621	13
+
+	1	UDP 192.168.1.186:43785 -> 230.5.5.140:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][41 pkts/47881 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][1.68 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 45/0 1151/0 187/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 1168/0 1394/0 481/0][PLAIN TEXT (sRSBRT)][Plen Bins: 4,7,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,82,0,0,0,0,0]
+	2	UDP 192.168.1.186:49408 -> 230.5.5.36:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][39 pkts/47741 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][1.01 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 28/0 592/0 97/0][Pkt Len c2s/s2c min/avg/max/stddev: 94/0 1224/0 1394/0 422/0][PLAIN TEXT ( tHPaCK)][Plen Bins: 0,7,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,86,0,0,0,0,0]
+	3	UDP 192.168.1.186:37457 -> 230.5.5.88:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][49 pkts/47597 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][1.65 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 35/0 596/0 87/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 971/0 1374/0 594/0][PLAIN TEXT (Changes.t)][Plen Bins: 8,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,67,0,0,0,0,0,0]
+	4	UDP 192.168.1.186:43785 -> 230.4.4.1:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][20 pkts/9800 bytes -> 0 pkts/0 bytes][Goodput ratio: 91/0][2.62 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 25/0 141/0 1517/0 334/0][Pkt Len c2s/s2c min/avg/max/stddev: 490/0 490/0 490/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 192.168.1.186:49408 -> 230.4.4.1:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][20 pkts/9800 bytes -> 0 pkts/0 bytes][Goodput ratio: 91/0][2.06 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 20/0 112/0 1513/0 340/0][Pkt Len c2s/s2c min/avg/max/stddev: 490/0 490/0 490/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 192.168.1.186:1044 -> 230.4.4.1:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][20 pkts/6040 bytes -> 0 pkts/0 bytes][Goodput ratio: 86/0][2.61 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 25/0 141/0 1506/0 331/0][Pkt Len c2s/s2c min/avg/max/stddev: 302/0 302/0 302/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 192.168.1.201:1044 <-> 192.168.1.186:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][10 pkts/1936 bytes <-> 2 pkts/132 bytes][Goodput ratio: 78/36][45.56 sec][bytes ratio: 0.872 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 5694/0 42424/0 13893/0][Pkt Len c2s/s2c min/avg/max/stddev: 70/66 194/66 590/66 144/0][Plen Bins: 25,25,8,0,0,33,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 192.168.1.186:37457 -> 230.4.4.1:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][20 pkts/1640 bytes -> 0 pkts/0 bytes][Goodput ratio: 49/0][2.07 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 19/0 113/0 1513/0 340/0][Pkt Len c2s/s2c min/avg/max/stddev: 82/0 82/0 82/0 0/0][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 192.168.1.201:1044 -> 192.168.1.186:37457 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][14 pkts/1124 bytes -> 0 pkts/0 bytes][Goodput ratio: 48/0][3.12 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 8/0 232/0 2098/0 565/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 80/0 102/0 8/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 14,85,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	UDP 192.168.1.201:1044 -> 192.168.1.186:49408 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][6 pkts/844 bytes -> 0 pkts/0 bytes][Goodput ratio: 70/0][2.50 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 26/0 499/0 1496/0 546/0][Pkt Len c2s/s2c min/avg/max/stddev: 94/0 141/0 230/0 55/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,50,16,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	11	UDP 192.168.1.201:1044 -> 192.168.1.186:48545 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][2 pkts/732 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][1.50 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (Server not in server list)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	12	UDP 192.168.1.186:1044 -> 230.5.5.140:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][1 pkts/190 bytes -> 0 pkts/0 bytes][Goodput ratio: 77/0][< 1 sec][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	UDP 192.168.1.186:48545 -> 230.4.4.1:1044 [proto: 373/UFTP][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][2 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 48/0][1.50 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
