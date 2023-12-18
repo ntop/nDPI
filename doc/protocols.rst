@@ -351,3 +351,12 @@ References: `Protocol Specs: <https://www.profibus.com/download/profinet-specifi
 High-Speed LAN Instrument Protocol (HiSLIP) is a protocol for remote instrument control of LAN-based test and measurement instruments.
 
 References: `Protocol Specs: <https://www.ivifoundation.org/downloads/Protocol%20Specifications/IVI-6.1_HiSLIP-2.0-2020-04-23.pdf>`_.
+
+
+.. _Proto 373:
+
+`NDPI_PROTOCOL_UFTP`
+======================
+Encrypted UDP based FTP with multicast.
+
+References: `Protocol Specs: <https://uftp-multicast.sourceforge.net/protocol.txt>`_.
