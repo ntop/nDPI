@@ -10355,7 +10355,7 @@ static int _set_param_int(void *_variable, const char *value, const char *min_va
   /* Min and max values are set in the code, so we can convert them
      to integers without too many checks...*/
   if(min_value && max_value &&
-     (val < atoi(min_value) || val > atoi(max_value)))
+     (val < strtol(min_value, NULL, 0) || val > strtol(max_value, NULL, 0)))
     return -1;
 
   return 0;
