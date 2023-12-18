@@ -7715,7 +7715,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
   memset(&ret, 0, sizeof(ret));
 
-  if((!flow) || (!ndpi_str))
+  if((!flow) || (!ndpi_str) || (ndpi_str->finalized != 1))
     return(ret);
 
   packet = &ndpi_str->packet;
