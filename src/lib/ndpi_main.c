@@ -223,6 +223,7 @@ static void ndpi_int_change_protocol(struct ndpi_detection_module_struct *ndpi_s
 static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str);
 static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndpi_str,
 	  const NDPI_PROTOCOL_BITMASK *dbm, int count_only);
+static int get_protocol_id(struct ndpi_detection_module_struct *ndpi_str, char *proto);
 
 static int load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
 			       char *dir_path);
@@ -285,7 +286,7 @@ u_int32_t ndpi_detection_get_sizeof_ndpi_flow_udp_struct(void) {
 /* *********************************************************************************** */
 
 char *ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_str, u_int id) {
-  if(!ndpi_str)
+  if(!ndpi_str || ndpi_str->finalized != 1)
     return NULL;
   return((id >= ndpi_str->ndpi_num_supported_protocols) ? NULL : ndpi_str->proto_defaults[id].protoName);
 }
@@ -296,7 +297,7 @@ u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_str, 
   u_int16_t i, num = ndpi_get_num_supported_protocols(ndpi_str);
   char *p;
 
-  if(!ndpi_str || !name)
+  if(!ndpi_str || ndpi_str->finalized != 1 || !name)
     return(NDPI_PROTOCOL_UNKNOWN);
 
   for(i = 0; i < num; i++) {
@@ -3252,6 +3253,8 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
 
   if(!ndpi_str)
     return -1;
+  if(ndpi_str->finalized) /* Already finalized */
+    return 0;
 
   if(ndpi_str->cfg.libgcrypt_init) {
     if(!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P)) {
@@ -3584,6 +3587,8 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
 
   if(ndpi_str->cfg.track_payload_enabled)
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
+
+  ndpi_str->finalized = 1;
 
   return 0;
 }
@@ -4351,7 +4356,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
     }
   }
 
-  if((id = ndpi_get_protocol_id(ndpi_str, proto)) != -1) {
+  if((id = get_protocol_id(ndpi_str, proto)) != -1) {
     subprotocol_id = (u_int)id;
     def = &ndpi_str->proto_defaults[subprotocol_id];
   } else
@@ -9036,10 +9041,23 @@ char *ndpi_get_proto_breed_name(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ****************************************************** */
 
+static int get_protocol_id(struct ndpi_detection_module_struct *ndpi_str, char *proto) {
+  int i;
+
+  for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++)
+    if(ndpi_str->proto_defaults[i].protoName &&
+       strcasecmp(proto, ndpi_str->proto_defaults[i].protoName) == 0)
+      return(i);
+
+  return(-1);
+}
+
+/* ****************************************************** */
+
 int ndpi_get_protocol_id(struct ndpi_detection_module_struct *ndpi_str, char *proto) {
   int i;
 
-  if(!ndpi_str) return(-1);
+  if(!ndpi_str || ndpi_str->finalized != 1 || !proto) return(-1);
 
   for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++)
     if(ndpi_str->proto_defaults[i].protoName &&
@@ -9685,7 +9703,7 @@ const char *ndpi_get_l4_proto_name(ndpi_l4_proto_info proto) {
 
 ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct,
 					  u_int16_t ndpi_proto_id) {
-  if(ndpi_struct && ndpi_proto_id < ndpi_struct->ndpi_num_supported_protocols) {
+  if(ndpi_struct && ndpi_struct->finalized && ndpi_proto_id < ndpi_struct->ndpi_num_supported_protocols) {
     u_int16_t idx = ndpi_struct->proto_defaults[ndpi_proto_id].protoIdx;
     NDPI_SELECTION_BITMASK_PROTOCOL_SIZE bm = ndpi_struct->callback_buffer[idx].ndpi_selection_bitmask;
 
