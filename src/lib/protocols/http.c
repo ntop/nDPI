@@ -437,7 +437,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 
   if(flow->http.method == NDPI_HTTP_METHOD_RPC_IN_DATA ||
      flow->http.method == NDPI_HTTP_METHOD_RPC_OUT_DATA) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RPC, master_protocol, NDPI_CONFIDENCE_DPI);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_RPCH, master_protocol, NDPI_CONFIDENCE_DPI);
   }
 
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
