@@ -360,3 +360,12 @@ References: `Protocol Specs: <https://www.ivifoundation.org/downloads/Protocol%2
 Encrypted UDP based FTP with multicast.
 
 References: `Protocol Specs: <https://uftp-multicast.sourceforge.net/protocol.txt>`_.
+
+
+.. _Proto 374:
+
+`NDPI_PROTOCOL_JSON_RPC`
+======================
+JSON-RPC is a remote procedure call protocol encoded in JSON.
+
+References: `Protocol Specs: <https://www.jsonrpc.org/specification>`_.
