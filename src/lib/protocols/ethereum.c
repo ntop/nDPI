@@ -34,19 +34,6 @@ enum ether_disc_packet_type {
   DISC_ENRRESPONSE = 0x06
 };
 
-/* ************************************************************************** */
-
-u_int32_t mining_make_lru_cache_key(struct ndpi_flow_struct *flow) {
-  u_int32_t key;
-
-  /* network byte order */
-  if(flow->is_ipv6)
-    key = ndpi_quick_hash(flow->c_address.v6, 16) + ndpi_quick_hash(flow->s_address.v6, 16);
-  else
-    key = flow->c_address.v4 + flow->s_address.v4;
-
-  return key;
-}
 
 /* ************************************************************************** */
 
