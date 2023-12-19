@@ -5,7 +5,6 @@
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_detection_module_struct *ndpi_struct;
   FILE *fd;
-  NDPI_PROTOCOL_BITMASK all;
   NDPI_PROTOCOL_BITMASK debug_bitmask;
 
   /* To allow memory allocation failures */

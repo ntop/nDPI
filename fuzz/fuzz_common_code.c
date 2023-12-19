@@ -51,6 +51,7 @@ void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_
     ndpi_set_config(*ndpi_info_mod, NULL, "filename.risky_domains", "risky_domains.txt");
     ndpi_set_config(*ndpi_info_mod, NULL, "filename.malicious_ja3", "ja3_fingerprints.csv");
     ndpi_set_config(*ndpi_info_mod, NULL, "filename.malicious_sha1", "sha1_fingerprints.csv");
+    ndpi_set_config(*ndpi_info_mod, NULL, "filename.config", "config.txt");
 
     ndpi_finalize_initialization(*ndpi_info_mod);
   }

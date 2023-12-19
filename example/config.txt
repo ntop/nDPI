@@ -1,0 +1,15 @@
+#Format: <proto, param, value>
+#proto might be empty
+#Basic example of how to set nDPI configuration parameters via file
+#We set only some default values
+#See doc/configuration_parameters.md for a complete list and description of all the accepted knobs
+
+,packets_limit_per_flow,32
+ookla,aggressiveness,0x1
+
+,lru.bittorrent.ttl,0
+
+dns,enable,0
+dns,enable,1
+
+

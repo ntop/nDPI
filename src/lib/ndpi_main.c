@@ -4499,6 +4499,64 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 /*
  * Format:
  *
+ * <proto,param,value>
+ *
+ * Notes:
+ *  - proto might be empty
+ *  - empty lines or lines starting with # are ignored
+ */
+int load_config_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
+  char buffer[512], *line, *proto, *param = NULL, *value, *saveptr;
+  int len, rc;
+
+  if(!ndpi_str || !fd)
+    return -1;
+
+  while(1) {
+    line = fgets(buffer, sizeof(buffer), fd);
+
+    if(line == NULL)
+      break;
+
+    len = strlen(line);
+
+    if((len <= 1) || (line[0] == '#'))
+      continue;
+
+    line[len - 1] = '\0';
+
+    if(line[0] == ',') { /* First parameter might be missing */
+      proto = NULL;
+      param = strtok_r(line, ",", &saveptr);
+    } else {
+      proto = strtok_r(line, ",", &saveptr);
+      if(proto) {
+        param = strtok_r(NULL, ",", &saveptr);
+      }
+    }
+    if(param) {
+      value = strtok_r(NULL, ",", &saveptr);
+      if(value) {
+        rc = ndpi_set_config(ndpi_str, proto, param, value);
+	if(rc != 0) {
+          NDPI_LOG_ERR(ndpi_str, "Error ndpi_set_config [%s/%s/%s]: %d\n",
+                       proto, param, value, rc);
+          return rc;
+	}
+	continue;
+      }
+    }
+    NDPI_LOG_ERR(ndpi_str, "Error parsing [%s]\n", line);
+    return -2;
+  }
+  return 0;
+}
+
+/* ******************************************************************** */
+
+/*
+ * Format:
+ *
  * <host|ip>   <category_id>
  *
  * Notes:
@@ -10381,7 +10439,7 @@ static int _set_param_string(void *_variable, const char *value)
   return 0;
 }
 
-/* It can be used for CFG_PARAM_FILENAME parameters, too */
+/* It can be used for CFG_PARAM_FILENAME/CFG_PARAM_FILENAME_CONFIG parameters, too */
 static char *_get_param_string(void *_variable, char *buf, int buf_len)
 {
   char **variable = (char **)_variable;
@@ -10407,6 +10465,27 @@ static int _set_param_filename(void *_variable, const char *value)
     return -1;
   return 0;
 }
+
+static int _set_param_filename_config(struct ndpi_detection_module_struct *ndpi_str, void *_variable, const char *value)
+{
+  int rc;
+  FILE *fd;
+
+  rc = _set_param_filename(_variable, value);
+  if(rc != 0 || value == NULL || ndpi_str == NULL)
+    return rc;
+
+  fd = fopen(value, "r");
+  if(fd == NULL)
+    return -1; /* It shoudn't happen because we already checked it */
+  rc = load_config_file_fd(ndpi_str, fd);
+  fclose(fd);
+  if(rc < 0)
+    return rc;
+
+  return 0;
+}
+
 
 static char *_get_param_protocol_enable_disable(void *_variable, const char *proto, char *buf, int buf_len)
 {
@@ -10466,6 +10545,7 @@ enum cfg_param_type {
   CFG_PARAM_STRING         = 2,
   CFG_PARAM_FILENAME       = 3, /* Like string, but we check also if the file exists */
   CFG_PARAM_PROTOCOL_ENABLE_DISABLE = 4,
+  CFG_PARAM_FILENAME_CONFIG = 5, /* Like CFG_PARAM_FILENAME, but we also call ndpi_set_config() immediately for each row in it */
 };
 
 #define __OFF(a)	offsetof(struct ndpi_detection_module_config_struct, a)
@@ -10545,6 +10625,8 @@ static const struct cfg_param {
   { NULL,            "filename.risky_domains",                  NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_risky_domains) },
   { NULL,            "dirname.domains",                         NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(dirname_domains) },
 
+  { NULL,            "filename.config",                         NULL, NULL, NULL, CFG_PARAM_FILENAME_CONFIG, __OFF(filename_config) },
+
   /* LRU caches */
 
   { NULL,            "lru.ookla.size",                          "1024", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_num_entries) },
@@ -10600,6 +10682,9 @@ static void set_default_config(struct ndpi_detection_module_config_struct *cfg)
       else
         NDPI_BITMASK_RESET(*(NDPI_PROTOCOL_BITMASK *)((char *)cfg + c->offset));
       break;
+    case CFG_PARAM_FILENAME_CONFIG:
+      _set_param_filename_config(NULL, (void *)((char *)cfg + c->offset), c->default_value);
+      break;
     }
   }
 }
@@ -10617,6 +10702,7 @@ static void free_config(struct ndpi_detection_module_config_struct *cfg)
       break;
     case CFG_PARAM_STRING:
     case CFG_PARAM_FILENAME:
+    case CFG_PARAM_FILENAME_CONFIG:
       ndpi_free(*(char **)((char *)cfg + c->offset));
       break;
     }
@@ -10652,6 +10738,8 @@ int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
         return _set_param_filename((void *)((char *)&ndpi_str->cfg + c->offset), value);
       case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
         return _set_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), value, proto);
+      case CFG_PARAM_FILENAME_CONFIG:
+        return _set_param_filename_config(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset), value);
       }
     }
   }
@@ -10679,6 +10767,7 @@ char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
         return _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), buf, buf_len);
       case CFG_PARAM_STRING:
       case CFG_PARAM_FILENAME:
+      case CFG_PARAM_FILENAME_CONFIG:
         return _get_param_string((void *)((char *)&ndpi_str->cfg + c->offset), buf, buf_len);
       case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
         return _get_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), proto, buf, buf_len);
@@ -10714,6 +10803,7 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
       break;
     case CFG_PARAM_STRING:
     case CFG_PARAM_FILENAME:
+    case CFG_PARAM_FILENAME_CONFIG:
       fprintf(fd, " *) %s %s: %s [%s]",
               c->proto ? c->proto : "NULL",
               c->param,
