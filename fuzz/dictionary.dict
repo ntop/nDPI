@@ -132,3 +132,11 @@
 
 "='im.truphone.com'"
 "=\"im.truphone.com\""
+
+#Mining
+
+"\"mining.subscribe\""
+"\"mining.configure\""
+"zcash"
+"\"agent\":\"xmr-stak-cpu"
+"\"method\": \"eth_submitLogin"
