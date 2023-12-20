@@ -377,3 +377,12 @@ References: `Protocol Specs: <https://uftp-multicast.sourceforge.net/protocol.tx
 OpenFlow protocol is a network protocol closely associated with Software-Defined Networking (SDN).
 
 References: `Protocol Specs: <https://opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.5.1.pdf>`_.
+
+
+.. _Proto 375:
+
+`NDPI_PROTOCOL_JSON_RPC`
+======================
+JSON-RPC is a remote procedure call protocol encoded in JSON.
+
+References: `Protocol Specs: <https://www.jsonrpc.org/specification>`_.

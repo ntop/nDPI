@@ -403,6 +403,7 @@ typedef enum {
   NDPI_PROTOCOL_HISLIP                = 372,
   NDPI_PROTOCOL_UFTP                  = 373,
   NDPI_PROTOCOL_OPENFLOW              = 374,
+  NDPI_PROTOCOL_JSON_RPC              = 375,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
