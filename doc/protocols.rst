@@ -368,3 +368,12 @@ References: `Protocol Specs: <https://www.ivifoundation.org/downloads/Protocol%2
 Encrypted UDP based FTP with multicast.
 
 References: `Protocol Specs: <https://uftp-multicast.sourceforge.net/protocol.txt>`_.
+
+
+.. _Proto 374:
+
+`NDPI_PROTOCOL_OPENFLOW`
+======================
+OpenFlow protocol is a network protocol closely associated with Software-Defined Networking (SDN).
+
+References: `Protocol Specs: <https://opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.5.1.pdf>`_.
