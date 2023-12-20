@@ -1708,9 +1708,9 @@ static int ndpi_is_xss_injection(char* query) {
 static void ndpi_compile_rce_regex() {
   PCRE2_UCHAR pcreErrorStr[128];
   PCRE2_SIZE pcreErrorOffset;
-  int pcreErrorCode;
+  int i, pcreErrorCode = 0;
 
-  for(int i = 0; i < N_RCE_REGEX; i++) {
+  for(i = 0; i < N_RCE_REGEX; i++) {
     comp_rx[i] = (struct pcre2_struct*)ndpi_malloc(sizeof(struct pcre2_struct));
 
     comp_rx[i]->compiled = pcre2_compile((PCRE2_SPTR)rce_regex[i], PCRE2_ZERO_TERMINATED, 0, &pcreErrorCode,
@@ -1746,9 +1746,10 @@ static int ndpi_is_rce_injection(char* query) {
   }
 
   pcre2_match_data *pcreMatchData;
-  int pcreExecRet;
+  int i, pcreExecRet;
+  unsigned long j;
 
-  for(int i = 0; i < N_RCE_REGEX; i++) {
+  for(i = 0; i < N_RCE_REGEX; i++) {
     unsigned int length = strlen(query);
 
     pcreMatchData = pcre2_match_data_create_from_pattern(comp_rx[i]->compiled, NULL);
@@ -1789,16 +1790,16 @@ static int ndpi_is_rce_injection(char* query) {
 
   size_t ushlen = sizeof(ush_commands) / sizeof(ush_commands[0]);
 
-  for(unsigned long i = 0; i < ushlen; i++) {
-    if(strstr(query, ush_commands[i]) != NULL) {
+  for(j = 0; j < ushlen; j++) {
+    if(strstr(query, ush_commands[j]) != NULL) {
       return 1;
     }
   }
 
   size_t pwshlen = sizeof(pwsh_commands) / sizeof(pwsh_commands[0]);
 
-  for(unsigned long i = 0; i < pwshlen; i++) {
-    if(strstr(query, pwsh_commands[i]) != NULL) {
+  for(j = 0; j < pwshlen; j++) {
+    if(strstr(query, pwsh_commands[j]) != NULL) {
       return 1;
     }
   }
