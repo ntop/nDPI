@@ -64,3 +64,79 @@
 "Blizzard Web Client"
 "Blizzard Downloader"
 "Zattoo/4"
+"MSRPC"
+"Gnutella"
+
+#HTTP methods
+
+"OPTIONS"
+"GET"
+"HEAD"
+"PATCH"
+"POST"
+"PUT"
+"DELETE"
+"TRACE"
+"CONNECT"
+"RPC_CONNECT"
+"RPC_IN_DATA"
+"RPC_OUT_DATA"
+
+#HTTP payload signatures
+
+"\x4D\x5A"
+"\x7F\x45\x4C\x46"
+"\xCF\xFA\xED\xFE"
+"#"
+"!"
+"/"
+"\x64\x65\x78\x0A\x30\x33\x35\x00"
+
+#Gnutella patterns
+
+"urn:sha1:"
+"HEAD /gnutella/push-proxy?"
+"\x50\x55\x53\x48\x20\x67\x75\x69\x64\x3a"
+"GET /gnutella/"
+"\x80\x2f\x01\x03\x01\x00\x06\x00\x00\x00\x20\x00\x00\x34\x00\x00\xff\x4d\x6c"
+"\x20\x4d\x6c"
+"\x16\x03\x01\x00\x54\x01\x00\x00\x50\x03\x01\x4d\x6c"
+"\x00\x02\x00\x34\x01\x00\x00\x05"
+"\x31\x01\x00\x09\x00\x00\x00\x4c\x49\x4d\x45"
+"SCP@"
+"DNA@"
+"\x01\x01\x54\x0f\x51\x4b\x52\x50\x06\x52"
+"\x01\x01\x5c\x1b\x50\x55\x53\x48\x48\x10"
+"GND\x10"
+"\x31\x01\x00\x09\x00\x00\x00"
+"\x00\x01\x00\x00\x00\x00\x00"
+"X-Gnutella-"
+"X-Queue:"
+"application/x-gnutella-"
+"GNUTELLA/"
+"GNUTELLA CONNECT/"
+
+#Bittorrent signatures
+
+"Cache-Control: no-cache"
+"GET /data?fid="
+"Pragma: no-cache"
+":target20:"
+":find_node1:"
+"d1:ad2:id20:"
+":info_hash20:"
+":filter64"
+"d1:rd2:id20:"
+
+#Jabber
+
+"='im.truphone.com'"
+"=\"im.truphone.com\""
+
+#Mining
+
+"\"mining.subscribe\""
+"\"mining.configure\""
+"zcash"
+"\"agent\":\"xmr-stak-cpu"
+"\"method\": \"eth_submitLogin"

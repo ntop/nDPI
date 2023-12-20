@@ -435,9 +435,10 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OCSP, master_protocol, NDPI_CONFIDENCE_DPI);
   }
 
-  if(flow->http.method == NDPI_HTTP_METHOD_RPC_IN_DATA ||
-     flow->http.method == NDPI_HTTP_METHOD_RPC_OUT_DATA) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RPC, master_protocol, NDPI_CONFIDENCE_DPI);
+  if((flow->http.method == NDPI_HTTP_METHOD_RPC_CONNECT) ||
+     (flow->http.method == NDPI_HTTP_METHOD_RPC_IN_DATA) ||
+     (flow->http.method == NDPI_HTTP_METHOD_RPC_OUT_DATA)) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_RPCH, master_protocol, NDPI_CONFIDENCE_DPI);
   }
 
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
@@ -525,6 +526,11 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
      */
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
     ookla_add_to_cache(ndpi_struct, flow);
+  }
+
+  if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) && 
+      flow->http.user_agent && strstr(flow->http.user_agent, "MSRPC")) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_RPCH, master_protocol, NDPI_CONFIDENCE_DPI);
   }
 }
 
@@ -1002,7 +1008,9 @@ static struct l_string {
 		    STATIC_STRING_L("CONNECT "),
 		    STATIC_STRING_L("PROPFIND "),
 		    STATIC_STRING_L("REPORT "),
-		    STATIC_STRING_L("RPC_IN_DATA "), STATIC_STRING_L("RPC_OUT_DATA ")
+		    STATIC_STRING_L("RPC_CONNECT "),
+		    STATIC_STRING_L("RPC_IN_DATA "),
+		    STATIC_STRING_L("RPC_OUT_DATA ")
 };
 static const char *http_fs = "CDGHOPR";
 
