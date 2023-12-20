@@ -43,8 +43,8 @@ static void ndpi_search_json_rpc(struct ndpi_detection_module_struct *ndpi_struc
       NDPI_LOG_INFO(ndpi_struct, "found JSON-RPC over HTTP\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_JSON_RPC, 
                                  NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
-      return;
     }
+    return;
   }
 
   if (packet->payload_packet_len > 30 && (memcmp(packet->payload, 
