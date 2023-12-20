@@ -1,12 +1,12 @@
 DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 26 (26.00 diss/flow)
+Num dissector calls: 133 (133.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     1/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
@@ -21,6 +21,6 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Mining	8	650	1
+JSON-RPC	8	650	1
 
-	1	TCP 127.0.0.1:36646 <-> 127.0.0.1:8080 [proto: 42/Mining][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Mining/99][4 pkts/378 bytes <-> 4 pkts/272 bytes][Goodput ratio: 28/0][0.01 sec][currency: ZCash/Monero][bytes ratio: 0.163 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/0 3/0 10/0 5/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 94/68 172/74 45/3][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (sonrpc)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 127.0.0.1:36646 <-> 127.0.0.1:8080 [proto: 375/JSON-RPC][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RPC/16][4 pkts/378 bytes <-> 4 pkts/272 bytes][Goodput ratio: 28/0][0.01 sec][bytes ratio: 0.163 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 10/0 3/0 10/0 5/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 94/68 172/74 45/3][PLAIN TEXT (sonrpc)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

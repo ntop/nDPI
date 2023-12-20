@@ -23,6 +23,14 @@ TFTP is a very simple protocol used to transfer files. It is from this that its 
 References: `RFC1350 <https://datatracker.ietf.org/doc/html/rfc1350>`_ and `RFC2347 <https://datatracker.ietf.org/doc/html/rfc2347>`_ and `RFC2349 <https://datatracker.ietf.org/doc/html/rfc2349>`_
 
 
+.. _Proto 127:
+
+`NDPI_PROTOCOL_MS_RPCH`
+====================
+A Remote Procedure Call protocol over HTTP from Microsoft.
+
+References: `Protocol Specs: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rpch/c0f4c9c5-1a61-4d10-b8e2-005378d1d212`_.
+
 .. _Proto 338:
 
 `NDPI_PROTOCOL_SRTP`
@@ -363,6 +371,15 @@ References: `Protocol Specs: <https://uftp-multicast.sourceforge.net/protocol.tx
 
 
 .. _Proto 374:
+
+`NDPI_PROTOCOL_OPENFLOW`
+======================
+OpenFlow protocol is a network protocol closely associated with Software-Defined Networking (SDN).
+
+References: `Protocol Specs: <https://opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.5.1.pdf>`_.
+
+
+.. _Proto 375:
 
 `NDPI_PROTOCOL_JSON_RPC`
 ======================
