@@ -64,8 +64,14 @@ AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = se
 ])
 
 AS_IF([test "${with_sanitizer+set}" = set],[
-  NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak -fno-omit-frame-pointer"
-  NDPI_LDFLAGS="${NDPI_LDFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize=alignment -fsanitize=leak"
+  NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize=address -fsanitize=undefined -fsanitize=leak -fno-omit-frame-pointer"
+  NDPI_LDFLAGS="${NDPI_LDFLAGS} -fsanitize=address -fsanitize=undefined -fsanitize=leak"
+  #Sanitizers should work on any compilers that we support (or that we test on CI, at least)
+  #Exception: "-fsanitize=alignment" is not supported in gcc 4.9
+  AX_CHECK_COMPILE_FLAG([-fno-sanitize=alignment], [
+    NDPI_CFLAGS="${NDPI_CFLAGS} -fno-sanitize=alignment"
+    NDPI_LDFLAGS="${NDPI_LDFLAGS} -fno-sanitize=alignment"
+  ])
 ])
 
 AS_IF([test "${with_thread_sanitizer+set}" = set],[

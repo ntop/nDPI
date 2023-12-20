@@ -89,7 +89,7 @@ jobs:
         nBPF: [""]
         lto_gold_linker: [""]
         include:
-          - compiler: "gcc-7" # "Oldest" gcc easily available
+          - compiler: "gcc-4.9" # "Oldest" gcc easily available. To simulate RHEL7
             os: ubuntu-20.04
             arch: "x86_64"
             gcrypt: ""
@@ -97,7 +97,7 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
-          - compiler: "gcc-12" # "Newest" gcc easily available
+          - compiler: "gcc-13" # "Newest" gcc easily available
             os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
@@ -114,9 +114,9 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
-          - compiler: "clang-14" # "Newest" clang easily available
-            ar: "llvm-ar-14"
-            ranlib: "llvm-ranlib-14"
+          - compiler: "clang-17" # "Newest" clang easily available
+            ar: "llvm-ar-17"
+            ranlib: "llvm-ranlib-17"
             os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
@@ -141,7 +141,7 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: "nBPF"
-          - compiler: "clang-14"
+          - compiler: "clang-17"
             os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
@@ -226,9 +226,22 @@ jobs:
           make
           cd -
       - name: Setup Ubuntu specified compiler
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && ! startsWith(matrix.compiler, 'cc')
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && ! startsWith(matrix.compiler, 'cc') && ! startsWith(matrix.compiler, 'clang-17')
         run: |
+          #For gcc-4.9 (on ubuntu-20.04)
+          echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial main" | sudo tee -a /etc/apt/sources.list
+          echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe" | sudo tee -a /etc/apt/sources.list
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
+          #For gcc-13 (on ubuntu-22.04)
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
+          sudo apt-get update
           sudo apt-get install ${{ matrix.compiler }}
+      - name: Setup Ubuntu specified (newest) compiler
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'clang-17')
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod u+x llvm.sh
+          sudo ./llvm.sh 17
       - name: Install Windows msys2 prerequisites
         if: startsWith(matrix.os, 'windows')
         uses: msys2/setup-msys2@v2
