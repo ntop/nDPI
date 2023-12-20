@@ -47,8 +47,8 @@ static void ndpi_search_json_rpc(struct ndpi_detection_module_struct *ndpi_struc
     return;
   }
 
-  if (packet->payload_packet_len > 30 && (memcmp(packet->payload, 
-      "{\"jsonrpc\": \"2.0\"", NDPI_STATICSTRING_LEN("{\"jsonrpc\": \"2.0\"")) == 0))
+  if ((packet->payload_packet_len > 30) && (packet->payload[0] == '{') &&
+      (ndpi_strnstr((const char *)packet->payload, "\"jsonrpc\":", packet->payload_packet_len)))
   {
     NDPI_LOG_INFO(ndpi_struct, "found JSON-RPC over TCP\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_JSON_RPC,
