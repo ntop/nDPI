@@ -40,7 +40,6 @@
 */
 
 #include <assert.h> /* assert */
-#include <ctype.h> /* isdigit */
 #include <errno.h> /* errno */
 #include <math.h> /* sin */
 #include <stddef.h> /* NULL */
@@ -76,8 +75,6 @@ static u_char* ndpi_prefix_tochar (ndpi_prefix_t * prefix)
   if(family == AF_INET) return ((u_char *) & prefix->add.sin);
   else if(family == AF_INET6) return ((u_char *) & prefix->add.sin6);
   else /* if(family == AF_MAC) */ return ((u_char *) & prefix->add.mac);
-
-  return ((u_char *) & prefix->add.sin);
 }
 
 static int ndpi_comp_with_mask (void *addr, void *dest, u_int mask) {
@@ -103,7 +100,7 @@ static int ndpi_my_inet_pton (int af, const char *src, void *dst)
       int c, val;
 
       c = *src++;
-      if(!isdigit (c))
+      if(!ndpi_isdigit (c))
 	return (-1);
       val = 0;
       do {
@@ -111,7 +108,7 @@ static int ndpi_my_inet_pton (int af, const char *src, void *dst)
 	if(val > 255)
 	  return (0);
 	c = *src++;
-      } while (c && isdigit (c));
+      } while (c && ndpi_isdigit (c));
       xp[i] = (u_char)val;
       if(c == '\0')
 	break;

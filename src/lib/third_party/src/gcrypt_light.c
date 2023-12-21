@@ -344,8 +344,14 @@ static gcry_error_t _gcry_cipher_crypt (gcry_cipher_hd_t h,
                         src ? src:(const unsigned char *)in, (unsigned char *)out);
             break;
         case GCRY_CIPHER_MODE_GCM:
-            if(encrypt) return MBEDTLS_ERR_GCM_NOT_SUPPORT;
-            if(!( h->s_key && h->s_auth && h->s_iv && !h->s_crypt_ok)) return MBEDTLS_ERR_GCM_MISSING_KEY;
+            if(encrypt) {
+                ndpi_free(src);
+                return MBEDTLS_ERR_GCM_NOT_SUPPORT;
+            }
+            if(!( h->s_key && h->s_auth && h->s_iv && !h->s_crypt_ok)) {
+                ndpi_free(src);
+                return MBEDTLS_ERR_GCM_MISSING_KEY;
+            }
             h->taglen = 16;
             rv = mbedtls_gcm_crypt_and_tag(h->ctx.gcm,
                         MBEDTLS_GCM_DECRYPT,

@@ -74,7 +74,7 @@ static int ndpi_is_number(const char *str, u_int32_t str_len) {
   unsigned int i;
 
   for(i = 0; i < str_len; i++)
-    if(!isdigit((int)str[i])) return(0);
+    if(!ndpi_isdigit(str[i])) return(0);
 
   return(1);
 }

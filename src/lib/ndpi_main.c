@@ -4539,7 +4539,7 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str,
 int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str,
 			    FILE *fd, void *user_data) {
   char buffer[512], *line, *name, *category, *saveptr;
-  int len, num = 0;
+  int len, num = 0, cat_id;
 
   if(!ndpi_str || !fd)
     return(-1);
@@ -4562,12 +4562,17 @@ int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str,
       category = strtok_r(NULL, "\t", &saveptr);
 
       if(category) {
-	int rc = ndpi_load_category(ndpi_str, name,
-				    (ndpi_protocol_category_t) atoi(category),
-				    user_data);
+        const char *errstrp;
+        cat_id = ndpi_strtonum(category, 1, NDPI_PROTOCOL_NUM_CATEGORIES - 1, &errstrp, 10);
+        if(errstrp == NULL) {
 
-	if(rc >= 0)
-	  num++;
+          int rc = ndpi_load_category(ndpi_str, name,
+				      (ndpi_protocol_category_t)cat_id,
+				      user_data);
+
+          if(rc >= 0)
+           num++;
+        }
       }
     }
   }
@@ -4634,7 +4639,7 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
         line[i] = '\0';
         break;
       }
-      if (line[i] != '-' && line[i] != '.' && isalnum(line[i]) == 0
+      if (line[i] != '-' && line[i] != '.' && ndpi_isalnum(line[i]) == 0
           /* non standard checks for the sake of compatibility */
           && line[i] != '_')
         break;
@@ -4689,19 +4694,19 @@ int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
 
     /* Check if the format is <proto it>_<string>.<extension> */
     if((underscore = strchr(dp->d_name, '_')) != NULL) {
-      ndpi_protocol_category_t proto_id;
+      int cat_id;
+      const char *errstrp;
 
       underscore[0] = '\0';
-      proto_id = (ndpi_protocol_category_t)atoi(dp->d_name);
-
-      if((proto_id > 0) && (proto_id < (u_int16_t)NDPI_LAST_IMPLEMENTED_PROTOCOL)) {
+      cat_id = ndpi_strtonum(dp->d_name, 1, NDPI_PROTOCOL_NUM_CATEGORIES - 1, &errstrp, 10);
+      if(errstrp == NULL) {
 	/* Valid file */
 	char path[512];
 
 	underscore[0] = '_';
 	snprintf(path, sizeof(path), "%s/%s", dir_path, dp->d_name);
 
-	if (ndpi_load_category_file(ndpi_str, path, proto_id) < 0) {
+	if (ndpi_load_category_file(ndpi_str, path, (ndpi_protocol_category_t)cat_id) < 0) {
 	  NDPI_LOG_ERR(ndpi_str, "Failed to load '%s'\n", path);
 	  failed_files++;
 	}else
@@ -5975,9 +5980,6 @@ int ndpi_handle_ipv6_extension_headers(u_int16_t l3len, const u_int8_t **l4ptr,
 
     *nxt_hdr = (*l4ptr)[0];
 
-    if(*l4len < ehdr_len)
-      return(1);
-
     *l4len -= ehdr_len;
     (*l4ptr) += ehdr_len;
   }
@@ -6033,8 +6035,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
   if(l3 == NULL || l3_len < sizeof(struct ndpi_iphdr))
     return(1);
 
-  if((iph = (const struct ndpi_iphdr *) l3) == NULL)
-    return(1);
+  iph = (const struct ndpi_iphdr *) l3;
 
   if(iph->version == IPVERSION && iph->ihl >= 5) {
     NDPI_LOG_DBG2(ndpi_str, "ipv4 header\n");
@@ -6483,7 +6484,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	for(i=0; (i<packet->payload_packet_len)
 	      && (flow->flow_payload_len < ndpi_str->max_payload_track_len); i++) {
 	  flow->flow_payload[flow->flow_payload_len++] =
-	    (isprint(packet->payload[i]) || isspace(packet->payload[i])) ? packet->payload[i] : '.';
+	    (ndpi_isprint(packet->payload[i]) || ndpi_isspace(packet->payload[i])) ? packet->payload[i] : '.';
 	}
       }
     }
@@ -7019,7 +7020,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       (MS Teams uses Skype as transport protocol for voice/video)
     */
   case NDPI_PROTOCOL_MSTEAMS:
-    if(flow && (flow->l4_proto == IPPROTO_TCP)) {
+    if(flow->l4_proto == IPPROTO_TCP) {
       // printf("====>> NDPI_PROTOCOL_MSTEAMS\n");
 
       if(ndpi_str->msteams_cache)
@@ -7031,7 +7032,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     break;
 
   case NDPI_PROTOCOL_STUN:
-    if(flow && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE))
+    if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE)
       ndpi_reconcile_msteams_udp(ndpi_str, flow, NDPI_PROTOCOL_STUN);
     break;
 
@@ -7054,8 +7055,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       When Teams is unable to communicate via UDP
       it switches to TLS.TCP. Let's try to catch it
     */
-    if(flow
-       && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE)
+    if((flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE)
        && (ret->master_protocol == NDPI_PROTOCOL_UNKNOWN)
        && ndpi_str->msteams_cache
       ) {
@@ -9081,7 +9081,7 @@ const char *ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_str
   }
 
   if((category >= NDPI_PROTOCOL_CATEGORY_CUSTOM_1) && (category <= NDPI_PROTOCOL_CATEGORY_CUSTOM_5)) {
-    switch(category) {
+    switch((int)category) {
     case NDPI_PROTOCOL_CATEGORY_CUSTOM_1:
       return(ndpi_str->custom_category_labels[0]);
     case NDPI_PROTOCOL_CATEGORY_CUSTOM_2:
@@ -9092,13 +9092,9 @@ const char *ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_str
       return(ndpi_str->custom_category_labels[3]);
     case NDPI_PROTOCOL_CATEGORY_CUSTOM_5:
       return(ndpi_str->custom_category_labels[4]);
-    case NDPI_PROTOCOL_NUM_CATEGORIES:
-      return("Code should not use this internal constant");
-    default:
-      return("Unspecified");
     }
-  } else
-    return(categories[category]);
+  }
+  return(categories[category]);
 }
 
 /* ****************************************************** */
@@ -10178,7 +10174,7 @@ u_int8_t ends_with(struct ndpi_detection_module_struct *ndpi_struct,
 /* ******************************************************************** */
 
 static int ndpi_is_trigram_char(char c) {
-  if(isdigit(c) || (c == '.') || (c == '-'))
+  if(ndpi_isdigit(c) || (c == '.') || (c == '-'))
     return(0);
   else
     return(1);
@@ -10242,7 +10238,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
        ndpi_match_string_subprotocol(ndpi_str, name, strlen(name), &ret_match) > 0)
       return(0); /* Ignore DGA for known domain names */
 
-    if(isdigit((int)name[0])) {
+    if(ndpi_isdigit(name[0])) {
       struct in_addr ip_addr;
 
       ip_addr.s_addr = inet_addr(name);
@@ -10278,7 +10274,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	if(tmp[j] == '.') {
 	  num_dots++;
 	} else if(num_dots == 0) {
-	  if(!isdigit((int)tmp[j]))
+	  if(!ndpi_isdigit(tmp[j]))
 	    first_element_is_numeric = 0;
 	}
 
@@ -10291,10 +10287,10 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	} else
 	  num_char_repetitions = 1, last_char = tmp[j];
 
-	if(isdigit((int)tmp[j])) {
+	if(ndpi_isdigit(tmp[j])) {
 	  num_digits++;
 
-	  if(((j+2)<(u_int)len) && isdigit((int)tmp[j+1]) && (tmp[j+2] == '.')) {
+	  if(((j+2)<(u_int)len) && ndpi_isdigit(tmp[j+1]) && (tmp[j+2] == '.')) {
 	    /* Check if there are too many digits */
 	    if(num_digits < 4)
 	      return(0); /* Double digits */
@@ -10393,7 +10389,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	trigram_char_skip = 0;
 
 	for(i = 0; word[i+1] != '\0'; i++) {
-	  if(isdigit((int)word[i]))
+	  if(ndpi_isdigit(word[i]))
 	    num_consecutive_digits++;
 	  else {
 	    if((num_word == 1) && (num_consecutive_digits > max_num_consecutive_digits_first_word))

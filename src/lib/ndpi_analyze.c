@@ -148,7 +148,7 @@ float ndpi_data_average(struct ndpi_analyze_struct *s) {
   if((!s) || (s->num_data_entries == 0))
     return(0);
 
-  return((s->num_data_entries == 0) ? 0 : ((float)s->sum_total / (float)s->num_data_entries));
+  return((float)s->sum_total / (float)s->num_data_entries);
 }
 
 /* ********************************************************************************* */

@@ -92,11 +92,6 @@ protobuf_dissect_varint(struct ndpi_packet_struct const * const packet,
     }
   }
 
-  if (i == 10)
-  {
-    return -1;
-  }
-
   *offset += i + 1;
   return 0;
 }

@@ -696,7 +696,7 @@ static inline int ndpi_is_other_char(char c) {
 /* ******************************************************************** */
 
 static int _ndpi_is_valid_char(char c) {
-  if(ispunct(c) && (!ndpi_is_other_char(c)))
+  if(ndpi_ispunct(c) && (!ndpi_is_other_char(c)))
     return(0);
   else
     return(ndpi_isdigit(c)
@@ -722,7 +722,7 @@ static int ndpi_find_non_eng_bigrams(struct ndpi_detection_module_struct *ndpi_s
 				     char *str) {
   char s[3];
 
-  if((isdigit((int)str[0]) && isdigit((int)str[1]))
+  if((ndpi_isdigit(str[0]) && ndpi_isdigit(str[1]))
      || ndpi_is_other_char(str[0])
      || ndpi_is_other_char(str[1])
      )
@@ -741,7 +741,7 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 				    char *buffer, u_int buffer_size,
 				    u_int8_t min_string_match_len,
 				    char *outbuf, u_int outbuf_len) {
-  u_int ret = 0, i = 0, do_cr = 0, len = 0, o_idx = 0, being_o_idx = 0;
+  u_int ret = 0, i, do_cr = 0, len = 0, o_idx = 0, being_o_idx = 0;
 
   if(buffer_size <= 0)
     return(0);
@@ -768,7 +768,7 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
 	len += 1;
       }
 
-      // printf("->> %c%c\n", isprint(buffer[i]) ? buffer[i] : '.', isprint(buffer[i+1]) ? buffer[i+1] : '.');
+      // printf("->> %c%c\n", ndpi_isprint(buffer[i]) ? buffer[i] : '.', ndpi_isprint(buffer[i+1]) ? buffer[i+1] : '.');
       if(do_cr) {
 	if(len > min_string_match_len)
 	  ret = 1;
