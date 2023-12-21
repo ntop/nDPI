@@ -700,7 +700,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     char _hostname[256];
 
     ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
-    ret.app_protocol    = (d_port == LLMNR_PORT) ? NDPI_PROTOCOL_LLMNR : ((d_port == MDNS_PORT) ? NDPI_PROTOCOL_MDNS : NDPI_PROTOCOL_DNS);
+    ret.app_protocol    = (d_port == LLMNR_PORT) ? NDPI_PROTOCOL_LLMNR : (((d_port == MDNS_PORT) && isLLMNRMulticastAddress(packet) ) ? NDPI_PROTOCOL_MDNS : NDPI_PROTOCOL_DNS);
 
     if(invalid) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
