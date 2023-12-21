@@ -805,6 +805,8 @@ int ndpi_init_empty_app_protocol(ndpi_protocol_match const * const hostname_list
   return 0;
 }
 
+/* ******************************************************************** */
+
 int ndpi_init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
                            ndpi_protocol_match const * const match) {
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
@@ -6987,6 +6989,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     break;
 
   case NDPI_PROTOCOL_SYSLOG:
+  case NDPI_PROTOCOL_MDNS:
     if(flow->l4_proto == IPPROTO_UDP)
       ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
     break;

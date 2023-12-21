@@ -773,7 +773,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     if(dot) {
       uintptr_t first_element_len = dot - _hostname;
 
-      if(first_element_len > 32) {
+      if((first_element_len > 32) && (!is_mdns)) {
 	/*
 	  The lenght of the first element in the query is very long
 	  and this might be an issue or indicate an exfiltration
