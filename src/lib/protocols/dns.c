@@ -700,7 +700,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     char _hostname[256];
 
     ret.master_protocol = NDPI_PROTOCOL_UNKNOWN;
-    ret.app_protocol    = (d_port == LLMNR_PORT) ? NDPI_PROTOCOL_LLMNR : ((d_port == MDNS_PORT) ? NDPI_PROTOCOL_MDNS : NDPI_PROTOCOL_DNS);
+    ret.app_protocol    = (d_port == LLMNR_PORT) ? NDPI_PROTOCOL_LLMNR : (((d_port == MDNS_PORT) && isLLMNRMulticastAddress(packet) ) ? NDPI_PROTOCOL_MDNS : NDPI_PROTOCOL_DNS);
 
     if(invalid) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
@@ -773,7 +773,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     if(dot) {
       uintptr_t first_element_len = dot - _hostname;
 
-      if(first_element_len > 32) {
+      if((first_element_len > 32) && (!is_mdns)) {
 	/*
 	  The lenght of the first element in the query is very long
 	  and this might be an issue or indicate an exfiltration
