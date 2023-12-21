@@ -386,3 +386,12 @@ References: `Protocol Specs: <https://opennetworking.org/wp-content/uploads/2014
 JSON-RPC is a remote procedure call protocol encoded in JSON.
 
 References: `Protocol Specs: <https://www.jsonrpc.org/specification>`_.
+
+
+.. _Proto 376:
+
+`NDPI_PROTOCOL_APACHE_KAFKA`
+======================
+Apache Kafka is a distributed event store and stream-processing platform.
+
+References: `Official site <https://kafka.apache.org>`_ and `Github <https://github.com/apache/kafka>`_.
