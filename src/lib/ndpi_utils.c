@@ -2161,6 +2161,13 @@ const char* ndpi_http_method2str(ndpi_http_method m) {
   case NDPI_HTTP_METHOD_RPC_CONNECT:  return("RPC_CONNECT");
   case NDPI_HTTP_METHOD_RPC_IN_DATA:  return("RPC_IN_DATA");
   case NDPI_HTTP_METHOD_RPC_OUT_DATA: return("RPC_OUT_DATA");
+  case NDPI_HTTP_METHOD_MKCOL:        return("MKCOL");
+  case NDPI_HTTP_METHOD_MOVE:         return("MOVE");
+  case NDPI_HTTP_METHOD_COPY:         return("COPY");
+  case NDPI_HTTP_METHOD_LOCK:         return("LOCK");
+  case NDPI_HTTP_METHOD_UNLOCK:       return("UNLOCK");
+  case NDPI_HTTP_METHOD_PROPFIND:     return("PROPFIND");
+  case NDPI_HTTP_METHOD_PROPPATCH:    return("PROPPATCH");
   }
 
   return("Unknown HTTP method");
@@ -2177,17 +2184,41 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
   case 'G': return(NDPI_HTTP_METHOD_GET);
   case 'H': return(NDPI_HTTP_METHOD_HEAD);
 
+  case 'L':
+    if (strncmp(method, "LOCK", 4) == 0)
+      return(NDPI_HTTP_METHOD_LOCK);
+    break;
+
+  case 'M':
+    if (strncmp(method, "MOVE", 4) == 0)
+      return(NDPI_HTTP_METHOD_MOVE);
+    else if (strncmp(method, "MKCO", 4) == 0)
+      return(NDPI_HTTP_METHOD_MKCOL);
+    break;
+
   case 'P':
     switch(method[1]) {
     case 'A':return(NDPI_HTTP_METHOD_PATCH);
     case 'O':return(NDPI_HTTP_METHOD_POST);
     case 'U':return(NDPI_HTTP_METHOD_PUT);
+    case 'R':
+      if (method_len >= 5) {
+        if (strncmp(method, "PROPF", 5) == 0)
+          return(NDPI_HTTP_METHOD_PROPFIND);
+        else if (strncmp(method, "PROPP", 5) == 0)
+          return NDPI_HTTP_METHOD_PROPPATCH;
+      }
     }
     break;
 
   case 'D':  return(NDPI_HTTP_METHOD_DELETE);
   case 'T':  return(NDPI_HTTP_METHOD_TRACE);
-  case 'C':  return(NDPI_HTTP_METHOD_CONNECT);
+  case 'C':
+    if (method_len == 4)
+      return(NDPI_HTTP_METHOD_COPY);
+    else
+      return(NDPI_HTTP_METHOD_CONNECT);
+
   case 'R':
     if(method_len >= 11) {
       if(strncmp(method, "RPC_CONNECT", 11) == 0) {
@@ -2198,6 +2229,11 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
         return(NDPI_HTTP_METHOD_RPC_OUT_DATA);
       }
     }
+    break;
+
+  case 'U':
+    if (method_len == 6)
+      return(NDPI_HTTP_METHOD_UNLOCK);
     break;
   }
 
