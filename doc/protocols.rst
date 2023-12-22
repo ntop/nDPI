@@ -390,6 +390,19 @@ References: `Protocol Specs: <https://www.jsonrpc.org/specification>`_.
 
 .. _Proto 376:
 
+`NDPI_PROTOCOL_WEBDAV`
+======================
+WebDAV is a set of extensions to the HTTP protocol that allows WebDAV clients to collaboratively edit and manage files on remote Web servers.
+
+References: `RFC4918: <https://datatracker.ietf.org/doc/html/rfc4918>`_.
+
+Notes:
+
+- WebDAV is almost always encrypted, i.e. transported over TLS.
+
+
+.. _Proto 377:
+
 `NDPI_PROTOCOL_APACHE_KAFKA`
 ======================
 Apache Kafka is a distributed event store and stream-processing platform.
