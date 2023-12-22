@@ -2183,16 +2183,12 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
   case 'O': return(NDPI_HTTP_METHOD_OPTIONS);
   case 'G': return(NDPI_HTTP_METHOD_GET);
   case 'H': return(NDPI_HTTP_METHOD_HEAD);
-
-  case 'L':
-    if (strncmp(method, "LOCK", 4) == 0)
-      return(NDPI_HTTP_METHOD_LOCK);
-    break;
+  case 'L': return(NDPI_HTTP_METHOD_LOCK);
 
   case 'M':
-    if (strncmp(method, "MOVE", 4) == 0)
+    if (method[1] == 'O')
       return(NDPI_HTTP_METHOD_MOVE);
-    else if (strncmp(method, "MKCO", 4) == 0)
+    else
       return(NDPI_HTTP_METHOD_MKCOL);
     break;
 
@@ -2231,10 +2227,7 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
     }
     break;
 
-  case 'U':
-    if (method_len == 6)
-      return(NDPI_HTTP_METHOD_UNLOCK);
-    break;
+  case 'U': return(NDPI_HTTP_METHOD_UNLOCK);
   }
 
   return(NDPI_HTTP_METHOD_UNKNOWN);
