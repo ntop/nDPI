@@ -1738,10 +1738,8 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   printf("[JA4] %s [len: %lu]\n", ja_str, strlen(ja_str));
 #endif
 
-  snprintf(flow->protos.tls_quic.ja4_client,
-	   sizeof(flow->protos.tls_quic.ja4_client),
-	   "%s", ja_str);
-
+  strncpy(flow->protos.tls_quic.ja4_client, ja_str, 36);
+  flow->protos.tls_quic.ja4_client[36] = 0;
 }
 
 /* **************************************** */
