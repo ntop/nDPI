@@ -399,3 +399,12 @@ References: `RFC4918: <https://datatracker.ietf.org/doc/html/rfc4918>`_.
 Notes:
 
 - WebDAV is almost always encrypted, i.e. transported over TLS.
+
+
+.. _Proto 377:
+
+`NDPI_PROTOCOL_APACHE_KAFKA`
+======================
+Apache Kafka is a distributed event store and stream-processing platform.
+
+References: `Official site <https://kafka.apache.org>`_ and `Github <https://github.com/apache/kafka>`_.

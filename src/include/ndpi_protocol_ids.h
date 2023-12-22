@@ -405,6 +405,7 @@ typedef enum {
   NDPI_PROTOCOL_OPENFLOW              = 374,
   NDPI_PROTOCOL_JSON_RPC              = 375,
   NDPI_PROTOCOL_WEBDAV                = 376,
+  NDPI_PROTOCOL_APACHE_KAFKA          = 377,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
