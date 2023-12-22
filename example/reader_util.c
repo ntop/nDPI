@@ -1326,6 +1326,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->ssh_tls.notAfter = flow->ndpi_flow->protos.tls_quic.notAfter;
     ndpi_snprintf(flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja3_client);
+    ndpi_snprintf(flow->ssh_tls.ja4_client, sizeof(flow->ssh_tls.ja4_client), "%s",
+	     flow->ndpi_flow->protos.tls_quic.ja4_client);
     ndpi_snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja3_server);
     flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.tls_quic.server_unsafe_cipher;
