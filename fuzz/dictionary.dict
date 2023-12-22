@@ -81,6 +81,13 @@
 "RPC_CONNECT"
 "RPC_IN_DATA"
 "RPC_OUT_DATA"
+"MKCOL"
+"MOVE"
+"COPY"
+"LOCK"
+"UNLOCK"
+"PROPFIND"
+"PROPPATCH"
 
 #HTTP payload signatures
 
