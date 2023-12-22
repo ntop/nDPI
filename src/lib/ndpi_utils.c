@@ -1708,9 +1708,9 @@ static int ndpi_is_xss_injection(char* query) {
 static void ndpi_compile_rce_regex() {
   PCRE2_UCHAR pcreErrorStr[128];
   PCRE2_SIZE pcreErrorOffset;
-  int pcreErrorCode;
+  int i, pcreErrorCode = 0;
 
-  for(int i = 0; i < N_RCE_REGEX; i++) {
+  for(i = 0; i < N_RCE_REGEX; i++) {
     comp_rx[i] = (struct pcre2_struct*)ndpi_malloc(sizeof(struct pcre2_struct));
 
     comp_rx[i]->compiled = pcre2_compile((PCRE2_SPTR)rce_regex[i], PCRE2_ZERO_TERMINATED, 0, &pcreErrorCode,
@@ -1746,9 +1746,10 @@ static int ndpi_is_rce_injection(char* query) {
   }
 
   pcre2_match_data *pcreMatchData;
-  int pcreExecRet;
+  int i, pcreExecRet;
+  unsigned long j;
 
-  for(int i = 0; i < N_RCE_REGEX; i++) {
+  for(i = 0; i < N_RCE_REGEX; i++) {
     unsigned int length = strlen(query);
 
     pcreMatchData = pcre2_match_data_create_from_pattern(comp_rx[i]->compiled, NULL);
@@ -1789,16 +1790,16 @@ static int ndpi_is_rce_injection(char* query) {
 
   size_t ushlen = sizeof(ush_commands) / sizeof(ush_commands[0]);
 
-  for(unsigned long i = 0; i < ushlen; i++) {
-    if(strstr(query, ush_commands[i]) != NULL) {
+  for(j = 0; j < ushlen; j++) {
+    if(strstr(query, ush_commands[j]) != NULL) {
       return 1;
     }
   }
 
   size_t pwshlen = sizeof(pwsh_commands) / sizeof(pwsh_commands[0]);
 
-  for(unsigned long i = 0; i < pwshlen; i++) {
-    if(strstr(query, pwsh_commands[i]) != NULL) {
+  for(j = 0; j < pwshlen; j++) {
+    if(strstr(query, pwsh_commands[j]) != NULL) {
       return 1;
     }
   }
@@ -2160,6 +2161,13 @@ const char* ndpi_http_method2str(ndpi_http_method m) {
   case NDPI_HTTP_METHOD_RPC_CONNECT:  return("RPC_CONNECT");
   case NDPI_HTTP_METHOD_RPC_IN_DATA:  return("RPC_IN_DATA");
   case NDPI_HTTP_METHOD_RPC_OUT_DATA: return("RPC_OUT_DATA");
+  case NDPI_HTTP_METHOD_MKCOL:        return("MKCOL");
+  case NDPI_HTTP_METHOD_MOVE:         return("MOVE");
+  case NDPI_HTTP_METHOD_COPY:         return("COPY");
+  case NDPI_HTTP_METHOD_LOCK:         return("LOCK");
+  case NDPI_HTTP_METHOD_UNLOCK:       return("UNLOCK");
+  case NDPI_HTTP_METHOD_PROPFIND:     return("PROPFIND");
+  case NDPI_HTTP_METHOD_PROPPATCH:    return("PROPPATCH");
   }
 
   return("Unknown HTTP method");
@@ -2175,18 +2183,38 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
   case 'O': return(NDPI_HTTP_METHOD_OPTIONS);
   case 'G': return(NDPI_HTTP_METHOD_GET);
   case 'H': return(NDPI_HTTP_METHOD_HEAD);
+  case 'L': return(NDPI_HTTP_METHOD_LOCK);
+
+  case 'M':
+    if (method[1] == 'O')
+      return(NDPI_HTTP_METHOD_MOVE);
+    else
+      return(NDPI_HTTP_METHOD_MKCOL);
+    break;
 
   case 'P':
     switch(method[1]) {
     case 'A':return(NDPI_HTTP_METHOD_PATCH);
     case 'O':return(NDPI_HTTP_METHOD_POST);
     case 'U':return(NDPI_HTTP_METHOD_PUT);
+    case 'R':
+      if (method_len >= 5) {
+        if (strncmp(method, "PROPF", 5) == 0)
+          return(NDPI_HTTP_METHOD_PROPFIND);
+        else if (strncmp(method, "PROPP", 5) == 0)
+          return NDPI_HTTP_METHOD_PROPPATCH;
+      }
     }
     break;
 
   case 'D':  return(NDPI_HTTP_METHOD_DELETE);
   case 'T':  return(NDPI_HTTP_METHOD_TRACE);
-  case 'C':  return(NDPI_HTTP_METHOD_CONNECT);
+  case 'C':
+    if (method_len == 4)
+      return(NDPI_HTTP_METHOD_COPY);
+    else
+      return(NDPI_HTTP_METHOD_CONNECT);
+
   case 'R':
     if(method_len >= 11) {
       if(strncmp(method, "RPC_CONNECT", 11) == 0) {
@@ -2198,6 +2226,8 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
       }
     }
     break;
+
+  case 'U': return(NDPI_HTTP_METHOD_UNLOCK);
   }
 
   return(NDPI_HTTP_METHOD_UNKNOWN);

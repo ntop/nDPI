@@ -377,3 +377,34 @@ References: `Protocol Specs: <https://uftp-multicast.sourceforge.net/protocol.tx
 OpenFlow protocol is a network protocol closely associated with Software-Defined Networking (SDN).
 
 References: `Protocol Specs: <https://opennetworking.org/wp-content/uploads/2014/10/openflow-switch-v1.5.1.pdf>`_.
+
+
+.. _Proto 375:
+
+`NDPI_PROTOCOL_JSON_RPC`
+======================
+JSON-RPC is a remote procedure call protocol encoded in JSON.
+
+References: `Protocol Specs: <https://www.jsonrpc.org/specification>`_.
+
+
+.. _Proto 376:
+
+`NDPI_PROTOCOL_WEBDAV`
+======================
+WebDAV is a set of extensions to the HTTP protocol that allows WebDAV clients to collaboratively edit and manage files on remote Web servers.
+
+References: `RFC4918: <https://datatracker.ietf.org/doc/html/rfc4918>`_.
+
+Notes:
+
+- WebDAV is almost always encrypted, i.e. transported over TLS.
+
+
+.. _Proto 377:
+
+`NDPI_PROTOCOL_APACHE_KAFKA`
+======================
+Apache Kafka is a distributed event store and stream-processing platform.
+
+References: `Official site <https://kafka.apache.org>`_ and `Github <https://github.com/apache/kafka>`_.

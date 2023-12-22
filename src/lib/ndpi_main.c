@@ -813,6 +813,8 @@ int ndpi_init_empty_app_protocol(ndpi_protocol_match const * const hostname_list
   return 0;
 }
 
+/* ******************************************************************** */
+
 int ndpi_init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
                            ndpi_protocol_match const * const match) {
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
@@ -1056,6 +1058,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			      NDPI_PROTOCOL_MPEGDASH,
 			      NDPI_PROTOCOL_RTSP,
 			      NDPI_PROTOCOL_APACHE_THRIFT,
+			      NDPI_PROTOCOL_JSON_RPC,
 			      NDPI_PROTOCOL_MATCHED_BY_CONTENT,
 			      NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS); /* NDPI_PROTOCOL_HTTP can have (content-matched) subprotocols */
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MDNS,
@@ -2166,12 +2169,24 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_a, 4880, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UFTP,
-        "UFTP", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
-        ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-        ndpi_build_default_ports(ports_b, 1044, 0, 0, 0, 0) /* UDP */);
+			  "UFTP", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 1044, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_OPENFLOW,
 			  "OpenFlow", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 6653, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_JSON_RPC,
+			  "JSON-RPC", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WEBDAV,
+			  "WebDAV", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),  /* TCP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0)); /* UDP */
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_APACHE_KAFKA,
+			  "Kafka", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 9092, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
@@ -5692,6 +5707,12 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* OpenFlow */
   init_openflow_dissector(ndpi_str, &a);
 
+  /* JSON-RPC */
+  init_json_rpc_dissector(ndpi_str, &a);
+
+  /* Apache Kafka */
+  init_kafka_dissector(ndpi_str, &a);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
@@ -6949,6 +6970,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     break;
 
   case NDPI_PROTOCOL_SYSLOG:
+  case NDPI_PROTOCOL_MDNS:
     if(flow->l4_proto == IPPROTO_UDP)
       ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
     break;

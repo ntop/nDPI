@@ -441,6 +441,20 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_RPCH, master_protocol, NDPI_CONFIDENCE_DPI);
   }
 
+  switch (flow->http.method) {
+    case NDPI_HTTP_METHOD_MKCOL:
+    case NDPI_HTTP_METHOD_MOVE:
+    case NDPI_HTTP_METHOD_COPY:
+    case NDPI_HTTP_METHOD_LOCK:
+    case NDPI_HTTP_METHOD_UNLOCK:
+    case NDPI_HTTP_METHOD_PROPFIND:
+    case NDPI_HTTP_METHOD_PROPPATCH:
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBDAV, master_protocol, NDPI_CONFIDENCE_DPI);
+      break;
+    default:
+      break;
+  }
+
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
      hostname_just_set && flow->host_server_name[0] != '\0') {
     ndpi_match_hostname_protocol(ndpi_struct, flow,
