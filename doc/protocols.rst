@@ -395,3 +395,7 @@ References: `Protocol Specs: <https://www.jsonrpc.org/specification>`_.
 WebDAV is a set of extensions to the HTTP protocol that allows WebDAV clients to collaboratively edit and manage files on remote Web servers.
 
 References: `RFC4918: <https://datatracker.ietf.org/doc/html/rfc4918>`_.
+
+Notes:
+
+- WebDAV is almost always encrypted, i.e. transported over TLS.
