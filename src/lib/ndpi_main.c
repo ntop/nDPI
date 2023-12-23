@@ -124,6 +124,7 @@
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ndpi_md5.h"
+#include "third_party/include/ndpi_sha256.h"
 
 #ifdef HAVE_NBPF
 #include "nbpf.h"
@@ -10088,6 +10089,16 @@ void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]) {
   ndpi_MD5Init(&ctx);
   ndpi_MD5Update(&ctx, data, data_len);
   ndpi_MD5Final(hash, &ctx);
+}
+
+/* ******************************************************************** */
+
+void ndpi_sha256(const u_char *data, size_t data_len, u_int8_t sha_hash[32]) {
+  ndpi_SHA256_CTX sha_ctx;
+
+  ndpi_sha256_init(&sha_ctx);
+  ndpi_sha256_update(&sha_ctx, data, data_len);
+  ndpi_sha256_final(&sha_ctx, sha_hash);
 }
 
 /* ******************************************************************** */
