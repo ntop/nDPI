@@ -43,7 +43,7 @@ static const u_int32_t k[64] = {
 };
 
 /*********************** FUNCTION DEFINITIONS ***********************/
-void sha256_transform(SHA256_CTX *ctx, const u_int8_t data[])
+void sha256_transform(ndpi_SHA256_CTX *ctx, const u_int8_t data[])
 {
   u_int32_t a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
 
@@ -84,7 +84,7 @@ void sha256_transform(SHA256_CTX *ctx, const u_int8_t data[])
   ctx->state[7] += h;
 }
 
-void ndpi_sha256_init(SHA256_CTX *ctx)
+void ndpi_sha256_init(ndpi_SHA256_CTX *ctx)
 {
   ctx->datalen = 0;
   ctx->bitlen = 0;
@@ -98,7 +98,7 @@ void ndpi_sha256_init(SHA256_CTX *ctx)
   ctx->state[7] = 0x5be0cd19;
 }
 
-void ndpi_sha256_update(SHA256_CTX *ctx, const u_int8_t data[], size_t len)
+void ndpi_sha256_update(ndpi_SHA256_CTX *ctx, const u_int8_t data[], size_t len)
 {
   u_int32_t i;
 
@@ -113,7 +113,7 @@ void ndpi_sha256_update(SHA256_CTX *ctx, const u_int8_t data[], size_t len)
   }
 }
 
-void ndpi_sha256_final(SHA256_CTX *ctx, u_int8_t hash[])
+void ndpi_sha256_final(ndpi_SHA256_CTX *ctx, u_int8_t hash[])
 {
   u_int32_t i;
 
