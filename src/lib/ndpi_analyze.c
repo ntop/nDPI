@@ -1765,6 +1765,15 @@ u_int16_t ndpi_crc16_xmodem(const void *data, size_t n_bytes) {
   return __crc16(0, data, n_bytes);
 }
 
+u_int16_t ndpi_crc16_x25(const void* data, size_t n_bytes) {
+  u_int16_t crc = 0xFFFF;
+  u_int8_t* b = (u_int8_t*)data;
+  while (n_bytes--) {
+    crc = (crc >> 8) ^ crc16_ccitt_table[(crc ^ *b++) & 0xFF];
+  }
+  return (crc ^ 0xFFFF);
+}
+
 /* ********************************************************** */
 /*       http://home.thep.lu.se/~bjorn/crc/crc32_fast.c       */
 /* ********************************************************** */

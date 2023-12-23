@@ -408,3 +408,12 @@ Notes:
 Apache Kafka is a distributed event store and stream-processing platform.
 
 References: `Official site <https://kafka.apache.org>`_ and `Github <https://github.com/apache/kafka>`_.
+
+
+.. _Proto 378:
+
+`NDPI_PROTOCOL_IEC62056`
+============================
+DLMS/COSEM (IEC 62056-4-7) is a protocol used to communicate with water, gas and electricity meters.
+
+References: `Paid Specs: <https://webstore.iec.ch/publication/22487>`_.

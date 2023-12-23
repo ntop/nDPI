@@ -1790,6 +1790,7 @@ extern "C" {
   u_int16_t ndpi_crc16_ccit(const void* data, size_t n_bytes);
   u_int16_t ndpi_crc16_ccit_false(const void *data, size_t n_bytes);
   u_int16_t ndpi_crc16_xmodem(const void *data, size_t n_bytes);
+  u_int16_t ndpi_crc16_x25(const void* data, size_t n_bytes);
   u_int32_t ndpi_crc32(const void* data, size_t n_bytes);
   u_int32_t ndpi_nearest_power_of_two(u_int32_t x);
 
