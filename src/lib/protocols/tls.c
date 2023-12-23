@@ -1603,10 +1603,10 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow,
 			     u_int32_t quic_version,
 			     union ja_info *ja) {
-  BYTE tmp_str[JA_STR_LEN];
+  u_int8_t tmp_str[JA_STR_LEN];
   u_int tmp_str_len, num_extn;
   SHA256_CTX sha_ctx;
-  BYTE sha_hash[SHA256_BLOCK_SIZE];
+  u_int8_t sha_hash[SHA256_BLOCK_SIZE];
   char ja_str[JA_STR_LEN];
   u_int16_t ja_str_len, i;
   int rc;
