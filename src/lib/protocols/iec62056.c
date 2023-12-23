@@ -51,7 +51,7 @@ static void ndpi_search_iec62056(struct ndpi_detection_module_struct *ndpi_struc
       packet->payload[0] == 0x7E && packet->payload[1] == 0xA0 && /* HDLC frame start */
       packet->payload[packet->payload_packet_len-1] == 0x7E) /* HDLC frame end */
   {
-    u_int16_t fcs = ndpi_crc16_x25(&packet->payload[1], packet->payload_packet_len-4);
+    u_int16_t fcs = le16toh(ndpi_crc16_x25(&packet->payload[1], packet->payload_packet_len-4));
     if (fcs == get_u_int16_t(packet->payload, packet->payload_packet_len-3)) {
       ndpi_int_iec62056_add_connection(ndpi_struct,  flow);
       return;
