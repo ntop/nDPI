@@ -1603,10 +1603,9 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow,
 			     u_int32_t quic_version,
 			     union ja_info *ja) {
-  BYTE tmp_str[JA_STR_LEN];
+  u_int8_t tmp_str[JA_STR_LEN];
   u_int tmp_str_len, num_extn;
-  SHA256_CTX sha_ctx;
-  BYTE sha_hash[SHA256_BLOCK_SIZE];
+  u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
   char ja_str[JA_STR_LEN];
   u_int16_t ja_str_len, i;
   int rc;
@@ -1690,9 +1689,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
     if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;
   }
 
-  ndpi_sha256_init(&sha_ctx);
-  ndpi_sha256_update(&sha_ctx, tmp_str, tmp_str_len);
-  ndpi_sha256_final(&sha_ctx, sha_hash);
+  ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], JA_STR_LEN-ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x_",
@@ -1724,9 +1721,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   printf("[EXTN] %s [len: %u]\n", tmp_str, tmp_str_len);
 #endif
 
-  ndpi_sha256_init(&sha_ctx);
-  ndpi_sha256_update(&sha_ctx, tmp_str, tmp_str_len);
-  ndpi_sha256_final(&sha_ctx, sha_hash);
+  ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], JA_STR_LEN-ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x",
@@ -2383,13 +2378,14 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
 		ja.client.num_signature_algorithms = ndpi_min(sa_size, MAX_NUM_JA);
-
+		for(i=0, id=0; i<tot_signature_algorithms_len && s_offset+i<total_len; i += 2) {
+		  ja.client.signature_algorithms[id++] = ntohs(*(u_int16_t*)&packet->payload[s_offset+i]);
+		}
+		
 		for(i=0, id=0; i<tot_signature_algorithms_len && s_offset+i<total_len; i++) {
 		  int rc = ndpi_snprintf(&ja.client.signature_algorithms_str[i*2],
 					 sizeof(ja.client.signature_algorithms_str)-i*2,
 					 "%02X", packet->payload[s_offset+i]);
-		  ja.client.signature_algorithms[id++] = ntohs(*(u_int16_t*)&packet->payload[s_offset+i*2]);
-
 		  if(rc < 0) break;
 		}
 

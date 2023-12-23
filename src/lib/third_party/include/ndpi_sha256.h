@@ -11,25 +11,25 @@
 
 /*************************** HEADER FILES ***************************/
 #include <stddef.h>
+#include "ndpi_typedefs.h"
 
 /****************************** MACROS ******************************/
-#define SHA256_BLOCK_SIZE 32            // SHA256 outputs a 32 byte digest
+
+#define NDPI_SHA256_BLOCK_SIZE 32            // SHA256 outputs a 32 byte digest
 
 /**************************** DATA TYPES ****************************/
-typedef unsigned char BYTE;             // 8-bit byte
-typedef unsigned int  WORD;             // 32-bit word, change to "long" for 16-bit machines
 
 typedef struct {
-  BYTE data[64];
-  WORD datalen;
+  u_int8_t data[64];
+  u_int32_t datalen;
   unsigned long long bitlen;
-  WORD state[8];
-} SHA256_CTX;
+  u_int32_t state[8];
+} ndpi_SHA256_CTX;
 
 /*********************** FUNCTION DECLARATIONS **********************/
 
-void ndpi_sha256_init(SHA256_CTX *ctx);
-void ndpi_sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len);
-void ndpi_sha256_final(SHA256_CTX *ctx, BYTE hash[]);
+void ndpi_sha256_init(ndpi_SHA256_CTX *ctx);
+void ndpi_sha256_update(ndpi_SHA256_CTX *ctx, const u_int8_t data[], size_t len);
+void ndpi_sha256_final(ndpi_SHA256_CTX *ctx, u_int8_t hash[]);
 
 #endif   // SHA256_H

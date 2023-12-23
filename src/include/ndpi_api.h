@@ -1787,6 +1787,8 @@ extern "C" {
   /* ******************************* */
 
   void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]);
+  void ndpi_sha256(const u_char *data, size_t data_len, u_int8_t sha_hash[32]);
+  
   u_int16_t ndpi_crc16_ccit(const void* data, size_t n_bytes);
   u_int16_t ndpi_crc16_ccit_false(const void *data, size_t n_bytes);
   u_int16_t ndpi_crc16_xmodem(const void *data, size_t n_bytes);
