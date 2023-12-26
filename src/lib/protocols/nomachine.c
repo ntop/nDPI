@@ -56,8 +56,8 @@ static void ndpi_search_nomachine(struct ndpi_detection_module_struct *ndpi_stru
     }
   } else if (packet->udp != NULL) {
     if (packet->payload_packet_len > 9 && /* Shortest valid packet is 10 bytes long, probably it's keep-alive */
-        get_u_int16_t(packet->payload, 2) == 1 &&
-        get_u_int16_t(packet->payload, 4) == packet->payload_packet_len)
+        le16toh(get_u_int16_t(packet->payload, 2)) == 1 &&
+        le16toh(get_u_int16_t(packet->payload, 4)) == packet->payload_packet_len)
     {
       ndpi_int_nomachine_add_connection(ndpi_struct, flow);
       return;
