@@ -567,6 +567,8 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
   char *name;
   int j;
 
+  NDPI_LOG_DBG2(ndpi_str, "[NDPI] Set defaults %s [%d]\n", protoName, protoId);
+
   if(!ndpi_is_valid_protoId(protoId)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] %s/protoId=%d: INTERNAL ERROR\n", protoName, protoId);
     return;
@@ -986,10 +988,8 @@ static void ndpi_validate_protocol_initialization(struct ndpi_detection_module_s
 
 /* This function is used to map protocol name and default ports and it MUST
    be updated whenever a new protocol is added to NDPI.
-
-   Do NOT add web services (NDPI_SERVICE_xxx) here.
 */
-static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str) {
+void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str) {
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
 
   /* Reset all settings */
@@ -3294,7 +3294,7 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
   }
 
-  ndpi_init_protocol_defaults(ndpi_str);
+  init_protocol_defaults(ndpi_str);
 
   if(ndpi_callback_init(ndpi_str)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating callbacks\n");
@@ -10603,7 +10603,6 @@ static const struct cfg_param {
 
   { "tls",           "certificate_expiration_threshold",        "30", "0", "365", CFG_PARAM_INT, __OFF(tls_certificate_expire_in_x_days) },
   { "tls",           "application_blocks_tracking.enable",      "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_app_blocks_tracking_enabled) },
-  /* An example of metadata configuration (yes/no) */
   { "tls",           "metadata.sha1_fingerprint.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_sha1_fingerprint_enabled) },
 
   { "smtp",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled) },
@@ -10855,7 +10854,7 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
       fprintf(fd, " *) %s %s: %s [all %s]",
               c->proto ? c->proto : "NULL",
               c->param,
-              _get_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), "any", buf, sizeof(buf)),
+              /* TODO */ _get_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), "any", buf, sizeof(buf)),
 	      c->default_value);
       fprintf(fd, "\n");
       break;

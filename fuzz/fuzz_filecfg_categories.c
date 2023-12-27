@@ -21,8 +21,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fd)
     fclose(fd);
 
-  /* We don't really need to call ndpi_finalize_initialization */
-
   ndpi_exit_detection_module(ndpi_struct);
   return 0;
 }
