@@ -5488,6 +5488,18 @@ void binaryBitmapUnitTest() {
 
 /* *********************************************** */
 
+void pearsonUnitTest() {
+  u_int32_t data_a[] = {1, 2, 3, 4, 5};
+  u_int32_t data_b[] = {1000, 113, 104, 105, 106};
+  u_int16_t num = sizeof(data_a) / sizeof(u_int32_t);
+  float pearson = ndpi_pearson_correlation(data_a, data_b, num);
+
+  assert(pearson != 0.0);
+  // printf("%.8f\n", pearson);
+}
+
+/* *********************************************** */
+
 void domainSearchUnitTest() {
   ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
   char *domain = "ntop.org";
@@ -5576,6 +5588,7 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    pearsonUnitTest();
     binaryBitmapUnitTest();
     domainSearchUnitTest();
     domainSearchUnitTest2();

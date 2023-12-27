@@ -66,6 +66,20 @@ struct ndpi_analyze_struct* ndpi_alloc_data_analysis(u_int16_t _max_series_len) 
 
 /* ********************************************************************************* */
 
+struct ndpi_analyze_struct* ndpi_alloc_data_analysis_from_series(const u_int32_t *values, u_int16_t num_values) {
+  u_int16_t i;
+  struct ndpi_analyze_struct *ret = ndpi_alloc_data_analysis(num_values);
+
+  if(ret == NULL) return(NULL);
+   
+  for(i=0; i<num_values; i++)
+    ndpi_data_add_value(ret, (const u_int64_t)values[i]);
+
+  return(ret);
+}
+
+/* ********************************************************************************* */
+
 void ndpi_free_data_analysis(struct ndpi_analyze_struct *d, u_int8_t free_pointer) {
   if(d && d->values) ndpi_free(d->values);
   if(free_pointer) ndpi_free(d);
@@ -1666,6 +1680,31 @@ int ndpi_predict_linear(u_int32_t *values, u_int32_t num_values,
   *prediction = c + (m * (predict_periods + num_values - 1));
 
   return(0);
+}
+
+/* ********************************************************************************* */
+
+double ndpi_pearson_correlation(u_int32_t *values_a, u_int32_t *values_b, u_int16_t num_values) {
+  double sum_a = 0, sum_b = 0, sum_squared_diff_a = 0, sum_squared_diff_b = 0, sum_product_diff = 0;
+  u_int16_t i;
+  double mean_a, mean_b, variance_a, variance_b, covariance;
+
+  if(num_values == 0) return(0.0);
+  
+  for(i = 0; i < num_values; i++)
+    sum_a += values_a[i], sum_b += values_b[i];
+
+  mean_a = sum_a / num_values, mean_b = sum_b / num_values;
+
+  for(i = 0; i < num_values; i++)
+    sum_squared_diff_a += pow(values_a[i] - mean_a, 2),
+      sum_squared_diff_b += pow(values_b[i] - mean_b, 2),
+      sum_product_diff += (values_a[i] - mean_a) * (values_b[i] - mean_b);
+
+  variance_a = sum_squared_diff_a / (double)num_values, variance_b = sum_squared_diff_b / (double)num_values;
+  covariance = sum_product_diff / (double)num_values;
+      
+  return(covariance / sqrt(variance_a * variance_b));
 }
 
 /* ********************************************************************************* */
