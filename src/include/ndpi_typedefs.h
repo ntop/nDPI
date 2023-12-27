@@ -1386,7 +1386,7 @@ struct ndpi_flow_struct {
     struct {
       char *server_names, *advertised_alpns, *negotiated_alpn, *tls_supported_versions, *issuerDN, *subjectDN;
       u_int32_t notBefore, notAfter;
-      char ja3_client[33], ja3_server[33];
+      char ja3_client[33], ja3_server[33], ja4_client[37];
       u_int16_t server_cipher;
       u_int8_t sha1_certificate_fingerprint[20];
       u_int8_t hello_processed:1, ch_direction:1, subprotocol_detected:1, fingerprint_set:1, _pad:4;
@@ -1570,11 +1570,11 @@ struct ndpi_flow_struct {
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 216,
-               "Size of the struct member protocols increased to more than 216 bytes, "
+_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 256,
+               "Size of the struct member protocols increased to more than 256 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 968,
-               "Size of the flow struct increased to more than 968 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1008,
+               "Size of the flow struct increased to more than 1008 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

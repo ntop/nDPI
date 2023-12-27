@@ -356,6 +356,7 @@
     <ClCompile Include="..\src\lib\third_party\src\ndpi_md5.c" />
     <ClCompile Include="..\src\lib\third_party\src\ndpi_patricia.c" />
     <ClCompile Include="..\src\lib\third_party\src\ndpi_sha1.c" />
+    <ClCompile Include="..\src\lib\third_party\src\ndpi_sha256.c" />
     <ClCompile Include="..\src\lib\third_party\src\sha1-fast.c" />
     <ClCompile Include="..\src\lib\third_party\src\strptime.c" />
     <ClCompile Include="..\src\lib\third_party\src\hll\MurmurHash3.c" />

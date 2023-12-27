@@ -1867,6 +1867,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_tls.ja3_client[0] != '\0') fprintf(out, "[JA3C: %s%s]", flow->ssh_tls.ja3_client,
 						    print_cipher(flow->ssh_tls.client_unsafe_cipher));
 
+    if(flow->ssh_tls.ja4_client[0] != '\0') fprintf(out, "[JA4: %s%s]", flow->ssh_tls.ja4_client,
+						    print_cipher(flow->ssh_tls.client_unsafe_cipher));
+    
     if(flow->ssh_tls.server_info[0] != '\0') fprintf(out, "[Server: %s]", flow->ssh_tls.server_info);
 
     if(flow->ssh_tls.server_names) fprintf(out, "[ServerNames: %s]", flow->ssh_tls.server_names);
@@ -2919,7 +2922,7 @@ static void printFlowsStats() {
     ndpi_ja3_info *info_of_element = NULL;
     ndpi_host_ja3_fingerprints *tmp = NULL;
     ndpi_ja3_info *tmp2 = NULL;
-    unsigned int num_ja3_client;
+    unsigned int num_ja3_ja4_client;
     unsigned int num_ja3_server;
 
     fprintf(out, "\n");
@@ -3085,14 +3088,14 @@ static void printFlowsStats() {
 
           for(ja3ByHost_element = ja3ByHostsHashT; ja3ByHost_element != NULL;
               ja3ByHost_element = ja3ByHost_element->hh.next) {
-            num_ja3_client = HASH_COUNT(ja3ByHost_element->host_client_info_hasht);
+            num_ja3_ja4_client = HASH_COUNT(ja3ByHost_element->host_client_info_hasht);
             num_ja3_server = HASH_COUNT(ja3ByHost_element->host_server_info_hasht);
 
-            if(num_ja3_client > 0) {
+            if(num_ja3_ja4_client > 0) {
               fprintf(out, "\t%d\t %-24s \t %-7u\n",
                       i,
                       ja3ByHost_element->ip_string,
-                      num_ja3_client
+                      num_ja3_ja4_client
                       );
               i++;
             }
@@ -3117,10 +3120,10 @@ static void printFlowsStats() {
           //ja3ByHost_element: element of ja3ByHostsHashT
           //info_of_element: element of the inner hash table of ja3ByHost_element
           HASH_ITER(hh, ja3ByHostsHashT, ja3ByHost_element, tmp) {
-            num_ja3_client = HASH_COUNT(ja3ByHost_element->host_client_info_hasht);
+            num_ja3_ja4_client = HASH_COUNT(ja3ByHost_element->host_client_info_hasht);
             num_ja3_server = HASH_COUNT(ja3ByHost_element->host_server_info_hasht);
             againstRepeat = 0;
-            if(num_ja3_client > 0) {
+            if(num_ja3_ja4_client > 0) {
               HASH_ITER(hh, ja3ByHost_element->host_client_info_hasht, info_of_element, tmp2) {
                 fprintf(out, "\t%-7d %-24s %s %s\n",
                         i,
