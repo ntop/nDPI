@@ -229,7 +229,7 @@ typedef enum {
   NDPI_PROTOCOL_MPEGTS                = 198,
   NDPI_PROTOCOL_SNAPCHAT              = 199,
   NDPI_PROTOCOL_SINA                  = 200,
-  NDPI_PROTOCOL_HANGOUT_DUO           = 201, /* Google Hangout ad Duo (merged as they are very similar) */
+  NDPI_PROTOCOL_GOOGLE_MEET           = 201,
   NDPI_PROTOCOL_IFLIX                 = 202,
   NDPI_PROTOCOL_GITHUB                = 203,
   NDPI_PROTOCOL_BJNP                  = 204,
