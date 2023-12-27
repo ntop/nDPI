@@ -35,6 +35,7 @@ static void ndpi_int_nomachine_add_connection(struct ndpi_detection_module_struc
   NDPI_LOG_INFO(ndpi_struct, "found NoMachine\n");
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NOMACHINE,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found NoMachine");
 }
 
 static void ndpi_search_nomachine(struct ndpi_detection_module_struct *ndpi_struct,
@@ -49,12 +50,13 @@ static void ndpi_search_nomachine(struct ndpi_detection_module_struct *ndpi_stru
      * only the characters NXSH (request) & NXD (response) and a version 
      * number. After that it is followed by a TLS handshake. */
     if ((packet->payload_packet_len > 10 && packet->payload_packet_len < 15) &&
-        ((memcmp(packet->payload, "NXSH", 4) == 0) || (memcmp(packet->payload, "NXD", 3) == 0)))
+        ((memcmp(packet->payload, "NXSH-", 5) == 0) || (memcmp(packet->payload, "NXD-", 4) == 0)))
     {
       ndpi_int_nomachine_add_connection(ndpi_struct, flow);
       return;
     }
   } else if (packet->udp != NULL) {
+    /* NoMachine uses UDP for multimedia data */
     if (packet->payload_packet_len > 9 && /* Shortest valid packet is 10 bytes long, probably it's keep-alive */
         le16toh(get_u_int16_t(packet->payload, 2)) == 1 &&
         le16toh(get_u_int16_t(packet->payload, 4)) == packet->payload_packet_len &&
