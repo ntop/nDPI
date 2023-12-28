@@ -71,7 +71,7 @@ struct ndpi_analyze_struct* ndpi_alloc_data_analysis_from_series(const u_int32_t
   struct ndpi_analyze_struct *ret = ndpi_alloc_data_analysis(num_values);
 
   if(ret == NULL) return(NULL);
-   
+
   for(i=0; i<num_values; i++)
     ndpi_data_add_value(ret, (const u_int64_t)values[i]);
 
@@ -1648,6 +1648,31 @@ u_int ndpi_find_outliers(u_int32_t *values, bool *outliers, u_int32_t num_values
   return(ret);
 }
 
+/* *********************************************************** */
+
+/* Check if the specified value is an outlier with respect to the past values */
+bool ndpi_is_outlier(u_int32_t *past_values, u_int32_t num_past_values,
+		     u_int32_t value_to_check, float threshold,
+		     float *lower, float *upper) {
+  struct ndpi_analyze_struct *data = ndpi_alloc_data_analysis_from_series(past_values, num_past_values);
+  float mean, stddev, v;
+
+  if(!data) return(false);
+
+  mean   = ndpi_data_mean(data);
+  stddev = ndpi_data_stddev(data);
+
+  /* The mimimum threshold is 1 (i.e. the value of the stddev) */
+  if(threshold < 1.) threshold = 1.;
+
+  v = threshold * stddev;
+  *lower = mean - v, *upper = mean + v;
+
+  ndpi_free_data_analysis(data, 1 /* free memory */);
+
+  return(((value_to_check < *lower) || (value_to_check > *upper)) ? true : false);
+}
+
 /* ********************************************************************************* */
 
 /*
@@ -1690,7 +1715,7 @@ double ndpi_pearson_correlation(u_int32_t *values_a, u_int32_t *values_b, u_int1
   double mean_a, mean_b, variance_a, variance_b, covariance;
 
   if(num_values == 0) return(0.0);
-  
+
   for(i = 0; i < num_values; i++)
     sum_a += values_a[i], sum_b += values_b[i];
 
@@ -1703,10 +1728,11 @@ double ndpi_pearson_correlation(u_int32_t *values_a, u_int32_t *values_b, u_int1
 
   variance_a = sum_squared_diff_a / (double)num_values, variance_b = sum_squared_diff_b / (double)num_values;
   covariance = sum_product_diff / (double)num_values;
-      
+
   return(covariance / sqrt(variance_a * variance_b));
 }
 
+/* ********************************************************************************* */
 /* ********************************************************************************* */
 
 static const u_int16_t crc16_ccitt_table[256] = {
@@ -1911,7 +1937,7 @@ struct ndpi_cm_sketch *ndpi_cm_sketch_init(u_int16_t num_hashes) {
   num_hashes = ndpi_nearest_power_of_two(num_hashes);
 
   sketch->num_hashes = num_hashes;
-  sketch->num_hash_buckets = num_hashes * NDPI_COUNT_MIN_SKETCH_NUM_BUCKETS;  
+  sketch->num_hash_buckets = num_hashes * NDPI_COUNT_MIN_SKETCH_NUM_BUCKETS;
   sketch->num_hash_buckets = ndpi_nearest_power_of_two(sketch->num_hash_buckets)-1,
 
   len = num_hashes * NDPI_COUNT_MIN_SKETCH_NUM_BUCKETS * sizeof(u_int32_t);
@@ -1966,7 +1992,7 @@ u_int32_t ndpi_cm_sketch_count(struct ndpi_cm_sketch *sketch, u_int32_t element)
     printf("ndpi_add_sketch_add() [hash: %d][num_hash_buckets: %u][hashval: %d][value: %d]\n",
 	   idx, sketch->num_hash_buckets, hashval, sketch->tables[hashval]);
 #endif
-    
+
     min_value = ndpi_min(min_value, sketch->tables[hashval]);
   }
 

@@ -1948,6 +1948,29 @@ extern "C" {
   double ndpi_pearson_correlation(u_int32_t *values_a, u_int32_t *values_b, u_int16_t num_values);
   
   /* ******************************* */
+  
+  /*
+   * Checks if a specified value is an outlier with respect to past values
+   * using the Z-score.
+   *
+   * @par past_valuea     = List of observed past values (past knowledge)
+   * @par num_past_values = Number of observed past values
+   * @par value_to_check  = The value to be checked with respect to past values
+   * @par threshold       = Threshold on z-score:. Typical values:
+   *                        t = 1 - The value to check should not exceed the past values
+   *                        t > 1 - The value to check has to be within (t * stddev) boundaries
+   * @par lower           - [out] Lower threshold
+   * @par upper           - [out] Upper threshold   
+   *
+   * @return true if the specified value is an outlier, false otherwise
+   *
+   */
+  
+  bool ndpi_is_outlier(u_int32_t *past_values, u_int32_t num_past_values,
+		       u_int32_t value_to_check, float threshold,
+		       float *lower, float *upper);
+
+  /* ******************************* */
 
   u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long);
 
