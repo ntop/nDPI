@@ -10412,7 +10412,10 @@ static u_int16_t __get_proto_id(const char *proto_name)
   return proto_id;
 }
 
-static int _set_param_enable_disable(void *_variable, const char *value)
+static int _set_param_enable_disable(struct ndpi_detection_module_struct *ndpi_str,
+                                     void *_variable, const char *value,
+                                     const char *min_value, const char *max_value,
+                                     const char *proto)
 {
   int *variable = (int *)_variable;
 
@@ -10429,7 +10432,10 @@ static int _set_param_enable_disable(void *_variable, const char *value)
   return -1;
 }
 
-static int _set_param_int(void *_variable, const char *value, const char *min_value, const char *max_value)
+static int _set_param_int(struct ndpi_detection_module_struct *ndpi_str,
+                          void *_variable, const char *value,
+                          const char *min_value, const char *max_value,
+                          const char *proto)
 {
   int *variable = (int *)_variable;
   char *endptr;
@@ -10459,8 +10465,7 @@ static int _set_param_int(void *_variable, const char *value, const char *min_va
   return 0;
 }
 
-/* It can be used for CFG_PARAM_ENABLE_DISABLE parameters, too */
-static char *_get_param_int(void *_variable, char *buf, int buf_len)
+static char *_get_param_int(void *_variable, const char *proto, char *buf, int buf_len)
 {
   int *variable = (int *)_variable;
 
@@ -10469,7 +10474,10 @@ static char *_get_param_int(void *_variable, char *buf, int buf_len)
   return buf;
 }
 
-static int _set_param_string(void *_variable, const char *value)
+static int _set_param_string(struct ndpi_detection_module_struct *ndpi_str,
+                             void *_variable, const char *value,
+                             const char *min_value, const char *max_value,
+                             const char *proto)
 {
   char **variable = (char **)_variable;
 
@@ -10479,8 +10487,7 @@ static int _set_param_string(void *_variable, const char *value)
   return 0;
 }
 
-/* It can be used for CFG_PARAM_FILENAME/CFG_PARAM_FILENAME_CONFIG parameters, too */
-static char *_get_param_string(void *_variable, char *buf, int buf_len)
+static char *_get_param_string(void *_variable, const char *proto, char *buf, int buf_len)
 {
   char **variable = (char **)_variable;
 
@@ -10489,7 +10496,10 @@ static char *_get_param_string(void *_variable, char *buf, int buf_len)
   return buf;
 }
 
-static int _set_param_filename(void *_variable, const char *value)
+static int _set_param_filename(struct ndpi_detection_module_struct *ndpi_str,
+                               void *_variable, const char *value,
+                               const char *min_value, const char *max_value,
+                               const char *proto)
 {
   char **variable = (char **)_variable;
 
@@ -10506,12 +10516,15 @@ static int _set_param_filename(void *_variable, const char *value)
   return 0;
 }
 
-static int _set_param_filename_config(struct ndpi_detection_module_struct *ndpi_str, void *_variable, const char *value)
+static int _set_param_filename_config(struct ndpi_detection_module_struct *ndpi_str,
+                                      void *_variable, const char *value,
+                                      const char *min_value, const char *max_value,
+                                      const char *proto)
 {
   int rc;
   FILE *fd;
 
-  rc = _set_param_filename(_variable, value);
+  rc = _set_param_filename(ndpi_str, _variable, value, min_value, max_value, proto);
   if(rc != 0 || value == NULL || ndpi_str == NULL)
     return rc;
 
@@ -10541,12 +10554,16 @@ static char *_get_param_protocol_enable_disable(void *_variable, const char *pro
   return buf;
 }
 
-static int _set_param_protocol_enable_disable(void *_variable, const char *value, const char *proto)
+static int _set_param_protocol_enable_disable(struct ndpi_detection_module_struct *ndpi_str,
+                                              void *_variable, const char *value,
+                                              const char *min_value, const char *max_value,
+                                              const char *proto)
 {
   NDPI_PROTOCOL_BITMASK *bitmask = (NDPI_PROTOCOL_BITMASK *)_variable;
   u_int16_t proto_id;
 
-  if(strcmp(proto, "any") == 0) {
+  if(strcmp(proto, "any") == 0 ||
+     strcmp(proto, "$PROTO_NAME") == 0) {
     if(strcmp(value, "1") == 0 ||
        strcmp(value, "enable") == 0) {
       NDPI_BITMASK_SET_ALL(*bitmask);
@@ -10577,8 +10594,6 @@ static int _set_param_protocol_enable_disable(void *_variable, const char *value
 }
 
 
-typedef int (*cfg_fn)(void *variable, const char *value);
-
 enum cfg_param_type {
   CFG_PARAM_ENABLE_DISABLE = 0,
   CFG_PARAM_INT            = 1,
@@ -10586,6 +10601,27 @@ enum cfg_param_type {
   CFG_PARAM_FILENAME       = 3, /* Like string, but we check also if the file exists */
   CFG_PARAM_PROTOCOL_ENABLE_DISABLE = 4,
   CFG_PARAM_FILENAME_CONFIG = 5, /* Like CFG_PARAM_FILENAME, but we also call ndpi_set_config() immediately for each row in it */
+};
+
+
+typedef int (*cfg_set)(struct ndpi_detection_module_struct *ndpi_str,
+                       void *_variable, const char *value,
+                       const char *min_value, const char *max_value,
+                       const char *proto);
+typedef char *(*cfg_get)(void *_variable, const char *proto, char *buf, int buf_len);
+
+static const struct cfg_op {
+  enum cfg_param_type type;
+  cfg_set fn_set;
+  cfg_get fn_get;
+  int to_free;
+} cfg_ops[] = {
+  { CFG_PARAM_ENABLE_DISABLE,          _set_param_enable_disable,          _get_param_int,                     0 },
+  { CFG_PARAM_INT,                     _set_param_int,                     _get_param_int,                     0 },
+  { CFG_PARAM_STRING,                  _set_param_string,                  _get_param_string,                  1 },
+  { CFG_PARAM_FILENAME,                _set_param_filename,                _get_param_string,                  1 },
+  { CFG_PARAM_PROTOCOL_ENABLE_DISABLE, _set_param_protocol_enable_disable, _get_param_protocol_enable_disable, 0 },
+  { CFG_PARAM_FILENAME_CONFIG,         _set_param_filename_config,         _get_param_string,                  1 },
 };
 
 #define __OFF(a)	offsetof(struct ndpi_detection_module_config_struct, a)
@@ -10702,29 +10738,8 @@ static void set_default_config(struct ndpi_detection_module_config_struct *cfg)
   const struct cfg_param *c;
 
   for(c = &cfg_params[0]; c && c->param; c++) {
-    switch(c->type) {
-    case CFG_PARAM_ENABLE_DISABLE:
-      _set_param_enable_disable((void *)((char *)cfg + c->offset), c->default_value);
-      break;
-    case CFG_PARAM_INT:
-      _set_param_int((void *)((char *)cfg + c->offset), c->default_value, c->min_value, c->max_value);
-      break;
-    case CFG_PARAM_STRING:
-      _set_param_string((void *)((char *)cfg + c->offset), c->default_value);
-      break;
-    case CFG_PARAM_FILENAME:
-      _set_param_filename((void *)((char *)cfg + c->offset), c->default_value);
-      break;
-    case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
-      if(strcmp(c->default_value, "1") == 0)
-        NDPI_BITMASK_SET_ALL(*(NDPI_PROTOCOL_BITMASK *)((char *)cfg + c->offset));
-      else
-        NDPI_BITMASK_RESET(*(NDPI_PROTOCOL_BITMASK *)((char *)cfg + c->offset));
-      break;
-    case CFG_PARAM_FILENAME_CONFIG:
-      _set_param_filename_config(NULL, (void *)((char *)cfg + c->offset), c->default_value);
-      break;
-    }
+    cfg_ops[c->type].fn_set(NULL, (void *)((char *)cfg + c->offset),
+                            c->default_value, c->min_value, c->max_value, c->proto);
   }
 }
 
@@ -10733,18 +10748,8 @@ static void free_config(struct ndpi_detection_module_config_struct *cfg)
   const struct cfg_param *c;
 
   for(c = &cfg_params[0]; c && c->param; c++) {
-    switch(c->type) {
-    case CFG_PARAM_ENABLE_DISABLE:
-    case CFG_PARAM_INT:
-    case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
-      /* Nothing to do */
-      break;
-    case CFG_PARAM_STRING:
-    case CFG_PARAM_FILENAME:
-    case CFG_PARAM_FILENAME_CONFIG:
+    if(cfg_ops[c->type].to_free)
       ndpi_free(*(char **)((char *)cfg + c->offset));
-      break;
-    }
   }
 }
 
@@ -10766,20 +10771,8 @@ int ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
 	strcmp(c->proto, "$PROTO_NAME") == 0 &&
 	strcmp(param, c->param) == 0)) {
 
-      switch(c->type) {
-      case CFG_PARAM_ENABLE_DISABLE:
-        return _set_param_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), value);
-      case CFG_PARAM_INT:
-        return _set_param_int((void *)((char *)&ndpi_str->cfg + c->offset), value, c->min_value, c->max_value);
-      case CFG_PARAM_STRING:
-        return _set_param_string((void *)((char *)&ndpi_str->cfg + c->offset), value);
-      case CFG_PARAM_FILENAME:
-        return _set_param_filename((void *)((char *)&ndpi_str->cfg + c->offset), value);
-      case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
-        return _set_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), value, proto);
-      case CFG_PARAM_FILENAME_CONFIG:
-        return _set_param_filename_config(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset), value);
-      }
+      return cfg_ops[c->type].fn_set(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset),
+                                     value, c->min_value, c->max_value, proto);
     }
   }
   return -3;
@@ -10800,17 +10793,7 @@ char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
 	(proto && c->proto && strcmp(proto, c->proto) == 0)) &&
        strcmp(param, c->param) == 0) {
 
-      switch(c->type) {
-      case CFG_PARAM_ENABLE_DISABLE:
-      case CFG_PARAM_INT:
-        return _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), buf, buf_len);
-      case CFG_PARAM_STRING:
-      case CFG_PARAM_FILENAME:
-      case CFG_PARAM_FILENAME_CONFIG:
-        return _get_param_string((void *)((char *)&ndpi_str->cfg + c->offset), buf, buf_len);
-      case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
-        return _get_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), proto, buf, buf_len);
-      }
+      return cfg_ops[c->type].fn_get((void *)((char *)&ndpi_str->cfg + c->offset), proto, buf, buf_len);
     }
   }
   return NULL;
@@ -10834,7 +10817,7 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
       fprintf(fd, " *) %s %s: %s [%s]",
               c->proto ? c->proto : "NULL",
               c->param,
-              _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), buf, sizeof(buf)),
+              _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), c->proto, buf, sizeof(buf)),
 	      c->default_value);
       if(c->min_value && c->max_value)
         fprintf(fd, " [%s-%s]", c->min_value, c->max_value);
@@ -10846,7 +10829,7 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
       fprintf(fd, " *) %s %s: %s [%s]",
               c->proto ? c->proto : "NULL",
               c->param,
-	      _get_param_string((void *)((char *)&ndpi_str->cfg + c->offset), buf, sizeof(buf)),
+	      _get_param_string((void *)((char *)&ndpi_str->cfg + c->offset), c->proto, buf, sizeof(buf)),
 	      c->default_value);
       fprintf(fd, "\n");
       break;
