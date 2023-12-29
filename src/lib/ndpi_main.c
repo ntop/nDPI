@@ -481,7 +481,7 @@ void ndpi_exclude_protocol(struct ndpi_detection_module_struct *ndpi_str, struct
                            u_int16_t protocol_id, const char *_file, const char *_func, int _line) {
   if(ndpi_is_valid_protoId(protocol_id)) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    if(ndpi_str && ndpi_str->ndpi_log_level >= NDPI_LOG_DEBUG && ndpi_str->ndpi_debug_printf != NULL) {
+    if(ndpi_str && ndpi_str->cfg.log_level >= NDPI_LOG_DEBUG && ndpi_str->ndpi_debug_printf != NULL) {
       (*(ndpi_str->ndpi_debug_printf))(protocol_id, ndpi_str, NDPI_LOG_DEBUG, _file, _func, _line, "exclude %s\n",
 				       ndpi_get_proto_name(ndpi_str, protocol_id));
     }
@@ -2893,7 +2893,7 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
 #define MAX_STR_LEN 250
   char str[MAX_STR_LEN];
   if(ndpi_str != NULL && log_level > NDPI_LOG_ERROR && proto > 0 && proto < NDPI_MAX_SUPPORTED_PROTOCOLS &&
-     !NDPI_ISSET(&ndpi_str->debug_bitmask, proto))
+     !NDPI_ISSET(&ndpi_str->cfg.debug_bitmask, proto))
     return;
   va_start(args, format);
   ndpi_vsnprintf(str, sizeof(str) - 1, format, args);
@@ -3078,7 +3078,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr) ndpi_debug_printf);
-  NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
   if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) == NULL ||
@@ -9635,18 +9634,6 @@ u_int ndpi_get_ndpi_detection_module_size() {
   return(sizeof(struct ndpi_detection_module_struct));
 }
 
-void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_str, NDPI_PROTOCOL_BITMASK debug_bitmask) {
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  if(ndpi_str)
-    ndpi_str->debug_bitmask = debug_bitmask;
-#endif
-}
-
-void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_str, u_int l){
-  if(ndpi_str)
-    ndpi_str->ndpi_log_level = l;
-}
-
 /* ******************************************************************** */
 
 u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow)
@@ -10562,7 +10549,10 @@ static int _set_param_protocol_enable_disable(struct ndpi_detection_module_struc
   NDPI_PROTOCOL_BITMASK *bitmask = (NDPI_PROTOCOL_BITMASK *)_variable;
   u_int16_t proto_id;
 
+printf("[%s] value %s\n", proto, value);
+
   if(strcmp(proto, "any") == 0 ||
+     strcmp(proto, "all") == 0 ||
      strcmp(proto, "$PROTO_NAME") == 0) {
     if(strcmp(value, "1") == 0 ||
        strcmp(value, "enable") == 0) {
@@ -10673,6 +10663,7 @@ static const struct cfg_param {
   { "zoom",          "ip_list.load",                            "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ip_list_zoom_enabled) },
 
   { "$PROTO_NAME",   "enable",                                  "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(detection_bitmask) },
+  { "$PROTO_NAME",   "log.enable",                              "0", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(debug_bitmask) },
 
   /* Global parameters */
 
@@ -10701,6 +10692,8 @@ static const struct cfg_param {
   { NULL,            "dirname.domains",                         NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(dirname_domains) },
 
   { NULL,            "filename.config",                         NULL, NULL, NULL, CFG_PARAM_FILENAME_CONFIG, __OFF(filename_config) },
+
+  { NULL,            "log.level",                               "0", "0", "4", CFG_PARAM_INT, __OFF(log_level) },
 
   /* LRU caches */
 

@@ -5,16 +5,14 @@
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_detection_module_struct *ndpi_struct;
   FILE *fd;
-  NDPI_PROTOCOL_BITMASK debug_bitmask;
 
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
   ndpi_struct = ndpi_init_detection_module();
 
-  NDPI_BITMASK_SET_ALL(debug_bitmask);
-  ndpi_set_log_level(ndpi_struct, 4);
-  ndpi_set_debug_bitmask(ndpi_struct, debug_bitmask);
+  ndpi_set_config(ndpi_struct, NULL, "log.level", "4");
+  ndpi_set_config(ndpi_struct, "all", "log.enable", "1");
 
   fd = buffer_to_file(data, size);
   load_malicious_sha1_file_fd(ndpi_struct, fd);

@@ -98,8 +98,7 @@ struct cfg {
 static struct cfg cfgs[MAX_NUM_CFGS];
 static int num_cfgs = 0;
 
-int nDPI_LogLevel = 0;
-char *_debug_protocols = NULL;
+int reader_log_level = 0;
 static u_int8_t stats_flag = 0;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
@@ -254,7 +253,6 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 void test_lib(); /* Forward */
 
 extern void ndpi_report_payload_stats(FILE *out);
-extern int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverted_logic);
 
 /* ********************************** */
 
@@ -1103,19 +1101,54 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'V':
-      nDPI_LogLevel  = atoi(optarg);
-      if(nDPI_LogLevel < NDPI_LOG_ERROR) nDPI_LogLevel = NDPI_LOG_ERROR;
-      if(nDPI_LogLevel > NDPI_LOG_DEBUG_EXTRA) {
-        nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
-        ndpi_free(_debug_protocols);
-        _debug_protocols = ndpi_strdup("all");
+    {
+      char buf[8];
+      int log_level;
+
+      log_level = atoi(optarg);
+      if(log_level < NDPI_LOG_ERROR)
+        log_level = NDPI_LOG_ERROR;
+      if(log_level > NDPI_LOG_DEBUG_EXTRA) {
+        log_level = NDPI_LOG_DEBUG_EXTRA;
+        if(__add_cfg("all", "log.enable", "1", 1) == 1) {
+          printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+          exit(1);
+        }
       }
+      snprintf(buf, sizeof(buf), "%d", log_level);
+      if(__add_cfg(NULL, "log.level", buf, 1) == 1) {
+        printf("Invalid log level [%s] [num:%d/%d]\n", buf, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
+      reader_log_level = log_level;
       break;
+    }
 
     case 'u':
-      ndpi_free(_debug_protocols);
-      _debug_protocols = ndpi_strdup(optarg);
+    {
+      char *n;
+      char *str = ndpi_strdup(optarg);
+      int inverted_logic;
+
+      for(n = strtok(str, ","); n && *n; n = strtok(NULL, ",")) {
+        inverted_logic = 0;
+        if(*n == '-') {
+          inverted_logic = 1;
+          n++;
+        }
+        /* Reset any previous call to this knob */
+	if(__add_cfg("all", "log.enable", "0", 1) == 1) {
+          printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+          exit(1);
+        }
+        if(__add_cfg(n, "log.enable", inverted_logic ? "0" : "1", 1) == 1) {
+          printf("Invalid parameter [%s] [num:%d/%d]\n", n, num_cfgs, MAX_NUM_CFGS);
+          exit(1);
+        }
+      }
+      ndpi_free(str);
       break;
+    }
 
     case 'B':
     {
@@ -1217,7 +1250,11 @@ static void parseOptions(int argc, char **argv) {
 
     case 'q':
       quiet_mode = 1;
-      nDPI_LogLevel = 0;
+      if(__add_cfg(NULL, "log.level", "0", 1) == 1) {
+        printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
+      reader_log_level = 0;
       break;
 
       /* Extcap */
@@ -1869,7 +1906,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->ssh_tls.ja4_client[0] != '\0') fprintf(out, "[JA4: %s%s]", flow->ssh_tls.ja4_client,
 						    print_cipher(flow->ssh_tls.client_unsafe_cipher));
-    
+
     if(flow->ssh_tls.server_info[0] != '\0') fprintf(out, "[Server: %s]", flow->ssh_tls.server_info);
 
     if(flow->ssh_tls.server_names) fprintf(out, "[ServerNames: %s]", flow->ssh_tls.server_names);
@@ -3703,10 +3740,10 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       float b = (float)(cumulative_stats.total_wire_bytes * 8 *1000000)/(float)processing_time_usec;
       float traffic_duration;
       struct tm result;
-      
+
       if(live_capture) traffic_duration = processing_time_usec;
       else traffic_duration = ((u_int64_t)pcap_end.tv_sec*1000000 + pcap_end.tv_usec) - ((u_int64_t)pcap_start.tv_sec*1000000 + pcap_start.tv_usec);
-      
+
       printf("\tnDPI throughput:       %s pps / %s/sec\n", formatPackets(t, buf), formatTraffic(b, 1, buf1));
       if(traffic_duration != 0) {
 	t = (float)(cumulative_stats.ip_packet_count*1000000)/(float)traffic_duration;
@@ -5302,16 +5339,16 @@ void compressedBitmapUnitTest() {
 void filterUnitTest() {
   ndpi_filter* f = ndpi_filter_alloc();
   u_int32_t v, i;
-  
+
   assert(f);
 
   srand(time(NULL));
-  
+
   for(i=0; i<1000; i++)
     assert(ndpi_filter_add(f, v = rand()));
 
   assert(ndpi_filter_contains(f, v));
-  
+
   ndpi_filter_free(f);
 }
 
@@ -5368,7 +5405,7 @@ void sketchUnitTest() {
 #endif
 
   sketch = ndpi_cm_sketch_init(32);
-  
+
   if(sketch) {
     u_int32_t i, num_one = 0;
     bool do_trace = false;
@@ -5390,7 +5427,7 @@ void sketchUnitTest() {
 
     if(do_trace)
       exit(0);
-  }  
+  }
 }
 
 /* *********************************************** */
@@ -5399,7 +5436,7 @@ void binaryBitmapUnitTest() {
   ndpi_binary_bitmap *b = ndpi_binary_bitmap_alloc();
   u_int64_t hashval = 8149764909040470312;
   u_int8_t category = 33;
-  
+
   ndpi_binary_bitmap_set(b, hashval, category);
   ndpi_binary_bitmap_set(b, hashval+1, category);
   category = 0;
@@ -5410,13 +5447,39 @@ void binaryBitmapUnitTest() {
 
 /* *********************************************** */
 
+void pearsonUnitTest() {
+  u_int32_t data_a[] = {1, 2, 3, 4, 5};
+  u_int32_t data_b[] = {1000, 113, 104, 105, 106};
+  u_int16_t num = sizeof(data_a) / sizeof(u_int32_t);
+  float pearson = ndpi_pearson_correlation(data_a, data_b, num);
+
+  assert(pearson != 0.0);
+  // printf("%.8f\n", pearson);
+}
+
+/* *********************************************** */
+
+void outlierUnitTest() {
+  u_int32_t data[] = {1, 2, 3, 4, 5};
+  u_int16_t num = sizeof(data) / sizeof(u_int32_t);
+  u_int16_t value_to_check = 8;
+  float threshold = 1.5, lower, upper;
+  float is_outlier = ndpi_is_outlier(data, num, value_to_check,
+				     threshold, &lower, &upper);
+
+  /* printf("%.2f < %u < %.2f : %s\n", lower, value_to_check, upper, is_outlier ? "OUTLIER" : "OK"); */
+  assert(is_outlier == true);
+}
+
+/* *********************************************** */
+
 void domainSearchUnitTest() {
   ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
   char *domain = "ntop.org";
   u_int8_t class_id;
-  
+
   assert(sc);
-    
+
   ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, ".ntop.org");
   ndpi_domain_classify_add(sc, NDPI_PROTOCOL_NTOP, domain);
   assert(ndpi_domain_classify_contains(sc, &class_id, domain));
@@ -5428,18 +5491,18 @@ void domainSearchUnitTest() {
   /* Subdomain check */
   assert(ndpi_domain_classify_contains(sc, &class_id, "blog.ntop.org"));
   assert(class_id == NDPI_PROTOCOL_NTOP);
-  
+
 #ifdef DEBUG_TRACE
   struct stat st;
-  
+
   if(stat(fname, &st) == 0) {
     u_int32_t s = ndpi_domain_classify_size(sc);
-    
+
     printf("Size: %u [%.1f %% of the original filename size]\n",
 	   s, (float)(s * 100) / (float)st.st_size);
   }
 #endif
-  
+
   ndpi_domain_classify_free(sc);
 }
 
@@ -5453,7 +5516,7 @@ void domainSearchUnitTest2() {
   ndpi_domain_classify_add(c, class_id, "apple.com");
 
   assert(!ndpi_domain_classify_contains(c, &class_id, "ntop.com"));
-  
+
   ndpi_domain_classify_free(c);
 }
 
@@ -5498,6 +5561,8 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    outlierUnitTest();
+    pearsonUnitTest();
     binaryBitmapUnitTest();
     domainSearchUnitTest();
     domainSearchUnitTest2();
@@ -5565,7 +5630,7 @@ int main(int argc, char **argv) {
   }
 
   signal(SIGINT, sigproc);
-  
+
   for(i=0; i<num_loops; i++)
     test_lib();
 
@@ -5575,8 +5640,6 @@ int main(int argc, char **argv) {
   if(extcap_fifo_h) pcap_close(extcap_fifo_h);
   if(enable_malloc_bins) ndpi_free_bin(&malloc_bins);
   if(csv_fp)        fclose(csv_fp);
-  
-  ndpi_free(_debug_protocols);
 
   for(i = 0; i < num_cfgs; i++) {
     ndpi_free(cfgs[i].proto);

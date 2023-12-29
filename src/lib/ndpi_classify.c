@@ -61,6 +61,7 @@
     _a < _b ? _a : _b; })
 #endif
 
+/* **************************************** */
 
 //bias (1) + w (207)
 //const float ndpi_parameters_splt[NUM_PARAMETERS_SPLT_LOGREG] = {
@@ -240,6 +241,8 @@ float ndpi_parameters_bd[NUM_PARAMETERS_BD_LOGREG] = {
 						      0.000000000000000000e+00, 0.000000000000000000e+00, -9.635140703414636576e+00, 2.603288107669730511e+00,
 };
 
+/* **************************************** */
+
 /**
  * \fn void ndpi_merge_splt_arrays (const uint16_t *pkt_len, const pkt_timeval *pkt_time,
  const uint16_t *pkt_len_twin, const pkt_timeval *pkt_time_twin,
@@ -342,6 +345,8 @@ ndpi_merge_splt_arrays (const uint16_t *pkt_len, const pkt_timeval *pkt_time,
     merged_times[0] = ndpi_timeval_to_microseconds(start_m);
 }
 
+/* **************************************** */
+
 /* transform lens array to Markov chain */
 static void
 ndpi_get_mc_rep_lens (uint16_t *lens, float *length_mc, uint16_t num_packets)
@@ -382,6 +387,8 @@ ndpi_get_mc_rep_lens (uint16_t *lens, float *length_mc, uint16_t num_packets)
   }
 }
 
+/* **************************************** */
+
 /* transform times array to Markov chain */
 void
 ndpi_get_mc_rep_times (uint16_t *times, float *time_mc, uint16_t num_packets)
@@ -421,6 +428,8 @@ ndpi_get_mc_rep_times (uint16_t *times, float *time_mc, uint16_t num_packets)
   }
 }
 
+/* **************************************** */
+
 /**
  * \fn float classify (const unsigned short *pkt_len, const pkt_timeval *pkt_time,
  const unsigned short *pkt_len_twin, const pkt_timeval *pkt_time_twin,
@@ -452,8 +461,7 @@ ndpi_classify (const unsigned short *pkt_len, const pkt_timeval *pkt_time,
                const unsigned short *pkt_len_twin, const pkt_timeval *pkt_time_twin,
                pkt_timeval start_time, pkt_timeval start_time_twin, uint32_t max_num_pkt_len,
                uint16_t sp, uint16_t dp, uint32_t op, uint32_t ip, uint32_t np_o, uint32_t np_i,
-               uint32_t ob, uint32_t ib, uint16_t use_bd, const uint32_t *bd, const uint32_t *bd_t)
-{
+               uint32_t ob, uint32_t ib, uint16_t use_bd, const uint32_t *bd, const uint32_t *bd_t) {
 
   float features[NUM_PARAMETERS_BD_LOGREG] = {1.0};
   float mc_lens[MC_BINS_LEN*MC_BINS_LEN];
@@ -539,6 +547,8 @@ ndpi_classify (const unsigned short *pkt_len, const pkt_timeval *pkt_time,
   return 1.0/(1.0+exp(score));
 }
 
+/* **************************************** */
+
 /**
  * \fn void update_params (char *splt_params, char *bd_params)
  * \brief if a user supplies new parameter files, update parameters splt/bd
@@ -592,6 +602,8 @@ ndpi_update_params (classifier_type_codes_t param_type, const char *param_file)
   }
 }
 
+/* **************************************** */
+
 /* *********************************************************************
  * ---------------------------------------------------------------------
  *                      Time functions
@@ -618,6 +630,8 @@ ndpi_timer_eq(const pkt_timeval *a,
 
   return 0;
 }
+
+/* **************************************** */
 
 unsigned int
 ndpi_timer_lt(const pkt_timeval *a,
@@ -647,6 +661,8 @@ ndpi_timer_sub(const pkt_timeval *a,
   }
 }
 
+/* **************************************** */
+
 /**
  * \brief Zeroize a timeval.
  * \param a Timeval to zero out
@@ -657,6 +673,8 @@ ndpi_timer_clear(pkt_timeval *a)
 {
   a->tv_sec = a->tv_usec = 0;
 }
+
+/* **************************************** */
 
 /**
  * \brief Calculate the milliseconds representation of a timeval.
@@ -670,6 +688,8 @@ ndpi_timeval_to_milliseconds(pkt_timeval ts)
   u_int64_t usec = ts.tv_usec;
   return usec / 1000 + sec * 1000;
 }
+
+/* **************************************** */
 
 /**
  * \brief Calculate the microseconds representation of a timeval.

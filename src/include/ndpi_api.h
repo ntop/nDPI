@@ -348,7 +348,8 @@ extern "C" {
    * @return the ID of the app protocol detected
    *
    */
-  u_int16_t ndpi_get_flow_appprotocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow);
+  u_int16_t ndpi_get_flow_appprotocol(struct ndpi_detection_module_struct *ndpi_str,
+				      struct ndpi_flow_struct *flow);
 
   /**
    * Get the category of the passed flows for the detected module
@@ -359,7 +360,8 @@ extern "C" {
    * @return the ID of the category
    *
    */
-  ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow);
+  ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_detection_module_struct *ndpi_str,
+						  struct ndpi_flow_struct *flow);
 
   /**
    * Get the ndpi protocol data of the passed flows for the detected module
@@ -370,8 +372,9 @@ extern "C" {
    * @par    ndpi_proto   = the output struct where to store the requested information
    *
    */
-  void ndpi_get_flow_ndpi_proto(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-                    struct ndpi_proto * ndpi_proto);
+  void ndpi_get_flow_ndpi_proto(struct ndpi_detection_module_struct *ndpi_str,
+				struct ndpi_flow_struct *flow,
+				struct ndpi_proto * ndpi_proto);
 
   /**
    * API call that is called internally by ndpi_detection_process_packet or by apps
@@ -403,7 +406,8 @@ extern "C" {
    else != 0
    *
    */
-  u_int8_t ndpi_detection_get_l4(const u_int8_t *l3, u_int16_t l3_len, const u_int8_t **l4_return, u_int16_t *l4_len_return,
+  u_int8_t ndpi_detection_get_l4(const u_int8_t *l3, u_int16_t l3_len,
+				 const u_int8_t **l4_return, u_int16_t *l4_len_return,
 				 u_int8_t *l4_protocol_return, u_int32_t flags);
 
   /**
@@ -418,10 +422,8 @@ extern "C" {
    *
    */
   ndpi_protocol ndpi_find_port_based_protocol(struct ndpi_detection_module_struct *ndpi_struct/* , u_int8_t proto */,
-					      u_int32_t shost,
-					      u_int16_t sport,
-					      u_int32_t dhost,
-					      u_int16_t dport);
+					      u_int32_t shost, u_int16_t sport,
+					      u_int32_t dhost, u_int16_t dport);
   /**
    * Search and return the protocol guessed that is undetected
    *
@@ -451,10 +453,8 @@ extern "C" {
   ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_struct *ndpi_struct,
 						  struct ndpi_flow_struct *flow,
 						  u_int8_t proto,
-						  u_int32_t shost,
-						  u_int16_t sport,
-						  u_int32_t dhost,
-						  u_int16_t dport);
+						  u_int32_t shost, u_int16_t sport,
+						  u_int32_t dhost, u_int16_t dport);
   /**
    * Check if the string passed match with a protocol
    *
@@ -956,8 +956,6 @@ extern "C" {
   u_int ndpi_get_ndpi_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_detection_module_size(void);
-  void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l);
-  void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_mod, NDPI_PROTOCOL_BITMASK debug_bitmask);
 
   /* Simple helper to get current time, in sec */
   u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow);
@@ -1609,6 +1607,7 @@ extern "C" {
 
   /* Data analysis */
   struct ndpi_analyze_struct* ndpi_alloc_data_analysis(u_int16_t _max_series_len);
+  struct ndpi_analyze_struct* ndpi_alloc_data_analysis_from_series(const u_int32_t *values, u_int16_t num_values);
   void ndpi_init_data_analysis(struct ndpi_analyze_struct *s, u_int16_t _max_series_len);
   void ndpi_free_data_analysis(struct ndpi_analyze_struct *d, u_int8_t free_pointer);
   void ndpi_reset_data_analysis(struct ndpi_analyze_struct *d);
@@ -1792,6 +1791,49 @@ extern "C" {
   */
   int ndpi_predict_linear(u_int32_t *values, u_int32_t num_values,
 			  u_int32_t predict_periods, u_int32_t *prediction);
+
+  /* ******************************* */
+
+  /*
+   * Checks if the two series are correlated using the
+   * Pearson correlation coefficient that is a value in the -1..0..+1 range
+   * where:
+   * -1 < x < 0   Negative correlation (when one changes the other series changes in opposite direction)
+   * x = 0        No correlation       (no relationship between the series)
+   * 0 < x < 1    Positive correlation (when one changes the other series changes in the same direction)
+   * (i.e. when a series increases, the other also increase and vice-versa)
+   *
+   * @par    values_a   = First series with num_values values
+   * @par    values_b   = Second series with num_values values
+   * @par    num_values = Number of series entries
+   *
+   * @return pearson correlation coefficient
+   *
+   */
+  double ndpi_pearson_correlation(u_int32_t *values_a, u_int32_t *values_b, u_int16_t num_values);
+  
+  /* ******************************* */
+  
+  /*
+   * Checks if a specified value is an outlier with respect to past values
+   * using the Z-score.
+   *
+   * @par past_valuea     = List of observed past values (past knowledge)
+   * @par num_past_values = Number of observed past values
+   * @par value_to_check  = The value to be checked with respect to past values
+   * @par threshold       = Threshold on z-score:. Typical values:
+   *                        t = 1 - The value to check should not exceed the past values
+   *                        t > 1 - The value to check has to be within (t * stddev) boundaries
+   * @par lower           - [out] Lower threshold
+   * @par upper           - [out] Upper threshold   
+   *
+   * @return true if the specified value is an outlier, false otherwise
+   *
+   */
+  
+  bool ndpi_is_outlier(u_int32_t *past_values, u_int32_t num_past_values,
+		       u_int32_t value_to_check, float threshold,
+		       float *lower, float *upper);
 
   /* ******************************* */
 

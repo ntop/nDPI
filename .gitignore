@@ -90,7 +90,6 @@
 /fuzz/fuzz_filecfg_malicious_ja3
 /fuzz/fuzz_filecfg_risk_domains
 /fuzz/fuzz_readerutils_workflow
-/fuzz/fuzz_readerutils_parseprotolist
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_seed_corpus.zip
 /fuzz/fuzz_quic_get_crypto_data_seed_corpus.zip
@@ -122,7 +121,6 @@
 /fuzz/fuzz_dga_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip
 /fuzz/fuzz_readerutils_workflow_seed_corpus.zip
-/fuzz/fuzz_readerutils_parseprotolist_seed_corpus.zip
 /fuzz/fuzz_*.dict
 /influxdb/Makefile
 /install-sh

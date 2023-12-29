@@ -396,64 +396,11 @@ static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod,
 
 /* ***************************************************** */
 
-static char _proto_delim[] = " \t,:;";
-int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverted_logic) {
-  char *n;
-  uint16_t proto;
-  char op;
-  struct ndpi_detection_module_struct *module;
-
-  if(!inverted_logic)
-   op = 1; /* Default action: add to the bitmask */
-  else
-   op = 0; /* Default action: remove from the bitmask */
-  /* Use a temporary module with all protocols enabled */
-  module = ndpi_init_detection_module();
-  if(!module)
-    return 1;
-  ndpi_finalize_initialization(module);
-
-  for(n = strtok(str,_proto_delim); n && *n; n = strtok(NULL,_proto_delim)) {
-    if(*n == '-') {
-      op = !inverted_logic ? 0 : 1;
-      n++;
-    } else if(*n == '+') {
-      op = !inverted_logic ? 1 : 0;
-      n++;
-    }
-    if(!strcmp(n,"all")) {
-      if(op)
-	NDPI_BITMASK_SET_ALL(*bitmask);
-      else
-	NDPI_BITMASK_RESET(*bitmask);
-      continue;
-    }
-    proto = ndpi_get_proto_id(module, n);
-    if(proto == NDPI_PROTOCOL_UNKNOWN && strcmp(n,"unknown") && strcmp(n,"0")) {
-      LOG(NDPI_LOG_ERROR, "Invalid protocol %s\n", n);
-      ndpi_exit_detection_module(module);
-      return 1;
-    }
-    if(op)
-      NDPI_BITMASK_ADD(*bitmask,proto);
-    else
-      NDPI_BITMASK_DEL(*bitmask,proto);
-  }
-  ndpi_exit_detection_module(module);
-  return 0;
-}
-
-/* ***************************************************** */
-
-extern char *_debug_protocols;
-
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle, int do_init_flows_root,
 					 ndpi_serialization_format serialization_format) {
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
-  static NDPI_PROTOCOL_BITMASK debug_bitmask;
-  static int _debug_protocols_ok = 0;
 
   /* On some fuzzers we don't want to use these memory allocators, but some custom ones */
 #ifndef DISABLE_CUSTOM_ALLOCATOR_ON_READERUTILS
@@ -481,20 +428,6 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   workflow->ndpi_struct = module;
 
   ndpi_set_user_data(module, workflow);
-
-  ndpi_set_log_level(module, nDPI_LogLevel);
-
-  if(_debug_protocols != NULL && ! _debug_protocols_ok) {
-    NDPI_BITMASK_RESET(debug_bitmask);
-    if(parse_proto_name_list(_debug_protocols, &debug_bitmask, 0)) {
-      ndpi_exit_detection_module(module);
-      ndpi_free(workflow);
-      return NULL;
-    }
-    _debug_protocols_ok = 1;
-  }
-  if(_debug_protocols_ok)
-    ndpi_set_debug_bitmask(module, debug_bitmask);
 
   if(do_init_flows_root) {
     workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));

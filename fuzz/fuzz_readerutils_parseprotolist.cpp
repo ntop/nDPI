@@ -6,8 +6,6 @@
 #include <stdio.h>
 #include "fuzzer/FuzzedDataProvider.h"
 
-char *_debug_protocols;
-int nDPI_LogLevel = 0;
 u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
 u_int8_t enable_payload_analyzer = 0;
 u_int8_t enable_flow_stats = 0;
