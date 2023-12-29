@@ -10549,8 +10549,6 @@ static int _set_param_protocol_enable_disable(struct ndpi_detection_module_struc
   NDPI_PROTOCOL_BITMASK *bitmask = (NDPI_PROTOCOL_BITMASK *)_variable;
   u_int16_t proto_id;
 
-printf("[%s] value %s\n", proto, value);
-
   if(strcmp(proto, "any") == 0 ||
      strcmp(proto, "all") == 0 ||
      strcmp(proto, "$PROTO_NAME") == 0) {
