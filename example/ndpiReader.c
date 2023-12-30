@@ -359,7 +359,8 @@ static void ndpiCheckIPMatch(char *testChar) {
   struct in_addr addr;
   char appBufStr[64];
   ndpi_protocol detected_protocol;
-  int i, rc;
+  int i;
+  ndpi_cfg_error rc;
 
   if(!testChar)
     return;
@@ -369,7 +370,7 @@ static void ndpiCheckIPMatch(char *testChar) {
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_str,
 			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
-    if (rc != 0)
+    if (rc < NDPI_CFG_OK)
       fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
 	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
   }
@@ -554,7 +555,7 @@ static void help(u_int long_help) {
          "                            | <d> = max packet payload dissection\n"
          "                            | <d> = max num reported payloads\n"
          "                            | Default: %u:%u:%u:%u:%u\n"
-         "  -c <path>                 | Load custom categories from the specified file\n"
+         "  -c <path>                 | Load custom categories from the specified file. It is a shortcut to --cfg=,NULL,filename.categories,<path>\n"
          "  -C <path>                 | Write output in CSV format on the specified file\n"
          "  -r <path>                 | Load risky domain file. It is a shortcut to --cfg=,NULL,filename.risky_domains,<path>\n"
          "  -j <path>                 | Load malicious JA3 fingeprints. It is a shortcut to --cfg=,NULL,filename.malicious_ja3,<path>\n"
@@ -568,7 +569,7 @@ static void help(u_int long_help) {
          "                            | 1 = verbose\n"
          "                            | 2 = very verbose\n"
          "                            | 3 = port stats\n"
-	   "                            | 4 = hash stats\n"
+         "                            | 4 = hash stats\n"
          "  -V <1-4>                  | nDPI logging level\n"
          "                            | 1 - trace, 2 - debug, 3 - full debug\n"
          "                            | >3 - full debug + log enabled for all protocols (i.e. '-u all')\n"
@@ -2674,7 +2675,8 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   struct ndpi_workflow_prefs prefs;
-  int i, rc;
+  int i;
+  ndpi_cfg_error rc;
 
   memset(&prefs, 0, sizeof(prefs));
   prefs.decode_tunnels = decode_tunnels;
@@ -2702,7 +2704,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
-    if (rc != 0)
+    if (rc < NDPI_CFG_OK)
       fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
 	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
   }
