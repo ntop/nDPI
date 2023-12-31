@@ -1,1 +1,1 @@
---cfg=,ip_lists.load,0
+--cfg=any,ip_list.load,0

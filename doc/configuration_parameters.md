@@ -21,8 +21,6 @@ TODO
 | NULL         | "filename.risk_domains"                   | NULL          | NULL      | NULL      | Name of the file to load with the list of risky domains |
 | NULL         | "dirname.domains"                         | NULL          | NULL      | NULL      | Load files (whose name is $categoryid\_$label.$extension) stored in the specified directory and bind each domain to the specified category |
 | NULL         | "filename.config"                         | NULL          | NULL      | NULL      | Name of the file containing a list of configuration knobs itself (one per line)!. Useful to configure nDPI via text file instead of via API |
-| NULL         | "asn_lists.load"                          | 1             | NULL      | NULL      | Enable/disable loading of every IP addresses lists used for (sub)classification and based on BGP information |
-| NULL         | "ip_lists.load"                           | 1             | NULL      | NULL      | Enable/disable loading of every IP addresses lists used for (sub)classification |
 | NULL         | "flow_risk_lists.load"                    | 1             | NULL      | NULL      | Enable/disable loading of every IP addresses lists used to check any flow risks |
 | NULL         | "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load" | 1             | NULL      | NULL      | Enable/disable loading of internal iCouldPrivateRealy IP address list used to check `NDPI_ANONYMOUS_SUBSCRIBER` flow risk |
 | NULL         | "flow_risk.anonymous_subscriber.list.protonvpn.load"          | 1             | NULL      | NULL      | Enable/disable loading of internal IP address list of ProtonVPN exit nodes used to check `NDPI_ANONYMOUS_SUBSCRIBER` flow risk  |
@@ -52,3 +50,6 @@ TODO
 | "tor"         | "ip_list.load"                           | 1             | NULL      | NULL      | Enable/disable loading of internal list of Tor ip addresses |
 | "whatsapp"    | "ip_list.load"                           | 1             | NULL      | NULL      | Enable/disable loading of internal list of Whatsapp ip addresses |
 | "zoom"        | "ip_list.load"                           | 1             | NULL      | NULL      | Enable/disable loading of internal list of Zoom ip addresses |
+| $PROTO_NAME   | "enable"                                 | 1             | NULL      | NULL      | Enable/disable the specific protocol. Use "any" as protocol name if you want to easily enable/disable all protocols |
+| $PROTO_NAME   | "log.enable"                             | 0             | NULL      | NULL      | Enable/disable logging/debug for specific protocol. Use "any" as protocol name if you want to easily enable/disable logging/debug for all protocols |
+| $PROTO_NAME   | "ip_list.load"                           | 1             | NULL      | NULL      | Enable/disable loading of internal list of IP addresses (used for (sub)classification) specific to that protocol. Use "any" as protocol name if you want to easily enable/disable all lists |

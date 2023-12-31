@@ -201,21 +201,7 @@ struct ndpi_detection_module_config_struct {
 
   int ookla_aggressiveness;
 
-  int ip_lists_enabled;
-  int ip_list_amazonaws_enabled;
-  int ip_list_azure_enabled;
-  int ip_list_cachefly_enabled;
-  int ip_list_cloudflare_enabled;
-  int ip_list_google_enabled;
-  int ip_list_googlecloud_enabled;
-  int ip_list_microsoft_enabled;
-  int ip_list_ethereum_enabled;
-  int ip_list_mullvad_enabled;
-  int ip_list_protonvpn_enabled;
-  int ip_list_tor_enabled;
-  int ip_list_whatsapp_enabled;
-  int ip_list_zoom_enabled;
-  int asn_lists_enabled;
+  NDPI_PROTOCOL_BITMASK ip_list_bitmask;
 
   int flow_risk_lists_enabled;
   int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
