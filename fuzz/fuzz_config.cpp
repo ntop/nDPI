@@ -28,6 +28,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char log_ts[32];
   int value;
   char cfg_value[32];
+  char cfg_proto[32];
 
 
   /* Just to be sure to have some data */
@@ -117,10 +118,24 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     if(fuzzed_data.ConsumeBool()) {
       value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
       sprintf(cfg_value, "%d", value);
-      /* TODO: from integer to name */
-#if 0
-      ndpi_set_config(ndpi_info_mod, "", "enable", cfg_value);
-#endif
+      sprintf(cfg_proto, "%d", i);
+      ndpi_set_config(ndpi_info_mod, cfg_proto, "enable", cfg_value);
+    }
+  }
+  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS; i++) {
+    if(fuzzed_data.ConsumeBool()) {
+      value = fuzzed_data.ConsumeIntegralInRange(0, NDPI_PROTOCOL_NUM_CATEGORIES - 1 + 1);
+      sprintf(cfg_value, "%d", value);
+      sprintf(cfg_proto, "%d", i);
+      ndpi_set_config(ndpi_info_mod, cfg_proto, "category", cfg_value);
+    }
+  }
+  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS; i++) {
+    if(fuzzed_data.ConsumeBool()) {
+      value = fuzzed_data.ConsumeIntegralInRange(0, NUM_BREEDS - 1 + 1);
+      sprintf(cfg_value, "%d", value);
+      sprintf(cfg_proto, "%d", i);
+      ndpi_set_config(ndpi_info_mod, cfg_proto, "breed", cfg_value);
     }
   }
   if(fuzzed_data.ConsumeBool()) {
@@ -132,10 +147,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     if(fuzzed_data.ConsumeBool()) {
       value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
       sprintf(cfg_value, "%d", value);
-      /* TODO: from integer to name */
-#if 0
-      ndpi_set_config(ndpi_info_mod, "", "log.enable", cfg_value);
-#endif
+      sprintf(cfg_proto, "%d", i);
+      /* TODO: we should try to map integer into name */
+      ndpi_set_config(ndpi_info_mod, cfg_proto, "log.enable", cfg_value);
     }
   }
   if(fuzzed_data.ConsumeBool()) {
@@ -147,10 +161,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     if(fuzzed_data.ConsumeBool()) {
       value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
       sprintf(cfg_value, "%d", value);
-      /* TODO: from integer to name */
-#if 0
-      ndpi_set_config(ndpi_info_mod, "", "ip_list.load", cfg_value);
-#endif
+      sprintf(cfg_proto, "%d", i);
+      ndpi_set_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value);
     }
   }
   if(fuzzed_data.ConsumeBool()) {
@@ -323,8 +335,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   }
   ndpi_map_user_proto_id_to_ndpi_id(ndpi_info_mod, pid);
   ndpi_map_ndpi_id_to_user_proto_id(ndpi_info_mod, pid);
-  ndpi_set_proto_breed(ndpi_info_mod, pid, NDPI_PROTOCOL_SAFE);
-  ndpi_set_proto_category(ndpi_info_mod, pid, NDPI_PROTOCOL_CATEGORY_MEDIA);
   ndpi_is_subprotocol_informative(ndpi_info_mod, pid);
   ndpi_get_proto_breed(ndpi_info_mod, pid);
 

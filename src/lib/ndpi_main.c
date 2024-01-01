@@ -430,26 +430,6 @@ ndpi_port_range *ndpi_build_default_ports(ndpi_port_range *ports, u_int16_t port
 
 /* ********************************************************************************** */
 
-void ndpi_set_proto_breed(struct ndpi_detection_module_struct *ndpi_str,
-			  u_int16_t protoId, ndpi_protocol_breed_t breed) {
-  if(!ndpi_is_valid_protoId(protoId))
-    return;
-  else if(ndpi_str)
-    ndpi_str->proto_defaults[protoId].protoBreed = breed;
-}
-
-/* ********************************************************************************** */
-
-void ndpi_set_proto_category(struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId,
-                             ndpi_protocol_category_t protoCategory) {
-  if(!ndpi_is_valid_protoId(protoId))
-    return;
-  else if(ndpi_str)
-    ndpi_str->proto_defaults[protoId].protoCategory = protoCategory;
-}
-
-/* ********************************************************************************** */
-
 /*
   There are some (master) protocols that are informative, meaning that it shows
   what is the subprotocol about, but also that the subprotocol isn't a real protocol.
@@ -594,9 +574,23 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
   */
   ndpi_str->proto_defaults[protoId].isAppProtocol = is_app_protocol;
   ndpi_str->proto_defaults[protoId].protoName = name;
-  ndpi_str->proto_defaults[protoId].protoCategory = protoCategory;
+  if(ndpi_str->cfg.protocols_categories[protoId] != -1) {
+    NDPI_LOG_DBG(ndpi_str, "Overwriting category for proto %s [%d] %d->%d\n",
+                 protoName, protoId, protoCategory,
+                 ndpi_str->cfg.protocols_categories[protoId]);
+    ndpi_str->proto_defaults[protoId].protoCategory = ndpi_str->cfg.protocols_categories[protoId];
+  } else {
+    ndpi_str->proto_defaults[protoId].protoCategory = protoCategory;
+  }
   ndpi_str->proto_defaults[protoId].protoId = protoId;
-  ndpi_str->proto_defaults[protoId].protoBreed = breed;
+  if(ndpi_str->cfg.protocols_breeds[protoId] != -1) {
+    NDPI_LOG_DBG(ndpi_str, "Overwriting breed for proto %s [%d] %d->%d\n",
+                 protoName, protoId, breed,
+                 ndpi_str->cfg.protocols_breeds[protoId]);
+    ndpi_str->proto_defaults[protoId].protoBreed = ndpi_str->cfg.protocols_breeds[protoId];
+  } else {
+    ndpi_str->proto_defaults[protoId].protoBreed = breed;
+  }
   ndpi_str->proto_defaults[protoId].subprotocols = NULL;
   ndpi_str->proto_defaults[protoId].subprotocol_count = 0;
 
@@ -10426,11 +10420,23 @@ void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
 
 /* ******************************************************************** */
 
-static u_int16_t __get_proto_id(const char *proto_name)
+static u_int16_t __get_proto_id(const char *proto_name_or_id)
 {
   struct ndpi_detection_module_struct *module;
   u_int16_t proto_id;
+  char *endptr;
+  long val;
 
+  /* Let try to decode the string as numerical protocol id */
+  errno = 0;    /* To distinguish success/failure after call */
+  val = strtol(proto_name_or_id, &endptr, 10);
+  if(errno == 0 && *endptr == '\0' &&
+     (val >= 0 && val < NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS)) {
+    return val;
+
+  }
+
+  /* Try to decode the string as protocol name */
   /* Use a temporary module with all protocols enabled */
   module = ndpi_init_detection_module();
   if(!module)
@@ -10439,7 +10445,7 @@ static u_int16_t __get_proto_id(const char *proto_name)
   ndpi_set_config(module, "any", "ip_list.load", "0");
   ndpi_set_config(module, NULL, "flow_risk_lists.load", "0");
   ndpi_finalize_initialization(module);
-  proto_id = ndpi_get_proto_by_name(module, proto_name);
+  proto_id = ndpi_get_proto_by_name(module, proto_name_or_id);
   ndpi_exit_detection_module(module);
 
   return proto_id;
@@ -10593,7 +10599,7 @@ static ndpi_cfg_error _set_param_protocol_enable_disable(struct ndpi_detection_m
 
   if(strcmp(proto, "any") == 0 ||
      strcmp(proto, "all") == 0 ||
-     strcmp(proto, "$PROTO_NAME") == 0) {
+     strcmp(proto, "$PROTO_NAME_OR_ID") == 0) {
     if(strcmp(value, "1") == 0 ||
        strcmp(value, "enable") == 0) {
       NDPI_BITMASK_SET_ALL(*bitmask);
@@ -10623,13 +10629,61 @@ static ndpi_cfg_error _set_param_protocol_enable_disable(struct ndpi_detection_m
   return NDPI_CFG_INVALID_VALUE;
 }
 
+static char *_get_param_protocol_int(void *_variable, const char *proto, char *buf, int buf_len)
+{
+  int *array = (int *)_variable;
+  u_int16_t proto_id;
+
+  proto_id = __get_proto_id(proto);
+  if(proto_id == NDPI_PROTOCOL_UNKNOWN)
+    return NULL;
+
+  snprintf(buf, buf_len, "%d", array[proto_id]);
+  buf[buf_len - 1] = '\0';
+  return buf;
+}
+
+static ndpi_cfg_error _set_param_protocol_int(struct ndpi_detection_module_struct *ndpi_str,
+                                              void *_variable, const char *value,
+                                              const char *min_value, const char *max_value,
+                                              const char *proto)
+{
+  int *array = (int *)_variable;
+  u_int16_t proto_id;
+  int i, val;
+
+  val = atoi(value); /* TODO */
+
+  /* Min and max values are set in the code, so we can convert them
+     to integers without too many checks...*/
+  if(min_value && max_value &&
+     (val < strtol(min_value, NULL, 0) || val > strtol(max_value, NULL, 0)))
+    return NDPI_CFG_INVALID_VALUE;
+
+  if(strcmp(proto, "any") == 0 ||
+     strcmp(proto, "all") == 0 ||
+     strcmp(proto, "$PROTO_NAME_OR_ID") == 0) {
+    for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS; i++)
+      array[i] = val;
+    return NDPI_CFG_OK;
+  }
+
+  proto_id = __get_proto_id(proto);
+  if(proto_id == NDPI_PROTOCOL_UNKNOWN)
+    return NDPI_CFG_INVALID_VALUE;
+
+  array[proto_id] = val;
+  return NDPI_CFG_OK;
+}
+
 enum cfg_param_type {
   CFG_PARAM_ENABLE_DISABLE = 0,
-  CFG_PARAM_INT            = 1,
-  CFG_PARAM_STRING         = 2,
-  CFG_PARAM_FILENAME       = 3, /* Like string, but we check also if the file exists */
-  CFG_PARAM_PROTOCOL_ENABLE_DISABLE = 4,
-  CFG_PARAM_FILENAME_CONFIG = 5, /* Like CFG_PARAM_FILENAME, but we also call ndpi_set_config() immediately for each row in it */
+  CFG_PARAM_INT,
+  CFG_PARAM_STRING,
+  CFG_PARAM_FILENAME, /* Like string, but we check also if the file exists */
+  CFG_PARAM_PROTOCOL_ENABLE_DISABLE,
+  CFG_PARAM_FILENAME_CONFIG, /* Like CFG_PARAM_FILENAME, but we also call ndpi_set_config() immediately for each row in it */
+  CFG_PARAM_PROTOCOL_INT,
 };
 
 static int callback_ja3(struct ndpi_detection_module_struct *ndpi_str)
@@ -10700,6 +10754,7 @@ static const struct cfg_op {
   { CFG_PARAM_FILENAME,                _set_param_filename,                _get_param_string },
   { CFG_PARAM_PROTOCOL_ENABLE_DISABLE, _set_param_protocol_enable_disable, _get_param_protocol_enable_disable },
   { CFG_PARAM_FILENAME_CONFIG,         _set_param_filename_config,         _get_param_string },
+  { CFG_PARAM_PROTOCOL_INT,            _set_param_protocol_int,            _get_param_protocol_int },
 };
 
 #define __OFF(a)	offsetof(struct ndpi_detection_module_config_struct, a)
@@ -10737,9 +10792,11 @@ static const struct cfg_param {
 
   { "ookla",         "aggressiveness",                          "0x01", "0", "1", CFG_PARAM_INT, __OFF(ookla_aggressiveness), NULL },
 
-  { "$PROTO_NAME",   "enable",                                  "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(detection_bitmask), NULL },
-  { "$PROTO_NAME",   "log.enable",                              "0", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(debug_bitmask), NULL },
-  { "$PROTO_NAME",   "ip_list.load",                            "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask), NULL },
+  { "$PROTO_NAME_OR_ID", "enable",                              "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(detection_bitmask), NULL },
+  { "$PROTO_NAME_OR_ID", "category",                            "-1", "-1", "107" /* TODO: NDPI_PROTOCOL_NUM_CATEGORIES - 1*/, CFG_PARAM_PROTOCOL_INT, __OFF(protocols_categories), NULL },
+  { "$PROTO_NAME_OR_ID", "breed",                               "-1", "-1", "7" /* TODO: NUM_BREEDS - 1 */, CFG_PARAM_PROTOCOL_INT, __OFF(protocols_breeds), NULL },
+  { "$PROTO_NAME_OR_ID", "log.enable",                          "0", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(debug_bitmask), NULL },
+  { "$PROTO_NAME_OR_ID", "ip_list.load",                        "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask), NULL },
 
   /* Global parameters */
 
@@ -10827,7 +10884,7 @@ ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
 	 (proto && c->proto && strcmp(proto, c->proto) == 0)) &&
         strcmp(param, c->param) == 0) ||
        (proto && c->proto &&
-	strcmp(c->proto, "$PROTO_NAME") == 0 &&
+	strcmp(c->proto, "$PROTO_NAME_OR_ID") == 0 &&
 	strcmp(param, c->param) == 0)) {
 
       rc = cfg_ops[c->type].fn_set(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset),
@@ -10877,6 +10934,7 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
 
   fprintf(fd, " Protocol (empty/NULL for global knobs), parameter, value, [default value], [min value, max_value]\n");
 
+  /* TODO */
   for(c = &cfg_params[0]; c && c->param; c++) {
     switch(c->type) {
     case CFG_PARAM_ENABLE_DISABLE:
@@ -10900,11 +10958,21 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
 	      c->default_value);
       fprintf(fd, "\n");
       break;
+    /* TODO */
     case CFG_PARAM_PROTOCOL_ENABLE_DISABLE:
       fprintf(fd, " *) %s %s: %s [all %s]",
               c->proto ? c->proto : "NULL",
               c->param,
               /* TODO */ _get_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), "any", buf, sizeof(buf)),
+	      c->default_value);
+      fprintf(fd, "\n");
+      break;
+    /* TODO */
+    case CFG_PARAM_PROTOCOL_INT:
+      fprintf(fd, " *) %s %s: %s [all %s]",
+              c->proto ? c->proto : "NULL",
+              c->param,
+              /* TODO */ _get_param_protocol_int((void *)((char *)&ndpi_str->cfg + c->offset), "any", buf, sizeof(buf)),
 	      c->default_value);
       fprintf(fd, "\n");
       break;

@@ -156,10 +156,7 @@ struct ndpi_detection_module_config_struct {
 
   char filename_config[CFG_MAX_LEN];
 
-  NDPI_PROTOCOL_BITMASK detection_bitmask;
-
   int log_level;
-  NDPI_PROTOCOL_BITMASK debug_bitmask;
 
   /* LRU caches */
 
@@ -203,7 +200,12 @@ struct ndpi_detection_module_config_struct {
 
   int ookla_aggressiveness;
 
+  NDPI_PROTOCOL_BITMASK detection_bitmask;
+  NDPI_PROTOCOL_BITMASK debug_bitmask;
   NDPI_PROTOCOL_BITMASK ip_list_bitmask;
+
+  int protocols_categories[NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
+  int protocols_breeds[NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
   int flow_risk_lists_enabled;
   int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;

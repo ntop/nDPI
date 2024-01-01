@@ -560,28 +560,6 @@ extern "C" {
   int ndpi_is_custom_category(ndpi_protocol_category_t category);
 
   /**
-   * Overwrite a protocol category defined by nDPI with the custom category
-   *
-   * @par     ndpi_mod      = the detection module
-   * @par     protoId       = the protocol identifier to overwrite
-   * @par     breed         = the breed to be associated to the protocol
-   *
-   */
-  void ndpi_set_proto_breed(struct ndpi_detection_module_struct *ndpi_mod,
-			    u_int16_t protoId, ndpi_protocol_breed_t breed);
-
-  /**
-   * Overwrite a protocol category defined by nDPI with the custom category
-   *
-   * @par     ndpi_mod      = the detection module
-   * @par     protoId       = the protocol identifier to overwrite
-   * @par     category      = the category associated to the protocol
-   *
-   */
-  void ndpi_set_proto_category(struct ndpi_detection_module_struct *ndpi_mod,
-			       u_int16_t protoId, ndpi_protocol_category_t protoCategory);
-
-  /**
    * Check if subprotocols of the specified master protocol are just
    * informative (and not real)
    *
