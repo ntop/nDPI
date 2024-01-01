@@ -3,8 +3,8 @@
 
 TODO
 
-| Protocol     | Parameter                                 | Default value | Min value | Max value | Description |
-| ------       | ------                                    | ------        | ------    | ------    | ------      |
+| Protocol     | Parameter                                 | Default value | Min value | Max value | Description | Notes  |
+| ------       | ------                                    | ------        | ------    | ------    | ------      | ------ |
 | NULL         | "packets_limit_per_flow"                  | 32            | 0         | 255       | The upper limit on the number of packets per flow that will be subject to DPI, after which classification will be considered complete (0 = no limit) |
 | NULL         | "flow.direction_detection.enable"         | 1             | NULL      | NULL      | Enable/disable internal detection of packet direction (client to server or server to client) |
 | NULL         | "flow.track_payload.enable"               | 0             | NULL      | NULL      | Enable/disable tracking/export of flow payload (i.e. L5/7 data) |
@@ -18,8 +18,8 @@ TODO
 | NULL         | "flow_risk.crawler_bot.list.load"         | 1             | NULL      | NULL      | Enable/disable loading of internal IP address list used to check `NDPI_HTTP_CRAWLER_BOT` flow risk |
 | NULL         | "filename.protocols"                      | NULL          | NULL      | NULL      | Name of the file to load with custom rules/protocols |
 | NULL         | "filename.categories"                     | NULL          | NULL      | NULL      | Name of the file to load with custom categories |
-| NULL         | "filename.malicious_sha1"                 | NULL          | NULL      | NULL      | Name of the file to load with the list of malicious JA3 fingerprints |
-| NULL         | "filename.malicious_ja3"                  | NULL          | NULL      | NULL      | Name of the file to load with the list of malicious SSL certificate SHA1 fingerprints |
+| NULL         | "filename.malicious_sha1"                 | NULL          | NULL      | NULL      | Name of the file to load with the list of malicious JA3 fingerprints | The file is loaded immediately: if there are no errors, `ndpi_set_config()` returns the number of signature loaded |
+| NULL         | "filename.malicious_ja3"                  | NULL          | NULL      | NULL      | Name of the file to load with the list of malicious SSL certificate SHA1 fingerprints | The file is loaded immediately: if there are no errors, `ndpi_set_config()` returns the number of signature loaded |
 | NULL         | "filename.risk_domains"                   | NULL          | NULL      | NULL      | Name of the file to load with the list of risky domains |
 | NULL         | "dirname.domains"                         | NULL          | NULL      | NULL      | Load files (whose name is $categoryid\_$label.$extension) stored in the specified directory and bind each domain to the specified category |
 | NULL         | "filename.config"                         | NULL          | NULL      | NULL      | Name of the file containing a list of configuration knobs itself (one per line)!. Useful to configure nDPI via text file instead of via API |
@@ -40,4 +40,4 @@ TODO
 | "ookla"      | "aggressiveness",                         | 0x01          | 0x00      | 0x01      | Detection aggressiveness for Ookla. The value is a bitmask. Values: 0x0 = disabled; 0x01 = enable heuristic for detection over TLS (via Ookla LRU cache) |
 | $PROTO_NAME   | "enable"                                 | 1             | NULL      | NULL      | Enable/disable the specific protocol. Use "any" as protocol name if you want to easily enable/disable all protocols |
 | $PROTO_NAME   | "log.enable"                             | 0             | NULL      | NULL      | Enable/disable logging/debug for specific protocol. Use "any" as protocol name if you want to easily enable/disable logging/debug for all protocols |
-| $PROTO_NAME   | "ip_list.load"                           | 1             | NULL      | NULL      | Enable/disable loading of internal list of IP addresses (used for (sub)classification) specific to that protocol. Use "any" as protocol name if you want to easily enable/disable all lists |
+| $PROTO_NAME   | "ip_list.load"                           | 1             | NULL      | NULL      | Enable/disable loading of internal list of IP addresses (used for (sub)classification) specific to that protocol. Use "any" as protocol name if you want to easily enable/disable all lists. This knob is valid only for the following protocols: Alibaba, Amazon AWS, Apple, Avast, Bloomberg, Cachefly, Cloudflare, Discord, Disney+, Dropbox, Edgecast, EpicGames, Ethereum, Facebook, Github, Google, Google Cloud, GoTo, Hotspot Shield, Hulu, Line, Microsoft 365, Microsoft Azure, Microsoft One Drive, Microsoft Outlook, Mullvad, Netflix, Nvidia, OpenDNS, ProtonVPN, RiotGames, Roblox, Skype/Teams, Starcraft, Steam, Teamviewer, Telegram, Tencent, Threema, TOR, Twitch, Twitter, UbuntuONE, VK, Yandex, Yandex Cloud, Webex, Whatsapp, Zoom |

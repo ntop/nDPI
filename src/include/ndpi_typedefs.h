@@ -238,6 +238,7 @@ typedef enum {
   NDPI_CFG_INVALID_PARAM = -100,
   NDPI_CFG_NOT_FOUND,
   NDPI_CFG_INVALID_VALUE,
+  NDPI_CFG_CALLBACK_ERROR,
 
   NDPI_CFG_OK = 0,
 } ndpi_cfg_error;

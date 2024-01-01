@@ -3339,32 +3339,6 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
       NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
                    ndpi_str->cfg.filename_categories, rc);
   }
-  if(ndpi_str->cfg.filename_malicious_sha1[0] != '\0') {
-    fd = fopen(ndpi_str->cfg.filename_malicious_sha1, "r");
-    if(fd == NULL) {
-      NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
-                   ndpi_str->cfg.filename_malicious_sha1, strerror(errno));
-      return -1;
-    }
-    rc = load_malicious_sha1_file_fd(ndpi_str, fd);
-    fclose(fd);
-    if(rc < 0)
-      NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
-                   ndpi_str->cfg.filename_malicious_sha1, rc);
-  }
-  if(ndpi_str->cfg.filename_malicious_ja3[0] != '\0') {
-    fd = fopen(ndpi_str->cfg.filename_malicious_ja3, "r");
-    if(fd == NULL) {
-      NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
-                   ndpi_str->cfg.filename_malicious_ja3, strerror(errno));
-      return -1;
-    }
-    rc = load_malicious_ja3_file_fd(ndpi_str, fd);
-    fclose(fd);
-    if(rc < 0)
-      NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
-                   ndpi_str->cfg.filename_malicious_ja3, rc);
-  }
   if(ndpi_str->cfg.filename_risky_domains[0] != '\0') {
     fd = fopen(ndpi_str->cfg.filename_risky_domains, "r");
     if(fd == NULL) {
@@ -3378,6 +3352,7 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
       NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
                    ndpi_str->cfg.filename_risky_domains, rc);
   }
+  /* Sha1 and ja3 signatures have already been loaded */
 
   ndpi_enable_loaded_categories(ndpi_str);
 
@@ -10648,7 +10623,6 @@ static ndpi_cfg_error _set_param_protocol_enable_disable(struct ndpi_detection_m
   return NDPI_CFG_INVALID_VALUE;
 }
 
-
 enum cfg_param_type {
   CFG_PARAM_ENABLE_DISABLE = 0,
   CFG_PARAM_INT            = 1,
@@ -10658,12 +10632,62 @@ enum cfg_param_type {
   CFG_PARAM_FILENAME_CONFIG = 5, /* Like CFG_PARAM_FILENAME, but we also call ndpi_set_config() immediately for each row in it */
 };
 
+static int callback_ja3(struct ndpi_detection_module_struct *ndpi_str)
+{
+  FILE *fd;
+  int rc = 0;
+
+  NDPI_LOG_DBG2(ndpi_str, "Loading %s\n", ndpi_str->cfg.filename_malicious_ja3);
+
+  if(ndpi_str->cfg.filename_malicious_ja3[0] != '\0') {
+    fd = fopen(ndpi_str->cfg.filename_malicious_ja3, "r");
+    if(fd == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
+                   ndpi_str->cfg.filename_malicious_ja3, strerror(errno));
+      return -1;
+    }
+    rc = load_malicious_ja3_file_fd(ndpi_str, fd);
+    fclose(fd);
+    if(rc < 0)
+      NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
+                   ndpi_str->cfg.filename_malicious_ja3, rc);
+  }
+  NDPI_LOG_DBG2(ndpi_str, "Loaded %d ja3 signatures\n", rc);
+  return rc;
+}
+
+static int callback_sha1(struct ndpi_detection_module_struct *ndpi_str)
+{
+  FILE *fd;
+  int rc = 0;
+
+  NDPI_LOG_DBG2(ndpi_str, "Loading %s\n", ndpi_str->cfg.filename_malicious_sha1);
+
+
+  if(ndpi_str->cfg.filename_malicious_sha1[0] != '\0') {
+    fd = fopen(ndpi_str->cfg.filename_malicious_sha1, "r");
+    if(fd == NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
+                   ndpi_str->cfg.filename_malicious_sha1, strerror(errno));
+      return -1;
+    }
+    rc = load_malicious_sha1_file_fd(ndpi_str, fd);
+    fclose(fd);
+    if(rc < 0)
+      NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
+                   ndpi_str->cfg.filename_malicious_sha1, rc);
+  }
+  NDPI_LOG_DBG2(ndpi_str, "Loaded %d sha1 signatures\n", rc);
+  return rc;
+}
+
 
 typedef ndpi_cfg_error (*cfg_set)(struct ndpi_detection_module_struct *ndpi_str,
                                   void *_variable, const char *value,
                                   const char *min_value, const char *max_value,
                                   const char *proto);
 typedef char *(*cfg_get)(void *_variable, const char *proto, char *buf, int buf_len);
+typedef int (*cfg_calback)(struct ndpi_detection_module_struct *ndpi_str);
 
 static const struct cfg_op {
   enum cfg_param_type type;
@@ -10688,89 +10712,90 @@ static const struct cfg_param {
   char *max_value;
   enum cfg_param_type type;
   int offset;
+  cfg_calback fn_callback;
 } cfg_params[] = {
   /* Per-protocol parameters */
 
-  { "tls",           "certificate_expiration_threshold",        "30", "0", "365", CFG_PARAM_INT, __OFF(tls_certificate_expire_in_x_days) },
-  { "tls",           "application_blocks_tracking.enable",      "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_app_blocks_tracking_enabled) },
-  { "tls",           "metadata.sha1_fingerprint.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_sha1_fingerprint_enabled) },
+  { "tls",           "certificate_expiration_threshold",        "30", "0", "365", CFG_PARAM_INT, __OFF(tls_certificate_expire_in_x_days), NULL },
+  { "tls",           "application_blocks_tracking.enable",      "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_app_blocks_tracking_enabled), NULL },
+  { "tls",           "metadata.sha1_fingerprint.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_sha1_fingerprint_enabled), NULL },
 
-  { "smtp",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled) },
+  { "smtp",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled), NULL },
 
-  { "imap",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(imap_opportunistic_tls_enabled) },
+  { "imap",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(imap_opportunistic_tls_enabled), NULL },
 
-  { "pop",           "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(pop_opportunistic_tls_enabled) },
+  { "pop",           "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(pop_opportunistic_tls_enabled), NULL },
 
-  { "ftp",           "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ftp_opportunistic_tls_enabled) },
+  { "ftp",           "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ftp_opportunistic_tls_enabled), NULL },
 
-  { "stun",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_opportunistic_tls_enabled) },
+  { "stun",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_opportunistic_tls_enabled), NULL },
 
-  { "dns",           "subclassification.enable",                "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_subclassification_enabled) },
-  { "dns",           "process_response.enable",                 "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_parse_response_enabled) },
+  { "dns",           "subclassification.enable",                "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_subclassification_enabled), NULL },
+  { "dns",           "process_response.enable",                 "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_parse_response_enabled), NULL },
 
-  { "http",          "process_response.enable",                 "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(http_parse_response_enabled) },
+  { "http",          "process_response.enable",                 "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(http_parse_response_enabled), NULL },
 
-  { "ookla",         "aggressiveness",                          "0x01", "0", "1", CFG_PARAM_INT, __OFF(ookla_aggressiveness) },
+  { "ookla",         "aggressiveness",                          "0x01", "0", "1", CFG_PARAM_INT, __OFF(ookla_aggressiveness), NULL },
 
-  { "$PROTO_NAME",   "enable",                                  "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(detection_bitmask) },
-  { "$PROTO_NAME",   "log.enable",                              "0", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(debug_bitmask) },
-  { "$PROTO_NAME",   "ip_list.load",                            "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask) },
+  { "$PROTO_NAME",   "enable",                                  "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(detection_bitmask), NULL },
+  { "$PROTO_NAME",   "log.enable",                              "0", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(debug_bitmask), NULL },
+  { "$PROTO_NAME",   "ip_list.load",                            "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask), NULL },
 
   /* Global parameters */
 
   /* An example of integer configuration */
-  { NULL,            "packets_limit_per_flow",                  "32", "0", "255", CFG_PARAM_INT, __OFF(max_packets_to_process) },
-  { NULL,            "flow.direction_detection.enable",         "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(direction_detect_enabled) },
-  { NULL,            "flow.track_payload.enable",               "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(track_payload_enabled) },
-  { NULL,            "tcp_ack_payload_heuristic.enable",        "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_ack_paylod_heuristic) },
-  { NULL,            "fully_encrypted_heuristic.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic) },
-  { NULL,            "libgcrypt.init",                          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(libgcrypt_init) },
-  { NULL,            "guess_on_giveup",                         "0x3", "0", "3", CFG_PARAM_INT, __OFF(guess_on_giveup) },
+  { NULL,            "packets_limit_per_flow",                  "32", "0", "255", CFG_PARAM_INT, __OFF(max_packets_to_process), NULL },
+  { NULL,            "flow.direction_detection.enable",         "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(direction_detect_enabled), NULL },
+  { NULL,            "flow.track_payload.enable",               "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(track_payload_enabled), NULL },
+  { NULL,            "tcp_ack_payload_heuristic.enable",        "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_ack_paylod_heuristic), NULL },
+  { NULL,            "fully_encrypted_heuristic.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic), NULL },
+  { NULL,            "libgcrypt.init",                          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(libgcrypt_init), NULL },
+  { NULL,            "guess_on_giveup",                         "0x3", "0", "3", CFG_PARAM_INT, __OFF(guess_on_giveup), NULL },
 
-  { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled) },
+  { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },
 
-  { NULL,            "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_icloudprivaterelay_enabled) },
-  { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_protonvpn_enabled) },
-  { NULL,            "flow_risk.crawler_bot.list.load",                             "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_crawler_bot_list_enabled) },
+  { NULL,            "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_icloudprivaterelay_enabled), NULL },
+  { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_protonvpn_enabled), NULL },
+  { NULL,            "flow_risk.crawler_bot.list.load",                             "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_crawler_bot_list_enabled), NULL },
 
-  { NULL,            "filename.protocols",                      NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_protocols) },
-  { NULL,            "filename.categories",                     NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_categories) },
-  { NULL,            "filename.malicious_sha1",                 NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_malicious_sha1) },
-  { NULL,            "filename.malicious_ja3",                  NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_malicious_ja3) },
-  { NULL,            "filename.risky_domains",                  NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_risky_domains) },
-  { NULL,            "dirname.domains",                         NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(dirname_domains) },
+  { NULL,            "filename.protocols",                      NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_protocols), NULL },
+  { NULL,            "filename.categories",                     NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_categories), NULL },
+  { NULL,            "filename.malicious_sha1",                 NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_malicious_sha1), callback_sha1 },
+  { NULL,            "filename.malicious_ja3",                  NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_malicious_ja3), callback_ja3 },
+  { NULL,            "filename.risky_domains",                  NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(filename_risky_domains), NULL },
+  { NULL,            "dirname.domains",                         NULL, NULL, NULL, CFG_PARAM_FILENAME, __OFF(dirname_domains), NULL },
 
-  { NULL,            "filename.config",                         NULL, NULL, NULL, CFG_PARAM_FILENAME_CONFIG, __OFF(filename_config) },
+  { NULL,            "filename.config",                         NULL, NULL, NULL, CFG_PARAM_FILENAME_CONFIG, __OFF(filename_config), NULL },
 
-  { NULL,            "log.level",                               "0", "0", "4", CFG_PARAM_INT, __OFF(log_level) },
+  { NULL,            "log.level",                               "0", "0", "4", CFG_PARAM_INT, __OFF(log_level), NULL },
 
   /* LRU caches */
 
-  { NULL,            "lru.ookla.size",                          "1024", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_num_entries) },
-  { NULL,            "lru.ookla.ttl",                           "120", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_ttl) },
+  { NULL,            "lru.ookla.size",                          "1024", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_num_entries), NULL },
+  { NULL,            "lru.ookla.ttl",                           "120", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_ttl), NULL },
 
-  { NULL,            "lru.bittorrent.size",                     "32768", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_num_entries) },
-  { NULL,            "lru.bittorrent.ttl",                      "0", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_ttl) },
+  { NULL,            "lru.bittorrent.size",                     "32768", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_num_entries), NULL },
+  { NULL,            "lru.bittorrent.ttl",                      "0", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_ttl), NULL },
 
-  { NULL,            "lru.zoom.size",                           "512", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_num_entries) },
-  { NULL,            "lru.zoom.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_ttl) },
+  { NULL,            "lru.zoom.size",                           "512", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_num_entries), NULL },
+  { NULL,            "lru.zoom.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_ttl), NULL },
 
-  { NULL,            "lru.stun.size",                           "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_num_entries) },
-  { NULL,            "lru.stun.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_ttl) },
+  { NULL,            "lru.stun.size",                           "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_num_entries), NULL },
+  { NULL,            "lru.stun.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_ttl), NULL },
 
-  { NULL,            "lru.tls_cert.size",                       "1024", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_num_entries) },
-  { NULL,            "lru.tls_cert.ttl",                        "0", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_ttl) },
+  { NULL,            "lru.tls_cert.size",                       "1024", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_num_entries), NULL },
+  { NULL,            "lru.tls_cert.ttl",                        "0", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_ttl), NULL },
 
-  { NULL,            "lru.mining.size",                         "1024", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_num_entries) },
-  { NULL,            "lru.mining.ttl",                          "0", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_ttl) },
+  { NULL,            "lru.mining.size",                         "1024", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_num_entries), NULL },
+  { NULL,            "lru.mining.ttl",                          "0", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_ttl), NULL },
 
-  { NULL,            "lru.msteams.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries) },
-  { NULL,            "lru.msteams.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_ttl) },
+  { NULL,            "lru.msteams.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries), NULL },
+  { NULL,            "lru.msteams.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_ttl), NULL },
 
-  { NULL,            "lru.stun_zoom.size",                      "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_zoom_cache_num_entries) },
-  { NULL,            "lru.stun_zoom.ttl",                       "60", "0", "16777215", CFG_PARAM_INT, __OFF(stun_zoom_cache_ttl) },
+  { NULL,            "lru.stun_zoom.size",                      "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_zoom_cache_num_entries), NULL },
+  { NULL,            "lru.stun_zoom.ttl",                       "60", "0", "16777215", CFG_PARAM_INT, __OFF(stun_zoom_cache_ttl), NULL },
 
-  { NULL, NULL, NULL, NULL, NULL, 0, -1 },
+  { NULL, NULL, NULL, NULL, NULL, 0, -1, NULL },
 };
 
 #undef __OFF
@@ -10789,6 +10814,8 @@ ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
 		               const char *proto, const char *param, const char *value)
 {
   const struct cfg_param *c;
+  ndpi_cfg_error rc;
+  int ret;
 
   if(!ndpi_str || !param || !value)
     return NDPI_CFG_INVALID_PARAM;
@@ -10803,8 +10830,16 @@ ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
 	strcmp(c->proto, "$PROTO_NAME") == 0 &&
 	strcmp(param, c->param) == 0)) {
 
-      return cfg_ops[c->type].fn_set(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset),
-                                     value, c->min_value, c->max_value, proto);
+      rc = cfg_ops[c->type].fn_set(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset),
+                                   value, c->min_value, c->max_value, proto);
+      if(rc == NDPI_CFG_OK && c->fn_callback) {
+        ret = c->fn_callback(ndpi_str);
+        if(ret < 0)
+          rc = NDPI_CFG_CALLBACK_ERROR;
+        else
+          rc = ret;
+      }
+      return rc;
     }
   }
   return NDPI_CFG_NOT_FOUND;
