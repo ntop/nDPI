@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 BACnet	23	1373	10
 
+Safe                            23 1373          10           
+
 	1	UDP 204.172.177.255:47808 -> 204.172.177.159:47808 [proto: 334/BACnet][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][14 pkts/833 bytes -> 0 pkts/0 bytes][Goodput ratio: 29/0][221.21 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1387/0 17424/0 43334/0 13696/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 60/0 67/0 5/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 64.62.197.26:36992 -> 90.147.69.221:47808 [proto: 334/BACnet][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 28/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 64.62.197.166:36664 -> 90.147.69.213:47808 [proto: 334/BACnet][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 28/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

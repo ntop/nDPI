@@ -23,5 +23,7 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Service_Location_Protocol	2	490	2
 
+Acceptable                       2 490           2            
+
 	1	UDP 23.220.116.175:427 -> 192.168.199.71:57782 [proto: 347/Service_Location_Protocol][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][1 pkts/404 bytes -> 0 pkts/0 bytes][Goodput ratio: 89/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (Stella4)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 250.83.105.78:51708 -> 172.30.246.115:427 [proto: 347/Service_Location_Protocol][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (service)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

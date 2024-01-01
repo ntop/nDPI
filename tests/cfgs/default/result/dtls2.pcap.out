@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 DTLS	30	4991	1
 
+Safe                            30 4991          1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 61.68.110.153            	 1      

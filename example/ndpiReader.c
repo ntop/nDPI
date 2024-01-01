@@ -3646,7 +3646,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   u_int32_t avg_pkt_size = 0;
   int thread_id;
   char buf[32];
-  long long unsigned int breed_stats[NUM_BREEDS] = { 0 };
+  long long unsigned int breed_stats_pkts[NUM_BREEDS] = { 0 };
+  long long unsigned int breed_stats_bytes[NUM_BREEDS] = { 0 };
+  long long unsigned int breed_stats_flows[NUM_BREEDS] = { 0 };
 
   memset(&cumulative_stats, 0, sizeof(cumulative_stats));
 
@@ -4024,7 +4026,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     ndpi_protocol_breed_t breed = ndpi_get_proto_breed(ndpi_thread_info[0].workflow->ndpi_struct, i);
 
     if(cumulative_stats.protocol_counter[i] > 0) {
-      breed_stats[breed] += (long long unsigned int)cumulative_stats.protocol_counter_bytes[i];
+      breed_stats_bytes[breed] += (long long unsigned int)cumulative_stats.protocol_counter_bytes[i];
+      breed_stats_pkts[breed] += (long long unsigned int)cumulative_stats.protocol_counter[i];
+      breed_stats_flows[breed] += (long long unsigned int)cumulative_stats.protocol_flows[i];
 
       if(results_file)
 	fprintf(results_file, "%s\t%llu\t%llu\t%u\n",
@@ -4049,10 +4053,21 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     printf("\n\nProtocol statistics:\n");
 
     for(i=0; i < NUM_BREEDS; i++) {
-      if(breed_stats[i] > 0) {
-	printf("\t%-20s %13llu bytes\n",
+      if(breed_stats_pkts[i] > 0) {
+	printf("\t%-20s packets: %-13llu bytes: %-13llu "
+	       "flows: %-13llu\n",
 	       ndpi_get_proto_breed_name(ndpi_thread_info[0].workflow->ndpi_struct, i),
-	       breed_stats[i]);
+	       breed_stats_pkts[i], breed_stats_bytes[i], breed_stats_flows[i]);
+      }
+    }
+  }
+  if(results_file) {
+    fprintf(results_file, "\n");
+    for(i=0; i < NUM_BREEDS; i++) {
+      if(breed_stats_pkts[i] > 0) {
+	fprintf(results_file, "%-20s %13llu %-13llu %-13llu\n",
+	        ndpi_get_proto_breed_name(ndpi_thread_info[0].workflow->ndpi_struct, i),
+	        breed_stats_pkts[i], breed_stats_bytes[i], breed_stats_flows[i]);
       }
     }
   }

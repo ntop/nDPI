@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 GTP_PRIME	1	300	1
 
+Acceptable                       1 300           1            
+
 	1	UDP 10.10.54.1:64580 -> 10.10.39.10:3386 [VLAN: 103][proto: 152.273/GTP.GTP_PRIME][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/300 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][< 1 sec][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic][PLAIN TEXT (NODE01)][Plen Bins: 0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

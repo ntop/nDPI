@@ -23,5 +23,7 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 BitTorrent	4	939	2
 
+Acceptable                       4 939           2            
+
 	1	UDP 10.0.2.15:23994 <-> 89.64.45.227:5201 [proto: 37/BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Download/7][1 pkts/140 bytes <-> 1 pkts/345 bytes][Goodput ratio: 70/88][0.72 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 6771,51413][PLAIN TEXT (target20)][Plen Bins: 0,0,0,50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 10.0.2.15:23994 <-> 79.164.55.123:5001 [proto: 37/BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Download/7][1 pkts/140 bytes <-> 1 pkts/314 bytes][Goodput ratio: 70/86][0.07 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 6771,51413][PLAIN TEXT (target20)][Plen Bins: 0,0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

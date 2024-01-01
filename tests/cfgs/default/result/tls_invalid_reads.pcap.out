@@ -27,6 +27,9 @@ Patricia protocols IPv6: 0/0 (search/found)
 TLS	8	1891	2
 Crashlytics	3	560	1
 
+Safe                             8 1891          2            
+Acceptable                       3 560           1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 10.191.139.17            	 1      

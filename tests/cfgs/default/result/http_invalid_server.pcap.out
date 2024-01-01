@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 OCSP	12	1301	1
 
+Safe                            12 1301          1            
+
 	1	TCP 192.168.1.29:51536 <-> 143.204.14.183:80 [proto: 7.63/HTTP.OCSP][IP: 265/AmazonAWS][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][7 pkts/556 bytes <-> 5 pkts/745 bytes][Goodput ratio: 15/55][0.04 sec][Hostname/SNI: ocsp.rootg2.amazontrust.com][bytes ratio: -0.145 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 5/4 12/12 6/6][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 79/149 148/468 28/160][URL: ocsp.rootg2.amazontrust.com/][StatusCode: 200][Content-Type: application/ocsp-response][Server: ¯\_(ツ)_/¯][User-Agent: **][Risk: ** HTTP Susp User-Agent **** HTTP Susp Header **][Risk Score: 200][Risk Info: Suspicious Log4J / Suspicious Agent][PLAIN TEXT (GET / HTTP/1.1)][Plen Bins: 33,0,33,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

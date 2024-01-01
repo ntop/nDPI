@@ -23,5 +23,7 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 FIX	3046	246540	2
 
+Safe                          3046 246540        2            
+
 	1	TCP 10.101.0.2:34962 <-> 10.102.0.2:1024 [proto: 230/FIX][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RPC/16][683 pkts/53501 bytes <-> 1304 pkts/102844 bytes][Goodput ratio: 25/25][0.01 sec][bytes ratio: -0.316 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 78/79 160/174 35/38][PLAIN TEXT (FIXT.1.1)][Plen Bins: 0,0,46,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 10.101.0.2:34963 <-> 10.102.0.9:1024 [proto: 230/FIX][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RPC/16][411 pkts/34812 bytes <-> 648 pkts/55383 bytes][Goodput ratio: 31/32][0.01 sec][bytes ratio: -0.228 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 85/85 160/174 39/42][PLAIN TEXT (FIXT.1.1)][Plen Bins: 0,0,47,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

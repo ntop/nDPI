@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Skype_TeamsCall	5	339	1
 
+Acceptable                       5 339           1            
+
 	1	UDP 192.168.1.2:35990 <-> 24.224.190.149:39262 [proto: 125.38/Skype_Teams.Skype_TeamsCall][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: VoIP/10][4 pkts/279 bytes <-> 1 pkts/60 bytes][Goodput ratio: 40/30][72.51 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

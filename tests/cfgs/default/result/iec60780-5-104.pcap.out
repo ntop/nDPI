@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 IEC60870	147	9033	6
 
+Acceptable                     147 9033          6            
+
 	1	TCP 172.27.248.109:1578 <-> 172.27.248.79:2404 [proto: 245/IEC60870][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: IoT-Scada/31][28 pkts/1758 bytes <-> 19 pkts/1297 bytes][Goodput ratio: 9/20][235.18 sec][bytes ratio: 0.151 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/4 9106/11905 32485/32516 10297/10287][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 63/68 76/118 5/15][Plen Bins: 96,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 172.27.248.109:1568 <-> 172.27.248.79:2404 [proto: 245/IEC60870][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: IoT-Scada/31][17 pkts/1040 bytes <-> 12 pkts/674 bytes][Goodput ratio: 7/3][160.96 sec][bytes ratio: 0.214 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 9874/10029 38294/26906 11815/8997][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 61/56 68/62 2/3][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 172.27.248.109:1572 <-> 172.27.248.79:2404 [proto: 245/IEC60870][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: IoT-Scada/31][15 pkts/940 bytes <-> 10 pkts/572 bytes][Goodput ratio: 9/4][191.16 sec][bytes ratio: 0.243 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 12850/21996 59783/60001 22023/25276][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 63/57 76/62 5/3][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

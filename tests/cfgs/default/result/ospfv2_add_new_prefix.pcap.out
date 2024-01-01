@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 OSPF	2	200	1
 
+Acceptable                       2 200           1            
+
 	1	OSPF 10.1.10.10:0 <-> 10.1.10.1:0 [proto: 85/OSPF][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/122 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][2.51 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 AliCloud	225	22986	15
 
+Acceptable                     225 22986         15           
+
 	1	TCP 192.168.2.100:45094 <-> 8.209.76.194:8999 [proto: 306/AliCloud][IP: 274/Alibaba][Encrypted][Confidence: DPI][DPI packets: 4][cat: Cloud/13][7 pkts/822 bytes <-> 8 pkts/832 bytes][Goodput ratio: 43/36][0.49 sec][bytes ratio: -0.006 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/1 17/67 23/322 7/115][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 117/104 274/250 77/60][Plen Bins: 28,28,0,0,14,14,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.2.100:51774 <-> 8.209.77.36:8999 [proto: 306/AliCloud][IP: 274/Alibaba][Encrypted][Confidence: DPI][DPI packets: 4][cat: Cloud/13][7 pkts/822 bytes <-> 8 pkts/832 bytes][Goodput ratio: 43/36][0.46 sec][bytes ratio: -0.006 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 3/0 14/64 20/318 7/114][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 117/104 274/250 77/60][Plen Bins: 28,28,0,0,14,14,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.2.100:57322 <-> 8.209.107.122:8999 [proto: 306/AliCloud][IP: 274/Alibaba][Encrypted][Confidence: DPI][DPI packets: 4][cat: Cloud/13][7 pkts/822 bytes <-> 8 pkts/832 bytes][Goodput ratio: 43/36][0.33 sec][bytes ratio: -0.006 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 2/0 16/41 24/166 9/57][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 117/104 274/250 77/60][Plen Bins: 28,28,0,0,14,14,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

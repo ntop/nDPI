@@ -29,6 +29,10 @@ Dropbox	2	1088	1
 WhatsApp	32	3243	2
 Spotify	1	86	1
 
+Safe                            50 23466         2            
+Acceptable                      42 6585          6            
+Fun                              1 86            1            
+
 	1	TCP 192.168.2.4:49205 <-> 17.173.66.102:443 [proto: 91/TLS][IP: 140/Apple][Encrypted][Confidence: DPI][DPI packets: 6][cat: Web/5][24 pkts/15117 bytes <-> 20 pkts/6254 bytes][Goodput ratio: 91/83][3.89 sec][bytes ratio: 0.415 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 180/27 2803/212 622/57][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 630/313 1494/1002 544/370][Plen Bins: 0,0,4,0,0,0,0,0,0,0,16,0,0,0,8,4,0,16,0,0,0,0,4,0,0,0,0,0,0,16,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,16,0,0]
 	2	TCP 192.168.2.4:49206 <-> 158.85.58.15:5222 [proto: 142/WhatsApp][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 5][cat: Chat/9][17 pkts/1794 bytes <-> 13 pkts/1169 bytes][Goodput ratio: 37/26][19.72 sec][bytes ratio: 0.211 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/10 1371/2066 10513/10479 2988/3556][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 106/90 267/144 68/22][PLAIN TEXT (iPhone)][Plen Bins: 21,50,7,0,0,14,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 17.110.229.14:5223 -> 192.168.2.4:49193 [proto: 91/TLS][IP: 140/Apple][Encrypted][Confidence: DPI][DPI packets: 6][cat: Web/5][6 pkts/2095 bytes -> 0 pkts/0 bytes][Goodput ratio: 81/0][20.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 659/0 4000/0 10199/0 3476/0][Pkt Len c2s/s2c min/avg/max/stddev: 220/0 349/0 375/0 58/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,16,0,0,0,0,83,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

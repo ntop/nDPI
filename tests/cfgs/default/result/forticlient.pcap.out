@@ -24,6 +24,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 FortiClient	2000	430931	5
 
+Safe                          2000 430931        5            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.178            	 2      

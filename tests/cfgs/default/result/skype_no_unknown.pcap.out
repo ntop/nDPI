@@ -41,6 +41,11 @@ Dropbox	8	4352	4
 Skype_Teams	518	198936	25
 NAT-PMP	4	216	1
 
+Safe                           474 102723        29           
+Acceptable                     754 231749        191          
+Dangerous                        5 1100          3            
+Unrated                        846 152252        44           
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.34             	 3      

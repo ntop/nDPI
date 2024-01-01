@@ -25,4 +25,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Facebook	20	11399	1
 
+Fun                             20 11399         1            
+
 	1	UDP 10.0.2.15:35957 <-> 69.171.250.15:443 [proto: 119/Facebook][IP: 119/Facebook][Encrypted][Confidence: Match by IP][DPI packets: 13][cat: SocialNetwork/6][7 pkts/3196 bytes <-> 13 pkts/8203 bytes][Goodput ratio: 79/85][8.96 sec][bytes ratio: -0.439 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1782/811 8808/8827 3513/2535][Pkt Len c2s/s2c min/avg/max/stddev: 128/115 457/631 1326/1346 492/540][PLAIN TEXT (Xic gcl)][Plen Bins: 20,25,10,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,0,0,0,0,5,0,0,0,0,0,5,20,0,0,0,0,0,0,0,0]

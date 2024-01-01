@@ -23,6 +23,8 @@ Patricia protocols IPv6: 1/1 (search/found)
 
 Cloudflare	10	4226	1
 
+Acceptable                      10 4226          1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 2001:b07:a3d:c112:ce16:b409:3d0a:9177 	 1      

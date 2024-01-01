@@ -27,6 +27,9 @@ Patricia protocols IPv6: 0/0 (search/found)
 TLS	7	2046	1
 Whois-DAS	16	4294	2
 
+Safe                             7 2046          1            
+Acceptable                      16 4294          2            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 10.17.34.139             	 1      

@@ -37,6 +37,12 @@ Telegram	908	185304	12
 Microsoft	2	284	1
 GoogleServices	2	186	1
 
+Safe                             7 780           3            
+Acceptable                    1243 262352        39           
+Fun                              9 742           2            
+Dangerous                        1 243           1            
+Unrated                        306 72708         3            
+
 	1	UDP 192.168.1.77:28150 <-> 91.108.8.1:533 [proto: 185/Telegram][IP: 185/Telegram][Encrypted][Confidence: DPI][DPI packets: 1][cat: Chat/9][12 pkts/1272 bytes <-> 276 pkts/68136 bytes][Goodput ratio: 60/83][16.92 sec][bytes ratio: -0.963 (Download)][IAT c2s/s2c min/avg/max/stddev: 48/0 290/61 504/476 186/43][Pkt Len c2s/s2c min/avg/max/stddev: 74/90 106/247 138/330 24/41][Plen Bins: 0,2,4,3,0,19,37,21,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.1.77:28150 <-> 91.108.8.8:529 [proto: 185/Telegram][IP: 185/Telegram][Encrypted][Confidence: DPI][DPI packets: 1][cat: Chat/9][285 pkts/65890 bytes <-> 13 pkts/1522 bytes][Goodput ratio: 82/64][16.92 sec][bytes ratio: 0.955 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4/27 59/210 504/472 30/201][Pkt Len c2s/s2c min/avg/max/stddev: 74/90 231/117 314/138 44/16][Plen Bins: 0,2,4,3,8,28,14,37,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP [fe80::4ba:91a:7817:e318]:5353 -> [ff02::fb]:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][120 pkts/27243 bytes -> 0 pkts/0 bytes][Goodput ratio: 73/0][58.59 sec][Hostname/SNI: _dacp._tcp.local][_dacp._tcp.local][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 504/0 17386/0 1760/0][Pkt Len c2s/s2c min/avg/max/stddev: 162/0 227/0 489/0 65/0][PLAIN TEXT (iTunes)][Plen Bins: 0,0,0,50,8,20,0,5,15,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

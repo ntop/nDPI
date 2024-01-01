@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 AVAST	142	9433	10
 
+Safe                           142 9433          10           
+
 	1	TCP 192.168.2.100:62741 <-> 5.62.53.131:80 [proto: 307/AVAST][IP: 307/AVAST][Encrypted][Confidence: DPI][DPI packets: 4][cat: Network/14][8 pkts/543 bytes <-> 7 pkts/512 bytes][Goodput ratio: 18/20][569.69 sec][bytes ratio: 0.029 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 63304/75961 189840/189839 89445/92978][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 68/73 150/140 31/28][Plen Bins: 67,0,16,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.2.100:64903 <-> 5.62.53.53:80 [proto: 307/AVAST][IP: 307/AVAST][Encrypted][Confidence: DPI][DPI packets: 4][cat: Network/14][8 pkts/583 bytes <-> 7 pkts/432 bytes][Goodput ratio: 24/4][1385.80 sec][bytes ratio: 0.149 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 171484/205784 356850/356863 172007/168697][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 73/62 150/70 32/3][Plen Bins: 67,16,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.2.100:49532 <-> 5.62.54.89:80 [proto: 307/AVAST][IP: 307/AVAST][Encrypted][Confidence: DPI][DPI packets: 4][cat: Network/14][8 pkts/544 bytes <-> 7 pkts/432 bytes][Goodput ratio: 18/4][797.30 sec][bytes ratio: 0.115 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 99700/119575 199551/199551 99662/97621][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 68/62 150/70 31/3][Plen Bins: 83,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

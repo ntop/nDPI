@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 SMBv23	101	30748	1
 
+Acceptable                     101 30748         1            
+
 	1	TCP 192.168.1.118:56848 <-> 192.168.1.187:445 [proto: 10.41/NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][62 pkts/14382 bytes <-> 39 pkts/16366 bytes][Goodput ratio: 77/87][2.38 sec][bytes ratio: -0.065 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 46/80 2157/2158 299/394][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 232/420 530/1514 194/299][Plen Bins: 0,0,4,7,1,0,1,1,0,1,7,9,20,21,6,13,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0]

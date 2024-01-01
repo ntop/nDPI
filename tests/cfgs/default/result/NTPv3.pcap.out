@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 NTP	1	90	1
 
+Acceptable                       1 90            1            
+
 	1	UDP 175.144.140.29:123 -> 78.46.76.2:80 [proto: 9/NTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

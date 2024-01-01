@@ -26,6 +26,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 ICMP	6	420	1
 Zoom	2508	652095	4
 
+Acceptable                    2514 652515        5            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.178            	 1      

@@ -27,6 +27,8 @@ ICMP	2	140	1
 RTP	2871	614394	5
 CiscoSkinny	94	10114	3
 
+Acceptable                    2967 624648        9            
+
 	1	UDP 192.168.195.58:32144 <-> 192.168.195.50:17718 [proto: 87/RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][DPI packets: 3][cat: Media/1][730 pkts/156220 bytes <-> 712 pkts/152368 bytes][Goodput ratio: 80/80][7.28 sec][bytes ratio: 0.012 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 7/7 20/20 9/9][Pkt Len c2s/s2c min/avg/max/stddev: 214/214 214/214 214/214 0/0][PLAIN TEXT (zwwtvutz)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.195.58:32150 -> 192.168.193.24:9395 [proto: 87/RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][DPI packets: 3][cat: Media/1][365 pkts/78110 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][7.28 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 19/0 20/0 20/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 214/0 214/0 214/0 0/0][PLAIN TEXT (zwwtvutz)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.195.58:32152 -> 192.168.193.24:9396 [proto: 87/RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][DPI packets: 3][cat: Media/1][356 pkts/76184 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][7.10 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 19/0 20/0 20/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 214/0 214/0 214/0 0/0][PLAIN TEXT (wskptvv)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

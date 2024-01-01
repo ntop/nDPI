@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 IMAP	33	3774	1
 
+Unsafe                          33 3774          1            
+
 	1	TCP 10.40.4.2:46045 <-> 10.40.3.2:143 [proto: 4/IMAP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 11][cat: Email/3][20 pkts/1507 bytes <-> 13 pkts/2267 bytes][Goodput ratio: 12/62][4.57 sec][User: samir][Pwd: pfres][bytes ratio: -0.201 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 9/17 39/39 15/16][Pkt Len c2s/s2c min/avg/max/stddev: 66/74 75/174 139/762 17/181][Risk: ** Unsafe Protocol **** Clear-Text Credentials **][Risk Score: 110][Risk Info: Found IMAP username (samir)][PLAIN TEXT ( OK IMAP4)][Plen Bins: 51,22,11,5,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

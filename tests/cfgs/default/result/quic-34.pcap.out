@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 QUIC	4	4836	1
 
+Acceptable                       4 4836          1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.56.1             	 1      

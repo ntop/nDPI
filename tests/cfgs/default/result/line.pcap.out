@@ -26,6 +26,9 @@ TLS	72	11499	1
 Line	37	9480	1
 LineCall	181	42253	3
 
+Safe                            72 11499         1            
+Acceptable                     218 51733         4            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 10.200.3.125             	 1      

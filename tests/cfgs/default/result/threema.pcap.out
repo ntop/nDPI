@@ -26,6 +26,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Threema	83	11578	6
 
+Fun                             83 11578         6            
+
 	1	TCP 192.168.2.100:50484 <-> 185.88.236.110:5222 [proto: 305/Threema][IP: 305/Threema][Encrypted][Confidence: DPI][DPI packets: 10][cat: Chat/9][9 pkts/1998 bytes <-> 6 pkts/1066 bytes][Goodput ratio: 70/62][30.23 sec][bytes ratio: 0.304 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/28 347/6958 2277/27743 788/12000][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 222/178 801/534 238/162][Plen Bins: 0,33,22,0,0,11,0,0,0,0,0,0,11,0,11,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.2.100:50298 <-> 185.88.236.110:5222 [proto: 305/Threema][IP: 305/Threema][Encrypted][Confidence: DPI][DPI packets: 10][cat: Chat/9][10 pkts/2025 bytes <-> 5 pkts/548 bytes][Goodput ratio: 67/38][46.73 sec][bytes ratio: 0.574 (Upload)][IAT c2s/s2c min/avg/max/stddev: 3/31 5838/33 46525/38 15378/3][Pkt Len c2s/s2c min/avg/max/stddev: 66/74 202/110 510/146 167/24][Plen Bins: 0,44,11,0,0,11,0,0,0,11,0,11,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.2.100:50618 <-> 185.88.236.110:5222 [proto: 305/Threema][IP: 305/Threema][Encrypted][Confidence: DPI][DPI packets: 10][cat: Chat/9][9 pkts/879 bytes <-> 6 pkts/1079 bytes][Goodput ratio: 31/62][5.39 sec][bytes ratio: -0.102 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/28 52/1686 209/4996 67/2340][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 98/180 257/661 59/217][Plen Bins: 0,40,20,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

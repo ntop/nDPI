@@ -24,6 +24,9 @@ Patricia protocols IPv6: 2/0 (search/found)
 SMTPS	33	6429	1
 Google	36	8403	1
 
+Safe                            33 6429          1            
+Acceptable                      36 8403          1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 10.0.0.1                 	 1      

@@ -29,6 +29,10 @@ TLS	28	15397	1
 ICMPV6	48	7862	3
 Facebook	37	14726	3
 
+Safe                            32 15913         3            
+Acceptable                      58 9654          4            
+Fun                             37 14726         3            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 2001:470:1f17:13f:3e97:eff:fe73:4dec 	 2      

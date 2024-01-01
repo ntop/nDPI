@@ -23,6 +23,8 @@ Patricia protocols IPv6: 4/0 (search/found)
 
 Syncthing	34	15680	4
 
+Fun                             34 15680         4            
+
 	1	UDP [fe80::6238:e0ff:fec5:35a0]:47077 -> [ff12::8384]:21027 [proto: 313/Syncthing][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][15 pkts/7450 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][419.99 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 29994/0 30000/0 30004/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 267/0 497/0 530/0 85/0][PLAIN TEXT (//192.168.2.100)][Plen Bins: 0,0,0,0,0,0,6,6,0,0,0,0,0,0,87,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.2.100:54977 -> 192.168.2.255:21027 [proto: 313/Syncthing][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][15 pkts/7150 bytes -> 0 pkts/0 bytes][Goodput ratio: 91/0][0.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 29994/0 30000/0 30005/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 247/0 477/0 510/0 85/0][PLAIN TEXT (//192.168.2.100)][Plen Bins: 0,0,0,0,0,0,6,6,0,0,0,0,0,0,87,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP [fe80::6238:e0ff:fec5:35a0]:42370 -> [ff12::8384]:21027 [proto: 313/Syncthing][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Download/7][2 pkts/560 bytes -> 0 pkts/0 bytes][Goodput ratio: 78/0][29.99 sec][PLAIN TEXT (//192.168.2.100)][Plen Bins: 0,0,0,0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

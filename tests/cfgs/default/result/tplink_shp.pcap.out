@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 TPLINK_SHP	251	17821	8
 
+Acceptable                     251 17821         8            
+
 	1	UDP 192.168.242.40:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][32 pkts/2272 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1860.44 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 58157/0 60014/0 62682/0 801/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.242.41:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][32 pkts/2272 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1860.44 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 59941/0 60012/0 60058/0 30/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.242.99:9999 -> 255.255.255.255:9999 [proto: 332/TPLINK_SHP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][32 pkts/2272 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][1860.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 59882/0 59999/0 60106/0 30/0][Pkt Len c2s/s2c min/avg/max/stddev: 71/0 71/0 71/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

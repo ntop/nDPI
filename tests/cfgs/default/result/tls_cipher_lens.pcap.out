@@ -24,6 +24,9 @@ Patricia protocols IPv6: 0/0 (search/found)
 TLS	4	932	4
 Google	1	233	1
 
+Safe                             4 932           4            
+Acceptable                       1 233           1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.11.11            	 2      

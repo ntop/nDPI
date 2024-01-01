@@ -28,6 +28,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 DNS	15	1612	1
 NestLogSink	759	116848	13
 
+Acceptable                     774 118460        14           
+
 	1	TCP 192.168.242.15:63342 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][IP: 284/GoogleCloud][ClearText][Confidence: DPI][DPI packets: 8][cat: Cloud/13][37 pkts/14650 bytes <-> 35 pkts/4115 bytes][Goodput ratio: 86/54][4.71 sec][bytes ratio: 0.561 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4/0 142/150 1347/1490 251/290][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 396/118 585/733 192/108][PLAIN TEXT (05CA02AC4414028)][Plen Bins: 0,50,1,1,0,0,0,0,0,0,0,0,0,0,45,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.242.15:63345 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][IP: 284/GoogleCloud][ClearText][Confidence: DPI][DPI packets: 8][cat: Cloud/13][36 pkts/14613 bytes <-> 35 pkts/4114 bytes][Goodput ratio: 86/54][4.14 sec][bytes ratio: 0.561 (Upload)][IAT c2s/s2c min/avg/max/stddev: 11/0 132/134 1166/1477 229/290][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 406/118 584/732 185/107][PLAIN TEXT (05CA02AC4414028)][Plen Bins: 0,50,1,0,1,0,0,0,0,0,0,0,0,0,45,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.242.15:63351 <-> 35.188.154.186:11095 [proto: 43/NestLogSink][IP: 284/GoogleCloud][ClearText][Confidence: DPI][DPI packets: 8][cat: Cloud/13][25 pkts/9229 bytes <-> 24 pkts/2916 bytes][Goodput ratio: 85/55][3.56 sec][bytes ratio: 0.520 (Upload)][IAT c2s/s2c min/avg/max/stddev: 5/0 164/174 1319/1484 293/350][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 369/122 584/733 204/130][PLAIN TEXT (05CA02AC4414028)][Plen Bins: 0,50,2,0,0,0,0,0,0,0,0,2,0,0,41,0,2,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

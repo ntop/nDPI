@@ -26,6 +26,9 @@ DNS	2	178	1
 TLS	58	36496	1
 HTTP_Connect	40	26841	1
 
+Safe                            58 36496         1            
+Acceptable                      42 27019         2            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.146            	 1      

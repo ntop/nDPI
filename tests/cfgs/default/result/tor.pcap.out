@@ -31,6 +31,11 @@ DHCPV6	6	906	1
 Dropbox	10	1860	1
 Tor	112	39736	3
 
+Safe                           220 93832         5            
+Acceptable                      16 2766          2            
+Potentially Dangerous           112 39736         3            
+Dangerous                        1 252           1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.252            	 1      

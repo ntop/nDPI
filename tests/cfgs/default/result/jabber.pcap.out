@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Jabber	358	61304	12
 
+Acceptable                     358 61304         12           
+
 	1	TCP 172.16.0.62:57094 <-> 172.16.1.138:5222 [proto: 67/Jabber][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][44 pkts/5701 bytes <-> 42 pkts/13807 bytes][Goodput ratio: 49/80][2.17 sec][bytes ratio: -0.416 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 36/39 611/611 109/111][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 130/329 559/1514 104/415][PLAIN TEXT (xml version)][Plen Bins: 2,4,2,24,9,13,4,6,9,0,2,2,2,0,0,4,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0]
 	2	TCP 172.16.0.62:57122 <-> 172.16.1.138:5222 [proto: 67/Jabber][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][44 pkts/5701 bytes <-> 42 pkts/13806 bytes][Goodput ratio: 49/80][2.16 sec][bytes ratio: -0.415 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 36/39 521/520 99/101][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 130/329 677/1514 116/415][PLAIN TEXT (xml version)][Plen Bins: 2,4,2,22,9,15,4,7,9,0,2,2,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0]
 	3	TCP 172.16.0.62:57149 <-> 172.16.1.138:5222 [proto: 67/Jabber][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Web/5][21 pkts/2752 bytes <-> 17 pkts/3414 bytes][Goodput ratio: 50/67][656.22 sec][bytes ratio: -0.107 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 35858/700 600484/4996 141164/1575][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 131/201 305/529 77/137][PLAIN TEXT (presence to)][Plen Bins: 0,18,0,22,18,9,18,4,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
