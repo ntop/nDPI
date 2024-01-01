@@ -230,7 +230,6 @@ static int load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
 			       char *dir_path);
 
 static void set_default_config(struct ndpi_detection_module_config_struct *cfg);
-static void free_config(struct ndpi_detection_module_config_struct *cfg);
 
 /* ****************************************** */
 
@@ -3307,14 +3306,14 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     return -1;
   }
 
-  if(ndpi_str->cfg.dirname_domains) {
+  if(ndpi_str->cfg.dirname_domains[0] != '\0') {
     rc = load_categories_dir(ndpi_str, ndpi_str->cfg.dirname_domains);
     if(rc < 0)
       NDPI_LOG_ERR(ndpi_str, "Error loadind directory %s: %d\n",
                    ndpi_str->cfg.dirname_domains, rc);
   }
 
-  if(ndpi_str->cfg.filename_protocols) {
+  if(ndpi_str->cfg.filename_protocols[0] != '\0') {
     fd = fopen(ndpi_str->cfg.filename_protocols, "r");
     if(fd == NULL) {
       NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
@@ -3327,7 +3326,7 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
       NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
                    ndpi_str->cfg.filename_protocols, rc);
   }
-  if(ndpi_str->cfg.filename_categories) {
+  if(ndpi_str->cfg.filename_categories[0] != '\0') {
     fd = fopen(ndpi_str->cfg.filename_categories, "r");
     if(fd == NULL) {
       NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
@@ -3340,7 +3339,7 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
       NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
                    ndpi_str->cfg.filename_categories, rc);
   }
-  if(ndpi_str->cfg.filename_malicious_sha1) {
+  if(ndpi_str->cfg.filename_malicious_sha1[0] != '\0') {
     fd = fopen(ndpi_str->cfg.filename_malicious_sha1, "r");
     if(fd == NULL) {
       NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
@@ -3353,7 +3352,7 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
       NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
                    ndpi_str->cfg.filename_malicious_sha1, rc);
   }
-  if(ndpi_str->cfg.filename_malicious_ja3) {
+  if(ndpi_str->cfg.filename_malicious_ja3[0] != '\0') {
     fd = fopen(ndpi_str->cfg.filename_malicious_ja3, "r");
     if(fd == NULL) {
       NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
@@ -3366,7 +3365,7 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
       NDPI_LOG_ERR(ndpi_str, "Error loadind file %s: %d\n",
                    ndpi_str->cfg.filename_malicious_ja3, rc);
   }
-  if(ndpi_str->cfg.filename_risky_domains) {
+  if(ndpi_str->cfg.filename_risky_domains[0] != '\0') {
     fd = fopen(ndpi_str->cfg.filename_risky_domains, "r");
     if(fd == NULL) {
       NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n",
@@ -4083,8 +4082,6 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 	    ndpi_free(ndpi_str->callback_buffer);
     if(ndpi_str->callback_buffer_tcp_payload)
 	    ndpi_free(ndpi_str->callback_buffer_tcp_payload);
-
-    free_config(&ndpi_str->cfg);
 
     ndpi_free(ndpi_str);
   }
@@ -10540,19 +10537,17 @@ static ndpi_cfg_error _set_param_string(struct ndpi_detection_module_struct *ndp
                                         const char *min_value, const char *max_value,
                                         const char *proto)
 {
-  char **variable = (char **)_variable;
+  char *variable = (char *)_variable;
 
-  *variable = ndpi_strdup(value);
-  if(!*variable)
-    return NDPI_CFG_MEM_ERROR;
+  strncpy(variable, value, CFG_MAX_LEN);
   return NDPI_CFG_OK;
 }
 
 static char *_get_param_string(void *_variable, const char *proto, char *buf, int buf_len)
 {
-  char **variable = (char **)_variable;
+  char *variable = (char *)_variable;
 
-  snprintf(buf, buf_len, "%s", *variable);
+  snprintf(buf, buf_len, "%s", variable);
   buf[buf_len - 1] = '\0';
   return buf;
 }
@@ -10562,18 +10557,16 @@ static ndpi_cfg_error _set_param_filename(struct ndpi_detection_module_struct *n
                                           const char *min_value, const char *max_value,
                                           const char *proto)
 {
-  char **variable = (char **)_variable;
+  char *variable = (char *)_variable;
 
   if(value == NULL) { /* Valid value */
-    *variable = NULL;
+    variable[0] = '\0';
     return NDPI_CFG_OK;
   }
 
   if(access(value, F_OK) != 0)
     return NDPI_CFG_INVALID_VALUE;
-  *variable = ndpi_strdup(value);
-  if(!*variable)
-    return NDPI_CFG_MEM_ERROR;
+  strncpy(variable, value, CFG_MAX_LEN);
   return NDPI_CFG_OK;
 }
 
@@ -10676,14 +10669,13 @@ static const struct cfg_op {
   enum cfg_param_type type;
   cfg_set fn_set;
   cfg_get fn_get;
-  int to_free;
 } cfg_ops[] = {
-  { CFG_PARAM_ENABLE_DISABLE,          _set_param_enable_disable,          _get_param_int,                     0 },
-  { CFG_PARAM_INT,                     _set_param_int,                     _get_param_int,                     0 },
-  { CFG_PARAM_STRING,                  _set_param_string,                  _get_param_string,                  1 },
-  { CFG_PARAM_FILENAME,                _set_param_filename,                _get_param_string,                  1 },
-  { CFG_PARAM_PROTOCOL_ENABLE_DISABLE, _set_param_protocol_enable_disable, _get_param_protocol_enable_disable, 0 },
-  { CFG_PARAM_FILENAME_CONFIG,         _set_param_filename_config,         _get_param_string,                  1 },
+  { CFG_PARAM_ENABLE_DISABLE,          _set_param_enable_disable,          _get_param_int },
+  { CFG_PARAM_INT,                     _set_param_int,                     _get_param_int },
+  { CFG_PARAM_STRING,                  _set_param_string,                  _get_param_string },
+  { CFG_PARAM_FILENAME,                _set_param_filename,                _get_param_string },
+  { CFG_PARAM_PROTOCOL_ENABLE_DISABLE, _set_param_protocol_enable_disable, _get_param_protocol_enable_disable },
+  { CFG_PARAM_FILENAME_CONFIG,         _set_param_filename_config,         _get_param_string },
 };
 
 #define __OFF(a)	offsetof(struct ndpi_detection_module_config_struct, a)
@@ -10790,16 +10782,6 @@ static void set_default_config(struct ndpi_detection_module_config_struct *cfg)
   for(c = &cfg_params[0]; c && c->param; c++) {
     cfg_ops[c->type].fn_set(NULL, (void *)((char *)cfg + c->offset),
                             c->default_value, c->min_value, c->max_value, c->proto);
-  }
-}
-
-static void free_config(struct ndpi_detection_module_config_struct *cfg)
-{
-  const struct cfg_param *c;
-
-  for(c = &cfg_params[0]; c && c->param; c++) {
-    if(cfg_ops[c->type].to_free)
-      ndpi_free(*(char **)((char *)cfg + c->offset));
   }
 }
 

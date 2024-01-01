@@ -122,6 +122,8 @@ typedef struct {
 } nbpf_filter;
 #endif
 
+#define CFG_MAX_LEN	256
+
 struct ndpi_detection_module_config_struct {
   int max_packets_to_process;
   int direction_detect_enabled;
@@ -145,14 +147,14 @@ struct ndpi_detection_module_config_struct {
   int libgcrypt_init;
   int guess_on_giveup;
 
-  char *filename_protocols;
-  char *filename_categories;
-  char *filename_malicious_sha1;
-  char *filename_malicious_ja3;
-  char *filename_risky_domains;
-  char *dirname_domains;
+  char filename_protocols[CFG_MAX_LEN];
+  char filename_categories[CFG_MAX_LEN];
+  char filename_malicious_sha1[CFG_MAX_LEN];
+  char filename_malicious_ja3[CFG_MAX_LEN];
+  char filename_risky_domains[CFG_MAX_LEN];
+  char dirname_domains[CFG_MAX_LEN];
 
-  char *filename_config;
+  char filename_config[CFG_MAX_LEN];
 
   NDPI_PROTOCOL_BITMASK detection_bitmask;
 
