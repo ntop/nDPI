@@ -642,6 +642,7 @@ void init_json_rpc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 void init_kafka_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_nomachine_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_iec62056_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_hl7_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 

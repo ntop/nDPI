@@ -438,3 +438,12 @@ References: `Paid Specs: <https://webstore.iec.ch/publication/22487>`_
 Notes:
 
 - Wireshark is not able to recognize this protocol. Some old plugins/code (with some documentation) are available `here <https://github.com/bearxiong99/wireshark-dlms>` and `here <https://github.com/matousp/dlms-analysis/tree/master>`.
+
+
+.. _Proto 380:
+
+`NDPI_PROTOCOL_HL7`
+=========================
+HL7 is a range of global standards for the transfer of clinical and administrative health data between applications.
+
+References: `Main site <https://www.hl7.org/>`_
