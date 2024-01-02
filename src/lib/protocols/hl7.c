@@ -1,7 +1,7 @@
 /*
  * hl7.c
  *
- * Health Level Seven (HL7) Version 2.x
+ * Health Level Seven (HL7)
  * 
  * Copyright (C) 2023 - ntop.org
  * Copyright (C) 2023 - V.G <jacendi@protonmail.com>
@@ -37,6 +37,24 @@ static void ndpi_search_hl7(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search HL7\n");
+
+  if (((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP) ||
+      (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP)) &&
+      packet->content_line.ptr != NULL)
+  {
+    if ((LINE_ENDS(packet->content_line, "x-application/hl7-v2+er7") != 0) ||
+        (LINE_ENDS(packet->content_line, "x-application/hl7-v2+xml") != 0) ||
+        (LINE_ENDS(packet->content_line, "x-application/hl7-v3+xml") != 0) ||
+        (LINE_ENDS(packet->content_line, "x-application/fhir+xml") != 0)   ||
+        (LINE_ENDS(packet->content_line, "x-application/fhir+json") != 0)  ||
+        (LINE_ENDS(packet->content_line, "x-application/xml+cda") != 0))
+    {
+      NDPI_LOG_INFO(ndpi_struct, "found HL7 over HTTP\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HL7, NDPI_PROTOCOL_HTTP, 
+                                 NDPI_CONFIDENCE_DPI);
+    }
+    return;
+  }
 
   if (packet->payload_packet_len > 100 &&
       ndpi_strnstr((const char *)packet->payload, "MSH|^~\\&|", packet->payload_packet_len))
