@@ -11,7 +11,7 @@ extern "C" int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
-  u_int16_t i, num_iteration, is_added = 0;
+  u_int16_t i, j, num_iteration, is_added = 0;
   AC_AUTOMATA_t *a;
   void *a2;
   MATCH_CALLBACK_f mc;
@@ -20,7 +20,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char *value_dup, *value_added;
   AC_REP_t match;
   AC_TEXT_t ac_input_text;
-  FILE *f;
   u_int16_t protocol_id;
   ndpi_protocol_category_t category;
   ndpi_protocol_breed_t breed;
@@ -59,31 +58,38 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
   for (i = 0; i < num_iteration; i++) {
-    memset(&ac_pattern, 0, sizeof(ac_pattern));
-
     std::string value = fuzzed_data.ConsumeRandomLengthString(64);
-    value_dup = ndpi_strdup(value.c_str());
-    if (!value_dup)
-      continue;
 
-    ac_pattern.astring = value_dup;
-    ac_pattern.length = strlen(value_dup);
-    ac_pattern.rep.number = fuzzed_data.ConsumeIntegral<u_int16_t>();
-    ac_pattern.rep.category = 0;
-    ac_pattern.rep.breed = 0;
-    ac_pattern.rep.level = fuzzed_data.ConsumeIntegralInRange(0, 2);
-    ac_pattern.rep.from_start = fuzzed_data.ConsumeBool();
-    ac_pattern.rep.at_end = fuzzed_data.ConsumeBool();
-    ac_pattern.rep.dot = memchr(value_dup, '.', strlen(value_dup)) != NULL;
+    /* Adding (sometimes) the same string twice, with different "properties" */
+    for (j = 0; j < 2; j++) {
+      if (j == 1 && fuzzed_data.ConsumeBool())
+        continue;
 
-    if (ac_automata_add(a, &ac_pattern) != ACERR_SUCCESS) {
-      ndpi_free(value_dup);
-    } else {
-      /* Keep one random string really added */
-      if (is_added == 0 && fuzzed_data.ConsumeBool()) {
-        value_added = ndpi_strdup(value_dup);
-	if (value_added)
-          is_added = 1;
+      memset(&ac_pattern, 0, sizeof(ac_pattern));
+
+      value_dup = ndpi_strdup(value.c_str());
+      if (!value_dup)
+        continue;
+
+      ac_pattern.astring = value_dup;
+      ac_pattern.length = strlen(value_dup);
+      ac_pattern.rep.number = fuzzed_data.ConsumeIntegral<u_int16_t>();
+      ac_pattern.rep.category = 0;
+      ac_pattern.rep.breed = 0;
+      ac_pattern.rep.level = fuzzed_data.ConsumeIntegralInRange(0, 2);
+      ac_pattern.rep.from_start = fuzzed_data.ConsumeBool();
+      ac_pattern.rep.at_end = fuzzed_data.ConsumeBool();
+      ac_pattern.rep.dot = memchr(value_dup, '.', strlen(value_dup)) != NULL;
+
+      if (ac_automata_add(a, &ac_pattern) != ACERR_SUCCESS) {
+        ndpi_free(value_dup);
+      } else {
+        /* Keep one random string really added */
+        if (is_added == 0 && fuzzed_data.ConsumeBool()) {
+          value_added = ndpi_strdup(value_dup);
+	  if (value_added)
+            is_added = 1;
+        }
       }
     }
 
@@ -133,10 +139,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_free(value_added);
   }
 
-  f = fopen("/dev/null", "w");
-  ac_automata_dump(a, f);
-  if (f)
-    fclose(f);
+  ac_automata_dump(a, stdout);
 
   ac_automata_get_stats(a, &stats);
 

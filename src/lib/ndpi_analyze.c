@@ -1729,6 +1729,9 @@ double ndpi_pearson_correlation(u_int32_t *values_a, u_int32_t *values_b, u_int1
   variance_a = sum_squared_diff_a / (double)num_values, variance_b = sum_squared_diff_b / (double)num_values;
   covariance = sum_product_diff / (double)num_values;
 
+  if(variance_a == 0.0 || variance_b == 0.0)
+    return(0.0);
+
   return(covariance / sqrt(variance_a * variance_b));
 }
 
@@ -1828,6 +1831,15 @@ u_int16_t ndpi_crc16_ccit_false(const void *data, size_t n_bytes) {
 
 u_int16_t ndpi_crc16_xmodem(const void *data, size_t n_bytes) {
   return __crc16(0, data, n_bytes);
+}
+
+u_int16_t ndpi_crc16_x25(const void* data, size_t n_bytes) {
+  u_int16_t crc = 0xFFFF;
+  u_int8_t* b = (u_int8_t*)data;
+  while (n_bytes--) {
+    crc = (crc >> 8) ^ crc16_ccitt_table[(crc ^ *b++) & 0xFF];
+  }
+  return (crc ^ 0xFFFF);
 }
 
 /* ********************************************************** */
