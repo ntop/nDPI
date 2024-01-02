@@ -104,13 +104,11 @@
 /fuzz/fuzz_alg_hll_seed_corpus.zip
 /fuzz/fuzz_alg_jitter_seed_corpus.zip
 /fuzz/fuzz_alg_crc32_md5_seed_corpus.zip
-/fuzz/fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip
 /fuzz/fuzz_alg_bytestream_seed_corpus.zip
 /fuzz/fuzz_ds_patricia_seed_corpus.zip
 /fuzz/fuzz_ds_libcache_seed_corpus.zip
 /fuzz/fuzz_ds_tree_seed_corpus.zip
 /fuzz/fuzz_ds_ptree_seed_corpus.zip
-/fuzz/fuzz_ds_ahocorasick_seed_corpus.zip
 /fuzz/fuzz_ds_bitmap64_seed_corpus.zip
 /fuzz/fuzz_ds_domain_classify_seed_corpus.zip
 /fuzz/fuzz_libinjection_seed_corpus.zip

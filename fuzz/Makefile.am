@@ -635,17 +635,9 @@ files_corpus_fuzz_ds_patricia :=  $(wildcard corpus/fuzz_ds_patricia/*)
 fuzz_ds_patricia_seed_corpus.zip: $(files_corpus_fuzz_ds_patricia)
 	zip -j fuzz_ds_patricia_seed_corpus.zip $(files_corpus_fuzz_ds_patricia)
 
-files_corpus_fuzz_ds_ahocorasick :=  $(wildcard corpus/fuzz_ds_ahocorasick/*)
-fuzz_ds_ahocorasick_seed_corpus.zip: $(files_corpus_fuzz_ds_ahocorasick)
-	zip -j fuzz_ds_ahocorasick_seed_corpus.zip $(files_corpus_fuzz_ds_ahocorasick)
-
 files_corpus_fuzz_alg_ses_des :=  $(wildcard corpus/fuzz_alg_ses_des/*)
 fuzz_alg_ses_des_seed_corpus.zip: $(files_corpus_fuzz_alg_ses_des)
 	zip -j fuzz_alg_ses_des_seed_corpus.zip $(files_corpus_fuzz_alg_ses_des)
-
-files_corpus_fuzz_alg_hw_rsi_outliers_da :=  $(wildcard corpus/fuzz_alg_hw_rsi_outliers_da/*)
-fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip: $(files_corpus_fuzz_alg_hw_rsi_outliers_da)
-	zip -j fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip $(files_corpus_fuzz_alg_hw_rsi_outliers_da)
 
 files_corpus_fuzz_alg_bins :=  $(wildcard corpus/fuzz_alg_bins/*)
 fuzz_alg_bins_seed_corpus.zip: $(files_corpus_fuzz_alg_bins)
@@ -723,7 +715,7 @@ files_corpus_fuzz_ds_domain_classify :=  $(wildcard corpus/fuzz_ds_domain_classi
 fuzz_ds_domain_classify_seed_corpus.zip: $(files_corpus_fuzz_ds_domain_classify)
 	zip -j fuzz_ds_domain_classify_seed_corpus.zip $(files_corpus_fuzz_ds_domain_classify)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_ds_ahocorasick_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_hw_rsi_outliers_da_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_malicious_ja3_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_config_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_malicious_ja3_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip
 	cp corpus/fuzz_*seed_corpus.zip .
 
 #Create dictionaries exactly as expected by oss-fuzz.
@@ -770,9 +762,7 @@ distdir:
 		-o -path './corpus/fuzz_alg_hll/*' \
 		-o -path './corpus/fuzz_alg_jitter/*' \
 		-o -path './corpus/fuzz_alg_crc32_md5/*' \
-		-o -path './corpus/fuzz_alg_hw_rsi_outliers_da/*' \
 		-o -path './corpus/fuzz_alg_bytestream/*' \
-		-o -path './corpus/fuzz_ds_ahocorasick/*' \
 		-o -path './corpus/fuzz_ds_libcache/*' \
 		-o -path './corpus/fuzz_ds_tree/*' \
 		-o -path './corpus/fuzz_ds_bitmap64/*' \

@@ -1,10 +1,10 @@
 Guessed flow protos:	1
 
-DPI Packets (TCP):	18	(6.00 pkts/flow)
+DPI Packets (TCP):	30	(7.50 pkts/flow)
 DPI Packets (UDP):	4	(2.00 pkts/flow)
 Confidence Match by port    : 1 (flows)
-Confidence DPI              : 4 (flows)
-Num dissector calls: 688 (137.60 diss/flow)
+Confidence DPI              : 5 (flows)
+Num dissector calls: 922 (153.67 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -22,15 +22,17 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   10/0 (search/found)
+Patricia protocols:   12/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 PostgreSQL	10	689	1
 Usenet	12	1099	2
+TeamViewer	59	31448	1
 WireGuard	4	592	2
 
-	1	TCP 172.16.20.244:59038 <-> 172.16.20.75:5432 [proto: 19/PostgreSQL][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Database/11][6 pkts/416 bytes <-> 4 pkts/273 bytes][Goodput ratio: 2/0][0.02 sec][bytes ratio: 0.208 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/9 17/18 7/9][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 69/68 78/74 5/3][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	TCP 172.26.235.166:55630 <-> 172.30.92.62:119 [proto: 93/Usenet][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][4 pkts/293 bytes <-> 2 pkts/264 bytes][Goodput ratio: 7/47][0.02 sec][bytes ratio: 0.052 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/17 6/17 17/17 8/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/74 73/132 87/190 9/58][PLAIN TEXT (200 Leafnode NNTP Daemon)][Plen Bins: 50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	3	TCP 192.168.190.20:55630 <-> 192.168.190.5:119 [proto: 93/Usenet][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][4 pkts/278 bytes <-> 2 pkts/264 bytes][Goodput ratio: 2/47][0.02 sec][bytes ratio: 0.026 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/17 6/17 17/17 8/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/74 70/132 74/190 4/58][PLAIN TEXT (200 Leafnode NNTP Daemon)][Plen Bins: 50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	4	UDP 10.9.0.1:43462 <-> 10.9.0.2:51820 [proto: 206/WireGuard][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: VPN/2][1 pkts/190 bytes <-> 1 pkts/106 bytes][Goodput ratio: 77/60][0.00 sec][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	5	UDP 10.147.205.42:43462 <-> 10.45.123.132:51820 [proto: 206/WireGuard][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 2][cat: VPN/2][1 pkts/190 bytes <-> 1 pkts/106 bytes][Goodput ratio: 77/60][0.00 sec][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.0.1:8787 <-> 10.10.10.1:32177 [proto: 148/TeamViewer][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 12][cat: RemoteAccess/12][25 pkts/14755 bytes <-> 34 pkts/16693 bytes][Goodput ratio: 90/89][2.12 sec][bytes ratio: -0.062 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 79/59 277/257 105/90][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 590/491 1514/1514 585/593][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (XDsiBZ)][Plen Bins: 0,19,2,5,2,0,0,0,0,0,0,5,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2,15,5,0,2,2,2,0,0,0,0,0,0,29,0,0]
+	2	TCP 172.16.20.244:59038 <-> 172.16.20.75:5432 [proto: 19/PostgreSQL][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Database/11][6 pkts/416 bytes <-> 4 pkts/273 bytes][Goodput ratio: 2/0][0.02 sec][bytes ratio: 0.208 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/9 17/18 7/9][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 69/68 78/74 5/3][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 172.26.235.166:55630 <-> 172.30.92.62:119 [proto: 93/Usenet][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][4 pkts/293 bytes <-> 2 pkts/264 bytes][Goodput ratio: 7/47][0.02 sec][bytes ratio: 0.052 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/17 6/17 17/17 8/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/74 73/132 87/190 9/58][PLAIN TEXT (200 Leafnode NNTP Daemon)][Plen Bins: 50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 192.168.190.20:55630 <-> 192.168.190.5:119 [proto: 93/Usenet][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][4 pkts/278 bytes <-> 2 pkts/264 bytes][Goodput ratio: 2/47][0.02 sec][bytes ratio: 0.026 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/17 6/17 17/17 8/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/74 70/132 74/190 4/58][PLAIN TEXT (200 Leafnode NNTP Daemon)][Plen Bins: 50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 10.9.0.1:43462 <-> 10.9.0.2:51820 [proto: 206/WireGuard][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: VPN/2][1 pkts/190 bytes <-> 1 pkts/106 bytes][Goodput ratio: 77/60][0.00 sec][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 10.147.205.42:43462 <-> 10.45.123.132:51820 [proto: 206/WireGuard][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 2][cat: VPN/2][1 pkts/190 bytes <-> 1 pkts/106 bytes][Goodput ratio: 77/60][0.00 sec][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

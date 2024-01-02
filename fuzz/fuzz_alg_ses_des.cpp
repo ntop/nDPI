@@ -33,8 +33,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_free(values);
 
   significance = fuzzed_data.ConsumeFloatingPointInRange<float>(0, 1.1);
-  rc_ses = ndpi_ses_init(&s, alpha_ses, significance);
-  rc_des = ndpi_des_init(&d, alpha_des, beta, significance);
+  rc_ses = ndpi_ses_init(fuzzed_data.ConsumeBool() ? &s : NULL, alpha_ses, significance);
+  rc_des = ndpi_des_init(fuzzed_data.ConsumeBool() ? &d : NULL, alpha_des, beta, significance);
 
   num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
   for (i = 0; i < num_iteration; i++) {
