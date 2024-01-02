@@ -1571,6 +1571,7 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "O=Yandex LLC",                    NDPI_PROTOCOL_YANDEX },
   { "O=Riot Games, Inc.",              NDPI_PROTOCOL_RIOTGAMES   },
   { "O=Riot Games Inc",                NDPI_PROTOCOL_RIOTGAMES   },
+  { "O=NoMachine",                     NDPI_PROTOCOL_NOMACHINE },
 
   { "CN=hangouts",                     NDPI_PROTOCOL_HANGOUT_DUO },
   { "CN=Snapchat Inc.",                NDPI_PROTOCOL_SNAPCHAT_CALL },

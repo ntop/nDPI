@@ -408,3 +408,12 @@ Notes:
 Apache Kafka is a distributed event store and stream-processing platform.
 
 References: `Official site <https://kafka.apache.org>`_ and `Github <https://github.com/apache/kafka>`_.
+
+
+.. _Proto 378:
+
+`NDPI_PROTOCOL_NOMACHINE`
+======================
+NoMachine is a popular proprietary remote desktop software.
+
+References: `Main site <https://www.nomachine.com/>`_.

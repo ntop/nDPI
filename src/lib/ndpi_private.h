@@ -640,6 +640,7 @@ void init_uftp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 void init_openflow_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_json_rpc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_kafka_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_nomachine_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 
