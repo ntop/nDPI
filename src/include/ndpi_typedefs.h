@@ -849,9 +849,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_LOTUS_NOTES */
   u_int8_t lotus_notes_packet_id;
 
-  /* NDPI_PROTOCOL_TEAMVIEWER */
-  u_int8_t teamviewer_stage;
-
   /* NDPI_PROTOCOL_ZMQ */
   u_int8_t prev_zmq_pkt_len;
   u_char prev_zmq_pkt[10];
@@ -891,9 +888,6 @@ struct ndpi_flow_udp_struct {
 
   /* NDPI_PROTOCOL_SKYPE */
   u_int8_t skype_crc[4];
-
-  /* NDPI_PROTOCOL_TEAMVIEWER */
-  u_int8_t teamviewer_stage;
 
   /* NDPI_PROTOCOL_EAQ */
   u_int8_t eaq_pkt_id;
@@ -1455,6 +1449,8 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_OOKLA */
   u_int8_t ookla_stage : 1;
 
+  /* NDPI_PROTOCOL_TEAMVIEWER */
+  u_int8_t teamviewer_stage : 3;
 
   /* NDPI_PROTOCOL_OPENVPN */
   u_int8_t ovpn_session_id[2][8];
