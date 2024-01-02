@@ -1972,7 +1972,7 @@ extern "C" {
 
   /* ******************************* */
 
-  u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long);
+  u_int32_t ndpi_quick_16_byte_hash(const u_int8_t *in_16_bytes_long);
 
   /* ******************************* */
 

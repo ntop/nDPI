@@ -15,13 +15,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int16_t num_periods;
   u_int8_t additive_seeasonal;
   double alpha, beta, gamma, forecast, confidence_band;
-  float significance;
-  u_int32_t *values, predict_periods;
+  float significance, lower, upper, threshold;
+  u_int32_t *values, *values2, predict_periods;
   u_int32_t prediction;
+  u_int32_t value_to_check;
   bool *outliers;
 
-  /* Use the same (integral) dataset to peform: RSI, Data analysis, HW, outliers
-     and linear regression */
+  /* Use the same (integral) dataset to peform: RSI, Data analysis, HW, outliers,
+     linear regression, Pearson correlation */
 
   /* Just to have some data */
   if(fuzzed_data.remaining_bytes() < 1024)
@@ -33,17 +34,21 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* Data set */
   num_values = fuzzed_data.ConsumeIntegral<u_int8_t>();
   values = (u_int32_t *)ndpi_malloc(sizeof(u_int32_t) * num_values);
+  values2 = (u_int32_t *)ndpi_malloc(sizeof(u_int32_t) * num_values);
   outliers = (bool *)ndpi_malloc(sizeof(bool) * num_values);
-  if (!values || !outliers) {
+  if (!values || !values2 || !outliers) {
     ndpi_free(values);
+    ndpi_free(values2);
     ndpi_free(outliers);
     return -1;
   }
-  for (i = 0; i < num_values; i++)
+  for (i = 0; i < num_values; i++) {
     values[i] = fuzzed_data.ConsumeIntegral<u_int32_t>();
+    values2[i] = fuzzed_data.ConsumeIntegral<u_int32_t>();
+  }
   
   /* Init HW */
-  num_periods = fuzzed_data.ConsumeIntegral<u_int8_t>();
+  num_periods = fuzzed_data.ConsumeIntegral<u_int16_t>();
   additive_seeasonal = fuzzed_data.ConsumeBool();
   alpha = fuzzed_data.ConsumeFloatingPointInRange<double>(0, 1);
   beta = fuzzed_data.ConsumeFloatingPointInRange<double>(0, 1);
@@ -57,7 +62,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   /* Init Data Analysis */
   max_series_len = fuzzed_data.ConsumeIntegral<u_int16_t>();
-  a = ndpi_alloc_data_analysis(max_series_len);
+  if(fuzzed_data.ConsumeBool()) {
+    a = ndpi_alloc_data_analysis(max_series_len);
+    for (i = 0; i < num_values; i++) {
+      ndpi_data_add_value(a, values[i]);
+    }
+  } else {
+    a = ndpi_alloc_data_analysis_from_series(values, num_values);
+  }
 
   /* Init Linear Regression */
   predict_periods = fuzzed_data.ConsumeIntegral<u_int8_t>();
@@ -68,7 +80,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       ndpi_hw_add_value(&hw, values[i], &forecast, &confidence_band);
     if (rc_rsi == 0)
       ndpi_rsi_add_value(&rsi, values[i]);
-    ndpi_data_add_value(a, values[i]);
   }
   ndpi_find_outliers(values, outliers, num_values);
   ndpi_predict_linear(values, num_values, predict_periods, &prediction);
@@ -94,6 +105,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if (num_values > 1)
     ndpi_data_ratio2str(ndpi_data_ratio(values[0], values[1]));
 
+  /* Outlier */
+  value_to_check = fuzzed_data.ConsumeIntegral<u_int32_t>();
+  threshold = fuzzed_data.ConsumeFloatingPointInRange<float>(0, 2^32 - 1);
+  ndpi_is_outlier(values, num_values, value_to_check, threshold,
+                  &lower, &upper);
+
+  /* Pearson correlation */
+  ndpi_pearson_correlation(values, values2, num_values);
+
   /* Done. Free */
   if (rc_hw == 0)
     ndpi_hw_free(&hw);
@@ -101,6 +121,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_free_rsi(&rsi);
   ndpi_free_data_analysis(a, 1);  
   ndpi_free(values);
+  ndpi_free(values2);
   ndpi_free(outliers);
 
   return 0;
