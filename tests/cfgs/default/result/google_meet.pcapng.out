@@ -1,0 +1,33 @@
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+DPI Packets (UDP):	1	(1.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          2/2 (search/found)
+Automa domain:        2/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  3/3 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/2 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+GoogleMeet	12	8888	2
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.88.231           	 2      
+
+
+	1	UDP 192.168.88.231:59369 <-> 173.194.73.101:443 [proto: 188.201/QUIC.GoogleMeet][IP: 126/Google][Encrypted][Confidence: DPI][DPI packets: 1][cat: Chat/9][2 pkts/1373 bytes <-> 4 pkts/5168 bytes][Goodput ratio: 94/97][0.04 sec][Hostname/SNI: meet.google.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: -0.580 (Download)][IAT c2s/s2c min/avg/max/stddev: 18/17 18/6 18/17 0/8][Pkt Len c2s/s2c min/avg/max/stddev: 81/1292 686/1292 1292/1292 606/0][TLSv1.3][QUIC ver: V-1][JA3C: 86ba0adabbe377daf6b620f07b59b45c][JA4: q13d0311h][ECH: version 0xfe0d][PLAIN TEXT (w.ZLst)][Plen Bins: 0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,83,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.88.231:43268 <-> 173.194.73.101:443 [proto: 91.201/TLS.GoogleMeet][IP: 126/Google][Encrypted][Confidence: DPI][DPI packets: 6][cat: Chat/9][3 pkts/741 bytes <-> 3 pkts/1606 bytes][Goodput ratio: 72/87][0.03 sec][Hostname/SNI: meet.google.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.369 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 8/8 16/16 8/8][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 247/535 601/1466 250/658][TLSv1.3][JA3C: f97d8fcbd3d1517f7bf0d2c536a503a1][JA4: t00d1516h2_8daaf6152771_02713d6af862][JA3S: eb1d94daa7e0344597e756a1fb6e7054][ECH: version 0xfe0d][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0]
