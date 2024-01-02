@@ -129,6 +129,7 @@
     <ClCompile Include="..\src\lib\protocols\openflow.c" />
     <ClCompile Include="..\src\lib\protocols\json-rpc.c" />
     <ClCompile Include="..\src\lib\protocols\kafka.c" />
+    <ClCompile Include="..\src\lib\protocols\nomachine.c" />
     <ClCompile Include="..\src\lib\protocols\iec62056.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />

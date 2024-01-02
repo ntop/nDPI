@@ -412,6 +412,15 @@ References: `Official site <https://kafka.apache.org>`_ and `Github <https://git
 
 .. _Proto 378:
 
+`NDPI_PROTOCOL_NOMACHINE`
+======================
+NoMachine is a popular proprietary remote desktop software.
+
+References: `Main site <https://www.nomachine.com/>`_.
+
+
+.. _Proto 379:
+
 `NDPI_PROTOCOL_IEC62056`
 ============================
 IEC 62056-4-7 DLMS/COSEM transport layer for IP networks.
