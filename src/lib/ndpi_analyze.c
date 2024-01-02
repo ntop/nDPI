@@ -1729,6 +1729,9 @@ double ndpi_pearson_correlation(u_int32_t *values_a, u_int32_t *values_b, u_int1
   variance_a = sum_squared_diff_a / (double)num_values, variance_b = sum_squared_diff_b / (double)num_values;
   covariance = sum_product_diff / (double)num_values;
 
+  if(variance_a == 0.0 || variance_b == 0.0)
+    return(0.0);
+
   return(covariance / sqrt(variance_a * variance_b));
 }
 
