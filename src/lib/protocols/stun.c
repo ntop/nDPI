@@ -575,13 +575,13 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
        (ntohs(flow->s_port) >= 19302 && ntohs(flow->s_port) <= 19309) ||
        ntohs(flow->s_port) == 3478) {
       if(flow->is_ipv6) {
-	u_int64_t pref1 = 0x2001486048640005; /* 2001:4860:4864:5::/64 */
-	u_int64_t pref2 = 0x2001486048640006; /* 2001:4860:4864:6::/64 */
+	u_int64_t pref1 = ndpi_htonll(0x2001486048640005); /* 2001:4860:4864:5::/64 */
+	u_int64_t pref2 = ndpi_htonll(0x2001486048640006); /* 2001:4860:4864:6::/64 */
 
-        if(memcmp(&flow->c_address.v6, &pref1, sizeof(pref1)) == 0 ||
-           memcmp(&flow->c_address.v6, &pref2, sizeof(pref2)) == 0 ||
-           memcmp(&flow->s_address.v6, &pref1, sizeof(pref1)) == 0 ||
-           memcmp(&flow->s_address.v6, &pref2, sizeof(pref2)) == 0) {
+        if(memcmp(flow->c_address.v6, &pref1, sizeof(pref1)) == 0 ||
+           memcmp(flow->c_address.v6, &pref2, sizeof(pref2)) == 0 ||
+           memcmp(flow->s_address.v6, &pref1, sizeof(pref1)) == 0 ||
+           memcmp(flow->s_address.v6, &pref2, sizeof(pref2)) == 0) {
           app_proto = NDPI_PROTOCOL_GOOGLE_MEET;
 	}
       } else {
