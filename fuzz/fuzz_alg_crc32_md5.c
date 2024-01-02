@@ -12,6 +12,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_crc16_ccit(data, size);
   ndpi_crc16_ccit_false(data, size);
   ndpi_crc16_xmodem(data, size);
+  ndpi_crc16_x25(data, size);
   ndpi_crc32(data, size);
   ndpi_md5(data, size, hash);
 

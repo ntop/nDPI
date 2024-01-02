@@ -349,6 +349,7 @@
     <ClCompile Include="..\src\lib\protocols\json-rpc.c" />
     <ClCompile Include="..\src\lib\protocols\kafka.c" />
     <ClCompile Include="..\src\lib\protocols\nomachine.c" />
+    <ClCompile Include="..\src\lib\protocols\iec62056.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />
