@@ -1089,6 +1089,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			      NDPI_PROTOCOL_RTSP,
 			      NDPI_PROTOCOL_APACHE_THRIFT,
 			      NDPI_PROTOCOL_JSON_RPC,
+			      NDPI_PROTOCOL_HL7,
 			      NDPI_PROTOCOL_MATCHED_BY_CONTENT,
 			      NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS); /* NDPI_PROTOCOL_HTTP can have (content-matched) subprotocols */
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MDNS,
@@ -1770,8 +1771,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "DRDA", NDPI_PROTOCOL_CATEGORY_DATABASE,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),  /* TCP */
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0)); /* UDP */
-  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HANGOUT_DUO,
-			  "GoogleHangoutDuo", NDPI_PROTOCOL_CATEGORY_VOIP,
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GOOGLE_MEET,
+			  "GoogleMeet", NDPI_PROTOCOL_CATEGORY_VOIP,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BJNP,
@@ -2218,9 +2219,21 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Kafka", NDPI_PROTOCOL_CATEGORY_RPC,
 			  ndpi_build_default_ports(ports_a, 9092, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NOMACHINE,
+			  "NoMachine", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
+			  ndpi_build_default_ports(ports_a, 4000, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 4000, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IEC62056,
+			  "IEC62056", NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
+			  ndpi_build_default_ports(ports_a, 4059, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 4059, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HL7,
+			  "HL7", NDPI_PROTOCOL_CATEGORY_RPC,
+			  ndpi_build_default_ports(ports_a, 2575, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CEPH,
 			  "Ceph", NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER,
-			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_a, 3300, 6789, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
@@ -5727,6 +5740,15 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* Apache Kafka */
   init_kafka_dissector(ndpi_str, &a);
+
+  /* NoMachine */
+  init_nomachine_dissector(ndpi_str, &a);
+
+  /* IEC 62056 */
+  init_iec62056_dissector(ndpi_str, &a);
+
+  /* HL7 */
+  init_hl7_dissector(ndpi_str, &a);
 
   /* Ceph */
   init_ceph_dissector(ndpi_str, &a);

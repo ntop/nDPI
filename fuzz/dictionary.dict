@@ -89,6 +89,12 @@
 "PROPFIND"
 "PROPPATCH"
 
+#HTTP Content Line
+"x-application/hl7-v3+xml"
+"x-application/fhir+xml"
+"x-application/fhir+json"
+"x-application/xml+cda"
+
 #HTTP payload signatures
 
 "\x4D\x5A"

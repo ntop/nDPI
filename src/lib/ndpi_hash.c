@@ -134,7 +134,7 @@ u_int32_t ndpi_hash_string_len(const char *str, u_int len) {
   two independent 64-bit linear congruential generators are applied
   results are mixed, scrambled and cast to 32-bit
 */
-u_int32_t ndpi_quick_16_byte_hash(u_int8_t *in_16_bytes_long) {
+u_int32_t ndpi_quick_16_byte_hash(const u_int8_t *in_16_bytes_long) {
   u_int64_t a = *(u_int64_t*)(in_16_bytes_long + 0);
   u_int64_t c = *(u_int64_t*)(in_16_bytes_long + 8);
 
