@@ -608,8 +608,8 @@ static ndpi_protocol_match host_match[] =
    { "app-measurement.com",                       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".app-measurement.com",                      "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
-   /* Google Hangout */
-   { "images2-hangout-opensocial.googleusercontent.com", "GoogleHangout", NDPI_PROTOCOL_HANGOUT_DUO, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Google Meet */
+   { "meet.google.com",                           "GoogleMeet", NDPI_PROTOCOL_GOOGLE_MEET, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    /* Google Services */
    { "googleapis.com",                     "GoogleServices",   NDPI_PROTOCOL_GOOGLE_SERVICES, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -1573,7 +1573,6 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "O=Riot Games Inc",                NDPI_PROTOCOL_RIOTGAMES   },
   { "O=NoMachine",                     NDPI_PROTOCOL_NOMACHINE },
 
-  { "CN=hangouts",                     NDPI_PROTOCOL_HANGOUT_DUO },
   { "CN=Snapchat Inc.",                NDPI_PROTOCOL_SNAPCHAT_CALL },
   { "CN=NVIDIA GameStream",            NDPI_PROTOCOL_GEFORCENOW },
 
