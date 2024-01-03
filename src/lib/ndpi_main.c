@@ -10490,7 +10490,7 @@ static ndpi_cfg_error _set_param_enable_disable(struct ndpi_detection_module_str
     *variable = 0;
     return NDPI_CFG_OK;
   }
-  return NDPI_CFG_INVALID_VALUE;
+  return NDPI_CFG_INVALID_PARAM;
 }
 
 static ndpi_cfg_error _set_param_int(struct ndpi_detection_module_struct *ndpi_str,
@@ -10508,11 +10508,11 @@ static ndpi_cfg_error _set_param_int(struct ndpi_detection_module_struct *ndpi_s
   /* Check for various possible errors */
   if((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) ||
      (errno != 0 && val == 0)) {
-    return NDPI_CFG_INVALID_VALUE;
+    return NDPI_CFG_INVALID_PARAM;
   }
   if (endptr == value) {
     /* No digits were found */
-    return NDPI_CFG_INVALID_VALUE;
+    return NDPI_CFG_INVALID_PARAM;
   }
   /* If we got here, strtol() successfully parsed a number */
   *variable = val;
@@ -10521,7 +10521,7 @@ static ndpi_cfg_error _set_param_int(struct ndpi_detection_module_struct *ndpi_s
      to integers without too many checks...*/
   if(min_value && max_value &&
      (val < strtol(min_value, NULL, 0) || val > strtol(max_value, NULL, 0)))
-    return NDPI_CFG_INVALID_VALUE;
+    return NDPI_CFG_INVALID_PARAM;
 
   return NDPI_CFG_OK;
 }
@@ -10568,7 +10568,7 @@ static ndpi_cfg_error _set_param_filename(struct ndpi_detection_module_struct *n
   }
 
   if(access(value, F_OK) != 0)
-    return NDPI_CFG_INVALID_VALUE;
+    return NDPI_CFG_INVALID_PARAM;
   strncpy(variable, value, CFG_MAX_LEN);
   return NDPI_CFG_OK;
 }
@@ -10587,7 +10587,7 @@ static ndpi_cfg_error _set_param_filename_config(struct ndpi_detection_module_st
 
   fd = fopen(value, "r");
   if(fd == NULL)
-    return NDPI_CFG_INVALID_VALUE; /* It shoudn't happen because we already checked it */
+    return NDPI_CFG_INVALID_PARAM; /* It shoudn't happen because we already checked it */
   rc = load_config_file_fd(ndpi_str, fd);
   fclose(fd);
   if(rc < 0)
@@ -10636,7 +10636,7 @@ static ndpi_cfg_error _set_param_protocol_enable_disable(struct ndpi_detection_m
 
   proto_id = __get_proto_id(proto);
   if(proto_id == NDPI_PROTOCOL_UNKNOWN)
-    return NDPI_CFG_INVALID_VALUE;
+    return NDPI_CFG_INVALID_PARAM;
 
   if(strcmp(value, "1") == 0 ||
      strcmp(value, "enable") == 0) {
@@ -10648,7 +10648,7 @@ static ndpi_cfg_error _set_param_protocol_enable_disable(struct ndpi_detection_m
     NDPI_BITMASK_DEL(*bitmask, proto_id);
     return NDPI_CFG_OK;
   }
-  return NDPI_CFG_INVALID_VALUE;
+  return NDPI_CFG_INVALID_PARAM;
 }
 
 static char *_get_param_protocol_int(void *_variable, const char *proto, char *buf, int buf_len)
@@ -10680,7 +10680,7 @@ static ndpi_cfg_error _set_param_protocol_int(struct ndpi_detection_module_struc
      to integers without too many checks...*/
   if(min_value && max_value &&
      (val < strtol(min_value, NULL, 0) || val > strtol(max_value, NULL, 0)))
-    return NDPI_CFG_INVALID_VALUE;
+    return NDPI_CFG_INVALID_PARAM;
 
   if(strcmp(proto, "any") == 0 ||
      strcmp(proto, "all") == 0 ||
@@ -10692,7 +10692,7 @@ static ndpi_cfg_error _set_param_protocol_int(struct ndpi_detection_module_struc
 
   proto_id = __get_proto_id(proto);
   if(proto_id == NDPI_PROTOCOL_UNKNOWN)
-    return NDPI_CFG_INVALID_VALUE;
+    return NDPI_CFG_INVALID_PARAM;
 
   array[proto_id] = val;
   return NDPI_CFG_OK;
@@ -10897,7 +10897,9 @@ ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
   int ret;
 
   if(!ndpi_str || !param || !value)
-    return NDPI_CFG_INVALID_PARAM;
+    return NDPI_CFG_INVALID_CONTEXT;
+  if(ndpi_str->finalized)
+    return NDPI_CFG_CONTEXT_ALREADY_INITIALIZED;
 
   NDPI_LOG_DBG(ndpi_str, "Set [%s][%s][%s]\n", proto, param, value);
 
