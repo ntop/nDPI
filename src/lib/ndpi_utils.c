@@ -3065,3 +3065,40 @@ int tpkt_verify_hdr(const struct ndpi_packet_struct * const packet)
           (packet->payload[0] == 3) && (packet->payload[1] == 0) &&
           (get_u_int16_t(packet->payload,2) == htons(packet->payload_packet_len)));
 }
+
+/* ******************************************* */
+
+int64_t ndpi_strtonum(const char *numstr, int64_t minval, int64_t maxval, const char **errstrp, int base)
+{
+  int64_t val = 0;
+  char* endptr;
+
+  if (minval > maxval) {
+    *errstrp = "minval > maxval";
+    return 0;
+  }
+
+  errno = 0;    /* To distinguish success/failure after call */
+  val = (int64_t)strtoll(numstr, &endptr, base);
+
+  if((val == LLONG_MIN && errno == ERANGE) || (val < minval)) {
+    *errstrp = "value too small";
+    return 0;
+  }
+  if((val == LLONG_MAX && errno == ERANGE) || (val > maxval )) {
+    *errstrp = "value too large";
+    return 0;
+  }
+  if(errno != 0 && val == 0) {
+    *errstrp = "generic error";
+    return 0;
+  }
+  if(endptr == numstr) {
+    *errstrp = "No digits were found";
+    return 0;
+  }
+  /* Like the original strtonum, we allow further characters after the number */
+
+  *errstrp = NULL;
+  return val;
+}

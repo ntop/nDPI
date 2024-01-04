@@ -2209,6 +2209,7 @@ extern "C" {
 
   /* ******************************* */
 
+  int64_t ndpi_strtonum(const char *numstr, int64_t minval, int64_t maxval, const char **errstrp, int base);
   int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args);
   int ndpi_snprintf(char * str, size_t size, char const * format, ...);
   struct tm *ndpi_gmtime_r(const time_t *timep,

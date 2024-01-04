@@ -5377,6 +5377,29 @@ void compressedBitmapUnitTest() {
 
 /* *********************************************** */
 
+void strtonumUnitTest() {
+  const char *errstrp;
+
+  assert(ndpi_strtonum("0", -10, +10, &errstrp, 10) == 0);
+  assert(errstrp == NULL);
+  assert(ndpi_strtonum("0", +10, -10, &errstrp, 10) == 0);
+  assert(errstrp != NULL);
+  assert(ndpi_strtonum("  -11  ", -10, +10, &errstrp, 10) == 0);
+  assert(errstrp != NULL);
+  assert(ndpi_strtonum("  -11  ", -100, +100, &errstrp, 10) == -11);
+  assert(errstrp == NULL);
+  assert(ndpi_strtonum("123abc", LLONG_MIN, LLONG_MAX, &errstrp, 10) == 123);
+  assert(errstrp == NULL);
+  assert(ndpi_strtonum("123abc", LLONG_MIN, LLONG_MAX, &errstrp, 16) == 0x123abc);
+  assert(errstrp == NULL);
+  assert(ndpi_strtonum("  0x123abc", LLONG_MIN, LLONG_MAX, &errstrp, 16) == 0x123abc);
+  assert(errstrp == NULL);
+  assert(ndpi_strtonum("ghi", -10, +10, &errstrp, 10) == 0);
+  assert(errstrp != NULL);
+}
+
+/* *********************************************** */
+
 void filterUnitTest() {
   ndpi_filter* f = ndpi_filter_alloc();
   u_int32_t v, i;
@@ -5628,6 +5651,7 @@ int main(int argc, char **argv) {
     ndpi_self_check_host_match(stderr);
     analysisUnitTest();
     compressedBitmapUnitTest();
+    strtonumUnitTest();
 #endif
   }
 
