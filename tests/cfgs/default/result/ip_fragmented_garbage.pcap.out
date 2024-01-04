@@ -1,4 +1,4 @@
-DPI Packets (TCP):	29	(29.00 pkts/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Num dissector calls: 0 (0.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
@@ -21,11 +21,11 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   0/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Unknown	29	1566	1
+Unknown	4	216	1
 
-Unrated                         29 1566          1            
+Unrated                          4 216           1            
 
 
 
 Undetected flows:
-	1	TCP 10.0.0.2:0 -> 10.128.0.2:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 29][29 pkts/1566 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][8.51 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 302/0 304/0 305/0 1/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 54/0 54/0 0/0][PLAIN TEXT (hdflkda)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 10.0.0.2:0 -> 10.128.0.2:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 4][4 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][0.91 sec][PLAIN TEXT (hdflkda)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
