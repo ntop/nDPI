@@ -447,3 +447,12 @@ Notes:
 HL7 is a range of global standards for the transfer of clinical and administrative health data between applications.
 
 References: `Main site <https://www.hl7.org/>`_
+
+
+.. _Proto 381:
+
+`NDPI_PROTOCOL_CEPH`
+=========================
+Ceph is a scalable distributed storage system.
+
+References: `Main site <https://ceph.io/en/>`_

@@ -409,6 +409,7 @@ typedef enum {
   NDPI_PROTOCOL_NOMACHINE             = 378,
   NDPI_PROTOCOL_IEC62056              = 379,
   NDPI_PROTOCOL_HL7                   = 380,
+  NDPI_PROTOCOL_CEPH                  = 381,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
