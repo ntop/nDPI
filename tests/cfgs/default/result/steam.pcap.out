@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Steam	107	9232	58
 
+Fun                            107 9232          58           
+
 	1	UDP 192.168.188.149:45665 <-> 72.165.61.188:27018 [proto: 74/Steam][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][5 pkts/846 bytes <-> 6 pkts/608 bytes][Goodput ratio: 75/58][0.69 sec][bytes ratio: 0.164 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 50/0 149/124 298/289 107/116][Pkt Len c2s/s2c min/avg/max/stddev: 78/78 169/101 366/158 117/28][PLAIN TEXT (H@VS01)][Plen Bins: 0,63,9,9,0,0,9,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.188.149:45665 <-> 68.142.91.34:27017 [proto: 74/Steam][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/78 bytes <-> 1 pkts/86 bytes][Goodput ratio: 46/51][0.09 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.188.149:45665 <-> 68.142.91.35:27017 [proto: 74/Steam][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/78 bytes <-> 1 pkts/86 bytes][Goodput ratio: 46/51][0.10 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

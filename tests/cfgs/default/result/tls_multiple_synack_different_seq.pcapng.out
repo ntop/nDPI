@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 AmazonAWS	10	6532	1
 
+Acceptable                      10 6532          1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 10.10.10.1               	 1      

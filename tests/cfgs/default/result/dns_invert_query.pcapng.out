@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 DNS	2	134	1
 
+Acceptable                       2 134           1            
+
 	1	UDP 173.147.108.174:18427 <-> 244.187.95.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/78 bytes <-> 1 pkts/56 bytes][Goodput ratio: 46/21][0.00 sec][Hostname/SNI: 216.58.202.4][::][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

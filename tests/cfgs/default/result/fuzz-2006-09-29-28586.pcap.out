@@ -5,7 +5,7 @@ DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Unknown          : 3 (flows)
 Confidence Match by port    : 26 (flows)
 Confidence DPI              : 11 (flows)
-Num dissector calls: 1081 (27.02 diss/flow)
+Num dissector calls: 1087 (27.17 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/87/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -28,6 +28,9 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Unknown	3	655	3
 HTTP	118	28709	37
+
+Acceptable                     118 28709         37           
+Unrated                          3 655           3            
 
 	1	TCP 172.20.3.5:2601 <-> 172.20.3.13:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 13][cat: Web/5][9 pkts/6343 bytes <-> 4 pkts/409 bytes][Goodput ratio: 92/46][11.25 sec][bytes ratio: 0.879 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/104 67/128 469/152 164/24][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 705/102 1514/243 721/81][PLAIN TEXT (POST /servlets/mms HTTP/1.1)][Plen Bins: 16,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,0,0]
 	2	TCP 172.20.3.5:2606 <-> 172.20.3.13:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 12][cat: Web/5][8 pkts/2287 bytes <-> 5 pkts/2963 bytes][Goodput ratio: 80/91][11.18 sec][Hostname/SNI: 172.20.3.13][bytes ratio: -0.129 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 58/58 177/172 83/81][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 286/593 1514/1514 478/662][URL: 172.20.3.13/servlets/mms?message-id=189301][Risk: ** HTTP Susp User-Agent **** HTTP/TLS/QUIC Numeric Hostname/SNI **][Risk Score: 110][Risk Info: Found host 172.20.3.13 / Empty or missing User-Agent][PLAIN TEXT (GET /servlets/mms)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,50,0,0]

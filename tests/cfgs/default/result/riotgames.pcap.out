@@ -24,6 +24,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 Discord	4	220	2
 RiotGames	40	3733	7
 
+Fun                             44 3953          9            
+
 	1	UDP 192.168.2.100:59956 <-> 162.249.72.1:7194 [proto: 302/RiotGames][IP: 302/RiotGames][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][10 pkts/1106 bytes <-> 5 pkts/387 bytes][Goodput ratio: 62/46][5.50 sec][bytes ratio: 0.482 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/30 684/10 1033/30 438/14][Pkt Len c2s/s2c min/avg/max/stddev: 87/75 111/77 259/87 50/5][Plen Bins: 0,93,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.2.100:49298 <-> 162.249.72.1:7194 [proto: 302/RiotGames][IP: 302/RiotGames][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][6 pkts/712 bytes <-> 9 pkts/748 bytes][Goodput ratio: 65/49][2.43 sec][bytes ratio: -0.025 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 28/31 283/132 994/203 372/82][Pkt Len c2s/s2c min/avg/max/stddev: 81/66 119/83 259/181 63/35][Plen Bins: 33,54,0,0,6,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.2.100:50004 <-> 162.249.72.1:8181 [proto: 302/RiotGames][IP: 302/RiotGames][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/78 bytes <-> 1 pkts/78 bytes][Goodput ratio: 46/46][0.04 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

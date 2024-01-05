@@ -3,7 +3,7 @@ Guessed flow protos:	1
 DPI Packets (TCP):	10	(3.33 pkts/flow)
 Confidence Match by port    : 1 (flows)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 139 (46.33 diss/flow)
+Num dissector calls: 140 (46.67 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -26,6 +26,9 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 TLS	8	1891	2
 Crashlytics	3	560	1
+
+Safe                             8 1891          2            
+Acceptable                       3 560           1            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

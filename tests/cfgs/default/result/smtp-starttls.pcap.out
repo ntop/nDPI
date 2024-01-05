@@ -1,6 +1,6 @@
 DPI Packets (TCP):	26	(13.00 pkts/flow)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 165 (82.50 diss/flow)
+Num dissector calls: 166 (83.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -23,6 +23,9 @@ Patricia protocols IPv6: 2/0 (search/found)
 
 SMTPS	33	6429	1
 Google	36	8403	1
+
+Safe                            33 6429          1            
+Acceptable                      36 8403          1            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

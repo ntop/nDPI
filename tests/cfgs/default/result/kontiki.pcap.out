@@ -27,6 +27,10 @@ Unknown	4	1696	2
 Kontiki	44	35476	2
 ICMP	7	494	4
 
+Acceptable                       7 494           4            
+Potentially Dangerous            44 35476         2            
+Unrated                          4 1696          2            
+
 	1	UDP 10.25.32.59:19948 <-> 64.200.148.86:8888 [proto: 32/Kontiki][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Media/1][11 pkts/1069 bytes <-> 29 pkts/34159 bytes][Goodput ratio: 57/96][0.72 sec][bytes ratio: -0.939 (Download)][IAT c2s/s2c min/avg/max/stddev: 3/0 94/3 212/29 93/7][Pkt Len c2s/s2c min/avg/max/stddev: 46/70 97/1178 259/1283 77/315][Risk: ** Unsafe Protocol **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (ZuetBitjw)][Plen Bins: 22,0,2,0,0,2,5,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,66,0,0,0,0,0,0,0,0,0]
 	2	ICMP 10.25.32.3:0 -> 10.25.32.59:0 [proto: 81/ICMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][4 pkts/280 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][4.59 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 10.25.32.59:19948 -> 64.200.148.88:80 [proto: 32/Kontiki][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Media/1][4 pkts/248 bytes -> 0 pkts/0 bytes][Goodput ratio: 32/0][4.59 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

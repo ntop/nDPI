@@ -1,7 +1,7 @@
 DPI Packets (TCP):	8	(1.33 pkts/flow)
 DPI Packets (UDP):	9	(2.25 pkts/flow)
 Confidence DPI              : 10 (flows)
-Num dissector calls: 752 (75.20 diss/flow)
+Num dissector calls: 754 (75.40 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/6/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -28,6 +28,10 @@ Steam	2	68	1
 HalfLife2	2	96	1
 Starcraft	4	200	4
 Protobuf	8	2487	1
+
+Safe                             8 2487          1            
+Fun                              9 505           7            
+Potentially Dangerous             4 333           2            
 
 	1	UDP 127.0.0.1:1119 -> 127.0.0.1:1120 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][8 pkts/2487 bytes -> 0 pkts/0 bytes][Goodput ratio: 91/0][204.53 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 8008/0 29219/0 105424/0 32476/0][Pkt Len c2s/s2c min/avg/max/stddev: 48/0 311/0 576/0 250/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 37,0,12,0,0,0,0,0,0,0,0,0,0,0,0,12,0,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.1.128:1 -> 1.2.3.4:10 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Download/7][2 pkts/170 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 70][Risk Info: TCP NULL scan / No server to client traffic][Plen Bins: 50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 EtherSIO	36	3226	1
 
+Acceptable                      36 3226          1            
+
 	1	UDP 172.23.2.27:1024 -> 172.23.2.15:6060 [proto: 363/EtherSIO][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][36 pkts/3226 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][3.39 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 94/0 100/0 111/0 6/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 90/0 91/0 6/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 5,94,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

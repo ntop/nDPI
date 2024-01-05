@@ -4,7 +4,7 @@ DPI Packets (TCP):	41	(5.12 pkts/flow)
 Confidence Match by port    : 2 (flows)
 Confidence DPI              : 5 (flows)
 Confidence Match by IP      : 1 (flows)
-Num dissector calls: 196 (24.50 diss/flow)
+Num dissector calls: 197 (24.62 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/9/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -31,6 +31,9 @@ Google	3	182	1
 Messenger	17	2369	1
 GoogleServices	5	492	1
 CloudflareWarp	22	7762	2
+
+Safe                             5 294           2            
+Acceptable                      58 11695         6            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

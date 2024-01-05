@@ -6,7 +6,7 @@ DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 59 (flows)
 Confidence Match by port    : 28 (flows)
 Confidence DPI              : 206 (flows)
-Num dissector calls: 28064 (95.78 diss/flow)
+Num dissector calls: 28150 (96.08 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/261/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -42,6 +42,11 @@ AppleiCloud	88	20520	2
 Spotify	5	430	1
 Microsoft	14	1302	2
 NAT-PMP	8	432	2
+
+Safe                           488 54927         35           
+Acceptable                    1009 307083        198          
+Fun                              5 430           1            
+Unrated                       1567 272044        59           
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

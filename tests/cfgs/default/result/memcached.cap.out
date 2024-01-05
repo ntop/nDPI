@@ -1,6 +1,6 @@
 DPI Packets (TCP):	6	(6.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 138 (138.00 diss/flow)
+Num dissector calls: 139 (139.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -22,5 +22,7 @@ Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 Memcached	10	1711	1
+
+Acceptable                      10 1711          1            
 
 	1	TCP 127.0.0.1:59604 <-> 127.0.0.1:11211 [proto: 40/Memcached][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Network/14][6 pkts/411 bytes <-> 4 pkts/1300 bytes][Goodput ratio: 2/79][< 1 sec][bytes ratio: -0.520 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68/325 74/1094 4/444][PLAIN TEXT (STAT pid 8837)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

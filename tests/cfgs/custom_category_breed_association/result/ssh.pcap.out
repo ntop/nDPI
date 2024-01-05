@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 SSH	258	35546	1
 
+Dangerous                      258 35546         1            
+
 	1	TCP 172.16.238.1:58395 <-> 172.16.238.168:22 [proto: 92/SSH][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 10][cat: DataTransfer/4][159 pkts/15615 bytes <-> 99 pkts/19931 bytes][Goodput ratio: 33/67][248.48 sec][Hostname/SNI: SSH-2.0-OpenSSH_5.3][bytes ratio: -0.121 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1846/2934 166223/166224 14794/19692][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 98/201 970/1346 83/283][Risk: ** SSH Obsolete Cli Vers/Cipher **** SSH Obsolete Ser Vers/Cipher **** Unsafe Protocol **][Risk Score: 160][Risk Info: Found cipher arcfour128 / Found cipher arcfour128][HASSH-C: 21B457A327CE7A2D4FCE5EF2C42400BD][Server: SSH-2.0-OpenSSH_5.6][HASSH-S: B1C6C0D56317555B85C7005A3DE29325][Plen Bins: 2,76,12,2,3,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0]

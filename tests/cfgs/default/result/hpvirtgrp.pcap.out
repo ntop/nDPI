@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 HP_VIRTGRP	135	12739	9
 
+Acceptable                     135 12739         9            
+
 	1	TCP 192.168.2.100:40152 <-> 160.44.194.66:5223 [proto: 256/HP_VIRTGRP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][7 pkts/1019 bytes <-> 8 pkts/613 bytes][Goodput ratio: 61/26][1.18 sec][bytes ratio: 0.249 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 92/192 380/409 144/135][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 146/77 217/106 74/17][Plen Bins: 0,50,0,0,12,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.2.100:35634 <-> 160.44.194.66:5223 [proto: 256/HP_VIRTGRP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][8 pkts/945 bytes <-> 7 pkts/524 bytes][Goodput ratio: 52/23][233.89 sec][bytes ratio: 0.287 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4/0 38973/46772 233376/233402 86940/93315][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 118/75 217/106 70/18][Plen Bins: 0,57,0,0,14,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.2.100:49838 <-> 160.44.194.66:5223 [proto: 256/HP_VIRTGRP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: Network/14][9 pkts/1019 bytes <-> 6 pkts/435 bytes][Goodput ratio: 48/20][129.59 sec][bytes ratio: 0.402 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 18430/32235 128357/128902 44878/55811][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 113/72 217/106 68/18][Plen Bins: 0,50,0,0,16,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

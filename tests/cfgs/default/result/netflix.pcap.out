@@ -33,6 +33,10 @@ IGMP	1	60	1
 TLS	2	126	1
 NetFlix	956	508247	38
 
+Safe                             2 126           1            
+Acceptable                     835 498043        22           
+Fun                            956 508247        38           
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.7              	 4      

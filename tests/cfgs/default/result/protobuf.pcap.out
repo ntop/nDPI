@@ -1,6 +1,6 @@
 DPI Packets (TCP):	26	(5.20 pkts/flow)
 Confidence DPI              : 5 (flows)
-Num dissector calls: 706 (141.20 diss/flow)
+Num dissector calls: 707 (141.40 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -22,6 +22,8 @@ Patricia protocols:   10/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 Protobuf	60	4446	5
+
+Safe                            60 4446          5            
 
 	1	TCP 127.0.0.1:52392 <-> 127.0.0.1:12345 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][11 pkts/890 bytes <-> 9 pkts/498 bytes][Goodput ratio: 32/0][70.00 sec][bytes ratio: 0.282 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/10000 6667/8333 10000/10000 4714/3727][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 81/55 122/66 31/4][PLAIN TEXT (AAAABBBBX)][Plen Bins: 42,0,57,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 127.0.0.1:39786 <-> 127.0.0.1:12345 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][5 pkts/832 bytes <-> 3 pkts/174 bytes][Goodput ratio: 66/0][10.00 sec][bytes ratio: 0.654 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 2500/0 10000/0 4330/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 166/58 604/66 219/6][PLAIN TEXT (Lorem ipsum dolor sit amet)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -25,6 +25,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 WhatsAppCall	44	5916	8
 WhatsApp	217	22139	5
 
+Acceptable                     261 28055         13           
+
 	1	TCP 10.8.0.1:42241 <-> 173.192.222.189:5222 [proto: 142/WhatsApp][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: Chat/9][30 pkts/2539 bytes <-> 32 pkts/3070 bytes][Goodput ratio: 35/44][47.83 sec][bytes ratio: -0.095 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1858/1709 28667/28718 5783/5581][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 85/96 299/559 55/94][PLAIN TEXT (Android)][Plen Bins: 47,21,7,3,7,7,0,3,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 10.8.0.1:35480 <-> 184.173.179.46:443 [proto: 142/WhatsApp][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: Chat/9][24 pkts/3029 bytes <-> 22 pkts/1961 bytes][Goodput ratio: 57/39][13.49 sec][bytes ratio: 0.214 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 681/812 10696/10748 2366/2570][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 126/89 590/469 124/92][PLAIN TEXT (Android)][Plen Bins: 21,10,37,5,0,10,0,0,0,0,0,5,5,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 10.8.0.1:44819 <-> 158.85.58.42:5222 [proto: 142/WhatsApp][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: Chat/9][15 pkts/2690 bytes <-> 15 pkts/2019 bytes][Goodput ratio: 69/60][8.61 sec][bytes ratio: 0.142 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 717/767 8044/4043 2210/1535][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 179/135 590/1022 203/241][PLAIN TEXT (Android)][Plen Bins: 36,0,0,9,9,9,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

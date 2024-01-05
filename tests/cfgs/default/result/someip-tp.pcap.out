@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 SOMEIP	9	12850	1
 
+Acceptable                       9 12850         1            
+
 	1	UDP 10.0.1.207:56772 -> 10.0.1.1:18193 [proto: 229/SOMEIP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][9 pkts/12850 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.10 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4/0 12/0 20/0 5/0][Pkt Len c2s/s2c min/avg/max/stddev: 1218/0 1428/0 1454/0 74/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic][PLAIN TEXT (./0123456789)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,88,0,0,0]

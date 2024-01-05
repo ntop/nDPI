@@ -26,6 +26,9 @@ DNS	2	162	1
 HTTP	12	1597	1
 Spotify	2	197	1
 
+Acceptable                      14 1759          2            
+Fun                              2 197           1            
+
 	1	TCP 192.168.2.140:56011 <-> 170.33.9.230:80 [proto: 7/HTTP][IP: 274/Alibaba][ClearText][Confidence: DPI][DPI packets: 8][cat: Web/5][7 pkts/568 bytes <-> 5 pkts/1029 bytes][Goodput ratio: 29/69][0.57 sec][Hostname/SNI: www.love.xn--55qx5d][bytes ratio: -0.289 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 77/122 222/352 90/163][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 81/206 137/765 36/280][URL: www.love.xn--55qx5d/][StatusCode: 403][Content-Type: text/html][User-Agent: curl/7.77.0][Risk: ** IDN Domain Name **** Error Code **][Risk Score: 20][Risk Info: www.love.xn--55qx5d / HTTP Error Code 403][PLAIN TEXT (GET / HTTP/1.1)][Plen Bins: 0,0,66,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.2.140:45520 <-> 192.168.2.1:53 [proto: 5.156/DNS.Spotify][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/69 bytes <-> 1 pkts/128 bytes][Goodput ratio: 39/67][0.02 sec][Hostname/SNI: i.scdn.co][146.75.62.248][PLAIN TEXT (scdnco)][Plen Bins: 50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.2.140:60156 <-> 192.168.2.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/81 bytes <-> 1 pkts/81 bytes][Goodput ratio: 48/48][0.00 sec][Hostname/SNI: www.xn--mnich-kva.com][::][Risk: ** IDN Domain Name **** Error Code **][Risk Score: 20][Risk Info: www.xn--mnich-kva.com / DNS Error Code NXDOMAIN][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

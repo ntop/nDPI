@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 NAT-PMP	11	586	4
 
+Acceptable                      11 586           4            
+
 	1	UDP 192.168.1.128:36852 <-> 192.168.1.254:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][2 pkts/98 bytes <-> 2 pkts/120 bytes][Goodput ratio: 14/23][8.37 sec][Result: 0][Internal Port: 51413][External Port: 51413][External Address: 10.201.213.174][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.2.100:35763 -> 192.168.2.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][4 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][< 1 sec][Result: 0][Internal Port: 22000][External Port: 20216][External Address: 0.0.0.0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.2.100:59817 -> 192.168.2.1:5351 [proto: 312/NAT-PMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][2 pkts/108 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][0.25 sec][Result: 0][Internal Port: 22000][External Port: 6243][External Address: 0.0.0.0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

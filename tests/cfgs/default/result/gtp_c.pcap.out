@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 GTP_C	4	684	1
 
+Acceptable                       4 684           1            
+
 	1	UDP 10.101.0.2:1024 <-> 10.102.0.2:2123 [proto: 152.272/GTP.GTP_C][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/365 bytes <-> 2 pkts/319 bytes][Goodput ratio: 77/73][0.00 sec][PLAIN TEXT (internet)][Plen Bins: 25,25,0,0,0,0,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

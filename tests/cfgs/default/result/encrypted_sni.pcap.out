@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 TLS	3	2310	3
 
+Safe                             3 2310          3            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.12             	 1      

@@ -1,6 +1,6 @@
 DPI Packets (TCP):	344	(4.00 pkts/flow)
 Confidence DPI              : 86 (flows)
-Num dissector calls: 13416 (156.00 diss/flow)
+Num dissector calls: 13502 (157.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -22,6 +22,8 @@ Patricia protocols:   86/86 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 WhatsApp	679	96293	86
+
+Acceptable                     679 96293         86           
 
 	1	TCP 192.168.2.100:49026 -> 179.60.195.33:5222 [proto: 142/WhatsApp][IP: 119/Facebook][Encrypted][Confidence: DPI][DPI packets: 4][cat: Chat/9][8 pkts/3049 bytes -> 0 pkts/0 bytes][Goodput ratio: 82/0][0.19 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 28/0 125/0 41/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 381/0 1315/0 539/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,40,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.2.100:44804 -> 179.60.195.49:5222 [proto: 142/WhatsApp][IP: 142/WhatsApp][Encrypted][Confidence: DPI][DPI packets: 4][cat: Chat/9][9 pkts/2139 bytes -> 0 pkts/0 bytes][Goodput ratio: 72/0][0.33 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 42/0 131/0 41/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 238/0 1090/0 319/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 40,0,0,0,0,0,20,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

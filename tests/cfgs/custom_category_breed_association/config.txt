@@ -1,1 +1,1 @@
---cfg=ssh,category,4 --cfg=ssh,breed,5  --cfg=390,breed,5 --cfg=391,category,4 --cfg=392,category,5
+--cfg=ssh,category,4 --cfg=ssh,breed,5  --cfg=391,breed,5 --cfg=392,category,4 --cfg=393,category,5

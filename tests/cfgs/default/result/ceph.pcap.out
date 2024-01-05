@@ -1,0 +1,28 @@
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Ceph	39	13379	1
+
+Acceptable                      39 13379         1            
+
+	1	TCP 10.0.3.249:35556 <-> 10.0.3.67:6789 [proto: 381/Ceph][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: DataTransfer/4][20 pkts/2479 bytes <-> 19 pkts/10900 bytes][Goodput ratio: 46/88][0.10 sec][bytes ratio: -0.629 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/0 59/0 16/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 124/574 345/3533 77/1032][PLAIN TEXT (machine2)][Plen Bins: 20,8,12,12,16,0,0,0,8,4,0,0,0,0,4,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8]

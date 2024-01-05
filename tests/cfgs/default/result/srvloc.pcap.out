@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Service_Location_Protocol	629	57125	620
 
+Acceptable                     629 57125         620          
+
 	1	UDP 45.124.147.156:50663 -> 165.114.202.61:427 [proto: 347/Service_Location_Protocol][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][2 pkts/280 bytes -> 0 pkts/0 bytes][Goodput ratio: 70/0][< 1 sec][URL(s): slpTest://test:31337/][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (slpTest)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 20.133.112.32:11510 -> 165.114.202.61:427 [proto: 347/Service_Location_Protocol][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][2 pkts/192 bytes -> 0 pkts/0 bytes][Goodput ratio: 56/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (service)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 42.224.153.12:15346 -> 90.147.171.51:427 [proto: 347/Service_Location_Protocol][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][2 pkts/192 bytes -> 0 pkts/0 bytes][Goodput ratio: 56/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (service)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

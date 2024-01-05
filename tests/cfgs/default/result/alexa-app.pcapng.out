@@ -5,7 +5,7 @@ DPI Packets (UDP):	64	(1.94 pkts/flow)
 DPI Packets (other):	6	(1.00 pkts/flow)
 Confidence Match by port    : 14 (flows)
 Confidence DPI              : 146 (flows)
-Num dissector calls: 551 (3.44 diss/flow)
+Num dissector calls: 552 (3.45 diss/flow)
 LRU cache ookla:      0/5/0 (insert/search/found)
 LRU cache bittorrent: 0/42/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -39,6 +39,9 @@ Amazon	2398	980912	97
 PlayStore	21	8064	2
 GoogleServices	19	2784	2
 AmazonAWS	383	142290	19
+
+Safe                           138 23305         13           
+Acceptable                    2936 1146440       147          
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

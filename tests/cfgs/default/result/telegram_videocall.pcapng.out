@@ -7,7 +7,7 @@ Confidence Match by port    : 8 (flows)
 Confidence DPI (cache)      : 10 (flows)
 Confidence DPI              : 15 (flows)
 Confidence Match by IP      : 1 (flows)
-Num dissector calls: 1997 (58.74 diss/flow)
+Num dissector calls: 2005 (58.97 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/27/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -35,6 +35,9 @@ ICMPV6	5	350	2
 Dropbox	2	348	1
 AmazonAWS	4	288	1
 TelegramVoip	228	41561	16
+
+Safe                           640 339548        9            
+Acceptable                     247 43569         25           
 
 	1	TCP 192.168.12.169:37950 <-> 149.154.167.91:443 [proto: 91/TLS][IP: 185/Telegram][Encrypted][Confidence: Match by port][DPI packets: 18][cat: Web/5][156 pkts/40749 bytes <-> 214 pkts/142865 bytes][Goodput ratio: 75/90][41.14 sec][bytes ratio: -0.556 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 246/152 12847/5983 1291/707][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 261/668 1090/1294 224/564][Risk: ** Fully encrypted flow **][Risk Score: 50][Plen Bins: 0,0,2,2,4,5,6,4,4,3,0,1,0,0,1,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,60,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.12.169:40830 <-> 149.154.167.222:443 [proto: 91/TLS][IP: 185/Telegram][Encrypted][Confidence: Match by port][DPI packets: 18][cat: Web/5][80 pkts/7287 bytes <-> 100 pkts/120708 bytes][Goodput ratio: 27/95][28.19 sec][bytes ratio: -0.886 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 437/1 25008/31 3114/5][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 91/1207 644/1294 95/289][Risk: ** Fully encrypted flow **][Risk Score: 50][Plen Bins: 0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,94,0,0,0,0,0,0,0,0,0]

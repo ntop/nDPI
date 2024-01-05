@@ -3,7 +3,7 @@ Guessed flow protos:	1
 DPI Packets (TCP):	7	(3.50 pkts/flow)
 Confidence Match by port    : 1 (flows)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 197 (98.50 diss/flow)
+Num dissector calls: 198 (99.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -26,6 +26,9 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 TLS	3	4242	1
 RiotGames	4	4338	1
+
+Safe                             3 4242          1            
+Fun                              4 4338          1            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

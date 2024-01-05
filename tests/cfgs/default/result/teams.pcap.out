@@ -7,7 +7,7 @@ Confidence Unknown          : 1 (flows)
 Confidence Match by port    : 2 (flows)
 Confidence DPI (partial)    : 4 (flows)
 Confidence DPI              : 76 (flows)
-Num dissector calls: 531 (6.40 diss/flow)
+Num dissector calls: 532 (6.41 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/9/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -43,6 +43,11 @@ Microsoft	405	284048	12
 Microsoft365	136	52120	6
 Teams	595	215358	26
 Azure	2	294	1
+
+Safe                          1065 521113        45           
+Acceptable                     428 155344        36           
+Fun                              1 82            1            
+Unrated                          4 456           1            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

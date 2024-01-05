@@ -6,7 +6,7 @@ DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 34 (flows)
 Confidence Match by port    : 27 (flows)
 Confidence DPI              : 190 (flows)
-Num dissector calls: 6898 (27.48 diss/flow)
+Num dissector calls: 6910 (27.53 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/189/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -37,6 +37,12 @@ SMBv23	3	186	1
 RTP	5	1070	1
 SIP	85	39540	15
 Protobuf	1	113	1
+
+Safe                             1 113           1            
+Acceptable                     498 77785         202          
+Unsafe                          35 2456          11           
+Dangerous                        7 1620          3            
+Unrated                         34 4212          34           
 
 	1	UDP 212.242.33.35:5060 <-> 192.168.1.2:5060 [proto: 100/SIP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][23 pkts/11772 bytes <-> 37 pkts/14743 bytes][Goodput ratio: 91/89][1521.43 sec][bytes ratio: -0.112 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 19/227 32597/38366 167478/304738 41340/57147][Pkt Len c2s/s2c min/avg/max/stddev: 344/47 512/398 711/1118 86/358][PLAIN TEXT (SIP/2.0 401 Unauthorized)][Plen Bins: 29,0,0,0,0,0,0,0,0,3,6,0,3,6,8,13,1,0,3,0,1,15,0,0,0,5,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.1.2:5060 <-> 200.68.120.81:5060 [proto: 100/SIP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: VoIP/10][9 pkts/4647 bytes <-> 3 pkts/1944 bytes][Goodput ratio: 92/93][66.58 sec][bytes ratio: 0.410 (Upload)][IAT c2s/s2c min/avg/max/stddev: 507/34556 8170/34556 32608/34556 10578/0][Pkt Len c2s/s2c min/avg/max/stddev: 417/637 516/648 864/656 186/8][PLAIN TEXT (INVITEKsip)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,59,0,0,0,0,0,0,8,16,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

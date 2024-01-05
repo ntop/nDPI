@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 SIP	30	5592	1
 
+Acceptable                      30 5592          1            
+
 	1	UDP 10.239.156.235:5060 <-> 172.29.38.91:5060 [proto: 100/SIP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 9][cat: VoIP/10][15 pkts/2691 bytes <-> 15 pkts/2901 bytes][Goodput ratio: 73/75][491.56 sec][bytes ratio: -0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 67/59 36861/36861 49155/49155 16718/16727][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 179/193 555/661 205/233][PLAIN TEXT (oREGISTER sip)][Plen Bins: 74,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,6,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

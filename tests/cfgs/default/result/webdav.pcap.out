@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 WebDAV	14	2742	1
 
+Acceptable                      14 2742          1            
+
 	1	TCP 10.24.8.189:50652 <-> 104.156.149.6:80 [proto: 7.376/HTTP.WebDAV][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Collaborative/15][7 pkts/727 bytes <-> 7 pkts/2015 bytes][Goodput ratio: 46/81][5.07 sec][Hostname/SNI: 104.156.149.6][bytes ratio: -0.470 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 22/8 67/20 24/9][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 104/288 223/1107 75/390][URL: 104.156.149.6/webdav][StatusCode: 301][Content-Type: text/html][Server: Apache/2.4.52 (Ubuntu)][User-Agent: Microsoft-WebDAV-MiniRedir/10.0.19045][Risk: ** HTTP/TLS/QUIC Numeric Hostname/SNI **][Risk Score: 10][Risk Info: Found host 104.156.149.6][PLAIN TEXT (PROPFIND /webdav HTTP/1.1)][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

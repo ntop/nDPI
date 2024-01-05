@@ -2,7 +2,7 @@ Guessed flow protos:	1
 
 DPI Packets (TCP):	21	(21.00 pkts/flow)
 Confidence Match by port    : 1 (flows)
-Num dissector calls: 207 (207.00 diss/flow)
+Num dissector calls: 208 (208.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -24,5 +24,7 @@ Patricia protocols:   1/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 HTTP	82	77940	1
+
+Acceptable                      82 77940         1            
 
 	1	TCP 172.17.36.21:57619 <-> 63.190.145.43:80 [proto: GTP:7/HTTP][IP: 265/AmazonAWS][ClearText][Confidence: Match by port][DPI packets: 21][cat: Web/5][28 pkts/3184 bytes <-> 54 pkts/74756 bytes][Goodput ratio: 0/93][15.67 sec][bytes ratio: -0.918 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 448/205 1615/2133 476/518][Pkt Len c2s/s2c min/avg/max/stddev: 94/90 114/1384 130/1490 9/330][PLAIN TEXT (.iJoJJ)][Plen Bins: 0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,1,0,0,92,0,0,0,0]

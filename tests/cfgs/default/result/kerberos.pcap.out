@@ -4,7 +4,7 @@ DPI Packets (TCP):	77	(2.14 pkts/flow)
 Confidence Unknown          : 2 (flows)
 Confidence Match by port    : 23 (flows)
 Confidence DPI              : 11 (flows)
-Num dissector calls: 4259 (118.31 diss/flow)
+Num dissector calls: 4284 (119.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/75/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -29,6 +29,9 @@ Unknown	9	3031	2
 SMBv23	6	1914	3
 Kerberos	48	19194	24
 LDAP	14	4152	7
+
+Acceptable                      68 25260         34           
+Unrated                          9 3031          2            
 
 	1	TCP 172.16.8.201:49171 <-> 172.16.8.8:88 [proto: 111/Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/1486 bytes <-> 1 pkts/1506 bytes][Goodput ratio: 96/96][0.00 sec][happycraft.org\johnson-pc][PLAIN TEXT (HAPPYCRAFT.ORG)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,50,0,0]
 	2	TCP 172.16.8.201:49160 <-> 172.16.8.8:88 [proto: 111/Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/1485 bytes <-> 1 pkts/1498 bytes][Goodput ratio: 96/96][< 1 sec][happycraft.org\johnson-pc][PLAIN TEXT (HAPPYCRAFT.ORG)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,50,0,0]

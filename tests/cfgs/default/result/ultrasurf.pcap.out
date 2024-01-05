@@ -24,6 +24,9 @@ Patricia protocols IPv6: 0/0 (search/found)
 TLS	233	106228	2
 UltraSurf	100	120543	1
 
+Safe                           233 106228        2            
+Acceptable                     100 120543        1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 10.132.0.23              	 1      

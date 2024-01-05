@@ -5,7 +5,7 @@ DPI Packets (UDP):	120	(1.21 pkts/flow)
 Confidence Unknown          : 14 (flows)
 Confidence Match by port    : 6 (flows)
 Confidence DPI              : 177 (flows)
-Num dissector calls: 4880 (24.77 diss/flow)
+Num dissector calls: 4883 (24.79 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/60/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -43,6 +43,12 @@ GoogleServices	17	30330	1
 MpegDash	1	299	1
 1kxun	914	1969311	48
 Line	30	19034	3
+
+Safe                           124 28754         9            
+Acceptable                     622 514902        119          
+Fun                            948 1976493       53           
+Dangerous                        5 1197          2            
+Unrated                         24 6428          14           
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

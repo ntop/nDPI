@@ -1,7 +1,7 @@
 DPI Packets (TCP):	39	(13.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 544 (181.33 diss/flow)
+Num dissector calls: 546 (182.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -25,6 +25,10 @@ Patricia protocols IPv6: 0/0 (search/found)
 Unknown	1115	1122198	1
 FTP_CONTROL	68	5571	1
 FTP_DATA	9	1819	1
+
+Acceptable                       9 1819          1            
+Unsafe                          68 5571          1            
+Unrated                       1115 1122198       1            
 
 	1	TCP 192.168.1.212:50694 <-> 90.130.70.73:21 [proto: 1/FTP_CONTROL][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 12][cat: Download/7][41 pkts/2892 bytes <-> 27 pkts/2679 bytes][Goodput ratio: 6/33][8.48 sec][User: anonymous][Pwd: NcFTP@][bytes ratio: 0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 236/108 4743/1377 849/305][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 71/99 96/307 7/45][Risk: ** Unsafe Protocol **** Clear-Text Credentials **][Risk Score: 110][Risk Info: Found FTP username (anonymous)][PLAIN TEXT (vsFTPd 3.0.3)][Plen Bins: 74,18,5,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.1.212:50695 <-> 90.130.70.73:25685 [proto: 175/FTP_DATA][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Download/7][5 pkts/342 bytes <-> 4 pkts/1477 bytes][Goodput ratio: 0/82][0.09 sec][bytes ratio: -0.624 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/28 14/28 29/29 14/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68/369 78/1271 5/521][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (    1 0        0        1073741)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0]

@@ -29,6 +29,10 @@ MDNS	1	82	1
 TLS	93	20848	6
 LLMNR	91	6931	48
 
+Safe                            93 20848         6            
+Acceptable                     109 8732          55           
+Unrated                       1521 2498194       136          
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.5.16             	 2      

@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 DNS	2	196	1
 
+Acceptable                       2 196           1            
+
 	1	UDP 127.0.0.1:35980 <-> 127.0.0.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/90 bytes <-> 1 pkts/106 bytes][Goodput ratio: 53/60][0.00 sec][Hostname/SNI: www.allyourbasesare???ongto.cn][19.185.141.241][Risk: ** Non-Printable/Invalid Chars Detected **][Risk Score: 100][PLAIN TEXT (allyourba)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

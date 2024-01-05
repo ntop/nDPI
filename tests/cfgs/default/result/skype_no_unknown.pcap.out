@@ -6,7 +6,7 @@ DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 44 (flows)
 Confidence Match by port    : 22 (flows)
 Confidence DPI              : 201 (flows)
-Num dissector calls: 23265 (87.13 diss/flow)
+Num dissector calls: 23329 (87.37 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/198/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -40,6 +40,11 @@ TLS	474	102723	29
 Dropbox	8	4352	4
 Skype_Teams	518	198936	25
 NAT-PMP	4	216	1
+
+Safe                           474 102723        29           
+Acceptable                     754 231749        191          
+Dangerous                        5 1100          3            
+Unrated                        846 152252        44           
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

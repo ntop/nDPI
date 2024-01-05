@@ -1,6 +1,6 @@
 DPI Packets (TCP):	74	(6.17 pkts/flow)
 Confidence DPI              : 12 (flows)
-Num dissector calls: 1544 (128.67 diss/flow)
+Num dissector calls: 1553 (129.42 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -22,6 +22,8 @@ Patricia protocols:   24/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 Jabber	358	61304	12
+
+Acceptable                     358 61304         12           
 
 	1	TCP 172.16.0.62:57094 <-> 172.16.1.138:5222 [proto: 67/Jabber][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][44 pkts/5701 bytes <-> 42 pkts/13807 bytes][Goodput ratio: 49/80][2.17 sec][bytes ratio: -0.416 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 36/39 611/611 109/111][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 130/329 559/1514 104/415][PLAIN TEXT (xml version)][Plen Bins: 2,4,2,24,9,13,4,6,9,0,2,2,2,0,0,4,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0]
 	2	TCP 172.16.0.62:57122 <-> 172.16.1.138:5222 [proto: 67/Jabber][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][44 pkts/5701 bytes <-> 42 pkts/13806 bytes][Goodput ratio: 49/80][2.16 sec][bytes ratio: -0.415 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 36/39 521/520 99/101][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 130/329 677/1514 116/415][PLAIN TEXT (xml version)][Plen Bins: 2,4,2,22,9,15,4,7,9,0,2,2,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0]

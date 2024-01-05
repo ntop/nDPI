@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Zabbix	236	24571	24
 
+Acceptable                     236 24571         24           
+
 	1	TCP 192.168.7.16:36699 <-> 192.168.7.17:10051 [proto: 248/Zabbix][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][5 pkts/429 bytes <-> 5 pkts/1083 bytes][Goodput ratio: 21/69][0.00 sec][bytes ratio: -0.433 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/1 2/2 1/1][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 86/217 157/811 36/297][Plen Bins: 0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.7.16:60217 <-> 192.168.7.17:10051 [proto: 248/Zabbix][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][5 pkts/429 bytes <-> 5 pkts/1083 bytes][Goodput ratio: 21/69][0.00 sec][bytes ratio: -0.433 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/1 2/2 1/1][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 86/217 157/811 36/297][Plen Bins: 0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.7.16:50639 <-> 192.168.7.17:10051 [proto: 248/Zabbix][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][5 pkts/669 bytes <-> 5 pkts/436 bytes][Goodput ratio: 49/22][0.00 sec][bytes ratio: 0.211 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 134/87 397/164 132/39][Plen Bins: 0,0,0,50,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

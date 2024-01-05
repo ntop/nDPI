@@ -6,7 +6,7 @@ DPI Packets (other):	2	(1.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence Match by port    : 1 (flows)
 Confidence DPI              : 33 (flows)
-Num dissector calls: 626 (17.89 diss/flow)
+Num dissector calls: 629 (17.97 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/6/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -36,6 +36,10 @@ TLS	136	54497	5
 Apple	2	273	1
 Microsoft	121	47561	14
 Azure	2	306	1
+
+Safe                           259 102331        20           
+Acceptable                      43 5081          14           
+Unrated                         13 5582          1            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

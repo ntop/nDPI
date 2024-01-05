@@ -6,7 +6,7 @@ DPI Packets (other):	10	(1.00 pkts/flow)
 Confidence Unknown          : 2 (flows)
 Confidence Match by port    : 6 (flows)
 Confidence DPI              : 61 (flows)
-Num dissector calls: 871 (12.62 diss/flow)
+Num dissector calls: 872 (12.64 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/24/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -44,6 +44,10 @@ AJP	5	390	1
 Apple	2	297	1
 CiscoVPN	3	198	1
 ApplePush	6	966	3
+
+Safe                           359 93320         15           
+Acceptable                     207 36239         52           
+Unrated                         19 1054          2            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

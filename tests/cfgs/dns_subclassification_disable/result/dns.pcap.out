@@ -23,5 +23,7 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 DNS	5	536	2
 
+Acceptable                       5 536           2            
+
 	1	UDP 82.178.113.245:47255 <-> 82.178.158.181:53 [VLAN: 785][proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/91 bytes <-> 1 pkts/219 bytes][Goodput ratio: 36/73][0.00 sec][Hostname/SNI: e7.whatsapp.net][169.45.219.235][PLAIN TEXT (whatsapp)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.170.20:53 <-> 192.168.170.8:32795 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/151 bytes <-> 1 pkts/75 bytes][Goodput ratio: 44/43][41.07 sec][Hostname/SNI: www.l.google.com][::][PLAIN TEXT (google)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

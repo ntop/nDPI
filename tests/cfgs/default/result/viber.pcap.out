@@ -5,7 +5,7 @@ DPI Packets (UDP):	27	(1.93 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
 Confidence Match by port    : 4 (flows)
 Confidence DPI              : 25 (flows)
-Num dissector calls: 465 (16.03 diss/flow)
+Num dissector calls: 466 (16.07 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/12/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -36,6 +36,11 @@ Facebook	2	281	1
 Google	31	9113	3
 Viber	295	105504	12
 QUIC	3	194	1
+
+Safe                           102 33446         6            
+Acceptable                      46 13603         9            
+Fun                            297 105785        13           
+Tracker/Ads                      2 377           1            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     

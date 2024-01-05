@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 H323	10	939	1
 
+Acceptable                      10 939           1            
+
 	1	TCP 10.1.6.18:1720 <-> 10.1.3.143:32803 [proto: 158/H323][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 3][cat: VoIP/10][5 pkts/509 bytes <-> 5 pkts/430 bytes][Goodput ratio: 44/37][1.04 sec][bytes ratio: 0.084 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 60/17 261/261 627/627 217/225][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 102/86 151/214 35/64][PLAIN TEXT (m.jemec)][Plen Bins: 0,0,50,25,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Controller_Area_Network	8	696	8
 
+Safe                             8 696           8            
+
 	1	UDP 55.97.32.36:56551 -> 61.40.63.42:25353 [proto: 352/Controller_Area_Network][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 103.183.191.240:46565 -> 73.121.85.123:63575 [proto: 352/Controller_Area_Network][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 128.244.36.46:34952 -> 196.77.109.252:11898 [proto: 352/Controller_Area_Network][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

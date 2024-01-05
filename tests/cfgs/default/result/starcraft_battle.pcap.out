@@ -6,7 +6,7 @@ DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by port    : 12 (flows)
 Confidence DPI              : 39 (flows)
 Confidence Match by IP      : 1 (flows)
-Num dissector calls: 1619 (31.13 diss/flow)
+Num dissector calls: 1622 (31.19 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/39/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -36,6 +36,10 @@ TLS	46	3071	14
 Google	11	1420	2
 QUIC	6	475	1
 Starcraft	236	51494	6
+
+Safe                            46 3071          14           
+Acceptable                     506 304727        31           
+Fun                            245 52374         7            
 
 	1	TCP 192.168.1.100:3508 <-> 87.248.221.254:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Download/7][90 pkts/5059 bytes <-> 89 pkts/129145 bytes][Goodput ratio: 4/96][3.22 sec][Hostname/SNI: llnw.blizzard.com][bytes ratio: -0.925 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 45/3 2914/58 341/11][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 56/1451 241/1514 20/291][URL: llnw.blizzard.com/sc2-pod-retail/AF11CD00/EU/24621.direct/s2-36281-BA356DD57557728843CAF63A12C79AA3.mfil][StatusCode: 200][Content-Type: application/octet-stream][Server: Apache][User-Agent: Blizzard Web Client][Risk: ** Binary App Transfer **** Susp DGA Domain name **][Risk Score: 250][Risk Info: llnw.blizzard.com / Found mime exe octet-stream][PLAIN TEXT (GET /sc)][Plen Bins: 0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,97,0,0]
 	2	TCP 192.168.1.100:3517 <-> 213.248.127.130:1119 [proto: 213/Starcraft][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Game/8][126 pkts/9157 bytes <-> 89 pkts/41021 bytes][Goodput ratio: 26/88][3.83 sec][bytes ratio: -0.635 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 30/37 1016/1086 104/133][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 73/461 249/1514 28/593][PLAIN TEXT (matteobracci1@gmail.com)][Plen Bins: 76,2,2,2,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,13,0,0]

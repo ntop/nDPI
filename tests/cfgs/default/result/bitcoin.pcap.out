@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 BITCOIN	637	581074	6
 
+Acceptable                     637 581074        6            
+
 	1	TCP 192.168.1.142:55328 <-> 69.118.54.122:8333 [proto: 343/BITCOIN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Crypto_Currency/106][2 pkts/281 bytes <-> 137 pkts/191029 bytes][Goodput ratio: 53/95][330.56 sec][bytes ratio: -0.997 (Download)][IAT c2s/s2c min/avg/max/stddev: 141657/0 141657/2644 141657/76010 0/11325][Pkt Len c2s/s2c min/avg/max/stddev: 110/86 140/1394 171/1514 30/378][PLAIN TEXT (version)][Plen Bins: 0,6,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,92,0,0]
 	2	TCP 192.168.1.142:55348 <-> 74.89.181.229:8333 [proto: 343/BITCOIN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Crypto_Currency/106][55 pkts/28663 bytes <-> 117 pkts/134830 bytes][Goodput ratio: 87/94][1491.26 sec][bytes ratio: -0.649 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 21789/4882 100110/64236 26995/11546][Pkt Len c2s/s2c min/avg/max/stddev: 110/86 521/1152 1514/1514 578/589][PLAIN TEXT (version)][Plen Bins: 0,32,0,4,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,59,0,0]
 	3	TCP 192.168.1.142:55383 <-> 66.68.83.22:8333 [proto: 343/BITCOIN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Crypto_Currency/106][65 pkts/45271 bytes <-> 96 pkts/70339 bytes][Goodput ratio: 91/91][1337.01 sec][bytes ratio: -0.217 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 18993/12001 134322/105866 27575/21527][Pkt Len c2s/s2c min/avg/max/stddev: 110/86 696/733 1514/1514 637/653][PLAIN TEXT (version)][Plen Bins: 0,47,0,4,0,0,0,0,5,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,40,0,0]

@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 RMCP	6	380	6
 
+Safe                             6 380           6            
+
 	1	UDP 64.240.55.240:57984 -> 30.144.16.67:623 [proto: 351/RMCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/65 bytes -> 0 pkts/0 bytes][Goodput ratio: 35/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 123.212.25.229:49531 -> 171.47.173.23:623 [proto: 351/RMCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/65 bytes -> 0 pkts/0 bytes][Goodput ratio: 35/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 127.36.88.103:34698 -> 164.114.97.252:623 [proto: 351/RMCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/65 bytes -> 0 pkts/0 bytes][Goodput ratio: 35/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

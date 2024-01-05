@@ -27,6 +27,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 ETHEREUM	2000	216111	74
 
+Acceptable                    2000 216111        74           
+
 	1	TCP 192.168.1.184:56626 <-> 178.128.195.220:30303 [proto: 354/ETHEREUM][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Crypto_Currency/106][32 pkts/3294 bytes <-> 37 pkts/3156 bytes][Goodput ratio: 36/21][0.16 sec][bytes ratio: 0.021 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 2/4 42/62 8/14][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 103/85 612/470 105/69][Plen Bins: 62,21,0,3,3,0,0,0,3,0,0,0,3,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.1.184:56638 <-> 209.250.240.205:30303 [proto: 354/ETHEREUM][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Crypto_Currency/106][34 pkts/3347 bytes <-> 28 pkts/2774 bytes][Goodput ratio: 34/32][0.15 sec][bytes ratio: 0.094 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 5/3 43/41 12/10][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 98/99 481/560 79/95][Plen Bins: 43,29,0,14,3,3,0,0,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.1.184:56660 <-> 51.161.23.12:30303 [proto: 354/ETHEREUM][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Crypto_Currency/106][36 pkts/3241 bytes <-> 29 pkts/2723 bytes][Goodput ratio: 29/31][0.57 sec][bytes ratio: 0.087 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 10/9 147/141 36/34][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 90/94 639/487 96/81][Plen Bins: 63,21,3,3,3,0,0,0,0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

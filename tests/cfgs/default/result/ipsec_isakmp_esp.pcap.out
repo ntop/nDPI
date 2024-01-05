@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 IPSec	1080	580682	24
 
+Safe                          1080 580682        24           
+
 	1	UDP 192.168.2.100:14500 <-> 109.237.187.227:4500 [proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: VPN/2][133 pkts/90074 bytes <-> 158 pkts/61560 bytes][Goodput ratio: 94/89][< 1 sec][bytes ratio: 0.188 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 224588/183284 12245008/12245090 1295597/1170056][Pkt Len c2s/s2c min/avg/max/stddev: 122/82 677/390 1374/1374 512/393][PLAIN TEXT (@EmPAT)][Plen Bins: 0,0,14,14,24,0,7,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,7,0,0,5,0,0,0,7,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0]
 	2	UDP 192.168.2.100:14500 <-> 109.237.187.130:4500 [proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: VPN/2][37 pkts/23230 bytes <-> 53 pkts/36862 bytes][Goodput ratio: 93/94][< 1 sec][bytes ratio: -0.227 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 51181/32575 761601/761794 163164/132507][Pkt Len c2s/s2c min/avg/max/stddev: 138/122 628/696 1374/1374 489/539][PLAIN TEXT (H.P.RE)][Plen Bins: 0,0,6,13,20,0,6,0,0,0,0,0,0,6,0,0,0,0,1,0,0,0,0,0,0,6,0,0,0,0,0,0,12,0,0,0,0,0,0,0,6,20,0,0,0,0,0,0]
 	3	UDP 192.168.2.100:10500 <-> 109.237.187.227:500 [proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: VPN/2][54 pkts/44820 bytes <-> 53 pkts/11118 bytes][Goodput ratio: 95/80][< 1 sec][bytes ratio: 0.602 (Upload)][IAT c2s/s2c min/avg/max/stddev: 28/27 689892/698588 12245747/12245747 1998175/2019137][Pkt Len c2s/s2c min/avg/max/stddev: 818/94 830/210 842/330 12/118][PLAIN TEXT (rMpKau6)][Plen Bins: 0,25,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
