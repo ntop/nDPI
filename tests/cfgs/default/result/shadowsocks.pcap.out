@@ -25,6 +25,9 @@ Patricia protocols IPv6: 0/0 (search/found)
 Unknown	15	68444	1
 SOCKS	29	69355	1
 
+Acceptable                      29 69355         1            
+Unrated                         15 68444         1            
+
 	1	TCP 127.0.0.1:37904 <-> 127.0.0.1:1080 [proto: 172/SOCKS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][16 pkts/1160 bytes <-> 13 pkts/68195 bytes][Goodput ratio: 8/99][1.49 sec][bytes ratio: -0.967 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 114/160 659/660 191/203][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 72/5246 148/16450 20/7185][PLAIN TEXT (GET / HTTP/1.1)][Plen Bins: 33,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41]
 
 

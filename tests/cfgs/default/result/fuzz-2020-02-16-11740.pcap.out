@@ -30,6 +30,9 @@ Unknown	19	6603	19
 VRRP	1	725	1
 Radius	295	143155	57
 
+Acceptable                     296 143880        58           
+Unrated                         19 6603          19           
+
 	1	UDP 10.12.64.30:29200 <-> 198.226.25.53:1812 [proto: 146/Radius][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][110 pkts/79894 bytes <-> 102 pkts/24138 bytes][Goodput ratio: 93/82][2575.21 sec][bytes ratio: 0.536 (Upload)][IAT c2s/s2c min/avg/max/stddev: 21/154 25882/28068 567977/452627 75856/68610][Pkt Len c2s/s2c min/avg/max/stddev: 697/179 726/237 745/318 20/53][PLAIN TEXT (50311480271516480@wlan.mnc480.m)][Plen Bins: 0,0,0,0,12,12,10,0,12,0,0,0,0,0,0,0,0,0,0,0,14,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 10.12.64.30:29200 <-> 198.226.25.62:1812 [proto: 146/Radius][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][12 pkts/8682 bytes <-> 6 pkts/1365 bytes][Goodput ratio: 94/81][1507.26 sec][bytes ratio: 0.728 (Upload)][IAT c2s/s2c min/avg/max/stddev: 195/217 150274/201744 597367/597234 204869/243404][Pkt Len c2s/s2c min/avg/max/stddev: 660/165 724/228 745/318 27/65][PLAIN TEXT (50311480281501589@wlan.mnc480.m)][Plen Bins: 0,0,0,5,11,5,0,0,11,0,0,0,0,0,0,0,0,0,0,5,16,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 10.12.64.30:29200 <-> 198.226.25.53:1813 [proto: 146/Radius][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][6 pkts/3539 bytes <-> 4 pkts/620 bytes][Goodput ratio: 93/73][2002.35 sec][bytes ratio: 0.702 (Upload)][IAT c2s/s2c min/avg/max/stddev: 6131/15399 400469/467937 1165850/1229729 441254/541835][Pkt Len c2s/s2c min/avg/max/stddev: 251/147 590/155 876/179 230/14][PLAIN TEXT (50311480073638072@wlan.mnc400.m)][Plen Bins: 0,0,0,30,10,0,10,0,10,0,0,0,0,0,0,0,0,0,0,10,10,10,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

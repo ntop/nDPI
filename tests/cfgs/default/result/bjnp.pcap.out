@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 BJNP	10	460	10
 
+Acceptable                      10 460           10           
+
 	1	UDP 192.168.185.141:50087 -> 192.168.1.17:8612 [proto: 204/BJNP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/46 bytes -> 0 pkts/0 bytes][Goodput ratio: 34/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.185.141:50089 -> 192.168.1.1:8612 [proto: 204/BJNP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/46 bytes -> 0 pkts/0 bytes][Goodput ratio: 34/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.185.141:50089 -> 192.168.1.2:8612 [proto: 204/BJNP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/46 bytes -> 0 pkts/0 bytes][Goodput ratio: 34/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

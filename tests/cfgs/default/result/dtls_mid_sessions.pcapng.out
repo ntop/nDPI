@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 DTLS	91	37868	4
 
+Safe                            91 37868         4            
+
 	1	UDP 170.151.105.215:443 <-> 121.152.255.238:8460 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][17 pkts/16320 bytes <-> 13 pkts/2086 bytes][Goodput ratio: 96/74][0.55 sec][bytes ratio: 0.773 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 31/24 152/154 51/46][Pkt Len c2s/s2c min/avg/max/stddev: 135/135 960/160 1495/352 623/62][Plen Bins: 0,0,44,6,3,0,3,0,3,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,30,0,0]
 	2	UDP 170.151.105.215:443 <-> 72.102.179.218:62811 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][13 pkts/6283 bytes <-> 17 pkts/3803 bytes][Goodput ratio: 91/81][3.28 sec][bytes ratio: 0.246 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 240/212 1725/941 499/287][Pkt Len c2s/s2c min/avg/max/stddev: 135/135 483/224 1495/833 556/172][Plen Bins: 0,0,34,20,13,0,6,3,3,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0]
 	3	UDP 135.215.56.198:443 -> 124.73.140.89:61189 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Web/5][30 pkts/9241 bytes -> 0 pkts/0 bytes][Goodput ratio: 86/0][0.27 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 9/0 28/0 7/0][Pkt Len c2s/s2c min/avg/max/stddev: 120/0 308/0 1381/0 280/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (q/SCmS.)][Plen Bins: 0,0,20,3,13,0,41,0,3,0,3,3,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,3,0,0,0,0,0,0]

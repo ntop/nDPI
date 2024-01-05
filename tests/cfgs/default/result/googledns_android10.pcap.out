@@ -28,6 +28,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 ICMP	4	392	1
 DoH_DoT	528	132502	7
 
+Acceptable                     532 132894        8            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.159            	 2      

@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 UBNTAC2	8	1736	8
 
+Safe                             8 1736          8            
+
 	1	UDP 192.168.1.1:34085 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/217 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][UniFiSecurityGateway.ER-e120.v4][PLAIN TEXT (UniFiSecurityGateway.ER)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.1.1:42838 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/217 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][UniFiSecurityGateway.ER-e120.v4][PLAIN TEXT (UniFiSecurityGateway.ER)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.1.1:44641 -> 255.255.255.255:10001 [proto: 31/UBNTAC2][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/217 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][UniFiSecurityGateway.ER-e120.v4][PLAIN TEXT (UniFiSecurityGateway.ER)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

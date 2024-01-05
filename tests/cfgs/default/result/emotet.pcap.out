@@ -25,6 +25,9 @@ SMTP	626	438465	1
 HTTP	1601	1581542	3
 TLS	153	107018	2
 
+Safe                           153 107018        2            
+Acceptable                    2227 2020007       4            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 10.4.25.101              	 1      

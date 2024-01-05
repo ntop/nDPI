@@ -25,4 +25,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 TLS	28	9108	1
 
+Safe                            28 9108          1            
+
 	1	TCP 172.31.3.224:42835 <-> 216.58.212.100:443 [proto: 91/TLS][IP: 126/Google][Encrypted][Confidence: Match by port][DPI packets: 24][cat: Web/5][16 pkts/1512 bytes <-> 12 pkts/7596 bytes][Goodput ratio: 43/91][6.67 sec][bytes ratio: -0.668 (Download)][IAT c2s/s2c min/avg/max/stddev: 76/66 422/544 1185/1213 376/402][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 94/633 368/1484 87/622][Plen Bins: 8,8,0,8,0,8,0,0,0,25,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0]

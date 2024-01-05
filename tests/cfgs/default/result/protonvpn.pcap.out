@@ -29,6 +29,9 @@ TLS	1	74	1
 WireGuard	14	2060	1
 ProtonVPN	26	8061	1
 
+Safe                             1 74            1            
+Acceptable                      40 10121         2            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 10.0.2.15                	 1      

@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 RTPS	29	22382	1
 
+Acceptable                      29 22382         1            
+
 	1	UDP 127.0.0.1:28108 -> 127.0.0.1:7410 [proto: 359/RTPS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][29 pkts/22382 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][490.03 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1000/0 17655/0 30000/0 13497/0][Pkt Len c2s/s2c min/avg/max/stddev: 58/0 772/0 822/0 185/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic][PLAIN TEXT (dds.sys)][Plen Bins: 3,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,93,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

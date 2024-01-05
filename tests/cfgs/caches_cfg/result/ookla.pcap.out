@@ -28,6 +28,9 @@ TLS	29	23166	1
 HTTP_Proxy	10	2375	1
 Ookla	74	12870	4
 
+Safe                           103 36036         5            
+Acceptable                      10 2375          1            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.128            	 2      

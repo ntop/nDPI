@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Dropbox	848	90532	15
 
+Acceptable                     848 90532         15           
+
 	1	UDP 192.168.56.1:50318 <-> 192.168.56.101:17500 [proto: 121/Dropbox][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Cloud/13][100 pkts/13960 bytes <-> 100 pkts/6260 bytes][Goodput ratio: 70/33][11.19 sec][bytes ratio: 0.381 (Upload)][IAT c2s/s2c min/avg/max/stddev: 103/103 113/112 150/151 11/11][Pkt Len c2s/s2c min/avg/max/stddev: 136/59 140/63 143/66 2/2][PLAIN TEXT (messageType)][Plen Bins: 50,0,13,36,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.56.1:50312 <-> 192.168.56.101:17500 [proto: 121/Dropbox][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Cloud/13][100 pkts/13947 bytes <-> 100 pkts/6247 bytes][Goodput ratio: 70/33][11.09 sec][bytes ratio: 0.381 (Upload)][IAT c2s/s2c min/avg/max/stddev: 103/103 111/111 154/150 10/9][Pkt Len c2s/s2c min/avg/max/stddev: 136/59 139/62 143/66 2/2][PLAIN TEXT (messageType)][Plen Bins: 50,0,11,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.56.1:50319 <-> 192.168.56.101:17500 [proto: 121/Dropbox][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Cloud/13][100 pkts/13921 bytes <-> 100 pkts/6221 bytes][Goodput ratio: 70/32][10.92 sec][bytes ratio: 0.382 (Upload)][IAT c2s/s2c min/avg/max/stddev: 103/103 110/110 172/164 11/11][Pkt Len c2s/s2c min/avg/max/stddev: 136/59 139/62 143/66 2/2][PLAIN TEXT (messageType)][Plen Bins: 50,0,15,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

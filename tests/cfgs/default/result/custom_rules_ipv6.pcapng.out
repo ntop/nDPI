@@ -27,6 +27,8 @@ CustomProtocolF	1	1287	1
 CustomProtocolG	1	318	1
 CustomProtocolH	1	318	1
 
+Acceptable                       6 3810          5            
+
 	1	UDP [247f:855b:5e16:3caf:3f2c:4134:9592:661b]:100 -> [21bc:b273:7f68:88d7:77a8:585:3990:927b]:1991 [proto: 392/CustomProtocolE][IP: 392/CustomProtocolE][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/1287 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
 	2	UDP [247f:855b:5e16:3caf:3f2c:4134:9592:661b]:36098 -> [21bc:b273:7f68:88d7:77a8:585:3990:927b]:50621 [proto: 393/CustomProtocolF][IP: 393/CustomProtocolF][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/1287 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
 	3	UDP [3ffe:507::1:200:86ff:fe05:80da]:21554 <-> [3ffe:501:4819::42]:5333 [proto: 391/CustomProtocolD][IP: 391/CustomProtocolD][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/90 bytes <-> 1 pkts/510 bytes][Goodput ratio: 31/88][0.07 sec][PLAIN TEXT (itojun)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

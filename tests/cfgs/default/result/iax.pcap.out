@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 IAX	50	9172	1
 
+Acceptable                      50 9172          1            
+
 	1	UDP 82.110.36.84:4569 <-> 192.168.2.120:4566 [proto: 95/IAX][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][28 pkts/5240 bytes <-> 22 pkts/3932 bytes][Goodput ratio: 77/76][0.53 sec][bytes ratio: 0.143 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 18/5 43/51 10/13][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 187/179 214/214 48/59][PLAIN TEXT (442088205155)][Plen Bins: 14,0,2,0,0,84,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

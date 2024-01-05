@@ -30,6 +30,10 @@ ICMP	1	70	1
 TLS	28	2022	3
 AppleiTunes	90	29795	2
 
+Safe                            28 2022          3            
+Acceptable                       7 1624          3            
+Fun                            602 312122        13           
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.2.17             	 3      

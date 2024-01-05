@@ -36,6 +36,9 @@ Dropbox	2	348	1
 AmazonAWS	4	288	1
 TelegramVoip	228	41561	16
 
+Safe                           640 339548        9            
+Acceptable                     247 43569         25           
+
 	1	TCP 192.168.12.169:37950 <-> 149.154.167.91:443 [proto: 91/TLS][IP: 185/Telegram][Encrypted][Confidence: Match by port][DPI packets: 18][cat: Web/5][156 pkts/40749 bytes <-> 214 pkts/142865 bytes][Goodput ratio: 75/90][41.14 sec][bytes ratio: -0.556 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 246/152 12847/5983 1291/707][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 261/668 1090/1294 224/564][Risk: ** Fully encrypted flow **][Risk Score: 50][Plen Bins: 0,0,2,2,4,5,6,4,4,3,0,1,0,0,1,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,60,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.12.169:40830 <-> 149.154.167.222:443 [proto: 91/TLS][IP: 185/Telegram][Encrypted][Confidence: Match by port][DPI packets: 18][cat: Web/5][80 pkts/7287 bytes <-> 100 pkts/120708 bytes][Goodput ratio: 27/95][28.19 sec][bytes ratio: -0.886 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 437/1 25008/31 3114/5][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 91/1207 644/1294 95/289][Risk: ** Fully encrypted flow **][Risk Score: 50][Plen Bins: 0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,94,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.12.169:42405 <-> 93.36.13.115:35393 [proto: 78.355/STUN.TelegramVoip][IP: 0/Unknown][ClearText][Confidence: DPI (cache)][DPI packets: 1][cat: VoIP/10][59 pkts/17987 bytes <-> 55 pkts/9102 bytes][Goodput ratio: 86/75][2.02 sec][bytes ratio: 0.328 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 32/28 306/117 48/28][Pkt Len c2s/s2c min/avg/max/stddev: 65/63 305/165 1154/435 330/102][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][PLAIN TEXT (BPEmhF0)][Plen Bins: 8,28,25,7,0,0,0,15,0,1,1,0,2,1,0,1,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 TuyaLP	98	21948	13
 
+Acceptable                      98 21948         13           
+
 	1	UDP 192.168.242.170:49154 -> 255.255.255.255:6667 [proto: 331/TuyaLP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][8 pkts/1840 bytes -> 0 pkts/0 bytes][Goodput ratio: 82/0][35.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4999/0 5000/0 5001/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 230/0 230/0 230/0 0/0][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.242.172:49154 -> 255.255.255.255:6667 [proto: 331/TuyaLP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][8 pkts/1840 bytes -> 0 pkts/0 bytes][Goodput ratio: 82/0][35.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4997/0 5000/0 5001/0 2/0][Pkt Len c2s/s2c min/avg/max/stddev: 230/0 230/0 230/0 0/0][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.242.174:49154 -> 255.255.255.255:6667 [proto: 331/TuyaLP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][8 pkts/1840 bytes -> 0 pkts/0 bytes][Goodput ratio: 82/0][35.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4998/0 5000/0 5003/0 2/0][Pkt Len c2s/s2c min/avg/max/stddev: 230/0 230/0 230/0 0/0][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

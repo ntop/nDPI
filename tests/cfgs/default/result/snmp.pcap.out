@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 SNMP	72	14435	17
 
+Acceptable                      72 14435         17           
+
 	1	UDP 10.99.8.88:43242 <-> 10.100.253.146:161 [VLAN: 1308][proto: 14/SNMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][3 pkts/2367 bytes <-> 3 pkts/1502 bytes][Goodput ratio: 94/91][0.11 sec][bytes ratio: 0.224 (Upload)][IAT c2s/s2c min/avg/max/stddev: 21/18 44/20 67/21 23/2][Pkt Len c2s/s2c min/avg/max/stddev: 611/75 789/501 1143/717 250/301][Risk: ** Error Code **][Risk Score: 10][Risk Info: SNMP Error 1][PLAIN TEXT (public)][Plen Bins: 16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 131.179.49.165:35970 <-> 254.158.1.169:161 [proto: 14/SNMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][3 pkts/462 bytes <-> 3 pkts/534 bytes][Goodput ratio: 73/76][0.43 sec][bytes ratio: -0.072 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 143/142 144/144 145/146 1/2][Pkt Len c2s/s2c min/avg/max/stddev: 106/147 154/178 178/198 34/22][Plen Bins: 0,0,16,16,67,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 131.179.49.165:60694 <-> 254.158.1.169:161 [proto: 14/SNMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][3 pkts/462 bytes <-> 3 pkts/527 bytes][Goodput ratio: 73/76][0.43 sec][bytes ratio: -0.066 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 117/150 134/154 150/158 16/4][Pkt Len c2s/s2c min/avg/max/stddev: 106/147 154/176 178/191 34/20][Plen Bins: 0,0,16,16,67,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

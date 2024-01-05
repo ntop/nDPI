@@ -24,6 +24,9 @@ Patricia protocols IPv6: 0/0 (search/found)
 VK	82	10228	4
 TLS	827	116853	6
 
+Safe                           827 116853        6            
+Fun                             82 10228         4            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.1.249            	 1      

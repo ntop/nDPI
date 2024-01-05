@@ -84,6 +84,12 @@ NoMachine	2	116	2
 Ceph	4	232	4
 iSCSI	2	116	2
 
+Safe                            14 812           14           
+Acceptable                     125 7276          112          
+Fun                              6 348           6            
+Unsafe                           8 464           8            
+Unrated                       1858 107772        1854         
+
 	1	TCP 172.16.0.8:36050 <-> 64.13.134.52:22 [proto: 92/SSH][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 5][cat: RemoteAccess/12][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.68 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 172.16.0.8:36050 <-> 64.13.134.52:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 5][cat: Network/14][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.09 sec][::][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 172.16.0.8:36050 <-> 64.13.134.52:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 5][cat: Web/5][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.27 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

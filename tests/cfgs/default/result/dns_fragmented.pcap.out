@@ -24,6 +24,8 @@ Patricia protocols IPv6: 28/8 (search/found)
 
 DNS	59	21695	21
 
+Acceptable                      59 21695         21           
+
 	1	TCP [2001:470:1f0b:16b0:20c:29ff:fe7c:a4cb]:57089 <-> [2001:470:1f0b:16b0::a26:53]:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Network/14][6 pkts/578 bytes <-> 4 pkts/2084 bytes][Goodput ratio: 9/83][0.00 sec][Hostname/SNI: weberlab.de][::][bytes ratio: -0.566 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 1/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/86 96/521 140/1818 20/749][PLAIN TEXT (weberlab)][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50]
 	2	TCP 194.247.5.6:39005 <-> 194.247.5.14:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Network/14][6 pkts/458 bytes <-> 4 pkts/2004 bytes][Goodput ratio: 12/86][0.00 sec][Hostname/SNI: weberlab.de][::][bytes ratio: -0.628 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 76/501 120/1798 20/749][PLAIN TEXT (weberlab)][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50]
 	3	UDP [2001:470:1f0b:16b0:20c:29ff:fe7c:a4cb]:55729 <-> [2001:470:765b::a25:53]:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 3][cat: Network/14][2 pkts/228 bytes <-> 1 pkts/1494 bytes][Goodput ratio: 45/95][5.01 sec][Hostname/SNI: weberlab.de][::][Risk: ** Large DNS Packet (512+ bytes) **** Fragmented DNS Message **][Risk Score: 100][Risk Info: 1424 Bytes DNS Packet][PLAIN TEXT (weberlab)][Plen Bins: 0,66,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0]

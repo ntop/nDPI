@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 ICMP	863	190810	1
 
+Acceptable                     863 190810        1            
+
 	1	ICMP 192.168.154.131:0 <-> 192.168.154.132:0 [proto: 81/ICMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][448 pkts/98566 bytes <-> 415 pkts/92244 bytes][Goodput ratio: 81/81][1122.51 sec][bytes ratio: 0.033 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 2578/2731 145505/145505 9091/9494][Pkt Len c2s/s2c min/avg/max/stddev: 74/74 220/222 1075/1070 245/245][Risk: ** Malformed Packet **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (OpenSSH5)][Plen Bins: 0,32,24,24,7,3,3,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

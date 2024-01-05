@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 DNScrypt	6	4300	3
 
+Acceptable                       6 4300          3            
+
 	1	UDP 127.0.0.1:50893 <-> 127.0.0.2:5353 [proto: 208/DNScrypt][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/1130 bytes <-> 1 pkts/410 bytes][Goodput ratio: 96/90][0.01 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 127.0.0.1:38650 <-> 127.0.0.2:5353 [proto: 208/DNScrypt][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/1130 bytes <-> 1 pkts/282 bytes][Goodput ratio: 96/85][0.01 sec][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 127.0.0.1:42883 <-> 127.0.0.2:5353 [proto: 208/DNScrypt][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/1130 bytes <-> 1 pkts/218 bytes][Goodput ratio: 96/80][0.01 sec][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0]

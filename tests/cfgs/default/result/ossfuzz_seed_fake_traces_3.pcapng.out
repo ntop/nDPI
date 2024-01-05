@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 MapleStory	4	362	1
 
+Fun                              4 362           1            
+
 	1	TCP 192.168.16.173:60546 <-> 93.184.216.34:80 [proto: 113/MapleStory][IP: 288/Edgecast][ClearText][Confidence: DPI][DPI packets: 4][cat: Game/8][3 pkts/288 bytes <-> 1 pkts/74 bytes][Goodput ratio: 28/0][0.10 sec][Hostname/SNI: example.com][User-Agent: AspINet][PLAIN TEXT (pGET /maplestory/ HTTP/1.1)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

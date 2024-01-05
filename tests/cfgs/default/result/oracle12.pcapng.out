@@ -25,4 +25,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 Oracle	20	2518	1
 
+Acceptable                      20 2518          1            
+
 	1	TCP 10.0.2.15:40226 <-> 10.0.72.139:1521 [proto: 167/Oracle][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 20][cat: Database/11][9 pkts/1447 bytes <-> 11 pkts/1071 bytes][Goodput ratio: 65/41][0.03 sec][bytes ratio: 0.149 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/3 20/19 7/6][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 161/97 287/293 93/71][PLAIN TEXT (DESCRIPTION)][Plen Bins: 18,18,9,9,0,9,18,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

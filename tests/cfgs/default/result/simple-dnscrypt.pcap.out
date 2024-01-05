@@ -24,6 +24,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 DNScrypt	111	44676	4
 
+Acceptable                     111 44676         4            
+
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
 	1	 192.168.43.167           	 2      

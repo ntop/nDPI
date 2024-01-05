@@ -23,4 +23,6 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 RTCP	5	740	1
 
+Acceptable                       5 740           1            
+
 	1	UDP 217.12.244.34:25963 <-> 217.12.247.98:31601 [proto: 165/RTCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: VoIP/10][3 pkts/468 bytes <-> 2 pkts/272 bytes][Goodput ratio: 72/67][8.04 sec][PLAIN TEXT (931534)][Plen Bins: 0,0,40,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

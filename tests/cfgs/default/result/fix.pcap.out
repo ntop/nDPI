@@ -23,6 +23,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 
 FIX	1261	115514	12
 
+Safe                          1261 115514        12           
+
 	1	TCP 208.245.107.3:4000 <-> 192.168.0.20:45578 [proto: 230/FIX][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][228 pkts/26333 bytes <-> 228 pkts/13920 bytes][Goodput ratio: 53/2][22.80 sec][bytes ratio: 0.308 (Upload)][IAT c2s/s2c min/avg/max/stddev: 3/0 100/100 850/850 127/126][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 115/61 511/140 54/9][PLAIN TEXT (FIX.4.1)][Plen Bins: 35,41,10,8,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 8.17.22.31:4000 <-> 192.168.0.20:47968 [proto: 230/FIX][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][201 pkts/21246 bytes <-> 200 pkts/13460 bytes][Goodput ratio: 38/2][22.86 sec][bytes ratio: 0.224 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 110/109 501/500 86/84][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 106/67 169/153 15/11][PLAIN TEXT (FIX.4.1)][Plen Bins: 23,67,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 8.17.22.31:4000 <-> 192.168.0.20:43594 [proto: 230/FIX][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: RPC/16][111 pkts/16881 bytes <-> 111 pkts/7680 bytes][Goodput ratio: 57/5][22.65 sec][bytes ratio: 0.375 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 202/199 265/291 96/98][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 152/69 288/164 42/17][PLAIN TEXT (FIX.4.1)][Plen Bins: 3,25,31,28,10,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
