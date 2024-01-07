@@ -1,0 +1,33 @@
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+GoogleChat	6	3875	1
+
+Acceptable                       6 3875          1            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.88.231           	 1      
+
+
+	1	TCP 192.168.88.231:46172 <-> 142.251.1.100:443 [proto: 91.382/TLS.GoogleChat][IP: 126/Google][Encrypted][Confidence: DPI][DPI packets: 6][cat: Chat/9][3 pkts/869 bytes <-> 3 pkts/3006 bytes][Goodput ratio: 76/93][0.04 sec][Hostname/SNI: chat.google.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.551 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 10/10 20/20 10/10][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 290/1002 729/2866 311/1318][TLSv1.3][JA3C: b5001237acdf006056b409cc433726b0][JA4: t13d1715h2_5b57614c22b0_5c2c66f702b0][JA3S: eb1d94daa7e0344597e756a1fb6e7054][ECH: version 0xfe0d][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50]

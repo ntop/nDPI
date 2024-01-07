@@ -456,3 +456,12 @@ References: `Main site <https://www.hl7.org/>`_
 Ceph is a scalable distributed storage system.
 
 References: `Main site <https://ceph.io/en/>`_
+
+
+.. _Proto 381:
+
+`NDPI_PROTOCOL_GOOGLE_CHAT`
+=========================
+Google Chat is an instant messaging service from Google, which replaced Hangouts.
+
+References: `Main site <https://chat.google.com/>`_
