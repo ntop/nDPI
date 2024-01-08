@@ -38,11 +38,11 @@ ICMP	4	328	1
 IGMP	4	226	4
 TLS	474	102723	29
 Dropbox	8	4352	4
-Skype_Teams	518	198936	25
+Skype_Teams	220	49687	25
 NAT-PMP	4	216	1
 
 Safe                           474 102723        29           
-Acceptable                     754 231749        191          
+Acceptable                     456 82500         191          
 Dangerous                        5 1100          3            
 Unrated                        846 152252        44           
 
@@ -51,7 +51,7 @@ JA3 Host Stats:
 	1	 192.168.1.34             	 3      
 
 
-	1	TCP 192.168.1.34:51230 <-> 157.56.126.211:443 [proto: 91.125/TLS.Skype_Teams][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 9][cat: VoIP/10][166 pkts/39042 bytes <-> 182 pkts/142645 bytes][Goodput ratio: 72/92][51.22 sec][bytes ratio: -0.570 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 370/331 45360/45460 3946/3736][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 235/784 1506/1506 433/565][Risk: ** Obsolete TLS (v1.1 or older) **][Risk Score: 100][Risk Info: TLSv1][TLSv1][JA3C: 06207a1730b5deeb207b0556e102ded2][JA4: t10d230000_9b3242b70dbd_e3b0c44298fc][ServerNames: *.gateway.messenger.live.com,*.beta.gateway.edge.messenger.live.com,*.by2.gateway.edge.messenger.live.com,*.sn1.gateway.edge.messenger.live.com][JA3S: 5e4e5596180ebd0ac0317125ee490707][Issuer: C=US, ST=Washington, L=Redmond, O=Microsoft Corporation, OU=Microsoft IT, CN=Microsoft IT SSL SHA2][Subject: CN=*.gateway.messenger.live.com][Certificate SHA-1: 95:C4:07:41:85:D4:EF:AA:D9:1F:0F:1F:3C:08:BF:8E:8B:D0:90:51][Validity: 2014-10-27 22:51:07 - 2016-10-26 22:51:07][Cipher: TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA][Plen Bins: 19,2,1,5,0,1,2,0,0,3,0,0,0,1,0,0,0,1,1,0,0,1,1,0,1,0,1,10,1,1,0,0,0,0,0,0,2,0,0,0,3,5,0,0,0,30,0,0]
+	1	TCP 192.168.1.34:51230 <-> 157.56.126.211:443 [proto: 91.125/TLS.Skype_Teams][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 9][cat: VoIP/10][32 pkts/24574 bytes <-> 18 pkts/7864 bytes][Goodput ratio: 91/85][1.62 sec][bytes ratio: 0.515 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 43/71 286/289 72/75][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 768/437 1506/1506 662/527][Risk: ** Obsolete TLS (v1.1 or older) **][Risk Score: 100][Risk Info: TLSv1][TLSv1][JA3C: 06207a1730b5deeb207b0556e102ded2][JA4: t10d230000_9b3242b70dbd_e3b0c44298fc][ServerNames: *.gateway.messenger.live.com,*.beta.gateway.edge.messenger.live.com,*.by2.gateway.edge.messenger.live.com,*.sn1.gateway.edge.messenger.live.com][JA3S: 5e4e5596180ebd0ac0317125ee490707][Issuer: C=US, ST=Washington, L=Redmond, O=Microsoft Corporation, OU=Microsoft IT, CN=Microsoft IT SSL SHA2][Subject: CN=*.gateway.messenger.live.com][Certificate SHA-1: 95:C4:07:41:85:D4:EF:AA:D9:1F:0F:1F:3C:08:BF:8E:8B:D0:90:51][Validity: 2014-10-27 22:51:07 - 2016-10-26 22:51:07][Cipher: TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA][PLAIN TEXT (cQyScM)][Plen Bins: 5,5,2,8,0,5,5,2,0,0,0,0,0,0,0,0,2,2,0,2,0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,50,0,0]
 	2	TCP 192.168.1.34:51227 <-> 17.172.100.36:443 [proto: 91/TLS][IP: 140/Apple][Encrypted][Confidence: DPI][DPI packets: 5][cat: Web/5][38 pkts/9082 bytes <-> 38 pkts/10499 bytes][Goodput ratio: 77/80][68.36 sec][bytes ratio: -0.072 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 2273/323 55625/8255 10014/1510][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 239/276 680/1494 273/358][Plen Bins: 16,16,0,0,0,0,0,0,0,0,16,0,0,0,0,5,2,5,13,16,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,0,0]
 	3	TCP 192.168.1.34:51307 <-> 149.13.32.15:13392 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 16][cat: Web/5][19 pkts/16968 bytes <-> 7 pkts/531 bytes][Goodput ratio: 93/13][10.40 sec][bytes ratio: 0.939 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 625/19 4127/44 1113/18][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 893/76 1506/123 670/20][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 27,5,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,0,0,0,0,0,0,51,0,0]
 	4	TCP 192.168.1.34:51312 <-> 149.13.32.15:13392 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 16][cat: Web/5][18 pkts/15111 bytes <-> 7 pkts/531 bytes][Goodput ratio: 92/13][6.05 sec][bytes ratio: 0.932 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 377/19 2072/42 642/17][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 840/76 1506/123 681/20][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 23,5,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,48,0,0]
