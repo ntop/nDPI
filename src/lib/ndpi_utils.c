@@ -1569,7 +1569,7 @@ char *ndpi_get_ip_proto_name(u_int16_t ip_proto, char *name, unsigned int name_l
     snprintf(name, name_len, "PIM");
     break;
 
-  case 112:
+  case NDPI_VRRP_PROTOCOL_TYPE:
     snprintf(name, name_len, "VRRP");
     break;
 
@@ -2849,7 +2849,7 @@ int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args
 struct tm *ndpi_gmtime_r(const time_t *timep,
                          struct tm *result)
 {
-#ifdef WIN32
+#if defined(WIN32)
   gmtime_s(result, timep);
   return result;
 #else

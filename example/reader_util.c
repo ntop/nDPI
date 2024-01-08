@@ -1425,6 +1425,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->flow_payload = flow->ndpi_flow->flow_payload, flow->flow_payload_len = flow->ndpi_flow->flow_payload_len;
     flow->ndpi_flow->flow_payload = NULL; /* We'll free the memory */
 
+    if(workflow->flow_callback != NULL)
+      workflow->flow_callback(workflow, flow, workflow->flow_callback_userdata);
+
     ndpi_free_flow_info_half(flow);
   }
 }
