@@ -574,39 +574,15 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
   */
   ndpi_str->proto_defaults[protoId].isAppProtocol = is_app_protocol;
   ndpi_str->proto_defaults[protoId].protoName = name;
-  if(ndpi_str->cfg.protocols_categories[protoId] != -1) {
-    NDPI_LOG_DBG(ndpi_str, "Overwriting category for proto %s [%d] %d->%d\n",
-                 protoName, protoId, protoCategory,
-                 ndpi_str->cfg.protocols_categories[protoId]);
-    ndpi_str->proto_defaults[protoId].protoCategory = ndpi_str->cfg.protocols_categories[protoId];
-  } else {
-    ndpi_str->proto_defaults[protoId].protoCategory = protoCategory;
-  }
+  ndpi_str->proto_defaults[protoId].protoCategory = protoCategory;
   ndpi_str->proto_defaults[protoId].protoId = protoId;
-  if(ndpi_str->cfg.protocols_breeds[protoId] != -1) {
-    NDPI_LOG_DBG(ndpi_str, "Overwriting breed for proto %s [%d] %d->%d\n",
-                 protoName, protoId, breed,
-                 ndpi_str->cfg.protocols_breeds[protoId]);
-    ndpi_str->proto_defaults[protoId].protoBreed = ndpi_str->cfg.protocols_breeds[protoId];
-  } else {
-    ndpi_str->proto_defaults[protoId].protoBreed = breed;
-  }
+  ndpi_str->proto_defaults[protoId].protoBreed = breed;
   ndpi_str->proto_defaults[protoId].subprotocols = NULL;
   ndpi_str->proto_defaults[protoId].subprotocol_count = 0;
 
-  if(!is_proto_enabled(ndpi_str, protoId)) {
-    NDPI_LOG_DBG(ndpi_str, "[NDPI] Skip default ports for %s/protoId=%d: disabled\n", protoName, protoId);
-    return;
-  }
-
   for(j = 0; j < MAX_DEFAULT_PORTS; j++) {
-    if(udpDefPorts[j].port_low != 0)
-      addDefaultPort(ndpi_str, &udpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->udpRoot,
-		     __FUNCTION__, __LINE__);
-
-    if(tcpDefPorts[j].port_low != 0)
-      addDefaultPort(ndpi_str, &tcpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->tcpRoot,
-		     __FUNCTION__, __LINE__);
+    ndpi_str->proto_defaults[protoId].tcp_default_ports_ranges[j] = tcpDefPorts[j];
+    ndpi_str->proto_defaults[protoId].udp_default_ports_ranges[j] = udpDefPorts[j];
 
     /* No port range, just the lower port */
     ndpi_str->proto_defaults[protoId].tcp_default_ports[j] = tcpDefPorts[j].port_low;
@@ -1625,7 +1601,7 @@ void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str) {
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CISCOVPN,
 			  "CiscoVPN", NDPI_PROTOCOL_CATEGORY_VPN,
-			  ndpi_build_default_ports(ports_a, 10000, 8008, 8009, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_a, 10000, 8008, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 10000, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TEAMSPEAK,
 			  "TeamSpeak", NDPI_PROTOCOL_CATEGORY_VOIP,
@@ -2203,11 +2179,6 @@ void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str) {
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
 #endif
-
-  /* calling function for host and content matched protocols */
-  init_string_based_protocols(ndpi_str);
-
-  ndpi_validate_protocol_initialization(ndpi_str);
 }
 
 /* ****************************************************** */
@@ -3227,6 +3198,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
     ndpi_snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
 	     (unsigned int) (i + 1));
 
+  init_protocol_defaults(ndpi_str);
+
   return(ndpi_str);
 }
 
@@ -3287,7 +3260,8 @@ static int is_ip_list_enabled(struct ndpi_detection_module_struct *ndpi_str, int
 }
 
 int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
-  u_int i;
+  u_int i, j;
+  u_int16_t protoId;
   int rc;
   FILE *fd;
 
@@ -3310,7 +3284,10 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
   }
 
-  init_protocol_defaults(ndpi_str);
+  /* calling function for host and content matched protocols */
+  init_string_based_protocols(ndpi_str);
+
+  ndpi_validate_protocol_initialization(ndpi_str);
 
   if(ndpi_callback_init(ndpi_str)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating callbacks\n");
@@ -3366,6 +3343,42 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   /* Sha1 and ja3 signatures have already been loaded */
 
   ndpi_enable_loaded_categories(ndpi_str);
+
+  /* After we have loaded custom protocols! */
+  for (protoId = 0; protoId < (NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS); protoId++) {
+  
+    /* Overwrite category/breed protocol with values from user configuration */
+    if(ndpi_str->cfg.protocols_categories[protoId] != -1) {
+      NDPI_LOG_DBG(ndpi_str, "Overwriting category for proto %s [%d] %d->%d\n",
+                   ndpi_str->proto_defaults[protoId].protoName, protoId,
+                   ndpi_str->proto_defaults[protoId].protoCategory,
+                   ndpi_str->cfg.protocols_categories[protoId]);
+      ndpi_str->proto_defaults[protoId].protoCategory = ndpi_str->cfg.protocols_categories[protoId];
+    }
+    if(ndpi_str->cfg.protocols_breeds[protoId] != -1) {
+      NDPI_LOG_DBG(ndpi_str, "Overwriting breed for proto %s [%d] %d->%d\n",
+                   ndpi_str->proto_defaults[protoId].protoName, protoId,
+                   ndpi_str->proto_defaults[protoId].protoBreed,
+                   ndpi_str->cfg.protocols_breeds[protoId]);
+      ndpi_str->proto_defaults[protoId].protoBreed = ndpi_str->cfg.protocols_breeds[protoId];
+    }
+
+    /* Enable mapping for default ports */
+    if(is_proto_enabled(ndpi_str, protoId)) {
+      for(j = 0; j < MAX_DEFAULT_PORTS; j++) {
+        if(ndpi_str->proto_defaults[protoId].udp_default_ports_ranges[j].port_low != 0)
+          addDefaultPort(ndpi_str, &ndpi_str->proto_defaults[protoId].udp_default_ports_ranges[j],
+                         &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->udpRoot,
+                         __FUNCTION__, __LINE__);
+
+        if(ndpi_str->proto_defaults[protoId].tcp_default_ports_ranges[j].port_low != 0)
+          addDefaultPort(ndpi_str, &ndpi_str->proto_defaults[protoId].tcp_default_ports_ranges[j],
+                         &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->tcpRoot,
+                         __FUNCTION__, __LINE__);
+      }
+    }
+
+  }
 
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AMAZON_AWS)) {
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_amazon_aws_protocol_list);

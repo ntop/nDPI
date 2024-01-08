@@ -421,8 +421,6 @@ int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, F
 int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 int load_risk_domain_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 
-void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str);
-
 
 /* TLS */
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,

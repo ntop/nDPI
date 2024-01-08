@@ -14,9 +14,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_set_config(ndpi_struct, NULL, "log.level", "4");
   ndpi_set_config(ndpi_struct, "all", "log.enable", "1");
 
-  if(ndpi_struct)
-    init_protocol_defaults(ndpi_struct);
-
   fd = buffer_to_file(data, size);
   load_protocols_file_fd(ndpi_struct, fd);
   if(fd)
