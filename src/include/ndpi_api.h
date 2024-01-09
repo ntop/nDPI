@@ -1035,9 +1035,6 @@ extern "C" {
   int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
 				     char *name_or_ip, u_int name_len,
 				     ndpi_protocol_category_t *id);
-  int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
-				     ndpi_detection_preference pref,
-				     int value);
 
   u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct *ndpi_str,
 					      u_int16_t user_proto_id);

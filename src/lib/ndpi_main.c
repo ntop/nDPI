@@ -960,34 +960,6 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
 /* ******************************************************************** */
 
-int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_str, ndpi_detection_preference pref,
-                                   int value) {
-  if(!ndpi_str)
-    return -1;
-
-  switch(pref) {
-  case ndpi_pref_direction_detect_disable:
-    ndpi_str->direction_detect_disable = (u_int8_t) value;
-    break;
-
-  case ndpi_pref_enable_tls_block_dissection:
-    /*
-      If this option is enabled only the TLS Application data blocks past the
-      certificate negotiation are considered
-    */
-    ndpi_str->num_tls_blocks_to_follow = NDPI_MAX_NUM_TLS_APPL_BLOCKS;
-    ndpi_str->skip_tls_blocks_until_change_cipher = 1;
-    break;
-
-  default:
-    return(-1);
-  }
-
-  return(0);
-}
-
-/* ******************************************************************** */
-
 static void ndpi_validate_protocol_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
@@ -3655,6 +3627,11 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
 
   ndpi_str->ac_automa_finalized = 1;
 
+  if(ndpi_str->cfg.tls_app_blocks_tracking_enabled) {
+    ndpi_str->num_tls_blocks_to_follow = NDPI_MAX_NUM_TLS_APPL_BLOCKS;
+    ndpi_str->skip_tls_blocks_until_change_cipher = 1;
+  }
+
   ndpi_str->finalized = 1;
 
   return 0;
@@ -4057,7 +4034,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->public_domain_suffixes)
       ndpi_domain_classify_free(ndpi_str->public_domain_suffixes);
-  
+
     ndpi_free(ndpi_str);
   }
 
@@ -6616,7 +6593,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     packet->tcp_retransmission = 0, packet->packet_direction = 0;
 
-    if(ndpi_str->direction_detect_disable) {
+    if(!ndpi_str->cfg.direction_detect_enabled) {
       packet->packet_direction = flow->packet_direction;
     } else {
       if(iph != NULL && ntohl(iph->saddr) < ntohl(iph->daddr))
@@ -6641,7 +6618,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       else if(flags == (TH_FIN | TH_PUSH | TH_URG))
 	ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP XMAS scan");
 
-      if(!ndpi_str->direction_detect_disable &&
+      if(ndpi_str->cfg.direction_detect_enabled &&
          (tcph->source != tcph->dest))
 	packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
 
@@ -6722,7 +6699,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	flow->next_tcp_seq_nr[1] = 0;
       }
     } else if(udph != NULL) {
-      if(!ndpi_str->direction_detect_disable &&
+      if(ndpi_str->cfg.direction_detect_enabled &&
          (udph->source != udph->dest))
 	packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
     }
@@ -10807,6 +10784,7 @@ static const struct cfg_param {
 } cfg_params[] = {
   /* Per-protocol parameters */
 
+  { "tls",           "application_blocks_tracking.enable",      "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_app_blocks_tracking_enabled) },
   { "tls",           "metadata.sha1_fingerprint.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_sha1_fingerprint_enabled) },
 
   { "smtp",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled) },
@@ -10826,6 +10804,7 @@ static const struct cfg_param {
   /* Global parameters */
 
   { NULL,            "packets_limit_per_flow",                  "32", "0", "255", CFG_PARAM_INT, __OFF(max_packets_to_process) },
+  { NULL,            "flow.direction_detection.enable",         "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(direction_detect_enabled) },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled)},
 

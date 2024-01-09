@@ -2795,14 +2795,14 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
   }
 
+  if(enable_doh_dot_detection)
+    ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, "tls", "application_blocks_tracking.enable", "1");
+
   ret = ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
   if(ret != 0) {
     fprintf(stderr, "Error ndpi_finalize_initialization: %d\n", ret);
     exit(-1);
   }
-
-  if(enable_doh_dot_detection)
-    ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 1);
 }
 
 /* *********************************************** */
