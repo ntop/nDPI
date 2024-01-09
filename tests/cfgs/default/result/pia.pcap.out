@@ -1,0 +1,33 @@
+DPI Packets (TCP):	7	(7.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   1/2/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/0 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      1/1 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+PrivateInternetAccess	9	3842	1
+
+Acceptable                       9 3842          1            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.88.3             	 1      
+
+
+	1	TCP 192.168.88.3:56854 <-> 143.244.45.60:443 [proto: 91.384/TLS.PrivateInternetAccess][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 7][cat: VPN/2][5 pkts/948 bytes <-> 4 pkts/2894 bytes][Goodput ratio: 64/91][0.04 sec][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.507 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 9/6 19/15 8/6][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 190/724 583/1514 200/661][Risk: ** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **][Risk Score: 60][Risk Info: No ALPN][TLSv1.2][JA3C: ee798410f39b7911fa5306cf3f3e6adc][JA4: t13d571000_131602cb7446_6c96259584c4][ServerNames: newjersey402][JA3S: ec74a5c51106f0419184d0dd08fb05bc][Issuer: C=US, ST=CA, L=LosAngeles, O=Private Internet Access, OU=Private Internet Access, CN=Private Internet Access][Subject: C=US, ST=CA, L=LosAngeles, O=Private Internet Access, OU=Private Internet Access, CN=newjersey402, C=US, ST=CA, L=LosAngeles, O=Private Internet Access, OU=Private Internet Access, CN=Private Internet Access][Certificate SHA-1: 15:93:3C:30:66:5E:3D:9D:AF:2D:89:56:75:07:DF:06:BB:D2:61:3F][Firefox][Validity: 2020-11-17 14:30:51 - 2021-05-16 14:30:51][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][Plen Bins: 0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,25,0,0]
