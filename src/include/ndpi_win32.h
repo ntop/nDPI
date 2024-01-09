@@ -59,6 +59,10 @@
 #define strdup _strdup
 #endif
 
+#ifndef F_OK
+#define F_OK 0
+#endif
+
 extern char* strsep(char **sp, char *sep);
 
 typedef unsigned char  u_char;

@@ -234,6 +234,14 @@ typedef enum {
    ndpi_leaf
 } ndpi_VISIT;
 
+typedef enum {
+  NDPI_CFG_INVALID_CONTEXT = -1,
+  NDPI_CFG_NOT_FOUND = -2,
+  NDPI_CFG_INVALID_PARAM = -3,
+  NDPI_CFG_CONTEXT_ALREADY_INITIALIZED = -4,
+
+  NDPI_CFG_OK = 0,
+} ndpi_cfg_error;
 
 /* NDPI_MASK_SIZE */
 typedef u_int32_t ndpi_ndpi_mask;
@@ -1065,7 +1073,6 @@ typedef enum {
 
 typedef enum {
    ndpi_pref_direction_detect_disable = 0,
-   ndpi_pref_max_packets_to_process,
    ndpi_pref_enable_tls_block_dissection, /* nDPI considers only those blocks past the certificate exchange */
 } ndpi_detection_preference;
 

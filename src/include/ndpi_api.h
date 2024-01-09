@@ -2246,6 +2246,15 @@ extern "C" {
 
   /* ******************************* */
 
+  ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
+                                 const char *proto, const char *param, const char *value);
+  char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
+			const char *proto, const char *param, char *buf, int buf_len);
+  char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
+			 FILE *fd);
+
+  /* ******************************* */
+
   /* Can't call libc functions from kernel space, define some stub instead */
 
 #define ndpi_isalpha(ch) (((ch) >= 'a' && (ch) <= 'z') || ((ch) >= 'A' && (ch) <= 'Z'))

@@ -1,0 +1,1 @@
+--cfg=tls,metadata.sha1_fingerprint.enable,0
