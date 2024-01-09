@@ -57,6 +57,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_set_user_data(ndpi_info_mod, (void *)0xabcdabcd); /* Twice to trigger overwriting */
   ndpi_get_user_data(ndpi_info_mod);
 
+  /* ndpi_set_config: try to keep the soame order of the definitions in ndpi_main.c.
+     + 1 to trigger unvalid parameter error */
+
   ndpi_set_tls_cert_expire_days(ndpi_info_mod, fuzzed_data.ConsumeIntegral<u_int8_t>());
 
   if(fuzzed_data.ConsumeBool())
@@ -76,15 +79,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* TODO: stub for geo stuff */
   ndpi_load_geoip(ndpi_info_mod, NULL, NULL);
 
-  if(fuzzed_data.ConsumeBool())
-    ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_direction_detect_disable,
-                                   fuzzed_data.ConsumeBool());
-  if(fuzzed_data.ConsumeBool())
-    ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_enable_tls_block_dissection,
-                                   0 /* unused */);
-
-  ndpi_set_detection_preferences(ndpi_info_mod, static_cast<ndpi_detection_preference>(0xFF), 0xFF); /* Invalid preference */
-
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, "tls", "application_blocks_tracking.enable", cfg_value);
+  }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
@@ -137,6 +136,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 255 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "packets_limit_per_flow", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "flow.direction_detection.enable", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);

@@ -148,6 +148,7 @@ typedef struct {
 
 struct ndpi_detection_module_config_struct {
   int max_packets_to_process;
+  int direction_detect_enabled;
 
   char filename_config[CFG_MAX_LEN];
 
@@ -172,6 +173,7 @@ struct ndpi_detection_module_config_struct {
 
   /* Protocols */
 
+  int tls_app_blocks_tracking_enabled;
   int tls_sha1_fingerprint_enabled;
 
   int smtp_opportunistic_tls_enabled;

@@ -1071,11 +1071,6 @@ typedef enum {
   NDPI_PROTOCOL_ANY_CATEGORY /* Used to handle wildcards */
 } ndpi_protocol_category_t;
 
-typedef enum {
-   ndpi_pref_direction_detect_disable = 0,
-   ndpi_pref_enable_tls_block_dissection, /* nDPI considers only those blocks past the certificate exchange */
-} ndpi_detection_preference;
-
 /* ntop extensions */
 typedef struct ndpi_proto_defaults {
   char *protoName;
