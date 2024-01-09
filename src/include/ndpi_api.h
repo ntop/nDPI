@@ -222,8 +222,10 @@ extern "C" {
    *
    * @par ndpi_str = the struct created for the protocol detection
    *
+   * @return 0 on success
+   *
    */
-  void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str);
+  int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str);
 
   /**
    * Frees the dynamic memory allocated members in the specified flow
