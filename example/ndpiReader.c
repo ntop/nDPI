@@ -107,7 +107,6 @@ static int num_cfgs = 0;
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 char *_disabled_protocols = NULL;
-int aggressiveness[NDPI_MAX_SUPPORTED_PROTOCOLS];
 static u_int8_t stats_flag = 0;
 ndpi_init_prefs init_prefs = ndpi_no_prefs | ndpi_enable_tcp_ack_payload_heuristic;
 u_int8_t human_readeable_string_len = 5;
@@ -603,7 +602,6 @@ static void help(u_int long_help) {
          "  -I                        | Ignore VLAN id for flow hash calculation\n"
          "  -A                        | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
          "  -M                        | Memory allocation stats on data-path (only by the library). It works only on single-thread configuration\n"
-         "  -Z proto:value            | Set this value of aggressiveness for this protocol (0 to disable it). This flag can be used multiple times\n"
          "  --cfg=proto,param,value          | Configure the specific attribute of this protocol\n"
          ,
          human_readeable_string_len,
@@ -981,7 +979,7 @@ int reader_add_cfg(char *proto, char *param, char *value, int dup)
  */
 static void parseOptions(int argc, char **argv) {
   int option_idx = 0;
-  int opt, i;
+  int opt;
 #ifndef USE_DPDK
   char *__pcap_file = NULL;
   int thread_id, do_capture = 0;
@@ -1003,11 +1001,8 @@ static void parseOptions(int argc, char **argv) {
   }
 #endif
 
-  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++)
-    aggressiveness[i] = -1; /* Use the default value */
-
   while((opt = getopt_long(argc, argv,
-			   "a:Ab:B:e:Ec:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:Rs:tu:v:V:n:rp:x:X:w:Z:q0123:456:7:89:m:MT:U:",
+			   "a:Ab:B:e:Ec:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:Rs:tu:v:V:n:rp:x:X:w:q0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -1147,36 +1142,6 @@ static void parseOptions(int argc, char **argv) {
       _disabled_protocols = ndpi_strdup(optarg);
       break;
 
-    case 'Z': /* proto_name:aggr_value */
-      {
-        struct ndpi_detection_module_struct *module_tmp;
-        NDPI_PROTOCOL_BITMASK all;
-        char *saveptr, *tmp_str, *proto_str, *aggr_str;
-
-        /* Use a temporary module with all protocols enabled */
-        module_tmp = ndpi_init_detection_module(0);
-        if(!module_tmp)
-          break;
-
-        NDPI_BITMASK_SET_ALL(all);
-        ndpi_set_protocol_detection_bitmask2(module_tmp, &all);
-        ndpi_finalize_initialization(module_tmp);
-
-        tmp_str = ndpi_strdup(optarg);
-        if(tmp_str) {
-          proto_str = strtok_r(tmp_str, ":", &saveptr);
-          if(proto_str) {
-            aggr_str = strtok_r(NULL, ":", &saveptr);
-            if(aggr_str) {
-              aggressiveness[ndpi_get_protocol_id(module_tmp, proto_str)] = atoi(aggr_str);
-            }
-          }
-        }
-        ndpi_free(tmp_str);
-        ndpi_exit_detection_module(module_tmp);
-        break;
-      }
-
     case 'h':
       help(0);
       break;
@@ -1313,7 +1278,7 @@ static void parseOptions(int argc, char **argv) {
       max_num_udp_dissected_pkts = atoi(optarg);
       break;
 
-   case OPTLONG_VALUE_CFG:
+    case OPTLONG_VALUE_CFG:
       if(parse_three_strings(optarg, &s1, &s2, &s3) == -1 ||
         reader_add_cfg(s1, s2, s3, 0) == -1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
@@ -2821,12 +2786,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _protoFilePath);
-
-  /* Set aggressiveness here */
-  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
-    if(aggressiveness[i] != -1)
-      ndpi_set_protocol_aggressiveness(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, aggressiveness[i]);
-  }
 
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct,

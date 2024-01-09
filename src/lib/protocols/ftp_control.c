@@ -640,7 +640,7 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
 	 flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 0) {
 	flow->ftp_control_stage = 0;
       } else if (flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 &&
-		 ndpi_struct->opportunistic_tls_ftp_enabled) {
+		 ndpi_struct->cfg.ftp_opportunistic_tls_enabled) {
 	flow->host_server_name[0] = '\0'; /* Remove any data set by other dissectors (eg. SMTP) */
 	/* Switch classification to FTPS */
 	ndpi_set_detected_protocol(ndpi_struct, flow,

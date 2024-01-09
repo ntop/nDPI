@@ -1,1 +1,1 @@
--Z ookla:0
+--cfg=ookla,aggressiveness,0x0

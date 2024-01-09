@@ -402,7 +402,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   } else if(first_byte <= 63) {
     NDPI_LOG_DBG(ndpi_struct, "DTLS\n");
 
-    if(ndpi_struct->opportunistic_tls_stun_enabled &&
+    if(ndpi_struct->cfg.stun_opportunistic_tls_enabled &&
        is_dtls(packet->payload, packet->payload_packet_len, &unused)) {
 
       /* Process this DTLS packet via TLS/DTLS code but keep using STUN dissection.

@@ -3277,14 +3277,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     return(NULL);
   }
 
-  ndpi_str->opportunistic_tls_smtp_enabled = 1;
-  ndpi_str->opportunistic_tls_imap_enabled = 1;
-  ndpi_str->opportunistic_tls_pop_enabled = 1;
-  ndpi_str->opportunistic_tls_ftp_enabled = 1;
-  ndpi_str->opportunistic_tls_stun_enabled = 1;
-
-  ndpi_str->aggressiveness_ookla = NDPI_AGGRESSIVENESS_OOKLA_TLS;
-
   if(prefs & ndpi_enable_tcp_ack_payload_heuristic)
     ndpi_str->tcp_ack_paylod_heuristic = 1;
 
@@ -10558,92 +10550,6 @@ int ndpi_seen_flow_beginning(const struct ndpi_flow_struct *flow)
 
 /* ******************************************************************** */
 
-int ndpi_set_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
-			       u_int16_t proto, int value)
-{
-  if(!ndpi_struct || (value != 0 && value != 1))
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_MAIL_SMTP:
-    ndpi_struct->opportunistic_tls_smtp_enabled = value;
-    return 0;
-  case NDPI_PROTOCOL_MAIL_IMAP:
-    ndpi_struct->opportunistic_tls_imap_enabled = value;
-    return 0;
-  case NDPI_PROTOCOL_MAIL_POP:
-    ndpi_struct->opportunistic_tls_pop_enabled = value;
-    return 0;
-  case NDPI_PROTOCOL_FTP_CONTROL:
-    ndpi_struct->opportunistic_tls_ftp_enabled = value;
-    return 0;
-  case NDPI_PROTOCOL_STUN:
-    ndpi_struct->opportunistic_tls_stun_enabled = value;
-    return 0;
-  default:
-    return -1;
-  }
-}
-
-/* ******************************************************************** */
-
-int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
-			       u_int16_t proto)
-{
-  if(!ndpi_struct)
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_MAIL_SMTP:
-    return ndpi_struct->opportunistic_tls_smtp_enabled;
-  case NDPI_PROTOCOL_MAIL_IMAP:
-    return ndpi_struct->opportunistic_tls_imap_enabled;
-  case NDPI_PROTOCOL_MAIL_POP:
-    return ndpi_struct->opportunistic_tls_pop_enabled;
-  case NDPI_PROTOCOL_FTP_CONTROL:
-    return ndpi_struct->opportunistic_tls_ftp_enabled;
-  case NDPI_PROTOCOL_STUN:
-    return ndpi_struct->opportunistic_tls_stun_enabled;
-  default:
-    return -1;
-  }
-}
-
-/* ******************************************************************** */
-
-int ndpi_set_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
-                                     u_int16_t proto, u_int32_t value)
-{
-  if(!ndpi_struct)
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_OOKLA:
-    ndpi_struct->aggressiveness_ookla = value;
-    return 0;
-  default:
-    return -1;
-  }
-}
-
-/* ******************************************************************** */
-
-u_int32_t ndpi_get_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
-                                           u_int16_t proto)
-{
-  if(!ndpi_struct)
-    return -1;
-
-  switch(proto) {
-  case NDPI_PROTOCOL_OOKLA:
-    return ndpi_struct->aggressiveness_ookla;
-  default:
-    return -1;
-  }
-}
-
-/* ******************************************************************** */
-
 void ndpi_set_user_data(struct ndpi_detection_module_struct *ndpi_str, void *user_data)
 {
   if (ndpi_str == NULL)
@@ -10695,7 +10601,6 @@ static u_int16_t __get_proto_id(const char *proto_name_or_id)
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(module, &all);
   /* Try to be fast: we need only the protocol name -> protocol id mapping! */
-  /* TODO */
   ndpi_set_config(module, "any", "ip_list.load", "0");
   ndpi_set_config(module, NULL, "flow_risk_lists.load", "0");
   ndpi_finalize_initialization(module);
@@ -10903,6 +10808,18 @@ static const struct cfg_param {
   /* Per-protocol parameters */
 
   { "tls",           "metadata.sha1_fingerprint.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_sha1_fingerprint_enabled) },
+
+  { "smtp",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled) },
+
+  { "imap",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(imap_opportunistic_tls_enabled) },
+
+  { "pop",           "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(pop_opportunistic_tls_enabled) },
+
+  { "ftp",           "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ftp_opportunistic_tls_enabled) },
+
+  { "stun",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_opportunistic_tls_enabled) },
+
+  { "ookla",         "aggressiveness",                          "0x01", "0", "1", CFG_PARAM_INT, __OFF(ookla_aggressiveness) },
 
   { "$PROTO_NAME_OR_ID", "ip_list.load",                        "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask)},
 

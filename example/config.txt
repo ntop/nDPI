@@ -5,6 +5,7 @@
 #See doc/configuration_parameters.md for a complete list and description of all the accepted knobs
 
 packets_limit_per_flow,32
+ookla,aggressiveness,0x1
 tls,metadata.sha1_fingerprint.enable,1
 
 lru.bittorrent.ttl,0
