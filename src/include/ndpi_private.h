@@ -173,6 +173,13 @@ struct ndpi_detection_module_config_struct {
   /* Protocols */
 
   int tls_sha1_fingerprint_enabled;
+
+  NDPI_PROTOCOL_BITMASK ip_list_bitmask;
+
+  int flow_risk_lists_enabled;
+  int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
+  int risk_anonymous_subscriber_list_protonvpn_enabled;
+  int risk_crawler_bot_list_enabled;
 };
 
 struct ndpi_detection_module_struct {
