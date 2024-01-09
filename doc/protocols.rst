@@ -465,3 +465,12 @@ References: `Main site <https://ceph.io/en/>`_
 Google Chat is an instant messaging service from Google, which replaced Hangouts.
 
 References: `Main site <https://chat.google.com/>`_
+
+
+.. _Proto 382:
+
+`NDPI_PROTOCOL_ROUGHTIME`
+=========================
+A protocol that aims to achieve rough time synchronization while detecting servers that provide inaccurate time and providing cryptographic proof of their malfeasance.
+
+References: `IETF Draft <https://www.ietf.org/archive/id/draft-ietf-ntp-roughtime-08.html>`_
