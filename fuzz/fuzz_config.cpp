@@ -28,21 +28,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_proto p, p2;
   char out[128];
   char log_ts[32];
+  int value;
+  char cfg_value[32];
 
 
-  if(fuzzed_data.remaining_bytes() < 4 + /* ndpi_init_detection_module() */
-				     NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS +
-				     1 + /* TLS cert expire */
-				     6 + /* files */
-				     ((NDPI_LRUCACHE_MAX + 1) * 5) + /* LRU caches */
-				     2 + 1 + 4 + /* ndpi_set_detection_preferences() */
-				     7 + /* Opportunistic tls */
-				     2 + /* Pid */
-				     2 + /* Category */
-				     1 + /* Tunnel */
-				     1 + /* Bool value */
-				     2 + /* input_info */
-				     21 /* Min real data: ip length + 1 byte of L4 header */)
+  /* Just to be sure to have some data */
+  if(fuzzed_data.remaining_bytes() < NDPI_MAX_SUPPORTED_PROTOCOLS * 2 + 200)
     return -1;
 
   /* To allow memory allocation failures */
@@ -101,9 +92,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool())
     ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_enable_tls_block_dissection,
                                    0 /* unused */);
-  if(fuzzed_data.ConsumeBool())
-    ndpi_set_detection_preferences(ndpi_info_mod, ndpi_pref_max_packets_to_process,
-                                   fuzzed_data.ConsumeIntegralInRange(0, (1 << 16)));
 
   ndpi_set_detection_preferences(ndpi_info_mod, static_cast<ndpi_detection_preference>(0xFF), 0xFF); /* Invalid preference */
 
@@ -124,6 +112,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
     ndpi_set_protocol_aggressiveness(ndpi_info_mod, i, random_value);
     ndpi_get_protocol_aggressiveness(ndpi_info_mod, i);
+  }
+
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, "tls", "metadata.sha1_fingerprint.enable", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 255 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "packets_limit_per_flow", cfg_value);
   }
 
   ndpi_finalize_initialization(ndpi_info_mod);

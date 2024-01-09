@@ -1,0 +1,33 @@
+DPI Packets (TCP):	5	(5.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  1/1 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Cybersec	48	22229	1
+
+Safe                            48 22229         1            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.160            	 1      
+
+
+	1	TCP 192.168.1.160:54804 <-> 151.101.66.49:443 [proto: 91.283/TLS.Cybersec][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 5][cat: Cybersecurity/33][24 pkts/2404 bytes <-> 24 pkts/19825 bytes][Goodput ratio: 35/92][0.09 sec][Hostname/SNI: feodotracker.abuse.ch][(Advertised) ALPNs: http/1.1][bytes ratio: -0.784 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/4 15/21 5/7][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 100/826 583/1434 109/662][TLSv1.2][JA3C: 2a26b1a62e40d25d4de3babc9d532f30][JA4: t12d6707ht_2955a3196ffa_b1760ac0ffd7][Firefox][Plen Bins: 12,16,0,4,0,4,4,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,55,0,0,0,0,0]

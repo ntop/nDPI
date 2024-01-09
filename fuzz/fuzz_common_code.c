@@ -57,6 +57,8 @@ void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(*ndpi_info_mod, &all);
 
+    ndpi_set_config(*ndpi_info_mod, NULL, "filename.config", "config.txt");
+
     ndpi_finalize_initialization(*ndpi_info_mod);
   }
 }

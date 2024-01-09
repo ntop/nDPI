@@ -94,6 +94,16 @@ static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
 u_int8_t enable_realtime_output = 0, enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
+
+struct cfg {
+  char *proto;
+  char *param;
+  char *value;
+};
+#define MAX_NUM_CFGS 32
+static struct cfg cfgs[MAX_NUM_CFGS];
+static int num_cfgs = 0;
+
 int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 char *_disabled_protocols = NULL;
@@ -363,6 +373,8 @@ static void ndpiCheckIPMatch(char *testChar) {
   struct in_addr addr;
   char appBufStr[64];
   ndpi_protocol detected_protocol;
+  int i;
+  ndpi_cfg_error rc;
   NDPI_PROTOCOL_BITMASK all;
 
   if(!testChar)
@@ -374,6 +386,14 @@ static void ndpiCheckIPMatch(char *testChar) {
 
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_str, _protoFilePath);
+
+  for(i = 0; i < num_cfgs; i++) {
+    rc = ndpi_set_config(ndpi_str,
+			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
+    if (rc < NDPI_CFG_OK)
+      fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
+	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
+  }
 
   ndpi_finalize_initialization(ndpi_str);
 
@@ -571,7 +591,7 @@ static void help(u_int long_help) {
          "                            | 1 = verbose\n"
          "                            | 2 = very verbose\n"
          "                            | 3 = port stats\n"
-	   "                            | 4 = hash stats\n"
+         "                            | 4 = hash stats\n"
          "  -V <1-4>                  | nDPI logging level\n"
          "                            | 1 - trace, 2 - debug, 3 - full debug\n"
          "                            | >3 - full debug + log enabled for all protocols (i.e. '-u all')\n"
@@ -589,12 +609,22 @@ static void help(u_int long_help) {
          "  -Z proto:value            | Set this value of aggressiveness for this protocol (0 to disable it). This flag can be used multiple times\n"
          "  --lru-cache-size=NAME:size       | Specify the size for this LRU cache (0 to disable it). This flag can be used multiple times\n"
          "  --lru-cache-ttl=NAME:size        | Specify the TTL [in seconds] for this LRU cache (0 to disable it). This flag can be used multiple times\n"
+         "  --cfg=proto,param,value          | Configure the specific attribute of this protocol\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
          max_num_reported_top_payloads, max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts);
 
   printf("\nLRU Cache names: ookla, bittorrent, zoom, stun, tls_cert, mining, msteams, stun_zoom\n");
+
+  NDPI_PROTOCOL_BITMASK all;
+  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  NDPI_BITMASK_SET_ALL(all);
+  ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
+  ndpi_finalize_initialization(ndpi_info_mod);
+
+  printf("\nProtocols configuration parameters:\n");
+  ndpi_dump_config(ndpi_info_mod, stdout);
 
 #ifndef WIN32
   printf("\nExcap (wireshark) options:\n"
@@ -616,23 +646,18 @@ static void help(u_int long_help) {
            ndpi_detection_get_sizeof_ndpi_flow_struct(),
            sizeof(((struct ndpi_flow_struct *)0)->protos));
 
-    NDPI_PROTOCOL_BITMASK all;
-    struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
     printf("\n\nnDPI supported protocols:\n");
     printf("%3s %-22s %-10s %-8s %-12s %s\n",
 	   "Id", "Protocol", "Layer_4", "Nw_Proto", "Breed", "Category");
     num_threads = 1;
 
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
-
     ndpi_dump_protocols(ndpi_info_mod, stdout);
 
     printf("\n\nnDPI supported risks:\n");
     ndpi_dump_risks_score(stdout);
-
-    ndpi_exit_detection_module(ndpi_info_mod);
   }
+
+  ndpi_exit_detection_module(ndpi_info_mod);
 
   exit(!long_help);
 }
@@ -640,6 +665,8 @@ static void help(u_int long_help) {
 
 #define OPTLONG_VALUE_LRU_CACHE_SIZE	1000
 #define OPTLONG_VALUE_LRU_CACHE_TTL	1001
+
+#define OPTLONG_VALUE_CFG		3000
 
 static struct option longopts[] = {
   /* mandatory extcap options */
@@ -684,6 +711,8 @@ static struct option longopts[] = {
 
   { "lru-cache-size", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_SIZE},
   { "lru-cache-ttl", required_argument, NULL, OPTLONG_VALUE_LRU_CACHE_TTL},
+
+  { "cfg", required_argument, NULL, OPTLONG_VALUE_CFG},
 
   {0, 0, 0, 0}
 };
@@ -941,6 +970,69 @@ static int parse_two_unsigned_integer(char *param, u_int32_t *num1, u_int32_t *n
   return -1;
 }
 
+static int parse_three_strings(char *param, char **s1, char **s2, char **s3)
+{
+  char *saveptr, *tmp_str, *s1_str, *s2_str = NULL, *s3_str;
+  int num_commas;
+  unsigned int i;
+
+  tmp_str = ndpi_strdup(param);
+  if(tmp_str) {
+
+    /* First parameter might be missing */
+    num_commas = 0;
+    for(i = 0; i < strlen(tmp_str); i++) {
+      if(tmp_str[i] == ',')
+        num_commas++;
+    }
+
+    if(num_commas == 1) {
+      s1_str = NULL;
+      s2_str = strtok_r(tmp_str, ",", &saveptr);
+    } else if(num_commas == 2) {
+      s1_str = strtok_r(tmp_str, ",", &saveptr);
+      if(s1_str) {
+        s2_str = strtok_r(NULL, ",", &saveptr);
+      }
+    } else {
+      ndpi_free(tmp_str);
+      return -1;
+    }
+
+    if(s2_str) {
+      s3_str = strtok_r(NULL, ",", &saveptr);
+      if(s3_str) {
+        *s1 = ndpi_strdup(s1_str);
+        *s2 = ndpi_strdup(s2_str);
+        *s3 = ndpi_strdup(s3_str);
+        ndpi_free(tmp_str);
+        if(!s1 || !s2 || !s3) {
+          ndpi_free(s1);
+          ndpi_free(s2);
+          ndpi_free(s3);
+          return -1;
+        }
+        return 0;
+      }
+    }
+  }
+  ndpi_free(tmp_str);
+  return -1;
+}
+
+int reader_add_cfg(char *proto, char *param, char *value, int dup)
+{
+  if(num_cfgs >= MAX_NUM_CFGS) {
+    printf("Too many parameter! [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+    return -1;
+  }
+  cfgs[num_cfgs].proto = dup ? ndpi_strdup(proto) : proto;
+  cfgs[num_cfgs].param = dup ? ndpi_strdup(param) : param;
+  cfgs[num_cfgs].value = dup ? ndpi_strdup(value) : value;
+  num_cfgs++;
+  return 0;
+}
+
 /* ********************************** */
 
 /**
@@ -958,6 +1050,7 @@ static void parseOptions(int argc, char **argv) {
 #endif
 #endif
   int cache_idx, cache_size, cache_ttl;
+  char *s1, *s2, *s3;
 
 #ifdef USE_DPDK
   {
@@ -1299,6 +1392,14 @@ static void parseOptions(int argc, char **argv) {
         exit(1);
       }
       lru_cache_ttls[cache_idx] = cache_ttl;
+      break;
+
+   case OPTLONG_VALUE_CFG:
+      if(parse_three_strings(optarg, &s1, &s2, &s3) == -1 ||
+        reader_add_cfg(s1, s2, s3, 0) == -1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
     default:
@@ -2731,6 +2832,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_workflow_prefs prefs;
   int i;
+  ndpi_cfg_error rc;
 
   memset(&prefs, 0, sizeof(prefs));
   prefs.decode_tunnels = decode_tunnels;
@@ -2820,6 +2922,15 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
     if(aggressiveness[i] != -1)
       ndpi_set_protocol_aggressiveness(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, aggressiveness[i]);
   }
+
+  for(i = 0; i < num_cfgs; i++) {
+    rc = ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
+    if (rc != NDPI_CFG_OK)
+      fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
+	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
+  }
+
 
   ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
 
@@ -5827,6 +5938,12 @@ int main(int argc, char **argv) {
 
   ndpi_free(_debug_protocols);
   ndpi_free(_disabled_protocols);
+
+  for(i = 0; i < num_cfgs; i++) {
+    ndpi_free(cfgs[i].proto);
+    ndpi_free(cfgs[i].param);
+    ndpi_free(cfgs[i].value);
+  }
 
 #ifdef DEBUG_TRACE
   if(trace) fclose(trace);
