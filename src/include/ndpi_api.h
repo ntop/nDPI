@@ -1074,20 +1074,6 @@ extern "C" {
 			       lru_cache_type cache_type,
 			       struct ndpi_lru_cache_stats *stats);
 
-  int ndpi_get_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
-			      lru_cache_type cache_type,
-			      u_int32_t *num_entries);
-  int ndpi_set_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
-			      lru_cache_type cache_type,
-			      u_int32_t num_entries);
-
-  int ndpi_set_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
-			     lru_cache_type cache_type,
-			     u_int32_t ttl);
-  int ndpi_get_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
-			     lru_cache_type cache_type,
-			     u_int32_t *ttl);
-
   int ndpi_set_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
 				 u_int16_t proto, int value);
   int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,

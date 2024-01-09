@@ -7,4 +7,6 @@
 packets_limit_per_flow,32
 tls,metadata.sha1_fingerprint.enable,1
 
+lru.bittorrent.ttl,0
+
 

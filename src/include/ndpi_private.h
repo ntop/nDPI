@@ -151,6 +151,25 @@ struct ndpi_detection_module_config_struct {
 
   char filename_config[CFG_MAX_LEN];
 
+  /* LRU caches */
+
+  int ookla_cache_num_entries;
+  int ookla_cache_ttl;
+  int bittorrent_cache_num_entries;
+  int bittorrent_cache_ttl;
+  int zoom_cache_num_entries;
+  int zoom_cache_ttl;
+  int stun_cache_num_entries;
+  int stun_cache_ttl;
+  int tls_cert_cache_num_entries;
+  int tls_cert_cache_ttl;
+  int mining_cache_num_entries;
+  int mining_cache_ttl;
+  int msteams_cache_num_entries;
+  int msteams_cache_ttl;
+  int stun_zoom_cache_num_entries;
+  int stun_zoom_cache_ttl;
+
   /* Protocols */
 
   int tls_sha1_fingerprint_enabled;
@@ -244,13 +263,9 @@ struct ndpi_detection_module_struct {
 
   /* NDPI_PROTOCOL_OOKLA */
   struct ndpi_lru_cache *ookla_cache;
-  u_int32_t ookla_cache_num_entries;
-  u_int32_t ookla_cache_ttl;
 
   /* NDPI_PROTOCOL_BITTORRENT */
   struct ndpi_lru_cache *bittorrent_cache;
-  u_int32_t bittorrent_cache_num_entries;
-  u_int32_t bittorrent_cache_ttl;
 
   /* NDPI_PROTOCOL_ZOOM */
   struct ndpi_lru_cache *zoom_cache;
@@ -259,26 +274,16 @@ struct ndpi_detection_module_struct {
 
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
-  u_int32_t stun_cache_num_entries;
-  u_int32_t stun_cache_ttl;
   struct ndpi_lru_cache *stun_zoom_cache;
-  u_int32_t stun_zoom_cache_num_entries;
-  u_int32_t stun_zoom_cache_ttl;
 
   /* NDPI_PROTOCOL_TLS and subprotocols */
   struct ndpi_lru_cache *tls_cert_cache;
-  u_int32_t tls_cert_cache_num_entries;
-  int32_t tls_cert_cache_ttl;
 
   /* NDPI_PROTOCOL_MINING and subprotocols */
   struct ndpi_lru_cache *mining_cache;
-  u_int32_t mining_cache_num_entries;
-  u_int32_t mining_cache_ttl;
 
   /* NDPI_PROTOCOL_MSTEAMS */
   struct ndpi_lru_cache *msteams_cache;
-  u_int32_t msteams_cache_num_entries;
-  u_int32_t msteams_cache_ttl;
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
