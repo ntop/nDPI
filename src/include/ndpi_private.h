@@ -174,6 +174,18 @@ struct ndpi_detection_module_config_struct {
 
   int tls_sha1_fingerprint_enabled;
 
+  int smtp_opportunistic_tls_enabled;
+
+  int imap_opportunistic_tls_enabled;
+
+  int pop_opportunistic_tls_enabled;
+
+  int ftp_opportunistic_tls_enabled;
+
+  int stun_opportunistic_tls_enabled;
+
+  int ookla_aggressiveness;
+
   NDPI_PROTOCOL_BITMASK ip_list_bitmask;
 
   int flow_risk_lists_enabled;
@@ -293,14 +305,6 @@ struct ndpi_detection_module_struct {
   struct ndpi_lru_cache *msteams_cache;
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
-
-  int opportunistic_tls_smtp_enabled;
-  int opportunistic_tls_imap_enabled;
-  int opportunistic_tls_pop_enabled;
-  int opportunistic_tls_ftp_enabled;
-  int opportunistic_tls_stun_enabled;
-
-  u_int32_t aggressiveness_ookla;
 
   int tcp_ack_paylod_heuristic;
   int fully_encrypted_based_on_first_pkt_heuristic;

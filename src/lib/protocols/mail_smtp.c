@@ -418,7 +418,7 @@ int ndpi_extra_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_st
          454 TLS not available due to temporary reason"
     */
 
-    if(ndpi_struct->opportunistic_tls_smtp_enabled &&
+    if(ndpi_struct->cfg.smtp_opportunistic_tls_enabled &&
        packet->payload_packet_len > 3 && memcmp(packet->payload, "220", 3) == 0) {
       rc = 1;
       /* Switch classification to SMTPS, keeping the hostname sub-classification (if any) */
