@@ -2831,7 +2831,7 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_workflow_prefs prefs;
-  int i;
+  int i, ret;
   ndpi_cfg_error rc;
 
   memset(&prefs, 0, sizeof(prefs));
@@ -2931,8 +2931,11 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
   }
 
-
-  ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
+  ret = ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
+  if(ret != 0) {
+    fprintf(stderr, "Error ndpi_finalize_initialization: %d\n", ret);
+    exit(-1);
+  }
 
   if(enable_doh_dot_detection)
     ndpi_set_detection_preferences(ndpi_thread_info[thread_id].workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 1);

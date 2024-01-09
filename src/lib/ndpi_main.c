@@ -3514,13 +3514,13 @@ static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct 
 
 /* *********************************************** */
 
-void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
+int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
   if(!ndpi_str)
-    return;
+    return -1;
   if(ndpi_str->finalized) /* Already finalized */
-    return;
+    return 0;
 
   ndpi_add_domain_risk_exceptions(ndpi_str);
 
@@ -3589,7 +3589,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
     }
   }
 
-  if(ndpi_str->ac_automa_finalized) return;
+  if(ndpi_str->ac_automa_finalized) return -1;
 
   ndpi_automa * const automa[] = { &ndpi_str->host_automa,
                                    &ndpi_str->tls_cert_subject_automa,
@@ -3607,7 +3607,7 @@ void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str)
 
   ndpi_str->finalized = 1;
 
-  return;
+  return 0;
 }
 
 /* *********************************************** */
