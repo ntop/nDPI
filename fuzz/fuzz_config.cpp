@@ -30,6 +30,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char log_ts[32];
   int value;
   char cfg_value[32];
+  char cfg_proto[32];
 
 
   /* Just to be sure to have some data */
@@ -110,10 +111,44 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_config(ndpi_info_mod, "tls", "metadata.sha1_fingerprint.enable", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, "any", "ip_list.load", cfg_value);
+  }
+  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
+    if(fuzzed_data.ConsumeBool()) {
+      value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+      sprintf(cfg_value, "%d", value);
+      sprintf(cfg_proto, "%d", i);
+      ndpi_set_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value);
+    }
+  }
+  if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 255 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "packets_limit_per_flow", cfg_value);
   }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk_lists.load", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk.anonymous_subscriber.list.protonvpn.load", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk.crawler_bot.list.load", cfg_value);
+  }
+
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
     sprintf(cfg_value, "%d", value);
@@ -241,7 +276,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   input_info.seen_flow_beginning = !!fuzzed_data.ConsumeBool();
   memset(&flow, 0, sizeof(flow));
   std::vector<uint8_t>pkt = fuzzed_data.ConsumeRemainingBytes<uint8_t>();
-  assert(pkt.size() >= 21); /* To be sure check on fuzzed_data.remaining_bytes() at the beginning is right */
 
   ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, &input_info);
   p = ndpi_detection_giveup(ndpi_info_mod, &flow, 1, &protocol_was_guessed);
