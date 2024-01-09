@@ -474,3 +474,12 @@ References: `Main site <https://chat.google.com/>`_
 A protocol that aims to achieve rough time synchronization while detecting servers that provide inaccurate time and providing cryptographic proof of their malfeasance.
 
 References: `IETF Draft <https://www.ietf.org/archive/id/draft-ietf-ntp-roughtime-08.html>`_
+
+
+.. _Proto 384:
+
+`NDPI_PROTOCOL_PIA`
+=========================
+Private Internet Access (PIA) is a popular VPN service from Kape Technologies.
+
+References: `Main site <https://www.privateinternetaccess.com/>`_

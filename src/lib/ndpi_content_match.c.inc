@@ -1580,6 +1580,8 @@ static ndpi_protocol_match host_match[] =
    { ".tesla.services",                  "TeslaServices", NDPI_PROTOCOL_TESLA_SERVICES, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "digitalassets.tesla.com",          "TeslaServices", NDPI_PROTOCOL_TESLA_SERVICES, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "privateinternetaccess.com",        "PrivateInternetAccess", NDPI_PROTOCOL_PIA, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif
@@ -1607,6 +1609,7 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "O=Riot Games, Inc.",              NDPI_PROTOCOL_RIOTGAMES   },
   { "O=Riot Games Inc",                NDPI_PROTOCOL_RIOTGAMES   },
   { "O=NoMachine",                     NDPI_PROTOCOL_NOMACHINE },
+  { "O=Private Internet Access",       NDPI_PROTOCOL_PIA },
 
   { "CN=Snapchat Inc.",                NDPI_PROTOCOL_SNAPCHAT_CALL },
   { "CN=NVIDIA GameStream",            NDPI_PROTOCOL_GEFORCENOW },
