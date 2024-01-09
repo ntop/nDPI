@@ -11,7 +11,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
-  ndpi_struct = ndpi_init_detection_module(ndpi_no_prefs);
+  ndpi_struct = ndpi_init_detection_module();
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_struct, &all);
 

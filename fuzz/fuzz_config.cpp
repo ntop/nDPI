@@ -39,7 +39,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
-  ndpi_info_mod = ndpi_init_detection_module(fuzzed_data.ConsumeIntegral<u_int32_t>());
+  ndpi_info_mod = ndpi_init_detection_module();
 
   set_ndpi_debug_function(ndpi_info_mod, NULL);
 

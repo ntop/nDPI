@@ -149,6 +149,24 @@ typedef struct {
 struct ndpi_detection_module_config_struct {
   int max_packets_to_process;
   int direction_detect_enabled;
+ /* In some networks, there are some anomalous TCP flows where
+    the smallest ACK packets have some kind of zero padding.
+    It looks like the IP and TCP headers in those frames wrongly consider the
+    0x00 Ethernet padding bytes as part of the TCP payload.
+    While this kind of packets is perfectly valid per-se, in some conditions
+    they might be treated by the TCP reassembler logic as (partial) overlaps,
+    deceiving the classification engine.
+    Add an heuristic to detect these packets and to ignore them, allowing
+    correct detection/classification.
+    See #1946 for other details */
+  int tcp_ack_paylod_heuristic;
+  /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
+     the payload is encrypted in an attempt to “look like nothing”.
+     This heuristic only analyzes the first packet of the flow.
+     See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
+  int fully_encrypted_heuristic;
+  int track_payload_enabled;
+  int libgcrypt_init;
 
   char filename_config[CFG_MAX_LEN];
 
