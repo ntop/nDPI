@@ -48,7 +48,8 @@ static void ndpi_dbg_fn(u_int32_t protocol,
 {
   assert(protocol == NDPI_PROTOCOL_UNKNOWN);
   assert(module_struct != NULL);
-  assert(log_level == NDPI_LOG_DEBUG_EXTRA);
+  /* While this program always logs at NDPI_LOG_DEBUG_EXTRA level, the
+     initialization of the library may log at any level */
 
   (void)file;
   (void)func;
@@ -91,7 +92,7 @@ int main(int argc, char **argv) {
 
   /* Initialize nDPI detection module*/
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(ndpi_no_prefs);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module();
   assert(ndpi_str != NULL);
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);

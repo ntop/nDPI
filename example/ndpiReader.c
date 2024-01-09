@@ -108,7 +108,6 @@ int nDPI_LogLevel = 0;
 char *_debug_protocols = NULL;
 char *_disabled_protocols = NULL;
 static u_int8_t stats_flag = 0;
-ndpi_init_prefs init_prefs = ndpi_no_prefs | ndpi_enable_tcp_ack_payload_heuristic;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
@@ -331,7 +330,7 @@ void ndpiCheckHostStringMatch(char *testChar) {
   if(!testChar)
     return;
 
-  ndpi_str = ndpi_init_detection_module(init_prefs);
+  ndpi_str = ndpi_init_detection_module();
   ndpi_finalize_initialization(ndpi_str);
 
   testRes =  ndpi_match_string_subprotocol(ndpi_str,
@@ -376,7 +375,7 @@ static void ndpiCheckIPMatch(char *testChar) {
   if(!testChar)
     return;
 
-  ndpi_str = ndpi_init_detection_module(init_prefs);
+  ndpi_str = ndpi_init_detection_module();
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
@@ -561,7 +560,6 @@ static void help(u_int long_help) {
          "                            | 2 - List known risks\n"
          "  -d                        | Disable protocol guess and use only DPI\n"
          "  -e <len>                  | Min human readeable string match len. Default %u\n"
-	 "  -E                        | Track flow payload\n"
          "  -q                        | Quiet mode\n"
          "  -F                        | Enable flow stats\n"
          "  -t                        | Dissect GTP/TZSP tunnels\n"
@@ -609,7 +607,7 @@ static void help(u_int long_help) {
          max_num_reported_top_payloads, max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts);
 
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
   ndpi_finalize_initialization(ndpi_info_mod);
@@ -769,7 +767,7 @@ void extcap_config() {
   ndpi_proto_defaults_t *proto_defaults;
 #endif
 
-  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
 #if 0
   ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
   proto_defaults = ndpi_get_proto_defaults(ndpi_info_mod);
@@ -1002,7 +1000,7 @@ static void parseOptions(int argc, char **argv) {
 #endif
 
   while((opt = getopt_long(argc, argv,
-			   "a:Ab:B:e:Ec:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:Rs:tu:v:V:n:rp:x:X:w:q0123:456:7:89:m:MT:U:",
+			   "a:Ab:B:e:c:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:Rs:tu:v:V:n:rp:x:X:w:q0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -1032,10 +1030,6 @@ static void parseOptions(int argc, char **argv) {
 
     case 'e':
       human_readeable_string_len = atoi(optarg);
-      break;
-
-    case 'E':
-      init_prefs |= ndpi_track_flow_payload;
       break;
 
     case 'i':
@@ -1253,7 +1247,7 @@ static void parseOptions(int argc, char **argv) {
 
     case '9':
     {
-      struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+      struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
       extcap_packet_filter = ndpi_get_proto_by_name(ndpi_info_mod, optarg);
       if(extcap_packet_filter == NDPI_PROTOCOL_UNKNOWN) extcap_packet_filter = atoi(optarg);
       ndpi_exit_detection_module(ndpi_info_mod);
@@ -2786,6 +2780,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _protoFilePath);
+
+  ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
 
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct,
@@ -4770,7 +4766,7 @@ static void dgaUnitTest() {
   };
   int debug = 0, i;
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(init_prefs);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module();
 
   assert(ndpi_str != NULL);
 
@@ -5613,7 +5609,7 @@ void outlierUnitTest() {
 
 void domainsUnitTest() {
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
   const char *lists_path = "../lists/public_suffix_list.dat";
   struct stat st;
 

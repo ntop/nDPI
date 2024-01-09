@@ -1505,30 +1505,6 @@ typedef struct {
   u_int16_t value;
 } ndpi_network6;
 
-typedef u_int32_t ndpi_init_prefs;
-
-typedef enum {
-    ndpi_no_prefs                  = 0,
-    ndpi_dont_init_libgcrypt       = (1 << 1),
-    ndpi_track_flow_payload        = (1 << 16),
-    /* In some networks, there are some anomalous TCP flows where
-       the smallest ACK packets have some kind of zero padding.
-       It looks like the IP and TCP headers in those frames wrongly consider the
-       0x00 Ethernet padding bytes as part of the TCP payload.
-       While this kind of packets is perfectly valid per-se, in some conditions
-       they might be treated by the TCP reassembler logic as (partial) overlaps,
-       deceiving the classification engine.
-       Add an heuristic to detect these packets and to ignore them, allowing
-       correct detection/classification.
-       See #1946 for other details */
-    ndpi_enable_tcp_ack_payload_heuristic = (1 << 17),
-    /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
-       the payload is encrypted in an attempt to “look like nothing”.
-       This heuristic only analyzes the first packet of the flow.
-       See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
-    ndpi_disable_fully_encrypted_heuristic = (1 << 20),
-  } ndpi_prefs;
-
 typedef struct {
   u_int32_t protocol_id;
   ndpi_protocol_category_t protocol_category;

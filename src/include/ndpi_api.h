@@ -211,11 +211,10 @@ extern "C" {
    * indipendent detection contexts) but all these calls MUST NOT run
    * in parallel
    *
-   * @par prefs = load preferences
    * @return  the initialized detection module
    *
    */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs);
+  struct ndpi_detection_module_struct *ndpi_init_detection_module(void);
 
   /**
    * Completes the initialization (2nd step)

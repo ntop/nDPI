@@ -3077,7 +3077,7 @@ static void free_ptree_data(void *data) {
 
 /* ******************************************************************** */
 
-struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs) {
+struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
   int i;
 
@@ -3102,22 +3102,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
-  if(!(prefs & ndpi_dont_init_libgcrypt)) {
-    if(!gcry_control (GCRYCTL_INITIALIZATION_FINISHED_P)) {
-      const char *gcrypt_ver = gcry_check_version(NULL);
-      if(!gcrypt_ver) {
-        NDPI_LOG_ERR(ndpi_str, "Error initializing libgcrypt\n");
-        ndpi_free(ndpi_str);
-        return NULL;
-      }
-      NDPI_LOG_DBG(ndpi_str, "Libgcrypt %s\n", gcrypt_ver);
-      /* Tell Libgcrypt that initialization has completed. */
-      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
-    }
-  } else {
-    NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
-  }
-
   if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) == NULL ||
      (ndpi_str->protocols_ptree6 = ndpi_patricia_new(128 /* IPv6 */)) == NULL) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating tree\n");
@@ -3126,8 +3110,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
   }
   ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list);
 
-  if(prefs & ndpi_track_flow_payload)
-    ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
 
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
   ndpi_str->ip_risk_mask_ptree6 = ndpi_patricia_new(128 /* IPv6 */);
@@ -3249,12 +3231,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs 
     return(NULL);
   }
 
-  if(prefs & ndpi_enable_tcp_ack_payload_heuristic)
-    ndpi_str->tcp_ack_paylod_heuristic = 1;
-
-  if(!(prefs & ndpi_disable_fully_encrypted_heuristic))
-    ndpi_str->fully_encrypted_based_on_first_pkt_heuristic = 1;
-
   for(i = 0; i < NUM_CUSTOM_CATEGORIES; i++)
     ndpi_snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
 	     (unsigned int) (i + 1));
@@ -3325,6 +3301,20 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     return -1;
   if(ndpi_str->finalized) /* Already finalized */
     return 0;
+
+  if(ndpi_str->cfg.libgcrypt_init) {
+    if(!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P)) {
+      const char *gcrypt_ver = gcry_check_version(NULL);
+      if(!gcrypt_ver) {
+        NDPI_LOG_ERR(ndpi_str, "Error initializing libgcrypt\n");
+      }
+      NDPI_LOG_DBG(ndpi_str, "Libgcrypt %s\n", gcrypt_ver);
+      /* Tell Libgcrypt that initialization has completed. */
+      gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
+    }
+  } else {
+    NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
+  }
 
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AMAZON_AWS)) {
     ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_amazon_aws_protocol_list);
@@ -3631,6 +3621,9 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     ndpi_str->num_tls_blocks_to_follow = NDPI_MAX_NUM_TLS_APPL_BLOCKS;
     ndpi_str->skip_tls_blocks_until_change_cipher = 1;
   }
+
+  if(ndpi_str->cfg.track_payload_enabled)
+    ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
 
   ndpi_str->finalized = 1;
 
@@ -6650,7 +6643,7 @@ void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 	}
       }
 
-      if(ndpi_str->tcp_ack_paylod_heuristic && tcp_ack_padding(packet)) {
+      if(ndpi_str->cfg.tcp_ack_paylod_heuristic && tcp_ack_padding(packet)) {
         NDPI_LOG_DBG2(ndpi_str, "TCP ACK with zero padding. Ignoring\n");
         packet->tcp_retransmission = 1;
       } else if(flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0 ||
@@ -8259,7 +8252,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
      && (flow->l4_proto == IPPROTO_TCP))
     ndpi_add_connection_as_zoom(ndpi_str, flow);
 
-  if(ndpi_str->fully_encrypted_based_on_first_pkt_heuristic &&
+  if(ndpi_str->cfg.fully_encrypted_heuristic &&
      ret.app_protocol == NDPI_PROTOCOL_UNKNOWN && /* Only for unknown traffic */
      flow->packet_counter == 1 && packet->payload_packet_len > 0) {
    flow->first_pkt_fully_encrypted = fully_enc_heuristic(ndpi_str, flow);
@@ -9361,7 +9354,7 @@ void ndpi_generate_options(u_int opt, FILE *options_out) {
   u_int i;
 
   if (!options_out) return;
-  ndpi_str = ndpi_init_detection_module(ndpi_no_prefs);
+  ndpi_str = ndpi_init_detection_module();
   if (!ndpi_str) return;
 
   NDPI_BITMASK_SET_ALL(all);
@@ -10572,7 +10565,7 @@ static u_int16_t __get_proto_id(const char *proto_name_or_id)
 
   /* Try to decode the string as protocol name */
   /* Use a temporary module with all protocols enabled */
-  module = ndpi_init_detection_module(ndpi_no_prefs);
+  module = ndpi_init_detection_module();
   if(!module)
     return -1;
   NDPI_BITMASK_SET_ALL(all);
@@ -10805,6 +10798,10 @@ static const struct cfg_param {
 
   { NULL,            "packets_limit_per_flow",                  "32", "0", "255", CFG_PARAM_INT, __OFF(max_packets_to_process) },
   { NULL,            "flow.direction_detection.enable",         "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(direction_detect_enabled) },
+  { NULL,            "flow.track_payload.enable",               "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(track_payload_enabled), },
+  { NULL,            "tcp_ack_payload_heuristic.enable",        "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_ack_paylod_heuristic) },
+  { NULL,            "fully_encrypted_heuristic.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic) },
+  { NULL,            "libgcrypt.init",                          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(libgcrypt_init), },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled)},
 
