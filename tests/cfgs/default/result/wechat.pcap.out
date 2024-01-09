@@ -32,7 +32,7 @@ HTTP	70	4620	8
 MDNS	116	10672	4
 NTP	1	90	1
 NetBIOS	9	828	1
-SMBv1	3	751	1
+SMB	3	751	1
 DHCP	1	342	1
 QQ	26	9402	2
 IGMP	24	1280	4
@@ -44,9 +44,8 @@ WeChat	989	520787	32
 GoogleDocs	15	5114	2
 
 Safe                           305 89209         22           
-Acceptable                     349 47161         46           
+Acceptable                     352 47912         47           
 Fun                           1015 530189        34           
-Dangerous                        3 751           1            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -96,7 +95,7 @@ JA3 Host Stats:
 	41	TCP 203.205.151.162:443 <-> 192.168.1.103:54084 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 6][cat: Web/5][3 pkts/802 bytes <-> 3 pkts/198 bytes][Goodput ratio: 75/0][16.21 sec][bytes ratio: 0.604 (Upload)][IAT c2s/s2c min/avg/max/stddev: 6562/9679 8102/9679 9642/9679 1540/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 267/66 670/66 285/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	42	UDP 192.168.1.100:137 -> 192.168.1.255:137 [proto: 10/NetBIOS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][9 pkts/828 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][1.44 sec][Hostname/SNI: lbjamwptxz][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 179/0 816/0 313/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/0 92/0 92/0 0/0][PLAIN TEXT ( EMECEKEBENFHFAFEFIFKCACACACACA)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	43	IGMP 192.168.1.100:0 -> 224.0.0.22:0 [proto: 82/IGMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][15 pkts/810 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][3769.99 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 409/0 289920/0 3384346/0 895904/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 54/0 54/0 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	44	UDP 192.168.1.100:138 -> 192.168.1.255:138 [proto: 10.16/NetBIOS.SMBv1][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][3 pkts/751 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][3600.00 sec][Hostname/SNI: giovanni-pc][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT ( EHEJEPFGEBEOEOEJ)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	44	UDP 192.168.1.100:138 -> 192.168.1.255:138 [proto: 10.16/NetBIOS.SMB][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][3 pkts/751 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][3600.00 sec][Hostname/SNI: giovanni-pc][PLAIN TEXT ( EHEJEPFGEBEOEOEJ)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	45	TCP 192.168.1.103:54112 <-> 203.205.151.162:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 9][cat: Web/5][5 pkts/338 bytes <-> 4 pkts/280 bytes][Goodput ratio: 0/0][22.72 sec][bytes ratio: 0.094 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 351/910 5597/910 20327/910 8509/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68/70 74/74 3/4][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	46	TCP 192.168.1.103:54114 <-> 203.205.151.162:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][DPI packets: 9][cat: Web/5][5 pkts/338 bytes <-> 4 pkts/280 bytes][Goodput ratio: 0/0][55.41 sec][bytes ratio: 0.094 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 312/33511 13774/33511 33196/33511 13762/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68/70 74/74 3/4][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	47	UDP 192.168.1.103:19041 <-> 192.168.1.254:53 [proto: 5.48/DNS.QQ][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/73 bytes <-> 1 pkts/537 bytes][Goodput ratio: 42/92][0.03 sec][Hostname/SNI: res.wx.qq.com][203.205.158.34][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

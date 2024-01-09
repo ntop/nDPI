@@ -31,7 +31,7 @@ Unknown	883	76902	389
 MDNS	18	1632	2
 NetBIOS	15	1596	1
 SSDP	46	8904	8
-SMBv1	5	1215	1
+SMB	5	1215	1
 DHCP	2	946	2
 Gnutella	2787	437378	330
 ICMP	8	721	5
@@ -45,9 +45,8 @@ NAT-PMP	4	176	4
 BACnet	2	140	1
 
 Safe                            23 4535          2            
-Acceptable                     184 57460         38           
+Acceptable                     189 58675         39           
 Potentially Dangerous          2787 437378        330          
-Dangerous                        5 1215          1            
 Unrated                        883 76902         389          
 
 JA3 Host Stats: 
@@ -142,7 +141,7 @@ JA3 Host Stats:
 	85	TCP 10.0.2.15:50261 <-> 156.57.42.2:33476 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Download/7][5 pkts/879 bytes <-> 5 pkts/527 bytes][Goodput ratio: 68/48][13.84 sec][bytes ratio: 0.250 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 3460/4229 12669/12668 5337/5967][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 176/105 651/307 238/101][User-Agent: gtk-gnutella/1.2.2 (2022-02-25; GTK2; Windows x64)][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (GNUTELLA CONNECT/0.6)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	86	TCP 10.0.2.15:50250 <-> 27.94.154.53:6346 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Download/7][5 pkts/880 bytes <-> 5 pkts/524 bytes][Goodput ratio: 68/48][0.46 sec][bytes ratio: 0.254 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 114/85 256/255 115/120][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 176/105 652/304 238/100][User-Agent: gtk-gnutella/1.2.2 (2022-02-25; GTK2; Windows x64)][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (GNUTELLA CONNECT/0.6)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	87	UDP 10.0.2.15:57623 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][6 pkts/1294 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][Hostname/SNI: 239.255.255.250:1900][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 188/0 216/0 224/0 13/0][User-Agent: gtk-gnutella/1.2.2 (2022-02-25)][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,0,16,83,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	88	UDP 10.0.2.15:138 -> 10.0.2.255:138 [proto: 10.16/NetBIOS.SMBv1][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][5 pkts/1215 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][582.84 sec][Hostname/SNI: msedgewin10][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT ( ENFDEFEEEHEFFHEJEODBDACACACACA)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	88	UDP 10.0.2.15:138 -> 10.0.2.255:138 [proto: 10.16/NetBIOS.SMB][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][5 pkts/1215 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][582.84 sec][Hostname/SNI: msedgewin10][PLAIN TEXT ( ENFDEFEEEHEFFHEJEODBDACACACACA)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	89	UDP 10.0.2.15:28681 <-> 213.229.111.224:4876 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Download/7][6 pkts/555 bytes <-> 3 pkts/612 bytes][Goodput ratio: 54/79][388.82 sec][bytes ratio: -0.049 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 487/2153 77092/101426 199495/200699 72356/99273][Pkt Len c2s/s2c min/avg/max/stddev: 70/130 92/204 123/320 24/83][Risk: ** Unsafe Protocol **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (CEGTKGb)][Plen Bins: 33,11,33,11,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	90	TCP 10.0.2.15:50199 <-> 47.147.52.21:36728 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Download/7][5 pkts/880 bytes <-> 4 pkts/220 bytes][Goodput ratio: 68/0][0.44 sec][bytes ratio: 0.600 (Upload)][IAT c2s/s2c min/avg/max/stddev: 27/27 111/36 232/44 82/8][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 176/55 652/58 238/2][User-Agent: gtk-gnutella/1.2.2 (2022-02-25; GTK2; Windows x64)][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (GNUTELLA CONNECT/0.6)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	91	TCP 10.0.2.15:50291 <-> 200.7.155.210:28365 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Download/7][5 pkts/905 bytes <-> 3 pkts/166 bytes][Goodput ratio: 66/0][24.54 sec][bytes ratio: 0.690 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/2 3913/2 6610/2 2636/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 181/55 653/58 236/2][User-Agent: gtk-gnutella/1.2.2 (2022-02-25; GTK2; Windows x64)][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (GNUTELLA CONNECT/0.6)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

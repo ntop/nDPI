@@ -1127,8 +1127,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "XDMCP", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS,
 			  ndpi_build_default_ports(ports_a, 177, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 177, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_DANGEROUS, NDPI_PROTOCOL_SMBV1,
-			  "SMBv1", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SMB,
+			  "SMB", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
 			  ndpi_build_default_ports(ports_a, 445, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SYSLOG,
@@ -1207,9 +1207,9 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Memcached", NDPI_PROTOCOL_CATEGORY_NETWORK,
 			  ndpi_build_default_ports(ports_a, 11211, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 11211, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SMBV23,
-			  "SMBv23", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
-			  ndpi_build_default_ports(ports_a, 445, 0, 0, 0, 0) /* TCP */,
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE_41,
+			  "Free41", NDPI_PROTOCOL_CATEGORY_SYSTEM_OS,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_UNSAFE, NDPI_PROTOCOL_MINING,
 			  "Mining", CUSTOM_CATEGORY_MINING,

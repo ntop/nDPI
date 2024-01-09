@@ -379,7 +379,7 @@ static void ndpi_search_netbios(struct ndpi_detection_module_struct *ndpi_struct
 
 	    NDPI_LOG_INFO(ndpi_struct, "found netbios with checked ip-address\n");
 
-	    ndpi_int_netbios_add_connection(ndpi_struct, flow, (leftover > 0) ? NDPI_PROTOCOL_SMBV1 : NDPI_PROTOCOL_UNKNOWN);
+	    ndpi_int_netbios_add_connection(ndpi_struct, flow, (leftover > 0) ? NDPI_PROTOCOL_SMB : NDPI_PROTOCOL_UNKNOWN);
 	    return;
 	  }
 	}

@@ -21,7 +21,7 @@
  *
  */
 #include "ndpi_protocol_ids.h"
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SMBV23
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_SMB
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
@@ -51,28 +51,27 @@ static void ndpi_search_smb_tcp(struct ndpi_detection_module_struct *ndpi_struct
         if(memcmp(&packet->payload[4], smbv1, sizeof(smbv1)) == 0) {
           if(packet->payload[8] != 0x72) /* Skip Negotiate request */ {
             NDPI_LOG_INFO(ndpi_struct, "found SMBv1\n");
-            ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
+            ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMB, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
             ndpi_set_risk(ndpi_struct, flow, NDPI_SMB_INSECURE_VERSION, "Found SMBv1");
           }
           return;
         } else if(memcmp(&packet->payload[4], smbv2, sizeof(smbv2)) == 0) {
-          NDPI_LOG_INFO(ndpi_struct, "found SMBv23\n");
-          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV23, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
+          NDPI_LOG_INFO(ndpi_struct, "found SMB version 2 or 3\n");
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMB, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
           return;
         }
       }
     }
   }
 
-  NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1);
-  NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_SMBV23);
+  NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_SMB);
 }
 
 
 void init_smb_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
   ndpi_set_bitmask_protocol_detection("SMB", ndpi_struct, *id,
-				      NDPI_PROTOCOL_SMBV23,
+				      NDPI_PROTOCOL_SMB,
 				      ndpi_search_smb_tcp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,

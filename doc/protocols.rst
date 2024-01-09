@@ -5,6 +5,15 @@ This page provides the list of the protocols/applications supported by nDPI. For
 
 Work in progress!
 
+.. _Proto 16:
+
+`NDPI_PROTOCOL_SMB`
+=======================
+Server Message Block is a client-server protocol that is used to share files, printers, and other resources over a network.
+
+References: `Protocol Specs: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb/f210069c-7086-4dc2-885e-861d837df688>`_
+
+
 .. _Proto 72:
 
 `NDPI_PROTOCOL_HART_IP`

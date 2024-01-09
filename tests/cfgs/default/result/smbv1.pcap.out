@@ -21,8 +21,8 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-SMBv1	7	1197	1
+SMB	7	1197	1
 
-Dangerous                        7 1197          1            
+Acceptable                       7 1197          1            
 
-	1	TCP 172.16.156.130:50927 <-> 10.128.0.243:445 [proto: 10.16/NetBIOS.SMBv1][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 3][cat: System/18][4 pkts/669 bytes <-> 3 pkts/528 bytes][Goodput ratio: 68/69][0.10 sec][bytes ratio: 0.118 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 27/34 32/35 37/36 4/1][Pkt Len c2s/s2c min/avg/max/stddev: 136/114 167/176 194/243 26/53][Risk: ** Known Proto on Non Std Port **** SMB Insecure Vers **** Unsafe Protocol **][Risk Score: 160][Risk Info: Found SMBv1 / Expected on port 139][PLAIN TEXT (PC NETWORK PROGRAM 1.0)][Plen Bins: 0,14,28,14,28,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 172.16.156.130:50927 <-> 10.128.0.243:445 [proto: 10.16/NetBIOS.SMB][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 3][cat: System/18][4 pkts/669 bytes <-> 3 pkts/528 bytes][Goodput ratio: 68/69][0.10 sec][bytes ratio: 0.118 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 27/34 32/35 37/36 4/1][Pkt Len c2s/s2c min/avg/max/stddev: 136/114 167/176 194/243 26/53][Risk: ** SMB Insecure Vers **][Risk Score: 100][Risk Info: Found SMBv1][PLAIN TEXT (PC NETWORK PROGRAM 1.0)][Plen Bins: 0,14,28,14,28,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

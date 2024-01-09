@@ -44,7 +44,7 @@ typedef enum {
   NDPI_PROTOCOL_BGP                   = 13,
   NDPI_PROTOCOL_SNMP                  = 14,
   NDPI_PROTOCOL_XDMCP                 = 15,
-  NDPI_PROTOCOL_SMBV1                 = 16, /* SMB version 1 */
+  NDPI_PROTOCOL_SMB                   = 16,
   NDPI_PROTOCOL_SYSLOG                = 17,
   NDPI_PROTOCOL_DHCP                  = 18,
   NDPI_PROTOCOL_POSTGRES              = 19,
@@ -69,7 +69,7 @@ typedef enum {
   NDPI_PROTOCOL_SKYPE_TEAMS_CALL      = 38, /* Skype call and videocalls */
   NDPI_PROTOCOL_SIGNAL                = 39,
   NDPI_PROTOCOL_MEMCACHED             = 40, /* Memcached */
-  NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */
+  NDPI_PROTOCOL_FREE_41               = 41,
   NDPI_PROTOCOL_MINING                = 42, /* Ethereum, ZCash, Monero */
   NDPI_PROTOCOL_NEST_LOG_SINK         = 43, /* Nest Log Sink (Nest Protect) */
   NDPI_PROTOCOL_MODBUS                = 44, /* Modbus */
