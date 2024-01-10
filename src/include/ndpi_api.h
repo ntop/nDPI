@@ -1085,17 +1085,6 @@ extern "C" {
 				    ndpi_protocol_category_t *category,
 				    ndpi_protocol_breed_t *breed);
 
-  /**
-   * Specifies the threshold used to trigger the NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE
-   * flow risk that by default is set to 30 days
-   *
-   * @par    ndpi_struct  = the struct created for the protocol detection
-   * @par    days         = the number of days threshold for emitting the alert
-   *
-   */
-  void ndpi_set_tls_cert_expire_days(struct ndpi_detection_module_struct *ndpi_str,
-				     u_int8_t days);
-
   void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 				   struct ndpi_flow_struct *flow);
 

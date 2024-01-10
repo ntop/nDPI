@@ -545,7 +545,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	      snprintf(str, sizeof(str), "%s - %s", b, e);
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_CERTIFICATE_EXPIRED, str); /* Certificate expired */
 	    } else if((time_sec > flow->protos.tls_quic.notBefore)
-		      && (time_sec > (flow->protos.tls_quic.notAfter - (ndpi_struct->tls_certificate_expire_in_x_days * 86400)))) {
+		      && (time_sec > (flow->protos.tls_quic.notAfter - (ndpi_struct->cfg.tls_certificate_expire_in_x_days * 86400)))) {
 	      char str[96], b[32], e[32];
 	      struct tm result;
 	      time_t theTime;

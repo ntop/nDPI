@@ -191,6 +191,7 @@ struct ndpi_detection_module_config_struct {
 
   /* Protocols */
 
+  int tls_certificate_expire_in_x_days;
   int tls_app_blocks_tracking_enabled;
   int tls_sha1_fingerprint_enabled;
 
