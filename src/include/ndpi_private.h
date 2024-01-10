@@ -205,6 +205,8 @@ struct ndpi_detection_module_config_struct {
 
   int stun_opportunistic_tls_enabled;
 
+  int http_parse_response_enabled;
+
   int ookla_aggressiveness;
 
   NDPI_PROTOCOL_BITMASK ip_list_bitmask;
@@ -327,13 +329,8 @@ struct ndpi_detection_module_struct {
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
-  int tcp_ack_paylod_heuristic;
-  int fully_encrypted_based_on_first_pkt_heuristic;
-
   u_int16_t ndpi_to_user_proto_id[NDPI_MAX_NUM_CUSTOM_PROTOCOLS]; /* custom protocolId mapping */
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
-
-  u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */ _pad:7;
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"

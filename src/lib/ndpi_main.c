@@ -10790,6 +10790,8 @@ static const struct cfg_param {
 
   { "stun",          "tls_dissection.enable",                   "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_opportunistic_tls_enabled) },
 
+  { "http",          "process_response.enable",                 "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(http_parse_response_enabled) },
+
   { "ookla",         "aggressiveness",                          "0x01", "0", "1", CFG_PARAM_INT, __OFF(ookla_aggressiveness) },
 
   { "$PROTO_NAME_OR_ID", "ip_list.load",                        "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask)},
