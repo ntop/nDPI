@@ -92,7 +92,7 @@ static char* domain_to_check = NULL;
 static char* ip_port_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
 /** User preferences **/
-u_int8_t enable_realtime_output = 0, enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
+u_int8_t enable_realtime_output = 0, enable_protocol_guess = NDPI_GIVEUP_GUESS_BY_PORT | NDPI_GIVEUP_GUESS_BY_IP, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
 
 struct cfg {
@@ -557,7 +557,7 @@ static void help(u_int long_help) {
          "                            | 0 - List known protocols\n"
          "                            | 1 - List known categories\n"
          "                            | 2 - List known risks\n"
-         "  -d                        | Disable protocol guess and use only DPI\n"
+         "  -d                        | Disable protocol guess (by ip and by port) and use only DPI. It is a shortcut to --cfg=,NULL,guess_on_giveup,0\n"
          "  -e <len>                  | Min human readeable string match len. Default %u\n"
          "  -q                        | Quiet mode\n"
          "  -F                        | Enable flow stats\n"
@@ -1021,6 +1021,10 @@ static void parseOptions(int argc, char **argv) {
 
     case 'd':
       enable_protocol_guess = 0;
+      if(reader_add_cfg(NULL, "guess_on_giveup", "0", 1) == 1) {
+        printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
     case 'D':
@@ -2180,7 +2184,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
       malloc_size_stats = 1;
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct,
-                                                      flow->ndpi_flow, enable_protocol_guess, &proto_guessed);
+                                                      flow->ndpi_flow, &proto_guessed);
       malloc_size_stats = 0;
 
       if(proto_guessed) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;

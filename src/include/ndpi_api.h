@@ -290,14 +290,12 @@ extern "C" {
    *
    * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
-   * @par    enable_guess = guess protocol if unknown
    * @par    protocol_was_guessed = 1 if the protocol was guesses (requires enable_guess = 1), 0 otherwise
    * @return the detected protocol even if the flow is not completed;
    *
    */
   ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow,
-				      u_int8_t enable_guess,
 				      u_int8_t *protocol_was_guessed);
 
   /**

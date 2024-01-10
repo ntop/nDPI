@@ -23,7 +23,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   ndpi_protocol detected_protocol =
     ndpi_detection_process_packet(ndpi_info_mod, &ndpi_flow, Data, Size, 0, NULL);
   ndpi_protocol guessed_protocol =
-    ndpi_detection_giveup(ndpi_info_mod, &ndpi_flow, 1, &protocol_was_guessed);
+    ndpi_detection_giveup(ndpi_info_mod, &ndpi_flow, &protocol_was_guessed);
 
   ndpi_reset_serializer(&json_serializer);
   ndpi_reset_serializer(&csv_serializer);

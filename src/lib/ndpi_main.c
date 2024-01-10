@@ -7377,7 +7377,7 @@ static void ndpi_check_tcp_flags(struct ndpi_detection_module_struct *ndpi_str,
 /* ********************************************************************************* */
 
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-				    u_int8_t enable_guess, u_int8_t *protocol_was_guessed) {
+				    u_int8_t *protocol_was_guessed) {
   ndpi_protocol ret = NDPI_PROTOCOL_NULL;
   u_int16_t cached_proto;
 
@@ -7448,7 +7448,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   }
 
   /* Classification by-port */
-  if(enable_guess && ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
+  if((ndpi_str->cfg.guess_on_giveup & NDPI_GIVEUP_GUESS_BY_PORT) &&
+     ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
 
     /* Ignore guessed protocol if they have been discarded */
     if(flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN &&
@@ -7464,7 +7465,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   }
 
   /* Classification by-ip, as last effort */
-  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
+  if((ndpi_str->cfg.guess_on_giveup & NDPI_GIVEUP_GUESS_BY_IP) &&
+     ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
      flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
 
       ndpi_set_detected_protocol(ndpi_str, flow,
@@ -7929,7 +7931,7 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
       if(flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
         u_int8_t protocol_was_guessed;
 
-        *ret = ndpi_detection_giveup(ndpi_str, flow, 0, &protocol_was_guessed);
+        *ret = ndpi_detection_giveup(ndpi_str, flow, &protocol_was_guessed);
       }
 
       ndpi_fill_protocol_category(ndpi_str, flow, ret);
@@ -10795,6 +10797,7 @@ static const struct cfg_param {
   { NULL,            "tcp_ack_payload_heuristic.enable",        "0", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_ack_paylod_heuristic) },
   { NULL,            "fully_encrypted_heuristic.enable",        "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic) },
   { NULL,            "libgcrypt.init",                          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(libgcrypt_init), },
+  { NULL,            "guess_on_giveup",                         "0x3", "0", "3", CFG_PARAM_INT, __OFF(guess_on_giveup) },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled)},
 
