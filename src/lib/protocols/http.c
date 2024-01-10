@@ -1493,16 +1493,20 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
   NDPI_LOG_DBG(ndpi_struct, "search HTTP\n");
   ndpi_check_http_tcp(ndpi_struct, flow);
 
-  if((flow->host_server_name[0] != '\0'&&
+  if((ndpi_struct->cfg.http_parse_response_enabled &&
+      flow->host_server_name[0] != '\0'&&
       flow->http.response_status_code != 0) ||
-    /* We have found 3 consecutive requests (without the reply) or 3
-       consecutive replies (without the request). If the traffic is really
-       asymmetric, stop here, because we will never find the metadata from
-       both the request and the reply. We wait for 3 events (instead of 2)
-       to avoid false positives triggered by missing/dropped packets */
-    (flow->l4.tcp.http_asymmetric_stage == 2 &&
-     (flow->packet_direction_complete_counter[0] == 0 ||
-      flow->packet_direction_complete_counter[1] == 0))) {
+     (!ndpi_struct->cfg.http_parse_response_enabled &&
+      (flow->host_server_name[0] != '\0' ||
+       flow->http.response_status_code != 0)) ||
+     /* We have found 3 consecutive requests (without the reply) or 3
+        consecutive replies (without the request). If the traffic is really
+        asymmetric, stop here, because we will never find the metadata from
+        both the request and the reply. We wait for 3 events (instead of 2)
+        to avoid false positives triggered by missing/dropped packets */
+     (flow->l4.tcp.http_asymmetric_stage == 2 &&
+      (flow->packet_direction_complete_counter[0] == 0 ||
+       flow->packet_direction_complete_counter[1] == 0))) {
     flow->extra_packets_func = NULL; /* We're good now */
 
     if(flow->initial_binary_bytes_len) ndpi_analyze_content_signature(ndpi_struct, flow);
