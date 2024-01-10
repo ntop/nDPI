@@ -2,7 +2,7 @@
  * bittorrent.c
  *
  * Copyright (C) 2009-11 - ipoque GmbH
- * Copyright (C) 2011-22 - ntop.org
+ * Copyright (C) 2011-24 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -34,12 +34,20 @@
 
 // #define BITTORRENT_CACHE_DEBUG 1
 
+PACK_ON
 struct ndpi_utp_hdr {
-  u_int8_t h_version:4, h_type:4, next_extension;
+#if defined(__BIG_ENDIAN__)
+  u_int8_t h_type:4, h_version:4;
+#elif defined(__LITTLE_ENDIAN__)
+  u_int8_t h_version:4, h_type:4;
+#else
+#error "Missing endian macro definitions."
+#endif
+  u_int8_t next_extension;
   u_int16_t connection_id;
   u_int32_t ts_usec, tdiff_usec, window_size;
   u_int16_t sequence_nr, ack_nr;
-};
+} PACK_OFF;
 
 
 /* Forward declaration */
@@ -68,7 +76,13 @@ static u_int8_t is_utpv1_pkt(const u_int8_t *payload, u_int payload_len) {
   if(h->h_version != 1)             return(0);
   if(h->h_type > 4)                 return(0);
   if(h->next_extension > 2)         return(0);
-  if(ntohl(h->window_size) > 65565) return(0);
+  if(h->window_size == 0)    return(0);
+  if(h->h_type == 4 /* SYN */ && (h->tdiff_usec != 0 ||
+     payload_len != sizeof(struct ndpi_utp_hdr))) return(0);
+  if(h->h_type == 0 /* DATA */ &&
+     payload_len == sizeof(struct ndpi_utp_hdr)) return(0);
+  if(h->connection_id == 0) return(0);
+  if(h->ts_usec == 0) return(0);
 
   if((h->window_size == 0) && (payload_len != sizeof(struct ndpi_utp_hdr)))
     return(0);
@@ -531,7 +545,11 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 
 	  if(is_utpv1_pkt(packet->payload, packet->payload_packet_len)) {
 	    bt_proto = ndpi_strnstr((const char *)&packet->payload[20], BITTORRENT_PROTO_STRING, packet->payload_packet_len-20);
-	    goto bittorrent_found;
+	    if(flow->packet_counter > 2 || bt_proto != NULL) {
+	      goto bittorrent_found;
+	    } else {
+	      return;
+	    }
 	  } else if((packet->payload[0]== 0x60)
 		    && (packet->payload[1]== 0x0)
 		    && (packet->payload[2]== 0x0)

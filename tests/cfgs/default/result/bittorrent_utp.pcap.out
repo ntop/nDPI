@@ -1,8 +1,8 @@
-DPI Packets (UDP):	4	(4.00 pkts/flow)
-Confidence DPI              : 1 (flows)
-Num dissector calls: 74 (74.00 diss/flow)
+DPI Packets (UDP):	10	(5.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 233 (116.50 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 5/0/0 (insert/search/found)
+LRU cache bittorrent: 10/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
@@ -18,11 +18,12 @@ Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia protocols:   4/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-BitTorrent	86	41489	1
+BitTorrent	92	41870	2
 
-Acceptable                      86 41489         1            
+Acceptable                      92 41870         2            
 
 	1	UDP 82.243.113.43:64969 <-> 192.168.1.5:40959 [proto: 37/BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Download/7][47 pkts/36653 bytes <-> 39 pkts/4836 bytes][Goodput ratio: 95/66][19.22 sec][bytes ratio: 0.767 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/11 223/425 4392/4641 701/934][Pkt Len c2s/s2c min/avg/max/stddev: 62/62 780/124 1514/519 609/123][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (hash20)][Plen Bins: 52,1,2,4,0,1,1,1,0,0,5,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,6,0,0,0,6,0,0,0,8,0]
+	2	UDP 127.0.0.1:49861 <-> 127.0.0.1:33333 [proto: 37/BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Download/7][3 pkts/195 bytes <-> 3 pkts/186 bytes][Goodput ratio: 35/32][2.70 sec][bytes ratio: 0.024 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1205/1205 1348/1348 1492/1492 144/144][Pkt Len c2s/s2c min/avg/max/stddev: 62/62 65/62 67/62 2/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
