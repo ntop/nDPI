@@ -60,8 +60,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* ndpi_set_config: try to keep the soame order of the definitions in ndpi_main.c.
      + 1 to trigger unvalid parameter error */
 
-  ndpi_set_tls_cert_expire_days(ndpi_info_mod, fuzzed_data.ConsumeIntegral<u_int8_t>());
-
   if(fuzzed_data.ConsumeBool())
     ndpi_load_protocols_file(ndpi_info_mod, "protos.txt");
   if(fuzzed_data.ConsumeBool())
@@ -79,6 +77,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* TODO: stub for geo stuff */
   ndpi_load_geoip(ndpi_info_mod, NULL, NULL);
 
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 365 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, "tls", "certificate_expiration_threshold", cfg_value);
+  }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
