@@ -475,7 +475,7 @@ void ndpi_exclude_protocol(struct ndpi_detection_module_struct *ndpi_str, struct
                            u_int16_t protocol_id, const char *_file, const char *_func, int _line) {
   if(ndpi_is_valid_protoId(protocol_id)) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    if(ndpi_str && ndpi_str->ndpi_log_level >= NDPI_LOG_DEBUG && ndpi_str->ndpi_debug_printf != NULL) {
+    if(ndpi_str && ndpi_str->cfg.log_level >= NDPI_LOG_DEBUG && ndpi_str->ndpi_debug_printf != NULL) {
       (*(ndpi_str->ndpi_debug_printf))(protocol_id, ndpi_str, NDPI_LOG_DEBUG, _file, _func, _line, "exclude %s\n",
 				       ndpi_get_proto_name(ndpi_str, protocol_id));
     }
@@ -2914,7 +2914,7 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
 #define MAX_STR_LEN 250
   char str[MAX_STR_LEN];
   if(ndpi_str != NULL && log_level > NDPI_LOG_ERROR && proto > 0 && proto < NDPI_MAX_SUPPORTED_PROTOCOLS &&
-     !NDPI_ISSET(&ndpi_str->debug_bitmask, proto))
+     !NDPI_ISSET(&ndpi_str->cfg.debug_bitmask, proto))
     return;
   va_start(args, format);
   ndpi_vsnprintf(str, sizeof(str) - 1, format, args);
@@ -3099,7 +3099,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   set_ndpi_debug_function(ndpi_str, (ndpi_debug_function_ptr) ndpi_debug_printf);
-  NDPI_BITMASK_RESET(ndpi_str->debug_bitmask);
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
   if((ndpi_str->protocols_ptree = ndpi_patricia_new(32 /* IPv4 */)) == NULL ||
@@ -9786,18 +9785,6 @@ u_int ndpi_get_ndpi_detection_module_size() {
   return(sizeof(struct ndpi_detection_module_struct));
 }
 
-void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_str, NDPI_PROTOCOL_BITMASK debug_bitmask) {
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  if(ndpi_str)
-    ndpi_str->debug_bitmask = debug_bitmask;
-#endif
-}
-
-void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_str, u_int l){
-  if(ndpi_str)
-    ndpi_str->ndpi_log_level = l;
-}
-
 /* ******************************************************************** */
 
 u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow)
@@ -10797,7 +10784,8 @@ static const struct cfg_param {
 
   { "ookla",         "aggressiveness",                          "0x01", "0", "1", CFG_PARAM_INT, __OFF(ookla_aggressiveness) },
 
-  { "$PROTO_NAME_OR_ID", "ip_list.load",                        "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask)},
+  { "$PROTO_NAME_OR_ID", "log.enable",                          "0", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(debug_bitmask) },
+  { "$PROTO_NAME_OR_ID", "ip_list.load",                        "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask) },
 
   /* Global parameters */
 
@@ -10815,6 +10803,8 @@ static const struct cfg_param {
   { NULL,            "flow_risk.crawler_bot.list.load",                             "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_crawler_bot_list_enabled)},
 
   { NULL,            "filename.config",                         NULL, NULL, NULL, CFG_PARAM_FILENAME_CONFIG, __OFF(filename_config) },
+
+  { NULL,            "log.level",                               "0", "0", "3", CFG_PARAM_INT, __OFF(log_level) },
 
   /* LRU caches */
 

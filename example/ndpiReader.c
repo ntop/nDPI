@@ -104,8 +104,7 @@ struct cfg {
 static struct cfg cfgs[MAX_NUM_CFGS];
 static int num_cfgs = 0;
 
-int nDPI_LogLevel = 0;
-char *_debug_protocols = NULL;
+int reader_log_level = 0;
 char *_disabled_protocols = NULL;
 static u_int8_t stats_flag = 0;
 u_int8_t human_readeable_string_len = 5;
@@ -586,9 +585,9 @@ static void help(u_int long_help) {
          "                            | 2 = very verbose\n"
          "                            | 3 = port stats\n"
          "                            | 4 = hash stats\n"
-         "  -V <1-4>                  | nDPI logging level\n"
-         "                            | 1 - trace, 2 - debug, 3 - full debug\n"
-         "                            | >3 - full debug + log enabled for all protocols (i.e. '-u all')\n"
+         "  -V <0-4>                  | nDPI logging level\n"
+         "                            | 0 - error, 1 - trace, 2 - debug, 3 - extra debug\n"
+         "                            | >3 - extra debug + log enabled for all protocols (i.e. '-u all')\n"
          "  -u all|proto|num[,...]    | Enable logging only for such protocol(s)\n"
          "                            | If this flag is present multiple times (directly, or via '-V'),\n"
          "                            | only the last instance will be considered\n"
@@ -1117,19 +1116,60 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'V':
-      nDPI_LogLevel  = atoi(optarg);
-      if(nDPI_LogLevel < NDPI_LOG_ERROR) nDPI_LogLevel = NDPI_LOG_ERROR;
-      if(nDPI_LogLevel > NDPI_LOG_DEBUG_EXTRA) {
-        nDPI_LogLevel = NDPI_LOG_DEBUG_EXTRA;
-        ndpi_free(_debug_protocols);
-        _debug_protocols = ndpi_strdup("all");
+    {
+      char buf[12];
+      int log_level;
+      const char *errstrp;
+
+      /* (Internals) log levels are 0-3, but ndpiReader allows 0-4, where with 4
+          we also enable all protocols */
+      log_level = ndpi_strtonum(optarg, NDPI_LOG_ERROR, NDPI_LOG_DEBUG_EXTRA + 1, &errstrp, 10);
+      if(errstrp != NULL) {
+        printf("Invalid log level %s: %s\n", optarg, errstrp);
+        exit(1);
       }
+      if(log_level > NDPI_LOG_DEBUG_EXTRA) {
+        log_level = NDPI_LOG_DEBUG_EXTRA;
+        if(reader_add_cfg("all", "log.enable", "1", 1) == 1) {
+          printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+          exit(1);
+        }
+      }
+      snprintf(buf, sizeof(buf), "%d", log_level);
+      if(reader_add_cfg(NULL, "log.level", buf, 1) == 1) {
+        printf("Invalid log level [%s] [num:%d/%d]\n", buf, num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
+      reader_log_level = log_level;
       break;
+    }
 
     case 'u':
-      ndpi_free(_debug_protocols);
-      _debug_protocols = ndpi_strdup(optarg);
+    {
+      char *n;
+      char *str = ndpi_strdup(optarg);
+      int inverted_logic;
+
+      /* Reset any previous call to this knob */
+      if(reader_add_cfg("all", "log.enable", "0", 1) == 1) {
+        printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
+
+      for(n = strtok(str, ","); n && *n; n = strtok(NULL, ",")) {
+        inverted_logic = 0;
+        if(*n == '-') {
+          inverted_logic = 1;
+          n++;
+        }
+        if(reader_add_cfg(n, "log.enable", inverted_logic ? "0" : "1", 1) == 1) {
+          printf("Invalid parameter [%s] [num:%d/%d]\n", n, num_cfgs, MAX_NUM_CFGS);
+          exit(1);
+        }
+      }
+      ndpi_free(str);
       break;
+    }
 
     case 'B':
       ndpi_free(_disabled_protocols);
@@ -1215,7 +1255,11 @@ static void parseOptions(int argc, char **argv) {
 
     case 'q':
       quiet_mode = 1;
-      nDPI_LogLevel = 0;
+      if(reader_add_cfg(NULL, "log.level", "0", 1) == 1) {
+        printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
+      reader_log_level = 0;
       break;
 
       /* Extcap */
@@ -5799,7 +5843,6 @@ int main(int argc, char **argv) {
   if(enable_malloc_bins) ndpi_free_bin(&malloc_bins);
   if(csv_fp)        fclose(csv_fp);
 
-  ndpi_free(_debug_protocols);
   ndpi_free(_disabled_protocols);
 
   for(i = 0; i < num_cfgs; i++) {

@@ -170,6 +170,8 @@ struct ndpi_detection_module_config_struct {
 
   char filename_config[CFG_MAX_LEN];
 
+  int log_level;
+
   /* LRU caches */
 
   int ookla_cache_num_entries;
@@ -212,6 +214,7 @@ struct ndpi_detection_module_config_struct {
 
   int ookla_aggressiveness;
 
+  NDPI_PROTOCOL_BITMASK debug_bitmask;
   NDPI_PROTOCOL_BITMASK ip_list_bitmask;
 
   int flow_risk_lists_enabled;
@@ -245,14 +248,11 @@ struct ndpi_detection_module_struct {
 
   default_ports_tree_node_t *tcpRoot, *udpRoot;
 
-  ndpi_log_level_t ndpi_log_level; /* default error */
-
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   /* debug callback, only set when debug is used */
   ndpi_debug_function_ptr ndpi_debug_printf;
   const char *ndpi_debug_print_file;
   const char *ndpi_debug_print_function;
-  NDPI_PROTOCOL_BITMASK debug_bitmask;
 #endif
 
   /* misc parameters */
