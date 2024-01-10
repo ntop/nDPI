@@ -57,10 +57,9 @@ class NDPI(object):
                              app_protocol=p.app_protocol,
                              category=p.category)
 
-    def giveup(self, flow, enable_guess=True):
+    def giveup(self, flow):
         p = lib.ndpi_detection_giveup(self._detection_module,
                                       flow.C,
-                                      enable_guess,
                                       ffi.new("uint8_t*", 0))
         return ndpi_protocol(C=p,
                              master_protocol=p.master_protocol,

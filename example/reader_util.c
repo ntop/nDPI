@@ -73,7 +73,7 @@
 #include "reader_util.h"
 #include "ndpi_classify.h"
 
-extern u_int8_t enable_protocol_guess, enable_flow_stats, enable_payload_analyzer;
+extern u_int8_t enable_flow_stats, enable_payload_analyzer;
 extern u_int8_t verbose, human_readeable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 24 */, max_num_tcp_dissected_pkts /* 80 */;
 static u_int32_t flow_id = 0;
@@ -1729,7 +1729,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	  u_int8_t proto_guessed;
 
 	  flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
-							  enable_protocol_guess, &proto_guessed);
+							  &proto_guessed);
 	  if(proto_guessed) workflow->stats.guessed_flow_protocols++;
 	}
 

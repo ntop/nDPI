@@ -761,6 +761,8 @@ struct ndpi_lru_cache {
   struct ndpi_lru_cache_entry *entries;
 };
 
+#define NDPI_GIVEUP_GUESS_BY_PORT	0x01
+#define NDPI_GIVEUP_GUESS_BY_IP		0x02
 
 /* Aggressiveness values */
 

@@ -167,6 +167,7 @@ struct ndpi_detection_module_config_struct {
   int fully_encrypted_heuristic;
   int track_payload_enabled;
   int libgcrypt_init;
+  int guess_on_giveup;
 
   char filename_config[CFG_MAX_LEN];
 
