@@ -785,23 +785,30 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     }
     
     if(len > 0) {
-      ndpi_protocol_match_result ret_match;
+      if(ndpi_struct->cfg.dns_subclassification_enabled) {
+        ndpi_protocol_match_result ret_match;
 
-      ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
-						     flow->host_server_name,
-						     strlen(flow->host_server_name),
-						     &ret_match,
+        ret.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
+						       flow->host_server_name,
+						       strlen(flow->host_server_name),
+						       &ret_match,
 						     NDPI_PROTOCOL_DNS);
+
+
+        if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+	  ret.master_protocol = checkDNSSubprotocol(s_port, d_port);
+        else
+	  ret.master_protocol = NDPI_PROTOCOL_DNS;
+
+        ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0);
+      } else {
+        ret.master_protocol = checkDNSSubprotocol(s_port, d_port);
+        ret.app_protocol = NDPI_PROTOCOL_UNKNOWN;
+      }
 
       /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
       flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
 
-      if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-	ret.master_protocol = checkDNSSubprotocol(s_port, d_port);
-      else
-	ret.master_protocol = NDPI_PROTOCOL_DNS;
-
-      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0);
     }
 
     /* Report if this is a DNS query or reply */
@@ -811,11 +818,13 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       /* In this case we say that the protocol has been detected just to let apps carry on with their activities */
       ndpi_set_detected_protocol(ndpi_struct, flow, ret.app_protocol, ret.master_protocol, NDPI_CONFIDENCE_DPI);
 
-      /* We have never triggered extra-dissection for LLMNR. Keep the old behaviour */
-      if(ret.master_protocol != NDPI_PROTOCOL_LLMNR) {
-        /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
-        flow->max_extra_packets_to_check = 5;
-        flow->extra_packets_func = search_dns_again;
+      if(ndpi_struct->cfg.dns_parse_response_enabled) {
+        /* We have never triggered extra-dissection for LLMNR. Keep the old behaviour */
+        if(ret.master_protocol != NDPI_PROTOCOL_LLMNR) {
+          /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
+          flow->max_extra_packets_to_check = 5;
+          flow->extra_packets_func = search_dns_again;
+	}
       }
       return; /* The response will set the verdict */
     }
