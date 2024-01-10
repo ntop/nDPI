@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
   assert(ndpi_str != NULL);
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
-  ndpi_set_log_level(ndpi_str, NDPI_LOG_DEBUG_EXTRA);
+  ndpi_set_config(ndpi_str, NULL, "log.level", "3"); /* NDPI_LOG_DEBUG_EXTRA */
   set_ndpi_debug_function(ndpi_str, ndpi_dbg_fn);
   ndpi_finalize_initialization(ndpi_str);
   assert(ndpi_str != NULL);

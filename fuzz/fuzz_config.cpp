@@ -140,6 +140,20 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, "any", "log.enable", cfg_value);
+  }
+  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
+    if(fuzzed_data.ConsumeBool()) {
+      value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+      sprintf(cfg_value, "%d", value);
+      sprintf(cfg_proto, "%d", i);
+      /* TODO: we should try to map integer into name */
+      ndpi_set_config(ndpi_info_mod, cfg_proto, "log.enable", cfg_value);
+    }
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, "any", "ip_list.load", cfg_value);
   }
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
