@@ -1,0 +1,36 @@
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+DPI Packets (UDP):	2	(2.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 129 (64.50 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+OpenVPN	19	8458	1
+Shellfire	6	2114	1
+
+Acceptable                      25 10572         2            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.88.208           	 1      
+
+
+	1	UDP 192.168.88.208:56468 <-> 162.252.172.147:1194 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 2][cat: VPN/2][10 pkts/4107 bytes <-> 9 pkts/4351 bytes][Goodput ratio: 90/91][0.51 sec][bytes ratio: -0.029 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 47/37 127/129 61/58][Pkt Len c2s/s2c min/avg/max/stddev: 56/64 411/483 1242/1242 486/470][PLAIN TEXT (CskhB.2)][Plen Bins: 47,0,0,0,0,5,0,10,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.88.208:49705 <-> 136.243.70.216:443 [proto: 91.385/TLS.Shellfire][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 6][cat: VPN/2][3 pkts/494 bytes <-> 3 pkts/1620 bytes][Goodput ratio: 65/89][0.14 sec][Hostname/SNI: www.shellfire.de][TLS Supported Versions: TLSv1.2][bytes ratio: -0.533 (Download)][IAT c2s/s2c min/avg/max/stddev: 39/0 47/47 55/94 8/47][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 165/540 374/1494 148/675][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TLSv1.2][JA3C: 7285978225aaa79f891c83b5878e545b][JA4: t12d461000_5f5519fb12cc_e7f6975a27c7][JA3S: b653c251b0ee54c3088fe7bb997cf59d][Firefox][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][Plen Bins: 0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]

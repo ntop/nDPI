@@ -483,3 +483,12 @@ References: `IETF Draft <https://www.ietf.org/archive/id/draft-ietf-ntp-roughtim
 Private Internet Access (PIA) is a popular VPN service from Kape Technologies.
 
 References: `Main site <https://www.privateinternetaccess.com/>`_
+
+
+.. _Proto 385:
+
+`NDPI_PROTOCOL_SHELLFIRE`
+=========================
+Yet another VPN service. Operated by the German company Shellfire GmbH.
+
+References: `Main site <https://www.shellfire.net/>`_
