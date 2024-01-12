@@ -483,3 +483,12 @@ References: `IETF Draft <https://www.ietf.org/archive/id/draft-ietf-ntp-roughtim
 Private Internet Access (PIA) is a popular VPN service from Kape Technologies.
 
 References: `Main site <https://www.privateinternetaccess.com/>`_
+
+
+.. _Proto 385:
+
+`NDPI_PROTOCOL_KCP`
+===================
+KCP - A Fast and Reliable ARQ Protocol. It provides TCP-like stream support with low latency at the cost of bandwidth usage - used by lot's of Open Source / Third Party applications.
+
+References: `Protocol Specs: <https://github.com/skywind3000/kcp/blob/master/protocol.txt>`_
