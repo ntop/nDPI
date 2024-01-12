@@ -122,7 +122,7 @@ static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_
 /* *********************************************** */
 
 static int ndpi_http_is_print(char c) {
-  if(isprint(c) || (c == '\t') || (c == '\r') || (c == '\n'))
+  if(ndpi_isprint(c) || (c == '\t') || (c == '\r') || (c == '\n'))
     return(1);
   else
     return(0);
@@ -568,11 +568,11 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
        * We assume at least one non alpha char.
        * e.g. ' ', '-' or ';' ...
        */
-      if (isalpha(ua[i]) == 0)
+      if (ndpi_isalpha(ua[i]) == 0)
       {
         break;
       }
-      if (isupper(ua[i]) != 0)
+      if (isupper((unsigned char)ua[i]) != 0)
       {
         upper_case_count++;
       }
@@ -771,7 +771,7 @@ static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_str
 	char buf[16] = { '\0' };
 
 	for(i=off, j=0; (i<server_len) && (j<sizeof(buf)-1)
-	      && (isdigit(server[i]) || (server[i] == '.')); i++)
+	      && (ndpi_isdigit(server[i]) || (server[i] == '.')); i++)
 	  buf[j++] = server[i];
 
 	if(sscanf(buf, "%d.%d.%d", &a, &b, &c) == 3) {
@@ -790,7 +790,7 @@ static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_str
 
       /* Check server content */
       for(i=0; i<server_len; i++) {
-	if(!isprint(server[i])) {
+	if(!ndpi_isprint(server[i])) {
 	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, "Suspicious Agent");
 	  break;
 	}
@@ -816,7 +816,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
      && (packet->host_line.len > 0)) {
     int len = packet->http_url_name.len + packet->host_line.len + 1;
 
-    if(isdigit(packet->host_line.ptr[0])
+    if(ndpi_isdigit(packet->host_line.ptr[0])
        && (packet->host_line.len < 21))
       ndpi_check_numeric_ip(ndpi_struct, flow, (char*)packet->host_line.ptr, packet->host_line.len);
 

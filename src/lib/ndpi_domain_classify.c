@@ -224,7 +224,7 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
   if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local"))) return(false);
 
   /* This is a number or a numeric IP or similar */
-  if(isdigit(domain[len-1]) && isdigit(domain[0])) {
+  if(ndpi_isdigit(domain[len-1]) && isdigit(domain[0])) {
 #ifdef DEBUG_CONTAINS
     printf("[contains] %s INVALID\n", domain);
 #endif

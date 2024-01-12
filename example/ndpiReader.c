@@ -1963,7 +1963,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fprintf(out, "[Payload: ");
 
       for(i=0; i<flow->flow_payload_len; i++)
-	fprintf(out, "%c", isspace(flow->flow_payload[i]) ? '.' : flow->flow_payload[i]);
+	fprintf(out, "%c", ndpi_isspace(flow->flow_payload[i]) ? '.' : flow->flow_payload[i]);
 
       fprintf(out, "]");
     }

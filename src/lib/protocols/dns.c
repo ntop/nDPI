@@ -253,7 +253,7 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 	  
 	  hostname_is_valid = 0;
 	  
-	  if (isprint(c) == 0) {
+	  if (ndpi_isprint(c) == 0) {
 	    _hostname[j++] = '?';
 	  } else {
 	    _hostname[j++] = '_';

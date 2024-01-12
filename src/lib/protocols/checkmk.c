@@ -60,7 +60,7 @@ static void ndpi_search_checkmk(struct ndpi_detection_module_struct *ndpi_struct
      * this will detect the OpenSession command of the Data Stream Interface (DSI) protocol
      * which is exclusively used by the Apple Filing Protocol (AFP) on TCP/IP networks
      */
-    if (packet->payload_packet_len >= 15 && packet->payload_packet_len < 100
+    if (packet->payload_packet_len < 100
         && memcmp(packet->payload, "<<<check_mk>>>", 14) == 0) {
 
       NDPI_LOG_DBG(ndpi_struct, "Check_MK: Flow detected.\n");

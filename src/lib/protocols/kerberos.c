@@ -487,7 +487,7 @@ static void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struc
 
 		  name_offset += 1;
 		  if(name_offset < packet->payload_packet_len - 1 &&
-		     isprint(packet->payload[name_offset+1]) == 0) /* Isn't printable ? */
+		     ndpi_isprint(packet->payload[name_offset+1]) == 0) /* Isn't printable ? */
 		  {
 		    name_offset++;
 		  }

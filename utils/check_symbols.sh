@@ -19,7 +19,7 @@ for line in `nm -P -u "${NDPI_LIB}"`; do
     fi
 
     #printf '%s\n' "${line}"
-    FOUND_SYMBOL="$(printf '%s' "${line}" | grep '^\(malloc\|calloc\|realloc\|free\|printf\|fprintf\)$' || true)"
+    FOUND_SYMBOL="$(printf '%s' "${line}" | grep '^\(malloc\|calloc\|realloc\|free\|printf\|fprintf\|isdigit\|isalpha\|isalnum\|isspace\|isprint\|ispunct\)$' || true)"
 
     if [ ! -z "${FOUND_SYMBOL}" ]; then
         SKIP=0
@@ -60,6 +60,6 @@ done
 
 printf 'Unwanted symbols found: %s\n' "${FAIL_COUNT}"
 if [ ${FAIL_COUNT} -gt 0 ]; then
-    printf '%s\n' 'Please make sure to use only ndpi_malloc/ndpi_calloc/ndpi_realloc/ndpi_free wrapper instead of malloc/calloc/realloc/free'
+    printf '%s\n' 'Please make sure to use only ndpi_malloc/ndpi_calloc/ndpi_realloc/ndpi_free/ndpi_isdigit/ndpi_isalpha/ndpi_isalnum/ndpi_isspace/ndpi_isprint/ndpi_ispunct wrapper instead of malloc/calloc/realloc/free/isdigit/isalpha/isalnum/isspace/isprint/ispunct'
 fi
 exit ${FAIL_COUNT}

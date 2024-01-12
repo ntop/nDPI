@@ -559,9 +559,9 @@ ndpi_classify (const unsigned short *pkt_len, const pkt_timeval *pkt_time,
 void
 ndpi_update_params (classifier_type_codes_t param_type, const char *param_file)
 {
-  float param;
+  float param = 0.0;
   FILE *fp;
-  int count = 0;
+  int count;
 
   switch (param_type) {
   case (SPLT_PARAM_TYPE):
@@ -711,7 +711,7 @@ ndpi_log_timestamp(char *log_ts, uint32_t log_ts_len)
 {
   pkt_timeval tv;
   time_t nowtime;
-  struct tm nowtm_r;
+  struct tm nowtm_r = { 0 };
   char tmbuf[NDPI_TIMESTAMP_LEN];
 
   gettimeofday(&tv, NULL);

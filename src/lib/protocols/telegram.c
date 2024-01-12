@@ -75,7 +75,7 @@ static void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struc
       u_int16_t sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
 
       if(is_telegram_port_range(sport) || is_telegram_port_range(dport)) {
-	u_int i=0, found = 0;
+	u_int i, found = 0;
 
 	for(i=0; i<packet->payload_packet_len; i++) {
 	  if(packet->payload[i] == 0xFF) {
