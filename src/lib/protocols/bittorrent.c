@@ -69,24 +69,52 @@ static int search_bittorrent_again(struct ndpi_detection_module_struct *ndpi_str
 
 /* *********************************************** */
 
+static int get_utpv1_length(const u_int8_t *payload, u_int payload_len)
+{
+  struct ndpi_utp_hdr *h = (struct ndpi_utp_hdr*)payload;
+  unsigned int off, num_ext = 0;
+  u_int8_t ext_type = h->next_extension;
+
+  off = sizeof(struct ndpi_utp_hdr);
+  while(ext_type != 0 && off + 1 < payload_len) {
+    ext_type = payload[off];
+    if(ext_type > 2)
+      return -1;
+    /* BEP-29 doesn't have any limits on the number of extensions
+       but putting an hard limit makes sense (there are only 3 ext types) */
+    if(++num_ext > 4)
+      return -1;
+    off += 2 + payload[off + 1];
+  }
+  if(ext_type == 0)
+    return off;
+  return -1;
+}
+
+/* *********************************************** */
+
 static u_int8_t is_utpv1_pkt(const u_int8_t *payload, u_int payload_len) {
   struct ndpi_utp_hdr *h = (struct ndpi_utp_hdr*)payload;
+  int h_length;
 
   if(payload_len < sizeof(struct ndpi_utp_hdr)) return(0);
+  h_length = get_utpv1_length(payload, payload_len);
+  if(h_length == -1)                return(0);
   if(h->h_version != 1)             return(0);
   if(h->h_type > 4)                 return(0);
   if(h->next_extension > 2)         return(0);
-  if(h->window_size == 0)    return(0);
   if(h->h_type == 4 /* SYN */ && (h->tdiff_usec != 0 ||
-     payload_len != sizeof(struct ndpi_utp_hdr))) return(0);
+     payload_len != (u_int)h_length)) return(0);
   if(h->h_type == 0 /* DATA */ &&
-     payload_len == sizeof(struct ndpi_utp_hdr)) return(0);
+     payload_len == (u_int)h_length) return(0);
   if(h->connection_id == 0) return(0);
   if(h->ts_usec == 0) return(0);
 
-  if((h->window_size == 0) && (payload_len != sizeof(struct ndpi_utp_hdr)))
+  if((h->window_size == 0) && (payload_len != (u_int)h_length))
     return(0);
 
+  if(h->h_type == 0)
+    return (2); /* DATA */
   return(1);
 }
 
@@ -542,10 +570,12 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
 	  /* Check if this is protocol v0 */
 	  u_int8_t v0_extension = packet->payload[17];
 	  u_int8_t v0_flags     = packet->payload[18];
+	  int rc;
 
-	  if(is_utpv1_pkt(packet->payload, packet->payload_packet_len)) {
+	  if((rc = is_utpv1_pkt(packet->payload, packet->payload_packet_len)) > 0) {
 	    bt_proto = ndpi_strnstr((const char *)&packet->payload[20], BITTORRENT_PROTO_STRING, packet->payload_packet_len-20);
-	    if(flow->packet_counter > 2 || bt_proto != NULL) {
+	    /* DATA check is quite weak so in that case wait for multiple packets/confirmations */
+	    if(rc == 1 || bt_proto != NULL || (rc == 2 && flow->packet_counter > 2)) {
 	      goto bittorrent_found;
 	    } else {
 	      return;
