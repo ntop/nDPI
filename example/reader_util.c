@@ -1705,8 +1705,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     struct ndpi_flow_input_info input_info;
 
     u_int enough_packets =
-      (((proto == IPPROTO_UDP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_udp_dissected_pkts))
-       || ((proto == IPPROTO_TCP) && ((flow->src2dst_packets + flow->dst2src_packets) > max_num_tcp_dissected_pkts))) ? 1 : 0;
+      ((proto == IPPROTO_UDP && (max_num_udp_dissected_pkts > 0 && flow->src2dst_packets + flow->dst2src_packets > max_num_udp_dissected_pkts)) ||
+       (proto == IPPROTO_TCP && (max_num_tcp_dissected_pkts > 0 && flow->src2dst_packets + flow->dst2src_packets > max_num_tcp_dissected_pkts))) ? 1 : 0;
 
 #if 0
     printf("%s()\n", __FUNCTION__);
