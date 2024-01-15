@@ -265,10 +265,10 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
 
     elem = strchr(elem, '.');
 
-    if((elem == NULL) /* || (elem == dot) */)
-      break;
-    else
-      elem = &elem[1];    
+    if(elem == NULL)   break;
+    // if(elem == dot)    break;
+
+    elem = &elem[1];    
   } /* while */
 
   /* Not found */
