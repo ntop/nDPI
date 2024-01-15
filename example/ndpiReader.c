@@ -5633,6 +5633,29 @@ void outlierUnitTest() {
 
 /* *********************************************** */
 
+void domainsUnitTest() {
+  NDPI_PROTOCOL_BITMASK all;
+  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+  const char *lists_path = "../lists/public_suffix_list.dat";
+  struct stat st;
+
+  if(stat(lists_path, &st) == 0) {
+    NDPI_BITMASK_SET_ALL(all);
+    ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
+
+    assert(ndpi_load_domain_suffixes(ndpi_info_mod, "../lists/public_suffix_list.dat") == 0);
+
+    assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.chosei.chiba.jp"), "chosei.chiba.jp") == 0);
+    assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.unipi.it"), "it") == 0);
+    assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "mail.apple.com"), "com") == 0);
+    assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.bbc.co.uk"), "co.uk") == 0);
+
+    ndpi_exit_detection_module(ndpi_info_mod);
+  }
+}
+
+/* *********************************************** */
+
 void domainSearchUnitTest() {
   ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
   char *domain = "ntop.org";
@@ -5702,7 +5725,6 @@ int main(int argc, char **argv) {
   }
 #endif
 
-
   if(ndpi_get_api_version() != NDPI_API_VERSION) {
     printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
     return(-1);
@@ -5721,6 +5743,7 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    domainsUnitTest();
     outlierUnitTest();
     pearsonUnitTest();
     binaryBitmapUnitTest();

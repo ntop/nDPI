@@ -2147,6 +2147,9 @@ extern "C" {
 							 u_int8_t class_id,
 							 char *file_path);
   bool                  ndpi_domain_classify_finalize(ndpi_domain_classify *s);
+  const char*           ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
+							    u_int8_t *class_id /* out */,
+							    const char *hostnname);
   bool                  ndpi_domain_classify_contains(ndpi_domain_classify *s,
 						      u_int8_t *class_id /* out */,
 						      const char *domain);
@@ -2188,10 +2191,42 @@ extern "C" {
   /**
    * Get user data which was previously set with `ndpi_set_user_data()`.
    *
+   * @par ndpi_str = the struct created for the protocol detection
+   *
    * @return the user data pointer
    *
    */
   void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str);
+
+  /* ******************************* */
+
+  /**
+   * Loads the domain suffixes from the specified path. You need to
+   * perform this action once
+   *
+   * @par ndpi_str = the struct created for the protocol detection
+   * @par public_suffix_list_path = path of the public_suffix_list path
+   *
+   * @return 0 = no error, -1 otherwise
+   *
+   */
+  int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
+				char *public_suffix_list_path);
+
+  /**
+   * Returns the domain suffix out of the specified hostname.
+   * The returned pointer is an offset of the original hostname.
+   * Note that you need to call ndpi_load_domain_suffixes() before
+   * calling this function.
+   *
+   * @par ndpi_str = the struct created for the protocol detection
+   * @par hostname = the hostname from which the domain name has to be extracted
+   *
+   * @return The host domain name or the hostitself if not found.
+   *
+   */
+  const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndpi_str,
+					  const char *hostname);
 
   /* ******************************* */
 

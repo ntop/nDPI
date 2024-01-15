@@ -132,6 +132,7 @@
     <ClCompile Include="..\src\lib\ndpi_memory.c" />
     <ClCompile Include="..\src\lib\ndpi_serializer.c" />
     <ClCompile Include="..\src\lib\ndpi_utils.c" />
+    <ClCompile Include="..\src\lib\ndpi_domains.c" />
     <ClCompile Include="..\src\lib\ndpi_binary_bitmap.c" />
     <ClCompile Include="..\src\lib\ndpi_hash.c" />
     <ClCompile Include="..\src\lib\ndpi_domain_classify.c" />

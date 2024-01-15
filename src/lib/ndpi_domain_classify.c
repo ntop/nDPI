@@ -89,7 +89,7 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
   u_int32_t i;
   char *dot;
 
-  if(!s || !domain)
+  if((!s) || (!domain))
     return(false);
 
   /* Skip initial string . in domain names */
@@ -97,18 +97,21 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
 
   dot = strrchr(domain, '.');
 
-  if(!dot) return(false);
-  if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))
-    return(false);
-
+  if(dot) {  
+    if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))
+      return(false);
+  }
+  
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->classes[i].class_id == class_id) {
       break;      
     } else if(s->classes[i].class_id == 0) {
       s->classes[i].class_id = class_id;
       s->classes[i].domains  = ndpi_bitmap64_alloc();
+      
       if(!s->classes[i].domains)
         s->classes[i].class_id = 0;
+
       break;
     }
   }
@@ -130,7 +133,7 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
   FILE *fd;
   char *line;
 
-  if(!s || !file_path)
+  if((!s) || (!file_path))
     return(false);
 
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
@@ -199,9 +202,9 @@ bool ndpi_domain_classify_finalize(ndpi_domain_classify *s) {
 /* ********************************************************** */
 
 static bool is_valid_domain_char(u_char c) {
-  if(((c >= 'A')&& (c <= 'Z'))
-     || ((c >= 'a')&& (c <= 'z'))
-     || ((c >= '0')&& (c <= '9'))
+  if(((c >= 'A') && (c <= 'Z'))
+     || ((c >= 'a') && (c <= 'z'))
+     || ((c >= '0') && (c <= '9'))
      || (c == '_')
      || (c == '-')
      || (c == '.'))
@@ -212,35 +215,37 @@ static bool is_valid_domain_char(u_char c) {
 
 /* ********************************************************** */
 
-bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
-				   u_int8_t *class_id /* out */,
-				   const char *domain) {
+const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
+						u_int8_t *class_id /* out */,
+						const char *hostname) {
   u_int32_t i, len;
   const char *dot, *elem;
 
-  if(!domain || !s)                                       return(false);
-  if((len = strlen(domain)) == 0)                         return(false);
-  if((dot = strrchr(domain, '.')) == NULL)                return(false);
-  if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local"))) return(false);
+  *class_id = 0; /* Unknown class_id */
+  
+  if(!hostname || !s)                                       return(hostname);
+  if((len = strlen(hostname)) == 0)                         return(hostname);
+  if((dot = strrchr(hostname, '.')) == NULL)                return(hostname);
+  if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))   return(hostname);
 
   /* This is a number or a numeric IP or similar */
-  if(ndpi_isdigit(domain[len-1]) && isdigit(domain[0])) {
+  if(ndpi_isdigit(hostname[len-1]) && isdigit(hostname[0])) {
 #ifdef DEBUG_CONTAINS
-    printf("[contains] %s INVALID\n", domain);
+    printf("[contains] %s INVALID\n", hostname);
 #endif
 
-    return(false);
+    return(hostname);
   }
 
-  if(!is_valid_domain_char(domain[0])) {
+  if(!is_valid_domain_char(hostname[0])) {
 #ifdef DEBUG_CONTAINS
-    printf("[contains] %s INVALID\n", domain);
+    printf("[contains] %s INVALID\n", hostname);
 #endif
 
-    return(false);
+    return(hostname);
   }
 
-  elem = domain;
+  elem = hostname;
   
   while(elem != NULL) {
     u_int64_t hash = ndpi_quick_hash64(elem, strlen(elem));
@@ -249,10 +254,10 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
       if(s->classes[i].class_id != 0) {
 	if(ndpi_bitmap64_isset(s->classes[i].domains, hash)) {
 #ifdef DEBUG_CONTAINS
-	  printf("[contains] %s = %d\n", domain, s->classes[i].class_id);
+	  printf("[contains] %s = %d\n", hostname, s->classes[i].class_id);
 #endif
 	  *class_id = s->classes[i].class_id;
-	  return(true);
+	  return(elem);
 	}
       } else
 	break;
@@ -260,16 +265,23 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
 
     elem = strchr(elem, '.');
 
-    if((elem == NULL) || (elem == dot))
+    if((elem == NULL) /* || (elem == dot) */)
       break;
     else
       elem = &elem[1];    
   } /* while */
-  
-#ifdef DEBUG_CONTAINS
-  printf("[contains] %s NOT FOUND\n", domain);
-#endif
 
-  return(false);
+  /* Not found */
+  return(hostname);
+}
+
+/* ********************************************************** */
+
+bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
+				   u_int8_t *class_id /* out */,
+				   const char *domain) {
+  (void)ndpi_domain_classify_longest_prefix(s, class_id, domain); /* UNUSED */
+
+  return((*class_id == 0) ? false : true);
 }
 

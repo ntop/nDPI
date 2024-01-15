@@ -152,7 +152,7 @@ struct ndpi_detection_module_struct {
   u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, _notused:7;
   u_int8_t tls_certificate_expire_in_x_days;
-  
+
   void *user_data;
   char custom_category_labels[NUM_CUSTOM_CATEGORIES][CUSTOM_CATEGORY_LABEL_LEN];
 
@@ -206,11 +206,11 @@ struct ndpi_detection_module_struct {
   /* Patricia trees */
   ndpi_patricia_tree_t *ip_risk_mask_ptree;
   ndpi_patricia_tree_t *ip_risk_mask_ptree6;
-  ndpi_patricia_tree_t *ip_risk_ptree; 
+  ndpi_patricia_tree_t *ip_risk_ptree;
   ndpi_patricia_tree_t *ip_risk_ptree6;
   ndpi_patricia_tree_t *protocols_ptree;  /* IP-based protocol detection */
   ndpi_patricia_tree_t *protocols_ptree6;
-  
+
   /* *** If you add a new Patricia tree, please update ptree_type above! *** */
 
   struct {
@@ -256,7 +256,7 @@ struct ndpi_detection_module_struct {
   struct ndpi_lru_cache *tls_cert_cache;
   u_int32_t tls_cert_cache_num_entries;
   int32_t tls_cert_cache_ttl;
-  
+
   /* NDPI_PROTOCOL_MINING and subprotocols */
   struct ndpi_lru_cache *mining_cache;
   u_int32_t mining_cache_num_entries;
@@ -302,7 +302,9 @@ struct ndpi_detection_module_struct {
   nbpf_filter nbpf_custom_proto[MAX_NBPF_CUSTOM_PROTO];
 #endif
 
-  u_int16_t max_payload_track_len;    
+  u_int16_t max_payload_track_len;
+
+  ndpi_domain_classify *public_domain_suffixes;
 };
 
 
