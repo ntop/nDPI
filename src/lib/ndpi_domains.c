@@ -64,16 +64,16 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
 
     if(!ndpi_domain_classify_add(ndpi_str->public_domain_suffixes,
 				 1 /* dummy */, &line[offset])) {
-      if(do_trace) printf("Error while processing domain %s\n", &line[offset]);
+      if(do_trace) NDPI_LOG_ERR(ndpi_str, "Error while processing domain %s\n", &line[offset]);
     } else
       num_domains++;
   }
 
   if(!ndpi_domain_classify_finalize(ndpi_str->public_domain_suffixes)) {
-    if(do_trace) printf("Error while finalizing domain processing\n");
+    if(do_trace) NDPI_LOG_ERR(ndpi_str, "Error while finalizing domain processing\n");
   }
 
-  if(do_trace) printf("Loaded %u domains\n", num_domains);
+  if(do_trace) NDPI_LOG_ERR(ndpi_str, "Loaded %u domains\n", num_domains);
   
   return(0);
 }
