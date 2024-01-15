@@ -1269,7 +1269,8 @@ static void parseOptions(int argc, char **argv) {
 
     case 'T':
       max_num_tcp_dissected_pkts = atoi(optarg);
-      if(max_num_tcp_dissected_pkts < 3) max_num_tcp_dissected_pkts = 3;
+      /* If we enable that, allow at least 3WHS + 1 "real" packet */
+      if(max_num_tcp_dissected_pkts != 0 && max_num_tcp_dissected_pkts < 4) max_num_tcp_dissected_pkts = 4;
       break;
 
     case 'x':
@@ -1282,7 +1283,6 @@ static void parseOptions(int argc, char **argv) {
 
     case 'U':
       max_num_udp_dissected_pkts = atoi(optarg);
-      if(max_num_udp_dissected_pkts < 3) max_num_udp_dissected_pkts = 3;
       break;
 
     case OPTLONG_VALUE_LRU_CACHE_SIZE:
