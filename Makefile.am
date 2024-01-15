@@ -21,6 +21,7 @@ EXTRA_DIST = README.md README.fuzzer.md CHANGELOG.md CONTRIBUTING.md \
 	lists/100_malware.list \
 	lists/107_gambling.list \
 	lists/107_gambling_custom.list \
+	lists/public_suffix_list.dat \
 	lists/README.md \
 	sonar-project.properties .github .ci-ignore
 
