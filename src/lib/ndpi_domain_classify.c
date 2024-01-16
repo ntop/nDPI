@@ -264,12 +264,12 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
 	break;
     }
 
+    prev_elem = elem;
     elem = strchr(elem, '.');
 
     if(elem == NULL)   break;
     // if(elem == dot)    break;
 
-    prev_elem = elem;
     elem = &elem[1];    
   } /* while */
 
