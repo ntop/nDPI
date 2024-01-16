@@ -88,6 +88,20 @@ const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndp
     u_int8_t class_id;
     
     return(ndpi_domain_classify_longest_prefix(ndpi_str->public_domain_suffixes,
-					       &class_id, hostname));
+					       &class_id, hostname, false));
+  }
+}
+
+/* ******************************* */
+
+const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
+				 const char *hostname) {
+  if(ndpi_str->public_domain_suffixes == NULL)
+    return(hostname);
+  else {
+    u_int8_t class_id;
+    
+    return(ndpi_domain_classify_longest_prefix(ndpi_str->public_domain_suffixes,
+					       &class_id, hostname, true));
   }
 }

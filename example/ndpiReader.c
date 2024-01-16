@@ -5649,6 +5649,11 @@ void domainsUnitTest() {
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.unipi.it"), "it") == 0);
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "mail.apple.com"), "com") == 0);
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.bbc.co.uk"), "co.uk") == 0);
+
+    assert(strcmp(ndpi_get_host_domain(ndpi_info_mod, "www.chosei.chiba.jp"), "chosei.chiba.jp") == 0);
+    assert(strcmp(ndpi_get_host_domain(ndpi_info_mod, "www.unipi.it"), "unipi.it") == 0);
+    assert(strcmp(ndpi_get_host_domain(ndpi_info_mod, "mail.apple.com"), "apple.com") == 0);
+    assert(strcmp(ndpi_get_host_domain(ndpi_info_mod, "www.bbc.co.uk"), "bbc.co.uk") == 0);
   }
 
   ndpi_exit_detection_module(ndpi_info_mod);

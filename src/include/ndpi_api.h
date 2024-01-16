@@ -2149,7 +2149,8 @@ extern "C" {
   bool                  ndpi_domain_classify_finalize(ndpi_domain_classify *s);
   const char*           ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
 							    u_int8_t *class_id /* out */,
-							    const char *hostnname);
+							    const char *hostnname,
+							    bool return_subprefix);
   bool                  ndpi_domain_classify_contains(ndpi_domain_classify *s,
 						      u_int8_t *class_id /* out */,
 						      const char *domain);
@@ -2222,11 +2223,26 @@ extern "C" {
    * @par ndpi_str = the struct created for the protocol detection
    * @par hostname = the hostname from which the domain name has to be extracted
    *
-   * @return The host domain name or the hostitself if not found.
+   * @return The host domain name suffic or the host itself if not found.
    *
    */
   const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndpi_str,
 					  const char *hostname);
+
+  /**
+   * Returns the domain (including the TLS) suffix out of the specified hostname.
+   * The returned pointer is an offset of the original hostname.
+   * Note that you need to call ndpi_load_domain_suffixes() before
+   * calling this function.
+   *
+   * @par ndpi_str = the struct created for the protocol detection
+   * @par hostname = the hostname from which the domain name has to be extracted
+   *
+   * @return The host domain name or the hosti tself if not found.
+   *
+   */
+  const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
+				   const char *hostname);
 
   /* ******************************* */
 

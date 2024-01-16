@@ -217,9 +217,10 @@ static bool is_valid_domain_char(u_char c) {
 
 const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
 						u_int8_t *class_id /* out */,
-						const char *hostname) {
+						const char *hostname,
+						bool return_subprefix) {
   u_int32_t i, len;
-  const char *dot, *elem;
+  const char *dot, *elem, *prev_elem;
 
   *class_id = 0; /* Unknown class_id */
   
@@ -245,7 +246,7 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
     return(hostname);
   }
 
-  elem = hostname;
+  elem = prev_elem = hostname;
   
   while(elem != NULL) {
     u_int64_t hash = ndpi_quick_hash64(elem, strlen(elem));
@@ -257,7 +258,7 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
 	  printf("[contains] %s = %d\n", hostname, s->classes[i].class_id);
 #endif
 	  *class_id = s->classes[i].class_id;
-	  return(elem);
+	  return(return_subprefix ? prev_elem : elem);
 	}
       } else
 	break;
@@ -268,6 +269,7 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
     if(elem == NULL)   break;
     // if(elem == dot)    break;
 
+    prev_elem = elem;
     elem = &elem[1];    
   } /* while */
 
@@ -280,7 +282,7 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
 bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
 				   u_int8_t *class_id /* out */,
 				   const char *domain) {
-  (void)ndpi_domain_classify_longest_prefix(s, class_id, domain); /* UNUSED */
+  (void)ndpi_domain_classify_longest_prefix(s, class_id, domain, false); /* UNUSED */
 
   return((*class_id == 0) ? false : true);
 }
