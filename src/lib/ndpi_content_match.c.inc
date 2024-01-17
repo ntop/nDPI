@@ -1596,6 +1596,7 @@ static ndpi_protocol_match host_match[] =
    { "digitalassets.tesla.com",          "TeslaServices", NDPI_PROTOCOL_TESLA_SERVICES, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "privateinternetaccess.com",        "PrivateInternetAccess", NDPI_PROTOCOL_PIA, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "dota2.com",                        "Dota2",                 NDPI_PROTOCOL_DOTA2, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"

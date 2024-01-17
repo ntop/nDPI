@@ -355,6 +355,7 @@
     <ClCompile Include="..\src\lib\protocols\iec62056.c" />
     <ClCompile Include="..\src\lib\protocols\hl7.c" />
     <ClCompile Include="..\src\lib\protocols\ceph.c" />
+    <ClCompile Include="..\src\lib\protocols\steam_datagram_relay.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />
