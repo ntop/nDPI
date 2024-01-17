@@ -723,6 +723,7 @@ void init_roughtime_dissector(struct ndpi_detection_module_struct *ndpi_struct, 
 void init_kcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_valve_sdr_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mumble_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_zoom_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 

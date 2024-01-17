@@ -84,90 +84,6 @@ static int is_valid_rtcp_payload_type(uint8_t type)
   return (type >= 192 && type <= 213);
 }
 
-/* *************************************************************** */
-
-/*
-  https://github.com/Princeton-Cabernet/zoom-analysis
-  https://citizenlab.ca/2020/04/move-fast-roll-your-own-crypto-a-quick-look-at-the-confidentiality-of-zoom-meetings/
-  https://github.com/marty90/rtc_pcap_cleaners
- */
-
-PACK_ON struct zoom_sfu_encapsulation {
-  u_int8_t  sfu_type; /* 3/4 = Zoom_0, 5 = RTCP/RTP */
-  u_int16_t sequence_num;
-  u_int32_t unknown;
-  u_int8_t  direction; /* 0 = -> Zoom, 4 = <- Zoom */
-} PACK_OFF;
-
-PACK_ON struct zoom_media_encapsulation {
-  u_int8_t  enc_type; /* 13/30 = Screen Share, 15 = Audio, 16 = Video, 33/34/35 = RTCP  */
-  u_int32_t unknown_1, unknown_2;
-  u_int16_t sequence_num;
-  u_int32_t timestamp;
-} PACK_OFF;
-
-#define ZOOM_PORT 8801
-
-static u_int8_t isZoom(struct ndpi_flow_struct *flow,
-		       u_int16_t sport, u_int16_t dport,
-		       const u_int8_t *payload, const u_int16_t payloadLen,
-		       u_int8_t *is_rtp, u_int8_t *zoom_stream_type,
-		       u_int16_t *payload_offset) {
-  u_int16_t header_offset = sizeof(struct zoom_sfu_encapsulation) + sizeof(struct zoom_media_encapsulation);
-
-  *payload_offset = 0;
-  if(payloadLen < header_offset)
-    return(0);
-
-  if((sport == ZOOM_PORT) || (dport == ZOOM_PORT)) {
-    struct zoom_sfu_encapsulation *enc = (struct zoom_sfu_encapsulation*)payload;
-
-    /* printf("==> %u <-> %u [type: %u]\n", sport, dport, enc->sfu_type); */
-
-    if((enc->sfu_type >= 3) && (enc->sfu_type <= 5)) {
-      struct zoom_media_encapsulation *enc = (struct zoom_media_encapsulation*)(&payload[sizeof(struct zoom_sfu_encapsulation)]);
-
-      *zoom_stream_type = enc->enc_type;
-      
-      switch(enc->enc_type) {
-      case 13: /* Screen Share */
-      case 30: /* Screen Share */
-	*is_rtp = 0;
-	*payload_offset = 27;
-	flow->flow_multimedia_type = ndpi_multimedia_screen_sharing_flow;
-	break;
-	
-      case 15: /* Audio */
-	*is_rtp = 1;
-	*payload_offset = 27;
-	flow->flow_multimedia_type = ndpi_multimedia_audio_flow;
-	break;
-	
-      case 16: /* Video */
-	*is_rtp = 1;
-	*payload_offset = 32;
-	flow->flow_multimedia_type = ndpi_multimedia_video_flow;
-	break;
-
-      case 33: /* RTCP */
-      case 34: /* RTCP */
-      case 35: /* RTCP */
-	*is_rtp = 1;
-	*payload_offset = 36;
-	break;
-
-      default:
-	*is_rtp = 0;
-	break;
-      }
-      
-      return(1);
-    }
-  }
-
-  return(0);
-}
-
 int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
 		   struct ndpi_flow_struct *flow)
 {
@@ -230,11 +146,10 @@ int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow) {
-  u_int8_t is_rtp, zoom_stream_type;
-  u_int16_t s_port = ntohs(ndpi_struct->packet.udp->source), d_port = ntohs(ndpi_struct->packet.udp->dest), payload_offset;
+  u_int8_t is_rtp;
+  u_int16_t d_port = ntohs(ndpi_struct->packet.udp->dest);
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *payload = packet->payload;
-  const u_int16_t payload_len = packet->payload_packet_len;
 
   NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
 
@@ -243,25 +158,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
      d_port == 9600    /* FINS_PORT */) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
-  }
-
-  /* TODO: should we move zoom stuff in a new, separated dissector? */
-  if(isZoom(flow, s_port, d_port, payload, payload_len,
-	    &is_rtp, &zoom_stream_type, &payload_offset)) {
-    if(payload_offset < payload_len) {
-      /*
-	payload_len -= payload_offset;
-	payload = &payload[payload_offset];
-      */
-
-      /* printf("->>> %u\n", zoom_stream_type); */
-      
-      ndpi_set_detected_protocol(ndpi_struct, flow, 
-				 NDPI_PROTOCOL_ZOOM,
-				 NDPI_PROTOCOL_SRTP,
-				 NDPI_CONFIDENCE_DPI);
-      return;
-    }
   }
 
   /* * Let some "unknown" packets at the beginning

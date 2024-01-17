@@ -5872,6 +5872,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Mumble */
   init_mumble_dissector(ndpi_str, &a);
 
+  /* Zoom */
+  init_zoom_dissector(ndpi_str, &a);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
