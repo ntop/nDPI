@@ -41,6 +41,14 @@ Google Meet is a video conferencing service from Google.
 References: `Main site: <https://meet.google.com/>`_
 
 
+.. _Proto 235:
+
+`NDPI_PROTOCOL_VALVE_SDR`
+===========================
+Steam Datagram Relay (SDR) is Valve's virtual private gaming network. Used in all modern games from Valve, but can also be used by developers via the Steamworks SDK for their games.
+
+References: `Main site: <https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay>`_
+
 .. _Proto 338:
 
 `NDPI_PROTOCOL_SRTP`
@@ -492,3 +500,12 @@ References: `Main site <https://www.privateinternetaccess.com/>`_
 KCP - A Fast and Reliable ARQ Protocol. It provides TCP-like stream support with low latency at the cost of bandwidth usage - used by lot's of Open Source / Third Party applications.
 
 References: `Protocol Specs: <https://github.com/skywind3000/kcp/blob/master/protocol.txt>`_
+
+
+.. _Proto 386:
+
+`NDPI_PROTOCOL_DOTA2`
+=========================
+Dota 2 is an extremely popular multiplayer MOBA game from Valve.
+
+References: `Main site <https://www.dota2.com/>`_
