@@ -1,8 +1,8 @@
 /*
  * steam_datagram_relay.c
  *
- * Copyright (C) 2023 - ntop.org
- * Copyright (C) 2023 - V.G <jacendi@protonmail.com>
+ * Copyright (C) 2024 - ntop.org
+ * Copyright (C) 2024 - V.G <jacendi@protonmail.com>
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
