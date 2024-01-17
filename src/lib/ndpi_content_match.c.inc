@@ -961,6 +961,7 @@ static ndpi_protocol_match host_match[] =
    { "steamcommunity.com",                        "Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".steamcontent.com",                        "Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".steamstatic.com",                          "Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".steamserver.net",                          "Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "steamcommunity-a.akamaihd.net",             "Steam",        NDPI_PROTOCOL_STEAM, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { ".wechat.com",                            "WeChat",           NDPI_PROTOCOL_WECHAT, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
