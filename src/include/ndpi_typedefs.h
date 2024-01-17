@@ -1437,9 +1437,6 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_RTMP */
   u_int8_t rtmp_stage:2;
 
-  /* NDPI_PROTOCOL_STEAM */
-  u_int16_t steam_stage:3, steam_stage1:3, steam_stage2:2, steam_stage3:2;
-
   /* NDPI_PROTOCOL_STARCRAFT */
   u_int8_t starcraft_udp_stage : 3;	// 0-7
 

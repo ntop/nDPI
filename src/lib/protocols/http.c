@@ -546,6 +546,11 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
       flow->http.user_agent && strstr(flow->http.user_agent, "MSRPC")) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_RPCH, master_protocol, NDPI_CONFIDENCE_DPI);
   }
+
+  if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) && 
+      flow->http.user_agent && strstr(flow->http.user_agent, "Valve/Steam HTTP Client")) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STEAM, master_protocol, NDPI_CONFIDENCE_DPI);
+  }
 }
 
 /* ************************************************************* */
