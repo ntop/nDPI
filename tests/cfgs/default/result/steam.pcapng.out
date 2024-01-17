@@ -1,0 +1,39 @@
+DPI Packets (TCP):	12	(6.00 pkts/flow)
+DPI Packets (UDP):	2	(1.00 pkts/flow)
+Confidence DPI              : 4 (flows)
+Num dissector calls: 115 (28.75 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          2/2 (search/found)
+Automa domain:        2/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  1/1 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   6/2 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Steam	16	2112	2
+SteamDatagramRelay	2	284	1
+Dota2	10	2545	1
+
+Fun                             28 4941          4            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.88.231           	 1      
+
+
+	1	TCP 192.168.88.231:54243 <-> 188.114.98.224:443 [proto: 91.386/TLS.Dota2][IP: 220/Cloudflare][Encrypted][Confidence: DPI][DPI packets: 6][cat: Game/8][5 pkts/1378 bytes <-> 5 pkts/1167 bytes][Goodput ratio: 75/71][< 1 sec][Hostname/SNI: www.dota2.com][(Advertised) ALPNs: http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: 0.083 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 13/47 43/68 98/94 32/17][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 276/233 589/796 253/284][TLSv1.3][JA3C: 07eb11020e4395f99e5ef70baf9c1d11][JA4: t13d3213ht_85d9c3ed342d_158b9cf6d7fa][JA3S: 15af977ce25de452b96affa2addb1036][Firefox][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.88.231:59739 <-> 2.20.254.25:80 [proto: 7.74/HTTP.Steam][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Game/8][6 pkts/629 bytes <-> 4 pkts/559 bytes][Goodput ratio: 36/51][< 1 sec][Hostname/SNI: test.steampowered.com][bytes ratio: 0.059 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 6002/2 30001/3 12000/2][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 105/140 291/353 83/123][URL: test.steampowered.com/204][StatusCode: 204][Content-Type: text/plain][Server: AkamaiNetStorage][User-Agent: Valve/Steam HTTP Client 1.0][PLAIN TEXT (GET /204 HTTP/1.1)][Plen Bins: 0,0,0,0,0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.88.231:27036 -> 192.168.88.255:27036 [proto: 74/Steam][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Game/8][6 pkts/924 bytes -> 0 pkts/0 bytes][Goodput ratio: 73/0][22.02 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 4403/0 15014/0 5613/0][Pkt Len c2s/s2c min/avg/max/stddev: 82/0 154/0 226/0 72/0][PLAIN TEXT (localhost)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.168.88.231:46604 -> 155.133.252.86:27045 [proto: 235/SteamDatagramRelay][IP: 74/Steam][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][2 pkts/284 bytes -> 0 pkts/0 bytes][Goodput ratio: 70/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (sdping)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
