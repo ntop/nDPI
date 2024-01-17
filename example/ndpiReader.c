@@ -3999,10 +3999,6 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	     (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_BITTORRENT].n_insert,
 	     (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_BITTORRENT].n_search,
 	     (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_BITTORRENT].n_found);
-      printf("\tLRU cache zoom:       %llu/%llu/%llu (insert/search/found)\n",
-	     (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_ZOOM].n_insert,
-	     (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_ZOOM].n_search,
-	     (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_ZOOM].n_found);
       printf("\tLRU cache stun:       %llu/%llu/%llu (insert/search/found)\n",
 	     (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_STUN].n_insert,
 	     (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_STUN].n_search,
@@ -4104,10 +4100,6 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	      (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_BITTORRENT].n_insert,
 	      (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_BITTORRENT].n_search,
 	      (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_BITTORRENT].n_found);
-      fprintf(results_file, "LRU cache zoom:       %llu/%llu/%llu (insert/search/found)\n",
-	      (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_ZOOM].n_insert,
-	      (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_ZOOM].n_search,
-	      (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_ZOOM].n_found);
       fprintf(results_file, "LRU cache stun:       %llu/%llu/%llu (insert/search/found)\n",
 	      (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_STUN].n_insert,
 	      (long long unsigned int)cumulative_stats.lru_stats[NDPI_LRUCACHE_STUN].n_search,
