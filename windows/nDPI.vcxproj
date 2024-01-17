@@ -157,7 +157,6 @@
     <ClCompile Include="..\src\lib\protocols\collectd.c" />
     <ClCompile Include="..\src\lib\protocols\cpha.c" />
     <ClCompile Include="..\src\lib\protocols\crynet.c" />
-    <ClCompile Include="..\src\lib\protocols\csgo.c" />
     <ClCompile Include="..\src\lib\protocols\diameter.c" />
     <ClCompile Include="..\src\lib\protocols\discord.c" />
     <ClCompile Include="..\src\lib\protocols\dnp3.c" />

@@ -160,7 +160,6 @@
     <ClCompile Include="..\src\lib\protocols\cassandra.c" />
     <ClCompile Include="..\src\lib\protocols\checkmk.c" />
     <ClCompile Include="..\src\lib\protocols\cpha.c" />
-    <ClCompile Include="..\src\lib\protocols\csgo.c" />
     <ClCompile Include="..\src\lib\protocols\diameter.c" />
     <ClCompile Include="..\src\lib\protocols\dnp3.c" />
     <ClCompile Include="..\src\lib\protocols\dnscrypt.c" />
