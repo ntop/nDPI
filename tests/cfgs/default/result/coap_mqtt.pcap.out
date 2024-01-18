@@ -1,7 +1,7 @@
 DPI Packets (TCP):	7	(1.75 pkts/flow)
 DPI Packets (UDP):	12	(1.00 pkts/flow)
 Confidence DPI              : 16 (flows)
-Num dissector calls: 300 (18.75 diss/flow)
+Num dissector calls: 296 (18.50 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)

@@ -133,6 +133,7 @@
     <ClCompile Include="..\src\lib\protocols\iec62056.c" />
     <ClCompile Include="..\src\lib\protocols\hl7.c" />
     <ClCompile Include="..\src\lib\protocols\ceph.c" />
+    <ClCompile Include="..\src\lib\protocols\steam_datagram_relay.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />
@@ -159,7 +160,6 @@
     <ClCompile Include="..\src\lib\protocols\cassandra.c" />
     <ClCompile Include="..\src\lib\protocols\checkmk.c" />
     <ClCompile Include="..\src\lib\protocols\cpha.c" />
-    <ClCompile Include="..\src\lib\protocols\csgo.c" />
     <ClCompile Include="..\src\lib\protocols\diameter.c" />
     <ClCompile Include="..\src\lib\protocols\dnp3.c" />
     <ClCompile Include="..\src\lib\protocols\dnscrypt.c" />

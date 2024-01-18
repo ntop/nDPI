@@ -263,7 +263,7 @@ typedef enum {
   NDPI_PROTOCOL_PASTEBIN              = 232,
   NDPI_PROTOCOL_LINKEDIN              = 233,
   NDPI_PROTOCOL_SOUNDCLOUD            = 234,
-  NDPI_PROTOCOL_CSGO                  = 235, /* Counter-Strike Global Offensive, Dota = 2 */
+  NDPI_PROTOCOL_VALVE_SDR             = 235, /* Used by all modern Valve games */
   NDPI_PROTOCOL_LISP                  = 236,
   NDPI_PROTOCOL_DIAMETER              = 237,
   NDPI_PROTOCOL_APPLE_PUSH            = 238,
@@ -414,6 +414,7 @@ typedef enum {
   NDPI_PROTOCOL_ROUGHTIME             = 383,
   NDPI_PROTOCOL_PIA                   = 384,
   NDPI_PROTOCOL_KCP                   = 385,
+  NDPI_PROTOCOL_DOTA2                 = 386,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
