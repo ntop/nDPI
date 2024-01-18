@@ -1,1 +1,1 @@
---cfg=dns,subclassification.enable,0 --cfg=dns,process_response.enable,0
+--cfg=dns,subclassification,0 --cfg=dns,process_response,0
