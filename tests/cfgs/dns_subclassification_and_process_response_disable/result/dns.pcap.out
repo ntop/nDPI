@@ -1,0 +1,29 @@
+DPI Packets (UDP):	2	(1.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     2/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        1/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+DNS	5	536	2
+
+Acceptable                       5 536           2            
+
+	1	UDP 82.178.113.245:47255 <-> 82.178.158.181:53 [VLAN: 785][proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/91 bytes <-> 1 pkts/219 bytes][Goodput ratio: 36/73][0.00 sec][Hostname/SNI: e7.whatsapp.net][::][PLAIN TEXT (whatsapp)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.170.20:53 <-> 192.168.170.8:32795 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/151 bytes <-> 1 pkts/75 bytes][Goodput ratio: 44/43][41.07 sec][Hostname/SNI: www.l.google.com][::][PLAIN TEXT (google)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

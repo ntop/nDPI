@@ -36,16 +36,13 @@ void fuzz_set_alloc_callbacks_and_seed(int seed)
 
 void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_mod)
 {
-  ndpi_init_prefs prefs = ndpi_no_prefs;
   NDPI_PROTOCOL_BITMASK all;
-  NDPI_PROTOCOL_BITMASK debug_bitmask;
 
   if(*ndpi_info_mod == NULL) {
-    *ndpi_info_mod = ndpi_init_detection_module(prefs);
+    *ndpi_info_mod = ndpi_init_detection_module();
 
-    NDPI_BITMASK_SET_ALL(debug_bitmask);
-    ndpi_set_log_level(*ndpi_info_mod, 4);
-    ndpi_set_debug_bitmask(*ndpi_info_mod, debug_bitmask);
+    ndpi_set_config(*ndpi_info_mod, NULL, "log.level", "3");
+    ndpi_set_config(*ndpi_info_mod, "all", "log.enable", "1");
 
     ndpi_load_categories_dir(*ndpi_info_mod, "./lists/");
     ndpi_load_protocols_file(*ndpi_info_mod, "protos.txt");
@@ -56,6 +53,8 @@ void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_
 
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(*ndpi_info_mod, &all);
+
+    ndpi_set_config(*ndpi_info_mod, NULL, "filename.config", "config.txt");
 
     ndpi_finalize_initialization(*ndpi_info_mod);
   }

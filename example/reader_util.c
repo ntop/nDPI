@@ -73,13 +73,12 @@
 #include "reader_util.h"
 #include "ndpi_classify.h"
 
-extern u_int8_t enable_protocol_guess, enable_flow_stats, enable_payload_analyzer;
+extern u_int8_t enable_flow_stats, enable_payload_analyzer;
 extern u_int8_t verbose, human_readeable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 24 */, max_num_tcp_dissected_pkts /* 80 */;
 static u_int32_t flow_id = 0;
 
 u_int8_t enable_doh_dot_detection = 0;
-extern ndpi_init_prefs init_prefs;
 
 extern int malloc_size_stats;
 extern struct ndpi_bin malloc_bins;
@@ -410,7 +409,7 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
   else
    op = 0; /* Default action: remove from the bitmask */
   /* Use a temporary module with all protocols enabled */
-  module = ndpi_init_detection_module(0);
+  module = ndpi_init_detection_module();
   if(!module)
     return 1;
   NDPI_BITMASK_SET_ALL(all);
@@ -449,15 +448,11 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
 
 /* ***************************************************** */
 
-extern char *_debug_protocols;
-
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle, int do_init_flows_root,
 					 ndpi_serialization_format serialization_format) {
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
-  static NDPI_PROTOCOL_BITMASK debug_bitmask;
-  static int _debug_protocols_ok = 0;
 
   /* On some fuzzers we don't want to use these memory allocators, but some custom ones */
 #ifndef DISABLE_CUSTOM_ALLOCATOR_ON_READERUTILS
@@ -466,7 +461,7 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
 #endif
 
   /* TODO: just needed here to init ndpi ndpi_malloc wrapper */
-  module = ndpi_init_detection_module(init_prefs);
+  module = ndpi_init_detection_module();
 
   if(module == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");
@@ -485,20 +480,6 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   workflow->ndpi_struct = module;
 
   ndpi_set_user_data(module, workflow);
-
-  ndpi_set_log_level(module, nDPI_LogLevel);
-
-  if(_debug_protocols != NULL && ! _debug_protocols_ok) {
-    NDPI_BITMASK_RESET(debug_bitmask);
-    if(parse_proto_name_list(_debug_protocols, &debug_bitmask, 0)) {
-      ndpi_exit_detection_module(module);
-      ndpi_free(workflow);
-      return NULL;
-    }
-    _debug_protocols_ok = 1;
-  }
-  if(_debug_protocols_ok)
-    ndpi_set_debug_bitmask(module, debug_bitmask);
 
   if(do_init_flows_root) {
     workflow->ndpi_flows_root = ndpi_calloc(workflow->prefs.num_roots, sizeof(void *));
@@ -1748,7 +1729,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	  u_int8_t proto_guessed;
 
 	  flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
-							  enable_protocol_guess, &proto_guessed);
+							  &proto_guessed);
 	  if(proto_guessed) workflow->stats.guessed_flow_protocols++;
 	}
 

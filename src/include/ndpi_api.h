@@ -211,19 +211,20 @@ extern "C" {
    * indipendent detection contexts) but all these calls MUST NOT run
    * in parallel
    *
-   * @par prefs = load preferences
    * @return  the initialized detection module
    *
    */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module(ndpi_init_prefs prefs);
+  struct ndpi_detection_module_struct *ndpi_init_detection_module(void);
 
   /**
    * Completes the initialization (2nd step)
    *
    * @par ndpi_str = the struct created for the protocol detection
    *
+   * @return 0 on success
+   *
    */
-  void ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str);
+  int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str);
 
   /**
    * Frees the dynamic memory allocated members in the specified flow
@@ -289,14 +290,12 @@ extern "C" {
    *
    * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
-   * @par    enable_guess = guess protocol if unknown
    * @par    protocol_was_guessed = 1 if the protocol was guesses (requires enable_guess = 1), 0 otherwise
    * @return the detected protocol even if the flow is not completed;
    *
    */
   ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow,
-				      u_int8_t enable_guess,
 				      u_int8_t *protocol_was_guessed);
 
   /**
@@ -1033,9 +1032,6 @@ extern "C" {
   int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_struct,
 				     char *name_or_ip, u_int name_len,
 				     ndpi_protocol_category_t *id);
-  int ndpi_set_detection_preferences(struct ndpi_detection_module_struct *ndpi_mod,
-				     ndpi_detection_preference pref,
-				     int value);
 
   u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct *ndpi_str,
 					      u_int16_t user_proto_id);
@@ -1054,8 +1050,6 @@ extern "C" {
   u_int ndpi_get_ndpi_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_detection_module_size(void);
-  void ndpi_set_log_level(struct ndpi_detection_module_struct *ndpi_mod, u_int l);
-  void ndpi_set_debug_bitmask(struct ndpi_detection_module_struct *ndpi_mod, NDPI_PROTOCOL_BITMASK debug_bitmask);
 
   /* Simple helper to get current time, in sec */
   u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow);
@@ -1072,30 +1066,6 @@ extern "C" {
 			       lru_cache_type cache_type,
 			       struct ndpi_lru_cache_stats *stats);
 
-  int ndpi_get_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
-			      lru_cache_type cache_type,
-			      u_int32_t *num_entries);
-  int ndpi_set_lru_cache_size(struct ndpi_detection_module_struct *ndpi_struct,
-			      lru_cache_type cache_type,
-			      u_int32_t num_entries);
-
-  int ndpi_set_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
-			     lru_cache_type cache_type,
-			     u_int32_t ttl);
-  int ndpi_get_lru_cache_ttl(struct ndpi_detection_module_struct *ndpi_struct,
-			     lru_cache_type cache_type,
-			     u_int32_t *ttl);
-
-  int ndpi_set_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
-				 u_int16_t proto, int value);
-  int ndpi_get_opportunistic_tls(struct ndpi_detection_module_struct *ndpi_struct,
-				 u_int16_t proto);
-
-  int ndpi_set_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
-                                       u_int16_t proto, u_int32_t value);
-  u_int32_t ndpi_get_protocol_aggressiveness(struct ndpi_detection_module_struct *ndpi_struct,
-                                             u_int16_t proto);
-
   /**
    * Find a protocol id associated with a string automata
    *
@@ -1110,17 +1080,6 @@ extern "C" {
 				    u_int16_t *protocol_id,
 				    ndpi_protocol_category_t *category,
 				    ndpi_protocol_breed_t *breed);
-
-  /**
-   * Specifies the threshold used to trigger the NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE
-   * flow risk that by default is set to 30 days
-   *
-   * @par    ndpi_struct  = the struct created for the protocol detection
-   * @par    days         = the number of days threshold for emitting the alert
-   *
-   */
-  void ndpi_set_tls_cert_expire_days(struct ndpi_detection_module_struct *ndpi_str,
-				     u_int8_t days);
 
   void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 				   struct ndpi_flow_struct *flow);
@@ -2243,6 +2202,15 @@ extern "C" {
    */
   const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
 				   const char *hostname);
+
+  /* ******************************* */
+
+  ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
+                                 const char *proto, const char *param, const char *value);
+  char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
+			const char *proto, const char *param, char *buf, int buf_len);
+  char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
+			 FILE *fd);
 
   /* ******************************* */
 

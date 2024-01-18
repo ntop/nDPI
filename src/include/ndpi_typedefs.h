@@ -234,6 +234,14 @@ typedef enum {
    ndpi_leaf
 } ndpi_VISIT;
 
+typedef enum {
+  NDPI_CFG_INVALID_CONTEXT = -1,
+  NDPI_CFG_NOT_FOUND = -2,
+  NDPI_CFG_INVALID_PARAM = -3,
+  NDPI_CFG_CONTEXT_ALREADY_INITIALIZED = -4,
+
+  NDPI_CFG_OK = 0,
+} ndpi_cfg_error;
 
 /* NDPI_MASK_SIZE */
 typedef u_int32_t ndpi_ndpi_mask;
@@ -753,6 +761,8 @@ struct ndpi_lru_cache {
   struct ndpi_lru_cache_entry *entries;
 };
 
+#define NDPI_GIVEUP_GUESS_BY_PORT	0x01
+#define NDPI_GIVEUP_GUESS_BY_IP		0x02
 
 /* Aggressiveness values */
 
@@ -1058,12 +1068,6 @@ typedef enum {
 				*/
   NDPI_PROTOCOL_ANY_CATEGORY /* Used to handle wildcards */
 } ndpi_protocol_category_t;
-
-typedef enum {
-   ndpi_pref_direction_detect_disable = 0,
-   ndpi_pref_max_packets_to_process,
-   ndpi_pref_enable_tls_block_dissection, /* nDPI considers only those blocks past the certificate exchange */
-} ndpi_detection_preference;
 
 /* ntop extensions */
 typedef struct ndpi_proto_defaults {
@@ -1495,48 +1499,6 @@ typedef struct {
   u_int8_t cidr;
   u_int16_t value;
 } ndpi_network6;
-
-typedef u_int32_t ndpi_init_prefs;
-
-typedef enum {
-    ndpi_no_prefs                  = 0,
-    ndpi_dont_load_tor_list        = (1 << 0),
-    ndpi_dont_init_libgcrypt       = (1 << 1),
-    ndpi_dont_load_azure_list      = (1 << 3),
-    ndpi_dont_load_whatsapp_list   = (1 << 4),
-    ndpi_dont_load_amazon_aws_list = (1 << 5),
-    ndpi_dont_load_ethereum_list   = (1 << 6),
-    ndpi_dont_load_zoom_list       = (1 << 7),
-    ndpi_dont_load_cloudflare_list = (1 << 8),
-    ndpi_dont_load_microsoft_list  = (1 << 9),
-    ndpi_dont_load_google_list     = (1 << 10),
-    ndpi_dont_load_google_cloud_list = (1 << 11),
-    ndpi_dont_load_asn_lists       = (1 << 12),
-    ndpi_dont_load_icloud_private_relay_list  = (1 << 13),
-    ndpi_dont_init_risk_ptree      = (1 << 14),
-    ndpi_dont_load_cachefly_list   = (1 << 15),
-    ndpi_track_flow_payload        = (1 << 16),
-    /* In some networks, there are some anomalous TCP flows where
-       the smallest ACK packets have some kind of zero padding.
-       It looks like the IP and TCP headers in those frames wrongly consider the
-       0x00 Ethernet padding bytes as part of the TCP payload.
-       While this kind of packets is perfectly valid per-se, in some conditions
-       they might be treated by the TCP reassembler logic as (partial) overlaps,
-       deceiving the classification engine.
-       Add an heuristic to detect these packets and to ignore them, allowing
-       correct detection/classification.
-       See #1946 for other details */
-    ndpi_enable_tcp_ack_payload_heuristic = (1 << 17),
-    ndpi_dont_load_crawlers_list = (1 << 18),
-    ndpi_dont_load_protonvpn_list = (1 << 19),
-    /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
-       the payload is encrypted in an attempt to “look like nothing”.
-       This heuristic only analyzes the first packet of the flow.
-       See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
-    ndpi_disable_fully_encrypted_heuristic = (1 << 20),
-    ndpi_dont_load_protonvpn_exit_nodes_list = (1 << 21),
-    ndpi_dont_load_mullvad_list = (1 << 22),
-  } ndpi_prefs;
 
 typedef struct {
   u_int32_t protocol_id;

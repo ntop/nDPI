@@ -144,13 +144,92 @@ typedef struct {
 } nbpf_filter;
 #endif
 
+#define CFG_MAX_LEN	256
+
+struct ndpi_detection_module_config_struct {
+  int max_packets_to_process;
+  int direction_detect_enabled;
+ /* In some networks, there are some anomalous TCP flows where
+    the smallest ACK packets have some kind of zero padding.
+    It looks like the IP and TCP headers in those frames wrongly consider the
+    0x00 Ethernet padding bytes as part of the TCP payload.
+    While this kind of packets is perfectly valid per-se, in some conditions
+    they might be treated by the TCP reassembler logic as (partial) overlaps,
+    deceiving the classification engine.
+    Add an heuristic to detect these packets and to ignore them, allowing
+    correct detection/classification.
+    See #1946 for other details */
+  int tcp_ack_paylod_heuristic;
+  /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
+     the payload is encrypted in an attempt to “look like nothing”.
+     This heuristic only analyzes the first packet of the flow.
+     See: https://www.usenix.org/system/files/sec23fall-prepub-234-wu-mingshi.pdf */
+  int fully_encrypted_heuristic;
+  int track_payload_enabled;
+  int libgcrypt_init;
+  int guess_on_giveup;
+
+  char filename_config[CFG_MAX_LEN];
+
+  int log_level;
+
+  /* LRU caches */
+
+  int ookla_cache_num_entries;
+  int ookla_cache_ttl;
+  int bittorrent_cache_num_entries;
+  int bittorrent_cache_ttl;
+  int zoom_cache_num_entries;
+  int zoom_cache_ttl;
+  int stun_cache_num_entries;
+  int stun_cache_ttl;
+  int tls_cert_cache_num_entries;
+  int tls_cert_cache_ttl;
+  int mining_cache_num_entries;
+  int mining_cache_ttl;
+  int msteams_cache_num_entries;
+  int msteams_cache_ttl;
+  int stun_zoom_cache_num_entries;
+  int stun_zoom_cache_ttl;
+
+  /* Protocols */
+
+  int tls_certificate_expire_in_x_days;
+  int tls_app_blocks_tracking_enabled;
+  int tls_sha1_fingerprint_enabled;
+
+  int smtp_opportunistic_tls_enabled;
+
+  int imap_opportunistic_tls_enabled;
+
+  int pop_opportunistic_tls_enabled;
+
+  int ftp_opportunistic_tls_enabled;
+
+  int stun_opportunistic_tls_enabled;
+
+  int dns_subclassification_enabled;
+  int dns_parse_response_enabled;
+
+  int http_parse_response_enabled;
+
+  int ookla_aggressiveness;
+
+  NDPI_PROTOCOL_BITMASK debug_bitmask;
+  NDPI_PROTOCOL_BITMASK ip_list_bitmask;
+
+  int flow_risk_lists_enabled;
+  int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
+  int risk_anonymous_subscriber_list_protonvpn_enabled;
+  int risk_crawler_bot_list_enabled;
+};
+
 struct ndpi_detection_module_struct {
   NDPI_PROTOCOL_BITMASK detection_bitmask;
 
   u_int64_t current_ts;
-  u_int16_t max_packets_to_process;
   u_int16_t num_tls_blocks_to_follow;
-  u_int8_t skip_tls_blocks_until_change_cipher:1, _notused:7;
+  u_int8_t skip_tls_blocks_until_change_cipher:1, finalized:1, _notused:6;
   u_int8_t tls_certificate_expire_in_x_days;
 
   void *user_data;
@@ -170,14 +249,11 @@ struct ndpi_detection_module_struct {
 
   default_ports_tree_node_t *tcpRoot, *udpRoot;
 
-  ndpi_log_level_t ndpi_log_level; /* default error */
-
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   /* debug callback, only set when debug is used */
   ndpi_debug_function_ptr ndpi_debug_printf;
   const char *ndpi_debug_print_file;
   const char *ndpi_debug_print_function;
-  NDPI_PROTOCOL_BITMASK debug_bitmask;
 #endif
 
   /* misc parameters */
@@ -226,18 +302,16 @@ struct ndpi_detection_module_struct {
 
   u_int8_t ip_version_limit;
 
+  struct ndpi_detection_module_config_struct cfg;
+
   /* NDPI_PROTOCOL_TINC */
   struct cache *tinc_cache;
 
   /* NDPI_PROTOCOL_OOKLA */
   struct ndpi_lru_cache *ookla_cache;
-  u_int32_t ookla_cache_num_entries;
-  u_int32_t ookla_cache_ttl;
 
   /* NDPI_PROTOCOL_BITTORRENT */
   struct ndpi_lru_cache *bittorrent_cache;
-  u_int32_t bittorrent_cache_num_entries;
-  u_int32_t bittorrent_cache_ttl;
 
   /* NDPI_PROTOCOL_ZOOM */
   struct ndpi_lru_cache *zoom_cache;
@@ -246,44 +320,21 @@ struct ndpi_detection_module_struct {
 
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
-  u_int32_t stun_cache_num_entries;
-  u_int32_t stun_cache_ttl;
   struct ndpi_lru_cache *stun_zoom_cache;
-  u_int32_t stun_zoom_cache_num_entries;
-  u_int32_t stun_zoom_cache_ttl;
 
   /* NDPI_PROTOCOL_TLS and subprotocols */
   struct ndpi_lru_cache *tls_cert_cache;
-  u_int32_t tls_cert_cache_num_entries;
-  int32_t tls_cert_cache_ttl;
 
   /* NDPI_PROTOCOL_MINING and subprotocols */
   struct ndpi_lru_cache *mining_cache;
-  u_int32_t mining_cache_num_entries;
-  u_int32_t mining_cache_ttl;
 
   /* NDPI_PROTOCOL_MSTEAMS */
   struct ndpi_lru_cache *msteams_cache;
-  u_int32_t msteams_cache_num_entries;
-  u_int32_t msteams_cache_ttl;
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
-  int opportunistic_tls_smtp_enabled;
-  int opportunistic_tls_imap_enabled;
-  int opportunistic_tls_pop_enabled;
-  int opportunistic_tls_ftp_enabled;
-  int opportunistic_tls_stun_enabled;
-
-  u_int32_t aggressiveness_ookla;
-
-  int tcp_ack_paylod_heuristic;
-  int fully_encrypted_based_on_first_pkt_heuristic;
-
   u_int16_t ndpi_to_user_proto_id[NDPI_MAX_NUM_CUSTOM_PROTOCOLS]; /* custom protocolId mapping */
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
-
-  u_int8_t direction_detect_disable:1, /* disable internal detection of packet direction */ _pad:7;
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"

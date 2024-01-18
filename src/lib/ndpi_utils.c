@@ -2800,14 +2800,6 @@ u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************* */
 
-void ndpi_set_tls_cert_expire_days(struct ndpi_detection_module_struct *ndpi_str,
-				   u_int8_t num_days) {
-  if(ndpi_str)
-    ndpi_str->tls_certificate_expire_in_x_days = num_days;
-}
-
-/* ******************************************* */
-
 u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow) {
   switch(flow->detected_protocol_stack[0] /* app_protocol */) {
   case NDPI_PROTOCOL_DNS:

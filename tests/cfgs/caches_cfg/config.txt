@@ -1,1 +1,1 @@
---lru-cache-size=ookla:0 --lru-cache-ttl=msteams:1
+--cfg=lru.ookla.size,0 --cfg=lru.msteams.ttl,1

@@ -11,14 +11,11 @@
 struct ndpi_workflow_prefs *prefs = NULL;
 struct ndpi_workflow *workflow = NULL;
 
-int nDPI_LogLevel = 0;
-char *_debug_protocols = NULL;
 u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
-u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0;
+u_int8_t enable_payload_analyzer = 0;
 u_int8_t enable_flow_stats = 1;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
-ndpi_init_prefs init_prefs = ndpi_track_flow_payload | ndpi_enable_tcp_ack_payload_heuristic;
 int enable_malloc_bins = 1;
 int malloc_size_stats = 0;
 int max_malloc_bins = 14;
@@ -37,7 +34,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   int r;
   char errbuf[PCAP_ERRBUF_SIZE];
   NDPI_PROTOCOL_BITMASK all;
-  NDPI_PROTOCOL_BITMASK debug_bitmask;
   u_int i;
   FILE *fd;
 
@@ -58,9 +54,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json);
 
-    NDPI_BITMASK_SET_ALL(debug_bitmask);
-    ndpi_set_log_level(workflow->ndpi_struct, 4);
-    ndpi_set_debug_bitmask(workflow->ndpi_struct, debug_bitmask);
+    ndpi_set_config(workflow->ndpi_struct, NULL, "log.level", "3");
+    ndpi_set_config(workflow->ndpi_struct, "all", "log.enable", "1");
 
     ndpi_load_protocols_file(workflow->ndpi_struct, "protos.txt");
     ndpi_load_categories_file(workflow->ndpi_struct, "categories.txt", NULL);
@@ -72,7 +67,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
 
-    ndpi_set_detection_preferences(workflow->ndpi_struct, ndpi_pref_enable_tls_block_dissection, 0 /* unused */);
+    ndpi_set_config(workflow->ndpi_struct, NULL, "flow.track_payload.enable", "1");
+    ndpi_set_config(workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
+    ndpi_set_config(workflow->ndpi_struct, "tls", "application_blocks_tracking.enable", "1");
 
     memset(workflow->stats.protocol_counter, 0,
 	   sizeof(workflow->stats.protocol_counter));

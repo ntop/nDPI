@@ -32,7 +32,7 @@ class NDPI(object):
                  "_detection_module")
 
     def __init__(self):
-        self._detection_module = lib.ndpi_init_detection_module(0)
+        self._detection_module = lib.ndpi_init_detection_module()
         if self._detection_module == ffi.NULL:
             raise MemoryError("Unable to instantiate NDPI object")
         lib.ndpi_py_setup_detection_module(self._detection_module)
@@ -57,10 +57,9 @@ class NDPI(object):
                              app_protocol=p.app_protocol,
                              category=p.category)
 
-    def giveup(self, flow, enable_guess=True):
+    def giveup(self, flow):
         p = lib.ndpi_detection_giveup(self._detection_module,
                                       flow.C,
-                                      enable_guess,
                                       ffi.new("uint8_t*", 0))
         return ndpi_protocol(C=p,
                              master_protocol=p.master_protocol,

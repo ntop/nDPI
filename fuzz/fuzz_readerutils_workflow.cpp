@@ -8,14 +8,11 @@
 
 extern u_int8_t enable_doh_dot_detection;
 
-char *_debug_protocols;
-int nDPI_LogLevel = 0;
 u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
-u_int8_t enable_protocol_guess = 1, enable_payload_analyzer = 0;
+u_int8_t enable_payload_analyzer = 0;
 u_int8_t enable_flow_stats = 0;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
-ndpi_init_prefs init_prefs = ndpi_track_flow_payload | ndpi_enable_tcp_ack_payload_heuristic;
 int enable_malloc_bins = 0;
 int malloc_size_stats = 0;
 int max_malloc_bins = 14;
@@ -35,6 +32,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char errbuf[PCAP_ERRBUF_SIZE];
   FILE *fd;
   u_int8_t debug_protos_index;
+  char *_debug_protocols;
   const char *strs[] = { "all",
 			 "dns,quic",
 			 "+dns:-quic",
