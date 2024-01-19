@@ -440,6 +440,8 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
             /* TODO: right way? It is a bit scary... do we need to reset something else too? */
             reset_detected_protocol(ndpi_struct, flow);
             change_category(ndpi_struct, flow, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED);
+	    /* STUN often triggers this risk; clear it. TODO: clear other risks? */
+	    ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
 
             /* Give room for DTLS handshake, where we might have
                retransmissions and fragments */
