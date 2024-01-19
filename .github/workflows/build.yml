@@ -67,7 +67,7 @@ jobs:
           git diff-index --quiet HEAD -- || true
 
   test:
-    name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }} ${{matrix.lto_gold_linker}}
+    name: ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }} ${{matrix.lto_gold_linker}} ${{matrix.global_context}}
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
@@ -88,6 +88,7 @@ jobs:
         msan: [""]
         nBPF: [""]
         lto_gold_linker: [""]
+        global_context: [""] #Enable by default
         include:
           - compiler: "gcc-4.9" # "Oldest" gcc easily available. To simulate RHEL7
             os: ubuntu-20.04
@@ -141,6 +142,15 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: "nBPF"
+          - compiler: "cc"
+            os: ubuntu-latest
+            arch: "x86_64"
+            gcrypt: ""
+            pcre: "--with-pcre2"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
+            nBPF: ""
+            global_context: "--disable-global-context-support"
           - compiler: "clang-17"
             os: ubuntu-22.04
             arch: "x86_64"

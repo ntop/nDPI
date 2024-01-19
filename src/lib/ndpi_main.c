@@ -3084,9 +3084,60 @@ static void free_ptree_data(void *data) {
   }
 }
 
+struct ndpi_global_context *ndpi_global_init(void) {
+
+#ifndef USE_GLOBAL_CONTEXT
+  return NULL;
+#endif
+
+  struct ndpi_global_context *g_ctx = ndpi_calloc(1, sizeof(struct ndpi_global_context));
+
+  if(g_ctx == NULL)
+    return(NULL);
+
+  /* Global caches (if any) are initialized during the initialization
+     of the local context(s) */
+
+  /*  Note that we don't have yet an easy way to log from this function */
+
+  return g_ctx;
+}
+
 /* ******************************************************************** */
 
-struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
+void ndpi_global_deinit(struct ndpi_global_context *g_ctx) {
+
+  /*  Note that we don't have yet an easy way to log from this function */
+
+  if(g_ctx) {
+
+    /* Global caches are freed here, so that we are able to get statistics even
+       after the uninitialization of all the local contexts */
+
+    if(g_ctx->ookla_global_cache)
+      ndpi_lru_free_cache(g_ctx->ookla_global_cache);
+    if(g_ctx->bittorrent_global_cache)
+      ndpi_lru_free_cache(g_ctx->bittorrent_global_cache);
+    if(g_ctx->zoom_global_cache)
+      ndpi_lru_free_cache(g_ctx->zoom_global_cache);
+    if(g_ctx->stun_global_cache)
+      ndpi_lru_free_cache(g_ctx->stun_global_cache);
+    if(g_ctx->stun_zoom_global_cache)
+      ndpi_lru_free_cache(g_ctx->stun_zoom_global_cache);
+    if(g_ctx->tls_cert_global_cache)
+      ndpi_lru_free_cache(g_ctx->tls_cert_global_cache);
+    if(g_ctx->mining_global_cache)
+      ndpi_lru_free_cache(g_ctx->mining_global_cache);
+    if(g_ctx->msteams_global_cache)
+      ndpi_lru_free_cache(g_ctx->msteams_global_cache);
+
+    ndpi_free(g_ctx);
+  }
+}
+
+/* ******************************************************************** */
+
+struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_malloc(sizeof(struct ndpi_detection_module_struct));
   int i;
 
@@ -3122,6 +3173,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(void) {
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
   ndpi_str->ip_risk_mask_ptree6 = ndpi_patricia_new(128 /* IPv6 */);
 
+  ndpi_str->g_ctx = g_ctx;
   set_default_config(&ndpi_str->cfg);
 
   NDPI_BITMASK_SET_ALL(ndpi_str->detection_bitmask);
@@ -3542,64 +3594,128 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   ndpi_add_domain_risk_exceptions(ndpi_str);
 
   if(ndpi_str->cfg.ookla_cache_num_entries > 0) {
-    ndpi_str->ookla_cache = ndpi_lru_cache_init(ndpi_str->cfg.ookla_cache_num_entries,
-                                                ndpi_str->cfg.ookla_cache_ttl);
+    if(ndpi_str->cfg.ookla_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->ookla_global_cache) {
+        ndpi_str->g_ctx->ookla_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.ookla_cache_num_entries,
+                                                                  ndpi_str->cfg.ookla_cache_ttl, 1);
+      }
+      ndpi_str->ookla_cache = ndpi_str->g_ctx->ookla_global_cache;
+    } else {
+      ndpi_str->ookla_cache = ndpi_lru_cache_init(ndpi_str->cfg.ookla_cache_num_entries,
+                                                  ndpi_str->cfg.ookla_cache_ttl, 0);
+    }
     if(!ndpi_str->ookla_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->cfg.ookla_cache_num_entries);
     }
   }
   if(ndpi_str->cfg.bittorrent_cache_num_entries > 0) {
-    ndpi_str->bittorrent_cache = ndpi_lru_cache_init(ndpi_str->cfg.bittorrent_cache_num_entries,
-                                                     ndpi_str->cfg.bittorrent_cache_ttl);
+    if(ndpi_str->cfg.bittorrent_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->bittorrent_global_cache) {
+        ndpi_str->g_ctx->bittorrent_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.bittorrent_cache_num_entries,
+                                                                       ndpi_str->cfg.bittorrent_cache_ttl, 1);
+      }
+      ndpi_str->bittorrent_cache = ndpi_str->g_ctx->bittorrent_global_cache;
+    } else {
+      ndpi_str->bittorrent_cache = ndpi_lru_cache_init(ndpi_str->cfg.bittorrent_cache_num_entries,
+                                                       ndpi_str->cfg.bittorrent_cache_ttl, 0);
+    }
     if(!ndpi_str->bittorrent_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->cfg.bittorrent_cache_num_entries);
     }
   }
   if(ndpi_str->cfg.zoom_cache_num_entries > 0) {
-    ndpi_str->zoom_cache = ndpi_lru_cache_init(ndpi_str->cfg.zoom_cache_num_entries,
-                                               ndpi_str->cfg.zoom_cache_ttl);
+    if(ndpi_str->cfg.zoom_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->zoom_global_cache) {
+        ndpi_str->g_ctx->zoom_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.zoom_cache_num_entries,
+                                                                 ndpi_str->cfg.zoom_cache_ttl, 1);
+      }
+      ndpi_str->zoom_cache = ndpi_str->g_ctx->zoom_global_cache;
+    } else {
+      ndpi_str->zoom_cache = ndpi_lru_cache_init(ndpi_str->cfg.zoom_cache_num_entries,
+                                                 ndpi_str->cfg.zoom_cache_ttl, 0);
+    }
     if(!ndpi_str->zoom_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->cfg.zoom_cache_num_entries);
     }
   }
   if(ndpi_str->cfg.stun_cache_num_entries > 0) {
-    ndpi_str->stun_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_cache_num_entries,
-                                               ndpi_str->cfg.stun_cache_ttl);
+    if(ndpi_str->cfg.stun_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->stun_global_cache) {
+        ndpi_str->g_ctx->stun_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_cache_num_entries,
+                                                                 ndpi_str->cfg.stun_cache_ttl, 1);
+      }
+      ndpi_str->stun_cache = ndpi_str->g_ctx->stun_global_cache;
+    } else {
+      ndpi_str->stun_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_cache_num_entries,
+                                                 ndpi_str->cfg.stun_cache_ttl, 0);
+    }
     if(!ndpi_str->stun_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->cfg.stun_cache_num_entries);
     }
   }
   if(ndpi_str->cfg.tls_cert_cache_num_entries > 0) {
-    ndpi_str->tls_cert_cache = ndpi_lru_cache_init(ndpi_str->cfg.tls_cert_cache_num_entries,
-                                                   ndpi_str->cfg.tls_cert_cache_ttl);
+    if(ndpi_str->cfg.tls_cert_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->tls_cert_global_cache) {
+        ndpi_str->g_ctx->tls_cert_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.tls_cert_cache_num_entries,
+                                                                     ndpi_str->cfg.tls_cert_cache_ttl, 1);
+      }
+      ndpi_str->tls_cert_cache = ndpi_str->g_ctx->tls_cert_global_cache;
+    } else {
+      ndpi_str->tls_cert_cache = ndpi_lru_cache_init(ndpi_str->cfg.tls_cert_cache_num_entries,
+                                                     ndpi_str->cfg.tls_cert_cache_ttl, 0);
+    }
     if(!ndpi_str->tls_cert_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->cfg.tls_cert_cache_num_entries);
     }
   }
   if(ndpi_str->cfg.mining_cache_num_entries > 0) {
-    ndpi_str->mining_cache = ndpi_lru_cache_init(ndpi_str->cfg.mining_cache_num_entries,
-                                                 ndpi_str->cfg.mining_cache_ttl);
+    if(ndpi_str->cfg.mining_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->mining_global_cache) {
+        ndpi_str->g_ctx->mining_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.mining_cache_num_entries,
+                                                                   ndpi_str->cfg.mining_cache_ttl, 1);
+      }
+      ndpi_str->mining_cache = ndpi_str->g_ctx->mining_global_cache;
+    } else {
+      ndpi_str->mining_cache = ndpi_lru_cache_init(ndpi_str->cfg.mining_cache_num_entries,
+                                                   ndpi_str->cfg.mining_cache_ttl, 0);
+    }
     if(!ndpi_str->mining_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->cfg.mining_cache_num_entries);
     }
   }
   if(ndpi_str->cfg.msteams_cache_num_entries > 0) {
-    ndpi_str->msteams_cache = ndpi_lru_cache_init(ndpi_str->cfg.msteams_cache_num_entries,
-                                                  ndpi_str->cfg.msteams_cache_ttl);
+    if(ndpi_str->cfg.msteams_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->msteams_global_cache) {
+        ndpi_str->g_ctx->msteams_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.msteams_cache_num_entries,
+                                                                    ndpi_str->cfg.msteams_cache_ttl, 1);
+      }
+      ndpi_str->msteams_cache = ndpi_str->g_ctx->msteams_global_cache;
+    } else {
+      ndpi_str->msteams_cache = ndpi_lru_cache_init(ndpi_str->cfg.msteams_cache_num_entries,
+                                                    ndpi_str->cfg.msteams_cache_ttl, 0);
+    }
     if(!ndpi_str->msteams_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->cfg.msteams_cache_num_entries);
     }
   }
   if(ndpi_str->cfg.stun_zoom_cache_num_entries > 0) {
-    ndpi_str->stun_zoom_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_zoom_cache_num_entries,
-                                                    ndpi_str->cfg.stun_zoom_cache_ttl);
+    if(ndpi_str->cfg.stun_zoom_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->stun_zoom_global_cache) {
+        ndpi_str->g_ctx->stun_zoom_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_zoom_cache_num_entries,
+                                                                      ndpi_str->cfg.stun_zoom_cache_ttl, 1);
+      }
+      ndpi_str->stun_zoom_cache = ndpi_str->g_ctx->stun_zoom_global_cache;
+    } else {
+      ndpi_str->stun_zoom_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_zoom_cache_num_entries,
+                                                      ndpi_str->cfg.stun_zoom_cache_ttl, 0);
+    }
     if(!ndpi_str->stun_zoom_cache) {
       NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
                    ndpi_str->cfg.stun_zoom_cache_num_entries);
@@ -3906,28 +4022,36 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->tinc_cache)
       cache_free((cache_t)(ndpi_str->tinc_cache));
 
-    if(ndpi_str->ookla_cache)
+    if(!ndpi_str->cfg.ookla_cache_scope &&
+       ndpi_str->ookla_cache)
       ndpi_lru_free_cache(ndpi_str->ookla_cache);
 
-    if(ndpi_str->bittorrent_cache)
+    if(!ndpi_str->cfg.bittorrent_cache_scope &&
+       ndpi_str->bittorrent_cache)
       ndpi_lru_free_cache(ndpi_str->bittorrent_cache);
 
-    if(ndpi_str->zoom_cache)
+    if(!ndpi_str->cfg.zoom_cache_scope &&
+       ndpi_str->zoom_cache)
       ndpi_lru_free_cache(ndpi_str->zoom_cache);
 
-    if(ndpi_str->stun_cache)
+    if(!ndpi_str->cfg.stun_cache_scope &&
+       ndpi_str->stun_cache)
       ndpi_lru_free_cache(ndpi_str->stun_cache);
 
-    if(ndpi_str->stun_zoom_cache)
+    if(!ndpi_str->cfg.stun_zoom_cache_scope &&
+       ndpi_str->stun_zoom_cache)
       ndpi_lru_free_cache(ndpi_str->stun_zoom_cache);
 
-    if(ndpi_str->tls_cert_cache)
+    if(!ndpi_str->cfg.tls_cert_cache_scope &&
+       ndpi_str->tls_cert_cache)
       ndpi_lru_free_cache(ndpi_str->tls_cert_cache);
 
-    if(ndpi_str->mining_cache)
+    if(!ndpi_str->cfg.mining_cache_scope &&
+       ndpi_str->mining_cache)
       ndpi_lru_free_cache(ndpi_str->mining_cache);
 
-    if(ndpi_str->msteams_cache)
+    if(!ndpi_str->cfg.msteams_cache_scope &&
+       ndpi_str->msteams_cache)
       ndpi_lru_free_cache(ndpi_str->msteams_cache);
 
     if(ndpi_str->protocols_ptree)
@@ -9276,7 +9400,7 @@ void ndpi_generate_options(u_int opt, FILE *options_out) {
   u_int i;
 
   if (!options_out) return;
-  ndpi_str = ndpi_init_detection_module();
+  ndpi_str = ndpi_init_detection_module(NULL);
   if (!ndpi_str) return;
 
   NDPI_BITMASK_SET_ALL(all);
@@ -9722,13 +9846,20 @@ u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow)
 /* ******************************************************************** */
 
 /* LRU cache */
-struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl) {
+struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl, int shared) {
   struct ndpi_lru_cache *c = (struct ndpi_lru_cache *) ndpi_calloc(1, sizeof(struct ndpi_lru_cache));
 
   if(!c)
     return(NULL);
 
-  c->ttl = ttl;
+  c->ttl = ttl & 0x7FFFFFFF;
+  c->shared = !!shared;
+  if(c->shared) {
+    if(pthread_mutex_init(&c->mutex, NULL) != 0) {
+      ndpi_free(c);
+      return(NULL);
+    }
+  }
   c->entries = (struct ndpi_lru_cache_entry *) ndpi_calloc(num_entries, sizeof(struct ndpi_lru_cache_entry));
 
   if(!c->entries) {
@@ -9745,9 +9876,26 @@ void ndpi_lru_free_cache(struct ndpi_lru_cache *c) {
   ndpi_free(c);
 }
 
+static void __lru_cache_lock(struct ndpi_lru_cache *c)
+{
+  if(c->shared) {
+    pthread_mutex_lock(&c->mutex);
+  }
+}
+
+static void __lru_cache_unlock(struct ndpi_lru_cache *c)
+{
+  if(c->shared) {
+    pthread_mutex_unlock(&c->mutex);
+  }
+}
+
 u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
 			     u_int16_t *value, u_int8_t clean_key_when_found, u_int32_t now_sec) {
   u_int32_t slot = key % c->num_entries;
+  u_int8_t ret;
+
+  __lru_cache_lock(c);
 
   c->stats.n_search++;
   if(c->entries[slot].is_full && c->entries[slot].key == key &&
@@ -9757,16 +9905,24 @@ u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
     if(clean_key_when_found)
       c->entries[slot].is_full = 0;
     c->stats.n_found++;
-    return(1);
+    ret = 1;
   } else
-    return(0);
+    ret = 0;
+
+  __lru_cache_unlock(c);
+
+  return ret;
 }
 
 void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value, u_int32_t now_sec) {
   u_int32_t slot = key % c->num_entries;
 
+  __lru_cache_lock(c);
+
   c->stats.n_insert++;
   c->entries[slot].is_full = 1, c->entries[slot].key = key, c->entries[slot].value = value, c->entries[slot].timestamp = now_sec;
+
+  __lru_cache_unlock(c);
 }
 
 void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *stats) {
@@ -9781,37 +9937,53 @@ void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *s
   }
 }
 
-int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
+int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
+			     struct ndpi_detection_module_struct *ndpi_struct,
 			     lru_cache_type cache_type,
 			     struct ndpi_lru_cache_stats *stats)
 {
-  if(!ndpi_struct || !stats)
+  int scope, is_local = 1;
+  char param[64], buf[8];
+
+  if(!stats || (!ndpi_struct && !g_ctx))
     return -1;
+  if(!ndpi_struct) {
+    is_local = 0;
+  } else {
+    snprintf(param, sizeof(param), "lru.%s.scope", ndpi_lru_cache_idx_to_name(cache_type));
+    ndpi_get_config(ndpi_struct, NULL, param, buf, sizeof(buf));
+    scope = atoi(buf);
+    if(scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      is_local = 0;
+      if(!g_ctx)
+        return -1;
+    }
+  }
 
   switch(cache_type) {
   case NDPI_LRUCACHE_OOKLA:
-    ndpi_lru_get_stats(ndpi_struct->ookla_cache, stats);
+    ndpi_lru_get_stats(is_local ? ndpi_struct->ookla_cache : g_ctx->ookla_global_cache, stats);
     return 0;
   case NDPI_LRUCACHE_BITTORRENT:
-    ndpi_lru_get_stats(ndpi_struct->bittorrent_cache, stats);
+    ndpi_lru_get_stats(is_local ? ndpi_struct->bittorrent_cache : g_ctx->bittorrent_global_cache, stats);
     return 0;
   case NDPI_LRUCACHE_ZOOM:
-    ndpi_lru_get_stats(ndpi_struct->zoom_cache, stats);
+    ndpi_lru_get_stats(is_local ? ndpi_struct->zoom_cache : g_ctx->zoom_global_cache, stats);
     return 0;
   case NDPI_LRUCACHE_STUN:
-    ndpi_lru_get_stats(ndpi_struct->stun_cache, stats);
+    ndpi_lru_get_stats(is_local ? ndpi_struct->stun_cache : g_ctx->stun_global_cache, stats);
     return 0;
   case NDPI_LRUCACHE_TLS_CERT:
-    ndpi_lru_get_stats(ndpi_struct->tls_cert_cache, stats);
+    ndpi_lru_get_stats(is_local ? ndpi_struct->tls_cert_cache : g_ctx->tls_cert_global_cache, stats);
     return 0;
   case NDPI_LRUCACHE_MINING:
-    ndpi_lru_get_stats(ndpi_struct->mining_cache, stats);
+    ndpi_lru_get_stats(is_local ? ndpi_struct->mining_cache : g_ctx->mining_global_cache, stats);
     return 0;
   case NDPI_LRUCACHE_MSTEAMS:
-    ndpi_lru_get_stats(ndpi_struct->msteams_cache, stats);
+    ndpi_lru_get_stats(is_local ? ndpi_struct->msteams_cache : g_ctx->msteams_global_cache, stats);
     return 0;
   case NDPI_LRUCACHE_STUN_ZOOM:
-    ndpi_lru_get_stats(ndpi_struct->stun_zoom_cache, stats);
+    ndpi_lru_get_stats(is_local ? ndpi_struct->stun_zoom_cache : g_ctx->stun_zoom_global_cache, stats);
     return 0;
   default:
     return -1;
@@ -10480,7 +10652,7 @@ static u_int16_t __get_proto_id(const char *proto_name_or_id)
 
   /* Try to decode the string as protocol name */
   /* Use a temporary module with all protocols enabled */
-  module = ndpi_init_detection_module();
+  module = ndpi_init_detection_module(NULL);
   if(!module)
     return NDPI_PROTOCOL_UNKNOWN;
   NDPI_BITMASK_SET_ALL(all);
@@ -10654,6 +10826,20 @@ static ndpi_cfg_error _set_param_protocol_enable_disable(struct ndpi_detection_m
   return NDPI_CFG_INVALID_PARAM;
 }
 
+static int clbk_only_with_global_ctx(struct ndpi_detection_module_struct *ndpi_str,
+                                     void *_variable, const char *proto,
+                                     const char *param)
+{
+  int *variable = (int *)_variable;
+
+  /* Integer set > 0 only if there is a global context */
+  if(*variable > 0 && !ndpi_str->g_ctx) {
+    *variable = 0;
+    return -1;
+  }
+  return 0;
+}
+
 
 enum cfg_param_type {
   CFG_PARAM_ENABLE_DISABLE = 0,
@@ -10742,27 +10928,35 @@ static const struct cfg_param {
 
   { NULL,            "lru.ookla.size",                          "1024", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_num_entries), NULL },
   { NULL,            "lru.ookla.ttl",                           "120", "0", "16777215", CFG_PARAM_INT, __OFF(ookla_cache_ttl), NULL },
+  { NULL,            "lru.ookla.scope",                         "0", "0", "1", CFG_PARAM_INT, __OFF(ookla_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.bittorrent.size",                     "32768", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_num_entries), NULL },
   { NULL,            "lru.bittorrent.ttl",                      "0", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_ttl), NULL },
+  { NULL,            "lru.bittorrent.scope",                    "0", "0", "1", CFG_PARAM_INT, __OFF(bittorrent_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.zoom.size",                           "512", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_num_entries), NULL },
   { NULL,            "lru.zoom.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_ttl), NULL },
+  { NULL,            "lru.zoom.scope",                          "0", "0", "1", CFG_PARAM_INT, __OFF(zoom_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.stun.size",                           "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_num_entries), NULL },
   { NULL,            "lru.stun.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_ttl), NULL },
+  { NULL,            "lru.stun.scope",                          "0", "0", "1", CFG_PARAM_INT, __OFF(stun_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.tls_cert.size",                       "1024", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_num_entries), NULL },
   { NULL,            "lru.tls_cert.ttl",                        "0", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_ttl), NULL },
+  { NULL,            "lru.tls_cert.scope",                      "0", "0", "1", CFG_PARAM_INT, __OFF(tls_cert_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.mining.size",                         "1024", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_num_entries), NULL },
   { NULL,            "lru.mining.ttl",                          "0", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_ttl), NULL },
+  { NULL,            "lru.mining.scope",                        "0", "0", "1", CFG_PARAM_INT, __OFF(mining_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.msteams.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries), NULL },
   { NULL,            "lru.msteams.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_ttl), NULL },
+  { NULL,            "lru.msteams.scope",                       "0", "0", "1", CFG_PARAM_INT, __OFF(msteams_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.stun_zoom.size",                      "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_zoom_cache_num_entries), NULL },
   { NULL,            "lru.stun_zoom.ttl",                       "60", "0", "16777215", CFG_PARAM_INT, __OFF(stun_zoom_cache_ttl), NULL },
+  { NULL,            "lru.stun_zoom.scope",                     "0", "0", "1", CFG_PARAM_INT, __OFF(stun_zoom_cache_scope), clbk_only_with_global_ctx },
 
 
   { NULL, NULL, NULL, NULL, NULL, 0, -1, NULL },

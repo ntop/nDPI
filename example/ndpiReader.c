@@ -367,7 +367,7 @@ void ndpiCheckHostStringMatch(char *testChar) {
   if(!testChar)
     return;
 
-  ndpi_str = ndpi_init_detection_module();
+  ndpi_str = ndpi_init_detection_module(NULL);
   ndpi_finalize_initialization(ndpi_str);
 
   testRes =  ndpi_match_string_subprotocol(ndpi_str,
@@ -412,7 +412,7 @@ static void ndpiCheckIPMatch(char *testChar) {
   if(!testChar)
     return;
 
-  ndpi_str = ndpi_init_detection_module();
+  ndpi_str = ndpi_init_detection_module(NULL);
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
@@ -476,7 +476,8 @@ static double ndpi_flow_get_byte_count_entropy(const uint32_t byte_count[256],
 /**
  * @brief Set main components necessary to the detection
  */
-static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle);
+static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
+                           struct ndpi_global_context *g_ctx);
 
 /**
  * @brief Get flow byte distribution mean and variance
@@ -646,7 +647,7 @@ static void help(u_int long_help) {
          max_num_reported_top_payloads, max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts);
 
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
+  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(NULL);
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
 
@@ -810,7 +811,7 @@ void extcap_config() {
   ndpi_proto_defaults_t *proto_defaults;
 #endif
 
-  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
+  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(NULL);
 #if 0
   ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
   proto_defaults = ndpi_get_proto_defaults(ndpi_info_mod);
@@ -1339,7 +1340,7 @@ static void parseOptions(int argc, char **argv) {
 
     case '9':
     {
-      struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
+      struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(NULL);
       extcap_packet_filter = ndpi_get_proto_by_name(ndpi_info_mod, optarg);
       if(extcap_packet_filter == NDPI_PROTOCOL_UNKNOWN) extcap_packet_filter = atoi(optarg);
       ndpi_exit_detection_module(ndpi_info_mod);
@@ -2798,7 +2799,8 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
 /**
  * @brief Setup for detection begin
  */
-static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
+static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
+                           struct ndpi_global_context *g_ctx) {
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_workflow_prefs prefs;
   int i, ret;
@@ -2813,7 +2815,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
-                                                            serialization_format);
+                                                            serialization_format,
+							    g_ctx);
 
   /* Protocols to enable/disable. Default: everything is enabled */
   NDPI_BITMASK_SET_ALL(enabled_bitmask);
@@ -2854,6 +2857,8 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
     }
   }
 
+  ndpi_thread_info[thread_id].workflow->g_ctx = g_ctx;
+
   ndpi_workflow_set_flow_callback(ndpi_thread_info[thread_id].workflow,
                                   on_protocol_discovered, NULL);
 
@@ -2867,7 +2872,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
 
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
+                         cfgs[i].proto, cfgs[i].param, cfgs[i].value);
     if (rc != NDPI_CFG_OK)
       fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
 	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
@@ -3841,10 +3846,21 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     /* LRU caches */
     for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
       struct ndpi_lru_cache_stats s;
-      ndpi_get_lru_cache_stats(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &s);
-      cumulative_stats.lru_stats[i].n_insert += s.n_insert;
-      cumulative_stats.lru_stats[i].n_search += s.n_search;
-      cumulative_stats.lru_stats[i].n_found += s.n_found;
+      int scope;
+      char param[64];
+
+      snprintf(param, sizeof(param), "lru.%s.scope", ndpi_lru_cache_idx_to_name(i));
+      if(ndpi_get_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, NULL, param, buf, sizeof(buf)) != NULL) {
+        scope = atoi(buf);
+	if(scope == NDPI_LRUCACHE_SCOPE_LOCAL ||
+           (scope == NDPI_LRUCACHE_SCOPE_GLOBAL && thread_id == 0)) {
+          ndpi_get_lru_cache_stats(ndpi_thread_info[thread_id].workflow->g_ctx,
+                                   ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &s);
+          cumulative_stats.lru_stats[i].n_insert += s.n_insert;
+          cumulative_stats.lru_stats[i].n_search += s.n_search;
+          cumulative_stats.lru_stats[i].n_found += s.n_found;
+	}
+      }
     }
 
     /* Automas */
@@ -4152,7 +4168,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_found);
 
       if(enable_malloc_bins)
-	fprintf(results_file, "Data-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
+        fprintf(results_file, "Data-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
     }
 
     fprintf(results_file, "\n");
@@ -4649,6 +4665,7 @@ void * processing_thread(void *_thread_id) {
   return NULL;
 }
 
+/* ***************************************************** */
 
 /**
  * @brief Begin, process, end detection process
@@ -4660,9 +4677,22 @@ void test_lib() {
 #else
   long thread_id;
 #endif
+  struct ndpi_global_context *g_ctx;
 
   set_ndpi_malloc(ndpi_malloc_wrapper), set_ndpi_free(free_wrapper);
   set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
+
+#ifndef USE_GLOBAL_CONTEXT
+  /* ndpiReader works even if libnDPI has been compiled without global context support,
+     but you can't configure any cache with global scope */
+  g_ctx = NULL;
+#else
+  g_ctx = ndpi_global_init();
+  if(!g_ctx) {
+    fprintf(stderr, "Error ndpi_global_init\n");
+    exit(-1);
+  }
+#endif
 
 #ifdef DEBUG_TRACE
   if(trace) fprintf(trace, "Num threads: %d\n", num_threads);
@@ -4676,7 +4706,7 @@ void test_lib() {
 #endif
 
     cap = openPcapFileOrDevice(thread_id, (const u_char*)_pcap_file[thread_id]);
-    setupDetection(thread_id, cap);
+    setupDetection(thread_id, cap, g_ctx);
   }
 
   gettimeofday(&begin, NULL);
@@ -4736,6 +4766,8 @@ void test_lib() {
 
     terminateDetection(thread_id);
   }
+
+  ndpi_global_deinit(g_ctx);
 }
 
 /* *********************************************** */
@@ -4853,7 +4885,7 @@ static void dgaUnitTest() {
   };
   int debug = 0, i;
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module();
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
 
   assert(ndpi_str != NULL);
 
@@ -5696,7 +5728,7 @@ void outlierUnitTest() {
 
 void domainsUnitTest() {
   NDPI_PROTOCOL_BITMASK all;
-  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
+  struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(NULL);
   const char *lists_path = "../lists/public_suffix_list.dat";
   struct stat st;
 

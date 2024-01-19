@@ -1,0 +1,1 @@
+--cfg=lru.ookla.scope,1 --cfg=lru.bittorrent.scope,1 --cfg=lru.zoom.scope,1 --cfg=lru.stun.scope,1 --cfg=lru.tls_cert.scope,1 --cfg=lru.mining.scope,1 --cfg=lru.msteams.scope,1 --cfg=lru.stun_zoom.scope,1 

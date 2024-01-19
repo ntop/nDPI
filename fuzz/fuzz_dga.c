@@ -13,7 +13,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char *name;
 
   if (ndpi_struct == NULL) {
-    fuzz_init_detection_module(&ndpi_struct);
+    fuzz_init_detection_module(&ndpi_struct, NULL);
     ndpi_flow = ndpi_calloc(1, sizeof(struct ndpi_flow_struct));
   }
 

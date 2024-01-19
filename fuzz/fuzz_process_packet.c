@@ -13,7 +13,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   uint8_t protocol_was_guessed;
 
   if (ndpi_info_mod == NULL) {
-    fuzz_init_detection_module(&ndpi_info_mod);
+    fuzz_init_detection_module(&ndpi_info_mod, NULL);
 
     ndpi_init_serializer(&json_serializer, ndpi_serialization_format_json);
     ndpi_init_serializer(&csv_serializer, ndpi_serialization_format_csv);

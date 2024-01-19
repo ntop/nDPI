@@ -367,7 +367,7 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
   else
    op = 0; /* Default action: remove from the bitmask */
   /* Use a temporary module with all protocols enabled */
-  module = ndpi_init_detection_module();
+  module = ndpi_init_detection_module(NULL);
   if(!module)
     return 1;
   NDPI_BITMASK_SET_ALL(all);
@@ -408,11 +408,12 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
 
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle, int do_init_flows_root,
-					 ndpi_serialization_format serialization_format) {
+					 ndpi_serialization_format serialization_format,
+					 struct ndpi_global_context *g_ctx) {
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
 
-  module = ndpi_init_detection_module();
+  module = ndpi_init_detection_module(g_ctx);
 
   if(module == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");

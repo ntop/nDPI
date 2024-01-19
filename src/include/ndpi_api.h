@@ -202,6 +202,22 @@ extern "C" {
                                 ndpi_protocol_match const * const match);
 
   /**
+   * Returns a new initialized global context.
+   *
+   * @return  the initialized global context
+   *
+   */
+  struct ndpi_global_context *ndpi_global_init(void);
+
+  /**
+   * Deinit a properly initialized global context.
+   *
+   * @par g_ctx = global context to free/deinit
+   *
+   */
+  void ndpi_global_deinit(struct ndpi_global_context *g_ctx);
+
+  /**
    * Returns a new initialized detection module
    * Note that before you can use it you can still load
    * hosts and do other things. As soon as you are ready to use
@@ -211,10 +227,11 @@ extern "C" {
    * indipendent detection contexts) but all these calls MUST NOT run
    * in parallel
    *
+   * @g_ctx = global context associated to the new detection module; NULL if no global context is needed
    * @return  the initialized detection module
    *
    */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module(void);
+  struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx);
 
   /**
    * Completes the initialization (2nd step)
@@ -1038,14 +1055,15 @@ extern "C" {
   u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow);
 
   /* LRU cache */
-  struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl);
+  struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl, int shared);
   void ndpi_lru_free_cache(struct ndpi_lru_cache *c);
   u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
 			       u_int16_t *value, u_int8_t clean_key_when_found, u_int32_t now_sec);
   void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value, u_int32_t now_sec);
   void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *stats);
 
-  int ndpi_get_lru_cache_stats(struct ndpi_detection_module_struct *ndpi_struct,
+  int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
+			       struct ndpi_detection_module_struct *ndpi_struct,
 			       lru_cache_type cache_type,
 			       struct ndpi_lru_cache_stats *stats);
 

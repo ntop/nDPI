@@ -30,6 +30,8 @@ PCRE2_ENABLED=@PCRE2_ENABLED@
 PCRE_PCAPS="WebattackRCE.pcap"
 NBPF_ENABLED=@NBPF_ENABLED@
 NBPF_PCAPS="h323-overflow.pcap"
+GLOBAL_CONTEXT_ENABLED=@GLOBAL_CONTEXT_ENABLED@
+GLOBAL_CONTEXT_CFGS="caches_global"
 READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,../../../example/config.txt -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja3_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -G ../../../lists -q -K JSON -k /dev/null -t -v 2"
 
 RC=0
@@ -152,6 +154,21 @@ if [ $FUZZY_TESTING_ENABLED -eq 1 ]; then
 fi
 
 for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
+
+    SKIP_CFG=0
+    if [ $GLOBAL_CONTEXT_ENABLED -eq 0 ]; then
+        for c in $GLOBAL_CONTEXT_CFGS; do
+            if [ $c = $(basename $d) ]; then
+	        SKIP_CFG=1
+	        break
+	    fi
+        done
+    fi
+    if [ $SKIP_CFG -eq 1 ]; then
+        printf "Configuration \""$(basename $d)"\" \tSKIPPED\n"
+        continue
+    fi
+
     cd ./cfgs/"$(basename $d)"
 
     PCAPS=`cd pcap; /bin/ls *.*cap*`
