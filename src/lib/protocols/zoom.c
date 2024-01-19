@@ -54,8 +54,7 @@ static void ndpi_int_zoom_add_connection(struct ndpi_detection_module_struct *nd
   NDPI_LOG_INFO(ndpi_struct, "found Zoom\n");
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM, master, NDPI_CONFIDENCE_DPI);
 
-  /* Keep looking for RTP if we are at the beginning of the flow (SFU 1 or 2).
-   * It is similar to the STUN logic... */
+  /* Keep looking for RTP. It is similar to the STUN logic... */
   if(master == NDPI_PROTOCOL_UNKNOWN) {
     flow->max_extra_packets_to_check = 4;
     flow->extra_packets_func = zoom_search_again;
@@ -150,10 +149,12 @@ static void ndpi_search_zoom(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_int_zoom_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
       return;
 
-    /* SFU types 3 and 4. This check is quite weak but these packets are rare.
-       Wait for other kind of traffic */
-    } else if((packet->payload[0] == 0x03 || packet->payload[0] == 0x04) &&
-              flow->packet_counter < 3) {
+    /* SFU types 3 and 4. This check is quite weak: let give time to the other
+       dissectors to kick in */
+    } else if((packet->payload[0] == 0x03 || packet->payload[0] == 0x04)) {
+      if(flow->packet_counter < 4)
+        return;
+      ndpi_int_zoom_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
       return;
 
     /* SFU types 5 */
