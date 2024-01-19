@@ -932,6 +932,10 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_TFTP */
   u_int16_t tftp_data_num;
   u_int16_t tftp_ack_num;
+
+  /* NDPI_PROTOCOL_MUMBLE */
+  u_int8_t mumble_stage:1;
+  u_int64_t mumble_ident;
 };
 
 /* ************************************************** */
