@@ -416,6 +416,7 @@ typedef enum {
   NDPI_PROTOCOL_KCP                   = 385,
   NDPI_PROTOCOL_DOTA2                 = 386,
   NDPI_PROTOCOL_MUMBLE                = 387,
+  NDPI_PROTOCOL_ELECTRONICARTS        = 388,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

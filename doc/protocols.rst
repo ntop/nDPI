@@ -518,3 +518,16 @@ References: `Main site <https://www.dota2.com/>`_
 Mumble is a free, open source, low latency, high quality voice chat application.
 
 References: `Main site <https://www.mumble.info/>`_
+
+
+.. _Proto 388:
+
+`NDPI_PROTOCOL_ELECTRONICARTS`
+=========================
+Electronic Arts is a leading publisher of games on Console, PC and Mobile.
+
+References: `Main site <https://www.ea.com/>`_
+
+Notes:
+
+- Almost all of that traffic is related to their EA Origin game store.
