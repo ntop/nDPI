@@ -6,15 +6,11 @@
 #include <stdio.h>
 #include "fuzzer/FuzzedDataProvider.h"
 
-u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
 u_int8_t enable_payload_analyzer = 0;
 u_int8_t enable_flow_stats = 0;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
-int enable_malloc_bins = 0;
 int malloc_size_stats = 0;
-int max_malloc_bins = 14;
-struct ndpi_bin malloc_bins; /* unused */
 
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {

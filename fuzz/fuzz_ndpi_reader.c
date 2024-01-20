@@ -11,15 +11,11 @@
 struct ndpi_workflow_prefs *prefs = NULL;
 struct ndpi_workflow *workflow = NULL;
 
-u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
 u_int8_t enable_payload_analyzer = 0;
 u_int8_t enable_flow_stats = 1;
 u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
-int enable_malloc_bins = 1;
 int malloc_size_stats = 0;
-int max_malloc_bins = 14;
-struct ndpi_bin malloc_bins; /* unused */
 
 extern void ndpi_report_payload_stats(FILE *out);
 
@@ -71,12 +67,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic", "1");
     ndpi_set_config(workflow->ndpi_struct, "tls", "application_blocks_tracking", "1");
 
-    memset(workflow->stats.protocol_counter, 0,
-	   sizeof(workflow->stats.protocol_counter));
-    memset(workflow->stats.protocol_counter_bytes, 0,
-	   sizeof(workflow->stats.protocol_counter_bytes));
-    memset(workflow->stats.protocol_flows, 0,
-	   sizeof(workflow->stats.protocol_flows));
     ndpi_finalize_initialization(workflow->ndpi_struct);
 
 #ifdef CRYPT_FORCE_NO_AESNI
@@ -139,7 +129,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   for(i = 0; i < workflow->prefs.num_roots; i++)
     ndpi_tdestroy(workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
   ndpi_free(workflow->ndpi_flows_root);
-  /* Free payload analyzer data, without printing */
+  /* Free payload analyzer data */
   if(enable_payload_analyzer)
     ndpi_report_payload_stats(stdout);
 
