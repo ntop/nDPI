@@ -58,6 +58,14 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
 
   NDPI_LOG_DBG(ndpi_struct, "search Cassandra CQL\n");
 
+  if (packet->payload_packet_len == 19 &&
+      ntohl(get_u_int32_t(packet->payload, 0)) == 0xCA552DFA)
+  {
+    NDPI_LOG_INFO(ndpi_struct, "found Cassandra Internode Communication\n");
+    ndpi_int_cassandra_add_connection(ndpi_struct, flow);
+    return;
+  }
+
   if (packet->payload_packet_len < 9 ||
       (!ndpi_validate_cassandra_response(packet->payload[0]) ||
        !ndpi_validate_cassandra_request(packet->payload[0])))
