@@ -384,7 +384,7 @@ static void ndpiCheckIPMatch(char *testChar) {
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_str,
 			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
-    if (rc < NDPI_CFG_OK)
+    if (rc != NDPI_CFG_OK)
       fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
 	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
   }
@@ -557,7 +557,7 @@ static void help(u_int long_help) {
          "                            | 0 - List known protocols\n"
          "                            | 1 - List known categories\n"
          "                            | 2 - List known risks\n"
-         "  -d                        | Disable protocol guess (by ip and by port) and use only DPI. It is a shortcut to --cfg=,NULL,guess_on_giveup,0\n"
+         "  -d                        | Disable protocol guess (by ip and by port) and use only DPI. It is a shortcut to --cfg=dpi.guess_on_giveup,0\n"
          "  -e <len>                  | Min human readeable string match len. Default %u\n"
          "  -q                        | Quiet mode\n"
          "  -F                        | Enable flow stats\n"
@@ -1021,7 +1021,7 @@ static void parseOptions(int argc, char **argv) {
 
     case 'd':
       enable_protocol_guess = 0;
-      if(reader_add_cfg(NULL, "guess_on_giveup", "0", 1) == 1) {
+      if(reader_add_cfg(NULL, "dpi.guess_on_giveup", "0", 1) == 1) {
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
@@ -1134,7 +1134,7 @@ static void parseOptions(int argc, char **argv) {
       }
       if(log_level > NDPI_LOG_DEBUG_EXTRA) {
         log_level = NDPI_LOG_DEBUG_EXTRA;
-        if(reader_add_cfg("all", "log.enable", "1", 1) == 1) {
+        if(reader_add_cfg("all", "log", "enable", 1) == 1) {
           printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
           exit(1);
         }
@@ -1155,7 +1155,7 @@ static void parseOptions(int argc, char **argv) {
       int inverted_logic;
 
       /* Reset any previous call to this knob */
-      if(reader_add_cfg("all", "log.enable", "0", 1) == 1) {
+      if(reader_add_cfg("all", "log", "disable", 1) == 1) {
         printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
@@ -1166,7 +1166,7 @@ static void parseOptions(int argc, char **argv) {
           inverted_logic = 1;
           n++;
         }
-        if(reader_add_cfg(n, "log.enable", inverted_logic ? "0" : "1", 1) == 1) {
+        if(reader_add_cfg(n, "log", inverted_logic ? "disable" : "enable", 1) == 1) {
           printf("Invalid parameter [%s] [num:%d/%d]\n", n, num_cfgs, MAX_NUM_CFGS);
           exit(1);
         }
@@ -2829,7 +2829,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _protoFilePath);
 
-  ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic.enable", "1");
+  ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic", "enable");
 
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct,
@@ -2840,7 +2840,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   }
 
   if(enable_doh_dot_detection)
-    ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, "tls", "application_blocks_tracking.enable", "1");
+    ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, "tls", "application_blocks_tracking", "enable");
 
   ret = ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
   if(ret != 0) {

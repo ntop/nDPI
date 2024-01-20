@@ -3094,3 +3094,15 @@ int64_t ndpi_strtonum(const char *numstr, int64_t minval, int64_t maxval, const 
   *errstrp = NULL;
   return val;
 }
+
+/* ******************************************* */
+
+const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx)
+{
+  const char *names[NDPI_LRUCACHE_MAX] = { "ookla", "bittorrent", "zoom", "stun",
+                                           "tls_cert", "mining", "msteams", "stun_zoom" };
+
+  if(idx < 0 || idx >= NDPI_LRUCACHE_MAX)
+    return NULL;
+  return names[idx];
+}

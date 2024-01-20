@@ -13,15 +13,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_detection_module_struct *ndpi_info_mod;
   struct ndpi_flow_struct flow;
   u_int8_t protocol_was_guessed;
-  u_int32_t i;
+  u_int32_t i, ret;
   u_int16_t bool_value;
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_lru_cache_stats lru_stats;
   struct ndpi_patricia_tree_stats patricia_stats;
   struct ndpi_automa_stats automa_stats;
-  int cat;
+  int cat, idx;
   u_int16_t pid;
   char *protoname;
+  const char *name;
   char catname[] = "name";
   struct ndpi_flow_input_info input_info;
   ndpi_proto p, p2;
@@ -30,6 +31,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   int value;
   char cfg_value[32];
   char cfg_proto[32];
+  char cfg_param[32];
 
 
   /* Just to be sure to have some data */
@@ -77,6 +79,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* TODO: stub for geo stuff */
   ndpi_load_geoip(ndpi_info_mod, NULL, NULL);
 
+  /* To trigger NDPI_CFG_CONTEXT_ALREADY_INITIALIZED */
+  if(fuzzed_data.ConsumeBool()) {
+    ret = ndpi_finalize_initialization(ndpi_info_mod);
+    if(ret != 0) {
+      ndpi_exit_detection_module(ndpi_info_mod);
+      ndpi_info_mod = NULL;
+    }
+  }
+
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 365 + 1);
     sprintf(cfg_value, "%d", value);
@@ -85,62 +96,62 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "tls", "application_blocks_tracking.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "tls", "application_blocks_tracking", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "tls", "metadata.sha1_fingerprint.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "tls", "metadata.sha1_fingerprint", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "smtp", "tls_dissection.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "smtp", "tls_dissection", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "imap", "tls_dissection.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "imap", "tls_dissection", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "pop", "tls_dissection.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "pop", "tls_dissection", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "ftp", "tls_dissection.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "ftp", "tls_dissection", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "stun", "tls_dissection.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "stun", "tls_dissection", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "dns", "subclassification.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "dns", "subclassification", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "dns", "process_response.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "dns", "process_response", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "http", "process_response.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "http", "process_response", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 0x01 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "ookla", "aggressiveness", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "ookla", "dpi.aggressiveness", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, "any", "log.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, "any", "log", cfg_value);
   }
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
     if(fuzzed_data.ConsumeBool()) {
@@ -148,7 +159,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       sprintf(cfg_value, "%d", value);
       sprintf(cfg_proto, "%d", i);
       /* TODO: we should try to map integer into name */
-      ndpi_set_config(ndpi_info_mod, cfg_proto, "log.enable", cfg_value);
+      ndpi_set_config(ndpi_info_mod, cfg_proto, "log", cfg_value);
     }
   }
   if(fuzzed_data.ConsumeBool()) {
@@ -172,22 +183,22 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "flow.direction_detection.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, NULL, "flow.direction_detection", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "flow.track_payload.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, NULL, "flow.track_payload", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "tcp_ack_payload_heuristic.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, NULL, "tcp_ack_payload_heuristic", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "fully_encrypted_heuristic.enable", cfg_value);
+    ndpi_set_config(ndpi_info_mod, NULL, "fully_encrypted_heuristic", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
@@ -197,7 +208,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 0x03 + 1);
     sprintf(cfg_value, "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "guess_on_giveup", cfg_value);
+    ndpi_set_config(ndpi_info_mod, NULL, "dpi.guess_on_giveup", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
@@ -304,6 +315,30 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.ttl", cfg_value);
   }
+  /* Configure one cache via index */
+  if(fuzzed_data.ConsumeBool()) {
+    idx = fuzzed_data.ConsumeIntegralInRange(0, static_cast<int>(NDPI_LRUCACHE_MAX));
+    name = ndpi_lru_cache_idx_to_name(static_cast<lru_cache_type>(idx));
+    if(name) {
+      value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
+      sprintf(cfg_param, "lru.%s.size", name);
+      ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
+      value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 + 1);
+      sprintf(cfg_param, "lru.%s.ttl", name);
+      ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
+    }
+  }
+  /* Invalid parameter */
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "foo", cfg_value);
+  }
+  /* Invalid value */
+  if(fuzzed_data.ConsumeBool()) {
+    sprintf(cfg_value, "%s", "jjj");
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.ttl", cfg_value);
+  }
 
   ndpi_finalize_initialization(ndpi_info_mod);
 
@@ -344,6 +379,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_dump_protocols(ndpi_info_mod, stdout);
   ndpi_generate_options(fuzzed_data.ConsumeIntegralInRange(0, 4), stdout);
   ndpi_dump_risks_score(stdout);
+  ndpi_dump_config(ndpi_info_mod, stdout);
 
   /* Basic code to try testing this "config" */
   bool_value = fuzzed_data.ConsumeBool();

@@ -315,8 +315,6 @@ struct ndpi_detection_module_struct {
 
   /* NDPI_PROTOCOL_ZOOM */
   struct ndpi_lru_cache *zoom_cache;
-  u_int32_t zoom_cache_num_entries;
-  u_int32_t zoom_cache_ttl;
 
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
@@ -435,6 +433,7 @@ int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE 
 int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 int load_risk_domain_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
+int load_config_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 
 
 /* TLS */

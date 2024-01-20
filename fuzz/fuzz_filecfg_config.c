@@ -18,7 +18,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_set_config(ndpi_struct, "all", "log", "1");
 
   fd = buffer_to_file(data, size);
-  load_risk_domain_file_fd(ndpi_struct, fd);
+  load_config_file_fd(ndpi_struct, fd);
   if(fd)
     fclose(fd);
 
