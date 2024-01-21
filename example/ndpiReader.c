@@ -609,6 +609,10 @@ static void help(u_int long_help) {
   struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module();
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
+
+  if(_protoFilePath != NULL)
+    ndpi_load_protocols_file(ndpi_info_mod, _protoFilePath);
+
   ndpi_finalize_initialization(ndpi_info_mod);
 
   printf("\nProtocols configuration parameters:\n");
@@ -635,8 +639,8 @@ static void help(u_int long_help) {
            sizeof(((struct ndpi_flow_struct *)0)->protos));
 
     printf("\n\nnDPI supported protocols:\n");
-    printf("%3s %-22s %-10s %-8s %-12s %s\n",
-	   "Id", "Protocol", "Layer_4", "Nw_Proto", "Breed", "Category");
+    printf("%3s %8s %-22s %-10s %-8s %-12s %s\n",
+	   "Id", "Userd-id", "Protocol", "Layer_4", "Nw_Proto", "Breed", "Category");
     num_threads = 1;
 
     ndpi_dump_protocols(ndpi_info_mod, stdout);
@@ -4126,7 +4130,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
   if(!quiet_mode) printf("\n\nDetected protocols:\n");
   for(i = 0; i <= ndpi_get_num_supported_protocols(ndpi_thread_info[0].workflow->ndpi_struct); i++) {
-    ndpi_protocol_breed_t breed = ndpi_get_proto_breed(ndpi_thread_info[0].workflow->ndpi_struct, i);
+    ndpi_protocol_breed_t breed = ndpi_get_proto_breed(ndpi_thread_info[0].workflow->ndpi_struct,
+                                                       ndpi_map_ndpi_id_to_user_proto_id(ndpi_thread_info[0].workflow->ndpi_struct, i));
 
     if(cumulative_stats.protocol_counter[i] > 0) {
       breed_stats_bytes[breed] += (long long unsigned int)cumulative_stats.protocol_counter_bytes[i];
@@ -4135,7 +4140,8 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
       if(results_file)
 	fprintf(results_file, "%s\t%llu\t%llu\t%u\n",
-		ndpi_get_proto_name(ndpi_thread_info[0].workflow->ndpi_struct, i),
+		ndpi_get_proto_name(ndpi_thread_info[0].workflow->ndpi_struct,
+				    ndpi_map_ndpi_id_to_user_proto_id(ndpi_thread_info[0].workflow->ndpi_struct, i)),
 		(long long unsigned int)cumulative_stats.protocol_counter[i],
 		(long long unsigned int)cumulative_stats.protocol_counter_bytes[i],
 		cumulative_stats.protocol_flows[i]);
