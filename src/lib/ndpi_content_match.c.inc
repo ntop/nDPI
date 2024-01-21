@@ -1600,6 +1600,8 @@ static ndpi_protocol_match host_match[] =
    { "dota2.com",                        "Dota2",                 NDPI_PROTOCOL_DOTA2, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "publist.mumble.info",              "Mumble",                NDPI_PROTOCOL_MUMBLE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "example.com",                      "DummyProtoJustForTest", NDPI_PROTOCOL_DUMMY_ID_FOR_TEST, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif
