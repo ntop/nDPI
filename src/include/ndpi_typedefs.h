@@ -958,6 +958,7 @@ typedef enum {
   NDPI_CONFIDENCE_DPI,                      /* Deep packet inspection */
   NDPI_CONFIDENCE_MATCH_BY_IP,              /* Classification obtained looking only at the IP addresses */
   NDPI_CONFIDENCE_DPI_AGGRESSIVE,           /* Aggressive DPI: it might be a false positive */
+  NDPI_CONFIDENCE_CUSTOM_RULE,              /* Matching a custom rules */
 
   /*
     IMPORTANT

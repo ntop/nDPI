@@ -7939,7 +7939,7 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
       /* This is a custom protocol and it has priority over everything else */
       ret->master_protocol = NDPI_PROTOCOL_UNKNOWN,
       ret->app_protocol = flow->guessed_protocol_id;
-      flow->confidence = NDPI_CONFIDENCE_MATCH_BY_PORT; /* TODO */
+      flow->confidence = NDPI_CONFIDENCE_CUSTOM_RULE;
       ndpi_fill_protocol_category(ndpi_str, flow, ret);
       return(-1);
     }
@@ -7951,6 +7951,7 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
         *ret = ndpi_detection_giveup(ndpi_str, flow, &protocol_was_guessed);
       }
 
+      flow->confidence = NDPI_CONFIDENCE_CUSTOM_RULE;
       ndpi_fill_protocol_category(ndpi_str, flow, ret);
       return(-1);
     }
@@ -7964,6 +7965,7 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
 
     flow->num_dissector_calls += ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
 
+    flow->confidence = NDPI_CONFIDENCE_CUSTOM_RULE;
     ndpi_fill_protocol_category(ndpi_str, flow, ret);
     return(-1);
   }
@@ -8288,8 +8290,9 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 							    packetlen, current_time_ms,
 							    input_info);
 
-  p.master_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.master_protocol),
-    p.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.app_protocol);
+  p.master_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.master_protocol);
+  p.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.app_protocol);
+  p.protocol_by_ip = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.protocol_by_ip);
 
   return(p);
 }
@@ -9173,6 +9176,9 @@ const char *ndpi_confidence_get_name(ndpi_confidence_t confidence)
   case NDPI_CONFIDENCE_DPI_AGGRESSIVE:
     return "DPI (aggressive)";
 
+  case NDPI_CONFIDENCE_CUSTOM_RULE:
+    return "Match by custom rule";
+
   default:
     return NULL;
   }
@@ -9353,8 +9359,9 @@ void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_str, FILE *du
   if(!ndpi_str || !dump_out) return;
 
   for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++)
-    fprintf(dump_out, "%3d %-22s %-10s %-8s %-12s %s\n",
-	   i, ndpi_str->proto_defaults[i].protoName,
+    fprintf(dump_out, "%3d %8d %-22s %-10s %-8s %-12s %s\n",
+	   i, ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, i),
+	   ndpi_str->proto_defaults[i].protoName,
 	   ndpi_get_l4_proto_name(ndpi_get_l4_proto_info(ndpi_str, i)),
 	   ndpi_str->proto_defaults[i].isAppProtocol ? "" : "X",
 	   ndpi_get_proto_breed_name(ndpi_str, ndpi_str->proto_defaults[i].protoBreed),
