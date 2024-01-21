@@ -356,6 +356,7 @@
     <ClCompile Include="..\src\lib\protocols\ceph.c" />
     <ClCompile Include="..\src\lib\protocols\steam_datagram_relay.c" />
     <ClCompile Include="..\src\lib\protocols\mumble.c" />
+    <ClCompile Include="..\src\lib\protocols\yojimbo.c" />
     <ClCompile Include="..\src\lib\protocols\zoom.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
