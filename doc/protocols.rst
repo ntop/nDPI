@@ -518,3 +518,12 @@ References: `Main site <https://www.dota2.com/>`_
 Mumble is a free, open source, low latency, high quality voice chat application.
 
 References: `Main site <https://www.mumble.info/>`_
+
+
+.. _Proto 388:
+
+`NDPI_PROTOCOL_YOJIMBO`
+=======================
+Yojimbo (netcode) is a secure connection-based client/server protocol built on top of UDP.
+
+References: `Protocol Specs: <https://github.com/mas-bandwidth/netcode/blob/main/STANDARD.md>`_

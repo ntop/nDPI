@@ -21,17 +21,17 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   0/0 (search/found)
 Patricia protocols IPv6: 9/5 (search/found)
 
-Unknown	1	318	1
+Unknown	1	1287	1
 CustomProtocolD	2	600	1
 CustomProtocolE	1	1287	1
-CustomProtocolF	1	1287	1
+CustomProtocolG	1	318	1
 CustomProtocolH	1	318	1
 
-Acceptable                       5 3492          4            
-Unrated                          1 318           1            
+Acceptable                       5 2523          4            
+Unrated                          1 1287          1            
 
-	1	UDP [247f:855b:5e16:3caf:3f2c:4134:9592:661b]:100 -> [21bc:b273:7f68:88d7:77a8:585:3990:927b]:1991 [proto: 398/CustomProtocolE][IP: 398/CustomProtocolE][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/1287 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
-	2	UDP [247f:855b:5e16:3caf:3f2c:4134:9592:661b]:36098 -> [21bc:b273:7f68:88d7:77a8:585:3990:927b]:50621 [proto: 399/CustomProtocolF][IP: 399/CustomProtocolF][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/1287 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
-	3	UDP [3ffe:507::1:200:86ff:fe05:80da]:21554 <-> [3ffe:501:4819::42]:5333 [proto: 397/CustomProtocolD][IP: 397/CustomProtocolD][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/90 bytes <-> 1 pkts/510 bytes][Goodput ratio: 31/88][0.07 sec][PLAIN TEXT (itojun)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	4	UDP [fe80::76ac:b9ff:fe6c:c124]:12717 -> [ff02::1]:64315 [proto: 400/CustomProtocolC][IP: 400/CustomProtocolC][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/318 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][PLAIN TEXT (BZ.qca956)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	5	UDP [fe80::76ac:b9ff:fe6c:c124]:12718 -> [ff02::1]:26993 [proto: 401/CustomProtocolH][IP: 401/CustomProtocolH][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/318 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][PLAIN TEXT (BZ.qca956)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP [247f:855b:5e16:3caf:3f2c:4134:9592:661b]:100 -> [21bc:b273:7f68:88d7:77a8:585:3990:927b]:1991 [proto: 399/CustomProtocolE][IP: 399/CustomProtocolE][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/1287 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+	2	UDP [247f:855b:5e16:3caf:3f2c:4134:9592:661b]:36098 -> [21bc:b273:7f68:88d7:77a8:585:3990:927b]:50621 [proto: 400/CustomProtocolC][IP: 400/CustomProtocolC][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/1287 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+	3	UDP [3ffe:507::1:200:86ff:fe05:80da]:21554 <-> [3ffe:501:4819::42]:5333 [proto: 398/CustomProtocolD][IP: 398/CustomProtocolD][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/90 bytes <-> 1 pkts/510 bytes][Goodput ratio: 31/88][0.07 sec][PLAIN TEXT (itojun)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP [fe80::76ac:b9ff:fe6c:c124]:12717 -> [ff02::1]:64315 [proto: 401/CustomProtocolG][IP: 401/CustomProtocolG][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/318 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][PLAIN TEXT (BZ.qca956)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP [fe80::76ac:b9ff:fe6c:c124]:12718 -> [ff02::1]:26993 [proto: 402/CustomProtocolH][IP: 402/CustomProtocolH][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/318 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][PLAIN TEXT (BZ.qca956)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
