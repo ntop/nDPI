@@ -522,6 +522,15 @@ References: `Main site <https://www.mumble.info/>`_
 
 .. _Proto 388:
 
+`NDPI_PROTOCOL_YOJIMBO`
+=======================
+Yojimbo (netcode) is a secure connection-based client/server protocol built on top of UDP.
+
+References: `Protocol Specs: <https://github.com/mas-bandwidth/netcode/blob/main/STANDARD.md>`_
+
+
+.. _Proto 389:
+
 `NDPI_PROTOCOL_ELECTRONICARTS`
 =========================
 Electronic Arts is a leading publisher of games on Console, PC and Mobile.
