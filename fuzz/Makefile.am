@@ -577,8 +577,8 @@ fuzz_filecfg_config_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_filecfg_config_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_readerutils_workflow_SOURCES = fuzz_readerutils_workflow.cpp fuzz_common_code.c ../example/reader_util.c
-fuzz_readerutils_workflow_CXXFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -DDISABLE_CUSTOM_ALLOCATOR_ON_READERUTILS
-fuzz_readerutils_workflow_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DDISABLE_CUSTOM_ALLOCATOR_ON_READERUTILS
+fuzz_readerutils_workflow_CXXFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_readerutils_workflow_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
 fuzz_readerutils_workflow_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_readerutils_workflow_LDFLAGS = $(PCAP_LIB) $(LIBS)
 if HAS_FUZZLDFLAGS

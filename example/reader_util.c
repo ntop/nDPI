@@ -81,9 +81,6 @@ static u_int32_t flow_id = 0;
 u_int8_t enable_doh_dot_detection = 0;
 
 extern int malloc_size_stats;
-extern struct ndpi_bin malloc_bins;
-extern int max_malloc_bins;
-extern int enable_malloc_bins;
 
 /* ****************************************************** */
 
@@ -335,45 +332,6 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
 
 /* ***************************************************** */
 
-extern u_int32_t current_ndpi_memory, max_ndpi_memory;
-
-static u_int32_t __slot_malloc_bins(u_int64_t v)
-{
-  int i;
-
-  /* 0-2,3-4,5-8,9-16,17-32,33-64,65-128,129-256,257-512,513-1024,1025-2048,2049-4096,4097-8192,8193- */
-  for(i=0; i < max_malloc_bins - 1; i++)
-    if((1ULL << (i + 1)) >= v)
-      return i;
-  return i;
-}
-
-/**
- * @brief ndpi_malloc wrapper function
- */
-static void *ndpi_malloc_wrapper(size_t size) {
-  current_ndpi_memory += size;
-
-  if(current_ndpi_memory > max_ndpi_memory)
-    max_ndpi_memory = current_ndpi_memory;
-
-  if(enable_malloc_bins && malloc_size_stats)
-    ndpi_inc_bin(&malloc_bins, __slot_malloc_bins(size), 1);
-
-  return(malloc(size)); /* Don't change to ndpi_malloc !!!!! */
-}
-
-/* ***************************************************** */
-
-/**
- * @brief free wrapper function
- */
-static void free_wrapper(void *freeable) {
-  free(freeable); /* Don't change to ndpi_free !!!!! */
-}
-
-/* ***************************************************** */
-
 static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod, const char *name) {
   uint16_t proto_id;
   char *e;
@@ -454,13 +412,6 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
 
-  /* On some fuzzers we don't want to use these memory allocators, but some custom ones */
-#ifndef DISABLE_CUSTOM_ALLOCATOR_ON_READERUTILS
-  set_ndpi_malloc(ndpi_malloc_wrapper), set_ndpi_free(free_wrapper);
-  set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
-#endif
-
-  /* TODO: just needed here to init ndpi ndpi_malloc wrapper */
   module = ndpi_init_detection_module();
 
   if(module == NULL) {
@@ -1714,16 +1665,10 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if(enough_packets || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
 	 && ndpi_extra_dissection_possible(workflow->ndpi_struct, ndpi_flow))
-	; /* Wait for certificate fingerprint */
+	; /* Wait for further metadata */
       else {
 	/* New protocol detected or give up */
 	flow->detection_completed = 1;
-
-#if 0
-	/* Check if we should keep checking extra packets */
-	if(ndpi_flow && ndpi_flow->check_extra_packets)
-	  flow->check_extra_packets = 1;
-#endif
 
 	if(flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
 	  u_int8_t proto_guessed;
