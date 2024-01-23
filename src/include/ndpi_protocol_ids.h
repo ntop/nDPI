@@ -418,6 +418,7 @@ typedef enum {
   NDPI_PROTOCOL_MUMBLE                = 387,
   NDPI_PROTOCOL_YOJIMBO               = 388,
   NDPI_PROTOCOL_ELECTRONICARTS        = 389,
+  NDPI_PROTOCOL_STOMP                 = 390,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

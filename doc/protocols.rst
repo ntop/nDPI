@@ -540,3 +540,12 @@ References: `Main site <https://www.ea.com/>`_
 Notes:
 
 - Almost all of that traffic is related to their EA Origin game store.
+
+
+.. _Proto 390:
+
+`NDPI_PROTOCOL_STOMP`
+========================
+STOMP is a simple interoperable protocol designed for asynchronous message passing between clients via mediating servers. Supported in ActiveMQ and RabbitMQ.
+
+References: `Protocol Specs: <https://stomp.github.io/stomp-specification-1.2.html>`_
