@@ -388,23 +388,6 @@ extern "C" {
 				struct ndpi_proto * ndpi_proto);
 
   /**
-   * API call that is called internally by ndpi_detection_process_packet or by apps
-   * that want to avoid calling ndpi_detection_process_packet as they have already
-   * parsed the packet and thus want to avoid this.
-   *
-   *
-   * @par    ndpi_struct              = the detection module
-   * @par    flow                     = the flow given for the detection module
-   * @par    ndpi_selection_bitmask   = the protocol selected bitmask
-   * @return number of protocol dissector that have been tried (0 = no more dissectors)
-   *
-   */
-  u_int32_t ndpi_check_flow_func(struct ndpi_detection_module_struct *ndpi_struct,
-				 struct ndpi_flow_struct *flow,
-				 NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet);
-
-
-  /**
    * Query the pointer to the layer 4 packet
    *
    * @par    l3 = pointer to the layer 3 data

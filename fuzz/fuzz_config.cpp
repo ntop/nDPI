@@ -32,6 +32,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char cfg_value[32];
   char cfg_proto[32];
   char cfg_param[32];
+  u_int64_t cat_userdata = 0;
 
 
   /* Just to be sure to have some data */
@@ -65,16 +66,32 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool())
     ndpi_load_protocols_file(ndpi_info_mod, "protos.txt");
   if(fuzzed_data.ConsumeBool())
-    ndpi_load_categories_file(ndpi_info_mod, "categories.txt", NULL);
+    ndpi_load_protocols_file(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "invalid_filename"); /* Error */
+  if(fuzzed_data.ConsumeBool())
+    ndpi_load_categories_file(ndpi_info_mod, "categories.txt", &cat_userdata);
+  if(fuzzed_data.ConsumeBool())
+    ndpi_load_categories_file(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "invalid_filename", &cat_userdata); /* Error */
   if(fuzzed_data.ConsumeBool())
     ndpi_load_risk_domain_file(ndpi_info_mod, "risky_domains.txt");
   if(fuzzed_data.ConsumeBool())
+    ndpi_load_risk_domain_file(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "invalid_filename"); /* Error */
+  if(fuzzed_data.ConsumeBool())
     ndpi_load_malicious_ja3_file(ndpi_info_mod, "ja3_fingerprints.csv");
   if(fuzzed_data.ConsumeBool())
-    ndpi_load_malicious_sha1_file(ndpi_info_mod, "sha1_fingerprints.csv");
-  /* Note that this function is not used by ndpiReader */
+    ndpi_load_malicious_ja3_file(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "invalid_filename"); /* Error */
   if(fuzzed_data.ConsumeBool())
+    ndpi_load_malicious_sha1_file(ndpi_info_mod, "sha1_fingerprints.csv");
+  if(fuzzed_data.ConsumeBool())
+    ndpi_load_malicious_sha1_file(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "invalid_filename"); /* Error */
+  if(fuzzed_data.ConsumeBool())
+    ndpi_load_domain_suffixes(ndpi_info_mod, (char *)"public_suffix_list.dat");
+  if(fuzzed_data.ConsumeBool())
+    ndpi_load_domain_suffixes(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : (char *)"invalid_filename"); /* Error */
+  /* Note that this function is not used by ndpiReader */
+  if(fuzzed_data.ConsumeBool()) {
+    ndpi_load_ipv4_ptree(ndpi_info_mod, "invalid_filename", NDPI_PROTOCOL_TLS);
     ndpi_load_ipv4_ptree(ndpi_info_mod, "ipv4_addresses.txt", NDPI_PROTOCOL_TLS);
+  }
 
   /* TODO: stub for geo stuff */
   ndpi_load_geoip(ndpi_info_mod, NULL, NULL);
@@ -92,11 +109,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 365 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, "tls", "certificate_expiration_threshold", cfg_value);
+    ndpi_get_config(ndpi_info_mod, "tls", "certificate_expiration_threshold", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, "tls", "application_blocks_tracking", cfg_value);
+    ndpi_get_config(ndpi_info_mod, "tls", "application_blocks_tracking", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
@@ -152,6 +171,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, "any", "log", cfg_value);
+    ndpi_get_config(ndpi_info_mod, "any", "log", cfg_value, sizeof(cfg_value));
   }
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
     if(fuzzed_data.ConsumeBool()) {
@@ -160,12 +180,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       sprintf(cfg_proto, "%d", i);
       /* TODO: we should try to map integer into name */
       ndpi_set_config(ndpi_info_mod, cfg_proto, "log", cfg_value);
+      ndpi_get_config(ndpi_info_mod, cfg_proto, "log", cfg_value, sizeof(cfg_value));
     }
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, "any", "ip_list.load", cfg_value);
+    ndpi_get_config(ndpi_info_mod, "any", "ip_list.load", cfg_value, sizeof(cfg_value));
   }
   for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
     if(fuzzed_data.ConsumeBool()) {
@@ -173,6 +195,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       sprintf(cfg_value, "%d", value);
       sprintf(cfg_proto, "%d", i);
       ndpi_set_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value);
+      ndpi_get_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value, sizeof(cfg_value));
     }
   }
   if(fuzzed_data.ConsumeBool()) {
@@ -229,6 +252,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "flow_risk.crawler_bot.list.load", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    ndpi_set_config(ndpi_info_mod, NULL, "filename.config", fuzzed_data.ConsumeBool() ? NULL : (char *)"config.txt");
+    ndpi_get_config(ndpi_info_mod, NULL, "filename.config", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 3 + 1);
@@ -323,9 +350,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
       sprintf(cfg_param, "lru.%s.size", name);
       ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
+      ndpi_get_config(ndpi_info_mod, NULL, cfg_param, cfg_value, sizeof(cfg_value));
       value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 + 1);
       sprintf(cfg_param, "lru.%s.ttl", name);
       ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
+      ndpi_get_config(ndpi_info_mod, NULL, cfg_param, cfg_value, sizeof(cfg_value));
     }
   }
   /* Invalid parameter */
@@ -333,12 +362,18 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "foo", cfg_value);
+    ndpi_get_config(ndpi_info_mod, NULL, "foo", cfg_value, sizeof(cfg_value));
   }
   /* Invalid value */
   if(fuzzed_data.ConsumeBool()) {
     sprintf(cfg_value, "%s", "jjj");
     ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.ttl", cfg_value);
+    ndpi_get_config(ndpi_info_mod, NULL, "lru.stun_zoom.ttl", cfg_value, sizeof(cfg_value));
   }
+
+  ndpi_add_host_risk_mask(ndpi_info_mod,
+                          (char *)fuzzed_data.ConsumeBytesAsString(32).c_str(),
+                          static_cast<ndpi_risk>(fuzzed_data.ConsumeIntegral<u_int64_t>()));
 
   ndpi_finalize_initialization(ndpi_info_mod);
 
@@ -355,8 +390,26 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_is_subprotocol_informative(ndpi_info_mod, pid);
   ndpi_get_proto_breed(ndpi_info_mod, pid);
 
+  ndpi_port_range d_port[MAX_DEFAULT_PORTS] = {};
+  ndpi_set_proto_defaults(ndpi_info_mod, 0, 0, NDPI_PROTOCOL_SAFE, pid,
+                          protoname, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
+			  d_port, d_port);
+
   ndpi_get_proto_by_name(ndpi_info_mod, NULL); /* Error */
   ndpi_get_proto_by_name(ndpi_info_mod, "foo"); /* Invalid protocol */
+  ndpi_get_proto_name(ndpi_info_mod, pid);
+  ndpi_get_protocol_id(ndpi_info_mod, protoname);
+
+  struct in_addr pin;
+  struct in6_addr pin6;
+  pin.s_addr = fuzzed_data.ConsumeIntegral<u_int32_t>();
+  ndpi_network_port_ptree_match(ndpi_info_mod, &pin, fuzzed_data.ConsumeIntegral<u_int16_t>());
+  for(i = 0; i < 16; i++)
+    pin6.s6_addr[i] = fuzzed_data.ConsumeIntegral<u_int8_t>();
+  ndpi_network_port_ptree6_match(ndpi_info_mod, &pin6, fuzzed_data.ConsumeIntegral<u_int16_t>());
+
+  ndpi_get_host_domain_suffix(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "www.bbc.co.uk");
+  ndpi_get_host_domain(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "www.bbc.co.uk");
 
   /* Custom category configuration */
   cat = fuzzed_data.ConsumeIntegralInRange(static_cast<int>(NDPI_PROTOCOL_CATEGORY_CUSTOM_1),
@@ -376,10 +429,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   ndpi_self_check_host_match(stdout);
 
-  ndpi_dump_protocols(ndpi_info_mod, stdout);
-  ndpi_generate_options(fuzzed_data.ConsumeIntegralInRange(0, 4), stdout);
-  ndpi_dump_risks_score(stdout);
-  ndpi_dump_config(ndpi_info_mod, stdout);
+  ndpi_dump_protocols(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : stdout);
+  ndpi_generate_options(fuzzed_data.ConsumeIntegralInRange(0, 4), fuzzed_data.ConsumeBool() ? NULL : stdout);
+  ndpi_dump_risks_score(fuzzed_data.ConsumeBool() ? NULL : stdout);
+  ndpi_dump_config(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : stdout);
 
   /* Basic code to try testing this "config" */
   bool_value = fuzzed_data.ConsumeBool();
@@ -387,6 +440,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   input_info.seen_flow_beginning = !!fuzzed_data.ConsumeBool();
   memset(&flow, 0, sizeof(flow));
   std::vector<uint8_t>pkt = fuzzed_data.ConsumeRemainingBytes<uint8_t>();
+
+  const u_int8_t *l4_return;
+  u_int16_t l4_len_return;
+  u_int8_t l4_protocol_return;
+  ndpi_detection_get_l4(pkt.data(), pkt.size(), &l4_return, &l4_len_return, &l4_protocol_return, NDPI_DETECTION_ONLY_IPV6);
+  ndpi_detection_get_l4(pkt.data(), pkt.size(), &l4_return, &l4_len_return, &l4_protocol_return, NDPI_DETECTION_ONLY_IPV4);
 
   ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, &input_info);
   p = ndpi_detection_giveup(ndpi_info_mod, &flow, &protocol_was_guessed);
@@ -406,7 +465,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_http_method(ndpi_info_mod, bool_value ? &flow : NULL);
   ndpi_get_http_url(ndpi_info_mod, &flow);
   ndpi_get_http_content_type(ndpi_info_mod, &flow);
-  check_for_email_address(ndpi_info_mod, 0);
   ndpi_get_flow_name(bool_value ? &flow : NULL);
   /* ndpi_guess_undetected_protocol() is a "strange" function. Try fuzzing it, here */
   if(!ndpi_is_protocol_detected(ndpi_info_mod, p)) {
@@ -423,7 +481,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
                                         flow.c_address.v4, flow.c_port,
                                         flow.s_address.v4, flow.s_port);
     } else {
-      ndpi_find_ipv6_category_userdata(ndpi_info_mod, (struct in6_addr *)flow.c_address.v6);
+      ndpi_find_ipv6_category_userdata(ndpi_info_mod, bool_value ? NULL : (struct in6_addr *)flow.c_address.v6);
     }
     /* Another "strange" function: fuzz it here, for lack of a better alternative */
     ndpi_search_tcp_or_udp(ndpi_info_mod, &flow);

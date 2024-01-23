@@ -82,6 +82,8 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
 
 const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndpi_str,
 					const char *hostname) {
+  if(!ndpi_str)
+    return NULL;
   if(ndpi_str->public_domain_suffixes == NULL)
     return(hostname);
   else {
@@ -96,6 +98,8 @@ const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndp
 
 const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
 				 const char *hostname) {
+  if(!ndpi_str)
+    return NULL;
   if(ndpi_str->public_domain_suffixes == NULL)
     return(hostname);
   else {

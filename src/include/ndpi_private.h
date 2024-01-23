@@ -265,7 +265,6 @@ struct ndpi_detection_module_struct {
   u_int ndpi_num_supported_protocols;
   u_int ndpi_num_custom_protocols;
 
-  int ac_automa_finalized;
   /* HTTP/DNS/HTTPS/QUIC host matching */
   ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
     risky_domain_automa, tls_cert_subject_automa,
@@ -414,9 +413,6 @@ u_int8_t ips_match(u_int32_t src, u_int32_t dst,
 u_int8_t ends_with(struct ndpi_detection_module_struct *ndpi_struct,
                    char *str, char *ends);
 
-u_int16_t check_for_email_address(struct ndpi_detection_module_struct *ndpi_struct,
-                                  u_int16_t counter);
-
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
 				 u_int8_t protocol,
@@ -434,7 +430,8 @@ int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, F
 int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 int load_risk_domain_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 int load_config_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
-
+int load_category_file_fd(struct ndpi_detection_module_struct *ndpi_str,
+			  FILE *fd, ndpi_protocol_category_t category_id);
 
 /* TLS */
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
