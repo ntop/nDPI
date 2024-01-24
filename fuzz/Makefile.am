@@ -8,7 +8,7 @@ bin_PROGRAMS += fuzz_libinjection fuzz_binaryfusefilter
 #Internal crypto
 bin_PROGRAMS += fuzz_gcrypt_light fuzz_gcrypt_aes fuzz_gcrypt_gcm fuzz_gcrypt_cipher
 #Configuration files
-bin_PROGRAMS += fuzz_filecfg_protocols fuzz_filecfg_categories fuzz_filecfg_malicious_sha1 fuzz_filecfg_malicious_ja3 fuzz_filecfg_risk_domains fuzz_filecfg_config
+bin_PROGRAMS += fuzz_filecfg_protocols fuzz_filecfg_categories fuzz_filecfg_malicious_sha1 fuzz_filecfg_malicious_ja3 fuzz_filecfg_risk_domains fuzz_filecfg_config fuzz_filecfg_category
 #Reader utils
 bin_PROGRAMS += fuzz_readerutils_workflow fuzz_readerutils_parseprotolist
 
@@ -576,6 +576,19 @@ fuzz_filecfg_config_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_filecfg_config_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_filecfg_category_SOURCES = fuzz_filecfg_category.c fuzz_common_code.c
+fuzz_filecfg_category_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_filecfg_category_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_filecfg_category_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_filecfg_category_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_filecfg_category_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_filecfg_category_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_filecfg_category_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
 fuzz_readerutils_workflow_SOURCES = fuzz_readerutils_workflow.cpp fuzz_common_code.c ../example/reader_util.c
 fuzz_readerutils_workflow_CXXFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS)
 fuzz_readerutils_workflow_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
@@ -639,10 +652,6 @@ fuzz_is_stun_udp_seed_corpus.zip: $(files_corpus_fuzz_is_stun_udp)
 files_corpus_fuzz_is_stun_tcp :=  $(wildcard corpus/fuzz_is_stun_tcp/*)
 fuzz_is_stun_tcp_seed_corpus.zip: $(files_corpus_fuzz_is_stun_tcp)
 	zip -j fuzz_is_stun_tcp_seed_corpus.zip $(files_corpus_fuzz_is_stun_tcp)
-
-files_corpus_fuzz_ds_patricia :=  $(wildcard corpus/fuzz_ds_patricia/*)
-fuzz_ds_patricia_seed_corpus.zip: $(files_corpus_fuzz_ds_patricia)
-	zip -j fuzz_ds_patricia_seed_corpus.zip $(files_corpus_fuzz_ds_patricia)
 
 files_corpus_fuzz_alg_ses_des :=  $(wildcard corpus/fuzz_alg_ses_des/*)
 fuzz_alg_ses_des_seed_corpus.zip: $(files_corpus_fuzz_alg_ses_des)
@@ -712,6 +721,10 @@ files_corpus_fuzz_filecfg_config :=  $(wildcard corpus/fuzz_filecfg_config/*)
 fuzz_filecfg_config_seed_corpus.zip: $(files_corpus_fuzz_filecfg_config)
 	zip -j fuzz_filecfg_config_seed_corpus.zip $(files_corpus_fuzz_filecfg_config)
 
+files_corpus_fuzz_filecfg_category :=  $(wildcard corpus/fuzz_filecfg_category/*)
+fuzz_filecfg_category_seed_corpus.zip: $(files_corpus_fuzz_filecfg_category)
+	zip -j fuzz_filecfg_category_seed_corpus.zip $(files_corpus_fuzz_filecfg_category)
+
 files_corpus_fuzz_readerutils_workflow :=  $(wildcard corpus/fuzz_readerutils_workflow/*)
 fuzz_readerutils_workflow_seed_corpus.zip: $(files_corpus_fuzz_readerutils_workflow)
 	zip -j fuzz_readerutils_workflow_seed_corpus.zip $(files_corpus_fuzz_readerutils_workflow)
@@ -728,7 +741,7 @@ files_corpus_fuzz_ds_domain_classify :=  $(wildcard corpus/fuzz_ds_domain_classi
 fuzz_ds_domain_classify_seed_corpus.zip: $(files_corpus_fuzz_ds_domain_classify)
 	zip -j fuzz_ds_domain_classify_seed_corpus.zip $(files_corpus_fuzz_ds_domain_classify)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_ds_patricia_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_filecfg_config_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_malicious_ja3_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_ds_tree_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip fuzz_filecfg_config_seed_corpus.zip fuzz_filecfg_category_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_malicious_ja3_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip
 	cp corpus/fuzz_*seed_corpus.zip .
 
 #Create dictionaries exactly as expected by oss-fuzz.
@@ -762,6 +775,7 @@ distdir:
 		-o -path './corpus/fuzz_filecfg_malicious_ja3/*' \
 		-o -path './corpus/fuzz_filecfg_risk_domains/*' \
 		-o -path './corpus/fuzz_filecfg_config/*' \
+		-o -path './corpus/fuzz_filecfg_category/*' \
 		-o -path './corpus/fuzz_readerutils_workflow/*' \
 		-o -path './corpus/fuzz_readerutils_parseprotolist/*' \
 		-o -path './corpus/fuzz_is_stun_udp/*' \
@@ -780,7 +794,6 @@ distdir:
 		-o -path './corpus/fuzz_ds_tree/*' \
 		-o -path './corpus/fuzz_ds_bitmap64/*' \
 		-o -path './corpus/fuzz_ds_domain_classify/*' \
-		-o -path './corpus/fuzz_ds_ptree/*' \
-		-o -path './corpus/fuzz_ds_patricia/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
+		-o -path './corpus/fuzz_ds_ptree/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 
 all: corpus dictionaries

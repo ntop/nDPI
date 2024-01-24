@@ -44,6 +44,7 @@ void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_
     ndpi_set_config(*ndpi_info_mod, NULL, "log.level", "3");
     ndpi_set_config(*ndpi_info_mod, "all", "log", "enable");
 
+    ndpi_load_domain_suffixes(*ndpi_info_mod, "public_suffix_list.dat");
     ndpi_load_categories_dir(*ndpi_info_mod, "./lists/");
     ndpi_load_protocols_file(*ndpi_info_mod, "protos.txt");
     ndpi_load_categories_file(*ndpi_info_mod, "categories.txt", NULL);
