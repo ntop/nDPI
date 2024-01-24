@@ -23,6 +23,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int16_t protocol_id;
   ndpi_protocol_category_t category;
   ndpi_protocol_breed_t breed;
+  u_int32_t unused;
 
   /* TODO: real string instead of random bytes */
 
@@ -120,7 +121,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     ndpi_free(value_dup);
 
-    ndpi_match_string(a2, (char *)value.c_str());
+    ndpi_match_string(a2, fuzzed_data.ConsumeBool() ? NULL : (char *)value.c_str());
+    ndpi_match_string_value(a2, fuzzed_data.ConsumeBool() ? NULL : (char *)value.c_str(),
+                            strlen(value.c_str()), &unused);
     ndpi_match_string_protocol_id(a2, (char *)value.c_str(), strlen(value.c_str()),
                                   &protocol_id, &category, &breed);
   }
@@ -133,6 +136,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ac_automata_search(a, &ac_input_text, &match);
 
     ndpi_match_string(a2, value_added);
+    ndpi_match_string_value(a2, value_added, strlen(value_added), &unused);
     ndpi_match_string_protocol_id(a2, value_added, strlen(value_added),
                                   &protocol_id, &category, &breed);
 

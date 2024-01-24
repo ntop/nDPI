@@ -62,6 +62,7 @@ ipv6:[247f:855b:5e16:3caf::]/64:100@CustomProtocolE=2048
 ipv6:[247f:855b:5e16:3caf::]/64@CustomProtocolF=2049
 ipv6:[fe80::76ac:b9ff:fe6c:c124]:12717@CustomProtocolG=2050
 ipv6:[fe80::76ac:b9ff:fe6c:c124]:12718@CustomProtocolH=65535
+ipv6:[fe80::76ac:b9ff:fe6c:c124]:12719@CustomProtocolI=65534
 
 #
 # You can use symbolic IP addreses if you want
