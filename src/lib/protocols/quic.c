@@ -980,6 +980,7 @@ static int quic_derive_initial_secrets(struct ndpi_detection_module_struct *ndpi
 
 
 static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi_struct,
+				       const uint8_t *orig_dest_conn_id, uint8_t orig_dest_conn_id_len,
 				       const uint8_t *dest_conn_id, uint8_t dest_conn_id_len,
 				       uint8_t source_conn_id_len, uint32_t version,
 				       uint32_t *clear_payload_len)
@@ -993,7 +994,7 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   uint8_t client_secret[HASH_SHA2_256_LENGTH];
 
   memset(&ciphers, '\0', sizeof(ciphers));
-  if(quic_derive_initial_secrets(ndpi_struct, version, dest_conn_id, dest_conn_id_len,
+  if(quic_derive_initial_secrets(ndpi_struct, version, orig_dest_conn_id, orig_dest_conn_id_len,
 				 client_secret) != 0) {
     NDPI_LOG_DBG(ndpi_struct, "Error quic_derive_initial_secrets\n");
     return NULL;
@@ -1320,6 +1321,7 @@ const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_struct,
+				  struct ndpi_flow_struct *flow,
 				  uint32_t version, uint32_t *clear_payload_len)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
@@ -1355,7 +1357,19 @@ static uint8_t *get_clear_payload(struct ndpi_detection_module_struct *ndpi_stru
 
     source_conn_id_len = packet->payload[6 + dest_conn_id_len];
     const u_int8_t *dest_conn_id = &packet->payload[6];
+
+    /* For initializing the ciphers we need the DCID of the very first Initial
+       sent by the client. This is quite important when CH is fragmented into multiple
+       packets and these packets have different DCID */
+    if(flow->l4.udp.quic_orig_dest_conn_id_len == 0) {
+      memcpy(flow->l4.udp.quic_orig_dest_conn_id,
+             dest_conn_id, dest_conn_id_len);
+      flow->l4.udp.quic_orig_dest_conn_id_len = dest_conn_id_len;
+    }
+
     clear_payload = decrypt_initial_packet(ndpi_struct,
+					   flow->l4.udp.quic_orig_dest_conn_id,
+					   flow->l4.udp.quic_orig_dest_conn_id_len,
 					   dest_conn_id, dest_conn_id_len,
 					   source_conn_id_len, version,
 					   clear_payload_len);
@@ -1943,7 +1957,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
   /*
    * 4) Extract the Payload from Initial Packets
    */
-  clear_payload = get_clear_payload(ndpi_struct, version, &clear_payload_len);
+  clear_payload = get_clear_payload(ndpi_struct, flow, version, &clear_payload_len);
   if(!clear_payload) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
