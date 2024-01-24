@@ -1,0 +1,29 @@
+DPI Packets (TCP):	12	(6.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 284 (142.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Radmin	17	1074	2
+
+Acceptable                      17 1074          2            
+
+	1	TCP 192.168.88.208:49736 <-> 192.168.88.197:4899 [proto: 391/Radmin][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: RemoteAccess/12][6 pkts/346 bytes <-> 5 pkts/346 bytes][Goodput ratio: 3/13][0.77 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/51 153/228 457/405 193/177][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 58/69 66/100 5/16][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found Radmin][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.88.208:49739 <-> 192.168.88.197:4899 [proto: 391/Radmin][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: RemoteAccess/12][3 pkts/188 bytes <-> 3 pkts/194 bytes][Goodput ratio: 7/7][0.40 sec][bytes ratio: -0.016 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/51 0/201 0/351 0/150][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 63/65 68/68 6/3][Risk: ** Desktop/File Sharing **][Risk Score: 10][Risk Info: Found Radmin][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
