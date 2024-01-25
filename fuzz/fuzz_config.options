@@ -1,2 +1,4 @@
 [libfuzzer]
 close_fd_mask=1
+max_len=8192
+len_control=0
