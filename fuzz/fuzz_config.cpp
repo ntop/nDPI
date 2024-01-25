@@ -34,11 +34,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char cfg_param[32];
   u_int64_t cat_userdata = 0;
 
-
-  /* Just to be sure to have some data */
-  if(fuzzed_data.remaining_bytes() < NDPI_MAX_SUPPORTED_PROTOCOLS * 2 + 200)
-    return -1;
-
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
@@ -85,6 +80,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_load_malicious_sha1_file(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "invalid_filename"); /* Error */
   if(fuzzed_data.ConsumeBool())
     ndpi_load_domain_suffixes(ndpi_info_mod, (char *)"public_suffix_list.dat");
+  if(fuzzed_data.ConsumeBool())
+    ndpi_load_domain_suffixes(ndpi_info_mod, (char *)"public_suffix_list.dat"); /* To trigger reload */
   if(fuzzed_data.ConsumeBool())
     ndpi_load_domain_suffixes(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : (char *)"invalid_filename"); /* Error */
   /* Note that this function is not used by ndpiReader */
