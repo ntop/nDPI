@@ -137,6 +137,7 @@
     <ClCompile Include="..\src\lib\protocols\mumble.c" />
     <ClCompile Include="..\src\lib\protocols\zoom.c" />
     <ClCompile Include="..\src\lib\protocols\stomp.c" />
+    <ClCompile Include="..\src\lib\protocols\radmin.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />

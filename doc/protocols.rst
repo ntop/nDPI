@@ -549,3 +549,12 @@ Notes:
 STOMP is a simple interoperable protocol designed for asynchronous message passing between clients via mediating servers. Supported in ActiveMQ and RabbitMQ.
 
 References: `Protocol Specs: <https://stomp.github.io/stomp-specification-1.2.html>`_
+
+
+.. _Proto 391:
+
+`NDPI_PROTOCOL_RADMIN`
+=========================
+Radmin is remote access software for the Microsoft Windows platform.
+
+References: `Main site <https://www.radmin.com/>`_

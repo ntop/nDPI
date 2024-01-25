@@ -869,6 +869,9 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_NEST_LOG_SINK */
   u_int8_t nest_log_sink_matches;
+
+  /* NDPI_PROTOCOL_RADMIN */
+  u_int32_t radmin_stage:1;
 };
 
 /* ************************************************** */
