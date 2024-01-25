@@ -420,6 +420,7 @@ typedef enum {
   NDPI_PROTOCOL_ELECTRONICARTS        = 389,
   NDPI_PROTOCOL_STOMP                 = 390,
   NDPI_PROTOCOL_RADMIN                = 391,
+  NDPI_PROTOCOL_RAFT                  = 392,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

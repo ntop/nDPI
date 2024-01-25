@@ -1,0 +1,29 @@
+DPI Packets (TCP):	12	(6.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 340 (170.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Raft	64	5504	2
+
+Acceptable                      64 5504          2            
+
+	1	TCP 127.0.0.1:46286 <-> 127.0.0.1:9002 [proto: 392/Raft][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Network/14][17 pkts/2234 bytes <-> 15 pkts/822 bytes][Goodput ratio: 58/0][1.13 sec][bytes ratio: 0.462 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/4 74/81 125/125 58/57][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 131/55 214/66 38/3][PLAIN TEXT (127.0.0.1)][Plen Bins: 0,20,61,6,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 127.0.0.1:38488 <-> 127.0.0.1:9001 [proto: 392/Raft][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Network/14][17 pkts/1626 bytes <-> 15 pkts/822 bytes][Goodput ratio: 43/0][1.13 sec][bytes ratio: 0.328 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/6 74/82 137/137 58/57][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 96/55 102/66 14/3][PLAIN TEXT (127.0.0.1)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

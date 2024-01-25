@@ -558,3 +558,12 @@ References: `Protocol Specs: <https://stomp.github.io/stomp-specification-1.2.ht
 Radmin is remote access software for the Microsoft Windows platform.
 
 References: `Main site <https://www.radmin.com/>`_
+
+
+.. _Proto 392:
+
+`NDPI_PROTOCOL_RAFT`
+====================
+Raft is a consensus algorithm and protocol for managing a replicated log.
+
+References: `C implementation <https://github.com/canonical/raft>`_ and `Paper <https://raft.github.io/raft.pdf>`_

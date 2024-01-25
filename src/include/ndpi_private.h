@@ -723,6 +723,7 @@ void init_zoom_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 void init_yojimbo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_stomp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_radmin_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_raft_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 
