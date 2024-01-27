@@ -32,6 +32,8 @@
 #define DEBUG_CONTAINS
 #endif
 
+/* ********************************************************** */
+
 ndpi_domain_classify* ndpi_domain_classify_alloc() {
   int i;
   ndpi_domain_classify *cat = (ndpi_domain_classify*)ndpi_malloc(sizeof(ndpi_domain_classify));
@@ -41,7 +43,7 @@ ndpi_domain_classify* ndpi_domain_classify_alloc() {
 
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++)
     cat->classes[i].class_id = 0, cat->classes[i].domains = NULL;
-    
+
   return((ndpi_domain_classify*)cat);
 }
 
@@ -88,6 +90,7 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
 			      const char *domain) {
   u_int32_t i;
   char *dot;
+  u_int64_t hash;
 
   if((!s) || (!domain))
     return(false);
@@ -97,18 +100,18 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
 
   dot = strrchr(domain, '.');
 
-  if(dot) {  
+  if(dot) {
     if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))
       return(false);
   }
-  
+
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->classes[i].class_id == class_id) {
-      break;      
+      break;
     } else if(s->classes[i].class_id == 0) {
       s->classes[i].class_id = class_id;
       s->classes[i].domains  = ndpi_bitmap64_alloc();
-      
+
       if(!s->classes[i].domains)
         s->classes[i].class_id = 0;
 
@@ -119,8 +122,14 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
   if(i == MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS)
     return(false);
 
-  return(ndpi_bitmap64_set(s->classes[i].domains,
-			   ndpi_quick_hash64(domain, strlen(domain))));
+  hash = ndpi_quick_hash64(domain, strlen(domain));
+
+#ifdef DEBUG_ADD
+  if(strcmp(domain, "execute-api.eu-north-1.amazonaws.com") == 0)
+    printf("[add] %s = %d [%llu]\n", domain, s->classes[i].class_id, hash);
+#endif
+
+  return(ndpi_bitmap64_set(s->classes[i].domains, hash));
 }
 
 /* ********************************************************** */
@@ -138,7 +147,7 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
 
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->classes[i].class_id == class_id) {
-      break;      
+      break;
     } else if(s->classes[i].class_id == 0) {
       s->classes[i].class_id = class_id;
       s->classes[i].domains  = ndpi_bitmap64_alloc();
@@ -160,7 +169,7 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
   while((line = fgets(buf, sizeof(buf), fd)) != NULL) {
     u_int len;
     u_int64_t hash;
-    
+
     if((line[0] == '#') ||  (line[0] == '\0'))
       continue;
     else {
@@ -174,7 +183,7 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
 
     hash = ndpi_quick_hash64(line, strlen(line));
 
-    if(ndpi_bitmap64_set(s->classes[i].domains, hash))			 
+    if(ndpi_bitmap64_set(s->classes[i].domains, hash))
       num_added++;
   }
 
@@ -223,7 +232,7 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
   const char *dot, *elem, *prev_elem;
 
   *class_id = 0; /* Unknown class_id */
-  
+
   if(!hostname || !s)                                       return(hostname);
   if((len = strlen(hostname)) == 0)                         return(hostname);
   if((dot = strrchr(hostname, '.')) == NULL)                return(hostname);
@@ -247,15 +256,16 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
   }
 
   elem = prev_elem = hostname;
-  
+
   while(elem != NULL) {
     u_int64_t hash = ndpi_quick_hash64(elem, strlen(elem));
-    
+
     for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
       if(s->classes[i].class_id != 0) {
 	if(ndpi_bitmap64_isset(s->classes[i].domains, hash)) {
 #ifdef DEBUG_CONTAINS
-	  printf("[contains] %s = %d\n", hostname, s->classes[i].class_id);
+	  printf("[contains] %s = %d [%llu]\n",
+		 hostname, s->classes[i].class_id, hash);
 #endif
 	  *class_id = s->classes[i].class_id;
 	  return(return_subprefix ? prev_elem : elem);
@@ -270,7 +280,7 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
     if(elem == NULL)   break;
     // if(elem == dot)    break;
 
-    elem = &elem[1];    
+    elem = &elem[1];
   } /* while */
 
   /* Not found */
@@ -286,4 +296,3 @@ bool ndpi_domain_classify_contains(ndpi_domain_classify *s,
 
   return((*class_id == 0) ? false : true);
 }
-

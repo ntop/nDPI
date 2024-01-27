@@ -595,7 +595,8 @@ static void help(u_int long_help) {
          "                            | 0 - List known protocols\n"
          "                            | 1 - List known categories\n"
          "                            | 2 - List known risks\n"
-         "  -d                        | Disable protocol guess (by ip and by port) and use only DPI. It is a shortcut to --cfg=dpi.guess_on_giveup,0\n"
+         "  -d                        | Disable protocol guess (by ip and by port) and use only DPI.\n"
+	 "                            | It is a shortcut to --cfg=dpi.guess_on_giveup,0\n"
          "  -e <len>                  | Min human readeable string match len. Default %u\n"
          "  -q                        | Quiet mode\n"
          "  -F                        | Enable flow stats\n"
@@ -636,8 +637,9 @@ static void help(u_int long_help) {
          "  -x <domain>               | Check domain name [Test only]\n"
          "  -I                        | Ignore VLAN id for flow hash calculation\n"
          "  -A                        | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
-         "  -M                        | Memory allocation stats on data-path (only by the library). It works only on single-thread configuration\n"
-         "  --cfg=proto,param,value          | Configure the specific attribute of this protocol\n"
+         "  -M                        | Memory allocation stats on data-path (only by the library).\n"
+	 "                            | It works only on single-thread configuration\n"
+         "  --cfg=proto,param,value   | Configure the specific attribute of this protocol\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -5703,7 +5705,7 @@ void domainsUnitTest() {
     ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
 
     assert(ndpi_load_domain_suffixes(ndpi_info_mod, "../lists/public_suffix_list.dat") == 0);
-
+    
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.chosei.chiba.jp"), "chosei.chiba.jp") == 0);
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.unipi.it"), "it") == 0);
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "mail.apple.com"), "com") == 0);
@@ -5713,6 +5715,7 @@ void domainsUnitTest() {
     assert(strcmp(ndpi_get_host_domain(ndpi_info_mod, "www.unipi.it"), "unipi.it") == 0);
     assert(strcmp(ndpi_get_host_domain(ndpi_info_mod, "mail.apple.com"), "apple.com") == 0);
     assert(strcmp(ndpi_get_host_domain(ndpi_info_mod, "www.bbc.co.uk"), "bbc.co.uk") == 0);
+    assert(strcmp(ndpi_get_host_domain(ndpi_info_mod, "zy1ssnfwwl.execute-api.eu-north-1.amazonaws.com"), "amazonaws.com") == 0);
   }
 
   ndpi_exit_detection_module(ndpi_info_mod);

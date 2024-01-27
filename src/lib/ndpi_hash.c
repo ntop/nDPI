@@ -56,7 +56,7 @@ u_int64_t ndpi_quick_hash64(const char *str, u_int str_len) {
   for(i=0; i<str_len; i++)
     h = (h * 177) + str[i];
 
-  h ^= strlen(str);
+  h ^= str_len;
   
   return h;
 }

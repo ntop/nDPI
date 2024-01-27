@@ -47,6 +47,10 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
 
   while((line = fgets(buf, sizeof(buf), fd)) != NULL) {
     u_int offset, len;
+
+    /* Skip private domains */
+    if(strstr(line, "// ===END ICANN DOMAINS==="))
+      break;
     
     /* Skip empty lines or comments */
     if((line[0] == '\0') || (line[0] == '/') || (line[0] == '\n') || (line[0] == '\r'))
