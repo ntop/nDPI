@@ -76,7 +76,9 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
     NDPI_LOG_ERR(ndpi_str, "Error while finalizing domain processing\n");
   }
 
-  NDPI_LOG_DBG(ndpi_str, "Loaded %u domains\n", num_domains);
+  if(num_domains > 0) {
+    NDPI_LOG_DBG(ndpi_str, "Loaded %u domains\n", num_domains);
+  }
   
   return(0);
 }
