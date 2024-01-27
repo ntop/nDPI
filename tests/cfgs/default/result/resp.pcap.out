@@ -1,6 +1,6 @@
-DPI Packets (TCP):	11	(11.00 pkts/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 217 (217.00 diss/flow)
+Num dissector calls: 1 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -14,15 +14,15 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-IMAP	33	3774	1
+RESP	39	92898	1
 
-Unsafe                          33 3774          1            
+Acceptable                      39 92898         1            
 
-	1	TCP 10.40.4.2:46045 <-> 10.40.3.2:143 [proto: 4/IMAP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 11][cat: Email/3][20 pkts/1507 bytes <-> 13 pkts/2267 bytes][Goodput ratio: 12/62][4.57 sec][User: samir][Pwd: pfres][bytes ratio: -0.201 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 9/17 39/39 15/16][Pkt Len c2s/s2c min/avg/max/stddev: 66/74 75/174 139/762 17/181][Risk: ** Unsafe Protocol **** Clear-Text Credentials **][Risk Score: 110][Risk Info: Found IMAP username (samir)][PLAIN TEXT ( OK IMAP4)][Plen Bins: 51,22,11,5,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.88.221:51882 <-> 192.168.88.231:6379 [proto: 182/RESP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Database/11][22 pkts/1556 bytes <-> 17 pkts/91342 bytes][Goodput ratio: 6/99][28.51 sec][bytes ratio: -0.967 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1413/1863 15066/15069 3554/4207][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 71/5373 108/20338 10/5879][PLAIN TEXT (COMMAND)][Plen Bins: 35,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,59]

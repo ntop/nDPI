@@ -565,7 +565,7 @@ void init_quake_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
 void init_quic_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_radius_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_rdp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_redis_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_resp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_rsync_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_rtcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_rtmp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
