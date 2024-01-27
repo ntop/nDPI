@@ -10061,6 +10061,10 @@ static int ndpi_is_vowel(char c) {
 int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			struct ndpi_flow_struct *flow,
 			char *name, u_int8_t is_hostname, u_int8_t check_subproto) {
+
+  /* Get domain name if ndpi_load_domain_suffixes(..) has been called */
+  name = (char*)ndpi_get_host_domain(ndpi_str, name);
+  
   if(ndpi_dga_function != NULL) {
     /* A custom DGA function is defined */
     int rc = ndpi_dga_function(name, is_hostname);
