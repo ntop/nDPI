@@ -1,7 +1,13 @@
 /*
- * redis.c
+ * resp.c
  *
- * Copyright (C) 2011-22 - ntop.org
+ * Redis Serialization Protocol
+ * 
+ * Copyright (C) 2024 - ntop.org
+ * Copyright (C) 2024 - V.G <jacendi@protonmail.com>
+ *
+ * This file is part of nDPI, an open source deep packet inspection
+ * library based on the OpenDPI and PACE technology by ipoque GmbH
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,75 +26,56 @@
 
 #include "ndpi_protocol_ids.h"
 
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_REDIS
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_RESP
 
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
+static void ndpi_search_resp(struct ndpi_detection_module_struct *ndpi_struct,
+                             struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
-static void ndpi_int_redis_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_REDIS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-}
-
-
-static void ndpi_check_redis(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  NDPI_LOG_DBG(ndpi_struct, "search RESP\n");
   
-  /* Break after 10 packets. */
-  if(flow->packet_counter > 10) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
+  if (packet->payload_packet_len < 10)
+    goto exclude;
+
+  switch(packet->payload[0])
+  {
+    case '*':
+    case '$':
+    case '~':
+      break;
+    default:
+      goto exclude;
   }
 
-  if(packet->packet_direction == 0)
-    flow->redis_s2d_first_char = packet->payload[0];
-  else
-    flow->redis_d2s_first_char = packet->payload[0];
+  u_int8_t offset = 1;
+  while (offset < 4 && packet->payload[offset] != '\r')
+  {
+    if (!ndpi_isdigit(packet->payload[offset]))
+      goto exclude;
+    offset++;
+  }
 
-  if((flow->redis_s2d_first_char != '\0') && (flow->redis_d2s_first_char != '\0')) {
-    /*
-     *1
-     $4
-     PING
-     +PONG
-     *3
-     $3
-     SET
-     $19
-     dns.cache.127.0.0.1
-     $9
-     localhost
-     +OK
-    */
+  if (memcmp(&packet->payload[offset], "\r\n", 2) == 0) {
+    NDPI_LOG_INFO(ndpi_struct, "found RESP\n");
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RESP,
+                               NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  }
 
-    if(((flow->redis_s2d_first_char == '*') 
-	&& ((flow->redis_d2s_first_char == '+') || (flow->redis_d2s_first_char == ':')))
-       || ((flow->redis_d2s_first_char == '*') 
-	   && ((flow->redis_s2d_first_char == '+') || (flow->redis_s2d_first_char == ':')))) {
-      NDPI_LOG_INFO(ndpi_struct, "Found Redis\n");
-      ndpi_int_redis_add_connection(ndpi_struct, flow);
-    } else {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    }
-  } else
-    return; /* Too early */
+exclude:
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-static void ndpi_search_redis(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  NDPI_LOG_DBG(ndpi_struct, "search Redis\n");
-
-  ndpi_check_redis(ndpi_struct, flow);
-}
-
-
-void init_redis_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_resp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("Redis", ndpi_struct, *id,
-				      NDPI_PROTOCOL_REDIS,
-				      ndpi_search_redis,
+  ndpi_set_bitmask_protocol_detection("RESP", ndpi_struct, *id,
+				      NDPI_PROTOCOL_RESP,
+				      ndpi_search_resp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
   *id += 1;
 }

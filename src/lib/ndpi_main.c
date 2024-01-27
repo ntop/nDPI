@@ -1682,8 +1682,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Megaco", NDPI_PROTOCOL_CATEGORY_VOIP,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),     /* TCP */
 			  ndpi_build_default_ports(ports_b, 2944, 0, 0, 0, 0)); /* UDP */
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_REDIS,
-			  "Redis", NDPI_PROTOCOL_CATEGORY_DATABASE,
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RESP,
+			  "RESP", NDPI_PROTOCOL_CATEGORY_DATABASE,
 			  ndpi_build_default_ports(ports_a, 6379, 0, 0, 0, 0), /* TCP */
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0));   /* UDP */
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZMQ,
@@ -5511,8 +5511,8 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* MEGACO */
   init_megaco_dissector(ndpi_str, &a);
 
-  /* REDIS */
-  init_redis_dissector(ndpi_str, &a);
+  /* RESP */
+  init_resp_dissector(ndpi_str, &a);
 
   /* VHUA */
   init_vhua_dissector(ndpi_str, &a);
