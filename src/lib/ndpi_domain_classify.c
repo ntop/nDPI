@@ -89,7 +89,6 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
 			      u_int8_t class_id,
 			      const char *domain) {
   u_int32_t i;
-  char *dot;
   u_int64_t hash;
 
   if((!s) || (!domain))
@@ -98,13 +97,15 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
   /* Skip initial string . in domain names */
   while(domain[0] == '.') domain++;
 
-  dot = strrchr(domain, '.');
+#if 0
+  char *dot = strrchr(domain, '.');
 
   if(dot) {
     if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))
       return(false);
   }
-
+#endif
+  
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->classes[i].class_id == class_id) {
       break;
@@ -123,11 +124,6 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
     return(false);
 
   hash = ndpi_quick_hash64(domain, strlen(domain));
-
-#ifdef DEBUG_ADD
-  if(strcmp(domain, "execute-api.eu-north-1.amazonaws.com") == 0)
-    printf("[add] %s = %d [%llu]\n", domain, s->classes[i].class_id, hash);
-#endif
 
   return(ndpi_bitmap64_set(s->classes[i].domains, hash));
 }
