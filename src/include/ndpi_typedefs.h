@@ -1413,9 +1413,6 @@ struct ndpi_flow_struct {
 
   ndpi_protocol_category_t category;
 
-  /* NDPI_PROTOCOL_REDIS */
-  u_int8_t redis_s2d_first_char, redis_d2s_first_char;
-
   /* Only packets with L5 data (ie no TCP SYN, pure ACKs, ...) */
   u_int16_t packet_counter;		      // can be 0 - 65000
   u_int16_t packet_direction_counter[2];
