@@ -41,10 +41,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   set_ndpi_debug_function(ndpi_info_mod, NULL);
 
-  NDPI_BITMASK_RESET(enabled_bitmask);
-  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS ; i++) {
-    if(fuzzed_data.ConsumeBool())
-      NDPI_BITMASK_ADD(enabled_bitmask, i);
+  NDPI_BITMASK_SET_ALL(enabled_bitmask);
+  if(fuzzed_data.ConsumeBool()) {
+    NDPI_BITMASK_RESET(enabled_bitmask);
+    for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
+      if(fuzzed_data.ConsumeBool())
+        NDPI_BITMASK_ADD(enabled_bitmask, i);
+    }
   }
   if(ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &enabled_bitmask) == -1) {
     ndpi_exit_detection_module(ndpi_info_mod);
@@ -170,15 +173,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_config(ndpi_info_mod, "any", "log", cfg_value);
     ndpi_get_config(ndpi_info_mod, "any", "log", cfg_value, sizeof(cfg_value));
   }
-  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
-    if(fuzzed_data.ConsumeBool()) {
-      value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
-      sprintf(cfg_value, "%d", value);
-      sprintf(cfg_proto, "%d", i);
-      /* TODO: we should try to map integer into name */
-      ndpi_set_config(ndpi_info_mod, cfg_proto, "log", cfg_value);
-      ndpi_get_config(ndpi_info_mod, cfg_proto, "log", cfg_value, sizeof(cfg_value));
-    }
+  if(fuzzed_data.ConsumeBool()) {
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    sprintf(cfg_proto, "%d", pid);
+    /* TODO: we should try to map integer into name */
+    ndpi_set_config(ndpi_info_mod, cfg_proto, "log", cfg_value);
+    ndpi_get_config(ndpi_info_mod, cfg_proto, "log", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
@@ -186,14 +188,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_config(ndpi_info_mod, "any", "ip_list.load", cfg_value);
     ndpi_get_config(ndpi_info_mod, "any", "ip_list.load", cfg_value, sizeof(cfg_value));
   }
-  for(i = 0; i < NDPI_MAX_SUPPORTED_PROTOCOLS; i++) {
-    if(fuzzed_data.ConsumeBool()) {
-      value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
-      sprintf(cfg_value, "%d", value);
-      sprintf(cfg_proto, "%d", i);
-      ndpi_set_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value);
-      ndpi_get_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value, sizeof(cfg_value));
-    }
+  if(fuzzed_data.ConsumeBool()) {
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    sprintf(cfg_proto, "%d", pid);
+    ndpi_set_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value);
+    ndpi_get_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 255 + 1);
