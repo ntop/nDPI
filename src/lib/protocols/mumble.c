@@ -34,6 +34,8 @@ static void ndpi_search_mumble(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
+  NDPI_LOG_DBG(ndpi_struct, "search Mumble\n");
+
   if (current_pkt_from_client_to_server(ndpi_struct, flow) && 
       packet->payload_packet_len == 12)
   {

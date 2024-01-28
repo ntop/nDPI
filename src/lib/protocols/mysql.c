@@ -35,6 +35,8 @@ static void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_stru
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
+  NDPI_LOG_DBG(ndpi_struct, "search MySQL\n");
+
   if(packet->payload_packet_len > 70 && packet->payload_packet_len < 120) {
     u_int32_t length = (packet->payload[2] << 16) + (packet->payload[1] << 8) + packet->payload[0];
 
