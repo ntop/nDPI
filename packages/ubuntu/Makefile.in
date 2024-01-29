@@ -4,10 +4,11 @@ NDPI_BUILD="$(realpath ${NDPI_HOME}/packages/ubuntu)"
 ndpi:
 	\rm -rf ./debian/ndpi-tmp ./debian/ndpi-dev-tmp ./debian/ndpi ./debian/ndpi-dev
 	mkdir -p ./debian/ndpi-tmp ./debian/ndpi-dev-tmp
-	mkdir -p  ./debian/ndpi-tmp/usr/lib ./debian/ndpi-tmp/usr/bin 
+	mkdir -p  ./debian/ndpi-tmp/usr/lib ./debian/ndpi-tmp/usr/bin ./debian/ndpi-tmp/usr/share/ndpi
 	mkdir -p ./debian/ndpi-dev-tmp/usr/lib ./debian/ndpi-dev-tmp/usr/include/ndpi ./debian/ndpi-dev-tmp/usr/lib/pkgconfig
 	cd ${NDPI_HOME}; ./autogen.sh; ./configure; $(MAKE)
 	cp $(NDPI_HOME)/src/lib/libndpi.so.@NDPI_VERS@ ./debian/ndpi-tmp/usr/lib/
+	cp $(NDPI_HOME)/lists/public_suffix_list.dat ./debian/ndpi-tmp/usr/share/ndpi/
 	cd ./debian/ndpi-tmp/usr/lib/; ln -s libndpi.so.@NDPI_VERS@ libndpi.so; cd -
 	cd ./debian/ndpi-tmp/usr/lib/; ln -s libndpi.so.@NDPI_VERS@ libndpi.so.@MAJOR_RELEASE@; cd -
 	cp $(NDPI_HOME)/src/lib/libndpi.a ./debian/ndpi-dev-tmp/usr/lib/
