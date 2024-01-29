@@ -221,6 +221,7 @@
     <ClCompile Include="..\src\lib\protocols\bittorrent.c" />
     <ClCompile Include="..\src\lib\protocols\ciscovpn.c" />
     <ClCompile Include="..\src\lib\protocols\citrix.c" />
+    <ClCompile Include="..\src\lib\protocols\cip.c" />
     <ClCompile Include="..\src\lib\protocols\coap.c" />
     <ClCompile Include="..\src\lib\protocols\corba.c" />
     <ClCompile Include="..\src\lib\protocols\crossfire.c" />
