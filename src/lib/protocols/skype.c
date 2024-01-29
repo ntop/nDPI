@@ -72,7 +72,10 @@ static void ndpi_check_skype(struct ndpi_detection_module_struct *ndpi_struct, s
 	if(is_port(sport, dport, 8801)) {
 	  NDPI_LOG_INFO(ndpi_struct, "found ZOOM (in SKYPE_TEAMS code)\n");
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	} else if (payload_len >= 16 && packet->payload[0] != 0x01) /* Avoid invalid Cisco HSRP detection / RADIUS */ {
+	} else if((payload_len >= 16)
+		  && (packet->payload[0] != 0x01) /* Avoid invalid Cisco HSRP detection / RADIUS */
+		  && (sport != dport) /* Avoid matching simple OT protocols such as CIP that have src and dst port alike */
+		  ) {
 	  NDPI_LOG_INFO(ndpi_struct, "found SKYPE_TEAMS\n");
 	  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SKYPE_TEAMS_CALL, NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_CONFIDENCE_DPI);
 	}
