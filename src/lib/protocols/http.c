@@ -59,8 +59,13 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
 						 char *msg) {
   /*
     Check known exceptions
+    https://learn.microsoft.com/en-us/windows/privacy/windows-endpoints-1909-non-enterprise-editions
   */
-  if(ends_with(ndpi_struct, (char*)flow->host_server_name, ".windowsupdate.com"))
+  if(ends_with(ndpi_struct, (char*)flow->host_server_name, ".windowsupdate.com")
+     || ends_with(ndpi_struct, (char*)flow->host_server_name, ".microsoft.com")
+     || ends_with(ndpi_struct, (char*)flow->host_server_name, ".office365.com")
+     || ends_with(ndpi_struct, (char*)flow->host_server_name, ".windows.com")
+     )
     ;
   else
     ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER, msg);
