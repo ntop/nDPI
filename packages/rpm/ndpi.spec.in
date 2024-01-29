@@ -63,6 +63,9 @@ mkdir -p $RPM_BUILD_ROOT%{includedir}
 mkdir -p $RPM_BUILD_ROOT%{libdir}/pkgconfig
 mkdir -p $RPM_BUILD_ROOT%{bindir}
 cd $HOME/nDPI; make DESTDIR=$RPM_BUILD_ROOT install;
+mkdir -p $RPM_BUILD_ROOT/usr/share/ndpi
+cp $HOME/nDPI/lists/public_suffix_list.dat $RPM_BUILD_ROOT/usr/share/ndpi
+
 #cp $HOME/nDPI/libndpi.pc $RPM_BUILD_ROOT%{libdir}/pkgconfig
 #cd $RPM_BUILD_ROOT%{libdir}/; ln -s libndpi.so.@PACKAGE_VERSION@ libndpi.so.@MAJOR_RELEASE@; cd -
 #cd $RPM_BUILD_ROOT%{libdir}/; ln -s libndpi.so.@PACKAGE_VERSION@ libndpi.so; cd -
@@ -86,6 +89,7 @@ rm -fr $RPM_BUILD_ROOT
 /usr/bin/ndpiReader
 /usr/share/ndpi/ndpiCustomCategory.txt
 /usr/share/ndpi/ndpiProtos.txt
+/usr/share/ndpi/public_suffix_list.dat
 /etc/ld.so.conf.d/ndpi.conf
 #%{libdir}/pkgconfig/libndpi.pc
 
