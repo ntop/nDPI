@@ -46,6 +46,8 @@ static void ndpi_search_hislip(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
+  NDPI_LOG_DBG(ndpi_struct, "search HiSLIP\n");
+
   if ((packet->payload_packet_len >= 16) &&
       (memcmp(packet->payload, "HS", 2) == 0) && ((packet->payload[2] - 26) < 0x65) &&
       (ndpi_ntohll(get_u_int64_t(packet->payload, 8)) == (u_int64_t)(packet->payload_packet_len - 16)))

@@ -39,6 +39,9 @@ static void ndpi_search_yojimbo(struct ndpi_detection_module_struct *ndpi_struct
                                 struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
+
+  NDPI_LOG_DBG(ndpi_struct, "search Yojimbo\n");
+
   uint64_t const magic = 0x4e4554434f444520; // "NETCODE "
 
   if (packet->payload_packet_len < 9)

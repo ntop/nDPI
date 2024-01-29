@@ -54,7 +54,9 @@ static void ndpi_search_fins(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
-  
+
+  NDPI_LOG_DBG(ndpi_struct, "search Omron FINS\n");
+
   /* FINS/TCP header is 20 bytes long, but it's usually followed
    * by 10 byte FINS header and command data
    */

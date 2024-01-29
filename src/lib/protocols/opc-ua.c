@@ -45,6 +45,8 @@ static void ndpi_search_opc_ua(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
+  NDPI_LOG_DBG(ndpi_struct, "search OPC UA\n");
+
   /* Shortest OPC UA packet I've ever seen */
   if (packet->payload_packet_len >= 16) {
     /* Each OPC UA MessageChunk starts with a 3 byte ASCII code that defines 
