@@ -14,8 +14,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(ndpi_struct, &all);
 
-  ndpi_set_config(ndpi_struct, NULL, "log.level", "3");
-  ndpi_set_config(ndpi_struct, "all", "log", "1");
+  ndpi_set_config_u64(ndpi_struct, NULL, "log.level", 3);
+  ndpi_set_config_u64(ndpi_struct, "all", "log", 1);
 
   fd = buffer_to_file(data, size);
   load_categories_file_fd(ndpi_struct, fd, NULL);

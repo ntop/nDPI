@@ -2190,6 +2190,8 @@ extern "C" {
 
   ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
                                  const char *proto, const char *param, const char *value);
+  ndpi_cfg_error ndpi_set_config_u64(struct ndpi_detection_module_struct *ndpi_str,
+                                     const char *proto, const char *param, uint64_t value);
   char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
 			const char *proto, const char *param, char *buf, int buf_len);
   char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
