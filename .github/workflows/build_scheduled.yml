@@ -12,7 +12,7 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -32,7 +32,7 @@ jobs:
       - name: Generate Coverage Report
         run: |
           make coverage
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ndpi-coverage-report
           path: coverage_report
@@ -42,7 +42,7 @@ jobs:
     name: Documentation (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up Python 3.9
@@ -63,7 +63,7 @@ jobs:
           make doc
           mkdir -vp doc/_build/ndpi-documentation-upload/ndpi-documentation
           mv -v doc/_build/html doc/_build/ndpi-documentation-upload/ndpi-documentation/html
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ndpi-documentation
           path: doc/_build/ndpi-documentation-upload
@@ -76,7 +76,7 @@ jobs:
       GO111MODULE: on
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -104,7 +104,7 @@ jobs:
             mv -v tests/cfgs/${PROFILE}/result/cpu_profile.png ndpi-performance-upload/${PROFILE}_cpu_profile.png
             mv -v tests/cfgs/${PROFILE}/result/heap_profile.png ndpi-performance-upload/${PROFILE}_heap_profile.png
           done
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ndpi-performance
           path: ndpi-performance-upload
