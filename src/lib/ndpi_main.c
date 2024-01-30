@@ -10825,6 +10825,21 @@ ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
   return NDPI_CFG_NOT_FOUND;
 }
 
+ndpi_cfg_error ndpi_set_config_u64(struct ndpi_detection_module_struct *ndpi_str,
+                                   const char *proto, const char *param, uint64_t value)
+{
+  char value_str[21];
+  int value_len;
+
+  value_len = ndpi_snprintf(value_str, sizeof(value_str), "%llu", (unsigned long long int)value);
+  if (value_len <= 0 || value_len >= (int)sizeof(value_str))
+  {
+    return NDPI_CFG_INVALID_PARAM;
+  }
+
+  return ndpi_set_config(ndpi_str, proto, param, value_str);
+}
+
 char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
 		      const char *proto, const char *param, char *buf, int buf_len)
 {
