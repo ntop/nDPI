@@ -43,11 +43,12 @@ static void ndpi_search_cip(struct ndpi_detection_module_struct *ndpi_struct,
      ) {
     u_int8_t num_items = packet->payload[0], offset = 2;
 
-    while((num_items > 0) && (packet->payload_packet_len > (offset + 4))) {
+    while((num_items > 0) && (packet->payload_packet_len > ((u_int32_t)offset + 4))) {
       // u_int16_t type_id = *((u_int16_t*)&packet->payload[offset]);
       u_int16_t lenght = (packet->payload[offset+3] << 8) + packet->payload[offset+2];
 
       offset += 4 + lenght;
+      num_items--;
     }
 
     if(offset == packet->payload_packet_len) {
