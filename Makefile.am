@@ -15,6 +15,7 @@ EXTRA_DIST = README.md README.fuzzer.md CHANGELOG.md CONTRIBUTING.md \
 	doc/requirements.txt doc/conf.py doc/flow_risks.rst doc/protocols.rst doc/guide/nDPI_QuickStartGuide.pages \
 		doc/guide/nDPI_QuickStartGuide.pdf doc/img/logo.png doc/index.rst \
 		doc/Makefile doc/what_is_ndpi.rst doc/FAQ.md doc/configuration_parameters.md \
+		doc/library_initialization.md \
 	python/DEV_GUIDE.md python/dev_requirements.txt python/ndpi_example.py python/ndpi/__init__.py \
 		python/ndpi/ndpi_build.py python/ndpi/ndpi.py python/README.md \
 		python/requirements.txt python/setup.py python/tests.py \

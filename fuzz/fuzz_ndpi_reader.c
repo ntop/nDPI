@@ -10,6 +10,7 @@
 
 struct ndpi_workflow_prefs *prefs = NULL;
 struct ndpi_workflow *workflow = NULL;
+struct ndpi_global_context *g_ctx;
 
 u_int8_t enable_payload_analyzer = 0;
 u_int8_t enable_flow_stats = 1;
@@ -48,7 +49,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     fuzz_set_alloc_callbacks();
 #endif
 
-    workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json);
+    g_ctx = ndpi_global_init();
+
+    workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json, g_ctx);
 
     ndpi_set_config(workflow->ndpi_struct, NULL, "log.level", "3");
     ndpi_set_config(workflow->ndpi_struct, "all", "log", "1");

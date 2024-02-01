@@ -24,6 +24,11 @@ E * ndpi_typedefs.h
 #ifndef __NDPI_TYPEDEFS_H__
 #define __NDPI_TYPEDEFS_H__
 
+#ifndef NDPI_CFFI_PREPROCESSING
+#define HAVE_STRUCT_TIMESPEC
+#include <pthread.h>
+#endif
+
 #include "ndpi_define.h"
 #ifndef NDPI_CFFI_PREPROCESSING
 #include "ndpi_includes.h"
@@ -743,6 +748,11 @@ typedef enum {
   NDPI_LRUCACHE_MAX	/* Last one! */
 } lru_cache_type;
 
+typedef enum {
+  NDPI_LRUCACHE_SCOPE_LOCAL = 0,
+  NDPI_LRUCACHE_SCOPE_GLOBAL,
+} lru_cache_scope;
+
 struct ndpi_lru_cache_entry {
   u_int32_t key; /* Store the whole key to avoid ambiguities */
   u_int32_t is_full:1, value:16, pad:15;
@@ -757,7 +767,10 @@ struct ndpi_lru_cache_stats {
 
 struct ndpi_lru_cache {
   u_int32_t num_entries;
-  u_int32_t ttl;
+  u_int32_t ttl : 31, shared : 1;
+#ifndef NDPI_CFFI_PREPROCESSING
+  pthread_mutex_t mutex;
+#endif
   struct ndpi_lru_cache_stats stats;
   struct ndpi_lru_cache_entry *entries;
 };
@@ -947,6 +960,8 @@ struct ndpi_flow_udp_struct {
 
 /* ************************************************** */
 
+
+struct ndpi_global_context;
 struct ndpi_detection_module_struct;
 struct ndpi_flow_struct;
 

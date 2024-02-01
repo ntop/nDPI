@@ -17,6 +17,7 @@ int malloc_size_stats = 0;
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   ndpi_workflow *w;
+  struct ndpi_global_context *g_ctx;
   struct ndpi_workflow_prefs prefs;
   pcap_t *pcap_handle;
   ndpi_serialization_format serialization_format;
@@ -82,7 +83,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     return 0;
   }
 
-  w = ndpi_workflow_init(&prefs, pcap_handle, 1, serialization_format);
+  g_ctx = ndpi_global_init();
+
+  w = ndpi_workflow_init(&prefs, pcap_handle, 1, serialization_format, g_ctx);
   if(w) {
     NDPI_BITMASK_SET_ALL(enabled_bitmask);
     rc = ndpi_set_protocol_detection_bitmask2(w->ndpi_struct, &enabled_bitmask);
@@ -100,6 +103,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_workflow_free(w);
   }
   pcap_close(pcap_handle);
+
+  ndpi_global_deinit(g_ctx);
 
   ndpi_free(_debug_protocols);
 

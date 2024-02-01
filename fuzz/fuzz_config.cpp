@@ -27,6 +27,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_flow_input_info input_info;
   ndpi_proto p, p2;
   char out[128];
+  struct ndpi_global_context *g_ctx;
   char log_ts[32];
   int value;
   char cfg_value[32];
@@ -37,7 +38,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
-  ndpi_info_mod = ndpi_init_detection_module();
+  if(fuzzed_data.ConsumeBool())
+    g_ctx = ndpi_global_init();
+  else
+    g_ctx = NULL;
+
+  ndpi_info_mod = ndpi_init_detection_module(g_ctx);
 
   set_ndpi_debug_function(ndpi_info_mod, NULL);
 
@@ -271,6 +277,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_config(ndpi_info_mod, NULL, "lru.ookla.ttl", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.ookla.scope", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.bittorrent.size", cfg_value);
@@ -279,6 +290,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.bittorrent.ttl", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.bittorrent.scope", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
@@ -291,6 +307,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_config(ndpi_info_mod, NULL, "lru.zoom.ttl", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.zoom.scope", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.stun.size", cfg_value);
@@ -299,6 +320,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.stun.ttl", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.stun.scope", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
@@ -311,6 +337,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_config(ndpi_info_mod, NULL, "lru.tls_cert.ttl", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.tls_cert.scope", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.mining.size", cfg_value);
@@ -319,6 +350,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 + 1);
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.mining.ttl", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.mining.scope", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
@@ -331,6 +367,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_config(ndpi_info_mod, NULL, "lru.msteams.ttl", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.msteams.scope", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.size", cfg_value);
@@ -340,6 +381,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.ttl", cfg_value);
   }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.scope", cfg_value);
+  }
   /* Configure one cache via index */
   if(fuzzed_data.ConsumeBool()) {
     idx = fuzzed_data.ConsumeIntegralInRange(0, static_cast<int>(NDPI_LRUCACHE_MAX));
@@ -347,10 +393,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     if(name) {
       value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
       sprintf(cfg_param, "lru.%s.size", name);
+      sprintf(cfg_value, "%d", value);
       ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
       ndpi_get_config(ndpi_info_mod, NULL, cfg_param, cfg_value, sizeof(cfg_value));
       value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 + 1);
       sprintf(cfg_param, "lru.%s.ttl", name);
+      sprintf(cfg_value, "%d", value);
+      ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
+      value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+      sprintf(cfg_param, "lru.%s.scope", name);
+      sprintf(cfg_value, "%d", value);
       ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
       ndpi_get_config(ndpi_info_mod, NULL, cfg_param, cfg_value, sizeof(cfg_value));
     }
@@ -500,7 +552,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   /* Get some final stats */
   for(i = 0; i < NDPI_LRUCACHE_MAX + 1; i++) /* + 1 to test invalid type */
-    ndpi_get_lru_cache_stats(ndpi_info_mod, static_cast<lru_cache_type>(i), &lru_stats);
+    ndpi_get_lru_cache_stats(g_ctx, ndpi_info_mod, static_cast<lru_cache_type>(i), &lru_stats);
   for(i = 0; i < NDPI_PTREE_MAX + 1; i++) /* + 1 to test invalid type */
     ndpi_get_patricia_stats(ndpi_info_mod, static_cast<ptree_type>(i), &patricia_stats);
   for(i = 0; i < NDPI_AUTOMA_MAX + 1; i++) /* + 1 to test invalid type */
@@ -522,6 +574,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_free_geoip(ndpi_info_mod);
 
   ndpi_exit_detection_module(ndpi_info_mod);
+
+  ndpi_global_deinit(g_ctx);
 
   return 0;
 }

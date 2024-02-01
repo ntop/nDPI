@@ -29,6 +29,7 @@ AC_ARG_ENABLE(npcap, AS_HELP_STRING([--disable-npcap], [msys2 only: Disable link
 AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom path; default: ${PWD}/../PF_RING/userland/nbpf]),[NBPF_HOME=$withval],[NBPF_HOME=${PWD}/../PF_RING/userland/nbpf])
 AC_ARG_WITH(lto-and-gold-linker, AS_HELP_STRING([--with-lto-and-gold-linker], [Build with LTO and Gold linker]))
 AC_ARG_ENABLE(debug-build, AS_HELP_STRING([--enable-debug-build], [Enable debug build (`-g` flag)]),[enable_debugbuild=$enableval],[enable_debugbuild=no])
+AC_ARG_ENABLE(global-context-support, AS_HELP_STRING([--disable-global-context-support], [Disable support for global context. No external dependency on libpthread]))
 
 NDPI_CFLAGS="${NDPI_CFLAGS} -D_DEFAULT_SOURCE=1 -D_GNU_SOURCE=1"
 
@@ -208,6 +209,13 @@ if test "x$ac_cv_lib_rrd_rrd_fetch_r" = xyes; then :
    AC_DEFINE_UNQUOTED(HAVE_RRDTOOL, "1", [rrdtool is present])
    EXTRA_TARGETS="$EXTRA_TARGETS rrdtool"
 fi
+
+GLOBAL_CONTEXT_ENABLED=0
+AS_IF([test "x$enable_global_context_support" != "xno"], [
+  AC_CHECK_LIB([pthread], [pthread_mutex_init])
+  AC_DEFINE_UNQUOTED(USE_GLOBAL_CONTEXT, 1, [Use gloabl context feature. Depend on libpthread])
+  GLOBAL_CONTEXT_ENABLED=1
+])
 
 ADDITIONAL_INCS=
 ADDITIONAL_LIBS="$LIBM"
@@ -428,6 +436,7 @@ AC_SUBST(GPROF_ENABLED)
 AC_SUBST(USE_HOST_LIBGCRYPT)
 AC_SUBST(PCRE2_ENABLED)
 AC_SUBST(NBPF_ENABLED)
+AC_SUBST(GLOBAL_CONTEXT_ENABLED)
 AC_SUBST(HANDLE_TLS_SIGS)
 AC_SUBST(DISABLE_NPCAP)
 AC_SUBST(EXE_SUFFIX)

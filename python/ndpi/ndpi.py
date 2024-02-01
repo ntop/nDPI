@@ -32,7 +32,7 @@ class NDPI(object):
                  "_detection_module")
 
     def __init__(self):
-        self._detection_module = lib.ndpi_init_detection_module()
+        self._detection_module = lib.ndpi_init_detection_module(ffi.NULL)
         if self._detection_module == ffi.NULL:
             raise MemoryError("Unable to instantiate NDPI object")
         lib.ndpi_py_setup_detection_module(self._detection_module)
