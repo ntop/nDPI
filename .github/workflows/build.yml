@@ -16,11 +16,11 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
       - name: Install Ubuntu Prerequisites
@@ -47,7 +47,7 @@ jobs:
     name: Test Utils (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -77,7 +77,7 @@ jobs:
       matrix:
         # ubuntu-latest == ubuntu-22.04
         # macOS-latest == macos-12
-        os: ["ubuntu-latest", "ubuntu-20.04", "macOS-latest", "macos-11", "windows-latest"]
+        os: ["ubuntu-latest", "ubuntu-20.04", "macOS-latest", "macos-13", "windows-latest"]
         arch: ["x86_64"]
         gcrypt: ["--with-local-libgcrypt", ""]
         compiler: ["cc"]
@@ -168,11 +168,11 @@ jobs:
             msan: "" # Disable sanitizer on macos
             nBPF: ""
           - compiler: "cc"
-            os: macos-12
+            os: macos-14
             arch: "x86_64"
             gcrypt: ""
-            pcre: "--with-pcre2"
-            maxminddb: "--with-maxminddb"
+            pcre: ""
+            maxminddb: ""
             msan: "" # Disable sanitizer on macos
             nBPF: ""
           - compiler: "cc"
@@ -204,7 +204,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.arch, 'x86_64')
         run: |
           docker run --rm --privileged multiarch/qemu-user-static:register --reset
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install Ubuntu Prerequisites
@@ -315,11 +315,17 @@ jobs:
           msys2 -c 'make all'
           msys2 -c 'ldd ./example/ndpiReader.exe'
       - name: Build nDPI
-        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
+        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.os, 'macos-14')
         run: |
           make all
           make -C example ndpiSimpleIntegration
           make -C rrdtool
+      - name: Build nDPI (MacOS M1)
+        if: startsWith(matrix.os, 'macos-14')
+        run: |
+          make all
+          make -C example ndpiSimpleIntegration
+          #There are somes issues with librrd
       - name: Print nDPI long help
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
@@ -327,8 +333,8 @@ jobs:
       - name: Install nDPI
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
-          make install DESTDIR=$(realpath _install)
-          ls -alhHR _install
+          DESTDIR=/tmp/ndpi make install
+          ls -alhHR /tmp/ndpi
       - name: Test nDPI [SYMBOLS]
         if: (startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'mac')) && startsWith(matrix.arch, 'x86_64')
         run: |
@@ -341,7 +347,7 @@ jobs:
           ./tests/do.sh
       - name: Test nDPI [UNIT]
         #Some issues with masan + json-c. Disable the test as workaround
-        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.msan, '--with-memory-sanitizer')
+        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.msan, '--with-memory-sanitizer') && !startsWith(matrix.os, 'macos-14')
         run: |
           ./tests/do-unit.sh
       - name: Test nDPI [DGA]

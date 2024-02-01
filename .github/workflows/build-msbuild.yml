@@ -15,10 +15,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Download NuGet packages
         run: msbuild windows/nDPI.sln -t:restore -p:RestorePackagesConfig=true
@@ -36,7 +36,7 @@ jobs:
         run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug-ndpiReader
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: windows/bin
