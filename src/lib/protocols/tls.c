@@ -1608,10 +1608,11 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t tmp_str[JA_STR_LEN];
   u_int tmp_str_len, num_extn;
   u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
-  char ja_str[JA_STR_LEN];
   u_int16_t ja_str_len, i;
   int rc;
   u_int16_t tls_handshake_version = ja->client.tls_handshake_version;
+  char * const ja_str = &flow->protos.tls_quic.ja4_client[0];
+  const u_int16_t ja_max_len = sizeof(flow->protos.tls_quic.ja4_client);
   
   /*
     Compute JA4 TLS/QUIC client
@@ -1639,42 +1640,50 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   
   switch(tls_handshake_version) {
   case 0x0304: /* TLS 1.3 = “13” */
-    ja_str[1] = '1', ja_str[2] = '3';
+    ja_str[1] = '1';
+    ja_str[2] = '3';
     break;
 
   case 0x0303: /* TLS 1.2 = “12” */
-    ja_str[1] = '1', ja_str[2] = '2';
+    ja_str[1] = '1';
+    ja_str[2] = '2';
     break;
 
   case 0x0302: /* TLS 1.1 = “11” */
-    ja_str[1] = '1', ja_str[2] = '1';
+    ja_str[1] = '1';
+    ja_str[2] = '1';
     break;
 
   case 0x0301: /* TLS 1.0 = “10” */
-    ja_str[1] = '1', ja_str[2] = '0';
+    ja_str[1] = '1';
+    ja_str[2] = '0';
     break;
 
   case 0x0300: /* SSL 3.0 = “s3” */
-    ja_str[1] = 's', ja_str[2] = '3';
+    ja_str[1] = 's';
+    ja_str[2] = '3';
     break;
 
   case 0x0200: /* SSL 2.0 = “s2” */
-    ja_str[1] = 's', ja_str[2] = '2';
+    ja_str[1] = 's';
+    ja_str[2] = '2';
     break;
 
   case 0x0100: /* SSL 1.0 = “s1” */
-    ja_str[1] = 's', ja_str[2] = '3';
+    ja_str[1] = 's';
+    ja_str[2] = '3';
     break;
 
   default:
-    ja_str[1] = '0', ja_str[2] = '0';
+    ja_str[1] = '0';
+    ja_str[2] = '0';
     break;
   }
 
   ja_str[3] = ndpi_isset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST) ? 'i' : 'd', ja_str_len = 4;
 
   /* JA4_a */
-  rc = ndpi_snprintf(&ja_str[ja_str_len], JA_STR_LEN-ja_str_len, "%02u%02u%c%c_",
+  rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len, "%02u%02u%c%c_",
 		     ja->client.num_ciphers, ja->client.num_tls_extensions,
 		     (ja->client.alpn[0] == '\0') ? '0' : ja->client.alpn[0],
 		     (ja->client.alpn[0] == '\0') ? '0' : ja->client.alpn[1]);
@@ -1693,7 +1702,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
 
-  rc = ndpi_snprintf(&ja_str[ja_str_len], JA_STR_LEN-ja_str_len,
+  rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x_",
 		     sha_hash[0], sha_hash[1], sha_hash[2],
 		     sha_hash[3], sha_hash[4], sha_hash[5]);
@@ -1725,18 +1734,16 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
 
-  rc = ndpi_snprintf(&ja_str[ja_str_len], JA_STR_LEN-ja_str_len,
+  rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x",
 		     sha_hash[0], sha_hash[1], sha_hash[2],
 		     sha_hash[3], sha_hash[4], sha_hash[5]);
   if((rc > 0) && (ja_str_len + rc < JA_STR_LEN)) ja_str_len += rc;
 
+  ja_str[36] = 0;
 #ifdef DEBUG_JA
   printf("[JA4] %s [len: %lu]\n", ja_str, strlen(ja_str));
 #endif
-
-  strncpy(flow->protos.tls_quic.ja4_client, ja_str, 36);
-  flow->protos.tls_quic.ja4_client[36] = 0;
 }
 
 /* **************************************** */
