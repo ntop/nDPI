@@ -31,7 +31,7 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
   FILE *fd;
   u_int num_domains = 0;
   
-  if(public_suffix_list_path == NULL)
+  if(ndpi_str == NULL || public_suffix_list_path == NULL)
     return(-1);
 
   if((fd = fopen(public_suffix_list_path, "r")) == NULL)
