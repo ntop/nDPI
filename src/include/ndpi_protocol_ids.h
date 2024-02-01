@@ -422,6 +422,7 @@ typedef enum {
   NDPI_PROTOCOL_RADMIN                = 391,
   NDPI_PROTOCOL_RAFT                  = 392,
   NDPI_PROTOCOL_CIP                   = 393,
+  NDPI_PROTOCOL_GEARMAN               = 394,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
