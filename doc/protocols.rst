@@ -575,3 +575,12 @@ References: `Main site <https://www.radmin.com/>`_
 Raft is a consensus algorithm and protocol for managing a replicated log.
 
 References: `C implementation <https://github.com/canonical/raft>`_ and `Paper <https://raft.github.io/raft.pdf>`_
+
+
+.. _Proto 394:
+
+`NDPI_PROTOCOL_GEARMAN`
+====================
+Gearman is a network-based job-queuing system that was initially developed by Danga Interactive in order to process large volumes of jobs.
+
+References: `Main site <http://gearman.org/>`_

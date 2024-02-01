@@ -1,6 +1,6 @@
-DPI Packets (TCP):	7	(7.00 pkts/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 191 (191.00 diss/flow)
+Num dissector calls: 1 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -21,8 +21,8 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-ISO9506-1-MMS	22	1907	1
+Gearman	8	494	1
 
-Acceptable                      22 1907          1            
+Acceptable                       8 494           1            
 
-	1	TCP 172.16.0.101:1345 <-> 172.16.202.5:102 [proto: 366/ISO9506-1-MMS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 7][cat: IoT-Scada/31][11 pkts/1000 bytes <-> 11 pkts/907 bytes][Goodput ratio: 37/31][0.61 sec][bytes ratio: 0.049 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 63/28 218/100 83/42][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 91/82 221/200 47/39][Plen Bins: 51,16,16,0,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.80.1:23405 <-> 192.168.80.128:4730 [proto: 394/Gearman][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: RPC/16][4 pkts/254 bytes <-> 4 pkts/240 bytes][Goodput ratio: 10/5][0.00 sec][bytes ratio: 0.028 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/1 0/2 0/1][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 64/60 68/66 6/6][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
