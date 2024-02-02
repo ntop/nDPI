@@ -10401,9 +10401,18 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
   len = ndpi_min(value_len, sizeof(flow->host_server_name) - 1);
   dst = flow->host_server_name;
 
-  for(i = 0; i < len; i++)
-    dst[i] = tolower(value[value_len - len + i]);
+  for(i = 0; i < len; i++) {
+    char c = tolower(value[value_len - len + i]);
+    if (c == '\t') c = ' ';
+    if (ndpi_isprint(c) == 0)
+            c = '?';
+    dst[i] = c;
+  }
   dst[i] = '\0';
+
+  /* Removing spaces at the end of a line */
+  while(i > 0 && dst[i-1] == ' ')
+    dst[--i] = '\0';
 
   return dst;
 }
