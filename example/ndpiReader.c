@@ -397,6 +397,28 @@ void ndpiCheckHostStringMatch(char *testChar) {
 
 /* *********************************************** */
 
+static char const *
+ndpi_cfg_error2string(ndpi_cfg_error const err)
+{
+  switch (err)
+  {
+    case NDPI_CFG_INVALID_CONTEXT:
+      return "Invalid context";
+    case NDPI_CFG_NOT_FOUND:
+      return "Configuration not found";
+    case NDPI_CFG_INVALID_PARAM:
+      return "Invalid configuration parameter";
+    case NDPI_CFG_CONTEXT_ALREADY_INITIALIZED:
+      return "Configuration context already initialized";
+    case NDPI_CFG_CALLBACK_ERROR:
+      return "Configuration callback error";
+    case NDPI_CFG_OK:
+      return "Success";
+  }
+
+  return "Unknown";
+}
+
 static void ndpiCheckIPMatch(char *testChar) {
   struct ndpi_detection_module_struct *ndpi_str;
   u_int16_t ret = NDPI_PROTOCOL_UNKNOWN;
@@ -422,9 +444,12 @@ static void ndpiCheckIPMatch(char *testChar) {
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_str,
 			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
-    if (rc != NDPI_CFG_OK)
-      fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
-	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
+    if (rc != NDPI_CFG_OK) {
+      fprintf(stderr, "Error setting config [%s][%s][%s]: %s (%d)\n",
+	      (cfgs[i].proto != NULL ? cfgs[i].proto : ""),
+	      cfgs[i].param, cfgs[i].value, ndpi_cfg_error2string(rc), rc);
+      exit(-1);
+    }
   }
 
   ndpi_finalize_initialization(ndpi_str);
@@ -2873,9 +2898,12 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
   for(i = 0; i < num_cfgs; i++) {
     rc = ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                          cfgs[i].proto, cfgs[i].param, cfgs[i].value);
-    if (rc != NDPI_CFG_OK)
-      fprintf(stderr, "Error setting config [%s][%s][%s]: %d\n",
-	      cfgs[i].proto, cfgs[i].param, cfgs[i].value, rc);
+    if (rc != NDPI_CFG_OK) {
+      fprintf(stderr, "Error setting config [%s][%s][%s]: %s (%d)\n",
+	      (cfgs[i].proto != NULL ? cfgs[i].proto : ""),
+	      cfgs[i].param, cfgs[i].value, ndpi_cfg_error2string(rc), rc);
+      exit(-1);
+    }
   }
 
   if(enable_doh_dot_detection)
