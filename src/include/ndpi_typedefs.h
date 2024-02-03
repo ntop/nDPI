@@ -25,8 +25,11 @@ E * ndpi_typedefs.h
 #define __NDPI_TYPEDEFS_H__
 
 #ifndef NDPI_CFFI_PREPROCESSING
+#include "ndpi_config.h"
+#ifdef USE_GLOBAL_CONTEXT
 #define HAVE_STRUCT_TIMESPEC
 #include <pthread.h>
+#endif
 #endif
 
 #include "ndpi_define.h"
@@ -769,7 +772,9 @@ struct ndpi_lru_cache {
   u_int32_t num_entries;
   u_int32_t ttl : 31, shared : 1;
 #ifndef NDPI_CFFI_PREPROCESSING
+#ifdef USE_GLOBAL_CONTEXT
   pthread_mutex_t mutex;
+#endif
 #endif
   struct ndpi_lru_cache_stats stats;
   struct ndpi_lru_cache_entry *entries;

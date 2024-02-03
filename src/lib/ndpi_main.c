@@ -3093,11 +3093,9 @@ static void free_ptree_data(void *data) {
 }
 
 struct ndpi_global_context *ndpi_global_init(void) {
-
 #ifndef USE_GLOBAL_CONTEXT
   return NULL;
-#endif
-
+#else
   struct ndpi_global_context *g_ctx = ndpi_calloc(1, sizeof(struct ndpi_global_context));
 
   if(g_ctx == NULL)
@@ -3109,6 +3107,7 @@ struct ndpi_global_context *ndpi_global_init(void) {
   /*  Note that we don't have yet an easy way to log from this function */
 
   return g_ctx;
+#endif
 }
 
 /* ******************************************************************** */
@@ -9868,12 +9867,14 @@ struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl,
 
   c->ttl = ttl & 0x7FFFFFFF;
   c->shared = !!shared;
+#ifdef USE_GLOBAL_CONTEXT
   if(c->shared) {
     if(pthread_mutex_init(&c->mutex, NULL) != 0) {
       ndpi_free(c);
       return(NULL);
     }
   }
+#endif
   c->entries = (struct ndpi_lru_cache_entry *) ndpi_calloc(num_entries, sizeof(struct ndpi_lru_cache_entry));
 
   if(!c->entries) {
@@ -9892,16 +9893,20 @@ void ndpi_lru_free_cache(struct ndpi_lru_cache *c) {
 
 static void __lru_cache_lock(struct ndpi_lru_cache *c)
 {
+#ifdef USE_GLOBAL_CONTEXT
   if(c->shared) {
     pthread_mutex_lock(&c->mutex);
   }
+#endif
 }
 
 static void __lru_cache_unlock(struct ndpi_lru_cache *c)
 {
+#ifdef USE_GLOBAL_CONTEXT
   if(c->shared) {
     pthread_mutex_unlock(&c->mutex);
   }
+#endif
 }
 
 u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
