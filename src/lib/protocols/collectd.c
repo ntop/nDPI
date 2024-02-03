@@ -159,7 +159,8 @@ static void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struc
          * the collectd protocol.
          */
         hostname_offset = block_offset;
-        hostname_length = block_length;
+        if(block_length > 4)
+          hostname_length = block_length - 4; /* Ignore type and length fields */
       } else if (block_type == COLELCTD_TYPE_ENCR_AES256) {
         /*
          * The encrypted data block is a special case.
