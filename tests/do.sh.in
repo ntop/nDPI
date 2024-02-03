@@ -103,7 +103,7 @@ check_results() {
 	      done
 	    fi
 	    if [ $SKIP_PCAP -eq 1 ]; then
-	        printf "%-32s\tSKIPPED\n" "$f"
+	        printf "%-48s\tSKIPPED\n" "$f"
 	        continue
 	    fi
 
@@ -165,7 +165,7 @@ for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
         done
     fi
     if [ $SKIP_CFG -eq 1 ]; then
-        printf "Configuration \""$(basename $d)"\" \tSKIPPED\n"
+        printf "Configuration \""$(basename $d)"\" %-18s\tSKIPPED\n"
         continue
     fi
 
