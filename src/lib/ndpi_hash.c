@@ -48,16 +48,15 @@ u_int32_t ndpi_quick_hash(const unsigned char *str, u_int str_len) {
 
 /* ******************************************************************** */
 
-/* Based on Daniel Lemire code */
 u_int64_t ndpi_quick_hash64(const char *str, u_int str_len) {
-  u_int64_t h = 0;
+  u_int64_t h = 177;
   u_int i;
-  
+
   for(i=0; i<str_len; i++)
-    h = (h * 177) + str[i];
+    h = (h * 31) + str[i];
 
   h ^= str_len;
-  
+
   return h;
 }
 
@@ -92,7 +91,7 @@ u_int32_t ndpi_rev_hash_string(const char *str) {
 
   if(len == 0) return(0);
   len--;
-  
+
   for(hash = i = 0; len >= 0; len--) {
     hash += str[len];
     hash += (hash << 10);
