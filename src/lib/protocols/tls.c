@@ -2253,7 +2253,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];
 
 		  if((offset+extension_offset+5+len) <= packet->payload_packet_len) {
-		    char *sni = ndpi_hostname_sni_set(flow, &packet->payload[offset+extension_offset+5], len);
+		    char *sni = ndpi_hostname_sni_set(flow, &packet->payload[offset+extension_offset+5], len, NDPI_HOSTNAME_NORM_ALL);
 		    int sni_len = strlen(sni);
 #ifdef DEBUG_TLS
 		    printf("[TLS] SNI: [%s]\n", sni);

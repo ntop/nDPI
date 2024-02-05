@@ -138,7 +138,7 @@ static int fcgi_parse_params(struct ndpi_flow_struct * const flow,
 
   flow->http.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
                                            (u_int16_t)packet->http_method.len);
-  ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len);
+  ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
   ndpi_user_agent_set(flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
 
   if (flow->http.url == NULL && packet->http_url_name.len > 0)

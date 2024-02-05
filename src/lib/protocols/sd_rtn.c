@@ -51,7 +51,7 @@ static int ndpi_int_sd_rtn_dissect_sni(struct ndpi_flow_struct * const flow,
     return -1;
   }
 
-  ndpi_hostname_sni_set(flow, &payload[19], sni_len);
+  ndpi_hostname_sni_set(flow, &payload[19], sni_len, NDPI_HOSTNAME_NORM_ALL);
 
   return 0;
 }

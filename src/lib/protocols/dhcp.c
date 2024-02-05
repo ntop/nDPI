@@ -180,7 +180,7 @@ static void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struc
             NDPI_LOG_DBG2(ndpi_struct, "[DHCP] '%.*s'\n",name,len);
 	      //	    while(j < len) { printf( "%c", name[j]); j++; }; printf("\n");
 #endif
-            ndpi_hostname_sni_set(flow, name, len);
+            ndpi_hostname_sni_set(flow, name, len, NDPI_HOSTNAME_NORM_ALL);
 	  }
 
           i += len + 2;

@@ -263,6 +263,11 @@ typedef u_int32_t ndpi_ndpi_mask;
 #define NDPI_NUM_FDS_BITS     16
 #endif
 
+#define NDPI_HOSTNAME_NORM_LC 1
+#define NDPI_HOSTNAME_NORM_REPLACE_IC 2
+#define NDPI_HOSTNAME_NORM_STRIP_EOLSP 4
+#define NDPI_HOSTNAME_NORM_ALL (NDPI_HOSTNAME_NORM_LC | NDPI_HOSTNAME_NORM_REPLACE_IC | NDPI_HOSTNAME_NORM_STRIP_EOLSP)
+
 typedef struct ndpi_protocol_bitmask_struct {
   ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS];
 } ndpi_protocol_bitmask_struct_t;

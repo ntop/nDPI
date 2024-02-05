@@ -764,7 +764,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 
     u_int8_t hostname_is_valid = ndpi_grab_dns_name(packet, &off, _hostname, sizeof(_hostname), &len, is_mdns);
 
-    ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len);
+    ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len, is_mdns ? NDPI_HOSTNAME_NORM_LC : NDPI_HOSTNAME_NORM_ALL);
 
     if (hostname_is_valid == 0)
       ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, NULL);
