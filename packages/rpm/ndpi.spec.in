@@ -49,7 +49,10 @@ you will need to install %{name}-dev.
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
 
 %define includedir    /usr/include/ndpi
-%{?el7:%define libdir /usr/lib}
+
+# Default and fallback
+%define libdir /usr/lib
+
 %{?el8:%define libdir /usr/lib64}
 %{?el9:%define libdir /usr/lib64}
 %define bindir        /usr/bin
@@ -83,16 +86,9 @@ rm -fr $RPM_BUILD_ROOT
 %files
 %defattr(-, root, root)
 
-%if %{defined libdir}
 %{libdir}/libndpi.so
 %{libdir}/libndpi.so.@MAJOR_RELEASE@
 %{libdir}/libndpi.so.@PACKAGE_VERSION@
-%else
-# Fallback for rpmbuild on Ubuntu (CI)
-/usr/lib/libndpi.so
-/usr/lib/libndpi.so.@MAJOR_RELEASE@
-/usr/lib/libndpi.so.@PACKAGE_VERSION@
-%endif
 /usr/bin/ndpiReader
 /usr/share/ndpi/ndpiCustomCategory.txt
 /usr/share/ndpi/ndpiProtos.txt
@@ -106,12 +102,7 @@ rm -fr $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 
 %{includedir}
-%if %{defined libdir}
 %{libdir}/libndpi.a
-%else
-# Fallback for rpmbuild on Ubuntu (CI)
-/usr/lib/libndpi.a
-%endif
 
 %changelog
 * Mon Nov 19 2018 Alfredo Cardigliano <cardigliano@ntop.org> 2.5
