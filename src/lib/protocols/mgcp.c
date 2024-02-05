@@ -88,10 +88,10 @@ static void ndpi_search_mgcp(struct ndpi_detection_module_struct *ndpi_struct, s
       endpoint_hostname = ndpi_strnstr(endpoint, "@", packet->payload_packet_len - ((u_int8_t const *)endpoint - packet->payload));
       if (endpoint_hostname == NULL || endpoint_hostname >= mgcp)
       {
-        ndpi_hostname_sni_set(flow, (u_int8_t const *)endpoint, (mgcp - endpoint) - 1);
+        ndpi_hostname_sni_set(flow, (u_int8_t const *)endpoint, (mgcp - endpoint) - 1, NDPI_HOSTNAME_NORM_ALL);
       } else {
         endpoint_hostname++;
-        ndpi_hostname_sni_set(flow, (u_int8_t const *)endpoint_hostname, (mgcp - endpoint_hostname) - 1);
+        ndpi_hostname_sni_set(flow, (u_int8_t const *)endpoint_hostname, (mgcp - endpoint_hostname) - 1, NDPI_HOSTNAME_NORM_ALL);
       }
       return;
     }

@@ -63,9 +63,9 @@ static void xiaomi_dissect_metadata(struct ndpi_detection_module_struct *ndpi_st
         /* If "domain:port", strip the port */
         ptr = ndpi_strnstr((const char *)&payload[offset], ":", len);
         if(ptr == NULL)
-          ndpi_hostname_sni_set(flow, &payload[offset], len);
+          ndpi_hostname_sni_set(flow, &payload[offset], len, NDPI_HOSTNAME_NORM_ALL);
         else
-          ndpi_hostname_sni_set(flow, &payload[offset], (const u_int8_t *)ptr - &payload[offset]);
+          ndpi_hostname_sni_set(flow, &payload[offset], (const u_int8_t *)ptr - &payload[offset], NDPI_HOSTNAME_NORM_ALL);
         break;
 
       case 0x32: /* Radio access technology (+ APN) */

@@ -10394,25 +10394,38 @@ ndpi_risk_info* ndpi_risk2severity(ndpi_risk_enum risk) {
 /* ******************************************************************** */
 
 char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
-			    const u_int8_t *value, size_t value_len) {
+			    const u_int8_t *value, size_t value_len,
+			    int normalize) {
   char *dst;
   size_t len, i;
 
   len = ndpi_min(value_len, sizeof(flow->host_server_name) - 1);
   dst = flow->host_server_name;
 
-  for(i = 0; i < len; i++) {
-    char c = tolower(value[value_len - len + i]);
-    if (c == '\t') c = ' ';
-    if (ndpi_isprint(c) == 0)
+  if(!normalize) {
+    memcpy(dst,&value[value_len - len],len);
+    dst[len] = '\0';
+  } else {
+    for(i = 0; i < len; i++) {
+      char c = value[value_len - len + i];
+      if(!c) break;
+      if(normalize & NDPI_HOSTNAME_NORM_LC) c = tolower(c);
+      if(normalize & NDPI_HOSTNAME_NORM_REPLACE_IC) {
+        if (c == '\t') c = ' ';
+        if (ndpi_isprint(c) == 0)
             c = '?';
-    dst[i] = c;
-  }
-  dst[i] = '\0';
+      }
+      dst[i] = c;
+    }
 
-  /* Removing spaces at the end of a line */
-  while(i > 0 && dst[i-1] == ' ')
-    dst[--i] = '\0';
+    dst[i] = '\0';
+    if(normalize & NDPI_HOSTNAME_NORM_STRIP_EOLSP) {
+      /* Removing spaces at the end of a line */
+      while(i > 0 && dst[i-1] == ' ')
+        dst[--i] = '\0';
+    }
+  }
+
 
   return dst;
 }

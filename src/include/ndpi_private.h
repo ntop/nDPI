@@ -393,7 +393,7 @@ void change_category(struct ndpi_detection_module_struct *ndpi_struct,
 		     ndpi_protocol_category_t protocol_category);
 
 
-char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
+char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len, int normalize);
 char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
 
 void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struct,

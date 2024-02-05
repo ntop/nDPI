@@ -270,7 +270,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
     case 0x0014: /* Realm */
       if(flow->host_server_name[0] == '\0') {
-        ndpi_hostname_sni_set(flow, payload + off + 4, ndpi_min(len, payload_length - off - 4));
+        ndpi_hostname_sni_set(flow, payload + off + 4, ndpi_min(len, payload_length - off - 4), NDPI_HOSTNAME_NORM_ALL);
         NDPI_LOG_DBG(ndpi_struct, "Realm [%s]\n", flow->host_server_name);
 
         if(strstr(flow->host_server_name, "google.com") != NULL) {
