@@ -3104,6 +3104,6 @@ const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx)
                                            "tls_cert", "mining", "msteams", "stun_zoom" };
 
   if(idx < 0 || idx >= NDPI_LRUCACHE_MAX)
-    return NULL;
+    return "unknown";
   return names[idx];
 }

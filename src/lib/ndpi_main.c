@@ -9962,7 +9962,7 @@ int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
 			     struct ndpi_lru_cache_stats *stats)
 {
   int scope, is_local = 1;
-  char param[64], buf[8];
+  char param[64], buf[8], *rc;
 
   if(!stats || (!ndpi_struct && !g_ctx))
     return -1;
@@ -9970,7 +9970,9 @@ int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
     is_local = 0;
   } else {
     snprintf(param, sizeof(param), "lru.%s.scope", ndpi_lru_cache_idx_to_name(cache_type));
-    ndpi_get_config(ndpi_struct, NULL, param, buf, sizeof(buf));
+    rc = ndpi_get_config(ndpi_struct, NULL, param, buf, sizeof(buf));
+    if(rc == NULL)
+      return -1;
     scope = atoi(buf);
     if(scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
       is_local = 0;
