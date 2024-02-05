@@ -25,8 +25,8 @@ E * ndpi_typedefs.h
 #define __NDPI_TYPEDEFS_H__
 
 #ifndef NDPI_CFFI_PREPROCESSING
-#include "ndpi_config.h"
 #ifdef USE_GLOBAL_CONTEXT
+#include "ndpi_config.h"
 #define HAVE_STRUCT_TIMESPEC
 #include <pthread.h>
 #endif
