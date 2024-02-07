@@ -763,6 +763,7 @@ void init_radmin_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
 void init_raft_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_cip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_gearman_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_tencent_games_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 

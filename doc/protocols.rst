@@ -584,3 +584,12 @@ References: `C implementation <https://github.com/canonical/raft>`_ and `Paper <
 Gearman is a network-based job-queuing system that was initially developed by Danga Interactive in order to process large volumes of jobs.
 
 References: `Main site <http://gearman.org/>`_
+
+
+.. _Proto 395:
+
+`NDPI_PROTOCOL_TENCENTGAMES`
+====================
+A protocol used by various games from Tencent (mostly mobile games).
+
+References: `Main site <https://www.tencentgames.com/>`_
