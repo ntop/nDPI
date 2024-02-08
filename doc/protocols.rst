@@ -593,3 +593,21 @@ References: `Main site <http://gearman.org/>`_
 A protocol used by various games from Tencent (mostly mobile games).
 
 References: `Main site <https://www.tencentgames.com/>`_
+
+
+.. _Proto 396:
+
+`NDPI_PROTOCOL_GAIJINENTERTAINMENT`
+====================
+Protocols used in various games from Gaijin Entertainment.
+
+References: `Main site <https://gaijin.net/>`_
+
+
+.. _Proto 397:
+
+`NDPI_PROTOCOL_CROSSOUT`
+====================
+A post-apocalyptic MMO game from Targem Games and Gaijin Entertainment.
+
+References: `Main site <https://crossout.net/>`_

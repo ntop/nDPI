@@ -1,0 +1,29 @@
+DPI Packets (UDP):	2	(1.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 266 (133.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+GaijinEntertainment	10	1373	2
+
+Fun                             10 1373          2            
+
+	1	UDP 192.168.88.231:37333 -> 95.211.246.178:20011 [proto: 396/GaijinEntertainment][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][5 pkts/908 bytes -> 0 pkts/0 bytes][Goodput ratio: 77/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (app.start)][Plen Bins: 0,0,0,20,60,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.88.231:36929 <-> 185.253.20.249:20021 [proto: 396/GaijinEntertainment][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][3 pkts/315 bytes <-> 2 pkts/150 bytes][Goodput ratio: 60/38][0.05 sec][PLAIN TEXT (Steve Hurley)][Plen Bins: 40,40,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
