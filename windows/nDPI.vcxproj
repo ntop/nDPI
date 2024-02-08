@@ -364,6 +364,7 @@
     <ClCompile Include="..\src\lib\protocols\stomp.c" />
     <ClCompile Include="..\src\lib\protocols\radmin.c" />
     <ClCompile Include="..\src\lib\protocols\gearman.c" />
+    <ClCompile Include="..\src\lib\protocols\tencent_games.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />
