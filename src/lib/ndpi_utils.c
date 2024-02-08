@@ -2955,13 +2955,8 @@ u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *nd
 	return(1);
       break;
 
-    case NDPI_MAX_RISK_PARAM_ID:
-      /* Nothing to do, just avoid warnings */
-      break;
-
     default:
-      printf("nDPI [%s:%u] Ignored risk parameter id %u\n",
-	     __FILE__, __LINE__, params[i].id);
+      NDPI_LOG_ERR(ndpi_str, "Ignored risk parameter id %u\n", params[i].id);
       break;
     }
   }

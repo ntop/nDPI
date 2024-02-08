@@ -53,8 +53,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int i, left = packet->payload_packet_len-x;
 
-  if(left <= 0) return;
-
   for(i=0; jabber_strings[i].string != NULL; i++) {
     if(ndpi_strnstr((const char*)&packet->payload[x], jabber_strings[i].string, left) != NULL) {    
       ndpi_int_jabber_add_connection(ndpi_struct, flow, jabber_strings[i].ndpi_protocol, NDPI_CONFIDENCE_DPI);

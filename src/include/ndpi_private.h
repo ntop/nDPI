@@ -465,6 +465,9 @@ char* ndpi_intoav4(unsigned int addr, char* buf, u_int16_t bufLen);
 
 u_int16_t icmp4_checksum(u_int8_t const * const buf, size_t len);
 
+ndpi_risk_enum ndpi_network_risk_ptree_match(struct ndpi_detection_module_struct *ndpi_str,
+					     struct in_addr *pin /* network byte order */);
+
 int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_mod, FILE *fd);
 int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd, void *user_data);
 int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
