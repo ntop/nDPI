@@ -2258,7 +2258,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("[TLS] SNI: [%s]\n", sni);
 #endif
-		    if(ndpi_is_valid_hostname(sni, sni_len) == 0) {
+		    if(ndpi_is_valid_hostname((char *)&packet->payload[offset+extension_offset+5], len) == 0) {
 		      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, sni);
 
 		      /* This looks like an attack */
