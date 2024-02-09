@@ -425,7 +425,6 @@ typedef enum {
   NDPI_PROTOCOL_GEARMAN               = 394,
   NDPI_PROTOCOL_TENCENTGAMES          = 395,
   NDPI_PROTOCOL_GAIJIN                = 396,
-  NDPI_PROTOCOL_CROSSOUT              = 397,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

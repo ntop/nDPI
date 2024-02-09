@@ -602,12 +602,3 @@ References: `Main site <https://www.tencentgames.com/>`_
 Protocols used in various games from Gaijin Entertainment.
 
 References: `Main site <https://gaijin.net/>`_
-
-
-.. _Proto 397:
-
-`NDPI_PROTOCOL_CROSSOUT`
-====================
-A post-apocalyptic MMO game from Targem Games and Gaijin Entertainment.
-
-References: `Main site <https://crossout.net/>`_
