@@ -1604,6 +1604,12 @@ static ndpi_protocol_match host_match[] =
    { "dota2.com",                        "Dota2",                 NDPI_PROTOCOL_DOTA2, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "publist.mumble.info",              "Mumble",                NDPI_PROTOCOL_MUMBLE, NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   /* Gaijin Entertainment */
+   { ".gaijin.net", "GaijinEntertainment", NDPI_PROTOCOL_GAIJIN, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".gaijinent.com", "GaijinEntertainment", NDPI_PROTOCOL_GAIJIN, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".crossout.net", "GaijinEntertainment", NDPI_PROTOCOL_GAIJIN, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { ".warthunder.com", "GaijinEntertainment", NDPI_PROTOCOL_GAIJIN, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif

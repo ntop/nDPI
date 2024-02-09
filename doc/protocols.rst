@@ -593,3 +593,12 @@ References: `Main site <http://gearman.org/>`_
 A protocol used by various games from Tencent (mostly mobile games).
 
 References: `Main site <https://www.tencentgames.com/>`_
+
+
+.. _Proto 396:
+
+`NDPI_PROTOCOL_GAIJIN`
+====================
+Protocols used in various games from Gaijin Entertainment.
+
+References: `Main site <https://gaijin.net/>`_
