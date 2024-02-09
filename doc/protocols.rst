@@ -597,7 +597,7 @@ References: `Main site <https://www.tencentgames.com/>`_
 
 .. _Proto 396:
 
-`NDPI_PROTOCOL_GAIJINENTERTAINMENT`
+`NDPI_PROTOCOL_GAIJIN`
 ====================
 Protocols used in various games from Gaijin Entertainment.
 
