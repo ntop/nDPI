@@ -10947,6 +10947,9 @@ static const struct cfg_param {
   { "tls",           "certificate_expiration_threshold",        "30", "0", "365", CFG_PARAM_INT, __OFF(tls_certificate_expire_in_x_days), NULL },
   { "tls",           "application_blocks_tracking",             "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_app_blocks_tracking_enabled), NULL },
   { "tls",           "metadata.sha1_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_sha1_fingerprint_enabled), NULL },
+  { "tls",           "metadata.ja3c_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja3c_fingerprint_enabled), NULL },
+  { "tls",           "metadata.ja3s_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja3s_fingerprint_enabled), NULL },
+  { "tls",           "metadata.ja4c_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja4c_fingerprint_enabled), NULL },
 
   { "smtp",          "tls_dissection",                          "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled), NULL },
 

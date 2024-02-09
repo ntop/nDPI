@@ -233,6 +233,9 @@ struct ndpi_detection_module_config_struct {
   int tls_certificate_expire_in_x_days;
   int tls_app_blocks_tracking_enabled;
   int tls_sha1_fingerprint_enabled;
+  int tls_ja3c_fingerprint_enabled;
+  int tls_ja3s_fingerprint_enabled;
+  int tls_ja4c_fingerprint_enabled;
 
   int smtp_opportunistic_tls_enabled;
 

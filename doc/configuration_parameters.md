@@ -24,6 +24,9 @@ TODO
 | "tls"        | "certificate_expiration_threshold"        | 30            | 0         | 365       | The threshold (in days) used to trigger the `NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE` flow risk |
 | "tls"        | "application_blocks_tracking"             | disable       | NULL      | NULL      | Enable/disable processing of TLS Application Blocks (post handshake) to extract statistical information about the flow |
 | "tls"        | "metadata.sha1_fingerprint"               | enable        | NULL      | NULL      | Enable/disable computation and export of SHA1 fingerprint for TLS flows. Note that if it is disable, the flow risk `NDPI_MALICIOUS_SHA1_CERTIFICATE` is not checked |
+| "tls"        | "metadata.ja3c_fingerprint"               | enable        | NULL      | NULL      | Enable/disable computation and export of JA3C fingerprint for TLS flows. Note that if it is disable, the flow risk `NDPI_MALICIOUS_JA3` is not checked |
+| "tls"        | "metadata.ja3s_fingerprint"               | enable        | NULL      | NULL      | Enable/disable computation and export of JA3S fingerprint for TLS flows |
+| "tls"        | "metadata.ja4c_fingerprint"               | enable        | NULL      | NULL      | Enable/disable computation and export of JA4C fingerprint for TLS flows |
 | "smtp"       | "tls_dissection"                          | enable        | NULL      | NULL      | Enable/disable dissection of TLS packets in cleartext SMTP flows (because of opportunistic TLS, via STARTTLS msg) |
 | "imap"       | "tls_dissection"                          | enable        | NULL      | NULL      | Enable/disable dissection of TLS packets in cleartext IMAP flows (because of opportunistic TLS, via STARTTLS msg) |
 | "pop"        | "tls_dissection"                          | enable        | NULL      | NULL      | Enable/disable dissection of TLS packets in cleartext POP flows (because of opportunistic TLS, via STARTTLS msg) |
