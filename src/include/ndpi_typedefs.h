@@ -596,7 +596,7 @@ struct ndpi_vxlanhdr {
 #define NDPI_GRE_STRICT      ntohs(0x0800)
 #define NDPI_GRE_REC         ntohs(0x0700)
 #define NDPI_GRE_ACK         ntohs(0x0080)
-#define NDPI_GRE_FLAGS       ntohs(0x00f8)
+#define NDPI_GRE_FLAGS       ntohs(0x0078)
 #define NDPI_GRE_VERSION     ntohs(0x0007)
 
 #define NDPI_GRE_IS_CSUM(f)		((f) & NDPI_GRE_CSUM)
