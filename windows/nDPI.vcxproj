@@ -278,6 +278,7 @@
     <ClCompile Include="..\src\lib\protocols\oicq.c" />
     <ClCompile Include="..\src\lib\protocols\openvpn.c" />
     <ClCompile Include="..\src\lib\protocols\oracle.c" />
+    <ClCompile Include="..\src\lib\protocols\portable_executable.c" />
     <ClCompile Include="..\src\lib\protocols\postgres.c" />
     <ClCompile Include="..\src\lib\protocols\ppstream.c" />
     <ClCompile Include="..\src\lib\protocols\pptp.c" />
