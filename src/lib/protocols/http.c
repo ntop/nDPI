@@ -958,8 +958,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
       hostname_just_set = 1;
 
-      if(ndpi_is_valid_hostname(flow->host_server_name,
-				strlen(flow->host_server_name)) == 0) {
+      if(ndpi_is_valid_hostname((char *)packet->host_line.ptr,
+				packet->host_line.len) == 0) {
 	char str[128];
 
 	snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);

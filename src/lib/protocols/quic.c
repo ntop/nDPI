@@ -1465,8 +1465,8 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_check_dga_name(ndpi_struct, flow,
                           flow->host_server_name, 1, 0);
 
-      if(ndpi_is_valid_hostname(flow->host_server_name,
-				strlen(flow->host_server_name)) == 0) {
+      if(ndpi_is_valid_hostname((char *)&crypto_data[tag_offset_start + prev_offset],
+				len) == 0) {
 	char str[128];
 
 	snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);

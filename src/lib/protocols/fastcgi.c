@@ -213,8 +213,8 @@ static void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct
                                   &ret_match, NDPI_PROTOCOL_FASTCGI);
       ndpi_check_dga_name(ndpi_struct, flow,
                           flow->host_server_name, 1, 0);
-      if(ndpi_is_valid_hostname(flow->host_server_name,
-                                strlen(flow->host_server_name)) == 0) {
+      if(ndpi_is_valid_hostname((char *)packet->host_line.ptr,
+                                packet->host_line.len) == 0) {
         char str[128];
 
         snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);

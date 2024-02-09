@@ -8698,6 +8698,13 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
       if(h->line->len == 0)
         h->line->ptr = NULL;
 
+      /* Stripping trailing spaces */
+      while(h->line->len > 0 && h->line->ptr[h->line->len - 1] == ' ') {
+        h->line->len--;
+      }
+      if(h->line->len == 0)
+        h->line->ptr = NULL;
+
       break;
     }
   }
