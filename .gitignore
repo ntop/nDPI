@@ -107,7 +107,6 @@
 /fuzz/fuzz_alg_crc32_md5_seed_corpus.zip
 /fuzz/fuzz_alg_bytestream_seed_corpus.zip
 /fuzz/fuzz_ds_libcache_seed_corpus.zip
-/fuzz/fuzz_ds_tree_seed_corpus.zip
 /fuzz/fuzz_ds_ptree_seed_corpus.zip
 /fuzz/fuzz_ds_bitmap64_seed_corpus.zip
 /fuzz/fuzz_ds_domain_classify_seed_corpus.zip

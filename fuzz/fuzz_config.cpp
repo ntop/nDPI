@@ -12,7 +12,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   struct ndpi_detection_module_struct *ndpi_info_mod;
   struct ndpi_flow_struct flow;
-  u_int8_t protocol_was_guessed;
+  u_int8_t protocol_was_guessed, unused;
   u_int32_t i, ret;
   u_int16_t bool_value;
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
@@ -34,6 +34,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char cfg_proto[32];
   char cfg_param[32];
   u_int64_t cat_userdata = 0;
+  u_int16_t unused1, unused2;
 
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
@@ -71,6 +72,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_load_protocols_file(ndpi_info_mod, "protos.txt");
   if(fuzzed_data.ConsumeBool())
     ndpi_load_protocols_file(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "invalid_filename"); /* Error */
+  if(fuzzed_data.ConsumeBool())
+    ndpi_load_categories_dir(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : (char *)"./");
+  if(fuzzed_data.ConsumeBool())
+    ndpi_load_categories_dir(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : (char *)"invalid_dir");
   if(fuzzed_data.ConsumeBool())
     ndpi_load_categories_file(ndpi_info_mod, "categories.txt", &cat_userdata);
   if(fuzzed_data.ConsumeBool())
@@ -484,6 +489,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_dump_risks_score(fuzzed_data.ConsumeBool() ? NULL : stdout);
   ndpi_dump_config(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : stdout);
 
+  char buf[8]; /* Too short in same cases... */
+  if(fuzzed_data.ConsumeBool()) {
+    ndpi_ssl_version2str(buf, sizeof(buf), fuzzed_data.ConsumeIntegral<u_int16_t>(), &unused);
+    ndpi_get_ip_proto_name(fuzzed_data.ConsumeIntegral<u_int8_t>(), buf, sizeof(buf));
+  } else {
+    ndpi_ssl_version2str(NULL, 0, fuzzed_data.ConsumeIntegral<u_int16_t>(), &unused);
+    ndpi_get_ip_proto_name(fuzzed_data.ConsumeIntegral<u_int8_t>(), NULL, 0);
+  }
+  ndpi_risk2str(static_cast<ndpi_risk_enum>(fuzzed_data.ConsumeIntegral<u_int64_t>()));
+  ndpi_severity2str(static_cast<ndpi_risk_severity>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
+  ndpi_risk2score(static_cast<ndpi_risk_enum>(fuzzed_data.ConsumeIntegral<u_int64_t>()), &unused1, &unused2);
+  ndpi_http_method2str(static_cast<ndpi_http_method>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
+
   /* Basic code to try testing this "config" */
   bool_value = fuzzed_data.ConsumeBool();
   input_info.in_pkt_dir = fuzzed_data.ConsumeIntegralInRange(0,2);
@@ -537,10 +555,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_search_tcp_or_udp(ndpi_info_mod, &flow);
   }
   if(!flow.is_ipv6) {
-    ndpi_network_ptree_match(ndpi_info_mod, (struct in_addr *)&flow.c_address.v4);
+    if(bool_value)
+      ndpi_network_risk_ptree_match(ndpi_info_mod, (struct in_addr *)&flow.c_address.v4);
 
     ndpi_risk_params params[] = { { NDPI_PARAM_HOSTNAME, flow.host_server_name},
-                                  { NDPI_PARAM_ISSUER_DN, flow.host_server_name},
+                                  { NDPI_PARAM_ISSUER_DN, (void *)("CN=813845657003339838, O=Code42, OU=TEST, ST=MN, C=US") /* from example/protos.txt */},
                                   { NDPI_PARAM_HOST_IPV4, &flow.c_address.v4} };
     ndpi_check_flow_risk_exceptions(ndpi_info_mod, 3, params);
   }

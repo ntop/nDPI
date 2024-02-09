@@ -125,6 +125,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   gpg_strerror_r(rc, buf_err, sizeof(buf_err));
 
+  gpg_strerror_r(static_cast<gcry_error_t>(fuzzed_data.ConsumeIntegral<u_int16_t>()), buf_err, sizeof(buf_err));
+
   ndpi_free(enc_out);
 
   return 0;

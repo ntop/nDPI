@@ -1,7 +1,9 @@
 #include "ndpi_api.h"
+#include "ndpi_md5.h"
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_char hash[16];
+  ndpi_MD5_CTX ctx;
   struct ndpi_popcount popcount;
   char *str;
 
@@ -14,7 +16,13 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_crc16_xmodem(data, size);
   ndpi_crc16_x25(data, size);
   ndpi_crc32(data, size);
+
   ndpi_md5(data, size, hash);
+
+  ndpi_MD5Init(&ctx);
+  ndpi_MD5Update(&ctx, data, size / 2);
+  ndpi_MD5Update(&ctx, data + size / 2, size - size / 2);
+  ndpi_MD5Final(hash, &ctx);
 
   ndpi_murmur_hash((const char *)data, size);
   ndpi_quick_hash(data, size);

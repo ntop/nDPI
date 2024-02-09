@@ -2603,6 +2603,9 @@ ndpi_risk_enum ndpi_network_risk_ptree_match(struct ndpi_detection_module_struct
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
+  if(!ndpi_str || !ndpi_str->ip_risk_ptree)
+    return(NDPI_NO_RISK);
+
   /* Make sure all in network byte order otherwise compares wont work */
   ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_ptree)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->ip_risk_ptree, &prefix);
@@ -4918,11 +4921,15 @@ int load_category_file_fd(struct ndpi_detection_module_struct *ndpi_str,
 */
 int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
 			     char *dir_path) {
-  DIR *dirp = opendir(dir_path);
+  DIR *dirp;
   struct dirent *dp;
   int failed_files = 0;
   int num_loaded = 0;
 
+  if(!ndpi_str || !dir_path)
+    return(0);
+
+  dirp = opendir(dir_path);
   if (dirp == NULL)
     return(0);
 
@@ -11102,9 +11109,12 @@ char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
   NDPI_LOG_DBG(ndpi_str, "Get [%s][%s]\n", proto, param);
 
   for(c = &cfg_params[0]; c && c->param; c++) {
-    if(((proto == NULL && c->proto == NULL) ||
-	(proto && c->proto && strcmp(proto, c->proto) == 0)) &&
-       strcmp(param, c->param) == 0) {
+    if((((proto == NULL && c->proto == NULL) ||
+	 (proto && c->proto && strcmp(proto, c->proto) == 0)) &&
+        strcmp(param, c->param) == 0) ||
+       (proto && c->proto &&
+	strcmp(c->proto, "$PROTO_NAME_OR_ID") == 0 &&
+	strcmp(param, c->param) == 0)) {
 
       return cfg_ops[c->type].fn_get((void *)((char *)&ndpi_str->cfg + c->offset), proto, buf, buf_len);
     }
