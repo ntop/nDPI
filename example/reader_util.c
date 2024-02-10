@@ -1783,10 +1783,9 @@ static uint32_t ndpi_is_valid_gre_tunnel(const struct pcap_pkthdr *header,
   struct ndpi_gre_basehdr *grehdr = (struct ndpi_gre_basehdr*)&packet[offset];
   offset += sizeof(struct ndpi_gre_basehdr);
   /*
-    rfc-1701
     The GRE flags are encoded in the first two octets.  Bit 0 is the
     most significant bit, bit 15 is the least significant bit.  Bits
-    13 through 15 are reserved for the Version field.  Bits 5 through
+    13 through 15 are reserved for the Version field.  Bits 9 through
     12 are reserved for future use and MUST be transmitted as zero.
   */
   if(NDPI_GRE_IS_FLAGS(grehdr->flags))
