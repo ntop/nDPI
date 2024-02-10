@@ -13,7 +13,8 @@ DOMAINS="$(curl -s 'https://www.gamingcommission.be/en/gaming-commission/illegal
 is_str_empty "${DOMAINS}" "Please check gambling sites URL and sed REGEX."
 
 printf '(2) %s\n' "Downloading Gambling Sites (Poland)"
-DOMAINS_PL="$(curl -s https://hazard.mf.gov.pl/api/Register | xmllint --xpath "/*[local-name(.)='Rejestr']/*[local-name(.)='PozycjaRejestru']/*[local-name(.)='AdresDomeny']/text()" -)"
+DOMAINS_PL="$(curl -s https://hazard.mf.gov.pl/api/Register)"
+DOMAINS_PL="$(echo "${DOMAINS_PL}" | xmllint --xpath "/*[local-name(.)='Rejestr']/*[local-name(.)='PozycjaRejestru']/*[local-name(.)='AdresDomeny']/text()" - || true)"
 is_str_empty "${DOMAINS_PL}" "Please check gambling sites URL and XPath."
 
 echo "${DOMAINS}" "${DOMAINS_PL}" | sort | uniq >${LIST}
