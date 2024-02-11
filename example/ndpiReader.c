@@ -5754,6 +5754,38 @@ void outlierUnitTest() {
 
 /* *********************************************** */
 
+void loadStressTest() {
+  struct ndpi_detection_module_struct *ndpi_struct_shadow = ndpi_init_detection_module(NULL);
+  NDPI_PROTOCOL_BITMASK all;
+
+  if(ndpi_struct_shadow) {
+    int i;
+
+    NDPI_BITMASK_SET_ALL(all);
+    ndpi_set_protocol_detection_bitmask2(ndpi_struct_shadow, &all);
+
+    for(i=1; i<100000; i++) {
+      char name[32];
+      ndpi_protocol_category_t id = CUSTOM_CATEGORY_MALWARE;
+      u_int8_t value = (u_int8_t)i;
+
+      snprintf(name, sizeof(name), "%d.com", i);
+      ndpi_load_hostname_category(ndpi_struct_shadow, name, id);
+
+      snprintf(name, sizeof(name), "%u.%u.%u.%u", value, value, value, value);
+      ndpi_load_ip_category(ndpi_struct_shadow, name, id, (void *)"My list");
+    }
+
+    ndpi_enable_loaded_categories(ndpi_struct_shadow);
+    ndpi_finalize_initialization(ndpi_struct_shadow);
+    ndpi_exit_detection_module(ndpi_struct_shadow);
+  }
+
+  exit(0);
+}
+
+/* *********************************************** */
+
 void domainsUnitTest() {
   NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_info_mod = ndpi_init_detection_module(NULL);
@@ -5765,7 +5797,7 @@ void domainsUnitTest() {
     ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
 
     assert(ndpi_load_domain_suffixes(ndpi_info_mod, "../lists/public_suffix_list.dat") == 0);
-    
+
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.chosei.chiba.jp"), "chosei.chiba.jp") == 0);
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.unipi.it"), "it") == 0);
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "mail.apple.com"), "com") == 0);
@@ -5870,6 +5902,7 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    loadStressTest();
     domainsUnitTest();
     outlierUnitTest();
     pearsonUnitTest();
