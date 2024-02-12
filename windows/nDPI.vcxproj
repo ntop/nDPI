@@ -299,7 +299,6 @@
     <ClCompile Include="..\src\lib\protocols\sflow.c" />
     <ClCompile Include="..\src\lib\protocols\sip.c" />
     <ClCompile Include="..\src\lib\protocols\skinny.c" />
-    <ClCompile Include="..\src\lib\protocols\skype.c" />
     <ClCompile Include="..\src\lib\protocols\slp.c" />
     <ClCompile Include="..\src\lib\protocols\smb.c" />
     <ClCompile Include="..\src\lib\protocols\socks45.c" />
