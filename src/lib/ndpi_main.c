@@ -4855,6 +4855,8 @@ int ndpi_load_category_file(struct ndpi_detection_module_struct *ndpi_str,
   return rc;
 }
 
+/* ******************************************************************** */
+
 int load_category_file_fd(struct ndpi_detection_module_struct *ndpi_str,
 			  FILE *fd, ndpi_protocol_category_t category_id) {
   char buffer[256], *line;
@@ -5022,6 +5024,8 @@ int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, co
   return rc;
 }
 
+/* ******************************************************************** */
+
 int load_risk_domain_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
   char buffer[128], *line;
   int len, num = 0;
@@ -5079,6 +5083,8 @@ int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, 
 
   return rc;
 }
+
+/* ******************************************************************** */
 
 int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
   char buffer[128], *line;
@@ -5151,6 +5157,8 @@ int ndpi_load_malicious_sha1_file(struct ndpi_detection_module_struct *ndpi_str,
 
   return rc;
 }
+
+/* ******************************************************************** */
 
 int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd)
 {
@@ -5236,6 +5244,8 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
 
   return rc;
 }
+
+/* ******************************************************************** */
 
 int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
   char *buffer, *old_buffer;
@@ -10644,7 +10654,6 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
     }
   }
 
-
   return dst;
 }
 
@@ -10682,8 +10691,7 @@ int ndpi_seen_flow_beginning(const struct ndpi_flow_struct *flow)
 
 /* ******************************************************************** */
 
-void ndpi_set_user_data(struct ndpi_detection_module_struct *ndpi_str, void *user_data)
-{
+void ndpi_set_user_data(struct ndpi_detection_module_struct *ndpi_str, void *user_data) {
   if (ndpi_str == NULL)
   {
     return;
@@ -10696,6 +10704,8 @@ void ndpi_set_user_data(struct ndpi_detection_module_struct *ndpi_str, void *use
 
   ndpi_str->user_data = user_data;
 }
+
+/* ******************************************************************** */
 
 void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
 {
@@ -10742,11 +10752,12 @@ static u_int16_t __get_proto_id(const char *proto_name_or_id)
   return proto_id;
 }
 
+/* ******************************************************************** */
+
 static ndpi_cfg_error _set_param_enable_disable(struct ndpi_detection_module_struct *ndpi_str,
                                                 void *_variable, const char *value,
                                                 const char *min_value, const char *max_value,
-                                                const char *proto)
-{
+                                                const char *proto) {
   int *variable = (int *)_variable;
 
   if(strcmp(value, "1") == 0 ||
@@ -10754,19 +10765,22 @@ static ndpi_cfg_error _set_param_enable_disable(struct ndpi_detection_module_str
     *variable = 1;
     return NDPI_CFG_OK;
   }
+  
   if(strcmp(value, "0") == 0 ||
      strcmp(value, "disable") == 0) {
     *variable = 0;
     return NDPI_CFG_OK;
   }
+  
   return NDPI_CFG_INVALID_PARAM;
 }
+
+/* ******************************************************************** */
 
 static ndpi_cfg_error _set_param_int(struct ndpi_detection_module_struct *ndpi_str,
                                      void *_variable, const char *value,
                                      const char *min_value, const char *max_value,
-                                     const char *proto)
-{
+                                     const char *proto) {
   int *variable = (int *)_variable;
   const char *errstrp;
   long val;
@@ -10787,8 +10801,9 @@ static ndpi_cfg_error _set_param_int(struct ndpi_detection_module_struct *ndpi_s
   return NDPI_CFG_OK;
 }
 
-static char *_get_param_int(void *_variable, const char *proto, char *buf, int buf_len)
-{
+/* ******************************************************************** */
+
+static char *_get_param_int(void *_variable, const char *proto, char *buf, int buf_len) {
   int *variable = (int *)_variable;
 
   snprintf(buf, buf_len, "%d", *variable);
@@ -10796,8 +10811,9 @@ static char *_get_param_int(void *_variable, const char *proto, char *buf, int b
   return buf;
 }
 
-static char *_get_param_string(void *_variable, const char *proto, char *buf, int buf_len)
-{
+/* ******************************************************************** */
+
+static char *_get_param_string(void *_variable, const char *proto, char *buf, int buf_len) {
   char *variable = (char *)_variable;
 
   snprintf(buf, buf_len, "%s", variable);
@@ -10805,11 +10821,12 @@ static char *_get_param_string(void *_variable, const char *proto, char *buf, in
   return buf;
 }
 
+/* ******************************************************************** */
+
 static ndpi_cfg_error _set_param_filename(struct ndpi_detection_module_struct *ndpi_str,
                                           void *_variable, const char *value,
                                           const char *min_value, const char *max_value,
-                                          const char *proto)
-{
+                                          const char *proto) {
   char *variable = (char *)_variable;
 
   if(value == NULL) { /* Valid value */
@@ -10823,11 +10840,12 @@ static ndpi_cfg_error _set_param_filename(struct ndpi_detection_module_struct *n
   return NDPI_CFG_OK;
 }
 
+/* ******************************************************************** */
+
 static ndpi_cfg_error _set_param_filename_config(struct ndpi_detection_module_struct *ndpi_str,
                                                  void *_variable, const char *value,
                                                  const char *min_value, const char *max_value,
-                                                 const char *proto)
-{
+                                                 const char *proto) {
   int rc;
   FILE *fd;
 
@@ -10836,18 +10854,24 @@ static ndpi_cfg_error _set_param_filename_config(struct ndpi_detection_module_st
     return rc;
 
   fd = fopen(value, "r");
+
   if(fd == NULL)
     return NDPI_CFG_INVALID_PARAM; /* It shoudn't happen because we already checked it */
+
   rc = load_config_file_fd(ndpi_str, fd);
+
   fclose(fd);
+
   if(rc < 0)
     return rc;
 
   return NDPI_CFG_OK;
 }
 
+/* ******************************************************************** */
 
-static char *_get_param_protocol_enable_disable(void *_variable, const char *proto, char *buf, int buf_len)
+static char *_get_param_protocol_enable_disable(void *_variable, const char *proto,
+						char *buf, int buf_len)
 {
   NDPI_PROTOCOL_BITMASK *bitmask = (NDPI_PROTOCOL_BITMASK *)_variable;
   u_int16_t proto_id;
