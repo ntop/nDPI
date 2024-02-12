@@ -67,8 +67,10 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
      || ends_with(ndpi_struct, (char*)flow->host_server_name, ".windows.com")
      )
     ;
-  else
+  else {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PORTABLE_EXECUTABLE, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
     ndpi_set_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER, msg);
+  }
  }
 
   /* *********************************************** */
@@ -189,10 +191,10 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
 
       packet->http_check_content = 1;
 
-      if(len >= 8 /* 4 chars for \r\n\r\n and at least 4 charts for content guess */) {
-	double_ret += 4;
-
-	ndpi_http_check_human_redeable_content(ndpi_struct, flow, double_ret, len);
+      if (len > 4 /* 4 chars for \r\n\r\n and at least 4 charts for content guess */) {
+        double_ret += 4;
+        len -= 4;
+        ndpi_http_check_human_redeable_content(ndpi_struct, flow, double_ret, len);
       }
     }
 
