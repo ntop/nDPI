@@ -5780,8 +5780,6 @@ void loadStressTest() {
     ndpi_finalize_initialization(ndpi_struct_shadow);
     ndpi_exit_detection_module(ndpi_struct_shadow);
   }
-
-  exit(0);
 }
 
 /* *********************************************** */
