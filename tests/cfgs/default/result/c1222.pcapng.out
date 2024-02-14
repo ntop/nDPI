@@ -1,6 +1,6 @@
-DPI Packets (UDP):	4	(4.00 pkts/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 163 (163.00 diss/flow)
+Num dissector calls: 1 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -21,8 +21,8 @@ Patricia risk IPv6:   1/0 (search/found)
 Patricia protocols:   0/0 (search/found)
 Patricia protocols IPv6: 2/0 (search/found)
 
-OpenVPN	13	5354	1
+ANSI_C1222	9	1067	1
 
-Acceptable                      13 5354          1            
+Acceptable                       9 1067          1            
 
-	1	UDP [::1]:56256 <-> [::1]:1194 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: VPN/2][7 pkts/3253 bytes <-> 6 pkts/2101 bytes][Goodput ratio: 89/85][0.02 sec][bytes ratio: 0.215 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 3/3 11/9 4/4][Pkt Len c2s/s2c min/avg/max/stddev: 114/114 465/350 1228/1033 382/314][Plen Bins: 0,31,7,0,0,0,7,15,0,0,0,7,0,0,0,0,7,0,0,0,7,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP [fe80::21e:ecff:fe30:9474]:42787 <-> [fe80::203:47ff:feeb:3faf]:1153 [proto: 397/ANSI_C1222][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: IoT-Scada/31][5 pkts/552 bytes <-> 4 pkts/515 bytes][Goodput ratio: 19/30][1.41 sec][bytes ratio: 0.035 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 20/20 342/470 1249/1249 525/553][Pkt Len c2s/s2c min/avg/max/stddev: 88/88 110/129 192/243 41/66][Plen Bins: 0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
