@@ -774,6 +774,7 @@ void init_cip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 void init_gearman_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_tencent_games_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_gaijin_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_c1222_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 

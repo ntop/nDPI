@@ -602,3 +602,12 @@ References: `Main site <https://www.tencentgames.com/>`_
 Protocols used in various games from Gaijin Entertainment.
 
 References: `Main site <https://gaijin.net/>`_
+
+
+.. _Proto 397:
+
+`NDPI_PROTOCOL_C1222`
+====================
+ANSI C12.22 (IEEE Std 1703) describe a protocol for transporting ANSI C12.19 table data over networks. It's mostly used to communicate with electric meters.
+
+References: `Paid specs <https://www.nema.org/Standards/view/American-National-Standard-for-Protocol-Specification-for-Interfacing-to-Data-Communication-Networks/>`_
