@@ -46,8 +46,9 @@ static void ndpi_search_modbus_tcp(struct ndpi_detection_module_struct *ndpi_str
       u_int16_t modbus_len = htons(*((u_int16_t*)&packet->payload[4]));
 
       // the fourth parameter of the payload is the length of the segment            
-      if((modbus_len-1) == (packet->payload_packet_len - 7 /* ModbusTCP header len */)) {
-        /* Check Modbus function code. 0x5A (90) is reserved for UMAS protocol */
+      if(((modbus_len-1) == (packet->payload_packet_len - 7 /* ModbusTCP header len */))
+	 && (packet->payload[2] == 0x0) && (packet->payload[3] == 0x0) /* Protocol identifier */) {
+	/* Check Modbus function code. 0x5A (90) is reserved for UMAS protocol */
         if (packet->payload[7] == 0x5A) {
           NDPI_LOG_INFO(ndpi_struct, "found Schneider Electric UMAS\n");
           ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UMAS, NDPI_PROTOCOL_MODBUS, NDPI_CONFIDENCE_DPI);
