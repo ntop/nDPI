@@ -2745,6 +2745,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    if(!invalid_ja) {
 	      /* Compute JA3 client */
 
+compute_ja3c:
               if(ndpi_struct->cfg.tls_ja3c_fingerprint_enabled) {
 	        int rc;
                 u_int16_t ja_str_len;
@@ -2752,7 +2753,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
                 ndpi_MD5_CTX ctx;
                 u_char md5_hash[16];
 
-compute_ja3c:
 	        ja_str_len = ndpi_snprintf(ja_str, JA_STR_LEN, "%u,", ja.client.tls_handshake_version);
 
 	        for(i=0; i<ja.client.num_ciphers; i++) {
