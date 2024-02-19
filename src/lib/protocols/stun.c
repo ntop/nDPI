@@ -373,7 +373,6 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   u_int32_t unused;
   int first_dtls_pkt = 0;
   u_int16_t old_proto_stack[2] = {NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN};
-  ndpi_protocol_category_t old_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
 
   NDPI_LOG_DBG2(ndpi_struct, "Packet counter %d protos %d/%d\n", flow->packet_counter,
                 flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
@@ -393,9 +392,6 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
     if(is_stun(ndpi_struct, flow, &app_proto) /* To extract other metadata */ &&
        flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN /* No previous subclassification */) {
       ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
-      /* TODO */
-      ndpi_protocol ret = { NDPI_PROTOCOL_STUN, app_proto, NDPI_PROTOCOL_UNKNOWN /* unused */, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
-      flow->category = ndpi_get_proto_category(ndpi_struct, ret);
     }
   } else if(first_byte <= 19) {
     NDPI_LOG_DBG(ndpi_struct, "DROP or ZRTP range. Unexpected\n");
@@ -435,11 +431,10 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 	    /* We might need to rollback this change... */
 	    old_proto_stack[0] = flow->detected_protocol_stack[0];
 	    old_proto_stack[1] = flow->detected_protocol_stack[1];
-	    old_category = flow->category;
 
             /* TODO: right way? It is a bit scary... do we need to reset something else too? */
             reset_detected_protocol(ndpi_struct, flow);
-            change_category(ndpi_struct, flow, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED);
+            /* We keep the category related to STUN traffic */
 	    /* STUN often triggers this risk; clear it. TODO: clear other risks? */
 	    ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
 
@@ -464,7 +459,6 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
             ndpi_set_detected_protocol(ndpi_struct, flow,
                                        old_proto_stack[1], old_proto_stack[0],
                                        NDPI_CONFIDENCE_DPI);
-            change_category(ndpi_struct, flow, old_category);
 
             flow->stun.maybe_dtls = 0;
             flow->max_extra_packets_to_check -= 10;
@@ -613,6 +607,13 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
      app_proto != NDPI_PROTOCOL_UNKNOWN) {
     NDPI_LOG_DBG(ndpi_struct, "Setting %d\n", app_proto);
     ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, __get_master(flow), confidence);
+
+    /* In "normal" data-path the generic code in `ndpi_internal_detection_process_packet()`
+       takes care of setting the category */
+    if(flow->extra_packets_func) {
+      ndpi_protocol ret = { __get_master(flow), app_proto, NDPI_PROTOCOL_UNKNOWN /* unused */, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
+      flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+    }
   }
 
   /* We want extra dissection for:
