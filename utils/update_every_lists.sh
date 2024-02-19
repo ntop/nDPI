@@ -42,6 +42,8 @@ RETVAL=$(( RETVAL + $? ))
 RETVAL=$(( RETVAL + $? ))
 ./protonvpn_ip_addresses_download.sh
 RETVAL=$(( RETVAL + $? ))
+./public_suffix_list_download.sh
+RETVAL=$(( RETVAL + $? ))
 
 test ${RETVAL} -ne 0 && printf '%s: %s\n' "${0}" "${RETVAL} script(s) failed"
 exit ${RETVAL}
