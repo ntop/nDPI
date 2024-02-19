@@ -96,4 +96,5 @@ install: $(NDPI_LIBS)
 	cp -P $(NDPI_LIB_SHARED_BASE) $(DESTDIR)$(PREFIX)$(libdir)/
 	cp -P $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) $(DESTDIR)$(PREFIX)$(libdir)/
 	mkdir -p $(DESTDIR)$(PREFIX)$(includedir)
-	cp ../include/*.h $(DESTDIR)$(PREFIX)$(includedir)
+	#Avoid installing private header
+	find ../include/*.h ! -name ndpi_private.h -exec cp "{}" $(DESTDIR)$(PREFIX)$(includedir)/ \;
