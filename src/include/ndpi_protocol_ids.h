@@ -428,6 +428,7 @@ typedef enum {
   NDPI_PROTOCOL_C1222                 = 397,
   NDPI_PROTOCOL_HUAWEI                = 398,
   NDPI_PROTOCOL_HUAWEI_CLOUD          = 399,
+  NDPI_PROTOCOL_DLEP                  = 400,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
