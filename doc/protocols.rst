@@ -611,3 +611,21 @@ References: `Main site <https://gaijin.net/>`_
 ANSI C12.22 (IEEE Std 1703) describe a protocol for transporting ANSI C12.19 table data over networks. It's mostly used to communicate with electric meters.
 
 References: `Paid specs <https://www.nema.org/Standards/view/American-National-Standard-for-Protocol-Specification-for-Interfacing-to-Data-Communication-Networks/>`_
+
+
+.. _Proto 398:
+
+`NDPI_PROTOCOL_HUAWEI`
+======================
+Generic Huawei traffic.
+
+References: `Main site <https://www.huawei.com/>`_
+
+
+.. _Proto 399:
+
+`NDPI_PROTOCOL_HUAWEI_CLOUD`
+============================
+Huawei Mobile Cloud.
+
+References: `Main site <https://cloud.huawei.com/>`_
