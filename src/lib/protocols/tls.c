@@ -1759,6 +1759,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t handshake_type;
   bool is_quic = (quic_version != 0);
   bool is_dtls = packet->udp && (!is_quic);
+  bool use_srtp = 0;
 
 #ifdef DEBUG_TLS
   printf("TLS %s() called\n", __FUNCTION__);
@@ -2501,6 +2502,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		printf("Client TLS [SIGNATURE_ALGORITHMS: %s]\n", ja.client.signature_algorithms_str);
 #endif
+	      } else if(extension_id == 14 /* use_srtp */) {
+                use_srtp = 1;
+#ifdef DEBUG_TLS
+                printf("Client TLS: use_srtp\n");
+#endif
 	      } else if(extension_id == 16 /* application_layer_protocol_negotiation */ &&
 	                offset+extension_offset+1 < total_len) {
 		u_int16_t s_offset = offset+extension_offset;
@@ -2826,6 +2832,7 @@ compute_ja3c:
 
 	    /* Before returning to the caller we need to make a final check */
 	    if((flow->protos.tls_quic.ssl_version >= 0x0303) /* >= TLSv1.2 */
+	       && !(flow->stun.maybe_dtls == 1 && is_dtls && use_srtp) /* Webrtc traffic */
 	       && (flow->protos.tls_quic.advertised_alpns == NULL) /* No ALPN */) {
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_NOT_CARRYING_HTTPS, "No ALPN");
 	    }
@@ -2840,6 +2847,7 @@ compute_ja3c:
 	    /* Add check for missing SNI */
 	    if(flow->host_server_name[0] == '\0'
 	       && (flow->protos.tls_quic.ssl_version >= 0x0302) /* TLSv1.1 */
+	       && !(flow->stun.maybe_dtls == 1 && is_dtls && use_srtp) /* Webrtc traffic */
 	       && (flow->protos.tls_quic.encrypted_sni.esni == NULL) /* No ESNI */
 	       ) {
 	      /* This is a bit suspicious */
