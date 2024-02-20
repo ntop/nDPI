@@ -83,63 +83,7 @@
 
 #endif
 
-#define NDPI_USE_ASYMMETRIC_DETECTION                           0
 #define NDPI_SELECTION_BITMASK_PROTOCOL_SIZE			u_int32_t
-
-#define NDPI_SELECTION_BITMASK_PROTOCOL_IP			(1<<0)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP			(1<<1)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP			(1<<2)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP		(1<<3)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD		(1<<4)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION	(1<<5)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_IPV6			(1<<6)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6		(1<<7)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC	(1<<8)
-/* now combined detections */
-
-/* v4 */
-#define NDPI_SELECTION_BITMASK_PROTOCOL_TCP (NDPI_SELECTION_BITMASK_PROTOCOL_IP | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_UDP (NDPI_SELECTION_BITMASK_PROTOCOL_IP | NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP (NDPI_SELECTION_BITMASK_PROTOCOL_IP | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)
-
-/* v6 */
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP (NDPI_SELECTION_BITMASK_PROTOCOL_IPV6 | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP (NDPI_SELECTION_BITMASK_PROTOCOL_IPV6 | NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP_OR_UDP (NDPI_SELECTION_BITMASK_PROTOCOL_IPV6 | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)
-
-/* v4 or v6 */
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP (NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6 | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP (NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6 | NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP (NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6 | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)
-
-/* does it make sense to talk about udp with payload ??? have you ever seen empty udp packets ? */
-#define NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD		(NDPI_SELECTION_BITMASK_PROTOCOL_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP_WITH_PAYLOAD		(NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD		(NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
-
-#define NDPI_SELECTION_BITMASK_PROTOCOL_TCP_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION)
-
-#define NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION)
-
-#define NDPI_SELECTION_BITMASK_PROTOCOL_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
-
-#define NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
-#define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
-
-/* safe src/dst protocol check macros... */
-
-#define NDPI_SRC_HAS_PROTOCOL(src,protocol) ((src) != NULL && NDPI_COMPARE_PROTOCOL_TO_BITMASK((src)->detected_protocol_bitmask,(protocol)) != 0)
-
-#define NDPI_DST_HAS_PROTOCOL(dst,protocol) ((dst) != NULL && NDPI_COMPARE_PROTOCOL_TO_BITMASK((dst)->detected_protocol_bitmask,(protocol)) != 0)
-
-#define NDPI_SRC_OR_DST_HAS_PROTOCOL(src,dst,protocol) (NDPI_SRC_HAS_PROTOCOL(src,protocol) || NDPI_SRC_HAS_PROTOCOL(dst,protocol))
 
 /**
  * convenience macro to check for excluded protocol
@@ -150,77 +94,7 @@
 								( NDPI_COMPARE_PROTOCOL_TO_BITMASK((ndpi_struct)->detection_bitmask, (protocol)) == 0 || \
 								  NDPI_COMPARE_PROTOCOL_TO_BITMASK((flow)->excluded_protocol_bitmask, (protocol)) != 0 ) )
 
-/* misc definitions */
-#define NDPI_DEFAULT_MAX_TCP_RETRANSMISSION_WINDOW_SIZE 0x10000
-#define NDPI_DEFAULT_MAX_NUM_PKTS_PER_FLOW_TO_DISSECT   32
-
-/* TODO: rebuild all memory areas to have a more aligned memory block here */
-
-/* DEFINITION OF MAX LINE NUMBERS FOR line parse algorithm */
-#define NDPI_MAX_PARSE_LINES_PER_PACKET                         64
-
-#define MAX_PACKET_COUNTER                                   65000
 #define MAX_DEFAULT_PORTS                                        5
-
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
- #define NDPI_LOG(proto, m, log_level, args...)		                                 \
-  {								                         \
-    struct ndpi_detection_module_struct *mod = (struct ndpi_detection_module_struct*) m; \
-    if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-      (*(mod->ndpi_debug_printf))(proto, mod, log_level, __FILE__, __FUNCTION__, __LINE__, args); \
-  }
-
- /* We must define NDPI_CURRENT_PROTO before include ndpi_main.h !!!
-  *
-  * #include "ndpi_protocol_ids.h"
-  * #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_XXXX
-  * #include "ndpi_api.h"
-  *
-  */
-
- #ifndef NDPI_CURRENT_PROTO
- #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
- #endif
-
- #define NDPI_LOG_ERR(mod, args...)		                                 \
-  if(mod && mod->ndpi_log_level >= NDPI_LOG_ERROR) {	                         \
-    if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-      (*(mod->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod, NDPI_LOG_ERROR , __FILE__, __FUNCTION__, __LINE__, args); \
-  }
-
- #define NDPI_LOG_INFO(mod, args...)		                                 \
-  if(mod && mod->ndpi_log_level >= NDPI_LOG_TRACE) {	                         \
-    if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-      (*(mod->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod, NDPI_LOG_TRACE , __FILE__, __FUNCTION__, __LINE__, args); \
-  }
-
- #define NDPI_LOG_DBG(mod, args...)		                                 \
-  if(mod && mod->ndpi_log_level >= NDPI_LOG_DEBUG) {	                         \
-    if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-      (*(mod->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod, NDPI_LOG_DEBUG , __FILE__, __FUNCTION__, __LINE__, args); \
-  }
-
- #define NDPI_LOG_DBG2(mod, args...)		                                 \
-  if(mod && mod->ndpi_log_level >= NDPI_LOG_DEBUG_EXTRA) {	                         \
-    if(mod != NULL && mod->ndpi_debug_printf != NULL)		                         \
-      (*(mod->ndpi_debug_printf))(NDPI_CURRENT_PROTO, mod, NDPI_LOG_DEBUG_EXTRA , __FILE__, __FUNCTION__, __LINE__, args); \
-  }
-
-#else							/* not defined NDPI_ENABLE_DEBUG_MESSAGES */
-# ifdef WIN32
-# define NDPI_LOG(...) {}
-# define NDPI_LOG_ERR(...) {}
-# define NDPI_LOG_INFO(...) {}
-# define NDPI_LOG_DBG(...) {}
-# define NDPI_LOG_DBG2(...) {}
-# else
-# define NDPI_LOG(proto, mod, log_level, args...) { /* printf(args); */ }
-# define NDPI_LOG_ERR(mod, args...)  { printf(args); }
-# define NDPI_LOG_INFO(mod, args...) { /* printf(args); */ }
-# define NDPI_LOG_DBG(mod,  args...) { /* printf(args); */ }
-# define NDPI_LOG_DBG2(mod, args...) { /* printf(args); */ }
-# endif
-#endif							/* NDPI_ENABLE_DEBUG_MESSAGES */
 
 #define NDPI_EXCLUDE_PROTO(mod,flow) ndpi_exclude_protocol(mod, flow, NDPI_CURRENT_PROTO, __FILE__, __FUNCTION__, __LINE__)
 #define NDPI_EXCLUDE_PROTO_EXT(mod,flow,proto) ndpi_exclude_protocol(mod, flow, proto, __FILE__, __FUNCTION__, __LINE__)
@@ -278,10 +152,6 @@
 #define ndpi_min(a,b)   ((a < b) ? a : b)
 #define ndpi_max(a,b)   ((a > b) ? a : b)
 
-#define NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct,flow,packet)		\
-                        if (packet->packet_lines_parsed_complete != 1) {        \
-			  ndpi_parse_packet_line_info(ndpi_struct,flow);	\
-                        }                                                       \
 
 #define NDPI_IPSEC_PROTOCOL_ESP    50
 #define NDPI_IPSEC_PROTOCOL_AH     51
