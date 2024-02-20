@@ -629,3 +629,12 @@ References: `Main site <https://www.huawei.com/>`_
 Huawei Mobile Cloud.
 
 References: `Main site <https://cloud.huawei.com/>`_
+
+
+.. _Proto 400:
+
+`NDPI_PROTOCOL_DLEP`
+=====================
+The Dynamic Link ExchangeProtocol (DLEP) is a radio aware routing (RAR) protocol.
+
+References: `RFC <https://datatracker.ietf.org/doc/html/rfc8175>`_
