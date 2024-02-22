@@ -2458,7 +2458,7 @@ void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
     if(host && (host[0] != '\0')) {
       /* Check host exception */
       ndpi_check_hostname_risk_exception(ndpi_str, flow, host);
-
+      
       if(flow->risk_mask == 0) {
 	u_int i;
 
@@ -2471,6 +2471,8 @@ void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 	    ndpi_free(flow->risk_infos[i].info);
 	    flow->risk_infos[i].info = NULL;
 	  }
+
+	  flow->risk_infos[i].id = NDPI_NO_RISK;
 	}
 
 	flow->num_risk_infos = 0;
@@ -2507,6 +2509,10 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
   if(!ndpi_isset_risk(ndpi_str, flow, r)) {
     ndpi_risk v = 1ull << r;
 
+    /* In case there is an exception set, take it into account */
+    if(flow->host_risk_mask_evaluated)
+      v &= flow->risk_mask;
+    
     // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
     flow->risk |= v;
 
