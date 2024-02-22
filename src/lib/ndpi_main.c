@@ -7358,7 +7358,11 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 				 NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_TLS,
 				 NDPI_CONFIDENCE_DPI_PARTIAL);
       }
-    }
+    } else if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_TELEGRAM) {
+	ndpi_int_change_protocol(ndpi_str, flow,
+				 flow->guessed_protocol_id_by_ip, flow->detected_protocol_stack[1],
+				 NDPI_CONFIDENCE_DPI_PARTIAL);	
+      }
     break;
 
   case NDPI_PROTOCOL_SKYPE_TEAMS:
