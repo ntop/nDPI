@@ -2472,6 +2472,10 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
   if(!ndpi_isset_risk(ndpi_str, flow, r)) {
     ndpi_risk v = 1ull << r;
 
+    /* In case there is an exception set, take it into account */
+    if(flow->host_risk_mask_evaluated)
+      v &= flow->risk_mask;
+    
     // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
     flow->risk |= v;
 
