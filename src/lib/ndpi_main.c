@@ -8413,6 +8413,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
     flow->risk_checked = 1;
   }
+
   if(!flow->tree_risk_checked) {
     ndpi_risk_enum net_risk = NDPI_NO_RISK;
 
@@ -8434,6 +8435,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
       addr = *(struct in6_addr *)&flow->c_address.v6;
       net_risk = ndpi_network_risk_ptree_match6(ndpi_str, &addr);
     }
+
     if(net_risk != NDPI_NO_RISK)
       ndpi_set_risk(ndpi_str, flow, net_risk, NULL);
 
@@ -8450,10 +8452,17 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   /* ndpi_reconcile_protocols(ndpi_str, flow, &ret); */
 
   /* Zoom cache */
-  if((ret.app_protocol == NDPI_PROTOCOL_ZOOM)
-     && (flow->l4_proto == IPPROTO_TCP))
+  if((ret.app_protocol == NDPI_PROTOCOL_ZOOM) && (flow->l4_proto == IPPROTO_TCP))
     ndpi_add_connection_as_zoom(ndpi_str, flow);
 
+  /*
+    Telegram
+    With MTProto 2.0 telegram is no longr TLS-based (altoug based on TCP/443) so
+    we need to detect it with Telegram IPs
+  */
+  if(ret.protocol_by_ip == NDPI_PROTOCOL_TELEGRAM)
+    ret.app_protocol = NDPI_PROTOCOL_TELEGRAM, flow->confidence = NDPI_CONFIDENCE_MATCH_BY_IP;
+  
   if(ndpi_str->cfg.fully_encrypted_heuristic &&
      ret.app_protocol == NDPI_PROTOCOL_UNKNOWN && /* Only for unknown traffic */
      flow->packet_counter == 1 && packet->payload_packet_len > 0) {
