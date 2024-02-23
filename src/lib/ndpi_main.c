@@ -8454,14 +8454,6 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   /* Zoom cache */
   if((ret.app_protocol == NDPI_PROTOCOL_ZOOM) && (flow->l4_proto == IPPROTO_TCP))
     ndpi_add_connection_as_zoom(ndpi_str, flow);
-
-  /*
-    Telegram
-    With MTProto 2.0 telegram is no longr TLS-based (altoug based on TCP/443) so
-    we need to detect it with Telegram IPs
-  */
-  if(ret.protocol_by_ip == NDPI_PROTOCOL_TELEGRAM)
-    ret.app_protocol = NDPI_PROTOCOL_TELEGRAM, flow->confidence = NDPI_CONFIDENCE_MATCH_BY_IP;
   
   if(ndpi_str->cfg.fully_encrypted_heuristic &&
      ret.app_protocol == NDPI_PROTOCOL_UNKNOWN && /* Only for unknown traffic */

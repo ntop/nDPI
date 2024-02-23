@@ -31,8 +31,9 @@
 #include "ndpi_private.h"
 
 static void ndpi_int_telegram_add_connection(struct ndpi_detection_module_struct
-                                             *ndpi_struct, struct ndpi_flow_struct *flow) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+                                             *ndpi_struct, struct ndpi_flow_struct *flow,
+					     ndpi_confidence_t confidence) {
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_UNKNOWN, confidence);
   NDPI_LOG_INFO(ndpi_struct, "found telegram\n");
 }
 
@@ -51,18 +52,15 @@ static void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struc
   NDPI_LOG_DBG(ndpi_struct, "search telegram\n");
 
   if(packet->tcp != NULL) {
-    if(packet->payload_packet_len > 56) {
-      u_int16_t dport = ntohs(packet->tcp->dest);
-      /* u_int16_t sport = ntohs(packet->tcp->source); */
-
-      if(packet->payload[0] == 0xef && (dport == 443 || dport == 80 || dport == 25)) {
-        if(packet->payload[1] == 0x7f) {
-          ndpi_int_telegram_add_connection(ndpi_struct, flow);
-        } else if(packet->payload[1]*4 <= packet->payload_packet_len - 1) {
-          ndpi_int_telegram_add_connection(ndpi_struct, flow);
-        }
-        return;
-      }
+    /* With MTProto 2.0 telegram via app is no longer TLS-based (althought based on TCP/443) so
+       we need to detect it with Telegram IPs.
+       Basically, we want a fast classification by ip. Note that, real Telegram traffic over
+       TLS (i.e. Telegram Web) is correctly classified as TLS/Telegram because TLS dissector
+       already kicked in.
+       Let's check every port for the time being */
+    if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_TELEGRAM) {
+      ndpi_int_telegram_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_MATCH_BY_IP);
+      return;
     }
   } else if(packet->udp != NULL) {
     /*
@@ -94,7 +92,7 @@ static void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struc
 	}
 
 	if(found == 12)	{
-	  ndpi_int_telegram_add_connection(ndpi_struct, flow);
+	  ndpi_int_telegram_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
 	  return;
 	}
       }
