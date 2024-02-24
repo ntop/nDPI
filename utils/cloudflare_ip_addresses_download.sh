@@ -10,8 +10,8 @@ LIST=/tmp/cloudflare.list
 LIST6=/tmp/cloudflare.list6
 LIST_MERGED=/tmp/cloudflare.list_m
 LIST6_MERGED=/tmp/cloudflare.list6_m
-ORIGIN="https://www.cloudflare.com/ips-v4"
-ORIGIN6="https://www.cloudflare.com/ips-v6"
+ORIGIN="https://www.cloudflare.com/ips-v4/"
+ORIGIN6="https://www.cloudflare.com/ips-v6/"
 
 echo "(1) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
