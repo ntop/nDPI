@@ -363,11 +363,14 @@ void ndpiCheckHostStringMatch(char *testChar) {
   char appBufStr[64];
   ndpi_protocol detected_protocol;
   struct ndpi_detection_module_struct *ndpi_str;
+  NDPI_PROTOCOL_BITMASK all;
 
   if(!testChar)
     return;
 
   ndpi_str = ndpi_init_detection_module(NULL);
+  NDPI_BITMASK_SET_ALL(all);
+  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
   ndpi_finalize_initialization(ndpi_str);
 
   testRes =  ndpi_match_string_subprotocol(ndpi_str,
