@@ -853,6 +853,15 @@ void ndpi_self_check_host_match(FILE *error_out) {
   u_int32_t i, j;
 
   for(i = 0; host_match[i].string_to_match != NULL; i++) {
+    if(host_match[i].string_to_match[0] == '.') {
+      if (error_out != NULL) {
+        fprintf(error_out,
+                "[NDPI] INTERNAL ERROR Invalid string detected '%s'. It can not start with '.'\n",
+                host_match[i].string_to_match);
+        fprintf(error_out, "\nPlease fix host_match[] in ndpi_content_match.c.inc\n");
+      }
+      abort();
+    }
     for(j = 0; host_match[j].string_to_match != NULL; j++) {
       if((i != j) && (strcmp(host_match[i].string_to_match, host_match[j].string_to_match) == 0)) {
         if (error_out != NULL) {
@@ -2308,24 +2317,40 @@ int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
       return 1;
     }
     /* pattern is DOMAIN.NAME and string x.DOMAIN.NAME ? */
-    if(start > 1 && !ndpi_is_middle_string_char(pattern->astring[0]) && pattern->rep.dot) {
+    if(start >= 1 && !ndpi_is_middle_string_char(pattern->astring[0])) {
       /*
 	The patch below allows in case of pattern ws.amazon.com
 	to avoid matching aws.amazon.com whereas a.ws.amazon.com
 	has to match
       */
-      if(ndpi_is_middle_string_char(txt->astring[start-1])) {
+      if(txt->astring[start-1] == '.') {
 	if(!txt->match.last || txt->match.last->rep.level < pattern->rep.level) {
 	  txt->match.last = pattern; *match = pattern->rep;
-	  MATCH_DEBUG_INFO("[NDPI] Searching: Found domain match. Proto %d \n",pattern->rep.number);
+	  MATCH_DEBUG_INFO("[NDPI] Searching: Found domain match (pre). Proto %d \n",pattern->rep.number);
 	}
       }
       continue;
     }
 
-    if(!txt->match.last || txt->match.last->rep.level < pattern->rep.level) {
-      txt->match.last = pattern; *match = pattern->rep;
-      MATCH_DEBUG_INFO("[NDPI] Searching: matched. Proto %d \n",pattern->rep.number);
+    /* pattern is -DOMAIN.NAME and string x-DOMAIN.NAME ? */
+    if(start >= 1 && pattern->astring[0] == '-') {
+      if(txt->astring[start] == '-') {
+	if(!txt->match.last || txt->match.last->rep.level < pattern->rep.level) {
+	  txt->match.last = pattern; *match = pattern->rep;
+	  MATCH_DEBUG_INFO("[NDPI] Searching: Found domain match (pre -). Proto %d \n",pattern->rep.number);
+	}
+      }
+      continue;
+    }
+
+    /* pattern is DOMAIN. and string DOMAIN.SOMETHING ? or
+       DOMAIN- and DOMAIN-SOMETHING */
+    if(start == 0 && ndpi_is_middle_string_char(pattern->astring[pattern->length - 1])) {
+	if(!txt->match.last || txt->match.last->rep.level < pattern->rep.level) {
+	  txt->match.last = pattern; *match = pattern->rep;
+	  MATCH_DEBUG_INFO("[NDPI] Searching: Found domain match (post). Proto %d \n",pattern->rep.number);
+	}
+      continue;
     }
   }
   return 0;
@@ -3786,6 +3811,12 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
 
 /* Wrappers */
 void *ndpi_init_automa(void) {
+  return(ac_automata_init(NULL));
+}
+
+/* ****************************************************** */
+
+void *ndpi_init_automa_domain(void) {
   return(ac_automata_init(ac_domain_match_handler));
 }
 
