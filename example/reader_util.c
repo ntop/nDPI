@@ -1404,29 +1404,36 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
                 sizeof(flow->http.user_agent),
                 "%s", (flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : ""));
 
-  if (workflow->ndpi_serialization_format != ndpi_serialization_format_unknown) {
-    if (ndpi_flow2json(workflow->ndpi_struct, flow->ndpi_flow,
-                       flow->ip_version, flow->protocol,
-		       flow->vlan_id,
-                       flow->src_ip, flow->dst_ip,
-                       &flow->src_ip6, &flow->dst_ip6,
-                       flow->src_port, flow->dst_port,
-                       flow->detected_protocol,
-                       &flow->ndpi_flow_serializer) != 0) {
-      LOG(NDPI_LOG_ERROR, "flow2json failed\n");
-      exit(-1);
-    }
-    
-    ndpi_serialize_string_uint32(&flow->ndpi_flow_serializer, "detection_completed", flow->detection_completed);
-    ndpi_serialize_string_uint32(&flow->ndpi_flow_serializer, "check_extra_packets", flow->check_extra_packets);
+  if (workflow->ndpi_serialization_format != ndpi_serialization_format_unknown) 
+  {
+      if (!isValidFlowForLogging(flow))
+      {
+          return ;
+      }
+
+	  if (ndpi_flow2json(workflow->ndpi_struct, flow->ndpi_flow,
+		  flow->ip_version, flow->protocol,
+		  flow->vlan_id,
+		  flow->src_ip, flow->dst_ip,
+		  &flow->src_ip6, &flow->dst_ip6,
+		  flow->src_port, flow->dst_port,
+		  flow->detected_protocol,
+		  &flow->ndpi_flow_serializer) != 0)
+	  {
+		  LOG(NDPI_LOG_ERROR, "flow2json failed\n");
+		  exit(-1);
+	  }
+	  ndpi_serialize_string_uint32(&flow->ndpi_flow_serializer, "detection_completed", flow->detection_completed);
+	  ndpi_serialize_string_uint32(&flow->ndpi_flow_serializer, "check_extra_packets", flow->check_extra_packets);
   }
 
   if(flow->detection_completed && (!flow->check_extra_packets)) {   
     flow->flow_payload = flow->ndpi_flow->flow_payload, flow->flow_payload_len = flow->ndpi_flow->flow_payload_len;
     flow->ndpi_flow->flow_payload = NULL; /* We'll free the memory */
 
-    if(workflow->flow_callback != NULL)
-      workflow->flow_callback(workflow, flow, workflow->flow_callback_userdata);
+
+    if (workflow->flow_callback != NULL)
+        workflow->flow_callback(workflow, flow, workflow->flow_callback_userdata);
 
     ndpi_free_flow_info_half(flow);
   }

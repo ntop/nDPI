@@ -28,6 +28,7 @@
 #include "../src/lib/third_party/include/uthash.h"
 #include "../src/lib/third_party/include/ahocorasick.h"
 
+#include "ReadJson.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -63,6 +64,7 @@
 
 #include "reader_util.h"
 
+
 #define ntohl64(x) ( ( (uint64_t)(ntohl( (uint32_t)((x << 32) >> 32) )) << 32) | ntohl( ((uint32_t)(x >> 32)) ) )
 #define htonl64(x) ntohl64(x)
 
@@ -91,6 +93,25 @@ static ndpi_serialization_format serialization_format = ndpi_serialization_forma
 static char* domain_to_check = NULL;
 static char* ip_port_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
+
+/*--------------------------------------Ashwani start--------------------------------------------*/
+static FILE* serializationLogFile = NULL;               // nDPIReader_Log_File.txt is created at the same location where nDPIReader.exe is placed.
+static char* pCapFilesFolderLocationPath = NULL;        // This is the full path of folder which has pCap files to process
+static char* pCapFilesSearchString = NULL;              // This pCapFilesFolderLocationPath/*.* 
+static char moduleFolderPath[1024];                     // This is the path of folder in which nDPIReader.exe resides
+static bool needToRecordRisk = false;                   // This parameters is used to determine whether <record> field needs to be logged into json log file (ALERTS/EVENTS) or not
+
+#define MAX_NUMBER_OF_FILES 1000
+#define MAX_PATH_LENGTH 512
+
+char* pcap_files[MAX_NUMBER_OF_FILES];
+char* generated_tmp_json_files_events[MAX_NUMBER_OF_FILES];
+char* generated_tmp_json_files_alerts[MAX_NUMBER_OF_FILES];
+char* generated_json_files_events[MAX_NUMBER_OF_FILES];
+char* generated_json_files_alerts[MAX_NUMBER_OF_FILES];
+int number_of_valid_files_found = 0;
+/*--------------------------------------Ashwani end--------------------------------------------*/
+
 /** User preferences **/
 u_int8_t enable_realtime_output = 0, enable_protocol_guess = 1, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
@@ -110,6 +131,7 @@ static u_int16_t num_loops = 1;
 static u_int8_t shutdown_app = 0, quiet_mode = 0;
 static u_int8_t num_threads = 1;
 static struct timeval startup_time, begin, end;
+
 #ifdef __linux__
 static int core_affinity[MAX_NUM_READER_THREADS];
 #endif
@@ -520,9 +542,10 @@ static void help(u_int long_help) {
          "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
          "          [-p <protos>][-l <loops> [-q][-d][-h][-H][-D][-e <len>][-E][-t][-v <level>]\n"
          "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
-         "          [-r <file>][-R][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>]\n"
+         "          [-r <file>][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>]\n"
          "          [-a <mode>][-B proto_list]\n\n"
          "Usage:\n"
+         "  -R <pcap files location>  | Specify folder full path where pcap files are stores for processing\n"  // Ashwani: location of pcap files (Example: "C:\Ashwani\misc\nDPI\Testing\pCapFiles")
          "  -i <file.pcap|device>     | Specify a pcap file/playlist to read packets from or a\n"
          "                            | device for live capture (comma-separated list)\n"
          "  -f <BPF filter>           | Specify a BPF filter for filtering selected traffic\n"
@@ -559,7 +582,6 @@ static void help(u_int long_help) {
          "  -c <path>                 | Load custom categories from the specified file\n"
          "  -C <path>                 | Write output in CSV format on the specified file\n"
          "  -r <path>                 | Load risky domain file\n"
-         "  -R                        | Print detected realtime protocols\n"
          "  -j <path>                 | Load malicious JA3 fingeprints\n"
          "  -S <path>                 | Load malicious SSL certificate SHA1 fingerprints\n"
 	 "  -G <dir>                  | Bind domain names to categories loading files from <dir>\n"
@@ -941,6 +963,167 @@ static int parse_two_unsigned_integer(char *param, u_int32_t *num1, u_int32_t *n
   return -1;
 }
 
+/*-----------------------------------------------------------------------------------------------------*/
+// Ashwani:
+// This gets all the valid pcap and pcapng files located at specified pCap files location
+//
+void fetchFilesToProcess() 
+{
+    WIN32_FIND_DATA find_data;
+    HANDLE hFind = FindFirstFile(pCapFilesSearchString, &find_data);
+
+    if (hFind == INVALID_HANDLE_VALUE) 
+    {
+        perror("Error opening directory");
+        return;
+    }
+
+    number_of_valid_files_found = 0;
+
+	do 
+    {
+		if (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			continue; // Skip directories
+		}
+
+		const char* filename = find_data.cFileName;
+		const char* extension_pcap = ".pcap";
+		size_t ext_length_pcap = strlen(extension_pcap);
+
+		const char* extension_pcapng = ".pcapng";
+		size_t ext_length_pcapng = strlen(extension_pcapng);
+		size_t file_length = strlen(filename);
+
+		if (file_length >= ext_length_pcap && strcmp(filename + file_length - ext_length_pcap, extension_pcap) == 0 ||
+			file_length >= ext_length_pcapng && strcmp(filename + file_length - ext_length_pcapng, extension_pcapng) == 0)
+		{
+			char* pcapFileFullPath = (char*)malloc(MAX_PATH_LENGTH);
+			if (pcapFileFullPath == NULL)
+			{
+				perror("Memory allocation error");
+				FindClose(hFind);
+				return;
+			}
+
+			sprintf(pcapFileFullPath, "%s\\%s", pCapFilesFolderLocationPath, filename);
+
+			char* dot = strrchr(filename, '.');
+			if (dot != NULL)
+			{
+				*dot = '\0'; // Replace the dot with the null terminator
+			}
+
+			char* eventJsonFileFullPath = (char*)malloc(MAX_PATH_LENGTH);
+			if (eventJsonFileFullPath == NULL)
+			{
+				perror("Memory allocation error");
+				FindClose(hFind);
+				return;
+			}
+
+			pcap_files[number_of_valid_files_found] = pcapFileFullPath;
+
+			sprintf(eventJsonFileFullPath, "%s\\%s\\%s.%s", moduleFolderPath, "Events", filename, "json");
+			generated_json_files_events[number_of_valid_files_found] = eventJsonFileFullPath;
+
+			char* eventTmpJsonFileFullPath = (char*)malloc(MAX_PATH_LENGTH);
+			if (eventTmpJsonFileFullPath == NULL)
+			{
+				perror("Memory allocation error");
+				FindClose(hFind);
+				return;
+			}
+
+
+			sprintf(eventTmpJsonFileFullPath, "%s.%s", eventJsonFileFullPath, "tmp");
+			generated_tmp_json_files_events[number_of_valid_files_found] = eventTmpJsonFileFullPath;
+
+			char* alertJsonFileFullPath = (char*)malloc(MAX_PATH_LENGTH);
+			if (alertJsonFileFullPath == NULL)
+			{
+				perror("Memory allocation error");
+				FindClose(hFind);
+				return;
+			}
+
+			sprintf(alertJsonFileFullPath, "%s\\%s\\%s.%s", moduleFolderPath, "Alerts", filename, "json");
+			generated_json_files_alerts[number_of_valid_files_found] = alertJsonFileFullPath;
+
+			char* alertTmpJsonFileFullPath = (char*)malloc(MAX_PATH_LENGTH);
+			if (alertTmpJsonFileFullPath == NULL)
+			{
+				perror("Memory allocation error");
+				FindClose(hFind);
+				return;
+			}
+
+			sprintf(alertTmpJsonFileFullPath, "%s.%s", alertJsonFileFullPath, "tmp");
+			generated_tmp_json_files_alerts[number_of_valid_files_found] = alertTmpJsonFileFullPath;
+
+			number_of_valid_files_found++;
+
+			if (number_of_valid_files_found >= MAX_NUMBER_OF_FILES) 
+            {
+				fprintf(serializationLogFile, "ERROR: Maximum number of files reached (%d), some files may be omitted.\n", MAX_NUMBER_OF_FILES);
+				break;
+			}
+		}
+    } while (FindNextFile(hFind, &find_data) != 0);
+
+    FindClose(hFind);
+}
+
+/*-----------------------------------------------------------------------------------------------------*/
+// Ashwani:
+// This gets all the valid pcap and pcapng files and also set options like where data should be recorded.
+//
+static void fetchFilesToProcessAndSetDefaultOptions()
+{
+    do
+    {       
+        fetchFilesToProcess();
+
+        if (number_of_valid_files_found == 0)
+        {
+            fprintf(serializationLogFile, "No file to process. Sleeping for 15 seconds\n");
+            if (_isatty(_fileno(stdin)))
+            {
+                printf("No file to process. Sleeping for 15 seconds\n");
+            }
+            sleep(15);
+        }
+    } while (number_of_valid_files_found == 0);
+
+    // Print the full paths of the .pcap files
+    fprintf(serializationLogFile, "\nTotal number of pcap/pcapng files found = %d\n\n", number_of_valid_files_found);
+    if (_isatty(_fileno(stdin)))
+    {
+        printf("\nTotal number of pcap/pcapng files found = %d\n\n", number_of_valid_files_found);
+    }
+
+    int maxFileLength = 0;
+    for (int i = 0; i < number_of_valid_files_found; i++)
+    {
+        int length = strlen(pcap_files[i]);
+        if (length > maxFileLength)
+        {
+            maxFileLength = length;
+        }
+    }
+    for (int i = 0; i < number_of_valid_files_found; i++)
+    {
+        fprintf(serializationLogFile, "%3d.  %-*s| %-*s\n", i, maxFileLength + 10, pcap_files[i], maxFileLength, generated_tmp_json_files_events[i]);
+        if (_isatty(_fileno(stdin)))
+        {
+            printf("%3d.  %-*s| %-*s\n", i, maxFileLength + 10, pcap_files[i], maxFileLength, generated_tmp_json_files_events[i]);
+        }
+    }
+
+    verbose = 2;
+    quiet_mode = 1;
+}
+
 /* ********************************** */
 
 /**
@@ -979,7 +1162,7 @@ static void parseOptions(int argc, char **argv) {
   }
 
   while((opt = getopt_long(argc, argv,
-			   "a:Ab:B:e:Ec:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:Rs:tu:v:V:n:rp:x:X:w:Z:q0123:456:7:89:m:MT:U:",
+			   "a:Ab:B:e:Ec:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:R:s:tu:v:V:n:rp:x:X:w:Z:q0123:456:7:89:m:MT:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -1017,7 +1200,7 @@ static void parseOptions(int argc, char **argv) {
 
     case 'i':
     case '3':
-      _pcap_file[0] = optarg;
+     // _pcap_file[0] = optarg;  // Ashwani: This is commented out as we take pcap/pcapng files from the input folder which is set using option '-R'
       break;
 
     case 'I':
@@ -1083,8 +1266,8 @@ static void parseOptions(int argc, char **argv) {
       break;
 
     case 'R':
-      enable_realtime_output =1;
-      break;
+        pCapFilesFolderLocationPath = optarg; // Ashwani: This is folder path of pcap/pcapng files
+        break;
 
     case 's':
       capture_for = atoi(optarg);
@@ -1195,11 +1378,14 @@ static void parseOptions(int argc, char **argv) {
 
     case 'k':
       errno = 0;
-      if((serialization_fp = fopen(optarg, "w")) == NULL)
-      {
-        printf("Unable to write on serialization file %s: %s\n", optarg, strerror(errno));
-        exit(1);
-      }
+      // Ashwani: This code is commented out as we create serialization files in main method when we iterate over all the valid files.
+      // found at the location specified by the user.
+      // //
+      //if((serialization_fp = fopen(optarg, "w")) == NULL)
+      //{
+      //  printf("Unable to write on serialization file %s: %s\n", optarg, strerror(errno));
+      //  exit(1);
+      //}
       break;
 
     case 'K':
@@ -1333,29 +1519,32 @@ static void parseOptions(int argc, char **argv) {
     extcap_capture();
   }
 
-  if(!domain_to_check && !ip_port_to_check) {
-    if(_pcap_file[0] == NULL)
-      help(0);
+  //
+  // Ashwani: Following code is commented as we now iterate over all valid pcap/pcapng files in main method itself.
+  // 
+  //if(!domain_to_check && !ip_port_to_check) {
+  //  if(_pcap_file[0] == NULL)
+  //    help(0);
 
-    if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
-      num_threads = 0;               /* setting number of threads = number of interfaces */
-      __pcap_file = strtok(_pcap_file[0], ",");
-      while(__pcap_file != NULL && num_threads < MAX_NUM_READER_THREADS) {
-        _pcap_file[num_threads++] = __pcap_file;
-        __pcap_file = strtok(NULL, ",");
-      }
-    } else {
-      if(num_threads > MAX_NUM_READER_THREADS) num_threads = MAX_NUM_READER_THREADS;
-      for(thread_id = 1; thread_id < num_threads; thread_id++)
-        _pcap_file[thread_id] = _pcap_file[0];
-    }
+  //  if(strchr(_pcap_file[0], ',')) { /* multiple ingress interfaces */
+  //    num_threads = 0;               /* setting number of threads = number of interfaces */
+  //    __pcap_file = strtok(_pcap_file[0], ",");
+  //    while(__pcap_file != NULL && num_threads < MAX_NUM_READER_THREADS) {
+  //      _pcap_file[num_threads++] = __pcap_file;
+  //      __pcap_file = strtok(NULL, ",");
+  //    }
+  //  } else {
+  //    if(num_threads > MAX_NUM_READER_THREADS) num_threads = MAX_NUM_READER_THREADS;
+  //    for(thread_id = 1; thread_id < num_threads; thread_id++)
+  //      _pcap_file[thread_id] = _pcap_file[0];
+  //  }
 
-    if(num_threads > 1 && enable_malloc_bins == 1)
-    {
-      printf("Memory profiling ('-M') is incompatible with multi-thread enviroment");
-      exit(1);
-    }
-  }
+  //  if(num_threads > 1 && enable_malloc_bins == 1)
+  //  {
+  //    printf("Memory profiling ('-M') is incompatible with multi-thread enviroment");
+  //    exit(1);
+  //  }
+  //}
 
 #ifdef __linux__
 #ifndef USE_DPDK
@@ -1479,7 +1668,12 @@ void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
 /**
  * @brief Print the flow
  */
-static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t thread_id) {
+static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t thread_id) 
+{
+  // Ashwani: return from here as we do not want to print anything to console window
+  //
+  return;
+
   FILE *out = results_file ? results_file : stdout;
   u_int8_t known_tls;
   char buf[32], buf1[64];
@@ -1972,130 +2166,180 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   }
 }
 
-static void printFlowSerialized(u_int16_t thread_id,
-                                struct ndpi_flow_info *flow)
+
+static void printFlowSerialized(u_int16_t thread_id, struct ndpi_flow_info* flow)
 {
-  char *json_str = NULL;
-  u_int32_t json_str_len = 0;
-  ndpi_serializer * const serializer = &flow->ndpi_flow_serializer;
-  //float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
-  double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
-  float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
+    char* json_str = NULL;
+    u_int32_t json_str_len = 0;
+    ndpi_serializer* const serializer = &flow->ndpi_flow_serializer;
+    //float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
+    double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
+    float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
 
-  ndpi_serialize_string_uint32(serializer, "flow_id", flow->flow_id);
-  ndpi_serialize_string_double(serializer, "first_seen", f / 1000., "%.3f");
-  ndpi_serialize_string_double(serializer, "last_seen", l / 1000., "%.3f");
-  ndpi_serialize_string_double(serializer, "duration", (l-f)/1000.0, "%.3f");
-  ndpi_serialize_string_uint32(serializer, "vlan_id", flow->vlan_id);
-  ndpi_serialize_string_uint32(serializer, "bidirectional", flow->bidirectional);
+    if (!isValidFlowForLogging(flow))
+    {
+        return ;
+    }
 
-  /* XFER Packets/Bytes */
-  ndpi_serialize_start_of_block(serializer, "xfer");
-  ndpi_serialize_string_float(serializer, "data_ratio", data_ratio, "%.3f");
-  ndpi_serialize_string_string(serializer, "data_ratio_str", ndpi_data_ratio2str(data_ratio));
-  ndpi_serialize_string_uint32(serializer, "src2dst_packets", flow->src2dst_packets);
-  ndpi_serialize_string_uint64(serializer, "src2dst_bytes",
-                               (u_int64_t)flow->src2dst_bytes);
-  ndpi_serialize_string_uint64(serializer, "src2dst_goodput_bytes",
-                               (u_int64_t)flow->src2dst_goodput_bytes);
-  ndpi_serialize_string_uint32(serializer, "dst2src_packets", flow->dst2src_packets);
-  ndpi_serialize_string_uint64(serializer, "dst2src_bytes",
-                               (u_int64_t)flow->dst2src_bytes);
-  ndpi_serialize_string_uint64(serializer, "dst2src_goodput_bytes",
-                               (u_int64_t)flow->dst2src_goodput_bytes);
-  ndpi_serialize_end_of_block(serializer);
+    if (needToRecordRisk)
+    {
+        if (!flow->risk_str)
+        {           
+            return;
+        }
 
-  /* IAT (Inter Arrival Time) */
-  ndpi_serialize_start_of_block(serializer, "iat");
-  ndpi_serialize_string_uint32(serializer, "flow_min", ndpi_data_min(flow->iat_flow));
-  ndpi_serialize_string_float(serializer, "flow_avg",
-                              ndpi_data_average(flow->iat_flow), "%.1f");
-  ndpi_serialize_string_uint32(serializer, "flow_max", ndpi_data_max(flow->iat_flow));
-  ndpi_serialize_string_float(serializer, "flow_stddev",
-                              ndpi_data_stddev(flow->iat_flow), "%.1f");
+        ndpi_serialize_start_of_block(serializer, "event");
+        ndpi_serialize_string_string(serializer, "kind", "alert");
+        ndpi_serialize_end_of_block(serializer);
+    }
+    else
+    {
+        ndpi_serialize_start_of_block(serializer, "event");
+        ndpi_serialize_string_string(serializer, "kind", "event");
+        ndpi_serialize_end_of_block(serializer);
+    }
 
-  ndpi_serialize_string_uint32(serializer, "c_to_s_min",
-                               ndpi_data_min(flow->iat_c_to_s));
-  ndpi_serialize_string_float(serializer, "c_to_s_avg",
-                              ndpi_data_average(flow->iat_c_to_s), "%.1f");
-  ndpi_serialize_string_uint32(serializer, "c_to_s_max",
-                               ndpi_data_max(flow->iat_c_to_s));
-  ndpi_serialize_string_float(serializer, "c_to_s_stddev",
-                              ndpi_data_stddev(flow->iat_c_to_s), "%.1f");
+	ndpi_serialize_start_of_block(serializer, "flow");
+	ndpi_serialize_string_uint32(serializer, "id", flow->hashval);
+	ndpi_serialize_end_of_block(serializer);
 
-  ndpi_serialize_string_uint32(serializer, "s_to_c_min",
-                               ndpi_data_min(flow->iat_s_to_c));
-  ndpi_serialize_string_float(serializer, "s_to_c_avg",
-                              ndpi_data_average(flow->iat_s_to_c), "%.1f");
-  ndpi_serialize_string_uint32(serializer, "s_to_c_max",
-                               ndpi_data_max(flow->iat_s_to_c));
-  ndpi_serialize_string_float(serializer, "s_to_c_stddev",
-                              ndpi_data_stddev(flow->iat_s_to_c), "%.1f");
-  ndpi_serialize_end_of_block(serializer);
+    time_t start_seconds = f / 1000;
+    struct tm* timeinfo;
+    timeinfo = gmtime(&start_seconds);
+    char datetime_start_str[30];
+    strftime(datetime_start_str, 30, "%Y-%m-%dT%H:%M:%SZ", timeinfo);
 
-  /* Packet Length */
-  ndpi_serialize_start_of_block(serializer, "pktlen");
-  ndpi_serialize_string_uint32(serializer, "c_to_s_min",
-                               ndpi_data_min(flow->pktlen_c_to_s));
-  ndpi_serialize_string_float(serializer, "c_to_s_avg",
-                              ndpi_data_average(flow->pktlen_c_to_s), "%.1f");
-  ndpi_serialize_string_uint32(serializer, "c_to_s_max",
-                               ndpi_data_max(flow->pktlen_c_to_s));
-  ndpi_serialize_string_float(serializer, "c_to_s_stddev",
-                              ndpi_data_stddev(flow->pktlen_c_to_s), "%.1f");
 
-  ndpi_serialize_string_uint32(serializer, "s_to_c_min",
-                               ndpi_data_min(flow->pktlen_s_to_c));
-  ndpi_serialize_string_float(serializer, "s_to_c_avg",
-                              ndpi_data_average(flow->pktlen_s_to_c), "%.1f");
-  ndpi_serialize_string_uint32(serializer, "s_to_c_max",
-                               ndpi_data_max(flow->pktlen_s_to_c));
-  ndpi_serialize_string_float(serializer, "s_to_c_stddev",
-                              ndpi_data_stddev(flow->pktlen_s_to_c), "%.1f");
-  ndpi_serialize_end_of_block(serializer);
+    time_t end_seconds = l / 1000;
+    timeinfo = gmtime(&end_seconds);
+    char datetime_end_str[30];
+    strftime(datetime_end_str, 30, "%Y-%m-%dT%H:%M:%SZ", timeinfo);
 
-  /* TCP flags */
-  ndpi_serialize_start_of_block(serializer, "tcp_flags");
-  ndpi_serialize_string_int32(serializer, "cwr_count", flow->cwr_count);
-  ndpi_serialize_string_int32(serializer, "ece_count", flow->ece_count);
-  ndpi_serialize_string_int32(serializer, "urg_count", flow->urg_count);
-  ndpi_serialize_string_int32(serializer, "ack_count", flow->ack_count);
-  ndpi_serialize_string_int32(serializer, "psh_count", flow->psh_count);
-  ndpi_serialize_string_int32(serializer, "rst_count", flow->rst_count);
-  ndpi_serialize_string_int32(serializer, "syn_count", flow->syn_count);
-  ndpi_serialize_string_int32(serializer, "fin_count", flow->fin_count);
+	ndpi_serialize_start_of_block(serializer, "event");
+	ndpi_serialize_string_string(serializer, "start", datetime_start_str);
+	ndpi_serialize_string_string(serializer, "end", datetime_end_str);
 
-  ndpi_serialize_string_int32(serializer, "src2dst_cwr_count", flow->src2dst_cwr_count);
-  ndpi_serialize_string_int32(serializer, "src2dst_ece_count", flow->src2dst_ece_count);
-  ndpi_serialize_string_int32(serializer, "src2dst_urg_count", flow->src2dst_urg_count);
-  ndpi_serialize_string_int32(serializer, "src2dst_ack_count", flow->src2dst_ack_count);
-  ndpi_serialize_string_int32(serializer, "src2dst_psh_count", flow->src2dst_psh_count);
-  ndpi_serialize_string_int32(serializer, "src2dst_rst_count", flow->src2dst_rst_count);
-  ndpi_serialize_string_int32(serializer, "src2dst_syn_count", flow->src2dst_syn_count);
-  ndpi_serialize_string_int32(serializer, "src2dst_fin_count", flow->src2dst_fin_count);
+	long long nanoseconds = (end_seconds - start_seconds) * 1000000;
 
-  ndpi_serialize_string_int32(serializer, "dst2src_cwr_count", flow->dst2src_cwr_count);
-  ndpi_serialize_string_int32(serializer, "dst2src_ece_count", flow->dst2src_ece_count);
-  ndpi_serialize_string_int32(serializer, "dst2src_urg_count", flow->dst2src_urg_count);
-  ndpi_serialize_string_int32(serializer, "dst2src_ack_count", flow->dst2src_ack_count);
-  ndpi_serialize_string_int32(serializer, "dst2src_psh_count", flow->dst2src_psh_count);
-  ndpi_serialize_string_int32(serializer, "dst2src_rst_count", flow->dst2src_rst_count);
-  ndpi_serialize_string_int32(serializer, "dst2src_syn_count", flow->dst2src_syn_count);
-  ndpi_serialize_string_int32(serializer, "dst2src_fin_count", flow->dst2src_fin_count);
-  ndpi_serialize_end_of_block(serializer);
+	ndpi_serialize_string_uint64(serializer, "duration", nanoseconds);
+	ndpi_serialize_end_of_block(serializer);
 
-  /* TCP window */
-  ndpi_serialize_string_uint32(serializer, "c_to_s_init_win", flow->c_to_s_init_win);
-  ndpi_serialize_string_uint32(serializer, "s_to_c_init_win", flow->s_to_c_init_win);
+	ndpi_serialize_string_uint32(serializer, "vlan_id", flow->vlan_id);
+	ndpi_serialize_string_uint32(serializer, "bidirectional", flow->bidirectional);
 
-  json_str = ndpi_serializer_get_buffer(serializer, &json_str_len);
-  if (json_str == NULL || json_str_len == 0)
-  {
-    printf("ERROR: nDPI serialization failed\n");
-    exit(-1);
-  }
+	/* XFER Packets/Bytes */
+	ndpi_serialize_start_of_block(serializer, "xfer");
+	ndpi_serialize_string_float(serializer, "data_ratio", data_ratio, "%.3f");
+	ndpi_serialize_string_string(serializer, "data_ratio_str", ndpi_data_ratio2str(data_ratio));
 
-  fprintf(serialization_fp, "%.*s\n", (int)json_str_len, json_str);
+    ndpi_serialize_start_of_block(serializer, "source");
+    ndpi_serialize_string_uint32(serializer, "packets", flow->src2dst_packets);
+    ndpi_serialize_string_uint64(serializer, "bytes", (u_int64_t)flow->src2dst_bytes);
+    ndpi_serialize_end_of_block(serializer);
+
+    ndpi_serialize_start_of_block(serializer, "destination");
+    ndpi_serialize_string_uint32(serializer, "packets", flow->dst2src_packets);
+    ndpi_serialize_string_uint64(serializer, "bytes", (u_int64_t)flow->dst2src_bytes);
+    ndpi_serialize_end_of_block(serializer);
+
+	ndpi_serialize_string_uint64(serializer, "src2dst_goodput_bytes",
+		(u_int64_t)flow->src2dst_goodput_bytes);
+
+	ndpi_serialize_string_uint64(serializer, "dst2src_goodput_bytes",
+		(u_int64_t)flow->dst2src_goodput_bytes);
+	ndpi_serialize_end_of_block(serializer);
+
+	/* IAT (Inter Arrival Time) */
+	ndpi_serialize_start_of_block(serializer, "iat");
+	ndpi_serialize_string_uint32(serializer, "flow_min", ndpi_data_min(flow->iat_flow));
+	ndpi_serialize_string_float(serializer, "flow_avg",
+		ndpi_data_average(flow->iat_flow), "%.1f");
+	ndpi_serialize_string_uint32(serializer, "flow_max", ndpi_data_max(flow->iat_flow));
+	ndpi_serialize_string_float(serializer, "flow_stddev",
+		ndpi_data_stddev(flow->iat_flow), "%.1f");
+
+	ndpi_serialize_string_uint32(serializer, "c_to_s_min",
+		ndpi_data_min(flow->iat_c_to_s));
+	ndpi_serialize_string_float(serializer, "c_to_s_avg",
+		ndpi_data_average(flow->iat_c_to_s), "%.1f");
+	ndpi_serialize_string_uint32(serializer, "c_to_s_max",
+		ndpi_data_max(flow->iat_c_to_s));
+	ndpi_serialize_string_float(serializer, "c_to_s_stddev",
+		ndpi_data_stddev(flow->iat_c_to_s), "%.1f");
+
+	ndpi_serialize_string_uint32(serializer, "s_to_c_min",
+		ndpi_data_min(flow->iat_s_to_c));
+	ndpi_serialize_string_float(serializer, "s_to_c_avg",
+		ndpi_data_average(flow->iat_s_to_c), "%.1f");
+	ndpi_serialize_string_uint32(serializer, "s_to_c_max",
+		ndpi_data_max(flow->iat_s_to_c));
+	ndpi_serialize_string_float(serializer, "s_to_c_stddev",
+		ndpi_data_stddev(flow->iat_s_to_c), "%.1f");
+	ndpi_serialize_end_of_block(serializer);
+
+	/* Packet Length */
+	ndpi_serialize_start_of_block(serializer, "pktlen");
+	ndpi_serialize_string_uint32(serializer, "c_to_s_min",
+		ndpi_data_min(flow->pktlen_c_to_s));
+	ndpi_serialize_string_float(serializer, "c_to_s_avg",
+		ndpi_data_average(flow->pktlen_c_to_s), "%.1f");
+	ndpi_serialize_string_uint32(serializer, "c_to_s_max",
+		ndpi_data_max(flow->pktlen_c_to_s));
+	ndpi_serialize_string_float(serializer, "c_to_s_stddev",
+		ndpi_data_stddev(flow->pktlen_c_to_s), "%.1f");
+
+	ndpi_serialize_string_uint32(serializer, "s_to_c_min",
+		ndpi_data_min(flow->pktlen_s_to_c));
+	ndpi_serialize_string_float(serializer, "s_to_c_avg",
+		ndpi_data_average(flow->pktlen_s_to_c), "%.1f");
+	ndpi_serialize_string_uint32(serializer, "s_to_c_max",
+		ndpi_data_max(flow->pktlen_s_to_c));
+	ndpi_serialize_string_float(serializer, "s_to_c_stddev",
+		ndpi_data_stddev(flow->pktlen_s_to_c), "%.1f");
+	ndpi_serialize_end_of_block(serializer);
+
+	/* TCP flags */
+	ndpi_serialize_start_of_block(serializer, "tcp_flags");
+	ndpi_serialize_string_int32(serializer, "cwr_count", flow->cwr_count);
+	ndpi_serialize_string_int32(serializer, "ece_count", flow->ece_count);
+	ndpi_serialize_string_int32(serializer, "urg_count", flow->urg_count);
+	ndpi_serialize_string_int32(serializer, "ack_count", flow->ack_count);
+	ndpi_serialize_string_int32(serializer, "psh_count", flow->psh_count);
+	ndpi_serialize_string_int32(serializer, "rst_count", flow->rst_count);
+	ndpi_serialize_string_int32(serializer, "syn_count", flow->syn_count);
+	ndpi_serialize_string_int32(serializer, "fin_count", flow->fin_count);
+
+	ndpi_serialize_string_int32(serializer, "src2dst_cwr_count", flow->src2dst_cwr_count);
+	ndpi_serialize_string_int32(serializer, "src2dst_ece_count", flow->src2dst_ece_count);
+	ndpi_serialize_string_int32(serializer, "src2dst_urg_count", flow->src2dst_urg_count);
+	ndpi_serialize_string_int32(serializer, "src2dst_ack_count", flow->src2dst_ack_count);
+	ndpi_serialize_string_int32(serializer, "src2dst_psh_count", flow->src2dst_psh_count);
+	ndpi_serialize_string_int32(serializer, "src2dst_rst_count", flow->src2dst_rst_count);
+	ndpi_serialize_string_int32(serializer, "src2dst_syn_count", flow->src2dst_syn_count);
+	ndpi_serialize_string_int32(serializer, "src2dst_fin_count", flow->src2dst_fin_count);
+
+	ndpi_serialize_string_int32(serializer, "dst2src_cwr_count", flow->dst2src_cwr_count);
+	ndpi_serialize_string_int32(serializer, "dst2src_ece_count", flow->dst2src_ece_count);
+	ndpi_serialize_string_int32(serializer, "dst2src_urg_count", flow->dst2src_urg_count);
+	ndpi_serialize_string_int32(serializer, "dst2src_ack_count", flow->dst2src_ack_count);
+	ndpi_serialize_string_int32(serializer, "dst2src_psh_count", flow->dst2src_psh_count);
+	ndpi_serialize_string_int32(serializer, "dst2src_rst_count", flow->dst2src_rst_count);
+	ndpi_serialize_string_int32(serializer, "dst2src_syn_count", flow->dst2src_syn_count);
+	ndpi_serialize_string_int32(serializer, "dst2src_fin_count", flow->dst2src_fin_count);
+	ndpi_serialize_end_of_block(serializer);
+
+	/* TCP window */
+	ndpi_serialize_string_uint32(serializer, "c_to_s_init_win", flow->c_to_s_init_win);
+	ndpi_serialize_string_uint32(serializer, "s_to_c_init_win", flow->s_to_c_init_win);
+ 
+    json_str = ndpi_serializer_get_buffer(serializer, &json_str_len);
+    if (json_str == NULL || json_str_len == 0)
+    {
+        printf("ERROR: nDPI serialization failed\n");
+        exit(-1);
+    }
+
+    fprintf(serialization_fp, "%.*s\n", (int)json_str_len, json_str);
 }
 
 /* ********************************** */
@@ -2651,78 +2895,82 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 
 /* *********************************************** */
 
+
 static int is_realtime_protocol(ndpi_protocol proto)
 {
-  static u_int16_t const realtime_protos[] = {
-    NDPI_PROTOCOL_YOUTUBE,
-    NDPI_PROTOCOL_YOUTUBE_UPLOAD,
-    NDPI_PROTOCOL_TIKTOK,
-    NDPI_PROTOCOL_GOOGLE,
-    NDPI_PROTOCOL_GOOGLE_CLASSROOM,
-    NDPI_PROTOCOL_GOOGLE_CLOUD,
-    NDPI_PROTOCOL_GOOGLE_DOCS,
-    NDPI_PROTOCOL_GOOGLE_DRIVE,
-    NDPI_PROTOCOL_GOOGLE_MAPS,
-    NDPI_PROTOCOL_GOOGLE_SERVICES
-  };
-  u_int16_t i;
+    static u_int16_t const realtime_protos[] = {
+      NDPI_PROTOCOL_YOUTUBE,
+      NDPI_PROTOCOL_YOUTUBE_UPLOAD,
+      NDPI_PROTOCOL_TIKTOK,
+      NDPI_PROTOCOL_GOOGLE,
+      NDPI_PROTOCOL_GOOGLE_CLASSROOM,
+      NDPI_PROTOCOL_GOOGLE_CLOUD,
+      NDPI_PROTOCOL_GOOGLE_DOCS,
+      NDPI_PROTOCOL_GOOGLE_DRIVE,
+      NDPI_PROTOCOL_GOOGLE_MAPS,
+      NDPI_PROTOCOL_GOOGLE_SERVICES
+};
+    u_int16_t i;
 
-  for (i = 0; i < NDPI_ARRAY_LENGTH(realtime_protos); i++) {
-    if (proto.app_protocol == realtime_protos[i]
-        || proto.master_protocol == realtime_protos[i])
-    {
-      return 1;
+    for (i = 0; i < NDPI_ARRAY_LENGTH(realtime_protos); i++) {
+        if (proto.app_protocol == realtime_protos[i]
+            || proto.master_protocol == realtime_protos[i])
+        {
+            return 1;
+        }
     }
-  }
 
-  return 0;
+    return 0;
 }
 
-static void dump_realtime_protocol(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow)
+static void dump_realtime_protocol(struct ndpi_workflow* workflow, struct ndpi_flow_info* flow)
 {
-  FILE *out = results_file ? results_file : stdout;
-  char srcip[64], dstip[64];
-  char ip_proto[64], app_name[64];
-  char date[64];
-  int ret = is_realtime_protocol(flow->detected_protocol);
-  time_t firsttime = flow->first_seen_ms;
-  struct tm result;
+    FILE* out = results_file ? results_file : stdout;
+    char srcip[64], dstip[64];
+    char ip_proto[64], app_name[64];
+    char date[64];
+    int ret = is_realtime_protocol(flow->detected_protocol);
+    time_t firsttime = flow->first_seen_ms;
+    struct tm result;
 
-  if (ndpi_gmtime_r(&firsttime, &result) != NULL)
-  {
-    strftime(date, sizeof(date), "%d.%m.%y %H:%M:%S", &result);
-  } else {
-    snprintf(date, sizeof(date), "%s", "Unknown");
-  }
+    if (ndpi_gmtime_r(&firsttime, &result) != NULL)
+    {
+        strftime(date, sizeof(date), "%d.%m.%y %H:%M:%S", &result);
+    }
+    else {
+        snprintf(date, sizeof(date), "%s", "Unknown");
+    }
 
-  if (flow->ip_version==4) {
-    inet_ntop(AF_INET, &flow->src_ip, srcip, sizeof(srcip));
-    inet_ntop(AF_INET, &flow->dst_ip, dstip, sizeof(dstip));
-  } else {
-    snprintf(srcip, sizeof(srcip), "[%s]", flow->src_name);
-    snprintf(dstip, sizeof(dstip), "[%s]", flow->dst_name);
-  }
+    if (flow->ip_version == 4) {
+        inet_ntop(AF_INET, &flow->src_ip, srcip, sizeof(srcip));
+        inet_ntop(AF_INET, &flow->dst_ip, dstip, sizeof(dstip));
+    }
+    else {
+        snprintf(srcip, sizeof(srcip), "[%s]", flow->src_name);
+        snprintf(dstip, sizeof(dstip), "[%s]", flow->dst_name);
+    }
 
-  ndpi_protocol2name(workflow->ndpi_struct, flow->detected_protocol, app_name, sizeof(app_name));
+    ndpi_protocol2name(workflow->ndpi_struct, flow->detected_protocol, app_name, sizeof(app_name));
 
-  if (ret == 1) {
-    fprintf(out, "Detected Realtime protocol %s --> [%s] %s:%d <--> %s:%d app=%s <%s>\n",
+    if (ret == 1) {
+        fprintf(out, "Detected Realtime protocol %s --> [%s] %s:%d <--> %s:%d app=%s <%s>\n",
             date, ndpi_get_ip_proto_name(flow->protocol, ip_proto, sizeof(ip_proto)),
             srcip, ntohs(flow->src_port), dstip, ntohs(flow->dst_port),
             app_name, flow->human_readeable_string_buffer);
-  }
+    }
 }
 
-static void on_protocol_discovered(struct ndpi_workflow * workflow,
-                                   struct ndpi_flow_info * flow,
-                                   void * userdata)
+static void on_protocol_discovered(struct ndpi_workflow* workflow,
+    struct ndpi_flow_info* flow,
+    void* userdata)
 {
-  (void)userdata;
-  if (enable_realtime_output != 0)
-    dump_realtime_protocol(workflow, flow);
+    (void)userdata;
+    if (enable_realtime_output != 0)
+        dump_realtime_protocol(workflow, flow);
 }
 
 /* *********************************************** */
+
 
 /**
  * @brief Setup for detection begin
@@ -2783,7 +3031,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle) {
   }
 
   ndpi_workflow_set_flow_callback(ndpi_thread_info[thread_id].workflow,
-                                  on_protocol_discovered, NULL);
+      on_protocol_discovered, NULL);
 
   /* Make sure to load lists before finalizing the initialization */
   ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &enabled_bitmask);
@@ -2968,7 +3216,8 @@ void printPortStats(struct port_stats *stats) {
       }
     }
 
-    printf("\n");
+    // Ashwani: Commented following line
+    // printf("\n");
     if(i >= 10) break;
   }
 }
@@ -3021,7 +3270,9 @@ static void printRiskStats() {
 
       printf("\n\tNOTE: as one flow can have multiple risks set, the sum of the\n"
              "\t      last column can exceed the number of flows with risks.\n");
-      printf("\n\n");
+      
+      // Ashwani: Commented following line
+      //printf("\n\n");
     }
   }
 }
@@ -3234,15 +3485,21 @@ static void printFlowsStats() {
           /* for each host the number of flow with a ja3 fingerprint is printed */
           i = 1;
 
-          fprintf(out, "JA3 Host Stats: \n");
-          fprintf(out, "\t\t IP %-24s \t %-10s \n", "Address", "# JA3C");
+          if (out != stdout)
+          {
+              fprintf(out, "JA3 Host Stats: \n");
+              fprintf(out, "\t\t IP %-24s \t %-10s \n", "Address", "# JA3C");
+          }
 
           for(ja3ByHost_element = ja3ByHostsHashT; ja3ByHost_element != NULL;
               ja3ByHost_element = ja3ByHost_element->hh.next) {
             num_ja3_ja4_client = HASH_COUNT(ja3ByHost_element->host_client_info_hasht);
             num_ja3_server = HASH_COUNT(ja3ByHost_element->host_server_info_hasht);
 
-            if(num_ja3_ja4_client > 0) {
+            // Ashwani
+            // added out != stdout check
+            //
+            if(num_ja3_ja4_client > 0 && out != stdout) {
               fprintf(out, "\t%d\t %-24s \t %-7u\n",
                       i,
                       ja3ByHost_element->ip_string,
@@ -3498,7 +3755,9 @@ static void printFlowsStats() {
 	    		printf (" ");
 	    	printf("%d\n",host_iter->occurency);
 	}
-	printf("%s", "\n\n");
+
+    // Ashwani: Commented following line
+	// printf("%s", "\n\n");
 
 	//freeing the hash table
 	HASH_ITER(hh, hostsHashT, host_iter, tmp) {
@@ -3566,7 +3825,9 @@ static void printFlowsStats() {
 #endif
 
       print_flow:
-        printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id);
+        ;
+        // Ashwani: Commented following line
+        // printFlow(i+1, all_flows[i].flow, all_flows[i].thread_id); //Ashwani: Commented to put data into std::out
       }
 
 #ifndef DIRECTION_BINS
@@ -3708,6 +3969,8 @@ static void printFlowsStats() {
       }
     }
 
+    // Ashwani
+    // Disable this loop for csv output files
     for(i=0; i<num_flows; i++)
     {
       printFlowSerialized(all_flows[i].thread_id, all_flows[i].flow);
@@ -4161,12 +4424,16 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     HASH_SORT(dstStats, port_stats_sort);
   }
 
-  if(verbose == 3) {
-    printf("\n\nSource Ports Stats:\n");
-    printPortStats(srcStats);
+  if(verbose == 3) 
+  {
+    // Ashwani:
+    // Commented out following code.
+    // 
+    //printf("\n\nSource Ports Stats:\n");
+    //printPortStats(srcStats);
 
-    printf("\nDestination Ports Stats:\n");
-    printPortStats(dstStats);
+    //printf("\nDestination Ports Stats:\n");
+    //printPortStats(dstStats);
   }
 
  free_stats:
@@ -4468,8 +4735,12 @@ static void ndpi_process_packet(u_char *args,
       memset(&ndpi_thread_info[thread_id].workflow->stats, 0, sizeof(struct ndpi_stats));
     }
 
-    if(!quiet_mode)
-      printf("\n-------------------------------------------\n\n");
+    if (!quiet_mode)
+    {
+        // Ashwani: Commented following line
+        // 
+        // printf("\n-------------------------------------------\n\n");
+    }
 
     memcpy(&begin, &end, sizeof(begin));
     memcpy(&pcap_start, &pcap_end, sizeof(pcap_start));
@@ -5449,7 +5720,10 @@ void compressedBitmapUnitTest() {
     assert(ndpi_bitmap_isset(b, v));
   }
 
-  if(trace) printf("\n");
+  // Ashwani:
+  // Commented out following code
+  // 
+  // if(trace) printf("\n");
 
   ser = ndpi_bitmap_serialize(b, &buf);
   assert(ser > 0);
@@ -5463,7 +5737,10 @@ void compressedBitmapUnitTest() {
     if(trace) printf("%u ", value);
   }
 
-  if(trace) printf("\n");
+  // Ashwani:
+  // Commented out following code
+  // 
+  // if(trace) printf("\n");
   ndpi_bitmap_iterator_free(it);
 
   ndpi_free(buf);
@@ -5614,6 +5891,9 @@ void pearsonUnitTest() {
   float pearson = ndpi_pearson_correlation(data_a, data_b, num);
 
   assert(pearson != 0.0);
+
+  // Ashwani: Commented following line
+  // //
   // printf("%.8f\n", pearson);
 }
 
@@ -5680,136 +5960,500 @@ void domainSearchUnitTest2() {
   ndpi_domain_classify_free(c);
 }
 
-/* *********************************************** */
+/* ----------------------------------------------------------------------------------------------------------------------------------------------- */
 
+// Ashwani
+// Added this routine to get the full path of DPIReader program.
+//
+static void getExecutablePath(char* buffer, size_t size)
+{
+    #ifdef _WIN32
+        GetModuleFileName(NULL, buffer, size);
+    #elif defined(__linux__) || defined(__APPLE__)
+        ssize_t len = readlink("/proc/self/exe", buffer, size - 1);
+        if (len != -1) {
+            buffer[len] = '\0';
+        }
+    #endif
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------------- */
+// Ashwani
+// Added this routine to get the full path of folder in which DPIReader program is running
+//
+static void getParentFolderPathOfExecutable(char* buffer, size_t size) 
+{
+    #ifdef _WIN32
+        GetModuleFileName(NULL, buffer, size);
+        char* lastBackslash = strrchr(buffer, '\\');
+        if (lastBackslash != NULL) {
+            *lastBackslash = '\0'; // Remove the executable name       
+        }
+    #elif defined(__linux__) || defined(__APPLE__)
+        char path[1024];
+        ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+        if (len != -1) {
+            path[len] = '\0';
+            char* folderName = dirname(path);
+            strncpy(buffer, folderName, size);
+        }
+    #endif
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------------- */
+// Ashwani
+// Return true if file is empty else returns false.
+//
+static int isFileEmpty(FILE* file)
+{
+    // Save the current position in the file
+    long currentPosition = ftell(file);
+
+    // Move the file pointer to the end of the file
+    fseek(file, 0, SEEK_END);
+
+    // Get the current position, which now represents the size of the file
+    long size = ftell(file);
+
+    // Restore the file pointer to the original position
+    fseek(file, currentPosition, SEEK_SET);
+
+    // Check if the file is empty
+    return size == 0;
+}
+
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------------- */
 /**
    @brief MAIN FUNCTION
 **/
-int main(int argc, char **argv) {
-  int i, skip_unit_tests = 0;
+int main(int argc, char **argv) 
+{
+      int i, skip_unit_tests = 0;
 
-#ifdef DEBUG_TRACE
-  trace = fopen("/tmp/ndpiReader.log", "a");
+    #ifdef DEBUG_TRACE
+      trace = fopen("/tmp/ndpiReader.log", "a");
 
-  if(trace) {
-    int i;
+      if(trace) {
+        int i;
 
-    fprintf(trace, " #### %s #### \n", __FUNCTION__);
-    fprintf(trace, " #### [argc: %u] #### \n", argc);
+        fprintf(trace, " #### %s #### \n", __FUNCTION__);
+        fprintf(trace, " #### [argc: %u] #### \n", argc);
 
-    for(i=0; i<argc; i++)
-      fprintf(trace, " #### [%d] [%s]\n", i, argv[i]);
-  }
-#endif
+        for(i=0; i<argc; i++)
+          fprintf(trace, " #### [%d] [%s]\n", i, argv[i]);
+      }
+    #endif
+
+      getParentFolderPathOfExecutable(moduleFolderPath, sizeof(moduleFolderPath));
+      int logFileSize = strlen(moduleFolderPath) + strlen("nDPIReader_Log_File.txt");
+
+      char* logFile = (char*)malloc(logFileSize * sizeof(char));
+      if (logFile == 0)
+      {
+          printf("Call to malloc failed due to error: %s\n", strerror(errno));
+          return (-1);
+      }
+
+      strcpy(logFile, moduleFolderPath);
+      strcat(logFile, "\\nDPIReader_Log_File.txt");
+
+      if ((serializationLogFile = fopen(logFile, "w")) == NULL)
+      {
+          printf("Unable to create log file %s: %s\n", logFile, strerror(errno));
+          return (-1);
+      }
+
+      if (ndpi_get_api_version() != NDPI_API_VERSION)
+      {
+          fprintf(serializationLogFile, "ERROR: nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("This program is run from a command prompt or terminal.\n");
+          }
+          fclose(serializationLogFile);
+          return(-1);
+      }
+
+      // (MM.DD.YYYY.V)
+      fprintf(serializationLogFile, "nDPI Version 02.29.2024.1 - This is the first version from nDPIFork repository\n");
+      if (_isatty(_fileno(stdin)))
+      {
+          printf("nDPI Version 02.29.2024.1 - This is the first version from nDPIFork repository\n");
+      }
+
+      skip_unit_tests = true;
+
+      if(!skip_unit_tests) {
+    #ifndef DEBUG_TRACE
+        /* Skip tests when debugging */
+
+    #ifdef HW_TEST
+        hwUnitTest2();
+    #endif
+
+    #ifdef STRESS_TEST
+        desUnitStressTest();
+        exit(0);
+    #endif
+
+        outlierUnitTest();
+        pearsonUnitTest();
+        binaryBitmapUnitTest();
+        domainSearchUnitTest();
+        domainSearchUnitTest2();
+        sketchUnitTest();
+        linearUnitTest();
+        zscoreUnitTest();
+        sesUnitTest();
+        desUnitTest();
+
+        /* Internal checks */
+        // binUnitTest();
+        //hwUnitTest();
+        jitterUnitTest();
+        rsiUnitTest();
+        hashUnitTest();
+        dgaUnitTest();
+        hllUnitTest();
+        bitmapUnitTest();
+        filterUnitTest();
+        automataUnitTest();
+        analyzeUnitTest();
+        ndpi_self_check_host_match(stderr);
+        analysisUnitTest();
+        compressedBitmapUnitTest();
+        strtonumUnitTest();
+    #endif
+      }
 
 
-  if(ndpi_get_api_version() != NDPI_API_VERSION) {
-    printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
-    return(-1);
-  }
+      if (_isatty(_fileno(stdin)))
+      {
+          printf("Number of arguments: %d\n", argc - 1); // argc includes the program name
+      }
 
-  if(!skip_unit_tests) {
-#ifndef DEBUG_TRACE
-    /* Skip tests when debugging */
+      fprintf(serializationLogFile, "Number of arguments: %d\n", argc - 1); // argc includes the program name
+      for (int i = 1; i < argc; i++)
+      {
+          fprintf(serializationLogFile, "Argument % d: % s\n", i, argv[i]);
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("Argument % d: % s\n", i, argv[i]);
+          }
+      }
 
-#ifdef HW_TEST
-    hwUnitTest2();
-#endif
+      parseOptions(argc, argv);
 
-#ifdef STRESS_TEST
-    desUnitStressTest();
-    exit(0);
-#endif
+      if (pCapFilesFolderLocationPath == NULL)
+      {
+          fprintf(serializationLogFile, "ERROR: PCAP files folder location not specified. See help!\n");
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("ERROR: PCAP files folder location not specified. See help!\n");
+          }
+          fclose(serializationLogFile);
+          help(0);
+          exit(0);
+      }
 
-    outlierUnitTest();
-    pearsonUnitTest();
-    binaryBitmapUnitTest();
-    domainSearchUnitTest();
-    domainSearchUnitTest2();
-    sketchUnitTest();
-    linearUnitTest();
-    zscoreUnitTest();
-    sesUnitTest();
-    desUnitTest();
 
-    /* Internal checks */
-    // binUnitTest();
-    //hwUnitTest();
-    jitterUnitTest();
-    rsiUnitTest();
-    hashUnitTest();
-    dgaUnitTest();
-    hllUnitTest();
-    bitmapUnitTest();
-    filterUnitTest();
-    automataUnitTest();
-    analyzeUnitTest();
-    ndpi_self_check_host_match(stderr);
-    analysisUnitTest();
-    compressedBitmapUnitTest();
-    strtonumUnitTest();
-#endif
-  }
+      fprintf(serializationLogFile, "\nSearching for pCap files at location      : %s\n", pCapFilesFolderLocationPath);
+      fprintf(serializationLogFile, "JSON file will be generated at location   : %s\n", moduleFolderPath);
 
-  gettimeofday(&startup_time, NULL);
-  memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
+      if (_isatty(_fileno(stdin)))
+      {
+          printf("\nSearching for pCap files at location      : %s\n", pCapFilesFolderLocationPath);
+          printf("JSON file will be generated at location   : %s\n", moduleFolderPath);
+      }
 
-  if(getenv("AHO_DEBUG"))
-    ac_automata_enable_debug(1);
-  parseOptions(argc, argv);
+      int size = strlen(pCapFilesFolderLocationPath) + strlen("\\*.*");
 
-  if(domain_to_check) {
-    ndpiCheckHostStringMatch(domain_to_check);
-    exit(0);
-  }
-  if(ip_port_to_check) {
-    ndpiCheckIPMatch(ip_port_to_check);
-    exit(0);
-  }
+      pCapFilesSearchString = (char*)malloc(size * sizeof(char));
+      if (pCapFilesSearchString == 0)
+      {
+          fprintf(serializationLogFile, "ERROR: Memory allocation failed for <pCapFilesSearchString>\n");
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("ERROR: Memory allocation failed for <pCapFilesSearchString>\n");
+          }
+          fclose(serializationLogFile);
+          return(-1);
+      }
 
-  if(enable_doh_dot_detection) {
-    init_doh_bins();
-    /* Clusters are not really used in DoH/DoT detection, but because of how
-       the code has been written, we need to enable also clustering feature */
-    if(num_bin_clusters == 0)
-      num_bin_clusters = 1;
-  }
+      strcpy(pCapFilesSearchString, pCapFilesFolderLocationPath);
+      strcat(pCapFilesSearchString, "\\*.*");
+      fprintf(serializationLogFile, "pCap Folder Search Path = %s\n", pCapFilesSearchString);
+      if (_isatty(_fileno(stdin)))
+      {
+          printf("pCap Folder Search Path = %s\n", pCapFilesSearchString);
+    }
 
-  if(!quiet_mode) {
-    printf("\n-----------------------------------------------------------\n"
-	   "* NOTE: This is demo app to show *some* nDPI features.\n"
-	   "* In this demo we have implemented only some basic features\n"
-	   "* just to show you what you can do with the library. Feel \n"
-	   "* free to extend it and send us the patches for inclusion\n"
-	   "------------------------------------------------------------\n\n");
+      int alertFolderSize = strlen(moduleFolderPath) + strlen("Alerts");
+      char* alertFolder = (char*)malloc(alertFolderSize * sizeof(char));
+      if (alertFolder == 0)
+      {
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
+          }
 
-    printf("Using nDPI (%s) [%d thread(s)]\n", ndpi_revision(), num_threads);
+          fprintf(serializationLogFile, "ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
+          return (-1);
+      }
 
-    const char *gcrypt_ver = ndpi_get_gcrypt_version();
-    if(gcrypt_ver)
-      printf("Using libgcrypt version %s\n", gcrypt_ver);
-  }
+      strcpy(alertFolder, moduleFolderPath);
+      strcat(alertFolder, "\\Alerts");
 
-  signal(SIGINT, sigproc);
+      if (!CreateDirectory(alertFolder, NULL))
+      {
+          fprintf(serializationLogFile, "ERROR: Unable to Create Alerts Folder\n");
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("ERROR: Unable to Create Alerts Folder\n");
+          }
+      }
+      else
+      {
+          fprintf(serializationLogFile, "Alerts Folder created at %s\n", alertFolder);
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("Alerts Folder created at %s\n", alertFolder);
+          }
+      }
 
-  for(i=0; i<num_loops; i++)
-    test_lib();
+      int eventFolderSize = strlen(moduleFolderPath) + strlen("Events");
+      char* eventFolder = (char*)malloc(alertFolderSize * sizeof(char));
+      if (eventFolder == 0)
+      {
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
+          }
 
-  if(results_path)  ndpi_free(results_path);
-  if(results_file)  fclose(results_file);
-  if(extcap_dumper) pcap_dump_close(extcap_dumper);
-  if(extcap_fifo_h) pcap_close(extcap_fifo_h);
-  if(enable_malloc_bins) ndpi_free_bin(&malloc_bins);
-  if(csv_fp)        fclose(csv_fp);
+          fprintf(serializationLogFile, "ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
+          return (-1);
+      }
 
-  ndpi_free(_debug_protocols);
-  ndpi_free(_disabled_protocols);
+      strcpy(eventFolder, moduleFolderPath);
+      strcat(eventFolder, "\\Events");
 
-#ifdef DEBUG_TRACE
-  if(trace) fclose(trace);
-#endif
+      if (!CreateDirectory(eventFolder, NULL))
+      {
+          fprintf(serializationLogFile, "ERROR: Unable to Create Events Folder\n");
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("ERROR: Unable to Create Events Folder\n");
+          }
+      }
+      else
+      {
+          fprintf(serializationLogFile, "Events Folder created at %s\n", eventFolder);
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("Events Folder created at %s\n", eventFolder);
+          }
+      }
 
-  return 0;
+      do
+      {
+          number_of_valid_files_found = 0;
+          fetchFilesToProcessAndSetDefaultOptions();
+
+          fprintf(serializationLogFile, "STARTING FILE PROCESSING\n");
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("STARTING FILE PROCESSING\n");
+          }
+
+          serialization_format = ndpi_serialization_format_json;
+
+          for (int index = 0; index < number_of_valid_files_found; index++)
+          {
+              for (int count = 0; count < 2; count++)
+              {
+                  if (count == 0)
+                  {
+                      needToRecordRisk = false;
+                      ndpi_record_risk(needToRecordRisk);
+                  }
+
+                  gettimeofday(&startup_time, NULL);
+                  memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
+
+                  if (getenv("AHO_DEBUG"))
+                  {
+                      ac_automata_enable_debug(1);
+                  }
+
+                  _pcap_file[0] = pcap_files[index];
+
+                  if (count == 0)
+                  {
+                      fprintf(serializationLogFile, "%3d. Generating - %s, (START)", index, generated_tmp_json_files_events[index]);
+                      if (_isatty(_fileno(stdin)))
+                      {
+                          printf("%3d. Generating - %s, (START)", index, generated_tmp_json_files_events[index]);
+                      }
+
+                      serialization_fp = fopen(generated_tmp_json_files_events[index], "w");
+
+                      if (serialization_fp == NULL)
+                      {
+                          fprintf(serializationLogFile, "Unable to write on serialization file %s: %s\n", generated_tmp_json_files_events[index], strerror(errno));
+                          if (_isatty(_fileno(stdin)))
+                          {
+                              printf("Unable to write on serialization file %s: %s\n", generated_tmp_json_files_events[index], strerror(errno));
+                          }
+                          continue;
+                      }
+                  }
+                  else
+                  {
+                      fprintf(serializationLogFile, "%3d. Generating - %s, (START)", index, generated_tmp_json_files_alerts[index]);
+                      if (_isatty(_fileno(stdin)))
+                      {
+                          printf("%3d. Generating - %s, (START)", index, generated_tmp_json_files_alerts[index]);
+                      }
+
+                      serialization_fp = fopen(generated_tmp_json_files_alerts[index], "w");
+
+                      if (serialization_fp == NULL)
+                      {
+                          fprintf(serializationLogFile, "Unable to write on serialization file %s: %s\n", generated_tmp_json_files_alerts[index], strerror(errno));
+                          if (_isatty(_fileno(stdin)))
+                          {
+                              printf("Unable to write on serialization file %s: %s\n", generated_tmp_json_files_alerts[index], strerror(errno));
+                          }
+                          continue;
+                      }
+                  }
+
+                  struct ndpi_detection_module_struct* ndpi_info_mod = ndpi_init_detection_module(init_prefs);
+
+                  if (ndpi_info_mod == NULL)
+                  {
+                      return -1;
+                  }
+
+                  if (domain_to_check) {
+                      fclose(serializationLogFile);
+                      ndpiCheckHostStringMatch(domain_to_check);
+                      exit(0);
+                  }
+
+                  if (!quiet_mode)
+                  {
+                      printf("\n-----------------------------------------------------------\n"
+                          "* NOTE: This is demo app to show *some* nDPI features.\n"
+                          "* In this demo we have implemented only some basic features\n"
+                          "* just to show you what you can do with the library. Feel \n"
+                          "* free to extend it and send us the patches for inclusion\n"
+                          "------------------------------------------------------------\n\n");
+
+                      printf("Using nDPI (%s) [%d thread(s)]\n", ndpi_revision(), num_threads);
+
+                      const char* gcrypt_ver = ndpi_get_gcrypt_version();
+                      if (gcrypt_ver)
+                          printf("Using libgcrypt version %s\n", gcrypt_ver);
+                  }
+
+                  signal(SIGINT, sigproc);
+
+                  for (i = 0; i < num_loops; i++)
+                  {
+                      test_lib();
+                  }
+
+                  if (results_path)  ndpi_free(results_path);
+                  if (results_file)  fclose(results_file);
+                  if (extcap_dumper) pcap_dump_close(extcap_dumper);
+                  if (extcap_fifo_h) pcap_close(extcap_fifo_h);
+                  if (ndpi_info_mod) ndpi_exit_detection_module(ndpi_info_mod);
+                  if (enable_malloc_bins)
+                      ndpi_free_bin(&malloc_bins);
+                  if (csv_fp)        fclose(csv_fp);
+                  ndpi_free(_debug_protocols);
+                  ndpi_free(_disabled_protocols);
+
+                  if (isFileEmpty(serialization_fp))
+                  {
+                      fclose(serialization_fp);
+                      if (count == 0)
+                      {
+                          remove(generated_tmp_json_files_events[index]);
+                      }
+                      else
+                      {
+                          remove(generated_tmp_json_files_alerts[index]);
+                      }
+                  }
+                  else
+                  {
+                      fclose(serialization_fp);
+                      if (count == 0)
+                      {
+                          if (rename(generated_tmp_json_files_events[index], generated_json_files_events[index]) != 0)
+                          {
+                              fprintf(serializationLogFile, "Error renaming - %s file",  generated_tmp_json_files_events[index]);
+                              if (_isatty(_fileno(stdin)))
+                              {
+                                  printf("Error renaming - %s file",  generated_tmp_json_files_events[index]);
+                              }
+                          }
+                      }
+                      else
+                      {
+                          if (rename(generated_tmp_json_files_alerts[index], generated_json_files_alerts[index]) != 0)
+                          {
+                              fprintf(serializationLogFile, "Error renaming - %s file",  generated_tmp_json_files_alerts[index]);
+                              if (_isatty(_fileno(stdin)))
+                              {
+                                  printf("Error renaming - %s file",  generated_tmp_json_files_alerts[index]);
+                              }
+                          }
+                      }
+                  }
+
+
+                  if (count == 0)
+                  {
+                      needToRecordRisk = true;
+                      ndpi_record_risk(needToRecordRisk);
+
+                      fprintf(serializationLogFile, "\n\t\t%s, (END)\n", generated_tmp_json_files_events[index]);
+                      if (_isatty(_fileno(stdin)))
+                      {
+                          printf("\n\t\t%s, (END)\n", generated_tmp_json_files_events[index]);
+                      }
+                  }
+                  else
+                  {
+                      fprintf(serializationLogFile, "\n\t\t%s, (END)\n", generated_tmp_json_files_alerts[index]);
+                      if (_isatty(_fileno(stdin)))
+                      {
+                          printf("\n\t\t%s, (END)\n", generated_tmp_json_files_alerts[index]);
+                      }
+                  }
+              }
+
+              //fprintf(serializationLogFile, "--(END)\n");
+              //if (_isatty(_fileno(stdin)))
+              //{
+              //    printf("--(END)\n");
+              //}
+              remove(_pcap_file[0]);
+              pcap_files[index] = "";
+          }
+      } while (true);
+
+      fclose(serializationLogFile);
+
+    #ifdef DEBUG_TRACE
+      if(trace) fclose(trace);
+    #endif
+
+      return 0;
 }
 
 #ifdef _MSC_BUILD

@@ -72,6 +72,8 @@ struct pcre2_struct {
 };
 #endif
 
+static bool m_recordRisk = false;
+
 /*
  * Please keep this strcture in sync with
  * `struct ndpi_str_hash` in src/include/ndpi_typedefs.h
@@ -107,6 +109,27 @@ int ndpi_check_punycode_string(char * buffer , int len) {
   // not a punycode string
   return 0;
 }
+
+static char* intToString(int num) 
+{
+    // Determine the maximum number of digits required for the integer
+    int numDigits = snprintf(NULL, 0, "%d", num);
+
+    // Allocate memory dynamically for the string
+    char* str = (char*)malloc(numDigits + 1); // +1 for the null-terminator
+
+    if (str == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return NULL;
+    }
+
+    // Use sprintf to convert the integer to a string
+    sprintf(str, "%d", num);
+
+    // Return the dynamically allocated string
+    return str;
+}
+
 
 /* ****************************************** */
 
@@ -1055,6 +1078,171 @@ char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
   return ret;
 }
 
+static const char* ndpi_risk2description(ndpi_risk_enum risk)
+{
+
+    switch (risk) {
+    case NDPI_URL_POSSIBLE_XSS:
+        return("HTTP only: this risk indicates a possible `XSS (Cross Side Scripting) <https://en.wikipedia.org/wiki/Cross-site_scripting>`_ attack.");
+
+    case NDPI_URL_POSSIBLE_SQL_INJECTION:
+        return("HTTP only: this risk indicates a possible `SQL Injection attack <https://en.wikipedia.org/wiki/SQL_injection>`_.");
+
+    case NDPI_URL_POSSIBLE_RCE_INJECTION:
+        return("HTTP only: this risk indicates a possible `RCE (Remote Code Execution) attack <https://en.wikipedia.org/wiki/Arbitrary_code_execution>`_.");
+
+    case NDPI_BINARY_APPLICATION_TRANSFER:
+        return("HTTP only: this risk indicates that a binary application is downloaded/uploaded. Detected applications include Windows binaries, Linux executables, Unix scripts and Android apps.");
+
+    case NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT:
+        return("This risk indicates a known protocol used on a non standard port. Example HTTP is supposed to use TCP/80, and in case it is detected on TCP/1234 this risk is detected.");
+
+    case NDPI_TLS_SELFSIGNED_CERTIFICATE:
+        return("TLS/QUIC only: this risk is triggered when a `self-signed certificate <https://en.wikipedia.org/wiki/Self-signed_certificate>`_ is used.");
+
+    case NDPI_TLS_OBSOLETE_VERSION:
+        return("Risk triggered when TLS version is older than 1.1.");
+
+    case NDPI_TLS_WEAK_CIPHER:
+        return("Risk triggered when an unsafe TLS cipher is used. See `this page <https://community.qualys.com/thread/18212-how-does-qualys-determine-the-server-cipher-suites>`_ for a list of insecure ciphers.");
+
+    case NDPI_TLS_CERTIFICATE_EXPIRED:
+        return("Risk triggered when a TLS certificate is expired, i.e. the current date falls outside of the certificate validity dates.");
+
+    case NDPI_TLS_CERTIFICATE_MISMATCH:
+        return("Risk triggered when a TLS certificate does not match the hostname we're accessing. Example you do http://www.aaa.com and the TLS certificate returned is for www.bbb.com.");
+
+    case NDPI_HTTP_SUSPICIOUS_USER_AGENT:
+        return("HTTP only: this risk is triggered whenever the user agent contains suspicious characters or its format is suspicious. Example: <?php something ?> is a typical suspicious user agent.");
+
+    case NDPI_NUMERIC_IP_HOST:
+        return("This risk is triggered whenever a HTTP/TLS/QUIC connection is using a literal IPv4 or IPv6 address as ServerName (TLS/QUIC; example: SNI=1.2.3.4) or as Hostname (HTTP; example: http://1.2.3.4.).");
+
+    case NDPI_HTTP_SUSPICIOUS_URL:
+        return("HTTP only: this risk is triggered whenever the accessed URL is suspicious. Example: http://127.0.0.1/msadc/..%255c../..%255c../..%255c../winnt/system32/cmd.exe.");
+
+    case NDPI_HTTP_SUSPICIOUS_HEADER:
+        return("HTTP only: this risk is triggered whenever the HTTP peader contains suspicious entries such as Uuid, TLS_version, Osname that are unexpected on the HTTP header.");
+
+    case NDPI_TLS_NOT_CARRYING_HTTPS:
+        return("TLS only: this risk indicates that this TLS flow will not be used to transport HTTP content. Example VPNs use TLS to encrypt data rather to carry HTTP. This is useful to spot this type of cases.");
+
+    case NDPI_SUSPICIOUS_DGA_DOMAIN:
+        return("A `DGA <https://en.wikipedia.org/wiki/Domain_generation_algorithm>`_ is used to generate domain names often used by malwares. This risk indicates that this domain name can (but it's not 100% sure) a DGA as its name is suspicious.");
+
+    case NDPI_MALFORMED_PACKET:
+        return("This risk is generated when a packet (e.g. a DNS packet) has an unexpected formt. This can indicate a protocol error or more often an attempt to jeopardize a valid protocol to carry other type of data.");
+
+    case NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER:
+        return("This risk is generated whenever a SSH client uses an obsolete SSH protocol version or insecure ciphers.");
+
+    case NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER:
+        return("This risk is generated whenever a SSH server uses an obsolete SSH protocol version or insecure ciphers.");
+
+    case NDPI_SMB_INSECURE_VERSION:
+        return("This risk indicates that the `SMB <https://en.wikipedia.org/wiki/Server_Message_Block>`_ version used is insecure (i.e. v1).");
+
+    case NDPI_TLS_SUSPICIOUS_ESNI_USAGE:
+        return("`SNI <https://en.wikipedia.org/wiki/Server_Name_Indication>`_ is a way to carry in TLS the host/domain name we're accessing. ESNI means encrypted SNI and it is a way to mask SNI (carried in clear text in the TLS header) with encryption. While this practice is legal, it could be used for hiding data or for attacks such as a suspicious `domain fronting <https://github.com/SixGenInc/Noctilucent/blob/master/docs/>`_.");
+
+    case NDPI_UNSAFE_PROTOCOL:
+        return("This risk indicates that the protocol used is insecure and that a secure protocol should be used (e.g. Telnet vs SSH).");
+
+    case NDPI_DNS_SUSPICIOUS_TRAFFIC:
+        return("This risk is returned when DNS traffic returns an unexpected/obsolete `record type <https://en.wikipedia.org/wiki/List_of_DNS_record_types>`_."); /* Exfiltration ? */
+
+    case NDPI_TLS_MISSING_SNI:
+        return("TLS needs to carry the the `SNI <https://en.wikipedia.org/wiki/Server_Name_Indication>`_ of the remote server we're accessing. Unfortunately SNI is optional in TLS so it can be omitted. In this case this risk is triggered as this is a non-standard situation that indicates a potential security problem or a protocol using TLS for other purposes (or a protocol bug).");
+
+    case NDPI_HTTP_SUSPICIOUS_CONTENT:
+        return("HTTP only: risk reported when HTTP carries content in expected format. Example the HTTP header indicates that the context is text/html but the real content is not readeable (i.e. it can transport binary data). In general this is an attempt to use a valid MIME type to carry data that does not match the type.");
+
+    case NDPI_RISKY_ASN:
+        return("This is a placeholder for traffic exchanged with `ASN <https://en.wikipedia.org/wiki/Autonomous_system_(Internet)>`_ that are considered risky. nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).");
+
+    case NDPI_RISKY_DOMAIN:
+        return("This is a placeholder for traffic exchanged with domain names that are considered risky. nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).");
+
+    case NDPI_MALICIOUS_JA3:
+        return("`JA3 <https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967>`_ is a method to fingerprint TLS traffic. This risk indicates that the JA3 of the TLS connection is considered suspicious (i.e. it has been found in known malware JA3 blacklists). nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).");
+
+    case NDPI_MALICIOUS_SHA1_CERTIFICATE:
+        return("TLS certificates are uniquely identified with a `SHA1 <https://en.wikipedia.org/wiki/SHA-1>`_ hash value. If such hash is found on a blacklist, this risk can be used. As for other risks, this is a placeholder as nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).");
+
+    case NDPI_DESKTOP_OR_FILE_SHARING_SESSION:
+        return("This risk is set when the flow carries desktop or file sharing sessions (e.g. TeamViewer or AnyDesk just to mention two).");
+
+    case NDPI_TLS_UNCOMMON_ALPN:
+        return("This risk is set when the `ALPN <https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation>`_ (it indicates the protocol carried into this TLS flow, for instance HTTP/1.1) is uncommon with respect to the list of expected values");
+
+    case NDPI_TLS_CERT_VALIDITY_TOO_LONG:
+        return("From 01/09/2020 TLS certificates lifespan is limited to `13 months <https://www.appviewx.com/blogs/tls-certificate-lifespans-now-capped-at-13-months/>`_. This risk is triggered for certificates not respecting this directive.");
+
+    case NDPI_TLS_SUSPICIOUS_EXTENSION:
+        return("This risk is triggered when the domain name (SNI extension) is not printable and thus it is a problem. In TLS extensions can be dynamically specified by the client in the hello packet.");
+
+    case NDPI_TLS_FATAL_ALERT:
+        return("This risk is triggered when a TLS fatal alert is detected in the TLS flow. See `this page <https://techcommunity.microsoft.com/t5/iis-support-blog/ssl-tls-alert-protocol-and-the-alert-codes/ba-p/377132>`_ for details.");
+
+    case NDPI_SUSPICIOUS_ENTROPY:
+        return("This risk is used to detect suspicious data carried in ICMP packets whose entropy (used to measure how data is distributed, hence to indirectly guess the type of data carried on) is suspicious and thus that it can indicate a data leak. Suspicious values indicate random entropy or entropy that is similar to encrypted traffic. In the latter case, this can be a suspicious data exfiltration symptom.");
+
+    case NDPI_CLEAR_TEXT_CREDENTIALS:
+        return("Clear text protocols are not bad per-se, but they should be avoided when they carry credentials as they can be intercepted by malicious users. This risk is triggered whenever clear text protocols (e.g. FTP, HTTP, IMAP...) contain credentials in clear text (read it as nDPI does not trigger this risk for HTTP connections that do not carry credentials).");
+
+    case NDPI_DNS_LARGE_PACKET:
+        return("`DNS <https://en.wikipedia.org/wiki/Domain_Name_System>`_ packets over UDP should be limited to 512 bytes. DNS packets over this threshold indicate a potential security risk (e.g. use DNS to carry data) or a misconfiguration.");
+
+    case NDPI_DNS_FRAGMENTED:
+        return("UDP `DNS <https://en.wikipedia.org/wiki/Domain_Name_System>`_ packets cannot be fragmented. If so, this indicates a potential security risk (e.g. use DNS to carry data) or a misconfiguration.");
+
+    case NDPI_INVALID_CHARACTERS:
+        return("The risk is set whenever a dissected protocol contains characters not allowed in that protocol field. For example a DNS hostname must only contain a subset of all printable characters or else this risk is set. Additionally, some TLS protocol fields are checked for printable characters as well.");
+
+    case NDPI_POSSIBLE_EXPLOIT:
+        return("The risk is set whenever a possible exploit (e.g. `Log4J/Log4Shell <https://en.wikipedia.org/wiki/Log4Shell>`_) is detected.");
+
+    case NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE:
+        return("The risk is set whenever a TLS certificate is close to the expiration date.");
+
+    case NDPI_PUNYCODE_IDN:
+        return("The risk is set whenever a domain name is specified in IDN format as they are sometimes used in `IDN homograph attacks <https://en.wikipedia.org/wiki/IDN_homograph_attack>`_.");
+
+    case NDPI_ERROR_CODE_DETECTED:
+        return("The risk is set whenever an error code is detected in the underlying protocol (e.g. HTTP and DNS).");
+
+    case NDPI_HTTP_CRAWLER_BOT:
+        return("The risk is set whenever a crawler/bot/robot has been detected");
+
+    case NDPI_ANONYMOUS_SUBSCRIBER:
+        return("The risk is set whenever the (source) ip address has been anonymized and it can't be used to identify the subscriber. Example: the flow is generated by an iCloud - private - relay exit node.");
+
+    case NDPI_UNIDIRECTIONAL_TRAFFIC:
+        return("The risk is set whenever the flow has unidirectional traffic (typically no traffic on the server to client direction). This risk is not triggered for multicast / broadcast destinations.");
+
+    case NDPI_HTTP_OBSOLETE_SERVER:
+        return("This risk is generated whenever a HTTP server uses an obsolete HTTP server version.");
+
+    case NDPI_PERIODIC_FLOW:
+        return("This risk is generated whenever a flow is observed at a specific periodic pace (e.g. every 10 seconds).");
+
+    case NDPI_MINOR_ISSUES:
+        return("Minor packet/flow issues (e.g. DNS traffic with zero TTL) have been detected.");
+
+    case NDPI_TCP_ISSUES:
+        return("Relevant TCP connection issues such as connection refused, scan, or probe attempt.");
+
+    default:
+
+        return("ERROR: Unknown Risk");
+    }
+}
+
+void ndpi_record_risk(bool record)
+{
+    m_recordRisk = record;
+}
+
 /* ********************************** */
 
 void ndpi_serialize_risk(ndpi_serializer *serializer,
@@ -1074,11 +1262,11 @@ void ndpi_serialize_risk(ndpi_serializer *serializer,
       if(risk_info == NULL)
         continue;
 
-      ndpi_serialize_start_of_block_uint32(serializer, i);
+      ndpi_serialize_string_uint32(serializer, "key", i);
+      ndpi_serialize_string_string(serializer, "description", ndpi_risk2description(r));
       ndpi_serialize_string_string(serializer, "risk", ndpi_risk2str(risk_info->risk));
       ndpi_serialize_string_string(serializer, "severity", ndpi_severity2str(risk_info->severity));
       ndpi_serialize_risk_score(serializer, r);
-      ndpi_serialize_end_of_block(serializer);
     }
   }
 
@@ -1113,7 +1301,8 @@ void ndpi_serialize_confidence(ndpi_serializer *serializer,
   }
 
   ndpi_serialize_start_of_block(serializer, "confidence");
-  ndpi_serialize_uint32_string(serializer, (u_int32_t)confidence, ndpi_confidence_get_name(confidence));
+  ndpi_serialize_string_uint32(serializer, "key", (u_int32_t)confidence);
+  ndpi_serialize_string_string(serializer, "value", ndpi_confidence_get_name(confidence));
   ndpi_serialize_end_of_block(serializer);
 }
 
@@ -1127,23 +1316,29 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
 {
   char buf[64];
 
-  ndpi_serialize_risk(serializer, risk);
+  ndpi_serialize_start_of_block(serializer, "ndpi");
+  if (m_recordRisk)
+  {
+      ndpi_serialize_risk(serializer, risk);
+  }
   ndpi_serialize_confidence(serializer, confidence);
-  ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
   ndpi_serialize_string_string(serializer, "proto_id", ndpi_protocol2id(ndpi_struct, l7_protocol, buf, sizeof(buf)));
   ndpi_serialize_string_string(serializer, "proto_by_ip", ndpi_get_proto_name(ndpi_struct,
-                                                                              l7_protocol.protocol_by_ip));
-  ndpi_serialize_string_uint32(serializer, "proto_by_ip_id", l7_protocol.protocol_by_ip);
-  ndpi_serialize_string_uint32(serializer, "encrypted", ndpi_is_encrypted_proto(ndpi_struct, l7_protocol));
-  ndpi_protocol_breed_t breed =
-    ndpi_get_proto_breed(ndpi_struct,
-                         (l7_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN ? l7_protocol.app_protocol : l7_protocol.master_protocol));
-  ndpi_serialize_string_string(serializer, "breed", ndpi_get_proto_breed_name(ndpi_struct, breed));
-  if(l7_protocol.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+      l7_protocol.protocol_by_ip));
+
+  char* proto_by_ip_id_string = intToString(l7_protocol.protocol_by_ip);
+  ndpi_serialize_string_string(serializer, "proto_by_ip_id", proto_by_ip_id_string);
+  if (proto_by_ip_id_string != NULL)
   {
-    ndpi_serialize_string_uint32(serializer, "category_id", l7_protocol.category);
-    ndpi_serialize_string_string(serializer, "category", ndpi_category_get_name(ndpi_struct, l7_protocol.category));
+      free(proto_by_ip_id_string);
   }
+  ndpi_serialize_string_uint32(serializer, "encrypted", ndpi_is_encrypted_proto(ndpi_struct, l7_protocol));
+  if (l7_protocol.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+  {
+      ndpi_serialize_string_uint32(serializer, "category_id", l7_protocol.category);
+      ndpi_serialize_string_string(serializer, "category", ndpi_category_get_name(ndpi_struct, l7_protocol.category));
+  }
+  ndpi_serialize_end_of_block(serializer);
 }
 
 /* ********************************** */
@@ -1153,7 +1348,6 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
   if(flow->protos.tls_quic.ssl_version)
   {
     char buf[64];
-    char notBefore[32], notAfter[32];
     struct tm a, b, *before = NULL, *after = NULL;
     u_int i, off;
     u_int8_t unknown_tls_version;
@@ -1177,27 +1371,24 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
 
       if(flow->protos.tls_quic.server_names)
       {
-        ndpi_serialize_string_string(serializer, "server_names",
+        ndpi_serialize_string_string(serializer, "client.server_name",
                                      flow->protos.tls_quic.server_names);
       }
 
-      if(before)
+      ndpi_serialize_string_string(serializer, "client.ja3", flow->protos.tls_quic.ja3_client);
+      ndpi_serialize_string_string(serializer, "server.ja3", flow->protos.tls_quic.ja3_server);
+      if (flow->protos.tls_quic.issuerDN)
       {
-        strftime(notBefore, sizeof(notBefore), "%Y-%m-%d %H:%M:%S", before);
-        ndpi_serialize_string_string(serializer, "notbefore", notBefore);
+          ndpi_serialize_string_string(serializer, "server.issuer", flow->protos.tls_quic.issuerDN);
+      }
+      if (flow->protos.tls_quic.subjectDN)
+      {
+          ndpi_serialize_string_string(serializer, "server.subject", flow->protos.tls_quic.subjectDN);
       }
 
-      if(after)
-      {
-        strftime(notAfter, sizeof(notAfter), "%Y-%m-%d %H:%M:%S", after);
-        ndpi_serialize_string_string(serializer, "notafter", notAfter);
-      }
+      ndpi_serialize_string_string(serializer, "cipher",  ndpi_cipher2str(flow->protos.tls_quic.server_cipher, unknown_cipher));
 
-      ndpi_serialize_string_string(serializer, "ja3", flow->protos.tls_quic.ja3_client);
-      ndpi_serialize_string_string(serializer, "ja3s", flow->protos.tls_quic.ja3_server);
-      ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->protos.tls_quic.server_unsafe_cipher);
-      ndpi_serialize_string_string(serializer, "cipher",
-                                   ndpi_cipher2str(flow->protos.tls_quic.server_cipher, unknown_cipher));
+      ndpi_serialize_end_of_block(serializer);
 
       if(flow->protos.tls_quic.issuerDN)
       {
@@ -1232,8 +1423,6 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
 
         ndpi_serialize_string_string(serializer, "fingerprint", buf);
       }
-
-      ndpi_serialize_end_of_block(serializer);
     }
   }
 }
@@ -1243,21 +1432,27 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 		  struct ndpi_flow_struct *flow,
 		  ndpi_protocol l7_protocol,
 		  ndpi_serializer *serializer) {
-  char buf[64];
+
   char const *host_server_name;
   char quic_version[16];
 
   if(flow == NULL) return(-1);
 
-  ndpi_serialize_start_of_block(serializer, "ndpi");
-  ndpi_serialize_proto(ndpi_struct, serializer, flow->risk, flow->confidence, l7_protocol);
-
+  ndpi_serialize_start_of_block(serializer, "url");
   host_server_name = ndpi_get_flow_info(flow, &l7_protocol);
   if (host_server_name != NULL)
   {
-    ndpi_serialize_string_string(serializer, "hostname", host_server_name);
+      ndpi_serialize_string_string(serializer, "full", host_server_name);
   }
+  ndpi_serialize_end_of_block(serializer);
 
+  ndpi_serialize_start_of_block(serializer, "rule");
+  ndpi_protocol_breed_t breed = ndpi_get_proto_breed(ndpi_struct, (l7_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN ? l7_protocol.app_protocol : l7_protocol.master_protocol));
+  ndpi_serialize_string_string(serializer, "category", ndpi_get_proto_breed_name(ndpi_struct, breed));
+  ndpi_serialize_end_of_block(serializer);
+
+  char buf[64];
+  ndpi_serialize_proto(ndpi_struct, serializer, flow->risk, flow->confidence, l7_protocol);
   switch(l7_protocol.master_protocol ? l7_protocol.master_protocol : l7_protocol.app_protocol) {
   case NDPI_PROTOCOL_IP_ICMP:
     if(flow->entropy > 0.0f) {
@@ -1377,7 +1572,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_TELNET:
     ndpi_serialize_start_of_block(serializer, "telnet");
     ndpi_serialize_string_string(serializer, "username", flow->protos.telnet.username);
-    ndpi_serialize_string_string(serializer, "password", flow->protos.telnet.password);
+    ndpi_serialize_string_string(serializer, "password", "***");
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -1438,15 +1633,16 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
                           flow->protos.tls_quic.quic_version);
     ndpi_serialize_string_string(serializer, "quic_version", quic_version);
 
-    ndpi_tls2json(serializer, flow);
 
     ndpi_serialize_end_of_block(serializer);
+    ndpi_tls2json(serializer, flow);
+
     break;
 
   case NDPI_PROTOCOL_MAIL_IMAP:
     ndpi_serialize_start_of_block(serializer, "imap");
     ndpi_serialize_string_string(serializer,  "user", flow->l4.tcp.ftp_imap_pop_smtp.username);
-    ndpi_serialize_string_string(serializer,  "password", flow->l4.tcp.ftp_imap_pop_smtp.password);
+    ndpi_serialize_string_string(serializer,  "password", "***");
     ndpi_serialize_string_uint32(serializer, "auth_failed",
                                  flow->l4.tcp.ftp_imap_pop_smtp.auth_failed);
     ndpi_serialize_end_of_block(serializer);
@@ -1455,7 +1651,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_MAIL_POP:
     ndpi_serialize_start_of_block(serializer, "pop");
     ndpi_serialize_string_string(serializer,  "user", flow->l4.tcp.ftp_imap_pop_smtp.username);
-    ndpi_serialize_string_string(serializer,  "password", flow->l4.tcp.ftp_imap_pop_smtp.password);
+    ndpi_serialize_string_string(serializer,  "password", "***");
     ndpi_serialize_string_uint32(serializer, "auth_failed",
                                  flow->l4.tcp.ftp_imap_pop_smtp.auth_failed);
     ndpi_serialize_end_of_block(serializer);
@@ -1464,7 +1660,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_MAIL_SMTP:
     ndpi_serialize_start_of_block(serializer, "smtp");
     ndpi_serialize_string_string(serializer,  "user", flow->l4.tcp.ftp_imap_pop_smtp.username);
-    ndpi_serialize_string_string(serializer,  "password", flow->l4.tcp.ftp_imap_pop_smtp.password);
+    ndpi_serialize_string_string(serializer,  "password", "***");
     ndpi_serialize_string_uint32(serializer, "auth_failed",
                                  flow->l4.tcp.ftp_imap_pop_smtp.auth_failed);
     ndpi_serialize_end_of_block(serializer);
@@ -1473,7 +1669,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_FTP_CONTROL:
     ndpi_serialize_start_of_block(serializer, "ftp");
     ndpi_serialize_string_string(serializer,  "user", flow->l4.tcp.ftp_imap_pop_smtp.username);
-    ndpi_serialize_string_string(serializer,  "password", flow->l4.tcp.ftp_imap_pop_smtp.password);
+    ndpi_serialize_string_string(serializer,  "password", "***");
     ndpi_serialize_string_uint32(serializer,  "auth_failed", flow->l4.tcp.ftp_imap_pop_smtp.auth_failed);
     ndpi_serialize_end_of_block(serializer);
     break;
@@ -1501,7 +1697,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
   } /* switch */
 
-  ndpi_serialize_end_of_block(serializer); // "ndpi"
+  //ndpi_serialize_end_of_block(serializer); // "ndpi"
 
   return(0);
 }
@@ -1569,7 +1765,7 @@ char *ndpi_get_ip_proto_name(u_int16_t ip_proto, char *name, unsigned int name_l
     snprintf(name, name_len, "PIM");
     break;
 
-  case NDPI_VRRP_PROTOCOL_TYPE:
+  case  NDPI_VRRP_PROTOCOL_TYPE:
     snprintf(name, name_len, "VRRP");
     break;
 
@@ -1598,7 +1794,8 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
   char src_name[INET6_ADDRSTRLEN] = {'\0'}, dst_name[INET6_ADDRSTRLEN] = {'\0'};
   char l4_proto_name[32];
 
-  if(ip_version == 4) {
+  if(ip_version == 4) 
+  {
     inet_ntop(AF_INET, &src_v4, src_name, sizeof(src_name));
     inet_ntop(AF_INET, &dst_v4, dst_name, sizeof(dst_name));
   } else {
@@ -1608,16 +1805,37 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_patchIPv6Address(src_name), ndpi_patchIPv6Address(dst_name);
   }
 
-  if(vlan_id != 0) ndpi_serialize_string_uint32(serializer, "vlan_id", vlan_id);
-  ndpi_serialize_string_string(serializer, "src_ip", src_name);
-  ndpi_serialize_string_string(serializer, "dest_ip", dst_name);
-  if(src_port) ndpi_serialize_string_uint32(serializer, "src_port", ntohs(src_port));
-  if(dst_port) ndpi_serialize_string_uint32(serializer, "dst_port", ntohs(dst_port));
+  ndpi_serialize_start_of_block(serializer, "source");
+  ndpi_serialize_string_string(serializer, "ip", src_name);
+  if (src_port) ndpi_serialize_string_uint32(serializer, "port", ntohs(src_port));
+  ndpi_serialize_end_of_block(serializer);
 
-  ndpi_serialize_string_uint32(serializer, "ip", ip_version);
+  ndpi_serialize_start_of_block(serializer, "destination");
+  ndpi_serialize_string_string(serializer, "ip", dst_name);
+  if (dst_port) ndpi_serialize_string_uint32(serializer, "port", ntohs(dst_port));
+  ndpi_serialize_end_of_block(serializer);
 
-  ndpi_serialize_string_string(serializer, "proto", ndpi_get_ip_proto_name(l4_protocol, l4_proto_name, sizeof(l4_proto_name)));
+  ndpi_serialize_start_of_block(serializer, "network");
+  if (ip_version == 4)
+  {
+      ndpi_serialize_string_string(serializer, "type", "ipv4");
+  }
+  else if (ip_version == 6)
+  {
+      ndpi_serialize_string_string(serializer, "type", "ipv6");
+  }
+  else
+  {
+      ndpi_serialize_string_string(serializer, "type", "ERROR_REPORT_ISSUE");
+  }
+  ndpi_serialize_string_string(serializer, "transport", ndpi_get_ip_proto_name(l4_protocol, l4_proto_name, sizeof(l4_proto_name)));
 
+
+  char buf[64];
+  ndpi_serialize_string_string(serializer, "application", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
+
+
+  ndpi_serialize_end_of_block(serializer);
   return(ndpi_dpi2json(ndpi_struct, flow, l7_protocol, serializer));
 }
 
@@ -2849,7 +3067,7 @@ int ndpi_vsnprintf(char * str, size_t size, char const * format, va_list va_args
 struct tm *ndpi_gmtime_r(const time_t *timep,
                          struct tm *result)
 {
-#if defined(WIN32)
+#ifdef WIN32
   gmtime_s(result, timep);
   return result;
 #else

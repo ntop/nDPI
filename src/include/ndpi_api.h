@@ -1829,6 +1829,7 @@ extern "C" {
 
   u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str,
 				     ndpi_protocol proto);
+  void ndpi_record_risk(bool record);
   void ndpi_serialize_risk(ndpi_serializer *serializer, ndpi_risk risk);
   void ndpi_serialize_risk_score(ndpi_serializer *serializer, ndpi_risk_enum risk);
   void ndpi_serialize_confidence(ndpi_serializer *serializer, ndpi_confidence_t confidence);

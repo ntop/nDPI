@@ -375,7 +375,7 @@ typedef struct ndpi_workflow {
   struct ndpi_stats stats;
 
   ndpi_workflow_callback_ptr flow_callback;
-  void * flow_callback_userdata;
+  void* flow_callback_userdata;
 
   /* outside referencies */
   pcap_t *pcap_handle;
@@ -413,9 +413,9 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
 
 /* Flow callback for completed flows, before the flow memory will be freed. */
-static inline void ndpi_workflow_set_flow_callback(struct ndpi_workflow * workflow, ndpi_workflow_callback_ptr callback, void * userdata) {
-  workflow->flow_callback = callback;
-  workflow->flow_callback_userdata = userdata;
+static inline void ndpi_workflow_set_flow_callback(struct ndpi_workflow* workflow, ndpi_workflow_callback_ptr callback, void* userdata) {
+    workflow->flow_callback = callback;
+    workflow->flow_callback_userdata = userdata;
 }
 
 int ndpi_is_datalink_supported(int datalink_type);
