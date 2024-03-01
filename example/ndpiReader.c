@@ -6127,7 +6127,6 @@ int main(int argc, char **argv)
     #endif
       }
 
-
       if (_isatty(_fileno(stdin)))
       {
           printf("Number of arguments: %d\n", argc - 1); // argc includes the program name
