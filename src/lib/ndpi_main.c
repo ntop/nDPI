@@ -3340,6 +3340,7 @@ static void ndpi_add_domain_risk_exceptions(struct ndpi_detection_module_struct 
     ".work",
     /* DGA's are used for caching */
     "akamaihd.net",
+    "dropboxusercontent.com",
     NULL /* End */
   };
   const ndpi_risk risks_to_mask[] = {
