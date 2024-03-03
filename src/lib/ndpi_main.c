@@ -9323,8 +9323,9 @@ static int category_depends_on_master(int proto)
   case NDPI_PROTOCOL_MAIL_SMTPS:
   case NDPI_PROTOCOL_MAIL_IMAPS:
   case NDPI_PROTOCOL_DNS:
-	  return 1;
+    return 1;
   }
+  
   return 0;
 }
 
