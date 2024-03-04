@@ -1,6 +1,6 @@
-DPI Packets (UDP):	3	(3.00 pkts/flow)
+DPI Packets (UDP):	1	(1.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 154 (154.00 diss/flow)
+Num dissector calls: 136 (136.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -14,15 +14,15 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   1/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-WireGuard	10	1924	1
+NarakaBladepoint	5	753	1
 
-Acceptable                      10 1924          1            
+Fun                              5 753           1            
 
-	1	UDP 192.168.122.11:22595 <-> 198.54.131.98:5060 [proto: 206/WireGuard][IP: 348/Mullvad][Encrypted][Confidence: DPI][DPI packets: 3][cat: VPN/2][6 pkts/828 bytes <-> 4 pkts/1096 bytes][Goodput ratio: 69/85][0.97 sec][bytes ratio: -0.139 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/234 193/239 470/248 177/6][Pkt Len c2s/s2c min/avg/max/stddev: 122/122 138/274 202/714 29/254][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 51820][Plen Bins: 0,0,60,20,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.88.231:58951 <-> 34.141.75.90:28203 [proto: 402/NarakaBladepoint][IP: 284/GoogleCloud][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][3 pkts/339 bytes <-> 2 pkts/414 bytes][Goodput ratio: 63/80][0.07 sec][PLAIN TEXT (9251381)][Plen Bins: 0,40,20,20,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -647,3 +647,12 @@ References: `RFC <https://datatracker.ietf.org/doc/html/rfc8175>`_
 Bidirectional Forwarding Detection is a network protocol that is used to detect faults between two routers or switches.
 
 References: `RFC <https://datatracker.ietf.org/doc/html/rfc5880>`_
+
+
+.. _Proto 402:
+
+`NDPI_PROTOCOL_NARAKA`
+============================
+Naraka: Bladepoint is a free-to-play action battle royale game developed by 24 Entertainment.
+
+References: `Main site <https://www.narakathegame.com/>`_

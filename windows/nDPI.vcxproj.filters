@@ -143,6 +143,7 @@
     <ClCompile Include="..\src\lib\protocols\c1222.c" />
     <ClCompile Include="..\src\lib\protocols\dlep.c" />
     <ClCompile Include="..\src\lib\protocols\bfd.c" />
+    <ClCompile Include="..\src\lib\protocols\naraka.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />
