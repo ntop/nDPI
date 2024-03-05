@@ -248,6 +248,7 @@ struct ndpi_detection_module_config_struct {
   int ftp_opportunistic_tls_enabled;
 
   int stun_opportunistic_tls_enabled;
+  int stun_max_packets_extra_dissection;
 
   int dns_subclassification_enabled;
   int dns_parse_response_enabled;
