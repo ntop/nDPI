@@ -660,8 +660,8 @@ int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
 u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_type);
 
 /* Bittorrent */
-u_int32_t make_bittorrent_host_key(struct ndpi_flow_struct *flow, int client, int offset);
-u_int32_t make_bittorrent_peers_key(struct ndpi_flow_struct *flow);
+u_int64_t make_bittorrent_host_key(struct ndpi_flow_struct *flow, int client, int offset);
+u_int64_t make_bittorrent_peers_key(struct ndpi_flow_struct *flow);
 int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struct,
                                  struct ndpi_flow_struct *flow);
 
@@ -673,7 +673,7 @@ int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct
 int tpkt_verify_hdr(const struct ndpi_packet_struct * const packet);
 
 /* Mining Protocols (Ethereum, Monero, ...) */
-u_int32_t mining_make_lru_cache_key(struct ndpi_flow_struct *flow);
+u_int64_t mining_make_lru_cache_key(struct ndpi_flow_struct *flow);
 
 
 /* Protocols init */

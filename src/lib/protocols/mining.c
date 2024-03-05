@@ -28,14 +28,14 @@
 
 /* ************************************************************************** */
 
-u_int32_t mining_make_lru_cache_key(struct ndpi_flow_struct *flow) {
-  u_int32_t key;
+u_int64_t mining_make_lru_cache_key(struct ndpi_flow_struct *flow) {
+  u_int64_t key;
 
   /* network byte order */
   if(flow->is_ipv6)
-    key = ndpi_quick_hash(flow->c_address.v6, 16) + ndpi_quick_hash(flow->s_address.v6, 16);
+    key = (ndpi_quick_hash64((const char *)flow->c_address.v6, 16) << 32) | (ndpi_quick_hash64((const char *)flow->s_address.v6, 16) & 0xFFFFFFFF);
   else
-    key = flow->c_address.v4 + flow->s_address.v4;
+    key = ((u_int64_t)flow->c_address.v4 << 32) | flow->s_address.v4;
 
   return key;
 }

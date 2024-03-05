@@ -757,7 +757,7 @@ typedef enum {
 } lru_cache_scope;
 
 struct ndpi_lru_cache_entry {
-  u_int32_t key; /* Store the whole key to avoid ambiguities */
+  u_int64_t key; /* Store the whole key to avoid ambiguities */
   u_int32_t is_full:1, value:16, pad:15;
   u_int32_t timestamp; /* sec */
 };

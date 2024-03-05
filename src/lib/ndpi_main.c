@@ -7255,17 +7255,17 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
 /* ********************************************************************************* */
 
-static u_int32_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_client) {
-  u_int32_t key;
+static u_int64_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_client) {
+  u_int64_t key;
 
   if(use_client) {
     if(flow->is_ipv6)
-      key = ndpi_quick_hash(flow->c_address.v6, 16);
+      key = ndpi_quick_hash64((const char *)flow->c_address.v6, 16);
     else
       key = ntohl(flow->c_address.v4);
   } else {
     if(flow->is_ipv6)
-      key = ndpi_quick_hash(flow->s_address.v6, 16);
+      key = ndpi_quick_hash64((const char *)flow->s_address.v6, 16);
     else
       key = ntohl(flow->s_address.v4);
   }
@@ -7530,7 +7530,7 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
   if(ndpi_struct->bittorrent_cache) {
     u_int16_t cached_proto;
     u_int8_t found = 0;
-    u_int32_t key, key1, key2;
+    u_int64_t key, key1, key2;
 
     flow->bt_check_performed = 1;
 
@@ -7544,9 +7544,10 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
       || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(flow));
 
 #ifdef BITTORRENT_CACHE_DEBUG
-    printf("[BitTorrent] *** [%s] SEARCHING ports %u / %u [%u][%u][%u][found: %u]\n",
+    printf("[BitTorrent] *** [%s] SEARCHING ports %u / %u [0x%llx][0x%llx][0x%llx][found: %u]\n",
            flow->l4_proto == IPPROTO_UDP ? "UDP": "TCP",
-           ntohs(flow->c_port), ntohs(flow->s_port), key, key1, key2, found);
+           ntohs(flow->c_port), ntohs(flow->s_port),
+           (long long unsigned int)key, (long long unsigned int)key1, (long long unsigned int)key2, found);
 #endif
 
     return(found);
@@ -7560,17 +7561,17 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
 /* #define ZOOM_CACHE_DEBUG */
 
 
-static u_int32_t make_zoom_key(struct ndpi_flow_struct *flow, int server) {
-  u_int32_t key;
+static u_int64_t make_zoom_key(struct ndpi_flow_struct *flow, int server) {
+  u_int64_t key;
 
   if(server) {
     if(flow->is_ipv6)
-      key = ndpi_quick_hash(flow->s_address.v6, 16);
+      key = ndpi_quick_hash64((const char *)flow->s_address.v6, 16);
     else
       key = flow->s_address.v4;
   } else {
     if(flow->is_ipv6)
-      key = ndpi_quick_hash(flow->c_address.v6, 16);
+      key = ndpi_quick_hash64((const char *)flow->c_address.v6, 16);
     else
       key = flow->c_address.v4;
   }
@@ -7585,7 +7586,7 @@ static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct 
 
   if(ndpi_struct->zoom_cache) {
     u_int16_t cached_proto;
-    u_int32_t key;
+    u_int64_t key;
 
     key = make_zoom_key(flow, server);
     u_int8_t found = ndpi_lru_find_cache(ndpi_struct->zoom_cache, key, &cached_proto,
@@ -7593,7 +7594,7 @@ static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct 
 					 ndpi_get_current_time(flow));
 
 #ifdef ZOOM_CACHE_DEBUG
-    printf("[Zoom] *** [TCP] SEARCHING key %u [found: %u]\n", key, found);
+    printf("[Zoom] *** [TCP] SEARCHING key 0x%llx [found: %u]\n", (long long unsigned int)key, found);
 #endif
 
     return(found);
@@ -10028,9 +10029,9 @@ static void __lru_cache_unlock(struct ndpi_lru_cache *c)
 #endif
 }
 
-u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
+u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int64_t key,
 			     u_int16_t *value, u_int8_t clean_key_when_found, u_int32_t now_sec) {
-  u_int32_t slot = key % c->num_entries;
+  u_int32_t slot = ndpi_quick_hash((unsigned char *)&key, sizeof(key)) % c->num_entries;
   u_int8_t ret;
 
   __lru_cache_lock(c);
@@ -10052,8 +10053,8 @@ u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
   return ret;
 }
 
-void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value, u_int32_t now_sec) {
-  u_int32_t slot = key % c->num_entries;
+void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int64_t key, u_int16_t value, u_int32_t now_sec) {
+  u_int32_t slot = ndpi_quick_hash((unsigned char *)&key, sizeof(key)) % c->num_entries;
 
   __lru_cache_lock(c);
 
