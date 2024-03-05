@@ -401,6 +401,7 @@ static ndpi_protocol_match host_match[] =
    { "captive.apple.com",                         "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "captive.apple.com.",                        "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL }, /* apple.com.edgekey.net */
    { "gsp1.apple.com",                            "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "attwifi.apple.com",                         "Apple",            NDPI_PROTOCOL_APPLE, NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".push.apple.com",                           "ApplePush",        NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "push-apple.com",                            "ApplePush",        NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { ".icloud.com",                               "AppleiCloud",      NDPI_PROTOCOL_APPLE_ICLOUD, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -568,7 +569,6 @@ static ndpi_protocol_match host_match[] =
    { "doh.ffmuc.net", "DoH_DoT", NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ns0.fdn.fr", "DoH_DoT", NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ns1.fdn.fr", "DoH_DoT", NDPI_PROTOCOL_DOH_DOT, NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-
 
    /*
      See https://better.fyi/trackers/
@@ -1692,10 +1692,11 @@ static ndpi_category_match category_match[] = {
    { "pcdn.skycdn.",                     NDPI_PROTOCOL_CATEGORY_STREAMING },
 
    /* https://success.tanaza.com/s/article/How-Automatic-Detection-of-Captive-Portal-works */
-   { "thinkdifferent.us",                NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
-   { "airport.us",                       NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
-   { "detectportal.firefox.com",         NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
-   { "connectivitycheck.platform.hicloud.com",    NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
-
+   { "thinkdifferent.us",                      NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "airport.us",                             NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "detectportal.firefox.com",               NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "connectivitycheck.platform.hicloud.com", NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   { "nmcheck.gnome.org",                      NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK },
+   
    { NULL, 0 }
 };
