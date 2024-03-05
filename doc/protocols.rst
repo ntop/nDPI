@@ -651,8 +651,8 @@ References: `RFC <https://datatracker.ietf.org/doc/html/rfc5880>`_
 
 .. _Proto 402:
 
-`NDPI_PROTOCOL_NARAKA`
+`NDPI_PROTOCOL_NETEASE_GAMES`
 ============================
-Naraka: Bladepoint is a free-to-play action battle royale game developed by 24 Entertainment.
+Traffic of various NetEase games.
 
-References: `Main site <https://www.narakathegame.com/>`_
+References: `Main site <https://www.neteasegames.com/>`_
