@@ -658,7 +658,7 @@ Traffic of various NetEase games.
 References: `Main site <https://www.neteasegames.com/>`_
 
 
-.. _Proto 402:
+.. _Proto 403:
 
 `NDPI_PROTOCOL_PATHOFEXILE`
 ============================
