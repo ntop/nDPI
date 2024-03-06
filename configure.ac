@@ -178,12 +178,19 @@ if ! test "${with_only_libndpi+set}" = set; then :
         JSONC_LIBS=""
         JSONC_CFLAGS=""
     ])
-    AX_PTHREAD([],[
-        AC_MSG_WARN([POSIX Threads not available. Building library only.])
-        JSONC_LIBS=""
-        JSONC_CFLAGS=""
-        EXTRA_TARGETS=""
-    ])
+    dnl> AX_PTHREAD test does not work along with MingW/MSYS anymore
+    case "$host" in
+      *-*-mingw32*|*-*-msys)
+      ;;
+      *)
+        AX_PTHREAD([],[
+            AC_MSG_WARN([POSIX Threads not available. Building library only.])
+            JSONC_LIBS=""
+            JSONC_CFLAGS=""
+            EXTRA_TARGETS=""
+        ])
+      ;;
+    esac
 fi
 AM_CONDITIONAL([BUILD_UNITTESTS], [test "x$build_unittests" = "xyes"])
 
