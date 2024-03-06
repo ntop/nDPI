@@ -13,7 +13,7 @@ LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/21/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/2/0 (insert/search/found)
-Automa host:          32/25 (search/found)
+Automa host:          32/28 (search/found)
 Automa domain:        32/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     12/0 (search/found)
@@ -25,17 +25,17 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   72/16 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-DNS	6	630	3
-HTTP	19	2275	5
+DNS	4	476	2
+HTTP	10	676	4
 TLS	23	1578	15
 QUIC	23	4118	2
 Sina	335	220149	11
 Alibaba	8	877	3
-SinaWeibo	84	37928	5
+SinaWeibo	95	39681	7
 
 Safe                            23 1578          15           
-Acceptable                      56 7900          13           
-Fun                            419 258077        16           
+Acceptable                      45 6147          11           
+Fun                            430 259830        18           
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -51,7 +51,7 @@ JA3 Host Stats:
 	7	TCP 192.168.1.105:35806 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: SocialNetwork/6][7 pkts/946 bytes <-> 6 pkts/3755 bytes][Goodput ratio: 49/89][0.23 sec][Hostname/SNI: img.t.sinajs.cn][bytes ratio: -0.598 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/1 45/42 163/160 63/68][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 135/626 530/1502 161/505][URL: img.t.sinajs.cn/t6/style/images/global_nav/WB_logo_b.png][StatusCode: 200][Content-Type: image/png][Server: PWS/8.1.36][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36][PLAIN TEXT (GET /t6/style/images/global)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,20,0,20,0,0,0,0,20,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0]
 	8	UDP 192.168.1.105:53656 <-> 216.58.210.227:443 [proto: 188/QUIC][IP: 126/Google][Encrypted][Confidence: Match by port][DPI packets: 13][cat: Web/5][8 pkts/1301 bytes <-> 6 pkts/873 bytes][Goodput ratio: 74/71][1.60 sec][bytes ratio: 0.197 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 76/2 266/14 1385/29 503/13][Pkt Len c2s/s2c min/avg/max/stddev: 67/74 163/146 406/433 122/129][Plen Bins: 21,35,14,0,0,7,0,0,7,0,0,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	9	UDP 216.58.210.14:443 <-> 192.168.1.105:49361 [proto: 188/QUIC][IP: 126/Google][Encrypted][Confidence: Match by port][DPI packets: 9][cat: Web/5][5 pkts/963 bytes <-> 4 pkts/981 bytes][Goodput ratio: 78/83][0.69 sec][bytes ratio: -0.009 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 171/228 626/662 264/307][Pkt Len c2s/s2c min/avg/max/stddev: 77/85 193/245 353/660 93/241][Plen Bins: 0,33,11,11,11,11,0,0,0,11,0,0,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	10	TCP 192.168.1.105:59119 <-> 114.134.80.162:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Web/5][5 pkts/736 bytes <-> 4 pkts/863 bytes][Goodput ratio: 61/73][1.05 sec][Hostname/SNI: weibo.com][bytes ratio: -0.079 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/347 176/348 353/348 174/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 147/216 500/689 177/273][URL: weibo.com/login.php?lang=en-us][StatusCode: 301][Content-Type: text/html][Server: Apache][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36][PLAIN TEXT (GET /login.php)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	TCP 192.168.1.105:59119 <-> 114.134.80.162:80 [proto: 7.356/HTTP.SinaWeibo][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: SocialNetwork/6][5 pkts/736 bytes <-> 4 pkts/863 bytes][Goodput ratio: 61/73][1.05 sec][Hostname/SNI: weibo.com][bytes ratio: -0.079 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/347 176/348 353/348 174/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 147/216 500/689 177/273][URL: weibo.com/login.php?lang=en-us][StatusCode: 301][Content-Type: text/html][Server: Apache][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36][PLAIN TEXT (GET /login.php)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	11	TCP 192.168.1.105:35811 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: SocialNetwork/6][3 pkts/604 bytes <-> 2 pkts/140 bytes][Goodput ratio: 66/0][0.46 sec][Hostname/SNI: js.t.sinajs.cn][URL: js.t.sinajs.cn/t5/register/js/v6/pl/base.js?version=201605130537][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36][PLAIN TEXT (KGET /t)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	12	TCP 192.168.1.105:42275 <-> 222.73.28.96:80 [proto: 7.200/HTTP.Sina][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: SocialNetwork/6][3 pkts/610 bytes <-> 1 pkts/66 bytes][Goodput ratio: 70/0][0.38 sec][Hostname/SNI: u1.img.mobile.sina.cn][URL: u1.img.mobile.sina.cn/public/files/image/620x300_img5653d57c6dab2.png][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36][PLAIN TEXT (GET /public/files/image/620)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	13	TCP 192.168.1.105:50827 <-> 47.89.65.229:443 [proto: 91.274/TLS.Alibaba][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: Web/5][3 pkts/382 bytes <-> 1 pkts/66 bytes][Goodput ratio: 52/0][0.16 sec][Hostname/SNI: g.alicdn.com][(Advertised) ALPNs: h2;spdy/3.1;http/1.1][TLSv1.2][JA3C: 58e7f64db6e4fe4941dd9691d421196c][JA4: t12d1412h2_20a10634286c_ce3753e6c77f][Firefox][PLAIN TEXT (g.alicdn.com)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -67,7 +67,7 @@ JA3 Host Stats:
 	23	TCP 192.168.1.105:59120 <-> 114.134.80.162:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 3][cat: Web/5][2 pkts/128 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.36 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	24	TCP 192.168.1.105:59121 <-> 114.134.80.162:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 3][cat: Web/5][2 pkts/128 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.34 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	25	UDP 192.168.1.105:53466 <-> 192.168.1.1:53 [proto: 5.274/DNS.Alibaba][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/112 bytes][Goodput ratio: 43/62][0.20 sec][Hostname/SNI: log.mmstat.com][140.205.174.1][PLAIN TEXT (mmstat)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	26	UDP 192.168.1.105:54988 <-> 192.168.1.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/69 bytes <-> 1 pkts/85 bytes][Goodput ratio: 39/50][0.08 sec][Hostname/SNI: weibo.com][114.134.80.162][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	26	UDP 192.168.1.105:54988 <-> 192.168.1.1:53 [proto: 5.356/DNS.SinaWeibo][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/69 bytes <-> 1 pkts/85 bytes][Goodput ratio: 39/50][0.08 sec][Hostname/SNI: weibo.com][114.134.80.162][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	27	TCP 192.168.1.105:34699 <-> 216.58.212.65:443 [proto: 91/TLS][IP: 126/Google][Encrypted][Confidence: Match by port][DPI packets: 2][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.02 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	28	TCP 192.168.1.105:35154 <-> 216.58.210.206:443 [proto: 91/TLS][IP: 126/Google][Encrypted][Confidence: Match by port][DPI packets: 2][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.05 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	29	TCP 192.168.1.105:37802 <-> 216.58.212.69:443 [proto: 91/TLS][IP: 126/Google][Encrypted][Confidence: Match by port][DPI packets: 2][cat: Web/5][1 pkts/66 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.03 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

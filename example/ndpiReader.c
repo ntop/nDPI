@@ -5005,6 +5005,48 @@ void automataUnitTest() {
   ndpi_free_automa(automa);
 }
 
+/* *********************************************** */
+
+void automataDomainsUnitTest() {
+  void *automa = ndpi_init_automa_domain();
+
+  assert(automa);
+  assert(ndpi_add_string_to_automa(automa, ndpi_strdup("wikipedia.it")) == 0);
+  ndpi_finalize_automa(automa);
+  assert(ndpi_match_string(automa, "wikipedia.it") == 1);
+  assert(ndpi_match_string(automa, "foo.wikipedia.it") == 1);
+  assert(ndpi_match_string(automa, "foowikipedia.it") == 0);
+  assert(ndpi_match_string(automa, "foowikipedia") == 0);
+  assert(ndpi_match_string(automa, "-wikipedia.it") == 0);
+  assert(ndpi_match_string(automa, "foo-wikipedia.it") == 0);
+  assert(ndpi_match_string(automa, "wikipedia.it.com") == 0);
+  ndpi_free_automa(automa);
+
+  automa = ndpi_init_automa_domain();
+  assert(automa);
+  assert(ndpi_add_string_to_automa(automa, ndpi_strdup("wikipedia.")) == 0);
+  ndpi_finalize_automa(automa);
+  assert(ndpi_match_string(automa, "wikipedia.it") == 1);
+  assert(ndpi_match_string(automa, "foo.wikipedia.it") == 1);
+  assert(ndpi_match_string(automa, "foowikipedia.it") == 0);
+  assert(ndpi_match_string(automa, "foowikipedia") == 0);
+  assert(ndpi_match_string(automa, "-wikipedia.it") == 0);
+  assert(ndpi_match_string(automa, "foo-wikipedia.it") == 0);
+  assert(ndpi_match_string(automa, "wikipediafoo") == 0);
+  assert(ndpi_match_string(automa, "wikipedia.it.com") == 1);
+  ndpi_free_automa(automa);
+
+  automa = ndpi_init_automa_domain();
+  assert(automa);
+  assert(ndpi_add_string_to_automa(automa, ndpi_strdup("-buy.itunes.apple.com")) == 0);
+  ndpi_finalize_automa(automa);
+  assert(ndpi_match_string(automa, "buy.itunes.apple.com") == 0);
+  assert(ndpi_match_string(automa, "p53-buy.itunes.apple.com") == 1);
+  assert(ndpi_match_string(automa, "p53buy.itunes.apple.com") == 0);
+  assert(ndpi_match_string(automa, "foo.p53-buy.itunes.apple.com") == 1);
+  ndpi_free_automa(automa);
+}
+
 #endif
 
 /* *********************************************** */
@@ -5927,6 +5969,7 @@ int main(int argc, char **argv) {
     bitmapUnitTest();
     filterUnitTest();
     automataUnitTest();
+    automataDomainsUnitTest();
     analyzeUnitTest();
     ndpi_self_check_host_match(stderr);
     analysisUnitTest();

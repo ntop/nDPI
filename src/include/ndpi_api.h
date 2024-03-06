@@ -932,6 +932,7 @@ extern "C" {
    *
    */
   void* ndpi_init_automa(void);
+  void *ndpi_init_automa_domain(void);
 
   /**
    * Free Aho-Corasick automata allocated with ndpi_init_automa();
