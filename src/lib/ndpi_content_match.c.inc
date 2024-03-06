@@ -1609,6 +1609,7 @@ static ndpi_protocol_match host_match[] =
    { "myhuaweicloud.com",                "HuaweiCloud", NDPI_PROTOCOL_HUAWEI_CLOUD, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "easebar.com",                      "NetEaseGames", NDPI_PROTOCOL_NETEASE_GAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "pathofexile.com",                  "PathofExile", NDPI_PROTOCOL_PATHOFEXILE, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"

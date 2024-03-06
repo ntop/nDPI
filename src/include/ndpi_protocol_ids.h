@@ -431,6 +431,7 @@ typedef enum {
   NDPI_PROTOCOL_DLEP                  = 400,
   NDPI_PROTOCOL_BFD                   = 401,
   NDPI_PROTOCOL_NETEASE_GAMES         = 402,
+  NDPI_PROTOCOL_PATHOFEXILE           = 403,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

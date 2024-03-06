@@ -656,3 +656,12 @@ References: `RFC <https://datatracker.ietf.org/doc/html/rfc5880>`_
 Traffic of various NetEase games.
 
 References: `Main site <https://www.neteasegames.com/>`_
+
+
+.. _Proto 403:
+
+`NDPI_PROTOCOL_PATHOFEXILE`
+============================
+Path of Exile is a free-to-play online Action RPG.
+
+References: `Main site <https://pathofexile.com/>`_
