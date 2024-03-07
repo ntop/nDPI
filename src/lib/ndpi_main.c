@@ -7413,7 +7413,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       }
     } else if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_TELEGRAM) {
 	ndpi_int_change_protocol(ndpi_str, flow,
-				 flow->guessed_protocol_id_by_ip, flow->detected_protocol_stack[1],
+				 flow->guessed_protocol_id_by_ip, flow->detected_protocol_stack[0],
 				 NDPI_CONFIDENCE_DPI_PARTIAL);	
       }
     break;

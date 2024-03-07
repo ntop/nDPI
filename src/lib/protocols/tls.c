@@ -2615,7 +2615,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  }
 
 #ifdef DEBUG_TLS
-		  printf("Client TLS [SUPPORTED_VERSIONS: %s]\n", ja.client.supported_versions_str);
+		  printf("Client TLS [SUPPORTED_VERSIONS: %s]\n", version_str);
 #endif
 
 		  if(flow->protos.tls_quic.tls_supported_versions == NULL)
