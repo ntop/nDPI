@@ -40,6 +40,7 @@ Redis Serialization Protocol
 
 References: `Protocol Specs: <https://redis.io/docs/reference/protocol-spec/`_
 
+
 .. _Proto 201:
 
 `NDPI_PROTOCOL_GOOGLE_MEET`
@@ -665,3 +666,16 @@ References: `Main site <https://www.neteasegames.com/>`_
 Path of Exile is a free-to-play online Action RPG.
 
 References: `Main site <https://pathofexile.com/>`_
+
+
+.. _Proto 404:
+
+`NDPI_PROTOCOL_GOOGLE_CALL`
+===========================
+Audio/video calls made by (any) Google applications (i.e Google Meet).
+
+References: `Main site: <https://meet.google.com/>`_
+
+Notes:
+
+- nDPI usually uses different protocol ids for the generic application traffic and for its "realtime" traffic (examples: NDPI_PROTOCOL_MEET/NDPI_PROTOCOL_GOOGLE_CALL, NDPI_PROTOCOL_WHATSAPP/NDPI_PROTOCOL_WHATSAPP_CALL, ...)

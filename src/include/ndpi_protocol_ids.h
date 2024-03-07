@@ -432,6 +432,7 @@ typedef enum {
   NDPI_PROTOCOL_BFD                   = 401,
   NDPI_PROTOCOL_NETEASE_GAMES         = 402,
   NDPI_PROTOCOL_PATHOFEXILE           = 403,
+  NDPI_PROTOCOL_GOOGLE_CALL           = 404, /* Voip/audio/video calls from Google Chat/Meet/... */
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
