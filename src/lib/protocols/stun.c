@@ -440,7 +440,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
             /* Give room for DTLS handshake, where we might have
                retransmissions and fragments */
-            flow->max_extra_packets_to_check += 10;
+            flow->max_extra_packets_to_check = ndpi_min(255, (int)flow->max_extra_packets_to_check + 10);
             flow->stun.maybe_dtls = 1;
 	  }
           NDPI_LOG_DBG(ndpi_struct, "Switch to TLS (%d/%d)\n",
@@ -626,19 +626,8 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
     if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN /* No-subclassification */ ||
        flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP /* Metadata. TODO: other protocols? */) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
-
-      if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP) {
-        flow->max_extra_packets_to_check = 10; /* Looking for metadata. There are no really RTP packets
-						  in Telegram flows, so no need to enable monitoring for them */
-      } else {
-        flow->max_extra_packets_to_check = 4;
-        flow->extra_packets_func = stun_search_again;
-      }
-    }
-  } else {
-    /* Already in extra dissection, but we just sub-classied */
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP) {
-      flow->max_extra_packets_to_check = 10;
+      flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
+      flow->extra_packets_func = stun_search_again;
     }
   }
 }
