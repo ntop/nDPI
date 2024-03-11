@@ -1,0 +1,33 @@
+{
+	"nDPIReader": {
+		"skipParameters": [
+			{
+				"sourceIP": "192.168.2.126",
+				"destinationIP" : "14.136.136.108",
+				"destinationPort" : 80
+			},
+			{
+				"sourceIP": "172.16.42.216",
+				"destinationIP" : "54.239.29.253"	
+			},
+			{
+				"destinationIP": "216.239.38.120",
+				"destinationPort" : 443
+			},
+			{
+				"sourceIP": "192.168.115.8",
+				"destinationPort": 80
+			},
+			{
+				"sourceIP" : "192.168.1.34"
+			},
+			{
+				"destinationPort" : 27017				
+			},
+			{
+				"destinationIP": "54.230.227.172"
+			}
+			
+		]
+	}
+}

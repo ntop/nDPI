@@ -191,7 +191,7 @@ extern bool isValidFlowForLogging(struct ndpi_flow_info* flow)
     if (!hasAlreadyReadLogFile)
     {
         char buffer[1024];
-        const char* configurationFileName = "nDPIConfiguration.json";
+        const char* configurationFileName = "Settings\\nDPIConfiguration.json";
 
         // Get the folder path of the currently running program
         char programFolderPath[MAX_PATH_LENGTH];
@@ -200,6 +200,7 @@ extern bool isValidFlowForLogging(struct ndpi_flow_info* flow)
         // Append the file name to the folder path
         char configurationFilePath[MAX_PATH_LENGTH];
         appendFileNameToPath(configurationFileName, programFolderPath, configurationFilePath, sizeof(configurationFilePath));
+        printf("\nConfiguration file location: %s\n", configurationFilePath);
 
         FILE* fp = fopen(configurationFilePath, "r");
         if (fp == NULL)

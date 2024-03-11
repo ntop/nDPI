@@ -6076,10 +6076,10 @@ int main(int argc, char **argv)
       }
 
       // (MM.DD.YYYY.V)
-      fprintf(serializationLogFile, "nDPI Version 02.29.2024.1 - This is the first version from nDPIFork repository\n");
+      fprintf(serializationLogFile, "nDPI Version 03.11.2024.1 - Configuration files mooved to Settings\nDPIConfiguration.json\n");
       if (_isatty(_fileno(stdin)))
       {
-          printf("nDPI Version 02.29.2024.1 - This is the first version from nDPIFork repository\n");
+          printf("nDPI Version 03.11.2024.1 - Configuration files mooved to Settings\nDPIConfiguration.json\n");
       }
 
       skip_unit_tests = true;
