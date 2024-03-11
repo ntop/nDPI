@@ -174,8 +174,6 @@ bool ndpi_bitmap64_isset(ndpi_bitmap64 *_b, u_int64_t value) {
     return(false);
 
   if(!b->is_compressed) ndpi_bitmap64_compress(b);
-  if(!b->is_compressed)
-    return(false);
 
   return(binary_fuse16_contain(value, &b->bitmap));
 }
@@ -201,8 +199,8 @@ void ndpi_bitmap64_free(ndpi_bitmap64 *_b) {
 u_int32_t ndpi_bitmap64_size(ndpi_bitmap64 *_b) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
 
-  if(!b)
-    return(0);
-
+  if(!b) return(0);
+  if(!b->is_compressed) ndpi_bitmap64_compress(b);
+  
   return(sizeof(ndpi_bitmap64) + binary_fuse16_size_in_bytes(&b->bitmap));
 }

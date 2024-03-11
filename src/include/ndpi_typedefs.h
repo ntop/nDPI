@@ -1,5 +1,5 @@
 /*
-E * ndpi_typedefs.h
+ * ndpi_typedefs.h
  *
  * Copyright (C) 2011-23 - ntop.org
  *
