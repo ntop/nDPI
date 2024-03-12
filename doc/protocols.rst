@@ -679,3 +679,12 @@ References: `Main site: <https://meet.google.com/>`_
 Notes:
 
 - nDPI usually uses different protocol ids for the generic application traffic and for its "realtime" traffic (examples: NDPI_PROTOCOL_MEET/NDPI_PROTOCOL_GOOGLE_CALL, NDPI_PROTOCOL_WHATSAPP/NDPI_PROTOCOL_WHATSAPP_CALL, ...)
+
+
+.. _Proto 405:
+
+`NDPI_PROTOCOL_PFCP`
+=====================
+PFCP is a protocol used for communicating between control plane (CP) and user plane (UP) functions in 4G and 5G networks.
+
+References: `Protocol Specs: <https://www.etsi.org/deliver/etsi_ts/129200_129299/129244/16.05.00_60/ts_129244v160500p.pdf>`_

@@ -145,6 +145,7 @@
     <ClCompile Include="..\src\lib\protocols\bfd.c" />
     <ClCompile Include="..\src\lib\protocols\netease_games.c" />
     <ClCompile Include="..\src\lib\protocols\path_of_exile.c" />
+    <ClCompile Include="..\src\lib\protocols\pfcp.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />
