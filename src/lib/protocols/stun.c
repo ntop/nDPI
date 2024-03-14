@@ -311,18 +311,21 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       return 1;
 
     case 0x0013:
-      NDPI_LOG_DBG(ndpi_struct, "DATA attribute\n");
+      NDPI_LOG_DBG(ndpi_struct, "DATA attribute (%d/%d)\n",
+                  real_len, payload_length - off - 4);
 
-      orig_payload = packet->payload;
-      orig_payload_length = packet->payload_packet_len;
-      packet->payload = payload + off + 4;
-      packet->payload_packet_len = payload_length - off - 4;
+      if(real_len <= payload_length - off - 4) {
+        orig_payload = packet->payload;
+        orig_payload_length = packet->payload_packet_len;
+        packet->payload = payload + off + 4;
+        packet->payload_packet_len = real_len;
 
-      stun_search_again(ndpi_struct, flow);
-      NDPI_LOG_DBG(ndpi_struct, "End recursion\n");
+        stun_search_again(ndpi_struct, flow);
+        NDPI_LOG_DBG(ndpi_struct, "End recursion\n");
 
-      packet->payload = orig_payload;
-      packet->payload_packet_len = orig_payload_length;
+        packet->payload = orig_payload;
+        packet->payload_packet_len = orig_payload_length;
+      }
 
       break;
 
@@ -424,6 +427,9 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
         if(flow->tls_quic.certificate_processed == 1) {
           NDPI_LOG_DBG(ndpi_struct, "Interesting DTLS stuff already processed. Ignoring\n");
         } else {
+          NDPI_LOG_DBG(ndpi_struct, "Switch to DTLS (%d/%d)\n",
+                       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+
           if(flow->stun.maybe_dtls == 0) {
             /* First DTLS packet of the flow */
             first_dtls_pkt = 1;
@@ -443,8 +449,6 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
             flow->max_extra_packets_to_check = ndpi_min(255, (int)flow->max_extra_packets_to_check + 10);
             flow->stun.maybe_dtls = 1;
 	  }
-          NDPI_LOG_DBG(ndpi_struct, "Switch to TLS (%d/%d)\n",
-                       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
 
 	  switch_to_tls(ndpi_struct, flow, first_dtls_pkt);
 
