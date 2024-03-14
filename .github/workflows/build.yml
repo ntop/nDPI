@@ -207,6 +207,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Fix kernel mmap rnd bits on Ubuntu
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
+        run: |
+          # Workaround for compatinility between latest kernel and sanitizer
+          # See https://github.com/actions/runner-images/issues/9491
+          sudo sysctl vm.mmap_rnd_bits=28
       - name: Install Ubuntu Prerequisites
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
         run: |
