@@ -173,7 +173,10 @@ bool ndpi_bitmap64_isset(ndpi_bitmap64 *_b, u_int64_t value) {
   if(!b)
     return(false);
 
-  if(!b->is_compressed) ndpi_bitmap64_compress(b);
+  if(!b->is_compressed) {
+    if(!ndpi_bitmap64_compress(b))
+      return(false); /* Compresssion failed */
+  }
 
   return(binary_fuse16_contain(value, &b->bitmap));
 }
@@ -200,7 +203,11 @@ u_int32_t ndpi_bitmap64_size(ndpi_bitmap64 *_b) {
   ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
 
   if(!b) return(0);
-  if(!b->is_compressed) ndpi_bitmap64_compress(b);
-  
+
+  if(!b->is_compressed) {
+    if(!ndpi_bitmap64_compress(b))
+      return(0); /* Compresssion failed */
+  }
+
   return(sizeof(ndpi_bitmap64) + binary_fuse16_size_in_bytes(&b->bitmap));
 }
