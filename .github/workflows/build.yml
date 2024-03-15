@@ -311,7 +311,7 @@ jobs:
       - name: Configure nDPI on Ubuntu
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
         run: |
-          AR=${{ matrix.ar }} RANLIB=${{ matrix.ranlib }} ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs ${{matrix.lto_gold_linker}}
+          AR=${{ matrix.ar }} RANLIB=${{ matrix.ranlib }} ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs ${{matrix.lto_gold_linker}} ${{matrix.global_context}}
       - name: Configure nDPI on MacOS
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
