@@ -220,7 +220,7 @@ fi
 GLOBAL_CONTEXT_ENABLED=0
 AS_IF([test "x$enable_global_context_support" != "xno"], [
   AC_CHECK_LIB([pthread], [pthread_mutex_init])
-  AC_DEFINE_UNQUOTED(USE_GLOBAL_CONTEXT, 1, [Use gloabl context feature. Depend on libpthread])
+  NDPI_CFLAGS="${NDPI_CFLAGS} -DUSE_GLOBAL_CONTEXT"
   GLOBAL_CONTEXT_ENABLED=1
 ])
 
