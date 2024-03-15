@@ -2176,10 +2176,10 @@ static void printFlowSerialized(u_int16_t thread_id, struct ndpi_flow_info* flow
     double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
 
-    if (!isValidFlowForLogging(flow))
-    {
-        return ;
-    }
+    //if (!isValidFlowForLogging(flow))
+    //{
+    //    return ;
+    //}
 
     if (needToRecordRisk)
     {

@@ -189,77 +189,77 @@ static void printParamsVector(const struct SkipParameters* paramsVector, int vec
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------*/
- bool isValidFlowForLogging(struct ndpi_flow_info* flow)
-{
-    if (!hasAlreadyReadLogFile)
-    {
-        char buffer[1024];
-        const char* configurationFileName = "Settings\\nDPIConfiguration.json";
-
-        // Get the folder path of the currently running program
-        char programFolderPath[MAX_PATH_LENGTH];
-        getProgramFolderPath(programFolderPath, sizeof(programFolderPath));
-
-        // Append the file name to the folder path
-        char configurationFilePath[MAX_PATH_LENGTH];
-        appendFileNameToPath(configurationFileName, programFolderPath, configurationFilePath, sizeof(configurationFilePath));
-        printf("\nConfiguration file location: %s\n", configurationFilePath);
-
-        FILE* fp = fopen(configurationFilePath, "r");
-        if (fp == NULL)
-        {
-            perror("Error opening file");
-            return false;
-        }
-
-        // Get the file size
-        fseek(fp, 0, SEEK_END);
-        rewind(fp);
-
-        // Read the file into a buffer
-        fread(buffer, 1024, 1, fp);
-        fclose(fp);
-
-        // Parse the JSON buffer
-        struct json_object* root;
-        root = json_tokener_parse(buffer);
-        if (root == NULL)
-        {
-            fprintf(stderr, "Error parsing JSON\n");
-            return false;
-        }
-
-        // Traverse the JSON object and populate the array
-        traverseJsonObject(root, &paramsVector, &vectorSize);
-        printParamsVector(paramsVector, vectorSize);
-
-        // Free the JSON object
-        json_object_put(root);
-        hasAlreadyReadLogFile = true;
-    }
-
-    char src_name[INET6_ADDRSTRLEN] = { '\0' };
-    if (flow->ip_version == 4)
-    {
-        inet_ntop(AF_INET, &flow->src_ip, src_name, sizeof(src_name));
-    }
-    else
-    {
-        inet_ntop(AF_INET6, &flow->src_ip6, src_name, sizeof(src_name));
-    }
-
-    char dst_name[INET6_ADDRSTRLEN] = { '\0' };
-    if (flow->ip_version == 4)
-    {
-        inet_ntop(AF_INET, &flow->dst_ip, dst_name, sizeof(dst_name));
-    }
-    else
-    {
-        inet_ntop(AF_INET6, &flow->dst_ip6, dst_name, sizeof(dst_name));
-    }
-
-    int destinationPort = flow->dst_port;
-    u_int32_t destinationPortToCompare = ntohs(destinationPort);
-
-    return !matchEntryInParamsVector(src_name, dst_name, destinationPortToCompare);
-}
+// bool isValidFlowForLogging(struct ndpi_flow_info* flow)
+//{
+//    if (!hasAlreadyReadLogFile)
+//    {
+//        char buffer[1024];
+//        const char* configurationFileName = "Settings\\nDPIConfiguration.json";
+//
+//        // Get the folder path of the currently running program
+//        char programFolderPath[MAX_PATH_LENGTH];
+//        getProgramFolderPath(programFolderPath, sizeof(programFolderPath));
+//
+//        // Append the file name to the folder path
+//        char configurationFilePath[MAX_PATH_LENGTH];
+//        appendFileNameToPath(configurationFileName, programFolderPath, configurationFilePath, sizeof(configurationFilePath));
+//        printf("\nConfiguration file location: %s\n", configurationFilePath);
+//
+//        FILE* fp = fopen(configurationFilePath, "r");
+//        if (fp == NULL)
+//        {
+//            perror("Error opening file");
+//            return false;
+//        }
+//
+//        // Get the file size
+//        fseek(fp, 0, SEEK_END);
+//        rewind(fp);
+//
+//        // Read the file into a buffer
+//        fread(buffer, 1024, 1, fp);
+//        fclose(fp);
+//
+//        // Parse the JSON buffer
+//        struct json_object* root;
+//        root = json_tokener_parse(buffer);
+//        if (root == NULL)
+//        {
+//            fprintf(stderr, "Error parsing JSON\n");
+//            return false;
+//        }
+//
+//        // Traverse the JSON object and populate the array
+//        traverseJsonObject(root, &paramsVector, &vectorSize);
+//        printParamsVector(paramsVector, vectorSize);
+//
+//        // Free the JSON object
+//        json_object_put(root);
+//        hasAlreadyReadLogFile = true;
+//    }
+//
+//    char src_name[INET6_ADDRSTRLEN] = { '\0' };
+//    if (flow->ip_version == 4)
+//    {
+//        inet_ntop(AF_INET, &flow->src_ip, src_name, sizeof(src_name));
+//    }
+//    else
+//    {
+//        inet_ntop(AF_INET6, &flow->src_ip6, src_name, sizeof(src_name));
+//    }
+//
+//    char dst_name[INET6_ADDRSTRLEN] = { '\0' };
+//    if (flow->ip_version == 4)
+//    {
+//        inet_ntop(AF_INET, &flow->dst_ip, dst_name, sizeof(dst_name));
+//    }
+//    else
+//    {
+//        inet_ntop(AF_INET6, &flow->dst_ip6, dst_name, sizeof(dst_name));
+//    }
+//
+//    int destinationPort = flow->dst_port;
+//    u_int32_t destinationPortToCompare = ntohs(destinationPort);
+//
+//    return !matchEntryInParamsVector(src_name, dst_name, destinationPortToCompare);
+//}
