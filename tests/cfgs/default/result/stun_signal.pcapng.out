@@ -1,12 +1,12 @@
-DPI Packets (UDP):	36	(1.71 pkts/flow)
+DPI Packets (UDP):	32	(1.52 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
-Confidence DPI (cache)      : 19 (flows)
-Confidence DPI              : 4 (flows)
+Confidence DPI (cache)      : 20 (flows)
+Confidence DPI              : 3 (flows)
 Num dissector calls: 104 (4.52 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
-LRU cache stun:       40/56/19 (insert/search/found)
+LRU cache stun:       42/47/20 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
@@ -23,13 +23,12 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   25/23 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-STUN	106	12322	1
 ICMP	53	5186	2
-SignalVoip	301	30988	20
+SignalVoip	407	43310	21
 
 Acceptable                     460 48496         23           
 
-	1	UDP 192.168.12.169:43068 <-> 18.195.131.143:61156 [proto: 78/STUN][IP: 265/AmazonAWS][ClearText][Confidence: DPI][DPI packets: 5][cat: Network/14][48 pkts/4692 bytes <-> 58 pkts/7630 bytes][Goodput ratio: 57/68][12.11 sec][bytes ratio: -0.238 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 224/234 1055/1059 250/294][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 98/132 146/306 23/72][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (BrDwrhkDr//9e)][Plen Bins: 26,31,15,15,5,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.12.169:43068 <-> 18.195.131.143:61156 [proto: 78.269/STUN.SignalVoip][IP: 265/AmazonAWS][ClearText][Confidence: DPI (cache)][DPI packets: 1][cat: VoIP/10][48 pkts/4692 bytes <-> 58 pkts/7630 bytes][Goodput ratio: 57/68][12.11 sec][bytes ratio: -0.238 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 224/234 1055/1059 250/294][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 98/132 146/306 23/72][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][PLAIN TEXT (BrDwrhkDr//9e)][Plen Bins: 26,31,15,15,5,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.12.169:47767 <-> 18.195.131.143:61498 [proto: 78.269/STUN.SignalVoip][IP: 265/AmazonAWS][ClearText][Confidence: DPI (cache)][DPI packets: 1][cat: VoIP/10][18 pkts/1900 bytes <-> 35 pkts/6496 bytes][Goodput ratio: 60/77][2.67 sec][bytes ratio: -0.547 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 173/74 665/630 186/150][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 106/186 146/306 26/92][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic][PLAIN TEXT (80JiLM)][Plen Bins: 13,16,18,18,9,0,0,0,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	ICMP 35.158.183.167:0 <-> 192.168.12.169:0 [proto: 81/ICMP][IP: 265/AmazonAWS][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][30 pkts/2780 bytes <-> 4 pkts/552 bytes][Goodput ratio: 55/69][51.83 sec][bytes ratio: 0.669 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 906/1 7931/1 2120/0][Pkt Len c2s/s2c min/avg/max/stddev: 90/138 93/138 98/138 4/0][PLAIN TEXT (BJKHNYBG4)][Plen Bins: 0,88,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	UDP 192.168.12.169:43068 <-> 35.158.183.167:3478 [proto: 78.269/STUN.SignalVoip][IP: 265/AmazonAWS][ClearText][Confidence: DPI (cache)][DPI packets: 1][cat: VoIP/10][13 pkts/1598 bytes <-> 13 pkts/1638 bytes][Goodput ratio: 66/67][31.02 sec][bytes ratio: -0.012 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 2090/2098 10035/10033 3616/3611][Pkt Len c2s/s2c min/avg/max/stddev: 62/102 123/126 174/190 47/25][PLAIN TEXT (xYXlLJQ)][Plen Bins: 19,15,26,30,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

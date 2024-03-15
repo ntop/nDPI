@@ -1058,9 +1058,9 @@ extern "C" {
   /* LRU cache */
   struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl, int shared);
   void ndpi_lru_free_cache(struct ndpi_lru_cache *c);
-  u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int32_t key,
+  u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int64_t key,
 			       u_int16_t *value, u_int8_t clean_key_when_found, u_int32_t now_sec);
-  void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int32_t key, u_int16_t value, u_int32_t now_sec);
+  void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int64_t key, u_int16_t value, u_int32_t now_sec);
   void ndpi_lru_get_stats(struct ndpi_lru_cache *c, struct ndpi_lru_cache_stats *stats);
 
   int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,

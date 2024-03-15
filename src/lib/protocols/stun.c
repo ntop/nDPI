@@ -33,8 +33,8 @@
 
 #define STUN_HDR_LEN   20 /* STUN message header length, Classic-STUN (RFC 3489) and STUN (RFC 8489) both */
 
-static u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
-static u_int32_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port);
+static u_int64_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
+static u_int64_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port);
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
 					 u_int app_proto);
@@ -46,7 +46,7 @@ static u_int16_t search_into_cache(struct ndpi_detection_module_struct *ndpi_str
 				   struct ndpi_flow_struct *flow)
 {
   u_int16_t proto;
-  u_int32_t key;
+  u_int64_t key;
   int rc;
 
   if(ndpi_struct->stun_cache) {
@@ -55,7 +55,7 @@ static u_int16_t search_into_cache(struct ndpi_detection_module_struct *ndpi_str
 			     0 /* Don't remove it as it can be used for other connections */,
 			     ndpi_get_current_time(flow));
 #ifdef DEBUG_LRU
-    printf("[LRU] Searching %u\n", key);
+    printf("[LRU] Searching 0x%llx\n", (long long unsigned int)key);
 #endif
 
     if(!rc) {
@@ -64,19 +64,19 @@ static u_int16_t search_into_cache(struct ndpi_detection_module_struct *ndpi_str
 			       0 /* Don't remove it as it can be used for other connections */,
 			       ndpi_get_current_time(flow));
 #ifdef DEBUG_LRU
-      printf("[LRU] Searching %u\n", key);
+      printf("[LRU] Searching 0x%llx\n", (long long unsigned int)key);
 #endif
     }
 
     if(rc) {
 #ifdef DEBUG_LRU
-      printf("[LRU] Cache FOUND %u / %u\n", key, proto);
+      printf("[LRU] Cache FOUND 0x%llx / %u\n", (long long unsigned int)key, proto);
 #endif
 
       return proto;
     } else {
 #ifdef DEBUG_LRU
-      printf("[LRU] NOT FOUND %u\n", key);
+      printf("[LRU] NOT FOUND 0x%llx\n", (long long unsigned int)key);
 #endif
     }
   } else {
@@ -91,7 +91,7 @@ static void add_to_caches(struct ndpi_detection_module_struct *ndpi_struct,
 			  struct ndpi_flow_struct *flow,
 			  u_int16_t app_proto)
 {
-  u_int32_t key, key_rev;
+  u_int64_t key, key_rev;
 
   if(ndpi_struct->stun_cache &&
      app_proto != NDPI_PROTOCOL_STUN &&
@@ -104,7 +104,8 @@ static void add_to_caches(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key_rev, app_proto, ndpi_get_current_time(flow));
 
 #ifdef DEBUG_LRU
-    printf("[LRU] ADDING %u 0x%x app %u [%u -> %u]\n", key, key_rev, app_proto,
+    printf("[LRU] ADDING 0x%llx 0x%llx app %u [%u -> %u]\n",
+	   (long long unsigned int)key, (long long unsigned int)key_rev, app_proto,
 	   ntohs(flow->c_port), ntohs(flow->s_port));
 #endif
   }
@@ -118,7 +119,7 @@ static void add_to_caches(struct ndpi_detection_module_struct *ndpi_struct,
                           0 /* dummy */, ndpi_get_current_time(flow));
 
 #ifdef DEBUG_ZOOM_LRU
-    printf("[LRU ZOOM] ADDING %u [src_port %u]\n", key, ntohs(flow->c_port));
+    printf("[LRU ZOOM] ADDING 0x%llu [src_port %u]\n", (long long unsigned int)key, ntohs(flow->c_port));
 #endif
   }
 }
@@ -241,13 +242,13 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
         if(1 /* TODO: enable/disable */ &&
            ndpi_struct->stun_cache) {
-          u_int32_t key = get_stun_lru_key_raw4(ip, port);
+          u_int64_t key = get_stun_lru_key_raw4(ip, port);
 
           ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
 				flow->detected_protocol_stack[0],
 				ndpi_get_current_time(flow));
 #ifdef DEBUG_LRU
-          printf("[LRU] Add peer %u %d\n", key, flow->detected_protocol_stack[0]);
+          printf("[LRU] Add peer 0x%llx %d\n", (long long unsigned int)key, flow->detected_protocol_stack[0]);
 #endif
         }
       }
@@ -514,24 +515,24 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ************************************************************ */
 
-static u_int32_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
+static u_int64_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
   if(rev) {
     if(flow->is_ipv6)
-      return ndpi_quick_hash(flow->s_address.v6, 16) + ntohs(flow->s_port);
+      return (ndpi_quick_hash64((const char *)flow->s_address.v6, 16) << 16) | ntohs(flow->s_port);
     else
-      return ntohl(flow->s_address.v4) + ntohs(flow->s_port);
+      return ((u_int64_t)flow->s_address.v4 << 32) | flow->s_port;
   } else {
     if(flow->is_ipv6)
-      return ndpi_quick_hash(flow->c_address.v6, 16) + ntohs(flow->c_port);
+      return (ndpi_quick_hash64((const char *)flow->c_address.v6, 16) << 16) | ntohs(flow->c_port);
     else
-      return ntohl(flow->c_address.v4) + ntohs(flow->c_port);
+      return ((u_int64_t)flow->c_address.v4 << 32) | flow->c_port;
   }
 }
 
 /* ************************************************************ */
 
-static u_int32_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port_host_order) {
-  return ntohl(ip) + port_host_order;
+static u_int64_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port_host_order) {
+  return ((u_int64_t)ip << 32) | htons(port_host_order);
 }
 
 /* ************************************************************ */
@@ -540,13 +541,13 @@ int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct
                                 struct ndpi_flow_struct *flow)
 {
   u_int16_t dummy;
-  u_int32_t key;
+  u_int64_t key;
 
   if(ndpi_struct->stun_zoom_cache &&
      flow->l4_proto == IPPROTO_UDP) {
     key = get_stun_lru_key(flow, 0); /* Src */
 #ifdef DEBUG_ZOOM_LRU
-    printf("[LRU ZOOM] Search %u [src_port %u]\n", key, ntohs(flow->c_port));
+    printf("[LRU ZOOM] Search 0x%llx [src_port %u]\n", (long long unsigned int)key, ntohs(flow->c_port));
 #endif
 
     if(ndpi_lru_find_cache(ndpi_struct->stun_zoom_cache, key,

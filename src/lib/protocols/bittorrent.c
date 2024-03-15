@@ -144,20 +144,20 @@ static void ndpi_search_bittorrent_hash(struct ndpi_detection_module_struct *ndp
 
 /* *********************************************** */
 
-u_int32_t make_bittorrent_host_key(struct ndpi_flow_struct *flow, int client, int offset) {
-  u_int32_t key;
+u_int64_t make_bittorrent_host_key(struct ndpi_flow_struct *flow, int client, int offset) {
+  u_int64_t key;
 
   /* network byte order */
   if(flow->is_ipv6) {
     if(client)
-      key = ip_port_hash_funct(ndpi_quick_hash(flow->c_address.v6, 16), htons(ntohs(flow->c_port) + offset));
+      key = (ndpi_quick_hash64((const char *)flow->c_address.v6, 16) << 16) | htons(ntohs(flow->c_port) + offset);
     else
-      key = ip_port_hash_funct(ndpi_quick_hash(flow->s_address.v6, 16), flow->s_port);
+      key = (ndpi_quick_hash64((const char *)flow->s_address.v6, 16) << 16) | flow->s_port;
   } else {
     if(client)
-      key = ip_port_hash_funct(flow->c_address.v4, htons(ntohs(flow->c_port) + offset));
+      key = ((u_int64_t)flow->c_address.v4 << 32) | htons(ntohs(flow->c_port) + offset);
     else
-      key = ip_port_hash_funct(flow->s_address.v4, flow->s_port);
+      key = ((u_int64_t)flow->s_address.v4 << 32) | flow->s_port;
   }
 
   return key;
@@ -165,14 +165,14 @@ u_int32_t make_bittorrent_host_key(struct ndpi_flow_struct *flow, int client, in
 
 /* *********************************************** */
 
-u_int32_t make_bittorrent_peers_key(struct ndpi_flow_struct *flow) {
-  u_int32_t key;
+u_int64_t make_bittorrent_peers_key(struct ndpi_flow_struct *flow) {
+  u_int64_t key;
 
   /* network byte order */
   if(flow->is_ipv6)
-    key = ndpi_quick_hash(flow->c_address.v6, 16) + ndpi_quick_hash(flow->s_address.v6, 16);
+    key = (ndpi_quick_hash64((const char *)flow->c_address.v6, 16) << 32) | (ndpi_quick_hash64((const char *)flow->s_address.v6, 16) & 0xFFFFFFFF);
   else
-    key = flow->c_address.v4 + flow->s_address.v4;
+    key = ((u_int64_t)flow->c_address.v4 << 32) | flow->s_address.v4;
 
   return key;
 }
@@ -196,7 +196,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
   }
   
   if(ndpi_struct->bittorrent_cache) {
-    u_int32_t key, key1, key2, i;
+    u_int64_t key, key1, key2, i;
 
     key = make_bittorrent_peers_key(flow);
     key1 = make_bittorrent_host_key(flow, 1, 0), key2 = make_bittorrent_host_key(flow, 0, 0);
@@ -218,7 +218,10 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     }
     
 #ifdef BITTORRENT_CACHE_DEBUG
-    printf("[BitTorrent] [%s] *** ADDED ports %u / %u [%u][%u]\n", flow->l4_proto == IPPROTO_TCP ? "TCP" : "UDP", ntohs(flow->c_port), ntohs(flow->s_port), key1, key2);
+    printf("[BitTorrent] [%s] *** ADDED ports %u / %u [0x%llx][0x%llx]\n",
+	   flow->l4_proto == IPPROTO_TCP ? "TCP" : "UDP",
+	   ntohs(flow->c_port), ntohs(flow->s_port),
+	   (long long unsigned int)key1, (long long unsigned int)key2);
 #endif
   }
 }

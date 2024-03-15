@@ -296,34 +296,34 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
 
 /* **************************************** */
 
-static u_int32_t make_tls_cert_key(struct ndpi_packet_struct *packet, int is_from_client)
+static u_int64_t make_tls_cert_key(struct ndpi_packet_struct *packet, int is_from_client)
 {
-  u_int32_t key;
+  u_int64_t key;
 
   /* Server ip/port */
   if(packet->iphv6 == NULL) {
     if(packet->tcp) {
       if(is_from_client)
-        key = packet->iph->daddr + packet->tcp->dest;
+        key = ((u_int64_t)packet->iph->daddr << 32) | packet->tcp->dest;
       else
-        key = packet->iph->saddr + packet->tcp->source;
+        key = ((u_int64_t)packet->iph->saddr << 32) | packet->tcp->source;
     } else {
       if(is_from_client)
-        key = packet->iph->daddr + packet->udp->dest;
+        key = ((u_int64_t)packet->iph->daddr << 32) | packet->udp->dest;
       else
-        key = packet->iph->saddr + packet->udp->source;
+        key = ((u_int64_t)packet->iph->saddr << 32) | packet->udp->source;
     }
   } else {
     if(packet->tcp) {
       if(is_from_client)
-        key = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_dst, 16) + packet->tcp->dest;
+        key = (ndpi_quick_hash64((const char *)&packet->iphv6->ip6_dst, 16) << 16) | packet->tcp->dest;
       else
-        key = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_src, 16) + packet->tcp->source;
+        key = (ndpi_quick_hash64((const char *)&packet->iphv6->ip6_src, 16) << 16) | packet->tcp->source;
     } else {
       if(is_from_client)
-        key = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_dst, 16) + packet->udp->dest;
+        key = (ndpi_quick_hash64((const char *)&packet->iphv6->ip6_dst, 16) << 16) | packet->udp->dest;
       else
-        key = ndpi_quick_hash((unsigned char *)&packet->iphv6->ip6_src, 16) + packet->udp->source;
+        key = (ndpi_quick_hash64((const char *)&packet->iphv6->ip6_src, 16) << 16) | packet->udp->source;
     }
   }
 
@@ -342,7 +342,7 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
 
     if(ndpi_struct->tls_cert_cache) {
       u_int16_t cached_proto;
-      u_int32_t key;
+      u_int64_t key;
 
       key = make_tls_cert_key(packet, is_from_client);
 
@@ -740,7 +740,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	ndpi_unset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST);
 
 	if(ndpi_struct->tls_cert_cache) {
-	  u_int32_t key = make_tls_cert_key(packet, 0 /* from the server */);
+	  u_int64_t key = make_tls_cert_key(packet, 0 /* from the server */);
 
 	  ndpi_lru_add_to_cache(ndpi_struct->tls_cert_cache, key, proto_id, ndpi_get_current_time(flow));
 	}
