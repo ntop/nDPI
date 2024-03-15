@@ -69,8 +69,8 @@ static void traverseJsonObject(json_object* jsonObj, struct SkipParameters** par
         else if (type == json_type_array)
         {
             int arrayLength = json_object_array_length(val);
-
-            for (int i = 0; i < arrayLength; ++i)
+            int i = 0;
+            for (i = 0; i < arrayLength; ++i)
             {
                 *vectorSize += 1;
                 *paramsVector = realloc(*paramsVector, (*vectorSize) * sizeof(struct SkipParameters));
@@ -121,7 +121,8 @@ static void traverseJsonObject(json_object* jsonObj, struct SkipParameters** par
 extern void freeJsonLogFileData()
 {
     // Free allocated memory
-    for (int i = 0; i < vectorSize; ++i)
+    int i = 0;
+    for ( i = 0; i < vectorSize; ++i)
     {
         free(paramsVector[i].sourceIP);
         free(paramsVector[i].destinationIP);
@@ -133,7 +134,8 @@ extern void freeJsonLogFileData()
 /*--------------------------------------------------------------------------------------------------------------------------*/
 static bool matchEntryInParamsVector(const char* srcIP, const char* destIP, int destPort) 
 {
-    for (int i = 0; i < vectorSize; ++i) 
+    int i = 0;
+    for (i = 0; i < vectorSize; ++i) 
     {
         // Check if sourceIP matches
         if (strcmp(paramsVector[i].sourceIP, "NOT_SET") != 0 && strcmp(paramsVector[i].sourceIP, srcIP) != 0) 
@@ -166,7 +168,8 @@ static void printParamsVector(const struct SkipParameters* paramsVector, int vec
 {
     printf("Params Vector:\n");
 
-    for (int i = 0; i < vectorSize; ++i) {
+    int i = 0;
+    for ( i = 0; i < vectorSize; ++i) {
         printf("Entry %d:\n", i + 1);
         printf("  Source IP: %s\n", paramsVector[i].sourceIP);
         printf("  Destination IP: %s\n", paramsVector[i].destinationIP);
