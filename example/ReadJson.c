@@ -118,7 +118,7 @@ static void traverseJsonObject(json_object* jsonObj, struct SkipParameters** par
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------*/
-extern void freeJsonLogFileData()
+void freeJsonLogFileData()
 {
     // Free allocated memory
     int i = 0;
@@ -188,7 +188,7 @@ static void printParamsVector(const struct SkipParameters* paramsVector, int vec
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------*/
-extern bool isValidFlowForLogging(struct ndpi_flow_info* flow)
+ bool isValidFlowForLogging(struct ndpi_flow_info* flow)
 {
     static hasAlreadyReadLogFile = false;
     if (!hasAlreadyReadLogFile)
@@ -209,7 +209,7 @@ extern bool isValidFlowForLogging(struct ndpi_flow_info* flow)
         if (fp == NULL)
         {
             perror("Error opening file");
-            return 1;
+            return false;
         }
 
         // Get the file size
@@ -227,7 +227,7 @@ extern bool isValidFlowForLogging(struct ndpi_flow_info* flow)
         if (root == NULL)
         {
             fprintf(stderr, "Error parsing JSON\n");
-            return 1;
+            return false;
         }
 
         // Traverse the JSON object and populate the array
