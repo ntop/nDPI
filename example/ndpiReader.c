@@ -6242,28 +6242,29 @@ int main(int argc, char **argv)
 
       strcpy(alertFolder, moduleFolderPath);
       strcat(alertFolder, "\\Alerts");
-
-      if (!CreateDirectory(alertFolder, NULL))
-      {
-          fprintf(serializationLogFile, "ERROR: Unable to Create Alerts Folder\n");
-           #ifdef WIN32
-              if (_isatty(_fileno(stdin)))
-              {
-                  printf("ERROR: Unable to Create Alerts Folder\n");
-              }
-           #endif
+      #ifdef WIN32
+          if (!CreateDirectory(alertFolder, NULL))
+          {
+              fprintf(serializationLogFile, "ERROR: Unable to Create Alerts Folder\n");
+               #ifdef WIN32
+                  if (_isatty(_fileno(stdin)))
+                  {
+                      printf("ERROR: Unable to Create Alerts Folder\n");
+                  }
+               #endif
         
-      }
-      else
-      {
-          fprintf(serializationLogFile, "Alerts Folder created at %s\n", alertFolder);
-          #ifdef WIN32
-              if (_isatty(_fileno(stdin)))
-              {
-                  printf("Alerts Folder created at %s\n", alertFolder);
-              }
-          #endif         
-      }
+          }
+          else
+          {
+              fprintf(serializationLogFile, "Alerts Folder created at %s\n", alertFolder);
+              #ifdef WIN32
+                  if (_isatty(_fileno(stdin)))
+                  {
+                      printf("Alerts Folder created at %s\n", alertFolder);
+                  }
+              #endif         
+          }
+      #endif
 
       int eventFolderSize = strlen(moduleFolderPath) + strlen("Events");
       char* eventFolder = (char*)malloc(alertFolderSize * sizeof(char));
@@ -6284,26 +6285,28 @@ int main(int argc, char **argv)
       strcpy(eventFolder, moduleFolderPath);
       strcat(eventFolder, "\\Events");
 
-      if (!CreateDirectory(eventFolder, NULL))
-      {
-          fprintf(serializationLogFile, "ERROR: Unable to Create Events Folder\n");
-          #ifdef WIN32
-              if (_isatty(_fileno(stdin)))
-              {
-                  printf("ERROR: Unable to Create Events Folder\n");
-              }
-          #endif         
-      }
-      else
-      {
-          fprintf(serializationLogFile, "Events Folder created at %s\n", eventFolder);
-          #ifdef WIN32
-              if (_isatty(_fileno(stdin)))
-              {
-                  printf("Events Folder created at %s\n", eventFolder);
-              }
-          #endif        
-      }
+      #ifdef WIN32
+          if (!CreateDirectory(eventFolder, NULL))
+          {
+              fprintf(serializationLogFile, "ERROR: Unable to Create Events Folder\n");
+              #ifdef WIN32
+                  if (_isatty(_fileno(stdin)))
+                  {
+                      printf("ERROR: Unable to Create Events Folder\n");
+                  }
+              #endif         
+          }
+          else
+          {
+              fprintf(serializationLogFile, "Events Folder created at %s\n", eventFolder);
+              #ifdef WIN32
+                  if (_isatty(_fileno(stdin)))
+                  {
+                      printf("Events Folder created at %s\n", eventFolder);
+                  }
+              #endif        
+          }
+      #endif
 
       do
       {
