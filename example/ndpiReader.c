@@ -969,7 +969,7 @@ static int parse_two_unsigned_integer(char *param, u_int32_t *num1, u_int32_t *n
 //
 void fetchFilesToProcess() 
 {
-#ifndef WIN32
+#ifdef WIN32
     WIN32_FIND_DATA find_data;
     HANDLE hFind = FindFirstFile(pCapFilesSearchString, &find_data);
 
@@ -1082,7 +1082,6 @@ void fetchFilesToProcess()
 //
 static void fetchFilesToProcessAndSetDefaultOptions()
 {
-
     do
     {       
         fetchFilesToProcess();
@@ -1125,7 +1124,6 @@ static void fetchFilesToProcessAndSetDefaultOptions()
             printf("%3d.  %-*s| %-*s\n", i, maxFileLength + 10, pcap_files[i], maxFileLength, generated_tmp_json_files_events[i]);
         }
     }
-
 
     verbose = 2;
     quiet_mode = 1;
