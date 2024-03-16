@@ -1103,7 +1103,8 @@ static void fetchFilesToProcessAndSetDefaultOptions()
     }
 
     int maxFileLength = 0;
-    for (int i = 0; i < number_of_valid_files_found; i++)
+    int i = 0;
+    for (i = 0; i < number_of_valid_files_found; i++)
     {
         int length = strlen(pcap_files[i]);
         if (length > maxFileLength)
@@ -1111,7 +1112,9 @@ static void fetchFilesToProcessAndSetDefaultOptions()
             maxFileLength = length;
         }
     }
-    for (int i = 0; i < number_of_valid_files_found; i++)
+    
+    i = 0;
+    for (i = 0; i < number_of_valid_files_found; i++)
     {
         fprintf(serializationLogFile, "%3d.  %-*s| %-*s\n", i, maxFileLength + 10, pcap_files[i], maxFileLength, generated_tmp_json_files_events[i]);
         if (_isatty(_fileno(stdin)))
@@ -6133,7 +6136,8 @@ int main(int argc, char **argv)
       }
 
       fprintf(serializationLogFile, "Number of arguments: %d\n", argc - 1); // argc includes the program name
-      for (int i = 1; i < argc; i++)
+      i = 1;
+      for (i = 1; i < argc; i++)
       {
           fprintf(serializationLogFile, "Argument % d: % s\n", i, argv[i]);
           if (_isatty(_fileno(stdin)))
@@ -6267,9 +6271,11 @@ int main(int argc, char **argv)
 
           serialization_format = ndpi_serialization_format_json;
 
-          for (int index = 0; index < number_of_valid_files_found; index++)
+          int index = 0;
+          for (index = 0; index < number_of_valid_files_found; index++)
           {
-              for (int count = 0; count < 2; count++)
+              int count = 0;
+              for (count = 0; count < 2; count++)
               {
                   if (count == 0)
                   {
