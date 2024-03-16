@@ -1089,20 +1089,24 @@ static void fetchFilesToProcessAndSetDefaultOptions()
         if (number_of_valid_files_found == 0)
         {
             fprintf(serializationLogFile, "No file to process. Sleeping for 15 seconds\n");
+#ifdef WIN32
             if (_isatty(_fileno(stdin)))
             {
                 printf("No file to process. Sleeping for 15 seconds\n");
             }
+#endif
             sleep(15);
         }
     } while (number_of_valid_files_found == 0);
 
     // Print the full paths of the .pcap files
     fprintf(serializationLogFile, "\nTotal number of pcap/pcapng files found = %d\n\n", number_of_valid_files_found);
-    if (_isatty(_fileno(stdin)))
-    {
-        printf("\nTotal number of pcap/pcapng files found = %d\n\n", number_of_valid_files_found);
-    }
+    #ifdef WIN32
+        if (_isatty(_fileno(stdin)))
+        {
+            printf("\nTotal number of pcap/pcapng files found = %d\n\n", number_of_valid_files_found);
+        }
+    #endif
 
     int maxFileLength = 0;
     int i = 0;
@@ -1119,10 +1123,13 @@ static void fetchFilesToProcessAndSetDefaultOptions()
     for (i = 0; i < number_of_valid_files_found; i++)
     {
         fprintf(serializationLogFile, "%3d.  %-*s| %-*s\n", i, maxFileLength + 10, pcap_files[i], maxFileLength, generated_tmp_json_files_events[i]);
-        if (_isatty(_fileno(stdin)))
-        {
-            printf("%3d.  %-*s| %-*s\n", i, maxFileLength + 10, pcap_files[i], maxFileLength, generated_tmp_json_files_events[i]);
-        }
+        #ifdef WIN32
+                if (_isatty(_fileno(stdin)))
+                {
+                    printf("%3d.  %-*s| %-*s\n", i, maxFileLength + 10, pcap_files[i], maxFileLength, generated_tmp_json_files_events[i]);
+                }
+        #endif
+
     }
 
     verbose = 2;
@@ -6072,20 +6079,26 @@ int main(int argc, char **argv)
       if (ndpi_get_api_version() != NDPI_API_VERSION)
       {
           fprintf(serializationLogFile, "ERROR: nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("This program is run from a command prompt or terminal.\n");
-          }
+          #ifdef WIN32
+                  if (_isatty(_fileno(stdin)))
+                  {
+                      printf("This program is run from a command prompt or terminal.\n");
+                  }
+          #endif
+
           fclose(serializationLogFile);
           return(-1);
       }
 
       // (MM.DD.YYYY.V)
       fprintf(serializationLogFile, "nDPI Version 03.11.2024.1 - Configuration files mooved to Settings\nDPIConfiguration.json\n");
-      if (_isatty(_fileno(stdin)))
-      {
-          printf("nDPI Version 03.11.2024.1 - Configuration files mooved to Settings\nDPIConfiguration.json\n");
-      }
+       #ifdef WIN32
+          if (_isatty(_fileno(stdin)))
+          {
+              printf("nDPI Version 03.11.2024.1 - Configuration files mooved to Settings\nDPIConfiguration.json\n");
+          }
+      #endif
+
 
       skip_unit_tests = true;
 
@@ -6132,31 +6145,40 @@ int main(int argc, char **argv)
     #endif
       }
 
+    #ifdef WIN32
       if (_isatty(_fileno(stdin)))
       {
           printf("Number of arguments: %d\n", argc - 1); // argc includes the program name
       }
+    #endif
 
-      fprintf(serializationLogFile, "Number of arguments: %d\n", argc - 1); // argc includes the program name
-      i = 1;
-      for (i = 1; i < argc; i++)
-      {
-          fprintf(serializationLogFile, "Argument % d: % s\n", i, argv[i]);
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("Argument % d: % s\n", i, argv[i]);
-          }
-      }
+
+	  fprintf(serializationLogFile, "Number of arguments: %d\n", argc - 1); // argc includes the program name
+	  i = 1;
+	  for (i = 1; i < argc; i++)
+	  {
+		  fprintf(serializationLogFile, "Argument % d: % s\n", i, argv[i]);
+          #ifdef WIN32
+		  if (_isatty(_fileno(stdin)))
+		  {
+			  printf("Argument % d: % s\n", i, argv[i]);
+		  }
+         #endif
+
+	  }
 
       parseOptions(argc, argv);
 
       if (pCapFilesFolderLocationPath == NULL)
       {
           fprintf(serializationLogFile, "ERROR: PCAP files folder location not specified. See help!\n");
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("ERROR: PCAP files folder location not specified. See help!\n");
-          }
+          #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("ERROR: PCAP files folder location not specified. See help!\n");
+              }
+          #endif
+          
           fclose(serializationLogFile);
           help(0);
           exit(0);
@@ -6166,11 +6188,14 @@ int main(int argc, char **argv)
       fprintf(serializationLogFile, "\nSearching for pCap files at location      : %s\n", pCapFilesFolderLocationPath);
       fprintf(serializationLogFile, "JSON file will be generated at location   : %s\n", moduleFolderPath);
 
-      if (_isatty(_fileno(stdin)))
-      {
-          printf("\nSearching for pCap files at location      : %s\n", pCapFilesFolderLocationPath);
-          printf("JSON file will be generated at location   : %s\n", moduleFolderPath);
-      }
+      #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("\nSearching for pCap files at location      : %s\n", pCapFilesFolderLocationPath);
+                  printf("JSON file will be generated at location   : %s\n", moduleFolderPath);
+              }
+      #endif
+     
 
       int size = strlen(pCapFilesFolderLocationPath) + strlen("\\*.*");
 
@@ -6178,10 +6203,13 @@ int main(int argc, char **argv)
       if (pCapFilesSearchString == 0)
       {
           fprintf(serializationLogFile, "ERROR: Memory allocation failed for <pCapFilesSearchString>\n");
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("ERROR: Memory allocation failed for <pCapFilesSearchString>\n");
-          }
+          #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("ERROR: Memory allocation failed for <pCapFilesSearchString>\n");
+              }
+          #endif
+         
           fclose(serializationLogFile);
           return(-1);
       }
@@ -6189,19 +6217,24 @@ int main(int argc, char **argv)
       strcpy(pCapFilesSearchString, pCapFilesFolderLocationPath);
       strcat(pCapFilesSearchString, "\\*.*");
       fprintf(serializationLogFile, "pCap Folder Search Path = %s\n", pCapFilesSearchString);
-      if (_isatty(_fileno(stdin)))
-      {
-          printf("pCap Folder Search Path = %s\n", pCapFilesSearchString);
-    }
+       #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("pCap Folder Search Path = %s\n", pCapFilesSearchString);
+              }
+       #endif
+      
 
       int alertFolderSize = strlen(moduleFolderPath) + strlen("Alerts");
       char* alertFolder = (char*)malloc(alertFolderSize * sizeof(char));
       if (alertFolder == 0)
       {
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
-          }
+          #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
+              }
+          #endif
 
           fprintf(serializationLogFile, "ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
           return (-1);
@@ -6213,28 +6246,36 @@ int main(int argc, char **argv)
       if (!CreateDirectory(alertFolder, NULL))
       {
           fprintf(serializationLogFile, "ERROR: Unable to Create Alerts Folder\n");
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("ERROR: Unable to Create Alerts Folder\n");
-          }
+           #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("ERROR: Unable to Create Alerts Folder\n");
+              }
+           #endif
+        
       }
       else
       {
           fprintf(serializationLogFile, "Alerts Folder created at %s\n", alertFolder);
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("Alerts Folder created at %s\n", alertFolder);
-          }
+          #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("Alerts Folder created at %s\n", alertFolder);
+              }
+          #endif         
       }
 
       int eventFolderSize = strlen(moduleFolderPath) + strlen("Events");
       char* eventFolder = (char*)malloc(alertFolderSize * sizeof(char));
       if (eventFolder == 0)
       {
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
-          }
+          #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
+              }
+          #endif
+          
 
           fprintf(serializationLogFile, "ERROR: Call to malloc failed due to error: %s\n", strerror(errno));
           return (-1);
@@ -6246,18 +6287,22 @@ int main(int argc, char **argv)
       if (!CreateDirectory(eventFolder, NULL))
       {
           fprintf(serializationLogFile, "ERROR: Unable to Create Events Folder\n");
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("ERROR: Unable to Create Events Folder\n");
-          }
+          #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("ERROR: Unable to Create Events Folder\n");
+              }
+          #endif         
       }
       else
       {
           fprintf(serializationLogFile, "Events Folder created at %s\n", eventFolder);
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("Events Folder created at %s\n", eventFolder);
-          }
+          #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("Events Folder created at %s\n", eventFolder);
+              }
+          #endif        
       }
 
       do
@@ -6266,11 +6311,13 @@ int main(int argc, char **argv)
           fetchFilesToProcessAndSetDefaultOptions();
 
           fprintf(serializationLogFile, "STARTING FILE PROCESSING\n");
-          if (_isatty(_fileno(stdin)))
-          {
-              printf("STARTING FILE PROCESSING\n");
-          }
-
+          #ifdef WIN32
+              if (_isatty(_fileno(stdin)))
+              {
+                  printf("STARTING FILE PROCESSING\n");
+              }
+          #endif
+        
           serialization_format = ndpi_serialization_format_json;
 
           int index = 0;
@@ -6298,40 +6345,52 @@ int main(int argc, char **argv)
                   if (count == 0)
                   {
                       fprintf(serializationLogFile, "%3d. Generating - %s, (START)", index, generated_tmp_json_files_events[index]);
-                      if (_isatty(_fileno(stdin)))
-                      {
-                          printf("%3d. Generating - %s, (START)", index, generated_tmp_json_files_events[index]);
-                      }
+                      #ifdef WIN32
+                          if (_isatty(_fileno(stdin)))
+                          {
+                              printf("%3d. Generating - %s, (START)", index, generated_tmp_json_files_events[index]);
+                          }
+                      #endif
+                    
 
                       serialization_fp = fopen(generated_tmp_json_files_events[index], "w");
 
                       if (serialization_fp == NULL)
                       {
                           fprintf(serializationLogFile, "Unable to write on serialization file %s: %s\n", generated_tmp_json_files_events[index], strerror(errno));
-                          if (_isatty(_fileno(stdin)))
-                          {
-                              printf("Unable to write on serialization file %s: %s\n", generated_tmp_json_files_events[index], strerror(errno));
-                          }
+                          #ifdef WIN32
+                              if (_isatty(_fileno(stdin)))
+                              {
+                                  printf("Unable to write on serialization file %s: %s\n", generated_tmp_json_files_events[index], strerror(errno));
+                              }
+                          #endif
+                         
                           continue;
                       }
                   }
                   else
                   {
                       fprintf(serializationLogFile, "%3d. Generating - %s, (START)", index, generated_tmp_json_files_alerts[index]);
-                      if (_isatty(_fileno(stdin)))
-                      {
-                          printf("%3d. Generating - %s, (START)", index, generated_tmp_json_files_alerts[index]);
-                      }
+                      #ifdef WIN32
+                          if (_isatty(_fileno(stdin)))
+                          {
+                              printf("%3d. Generating - %s, (START)", index, generated_tmp_json_files_alerts[index]);
+                          }
+                      #endif
+                    
 
                       serialization_fp = fopen(generated_tmp_json_files_alerts[index], "w");
 
                       if (serialization_fp == NULL)
                       {
                           fprintf(serializationLogFile, "Unable to write on serialization file %s: %s\n", generated_tmp_json_files_alerts[index], strerror(errno));
-                          if (_isatty(_fileno(stdin)))
-                          {
-                              printf("Unable to write on serialization file %s: %s\n", generated_tmp_json_files_alerts[index], strerror(errno));
-                          }
+                          #ifdef WIN32
+                              if (_isatty(_fileno(stdin)))
+                              {
+                                  printf("Unable to write on serialization file %s: %s\n", generated_tmp_json_files_alerts[index], strerror(errno));
+                              }
+                          #endif
+                        
                           continue;
                       }
                   }
@@ -6403,10 +6462,12 @@ int main(int argc, char **argv)
                           if (rename(generated_tmp_json_files_events[index], generated_json_files_events[index]) != 0)
                           {
                               fprintf(serializationLogFile, "Error renaming - %s file",  generated_tmp_json_files_events[index]);
-                              if (_isatty(_fileno(stdin)))
-                              {
-                                  printf("Error renaming - %s file",  generated_tmp_json_files_events[index]);
-                              }
+                              #ifdef WIN32
+                                  if (_isatty(_fileno(stdin)))
+                                  {
+                                      printf("Error renaming - %s file", generated_tmp_json_files_events[index]);
+                                  }
+                              #endif                             
                           }
                       }
                       else
@@ -6414,14 +6475,15 @@ int main(int argc, char **argv)
                           if (rename(generated_tmp_json_files_alerts[index], generated_json_files_alerts[index]) != 0)
                           {
                               fprintf(serializationLogFile, "Error renaming - %s file",  generated_tmp_json_files_alerts[index]);
-                              if (_isatty(_fileno(stdin)))
-                              {
-                                  printf("Error renaming - %s file",  generated_tmp_json_files_alerts[index]);
-                              }
+                              #ifdef WIN32
+                                  if (_isatty(_fileno(stdin)))
+                                  {
+                                      printf("Error renaming - %s file", generated_tmp_json_files_alerts[index]);
+                                  }
+                              #endif                             
                           }
                       }
                   }
-
 
                   if (count == 0)
                   {
@@ -6429,18 +6491,23 @@ int main(int argc, char **argv)
                       ndpi_record_risk(needToRecordRisk);
 
                       fprintf(serializationLogFile, "\n\t\t%s, (END)\n", generated_tmp_json_files_events[index]);
-                      if (_isatty(_fileno(stdin)))
-                      {
-                          printf("\n\t\t%s, (END)\n", generated_tmp_json_files_events[index]);
-                      }
+                      #ifdef WIN32
+                          if (_isatty(_fileno(stdin)))
+                          {
+                              printf("\n\t\t%s, (END)\n", generated_tmp_json_files_events[index]);
+                          }
+                      #endif
+                     
                   }
                   else
                   {
                       fprintf(serializationLogFile, "\n\t\t%s, (END)\n", generated_tmp_json_files_alerts[index]);
-                      if (_isatty(_fileno(stdin)))
-                      {
-                          printf("\n\t\t%s, (END)\n", generated_tmp_json_files_alerts[index]);
-                      }
+                      #ifdef WIN32
+                          if (_isatty(_fileno(stdin)))
+                          {
+                              printf("\n\t\t%s, (END)\n", generated_tmp_json_files_alerts[index]);
+                          }
+                      #endif                      
                   }
               }
 
