@@ -540,7 +540,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
             NDPI_LOG_DBG(ndpi_struct, "Switch to TLS failed. Rollback to old classification\n");
 
             ndpi_set_detected_protocol(ndpi_struct, flow,
-                                       old_proto_stack[1], old_proto_stack[0],
+                                       old_proto_stack[0], old_proto_stack[1],
                                        NDPI_CONFIDENCE_DPI);
 
             flow->stun.maybe_dtls = 0;
