@@ -52,6 +52,7 @@
 
 static u_int64_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 static u_int64_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port);
+static u_int64_t get_stun_lru_key_raw6(u_int8_t *ip, u_int16_t port);
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
 					 u_int app_proto);
@@ -156,6 +157,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
   const u_int8_t *orig_payload;
   u_int16_t orig_payload_length;
   u_int32_t magic_cookie;
+  u_int32_t transaction_id[3];
 
   if(payload_length < STUN_HDR_LEN) {
     return 0;
@@ -180,6 +182,9 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
   msg_type = ntohs(*((u_int16_t *)&payload[0]));
   msg_len = ntohs(*((u_int16_t *)&payload[2]));
   magic_cookie = ntohl(*((u_int32_t *)&payload[4]));
+  transaction_id[0] = ntohl(*((u_int32_t *)&payload[8]));
+  transaction_id[1] = ntohl(*((u_int32_t *)&payload[12]));
+  transaction_id[2] = ntohl(*((u_int32_t *)&payload[16]));
 
   /* No magic_cookie on classic-stun */
   /* Let's hope that we don't have anymore classic-stun over TCP */
@@ -271,32 +276,58 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
     switch(attribute) {
     case 0x0012: /* XOR-PEER-ADDRESS */
-      if(off + 12 < payload_length &&
-         len == 8 && payload[off + 5] == 0x01) { /* TODO: ipv6 */
+      if(off + 12 < payload_length ) {
         u_int16_t port;
-        u_int32_t ip;
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
 	char buf[128];
 #endif
 
-        port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
-        ip = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
+	if(len == 8 && payload[off + 5] == 0x01) { /* ipv4 */
+          u_int32_t ip;
 
-        NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
-                     inet_ntop(AF_INET, &ip, buf, sizeof(buf)), port,
-                     flow->detected_protocol_stack[0]);
+          port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
+          ip = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
 
-        if(1 /* TODO: enable/disable */ &&
-           ndpi_struct->stun_cache) {
-          u_int64_t key = get_stun_lru_key_raw4(ip, port);
+          NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
+                       inet_ntop(AF_INET, &ip, buf, sizeof(buf)), port,
+                       flow->detected_protocol_stack[0]);
 
-          ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
-				flow->detected_protocol_stack[0],
-				ndpi_get_current_time(flow));
+          if(1 /* TODO: enable/disable */ &&
+             ndpi_struct->stun_cache) {
+            u_int64_t key = get_stun_lru_key_raw4(ip, port);
+
+            ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
+				  flow->detected_protocol_stack[0],
+				  ndpi_get_current_time(flow));
 #ifdef DEBUG_LRU
-          printf("[LRU] Add peer 0x%llx %d\n", (long long unsigned int)key, flow->detected_protocol_stack[0]);
+            printf("[LRU] Add peer 0x%llx %d\n", (long long unsigned int)key, flow->detected_protocol_stack[0]);
 #endif
-        }
+	  }
+        } else if(len == 20 && payload[off + 5] == 0x02 && off + 24 < payload_length) { /* ipv6 */
+          u_int32_t ip[4];
+
+          port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
+          ip[0] = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
+          ip[1] = *((u_int32_t *)&payload[off + 12]) ^ htonl(transaction_id[0]);
+          ip[2] = *((u_int32_t *)&payload[off + 16]) ^ htonl(transaction_id[1]);
+          ip[3] = *((u_int32_t *)&payload[off + 20]) ^ htonl(transaction_id[2]);
+
+          NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
+                       inet_ntop(AF_INET6, &ip, buf, sizeof(buf)), port,
+                       flow->detected_protocol_stack[0]);
+
+          if(1 /* TODO: enable/disable */ &&
+             ndpi_struct->stun_cache) {
+            u_int64_t key = get_stun_lru_key_raw6((u_int8_t *)ip, port);
+
+            ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
+				  flow->detected_protocol_stack[0],
+				  ndpi_get_current_time(flow));
+#ifdef DEBUG_LRU
+            printf("[LRU] Add peer 0x%llx %d\n", (long long unsigned int)key, flow->detected_protocol_stack[0]);
+#endif
+	  }
+	}
       }
       break;
 
@@ -360,7 +391,6 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x0013:
       NDPI_LOG_DBG(ndpi_struct, "DATA attribute (%d/%d)\n",
                   real_len, payload_length - off - 4);
-
       if(real_len <= payload_length - off - 4) {
         orig_payload = packet->payload;
         orig_payload_length = packet->payload_packet_len;
@@ -588,6 +618,12 @@ static u_int64_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev) {
 
 static u_int64_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port_host_order) {
   return ((u_int64_t)ip << 32) | htons(port_host_order);
+}
+
+/* ************************************************************ */
+
+static u_int64_t get_stun_lru_key_raw6(u_int8_t *ip, u_int16_t port_host_order) {
+  return ((u_int64_t)ndpi_quick_hash(ip, 16) << 32) | htons(port_host_order);
 }
 
 /* ************************************************************ */
