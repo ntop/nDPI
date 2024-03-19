@@ -555,7 +555,33 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   } else if(first_byte <= 79) {
     if(flow->stun.is_turn) {
       NDPI_LOG_DBG(ndpi_struct, "TURN range\n");
-      /* TODO */
+
+      if(packet->payload_packet_len >= 4) {
+        u_int16_t ch_len;
+
+        ch_len = ntohs(*(u_int16_t *)&packet->payload[2]);
+
+        if(ch_len <= packet->payload_packet_len - 4) {
+          const u_int8_t *orig_payload;
+          u_int16_t orig_payload_length;
+
+          orig_payload = packet->payload;
+          orig_payload_length = packet->payload_packet_len;
+          packet->payload = packet->payload + 4;
+          packet->payload_packet_len = ch_len;
+
+          stun_search_again(ndpi_struct, flow);
+          NDPI_LOG_DBG(ndpi_struct, "End recursion on turn channel\n");
+
+          packet->payload = orig_payload;
+          packet->payload_packet_len = orig_payload_length;
+
+        } else {
+          if(flow->l4_proto == IPPROTO_UDP) /* The error is quite common on TCP since we don't reassemble msgs */
+            NDPI_LOG_DBG(ndpi_struct, "Invalid channel length %d %d\n",
+                         ch_len, packet->payload_packet_len - 4);
+        }
+      }
     } else {
       NDPI_LOG_DBG(ndpi_struct, "QUIC range (not turn). Unexpected\n");
     }
