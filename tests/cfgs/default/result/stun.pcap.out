@@ -1,12 +1,12 @@
 DPI Packets (TCP):	9	(4.50 pkts/flow)
-DPI Packets (UDP):	16	(3.20 pkts/flow)
+DPI Packets (UDP):	18	(3.00 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
-Confidence DPI              : 8 (flows)
-Num dissector calls: 28 (3.50 diss/flow)
+Confidence DPI              : 9 (flows)
+Num dissector calls: 29 (3.22 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
-LRU cache stun:       8/32/0 (insert/search/found)
+LRU cache stun:       8/34/0 (insert/search/found)
 LRU cache tls_cert:   0/1/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
@@ -17,21 +17,21 @@ Automa tls cert:      0/0 (search/found)
 Automa risk mask:     1/0 (search/found)
 Automa common alpns:  2/2 (search/found)
 Patricia risk mask:   10/0 (search/found)
-Patricia risk mask IPv6: 2/0 (search/found)
+Patricia risk mask IPv6: 4/0 (search/found)
 Patricia risk:        1/0 (search/found)
-Patricia risk IPv6:   1/0 (search/found)
+Patricia risk IPv6:   2/0 (search/found)
 Patricia protocols:   9/5 (search/found)
-Patricia protocols IPv6: 2/0 (search/found)
+Patricia protocols IPv6: 4/1 (search/found)
 
 DTLS	4	766	1
 Skype_TeamsCall	15	2124	1
-STUN	62	7620	2
+STUN	64	7848	3
 ICMP	1	122	1
 FacebookVoip	75	10554	1
 GoogleCall	41	7228	2
 
 Safe                             4 766           1            
-Acceptable                     194 27648         7            
+Acceptable                     196 27876         8            
 
 JA3 Host Stats: 
 		 IP Address                  	 # JA3C     
@@ -45,4 +45,5 @@ JA3 Host Stats:
 	5	TCP 10.77.110.51:41588 <-> 10.206.50.239:42000 [VLAN: 1611][proto: 78.38/STUN.Skype_TeamsCall][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 3][cat: VoIP/10][7 pkts/1006 bytes <-> 8 pkts/1118 bytes][Goodput ratio: 58/57][1.05 sec][bytes ratio: -0.053 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 189/134 369/399 144/153][Pkt Len c2s/s2c min/avg/max/stddev: 70/64 144/140 164/172 31/43][Plen Bins: 0,0,25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	6	UDP 192.168.12.169:43016 <-> 74.125.247.128:3478 [proto: 78.404/STUN.GoogleCall][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 4][cat: VoIP/10][4 pkts/528 bytes <-> 4 pkts/408 bytes][Goodput ratio: 68/59][1.25 sec][Hostname/SNI: turn.l.google.com][bytes ratio: 0.128 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 9/23 342/409 974/1177 447/543][Pkt Len c2s/s2c min/avg/max/stddev: 62/74 132/102 198/122 61/19][PLAIN TEXT (BSnLfRxS6)][Plen Bins: 12,37,25,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	7	UDP 192.168.43.169:48854 <-> 134.224.90.111:8801 [proto: 30/DTLS][IP: 189/Zoom][Encrypted][Confidence: DPI][DPI packets: 4][cat: Network/14][3 pkts/660 bytes <-> 1 pkts/106 bytes][Goodput ratio: 81/60][0.12 sec][(Advertised) ALPNs: webrtc;c-webrtc][DTLSv1.2][JA3C: 3e12a43c7535bb32beac3928f8fe905d][JA4: t00d0808we_c6c2b6ec87e0_06b1ae923e2a][Firefox][PLAIN TEXT (DCBD09778680)][Plen Bins: 0,0,25,0,25,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	8	ICMP 192.168.12.169:0 -> 74.125.247.128:0 [proto: 81/ICMP][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/122 bytes -> 0 pkts/0 bytes][Goodput ratio: 65/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (62NfUD5)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP [2600:1900:4160:5999::19::]:3478 -> [2001:b07:a3d:c112:48a1:1094:1227:281e]:48094 [proto: 78/STUN][IP: 284/GoogleCloud][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][2 pkts/228 bytes -> 0 pkts/0 bytes][Goodput ratio: 45/0][0.02 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (KdfbdZ2)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	ICMP 192.168.12.169:0 -> 74.125.247.128:0 [proto: 81/ICMP][IP: 126/Google][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/122 bytes -> 0 pkts/0 bytes][Goodput ratio: 65/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (62NfUD5)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
