@@ -1,12 +1,12 @@
 Guessed flow protos:	1
 
 DPI Packets (TCP):	528	(3.85 pkts/flow)
-DPI Packets (UDP):	886	(1.45 pkts/flow)
+DPI Packets (UDP):	884	(1.44 pkts/flow)
 DPI Packets (other):	10	(1.00 pkts/flow)
 Confidence Unknown          : 389 (flows)
 Confidence Match by port    : 1 (flows)
 Confidence DPI              : 370 (flows)
-Num dissector calls: 50254 (66.12 diss/flow)
+Num dissector calls: 50206 (66.06 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/1170/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -429,8 +429,8 @@ JA3 Host Stats:
 
 
 Undetected flows:
-	1	UDP 10.0.2.15:28681 <-> 193.32.126.214:59596 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 13][9 pkts/1133 bytes <-> 9 pkts/4728 bytes][Goodput ratio: 67/92][160.92 sec][bytes ratio: -0.613 (Download)][IAT c2s/s2c min/avg/max/stddev: 272/272 21367/21368 67329/67329 24897/24896][Pkt Len c2s/s2c min/avg/max/stddev: 70/130 126/525 274/769 57/278][PLAIN TEXT (CEGTKGb)][Plen Bins: 11,5,33,5,0,0,0,11,5,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 10.0.2.15:28681 <-> 104.156.226.72:53258 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 13][11 pkts/1318 bytes <-> 10 pkts/4413 bytes][Goodput ratio: 65/90][310.25 sec][bytes ratio: -0.540 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/119 32737/11587 222605/51544 68858/17008][Pkt Len c2s/s2c min/avg/max/stddev: 70/82 120/441 274/769 53/328][PLAIN TEXT (CEGTKGb)][Plen Bins: 4,28,28,9,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.0.2.15:28681 <-> 193.32.126.214:59596 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 12][9 pkts/1133 bytes <-> 9 pkts/4728 bytes][Goodput ratio: 67/92][160.92 sec][bytes ratio: -0.613 (Download)][IAT c2s/s2c min/avg/max/stddev: 272/272 21367/21368 67329/67329 24897/24896][Pkt Len c2s/s2c min/avg/max/stddev: 70/130 126/525 274/769 57/278][PLAIN TEXT (CEGTKGb)][Plen Bins: 11,5,33,5,0,0,0,11,5,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.0.2.15:28681 <-> 104.156.226.72:53258 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 12][11 pkts/1318 bytes <-> 10 pkts/4413 bytes][Goodput ratio: 65/90][310.25 sec][bytes ratio: -0.540 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/119 32737/11587 222605/51544 68858/17008][Pkt Len c2s/s2c min/avg/max/stddev: 70/82 120/441 274/769 53/328][PLAIN TEXT (CEGTKGb)][Plen Bins: 4,28,28,9,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 10.0.2.15:28681 <-> 104.238.172.250:23548 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 10][5 pkts/464 bytes <-> 5 pkts/1845 bytes][Goodput ratio: 55/89][310.09 sec][bytes ratio: -0.598 (Download)][IAT c2s/s2c min/avg/max/stddev: 650/650 77515/77515 261177/261177 107329/107329][Pkt Len c2s/s2c min/avg/max/stddev: 70/82 93/369 123/769 25/327][PLAIN TEXT (CEGTKGb)][Plen Bins: 10,40,20,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	UDP 10.0.2.15:28681 <-> 142.132.165.13:30566 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 6][3 pkts/296 bytes <-> 3 pkts/1203 bytes][Goodput ratio: 57/89][160.89 sec][bytes ratio: -0.605 (Download)][IAT c2s/s2c min/avg/max/stddev: 77417/77420 80434/80434 83450/83449 3016/3014][Pkt Len c2s/s2c min/avg/max/stddev: 70/149 99/401 128/769 24/266][PLAIN TEXT (CEGTKGb)][Plen Bins: 16,16,16,16,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	5	UDP 10.0.2.15:28681 <-> 185.187.74.173:53489 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 6][3 pkts/291 bytes <-> 3 pkts/1203 bytes][Goodput ratio: 57/89][196.47 sec][bytes ratio: -0.610 (Download)][IAT c2s/s2c min/avg/max/stddev: 33201/33197 98224/98222 163247/163248 65023/65026][Pkt Len c2s/s2c min/avg/max/stddev: 70/149 97/401 123/769 22/266][PLAIN TEXT (CEGTKGW)][Plen Bins: 16,16,16,16,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -1,7 +1,7 @@
-DPI Packets (UDP):	82	(1.71 pkts/flow)
+DPI Packets (UDP):	81	(1.69 pkts/flow)
 Confidence Unknown          : 3 (flows)
 Confidence DPI              : 45 (flows)
-Num dissector calls: 1592 (33.17 diss/flow)
+Num dissector calls: 1582 (32.96 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/9/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -91,6 +91,6 @@ Unrated                        306 72708         3
 
 
 Undetected flows:
-	1	UDP 192.168.1.77:23174 <-> 192.168.1.52:31480 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 13][148 pkts/36776 bytes <-> 153 pkts/35418 bytes][Goodput ratio: 83/82][12.14 sec][bytes ratio: 0.019 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 57/42 71/82 1175/1681 105/157][Pkt Len c2s/s2c min/avg/max/stddev: 90/90 248/231 298/314 27/30][PLAIN TEXT (@XL/TB)][Plen Bins: 0,0,1,0,0,27,44,23,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.1.77:23174 <-> 192.168.1.52:31480 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 12][148 pkts/36776 bytes <-> 153 pkts/35418 bytes][Goodput ratio: 83/82][12.14 sec][bytes ratio: 0.019 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 57/42 71/82 1175/1681 105/157][Pkt Len c2s/s2c min/avg/max/stddev: 90/90 248/231 298/314 27/30][PLAIN TEXT (@XL/TB)][Plen Bins: 0,0,1,0,0,27,44,23,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.1.77:28150 -> 87.11.205.195:59772 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 3][3 pkts/302 bytes -> 0 pkts/0 bytes][Goodput ratio: 58/0][11.00 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,66,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.1.77:23174 -> 87.11.205.195:60723 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 2][2 pkts/212 bytes -> 0 pkts/0 bytes][Goodput ratio: 60/0][1.50 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

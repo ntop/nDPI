@@ -781,13 +781,6 @@ static void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, s
   /* TODO: can we stop earlier? */
   if(flow->packet_counter > 10)
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-
-  if(flow->packet_counter > 0) {
-    /* This might be a RTP stream: let's make sure we check it */
-    /* At this point the flow has not been fully classified as STUN yet */
-    NDPI_LOG_DBG(ndpi_struct, "re-enable RTP\n");
-    NDPI_CLR(&flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP);
-  }
 }
 
 void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id) {
