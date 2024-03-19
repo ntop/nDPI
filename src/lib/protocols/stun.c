@@ -211,7 +211,19 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if(magic_cookie != 0x2112A442) {
-    /* Some heuristic to detect classic-stun: let's see if attributes list seems ok */
+    /* Some heuristic to detect classic-stun:
+       * msg type check (list from Wireshark)
+       * let's see if attributes list seems ok */
+    if(msg_type != 0x0001 && msg_type != 0x0101 && msg_type != 0x0111 && /* Binding */
+       msg_type != 0x0002 && msg_type != 0x0102 && msg_type != 0x0112 && /* Shared secret */
+       msg_type != 0x0003 && msg_type != 0x0103 && msg_type != 0x0113 && /* Allocate */
+       msg_type != 0x0004 && msg_type != 0x0104 && msg_type != 0x0114 && /* Send */
+       msg_type != 0x0115 && /* Data Indication */
+       msg_type != 0x0006 && msg_type != 0x0106 && msg_type != 0x0116 /* Set Active Destination */) {
+      NDPI_LOG_DBG(ndpi_struct, "No classic-stun 0x%x\n", msg_type);
+      return 0;
+    }
+
     off = STUN_HDR_LEN;
     while(off + 4 < payload_length) {
       u_int16_t len = ntohs(*((u_int16_t *)&payload[off + 2]));
