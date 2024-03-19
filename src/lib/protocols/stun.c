@@ -33,6 +33,23 @@
 
 #define STUN_HDR_LEN   20 /* STUN message header length, Classic-STUN (RFC 3489) and STUN (RFC 8489) both */
 
+
+/* Methods */
+#define METHOD_BINDING                 0x0001 /* RFC8489 */
+#define METHOD_SHARED_SECRET           0x0002 /* RFC3489 */
+#define METHOD_ALLOCATE                0x0003 /* RFC8489 */
+#define METHOD_REFRESH                 0x0004 /* RFC8489 */
+#define METHOD_DATA_IND_OLD            0x0005
+#define METHOD_SEND                    0x0006 /* RFC8656 */
+#define METHOD_DATA_IND                0x0007 /* RFC8656 */
+#define METHOD_CREATE_PERMISSION       0x0008 /* RFC8656 */
+#define METHOD_CHANNELBIND             0x0009 /* RFC8656 */
+/* TCP specific */
+#define METHOD_CONNECT                 0x000a /* RFC6062 */
+#define METHOD_CONNECTION_BIND         0x000b /* RFC6062 */
+#define METHOD_CONNECTION_ATTEMPT      0x000c /* RFC6062 */
+
+
 static u_int64_t get_stun_lru_key(struct ndpi_flow_struct *flow, u_int8_t rev);
 static u_int64_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port);
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
@@ -132,7 +149,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
             u_int16_t *app_proto)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int16_t msg_type, msg_len;
+  u_int16_t msg_type, msg_len, method;
   int off;
   const u_int8_t *payload = packet->payload;
   u_int16_t payload_length = packet->payload_packet_len;
@@ -213,6 +230,23 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
   if(msg_type == 0x0800 || msg_type == 0x0801 || msg_type == 0x0802) {
     *app_proto = NDPI_PROTOCOL_WHATSAPP_CALL;
     return 1;
+  }
+
+  method = (msg_type & 0x000F) | ((msg_type & 0x00E0) >> 1) | ((msg_type & 0x3E00) >> 2);
+  switch(method) {
+  case METHOD_ALLOCATE:
+  case METHOD_REFRESH:
+  case METHOD_SEND:
+  case METHOD_DATA_IND:
+  case METHOD_DATA_IND_OLD:
+  case METHOD_CREATE_PERMISSION:
+  case METHOD_CHANNELBIND:
+  case METHOD_CONNECT:
+  case METHOD_CONNECTION_BIND:
+  case METHOD_CONNECTION_ATTEMPT:
+    NDPI_LOG_DBG(ndpi_struct, "TURN flow (method %d)\n", method);
+    flow->stun.is_turn = 1;
+    break;
   }
 
   off = STUN_HDR_LEN;
@@ -390,15 +424,17 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
   first_byte = packet->payload[0];
 
-  /* draft-ietf-avtcore-rfc7983bis */
+  /* RFC9443 */
   if(first_byte <= 3) {
     NDPI_LOG_DBG(ndpi_struct, "Still STUN\n");
     if(is_stun(ndpi_struct, flow, &app_proto) /* To extract other metadata */ &&
        flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN /* No previous subclassification */) {
       ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
     }
+  } else if(first_byte <= 15) {
+    NDPI_LOG_DBG(ndpi_struct, "DROP range. Unexpected\n");
   } else if(first_byte <= 19) {
-    NDPI_LOG_DBG(ndpi_struct, "DROP or ZRTP range. Unexpected\n");
+    NDPI_LOG_DBG(ndpi_struct, "ZRTP range. Unexpected\n");
   } else if(first_byte <= 63) {
     NDPI_LOG_DBG(ndpi_struct, "DTLS\n");
 
@@ -474,8 +510,15 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
         }
       }
     }
+  } else if(first_byte <= 79) {
+    if(flow->stun.is_turn) {
+      NDPI_LOG_DBG(ndpi_struct, "TURN range\n");
+      /* TODO */
+    } else {
+      NDPI_LOG_DBG(ndpi_struct, "QUIC range (not turn). Unexpected\n");
+    }
   } else if(first_byte <= 127) {
-    NDPI_LOG_DBG(ndpi_struct, "QUIC or TURN range. Unexpected\n");
+    NDPI_LOG_DBG(ndpi_struct, "QUIC range. Unexpected\n");
   } else if(first_byte <= 191) {
 
     rtp_rtcp = is_rtp_or_rtcp(ndpi_struct, flow);

@@ -1274,7 +1274,7 @@ struct ndpi_flow_struct {
   } kerberos_buf;
 
   struct {
-    u_int8_t maybe_dtls;
+    u_int8_t maybe_dtls : 1, is_turn : 1, pad : 6;
   } stun;
 
   struct {
