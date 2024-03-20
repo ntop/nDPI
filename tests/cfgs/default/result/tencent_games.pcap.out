@@ -1,6 +1,6 @@
-DPI Packets (TCP):	4	(4.00 pkts/flow)
-Confidence DPI              : 1 (flows)
-Num dissector calls: 144 (144.00 diss/flow)
+DPI Packets (TCP):	8	(4.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 288 (144.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -18,11 +18,12 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   1/1 (search/found)
+Patricia protocols:   2/2 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-TencentGames	10	818	1
+TencentGames	16	1361	2
 
-Fun                             10 818           1            
+Fun                             16 1361          2            
 
 	1	TCP 10.215.173.1:43300 <-> 43.130.19.227:65010 [proto: 395/TencentGames][IP: 285/Tencent][ClearText][Confidence: DPI][DPI packets: 4][cat: Game/8][5 pkts/413 bytes <-> 5 pkts/405 bytes][Goodput ratio: 47/49][0.61 sec][bytes ratio: 0.010 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/4 103/104 200/200 95/96][Pkt Len c2s/s2c min/avg/max/stddev: 40/40 83/81 157/173 46/52][PLAIN TEXT (9089499565149320430)][Plen Bins: 0,0,50,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 10.215.173.1:46658 <-> 162.62.97.166:8085 [proto: 395/TencentGames][IP: 285/Tencent][ClearText][Confidence: DPI][DPI packets: 4][cat: Game/8][3 pkts/290 bytes <-> 3 pkts/253 bytes][Goodput ratio: 52/49][0.17 sec][bytes ratio: 0.068 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 7/8 51/40 95/71 44/32][Pkt Len c2s/s2c min/avg/max/stddev: 40/40 97/84 190/165 66/57][PLAIN TEXT (gcloud)][Plen Bins: 0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
