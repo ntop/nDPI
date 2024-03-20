@@ -65,6 +65,14 @@ static void ndpi_search_tencent_games(struct ndpi_detection_module_struct *ndpi_
       ndpi_int_tencent_games_add_connection(ndpi_struct, flow);
       return;
     }
+
+    if (get_u_int16_t(packet->payload, 0) == 0 &&
+        ntohs(get_u_int16_t(packet->payload, 2)) == (u_int16_t)(packet->payload_packet_len-4) &&
+        ntohs(get_u_int16_t(packet->payload, 4)) == 0x7801)
+    {
+      ndpi_int_tencent_games_add_connection(ndpi_struct, flow);
+      return;
+    }
   }
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
