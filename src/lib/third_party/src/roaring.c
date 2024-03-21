@@ -24279,7 +24279,7 @@ void roaring64_bitmap_flip_closed_inplace(roaring64_bitmap_t *r, uint64_t min,
 static inline uint64_t count_high32(const roaring64_bitmap_t *r) {
     art_iterator_t it = art_init_iterator(&r->art, /*first=*/true);
     uint64_t high32_count = 0;
-    uint32_t prev_high32;
+    uint32_t prev_high32 = 0;
     while (it.value != NULL) {
         uint32_t current_high32 = (uint32_t)(combine_key(it.key, 0) >> 32);
         if (high32_count == 0 || prev_high32 != current_high32) {
