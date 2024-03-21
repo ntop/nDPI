@@ -24307,7 +24307,7 @@ size_t roaring64_bitmap_portable_size_in_bytes(const roaring64_bitmap_t *r) {
     size += sizeof(high32_count);
 
     art_iterator_t it = art_init_iterator(&r->art, /*first=*/true);
-    uint32_t prev_high32;
+    uint32_t prev_high32 = 0;
     roaring_bitmap_t *bitmap32 = NULL;
 
     // Iterate through buckets ordered by increasing keys.
@@ -24372,7 +24372,7 @@ size_t roaring64_bitmap_portable_serialize(const roaring64_bitmap_t *r,
     buf += sizeof(high32_count);
 
     art_iterator_t it = art_init_iterator(&r->art, /*first=*/true);
-    uint32_t prev_high32;
+    uint32_t prev_high32 = 0;
     roaring_bitmap_t *bitmap32 = NULL;
 
     // Iterate through buckets ordered by increasing keys.
