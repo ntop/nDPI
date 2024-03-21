@@ -1140,7 +1140,7 @@ typedef struct ndpi_proto {
 #define CUSTOM_CATEGORY_LABEL_LEN 32
 
 typedef void ndpi_bitmap;
-typedef void ndpi_bitmap64;
+typedef void ndpi_bitmap64_fuse;
 typedef void ndpi_bitmap_iterator;
 typedef void ndpi_filter;
     
@@ -1155,7 +1155,7 @@ typedef struct {
 typedef struct {
   struct {
     u_int16_t class_id;
-    ndpi_bitmap64 *domains;
+    ndpi_bitmap64_fuse *domains;
   } classes[MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS];
 } ndpi_domain_classify;
 

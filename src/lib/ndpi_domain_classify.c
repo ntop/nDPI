@@ -57,7 +57,7 @@ void ndpi_domain_classify_free(ndpi_domain_classify *s) {
 
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->classes[i].domains != NULL) {
-      ndpi_bitmap64_free(s->classes[i].domains);
+      ndpi_bitmap64_fuse_free(s->classes[i].domains);
     } else
       break;
   }
@@ -75,7 +75,7 @@ u_int32_t ndpi_domain_classify_size(ndpi_domain_classify *s) {
 
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->classes[i].domains != NULL) {
-      tot_len += ndpi_bitmap64_size(s->classes[i].domains);
+      tot_len += ndpi_bitmap64_fuse_size(s->classes[i].domains);
     } else
       break;
   }
@@ -111,7 +111,7 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
       break;
     } else if(s->classes[i].class_id == 0) {
       s->classes[i].class_id = class_id;
-      s->classes[i].domains  = ndpi_bitmap64_alloc();
+      s->classes[i].domains  = ndpi_bitmap64_fuse_alloc();
 
       if(!s->classes[i].domains)
         s->classes[i].class_id = 0;
@@ -125,7 +125,7 @@ bool ndpi_domain_classify_add(ndpi_domain_classify *s,
 
   hash = ndpi_quick_hash64(domain, strlen(domain));
 
-  return(ndpi_bitmap64_set(s->classes[i].domains, hash));
+  return(ndpi_bitmap64_fuse_set(s->classes[i].domains, hash));
 }
 
 /* ********************************************************** */
@@ -146,7 +146,7 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
       break;
     } else if(s->classes[i].class_id == 0) {
       s->classes[i].class_id = class_id;
-      s->classes[i].domains  = ndpi_bitmap64_alloc();
+      s->classes[i].domains  = ndpi_bitmap64_fuse_alloc();
       if(!s->classes[i].domains)
         s->classes[i].class_id = 0;
       break;
@@ -179,7 +179,7 @@ u_int32_t ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
 
     hash = ndpi_quick_hash64(line, strlen(line));
 
-    if(ndpi_bitmap64_set(s->classes[i].domains, hash))
+    if(ndpi_bitmap64_fuse_set(s->classes[i].domains, hash))
       num_added++;
   }
 
@@ -198,7 +198,7 @@ bool ndpi_domain_classify_finalize(ndpi_domain_classify *s) {
 
   for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
     if(s->classes[i].class_id != 0) {
-      ndpi_bitmap64_compress(s->classes[i].domains);
+      ndpi_bitmap64_fuse_compress(s->classes[i].domains);
     }
   }
   return(true);
@@ -258,7 +258,7 @@ const char* ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
 
     for(i=0; i<MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS; i++) {
       if(s->classes[i].class_id != 0) {
-	if(ndpi_bitmap64_isset(s->classes[i].domains, hash)) {
+	if(ndpi_bitmap64_fuse_isset(s->classes[i].domains, hash)) {
 #ifdef DEBUG_CONTAINS
 	  printf("[contains] %s = %d [%llu]\n",
 		 hostname, s->classes[i].class_id, hash);

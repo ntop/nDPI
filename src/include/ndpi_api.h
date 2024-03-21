@@ -2045,16 +2045,16 @@ extern "C" {
 
     This is
     - a probabilistic datastructure !!! (i.e. be prepared to false positives)
-    - immutable (i.e. adding keys after a search (i.e. ndpi_bitmap64_isset)
+    - immutable (i.e. adding keys after a search (i.e. ndpi_bitmap64_fuse_isset)
       is not allowed
    */
 
-  ndpi_bitmap64* ndpi_bitmap64_alloc(void);
-  bool ndpi_bitmap64_set(ndpi_bitmap64 *b, u_int64_t value);
-  bool ndpi_bitmap64_compress(ndpi_bitmap64 *b);
-  bool ndpi_bitmap64_isset(ndpi_bitmap64 *b, u_int64_t value);
-  void ndpi_bitmap64_free(ndpi_bitmap64 *b);
-  u_int32_t ndpi_bitmap64_size(ndpi_bitmap64 *b);
+  ndpi_bitmap64_fuse* ndpi_bitmap64_fuse_alloc(void);
+  bool ndpi_bitmap64_fuse_set(ndpi_bitmap64_fuse *b, u_int64_t value);
+  bool ndpi_bitmap64_fuse_compress(ndpi_bitmap64_fuse *b);
+  bool ndpi_bitmap64_fuse_isset(ndpi_bitmap64_fuse *b, u_int64_t value);
+  void ndpi_bitmap64_fuse_free(ndpi_bitmap64_fuse *b);
+  u_int32_t ndpi_bitmap64_fuse_size(ndpi_bitmap64_fuse *b);
 
   /* ******************************* */
 
