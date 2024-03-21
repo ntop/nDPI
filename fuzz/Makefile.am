@@ -2,7 +2,7 @@ bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail 
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream
 #Data structures
-bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64 fuzz_ds_domain_classify
+bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64_fuse fuzz_ds_domain_classify
 #Third party
 bin_PROGRAMS += fuzz_libinjection fuzz_binaryfusefilter
 #Internal crypto
@@ -328,20 +328,20 @@ fuzz_ds_cmsketch_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_cmsketch_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ds_bitmap64_SOURCES = fuzz_ds_bitmap64.cpp fuzz_common_code.c
-fuzz_ds_bitmap64_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
-fuzz_ds_bitmap64_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
-fuzz_ds_bitmap64_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
-fuzz_ds_bitmap64_LDFLAGS = $(LIBS)
+fuzz_ds_bitmap64_fuse_SOURCES = fuzz_ds_bitmap64_fuse.cpp fuzz_common_code.c
+fuzz_ds_bitmap64_fuse_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_ds_bitmap64_fuse_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_ds_bitmap64_fuse_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_ds_bitmap64_fuse_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
-fuzz_ds_bitmap64_CXXFLAGS += $(LIB_FUZZING_ENGINE)
-fuzz_ds_bitmap64_CFLAGS += $(LIB_FUZZING_ENGINE)
-fuzz_ds_bitmap64_LDFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_bitmap64_fuse_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_bitmap64_fuse_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_bitmap64_fuse_LDFLAGS += $(LIB_FUZZING_ENGINE)
 endif
 # force usage of CXX for linker
-fuzz_ds_bitmap64_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+fuzz_ds_bitmap64_fuse_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
-    $(fuzz_ds_bitmap64_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+    $(fuzz_ds_bitmap64_fuse_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_domain_classify_SOURCES = fuzz_ds_domain_classify.cpp fuzz_common_code.c
 fuzz_ds_domain_classify_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
@@ -729,15 +729,15 @@ files_corpus_fuzz_readerutils_parseprotolist :=  $(wildcard corpus/fuzz_readerut
 fuzz_readerutils_parseprotolist_seed_corpus.zip: $(files_corpus_fuzz_readerutils_parseprotolist)
 	zip -j fuzz_readerutils_parseprotolist_seed_corpus.zip $(files_corpus_fuzz_readerutils_parseprotolist)
 
-files_corpus_fuzz_ds_bitmap64 :=  $(wildcard corpus/fuzz_ds_bitmap64/*)
-fuzz_ds_bitmap64_seed_corpus.zip: $(files_corpus_fuzz_ds_bitmap64)
-	zip -j fuzz_ds_bitmap64_seed_corpus.zip $(files_corpus_fuzz_ds_bitmap64)
+files_corpus_fuzz_ds_bitmap64_fuse :=  $(wildcard corpus/fuzz_ds_bitmap64_fuse/*)
+fuzz_ds_bitmap64_fuse_seed_corpus.zip: $(files_corpus_fuzz_ds_bitmap64_fuse)
+	zip -j fuzz_ds_bitmap64_fuse_seed_corpus.zip $(files_corpus_fuzz_ds_bitmap64_fuse)
 
 files_corpus_fuzz_ds_domain_classify :=  $(wildcard corpus/fuzz_ds_domain_classify/*)
 fuzz_ds_domain_classify_seed_corpus.zip: $(files_corpus_fuzz_ds_domain_classify)
 	zip -j fuzz_ds_domain_classify_seed_corpus.zip $(files_corpus_fuzz_ds_domain_classify)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip fuzz_filecfg_config_seed_corpus.zip fuzz_filecfg_category_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_malicious_ja3_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_fuse_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip fuzz_filecfg_config_seed_corpus.zip fuzz_filecfg_category_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_malicious_ja3_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip
 	cp corpus/fuzz_*seed_corpus.zip .
 
 #Create dictionaries exactly as expected by oss-fuzz.
@@ -787,7 +787,7 @@ distdir:
 		-o -path './corpus/fuzz_alg_crc32_md5/*' \
 		-o -path './corpus/fuzz_alg_bytestream/*' \
 		-o -path './corpus/fuzz_ds_libcache/*' \
-		-o -path './corpus/fuzz_ds_bitmap64/*' \
+		-o -path './corpus/fuzz_ds_bitmap64_fuse/*' \
 		-o -path './corpus/fuzz_ds_domain_classify/*' \
 		-o -path './corpus/fuzz_ds_ptree/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 
