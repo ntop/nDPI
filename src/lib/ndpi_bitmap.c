@@ -123,7 +123,7 @@ size_t ndpi_bitmap_serialize(ndpi_bitmap* b, char **buf) {
 #ifdef USE_ROARING_V2
   const roaring_bitmap_t *r = (const roaring_bitmap_t *)b;
   
-  s = roaring_bitmap_size_in_bytes(r);
+  s = roaring_bitmap_portable_size_in_bytes(r);
 #else
   const roaring64_bitmap_t *r = (const roaring64_bitmap_t *)b;
   
@@ -264,8 +264,11 @@ bool ndpi_bitmap_is_empty(ndpi_bitmap* b) {
    true is returned when a value is present, false when we reached the end 
 */
 bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, u_int64_t *value) {
-#ifdef USE_ROARING_V2 
-  uint32_t num = roaring_read_uint32_iterator((roaring_uint32_iterator_t*)i, value, 1);
+#ifdef USE_ROARING_V2
+  uint32_t ret;
+  uint32_t num = roaring_read_uint32_iterator((roaring_uint32_iterator_t*)i, &ret, 1);
+
+  *value = (uint32_t)ret;
 #else
   uint64_t num = roaring64_iterator_read((roaring64_iterator_t*)i, value, 1);
 #endif
