@@ -2012,18 +2012,16 @@ extern "C" {
   */
 
   ndpi_bitmap* ndpi_bitmap_alloc(void);
-  ndpi_bitmap* ndpi_bitmap_alloc_size(u_int32_t size);
   void ndpi_bitmap_free(ndpi_bitmap* b);
   ndpi_bitmap* ndpi_bitmap_copy(ndpi_bitmap* b);
   u_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b);
   bool ndpi_bitmap_is_empty(ndpi_bitmap* b);
-  void ndpi_bitmap_set(ndpi_bitmap* b, u_int32_t value);
-  void ndpi_bitmap_unset(ndpi_bitmap* b, u_int32_t value);
-  bool ndpi_bitmap_isset(ndpi_bitmap* b, u_int32_t value);
-  void ndpi_bitmap_clear(ndpi_bitmap* b);
+  void ndpi_bitmap_set(ndpi_bitmap* b, u_int64_t value);
+  void ndpi_bitmap_unset(ndpi_bitmap* b, u_int64_t value);
+  bool ndpi_bitmap_isset(ndpi_bitmap* b, u_int64_t value);
 
   size_t ndpi_bitmap_serialize(ndpi_bitmap* b, char **buf);
-  ndpi_bitmap* ndpi_bitmap_deserialize(char *buf);
+  ndpi_bitmap* ndpi_bitmap_deserialize(char *buf, size_t buf_len);
 
   void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and);
   ndpi_bitmap* ndpi_bitmap_and_alloc(ndpi_bitmap* a, ndpi_bitmap* b_and);
@@ -2035,7 +2033,7 @@ extern "C" {
 
   ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b);
   void ndpi_bitmap_iterator_free(ndpi_bitmap* b);
-  bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, u_int32_t *value);
+  bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, u_int64_t *value);
 
   /* ******************************* */
 
