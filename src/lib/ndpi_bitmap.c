@@ -161,13 +161,21 @@ void ndpi_bitmap_optimize(ndpi_bitmap* a) {
 /* ******************************************* */
 
 ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
+#ifdef USE_ROARING_V2 
   return(roaring_create_iterator((roaring_bitmap_t*)b));
+#else
+  return(roaring_iterator_create((roaring_bitmap_t*)b));
+#endif
 }
 
 /* ******************************************* */
 
 void ndpi_bitmap_iterator_free(ndpi_bitmap* b) {
+#ifdef USE_ROARING_V2
   roaring_free_uint32_iterator((roaring_uint32_iterator_t*)b);
+#else
+  roaring_uint32_iterator_free((roaring_uint32_iterator_t*)b);
+#endif
 }
 
 /* ******************************************* */
@@ -183,7 +191,11 @@ bool ndpi_bitmap_is_empty(ndpi_bitmap* b) {
    true is returned when a value is present, false when we reached the end 
 */
 bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, uint32_t *value) {
+#ifdef USE_ROARING_V2 
   uint32_t num = roaring_read_uint32_iterator((roaring_uint32_iterator_t*)i, value, 1);
-
+#else
+  uint32_t num = roaring_uint32_iterator_read((roaring_uint32_iterator_t*)i, value, 1);
+#endif
+  
   return((num == 1) ? true /* found */ : false /* not found */);  
 }
