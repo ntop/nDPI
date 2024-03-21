@@ -5626,7 +5626,7 @@ void compressedBitmapUnitTest() {
 
   assert((it = ndpi_bitmap_iterator_alloc(b)));
   while(ndpi_bitmap_iterator_next(it, &value)) {
-    if(trace) printf("%lluu ", value);
+    if(trace) printf("%lu ", value);
   }
 
   if(trace) printf("\n");
