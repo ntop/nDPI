@@ -120,6 +120,19 @@ AC_CHECK_TOOL(AR, ar, [false])
 
 AC_LANG_WERROR
 
+AC_MSG_CHECKING([whether roaring v3 works])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+	    #if __has_include (<stdio.h>)
+	    #endif
+	    ]])],
+	    [
+	      AC_MSG_RESULT([yes])
+	      ],
+	      [
+	        AC_MSG_RESULT([no])
+		  AC_DEFINE_UNQUOTED(USE_ROARING_V2, "1", [Use CRoaring 2.1.x])
+  ])
+		  
 NDPI_MAJOR=`echo "${PACKAGE_VERSION}" | cut -d . -f 1`
 NDPI_MINOR=`echo "${PACKAGE_VERSION}" | cut -d . -f 2`
 NDPI_PATCH=`echo "${PACKAGE_VERSION}" | cut -d . -f 3`
