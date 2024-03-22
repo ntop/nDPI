@@ -697,3 +697,12 @@ References: `Protocol Specs: <https://www.etsi.org/deliver/etsi_ts/129200_129299
 File Delivery over Unidirectional Transport.
 
 References: `RFC <https://datatracker.ietf.org/doc/html/rfc6726>`_
+
+
+.. _Proto 407:
+
+`NDPI_PROTOCOL_LOLWILDRIFT`
+============================
+League of Legends: Wild Rift is a mobile MOBA game.
+
+References: `Main site <https://wildrift.leagueoflegends.com/>`_
