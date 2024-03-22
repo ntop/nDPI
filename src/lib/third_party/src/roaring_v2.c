@@ -4303,7 +4303,7 @@ int run_run_container_ixor(
 #include "ndpi_config.h"
 
 #define NDPI_REPLACE_FPRINTF
-#include "../../ndpi_replace_printf.h"
+#include "../../../include/ndpi_replace_printf.h"
 #endif
 
 #ifdef __cplusplus

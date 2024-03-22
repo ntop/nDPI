@@ -43,7 +43,7 @@ typedef __kernel_size_t size_t;
 #include "ndpi_api.h"
 #include "ahocorasick.h"
 
-#include "../../ndpi_replace_printf.h"
+#include "../../../include/ndpi_replace_printf.h"
 
 /* TODO: For different depth of node, number of outgoing edges differs
    considerably, It is efficient to use different chunk size for 

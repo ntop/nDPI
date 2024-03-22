@@ -3966,6 +3966,12 @@ int run_run_container_ixor(run_container_t *src_1, const run_container_t *src_2,
 #include <stdbool.h>
 #include <stdio.h>
 
+#ifndef WIN32
+#include "ndpi_config.h"
+
+#define NDPI_REPLACE_FPRINTF
+#include "../../../include/ndpi_replace_printf.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -4352,6 +4358,7 @@ static inline int32_t container_size_in_bytes(const container_t *c,
     return 0;  // unreached
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES 
 /**
  * print the container (useful for debugging), requires a  typecode
  */
@@ -4363,7 +4370,8 @@ void container_printf(const container_t *container, uint8_t typecode);
  */
 void container_printf_as_uint32_array(const container_t *container,
                                       uint8_t typecode, uint32_t base);
-
+#endif
+ 
 bool container_internal_validate(const container_t *container, uint8_t typecode,
                                  const char **reason);
 
@@ -10444,6 +10452,7 @@ size_t art_size_in_bytes_at(const art_node_t *node) {
     return size;
 }
 
+ 
 static void art_node_print_type(const art_node_t *node) {
     if (art_is_leaf(node)) {
         printf("Leaf");
@@ -10469,6 +10478,7 @@ static void art_node_print_type(const art_node_t *node) {
 }
 
 void art_node_printf(const art_node_t *node, uint8_t depth) {
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES 
     if (art_is_leaf(node)) {
         printf("{ type: Leaf, key: ");
         art_leaf_t *leaf = CAST_LEAF(node);
@@ -10542,8 +10552,9 @@ void art_node_printf(const art_node_t *node, uint8_t depth) {
     depth--;
     printf("%*s", depth, "");
     printf("}\n");
+#endif
 }
-
+ 
 void art_insert(art_t *art, const art_key_chunk_t *key, art_val_t *val) {
     art_leaf_t *leaf = (art_leaf_t *)val;
     art_leaf_populate(leaf, key);
@@ -10591,12 +10602,15 @@ size_t art_size_in_bytes(const art_t *art) {
 }
 
 void art_printf(const art_t *art) {
+#ifdef NDPI_REPLACE_FPRINTF
     if (art->root == NULL) {
         return;
     }
     art_node_printf(art->root, 0);
+#endif
 }
 
+ 
 // Returns the current node that the iterator is positioned at.
 static inline art_node_t *art_iterator_node(art_iterator_t *iterator) {
     return iterator->frames[iterator->frame].node;
@@ -13063,6 +13077,7 @@ int array_container_to_uint32_array(void *vout, const array_container_t *cont,
     return outpos;
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES 
 void array_container_printf(const array_container_t *v) {
     if (v->cardinality == 0) {
         printf("{}");
@@ -13086,7 +13101,8 @@ void array_container_printf_as_uint32_array(const array_container_t *v,
         printf(",%u", v->array[i] + base);
     }
 }
-
+#endif
+ 
 /*
  * Validate the container. Returns true if valid.
  */
@@ -14164,6 +14180,7 @@ int bitset_container_to_uint32_array(
 #endif
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES 
 /*
  * Print this container using printf (useful for debugging).
  */
@@ -14211,7 +14228,8 @@ void bitset_container_printf_as_uint32_array(const bitset_container_t * v, uint3
 		base += 64;
 	}
 }
-
+#endif
+ 
 /*
  * Validate the container. Returns true if valid.
  */
@@ -14576,7 +14594,8 @@ void container_free(container_t *c, uint8_t type) {
     }
 }
 
-void container_printf(const container_t *c, uint8_t type) {
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+ void container_printf(const container_t *c, uint8_t type) {
     c = container_unwrap_shared(c, &type);
     switch (type) {
         case BITSET_CONTAINER_TYPE:
@@ -14610,7 +14629,8 @@ void container_printf_as_uint32_array(const container_t *c, uint8_t typecode,
             roaring_unreachable;
     }
 }
-
+#endif
+ 
 bool container_internal_validate(const container_t *container, uint8_t typecode,
                                  const char **reason) {
     if (container == NULL) {
@@ -18433,6 +18453,7 @@ int run_container_to_uint32_array(void *vout, const run_container_t *cont,
     return outpos;
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES 
 /*
  * Print this container using printf (useful for debugging).
  */
@@ -18443,6 +18464,7 @@ void run_container_printf(const run_container_t *cont) {
         printf("[%d,%d]", run_start, run_start + le);
     }
 }
+
 
 /*
  * Print this container using printf as a comma-separated list of 32-bit
@@ -18463,7 +18485,8 @@ void run_container_printf_as_uint32_array(const run_container_t *cont,
         for (uint32_t j = 0; j <= le; ++j) printf(",%u", run_start + j);
     }
 }
-
+#endif
+ 
 /*
  * Validate the container. Returns true if valid.
  */
@@ -19594,6 +19617,7 @@ void roaring_bitmap_remove_range_closed(roaring_bitmap_t *r, uint32_t min,
     }
 }
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES 
 void roaring_bitmap_printf(const roaring_bitmap_t *r) {
     const roaring_array_t *ra = &r->high_low_container;
 
@@ -19629,7 +19653,8 @@ void roaring_bitmap_printf_describe(const roaring_bitmap_t *r) {
     }
     printf("}");
 }
-
+#endif
+ 
 typedef struct min_max_sum_s {
     uint32_t min;
     uint32_t max;
