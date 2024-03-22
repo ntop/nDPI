@@ -10454,7 +10454,8 @@ size_t art_size_in_bytes_at(const art_node_t *node) {
 
  
 static void art_node_print_type(const art_node_t *node) {
-    if (art_is_leaf(node)) {
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  if (art_is_leaf(node)) {
         printf("Leaf");
         return;
     }
@@ -10475,6 +10476,7 @@ static void art_node_print_type(const art_node_t *node) {
             assert(false);
             return;
     }
+#endif
 }
 
 void art_node_printf(const art_node_t *node, uint8_t depth) {
@@ -13079,7 +13081,7 @@ int array_container_to_uint32_array(void *vout, const array_container_t *cont,
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES 
 void array_container_printf(const array_container_t *v) {
-    if (v->cardinality == 0) {
+  if (v->cardinality == 0) {
         printf("{}");
         return;
     }
@@ -14127,7 +14129,7 @@ int bitset_container_##opname##_nocard(const bitset_container_t *src_1,   \
 }                                                                         \
 int bitset_container_##opname##_justcard(const bitset_container_t *src_1, \
                               const bitset_container_t *src_2) {          \
-   printf("A1\n"); const uint64_t * __restrict__ words_1 = src_1->words;                 \
+  /* printf("A1\n"); */ const uint64_t * __restrict__ words_1 = src_1->words; \
     const uint64_t * __restrict__ words_2 = src_2->words;                 \
     int32_t sum = 0;                                                      \
     for (size_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; i += 2) {      \
@@ -14185,7 +14187,7 @@ int bitset_container_to_uint32_array(
  * Print this container using printf (useful for debugging).
  */
 void bitset_container_printf(const bitset_container_t * v) {
-	printf("{");
+  printf("{");
 	uint32_t base = 0;
 	bool iamfirst = true;// TODO: rework so that this is not necessary yet still readable
 	for (int i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i) {
@@ -14206,12 +14208,11 @@ void bitset_container_printf(const bitset_container_t * v) {
 	printf("}");
 }
 
-
 /*
  * Print this container using printf as a comma-separated list of 32-bit integers starting at base.
  */
 void bitset_container_printf_as_uint32_array(const bitset_container_t * v, uint32_t base) {
-	bool iamfirst = true;// TODO: rework so that this is not necessary yet still readable
+  bool iamfirst = true;// TODO: rework so that this is not necessary yet still readable
 	for (int i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i) {
 		uint64_t w = v->words[i];
 		while (w != 0) {
@@ -18458,7 +18459,8 @@ int run_container_to_uint32_array(void *vout, const run_container_t *cont,
  * Print this container using printf (useful for debugging).
  */
 void run_container_printf(const run_container_t *cont) {
-    for (int i = 0; i < cont->n_runs; ++i) {
+
+  for (int i = 0; i < cont->n_runs; ++i) {
         uint16_t run_start = cont->runs[i].value;
         uint16_t le = cont->runs[i].length;
         printf("[%d,%d]", run_start, run_start + le);
