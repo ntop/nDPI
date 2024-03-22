@@ -10479,8 +10479,8 @@ static void art_node_print_type(const art_node_t *node) {
 #endif
 }
 
-void art_node_printf(const art_node_t *node, uint8_t depth) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES 
+void art_node_printf(const art_node_t *node, uint8_t depth) {
     if (art_is_leaf(node)) {
         printf("{ type: Leaf, key: ");
         art_leaf_t *leaf = CAST_LEAF(node);
@@ -10554,8 +10554,8 @@ void art_node_printf(const art_node_t *node, uint8_t depth) {
     depth--;
     printf("%*s", depth, "");
     printf("}\n");
-#endif
 }
+#endif
  
 void art_insert(art_t *art, const art_key_chunk_t *key, art_val_t *val) {
     art_leaf_t *leaf = (art_leaf_t *)val;
@@ -10603,14 +10603,14 @@ size_t art_size_in_bytes(const art_t *art) {
     return size;
 }
 
+ #ifdef NDPI_ENABLE_DEBUG_MESSAGES
 void art_printf(const art_t *art) {
-#ifdef NDPI_REPLACE_FPRINTF
     if (art->root == NULL) {
         return;
     }
     art_node_printf(art->root, 0);
-#endif
 }
+#endif
 
  
 // Returns the current node that the iterator is positioned at.
