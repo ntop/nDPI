@@ -1406,10 +1406,10 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   if (workflow->ndpi_serialization_format != ndpi_serialization_format_unknown) 
   {
-      //if (!isValidFlowForLogging(flow))
-      //{
-      //    return ;
-      //}
+      if (!isValidFlowForLogging(flow))
+      {
+          return ;
+      }
 
 	  if (ndpi_flow2json(workflow->ndpi_struct, flow->ndpi_flow,
 		  flow->ip_version, flow->protocol,

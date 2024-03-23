@@ -2188,10 +2188,10 @@ static void printFlowSerialized(u_int16_t thread_id, struct ndpi_flow_info* flow
     double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
 
-    //if (!isValidFlowForLogging(flow))
-    //{
-    //    return ;
-    //}
+    if (!isValidFlowForLogging(flow))
+    {
+        return ;
+    }
 
     if (needToRecordRisk)
     {
@@ -6091,11 +6091,11 @@ int main(int argc, char **argv)
       }
 
       // (MM.DD.YYYY.V)
-      fprintf(serializationLogFile, "nDPI Version 03.11.2024.1 - Configuration files mooved to Settings\nDPIConfiguration.json\n");
+      fprintf(serializationLogFile, "nDPI Version 03.11.2024.1 - Configuration files moved to Settings\nDPIConfiguration.json\n");
        #ifdef WIN32
           if (_isatty(_fileno(stdin)))
           {
-              printf("nDPI Version 03.11.2024.1 - Configuration files mooved to Settings\nDPIConfiguration.json\n");
+              printf("nDPI Version 03.11.2024.1 - Configuration files moved to Settings\nDPIConfiguration.json\n");
           }
       #endif
 
