@@ -1,6 +1,13 @@
 #include "ndpi_config.h"
 
 #ifndef USE_ROARING_V2
+#ifndef WIN32
+#include "ndpi_config.h"
+
+#define NDPI_REPLACE_FPRINTF
+#include "../../../include/ndpi_replace_printf.h"
+#endif
+
 // !!! DO NOT EDIT - THIS IS AN AUTO-GENERATED FILE !!!
 // Created by amalgamation.sh on 2024-03-20T03:56:45Z
 
@@ -1479,7 +1486,8 @@ int array_container_to_uint32_array(void *vout, const array_container_t *cont,
 /* Compute the number of runs */
 int32_t array_container_number_of_runs(const array_container_t *ac);
 
-/*
+
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES/*
  * Print this container using printf (useful for debugging).
  */
 void array_container_printf(const array_container_t *v);
@@ -1490,7 +1498,8 @@ void array_container_printf(const array_container_t *v);
  */
 void array_container_printf_as_uint32_array(const array_container_t *v,
                                             uint32_t base);
-
+#endif
+ 
 bool array_container_validate(const array_container_t *v, const char **reason);
 
 /**
@@ -2249,6 +2258,7 @@ int bitset_container_to_uint32_array(uint32_t *out,
                                      const bitset_container_t *bc,
                                      uint32_t base);
 
+ #ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /*
  * Print this container using printf (useful for debugging).
  */
@@ -2260,7 +2270,8 @@ void bitset_container_printf(const bitset_container_t *v);
  */
 void bitset_container_printf_as_uint32_array(const bitset_container_t *v,
                                              uint32_t base);
-
+#endif
+ 
 bool bitset_container_validate(const bitset_container_t *v,
                                const char **reason);
 
@@ -2792,6 +2803,7 @@ void run_container_xor(const run_container_t *src_1,
 int run_container_to_uint32_array(void *vout, const run_container_t *cont,
                                   uint32_t base);
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /*
  * Print this container using printf (useful for debugging).
  */
@@ -2803,7 +2815,8 @@ void run_container_printf(const run_container_t *v);
  */
 void run_container_printf_as_uint32_array(const run_container_t *v,
                                           uint32_t base);
-
+#endif
+ 
 bool run_container_validate(const run_container_t *run, const char **reason);
 
 /**
@@ -3965,13 +3978,6 @@ int run_run_container_ixor(run_container_t *src_1, const run_container_t *src_2,
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
-
-#ifndef WIN32
-#include "ndpi_config.h"
-
-#define NDPI_REPLACE_FPRINTF
-#include "../../../include/ndpi_replace_printf.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -6844,11 +6850,13 @@ void art_free(art_t *art);
  */
 size_t art_size_in_bytes(const art_t *art);
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 /**
  * Prints the ART using printf, useful for debugging.
  */
 void art_printf(const art_t *art);
-
+#endif
+ 
 /**
  * Callback for validating the value stored in a leaf.
  *
@@ -10452,9 +10460,9 @@ size_t art_size_in_bytes_at(const art_node_t *node) {
     return size;
 }
 
- 
-static void art_node_print_type(const art_node_t *node) {
+
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
+static void art_node_print_type(const art_node_t *node) {
   if (art_is_leaf(node)) {
         printf("Leaf");
         return;
@@ -10476,10 +10484,9 @@ static void art_node_print_type(const art_node_t *node) {
             assert(false);
             return;
     }
-#endif
 }
 
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES 
+ 
 void art_node_printf(const art_node_t *node, uint8_t depth) {
     if (art_is_leaf(node)) {
         printf("{ type: Leaf, key: ");
@@ -10603,7 +10610,7 @@ size_t art_size_in_bytes(const art_t *art) {
     return size;
 }
 
- #ifdef NDPI_ENABLE_DEBUG_MESSAGES
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 void art_printf(const art_t *art) {
     if (art->root == NULL) {
         return;
