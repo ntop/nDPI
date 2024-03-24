@@ -132,7 +132,13 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 	        AC_MSG_RESULT([no])
 		  AC_DEFINE_UNQUOTED(USE_ROARING_V2, "1", [Use CRoaring 2.1.x])
   ])
-		  
+
+GCC_VERSION=`gcc --version | cut -d ' ' -f 3 | head -1|cut -d '.' -f 1`
+if [ "${GCC_VERSION}" -lt "7" ]; then
+ AC_DEFINE_UNQUOTED(USE_ROARING_V2, "1", [Use CRoaring 2.1.x])
+fi
+
+
 NDPI_MAJOR=`echo "${PACKAGE_VERSION}" | cut -d . -f 1`
 NDPI_MINOR=`echo "${PACKAGE_VERSION}" | cut -d . -f 2`
 NDPI_PATCH=`echo "${PACKAGE_VERSION}" | cut -d . -f 3`
