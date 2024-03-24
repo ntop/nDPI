@@ -744,7 +744,8 @@ static inline uint32_t croaring_refcount_get(const croaring_refcount_t *val) {
     // > of the variable updated; all bits are updated in an atomic fashion.
     return *val;
 }
-#elif CROARING_ATOMIC_IMPL == CROARING_ATOMIC_IMPL_NONE
+//#elif CROARING_ATOMIC_IMPL == CROARING_ATOMIC_IMPL_NONE
+#else
 #include <assert.h>
 typedef uint32_t croaring_refcount_t;
 
@@ -761,8 +762,8 @@ static inline bool croaring_refcount_dec(croaring_refcount_t *val) {
 static inline uint32_t croaring_refcount_get(const croaring_refcount_t *val) {
     return *val;
 }
-#else
-#error "Unknown atomic implementation"
+//#else
+//#error "Unknown atomic implementation"
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
