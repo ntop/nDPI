@@ -274,7 +274,7 @@ PPDerived movable_CAST_HELPER(Base **ptr_to_ptr) {
 
 #include <stddef.h>  // for size_t
 #include <stdint.h>
-
+#include <string.h>
 
 #if CROARING_IS_X64
 #ifndef CROARING_COMPILER_SUPPORTS_AVX512
