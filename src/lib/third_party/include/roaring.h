@@ -372,7 +372,7 @@ extern "C" {  // portability definitions are in global scope, not a namespace
 /* wrappers for Visual Studio built-ins that look like gcc built-ins
  * __builtin_ctzll */
 /** result might be undefined when input_num is zero */
-inline int roaring_trailing_zeroes(unsigned long long input_num) {
+static inline int roaring_trailing_zeroes(unsigned long long input_num) {
     unsigned long index;
 #ifdef _WIN64  // highly recommended!!!
     _BitScanForward64(&index, input_num);
@@ -390,7 +390,7 @@ inline int roaring_trailing_zeroes(unsigned long long input_num) {
 /* wrappers for Visual Studio built-ins that look like gcc built-ins
  * __builtin_clzll */
 /** result might be undefined when input_num is zero */
-inline int roaring_leading_zeroes(unsigned long long input_num) {
+static inline int roaring_leading_zeroes(unsigned long long input_num) {
     unsigned long index;
 #ifdef _WIN64  // highly recommended!!!
     _BitScanReverse64(&index, input_num);
@@ -415,11 +415,11 @@ inline int roaring_leading_zeroes(unsigned long long input_num) {
 #define CROARING_INTRINSICS 1
 #define roaring_unreachable __builtin_unreachable()
 /** result might be undefined when input_num is zero */
-inline int roaring_trailing_zeroes(unsigned long long input_num) {
+static inline int roaring_trailing_zeroes(unsigned long long input_num) {
     return __builtin_ctzll(input_num);
 }
 /** result might be undefined when input_num is zero */
-inline int roaring_leading_zeroes(unsigned long long input_num) {
+static inline int roaring_leading_zeroes(unsigned long long input_num) {
     return __builtin_clzll(input_num);
 }
 #endif
@@ -843,17 +843,17 @@ bitset_t *bitset_copy(const bitset_t *bitset);
 bool bitset_resize(bitset_t *bitset, size_t newarraysize, bool padwithzeroes);
 
 /* returns how many bytes of memory the backend buffer uses */
-inline size_t bitset_size_in_bytes(const bitset_t *bitset) {
+static inline size_t bitset_size_in_bytes(const bitset_t *bitset) {
     return bitset->arraysize * sizeof(uint64_t);
 }
 
 /* returns how many bits can be accessed */
-inline size_t bitset_size_in_bits(const bitset_t *bitset) {
+static inline size_t bitset_size_in_bits(const bitset_t *bitset) {
     return bitset->arraysize * 64;
 }
 
 /* returns how many words (64-bit) of memory the backend buffer uses */
-inline size_t bitset_size_in_words(const bitset_t *bitset) {
+static inline size_t bitset_size_in_words(const bitset_t *bitset) {
     return bitset->arraysize;
 }
 
@@ -875,7 +875,7 @@ void bitset_shift_right(bitset_t *bitset, size_t s);
 
 /* Set the ith bit. Attempts to resize the bitset if needed (may silently fail)
  */
-inline void bitset_set(bitset_t *bitset, size_t i) {
+static inline void bitset_set(bitset_t *bitset, size_t i) {
     size_t shiftedi = i / 64;
     if (shiftedi >= bitset->arraysize) {
         if (!bitset_grow(bitset, shiftedi + 1)) {
@@ -887,7 +887,7 @@ inline void bitset_set(bitset_t *bitset, size_t i) {
 
 /* Set the ith bit to the specified value. Attempts to resize the bitset if
  * needed (may silently fail) */
-inline void bitset_set_to_value(bitset_t *bitset, size_t i, bool flag) {
+static inline void bitset_set_to_value(bitset_t *bitset, size_t i, bool flag) {
     size_t shiftedi = i / 64;
     uint64_t mask = ((uint64_t)1) << (i % 64);
     uint64_t dynmask = ((uint64_t)flag) << (i % 64);
@@ -903,7 +903,7 @@ inline void bitset_set_to_value(bitset_t *bitset, size_t i, bool flag) {
 }
 
 /* Get the value of the ith bit.  */
-inline bool bitset_get(const bitset_t *bitset, size_t i) {
+static inline bool bitset_get(const bitset_t *bitset, size_t i) {
     size_t shiftedi = i / 64;
     if (shiftedi >= bitset->arraysize) {
         return false;
@@ -974,7 +974,7 @@ size_t bitset_symmetric_difference_count(const bitset_t *CBITSET_RESTRICT b1,
     //.....
   }
   */
-inline bool bitset_next_set_bit(const bitset_t *bitset, size_t *i) {
+static inline bool bitset_next_set_bit(const bitset_t *bitset, size_t *i) {
     size_t x = *i / 64;
     if (x >= bitset->arraysize) {
         return false;
@@ -1006,7 +1006,7 @@ inline bool bitset_next_set_bit(const bitset_t *bitset, size_t *i) {
     //.....
   }
   */
-inline size_t bitset_next_set_bits(const bitset_t *bitset, size_t *buffer,
+static inline size_t bitset_next_set_bits(const bitset_t *bitset, size_t *buffer,
                                    size_t capacity, size_t *startfrom) {
     if (capacity == 0) return 0;  // sanity check
     size_t x = *startfrom / 64;
@@ -1042,7 +1042,7 @@ end:
 typedef bool (*bitset_iterator)(size_t value, void *param);
 
 // return true if uninterrupted
-inline bool bitset_for_each(const bitset_t *b, bitset_iterator iterator,
+static inline bool bitset_for_each(const bitset_t *b, bitset_iterator iterator,
                             void *ptr) {
   size_t base = 0, i;
     for (i = 0; i < b->arraysize; ++i) {
@@ -1058,7 +1058,7 @@ inline bool bitset_for_each(const bitset_t *b, bitset_iterator iterator,
     return true;
 }
 
-inline void bitset_print(const bitset_t *b) {
+static inline void bitset_print(const bitset_t *b) {
     size_t i;
     printf("{");
     for (i = 0; bitset_next_set_bit(b, &i); i++) {
@@ -1113,7 +1113,7 @@ roaring_bitmap_t *roaring_bitmap_create_with_capacity(uint32_t cap);
  * Returns NULL if the allocation fails.
  * Client is responsible for calling `roaring_bitmap_free()`.
  */
-inline roaring_bitmap_t *roaring_bitmap_create(void) {
+static inline roaring_bitmap_t *roaring_bitmap_create(void) {
     return roaring_bitmap_create_with_capacity(0);
 }
 
@@ -1129,7 +1129,7 @@ bool roaring_bitmap_init_with_capacity(roaring_bitmap_t *r, uint32_t cap);
  * The bitmap will be in a "clear" state, with no auxiliary allocations.
  * Since this performs no allocations, the function will not fail.
  */
-inline void roaring_bitmap_init_cleared(roaring_bitmap_t *r) {
+static inline void roaring_bitmap_init_cleared(roaring_bitmap_t *r) {
     roaring_bitmap_init_with_capacity(r, 0);
 }
 
@@ -1154,10 +1154,10 @@ roaring_bitmap_t *roaring_bitmap_of_ptr(size_t n_args, const uint32_t *vals);
  * do so for all of your bitmaps, since interactions between bitmaps with and
  * without COW is unsafe.
  */
-inline bool roaring_bitmap_get_copy_on_write(const roaring_bitmap_t *r) {
+static inline bool roaring_bitmap_get_copy_on_write(const roaring_bitmap_t *r) {
     return r->high_low_container.flags & ROARING_FLAG_COW;
 }
-inline void roaring_bitmap_set_copy_on_write(roaring_bitmap_t *r, bool cow) {
+static inline void roaring_bitmap_set_copy_on_write(roaring_bitmap_t *r, bool cow) {
     if (cow) {
         r->high_low_container.flags |= ROARING_FLAG_COW;
     } else {
@@ -1458,7 +1458,7 @@ void roaring_bitmap_add_range_closed(roaring_bitmap_t *r, uint32_t min,
 /**
  * Add all values in range [min, max)
  */
-inline void roaring_bitmap_add_range(roaring_bitmap_t *r, uint64_t min,
+static inline void roaring_bitmap_add_range(roaring_bitmap_t *r, uint64_t min,
                                      uint64_t max) {
     if (max <= min) return;
     roaring_bitmap_add_range_closed(r, (uint32_t)min, (uint32_t)(max - 1));
@@ -1478,7 +1478,7 @@ void roaring_bitmap_remove_range_closed(roaring_bitmap_t *r, uint32_t min,
 /**
  * Remove all values in range [min, max)
  */
-inline void roaring_bitmap_remove_range(roaring_bitmap_t *r, uint64_t min,
+static inline void roaring_bitmap_remove_range(roaring_bitmap_t *r, uint64_t min,
                                         uint64_t max) {
     if (max <= min) return;
     roaring_bitmap_remove_range_closed(r, (uint32_t)min, (uint32_t)(max - 1));
