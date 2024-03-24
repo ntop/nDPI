@@ -10813,7 +10813,8 @@ static bool art_node_iterator_lower_bound(const art_node_t *node,
 }
 
 art_iterator_t art_init_iterator(const art_t *art, bool first) {
-    art_iterator_t iterator = {0};
+    art_iterator_t iterator;
+    memset(&iterator, 0, sizeof(iterator));
     if (art->root == NULL) {
         return iterator;
     }
@@ -10870,7 +10871,8 @@ bool art_iterator_lower_bound(art_iterator_t *iterator,
 }
 
 art_iterator_t art_lower_bound(const art_t *art, const art_key_chunk_t *key) {
-    art_iterator_t iterator = {0};
+    art_iterator_t iterator;
+    memset(&iterator, 0, sizeof(iterator));
     if (art->root != NULL) {
         art_node_iterator_lower_bound(art->root, &iterator, key);
     }
@@ -10878,7 +10880,8 @@ art_iterator_t art_lower_bound(const art_t *art, const art_key_chunk_t *key) {
 }
 
 art_iterator_t art_upper_bound(const art_t *art, const art_key_chunk_t *key) {
-    art_iterator_t iterator = {0};
+    art_iterator_t iterator;
+    memset(&iterator, 0, sizeof(iterator));
     if (art->root != NULL) {
         if (art_node_iterator_lower_bound(art->root, &iterator, key) &&
             art_compare_keys(iterator.key, key) == 0) {
@@ -19515,7 +19518,8 @@ roaring_bitmap_t *roaring_bitmap_of(size_t n_args, ...) {
     // todo: could be greatly optimized but we do not expect this call to ever
     // include long lists
     roaring_bitmap_t *answer = roaring_bitmap_create();
-    roaring_bulk_context_t context = {0};
+    roaring_bulk_context_t context;
+    memset(&context, 0, sizeof(context));
     va_list ap;
     va_start(ap, n_args);
     size_t i; for(i = 0; i < n_args; i++) {
@@ -20879,7 +20883,7 @@ roaring_bitmap_t *roaring_bitmap_deserialize(const void *buf) {
         if (bitmap == NULL) {
             return NULL;
         }
-        roaring_bulk_context_t context = {0};
+        roaring_bulk_context_t context; memset(&context, 0, sizeof(context));
         uint32_t i; for(i = 0; i < card; i++) {
             // elems may not be aligned, read with memcpy
             uint32_t elem;
@@ -20922,7 +20926,7 @@ roaring_bitmap_t *roaring_bitmap_deserialize_safe(const void *buf,
         if (bitmap == NULL) {
             return NULL;
         }
-        roaring_bulk_context_t context = {0};
+        roaring_bulk_context_t context; memset(&context, 0, sizeof(context));
         uint32_t i; for(i = 0; i < card; i++) {
             // elems may not be aligned, read with memcpy
             uint32_t elem;
@@ -22924,7 +22928,7 @@ roaring64_bitmap_t *roaring64_bitmap_of_ptr(size_t n_args,
 
 roaring64_bitmap_t *roaring64_bitmap_of(size_t n_args, ...) {
     roaring64_bitmap_t *r = roaring64_bitmap_create();
-    roaring64_bulk_context_t context = {0};
+    roaring64_bulk_context_t context; memset(&context, 0, sizeof(context));
     va_list ap;
     va_start(ap, n_args);
     size_t i; for(i = 0; i < n_args; i++) {
@@ -23017,7 +23021,7 @@ void roaring64_bitmap_add_many(roaring64_bitmap_t *r, size_t n_args,
         return;
     }
     const uint64_t *end = vals + n_args;
-    roaring64_bulk_context_t context = {0};
+    roaring64_bulk_context_t context; memset(&context, 0, sizeof(context));
     const uint64_t *current_val; for(current_val = vals; current_val != end;
          current_val++) {
         roaring64_bitmap_add_bulk(r, &context, *current_val);
@@ -23340,7 +23344,7 @@ void roaring64_bitmap_remove_many(roaring64_bitmap_t *r, size_t n_args,
         return;
     }
     const uint64_t *end = vals + n_args;
-    roaring64_bulk_context_t context = {0};
+    roaring64_bulk_context_t context; memset(&context, 0, sizeof(context));
     const uint64_t *current_val; for(current_val = vals; current_val != end;
          current_val++) {
         roaring64_bitmap_remove_bulk(r, &context, *current_val);
