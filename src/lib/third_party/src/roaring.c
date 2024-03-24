@@ -12223,7 +12223,8 @@ size_t bitset_extract_setbits_avx2(const uint64_t *words, size_t length,
         if (w == 0) {
             baseVec = _mm256_add_epi32(baseVec, incVec);
         } else {
-            for (int k = 0; k < 4; ++k) {
+	  int k;
+            for (k = 0; k < 4; ++k) {
                 uint8_t byteA = (uint8_t)w;
                 uint8_t byteB = (uint8_t)(w >> 8);
                 w >>= 16;
@@ -14423,7 +14424,8 @@ bool bitset_container_is_subset(const bitset_container_t *container1,
             return false;
         }
     }
-    for(int32_t i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
+    int32_t i;
+    for(i = 0; i < BITSET_CONTAINER_SIZE_IN_WORDS; ++i ) {
 		if((container1->words[i] & container2->words[i]) != container1->words[i]) {
 			return false;
 		}
@@ -14513,7 +14515,8 @@ uint32_t bitset_container_rank_many(const bitset_container_t *container, uint64_
       if(xhigh != high) return iter - begin; // stop at next container
 
       uint16_t xlow = (uint16_t)x;
-      for(int count = xlow / 64; i < count; i++){
+      int count;
+      for(count = xlow / 64; i < count; i++){
         sum += roaring_hamming(container->words[i]);
       }
       uint64_t lastword = container->words[i];
