@@ -1044,8 +1044,8 @@ typedef bool (*bitset_iterator)(size_t value, void *param);
 // return true if uninterrupted
 inline bool bitset_for_each(const bitset_t *b, bitset_iterator iterator,
                             void *ptr) {
-    size_t base = 0;
-    for (size_t i = 0; i < b->arraysize; ++i) {
+  size_t base = 0, i;
+    for (i = 0; i < b->arraysize; ++i) {
         uint64_t w = b->array[i];
         while (w != 0) {
             uint64_t t = w & (~w + 1);
@@ -1059,8 +1059,9 @@ inline bool bitset_for_each(const bitset_t *b, bitset_iterator iterator,
 }
 
 inline void bitset_print(const bitset_t *b) {
+    size_t i;
     printf("{");
-    for (size_t i = 0; bitset_next_set_bit(b, &i); i++) {
+    for (i = 0; bitset_next_set_bit(b, &i); i++) {
         printf("%zu, ", i);
     }
     printf("}");
