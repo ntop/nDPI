@@ -137,7 +137,7 @@
     <ClCompile Include="..\src\lib\ndpi_binary_bitmap.c" />
     <ClCompile Include="..\src\lib\ndpi_hash.c" />
     <ClCompile Include="..\src\lib\ndpi_domain_classify.c" />
-    <ClCompile Include="..\src\lib\ndpi_bitmap64.c" />
+    <ClCompile Include="..\src\lib\ndpi_bitmap64_fuse.c" />
     <ClCompile Include="..\src\lib\protocols\activision.c" />
     <ClCompile Include="..\src\lib\protocols\afp.c" />
     <ClCompile Include="..\src\lib\protocols\ajp.c" />

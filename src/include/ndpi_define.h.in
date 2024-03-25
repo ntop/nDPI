@@ -176,6 +176,7 @@
 #define get_u_int32_t(X,O)  (*(u_int32_t *)((&(((u_int8_t *)X)[O]))))
 #if defined(__arm__)
 #include <stdint.h>
+#include <string.h>
 static inline uint64_t get_u_int64_t(const uint8_t* X, int O)
 {
   uint64_t tmp;
