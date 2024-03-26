@@ -199,9 +199,7 @@ AS_IF([test "x${enable_tls_sigs}" = "xyes"],[
   HANDLE_TLS_SIGS=""
 ])
 
-NDPI_CFLAGS="-W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-address-of-packed-member ${NDPI_CFLAGS} -Wno-attributes"
-#Workaround for RoaringBitmap with gcc-7
-NDPI_CFLAGS="-Wno-attributes ${NDPI_CFLAGS}"
+NDPI_CFLAGS="-W -Wall -Wno-address-of-packed-member ${NDPI_CFLAGS} -Wno-attributes"
 
 AS_IF([test "${with_lto_and_gold_linker+set}" = set], [
        NDPI_CFLAGS="${NDPI_CFLAGS} -flto -fuse-ld=gold -Wno-unused-command-line-argument"
@@ -323,6 +321,9 @@ esac
 AC_ARG_ENABLE([debug-messages],
     AS_HELP_STRING([--enable-debug-messages], [Define NDPI_ENABLE_DEBUG_MESSAGES=1]), [
 	AC_DEFINE(NDPI_ENABLE_DEBUG_MESSAGES, 1, [Enable ndpi_debug_messages]) ])
+AS_IF([test "x$enable_debug_messages" = "xyes"], [
+    NDPI_CFLAGS="${NDPI_CFLAGS} -Wno-unused-parameter"
+])
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [
     AC_PROG_CXX

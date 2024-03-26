@@ -44,7 +44,7 @@ static void ndpi_search_icecast_tcp(struct ndpi_detection_module_struct *ndpi_st
   if((packet->payload_packet_len < 500 &&
        packet->payload_packet_len >= 7 && memcmp(packet->payload, "SOURCE ", 7) == 0)
       || flow->l4.tcp.icecast_stage) {
-    ndpi_parse_packet_line_info_any(ndpi_struct, flow);
+    ndpi_parse_packet_line_info_any(ndpi_struct);
     NDPI_LOG_DBG2(ndpi_struct, "Icecast lines=%d\n", packet->parsed_lines);
     for (i = 0; i < packet->parsed_lines; i++) {
       if(packet->line[i].ptr != NULL && packet->line[i].len > 4

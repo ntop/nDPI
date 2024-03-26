@@ -25,7 +25,6 @@
 
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
-				 u_int8_t protocol,
 				 u_int32_t saddr, u_int32_t daddr) /* host endianess */
 {
   u_int16_t rc;
@@ -56,7 +55,6 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
   if(packet->iph /* IPv4 Only: we need to support packet->iphv6 at some point */) {
     proto = ndpi_search_tcp_or_udp_raw(ndpi_struct,
 				       flow,
-				       flow->l4_proto,
 				       ntohl(packet->iph->saddr), 
 				       ntohl(packet->iph->daddr));
 

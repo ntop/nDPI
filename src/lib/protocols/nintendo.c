@@ -29,8 +29,7 @@
 #include "ndpi_private.h"
 
 static void ndpi_int_nintendo_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					     struct ndpi_flow_struct *flow,
-					     u_int8_t due_to_correlation) {
+					     struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NINTENDO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -46,7 +45,7 @@ static void ndpi_search_nintendo(struct ndpi_detection_module_struct *ndpi_struc
 
       if(memcmp(payload, nintendo_pattern, 5) == 0) {
 	NDPI_LOG_INFO(ndpi_struct, "found nintendo\n");
-	ndpi_int_nintendo_add_connection(ndpi_struct, flow, 0);
+	ndpi_int_nintendo_add_connection(ndpi_struct, flow);
 	return;
       }
     }

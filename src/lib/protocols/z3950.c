@@ -35,7 +35,6 @@ static void ndpi_int_z3950_add_connection(struct ndpi_detection_module_struct *n
 /* ***************************************************************** */
 
 static int z3950_parse_sequences(struct ndpi_packet_struct const * const packet,
-				 struct ndpi_flow_struct *flow,
                                  int max_sequences) {
   size_t payload_offset = 2;
   int cur_sequences = 0;
@@ -92,7 +91,7 @@ static void ndpi_search_z3950(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->tcp != NULL && packet->payload_packet_len >= 6 &&
      flow->packet_counter >= 1 && flow->packet_counter <= 8) {
-    int ret = z3950_parse_sequences(packet, flow, minimum_expected_sequences);
+    int ret = z3950_parse_sequences(packet, minimum_expected_sequences);
 
     if(ret < 0) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

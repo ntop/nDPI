@@ -30,8 +30,7 @@
 
 
 static void ndpi_int_spotify_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					    struct ndpi_flow_struct *flow,
-					    u_int8_t due_to_correlation)
+					    struct ndpi_flow_struct *flow)
 {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SPOTIFY, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
@@ -50,7 +49,7 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
       if(payload_len >= 7) {
 	if(memcmp(packet->payload, "SpotUdp", 7) == 0) {
 	  NDPI_LOG_INFO(ndpi_struct, "found spotify udp dissector\n");
-	  ndpi_int_spotify_add_connection(ndpi_struct, flow, 0);
+	  ndpi_int_spotify_add_connection(ndpi_struct, flow);
 	  return;
 	}
       }
@@ -62,7 +61,7 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
        packet->payload[6] == 0x52 && (packet->payload[7] == 0x0e || packet->payload[7] == 0x0f) &&
        packet->payload[8] == 0x50 ) {
       NDPI_LOG_INFO(ndpi_struct, "found spotify tcp dissector\n");
-      ndpi_int_spotify_add_connection(ndpi_struct, flow, 0);
+      ndpi_int_spotify_add_connection(ndpi_struct, flow);
     }
   }
 

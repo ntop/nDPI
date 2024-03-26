@@ -32,8 +32,7 @@
 #define DB_LSP_PORT 17500
 
 static void ndpi_int_dropbox_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					    struct ndpi_flow_struct *flow,
-					    u_int8_t due_to_correlation) {
+					    struct ndpi_flow_struct *flow) {
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DROPBOX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -49,7 +48,7 @@ static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct,
       if(payload_len > 10) {
         if(ndpi_strnstr((const char *)packet->payload, "\"host_int\"", payload_len) != NULL) {	    
           NDPI_LOG_INFO(ndpi_struct, "found dropbox\n");
-          ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
+          ndpi_int_dropbox_add_connection(ndpi_struct, flow);
           return;
 	}
       }
@@ -57,7 +56,7 @@ static void ndpi_check_dropbox(struct ndpi_detection_module_struct *ndpi_struct,
       if(payload_len > 10) {
         if(ndpi_strnstr((const char *)packet->payload, "Bus17Cmd", payload_len) != NULL) {	    
           NDPI_LOG_INFO(ndpi_struct, "found dropbox\n");
-          ndpi_int_dropbox_add_connection(ndpi_struct, flow, 0);
+          ndpi_int_dropbox_add_connection(ndpi_struct, flow);
           return;
 	}
       }

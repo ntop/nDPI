@@ -65,7 +65,7 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
 	return(1);
 	
       flow->protos.telnet.password_detected = 1;
-      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
+      ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
       flow->protos.telnet.password[flow->protos.telnet.character_id] = '\0';
       return(0);
     }
@@ -99,7 +99,7 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
 
     snprintf(buf, sizeof(buf), "Found Telnet username (%s)",
 	     flow->protos.telnet.username);
-    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
+    ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
 
     return(1);
   }
@@ -146,8 +146,7 @@ __mingw_forceinline static
 #else
 __forceinline static
 #endif
-u_int8_t search_iac(struct ndpi_detection_module_struct *ndpi_struct,
-		    struct ndpi_flow_struct *flow) {
+u_int8_t search_iac(struct ndpi_detection_module_struct *ndpi_struct) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   u_int16_t a;
@@ -189,7 +188,7 @@ static void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct *ndpi_str
 				   struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search telnet\n");
 
-  if(search_iac(ndpi_struct, flow) == 1) {
+  if(search_iac(ndpi_struct) == 1) {
     if(flow->l4.tcp.telnet_stage == 2) {
       NDPI_LOG_INFO(ndpi_struct, "found telnet\n");
       ndpi_int_telnet_add_connection(ndpi_struct, flow);

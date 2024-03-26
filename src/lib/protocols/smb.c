@@ -52,7 +52,7 @@ static void ndpi_search_smb_tcp(struct ndpi_detection_module_struct *ndpi_struct
           if(packet->payload[8] != 0x72) /* Skip Negotiate request */ {
             NDPI_LOG_INFO(ndpi_struct, "found SMBv1\n");
             ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
-            ndpi_set_risk(ndpi_struct, flow, NDPI_SMB_INSECURE_VERSION, "Found SMBv1");
+            ndpi_set_risk(flow, NDPI_SMB_INSECURE_VERSION, "Found SMBv1");
           }
           return;
         } else if(memcmp(&packet->payload[4], smbv2, sizeof(smbv2)) == 0) {
