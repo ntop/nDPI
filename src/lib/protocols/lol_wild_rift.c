@@ -31,12 +31,28 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
+static void ndpi_int_lolwildrift_add_connection(struct ndpi_detection_module_struct *ndpi_struct, 
+                                                struct ndpi_flow_struct *flow)
+{
+  NDPI_LOG_INFO(ndpi_struct, "found League of Legends: Wild Rift\n");
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LOLWILDRIFT,
+                             NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+}
+
 static void ndpi_search_lolwildrift(struct ndpi_detection_module_struct *ndpi_struct,
                                     struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search League of Legends: Wild Rift\n");
+
+  if (packet->payload_packet_len == 22 &&
+      ntohl(get_u_int32_t(packet->payload, 0)) == 0x102C841 &&
+      ntohl(get_u_int32_t(packet->payload, packet->payload_packet_len-4)) == 0x41304231)
+  {
+    ndpi_int_lolwildrift_add_connection(ndpi_struct, flow);
+    return;
+  }
 
   if (packet->payload_packet_len == 69 &&
       ntohl(get_u_int32_t(packet->payload, 0)) == 0x4000000)
@@ -49,10 +65,7 @@ static void ndpi_search_lolwildrift(struct ndpi_detection_module_struct *ndpi_st
       packet->payload_packet_len == 359 &&
       ntohl(get_u_int32_t(packet->payload, 0)) == 0x10000000)
   {
-    NDPI_LOG_INFO(ndpi_struct, "found League of Legends: Wild Rift\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow,
-                               NDPI_PROTOCOL_LOLWILDRIFT, NDPI_PROTOCOL_UNKNOWN,
-                               NDPI_CONFIDENCE_DPI);
+    ndpi_int_lolwildrift_add_connection(ndpi_struct, flow);
     return;
   }
 
