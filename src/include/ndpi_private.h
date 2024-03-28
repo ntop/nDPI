@@ -558,8 +558,7 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct
 				u_int16_t lower_detected_protocol,
 				ndpi_confidence_t confidence);
 
-void reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-			     struct ndpi_flow_struct *flow);
+void reset_detected_protocol(struct ndpi_flow_struct *flow);
 
 void ndpi_set_detected_protocol_keeping_master(struct ndpi_detection_module_struct *ndpi_str,
 					       struct ndpi_flow_struct *flow,
@@ -576,8 +575,7 @@ char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value, 
 
 void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struct,
 					  struct ndpi_flow_struct *flow);
-void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_struct,
-					      struct ndpi_flow_struct *flow);
+void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_struct);
 
 void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str);
 u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
@@ -593,7 +591,6 @@ u_int8_t ends_with(struct ndpi_detection_module_struct *ndpi_struct,
 
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
-				 u_int8_t protocol,
 				 u_int32_t saddr, u_int32_t daddr);
 
 u_int32_t ip_port_hash_funct(u_int32_t ip, u_int16_t port);
@@ -627,8 +624,7 @@ void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_st
 				    struct ndpi_flow_struct *flow);
 
 /* HTTP */
-void http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
-                             struct ndpi_flow_struct *flow,
+void http_process_user_agent(struct ndpi_flow_struct *flow,
                              const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
 
 /* OOKLA */
@@ -648,15 +644,13 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
                  struct ndpi_flow_struct *flow,
                  const u_int8_t *crypto_data, uint32_t crypto_data_len);
-const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
-                               struct ndpi_flow_struct *flow,
+const uint8_t *get_crypto_data(struct ndpi_flow_struct *flow,
                                u_int8_t *clear_payload, uint32_t clear_payload_len,
                                uint64_t *crypto_data_len);
 
 /* RTP */
 int is_valid_rtp_payload_type(uint8_t type);
-int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
-                          struct ndpi_flow_struct *flow);
+int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct);
 u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_type);
 
 /* Bittorrent */

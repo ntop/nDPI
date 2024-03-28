@@ -34,7 +34,7 @@ __mingw_forceinline static
 #else
 __forceinline static
 #endif
-u_int8_t ndpi_int_zattoo_user_agent_set(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+u_int8_t ndpi_int_zattoo_user_agent_set(struct ndpi_detection_module_struct *ndpi_struct)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
@@ -90,7 +90,7 @@ static void ndpi_search_zattoo(struct ndpi_detection_module_struct *ndpi_struct,
        * that might be changed later */
       ndpi_parse_packet_line_info(ndpi_struct, flow);
 
-      if(ndpi_int_zattoo_user_agent_set(ndpi_struct, flow)) {
+      if(ndpi_int_zattoo_user_agent_set(ndpi_struct)) {
 	
 	NDPI_LOG_INFO(ndpi_struct, "found zattoo. add connection over tcp with pattern GET / or POST /\n");
 	ZATTOO_DETECTED;

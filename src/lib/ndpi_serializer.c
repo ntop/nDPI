@@ -505,11 +505,13 @@ static inline void ndpi_serialize_single_float(ndpi_private_serializer *serializ
 /* ********************************** */
 
 /* TODO: fix portability across platforms */
+#if 0
 static inline void ndpi_serialize_single_double(ndpi_private_serializer *serializer,
                            double s) {
   memcpy(&serializer->buffer.data[serializer->status.buffer.size_used], &s, sizeof(s));
   serializer->status.buffer.size_used += sizeof(double);
 }
+#endif
 
 /* ********************************** */
 

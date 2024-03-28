@@ -149,9 +149,7 @@ static u_int32_t __get_master(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
-static int ndpi_search_tls_memory(struct ndpi_detection_module_struct *ndpi_struct,
-				  struct ndpi_flow_struct *flow,
-				  const u_int8_t *payload,
+static int ndpi_search_tls_memory(const u_int8_t *payload,
 				  u_int16_t payload_len,
 				  u_int32_t seq,
 				  message_t *message) {
@@ -987,7 +985,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   message = &flow->tls_quic.message[packet->packet_direction];
-  if(ndpi_search_tls_memory(ndpi_struct, flow, packet->payload,
+  if(ndpi_search_tls_memory(packet->payload,
 			    packet->payload_packet_len, ntohl(packet->tcp->seq),
 			    message) == -1)
     return 0; /* Error -> stop */
@@ -1286,11 +1284,11 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
 	  }
 
           if(handshake_frag_off == 0) {
-            rc = ndpi_search_tls_memory(ndpi_struct, flow,  &block[13],
+            rc = ndpi_search_tls_memory(&block[13],
 					handshake_frag_len + 12,
 					handshake_frag_off, message);
 	  } else {
-            rc = ndpi_search_tls_memory(ndpi_struct, flow,  &block[13 + 12],
+            rc = ndpi_search_tls_memory(&block[13 + 12],
 					handshake_frag_len,
 					handshake_frag_off + 12, message);
 	  }
@@ -1601,8 +1599,7 @@ static int u_int16_t_cmpfunc(const void * a, const void * b) { return(*(u_int16_
 
 /* **************************************** */
 
-static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
-			     struct ndpi_flow_struct *flow,
+static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
 			     u_int32_t quic_version,
 			     union ja_info *ja) {
   u_int8_t tmp_str[JA_STR_LEN];
@@ -1680,7 +1677,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
     break;
   }
 
-  ja_str[3] = ndpi_isset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST) ? 'i' : 'd', ja_str_len = 4;
+  ja_str[3] = ndpi_isset_risk(flow, NDPI_NUMERIC_IP_HOST) ? 'i' : 'd', ja_str_len = 4;
 
   /* JA4_a */
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len, "%02u%02u%c%c_",
@@ -2825,7 +2822,7 @@ compute_ja3c:
 	      }
 
 	      if(ndpi_struct->cfg.tls_ja4c_fingerprint_enabled) {
-	        ndpi_compute_ja4(ndpi_struct, flow, quic_version, &ja);
+	        ndpi_compute_ja4(flow, quic_version, &ja);
 	      }
 	      /* End JA3/JA4 */
 	    }

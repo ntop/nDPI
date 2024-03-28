@@ -448,7 +448,7 @@ void ndpi_set_proto_category(struct ndpi_detection_module_struct *ndpi_str, u_in
   - HTTP/SSL are NOT informative as SSL.Facebook (likely) means that this is
   SSL (HTTPS) traffic containg Facebook traffic.
 */
-u_int8_t ndpi_is_subprotocol_informative(struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId) {
+u_int8_t ndpi_is_subprotocol_informative(u_int16_t protoId) {
   if(!ndpi_is_valid_protoId(protoId))
     return(0);
 
@@ -2779,8 +2779,7 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************* */
 
-static void ndpi_init_ptree_ipv4(struct ndpi_detection_module_struct *ndpi_str,
-				 void *ptree, ndpi_network host_list[]) {
+static void ndpi_init_ptree_ipv4(void *ptree, ndpi_network host_list[]) {
   int i;
 
   for(i = 0; host_list[i].network != 0x0; i++) {
@@ -3016,6 +3015,10 @@ void ndpi_debug_printf(unsigned int proto, struct ndpi_detection_module_struct *
   } else {
     printf("Proto: %u, %s", proto, str);
   }
+#else
+  (void)file_name;
+  (void)func_name;
+  (void)line_number;
 #endif
 
 }
@@ -3246,7 +3249,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
     ndpi_exit_detection_module(ndpi_str);
     return NULL;
   }
-  ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, host_protocol_list);
+  ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, host_protocol_list);
 
 
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
@@ -3454,199 +3457,199 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   }
 
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AMAZON_AWS)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_amazon_aws_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_amazon_aws_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_amazon_aws_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_MICROSOFT_AZURE)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_azure_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_microsoft_azure_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_microsoft_azure_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_CACHEFLY)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_cachefly_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_cachefly_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_cachefly_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_CLOUDFLARE)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_cloudflare_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_cloudflare_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_cloudflare_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_GOOGLE)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_google_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_google_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_google_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_GOOGLE_CLOUD)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_google_cloud_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_google_cloud_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_google_cloud_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_MICROSOFT_365)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_microsoft_365_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_microsoft_365_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_microsoft_365_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_MS_ONE_DRIVE)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ms_one_drive_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_ms_one_drive_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_ms_one_drive_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_MS_OUTLOOK)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ms_outlook_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_ms_outlook_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_ms_outlook_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_SKYPE_TEAMS)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_skype_teams_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_skype_teams_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_skype_teams_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_PROTONVPN)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_protonvpn_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_protonvpn_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_protonvpn_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_TOR)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_tor_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_tor_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_tor_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_WHATSAPP)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_whatsapp_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_whatsapp_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_whatsapp_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_ETHEREUM)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ethereum_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_ethereum_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_ethereum_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_ZOOM)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_zoom_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_zoom_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_zoom_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_MULLVAD)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_mullvad_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_mullvad_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_mullvad_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_TELEGRAM)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_telegram_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_telegram_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_telegram_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_APPLE)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_apple_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_apple_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_apple_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_TWITTER)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_twitter_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_twitter_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_twitter_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_NETFLIX)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_netflix_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_netflix_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_netflix_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_WEBEX)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_webex_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_webex_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_webex_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_TEAMVIEWER)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_teamviewer_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_teamviewer_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_teamviewer_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_FACEBOOK)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_facebook_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_facebook_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_facebook_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_TENCENT)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_tencent_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_tencent_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_tencent_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_OPENDNS)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_opendns_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_opendns_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_opendns_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_DROPBOX)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_dropbox_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_dropbox_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_dropbox_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_STARCRAFT)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_starcraft_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_starcraft_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_starcraft_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_UBUNTUONE)) {
-   ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_ubuntuone_protocol_list);
+   ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_ubuntuone_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_ubuntuone_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_TWITCH)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_twitch_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_twitch_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_twitch_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_HOTSPOT_SHIELD)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_hotspot_shield_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_hotspot_shield_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_hotspot_shield_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_GITHUB)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_github_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_github_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_github_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_STEAM)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_steam_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_steam_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_steam_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_BLOOMBERG)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_bloomberg_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_bloomberg_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_bloomberg_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_EDGECAST)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_edgecast_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_edgecast_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_edgecast_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_GOTO)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_goto_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_goto_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_goto_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_RIOTGAMES)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_riotgames_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_riotgames_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_riotgames_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_THREEMA)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_threema_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_threema_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_threema_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_ALIBABA)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_alibaba_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_alibaba_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_alibaba_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AVAST)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_avast_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_avast_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_avast_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_DISCORD)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_discord_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_discord_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_discord_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_LINE)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_line_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_line_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_line_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_VK)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_vk_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_vk_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_vk_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_YANDEX)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_yandex_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_yandex_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_yandex_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_YANDEX_CLOUD)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_yandex_cloud_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_yandex_cloud_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_yandex_cloud_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_DISNEYPLUS)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_disneyplus_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_disneyplus_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_disneyplus_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_HULU)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_hulu_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_hulu_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_hulu_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_EPICGAMES)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_epicgames_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_epicgames_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_epicgames_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_NVIDIA)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_nvidia_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_nvidia_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_nvidia_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_ROBLOX)) {
-    ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->protocols_ptree, ndpi_protocol_roblox_protocol_list);
+    ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, ndpi_protocol_roblox_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols_ptree6, ndpi_protocol_roblox_protocol_list_6);
   }
 
@@ -3658,15 +3661,15 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     }
 
     if(ndpi_str->cfg.risk_anonymous_subscriber_list_icloudprivaterelay_enabled) {
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list);
       ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk_ptree6, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list_6);
     }
     if(ndpi_str->cfg.risk_anonymous_subscriber_list_protonvpn_enabled) {
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_protonvpn_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str->ip_risk_ptree, ndpi_anonymous_subscriber_protonvpn_protocol_list);
       ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk_ptree6, ndpi_anonymous_subscriber_protonvpn_protocol_list_6);
     }
     if(ndpi_str->cfg.risk_crawler_bot_list_enabled) {
-      ndpi_init_ptree_ipv4(ndpi_str, ndpi_str->ip_risk_ptree, ndpi_http_crawler_bot_protocol_list);
+      ndpi_init_ptree_ipv4(ndpi_str->ip_risk_ptree, ndpi_http_crawler_bot_protocol_list);
       ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk_ptree6, ndpi_http_crawler_bot_protocol_list_6);
     }
   }
@@ -7319,8 +7322,7 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 
 /* ********************************************************************************* */
 
-static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_detection_module_struct *ndpi_str,
-						struct ndpi_flow_struct *flow,
+static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_flow_struct *flow,
 						u_int16_t sport, u_int16_t dport) {
 
   /*
@@ -7347,15 +7349,14 @@ static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_detection_module_str
 
 /* ********************************************************************************* */
 
-static void ndpi_reconcile_msteams_call_udp(struct ndpi_detection_module_struct *ndpi_str,
-					    struct ndpi_flow_struct *flow) {
+static void ndpi_reconcile_msteams_call_udp(struct ndpi_flow_struct *flow) {
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
     if(flow->l4_proto == IPPROTO_UDP) {
       u_int16_t sport = ntohs(flow->c_port);
       u_int16_t dport = ntohs(flow->s_port);
 
-      if(ndpi_reconcile_msteams_call_udp_port(ndpi_str, flow, sport, dport) == 0)
-	ndpi_reconcile_msteams_call_udp_port(ndpi_str, flow, dport, sport);
+      if(ndpi_reconcile_msteams_call_udp_port(flow, sport, dport) == 0)
+	ndpi_reconcile_msteams_call_udp_port(flow, dport, sport);
     }
   }
 }
@@ -7461,7 +7462,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       }
     }
 
-    ndpi_reconcile_msteams_call_udp(ndpi_str, flow);
+    ndpi_reconcile_msteams_call_udp(flow);
     break;
 
   case NDPI_PROTOCOL_RDP:
@@ -8145,9 +8146,7 @@ static int ndpi_is_ntop_protocol(ndpi_protocol *ret) {
 
 /* ********************************************************************************* */
 
-static int ndpi_check_protocol_port_mismatch_exceptions(struct ndpi_detection_module_struct *ndpi_str,
-							struct ndpi_flow_struct *flow,
-							default_ports_tree_node_t *expected_proto,
+static int ndpi_check_protocol_port_mismatch_exceptions(default_ports_tree_node_t *expected_proto,
 							ndpi_protocol *returned_proto) {
   /*
     For TLS (and other protocols) it is not simple to guess the exact protocol so before
@@ -8416,7 +8415,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
        ) {
       // printf("******** %u / %u\n", found->proto->protoId, ret.master_protocol);
 
-      if(!ndpi_check_protocol_port_mismatch_exceptions(ndpi_str, flow, found, &ret)) {
+      if(!ndpi_check_protocol_port_mismatch_exceptions(found, &ret)) {
 	/*
 	  Before triggering the alert we need to make some extra checks
 	  - the protocol found is not running on the port we have found
@@ -8715,7 +8714,7 @@ struct header_line {
   struct ndpi_int_one_line_struct *line;
 };
 
-static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow)
+static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str)
 {
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
   struct ndpi_int_one_line_struct *line;
@@ -8886,7 +8885,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
       packet->line[packet->parsed_lines].len =
 	(u_int16_t)(((size_t) &packet->payload[a]) - ((size_t) packet->line[packet->parsed_lines].ptr));
 
-      parse_single_packet_line(ndpi_str, flow);
+      parse_single_packet_line(ndpi_str);
 
       if(packet->line[packet->parsed_lines].len == 0) {
 	packet->empty_line_position = a;
@@ -8909,14 +8908,14 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
       (u_int16_t)(((size_t) &packet->payload[packet->payload_packet_len]) -
 		  ((size_t) packet->line[packet->parsed_lines].ptr));
 
-    parse_single_packet_line(ndpi_str, flow);
+    parse_single_packet_line(ndpi_str);
     packet->parsed_lines++;
   }
 }
 
 /* ********************************************************************************* */
 
-void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_str) {
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
   u_int32_t a;
   u_int16_t end = packet->payload_packet_len;
@@ -8993,7 +8992,7 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, s
 
 /* ********************************************************************************* */
 
-void reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+void reset_detected_protocol(struct ndpi_flow_struct *flow) {
   flow->detected_protocol_stack[1] = NDPI_PROTOCOL_UNKNOWN;
   flow->detected_protocol_stack[0] = NDPI_PROTOCOL_UNKNOWN;
   flow->confidence = NDPI_CONFIDENCE_UNKNOWN;
@@ -9001,19 +9000,19 @@ void reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, stru
 
 /* ********************************************************************************* */
 
-u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_flow_struct *flow) {
   return(flow->detected_protocol_stack[1]);
 }
 
 /* ********************************************************************************* */
 
-u_int16_t ndpi_get_flow_appprotocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
+u_int16_t ndpi_get_flow_appprotocol(struct ndpi_flow_struct *flow) {
   return(flow->detected_protocol_stack[0]);
 }
 
 /* ********************************************************************************* */
 
-ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow)
+ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_flow_struct *flow)
 {
   return(flow->category);
 }
@@ -9023,9 +9022,9 @@ ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_detection_module_str
 void ndpi_get_flow_ndpi_proto(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 			      struct ndpi_proto * ndpi_proto)
 {
-  ndpi_proto->master_protocol = ndpi_get_flow_masterprotocol(ndpi_str, flow);
-  ndpi_proto->app_protocol = ndpi_get_flow_appprotocol(ndpi_str, flow);
-  ndpi_proto->category = ndpi_get_flow_category(ndpi_str, flow);
+  ndpi_proto->master_protocol = ndpi_get_flow_masterprotocol(flow);
+  ndpi_proto->app_protocol = ndpi_get_flow_appprotocol(flow);
+  ndpi_proto->category = ndpi_get_flow_category(flow);
 }
 
 /* ********************************************************************************* */
@@ -9195,7 +9194,7 @@ ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_str
 
   if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
     if(shost && dhost)
-      rc = ndpi_search_tcp_or_udp_raw(ndpi_str, flow, proto, shost, dhost);
+      rc = ndpi_search_tcp_or_udp_raw(ndpi_str, flow, shost, dhost);
     else
       rc = NDPI_PROTOCOL_UNKNOWN;
 
