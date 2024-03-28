@@ -18,6 +18,9 @@ ifneq ($(OS),Windows_NT)
 CFLAGS     += -fPIC -DPIC
 endif
 CFLAGS     += -I. -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
+CFLAGS_third_party/src/gcrypt_light.c := -Wno-unused-parameter
+CFLAGS_third_party/src/ahocorasick.c := -Wno-unused-function -Wno-unused-parameter
+CFLAGS_third_party/src/roaring.c := -Wno-unused-function -Wno-attributes
 LDFLAGS    += @NDPI_LDFLAGS@
 LIBS       = @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
 
@@ -66,7 +69,7 @@ $(NDPI_LIB_SHARED): $(OBJECTS)
 	ln -fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
 
 %.o: %.c $(HEADERS) Makefile
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(CFLAGS_$<) -c $< -o $@
 
 clean:
 	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo libndpi.so*

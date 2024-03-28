@@ -366,6 +366,9 @@ int main(int argc, char **argv) {
 #ifndef WIN32
   int c;
 #endif
+  (void)argc;
+  (void)argv;
+
   NDPI_PROTOCOL_BITMASK all;
   
   if (ndpi_get_api_version() != NDPI_API_VERSION) {

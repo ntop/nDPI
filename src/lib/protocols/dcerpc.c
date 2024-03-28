@@ -35,7 +35,7 @@ static void ndpi_int_dcerpc_add_connection(struct ndpi_detection_module_struct
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DCERPC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
-static bool is_connection_oriented_dcerpc(struct ndpi_packet_struct *packet, struct ndpi_flow_struct *flow)
+static bool is_connection_oriented_dcerpc(struct ndpi_packet_struct *packet)
 {
   if((packet->tcp != NULL)
      && (packet->payload_packet_len >= 64)
@@ -48,7 +48,7 @@ static bool is_connection_oriented_dcerpc(struct ndpi_packet_struct *packet, str
   return false;
 }
 
-static bool is_connectionless_dcerpc(struct ndpi_packet_struct *packet, struct ndpi_flow_struct *flow)
+static bool is_connectionless_dcerpc(struct ndpi_packet_struct *packet)
 {
   u_int16_t fragment_len;
   
@@ -83,7 +83,7 @@ static void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search DCERPC\n");
-  if (is_connection_oriented_dcerpc(packet, flow) || is_connectionless_dcerpc(packet, flow)) {
+  if (is_connection_oriented_dcerpc(packet) || is_connectionless_dcerpc(packet)) {
     NDPI_LOG_INFO(ndpi_struct, "found DCERPC\n");
     ndpi_int_dcerpc_add_connection(ndpi_struct, flow);
     return;

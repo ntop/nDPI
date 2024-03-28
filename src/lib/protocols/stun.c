@@ -417,8 +417,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
   return 1;
 }
 
-static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struct,
-                                 struct ndpi_flow_struct *flow)
+static int keep_extra_dissection(struct ndpi_flow_struct *flow)
 {
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN /* No subclassification */)
     return 1;
@@ -518,10 +517,10 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 	    old_proto_stack[1] = flow->detected_protocol_stack[1];
 
             /* TODO: right way? It is a bit scary... do we need to reset something else too? */
-            reset_detected_protocol(ndpi_struct, flow);
+            reset_detected_protocol(flow);
             /* We keep the category related to STUN traffic */
 	    /* STUN often triggers this risk; clear it. TODO: clear other risks? */
-	    ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+	    ndpi_unset_risk(flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
 
             /* Give room for DTLS handshake, where we might have
                retransmissions and fragments */
@@ -589,7 +588,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "QUIC range. Unexpected\n");
   } else if(first_byte <= 191) {
 
-    rtp_rtcp = is_rtp_or_rtcp(ndpi_struct, flow);
+    rtp_rtcp = is_rtp_or_rtcp(ndpi_struct);
     if(rtp_rtcp == IS_RTP) {
       NDPI_LOG_DBG(ndpi_struct, "RTP (dir %d)\n", packet->packet_direction);
       NDPI_LOG_INFO(ndpi_struct, "Found RTP over STUN\n");
@@ -621,7 +620,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   } else {
     NDPI_LOG_DBG(ndpi_struct, "QUIC range. Unexpected\n");
   }
-  return keep_extra_dissection(ndpi_struct, flow);
+  return keep_extra_dissection(flow);
 }
 
 /* ************************************************************ */

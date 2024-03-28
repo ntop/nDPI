@@ -84,8 +84,7 @@ static int is_valid_rtcp_payload_type(uint8_t type)
   return (type >= 192 && type <= 213);
 }
 
-int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
-		   struct ndpi_flow_struct *flow)
+int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t padding, csrc_count, ext_header;
@@ -170,7 +169,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  is_rtp = is_rtp_or_rtcp(ndpi_struct, flow);
+  is_rtp = is_rtp_or_rtcp(ndpi_struct);
   if(is_rtp == IS_RTP) {
     if(flow->l4.udp.rtp_stage == 2) {
       if(flow->l4.udp.line_pkts[0] >= 2 && flow->l4.udp.line_pkts[1] >= 2) {

@@ -34,7 +34,7 @@ static void ndpi_int_ftp_data_add_connection(struct ndpi_detection_module_struct
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_FTP_DATA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
-static int ndpi_match_ftp_data_port(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static int ndpi_match_ftp_data_port(struct ndpi_detection_module_struct *ndpi_struct) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   /* Check connection over TCP */
@@ -46,7 +46,7 @@ static int ndpi_match_ftp_data_port(struct ndpi_detection_module_struct *ndpi_st
   return 0;
 }
 
-static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *ndpi_struct) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
@@ -70,7 +70,7 @@ static int ndpi_match_ftp_data_directory(struct ndpi_detection_module_struct *nd
   return 0;
 }
 
-static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_struct) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
@@ -235,9 +235,9 @@ static void ndpi_check_ftp_data(struct ndpi_detection_module_struct *ndpi_struct
   */
   if(ndpi_seen_flow_beginning(flow)) {
     if((packet->payload_packet_len > 0)
-       && (ndpi_match_file_header(ndpi_struct, flow)
-	   || ndpi_match_ftp_data_directory(ndpi_struct, flow) 
-	   || ndpi_match_ftp_data_port(ndpi_struct, flow)
+       && (ndpi_match_file_header(ndpi_struct)
+	   || ndpi_match_ftp_data_directory(ndpi_struct) 
+	   || ndpi_match_ftp_data_port(ndpi_struct)
 	   )
        ) {
       NDPI_LOG_INFO(ndpi_struct, "found FTP_DATA request\n");

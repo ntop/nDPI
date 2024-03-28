@@ -51,6 +51,7 @@ static void ndpi_dbg_fn(u_int32_t protocol,
   /* While this program always logs at NDPI_LOG_DEBUG_EXTRA level, the
      initialization of the library may log at any level */
 
+  (void)log_level;
   (void)file;
   (void)func;
   (void)line;
