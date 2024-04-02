@@ -107,7 +107,7 @@ jobs:
             msan: "--with-sanitizer"
             nBPF: ""
             lto_gold_linker: "--with-lto-and-gold-linker"
-          - compiler: "clang-7" # "Oldest" clang easily available
+          - compiler: "clang-9" # "Oldest" clang easily available
             os: ubuntu-20.04
             arch: "x86_64"
             gcrypt: ""

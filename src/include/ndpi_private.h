@@ -910,6 +910,7 @@ void init_netease_games_dissector(struct ndpi_detection_module_struct *ndpi_stru
 void init_pathofexile_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_pfcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_flute_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_lolwildrift_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 

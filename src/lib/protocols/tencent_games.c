@@ -29,6 +29,14 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
+static void ndpi_int_tencent_games_add_connection(struct ndpi_detection_module_struct *ndpi_struct, 
+                                                  struct ndpi_flow_struct *flow)
+{
+  NDPI_LOG_INFO(ndpi_struct, "found Tencent Games\n");
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TENCENTGAMES,
+                             NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+}
+
 static void ndpi_search_tencent_games(struct ndpi_detection_module_struct *ndpi_struct,
                                       struct ndpi_flow_struct *flow)
 {
@@ -40,9 +48,36 @@ static void ndpi_search_tencent_games(struct ndpi_detection_module_struct *ndpi_
     if (ntohl(get_u_int32_t(packet->payload, 0)) == 0x3366000B &&
         ntohs(get_u_int16_t(packet->payload, 4)) == 0xB)
     {
-      NDPI_LOG_INFO(ndpi_struct, "found Tencent Games\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TENCENTGAMES,
-                                 NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_int_tencent_games_add_connection(ndpi_struct, flow);
+      return;
+    }
+
+    if (ntohl(get_u_int32_t(packet->payload, 0)) == 0x4366AA00 &&
+        ntohl(get_u_int32_t(packet->payload, 12)) == 0x10E68601)
+    {
+      ndpi_int_tencent_games_add_connection(ndpi_struct, flow);
+      return;
+    }
+
+    if (ntohl(get_u_int32_t(packet->payload, 0)) == 0xAA000000 &&
+        ntohl(get_u_int32_t(packet->payload, 10)) == 0x10E68601)
+    {
+      ndpi_int_tencent_games_add_connection(ndpi_struct, flow);
+      return;
+    }
+
+    if (get_u_int16_t(packet->payload, 0) == 0 &&
+        ntohs(get_u_int16_t(packet->payload, 2)) == (u_int16_t)(packet->payload_packet_len-4) &&
+        ntohs(get_u_int16_t(packet->payload, 4)) == 0x7801)
+    {
+      ndpi_int_tencent_games_add_connection(ndpi_struct, flow);
+      return;
+    }
+
+    if (ntohl(get_u_int32_t(packet->payload, 0)) == 0x4215F787 &&
+        get_u_int16_t(packet->payload, 6) == 0)
+    {
+      ndpi_int_tencent_games_add_connection(ndpi_struct, flow);
       return;
     }
   }

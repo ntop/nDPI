@@ -1,7 +1,7 @@
 /*
- * ndpi_bitmap64.c
+ * ndpi_bitmap64_fuse.c
  *
- * Copyright (C) 2011-23 - ntop.org and contributors
+ * Copyright (C) 2011-24 - ntop.org and contributors
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -30,7 +30,7 @@
 #include "ndpi_api.h"
 #include "third_party/include/binaryfusefilter.h"
 
-#define NDPI_BITMAP64_REALLOC_SIZE  4096
+#define NDPI_BITMAP64_FUSE_REALLOC_SIZE  4096
 
 // #define PRINT_DUPLICATED_HASHS
 
@@ -39,16 +39,16 @@ typedef struct {
   u_int64_t *entries;
   bool is_compressed;
   binary_fuse16_t bitmap;
-} ndpi_bitmap64_t;
+} ndpi_bitmap64_fuse_t;
 
 /* ********************************************************** */
 
-ndpi_bitmap64* ndpi_bitmap64_alloc() {
-  ndpi_bitmap64_t *rc = (ndpi_bitmap64_t*)ndpi_malloc(sizeof(ndpi_bitmap64_t));
+ndpi_bitmap64_fuse* ndpi_bitmap64_fuse_alloc() {
+  ndpi_bitmap64_fuse_t *rc = (ndpi_bitmap64_fuse_t*)ndpi_malloc(sizeof(ndpi_bitmap64_fuse_t));
 
   if(!rc) return(rc);
 
-  rc->num_allocated_entries = NDPI_BITMAP64_REALLOC_SIZE, rc->num_used_entries = 0;
+  rc->num_allocated_entries = NDPI_BITMAP64_FUSE_REALLOC_SIZE, rc->num_used_entries = 0;
   if((rc->entries = (u_int64_t*)ndpi_calloc(rc->num_allocated_entries, sizeof(u_int64_t))) == NULL) {
     ndpi_free(rc);
     return(NULL);
@@ -56,12 +56,12 @@ ndpi_bitmap64* ndpi_bitmap64_alloc() {
 
   rc->is_compressed = false;
 
-  return((ndpi_bitmap64*)rc);
+  return((ndpi_bitmap64_fuse*)rc);
 }
 
 /* ********************************************************** */
 
-static int ndpi_bitmap64_entry_compare(const void *_a, const void *_b) {
+static int ndpi_bitmap64_fuse_entry_compare(const void *_a, const void *_b) {
   u_int64_t *a = (u_int64_t*)_a, *b = (u_int64_t*)_b;
 
   if(*a < *b) return -1;
@@ -72,8 +72,8 @@ static int ndpi_bitmap64_entry_compare(const void *_a, const void *_b) {
 /* ********************************************************** */
 
 /* Sort and compact memory before searching */
-bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
-  ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
+bool ndpi_bitmap64_fuse_compress(ndpi_bitmap64_fuse *_b) {
+  ndpi_bitmap64_fuse_t *b = (ndpi_bitmap64_fuse_t*)_b;
   u_int32_t i;
 
   if(!b)
@@ -86,7 +86,7 @@ bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
     if(b->num_used_entries > 1)
       qsort(b->entries, b->num_used_entries,
 	    sizeof(u_int64_t),
-	    ndpi_bitmap64_entry_compare);
+	    ndpi_bitmap64_fuse_entry_compare);
 
     /* Now remove duplicates */
     u_int64_t old_value = b->entries[0], new_len = 1;
@@ -128,8 +128,8 @@ bool ndpi_bitmap64_compress(ndpi_bitmap64 *_b) {
 
 /* ********************************************************** */
 
-bool ndpi_bitmap64_set(ndpi_bitmap64 *_b, u_int64_t value) {
-  ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
+bool ndpi_bitmap64_fuse_set(ndpi_bitmap64_fuse *_b, u_int64_t value) {
+  ndpi_bitmap64_fuse_t *b = (ndpi_bitmap64_fuse_t*)_b;
 
   if(!b)
     return(false);
@@ -146,7 +146,7 @@ bool ndpi_bitmap64_set(ndpi_bitmap64 *_b, u_int64_t value) {
 
   if(b->num_used_entries >= b->num_allocated_entries) {
     u_int64_t *rc;
-    u_int32_t new_len = b->num_allocated_entries + NDPI_BITMAP64_REALLOC_SIZE;
+    u_int32_t new_len = b->num_allocated_entries + NDPI_BITMAP64_FUSE_REALLOC_SIZE;
 
     rc = (u_int64_t*)ndpi_realloc(b->entries,
 				  sizeof(u_int64_t)*b->num_allocated_entries,
@@ -167,14 +167,14 @@ bool ndpi_bitmap64_set(ndpi_bitmap64 *_b, u_int64_t value) {
 
 /* ********************************************************** */
 
-bool ndpi_bitmap64_isset(ndpi_bitmap64 *_b, u_int64_t value) {
-  ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
+bool ndpi_bitmap64_fuse_isset(ndpi_bitmap64_fuse *_b, u_int64_t value) {
+  ndpi_bitmap64_fuse_t *b = (ndpi_bitmap64_fuse_t*)_b;
 
   if(!b)
     return(false);
 
   if(!b->is_compressed) {
-    if(!ndpi_bitmap64_compress(b))
+    if(!ndpi_bitmap64_fuse_compress(b))
       return(false); /* Compresssion failed */
   }
 
@@ -183,8 +183,8 @@ bool ndpi_bitmap64_isset(ndpi_bitmap64 *_b, u_int64_t value) {
 
 /* ********************************************************** */
 
-void ndpi_bitmap64_free(ndpi_bitmap64 *_b) {
-  ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
+void ndpi_bitmap64_fuse_free(ndpi_bitmap64_fuse *_b) {
+  ndpi_bitmap64_fuse_t *b = (ndpi_bitmap64_fuse_t*)_b;
 
   if(!b)
     return;
@@ -199,15 +199,15 @@ void ndpi_bitmap64_free(ndpi_bitmap64 *_b) {
 
 /* ********************************************************** */
 
-u_int32_t ndpi_bitmap64_size(ndpi_bitmap64 *_b) {
-  ndpi_bitmap64_t *b = (ndpi_bitmap64_t*)_b;
+u_int32_t ndpi_bitmap64_fuse_size(ndpi_bitmap64_fuse *_b) {
+  ndpi_bitmap64_fuse_t *b = (ndpi_bitmap64_fuse_t*)_b;
 
   if(!b) return(0);
 
   if(!b->is_compressed) {
-    if(!ndpi_bitmap64_compress(b))
+    if(!ndpi_bitmap64_fuse_compress(b))
       return(0); /* Compresssion failed */
   }
 
-  return(sizeof(ndpi_bitmap64) + binary_fuse16_size_in_bytes(&b->bitmap));
+  return(sizeof(ndpi_bitmap64_fuse) + binary_fuse16_size_in_bytes(&b->bitmap));
 }

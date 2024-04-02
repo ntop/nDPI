@@ -911,6 +911,9 @@ struct ndpi_flow_udp_struct {
   u_int32_t quic_0rtt_found:1;
   u_int32_t quic_vn_pair:1;
 
+  /* NDPI_PROTOCOL_LOLWILDRIFT */
+  u_int32_t lolwildrift_stage:1;
+
   /* NDPI_PROTOCOL_EPICGAMES */
   u_int32_t epicgames_stage:1;
   u_int32_t epicgames_word;
@@ -1141,6 +1144,7 @@ typedef struct ndpi_proto {
 
 typedef void ndpi_bitmap;
 typedef void ndpi_bitmap64;
+typedef void ndpi_bitmap64_fuse; /* probabilistic */
 typedef void ndpi_bitmap_iterator;
 typedef void ndpi_filter;
     
@@ -1155,7 +1159,7 @@ typedef struct {
 typedef struct {
   struct {
     u_int16_t class_id;
-    ndpi_bitmap64 *domains;
+    ndpi_bitmap64_fuse *domains;
   } classes[MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS];
 } ndpi_domain_classify;
 
