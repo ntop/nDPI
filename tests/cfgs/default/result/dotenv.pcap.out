@@ -1,0 +1,28 @@
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 15 (15.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/0 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+HTTP	10	993	1
+
+Acceptable                      10 993           1            
+
+	1	TCP 192.168.2.198:51327 <-> 89.31.76.10:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: Download/7][6 pkts/490 bytes <-> 4 pkts/503 bytes][Goodput ratio: 17/46][0.12 sec][Hostname/SNI: sevenpitaly.com][bytes ratio: -0.013 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/22 45/43 20/22][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 82/126 148/297 30/99][URL: sevenpitaly.com/.env][StatusCode: 406][Content-Type: application/octet-stream][Server: openresty][User-Agent: curl/8.4.0][Risk: ** Possible Exploit Attempt **** Error Code **** Binary Data Transfer Attemot **][Risk Score: 210][Risk Info: URL starting with dot / HTTP Error Code 406 / Found mime exe octet-stream][PLAIN TEXT (GET /.env HTTP/1.1)][Plen Bins: 0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

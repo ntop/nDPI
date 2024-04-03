@@ -67,8 +67,12 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
      || ends_with(ndpi_struct, (char*)flow->host_server_name, ".windows.com")
      )
     ;
-  else
-    ndpi_set_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER, msg);
+  else {
+    if((flow->http.response_status_code >= 200) && (flow->http.response_status_code < 300))
+      ndpi_set_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER, msg);
+    else
+      ndpi_set_risk(flow, NDPI_BINARY_TRANSFER_ATTEMPT, msg);
+  }
  }
 
   /* *********************************************** */

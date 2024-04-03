@@ -2014,7 +2014,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Non-Printable/Invalid Chars Detected");
 
   case NDPI_POSSIBLE_EXPLOIT:
-    return("Possible Exploit");
+    return("Possible Exploit Attempt");
 
   case NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE:
     return("TLS Cert About To Expire");
@@ -2054,6 +2054,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_MALWARE_HOST_CONTACTED:
     return("Client contacted a malware host");
+
+  case NDPI_BINARY_TRANSFER_ATTEMPT:
+    return("Binary Data Transfer Attemot");
 
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
