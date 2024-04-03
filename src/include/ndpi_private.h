@@ -469,21 +469,21 @@ struct ndpi_detection_module_struct {
 
 #else /* not defined NDPI_ENABLE_DEBUG_MESSAGES */
 # ifdef WIN32
-# define NDPI_LOG(...) {}
-# define NDPI_LOG_ERR(...) {}
-# define NDPI_LOG_INFO(...) {}
-# define NDPI_LOG_DBG(...) {}
-# define NDPI_LOG_DBG2(...) {}
+# define NDPI_LOG(mod, ...) { (void)mod; }
+# define NDPI_LOG_ERR(mod, ...) { (void)mod; }
+# define NDPI_LOG_INFO(mod, ...) { (void)mod; }
+# define NDPI_LOG_DBG(mod, ...) { (void)mod; }
+# define NDPI_LOG_DBG2(mod, ...) { (void)mod; }
 # else
 # define NDPI_LOG(proto, mod, log_level, args...) { /* printf(args); */ }
 # ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
-#  define NDPI_LOG_ERR(mod, args...)  { printf(args); }
+#  define NDPI_LOG_ERR(mod, args...)  { (void)mod; printf(args); }
 # else
-#  define NDPI_LOG_ERR(mod, args...)  { /* printf(args); */ }
+#  define NDPI_LOG_ERR(mod, args...)  { (void)mod; /* printf(args); */ }
 # endif
-# define NDPI_LOG_INFO(mod, args...) { /* printf(args); */ }
-# define NDPI_LOG_DBG(mod,  args...) { /* printf(args); */ }
-# define NDPI_LOG_DBG2(mod, args...) { /* printf(args); */ }
+# define NDPI_LOG_INFO(mod, args...) { (void)mod; /* printf(args); */ }
+# define NDPI_LOG_DBG(mod,  args...) { (void)mod; /* printf(args); */ }
+# define NDPI_LOG_DBG2(mod, args...) { (void)mod; /* printf(args); */ }
 # endif
 #endif /* NDPI_ENABLE_DEBUG_MESSAGES */
 
@@ -558,16 +558,14 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct
 				u_int16_t lower_detected_protocol,
 				ndpi_confidence_t confidence);
 
-void reset_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-			     struct ndpi_flow_struct *flow);
+void reset_detected_protocol(struct ndpi_flow_struct *flow);
 
 void ndpi_set_detected_protocol_keeping_master(struct ndpi_detection_module_struct *ndpi_str,
 					       struct ndpi_flow_struct *flow,
 					       u_int16_t detected_protocol,
 					       ndpi_confidence_t confidence);
 
-void change_category(struct ndpi_detection_module_struct *ndpi_struct,
-		     struct ndpi_flow_struct *flow,
+void change_category(struct ndpi_flow_struct *flow,
 		     ndpi_protocol_category_t protocol_category);
 
 
@@ -576,8 +574,7 @@ char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value, 
 
 void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struct,
 					  struct ndpi_flow_struct *flow);
-void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_struct,
-					      struct ndpi_flow_struct *flow);
+void ndpi_parse_packet_line_info_any(struct ndpi_detection_module_struct *ndpi_struct);
 
 void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str);
 u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
@@ -593,7 +590,6 @@ u_int8_t ends_with(struct ndpi_detection_module_struct *ndpi_struct,
 
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
-				 u_int8_t protocol,
 				 u_int32_t saddr, u_int32_t daddr);
 
 u_int32_t ip_port_hash_funct(u_int32_t ip, u_int16_t port);
@@ -655,8 +651,7 @@ const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* RTP */
 int is_valid_rtp_payload_type(uint8_t type);
-int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
-                          struct ndpi_flow_struct *flow);
+int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct);
 u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_type);
 
 /* Bittorrent */

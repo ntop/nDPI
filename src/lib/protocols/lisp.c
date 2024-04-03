@@ -29,8 +29,7 @@
 #define LISP_PORT1 4342 /* TCP and UDP */
 
 static void ndpi_int_lisp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					    struct ndpi_flow_struct *flow,
-					    u_int8_t due_to_correlation)
+					    struct ndpi_flow_struct *flow)
 {
 
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LISP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
@@ -47,7 +46,7 @@ static void ndpi_check_lisp(struct ndpi_detection_module_struct *ndpi_struct, st
     if((packet->udp->source == lisp_port && packet->udp->dest == lisp_port) ||
        (packet->udp->source == lisp_port1 && packet->udp->dest == lisp_port1)) {
       NDPI_LOG_INFO(ndpi_struct, "found lisp\n");
-      ndpi_int_lisp_add_connection(ndpi_struct, flow, 0);
+      ndpi_int_lisp_add_connection(ndpi_struct, flow);
       return;
     }
   } else {
@@ -63,7 +62,7 @@ static void ndpi_check_lisp(struct ndpi_detection_module_struct *ndpi_struct, st
 	   packet->payload[packet->payload_packet_len - 3] == 0xAC &&
 	   packet->payload[packet->payload_packet_len - 4] == 0x9F) {
 	  NDPI_LOG_INFO(ndpi_struct, "found lisp\n");
-	  ndpi_int_lisp_add_connection(ndpi_struct, flow, 0);
+	  ndpi_int_lisp_add_connection(ndpi_struct, flow);
           return;
 	}
       }

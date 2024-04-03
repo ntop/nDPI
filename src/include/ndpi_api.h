@@ -359,49 +359,41 @@ extern "C" {
    * Get the main protocol of the passed flows for the detected module
    *
    *
-   * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
    * @return the ID of the master protocol detected
    *
    */
-  u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-					 struct ndpi_flow_struct *flow);
+  u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_flow_struct *flow);
 
   /**
    * Get the app protocol of the passed flows for the detected module
    *
    *
-   * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
    * @return the ID of the app protocol detected
    *
    */
-  u_int16_t ndpi_get_flow_appprotocol(struct ndpi_detection_module_struct *ndpi_str,
-				      struct ndpi_flow_struct *flow);
+  u_int16_t ndpi_get_flow_appprotocol(struct ndpi_flow_struct *flow);
 
   /**
    * Get the category of the passed flows for the detected module
    *
    *
-   * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
    * @return the ID of the category
    *
    */
-  ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_detection_module_struct *ndpi_str,
-						  struct ndpi_flow_struct *flow);
+  ndpi_protocol_category_t ndpi_get_flow_category(struct ndpi_flow_struct *flow);
 
   /**
    * Get the ndpi protocol data of the passed flows for the detected module
    *
    *
-   * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
    * @par    ndpi_proto   = the output struct where to store the requested information
    *
    */
-  void ndpi_get_flow_ndpi_proto(struct ndpi_detection_module_struct *ndpi_str,
-				struct ndpi_flow_struct *flow,
+  void ndpi_get_flow_ndpi_proto(struct ndpi_flow_struct *flow,
 				struct ndpi_proto * ndpi_proto);
 
   /**
@@ -551,15 +543,13 @@ extern "C" {
    * Same as ndpi_protocol2name() with the difference that the numeric protocol
    * name is returned
    *
-   * @par     ndpi_mod      = the detection module
    * @par     proto         = the struct ndpi_protocol contain the protocols name
    * @par     buf           = the buffer to write the name of the protocols
    * @par     buf_len       = the length of the buffer
    * @return  the buffer contains the master_protocol and protocol name
    *
    */
-  char* ndpi_protocol2id(struct ndpi_detection_module_struct *ndpi_mod,
-			 ndpi_protocol proto, char *buf, u_int buf_len);
+  char* ndpi_protocol2id(ndpi_protocol proto, char *buf, u_int buf_len);
 
   /**
    * Find out if a given category is custom/user-defined
@@ -596,13 +586,11 @@ extern "C" {
    * Check if subprotocols of the specified master protocol are just
    * informative (and not real)
    *
-   * @par     mod           = the detection module
    * @par     protoId       = the (master) protocol identifier to query
    * @return  1 = the subprotocol is informative, 0 otherwise.
    *
    */
-  u_int8_t ndpi_is_subprotocol_informative(struct ndpi_detection_module_struct *ndpi_mod,
-					   u_int16_t protoId);
+  u_int8_t ndpi_is_subprotocol_informative(u_int16_t protoId);
 
   /**
    * Set hostname-based protocol
@@ -690,8 +678,7 @@ extern "C" {
    * @return  the string name of the breed ID
    *
    */
-  char* ndpi_get_proto_breed_name(struct ndpi_detection_module_struct *ndpi_struct,
-				  ndpi_protocol_breed_t breed_id);
+  char* ndpi_get_proto_breed_name(ndpi_protocol_breed_t breed_id);
 
   /**
    * Return the ID of the protocol
@@ -880,35 +867,29 @@ extern "C" {
   /**
    * Retrieve information for HTTP flows
    *
-   * @par     ndpi_mod = the detection module
    * @par     flow     = the detected flow
    * @return  the HTTP method information about the flow
    *
    */
-  ndpi_http_method ndpi_get_http_method(struct ndpi_detection_module_struct *ndpi_mod,
-					struct ndpi_flow_struct *flow);
+  ndpi_http_method ndpi_get_http_method(struct ndpi_flow_struct *flow);
 
   /**
    * Get the HTTP url
    *
-   * @par     ndpi_mod = the detection module
    * @par     flow     = the detected flow
    * @return  the HTTP method information about the flow
    *
    */
-  char* ndpi_get_http_url(struct ndpi_detection_module_struct *ndpi_mod,
-			  struct ndpi_flow_struct *flow);
+  char* ndpi_get_http_url(struct ndpi_flow_struct *flow);
 
   /**
    * Get the HTTP content-type
    *
-   * @par     ndpi_mod = the detection module
    * @par     flow     = the detected flow
    * @return  the HTTP method information about the flow
    *
    */
-  char* ndpi_get_http_content_type(struct ndpi_detection_module_struct *ndpi_mod,
-				   struct ndpi_flow_struct *flow);
+  char* ndpi_get_http_content_type(struct ndpi_flow_struct *flow);
 
   /* NDPI_PROTOCOL_TOR */
   /**
@@ -1102,15 +1083,14 @@ extern "C" {
   int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struct ndpi_in6_addr *dst_ip,
 			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
 			    u_char *hash_buf, u_int8_t hash_buf_len);
-  u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_struct,
-					  struct ndpi_flow_struct *flow);
+  u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_str,
+                                          struct ndpi_flow_struct *flow);
   u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher);
   const char* ndpi_cipher2str(u_int32_t cipher, char unknown_cipher[8]);
   const char* ndpi_tunnel2str(ndpi_packet_tunnel tt);
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow);
-  int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_struct,
-				      char *buffer, u_int buffer_size,
+  int ndpi_has_human_readeable_string(char *buffer, u_int buffer_size,
 				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
 				      char *outbuf, u_int outbuf_len);
   /* Return a flow info string (summarized). Does only work for DNS/HTTP/TLS/QUIC. */
@@ -1788,8 +1768,7 @@ extern "C" {
 
   ndpi_risk_enum ndpi_validate_url(char *url);
 
-  u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str,
-				     ndpi_protocol proto);
+  u_int8_t ndpi_is_protocol_detected(ndpi_protocol proto);
   void ndpi_serialize_risk(ndpi_serializer *serializer, ndpi_risk risk);
   void ndpi_serialize_risk_score(ndpi_serializer *serializer, ndpi_risk_enum risk);
   void ndpi_serialize_confidence(ndpi_serializer *serializer, ndpi_confidence_t confidence);

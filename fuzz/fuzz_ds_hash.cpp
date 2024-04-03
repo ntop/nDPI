@@ -7,6 +7,7 @@
 #include "fuzzer/FuzzedDataProvider.h"
 
 extern "C" void cleanup_func(ndpi_str_hash *h) {
+  (void)h;
   /* Nothing to do */
   return;
 }

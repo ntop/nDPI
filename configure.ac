@@ -218,9 +218,7 @@ AS_IF([test "x${enable_tls_sigs}" = "xyes"],[
   HANDLE_TLS_SIGS=""
 ])
 
-NDPI_CFLAGS="-W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-address-of-packed-member ${NDPI_CFLAGS} -Wno-attributes"
-#Workaround for RoaringBitmap with gcc-7
-NDPI_CFLAGS="-Wno-attributes ${NDPI_CFLAGS}"
+NDPI_CFLAGS="-W -Wall -Wno-address-of-packed-member ${NDPI_CFLAGS}"
 
 AS_IF([test "${with_lto_and_gold_linker+set}" = set], [
        NDPI_CFLAGS="${NDPI_CFLAGS} -flto -fuse-ld=gold -Wno-unused-command-line-argument"

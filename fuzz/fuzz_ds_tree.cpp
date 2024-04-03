@@ -22,6 +22,9 @@ static void __free(void * const node)
 }
 static void __walk(const void *a, ndpi_VISIT which, int depth, void *user_data)
 {
+  (void)which;
+  (void)depth;
+
   assert(user_data == NULL && a);
 }
 

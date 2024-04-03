@@ -462,7 +462,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_map_ndpi_id_to_user_proto_id(ndpi_info_mod, pid);
   ndpi_set_proto_breed(ndpi_info_mod, pid, NDPI_PROTOCOL_SAFE);
   ndpi_set_proto_category(ndpi_info_mod, pid, NDPI_PROTOCOL_CATEGORY_MEDIA);
-  ndpi_is_subprotocol_informative(ndpi_info_mod, pid);
+  ndpi_is_subprotocol_informative(pid);
   ndpi_get_proto_breed(ndpi_info_mod, pid);
 
   ndpi_port_range d_port[MAX_DEFAULT_PORTS] = {};
@@ -538,31 +538,31 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, &input_info);
   p = ndpi_detection_giveup(ndpi_info_mod, &flow, &protocol_was_guessed);
 
-  assert(p.master_protocol == ndpi_get_flow_masterprotocol(ndpi_info_mod, &flow));
-  assert(p.app_protocol == ndpi_get_flow_appprotocol(ndpi_info_mod, &flow));
-  assert(p.category == ndpi_get_flow_category(ndpi_info_mod, &flow));
+  assert(p.master_protocol == ndpi_get_flow_masterprotocol(&flow));
+  assert(p.app_protocol == ndpi_get_flow_appprotocol(&flow));
+  assert(p.category == ndpi_get_flow_category(&flow));
   ndpi_get_lower_proto(p);
   ndpi_get_upper_proto(p);
   ndpi_get_flow_error_code(&flow);
   ndpi_get_flow_risk_info(&flow, out, sizeof(out), 1);
-  ndpi_get_flow_ndpi_proto(ndpi_info_mod, &flow, &p2);
+  ndpi_get_flow_ndpi_proto(&flow, &p2);
   ndpi_is_proto(p, NDPI_PROTOCOL_TLS);
   ndpi_http_method2str(flow.http.method);
   ndpi_get_l4_proto_name(ndpi_get_l4_proto_info(ndpi_info_mod, p.app_protocol));
-  ndpi_is_subprotocol_informative(ndpi_info_mod, p.app_protocol);
-  ndpi_get_http_method(ndpi_info_mod, bool_value ? &flow : NULL);
-  ndpi_get_http_url(ndpi_info_mod, &flow);
-  ndpi_get_http_content_type(ndpi_info_mod, &flow);
+  ndpi_is_subprotocol_informative(p.app_protocol);
+  ndpi_get_http_method(bool_value ? &flow : NULL);
+  ndpi_get_http_url(&flow);
+  ndpi_get_http_content_type(&flow);
   ndpi_get_flow_name(bool_value ? &flow : NULL);
   /* ndpi_guess_undetected_protocol() is a "strange" function. Try fuzzing it, here */
-  if(!ndpi_is_protocol_detected(ndpi_info_mod, p)) {
+  if(!ndpi_is_protocol_detected(p)) {
     ndpi_guess_undetected_protocol(ndpi_info_mod, bool_value ? &flow : NULL,
                                    flow.l4_proto);
     if(!flow.is_ipv6) {
       /* Another "strange" function (ipv4 only): fuzz it here, for lack of a better alternative */
       ndpi_find_ipv4_category_userdata(ndpi_info_mod, flow.c_address.v4);
 
-      ndpi_search_tcp_or_udp_raw(ndpi_info_mod, NULL, 0, ntohl(flow.c_address.v4), ntohl(flow.s_address.v4));
+      ndpi_search_tcp_or_udp_raw(ndpi_info_mod, NULL, ntohl(flow.c_address.v4), ntohl(flow.s_address.v4));
 
       ndpi_guess_undetected_protocol_v4(ndpi_info_mod, bool_value ? &flow : NULL,
                                         flow.l4_proto,

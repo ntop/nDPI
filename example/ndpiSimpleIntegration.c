@@ -900,8 +900,7 @@ static void ndpi_process_packet(uint8_t * const args,
 				  ip != NULL ? (uint8_t *)ip : (uint8_t *)ip6,
 				  ip_size, time_ms, NULL);
 
-  if (ndpi_is_protocol_detected(workflow->ndpi_struct,
-				flow_to_process->detected_l7_protocol) != 0 &&
+  if (ndpi_is_protocol_detected(flow_to_process->detected_l7_protocol) != 0 &&
       flow_to_process->detection_completed == 0)
     {
       if (flow_to_process->detected_l7_protocol.master_protocol != NDPI_PROTOCOL_UNKNOWN ||

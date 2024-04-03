@@ -718,8 +718,7 @@ static inline int ndpi_is_valid_char(char c) {
 
 /* ******************************************************************** */
 
-static int ndpi_find_non_eng_bigrams(struct ndpi_detection_module_struct *ndpi_struct,
-				     char *str) {
+static int ndpi_find_non_eng_bigrams(char *str) {
   char s[3];
 
   if((ndpi_isdigit(str[0]) && ndpi_isdigit(str[1]))
@@ -737,8 +736,7 @@ static int ndpi_find_non_eng_bigrams(struct ndpi_detection_module_struct *ndpi_s
 
 /* #define PRINT_STRINGS 1 */
 
-int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_struct,
-				    char *buffer, u_int buffer_size,
+int ndpi_has_human_readeable_string(char *buffer, u_int buffer_size,
 				    u_int8_t min_string_match_len,
 				    char *outbuf, u_int outbuf_len) {
   u_int ret = 0, i, do_cr = 0, len = 0, o_idx = 0, being_o_idx = 0;
@@ -752,7 +750,7 @@ int ndpi_has_human_readeable_string(struct ndpi_detection_module_struct *ndpi_st
   for(i=0; i<buffer_size-2; i++) {
     if(ndpi_is_valid_char(buffer[i])
        && ndpi_is_valid_char(buffer[i+1])
-       && ndpi_find_non_eng_bigrams(ndpi_struct, &buffer[i])) {
+       && ndpi_find_non_eng_bigrams(&buffer[i])) {
 #ifdef PRINT_STRINGS
       printf("%c%c", buffer[i], buffer[i+1]);
 #endif
@@ -1130,7 +1128,7 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_serialize_risk(serializer, risk);
   ndpi_serialize_confidence(serializer, confidence);
   ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
-  ndpi_serialize_string_string(serializer, "proto_id", ndpi_protocol2id(ndpi_struct, l7_protocol, buf, sizeof(buf)));
+  ndpi_serialize_string_string(serializer, "proto_id", ndpi_protocol2id(l7_protocol, buf, sizeof(buf)));
   ndpi_serialize_string_string(serializer, "proto_by_ip", ndpi_get_proto_name(ndpi_struct,
                                                                               l7_protocol.protocol_by_ip));
   ndpi_serialize_string_uint32(serializer, "proto_by_ip_id", l7_protocol.protocol_by_ip);
@@ -1138,7 +1136,7 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_protocol_breed_t breed =
     ndpi_get_proto_breed(ndpi_struct,
                          (l7_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN ? l7_protocol.app_protocol : l7_protocol.master_protocol));
-  ndpi_serialize_string_string(serializer, "breed", ndpi_get_proto_breed_name(ndpi_struct, breed));
+  ndpi_serialize_string_string(serializer, "breed", ndpi_get_proto_breed_name(breed));
   if(l7_protocol.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
   {
     ndpi_serialize_string_uint32(serializer, "category_id", l7_protocol.category);
@@ -1883,8 +1881,7 @@ ndpi_risk_enum ndpi_validate_url(char *url) {
 
 /* ******************************************************************** */
 
-u_int8_t ndpi_is_protocol_detected(struct ndpi_detection_module_struct *ndpi_str,
-				   ndpi_protocol proto) {
+u_int8_t ndpi_is_protocol_detected(ndpi_protocol proto) {
   if((proto.master_protocol != NDPI_PROTOCOL_UNKNOWN)
      || (proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)
      || (proto.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED))
@@ -2500,13 +2497,12 @@ void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************************************** */
 
-void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
-		   struct ndpi_flow_struct *flow, ndpi_risk_enum r,
+void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r,
 		   char *risk_message) {
   if(!flow) return;
 
   /* Check if the risk is not yet set */
-  if(!ndpi_isset_risk(ndpi_str, flow, r)) {
+  if(!ndpi_isset_risk(flow, r)) {
     ndpi_risk v = 1ull << r;
 
     /* In case there is an exception set, take it into account */
@@ -2557,9 +2553,8 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************************************** */
 
-void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
-		     struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
-  if(ndpi_isset_risk(ndpi_str, flow, r)) {
+void ndpi_unset_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
+  if(ndpi_isset_risk(flow, r)) {
     u_int8_t i, j;
     ndpi_risk v = 1ull << r;
 
@@ -2584,8 +2579,7 @@ void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************************************** */
 
-int ndpi_isset_risk(struct ndpi_detection_module_struct *ndpi_str,
-		     struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
+int ndpi_isset_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
   ndpi_risk v = 1ull << r;
 
   return(((flow->risk & v) == v) ?  1 : 0);
