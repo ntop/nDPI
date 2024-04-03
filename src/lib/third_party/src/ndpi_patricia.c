@@ -238,6 +238,16 @@ static ndpi_prefix_t * ndpi_New_Prefix2 (int family, void *dest, int bitlen, ndp
       }
       memcpy (&prefix->add.sin, dest, sizeof(struct in_addr));
     }
+    else if(family == AF_MAC) {
+      default_bitlen = 48;
+      if(prefix == NULL) {
+        prefix = (ndpi_prefix_t*)ndpi_calloc(1, sizeof (ndpi_prefix_t));
+        if(!prefix)
+          return (NULL);
+        dynamic_allocated++;
+      }
+      memcpy (prefix->add.mac, dest, 6);
+    }
     else {
       return (NULL);
     }
