@@ -1309,6 +1309,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
       }
     }
+  } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_STUN)) {
+    flow->stun.mapped_address.ipv4 = flow->ndpi_flow->stun.mapped_address.ipv4,
+      flow->stun.mapped_address.port = flow->ndpi_flow->stun.mapped_address.port;
   }
 
   flow->multimedia_flow_type = flow->ndpi_flow->flow_multimedia_type;

@@ -344,6 +344,8 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x4007:
       /* These are the only messages apparently whatsapp voice can use */
       *app_proto = NDPI_PROTOCOL_WHATSAPP_CALL;
+      flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
+      flow->extra_packets_func = stun_search_again;
       return 1;
 
     case 0x0014: /* Realm */
@@ -403,7 +405,22 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
         packet->payload = orig_payload;
         packet->payload_packet_len = orig_payload_length;
       }
+      break;
 
+    case 0x0020: /* XOR-MAPPED-ADDRESS */
+      if(real_len <= payload_length - off - 12) {
+	u_int8_t protocol_family = payload[off+5];
+
+	if(protocol_family == 0x01 /* IPv4 */) {
+	  u_int16_t xored_port = ntohs(*((u_int16_t*)&payload[off+6]));
+	  u_int32_t xored_ip   = ntohl(*((u_int32_t*)&payload[off+8]));
+	  u_int16_t port_xor    = (magic_cookie >> 16) & 0xFFFF;
+
+	  flow->stun.mapped_address.port = xored_port ^ port_xor;
+	  flow->stun.mapped_address.ipv4 = xored_ip   ^ magic_cookie;
+	  flow->extra_packets_func = NULL; /* We're good now */
+	}
+      }
       break;
 
     default:
@@ -428,7 +445,8 @@ static int keep_extra_dissection(struct ndpi_flow_struct *flow)
     return 0;
 
   /* Looking for XOR-PEER-ADDRESS metadata; TODO: other protocols? */
-  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP)
+  if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP)
+     || (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_WHATSAPP_CALL))
     return 1;
   return 0;
 }

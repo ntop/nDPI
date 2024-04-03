@@ -1280,6 +1280,10 @@ struct ndpi_flow_struct {
 
   struct {
     u_int8_t maybe_dtls : 1, is_turn : 1, pad : 6;
+    struct {
+      u_int32_t ipv4;
+      u_int16_t port;
+    } mapped_address;
   } stun;
 
   struct {

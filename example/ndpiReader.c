@@ -1457,7 +1457,6 @@ static void parseOptions(int argc, char **argv) {
 
 /* ********************************** */
 
-#if 0
 /**
  * @brief A faster replacement for inet_ntoa().
  */
@@ -1487,7 +1486,6 @@ char* intoaV4(u_int32_t addr, char* buf, u_int16_t bufLen) {
 
   return(cp);
 }
-#endif
 
 /* ********************************** */
 
@@ -1905,6 +1903,14 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       }
     }
 
+    if(flow->stun.mapped_address.ipv4 != 0) {
+      char buf[32];
+      
+      fprintf(out, "[Mapped IP/Port: %s:%u]",
+	      intoaV4(flow->stun.mapped_address.ipv4, buf, sizeof(buf)),
+	      flow->stun.mapped_address.port);
+    }
+    
     if(flow->http.url[0] != '\0') {
       ndpi_risk_enum risk = ndpi_validate_url(flow->http.url);
 
