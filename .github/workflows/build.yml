@@ -14,7 +14,7 @@ jobs:
     name: Python Bindings (ubuntu-latest)
     runs-on: ubuntu-latest
     env:
-      CFLAGS: -Werror
+      CFLAGS: -Wextra -Werror
     steps:
       - uses: actions/checkout@v4
         with:
@@ -71,7 +71,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
-      CFLAGS: -Werror
+      CFLAGS: -Wextra -Werror
     strategy:
       fail-fast: true
       matrix:
