@@ -18,6 +18,7 @@ ifneq ($(OS),Windows_NT)
 CFLAGS     += -fPIC -DPIC
 endif
 CFLAGS     += -I. -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
+CFLAGS_ndpi_bitmap.c := -Wno-unused-function
 CFLAGS_third_party/src/gcrypt_light.c := -Wno-unused-function -Wno-unused-parameter
 CFLAGS_third_party/src/ahocorasick.c := -Wno-unused-function -Wno-unused-parameter
 CFLAGS_third_party/src/roaring.c := -Wno-unused-function -Wno-attributes
