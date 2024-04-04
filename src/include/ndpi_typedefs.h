@@ -438,7 +438,7 @@ PACK_ON
 struct ndpi_mpls_header
 {
   /* Before using this strcut to parse an MPLS header, you will need to convert
-   * the 4-byte data to the correct endianess with ntohl(). */
+   * the 4-byte data to the correct endianness with ntohl(). */
 #if defined(__LITTLE_ENDIAN__)
   u_int32_t ttl:8, s:1, exp:3, label:20;
 #elif defined(__BIG_ENDIAN__)
