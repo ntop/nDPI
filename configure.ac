@@ -151,8 +151,8 @@ AC_DEFINE_UNQUOTED(NDPI_PATCH_LEVEL,   "${NDPI_PATCH}", [nDPI patch level])
 # .git as directory in a cloned repo
 # .git as file in submodule based integration
 if test -d ".git" || test -r ".git"; then
-     GIT_TAG=`git log -1 --format=%h`
-     GIT_DATE=`git log -1 --format=%cd`
+     GIT_TAG=`git log -1 --abbrev=7 --format=%h`
+     GIT_DATE=`git log -1 --abbrev=7 --format=%cd`
      #
      # On CentOS 6 `git rev-list HEAD --count` does not work
      #
