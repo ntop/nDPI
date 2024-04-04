@@ -384,7 +384,7 @@
  - Fix stop of extra dissection in HTTP, Bittorrent, Kerberos
  - Fix signed integer overflow in ASN1/BER dissector
  - Fix char/uchar bug in ahocorasick
- - Fix endianess in IP-Port lookup
+ - Fix endianness in IP-Port lookup
  - Fix FastCGI memory allocation issue
  - Fix metadata extraction in NAT-PMP
  - Fix invalid unidirectional traffic alert for unidirectional protocols (e.g. sFlow)

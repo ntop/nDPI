@@ -25,7 +25,7 @@
 
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
-				 u_int32_t saddr, u_int32_t daddr) /* host endianess */
+				 u_int32_t saddr, u_int32_t daddr) /* host endianness */
 {
   u_int16_t rc;
   struct in_addr host;
