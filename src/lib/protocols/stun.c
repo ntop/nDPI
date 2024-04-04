@@ -55,9 +55,71 @@ static u_int64_t get_stun_lru_key_raw4(u_int32_t ip, u_int16_t port);
 static u_int64_t get_stun_lru_key_raw6(u_int8_t *ip, u_int16_t port);
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
-					 u_int app_proto);
+					 u_int16_t app_proto,
+					 u_int16_t master_proto);
 static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow);
+
+
+/* Valid classifications:
+    * STUN, DTLS, STUN/RTP, DTLS/SRTP
+    * STUN/APP, DTLS/APP, SRTP/APP ["real" sub-classification]
+   The idea is:
+    * the specific "real" application (WA/FB/Signal/...), if present, should
+      be always set as "app" protocol, with STUN or DTLS or SRTP as "master" protocol
+    * every "real" application that we handle, if it uses RTP, it is
+      encrypted --> SRTP
+    * keep STUN/RTP for the generic case without sub-classification [because
+      nDPI uses SRTP only when it is sure that there is encryption]
+*/
+
+static int is_subclassification_real_by_proto(u_int16_t proto)
+{
+  if(proto == NDPI_PROTOCOL_UNKNOWN ||
+     proto == NDPI_PROTOCOL_STUN ||
+     proto == NDPI_PROTOCOL_RTP ||
+     proto == NDPI_PROTOCOL_SRTP ||
+     proto == NDPI_PROTOCOL_DTLS)
+    return 0;
+  return 1;
+}
+
+static int is_subclassification_real(struct ndpi_flow_struct *flow)
+{
+  /* No previous subclassification */
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN)
+    return 0;
+  return is_subclassification_real_by_proto(flow->detected_protocol_stack[0]);
+}
+
+static int is_new_subclassification_better(struct ndpi_detection_module_struct *ndpi_struct,
+                                           struct ndpi_flow_struct *flow,
+                                           u_int16_t new_app_proto)
+{
+  NDPI_LOG_DBG(ndpi_struct, "%d/%d -> %d\n",
+               flow->detected_protocol_stack[1], flow->detected_protocol_stack[0],
+               new_app_proto);
+
+  /* If we don't have a real subclassification, we might want to lookup into the cache again
+     (even if new_app_proto == NDPI_PROTOCOL_UNKNOWN) */
+
+  if(is_subclassification_real(flow) &&
+     new_app_proto == NDPI_PROTOCOL_UNKNOWN)
+    return 0;
+
+  /* Debug */
+  if(new_app_proto != NDPI_PROTOCOL_UNKNOWN &&
+     is_subclassification_real(flow) &&
+     new_app_proto != flow->detected_protocol_stack[0]) {
+    NDPI_LOG_ERR(ndpi_struct, "Incoherent sub-classification change %d/%d->%d \n",
+                 flow->detected_protocol_stack[1],
+                 flow->detected_protocol_stack[0], new_app_proto);
+  }
+
+  if(new_app_proto != flow->detected_protocol_stack[0])
+    return 1;
+  return 0;
+}
 
 
 static u_int16_t search_into_cache(struct ndpi_detection_module_struct *ndpi_struct,
@@ -111,11 +173,7 @@ static void add_to_caches(struct ndpi_detection_module_struct *ndpi_struct,
 {
   u_int64_t key, key_rev;
 
-  if(ndpi_struct->stun_cache &&
-     app_proto != NDPI_PROTOCOL_STUN &&
-     app_proto != NDPI_PROTOCOL_UNKNOWN) {
-    /* No sense to add STUN, but only subprotocols */
-
+  if(ndpi_struct->stun_cache) {
     key = get_stun_lru_key(flow, 0);
     ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto, ndpi_get_current_time(flow));
     key_rev = get_stun_lru_key(flow, 1);
@@ -292,8 +350,8 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
                        inet_ntop(AF_INET, &ip, buf, sizeof(buf)), port,
                        flow->detected_protocol_stack[0]);
 
-          if(1 /* TODO: enable/disable */ &&
-             ndpi_struct->stun_cache) {
+          if(ndpi_struct->stun_cache &&
+             is_subclassification_real(flow)) {
             u_int64_t key = get_stun_lru_key_raw4(ip, port);
 
             ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
@@ -316,8 +374,8 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
                        inet_ntop(AF_INET6, &ip, buf, sizeof(buf)), port,
                        flow->detected_protocol_stack[0]);
 
-          if(1 /* TODO: enable/disable */ &&
-             ndpi_struct->stun_cache) {
+          if(ndpi_struct->stun_cache &&
+             is_subclassification_real(flow)) {
             u_int64_t key = get_stun_lru_key_raw6((u_int8_t *)ip, port);
 
             ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
@@ -436,13 +494,8 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
 static int keep_extra_dissection(struct ndpi_flow_struct *flow)
 {
-  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN /* No subclassification */)
+  if(!is_subclassification_real(flow))
     return 1;
-
-  /* We have a sub-classification */
-
-  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_RTP)
-    return 0;
 
   /* Looking for XOR-PEER-ADDRESS metadata; TODO: other protocols? */
   if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP)
@@ -486,9 +539,10 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   /* RFC9443 */
   if(first_byte <= 3) {
     NDPI_LOG_DBG(ndpi_struct, "Still STUN\n");
-    if(is_stun(ndpi_struct, flow, &app_proto) /* To extract other metadata */ &&
-       flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN /* No previous subclassification */) {
-      ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
+    if(is_stun(ndpi_struct, flow, &app_proto)) { /* To extract other metadata */
+      if(is_new_subclassification_better(ndpi_struct, flow, app_proto)) {
+        ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto, __get_master(flow));
+      }
     }
   } else if(first_byte <= 15) {
     NDPI_LOG_DBG(ndpi_struct, "DROP range. Unexpected\n");
@@ -562,10 +616,10 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
             flow->stun.maybe_dtls = 0;
             flow->max_extra_packets_to_check -= 10;
-
-            NDPI_LOG_DBG(ndpi_struct, "(%d/%d)\n",
-                         flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
           }
+
+	  NDPI_LOG_DBG(ndpi_struct, "(%d/%d)\n",
+                       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
         }
       }
     }
@@ -613,23 +667,25 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
       rtp_get_stream_type(packet->payload[1] & 0x7F, &flow->flow_multimedia_type);
 
-      if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
-        if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DTLS) {
-          /* Keep DTLS/SUBPROTO since we already wrote to flow->protos.tls_quic */
+      if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RTP &&
+         flow->detected_protocol_stack[1] != NDPI_PROTOCOL_SRTP) {
+
+        if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
+          if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DTLS) {
+            /* Keep DTLS/SUBPROTO since we already wrote to flow->protos.tls_quic */
+          } else {
+            /* STUN/SUBPROTO -> SRTP/SUBPROTO */
+            ndpi_int_stun_add_connection(ndpi_struct, flow,
+                                         flow->detected_protocol_stack[0], NDPI_PROTOCOL_SRTP);
+          }
         } else {
-          /* STUN/SUBPROTO -> SUBPROTO/RTP */
-          ndpi_set_detected_protocol(ndpi_struct, flow,
-                                     NDPI_PROTOCOL_RTP, flow->detected_protocol_stack[0],
-                                     NDPI_CONFIDENCE_DPI);
+          /* STUN -> STUN/RTP, or
+             DTLS -> DTLS/SRTP */
+          ndpi_int_stun_add_connection(ndpi_struct, flow,
+                                       __get_master(flow) == NDPI_PROTOCOL_STUN ? NDPI_PROTOCOL_RTP: NDPI_PROTOCOL_SRTP,
+                                       __get_master(flow));
         }
-      } else {
-        /* STUN -> STUN/RTP, or
-           DTLS -> DTLS/RTP */
-        ndpi_set_detected_protocol(ndpi_struct, flow,
-                                   NDPI_PROTOCOL_RTP, __get_master(flow),
-                                   NDPI_CONFIDENCE_DPI);
       }
-      return 0; /* Stop */
     } else if(rtp_rtcp == IS_RTCP) {
       NDPI_LOG_DBG(ndpi_struct, "RTCP\n");
     } else {
@@ -700,8 +756,12 @@ int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct
 
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
-					 u_int app_proto) {
+					 u_int16_t app_proto,
+					 u_int16_t master_proto) {
   ndpi_confidence_t confidence = NDPI_CONFIDENCE_DPI;
+  u_int16_t new_app_proto;
+
+  NDPI_LOG_DBG(ndpi_struct, "Wanting %d/%d\n", master_proto, app_proto);
 
   if(app_proto == NDPI_PROTOCOL_UNKNOWN) {
     /* https://support.google.com/a/answer/1279090?hl=en */
@@ -734,23 +794,28 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
     }
   }
 
-  if(app_proto == NDPI_PROTOCOL_UNKNOWN) {
-    app_proto = search_into_cache(ndpi_struct, flow);
-    if(app_proto != NDPI_PROTOCOL_UNKNOWN)
+  if(!is_subclassification_real_by_proto(app_proto)) {
+    new_app_proto = search_into_cache(ndpi_struct, flow);
+    if(new_app_proto != NDPI_PROTOCOL_UNKNOWN) {
       confidence = NDPI_CONFIDENCE_DPI_CACHE;
+      if(app_proto == NDPI_PROTOCOL_RTP)
+        master_proto = NDPI_PROTOCOL_SRTP; /* STUN/RTP --> SRTP/APP */
+      app_proto = new_app_proto;
+    }
   }
-  if(app_proto != NDPI_PROTOCOL_UNKNOWN)
+  /* Adding only real subclassifications */
+  if(is_subclassification_real_by_proto(app_proto))
     add_to_caches(ndpi_struct, flow, app_proto);
 
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN ||
      app_proto != NDPI_PROTOCOL_UNKNOWN) {
-    NDPI_LOG_DBG(ndpi_struct, "Setting %d\n", app_proto);
-    ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, __get_master(flow), confidence);
+    NDPI_LOG_DBG(ndpi_struct, "Setting %d/%d\n", master_proto, app_proto);
+    ndpi_set_detected_protocol(ndpi_struct, flow, app_proto, master_proto, confidence);
 
     /* In "normal" data-path the generic code in `ndpi_internal_detection_process_packet()`
        takes care of setting the category */
     if(flow->extra_packets_func) {
-      ndpi_protocol ret = { __get_master(flow), app_proto, NDPI_PROTOCOL_UNKNOWN /* unused */, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
+      ndpi_protocol ret = { master_proto, app_proto, NDPI_PROTOCOL_UNKNOWN /* unused */, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
       flow->category = ndpi_get_proto_category(ndpi_struct, ret);
     }
   }
@@ -762,7 +827,7 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
      (to find all XOR-PEER-ADDRESS attributes)
   */
   if(!flow->extra_packets_func) {
-    if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN /* No-subclassification */ ||
+    if(!is_subclassification_real(flow) ||
        flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP /* Metadata. TODO: other protocols? */) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
       flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
@@ -791,7 +856,7 @@ static void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, s
   }
 
   if(is_stun(ndpi_struct, flow, &app_proto)) {
-    ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto);
+    ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto, __get_master(flow));
     return;
   }
 
