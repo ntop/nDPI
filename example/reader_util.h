@@ -301,8 +301,12 @@ typedef struct ndpi_flow_info {
 
   struct {
     struct {
-      u_int32_t ipv4;
+      union {
+        u_int32_t v4;
+        u_int8_t v6[16];
+      } address;
       u_int16_t port;
+      u_int16_t is_ipv6: 1, _pad: 15;
     } mapped_address;
   } stun;
   

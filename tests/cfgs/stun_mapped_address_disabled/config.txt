@@ -1,0 +1,1 @@
+--cfg=stun,metadata.attribute.mapped_address,0

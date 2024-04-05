@@ -402,9 +402,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x4007:
       /* These are the only messages apparently whatsapp voice can use */
       *app_proto = NDPI_PROTOCOL_WHATSAPP_CALL;
-      flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
-      flow->extra_packets_func = stun_search_again;
-      return 1;
+      break;
 
     case 0x0014: /* Realm */
       if(flow->host_server_name[0] == '\0') {
@@ -442,7 +440,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x8070: /* MS Implementation Version */
     case 0x8055: /* MS Service Quality */
       *app_proto = NDPI_PROTOCOL_SKYPE_TEAMS_CALL;
-      return 1;
+      break;
 
     case 0xFF03:
       *app_proto = NDPI_PROTOCOL_GOOGLE_CALL;
@@ -466,7 +464,8 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       break;
 
     case 0x0020: /* XOR-MAPPED-ADDRESS */
-      if(real_len <= payload_length - off - 12) {
+      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
+	 real_len <= payload_length - off - 12) {
 	u_int8_t protocol_family = payload[off+5];
 
 	if(protocol_family == 0x01 /* IPv4 */) {
@@ -475,8 +474,22 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 	  u_int16_t port_xor    = (magic_cookie >> 16) & 0xFFFF;
 
 	  flow->stun.mapped_address.port = xored_port ^ port_xor;
-	  flow->stun.mapped_address.ipv4 = xored_ip   ^ magic_cookie;
-	  flow->extra_packets_func = NULL; /* We're good now */
+	  flow->stun.mapped_address.address.v4 = htonl(xored_ip ^ magic_cookie);
+	  flow->stun.mapped_address.is_ipv6 = 0;
+	} else if(protocol_family == 0x02 /* IPv6 */ &&
+                  real_len <= payload_length - off - 24) {
+          u_int32_t ip[4];
+          u_int16_t port;
+
+          port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
+          ip[0] = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
+          ip[1] = *((u_int32_t *)&payload[off + 12]) ^ htonl(transaction_id[0]);
+          ip[2] = *((u_int32_t *)&payload[off + 16]) ^ htonl(transaction_id[1]);
+          ip[3] = *((u_int32_t *)&payload[off + 20]) ^ htonl(transaction_id[2]);
+
+	  flow->stun.mapped_address.port = port;
+	  memcpy(&flow->stun.mapped_address.address, &ip, 16);
+	  flow->stun.mapped_address.is_ipv6 = 1;
 	}
       }
       break;
@@ -492,16 +505,25 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
   return 1;
 }
 
-static int keep_extra_dissection(struct ndpi_flow_struct *flow)
+static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struct,
+                                 struct ndpi_flow_struct *flow)
 {
   if(!is_subclassification_real(flow))
     return 1;
 
-  /* Looking for XOR-PEER-ADDRESS metadata; TODO: other protocols? */
-  if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP)
-     || (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_WHATSAPP_CALL))
+  /* See the comment at the end of ndpi_int_stun_add_connection()
+     where we set the extra dissection */
+
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP)
     return 1;
-  return 0;
+
+  if(ndpi_struct->cfg.stun_mapped_address_enabled &&
+     flow->stun.mapped_address.port)
+    return 0;
+  if(!ndpi_struct->cfg.stun_mapped_address_enabled)
+    return 0;
+
+  return 1;
 }
 
 static u_int32_t __get_master(struct ndpi_flow_struct *flow) {
@@ -694,7 +716,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   } else {
     NDPI_LOG_DBG(ndpi_struct, "QUIC range. Unexpected\n");
   }
-  return keep_extra_dissection(flow);
+  return keep_extra_dissection(ndpi_struct, flow);
 }
 
 /* ************************************************************ */
@@ -822,16 +844,19 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
 
   /* We want extra dissection for:
      * sub-classification
-     * metadata extraction or looking for RTP
-     The latter is enabled only without sub-classification or for Telegram
-     (to find all XOR-PEER-ADDRESS attributes)
+     * metadata extraction (XOR-PEER-ADDRESS/XOR-MAPPED-ADDRESS) or looking for RTP
+       At the moment:
+       * it seems ZOOM doens't have any meaningful attributes
+       * we want XOR-MAPPED-ADDRESS only for Telegram -> we can stop after (the first)
+         XOR-MAPPED-ADDRESS for all the other sub-protocols
   */
   if(!flow->extra_packets_func) {
-    if(!is_subclassification_real(flow) ||
-       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP /* Metadata. TODO: other protocols? */) {
-      NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
-      flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
-      flow->extra_packets_func = stun_search_again;
+    if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_ZOOM) {
+      if(keep_extra_dissection(ndpi_struct, flow)) {
+        NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
+        flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
+        flow->extra_packets_func = stun_search_again;
+      }
     }
   }
 }
