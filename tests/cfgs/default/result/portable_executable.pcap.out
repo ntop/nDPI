@@ -1,0 +1,37 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	30	(15.00 pkts/flow)
+Confidence Unknown          : 1 (flows)
+Confidence Match by port    : 1 (flows)
+Num dissector calls: 504 (252.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/6/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/2/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Unknown	15	12160	1
+DNS	15	12154	1
+
+Acceptable                      15 12154         1            
+Unrated                         15 12160         1            
+
+	1	TCP 64.227.107.71:53 <-> 172.16.99.10:49652 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 15][cat: Network/14][11 pkts/11914 bytes <-> 4 pkts/240 bytes][Goodput ratio: 95/0][0.37 sec][::][bytes ratio: 0.961 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 40/182 362/364 114/182][Pkt Len c2s/s2c min/avg/max/stddev: 58/60 1083/60 1310/60 481/0][Risk: ** Binary App Transfer **** Malformed Packet **][Risk Score: 160][Risk Info: Invalid DNS Header / Portable Executable (PE32/PE32+) found][PLAIN TEXT (This program cannot be run in D)][Plen Bins: 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	TCP 172.16.99.201:1732 <-> 64.227.107.71:4444 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 15][4 pkts/246 bytes <-> 11 pkts/11914 bytes][Goodput ratio: 0/95][0.73 sec][bytes ratio: -0.960 (Download)][IAT c2s/s2c min/avg/max/stddev: 329/0 364/45 398/398 34/125][Pkt Len c2s/s2c min/avg/max/stddev: 60/58 62/1083 66/1310 3/481][Risk: ** Binary App Transfer **][Risk Score: 150][Risk Info: Portable Executable (PE32/PE32+) found][PLAIN TEXT (This program cannot be run in D)][Plen Bins: 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,0,0,0,0,0,0,0,0]

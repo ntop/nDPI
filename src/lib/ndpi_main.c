@@ -8160,6 +8160,44 @@ static int ndpi_is_ntop_protocol(ndpi_protocol *ret) {
 
 /* ********************************************************************************* */
 
+/* PE32/PE32+ format specs: https://learn.microsoft.com/en-us/windows/win32/debug/pe-format */
+static void ndpi_search_portable_executable(struct ndpi_detection_module_struct *ndpi_struct,
+                                            struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
+  static const uint16_t dos_signature = 0x4d5a; /* MZ */
+  static const uint32_t pe_signature = 0x50450000; /* PE */
+
+  NDPI_LOG_DBG(ndpi_struct, "search Portable Executable (PE) file\n");
+
+  if (flow->packet_counter > 5)
+  {
+    return;
+  }
+
+  if (packet->payload_packet_len < 0x3C /* offset to PE header */ + 4)
+  {
+    return;
+  }
+
+  if (ntohs(get_u_int16_t(packet->payload, 0)) != dos_signature)
+  {
+    return;
+  }
+
+  uint32_t const pe_offset = le32toh(get_u_int32_t(packet->payload, 0x3C));
+  if (packet->payload_packet_len <= pe_offset + 4 ||
+      be32toh(get_u_int32_t(packet->payload, pe_offset)) != pe_signature)
+  {
+    return;
+  }
+
+  NDPI_LOG_INFO(ndpi_struct, "found Portable Executable (PE) file\n");
+  ndpi_set_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER, "Portable Executable (PE32/PE32+) found");
+}
+
+/* ********************************************************************************* */
+
 static int ndpi_check_protocol_port_mismatch_exceptions(default_ports_tree_node_t *expected_proto,
 							ndpi_protocol *returned_proto) {
   /*
@@ -8551,6 +8589,10 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
      ret.app_protocol == NDPI_PROTOCOL_UNKNOWN && /* Only for unknown traffic */
      flow->packet_counter == 1 && packet->payload_packet_len > 0) {
    flow->first_pkt_fully_encrypted = fully_enc_heuristic(ndpi_str, flow);
+  }
+
+  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
+    ndpi_search_portable_executable(ndpi_str, flow);
   }
 
   return(ret);
