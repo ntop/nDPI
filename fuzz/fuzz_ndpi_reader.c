@@ -56,6 +56,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "log.level", "3");
     ndpi_set_config(workflow->ndpi_struct, "all", "log", "1");
 
+    ndpi_load_domain_suffixes(workflow->ndpi_struct, "public_suffix_list.dat");
+    ndpi_load_categories_dir(workflow->ndpi_struct, "./lists/");
     ndpi_load_protocols_file(workflow->ndpi_struct, "protos.txt");
     ndpi_load_categories_file(workflow->ndpi_struct, "categories.txt", NULL);
     ndpi_load_risk_domain_file(workflow->ndpi_struct, "risky_domains.txt");
@@ -69,6 +71,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "flow.track_payload", "1");
     ndpi_set_config(workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic", "1");
     ndpi_set_config(workflow->ndpi_struct, "tls", "application_blocks_tracking", "1");
+    ndpi_set_config(workflow->ndpi_struct, "stun", "max_packets_extra_dissection", "255");
 
     ndpi_finalize_initialization(workflow->ndpi_struct);
 
