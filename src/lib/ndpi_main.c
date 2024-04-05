@@ -8584,7 +8584,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   /* Zoom cache */
   if((ret.app_protocol == NDPI_PROTOCOL_ZOOM) && (flow->l4_proto == IPPROTO_TCP))
     ndpi_add_connection_as_zoom(ndpi_str, flow);
-  
+
   if(ndpi_str->cfg.fully_encrypted_heuristic &&
      ret.app_protocol == NDPI_PROTOCOL_UNKNOWN && /* Only for unknown traffic */
      flow->packet_counter == 1 && packet->payload_packet_len > 0) {
@@ -8593,6 +8593,27 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
   if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
     ndpi_search_portable_executable(ndpi_str, flow);
+  }
+
+  if(flow->first_pkt_fully_encrypted == 0 &&
+     ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
+     NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(flow->entropy) == 0 &&
+     flow->packet_counter < 3)
+  {
+    flow->entropy = ndpi_entropy(packet->payload, packet->payload_packet_len);
+    if(NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(flow->entropy) != 0) {
+      char str[32];
+
+      snprintf(str, sizeof(str), "Entropy %.2f", flow->entropy);
+      ndpi_set_risk(flow, NDPI_SUSPICIOUS_ENTROPY, str);
+    }
+  }
+  if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN &&
+     ret.app_protocol != NDPI_PROTOCOL_IP_ICMP &&
+     flow->entropy > 0.0f)
+  {
+    flow->entropy = 0.0f;
+    ndpi_unset_risk(flow, NDPI_SUSPICIOUS_ENTROPY);
   }
 
   return(ret);

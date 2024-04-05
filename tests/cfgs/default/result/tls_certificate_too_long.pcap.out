@@ -83,4 +83,4 @@ JA3 Host Stats:
 
 
 Undetected flows:
-	1	TCP 192.168.1.121:52721 <-> 192.168.1.139:55367 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 13][6 pkts/1578 bytes <-> 7 pkts/4004 bytes][Goodput ratio: 75/88][1.86 sec][bytes ratio: -0.435 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 388/69 825/279 297/108][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 263/572 460/1514 197/612][Plen Bins: 0,0,0,0,0,0,14,0,0,0,0,0,57,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,0,0]
+	1	TCP 192.168.1.121:52721 <-> 192.168.1.139:55367 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 13][6 pkts/1578 bytes <-> 7 pkts/4004 bytes][Goodput ratio: 75/88][1.86 sec][bytes ratio: -0.435 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 388/69 825/279 297/108][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 263/572 460/1514 197/612][Risk: ** Susp Entropy **][Risk Score: 50][Risk Info: Entropy 7.40][Plen Bins: 0,0,0,0,0,0,14,0,0,0,0,0,57,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,0,0]
