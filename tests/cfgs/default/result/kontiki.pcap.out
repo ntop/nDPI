@@ -41,4 +41,4 @@ Unrated                          4 1696          2
 
 Undetected flows:
 	1	UDP 10.25.32.59:19948 -> 255.255.255.255:19948 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/1033 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][PLAIN TEXT (xml version)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 10.25.32.59:19948 <-> 64.200.148.82:1948 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 3][2 pkts/411 bytes <-> 1 pkts/252 bytes][Goodput ratio: 79/83][0.01 sec][Plen Bins: 33,0,0,0,0,0,33,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.25.32.59:19948 <-> 64.200.148.82:1948 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 3][2 pkts/411 bytes <-> 1 pkts/252 bytes][Goodput ratio: 79/83][0.01 sec][Risk: ** Susp Entropy **][Risk Score: 50][Risk Info: Entropy 7.32][Plen Bins: 33,0,0,0,0,0,33,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
