@@ -1,0 +1,33 @@
+DPI Packets (TCP):	10	(10.00 pkts/flow)
+DPI Packets (UDP):	2	(2.00 pkts/flow)
+Confidence Unknown          : 2 (flows)
+Num dissector calls: 331 (165.50 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/6/0 (insert/search/found)
+LRU cache zoom:       0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/2/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/1/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Unknown	12	62824	2
+
+Unrated                         12 62824         2            
+
+
+
+Undetected flows:
+	1	TCP 127.0.0.1:41150 <-> 127.0.0.1:33333 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 10][5 pkts/31370 bytes <-> 5 pkts/338 bytes][Goodput ratio: 99/0][3.64 sec][bytes ratio: 0.979 (Upload)][IAT c2s/s2c min/avg/max/stddev: 3641/0 910/0 3641/0 1577/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 6274/68 16450/74 7620/3][Risk: ** Binary App Transfer **][Risk Score: 150][Risk Info: ELF found][PLAIN TEXT (/lib64/ld)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100]
+	2	UDP 127.0.0.1:60150 -> 127.0.0.1:33333 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 2][2 pkts/31116 bytes -> 0 pkts/0 bytes][Goodput ratio: 100/0][< 1 sec][Risk: ** Binary App Transfer **** Unidirectional Traffic **][Risk Score: 160][Risk Info: No server to client traffic / ELF found][PLAIN TEXT (/lib64/ld)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100]

@@ -8160,6 +8160,35 @@ static int ndpi_is_ntop_protocol(ndpi_protocol *ret) {
 
 /* ********************************************************************************* */
 
+/* ELF format specs: https://man7.org/linux/man-pages/man5/elf.5.html */
+static void ndpi_search_elf(struct ndpi_detection_module_struct *ndpi_struct,
+                            struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
+  static const uint32_t elf_signature = 0x7f454c46; /* [DEL]ELF */
+  static const uint32_t max_version = 6;
+
+  NDPI_LOG_DBG(ndpi_struct, "search ELF file\n");
+
+  if (packet->payload_packet_len < 24)
+  {
+    return;
+  }
+
+  if (ntohl(get_u_int32_t(packet->payload, 0)) != elf_signature)
+  {
+    return;
+  }
+
+  if (le32toh(get_u_int32_t(packet->payload, 20)) > max_version)
+  {
+    return;
+  }
+
+  NDPI_LOG_INFO(ndpi_struct, "found ELF file\n");
+  ndpi_set_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER, "ELF found");
+}
+
 /* PE32/PE32+ format specs: https://learn.microsoft.com/en-us/windows/win32/debug/pe-format */
 static void ndpi_search_portable_executable(struct ndpi_detection_module_struct *ndpi_struct,
                                             struct ndpi_flow_struct *flow)
@@ -8169,11 +8198,6 @@ static void ndpi_search_portable_executable(struct ndpi_detection_module_struct 
   static const uint32_t pe_signature = 0x50450000; /* PE */
 
   NDPI_LOG_DBG(ndpi_struct, "search Portable Executable (PE) file\n");
-
-  if (flow->packet_counter > 5)
-  {
-    return;
-  }
 
   if (packet->payload_packet_len < 0x3C /* offset to PE header */ + 4)
   {
@@ -8591,8 +8615,11 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
    flow->first_pkt_fully_encrypted = fully_enc_heuristic(ndpi_str, flow);
   }
 
-  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
+  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
+     flow->packet_counter <= 5)
+  {
     ndpi_search_portable_executable(ndpi_str, flow);
+    ndpi_search_elf(ndpi_str, flow);
   }
 
   if(flow->first_pkt_fully_encrypted == 0 &&
