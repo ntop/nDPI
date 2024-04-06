@@ -8186,7 +8186,7 @@ static void ndpi_search_portable_executable(struct ndpi_detection_module_struct 
   }
 
   uint32_t const pe_offset = le32toh(get_u_int32_t(packet->payload, 0x3C));
-  if (packet->payload_packet_len <= pe_offset + 4 ||
+  if ((u_int32_t)(packet->payload_packet_len - 4) <= pe_offset ||
       be32toh(get_u_int32_t(packet->payload, pe_offset)) != pe_signature)
   {
     return;
