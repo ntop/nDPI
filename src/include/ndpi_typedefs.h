@@ -838,6 +838,9 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_SSH */
   u_int32_t ssh_stage:3;
 
+  /* NDPI_PROTOCOL_KAFKA */
+  u_int32_t kafka_stage:1;
+
   /* NDPI_PROTOCOL_VNC */
   u_int32_t vnc_stage:2;			// 0 - 3
 
@@ -891,6 +894,9 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_RADMIN */
   u_int32_t radmin_stage:1;
+
+  /* NDPI_PROTOCOL_KAFKA */
+  u_int32_t kafka_correlation_id;
 };
 
 /* ************************************************** */
@@ -1507,8 +1513,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 256,
                "Size of the struct member protocols increased to more than 256 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1016,
-               "Size of the flow struct increased to more than 1016 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1024,
+               "Size of the flow struct increased to more than 1024 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif
