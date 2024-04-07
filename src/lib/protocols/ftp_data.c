@@ -82,10 +82,6 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
   if(ndpi_match_strprefix(packet->payload, payload_len, "RIFF"))
     return 1;
 
-  /* MZ is a .exe file */
-  if((packet->payload[0] == 'M') && (packet->payload[1] == 'Z') && (packet->payload[3] == 0x00))
-    return 1;
-
   /* Ogg files */
   if(ndpi_match_strprefix(packet->payload, payload_len, "OggS"))
     return 1;
@@ -116,10 +112,6 @@ static int ndpi_match_file_header(struct ndpi_detection_module_struct *ndpi_stru
 
   /* PHP scripts */
   if((packet->payload[0] == 0x3c) && (packet->payload[1] == 0x3f) && (packet->payload[2] == 0x70) && (packet->payload[3] == 0x68))
-    return 1;
-
-  /* Unix scripts */
-  if((packet->payload[0] == 0x23) && (packet->payload[1] == 0x21) && (packet->payload[2] == 0x2f) && (packet->payload[3] == 0x62))
     return 1;
 
   /* PDFs */

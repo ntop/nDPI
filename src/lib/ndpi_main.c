@@ -8160,6 +8160,29 @@ static int ndpi_is_ntop_protocol(ndpi_protocol *ret) {
 
 /* ********************************************************************************* */
 
+static void ndpi_search_shellscript(struct ndpi_detection_module_struct *ndpi_struct,
+                                    struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
+
+  NDPI_LOG_DBG(ndpi_struct, "search Shellscript\n");
+
+  if (packet->payload_packet_len < 3)
+  {
+    return;
+  }
+
+  if (packet->payload[0] != '#' ||
+      packet->payload[1] != '!' ||
+      (packet->payload[2] != '/' && packet->payload[2] != ' '))
+  {
+    return;
+  }
+
+  NDPI_LOG_INFO(ndpi_struct, "found Shellscript\n");
+  ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, "Shellscript found");
+}
+
 /* ELF format specs: https://man7.org/linux/man-pages/man5/elf.5.html */
 static void ndpi_search_elf(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow)
@@ -8622,6 +8645,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   {
     ndpi_search_portable_executable(ndpi_str, flow);
     ndpi_search_elf(ndpi_str, flow);
+    ndpi_search_shellscript(ndpi_str, flow);
   }
 
   if(flow->first_pkt_fully_encrypted == 0 &&
