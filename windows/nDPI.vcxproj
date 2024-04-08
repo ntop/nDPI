@@ -373,6 +373,7 @@
     <ClCompile Include="..\src\lib\protocols\pfcp.c" />
     <ClCompile Include="..\src\lib\protocols\flute.c" />
     <ClCompile Include="..\src\lib\protocols\lol_wild_rift.c" />
+    <ClCompile Include="..\src\lib\protocols\teso.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />
