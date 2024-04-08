@@ -7320,7 +7320,7 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 
     if(s_match || d_match) {
       ndpi_int_change_protocol(flow,
-			       NDPI_PROTOCOL_SKYPE_TEAMS, master,
+			       NDPI_PROTOCOL_SKYPE_TEAMS_CALL, master,
 			       /* Keep the same confidence */
 			       flow->confidence);
 
