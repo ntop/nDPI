@@ -1457,38 +1457,6 @@ static void parseOptions(int argc, char **argv) {
 
 /* ********************************** */
 
-/**
- * @brief A faster replacement for inet_ntoa().
- */
-char* intoaV4(u_int32_t addr, char* buf, u_int16_t bufLen) {
-  char *cp;
-  int n;
-
-  cp = &buf[bufLen];
-  *--cp = '\0';
-
-  n = 4;
-  do {
-    u_int byte = addr & 0xff;
-
-    *--cp = byte % 10 + '0';
-    byte /= 10;
-    if(byte > 0) {
-      *--cp = byte % 10 + '0';
-      byte /= 10;
-      if(byte > 0)
-        *--cp = byte + '0';
-    }
-    if(n > 1)
-      *--cp = '.';
-    addr >>= 8;
-  } while (--n > 0);
-
-  return(cp);
-}
-
-/* ********************************** */
-
 static char* print_cipher(ndpi_cipher_weakness c) {
   switch(c) {
   case ndpi_cipher_insecure:
@@ -1903,14 +1871,19 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       }
     }
 
-    if(flow->stun.mapped_address.ipv4 != 0) {
-      char buf[32];
-      
+    if(flow->stun.mapped_address.port != 0) {
+      char buf[INET6_ADDRSTRLEN];
+
+      if(flow->stun.mapped_address.is_ipv6) {
+        inet_ntop(AF_INET6, &flow->stun.mapped_address.address, buf, sizeof(buf));
+      } else {
+        inet_ntop(AF_INET, &flow->stun.mapped_address.address, buf, sizeof(buf));
+      }
       fprintf(out, "[Mapped IP/Port: %s:%u]",
-	      intoaV4(flow->stun.mapped_address.ipv4, buf, sizeof(buf)),
-	      flow->stun.mapped_address.port);
+              buf,
+              flow->stun.mapped_address.port);
     }
-    
+
     if(flow->http.url[0] != '\0') {
       ndpi_risk_enum risk = ndpi_validate_url(flow->http.url);
 

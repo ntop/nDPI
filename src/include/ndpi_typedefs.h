@@ -1287,8 +1287,12 @@ struct ndpi_flow_struct {
   struct {
     u_int8_t maybe_dtls : 1, is_turn : 1, pad : 6;
     struct {
-      u_int32_t ipv4;
+      union {
+        u_int32_t v4;
+        u_int8_t v6[16];
+      } address; /* Network-order */
       u_int16_t port;
+      u_int16_t is_ipv6: 1, _pad: 15;
     } mapped_address;
   } stun;
 
@@ -1513,8 +1517,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 256,
                "Size of the struct member protocols increased to more than 256 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1024,
-               "Size of the flow struct increased to more than 1024 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1032,
+               "Size of the flow struct increased to more than 1032 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

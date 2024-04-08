@@ -181,6 +181,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     sprintf(cfg_value, "%d", value);
+    ndpi_set_config(ndpi_info_mod, "stun", "metadata.attribute.mapped_address", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    sprintf(cfg_value, "%d", value);
     ndpi_set_config(ndpi_info_mod, "dns", "subclassification", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {

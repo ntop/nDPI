@@ -249,6 +249,7 @@ struct ndpi_detection_module_config_struct {
 
   int stun_opportunistic_tls_enabled;
   int stun_max_packets_extra_dissection;
+  int stun_mapped_address_enabled;
 
   int dns_subclassification_enabled;
   int dns_parse_response_enabled;
