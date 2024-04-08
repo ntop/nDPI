@@ -105,7 +105,7 @@ A `DGA <https://en.wikipedia.org/wiki/Domain_generation_algorithm>`_ is used to 
 
 NDPI_MALFORMED_PACKET
 =====================
-This risk is generated when a packet (e.g. a DNS packet) has an unexpected formt. This can indicate a protocol error or more often an attempt to jeopardize a valid protocol to carry other type of data.
+This risk is generated when a packet (e.g. a DNS packet) has an unexpected format. This can indicate a protocol error or more often an attempt to jeopardize a valid protocol to carry other type of data.
 
 .. _Risk 018:
 
