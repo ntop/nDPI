@@ -333,4 +333,4 @@ Client contacted a server host labelled as malware.
 
 NDPI_BINARY_TRANSFER_ATTEMPT
 ============================
-HTTP only: this risk indicates that a binary data application has been attempted (but failed).
+HTTP only: this risk indicates that a binary file/data application transfer (attempt).

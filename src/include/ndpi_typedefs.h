@@ -167,7 +167,7 @@ typedef enum {
   NDPI_FULLY_ENCRYPTED,        /* This (unknown) session is fully encrypted */
   NDPI_TLS_ALPN_SNI_MISMATCH,  /* Invalid ALPN/SNI combination */
   NDPI_MALWARE_HOST_CONTACTED, /* Flow client contacted a malware host */
-  NDPI_BINARY_TRANSFER_ATTEMPT,/* Attempt to transfer something in binary format */
+  NDPI_BINARY_DATA_TRANSFER,   /* Attempt to transfer something in binary format */
   
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
