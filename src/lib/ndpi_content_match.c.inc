@@ -1610,6 +1610,7 @@ static ndpi_protocol_match host_match[] =
 
    { "easebar.com",                      "NetEaseGames", NDPI_PROTOCOL_NETEASE_GAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "pathofexile.com",                  "PathofExile", NDPI_PROTOCOL_PATHOFEXILE, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "elderscrollsonline.com",           "TES_Online", NDPI_PROTOCOL_TESO, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
