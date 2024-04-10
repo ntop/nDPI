@@ -65,8 +65,7 @@ static char* forge_attempt_msg(struct ndpi_flow_struct *flow, char *msg, char *b
 
 /* *********************************************** */
 
-static void ndpi_set_binary_data_transfer(struct ndpi_detection_module_struct *ndpi_struct,
-					  struct ndpi_flow_struct *flow,
+static void ndpi_set_binary_data_transfer(struct ndpi_flow_struct *flow,
 					  char *msg) {
   char buf[256];
   
@@ -284,7 +283,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 		NDPI_LOG_INFO(ndpi_struct, "found HTTP file transfer");
 
 		snprintf(str, sizeof(str), "Found binary mime %s", cmp_mimes[i]);
-		ndpi_set_binary_data_transfer(ndpi_struct, flow, str);
+		ndpi_set_binary_data_transfer(flow, str);
 		found = true;
 		break;
 	      }
@@ -382,7 +381,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	    /* No executable but just data transfer */
 	    snprintf(str, sizeof(str), "File download %s",
 		     flow->http.filename ? flow->http.filename : "");
-	    ndpi_set_binary_data_transfer(ndpi_struct, flow, str);
+	    ndpi_set_binary_data_transfer(flow, str);
 	  }
 	}
       }
