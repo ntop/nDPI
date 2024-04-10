@@ -2219,6 +2219,19 @@ extern "C" {
 
   const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx);
 
+  /**
+   * Searches for a subsequence ('needle') within a block of memory ('haystack').
+   *
+   * @par haystack     = pointer to the block of memory where the search is performed
+   * @par haystack_len = length of the haystack block of memory
+   * @par needle       = pointer to the memory block representing the needle to search for
+   * @par needle_len   = length of the needle memory block
+   * 
+   * @return Pointer to the beginning of the needle within the haystack if found;
+   * otherwise, NULL.
+   */
+  void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle,
+                    size_t needle_len);
 
 #ifdef __cplusplus
 }

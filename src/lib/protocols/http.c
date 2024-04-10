@@ -30,17 +30,17 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
-static const char* binary_file_mimes_e[] = { "exe", NULL };
-static const char* binary_file_mimes_j[] = { "java-vm", NULL };
-static const char* binary_file_mimes_v[] = { "vnd.ms-cab-compressed", "vnd.microsoft.portable-executable", NULL };
-static const char* binary_file_mimes_x[] = { "x-msdownload", "x-dosexec", NULL };
+static const char* binary_exec_file_mimes_e[] = { "exe", NULL };
+static const char* binary_exec_file_mimes_j[] = { "java-vm", NULL };
+static const char* binary_exec_file_mimes_v[] = { "vnd.ms-cab-compressed", "vnd.microsoft.portable-executable", NULL };
+static const char* binary_exec_file_mimes_x[] = { "x-msdownload", "x-dosexec", NULL };
 
 static const char* download_file_mimes_b[] = { "bz", "bz2", NULL };
 static const char* download_file_mimes_o[] = { "octet-stream", NULL };
 static const char* download_file_mimes_x[] = { "x-tar", "x-zip", "x-bzip", NULL };
 
 #define ATTACHMENT_LEN    3
-static const char* binary_file_ext[] = {
+static const char* binary_exec_file_ext[] = {
 					"exe",
 					"msi",
 					"cab",
@@ -51,6 +51,27 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 				 struct ndpi_flow_struct *flow);
 static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow);
+
+/* *********************************************** */
+
+static char* forge_attempt_msg(struct ndpi_flow_struct *flow, char *msg, char *buf, u_int buf_len) {
+  if((flow->http.response_status_code >= 200) && (flow->http.response_status_code < 300))
+    return(msg);
+  else {
+    snprintf(buf, buf_len, "%s (attempt)", msg);
+    return(buf);
+  }
+}
+
+/* *********************************************** */
+
+static void ndpi_set_binary_data_transfer(struct ndpi_flow_struct *flow,
+					  char *msg) {
+  char buf[256];
+  
+  ndpi_set_risk(flow, NDPI_BINARY_DATA_TRANSFER,
+		forge_attempt_msg(flow, msg, buf, sizeof(buf)));
+}
 
 /* *********************************************** */
 
@@ -68,14 +89,13 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
      )
     ;
   else {
-    if((flow->http.response_status_code >= 200) && (flow->http.response_status_code < 300))
-      ndpi_set_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER, msg);
-    else
-      ndpi_set_risk(flow, NDPI_BINARY_TRANSFER_ATTEMPT, msg);
+    char buf[256];
+    
+    ndpi_set_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER, forge_attempt_msg(flow, msg, buf, sizeof(buf)));
   }
  }
 
-  /* *********************************************** */
+/* *********************************************** */
 
 static void ndpi_analyze_content_signature(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow) {
@@ -244,7 +264,8 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
       } else {
 	if(app_len_avail > 3) {
 	  const char** cmp_mimes = NULL;
-
+	  bool found = false;
+	  
 	  switch(app[0]) {
 	  case 'b': cmp_mimes = download_file_mimes_b; break;
 	  case 'o': cmp_mimes = download_file_mimes_o; break;
@@ -256,8 +277,14 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 
 	    for(i = 0; cmp_mimes[i] != NULL; i++) {
 	      if(strncasecmp(app, cmp_mimes[i], app_len_avail) == 0) {
+		char str[64];	       		
+
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-		NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
+		NDPI_LOG_INFO(ndpi_struct, "found HTTP file transfer");
+
+		snprintf(str, sizeof(str), "Found binary mime %s", cmp_mimes[i]);
+		ndpi_set_binary_data_transfer(flow, str);
+		found = true;
 		break;
 	      }
 	    }
@@ -265,24 +292,26 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 
 	  /* ***************************************** */
 
-	  switch(app[0]) {
-	  case 'e': cmp_mimes = binary_file_mimes_e; break;
-	  case 'j': cmp_mimes = binary_file_mimes_j; break;
-	  case 'v': cmp_mimes = binary_file_mimes_v; break;
-	  case 'x': cmp_mimes = binary_file_mimes_x; break;
-	  }
+	  if(!found) {
+	    switch(app[0]) {
+	    case 'e': cmp_mimes = binary_exec_file_mimes_e; break;
+	    case 'j': cmp_mimes = binary_exec_file_mimes_j; break;
+	    case 'v': cmp_mimes = binary_exec_file_mimes_v; break;
+	    case 'x': cmp_mimes = binary_exec_file_mimes_x; break;
+	    }
 
-	  if(cmp_mimes != NULL) {
-	    u_int8_t i;
+	    if(cmp_mimes != NULL) {
+	      u_int8_t i;
 
-	    for(i = 0; cmp_mimes[i] != NULL; i++) {
-	      if(strncasecmp(app, cmp_mimes[i], app_len_avail) == 0) {
-		char str[64];
+	      for(i = 0; cmp_mimes[i] != NULL; i++) {
+		if(strncasecmp(app, cmp_mimes[i], app_len_avail) == 0) {
+		  char str[64];
 
-		snprintf(str, sizeof(str), "Found mime exe %s", cmp_mimes[i]);
-		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-		ndpi_set_binary_application_transfer(ndpi_struct, flow, str);
-		NDPI_LOG_INFO(ndpi_struct, "Found executable HTTP transfer");
+		  snprintf(str, sizeof(str), "Found mime exe %s", cmp_mimes[i]);
+		  flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
+		  ndpi_set_binary_application_transfer(ndpi_struct, flow, str);
+		  NDPI_LOG_INFO(ndpi_struct, "Found executable HTTP transfer");
+		}
 	      }
 	    }
 	  }
@@ -334,19 +363,25 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	  attachment_len += filename_len-ATTACHMENT_LEN-1;
 
 	  if((attachment_len+ATTACHMENT_LEN) <= packet->content_disposition_line.len) {
-	    for(i = 0; binary_file_ext[i] != NULL; i++) {
+	    char str[64];
+	    
+	    for(i = 0; binary_exec_file_ext[i] != NULL; i++) {
 	      /* Use memcmp in case content-disposition contains binary data */
 	      if(memcmp(&packet->content_disposition_line.ptr[attachment_len],
-			binary_file_ext[i], ATTACHMENT_LEN) == 0) {
-		char str[64];
+			binary_exec_file_ext[i], ATTACHMENT_LEN) == 0) {
 
-		snprintf(str, sizeof(str), "Found file extn %s", binary_file_ext[i]);
+		snprintf(str, sizeof(str), "Found file extn %s", binary_exec_file_ext[i]);
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
 		ndpi_set_binary_application_transfer(ndpi_struct, flow, str);
 		NDPI_LOG_INFO(ndpi_struct, "found executable HTTP transfer");
 		return(flow->category);
 	      }
 	    }
+
+	    /* No executable but just data transfer */
+	    snprintf(str, sizeof(str), "File download %s",
+		     flow->http.filename ? flow->http.filename : "");
+	    ndpi_set_binary_data_transfer(flow, str);
 	  }
 	}
       }

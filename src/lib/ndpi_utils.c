@@ -2055,8 +2055,8 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_MALWARE_HOST_CONTACTED:
     return("Client contacted a malware host");
 
-  case NDPI_BINARY_TRANSFER_ATTEMPT:
-    return("Binary Data Transfer Attemot");
+  case NDPI_BINARY_DATA_TRANSFER:
+    return("Binary file/data transfer (attempt)");
 
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
