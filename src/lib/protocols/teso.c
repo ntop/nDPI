@@ -31,6 +31,14 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
+static void ndpi_int_teso_add_connection(struct ndpi_detection_module_struct * const ndpi_struct,
+                                         struct ndpi_flow_struct * const flow)
+{
+  NDPI_LOG_INFO(ndpi_struct, "found TES Online\n");
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TESO,
+                             NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+}
+
 static void ndpi_search_teso(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow)
 {
@@ -54,16 +62,16 @@ static void ndpi_search_teso(struct ndpi_detection_module_struct *ndpi_struct,
 
   const u_int8_t magic[] = { 0x8B, 0x78, 0x9C, 0x01 };
 
-  if (memmem(packet->payload, 140, "eso.live", NDPI_STATICSTRING_LEN("eso.live"))) {
-    NDPI_LOG_INFO(ndpi_struct, "found TES Online\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TESO,
-                               NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  if (ndpi_memmem(packet->payload, packet->payload_packet_len, "eso.live",
+      NDPI_STATICSTRING_LEN("eso.live")))
+  {
+    ndpi_int_teso_add_connection(ndpi_struct, flow);
     return;
   }
-  else if (memmem(packet->payload, 140, magic, sizeof(magic))) {
-    NDPI_LOG_INFO(ndpi_struct, "found TES Online\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TESO,
-                               NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  else if (ndpi_memmem(packet->payload, packet->payload_packet_len, magic,
+           sizeof(magic)))
+  {
+    ndpi_int_teso_add_connection(ndpi_struct, flow);
     return;
   }
 
