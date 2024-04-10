@@ -11443,8 +11443,9 @@ void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle,
   }
 
   const u_int8_t* h = NULL;
+  const u_int8_t* n = (const u_int8_t*)needle;
   for (h = haystack; h <= (const u_int8_t*)haystack+haystack_len-needle_len; ++h) {
-    if (!memcmp(h, needle, needle_len))
+    if (*h == n[0] && !memcmp(h, needle, needle_len))
       return (void*)h;
   }
 
