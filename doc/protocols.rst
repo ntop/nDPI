@@ -708,15 +708,6 @@ League of Legends: Wild Rift is a mobile MOBA game.
 References: `Main site <https://wildrift.leagueoflegends.com/>`_
 
 
-.. _Proto 407:
-
-`NDPI_PROTOCOL_LOLWILDRIFT`
-============================
-League of Legends: Wild Rift is a mobile MOBA game.
-
-References: `Main site <https://wildrift.leagueoflegends.com/>`_
-
-
 .. _Proto 408:
 
 `NDPI_PROTOCOL_TESO`
