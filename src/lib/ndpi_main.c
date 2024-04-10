@@ -11447,3 +11447,31 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
   }
   return NULL;
 }
+
+void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle, size_t needle_len)
+{
+  if (!haystack || !needle) {
+    return NULL;
+  }
+
+  if (needle_len > haystack_len) {
+    return NULL;
+  }
+
+  if ((size_t)(const u_int8_t*)haystack+haystack_len < haystack_len) {
+    return NULL;
+  }
+
+  if (needle_len == 1) {
+    return memchr(haystack, *(int*)needle, haystack_len);
+  }
+
+  const u_int8_t* h = NULL;
+  const u_int8_t* n = (const u_int8_t*)needle;
+  for (h = haystack; h <= (const u_int8_t*)haystack+haystack_len-needle_len; ++h) {
+    if (*h == n[0] && !memcmp(h, needle, needle_len))
+      return (void*)h;
+  }
+
+  return NULL;
+}
