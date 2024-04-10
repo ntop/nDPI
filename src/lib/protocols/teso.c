@@ -83,7 +83,7 @@ void init_teso_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
   ndpi_set_bitmask_protocol_detection("TES_Online", ndpi_struct, *id,
               NDPI_PROTOCOL_TESO,
               ndpi_search_teso,
-              NDPI_SELECTION_BITMASK_PROTOCOL_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+              NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
               SAVE_DETECTION_BITMASK_AS_UNKNOWN,
               ADD_TO_DETECTION_BITMASK);
 
