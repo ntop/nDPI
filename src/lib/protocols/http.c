@@ -222,8 +222,12 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
 
       if(len >= 8 /* 4 chars for \r\n\r\n and at least 4 charts for content guess */) {
 	double_ret += 4;
+	len -= 4;
 
 	ndpi_http_check_human_redeable_content(ndpi_struct, flow, double_ret, len);
+	if (flow->skip_entropy_check == 0) {
+	  flow->entropy = ndpi_entropy(double_ret, len);
+	}
       }
     }
 

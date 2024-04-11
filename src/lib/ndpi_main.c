@@ -175,7 +175,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_TLS_CERT_VALIDITY_TOO_LONG,            NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_SERVER_ACCOUNTABLE },
   { NDPI_TLS_SUSPICIOUS_EXTENSION,              NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE   },
   { NDPI_TLS_FATAL_ALERT,                       NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE   },
-  { NDPI_SUSPICIOUS_ENTROPY,                    NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE   },
+  { NDPI_SUSPICIOUS_ENTROPY,                    NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE   },
   { NDPI_CLEAR_TEXT_CREDENTIALS,                NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_DNS_LARGE_PACKET,                      NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_DNS_FRAGMENTED,                        NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
@@ -4396,14 +4396,10 @@ static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str
 	    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
 
 	  if(packet->payload_packet_len > sizeof(struct ndpi_icmphdr)) {
-	    flow->entropy = ndpi_entropy(packet->payload + sizeof(struct ndpi_icmphdr),
-	                                 packet->payload_packet_len - sizeof(struct ndpi_icmphdr));
-
-	    if(NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(flow->entropy) != 0) {
-	      char str[32];
-
-		snprintf(str, sizeof(str), "Entropy %.2f", flow->entropy);
-		ndpi_set_risk(flow, NDPI_SUSPICIOUS_ENTROPY, str);
+	    if (flow->skip_entropy_check == 0) {
+	      flow->entropy = ndpi_entropy(packet->payload + sizeof(struct ndpi_icmphdr),
+	                                   packet->payload_packet_len - sizeof(struct ndpi_icmphdr));
+	      ndpi_entropy2risk(flow);
 	    }
 
 	    u_int16_t chksm = icmp4_checksum(packet->payload, packet->payload_packet_len);
@@ -8583,25 +8579,16 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     ndpi_search_shellscript(ndpi_str, flow);
   }
 
-  if(flow->first_pkt_fully_encrypted == 0 &&
-     ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
-     NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(flow->entropy) == 0 &&
-     flow->packet_counter < 3)
+  if(flow->skip_entropy_check == 0 &&
+     flow->first_pkt_fully_encrypted == 0 &&
+     flow->packet_counter < 5 &&
+     /* The following protocols do their own entropy calculation/classification. */
+     ret.app_protocol != NDPI_PROTOCOL_IP_ICMP)
   {
-    flow->entropy = ndpi_entropy(packet->payload, packet->payload_packet_len);
-    if(NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(flow->entropy) != 0) {
-      char str[32];
-
-      snprintf(str, sizeof(str), "Entropy %.2f", flow->entropy);
-      ndpi_set_risk(flow, NDPI_SUSPICIOUS_ENTROPY, str);
+    if (ret.app_protocol != NDPI_PROTOCOL_HTTP) {
+      flow->entropy = ndpi_entropy(packet->payload, packet->payload_packet_len);
     }
-  }
-  if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN &&
-     ret.app_protocol != NDPI_PROTOCOL_IP_ICMP &&
-     flow->entropy > 0.0f)
-  {
-    flow->entropy = 0.0f;
-    ndpi_unset_risk(flow, NDPI_SUSPICIOUS_ENTROPY);
+    ndpi_entropy2risk(flow);
   }
 
   return(ret);
