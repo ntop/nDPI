@@ -1232,6 +1232,11 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
         ndpi_serialize_string_string(serializer, "fingerprint", buf);
       }
 
+      ndpi_serialize_string_uint32(serializer, "blocks", flow->l4.tcp.tls.num_tls_blocks);
+#ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
+      ndpi_serialize_string_uint32(serializer, "sig_algs", flow->protos.tls_quic.num_tls_signature_algorithms);
+#endif
+
       ndpi_serialize_end_of_block(serializer);
     }
   }
