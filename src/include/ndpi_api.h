@@ -1002,9 +1002,9 @@ extern "C" {
 				     u_int32_t saddr,
 				     u_int32_t daddr,
 				     ndpi_protocol *ret);
-  int ndpi_fill_ip6_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
-				      struct ndpi_flow_struct *flow,
-				      struct in6_addr *saddr, struct in6_addr *daddr,
+  int ndpi_fill_ipv6_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
+				       struct ndpi_flow_struct *flow,
+				       struct in6_addr *saddr, struct in6_addr *daddr,
 				      ndpi_protocol *ret);
   int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_struct,
 				 char *name, u_int name_len, ndpi_protocol_category_t *id);

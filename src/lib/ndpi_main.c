@@ -8067,10 +8067,10 @@ int ndpi_fill_ip_protocol_category(struct ndpi_detection_module_struct *ndpi_str
 
 /* ********************************************************************************* */
 
-int ndpi_fill_ip6_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
-				    struct ndpi_flow_struct *flow,
-				    struct in6_addr *saddr, struct in6_addr *daddr,
-				    ndpi_protocol *ret) {
+int ndpi_fill_ipv6_protocol_category(struct ndpi_detection_module_struct *ndpi_str,
+				     struct ndpi_flow_struct *flow,
+				     struct in6_addr *saddr, struct in6_addr *daddr,
+				     ndpi_protocol *ret) {
   bool match_client = true;
 
   ret->custom_category_userdata = NULL;
@@ -8297,7 +8297,8 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
       if(packet->iph)
 	ndpi_fill_ip_protocol_category(ndpi_str, flow, flow->c_address.v4, flow->s_address.v4, ret);
       else
-        ndpi_fill_ip6_protocol_category(ndpi_str, flow, (struct in6_addr *)flow->c_address.v6, (struct in6_addr *)flow->s_address.v6, ret);
+        ndpi_fill_ipv6_protocol_category(ndpi_str, flow, (struct in6_addr *)flow->c_address.v6,
+					 (struct in6_addr *)flow->s_address.v6, ret);
       flow->guessed_header_category = ret->category;
     } else
       flow->guessed_header_category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
