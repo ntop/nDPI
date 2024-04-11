@@ -68,7 +68,7 @@ static char* forge_attempt_msg(struct ndpi_flow_struct *flow, char *msg, char *b
 static void ndpi_set_binary_data_transfer(struct ndpi_flow_struct *flow,
 					  char *msg) {
   char buf[256];
-  
+
   ndpi_set_risk(flow, NDPI_BINARY_DATA_TRANSFER,
 		forge_attempt_msg(flow, msg, buf, sizeof(buf)));
 }
@@ -90,7 +90,7 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
     ;
   else {
     char buf[256];
-    
+
     ndpi_set_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER, forge_attempt_msg(flow, msg, buf, sizeof(buf)));
   }
  }
@@ -102,11 +102,18 @@ static void ndpi_analyze_content_signature(struct ndpi_detection_module_struct *
   u_int8_t set_risk = 0;
   const char *msg = NULL;
 
+  /*
+    NOTE: see also (ndpi_main.c)
+    - ndpi_search_elf
+    - ndpi_search_portable_executable
+    - ndpi_search_shellscript
+  */
+  
   if((flow->initial_binary_bytes_len >= 2) && (flow->initial_binary_bytes[0] == 0x4D) && (flow->initial_binary_bytes[1] == 0x5A))
-    set_risk = 1, msg = "Found Windows Exe"; /* Win executable */
+    set_risk = 1, msg = "Found DOS/Windows Exe"; /* Win executable */
   else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0x7F) && (flow->initial_binary_bytes[1] == 'E')
 	  && (flow->initial_binary_bytes[2] == 'L') && (flow->initial_binary_bytes[3] == 'F'))
-    set_risk = 1, msg = "Found Linux Exe"; /* Linux executable */
+    set_risk = 1, msg = "Found Linux Exe"; /* Linux ELF executable */
   else if((flow->initial_binary_bytes_len >= 4) && (flow->initial_binary_bytes[0] == 0xCF) && (flow->initial_binary_bytes[1] == 0xFA)
 	  && (flow->initial_binary_bytes[2] == 0xED) && (flow->initial_binary_bytes[3] == 0xFE))
     set_risk = 1, msg = "Found Linux Exe"; /* Linux executable */
@@ -265,7 +272,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	if(app_len_avail > 3) {
 	  const char** cmp_mimes = NULL;
 	  bool found = false;
-	  
+
 	  switch(app[0]) {
 	  case 'b': cmp_mimes = download_file_mimes_b; break;
 	  case 'o': cmp_mimes = download_file_mimes_o; break;
@@ -277,7 +284,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 
 	    for(i = 0; cmp_mimes[i] != NULL; i++) {
 	      if(strncasecmp(app, cmp_mimes[i], app_len_avail) == 0) {
-		char str[64];	       		
+		char str[64];
 
 		flow->guessed_category = flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
 		NDPI_LOG_INFO(ndpi_struct, "found HTTP file transfer");
@@ -364,7 +371,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 
 	  if((attachment_len+ATTACHMENT_LEN) <= packet->content_disposition_line.len) {
 	    char str[64];
-	    
+
 	    for(i = 0; binary_exec_file_ext[i] != NULL; i++) {
 	      /* Use memcmp in case content-disposition contains binary data */
 	      if(memcmp(&packet->content_disposition_line.ptr[attachment_len],
@@ -585,12 +592,12 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     ookla_add_to_cache(ndpi_struct, flow);
   }
 
-  if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) && 
+  if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) &&
       flow->http.user_agent && strstr(flow->http.user_agent, "MSRPC")) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_RPCH, master_protocol, NDPI_CONFIDENCE_DPI);
   }
 
-  if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) && 
+  if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) &&
       flow->http.user_agent && strstr(flow->http.user_agent, "Valve/Steam HTTP Client")) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STEAM, master_protocol, NDPI_CONFIDENCE_DPI);
   }

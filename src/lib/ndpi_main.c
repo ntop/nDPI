@@ -8168,27 +8168,24 @@ static int ndpi_is_ntop_protocol(ndpi_protocol *ret) {
 /* ********************************************************************************* */
 
 static void ndpi_search_shellscript(struct ndpi_detection_module_struct *ndpi_struct,
-                                    struct ndpi_flow_struct *flow)
-{
+                                    struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search Shellscript\n");
 
-  if (packet->payload_packet_len < 3)
-  {
-    return;
-  }
+  if (packet->payload_packet_len < 3)  
+    return;  
 
   if (packet->payload[0] != '#' ||
       packet->payload[1] != '!' ||
-      (packet->payload[2] != '/' && packet->payload[2] != ' '))
-  {
-    return;
-  }
+      (packet->payload[2] != '/' && packet->payload[2] != ' '))  
+    return;  
 
   NDPI_LOG_INFO(ndpi_struct, "found Shellscript\n");
   ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, "Shellscript found");
 }
+
+/* ********************************************************************************* */
 
 /* ELF format specs: https://man7.org/linux/man-pages/man5/elf.5.html */
 static void ndpi_search_elf(struct ndpi_detection_module_struct *ndpi_struct,
@@ -8201,28 +8198,23 @@ static void ndpi_search_elf(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search ELF file\n");
 
   if (packet->payload_packet_len < 24)
-  {
     return;
-  }
 
   if (ntohl(get_u_int32_t(packet->payload, 0)) != elf_signature)
-  {
     return;
-  }
 
   if (le32toh(get_u_int32_t(packet->payload, 20)) > max_version)
-  {
     return;
-  }
 
   NDPI_LOG_INFO(ndpi_struct, "found ELF file\n");
   ndpi_set_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER, "ELF found");
 }
 
+/* ********************************************************************************* */
+
 /* PE32/PE32+ format specs: https://learn.microsoft.com/en-us/windows/win32/debug/pe-format */
 static void ndpi_search_portable_executable(struct ndpi_detection_module_struct *ndpi_struct,
-                                            struct ndpi_flow_struct *flow)
-{
+                                            struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
   static const uint16_t dos_signature = 0x4d5a; /* MZ */
   static const uint32_t pe_signature = 0x50450000; /* PE */
@@ -8230,21 +8222,15 @@ static void ndpi_search_portable_executable(struct ndpi_detection_module_struct 
   NDPI_LOG_DBG(ndpi_struct, "search Portable Executable (PE) file\n");
 
   if (packet->payload_packet_len < 0x3C /* offset to PE header */ + 4)
-  {
     return;
-  }
 
   if (ntohs(get_u_int16_t(packet->payload, 0)) != dos_signature)
-  {
     return;
-  }
 
   uint32_t const pe_offset = le32toh(get_u_int32_t(packet->payload, 0x3C));
   if ((u_int32_t)(packet->payload_packet_len - 4) <= pe_offset ||
       be32toh(get_u_int32_t(packet->payload, pe_offset)) != pe_signature)
-  {
     return;
-  }
 
   NDPI_LOG_INFO(ndpi_struct, "found Portable Executable (PE) file\n");
   ndpi_set_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER, "Portable Executable (PE32/PE32+) found");
@@ -8648,9 +8634,9 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
    flow->first_pkt_fully_encrypted = fully_enc_heuristic(ndpi_str, flow);
   }
 
-  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
-     flow->packet_counter <= 5)
-  {
+  if((ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+     && (packet->payload_packet_len > 0)
+     && (flow->packet_counter <= 5)) {
     ndpi_search_portable_executable(ndpi_str, flow);
     ndpi_search_elf(ndpi_str, flow);
     ndpi_search_shellscript(ndpi_str, flow);
@@ -8978,8 +8964,6 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
     }
   }
 }
-
-
 
 /* ********************************************************************************* */
 
