@@ -200,6 +200,28 @@ static void add_to_caches(struct ndpi_detection_module_struct *ndpi_struct,
   }
 }
 
+static void parse_ip_port_attribute(const u_int8_t *payload, u_int16_t payload_length,
+                                    int off, u_int16_t real_len,ndpi_address_port *ap)
+{
+  if(off + 4 + real_len <= payload_length &&
+     (real_len == 8 || real_len == 20)) {
+    u_int8_t protocol_family = payload[off+5];
+
+    if(protocol_family == 0x01 /* IPv4 */ &&
+       real_len == 8) {
+      u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
+      u_int32_t ip   = ntohl(*((u_int32_t*)&payload[off+8]));
+
+      ap->port = port;
+      ap->address.v4 = htonl(ip);
+      ap->is_ipv6 = 0;
+    } else if(protocol_family == 0x02 /* IPv6 */ &&
+              real_len == 20) {
+      /* TODO */
+    }
+  }
+}
+
 #ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 static
 #endif
@@ -334,59 +356,20 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
     switch(attribute) {
     case 0x0001: /* MAPPED-ADDRESS */
-      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
-	 real_len < payload_length - off - 5) {
-	u_int8_t protocol_family = payload[off+5];
-
-	if(protocol_family == 0x01 /* IPv4 */) {
-	  u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
-	  u_int32_t ip   = ntohl(*((u_int32_t*)&payload[off+8]));
-
-	  flow->stun.mapped_address.port = port;
-	  flow->stun.mapped_address.address.v4 = htonl(ip);
-	  flow->stun.mapped_address.is_ipv6 = 0;
-	} else if(protocol_family == 0x02 /* IPv6 */ &&
-                  real_len <= payload_length - off - 24) {
-	  /* TODO */
-	}
+      if(ndpi_struct->cfg.stun_mapped_address_enabled) {
+        parse_ip_port_attribute(payload, payload_length, off, real_len, &flow->stun.mapped_address);
       }
       break;
 
     case 0x802b: /* RESPONSE-ORIGIN */
-      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
-	 real_len <= payload_length - off - 5) {
-	u_int8_t protocol_family = payload[off+5];
-
-	if(protocol_family == 0x01 /* IPv4 */) {
-	  u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
-	  u_int32_t ip   = ntohl(*((u_int32_t*)&payload[off+8]));
-
-	  flow->stun.response_origin.port = port;
-	  flow->stun.response_origin.address.v4 = htonl(ip);
-	  flow->stun.response_origin.is_ipv6 = 0;
-	} else if(protocol_family == 0x02 /* IPv6 */ &&
-                  real_len <= payload_length - off - 24) {
-	  /* TODO */
-	}
+      if(ndpi_struct->cfg.stun_response_origin_enabled) {
+        parse_ip_port_attribute(payload, payload_length, off, real_len, &flow->stun.response_origin);
       }
       break;
 
-    case 0x802c: /* OTHER-ADDRESS */	    
-      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
-	 real_len <= payload_length - off - 5) {
-	u_int8_t protocol_family = payload[off+5];
-
-	if(protocol_family == 0x01 /* IPv4 */) {
-	  u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
-	  u_int32_t ip   = ntohl(*((u_int32_t*)&payload[off+8]));
-
-	  flow->stun.other_address.port = port;
-	  flow->stun.other_address.address.v4 = htonl(ip);
-	  flow->stun.other_address.is_ipv6 = 0;
-	} else if(protocol_family == 0x02 /* IPv6 */ &&
-                  real_len <= payload_length - off - 24) {
-	  /* TODO */
-	}
+    case 0x802c: /* OTHER-ADDRESS */
+      if(ndpi_struct->cfg.stun_other_address_enabled) {
+        parse_ip_port_attribute(payload, payload_length, off, real_len, &flow->stun.other_address);
       }
       break;
 
@@ -405,7 +388,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
           ip = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
 	  
 	  flow->stun.peer_address.port = port;
-	  flow->stun.peer_address.address.v4 = htonl(ip);
+	  flow->stun.peer_address.address.v4 = ip;
 	  flow->stun.peer_address.is_ipv6 = 0;
 
           NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
@@ -439,6 +422,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  flow->stun.peer_address.port = port;
 	  memcpy(&flow->stun.peer_address.address, &ip, 16);
+	  flow->stun.peer_address.is_ipv6 = 1;
 
           if(ndpi_struct->stun_cache &&
              is_subclassification_real(flow)) {
@@ -545,10 +529,12 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
     case 0x0020: /* XOR-MAPPED-ADDRESS */
       if(ndpi_struct->cfg.stun_mapped_address_enabled &&
-	 real_len <= payload_length - off - 4) {
+	 off + 4 + real_len <= payload_length &&
+	 (real_len == 8 || real_len == 20)) {
 	u_int8_t protocol_family = payload[off+5];
 
-	if(protocol_family == 0x01 /* IPv4 */) {
+	if(protocol_family == 0x01 /* IPv4 */ &&
+	   real_len == 8) {
 	  u_int16_t xored_port = ntohs(*((u_int16_t*)&payload[off+6]));
 	  u_int32_t xored_ip   = ntohl(*((u_int32_t*)&payload[off+8]));
 	  u_int16_t port_xor    = (magic_cookie >> 16) & 0xFFFF;
@@ -557,7 +543,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 	  flow->stun.mapped_address.address.v4 = htonl(xored_ip ^ magic_cookie);
 	  flow->stun.mapped_address.is_ipv6 = 0;
 	} else if(protocol_family == 0x02 /* IPv6 */ &&
-                  real_len <= payload_length - off - 24) {
+                  real_len == 20) {
           u_int32_t ip[4];
           u_int16_t port;
 
@@ -575,11 +561,13 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       break;
 
     case 0x0016: /* XOR-RELAYED-ADDRESS */
-      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
-	 real_len <= payload_length - off - 4) {
+      if(1 /* TODO: cfg */ &&
+	 off + 4 + real_len <= payload_length &&
+	 (real_len == 8 || real_len == 20)) {
 	u_int8_t protocol_family = payload[off+5];
 
-	if(protocol_family == 0x01 /* IPv4 */) {
+	if(protocol_family == 0x01 /* IPv4 */ &&
+	   real_len == 8) {
 	  u_int16_t xored_port = ntohs(*((u_int16_t*)&payload[off+6]));
 	  u_int32_t xored_ip   = ntohl(*((u_int32_t*)&payload[off+8]));
 	  u_int16_t port_xor    = (magic_cookie >> 16) & 0xFFFF;
@@ -588,7 +576,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 	  flow->stun.relayed_address.address.v4 = htonl(xored_ip ^ magic_cookie);
 	  flow->stun.relayed_address.is_ipv6 = 0;
 	} else if(protocol_family == 0x02 /* IPv6 */ &&
-                  real_len <= payload_length - off - 24) {
+                  real_len == 20) {
           u_int32_t ip[4];
           u_int16_t port;
 
@@ -616,8 +604,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
   return 1;
 }
 
-static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struct,
-                                 struct ndpi_flow_struct *flow)
+static int keep_extra_dissection(struct ndpi_flow_struct *flow)
 {
   if(!is_subclassification_real(flow))
     return 1;
@@ -628,9 +615,9 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP)
     return 1;
 
-  if(ndpi_struct->cfg.stun_mapped_address_enabled == 0)
-    return 0;
-  
+  /* TODO: improve:
+     * some of these attributes might be disabled
+     * we might now if some of these attributes are never used from some protocol */
   if(!flow->stun.mapped_address.port
      || !flow->stun.peer_address.port
      || !flow->stun.relayed_address.port
@@ -831,7 +818,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   } else {
     NDPI_LOG_DBG(ndpi_struct, "QUIC range. Unexpected\n");
   }
-  return keep_extra_dissection(ndpi_struct, flow);
+  return keep_extra_dissection(flow);
 }
 
 /* ************************************************************ */
@@ -959,15 +946,14 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
 
   /* We want extra dissection for:
      * sub-classification
-     * metadata extraction (XOR-PEER-ADDRESS/XOR-MAPPED-ADDRESS) or looking for RTP
+     * metadata extraction (*-ADDRESS) or looking for RTP
        At the moment:
        * it seems ZOOM doens't have any meaningful attributes
-       * we want XOR-MAPPED-ADDRESS only for Telegram -> we can stop after (the first)
-         XOR-MAPPED-ADDRESS for all the other sub-protocols
+       * we want (all) XOR-MAPPED-ADDRESS only for Telegram
   */
   if(!flow->extra_packets_func) {
     if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_ZOOM) {
-      if(keep_extra_dissection(ndpi_struct, flow)) {
+      if(keep_extra_dissection(flow)) {
         NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
         flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
         flow->extra_packets_func = stun_search_again;
