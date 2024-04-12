@@ -437,6 +437,7 @@ typedef enum {
   NDPI_PROTOCOL_FLUTE                 = 406,
   NDPI_PROTOCOL_LOLWILDRIFT           = 407,
   NDPI_PROTOCOL_TESO                  = 408,
+  NDPI_PROTOCOL_LDP                   = 409,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
