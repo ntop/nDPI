@@ -81,7 +81,7 @@ static void ndpi_search_ldp(struct ndpi_detection_module_struct *ndpi_struct,
       u_int16_t ldp_msg_type = ntohs(get_u_int16_t(packet->payload, 10));
 
       /* Vendor defined message types */
-      if (ldp_msg_type >= 0x3F00 && ldp_msg_type <= 0x3EFF) {
+      if (ldp_msg_type >= 0x3E00 && ldp_msg_type <= 0x3EFF) {
         ndpi_int_ldp_add_connection(ndpi_struct, flow);
         return;
       }
