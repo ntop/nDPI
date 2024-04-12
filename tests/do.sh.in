@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#
+# Use (to override results)
+#
+# NDPI_FORCE_UPDATING_UTESTS_RESULTS=1 ./tests/do.sh 
+#
+
 cd "$(dirname "${0}")"
 
 FUZZY_TESTING_ENABLED=@BUILD_FUZZTARGETS@
