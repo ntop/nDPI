@@ -715,3 +715,12 @@ References: `Main site <https://wildrift.leagueoflegends.com/>`_
 The Elder Scrolls Online is a MMORPG set in the fantasy world of Tamriel.
 
 References: `Main site <https://www.elderscrollsonline.com/>`_
+
+
+.. _Proto 409:
+
+`NDPI_PROTOCOL_LDP`
+=====================
+The Label Distribution Protocol (LDP) is a routing protocol used to establish and maintain label-switched paths in a Multiprotocol Label Switching (MPLS) network.
+
+References: `RFC <https://datatracker.ietf.org/doc/html/rfc5036>`_
