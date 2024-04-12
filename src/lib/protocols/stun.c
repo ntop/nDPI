@@ -335,7 +335,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
     switch(attribute) {
     case 0x0001: /* MAPPED-ADDRESS */
       if(ndpi_struct->cfg.stun_mapped_address_enabled &&
-	 real_len <= payload_length - off - 5) {
+	 real_len < payload_length - off - 5) {
 	u_int8_t protocol_family = payload[off+5];
 
 	if(protocol_family == 0x01 /* IPv4 */) {
