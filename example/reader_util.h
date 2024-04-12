@@ -295,19 +295,14 @@ typedef struct ndpi_flow_info {
   } ssh_tls;
 
   struct {
-    char url[256], request_content_type[64], content_type[64], user_agent[256], server[128], nat_ip[32], filename[256];
+    char url[256], request_content_type[64], content_type[64],
+      user_agent[256], server[128], nat_ip[32], filename[256];
     u_int response_status_code;
   } http;
 
   struct {
-    struct {
-      union {
-        u_int32_t v4;
-        u_int8_t v6[16];
-      } address;
-      u_int16_t port;
-      u_int16_t is_ipv6: 1, _pad: 15;
-    } mapped_address;
+    ndpi_address_port mapped_address, peer_address,
+      relayed_address, response_origin, other_address;
   } stun;
   
   struct {

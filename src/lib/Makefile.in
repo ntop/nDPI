@@ -15,6 +15,9 @@ PREFIX     = @prefix@
 libdir     = @libdir@
 includedir = @includedir@/ndpi
 ifneq ($(OS),Windows_NT)
+OS := $(shell uname)
+endif
+ifneq ($(OS),Windows_NT)
 CFLAGS     += -fPIC -DPIC
 endif
 CFLAGS     += -I. -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
@@ -40,9 +43,6 @@ TMP_OBJS := $(OBJECTS)
 OBJECTS   = $(filter-out third_party/src/gcrypt_light.o,$(TMP_OBJS))
 endif
 
-ifneq ($(OS),Windows_NT)
-OS := $(shell uname)
-endif
 BUILD_MINGW    		 = @BUILD_MINGW@
 
 ifeq ($(OS),Darwin)

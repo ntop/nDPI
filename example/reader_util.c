@@ -1,7 +1,7 @@
 /*
  * reader_util.c
  *
- * Copyright (C) 2011-23 - ntop.org
+ * Copyright (C) 2011-24 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -42,6 +42,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #endif
+#include <assert.h>
 
 #include "reader_util.h"
 
@@ -1077,11 +1078,13 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     u_int j;
 
     if(flow->ndpi_flow->protos.bittorrent.hash[0] != '\0') {
-      flow->bittorent_hash = ndpi_malloc(sizeof(flow->ndpi_flow->protos.bittorrent.hash) * 2 + 1);
+      u_int avail = sizeof(flow->ndpi_flow->protos.bittorrent.hash) * 2 + 1;
+      flow->bittorent_hash = ndpi_malloc(avail);
       
       if(flow->bittorent_hash) {
+
         for(i=0, j = 0; i < sizeof(flow->ndpi_flow->protos.bittorrent.hash); i++) {
-          sprintf(&flow->bittorent_hash[j], "%02x",
+          snprintf(&flow->bittorent_hash[j], avail-j, "%02x",
 	          flow->ndpi_flow->protos.bittorrent.hash[i]);
 
           j += 2;
@@ -1311,11 +1314,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     }
   }
 
-  if(flow->ndpi_flow->stun.mapped_address.port) {
-    memcpy(&flow->stun.mapped_address.address, &flow->ndpi_flow->stun.mapped_address.address, 16);
-    flow->stun.mapped_address.port = flow->ndpi_flow->stun.mapped_address.port;
-    flow->stun.mapped_address.is_ipv6 = flow->ndpi_flow->stun.mapped_address.is_ipv6;
-  }
+  memcpy(&flow->stun.mapped_address, &flow->ndpi_flow->stun.mapped_address, sizeof(ndpi_address_port));
+  memcpy(&flow->stun.peer_address, &flow->ndpi_flow->stun.peer_address, sizeof(ndpi_address_port));
+  memcpy(&flow->stun.relayed_address, &flow->ndpi_flow->stun.relayed_address, sizeof(ndpi_address_port));
+  memcpy(&flow->stun.response_origin, &flow->ndpi_flow->stun.response_origin, sizeof(ndpi_address_port));
+  memcpy(&flow->stun.other_address, &flow->ndpi_flow->stun.other_address, sizeof(ndpi_address_port));
 
   flow->multimedia_flow_type = flow->ndpi_flow->flow_multimedia_type;
   

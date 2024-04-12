@@ -1178,6 +1178,16 @@ typedef enum {
 
 #define MAX_NUM_TLS_SIGNATURE_ALGORITHMS 16
 
+typedef struct {
+  union {
+    u_int32_t v4;
+    u_int8_t v6[16];
+  } address; /* Network-order */
+
+  u_int16_t port;
+  u_int16_t is_ipv6: 1, _pad: 15;
+} ndpi_address_port;
+  
 struct tls_heuristics {
   /*
     TLS heuristics for detecting browsers usage
@@ -1286,14 +1296,7 @@ struct ndpi_flow_struct {
 
   struct {
     u_int8_t maybe_dtls : 1, is_turn : 1, pad : 6;
-    struct {
-      union {
-        u_int32_t v4;
-        u_int8_t v6[16];
-      } address; /* Network-order */
-      u_int16_t port;
-      u_int16_t is_ipv6: 1, _pad: 15;
-    } mapped_address;
+    ndpi_address_port mapped_address, peer_address, relayed_address, response_origin, other_address;
   } stun;
 
   struct {

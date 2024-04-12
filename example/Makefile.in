@@ -1,6 +1,9 @@
 AR=@AR@
 CC=@CC@
 CXX=@CXX@
+ifneq ($(OS),Windows_NT)
+OS := $(shell uname)
+endif
 ifeq ($(OS),Darwin)
 CC=clang -fno-color-diagnostics
 endif

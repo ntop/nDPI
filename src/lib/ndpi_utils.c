@@ -1242,6 +1242,24 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
   }
 }
 
+/* ********************************** */
+
+static char* print_ndpi_address_port(ndpi_address_port *ap, char *buf, u_int buf_len) {
+  char ipbuf[INET6_ADDRSTRLEN];
+  
+  if(ap->is_ipv6) {
+    inet_ntop(AF_INET6, &ap->address, ipbuf, sizeof(ipbuf));
+  } else {
+    inet_ntop(AF_INET, &ap->address, ipbuf, sizeof(ipbuf));
+  }
+  
+  snprintf(buf, buf_len, "%s:%u", ipbuf, ap->port);
+  
+  return(buf);
+}
+
+/* ********************************** */
+
 /* NOTE: serializer must have been already initialized */
 int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 		  struct ndpi_flow_struct *flow,
@@ -1496,6 +1514,27 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_string_string(serializer,  "server_signature", flow->protos.ssh.server_signature);
     ndpi_serialize_string_string(serializer,  "hassh_client", flow->protos.ssh.hassh_client);
     ndpi_serialize_string_string(serializer,  "hassh_server", flow->protos.ssh.hassh_server);
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
+  case NDPI_PROTOCOL_STUN:
+    ndpi_serialize_start_of_block(serializer, "stun");
+
+    if(flow->stun.mapped_address.port)
+      ndpi_serialize_string_string(serializer,  "mapped_address", print_ndpi_address_port(&flow->stun.mapped_address, buf, sizeof(buf)));
+
+    if(flow->stun.peer_address.port)
+      ndpi_serialize_string_string(serializer,  "peer_address", print_ndpi_address_port(&flow->stun.peer_address, buf, sizeof(buf)));
+
+    if(flow->stun.relayed_address.port)
+      ndpi_serialize_string_string(serializer,  "relayed_address", print_ndpi_address_port(&flow->stun.relayed_address, buf, sizeof(buf)));
+
+    if(flow->stun.response_origin.port)
+      ndpi_serialize_string_string(serializer,  "response_origin", print_ndpi_address_port(&flow->stun.response_origin, buf, sizeof(buf)));
+
+    if(flow->stun.other_address.port)
+      ndpi_serialize_string_string(serializer,  "other_address", print_ndpi_address_port(&flow->stun.other_address, buf, sizeof(buf)));
+
     ndpi_serialize_end_of_block(serializer);
     break;
 

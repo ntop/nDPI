@@ -352,6 +352,44 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       }
       break;
 
+    case 0x802b: /* RESPONSE-ORIGIN */
+      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
+	 real_len <= payload_length - off - 5) {
+	u_int8_t protocol_family = payload[off+5];
+
+	if(protocol_family == 0x01 /* IPv4 */) {
+	  u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
+	  u_int32_t ip   = ntohl(*((u_int32_t*)&payload[off+8]));
+
+	  flow->stun.response_origin.port = port;
+	  flow->stun.response_origin.address.v4 = htonl(ip);
+	  flow->stun.response_origin.is_ipv6 = 0;
+	} else if(protocol_family == 0x02 /* IPv6 */ &&
+                  real_len <= payload_length - off - 24) {
+	  /* TODO */
+	}
+      }
+      break;
+
+    case 0x802c: /* OTHER-ADDRESS */	    
+      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
+	 real_len <= payload_length - off - 5) {
+	u_int8_t protocol_family = payload[off+5];
+
+	if(protocol_family == 0x01 /* IPv4 */) {
+	  u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
+	  u_int32_t ip   = ntohl(*((u_int32_t*)&payload[off+8]));
+
+	  flow->stun.other_address.port = port;
+	  flow->stun.other_address.address.v4 = htonl(ip);
+	  flow->stun.other_address.is_ipv6 = 0;
+	} else if(protocol_family == 0x02 /* IPv6 */ &&
+                  real_len <= payload_length - off - 24) {
+	  /* TODO */
+	}
+      }
+      break;
+
     case 0x0012: /* XOR-PEER-ADDRESS */
       if(off + 12 < payload_length ) {
         u_int16_t port;
@@ -359,11 +397,16 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 	char buf[128];
 #endif
 
-	if(len == 8 && payload[off + 5] == 0x01) { /* ipv4 */
+	if(len == 8 && payload[off + 5] == 0x01) {
+	  /* ipv4 */
           u_int32_t ip;
 
           port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
           ip = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
+	  
+	  flow->stun.peer_address.port = port;
+	  flow->stun.peer_address.address.v4 = htonl(ip);
+	  flow->stun.peer_address.is_ipv6 = 0;
 
           NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
                        inet_ntop(AF_INET, &ip, buf, sizeof(buf)), port,
@@ -380,7 +423,8 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
             printf("[LRU] Add peer 0x%llx %d\n", (long long unsigned int)key, flow->detected_protocol_stack[0]);
 #endif
 	  }
-        } else if(len == 20 && payload[off + 5] == 0x02 && off + 24 < payload_length) { /* ipv6 */
+        } else if(len == 20 && payload[off + 5] == 0x02 && off + 24 < payload_length) {
+	  /* ipv6 */
           u_int32_t ip[4];
 
           port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
@@ -392,6 +436,9 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
           NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
                        inet_ntop(AF_INET6, &ip, buf, sizeof(buf)), port,
                        flow->detected_protocol_stack[0]);
+
+	  flow->stun.peer_address.port = port;
+	  memcpy(&flow->stun.peer_address.address, &ip, 16);
 
           if(ndpi_struct->stun_cache &&
              is_subclassification_real(flow)) {
@@ -425,26 +472,40 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
     case 0x0014: /* Realm */
       if(flow->host_server_name[0] == '\0') {
+	int i;
+	bool valid = true;
+	
         ndpi_hostname_sni_set(flow, payload + off + 4, ndpi_min(len, payload_length - off - 4), NDPI_HOSTNAME_NORM_ALL);
         NDPI_LOG_DBG(ndpi_struct, "Realm [%s]\n", flow->host_server_name);
 
-        if(strstr(flow->host_server_name, "google.com") != NULL) {
-          *app_proto = NDPI_PROTOCOL_GOOGLE_CALL;
-          return 1;
-        } else if(strstr(flow->host_server_name, "whispersystems.org") != NULL ||
-                  strstr(flow->host_server_name, "signal.org") != NULL) {
-          *app_proto = NDPI_PROTOCOL_SIGNAL_VOIP;
-          return 1;
-        } else if(strstr(flow->host_server_name, "facebook") != NULL) {
-          *app_proto = NDPI_PROTOCOL_FACEBOOK_VOIP;
-          return 1;
-        } else if(strstr(flow->host_server_name, "stripcdn.com") != NULL) {
-          *app_proto = NDPI_PROTOCOL_ADULT_CONTENT;
-          return 1;
-        } else if(strstr(flow->host_server_name, "telegram") != NULL) {
-          *app_proto = NDPI_PROTOCOL_TELEGRAM_VOIP;
-          return 1;
-        }
+	/* Some Realm contain junk, so let's validate it */
+	for(i=0; flow->host_server_name[i] != '\0'; i++) {
+	  if(flow->host_server_name[i] == '?') {
+	    valid = false;
+	    break;
+	  }
+	}
+
+	if(valid) {
+	  if(strstr(flow->host_server_name, "google.com") != NULL) {
+	    *app_proto = NDPI_PROTOCOL_GOOGLE_CALL;
+	    return 1;
+	  } else if(strstr(flow->host_server_name, "whispersystems.org") != NULL ||
+		    strstr(flow->host_server_name, "signal.org") != NULL) {
+	    *app_proto = NDPI_PROTOCOL_SIGNAL_VOIP;
+	    return 1;
+	  } else if(strstr(flow->host_server_name, "facebook") != NULL) {
+	    *app_proto = NDPI_PROTOCOL_FACEBOOK_VOIP;
+	    return 1;
+	  } else if(strstr(flow->host_server_name, "stripcdn.com") != NULL) {
+	    *app_proto = NDPI_PROTOCOL_ADULT_CONTENT;
+	    return 1;
+	  } else if(strstr(flow->host_server_name, "telegram") != NULL) {
+	    *app_proto = NDPI_PROTOCOL_TELEGRAM_VOIP;
+	    return 1;
+	  }
+	} else
+	  flow->host_server_name[0] = '\0';
       }
       break;
 
@@ -513,6 +574,37 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       }
       break;
 
+    case 0x0016: /* XOR-RELAYED-ADDRESS */
+      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
+	 real_len <= payload_length - off - 4) {
+	u_int8_t protocol_family = payload[off+5];
+
+	if(protocol_family == 0x01 /* IPv4 */) {
+	  u_int16_t xored_port = ntohs(*((u_int16_t*)&payload[off+6]));
+	  u_int32_t xored_ip   = ntohl(*((u_int32_t*)&payload[off+8]));
+	  u_int16_t port_xor    = (magic_cookie >> 16) & 0xFFFF;
+
+	  flow->stun.relayed_address.port = xored_port ^ port_xor;
+	  flow->stun.relayed_address.address.v4 = htonl(xored_ip ^ magic_cookie);
+	  flow->stun.relayed_address.is_ipv6 = 0;
+	} else if(protocol_family == 0x02 /* IPv6 */ &&
+                  real_len <= payload_length - off - 24) {
+          u_int32_t ip[4];
+          u_int16_t port;
+
+          port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
+          ip[0] = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
+          ip[1] = *((u_int32_t *)&payload[off + 12]) ^ htonl(transaction_id[0]);
+          ip[2] = *((u_int32_t *)&payload[off + 16]) ^ htonl(transaction_id[1]);
+          ip[3] = *((u_int32_t *)&payload[off + 20]) ^ htonl(transaction_id[2]);
+
+	  flow->stun.relayed_address.port = port;
+	  memcpy(&flow->stun.relayed_address.address, &ip, 16);
+	  flow->stun.relayed_address.is_ipv6 = 1;
+	}
+      }
+      break;
+
     default:
       NDPI_LOG_DBG2(ndpi_struct, "Unknown attribute %04X\n", attribute);
       break;
@@ -536,13 +628,17 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP)
     return 1;
 
-  if(ndpi_struct->cfg.stun_mapped_address_enabled &&
-     flow->stun.mapped_address.port)
+  if(ndpi_struct->cfg.stun_mapped_address_enabled == 0)
     return 0;
-  if(!ndpi_struct->cfg.stun_mapped_address_enabled)
-    return 0;
-
-  return 1;
+  
+  if(!flow->stun.mapped_address.port
+     || !flow->stun.peer_address.port
+     || !flow->stun.relayed_address.port
+     || !flow->stun.response_origin.port
+     || !flow->stun.other_address.port)
+    return 1;
+  
+  return 0;
 }
 
 static u_int32_t __get_master(struct ndpi_flow_struct *flow) {
