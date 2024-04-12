@@ -1,7 +1,7 @@
 /*
  * stun.c
  *
- * Copyright (C) 2011-22 - ntop.org
+ * Copyright (C) 2011-24 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -333,6 +333,25 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "Attribute 0x%x (%d/%d)\n", attribute, len, real_len);
 
     switch(attribute) {
+    case 0x0001: /* MAPPED-ADDRESS */
+      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
+	 real_len <= payload_length - off - 4) {
+	u_int8_t protocol_family = payload[off+5];
+
+	if(protocol_family == 0x01 /* IPv4 */) {
+	  u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
+	  u_int32_t ip   = ntohl(*((u_int32_t*)&payload[off+8]));
+
+	  flow->stun.mapped_address.port = port;
+	  flow->stun.mapped_address.address.v4 = htonl(ip);
+	  flow->stun.mapped_address.is_ipv6 = 0;
+	} else if(protocol_family == 0x02 /* IPv6 */ &&
+                  real_len <= payload_length - off - 24) {
+	  /* TODO */
+	}
+      }
+      break;
+
     case 0x0012: /* XOR-PEER-ADDRESS */
       if(off + 12 < payload_length ) {
         u_int16_t port;
@@ -465,7 +484,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
     case 0x0020: /* XOR-MAPPED-ADDRESS */
       if(ndpi_struct->cfg.stun_mapped_address_enabled &&
-	 real_len <= payload_length - off - 12) {
+	 real_len <= payload_length - off - 4) {
 	u_int8_t protocol_family = payload[off+5];
 
 	if(protocol_family == 0x01 /* IPv4 */) {
