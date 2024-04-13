@@ -217,7 +217,17 @@ static void parse_ip_port_attribute(const u_int8_t *payload, u_int16_t payload_l
       ap->is_ipv6 = 0;
     } else if(protocol_family == 0x02 /* IPv6 */ &&
               real_len == 20) {
-      /* TODO */
+      u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
+      u_int32_t ip[4];
+
+      ip[0] = *((u_int32_t *)&payload[off + 8]);
+      ip[1] = *((u_int32_t *)&payload[off + 12]);
+      ip[2] = *((u_int32_t *)&payload[off + 16]);
+      ip[3] = *((u_int32_t *)&payload[off + 20]);
+
+      ap->port = port;
+      memcpy(&ap->address, &ip, 16);
+      ap->is_ipv6 = 1;
     }
   }
 }
