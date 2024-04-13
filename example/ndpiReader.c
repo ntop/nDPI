@@ -1527,11 +1527,11 @@ static void print_ndpi_address_port(FILE *out, const char *label, ndpi_address_p
       
     if(ap->is_ipv6) {
       inet_ntop(AF_INET6, &ap->address, buf, sizeof(buf));
+      fprintf(out, "[%s: [%s]:%u]", label, buf, ap->port);
     } else {
       inet_ntop(AF_INET, &ap->address, buf, sizeof(buf));
+      fprintf(out, "[%s: %s:%u]", label, buf, ap->port);
     }
-  
-    fprintf(out, "[%s: %s:%u]", label, buf, ap->port);
   }
 }
 
