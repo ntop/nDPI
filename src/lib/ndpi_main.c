@@ -11244,6 +11244,8 @@ static const struct cfg_param {
   { "stun",          "metadata.attribute.mapped_address",       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_mapped_address_enabled), NULL },
   { "stun",          "metadata.attribute.response_origin",      "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_response_origin_enabled), NULL },
   { "stun",          "metadata.attribute.other_address",        "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_other_address_enabled), NULL },
+  { "stun",          "metadata.attribute.relayed_address",      "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_relayed_address_enabled), NULL },
+  { "stun",          "metadata.attribute.peer_address",         "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_peer_address_enabled), NULL },
 
   { "dns",           "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_subclassification_enabled), NULL },
   { "dns",           "process_response",                        "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_parse_response_enabled), NULL },
