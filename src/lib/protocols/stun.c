@@ -222,6 +222,85 @@ static void parse_ip_port_attribute(const u_int8_t *payload, u_int16_t payload_l
   }
 }
 
+static void parse_xor_ip_port_attribute(struct ndpi_detection_module_struct *ndpi_struct,
+                                        struct ndpi_flow_struct *flow,
+                                        const u_int8_t *payload, u_int16_t payload_length,
+                                        int off, u_int16_t real_len,ndpi_address_port *ap,
+                                        u_int32_t transaction_id[3], u_int32_t magic_cookie,
+                                        int add_to_cache)
+{
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  char buf[128];
+#endif
+
+  if(off + 4 + real_len <= payload_length &&
+     (real_len == 8 || real_len == 20)) {
+    u_int8_t protocol_family = payload[off+5];
+
+    if(protocol_family == 0x01 /* IPv4 */ &&
+       real_len == 8) {
+      u_int32_t ip;
+      u_int16_t port;
+
+      port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
+      ip = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
+
+      ap->port = port;
+      ap->address.v4 = ip;
+      ap->is_ipv6 = 0;
+
+      if(add_to_cache) {
+        NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
+                     inet_ntop(AF_INET, &ip, buf, sizeof(buf)), port,
+                     flow->detected_protocol_stack[0]);
+
+        if(ndpi_struct->stun_cache &&
+           is_subclassification_real(flow)) {
+          u_int64_t key = get_stun_lru_key_raw4(ip, port);
+
+          ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
+				flow->detected_protocol_stack[0],
+				ndpi_get_current_time(flow));
+#ifdef DEBUG_LRU
+          printf("[LRU] Add peer 0x%llx %d\n", (long long unsigned int)key, flow->detected_protocol_stack[0]);
+#endif
+	}
+      }
+    } else if(protocol_family == 0x02 /* IPv6 */ &&
+              real_len == 20) {
+      u_int32_t ip[4];
+      u_int16_t port;
+
+      port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
+      ip[0] = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
+      ip[1] = *((u_int32_t *)&payload[off + 12]) ^ htonl(transaction_id[0]);
+      ip[2] = *((u_int32_t *)&payload[off + 16]) ^ htonl(transaction_id[1]);
+      ip[3] = *((u_int32_t *)&payload[off + 20]) ^ htonl(transaction_id[2]);
+
+      ap->port = port;
+      memcpy(&ap->address, &ip, 16);
+      ap->is_ipv6 = 1;
+
+      if(add_to_cache) {
+        NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
+                     inet_ntop(AF_INET6, &ip, buf, sizeof(buf)), port,
+                     flow->detected_protocol_stack[0]);
+
+        if(ndpi_struct->stun_cache &&
+           is_subclassification_real(flow)) {
+          u_int64_t key = get_stun_lru_key_raw6((u_int8_t *)ip, port);
+
+          ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
+                                flow->detected_protocol_stack[0],
+                                ndpi_get_current_time(flow));
+#ifdef DEBUG_LRU
+          printf("[LRU] Add peer 0x%llx %d\n", (long long unsigned int)key, flow->detected_protocol_stack[0]);
+#endif
+	}
+      }
+    }
+  }
+}
 #ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 static
 #endif
@@ -374,68 +453,11 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       break;
 
     case 0x0012: /* XOR-PEER-ADDRESS */
-      if(off + 12 < payload_length ) {
-        u_int16_t port;
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-	char buf[128];
-#endif
-
-	if(len == 8 && payload[off + 5] == 0x01) {
-	  /* ipv4 */
-          u_int32_t ip;
-
-          port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
-          ip = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
-	  
-	  flow->stun.peer_address.port = port;
-	  flow->stun.peer_address.address.v4 = ip;
-	  flow->stun.peer_address.is_ipv6 = 0;
-
-          NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
-                       inet_ntop(AF_INET, &ip, buf, sizeof(buf)), port,
-                       flow->detected_protocol_stack[0]);
-
-          if(ndpi_struct->stun_cache &&
-             is_subclassification_real(flow)) {
-            u_int64_t key = get_stun_lru_key_raw4(ip, port);
-
-            ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
-				  flow->detected_protocol_stack[0],
-				  ndpi_get_current_time(flow));
-#ifdef DEBUG_LRU
-            printf("[LRU] Add peer 0x%llx %d\n", (long long unsigned int)key, flow->detected_protocol_stack[0]);
-#endif
-	  }
-        } else if(len == 20 && payload[off + 5] == 0x02 && off + 24 < payload_length) {
-	  /* ipv6 */
-          u_int32_t ip[4];
-
-          port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
-          ip[0] = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
-          ip[1] = *((u_int32_t *)&payload[off + 12]) ^ htonl(transaction_id[0]);
-          ip[2] = *((u_int32_t *)&payload[off + 16]) ^ htonl(transaction_id[1]);
-          ip[3] = *((u_int32_t *)&payload[off + 20]) ^ htonl(transaction_id[2]);
-
-          NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
-                       inet_ntop(AF_INET6, &ip, buf, sizeof(buf)), port,
-                       flow->detected_protocol_stack[0]);
-
-	  flow->stun.peer_address.port = port;
-	  memcpy(&flow->stun.peer_address.address, &ip, 16);
-	  flow->stun.peer_address.is_ipv6 = 1;
-
-          if(ndpi_struct->stun_cache &&
-             is_subclassification_real(flow)) {
-            u_int64_t key = get_stun_lru_key_raw6((u_int8_t *)ip, port);
-
-            ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
-				  flow->detected_protocol_stack[0],
-				  ndpi_get_current_time(flow));
-#ifdef DEBUG_LRU
-            printf("[LRU] Add peer 0x%llx %d\n", (long long unsigned int)key, flow->detected_protocol_stack[0]);
-#endif
-	  }
-	}
+      if(ndpi_struct->cfg.stun_peer_address_enabled) {
+        parse_xor_ip_port_attribute(ndpi_struct, flow,
+                                    payload, payload_length, off, real_len,
+                                    &flow->stun.peer_address,
+                                    transaction_id, magic_cookie, 1);
       }
       break;
 
@@ -528,68 +550,20 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       break;
 
     case 0x0020: /* XOR-MAPPED-ADDRESS */
-      if(ndpi_struct->cfg.stun_mapped_address_enabled &&
-	 off + 4 + real_len <= payload_length &&
-	 (real_len == 8 || real_len == 20)) {
-	u_int8_t protocol_family = payload[off+5];
-
-	if(protocol_family == 0x01 /* IPv4 */ &&
-	   real_len == 8) {
-	  u_int16_t xored_port = ntohs(*((u_int16_t*)&payload[off+6]));
-	  u_int32_t xored_ip   = ntohl(*((u_int32_t*)&payload[off+8]));
-	  u_int16_t port_xor    = (magic_cookie >> 16) & 0xFFFF;
-
-	  flow->stun.mapped_address.port = xored_port ^ port_xor;
-	  flow->stun.mapped_address.address.v4 = htonl(xored_ip ^ magic_cookie);
-	  flow->stun.mapped_address.is_ipv6 = 0;
-	} else if(protocol_family == 0x02 /* IPv6 */ &&
-                  real_len == 20) {
-          u_int32_t ip[4];
-          u_int16_t port;
-
-          port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
-          ip[0] = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
-          ip[1] = *((u_int32_t *)&payload[off + 12]) ^ htonl(transaction_id[0]);
-          ip[2] = *((u_int32_t *)&payload[off + 16]) ^ htonl(transaction_id[1]);
-          ip[3] = *((u_int32_t *)&payload[off + 20]) ^ htonl(transaction_id[2]);
-
-	  flow->stun.mapped_address.port = port;
-	  memcpy(&flow->stun.mapped_address.address, &ip, 16);
-	  flow->stun.mapped_address.is_ipv6 = 1;
-	}
+      if(ndpi_struct->cfg.stun_mapped_address_enabled) {
+        parse_xor_ip_port_attribute(ndpi_struct, flow,
+                                    payload, payload_length, off, real_len,
+                                    &flow->stun.mapped_address,
+                                    transaction_id, magic_cookie, 0);
       }
       break;
 
     case 0x0016: /* XOR-RELAYED-ADDRESS */
-      if(1 /* TODO: cfg */ &&
-	 off + 4 + real_len <= payload_length &&
-	 (real_len == 8 || real_len == 20)) {
-	u_int8_t protocol_family = payload[off+5];
-
-	if(protocol_family == 0x01 /* IPv4 */ &&
-	   real_len == 8) {
-	  u_int16_t xored_port = ntohs(*((u_int16_t*)&payload[off+6]));
-	  u_int32_t xored_ip   = ntohl(*((u_int32_t*)&payload[off+8]));
-	  u_int16_t port_xor    = (magic_cookie >> 16) & 0xFFFF;
-
-	  flow->stun.relayed_address.port = xored_port ^ port_xor;
-	  flow->stun.relayed_address.address.v4 = htonl(xored_ip ^ magic_cookie);
-	  flow->stun.relayed_address.is_ipv6 = 0;
-	} else if(protocol_family == 0x02 /* IPv6 */ &&
-                  real_len == 20) {
-          u_int32_t ip[4];
-          u_int16_t port;
-
-          port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
-          ip[0] = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
-          ip[1] = *((u_int32_t *)&payload[off + 12]) ^ htonl(transaction_id[0]);
-          ip[2] = *((u_int32_t *)&payload[off + 16]) ^ htonl(transaction_id[1]);
-          ip[3] = *((u_int32_t *)&payload[off + 20]) ^ htonl(transaction_id[2]);
-
-	  flow->stun.relayed_address.port = port;
-	  memcpy(&flow->stun.relayed_address.address, &ip, 16);
-	  flow->stun.relayed_address.is_ipv6 = 1;
-	}
+      if(ndpi_struct->cfg.stun_relayed_address_enabled) {
+        parse_xor_ip_port_attribute(ndpi_struct, flow,
+                                    payload, payload_length, off, real_len,
+                                    &flow->stun.relayed_address,
+                                    transaction_id, magic_cookie, 0);
       }
       break;
 
