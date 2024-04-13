@@ -1,0 +1,1 @@
+--cfg=stun,metadata.attribute.mapped_address,0 --cfg=stun,metadata.attribute.peer_address,0 --cfg=stun,metadata.attribute.relayed_address,0 --cfg=stun,metadata.attribute.response_origin,0 --cfg=stun,metadata.attribute.other_address,0

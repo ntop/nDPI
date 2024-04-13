@@ -588,28 +588,45 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
   return 1;
 }
 
-static int keep_extra_dissection(struct ndpi_flow_struct *flow)
+static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struct,
+                                 struct ndpi_flow_struct *flow)
 {
+  /* We want extra dissection for:
+     * sub-classification
+     * metadata extraction (*-ADDRESS) or looking for RTP
+       At the moment:
+       * it seems ZOOM doens't have any meaningful attributes
+       * we want (all) XOR-PEER-ADDRESS only for Telegram.
+         * for the other protocols, we stop after we have all metadata (if enabled)
+         * for some specific protocol, we might know that some attributes
+           are never used
+  */
+
   if(!is_subclassification_real(flow))
     return 1;
 
-  /* See the comment at the end of ndpi_int_stun_add_connection()
-     where we set the extra dissection */
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_ZOOM)
+    return 0;
 
-  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP)
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TELEGRAM_VOIP &&
+     ndpi_struct->cfg.stun_peer_address_enabled)
     return 1;
 
-  /* TODO: improve:
-     * some of these attributes might be disabled
-     * we might now if some of these attributes are never used from some protocol */
-  if(!flow->stun.mapped_address.port
-     || !flow->stun.peer_address.port
-     || !flow->stun.relayed_address.port
-     || !flow->stun.response_origin.port
-     || !flow->stun.other_address.port)
-    return 1;
-  
-  return 0;
+  /* General rule */
+  if((flow->stun.mapped_address.port || !ndpi_struct->cfg.stun_mapped_address_enabled) &&
+     (flow->stun.peer_address.port || !ndpi_struct->cfg.stun_peer_address_enabled) &&
+     (flow->stun.relayed_address.port || !ndpi_struct->cfg.stun_relayed_address_enabled) &&
+     (flow->stun.response_origin.port || !ndpi_struct->cfg.stun_response_origin_enabled) &&
+     (flow->stun.other_address.port || !ndpi_struct->cfg.stun_other_address_enabled))
+    return 0;
+
+  /* Exception WA: only relayed and mapped address attributes */
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_WHATSAPP_CALL &&
+     (flow->stun.mapped_address.port || !ndpi_struct->cfg.stun_mapped_address_enabled) &&
+     (flow->stun.relayed_address.port || !ndpi_struct->cfg.stun_relayed_address_enabled))
+    return 0;
+
+  return 1;
 }
 
 static u_int32_t __get_master(struct ndpi_flow_struct *flow) {
@@ -802,7 +819,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   } else {
     NDPI_LOG_DBG(ndpi_struct, "QUIC range. Unexpected\n");
   }
-  return keep_extra_dissection(flow);
+  return keep_extra_dissection(ndpi_struct, flow);
 }
 
 /* ************************************************************ */
@@ -928,21 +945,10 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
     }
   }
 
-  /* We want extra dissection for:
-     * sub-classification
-     * metadata extraction (*-ADDRESS) or looking for RTP
-       At the moment:
-       * it seems ZOOM doens't have any meaningful attributes
-       * we want (all) XOR-MAPPED-ADDRESS only for Telegram
-  */
-  if(!flow->extra_packets_func) {
-    if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_ZOOM) {
-      if(keep_extra_dissection(flow)) {
-        NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
-        flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
-        flow->extra_packets_func = stun_search_again;
-      }
-    }
+  if(!flow->extra_packets_func && keep_extra_dissection(ndpi_struct, flow)) {
+    NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
+    flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
+    flow->extra_packets_func = stun_search_again;
   }
 }
 
