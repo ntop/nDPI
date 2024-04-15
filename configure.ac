@@ -134,6 +134,10 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
   ])
 
 GCC_VERSION=`gcc --version | cut -d ' ' -f 3 | head -1|cut -d '.' -f 1`
+if test "${GCC_VERSION}" == "version" ; then
+  GCC_VERSION=`gcc --version | cut -d ' ' -f 4 | head -1|cut -d '.' -f 1`
+fi
+
 if test "${GCC_VERSION}" -lt "7" ; then
  AC_DEFINE_UNQUOTED(USE_ROARING_V2, "1", [Use CRoaring 2.1.x])
 fi

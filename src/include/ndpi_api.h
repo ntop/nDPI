@@ -2217,6 +2217,11 @@ extern "C" {
 
   /* ******************************* */
 
+  size_t ndpi_compress_str(const char * in, size_t len, char * out, size_t bufsize);
+  size_t ndpi_decompress_str(const char * in, size_t len, char * out, size_t bufsize);
+
+  /* ******************************* */
+
   const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx);
 
   /**

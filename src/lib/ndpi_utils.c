@@ -38,6 +38,7 @@
 
 #include "ahocorasick.h"
 #include "libcache.h"
+#include "shoco.h"
 
 #include <time.h>
 #ifndef WIN32
@@ -3148,4 +3149,17 @@ const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx)
   if(idx < 0 || idx >= NDPI_LRUCACHE_MAX)
     return "unknown";
   return names[idx];
+}
+
+/* ******************************************* */
+
+size_t ndpi_compress_str(const char * in, size_t len, char * out, size_t bufsize) {
+  return(shoco_compress(in, len, out, bufsize));
+}
+
+/* ******************************************* */
+
+size_t ndpi_decompress_str(const char * in, size_t len, char * out, size_t bufsize) {
+  return(shoco_decompress(in, len, out, bufsize));
+
 }
