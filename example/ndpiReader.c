@@ -5630,6 +5630,42 @@ void strtonumUnitTest() {
 
 /* *********************************************** */
 
+void strlcpyUnitTest() {
+  // Test empty string
+  char dst_empty[10] = "";
+  assert(ndpi_strlcpy(dst_empty, "", sizeof(dst_empty)) == 0);
+  assert(dst_empty[0] == '\0');
+
+  // Basic copy test
+  char dst1[10] = "";
+  assert(ndpi_strlcpy(dst1, "abc", sizeof(dst1)) == 3);
+  assert(strcmp(dst1, "abc") == 0);
+
+  // Test with dst_len smaller than src_len
+  char dst2[4] = "";
+  assert(ndpi_strlcpy(dst2, "abcdef", sizeof(dst2)) == 6);
+  assert(strcmp(dst2, "abc") == 0); // Should truncate "abcdef" to "abc"
+
+  // Test with dst_len bigger than src_len
+  char dst3[10] = "";
+  assert(ndpi_strlcpy(dst3, "abc", sizeof(dst3)) == 3);
+  assert(strcmp(dst3, "abc") == 0);
+
+  // Test with dst_len equal to 1 (only null terminator should be copied)
+  char dst4[1];
+  assert(ndpi_strlcpy(dst4, "abc", sizeof(dst4)) == 3);
+  assert(dst4[0] == '\0'); // Should only contain the null terminator
+
+  // Test with NULL source, expecting return value to be 0
+  char dst5[10];
+  assert(ndpi_strlcpy(dst5, NULL, sizeof(dst5)) == 0);
+
+  // Test with NULL destination, should also return 0 without crashing
+  assert(ndpi_strlcpy(NULL, "abc", sizeof(dst5)) == 0);
+}
+
+/* *********************************************** */
+
 void filterUnitTest() {
   ndpi_filter* f = ndpi_filter_alloc();
   u_int32_t v, i;
@@ -5943,6 +5979,7 @@ int main(int argc, char **argv) {
     analysisUnitTest();
     compressedBitmapUnitTest();
     strtonumUnitTest();
+    strlcpyUnitTest();
 #endif
   }
 
