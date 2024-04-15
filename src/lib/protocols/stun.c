@@ -505,20 +505,15 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 	if(valid) {
 	  if(strstr(flow->host_server_name, "google.com") != NULL) {
 	    *app_proto = NDPI_PROTOCOL_GOOGLE_CALL;
-	    return 1;
 	  } else if(strstr(flow->host_server_name, "whispersystems.org") != NULL ||
 		    strstr(flow->host_server_name, "signal.org") != NULL) {
 	    *app_proto = NDPI_PROTOCOL_SIGNAL_VOIP;
-	    return 1;
 	  } else if(strstr(flow->host_server_name, "facebook") != NULL) {
 	    *app_proto = NDPI_PROTOCOL_FACEBOOK_VOIP;
-	    return 1;
 	  } else if(strstr(flow->host_server_name, "stripcdn.com") != NULL) {
 	    *app_proto = NDPI_PROTOCOL_ADULT_CONTENT;
-	    return 1;
 	  } else if(strstr(flow->host_server_name, "telegram") != NULL) {
 	    *app_proto = NDPI_PROTOCOL_TELEGRAM_VOIP;
-	    return 1;
 	  }
 	} else
 	  flow->host_server_name[0] = '\0';
@@ -540,7 +535,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
     case 0xFF03:
       *app_proto = NDPI_PROTOCOL_GOOGLE_CALL;
-      return 1;
+      break;
 
     case 0x0013:
       NDPI_LOG_DBG(ndpi_struct, "DATA attribute (%d/%d)\n",
