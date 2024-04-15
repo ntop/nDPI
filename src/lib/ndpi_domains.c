@@ -66,12 +66,14 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
       line[len--] = '\0';
 
     if(!ndpi_domain_classify_add(ndpi_str->public_domain_suffixes,
-				 1 /* dummy */, &line[offset])) {
+				 num_domains /* dummy */, &line[offset])) {
       NDPI_LOG_ERR(ndpi_str, "Error while processing domain %s\n", &line[offset]);
     } else
       num_domains++;
   }
 
+  fclose(fd);
+  
   if(!ndpi_domain_classify_finalize(ndpi_str->public_domain_suffixes)) {
     NDPI_LOG_ERR(ndpi_str, "Error while finalizing domain processing\n");
   }

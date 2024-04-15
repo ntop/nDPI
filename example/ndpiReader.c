@@ -5807,7 +5807,7 @@ void domainsUnitTest() {
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
 
-    assert(ndpi_load_domain_suffixes(ndpi_info_mod, "../lists/public_suffix_list.dat") == 0);
+    assert(ndpi_load_domain_suffixes(ndpi_info_mod, (char*)lists_path) == 0);
 
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.chosei.chiba.jp"), "chosei.chiba.jp") == 0);
     assert(strcmp(ndpi_get_host_domain_suffix(ndpi_info_mod, "www.unipi.it"), "it") == 0);
