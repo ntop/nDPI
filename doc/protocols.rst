@@ -724,3 +724,11 @@ References: `Main site <https://www.elderscrollsonline.com/>`_
 The Label Distribution Protocol (LDP) is a routing protocol used to establish and maintain label-switched paths in a Multiprotocol Label Switching (MPLS) network.
 
 References: `RFC <https://datatracker.ietf.org/doc/html/rfc5036>`_
+
+.. _Proto 410:
+
+`NDPI_PROTOCOL_KNXNET_IP`
+=====================
+KNXnet/IP is a building automation protocol that enables the exchange of data and control information over IP networks, extending the KNX standard for home and building automation.
+
+References: `Paid Specs: <https://webstore.ansi.org/standards/ds/dsiso225102019>`_

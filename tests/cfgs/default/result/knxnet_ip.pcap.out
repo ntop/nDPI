@@ -1,6 +1,6 @@
-DPI Packets (TCP):	6	(6.00 pkts/flow)
+DPI Packets (UDP):	1	(1.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 151 (151.00 diss/flow)
+Num dissector calls: 1 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -14,15 +14,15 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Kafka	19	2237	1
+KNXnet_IP	6	369	1
 
-Acceptable                      19 2237          1            
+Acceptable                       6 369           1            
 
-	1	TCP 127.0.0.1:46136 <-> 127.0.0.1:9092 [proto: 377/Kafka][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 6][cat: RPC/16][12 pkts/1107 bytes <-> 7 pkts/1130 bytes][Goodput ratio: 28/58][13.63 sec][bytes ratio: -0.010 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 800/288 6849/1049 2039/441][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 92/161 206/512 42/149][PLAIN TEXT (console)][Plen Bins: 12,38,12,12,12,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 172.22.12.76:39053 <-> 172.22.10.76:3671 [proto: 410/KNXnet_IP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][3 pkts/183 bytes <-> 3 pkts/186 bytes][Goodput ratio: 22/28][0.08 sec][bytes ratio: -0.008 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 18/17 42/41 65/65 24/24][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 61/62 63/63 1/1][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
