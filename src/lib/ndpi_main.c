@@ -4038,15 +4038,15 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
   return(id != NDPI_PROTOCOL_UNKNOWN ? 0 : -1);
 #else
   char buf[128];
-  u_int8_t class_id;
+  u_int16_t class_id;
   u_int max_len = sizeof(buf)-1;
 
   if(name_len > max_len) name_len = max_len;
   memcpy(buf, name, name_len);
   buf[name_len] = '\0';
 
-  if(ndpi_domain_classify_contains(ndpi_str->custom_categories.sc_hostnames,
-				   &class_id, buf)) {
+  if(ndpi_domain_classify_hostname(ndpi_str, ndpi_str->custom_categories.sc_hostnames,
+				    &class_id, buf)) {
     *category = (ndpi_protocol_category_t)class_id;
     return(0);
   } else
@@ -4066,6 +4066,8 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
   ndpi_patricia_node_t *node;
   u_int cp_len = ndpi_min(sizeof(ipbuf) - 1, name_len);
 
+  *id = 0;
+  
   if(!ndpi_str->custom_categories.categories_loaded)
     return(-1);
 
@@ -4196,10 +4198,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->tls_cert_subject_automa.ac_automa, 0);
 
     if(ndpi_str->malicious_ja3_hashmap != NULL)
-      ndpi_hash_free(&ndpi_str->malicious_ja3_hashmap, NULL);
+      ndpi_hash_free(&ndpi_str->malicious_ja3_hashmap);
 
     if(ndpi_str->malicious_sha1_hashmap != NULL)
-      ndpi_hash_free(&ndpi_str->malicious_sha1_hashmap, NULL);
+      ndpi_hash_free(&ndpi_str->malicious_sha1_hashmap);
 
 #ifdef USE_LEGACY_AHO_CORASICK
     if(ndpi_str->custom_categories.hostnames.ac_automa != NULL)
@@ -4260,7 +4262,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
       ndpi_free(ndpi_str->callback_buffer_tcp_payload);
 
     if(ndpi_str->public_domain_suffixes)
-      ndpi_domain_classify_free(ndpi_str->public_domain_suffixes);
+      ndpi_hash_free(&ndpi_str->public_domain_suffixes);
 
     ndpi_free(ndpi_str);
   }
@@ -5064,9 +5066,11 @@ int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
 
   if(failed_files)
     return(-1 * failed_files);
+
+  ndpi_enable_loaded_categories(ndpi_str);
+  
   return(num_loaded);
 }
-
 
 /* ******************************************************************** */
 
@@ -5209,7 +5213,7 @@ int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FI
       continue;
     }
 
-    if(ndpi_hash_add_entry(&ndpi_str->malicious_ja3_hashmap, line, len, NULL) == 0)
+    if(ndpi_hash_add_entry(&ndpi_str->malicious_ja3_hashmap, line, len, 0) == 0)
       num++;
   }
 
@@ -5287,7 +5291,8 @@ int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, F
     for (i = 0; i < 40; ++i)
       first_comma[i] = toupper(first_comma[i]);
 
-    if(ndpi_hash_add_entry(&ndpi_str->malicious_sha1_hashmap, first_comma, second_comma - first_comma, NULL) == 0)
+    if(ndpi_hash_add_entry(&ndpi_str->malicious_sha1_hashmap, first_comma,
+			   second_comma - first_comma, 0) == 0)
       num++;
   }
 
@@ -7896,7 +7901,7 @@ int ndpi_load_hostname_category(struct ndpi_detection_module_struct *ndpi_str,
   if(ndpi_str->custom_categories.sc_hostnames_shadow == NULL)
     return(-1);
 
-  return(ndpi_domain_classify_add(ndpi_str->custom_categories.sc_hostnames_shadow,
+  return(ndpi_domain_classify_add(ndpi_str, ndpi_str->custom_categories.sc_hostnames_shadow,
 				  (u_int16_t)category, (char*)name_to_add) ? 0 : -1);
 #endif
 }
@@ -7956,7 +7961,7 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
   }
 #else
   ndpi_domain_classify_free(ndpi_str->custom_categories.sc_hostnames);
-  ndpi_domain_classify_finalize(ndpi_str->custom_categories.sc_hostnames_shadow);
+  // ndpi_domain_classify_finalize(ndpi_str->custom_categories.sc_hostnames_shadow);
   ndpi_str->custom_categories.sc_hostnames        = ndpi_str->custom_categories.sc_hostnames_shadow;
   ndpi_str->custom_categories.sc_hostnames_shadow = ndpi_domain_classify_alloc();
 #endif

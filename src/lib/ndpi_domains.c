@@ -29,29 +29,29 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
 			      char *public_suffix_list_path) {
   char buf[256], *line;
   FILE *fd;
-  u_int num_domains = 0;
-  
+  u_int16_t domain_id = 1;
+
   if(ndpi_str == NULL || public_suffix_list_path == NULL)
     return(-1);
 
   if((fd = fopen(public_suffix_list_path, "r")) == NULL)
     return(-2);
-  
+
   if(ndpi_str->public_domain_suffixes != NULL) {
     /* An existing license was aleady loaded: free it and start over */
-    ndpi_domain_classify_free(ndpi_str->public_domain_suffixes);
+    ndpi_hash_free(&ndpi_str->public_domain_suffixes);
   }
 
-  if((ndpi_str->public_domain_suffixes = ndpi_domain_classify_alloc()) == NULL)
+  if(ndpi_hash_init(&ndpi_str->public_domain_suffixes) != 0)
     return(-3);
 
   while((line = fgets(buf, sizeof(buf), fd)) != NULL) {
     u_int offset, len;
-
+    
     /* Skip private domains */
     if(strstr(line, "// ===END ICANN DOMAINS==="))
       break;
-    
+
     /* Skip empty lines or comments */
     if((line[0] == '\0') || (line[0] == '/') || (line[0] == '\n') || (line[0] == '\r'))
       continue;
@@ -64,55 +64,99 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
     len = strlen(line) - 1;
     while((len > 0) && (line[len] == '\n'))
       line[len--] = '\0';
-
-    if(!ndpi_domain_classify_add(ndpi_str->public_domain_suffixes,
-				 num_domains /* dummy */, &line[offset])) {
+      
+    if(ndpi_hash_add_entry(&ndpi_str->public_domain_suffixes,
+			   &line[offset], strlen(&line[offset]), domain_id) != 0) {
       NDPI_LOG_ERR(ndpi_str, "Error while processing domain %s\n", &line[offset]);
     } else
-      num_domains++;
+      domain_id++;
   }
 
   fclose(fd);
-  
-  if(!ndpi_domain_classify_finalize(ndpi_str->public_domain_suffixes)) {
-    NDPI_LOG_ERR(ndpi_str, "Error while finalizing domain processing\n");
-  }
 
-  if(num_domains > 0) {
-    NDPI_LOG_DBG(ndpi_str, "Loaded %u domains\n", num_domains);
-  }
-  
+  if(domain_id > 0)
+    NDPI_LOG_DBG(ndpi_str, "Loaded %u domains\n", domain_id-1);
+
   return(0);
 }
 
 /* ******************************* */
 
+/*
+  Example
+  - www.ntop.org -> org
+  - www.bbc.co.uk -> co.uk
+*/
+
 const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndpi_str,
-					const char *hostname) {
+					const char *hostname,
+					u_int16_t *domain_id /* out */) {
+  char *dot, *prev_dot;
+
+  *domain_id = 0;
+  
   if(!ndpi_str)
     return NULL;
+
   if(ndpi_str->public_domain_suffixes == NULL)
     return(hostname);
-  else {
-    u_int8_t class_id;
+
+  prev_dot = dot = strrchr(hostname, '.');
+
+  while(dot != NULL) {
+    while((dot != hostname) && (dot[0] != '.'))
+      dot--;
     
-    return(ndpi_domain_classify_longest_prefix(ndpi_str->public_domain_suffixes,
-					       &class_id, hostname, false));
+    if((dot == hostname)
+       || (ndpi_hash_find_entry(ndpi_str->public_domain_suffixes,
+				&dot[1], strlen(&dot[1]), domain_id) != 0)) {
+      /* Not found: end of search */
+      return(&prev_dot[1]);
+    }
+    
+    prev_dot = dot;
+    dot--;
   }
+
+  return(hostname);
 }
 
 /* ******************************* */
 
+/*
+  Example
+  - www.ntop.org -> ntop.org
+  - www.bbc.co.uk -> bbc.co.uk
+*/
 const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
 				 const char *hostname) {
+  const char *ret;
+  char *dot;
+  u_int16_t domain_id;
+  
   if(!ndpi_str)
     return NULL;
+
   if(ndpi_str->public_domain_suffixes == NULL)
     return(hostname);
-  else {
-    u_int8_t class_id;
-    
-    return(ndpi_domain_classify_longest_prefix(ndpi_str->public_domain_suffixes,
-					       &class_id, hostname, true));
+  
+  ret = ndpi_get_host_domain_suffix(ndpi_str, hostname, &domain_id);
+
+  if((ret == NULL) || (ret == hostname))
+    return(hostname);
+
+  dot = strstr(hostname, ret);
+
+  if(dot == NULL)
+    return(hostname);
+
+  dot--;
+  while(dot != hostname) {
+    dot--;
+
+    if(dot[0] == '.')
+      return(&dot[1]);
   }
+      
+  return(hostname);
 }

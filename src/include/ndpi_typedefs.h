@@ -1127,11 +1127,7 @@ typedef struct _ndpi_automa {
   struct ndpi_automa_stats stats;
 } ndpi_automa;
 
-typedef struct ndpi_str_hash {
-  unsigned int hash;
-  void *value;
-  // u_int8_t private_data[1]; /* Avoid error C2466 and do not initiate private data with 0  */
-} ndpi_str_hash;
+typedef void ndpi_str_hash;
 
 typedef struct ndpi_proto {
   /*
@@ -1164,10 +1160,7 @@ typedef struct {
 #define MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS          16
 
 typedef struct {
-  struct {
-    u_int16_t class_id;
-    ndpi_bitmap64_fuse *domains;
-  } classes[MAX_NUM_NDPI_DOMAIN_CLASSIFICATIONS];
+  ndpi_str_hash *domains;
 } ndpi_domain_classify;
 
 typedef enum {
