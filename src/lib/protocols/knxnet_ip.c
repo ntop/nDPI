@@ -79,8 +79,10 @@ static void ndpi_search_knxnet_ip(struct ndpi_detection_module_struct *ndpi_stru
     return;
   }
 
-  if (is_valid_knxnet_ip_service_id(ntohs(get_u_int16_t(packet->payload, 2))) &&
-      ntohs(get_u_int16_t(packet->payload, 4)) == packet->payload_packet_len)
+  u_int16_t service_id = ntohs(get_u_int16_t(packet->payload, 2));
+  u_int16_t total_length = ntohs(get_u_int16_t(packet->payload, 4));
+
+  if (is_valid_knxnet_ip_service_id(service_id) && total_length == packet->payload_packet_len)
   {
     NDPI_LOG_INFO(ndpi_struct, "found KNXnet/IP\n");
     ndpi_set_detected_protocol(ndpi_struct, flow,
