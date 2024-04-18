@@ -3196,6 +3196,9 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
   /* [1] Encode the domain in 6 bits */
   suffix = ndpi_get_host_domain_suffix(ndpi_str, domain, &domain_id);
 
+  if(suffix == NULL)
+    return((u_int)snprintf(out, out_len, "%s", domain));  /* Unknown suffix */
+  
   snprintf((char*)domain_buf, sizeof(domain_buf), "%s", domain);
   domain_buf_len = strlen((char*)domain_buf), suffix_len = strlen(suffix);
 
@@ -3235,8 +3238,7 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
   if((compressed_len > 0) && ((out_idx == 0) || (compressed_len < out_idx))) {
     if(compressed_len >= domain_len) {
       /* Compression creates a longer buffer */
-      memcpy(out, domain, domain_len);
-      out_idx = domain_len;      
+      return((u_int)snprintf(out, out_len, "%s", domain));
     } else {
       compressed_len = ndpi_min(compressed_len, out_len-3);
       memcpy(out, compressed, compressed_len);
