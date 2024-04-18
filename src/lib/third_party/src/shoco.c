@@ -65,7 +65,9 @@ static inline int check_indices(const int16_t * shoco_restrict indices, int pack
 }
 #else
 static inline int check_indices(const int16_t * shoco_restrict indices, int pack_n) {
-  for (unsigned int i = 0; i < packs[pack_n].bytes_unpacked; ++i)
+  unsigned int i;
+  
+  for (i = 0; i < packs[pack_n].bytes_unpacked; ++i)
     if (indices[i] > packs[pack_n].masks[i])
       return 0;
   return 1;
@@ -73,7 +75,9 @@ static inline int check_indices(const int16_t * shoco_restrict indices, int pack
 #endif
 
 static inline int find_best_encoding(const int16_t * shoco_restrict indices, unsigned int n_consecutive) {
-  for (int p = PACK_COUNT - 1; p >= 0; --p)
+  int p;
+  
+  for (p = PACK_COUNT - 1; p >= 0; --p)
     if ((n_consecutive >= packs[p].bytes_unpacked) && (check_indices(indices, p)))
       return p;
   return -1;
@@ -124,11 +128,13 @@ size_t shoco_compress(const char * const shoco_restrict original, size_t strlen,
 
     pack_n = find_best_encoding(indices, n_consecutive);
     if (pack_n >= 0) {
+      unsigned int i;
+      
       if (o + packs[pack_n].bytes_packed > out_end)
         return bufsize + 1;
 
       code.word = packs[pack_n].word;
-      for (unsigned int i = 0; i < packs[pack_n].bytes_unpacked; ++i)
+      for (i = 0; i < packs[pack_n].bytes_unpacked; ++i)
         code.word |= indices[i] << packs[pack_n].offsets[i];
 
       // In the little-endian world, we need to swap what's
@@ -138,7 +144,7 @@ size_t shoco_compress(const char * const shoco_restrict original, size_t strlen,
 
       // if we'd just copy the word, we might write over the end
       // of the output string
-      for (unsigned int i = 0; i < packs[pack_n].bytes_packed; ++i)
+      for (i = 0; i < packs[pack_n].bytes_packed; ++i)
         o[i] = code.bytes[i];
 
       o += packs[pack_n].bytes_packed;
@@ -188,6 +194,8 @@ size_t shoco_decompress(const char * const shoco_restrict original, size_t compl
 
       *o++ = *in++;
     } else {
+      unsigned int i;
+      
       if (o + packs[mark].bytes_unpacked > out_end)
         return bufsize + 1;
       else if (in + packs[mark].bytes_packed > in_end)
@@ -196,7 +204,7 @@ size_t shoco_decompress(const char * const shoco_restrict original, size_t compl
       // This should be OK as well, but it fails with emscripten.
       // Test this with new versions of emcc.
       //code.word = swap(*(uint32_t *)in);
-      for (unsigned int i = 0; i < packs[mark].bytes_packed; ++i)
+      for (i = 0; i < packs[mark].bytes_packed; ++i)
         code.bytes[i] = in[i];
       code.word = swap(code.word);
 
@@ -206,7 +214,7 @@ size_t shoco_decompress(const char * const shoco_restrict original, size_t compl
       last_chr = o[0] = chrs_by_chr_id[(code.word >> offset) & mask];
 
       // unpack the successor chars
-      for (unsigned int i = 1; i < packs[mark].bytes_unpacked; ++i) {
+      for (i = 1; i < packs[mark].bytes_unpacked; ++i) {
         offset = packs[mark].offsets[i];
         mask = packs[mark].masks[i];
         last_chr = o[i] = chrs_by_chr_and_successor_id[(unsigned char)last_chr - MIN_CHR][(code.word >> offset) & mask];
