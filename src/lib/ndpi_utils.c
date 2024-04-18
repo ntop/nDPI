@@ -3233,14 +3233,14 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 
   /* [2] Check if compressing the string is more efficient */
   compressed_len = ndpi_compress_str((char*)domain_buf, domain_buf_len,
-			       (char*)compressed, sizeof(compressed));
+				     (char*)compressed, sizeof(compressed));
 
   if((compressed_len > 0) && ((out_idx == 0) || (compressed_len < out_idx))) {
     if(compressed_len >= domain_len) {
       /* Compression creates a longer buffer */
       return((u_int)snprintf(out, out_len, "%s", domain));
     } else {
-      compressed_len = ndpi_min(compressed_len, out_len-3);
+      compressed_len = ndpi_min(ndpi_min(compressed_len, sizeof(compressed)), out_len-3);
       memcpy(out, compressed, compressed_len);
       out_idx = compressed_len;
     }
