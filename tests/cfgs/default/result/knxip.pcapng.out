@@ -1,6 +1,7 @@
+DPI Packets (TCP):	1	(1.00 pkts/flow)
 DPI Packets (UDP):	1	(1.00 pkts/flow)
-Confidence DPI              : 1 (flows)
-Num dissector calls: 1 (1.00 diss/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -14,15 +15,16 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia protocols:   4/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-KNXnet_IP	2	118	1
+KNXnet_IP	3	200	2
 
-Acceptable                       2 118           1            
+Acceptable                       3 200           2            
 
 	1	UDP 192.168.88.231:41343 -> 224.0.23.12:3671 [proto: 410/KNXnet_IP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][2 pkts/118 bytes -> 0 pkts/0 bytes][Goodput ratio: 29/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.1.28:3671 -> 192.168.1.24:54445 [proto: 410/KNXnet_IP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][1 pkts/82 bytes -> 0 pkts/0 bytes][Goodput ratio: 34/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

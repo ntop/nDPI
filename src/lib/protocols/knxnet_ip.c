@@ -65,6 +65,12 @@ static inline int is_valid_knxnet_ip_service_id(u_int16_t service_id) {
   }
 }
 
+static void ndpi_int_knxnet_ip_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+{
+  NDPI_LOG_INFO(ndpi_struct, "found KNXnet/IP\n");
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_KNXNET_IP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+}
+
 static void ndpi_search_knxnet_ip(struct ndpi_detection_module_struct *ndpi_struct,
                                   struct ndpi_flow_struct *flow)
 {
@@ -75,22 +81,40 @@ static void ndpi_search_knxnet_ip(struct ndpi_detection_module_struct *ndpi_stru
   if ((packet->payload_packet_len < 10) || (packet->payload[0] != 0x06) ||
       (packet->payload[1] != 0x10))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
+    goto not_knxnet_ip;
   }
 
   u_int16_t service_id = ntohs(get_u_int16_t(packet->payload, 2));
   u_int16_t total_length = ntohs(get_u_int16_t(packet->payload, 4));
 
-  if (is_valid_knxnet_ip_service_id(service_id) && total_length == packet->payload_packet_len)
+  if (!is_valid_knxnet_ip_service_id(service_id))
   {
-    NDPI_LOG_INFO(ndpi_struct, "found KNXnet/IP\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow,
-                               NDPI_PROTOCOL_KNXNET_IP, NDPI_PROTOCOL_UNKNOWN,
-                               NDPI_CONFIDENCE_DPI);
+    goto not_knxnet_ip;
+  }
+
+  if (total_length == packet->payload_packet_len)
+  {
+    ndpi_int_knxnet_ip_add_connection(ndpi_struct, flow);
     return;
   }
 
+  /* Could it be a TCP packet containing multiple messages? */
+  if (packet->tcp != NULL)
+  {
+    if ((total_length + 10) > packet->payload_packet_len)
+    {
+      goto not_knxnet_ip;
+    }
+
+    if (ntohs(get_u_int16_t(packet->payload, total_length)) == 0x610 &&
+        is_valid_knxnet_ip_service_id(ntohs(get_u_int16_t(packet->payload, total_length+2))))
+    {
+      ndpi_int_knxnet_ip_add_connection(ndpi_struct, flow);
+      return;
+    }
+  }
+
+not_knxnet_ip:
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
