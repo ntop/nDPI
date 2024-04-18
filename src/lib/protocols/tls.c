@@ -643,7 +643,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 		      ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, dNSName);
 
 		      /* This looks like an attack */
-		      ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, NULL);
+		      ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, "Invalid dNSName name");
 		    }
 
 		    if(matched_name == 0) {
@@ -695,10 +695,13 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 
 		    i += len;
 		  } else {
+		    char buf[32];
+
+		    snprintf(buf, sizeof(buf), "Unknown extension %02X", general_name_type);
 #if DEBUG_TLS
 		    printf("[TLS] Leftover %u bytes", packet->payload_packet_len - i);
 #endif
-		    ndpi_set_risk(flow, NDPI_TLS_SUSPICIOUS_EXTENSION, NULL);
+		    ndpi_set_risk(flow, NDPI_TLS_SUSPICIOUS_EXTENSION, buf);
 		    break;
 		  }
 		} else {
@@ -781,7 +784,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
   if((packet->payload_packet_len != (length + 4 + (is_dtls ? 8 : 0))) || (packet->payload[1] != 0x0) ||
      certificates_offset >= packet->payload_packet_len) {
-    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
+    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Unvalid lenght");
     return(-1); /* Invalid length */
   }
 
@@ -790,7 +793,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
     packet->payload[certificates_offset - 1];
 
   if((packet->payload[certificates_offset - 3] != 0x0) || ((certificates_length+3) != length)) {
-    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
+    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid certificate offset");
     return(-2); /* Invalid length */
   }
 
@@ -1056,7 +1059,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	u_int8_t alert_level = message->buffer[5];
 
 	if(alert_level == 2 /* Warning (1), Fatal (2) */)
-	  ndpi_set_risk(flow, NDPI_TLS_FATAL_ALERT, NULL);
+	  ndpi_set_risk(flow, NDPI_TLS_FATAL_ALERT, "Found fatal TLS alert");
       }
 
       u_int16_t const alert_len = ntohs(*(u_int16_t const *)&message->buffer[3]);
@@ -1516,7 +1519,7 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
       printf("[TLS] extension length exceeds remaining packet length: %u > %u.\n",
 	     extension_len, packet->payload_packet_len - extension_payload_offset);
 #endif
-      ndpi_set_risk(flow, NDPI_TLS_SUSPICIOUS_EXTENSION, NULL);
+      ndpi_set_risk(flow, NDPI_TLS_SUSPICIOUS_EXTENSION, "Invalid extension len");
       return;
     }
 
@@ -2264,7 +2267,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		      ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, sni);
 
 		      /* This looks like an attack */
-		      ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, NULL);
+		      ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, "Invalid chars found in SNI: exploit or misconfiguration?");
 		    }
 
 		    if(!is_quic) {
@@ -2847,7 +2850,7 @@ compute_ja3c:
 	       && (flow->protos.tls_quic.encrypted_sni.esni == NULL) /* No ESNI */
 	       ) {
 	      /* This is a bit suspicious */
-	      ndpi_set_risk(flow, NDPI_TLS_MISSING_SNI, NULL);
+	      ndpi_set_risk(flow, NDPI_TLS_MISSING_SNI, "SNI should always be present");
 
 	      if(flow->protos.tls_quic.advertised_alpns != NULL) {
 		char buf[256], *tmp, *item;
@@ -2859,7 +2862,7 @@ compute_ja3c:
 		while(item != NULL) {
 		  if(item[0] == 'h') {
 		    /* Example 'h2' */
-		    ndpi_set_risk(flow, NDPI_TLS_ALPN_SNI_MISMATCH, NULL);
+		    ndpi_set_risk(flow, NDPI_TLS_ALPN_SNI_MISMATCH, item);
 		    break;
 		  } else
 		    item = strtok_r(NULL, ",", &tmp);

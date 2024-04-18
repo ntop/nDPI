@@ -400,7 +400,7 @@ struct ndpi_detection_module_struct {
 
   u_int16_t max_payload_track_len;
 
-  ndpi_domain_classify *public_domain_suffixes;
+  ndpi_str_hash *public_domain_suffixes;
 };
 
 

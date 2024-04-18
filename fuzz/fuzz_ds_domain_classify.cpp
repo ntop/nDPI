@@ -11,21 +11,27 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int16_t i, num_iteration, is_added = 0;
   bool rc;
   ndpi_domain_classify *d;
-  u_int8_t class_id;
+  u_int16_t class_id;
   std::string value, value_added;
-
+  struct ndpi_detection_module_struct *ndpi_struct;
+  NDPI_PROTOCOL_BITMASK all;
+  
+  ndpi_struct = ndpi_init_detection_module(NULL);
+  NDPI_BITMASK_SET_ALL(all);
+  ndpi_set_protocol_detection_bitmask2(ndpi_struct, &all);
+  
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
   d = ndpi_domain_classify_alloc();
 
   num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
+  
   for (i = 0; i < num_iteration; i++) {
-
     value = fuzzed_data.ConsumeBytesAsString(fuzzed_data.ConsumeIntegral<u_int8_t>());
-    class_id = fuzzed_data.ConsumeIntegral<u_int8_t>();
-
-    rc = ndpi_domain_classify_add(d, class_id, value.c_str());
+    class_id = fuzzed_data.ConsumeIntegral<u_int16_t>();
+    rc = ndpi_domain_classify_add(ndpi_struct, d, class_id, (char*)value.c_str());
+    
     /* Keep one random entry really added */
     if (rc == true && is_added == 0 && fuzzed_data.ConsumeBool()) {
       value_added = value;
@@ -33,28 +39,25 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
   }
 
-  ndpi_domain_classify_add_domains(d,
+  ndpi_domain_classify_add_domains(ndpi_struct, d,
 				   fuzzed_data.ConsumeIntegralInRange(0, NDPI_LAST_IMPLEMENTED_PROTOCOL - 1),
 				   fuzzed_data.ConsumeBool() ? (char *)"random_list.list" : (char *)"wrong_path");
-
-  if (fuzzed_data.ConsumeBool())
-    ndpi_domain_classify_finalize(d);
 
   /* "Random" search */
   num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
   for (i = 0; i < num_iteration; i++) {
     value = fuzzed_data.ConsumeBytesAsString(fuzzed_data.ConsumeIntegral<u_int8_t>());
-
-    ndpi_domain_classify_contains(d, &class_id, value.c_str());
+    ndpi_domain_classify_hostname(ndpi_struct, d, &class_id, (char *)value.c_str());
   }
+  
   /* Search of an added entry */
   if (is_added) {
-    ndpi_domain_classify_contains(d, &class_id, value_added.c_str());
+    ndpi_domain_classify_hostname(ndpi_struct, d, &class_id, (char *)value_added.c_str());
   }
 
   ndpi_domain_classify_size(d);
-
   ndpi_domain_classify_free(d);
-
+  
+  ndpi_exit_detection_module(ndpi_struct);
   return 0;
 }

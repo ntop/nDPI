@@ -1931,11 +1931,9 @@ extern "C" {
    * Free the hashmap.
    *
    * @par    h            = pointer to the hash map [in, out]
-   * @par    cleanup_func = pointer to a optional callback function
-   *                        called for each element in the hashmap [in]
    *
    */
-  void ndpi_hash_free(ndpi_str_hash **h, void (*cleanup_func)(ndpi_str_hash *h));
+  void ndpi_hash_free(ndpi_str_hash **h);
 
   /**
    * Search for an entry in the hashmap.
@@ -1949,7 +1947,7 @@ extern "C" {
    * @return 0 if an entry with that key was found, 1 otherwise
    *
    */
-  int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, void **value);
+  int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int16_t *value);
 
   /**
    * Add an entry to the hashmap.
@@ -1957,12 +1955,12 @@ extern "C" {
    * @par    h            = pointer to the hash map [in, out]
    * @par    key          = character string (no '\0' required) [in]
    * @par    key_len      = length of the character string @key [in]
-   * @par    value        = pointer to the value to add [in]
+   * @par    value        = value to add [in]
    *
    * @return 0 if the entry was added, 1 otherwise
    *
    */
-  int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, void *value);
+  int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int16_t value);
 
   /* ******************************* */
 
@@ -2076,23 +2074,21 @@ extern "C" {
     for substring domain matching and classification
   */
 
-  ndpi_domain_classify* ndpi_domain_classify_alloc(void);
-  void                  ndpi_domain_classify_free(ndpi_domain_classify *s);
-  u_int32_t             ndpi_domain_classify_size(ndpi_domain_classify *s);
-  bool                  ndpi_domain_classify_add(ndpi_domain_classify *s,
-						 u_int8_t class_id, const char *domain);
-  u_int32_t             ndpi_domain_classify_add_domains(ndpi_domain_classify *s,
-							 u_int8_t class_id,
-							 char *file_path);
-  bool                  ndpi_domain_classify_finalize(ndpi_domain_classify *s);
-  const char*           ndpi_domain_classify_longest_prefix(ndpi_domain_classify *s,
-							    u_int8_t *class_id /* out */,
-							    const char *hostnname,
-							    bool return_subprefix);
-  bool                  ndpi_domain_classify_contains(ndpi_domain_classify *s,
-						      u_int8_t *class_id /* out */,
-						      const char *domain);
-
+  ndpi_domain_classify* ndpi_domain_classify_alloc();
+  void ndpi_domain_classify_free(ndpi_domain_classify *s);
+  u_int32_t ndpi_domain_classify_size(ndpi_domain_classify *s);
+  bool ndpi_domain_classify_add(struct ndpi_detection_module_struct *ndpi_mod,
+				ndpi_domain_classify *s,
+				u_int16_t class_id, char *domain);
+  u_int32_t ndpi_domain_classify_add_domains(struct ndpi_detection_module_struct *ndpi_mod,
+					     ndpi_domain_classify *s,
+					     u_int16_t class_id,
+					     char *file_path);
+  bool ndpi_domain_classify_hostname(struct ndpi_detection_module_struct *ndpi_mod,
+				     ndpi_domain_classify *s,
+				     u_int16_t *class_id /* out */,
+				     char *hostname);
+  
   /* ******************************* */
 
   /*
@@ -2160,12 +2156,14 @@ extern "C" {
    *
    * @par ndpi_str = the struct created for the protocol detection
    * @par hostname = the hostname from which the domain name has to be extracted
+   * @par suffix_id = the id of the returned domain
    *
    * @return The host domain name suffic or the host itself if not found.
    *
    */
   const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndpi_str,
-					  const char *hostname);
+					  const char *hostname,
+					  u_int16_t *suffix_id /* out */);
 
   /**
    * Returns the domain (including the TLS) suffix out of the specified hostname.
@@ -2215,6 +2213,20 @@ extern "C" {
   struct tm *ndpi_gmtime_r(const time_t *timep,
                            struct tm *result);
 
+  /* ******************************* */
+
+  size_t ndpi_compress_str(const char * in, size_t len, char * out, size_t bufsize);
+  size_t ndpi_decompress_str(const char * in, size_t len, char * out, size_t bufsize);
+
+  /* ******************************* */
+
+  /* NOTE
+     this function works best if yout have loaded in memory domain
+     suffixes using ndpi_load_domain_suffixes()
+  */
+  u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
+			   char *domain, char *out, u_int out_len);
+    
   /* ******************************* */
 
   const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx);

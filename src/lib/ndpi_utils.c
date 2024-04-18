@@ -1,7 +1,7 @@
 /*
  * ndpi_utils.c
  *
- * Copyright (C) 2011-23 - ntop.org and contributors
+ * Copyright (C) 2011-24 - ntop.org and contributors
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -38,6 +38,7 @@
 
 #include "ahocorasick.h"
 #include "libcache.h"
+#include "shoco.h"
 
 #include <time.h>
 #ifndef WIN32
@@ -72,21 +73,11 @@ struct pcre2_struct {
 };
 #endif
 
-/*
- * Please keep this strcture in sync with
- * `struct ndpi_str_hash` in src/include/ndpi_typedefs.h
- */
-
-typedef struct ndpi_str_hash_private {
-  unsigned int hash;
-  void *value;
-  // u_int8_t private_data[1]; /* Avoid error C2466 and do not initiate private data with 0  */
+typedef struct {
+  char *key;
+  u_int16_t value16;
   UT_hash_handle hh;
-} ndpi_str_hash_private;
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-_Static_assert(sizeof(struct ndpi_str_hash) == sizeof(struct ndpi_str_hash_private) - sizeof(UT_hash_handle),
-               "Please keep `struct ndpi_str_hash` and `struct ndpi_str_hash_private` syncd.");
-#endif
+} ndpi_str_hash_priv;
 
 /* ****************************************** */
 
@@ -1246,15 +1237,15 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
 
 static char* print_ndpi_address_port(ndpi_address_port *ap, char *buf, u_int buf_len) {
   char ipbuf[INET6_ADDRSTRLEN];
-  
+
   if(ap->is_ipv6) {
     inet_ntop(AF_INET6, &ap->address, ipbuf, sizeof(ipbuf));
   } else {
     inet_ntop(AF_INET, &ap->address, ipbuf, sizeof(ipbuf));
   }
-  
+
   snprintf(buf, buf_len, "%s:%u", ipbuf, ap->port);
-  
+
   return(buf);
 }
 
@@ -2280,12 +2271,9 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
 
 /* ******************************************************************** */
 
-int ndpi_hash_init(ndpi_str_hash **h)
-{
+int ndpi_hash_init(ndpi_str_hash **h) {
   if (h == NULL)
-  {
     return 1;
-  }
 
   *h = NULL;
   return 0;
@@ -2293,76 +2281,68 @@ int ndpi_hash_init(ndpi_str_hash **h)
 
 /* ******************************************************************** */
 
-void ndpi_hash_free(ndpi_str_hash **h, void (*cleanup_func)(ndpi_str_hash *h))
-{
-  struct ndpi_str_hash_private *h_priv;
-  struct ndpi_str_hash_private *current, *tmp;
-
-  if (h == NULL)
-  {
-    return;
-  }
-  h_priv = *(struct ndpi_str_hash_private **)h;
-
-  HASH_ITER(hh, h_priv, current, tmp) {
-    HASH_DEL(h_priv, current);
-    if (cleanup_func != NULL)
-    {
-      cleanup_func((ndpi_str_hash *)current);
+void ndpi_hash_free(ndpi_str_hash **h) {
+  if(h != NULL) {
+    ndpi_str_hash_priv *h_priv = *((ndpi_str_hash_priv **)h);
+    ndpi_str_hash_priv *current, *tmp;
+    
+    HASH_ITER(hh, h_priv, current, tmp) {
+      HASH_DEL(h_priv, current);
+      ndpi_free(current->key);
+      ndpi_free(current);
     }
-    ndpi_free(current);
+    
+    *h = NULL;
   }
-
-  *h = NULL;
 }
 
 /* ******************************************************************** */
 
-int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, void **value)
-{
-  struct ndpi_str_hash_private *h_priv = (struct ndpi_str_hash_private *)h;
-  struct ndpi_str_hash_private *found;
-  unsigned int hash_value;
+int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int16_t *value) {
+  ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)h;
+  ndpi_str_hash_priv *item;
 
-  HASH_VALUE(key, key_len, hash_value);
-  HASH_FIND_INT(h_priv, &hash_value, found);
-  if (found != NULL)
-  {
-    if (value != NULL)
-    {
-      *value = found->value;
-    }
+  HASH_FIND(hh, h_priv, key, key_len, item);
+
+  if (item != NULL) {
+    if(value != NULL)
+      *value = item->value16;
+
     return 0;
-  } else {
+  } else
     return 1;
-  }
 }
 
 /* ******************************************************************** */
 
-int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, void *value)
-{
-  struct ndpi_str_hash_private **h_priv = (struct ndpi_str_hash_private **)h;
-  struct ndpi_str_hash_private *new = ndpi_calloc(1, sizeof(*new));
-  struct ndpi_str_hash_private *found;
-  unsigned int hash_value;
+int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int16_t value) {
+  ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)*h;
+  ndpi_str_hash_priv *item;
 
-  if (new == NULL)
-  {
-    return 1;
+  HASH_FIND(hh, h_priv, key, key_len, item);
+
+  if(item != NULL) {
+    item->value16 = value;
+    return(1); /* Entry already present */
   }
 
-  HASH_VALUE(key, key_len, hash_value);
-  new->hash = hash_value;
-  new->value = value;
-  HASH_ADD_INT(*h_priv, hash, new);
+  item = ndpi_calloc(1, sizeof(ndpi_str_hash_priv));
+  if(item == NULL)
+    return(2);
 
-  HASH_FIND_INT(*h_priv, &hash_value, found);
-  if (found == NULL) /* The insertion failed (because of a memory allocation error) */
-  {
-    ndpi_free(new);
-    return 1;
+  item->key = ndpi_malloc(key_len+1);
+
+  if(item->key == NULL) {
+    ndpi_free(item);
+    return(1);
+  } else {
+    memcpy(item->key, key, key_len);
+    item->key[key_len] = '\0';
   }
+
+  item->value16 = value;
+
+  HASH_ADD(hh, *((ndpi_str_hash_priv **)h), key[0], key_len, item);
 
   return 0;
 }
@@ -2502,7 +2482,7 @@ void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
     if(host && (host[0] != '\0')) {
       /* Check host exception */
       ndpi_check_hostname_risk_exception(ndpi_str, flow, host);
-      
+
       if(flow->risk_mask == 0) {
 	u_int i;
 
@@ -2555,7 +2535,7 @@ void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r,
     /* In case there is an exception set, take it into account */
     if(flow->host_risk_mask_evaluated)
       v &= flow->risk_mask;
-    
+
     // NDPI_SET_BIT(flow->risk, (u_int32_t)r);
     flow->risk |= v;
 
@@ -3148,4 +3128,142 @@ const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx)
   if(idx < 0 || idx >= NDPI_LRUCACHE_MAX)
     return "unknown";
   return names[idx];
+}
+
+/* ******************************************* */
+
+size_t ndpi_compress_str(const char * in, size_t len, char * out, size_t bufsize) {
+  size_t ret = shoco_compress(in, len, out, bufsize);
+
+  if(ret > bufsize)
+    return(0); /* Better not to compress data (it is longer than the uncompressed data) */
+
+  return(ret);
+}
+
+/* ******************************************* */
+
+size_t ndpi_decompress_str(const char * in, size_t len, char * out, size_t bufsize) {
+  return(shoco_decompress(in, len, out, bufsize));
+
+}
+
+/* ******************************************* */
+
+static u_char ndpi_domain_mapper[256];
+static bool ndpi_domain_mapper_initialized = false;
+
+#define IGNORE_CHAR           0xFF
+#define NUM_BITS_NIBBLE       6 /* each 'nibble' is encoded with 6 bits */
+#define NIBBLE_ELEM_OFFSET    24
+
+/* Used fo encoding domain names 8 bits -> 6 bits */
+static void ndpi_domain_mapper_init() {
+  u_int i;
+  u_char idx = 1 /* start from 1 to make sure 0 is no ambiguous */;
+
+  memset(ndpi_domain_mapper, IGNORE_CHAR, 256);
+
+  for(i='a'; i<= 'z'; i++)
+    ndpi_domain_mapper[i] = idx++;
+
+  for(i='0'; i<= '9'; i++)
+    ndpi_domain_mapper[i] = idx++;
+
+  ndpi_domain_mapper['-'] = idx++;
+  ndpi_domain_mapper['_'] = idx++;
+  ndpi_domain_mapper['.'] = idx++;
+}
+
+/* ************************************************ */
+
+u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
+			 char *domain, char *out, u_int out_len) {
+  u_int out_idx = 0, i, buf_shift = 0, domain_buf_len, compressed_len, suffix_len, domain_len;
+  u_int32_t value = 0;
+  u_char domain_buf[256], compressed[128];
+  u_int16_t domain_id = 0;
+  const char *suffix;
+
+  if(!ndpi_domain_mapper_initialized) {
+    ndpi_domain_mapper_init();
+    ndpi_domain_mapper_initialized = true;
+  }
+
+  domain_len = strlen(domain);
+  
+  if(domain_len >= (out_len-3))
+    return(0);
+
+  if(domain_len <= 4)
+    return((u_int)snprintf(out, out_len, "%s", domain));  /* Too short */
+
+  /* [1] Encode the domain in 6 bits */
+  suffix = ndpi_get_host_domain_suffix(ndpi_str, domain, &domain_id);
+
+  if(suffix == NULL)
+    return((u_int)snprintf(out, out_len, "%s", domain));  /* Unknown suffix */
+  
+  snprintf((char*)domain_buf, sizeof(domain_buf), "%s", domain);
+  domain_buf_len = strlen((char*)domain_buf), suffix_len = strlen(suffix);
+
+  if(domain_buf_len > suffix_len) {
+    snprintf((char*)domain_buf, sizeof(domain_buf), "%s", domain);
+    domain_buf_len = domain_buf_len-suffix_len-1;
+    domain_buf[domain_buf_len] = '\0';
+
+    for(i=0; domain_buf[i] != '\0'; i++) {
+      u_int32_t mapped_idx = ndpi_domain_mapper[domain_buf[i]];
+
+      if(mapped_idx != IGNORE_CHAR) {
+	mapped_idx <<= buf_shift;
+	value |= mapped_idx, buf_shift += NUM_BITS_NIBBLE;
+
+	if(buf_shift == NIBBLE_ELEM_OFFSET) {
+	  memcpy(&out[out_idx], &value, 3);
+	  out_idx += 3;
+	  buf_shift = 0; /* Move to the next buffer */
+	  value = 0;
+	}
+      }
+    }
+
+    if(buf_shift != 0) {
+      u_int bytes = buf_shift / NUM_BITS_NIBBLE;
+
+      memcpy(&out[out_idx], &value, bytes);
+      out_idx += bytes;
+    }
+  }
+
+  /* [2] Check if compressing the string is more efficient */
+  compressed_len = ndpi_compress_str((char*)domain_buf, domain_buf_len,
+				     (char*)compressed, sizeof(compressed));
+
+  if((compressed_len > 0) && ((out_idx == 0) || (compressed_len < out_idx))) {
+    if(compressed_len >= domain_len) {
+      /* Compression creates a longer buffer */
+      return((u_int)snprintf(out, out_len, "%s", domain));
+    } else {
+      compressed_len = ndpi_min(ndpi_min(compressed_len, sizeof(compressed)), out_len-3);
+      memcpy(out, compressed, compressed_len);
+      out_idx = compressed_len;
+    }
+  }
+  
+  /* Add trailer domainId value */
+  out[out_idx++] = (domain_id >> 8) & 0xFF;
+  out[out_idx++] = domain_id & 0xFF;
+
+#ifdef DEBUG
+  {
+    u_int i;
+
+    fprintf(stdout, "%s [len: %u][", domain, out_idx);
+    for(i=0; i<out_idx; i++) fprintf(stdout, "%02X", out[i] & 0xFF);
+    fprintf(stdout, "]\n");
+  }
+#endif
+
+  return(out_idx);
 }
