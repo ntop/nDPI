@@ -2282,19 +2282,18 @@ int ndpi_hash_init(ndpi_str_hash **h) {
 /* ******************************************************************** */
 
 void ndpi_hash_free(ndpi_str_hash **h) {
-  ndpi_str_hash_priv *h_priv = *((ndpi_str_hash_priv **)h);
-  ndpi_str_hash_priv *current, *tmp;
-
-  if (h == NULL)
-    return;
-
-  HASH_ITER(hh, h_priv, current, tmp) {
-    HASH_DEL(h_priv, current);
-    ndpi_free(current->key);
-    ndpi_free(current);
+  if(h != NULL) {
+    ndpi_str_hash_priv *h_priv = *((ndpi_str_hash_priv **)h);
+    ndpi_str_hash_priv *current, *tmp;
+    
+    HASH_ITER(hh, h_priv, current, tmp) {
+      HASH_DEL(h_priv, current);
+      ndpi_free(current->key);
+      ndpi_free(current);
+    }
+    
+    *h = NULL;
   }
-
-  *h = NULL;
 }
 
 /* ******************************************************************** */
