@@ -221,7 +221,7 @@ static void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct
         ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, str);
 
         /* This looks like an attack */
-        ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, NULL);
+        ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
       }
       ndpi_int_fastcgi_add_connection(ndpi_struct, flow, &ret_match);
     }

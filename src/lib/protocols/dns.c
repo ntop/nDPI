@@ -766,7 +766,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len, is_mdns ? NDPI_HOSTNAME_NORM_LC : NDPI_HOSTNAME_NORM_ALL);
 
     if (hostname_is_valid == 0)
-      ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, NULL);
+      ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, "Invalid chars detected in domain name");
 
     dot = strchr(_hostname, '.');
     if(dot) {

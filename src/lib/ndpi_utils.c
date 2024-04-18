@@ -3185,10 +3185,10 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
     ndpi_domain_mapper_initialized = true;
   }
 
-  if(strlen(domain) >= out_len)
-    return(0);
-
   domain_len = strlen(domain);
+  
+  if(domain_len >= (out_len-3))
+    return(0);
 
   if(domain_len <= 4)
     return((u_int)snprintf(out, out_len, "%s", domain));  /* Too short */
@@ -3226,16 +3226,22 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
       memcpy(&out[out_idx], &value, bytes);
       out_idx += bytes;
     }
-  } else
-    out_idx = out_len-1;
+  }
 
   /* [2] Check if compressing the string is more efficient */
   compressed_len = ndpi_compress_str((char*)domain_buf, domain_buf_len,
 			       (char*)compressed, sizeof(compressed));
 
-  if((compressed_len > 0) && (compressed_len < out_idx)) {
-    memcpy(out, compressed, compressed_len);
-    out_idx = compressed_len;
+  if((compressed_len > 0) && ((out_idx == 0) || (compressed_len < out_idx))) {
+    if(compressed_len >= domain_len) {
+      /* Compression creates a longer buffer */
+      memcpy(out, domain, domain_len);
+      out_idx = domain_len;      
+    } else {
+      compressed_len = ndpi_min(compressed_len, out_len-3);
+      memcpy(out, compressed, compressed_len);
+      out_idx = compressed_len;
+    }
   }
   
   /* Add trailer domainId value */

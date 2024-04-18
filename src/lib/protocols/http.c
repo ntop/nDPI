@@ -1007,7 +1007,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, str);
 
 	/* This looks like an attack */
-	ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, NULL);
+	ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
       }
 
       double_col = strchr((char*)flow->host_server_name, ':');
