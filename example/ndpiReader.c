@@ -377,21 +377,21 @@ void ndpiCheckHostStringMatch(char *testChar) {
                                            testChar, strlen(testChar), &match);
 
   if(testRes) {
-    memset( &detected_protocol, 0, sizeof(ndpi_protocol) );
+    memset(&detected_protocol, 0, sizeof(ndpi_protocol) );
 
     detected_protocol.app_protocol    = match.protocol_id;
     detected_protocol.master_protocol = 0;
     detected_protocol.category        = match.protocol_category;
 
-    ndpi_protocol2name( ndpi_str, detected_protocol, appBufStr,
-                        sizeof(appBufStr));
+    ndpi_protocol2name(ndpi_str, detected_protocol, appBufStr,
+		       sizeof(appBufStr));
 
     printf("Match Found for string [%s] -> P(%d) B(%d) C(%d) => %s %s %s\n",
 	   testChar, match.protocol_id, match.protocol_breed,
 	   match.protocol_category,
 	   appBufStr,
-	   ndpi_get_proto_breed_name( match.protocol_breed ),
-	   ndpi_category_get_name( ndpi_str, match.protocol_category));
+	   ndpi_get_proto_breed_name(match.protocol_breed ),
+	   ndpi_category_get_name(ndpi_str, match.protocol_category));
   } else
     printf("Match NOT Found for string: %s\n\n", testChar );
 
@@ -3883,7 +3883,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   if(!quiet_mode) {
     printf("\nnDPI Memory statistics:\n");
     printf("\tnDPI Memory (once):      %-13s\n", formatBytes(ndpi_get_ndpi_detection_module_size(), buf, sizeof(buf)));
-    printf("\tFlow Memory (per flow):  %-13s\n", formatBytes( ndpi_detection_get_sizeof_ndpi_flow_struct(), buf, sizeof(buf)));
+    printf("\tFlow Memory (per flow):  %-13s\n", formatBytes(ndpi_detection_get_sizeof_ndpi_flow_struct(), buf, sizeof(buf)));
     printf("\tActual Memory:           %-13s\n", formatBytes(current_ndpi_memory, buf, sizeof(buf)));
     printf("\tPeak Memory:             %-13s\n", formatBytes(max_ndpi_memory, buf, sizeof(buf)));
     printf("\tSetup Time:              %lu msec\n", (unsigned long)(setup_time_usec/1000));
@@ -5822,7 +5822,10 @@ void encodeDomainsUnitTest() {
     str = (char*)"www.bbc.co.uk"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 6);
 
     assert(ndpi_load_categories_dir(ndpi_str, "../lists"));
+    assert(ndpi_load_categories_file(ndpi_str, "./categories.txt", "categories.txt"));
 
+    str = (char*)"2001:db8:1::1"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 100);
+    str = (char*)"www.internetbadguys.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 100);
     str = (char*)"0grand-casino.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 107);
     str = (char*)"222.0grand-casino.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 107);
     str = (char*)"10bet.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 107);

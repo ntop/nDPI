@@ -70,7 +70,7 @@ u_int32_t ndpi_domain_classify_size(ndpi_domain_classify *s) {
 
 /* ********************************************************** */
 
-bool ndpi_domain_classify_add(struct ndpi_detection_module_struct *ndpi_mod,
+bool ndpi_domain_classify_add(struct ndpi_detection_module_struct *ndpi_str,
 			      ndpi_domain_classify *s,
 			      u_int16_t class_id,
 			      char *domain) {
@@ -157,6 +157,8 @@ bool ndpi_domain_classify_hostname(struct ndpi_detection_module_struct *ndpi_mod
   u_int32_t len;
   const char *dot;
   char *item;
+
+  // ndpi_enable_loaded_categories(ndpi_mod); /* Make sure they have been enabled */
 
   *class_id = 0; /* Unknown class_id */
 

@@ -954,7 +954,7 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 
   /* ************************ */
 
-  ndpi_enable_loaded_categories(ndpi_str);
+  //ndpi_enable_loaded_categories(ndpi_str);
 
   if(!ndpi_xgrams_inited) {
     ndpi_xgrams_inited = 1;
@@ -3454,11 +3454,17 @@ static int is_ip_list_enabled(struct ndpi_detection_module_struct *ndpi_str, int
   return 1;
 }
 
+/* *********************************************** */
+
 int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
   if(!ndpi_str)
     return -1;
+
+  if(!ndpi_str->custom_categories.categories_loaded)
+    ndpi_enable_loaded_categories(ndpi_str);
+
   if(ndpi_str->finalized) /* Already finalized */
     return 0;
 
@@ -4041,6 +4047,9 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
   u_int16_t class_id;
   u_int max_len = sizeof(buf)-1;
 
+  if(!ndpi_str->custom_categories.categories_loaded)
+    ndpi_enable_loaded_categories(ndpi_str);
+
   if(name_len > max_len) name_len = max_len;
   memcpy(buf, name, name_len);
   buf[name_len] = '\0';
@@ -4069,8 +4078,8 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
   *id = 0;
   
   if(!ndpi_str->custom_categories.categories_loaded)
-    return(-1);
-
+    ndpi_enable_loaded_categories(ndpi_str);
+      
   if(cp_len > 0) {
     memcpy(ipbuf, name_or_ip, cp_len);
     ipbuf[cp_len] = '\0';
@@ -4867,6 +4876,8 @@ int ndpi_load_categories_file(struct ndpi_detection_module_struct *ndpi_str,
   return rc;
 }
 
+/* ******************************************************************** */
+
 int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str,
 			    FILE *fd, void *user_data) {
   char buffer[512], *line, *name, *category, *saveptr;
@@ -5066,8 +5077,6 @@ int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
 
   if(failed_files)
     return(-1 * failed_files);
-
-  ndpi_enable_loaded_categories(ndpi_str);
   
   return(num_loaded);
 }
@@ -6230,42 +6239,42 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 /* ******************************************************************** */
 
 static inline int ndpi_proto_cb_tcp_payload(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
-    return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	     (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
-	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
-              NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0;
+  return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
+	  (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0;
 }
 
 /* ******************************************************************** */
 
 static inline int ndpi_proto_cb_tcp_nopayload(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
-    return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	     (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
-	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
-              NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0
-	   && (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	       NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD) == 0;
+  return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
+	  (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0
+    && (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
+	NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD) == 0;
 }
 
 /* ******************************************************************** */
 
 static inline int ndpi_proto_cb_udp(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
-    return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	     (NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP |
-	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
-	      NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0;
+  return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
+	  (NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0;
 }
 
 /* ******************************************************************** */
 
 static inline int ndpi_proto_cb_other(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
-    return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	     (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
-	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP |
-	      NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)) == 0
-	   ||
-             (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	       NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC) != 0;
+  return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
+	  (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)) == 0
+    ||
+    (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
+     NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC) != 0;
 }
 
 /* ******************************************************************** */
@@ -7936,6 +7945,9 @@ int ndpi_enable_loaded_categories(struct ndpi_detection_module_struct *ndpi_str)
   int i;
   static char *built_in = "built-in";
 
+  if(ndpi_str->custom_categories.categories_loaded)
+    return(-1); /* Already loaded */
+  
   /* First add the nDPI known categories matches */
   for(i = 0; category_match[i].string_to_match != NULL; i++)
     ndpi_load_category(ndpi_str, category_match[i].string_to_match,
