@@ -2308,7 +2308,7 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int16_t *
   if (item != NULL) {
     if(value != NULL)
       *value = item->value16;
-    
+
     return 0;
   } else
     return 1;
@@ -2316,14 +2316,23 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int16_t *
 
 /* ******************************************************************** */
 
-/* NOTE: in case key is not a printable string, the performance can be very bad */
 int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int16_t value) {
-  ndpi_str_hash_priv *item = ndpi_calloc(1, sizeof(ndpi_str_hash_priv));
-  
+  ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)*h;
+  ndpi_str_hash_priv *item;
+
+  HASH_FIND(hh, h_priv, key, key_len, item);
+
+  if(item != NULL) {
+    item->value16 = value;
+    return(1); /* Entry already present */
+  }
+
+  item = ndpi_calloc(1, sizeof(ndpi_str_hash_priv));
   if(item == NULL)
-    return(1);
+    return(2);
 
   item->key = ndpi_malloc(key_len+1);
+
   if(item->key == NULL) {
     ndpi_free(item);
     return(1);
@@ -2331,10 +2340,10 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int16_
     memcpy(item->key, key, key_len);
     item->key[key_len] = '\0';
   }
-  
+
   item->value16 = value;
 
-  HASH_ADD(hh, *((ndpi_str_hash_priv **)h), key[0], key_len, item);  
+  HASH_ADD(hh, *((ndpi_str_hash_priv **)h), key[0], key_len, item);
 
   return 0;
 }
@@ -3235,12 +3244,12 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 #ifdef DEBUG
   {
     u_int i;
-    
+
     fprintf(stdout, "%s [len: %u][", domain, out_idx);
     for(i=0; i<out_idx; i++) fprintf(stdout, "%02X", out[i] & 0xFF);
     fprintf(stdout, "]\n");
   }
 #endif
-  
+
   return(out_idx);
 }
