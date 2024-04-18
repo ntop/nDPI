@@ -64,9 +64,10 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
     len = strlen(line) - 1;
     while((len > 0) && (line[len] == '\n'))
       line[len--] = '\0';
-      
+
     if(ndpi_hash_add_entry(&ndpi_str->public_domain_suffixes,
 			   &line[offset], strlen(&line[offset]), domain_id) != 0) {
+
       NDPI_LOG_ERR(ndpi_str, "Error while processing domain %s\n", &line[offset]);
     } else
       domain_id++;
