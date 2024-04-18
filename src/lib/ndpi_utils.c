@@ -3133,7 +3133,12 @@ const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx)
 /* ******************************************* */
 
 size_t ndpi_compress_str(const char * in, size_t len, char * out, size_t bufsize) {
-  return(shoco_compress(in, len, out, bufsize));
+  size_t ret = shoco_compress(in, len, out, bufsize);
+
+  if(ret > bufsize)
+    return(0); /* Better not to compress data (it is longer than the uncompressed data) */
+
+  return(ret);
 }
 
 /* ******************************************* */
