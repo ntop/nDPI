@@ -3175,9 +3175,9 @@ static void ndpi_domain_mapper_init() {
 
 u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 			 char *domain, char *out, u_int out_len) {
-  u_int out_idx = 0, i, buf_shift = 0, domain_buf_len, out1_len, suffix_len, domain_len;
+  u_int out_idx = 0, i, buf_shift = 0, domain_buf_len, compressed_len, suffix_len, domain_len;
   u_int32_t value = 0;
-  u_char domain_buf[256], out1[128];
+  u_char domain_buf[256], compressed[128];
   u_int16_t domain_id = 0;
   const char *suffix;
 
@@ -3228,15 +3228,17 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
       out_idx += bytes;
     }
   } else
-    out_idx = (u_int)-1;
+    out_idx = out_len-1;
 
   /* [2] Check if compressing the string is more efficient */
-  out1_len = ndpi_compress_str((char*)domain_buf, domain_buf_len,
-			       (char*)out1, sizeof(out1));
+  compressed_len = ndpi_compress_str((char*)domain_buf, domain_buf_len,
+			       (char*)compressed, sizeof(compressed));
 
-  if(out1_len < out_idx)
-    memcpy(out, out1, out1_len), out_idx = out1_len;
-
+  if((compressed_len > 0) && (compressed_len < out_idx)) {
+    memcpy(out, compressed, compressed_len);
+    out_idx = compressed_len;
+  }
+  
   /* Add trailer domainId value */
   out[out_idx++] = (domain_id >> 8) & 0xFF;
   out[out_idx++] = domain_id & 0xFF;
