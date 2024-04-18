@@ -4096,7 +4096,8 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
     /* Search IPv4 */
 
     /* Make sure all in network byte order otherwise compares wont work */
-    ndpi_fill_prefix_v4(&prefix, &pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses)->maxbits);
+    ndpi_fill_prefix_v4(&prefix, &pin, 32,
+			((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses)->maxbits);
     node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses, &prefix);
 
     if(node) {
@@ -4106,7 +4107,8 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
     return(-1);
   } else if(inet_pton(AF_INET6, ipbuf, &pin6) == 1) {
     /* Search IPv6 */
-    ndpi_fill_prefix_v6(&prefix, &pin6, 128, ((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6)->maxbits);
+    ndpi_fill_prefix_v6(&prefix, &pin6, 128,
+			((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6)->maxbits);
     node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses6, &prefix);
 
     if(node) {

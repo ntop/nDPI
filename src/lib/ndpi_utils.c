@@ -3168,7 +3168,6 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 			 char *domain, char *out, u_int out_len) {
   u_int out_idx = 0, i, buf_shift = 0, domain_buf_len, out1_len, suffix_len, domain_len;
   u_int32_t value = 0;
-  char *last_dot = NULL;
   u_char domain_buf[256], out1[128];
   u_int16_t domain_id = 0;
   const char *suffix;
@@ -3230,10 +3229,18 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
     memcpy(out, out1, out1_len), out_idx = out1_len;
 
   /* Add trailer domainId value */
-  if(last_dot != NULL) {
-    out[out_idx++] = (domain_id >> 8) & 0xFF;
-    out[out_idx++] = domain_id & 0xFF;
-  }
+  out[out_idx++] = (domain_id >> 8) & 0xFF;
+  out[out_idx++] = domain_id & 0xFF;
 
+#ifdef DEBUG
+  {
+    u_int i;
+    
+    fprintf(stdout, "%s [len: %u][", domain, out_idx);
+    for(i=0; i<out_idx; i++) fprintf(stdout, "%02X", out[i] & 0xFF);
+    fprintf(stdout, "]\n");
+  }
+#endif
+  
   return(out_idx);
 }

@@ -27,6 +27,7 @@
 #include "ndpi_config.h"
 #include "ndpi_api.h"
 
+#define ENCODE_DATA
 
 /* ********************************************************** */
 
@@ -89,7 +90,8 @@ bool ndpi_domain_classify_add(struct ndpi_detection_module_struct *ndpi_str,
   // fprintf(stdout, "."); fflush(stdout);
 
 #ifdef ENCODE_DATA
-  out_len = ndpi_encode_domain(ndpi_mod, domain, out, sizeof(out));
+  out_len = ndpi_encode_domain(ndpi_str, domain, out, sizeof(out));
+  
   ndpi_hash_add_entry(&s->domains, out, out_len, class_id);
 #else
   ndpi_hash_add_entry(&s->domains, domain, strlen(domain), class_id);

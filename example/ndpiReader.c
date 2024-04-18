@@ -5818,8 +5818,8 @@ void encodeDomainsUnitTest() {
     ndpi_get_host_domain_suffix(ndpi_str, "www.ntop.org", &suffix_id); assert(suffix_id == 4503);
     ndpi_get_host_domain_suffix(ndpi_str, "www.bbc.co.uk", &suffix_id); assert(suffix_id == 5242);
 
-    str = (char*)"www.ntop.org"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 6);
-    str = (char*)"www.bbc.co.uk"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 6);
+    str = (char*)"www.ntop.org"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
+    str = (char*)"www.bbc.co.uk"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
 
     assert(ndpi_load_categories_dir(ndpi_str, "../lists"));
     assert(ndpi_load_categories_file(ndpi_str, "./categories.txt", "categories.txt"));
