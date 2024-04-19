@@ -5,6 +5,15 @@ This page provides the list of the protocols/applications supported by nDPI. For
 
 Work in progress!
 
+.. _Proto 32:
+
+`NDPI_PROTOCOL_BFCP`
+=======================
+BFCP (Binary Floor Control Protocol) is used for controlling and coordinating real-time data sharing and collaboration during video conferencing sessions.
+
+References: `RFC: <https://datatracker.ietf.org/doc/html/rfc8855>`_
+
+
 .. _Proto 72:
 
 `NDPI_PROTOCOL_HART_IP`
