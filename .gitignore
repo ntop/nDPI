@@ -61,6 +61,7 @@
 /fuzz/fuzz_alg_crc32_md5
 /fuzz/fuzz_alg_ses_des
 /fuzz/fuzz_alg_bytestream
+/fuzz/fuzz_alg_shoco
 /fuzz/fuzz_config
 /fuzz/fuzz_community_id
 /fuzz/fuzz_serialization
@@ -124,6 +125,7 @@
 /fuzz/fuzz_readerutils_workflow_seed_corpus.zip
 /fuzz/fuzz_readerutils_parseprotolist_seed_corpus.zip
 /fuzz/fuzz_*.dict
+/fuzz/testpcaps.zip
 /influxdb/Makefile
 /install-sh
 /libndpi.pc

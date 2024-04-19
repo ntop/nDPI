@@ -67,10 +67,7 @@
 /* **************************************************** */
 
 static u_int16_t ndpi_community_id_buf_copy(u_int8_t * const dst, const void * const src, u_int16_t len) {
-  if(src)
-    memcpy(dst, src, len);
-  else
-    memset(dst, 0, len);
+  memcpy(dst, src, len);
 
   return len;
 }

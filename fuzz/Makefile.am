@@ -1,6 +1,6 @@
 bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp
 #Alghoritms
-bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream
+bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco
 #Data structures
 bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64_fuse fuzz_ds_domain_classify
 #Third party
@@ -207,6 +207,19 @@ endif
 fuzz_alg_bytestream_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_alg_bytestream_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_alg_shoco_SOURCES = fuzz_alg_shoco.cpp
+fuzz_alg_shoco_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -I ../src/lib/third_party/include/
+fuzz_alg_shoco_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_alg_shoco_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_alg_shoco_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_alg_shoco_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_alg_shoco_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_alg_shoco_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_ses_des_SOURCES = fuzz_alg_ses_des.cpp fuzz_common_code.c
 fuzz_alg_ses_des_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
@@ -624,14 +637,17 @@ fuzz_readerutils_parseprotolist_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOL
 # see https://github.com/google/oss-fuzz/tree/master/projects/ndpi
 testpcaps := $(wildcard ../tests/cfgs/default/pcap/*.pcap*)
 
-fuzz_ndpi_reader_seed_corpus.zip: $(testpcaps)
-	zip -j fuzz_ndpi_reader_seed_corpus.zip $(testpcaps)
+testpcaps.zip: $(testpcaps)
+	zip -j testpcaps.zip $(testpcaps)
 
-fuzz_ndpi_reader_alloc_fail_seed_corpus.zip: $(testpcaps)
-	zip -j fuzz_ndpi_reader_alloc_fail_seed_corpus.zip $(testpcaps)
+fuzz_ndpi_reader_seed_corpus.zip: testpcaps.zip
+	cp testpcaps.zip fuzz_ndpi_reader_seed_corpus.zip
 
-fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip: $(testpcaps)
-	zip -j fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip $(testpcaps)
+fuzz_ndpi_reader_alloc_fail_seed_corpus.zip: testpcaps.zip
+	cp testpcaps.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
+
+fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip: testpcaps.zip
+	cp testpcaps.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip
 
 files_corpus_fuzz_quic_get_crypto_data :=  $(wildcard corpus/fuzz_quic_get_crypto_data/*)
 fuzz_quic_get_crypto_data_seed_corpus.zip: $(files_corpus_fuzz_quic_get_crypto_data)

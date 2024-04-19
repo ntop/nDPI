@@ -2302,6 +2302,9 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int16_t *
   ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)h;
   ndpi_str_hash_priv *item;
 
+  if(!key || key_len == 0)
+    return(2);
+
   HASH_FIND(hh, h_priv, key, key_len, item);
 
   if (item != NULL) {
@@ -2318,6 +2321,9 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int16_t *
 int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int16_t value) {
   ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)*h;
   ndpi_str_hash_priv *item;
+
+  if(!key || key_len == 0)
+    return(3);
 
   HASH_FIND(hh, h_priv, key, key_len, item);
 
