@@ -1,7 +1,6 @@
-DPI Packets (TCP):	4	(1.00 pkts/flow)
-DPI Packets (UDP):	1	(1.00 pkts/flow)
-Confidence DPI              : 5 (flows)
-Num dissector calls: 740 (148.00 diss/flow)
+DPI Packets (UDP):	2	(2.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 157 (157.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -15,19 +14,15 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   10/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   10/0 (search/found)
+Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-BFCP	10	688	5
+BFCP	9	588	1
 
-Acceptable                      10 688           5            
+Acceptable                       9 588           1            
 
-	1	UDP 192.168.3.134:57020 <-> 192.168.9.100:16500 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Video/26][3 pkts/210 bytes <-> 3 pkts/166 bytes][Goodput ratio: 36/24][0.05 sec][bytes ratio: 0.117 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 14/1 26/8 37/14 12/6][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 70/55 90/58 14/2][Plen Bins: 83,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	TCP 127.0.0.1:49226 -> 127.0.0.1:47086 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Video/26][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 15/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	3	TCP 127.0.0.1:49226 -> 127.0.0.1:47087 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Video/26][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 15/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	4	TCP 127.0.0.1:49226 -> 127.0.0.1:47088 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Video/26][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 15/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	5	TCP 127.0.0.1:49226 -> 127.0.0.1:47089 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Video/26][1 pkts/78 bytes -> 0 pkts/0 bytes][Goodput ratio: 15/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.9.100:16500 <-> 192.168.3.134:57020 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Video/26][5 pkts/318 bytes <-> 4 pkts/270 bytes][Goodput ratio: 34/34][0.47 sec][bytes ratio: 0.082 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/7 116/157 449/449 192/207][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 64/68 98/90 17/13][Plen Bins: 77,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

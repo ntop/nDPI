@@ -58,6 +58,7 @@ static void ndpi_search_bfcp(struct ndpi_detection_module_struct *ndpi_struct,
   if (!flow->bfcp_stage) {
     flow->bfcp_conference_id = conference_id;
     flow->bfcp_stage = 1;
+    return;
   }
 
   if (flow->bfcp_conference_id == conference_id) {
