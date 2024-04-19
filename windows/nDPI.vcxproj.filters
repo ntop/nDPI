@@ -40,7 +40,6 @@
     <ClCompile Include="..\src\lib\protocols\jabber.c" />
     <ClCompile Include="..\src\lib\protocols\kakaotalk_voice.c" />
     <ClCompile Include="..\src\lib\protocols\kerberos.c" />
-    <ClCompile Include="..\src\lib\protocols\kontiki.c" />
     <ClCompile Include="..\src\lib\protocols\ldap.c" />
     <ClCompile Include="..\src\lib\protocols\lotus_notes.c" />
     <ClCompile Include="..\src\lib\protocols\mail_imap.c" />
@@ -97,7 +96,6 @@
     <ClCompile Include="..\src\lib\protocols\tftp.c" />
     <ClCompile Include="..\src\lib\protocols\tplink_shp.c" />
     <ClCompile Include="..\src\lib\protocols\tuya_lp.c" />
-    <ClCompile Include="..\src\lib\protocols\tvuplayer.c" />
     <ClCompile Include="..\src\lib\protocols\ubntac2.c" />
     <ClCompile Include="..\src\lib\protocols\usenet.c" />
     <ClCompile Include="..\src\lib\protocols\vhua.c" />

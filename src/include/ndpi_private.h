@@ -714,7 +714,6 @@ void init_irc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 void init_jabber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_kakaotalk_voice_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_kerberos_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_kontiki_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_ldap_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_lotus_notes_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mail_imap_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
@@ -774,7 +773,6 @@ void init_teamviewer_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 void init_telegram_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_telnet_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_tftp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_tvuplayer_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_usenet_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_wsd_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_veohtv_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
