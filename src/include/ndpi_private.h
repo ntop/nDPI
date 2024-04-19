@@ -918,6 +918,7 @@ void init_flute_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
 void init_lolwildrift_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_teso_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_ldp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_knxnet_ip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 
