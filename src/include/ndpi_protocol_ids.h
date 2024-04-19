@@ -87,7 +87,7 @@ typedef enum {
   NDPI_PROTOCOL_YANDEX_MARKET         = 56,
   NDPI_PROTOCOL_YANDEX_DISK           = 57,
   NDPI_PROTOCOL_DISCORD               = 58,
-  NDPI_PROTOCOL_FREE_59               = 59,
+  NDPI_PROTOCOL_FREE_59               = 59, /* FREE */
   NDPI_PROTOCOL_MONGODB               = 60,
   NDPI_PROTOCOL_PLURALSIGHT           = 61,
   NDPI_PROTOCOL_YANDEX_CLOUD          = 62,
