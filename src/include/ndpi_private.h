@@ -714,7 +714,6 @@ void init_irc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 void init_jabber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_kakaotalk_voice_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_kerberos_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_kontiki_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_ldap_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_lotus_notes_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mail_imap_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);

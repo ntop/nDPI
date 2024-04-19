@@ -60,7 +60,7 @@ typedef enum {
   NDPI_PROTOCOL_MAIL_SMTPS            = 29,
   NDPI_PROTOCOL_DTLS                  = 30,
   NDPI_PROTOCOL_UBNTAC2               = 31, /* Ubiquity UBNT AirControl = 2 */
-  NDPI_PROTOCOL_KONTIKI               = 32,
+  NDPI_PROTOCOL_FREE_32               = 32, /* FREE */
   NDPI_PROTOCOL_YANDEX_MAIL           = 33,
   NDPI_PROTOCOL_YANDEX_MUSIC          = 34,
   NDPI_PROTOCOL_GNUTELLA              = 35,

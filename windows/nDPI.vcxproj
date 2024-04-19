@@ -255,7 +255,6 @@
     <ClCompile Include="..\src\lib\protocols\kakaotalk_voice.c" />
     <ClCompile Include="..\src\lib\protocols\kcp.c" />
     <ClCompile Include="..\src\lib\protocols\kerberos.c" />
-    <ClCompile Include="..\src\lib\protocols\kontiki.c" />
     <ClCompile Include="..\src\lib\protocols\ldap.c" />
     <ClCompile Include="..\src\lib\protocols\lotus_notes.c" />
     <ClCompile Include="..\src\lib\protocols\mail_imap.c" />
