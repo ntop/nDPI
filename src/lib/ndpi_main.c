@@ -11504,3 +11504,20 @@ void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle,
 
   return NULL;
 }
+
+size_t ndpi_strlcpy(char *dst, const char* src, size_t dst_len)
+{
+  if (!dst || !src) {
+    return 0;
+  }
+
+  size_t src_len = strlen(src);
+
+  if (dst_len != 0) {
+    size_t len = (src_len < dst_len - 1) ? src_len : dst_len - 1;
+    memcpy(dst, src, len);
+    dst[len] = '\0';
+  }
+
+  return src_len;
+}
