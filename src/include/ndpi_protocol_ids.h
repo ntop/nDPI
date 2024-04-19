@@ -87,7 +87,7 @@ typedef enum {
   NDPI_PROTOCOL_YANDEX_MARKET         = 56,
   NDPI_PROTOCOL_YANDEX_DISK           = 57,
   NDPI_PROTOCOL_DISCORD               = 58,
-  NDPI_PROTOCOL_TVUPLAYER             = 59,
+  NDPI_PROTOCOL_FREE_59               = 59,
   NDPI_PROTOCOL_MONGODB               = 60,
   NDPI_PROTOCOL_PLURALSIGHT           = 61,
   NDPI_PROTOCOL_YANDEX_CLOUD          = 62,
@@ -177,7 +177,7 @@ typedef enum {
   NDPI_PROTOCOL_RADIUS                = 146,
   NDPI_PROTOCOL_WINDOWS_UPDATE        = 147,
   NDPI_PROTOCOL_TEAMVIEWER            = 148,
-  NDPI_PROTOCOL_TUENTI                = 149,
+  NDPI_PROTOCOL_FREE_149              = 149, /* FREE */
   NDPI_PROTOCOL_LOTUS_NOTES           = 150,
   NDPI_PROTOCOL_SAP                   = 151,
   NDPI_PROTOCOL_GTP                   = 152,
