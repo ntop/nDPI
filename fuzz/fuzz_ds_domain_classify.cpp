@@ -6,6 +6,8 @@
 #include <assert.h>
 #include "fuzzer/FuzzedDataProvider.h"
 
+static struct ndpi_detection_module_struct *ndpi_struct = NULL;
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   u_int16_t i, num_iteration, is_added = 0;
@@ -13,13 +15,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_domain_classify *d;
   u_int16_t class_id;
   std::string value, value_added;
-  struct ndpi_detection_module_struct *ndpi_struct;
-  NDPI_PROTOCOL_BITMASK all;
-  
-  ndpi_struct = ndpi_init_detection_module(NULL);
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_struct, &all);
-  
+
+  if (ndpi_struct == NULL) {
+    fuzz_init_detection_module(&ndpi_struct, NULL);
+  }
+
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
 
@@ -58,6 +58,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_domain_classify_size(d);
   ndpi_domain_classify_free(d);
   
-  ndpi_exit_detection_module(ndpi_struct);
   return 0;
 }
