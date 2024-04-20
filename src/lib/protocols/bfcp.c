@@ -61,7 +61,7 @@ static void ndpi_search_bfcp(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if (flow->bfcp_conference_id == conference_id) {
+  if (flow->bfcp_stage && flow->bfcp_conference_id == conference_id) {
     NDPI_LOG_INFO(ndpi_struct, "found BFCP\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BFCP,
                                NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
