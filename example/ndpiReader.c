@@ -5631,37 +5631,46 @@ void strtonumUnitTest() {
 /* *********************************************** */
 
 void strlcpyUnitTest() {
-  // Test empty string
-  char dst_empty[10] = "";
-  assert(ndpi_strlcpy(dst_empty, "", sizeof(dst_empty)) == 0);
-  assert(dst_empty[0] == '\0');
+  char dest[10];
+  /* Test 1: Normal copy where destination buffer is big enough. */
+  memset(dest, 'X', sizeof(dest));
+  assert(ndpi_strlcpy(dest, "Hello", 10, 5) == 5);
+  assert(strcmp(dest, "Hello") == 0);
 
-  // Basic copy test
-  char dst1[10] = "";
-  assert(ndpi_strlcpy(dst1, "abc", sizeof(dst1)) == 3);
-  assert(strcmp(dst1, "abc") == 0);
+  /* Test 2: Edge case where dst_len is exactly enough for the string including null terminator. */
+  memset(dest, 'X', sizeof(dest));
+  assert(ndpi_strlcpy(dest, "Hello", 6, 5) == 5);
+  assert(strcmp(dest, "Hello") == 0);
 
-  // Test with dst_len smaller than src_len
-  char dst2[4] = "";
-  assert(ndpi_strlcpy(dst2, "abcdef", sizeof(dst2)) == 6);
-  assert(strcmp(dst2, "abc") == 0); // Should truncate "abcdef" to "abc"
+  /* Test 3: Copy with truncation when dst_len is too small. */
+  memset(dest, 'X', sizeof(dest));
+  assert(ndpi_strlcpy(dest, "HelloWorld", 6, 10) == 10);
+  assert(strcmp(dest, "Hello") == 0);
 
-  // Test with dst_len bigger than src_len
-  char dst3[10] = "";
-  assert(ndpi_strlcpy(dst3, "abc", sizeof(dst3)) == 3);
-  assert(strcmp(dst3, "abc") == 0);
+  /* Test 4: src_len is overestimated than actual string, should copy whole string till null terminator. */
+  memset(dest, 'X', sizeof(dest));
+  assert(ndpi_strlcpy(dest, "Hello", 10, 20) == 5);
+  assert(strcmp(dest, "Hello") == 0);
 
-  // Test with dst_len equal to 1 (only null terminator should be copied)
-  char dst4[1];
-  assert(ndpi_strlcpy(dst4, "abc", sizeof(dst4)) == 3);
-  assert(dst4[0] == '\0'); // Should only contain the null terminator
+  /* Test 5: Both src and dst are valid but lengths are 0, should do nothing. */
+  memset(dest, 'X', sizeof(dest));
+  assert(ndpi_strlcpy(dest, "Hello", 0, 0) == 0);
+  assert(dest[0] == 'X');
 
-  // Test with NULL source, expecting return value to be 0
-  char dst5[10];
-  assert(ndpi_strlcpy(dst5, NULL, sizeof(dst5)) == 0);
+  /* Test 6: Handling when either src or dst is NULL */
+  assert(ndpi_strlcpy(NULL, "Hello", 10, 5) == 0);
+  assert(ndpi_strlcpy(dest, NULL, 10, 5) == 0);
 
-  // Test with NULL destination, should also return 0 without crashing
-  assert(ndpi_strlcpy(NULL, "abc", sizeof(dst5)) == 0);
+  /* Test 7: Non-null-terminated source string, should copy until src_len is reached. */
+  char src[] = { 'a', 'b', 'c', 'd', 'e' };
+  memset(dest, 'X', sizeof(dest));
+  assert(ndpi_strlcpy(dest, src, 10, sizeof(src)) == 5);
+  /* Check byte by byte since strcmp wouldn't work properly without a null terminator. */
+  int i;
+  for (i = 0; i < 5; ++i) {
+    assert(dest[i] == src[i]);
+  }
+  assert(dest[5] == '\0');
 }
 
 /* *********************************************** */
