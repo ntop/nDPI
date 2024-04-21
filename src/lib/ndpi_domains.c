@@ -94,10 +94,10 @@ const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndp
 					u_int16_t *domain_id /* out */) {
   char *dot, *prev_dot;
 
-  *domain_id = 0;
-  
-  if(!ndpi_str)
+  if(!ndpi_str || !hostname || !domain_id)
     return NULL;
+
+  *domain_id = 0;
 
   if(ndpi_str->public_domain_suffixes == NULL)
     return(hostname);
