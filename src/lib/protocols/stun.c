@@ -686,6 +686,10 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
          * the easiest (!?) solution is to remove everything, and let the TLS dissector
 	   to set both master (i.e. DTLS) and subprotocol (if any) */
 
+      /* If we already have a real sub-classification, and the DTLS code doesn't set any
+         subclassification iself (it is quite unlikely that we have a subprotocol only via
+         Client Hello, for example), keep the original one */
+
       /* In same rare cases, with malformed/fuzzed traffic, `is_dtls()` might return false
          positives. In that case, the TLS dissector doesn't set the master protocol, so we
          need to rollback to the current state */
@@ -722,8 +726,16 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
 	  switch_to_tls(ndpi_struct, flow, first_dtls_pkt);
 
-	  NDPI_LOG_DBG(ndpi_struct, "(%d/%d)\n",
-                       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+	  if(first_dtls_pkt &&
+             flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DTLS &&
+             flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+             old_proto_stack[0] != NDPI_PROTOCOL_UNKNOWN &&
+             old_proto_stack[0] != NDPI_PROTOCOL_STUN) {
+            NDPI_LOG_DBG(ndpi_struct, "Keeping old subclassification %d\n", old_proto_stack[0]);
+            ndpi_int_stun_add_connection(ndpi_struct, flow,
+                                         old_proto_stack[0] == NDPI_PROTOCOL_RTP ? NDPI_PROTOCOL_SRTP : old_proto_stack[0],
+                                         __get_master(flow));
+	  }
 
 	  /* If this is not a real DTLS packet, we need to restore the old state */
           if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN &&
