@@ -82,7 +82,7 @@ typedef enum {
   NDPI_PROTOCOL_MAIL_IMAPS            = 51,
   NDPI_PROTOCOL_ICECAST               = 52,
   NDPI_PROTOCOL_CPHA                  = 53,
-  NDPI_PROTOCOL_PPSTREAM              = 54,
+  NDPI_PROTOCOL_PPS_TV                = 54,
   NDPI_PROTOCOL_ZATTOO                = 55,
   NDPI_PROTOCOL_YANDEX_MARKET         = 56,
   NDPI_PROTOCOL_YANDEX_DISK           = 57,

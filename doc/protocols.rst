@@ -5,6 +5,15 @@ This page provides the list of the protocols/applications supported by nDPI. For
 
 Work in progress!
 
+.. _Proto 54:
+
+`NDPI_PROTOCOL_PPS_TV`
+===========================
+PPS.tv is a popular online video streaming platform in China that provides a wide range of entertainment content, including movies, TV shows, and live events, to its users.
+
+References: `Main site: <https://pps.tv/>`_
+
+
 .. _Proto 72:
 
 `NDPI_PROTOCOL_HART_IP`
