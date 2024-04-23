@@ -21,7 +21,15 @@ References: `RFC: <https://datatracker.ietf.org/doc/html/rfc8855>`_
 iQIYI is a Chinese online video platform that offers a wide range of original and licensed content including movies, dramas, variety shows, and anime.
 
 References: `Main site: <https://www.iqiyi.com/>`_
-=======
+
+
+.. _Proto 59:
+
+`NDPI_PROTOCOL_ADOBE_CONNECT`
+===========================
+Adobe Connect is a web conferencing platform that allows users to conduct online meetings, webinars, and virtual classrooms.
+
+References: `Main site: <https://www.adobe.com/products/adobeconnect.html>`_
 
 
 .. _Proto 72:

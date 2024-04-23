@@ -1602,6 +1602,9 @@ static ndpi_protocol_match host_match[] =
    { "pathofexile.com",                  "PathofExile", NDPI_PROTOCOL_PATHOFEXILE, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "elderscrollsonline.com",           "TES_Online", NDPI_PROTOCOL_TESO, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   /* Adobe Connect */
+   { "adobeconnect.com",                 "AdobeConnect", NDPI_PROTOCOL_ADOBE_CONNECT, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif
