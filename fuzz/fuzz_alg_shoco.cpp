@@ -6,7 +6,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   const char *in;
   size_t in_len, out_len;
-  char out[4096], orig[4096];
+  char out[8192], orig[8192];
 
   /* No memory allocations involved */
 
@@ -15,7 +15,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   in_len = strlen(in);
 
   out_len = shoco_compress(in, in_len, out, sizeof(out));
-  shoco_decompress(out, out_len, orig, sizeof(orig));
+  if(out_len <= sizeof(out)) /* No error */
+    shoco_decompress(out, out_len, orig, sizeof(orig));
 
   return 0;
 }

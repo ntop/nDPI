@@ -43,7 +43,7 @@ static void ndpi_search_iqiyi(struct ndpi_detection_module_struct *ndpi_struct, 
 
   NDPI_LOG_DBG(ndpi_struct, "search iQIYI\n");
 
-  if (packet->payload_packet_len > 120 && 300 < packet->payload_packet_len) {
+  if (packet->payload_packet_len > 120 && packet->payload_packet_len < 300) {
     if (ndpi_memmem(packet->payload, packet->payload_packet_len, "PPStream", NDPI_STATICSTRING_LEN("PPStream"))) {
       ndpi_int_iqiyi_add_connection(ndpi_struct, flow);
       return;

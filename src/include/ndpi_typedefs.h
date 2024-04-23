@@ -1490,6 +1490,10 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_TEAMVIEWER */
   u_int8_t teamviewer_stage : 3;
 
+  /* NDPI_PROTOCOL_BFCP */
+  u_int8_t bfcp_stage:1;
+  u_int32_t bfcp_conference_id;
+
   /* NDPI_PROTOCOL_OPENVPN */
   u_int8_t ovpn_session_id[2][8];
 
