@@ -148,6 +148,7 @@
     <ClCompile Include="..\src\lib\protocols\teso.c" />
     <ClCompile Include="..\src\lib\protocols\ldp.c" />
     <ClCompile Include="..\src\lib\protocols\knxnet_ip.c" />
+    <ClCompile Include="..\src\lib\protocols\iqiyi.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />

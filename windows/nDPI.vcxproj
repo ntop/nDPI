@@ -374,6 +374,7 @@
     <ClCompile Include="..\src\lib\protocols\teso.c" />
     <ClCompile Include="..\src\lib\protocols\ldp.c" />
     <ClCompile Include="..\src\lib\protocols\knxnet_ip.c" />
+    <ClCompile Include="..\src\lib\protocols\iqiyi.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />
