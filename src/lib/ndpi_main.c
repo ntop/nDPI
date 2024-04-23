@@ -11506,19 +11506,22 @@ void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle,
   return NULL;
 }
 
-size_t ndpi_strlcpy(char *dst, const char* src, size_t dst_len)
+size_t ndpi_strlcpy(char* dst, const char* src, size_t dst_len, size_t src_len)
 {
-  if (!dst || !src) {
+  if (!dst || !src || dst_len == 0 || src_len == 0) {
     return 0;
   }
-
-  size_t src_len = strlen(src);
-
-  if (dst_len != 0) {
-    size_t len = (src_len < dst_len - 1) ? src_len : dst_len - 1;
-    memcpy(dst, src, len);
-    dst[len] = '\0';
+  
+  /* Optimization: search for a null terminator within src_len. It's important not to search beyond src_len 
+   * as it may not be safe. */
+  const char* null_char = (const char*)memchr(src, '\0', src_len);
+  if (null_char != NULL) {
+    src_len = null_char - src;
   }
+
+  size_t len = ndpi_min(src_len, dst_len-1);
+  memcpy(dst, src, len);
+  dst[len] = '\0';
 
   return src_len;
 }
