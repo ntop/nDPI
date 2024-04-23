@@ -14,6 +14,16 @@ BFCP (Binary Floor Control Protocol) is used for controlling and coordinating re
 References: `RFC: <https://datatracker.ietf.org/doc/html/rfc8855>`_
 
 
+.. _Proto 54:
+
+`NDPI_PROTOCOL_IQIYI`
+===========================
+iQIYI is a Chinese online video platform that offers a wide range of original and licensed content including movies, dramas, variety shows, and anime.
+
+References: `Main site: <https://www.iqiyi.com/>`_
+=======
+
+
 .. _Proto 72:
 
 `NDPI_PROTOCOL_HART_IP`

@@ -1220,10 +1220,6 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "WireGuard", NDPI_PROTOCOL_CATEGORY_VPN,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 51820, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_PPSTREAM,
-			  "PPStream", NDPI_PROTOCOL_CATEGORY_STREAMING,
-			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_XBOX,
 			  "Xbox", NDPI_PROTOCOL_CATEGORY_GAME,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -2306,6 +2302,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BFCP,
 			  "BFCP", NDPI_PROTOCOL_CATEGORY_VIDEO,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_IQIYI,
+			  "iQIYI", NDPI_PROTOCOL_CATEGORY_STREAMING,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
@@ -5569,10 +5569,6 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* NON_TCP_UDP */
   init_non_tcp_udp_dissector(ndpi_str, &a);
 
-
-  /* PPSTREAM */
-  init_ppstream_dissector(ndpi_str, &a);
-
   /* IAX */
   init_iax_dissector(ndpi_str, &a);
 
@@ -6204,6 +6200,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* Binary Floor Control Protocol */
   init_bfcp_dissector(ndpi_str, &a);
+
+  /* iQIYI */
+  init_iqiyi_dissector(ndpi_str, &a);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"

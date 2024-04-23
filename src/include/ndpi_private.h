@@ -738,7 +738,6 @@ void init_ntp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 void init_openvpn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_oracle_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_postgres_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_ppstream_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_pptp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_qq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_quake_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
@@ -918,6 +917,7 @@ void init_teso_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 void init_ldp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_knxnet_ip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_bfcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_iqiyi_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 
