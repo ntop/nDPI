@@ -2074,7 +2074,7 @@ extern "C" {
     for substring domain matching and classification
   */
 
-  ndpi_domain_classify* ndpi_domain_classify_alloc();
+  ndpi_domain_classify* ndpi_domain_classify_alloc(void);
   void ndpi_domain_classify_free(ndpi_domain_classify *s);
   u_int32_t ndpi_domain_classify_size(ndpi_domain_classify *s);
   bool ndpi_domain_classify_add(struct ndpi_detection_module_struct *ndpi_mod,
