@@ -5,15 +5,6 @@ This page provides the list of the protocols/applications supported by nDPI. For
 
 Work in progress!
 
-<<<<<<< HEAD
-.. _Proto 54:
-
-`NDPI_PROTOCOL_PPS_TV`
-===========================
-PPS.tv is a popular online video streaming platform in China that provides a wide range of entertainment content, including movies, TV shows, and live events, to its users.
-
-References: `Main site: <https://pps.tv/>`_
-=======
 .. _Proto 32:
 
 `NDPI_PROTOCOL_BFCP`
@@ -21,7 +12,16 @@ References: `Main site: <https://pps.tv/>`_
 BFCP (Binary Floor Control Protocol) is used for controlling and coordinating real-time data sharing and collaboration during video conferencing sessions.
 
 References: `RFC: <https://datatracker.ietf.org/doc/html/rfc8855>`_
->>>>>>> dev
+
+
+.. _Proto 54:
+
+`NDPI_PROTOCOL_IQIYI`
+===========================
+iQIYI is a Chinese online video platform that offers a wide range of original and licensed content including movies, dramas, variety shows, and anime.
+
+References: `Main site: <https://www.iqiyi.com/>`_
+=======
 
 
 .. _Proto 72:
