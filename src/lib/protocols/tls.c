@@ -1194,7 +1194,7 @@ int is_dtls(const u_int8_t *buf, u_int32_t buf_len, u_int32_t *block_len) {
   if(buf_len <= 13)
     return 0;
 
-  if((buf[0] != 0x16 && buf[0] != 0x14 && buf[0] != 0x17) || /* Handshake, change-cipher-spec, Application-Data */
+  if((buf[0] != 0x16 && buf[0] != 0x14 && buf[0] != 0x17 && buf[0] != 0x15) || /* Handshake, change-cipher-spec, Application-Data, Alert */
      !((buf[1] == 0xfe && buf[2] == 0xff) || /* Versions */
        (buf[1] == 0xfe && buf[2] == 0xfd) ||
        (buf[1] == 0x01 && buf[2] == 0x00))) {
@@ -1334,6 +1334,17 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
       processed += block_len + 13;
       flow->tls_quic.certificate_processed = 1; /* Fake, to avoid extra dissection */
       break;
+    } else if(block[0] == 0x15 /* Alert */) {
+#ifdef DEBUG_TLS
+      printf("[TLS] TLS Alert\n");
+#endif
+
+      if(block_len == 2) {
+       u_int8_t alert_level = block[13];
+
+       if(alert_level == 2 /* Warning (1), Fatal (2) */)
+         ndpi_set_risk(flow, NDPI_TLS_FATAL_ALERT, "Found fatal TLS alert");
+      }
     } else {
 #ifdef DEBUG_TLS
       printf("[TLS] Appllication Data\n");
