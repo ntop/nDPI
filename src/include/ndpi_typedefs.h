@@ -1469,9 +1469,6 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_SOCKS */
   u_int8_t socks5_stage:2, socks4_stage:2;      // 0 - 3
 
-  /* NDPI_PROTOCOL_EDONKEY */
-  u_int8_t edonkey_stage:2;	                // 0 - 3
-
   /* NDPI_PROTOCOL_FTP_CONTROL */
   u_int8_t ftp_control_stage:2;
 

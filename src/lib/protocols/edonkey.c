@@ -30,179 +30,41 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
+#define PROTO_EDONKEY        0xE3
+#define PROTO_EMULE_EXT      0xC5
+#define PROTO_EMULE_COMP     0xD4
 
-static void ndpi_int_edonkey_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static void ndpi_int_edonkey_add_connection(struct ndpi_detection_module_struct *ndpi_struct, 
+                                            struct ndpi_flow_struct *flow)
+{
+  NDPI_LOG_INFO(ndpi_struct, "found eDonkey\n");
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_EDONKEY, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
-static int ndpi_edonkey_payload_check(const u_int8_t *data, u_int32_t len) {
-  if((len >= 4) && (data[0] == 0xe3) && (data[2] == 0x00) && (data[3] == 0x00))
-    return 1;
-  
-  if((len >= 4) && (data[0] == 0xc5) && (data[2] == 0x00) && (data[3] == 0x00))
-    return 1;  
-  
-  if((len >= 2) && (data[0] == 0xe5) && (data[1] == 0x43))
-    return 1;
-  
-  if((len >= 4) && (data[0] == 0xe5) && (data[1] == 0x08) && (data[2] == 0x78) && (data[3] == 0xda))
-    return 1;
+static void ndpi_search_edonkey(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
-  if((len >= 4) && (data[0] == 0xe5) && (data[1] == 0x28) && (data[2] == 0x78) && (data[3] == 0xda))
-    return 1;
+  NDPI_LOG_DBG(ndpi_struct, "search eDonkey\n");
 
-  if((len >= 2) && (data[0] == 0xc5) && (data[1] == 0x90))
-    return 1;
-
-  if((len >= 2) && (data[0] == 0xc5) && (data[1] == 0x91))
-    return 1;
-
-  if((len == 2) && (data[0] == 0xc5) && (data[1] == 0x92))
-    return 1;
-
-  if((len == 2) && (data[0] == 0xc5) && (data[1] == 0x93))
-    return 1;
-
-  if((len >= 38 && len <= 70) && (data[0] == 0xc5) && (data[1] == 0x94))
-    return 1;
-
-  if((len >= 2) && (data[0] == 0xe3) && (data[1] == 0x9a))
-    return 1;
-
-  if((len >= 2) && (data[0] == 0xe3) && (data[1] == 0x9b))
-    return 1;
-
-  if((len == 6) && (data[0] == 0xe3) && (data[1] == 0x96))
-    return 1;
-
-  if((len <= 34 && ((len - 2) % 4 == 0)) && (data[0] == 0xe3) && (data[1] == 0x97))
-    return 1;
-
-  if((len >= 2) && (data[0] == 0xe3) && (data[1] == 0x92))
-    return 1;
-
-  if((len >= 2) && (data[0] == 0xe3) && (data[1] == 0x94))
-    return 1;
-
-  if((len >= 2) && (data[0] == 0xe3) && (data[1] == 0x98))
-    return 1;
-
-  if((len >= 2) && (data[0] == 0xe3) && (data[1] == 0x99))
-    return 1;
-
-  if((len == 6) && (data[0] == 0xe3) && (data[1] == 0xa2))
-    return 1;
-
-  if((len >= 2) && (data[0] == 0xe3) && (data[1] == 0xa3))
-    return 1;
-
-  if((len == 27) && (data[0] == 0xe4) && (data[1] == 0x00))
-    return 1;
-
-  if((len == 529) && (data[0] == 0xe4) && (data[1] == 0x08))
-    return 1;
-
-  if((len == 18) && (data[0] == 0xe4) && (data[1] == 0x01) && (data[2] == 0x00) && (data[3] == 0x00))
-    return 1;
-
-  if((len == 523) && (data[0] == 0xe4) && (data[1] == 0x09))
-    return 1;
-
-  if((len == 35) && (data[0] == 0xe4) && (data[1] == 0x21))
-    return 1;
-
-  if((len == 19) && (data[0] == 0xe4) && (data[1] == 0x4b))
-    return 1;
-
-  if((len >= 2) && (data[0] == 0xe4) && (data[1] == 0x11))
-    return 1;
-
-  if((len == 22 || len == 38 || len == 28) && (data[0] == 0xe4) && (data[1] == 0x19))
-    return 1;
-
-  if((len == 35) && (data[0] == 0xe4) && (data[1] == 0x20))
-    return 1;
-
-  if((len == 27) && (data[0] == 0xe4) && (data[1] == 0x18))
-    return 1;
-
-  if((len == 27) && (data[0] == 0xe4) && (data[1] == 0x10))
-    return 1;
-
-  if((len == 6) && (data[0] == 0xe4) && (data[1] == 0x58))
-    return 1;
-
-  if((len == 4) && (data[0] == 0xe4) && (data[1] == 0x50))
-    return 1;
-
-  if((len == 36) && (data[0] == 0xe4) && (data[1] == 0x52))
-    return 1;
-
-  if((len == 48) && (data[0] == 0xe4) && (data[1] == 0x40))
-    return 1;
-
-  if((len == 225) && (data[0] == 0xe4) && (data[1] == 0x43))
-    return 1;
-
-  if((len == 19) && (data[0] == 0xe4) && (data[1] == 0x48))
-    return 1;
-
-  if((len == 119 || len == 69 || len == 294) && (data[0] == 0xe4) && (data[1] == 0x29))
-    return 1;
-
-  if((len == 119 || len == 69 || len == 294 || len == 44 || len == 269) && (data[0] == 0xe4) && (data[1] == 0x28))
-    return 1;
-
-  return 0;
-}
-
-static void ndpi_check_edonkey(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int32_t payload_len = packet->payload_packet_len;
- 
-  /* Break after 10 packets. */
-  if(flow->packet_counter > 10) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
-  }
-
-  /* Check if we so far detected the protocol in the request or not. */
-  if(flow->edonkey_stage == 0) {
-    NDPI_LOG_DBG2(ndpi_struct, "EDONKEY stage 0: \n");
-
-    if(ndpi_edonkey_payload_check(packet->payload, payload_len)) {
-      NDPI_LOG_DBG2(ndpi_struct, "Possible EDONKEY request detected, we will look further for the response\n");
-
-      /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
-      flow->edonkey_stage = packet->packet_direction + 1;
-    } else
+  if (packet->payload_packet_len > 5) {
+    u_int8_t protocol = packet->payload[0];
+    if (protocol != PROTO_EDONKEY && protocol != PROTO_EMULE_EXT &&
+        protocol != PROTO_EMULE_COMP)
+    {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-  } else {
-    NDPI_LOG_DBG2(ndpi_struct, "EDONKEY stage %u: \n", flow->edonkey_stage);
-
-    /* At first check, if this is for sure a response packet (in another direction. If not, do nothing now and return. */
-    if((flow->edonkey_stage - packet->packet_direction) == 1) {
       return;
     }
-
-    /* This is a packet in another direction. Check if we find the proper response. */
-    if(ndpi_edonkey_payload_check(packet->payload, payload_len)) {
-      NDPI_LOG_INFO(ndpi_struct, "found EDONKEY\n");
+    /* All eDonkey over TCP packets should have this field */
+    u_int32_t message_length = packet->payload_packet_len-5;
+    if (message_length == le32toh(get_u_int32_t(packet->payload, 1)))
+    {
       ndpi_int_edonkey_add_connection(ndpi_struct, flow);
-    } else {
-      NDPI_LOG_DBG2(ndpi_struct, "The reply did not seem to belong to EDONKEY, resetting the stage to 0\n");
-      flow->edonkey_stage = 0;
+      return;
     }
   }
 
-  if(flow->packet_counter > 5)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);    
-}
-
-static void ndpi_search_edonkey(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  NDPI_LOG_DBG(ndpi_struct, "search EDONKEY\n");
-
-  ndpi_check_edonkey(ndpi_struct, flow);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
@@ -211,7 +73,7 @@ void init_edonkey_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_
   ndpi_set_bitmask_protocol_detection("eDonkey", ndpi_struct, *id,
 				      NDPI_PROTOCOL_EDONKEY,
 				      ndpi_search_edonkey,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 
