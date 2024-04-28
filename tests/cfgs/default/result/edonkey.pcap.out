@@ -1,6 +1,6 @@
-DPI Packets (TCP):	5	(5.00 pkts/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 153 (153.00 diss/flow)
+Num dissector calls: 8 (8.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache zoom:       0/0/0 (insert/search/found)
@@ -25,4 +25,4 @@ eDonkey	17	2016	1
 
 Unsafe                          17 2016          1            
 
-	1	TCP 201.15.177.227:1754 <-> 135.192.214.240:7551 [proto: 36/eDonkey][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: Download/7][6 pkts/598 bytes <-> 11 pkts/1418 bytes][Goodput ratio: 41/56][57.40 sec][bytes ratio: -0.407 (Download)][IAT c2s/s2c min/avg/max/stddev: 5/91 5347/4749 12107/12106 5400/4962][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 100/129 178/186 55/63][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (VeryCD)][Plen Bins: 0,0,0,25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 201.15.177.227:1754 <-> 135.192.214.240:7551 [proto: 36/eDonkey][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Download/7][6 pkts/598 bytes <-> 11 pkts/1418 bytes][Goodput ratio: 41/56][57.40 sec][bytes ratio: -0.407 (Download)][IAT c2s/s2c min/avg/max/stddev: 5/91 5347/4749 12107/12106 5400/4962][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 100/129 178/186 55/63][Risk: ** Unsafe Protocol **][Risk Score: 10][PLAIN TEXT (VeryCD)][Plen Bins: 0,0,0,25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
