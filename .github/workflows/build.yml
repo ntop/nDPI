@@ -76,8 +76,9 @@ jobs:
       fail-fast: true
       matrix:
         # ubuntu-latest == ubuntu-22.04
-        # macOS-latest == macos-12
-        os: ["ubuntu-latest", "ubuntu-20.04", "macOS-latest", "macos-13", "windows-latest"]
+        # macOS-latest == macos-14 on **ARM64**
+        # There are some issues with external dependencies on macOS-latest. Disable it for the time being
+        os: ["ubuntu-latest", "ubuntu-20.04", "macOS-12", "macOS-13", "windows-latest"]
         arch: ["x86_64"]
         gcrypt: ["--with-local-libgcrypt", ""]
         compiler: ["cc"]
@@ -160,7 +161,7 @@ jobs:
             msan: "--with-memory-sanitizer"
             nBPF: ""
           - compiler: "cc"
-            os: macOS-latest
+            os: macOS-13
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre2"
@@ -337,6 +338,7 @@ jobs:
           make all
           make -C example ndpiSimpleIntegration
           #There are somes issues with librrd
+          #make -C rrdtool
       - name: Print nDPI long help
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
