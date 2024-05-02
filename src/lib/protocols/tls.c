@@ -1611,6 +1611,32 @@ static int check_sni_is_numeric_ip(char *sni) {
 
 static int u_int16_t_cmpfunc(const void * a, const void * b) { return(*(u_int16_t*)a - *(u_int16_t*)b); }
 
+static bool is_grease_version(u_int16_t version) {
+  switch(version) {
+  case 0x0a0a:
+  case 0x1a1a:
+  case 0x2a2a:
+  case 0x3a3a:
+  case 0x4a4a:
+  case 0x5a5a:
+  case 0x6a6a:
+  case 0x7a7a:
+  case 0x8a8a:
+  case 0x9a9a:
+  case 0xaaaa:
+  case 0xbaba:  
+  case 0xcaca:
+  case 0xdada:
+  case 0xeaea:
+  case 0xfafa:
+    return(true);
+    break;
+    
+  default:
+    return(false);
+  }
+}
+
 /* **************************************** */
 
 static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
@@ -1624,7 +1650,6 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
   u_int16_t tls_handshake_version = ja->client.tls_handshake_version;
   char * const ja_str = &flow->protos.tls_quic.ja4_client[0];
   const u_int16_t ja_max_len = sizeof(flow->protos.tls_quic.ja4_client);
-  
   /*
     Compute JA4 TLS/QUIC client
 
@@ -1644,7 +1669,7 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
   ja_str[0] = (quic_version != 0) ? 'q' : 't';
 
   for(i=0; i<ja->client.num_supported_versions; i++) {
-    if((ja->client.supported_versions[i] != 0x0A0A /* GREASE */)
+    if((!is_grease_version(ja->client.supported_versions[i]))
        && (tls_handshake_version < ja->client.supported_versions[i]))
       tls_handshake_version = ja->client.supported_versions[i];
   }
