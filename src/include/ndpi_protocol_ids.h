@@ -439,6 +439,9 @@ typedef enum {
   NDPI_PROTOCOL_TESO                  = 408,
   NDPI_PROTOCOL_LDP                   = 409,
   NDPI_PROTOCOL_KNXNET_IP             = 410,
+  NDPI_PROTOCOL_BLUESKY               = 411,
+  NDPI_PROTOCOL_MASTODON              = 412,
+  NDPI_PROTOCOL_THREADS               = 413,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

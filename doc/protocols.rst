@@ -760,3 +760,30 @@ References: `RFC <https://datatracker.ietf.org/doc/html/rfc5036>`_
 KNXnet/IP is a building automation protocol that enables the exchange of data and control information over IP networks, extending the KNX standard for home and building automation.
 
 References: `Paid Specs: <https://webstore.ansi.org/standards/ds/dsiso225102019>`_
+
+
+.. _Proto 411:
+
+`NDPI_PROTOCOL_BLUESKY`
+======================
+Bluesky, also known as Bluesky Social, is a decentralized microblogging social platform.
+
+References: `Main site: <https://bsky.app/>`_
+
+
+.. _Proto 412:
+
+`NDPI_PROTOCOL_MASTODON`
+=======================
+Mastodon is free and open-source software for running self-hosted social networking services. It has microblogging features similar to Twitter.
+
+References: `Main site: <https://joinmastodon.org/>`_
+
+
+.. _Proto 413:
+
+`NDPI_PROTOCOL_THREADS`
+======================
+Threads is an online social media and social networking service operated by Meta Platforms.
+
+References: `Main site: <https://www.threads.net>`_
