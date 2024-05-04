@@ -86,7 +86,7 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
          (packet->payload[1] == 201 || /* RTCP, Receiver Report */
           packet->payload[1] == 200 || /* RTCP, Sender Report */
           is_valid_rtp_payload_type(packet->payload[1] & 0x7F)) /* RTP */) {
-        NDPI_LOG_DBG(ndpi_struct, "Probably RTP; keep looking for LINE");
+        NDPI_LOG_DBG(ndpi_struct, "Probably RTP; keep looking for LINE\n");
         return;
       } else {
         if((u_int8_t)(flow->l4.udp.line_base_cnt[packet->packet_direction] +

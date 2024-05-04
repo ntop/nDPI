@@ -914,6 +914,9 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_RTP */
   u_int32_t rtp_stage:2;
 
+  /* NDPI_PROTOCOL_RTCP */
+  u_int32_t rtcp_stage:2;
+
   /* NDPI_PROTOCOL_QUIC */
   u_int32_t quic_0rtt_found:1;
   u_int32_t quic_vn_pair:1;

@@ -311,9 +311,6 @@ static void parse_xor_ip_port_attribute(struct ndpi_detection_module_struct *ndp
     }
   }
 }
-#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
-static
-#endif
 int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
             struct ndpi_flow_struct *flow,
             u_int16_t *app_proto)
