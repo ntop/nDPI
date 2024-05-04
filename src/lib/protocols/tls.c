@@ -755,7 +755,8 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
     if(ndpi_check_issuerdn_risk_exception(ndpi_struct, flow->protos.tls_quic.issuerDN))
       return; /* This is a trusted DN */
 
-    ndpi_set_risk(flow, NDPI_TLS_SELFSIGNED_CERTIFICATE, flow->protos.tls_quic.subjectDN);
+    if(!flow->protos.tls_quic.webrtc)
+      ndpi_set_risk(flow, NDPI_TLS_SELFSIGNED_CERTIFICATE, flow->protos.tls_quic.subjectDN);
   }
 
 #if DEBUG_TLS
@@ -1795,7 +1796,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t handshake_type;
   bool is_quic = (quic_version != 0);
   bool is_dtls = packet->udp && (!is_quic);
-  bool use_srtp = 0;
 
 #ifdef DEBUG_TLS
   printf("TLS %s() called\n", __FUNCTION__);
@@ -2539,7 +2539,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		printf("Client TLS [SIGNATURE_ALGORITHMS: %s]\n", ja.client.signature_algorithms_str);
 #endif
 	      } else if(extension_id == 14 /* use_srtp */) {
-                use_srtp = 1;
+                /* This is likely a werbrtc flow */
+                if(flow->stun.maybe_dtls || flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DTLS)
+	          flow->protos.tls_quic.webrtc = 1;
 #ifdef DEBUG_TLS
                 printf("Client TLS: use_srtp\n");
 #endif
@@ -2867,7 +2869,7 @@ compute_ja3c:
 
 	    /* Before returning to the caller we need to make a final check */
 	    if((flow->protos.tls_quic.ssl_version >= 0x0303) /* >= TLSv1.2 */
-	       && !(flow->stun.maybe_dtls == 1 && is_dtls && use_srtp) /* Webrtc traffic */
+	       && !flow->protos.tls_quic.webrtc
 	       && (flow->protos.tls_quic.advertised_alpns == NULL) /* No ALPN */) {
 	      ndpi_set_risk(flow, NDPI_TLS_NOT_CARRYING_HTTPS, "No ALPN");
 	    }
@@ -2882,7 +2884,7 @@ compute_ja3c:
 	    /* Add check for missing SNI */
 	    if(flow->host_server_name[0] == '\0'
 	       && (flow->protos.tls_quic.ssl_version >= 0x0302) /* TLSv1.1 */
-	       && !(flow->stun.maybe_dtls == 1 && is_dtls && use_srtp) /* Webrtc traffic */
+	       && !flow->protos.tls_quic.webrtc
 	       && (flow->protos.tls_quic.encrypted_sni.esni == NULL) /* No ESNI */
 	       ) {
 	      /* This is a bit suspicious */
