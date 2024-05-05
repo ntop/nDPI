@@ -6717,42 +6717,6 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
     if(l4_packet_len >= packet->tcp->doff * 4) {
       packet->payload_packet_len = l4_packet_len - packet->tcp->doff * 4;
       packet->payload = ((u_int8_t *) packet->tcp) + (packet->tcp->doff * 4);
-
-      /* check for new tcp syn packets, here
-       * idea: reset detection state if a connection is unknown
-       */
-      if(packet->tcp->syn != 0 && packet->tcp->ack == 0 && flow->init_finished != 0 &&
-	 flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-	u_int16_t guessed_protocol_id, guessed_protocol_id_by_ip;
-	u_int16_t packet_direction_counter[2];
-        u_int8_t num_processed_pkts;
-
-#define flow_save(a) a = flow->a
-#define flow_restore(a) flow->a = a
-
-	flow_save(packet_direction_counter[0]);
-	flow_save(packet_direction_counter[1]);
-	flow_save(num_processed_pkts);
-	flow_save(guessed_protocol_id);
-	flow_save(guessed_protocol_id_by_ip);
-
-        ndpi_free_flow_data(flow);
-        memset(flow, 0, sizeof(*(flow)));
-
-        /* Restore pointers */
-        flow->l4_proto = IPPROTO_TCP;
-
-	flow_restore(packet_direction_counter[0]);
-	flow_restore(packet_direction_counter[1]);
-	flow_restore(num_processed_pkts);
-	flow_restore(guessed_protocol_id);
-	flow_restore(guessed_protocol_id_by_ip);
-
-#undef flow_save
-#undef flow_restore
-
-        NDPI_LOG_DBG(ndpi_str, "tcp syn packet for unknown protocol, reset detection state\n");
-      }
     } else {
       /* tcp header not complete */
       return(1);
