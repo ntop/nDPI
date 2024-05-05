@@ -2417,9 +2417,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		s_offset += 2;
 		tot_signature_algorithms_len = ndpi_min((sizeof(ja.client.signature_algorithms_str) / 2) - 1, tot_signature_algorithms_len);
 
+#ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
 		size_t sa_size = ndpi_min(tot_signature_algorithms_len / 2, MAX_NUM_TLS_SIGNATURE_ALGORITHMS);
 
-#ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
 		if (s_offset + 2 * sa_size <= packet->payload_packet_len) {
 		  flow->protos.tls_quic.num_tls_signature_algorithms = sa_size;
 		  memcpy(flow->protos.tls_quic.client_signature_algorithms,
@@ -2427,10 +2427,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 #endif
 
-		ja.client.num_signature_algorithms = ndpi_min(sa_size, MAX_NUM_JA);
 		for(i=0, id=0; i<tot_signature_algorithms_len && s_offset+i+1<total_len; i += 2) {
 		  ja.client.signature_algorithms[id++] = ntohs(*(u_int16_t*)&packet->payload[s_offset+i]);
 		}
+		ja.client.num_signature_algorithms = id;
 		
 		for(i=0, id=0; i<tot_signature_algorithms_len && s_offset+i+1<total_len; i++) {
 		  int rc = ndpi_snprintf(&ja.client.signature_algorithms_str[i*2],
