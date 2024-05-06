@@ -820,9 +820,6 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_IRC */
   u_int32_t irc_3a_counter:3;
-  u_int32_t irc_stage2:5;
-  u_int32_t irc_direction:2;
-  u_int32_t irc_0x1000_full:1;
 
   /* NDPI_PROTOCOL_USENET */
   u_int32_t usenet_stage:2;
