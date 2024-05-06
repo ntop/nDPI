@@ -3224,8 +3224,6 @@ void ndpi_global_deinit(struct ndpi_global_context *g_ctx) {
       ndpi_lru_free_cache(g_ctx->ookla_global_cache);
     if(g_ctx->bittorrent_global_cache)
       ndpi_lru_free_cache(g_ctx->bittorrent_global_cache);
-    if(g_ctx->zoom_global_cache)
-      ndpi_lru_free_cache(g_ctx->zoom_global_cache);
     if(g_ctx->stun_global_cache)
       ndpi_lru_free_cache(g_ctx->stun_global_cache);
     if(g_ctx->stun_zoom_global_cache)
@@ -3738,22 +3736,6 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
                    ndpi_str->cfg.bittorrent_cache_num_entries);
     }
   }
-  if(ndpi_str->cfg.zoom_cache_num_entries > 0) {
-    if(ndpi_str->cfg.zoom_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      if(!ndpi_str->g_ctx->zoom_global_cache) {
-        ndpi_str->g_ctx->zoom_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.zoom_cache_num_entries,
-                                                                 ndpi_str->cfg.zoom_cache_ttl, 1);
-      }
-      ndpi_str->zoom_cache = ndpi_str->g_ctx->zoom_global_cache;
-    } else {
-      ndpi_str->zoom_cache = ndpi_lru_cache_init(ndpi_str->cfg.zoom_cache_num_entries,
-                                                 ndpi_str->cfg.zoom_cache_ttl, 0);
-    }
-    if(!ndpi_str->zoom_cache) {
-      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->cfg.zoom_cache_num_entries);
-    }
-  }
   if(ndpi_str->cfg.stun_cache_num_entries > 0) {
     if(ndpi_str->cfg.stun_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
       if(!ndpi_str->g_ctx->stun_global_cache) {
@@ -4155,10 +4137,6 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(!ndpi_str->cfg.bittorrent_cache_scope &&
        ndpi_str->bittorrent_cache)
       ndpi_lru_free_cache(ndpi_str->bittorrent_cache);
-
-    if(!ndpi_str->cfg.zoom_cache_scope &&
-       ndpi_str->zoom_cache)
-      ndpi_lru_free_cache(ndpi_str->zoom_cache);
 
     if(!ndpi_str->cfg.stun_cache_scope &&
        ndpi_str->stun_cache)
@@ -7583,61 +7561,6 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ********************************************************************************* */
 
-/* #define ZOOM_CACHE_DEBUG */
-
-
-static u_int64_t make_zoom_key(struct ndpi_flow_struct *flow, int server) {
-  u_int64_t key;
-
-  if(server) {
-    if(flow->is_ipv6)
-      key = ndpi_quick_hash64((const char *)flow->s_address.v6, 16);
-    else
-      key = flow->s_address.v4;
-  } else {
-    if(flow->is_ipv6)
-      key = ndpi_quick_hash64((const char *)flow->c_address.v6, 16);
-    else
-      key = flow->c_address.v4;
-  }
-
-  return key;
-}
-
-/* ********************************************************************************* */
-
-static u_int8_t ndpi_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct,
-					    struct ndpi_flow_struct *flow, int server) {
-
-  if(ndpi_struct->zoom_cache) {
-    u_int16_t cached_proto;
-    u_int64_t key;
-
-    key = make_zoom_key(flow, server);
-    u_int8_t found = ndpi_lru_find_cache(ndpi_struct->zoom_cache, key, &cached_proto,
-					 0 /* Don't remove it as it can be used for other connections */,
-					 ndpi_get_current_time(flow));
-
-#ifdef ZOOM_CACHE_DEBUG
-    printf("[Zoom] *** [TCP] SEARCHING key 0x%llx [found: %u]\n", (long long unsigned int)key, found);
-#endif
-
-    return(found);
-  }
-
-  return(0);
-}
-
-/* ********************************************************************************* */
-
-static void ndpi_add_connection_as_zoom(struct ndpi_detection_module_struct *ndpi_struct,
-					struct ndpi_flow_struct *flow) {
-  if(ndpi_struct->zoom_cache)
-    ndpi_lru_add_to_cache(ndpi_struct->zoom_cache, make_zoom_key(flow, 1), NDPI_PROTOCOL_ZOOM, ndpi_get_current_time(flow));
-}
-
-/* ********************************************************************************* */
-
 /*
   NOTE:
 
@@ -7704,15 +7627,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 			 &cached_proto, 0 /* Don't remove it as it can be used for other connections */,
 			 ndpi_get_current_time(flow))) {
     ndpi_set_detected_protocol(ndpi_str, flow, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
-    ret.app_protocol = flow->detected_protocol_stack[0];
-  }
-
-  /* Does it looks like Zoom? */
-  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
-     flow->l4_proto == IPPROTO_UDP && /* Zoom/UDP used for video */
-     ((ntohs(flow->s_port) == 8801 && ndpi_search_into_zoom_cache(ndpi_str, flow, 1)) ||
-      (ntohs(flow->c_port) == 8801 && ndpi_search_into_zoom_cache(ndpi_str, flow, 0)))) {
-    ndpi_set_detected_protocol(ndpi_str, flow, NDPI_PROTOCOL_ZOOM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
     ret.app_protocol = flow->detected_protocol_stack[0];
   }
 
@@ -8613,10 +8527,6 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   flow->num_dissector_calls += num_calls;
 
   /* ndpi_reconcile_protocols(ndpi_str, flow, &ret); */
-
-  /* Zoom cache */
-  if((ret.app_protocol == NDPI_PROTOCOL_ZOOM) && (flow->l4_proto == IPPROTO_TCP))
-    ndpi_add_connection_as_zoom(ndpi_str, flow);
 
   if(ndpi_str->cfg.fully_encrypted_heuristic &&
      ret.app_protocol == NDPI_PROTOCOL_UNKNOWN && /* Only for unknown traffic */
@@ -10235,9 +10145,6 @@ int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
   case NDPI_LRUCACHE_BITTORRENT:
     ndpi_lru_get_stats(is_local ? ndpi_struct->bittorrent_cache : g_ctx->bittorrent_global_cache, stats);
     return 0;
-  case NDPI_LRUCACHE_ZOOM:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->zoom_cache : g_ctx->zoom_global_cache, stats);
-    return 0;
   case NDPI_LRUCACHE_STUN:
     ndpi_lru_get_stats(is_local ? ndpi_struct->stun_cache : g_ctx->stun_global_cache, stats);
     return 0;
@@ -11269,10 +11176,6 @@ static const struct cfg_param {
   { NULL,            "lru.bittorrent.size",                     "32768", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_num_entries), NULL },
   { NULL,            "lru.bittorrent.ttl",                      "0", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_ttl), NULL },
   { NULL,            "lru.bittorrent.scope",                    "0", "0", "1", CFG_PARAM_INT, __OFF(bittorrent_cache_scope), clbk_only_with_global_ctx },
-
-  { NULL,            "lru.zoom.size",                           "512", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_num_entries), NULL },
-  { NULL,            "lru.zoom.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(zoom_cache_ttl), NULL },
-  { NULL,            "lru.zoom.scope",                          "0", "0", "1", CFG_PARAM_INT, __OFF(zoom_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.stun.size",                           "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_num_entries), NULL },
   { NULL,            "lru.stun.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_ttl), NULL },

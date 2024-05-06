@@ -157,9 +157,6 @@ struct ndpi_global_context {
   /* NDPI_PROTOCOL_BITTORRENT */
   struct ndpi_lru_cache *bittorrent_global_cache;
 
-  /* NDPI_PROTOCOL_ZOOM */
-  struct ndpi_lru_cache *zoom_global_cache;
-
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_global_cache;
   struct ndpi_lru_cache *stun_zoom_global_cache;
@@ -211,9 +208,6 @@ struct ndpi_detection_module_config_struct {
   int bittorrent_cache_num_entries;
   int bittorrent_cache_ttl;
   int bittorrent_cache_scope;
-  int zoom_cache_num_entries;
-  int zoom_cache_ttl;
-  int zoom_cache_scope;
   int stun_cache_num_entries;
   int stun_cache_ttl;
   int stun_cache_scope;
@@ -359,9 +353,6 @@ struct ndpi_detection_module_struct {
 
   /* NDPI_PROTOCOL_BITTORRENT */
   struct ndpi_lru_cache *bittorrent_cache;
-
-  /* NDPI_PROTOCOL_ZOOM */
-  struct ndpi_lru_cache *zoom_cache;
 
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
