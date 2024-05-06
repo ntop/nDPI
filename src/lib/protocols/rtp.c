@@ -150,22 +150,26 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *payload = packet->payload;
 
-  NDPI_LOG_DBG(ndpi_struct, "search RTP\n");
+  NDPI_LOG_DBG(ndpi_struct, "search RTP (stage %d/%d)\n", flow->l4.udp.rtp_stage, flow->l4.udp.rtcp_stage);
 
   if(d_port == 5355 || /* LLMNR_PORT */
      d_port == 5353 || /* MDNS_PORT */
      d_port == 9600    /* FINS_PORT */) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
     return;
   }
 
-  /* * Let some "unknown" packets at the beginning
-     * search for 3 consecutive RTP/RTCP packets
-   */
+  /* * Let some "unknown" packets at the beginning:
+     * search for 3/4 consecutive RTP/RTCP packets.
+     * Wait a little longer (4 vs 3 pkts) for RTCP to try to tell if there are only
+     * RTCP packets in the flow or if RTP/RTCP are multiplexed together */
 
   if(flow->packet_counter > 3 &&
-     flow->l4.udp.rtp_stage == 0) {
+     flow->l4.udp.rtp_stage == 0 &&
+     flow->l4.udp.rtcp_stage == 0) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
     return;
   }
 
@@ -189,10 +193,26 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
     flow->l4.udp.rtp_stage += 1;
   } else if(is_rtp == IS_RTCP && flow->l4.udp.rtp_stage > 0) {
     /* RTCP after (some) RTP. Keep looking for RTP */
+  } else if(is_rtp == IS_RTCP && flow->l4.udp.rtp_stage == 0) {
+    if(flow->l4.udp.rtcp_stage == 3) {
+      NDPI_LOG_INFO(ndpi_struct, "Found RTCP\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow,
+                                 NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTCP,
+                                 NDPI_CONFIDENCE_DPI);
+      return;
+    }
+    flow->l4.udp.rtcp_stage += 1;
   } else {
-    if(flow->l4.udp.rtp_stage) {
-      flow->l4.udp.rtp_stage = 0;
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    if(flow->l4.udp.rtp_stage || flow->l4.udp.rtcp_stage) {
+      u_int16_t app_proto; /* unused */
+      u_int32_t unused;
+
+      /* TODO: we should switch to the demultiplexing-code in stun dissector */
+      if(!is_stun(ndpi_struct, flow, &app_proto) &&
+         !is_dtls(packet->payload, packet->payload_packet_len, &unused)) {
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
+      }
     }
   }
 }
@@ -205,16 +225,14 @@ static void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, st
   u_int16_t source = ntohs(packet->udp->source);
   u_int16_t dest = ntohs(packet->udp->dest);
 
-  // printf("==> %s()\n", __FUNCTION__);
-
-  /* printf("*** %s(pkt=%d)\n", __FUNCTION__, flow->packet_counter); */
-
   if((source != 30303) && (dest != 30303 /* Avoid to mix it with Ethereum that looks alike */)
      && (dest > 1023)
      )
     ndpi_rtp_search(ndpi_struct, flow);
-  else
+  else {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
+  }
 }
 
 /* *************************************************************** */

@@ -68,7 +68,6 @@
     <ClCompile Include="..\src\lib\protocols\rdp.c" />
     <ClCompile Include="..\src\lib\protocols\resp.c" />
     <ClCompile Include="..\src\lib\protocols\rsync.c" />
-    <ClCompile Include="..\src\lib\protocols\rtcp.c" />
     <ClCompile Include="..\src\lib\protocols\rtmp.c" />
     <ClCompile Include="..\src\lib\protocols\rtp.c" />
     <ClCompile Include="..\src\lib\protocols\rtsp.c" />

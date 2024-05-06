@@ -5745,9 +5745,6 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* SKINNY */
   init_skinny_dissector(ndpi_str, &a);
 
-  /* RTCP */
-  init_rtcp_dissector(ndpi_str, &a);
-
   /* RSYNC */
   init_rsync_dissector(ndpi_str, &a);
 

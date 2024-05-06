@@ -668,6 +668,9 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
 
 /* Stun */
 int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
+            struct ndpi_flow_struct *flow,
+            u_int16_t *app_proto);
 
 /* TPKT */
 int tpkt_verify_hdr(const struct ndpi_packet_struct * const packet);
