@@ -2739,20 +2739,24 @@ static ndpi_patricia_node_t* add_to_ptree(ndpi_patricia_tree_t *tree, int family
 
   Return: the number of entries loaded or -1 in case of error
 */
-int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
-			 const char *path, u_int16_t protocol_id) {
+int ndpi_load_ptree_file(ndpi_patricia_tree_t *ptree,
+			 const char *path,
+			 bool is_ipv4,
+			 u_int16_t protocol_id) {
   char buffer[128], *line, *addr, *cidr, *saveptr;
   FILE *fd;
   int len;
+  int af_type = is_ipv4 ? AF_INET : AF_INET6;
+  int default_cidr = is_ipv4 ? 32 : 128;
   u_int num_loaded = 0;
 
-  if(!ndpi_str || !path || !ndpi_str->protocols_ptree)
+  if( !path || !ptree)
     return(-1);
 
   fd = fopen(path, "r");
 
   if(fd == NULL) {
-    NDPI_LOG_ERR(ndpi_str, "Unable to open file %s [%s]\n", path, strerror(errno));
+    NDPI_LOG_ERR(NULL, "Unable to open file %s [%s]\n", path, strerror(errno));
     return(-1);
   }
 
@@ -2777,12 +2781,14 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
       cidr = strtok_r(NULL, "\n", &saveptr);
 
       pin.s_addr = inet_addr(addr);
-      if((node = add_to_ptree(ndpi_str->protocols_ptree, AF_INET, &pin, cidr ? atoi(cidr) : 32 /* bits */)) != NULL) {
+      if((node = add_to_ptree(ptree, af_type, &pin,
+			      cidr ? atoi(cidr) : default_cidr /* bits */)) != NULL) {
 	u_int i, found = 0;
 
 	for(i=0; i<UV16_MAX_USER_VALUES; i++) {
 	  if(node->value.u.uv16[i].user_value == 0) {
-	    node->value.u.uv16[i].user_value = protocol_id, node->value.u.uv16[i].additional_user_value =  0 /* port */;
+	    node->value.u.uv16[i].user_value = protocol_id,
+	      node->value.u.uv16[i].additional_user_value = 0 /* port */;
 	    found = 1;
 	    break;
 	  }
@@ -2800,7 +2806,35 @@ int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************* */
 
-static void ndpi_init_ptree_ipv4(void *ptree, ndpi_network host_list[]) {
+int ndpi_load_ipv4_ptree_file(ndpi_ptree_t *ptree, const char *path,
+			      u_int16_t protocol_id) {
+  return(ndpi_load_ptree_file(ptree->v4, path, true /* IPv4 */, protocol_id));
+}
+
+/* ******************************************* */
+
+int ndpi_load_ipv6_ptree_file(ndpi_ptree_t *ptree, const char *path,
+			      u_int16_t protocol_id) {
+  return(ndpi_load_ptree_file(ptree->v6, path, false /* IPv6 */, protocol_id));
+}
+
+/* ******************************************* */
+
+/*
+  Load a file containing IPv4 addresses in CIDR format as 'protocol_id'
+
+  Return: the number of entries loaded or -1 in case of error
+*/
+int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
+			 const char *path, u_int16_t protocol_id) {
+  return(ndpi_load_ptree_file(ndpi_str->protocols_ptree,
+			      path, true /* is_ipv4 */,
+			      protocol_id));
+}
+
+/* ******************************************* */
+
+static void ndpi_init_ptree_ipv4(ndpi_patricia_tree_t *ptree, ndpi_network host_list[]) {
   int i;
 
   for(i = 0; host_list[i].network != 0x0; i++) {
@@ -2822,7 +2856,7 @@ static void ndpi_init_ptree_ipv4(void *ptree, ndpi_network host_list[]) {
 /* ******************************************* */
 
 static void ndpi_init_ptree_ipv6(struct ndpi_detection_module_struct *ndpi_str,
-				 void *ptree, ndpi_network6 host_list[]) {
+				 ndpi_patricia_tree_t *ptree, ndpi_network6 host_list[]) {
   int i;
 
   for(i = 0; host_list[i].network != NULL; i++) {
@@ -3271,8 +3305,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
     ndpi_exit_detection_module(ndpi_str);
     return NULL;
   }
-  ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, host_protocol_list);
 
+  ndpi_init_ptree_ipv4(ndpi_str->protocols_ptree, host_protocol_list);
 
   ndpi_str->ip_risk_mask_ptree = ndpi_patricia_new(32 /* IPv4 */);
   ndpi_str->ip_risk_mask_ptree6 = ndpi_patricia_new(128 /* IPv6 */);
@@ -10310,9 +10344,11 @@ int ndpi_ptree_match_addr(ndpi_ptree_t *tree,
   bits = ptree->maxbits;
 
   if(is_v6)
-    ndpi_fill_prefix_v6(&prefix, (const struct in6_addr *) &addr->ipv6, bits, ptree->maxbits);
+    ndpi_fill_prefix_v6(&prefix, (const struct in6_addr *) &addr->ipv6,
+			bits, ptree->maxbits);
   else
-    ndpi_fill_prefix_v4(&prefix, (const struct in_addr *) &addr->ipv4, bits, ptree->maxbits);
+    ndpi_fill_prefix_v4(&prefix, (const struct in_addr *) &addr->ipv4,
+			bits, ptree->maxbits);
 
   node = ndpi_patricia_search_best(ptree, &prefix);
 

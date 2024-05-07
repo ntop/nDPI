@@ -1164,6 +1164,9 @@ extern "C" {
   ndpi_ptree_t* ndpi_ptree_create(void);
   int ndpi_ptree_insert(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, u_int8_t bits, u_int64_t user_data);
   int ndpi_ptree_match_addr(ndpi_ptree_t *tree, const ndpi_ip_addr_t *addr, u_int64_t *user_data);
+  int ndpi_load_ipv4_ptree_file(ndpi_ptree_t *tree, const char *path, u_int16_t protocol_id);
+  int ndpi_load_ipv6_ptree_file(ndpi_ptree_t *tree, const char *path, u_int16_t protocol_id);
+
   void ndpi_ptree_destroy(ndpi_ptree_t *tree);
 
   /* General purpose utilities */
