@@ -90,9 +90,12 @@ bool ndpi_domain_classify_add(struct ndpi_detection_module_struct *ndpi_str,
   // fprintf(stdout, "."); fflush(stdout);
 
 #ifdef ENCODE_DATA
-  out_len = ndpi_encode_domain(ndpi_str, domain, out, sizeof(out));
-  
-  ndpi_hash_add_entry(&s->domains, out, out_len, class_id);
+  if(ndpi_str) {
+    out_len = ndpi_encode_domain(ndpi_str, domain, out, sizeof(out));
+    
+    ndpi_hash_add_entry(&s->domains, out, out_len, class_id);
+  } else
+    ndpi_hash_add_entry(&s->domains, domain, strlen(domain), class_id);
 #else
   ndpi_hash_add_entry(&s->domains, domain, strlen(domain), class_id);
 #endif
@@ -167,11 +170,16 @@ bool ndpi_domain_classify_hostname(struct ndpi_detection_module_struct *ndpi_mod
 
     /* This looks like a match so let's check the hash now */
 #ifdef ENCODE_DATA
-    char out[256];
-    u_int32_t out_len = ndpi_encode_domain(ndpi_mod, item, out, sizeof(out));
-
-    if(ndpi_hash_find_entry(s->domains, out, out_len, class_id) == 0)
-      return(true);
+    if(ndpi_mod) {
+      char out[256];
+      u_int32_t out_len = ndpi_encode_domain(ndpi_mod, item, out, sizeof(out));
+      
+      if(ndpi_hash_find_entry(s->domains, out, out_len, class_id) == 0)
+	return(true);
+    } else {
+      if(ndpi_hash_find_entry(s->domains, item, strlen(item), class_id) == 0)
+	return(true);
+    }
 #else
     if(ndpi_hash_find_entry(s->domains, item, strlen(item), class_id) == 0)
       return(true);
