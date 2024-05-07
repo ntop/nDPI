@@ -11339,45 +11339,48 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
 
 void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle, size_t needle_len)
 {
-  if (!haystack || !needle) {
-    return NULL;
-  }
-
-  if (needle_len > haystack_len) {
-    return NULL;
-  }
-
-  if ((size_t)(const u_int8_t*)haystack+haystack_len < haystack_len) {
+  if (!haystack || !needle || haystack_len < needle_len || needle_len == 0) {
     return NULL;
   }
 
   if (needle_len == 1) {
-    return memchr(haystack, *(int*)needle, haystack_len);
+    return (void *)memchr(haystack, *(const u_int8_t *)needle, haystack_len);
   }
 
-  const u_int8_t* h = NULL;
-  const u_int8_t* n = (const u_int8_t*)needle;
-  for (h = haystack; h <= (const u_int8_t*)haystack+haystack_len-needle_len; ++h) {
-    if (*h == n[0] && !memcmp(h, needle, needle_len))
-      return (void*)h;
+  const u_int8_t *current = (const u_int8_t *)haystack;
+  const u_int8_t *haystack_end = (const u_int8_t *)haystack + haystack_len;
+
+  while (current <= haystack_end - needle_len) {
+    /* Find the first occurrence of the first character from the needle */
+    current = (const u_int8_t *)memchr(current, *(const u_int8_t *)needle,
+                                       haystack_end - current);
+
+    if (!current) {
+      return NULL;
+    }
+
+    /* Check the rest of the needle for a match */
+    if ((current + needle_len <= haystack_end) &&
+        (memcmp(current, needle, needle_len) == 0)) {
+      return (void *)current;
+    }
+
+    /* Shift one character to the right for the next search */
+    current++;
   }
 
   return NULL;
 }
 
-size_t ndpi_strlcpy(char *dst, const char* src, size_t dst_len)
+size_t ndpi_strlcpy(char *dst, const char* src, size_t dst_len, size_t src_len)
 {
-  if (!dst || !src) {
+  if (!dst || !src || dst_len == 0) {
     return 0;
   }
 
-  size_t src_len = strlen(src);
-
-  if (dst_len != 0) {
-    size_t len = (src_len < dst_len - 1) ? src_len : dst_len - 1;
-    memcpy(dst, src, len);
-    dst[len] = '\0';
-  }
+  size_t copy_len = ndpi_min(src_len, dst_len - 1);
+  memmove(dst, src, copy_len);
+  dst[copy_len] = '\0';
 
   return src_len;
 }

@@ -2232,30 +2232,41 @@ extern "C" {
   const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx);
 
   /**
-   * Searches for a subsequence ('needle') within a block of memory ('haystack').
+   * @brief Finds the first occurrence of the sequence `needle` in the array
+   * `haystack`.
    *
-   * @par haystack     = pointer to the block of memory where the search is performed
-   * @par haystack_len = length of the haystack block of memory
-   * @par needle       = pointer to the memory block representing the needle to search for
-   * @par needle_len   = length of the needle memory block
-   * 
-   * @return Pointer to the beginning of the needle within the haystack if found;
-   * otherwise, NULL.
+   * This function searches for the first occurrence of the sequence `needle` of
+   * length `needle_len` in the array `haystack` of length `haystack_len`. If
+   * `haystack` or `needle` is `NULL`, or `haystack_len` is less than
+   * `needle_len`, or `needle_len` is 0, the function returns `NULL`.
+   *
+   * For optimization, if `needle_len` is 1, the `memchr` function is used.
+   *
+   * @param haystack Pointer to the array in which the search is performed.
+   * @param haystack_len Length of the `haystack` array.
+   * @param needle Pointer to the array to be searched for in `haystack`.
+   * @param needle_len Length of the `needle` array.
+   * @return Pointer to the first occurrence of `needle` in `haystack` or `NULL`
+   * if `needle` is not found.
    */
   void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle,
                     size_t needle_len);
 
   /**
-   * Copies up to -dst_len - 1- characters from -src- to -dst-, ensuring the result is
-   * null-terminated. Measures -src- length and handles potential null pointers.
-   * 
-   * @par dst       = destination buffer
-   * @par src       = source string
-   * @par dst_len   = size of the destination buffer, includes the null terminator
-   * 
-   * @return Length of `src`. If greater or equal to -dst_len-, -dst- has been truncated.
+   * @brief Copies src string to dst buffer with length limit
+   *
+   * Copies the string src into dst buffer, limiting the copy length by dst_len.
+   * Handles both null-terminated and non null-terminated strings based on
+   * src_len. Ensures null-termination in dst if dst_len > 0.
+   *
+   * @param dst Destination buffer
+   * @param src Source string
+   * @param dst_len Size of dst buffer
+   * @param src_len Length of src string
+   *
+   * @return Length of src string
    */
-  size_t ndpi_strlcpy(char* dst, const char* src, size_t dst_len);
+  size_t ndpi_strlcpy(char* dst, const char* src, size_t dst_len, size_t src_len);
 
 #ifdef __cplusplus
 }
