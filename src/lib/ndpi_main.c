@@ -2756,7 +2756,7 @@ int ndpi_load_ptree_file(ndpi_patricia_tree_t *ptree,
   fd = fopen(path, "r");
 
   if(fd == NULL) {
-    NDPI_LOG_ERR(NULL, "Unable to open file %s [%s]\n", path, strerror(errno));
+    /* NDPI_LOG_ERR(NULL, "Unable to open file %s [%s]\n", path, strerror(errno)); */
     return(-1);
   }
 
@@ -2866,9 +2866,10 @@ static void ndpi_init_ptree_ipv6(struct ndpi_detection_module_struct *ndpi_str,
 
     rc = inet_pton(AF_INET6, host_list[i].network, &pin);
     if (rc != 1) {
-        NDPI_LOG_ERR(ndpi_str, "Invalid ipv6 address [%s]: %d\n", host_list[i].network, rc);
-        continue;
+      NDPI_LOG_ERR(ndpi_str, "Invalid ipv6 address [%s]: %d\n", host_list[i].network, rc);
+      continue;
     }
+    
     if((node = add_to_ptree(ptree, AF_INET6, &pin, host_list[i].cidr /* bits */)) != NULL) {
       node->value.u.uv16[0].user_value = host_list[i].value, node->value.u.uv16[0].additional_user_value = 0;
     }
