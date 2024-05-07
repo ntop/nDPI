@@ -465,11 +465,15 @@ struct ndpi_detection_module_struct {
 
 #else /* not defined NDPI_ENABLE_DEBUG_MESSAGES */
 # ifdef WIN32
+/* 
+*  Already defined in ndpi_define.h
+* 
 # define NDPI_LOG(mod, ...) { (void)mod; }
 # define NDPI_LOG_ERR(mod, ...) { (void)mod; }
 # define NDPI_LOG_INFO(mod, ...) { (void)mod; }
 # define NDPI_LOG_DBG(mod, ...) { (void)mod; }
 # define NDPI_LOG_DBG2(mod, ...) { (void)mod; }
+*/
 # else
 # define NDPI_LOG(proto, mod, log_level, args...) { /* printf(args); */ }
 # ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
