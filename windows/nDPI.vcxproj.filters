@@ -64,7 +64,7 @@
     <ClCompile Include="..\src\lib\protocols\pptp.c" />
     <ClCompile Include="..\src\lib\protocols\qq.c" />
     <ClCompile Include="..\src\lib\protocols\quic.c" />
-    <ClCompile Include="..\src\lib\protocols\radius.c" />
+    <ClCompile Include="..\src\lib\protocols\radius_proto.c" />
     <ClCompile Include="..\src\lib\protocols\rdp.c" />
     <ClCompile Include="..\src\lib\protocols\resp.c" />
     <ClCompile Include="..\src\lib\protocols\rsync.c" />
