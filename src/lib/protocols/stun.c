@@ -789,7 +789,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "QUIC range. Unexpected\n");
   } else if(first_byte <= 191) {
 
-    rtp_rtcp = is_rtp_or_rtcp(ndpi_struct);
+    rtp_rtcp = is_rtp_or_rtcp(ndpi_struct, NULL);
     if(rtp_rtcp == IS_RTP) {
       NDPI_LOG_DBG(ndpi_struct, "RTP (dir %d)\n", packet->packet_direction);
       NDPI_LOG_INFO(ndpi_struct, "Found RTP over STUN\n");
