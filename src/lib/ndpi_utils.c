@@ -2320,7 +2320,7 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int16_t *
 
 int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int16_t value) {
   ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)*h;
-  ndpi_str_hash_priv *item;
+  ndpi_str_hash_priv *item, *ret_found;
 
   if(!key || key_len == 0)
     return(3);
@@ -2349,6 +2349,13 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int16_
   item->value16 = value;
 
   HASH_ADD(hh, *((ndpi_str_hash_priv **)h), key[0], key_len, item);
+
+  HASH_FIND(hh, *((ndpi_str_hash_priv **)h), key, key_len, ret_found);
+  if(ret_found == NULL) { /* The insertion failed (because of a memory allocation error) */
+    ndpi_free(item->key);
+    ndpi_free(item);
+    return 4;
+  }
 
   return 0;
 }

@@ -148,7 +148,7 @@ const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
 
   dot = strstr(hostname, ret);
 
-  if(dot == NULL)
+  if(dot == NULL || dot == hostname)
     return(hostname);
 
   dot--;
