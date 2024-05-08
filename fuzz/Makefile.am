@@ -774,6 +774,7 @@ distdir:
 		-o -name '*.cpp' \
 		-o -name '*.options' \
 		-o -name 'ipv4_addresses.txt' \
+		-o -name 'ipv6_addresses.txt' \
 		-o -name 'bd_param.txt' \
 		-o -name 'splt_param.txt' \
 		-o -name 'random_list.list' \

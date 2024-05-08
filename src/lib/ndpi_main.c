@@ -2735,7 +2735,7 @@ static ndpi_patricia_node_t* add_to_ptree(ndpi_patricia_tree_t *tree, int family
 /* ******************************************* */
 
 /*
-  Load a file containing IPv4 addresses in CIDR format as 'protocol_id'
+  Load a file containing IPv4 OR IPv6 addresses in CIDR format as 'protocol_id'
 
   Return: the number of entries loaded or -1 in case of error
 */
@@ -2808,6 +2808,8 @@ int ndpi_load_ptree_file(ndpi_patricia_tree_t *ptree,
 
 int ndpi_load_ipv4_ptree_file(ndpi_ptree_t *ptree, const char *path,
 			      u_int16_t protocol_id) {
+  if(!ptree)
+    return -1;
   return(ndpi_load_ptree_file(ptree->v4, path, true /* IPv4 */, protocol_id));
 }
 
@@ -2815,6 +2817,8 @@ int ndpi_load_ipv4_ptree_file(ndpi_ptree_t *ptree, const char *path,
 
 int ndpi_load_ipv6_ptree_file(ndpi_ptree_t *ptree, const char *path,
 			      u_int16_t protocol_id) {
+  if(!ptree)
+    return -1;
   return(ndpi_load_ptree_file(ptree->v6, path, false /* IPv6 */, protocol_id));
 }
 
@@ -2827,6 +2831,8 @@ int ndpi_load_ipv6_ptree_file(ndpi_ptree_t *ptree, const char *path,
 */
 int ndpi_load_ipv4_ptree(struct ndpi_detection_module_struct *ndpi_str,
 			 const char *path, u_int16_t protocol_id) {
+  if(!ndpi_str)
+    return -1;
   return(ndpi_load_ptree_file(ndpi_str->protocols_ptree,
 			      path, true /* is_ipv4 */,
 			      protocol_id));

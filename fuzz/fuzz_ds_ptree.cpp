@@ -49,6 +49,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
   }
 
+  /* Some higher level functions */
+  ndpi_load_ipv4_ptree_file(t, "ipv4_addresses.txt", NDPI_PROTOCOL_TLS);
+  ndpi_load_ipv4_ptree_file(t, "invalid_filename", NDPI_PROTOCOL_TLS);
+  ndpi_load_ipv6_ptree_file(t, "ipv6_addresses.txt", NDPI_PROTOCOL_TLS);
+  ndpi_load_ipv6_ptree_file(t, "invalid_filename", NDPI_PROTOCOL_TLS);
+
   /* Random search */
   num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
   for (i = 0; i < num_iteration; i++) {

@@ -1,0 +1,5 @@
+#Random list of ipv6 addresses
+
+2001:db8:3333:4444:5555:6666:7777:8888
+2001:a:b:c::/64
+ff06::c3
