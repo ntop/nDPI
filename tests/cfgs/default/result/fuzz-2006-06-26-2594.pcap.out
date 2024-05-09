@@ -1,17 +1,17 @@
-Guessed flow protos:	27
+Guessed flow protos:	28
 
 DPI Packets (TCP):	48	(2.29 pkts/flow)
 DPI Packets (UDP):	369	(1.64 pkts/flow)
 DPI Packets (other):	5	(1.00 pkts/flow)
 Confidence Unknown          : 34 (flows)
-Confidence Match by port    : 27 (flows)
-Confidence DPI              : 190 (flows)
-Num dissector calls: 7480 (29.80 diss/flow)
+Confidence Match by port    : 28 (flows)
+Confidence DPI              : 189 (flows)
+Num dissector calls: 7510 (29.92 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/189/0 (insert/search/found)
+LRU cache bittorrent: 0/192/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/61/0 (insert/search/found)
+LRU cache mining:     0/62/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache stun_zoom:  0/34/0 (insert/search/found)
 Automa host:          254/0 (search/found)
@@ -27,7 +27,7 @@ Patricia protocols:   496/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 Unknown	34	4212	34
-FTP_CONTROL	35	2456	11
+FTP_CONTROL	36	2569	12
 DNS	301	26612	159
 NetBIOS	102	9445	25
 SMBv1	7	1620	3
@@ -35,11 +35,9 @@ DHCP	2	932	1
 SMBv23	3	186	1
 RTP	5	1070	1
 SIP	85	39540	15
-Protobuf	1	113	1
 
-Safe                             1 113           1            
 Acceptable                     498 77785         202          
-Unsafe                          35 2456          11           
+Unsafe                          36 2569          12           
 Dangerous                        7 1620          3            
 Unrated                         34 4212          34           
 
@@ -142,7 +140,7 @@ Unrated                         34 4212          34
 	97	UDP 192.168.1.3:53 -> 192.168.1.2:2712 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/144 bytes -> 0 pkts/0 bytes][Goodput ratio: 70/0][< 1 sec][Hostname/SNI: sip.cybercity.dk][::][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (cybercity)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	98	TCP 147.234.1.253:21 -> 192.169.1.2:2720 [proto: 1/FTP_CONTROL][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 1][cat: Download/7][1 pkts/130 bytes -> 0 pkts/0 bytes][Goodput ratio: 58/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No client to server traffic][PLAIN TEXT (331 Anonymous login ok)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	99	TCP 192.168.1.2:2718 -> 147.137.21.94:139 [proto: 10/NetBIOS][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 2][cat: System/18][2 pkts/124 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][2.92 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	100	TCP 147.234.1.253:21 -> 192.168.1.2:2732 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/113 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT ( Files larger then 250MB will b)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	100	TCP 147.234.1.253:21 -> 192.168.1.2:2732 [proto: 1/FTP_CONTROL][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 1][cat: Download/7][1 pkts/113 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No client to server traffic][PLAIN TEXT ( Files larger then 250MB will b)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	101	UDP 192.168.1.1:53 -> 192.168.1.2:2572 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/105 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][< 1 sec][::][Risk: ** Malformed Packet **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No client to server traffic / Invalid DNS Query Lenght][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	102	UDP 192.168.1.1:53 -> 192.168.1.2:2723 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/105 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][< 1 sec][Hostname/SNI: 1.0.0.127.in-adds.arpa][::][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	103	UDP 192.168.1.1:53 -> 192.168.1.2:2745 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/105 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][< 1 sec][Hostname/SNI: 1.0.0.127.in-addr.arpa][::][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
