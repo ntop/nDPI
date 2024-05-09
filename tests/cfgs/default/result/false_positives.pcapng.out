@@ -1,6 +1,6 @@
-DPI Packets (UDP):	6	(3.00 pkts/flow)
-Confidence DPI              : 2 (flows)
-Num dissector calls: 311 (155.50 diss/flow)
+DPI Packets (UDP):	9	(3.00 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 467 (155.67 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -13,16 +13,17 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   4/0 (search/found)
+Patricia protocols:   6/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-RTP	60	13200	2
+RTP	90	17049	3
 
-Acceptable                      60 13200         2            
+Acceptable                      90 17049         3            
 
 	1	UDP 10.192.92.81:52070 <-> 10.136.43.69:21048 [VLAN: 20][proto: 87/RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][DPI packets: 3][cat: Media/1][15 pkts/3330 bytes <-> 15 pkts/3330 bytes][Goodput ratio: 77/77][0.30 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 19/19 19/19 20/20 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 222/222 222/222 222/222 0/0][PLAIN TEXT (UUUUUUUUUUUUU)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 10.126.70.67:23784 <-> 10.236.7.225:50160 [VLAN: 107][proto: 87/RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][DPI packets: 3][cat: Media/1][18 pkts/3924 bytes <-> 12 pkts/2616 bytes][Goodput ratio: 79/79][0.34 sec][bytes ratio: 0.200 (Upload)][IAT c2s/s2c min/avg/max/stddev: 19/19 20/20 20/20 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 218/218 218/218 218/218 0/0][PLAIN TEXT (UUUUUUUUU)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 10.102.45.249:31046 <-> 10.133.48.100:21176 [VLAN: 10][proto: GTP:87/RTP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 3][cat: Media/1][22 pkts/2860 bytes <-> 8 pkts/989 bytes][Goodput ratio: 34/30][0.44 sec][bytes ratio: 0.486 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/19 22/19 44/20 15/0][Pkt Len c2s/s2c min/avg/max/stddev: 130/113 130/124 130/130 0/8][Plen Bins: 10,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

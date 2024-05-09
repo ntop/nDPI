@@ -652,7 +652,7 @@ const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* RTP */
 int is_valid_rtp_payload_type(uint8_t type);
-int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct);
+int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t *seq);
 u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_type);
 
 /* Bittorrent */

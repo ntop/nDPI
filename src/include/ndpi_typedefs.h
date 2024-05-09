@@ -930,6 +930,10 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_RAKNET */
   u_int32_t raknet_custom:1;
 
+  /* NDPI_PROTOCOL_RTP */
+  u_int16_t rtp_seq[2];
+  u_int8_t rtp_seq_set[2];
+
   /* NDPI_PROTOCOL_EAQ */
   u_int8_t eaq_pkt_id;
   u_int32_t eaq_sequence;
