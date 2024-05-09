@@ -38,6 +38,7 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
+  int rc;
 
   NDPI_LOG_DBG(ndpi_struct, "searching LineCall\n");
 
@@ -82,12 +83,12 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
       /* It might be a RTP/RTCP packet. Ignore it and keep looking for the
          LINE packet numbers */
       /* Basic RTP detection */
-      if((packet->payload[0] >> 6) == 2 && /* Version 2 */
-         (packet->payload[1] == 201 || /* RTCP, Receiver Report */
-          packet->payload[1] == 200 || /* RTCP, Sender Report */
-          is_valid_rtp_payload_type(packet->payload[1] & 0x7F)) /* RTP */) {
-        NDPI_LOG_DBG(ndpi_struct, "Probably RTP; keep looking for LINE\n");
-        return;
+      rc = is_rtp_or_rtcp(ndpi_struct, NULL);
+      if(rc == IS_RTCP || rc == IS_RTP) {
+        if(flow->packet_counter < 10) {
+          NDPI_LOG_DBG(ndpi_struct, "Probably RTP; keep looking for LINE\n");
+          return;
+	}
       } else {
         if((u_int8_t)(flow->l4.udp.line_base_cnt[packet->packet_direction] +
                       flow->l4.udp.line_pkts[packet->packet_direction]) == packet->payload[3]) {
