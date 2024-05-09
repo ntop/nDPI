@@ -24,4 +24,4 @@ HAProxy	1	375	1
 
 Safe                             1 375           1            
 
-	1	TCP 1.1.1.1:48502 -> 2.2.2.2:443 [proto: 350/HAProxy][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/375 bytes -> 0 pkts/0 bytes][Goodput ratio: 82/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (PROXY TCP)][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 1.1.1.1:48502 -> 2.2.2.2:443 [proto: 350/HAProxy][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/375 bytes -> 0 pkts/0 bytes][Goodput ratio: 82/0][< 1 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic / Entropy: 5.968 (Executable?)][PLAIN TEXT (PROXY TCP)][Plen Bins: 0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

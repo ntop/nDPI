@@ -113,8 +113,15 @@ extern "C" {
   int ndpi_is_printable_buffer(u_int8_t const * const buf, size_t len);
   int ndpi_normalize_printable_string(char * const str, size_t len);
   int ndpi_is_valid_hostname(char * const str, size_t len);
-#define NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(entropy) (entropy > 7.0f)
-  float ndpi_entropy(u_int8_t const * const buf, size_t len); 
+
+#define NDPI_ENTROPY_PLAINTEXT(entropy) (entropy < 4.941f)
+#define NDPI_ENTROPY_EXECUTABLE(entropy) (entropy >= 4.941f)
+#define NDPI_ENTROPY_EXECUTABLE_PACKED(entropy) (entropy >= 6.677f)
+#define NDPI_ENTROPY_EXECUTABLE_ENCRYPTED(entropy) (entropy >= 7.174f)
+#define NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(entropy) (entropy >= 7.312f)
+  float ndpi_entropy(u_int8_t const * const buf, size_t len);
+  char *ndpi_entropy2str(float entropy, char *buf, size_t len);
+  void ndpi_entropy2risk(struct ndpi_flow_struct *flow);
 
 #ifdef __cplusplus
 }

@@ -32,4 +32,4 @@ Unrated                          1 150           1
 
 
 Undetected flows:
-	1	UDP [2607:fc20:4052:39e:490a:ea4d:17fe:e09c]:49120 -> [fd00:976a:bc67:193e::7]:25658 [VLAN: 5][proto: GTP:0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/150 bytes -> 0 pkts/0 bytes][Goodput ratio: 29/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP [2607:fc20:4052:39e:490a:ea4d:17fe:e09c]:49120 -> [fd00:976a:bc67:193e::7]:25658 [VLAN: 5][proto: GTP:0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/150 bytes -> 0 pkts/0 bytes][Goodput ratio: 29/0][< 1 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic / Entropy: 5.369 (Executable?)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

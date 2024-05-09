@@ -2705,6 +2705,79 @@ float ndpi_entropy(u_int8_t const * const buf, size_t len) {
 }
 
 /* ******************************************************************** */
+
+/* Losely implemented by: https://redirect.cs.umbc.edu/courses/graduate/CMSC691am/student%20talks/CMSC%20691%20Malware%20-%20Entropy%20Analysis%20Presentation.pdf */
+char *ndpi_entropy2str(float entropy, char *buf, size_t len) {
+  if (buf == NULL) {
+    return NULL;
+  }
+
+  static const char entropy_fmtstr[] = "Entropy: %.3f (%s?)";
+  if (NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(entropy)) {
+    snprintf(buf, len, entropy_fmtstr, entropy, "Encrypted or Random");
+  } else if (NDPI_ENTROPY_EXECUTABLE_ENCRYPTED(entropy)) {
+    snprintf(buf, len, entropy_fmtstr, entropy, "Encrypted Executable");
+  } else if (NDPI_ENTROPY_EXECUTABLE_PACKED(entropy)) {
+    snprintf(buf, len, entropy_fmtstr, entropy, "Compressed Executable");
+  } else if (NDPI_ENTROPY_EXECUTABLE(entropy)) {
+    snprintf(buf, len, entropy_fmtstr, entropy, "Executable");
+  } else {
+    snprintf(buf, len, entropy_fmtstr, entropy, "Unknown");
+  }
+
+  return buf;
+}
+
+/* ******************************************************************** */
+
+void ndpi_entropy2risk(struct ndpi_flow_struct *flow) {
+  char str[64];
+
+  if (NDPI_ENTROPY_PLAINTEXT(flow->entropy))
+    goto reset_risk;
+
+  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS ||
+      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_TLS ||
+      flow->detected_protocol_stack[0] == NDPI_PROTOCOL_QUIC ||
+      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_QUIC ||
+      flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DTLS ||
+      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DTLS)
+  {
+    flow->skip_entropy_check = 1;
+    goto reset_risk;
+  }
+
+  if (flow->confidence != NDPI_CONFIDENCE_DPI &&
+      flow->confidence != NDPI_CONFIDENCE_DPI_CACHE) {
+    ndpi_set_risk(flow, NDPI_SUSPICIOUS_ENTROPY,
+                  ndpi_entropy2str(flow->entropy, str, sizeof(str)));
+    return;
+  }
+
+  if (ndpi_isset_risk(flow, NDPI_MALWARE_HOST_CONTACTED) ||
+      ndpi_isset_risk(flow, NDPI_BINARY_DATA_TRANSFER) ||
+      ndpi_isset_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER) ||
+      ndpi_isset_risk(flow, NDPI_POSSIBLE_EXPLOIT) ||
+      ndpi_isset_risk(flow, NDPI_HTTP_SUSPICIOUS_CONTENT) ||
+      ndpi_isset_risk(flow, NDPI_DNS_SUSPICIOUS_TRAFFIC) ||
+      ndpi_isset_risk(flow, NDPI_MALFORMED_PACKET) ||
+      (flow->category == NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT &&
+       (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
+        flow->detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP)) ||
+      flow->category == NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER ||
+      flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED ||
+      flow->category == NDPI_PROTOCOL_CATEGORY_WEB)
+  {
+    ndpi_set_risk(flow, NDPI_SUSPICIOUS_ENTROPY,
+                  ndpi_entropy2str(flow->entropy, str, sizeof(str)));
+    return;
+  }
+
+reset_risk:
+  ndpi_unset_risk(flow, NDPI_SUSPICIOUS_ENTROPY);
+}
+
+/* ******************************************************************** */
 static inline uint16_t get_n16bit(uint8_t const * cbuf) {
   uint16_t r = ((uint16_t)cbuf[0]) | (((uint16_t)cbuf[1]) << 8);
   return r;

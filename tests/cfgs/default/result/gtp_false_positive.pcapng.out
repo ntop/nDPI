@@ -29,7 +29,7 @@ GTP	2	424	2
 Acceptable                       2 424           2            
 Unrated                          5 428           1            
 
-	1	UDP 119.185.190.173:2123 -> 66.86.98.114:50140 [proto: 152/GTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 1][cat: Network/14][1 pkts/368 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (autoAlgo)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 119.185.190.173:2123 -> 66.86.98.114:50140 [proto: 152/GTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 1][cat: Network/14][1 pkts/368 bytes -> 0 pkts/0 bytes][Goodput ratio: 88/0][< 1 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic / Entropy: 6.121 (Executable?)][PLAIN TEXT (autoAlgo)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 50.7.111.134:17000 -> 103.225.103.159:2123 [proto: 152/GTP][IP: 0/Unknown][ClearText][Confidence: Match by port][DPI packets: 1][cat: Network/14][1 pkts/56 bytes -> 0 pkts/0 bytes][Goodput ratio: 14/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
