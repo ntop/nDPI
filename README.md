@@ -1,4 +1,3 @@
-![ntop][ntopng_logo] ![ntop][ntop_logo]
 # nDPI
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/ntop/nDPI/build.yml?branch=dev&logo=github)](https://github.com/ntop/nDPI/actions?query=workflow%3ABuild)
