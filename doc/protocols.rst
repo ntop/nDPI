@@ -787,3 +787,12 @@ References: `Main site: <https://joinmastodon.org/>`_
 Threads is an online social media and social networking service operated by Meta Platforms.
 
 References: `Main site: <https://www.threads.net>`_
+
+
+.. _Proto 414:
+
+`NDPI_PROTOCOL_VIBER_VOIP`
+=========================
+Audio/video calls made using the Viber app.
+
+References: `Wikipedia <https://en.wikipedia.org/wiki/Viber>`_
