@@ -5658,6 +5658,43 @@ void strlcpyUnitTest() {
 
 /* *********************************************** */
 
+void strnstrUnitTest(void) {
+  /* Test 1: null string */
+  assert(ndpi_strnstr(NULL, "find", 10) == NULL);
+  assert(ndpi_strnstr("string", NULL, 10) == NULL);
+
+  /* Test 2: empty substring */
+  assert(strcmp(ndpi_strnstr("string", "", 6), "string") == 0);
+
+  /* Test 3: single character substring */
+  assert(strcmp(ndpi_strnstr("string", "r", 6), "ring") == 0);
+  assert(ndpi_strnstr("string", "x", 6) == NULL);
+
+  /* Test 4: multiple character substring */
+  assert(strcmp(ndpi_strnstr("string", "ing", 6), "ing") == 0);
+  assert(ndpi_strnstr("string", "xyz", 6) == NULL);
+
+  /* Test 5: substring equal to the beginning of the string */
+  assert(strcmp(ndpi_strnstr("string", "str", 3), "string") == 0);
+
+  /* Test 6: substring at the end of the string */
+  assert(strcmp(ndpi_strnstr("string", "ing", 6), "ing") == 0);
+
+  /* Test 7: substring in the middle of the string */
+  assert(strcmp(ndpi_strnstr("hello world", "lo wo", 11), "lo world") == 0);
+
+  /* Test 8: repeated characters in the string */
+  assert(strcmp(ndpi_strnstr("aaaaaa", "aaa", 6), "aaaaaa") == 0);
+
+  /* Test 9: empty string and slen 0 */
+  assert(ndpi_strnstr("", "find", 0) == NULL);
+
+  /* Test 10: substring equal to the string */
+  assert(strcmp(ndpi_strnstr("string", "string", 6), "string") == 0);
+}
+
+/* *********************************************** */
+
 void filterUnitTest() {
   ndpi_filter* f = ndpi_filter_alloc();
   u_int32_t v, i;
@@ -6024,6 +6061,7 @@ int main(int argc, char **argv) {
     compressedBitmapUnitTest();
     strtonumUnitTest();
     strlcpyUnitTest();
+    strnstrUnitTest();
 #endif
   }
 
