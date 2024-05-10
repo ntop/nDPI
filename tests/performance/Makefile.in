@@ -1,8 +1,8 @@
 INC=-I ../../src/include/ -I ../../src/lib/third_party/include/
 LIB=../../src/lib/libndpi.a @ADDITIONAL_LIBS@ @LIBS@
 
-TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu
-TESTS=substring_test patricia_test
+TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu strnstr
+TESTS=substring_test patricia_test strnstr_test
 
 
 all: $(TESTS)
@@ -18,8 +18,14 @@ gcrypt-gnu: gcrypt.c Makefile
 substringsearch: substringsearch.c Makefile
 	$(CC) $(INC) @CFLAGS@ substringsearch.c -o substringsearch $(LIB)
 
+strnstr: strnstr.cpp Makefile
+	$(CXX) $(INC) @CFLAGS@ strnstr.cpp -o strnstr
+
 substring_test: substringsearch top-1m.csv
 	./substringsearch
+
+strnstr_test: strnstr
+	./strnstr
 
 #
 
