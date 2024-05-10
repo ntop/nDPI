@@ -177,7 +177,7 @@ typedef enum {
   NDPI_PROTOCOL_RADIUS                = 146,
   NDPI_PROTOCOL_WINDOWS_UPDATE        = 147,
   NDPI_PROTOCOL_TEAMVIEWER            = 148,
-  NDPI_PROTOCOL_FREE_149              = 149, /* FREE */
+  NDPI_PROTOCOL_EGD                   = 149,
   NDPI_PROTOCOL_LOTUS_NOTES           = 150,
   NDPI_PROTOCOL_SAP                   = 151,
   NDPI_PROTOCOL_GTP                   = 152,
