@@ -511,6 +511,8 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 	    *app_proto = NDPI_PROTOCOL_ADULT_CONTENT;
 	  } else if(strstr(flow->host_server_name, "telegram") != NULL) {
 	    *app_proto = NDPI_PROTOCOL_TELEGRAM_VOIP;
+	  } else if(strstr(flow->host_server_name, "viber") != NULL) {
+	    *app_proto = NDPI_PROTOCOL_VIBER_VOIP;
 	  }
 	} else
 	  flow->host_server_name[0] = '\0';
