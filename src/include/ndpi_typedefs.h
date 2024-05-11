@@ -1456,9 +1456,6 @@ struct ndpi_flow_struct {
   u_int16_t all_packets_counter;
   u_int16_t packet_direction_complete_counter[2];      // can be 0 - 65000
 
-  /* NDPI_PROTOCOL_H323 */
-  u_int8_t h323_valid_packets;
-
   /* NDPI_PROTOCOL_BITTORRENT */
   u_int8_t bittorrent_stage;		      // can be 0 - 255
   u_int8_t bt_check_performed : 1;

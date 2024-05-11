@@ -43,49 +43,32 @@ static void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search H323\n");
 
   /* TPKT header length + Q.931 header length without IE */
-  if (tpkt_verify_hdr(packet) && (packet->payload_packet_len > 10)) {
-      /* Check Q.931 Protocol Discriminator and call reference value length */
-      if ((packet->payload[4] == 0x08) && ((packet->payload[5] & 0xF) <= 3)) {
-        ndpi_int_h323_add_connection(ndpi_struct, flow);
-        return;
-      }
-  } else if (packet->udp != NULL) {
-    sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
-    NDPI_LOG_DBG2(ndpi_struct, "calculated dport over udp\n");
-
-    if (packet->payload_packet_len >= 6 && packet->payload[0] == 0x80 &&
-        packet->payload[1] == 0x08 &&
-        (packet->payload[2] == 0xe7 || packet->payload[2] == 0x26) &&
-        packet->payload[4] == 0x00 && packet->payload[5] == 0x00)
-    {
+  if(tpkt_verify_hdr(packet) && (packet->payload_packet_len > 20)) {
+    /* Check H.245 */
+    if(packet->payload[7] == 0x06 &&
+       ntohl(get_u_int32_t(packet->payload, 8)) == 0x0088175) /* protocolIdentifier OID */ {
       ndpi_int_h323_add_connection(ndpi_struct, flow);
       return;
     }
-    /* H323  */
-    if (sport == 1719 || dport == 1719) {
-      if ((packet->payload_packet_len > 5) && (packet->payload[0] == 0x16) &&
-          (packet->payload[1] == 0x80) && (packet->payload[4] == 0x06) &&
-          (packet->payload[5] == 0x00))
-      {
+    /* Check H.225.0 : check Q.931 Protocol Discriminator and call reference value length */
+    if((packet->payload[4] == 0x08) && ((packet->payload[5] & 0xF) <= 3)) {
+      ndpi_int_h323_add_connection(ndpi_struct, flow);
+      return;
+    }
+  } else if (packet->udp != NULL) {
+    sport = ntohs(packet->udp->source), dport = ntohs(packet->udp->dest);
+    if(sport == 1719 || dport == 1719) {
+      /* Check H.225.0 RAS */
+      if(packet->payload_packet_len > 20 &&
+         packet->payload[4] == 0x06 &&
+         ntohl(get_u_int32_t(packet->payload, 5)) == 0x0008914A /* protocolIdentifier OID */ ) {
         ndpi_int_h323_add_connection(ndpi_struct, flow);
-        return;
-      } else if (packet->payload_packet_len >= 20 &&
-                 packet->payload_packet_len <= 117) {
-        /* This check is quite generic: let's check another packet...*/
-        flow->h323_valid_packets++;
-        if (flow->h323_valid_packets >= 2) {
-          ndpi_int_h323_add_connection(ndpi_struct, flow);
-          return;
-        }
-      } else {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
         return;
       }
     }
   }
 
-  if (flow->packet_counter > 5)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 void init_h323_dissector(struct ndpi_detection_module_struct *ndpi_struct,
