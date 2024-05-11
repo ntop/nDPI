@@ -2304,9 +2304,13 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "iQIYI", NDPI_PROTOCOL_CATEGORY_STREAMING,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VIBER_VOIP,
+			  "ViberVoip", NDPI_PROTOCOL_CATEGORY_VOIP,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_186,
 			  "Free186", NDPI_PROTOCOL_CATEGORY_MUSIC,
-			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+ 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
@@ -9680,25 +9684,42 @@ void ndpi_dump_risks_score(FILE *risk_out) {
  * first slen characters of s.
  */
 char *ndpi_strnstr(const char *s, const char *find, size_t slen) {
-  char c;
-  size_t len;
-
-  if((c = *find++) != '\0') {
-    len = strnlen(find, slen);
-    do {
-      char sc;
-
-      do {
-	if(slen-- < 1 || (sc = *s++) == '\0')
-	  return(NULL);
-      } while(sc != c);
-      if(len > slen)
-	return(NULL);
-    } while(strncmp(s, find, len) != 0);
-    s--;
+  if (s == NULL || find == NULL || slen == 0) {
+    return NULL;
   }
 
-  return((char *) s);
+  char c = *find;
+
+  if (c == '\0') {
+    return (char *)s;
+  }
+
+  if (*(find + 1) == '\0') {
+    return (char *)memchr(s, c, slen);
+  }
+
+  size_t find_len = strnlen(find, slen);
+
+  if (find_len > slen) {
+    return NULL;
+  }
+
+  const char *end = s + slen - find_len;
+
+  while (s <= end) {
+    if (memcmp(s, find, find_len) == 0) {
+      return (char *)s;
+    }
+
+    size_t remaining_length = end - s;
+    s = (char *)memchr(s + 1, c, remaining_length);
+
+    if (s == NULL || s > end) {
+      return NULL;
+    }
+  }
+
+  return NULL;
 }
 
 /* ****************************************************** */

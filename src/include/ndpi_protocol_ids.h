@@ -442,6 +442,7 @@ typedef enum {
   NDPI_PROTOCOL_BLUESKY               = 411,
   NDPI_PROTOCOL_MASTODON              = 412,
   NDPI_PROTOCOL_THREADS               = 413,
+  NDPI_PROTOCOL_VIBER_VOIP            = 414,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
