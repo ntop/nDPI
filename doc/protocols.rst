@@ -68,6 +68,20 @@ A Remote Procedure Call protocol over HTTP from Microsoft.
 References: `Protocol Specs: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rpch/c0f4c9c5-1a61-4d10-b8e2-005378d1d212`_
 
 
+.. _Proto 149:
+
+`NDPI_PROTOCOL_EGD`
+=========================
+Ethernet Global Data (EGD) is a communication protocol developed by GE Fanuc Automation for real-time data exchange between automation devices and control systems using standard Ethernet technology. It is widely adopted in industrial environments for its simplicity and reliability in data communication.
+
+References: `Wikipedia <https://en.wikipedia.org/wiki/Ethernet_Global_Data_Protocol>`_
+
+Notes:
+
+- This dissector only works for data packets, not configuration commands.
+- IPv6 is not supported
+
+
 .. _Proto 182:
 
 `NDPI_PROTOCOL_RESP`
