@@ -918,6 +918,7 @@ void init_knxnet_ip_dissector(struct ndpi_detection_module_struct *ndpi_struct, 
 void init_bfcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_iqiyi_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_egd_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_cod_mobile_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 

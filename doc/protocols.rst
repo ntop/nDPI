@@ -65,7 +65,7 @@ References: `RFC1350 <https://datatracker.ietf.org/doc/html/rfc1350>`_ and `RFC2
 =======================
 A Remote Procedure Call protocol over HTTP from Microsoft.
 
-References: `Protocol Specs: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rpch/c0f4c9c5-1a61-4d10-b8e2-005378d1d212`_
+References: `Protocol Specs: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rpch/c0f4c9c5-1a61-4d10-b8e2-005378d1d212>`_
 
 
 .. _Proto 149:
@@ -88,7 +88,16 @@ Notes:
 =======================
 Redis Serialization Protocol
 
-References: `Protocol Specs: <https://redis.io/docs/reference/protocol-spec/`_
+References: `Protocol Specs: <https://redis.io/docs/reference/protocol-spec/>`_
+
+
+.. _Proto 186:
+
+`NDPI_PROTOCOL_COD_MOBILE`
+=======================
+Call of Duty: Mobile is a free-to-play shooter game for iOS and Android devices. It has amassed over 650 million downloads worldwide, making it one of the most popular mobile games.
+
+References: `Main site: <https://www.callofduty.com/mobile/>`_
 
 
 .. _Proto 201:
