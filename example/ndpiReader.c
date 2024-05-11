@@ -5691,6 +5691,16 @@ void strnstrUnitTest(void) {
 
   /* Test 10: substring equal to the string */
   assert(strcmp(ndpi_strnstr("string", "string", 6), "string") == 0);
+
+  /* Test 11a,b: max_length bigger that string length */
+  assert(strcmp(ndpi_strnstr("string", "string", 66), "string") == 0);
+  assert(ndpi_strnstr("string", "a", 66) == NULL);
+
+  /* Test 12: substring longer than the string */
+  assert(ndpi_strnstr("string", "stringA", 6) == NULL);
+
+  /* Test 13 */
+  assert(ndpi_strnstr("abcdef", "abc", 2) == NULL);
 }
 
 /* *********************************************** */
