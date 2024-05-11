@@ -32,6 +32,15 @@ Adobe Connect is a web conferencing platform that allows users to conduct online
 References: `Main site: <https://www.adobe.com/products/adobeconnect.html>`_
 
 
+.. _Proto 65:
+
+`NDPI_PROTOCOL_IRC`
+==================
+IRC (Internet Relay Chat) is a text-based chat system for instant messaging.
+
+References: `Wikipiedia: <https://en.wikipedia.org/wiki/IRC>`_ and `Some statistics: <https://netsplit.de/networks/top10.php>`
+
+
 .. _Proto 72:
 
 `NDPI_PROTOCOL_HART_IP`
@@ -84,6 +93,7 @@ References: `Main site: <https://meet.google.com/>`_
 Steam Datagram Relay (SDR) is Valve's virtual private gaming network. Used in all modern games from Valve, but can also be used by developers via the Steamworks SDK for their games.
 
 References: `Main site: <https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay>`_
+
 
 .. _Proto 338:
 

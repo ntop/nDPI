@@ -1611,6 +1611,11 @@ static ndpi_protocol_match host_match[] =
 
    { "threads.net",                      "Threads", NDPI_PROTOCOL_THREADS, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "irc.libera.chat",                  "IRC", NDPI_PROTOCOL_IRC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "irc.oftc.net",                     "IRC", NDPI_PROTOCOL_IRC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "irc.undernet.org",                 "IRC", NDPI_PROTOCOL_IRC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "irc.ircnet.com",                   "IRC", NDPI_PROTOCOL_IRC, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif
