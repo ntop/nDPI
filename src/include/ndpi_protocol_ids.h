@@ -214,7 +214,7 @@ typedef enum {
   NDPI_PROTOCOL_PINTEREST             = 183,
   NDPI_PROTOCOL_VHUA                  = 184,
   NDPI_PROTOCOL_TELEGRAM              = 185,
-  NDPI_PROTOCOL_VEVO                  = 186,
+  NDPI_PROTOCOL_FREE_186              = 186,  /* FREE */
   NDPI_PROTOCOL_PANDORA               = 187,
   NDPI_PROTOCOL_QUIC                  = 188,
   NDPI_PROTOCOL_ZOOM                  = 189, /* Zoom video conference. */
