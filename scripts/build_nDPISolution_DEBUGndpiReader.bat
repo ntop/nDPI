@@ -1,0 +1,2 @@
+@call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat"
+@call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe"  "C:\Projects\nDPIFork2\windows\nDPI.sln" /property:Configuration=Debug-ndpiReader
