@@ -32,6 +32,15 @@ Adobe Connect is a web conferencing platform that allows users to conduct online
 References: `Main site: <https://www.adobe.com/products/adobeconnect.html>`_
 
 
+.. _Proto 65:
+
+`NDPI_PROTOCOL_IRC`
+==================
+IRC (Internet Relay Chat) is a text-based chat system for instant messaging.
+
+References: `Wikipiedia: <https://en.wikipedia.org/wiki/IRC>`_ and `Some statistics: <https://netsplit.de/networks/top10.php>`
+
+
 .. _Proto 72:
 
 `NDPI_PROTOCOL_HART_IP`
@@ -67,6 +76,11 @@ Ethernet Global Data (EGD) is a communication protocol developed by GE Fanuc Aut
 
 References: `Wikipedia <https://en.wikipedia.org/wiki/Ethernet_Global_Data_Protocol>`_
 
+Notes:
+
+- This dissector only works for data packets, not configuration commands.
+- IPv6 is not supported
+
 
 .. _Proto 182:
 
@@ -93,6 +107,7 @@ References: `Main site: <https://meet.google.com/>`_
 Steam Datagram Relay (SDR) is Valve's virtual private gaming network. Used in all modern games from Valve, but can also be used by developers via the Steamworks SDK for their games.
 
 References: `Main site: <https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay>`_
+
 
 .. _Proto 338:
 
@@ -796,3 +811,12 @@ References: `Main site: <https://joinmastodon.org/>`_
 Threads is an online social media and social networking service operated by Meta Platforms.
 
 References: `Main site: <https://www.threads.net>`_
+
+
+.. _Proto 414:
+
+`NDPI_PROTOCOL_VIBER_VOIP`
+=========================
+Audio/video calls made using the Viber app.
+
+References: `Wikipedia <https://en.wikipedia.org/wiki/Viber>`_
