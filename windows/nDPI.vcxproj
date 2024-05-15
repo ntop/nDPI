@@ -376,6 +376,7 @@
     <ClCompile Include="..\src\lib\protocols\bfcp.c" />
     <ClCompile Include="..\src\lib\protocols\iqiyi.c" />
     <ClCompile Include="..\src\lib\protocols\egd.c" />
+    <ClCompile Include="..\src\lib\protocols\cod_mobile.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />

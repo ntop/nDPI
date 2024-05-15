@@ -1,0 +1,35 @@
+DPI Packets (TCP):	7	(7.00 pkts/flow)
+DPI Packets (UDP):	5	(2.50 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 472 (157.33 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/0/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  1/1 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/2 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+CoD_Mobile	13	3590	3
+
+Fun                             13 3590          3            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 10.215.173.1             	 1      
+
+
+	1	TCP 10.215.173.1:45028 <-> 49.51.177.25:8013 [proto: 91.186/TLS.CoD_Mobile][IP: 285/Tencent][Encrypted][Confidence: DPI][DPI packets: 7][cat: Game/8][4 pkts/697 bytes <-> 3 pkts/1560 bytes][Goodput ratio: 74/92][0.51 sec][Hostname/SNI: west-tdm.codmwest.com][(Advertised) ALPNs: http/1.1][(Negotiated) ALPN: http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.382 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/8 104/102 307/195 143/94][Pkt Len c2s/s2c min/avg/max/stddev: 40/40 174/520 552/1472 218/673][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 443][TLSv1.2][JA3C: 9b02ebd3a43b62d825e1ac605b621dc8][JA4: t13d1713ht_5b57614c22b0_eca864cca44a][JA3S: 00447ab319e9d94ba2b4c1248e155917][Safari][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0]
+	2	UDP 10.215.173.1:38704 <-> 43.131.34.20:7948 [proto: 186/CoD_Mobile][IP: 285/Tencent][ClearText][Confidence: DPI][DPI packets: 4][cat: Game/8][1 pkts/210 bytes <-> 3 pkts/1043 bytes][Goodput ratio: 86/92][0.06 sec][PLAIN TEXT (PREFAB)][Plen Bins: 25,0,0,0,0,25,0,0,0,0,0,0,0,0,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 10.215.173.1:40282 <-> 23.248.172.158:7500 [proto: 186/CoD_Mobile][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/40 bytes <-> 1 pkts/40 bytes][Goodput ratio: 29/29][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
