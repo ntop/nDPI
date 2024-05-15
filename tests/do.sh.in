@@ -5,6 +5,9 @@
 #
 # NDPI_FORCE_UPDATING_UTESTS_RESULTS=1 ./tests/do.sh 
 #
+# To run tests in parallel: (you need **GNU** `parallel` program)
+#
+# NDPI_FORCE_PARALLEL_UTESTS=1 ./tests/do.sh
 
 cd "$(dirname "${0}")"
 
@@ -16,6 +19,11 @@ fi
 FORCE_UPDATING_UTESTS_RESULTS=0
 if [ "${NDPI_FORCE_UPDATING_UTESTS_RESULTS}" = "1" ]; then
    FORCE_UPDATING_UTESTS_RESULTS=1
+fi
+
+FORCE_PARALLEL_UTESTS=0
+if [ "${NDPI_FORCE_PARALLEL_UTESTS}" = "1" ]; then
+   FORCE_PARALLEL_UTESTS=1
 fi
 
 #Remember: valgrind and *SAN are incompatible!
@@ -40,12 +48,36 @@ GLOBAL_CONTEXT_ENABLED=@GLOBAL_CONTEXT_ENABLED@
 GLOBAL_CONTEXT_CFGS="caches_global"
 READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,../../../example/config.txt -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja3_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -G ../../../lists -q -K JSON -k /dev/null -t -v 2"
 
+
+#These exports are used in parallel mode
+export CMD_DIFF
+export CMD_WDIFF
+export CMD_COLORDIFF
+export PCRE2_ENABLED
+export PCRE_PCAPS
+export NBPF_ENABLED
+export NBPF_PCAPS
+export READER
+export FORCE_UPDATING_UTESTS_RESULTS
+export FORCE_PARALLEL_UTESTS
+
+
 RC=0
 
 if [ ! -x "../example/ndpiReader${EXE_SUFFIX}" ]; then
   echo "$0: Missing ../example/ndpiReader${EXE_SUFFIX}"
   echo "$0: Run ./configure and make first"
   exit 1
+fi
+
+#For paralell tests you need `parallel` from GNU, not from `moreutils` package!
+#On Ubuntu, for example, you might need to explicitly run `apt install parallel`
+if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
+  if ! parallel -V | grep -qoE 'GNU parallel'; then
+    echo "$0: To run the test in parallel mode you need **GNU** `parallel`"
+    echo "$0: Try something like `apt install parallel`"
+    exit 1
+  fi
 fi
 
 if [ ${GPROF_ENABLED} -eq 1 ]; then
@@ -73,78 +105,99 @@ fuzzy_testing() {
     fi
 }
 
-build_results() {
-    for f in $PCAPS; do
-	#echo $f
+run_single_pcap()
+{
+    f=$1
+
+    if [ ! -f ./pcap/$f ]; then
+        return 0
+    fi
+
+    SKIP_PCAP=0;
+    if [ $PCRE2_ENABLED -eq 0 ]; then
+        for p in $PCRE_PCAPS; do
+            if [ $f = $p ]; then
+                SKIP_PCAP=1
+                break
+            fi
+        done
+    fi
+    if [ $NBPF_ENABLED -eq 0 ]; then
+        for p in $NBPF_PCAPS; do
+            if [ $f = $p ]; then
+                SKIP_PCAP=1
+                break
+            fi
+        done
+    fi
+    if [ $SKIP_PCAP -eq 1 ]; then
+        if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
+            printf "SKIPPED\n"
+        else
+            printf "%-48s\tSKIPPED\n" "$f"
+        fi
+        return 0
+    fi
+
+    CMD="$READER -i pcap/$f -w /tmp/reader.$$.out $READER_EXTRA_PARAM"
+    CPUPROFILE=./result/$f.cprof HEAPPROFILE=./result/$f $CMD
+    CMD_RET=$?
+    if [ $CMD_RET -eq 0 ] && [ -f /tmp/reader.$$.out ]; then
 	# create result files if not present
-	if [ ! -f result/$f.out ]; then
-	    CMD="$READER -i pcap/$f -w result/$f.out $READER_EXTRA_PARAM"
-	    $CMD
+        if [ ! -f result/$f.out ]; then
+            cp /tmp/reader.$$.out result/$f.out
 	fi
-    done
+        NUM_DIFF=`${CMD_DIFF} result/$f.out /tmp/reader.$$.out | wc -l`
+    else
+        if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
+            printf "ERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n"
+        else
+            printf "%-48s\tERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n" "$f"
+	    FAILURES+=("$f") #TODO: find a way to update this variable also in parallel mode
+        fi
+	return 1
+    fi
+
+    if [ $NUM_DIFF -eq 0 ]; then
+        if [ $FORCE_PARALLEL_UTESTS -eq 0 ]; then
+            printf "%-48s\tOK\n" "$f"
+        fi
+        return 0
+    else
+        if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
+            printf "ERROR\n"
+        else
+            printf "%-48s\tERROR\n" "$f"
+	    FAILURES+=("$f") #TODO: find a way to update this variable also in parallel mode
+	fi
+        echo "$CMD [old vs new]"
+        ${CMD_DIFF} result/$f.out /tmp/reader.$$.out
+        if [ ! -z "${CMD_COLORDIFF}" -a ! -z "${CMD_WDIFF}" ]; then
+            ${CMD_WDIFF} -n -3 result/$f.out /tmp/reader.$$.out | sort | uniq | ${CMD_COLORDIFF}
+        fi
+        if [ $FORCE_UPDATING_UTESTS_RESULTS -eq 1 ]; then
+            cp /tmp/reader.$$.out result/$f.out
+        fi
+    fi
+
+    /bin/rm -f /tmp/reader.$$.out
+
+    return 1
 }
+export -f run_single_pcap
 
 check_results() {
-	for f in $PCAPS; do
-	    if [ -n "$*" ]; then
-	    	SKIP_PCAP=1
-		for i in $* ; do [ "$f" = "$i" ] && SKIP_PCAP=0 && break ; done
-		[ $SKIP_PCAP = 1 ] && continue
-	    fi
-	    SKIP_PCAP=0
-	    if [ $PCRE2_ENABLED -eq 0 ]; then
-	      for p in $PCRE_PCAPS; do
-	        if [ $f = $p ]; then
-	          SKIP_PCAP=1
-	          break
-	        fi
-	      done
-	    fi
-	    if [ $NBPF_ENABLED -eq 0 ]; then
-	      for p in $NBPF_PCAPS; do
-	        if [ $f = $p ]; then
-	          SKIP_PCAP=1
-	          break
-	        fi
-	      done
-	    fi
-	    if [ $SKIP_PCAP -eq 1 ]; then
-	        printf "%-48s\tSKIPPED\n" "$f"
-	        continue
-	    fi
-
-	if [ -f result/$f.out ]; then
-	    CMD="$READER -i pcap/$f -w /tmp/reader.$$.out $READER_EXTRA_PARAM"
-	    CPUPROFILE=./result/$f.cprof HEAPPROFILE=./result/$f $CMD
-	    CMD_RET=$?
-	    if [ $CMD_RET -eq 0 ]; then
-	      NUM_DIFF=`${CMD_DIFF} result/$f.out /tmp/reader.$$.out | wc -l`
-	    else
-	      printf "%-48s\tERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n" "$f"
-	      RC=$(( RC + 1 ))
-	      FAILURES+=("$f.out")
-	      continue
-	    fi
-
-		if [ $NUM_DIFF -eq 0 ]; then
-		  printf "%-48s\tOK\n" "$f"
-		else
-		  printf "%-48s\tERROR\n" "$f"
-		  echo "$CMD [old vs new]"
-		  ${CMD_DIFF} result/$f.out /tmp/reader.$$.out
-		  if [ ! -z "${CMD_COLORDIFF}" -a ! -z "${CMD_WDIFF}" ]; then
-		    ${CMD_WDIFF} -n -3 result/$f.out /tmp/reader.$$.out | sort | uniq | ${CMD_COLORDIFF}
-		  fi
-		  RC=$(( RC + 1 ))
-		  FAILURES+=("$f.out")
-		  if [ $FORCE_UPDATING_UTESTS_RESULTS -eq 1 ]; then
-		    cp /tmp/reader.$$.out result/$f.out
-		  fi
-	    fi
-
-	    /bin/rm -f /tmp/reader.$$.out
-	fi
-    done
+    if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
+        parallel --bar --tag "run_single_pcap" ::: $PCAPS
+	RET=$? #Number of failed job up to 100
+	RC=$(( RC + $RET ))
+    else
+        for f in $PCAPS; do
+	    run_single_pcap $f
+	    RET=$?
+	    RC=$(( RC + $RET ))
+        done
+    fi
 
     if [ ${GPROF_ENABLED} -eq 1 ]; then
       GPROF_ARGS='-nodecount 100 -nodefraction 0 -symbolize=fastlocal'
@@ -177,15 +230,19 @@ for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
 
     cd ./cfgs/"$(basename $d)"
 
-    PCAPS=`cd pcap; /bin/ls *.*cap*`
+    if [ "$#" -ne 0 ]; then
+        PCAPS=$*
+    else
+        PCAPS=`cd pcap; /bin/ls *.*cap*`
+    fi
     FAILURES=()
     READER_EXTRA_PARAM=""
     [ -f config.txt ] && READER_EXTRA_PARAM=$(< config.txt)
+    export READER_EXTRA_PARAM
 
     echo "Run configuration \""$(basename $d)"\" [$READER_EXTRA_PARAM]"
 
-    build_results
-    check_results $*
+    check_results
 
     test ${#FAILURES} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
     test ${#FAILURES} -ne 0 && echo "Failed: ${FAILURES[@]}"
