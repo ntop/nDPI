@@ -918,10 +918,13 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
 	   (packet->payload[0] == 0x01) ? "Client" : "Server");
 #endif
 
-    /* Not support for DTLS 1.3 yet, then certificates are always visible in DTLS */
     if((packet->tcp && flow->protos.tls_quic.ssl_version >= 0x0304 /* TLS 1.3 */)
        && (packet->payload[0] == 0x02 /* Server Hello */)) {
       flow->tls_quic.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
+    }
+    if((packet->udp && flow->protos.tls_quic.ssl_version == 0xFEFC /* DTLS 1.3 */)
+       && (packet->payload[0] == 0x02 /* Server Hello */)) {
+      flow->tls_quic.certificate_processed = 1; /* No Certificate with DTLS 1.3+ */
     }
 
     checkTLSSubprotocol(ndpi_struct, flow, packet->payload[0] == 0x01);
@@ -1198,6 +1201,7 @@ int is_dtls(const u_int8_t *buf, u_int32_t buf_len, u_int32_t *block_len) {
   if((buf[0] != 0x16 && buf[0] != 0x14 && buf[0] != 0x17 && buf[0] != 0x15) || /* Handshake, change-cipher-spec, Application-Data, Alert */
      !((buf[1] == 0xfe && buf[2] == 0xff) || /* Versions */
        (buf[1] == 0xfe && buf[2] == 0xfd) ||
+       (buf[1] == 0xfe && buf[2] == 0xfc) ||
        (buf[1] == 0x01 && buf[2] == 0x00))) {
 #ifdef DEBUG_TLS
     printf("[TLS] DTLS invalid block 0x%x or old version 0x%x-0x%x-0x%x\n",
