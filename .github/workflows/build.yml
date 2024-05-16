@@ -75,10 +75,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        # ubuntu-latest == ubuntu-22.04
         # macOS-latest == macos-14 on **ARM64**
         # There are some issues with external dependencies on macOS-latest. Disable it for the time being
-        os: ["ubuntu-latest", "ubuntu-20.04", "macOS-12", "macOS-13", "windows-latest"]
+        os: ["ubuntu-20.04", "ubuntu-22.04", "ubuntu-24.04", "macOS-12", "macOS-13", "windows-latest"]
         arch: ["x86_64"]
         gcrypt: ["--with-local-libgcrypt", ""]
         compiler: ["cc"]
@@ -99,8 +98,8 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
-          - compiler: "gcc-13" # "Newest" gcc easily available
-            os: ubuntu-22.04
+          - compiler: "gcc-14" # "Newest" gcc easily available
+            os: ubuntu-24.04
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre2"
@@ -116,10 +115,10 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
-          - compiler: "clang-17" # "Newest" clang easily available
+          - compiler: "clang-17" # "Newest" clang easily available. See also below...
             ar: "llvm-ar-17"
             ranlib: "llvm-ranlib-17"
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             arch: "x86_64"
             gcrypt: ""
             pcre: "--with-pcre2"
@@ -127,6 +126,21 @@ jobs:
             msan: "--with-sanitizer"
             nBPF: ""
             lto_gold_linker: "--with-lto-and-gold-linker"
+          - compiler: "clang-18" # "The latest clang version easily available should be 18,
+                                 # but it is buggy on ubuntu-24.04 with LTO and Gold linker:
+                                 # https://github.com/llvm/llvm-project/issues/87553
+                                 # https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-18/+bug/2064187
+                                 # Waiting for a fix...
+            ar: "llvm-ar-18"
+            ranlib: "llvm-ranlib-18"
+            os: ubuntu-24.04
+            arch: "x86_64"
+            gcrypt: ""
+            pcre: "--with-pcre2"
+            maxminddb: "--with-maxminddb"
+            msan: "--with-sanitizer"
+            nBPF: ""
+            lto_gold_linker: ""
           - compiler: "cc"
             os: ubuntu-latest
             arch: "x86_64"
@@ -152,7 +166,7 @@ jobs:
             msan: "--with-sanitizer"
             nBPF: ""
             global_context: "--disable-global-context-support"
-          - compiler: "clang-17"
+          - compiler: "clang" #TODO: some issues with masan/clang/ubuntu-24.04
             os: ubuntu-22.04
             arch: "x86_64"
             gcrypt: ""
@@ -243,22 +257,14 @@ jobs:
           make
           cd -
       - name: Setup Ubuntu specified compiler
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && ! startsWith(matrix.compiler, 'cc') && ! startsWith(matrix.compiler, 'clang-17')
+        if: startsWith(matrix.os, 'ubuntu-20.04') && startsWith(matrix.arch, 'x86_64') && ! startsWith(matrix.compiler, 'cc')
         run: |
           #For gcc-4.9 (on ubuntu-20.04)
           echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial main" | sudo tee -a /etc/apt/sources.list
           echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe" | sudo tee -a /etc/apt/sources.list
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
-          #For gcc-13 (on ubuntu-22.04)
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
           sudo apt-get update
           sudo apt-get install ${{ matrix.compiler }}
-      - name: Setup Ubuntu specified (newest) compiler
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'clang-17')
-        run: |
-          wget https://apt.llvm.org/llvm.sh
-          chmod u+x llvm.sh
-          sudo ./llvm.sh 17
       - name: Install Windows msys2 prerequisites
         if: startsWith(matrix.os, 'windows')
         uses: msys2/setup-msys2@v2
