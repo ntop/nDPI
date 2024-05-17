@@ -1683,7 +1683,11 @@ typedef void (*ndpi_void_fn3_t)(ndpi_patricia_node_t *node, void *data, void *us
 
 /* **************************************** */
 
-typedef struct ndpi_ptree ndpi_ptree_t;
+typedef struct ndpi_ptree
+{
+  ndpi_patricia_tree_t *v4;
+  ndpi_patricia_tree_t *v6;
+} ndpi_ptree_t;
 
 /* **************************************** */
 

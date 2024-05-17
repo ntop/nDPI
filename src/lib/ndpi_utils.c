@@ -2367,12 +2367,13 @@ static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_stru
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
-  if(!ndpi_str->ip_risk_mask_ptree)
+  if(!ndpi_str->ip_risk_mask)
     return((u_int64_t)-1);
 
   /* Make sure all in network byte order otherwise compares wont work */
-  ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree)->maxbits);
-  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree, &prefix);
+  ndpi_fill_prefix_v4(&prefix, pin, 32,
+		      ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask->v4)->maxbits);
+  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask->v4, &prefix);
 
   if(node)
     return(node->value.u.uv64);
@@ -2387,12 +2388,13 @@ static u_int64_t ndpi_host_ip_risk_ptree_match6(struct ndpi_detection_module_str
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
-  if(!ndpi_str->ip_risk_mask_ptree6)
+  if(!ndpi_str->ip_risk_mask)
     return((u_int64_t)-1);
 
   /* Make sure all in network byte order otherwise compares wont work */
-  ndpi_fill_prefix_v6(&prefix, pin6, 128, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree6)->maxbits);
-  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree6, &prefix);
+  ndpi_fill_prefix_v6(&prefix, pin6, 128,
+		      ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask->v6)->maxbits);
+  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask->v6, &prefix);
 
   if(node)
     return(node->value.u.uv64);

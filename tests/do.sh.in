@@ -3,11 +3,11 @@
 #
 # Use (to override results)
 #
-# NDPI_FORCE_UPDATING_UTESTS_RESULTS=1 ./tests/do.sh 
+# NDPI_FORCE_UPDATING_UTESTS_RESULTS=1 ./do.sh 
 #
 # To run tests in parallel: (you need **GNU** `parallel` program)
 #
-# NDPI_FORCE_PARALLEL_UTESTS=1 ./tests/do.sh
+# NDPI_FORCE_PARALLEL_UTESTS=1 ./do.sh
 
 cd "$(dirname "${0}")"
 

@@ -320,12 +320,7 @@ struct ndpi_detection_module_struct {
   ndpi_list *trusted_issuer_dn;
 
   /* Patricia trees */
-  ndpi_patricia_tree_t *ip_risk_mask_ptree;
-  ndpi_patricia_tree_t *ip_risk_mask_ptree6;
-  ndpi_patricia_tree_t *ip_risk_ptree;
-  ndpi_patricia_tree_t *ip_risk_ptree6;
-  ndpi_patricia_tree_t *protocols_ptree;  /* IP-based protocol detection */
-  ndpi_patricia_tree_t *protocols_ptree6;
+  ndpi_ptree_t *ip_risk_mask, *ip_risk, *protocols /* IP-based protocol detection */;
 
   /* *** If you add a new Patricia tree, please update ptree_type above! *** */
 
