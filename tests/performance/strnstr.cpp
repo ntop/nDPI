@@ -30,40 +30,57 @@ char *ndpi_strnstr(const char *s, const char *find, size_t slen) {
   return ((char *)s);
 }
 
-char *ndpi_strnstr_opt(const char *s, const char *find, size_t slen) {
-  if (s == NULL || find == NULL || slen == 0) {
+char *ndpi_strnstr_opt(const char *haystack, const char *needle, size_t len)
+{
+  if (!haystack || !needle)
+  {
     return NULL;
   }
 
-  char c = *find;
+  size_t needle_len = strlen(needle);
+  size_t hs_real_len = strnlen(haystack, len);
 
-  if (c == '\0') {
-    return (char *)s;
-  }
-
-  if (*(find + 1) == '\0') {
-    return (char *)memchr(s, c, slen);
-  }
-
-  size_t find_len = strnlen(find, slen);
-
-  if (find_len > slen) {
+  if (!haystack || !needle)
+  {
     return NULL;
   }
 
-  const char *end = s + slen - find_len;
+  if (needle_len == 0)
+  {
+    return (char *)haystack;
+  }
 
-  while (s <= end) {
-    if (memcmp(s, find, find_len) == 0) {
-      return (char *)s;
-    }
+  if (needle_len > hs_real_len)
+  {
+    return NULL;
+  }
 
-    size_t remaining_length = end - s;
-    s = (char *)memchr(s + 1, c, remaining_length);
+  if (needle_len == 1)
+  {
+    return (char *)memchr(haystack, (int)*needle, hs_real_len);
+  }
 
-    if (s == NULL || s > end) {
+  const char *current = haystack;
+  const char *haystack_end = haystack + hs_real_len;
+
+  while (current <= haystack_end - needle_len)
+  {
+    /* Find the first occurrence of the first character from the needle */
+    current = (const char *)memchr(current, *needle, haystack_end - current);
+
+    if (!current)
+    {
       return NULL;
     }
+
+     /* Check the rest of the needle for a match */
+    if ((current + needle_len <= haystack_end) && (memcmp(current, needle, needle_len) == 0))
+    {
+      return (char *)current;
+    }
+
+    /* Shift one character to the right for the next search */
+    current++;
   }
 
   return NULL;
