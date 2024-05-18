@@ -702,8 +702,9 @@ static void help(u_int long_help) {
 #endif
 
   if(long_help) {
-    printf("\n\nSize of nDPI Flow structure: %u\n"
-           "Sizeof of nDPI Flow protocol union: %zu\n",
+    printf("\n\n"
+	   "Size of nDPI Flow structure:      %u\n"
+           "Size of nDPI Flow protocol union: %zu\n",
            ndpi_detection_get_sizeof_ndpi_flow_struct(),
            sizeof(((struct ndpi_flow_struct *)0)->protos));
 

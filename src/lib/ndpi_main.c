@@ -2792,6 +2792,8 @@ int ndpi_load_ptree_file(ndpi_ptree_t *ptree,
 	
 	if(inet_pton(AF_INET6, addr, &addr6) == 1)
 	  node = add_to_ptree(ptree->v6, AF_INET6, &addr6, cidr ? atoi(cidr) : 128);
+	else
+	  node = NULL;
       }
       
       if(node != NULL) {
@@ -4374,13 +4376,14 @@ static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str
 	    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
 
 	  if(packet->payload_packet_len > sizeof(struct ndpi_icmphdr)) {
-	    if (flow->skip_entropy_check == 0) {
+	    if(ndpi_str->cfg.compute_entropy && (flow->skip_entropy_check == 0)) {
 	      flow->entropy = ndpi_entropy(packet->payload + sizeof(struct ndpi_icmphdr),
 	                                   packet->payload_packet_len - sizeof(struct ndpi_icmphdr));
 	      ndpi_entropy2risk(flow);
 	    }
 
 	    u_int16_t chksm = icmp4_checksum(packet->payload, packet->payload_packet_len);
+	    
 	    if(chksm) {
 	      ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
 	    }
@@ -8563,15 +8566,17 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     ndpi_search_shellscript(ndpi_str, flow);
   }
 
-  if(flow->skip_entropy_check == 0 &&
+  if(ndpi_str->cfg.compute_entropy &&
+     flow->skip_entropy_check == 0 &&
      flow->first_pkt_fully_encrypted == 0 &&
      flow->packet_counter < 5 &&
      /* The following protocols do their own entropy calculation/classification. */
-     ret.app_protocol != NDPI_PROTOCOL_IP_ICMP)
-  {
+     ret.app_protocol != NDPI_PROTOCOL_IP_ICMP) {
+
     if (ret.app_protocol != NDPI_PROTOCOL_HTTP) {
       flow->entropy = ndpi_entropy(packet->payload, packet->payload_packet_len);
     }
+    
     ndpi_entropy2risk(flow);
   }
 
@@ -11173,6 +11178,7 @@ static const struct cfg_param {
   { NULL,            "fully_encrypted_heuristic",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic), NULL },
   { NULL,            "libgcrypt.init",                          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(libgcrypt_init), NULL },
   { NULL,            "dpi.guess_on_giveup",                     "0x3", "0", "3", CFG_PARAM_INT, __OFF(guess_on_giveup), NULL },
+  { NULL,            "dpi.compute_entropy",                     "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(compute_entropy), NULL },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },
 

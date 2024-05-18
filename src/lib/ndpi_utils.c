@@ -2743,8 +2743,7 @@ void ndpi_entropy2risk(struct ndpi_flow_struct *flow) {
       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_QUIC ||
       flow->detected_protocol_stack[1] == NDPI_PROTOCOL_QUIC ||
       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DTLS ||
-      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DTLS)
-  {
+      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DTLS) {
     flow->skip_entropy_check = 1;
     goto reset_risk;
   }
@@ -2780,6 +2779,7 @@ reset_risk:
 }
 
 /* ******************************************************************** */
+
 static inline uint16_t get_n16bit(uint8_t const * cbuf) {
   uint16_t r = ((uint16_t)cbuf[0]) | (((uint16_t)cbuf[1]) << 8);
   return r;

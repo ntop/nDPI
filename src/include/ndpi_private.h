@@ -195,7 +195,8 @@ struct ndpi_detection_module_config_struct {
   int track_payload_enabled;
   int libgcrypt_init;
   int guess_on_giveup;
-
+  int compute_entropy;
+  
   char filename_config[CFG_MAX_LEN];
 
   int log_level;
