@@ -1,12 +1,12 @@
 Guessed flow protos:	6
 
 DPI Packets (TCP):	18	(4.50 pkts/flow)
-DPI Packets (UDP):	35	(2.33 pkts/flow)
+DPI Packets (UDP):	32	(2.13 pkts/flow)
 DPI Packets (other):	2	(1.00 pkts/flow)
 Confidence Match by port    : 1 (flows)
 Confidence DPI              : 15 (flows)
 Confidence Match by IP      : 5 (flows)
-Num dissector calls: 1319 (62.81 diss/flow)
+Num dissector calls: 1280 (60.95 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/18/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -53,7 +53,7 @@ JA3 Host Stats:
 	11	UDP 192.168.12.114:10184 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 4][cat: Network/14][4 pkts/368 bytes <-> 4 pkts/400 bytes][Goodput ratio: 54/58][0.01 sec][Hostname/SNI: g2df33d01-lp1.p.srv.nintendo.net][52.10.205.177][bytes ratio: -0.042 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/4 4/4 5/5 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/92 92/100 92/108 0/8][PLAIN TEXT (nintendo)][Plen Bins: 0,75,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	12	UDP 192.168.12.114:52119 -> 52.10.205.177:34343 [proto: 265/AmazonAWS][IP: 265/AmazonAWS][Encrypted][Confidence: Match by IP][DPI packets: 1][cat: Cloud/13][1 pkts/730 bytes -> 0 pkts/0 bytes][Goodput ratio: 94/0][< 1 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic / Entropy: 7.623 (Encrypted or Random?)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	13	ICMP 151.6.184.98:0 -> 192.168.12.114:0 [proto: 81/ICMP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][9 pkts/630 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][0.60 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 75/0 316/0 130/0][Pkt Len c2s/s2c min/avg/max/stddev: 70/0 70/0 70/0 0/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	14	UDP 192.168.12.114:55915 <-> 35.158.74.61:10025 [proto: 265/AmazonAWS][IP: 265/AmazonAWS][Encrypted][Confidence: Match by IP][DPI packets: 10][cat: Cloud/13][5 pkts/290 bytes <-> 5 pkts/290 bytes][Goodput ratio: 27/27][0.06 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 4/3 2/1][Pkt Len c2s/s2c min/avg/max/stddev: 58/58 58/58 58/58 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	14	UDP 192.168.12.114:55915 <-> 35.158.74.61:10025 [proto: 265/AmazonAWS][IP: 265/AmazonAWS][Encrypted][Confidence: Match by IP][DPI packets: 7][cat: Cloud/13][5 pkts/290 bytes <-> 5 pkts/290 bytes][Goodput ratio: 27/27][0.06 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 4/3 2/1][Pkt Len c2s/s2c min/avg/max/stddev: 58/58 58/58 58/58 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	UDP 192.168.12.114:18874 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/110 bytes <-> 1 pkts/281 bytes][Goodput ratio: 61/85][0.03 sec][Hostname/SNI: e0d67c509fb203858ebcb2fe3f88c2aa.baas.nintendo.com][54.192.27.217][PLAIN TEXT (fb203858ebc)][Plen Bins: 0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	16	UDP 192.168.12.114:51035 <-> 192.168.12.1:53 [proto: 5.173/DNS.Nintendo][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/110 bytes <-> 1 pkts/281 bytes][Goodput ratio: 61/85][< 1 sec][Hostname/SNI: e0d67c509fb203858ebcb2fe3f88c2aa.baas.nintendo.com][54.192.27.8][PLAIN TEXT (fb203858ebc)][Plen Bins: 0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	17	UDP 192.168.12.114:52119 -> 35.158.74.61:33335 [proto: 173/Nintendo][IP: 265/AmazonAWS][ClearText][Confidence: DPI][DPI packets: 1][cat: Game/8][3 pkts/354 bytes -> 0 pkts/0 bytes][Goodput ratio: 64/0][0.00 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

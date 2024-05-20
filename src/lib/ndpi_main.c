@@ -349,9 +349,11 @@ u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct 
   NDPI_LOG_DBG2(ndpi_str, "[DEBUG] ***** %s(%u)\n", __FUNCTION__, ndpi_proto_id);
 #endif
 
+  /*
   if(!ndpi_str)
     return(0);
-
+  */
+  
   if(ndpi_proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS)
     return(ndpi_proto_id);
   else if(ndpi_proto_id < ndpi_str->ndpi_num_supported_protocols) {
@@ -6291,6 +6293,7 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
   /* now build the specific buffer for tcp, udp and non_tcp_udp */
   ndpi_str->callback_buffer_size_tcp_payload = 0;
   ndpi_str->callback_buffer_size_tcp_no_payload = 0;
+
   for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
     if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_tcp_payload(ndpi_str,a)) continue;
@@ -6302,6 +6305,7 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
     }
     ndpi_str->callback_buffer_size_tcp_payload++;
   }
+  
   for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
     if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_tcp_nopayload(ndpi_str,a)) continue;
@@ -6315,6 +6319,7 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
   }
 
   ndpi_str->callback_buffer_size_udp = 0;
+  
   for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
     if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_udp(ndpi_str,a)) continue;
@@ -6328,6 +6333,7 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
   }
 
   ndpi_str->callback_buffer_size_non_tcp_udp = 0;
+
   for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
     if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_other(ndpi_str,a)) continue;
@@ -6836,17 +6842,22 @@ int current_pkt_from_server_to_client(const struct ndpi_detection_module_struct 
 
 static int tcp_ack_padding(struct ndpi_packet_struct *packet) {
   const struct ndpi_tcphdr *tcph = packet->tcp;
+  
   if(tcph && tcph->ack && !tcph->psh &&
      packet->payload_packet_len < 8 &&
      packet->payload_packet_len > 1 /* To avoid TCP keep-alives */) {
     int i;
+    
     for(i = 0; i < packet->payload_packet_len; i++)
       if(packet->payload[i] != 0)
         return 0;
     return 1;
   }
+
   return 0;
 }
+
+/* ******************************************************************** */
 
 static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 				     struct ndpi_flow_struct *flow) {
@@ -6869,7 +6880,8 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
 	for(i=0; (i<packet->payload_packet_len)
 	      && (flow->flow_payload_len < ndpi_str->max_payload_track_len); i++) {
 	  flow->flow_payload[flow->flow_payload_len++] =
-	    (ndpi_isprint(packet->payload[i]) || ndpi_isspace(packet->payload[i])) ? packet->payload[i] : '.';
+	    (ndpi_isprint(packet->payload[i])
+	     || ndpi_isspace(packet->payload[i])) ? packet->payload[i] : '.';
 	}
       }
     }
@@ -6988,29 +7000,25 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
     }
 
     if(flow->init_finished == 0) {
-      u_int16_t s_port, d_port; /* Source/Dest ports */
+      u_int16_t s_port = 0, d_port = 0; /* Source/Dest ports */
 
       flow->init_finished = 1;
-
-      if(tcph != NULL &&
-	 ndpi_str->input_info &&
-	 ndpi_str->input_info->seen_flow_beginning == NDPI_FLOW_BEGINNING_SEEN) {
-	flow->l4.tcp.seen_syn = 1;
-	flow->l4.tcp.seen_syn_ack = 1;
-	flow->l4.tcp.seen_ack = 1;
-      }
-
-      /* Client/Server direction */
-
-      s_port = 0;
-      d_port = 0;
+      
       if(tcph != NULL) {
-	s_port = tcph->source;
-	d_port = tcph->dest;
+	if(ndpi_str->input_info &&
+	   ndpi_str->input_info->seen_flow_beginning == NDPI_FLOW_BEGINNING_SEEN) {
+	  flow->l4.tcp.seen_syn = 1;
+	  flow->l4.tcp.seen_syn_ack = 1;
+	  flow->l4.tcp.seen_ack = 1;
+	}
+
+	s_port = tcph->source, d_port = tcph->dest;
       } else if(udph != NULL) {
 	s_port = udph->source;
 	d_port = udph->dest;
       }
+      
+      /* Client/Server direction */
 
       if(ndpi_str->input_info &&
 	 ndpi_str->input_info->in_pkt_dir != NDPI_IN_PKT_DIR_UNKNOWN) {
@@ -7042,6 +7050,7 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
 	  memcpy(flow->c_address.v6, &packet->iphv6->ip6_src, 16);
 	  memcpy(flow->s_address.v6, &packet->iphv6->ip6_dst, 16);
 	}
+
 	flow->c_port = s_port;
 	flow->s_port = d_port;
       } else {
@@ -7052,6 +7061,7 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
 	  memcpy(flow->c_address.v6, &packet->iphv6->ip6_dst, 16);
 	  memcpy(flow->s_address.v6, &packet->iphv6->ip6_src, 16);
 	}
+	
 	flow->c_port = d_port;
 	flow->s_port = s_port;
       }
@@ -7073,9 +7083,9 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
       flow->packet_direction_complete_counter[packet->packet_direction]++;
     }
 
-    if(ndpi_is_multi_or_broadcast(packet))
-      ; /* multicast or broadcast */
-    else {
+    if(!ndpi_is_multi_or_broadcast(packet)) {
+      /* ! (multicast or broadcast) */
+
       if(flow->packet_direction_complete_counter[flow->client_packet_direction] == 0)
 	ndpi_set_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No client to server traffic"); /* Should never happen */
       else if(flow->packet_direction_complete_counter[!flow->client_packet_direction] == 0)
@@ -7097,28 +7107,25 @@ static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * c
   u_int32_t num_calls = 0, a;
 
   if(detected_protocol == NDPI_PROTOCOL_UNKNOWN)
-  {
     return num_calls;
-  }
 
-  for (a = 0; a < ndpi_str->proto_defaults[detected_protocol].subprotocol_count; a++)
-  {
+  for (a = 0; a < ndpi_str->proto_defaults[detected_protocol].subprotocol_count; a++) {
     u_int16_t subproto_id = ndpi_str->proto_defaults[detected_protocol].subprotocols[a];
+    
     if(subproto_id == (uint16_t)NDPI_PROTOCOL_MATCHED_BY_CONTENT ||
         subproto_id == flow->detected_protocol_stack[0] ||
-        subproto_id == flow->detected_protocol_stack[1])
-    {
+        subproto_id == flow->detected_protocol_stack[1]) {
       continue;
     }
 
     u_int16_t subproto_index = ndpi_str->proto_defaults[subproto_id].protoIdx;
+    
     if((ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask & ndpi_selection_packet) ==
          ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask &&
         NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
                              ndpi_str->callback_buffer[subproto_index].excluded_protocol_bitmask) == 0 &&
         NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer[subproto_index].detection_bitmask,
-                             detection_bitmask) != 0)
-    {
+                             detection_bitmask) != 0) {
       ndpi_str->callback_buffer[subproto_index].func(ndpi_str, flow);
       num_calls++;
     }
@@ -7134,8 +7141,7 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
 					   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE const ndpi_selection_packet,
 					   struct call_function_struct const * const callback_buffer,
 					   uint32_t callback_buffer_size,
-					   int is_tcp_without_payload)
-{
+					   int is_tcp_without_payload) {
   void *func = NULL;
   u_int32_t num_calls = 0;
   u_int16_t proto_index = ndpi_str->proto_defaults[flow->guessed_protocol_id].protoIdx;
@@ -7166,6 +7172,8 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
 
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
     {
+      /* TODO: optimize as today we're doing a linear scan */
+      
       for (a = 0; a < callback_buffer_size; a++) {
         if((func != callback_buffer[a].func) &&
             (callback_buffer[a].ndpi_selection_bitmask & ndpi_selection_packet) ==
@@ -7209,8 +7217,7 @@ u_int32_t check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_s
 
 static u_int32_t check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *ndpi_str,
 					  struct ndpi_flow_struct *flow,
-					  NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet)
-{
+					  NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet) {
   return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				   ndpi_str->callback_buffer_udp,
 				   ndpi_str->callback_buffer_size_udp, 0);

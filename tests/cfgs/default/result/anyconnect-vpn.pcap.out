@@ -1,12 +1,12 @@
 Guessed flow protos:	6
 
 DPI Packets (TCP):	131	(5.95 pkts/flow)
-DPI Packets (UDP):	82	(2.22 pkts/flow)
+DPI Packets (UDP):	81	(2.19 pkts/flow)
 DPI Packets (other):	10	(1.00 pkts/flow)
 Confidence Unknown          : 2 (flows)
 Confidence Match by port    : 6 (flows)
 Confidence DPI              : 61 (flows)
-Num dissector calls: 827 (11.99 diss/flow)
+Num dissector calls: 799 (11.58 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/24/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -124,4 +124,4 @@ JA3 Host Stats:
 
 Undetected flows:
 	1	TCP 10.0.0.227:56866 -> 10.0.0.151:8060 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 9][9 pkts/594 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][21.24 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 311/0 2655/0 6845/0 2564/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 66/0 66/0 0/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 10.0.0.227:52595 -> 10.0.0.1:192 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 10][10 pkts/460 bytes -> 0 pkts/0 bytes][Goodput ratio: 9/0][17.54 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 503/0 1948/0 5506/0 2007/0][Pkt Len c2s/s2c min/avg/max/stddev: 46/0 46/0 46/0 0/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.0.0.227:52595 -> 10.0.0.1:192 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 9][10 pkts/460 bytes -> 0 pkts/0 bytes][Goodput ratio: 9/0][17.54 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 503/0 1948/0 5506/0 2007/0][Pkt Len c2s/s2c min/avg/max/stddev: 46/0 46/0 46/0 0/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

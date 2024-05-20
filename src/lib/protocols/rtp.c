@@ -79,8 +79,7 @@ u_int8_t rtp_get_stream_type(u_int8_t payloadType, ndpi_multimedia_flow_type *s_
   }
 }
 
-static int is_valid_rtcp_payload_type(uint8_t type)
-{
+static int is_valid_rtcp_payload_type(uint8_t type) {
   return (type >= 192 && type <= 213);
 }
 
@@ -172,8 +171,8 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   is_rtp = is_rtp_or_rtcp(ndpi_struct, &seq);
-  if(is_rtp == IS_RTP) {
 
+  if(is_rtp == IS_RTP) {
     if(flow->l4.udp.rtp_stage == 2) {
       if(flow->l4.udp.line_pkts[0] >= 2 && flow->l4.udp.line_pkts[1] >= 2) {
         /* It seems that it is a LINE stuff; let its dissector to evaluate */
@@ -228,7 +227,10 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
         NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
         NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
       }
-    }
+    } else if(flow->packet_counter > 3) {
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
+    }      
   }
 }
 

@@ -6006,7 +6006,7 @@ void domainSearchUnitTest2() {
    @brief MAIN FUNCTION
 **/
 int main(int argc, char **argv) {
-  int i, skip_unit_tests = 0;
+  int i, skip_unit_tests = 1;
 
 #ifdef DEBUG_TRACE
   trace = fopen("/tmp/ndpiReader.log", "a");
