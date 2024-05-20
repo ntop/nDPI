@@ -2428,26 +2428,38 @@ int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
 
   switch(ptree_type) {
   case NDPI_PTREE_RISK_MASK:
+    if(!ndpi_struct->ip_risk_mask)
+      return -1;
     ndpi_patricia_get_stats(ndpi_struct->ip_risk_mask->v4, stats);
     return 0;
 
   case NDPI_PTREE_RISK_MASK6:
+    if(!ndpi_struct->ip_risk_mask)
+      return -1;
     ndpi_patricia_get_stats(ndpi_struct->ip_risk_mask->v6, stats);
     return 0;
 
   case NDPI_PTREE_RISK:
+    if(!ndpi_struct->ip_risk)
+      return -1;
     ndpi_patricia_get_stats(ndpi_struct->ip_risk->v4, stats);
     return 0;
 
   case NDPI_PTREE_RISK6:
+    if(!ndpi_struct->ip_risk)
+      return -1;
     ndpi_patricia_get_stats(ndpi_struct->ip_risk->v6, stats);
     return 0;
 
   case NDPI_PTREE_PROTOCOLS:
+    if(!ndpi_struct->protocols)
+      return -1;
     ndpi_patricia_get_stats(ndpi_struct->protocols->v4, stats);
     return 0;
 
   case NDPI_PTREE_PROTOCOLS6:
+    if(!ndpi_struct->protocols)
+      return -1;
     ndpi_patricia_get_stats(ndpi_struct->protocols->v6, stats);
     return 0;
 
@@ -4469,14 +4481,14 @@ int ndpi_add_ip_risk_mask(struct ndpi_detection_module_struct *ndpi_str,
 
   cidr = strtok_r(NULL, "\n", &saveptr);
 
-  if(!is_ipv6 && ndpi_str->ip_risk_mask) {
+  if(!is_ipv6 && ndpi_str->ip_risk_mask && ndpi_str->ip_risk_mask->v4) {
     struct in_addr pin;
 
     if(inet_pton(AF_INET, addr, &pin) != 1)
       return(-1);
     node = add_to_ptree(ndpi_str->ip_risk_mask->v4, AF_INET,
 			&pin, cidr ? atoi(cidr) : 32 /* bits */);
-  } else if(is_ipv6 && ndpi_str->ip_risk_mask->v6) {
+  } else if(is_ipv6 && ndpi_str->ip_risk_mask && ndpi_str->ip_risk_mask->v6) {
     struct in6_addr pin6;
 
     if(inet_pton(AF_INET6, addr, &pin6) != 1)
@@ -8528,7 +8540,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     /* Right now, all the 3 supported risks are only about the *client* ip.
        Don't check the server ip, to try avoiding false positives */
 
-    if(ndpi_str->ip_risk
+    if(ndpi_str->ip_risk && ndpi_str->ip_risk->v4
        && packet->iph
        && ndpi_is_public_ipv4(ntohl(packet->iph->saddr))
        && ndpi_is_public_ipv4(ntohl(packet->iph->daddr))) {
@@ -8536,7 +8548,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
       addr.s_addr = flow->c_address.v4;
       net_risk = ndpi_network_risk_ptree_match(ndpi_str, &addr);
-    } else if(ndpi_str->ip_risk->v6 &&
+    } else if(ndpi_str->ip_risk && ndpi_str->ip_risk->v6 &&
               packet->iphv6) { /* TODO: some checks on "local" addresses? */
       struct in6_addr addr;
 
