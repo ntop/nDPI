@@ -9646,7 +9646,7 @@ char *ndpi_strnstr(const char *haystack, const char *needle, size_t len)
       return NULL;
     }
 
-    if (memcmp(current, needle, needle_len) == 0)
+    if ((current + needle_len <= haystack_end) && memcmp(current, needle, needle_len) == 0)
     {
       return (char *)current;
     }
