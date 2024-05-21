@@ -29,7 +29,7 @@ for line in `nm -P -u "${NDPI_LIB}"`; do
                     'printf'|'fprintf') SKIP=1 ;;
                 esac
             ;;
-            '[ahocorasick.o]'|'[ndpi_serializer.o]')
+            '[ahocorasick.o]')
                 case "${FOUND_SYMBOL}" in
                     'fprintf') SKIP=1 ;;
                 esac

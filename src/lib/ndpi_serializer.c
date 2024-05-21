@@ -140,32 +140,6 @@ int ndpi_json_string_escape(const char *src, int src_len, char *dst, int dst_max
 
 /* ********************************** */
 
-#if UNUSED
-/*
- * Similar to ndpi_snprintf, this returns the number of bytes actually written
- * in any case (unlike ndpi_snprintf which returns, if the output is truncated,
- * the number of bytes which *would have been* written, and a negative
- * value on failures)
- */
-static inline int ndpi_snappend(char *buf, size_t size, const char *fmt, ...) {
-  int wlen;
-  va_list va;
-
-  va_start(va, fmt);
-  wlen = ndpi_snprintf(buf, size, fmt, va);
-  va_end(va);
-
-  if (wlen < 0)
-    wlen = 0;
-  else if (wlen >= size)
-    wlen = size-1;
-
-  return(wlen);
-}
-#endif
-
-/* ********************************** */
-
 void ndpi_reset_serializer(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
@@ -1254,7 +1228,7 @@ int ndpi_serialize_uint32_double(ndpi_serializer *_serializer,
 
   } else {
 #if 1
-    fprintf(stderr, "TLV serializer does not support double\n");
+    return(-1);
 #else
     ndpi_serialization_type kt;
     u_int8_t type = 0;
@@ -1963,7 +1937,7 @@ int ndpi_serialize_binary_double(ndpi_serializer *_serializer,
     serializer->status.buffer.size_used += rc;
   } else {
 #if 1
-    fprintf(stderr, "TLV serializer does not support double\n");
+    return(-1);
 #else
     serializer->buffer.data[serializer->status.buffer.size_used++] = (ndpi_serialization_string << 4) | ndpi_serialization_double;
 
@@ -2408,14 +2382,6 @@ int ndpi_serialize_end_of_block(ndpi_serializer *_serializer) {
 
 void ndpi_serializer_create_snapshot(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
-
-#if 0
-  printf("[NDPI] Snapshot status: %s%s%s\n",
-    (serializer->status.flags & NDPI_SERIALIZER_STATUS_COMMA) ? " COMMA" : "",
-    (serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY) ? " ARRAY" : "",
-    (serializer->status.flags & NDPI_SERIALIZER_STATUS_EOR)   ? " EOR"   : ""
-  );
-#endif
 
   memcpy(&serializer->snapshot, &serializer->status, sizeof(ndpi_private_serializer_status));
   serializer->has_snapshot = 1;
