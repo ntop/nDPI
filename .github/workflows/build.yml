@@ -71,7 +71,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
-      CFLAGS: -Wextra -Werror
+      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
     strategy:
       fail-fast: true
       matrix:
@@ -235,7 +235,7 @@ jobs:
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
           sudo apt-get install gcc-mingw-w64 libc6-dev
           sudo apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-breathe python3-pip
-          sudo apt-get install rrdtool librrd-dev
+          sudo apt-get install rrdtool librrd-dev parallel
       - name: Install Ubuntu Prerequisites (libgcrypt)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
         run: |
@@ -302,7 +302,7 @@ jobs:
           find /usr/local/bin -lname '*/Library/Frameworks/Python.framework/*' -delete
           sudo rm -rf /Library/Frameworks/Python.framework/
           brew install --force python3 && brew unlink python3 && brew unlink python3 && brew link --overwrite python3
-          brew install coreutils wdiff colordiff autoconf automake libtool pkg-config gettext json-c rrdtool
+          brew install coreutils wdiff colordiff autoconf automake libtool pkg-config gettext json-c rrdtool parallel
       - name: Install MacOS Prerequisites (libgcrypt)
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
         run: |
@@ -335,7 +335,7 @@ jobs:
       - name: Build nDPI
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.os, 'macos-14')
         run: |
-          make all
+          make -j all
           make -C example ndpiSimpleIntegration
           make -C rrdtool
       - name: Build nDPI (MacOS M1)
@@ -363,7 +363,7 @@ jobs:
       - name: Test nDPI [DIFF]
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows')
         run: |
-          ./tests/do.sh
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
       - name: Test nDPI [UNIT]
         #Some issues with masan + json-c. Disable the test as workaround
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.msan, '--with-memory-sanitizer') && !startsWith(matrix.os, 'macos-14')
@@ -417,7 +417,7 @@ jobs:
             apt-get -y install git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev libgcrypt20-dev libpcre3-dev libmaxminddb-dev rrdtool librrd-dev &&
             git config --global --add safe.directory $(realpath .) &&
             env CC=gcc CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs &&
-            make all &&
+            make -j all &&
             make -C example ndpiSimpleIntegration &&
             make -C rrdtool &&
             make check VERBOSE=1
@@ -441,7 +441,7 @@ jobs:
             apt-get -y install git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev libgcrypt20-dev libpcre3-dev libmaxminddb-dev rrdtool librrd-dev &&
             git config --global --add safe.directory $(realpath .) &&
             env CC=gcc CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs &&
-            make all &&
+            make -j all &&
             make -C example ndpiSimpleIntegration &&
             make -C rrdtool &&
             make check VERBOSE=1
@@ -465,7 +465,7 @@ jobs:
             apt-get -y install git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev libgcrypt20-dev libpcre3-dev libmaxminddb-dev rrdtool librrd-dev &&
             git config --global --add safe.directory $(realpath .) &&
             env CC=gcc CFLAGS='-Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs &&
-            make all &&
+            make -j all &&
             make -C example ndpiSimpleIntegration &&
             make -C rrdtool &&
             make check VERBOSE=1

@@ -1,8 +1,8 @@
 DPI Packets (TCP):	395	(7.18 pkts/flow)
-DPI Packets (UDP):	13	(6.50 pkts/flow)
+DPI Packets (UDP):	8	(4.00 pkts/flow)
 Confidence Unknown          : 4 (flows)
 Confidence DPI              : 53 (flows)
-Num dissector calls: 282 (4.95 diss/flow)
+Num dissector calls: 263 (4.61 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/12/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -94,7 +94,7 @@ JA3 Host Stats:
 
 
 Undetected flows:
-	1	UDP 10.8.0.1:51772 <-> 62.109.229.158:9000 [proto: 0/Unknown][IP: 141/Webex][ClearText][Confidence: Unknown][DPI packets: 12][14 pkts/1071 bytes <-> 2 pkts/100 bytes][Goodput ratio: 45/16][20.24 sec][bytes ratio: 0.829 (Upload)][IAT c2s/s2c min/avg/max/stddev: 122/117 1602/117 8966/117 2266/0][Pkt Len c2s/s2c min/avg/max/stddev: 47/50 76/50 84/50 14/0][Plen Bins: 31,68,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.8.0.1:51772 <-> 62.109.229.158:9000 [proto: 0/Unknown][IP: 141/Webex][ClearText][Confidence: Unknown][DPI packets: 7][14 pkts/1071 bytes <-> 2 pkts/100 bytes][Goodput ratio: 45/16][20.24 sec][bytes ratio: 0.829 (Upload)][IAT c2s/s2c min/avg/max/stddev: 122/117 1602/117 8966/117 2266/0][Pkt Len c2s/s2c min/avg/max/stddev: 47/50 76/50 84/50 14/0][Plen Bins: 31,68,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 10.8.0.1:51859 <-> 62.109.229.158:443 [proto: 0/Unknown][IP: 141/Webex][ClearText][Confidence: Unknown][DPI packets: 3][2 pkts/128 bytes <-> 1 pkts/54 bytes][Goodput ratio: 0/0][1.00 sec][Risk: ** TCP Connection Issues **][Risk Score: 50][Risk Info: Connection refused (client)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 10.133.206.47:54651 <-> 185.63.147.10:443 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 3][1 pkts/66 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	TCP 10.133.206.47:59447 <-> 107.20.242.44:443 [proto: 0/Unknown][IP: 265/AmazonAWS][ClearText][Confidence: Unknown][DPI packets: 3][1 pkts/66 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

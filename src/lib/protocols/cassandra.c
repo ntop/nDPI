@@ -66,7 +66,8 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
     return;
   }
 
-  if (packet->payload_packet_len < 9 ||
+  if ((packet->payload_packet_len < 9) ||
+      (flow->packet_counter >= 8) ||
       (!ndpi_validate_cassandra_response(packet->payload[0]) ||
        !ndpi_validate_cassandra_request(packet->payload[0])))
   {

@@ -92,6 +92,7 @@ static void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, s
     }
 #endif
   }
+
   if(flow->packet_counter >= 5)
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }

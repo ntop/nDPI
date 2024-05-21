@@ -40,12 +40,6 @@ static void ndpi_check_socks4(struct ndpi_detection_module_struct *ndpi_struct, 
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
 
-  /* Break after 10 packets. */
-  if(flow->packet_counter > 10) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
-  }
-
   /* Check if we so far detected the protocol in the request or not. */
   if(flow->socks4_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "SOCKS4 stage 0: \n");
@@ -80,12 +74,6 @@ static void ndpi_check_socks5(struct ndpi_detection_module_struct *ndpi_struct, 
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
-
-  /* Break after 10 packets. */
-  if(flow->packet_counter > 10) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
-  }
 
   /* Check if we so far detected the protocol in the request or not. */
   if(flow->socks5_stage == 0) {
@@ -122,6 +110,11 @@ static void ndpi_check_socks5(struct ndpi_detection_module_struct *ndpi_struct, 
 static void ndpi_search_socks(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_DBG(ndpi_struct, "search SOCKS\n");
+
+  if(flow->packet_counter >= 10) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
 
   ndpi_check_socks4(ndpi_struct, flow);
 

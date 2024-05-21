@@ -34,6 +34,8 @@ static void ndpi_int_sip_add_connection(struct ndpi_detection_module_struct *ndp
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SIP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
+/* ********************************************************** */
+
 #if !defined(WIN32)
 static inline
 #elif defined(MINGW_GCC)
@@ -41,13 +43,16 @@ __mingw_forceinline static
 #else
 __forceinline static
 #endif
-void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
-			       *ndpi_struct, struct ndpi_flow_struct *flow)
-{
+void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *packet_payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
 
+  if(flow->packet_counter >= 8) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
+  
   if(payload_len > 4) {
     /* search for STUN Turn ChannelData Prefix */
     u_int16_t message_len = ntohs(get_u_int16_t(packet->payload, 2));
@@ -57,9 +62,20 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
       payload_len -= 4;
       packet_payload += 4;
     }
+
+    if(!isprint(packet_payload[0])) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      return;
+    }
   }
 
-  if(payload_len >= 14) {
+  if(payload_len == 5 && memcmp(packet_payload, "hello", 5) == 0) {
+    NDPI_LOG_INFO(ndpi_struct, "found sip via HELLO (kind of ping)\n");
+    ndpi_int_sip_add_connection(ndpi_struct, flow);
+    return;
+  }
+
+  if(payload_len >= 14) {    
     if((memcmp(packet_payload, "NOTIFY ", 7) == 0 || memcmp(packet_payload, "notify ", 7) == 0)
        && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {
 
@@ -180,28 +196,20 @@ void ndpi_search_sip_handshake(struct ndpi_detection_module_struct
 
   /* add bitmask for tcp only, some stupid udp programs
    * send a very few (< 10 ) packets before invite (mostly a 0x0a0x0d, but just search the first 3 payload_packets here */
-  if(packet->udp != NULL && flow->packet_counter < 10) {
+  if(packet->udp != NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "need next packet\n");
     return;
   }
 
   if(payload_len == 4 && get_u_int32_t(packet_payload, 0) == 0) {
-    NDPI_LOG_DBG2(ndpi_struct, "maybe sip. need next packet\n");
+    NDPI_LOG_DBG2(ndpi_struct, "maybe sip. need next packet\n");    
     return;
   }
-
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-static void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
-  NDPI_LOG_DBG(ndpi_struct, "search sip\n");
+/* ********************************************************** */
 
-  ndpi_search_sip_handshake(ndpi_struct, flow);
-}
-
-void init_sip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
-{
+void init_sip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id) {
   ndpi_set_bitmask_protocol_detection("SIP", ndpi_struct, *id,
 				      NDPI_PROTOCOL_SIP,
 				      ndpi_search_sip,

@@ -3,11 +3,11 @@
 #
 # Use (to override results)
 #
-# NDPI_FORCE_UPDATING_UTESTS_RESULTS=1 ./tests/do.sh 
+# NDPI_FORCE_UPDATING_UTESTS_RESULTS=1 ./do.sh 
 #
 # To run tests in parallel: (you need **GNU** `parallel` program)
 #
-# NDPI_FORCE_PARALLEL_UTESTS=1 ./tests/do.sh
+# NDPI_FORCE_PARALLEL_UTESTS=1 ./do.sh
 
 cd "$(dirname "${0}")"
 
@@ -24,6 +24,11 @@ fi
 FORCE_PARALLEL_UTESTS=0
 if [ "${NDPI_FORCE_PARALLEL_UTESTS}" = "1" ]; then
    FORCE_PARALLEL_UTESTS=1
+fi
+
+SKIP_PARALLEL_BAR=0
+if [ "${NDPI_SKIP_PARALLEL_BAR}" = "1" ]; then
+   SKIP_PARALLEL_BAR=1
 fi
 
 #Remember: valgrind and *SAN are incompatible!
@@ -188,7 +193,11 @@ export -f run_single_pcap
 
 check_results() {
     if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
-        parallel --bar --tag "run_single_pcap" ::: $PCAPS
+        if [ $SKIP_PARALLEL_BAR -eq 1 ]; then
+            parallel --tag "run_single_pcap" ::: $PCAPS
+        else
+            parallel --bar --tag "run_single_pcap" ::: $PCAPS
+        fi
 	RET=$? #Number of failed job up to 100
 	RC=$(( RC + $RET ))
     else

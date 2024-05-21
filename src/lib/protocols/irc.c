@@ -97,8 +97,9 @@ static void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct
   u_int16_t http_content_ptr_len = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search irc\n");
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC && (flow->packet_counter > 10)) {
-    NDPI_LOG_DBG(ndpi_struct, "exclude irc, packet_counter > 70\n");
+  if((flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC && (flow->packet_counter > 10))
+     || (flow->packet_counter >= 10)) {
+    NDPI_LOG_DBG(ndpi_struct, "exclude irc, packet_counter too high0\n");
     NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_IRC);
     return;
   }

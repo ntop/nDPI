@@ -702,8 +702,9 @@ static void help(u_int long_help) {
 #endif
 
   if(long_help) {
-    printf("\n\nSize of nDPI Flow structure: %u\n"
-           "Sizeof of nDPI Flow protocol union: %zu\n",
+    printf("\n\n"
+	   "Size of nDPI Flow structure:      %u\n"
+           "Size of nDPI Flow protocol union: %zu\n",
            ndpi_detection_get_sizeof_ndpi_flow_struct(),
            sizeof(((struct ndpi_flow_struct *)0)->protos));
 
@@ -6005,7 +6006,12 @@ void domainSearchUnitTest2() {
    @brief MAIN FUNCTION
 **/
 int main(int argc, char **argv) {
-  int i, skip_unit_tests = 0;
+  int i;
+#ifdef NDPI_EXTENDED_SANITY_CHECKS
+  int skip_unit_tests = 0;
+#else
+  int skip_unit_tests = 1;
+#endif
 
 #ifdef DEBUG_TRACE
   trace = fopen("/tmp/ndpiReader.log", "a");

@@ -849,6 +849,7 @@ char* ndpi_ssl_version2str(char *buf, int buf_len,
   case 0XFB1A: strncpy(buf, "TLSv1.3 (Fizz)", buf_len); buf[buf_len - 1] = '\0'; return buf; /* https://engineering.fb.com/security/fizz/ */
   case 0XFEFF: strncpy(buf, "DTLSv1.0", buf_len); buf[buf_len - 1] = '\0'; return buf;
   case 0XFEFD: strncpy(buf, "DTLSv1.2", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case 0XFEFC: strncpy(buf, "DTLSv1.3", buf_len); buf[buf_len - 1] = '\0'; return buf;
   case 0x0A0A:
   case 0x1A1A:
   case 0x2A2A:
@@ -2367,12 +2368,13 @@ static u_int64_t ndpi_host_ip_risk_ptree_match(struct ndpi_detection_module_stru
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
-  if(!ndpi_str->ip_risk_mask_ptree)
+  if(!ndpi_str->ip_risk_mask)
     return((u_int64_t)-1);
 
   /* Make sure all in network byte order otherwise compares wont work */
-  ndpi_fill_prefix_v4(&prefix, pin, 32, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree)->maxbits);
-  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree, &prefix);
+  ndpi_fill_prefix_v4(&prefix, pin, 32,
+		      ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask->v4)->maxbits);
+  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask->v4, &prefix);
 
   if(node)
     return(node->value.u.uv64);
@@ -2387,12 +2389,13 @@ static u_int64_t ndpi_host_ip_risk_ptree_match6(struct ndpi_detection_module_str
   ndpi_prefix_t prefix;
   ndpi_patricia_node_t *node;
 
-  if(!ndpi_str->ip_risk_mask_ptree6)
+  if(!ndpi_str->ip_risk_mask)
     return((u_int64_t)-1);
 
   /* Make sure all in network byte order otherwise compares wont work */
-  ndpi_fill_prefix_v6(&prefix, pin6, 128, ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask_ptree6)->maxbits);
-  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask_ptree6, &prefix);
+  ndpi_fill_prefix_v6(&prefix, pin6, 128,
+		      ((ndpi_patricia_tree_t *) ndpi_str->ip_risk_mask->v6)->maxbits);
+  node = ndpi_patricia_search_best(ndpi_str->ip_risk_mask->v6, &prefix);
 
   if(node)
     return(node->value.u.uv64);
@@ -2741,8 +2744,7 @@ void ndpi_entropy2risk(struct ndpi_flow_struct *flow) {
       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_QUIC ||
       flow->detected_protocol_stack[1] == NDPI_PROTOCOL_QUIC ||
       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DTLS ||
-      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DTLS)
-  {
+      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DTLS) {
     flow->skip_entropy_check = 1;
     goto reset_risk;
   }
@@ -2778,6 +2780,7 @@ reset_risk:
 }
 
 /* ******************************************************************** */
+
 static inline uint16_t get_n16bit(uint8_t const * cbuf) {
   uint16_t r = ((uint16_t)cbuf[0]) | (((uint16_t)cbuf[1]) << 8);
   return r;

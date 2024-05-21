@@ -642,9 +642,8 @@ static void ndpi_search_bittorrent(struct ndpi_detection_module_struct *ndpi_str
     }
   }
 
-  if(flow->packet_counter > 8) {
-    ndpi_skip_bittorrent(ndpi_struct, flow);
-  }
+  if(flow->packet_counter > 5)
+    ndpi_skip_bittorrent(ndpi_struct, flow);  
 }
 
 /* ************************************* */

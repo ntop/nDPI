@@ -46,6 +46,7 @@ static void ndpi_search_dnscrypt(struct ndpi_detection_module_struct *ndpi_struc
     ndpi_int_dnscrypt_add_connection(ndpi_struct, flow);
     return;
   }
+  
   /* dnscrypt protocol version 1 and 2: resolver ping */
   if (packet->payload_packet_len > 13 + strlen(dnscrypt_initial) &&
       strncasecmp((char*)packet->payload + 13, dnscrypt_initial, strlen(dnscrypt_initial)) == 0)
@@ -56,10 +57,9 @@ static void ndpi_search_dnscrypt(struct ndpi_detection_module_struct *ndpi_struc
 
   if ((flow->packet_direction_counter[packet->packet_direction] >= 1 &&
        flow->packet_direction_counter[1 - packet->packet_direction] >= 1) ||
-      flow->packet_counter >= 10)
-  {
+      flow->packet_counter >= 8) {
     /*
-     * Wait for at least one packet per direction, but not more then 10 packets.
+     * Wait for at least one packet per direction, up to a max
      * Required as we need to wait for the server response which contains the ASCII pattern below.
      */
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

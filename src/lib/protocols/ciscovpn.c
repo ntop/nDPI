@@ -48,26 +48,23 @@ static void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struc
     NDPI_LOG_DBG2(ndpi_struct, "calculated CISCOVPN over udp ports\n");
   }
 
-  if(
-	  (
-	   (usport == 10000 && udport == 10000)
-	   &&
-	   (packet->payload_packet_len >= 4) &&
-	   (packet->payload[0] == 0xfe &&
-	    packet->payload[1] == 0x57 &&
-	    packet->payload[2] == 0x7e &&
-	    packet->payload[3] == 0x2b)
-	   )
-	  )
-    {
+  if((usport == 10000 && udport == 10000)) {
+    if((packet->payload_packet_len >= 4) &&
+       (packet->payload[0] == 0xfe &&
+	packet->payload[1] == 0x57 &&
+	packet->payload[2] == 0x7e &&
+	packet->payload[3] == 0x2b)
+       ) {
       /* This is a good query  fe577e2b */
       NDPI_LOG_INFO(ndpi_struct, "found CISCOVPN\n");
       ndpi_int_ciscovpn_add_connection(ndpi_struct, flow);
       return;
-    } 
-
-  if(flow->num_processed_pkts > 5)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    }
+    
+    if(flow->num_processed_pkts > 5)
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);    
+  } else
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);  
 }
 
 
