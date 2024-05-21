@@ -1655,12 +1655,13 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
   u_int16_t tls_handshake_version = ja->client.tls_handshake_version;
   char * const ja_str = &flow->protos.tls_quic.ja4_client[0];
   const u_int16_t ja_max_len = sizeof(flow->protos.tls_quic.ja4_client);
+  bool is_dtls = (flow->l4_proto == IPPROTO_UDP) && (quic_version == 0);
   /*
     Compute JA4 TLS/QUIC client
 
     https://github.com/FoxIO-LLC/ja4/blob/main/technical_details/JA4.md
 
-    (QUIC=”q” or TCP=”t”)
+    (QUIC=”q”, DTLS="d" or TCP=”t”)
     (2 character TLS version)
     (SNI=”d” or no SNI=”i”)
     (2 character count of ciphers)
@@ -1671,7 +1672,7 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
     _
     (sha256 hash of (the list of extension hex codes sorted in hex order)_(the list of signature algorithms), truncated to 12 characters)
   */
-  ja_str[0] = (quic_version != 0) ? 'q' : 't';
+  ja_str[0] = is_dtls ? 'd' : ((quic_version != 0) ? 'q' : 't');
 
   for(i=0; i<ja->client.num_supported_versions; i++) {
     if((!is_grease_version(ja->client.supported_versions[i]))
@@ -1712,6 +1713,21 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
 
   case 0x0100: /* SSL 1.0 = “s1” */
     ja_str[1] = 's';
+    ja_str[2] = '3';
+    break;
+
+  case 0xFEFF: /* DTLS 1.0 = “d1” */
+    ja_str[1] = 'd';
+    ja_str[2] = '1';
+    break;
+
+  case 0xFEFD: /* DTLS 1.2 = “d2” */
+    ja_str[1] = 'd';
+    ja_str[2] = '2';
+    break;
+
+  case 0xFEFC: /* DTLS 1.3 = “d3” */
+    ja_str[1] = 'd';
     ja_str[2] = '3';
     break;
 
