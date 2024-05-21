@@ -849,6 +849,7 @@ char* ndpi_ssl_version2str(char *buf, int buf_len,
   case 0XFB1A: strncpy(buf, "TLSv1.3 (Fizz)", buf_len); buf[buf_len - 1] = '\0'; return buf; /* https://engineering.fb.com/security/fizz/ */
   case 0XFEFF: strncpy(buf, "DTLSv1.0", buf_len); buf[buf_len - 1] = '\0'; return buf;
   case 0XFEFD: strncpy(buf, "DTLSv1.2", buf_len); buf[buf_len - 1] = '\0'; return buf;
+  case 0XFEFC: strncpy(buf, "DTLSv1.3", buf_len); buf[buf_len - 1] = '\0'; return buf;
   case 0x0A0A:
   case 0x1A1A:
   case 0x2A2A:
