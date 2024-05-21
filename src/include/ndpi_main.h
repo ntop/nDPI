@@ -47,11 +47,6 @@ extern "C" {
   void ndpi_tdestroy(void *vrootp, void (*freefct)(void *));
 
   int NDPI_BITMASK_COMPARE(NDPI_PROTOCOL_BITMASK a, NDPI_PROTOCOL_BITMASK b);
-  int NDPI_BITMASK_IS_EMPTY(NDPI_PROTOCOL_BITMASK a);
-  void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a);
-
-
-
 
   u_int16_t ntohs_ndpi_bytestream_to_number(const u_int8_t * str,
 					    u_int16_t max_chars_to_read,
@@ -61,9 +56,6 @@ extern "C" {
 				      u_int16_t * bytes_read);
   u_int64_t ndpi_bytestream_to_number64(const u_int8_t * str, u_int16_t max_chars_to_read,
 					u_int16_t * bytes_read);
-  u_int32_t ndpi_bytestream_dec_or_hex_to_number(const u_int8_t * str,
-						 u_int16_t max_chars_to_read,
-						 u_int16_t * bytes_read);
   u_int64_t ndpi_bytestream_dec_or_hex_to_number64(const u_int8_t * str,
 						   u_int16_t max_chars_to_read,
 						   u_int16_t * bytes_read);

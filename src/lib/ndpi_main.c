@@ -365,30 +365,6 @@ u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct 
 }
 
 /* ************************************************************************************* */
-/* ************************************************************************************* */
-
-#ifdef CODE_UNUSED
-ndpi_port_range *ndpi_build_default_ports_range(ndpi_port_range *ports, u_int16_t portA_low, u_int16_t portA_high,
-                                                u_int16_t portB_low, u_int16_t portB_high, u_int16_t portC_low,
-                                                u_int16_t portC_high, u_int16_t portD_low, u_int16_t portD_high,
-                                                u_int16_t portE_low, u_int16_t portE_high) {
-  int i = 0;
-
-  ports[i].port_low = portA_low, ports[i].port_high = portA_high;
-  i++;
-  ports[i].port_low = portB_low, ports[i].port_high = portB_high;
-  i++;
-  ports[i].port_low = portC_low, ports[i].port_high = portC_high;
-  i++;
-  ports[i].port_low = portD_low, ports[i].port_high = portD_high;
-  i++;
-  ports[i].port_low = portE_low, ports[i].port_high = portE_high;
-
-  return(ports);
-}
-#endif
-
-/* *********************************************************************************** */
 
 ndpi_port_range *ndpi_build_default_ports(ndpi_port_range *ports, u_int16_t portA, u_int16_t portB, u_int16_t portC,
                                           u_int16_t portD, u_int16_t portE) {
@@ -925,12 +901,6 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   /* ************************ */
 
   for(i = 0; tls_certificate_match[i].string_to_match != NULL; i++) {
-#if 0
-    printf("%s() %s / %u\n", __FUNCTION__,
-	   tls_certificate_match[i].string_to_match,
-	   tls_certificate_match[i].protocol_id);
-#endif
-
     if(!is_proto_enabled(ndpi_str, tls_certificate_match[i].protocol_id)) {
       NDPI_LOG_DBG(ndpi_str, "[NDPI] Skip tls cert match for %s/protoId=%d: disabled\n",
 		   tls_certificate_match[i].string_to_match, tls_certificate_match[i].protocol_id);
@@ -8637,44 +8607,6 @@ u_int32_t ndpi_bytestream_to_number(const u_int8_t *str, u_int16_t max_chars_to_
 
 /* ********************************************************************************* */
 
-#ifdef CODE_UNUSED
-u_int32_t ndpi_bytestream_dec_or_hex_to_number(const u_int8_t *str, u_int16_t max_chars_to_read, u_int16_t *bytes_read) {
-  u_int32_t val;
-  val = 0;
-  if(max_chars_to_read <= 2 || str[0] != '0' || str[1] != 'x') {
-    return(ndpi_bytestream_to_number(str, max_chars_to_read, bytes_read));
-  } else {
-    /*use base 16 system */
-    str += 2;
-    max_chars_to_read -= 2;
-    *bytes_read = *bytes_read + 2;
-
-    while(max_chars_to_read > 0) {
-      if(*str >= '0' && *str <= '9') {
-	val *= 16;
-	val += *str - '0';
-      } else if(*str >= 'a' && *str <= 'f') {
-	val *= 16;
-	val += *str + 10 - 'a';
-      } else if(*str >= 'A' && *str <= 'F') {
-	val *= 16;
-	val += *str + 10 - 'A';
-      } else {
-	break;
-      }
-      str++;
-      max_chars_to_read = max_chars_to_read - 1;
-      *bytes_read = *bytes_read + 1;
-    }
-  }
-
-  return(val);
-}
-
-#endif
-
-/* ********************************************************************************* */
-
 u_int64_t ndpi_bytestream_to_number64(const u_int8_t *str, u_int16_t max_chars_to_read, u_int16_t *bytes_read) {
   u_int64_t val;
   val = 0;
@@ -9990,27 +9922,6 @@ int NDPI_BITMASK_COMPARE(NDPI_PROTOCOL_BITMASK a, NDPI_PROTOCOL_BITMASK b) {
 
   return(0);
 }
-
-#ifdef CODE_UNUSED
-int NDPI_BITMASK_IS_EMPTY(NDPI_PROTOCOL_BITMASK a) {
-  unsigned int i;
-
-  for(i = 0; i < NDPI_NUM_FDS_BITS; i++)
-    if(a.fds_bits[i] != 0)
-      return(0);
-
-  return(1);
-}
-
-void NDPI_DUMP_BITMASK(NDPI_PROTOCOL_BITMASK a) {
-  unsigned int i;
-
-  for(i = 0; i < NDPI_NUM_FDS_BITS; i++)
-    printf("[%d=%u]", i, a.fds_bits[i]);
-
-  printf("\n");
-}
-#endif
 
 u_int16_t ndpi_get_api_version() {
   return(NDPI_API_VERSION);
