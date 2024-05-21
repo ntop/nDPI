@@ -69,6 +69,12 @@ void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     }
   }
 
+  if(payload_len == 5 && memcmp(packet_payload, "hello", 5) == 0) {
+    NDPI_LOG_INFO(ndpi_struct, "found sip via HELLO (kind of ping)\n");
+    ndpi_int_sip_add_connection(ndpi_struct, flow);
+    return;
+  }
+
   if(payload_len >= 14) {    
     if((memcmp(packet_payload, "NOTIFY ", 7) == 0 || memcmp(packet_payload, "notify ", 7) == 0)
        && (memcmp(&packet_payload[7], "SIP:", 4) == 0 || memcmp(&packet_payload[7], "sip:", 4) == 0)) {

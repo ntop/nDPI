@@ -663,7 +663,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   /* RFC9443 */
   if(first_byte <= 3) {
     NDPI_LOG_DBG(ndpi_struct, "Still STUN\n");
-    if(is_stun(ndpi_struct, flow, &app_proto)) { /* To extract other metadata */
+    if(is_stun(ndpi_struct, flow, &app_proto) == 1) { /* To extract other metadata */
       if(is_new_subclassification_better(ndpi_struct, flow, app_proto)) {
         ndpi_int_stun_add_connection(ndpi_struct, flow, app_proto, __get_master(flow));
       }
@@ -991,7 +991,7 @@ static void ndpi_search_stun(struct ndpi_detection_module_struct *ndpi_struct, s
   }
 
   /* TODO: can we stop earlier? */
-  if((rc == -1) || (flow->packet_counter > 8))
+  if(flow->packet_counter > 5)
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 

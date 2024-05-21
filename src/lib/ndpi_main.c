@@ -349,11 +349,9 @@ u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct 
   NDPI_LOG_DBG2(ndpi_str, "[DEBUG] ***** %s(%u)\n", __FUNCTION__, ndpi_proto_id);
 #endif
 
-  /*
   if(!ndpi_str)
     return(0);
-  */
-  
+
   if(ndpi_proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS)
     return(ndpi_proto_id);
   else if(ndpi_proto_id < ndpi_str->ndpi_num_supported_protocols) {
