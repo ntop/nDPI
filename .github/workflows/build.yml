@@ -71,7 +71,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
-      CFLAGS: -Wextra -Werror
+      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
     strategy:
       fail-fast: true
       matrix:
