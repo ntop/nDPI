@@ -2728,7 +2728,7 @@ static ndpi_patricia_node_t* add_to_ptree(ndpi_patricia_tree_t *tree, int family
 int ndpi_load_ptree_file(ndpi_ptree_t *ptree,
 			 const char *path,
 			 u_int16_t protocol_id) {
-  char buffer[128], *line, *addr, *cidr, *saveptr;
+  char buffer[1024], *line, *addr, *cidr, *saveptr;
   FILE *fd;
   int len;
   u_int num_loaded = 0;
@@ -2767,7 +2767,8 @@ int ndpi_load_ptree_file(ndpi_ptree_t *ptree,
 	struct in_addr addr4;
 	
 	addr4.s_addr = inet_addr(addr);
-	
+
+	/* printf("+ %s/%d\n", addr, cidr ? atoi(cidr) : 32); */
 	node = add_to_ptree(ptree->v4, AF_INET, &addr4, cidr ? atoi(cidr) : 32 /* bits */);
       } else {
 	struct in6_addr addr6;
