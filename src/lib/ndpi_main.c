@@ -9610,32 +9610,52 @@ void ndpi_dump_risks_score(FILE *risk_out) {
 
 /* ****************************************************** */
 
-/*
- * Find the first occurrence of find in s, where the search is limited to the
- * first slen characters of s.
- */
-char *ndpi_strnstr(const char *s, const char *find, size_t slen) {
-  char c;
-  size_t len;
-
-  if(s == NULL || find == NULL || slen == 0)
+char *ndpi_strnstr(const char *haystack, const char *needle, size_t len)
+{
+  if (!haystack || !needle || len == 0)
+  {
     return NULL;
-
-  if((c = *find++) != '\0') {
-    len = strnlen(find, slen);
-    do {
-      char sc;
-
-      do {
-	if(slen-- < 1 || (sc = *s++) == '\0')
-	  return(NULL);
-      } while(sc != c);
-      if(len > slen)
-	return(NULL);
-    } while(strncmp(s, find, len) != 0);
-    s--;
   }
-  return((char *) s);
+
+  size_t needle_len = strlen(needle);
+  size_t hs_real_len = strnlen(haystack, len);
+
+  if (needle_len == 0)
+  {
+    return (char *)haystack;
+  }
+
+  if (needle_len > hs_real_len)
+  {
+    return NULL;
+  }
+
+  if (needle_len == 1)
+  {
+    return (char *)memchr(haystack, *needle, hs_real_len);
+  }
+
+  const char *current = haystack;
+  const char *haystack_end = haystack + hs_real_len;
+
+  while (current <= haystack_end - needle_len)
+  {
+    current = (const char *)memchr(current, *needle, haystack_end - current);
+
+    if (!current)
+    {
+      return NULL;
+    }
+
+    if ((current + needle_len <= haystack_end) && memcmp(current, needle, needle_len) == 0)
+    {
+      return (char *)current;
+    }
+
+    current++;
+  }
+
+  return NULL;
 }
 
 /* ****************************************************** */
