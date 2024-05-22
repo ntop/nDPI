@@ -195,6 +195,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_TLS_ALPN_SNI_MISMATCH,                 NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_MALWARE_HOST_CONTACTED,                NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_BINARY_DATA_TRANSFER,                  NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
+  { NDPI_PROBING_ATTEMPT,                       NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY   }
@@ -7064,6 +7065,9 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
       flow->packet_direction_complete_counter[packet->packet_direction]++;
     }
 
+    if(packet->payload_packet_len > 0)
+      flow->packet_direction_with_payload_observed[packet->packet_direction] = 1;
+    
     if(!ndpi_is_multi_or_broadcast(packet)) {
       /* ! (multicast or broadcast) */
 
@@ -7598,6 +7602,51 @@ static void ndpi_check_tcp_flags(struct ndpi_flow_struct *flow) {
     ndpi_set_risk(flow, NDPI_TCP_ISSUES, "TCP probing attempt");
 }
 
+/* ******************************************************************** */
+
+static void ndpi_check_probing_attempt(struct ndpi_flow_struct *flow) {
+  if(flow->l4_proto == IPPROTO_TCP) {
+    if(flow->packet_direction_with_payload_observed[0]
+       && flow->packet_direction_with_payload_observed[1]) {
+      /* Both directions observed */
+
+      if(flow->confidence == NDPI_CONFIDENCE_DPI) {
+	switch(flow->detected_protocol_stack[0]) {
+	case NDPI_PROTOCOL_SSH:
+	  if(flow->protos.ssh.hassh_server[0] == '\0')
+	    ndpi_set_risk(flow, NDPI_PROBING_ATTEMPT, "SSH Probing");
+	  break;
+	  
+	case NDPI_PROTOCOL_TLS:
+	case NDPI_PROTOCOL_QUIC:
+	case NDPI_PROTOCOL_MAIL_SMTPS:
+	case NDPI_PROTOCOL_MAIL_POPS:
+	case NDPI_PROTOCOL_MAIL_IMAPS:
+	case NDPI_PROTOCOL_DTLS:
+	  if(flow->host_server_name[0] == '\0')
+	    ndpi_set_risk(flow, NDPI_PROBING_ATTEMPT, "TLS/QUIC Probing");
+	  break;
+	}
+      }
+    } else {
+      switch(flow->confidence) {
+      case NDPI_CONFIDENCE_MATCH_BY_PORT:
+      case NDPI_CONFIDENCE_NBPF:
+      case NDPI_CONFIDENCE_DPI_PARTIAL_CACHE:
+      case NDPI_CONFIDENCE_DPI_CACHE:
+      case NDPI_CONFIDENCE_MATCH_BY_IP:
+      case NDPI_CONFIDENCE_CUSTOM_RULE:
+	/* Skipping rules where an early match might be confused with a probing attempt */
+	break;
+
+      default:
+	ndpi_set_risk(flow, NDPI_PROBING_ATTEMPT,
+		      "TCP connection with unidirectional traffic");
+      }
+    }
+  }
+}
+
 /* ********************************************************************************* */
 
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
@@ -7612,9 +7661,11 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   if(!ndpi_str || !flow)
     return(ret);
 
-  if(flow->l4_proto == IPPROTO_TCP)
+  if(flow->l4_proto == IPPROTO_TCP) {
     ndpi_check_tcp_flags(flow);
-
+    ndpi_check_probing_attempt(flow);
+  }
+  
   /* Init defaults */
   ret.master_protocol = flow->detected_protocol_stack[1], ret.app_protocol = flow->detected_protocol_stack[0];
   ret.protocol_by_ip = flow->guessed_protocol_id_by_ip;
@@ -8331,7 +8382,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
       t.tuple.l3_proto = flow->l4_proto;
 
       if(packet->tcp)
-	t.tuple.l4_src_port = packet->tcp->source, t.tuple.l4_dst_port = packet->tcp->dest;
+	t.tuple.l4_src_port = packet->tcp->source, t.tuple.l4_dst_port = packet->tcp->dest;      
       else if(packet->udp)
 	t.tuple.l4_src_port = packet->udp->source, t.tuple.l4_dst_port = packet->udp->dest;
 
@@ -9879,7 +9930,7 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
       change_category(flow, ret_match.protocol_category);
 
     if(subproto == NDPI_PROTOCOL_OOKLA) {
-	ookla_add_to_cache(ndpi_struct, flow);
+      ookla_add_to_cache(ndpi_struct, flow);
     }
 
     return(1);
@@ -10147,8 +10198,11 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 	 flow->detected_protocol_stack[1],
 	 !!flow->extra_packets_func);
 
-  if(!flow->extra_packets_func)
+  if(!flow->extra_packets_func) {
+    ndpi_check_probing_attempt(flow);
     return(0);
+  }
+  
   return(1);
 }
 

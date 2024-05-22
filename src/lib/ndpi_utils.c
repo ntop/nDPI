@@ -2094,6 +2094,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_BINARY_DATA_TRANSFER:
     return("Binary file/data transfer (attempt)");
 
+  case NDPI_PROBING_ATTEMPT:
+    return("Probing attempt");
+    
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);

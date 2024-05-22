@@ -331,6 +331,12 @@ Client contacted a server host labelled as malware.
 
 .. _Risk 054:
 
-NDPI_BINARY_TRANSFER_ATTEMPT
+NDPI_BINARY_DATA_TRANSFER
 ============================
 HTTP only: this risk indicates that a binary file/data application transfer (attempt).
+
+.. _Risk 055:
+
+NDPI_PROBING_ATTEMPT
+====================
+Connection with no data exchagef that looks like a probing attempt

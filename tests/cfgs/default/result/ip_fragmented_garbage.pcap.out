@@ -27,4 +27,4 @@ Unrated                          4 216           1
 
 
 Undetected flows:
-	1	TCP 10.0.0.2:0 -> 10.128.0.2:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 4][4 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][0.91 sec][PLAIN TEXT (hdflkda)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 10.0.0.2:0 -> 10.128.0.2:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 4][4 pkts/216 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][0.91 sec][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][PLAIN TEXT (hdflkda)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

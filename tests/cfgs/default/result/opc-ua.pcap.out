@@ -24,4 +24,4 @@ OPC-UA	381	45578	1
 
 Acceptable                     381 45578         1            
 
-	1	TCP 127.0.0.1:57420 <-> 127.0.0.1:4840 [proto: 360/OPC-UA][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: IoT-Scada/31][191 pkts/23255 bytes <-> 190 pkts/22323 bytes][Goodput ratio: 54/52][0.01 sec][bytes ratio: 0.020 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 122/117 222/664 68/84][PLAIN TEXT (opc.tcp)][Plen Bins: 0,0,26,23,45,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 127.0.0.1:57420 <-> 127.0.0.1:4840 [proto: 360/OPC-UA][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: IoT-Scada/31][191 pkts/23255 bytes <-> 190 pkts/22323 bytes][Goodput ratio: 54/52][0.01 sec][bytes ratio: 0.020 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 56/56 122/117 222/664 68/84][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][PLAIN TEXT (opc.tcp)][Plen Bins: 0,0,26,23,45,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

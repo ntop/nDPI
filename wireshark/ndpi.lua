@@ -93,6 +93,7 @@ flow_risks[51] = ProtoField.bool("ndpi.flow_risk.fully_encrypted", "Fully encryp
 flow_risks[52] = ProtoField.bool("ndpi.flow_risk.tls_alpn_sni_mismatch", "ALPN/SNI Mismatch", num_bits_flow_risks, nil, bit(20), "nDPI Flow Risk: ALPN/SNI Mismatch")
 flow_risks[53] = ProtoField.bool("ndpi.flow_risk.malware_contact", "Contact with a malware host", num_bits_flow_risks, nil, bit(21), "nDPI Flow Risk: Malware host contacted")
 flow_risks[54] = ProtoField.bool("ndpi.flow_risk.binary_data_transfer", "Attempt to transfer a binary file", num_bits_flow_risks, nil, bit(21), "nDPI Flow Risk: binary data file transfer")
+flow_risks[55] = ProtoField.bool("ndpi.flow_risk.probing_attempt", "Probing attempt", num_bits_flow_risks, nil, bit(22), "nDPI Flow Risk: probing attempt")
 
 -- Last one: keep in sync the bitmask when adding new risks!!
 flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(20))

@@ -458,11 +458,11 @@ void ndpi_flow_info_freer(void *node) {
 /* ***************************************************** */
 
 static void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
-
   if(flow->dhcp_fingerprint) {
     ndpi_free(flow->dhcp_fingerprint);
     flow->dhcp_fingerprint = NULL;
   }
+  
   if(flow->dhcp_class_ident) {
     ndpi_free(flow->dhcp_class_ident);
     flow->dhcp_class_ident = NULL;
@@ -477,6 +477,7 @@ static void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
     ndpi_free(flow->telnet.username);
     flow->telnet.username = NULL;
   }
+  
   if(flow->telnet.password) {
     ndpi_free(flow->telnet.password);
     flow->telnet.password = NULL;

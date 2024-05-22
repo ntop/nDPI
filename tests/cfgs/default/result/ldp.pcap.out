@@ -25,6 +25,6 @@ LDP	7	946	3
 
 Acceptable                       7 946           3            
 
-	1	TCP 10.0.1.1:45334 <-> 10.0.0.6:646 [proto: 409/LDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/366 bytes <-> 2 pkts/352 bytes][Goodput ratio: 70/69][0.13 sec][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 10.0.1.1:45334 <-> 10.0.0.6:646 [proto: 409/LDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/366 bytes <-> 2 pkts/352 bytes][Goodput ratio: 70/69][0.13 sec][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: No server to client traffic / TCP connection with unidirectional traffic][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 10.0.0.2:646 -> 224.0.0.2:646 [proto: 409/LDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/152 bytes -> 0 pkts/0 bytes][Goodput ratio: 44/0][4.08 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 10.0.0.1:646 -> 224.0.0.2:646 [proto: 409/LDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/76 bytes -> 0 pkts/0 bytes][Goodput ratio: 44/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

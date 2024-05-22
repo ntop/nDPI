@@ -24,4 +24,4 @@ WebSocket	5	441	1
 
 Acceptable                       5 441           1            
 
-	1	TCP 192.168.43.135:12345 <-> 192.168.43.1:50999 [proto: 251/WebSocket][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Web/5][3 pkts/294 bytes <-> 2 pkts/147 bytes][Goodput ratio: 45/26][77.63 sec][PLAIN TEXT (Welcome)][Plen Bins: 60,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.43.135:12345 <-> 192.168.43.1:50999 [proto: 251/WebSocket][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Web/5][3 pkts/294 bytes <-> 2 pkts/147 bytes][Goodput ratio: 45/26][77.63 sec][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: No server to client traffic / TCP connection with unidirectional traffic][PLAIN TEXT (Welcome)][Plen Bins: 60,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
