@@ -185,7 +185,7 @@ typedef enum {
   NDPI_PROTOCOL_LLMNR                 = 154,
   NDPI_PROTOCOL_TOCA_BOCA             = 155,
   NDPI_PROTOCOL_SPOTIFY               = 156,
-  NDPI_PROTOCOL_MESSENGER             = 157,
+  NDPI_PROTOCOL_FACEBOOK_MESSENGER    = 157,
   NDPI_PROTOCOL_H323                  = 158,
   NDPI_PROTOCOL_OPENVPN               = 159,
   NDPI_PROTOCOL_NOE                   = 160,
