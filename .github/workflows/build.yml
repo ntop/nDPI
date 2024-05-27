@@ -30,7 +30,7 @@ jobs:
       - name: Build nDPI library
         run: |
           ./autogen.sh
-          make
+          make -j
           sudo make install
       - name: Generate Python bindings
         run: |
@@ -271,29 +271,7 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap
-      - name: Setup Windows msys2 prerequisites (libgcrypt)
-        if: startsWith(matrix.os, 'windows') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
-        run: |
-          msys2 -c 'git clone --branch libgpg-error-1.42 https://github.com/gpg/libgpg-error'
-          cd libgpg-error
-          msys2 -c './autogen.sh'
-          msys2 -c './configure -enable-maintainer-mode --enable-static --enable-shared --with-pic --disable-doc --disable-nls'
-          msys2 -c 'make'
-          msys2 -c 'make install'
-          msys2 -c 'cd ..'
-          msys2 -c 'rm -rf libgpg-error/'
-          msys2 -c 'git clone --branch libgcrypt-1.8.8 https://github.com/gpg/libgcrypt'
-          cd libgcrypt
-          msys2 -c './autogen.sh'
-          msys2 -c './configure -enable-maintainer-mode --enable-static --enable-shared --with-pic --disable-doc'
-          msys2 -c 'make'
-          msys2 -c 'make install'
-          msys2 -c 'cd ..'
-          msys2 -c 'rm -rf libgcrypt/'
-        env:
-          CC:
-          CFLAGS:
+          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap mingw-w64-x86_64-libgcrypt parallel
       - name: Installing MacOS prerequisites
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.arch, 'x86_64')
         run: |
@@ -330,7 +308,7 @@ jobs:
       - name: Build nDPI on Windows msys2
         if: startsWith(matrix.os, 'windows') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.compiler, 'cc')
         run: |
-          msys2 -c 'make all'
+          msys2 -c 'make -j all'
           msys2 -c 'ldd ./example/ndpiReader.exe'
       - name: Build nDPI
         if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.os, 'macos-14')
@@ -341,7 +319,7 @@ jobs:
       - name: Build nDPI (MacOS M1)
         if: startsWith(matrix.os, 'macos-14')
         run: |
-          make all
+          make -j all
           make -C example ndpiSimpleIntegration
           #There are somes issues with librrd
           #make -C rrdtool
@@ -376,7 +354,7 @@ jobs:
       - name: Test nDPI [DIFF] (runs only on windows jobs)
         if: startsWith(matrix.arch, 'x86_64') && startsWith(matrix.os, 'windows')
         run: |
-          msys2 -c './tests/do.sh'
+          msys2 -c 'NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh'
       - name: Test nDPI [UNIT] (runs only on windows jobs)
         if: startsWith(matrix.arch, 'x86_64') && startsWith(matrix.os, 'windows')
         run: |
@@ -395,7 +373,7 @@ jobs:
         run: |
           make distclean
           ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --host=x86_64-w64-mingw32
-          make all
+          make -j $(nproc) all
         env:
           CC:
       - name: Display qemu specified architecture (arm64 - little endian)
