@@ -829,3 +829,12 @@ References: `Main site: <https://www.threads.net>`_
 Audio/video calls made using the Viber app.
 
 References: `Wikipedia <https://en.wikipedia.org/wiki/Viber>`_
+
+
+.. _Proto 415:
+
+`NDPI_PROTOCOL_ZUG`
+=========================
+The ZUG protocol is part of the Casper 2.0 consensus model.
+
+References: `Main Site <https://casperlabs.io>`_ and `Blog Post <https://casperlabs.io/blog/beyond-eth-30-theres-casper-20>`_

@@ -1,0 +1,39 @@
+DPI Packets (UDP):	7	(1.00 pkts/flow)
+Confidence Unknown          : 1 (flows)
+Confidence DPI              : 6 (flows)
+Num dissector calls: 987 (141.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache stun_zoom:  0/1/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   12/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        6/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   13/2 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Unknown	1	452	1
+ZUG	6	984	6
+
+Acceptable                       6 984           6            
+Unrated                          1 452           1            
+
+	1	UDP 52.104.45.69:44174 -> 53.52.158.15:19000 [proto: 415/ZUG][IP: 221/MS_OneDrive][Encrypted][Confidence: DPI][DPI packets: 1][cat: Crypto_Currency/106][1 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 74.90.102.55:44370 -> 17.218.251.92:19000 [proto: 415/ZUG][IP: 140/Apple][Encrypted][Confidence: DPI][DPI packets: 1][cat: Crypto_Currency/106][1 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 117.220.197.41:37556 -> 44.22.132.225:19000 [proto: 415/ZUG][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Crypto_Currency/106][1 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 173.46.102.72:41686 -> 204.88.149.147:19000 [proto: 415/ZUG][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Crypto_Currency/106][1 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 197.130.35.95:39594 -> 163.40.238.205:19000 [proto: 415/ZUG][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Crypto_Currency/106][1 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 225.110.130.102:44066 -> 133.150.105.134:19000 [proto: 415/ZUG][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Crypto_Currency/106][1 pkts/164 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	UDP 61.59.105.181:19000 -> 199.24.15.231:48793 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 1][1 pkts/452 bytes -> 0 pkts/0 bytes][Goodput ratio: 91/0][< 1 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic / Entropy: 7.458 (Encrypted or Random?)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
