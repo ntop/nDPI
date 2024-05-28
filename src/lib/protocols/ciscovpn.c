@@ -39,14 +39,11 @@ static void ndpi_int_ciscovpn_add_connection(struct ndpi_detection_module_struct
 static void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int16_t udport = 0, usport = 0;
+  u_int16_t udport, usport;
 
   NDPI_LOG_DBG(ndpi_struct, "search CISCOVPN\n");
 
-  if(packet->udp != NULL) {
-    usport = ntohs(packet->udp->source), udport = ntohs(packet->udp->dest);
-    NDPI_LOG_DBG2(ndpi_struct, "calculated CISCOVPN over udp ports\n");
-  }
+  usport = ntohs(packet->udp->source), udport = ntohs(packet->udp->dest);
 
   if((usport == 10000 && udport == 10000)) {
     if((packet->payload_packet_len >= 4) &&
@@ -73,7 +70,7 @@ void init_ciscovpn_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
   ndpi_set_bitmask_protocol_detection("CiscoVPN", ndpi_struct, *id,
 				      NDPI_PROTOCOL_CISCOVPN,
 				      ndpi_search_ciscovpn,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
   *id += 1;
