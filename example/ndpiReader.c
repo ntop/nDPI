@@ -5957,6 +5957,7 @@ void domainSearchUnitTest() {
   ndpi_domain_classify_add(ndpi_str, sc, NDPI_PROTOCOL_NTOP, ".ntop.org");
   ndpi_domain_classify_add(ndpi_str, sc, NDPI_PROTOCOL_NTOP, domain);
   assert(ndpi_domain_classify_hostname(ndpi_str, sc, &class_id, domain));
+  assert(class_id == NDPI_PROTOCOL_NTOP);
 
   ndpi_domain_classify_add(ndpi_str, sc, NDPI_PROTOCOL_CATEGORY_GAMBLING, "123vc.club");
   assert(ndpi_domain_classify_hostname(ndpi_str, sc, &class_id, "123vc.club"));
@@ -5965,17 +5966,6 @@ void domainSearchUnitTest() {
   /* Subdomain check */
   assert(ndpi_domain_classify_hostname(ndpi_str, sc, &class_id, "blog.ntop.org"));
   assert(class_id == NDPI_PROTOCOL_NTOP);
-
-#ifdef DEBUG_TRACE
-  struct stat st;
-
-  if(stat(fname, &st) == 0) {
-    u_int32_t s = ndpi_domain_classify_size(ndpi_str, sc);
-
-    printf("Size: %u [%.1f %% of the original filename size]\n",
-	   s, (float)(s * 100) / (float)st.st_size);
-  }
-#endif
 
   ndpi_domain_classify_free(sc);
   ndpi_exit_detection_module(ndpi_str);
