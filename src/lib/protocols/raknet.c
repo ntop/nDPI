@@ -295,7 +295,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
         if (frame_offset == packet->payload_packet_len)
         {
           /* This packet might also be a RTP/RTCP one: give precedence to RTP/RTCP dissector */
-          if(flow->l4.udp.rtp_stage == 0 && flow->l4.udp.rtcp_stage == 0)
+          if(flow->rtp_stage == 0 && flow->rtcp_stage == 0)
             ndpi_int_raknet_add_connection(ndpi_struct, flow);
         } else {
           exclude_proto(ndpi_struct, flow);
@@ -366,7 +366,7 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
         if (record_index == record_count && record_offset == packet->payload_packet_len)
         {
           /* This packet might also be a RTP/RTCP one: give precedence to RTP/RTCP dissector */
-          if(flow->l4.udp.rtp_stage == 0 && flow->l4.udp.rtcp_stage == 0)
+          if(flow->rtp_stage == 0 && flow->rtcp_stage == 0)
             ndpi_int_raknet_add_connection(ndpi_struct, flow);
         } else {
           exclude_proto(ndpi_struct, flow);

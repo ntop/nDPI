@@ -228,7 +228,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
 #endif
   if ((protobuf_elements >= PROTOBUF_REQUIRED_ELEMENTS && protobuf_len_elements > 0 &&
        /* (On UDP) this packet might be also a RTP/RTCP one. Wait for the next one */
-       (flow->packet_counter > 1 || flow->l4_proto == IPPROTO_TCP || flow->l4.udp.rtp_stage == 0))
+       (flow->packet_counter > 1 || flow->l4_proto == IPPROTO_TCP || flow->rtp_stage == 0))
       || (flow->packet_counter >= PROTOBUF_MIN_PACKETS && protobuf_elements >= PROTOBUF_MIN_ELEMENTS))
   {
 #ifdef DEBUG_PROTOBUF
