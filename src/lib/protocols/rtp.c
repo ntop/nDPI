@@ -83,23 +83,16 @@ static int is_valid_rtcp_payload_type(uint8_t type) {
   return (type >= 192 && type <= 213);
 }
 
-int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t *seq)
+int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
+                   const u_int8_t *payload, u_int16_t payload_len, u_int16_t *seq)
 {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t csrc_count, ext_header;
   u_int16_t ext_len;
   u_int32_t min_len;
-  const u_int8_t *payload = packet->payload;
-  u_int16_t payload_len = packet->payload_packet_len;
 
   if(payload_len < 2)
     return NO_RTP_RTCP;
   
-  if(packet->tcp != NULL) {
-    payload_len -= 2;
-    payload += 2; /* Skip the length field */
-  }
-
   if((payload[0] & 0xC0) != 0x80) { /* Version 2 */
     NDPI_LOG_DBG(ndpi_struct, "Not version 2\n");
     return NO_RTP_RTCP;
@@ -149,10 +142,12 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t is_rtp;
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *payload = packet->payload;
+  u_int16_t payload_len = packet->payload_packet_len;
   u_int16_t seq;
 
   if(packet->tcp != NULL) {
       payload += 2; /* Skip the length field */
+      payload_len -= 2;
   }
   NDPI_LOG_DBG(ndpi_struct, "search RTP (stage %d/%d)\n", flow->rtp_stage, flow->rtcp_stage);
 
@@ -169,7 +164,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  is_rtp = is_rtp_or_rtcp(ndpi_struct, &seq);
+  is_rtp = is_rtp_or_rtcp(ndpi_struct, payload, payload_len, &seq);
 
   if(is_rtp == IS_RTP) {
     if(flow->rtp_stage == 2) {
