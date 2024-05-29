@@ -698,65 +698,60 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
          positives. In that case, the TLS dissector doesn't set the master protocol, so we
          need to rollback to the current state */
 
-      if(packet->tcp) {
-        /* TODO: TLS code assumes that DTLS is only over UDP */
-        NDPI_LOG_DBG(ndpi_struct, "Ignoring DTLS over TCP\n");
+      if(flow->tls_quic.certificate_processed == 1) {
+        NDPI_LOG_DBG(ndpi_struct, "Interesting DTLS stuff already processed. Ignoring\n");
       } else {
-        if(flow->tls_quic.certificate_processed == 1) {
-          NDPI_LOG_DBG(ndpi_struct, "Interesting DTLS stuff already processed. Ignoring\n");
-        } else {
-          NDPI_LOG_DBG(ndpi_struct, "Switch to DTLS (%d/%d)\n",
-                       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+        NDPI_LOG_DBG(ndpi_struct, "Switch to DTLS (%d/%d)\n",
+                     flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
 
-          if(flow->stun.maybe_dtls == 0) {
-            /* First DTLS packet of the flow */
-            first_dtls_pkt = 1;
+        if(flow->stun.maybe_dtls == 0) {
+          /* First DTLS packet of the flow */
+          first_dtls_pkt = 1;
 
-	    /* We might need to rollback this change... */
-	    old_proto_stack[0] = flow->detected_protocol_stack[0];
-	    old_proto_stack[1] = flow->detected_protocol_stack[1];
+          /* We might need to rollback this change... */
+          old_proto_stack[0] = flow->detected_protocol_stack[0];
+          old_proto_stack[1] = flow->detected_protocol_stack[1];
 
-            /* TODO: right way? It is a bit scary... do we need to reset something else too? */
-            reset_detected_protocol(flow);
-            /* We keep the category related to STUN traffic */
-	    /* STUN often triggers this risk; clear it. TODO: clear other risks? */
-	    ndpi_unset_risk(flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+          /* TODO: right way? It is a bit scary... do we need to reset something else too? */
+          reset_detected_protocol(flow);
+          /* We keep the category related to STUN traffic */
+          /* STUN often triggers this risk; clear it. TODO: clear other risks? */
+          ndpi_unset_risk(flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
 
-            /* Give room for DTLS handshake, where we might have
-               retransmissions and fragments */
-            flow->max_extra_packets_to_check = ndpi_min(255, (int)flow->max_extra_packets_to_check + 10);
-            flow->stun.maybe_dtls = 1;
-	  }
-
-	  switch_to_tls(ndpi_struct, flow, first_dtls_pkt);
-
-	  if(first_dtls_pkt &&
-             flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DTLS &&
-             flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
-             old_proto_stack[0] != NDPI_PROTOCOL_UNKNOWN &&
-             old_proto_stack[0] != NDPI_PROTOCOL_STUN) {
-            NDPI_LOG_DBG(ndpi_struct, "Keeping old subclassification %d\n", old_proto_stack[0]);
-            ndpi_int_stun_add_connection(ndpi_struct, flow,
-                                         old_proto_stack[0] == NDPI_PROTOCOL_RTP ? NDPI_PROTOCOL_SRTP : old_proto_stack[0],
-                                         __get_master(flow));
-	  }
-
-	  /* If this is not a real DTLS packet, we need to restore the old state */
-          if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN &&
-             first_dtls_pkt) {
-            NDPI_LOG_DBG(ndpi_struct, "Switch to TLS failed. Rollback to old classification\n");
-
-            ndpi_set_detected_protocol(ndpi_struct, flow,
-                                       old_proto_stack[0], old_proto_stack[1],
-                                       NDPI_CONFIDENCE_DPI);
-
-            flow->stun.maybe_dtls = 0;
-            flow->max_extra_packets_to_check -= 10;
-          }
-
-	  NDPI_LOG_DBG(ndpi_struct, "(%d/%d)\n",
-                       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+          /* Give room for DTLS handshake, where we might have
+             retransmissions and fragments */
+          flow->max_extra_packets_to_check = ndpi_min(255, (int)flow->max_extra_packets_to_check + 10);
+          flow->stun.maybe_dtls = 1;
         }
+
+        switch_to_tls(ndpi_struct, flow, first_dtls_pkt);
+
+        if(first_dtls_pkt &&
+           flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DTLS &&
+           flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+           old_proto_stack[0] != NDPI_PROTOCOL_UNKNOWN &&
+           old_proto_stack[0] != NDPI_PROTOCOL_STUN) {
+          NDPI_LOG_DBG(ndpi_struct, "Keeping old subclassification %d\n", old_proto_stack[0]);
+          ndpi_int_stun_add_connection(ndpi_struct, flow,
+                                       old_proto_stack[0] == NDPI_PROTOCOL_RTP ? NDPI_PROTOCOL_SRTP : old_proto_stack[0],
+                                       __get_master(flow));
+        }
+
+        /* If this is not a real DTLS packet, we need to restore the old state */
+        if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN &&
+           first_dtls_pkt) {
+          NDPI_LOG_DBG(ndpi_struct, "Switch to TLS failed. Rollback to old classification\n");
+
+          ndpi_set_detected_protocol(ndpi_struct, flow,
+                                     old_proto_stack[0], old_proto_stack[1],
+                                     NDPI_CONFIDENCE_DPI);
+
+          flow->stun.maybe_dtls = 0;
+          flow->max_extra_packets_to_check -= 10;
+        }
+
+        NDPI_LOG_DBG(ndpi_struct, "(%d/%d)\n",
+                     flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
       }
     }
   } else if(first_byte <= 79) {

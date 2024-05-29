@@ -119,7 +119,9 @@ static u_int32_t ndpi_tls_refine_master_protocol(struct ndpi_detection_module_st
     u_int16_t sport = ntohs(packet->tcp->source);
     u_int16_t dport = ntohs(packet->tcp->dest);
 
-    if((sport == 465) || (dport == 465) || (sport == 587) || (dport == 587))
+    if(flow->stun.maybe_dtls)
+      protocol = NDPI_PROTOCOL_DTLS;
+    else if((sport == 465) || (dport == 465) || (sport == 587) || (dport == 587))
       protocol = NDPI_PROTOCOL_MAIL_SMTPS;
     else if((sport == 993) || (dport == 993) || (flow->l4.tcp.mail_imap_starttls))
       protocol = NDPI_PROTOCOL_MAIL_IMAPS;
@@ -770,7 +772,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  int is_dtls = packet->udp ? 1 : 0;
+  int is_dtls = packet->udp || flow->stun.maybe_dtls; /* No certificate with QUIC */
   u_int32_t certificates_length, length = (packet->payload[1] << 16) + (packet->payload[2] << 8) + packet->payload[3];
   u_int32_t certificates_offset = 7 + (is_dtls ? 8 : 0);
   u_int8_t num_certificates_found = 0;
@@ -899,6 +901,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
                            struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int ret;
+  int is_dtls = packet->udp || flow->stun.maybe_dtls;
 
 #ifdef DEBUG_TLS
   printf("[TLS] Processing block %u\n", packet->payload[0]);
@@ -918,11 +921,11 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
 	   (packet->payload[0] == 0x01) ? "Client" : "Server");
 #endif
 
-    if((packet->tcp && flow->protos.tls_quic.ssl_version >= 0x0304 /* TLS 1.3 */)
+    if((!is_dtls && flow->protos.tls_quic.ssl_version >= 0x0304 /* TLS 1.3 */)
        && (packet->payload[0] == 0x02 /* Server Hello */)) {
       flow->tls_quic.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
     }
-    if((packet->udp && flow->protos.tls_quic.ssl_version == 0xFEFC /* DTLS 1.3 */)
+    if((is_dtls && flow->protos.tls_quic.ssl_version == 0xFEFC /* DTLS 1.3 */)
        && (packet->payload[0] == 0x02 /* Server Hello */)) {
       flow->tls_quic.certificate_processed = 1; /* No Certificate with DTLS 1.3+ */
     }
@@ -1655,7 +1658,7 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
   u_int16_t tls_handshake_version = ja->client.tls_handshake_version;
   char * const ja_str = &flow->protos.tls_quic.ja4_client[0];
   const u_int16_t ja_max_len = sizeof(flow->protos.tls_quic.ja4_client);
-  bool is_dtls = (flow->l4_proto == IPPROTO_UDP) && (quic_version == 0);
+  bool is_dtls = ((flow->l4_proto == IPPROTO_UDP) && (quic_version == 0)) || flow->stun.maybe_dtls;
   /*
     Compute JA4 TLS/QUIC client
 
@@ -1815,7 +1818,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
   u_int16_t total_len;
   u_int8_t handshake_type;
   bool is_quic = (quic_version != 0);
-  bool is_dtls = packet->udp && (!is_quic);
+  bool is_dtls = (packet->udp && !is_quic) || flow->stun.maybe_dtls;
 
 #ifdef DEBUG_TLS
   printf("TLS %s() called\n", __FUNCTION__);
@@ -2964,7 +2967,7 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
 	 flow->protos.tls_quic.ssl_version);
 #endif
 
-  if(packet->udp != NULL)
+  if(packet->udp != NULL || flow->stun.maybe_dtls)
     ndpi_search_tls_udp(ndpi_struct, flow);
   else
     ndpi_search_tls_tcp(ndpi_struct, flow);
