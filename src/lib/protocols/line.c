@@ -83,7 +83,7 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
       /* It might be a RTP/RTCP packet. Ignore it and keep looking for the
          LINE packet numbers */
       /* Basic RTP detection */
-      rc = is_rtp_or_rtcp(ndpi_struct, NULL);
+      rc = is_rtp_or_rtcp(ndpi_struct, packet->payload, packet->payload_packet_len, NULL);
       if(rc == IS_RTCP || rc == IS_RTP) {
         if(flow->packet_counter < 10) {
           NDPI_LOG_DBG(ndpi_struct, "Probably RTP; keep looking for LINE\n");
