@@ -5950,6 +5950,7 @@ void domainSearchUnitTest() {
   char *domain = "ntop.org";
   u_int16_t class_id;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
+  u_int8_t trace = 0;
 
   assert(ndpi_str);
   assert(sc);
@@ -5966,6 +5967,10 @@ void domainSearchUnitTest() {
   /* Subdomain check */
   assert(ndpi_domain_classify_hostname(ndpi_str, sc, &class_id, "blog.ntop.org"));
   assert(class_id == NDPI_PROTOCOL_NTOP);
+
+  u_int32_t s = ndpi_domain_classify_size(sc);
+  if(trace) printf("ndpi_domain_classify size: %u \n",s);
+  
 
   ndpi_domain_classify_free(sc);
   ndpi_exit_detection_module(ndpi_str);
