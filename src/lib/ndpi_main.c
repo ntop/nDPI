@@ -8315,6 +8315,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   if((!flow) || (!ndpi_str) || (ndpi_str->finalized != 1))
     return(ret);
 
+  flow->num_processed_pkts++;
   packet = &ndpi_str->packet;
 
   NDPI_LOG_DBG(ndpi_str, "[%d/%d] START packet processing\n",
@@ -8337,7 +8338,6 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     return(ret); /* Avoid spending too much time with this flow */
   }
 
-  flow->num_processed_pkts++;
   ndpi_str->current_ts = current_time_ms;
 
   /* Init default */
