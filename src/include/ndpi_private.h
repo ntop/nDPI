@@ -259,6 +259,8 @@ struct ndpi_detection_module_config_struct {
 
   int zoom_max_packets_extra_dissection;
 
+  int rtp_search_for_stun;
+
   NDPI_PROTOCOL_BITMASK debug_bitmask;
   NDPI_PROTOCOL_BITMASK ip_list_bitmask;
 
@@ -666,6 +668,7 @@ int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct
 int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
             struct ndpi_flow_struct *flow,
             u_int16_t *app_proto);
+void switch_extra_dissection_to_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
 /* TPKT */
 int tpkt_verify_hdr(const struct ndpi_packet_struct * const packet);

@@ -1,1 +1,1 @@
---cfg=stun,max_packets_extra_dissection,255 -U 0 -T 0 --cfg=packets_limit_per_flow,255
+--cfg=stun,max_packets_extra_dissection,255 -U 0 -T 0 --cfg=packets_limit_per_flow,255 --cfg=rtp,search_for_stun,1
