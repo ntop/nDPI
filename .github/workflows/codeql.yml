@@ -51,7 +51,7 @@ jobs:
 
       - name: Build nDPI library
         run: |
-          make
+          make -j
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
