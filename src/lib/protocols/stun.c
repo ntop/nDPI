@@ -347,6 +347,14 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
     payload_length -=2;
   }
 
+  /* Microsoft Multiplexed TURN messages */
+  if(payload_length >= STUN_HDR_LEN + 12 &&
+     ntohs(get_u_int16_t(payload, 0)) == 0xFF10 &&
+     ntohs(get_u_int16_t(payload, 2)) + 4 == payload_length) {
+    payload += 12;
+    payload_length -= 12;
+  }
+
   msg_type = ntohs(*((u_int16_t *)&payload[0]));
   msg_len = ntohs(*((u_int16_t *)&payload[2]));
   magic_cookie = ntohl(*((u_int32_t *)&payload[4]));
@@ -823,7 +831,39 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
       NDPI_LOG_DBG(ndpi_struct, "Unexpected\n");
     }
   } else {
-    NDPI_LOG_DBG(ndpi_struct, "QUIC range. Unexpected\n");
+    /* Microsoft Multiplexed TURN messages.
+       See: https://msopenspecs.azureedge.net/files/MS-TURN/%5bMS-TURN%5d.pdf 2.2.3 */
+    if(packet->payload_packet_len >= 12 &&
+       ntohs(get_u_int16_t(packet->payload, 0)) == 0xFF10 &&
+       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
+      u_int16_t ch_len;
+
+      ch_len = ntohs(get_u_int16_t(packet->payload, 2));
+
+      if(ch_len == packet->payload_packet_len - 4 &&
+         ch_len >= 8) {
+        const u_int8_t *orig_payload;
+        u_int16_t orig_payload_length;
+
+        orig_payload = packet->payload;
+        orig_payload_length = packet->payload_packet_len;
+        packet->payload = packet->payload + 12;
+        packet->payload_packet_len = ch_len - 8;
+
+        stun_search_again(ndpi_struct, flow);
+
+        NDPI_LOG_DBG(ndpi_struct, "End recursion on MS channel\n");
+
+        packet->payload = orig_payload;
+        packet->payload_packet_len = orig_payload_length;
+
+      } else {
+        NDPI_LOG_ERR(ndpi_struct, "Invalid MS channel length %d %d\n",
+                     ch_len, packet->payload_packet_len - 4);
+      }
+    } else {
+      NDPI_LOG_DBG(ndpi_struct, "QUIC other range. Unexpected\n");
+    }
   }
   return keep_extra_dissection(ndpi_struct, flow);
 }
