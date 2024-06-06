@@ -188,7 +188,7 @@ jobs:
             gcrypt: ""
             pcre: ""
             maxminddb: ""
-            msan: "" # Disable sanitizer on macos
+            msan: "--with-sanitizer"
             nBPF: ""
           - compiler: "cc"
             os: ubuntu-latest
