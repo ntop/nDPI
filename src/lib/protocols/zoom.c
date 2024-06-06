@@ -55,8 +55,9 @@ static void ndpi_int_zoom_add_connection(struct ndpi_detection_module_struct *nd
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM, master, NDPI_CONFIDENCE_DPI);
 
   /* Keep looking for RTP. It is similar to the STUN logic... */
-  if(master == NDPI_PROTOCOL_UNKNOWN) {
-    flow->max_extra_packets_to_check = 4;
+  if(master == NDPI_PROTOCOL_UNKNOWN &&
+     ndpi_struct->cfg.zoom_max_packets_extra_dissection > 0) {
+    flow->max_extra_packets_to_check = ndpi_struct->cfg.zoom_max_packets_extra_dissection;
     flow->extra_packets_func = zoom_search_again;
   }
 }
@@ -70,6 +71,50 @@ static int is_zoom_port(struct ndpi_flow_struct *flow)
   return 0;
 }
 
+static int is_zme(struct ndpi_flow_struct *flow,
+                  const u_char *payload, u_int16_t payload_len)
+{
+  if(payload_len > sizeof(struct zoom_media_enc)) {
+    struct zoom_media_enc *enc = (struct zoom_media_enc *)payload;
+
+    switch(enc->enc_type) {
+    case 13: /* Screen Share */
+    case 30: /* Screen Share */
+      if(payload_len >= 27) {
+        flow->flow_multimedia_type = ndpi_multimedia_screen_sharing_flow;
+        return 1;
+      }
+      break;
+
+    case 15: /* RTP Audio */
+      if(payload_len >= 27) {
+        flow->flow_multimedia_type = ndpi_multimedia_audio_flow;
+        return 1;
+      }
+      break;
+
+    case 16: /* RTP Video */
+      if(payload_len >= 32) {
+        flow->flow_multimedia_type = ndpi_multimedia_video_flow;
+        return 1;
+      }
+      break;
+
+    case 33: /* RTCP */
+    case 34: /* RTCP */
+    case 35: /* RTCP */
+      if(payload_len >= 36) {
+        return 1;
+      }
+      break;
+
+    default:
+      return 0;
+    }
+  }
+  return 0;
+}
+
 static int is_sfu_5(struct ndpi_detection_module_struct *ndpi_struct,
                     struct ndpi_flow_struct *flow)
 {
@@ -79,42 +124,8 @@ static int is_sfu_5(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->payload[0] == 0x05 &&
      packet->payload_packet_len > sizeof(struct zoom_sfu_enc) +
                                   sizeof(struct zoom_media_enc)) {
-    struct zoom_media_enc *enc = (struct zoom_media_enc *)&packet->payload[sizeof(struct zoom_sfu_enc)];
-
-    switch(enc->enc_type) {
-    case 13: /* Screen Share */
-    case 30: /* Screen Share */
-      if(packet->payload_packet_len >= 27) {
-        flow->flow_multimedia_type = ndpi_multimedia_screen_sharing_flow;
-        return 1;
-      }
-      break;
-
-    case 15: /* RTP Audio */
-      if(packet->payload_packet_len >= 27) {
-        flow->flow_multimedia_type = ndpi_multimedia_audio_flow;
-        return 1;
-      }
-      break;
-
-    case 16: /* RTP Video */
-      if(packet->payload_packet_len >= 32) {
-        flow->flow_multimedia_type = ndpi_multimedia_video_flow;
-        return 1;
-      }
-      break;
-
-    case 33: /* RTCP */
-    case 34: /* RTCP */
-    case 35: /* RTCP */
-      if(packet->payload_packet_len >= 36) {
-        return 1;
-      }
-      break;
-
-    default:
-      return 1;
-    }
+    return is_zme(flow, &packet->payload[sizeof(struct zoom_sfu_enc)],
+                  packet->payload_packet_len - sizeof(struct zoom_sfu_enc));
   }
   return 0;
 }
@@ -122,7 +133,14 @@ static int is_sfu_5(struct ndpi_detection_module_struct *ndpi_struct,
 static int zoom_search_again(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow)
 {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
   if(is_sfu_5(ndpi_struct, flow)) {
+    ndpi_int_zoom_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SRTP);
+    return 0; /* Stop */
+  }
+  if(flow->l4.udp.zoom_p2p &&
+     is_zme(flow, packet->payload, packet->payload_packet_len)) {
     ndpi_int_zoom_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SRTP);
     return 0; /* Stop */
   }
@@ -136,6 +154,7 @@ static void ndpi_search_zoom(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t tomatch_a[] = { 0x01, 0x00, 0x02 };  /* Other first pkt from the client */
   u_int8_t tomatch2[] = { 0x02, 0x00, 0x03 }; /* Usually first pkt from the server: useful with asymmetric traffic */
   u_int8_t tomatch2_a[] = { 0x02, 0x00, 0x02 }; /* Other first pkt from the server */
+  u_int8_t tomatch_p2p[] = { 0x1f, 0x02, 0x01 }; /* Usually first pkt for P2P connections */
 
   NDPI_LOG_DBG(ndpi_struct, "search Zoom\n");
 
@@ -161,6 +180,39 @@ static void ndpi_search_zoom(struct ndpi_detection_module_struct *ndpi_struct,
     } else if(is_sfu_5(ndpi_struct, flow)) {
       ndpi_int_zoom_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SRTP);
       return;
+    }
+  } else if(packet->payload_packet_len > 36 &&
+            memcmp(packet->payload, tomatch_p2p, 3) == 0 &&
+            *(u_int32_t *)&packet->payload[packet->payload_packet_len - 4] == 0) {
+    u_int32_t ip_len, uuid_len;
+
+    /* Check if it is a Peer-To-Peer call.
+       We have been identifing such flows using the "stun_zoom" LRU cache; let's
+       see if we are able to detect them properly via DPI.
+       According to the paper, P2P calls should use "Zoom Media Encapsulation"
+       header without any "Zoom SFU Encapsulation".
+       Looking at the traces, it seems that the packet structure is something like:
+       * ZME type 0x1F
+       * initial header 24 byte long, without any obvious sequence number field
+       * a Length-Value list of attributes (4 bytes length field)
+         * an ip address (as string)
+         * some kind of UUID
+       * 4 bytes as 0x00 at the end
+
+       TODO: if everything will work as expected, we can remove stun_zoom cache
+    */
+
+    ip_len = ntohl(*(u_int32_t *)&packet->payload[24]);
+
+    if(24 + 4 + ip_len + 4 < packet->payload_packet_len) {
+      uuid_len = ntohl(*(u_int32_t *)&packet->payload[24 + 4 + ip_len]);
+
+      if(packet->payload_packet_len == 24 + 4 + ip_len + 4 + uuid_len + 4) {
+        NDPI_LOG_DBG(ndpi_struct, "found P2P Zoom\n");
+        flow->l4.udp.zoom_p2p = 1;
+        ndpi_int_zoom_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
+        return;
+      }
     }
   }
 

@@ -909,6 +909,9 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_LOLWILDRIFT */
   u_int32_t lolwildrift_stage:1;
 
+  /* NDPI_PROTOCOL_ZOOM */
+  u_int32_t zoom_p2p:1;
+
   /* NDPI_PROTOCOL_EPICGAMES */
   u_int32_t epicgames_stage:1;
   u_int32_t epicgames_word;
