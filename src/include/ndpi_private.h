@@ -257,6 +257,8 @@ struct ndpi_detection_module_config_struct {
 
   int ookla_aggressiveness;
 
+  int zoom_max_packets_extra_dissection;
+
   NDPI_PROTOCOL_BITMASK debug_bitmask;
   NDPI_PROTOCOL_BITMASK ip_list_bitmask;
 
