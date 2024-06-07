@@ -135,6 +135,24 @@ int is_rtp_or_rtcp(struct ndpi_detection_module_struct *ndpi_struct,
   return NO_RTP_RTCP;
 }
 
+
+static void ndpi_int_rtp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+                                        struct ndpi_flow_struct *flow,
+                                        u_int16_t proto)
+{
+  ndpi_set_detected_protocol(ndpi_struct, flow,
+                             NDPI_PROTOCOL_UNKNOWN, proto,
+                             NDPI_CONFIDENCE_DPI);
+  if(ndpi_struct->cfg.rtp_search_for_stun) {
+    /* It makes sense to look for STUN only if we didn't capture the entire flow,
+       from the beginning */
+    if(!(flow->l4_proto == IPPROTO_TCP && ndpi_seen_flow_beginning(flow))) {
+      NDPI_LOG_DBG(ndpi_struct, "Enabling (STUN) extra dissection\n");
+      switch_extra_dissection_to_stun(ndpi_struct, flow);
+    }
+  }
+}
+
 /* *************************************************************** */
 
 static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
@@ -186,9 +204,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
         rtp_get_stream_type(payload[1] & 0x7F, &flow->flow_multimedia_type);
 
         NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow,
-                                   NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP,
-                                   NDPI_CONFIDENCE_DPI);
+        ndpi_int_rtp_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTP);
       }
       return;
     }
@@ -202,16 +218,14 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   } else if(is_rtp == IS_RTCP && flow->rtp_stage == 0) {
     if(flow->rtcp_stage == 3) {
       NDPI_LOG_INFO(ndpi_struct, "Found RTCP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow,
-                                 NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTCP,
-                                 NDPI_CONFIDENCE_DPI);
+      ndpi_int_rtp_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
       return;
     }
     flow->rtcp_stage += 1;
   } else {
     if(flow->rtp_stage || flow->rtcp_stage) {
-      u_int16_t app_proto; /* unused */
       u_int32_t unused;
+      u_int16_t app_proto = NDPI_PROTOCOL_UNKNOWN;
 
       /* TODO: we should switch to the demultiplexing-code in stun dissector */
       if(is_stun(ndpi_struct, flow, &app_proto) != 0 &&

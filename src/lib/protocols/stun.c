@@ -62,7 +62,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
 
 /* Valid classifications:
-    * STUN, DTLS, STUN/RTP, DTLS/SRTP
+    * STUN, DTLS, STUN/RTP, DTLS/SRTP, RTP or RTCP (the last two, only from RTP dissector)
     * STUN/APP, DTLS/APP, SRTP/APP ["real" sub-classification]
    The idea is:
     * the specific "real" application (WA/FB/Signal/...), if present, should
@@ -807,6 +807,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
       rtp_get_stream_type(packet->payload[1] & 0x7F, &flow->flow_multimedia_type);
 
       if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RTP &&
+         flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RTCP &&
          flow->detected_protocol_stack[1] != NDPI_PROTOCOL_SRTP) {
 
         if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
@@ -824,6 +825,11 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
                                        __get_master(flow) == NDPI_PROTOCOL_STUN ? NDPI_PROTOCOL_RTP: NDPI_PROTOCOL_SRTP,
                                        __get_master(flow));
         }
+      } else if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_RTCP &&
+                flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
+        /* From RTP dissector; if we have RTP and RTCP multiplexed together (but not STUN, yet) we always
+	   use RTP, as we do in RTP dissector */
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP, NDPI_CONFIDENCE_DPI);
       }
     } else if(rtp_rtcp == IS_RTCP) {
       NDPI_LOG_DBG(ndpi_struct, "RTCP\n");
@@ -971,9 +977,22 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
       confidence = NDPI_CONFIDENCE_DPI_CACHE;
       if(app_proto == NDPI_PROTOCOL_RTP)
         master_proto = NDPI_PROTOCOL_SRTP; /* STUN/RTP --> SRTP/APP */
+      if(master_proto == NDPI_PROTOCOL_RTP || master_proto == NDPI_PROTOCOL_RTCP)
+        master_proto = NDPI_PROTOCOL_SRTP; /* RTP|RTCP --> SRTP/APP */
       app_proto = new_app_proto;
     }
   }
+
+  /* From RTP dissector */
+  if(master_proto == NDPI_PROTOCOL_RTP || master_proto == NDPI_PROTOCOL_RTCP) {
+    if(app_proto == NDPI_PROTOCOL_UNKNOWN) {
+      app_proto = NDPI_PROTOCOL_RTP;
+      master_proto = NDPI_PROTOCOL_STUN; /* RTP|RTCP ->STUN/RTP */
+    } else {
+      master_proto = NDPI_PROTOCOL_SRTP;
+    }
+  }
+
   /* Adding only real subclassifications */
   if(is_subclassification_real_by_proto(app_proto))
     add_to_caches(ndpi_struct, flow, app_proto);
@@ -991,10 +1010,20 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
     }
   }
 
-  if(!flow->extra_packets_func && keep_extra_dissection(ndpi_struct, flow)) {
-    NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
-    flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
-    flow->extra_packets_func = stun_search_again;
+  switch_extra_dissection_to_stun(ndpi_struct, flow);
+}
+
+/* ************************************************************ */
+
+void switch_extra_dissection_to_stun(struct ndpi_detection_module_struct *ndpi_struct,
+				     struct ndpi_flow_struct *flow)
+{
+  if(!flow->extra_packets_func) {
+    if(keep_extra_dissection(ndpi_struct, flow)) {
+      NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
+      flow->max_extra_packets_to_check = ndpi_struct->cfg.stun_max_packets_extra_dissection;
+      flow->extra_packets_func = stun_search_again;
+    }
   }
 }
 
