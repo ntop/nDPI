@@ -184,7 +184,7 @@ static void ndpi_search_zoom(struct ndpi_detection_module_struct *ndpi_struct,
   } else if(packet->payload_packet_len > 36 &&
             memcmp(packet->payload, tomatch_p2p, 3) == 0 &&
             *(u_int32_t *)&packet->payload[packet->payload_packet_len - 4] == 0) {
-    u_int32_t ip_len, uuid_len;
+    u_int64_t ip_len, uuid_len;
 
     /* Check if it is a Peer-To-Peer call.
        We have been identifing such flows using the "stun_zoom" LRU cache; let's
