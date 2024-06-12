@@ -550,6 +550,16 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     }
   }
 
+  if(flow->http.url
+     && (
+       ends_with(ndpi_struct, (char*)flow->http.url, "/generate_204")
+       || ends_with(ndpi_struct, (char*)flow->http.url, "/generate204")
+       )
+    ) {
+    flow->category = NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK;
+    return;
+  }
+
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
      flow->http.url &&
      ((strstr(flow->http.url, ":8080/downloading?n=0.") != NULL) ||
