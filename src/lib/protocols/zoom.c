@@ -187,8 +187,6 @@ static void ndpi_search_zoom(struct ndpi_detection_module_struct *ndpi_struct,
     u_int64_t ip_len, uuid_len;
 
     /* Check if it is a Peer-To-Peer call.
-       We have been identifing such flows using the "stun_zoom" LRU cache; let's
-       see if we are able to detect them properly via DPI.
        According to the paper, P2P calls should use "Zoom Media Encapsulation"
        header without any "Zoom SFU Encapsulation".
        Looking at the traces, it seems that the packet structure is something like:
@@ -198,8 +196,6 @@ static void ndpi_search_zoom(struct ndpi_detection_module_struct *ndpi_struct,
          * an ip address (as string)
          * some kind of UUID
        * 4 bytes as 0x00 at the end
-
-       TODO: if everything will work as expected, we can remove stun_zoom cache
     */
 
     ip_len = ntohl(*(u_int32_t *)&packet->payload[24]);

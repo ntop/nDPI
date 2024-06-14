@@ -159,7 +159,6 @@ struct ndpi_global_context {
 
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_global_cache;
-  struct ndpi_lru_cache *stun_zoom_global_cache;
 
   /* NDPI_PROTOCOL_TLS and subprotocols */
   struct ndpi_lru_cache *tls_cert_global_cache;
@@ -221,9 +220,6 @@ struct ndpi_detection_module_config_struct {
   int msteams_cache_num_entries;
   int msteams_cache_ttl;
   int msteams_cache_scope;
-  int stun_zoom_cache_num_entries;
-  int stun_zoom_cache_ttl;
-  int stun_zoom_cache_scope;
 
   /* Protocols */
 
@@ -356,7 +352,6 @@ struct ndpi_detection_module_struct {
 
   /* NDPI_PROTOCOL_STUN and subprotocols */
   struct ndpi_lru_cache *stun_cache;
-  struct ndpi_lru_cache *stun_zoom_cache;
 
   /* NDPI_PROTOCOL_TLS and subprotocols */
   struct ndpi_lru_cache *tls_cert_cache;
@@ -664,7 +659,6 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
 
 
 /* Stun */
-int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
             struct ndpi_flow_struct *flow,
             u_int16_t *app_proto);

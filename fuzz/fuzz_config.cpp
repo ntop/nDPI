@@ -406,21 +406,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "lru.msteams.scope", cfg_value);
   }
-  if(fuzzed_data.ConsumeBool()) {
-    value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 / 2); /* max / 2 instead of max + 1 to avoid oom on oss-fuzzer */
-    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.size", cfg_value);
-  }
-  if(fuzzed_data.ConsumeBool()) {
-    value = fuzzed_data.ConsumeIntegralInRange(0, 16777215 + 1);
-    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.ttl", cfg_value);
-  }
-  if(fuzzed_data.ConsumeBool()) {
-    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
-    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.scope", cfg_value);
-  }
   /* Configure one cache via index */
   if(fuzzed_data.ConsumeBool()) {
     idx = fuzzed_data.ConsumeIntegralInRange(0, static_cast<int>(NDPI_LRUCACHE_MAX));
@@ -452,8 +437,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* Invalid value */
   if(fuzzed_data.ConsumeBool()) {
     snprintf(cfg_value, sizeof(cfg_value), "%s", "jjj");
-    ndpi_set_config(ndpi_info_mod, NULL, "lru.stun_zoom.ttl", cfg_value);
-    ndpi_get_config(ndpi_info_mod, NULL, "lru.stun_zoom.ttl", cfg_value, sizeof(cfg_value));
+    ndpi_set_config(ndpi_info_mod, NULL, "lru.stun.ttl", cfg_value);
+    ndpi_get_config(ndpi_info_mod, NULL, "lru.stun.ttl", cfg_value, sizeof(cfg_value));
   }
 
   ndpi_add_host_risk_mask(ndpi_info_mod,

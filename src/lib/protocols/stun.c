@@ -29,7 +29,6 @@
 #include "ndpi_private.h"
 
 // #define DEBUG_LRU  1
-// #define DEBUG_ZOOM_LRU  1
 
 #define STUN_HDR_LEN   20 /* STUN message header length, Classic-STUN (RFC 3489) and STUN (RFC 8489) both */
 
@@ -167,9 +166,9 @@ static u_int16_t search_into_cache(struct ndpi_detection_module_struct *ndpi_str
   return NDPI_PROTOCOL_UNKNOWN;
 }
 
-static void add_to_caches(struct ndpi_detection_module_struct *ndpi_struct,
-			  struct ndpi_flow_struct *flow,
-			  u_int16_t app_proto)
+static void add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
+			 struct ndpi_flow_struct *flow,
+			 u_int16_t app_proto)
 {
   u_int64_t key, key_rev;
 
@@ -183,19 +182,6 @@ static void add_to_caches(struct ndpi_detection_module_struct *ndpi_struct,
     printf("[LRU] ADDING 0x%llx 0x%llx app %u [%u -> %u]\n",
 	   (long long unsigned int)key, (long long unsigned int)key_rev, app_proto,
 	   ntohs(flow->c_port), ntohs(flow->s_port));
-#endif
-  }
-
-  /* TODO: extend to other protocols? */
-  if(ndpi_struct->stun_zoom_cache &&
-     app_proto == NDPI_PROTOCOL_ZOOM &&
-     flow->l4_proto == IPPROTO_UDP) {
-    key = get_stun_lru_key(flow, 0); /* Src */
-    ndpi_lru_add_to_cache(ndpi_struct->stun_zoom_cache, key,
-                          0 /* dummy */, ndpi_get_current_time(flow));
-
-#ifdef DEBUG_ZOOM_LRU
-    printf("[LRU ZOOM] ADDING 0x%llu [src_port %u]\n", (long long unsigned int)key, ntohs(flow->c_port));
 #endif
   }
 }
@@ -904,33 +890,6 @@ static u_int64_t get_stun_lru_key_raw6(u_int8_t *ip, u_int16_t port_host_order) 
 
 /* ************************************************************ */
 
-int stun_search_into_zoom_cache(struct ndpi_detection_module_struct *ndpi_struct,
-                                struct ndpi_flow_struct *flow)
-{
-  u_int16_t dummy;
-  u_int64_t key;
-
-  if(ndpi_struct->stun_zoom_cache &&
-     flow->l4_proto == IPPROTO_UDP) {
-    key = get_stun_lru_key(flow, 0); /* Src */
-#ifdef DEBUG_ZOOM_LRU
-    printf("[LRU ZOOM] Search 0x%llx [src_port %u]\n", (long long unsigned int)key, ntohs(flow->c_port));
-#endif
-
-    if(ndpi_lru_find_cache(ndpi_struct->stun_zoom_cache, key,
-                           &dummy, 0 /* Don't remove it as it can be used for other connections */,
-			   ndpi_get_current_time(flow))) {
-#ifdef DEBUG_ZOOM_LRU
-      printf("[LRU ZOOM] Found");
-#endif
-      return 1;
-    }
-  }
-  return 0;
-}
-
-/* ************************************************************ */
-
 static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
 					 u_int16_t app_proto,
@@ -995,7 +954,7 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
 
   /* Adding only real subclassifications */
   if(is_subclassification_real_by_proto(app_proto))
-    add_to_caches(ndpi_struct, flow, app_proto);
+    add_to_cache(ndpi_struct, flow, app_proto);
 
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN ||
      app_proto != NDPI_PROTOCOL_UNKNOWN) {
