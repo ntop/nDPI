@@ -1,7 +1,7 @@
 /*
  * jrmi.c
  *
- * Copyright (C) 2011-24 - ntop.org
+ * Copyright (C) 2024 - ntop.org
  *
  * nDPI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -27,32 +27,29 @@
 
 
 static void ndpi_int_jrmi_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					 struct ndpi_flow_struct *flow/* , */
-					 /* ndpi_protocol_type_t protocol_type */) {
+					 struct ndpi_flow_struct *flow) {
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_JRMI, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 static void ndpi_search_jrmi(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-			     struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+			     
+	struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
 	NDPI_LOG_DBG(ndpi_struct, "search jrmi\n");
 
-	if (packet->tcp != NULL) {
-		//>5 because of the version
-		if(packet->payload_packet_len > 5) {
-			if(packet->payload[0] == 0x4a &&
-				packet->payload[1] == 0x52 &&
-				packet->payload[2] == 0x4d &&
-				packet->payload[3] == 0x49 ) {
-				NDPI_LOG_INFO(ndpi_struct, "found jrmi over tcp\n");
-				ndpi_int_jrmi_add_connection(ndpi_struct, flow);
-				return;
-			}
+	//>5 because of the version
+	if(packet->payload_packet_len > 5) {
+		if(packet->payload[0] == 0x4a &&
+			packet->payload[1] == 0x52 &&
+			packet->payload[2] == 0x4d &&
+			packet->payload[3] == 0x49 ) {
+			NDPI_LOG_INFO(ndpi_struct, "found jrmi over tcp\n");
+			ndpi_int_jrmi_add_connection(ndpi_struct, flow);
+			return;
 		}
 	}
-
-	if(flow->packet_counter > 5)
-		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	
+	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
