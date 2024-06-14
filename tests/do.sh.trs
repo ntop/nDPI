@@ -1,0 +1,4 @@
+:test-result: FAIL
+:global-test-result: FAIL
+:recheck: yes
+:copy-in-global-log: yes
