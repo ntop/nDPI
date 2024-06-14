@@ -47,6 +47,7 @@ PACK_ON struct zoom_media_enc { /* Zoom media encapsulation */
 
 static int zoom_search_again(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow);
+static int keep_extra_dissection(struct ndpi_flow_struct *flow);
 
 static void ndpi_int_zoom_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow,
@@ -54,11 +55,13 @@ static void ndpi_int_zoom_add_connection(struct ndpi_detection_module_struct *nd
   NDPI_LOG_INFO(ndpi_struct, "found Zoom\n");
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZOOM, master, NDPI_CONFIDENCE_DPI);
 
-  /* Keep looking for RTP. It is similar to the STUN logic... */
-  if(master == NDPI_PROTOCOL_UNKNOWN &&
-     ndpi_struct->cfg.zoom_max_packets_extra_dissection > 0) {
-    flow->max_extra_packets_to_check = ndpi_struct->cfg.zoom_max_packets_extra_dissection;
-    flow->extra_packets_func = zoom_search_again;
+  if(!flow->extra_packets_func) {
+    if(keep_extra_dissection(flow) &&
+       ndpi_struct->cfg.zoom_max_packets_extra_dissection > 0) {
+      NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
+      flow->max_extra_packets_to_check = ndpi_struct->cfg.zoom_max_packets_extra_dissection;
+      flow->extra_packets_func = zoom_search_again;
+    }
   }
 }
 
@@ -71,7 +74,8 @@ static int is_zoom_port(struct ndpi_flow_struct *flow)
   return 0;
 }
 
-static int is_zme(struct ndpi_flow_struct *flow,
+static int is_zme(struct ndpi_detection_module_struct *ndpi_struct,
+                  struct ndpi_flow_struct *flow,
                   const u_char *payload, u_int16_t payload_len)
 {
   if(payload_len > sizeof(struct zoom_media_enc)) {
@@ -80,21 +84,24 @@ static int is_zme(struct ndpi_flow_struct *flow,
     switch(enc->enc_type) {
     case 13: /* Screen Share */
     case 30: /* Screen Share */
-      if(payload_len >= 27) {
+      if(payload_len > 27 &&
+         is_rtp_or_rtcp(ndpi_struct, payload + 27, payload_len - 27, NULL) == IS_RTP) {
         flow->flow_multimedia_type = ndpi_multimedia_screen_sharing_flow;
         return 1;
       }
       break;
 
     case 15: /* RTP Audio */
-      if(payload_len >= 27) {
+      if(payload_len > 19 &&
+         is_rtp_or_rtcp(ndpi_struct, payload + 19, payload_len - 19, NULL) == IS_RTP) {
         flow->flow_multimedia_type = ndpi_multimedia_audio_flow;
         return 1;
       }
       break;
 
     case 16: /* RTP Video */
-      if(payload_len >= 32) {
+      if(payload_len > 24 &&
+         is_rtp_or_rtcp(ndpi_struct, payload + 24, payload_len - 24, NULL) == IS_RTP) {
         flow->flow_multimedia_type = ndpi_multimedia_video_flow;
         return 1;
       }
@@ -103,7 +110,8 @@ static int is_zme(struct ndpi_flow_struct *flow,
     case 33: /* RTCP */
     case 34: /* RTCP */
     case 35: /* RTCP */
-      if(payload_len >= 36) {
+      if(payload_len > 16 &&
+         is_rtp_or_rtcp(ndpi_struct, payload + 16, payload_len - 16, NULL) == IS_RTCP) {
         return 1;
       }
       break;
@@ -124,10 +132,15 @@ static int is_sfu_5(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->payload[0] == 0x05 &&
      packet->payload_packet_len > sizeof(struct zoom_sfu_enc) +
                                   sizeof(struct zoom_media_enc)) {
-    return is_zme(flow, &packet->payload[sizeof(struct zoom_sfu_enc)],
+    return is_zme(ndpi_struct, flow, &packet->payload[sizeof(struct zoom_sfu_enc)],
                   packet->payload_packet_len - sizeof(struct zoom_sfu_enc));
   }
   return 0;
+}
+
+static int keep_extra_dissection(struct ndpi_flow_struct *flow)
+{
+  return flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN; /* No sub-classification */
 }
 
 static int zoom_search_again(struct ndpi_detection_module_struct *ndpi_struct,
@@ -135,16 +148,16 @@ static int zoom_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  if(is_sfu_5(ndpi_struct, flow)) {
+  if(!flow->l4.udp.zoom_p2p &&
+     is_sfu_5(ndpi_struct, flow)) {
     ndpi_int_zoom_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SRTP);
-    return 0; /* Stop */
   }
   if(flow->l4.udp.zoom_p2p &&
-     is_zme(flow, packet->payload, packet->payload_packet_len)) {
+     is_zme(ndpi_struct, flow, packet->payload, packet->payload_packet_len)) {
     ndpi_int_zoom_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_SRTP);
-    return 0; /* Stop */
   }
-  return 1; /* Keep looking */
+
+  return keep_extra_dissection(flow);
 }
 
 static void ndpi_search_zoom(struct ndpi_detection_module_struct *ndpi_struct,
