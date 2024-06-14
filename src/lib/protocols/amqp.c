@@ -35,8 +35,7 @@ struct amqp_header {
 } PACK_OFF;
 
 static void ndpi_int_amqp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					 struct ndpi_flow_struct *flow/* , */
-					 /* ndpi_protocol_type_t protocol_type */) {
+					 struct ndpi_flow_struct *flow) {
 	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AMQP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -45,7 +44,6 @@ static void ndpi_search_amqp(struct ndpi_detection_module_struct *ndpi_struct, s
 
 	NDPI_LOG_DBG(ndpi_struct, "search amqp\n");
 
-	if (packet->tcp != NULL) {
 		if(packet->payload_packet_len > sizeof(struct amqp_header)) {
 			struct amqp_header *h = (struct amqp_header*)packet->payload;
 
@@ -69,7 +67,7 @@ static void ndpi_search_amqp(struct ndpi_detection_module_struct *ndpi_struct, s
 				}
 			}
 		}
-	}
+
 	if(flow->packet_counter > 5)
 		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
