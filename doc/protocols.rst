@@ -838,3 +838,12 @@ References: `Wikipedia <https://en.wikipedia.org/wiki/Viber>`_
 The ZUG protocol is part of the Casper 2.0 consensus model.
 
 References: `Main Site <https://casperlabs.io>`_ and `Blog Post <https://casperlabs.io/blog/beyond-eth-30-theres-casper-20>`_
+
+
+.. _Proto 416:
+
+`NDPI_PROTOCOL_JRMI`
+=========================
+The JRMI protocol is the Java Remote Method Invocation protocol.
+
+References:  `Oracle site <https://docs.oracle.com/en/java/javase/21/docs/specs/rmi/protocol.html>`_

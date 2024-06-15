@@ -444,6 +444,7 @@ typedef enum {
   NDPI_PROTOCOL_THREADS               = 413,
   NDPI_PROTOCOL_VIBER_VOIP            = 414,
   NDPI_PROTOCOL_ZUG                   = 415,
+  NDPI_PROTOCOL_JRMI                  = 416, 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
