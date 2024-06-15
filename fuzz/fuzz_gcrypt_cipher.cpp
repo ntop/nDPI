@@ -6,6 +6,7 @@
 #define MBEDTLS_CHECK_RETURN_TYPICAL
 #define MBEDTLS_INTERNAL_VALIDATE_RET( cond, ret )  do { } while( 0 )
 #include "gcrypt/cipher.h"
+#include "gcrypt/error.h"
 #include "gcrypt/aes.h"
 
 extern int force_no_aesni;
@@ -56,10 +57,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   mbedtls_cipher_info_get_type(ctx_e->cipher_info);
   mbedtls_cipher_info_get_name(ctx_e->cipher_info);
   mbedtls_cipher_info_has_variable_key_bitlen(ctx_e->cipher_info);
+  mbedtls_cipher_info_has_variable_iv_size(ctx_e->cipher_info);
   mbedtls_cipher_info_get_iv_size(ctx_e->cipher_info);
   mbedtls_cipher_info_get_block_size(ctx_e->cipher_info);
   mbedtls_cipher_get_cipher_mode(ctx_e);
+  mbedtls_cipher_get_iv_size(ctx_e);
+  mbedtls_cipher_get_type(ctx_e);
+  mbedtls_cipher_get_name(ctx_e);
+  mbedtls_cipher_get_key_bitlen(ctx_e);
+  mbedtls_cipher_get_operation(ctx_e);
   mbedtls_cipher_info_get_key_bitlen(ctx_e->cipher_info);
+  mbedtls_error_add(0, 0, NULL, 0);
 
   posix_memalign((void **)&ctx_e->cipher_ctx, 8, sizeof(mbedtls_aes_context));
   posix_memalign((void **)&ctx_d->cipher_ctx, 8, sizeof(mbedtls_aes_context));

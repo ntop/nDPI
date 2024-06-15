@@ -44,7 +44,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ac_automata_enable_debug(0);
 
   a = ac_automata_init(mc);
-  a2 = ndpi_init_automa();
+  if (fuzzed_data.ConsumeBool())
+    a2 = ndpi_init_automa();
+  else
+    a2 = ndpi_init_automa_domain();
 
   if (fuzzed_data.ConsumeBool())
     ac_automata_feature(a, AC_FEATURE_DEBUG);

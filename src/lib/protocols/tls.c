@@ -1032,10 +1032,6 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       break;
     }
 
-    if(len == 0) {
-      something_went_wrong = 1;
-      break;
-    }
 
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Processing %u bytes message\n", len);
@@ -1638,7 +1634,6 @@ static bool is_grease_version(u_int16_t version) {
   case 0xeaea:
   case 0xfafa:
     return(true);
-    break;
     
   default:
     return(false);

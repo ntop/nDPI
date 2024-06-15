@@ -4976,7 +4976,7 @@ int load_category_file_fd(struct ndpi_detection_module_struct *ndpi_str,
       continue;
     }
 
-    if(ndpi_load_category(ndpi_str, line, category_id, NULL) > 0)
+    if(ndpi_load_category(ndpi_str, line, category_id, NULL) >= 0)
       num_loaded++;
   }
 
