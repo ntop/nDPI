@@ -30,6 +30,7 @@ AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom p
 AC_ARG_WITH(lto-and-gold-linker, AS_HELP_STRING([--with-lto-and-gold-linker], [Build with LTO and Gold linker]))
 AC_ARG_ENABLE(debug-build, AS_HELP_STRING([--enable-debug-build], [Enable debug build (`-g` flag)]),[enable_debugbuild=$enableval],[enable_debugbuild=no])
 AC_ARG_ENABLE(global-context-support, AS_HELP_STRING([--disable-global-context-support], [Disable support for global context. No external dependency on libpthread]))
+AC_ARG_ENABLE(memory-track-origins, AS_HELP_STRING([--disable-memory-track-origins], [Don't add -fsanitize-memory-track-origins flag when compiling with MASAN support. Useful for faster CI]))
 
 NDPI_CFLAGS="${NDPI_CFLAGS} -D_DEFAULT_SOURCE=1 -D_GNU_SOURCE=1"
 
@@ -81,7 +82,10 @@ AS_IF([test "${with_thread_sanitizer+set}" = set],[
 ])
 
 AS_IF([test "${with_memory_sanitizer+set}" = set],[
-  NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer"
+  NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize=memory -fno-omit-frame-pointer"
+  AS_IF([test "x$enable_memory_track_origins" != "xno"], [
+    NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize-memory-track-origins"
+  ])
   NDPI_LDFLAGS="${NDPI_LDFLAGS} -fsanitize=memory"
 ])
 

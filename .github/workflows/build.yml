@@ -172,7 +172,7 @@ jobs:
             gcrypt: ""
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
-            msan: "--with-memory-sanitizer"
+            msan: "--with-memory-sanitizer --disable-memory-track-origins"
             nBPF: ""
           - compiler: "cc"
             os: macOS-13
@@ -204,7 +204,7 @@ jobs:
             gcrypt: ""
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
-            msan: "--with-sanitizer"
+            msan: ""
             nBPF: ""
           - compiler: "cc"
             os: ubuntu-latest
@@ -222,20 +222,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Fix kernel mmap rnd bits on Ubuntu
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
-        run: |
-          # Workaround for compatinility between latest kernel and sanitizer
-          # See https://github.com/actions/runner-images/issues/9491
-          sudo sysctl vm.mmap_rnd_bits=28
       - name: Install Ubuntu Prerequisites
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64')
         run: |
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install gcc-mingw-w64 libc6-dev
-          sudo apt-get install doxygen python3-sphinx python3-sphinx-rtd-theme python3-breathe python3-pip
           sudo apt-get install rrdtool librrd-dev parallel
+      - name: Install Ubuntu Prerequisites [Mingw-w64] (runs only on ubuntu jobs)
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.msan, '--with-') #Only on a few "standard" builds, without any sanitizers
+        run: |
+          sudo apt-get install gcc-mingw-w64 libc6-dev
       - name: Install Ubuntu Prerequisites (libgcrypt)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
         run: |
@@ -333,7 +329,7 @@ jobs:
           DESTDIR=/tmp/ndpi make install
           ls -alhHR /tmp/ndpi
       - name: Test nDPI [SYMBOLS]
-        if: (startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'mac')) && startsWith(matrix.arch, 'x86_64')
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.msan, '--with-') #Only on a few "standard" builds, without any sanitizers
         run: |
           ./utils/check_symbols.sh || { FAILED=$?; echo "::error file=${NDPI_LIB}::Unwanted libc symbols found: ${FAILED}. Please make sure to use only ndpi_malloc/ndpi_calloc/ndpi_realloc/ndpi_free wrapper instead of malloc/calloc/realloc/free."; false; }
         env:
@@ -369,7 +365,7 @@ jobs:
           make dist
           ./utils/verify_dist_tarball.sh
       - name: Build nDPI [Mingw-w64] (runs only on ubuntu jobs)
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.nBPF, 'nBPF')
+        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.msan, '--with-') #Only on a few "standard" builds, without any sanitizers
         run: |
           make distclean
           ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --host=x86_64-w64-mingw32
