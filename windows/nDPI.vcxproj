@@ -287,6 +287,7 @@
     <ClCompile Include="..\src\lib\protocols\raft.c" />
     <ClCompile Include="..\src\lib\protocols\rdp.c" />
     <ClCompile Include="..\src\lib\protocols\resp.c" />
+    <ClCompile Include="..\src\lib\protocols\ripe_atlas.c" />
     <ClCompile Include="..\src\lib\protocols\rmcp.c" />
     <ClCompile Include="..\src\lib\protocols\roughtime.c" />
     <ClCompile Include="..\src\lib\protocols\rsync.c" />

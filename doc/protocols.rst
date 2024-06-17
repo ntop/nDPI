@@ -847,3 +847,12 @@ References: `Main Site <https://casperlabs.io>`_ and `Blog Post <https://casperl
 The JRMI protocol is the Java Remote Method Invocation protocol.
 
 References:  `Oracle site <https://docs.oracle.com/en/java/javase/21/docs/specs/rmi/protocol.html>`_
+
+
+.. _Proto 417:
+
+`NDPI_PROTOCOL_RIPE_ATLAS`
+==========================
+The RIPE Atlas probe protocol is used for the world's largest active Internet measurement network.
+
+References: `Main Site <https://atlas.ripe.net/>`_ and `Documentation <https://ripe-atlas-tools.readthedocs.io/en/latest/index.html>`_
