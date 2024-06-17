@@ -47,7 +47,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   num_iteration = fuzzed_data.ConsumeIntegral<u_int8_t>();
   for (i = 0; i < num_iteration; i++) {
     value = fuzzed_data.ConsumeBytesAsString(fuzzed_data.ConsumeIntegral<u_int8_t>());
-    ndpi_domain_classify_hostname(ndpi_struct, d, &class_id, (char *)value.c_str());
+    ndpi_domain_classify_hostname(fuzzed_data.ConsumeBool() ? ndpi_struct : NULL, d, &class_id, (char *)value.c_str());
   }
   
   /* Search of an added entry */

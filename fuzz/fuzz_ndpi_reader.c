@@ -15,7 +15,7 @@ struct ndpi_global_context *g_ctx;
 u_int8_t enable_payload_analyzer = 0;
 u_int8_t enable_flow_stats = 1;
 u_int8_t human_readeable_string_len = 5;
-u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
+u_int8_t max_num_udp_dissected_pkts = 0, max_num_tcp_dissected_pkts = 0; /* Disable limits at application layer */;
 int malloc_size_stats = 0;
 
 extern void ndpi_report_payload_stats(FILE *out);
@@ -53,6 +53,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json, g_ctx);
 
+    ndpi_workflow_set_flow_callback(workflow, NULL, NULL); /* No real callback */
+
     ndpi_set_config(workflow->ndpi_struct, NULL, "log.level", "3");
     ndpi_set_config(workflow->ndpi_struct, "all", "log", "1");
 
@@ -68,10 +70,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     NDPI_BITMASK_SET_ALL(all);
     ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
 
+    ndpi_set_config(workflow->ndpi_struct, NULL, "packets_limit_per_flow", "255");
     ndpi_set_config(workflow->ndpi_struct, NULL, "flow.track_payload", "1");
     ndpi_set_config(workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic", "1");
     ndpi_set_config(workflow->ndpi_struct, "tls", "application_blocks_tracking", "1");
     ndpi_set_config(workflow->ndpi_struct, "stun", "max_packets_extra_dissection", "255");
+    ndpi_set_config(workflow->ndpi_struct, "zoom", "max_packets_extra_dissection", "255");
     ndpi_set_config(workflow->ndpi_struct, "rtp", "search_for_stun", "1");
 
     ndpi_finalize_initialization(workflow->ndpi_struct);

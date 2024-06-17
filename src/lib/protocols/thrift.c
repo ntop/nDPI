@@ -83,9 +83,6 @@ static void ndpi_int_thrift_add_connection(struct ndpi_detection_module_struct *
     case NDPI_PROTOCOL_HTTP:
       NDPI_LOG_DBG(ndpi_struct, "found Apache Thrift HTTP\n");
       break;
-    default:
-      NDPI_LOG_DBG(ndpi_struct, "found Apache Thrift\n");
-      break;
   }
 
   ndpi_set_detected_protocol(ndpi_struct, flow,

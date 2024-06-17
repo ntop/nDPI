@@ -14,7 +14,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   int rc;
   std::vector<char>d;
   char kbuf[32];
-  u_int32_t buffer_len;
+  u_int32_t buffer_len, kbuf_len;
 
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);
@@ -66,19 +66,23 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       ndpi_serialize_string_raw(&serializer, kbuf, d.data(), d.size());
     ndpi_serialize_string_boolean(&serializer, kbuf, fuzzed_data.ConsumeIntegral<int8_t>());
 
-    if (fuzzed_data.ConsumeBool())
+    if (fuzzed_data.ConsumeBool()) {
       snprintf(kbuf, sizeof(kbuf), "%d", i); /* To trigger OPTIMIZE_NUMERIC_KEYS */
-    ndpi_serialize_binary_uint32(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<u_int32_t>());
-    ndpi_serialize_binary_int32(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<int32_t>());
-    ndpi_serialize_binary_uint64(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<u_int64_t>());
-    ndpi_serialize_binary_int64(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<int64_t>());
-    ndpi_serialize_binary_float(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeFloatingPoint<float>(), "%f");
+      kbuf_len = strlen(kbuf);
+    } else {
+      kbuf_len = sizeof(kbuf);
+    }
+    ndpi_serialize_binary_uint32(&serializer, kbuf, kbuf_len, fuzzed_data.ConsumeIntegral<u_int32_t>());
+    ndpi_serialize_binary_int32(&serializer, kbuf, kbuf_len, fuzzed_data.ConsumeIntegral<int32_t>());
+    ndpi_serialize_binary_uint64(&serializer, kbuf, kbuf_len, fuzzed_data.ConsumeIntegral<u_int64_t>());
+    ndpi_serialize_binary_int64(&serializer, kbuf, kbuf_len, fuzzed_data.ConsumeIntegral<int64_t>());
+    ndpi_serialize_binary_float(&serializer, kbuf, kbuf_len, fuzzed_data.ConsumeFloatingPoint<float>(), "%f");
     if (fmt != ndpi_serialization_format_tlv)
-      ndpi_serialize_binary_double(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeFloatingPoint<double>(), "%lf");
-    ndpi_serialize_binary_boolean(&serializer, kbuf, sizeof(kbuf), fuzzed_data.ConsumeIntegral<int8_t>());
+      ndpi_serialize_binary_double(&serializer, kbuf, kbuf_len, fuzzed_data.ConsumeFloatingPoint<double>(), "%lf");
+    ndpi_serialize_binary_boolean(&serializer, kbuf, kbuf_len, fuzzed_data.ConsumeIntegral<int8_t>());
     d = fuzzed_data.ConsumeBytes<char>(16);
     if (d.size())
-      ndpi_serialize_binary_binary(&serializer, kbuf, sizeof(kbuf), d.data(), d.size());
+      ndpi_serialize_binary_binary(&serializer, kbuf, kbuf_len, d.data(), d.size());
 
     if ((i & 0x3) == 0x3)
       ndpi_serialize_end_of_record(&serializer);

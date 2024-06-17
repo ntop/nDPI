@@ -518,6 +518,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_severity2str(static_cast<ndpi_risk_severity>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
   ndpi_risk2score(static_cast<ndpi_risk_enum>(fuzzed_data.ConsumeIntegral<u_int64_t>()), &unused1, &unused2);
   ndpi_http_method2str(static_cast<ndpi_http_method>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
+  ndpi_confidence_get_name(static_cast<ndpi_confidence_t>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
+  ndpi_get_proto_breed_name(static_cast<ndpi_protocol_breed_t>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
+  ndpi_get_l4_proto_name(static_cast<ndpi_l4_proto_info>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
+
+  char buf2[16];
+  ndpi_entropy2str(fuzzed_data.ConsumeFloatingPoint<float>(), fuzzed_data.ConsumeBool() ? buf2 : NULL, sizeof(buf2));
 
   /* Basic code to try testing this "config" */
   bool_value = fuzzed_data.ConsumeBool();
@@ -545,7 +551,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_flow_ndpi_proto(&flow, &p2);
   ndpi_is_proto(p, NDPI_PROTOCOL_TLS);
   ndpi_http_method2str(flow.http.method);
-  ndpi_get_l4_proto_name(ndpi_get_l4_proto_info(ndpi_info_mod, p.app_protocol));
   ndpi_is_subprotocol_informative(p.app_protocol);
   ndpi_get_http_method(bool_value ? &flow : NULL);
   ndpi_get_http_url(&flow);

@@ -47,10 +47,7 @@ static void ssdp_parse_lines(struct ndpi_detection_module_struct
 
   /* Save host which provides a service if available */
   if (packet->host_line.ptr != NULL && packet->host_line.len > 0) {
-    if (ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL) == NULL)
-    {
-      NDPI_LOG_DBG2(ndpi_struct, "Could not set SSDP host\n");
-    }
+    ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
   }
 }
 

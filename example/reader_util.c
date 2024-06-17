@@ -1353,7 +1353,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
                        flow->detected_protocol,
                        &flow->ndpi_flow_serializer) != 0) {
       LOG(NDPI_LOG_ERROR, "flow2json failed\n");
-      exit(-1);
+      return;
     }
     
     ndpi_serialize_string_uint32(&flow->ndpi_flow_serializer, "detection_completed", flow->detection_completed);

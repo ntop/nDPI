@@ -179,15 +179,10 @@ static void ndpi_search_mqtt(struct ndpi_detection_module_struct *ndpi_struct,
 	}
 	if (pt == PUBLISH) {
 		// payload CAN be zero bytes length (section 3.3.3 of MQTT standard)
-		u_int8_t qos = (u_int8_t) (flags & 0x06);
-		u_int8_t dup = (u_int8_t) (flags & 0x04);
+		u_int8_t qos = (u_int8_t) (flags & 0x06) >> 1;
+		u_int8_t dup = (u_int8_t) (flags & 0x08) >> 3;
 		if (qos > 2) { // qos values possible are 0,1,2
 			NDPI_LOG_DBG(ndpi_struct, "Excluding Mqtt invalid PUBLISH qos\n");
-			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
-			return;
-		}
-		if (dup > 1) { // dup flag possible 0,1
-			NDPI_LOG_DBG(ndpi_struct, "Excluding Mqtt invalid PUBLISH dup\n");
 			NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_MQTT);
 			return;
 		}

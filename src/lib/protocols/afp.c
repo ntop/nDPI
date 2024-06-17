@@ -62,20 +62,6 @@ static void ndpi_search_afp(struct ndpi_detection_module_struct *ndpi_struct, st
       return;
     }
 
-    /*
-     * this will detect the OpenSession command of the Data Stream Interface (DSI) protocol
-     * which is exclusively used by the Apple Filing Protocol (AFP) on TCP/IP networks
-     */
-    if (packet->payload_packet_len >= 22 && get_u_int16_t(packet->payload, 0) == htons(0x0004) &&
-	get_u_int16_t(packet->payload, 2) == htons(0x0001) && get_u_int32_t(packet->payload, 4) == 0 &&
-	get_u_int32_t(packet->payload, 8) == htonl(packet->payload_packet_len - 16) &&
-	get_u_int32_t(packet->payload, 12) == 0 && get_u_int16_t(packet->payload, 16) == htons(0x0104)) {
-
-      NDPI_LOG_INFO(ndpi_struct, "found AFP: DSI OpenSession\n");
-      ndpi_int_afp_add_connection(ndpi_struct, flow);
-      return;
-    }
-
     if((h->flags <= 1)
        && ((h->command >= 1) && (h->command <= 8))
        && (h->reserved == 0)
