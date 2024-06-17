@@ -79,11 +79,12 @@ The entire procedure of adding new protocols in detail:
 4. Add a new entry for the search function for the new protocol in: `src/include/ndpi_protocols.h`
 5. Choose (do not change anything) a selection bitmask from: `src/include/ndpi_define.h`
 6. Set protocol default ports in `ndpi_init_protocol_defaults` in: `src/lib/ndpi_main.c`
-7. Be sure to have nBPF support, cloning `PF_RING` in the same directory where you cloned `nDPI`: `git clone https://github.com/ntop/PF_RING/ && cd PF_RING/userland/nbpf && ./configure && make`
+7. Be sure to have nBPF support, cloning `PF_RING` in the same directory where you cloned `nDPI`: `git clone https://github.com/ntop/PF_RING/ && cd PF_RING/userland/nbpf && ./configure && make`. You can ignore the `/bin/sh: 1: ../lib/pfring_config: not found` error
 8. From the `nDPI` root directory, `./autogen.sh --with-pcre2` (nBPF and PCRE2 are usually optional, but they are needed to run/update *all* the unit tests)
 9. `make`
 10. `make check`
 11. Update the documentation, adding this new protocol to `doc/protocols.rst`
+12. Update the Windows Visual Studio configuration, adding the new c file in `windows/nDPI.vcxproj`
 
 ### How to use nDPI to Block Selected Traffic
 
