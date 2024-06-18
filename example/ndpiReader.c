@@ -709,8 +709,8 @@ static void help(u_int long_help) {
            sizeof(((struct ndpi_flow_struct *)0)->protos));
 
     printf("\n\nnDPI supported protocols:\n");
-    printf("%3s %8s %-22s %-10s %-8s %-12s %s\n",
-	   "Id", "Userd-id", "Protocol", "Layer_4", "Nw_Proto", "Breed", "Category");
+    printf("%3s %8s %-22s %-10s %-8s %-12s %-18s %-16s %-16s \n",
+	   "Id", "Userd-id", "Protocol", "Layer_4", "Nw_Proto", "Breed", "Category","Def UDP Port/s","Def TCP Port/s");
     num_threads = 1;
 
     ndpi_dump_protocols(ndpi_str, stdout);
