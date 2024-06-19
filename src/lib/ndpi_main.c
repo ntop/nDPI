@@ -9547,19 +9547,56 @@ int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_str, char *ca
 
 /* ****************************************************** */
 
+
+static char *default_ports_string(char *ports_str,u_int16_t *default_ports){
+
+    //dont display zero ports on help screen
+    if (default_ports[0] == 0)
+      //- for readability
+      return "-";
+
+    int j=0;
+    do
+    {
+      //max port len 5(eg 65535) + comma + nul
+      char port[7];
+      sprintf(port,"%d,",default_ports[j]);
+      strcat(ports_str,port);
+      j++;
+    } while (j < MAX_DEFAULT_PORTS && default_ports[j]!= 0);
+
+    //remove last comma
+    ports_str[strlen(ports_str)-1] = '\0';
+
+    return ports_str;
+
+}
+
+/* ****************************************************** */
+
+
 void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_str, FILE *dump_out) {
   int i;
 
   if(!ndpi_str || !dump_out) return;
 
-  for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++)
-    fprintf(dump_out, "%3d %8d %-22s %-10s %-8s %-12s %s\n",
+  for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++) {
+    //max port size(eg 65535) * 5 + 4 commas + nul
+    char udp_ports[30] = "";
+    char tcp_ports[30] = "";
+
+    fprintf(dump_out, "%3d %8d %-22s %-10s %-8s %-12s %-18s %-31s %-31s\n",
 	   i, ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, i),
 	   ndpi_str->proto_defaults[i].protoName,
 	   ndpi_get_l4_proto_name(ndpi_get_l4_proto_info(ndpi_str, i)),
 	   ndpi_str->proto_defaults[i].isAppProtocol ? "" : "X",
 	   ndpi_get_proto_breed_name(ndpi_str->proto_defaults[i].protoBreed),
-	   ndpi_category_get_name(ndpi_str, ndpi_str->proto_defaults[i].protoCategory));
+	   ndpi_category_get_name(ndpi_str, ndpi_str->proto_defaults[i].protoCategory),
+     default_ports_string(udp_ports,ndpi_str->proto_defaults[i].udp_default_ports),
+     default_ports_string(tcp_ports,ndpi_str->proto_defaults[i].tcp_default_ports)
+     );
+
+  }
 }
 
 /* ********************************** */
