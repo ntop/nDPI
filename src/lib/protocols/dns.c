@@ -768,17 +768,30 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     if (hostname_is_valid == 0)
       ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, "Invalid chars detected in domain name");
 
-    dot = strchr(_hostname, '.');
-    if(dot) {
-      uintptr_t first_element_len = dot - _hostname;
+    /* Ignore reverse DNS queries */
+    if(strstr(_hostname, ".in-addr.") == NULL) {
+      dot = strchr(_hostname, '.');
+      
+      if(dot) {
+	uintptr_t first_element_len = dot - _hostname;
 
-      if((first_element_len > 48) && (!is_mdns)) {
-	/*
-	  The lenght of the first element in the query is very long
-	  and this might be an issue or indicate an exfiltration
-	*/
+	if((first_element_len > 48) && (!is_mdns)) {
+	  /*
+	    The lenght of the first element in the query is very long
+	    and this might be an issue or indicate an exfiltration
+	  */
 
-	ndpi_set_risk(flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, "Long DNS host name");
+	  if(ends_with(ndpi_struct, _hostname, "multi.surbl.org")
+	     || ends_with(ndpi_struct, _hostname, "spamhaus.org")
+	     || ends_with(ndpi_struct, _hostname, "rackcdn.com")
+	     || ends_with(ndpi_struct, _hostname, "akamaiedge.net")
+	     || ends_with(ndpi_struct, _hostname, "mx-verification.google.com")
+	     || ends_with(ndpi_struct, _hostname, "amazonaws.com")
+	     )
+	    ; /* Check common domain exceptions [TODO: if the list grows too much use a different datastructure] */
+	  else
+	    ndpi_set_risk(flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, "Long DNS host name");
+	}
       }
     }
     
@@ -790,7 +803,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 						       flow->host_server_name,
 						       strlen(flow->host_server_name),
 						       &ret_match,
-						     NDPI_PROTOCOL_DNS);
+						       NDPI_PROTOCOL_DNS);
 
 
         if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
