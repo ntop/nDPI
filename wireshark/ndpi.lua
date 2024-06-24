@@ -27,6 +27,7 @@ local ndpi_proto = Proto("ndpi", "nDPI Protocol Interpreter")
 ndpi_proto.fields = {}
 
 local ndpi_fds    = ndpi_proto.fields
+ndpi_fds.magic                = ProtoField.new("nDPI Magic", "ndpi.magic", ftypes.UINT32, nil, base.HEX)
 ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
@@ -92,11 +93,11 @@ flow_risks[50] = ProtoField.bool("ndpi.flow_risk.tcp_issues", "TCP connection is
 flow_risks[51] = ProtoField.bool("ndpi.flow_risk.fully_encrypted", "Fully encrypted connection", num_bits_flow_risks, nil, bit(19), "nDPI Flow Risk: Fully encrypted connection")
 flow_risks[52] = ProtoField.bool("ndpi.flow_risk.tls_alpn_sni_mismatch", "ALPN/SNI Mismatch", num_bits_flow_risks, nil, bit(20), "nDPI Flow Risk: ALPN/SNI Mismatch")
 flow_risks[53] = ProtoField.bool("ndpi.flow_risk.malware_contact", "Contact with a malware host", num_bits_flow_risks, nil, bit(21), "nDPI Flow Risk: Malware host contacted")
-flow_risks[54] = ProtoField.bool("ndpi.flow_risk.binary_data_transfer", "Attempt to transfer a binary file", num_bits_flow_risks, nil, bit(21), "nDPI Flow Risk: binary data file transfer")
-flow_risks[55] = ProtoField.bool("ndpi.flow_risk.probing_attempt", "Probing attempt", num_bits_flow_risks, nil, bit(22), "nDPI Flow Risk: probing attempt")
+flow_risks[54] = ProtoField.bool("ndpi.flow_risk.binary_data_transfer", "Attempt to transfer a binary file", num_bits_flow_risks, nil, bit(22), "nDPI Flow Risk: binary data file transfer")
+flow_risks[55] = ProtoField.bool("ndpi.flow_risk.probing_attempt", "Probing attempt", num_bits_flow_risks, nil, bit(23), "nDPI Flow Risk: probing attempt")
 
 -- Last one: keep in sync the bitmask when adding new risks!!
-flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(20))
+flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(24))
 
 for _,v in pairs(flow_risks) do
   ndpi_fds[#ndpi_fds + 1] = v
@@ -1048,24 +1049,21 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 local magic = string.sub(ndpi_trailer, 1, 11)
 
 	 if(magic == "19:68:09:24") then
-	    local ndpikey, srckey, dstkey, flowkey
-	    local elems                = string.split(string.sub(ndpi_trailer, 12), ":")
-	    local ndpi_subtree         = tree:add(ndpi_proto, tvb(), "nDPI Protocol")
-	    local str_score            = elems[14]..elems[15]
-	    local flow_score           = tonumber(str_score, 16) -- 16 = HEX
-	    local len                  = tvb:len()
-	    local flow_risk            = tvb(len-30, 8):uint64() -- UInt64 object!
-	    local name                 = ""
+	    local ndpikey, srckey, dstkey, flowkey, flow_risk
 	    local flow_risk_tree
+	    local name
+	    local trailer_tvb          = tvb(tvb:len() - 38, 34) -- The last 4 bytes are the CRC. Even if nDPI needs to update it, it is not part of the nDPI trailer, strictly speaking
+	    local ndpi_subtree         = tree:add(ndpi_proto, trailer_tvb, "nDPI Protocol")
 	    
-	    for i=16,31 do
-	       name = name .. string.char(tonumber(elems[i], 16))
-	    end
+	    ndpi_subtree:add(ndpi_fds.magic, trailer_tvb(0, 4))
+	    ndpi_subtree:add(ndpi_fds.network_protocol, trailer_tvb(4, 2))
+	    ndpi_subtree:add(ndpi_fds.application_protocol, trailer_tvb(6, 2))
 
-	    ndpi_subtree:add(ndpi_fds.network_protocol, tvb(len-34, 2))
-	    ndpi_subtree:add(ndpi_fds.application_protocol, tvb(len-32, 2))
+	    flow_risk_tree = ndpi_subtree:add(ndpi_fds.flow_risk, trailer_tvb(8, 8))
+	    flow_risk = trailer_tvb(8, 8):uint64() -- UInt64 object!
+	    ndpi_subtree:add(ndpi_fds.flow_score, trailer_tvb(16, 2))
+	    flow_score = trailer_tvb(16, 2):int()
 
-	    flow_risk_tree = ndpi_subtree:add(ndpi_fds.flow_risk, tvb(len-30, 8))
 	    if (flow_risk ~= UInt64(0, 0)) then
 	       local rev_key = getstring(pinfo.dst)..":"..getstring(pinfo.dst_port).." - "..getstring(pinfo.src)..":"..getstring(pinfo.src_port)
 
@@ -1080,16 +1078,13 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       for i=0,63 do
 		 if flow_risks[i] ~= nil then
 	            -- Wireshark/Lua doesn't handle 64 bit integer very well, so we split the risk mask into two 32 bit integer values
-	            flow_risk_tree:add(flow_risks[i], tvb(len - (i < 32 and 26 or 30), 4))
+	            flow_risk_tree:add(flow_risks[i], trailer_tvb((i < 32 and 12 or 8), 4))
 		 end
 
 	       end
-	       flow_risk_tree:add(flow_risks[64], tvb(len - 30, 4))
+	       flow_risk_tree:add(flow_risks[64], trailer_tvb(8, 4)) -- Unused bits in flow risk bitmask
 	    end
 	    
-	    ndpi_subtree:add(ndpi_fds.flow_score, tvb(len-22, 2))	    
-	    ndpi_subtree:add(ndpi_fds.name, tvb(len-20, 16))
-
 	    if(flow_score > 0) then
 	       local level
 	       if(flow_score <= 10) then     -- NDPI_SCORE_RISK_LOW
@@ -1100,8 +1095,11 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 		  level = PI_ERROR
 	       end
 	       
-	       ndpi_subtree:add_expert_info(PI_MALFORMED, PI_WARN, "Non zero score")
+	       ndpi_subtree:add_expert_info(PI_PROTOCOL, level, "Non zero score")
 	    end
+
+	    ndpi_subtree:add(ndpi_fds.name, trailer_tvb(18, 16))
+	    name = trailer_tvb(18, 16):string()
 
 	    if(application_protocol ~= 0) then	       
 	       -- Set protocol name in the wireshark protocol column (if not Unknown)
