@@ -18,8 +18,12 @@
 -- Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 --
 
-function bit(p)
-   return 2 ^ p  -- 0-based indexing
+function bit(p) -- 0-based indexing; returning a UInt64 object!
+   if p < 32 then
+       return UInt64(2 ^ p, 0)
+   else
+       return UInt64(0, 2 ^ (p - 32))
+   end
 end
 
 
@@ -36,8 +40,8 @@ ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Score", "ndpi.flow_sco
 
 
 local flow_risks = {}
--- Wireshark/Lua doesn't handle 64 bit integer very well, so we split the risk mask into two 32 bit integer values
-local num_bits_flow_risks = 32
+--- You can't use a 64 bit integer "as-is" as mask: we choose to use UInt64 object instead
+local num_bits_flow_risks = 64
 flow_risks[0]  = ProtoField.bool("ndpi.flow_risk.unused0", "Reserved", num_bits_flow_risks, nil, bit(0), "nDPI Flow Risk: Reserved bit")
 flow_risks[1]  = ProtoField.bool("ndpi.flow_risk.xss_attack", "XSS attack", num_bits_flow_risks, nil, bit(1), "nDPI Flow Risk: XSS attack")
 flow_risks[2]  = ProtoField.bool("ndpi.flow_risk.sql_injection", "SQL injection", num_bits_flow_risks, nil, bit(2), "nDPI Flow Risk: SQL injection")
@@ -70,34 +74,33 @@ flow_risks[28] = ProtoField.bool("ndpi.flow_risk.possibly_malicious_ja3", "Possi
 flow_risks[29] = ProtoField.bool("ndpi.flow_risk.possibly_malicious_ssl_certificate_sha1", "Possibly Malicious SSL Certificate SHA1 Fingerprint", num_bits_flow_risks, nil, bit(29), "nDPI Flow Risk: Possibly Malicious SSL Certificate SHA1 Fingerprint")
 flow_risks[30] = ProtoField.bool("ndpi.flow_risk.desktop_file_sharing_session", "Desktop/File Sharing Session", num_bits_flow_risks, nil, bit(30), "nDPI Flow Risk: Desktop/File Sharing Session")
 flow_risks[31] = ProtoField.bool("ndpi.flow_risk.uncommon_tls_alpn", "Uncommon TLS ALPN", num_bits_flow_risks, nil, bit(31), "nDPI Flow Risk: Uncommon TLS ALPN")
--- Restart bitmask from 0!
-flow_risks[32] = ProtoField.bool("ndpi.flow_risk.cert_validity_too_long", "TLS certificate validity longer than 13 months", num_bits_flow_risks, nil, bit(0), "nDPI Flow Risk: TLS certificate validity longer than 13 months")
-flow_risks[33] = ProtoField.bool("ndpi.flow_risk.suspicious_extension", "TLS suspicious extension", num_bits_flow_risks, nil, bit(1), "nDPI Flow Risk: TLS suspicious extension")
-flow_risks[34] = ProtoField.bool("ndpi.flow_risk.fatal_alert", "TLS fatal alert detected", num_bits_flow_risks, nil, bit(2), "nDPI Flow Risk: TLS fatal alert")
-flow_risks[35] = ProtoField.bool("ndpi.flow_risk.suspicious_entropy", "Suspicious entropy", num_bits_flow_risks, nil, bit(3), "nDPI Flow Risk: suspicious entropy")
-flow_risks[36] = ProtoField.bool("ndpi.flow_risk.clear_text_credentials", "Cleat-Text credentials", num_bits_flow_risks, nil, bit(4), "nDPI Flow Risk: cleat-text credentials")
-flow_risks[37] = ProtoField.bool("ndpi.flow_risk.dns_large_packet", "DNS large packet", num_bits_flow_risks, nil, bit(5), "nDPI Flow Risk: DNS packet is larger than 512 bytes")
-flow_risks[38] = ProtoField.bool("ndpi.flow_risk.dns_fragmented", "DNS fragmented", num_bits_flow_risks, nil, bit(6), "nDPI Flow Risk: DNS message is fragmented")
-flow_risks[39] = ProtoField.bool("ndpi.flow_risk.invalid_characters", "Invalid characters", num_bits_flow_risks, nil, bit(7), "nDPI Flow Risk: Text contains non-printable characters")
-flow_risks[40] = ProtoField.bool("ndpi.flow_risk.possible_exploit", "Possible Exploit", num_bits_flow_risks, nil, bit(8), "nDPI Flow Risk: Possible exploit attempt detected")
-flow_risks[41] = ProtoField.bool("ndpi.flow_risk.cert_about_to_expire", "TLS cert about to expire", num_bits_flow_risks, nil, bit(9), "nDPI Flow Risk: TLS certificate about to expire")
-flow_risks[42] = ProtoField.bool("ndpi.flow_risk.punycode_idn", "IDN Domain Name", num_bits_flow_risks, nil, bit(10), "nDPI Flow Risk: IDN Domain Name")
-flow_risks[43] = ProtoField.bool("ndpi.flow_risk.error_code_detected", "Error Code Detected", num_bits_flow_risks, nil, bit(11), "nDPI Flow Risk: Error Code Detected")
-flow_risks[44] = ProtoField.bool("ndpi.flow_risk.crawler_bot", "Crawler/Bot Detected", num_bits_flow_risks, nil, bit(12), "nDPI Flow Risk: Crawler/Bot Detected")
-flow_risks[45] = ProtoField.bool("ndpi.flow_risk.anonymous_subscriber", "Anonymous Subscriber", num_bits_flow_risks, nil, bit(13), "nDPI Flow Risk: Anonymous Subscriber")
-flow_risks[46] = ProtoField.bool("ndpi.flow_risk.unidirectional_traffic", "Unidirectional Traffic", num_bits_flow_risks, nil, bit(14), "nDPI Flow Risk: Unidirectional Traffi")
-flow_risks[47] = ProtoField.bool("ndpi.flow_risk.http_obsolete_server", "Obsolete HTTP Server", num_bits_flow_risks, nil, bit(15), "nDPI Flow Risk: Obsolete HTTP Server")
-flow_risks[48] = ProtoField.bool("ndpi.flow_risk.periodic_flow", "Periodic Flow", num_bits_flow_risks, nil, bit(16), "nDPI Flow Risk: Periodic Flow")
-flow_risks[49] = ProtoField.bool("ndpi.flow_risk.minor_issues", "Minor flow issues", num_bits_flow_risks, nil, bit(17), "nDPI Flow Risk: Minor flow issues")
-flow_risks[50] = ProtoField.bool("ndpi.flow_risk.tcp_issues", "TCP connection issues", num_bits_flow_risks, nil, bit(18), "nDPI Flow Risk: TCP connection issues")
-flow_risks[51] = ProtoField.bool("ndpi.flow_risk.fully_encrypted", "Fully encrypted connection", num_bits_flow_risks, nil, bit(19), "nDPI Flow Risk: Fully encrypted connection")
-flow_risks[52] = ProtoField.bool("ndpi.flow_risk.tls_alpn_sni_mismatch", "ALPN/SNI Mismatch", num_bits_flow_risks, nil, bit(20), "nDPI Flow Risk: ALPN/SNI Mismatch")
-flow_risks[53] = ProtoField.bool("ndpi.flow_risk.malware_contact", "Contact with a malware host", num_bits_flow_risks, nil, bit(21), "nDPI Flow Risk: Malware host contacted")
-flow_risks[54] = ProtoField.bool("ndpi.flow_risk.binary_data_transfer", "Attempt to transfer a binary file", num_bits_flow_risks, nil, bit(22), "nDPI Flow Risk: binary data file transfer")
-flow_risks[55] = ProtoField.bool("ndpi.flow_risk.probing_attempt", "Probing attempt", num_bits_flow_risks, nil, bit(23), "nDPI Flow Risk: probing attempt")
+flow_risks[32] = ProtoField.bool("ndpi.flow_risk.cert_validity_too_long", "TLS certificate validity longer than 13 months", num_bits_flow_risks, nil, bit(32), "nDPI Flow Risk: TLS certificate validity longer than 13 months")
+flow_risks[33] = ProtoField.bool("ndpi.flow_risk.suspicious_extension", "TLS suspicious extension", num_bits_flow_risks, nil, bit(33), "nDPI Flow Risk: TLS suspicious extension")
+flow_risks[34] = ProtoField.bool("ndpi.flow_risk.fatal_alert", "TLS fatal alert detected", num_bits_flow_risks, nil, bit(34), "nDPI Flow Risk: TLS fatal alert")
+flow_risks[35] = ProtoField.bool("ndpi.flow_risk.suspicious_entropy", "Suspicious entropy", num_bits_flow_risks, nil, bit(35), "nDPI Flow Risk: suspicious entropy")
+flow_risks[36] = ProtoField.bool("ndpi.flow_risk.clear_text_credentials", "Cleat-Text credentials", num_bits_flow_risks, nil, bit(36), "nDPI Flow Risk: cleat-text credentials")
+flow_risks[37] = ProtoField.bool("ndpi.flow_risk.dns_large_packet", "DNS large packet", num_bits_flow_risks, nil, bit(37), "nDPI Flow Risk: DNS packet is larger than 512 bytes")
+flow_risks[38] = ProtoField.bool("ndpi.flow_risk.dns_fragmented", "DNS fragmented", num_bits_flow_risks, nil, bit(38), "nDPI Flow Risk: DNS message is fragmented")
+flow_risks[39] = ProtoField.bool("ndpi.flow_risk.invalid_characters", "Invalid characters", num_bits_flow_risks, nil, bit(39), "nDPI Flow Risk: Text contains non-printable characters")
+flow_risks[40] = ProtoField.bool("ndpi.flow_risk.possible_exploit", "Possible Exploit", num_bits_flow_risks, nil, bit(40), "nDPI Flow Risk: Possible exploit attempt detected")
+flow_risks[41] = ProtoField.bool("ndpi.flow_risk.cert_about_to_expire", "TLS cert about to expire", num_bits_flow_risks, nil, bit(41), "nDPI Flow Risk: TLS certificate about to expire")
+flow_risks[42] = ProtoField.bool("ndpi.flow_risk.punycode_idn", "IDN Domain Name", num_bits_flow_risks, nil, bit(42), "nDPI Flow Risk: IDN Domain Name")
+flow_risks[43] = ProtoField.bool("ndpi.flow_risk.error_code_detected", "Error Code Detected", num_bits_flow_risks, nil, bit(43), "nDPI Flow Risk: Error Code Detected")
+flow_risks[44] = ProtoField.bool("ndpi.flow_risk.crawler_bot", "Crawler/Bot Detected", num_bits_flow_risks, nil, bit(44), "nDPI Flow Risk: Crawler/Bot Detected")
+flow_risks[45] = ProtoField.bool("ndpi.flow_risk.anonymous_subscriber", "Anonymous Subscriber", num_bits_flow_risks, nil, bit(45), "nDPI Flow Risk: Anonymous Subscriber")
+flow_risks[46] = ProtoField.bool("ndpi.flow_risk.unidirectional_traffic", "Unidirectional Traffic", num_bits_flow_risks, nil, bit(46), "nDPI Flow Risk: Unidirectional Traffi")
+flow_risks[47] = ProtoField.bool("ndpi.flow_risk.http_obsolete_server", "Obsolete HTTP Server", num_bits_flow_risks, nil, bit(47), "nDPI Flow Risk: Obsolete HTTP Server")
+flow_risks[48] = ProtoField.bool("ndpi.flow_risk.periodic_flow", "Periodic Flow", num_bits_flow_risks, nil, bit(48), "nDPI Flow Risk: Periodic Flow")
+flow_risks[49] = ProtoField.bool("ndpi.flow_risk.minor_issues", "Minor flow issues", num_bits_flow_risks, nil, bit(49), "nDPI Flow Risk: Minor flow issues")
+flow_risks[50] = ProtoField.bool("ndpi.flow_risk.tcp_issues", "TCP connection issues", num_bits_flow_risks, nil, bit(50), "nDPI Flow Risk: TCP connection issues")
+flow_risks[51] = ProtoField.bool("ndpi.flow_risk.fully_encrypted", "Fully encrypted connection", num_bits_flow_risks, nil, bit(51), "nDPI Flow Risk: Fully encrypted connection")
+flow_risks[52] = ProtoField.bool("ndpi.flow_risk.tls_alpn_sni_mismatch", "ALPN/SNI Mismatch", num_bits_flow_risks, nil, bit(52), "nDPI Flow Risk: ALPN/SNI Mismatch")
+flow_risks[53] = ProtoField.bool("ndpi.flow_risk.malware_contact", "Contact with a malware host", num_bits_flow_risks, nil, bit(53), "nDPI Flow Risk: Malware host contacted")
+flow_risks[54] = ProtoField.bool("ndpi.flow_risk.binary_data_transfer", "Attempt to transfer a binary file", num_bits_flow_risks, nil, bit(54), "nDPI Flow Risk: binary data file transfer")
+flow_risks[55] = ProtoField.bool("ndpi.flow_risk.probing_attempt", "Probing attempt", num_bits_flow_risks, nil, bit(55), "nDPI Flow Risk: probing attempt")
 
 -- Last one: keep in sync the bitmask when adding new risks!!
-flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT32, nil, base.HEX, bit(32) - bit(24))
+flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT64, nil, base.HEX, bit(64) - bit(56))
 
 for _,v in pairs(flow_risks) do
   ndpi_fds[#ndpi_fds + 1] = v
@@ -1077,12 +1080,11 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       
 	       for i=0,63 do
 		 if flow_risks[i] ~= nil then
-	            -- Wireshark/Lua doesn't handle 64 bit integer very well, so we split the risk mask into two 32 bit integer values
-	            flow_risk_tree:add(flow_risks[i], trailer_tvb((i < 32 and 12 or 8), 4))
+	            flow_risk_tree:add(flow_risks[i], trailer_tvb(8, 8))
 		 end
 
 	       end
-	       flow_risk_tree:add(flow_risks[64], trailer_tvb(8, 4)) -- Unused bits in flow risk bitmask
+	       flow_risk_tree:add(flow_risks[64], trailer_tvb(8, 8)) -- Unused bits in flow risk bitmask
 	    end
 	    
 	    if(flow_score > 0) then
