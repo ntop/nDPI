@@ -761,13 +761,13 @@ function dns_dissector(tvb, pinfo, tree)
    local dns_response = f_dns_response()
    if(dns_response ~= nil) then
       local dns_ret_code = f_dns_ret_code()
-      local dns_response = tonumber(getval(dns_response))
+      local dns_response = dns_response() -- conversion to true/false. We can't use tonumber() on Bool
       local srckey = tostring(pinfo.src)
       local dstkey = tostring(pinfo.dst)
       local dns_query_name = f_dns_query_name()
       dns_query_name = getval(dns_query_name)
 
-      if(dns_response == 0) then
+      if(dns_response == false) then
 	 -- DNS Query
 	 if(dns_client_queries[srckey] == nil) then dns_client_queries[srckey] = 0 end
 	 dns_client_queries[srckey] = dns_client_queries[srckey] + 1
