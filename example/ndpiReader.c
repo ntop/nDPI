@@ -795,7 +795,7 @@ void extcap_dlts() {
 
 struct ndpi_proto_sorter {
   int id;
-  char name[16];
+  char name[32];
 };
 
 /* ********************************** */
@@ -833,18 +833,23 @@ int cmpFlows(const void *_a, const void *_b) {
 
 void extcap_config() {
   int argidx = 0;
-#if 0
+
   struct ndpi_proto_sorter *protos;
   u_int ndpi_num_supported_protocols;
   int i;
   ndpi_proto_defaults_t *proto_defaults;
-#endif
+  NDPI_PROTOCOL_BITMASK all;
 
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
-#if 0
+  if(!ndpi_str) exit(0);
+
+  NDPI_BITMASK_SET_ALL(all);
+  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
+
+  ndpi_finalize_initialization(ndpi_str);
+
   ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_str);
   proto_defaults = ndpi_get_proto_defaults(ndpi_str);
-#endif
 
   /* -i <interface> */
   printf("arg {number=%d}{call=-i}{display=Capture Interface}{type=string}{group=Live Capture}"
@@ -853,15 +858,14 @@ void extcap_config() {
   printf("arg {number=%d}{call=-i}{display=Pcap File to Analyze}{type=fileselect}{mustexist=true}{group=Pcap}"
          "{tooltip=The pcap file to analyze (if the interface is unspecified)}\n", argidx++);
 
-#if 0
-  /* Removed as it breaks! extcap */
+
   protos = (struct ndpi_proto_sorter*)ndpi_malloc(sizeof(struct ndpi_proto_sorter) * ndpi_num_supported_protocols);
   if(!protos) exit(0);
 
   printf("arg {number=%d}{call=--ndpi-proto-filter}{display=nDPI Protocol Filter}{type=selector}{group=Filter}"
          "{tooltip=nDPI Protocol to be filtered}\n", argidx);
 
-  printf("value {arg=%d}{value=%d}{display=%s}{default=true}\n", argidx, 0, "No nDPI filtering");
+  printf("value {arg=%d}{value=%d}{display=%s}{default=true}\n", argidx, (u_int32_t)-1, "No nDPI filtering");
 
   for(i=0; i<(int) ndpi_num_supported_protocols; i++) {
     protos[i].id = i;
@@ -875,7 +879,6 @@ void extcap_config() {
            protos[i].name, protos[i].id);
 
   ndpi_free(protos);
-#endif
 
   ndpi_exit_detection_module(ndpi_str);
 
