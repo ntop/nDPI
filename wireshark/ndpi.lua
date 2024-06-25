@@ -38,6 +38,25 @@ ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.proto
 ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64, nil, base.HEX)
 ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Score", "ndpi.flow_score", ftypes.UINT32)
 
+ndpi_fds.metadata_list        = ProtoField.new("nDPI Metadata List", "ndpi.metadata_list", ftypes.NONE)
+ndpi_fds.metadata             = ProtoField.new("nDPI Metadata", "ndpi.metadata", ftypes.NONE)
+local mtd_types = {
+        [0] = "Padding",
+        [1] = "Server Name",
+        [2] = "JA3C",
+        [3] = "JA3S",
+        [4] = "JA4C"
+}
+ndpi_fds.metadata_type        = ProtoField.new("nDPI Metadata Type", "ndpi.metadata.type", ftypes.UINT16, mtd_types)
+ndpi_fds.metadata_length      = ProtoField.new("nDPI Metadata Length", "ndpi.metadata.length", ftypes.UINT16)
+-- Generic field
+ndpi_fds.metadata_value       = ProtoField.new("nDPI Metadata Value", "ndpi.metadata.value", ftypes.BYTES)
+-- Specific fields
+ndpi_fds.metadata_server_name = ProtoField.new("nDPI Server Name", "ndpi.metadata.server_name", ftypes.STRING)
+ndpi_fds.metadata_ja3c        = ProtoField.new("nDPI JA3C", "ndpi.metadata.ja3c", ftypes.STRING)
+ndpi_fds.metadata_ja3s        = ProtoField.new("nDPI JA3S", "ndpi.metadata.ja3s", ftypes.STRING)
+ndpi_fds.metadata_ja4c        = ProtoField.new("nDPI JA4C", "ndpi.metadata.ja4c", ftypes.STRING)
+
 
 local flow_risks = {}
 --- You can't use a 64 bit integer "as-is" as mask: we choose to use UInt64 object instead
@@ -1055,9 +1074,9 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
 	 if(magic == "19:68:09:24") then
 	    local ndpikey, srckey, dstkey, flowkey, flow_risk
-	    local flow_risk_tree
+	    local flow_risk_tree, metadata_list_tree, metadata_tree
 	    local name
-	    local trailer_tvb          = tvb(tvb:len() - 38, 34) -- The last 4 bytes are the CRC. Even if nDPI needs to update it, it is not part of the nDPI trailer, strictly speaking
+	    local trailer_tvb          = tvb(tvb:len() - 294 , 290) -- The last 4 bytes are the CRC. Even if nDPI needs to update it, it is not part of the nDPI trailer, strictly speaking
 	    local ndpi_subtree         = tree:add(ndpi_proto, trailer_tvb, "nDPI Protocol")
 	    
 	    ndpi_subtree:add(ndpi_fds.magic, trailer_tvb(0, 4))
@@ -1111,6 +1130,39 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       -- Set protocol name in the wireshark protocol column (if not Unknown)
 	       pinfo.cols.protocol = name
 	       --print(network_protocol .. "/" .. application_protocol .. "/".. name)
+	    end
+
+	    -- Metadata
+	    local offset = 34
+	    metadata_list_tree = ndpi_subtree:add(ndpi_fds.metadata_list, trailer_tvb(offset, 256))
+	    while offset + 4 < 294 do
+
+	       local mtd_type = trailer_tvb(offset, 2):int();
+	       local mtd_length = trailer_tvb(offset + 2, 2):int();
+
+	       metadata_tree = metadata_list_tree:add(ndpi_fds.metadata, trailer_tvb(offset, 4 + mtd_length))
+	       metadata_tree:add(ndpi_fds.metadata_type, trailer_tvb(offset, 2))
+	       metadata_tree:add(ndpi_fds.metadata_length, trailer_tvb(offset + 2, 2))
+
+	       -- Specific fields: there is definitely a better way...
+	       if mtd_type == 1 then
+	         metadata_tree:append_text(" ServerName: " .. trailer_tvb(offset + 4, mtd_length):string())
+	         metadata_tree:add(ndpi_fds.metadata_server_name, trailer_tvb(offset + 4, mtd_length))
+	       elseif mtd_type == 2 then
+	         metadata_tree:append_text(" JA3C: " .. trailer_tvb(offset + 4, mtd_length):string())
+	         metadata_tree:add(ndpi_fds.metadata_ja3c, trailer_tvb(offset + 4, mtd_length))
+	       elseif mtd_type == 3 then
+	         metadata_tree:append_text(" JA3S: " .. trailer_tvb(offset + 4, mtd_length):string())
+	         metadata_tree:add(ndpi_fds.metadata_ja3s, trailer_tvb(offset + 4, mtd_length))
+	       elseif mtd_type == 4 then
+	         metadata_tree:append_text(" JA4C: " .. trailer_tvb(offset + 4, mtd_length):string())
+	         metadata_tree:add(ndpi_fds.metadata_ja4c, trailer_tvb(offset + 4, mtd_length))
+	       else
+	         -- Generic field
+	         metadata_tree:add(ndpi_fds.metadata_value, trailer_tvb(offset + 4, mtd_length))
+	       end
+
+	       offset = offset + 4 + mtd_length
 	    end
 
 	    if(compute_flows_stats and pinfo.visited == false) then

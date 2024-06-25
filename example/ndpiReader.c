@@ -216,6 +216,18 @@ struct receiver {
 struct receiver *receivers = NULL, *topReceivers = NULL;
 
 #define WIRESHARK_NTOP_MAGIC 0x19680924
+#define WIRESHARK_METADATA_SIZE	256
+
+#define WIRESHARK_METADATA_SERVERNAME	0x01
+#define WIRESHARK_METADATA_JA3C		0x02
+#define WIRESHARK_METADATA_JA3S		0x03
+#define WIRESHARK_METADATA_JA4C		0x04
+
+struct ndpi_packet_tlv {
+  u_int16_t type;
+  u_int16_t length;
+  unsigned char data[];
+};
 
 PACK_ON
 struct ndpi_packet_trailer {
@@ -224,6 +236,9 @@ struct ndpi_packet_trailer {
   ndpi_risk flow_risk;
   u_int16_t flow_score;
   char name[16];
+  /* TLV of attributes. Having a max and fixed size for all the metadata
+     is not efficient but greatly improves detection of the trailer by Wireshark */
+  unsigned char metadata[WIRESHARK_METADATA_SIZE];
 } PACK_OFF;
 
 static pcap_dumper_t *extcap_dumper = NULL;
@@ -4424,6 +4439,7 @@ static void ndpi_process_packet(u_char *args,
 				const u_char *packet) {
   struct ndpi_proto p;
   ndpi_risk flow_risk;
+  struct ndpi_flow_info *flow;
   u_int16_t thread_id = *((u_int16_t*)args);
 
   /* allocate an exact size buffer to check overflows */
@@ -4434,7 +4450,7 @@ static void ndpi_process_packet(u_char *args,
   }
 
   memcpy(packet_checked, packet, header->caplen);
-  p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked, &flow_risk);
+  p = ndpi_workflow_process_packet(ndpi_thread_info[thread_id].workflow, header, packet_checked, &flow_risk, &flow);
 
   if(!pcap_start.tv_sec) pcap_start.tv_sec = header->ts.tv_sec, pcap_start.tv_usec = header->ts.tv_usec;
   pcap_end.tv_sec = header->ts.tv_sec, pcap_end.tv_usec = header->ts.tv_usec;
@@ -4495,6 +4511,57 @@ static void ndpi_process_packet(u_char *args,
     trailer->flow_score = htons(ndpi_risk2score(flow_risk, &cli_score, &srv_score));
     trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
+
+    /* Metadata */
+    /* Metadata are (all) available in `flow` only after nDPI completed its work!
+       We export them only once */
+    /* TODO: boundary check. Right now there is always enough room, but we should check it if we are
+       going to extend the list of the metadata exported */
+    struct ndpi_packet_tlv *tlv = (struct ndpi_packet_tlv *)trailer->metadata;
+    int tot_len = 0;
+    if(flow && flow->detection_completed == 1) {
+      if(flow->host_server_name[0] != '\0') {
+        tlv->type = ntohs(WIRESHARK_METADATA_SERVERNAME);
+        tlv->length = ntohs(sizeof(flow->host_server_name));
+        memcpy(tlv->data, flow->host_server_name, sizeof(flow->host_server_name));
+        /* TODO: boundary check */
+        tot_len += 4 + htons(tlv->length);
+        tlv = (struct ndpi_packet_tlv *)&trailer->metadata[tot_len];
+      }
+      if(flow->ssh_tls.ja3_client[0] != '\0') {
+        tlv->type = ntohs(WIRESHARK_METADATA_JA3C);
+        tlv->length = ntohs(sizeof(flow->ssh_tls.ja3_client));
+        memcpy(tlv->data, flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client));
+        /* TODO: boundary check */
+        tot_len += 4 + htons(tlv->length);
+        tlv = (struct ndpi_packet_tlv *)&trailer->metadata[tot_len];
+      }
+      if(flow->ssh_tls.ja3_server[0] != '\0') {
+        tlv->type = ntohs(WIRESHARK_METADATA_JA3S);
+        tlv->length = ntohs(sizeof(flow->ssh_tls.ja3_server));
+        memcpy(tlv->data, flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server));
+        /* TODO: boundary check */
+        tot_len += 4 + htons(tlv->length);
+        tlv = (struct ndpi_packet_tlv *)&trailer->metadata[tot_len];
+      }
+      if(flow->ssh_tls.ja4_client[0] != '\0') {
+        tlv->type = ntohs(WIRESHARK_METADATA_JA4C);
+        tlv->length = ntohs(sizeof(flow->ssh_tls.ja4_client));
+        memcpy(tlv->data, flow->ssh_tls.ja4_client, sizeof(flow->ssh_tls.ja4_client));
+        /* TODO: boundary check */
+        tot_len += 4 + htons(tlv->length);
+        tlv = (struct ndpi_packet_tlv *)&trailer->metadata[tot_len];
+      }
+
+      flow->detection_completed = 2; /* Avoid exporting metadata again.
+                                        If we really want to have the metadata on Wireshark for *all*
+                                        the future packets of this flow, simply remove that assignment */
+    }
+    /* Last: padding */
+    tlv->type = 0;
+    tlv->length = ntohs(WIRESHARK_METADATA_SIZE - tot_len - 4);
+    /* The remaining bytes are already set to 0 */
+
     crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
     *crc = ndpi_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer));
     h.caplen += delta, h.len += delta;

@@ -126,9 +126,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     if(packet_checked) {
       ndpi_risk flow_risk;
+      struct ndpi_flow_info *flow = NULL; /* unused */
 
       memcpy(packet_checked, pkt, header->caplen);
-      ndpi_workflow_process_packet(workflow, header, packet_checked, &flow_risk);
+      ndpi_workflow_process_packet(workflow, header, packet_checked, &flow_risk, &flow);
       free(packet_checked);
     }
 

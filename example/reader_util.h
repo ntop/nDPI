@@ -416,7 +416,8 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow);
 struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 					       const struct pcap_pkthdr *header,
 					       const u_char *packet,
-					       ndpi_risk *flow_risk);
+					       ndpi_risk *flow_risk,
+					       struct ndpi_flow_info **flow);
 
 
 /* Flow callback for completed flows, before the flow memory will be freed. */

@@ -1440,7 +1440,8 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 					   const struct pcap_pkthdr *header,
 					   const u_char *packet,
 					   pkt_timeval when,
-					   ndpi_risk *flow_risk) {
+					   ndpi_risk *flow_risk,
+					   struct ndpi_flow_info **flow_ext) {
   struct ndpi_flow_info *flow = NULL;
   struct ndpi_flow_struct *ndpi_flow = NULL;
   u_int8_t proto;
@@ -1702,6 +1703,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 #endif
 
   *flow_risk = flow->risk;
+  *flow_ext = flow;
 
   return(flow->detected_protocol);
 }
@@ -1851,7 +1853,8 @@ static uint32_t ndpi_is_valid_gre_tunnel(const struct pcap_pkthdr *header,
 struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 					       const struct pcap_pkthdr *header,
 					       const u_char *packet,
-					       ndpi_risk *flow_risk) {
+					       ndpi_risk *flow_risk,
+					       struct ndpi_flow_info **flow) {
   /*
    * Declare pointers to packet headers
    */
@@ -1900,6 +1903,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   u_int8_t vlan_packet = 0;
 
   *flow_risk = 0 /* NDPI_NO_RISK */;
+  *flow = NULL;
 
   /* Increment raw packet counter */
   workflow->stats.raw_packet_count++;
@@ -2376,7 +2380,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   return(packet_processing(workflow, time_ms, vlan_id, tunnel_type, iph, iph6,
 			   header->caplen - ip_offset,
 			   header->caplen, header, packet, header->ts,
-			   flow_risk));
+			   flow_risk, flow));
 }
 
 /* *********************************************** */
