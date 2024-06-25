@@ -23,6 +23,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_serialization_format serialization_format;
   NDPI_PROTOCOL_BITMASK enabled_bitmask;
   ndpi_risk flow_risk;
+  struct ndpi_flow_info *flow = NULL; /* unused */
   const u_char *pkt;
   struct pcap_pkthdr *header;
   int r, rc;
@@ -95,7 +96,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       header = NULL;
       r = pcap_next_ex(pcap_handle, &header, &pkt);
       while (r > 0) {
-        ndpi_workflow_process_packet(w, header, pkt, &flow_risk);
+        ndpi_workflow_process_packet(w, header, pkt, &flow_risk, &flow);
         r = pcap_next_ex(pcap_handle, &header, &pkt);
       }
     }
