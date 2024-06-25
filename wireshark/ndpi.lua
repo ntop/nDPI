@@ -198,6 +198,8 @@ local debug                  = false
 
 local dump_timeseries = false
 
+local dissect_ndpi_trailer = true
+
 local dump_file = "/tmp/wireshark-influx.txt"
 local file
 
@@ -1027,11 +1029,11 @@ end
 
 -- the dissector function callback
 function ndpi_proto.dissector(tvb, pinfo, tree)
-   -- Wireshark dissects the packet twice. We ignore the first
-   -- run as on that step the packet is still undecoded
-   -- The trick below avoids to process the packet twice
+   -- Wireshark dissects the packet twice. General rule:
+   --  * proto fields must be add in both cases (to be compatible with tshark)
+   --  * statistics should be gather onl on first pass
 
-   if(pinfo.visited == true) then
+   if(dissect_ndpi_trailer) then
       local eth_trailer = {f_eth_trailer()}
       local vlan_trailer = {f_vlan_trailer()}
 
@@ -1068,15 +1070,17 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    flow_score = trailer_tvb(16, 2):int()
 
 	    if (flow_risk ~= UInt64(0, 0)) then
-	       local rev_key = getstring(pinfo.dst)..":"..getstring(pinfo.dst_port).." - "..getstring(pinfo.src)..":"..getstring(pinfo.src_port)
+               if(pinfo.visited == false) then
+	          local rev_key = getstring(pinfo.dst)..":"..getstring(pinfo.dst_port).." - "..getstring(pinfo.src)..":"..getstring(pinfo.src_port)
 
-	       if(flows_with_risks[rev_key] == nil) then
-		  local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).." - "..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
+	          if(flows_with_risks[rev_key] == nil) then
+		     local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).." - "..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
 		  
-		  if(flows_with_risks[key] == nil) then
-		     flows_with_risks[key] = flow_score
-		  end
-	       end
+		     if(flows_with_risks[key] == nil) then
+		        flows_with_risks[key] = flow_score
+		     end
+                  end
+               end
 	       
 	       for i=0,63 do
 		 if flow_risks[i] ~= nil then
@@ -1109,7 +1113,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       --print(network_protocol .. "/" .. application_protocol .. "/".. name)
 	    end
 
-	    if(compute_flows_stats) then
+	    if(compute_flows_stats and pinfo.visited == false) then
 	       ndpikey = tostring(slen(name))
 
 	       if(ndpi_protos[ndpikey] == nil) then ndpi_protos[ndpikey] = 0 end
@@ -1144,8 +1148,9 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 end
       end -- nDPI
 
+      -- These dissector add some proto fields
       latency_dissector(tvb, pinfo, tree)
-      tcp_dissector(tvb, pinfo, tree)
+      rpc_dissector(tvb, pinfo, tree)
    end
    
    -- ###########################################
@@ -1172,7 +1177,8 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    if(dump_timeseries) then
       timeseries_dissector(tvb, pinfo, tree)
    end
-   
+
+   tcp_dissector(tvb, pinfo, tree)
    mac_dissector(tvb, pinfo, tree)
    arp_dissector(tvb, pinfo, tree)
    vlan_dissector(tvb, pinfo, tree)
@@ -1180,7 +1186,6 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    http_dissector(tvb, pinfo, tree)
    dhcp_dissector(tvb, pinfo, tree)   
    dns_dissector(tvb, pinfo, tree)
-   rpc_dissector(tvb, pinfo, tree)
 end
 
 register_postdissector(ndpi_proto)
