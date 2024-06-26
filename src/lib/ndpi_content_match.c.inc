@@ -20,6 +20,34 @@
 
 /* ****************************************************** */
 
+
+static ndpi_network ndpi_http_crawler_bot_hardcoded_protocol_list[] = {
+
+ /* GPTBot: https://openai.com/gptbot-ranges.txt */
+ /* TODO:  are we able to autogenerate this list? */
+ { 0x34E69800 /* 52.230.152.0/24 */, 24, NDPI_HTTP_CRAWLER_BOT },
+ { 0x34E96A00 /* 52.233.106.0/24 */, 24, NDPI_HTTP_CRAWLER_BOT },
+
+ /* ChatGPT-User bot: https://platform.openai.com/docs/plugins/bot */
+ /* TODO:  are we able to autogenerate this list? */
+ { 0x17628EB0 /* 23.98.142.176/28 */, 28, NDPI_HTTP_CRAWLER_BOT },
+ { 0x2854B4E0 /* 40.84.180.224/28 */, 28, NDPI_HTTP_CRAWLER_BOT },
+ { 0x0D41F0F0 /* 13.65.240.240/28 */, 28, NDPI_HTTP_CRAWLER_BOT },
+ { 0x1461BD60 /* 20.97.189.96/28 */, 28, NDPI_HTTP_CRAWLER_BOT },
+ { 0x14A14BD0 /* 20.161.75.208/28 */, 28, NDPI_HTTP_CRAWLER_BOT },
+ { 0x34E14BD0 /* 52.225.75.208/28 */, 28, NDPI_HTTP_CRAWLER_BOT },
+ { 0x349C4D90 /* 52.156.77.144/28 */, 28, NDPI_HTTP_CRAWLER_BOT },
+ { 0x2854B440 /* 40.84.180.64/28 */, 28, NDPI_HTTP_CRAWLER_BOT },
+
+ /* End */
+ { 0x0, 0, 0 }
+};
+
+static ndpi_network6 ndpi_http_crawler_bot_hardcoded_protocol_list_6[] = {
+ /* End */
+ { NULL, 0, 0 },
+};
+
 static ndpi_network host_protocol_list[] = {
   /*
     OCS GO (Orange Cinéma Séries)
