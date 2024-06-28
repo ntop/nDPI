@@ -91,8 +91,15 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
    * 2) Handshake Response (92 bytes)
    * 3) Cookie Reply (64 bytes)
    * 4) Transport Data (variable length, min 32 bytes)
+   *
+   *
+   * TunnelBear VPN uses slightly different handshake packets: the format seems the same,
+   * but the length is different (204/100). Not sure why and I don't know if it is some
+   * kind of generic "obfuscation" attempt, used also by other apps. For the time being,
+   * classify this kind of traffic as Wireguard/TunnelBear
    */
-  if (message_type == WG_TYPE_HANDSHAKE_INITIATION && packet->payload_packet_len == 148) {
+  if (message_type == WG_TYPE_HANDSHAKE_INITIATION &&
+      (packet->payload_packet_len == 148 || packet->payload_packet_len == 204)) {
     u_int32_t sender_index = get_u_int32_t(payload, 4);
     /*
      * We always start a new detection stage on a handshake initiation.
@@ -106,7 +113,8 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
       return;
     } 
     /* need more packets before deciding */
-  } else if (message_type == WG_TYPE_HANDSHAKE_RESPONSE && packet->payload_packet_len == 92) {
+  } else if (message_type == WG_TYPE_HANDSHAKE_RESPONSE &&
+             (packet->payload_packet_len == 92 || packet->payload_packet_len == 100)) {
     if (flow->l4.udp.wireguard_stage == 2 - packet->packet_direction) {
       /*
        * This means we are probably processing a handshake response to a handshake
@@ -116,7 +124,10 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
       u_int32_t receiver_index = get_u_int32_t(payload, 8);
 
       if (receiver_index == flow->l4.udp.wireguard_peer_index[1 - packet->packet_direction]) {
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WIREGUARD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+        if(packet->payload_packet_len == 100)
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TUNNELBEAR, NDPI_PROTOCOL_WIREGUARD, NDPI_CONFIDENCE_DPI);
+        else
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WIREGUARD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       } else {
         NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       }
