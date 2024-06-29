@@ -125,6 +125,13 @@ size_t LLVMFuzzerMutate(uint8_t *Data, size_t Size, size_t MaxSize);
 #endif
 
 
+/* If you want custom memory allocators, you can simply change these defines */
+#define pl7m_malloc(size)	malloc(size)
+#define pl7m_calloc(num, size)	calloc(num, size)
+#define pl7m_free(p)		free(p)
+
+
+
 struct gre_header {
 #if defined(__LITTLE_ENDIAN_BITFIELD)
 	u_int16_t rec:3,
@@ -402,8 +409,8 @@ static int dissect_l3(struct m_pkt *p)
 	switch (p->l3_proto) {
 	case ETH_P_IP:
 		ip4 = (struct ip *)data;
-		if (ip4->ip_v != 4 ||
-		    data_len < 20 /* min */ ||
+		if (data_len < 20 /* min */ ||
+		    ip4->ip_v != 4 ||
 		    ip4->ip_hl < 5 ||
 		    data_len < ip4->ip_hl * 4 ||
 		    ntohs(ip4->ip_len) < ip4->ip_hl * 4) {
@@ -931,12 +938,12 @@ static struct m_pkt *__dup_pkt(struct m_pkt *p)
 {
 	struct m_pkt *n;
 
-	n = (struct m_pkt *)malloc(sizeof(struct m_pkt));
+	n = (struct m_pkt *)pl7m_malloc(sizeof(struct m_pkt));
 	if (!n)
 		return NULL;
-	n->raw_data = (unsigned char *)malloc(MAX_PKT_LENGTH);
+	n->raw_data = (unsigned char *)pl7m_malloc(MAX_PKT_LENGTH);
 	if(!n->raw_data) {
-		free(n);
+		pl7m_free(n);
 		return NULL;
 	}
 	memcpy(n->raw_data, p->raw_data, p->header.caplen);
@@ -960,8 +967,8 @@ static struct m_pkt *__dup_pkt(struct m_pkt *p)
 }
 static void __free_pkt(struct m_pkt *p)
 {
-	free(p->raw_data);
-	free(p);
+	pl7m_free(p->raw_data);
+	pl7m_free(p);
 }
 static void __add_pkt(struct pl7m_handle *h, struct m_pkt *p,
 		      struct m_pkt *prev, struct m_pkt *next)
@@ -1023,7 +1030,7 @@ static void __free_m_pkts(struct pl7m_handle *h)
 		__free_pkt(p);
 		p = n;
 	}
-	free(h);
+	pl7m_free(h);
 }
 
 static struct m_pkt *do_pkt_actions(struct pl7m_handle *h, struct m_pkt *p, struct m_pkt **prev)
@@ -1167,7 +1174,7 @@ static struct pl7m_handle *__deserialize_from_fd(FILE *fd_in)
 		return NULL;
 	}
 
-	h = (struct pl7m_handle *)calloc(1, sizeof(struct pl7m_handle));
+	h = (struct pl7m_handle *)pl7m_calloc(1, sizeof(struct pl7m_handle));
 	if (!h) {
 		pcap_close(pcap_h);
 		return NULL;
@@ -1183,15 +1190,15 @@ static struct pl7m_handle *__deserialize_from_fd(FILE *fd_in)
 			/* Ignore current pkt, but keep going */
 			continue;
 		}
-		p = (struct m_pkt *)calloc(sizeof(struct m_pkt), 1);
+		p = (struct m_pkt *)pl7m_calloc(sizeof(struct m_pkt), 1);
 		if (!p) {
 			__free_m_pkts(h);
 			pcap_close(pcap_h);
 			return NULL;
 		}
-		p->raw_data = (unsigned char *)malloc(MAX_PKT_LENGTH);
+		p->raw_data = (unsigned char *)pl7m_malloc(MAX_PKT_LENGTH);
 		if (!p->raw_data) {
-			free(p);
+			pl7m_free(p);
 			__free_m_pkts(h);
 			pcap_close(pcap_h);
 			return NULL;
@@ -1205,8 +1212,8 @@ static struct pl7m_handle *__deserialize_from_fd(FILE *fd_in)
 		if (rc != 0) {
 			derr("Error dissect_do\n");
 			/* Ignore current pkt, but keep going */
-			free(p->raw_data);
-			free(p);
+			pl7m_free(p->raw_data);
+			pl7m_free(p);
 			continue;
 		}
 
