@@ -3298,6 +3298,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
   }
 
   ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, host_protocol_list);
+  ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, host_protocol_list_6);
 
   ndpi_str->ip_risk_mask = ndpi_ptree_create();
 
@@ -6180,6 +6181,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* (Magellan) Ripe Atlas */
   init_ripe_atlas_dissector(ndpi_str, &a);
+
+  /* Cloudflare WARP */
+  init_cloudflare_warp_dissector(ndpi_str, &a);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"

@@ -323,6 +323,15 @@ static ndpi_network host_protocol_list[] = {
   { 0xADC70000 /* 173.199.0.0/18 */, 18, NDPI_PROTOCOL_GOTO },
   { 0x17EFE000 /* 23.239.224.0/19 */, 19, NDPI_PROTOCOL_GOTO },
 
+
+  /* CloudflareWarp: https://developers.cloudflare.com/cloudflare-one/connections/connect-devices/warp/deployment/firewall/
+     TODO:  are we able to autogenerate this list?
+  */
+  { 0xA29FC100 /* 162.159.193.0/24 */, 24, NDPI_PROTOCOL_CLOUDFLARE_WARP },
+  { 0xA29FC000 /* 162.159.192.0/24 */, 24, NDPI_PROTOCOL_CLOUDFLARE_WARP },
+  { 0xA29FC500 /* 162.159.197.0/24 */, 24, NDPI_PROTOCOL_CLOUDFLARE_WARP },
+
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_protocol_list.c.inc"
 #endif
@@ -331,6 +340,15 @@ static ndpi_network host_protocol_list[] = {
   { 0x0, 0, 0 }
 };
 
+static ndpi_network6 host_protocol_list_6[] = {
+
+ /* See the ipv4 list for a description */
+ { "2606:4700:100::", 48, NDPI_PROTOCOL_CLOUDFLARE_WARP },
+ { "2606:4700:102::", 48, NDPI_PROTOCOL_CLOUDFLARE_WARP },
+
+ /* End */
+ { NULL, 0, 0 }
+};
 
 /* ****************************************************** */
 

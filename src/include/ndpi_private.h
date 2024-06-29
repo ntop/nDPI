@@ -918,6 +918,7 @@ void init_cod_mobile_dissector(struct ndpi_detection_module_struct *ndpi_struct,
 void init_zug_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_jrmi_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_ripe_atlas_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_cloudflare_warp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 
