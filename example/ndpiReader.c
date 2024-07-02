@@ -1747,6 +1747,24 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 				    flow->detected_protocol) ? "Encrypted" : "ClearText");
 
     fprintf(out, "[Confidence: %s]", ndpi_confidence_get_name(flow->confidence));
+
+    if(flow->fpc.master_protocol == NDPI_PROTOCOL_UNKNOWN) {
+      fprintf(out, "[FPC: %u/%s, ",
+              flow->fpc.app_protocol,
+              ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                flow->fpc.app_protocol));
+    } else {
+      fprintf(out, "[FPC: %u.%u/%s.%s, ",
+              flow->fpc.master_protocol,
+              flow->fpc.app_protocol,
+              ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                flow->fpc.master_protocol),
+              ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                flow->fpc.app_protocol));
+    }
+    fprintf(out, "Confidence: %s]",
+	    ndpi_fpc_confidence_get_name(flow->fpc.confidence));
+
     /* If someone wants to have the num_dissector_calls variable per flow, he can print it here.
        Disabled by default to avoid too many diffs in the unit tests...
     */

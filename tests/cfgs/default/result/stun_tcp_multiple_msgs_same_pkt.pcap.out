@@ -23,4 +23,4 @@ STUN	5	506	1
 
 Acceptable                       5 506           1            
 
-	1	TCP 166.172.142.131:3479 <-> 23.183.197.71:42849 [proto: 78/STUN][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 5][cat: Network/14][1 pkts/74 bytes <-> 4 pkts/432 bytes][Goodput ratio: 0/39][10.93 sec][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][PLAIN TEXT (RXgFYlY)][Plen Bins: 75,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 166.172.142.131:3479 <-> 23.183.197.71:42849 [proto: 78/STUN][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Network/14][1 pkts/74 bytes <-> 4 pkts/432 bytes][Goodput ratio: 0/39][10.93 sec][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][PLAIN TEXT (RXgFYlY)][Plen Bins: 75,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

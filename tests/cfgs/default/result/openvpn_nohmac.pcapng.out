@@ -23,4 +23,4 @@ OpenVPN	944	303931	1
 
 Acceptable                     944 303931        1            
 
-	1	UDP 3.111.166.78:51146 <-> 85.134.13.165:1194 [proto: 159/OpenVPN][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][DPI packets: 2][cat: VPN/2][594 pkts/138399 bytes <-> 350 pkts/165532 bytes][Goodput ratio: 82/91][73.25 sec][bytes ratio: -0.089 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 101/181 5093/5107 502/713][Pkt Len c2s/s2c min/avg/max/stddev: 60/64 233/473 1490/1487 273/526][PLAIN TEXT (New York1)][Plen Bins: 18,1,1,72,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 3.111.166.78:51146 <-> 85.134.13.165:1194 [proto: 159/OpenVPN][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 2][cat: VPN/2][594 pkts/138399 bytes <-> 350 pkts/165532 bytes][Goodput ratio: 82/91][73.25 sec][bytes ratio: -0.089 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 101/181 5093/5107 502/713][Pkt Len c2s/s2c min/avg/max/stddev: 60/64 233/473 1490/1487 273/526][PLAIN TEXT (New York1)][Plen Bins: 18,1,1,72,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0]

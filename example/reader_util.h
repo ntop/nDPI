@@ -208,6 +208,7 @@ typedef struct ndpi_flow_info {
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
   ndpi_confidence_t confidence;
+  struct ndpi_fpc_info fpc;
   u_int16_t num_dissector_calls;
   u_int16_t dpi_packets;
 

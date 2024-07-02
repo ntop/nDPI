@@ -23,4 +23,4 @@ Ether-S-Bus	20	1260	1
 
 Acceptable                      20 1260          1            
 
-	1	UDP 172.16.1.120:2467 <-> 172.16.1.135:5050 [proto: 368/Ether-S-Bus][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][10 pkts/582 bytes <-> 10 pkts/678 bytes][Goodput ratio: 28/34][0.10 sec][bytes ratio: -0.076 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 7/8 10/10 22/20 5/4][Pkt Len c2s/s2c min/avg/max/stddev: 55/60 58/68 67/94 3/13][PLAIN TEXT (Modell  )][Plen Bins: 90,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 172.16.1.120:2467 <-> 172.16.1.135:5050 [proto: 368/Ether-S-Bus][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: IoT-Scada/31][10 pkts/582 bytes <-> 10 pkts/678 bytes][Goodput ratio: 28/34][0.10 sec][bytes ratio: -0.076 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 7/8 10/10 22/20 5/4][Pkt Len c2s/s2c min/avg/max/stddev: 55/60 58/68 67/94 3/13][PLAIN TEXT (Modell  )][Plen Bins: 90,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

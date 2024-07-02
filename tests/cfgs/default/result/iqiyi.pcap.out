@@ -23,4 +23,4 @@ iQIYI	2	327	1
 
 Fun                              2 327           1            
 
-	1	UDP 10.215.173.1:50412 <-> 116.211.199.199:16600 [proto: 54/iQIYI][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: Streaming/17][1 pkts/163 bytes <-> 1 pkts/164 bytes][Goodput ratio: 82/82][0.44 sec][PLAIN TEXT (PPStream)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.215.173.1:50412 <-> 116.211.199.199:16600 [proto: 54/iQIYI][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Streaming/17][1 pkts/163 bytes <-> 1 pkts/164 bytes][Goodput ratio: 82/82][0.44 sec][PLAIN TEXT (PPStream)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

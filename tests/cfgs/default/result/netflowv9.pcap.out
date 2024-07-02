@@ -23,4 +23,4 @@ NetFlow	10	13888	1
 
 Acceptable                      10 13888         1            
 
-	1	UDP 192.168.2.134:48629 -> 192.168.2.222:2057 [proto: 128/NetFlow][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Network/14][10 pkts/13888 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 1362/0 1389/0 1418/0 23/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,30,20,0,0,0,0]
+	1	UDP 192.168.2.134:48629 -> 192.168.2.222:2057 [proto: 128/NetFlow][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][10 pkts/13888 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 1362/0 1389/0 1418/0 23/0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,30,20,0,0,0,0]

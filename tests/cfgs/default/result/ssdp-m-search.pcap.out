@@ -23,4 +23,4 @@ SSDP	19	1197	1
 
 Acceptable                      19 1197          1            
 
-	1	UDP 192.168.242.8:42253 -> 192.168.242.255:32412 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: System/18][19 pkts/1197 bytes -> 0 pkts/0 bytes][Goodput ratio: 33/0][90.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4999/0 4999/0 5000/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 63/0 63/0 63/0 0/0][PLAIN TEXT (SEARCH )][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.242.8:42253 -> 192.168.242.255:32412 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: System/18][19 pkts/1197 bytes -> 0 pkts/0 bytes][Goodput ratio: 33/0][90.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 4999/0 4999/0 5000/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 63/0 63/0 63/0 0/0][PLAIN TEXT (SEARCH )][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

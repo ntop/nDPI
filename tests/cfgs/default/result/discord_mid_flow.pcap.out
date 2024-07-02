@@ -23,4 +23,4 @@ Discord	40	4040	1
 
 Fun                             40 4040          1            
 
-	1	UDP 66.22.242.132:50001 <-> 5.36.141.228:54935 [VLAN: 1][proto: 58/Discord][IP: 58/Discord][Encrypted][Confidence: DPI][DPI packets: 3][cat: Collaborative/15][30 pkts/3110 bytes <-> 10 pkts/930 bytes][Goodput ratio: 43/37][24.00 sec][bytes ratio: 0.540 (Upload)][IAT c2s/s2c min/avg/max/stddev: 42/77 846/1740 1000/4217 343/1555][Pkt Len c2s/s2c min/avg/max/stddev: 72/68 104/93 110/118 14/25][Plen Bins: 25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 66.22.242.132:50001 <-> 5.36.141.228:54935 [VLAN: 1][proto: 58/Discord][IP: 58/Discord][Encrypted][Confidence: DPI][FPC: 58/Discord, Confidence: IP address][DPI packets: 3][cat: Collaborative/15][30 pkts/3110 bytes <-> 10 pkts/930 bytes][Goodput ratio: 43/37][24.00 sec][bytes ratio: 0.540 (Upload)][IAT c2s/s2c min/avg/max/stddev: 42/77 846/1740 1000/4217 343/1555][Pkt Len c2s/s2c min/avg/max/stddev: 72/68 104/93 110/118 14/25][Plen Bins: 25,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

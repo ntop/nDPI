@@ -23,4 +23,4 @@ BitTorrent	2	322	1
 
 Acceptable                       2 322           1            
 
-	1	UDP 192.168.0.102:6771 -> 239.192.152.143:6771 [proto: 37/BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Download/7][2 pkts/322 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][300.03 sec][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.0.102:6771 -> 239.192.152.143:6771 [proto: 37/BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Download/7][2 pkts/322 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][300.03 sec][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

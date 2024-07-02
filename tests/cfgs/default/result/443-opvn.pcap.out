@@ -23,4 +23,4 @@ OpenVPN	46	11573	1
 
 Acceptable                      46 11573         1            
 
-	1	TCP 192.168.1.84:52973 <-> 192.12.192.103:1194 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 6][cat: VPN/2][25 pkts/5636 bytes <-> 21 pkts/5937 bytes][Goodput ratio: 70/77][8.96 sec][bytes ratio: -0.026 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 443/427 3959/4015 926/1024][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 225/283 1506/1506 330/399][PLAIN TEXT (Registro.it)][Plen Bins: 4,41,4,8,0,0,0,0,0,4,4,0,0,0,4,0,0,4,0,8,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,8,0,0]
+	1	TCP 192.168.1.84:52973 <-> 192.12.192.103:1194 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: VPN/2][25 pkts/5636 bytes <-> 21 pkts/5937 bytes][Goodput ratio: 70/77][8.96 sec][bytes ratio: -0.026 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 443/427 3959/4015 926/1024][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 225/283 1506/1506 330/399][PLAIN TEXT (Registro.it)][Plen Bins: 4,41,4,8,0,0,0,0,0,4,4,0,0,0,4,0,0,4,0,8,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,8,0,0]

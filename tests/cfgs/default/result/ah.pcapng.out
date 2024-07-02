@@ -24,5 +24,5 @@ IPSec	6	1768	2
 
 Safe                             6 1768          2            
 
-	1	UDP 10.2.3.2:500 <-> 10.3.4.4:500 [proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: VPN/2][2 pkts/770 bytes <-> 2 pkts/722 bytes][Goodput ratio: 89/88][0.02 sec][PLAIN TEXT (DELETE)][Plen Bins: 0,0,0,0,0,0,0,0,25,0,25,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	AH 10.2.3.2:0 <-> 10.3.4.4:0 [proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 1][cat: VPN/2][1 pkts/138 bytes <-> 1 pkts/138 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.2.3.2:500 <-> 10.3.4.4:500 [proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: VPN/2][2 pkts/770 bytes <-> 2 pkts/722 bytes][Goodput ratio: 89/88][0.02 sec][PLAIN TEXT (DELETE)][Plen Bins: 0,0,0,0,0,0,0,0,25,0,25,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	AH 10.2.3.2:0 <-> 10.3.4.4:0 [proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: VPN/2][1 pkts/138 bytes <-> 1 pkts/138 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
