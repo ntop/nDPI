@@ -446,6 +446,7 @@ typedef enum {
   NDPI_PROTOCOL_ZUG                   = 415,
   NDPI_PROTOCOL_JRMI                  = 416, 
   NDPI_PROTOCOL_RIPE_ATLAS            = 417,
+  NDPI_PROTOCOL_JSON                  = 418,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
