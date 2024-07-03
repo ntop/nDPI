@@ -8287,6 +8287,33 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
 
 /* ********************************************************************************* */
 
+static void fpc_update(struct ndpi_detection_module_struct *ndpi_str,
+                       struct ndpi_flow_struct *flow,
+		       u_int16_t fpc_master, u_int16_t fpc_app,
+		       ndpi_fpc_confidence_t fpc_confidence)
+{
+  NDPI_LOG_DBG(ndpi_str, "FPC %d.%d/%s -> %d.%d/%s\n",
+               flow->fpc.master_protocol, flow->fpc.app_protocol,
+               ndpi_fpc_confidence_get_name(flow->fpc.confidence),
+               fpc_master, fpc_app,
+               ndpi_fpc_confidence_get_name(fpc_confidence));
+  flow->fpc.master_protocol = fpc_master;
+  flow->fpc.app_protocol = fpc_app;
+  flow->fpc.confidence = fpc_confidence;
+}
+
+/* ********************************************************************************* */
+
+static void fpc_check_ip(struct ndpi_detection_module_struct *ndpi_str,
+                         struct ndpi_flow_struct *flow)
+{
+  if(flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN)
+    fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
+               flow->guessed_protocol_id_by_ip, NDPI_FPC_CONFIDENCE_IP);
+}
+
+/* ********************************************************************************* */
+
 static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detection_module_struct *ndpi_str,
 							    struct ndpi_flow_struct *flow,
 							    const unsigned char *packet_data,
@@ -8421,6 +8448,8 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
     if(ndpi_do_guess(ndpi_str, flow, &ret) == -1)
       return(ret);
+
+    fpc_check_ip(ndpi_str, flow);
   }
 
   num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
@@ -9378,6 +9407,25 @@ const char *ndpi_confidence_get_name(ndpi_confidence_t confidence)
 
   default:
     return NULL;
+  }
+}
+
+/* ****************************************************** */
+
+const char *ndpi_fpc_confidence_get_name(ndpi_fpc_confidence_t fpc_confidence)
+{
+  switch(fpc_confidence) {
+  case NDPI_FPC_CONFIDENCE_UNKNOWN:
+    return "Unknown";
+
+  case NDPI_FPC_CONFIDENCE_IP:
+    return "IP address";
+
+  case NDPI_FPC_CONFIDENCE_DNS:
+    return "DNS";
+
+  default:
+    return "Invalid"; /* Out of sync with ndpi_fpc_confidence_t definition */
   }
 }
 

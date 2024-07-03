@@ -628,6 +628,15 @@ extern "C" {
   const char* ndpi_confidence_get_name(ndpi_confidence_t confidence);
 
   /**
+   * Get FPC confidence as string
+   *
+   * @par     confidence      = the confidence value
+   * @return  the string name of the confidence result
+   *
+   */
+  const char* ndpi_fpc_confidence_get_name(ndpi_fpc_confidence_t fpc_confidence);
+
+  /**
    * Set protocol category string
    *
    * @par     mod           = the detection module

@@ -26,4 +26,4 @@ Unrated                          2 68            1
 
 
 Undetected flows:
-	1	UDP 127.0.0.1:100 <-> 127.0.0.1:200 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 2][1 pkts/32 bytes <-> 1 pkts/36 bytes][Goodput ratio: 12/22][10.70 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 127.0.0.1:100 <-> 127.0.0.1:200 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][1 pkts/32 bytes <-> 1 pkts/36 bytes][Goodput ratio: 12/22][10.70 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

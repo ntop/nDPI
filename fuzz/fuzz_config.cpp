@@ -519,6 +519,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_risk2score(static_cast<ndpi_risk_enum>(fuzzed_data.ConsumeIntegral<u_int64_t>()), &unused1, &unused2);
   ndpi_http_method2str(static_cast<ndpi_http_method>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
   ndpi_confidence_get_name(static_cast<ndpi_confidence_t>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
+  ndpi_fpc_confidence_get_name(static_cast<ndpi_fpc_confidence_t>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
   ndpi_get_proto_breed_name(static_cast<ndpi_protocol_breed_t>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
   ndpi_get_l4_proto_name(static_cast<ndpi_l4_proto_info>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
 

@@ -23,4 +23,4 @@ BitTorrent	2	160	1
 
 Acceptable                       2 160           1            
 
-	1	UDP 10.0.2.15:59751 <-> 10.0.2.3:53 [proto: 5.37/DNS.BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/72 bytes <-> 1 pkts/88 bytes][Goodput ratio: 41/52][0.00 sec][Hostname/SNI: utorrent.com][98.143.146.7][PLAIN TEXT (utorrent)][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.0.2.15:59751 <-> 10.0.2.3:53 [proto: 5.37/DNS.BitTorrent][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Network/14][1 pkts/72 bytes <-> 1 pkts/88 bytes][Goodput ratio: 41/52][0.00 sec][Hostname/SNI: utorrent.com][98.143.146.7][PLAIN TEXT (utorrent)][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -996,6 +996,23 @@ typedef enum {
 } ndpi_confidence_t;
 
 typedef enum {
+  NDPI_FPC_CONFIDENCE_UNKNOWN           = 0,    /* Unknown First Packet Classification */
+  NDPI_FPC_CONFIDENCE_IP,                       /* FPC based on IP address */
+  NDPI_FPC_CONFIDENCE_DNS,                      /* FPC based on DNS information */
+
+  /*
+    IMPORTANT
+
+    Please keep in sync with
+    ndpi_fpc_confidence_get_name()
+    in ndpi_main.c
+  */
+
+  /* Last one */
+  NDPI_FPC_CONFIDENCE_MAX,
+} ndpi_fpc_confidence_t;
+
+typedef enum {
   NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn't provide risks for the network. (e.g., a news site) */
   NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn't provide risks, but could be malicious (e.g., Dropbox) */
   NDPI_PROTOCOL_FUN,                   /* Pure fun protocol, which may be prohibited by the user policy (e.g., Netflix) */
@@ -1119,6 +1136,12 @@ typedef struct _ndpi_automa {
 
 typedef void ndpi_str_hash;
 
+struct ndpi_fpc_info {
+  u_int16_t master_protocol;
+  u_int16_t app_protocol;
+  ndpi_fpc_confidence_t confidence;
+};
+
 typedef struct ndpi_proto {
   /*
     Note
@@ -1194,6 +1217,9 @@ struct ndpi_flow_struct {
 
   u_int16_t num_dissector_calls;
   ndpi_confidence_t confidence; /* ndpi_confidence_t */
+
+  /* First Packet Classification info */
+  struct ndpi_fpc_info fpc;
 
   /*
     if ndpi_struct->direction_detect_disable == 1
@@ -1510,8 +1536,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 256,
                "Size of the struct member protocols increased to more than 256 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1112,
-               "Size of the flow struct increased to more than 1112 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1120,
+               "Size of the flow struct increased to more than 1120 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

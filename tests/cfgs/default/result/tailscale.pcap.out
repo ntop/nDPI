@@ -23,4 +23,4 @@ Tailscale	107	16516	1
 
 Acceptable                     107 16516         1            
 
-	1	UDP 192.168.88.3:41641 <-> 18.196.71.179:41641 [proto: 24/Tailscale][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][DPI packets: 1][cat: VPN/2][51 pkts/7842 bytes <-> 56 pkts/8674 bytes][Goodput ratio: 73/73][31.88 sec][bytes ratio: -0.050 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 28/0 586/517 2000/1880 588/502][Pkt Len c2s/s2c min/avg/max/stddev: 134/134 154/155 170/170 15/16][Plen Bins: 0,0,29,27,42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.88.3:41641 <-> 18.196.71.179:41641 [proto: 24/Tailscale][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 1][cat: VPN/2][51 pkts/7842 bytes <-> 56 pkts/8674 bytes][Goodput ratio: 73/73][31.88 sec][bytes ratio: -0.050 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 28/0 586/517 2000/1880 588/502][Pkt Len c2s/s2c min/avg/max/stddev: 134/134 154/155 170/170 15/16][Plen Bins: 0,0,29,27,42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

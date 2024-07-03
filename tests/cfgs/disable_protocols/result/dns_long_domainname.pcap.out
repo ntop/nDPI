@@ -25,4 +25,4 @@ Google	2	262	1
 
 Acceptable                       2 262           1            
 
-	1	UDP 192.168.1.168:65311 <-> 8.8.8.8:53 [proto: 126/Google][IP: 126/Google][Encrypted][Confidence: Match by IP][DPI packets: 2][cat: Web/5][1 pkts/103 bytes <-> 1 pkts/159 bytes][Goodput ratio: 59/73][0.02 sec][PLAIN TEXT (fhkfhsdkfhsk)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.1.168:65311 <-> 8.8.8.8:53 [proto: 126/Google][IP: 126/Google][Encrypted][Confidence: Match by IP][FPC: 126/Google, Confidence: IP address][DPI packets: 2][cat: Web/5][1 pkts/103 bytes <-> 1 pkts/159 bytes][Goodput ratio: 59/73][0.02 sec][PLAIN TEXT (fhkfhsdkfhsk)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

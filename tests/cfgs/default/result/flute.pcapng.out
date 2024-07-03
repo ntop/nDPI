@@ -23,4 +23,4 @@ FLUTE	4	1347	1
 
 Acceptable                       4 1347          1            
 
-	1	UDP 192.168.88.231:40717 -> 238.1.1.95:40085 [proto: 406/FLUTE][IP: 0/Unknown][ClearText][Confidence: DPI][DPI packets: 1][cat: Download/7][4 pkts/1347 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][4.99 sec][PLAIN TEXT (xml version)][Plen Bins: 25,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.88.231:40717 -> 238.1.1.95:40085 [proto: 406/FLUTE][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Download/7][4 pkts/1347 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][4.99 sec][PLAIN TEXT (xml version)][Plen Bins: 25,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

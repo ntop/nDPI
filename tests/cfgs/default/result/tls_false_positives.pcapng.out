@@ -26,4 +26,4 @@ Unrated                         30 37313         1
 
 
 Undetected flows:
-	1	TCP 10.10.10.1:1445 <-> 192.168.0.1:20979 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][DPI packets: 13][27 pkts/35276 bytes <-> 3 pkts/2037 bytes][Goodput ratio: 96/92][6.40 sec][bytes ratio: 0.891 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/3 267/2832 5666/5662 1131/2830][Pkt Len c2s/s2c min/avg/max/stddev: 66/186 1307/679 1454/1454 393/555][PLAIN TEXT (countrycode)][Plen Bins: 3,0,0,0,3,0,0,0,0,0,3,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,82,0,0,0,0]
+	1	TCP 10.10.10.1:1445 <-> 192.168.0.1:20979 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 13][27 pkts/35276 bytes <-> 3 pkts/2037 bytes][Goodput ratio: 96/92][6.40 sec][bytes ratio: 0.891 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/3 267/2832 5666/5662 1131/2830][Pkt Len c2s/s2c min/avg/max/stddev: 66/186 1307/679 1454/1454 393/555][PLAIN TEXT (countrycode)][Plen Bins: 3,0,0,0,3,0,0,0,0,0,3,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,82,0,0,0,0]

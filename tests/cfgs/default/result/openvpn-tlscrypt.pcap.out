@@ -23,4 +23,4 @@ OpenVPN	13	5354	1
 
 Acceptable                      13 5354          1            
 
-	1	UDP [::1]:56256 <-> [::1]:1194 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][DPI packets: 4][cat: VPN/2][7 pkts/3253 bytes <-> 6 pkts/2101 bytes][Goodput ratio: 89/85][0.02 sec][bytes ratio: 0.215 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 3/3 11/9 4/4][Pkt Len c2s/s2c min/avg/max/stddev: 114/114 465/350 1228/1033 382/314][Plen Bins: 0,31,7,0,0,0,7,15,0,0,0,7,0,0,0,0,7,0,0,0,7,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP [::1]:56256 <-> [::1]:1194 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: VPN/2][7 pkts/3253 bytes <-> 6 pkts/2101 bytes][Goodput ratio: 89/85][0.02 sec][bytes ratio: 0.215 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 3/3 11/9 4/4][Pkt Len c2s/s2c min/avg/max/stddev: 114/114 465/350 1228/1033 382/314][Plen Bins: 0,31,7,0,0,0,7,15,0,0,0,7,0,0,0,0,7,0,0,0,7,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0]
