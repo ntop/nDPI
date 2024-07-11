@@ -9737,17 +9737,23 @@ void ndpi_dump_risks_score(FILE *risk_out) {
 
 char *ndpi_strnstr(const char *haystack, const char *needle, size_t len)
 {
-  if (!haystack || !needle || len == 0)
+  if (!haystack || !needle)
   {
     return NULL;
   }
 
-  size_t needle_len = strlen(needle);
-  size_t hs_real_len = strnlen(haystack, len);
+  const size_t needle_len = strlen(needle);
 
   if (needle_len == 0)
   {
     return (char *)haystack;
+  }
+
+  const size_t hs_real_len = strnlen(haystack, len);
+
+  if (needle_len == 1)
+  {
+    return (char *)memchr(haystack, *needle, hs_real_len);
   }
 
   if (needle_len > hs_real_len)
@@ -9755,29 +9761,24 @@ char *ndpi_strnstr(const char *haystack, const char *needle, size_t len)
     return NULL;
   }
 
-  if (needle_len == 1)
-  {
-    return (char *)memchr(haystack, *needle, hs_real_len);
-  }
+  const char *const end_of_search = haystack + hs_real_len - needle_len + 1;
 
   const char *current = haystack;
-  const char *haystack_end = haystack + hs_real_len;
-
-  while (current <= haystack_end - needle_len)
+  while (current < end_of_search)
   {
-    current = (const char *)memchr(current, *needle, haystack_end - current);
+    current = (const char *)memchr(current, *needle, end_of_search - current);
 
     if (!current)
     {
       return NULL;
     }
 
-    if ((current + needle_len <= haystack_end) && memcmp(current, needle, needle_len) == 0)
+    if (memcmp(current, needle, needle_len) == 0)
     {
       return (char *)current;
     }
 
-    current++;
+    ++current;
   }
 
   return NULL;
