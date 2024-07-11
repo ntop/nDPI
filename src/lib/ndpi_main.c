@@ -7528,12 +7528,6 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
 /* ********************************************************************************* */
 
-u_int32_t ip_port_hash_funct(u_int32_t ip, u_int16_t port) {
-  return(ip + 3 * port);
-}
-
-/* ********************************************************************************* */
-
 /* #define BITTORRENT_CACHE_DEBUG */
 
 int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struct,

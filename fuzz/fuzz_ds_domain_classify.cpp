@@ -30,7 +30,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   for (i = 0; i < num_iteration; i++) {
     value = fuzzed_data.ConsumeBytesAsString(fuzzed_data.ConsumeIntegral<u_int8_t>());
     class_id = fuzzed_data.ConsumeIntegral<u_int16_t>();
-    rc = ndpi_domain_classify_add(ndpi_struct, d, class_id, (char*)value.c_str());
+    rc = ndpi_domain_classify_add(fuzzed_data.ConsumeBool() ? ndpi_struct : NULL,
+                                  d, class_id, (char*)value.c_str());
     
     /* Keep one random entry really added */
     if (rc == true && is_added == 0 && fuzzed_data.ConsumeBool()) {

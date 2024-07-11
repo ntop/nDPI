@@ -71,9 +71,6 @@ typedef struct {
 static void ssh_analyze_signature_version(struct ndpi_flow_struct *flow,
 					  char *str_to_check,
 					  u_int8_t is_client_signature) {
-
-  if(str_to_check == NULL) return;
-  
   u_int i;
   u_int8_t obsolete_ssh_version = 0;  
   const ssh_pattern ssh_servers_strings[] =

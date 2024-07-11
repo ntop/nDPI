@@ -103,8 +103,10 @@ static void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struc
 					    || (memcmp(packet->payload, "GET /uri-res/", 13) == 0))) {
       c = 8;
       while (c < (packet->payload_packet_len - 9)) {
-	if (packet->payload[c] == '?')
+	if (packet->payload[c] == '?') {
+	  c++;
 	  break;
+	}
 	c++;
       }
 

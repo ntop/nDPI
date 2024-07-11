@@ -284,7 +284,7 @@ static int dissect_l2(int datalink_type, struct m_pkt *p)
 		break;
 
 	case DLT_PPI:
-		if (data_len < l2_offset + 4)
+		if (data_len < l2_offset + 8)
 			return -1;
 		header_length = le16toh(*(u_int16_t *)&data[l2_offset + 2]);
 		dlt = le32toh(*(u_int32_t *)&data[l2_offset + 4]);

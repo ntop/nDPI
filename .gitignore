@@ -62,6 +62,8 @@
 /fuzz/fuzz_alg_ses_des
 /fuzz/fuzz_alg_bytestream
 /fuzz/fuzz_alg_shoco
+/fuzz/fuzz_alg_memmem
+/fuzz/fuzz_alg_strnstr
 /fuzz/fuzz_config
 /fuzz/fuzz_community_id
 /fuzz/fuzz_serialization
