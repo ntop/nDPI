@@ -101,11 +101,11 @@ static int ndpi_int_collectd_check_type(u_int16_t block_type)
   return 1;
 }
 
-static int ndpi_int_collectd_dissect_hostname(struct ndpi_flow_struct * const flow,
-                                              struct ndpi_packet_struct const * const packet,
-                                              u_int16_t block_length)
+static void ndpi_int_collectd_dissect_hostname(struct ndpi_flow_struct * const flow,
+                                               struct ndpi_packet_struct const * const packet,
+                                               u_int16_t block_length)
 {
-  return (ndpi_hostname_sni_set(flow, &packet->payload[4], block_length, NDPI_HOSTNAME_NORM_ALL) == NULL);
+  ndpi_hostname_sni_set(flow, &packet->payload[4], block_length, NDPI_HOSTNAME_NORM_ALL);
 }
 
 static int ndpi_int_collectd_dissect_username(struct ndpi_flow_struct * const flow,
@@ -184,11 +184,8 @@ static void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struc
     return;
   }
 
-  if (hostname_length > 0 &&
-      ndpi_int_collectd_dissect_hostname(flow, packet, hostname_length) != 0)
-  {
-    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid collectd Header");
-  }
+  if (hostname_length > 0)
+    ndpi_int_collectd_dissect_hostname(flow, packet, hostname_length);
 
   ndpi_int_collectd_add_connection(ndpi_struct, flow);
 }

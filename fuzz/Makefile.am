@@ -1,6 +1,6 @@
 bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp
 #Alghoritms
-bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco
+bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr
 #Data structures
 bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64_fuse fuzz_ds_domain_classify
 #Third party
@@ -222,6 +222,32 @@ endif
 fuzz_alg_shoco_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_alg_shoco_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_alg_memmem_SOURCES = fuzz_alg_memmem.cpp
+fuzz_alg_memmem_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_alg_memmem_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_alg_memmem_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_alg_memmem_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_alg_memmem_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_alg_memmem_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_alg_memmem_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_alg_strnstr_SOURCES = fuzz_alg_strnstr.cpp
+fuzz_alg_strnstr_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_alg_strnstr_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_alg_strnstr_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_alg_strnstr_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_alg_strnstr_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_alg_strnstr_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_alg_strnstr_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_ses_des_SOURCES = fuzz_alg_ses_des.cpp fuzz_common_code.c
 fuzz_alg_ses_des_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)

@@ -42,7 +42,7 @@ static int z3950_parse_sequences(struct ndpi_packet_struct const * const packet,
 
   pdu_type = packet->payload[0] & 0x1F;
 
-  if(((pdu_type < 20) || (pdu_type > 36)) && ((pdu_type < 43) || (pdu_type > 48)))
+  if((pdu_type < 20) || ((pdu_type > 36) && ((pdu_type < 43) || (pdu_type > 48))))
     return(-1);  
 
   while(cur_sequences++ < max_sequences) {

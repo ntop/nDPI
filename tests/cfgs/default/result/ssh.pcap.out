@@ -1,6 +1,6 @@
-DPI Packets (TCP):	10	(10.00 pkts/flow)
-Confidence DPI              : 1 (flows)
-Num dissector calls: 1 (1.00 diss/flow)
+DPI Packets (TCP):	19	(9.50 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 22 (11.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -16,11 +16,12 @@ Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia protocols:   4/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-SSH	258	35546	1
+SSH	295	44977	2
 
-Acceptable                     258 35546         1            
+Acceptable                     295 44977         2            
 
 	1	TCP 172.16.238.1:58395 <-> 172.16.238.168:22 [proto: 92/SSH][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 10][cat: RemoteAccess/12][159 pkts/15615 bytes <-> 99 pkts/19931 bytes][Goodput ratio: 33/67][248.48 sec][Hostname/SNI: SSH-2.0-OpenSSH_5.3][bytes ratio: -0.121 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1846/2934 166223/166224 14794/19692][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 98/201 970/1346 83/283][Risk: ** SSH Obsolete Cli Vers/Cipher **** SSH Obsolete Ser Vers/Cipher **][Risk Score: 150][Risk Info: Found cipher arcfour128 / Found cipher arcfour128][HASSH-C: 21B457A327CE7A2D4FCE5EF2C42400BD][Server: SSH-2.0-OpenSSH_5.6][HASSH-S: B1C6C0D56317555B85C7005A3DE29325][Plen Bins: 2,76,12,2,3,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0]
+	2	TCP 127.0.0.1:58496 <-> 127.0.0.1:8000 [proto: 92/SSH][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 9][cat: RemoteAccess/12][20 pkts/5598 bytes <-> 17 pkts/3833 bytes][Goodput ratio: 76/71][2.18 sec][Hostname/SNI: SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.11][bytes ratio: 0.187 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/1 119/162 1760/1760 424/463][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 280/225 1602/1098 437/270][Risk: ** Known Proto on Non Std Port **** SSH Obsolete Ser Vers/Cipher **][Risk Score: 100][Risk Info: Found cipher arcfour128][HASSH-C: C11B200866CF918393E62EA25D851D90][Server: SSH-2.0-APACHE-SSHD-2.5.0][HASSH-S: CA6DD86B2D9A44E4A3F1A55C53E6B0FA][Plen Bins: 13,4,42,4,4,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,4,0,0,0,0,0,4]

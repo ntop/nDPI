@@ -1086,12 +1086,18 @@ static struct l_string {
 		    STATIC_STRING_L("DELETE "),
 		    STATIC_STRING_L("CONNECT "),
 		    STATIC_STRING_L("PROPFIND "),
+		    STATIC_STRING_L("PROPPATCH "),
+		    STATIC_STRING_L("MKCOL "),
+		    STATIC_STRING_L("MOVE "),
+		    STATIC_STRING_L("COPY "),
+		    STATIC_STRING_L("LOCK "),
+		    STATIC_STRING_L("UNLOCK "),
 		    STATIC_STRING_L("REPORT "),
 		    STATIC_STRING_L("RPC_CONNECT "),
 		    STATIC_STRING_L("RPC_IN_DATA "),
 		    STATIC_STRING_L("RPC_OUT_DATA ")
 };
-static const char *http_fs = "CDGHOPR";
+static const char *http_fs = "CDGHLMOPRU";
 
 static u_int16_t http_request_url_offset(struct ndpi_detection_module_struct *ndpi_struct)
 {
