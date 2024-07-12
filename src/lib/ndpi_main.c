@@ -8322,6 +8322,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
   u_int32_t num_calls = 0;
   ndpi_protocol ret;
+  u_int16_t fpc_cached_proto;
 
   memset(&ret, 0, sizeof(ret));
 
@@ -8375,6 +8376,33 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
   if(flow->num_processed_pkts == 1) {
     /* first packet of this flow to be analyzed */
+        
+/*ToDo: First check in fpc cache, if found update the ndpi_flow_struct via fpc_update()
+        else update via below method from flow->guessed_protocol_id_by_ip, NDPI_FPC_CONFIDENCE_IP) and return(ret)
+**use --> ndpi_lru_find_cache() metod and value return from it(dummy) as protocol
+update the flow->fpc_app structue as results
+
+*/
+
+/* For each flow (at the very first packet) lookup into the cache using "SRC IP - DST IP" as key and, if a match is found, save the protocol id into ndpi_flow_struct structure as a "fpc result" */
+//printf("\nApp proto from ret-->%u\n",ret.app_protocol);
+if(!ndpi_str->fpc_cache){
+ printf("\n No FPC cache..\n");
+}
+/* Check some fpc cache */
+  if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
+     ndpi_str->fpc_cache &&
+     ndpi_lru_find_cache(ndpi_str->fpc_cache, make_fpc_lru_cache_key(flow),
+			 &fpc_cached_proto, 0 /* Don't remove it as it can be used for other connections */,
+			 ndpi_get_current_time(flow))) {
+      printf("\nFound from FPC cache...%u\n",fpc_cached_proto);
+    ndpi_set_detected_protocol(ndpi_str, flow, fpc_cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_FPC_CONFIDENCE_CACHE);
+    ret.app_protocol = fpc_cached_proto;//flow->detected_protocol_stack[0];
+  /* Save the protocol id into ndpi_flow_struct structure as a "fpc result" */
+      fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
+               fpc_cached_proto, NDPI_FPC_CONFIDENCE_CACHE);
+      return(ret);
+  }
 
 #ifdef HAVE_NBPF
     if(ndpi_str->nbpf_custom_proto[0].tree != NULL) {
@@ -8448,6 +8476,8 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
       return(ret);
 
     fpc_check_ip(ndpi_str, flow);
+    /* ToDo:Update fpc cache */
+    ndpi_fpc_cache_update(ndpi_str,flow);
   }
 
   num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
@@ -9421,6 +9451,9 @@ const char *ndpi_fpc_confidence_get_name(ndpi_fpc_confidence_t fpc_confidence)
 
   case NDPI_FPC_CONFIDENCE_DNS:
     return "DNS";
+    
+  case NDPI_FPC_CONFIDENCE_CACHE:
+      return "FPC cache";
 
   default:
     return "Invalid"; /* Out of sync with ndpi_fpc_confidence_t definition */
@@ -10249,6 +10282,10 @@ int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
     return 0;
   case NDPI_LRUCACHE_MSTEAMS:
     ndpi_lru_get_stats(is_local ? ndpi_struct->msteams_cache : g_ctx->msteams_global_cache, stats);
+    return 0;
+    //ToDo:add fpc cache details
+  case NDPI_LRUCACHE_FPC:
+    ndpi_lru_get_stats(is_local ? ndpi_struct->fpc_cache : g_ctx->fpc_global_cache, stats);
     return 0;
   default:
     return -1;
@@ -11293,8 +11330,11 @@ static const struct cfg_param {
   { NULL,            "lru.msteams.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries), NULL },
   { NULL,            "lru.msteams.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_ttl), NULL },
   { NULL,            "lru.msteams.scope",                       "0", "0", "1", CFG_PARAM_INT, __OFF(msteams_cache_scope), clbk_only_with_global_ctx },
-
-
+//ToDo:add fpc
+{ NULL,            "lru.fpc.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries), NULL },
+  { NULL,            "lru.fpc.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_ttl), NULL },
+  { NULL,            "lru.fpc.scope",                       "0", "0", "1", CFG_PARAM_INT, __OFF(msteams_cache_scope), clbk_only_with_global_ctx },
+  
   { NULL, NULL, NULL, NULL, NULL, 0, -1, NULL },
 };
 
