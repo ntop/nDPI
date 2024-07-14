@@ -11436,29 +11436,31 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
 
 void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle, size_t needle_len)
 {
-  if (!haystack || !needle || haystack_len < needle_len || needle_len == 0) {
+  if (!haystack || !needle || haystack_len < needle_len) {
     return NULL;
+  }
+
+  if (needle_len == 0) {
+    return (void *)haystack;
   }
 
   if (needle_len == 1) {
     return (void *)memchr(haystack, *(const u_int8_t *)needle, haystack_len);
   }
 
-  const u_int8_t *current = (const u_int8_t *)haystack;
-  const u_int8_t *haystack_end = (const u_int8_t *)haystack + haystack_len;
+  const u_int8_t *const end_of_search = (const u_int8_t *)haystack + haystack_len - needle_len + 1;
 
-  while (current <= haystack_end - needle_len) {
+  const u_int8_t *current = (const u_int8_t *)haystack;
+  while (current < end_of_search) {
     /* Find the first occurrence of the first character from the needle */
-    current = (const u_int8_t *)memchr(current, *(const u_int8_t *)needle,
-                                       haystack_end - current);
+    current = (const u_int8_t *)memchr(current, *(const u_int8_t *)needle, end_of_search - current);
 
     if (!current) {
       return NULL;
     }
 
     /* Check the rest of the needle for a match */
-    if ((current + needle_len <= haystack_end) &&
-        (memcmp(current, needle, needle_len) == 0)) {
+    if (memcmp(current, needle, needle_len) == 0) {
       return (void *)current;
     }
 
