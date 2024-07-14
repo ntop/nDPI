@@ -3260,6 +3260,8 @@ void ndpi_global_deinit(struct ndpi_global_context *g_ctx) {
       ndpi_lru_free_cache(g_ctx->mining_global_cache);
     if(g_ctx->msteams_global_cache)
       ndpi_lru_free_cache(g_ctx->msteams_global_cache);
+    if(g_ctx->fpc_dns_global_cache)
+      ndpi_lru_free_cache(g_ctx->fpc_dns_global_cache);
 
     ndpi_free(g_ctx);
   }
@@ -3829,6 +3831,23 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
                    ndpi_str->cfg.msteams_cache_num_entries);
     }
   }
+  //ToDo:add fpc cache details
+  if(ndpi_str->cfg.fpc_dns_cache_num_entries > 0) {
+    if(ndpi_str->cfg.fpc_dns_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->fpc_dns_global_cache) {
+        ndpi_str->g_ctx->fpc_dns_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.fpc_dns_cache_num_entries,                                                                   ndpi_str->cfg.fpc_dns_cache_ttl, 1);
+      }
+      ndpi_str->fpc_dns_cache = ndpi_str->g_ctx->fpc_dns_global_cache;
+    } else {
+      ndpi_str->fpc_dns_cache = ndpi_lru_cache_init(ndpi_str->cfg.fpc_dns_cache_num_entries,
+                                                    ndpi_str->cfg.fpc_dns_cache_ttl, 0);
+    }
+    if(!ndpi_str->fpc_dns_cache) {
+      NDPI_LOG_ERR(ndpi_str, "Error allocating lru fpc_dns_cache (num_entries %u)\n",
+                   ndpi_str->cfg.fpc_dns_cache_num_entries);
+         
+    }
+  }
 
   ndpi_automa * const automa[] = { &ndpi_str->host_automa,
                                    &ndpi_str->tls_cert_subject_automa,
@@ -4166,6 +4185,10 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(!ndpi_str->cfg.msteams_cache_scope &&
        ndpi_str->msteams_cache)
       ndpi_lru_free_cache(ndpi_str->msteams_cache);
+    //ToDo:add fpc details
+    if(!ndpi_str->cfg.fpc_dns_cache_scope &&
+       ndpi_str->fpc_dns_cache)
+      ndpi_lru_free_cache(ndpi_str->fpc_dns_cache);
 
     if(ndpi_str->protocols)    ndpi_ptree_destroy(ndpi_str->protocols);
     if(ndpi_str->ip_risk_mask) ndpi_ptree_destroy(ndpi_str->ip_risk_mask);
@@ -7278,6 +7301,20 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
 /* ********************************************************************************* */
 
+u_int64_t make_fpc_dns_cache_key(struct ndpi_flow_struct *flow) {
+  u_int64_t key;
+
+  /* network byte order */
+  if(flow->is_ipv6)
+    key = (ndpi_quick_hash64((const char *)flow->c_address.v6, 16) << 32) | (ndpi_quick_hash64((const char *)flow->s_address.v6, 16) & 0xFFFFFFFF);
+  else
+    key = ((u_int64_t)flow->c_address.v4 << 32) | flow->s_address.v4;
+
+  return key;
+}
+
+/* ********************************************************************************* */
+
 static u_int64_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_client) {
   u_int64_t key;
 
@@ -7368,6 +7405,21 @@ static void ndpi_reconcile_msteams_call_udp(struct ndpi_flow_struct *flow) {
 }
 
 /* ********************************************************************************* */
+
+static void ndpi_fpc_cache_update(struct ndpi_detection_module_struct *ndpi_str,
+				       struct ndpi_flow_struct *flow) {
+        
+    
+       if(ndpi_str->fpc_dns_cache){
+        // printf("\nInside ndpi_fpc_dns_cache_update()\n");
+	ndpi_lru_add_to_cache(ndpi_str->fpc_dns_cache,/*fpc_cache,*/
+			      make_fpc_dns_cache_key(flow),
+			      flow->fpc.app_protocol,
+			      ndpi_get_current_time(flow));
+     } else{
+     }
+			      
+}
 
 static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_str,
 				     struct ndpi_flow_struct *flow,
@@ -8322,7 +8374,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
   u_int32_t num_calls = 0;
   ndpi_protocol ret;
-  u_int16_t fpc_cached_proto;
+  u_int16_t fpc_dns_cached_proto;
 
   memset(&ret, 0, sizeof(ret));
 
@@ -8386,21 +8438,19 @@ update the flow->fpc_app structue as results
 
 /* For each flow (at the very first packet) lookup into the cache using "SRC IP - DST IP" as key and, if a match is found, save the protocol id into ndpi_flow_struct structure as a "fpc result" */
 //printf("\nApp proto from ret-->%u\n",ret.app_protocol);
-if(!ndpi_str->fpc_cache){
- printf("\n No FPC cache..\n");
-}
+
 /* Check some fpc cache */
   if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
-     ndpi_str->fpc_cache &&
-     ndpi_lru_find_cache(ndpi_str->fpc_cache, make_fpc_lru_cache_key(flow),
-			 &fpc_cached_proto, 0 /* Don't remove it as it can be used for other connections */,
+     ndpi_str->fpc_dns_cache &&
+     ndpi_lru_find_cache(ndpi_str->fpc_dns_cache, make_fpc_dns_cache_key(flow),
+			 &fpc_dns_cached_proto, 0 /* Don't remove it as it can be used for other connections */,
 			 ndpi_get_current_time(flow))) {
-      printf("\nFound from FPC cache...%u\n",fpc_cached_proto);
-    ndpi_set_detected_protocol(ndpi_str, flow, fpc_cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_FPC_CONFIDENCE_CACHE);
-    ret.app_protocol = fpc_cached_proto;//flow->detected_protocol_stack[0];
+    NDPI_LOG_DBG(ndpi_str,"\nFound from FPC cache...%u\n",fpc_dns_cached_proto);
+    ndpi_set_detected_protocol(ndpi_str, flow, fpc_dns_cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_FPC_CONFIDENCE_DNS);
+    ret.app_protocol = fpc_dns_cached_proto;//flow->detected_protocol_stack[0];
   /* Save the protocol id into ndpi_flow_struct structure as a "fpc result" */
       fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
-               fpc_cached_proto, NDPI_FPC_CONFIDENCE_CACHE);
+               fpc_dns_cached_proto, NDPI_FPC_CONFIDENCE_DNS);//testing
       return(ret);
   }
 
@@ -8476,7 +8526,7 @@ if(!ndpi_str->fpc_cache){
       return(ret);
 
     fpc_check_ip(ndpi_str, flow);
-    /* ToDo:Update fpc cache */
+    /* Update fpc cache */
     ndpi_fpc_cache_update(ndpi_str,flow);
   }
 
@@ -9451,9 +9501,6 @@ const char *ndpi_fpc_confidence_get_name(ndpi_fpc_confidence_t fpc_confidence)
 
   case NDPI_FPC_CONFIDENCE_DNS:
     return "DNS";
-    
-  case NDPI_FPC_CONFIDENCE_CACHE:
-      return "FPC cache";
 
   default:
     return "Invalid"; /* Out of sync with ndpi_fpc_confidence_t definition */
@@ -10284,8 +10331,8 @@ int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
     ndpi_lru_get_stats(is_local ? ndpi_struct->msteams_cache : g_ctx->msteams_global_cache, stats);
     return 0;
     //ToDo:add fpc cache details
-  case NDPI_LRUCACHE_FPC:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->fpc_cache : g_ctx->fpc_global_cache, stats);
+  case NDPI_LRUCACHE_FPC_DNS:
+    ndpi_lru_get_stats(is_local ? ndpi_struct->fpc_dns_cache : g_ctx->fpc_dns_global_cache, stats);
     return 0;
   default:
     return -1;
@@ -11330,10 +11377,10 @@ static const struct cfg_param {
   { NULL,            "lru.msteams.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries), NULL },
   { NULL,            "lru.msteams.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_ttl), NULL },
   { NULL,            "lru.msteams.scope",                       "0", "0", "1", CFG_PARAM_INT, __OFF(msteams_cache_scope), clbk_only_with_global_ctx },
-//ToDo:add fpc
-{ NULL,            "lru.fpc.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries), NULL },
-  { NULL,            "lru.fpc.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_ttl), NULL },
-  { NULL,            "lru.fpc.scope",                       "0", "0", "1", CFG_PARAM_INT, __OFF(msteams_cache_scope), clbk_only_with_global_ctx },
+  /*  fpc dns cache */
+  { NULL,            "lru.fpc_dns.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(fpc_dns_cache_num_entries), NULL },
+  { NULL,            "lru.fpc_dns.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(fpc_dns_cache_ttl), NULL },
+  { NULL,            "lru.fpc_dns.scope",                       "0", "0", "1", CFG_PARAM_INT, __OFF(fpc_dns_cache_scope), clbk_only_with_global_ctx },
   
   { NULL, NULL, NULL, NULL, NULL, 0, -1, NULL },
 };
