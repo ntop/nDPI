@@ -747,7 +747,7 @@ typedef enum {
   NDPI_LRUCACHE_TLS_CERT,
   NDPI_LRUCACHE_MINING,
   NDPI_LRUCACHE_MSTEAMS,
-  NDPI_LRUCACHE_FPC, /* First Pkt Classification */
+  NDPI_LRUCACHE_FPC_DNS, /* First Pkt Classification */
 
   NDPI_LRUCACHE_MAX	/* Last one! */
 } lru_cache_type;
@@ -1000,7 +1000,7 @@ typedef enum {
   NDPI_FPC_CONFIDENCE_UNKNOWN           = 0,    /* Unknown First Packet Classification */
   NDPI_FPC_CONFIDENCE_IP,                       /* FPC based on IP address */
   NDPI_FPC_CONFIDENCE_DNS,                      /* FPC based on DNS information */
-  NDPI_FPC_CONFIDENCE_CACHE,
+
   /*
     IMPORTANT
 

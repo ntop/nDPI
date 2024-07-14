@@ -170,7 +170,7 @@ struct ndpi_global_context {
   struct ndpi_lru_cache *msteams_global_cache;
   
   /* NDPI_FIRST_PKT_CLASSIFICATION_CACHE */
-  struct ndpi_lru_cache *fpc_global_cache;
+  struct ndpi_lru_cache *fpc_dns_global_cache;
 };
 
 #define CFG_MAX_LEN	256
@@ -223,9 +223,9 @@ struct ndpi_detection_module_config_struct {
   int msteams_cache_num_entries;
   int msteams_cache_ttl;
   int msteams_cache_scope;
-  int fpc_cache_num_entries;
-  int fpc_cache_ttl;
-  int fpc_cache_scope;
+  int fpc_dns_cache_num_entries;
+  int fpc_dns_cache_ttl;
+  int fpc_dns_cache_scope;
   
   /* Protocols */
 
@@ -369,7 +369,7 @@ struct ndpi_detection_module_struct {
   struct ndpi_lru_cache *msteams_cache;
   
   /* NDPI_FIRST_PKT_CLASSIFICATION_CACHE */
-  struct ndpi_lru_cache *fpc_cache;
+  struct ndpi_lru_cache *fpc_dns_cache;
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
