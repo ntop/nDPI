@@ -5793,6 +5793,53 @@ void strnstrUnitTest(void) {
 
 /* *********************************************** */
 
+void memmemUnitTest(void) {
+  /* Test 1: null string */
+  assert(ndpi_memmem(NULL, 0, NULL, 0) == NULL);
+  assert(ndpi_memmem(NULL, 0, NULL, 10) == NULL);
+  assert(ndpi_memmem(NULL, 0, "find", 10) == NULL);
+  assert(ndpi_memmem(NULL, 10, "find", 10) == NULL);
+  assert(ndpi_memmem("string", 10, NULL, 0) == NULL);
+  assert(ndpi_memmem("string", 10, NULL, 10) == NULL);
+
+  /* Test 2: zero length */
+  assert(strcmp(ndpi_memmem("", 0, "", 0), "") == 0);
+  assert(strcmp(ndpi_memmem("string", 6, "", 0), "string") == 0);
+  assert(strcmp(ndpi_memmem("string", 0, "", 0), "string") == 0);
+  assert(ndpi_memmem("", 0, "string", 6) == NULL);
+
+  /* Test 3: empty substring */
+  assert(strcmp(ndpi_memmem("string", 6, "", 0), "string") == 0);
+
+  /* Test 4: single character substring */
+  assert(strcmp(ndpi_memmem("string", 6, "r", 1), "ring") == 0);
+  assert(ndpi_memmem("string", 6, "x", 1) == NULL);
+
+  /* Test 5: multiple character substring */
+  assert(strcmp(ndpi_memmem("string", 6, "ing", 3), "ing") == 0);
+  assert(ndpi_memmem("string", 6, "xyz", 3) == NULL);
+
+  /* Test 6: substring equal to the beginning of the string */
+  assert(strcmp(ndpi_memmem("string", 6, "str", 3), "string") == 0);
+
+  /* Test 7: substring at the end of the string */
+  assert(strcmp(ndpi_memmem("string", 6, "ing", 3), "ing") == 0);
+
+  /* Test 8: substring in the middle of the string */
+  assert(strcmp(ndpi_memmem("hello world", strlen("hello world"), "lo wo", strlen("lo wo")), "lo world") == 0);
+
+  /* Test 9: repeated characters in the string */
+  assert(strcmp(ndpi_memmem("aaaaaa", 6, "aaa", 3), "aaaaaa") == 0);
+
+  /* Test 10: substring equal to the string */
+  assert(strcmp(ndpi_memmem("string", 6, "string", 6), "string") == 0);
+
+  /* Test 11: substring longer than the string */
+  assert(ndpi_memmem("string", 6, "stringA", 7) == NULL);
+}
+
+/* *********************************************** */
+
 void filterUnitTest() {
   ndpi_filter* f = ndpi_filter_alloc();
   u_int32_t v, i;
@@ -6160,6 +6207,7 @@ int main(int argc, char **argv) {
     strtonumUnitTest();
     strlcpyUnitTest();
     strnstrUnitTest();
+    memmemUnitTest();
 #endif
   }
 
