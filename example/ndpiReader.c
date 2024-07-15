@@ -5782,6 +5782,13 @@ void strnstrUnitTest(void) {
 
   /* Test 13 */
   assert(ndpi_strnstr("abcdef", "abc", 2) == NULL);
+
+  /* Test 14: zero length */
+  assert(strcmp(ndpi_strnstr("", "", 0), "") == 0);
+  assert(strcmp(ndpi_strnstr("string", "", 0), "string") == 0);
+  assert(ndpi_strnstr("", "str", 0) == NULL);
+  assert(ndpi_strnstr("string", "str", 0) == NULL);
+  assert(ndpi_strnstr("str", "string", 0) == NULL);
 }
 
 /* *********************************************** */

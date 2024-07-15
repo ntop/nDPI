@@ -71,6 +71,48 @@ char *ndpi_strnstr_opt(const char *haystack, const char *needle, size_t len) {
   return NULL;
 }
 
+char* ndpi_strnstr_opt2(const char* haystack, const char* needle, size_t length_limit) {
+  if (!haystack || !needle) {
+    return nullptr;
+  }
+
+  const size_t needle_len = strlen(needle);
+
+  if (needle_len == 0) {
+    return (char*) haystack;
+  }
+
+  const size_t hs_real_len = strnlen(haystack, length_limit);
+
+  if (needle_len == 1) {
+    return (char *)memchr(haystack, *needle, hs_real_len);
+  }
+
+  if (needle_len > hs_real_len) {
+    return nullptr;
+  }
+
+  const char*const end_of_search = haystack + hs_real_len - needle_len + 1;
+
+  const char *current = haystack;
+  while (current < end_of_search) {
+
+    current = (const char*) memchr(current, *needle, end_of_search - current);
+
+    if (!current) {
+      return nullptr;
+    }
+
+    if (memcmp(current, needle, needle_len) == 0) {
+      return (char*) current;
+    }
+
+    ++current;
+  }
+
+  return nullptr;
+}
+
 std::string random_string(size_t length, std::mt19937 &gen) {
   std::uniform_int_distribution<> dis(0, 255);
   std::string str(length, 0);
@@ -133,6 +175,7 @@ int main() {
       strnstr_impls = {
           {"ndpi_strnstr", ndpi_strnstr},
           {"ndpi_strnstr_opt", ndpi_strnstr_opt},
+          {"ndpi_strnstr_opt2", ndpi_strnstr_opt2},
       };
 
   const int iterations = 100000;
