@@ -9737,51 +9737,11 @@ void ndpi_dump_risks_score(FILE *risk_out) {
 
 char *ndpi_strnstr(const char *haystack, const char *needle, size_t len)
 {
-  if (!haystack || !needle)
-  {
+  if (!haystack || !needle) {
     return NULL;
   }
 
-  const size_t needle_len = strlen(needle);
-
-  if (needle_len == 0)
-  {
-    return (char *)haystack;
-  }
-
-  const size_t hs_real_len = strnlen(haystack, len);
-
-  if (needle_len == 1)
-  {
-    return (char *)memchr(haystack, *needle, hs_real_len);
-  }
-
-  if (needle_len > hs_real_len)
-  {
-    return NULL;
-  }
-
-  const char *const end_of_search = haystack + hs_real_len - needle_len + 1;
-
-  const char *current = haystack;
-  while (current < end_of_search)
-  {
-    current = (const char *)memchr(current, *needle, end_of_search - current);
-
-    if (!current)
-    {
-      return NULL;
-    }
-
-    if (memcmp(current, needle, needle_len) == 0)
-    {
-      return (char *)current;
-    }
-
-    ++current;
-  }
-
-  return NULL;
+  return (char *)ndpi_memmem(haystack, strnlen(haystack, len), needle, strlen(needle));
 }
 
 /* ****************************************************** */
@@ -11452,7 +11412,8 @@ void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle,
   const u_int8_t *const end_of_search = (const u_int8_t *)haystack + haystack_len - needle_len + 1;
 
   const u_int8_t *current = (const u_int8_t *)haystack;
-  while (current < end_of_search) {
+
+  while (1) {
     /* Find the first occurrence of the first character from the needle */
     current = (const u_int8_t *)memchr(current, *(const u_int8_t *)needle, end_of_search - current);
 
