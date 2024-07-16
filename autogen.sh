@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 rm -f configure config.h config.h.in
 
@@ -42,7 +42,6 @@ fi
 
 autoreconf -ivf
 
-echo "./configure $@"
+echo "./configure $*"
 chmod +x configure
-./configure $@
-
+./configure "$@"

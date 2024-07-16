@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 cd "$(dirname "${0}")" || exit 1
@@ -31,7 +30,7 @@ is_file_empty "${LIST6_MERGED}"
 ./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_AMAZON_AWS $LIST6_MERGED > $DEST
 is_file_empty "${DEST}"
 
-rm -f ${TMP} ${LIST} ${LIST6} ${LIST_MERGED} ${LIST_MERGED6}
+rm -f ${TMP} ${LIST} ${LIST6} ${LIST_MERGED} ${LIST6_MERGED}
 
 echo "(3) Amazon AWS IPs are available in $DEST"
 exit 0
