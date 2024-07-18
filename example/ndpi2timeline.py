@@ -34,46 +34,46 @@ import json
 protos = {}
 lastId = 1
 
+
 def get_timestamp(seen):
     tok = seen.split(".")
     return int(tok[0]) * 1000 + int(tok[1])
 
+
 def get_record(toks, csv_fields):
     global protos
     global lastId
-    
+
     if len(toks) < 11:
         return None
 
-    record = dict()
+    record = {}
     ndpiProtocol = toks[10]
 
-    ndpi_protos = ndpiProtocol.split(".")    
-    if(len(ndpi_protos) == 1):
+    ndpi_protos = ndpiProtocol.split(".")
+    if len(ndpi_protos) == 1:
         app_proto = ndpi_protos[0]
     else:
         app_proto = ndpi_protos[1]
-    
-    id = protos.get(ndpiProtocol)
-    if(id == None):
+
+    if protos.get(ndpiProtocol) is None:
         lastId = lastId + 1
         protos[ndpiProtocol] = lastId
-        id = lastId
-        #print(ndpiProtocol+"="+str(id))
+        # print(ndpiProtocol + "=" + str(id))
 
     ip_address = toks[5]
     server_name = toks[11]
     record["cat"]  = "flow"
     record["pid"]  = ip_address
-    record["tid"]  = ndpiProtocol # id
+    record["tid"]  = ndpiProtocol  # id
     record["ts"]   = get_timestamp(toks[2])
     record["ph"]   = "X"
     record["name"] = app_proto
 
-    if(server_name == ""):
+    if server_name == "":
         args = {}
     else:
-        args = { "name": server_name }
+        args = {"name": server_name}
     record["args"] = args
     record["dur"]  = get_timestamp(toks[3]) - record["ts"]
 
@@ -82,21 +82,22 @@ def get_record(toks, csv_fields):
         return record
 
     # Otherwise we just add everything we find as a string
-    if(0):
-        idx = 0
-        for tok in toks:
-            name = csv_fields[idx]
-            idx += 1
-            record["args"][name] = str(tok)
+    # if 0:
+    #     idx = 0
+    #     for tok in toks:
+    #         name = csv_fields[idx]
+    #         idx += 1
+    #         record["args"][name] = str(tok)
 
     return record
+
 
 def get_record_dict(filename):
     csv_fields = None
     records = []
-    fin = open(filename, "r");
+    fin = open(filename, "r")
     for line in fin:
-        line = line.replace("\n","")
+        line = line.replace("\n", "")
 
         # Get the legend if present
         if line[0] == '#':
@@ -116,10 +117,10 @@ def get_record_dict(filename):
 
         records.append(record)
 
-    json_dict = dict()
-    json_dict["traceEvents"] = records
+    json_dict = {"traceEvents": records}
 
     return json_dict
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
@@ -127,9 +128,9 @@ if __name__ == "__main__":
         sys.exit(0)
 
     record_dict = get_record_dict(sys.argv[1])
-    #print(record_dict)
-    #json_string = json.dumps(json_dict)
-    #print(json_string)
+    # print(record_dict)
+    # json_string = json.dumps(json_dict)
+    # print(json_string)
 
     with open(sys.argv[2], 'w') as fp:
         json.dump(record_dict, fp)
