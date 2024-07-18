@@ -15,6 +15,6 @@ Domain Suffix List
 ------------------
 
 public_suffix_list.dat can be downloaded from
-https://publicsuffix.org/list/public_suffix_list.dat and
+https://publicsuffix.org/list/public_suffix_list.dat, and
 it contains the list of domain suffixes
 
