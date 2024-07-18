@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
+set -e
 #
 # List all the current bittorrent nodes
 #
-
-set -e
 
 cd "$(dirname "${0}")" || exit 1
 . ./common.sh || exit 1

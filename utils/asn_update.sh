@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 FAILED_ASN=0
@@ -7,13 +6,13 @@ TOTAL_ASN=0
 
 function processing_list() {
 	local LIST_MERGED="/tmp/list_m"
-	local LIST_MERGED6="/tmp/list_m6"
+	local LIST6_MERGED="/tmp/list6_m"
 
 	echo "(2) Processing IP addresses..."
 	./mergeipaddrlist.py "$1" > $LIST_MERGED
-	./mergeipaddrlist.py "$2" > $LIST_MERGED6
-	./ipaddr2list.py "$LIST_MERGED" "$3" "$LIST_MERGED6" > "$4"
-	rm -f $LIST_MERGED
+	./mergeipaddrlist.py "$2" > $LIST6_MERGED
+	./ipaddr2list.py "$LIST_MERGED" "$3" "$LIST6_MERGED" > "$4"
+	rm -f $LIST_MERGED $LIST6_MERGED
 }
 
 function create_list() {
@@ -210,7 +209,7 @@ DEST=../src/lib/inc_generated/ndpi_asn_roblox.c.inc
 create_list NDPI_PROTOCOL_ROBLOX $DEST "" "AS22697"
 echo "(3) Roblox IPs are available in $DEST"
 
-if [ ${TOTAL_ASN} -eq 0 -o ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
+if [ ${TOTAL_ASN} -eq 0 ] || [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1
 else

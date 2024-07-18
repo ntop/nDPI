@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 cd "$(dirname "${0}")" || exit 1
@@ -19,7 +18,7 @@ ORIGIN="https://endpoints.office.com/endpoints/worldwide?clientrequestid=b10c5ed
 
 
 echo "(1) Downloading file... ${ORIGIN}"
-http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
+http_response=$(curl -s -o $TMP -w "%{http_code}" "${ORIGIN}")
 check_http_response "${http_response}"
 is_file_empty "${TMP}"
 
@@ -74,7 +73,7 @@ is_file_empty "${LIST6_MERGED}"
 ./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_MICROSOFT_365 $LIST6_MERGED > $DEST_OFFICE365
 is_file_empty "${DEST_OFFICE365}"
 
-rm -f ${TMP} ${LIST} ${LIST6} ${LIST_MERGED} ${LIST_MERGED6}
+rm -f ${TMP} ${LIST} ${LIST6} ${LIST_MERGED} ${LIST6_MERGED}
 
 echo "(3) Microsoft IPs are available in ${DEST_OUTLOOK}, ${DEST_SKYPE_MSTEAMS}, ${DEST_ONEDRIVE}, ${DEST_OFFICE365}"
 exit 0

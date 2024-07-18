@@ -1,5 +1,4 @@
-#!/bin/sh
-
+#!/usr/bin/env bash
 set -e
 
 if [ "$#" -ne 1 ]; then
