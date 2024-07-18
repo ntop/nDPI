@@ -9782,8 +9782,10 @@ const char * ndpi_strncasestr(const char *s, const char *find, size_t len) {
   const char *const end_of_search = s + s_len - find_len + 1;
 
   for (; s < end_of_search; ++s) {
-    if (strncasecmp(s, find, find_len) == 0) {
-      return s;
+    if (tolower((unsigned char)*s) == tolower((unsigned char)*find)) {
+      if (strncasecmp(s + 1, find + 1, find_len - 1) == 0) {
+        return s;
+      }
     }
   }
 
