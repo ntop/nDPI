@@ -9765,18 +9765,28 @@ char *ndpi_strnstr(const char *haystack, const char *needle, size_t len)
  * Same as ndpi_strnstr but case-insensitive.
  * Please note that this function is *NOT* equivalent to strncasecmp().
  */
-const char * ndpi_strncasestr(const char *str1, const char *str2, size_t len) {
-  size_t str1_len = strnlen(str1, len);
-  size_t str2_len = strlen(str2);
-  int i; /* signed! */
+const char * ndpi_strncasestr(const char *s, const char *find, size_t len) {
 
-  for(i = 0; i < (int)(str1_len - str2_len + 1); i++){
-    if(str1[0] == '\0')
-      return NULL;
-    else if(strncasecmp(str1, str2, str2_len) == 0)
-      return(str1);
+  if (!s || !find) {
+    return NULL;
+  }
 
-    str1++;
+  const size_t find_len = strlen(find);
+
+  if (find_len == 0) {
+    return s;
+  }
+
+  const size_t s_len = strnlen(s, len);
+
+  const char *const end_of_search = s + s_len - find_len + 1;
+
+  for (; s < end_of_search; ++s) {
+    if (tolower((unsigned char)*s) == tolower((unsigned char)*find)) {
+      if (strncasecmp(s + 1, find + 1, find_len - 1) == 0) {
+        return s;
+      }
+    }
   }
 
   return NULL;

@@ -5793,6 +5793,74 @@ void strnstrUnitTest(void) {
 
 /* *********************************************** */
 
+void strncasestrUnitTest(void) {
+  /* Test 1: null string */
+  assert(ndpi_strncasestr(NULL, "find", 10) == NULL);
+  assert(ndpi_strncasestr("string", NULL, 10) == NULL);
+
+  /* Test 2: empty substring */
+  assert(strcmp(ndpi_strncasestr("string", "", 6), "string") == 0);
+
+  /* Test 3: single character substring */
+  assert(strcmp(ndpi_strncasestr("string", "r", 6), "ring") == 0);
+  assert(strcmp(ndpi_strncasestr("string", "R", 6), "ring") == 0);
+  assert(strcmp(ndpi_strncasestr("stRing", "r", 6), "Ring") == 0);
+  assert(ndpi_strncasestr("string", "x", 6) == NULL);
+  assert(ndpi_strncasestr("string", "X", 6) == NULL);
+
+  /* Test 4: multiple character substring */
+  assert(strcmp(ndpi_strncasestr("string", "ing", 6), "ing") == 0);
+  assert(strcmp(ndpi_strncasestr("striNg", "InG", 6), "iNg") == 0);
+  assert(ndpi_strncasestr("string", "xyz", 6) == NULL);
+  assert(ndpi_strncasestr("striNg", "XyZ", 6) == NULL);
+
+  /* Test 5: substring equal to the beginning of the string */
+  assert(strcmp(ndpi_strncasestr("string", "str", 5), "string") == 0);
+  assert(strcmp(ndpi_strncasestr("string", "sTR", 5), "string") == 0);
+  assert(strcmp(ndpi_strncasestr("String", "STR", 5), "String") == 0);
+  assert(strcmp(ndpi_strncasestr("Long Long String", "long long", 15), "Long Long String") == 0);
+
+  /* Test 6: substring at the end of the string */
+  assert(strcmp(ndpi_strncasestr("string", "ing", 6), "ing") == 0);
+  assert(strcmp(ndpi_strncasestr("some longer STRing", "GEr sTrING", 18), "ger STRing") == 0);
+
+  /* Test 7: substring in the middle of the string */
+  assert(strcmp(ndpi_strncasestr("hello world", "lo wo", 11), "lo world") == 0);
+  assert(strcmp(ndpi_strncasestr("hello BEAUTIFUL world", "beautiful", 20), "BEAUTIFUL world") == 0);
+
+  /* Test 8: repeated characters in the string */
+  assert(strcmp(ndpi_strncasestr("aaaaaa", "aaa", 6), "aaaaaa") == 0);
+  assert(strcmp(ndpi_strncasestr("aaAaAa", "aaa", 6), "aaAaAa") == 0);
+  assert(strcmp(ndpi_strncasestr("AAAaaa", "aaa", 6), "AAAaaa") == 0);
+
+  /* Test 9: empty string and slen 0 */
+  assert(ndpi_strncasestr("", "find", 0) == NULL);
+
+  /* Test 10: substring equal to the string */
+  assert(strcmp(ndpi_strncasestr("string", "string", 6), "string") == 0);
+  assert(strcmp(ndpi_strncasestr("string", "STRING", 6), "string") == 0);
+  assert(strcmp(ndpi_strncasestr("sTrInG", "StRiNg", 6), "sTrInG") == 0);
+
+  /* Test 11a,b: max_length bigger that string length */
+  assert(strcmp(ndpi_strncasestr("string", "string", 66), "string") == 0);
+  assert(ndpi_strncasestr("string", "a", 66) == NULL);
+
+  /* Test 12: substring longer than the string */
+  assert(ndpi_strncasestr("string", "stringA", 6) == NULL);
+
+  /* Test 13 */
+  assert(ndpi_strncasestr("abcdef", "abc", 2) == NULL);
+
+  /* Test 14: zero length */
+  assert(strcmp(ndpi_strncasestr("", "", 0), "") == 0);
+  assert(strcmp(ndpi_strncasestr("string", "", 0), "string") == 0);
+  assert(ndpi_strncasestr("", "str", 0) == NULL);
+  assert(ndpi_strncasestr("string", "str", 0) == NULL);
+  assert(ndpi_strncasestr("str", "string", 0) == NULL);
+}
+
+/* *********************************************** */
+
 void memmemUnitTest(void) {
   /* Test 1: null string */
   assert(ndpi_memmem(NULL, 0, NULL, 0) == NULL);
@@ -6207,6 +6275,7 @@ int main(int argc, char **argv) {
     strtonumUnitTest();
     strlcpyUnitTest();
     strnstrUnitTest();
+    strncasestrUnitTest();
     memmemUnitTest();
 #endif
   }
