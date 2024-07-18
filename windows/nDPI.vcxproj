@@ -381,6 +381,7 @@
     <ClCompile Include="..\src\lib\protocols\cod_mobile.c" />
     <ClCompile Include="..\src\lib\protocols\zug.c" />
     <ClCompile Include="..\src\lib\protocols\jrmi.c" />
+    <ClCompile Include="..\src\lib\protocols\nano.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />
