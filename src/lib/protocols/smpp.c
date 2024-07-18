@@ -106,7 +106,7 @@ static void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struc
     // remove 0x80, get request type pdu
     u_int32_t pdu_req = pdu_type & 0x00FFFFFF;
     // list of known PDU types
-    if((pdu_req >  0x00000000 && pdu_req <= 0x00000009) ||
+    if((pdu_req <= 0x00000009) || /* [0-9] */
        (pdu_req == 0x0000000B || pdu_req == 0x00000015  ||
         pdu_req == 0x00000021 || pdu_req == 0x00000102  ||
         pdu_req == 0x00000103)){
