@@ -3,7 +3,7 @@
 import sys
 import socket
 
-# These scripts are mainly used to create "ip -> protocols" lists.
+# This script is mainly used to create "ip -> protocols" lists.
 # However, it is also used to create "ip -> risk" lists
 proto = "NDPI_PROTOCOL_XYX"
 append_name = ""
