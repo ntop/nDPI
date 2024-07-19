@@ -2,7 +2,7 @@
 
 import sys
 
-# This scripts is used to create "hostname/sni -> protocols" lists.
+# This script is used to create "hostname/sni -> protocols" lists.
 if len(sys.argv) < 6:
     print("Usage: {} <file> <name> <protocol> <category> <breed>".format(sys.argv[0]))
     sys.exit(1)

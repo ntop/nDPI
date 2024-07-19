@@ -11,4 +11,4 @@ This directory contains the implementation of the tshark class that contains thr
 - function tshark:read()
 
 ## Examples
-This this directory you can find simple code examples that show how to use the tshark class including counting packets and flow traffic accounting.
+In this directory you can find simple code examples that show how to use the tshark class including counting packets and flow traffic accounting.

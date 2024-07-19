@@ -13,7 +13,7 @@ nDPI can provide Wireshark protocol dissection to complement internal protocol d
 
 At Wireshark startup you will find a new extcap interface named "nDPI interface". Select that interface and specify an interface name (for live capture) or a pcap file path (for reading packets from a pcap file). You can choose a nDPI protocol list from the dropdown menu in case you want Wireshark to dissect only protocols of the specified nDPI application protocol.
 
-During capture the ndpiReader plugin will pass Wireshark the nDPI protocol information adding an ethernet packet trailer that contains nDPI information. The lua plugin interprets this information and it displays it in the Wireshark GUI.
+During capture the ndpiReader plugin will pass Wireshark the nDPI protocol information adding an ethernet packet trailer that contains nDPI information. The lua plugin interprets this information, and it displays it in the Wireshark GUI.
 
 ## nDPI Packet Filtering
 
