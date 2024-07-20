@@ -169,7 +169,7 @@ struct ndpi_global_context {
   /* NDPI_PROTOCOL_MSTEAMS */
   struct ndpi_lru_cache *msteams_global_cache;
   
-  /* NDPI_FIRST_PKT_CLASSIFICATION_CACHE */
+  /* FPC DNS cache */
   struct ndpi_lru_cache *fpc_dns_global_cache;
 };
 
@@ -368,7 +368,7 @@ struct ndpi_detection_module_struct {
   /* NDPI_PROTOCOL_MSTEAMS */
   struct ndpi_lru_cache *msteams_cache;
   
-  /* NDPI_FIRST_PKT_CLASSIFICATION_CACHE */
+  /* FPC DNS cache */
   struct ndpi_lru_cache *fpc_dns_cache;
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */

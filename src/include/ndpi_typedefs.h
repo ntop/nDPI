@@ -747,7 +747,7 @@ typedef enum {
   NDPI_LRUCACHE_TLS_CERT,
   NDPI_LRUCACHE_MINING,
   NDPI_LRUCACHE_MSTEAMS,
-  NDPI_LRUCACHE_FPC_DNS, /* First Pkt Classification */
+  NDPI_LRUCACHE_FPC_DNS, /* FPC DNS cache */
 
   NDPI_LRUCACHE_MAX	/* Last one! */
 } lru_cache_type;
