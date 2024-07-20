@@ -2279,9 +2279,21 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_a, 1099, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RIPE_ATLAS,
-              "RipeAtlas", NDPI_PROTOCOL_CATEGORY_NETWORK,
-              ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-              ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+			  "RipeAtlas", NDPI_PROTOCOL_CATEGORY_NETWORK,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_HLS,
+			  "HLS", NDPI_PROTOCOL_CATEGORY_MEDIA,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CLICKHOUSE,
+			  "ClickHouse", NDPI_PROTOCOL_CATEGORY_DATABASE,
+			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_NANO,
+			  "Nano", NDPI_PROTOCOL_CATEGORY_CRYPTO_CURRENCY,
+			  ndpi_build_default_ports(ports_a, 7075, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -6208,6 +6220,9 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Cloudflare WARP */
   init_cloudflare_warp_dissector(ndpi_str, &a);
 
+  /* Nano Cryptocurrency Protocol */
+  init_nano_dissector(ndpi_str, &a);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
 #endif
@@ -9817,50 +9832,11 @@ void ndpi_dump_risks_score(FILE *risk_out) {
 
 char *ndpi_strnstr(const char *haystack, const char *needle, size_t len)
 {
-  if (!haystack || !needle || len == 0)
-  {
+  if (!haystack || !needle) {
     return NULL;
   }
 
-  size_t needle_len = strlen(needle);
-  size_t hs_real_len = strnlen(haystack, len);
-
-  if (needle_len == 0)
-  {
-    return (char *)haystack;
-  }
-
-  if (needle_len > hs_real_len)
-  {
-    return NULL;
-  }
-
-  if (needle_len == 1)
-  {
-    return (char *)memchr(haystack, *needle, hs_real_len);
-  }
-
-  const char *current = haystack;
-  const char *haystack_end = haystack + hs_real_len;
-
-  while (current <= haystack_end - needle_len)
-  {
-    current = (const char *)memchr(current, *needle, haystack_end - current);
-
-    if (!current)
-    {
-      return NULL;
-    }
-
-    if ((current + needle_len <= haystack_end) && memcmp(current, needle, needle_len) == 0)
-    {
-      return (char *)current;
-    }
-
-    current++;
-  }
-
-  return NULL;
+  return (char *)ndpi_memmem(haystack, strnlen(haystack, len), needle, strlen(needle));
 }
 
 /* ****************************************************** */
@@ -9869,18 +9845,28 @@ char *ndpi_strnstr(const char *haystack, const char *needle, size_t len)
  * Same as ndpi_strnstr but case-insensitive.
  * Please note that this function is *NOT* equivalent to strncasecmp().
  */
-const char * ndpi_strncasestr(const char *str1, const char *str2, size_t len) {
-  size_t str1_len = strnlen(str1, len);
-  size_t str2_len = strlen(str2);
-  int i; /* signed! */
+const char * ndpi_strncasestr(const char *s, const char *find, size_t len) {
 
-  for(i = 0; i < (int)(str1_len - str2_len + 1); i++){
-    if(str1[0] == '\0')
-      return NULL;
-    else if(strncasecmp(str1, str2, str2_len) == 0)
-      return(str1);
+  if (!s || !find) {
+    return NULL;
+  }
 
-    str1++;
+  const size_t find_len = strlen(find);
+
+  if (find_len == 0) {
+    return s;
+  }
+
+  const size_t s_len = strnlen(s, len);
+
+  const char *const end_of_search = s + s_len - find_len + 1;
+
+  for (; s < end_of_search; ++s) {
+    if (tolower((unsigned char)*s) == tolower((unsigned char)*find)) {
+      if (strncasecmp(s + 1, find + 1, find_len - 1) == 0) {
+        return s;
+      }
+    }
   }
 
   return NULL;
@@ -11523,29 +11509,32 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
 
 void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle, size_t needle_len)
 {
-  if (!haystack || !needle || haystack_len < needle_len || needle_len == 0) {
+  if (!haystack || !needle || haystack_len < needle_len) {
     return NULL;
+  }
+
+  if (needle_len == 0) {
+    return (void *)haystack;
   }
 
   if (needle_len == 1) {
     return (void *)memchr(haystack, *(const u_int8_t *)needle, haystack_len);
   }
 
-  const u_int8_t *current = (const u_int8_t *)haystack;
-  const u_int8_t *haystack_end = (const u_int8_t *)haystack + haystack_len;
+  const u_int8_t *const end_of_search = (const u_int8_t *)haystack + haystack_len - needle_len + 1;
 
-  while (current <= haystack_end - needle_len) {
+  const u_int8_t *current = (const u_int8_t *)haystack;
+
+  while (1) {
     /* Find the first occurrence of the first character from the needle */
-    current = (const u_int8_t *)memchr(current, *(const u_int8_t *)needle,
-                                       haystack_end - current);
+    current = (const u_int8_t *)memchr(current, *(const u_int8_t *)needle, end_of_search - current);
 
     if (!current) {
       return NULL;
     }
 
     /* Check the rest of the needle for a match */
-    if ((current + needle_len <= haystack_end) &&
-        (memcmp(current, needle, needle_len) == 0)) {
+    if (memcmp(current, needle, needle_len) == 0) {
       return (void *)current;
     }
 

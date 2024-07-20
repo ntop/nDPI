@@ -1,0 +1,26 @@
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     1/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Nano	6	652	1
+
+Acceptable                       6 652           1            
+
+	1	TCP 192.168.88.231:59642 <-> 37.120.187.138:7075 [proto: 420/Nano][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Crypto_Currency/106][3 pkts/246 bytes <-> 3 pkts/406 bytes][Goodput ratio: 16/49][0.11 sec][bytes ratio: -0.245 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 26/27 51/54 26/27][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 82/135 106/266 17/92][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

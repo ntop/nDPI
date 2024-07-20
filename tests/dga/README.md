@@ -19,7 +19,7 @@ The modification can be a simple threshold change or a future lightweight ML app
 
 ## Used data
 
-Original used dataset is a collection of legit and DGA domains (balanced) that can be obtained as follow:
+Original used dataset is a collection of legit and DGA domains (balanced) that can be obtained as follows:
 
 ```shell
 wget https://raw.githubusercontent.com/chrmor/DGA_domains_dataset/master/dga_domains_full.csv
@@ -66,5 +66,5 @@ You can evaluate your modifications performances before submitting it as follows
 ./do-dga.sh
 ```
 
-If your modifications decreases baseline performances, test will fails.
-If not (well done), test passed and you must update the baseline metrics with your obtained ones.
+If your modifications decreases baseline performances, test will fail.
+If not (well done), test passed, and you must update the baseline metrics with your obtained ones.

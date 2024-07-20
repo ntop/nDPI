@@ -9,8 +9,7 @@ int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float 
 
 ## Add it to NDPI_APIS Python definition
 
-
-[**NDPI_APIS**][py_ndpi_api] must be updated with the this new API your want to add.
+[**NDPI_APIS**][py_ndpi_api] must be updated with the new API you want to add.
 
 ## Regenerate bindings
 

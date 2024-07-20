@@ -489,6 +489,15 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OCSP, master_protocol, NDPI_CONFIDENCE_DPI);
   }
 
+  /* HTTP Live Streaming */
+  if (packet->content_line.len > 28 &&
+      (strncmp((const char *)packet->content_line.ptr, "application/vnd.apple.mpegurl", 29) == 0 ||
+      strncmp((const char *)packet->content_line.ptr, "application/x-mpegURL", 21) == 0 ||
+      strncmp((const char *)packet->content_line.ptr, "application/x-mpegurl", 21) == 0)) {
+    NDPI_LOG_DBG2(ndpi_struct, "Found HLS\n");
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HLS, master_protocol, NDPI_CONFIDENCE_DPI);
+  }
+
   if((flow->http.method == NDPI_HTTP_METHOD_RPC_CONNECT) ||
      (flow->http.method == NDPI_HTTP_METHOD_RPC_IN_DATA) ||
      (flow->http.method == NDPI_HTTP_METHOD_RPC_OUT_DATA)) {

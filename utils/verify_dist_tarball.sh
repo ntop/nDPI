@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 EXCLUDE_PATTERN="(.*\.m4$|Makefile$|Makefile\.in$|utils/verify_dist_tarball\.sh|^packages/debian/.*|^packages/debian|^test-driver|^config\.guess|^config\.sub|^compile|^configure|/|depcomp|.gitattributes|.gitignore|install-sh|ltmain.sh|missing|src/include/ndpi_config\.h\.in|tests/pcap|tests/result)$"
 
@@ -10,7 +10,7 @@ cd "$(dirname "${0}")/.."
 git ls-tree --full-tree --name-only -r HEAD | grep -vE "${EXCLUDE_PATTERN}" | sort >/tmp/ndpi-dist-verify-git.txt
 
 TARBALL="${1}"
-if [ "x${TARBALL}" = x ]; then
+if [ -z "${TARBALL}" ]; then
 	if [ ! -r Makefile ]; then
 		./autogen.sh
 	fi

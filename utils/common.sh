@@ -1,6 +1,6 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-printf 'Running script: %s\n' "$(basename ${0})" >&2
+printf 'Running script: %s\n' "$(basename "${0}")" >&2
 
 function check_http_response()
 {
@@ -21,7 +21,7 @@ function is_file_empty()
         exit 1
     fi
 
-    if [ `cat "${file}" | wc -c` -eq 0 ]; then
+    if [ "$(< "${file}" wc -c)" -eq 0 ]; then
         printf '%s error: %s\n' "${0}" "file ${file} empty!" >&2
         exit 1
     fi

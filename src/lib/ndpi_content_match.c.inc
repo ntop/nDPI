@@ -1665,6 +1665,9 @@ static ndpi_protocol_match host_match[] =
 
    { "codmwest.com",                     "CoD_Mobile", NDPI_PROTOCOL_COD_MOBILE, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "clickhouse.com",                   "ClickHouse", NDPI_PROTOCOL_CLICKHOUSE, NDPI_PROTOCOL_CATEGORY_DATABASE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "clickhouse.cloud",                 "ClickHouse", NDPI_PROTOCOL_CLICKHOUSE, NDPI_PROTOCOL_CATEGORY_DATABASE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif

@@ -926,6 +926,7 @@ void init_zug_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 void init_jrmi_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_ripe_atlas_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_cloudflare_warp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_nano_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 #endif
 

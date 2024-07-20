@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 
 import sys
-import socket, struct
 
-# This scripts is used to create "hostname/sni -> protocols" lists.
+# This script is used to create "hostname/sni -> protocols" lists.
 if len(sys.argv) < 6:
     print("Usage: {} <file> <name> <protocol> <category> <breed>".format(sys.argv[0]))
-    sys.exit (1)
+    sys.exit(1)
 
 name = sys.argv[2]
 proto = sys.argv[3]
 category = sys.argv[4]
 breed = sys.argv[5]
-
 
 print("""/*
  *
@@ -37,23 +35,23 @@ print("""/*
 
 """)
 
-print("static ndpi_protocol_match "+proto.lower()+"_hostname_list[] = {")
+print("static ndpi_protocol_match " + proto.lower() + "_hostname_list[] = {")
 
 lines = 0
 with open(sys.argv[1]) as fp:
     for cnt, line in enumerate(fp):
         line = line.rstrip()
 
-        if(line != ""):
+        if line != "":
             lines += 1
             x = line.split("/")
 
-            if(len(x) == 2):
+            if len(x) == 2:
                 host = x[0]
             else:
                 host = line
 
-            if(host != ""):
+            if host != "":
                 print(' { ' + f'"{host}", "{name}", {proto}, {category}, {breed}, NDPI_PROTOCOL_DEFAULT_LEVEL' + ' },')
 
 print(" /* End */")

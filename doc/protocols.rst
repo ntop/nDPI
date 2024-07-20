@@ -856,3 +856,30 @@ References:  `Oracle site <https://docs.oracle.com/en/java/javase/21/docs/specs/
 The RIPE Atlas probe protocol is used for the world's largest active Internet measurement network.
 
 References: `Main Site <https://atlas.ripe.net/>`_ and `Documentation <https://ripe-atlas-tools.readthedocs.io/en/latest/index.html>`_
+
+
+.. _Proto 418:
+
+`NDPI_PROTOCOL_HLS`
+=====================
+HTTP Live Streaming (HLS) is an adaptive bitrate streaming communications protocol developed by Apple Inc. It allows for the delivery of media content over the internet by breaking the stream into small segments and adjusting the quality of the stream in real time based on the viewer's network conditions.
+
+References: `RFC <https://datatracker.ietf.org/doc/html/rfc8216>`_
+
+
+.. _Proto 419:
+
+`NDPI_PROTOCOL_CLICKHOUSE`
+======================
+ClickHouse is an open-source columnar database management system designed for online analytical processing (OLAP) of queries.
+
+References: `Main site: <https://clickhouse.com/>`_
+
+
+.. _Proto 420:
+
+`NDPI_PROTOCOL_NANO`
+======================
+Nano (XNO) is a decentralized, open-source cryptocurrency that focuses on delivering fast, fee-less, and eco-friendly transactions through its unique block-lattice structure.
+
+References: `Main site: <https://nano.org/>`_
