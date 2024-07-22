@@ -883,3 +883,12 @@ References: `Main site: <https://clickhouse.com/>`_
 Nano (XNO) is a decentralized, open-source cryptocurrency that focuses on delivering fast, fee-less, and eco-friendly transactions through its unique block-lattice structure.
 
 References: `Main site: <https://nano.org/>`_
+
+
+.. _Proto 421:
+
+`NDPI_PROTOCOL_OPENWIRE`
+======================
+OpenWire is a wire protocol used by Apache ActiveMQ for communication between clients and brokers, providing an efficient and flexible messaging framework. While it's not the most popular choice compared to other protocols like AMQP or MQTT, it is still utilized in scenarios where ActiveMQ is heavily integrated.
+
+References: `Main site: <https://activemq.apache.org/components/classic/documentation/openwire>`_
