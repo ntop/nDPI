@@ -8374,12 +8374,33 @@ static void fpc_update(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ********************************************************************************* */
 
-static void fpc_check_ip(struct ndpi_detection_module_struct *ndpi_str,
-                         struct ndpi_flow_struct *flow)
+static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
+                           struct ndpi_flow_struct *flow)
 {
-  if(flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN)
+  u_int16_t fpc_dns_cached_proto;
+
+
+  if(!ndpi_str->cfg.fpc_enabled)
+    return;
+
+  /* Order by most reliable logic */
+
+  /* Check via fpc DNS cache */
+  if(ndpi_str->fpc_dns_cache &&
+     ndpi_lru_find_cache(ndpi_str->fpc_dns_cache, make_fpc_dns_cache_key(flow),
+                         &fpc_dns_cached_proto, 0 /* Don't remove it as it can be used for other connections */,
+                         ndpi_get_current_time(flow))) {
+    fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
+               fpc_dns_cached_proto, NDPI_FPC_CONFIDENCE_DNS);
+    return;
+  }
+
+  /* Check via IP */
+  if(flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
     fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
                flow->guessed_protocol_id_by_ip, NDPI_FPC_CONFIDENCE_IP);
+    return;
+  }
 }
 
 /* ********************************************************************************* */
@@ -8394,7 +8415,6 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_packet;
   u_int32_t num_calls = 0;
   ndpi_protocol ret;
-  u_int16_t fpc_dns_cached_proto;
 
   memset(&ret, 0, sizeof(ret));
 
@@ -8519,22 +8539,6 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
     if(ndpi_do_guess(ndpi_str, flow, &ret) == -1)
       return(ret);
-
-    /* First Packet Classification */
-
-    fpc_check_ip(ndpi_str, flow);
-
-    /* Check fpc DNS cache */
-    if(ndpi_str->fpc_dns_cache &&
-       ndpi_lru_find_cache(ndpi_str->fpc_dns_cache, make_fpc_dns_cache_key(flow),
-                           &fpc_dns_cached_proto, 0 /* Don't remove it as it can be used for other connections */,
-                           ndpi_get_current_time(flow))) {
-      NDPI_LOG_DBG(ndpi_str,"Found from FPC DNS cache: %u\n",fpc_dns_cached_proto);
-
-      fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
-                 fpc_dns_cached_proto, NDPI_FPC_CONFIDENCE_DNS);
-    }
-    
   }
 
   num_calls = ndpi_check_flow_func(ndpi_str, flow, &ndpi_selection_packet);
@@ -8723,6 +8727,10 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     
     ndpi_entropy2risk(flow);
   }
+
+  /* First Packet Classification */
+  if(flow->all_packets_counter == 1)
+    fpc_check_eval(ndpi_str, flow);
 
   return(ret);
 }
@@ -11318,6 +11326,7 @@ static const struct cfg_param {
   { NULL,            "libgcrypt.init",                          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(libgcrypt_init), NULL },
   { NULL,            "dpi.guess_on_giveup",                     "0x3", "0", "3", CFG_PARAM_INT, __OFF(guess_on_giveup), NULL },
   { NULL,            "dpi.compute_entropy",                     "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(compute_entropy), NULL },
+  { NULL,            "fpc",                                     "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fpc_enabled), NULL },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },
 
@@ -11354,7 +11363,7 @@ static const struct cfg_param {
   { NULL,            "lru.msteams.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries), NULL },
   { NULL,            "lru.msteams.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_ttl), NULL },
   { NULL,            "lru.msteams.scope",                       "0", "0", "1", CFG_PARAM_INT, __OFF(msteams_cache_scope), clbk_only_with_global_ctx },
-  /*  fpc dns cache */
+
   { NULL,            "lru.fpc_dns.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(fpc_dns_cache_num_entries), NULL },
   { NULL,            "lru.fpc_dns.ttl",                         "60", "0", "16777215", CFG_PARAM_INT, __OFF(fpc_dns_cache_ttl), NULL },
   { NULL,            "lru.fpc_dns.scope",                       "0", "0", "1", CFG_PARAM_INT, __OFF(fpc_dns_cache_scope), clbk_only_with_global_ctx },
