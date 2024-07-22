@@ -473,6 +473,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			 )) {
 		if(found == 0) {
 		  memcpy(&flow->protos.dns.rsp_addr, packet->payload + x, data_len);
+		  flow->protos.dns.is_rsp_addr_ipv6 = (data_len == 16) ? 1 : 0;
 		  found = 1;
 		}
 	      }
@@ -804,7 +805,14 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 						       strlen(flow->host_server_name),
 						       &ret_match,
 						       NDPI_PROTOCOL_DNS);
-
+        /* Add to FPC DNS cache */
+        if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN &&
+           (flow->protos.dns.rsp_type == 0x1 || flow->protos.dns.rsp_type == 0x1c) && /* A, AAAA */
+           ndpi_struct->fpc_dns_cache) {
+            ndpi_lru_add_to_cache(ndpi_struct->fpc_dns_cache,
+                                  fpc_dns_cache_key_from_dns_info(flow), ret.app_protocol,
+                                  ndpi_get_current_time(flow));
+        }
 
         if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
 	  ret.master_protocol = checkDNSSubprotocol(s_port, d_port);
