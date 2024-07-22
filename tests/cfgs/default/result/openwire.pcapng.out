@@ -1,0 +1,27 @@
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   1/0 (search/found)
+Patricia protocols:   0/0 (search/found)
+Patricia protocols IPv6: 2/0 (search/found)
+
+OpenWire	43	5203	1
+
+Acceptable                      43 5203          1            
+
+	1	TCP [::1]:51157 <-> [::1]:61616 [proto: 421/OpenWire][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: RPC/16][22 pkts/2807 bytes <-> 21 pkts/2396 bytes][Goodput ratio: 49/43][1.07 sec][bytes ratio: 0.079 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 63/71 1067/1067 251/266][Pkt Len c2s/s2c min/avg/max/stddev: 64/64 128/114 348/592 83/130][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][PLAIN TEXT (ActiveM)][Plen Bins: 28,0,28,5,5,11,5,0,5,0,5,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
