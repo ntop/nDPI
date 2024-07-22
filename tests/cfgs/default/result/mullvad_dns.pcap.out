@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    1/1/0 (insert/search/found)
+LRU cache fpc_dns:    1/0/0 (insert/search/found)
 Automa host:          2/2 (search/found)
 Automa domain:        2/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ Mullvad	2	214	1
 
 Acceptable                       2 214           1            
 
-	1	UDP 192.168.122.11:51696 <-> 9.9.9.9:53 [proto: 5.348/DNS.Mullvad][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Network/14][1 pkts/98 bytes <-> 1 pkts/116 bytes][Goodput ratio: 57/63][0.05 sec][Hostname/SNI: www.mullvad.net][45.83.223.209][PLAIN TEXT (mullvad)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.122.11:51696 <-> 9.9.9.9:53 [proto: 5.348/DNS.Mullvad][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.348/DNS.Mullvad, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/98 bytes <-> 1 pkts/116 bytes][Goodput ratio: 57/63][0.05 sec][Hostname/SNI: www.mullvad.net][45.83.223.209][PLAIN TEXT (mullvad)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

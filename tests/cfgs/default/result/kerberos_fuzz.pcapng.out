@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ Kerberos	1	288	1
 
 Acceptable                       1 288           1            
 
-	1	TCP 126.4.1.0:88 -> 19.0.0.0:53646 [proto: 111/Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][1 pkts/288 bytes -> 0 pkts/0 bytes][Goodput ratio: 90/0][< 1 sec][r1i???ca???????]*??0p??????_???????ea?id;?????o\??????][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][PLAIN TEXT (/S.2T )][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 126.4.1.0:88 -> 19.0.0.0:53646 [proto: 111/Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/288 bytes -> 0 pkts/0 bytes][Goodput ratio: 90/0][< 1 sec][r1i???ca???????]*??0p??????_???????ea?id;?????o\??????][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][PLAIN TEXT (/S.2T )][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

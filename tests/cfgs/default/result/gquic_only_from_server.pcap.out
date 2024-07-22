@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ QUIC	30	39740	1
 
 Acceptable                      30 39740         1            
 
-	1	UDP 213.202.7.26:443 -> 10.189.122.71:60524 [VLAN: 1508][proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Web/5][30 pkts/39740 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.09 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 3/0 59/0 11/0][Pkt Len c2s/s2c min/avg/max/stddev: 69/0 1325/0 1396/0 275/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (AESGCC20)][Plen Bins: 3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,93,0,0,0,0,0]
+	1	UDP 213.202.7.26:443 -> 10.189.122.71:60524 [VLAN: 1508][proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][30 pkts/39740 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][0.09 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 3/0 59/0 11/0][Pkt Len c2s/s2c min/avg/max/stddev: 69/0 1325/0 1396/0 275/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (AESGCC20)][Plen Bins: 3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,93,0,0,0,0,0]

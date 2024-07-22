@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ PGM	1000	196302	1
 
 Acceptable                    1000 196302        1            
 
-	1	PGM 10.244.64.154:0 -> 235.0.1.47:0 [proto: 296/PGM][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][1000 pkts/196302 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][78.91 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 78/0 1479/0 169/0][Pkt Len c2s/s2c min/avg/max/stddev: 70/0 196/0 1344/0 201/0][PLAIN TEXT (PORTFOLIO)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	PGM 10.244.64.154:0 -> 235.0.1.47:0 [proto: 296/PGM][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 296/PGM, Confidence: DPI][DPI packets: 1][cat: Network/14][1000 pkts/196302 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][78.91 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 78/0 1479/0 169/0][Pkt Len c2s/s2c min/avg/max/stddev: 70/0 196/0 1344/0 201/0][PLAIN TEXT (PORTFOLIO)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

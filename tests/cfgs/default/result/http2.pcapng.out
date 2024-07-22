@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ HTTP2	10	1271	1
 
 Safe                            10 1271          1            
 
-	1	TCP 127.0.0.1:37824 <-> 127.0.0.1:29518 [proto: 349/HTTP2][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Web/5][4 pkts/591 bytes <-> 6 pkts/680 bytes][Goodput ratio: 54/40][0.00 sec][bytes ratio: -0.070 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 0/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 77/81 148/113 212/163 50/35][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: No server to client traffic / TCP connection with unidirectional traffic][PLAIN TEXT ( HTTP/2.0)][Plen Bins: 40,10,30,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 127.0.0.1:37824 <-> 127.0.0.1:29518 [proto: 349/HTTP2][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 349/HTTP2, Confidence: DPI][DPI packets: 1][cat: Web/5][4 pkts/591 bytes <-> 6 pkts/680 bytes][Goodput ratio: 54/40][0.00 sec][bytes ratio: -0.070 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 0/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 77/81 148/113 212/163 50/35][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: No server to client traffic / TCP connection with unidirectional traffic][PLAIN TEXT ( HTTP/2.0)][Plen Bins: 40,10,30,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

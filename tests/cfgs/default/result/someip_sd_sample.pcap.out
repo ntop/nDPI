@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/2/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,5 +24,5 @@ SOMEIP	6	660	2
 
 Acceptable                       6 660           2            
 
-	1	UDP 192.168.88.77:30490 <-> 192.168.88.73:30490 [proto: 229/SOMEIP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: RPC/16][2 pkts/228 bytes <-> 2 pkts/204 bytes][Goodput ratio: 49/43][0.80 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 192.168.88.73:30490 -> 235.2.3.5:30490 [proto: 229/SOMEIP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: RPC/16][2 pkts/228 bytes -> 0 pkts/0 bytes][Goodput ratio: 49/0][0.80 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.88.77:30490 <-> 192.168.88.73:30490 [proto: 229/SOMEIP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 229/SOMEIP, Confidence: DPI][DPI packets: 1][cat: RPC/16][2 pkts/228 bytes <-> 2 pkts/204 bytes][Goodput ratio: 49/43][0.80 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.88.73:30490 -> 235.2.3.5:30490 [proto: 229/SOMEIP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 229/SOMEIP, Confidence: DPI][DPI packets: 1][cat: RPC/16][2 pkts/228 bytes -> 0 pkts/0 bytes][Goodput ratio: 49/0][0.80 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

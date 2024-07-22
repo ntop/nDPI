@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ QUIC	10	7479	1
 
 Acceptable                      10 7479          1            
 
-	1	UDP [2bc6:b5ac:cb3b:676b::18]:443 -> [3dba:3762:c186:e122:89b0:5170:a86c:ecff]:53129 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Web/5][10 pkts/7479 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][0.34 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 38/0 290/0 90/0][Pkt Len c2s/s2c min/avg/max/stddev: 82/0 748/0 1292/0 549/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (AESGCC20at)][Plen Bins: 20,0,0,0,0,0,20,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]
+	1	UDP [2bc6:b5ac:cb3b:676b::18]:443 -> [3dba:3762:c186:e122:89b0:5170:a86c:ecff]:53129 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][10 pkts/7479 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][0.34 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 38/0 290/0 90/0][Pkt Len c2s/s2c min/avg/max/stddev: 82/0 748/0 1292/0 549/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (AESGCC20at)][Plen Bins: 20,0,0,0,0,0,20,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0]

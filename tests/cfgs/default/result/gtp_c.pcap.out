@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ GTP_C	4	684	1
 
 Acceptable                       4 684           1            
 
-	1	UDP 10.101.0.2:1024 <-> 10.102.0.2:2123 [proto: 152.272/GTP.GTP_C][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][2 pkts/365 bytes <-> 2 pkts/319 bytes][Goodput ratio: 77/73][0.00 sec][PLAIN TEXT (internet)][Plen Bins: 25,25,0,0,0,0,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.101.0.2:1024 <-> 10.102.0.2:2123 [proto: 152.272/GTP.GTP_C][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 152.272/GTP.GTP_C, Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/365 bytes <-> 2 pkts/319 bytes][Goodput ratio: 77/73][0.00 sec][PLAIN TEXT (internet)][Plen Bins: 25,25,0,0,0,0,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
