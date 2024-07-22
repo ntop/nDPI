@@ -198,6 +198,7 @@ struct ndpi_detection_module_config_struct {
   int libgcrypt_init;
   int guess_on_giveup;
   int compute_entropy;
+  int fpc_enabled;
   
   char filename_config[CFG_MAX_LEN];
 
