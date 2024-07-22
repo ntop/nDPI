@@ -473,6 +473,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			 )) {
 		if(found == 0) {
 		  memcpy(&flow->protos.dns.rsp_addr, packet->payload + x, data_len);
+		  flow->protos.dns.is_rsp_addr_ipv6 = (data_len == 16) ? 1 : 0;
 		  found = 1;
 		}
 	      }
@@ -652,17 +653,6 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 }
 
 /* *********************************************** */
-static u_int64_t fpc_dns_cache_key(struct ndpi_flow_struct *flow) {
-  u_int64_t key;
-  
-  /* network byte order */
- if(flow->is_ipv6)
-    key = ndpi_quick_hash64((const char *)flow->protos.dns.rsp_addr.ipv6.u6_addr.u6_addr8, 16);
- else
-    key = (u_int64_t)(flow->protos.dns.rsp_addr.ipv4);
-    
-  return key;
-}
 
 static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
@@ -815,15 +805,14 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 						       strlen(flow->host_server_name),
 						       &ret_match,
 						       NDPI_PROTOCOL_DNS);
-            /* Add to DNS cache */
-            if(((ret.app_protocol != NDPI_PROTOCOL_UNKNOWN) && (flow->protos.dns.rsp_type == 0x1)) ||
-                ((ret.app_protocol != NDPI_PROTOCOL_UNKNOWN) && (flow->protos.dns.rsp_type == 0x1c))){
-                if(ndpi_struct->fpc_dns_cache){
-                    ndpi_lru_add_to_cache(ndpi_struct->fpc_dns_cache,/*fpc_cache,*/
-                        fpc_dns_cache_key(flow),ret.app_protocol,                           ndpi_get_current_time(flow));
-                    
-                }
-            }
+        /* Add to FPC DNS cache */
+        if(ret.app_protocol != NDPI_PROTOCOL_UNKNOWN &&
+           (flow->protos.dns.rsp_type == 0x1 || flow->protos.dns.rsp_type == 0x1c) && /* A, AAAA */
+           ndpi_struct->fpc_dns_cache) {
+            ndpi_lru_add_to_cache(ndpi_struct->fpc_dns_cache,
+                                  fpc_dns_cache_key_from_dns_info(flow), ret.app_protocol,
+                                  ndpi_get_current_time(flow));
+        }
 
         if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
 	  ret.master_protocol = checkDNSSubprotocol(s_port, d_port);

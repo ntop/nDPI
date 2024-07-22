@@ -7317,18 +7317,30 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
 /* ********************************************************************************* */
 
-u_int64_t make_fpc_dns_cache_key(struct ndpi_flow_struct *flow) {
+static u_int64_t make_fpc_dns_cache_key(struct ndpi_flow_struct *flow) {
   u_int64_t key;
  
-  /* network byte order */
- if(flow->is_ipv6)
+  if(flow->is_ipv6)
     key = ndpi_quick_hash64((const char *)flow->s_address.v6, 16);
- else
+  else
     key = (u_int64_t)(flow->s_address.v4);
-      
+
   return key;
-} 
- 
+}
+
+/* ********************************************************************************* */
+
+u_int64_t fpc_dns_cache_key_from_dns_info(struct ndpi_flow_struct *flow) {
+  u_int64_t key;
+
+  if(flow->protos.dns.is_rsp_addr_ipv6)
+    key = ndpi_quick_hash64((const char *)&flow->protos.dns.rsp_addr.ipv6, 16);
+  else
+    key = (u_int64_t)(flow->protos.dns.rsp_addr.ipv4);
+
+  return key;
+}
+
 /* ********************************************************************************* */
 
 static u_int64_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_client) {
@@ -8429,9 +8441,6 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
   if(flow->num_processed_pkts == 1) {
     /* first packet of this flow to be analyzed */
- 
-    /* Check some fpc cache */
-  
 
 #ifdef HAVE_NBPF
     if(ndpi_str->nbpf_custom_proto[0].tree != NULL) {
@@ -8504,17 +8513,19 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     if(ndpi_do_guess(ndpi_str, flow, &ret) == -1)
       return(ret);
 
+    /* First Packet Classification */
+
     fpc_check_ip(ndpi_str, flow);
-    /* check fpc DNS cache */
+
+    /* Check fpc DNS cache */
     if(ndpi_str->fpc_dns_cache &&
-     ndpi_lru_find_cache(ndpi_str->fpc_dns_cache, make_fpc_dns_cache_key(flow),
-			 &fpc_dns_cached_proto, 0 /* Don't remove it as it can be used for other connections */,
-			 ndpi_get_current_time(flow))) {
-        NDPI_LOG_DBG(ndpi_str,"\nFound from FPC DNS cache...%u\n",fpc_dns_cached_proto);
-        
-        /* Save the protocol id into ndpi_flow_struct structure as a "fpc result" */
-        fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
-               fpc_dns_cached_proto, NDPI_FPC_CONFIDENCE_DNS);
+       ndpi_lru_find_cache(ndpi_str->fpc_dns_cache, make_fpc_dns_cache_key(flow),
+                           &fpc_dns_cached_proto, 0 /* Don't remove it as it can be used for other connections */,
+                           ndpi_get_current_time(flow))) {
+      NDPI_LOG_DBG(ndpi_str,"Found from FPC DNS cache: %u\n",fpc_dns_cached_proto);
+
+      fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
+                 fpc_dns_cached_proto, NDPI_FPC_CONFIDENCE_DNS);
     }
     
   }

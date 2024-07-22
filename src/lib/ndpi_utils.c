@@ -3215,7 +3215,8 @@ int64_t ndpi_strtonum(const char *numstr, int64_t minval, int64_t maxval, const 
 const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx)
 {
   const char *names[NDPI_LRUCACHE_MAX] = { "ookla", "bittorrent", "stun",
-                                           "tls_cert", "mining", "msteams" };
+                                           "tls_cert", "mining", "msteams",
+                                           "fpc_dns" };
 
   if(idx < 0 || idx >= NDPI_LRUCACHE_MAX)
     return "unknown";

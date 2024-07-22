@@ -613,6 +613,9 @@ int load_config_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd)
 int load_category_file_fd(struct ndpi_detection_module_struct *ndpi_str,
 			  FILE *fd, ndpi_protocol_category_t category_id);
 
+u_int64_t fpc_dns_cache_key_from_dns_info(struct ndpi_flow_struct *flow);
+
+
 /* TLS */
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow, uint32_t quic_version);
