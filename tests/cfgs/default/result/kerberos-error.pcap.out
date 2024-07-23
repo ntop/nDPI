@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ Kerberos	2	481	1
 
 Acceptable                       2 481           1            
 
-	1	UDP 148.151.79.183:34473 <-> 144.199.10.233:88 [VLAN: 2008][proto: 111/Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Network/14][1 pkts/333 bytes <-> 1 pkts/148 bytes][Goodput ratio: 86/68][0.36 sec][linux.shell.com\mus-n-cj0709][PLAIN TEXT (LINUX.SHELL.COM)][Plen Bins: 0,0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 148.151.79.183:34473 <-> 144.199.10.233:88 [VLAN: 2008][proto: 111/Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/333 bytes <-> 1 pkts/148 bytes][Goodput ratio: 86/68][0.36 sec][linux.shell.com\mus-n-cj0709][PLAIN TEXT (LINUX.SHELL.COM)][Plen Bins: 0,0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/4/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,7 +24,7 @@ BFD	11	698	4
 
 Acceptable                      11 698           4            
 
-	1	UDP 155.1.13.1:49152 -> 155.1.13.1:3785 [VLAN: 13][proto: 401/BFD][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][4 pkts/232 bytes -> 0 pkts/0 bytes][Goodput ratio: 21/0][0.46 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 155.1.13.3:49152 -> 155.1.13.1:3784 [VLAN: 13][proto: 401/BFD][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][3 pkts/210 bytes -> 0 pkts/0 bytes][Goodput ratio: 34/0][0.07 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	3	UDP 155.1.13.1:49152 -> 155.1.13.3:3784 [VLAN: 13][proto: 401/BFD][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 34/0][0.00 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	4	UDP 155.1.13.3:49152 -> 155.1.13.3:3785 [VLAN: 13][proto: 401/BFD][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][2 pkts/116 bytes -> 0 pkts/0 bytes][Goodput ratio: 21/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 155.1.13.1:49152 -> 155.1.13.1:3785 [VLAN: 13][proto: 401/BFD][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 401/BFD, Confidence: DPI][DPI packets: 1][cat: Network/14][4 pkts/232 bytes -> 0 pkts/0 bytes][Goodput ratio: 21/0][0.46 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 155.1.13.3:49152 -> 155.1.13.1:3784 [VLAN: 13][proto: 401/BFD][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 401/BFD, Confidence: DPI][DPI packets: 1][cat: Network/14][3 pkts/210 bytes -> 0 pkts/0 bytes][Goodput ratio: 34/0][0.07 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 155.1.13.1:49152 -> 155.1.13.3:3784 [VLAN: 13][proto: 401/BFD][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 401/BFD, Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 34/0][0.00 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 155.1.13.3:49152 -> 155.1.13.3:3785 [VLAN: 13][proto: 401/BFD][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 401/BFD, Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/116 bytes -> 0 pkts/0 bytes][Goodput ratio: 21/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

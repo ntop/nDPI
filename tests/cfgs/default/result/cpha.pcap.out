@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ CPHA	1	96	1
 
 Fun                              1 96            1            
 
-	1	UDP 0.0.0.0:8116 -> 172.21.3.0:8116 [VLAN: 21][proto: 53/CPHA][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][1 pkts/96 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 0.0.0.0:8116 -> 172.21.3.0:8116 [VLAN: 21][proto: 53/CPHA][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 53/CPHA, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/96 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

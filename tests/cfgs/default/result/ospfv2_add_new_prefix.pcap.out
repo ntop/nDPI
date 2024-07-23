@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ OSPF	2	200	1
 
 Acceptable                       2 200           1            
 
-	1	OSPF 10.1.10.10:0 <-> 10.1.10.1:0 [proto: 85/OSPF][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][1 pkts/122 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][2.51 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	OSPF 10.1.10.10:0 <-> 10.1.10.1:0 [proto: 85/OSPF][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 85/OSPF, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/122 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][2.51 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ QUIC	11	3918	1
 
 Acceptable                      11 3918          1            
 
-	1	UDP 10.230.40.168:62196 <-> 94.97.225.146:443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Web/5][10 pkts/3852 bytes <-> 1 pkts/66 bytes][Goodput ratio: 93/57][0.00 sec][bytes ratio: 0.966 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 1/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/66 385/66 1260/66 401/0][QUIC ver: MVFST-22][Plen Bins: 0,36,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.230.40.168:62196 <-> 94.97.225.146:443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][10 pkts/3852 bytes <-> 1 pkts/66 bytes][Goodput ratio: 93/57][0.00 sec][bytes ratio: 0.966 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 1/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/66 385/66 1260/66 401/0][QUIC ver: MVFST-22][Plen Bins: 0,36,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0]

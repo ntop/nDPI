@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          1/0 (search/found)
 Automa domain:        1/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ HTTP	5	2748	1
 
 Acceptable                       5 2748          1            
 
-	1	TCP 192.168.3.109:53528 <-> 192.168.3.107:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Web/5][2 pkts/823 bytes <-> 3 pkts/1925 bytes][Goodput ratio: 84/90][0.00 sec][Hostname/SNI: 192.168.3.107][URL: 192.168.3.107/DVWA-master/vulnerabilities/sqli/?id=%3Fid%3Da%27+UNION+SELECT+%22text1%22%2C%22text2%22%3B--+-%26Submit%3DSubmit&Submit=Submit][StatusCode: 200][Content-Type: text/html][Server: Apache/2.4.41 (Ubuntu)][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36][Risk: ** SQL Injection **** HTTP/TLS/QUIC Numeric Hostname/SNI **][Risk Score: 160][Risk Info: Found host 192.168.3.107][PLAIN TEXT (GET /DV)][Plen Bins: 0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0]
+	1	TCP 192.168.3.109:53528 <-> 192.168.3.107:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 3][cat: Web/5][2 pkts/823 bytes <-> 3 pkts/1925 bytes][Goodput ratio: 84/90][0.00 sec][Hostname/SNI: 192.168.3.107][URL: 192.168.3.107/DVWA-master/vulnerabilities/sqli/?id=%3Fid%3Da%27+UNION+SELECT+%22text1%22%2C%22text2%22%3B--+-%26Submit%3DSubmit&Submit=Submit][StatusCode: 200][Content-Type: text/html][Server: Apache/2.4.41 (Ubuntu)][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36][Risk: ** SQL Injection **** HTTP/TLS/QUIC Numeric Hostname/SNI **][Risk Score: 160][Risk Info: Found host 192.168.3.107][PLAIN TEXT (GET /DV)][Plen Bins: 0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0]

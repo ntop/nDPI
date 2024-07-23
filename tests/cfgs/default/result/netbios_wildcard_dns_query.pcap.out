@@ -7,7 +7,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          1/0 (search/found)
 Automa domain:        1/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -24,4 +24,4 @@ DNS	1	92	1
 
 Acceptable                       1 92            1            
 
-	1	UDP 10.1.67.250:41335 -> 10.1.66.20:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][1 pkts/92 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][< 1 sec][Hostname/SNI: ckaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa][::][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT ( CKAAAAAAAAAAAAAAAAAAAAAAAAAAAA)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.1.67.250:41335 -> 10.1.66.20:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/92 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][< 1 sec][Hostname/SNI: ckaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa][::][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT ( CKAAAAAAAAAAAAAAAAAAAAAAAAAAAA)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

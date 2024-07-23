@@ -12,7 +12,7 @@ LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/26/0 (insert/search/found)
 LRU cache mining:     0/10/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/33/0 (insert/search/found)
+LRU cache fpc_dns:    0/32/0 (insert/search/found)
 Automa host:          20/19 (search/found)
 Automa domain:        20/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -72,7 +72,7 @@ JA3 Host Stats:
 	29	TCP 10.8.0.1:45169 <-> 200.160.4.198:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.00 sec][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	30	TCP 10.8.0.1:60479 <-> 200.160.4.49:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.00 sec][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	TCP 10.8.0.1:60574 <-> 200.160.4.49:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][2 pkts/108 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.01 sec][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	32	UDP 10.8.0.1:46214 <-> 200.89.75.198:123 [proto: 9/NTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.31 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	32	UDP 10.8.0.1:46214 <-> 200.89.75.198:123 [proto: 9/NTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 9/NTP, Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.31 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 Undetected flows:
