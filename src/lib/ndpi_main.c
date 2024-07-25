@@ -4379,16 +4379,26 @@ static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str
 	/* Run some basic consistency tests */
 
 	if(packet->payload_packet_len < sizeof(struct ndpi_icmphdr)) {
-	  ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
+	  char buf[64];
+
+	  snprintf(buf, sizeof(buf), "Packet too short (%d vs %u)",
+		   packet->payload_packet_len, (unsigned int)sizeof(struct ndpi_icmphdr));
+	  ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, buf);
 	} else {
 	  u_int8_t icmp_type = (u_int8_t)packet->payload[0];
 	  u_int8_t icmp_code = (u_int8_t)packet->payload[1];
 
 	  /* https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml */
 	  if(((icmp_type >= 44) && (icmp_type <= 252))
-	     || (icmp_code > 15))
-	    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
+	     || (icmp_code > 15)) {
+	    char buf[64];
+	    
+	    snprintf(buf, sizeof(buf), "Invalid type (%u)/code(%u)",
+		     icmp_type, icmp_code);
 
+	    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, buf);
+	  }
+	  
 	  if(packet->payload_packet_len > sizeof(struct ndpi_icmphdr)) {
 	    if(ndpi_str->cfg.compute_entropy && (flow->skip_entropy_check == 0)) {
 	      flow->entropy = ndpi_entropy(packet->payload + sizeof(struct ndpi_icmphdr),
@@ -4399,7 +4409,7 @@ static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str
 	    u_int16_t chksm = icmp4_checksum(packet->payload, packet->payload_packet_len);
 	    
 	    if(chksm) {
-	      ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
+	      ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid ICMP checksum");
 	    }
 	  }
 	}
@@ -4419,16 +4429,27 @@ static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str
       if(flow) {
 	/* Run some basic consistency tests */
 
-	if(packet->payload_packet_len < sizeof(struct ndpi_icmp6hdr))
-	  ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
-	else {
+	if(packet->payload_packet_len < sizeof(struct ndpi_icmp6hdr)) {
+	  char buf[64];
+	
+	  snprintf(buf, sizeof(buf), "Packet too short (%d vs %u)",
+		   packet->payload_packet_len, (unsigned int)sizeof(struct ndpi_icmp6hdr));
+	  
+	  ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, buf);
+	} else {
 	  u_int8_t icmp6_type = (u_int8_t)packet->payload[0];
 	  u_int8_t icmp6_code = (u_int8_t)packet->payload[1];
 
 	  /* https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6 */
 	  if(((icmp6_type >= 5) && (icmp6_type <= 127))
-	     || ((icmp6_code >= 156) && (icmp6_type != 255)))
-	    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, NULL);
+	     || ((icmp6_code >= 156) && (icmp6_type != 255))) {
+ 	    char buf[64];
+	    
+	    snprintf(buf, sizeof(buf), "Invalid type (%u)/code(%u)",
+		     icmp6_type, icmp6_code);
+	    
+	    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, buf);
+	  }
 	}
       }
       return(NDPI_PROTOCOL_IP_ICMPV6);
