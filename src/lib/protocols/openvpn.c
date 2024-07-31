@@ -60,6 +60,16 @@
 #define P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size)  (P_HARD_RESET_PACKET_ID_OFFSET(hmac_size) + 8 * (!!(hmac_size)))
 
 
+static void ndpi_int_openvpn_add_connection(struct ndpi_detection_module_struct * const ndpi_struct,
+                                            struct ndpi_flow_struct * const flow)
+{
+  if(ndpi_struct->cfg.openvpn_subclassification_by_ip &&
+     ndpi_struct->proto_defaults[flow->guessed_protocol_id_by_ip].protoCategory == NDPI_PROTOCOL_CATEGORY_VPN) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_protocol_id_by_ip, NDPI_PROTOCOL_OPENVPN, NDPI_CONFIDENCE_DPI);
+  } else {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  }
+}
 
 static int is_opcode_valid(u_int8_t opcode)
 {
@@ -193,14 +203,14 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
        flow->packet_direction_counter[!dir] >= 2) {
       /* (2) */
       NDPI_LOG_INFO(ndpi_struct,"found openvpn (session ids match on both direction)\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	ndpi_int_openvpn_add_connection(ndpi_struct, flow);
 	return;
       }
     if(flow->packet_direction_counter[dir] >= 4 &&
        flow->packet_direction_counter[!dir] == 0) {
       /* (3) */
       NDPI_LOG_INFO(ndpi_struct,"found openvpn (asymmetric)\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_int_openvpn_add_connection(ndpi_struct, flow);
       return;
     }
   } else {
@@ -231,7 +241,7 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
 
           if(memcmp(flow->ovpn_session_id[!dir], session_remote, 8) == 0) {
             NDPI_LOG_INFO(ndpi_struct,"found openvpn\n");
-            ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+            ndpi_int_openvpn_add_connection(ndpi_struct, flow);
             return;
 	  } else {
             NDPI_LOG_DBG2(ndpi_struct, "key mismatch 0x%lx\n", ndpi_ntohll(*(u_int64_t *)session_remote));
