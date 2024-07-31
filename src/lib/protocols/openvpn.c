@@ -216,7 +216,7 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
 
     hmac_size = detect_hmac_size(ovpn_payload, ovpn_payload_len);
     NDPI_LOG_DBG2(ndpi_struct, "hmac size %d\n", hmac_size);
-    failed = 1;
+    failed = 0;
     if(hmac_size >= 0 &&
        P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size) < ovpn_payload_len) {
       u_int16_t offset = P_PACKET_ID_ARRAY_LEN_OFFSET(hmac_size);
@@ -237,8 +237,9 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
             NDPI_LOG_DBG2(ndpi_struct, "key mismatch 0x%lx\n", ndpi_ntohll(*(u_int64_t *)session_remote));
           }
         }
+        failed = 1;
       } else {
-        failed = 0; /* Server reset without remote session id field */
+        /* Server reset without remote session id field; no failure */
       }
     }
   }
