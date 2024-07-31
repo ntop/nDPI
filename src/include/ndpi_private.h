@@ -268,6 +268,10 @@ struct ndpi_detection_module_config_struct {
 
   int rtp_search_for_stun;
 
+  int openvpn_subclassification_by_ip;
+
+  int wireguard_subclassification_by_ip;
+
   NDPI_PROTOCOL_BITMASK debug_bitmask;
   NDPI_PROTOCOL_BITMASK ip_list_bitmask;
 

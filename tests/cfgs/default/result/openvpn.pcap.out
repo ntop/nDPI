@@ -1,29 +1,30 @@
 DPI Packets (TCP):	24	(8.00 pkts/flow)
-DPI Packets (UDP):	20	(3.33 pkts/flow)
-Confidence DPI              : 9 (flows)
-Num dissector calls: 1571 (174.56 diss/flow)
+DPI Packets (UDP):	24	(3.43 pkts/flow)
+Confidence DPI              : 10 (flows)
+Num dissector calls: 1757 (175.70 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/9/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/9/0 (insert/search/found)
+LRU cache fpc_dns:    0/10/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   6/0 (search/found)
+Patricia risk mask:   8/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        1/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   18/1 (search/found)
+Patricia protocols:   19/2 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 OpenVPN	691	131184	9
+NordVPN	15	7962	1
 
-Acceptable                     691 131184        9            
+Acceptable                     706 139146        10           
 
 	1	UDP 192.168.43.18:13680 <-> 139.59.151.137:13680 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: VPN/2][62 pkts/11508 bytes <-> 58 pkts/16664 bytes][Goodput ratio: 77/85][19.24 sec][bytes ratio: -0.183 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 289/106 3994/2456 764/365][Pkt Len c2s/s2c min/avg/max/stddev: 84/92 186/287 1214/1287 193/325][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (160727093158Z)][Plen Bins: 0,33,19,9,29,0,0,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0]
 	2	TCP 10.181.235.122:39772 <-> 10.251.71.30:1194 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: VPN/2][100 pkts/13594 bytes <-> 95 pkts/13987 bytes][Goodput ratio: 51/55][32.02 sec][bytes ratio: -0.014 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 245/317 3842/9253 675/1172][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 136/147 472/542 78/90][PLAIN TEXT (121031022835Z)][Plen Bins: 35,13,1,39,1,0,0,8,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -32,5 +33,6 @@ Acceptable                     691 131184        9
 	5	UDP 192.168.43.12:41507 <-> 139.59.151.137:13680 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VPN/2][49 pkts/7860 bytes <-> 34 pkts/5699 bytes][Goodput ratio: 74/75][9.11 sec][bytes ratio: 0.159 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 224/137 3857/2389 691/464][Pkt Len c2s/s2c min/avg/max/stddev: 84/92 160/168 1214/196 192/31][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (160727093158Z)][Plen Bins: 0,40,14,8,30,2,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0]
 	6	TCP 127.0.0.1:36138 <-> 127.0.0.1:443 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 12][cat: VPN/2][23 pkts/5552 bytes <-> 23 pkts/5854 bytes][Goodput ratio: 77/77][1.55 sec][bytes ratio: -0.026 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 69/85 1049/1050 238/247][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 241/255 1514/1440 378/396][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 1194][PLAIN TEXT (Rj.shh)][Plen Bins: 0,5,45,5,0,0,0,0,0,0,0,10,0,0,0,0,0,5,0,0,0,0,5,0,0,0,0,0,0,5,0,0,0,0,0,10,0,0,0,0,0,0,0,5,0,5,0,0]
 	7	UDP 192.168.12.156:41133 <-> 107.161.86.131:443 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: VPN/2][21 pkts/3745 bytes <-> 10 pkts/5947 bytes][Goodput ratio: 76/93][1.13 sec][bytes ratio: -0.227 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 60/68 316/253 83/100][Pkt Len c2s/s2c min/avg/max/stddev: 114/136 178/595 791/1170 150/425][Risk: ** Known Proto on Non Std Port **** Susp Entropy **][Risk Score: 60][Risk Info: Entropy: 5.932 (Executable?) / Expected on port 1194][PLAIN TEXT (qIasglO)][Plen Bins: 0,0,49,16,3,3,0,0,3,0,6,3,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,0,6,3,0,0,0,0,0,0,0,0,0,0,0,0]
-	8	UDP 69.197.143.179:443 -> 10.0.2.15:60201 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: VPN/2][11 pkts/6593 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][2.33 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 259/0 1305/0 430/0][Pkt Len c2s/s2c min/avg/max/stddev: 64/0 599/0 1268/0 521/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No client to server traffic / Expected on port 1194][PLAIN TEXT (RDNTzW)][Plen Bins: 27,0,9,0,0,0,9,0,0,0,0,0,9,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,9,0,0,0,0,0,0,0,0,0]
-	9	UDP 192.168.75.18:60201 -> 166.161.181.18:443 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: VPN/2][10 pkts/3335 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][0.31 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 34/0 152/0 62/0][Pkt Len c2s/s2c min/avg/max/stddev: 56/0 334/0 1242/0 458/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic / Expected on port 1194][Plen Bins: 60,0,0,10,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 192.168.12.156:37383 <-> 217.138.197.43:1234 [proto: 159.426/OpenVPN.NordVPN][IP: 426/NordVPN][Encrypted][Confidence: DPI][FPC: 426/NordVPN, Confidence: IP address][DPI packets: 4][cat: VPN/2][7 pkts/1911 bytes <-> 8 pkts/6051 bytes][Goodput ratio: 85/94][0.06 sec][bytes ratio: -0.520 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 11/8 36/37 14/14][Pkt Len c2s/s2c min/avg/max/stddev: 128/136 273/756 782/1158 228/451][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 0,0,13,34,0,0,0,0,6,0,0,6,0,0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 69.197.143.179:443 -> 10.0.2.15:60201 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: VPN/2][11 pkts/6593 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][2.33 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 259/0 1305/0 430/0][Pkt Len c2s/s2c min/avg/max/stddev: 64/0 599/0 1268/0 521/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No client to server traffic / Expected on port 1194][PLAIN TEXT (RDNTzW)][Plen Bins: 27,0,9,0,0,0,9,0,0,0,0,0,9,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,9,0,0,0,0,0,0,0,0,0]
+	10	UDP 192.168.75.18:60201 -> 166.161.181.18:443 [proto: 159/OpenVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: VPN/2][10 pkts/3335 bytes -> 0 pkts/0 bytes][Goodput ratio: 87/0][0.31 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 34/0 152/0 62/0][Pkt Len c2s/s2c min/avg/max/stddev: 56/0 334/0 1242/0 458/0][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic / Expected on port 1194][Plen Bins: 60,0,0,10,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0]
