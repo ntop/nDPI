@@ -88,6 +88,7 @@
 #include "inc_generated/ndpi_protonvpn_out_match.c.inc"
 #include "inc_generated/ndpi_mullvad_match.c.inc"
 #include "inc_generated/ndpi_nordvpn_match.c.inc"
+#include "inc_generated/ndpi_surfshark_match.c.inc"
 #include "inc_generated/ndpi_asn_telegram.c.inc"
 #include "inc_generated/ndpi_asn_apple.c.inc"
 #include "inc_generated/ndpi_asn_twitter.c.inc"
@@ -3641,6 +3642,10 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_NORDVPN)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_nordvpn_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_nordvpn_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_SURFSHARK)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_surfshark_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_surfshark_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_TELEGRAM)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_telegram_protocol_list);
