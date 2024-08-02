@@ -26,7 +26,6 @@ static ndpi_network ndpi_protocol_dropbox_protocol_list[] = {
  { 0x6CA0A000 /* 108.160.160.0/20 */, 20, NDPI_PROTOCOL_DROPBOX },
  { 0xA27D0000 /* 162.125.0.0/16 */, 16, NDPI_PROTOCOL_DROPBOX },
  { 0xB92D0800 /* 185.45.8.0/22 */, 22, NDPI_PROTOCOL_DROPBOX },
- { 0xB969A400 /* 185.105.164.0/24 */, 24, NDPI_PROTOCOL_DROPBOX },
  { 0xC0BDC800 /* 192.189.200.0/23 */, 23, NDPI_PROTOCOL_DROPBOX },
  /* End */
  { 0x0, 0, 0 }

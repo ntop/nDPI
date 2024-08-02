@@ -35,7 +35,9 @@ static ndpi_network ndpi_protocol_vk_protocol_list[] = {
 };
 
 static ndpi_network6 ndpi_protocol_vk_protocol_list_6[] = {
- { "2a00:bdc0::", 35, NDPI_PROTOCOL_VK },
+ { "2a00:bdc0::", 33, NDPI_PROTOCOL_VK },
+ { "2a00:bdc0:8000::", 34, NDPI_PROTOCOL_VK },
+ { "2a00:bdc0:c000::", 35, NDPI_PROTOCOL_VK },
  /* End */
  { NULL, 0, 0 }
 };
