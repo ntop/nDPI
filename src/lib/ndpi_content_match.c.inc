@@ -1679,6 +1679,8 @@ static ndpi_protocol_match host_match[] =
    { "napps-1.com",                      "NordVPN", NDPI_PROTOCOL_NORDVPN, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "napps-2.com",                      "NordVPN", NDPI_PROTOCOL_NORDVPN, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "surfshark.com",                    "SurfShark", NDPI_PROTOCOL_SURFSHARK, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif

@@ -938,3 +938,12 @@ References: `Main site: <https://www.lustre.org/>`_
 NordVPN is a VPN service.
 
 References: `Main site: <https://nordvpn.com>`_
+
+
+.. _Proto 427:
+
+`NDPI_PROTOCOL_SURFSHARK`
+========================
+Surfshark is a brand of VPN services offered by the Netherlands-based company Surfshark B.V.
+
+References: `Main site: <https://surfshark.com/>`_
