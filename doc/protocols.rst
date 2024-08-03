@@ -947,3 +947,12 @@ References: `Main site: <https://nordvpn.com>`_
 Surfshark is a brand of VPN services offered by the Netherlands-based company Surfshark B.V.
 
 References: `Main site: <https://surfshark.com/>`_
+
+
+.. _Proto 428:
+
+`NDPI_PROTOCOL_CACTUSVPN`
+========================
+CactusVPN is a VPN service.
+
+References: `Main site: <https://cactusvpn.com/>`_
