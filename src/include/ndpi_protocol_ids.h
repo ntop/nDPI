@@ -456,6 +456,7 @@ typedef enum {
   NDPI_PROTOCOL_LUSTRE                = 425,
   NDPI_PROTOCOL_NORDVPN               = 426,
   NDPI_PROTOCOL_SURFSHARK             = 427,
+  NDPI_PROTOCOL_CACTUSVPN             = 428,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
