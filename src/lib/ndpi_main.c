@@ -3920,6 +3920,10 @@ int ndpi_add_string_value_to_automa(void *_automa, char *str, u_int32_t num) {
   ac_pattern.length     = strlen(ac_pattern.astring);
 
   rc = ac_automata_add(automa, &ac_pattern);
+
+  if(rc != ACERR_SUCCESS)
+    ndpi_free(cstr);
+
   return(rc == ACERR_SUCCESS ? 0 : (rc == ACERR_DUPLICATE_PATTERN ? -2 : -1));
 }
 
