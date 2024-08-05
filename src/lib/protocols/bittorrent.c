@@ -60,7 +60,6 @@ static void ndpi_search_bittorrent_hash(struct ndpi_detection_module_struct *ndp
 
 static int search_bittorrent_again(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow) {
-  ndpi_search_bittorrent(ndpi_struct, flow);
   ndpi_search_bittorrent_hash(ndpi_struct, flow, -1);
   
   /* Possibly more processing */
