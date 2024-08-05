@@ -1,13 +1,14 @@
-DPI Packets (UDP):	12	(3.00 pkts/flow)
+DPI Packets (UDP):	18	(3.60 pkts/flow)
+Confidence Unknown          : 1 (flows)
 Confidence DPI              : 4 (flows)
-Num dissector calls: 642 (160.50 diss/flow)
+Num dissector calls: 838 (167.60 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache mining:     0/1/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/4/0 (insert/search/found)
+LRU cache fpc_dns:    0/5/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -17,14 +18,20 @@ Patricia risk mask:   6/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   8/0 (search/found)
+Patricia protocols:   10/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
+Unknown	6	460	1
 RTP	110	19309	4
 
 Acceptable                     110 19309         4            
+Unrated                          6 460           1            
 
 	1	UDP 10.192.92.81:52070 <-> 10.136.43.69:21048 [VLAN: 20][proto: 87/RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Media/1][15 pkts/3330 bytes <-> 15 pkts/3330 bytes][Goodput ratio: 77/77][0.30 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 19/19 19/19 20/20 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 222/222 222/222 222/222 0/0][PLAIN TEXT (UUUUUUUUUUUUU)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 10.126.70.67:23784 <-> 10.236.7.225:50160 [VLAN: 107][proto: 87/RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Media/1][18 pkts/3924 bytes <-> 12 pkts/2616 bytes][Goodput ratio: 79/79][0.34 sec][bytes ratio: 0.200 (Upload)][IAT c2s/s2c min/avg/max/stddev: 19/19 20/20 20/20 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 218/218 218/218 218/218 0/0][PLAIN TEXT (UUUUUUUUU)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 10.102.45.249:31046 <-> 10.133.48.100:21176 [VLAN: 10][proto: GTP:87/RTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Media/1][22 pkts/2860 bytes <-> 8 pkts/989 bytes][Goodput ratio: 34/30][0.44 sec][bytes ratio: 0.486 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/19 22/19 44/20 15/0][Pkt Len c2s/s2c min/avg/max/stddev: 130/113 130/124 130/130 0/8][Plen Bins: 10,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	UDP 10.133.32.101:36408 -> 10.110.31.25:1272 [VLAN: 10][proto: GTP:87/RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Media/1][20 pkts/2260 bytes -> 0 pkts/0 bytes][Goodput ratio: 24/0][0.38 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 19/0 20/0 21/0 1/0][Pkt Len c2s/s2c min/avg/max/stddev: 113/0 113/0 113/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	UDP 192.168.12.156:37649 <-> 57.128.172.97:9981 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][3 pkts/230 bytes <-> 3 pkts/230 bytes][Goodput ratio: 45/45][1.03 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 498/498 505/504 512/511 7/6][Pkt Len c2s/s2c min/avg/max/stddev: 72/72 77/77 82/82 4/4][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 4.970 (Executable?)][Plen Bins: 33,66,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

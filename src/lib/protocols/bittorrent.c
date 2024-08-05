@@ -104,6 +104,8 @@ static u_int8_t is_utpv1_pkt(const u_int8_t *payload, u_int payload_len) {
   if(h->next_extension > 2)         return(0);
   if(h->h_type == 4 /* SYN */ && (h->tdiff_usec != 0 ||
      payload_len != (u_int)h_length)) return(0);
+  if(h->h_type == 2 /* STATE */ &&
+     payload_len != (u_int)h_length) return(0);
   if(h->h_type == 0 /* DATA */ &&
      payload_len == (u_int)h_length) return(0);
   if(h->connection_id == 0) return(0);
