@@ -956,3 +956,12 @@ References: `Main site: <https://surfshark.com/>`_
 CactusVPN is a VPN service.
 
 References: `Main site: <https://cactusvpn.com/>`_
+
+
+.. _Proto 429:
+
+`NDPI_PROTOCOL_WINDSCRIBE`
+=========================
+Windscribe is a commercial, cross-platform virtual private network (VPN) service provider based in Canada.
+
+References: `Main site: <https://windscribe.com/>`_

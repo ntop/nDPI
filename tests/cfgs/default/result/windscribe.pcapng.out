@@ -1,0 +1,32 @@
+DPI Packets (TCP):	6	(6.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   1/2/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      1/1 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Windscribe	24	9582	1
+
+Acceptable                      24 9582          1            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.12.156           	 1      
+
+
+	1	TCP 192.168.12.156:42192 <-> 107.161.86.132:443 [proto: 91.429/TLS.Windscribe][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: VPN/2][12 pkts/3075 bytes <-> 12 pkts/6507 bytes][Goodput ratio: 74/88][1.17 sec][(Advertised) ALPNs: h2;http/1.1][bytes ratio: -0.358 (Download)][IAT c2s/s2c min/avg/max/stddev: 2/0 85/65 225/244 91/99][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 256/542 853/1514 219/579][Risk: ** Self-signed Cert **** Weak TLS Cipher **** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 300][Risk Info: SNI should always be present / h2 / Cipher TLS_RSA_WITH_AES_128_GCM_SHA256 / C=US, ST=CA, L=San Francisco, O=Windscribe, OU=IT][TLSv1.2][JA3C: 3aed7e7668a1356721767da8740f69ed][JA4: t12d1806h2_102b67c9f592_d0797edaf0d0][JA3S: 00be073a5459cc054724f5808fd7ab67 (WEAK)][Issuer: C=US, ST=CA, L=San Francisco, O=Windscribe, OU=IT Dept., CN=54.153.90.230][Subject: C=US, ST=CA, L=San Francisco, O=Windscribe, OU=IT Dept., CN=54.153.90.230][Certificate SHA-1: A5:6B:13:F0:68:BE:8C:0F:54:C9:15:A7:D6:68:75:F7:3F:49:92:DE][Validity: 2015-02-24 00:26:59 - 2031-07-30 00:26:59][Cipher: TLS_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,0,21,6,6,6,13,0,6,0,0,6,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,6,0,0,0,6,0,0,0,0,0,0,0,0,13,0,0]
