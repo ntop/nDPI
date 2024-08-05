@@ -1,5 +1,196 @@
 # CHANGELOG
 
+#### nDPI 4.10 (Aug 2024)
+
+## Major Changes
+- Initial work towards First Packet Classification (FPC)
+
+## New Supported Protocols and Services
+- Add OpenWire support (#2513)
+- FPC: add DNS correlation  (#2497)
+- ipaddr2list.py, ndpi2timeline.py: reformatted (#2509)
+- Add Nano (XNO) protocol support (#2508)
+- Added ClickHouse protocol
+- Add HLS support (#2502)
+- Add infrastructure for explicit support of Fist Packet Classification (#2488)
+- Add detection of Twitter bot (#2487)
+- Added default port mappings to ndpiReader help -H (#2477)
+- Add Ripe Atlas probe protocol. (#2473)
+- Add ZUG consensus protocol dissector. (#2458)
+- Added NDPI_PROBING_ATTEMPT risk
+- DTLS: add support for DTLS 1.3 (#2445)
+- Added dpi.compute_entropy configuration parameter
+- Add Call of Duty Mobile support (#2438)
+- Add Ethernet Global Data support (#2437)
+- Viber: add detection of voip calls and avoid false positives (#2434)
+- Add support for Mastodon, Bluesky and (FB-)Threads (#2418)
+- Fixes JA4 computation adding a better GREASE detect funzion
+- DTLS: add support for Alert message type (similar to TLS) (#2406)
+- Add Adobe Connect support (#2407)
+- Remove PPStream protocol and add iQIYI (#2403)
+- Add BFCP protocol support (#2401)
+- Add strlcpy implementation (#2395)
+- Add KNXnet/IP protocol support (#2397)
+- STUN: add support for ipv6 in some metadata (#2389)
+- Implemented STUN peer_address, relayed_address, response_origin, other_address parsing Added code to ignore invalid STUN realm Extended JSON output with STUN information
+- Add Label Distribution Protocol support (#2385)
+- Add The Elder Scrolls Online support (#2376)
+- Add Shellscript risk detection. (#2375)
+- Add PE32/PE32+ risk detection (detect transmitted windows executables). (#2312)
+- Added support for STUN Mapped IP address
+- Added binary data transfer risk alert
+- Add LoL: Wild Rift detection (#2356)
+- STUN: add dissection of XOR-PEER-ADDRESS with ipv6 address
+- Add FLUTE protocol dissector (#2351)
+- Add PFCP protocol dissector (#2342)
+- Add Path of Exile protocol dissector (#2337)
+- Add NetEase Games detection support (#2335)
+- Add Naraka Bladepoint detection support (#2334)
+- Add BFD protocol dissector (#2332)
+- Add DLEP protocol dissector (#2326)
+- Add ANSI C12.22 protocol dissector (#2317)
+- TLS: add configuration of JA* fingerprints (#2313)
+- Add detection of Gaijin Entertainment games (#2311)
+- Add new AppsFlyer domain (#2307)
+- Add TencentGames protocol dissector (#2306)
+- Add Gearman protocol dissector (#2297)
+- Add Raft protocol dissector. (#2286)
+- Add Radmin protocol dissector (#2283)
+- Add STOMP protocol dissector (#2280)
+- Add ElectronicArts detection support (#2274)
+- Add Yojimbo (netcode) protocol dissector (#2277)
+- Add a dedicated dissector for Zoom (#2265)
+- Add Mumble detection support (#2269)
+- Add KCP protocol dissector. (#2257)
+- Add PIA (Private Internet Access) support (#2250)
+- Add more adult content hostnames (#2247)
+- Add Roughtime protocol dissector. (#2248)
+- Add realtime protocol output to `ndpiReader`. (#2197)
+- Add Google Chat support (#2244)
+- ndpiReader: add breed stats on output used for CI (#2236)
+- Add Ceph protocol dissector (#2242)
+- Add HL7 protocol dissector (#2240)
+- Add IEC62056 (DLMS/COSEM) protocol dissector (#2229)
+- Add NoMachine NX protocol dissector (#2234)
+- Add Apache Kafka protocol dissector (#2226)
+- Add WebDAV detection support (#2224)
+- Add JSON-RPC protocol dissector (#2217)
+- Add OpenFlow protocol dissector (#2222)
+- Add UFTP protocol dissector (#2215)
+- Add HiSLIP protocol dissector (#2214)
+- Add PROFINET/IO protocol dissector (#2213)
+- Add Monero protocol classification. (#2196)
+- Add Ether-S-Bus protocol dissector (#2200)
+- Add IEEE C37.118 protocol dissector (#2193)
+- Add ISO 9506-1 MMS protocol dissector (#2189)
+- Add Beckhoff ADS protocol dissector (#2181)
+- Add Schneider Electric’s UMAS detection support (#2180)
+- Add Ether-S-I/O protocol dissector (#2174)
+- Add Omron FINS protocol dissector (#2172)
+- Rework S7Comm dissector; add S7Comm Plus support (#2165)
+- Add OPC UA protocol dissector (#2169)
+- Add RTPS protocol dissector (#2168)
+- Add HART-IP protocol dissector (#2163)
+- Add IEEE 1588-2008 (PTPv2) dissector (#2156)
+- Added TeslaServices and improved TikTok host names. Fixes #2140. (#2144)
+- Add ethereum protocol dissector. (#2111)
+- Added generic Google Protobuf dissector. (#2109)
+- Add CAN over Ethernet dissector.
+	
+	
+## Improvements
+
+ - Enhanced PrimeVideo detection
+ - Enhanced ookla tracing
+ - Improved ICMP malformed packet risk description
+- Improve detection of Cloudflare WARP traffic (#2491)
+- tunnelbear: improve detection over wireguard (#2485)
+- Improve detection of Twitter/X (#2482)
+- Zoom: fix detection of screen sharing (#2476)
+ - Improved detection of Android connectiity checks
+ - Zoom: fix integer overflow (#2469)
+ - RTP/STUN: look for STUN packets after RTP/RTCP classification (#2465)
+ - Zoom: faster detection of P2P flows (#2467)
+ - Added NDPI_PROTOCOL_NTOP assert and removed percentage comparison (#2460)
+- Add extra entropy checks and more precise(?) analysis. (#2383)
+- STUN: improve extraction of Mapped-Address metadata (#2370)
+- Added support for roaring bitmap v3 (#2355)
+- Add more TencentGames signatures (#2354)
+- Added DGA exception for Dropbox
+- QUIC: add heuristic to detect unidirectional *G*QUIC flows (#2207)
+- fuzzing: improve coverage (#2495)
+- Improve detection of Cloudflare WARP traffic (#2491)
+- fuzz: improve fuzzers using pl7m (#2486)
+- wireshark: lua: minor improvements
+- Improved logic for checking invalid DNS queries
+- fuzz: improve fuzzing coverage (#2474)
+- Improved Kafka dissector. (#2456)
+- H323: improve detection and avoid false positives (#2432)
+- Fix/improve fuzzing (#2426) (#2400)
+- eDonkey: improve/update classification (#2410)
+- Domain Classification Improvements  (#2396)
+- STUN: improve extraction of Mapped-Address metadata (#2370)
+- Improve LoL: Wild Rift detection (#2359)
+- Improve TencentGames detection (#2353)
+- STUN: improve heurstic to detect old classic-stun
+- ahocorasick: improve matching with subdomains (#2331)
+- Improved alert on suspicious DNS traffic
+- Telegram: improve identification
+- Improved Telegram detection
+- Improved modbus dissection to discard false positives
+- Improved Polish gambling sites fetch script. (#2315)
+- fuzz: improve fuzzing coverage (#2309)
+- Improve normalization of `flow->host_server_name` (#2310)
+- Improve `ndpi_set_config` error printing. (#2300)
+- Improve MySQL detection (#2279)
+- Improve handling of custom rules (#2276)
+- Zoom: improve detection (#2270)
+- Improved ndpi_get_host_domain
+- Bittorrent: improve detection of UTPv1 (#2259)
+- Improved uTorrent via utp (TCP-like streams over UDP). (#2255)
+- fuzz: improve fuzzing coverage (#2239)
+- fuzz: improve fuzzing coverage (#2220)
+- Improved belgium gambling sites regex. (#2184)
+- Improve CORBA detection (#2167)
+- STUN: improve demultiplexing of DTLS packets (#2153)
+- Improved TFTP. Fixes #2075. (#2149)
+- fuzz: improve coverage and remove dead code (#2135)
+- Improved Protobuf dissector. (#2119)
+- Improved detection as non DGA for hostnames belnging to a CDN (#2068)
+- Improved CryNetwork protocol dissector.
+
+## Tools
+- Make the CI faster (#2475)
+- Add a script to download/update the domain suffix list (#2321)
+- Add identification of Huawei generic and cloud traffic (#2325)
+- ndpiReader: improve the check on max number of pkts processed per flow (#2261)
+- Added default port mappings to ndpiReader help -H (#2477)
+- ndpiReader: restore `ndpiReader -x $DOMAIN_NAME` functionality (#2329)
+- ndpiReader: improve the check on max number of pkts processed per flow (#2261)
+- ndpiReader: fix memory leak
+- Add realtime protocol output to `ndpiReader`. (#2197)
+- ndpiReader: add breed stats on output used for CI (#2236)
+- ndpiReader: avoid creating two detection modules when processing traffic/traces (#2209)
+- ndpiReader: fix `guessed_flow_protocols` statistic (#2203)
+
+## Misc
+- Improved tests coverage
+- Varisous performance improvements
+- Added stress test
+- Added new API calls - ndpi_load_domain_suffixes() - ndpi_get_host_domain_suffix()
+- Add some fast CRC16 algorithms implementation (#2195)
+- Add a FAQ for the project (#2185)
+- Ip address list: aggregate Mullvad and Tor lists too (#2154)
+- IP lists: aggregate addresses wherever possible (#2152)
+- Added malicious sites from the polish cert. (#2121)
+- IPv6: add support for custom categories (#2126)
+- IPv6: add support for IPv6 risk exceptions (#2122)
+- IPv6: add support for custom rules (#2120)
+- IPv6: add support for IPv6 risk tree (#2118)
+- ipv6: add support for ipv6 addresses lists (#2113)
+
+
+
 #### nDPI 4.8 (Oct 2023)
 
 ## Major Changes
