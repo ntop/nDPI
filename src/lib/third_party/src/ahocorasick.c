@@ -226,6 +226,7 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
 {
   unsigned int i;
   AC_NODE_t * n;
+  AC_NODE_t * rev[patt->length];
   AC_NODE_t * next;
   AC_ALPHABET_t alpha;
 
@@ -250,10 +251,14 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
 
       if((next = node_find_next(n, alpha)) != 0) {
           n = next;
+          rev[i] = next;
           continue;
       }
-      if(!(next = node_create_next(n, alpha))) 
+      if(!(next = node_create_next(n, alpha))) {
+            while (--i)
+                  node_release(rev[i], 1);
               return ACERR_ERROR;
+      }
       next->id = ++thiz->id;
       thiz->all_nodes_num++;
       n = next;
@@ -274,12 +279,18 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
     /* original code */
     patt->rep.number = n->matched_patterns->patterns[0].rep.number;
 #endif
+    while (--i)
+          node_release(rev[i], 1);
+
     return ACERR_DUPLICATE_PATTERN;
   }
 
-  if(node_register_matchstr(n, patt, 0))
+  if(node_register_matchstr(n, patt, 0)) {
+      while (--i)
+           node_release(rev[i], 1);
       return ACERR_ERROR;
- 
+  }
+
   thiz->total_patterns++;
 
   return ACERR_SUCCESS;
