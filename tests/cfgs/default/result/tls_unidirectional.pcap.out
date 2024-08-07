@@ -15,7 +15,7 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
@@ -26,4 +26,4 @@ TLS	8	550	1
 
 Safe                             8 550           1            
 
-	1	TCP 192.168.2.198:50548 <-> 192.168.2.1:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 8][cat: Web/5][5 pkts/344 bytes <-> 3 pkts/206 bytes][Goodput ratio: 1/0][4.68 sec][bytes ratio: 0.251 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2/3291 1171/3291 3288/3291 1347/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 69/69 78/74 5/4][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.2.198:50548 <-> 192.168.2.1:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 8][cat: Web/5][5 pkts/344 bytes <-> 3 pkts/206 bytes][Goodput ratio: 1/0][4.68 sec][bytes ratio: 0.251 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2/3291 1171/3291 3288/3291 1347/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 69/69 78/74 5/4][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

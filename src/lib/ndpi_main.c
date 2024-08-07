@@ -7694,11 +7694,17 @@ static void ndpi_check_tcp_flags(struct ndpi_flow_struct *flow) {
 /* ******************************************************************** */
 
 static void ndpi_check_probing_attempt(struct ndpi_flow_struct *flow) {
-  if(flow->l4_proto == IPPROTO_TCP) {
+  /* TODO: check UDP traffic too */
+  
+  if((flow->l4_proto == IPPROTO_TCP)
+     && (flow->l4.tcp.cli2srv_tcp_flags & TH_PUSH)
+     && (flow->l4.tcp.srv2cli_tcp_flags & TH_PUSH)) {     
     if(flow->packet_direction_with_payload_observed[0]
        && flow->packet_direction_with_payload_observed[1]) {
       /* Both directions observed */
-
+      /* Nothing to do */
+    } else {
+      /* Skipping rules where an early match might be confused with a probing attempt */
       if(flow->confidence == NDPI_CONFIDENCE_DPI) {
 	switch(flow->detected_protocol_stack[0]) {
 	case NDPI_PROTOCOL_SSH:
@@ -7707,31 +7713,16 @@ static void ndpi_check_probing_attempt(struct ndpi_flow_struct *flow) {
 	  break;
 	  
 	case NDPI_PROTOCOL_TLS:
-	case NDPI_PROTOCOL_QUIC:
+	  /* case NDPI_PROTOCOL_QUIC: */
 	case NDPI_PROTOCOL_MAIL_SMTPS:
 	case NDPI_PROTOCOL_MAIL_POPS:
 	case NDPI_PROTOCOL_MAIL_IMAPS:
 	case NDPI_PROTOCOL_DTLS:
 	  if(flow->host_server_name[0] == '\0')
-	    ndpi_set_risk(flow, NDPI_PROBING_ATTEMPT, "TLS/QUIC Probing");
+	    ndpi_set_risk(flow, NDPI_PROBING_ATTEMPT, "TLS Probing");
 	  break;
 	}
-      }
-    } else {
-      switch(flow->confidence) {
-      case NDPI_CONFIDENCE_MATCH_BY_PORT:
-      case NDPI_CONFIDENCE_NBPF:
-      case NDPI_CONFIDENCE_DPI_PARTIAL_CACHE:
-      case NDPI_CONFIDENCE_DPI_CACHE:
-      case NDPI_CONFIDENCE_MATCH_BY_IP:
-      case NDPI_CONFIDENCE_CUSTOM_RULE:
-	/* Skipping rules where an early match might be confused with a probing attempt */
-	break;
-
-      default:
-	ndpi_set_risk(flow, NDPI_PROBING_ATTEMPT,
-		      "TCP connection with unidirectional traffic");
-      }
+      }	  
     }
   }
 }

@@ -24,4 +24,4 @@ Gearman	8	494	1
 
 Acceptable                       8 494           1            
 
-	1	TCP 192.168.80.1:23405 <-> 192.168.80.128:4730 [proto: 394/Gearman][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: RPC/16][4 pkts/254 bytes <-> 4 pkts/240 bytes][Goodput ratio: 10/5][0.00 sec][bytes ratio: 0.028 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/1 0/2 0/1][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 64/60 68/66 6/6][Risk: ** Probing attempt **][Risk Score: 50][Risk Info: TCP connection with unidirectional traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.80.1:23405 <-> 192.168.80.128:4730 [proto: 394/Gearman][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: RPC/16][4 pkts/254 bytes <-> 4 pkts/240 bytes][Goodput ratio: 10/5][0.00 sec][bytes ratio: 0.028 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/1 0/2 0/1][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 64/60 68/66 6/6][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
