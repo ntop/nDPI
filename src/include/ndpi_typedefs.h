@@ -1522,6 +1522,10 @@ struct ndpi_flow_struct {
    u_int8_t rtp_seq_set[2];
    u_int16_t rtp_seq[2];
 
+  /* NDPI_PROTOCOL_CNP_IP */
+  u_int8_t cnp_ip_stage:1;
+  u_int32_t cnp_ip_session_id;
+
   /* Flow payload */
   u_int16_t flow_payload_len;
   char *flow_payload;

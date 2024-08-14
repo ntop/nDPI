@@ -1,6 +1,6 @@
-DPI Packets (TCP):	6	(6.00 pkts/flow)
+DPI Packets (UDP):	2	(2.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 161 (161.00 diss/flow)
+Num dissector calls: 159 (159.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -13,15 +13,15 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Usenet	32	7037	1
+CNP-IP	2	144	1
 
-Acceptable                      32 7037          1            
+Acceptable                       2 144           1            
 
-	1	TCP 192.168.190.20:55630 <-> 192.168.190.5:119 [proto: 93/Usenet][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][19 pkts/1363 bytes <-> 13 pkts/5674 bytes][Goodput ratio: 8/85][67.36 sec][bytes ratio: -0.613 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 2775/4125 19518/19565 5508/6659][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 72/436 97/1514 10/556][PLAIN TEXT (200 Leafnode NNTP Daemon)][Plen Bins: 48,17,0,11,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,11,0,0]
+	1	UDP 127.0.0.1:39819 -> 127.0.0.1:1628 [proto: 422/CNP-IP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: IoT-Scada/31][2 pkts/144 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][0.01 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
