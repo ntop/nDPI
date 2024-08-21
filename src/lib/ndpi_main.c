@@ -6528,8 +6528,8 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
 
   iph = (const struct ndpi_iphdr *) l3;
 
-  if(iph->version == IPVERSION && iph->ihl >= 5) {
-    NDPI_LOG_DBG2(ndpi_str, "ipv4 header\n");
+  if((iph->version == 4 /* IPVERSION */) && (iph->ihl >= 5)) {
+    NDPI_LOG_DBG2(ndpi_str, "IPv4 header\n");
   }
   else if(iph->version == 6 && l3_len >= sizeof(struct ndpi_ipv6hdr)) {
     NDPI_LOG_DBG2(ndpi_str, "ipv6 header\n");
@@ -6738,7 +6738,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
   if(packet->iph != NULL)
     decaps_iph = packet->iph;
 
-  if(decaps_iph && decaps_iph->version == IPVERSION && decaps_iph->ihl >= 5) {
+  if(decaps_iph && (decaps_iph->version == 4 /* IPVERSION */) && (decaps_iph->ihl >= 5)) {
     NDPI_LOG_DBG2(ndpi_str, "ipv4 header\n");
   } else if(decaps_iph && decaps_iph->version == 6 && l3len >= sizeof(struct ndpi_ipv6hdr) &&
 	    (ndpi_str->ip_version_limit & NDPI_DETECTION_ONLY_IPV4) == 0) {
