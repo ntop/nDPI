@@ -45,20 +45,10 @@ static void ndpi_search_cnp_ip(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search CNP-IP\n");
 
   if (packet->payload_packet_len > 20 && packet->payload_packet_len == ntohs(get_u_int16_t(packet->payload, 0)) &&
-      (packet->payload[3] & 0x1F) == 0x01 && (packet->payload[5] & 0x1F) < 0x03)
+      (packet->payload[3] & 0x1F) == 0x01 && packet->payload[4] == 0 && (packet->payload[5] & 0x1F) < 0x03)
   {
-    u_int32_t session_id = ntohl(get_u_int32_t(packet->payload, 8));
-
-    if (!flow->cnp_ip_stage) {
-      flow->cnp_ip_stage = 1;
-      flow->cnp_ip_session_id = session_id;
-      return;
-    }
-
-    if (flow->cnp_ip_stage && flow->cnp_ip_session_id == session_id) {
-      ndpi_int_cnp_ip_add_connection(ndpi_struct, flow);
-      return;
-    }
+    ndpi_int_cnp_ip_add_connection(ndpi_struct, flow);
+    return;
   }
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);

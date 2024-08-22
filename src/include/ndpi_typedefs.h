@@ -1522,10 +1522,6 @@ struct ndpi_flow_struct {
    u_int8_t rtp_seq_set[2];
    u_int16_t rtp_seq[2];
 
-  /* NDPI_PROTOCOL_CNP_IP */
-  u_int8_t cnp_ip_stage:1;
-  u_int32_t cnp_ip_session_id;
-
   /* Flow payload */
   u_int16_t flow_payload_len;
   char *flow_payload;
@@ -1543,8 +1539,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 256,
                "Size of the struct member protocols increased to more than 256 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1128,
-               "Size of the flow struct increased to more than 1128 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1120,
+               "Size of the flow struct increased to more than 1120 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif
