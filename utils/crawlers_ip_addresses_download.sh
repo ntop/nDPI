@@ -25,7 +25,7 @@ ORIGIN3="https://developers.google.com/static/search/apis/ipranges/user-triggere
 ORIGIN_BING="https://www.bing.com/toolbox/bingbot.json"
 #Facebook Bot: https://developers.facebook.com/docs/sharing/webmasters/crawler/
 #TwitterBot
-ORIGIN_TW="https://developer.x.com/en/docs/twitter-for-websites/cards/guides/troubleshooting-cards"
+ORIGIN_TW="https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards"
 
 echo "(1) Downloading file... ${ORIGIN1}"
 http_response=$(curl -s -o $TMP1 -w "%{http_code}" ${ORIGIN1})
