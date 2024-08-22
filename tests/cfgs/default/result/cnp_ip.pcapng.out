@@ -1,13 +1,13 @@
-DPI Packets (UDP):	2	(2.00 pkts/flow)
+DPI Packets (UDP):	1	(1.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 145 (145.00 diss/flow)
+Num dissector calls: 144 (144.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -20,8 +20,8 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-sFlow	9	1702	1
+CNP-IP	2	144	1
 
-Acceptable                       9 1702          1            
+Acceptable                       2 144           1            
 
-	1	UDP 172.21.35.17:1027 -> 172.21.35.199:6343 [proto: 129/sFlow][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Network/14][9 pkts/1702 bytes -> 0 pkts/0 bytes][Goodput ratio: 78/0][109.01 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 6002/0 13626/0 19002/0 4554/0][Pkt Len c2s/s2c min/avg/max/stddev: 186/0 189/0 214/0 9/0][PLAIN TEXT (abcdefghijklmnopq)][Plen Bins: 0,0,0,0,88,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 127.0.0.1:39819 -> 127.0.0.1:1628 [proto: 422/CNP-IP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 422/CNP-IP, Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][2 pkts/144 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][0.01 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

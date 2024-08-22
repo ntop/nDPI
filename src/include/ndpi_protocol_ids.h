@@ -450,6 +450,7 @@ typedef enum {
   NDPI_PROTOCOL_CLICKHOUSE            = 419,
   NDPI_PROTOCOL_NANO                  = 420,
   NDPI_PROTOCOL_OPENWIRE              = 421,
+  NDPI_PROTOCOL_CNP_IP                = 422,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

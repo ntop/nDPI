@@ -892,3 +892,12 @@ References: `Main site: <https://nano.org/>`_
 OpenWire is a wire protocol used by Apache ActiveMQ for communication between clients and brokers, providing an efficient and flexible messaging framework. While it's not the most popular choice compared to other protocols like AMQP or MQTT, it is still utilized in scenarios where ActiveMQ is heavily integrated.
 
 References: `Main site: <https://activemq.apache.org/components/classic/documentation/openwire>`_
+
+
+.. _Proto 422:
+
+`NDPI_PROTOCOL_CNP_IP`
+=====================
+ISO/IEC 14908-4 specifies how to tunnel LonWorks control network protocol packets over IP networks. It enables encapsulation of the LonTalk protocol within UDP or TCP packets for transmission across IP-based networks.
+
+References: `Paid Specs: <https://www.iso.org/standard/60206.html>`_
