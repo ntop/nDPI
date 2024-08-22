@@ -385,6 +385,7 @@ void ndpiCheckHostStringMatch(char *testChar) {
 
   ndpi_str = ndpi_init_detection_module(NULL);
   NDPI_BITMASK_SET_ALL(all);
+  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
   ndpi_finalize_initialization(ndpi_str);
 
   testRes =  ndpi_match_string_subprotocol(ndpi_str,
