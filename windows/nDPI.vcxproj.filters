@@ -184,6 +184,7 @@
     <ClCompile Include="..\src\lib\protocols\dnp3.c" />
     <ClCompile Include="..\src\lib\protocols\dnscrypt.c" />
     <ClCompile Include="..\src\lib\protocols\ethernet_ip.c" />
+    <ClCompile Include="..\src\lib\protocols\atg.c" />
     <ClCompile Include="..\src\lib\protocols\fix.c" />
     <ClCompile Include="..\src\lib\protocols\genshin_impact.c" />
     <ClCompile Include="..\src\lib\protocols\hpvirtgrp.c" />

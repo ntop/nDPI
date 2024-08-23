@@ -901,3 +901,12 @@ References: `Main site: <https://activemq.apache.org/components/classic/document
 ISO/IEC 14908-4 specifies how to tunnel LonWorks control network protocol packets over IP networks. It enables encapsulation of the LonTalk protocol within UDP or TCP packets for transmission across IP-based networks.
 
 References: `Paid Specs: <https://www.iso.org/standard/60206.html>`_
+
+
+.. _Proto 423:
+
+`NDPI_PROTOCOL_ATG`
+===================
+This protocol is used to transfer data between the various components of an ATG (Automatic Tank Gauge) system.
+
+References: `Protocol Specs: <https://github.com/Orange-Cyberdefense/awesome-industrial-protocols/blob/main/protocols/atg.md>`_

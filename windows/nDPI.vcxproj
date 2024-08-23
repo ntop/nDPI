@@ -213,6 +213,7 @@
     <ClCompile Include="..\src\lib\protocols\wireguard.c" />
     <ClCompile Include="..\src\lib\protocols\wsd.c" />
     <ClCompile Include="..\src\lib\protocols\xiaomi.c" />
+    <ClCompile Include="..\src\lib\protocols\atg.c" />
     <ClCompile Include="..\src\lib\protocols\z3950.c" />
     <ClCompile Include="..\src\lib\protocols\zabbix.c" />
     <ClCompile Include="..\src\lib\third_party\src\ahocorasick.c" />
