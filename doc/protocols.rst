@@ -906,7 +906,7 @@ References: `Paid Specs: <https://www.iso.org/standard/60206.html>`_
 .. _Proto 423:
 
 `NDPI_PROTOCOL_ATG`
-======================
-ATG protocol used to transfer data between the various components of an ATG system.
+===================
+This protocol is used to transfer data between the various components of an ATG (Automatic Tank Gauge) system.
 
 References: `Protocol Specs: <https://github.com/Orange-Cyberdefense/awesome-industrial-protocols/blob/main/protocols/atg.md>`_
