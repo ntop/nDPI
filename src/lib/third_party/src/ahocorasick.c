@@ -335,7 +335,7 @@ AC_ERROR_t ac_automata_walk(AC_AUTOMATA_t * thiz,
     }
 
     path[ip].idx = i+1;
-    if(ip >= AC_PATTRN_MAX_LENGTH)
+    if(ip > AC_PATTRN_MAX_LENGTH)
         continue;
 
     ip++;
