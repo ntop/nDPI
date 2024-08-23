@@ -1848,6 +1848,11 @@ extern "C" {
 
   /* ******************************* */
 
+  /* Mahalanobis distance (https://en.wikipedia.org/wiki/Mahalanobis_distance) between a point x and a distribution with mean u and inverted covariant matrix i_s */
+  float ndpi_mahalanobis_distance(const u_int32_t *x, u_int32_t size, const float *u, const float *i_s);
+
+  /* ******************************* */
+
   int  ndpi_init_bin(struct ndpi_bin *b, enum ndpi_bin_family f, u_int16_t num_bins);
   void ndpi_free_bin(struct ndpi_bin *b);
   struct ndpi_bin* ndpi_clone_bin(struct ndpi_bin *b);

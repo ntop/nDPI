@@ -1,0 +1,49 @@
+DPI Packets (TCP):	35	(11.67 pkts/flow)
+DPI Packets (UDP):	15	(2.14 pkts/flow)
+Confidence DPI              : 9 (flows)
+Confidence DPI (aggressive) : 1 (flows)
+Num dissector calls: 167 (16.70 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/2/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    3/3/1 (insert/search/found)
+Automa host:          17/8 (search/found)
+Automa domain:        17/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     7/0 (search/found)
+Automa common alpns:  4/4 (search/found)
+Patricia risk mask:   14/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   19/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+DNS	8	680	4
+TLS	25	11617	1
+YouTube	40	17498	4
+SOCKS	27	9979	1
+
+Safe                            25 11617         1            
+Acceptable                      35 10659         5            
+Fun                             40 17498         4            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 127.0.0.1                	 1      
+	2	 192.168.1.183            	 1      
+
+
+	1	TCP 192.168.1.183:58730 <-> 142.250.180.142:443 [proto: 91.124/TLS.YouTube][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 124/YouTube, Confidence: DNS][DPI packets: 6][cat: Media/1][17 pkts/1985 bytes <-> 15 pkts/13936 bytes][Goodput ratio: 41/93][0.11 sec][Hostname/SNI: www.youtube.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.751 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 5/9 31/70 9/20][Pkt Len c2s/s2c min/avg/max/stddev: 68/68 117/929 585/1468 126/632][TLSv1.3][JA3C: 4ea056e63b7910cbf543f0c095064dfe][JA4: t13d3113h2_e8f1e7e78f70_ce5650b735ce][JA3S: 907bf3ecef1c987c889946b737b43de8][Firefox][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 18,0,6,0,0,0,6,0,0,0,0,0,0,0,0,0,6,0,0,0,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,51,0,0,0,0]
+	2	TCP 127.0.0.1:41796 <-> 127.0.0.1:1234 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI (aggressive)][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 23][cat: Web/5][13 pkts/2233 bytes <-> 12 pkts/9384 bytes][Goodput ratio: 60/91][0.14 sec][Hostname/SNI: test.lan][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.616 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 11/6 46/30 15/11][Pkt Len c2s/s2c min/avg/max/stddev: 68/68 172/782 675/2138 165/744][Risk: ** Known Proto on Non Std Port **** Obfuscated Traffic **][Risk Score: 150][Risk Info: Obfuscated TLS-in-TLS traffic][TLSv1.3][JA3C: 7a15285d4efc355608b304698cd7f9ab][JA4: t13d1911h2_9dc949149365_e7c285222651][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,13,13,6,6,0,0,0,6,0,0,0,0,0,6,0,0,0,6,0,6,0,0,0,0,0,0,6,0,0,0,0,0,0,0,6,0,6,0,0,0,0,0,0,0,0,0,13]
+	3	TCP 127.0.0.1:60654 <-> 127.0.0.1:1080 [proto: 172/SOCKS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][17 pkts/1999 bytes <-> 10 pkts/7980 bytes][Goodput ratio: 42/91][0.19 sec][bytes ratio: -0.599 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 9/7 46/43 16/15][Pkt Len c2s/s2c min/avg/max/stddev: 68/68 118/798 585/4164 119/1276][PLAIN TEXT (www.youtube.com)][Plen Bins: 37,25,6,0,0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12]
+	4	UDP 127.0.0.1:52786 <-> 127.0.0.53:53 [proto: 5.124/DNS.YouTube][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.124/DNS.YouTube, Confidence: DPI][DPI packets: 3][cat: Network/14][2 pkts/176 bytes <-> 2 pkts/468 bytes][Goodput ratio: 50/81][0.03 sec][Hostname/SNI: www.youtube.com][142.250.180.142][PLAIN TEXT (youtube)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 192.168.1.183:46451 <-> 192.168.1.253:53 [proto: 5.124/DNS.YouTube][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.124/DNS.YouTube, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/88 bytes <-> 1 pkts/413 bytes][Goodput ratio: 49/89][0.03 sec][Hostname/SNI: www.youtube.com][142.250.180.142][PLAIN TEXT (youtube)][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 192.168.1.183:54260 <-> 192.168.1.253:53 [proto: 5.124/DNS.YouTube][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.124/DNS.YouTube, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/88 bytes <-> 1 pkts/344 bytes][Goodput ratio: 49/87][0.03 sec][Hostname/SNI: www.youtube.com][2a00:1450:4002:411::200e][PLAIN TEXT (youtube)][Plen Bins: 0,50,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 127.0.0.1:53154 <-> 127.0.0.53:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/81 bytes <-> 1 pkts/97 bytes][Goodput ratio: 45/54][0.00 sec][Hostname/SNI: test.lan][127.0.0.1][Risk: ** Minor Issues **][Risk Score: 10][Risk Info: DNS Record with zero TTL][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 192.168.1.183:39434 <-> 192.168.1.253:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/81 bytes <-> 1 pkts/97 bytes][Goodput ratio: 45/54][0.00 sec][Hostname/SNI: test.lan][127.0.0.1][Risk: ** Minor Issues **][Risk Score: 10][Risk Info: DNS Record with zero TTL][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 127.0.0.1:56496 <-> 127.0.0.53:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/81 bytes <-> 1 pkts/81 bytes][Goodput ratio: 45/45][0.00 sec][Hostname/SNI: test.lan][::][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	UDP 192.168.1.183:38613 <-> 192.168.1.253:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/81 bytes <-> 1 pkts/81 bytes][Goodput ratio: 45/45][< 1 sec][Hostname/SNI: test.lan][::][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -152,6 +152,305 @@ static u_int32_t __get_master(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
+/* Heuristic to detect proxied/obfuscated TLS flows, based on
+   https://www.usenix.org/conference/usenixsecurity24/presentation/xue-fingerprinting.
+   Main differences between the paper and our implementation:
+    * only Mahalanobis Distance, no Chi-squared Test
+    * instead of 3-grams, we use 4-grams, always starting from the Client -> Server direction
+    * consecutive packets in the same direction always belong to the same burst/flight
+
+   Core idea:
+    * the packets/bytes distribution of a TLS handshake is quite unique
+    * this fingerprint is still detectable if the handshake is
+      encrypted/proxied/obfuscated
+*/
+
+struct tls_obfuscated_heuristic_set {
+  u_int8_t stage;
+  u_int32_t bytes[4];
+  u_int32_t pkts[4];
+};
+
+struct tls_obfuscated_heuristic_state {
+  u_int8_t num_pkts;
+
+  /* Burst/flight: consecutive packets in the same direction.
+   * Set: packet/bytes distribution of 4 consecutive bursts (always starting from C->S),
+          i.e. a 4-grams (using the paper terminology)
+   * We have up tp 2 sets contemporarily active.
+   * At the first pkt of a new C->S flight, we close the oldest set and open a new one */
+  struct tls_obfuscated_heuristic_set sets[2];
+};
+
+static int check_set(struct ndpi_detection_module_struct* ndpi_struct,
+                     struct tls_obfuscated_heuristic_set *set)
+{
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  struct ndpi_packet_struct* packet = &ndpi_struct->packet;
+#endif
+
+  /* Model: TLS 1.2; Firefox; No session resumption/0rtt */
+  const float i_s_tls_12[4 * 4] = { 0.000292421113167604, 4.43677617831228E-07, -5.69966093492813E-05, -2.18124698406311E-06,
+                                    4.43677617831228E-07, 5.98954952745268E-07, -3.59798436724817E-07, 5.71638172955893E-07,
+                                    -5.69966093492813E-05, -3.59798436724817E-07, 0.00076893788148309, 2.22278496185964E-05,
+                                    -2.18124698406311E-06, 5.71638172955893E-07, 2.22278496185964E-05, 5.72770077086287E-05 };
+  const float average_tls_12[4] = { 212.883690341977, 4514.71195039459, 107.770762871101, 307.580232995115 };
+  const float distance_tls_12 = 3.5;
+
+  /* Model: TLS 1.3; Firefox; No session resumption/0rtt; no PQ; ECH(-grease) enabled */
+  const float i_s_tls_13[4 * 4] = { 3.08030337925007E-05, 1.16179172096944E-07, 1.05356744968627E-07, 3.8862884355278E-08,
+                                    1.16179172096944E-07, 6.93179117519316E-07, 2.77413220880937E-08, -3.63723200682445E-09,
+                                    1.05356744968627E-07, 2.77413220880937E-08, 1.0260950589675E-06, -1.08769813590053E-08,
+                                    3.88628843552779E-08, -3.63723200682445E-09, -1.08769813590053E-08,	8.63307792288604E-08 };
+  const float average_tls_13[4] = { 640.657378447541, 4649.30338356554, 448.408302530566, 1094.2013079329};
+  const float distance_tls_13 = 3.0;
+
+  /* Model: TLS 1.2/1.3; Chrome; No session resumption/0rtt; PQ; ECH(-grease) enabled */
+  const float i_s_chrome[4 * 4] = { 6.72374390966642E-06, -2.32109583941723E-08, 6.67140014394388E-08, 1.2526322628285E-08,
+                                    -2.32109583941723E-08, 5.64668947932086E-07, 4.58963631972597E-08, 6.41254684791958E-09,
+                                    6.67140014394388E-08, 4.58963631972597E-08, 6.04057768431344E-07, -9.1507432597718E-10,
+                                    1.2526322628285E-08, 6.41254684791958E-09, -9.1507432597718E-10, 1.01184796635481E-07 };
+  const float average_chrome[4] = { 1850.43045387994, 4903.07735480722, 785.25280624695, 1051.22303562714 };
+  const float distance_chrome = 3.0;
+
+  /* TODO: * ECH/PQ are still under development/deployment -> re-evaluate these models
+           * Session resumptions/0rtt
+	   * Non-web traffic */
+
+  /* This is the only logic about pkts distributions.
+     ClientHello shoudn't be splitted in too many fragments: usually 1; 2 with PQ */
+  if(set->pkts[0] > 3) {
+    NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: too many pkts in the first burst %d\n", set->pkts[0]);
+    return 0;
+  }
+
+  if(ndpi_mahalanobis_distance(set->bytes, 4, average_chrome, i_s_chrome) < distance_chrome ||
+     /* To avoid false positives: we didn't find TLS 1.3 CH smaller than 517 */
+     (set->bytes[0] >= 517 && ndpi_mahalanobis_distance(set->bytes, 4, average_tls_13, i_s_tls_13) < distance_tls_13) ||
+     ndpi_mahalanobis_distance(set->bytes, 4, average_tls_12, i_s_tls_12) < distance_tls_12) {
+
+    NDPI_LOG_DBG(ndpi_struct, "TLS-Obf-Heur: md %f %f %f [%d/%d/%d/%d %d/%d/%d/%d] TCP? %d\n",
+                 ndpi_mahalanobis_distance(set->bytes, 4, average_tls_12, i_s_tls_12),
+                 ndpi_mahalanobis_distance(set->bytes, 4, average_tls_13, i_s_tls_13),
+                 ndpi_mahalanobis_distance(set->bytes, 4, average_chrome, i_s_chrome),
+                 set->pkts[0], set->pkts[1], set->pkts[2], set->pkts[3],
+                 set->bytes[0], set->bytes[1], set->bytes[2], set->bytes[3],
+                 !!packet->tcp);
+    return 1;
+  }
+
+  return 0;
+}
+
+static int tls_obfuscated_heur_search(struct ndpi_detection_module_struct* ndpi_struct,
+                                      struct ndpi_flow_struct* flow) {
+  struct ndpi_packet_struct* packet = &ndpi_struct->packet;
+  struct tls_obfuscated_heuristic_state *state = flow->tls_quic.obfuscated_heur_state;
+  struct tls_obfuscated_heuristic_set *set;
+  int i, j;
+  int is_tls_in_tls_heur = 0;
+  int byte_overhead;
+
+  /* Stages:
+     0: Unused/Start
+     1: C->S : burst 1
+     2: S->C : burst 2
+     3: C->S : burst 3
+     4: S->C : burst 4
+     5: C->S : End
+  */
+
+  if(!state)
+    return 1; /* Exclude */
+
+  if(packet->payload_packet_len == 0)
+    return 0; /* Continue */
+
+  NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: num_pkts %d\n", state->num_pkts);
+
+  if(flow->extra_packets_func &&
+     (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS ||
+      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_TLS)) /* TLS-in-TLS heuristic */
+    is_tls_in_tls_heur = 1;
+
+  /* We try to keep into account the overhead (header/padding/mac/iv/nonce) of the
+     external layers (i.e. above the TLS hanshake we are trying to detect) */
+  if(is_tls_in_tls_heur == 1) {
+    /* According to https://datatracker.ietf.org/doc/html/draft-mattsson-uta-tls-overhead-01
+       the average packet overhead for TLS is 29 bytes.
+       TODO: this draft is OLD and about TLS 1.2
+       Looking at real traffic, we found that we can have TLS packets 24 bytes long
+    */
+    byte_overhead = 24;
+  } else {
+    /* The paper says that the overhead is usually quite small
+       ["typically ranging between 20 to 60 bytes"], without any citations.
+       From the tests, it seams that we can ignore it */
+    byte_overhead = 0;
+  }
+
+  if(packet->payload_packet_len < byte_overhead) {
+    NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: packet too small. Stop.\n");
+    return 1; /* Exclude */
+  }
+
+  if(is_tls_in_tls_heur == 1) {
+    /* We usually stop processing TLS handshake (and switch to this extra dissection
+       data path) after the FIRST Change-Cipher message. However, for this
+       heuristic, we need to ignore all packets before a Change-Cipher is sent in the
+       same direction */
+    if(current_pkt_from_client_to_server(ndpi_struct, flow) &&
+       flow->tls_quic.change_cipher_from_client == 0) {
+      if(packet->payload[0] == 0x14) {
+        NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: Change-Cipher from client\n");
+        flow->tls_quic.change_cipher_from_client = 1;
+      }
+      NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: skip\n");
+      return 0; /* Continue */
+    }
+    if(current_pkt_from_server_to_client(ndpi_struct, flow) &&
+       flow->tls_quic.change_cipher_from_server == 0) {
+      if(packet->payload[0] == 0x14) {
+        flow->tls_quic.change_cipher_from_server = 1;
+        NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: Change-Cipher from server\n");
+      }
+      NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: skip\n");
+      return 0; /* Continue */
+    }
+  }
+
+  if(state->num_pkts++ > ndpi_struct->cfg.tls_heuristics_max_packets) {
+    NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: too many pkts. Stop\n");
+    return 1; /* Exclude */
+  }
+
+  /* Update active sets */
+  for(i = 0; i < 2; i ++) {
+    set = &state->sets[i];
+    switch(set->stage) {
+    case 0:
+      /* This happen only at the beginning of the heuristic: after the first pkt
+         of the third (absolute) burst, we always have both sets used */
+      if(i == 0 || state->sets[0].stage == 3) {
+        if(current_pkt_from_client_to_server(ndpi_struct, flow)) {
+          NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: open set %d\n", i);
+          set->stage = 1;
+          break;
+	} else {
+          /* First packet should be always from client.
+	     This shortcut makes detection harder if, before the obfuscated TLS hanshake
+	     there is random traffic */
+          return 1; /* Exclude */
+	}
+      }
+      continue;
+    case 1:
+      if(current_pkt_from_server_to_client(ndpi_struct, flow))
+        set->stage = 2;
+      break;
+    case 2:
+      if(current_pkt_from_client_to_server(ndpi_struct, flow))
+        set->stage = 3;
+      break;
+    case 3:
+      if(current_pkt_from_server_to_client(ndpi_struct, flow))
+        set->stage = 4;
+      break;
+    case 4:
+      if(current_pkt_from_client_to_server(ndpi_struct, flow))
+        set->stage = 5;
+      break;
+    /* We cant have 5 here */
+    }
+
+    if(set->stage != 5) {
+      set->bytes[set->stage - 1] += (packet->payload_packet_len - byte_overhead);
+      set->pkts[set->stage - 1] += 1;
+    }
+
+    NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: set %d stage %d bytes %d/%d/%d/%d pkts %d/%d/%d/%d\n",
+                  i, set->stage,
+                  set->bytes[0], set->bytes[1], set->bytes[2], set->bytes[3],
+                  set->pkts[0], set->pkts[1], set->pkts[2], set->pkts[3]);
+
+    /* Check completed set */
+    if(set->stage == 5) {
+      NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: set %d completed\n", i);
+      if(check_set(ndpi_struct, set)) {
+        /* Heuristic match */
+        return 2; /* Found */
+      } else {
+        /* Close this set and open a new one... */
+        set->stage = 1;
+        set->bytes[0] = packet->payload_packet_len - byte_overhead;
+        set->pkts[0] = 1;
+	for(j = 1; j < 4; j++) {
+          set->bytes[j] = 0;
+          set->pkts[j] = 0;
+        }
+        NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: set %d closed and reused\n", i);
+      }
+    }
+  }
+
+  return 0; /* Continue */
+}
+
+static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct* ndpi_struct,
+                                            struct ndpi_flow_struct* flow)
+{
+  int rc;
+
+  NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: extra dissection\n");
+
+  rc = tls_obfuscated_heur_search(ndpi_struct, flow);
+  if(rc == 0)
+    return 1; /* Keep working */
+  if(rc == 2) {
+    NDPI_LOG_DBG(ndpi_struct, "TLS-Obf-Heur: found!\n");
+
+    /* Right now, if an heuritic matches, we set the classification/risk.
+       TODO: avoid false positives!
+       Some ideas:
+        * try to identify the servers: we wait for multiple sessions to the same server,
+          before to start marking the flows to that address
+        * consider the number of burst after TLS handshake (see Fig 8 paper) */
+
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
+      ndpi_set_risk(flow, NDPI_OBFUSCATED_TRAFFIC, "Obfuscated TLS traffic");
+    } else {
+      flow->confidence = NDPI_CONFIDENCE_DPI_AGGRESSIVE; /* Update the value */
+      if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS ||
+         flow->detected_protocol_stack[1] == NDPI_PROTOCOL_TLS)
+        ndpi_set_risk(flow, NDPI_OBFUSCATED_TRAFFIC, "Obfuscated TLS-in-TLS traffic");
+      else
+        ndpi_set_risk(flow, NDPI_OBFUSCATED_TRAFFIC, "Obfuscated TLS-in-HTTP-WebSocket traffic");
+    }
+
+    ndpi_protocol ret = { { __get_master(ndpi_struct, flow), NDPI_PROTOCOL_UNKNOWN }, NDPI_PROTOCOL_UNKNOWN /* unused */, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
+    flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+  }
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow); /* Not necessary in extra-dissection data path,
+                                            but we need it with the plain heuristic */
+  return 0; /* Stop */
+}
+
+void switch_extra_dissection_to_tls_obfuscated_heur(struct ndpi_detection_module_struct* ndpi_struct,
+                                                    struct ndpi_flow_struct* flow)
+{
+  NDPI_LOG_DBG(ndpi_struct, "Switching to TLS Obfuscated heuristic\n");
+
+  flow->tls_quic.obfuscated_heur_state = ndpi_calloc(1, sizeof(struct tls_obfuscated_heuristic_state));
+
+  /* "* 2" to take into account ACKs. The "real" check is performend against
+     "tls_heuristics_max_packets" in tls_obfuscated_heur_search, as expected */
+  flow->max_extra_packets_to_check = ndpi_struct->cfg.tls_heuristics_max_packets * 2;
+  flow->extra_packets_func = tls_obfuscated_heur_search_again;
+}
+
+/* **************************************** */
+
 static int ndpi_search_tls_memory(const u_int8_t *payload,
 				  u_int16_t payload_len,
 				  u_int32_t seq,
@@ -1020,7 +1319,6 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
      https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5 */
   if(!(message->buffer[0] >= 20 &&
        message->buffer[0] <= 26)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     something_went_wrong = 1;
   }
 
@@ -1074,6 +1372,11 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
         printf("[TLS] Change Cipher Spec\n");
 #endif
+        if(current_pkt_from_client_to_server(ndpi_struct, flow))
+          flow->tls_quic.change_cipher_from_client = 1;
+        else
+          flow->tls_quic.change_cipher_from_server = 1;
+
         ndpi_int_tls_add_connection(ndpi_struct, flow);
         flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
         /* Further data is encrypted so we are not able to parse it without
@@ -1217,6 +1520,16 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_unset_risk(flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
       flow->extra_packets_func = NULL;
       return(0); /* That's all */
+    /* Loook for TLS-in-TLS */
+    } else if((ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_TLS) && /* Feature enabled */
+              (!something_went_wrong &&
+               flow->tls_quic.certificate_processed == 1 &&
+               flow->protos.tls_quic.client_hello_processed == 1 &&
+               flow->protos.tls_quic.server_hello_processed == 1) && /* TLS handshake found without errors */
+               flow->tls_quic.from_opportunistic_tls == 0 && /* No from plaintext Mails or FTP */
+              !is_flow_addr_informative(flow) /* The proxy server is likely hosted on some cloud providers */ ) {
+      switch_extra_dissection_to_tls_obfuscated_heur(ndpi_struct, flow);
+      return(1);
     } else {
       flow->extra_packets_func = NULL;
       return(0); /* That's all */
@@ -1412,7 +1725,6 @@ static int ndpi_search_tls_udp(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload_packet_len = p_len; /* Restore */
 
   if(no_dtls || change_cipher_found || flow->tls_quic.certificate_processed) {
-    NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
     return(0); /* That's all */
   } else {
     return(1); /* Keep working */
@@ -1448,6 +1760,8 @@ void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_st
     ndpi_free(flow->tls_quic.message[1].buffer);
   memset(&flow->tls_quic.message[1], '\0', sizeof(flow->tls_quic.message[1]));
 
+  flow->tls_quic.from_opportunistic_tls = 1;
+
   tlsInitExtraPacketProcessing(ndpi_struct, flow);
 }
 
@@ -1468,6 +1782,14 @@ void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
     if(flow->tls_quic.message[1].buffer)
       ndpi_free(flow->tls_quic.message[1].buffer);
     memset(&flow->tls_quic.message[1], '\0', sizeof(flow->tls_quic.message[1]));
+
+    /* We will not check obfuscated heuristic (anymore) because we have been
+       called from the STUN code, but we need to clear the previous state
+       (if any) to trigger "standard" TLS/DTLS code */
+    if(flow->tls_quic.obfuscated_heur_state) {
+      ndpi_free(flow->tls_quic.obfuscated_heur_state);
+      flow->tls_quic.obfuscated_heur_state = NULL;
+    }
   }
 
   ndpi_search_tls_wrapper(ndpi_struct, flow);
@@ -3033,6 +3355,7 @@ compute_ja3c:
 static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  int rc = 0;
 
 #ifdef DEBUG_TLS
   printf("==>> %s() %u [len: %u][version: %u]\n",
@@ -3042,10 +3365,44 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
 	 flow->protos.tls_quic.ssl_version);
 #endif
 
-  if(packet->udp != NULL || flow->stun.maybe_dtls)
-    ndpi_search_tls_udp(ndpi_struct, flow);
-  else
-    ndpi_search_tls_tcp(ndpi_struct, flow);
+  /* It is not easy to handle "standard" TLS/DTLS detection and (plain) obfuscated
+     heuristic at the SAME time. Use a trivial logic: switch to heuristic
+     code only if the standard functions fail */
+
+  /* We might be in extra-dissection data-path here (if we have been
+     called from STUN or from Mails/FTP/...), but plain obfuscated heuristic
+     is always checked in "standard" data-path! */
+
+  if(flow->tls_quic.obfuscated_heur_state == NULL) {
+    if(packet->udp != NULL || flow->stun.maybe_dtls)
+      rc = ndpi_search_tls_udp(ndpi_struct, flow);
+    else
+      rc = ndpi_search_tls_tcp(ndpi_struct, flow);
+
+    if(rc == 0)
+      flow->tls_quic.obfuscated_heur_state = ndpi_calloc(1, sizeof(struct tls_obfuscated_heuristic_state));
+  }
+
+  /* We should check for this TLS heuristic if:
+     * the feature is enabled
+     * this flow doesn't seem a real TLS/DTLS one
+     * we are not here from STUN code or from opportunistic tls path (mails/ftp)
+     * with TCP, we got the 3WHS (so that we can process the beginning of the flow)
+  */
+  if(flow->tls_quic.obfuscated_heur_state &&
+     (ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_PLAIN) &&
+     flow->stun.maybe_dtls == 0 &&
+     flow->tls_quic.from_opportunistic_tls == 0 &&
+     ((flow->l4_proto == IPPROTO_TCP && ndpi_seen_flow_beginning(flow)) ||
+      flow->l4_proto == IPPROTO_UDP) &&
+     !is_flow_addr_informative(flow) /* The proxy server is likely hosted on some cloud providers */ ) {
+    tls_obfuscated_heur_search_again(ndpi_struct, flow);
+  } else if(rc == 0) {
+    if(packet->udp != NULL || flow->stun.maybe_dtls)
+      NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
+    else
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  }
 }
 
 /* **************************************** */
