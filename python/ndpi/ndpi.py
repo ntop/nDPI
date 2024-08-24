@@ -18,8 +18,8 @@ from _ndpi import ffi, lib
 
 
 ndpi_protocol = namedtuple('NDPIProtocol', ['C',
-                                            'master_protocol',
-                                            'app_protocol',
+                                            'proto.master_protocol',
+                                            'proto.app_protocol',
                                             'category'])
 
 ndpi_confidence = namedtuple('NDPIConfidence', ['id',

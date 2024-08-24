@@ -886,8 +886,8 @@ static void ndpi_process_packet(uint8_t * const args,
 	     workflow->packets_captured,
 	     reader_thread->array_index,
 	     flow_to_process->flow_id,
-	     ndpi_get_proto_name(workflow->ndpi_struct, flow_to_process->guessed_protocol.master_protocol),
-	     ndpi_get_proto_name(workflow->ndpi_struct, flow_to_process->guessed_protocol.app_protocol),
+	     ndpi_get_proto_name(workflow->ndpi_struct, flow_to_process->guessed_protocol.proto.master_protocol),
+	     ndpi_get_proto_name(workflow->ndpi_struct, flow_to_process->guessed_protocol.proto.app_protocol),
 	     ndpi_category_get_name(workflow->ndpi_struct, flow_to_process->guessed_protocol.category));
     } else {
       printf("[%8llu, %d, %4d][FLOW NOT CLASSIFIED]\n",
@@ -903,8 +903,8 @@ static void ndpi_process_packet(uint8_t * const args,
   if (ndpi_is_protocol_detected(flow_to_process->detected_l7_protocol) != 0 &&
       flow_to_process->detection_completed == 0)
     {
-      if (flow_to_process->detected_l7_protocol.master_protocol != NDPI_PROTOCOL_UNKNOWN ||
-          flow_to_process->detected_l7_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN)
+      if (flow_to_process->detected_l7_protocol.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN ||
+          flow_to_process->detected_l7_protocol.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)
       {
         flow_to_process->detection_completed = 1;
         workflow->detected_flow_protocols++;
@@ -913,8 +913,8 @@ static void ndpi_process_packet(uint8_t * const args,
 	       workflow->packets_captured,
 	       reader_thread->array_index,
 	       flow_to_process->flow_id,
-	       ndpi_get_proto_name(workflow->ndpi_struct, flow_to_process->detected_l7_protocol.master_protocol),
-	       ndpi_get_proto_name(workflow->ndpi_struct, flow_to_process->detected_l7_protocol.app_protocol),
+	       ndpi_get_proto_name(workflow->ndpi_struct, flow_to_process->detected_l7_protocol.proto.master_protocol),
+	       ndpi_get_proto_name(workflow->ndpi_struct, flow_to_process->detected_l7_protocol.proto.app_protocol),
 	       ndpi_category_get_name(workflow->ndpi_struct, flow_to_process->detected_l7_protocol.category));
       }
     }
@@ -948,8 +948,8 @@ static void ndpi_process_packet(uint8_t * const args,
         }
       }
 
-      if (flow_to_process->detected_l7_protocol.master_protocol == NDPI_PROTOCOL_TLS ||
-	  flow_to_process->detected_l7_protocol.app_protocol == NDPI_PROTOCOL_TLS)
+      if (flow_to_process->detected_l7_protocol.proto.master_protocol == NDPI_PROTOCOL_TLS ||
+	  flow_to_process->detected_l7_protocol.proto.app_protocol == NDPI_PROTOCOL_TLS)
         {
 	  if (flow_to_process->tls_client_hello_seen == 0 &&
 	      flow_to_process->ndpi_flow->protos.tls_quic.hello_processed != 0)
