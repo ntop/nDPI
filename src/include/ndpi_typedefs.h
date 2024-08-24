@@ -1138,24 +1138,28 @@ typedef struct _ndpi_automa {
 
 typedef void ndpi_str_hash;
 
-struct ndpi_fpc_info {
-  u_int16_t master_protocol;
-  u_int16_t app_protocol;
-  ndpi_fpc_confidence_t confidence;
-};
-
-typedef struct ndpi_proto {
+typedef struct {
   /*
     Note
     below we do not use ndpi_protocol_id_t as users can define their own
     custom protocols and thus the typedef could be too short in size.
   */
-  u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */, protocol_by_ip;
+  u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
+} ndpi_master_app_protocol;
+
+struct ndpi_fpc_info {
+  ndpi_master_app_protocol proto;
+  ndpi_fpc_confidence_t confidence;
+};
+
+typedef struct ndpi_proto {
+  ndpi_master_app_protocol proto;
+  u_int16_t protocol_by_ip;
   ndpi_protocol_category_t category;
   void *custom_category_userdata;
 } ndpi_protocol;
 
-#define NDPI_PROTOCOL_NULL { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL }
+#define NDPI_PROTOCOL_NULL { { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL }
 
 #define NUM_CUSTOM_CATEGORIES      5
 #define CUSTOM_CATEGORY_LABEL_LEN 32

@@ -232,7 +232,7 @@ struct ndpi_packet_tlv {
 PACK_ON
 struct ndpi_packet_trailer {
   u_int32_t magic; /* WIRESHARK_NTOP_MAGIC */
-  u_int16_t master_protocol /* e.g. HTTP */, app_protocol /* e.g. FaceBook */;
+  ndpi_master_app_protocol proto;
   ndpi_risk flow_risk;
   u_int16_t flow_score;
   char name[16];
@@ -394,8 +394,8 @@ void ndpiCheckHostStringMatch(char *testChar) {
   if(testRes) {
     memset(&detected_protocol, 0, sizeof(ndpi_protocol) );
 
-    detected_protocol.app_protocol    = match.protocol_id;
-    detected_protocol.master_protocol = 0;
+    detected_protocol.proto.app_protocol    = match.protocol_id;
+    detected_protocol.proto.master_protocol = 0;
     detected_protocol.category        = match.protocol_category;
 
     ndpi_protocol2name(ndpi_str, detected_protocol, appBufStr,
@@ -484,13 +484,13 @@ static void ndpiCheckIPMatch(char *testChar) {
 
   if(ret != NDPI_PROTOCOL_UNKNOWN) {
     memset(&detected_protocol, 0, sizeof(ndpi_protocol));
-    detected_protocol.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, ret);
+    detected_protocol.proto.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, ret);
 
     ndpi_protocol2name(ndpi_str, detected_protocol, appBufStr,
                        sizeof(appBufStr));
 
     printf("Match Found for IP %s, port %d -> %s (%d)\n",
-	   ip_str, port, appBufStr, detected_protocol.app_protocol);
+	   ip_str, port, appBufStr, detected_protocol.proto.app_protocol);
   } else {
     printf("Match NOT Found for IP: %s\n", testChar);
   }
@@ -1756,19 +1756,19 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     fprintf(out, "[Confidence: %s]", ndpi_confidence_get_name(flow->confidence));
 
-    if(flow->fpc.master_protocol == NDPI_PROTOCOL_UNKNOWN) {
+    if(flow->fpc.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN) {
       fprintf(out, "[FPC: %u/%s, ",
-              flow->fpc.app_protocol,
+              flow->fpc.proto.app_protocol,
               ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                flow->fpc.app_protocol));
+                                flow->fpc.proto.app_protocol));
     } else {
       fprintf(out, "[FPC: %u.%u/%s.%s, ",
-              flow->fpc.master_protocol,
-              flow->fpc.app_protocol,
+              flow->fpc.proto.master_protocol,
+              flow->fpc.proto.app_protocol,
               ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                flow->fpc.master_protocol),
+                                flow->fpc.proto.master_protocol),
               ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                flow->fpc.app_protocol));
+                                flow->fpc.proto.app_protocol));
     }
     fprintf(out, "Confidence: %s]",
 	    ndpi_fpc_confidence_get_name(flow->fpc.confidence));
@@ -2219,8 +2219,8 @@ static void node_print_unknown_proto_walker(const void *node,
 
   (void)depth;
 
-  if((flow->detected_protocol.master_protocol != NDPI_PROTOCOL_UNKNOWN)
-     || (flow->detected_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN))
+  if((flow->detected_protocol.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN)
+     || (flow->detected_protocol.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN))
     return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) {
@@ -2242,8 +2242,8 @@ static void node_print_known_proto_walker(const void *node,
 
   (void)depth;
 
-  if((flow->detected_protocol.master_protocol == NDPI_PROTOCOL_UNKNOWN)
-     && (flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN))
+  if((flow->detected_protocol.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN)
+     && (flow->detected_protocol.proto.app_protocol == NDPI_PROTOCOL_UNKNOWN))
     return;
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) {
@@ -2280,7 +2280,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
 
-    proto = flow->detected_protocol.app_protocol ? flow->detected_protocol.app_protocol : flow->detected_protocol.master_protocol;
+    proto = flow->detected_protocol.proto.app_protocol ? flow->detected_protocol.proto.app_protocol : flow->detected_protocol.proto.master_protocol;
 
     proto = ndpi_map_user_proto_id_to_ndpi_id(ndpi_thread_info[thread_id].workflow->ndpi_struct, proto);
 
@@ -2660,12 +2660,12 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
     sport = ntohs(flow->src_port), dport = ntohs(flow->dst_port);
 
     /* get app level protocol */
-    if(flow->detected_protocol.master_protocol) {
+    if(flow->detected_protocol.proto.master_protocol) {
       ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                          flow->detected_protocol, proto, sizeof(proto));
     } else {
       strncpy(proto, ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                         flow->detected_protocol.app_protocol),sizeof(proto) - 1);
+                                         flow->detected_protocol.proto.app_protocol),sizeof(proto) - 1);
       proto[sizeof(proto) - 1] = '\0';
     }
 
@@ -2705,7 +2705,7 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
       if(verbose == 3)
         port_stats_walker(node, which, depth, user_data);
 
-      if((flow->detected_protocol.app_protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
+      if((flow->detected_protocol.proto.app_protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
 
       ndpi_flow_info_free_data(flow);
@@ -2776,8 +2776,8 @@ static int is_realtime_protocol(ndpi_protocol proto)
   u_int16_t i;
 
   for (i = 0; i < NDPI_ARRAY_LENGTH(realtime_protos); i++) {
-    if (proto.app_protocol == realtime_protos[i]
-        || proto.master_protocol == realtime_protos[i])
+    if (proto.proto.app_protocol == realtime_protos[i]
+        || proto.proto.master_protocol == realtime_protos[i])
     {
       return 1;
     }
@@ -3637,7 +3637,7 @@ static void printFlowsStats() {
             if((all_flows[i].flow->src2dst_syn_count == 0) || (all_flows[i].flow->dst2src_syn_count == 0))
               goto print_flow;
 
-            if(all_flows[i].flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS) {
+            if(all_flows[i].flow->detected_protocol.proto.master_protocol == NDPI_PROTOCOL_TLS) {
               if((all_flows[i].flow->src2dst_packets+all_flows[i].flow->dst2src_packets) < 40)
                 goto print_flow; /* Too few packets for TLS negotiation etc */
             }
@@ -3721,9 +3721,9 @@ static void printFlowsStats() {
                 fprintf(out, "[%s]", all_flows[i].flow->host_server_name);
 
               if(enable_doh_dot_detection) {
-                if(((all_flows[i].flow->detected_protocol.master_protocol == NDPI_PROTOCOL_TLS)
-                    || (all_flows[i].flow->detected_protocol.app_protocol == NDPI_PROTOCOL_TLS)
-                    || (all_flows[i].flow->detected_protocol.app_protocol == NDPI_PROTOCOL_DOH_DOT)
+                if(((all_flows[i].flow->detected_protocol.proto.master_protocol == NDPI_PROTOCOL_TLS)
+                    || (all_flows[i].flow->detected_protocol.proto.app_protocol == NDPI_PROTOCOL_TLS)
+                    || (all_flows[i].flow->detected_protocol.proto.app_protocol == NDPI_PROTOCOL_DOH_DOT)
                     )
                    && all_flows[i].flow->ssh_tls.advertised_alpns /* ALPN */
                    ) {
@@ -4516,13 +4516,13 @@ static void ndpi_process_packet(u_char *args,
   }
 
 #ifdef DEBUG_TRACE
-  if(trace) fprintf(trace, "Found %u bytes packet %u.%u\n", header->caplen, p.app_protocol, p.master_protocol);
+  if(trace) fprintf(trace, "Found %u bytes packet %u.%u\n", header->caplen, p.proto.app_protocol, p.proto.master_protocol);
 #endif
 
   if(extcap_dumper
      && ((extcap_packet_filter == (u_int16_t)-1)
-	 || (p.app_protocol == extcap_packet_filter)
-	 || (p.master_protocol == extcap_packet_filter)
+	 || (p.proto.app_protocol == extcap_packet_filter)
+	 || (p.proto.master_protocol == extcap_packet_filter)
 	 )
      ) {
     struct pcap_pkthdr h;
@@ -4543,7 +4543,7 @@ static void ndpi_process_packet(u_char *args,
     trailer->magic = htonl(WIRESHARK_NTOP_MAGIC);
     trailer->flow_risk = htonl64(flow_risk);
     trailer->flow_score = htons(ndpi_risk2score(flow_risk, &cli_score, &srv_score));
-    trailer->master_protocol = htons(p.master_protocol), trailer->app_protocol = htons(p.app_protocol);
+    trailer->proto.master_protocol = htons(p.proto.master_protocol), trailer->proto.app_protocol = htons(p.proto.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
 
     /* Metadata */

@@ -821,12 +821,12 @@ static const char* ndpi_get_flow_info_by_proto_id(struct ndpi_flow_struct const 
 
 const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
                                ndpi_protocol const * const l7_protocol) {
-  char const * const app_protocol_info = ndpi_get_flow_info_by_proto_id(flow, l7_protocol->app_protocol);
+  char const * const app_protocol_info = ndpi_get_flow_info_by_proto_id(flow, l7_protocol->proto.app_protocol);
 
   if(app_protocol_info != NULL)
     return app_protocol_info;
 
-  return ndpi_get_flow_info_by_proto_id(flow, l7_protocol->master_protocol);
+  return ndpi_get_flow_info_by_proto_id(flow, l7_protocol->proto.master_protocol);
 }
 
 /* ********************************** */
@@ -1127,7 +1127,7 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_serialize_string_uint32(serializer, "encrypted", ndpi_is_encrypted_proto(ndpi_struct, l7_protocol));
   ndpi_protocol_breed_t breed =
     ndpi_get_proto_breed(ndpi_struct,
-                         (l7_protocol.app_protocol != NDPI_PROTOCOL_UNKNOWN ? l7_protocol.app_protocol : l7_protocol.master_protocol));
+                         (l7_protocol.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN ? l7_protocol.proto.app_protocol : l7_protocol.proto.master_protocol));
   ndpi_serialize_string_string(serializer, "breed", ndpi_get_proto_breed_name(breed));
   if(l7_protocol.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
   {
@@ -1272,7 +1272,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_string_string(serializer, "hostname", host_server_name);
   }
 
-  switch(l7_protocol.master_protocol ? l7_protocol.master_protocol : l7_protocol.app_protocol) {
+  switch(l7_protocol.proto.master_protocol ? l7_protocol.proto.master_protocol : l7_protocol.proto.app_protocol) {
   case NDPI_PROTOCOL_IP_ICMP:
     if(flow->entropy > 0.0f) {
       ndpi_serialize_string_float(serializer, "entropy", flow->entropy, "%.6f");
@@ -1493,7 +1493,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case NDPI_PROTOCOL_DISCORD:
-    if (l7_protocol.master_protocol != NDPI_PROTOCOL_TLS) {
+    if (l7_protocol.proto.master_protocol != NDPI_PROTOCOL_TLS) {
       ndpi_serialize_start_of_block(serializer, "discord");
       ndpi_serialize_string_string(serializer, "client_ip", flow->protos.discord.client_ip);
       ndpi_serialize_end_of_block(serializer);
@@ -1918,8 +1918,8 @@ ndpi_risk_enum ndpi_validate_url(char *url) {
 /* ******************************************************************** */
 
 u_int8_t ndpi_is_protocol_detected(ndpi_protocol proto) {
-  if((proto.master_protocol != NDPI_PROTOCOL_UNKNOWN)
-     || (proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)
+  if((proto.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN)
+     || (proto.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)
      || (proto.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED))
     return(1);
   else
@@ -2905,15 +2905,15 @@ u_int8_t ndpi_is_valid_protoId(u_int16_t protoId) {
 
 u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
 				 ndpi_protocol proto) {
-  if(proto.master_protocol == NDPI_PROTOCOL_UNKNOWN && ndpi_is_valid_protoId(proto.app_protocol)) {
-    return(!ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto);
-  } else if(ndpi_is_valid_protoId(proto.master_protocol) && ndpi_is_valid_protoId(proto.app_protocol)) {
-    if(ndpi_str->proto_defaults[proto.master_protocol].isClearTextProto
-       && (!ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto))
+  if(proto.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN && ndpi_is_valid_protoId(proto.proto.app_protocol)) {
+    return(!ndpi_str->proto_defaults[proto.proto.app_protocol].isClearTextProto);
+  } else if(ndpi_is_valid_protoId(proto.proto.master_protocol) && ndpi_is_valid_protoId(proto.proto.app_protocol)) {
+    if(ndpi_str->proto_defaults[proto.proto.master_protocol].isClearTextProto
+       && (!ndpi_str->proto_defaults[proto.proto.app_protocol].isClearTextProto))
       return(0);
     else
-      return((ndpi_str->proto_defaults[proto.master_protocol].isClearTextProto
-	      && ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto) ? 0 : 1);
+      return((ndpi_str->proto_defaults[proto.proto.master_protocol].isClearTextProto
+	      && ndpi_str->proto_defaults[proto.proto.app_protocol].isClearTextProto) ? 0 : 1);
   } else
     return(0);
 }
@@ -2921,7 +2921,7 @@ u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
 /* ******************************************* */
 
 u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow) {
-  switch(flow->detected_protocol_stack[0] /* app_protocol */) {
+  switch(flow->detected_protocol_stack[0] /* proto.app_protocol */) {
   case NDPI_PROTOCOL_DNS:
     return(flow->protos.dns.reply_code);
 

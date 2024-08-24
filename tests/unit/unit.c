@@ -282,8 +282,8 @@ int serializeProtoUnitTest(void)
     }
     assert(ndpi_init_serializer(&serializer, fmt) != -1);
 
-    ndpi_protocol ndpi_proto = { .master_protocol = NDPI_PROTOCOL_TLS,
-                                 .app_protocol = NDPI_PROTOCOL_FACEBOOK,
+    ndpi_protocol ndpi_proto = { .proto.master_protocol = NDPI_PROTOCOL_TLS,
+                                 .proto.app_protocol = NDPI_PROTOCOL_FACEBOOK,
                                  .protocol_by_ip = NDPI_PROTOCOL_FACEBOOK,
                                  .category = NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK };
     ndpi_risk risks = 0;
