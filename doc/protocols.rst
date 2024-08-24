@@ -910,3 +910,13 @@ References: `Paid Specs: <https://www.iso.org/standard/60206.html>`_
 This protocol is used to transfer data between the various components of an ATG (Automatic Tank Gauge) system.
 
 References: `Protocol Specs: <https://github.com/Orange-Cyberdefense/awesome-industrial-protocols/blob/main/protocols/atg.md>`_
+
+
+.. _Proto 424:
+
+`NDPI_PROTOCOL_TRDP`
+===================
+The Train Real Time Data Protocol (TRDP) is a UDP/TCP-based communication protocol designed for IP networks in trains, enabling data exchange between devices such as door controls and air conditioning systems. 
+It is standardized by the IEC under IEC 61375-2-3 and is not related to the Remote Desktop Protocol (RDP).
+
+References: `Protocol Specs: <https://www.typhoon-hil.com/documentation/typhoon-hil-software-manual/References/iec_61375_trdp_protocol.html>`_
