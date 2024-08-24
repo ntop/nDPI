@@ -298,6 +298,32 @@ u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_str, 
   return(NDPI_PROTOCOL_UNKNOWN);
 }
 
+/* *********************************************************************************** */
+
+/* NOTE: supported both HTTP and TLS.YouTube */
+ndpi_master_app_protocol ndpi_get_protocol_by_name(struct ndpi_detection_module_struct *ndpi_str, const char *name) {
+  char *dot, buf[256];
+  ndpi_master_app_protocol ret = { NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_UNKNOWN }; 
+
+  if(!ndpi_str || !name)
+    return(ret);
+
+  snprintf(buf, sizeof(buf), "%s", name);
+  dot = strchr(buf, '.');
+
+  if(dot) {
+    /* TLS.YouTube */
+    dot[0] = '\0';
+    ret.app_protocol = ndpi_get_proto_by_name(ndpi_str,  &dot[1]);
+  } else {
+    /* TLS */    
+  }
+
+  ret.master_protocol = ndpi_get_proto_by_name(ndpi_str,  buf); /* both cases */
+  
+  return(ret);
+}
+
 /* ************************************************************************************* */
 /* ************************************************************************************* */
 
