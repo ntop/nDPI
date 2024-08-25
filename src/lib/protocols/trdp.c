@@ -57,7 +57,7 @@ static void ndpi_search_trdp(struct ndpi_detection_module_struct *ndpi_struct, s
       if ((u_int32_t)(packet->payload_packet_len-TRDP_PD_HDR_LEN) == dataset_len &&
           get_u_int32_t(packet->payload, 24) == 0) /* Reserved, must be zero */
       {
-        header_fcs = ndpi_crc32(packet->payload, TRDP_PD_HDR_LEN-4);
+        header_fcs = ndpi_crc32(packet->payload, TRDP_PD_HDR_LEN-4, 0);
         if (header_fcs == le32toh(get_u_int32_t(packet->payload, TRDP_PD_HDR_LEN-4))) {
           ndpi_int_trdp_add_connection(ndpi_struct, flow);
           return;
@@ -71,7 +71,7 @@ static void ndpi_search_trdp(struct ndpi_detection_module_struct *ndpi_struct, s
 
       if ((u_int32_t)(packet->payload_packet_len - TRDP_MD_HDR_LEN - padding) == dataset_len)
       {
-        header_fcs = ndpi_crc32(packet->payload, TRDP_MD_HDR_LEN-4);
+        header_fcs = ndpi_crc32(packet->payload, TRDP_MD_HDR_LEN-4, 0);
         if (header_fcs == le32toh(get_u_int32_t(packet->payload, TRDP_MD_HDR_LEN-4))) {
           ndpi_int_trdp_add_connection(ndpi_struct, flow);
           return;
