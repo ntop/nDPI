@@ -154,6 +154,7 @@
     <ClCompile Include="..\src\lib\protocols\nano.c" />
     <ClCompile Include="..\src\lib\protocols\openwire.c" />
     <ClCompile Include="..\src\lib\protocols\cnp-ip.c" />
+    <ClCompile Include="..\src\lib\protocols\trdp.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />
