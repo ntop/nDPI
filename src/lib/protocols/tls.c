@@ -2875,7 +2875,7 @@ compute_ja3c:
 	                                               NULL);
 
 	        if(rc1 == 0)
-	          ndpi_set_risk(flow, NDPI_MALICIOUS_JA3, flow->protos.tls_quic.ja3_client);
+	          ndpi_set_risk(flow, NDPI_MALICIOUS_FINGERPRINT, flow->protos.tls_quic.ja3_client);
 	        }
 	      }
 
