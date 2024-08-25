@@ -4597,7 +4597,7 @@ static void ndpi_process_packet(u_char *args,
     /* The remaining bytes are already set to 0 */
 
     crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
-    *crc = ndpi_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer));
+    *crc = ndpi_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer), 0);
     h.caplen += delta, h.len += delta;
 
 #ifdef DEBUG_TRACE
