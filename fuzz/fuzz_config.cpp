@@ -562,8 +562,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, &input_info);
   p = ndpi_detection_giveup(ndpi_info_mod, &flow, &protocol_was_guessed);
 
-  assert(p.master_protocol == ndpi_get_flow_masterprotocol(&flow));
-  assert(p.app_protocol == ndpi_get_flow_appprotocol(&flow));
+  assert(p.proto.master_protocol == ndpi_get_flow_masterprotocol(&flow));
+  assert(p.proto.app_protocol == ndpi_get_flow_appprotocol(&flow));
   assert(p.category == ndpi_get_flow_category(&flow));
   ndpi_get_lower_proto(p);
   ndpi_get_upper_proto(p);
@@ -572,7 +572,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_flow_ndpi_proto(&flow, &p2);
   ndpi_is_proto(p, NDPI_PROTOCOL_TLS);
   ndpi_http_method2str(flow.http.method);
-  ndpi_is_subprotocol_informative(p.app_protocol);
+  ndpi_is_subprotocol_informative(p.proto.app_protocol);
   ndpi_get_http_method(bool_value ? &flow : NULL);
   ndpi_get_http_url(&flow);
   ndpi_get_http_content_type(&flow);

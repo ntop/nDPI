@@ -1772,8 +1772,8 @@ static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_stru
     NDPI_LOG_DBG(ndpi_struct, "Found RTP/RTCP over QUIC\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SNAPCHAT_CALL, NDPI_PROTOCOL_QUIC, NDPI_CONFIDENCE_DPI);
     /* In "extra_eval" data path, if we change the classification, we need to update the category, too */
-    proto.master_protocol = NDPI_PROTOCOL_QUIC;
-    proto.app_protocol = NDPI_PROTOCOL_SNAPCHAT_CALL;
+    proto.proto.master_protocol = NDPI_PROTOCOL_QUIC;
+    proto.proto.app_protocol = NDPI_PROTOCOL_SNAPCHAT_CALL;
     proto.category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
     ndpi_fill_protocol_category(ndpi_struct, flow, &proto);
   } else {

@@ -282,11 +282,14 @@ int serializeProtoUnitTest(void)
     }
     assert(ndpi_init_serializer(&serializer, fmt) != -1);
 
-    ndpi_protocol ndpi_proto = { .master_protocol = NDPI_PROTOCOL_TLS,
-                                 .app_protocol = NDPI_PROTOCOL_FACEBOOK,
-                                 .protocol_by_ip = NDPI_PROTOCOL_FACEBOOK,
-                                 .category = NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK };
+    ndpi_protocol ndpi_proto;
     ndpi_risk risks = 0;
+
+    ndpi_proto.proto.master_protocol = NDPI_PROTOCOL_TLS,
+      ndpi_proto.proto.app_protocol = NDPI_PROTOCOL_FACEBOOK,
+      ndpi_proto.protocol_by_ip = NDPI_PROTOCOL_FACEBOOK,
+      ndpi_proto.category = NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK;
+       
     NDPI_SET_BIT(risks, NDPI_MALFORMED_PACKET);
     NDPI_SET_BIT(risks, NDPI_TLS_WEAK_CIPHER);
     NDPI_SET_BIT(risks, NDPI_TLS_OBSOLETE_VERSION);
