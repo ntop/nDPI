@@ -161,9 +161,9 @@ typedef enum {
 				  your app will clear this risk if future packets (not sent to nDPI)
 				  are received in the opposite direction */
   NDPI_HTTP_OBSOLETE_SERVER,
-  NDPI_PERIODIC_FLOW, /* 50 */ /* Set in case a flow repeats at a specific pace [used by apps on top of nDPI] */
+  NDPI_PERIODIC_FLOW,          /* Set in case a flow repeats at a specific pace [used by apps on top of nDPI] */
   NDPI_MINOR_ISSUES,           /* Generic packet issues (e.g. DNS with 0 TTL) */
-  NDPI_TCP_ISSUES,             /* 50 */ /* TCP issues such as connection failed or scan */
+  NDPI_TCP_ISSUES,    /* 50 */ /* TCP issues such as connection failed or scan */
   NDPI_FULLY_ENCRYPTED,        /* This (unknown) session is fully encrypted */
   NDPI_TLS_ALPN_SNI_MISMATCH,  /* Invalid ALPN/SNI combination */
   NDPI_MALWARE_HOST_CONTACTED, /* Flow client contacted a malware host */
