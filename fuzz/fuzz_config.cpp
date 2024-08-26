@@ -488,7 +488,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_proto_by_name(ndpi_info_mod, NULL); /* Error */
   ndpi_get_proto_by_name(ndpi_info_mod, "foo"); /* Invalid protocol */
   ndpi_get_proto_name(ndpi_info_mod, pid);
-  ndpi_get_protocol_id(ndpi_info_mod, protoname);
 
   struct in_addr pin;
   struct in6_addr pin6;
@@ -570,7 +569,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_flow_error_code(&flow);
   ndpi_get_flow_risk_info(&flow, out, sizeof(out), 1);
   ndpi_get_flow_ndpi_proto(&flow, &p2);
-  ndpi_is_proto(p, NDPI_PROTOCOL_TLS);
+  ndpi_is_proto(p.proto, NDPI_PROTOCOL_TLS);
   ndpi_http_method2str(flow.http.method);
   ndpi_is_subprotocol_informative(p.proto.app_protocol);
   ndpi_get_http_method(bool_value ? &flow : NULL);
