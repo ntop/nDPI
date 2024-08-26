@@ -690,10 +690,10 @@ extern "C" {
   char* ndpi_get_proto_breed_name(ndpi_protocol_breed_t breed_id);
 
   /**
-   * Return the name of the protocol given its ID
+   * Return the name of the protocol given its ID.
    *
    * @par     ndpi_mod   = the detection module
-   * @par     name       = the protocol name
+   * @par     name       = the protocol name. You can specify TLS or YouYube but not TLS.YouTube (se ndpi_get_protocol_by_name in this case)
    * @return  the ID of the protocol
    *
    */
@@ -710,16 +710,14 @@ extern "C" {
   extern char* ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_mod, u_int id);
 
   /**
-   * Return the name of the protocol given its ID
+   * Return the name of the protocol given its ID. You can specify TLS.YouTube or just TLS
    *
    * @par     ndpi_mod   = the detection module
    * @par     id         = the protocol id
    * @return  the name of the protocol
    *
-   */
-  
-  extern ndpi_master_app_protocol ndpi_get_protocol_by_name(struct ndpi_detection_module_struct *ndpi_str, const char *name);
-  
+   */  
+  extern ndpi_master_app_protocol ndpi_get_protocol_by_name(struct ndpi_detection_module_struct *ndpi_str, const char *name);  
 
   /**
    * Return the ID of the category
