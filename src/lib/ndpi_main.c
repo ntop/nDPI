@@ -315,6 +315,9 @@ ndpi_master_app_protocol ndpi_get_protocol_by_name(struct ndpi_detection_module_
     /* TLS.YouTube */
     dot[0] = '\0';
     ret.app_protocol = ndpi_get_proto_by_name(ndpi_str,  &dot[1]);
+
+    if(ret.app_protocol == NDPI_PROTOCOL_UNKNOWN)
+      return(ret); /* Parsing error */
   } else {
     /* TLS */
   }
