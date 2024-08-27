@@ -99,7 +99,7 @@ typedef enum {
   NOTE
   When the typedef below is modified don't forget to update
   - nDPI/wireshark/ndpi.lua
-  - ndpi_risk2str (in ndpi_utils.c)
+  - ndpi_risk2str, ndpi_risk2code, ndpi_code2risk (in ndpi_utils.c)
   - doc/flow_risks.rst
   - ndpi_known_risks (ndpi_main.c)
 

@@ -2096,11 +2096,250 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
 
   case NDPI_PROBING_ATTEMPT:
     return("Probing attempt");
-    
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
   }
+}
+
+/* ******************************************************************** */
+
+#define STRINGIFY(x) #x
+
+const char* ndpi_risk2code(ndpi_risk_enum risk) {
+  switch(risk) {
+  case NDPI_NO_RISK:
+    return STRINGIFY(NDPI_NO_RISK);
+  case NDPI_URL_POSSIBLE_SQL_INJECTION:
+    return STRINGIFY(NDPI_URL_POSSIBLE_SQL_INJECTION);
+  case NDPI_URL_POSSIBLE_RCE_INJECTION:
+    return STRINGIFY(NDPI_URL_POSSIBLE_RCE_INJECTION);
+  case NDPI_BINARY_APPLICATION_TRANSFER:
+    return STRINGIFY(NDPI_BINARY_APPLICATION_TRANSFER);
+  case NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT:
+    return STRINGIFY(NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+  case NDPI_TLS_SELFSIGNED_CERTIFICATE:
+    return STRINGIFY(NDPI_TLS_SELFSIGNED_CERTIFICATE);
+  case NDPI_TLS_OBSOLETE_VERSION:
+    return STRINGIFY(NDPI_TLS_OBSOLETE_VERSION);
+  case NDPI_TLS_WEAK_CIPHER:
+    return STRINGIFY(NDPI_TLS_WEAK_CIPHER);
+  case NDPI_TLS_CERTIFICATE_EXPIRED:
+    return STRINGIFY(NDPI_TLS_CERTIFICATE_EXPIRED);
+  case NDPI_TLS_CERTIFICATE_MISMATCH:
+    return STRINGIFY(NDPI_TLS_CERTIFICATE_MISMATCH);
+  case NDPI_HTTP_SUSPICIOUS_USER_AGENT:
+    return STRINGIFY(NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+  case NDPI_NUMERIC_IP_HOST:
+    return STRINGIFY(NDPI_NUMERIC_IP_HOST);
+  case NDPI_HTTP_SUSPICIOUS_URL:
+    return STRINGIFY(NDPI_HTTP_SUSPICIOUS_URL);
+  case NDPI_HTTP_SUSPICIOUS_HEADER:
+    return STRINGIFY(NDPI_HTTP_SUSPICIOUS_HEADER);
+  case NDPI_TLS_NOT_CARRYING_HTTPS:
+    return STRINGIFY(NDPI_TLS_NOT_CARRYING_HTTPS);
+  case NDPI_SUSPICIOUS_DGA_DOMAIN:
+    return STRINGIFY(NDPI_SUSPICIOUS_DGA_DOMAIN);
+  case NDPI_MALFORMED_PACKET:
+    return STRINGIFY(NDPI_MALFORMED_PACKET);
+  case NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER:
+    return STRINGIFY(NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER);
+  case NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER:
+    return STRINGIFY(NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER);
+  case NDPI_SMB_INSECURE_VERSION:
+    return STRINGIFY(NDPI_SMB_INSECURE_VERSION);
+  case NDPI_TLS_SUSPICIOUS_ESNI_USAGE:
+    return STRINGIFY(NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
+  case NDPI_UNSAFE_PROTOCOL:
+    return STRINGIFY(NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
+  case NDPI_DNS_SUSPICIOUS_TRAFFIC:
+    return STRINGIFY(NDPI_DNS_SUSPICIOUS_TRAFFIC);
+  case NDPI_TLS_MISSING_SNI:
+    return STRINGIFY(NDPI_TLS_MISSING_SNI);
+  case NDPI_HTTP_SUSPICIOUS_CONTENT:
+    return STRINGIFY(NDPI_HTTP_SUSPICIOUS_CONTENT);
+  case NDPI_RISKY_ASN:
+    return STRINGIFY(NDPI_RISKY_ASN);
+  case NDPI_RISKY_DOMAIN:
+    return STRINGIFY(NDPI_RISKY_DOMAIN);
+  case NDPI_MALICIOUS_FINGERPRINT:
+    return STRINGIFY(NDPI_MALICIOUS_FINGERPRINT);
+  case NDPI_MALICIOUS_SHA1_CERTIFICATE:
+    return STRINGIFY(NDPI_MALICIOUS_SHA1_CERTIFICATE);
+  case NDPI_DESKTOP_OR_FILE_SHARING_SESSION:
+    return STRINGIFY(NDPI_DESKTOP_OR_FILE_SHARING_SESSION);
+  case NDPI_TLS_UNCOMMON_ALPN:
+    return STRINGIFY(NDPI_TLS_UNCOMMON_ALPN);
+  case NDPI_TLS_CERT_VALIDITY_TOO_LONG:
+    return STRINGIFY(NDPI_TLS_CERT_VALIDITY_TOO_LONG);
+  case NDPI_TLS_SUSPICIOUS_EXTENSION:
+    return STRINGIFY(NDPI_TLS_SUSPICIOUS_EXTENSION);
+  case NDPI_TLS_FATAL_ALERT:
+    return STRINGIFY(NDPI_TLS_FATAL_ALERT);
+  case NDPI_SUSPICIOUS_ENTROPY:
+    return STRINGIFY(NDPI_SUSPICIOUS_ENTROPY);
+  case NDPI_CLEAR_TEXT_CREDENTIALS:
+    return STRINGIFY(NDPI_CLEAR_TEXT_CREDENTIALS);
+  case NDPI_DNS_LARGE_PACKET:
+    return STRINGIFY(NDPI_DNS_LARGE_PACKET);
+  case NDPI_DNS_FRAGMENTED:
+    return STRINGIFY(NDPI_DNS_FRAGMENTED);
+  case NDPI_INVALID_CHARACTERS:
+    return STRINGIFY(NDPI_INVALID_CHARACTERS);
+  case NDPI_POSSIBLE_EXPLOIT:
+    return STRINGIFY(NDPI_POSSIBLE_EXPLOIT);
+  case NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE:
+    return STRINGIFY(NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE);
+  case NDPI_PUNYCODE_IDN:
+    return STRINGIFY(NDPI_PUNYCODE_IDN);
+  case NDPI_ERROR_CODE_DETECTED:
+    return STRINGIFY(NDPI_ERROR_CODE_DETECTED);
+  case NDPI_HTTP_CRAWLER_BOT:
+    return STRINGIFY(NDPI_HTTP_CRAWLER_BOT);
+  case NDPI_ANONYMOUS_SUBSCRIBER:
+    return STRINGIFY(NDPI_ANONYMOUS_SUBSCRIBER);
+  case NDPI_UNIDIRECTIONAL_TRAFFIC:
+    return STRINGIFY(NDPI_UNIDIRECTIONAL_TRAFFIC);
+  case NDPI_HTTP_OBSOLETE_SERVER:
+    return STRINGIFY(NDPI_HTTP_OBSOLETE_SERVER);
+  case NDPI_PERIODIC_FLOW:
+    return STRINGIFY(NDPI_PERIODIC_FLOW);
+  case NDPI_MINOR_ISSUES:
+    return STRINGIFY(NDPI_MINOR_ISSUES);
+  case NDPI_TCP_ISSUES:
+    return STRINGIFY(NDPI_MINOR_ISSUES);
+  case NDPI_FULLY_ENCRYPTED:
+    return STRINGIFY(NDPI_FULLY_ENCRYPTED);
+  case NDPI_TLS_ALPN_SNI_MISMATCH:
+    return STRINGIFY(NDPI_TLS_ALPN_SNI_MISMATCH);
+  case NDPI_MALWARE_HOST_CONTACTED:
+    return STRINGIFY(NDPI_MALWARE_HOST_CONTACTED);
+  case NDPI_BINARY_DATA_TRANSFER:
+    return STRINGIFY(NDPI_BINARY_DATA_TRANSFER);
+  case NDPI_PROBING_ATTEMPT:
+    return STRINGIFY(NDPI_PROBING_ATTEMPT);
+
+  default:
+    return("Unknown risk");
+  }
+}
+
+/* ******************************************************************** */
+
+ndpi_risk_enum ndpi_code2risk(const char* risk) {
+  if(strcmp(STRINGIFY(NDPI_NO_RISK), risk) == 0)
+    return(NDPI_NO_RISK);
+  else if(strcmp(STRINGIFY(NDPI_URL_POSSIBLE_SQL_INJECTION), risk) == 0)
+    return(NDPI_URL_POSSIBLE_SQL_INJECTION);
+  else if(strcmp(STRINGIFY(NDPI_URL_POSSIBLE_RCE_INJECTION), risk) == 0)
+    return(NDPI_URL_POSSIBLE_RCE_INJECTION);
+  else if(strcmp(STRINGIFY(NDPI_BINARY_APPLICATION_TRANSFER), risk) == 0)
+    return(NDPI_BINARY_APPLICATION_TRANSFER);
+  else if(strcmp(STRINGIFY(NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT), risk) == 0)
+    return(NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+  else if(strcmp(STRINGIFY(NDPI_TLS_SELFSIGNED_CERTIFICATE), risk) == 0)
+    return(NDPI_TLS_SELFSIGNED_CERTIFICATE);
+  else if(strcmp(STRINGIFY(NDPI_TLS_OBSOLETE_VERSION), risk) == 0)
+    return(NDPI_TLS_OBSOLETE_VERSION);
+  else if(strcmp(STRINGIFY(NDPI_TLS_WEAK_CIPHER), risk) == 0)
+    return(NDPI_TLS_WEAK_CIPHER);
+  else if(strcmp(STRINGIFY(NDPI_TLS_CERTIFICATE_EXPIRED), risk) == 0)
+    return(NDPI_TLS_CERTIFICATE_EXPIRED);
+  else if(strcmp(STRINGIFY(NDPI_TLS_CERTIFICATE_MISMATCH), risk) == 0)
+    return(NDPI_TLS_CERTIFICATE_MISMATCH);
+  else if(strcmp(STRINGIFY(NDPI_HTTP_SUSPICIOUS_USER_AGENT), risk) == 0)
+    return(NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+  else if(strcmp(STRINGIFY(NDPI_NUMERIC_IP_HOST), risk) == 0)
+    return(NDPI_NUMERIC_IP_HOST);
+  else if(strcmp(STRINGIFY(NDPI_HTTP_SUSPICIOUS_URL), risk) == 0)
+    return(NDPI_HTTP_SUSPICIOUS_URL);
+  else if(strcmp(STRINGIFY(NDPI_HTTP_SUSPICIOUS_HEADER), risk) == 0)
+    return(NDPI_HTTP_SUSPICIOUS_HEADER);
+  else if(strcmp(STRINGIFY(NDPI_TLS_NOT_CARRYING_HTTPS), risk) == 0)
+    return(NDPI_TLS_NOT_CARRYING_HTTPS);
+  else if(strcmp(STRINGIFY(NDPI_SUSPICIOUS_DGA_DOMAIN), risk) == 0)
+    return(NDPI_SUSPICIOUS_DGA_DOMAIN);
+  else if(strcmp(STRINGIFY(NDPI_MALFORMED_PACKET), risk) == 0)
+    return(NDPI_MALFORMED_PACKET);
+  else if(strcmp(STRINGIFY(NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER), risk) == 0)
+    return(NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER);
+  else if(strcmp(STRINGIFY(NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER), risk) == 0)
+    return(NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER);
+  else if(strcmp(STRINGIFY(NDPI_SMB_INSECURE_VERSION), risk) == 0)
+    return(NDPI_SMB_INSECURE_VERSION);
+  else if(strcmp(STRINGIFY(NDPI_TLS_SUSPICIOUS_ESNI_USAGE), risk) == 0)
+    return(NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
+  else if(strcmp(STRINGIFY(NDPI_UNSAFE_PROTOCOL), risk) == 0)
+    return(NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
+  else if(strcmp(STRINGIFY(NDPI_DNS_SUSPICIOUS_TRAFFIC), risk) == 0)
+    return(NDPI_DNS_SUSPICIOUS_TRAFFIC);
+  else if(strcmp(STRINGIFY(NDPI_TLS_MISSING_SNI), risk) == 0)
+    return(NDPI_TLS_MISSING_SNI);
+  else if(strcmp(STRINGIFY(NDPI_HTTP_SUSPICIOUS_CONTENT), risk) == 0)
+    return(NDPI_HTTP_SUSPICIOUS_CONTENT);
+  else if(strcmp(STRINGIFY(NDPI_RISKY_ASN), risk) == 0)
+    return(NDPI_RISKY_ASN);
+  else if(strcmp(STRINGIFY(NDPI_RISKY_DOMAIN), risk) == 0)
+    return(NDPI_RISKY_DOMAIN);
+  else if(strcmp(STRINGIFY(NDPI_MALICIOUS_FINGERPRINT), risk) == 0)
+    return(NDPI_MALICIOUS_FINGERPRINT);
+  else if(strcmp(STRINGIFY(NDPI_MALICIOUS_SHA1_CERTIFICATE), risk) == 0)
+    return(NDPI_MALICIOUS_SHA1_CERTIFICATE);
+  else if(strcmp(STRINGIFY(NDPI_DESKTOP_OR_FILE_SHARING_SESSION), risk) == 0)
+    return(NDPI_DESKTOP_OR_FILE_SHARING_SESSION);
+  else if(strcmp(STRINGIFY(NDPI_TLS_UNCOMMON_ALPN), risk) == 0)
+    return(NDPI_TLS_UNCOMMON_ALPN);
+  else if(strcmp(STRINGIFY(NDPI_TLS_CERT_VALIDITY_TOO_LONG), risk) == 0)
+    return(NDPI_TLS_CERT_VALIDITY_TOO_LONG);
+  else if(strcmp(STRINGIFY(NDPI_TLS_SUSPICIOUS_EXTENSION), risk) == 0)
+    return(NDPI_TLS_SUSPICIOUS_EXTENSION);
+  else if(strcmp(STRINGIFY(NDPI_TLS_FATAL_ALERT), risk) == 0)
+    return(NDPI_TLS_FATAL_ALERT);
+  else if(strcmp(STRINGIFY(NDPI_SUSPICIOUS_ENTROPY), risk) == 0)
+    return(NDPI_SUSPICIOUS_ENTROPY);
+  else if(strcmp(STRINGIFY(NDPI_CLEAR_TEXT_CREDENTIALS), risk) == 0)
+    return(NDPI_CLEAR_TEXT_CREDENTIALS);
+  else if(strcmp(STRINGIFY(NDPI_DNS_LARGE_PACKET), risk) == 0)
+    return(NDPI_DNS_LARGE_PACKET);
+  else if(strcmp(STRINGIFY(NDPI_DNS_FRAGMENTED), risk) == 0)
+    return(NDPI_DNS_FRAGMENTED);
+  else if(strcmp(STRINGIFY(NDPI_INVALID_CHARACTERS), risk) == 0)
+    return(NDPI_INVALID_CHARACTERS);
+  else if(strcmp(STRINGIFY(NDPI_POSSIBLE_EXPLOIT), risk) == 0)
+    return(NDPI_POSSIBLE_EXPLOIT);
+  else if(strcmp(STRINGIFY(NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE), risk) == 0)
+    return(NDPI_TLS_CERTIFICATE_ABOUT_TO_EXPIRE);
+  else if(strcmp(STRINGIFY(NDPI_PUNYCODE_IDN), risk) == 0)
+    return(NDPI_PUNYCODE_IDN);
+  else if(strcmp(STRINGIFY(NDPI_ERROR_CODE_DETECTED), risk) == 0)
+    return(NDPI_ERROR_CODE_DETECTED);
+  else if(strcmp(STRINGIFY(NDPI_HTTP_CRAWLER_BOT), risk) == 0)
+    return(NDPI_HTTP_CRAWLER_BOT);
+  else if(strcmp(STRINGIFY(NDPI_ANONYMOUS_SUBSCRIBER), risk) == 0)
+    return(NDPI_ANONYMOUS_SUBSCRIBER);
+  else if(strcmp(STRINGIFY(NDPI_UNIDIRECTIONAL_TRAFFIC), risk) == 0)
+    return(NDPI_UNIDIRECTIONAL_TRAFFIC);
+  else if(strcmp(STRINGIFY(NDPI_HTTP_OBSOLETE_SERVER), risk) == 0)
+    return(NDPI_HTTP_OBSOLETE_SERVER);
+  else if(strcmp(STRINGIFY(NDPI_PERIODIC_FLOW), risk) == 0)
+    return(NDPI_PERIODIC_FLOW);
+  else if(strcmp(STRINGIFY(NDPI_MINOR_ISSUES), risk) == 0)
+    return(NDPI_MINOR_ISSUES);
+  else if(strcmp(STRINGIFY(NDPI_TCP_ISSUES), risk) == 0)
+    return(NDPI_MINOR_ISSUES);
+  else if(strcmp(STRINGIFY(NDPI_FULLY_ENCRYPTED), risk) == 0)
+    return(NDPI_FULLY_ENCRYPTED);
+  else if(strcmp(STRINGIFY(NDPI_TLS_ALPN_SNI_MISMATCH), risk) == 0)
+    return(NDPI_TLS_ALPN_SNI_MISMATCH);
+  else if(strcmp(STRINGIFY(NDPI_MALWARE_HOST_CONTACTED), risk) == 0)
+    return(NDPI_MALWARE_HOST_CONTACTED);
+  else if(strcmp(STRINGIFY(NDPI_BINARY_DATA_TRANSFER), risk) == 0)
+    return(NDPI_BINARY_DATA_TRANSFER);
+  else if(strcmp(STRINGIFY(NDPI_PROBING_ATTEMPT), risk) == 0)
+    return(NDPI_PROBING_ATTEMPT);
+  else
+    return(NDPI_MAX_RISK);
 }
 
 /* ******************************************************************** */
@@ -2289,13 +2528,13 @@ void ndpi_hash_free(ndpi_str_hash **h) {
   if(h != NULL) {
     ndpi_str_hash_priv *h_priv = *((ndpi_str_hash_priv **)h);
     ndpi_str_hash_priv *current, *tmp;
-    
+
     HASH_ITER(hh, h_priv, current, tmp) {
       HASH_DEL(h_priv, current);
       ndpi_free(current->key);
       ndpi_free(current);
     }
-    
+
     *h = NULL;
   }
 }
@@ -3284,7 +3523,7 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   domain_len = strlen(domain);
-  
+
   if(domain_len >= (out_len-3))
     return(0);
 
@@ -3296,7 +3535,7 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 
   if(suffix == NULL)
     return((u_int)snprintf(out, out_len, "%s", domain));  /* Unknown suffix */
-  
+
   snprintf((char*)domain_buf, sizeof(domain_buf), "%s", domain);
   domain_buf_len = strlen((char*)domain_buf), suffix_len = strlen(suffix);
 
@@ -3343,7 +3582,7 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
       out_idx = compressed_len;
     }
   }
-  
+
   /* Add trailer domainId value */
   out[out_idx++] = (domain_id >> 8) & 0xFF;
   out[out_idx++] = domain_id & 0xFF;
