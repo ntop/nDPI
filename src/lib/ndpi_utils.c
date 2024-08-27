@@ -1236,7 +1236,7 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
 
 /* ********************************** */
 
-static char* print_ndpi_address_port(ndpi_address_port *ap, char *buf, u_int buf_len) {
+char* print_ndpi_address_port(ndpi_address_port *ap, char *buf, u_int buf_len) {
   char ipbuf[INET6_ADDRSTRLEN];
 
   if(ap->is_ipv6) {

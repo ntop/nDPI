@@ -1807,7 +1807,7 @@ extern "C" {
   ndpi_risk_info* ndpi_risk2severity(ndpi_risk_enum risk);
   u_int16_t ndpi_risk2score(ndpi_risk risk,
 			    u_int16_t *client_score, u_int16_t *server_score);
-
+  char* print_ndpi_address_port(ndpi_address_port *ap, char *buf, u_int buf_len);
   u_int8_t ndpi_check_issuerdn_risk_exception(struct ndpi_detection_module_struct *ndpi_str,
 					      char *issuerDN);
   u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,

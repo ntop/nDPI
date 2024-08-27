@@ -1548,7 +1548,7 @@ void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
 
 /* ********************************** */
 
-static void print_ndpi_address_port(FILE *out, const char *label, ndpi_address_port *ap) {
+static void print_ndpi_address_port_file(FILE *out, const char *label, ndpi_address_port *ap) {
   if(ap->port != 0) {
     char buf[INET6_ADDRSTRLEN];
 
@@ -1932,11 +1932,11 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       }
     }
 
-    print_ndpi_address_port(out, "Mapped IP/Port", &flow->stun.mapped_address);
-    print_ndpi_address_port(out, "Peer IP/Port", &flow->stun.peer_address);
-    print_ndpi_address_port(out, "Relayed IP/Port", &flow->stun.relayed_address);
-    print_ndpi_address_port(out, "Rsp Origin IP/Port", &flow->stun.response_origin);
-    print_ndpi_address_port(out, "Other IP/Port", &flow->stun.other_address);
+    print_ndpi_address_port_file(out, "Mapped IP/Port", &flow->stun.mapped_address);
+    print_ndpi_address_port_file(out, "Peer IP/Port", &flow->stun.peer_address);
+    print_ndpi_address_port_file(out, "Relayed IP/Port", &flow->stun.relayed_address);
+    print_ndpi_address_port_file(out, "Rsp Origin IP/Port", &flow->stun.response_origin);
+    print_ndpi_address_port_file(out, "Other IP/Port", &flow->stun.other_address);
 
     if(flow->http.url[0] != '\0') {
       ndpi_risk_enum risk = ndpi_validate_url(flow->http.url);
