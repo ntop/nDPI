@@ -2111,6 +2111,8 @@ const char* ndpi_risk2code(ndpi_risk_enum risk) {
   switch(risk) {
   case NDPI_NO_RISK:
     return STRINGIFY(NDPI_NO_RISK);
+  case NDPI_URL_POSSIBLE_XSS:
+    return STRINGIFY(NDPI_URL_POSSIBLE_XSS);
   case NDPI_URL_POSSIBLE_SQL_INJECTION:
     return STRINGIFY(NDPI_URL_POSSIBLE_SQL_INJECTION);
   case NDPI_URL_POSSIBLE_RCE_INJECTION:
@@ -2230,6 +2232,8 @@ const char* ndpi_risk2code(ndpi_risk_enum risk) {
 ndpi_risk_enum ndpi_code2risk(const char* risk) {
   if(strcmp(STRINGIFY(NDPI_NO_RISK), risk) == 0)
     return(NDPI_NO_RISK);
+  else if(strcmp(STRINGIFY(NDPI_URL_POSSIBLE_XSS), risk) == 0)
+    return(NDPI_URL_POSSIBLE_XSS);
   else if(strcmp(STRINGIFY(NDPI_URL_POSSIBLE_SQL_INJECTION), risk) == 0)
     return(NDPI_URL_POSSIBLE_SQL_INJECTION);
   else if(strcmp(STRINGIFY(NDPI_URL_POSSIBLE_RCE_INJECTION), risk) == 0)
