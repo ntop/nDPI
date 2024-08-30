@@ -909,24 +909,34 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
 
   switch(packet->payload[0] /* block type */) {
   case 0x01: /* Client Hello */
-  case 0x02: /* Server Hello */
+    flow->protos.tls_quic.client_hello_processed = 1;
+    flow->protos.tls_quic.ch_direction = packet->packet_direction;
     processClientServerHello(ndpi_struct, flow, 0);
-    flow->protos.tls_quic.hello_processed = 1;
-    flow->protos.tls_quic.ch_direction = (packet->payload[0] == 0x01 ? packet->packet_direction : !packet->packet_direction);
     ndpi_int_tls_add_connection(ndpi_struct, flow);
 
 #ifdef DEBUG_TLS
-    printf("*** TLS [version: %02X][%s Hello]\n",
-	   flow->protos.tls_quic.ssl_version,
-	   (packet->payload[0] == 0x01) ? "Client" : "Server");
+    printf("*** TLS [version: %02X][Client Hello]\n",
+	   flow->protos.tls_quic.ssl_version);
 #endif
 
-    if((!is_dtls && flow->protos.tls_quic.ssl_version >= 0x0304 /* TLS 1.3 */)
-       && (packet->payload[0] == 0x02 /* Server Hello */)) {
+    checkTLSSubprotocol(ndpi_struct, flow, packet->payload[0] == 0x01);
+    break;
+
+  case 0x02: /* Server Hello */
+    flow->protos.tls_quic.server_hello_processed = 1;
+    flow->protos.tls_quic.ch_direction = !packet->packet_direction;
+    processClientServerHello(ndpi_struct, flow, 0);
+    ndpi_int_tls_add_connection(ndpi_struct, flow);
+
+#ifdef DEBUG_TLS
+    printf("*** TLS [version: %02X][Server Hello]\n",
+	   flow->protos.tls_quic.ssl_version);
+#endif
+
+    if(!is_dtls && flow->protos.tls_quic.ssl_version >= 0x0304 /* TLS 1.3 */) {
       flow->tls_quic.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
     }
-    if((is_dtls && flow->protos.tls_quic.ssl_version == 0xFEFC /* DTLS 1.3 */)
-       && (packet->payload[0] == 0x02 /* Server Hello */)) {
+    if(is_dtls && flow->protos.tls_quic.ssl_version == 0xFEFC /* DTLS 1.3 */) {
       flow->tls_quic.certificate_processed = 1; /* No Certificate with DTLS 1.3+ */
     }
 
@@ -936,7 +946,8 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
   case 0x0b: /* Certificate */
     /* Important: populate the tls union fields only after
      * ndpi_int_tls_add_connection has been called */
-    if(flow->protos.tls_quic.hello_processed) {
+    if(flow->protos.tls_quic.client_hello_processed ||
+       flow->protos.tls_quic.server_hello_processed) {
       /* Only certificates from the server */
       if(flow->protos.tls_quic.ch_direction != packet->packet_direction) {
         ret = processCertificate(ndpi_struct, flow);
@@ -1170,7 +1181,8 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     if((ndpi_struct->cfg.ookla_aggressiveness & NDPI_AGGRESSIVENESS_OOKLA_TLS) && /* Feature enabled */
        (!something_went_wrong &&
         flow->tls_quic.certificate_processed == 1 &&
-        flow->protos.tls_quic.hello_processed == 1) && /* TLS handshake found without errors */
+        flow->protos.tls_quic.client_hello_processed == 1 &&
+        flow->protos.tls_quic.server_hello_processed == 1) && /* TLS handshake found without errors */
        flow->detected_protocol_stack[0] == NDPI_PROTOCOL_TLS && /* No IMAPS/FTPS/... */
        flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN && /* No sub-classification */
        ntohs(flow->s_port) == 8080 && /* Ookla port */
