@@ -451,7 +451,7 @@ void ndpi_set_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
   if(!b || !b->u.bins8 || b->num_bins == 0)
     return;
 
-  if(slot_id >= b->num_bins) slot_id = 0;
+  if(slot_id >= b->num_bins) slot_id = b->num_bins - 1;
 
   switch(b->family) {
   case ndpi_bin_family8:
@@ -477,7 +477,7 @@ void ndpi_inc_bin(struct ndpi_bin *b, u_int16_t slot_id, u_int64_t val) {
 
   b->is_empty = 0;
 
-  if(slot_id >= b->num_bins) slot_id = 0;
+  if(slot_id >= b->num_bins) slot_id = b->num_bins - 1;
 
   switch(b->family) {
   case ndpi_bin_family8:
@@ -501,7 +501,7 @@ u_int64_t ndpi_get_bin_value(struct ndpi_bin *b, u_int16_t slot_id) {
   if(!b || !b->u.bins8 || b->num_bins == 0)
     return(0);
 
-  if(slot_id >= b->num_bins) slot_id = 0;
+  if(slot_id >= b->num_bins) slot_id = b->num_bins - 1;
 
   switch(b->family) {
   case ndpi_bin_family8:
