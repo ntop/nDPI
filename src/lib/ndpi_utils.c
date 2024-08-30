@@ -2473,7 +2473,6 @@ ndpi_http_method ndpi_http_str2method(const char* method, u_int16_t method_len) 
       return(NDPI_HTTP_METHOD_MOVE);
     else
       return(NDPI_HTTP_METHOD_MKCOL);
-    break;
 
   case 'P':
     switch(method[1]) {

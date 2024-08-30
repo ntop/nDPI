@@ -20,8 +20,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_patricia_tree_stats patricia_stats;
   struct ndpi_automa_stats automa_stats;
   int cat, idx;
-  u_int16_t pid;
-  char *protoname;
+  u_int16_t pid, pid2;
+  char *protoname, *protoname2;
+  char pids_name[32];
   const char *name;
   char catname[] = "name";
   struct ndpi_flow_input_info input_info;
@@ -471,7 +472,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
   protoname = ndpi_get_proto_by_id(ndpi_info_mod, pid);
   if (protoname) {
-    assert(ndpi_get_proto_by_name(ndpi_info_mod, protoname) == pid);
+    ndpi_get_proto_by_name(ndpi_info_mod, protoname);
+
+    pid2 = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
+    protoname2 = ndpi_get_proto_by_id(ndpi_info_mod, pid2);
+    if(protoname2) {
+      snprintf(pids_name, sizeof(pids_name), "%s.%s", protoname, protoname2);
+      pids_name[sizeof(pids_name) - 1] = '\0';
+      ndpi_get_protocol_by_name(ndpi_info_mod, pids_name);
+    }
   }
   ndpi_map_user_proto_id_to_ndpi_id(ndpi_info_mod, pid);
   ndpi_map_ndpi_id_to_user_proto_id(ndpi_info_mod, pid);
@@ -534,6 +543,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_ip_proto_name(fuzzed_data.ConsumeIntegral<u_int8_t>(), NULL, 0);
   }
   ndpi_risk2str(static_cast<ndpi_risk_enum>(fuzzed_data.ConsumeIntegral<u_int64_t>()));
+  ndpi_risk2code(static_cast<ndpi_risk_enum>(fuzzed_data.ConsumeIntegral<u_int64_t>()));
+  ndpi_code2risk(ndpi_risk2code(static_cast<ndpi_risk_enum>(fuzzed_data.ConsumeIntegralInRange(0, NDPI_MAX_RISK + 1))));
   ndpi_severity2str(static_cast<ndpi_risk_severity>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
   ndpi_risk2score(static_cast<ndpi_risk_enum>(fuzzed_data.ConsumeIntegral<u_int64_t>()), &unused1, &unused2);
   ndpi_http_method2str(static_cast<ndpi_http_method>(fuzzed_data.ConsumeIntegral<u_int8_t>()));
@@ -604,6 +615,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
                                   { NDPI_PARAM_ISSUER_DN, (void *)("CN=813845657003339838, O=Code42, OU=TEST, ST=MN, C=US") /* from example/protos.txt */},
                                   { NDPI_PARAM_HOST_IPV4, &flow.c_address.v4} };
     ndpi_check_flow_risk_exceptions(ndpi_info_mod, 3, params);
+
+    ndpi_risk_params params2[] = { { NDPI_MAX_RISK_PARAM_ID, &flow.c_address.v4} }; /* Invalid */
+    ndpi_check_flow_risk_exceptions(ndpi_info_mod, 1, params2);
   }
   /* TODO: stub for geo stuff */
   ndpi_get_geoip_asn(ndpi_info_mod, NULL, NULL);

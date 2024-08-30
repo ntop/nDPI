@@ -159,6 +159,39 @@ struct gre_header {
     __u16	protocol;
 };
 
+#define GTP_MSG_TPDU	0xFF
+
+struct gtp_header {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
+	u_int16_t n_pdu:1,
+		  sequence:1,
+		  extension:1,
+		  reserved:1,
+		  protocol:1,
+		  version:3,
+		  type:8;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+	u_int16_t version:3,
+		  protocol:1,
+		  reserved:1,
+		  extension:1,
+		  sequence:1,
+		  n_pdu:1,
+		  type:8;
+#else
+#error "Adjust your <asm/byteorder.h> defines"
+#endif
+	u_int16_t total_length;
+	u_int32_t teid;
+};
+
+struct gtp_header_optional {
+	u_int16_t sn;
+	u_int8_t n_pdu_nbr;
+	u_int8_t next_hdr;
+};
+
+
 struct m_pkt {
 	unsigned char *raw_data;
 	struct pcap_pkthdr header;
@@ -166,6 +199,7 @@ struct m_pkt {
 	int l2_offset;
 	int prev_l3_offset;
 	u_int16_t prev_l3_proto;
+	int gtp_offset;
 	int l3_offset;
 	u_int16_t l3_proto;
 	int l4_offset;
@@ -298,9 +332,13 @@ static int dissect_l2(int datalink_type, struct m_pkt *p)
 	case DLT_PPP:
 	case DLT_C_HDLC:
 		if (data[l2_offset + 0] == 0x0f || data[l2_offset + 0] == 0x8f) {
+			if (data_len < l2_offset + 4)
+				return -1;
 			l3_offset = 4;
 			l3_proto = ntohs(*((u_int16_t *)&data[l2_offset + 2]));
 		} else {
+			if (data_len < l2_offset + 2)
+				return -1;
 			l3_offset = l2_offset + 2;
 			next = ntohs(*((u_int16_t *)&data[l2_offset + 0]));
 			switch (next) {
@@ -704,6 +742,136 @@ static int dissect_l4(struct m_pkt *p)
 	}
 	return 0;
 }
+static int is_gtp_u(unsigned char *gtp_buffer, int gtp_buffer_len,
+		    const struct m_pkt *p, u_int16_t *l3_proto)
+{
+	struct gtp_header *gtp_h;
+	struct udphdr *udp_h;
+	uint16_t new_layer_len = 0;
+	unsigned char sub_proto;
+
+	if (p->l4_proto != IPPROTO_UDP ||
+	    gtp_buffer_len < (int)sizeof(struct gtp_header))
+		return 0;
+
+	/* Only default port */
+	udp_h = (struct udphdr *)(p->raw_data + p->l4_offset);
+	if(udp_h->source != htons(2152) &&
+	   udp_h->dest != htons(2152))
+		return 0;
+
+	gtp_h = (struct gtp_header *)gtp_buffer;
+
+	if (gtp_h->version != 1 ||
+	    gtp_h->type != GTP_MSG_TPDU ||
+	    gtp_h->reserved != 0 ||
+	    ntohs(gtp_h->total_length) > (gtp_buffer_len - sizeof(struct gtp_header))) {
+		ddbg("Invalid gtp header: %d, 0x%x, 0x%0x, %d vs %d\n",
+		     gtp_h->version, gtp_h->type, gtp_h->reserved,
+		     ntohs(gtp_h->total_length), gtp_buffer_len);
+		return 0;
+	}
+
+	new_layer_len = sizeof(struct gtp_header);
+
+	/* Optional header version 1 */
+	if (gtp_h->extension || gtp_h->sequence || gtp_h->n_pdu) {
+		new_layer_len += sizeof(struct gtp_header_optional);
+
+		if (gtp_buffer_len < new_layer_len)
+			return 0;
+	}
+	if (gtp_h->extension) {
+		unsigned int length = 0;
+
+		while (new_layer_len < (gtp_buffer_len - 1)) {
+			length = gtp_buffer[new_layer_len] << 2;
+			new_layer_len += length;
+			if (new_layer_len > gtp_buffer_len ||
+			    gtp_buffer[new_layer_len - 1] == 0 || length == 0)
+				break;
+		}
+		if (new_layer_len > gtp_buffer_len ||
+		    gtp_buffer[new_layer_len - 1] != 0 ||
+		    length == 0) {
+			return 0;
+		}
+	}
+
+	/* Trying to detect next proto. Code taken from wireshark */
+	if (gtp_buffer_len < new_layer_len + 1)
+		return 0;
+	sub_proto = gtp_buffer[new_layer_len];
+	if ((sub_proto >= 0x45) && (sub_proto <= 0x4e)) {
+		/* This is most likely an IPv4 packet
+		 * we can exclude 0x40 - 0x44 because the minimum header size is 20 octets
+		 * 0x4f is excluded because PPP protocol type "IPv6 header compression"
+		 * with protocol field compression is more likely than a plain
+		 * IPv4 packet with 60 octet header size */
+		*l3_proto = ETH_P_IP;
+	} else if ((sub_proto & 0xf0) == 0x60) {
+		/* This is most likely an IPv6 packet */
+		*l3_proto = ETH_P_IPV6;
+	} else {
+		/* This seems to be a PPP packet */
+                /* TODO: code not back-ported from wireshark yet*/
+		return 0;
+	}
+
+	return new_layer_len;
+}
+static int dissect_l4_detunneling(struct m_pkt *p)
+{
+	unsigned char *data = p->raw_data + p->l5_offset;
+	int data_len = p->header.caplen - p->l5_offset;
+	u_int16_t next_l3_proto;
+	int gtp_header_len, rc;
+
+	ddbg("L4(detunel): l4_proto %d data_len %d l5_length %d\n",
+	     p->l4_proto, data_len, p->l5_length);
+
+	if (data_len < 0 || p->l5_length > data_len)
+		return -1;
+
+	/* TODO: try to handle tunnel over fragment */
+	if (p->is_l3_fragment) {
+		ddbg("Skip L4(detunnel) dissection because it is a fragment\n");
+		return 0;
+	}
+	/* No reasons to detunnel if we skipped L4 dissection */
+	if (p->skip_l4_dissection) {
+		ddbg("Skip L4 dissection\n");
+		return 0;
+	}
+
+	/* GTP detunneling: looking only for MSG T-PDU that carries
+	   encapsulated data */
+	gtp_header_len = is_gtp_u(data, data_len, p, &next_l3_proto);
+	if (gtp_header_len > 0) {
+		ddbg("Found GTP-U\n");
+		if (p->prev_l3_proto == 0) {
+			assert(p->prev_l3_offset == 0);
+			p->prev_l3_proto = p->l3_proto;
+			p->prev_l3_offset = p->l3_offset;
+		} else {
+			derr("Multiple tunnels. Unsupported\n");
+			return -1;
+		}
+		assert(p->gtp_offset == 0);
+		p->gtp_offset = p->l5_offset;
+		p->l3_proto = next_l3_proto;
+		p->l3_offset = p->l5_offset + gtp_header_len;
+		rc = dissect_l3(p);
+		if (rc != 0) {
+			derr("Error dissect_l3 (after gtp)\n");
+			return -1;
+		}
+		return dissect_l4(p);
+	}
+
+	/* "Normal" L4 traffic */
+	return 0;
+}
 static int dissect_do(int datalink_type, struct m_pkt *p)
 {
 	int rc;
@@ -721,6 +889,12 @@ static int dissect_do(int datalink_type, struct m_pkt *p)
 	rc = dissect_l4(p);
 	if (rc != 0) {
 		derr("Error dissect_l4\n");
+		return -1;
+	}
+	/* Some kind of detunneling over L4 (usually over UDP). Example: GTP */
+	rc = dissect_l4_detunneling(p);
+	if (rc != 0) {
+		derr("Error dissect_l5\n");
 		return -1;
 	}
 	return 0;
@@ -788,6 +962,7 @@ static void update_do_l7(struct m_pkt *p)
 {
 	struct udphdr *udp_h;
 	struct tcphdr *tcp_h;
+	struct gtp_header *gtp_h;
 	size_t new_l5_len;
 	int l4_header_len = 0;
 	int l5_len_diff;
@@ -851,6 +1026,16 @@ static void update_do_l7(struct m_pkt *p)
 	} else if(p->prev_l3_proto == ETH_P_IPV6) {
 		ip6 = (struct ip6_hdr *)(p->raw_data + p->prev_l3_offset);
 		ip6->ip6_plen = htons(ntohs(ip6->ip6_plen) + l5_len_diff);
+	}
+
+	/* Update GTP header */
+	if (p->gtp_offset) {
+		gtp_h = (struct gtp_header *)(p->raw_data + p->gtp_offset);
+		gtp_h->total_length = htons(ntohs(gtp_h->total_length) + l5_len_diff);
+		/* Update previous UDP header */
+		assert(p->gtp_offset > (int)sizeof(struct udphdr));
+		udp_h = (struct udphdr *)(p->raw_data + p->gtp_offset - sizeof(struct udphdr));
+		udp_h->len = htons(ntohs(udp_h->len) + l5_len_diff);
 	}
 
 	p->l5_length = new_l5_len;
@@ -951,6 +1136,7 @@ static struct m_pkt *__dup_pkt(struct m_pkt *p)
 	n->l2_offset = p->l2_offset;
 	n->prev_l3_offset = p->prev_l3_offset;
 	n->prev_l3_proto = p->prev_l3_proto;
+	n->gtp_offset = p->gtp_offset;
 	n->l4_offset = p->l4_offset;
 	n->l3_offset = p->l3_offset;
 	n->l3_proto = p->l3_proto;
