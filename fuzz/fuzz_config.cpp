@@ -151,6 +151,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "tls", "subclassification", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "quic", "subclassification", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     ndpi_set_config(ndpi_info_mod, "smtp", "tls_dissection", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
@@ -207,6 +217,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     ndpi_set_config(ndpi_info_mod, "http", "process_response", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "http", "subclassification", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 0x01 + 1);

@@ -337,7 +337,8 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
 				int is_from_client) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
+  if(ndpi_struct->cfg.tls_subclassification_enabled &&
+     flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
     /* Subprotocol not yet set */
 
     if(ndpi_struct->tls_cert_cache) {
@@ -689,11 +690,13 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 		      }
 		    }
 
-		    if(!flow->protos.tls_quic.subprotocol_detected)
+		    if(ndpi_struct->cfg.tls_subclassification_enabled &&
+		       !flow->protos.tls_quic.subprotocol_detected) {
 		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, __get_master(ndpi_struct, flow), dNSName, dNSName_len)) {
 			flow->protos.tls_quic.subprotocol_detected = 1;
 		        ndpi_unset_risk(flow, NDPI_NUMERIC_IP_HOST);
 		      }
+		    }
 
 		    i += len;
 		  } else {
@@ -726,7 +729,8 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
   if(rdn_len && (flow->protos.tls_quic.subjectDN == NULL)) {
     flow->protos.tls_quic.subjectDN = ndpi_strdup(rdnSeqBuf);
 
-    if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
+    if(ndpi_struct->cfg.tls_subclassification_enabled &&
+       flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
       /* No idea what is happening behind the scenes: let's check the certificate */
       u_int32_t val;
       int rc = ndpi_match_string_value(ndpi_struct->tls_cert_subject_automa.ac_automa,
@@ -2325,10 +2329,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    }
 
 		    if(!is_quic) {
-		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, __get_master(ndpi_struct, flow), sni, sni_len))
+		      if(ndpi_struct->cfg.tls_subclassification_enabled &&
+		         ndpi_match_hostname_protocol(ndpi_struct, flow, __get_master(ndpi_struct, flow), sni, sni_len))
 		        flow->protos.tls_quic.subprotocol_detected = 1;
 		    } else {
-		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, sni, sni_len))
+		      if(ndpi_struct->cfg.quic_subclassification_enabled &&
+		         ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, sni, sni_len))
 		        flow->protos.tls_quic.subprotocol_detected = 1;
 		    }
 
@@ -2614,8 +2620,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    /* Without SNI matching we can try to sub-classify the flow via ALPN.
 		       Note that this happens only on very rare cases, not the common ones
 		       ("h2", "http/1.1", ...). Usefull for asymmetric traffic */
-		    if(!flow->protos.tls_quic.subprotocol_detected)
-	              tls_subclassify_by_alpn(ndpi_struct, flow);
+		    if(!flow->protos.tls_quic.subprotocol_detected) {
+		      if((is_quic && ndpi_struct->cfg.quic_subclassification_enabled) ||
+		         (!is_quic && ndpi_struct->cfg.tls_subclassification_enabled))
+	                tls_subclassify_by_alpn(ndpi_struct, flow);
+		    }
 		  }
 		}
 
