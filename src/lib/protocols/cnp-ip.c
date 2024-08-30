@@ -59,7 +59,7 @@ void init_cnp_ip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
   ndpi_set_bitmask_protocol_detection("CNP-IP", ndpi_struct, *id,
                                       NDPI_PROTOCOL_CNP_IP,
                                       ndpi_search_cnp_ip,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
 
