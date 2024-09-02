@@ -170,9 +170,9 @@ This is a placeholder for traffic exchanged with domain names that are considere
 
 .. _Risk 028:
 
-NDPI_MALICIOUS_JA3
-==================
-`JA3 <https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967>`_ is a method to fingerprint TLS traffic. This risk indicates that the JA3 of the TLS connection is considered suspicious (i.e. it has been found in known malware JA3 blacklists). nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).
+NDPI_MALICIOUS_FINGERPRINT
+==========================
+This risk indicates that the Fingerprint of the TLS connection is considered suspicious. nDPI does not fill this risk that instead should be filled by aplications sitting on top of nDPI (e.g. ntopng).
 
 .. _Risk 029:
 
