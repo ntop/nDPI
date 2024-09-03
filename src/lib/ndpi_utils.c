@@ -2083,19 +2083,19 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("TCP Connection Issues");
 
   case NDPI_FULLY_ENCRYPTED:
-    return("Fully encrypted flow");
+    return("Fully Encrypted Flow");
 
   case NDPI_TLS_ALPN_SNI_MISMATCH:
     return("ALPN/SNI Mismatch");
 
   case NDPI_MALWARE_HOST_CONTACTED:
-    return("Client contacted a malware host");
+    return("Client Contacted A Malware Host");
 
   case NDPI_BINARY_DATA_TRANSFER:
-    return("Binary file/data transfer (attempt)");
+    return("Binary File/Data Transfer (Attempt)");
 
   case NDPI_PROBING_ATTEMPT:
-    return("Probing attempt");
+    return("Probing Attempt");
 
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
