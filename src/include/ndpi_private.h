@@ -236,6 +236,9 @@ struct ndpi_detection_module_config_struct {
   int tls_ja3c_fingerprint_enabled;
   int tls_ja3s_fingerprint_enabled;
   int tls_ja4c_fingerprint_enabled;
+  int tls_subclassification_enabled;
+
+  int quic_subclassification_enabled;
 
   int smtp_opportunistic_tls_enabled;
 
@@ -257,6 +260,7 @@ struct ndpi_detection_module_config_struct {
   int dns_parse_response_enabled;
 
   int http_parse_response_enabled;
+  int http_subclassification_enabled;
 
   int ookla_aggressiveness;
 

@@ -466,6 +466,11 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
   u_int16_t master_protocol;
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
+  if(!ndpi_struct->cfg.http_subclassification_enabled) {
+    NDPI_LOG_DBG2(ndpi_struct, "Skip sub-protocol check because subclassification is disabled\n");
+    return;
+  }
+
   master_protocol = NDPI_PROTOCOL_HTTP;
   if(flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)
     master_protocol = flow->detected_protocol_stack[1];
