@@ -952,7 +952,7 @@ static void ndpi_process_packet(uint8_t * const args,
 	  flow_to_process->detected_l7_protocol.proto.app_protocol == NDPI_PROTOCOL_TLS)
         {
 	  if (flow_to_process->tls_client_hello_seen == 0 &&
-	      flow_to_process->ndpi_flow->protos.tls_quic.hello_processed != 0)
+	      flow_to_process->ndpi_flow->protos.tls_quic.client_hello_processed != 0)
             {
 	      uint8_t unknown_tls_version = 0;
 	      char buf_ver[16];

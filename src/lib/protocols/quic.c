@@ -1395,7 +1395,7 @@ void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload_packet_len = crypto_data_len;
 
   processClientServerHello(ndpi_struct, flow, flow->protos.tls_quic.quic_version);
-  flow->protos.tls_quic.hello_processed = 1; /* Allow matching of custom categories */
+  flow->protos.tls_quic.client_hello_processed = 1; /* Allow matching of custom categories */
 
   /* Restore */
   packet->payload = p;
@@ -1462,7 +1462,7 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
                                   flow->host_server_name,
                                   strlen(flow->host_server_name),
                                   &ret_match, NDPI_PROTOCOL_QUIC);
-      flow->protos.tls_quic.hello_processed = 1; /* Allow matching of custom categories */
+      flow->protos.tls_quic.client_hello_processed = 1; /* Allow matching of custom categories */
 
       ndpi_check_dga_name(ndpi_struct, flow,
                           flow->host_server_name, 1, 0);
