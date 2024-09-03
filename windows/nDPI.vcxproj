@@ -386,6 +386,7 @@
     <ClCompile Include="..\src\lib\protocols\openwire.c" />
     <ClCompile Include="..\src\lib\protocols\cnp-ip.c" />
     <ClCompile Include="..\src\lib\protocols\trdp.c" />
+    <ClCompile Include="..\src\lib\protocols\lustre.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />
