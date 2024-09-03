@@ -136,6 +136,7 @@ ntop_fds.appl_latency_rtt = ProtoField.new("Application Latency RTT (msec)", "nt
 local f_eth_source        = Field.new("eth.src")
 local f_eth_trailer       = Field.new("eth.trailer")
 local f_vlan_trailer      = Field.new("vlan.trailer")
+local f_sll_trailer       = Field.new("sll.trailer")
 local f_vlan_id           = Field.new("vlan.id")
 local f_arp_opcode        = Field.new("arp.opcode")
 local f_arp_sender_mac    = Field.new("arp.src.hw_mac")
@@ -1055,20 +1056,30 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
    if(dissect_ndpi_trailer) then
       local eth_trailer = {f_eth_trailer()}
       local vlan_trailer = {f_vlan_trailer()}
+      local sll_trailer = {f_sll_trailer()}
 
       -- nDPI trailer is usually the (only one) ethernet trailer.
-      -- But, depending on Wireshark configuration and on L2 protocols, the
+      -- But, depending on Wireshark configuration, on L2 protocols and on data link type, the
       -- situation may be more complex. Let's try to handle the most common cases:
       --  1) with (multiple) ethernet trailers, nDPI trailer is usually the last one
       --  2) with VLAN encapsulation, nDPI trailer is usually recognized as vlan trailer
+      --  3) with Linux "cooked" capture encapsulation, nDPI trailer is usually recognized as sll trailer
+      -- Note that it might not work with PPP-like encapsulations
       if(eth_trailer[#eth_trailer] ~= nil or
-         vlan_trailer[#vlan_trailer] ~= nil) then
+         vlan_trailer[#vlan_trailer] ~= nil or
+         sll_trailer[#sll_trailer] ~= nil) then
 
 	 local ndpi_trailer
+	 local trailer_tvb
 	 if (eth_trailer[#eth_trailer] ~= nil) then
 	     ndpi_trailer = getval(eth_trailer[#eth_trailer])
-	 else
+	     trailer_tvb = eth_trailer[#eth_trailer].range()
+	 elseif(vlan_trailer[#vlan_trailer] ~= nil) then
 	     ndpi_trailer = getval(vlan_trailer[#vlan_trailer])
+	     trailer_tvb = vlan_trailer[#vlan_trailer].range()
+	 else
+	     ndpi_trailer = getval(sll_trailer[#sll_trailer])
+	     trailer_tvb = sll_trailer[#sll_trailer].range()
 	 end
 	 local magic = string.sub(ndpi_trailer, 1, 11)
 
@@ -1076,7 +1087,6 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    local ndpikey, srckey, dstkey, flowkey, flow_risk
 	    local flow_risk_tree, metadata_list_tree, metadata_tree
 	    local name
-	    local trailer_tvb          = tvb(tvb:len() - 294 , 290) -- The last 4 bytes are the CRC. Even if nDPI needs to update it, it is not part of the nDPI trailer, strictly speaking
 	    local ndpi_subtree         = tree:add(ndpi_proto, trailer_tvb, "nDPI Protocol")
 	    
 	    ndpi_subtree:add(ndpi_fds.magic, trailer_tvb(0, 4))

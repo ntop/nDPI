@@ -246,6 +246,8 @@ static pcap_t *extcap_fifo_h = NULL;
 static char extcap_buf[16384];
 static char *extcap_capture_fifo    = NULL;
 static u_int16_t extcap_packet_filter = (u_int16_t)-1;
+static int do_extcap_capture = 0;
+static int extcap_add_crc = 0;
 
 // struct associated to a workflow for a thread
 struct reader_thread {
@@ -903,12 +905,12 @@ void extcap_config() {
 
 /* ********************************** */
 
-void extcap_capture() {
+void extcap_capture(int datalink_type) {
 #ifdef DEBUG_TRACE
   if(trace) fprintf(trace, " #### %s #### \n", __FUNCTION__);
 #endif
 
-  if((extcap_fifo_h = pcap_open_dead(DLT_EN10MB, 16384 /* MTU */)) == NULL) {
+  if((extcap_fifo_h = pcap_open_dead(datalink_type, 16384 /* MTU */)) == NULL) {
     fprintf(stderr, "Error pcap_open_dead");
 
 #ifdef DEBUG_TRACE
@@ -1051,7 +1053,7 @@ static void parseOptions(int argc, char **argv) {
   int opt;
 #ifndef USE_DPDK
   char *__pcap_file = NULL;
-  int thread_id, do_capture = 0;
+  int thread_id;
 #ifdef __linux__
   char *bind_mask = NULL;
   u_int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
@@ -1357,7 +1359,7 @@ static void parseOptions(int argc, char **argv) {
 
 #ifndef USE_DPDK
     case '5':
-      do_capture = 1;
+      do_extcap_capture = 1;
       break;
 #endif
 
@@ -1434,9 +1436,8 @@ static void parseOptions(int argc, char **argv) {
     printCSVHeader();
 
 #ifndef USE_DPDK
-  if(do_capture) {
+  if(do_extcap_capture) {
     quiet_mode = 1;
-    extcap_capture();
   }
 
   if(!domain_to_check && !ip_port_to_check) {
@@ -4526,15 +4527,18 @@ static void ndpi_process_packet(u_char *args,
 	 )
      ) {
     struct pcap_pkthdr h;
-    u_int32_t *crc, delta = sizeof(struct ndpi_packet_trailer) + 4 /* ethernet trailer */;
+    u_int32_t *crc, delta = sizeof(struct ndpi_packet_trailer);
     struct ndpi_packet_trailer *trailer;
     u_int16_t cli_score, srv_score;
 
     memcpy(&h, header, sizeof(h));
 
-    if(h.caplen > (sizeof(extcap_buf)-sizeof(struct ndpi_packet_trailer) - 4)) {
+    if(extcap_add_crc)
+      delta += 4; /* ethernet trailer */
+
+    if(h.caplen > (sizeof(extcap_buf) - delta)) {
       printf("INTERNAL ERROR: caplen=%u\n", h.caplen);
-      h.caplen = sizeof(extcap_buf)-sizeof(struct ndpi_packet_trailer) - 4;
+      h.caplen = sizeof(extcap_buf) - delta;
     }
 
     trailer = (struct ndpi_packet_trailer*)&extcap_buf[h.caplen];
@@ -4596,8 +4600,10 @@ static void ndpi_process_packet(u_char *args,
     tlv->length = ntohs(WIRESHARK_METADATA_SIZE - tot_len - 4);
     /* The remaining bytes are already set to 0 */
 
-    crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
-    *crc = ndpi_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer), 0);
+    if(extcap_add_crc) {
+      crc = (uint32_t*)&extcap_buf[h.caplen+sizeof(struct ndpi_packet_trailer)];
+      *crc = ndpi_crc32((const void*)extcap_buf, h.caplen+sizeof(struct ndpi_packet_trailer), 0);
+    }
     h.caplen += delta, h.len += delta;
 
 #ifdef DEBUG_TRACE
@@ -4654,6 +4660,17 @@ static void ndpi_process_packet(u_char *args,
 static void runPcapLoop(u_int16_t thread_id) {
   if((!shutdown_app) && (ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)) {
     int datalink_type = pcap_datalink(ndpi_thread_info[thread_id].workflow->pcap_handle);
+
+    /* When using as extcap interface, the output/dumper pcap must have the same datalink
+       type of the input traffic [to be able to use, for example, input pcaps with
+       Linux "cooked" capture encapsulation (i.e. captured with "any" interface...) where
+       there isn't an ethernet header] */
+    if(do_extcap_capture) {
+      extcap_capture(datalink_type);
+      if(datalink_type == DLT_EN10MB)
+        extcap_add_crc = 1;
+    }
+
     if(!ndpi_is_datalink_supported(datalink_type)) {
       printf("Unsupported datalink %d. Skip pcap\n", datalink_type);
       return;
