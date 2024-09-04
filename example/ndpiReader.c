@@ -235,6 +235,7 @@ struct ndpi_packet_trailer {
   ndpi_master_app_protocol proto;
   ndpi_risk flow_risk;
   u_int16_t flow_score;
+  char flow_risk_info[32];
   char name[16];
   /* TLV of attributes. Having a max and fixed size for all the metadata
      is not efficient but greatly improves detection of the trailer by Wireshark */
@@ -4547,6 +4548,10 @@ static void ndpi_process_packet(u_char *args,
     trailer->magic = htonl(WIRESHARK_NTOP_MAGIC);
     trailer->flow_risk = htonl64(flow_risk);
     trailer->flow_score = htons(ndpi_risk2score(flow_risk, &cli_score, &srv_score));
+    if(flow->risk_str) {
+      strncpy(trailer->flow_risk_info, flow->risk_str, sizeof(trailer->flow_risk_info));
+      trailer->flow_risk_info[sizeof(trailer->flow_risk_info) - 1] = '\0';
+    }
     trailer->proto.master_protocol = htons(p.proto.master_protocol), trailer->proto.app_protocol = htons(p.proto.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
 
