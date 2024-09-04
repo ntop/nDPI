@@ -37,6 +37,7 @@ ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndp
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
 ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64, nil, base.HEX)
 ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Score", "ndpi.flow_score", ftypes.UINT32)
+ndpi_fds.flow_risk_info       = ProtoField.new("nDPI Flow Risk Info", "ndpi.flow_risk_info", ftypes.STRING)
 
 ndpi_fds.metadata_list        = ProtoField.new("nDPI Metadata List", "ndpi.metadata_list", ftypes.NONE)
 ndpi_fds.metadata             = ProtoField.new("nDPI Metadata", "ndpi.metadata", ftypes.NONE)
@@ -1123,18 +1124,19 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    if(flow_score > 0) then
 	       local level
 	       if(flow_score <= 10) then     -- NDPI_SCORE_RISK_LOW
-		  level = PI_NOTE
+		  level = PI_CHAT
 	       elseif(flow_score <= 50) then -- NDPI_SCORE_RISK_MEDIUM
-		  level = PI_WARN
+		  level = PI_NOTE
 	       else
-		  level = PI_ERROR
+		  level = PI_WARN
 	       end
 	       
 	       ndpi_subtree:add_expert_info(PI_PROTOCOL, level, "Non zero score")
 	    end
 
-	    ndpi_subtree:add(ndpi_fds.name, trailer_tvb(18, 16))
-	    name = trailer_tvb(18, 16):string()
+	    ndpi_subtree:add(ndpi_fds.flow_risk_info, trailer_tvb(18, 32))
+	    ndpi_subtree:add(ndpi_fds.name, trailer_tvb(50, 16))
+	    name = trailer_tvb(50, 16):string()
 
 	    if(application_protocol ~= 0) then	       
 	       -- Set protocol name in the wireshark protocol column (if not Unknown)
@@ -1143,9 +1145,9 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    end
 
 	    -- Metadata
-	    local offset = 34
+	    local offset = 66
 	    metadata_list_tree = ndpi_subtree:add(ndpi_fds.metadata_list, trailer_tvb(offset, 256))
-	    while offset + 4 < 294 do
+	    while offset + 4 < 326 do
 
 	       local mtd_type = trailer_tvb(offset, 2):int();
 	       local mtd_length = trailer_tvb(offset + 2, 2):int();
