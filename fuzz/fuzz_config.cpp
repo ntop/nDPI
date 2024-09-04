@@ -242,6 +242,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 0x01 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "openvpn", "dpi.heuristics", cfg_value);
+    value = fuzzed_data.ConsumeIntegralInRange(0, 255 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "openvpn", "dpi.heuristics.num_messages", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 0x01 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     ndpi_set_config(ndpi_info_mod, "openvpn", "subclassification_by_ip", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {

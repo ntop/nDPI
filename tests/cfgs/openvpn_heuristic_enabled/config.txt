@@ -1,0 +1,1 @@
+--cfg=openvpn,dpi.heuristics,0x01 --cfg=packets_limit_per_flow,64
