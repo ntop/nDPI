@@ -453,6 +453,7 @@ typedef enum {
   NDPI_PROTOCOL_CNP_IP                = 422,
   NDPI_PROTOCOL_ATG                   = 423,
   NDPI_PROTOCOL_TRDP                  = 424,
+  NDPI_PROTOCOL_LUSTRE                = 425,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
