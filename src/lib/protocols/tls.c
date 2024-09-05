@@ -1658,7 +1658,8 @@ static bool is_grease_version(u_int16_t version) {
 
 /* **************************************** */
 
-static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
+static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow,
 			     u_int32_t quic_version,
 			     union ja_info *ja) {
   u_int8_t tmp_str[JA_STR_LEN];
@@ -1670,6 +1671,9 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
   char * const ja_str = &flow->protos.tls_quic.ja4_client[0];
   const u_int16_t ja_max_len = sizeof(flow->protos.tls_quic.ja4_client);
   bool is_dtls = ((flow->l4_proto == IPPROTO_UDP) && (quic_version == 0)) || flow->stun.maybe_dtls;
+  int ja4_r_len = 0;
+  char ja4_r[1024];
+  
   /*
     Compute JA4 TLS/QUIC client
 
@@ -1771,6 +1775,12 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
     if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;
   }
 
+  ja_str[ja_str_len] = 0;
+  i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s", ja_str); if(i > 0) ja4_r_len += i;
+
+  tmp_str[tmp_str_len] = 0;
+  i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s_", tmp_str); if(i > 0) ja4_r_len += i;
+  
   ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
@@ -1802,7 +1812,18 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
 #ifdef DEBUG_JA
   printf("[EXTN] %s [len: %u]\n", tmp_str, tmp_str_len);
 #endif
+  
+  tmp_str[tmp_str_len] = 0;
+  i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s", tmp_str); if(i > 0) ja4_r_len += i;
 
+  if(ndpi_struct->cfg.tls_ja4r_fingerprint_enabled) {
+    if(flow->protos.tls_quic.ja4_client_raw == NULL)
+      flow->protos.tls_quic.ja4_client_raw = ndpi_strdup(ja4_r);
+#ifdef DEBUG_JA
+    printf("[JA4_r] %s [len: %u]\n", ja4_r, ja4_r_len);
+#endif
+  }
+  
   ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
@@ -1812,6 +1833,7 @@ static void ndpi_compute_ja4(struct ndpi_flow_struct *flow,
   if((rc > 0) && (ja_str_len + rc < JA_STR_LEN)) ja_str_len += rc;
 
   ja_str[36] = 0;
+
 #ifdef DEBUG_JA
   printf("[JA4] %s [len: %lu]\n", ja_str, strlen(ja_str));
 #endif
@@ -2901,7 +2923,7 @@ compute_ja3c:
 	      }
 
 	      if(ndpi_struct->cfg.tls_ja4c_fingerprint_enabled) {
-	        ndpi_compute_ja4(flow, quic_version, &ja);
+	        ndpi_compute_ja4(ndpi_struct, flow, quic_version, &ja);
 	      }
 	      /* End JA3/JA4 */
 	    }
