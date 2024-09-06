@@ -841,6 +841,10 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_TELNET */
   u_int32_t telnet_stage:2;			// 0 - 2
 
+  /* NDPI_PROTOCOL_RTMP */
+  u_int32_t rtmp_stage:2;
+  u_int16_t rtmp_client_buffer_len;
+
   struct {
     /* NDPI_PROTOCOL_TLS */
     u_int8_t app_data_seen[2];
@@ -1492,9 +1496,6 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_FTP_CONTROL */
   u_int8_t ftp_control_stage:2;
-
-  /* NDPI_PROTOCOL_RTMP */
-  u_int8_t rtmp_stage:2;
 
   /* NDPI_PROTOCOL_STARCRAFT */
   u_int8_t starcraft_udp_stage : 3;	// 0-7
