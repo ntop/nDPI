@@ -186,9 +186,11 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(is_rtp == IS_RTP) {
     if(flow->rtp_stage == 2) {
-      if(flow->l4.udp.line_pkts[0] >= 2 && flow->l4.udp.line_pkts[1] >= 2) {
+      if(flow->l4_proto == IPPROTO_UDP &&
+         flow->l4.udp.line_pkts[0] >= 2 && flow->l4.udp.line_pkts[1] >= 2) {
         /* It seems that it is a LINE stuff; let its dissector to evaluate */
-      } else if(flow->l4.udp.epicgames_stage > 0) {
+      } else if(flow->l4_proto == IPPROTO_UDP &&
+                flow->l4.udp.epicgames_stage > 0) {
         /* It seems that it is a EpicGames stuff; let its dissector to evaluate */
       } else if(flow->rtp_seq_set[packet->packet_direction] &&
                 flow->rtp_seq[packet->packet_direction] == seq) {
