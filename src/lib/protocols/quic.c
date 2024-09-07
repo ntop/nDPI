@@ -1527,6 +1527,54 @@ static int may_be_gquic_rej(struct ndpi_detection_module_struct *ndpi_struct)
   return 0;
 }
 
+static int may_be_sh(struct ndpi_detection_module_struct *ndpi_struct,
+		     struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int8_t last_byte;
+
+  if((packet->payload[0] & 0x40) == 0)
+    return 0;
+  if(packet->udp->dest != ntohs(443)) {
+    if(packet->udp->source ==  ntohs(443)) {
+      return -1; /* Keep looking for packets sent by the client */
+    }
+    return 0;
+  }
+
+  /* SH packet sent by the client */
+
+  /* QUIC never retransmits packet, but we should also somehow check that
+   * these 3 packets from the client are really different from each other
+   * to avoid matching retransmissions on some other protocols.
+   * To avoid saving too much state, simply check the last byte of each packet
+   * (the idea is that being QUIC fully encrypted, the bytes are somehow always
+   * different; a weak assumption, but it allow us to save only 1 byte in
+   * flow structure and it seems to work)
+   * TODO: do we need something better?
+   */
+
+  if(packet->payload_packet_len < 1 + QUIC_SERVER_CID_HEURISTIC_LENGTH)
+    return 0;
+  last_byte = packet->payload[packet->payload_packet_len - 1];
+  if(flow->l4.udp.quic_server_cid_stage > 0) {
+    if(memcmp(flow->l4.udp.quic_server_cid, &packet->payload[1],
+              QUIC_SERVER_CID_HEURISTIC_LENGTH) != 0 ||
+       flow->l4.udp.quic_client_last_byte == last_byte)
+      return 0;
+    flow->l4.udp.quic_server_cid_stage++;
+    if(flow->l4.udp.quic_server_cid_stage == 3) {
+      /* Found QUIC via 3 SHs by client */
+      return 1;
+    }
+  } else {
+    memcpy(flow->l4.udp.quic_server_cid, &packet->payload[1], QUIC_SERVER_CID_HEURISTIC_LENGTH);
+    flow->l4.udp.quic_server_cid_stage = 1;
+  }
+  flow->l4.udp.quic_client_last_byte = last_byte;
+  return -1; /* Keep looking for other packets sent by client */
+}
+
 static int may_be_0rtt(struct ndpi_detection_module_struct *ndpi_struct,
 		       uint32_t *version)
 {
@@ -1881,9 +1929,16 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
    *    CHLO/ClientHello message and we need (only) it to sub-classify
    *    the flow.
    *    Detecting QUIC sessions where the first captured packet is not a
-   *    CHLO/CH is VERY hard. Let try only 2 easy cases:
+   *    CHLO/CH is VERY hard. Let try only some easy cases:
    *    * out-of-order 0-RTT, i.e 0-RTT packets received before the Initial;
    *      in that case, keep looking for the Initial
+   *    * if we have only SH pkts, focus on standard case where server
+   *      port is 443 and default length of Server CID is >=8 (as it happens
+   *      with most common broswer and apps). Look for 3 consecutive SH
+   *      pkts send by the client and check their CIDs (note that
+   *      some QUIC implementations have Client CID length set to 0, so
+   *      checking pkts sent by server is useless). Since we don't know the
+   *      real CID length, use the min value 8, i.e. QUIC_SERVER_CID_HEURISTIC_LENGTH
    *    * with only GQUIC packets from server (usefull with unidirectional
    *      captures) look for Rejection packet
    *    Avoid the generic cases and let's see if anyone complains...
@@ -1909,6 +1964,19 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
         flow->protos.tls_quic.quic_version = 0; /* unknown */
         return;
+      }
+      ret = may_be_sh(ndpi_struct, flow);
+      if(ret == 1) {
+        NDPI_LOG_INFO(ndpi_struct, "SH Quic\n");
+        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+        flow->protos.tls_quic.quic_version = 0; /* unknown */
+	return;
+      }
+      if(ret == -1) {
+        NDPI_LOG_DBG2(ndpi_struct, "Keep looking for SH by client\n");
+        if(flow->packet_counter > 10 /* TODO */)
+          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	return;
       }
       ret = may_be_gquic_rej(ndpi_struct);
       if(ret == 1) {
