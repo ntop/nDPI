@@ -1,13 +1,11 @@
-Guessed flow protos:	1
-
-DPI Packets (TCP):	20	(20.00 pkts/flow)
-Confidence Match by port    : 1 (flows)
-Num dissector calls: 251 (251.00 diss/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    0/1/0 (insert/search/found)
 Automa host:          0/0 (search/found)
@@ -26,4 +24,4 @@ Oracle	20	2518	1
 
 Acceptable                      20 2518          1            
 
-	1	TCP 10.0.2.15:40226 <-> 10.0.72.139:1521 [proto: 167/Oracle][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 20][cat: Database/11][9 pkts/1447 bytes <-> 11 pkts/1071 bytes][Goodput ratio: 65/41][0.03 sec][bytes ratio: 0.149 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/3 20/19 7/6][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 161/97 287/293 93/71][PLAIN TEXT (DESCRIPTION)][Plen Bins: 18,18,9,9,0,9,18,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 10.0.2.15:40226 <-> 10.0.72.139:1521 [proto: 167/Oracle][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Database/11][9 pkts/1447 bytes <-> 11 pkts/1071 bytes][Goodput ratio: 65/41][0.03 sec][bytes ratio: 0.149 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/3 20/19 7/6][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 161/97 287/293 93/71][PLAIN TEXT (DESCRIPTION)][Plen Bins: 18,18,9,9,0,9,18,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
