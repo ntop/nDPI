@@ -907,6 +907,7 @@ struct ndpi_flow_udp_struct {
   u_int32_t xbox_stage:1;
 
   /* NDPI_PROTOCOL_QUIC */
+  u_int32_t quic_server_cid_stage:2;
   u_int32_t quic_0rtt_found:1;
   u_int32_t quic_vn_pair:1;
 
@@ -942,6 +943,9 @@ struct ndpi_flow_udp_struct {
   u_int8_t *quic_reasm_buf;
   u_int8_t *quic_reasm_buf_bitmap;
   u_int32_t quic_reasm_buf_last_pos;
+#define QUIC_SERVER_CID_HEURISTIC_LENGTH	8
+  u_int8_t quic_server_cid[QUIC_SERVER_CID_HEURISTIC_LENGTH];
+  u_int8_t quic_client_last_byte;
   /* DCID of the first Initial sent by the client */
   u_int8_t quic_orig_dest_conn_id[20]; /* Max length is 20 on all QUIC versions */
   u_int8_t quic_orig_dest_conn_id_len;
@@ -1544,8 +1548,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 264,
                "Size of the struct member protocols increased to more than 264 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1128,
-               "Size of the flow struct increased to more than 1120 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1136,
+               "Size of the flow struct increased to more than 1136 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

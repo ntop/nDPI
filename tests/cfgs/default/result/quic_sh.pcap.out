@@ -1,0 +1,29 @@
+DPI Packets (UDP):	14	(4.67 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 530 (176.67 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/9/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/3/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 4/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   2/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 2/2 (search/found)
+
+QUIC	38	23111	3
+
+Acceptable                      38 23111         3            
+
+	1	UDP [2001:b07:a3d:c112:91b7:b97e:6e2:fad8]:37542 <-> [2606:4700:7::a29f:9804]:443 [proto: 188/QUIC][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 5][cat: Web/5][6 pkts/634 bytes <-> 15 pkts/13073 bytes][Goodput ratio: 41/93][0.11 sec][bytes ratio: -0.907 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 7/7 20/86 9/23][Pkt Len c2s/s2c min/avg/max/stddev: 105/90 106/872 109/1262 1/472][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 6.456 (Executable?)][PLAIN TEXT (vS17md)][Plen Bins: 4,34,0,4,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,4,0,0,0,0,0,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.1.245:40408 <-> 13.226.175.53:443 [proto: 188/QUIC][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 3][cat: Web/5][4 pkts/340 bytes <-> 3 pkts/4482 bytes][Goodput ratio: 50/97][0.00 sec][bytes ratio: -0.859 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 85/1494 85/1494 85/1494 0/0][Plen Bins: 0,57,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,0,0]
+	3	UDP [2a00:1450:4002:411::200e]:443 <-> [2001:b07:a3d:c112:91b7:b97e:6e2:fad8]:33144 [proto: 188/QUIC][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 126/Google, Confidence: IP address][DPI packets: 6][cat: Web/5][3 pkts/3876 bytes <-> 7 pkts/706 bytes][Goodput ratio: 95/38][0.03 sec][bytes ratio: 0.692 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 1/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 1292/99 1292/101 1292/104 0/2][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 7.836 (Encrypted or Random?)][Plen Bins: 0,70,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,30,0,0,0,0,0,0,0,0,0]
