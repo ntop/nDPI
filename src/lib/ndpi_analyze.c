@@ -31,7 +31,7 @@
 #include "ndpi_api.h"
 #include "ndpi_config.h"
 #include "third_party/include/hll.h"
-
+#include "third_party/include/kdtree.h"
 #include "ndpi_replace_printf.h"
 
 /* ********************************************************************************* */
@@ -1916,7 +1916,7 @@ u_int32_t ndpi_crc32(const void *data, size_t length, u_int32_t crc)
 {
   const u_int8_t *p = (const u_int8_t*)data;
   crc = ~crc;
-  
+
   while (length--)
   {
     crc = crc32_ieee_table[(crc ^ *p++) & 0xFF] ^ (crc >> 8);
@@ -2077,4 +2077,53 @@ void ndpi_popcount_count(struct ndpi_popcount *h, const u_int8_t *buf, u_int32_t
     h->pop_count += __builtin_popcount(buf[buf_len - (buf_len % 4) + i]);
 
   h->tot_bytes_count += buf_len;
+}
+
+/* ********************************************************************************* */
+/* ********************************************************************************* */
+
+ndpi_kd_tree* ndpi_kd_create(u_int num_dimensions) { return(kd_create((int)num_dimensions)); }
+
+void ndpi_kd_free(ndpi_kd_tree *tree) { kd_free((struct kdtree *)tree); }
+
+void ndpi_kd_clear(ndpi_kd_tree *tree) { kd_clear((struct kdtree *)tree); }
+
+bool ndpi_kd_insert(ndpi_kd_tree *tree, const double *data_vector, void *user_data) {
+  return(kd_insert((struct kdtree *)tree, data_vector, user_data) == 0 ? true : false);
+}
+
+ndpi_kd_tree_result *ndpi_kd_nearest(ndpi_kd_tree *tree, const double *data_vector) {
+  return(kd_nearest((struct kdtree *)tree, data_vector));
+}
+
+u_int32_t ndpi_kd_num_results(ndpi_kd_tree_result *res) { return((u_int32_t)kd_res_size((struct kdres*)res)); }
+
+bool ndpi_kd_result_end(ndpi_kd_tree_result *res) { return(kd_res_end((struct kdres *)res) == 0 ? false : true); }
+
+double* ndpi_kd_result_get_item(ndpi_kd_tree_result *res, double **user_data) {
+  return(kd_res_item((struct kdres*)res, user_data));
+}
+
+bool ndpi_kd_result_next(ndpi_kd_tree_result *res) {
+  return(kd_res_next((struct kdres*)res) == 0 ? false : true);
+}
+
+void ndpi_kd_result_free(ndpi_kd_tree_result *res) { kd_res_free((struct kdres *)res); }
+
+double ndpi_kd_distance(double *a1, double *a2, u_int num_dimensions) {
+  double dist_sq = 0, diff;
+  u_int i;
+
+  for(i=0; i<num_dimensions; i++) {
+    diff = a1[i] - a2[i];
+
+#if 0
+    if(diff != 0) {
+      printf("Difference %.3f at position %u\n", diff, pos);
+    }
+#endif
+    dist_sq += diff*diff;
+  }
+
+  return(dist_sq);
 }
