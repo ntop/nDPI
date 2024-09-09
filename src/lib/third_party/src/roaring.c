@@ -7811,7 +7811,7 @@ static void binarySearch2(const uint16_t *array, int32_t n, uint16_t target1,
  * and binarySearch2. This approach can be slightly superior to a conventional
  * galloping search in some instances.
  */
-int32_t intersect_skewed_uint16(const uint16_t *small, size_t size_s,
+int32_t intersect_skewed_uint16(const uint16_t *_small, size_t size_s,
                                 const uint16_t *large, size_t size_l,
                                 uint16_t *buffer) {
     size_t pos = 0, idx_l = 0, idx_s = 0;
@@ -7821,10 +7821,10 @@ int32_t intersect_skewed_uint16(const uint16_t *small, size_t size_s,
     }
     int32_t index1 = 0, index2 = 0, index3 = 0, index4 = 0;
     while ((idx_s + 4 <= size_s) && (idx_l < size_l)) {
-        uint16_t target1 = small[idx_s];
-        uint16_t target2 = small[idx_s + 1];
-        uint16_t target3 = small[idx_s + 2];
-        uint16_t target4 = small[idx_s + 3];
+        uint16_t target1 = _small[idx_s];
+        uint16_t target2 = _small[idx_s + 1];
+        uint16_t target3 = _small[idx_s + 2];
+        uint16_t target4 = _small[idx_s + 3];
         binarySearch4(large + idx_l, (int32_t)(size_l - idx_l), target1,
                       target2, target3, target4, &index1, &index2, &index3,
                       &index4);
@@ -7844,8 +7844,8 @@ int32_t intersect_skewed_uint16(const uint16_t *small, size_t size_s,
         idx_l += index4;
     }
     if ((idx_s + 2 <= size_s) && (idx_l < size_l)) {
-        uint16_t target1 = small[idx_s];
-        uint16_t target2 = small[idx_s + 1];
+        uint16_t target1 = _small[idx_s];
+        uint16_t target2 = _small[idx_s + 1];
         binarySearch2(large + idx_l, (int32_t)(size_l - idx_l), target1,
                       target2, &index1, &index2);
         if ((index1 + idx_l < size_l) && (large[idx_l + index1] == target1)) {
@@ -7858,7 +7858,7 @@ int32_t intersect_skewed_uint16(const uint16_t *small, size_t size_s,
         idx_l += index2;
     }
     if ((idx_s < size_s) && (idx_l < size_l)) {
-        uint16_t val_s = small[idx_s];
+        uint16_t val_s = _small[idx_s];
         int32_t index =
             binarySearch(large + idx_l, (int32_t)(size_l - idx_l), val_s);
         if (index >= 0) buffer[pos++] = val_s;
@@ -7867,7 +7867,7 @@ int32_t intersect_skewed_uint16(const uint16_t *small, size_t size_s,
 }
 
 // TODO: this could be accelerated, possibly, by using binarySearch4 as above.
-int32_t intersect_skewed_uint16_cardinality(const uint16_t *small,
+int32_t intersect_skewed_uint16_cardinality(const uint16_t *_small,
                                             size_t size_s,
                                             const uint16_t *large,
                                             size_t size_l) {
@@ -7877,7 +7877,7 @@ int32_t intersect_skewed_uint16_cardinality(const uint16_t *small,
         return 0;
     }
 
-    uint16_t val_l = large[idx_l], val_s = small[idx_s];
+    uint16_t val_l = large[idx_l], val_s = _small[idx_s];
 
     while (true) {
         if (val_l < val_s) {
@@ -7887,12 +7887,12 @@ int32_t intersect_skewed_uint16_cardinality(const uint16_t *small,
         } else if (val_s < val_l) {
             idx_s++;
             if (idx_s == size_s) break;
-            val_s = small[idx_s];
+            val_s = _small[idx_s];
         } else {
             pos++;
             idx_s++;
             if (idx_s == size_s) break;
-            val_s = small[idx_s];
+            val_s = _small[idx_s];
             idx_l = advanceUntil(large, (int32_t)idx_l, (int32_t)size_l, val_s);
             if (idx_l == size_l) break;
             val_l = large[idx_l];
@@ -7902,7 +7902,7 @@ int32_t intersect_skewed_uint16_cardinality(const uint16_t *small,
     return (int32_t)pos;
 }
 
-bool intersect_skewed_uint16_nonempty(const uint16_t *small, size_t size_s,
+bool intersect_skewed_uint16_nonempty(const uint16_t *_small, size_t size_s,
                                       const uint16_t *large, size_t size_l) {
     size_t idx_l = 0, idx_s = 0;
 
@@ -7910,7 +7910,7 @@ bool intersect_skewed_uint16_nonempty(const uint16_t *small, size_t size_s,
         return false;
     }
 
-    uint16_t val_l = large[idx_l], val_s = small[idx_s];
+    uint16_t val_l = large[idx_l], val_s = _small[idx_s];
 
     while (true) {
         if (val_l < val_s) {
@@ -7920,7 +7920,7 @@ bool intersect_skewed_uint16_nonempty(const uint16_t *small, size_t size_s,
         } else if (val_s < val_l) {
             idx_s++;
             if (idx_s == size_s) break;
-            val_s = small[idx_s];
+            val_s = _small[idx_s];
         } else {
             return true;
         }
