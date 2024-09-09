@@ -2098,14 +2098,8 @@ ndpi_kd_tree_result *ndpi_kd_nearest(ndpi_kd_tree *tree, const double *data_vect
 
 u_int32_t ndpi_kd_num_results(ndpi_kd_tree_result *res) { return((u_int32_t)kd_res_size((struct kdres*)res)); }
 
-bool ndpi_kd_result_end(ndpi_kd_tree_result *res) { return(kd_res_end((struct kdres *)res) == 0 ? false : true); }
-
 double* ndpi_kd_result_get_item(ndpi_kd_tree_result *res, double **user_data) {
   return(kd_res_item((struct kdres*)res, user_data));
-}
-
-bool ndpi_kd_result_next(ndpi_kd_tree_result *res) {
-  return(kd_res_next((struct kdres*)res) == 0 ? false : true);
 }
 
 void ndpi_kd_result_free(ndpi_kd_tree_result *res) { kd_res_free((struct kdres *)res); }
