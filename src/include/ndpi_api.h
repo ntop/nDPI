@@ -1887,16 +1887,8 @@ extern "C" {
   /* returns the size of the result set (in elements) */
   u_int32_t ndpi_kd_num_results(ndpi_kd_tree_result *res);
 
-  /* returns non-zero if the set iterator reached the end after the last element */
-  bool ndpi_kd_result_end(ndpi_kd_tree_result *res);
-
   /* returns the current element and updates user_data with the data put during insert */
   double* ndpi_kd_result_get_item(ndpi_kd_tree_result *res, double **user_data);
-
-  /* advances the result set iterator, returns true on success, false
-   * there are no more elements in the result set.
-   */
-  bool ndpi_kd_result_next(ndpi_kd_tree_result *res);
 
   /* frees a result set returned by kd_nearest_range() */
   void ndpi_kd_result_free(ndpi_kd_tree_result *res);
