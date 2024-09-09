@@ -1767,6 +1767,16 @@ struct ndpi_bin {
 typedef void ndpi_kd_tree;
 typedef void ndpi_kd_tree_result;
 
+/* Implemented in third_party/src/ball.c */
+typedef void ndpi_btree;
+
+typedef struct {
+  double **distances;
+  int    **indices;
+  int    n_samples;
+  int    n_neighbors;
+} ndpi_knn;
+
 /* **************************************** */
 
 #define HW_HISTORY_LEN               4

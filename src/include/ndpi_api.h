@@ -1899,6 +1899,26 @@ extern "C" {
   /* ******************************* */
 
   /*
+    Ball Tree: similar to KD-tree but more efficient with high cardinalities
+
+    - https://en.wikipedia.org/wiki/Ball_tree
+    - https://www.geeksforgeeks.org/ball-tree-and-kd-tree-algorithms/
+    - https://varshasaini.in/kd-tree-and-ball-tree-knn-algorithm/
+    - https://varshasaini.in/k-nearest-neighbor-knn-algorithm-in-machine-learning/
+
+    NOTE:
+    with ball tree, data is a vector of vector pointers (no array)    
+  */  
+  ndpi_btree* ndpi_btree_init(double **data, u_int32_t n_rows, u_int32_t n_columns);
+  ndpi_knn ndpi_btree_query(ndpi_btree *b, double **query_data,
+			    u_int32_t query_data_num_rows, u_int32_t query_data_num_columns,
+			    u_int32_t max_num_results);
+  void ndpi_free_knn(ndpi_knn knn);
+  void ndpi_free_btree(ndpi_btree *tree);
+  
+  /* ******************************* */
+  
+  /*
    * Finds outliers using Z-score
    * Z-Score = (Value - Mean) / StdDev
    *

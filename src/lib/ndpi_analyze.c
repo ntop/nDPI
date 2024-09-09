@@ -32,6 +32,7 @@
 #include "ndpi_config.h"
 #include "third_party/include/hll.h"
 #include "third_party/include/kdtree.h"
+#include "third_party/include/ball.h"
 #include "ndpi_replace_printf.h"
 
 /* ********************************************************************************* */
@@ -2121,3 +2122,22 @@ double ndpi_kd_distance(double *a1, double *a2, u_int num_dimensions) {
 
   return(dist_sq);
 }
+
+/* ********************************************************************************* */
+/* ********************************************************************************* */
+
+ndpi_btree* ndpi_btree_init(double **data, u_int32_t n_rows, u_int32_t n_columns) {
+  return((ndpi_btree*)btree_init(data, (int)n_rows, (int)n_columns, 30));
+}
+
+ndpi_knn ndpi_btree_query(ndpi_btree *b, double **query_data,
+			  u_int32_t query_data_num_rows, u_int32_t query_data_num_columns,
+			  u_int32_t max_num_results) {
+  return(btree_query((t_btree*)b, query_data, (int)query_data_num_rows,
+		     (int)query_data_num_columns, (int)max_num_results));
+}
+
+void ndpi_free_knn(ndpi_knn knn) { free_knn(knn, knn.n_samples); }
+
+void ndpi_free_btree(ndpi_btree *b) { free_tree((t_btree*)b); }
+
