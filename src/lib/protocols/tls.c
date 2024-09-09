@@ -29,6 +29,7 @@
 #include "ndpi_encryption.h"
 #include "ndpi_private.h"
 
+/* #define JA4R_DECIMAL 1 */
 
 static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow);
@@ -67,10 +68,10 @@ union ja_info {
     u_int16_t num_elliptic_curve, elliptic_curve[MAX_NUM_JA];
     u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA];
     u_int16_t num_signature_algorithms, signature_algorithms[MAX_NUM_JA];
-    u_int16_t num_supported_versions, supported_versions[MAX_NUM_JA];  
+    u_int16_t num_supported_versions, supported_versions[MAX_NUM_JA];
     char signature_algorithms_str[MAX_JA_STRLEN], alpn[MAX_JA_STRLEN];
   } client;
-  
+
   struct {
     u_int16_t tls_handshake_version;
     u_int16_t num_ciphers, cipher[MAX_NUM_JA];
@@ -1644,13 +1645,13 @@ static bool is_grease_version(u_int16_t version) {
   case 0x8a8a:
   case 0x9a9a:
   case 0xaaaa:
-  case 0xbaba:  
+  case 0xbaba:
   case 0xcaca:
   case 0xdada:
   case 0xeaea:
   case 0xfafa:
     return(true);
-    
+
   default:
     return(false);
   }
@@ -1673,7 +1674,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   bool is_dtls = ((flow->l4_proto == IPPROTO_UDP) && (quic_version == 0)) || flow->stun.maybe_dtls;
   int ja4_r_len = 0;
   char ja4_r[1024];
-  
+
   /*
     Compute JA4 TLS/QUIC client
 
@@ -1697,7 +1698,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
        && (tls_handshake_version < ja->client.supported_versions[i]))
       tls_handshake_version = ja->client.supported_versions[i];
   }
-  
+
   switch(tls_handshake_version) {
   case 0x0304: /* TLS 1.3 = “13” */
     ja_str[1] = '1';
@@ -1770,17 +1771,23 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 
   tmp_str_len = 0;
   for(i=0; i<ja->client.num_ciphers; i++) {
+#ifdef JA4R_DECIMAL
+    rc = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s%u", (i > 0) ? "," : "", ja->client.cipher[i]);
+    if(rc > 0) ja4_r_len += rc;
+#endif
     rc = ndpi_snprintf((char *)&tmp_str[tmp_str_len], JA_STR_LEN-tmp_str_len, "%s%04x",
 		       (i > 0) ? "," : "", ja->client.cipher[i]);
     if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;
   }
 
+#ifndef JA4R_DECIMAL
   ja_str[ja_str_len] = 0;
   i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s", ja_str); if(i > 0) ja4_r_len += i;
 
   tmp_str[tmp_str_len] = 0;
   i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s_", tmp_str); if(i > 0) ja4_r_len += i;
-  
+#endif
+
   ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
@@ -1793,9 +1800,19 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   printf("[CIPHER] %s [len: %u]\n", tmp_str, tmp_str_len);
 #endif
 
+#ifdef JA4R_DECIMAL
+  rc = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, " ");
+  if(rc > 0) ja4_r_len += rc;
+#endif
+
   tmp_str_len = 0;
   for(i=0, num_extn = 0; i<ja->client.num_tls_extensions; i++) {
     if((ja->client.tls_extension[i] > 0) && (ja->client.tls_extension[i] != 0x10 /* ALPN extension */)) {
+#ifdef JA4R_DECIMAL
+      rc = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s%u", (num_extn > 0) ? "," : "", ja->client.tls_extension[i]);
+      if(rc > 0) ja4_r_len += rc;
+#endif
+
       rc = ndpi_snprintf((char *)&tmp_str[tmp_str_len], JA_STR_LEN-tmp_str_len, "%s%04x",
 			 (num_extn > 0) ? "," : "", ja->client.tls_extension[i]);
       if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;
@@ -1812,9 +1829,12 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_JA
   printf("[EXTN] %s [len: %u]\n", tmp_str, tmp_str_len);
 #endif
-  
+
   tmp_str[tmp_str_len] = 0;
+
+#ifndef JA4R_DECIMAL
   i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s", tmp_str); if(i > 0) ja4_r_len += i;
+#endif
 
   if(ndpi_struct->cfg.tls_ja4r_fingerprint_enabled) {
     if(flow->protos.tls_quic.ja4_client_raw == NULL)
@@ -1823,7 +1843,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
     printf("[JA4_r] %s [len: %u]\n", ja4_r, ja4_r_len);
 #endif
   }
-  
+
   ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
@@ -2489,7 +2509,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  ja.client.signature_algorithms[id++] = ntohs(*(u_int16_t*)&packet->payload[s_offset+i]);
 		}
 		ja.client.num_signature_algorithms = id;
-		
+
 		for(i=0, id=0; i<tot_signature_algorithms_len && s_offset+i+1<total_len; i++) {
 		  int rc = ndpi_snprintf(&ja.client.signature_algorithms_str[i*2],
 					 sizeof(ja.client.signature_algorithms_str)-i*2,
