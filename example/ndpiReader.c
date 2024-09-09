@@ -6163,8 +6163,9 @@ void ballTreeUnitTest() {
   ndpi_knn result;
   u_int32_t nun_results = 2;
   int i, j;
-  
-  assert(ball_tree = ndpi_btree_init(rows, num_rows, num_columns));
+
+  ball_tree = ndpi_btree_init(rows, num_rows, num_columns);
+  assert(ball_tree != NULL);
   result = ndpi_btree_query(ball_tree, q_rows,
 			    sizeof(q_rows) / sizeof(double*),
 			    num_columns, nun_results);
