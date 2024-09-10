@@ -369,7 +369,7 @@ void free_knn(ndpi_knn knn, int row)
 double manhattan_dist(double *x1, double *x2, int size)
 {
   double d = 0;
-  int I;
+  int i;
   
   for (i = 0; i < size; i++)
     d += fabs(x1[i] - x2[i]);
