@@ -6113,6 +6113,91 @@ void loadStressTest() {
 
 /* *********************************************** */
 
+void kdUnitTest() {
+  ndpi_kd_tree *t = ndpi_kd_create(5);
+  double v[][5] = {
+    { 0, 4, 2, 3, 4 },
+    { 0, 1, 2, 3, 6 },
+    { 1, 2, 3, 4, 5 },
+  };
+  double v1[5] = { 0, 1, 2, 3, 8 };
+  u_int i, sz = 5*sizeof(double), num = sizeof(v) / sz;
+  ndpi_kd_tree_result *res;
+  double *ret, *to_find = v[1];
+
+  assert(t);
+
+  for(i=0; i<num; i++)
+    assert(ndpi_kd_insert(t, v[i], NULL) == true);
+
+  assert((res = ndpi_kd_nearest(t, to_find)) != NULL);
+  assert(ndpi_kd_num_results(res) == 1);
+  assert((ret = ndpi_kd_result_get_item(res, NULL)) != NULL);
+  assert(memcmp(ret, to_find, sz) == 0);
+  ndpi_kd_result_free(res);
+
+  assert((res = ndpi_kd_nearest(t, v1)) != NULL);
+  assert(ndpi_kd_num_results(res) == 1);
+  assert((ret = ndpi_kd_result_get_item(res, NULL)) != NULL);
+  assert(memcmp(ret, v1, sz) != 0);
+  assert(ndpi_kd_distance(ret, v1, 5) == 4.);
+  ndpi_kd_result_free(res);
+
+  ndpi_kd_free(t);
+}
+
+/* *********************************************** */
+
+void ballTreeUnitTest() {
+  ndpi_btree *ball_tree;
+  double v[][5] = {
+    { 0, 4, 2, 3, 4 },
+    { 0, 1, 2, 3, 6 },
+    { 1, 2, 3, 4, 5 },
+  };
+  double v1[] = { 0, 1, 2, 3, 8 };
+  double *rows[] = { v[0], v[1], v[2] };
+  double *q_rows[] = { v1 };
+  u_int32_t num_columns = 5;
+  u_int32_t num_rows = sizeof(v) / (sizeof(double)*num_columns);
+  ndpi_knn result;
+  u_int32_t nun_results = 2;
+  int i, j;
+
+  ball_tree = ndpi_btree_init(rows, num_rows, num_columns);
+  assert(ball_tree != NULL);
+  result = ndpi_btree_query(ball_tree, q_rows,
+			    sizeof(q_rows) / sizeof(double*),
+			    num_columns, nun_results);
+
+  assert(result.n_samples == 2);
+  
+  for (i = 0; i < result.n_samples; i++) {
+    printf("{\"knn_idx\": [");
+    for (j = 0; j < result.n_neighbors; j++)
+      {
+	printf("%d", result.indices[i][j]);
+	if (j != result.n_neighbors - 1)
+	  printf(", ");
+      }
+    printf("],\n \"knn_dist\": [");
+    for (j = 0; j < result.n_neighbors; j++)
+      {
+	printf("%.12lf", result.distances[i][j]);
+	if (j != result.n_neighbors - 1)
+	  printf(", ");
+      }
+    printf("]\n}\n");
+    if (i != result.n_samples - 1)
+      printf(", ");
+  }
+
+  ndpi_free_knn(result);
+  ndpi_free_btree(ball_tree);
+}
+
+/* *********************************************** */
+
 void encodeDomainsUnitTest() {
   NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
@@ -6290,6 +6375,7 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    kdUnitTest();
     encodeDomainsUnitTest();
     loadStressTest();
     domainsUnitTest();

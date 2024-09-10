@@ -1763,6 +1763,22 @@ struct ndpi_bin {
 
 /* **************************************** */
 
+/* Implemented in third_party/src/kdtree.c */
+typedef void ndpi_kd_tree;
+typedef void ndpi_kd_tree_result;
+
+/* Implemented in third_party/src/ball.c */
+typedef void ndpi_btree;
+
+typedef struct {
+  double **distances;
+  int    **indices;
+  int    n_samples;
+  int    n_neighbors;
+} ndpi_knn;
+
+/* **************************************** */
+
 #define HW_HISTORY_LEN               4
 #define MAX_SQUARE_ERROR_ITERATIONS 64 /* MUST be < num_values_rollup (256 max) */
 

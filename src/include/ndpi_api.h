@@ -698,7 +698,7 @@ extern "C" {
    *
    */
   extern u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_mod, const char *name);
-  
+
   /**
    * Return the name of the protocol given its ID
    *
@@ -716,8 +716,8 @@ extern "C" {
    * @par     id         = the protocol id
    * @return  the name of the protocol
    *
-   */  
-  extern ndpi_master_app_protocol ndpi_get_protocol_by_name(struct ndpi_detection_module_struct *ndpi_str, const char *name);  
+   */
+  extern ndpi_master_app_protocol ndpi_get_protocol_by_name(struct ndpi_detection_module_struct *ndpi_str, const char *name);
 
   /**
    * Return the ID of the category
@@ -1059,7 +1059,7 @@ extern "C" {
   bool ndpi_is_proto(ndpi_master_app_protocol proto, u_int16_t p);
   bool ndpi_is_proto_unknown(ndpi_master_app_protocol proto);
   bool ndpi_is_proto_equals(ndpi_master_app_protocol to_check, ndpi_master_app_protocol to_match, bool exact_match_only);
-  
+
   ndpi_proto_defaults_t* ndpi_get_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod);
@@ -1753,7 +1753,7 @@ extern "C" {
 
   void ndpi_md5(const u_char *data, size_t data_len, u_char hash[16]);
   void ndpi_sha256(const u_char *data, size_t data_len, u_int8_t sha_hash[32]);
-  
+
   u_int16_t ndpi_crc16_ccit(const void* data, size_t n_bytes);
   u_int16_t ndpi_crc16_ccit_false(const void *data, size_t n_bytes);
   u_int16_t ndpi_crc16_xmodem(const void *data, size_t n_bytes);
@@ -1865,6 +1865,59 @@ extern "C" {
 
   /* ******************************* */
 
+  /* create a kd-tree for num_dimensions vector items */
+  ndpi_kd_tree* ndpi_kd_create(u_int num_dimensions);
+
+  /* free the ndpi_kd_tree */
+  void ndpi_kd_free(ndpi_kd_tree *tree);
+
+  /* remove all the elements from the tree */
+  void ndpi_kd_clear(ndpi_kd_tree *tree);
+
+  /* insert a node, specifying its position, and optional data.
+     Return true = OK, false otherwise
+  */
+  bool ndpi_kd_insert(ndpi_kd_tree *tree, const double *data_vector, void *user_data);
+
+  /* Find the nearest node from a given point.
+   * This function returns a pointer to a result set with at most one element.
+   */
+  ndpi_kd_tree_result *ndpi_kd_nearest(ndpi_kd_tree *tree, const double *data_vector);
+
+  /* returns the size of the result set (in elements) */
+  u_int32_t ndpi_kd_num_results(ndpi_kd_tree_result *res);
+
+  /* returns the current element and updates user_data with the data put during insert */
+  double* ndpi_kd_result_get_item(ndpi_kd_tree_result *res, double **user_data);
+
+  /* frees a result set returned by kd_nearest_range() */
+  void ndpi_kd_result_free(ndpi_kd_tree_result *res);
+
+  /* Returns the distance (square root of the individual elements difference) */
+  double ndpi_kd_distance(double *a1, double *b2, u_int num_dimensions);
+
+  /* ******************************* */
+
+  /*
+    Ball Tree: similar to KD-tree but more efficient with high cardinalities
+
+    - https://en.wikipedia.org/wiki/Ball_tree
+    - https://www.geeksforgeeks.org/ball-tree-and-kd-tree-algorithms/
+    - https://varshasaini.in/kd-tree-and-ball-tree-knn-algorithm/
+    - https://varshasaini.in/k-nearest-neighbor-knn-algorithm-in-machine-learning/
+
+    NOTE:
+    with ball tree, data is a vector of vector pointers (no array)    
+  */  
+  ndpi_btree* ndpi_btree_init(double **data, u_int32_t n_rows, u_int32_t n_columns);
+  ndpi_knn ndpi_btree_query(ndpi_btree *b, double **query_data,
+			    u_int32_t query_data_num_rows, u_int32_t query_data_num_columns,
+			    u_int32_t max_num_results);
+  void ndpi_free_knn(ndpi_knn knn);
+  void ndpi_free_btree(ndpi_btree *tree);
+  
+  /* ******************************* */
+  
   /*
    * Finds outliers using Z-score
    * Z-Score = (Value - Mean) / StdDev
@@ -1912,9 +1965,9 @@ extern "C" {
    *
    */
   double ndpi_pearson_correlation(u_int32_t *values_a, u_int32_t *values_b, u_int16_t num_values);
-  
+
   /* ******************************* */
-  
+
   /*
    * Checks if a specified value is an outlier with respect to past values
    * using the Z-score.
@@ -1926,12 +1979,12 @@ extern "C" {
    *                        t = 1 - The value to check should not exceed the past values
    *                        t > 1 - The value to check has to be within (t * stddev) boundaries
    * @par lower           - [out] Lower threshold
-   * @par upper           - [out] Upper threshold   
+   * @par upper           - [out] Upper threshold
    *
    * @return true if the specified value is an outlier, false otherwise
    *
    */
-  
+
   bool ndpi_is_outlier(u_int32_t *past_values, u_int32_t num_past_values,
 		       u_int32_t value_to_check, float threshold,
 		       float *lower, float *upper);
@@ -2113,7 +2166,7 @@ extern "C" {
 				     ndpi_domain_classify *s,
 				     u_int16_t *class_id /* out */,
 				     char *hostname);
-  
+
   /* ******************************* */
 
   /*
@@ -2251,7 +2304,7 @@ extern "C" {
   */
   u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 			   char *domain, char *out, u_int out_len);
-    
+
   /* ******************************* */
 
   const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx);

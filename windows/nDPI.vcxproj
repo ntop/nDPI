@@ -219,6 +219,8 @@
     <ClCompile Include="..\src\lib\third_party\src\ahocorasick.c" />
     <ClCompile Include="..\src\lib\third_party\src\roaring.c" />
     <ClCompile Include="..\src\lib\third_party\src\shoco.c" />
+    <ClCompile Include="..\src\lib\third_party\src\kdtree.c" />
+    <ClCompile Include="..\src\lib\third_party\src\ball.c" />
     <ClCompile Include="..\src\lib\protocols\armagetron.c" />
     <ClCompile Include="..\src\lib\protocols\bgp.c" />
     <ClCompile Include="..\src\lib\protocols\bittorrent.c" />
