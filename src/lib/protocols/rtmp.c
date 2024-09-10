@@ -39,45 +39,48 @@ static void ndpi_int_rtmp_add_connection(struct ndpi_detection_module_struct *nd
 static void ndpi_check_rtmp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int32_t payload_len = packet->payload_packet_len;
   
-  /* Break after 13 packets. */
-  if (flow->packet_counter > 13) {
+  /* Look for the handshake, which is only at the beginning of the flow:
+      C->S: 0x03 + 1536 bytes
+      S->C: 0X03 + something...; we don't really check the length of the burst sent by the server, to avoid to save further state
+     See: https://en.wikipedia.org/w/index.php?title=Real-Time_Messaging_Protocol&section=12#Handshake */
+
+  if(!ndpi_seen_flow_beginning(flow)) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
-  
-  /* Check if we so far detected the protocol in the request or not. */
-  if(flow->rtmp_stage == 0) {
+
+  /* TODO: should we check somehow for mid-flows? */
+
+  if(flow->l4.tcp.rtmp_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "RTMP stage 0: \n");
      
-    if ((payload_len >= 9) &&
-	((packet->payload[0] == 0x03) || (packet->payload[0] == 0x06)) &&
-	/* https://en.wikipedia.org/w/index.php?title=Real-Time_Messaging_Protocol&section=12#Handshake */
-	get_u_int32_t(packet->payload, 5) == 0) {
-      NDPI_LOG_DBG2(ndpi_struct, "Possible RTMP request detected, we will look further for the response\n");
-       
-      /* Encode the direction of the packet in the stage, so we will know when we need to look for the response packet. */
-      flow->rtmp_stage = packet->packet_direction + 1;
-    } else
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-  } else {
-    NDPI_LOG_DBG2(ndpi_struct, "RTMP stage %u: \n", flow->rtmp_stage);
-    
-    /* At first check, if this is for sure a response packet (in another direction. If not, do nothing now and return. */
-    if ((flow->rtmp_stage - packet->packet_direction) == 1) {
+    if(packet->payload[0] == 0x03) {
+      flow->l4.tcp.rtmp_stage = packet->packet_direction + 1;
+      flow->l4.tcp.rtmp_client_buffer_len = packet->payload_packet_len;
       return;
     }
-    
-    /* This is a packet in another direction. Check if we find the proper response. */
-    if ((payload_len >= 4) && ((packet->payload[0] == 0x03) || (packet->payload[0] == 0x06) || (packet->payload[0] == 0x08) || (packet->payload[0] == 0x09) || (packet->payload[0] == 0x0a))) {
+  } else {
+    NDPI_LOG_DBG2(ndpi_struct, "RTMP stage %u (client already sent %d bytes)\n",
+                  flow->l4.tcp.rtmp_stage, flow->l4.tcp.rtmp_client_buffer_len);
+
+    /* At first check, if this is for sure a response packet (in another direction. If not, do nothing now and return. */
+    if(flow->l4.tcp.rtmp_stage - packet->packet_direction == 1) {
+      /* From the same direction */
+      flow->l4.tcp.rtmp_client_buffer_len += packet->payload_packet_len;
+      if(flow->l4.tcp.rtmp_client_buffer_len <= 1537)
+        return;
+    }
+
+    /* This is a packet in another direction */
+    if(packet->payload[0] == 0x03 && flow->l4.tcp.rtmp_client_buffer_len == 1537) {
       NDPI_LOG_INFO(ndpi_struct, "found RTMP\n");
       ndpi_int_rtmp_add_connection(ndpi_struct, flow);
-    } else {
-      NDPI_LOG_DBG2(ndpi_struct, "The reply did not seem to belong to RTMP, resetting the stage to 0\n");
-      flow->rtmp_stage = 0;
+      return;
     }
   }
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 static void ndpi_search_rtmp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

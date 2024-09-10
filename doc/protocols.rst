@@ -82,6 +82,15 @@ Notes:
 - IPv6 is not supported
 
 
+.. _Proto 174:
+
+`NDPI_PROTOCOL_RTMP`
+====================
+Real-Time Messaging Protocol (RTMP) is a communication protocol for streaming audio, video, and data over the Internet.
+
+References: `Wikipedia <https://en.wikipedia.org/wiki/Real-Time_Messaging_Protocol>`_
+
+
 .. _Proto 182:
 
 `NDPI_PROTOCOL_RESP`

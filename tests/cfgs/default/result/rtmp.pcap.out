@@ -1,13 +1,13 @@
-DPI Packets (TCP):	8	(8.00 pkts/flow)
-Confidence DPI              : 1 (flows)
-Num dissector calls: 180 (180.00 diss/flow)
+DPI Packets (TCP):	18	(6.00 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 551 (183.67 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/3/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -17,11 +17,13 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia protocols:   5/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-RTMP	26	8368	1
+RTMP	60	25463	3
 
-Acceptable                      26 8368          1            
+Acceptable                      60 25463         3            
 
-	1	TCP 192.168.43.1:1177 <-> 192.168.43.128:1935 [proto: 174/RTMP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 8][cat: Media/1][12 pkts/4108 bytes <-> 14 pkts/4260 bytes][Goodput ratio: 84/82][1.04 sec][bytes ratio: -0.018 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 83/75 334/230 119/85][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 342/304 1514/1514 531/465][PLAIN TEXT (ace@nAt)][Plen Bins: 7,21,14,0,7,7,0,0,0,7,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,21,0,0]
+	1	TCP 10.140.74.206:59509 <-> 193.118.47.46:6002 [VLAN: 113][proto: GTP:174/RTMP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Media/1][8 pkts/4268 bytes <-> 9 pkts/4410 bytes][Goodput ratio: 79/77][2.62 sec][bytes ratio: -0.016 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 331/225 819/1319 326/455][Pkt Len c2s/s2c min/avg/max/stddev: 122/118 534/490 1458/1458 539/530][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][PLAIN TEXT (StreamMedia)][Plen Bins: 13,20,6,0,0,13,6,6,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0]
+	2	TCP 10.140.80.204:49757 <-> 203.205.224.48:1935 [VLAN: 113][proto: GTP:174/RTMP][IP: 285/Tencent][ClearText][Confidence: DPI][FPC: 285/Tencent, Confidence: IP address][DPI packets: 5][cat: Media/1][8 pkts/4155 bytes <-> 9 pkts/4262 bytes][Goodput ratio: 81/79][0.83 sec][bytes ratio: -0.013 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 98/72 177/168 76/54][Pkt Len c2s/s2c min/avg/max/stddev: 110/99 519/474 1458/1458 547/539][PLAIN TEXT (connect)][Plen Bins: 26,13,0,0,0,13,0,13,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,26,0,0,0,0,0]
+	3	TCP 192.168.43.1:1177 <-> 192.168.43.128:1935 [proto: 174/RTMP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 8][cat: Media/1][12 pkts/4108 bytes <-> 14 pkts/4260 bytes][Goodput ratio: 84/82][1.04 sec][bytes ratio: -0.018 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 83/75 334/230 119/85][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 342/304 1514/1514 531/465][PLAIN TEXT (ace@nAt)][Plen Bins: 7,21,14,0,7,7,0,0,0,7,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,21,0,0]
