@@ -1434,6 +1434,7 @@ struct ndpi_flow_struct {
     } bittorrent;
 
     struct {
+      char options[48];
       char fingerprint[48];
       char class_ident[48];
     } dhcp;

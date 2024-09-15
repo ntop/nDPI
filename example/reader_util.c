@@ -1057,8 +1057,19 @@ static void dump_raw_fingerprint(struct ndpi_workflow * workflow,
 /* ****************************************************** */
 
 static void dump_flow_fingerprint(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
-  if(flow->ndpi_flow->protos.tls_quic.ja4_client_raw != NULL)
-    dump_raw_fingerprint(workflow, flow, "JA4r", flow->ndpi_flow->protos.tls_quic.ja4_client_raw);
+  if(is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) || is_ndpi_proto(flow, NDPI_PROTOCOL_QUIC)) {
+    if(flow->ndpi_flow->protos.tls_quic.ja4_client_raw != NULL)
+      dump_raw_fingerprint(workflow, flow, "JA4r", flow->ndpi_flow->protos.tls_quic.ja4_client_raw);
+  } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DHCP)
+	    && (flow->ndpi_flow->protos.dhcp.fingerprint[0] != '\0')) {
+    char buf[256];
+
+    snprintf(buf, sizeof(buf), "%s_%s",
+	     flow->ndpi_flow->protos.dhcp.options,
+	     flow->ndpi_flow->protos.dhcp.fingerprint);
+    
+    dump_raw_fingerprint(workflow, flow, "DHCP_r", buf);
+  }
 }
 
 /* ****************************************************** */
