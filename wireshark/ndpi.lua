@@ -37,16 +37,16 @@ ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndp
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
 ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64, nil, base.HEX)
 ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Score", "ndpi.flow_score", ftypes.UINT32)
+ndpi_fds.flow_risk_info_len   = ProtoField.new("nDPI Flow Risk Info Length", "ndpi.flow_risk_info_len", ftypes.UINT16, nil, base.DEC)
 ndpi_fds.flow_risk_info       = ProtoField.new("nDPI Flow Risk Info", "ndpi.flow_risk_info", ftypes.STRING)
 
+ndpi_fds.metadata_list_len    = ProtoField.new("nDPI Metadata List Length", "ndpi.metadata_list_len", ftypes.UINT16, nil, base.DEC)
 ndpi_fds.metadata_list        = ProtoField.new("nDPI Metadata List", "ndpi.metadata_list", ftypes.NONE)
 ndpi_fds.metadata             = ProtoField.new("nDPI Metadata", "ndpi.metadata", ftypes.NONE)
 local mtd_types = {
         [0] = "Padding",
         [1] = "Server Name",
-        [2] = "JA3C",
-        [3] = "JA3S",
-        [4] = "JA4C"
+        [2] = "JA4C"
 }
 ndpi_fds.metadata_type        = ProtoField.new("nDPI Metadata Type", "ndpi.metadata.type", ftypes.UINT16, mtd_types)
 ndpi_fds.metadata_length      = ProtoField.new("nDPI Metadata Length", "ndpi.metadata.length", ftypes.UINT16)
@@ -118,9 +118,10 @@ flow_risks[52] = ProtoField.bool("ndpi.flow_risk.tls_alpn_sni_mismatch", "ALPN/S
 flow_risks[53] = ProtoField.bool("ndpi.flow_risk.malware_contact", "Contact with a malware host", num_bits_flow_risks, nil, bit(53), "nDPI Flow Risk: Malware host contacted")
 flow_risks[54] = ProtoField.bool("ndpi.flow_risk.binary_data_transfer", "Attempt to transfer a binary file", num_bits_flow_risks, nil, bit(54), "nDPI Flow Risk: binary data file transfer")
 flow_risks[55] = ProtoField.bool("ndpi.flow_risk.probing_attempt", "Probing attempt", num_bits_flow_risks, nil, bit(55), "nDPI Flow Risk: probing attempt")
+flow_risks[56] = ProtoField.bool("ndpi.flow_risk.obfuscated_traffic", "Obfuscated Traffic", num_bits_flow_risks, nil, bit(56), "nDPI Flow Risk: obfuscated traffic")
 
 -- Last one: keep in sync the bitmask when adding new risks!!
-flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT64, nil, base.HEX, bit(64) - bit(56))
+flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT64, nil, base.HEX, bit(64) - bit(57))
 
 for _,v in pairs(flow_risks) do
   ndpi_fds[#ndpi_fds + 1] = v
@@ -1086,18 +1087,36 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
 	 if(magic == "19:68:09:24") then
 	    local ndpikey, srckey, dstkey, flowkey, flow_risk
-	    local flow_risk_tree, metadata_list_tree, metadata_tree
+	    local flow_risk_tree, flow_risk_info_len, metadata_list_tree, metadata_tree, metadata_list_len
 	    local name
 	    local ndpi_subtree         = tree:add(ndpi_proto, trailer_tvb, "nDPI Protocol")
+	    local application_protocol, mlen
+	    local offset = 0
 	    
-	    ndpi_subtree:add(ndpi_fds.magic, trailer_tvb(0, 4))
-	    ndpi_subtree:add(ndpi_fds.network_protocol, trailer_tvb(4, 2))
-	    ndpi_subtree:add(ndpi_fds.application_protocol, trailer_tvb(6, 2))
+	    ndpi_subtree:add(ndpi_fds.magic, trailer_tvb(offset, 4))
+	    offset = offset + 4
+	    ndpi_subtree:add(ndpi_fds.network_protocol, trailer_tvb(offset, 2))
+	    offset = offset + 2
+	    ndpi_subtree:add(ndpi_fds.application_protocol, trailer_tvb(offset, 2))
+	    application_protocol = trailer_tvb(offset, 2):int()
+	    offset = offset + 2
 
-	    flow_risk_tree = ndpi_subtree:add(ndpi_fds.flow_risk, trailer_tvb(8, 8))
-	    flow_risk = trailer_tvb(8, 8):uint64() -- UInt64 object!
-	    ndpi_subtree:add(ndpi_fds.flow_score, trailer_tvb(16, 2))
-	    flow_score = trailer_tvb(16, 2):int()
+	    ndpi_subtree:add(ndpi_fds.name, trailer_tvb(offset, 16))
+	    name = trailer_tvb(offset, 16):string()
+	    offset = offset + 16
+
+	    if(application_protocol ~= 0) then
+	       -- Set protocol name in the wireshark protocol column (if not Unknown)
+	       pinfo.cols.protocol = name
+	       --print(network_protocol .. "/" .. application_protocol .. "/".. name)
+	    end
+
+	    flow_risk_tree = ndpi_subtree:add(ndpi_fds.flow_risk, trailer_tvb(offset, 8))
+	    flow_risk = trailer_tvb(offset, 8):uint64() -- UInt64 object!
+	    offset = offset + 8
+	    ndpi_subtree:add(ndpi_fds.flow_score, trailer_tvb(offset, 2))
+	    flow_score = trailer_tvb(offset, 2):int()
+	    offset = offset + 2
 
 	    if (flow_risk ~= UInt64(0, 0)) then
                if(pinfo.visited == false) then
@@ -1114,11 +1133,11 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       
 	       for i=0,63 do
 		 if flow_risks[i] ~= nil then
-	            flow_risk_tree:add(flow_risks[i], trailer_tvb(8, 8))
+	            flow_risk_tree:add(flow_risks[i], trailer_tvb(24, 8))
 		 end
 
 	       end
-	       flow_risk_tree:add(flow_risks[64], trailer_tvb(8, 8)) -- Unused bits in flow risk bitmask
+	       flow_risk_tree:add(flow_risks[64], trailer_tvb(24, 8)) -- Unused bits in flow risk bitmask
 	    end
 	    
 	    if(flow_score > 0) then
@@ -1134,20 +1153,19 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       ndpi_subtree:add_expert_info(PI_PROTOCOL, level, "Non zero score")
 	    end
 
-	    ndpi_subtree:add(ndpi_fds.flow_risk_info, trailer_tvb(18, 32))
-	    ndpi_subtree:add(ndpi_fds.name, trailer_tvb(50, 16))
-	    name = trailer_tvb(50, 16):string()
-
-	    if(application_protocol ~= 0) then	       
-	       -- Set protocol name in the wireshark protocol column (if not Unknown)
-	       pinfo.cols.protocol = name
-	       --print(network_protocol .. "/" .. application_protocol .. "/".. name)
-	    end
+	    ndpi_subtree:add(ndpi_fds.flow_risk_info_len, trailer_tvb(offset, 2))
+	    flow_risk_info_len = trailer_tvb(offset, 2):int()
+	    offset = offset + 2
+	    ndpi_subtree:add(ndpi_fds.flow_risk_info, trailer_tvb(offset, flow_risk_info_len))
+	    offset = offset + flow_risk_info_len
 
 	    -- Metadata
-	    local offset = 66
-	    metadata_list_tree = ndpi_subtree:add(ndpi_fds.metadata_list, trailer_tvb(offset, 256))
-	    while offset + 4 < 326 do
+	    ndpi_subtree:add(ndpi_fds.metadata_list_len, trailer_tvb(offset, 2))
+	    metadata_list_len = trailer_tvb(offset, 2):int()
+	    offset = offset + 2
+	    metadata_list_tree = ndpi_subtree:add(ndpi_fds.metadata_list, trailer_tvb(offset, metadata_list_len))
+	    m_len = 0
+	    while m_len + 4 < metadata_list_len do
 
 	       local mtd_type = trailer_tvb(offset, 2):int();
 	       local mtd_length = trailer_tvb(offset + 2, 2):int();
@@ -1157,16 +1175,14 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       metadata_tree:add(ndpi_fds.metadata_length, trailer_tvb(offset + 2, 2))
 
 	       -- Specific fields: there is definitely a better way...
-	       if mtd_type == 1 then
+	       if mtd_type == 0 then
+	         metadata_tree:append_text(" Padding")
+	         -- Generic field
+	         metadata_tree:add(ndpi_fds.metadata_value, trailer_tvb(offset + 4, mtd_length))
+	       elseif mtd_type == 1 then
 	         metadata_tree:append_text(" ServerName: " .. trailer_tvb(offset + 4, mtd_length):string())
 	         metadata_tree:add(ndpi_fds.metadata_server_name, trailer_tvb(offset + 4, mtd_length))
 	       elseif mtd_type == 2 then
-	         metadata_tree:append_text(" JA3C: " .. trailer_tvb(offset + 4, mtd_length):string())
-	         metadata_tree:add(ndpi_fds.metadata_ja3c, trailer_tvb(offset + 4, mtd_length))
-	       elseif mtd_type == 3 then
-	         metadata_tree:append_text(" JA3S: " .. trailer_tvb(offset + 4, mtd_length):string())
-	         metadata_tree:add(ndpi_fds.metadata_ja3s, trailer_tvb(offset + 4, mtd_length))
-	       elseif mtd_type == 4 then
 	         metadata_tree:append_text(" JA4C: " .. trailer_tvb(offset + 4, mtd_length):string())
 	         metadata_tree:add(ndpi_fds.metadata_ja4c, trailer_tvb(offset + 4, mtd_length))
 	       else
@@ -1175,6 +1191,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       end
 
 	       offset = offset + 4 + mtd_length
+	       m_len = m_len + 4 + mtd_length
 	    end
 
 	    if(compute_flows_stats and pinfo.visited == false) then
