@@ -2097,6 +2097,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_PROBING_ATTEMPT:
     return("Probing Attempt");
 
+  case NDPI_OBFUSCATED_TRAFFIC:
+    return("Obfuscated Traffic");
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2221,6 +2224,8 @@ const char* ndpi_risk2code(ndpi_risk_enum risk) {
     return STRINGIFY(NDPI_BINARY_DATA_TRANSFER);
   case NDPI_PROBING_ATTEMPT:
     return STRINGIFY(NDPI_PROBING_ATTEMPT);
+  case NDPI_OBFUSCATED_TRAFFIC:
+    return STRINGIFY(NDPI_OBFUSCATED_TRAFFIC);
 
   default:
     return("Unknown risk");
@@ -2342,6 +2347,8 @@ ndpi_risk_enum ndpi_code2risk(const char* risk) {
     return(NDPI_BINARY_DATA_TRANSFER);
   else if(strcmp(STRINGIFY(NDPI_PROBING_ATTEMPT), risk) == 0)
     return(NDPI_PROBING_ATTEMPT);
+  else if(strcmp(STRINGIFY(NDPI_OBFUSCATED_TRAFFIC), risk) == 0)
+    return(NDPI_OBFUSCATED_TRAFFIC);
   else
     return(NDPI_MAX_RISK);
 }

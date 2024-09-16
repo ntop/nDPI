@@ -198,6 +198,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_MALWARE_HOST_CONTACTED,                NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_BINARY_DATA_TRANSFER,                  NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_PROBING_ATTEMPT,                       NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
+  { NDPI_OBFUSCATED_TRAFFIC,                    NDPI_RISK_HIGH, CLIENT_HIGH_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY   }
@@ -434,6 +435,38 @@ void ndpi_set_proto_category(struct ndpi_detection_module_struct *ndpi_str, u_in
     return;
   else if(ndpi_str)
     ndpi_str->proto_defaults[protoId].protoCategory = protoCategory;
+}
+
+/* ********************************************************************************** */
+
+int is_flow_addr_informative(const struct ndpi_flow_struct *flow)
+{
+  /* The ideas is to tell if the address itself carries some useful information or not.
+     Examples:
+      a flow to a Facebook address is quite likely related to some Facebook apps
+      a flow to an AWS address might be potentially anything
+  */
+
+  switch(flow->guessed_protocol_id_by_ip) {
+  case NDPI_PROTOCOL_UNKNOWN:
+  /* This is basically the list of cloud providers supported by nDPI */
+  case NDPI_PROTOCOL_TENCENT:
+  case NDPI_PROTOCOL_EDGECAST:
+  case NDPI_PROTOCOL_ALIBABA:
+  case NDPI_PROTOCOL_YANDEX_CLOUD:
+  case NDPI_PROTOCOL_AMAZON_AWS:
+  case NDPI_PROTOCOL_MICROSOFT_AZURE:
+  case NDPI_PROTOCOL_CACHEFLY:
+  case NDPI_PROTOCOL_CLOUDFLARE:
+  case NDPI_PROTOCOL_GOOGLE_CLOUD:
+    return 0;
+  /* This is basically the list of VPNs (with **entry** addresses) supported by nDPI */
+  case NDPI_PROTOCOL_NORDVPN:
+  case NDPI_PROTOCOL_PROTONVPN:
+    return 0;
+  default:
+    return 1;
+  }
 }
 
 /* ********************************************************************************** */
@@ -11439,6 +11472,8 @@ static const struct cfg_param {
 
   { "rtp",           "search_for_stun",                         "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(rtp_search_for_stun), NULL },
 
+  { "openvpn",       "dpi.heuristics",                          "0x00", "0", "0x01", CFG_PARAM_INT, __OFF(openvpn_heuristics), NULL },
+  { "openvpn",       "dpi.heuristics.num_messages",             "10", "0", "255", CFG_PARAM_INT, __OFF(openvpn_heuristics_num_msgs), NULL },
   { "openvpn",       "subclassification_by_ip",                 "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(openvpn_subclassification_by_ip), NULL },
 
   { "wireguard",     "subclassification_by_ip",                 "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(wireguard_subclassification_by_ip), NULL },

@@ -1,0 +1,36 @@
+Guessed flow protos:	3
+
+DPI Packets (TCP):	38	(19.00 pkts/flow)
+DPI Packets (UDP):	9	(9.00 pkts/flow)
+Confidence Match by port    : 2 (flows)
+Confidence Match by IP      : 1 (flows)
+Num dissector calls: 708 (236.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/9/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/3/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/3/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/2 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+SMTPS	60	17222	1
+TLS	87	25469	1
+NordVPN	30	10598	1
+
+Safe                           147 42691         2            
+Acceptable                      30 10598         1            
+
+	1	TCP 107.161.86.131:443 <-> 192.168.12.156:48072 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 15][cat: Web/5][40 pkts/9272 bytes <-> 47 pkts/16197 bytes][Goodput ratio: 70/81][3.15 sec][bytes ratio: -0.272 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 57/52 212/303 66/79][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 232/345 1514/1090 370/406][Plen Bins: 35,3,3,15,1,1,0,0,1,3,5,1,0,1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,18,0,0,0,0,0,0,0,0,0,1,0,0,3,0,0]
+	2	TCP 192.168.12.156:37976 <-> 185.128.25.99:465 [proto: 29/SMTPS][IP: 426/NordVPN][Encrypted][Confidence: Match by port][FPC: 426/NordVPN, Confidence: IP address][DPI packets: 23][cat: Email/3][29 pkts/7410 bytes <-> 31 pkts/9812 bytes][Goodput ratio: 74/79][1.73 sec][bytes ratio: -0.139 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 66/26 1019/153 204/31][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 256/317 1090/1514 256/424][Risk: ** Fully Encrypted Flow **][Risk Score: 50][PLAIN TEXT (HrFTzP)][Plen Bins: 0,0,14,30,14,2,0,2,5,0,5,5,2,0,0,2,0,0,0,0,0,2,0,2,0,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0]
+	3	UDP 192.168.12.156:47128 <-> 149.102.238.108:1214 [proto: 426/NordVPN][IP: 426/NordVPN][Encrypted][Confidence: Match by IP][FPC: 426/NordVPN, Confidence: IP address][DPI packets: 9][cat: VPN/2][19 pkts/3629 bytes <-> 11 pkts/6969 bytes][Goodput ratio: 78/93][1.26 sec][bytes ratio: -0.315 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 78/132 1156/1023 278/337][Pkt Len c2s/s2c min/avg/max/stddev: 115/136 191/634 782/1158 153/438][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 6.051 (Executable?)][PLAIN TEXT (SFhAFI)][Plen Bins: 0,0,23,41,3,0,0,0,3,0,3,6,0,0,0,0,0,0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0]

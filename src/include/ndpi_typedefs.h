@@ -169,7 +169,8 @@ typedef enum {
   NDPI_MALWARE_HOST_CONTACTED, /* Flow client contacted a malware host */
   NDPI_BINARY_DATA_TRANSFER,   /* Attempt to transfer something in binary format */
   NDPI_PROBING_ATTEMPT,        /* Probing attempt (e.g. TCP connection with no data exchanged or unidirection traffic for bidirectional flows such as SSH) */
-  
+  NDPI_OBFUSCATED_TRAFFIC,
+
   /* Leave this as last member */
   NDPI_MAX_RISK /* must be <= 63 due to (**) */
 } ndpi_risk_enum;
@@ -790,6 +791,10 @@ struct ndpi_lru_cache {
 
 /* Ookla */
 #define NDPI_AGGRESSIVENESS_OOKLA_TLS			0x01 /* Enable detection over TLS (using ookla cache) */
+
+/* OpenVPN */
+#define NDPI_HEURISTICS_OPENVPN_OPCODE			0x01 /* Enable heuristic based on opcode frequency */
+
 
 /* ************************************************** */
 
@@ -1520,6 +1525,14 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_OPENVPN */
   u_int8_t ovpn_session_id[2][8];
+  u_int8_t ovpn_alg_standard_state : 2;
+  u_int8_t ovpn_alg_heur_opcode_state : 2;
+  u_int8_t ovpn_heur_opcode__codes_num : 4;
+  u_int8_t ovpn_heur_opcode__num_msgs;
+#define OPENVPN_HEUR_MAX_NUM_OPCODES 4
+  u_int8_t ovpn_heur_opcode__codes[OPENVPN_HEUR_MAX_NUM_OPCODES];
+  u_int8_t ovpn_heur_opcode__resets[2];
+  u_int16_t ovpn_heur_opcode__missing_bytes[2];
 
   /* NDPI_PROTOCOL_TINC */
   u_int8_t tinc_state;
@@ -1549,8 +1562,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 264,
                "Size of the struct member protocols increased to more than 264 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1136,
-               "Size of the flow struct increased to more than 1136 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1152,
+               "Size of the flow struct increased to more than 1152 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif
