@@ -3637,6 +3637,7 @@ bool ndpi_serialize_flow_fingerprint(struct ndpi_flow_struct *flow, ndpi_seriali
 	    && (flow->protos.dhcp.fingerprint[0] != '\0')) {
     ndpi_serialize_string_string(serializer, "options", flow->protos.dhcp.options);
     ndpi_serialize_string_string(serializer, "fingerprint", flow->protos.dhcp.fingerprint);
+    ndpi_serialize_string_string(serializer, "class_identifier", flow->protos.dhcp.class_ident);
     
     return(true);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)
