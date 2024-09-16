@@ -943,14 +943,6 @@ void extcap_capture(int datalink_type) {
 
 /* ********************************** */
 
-void printFingerprintHeader() {
-  if(!fingerprint_fp) return;
-
-  fprintf(fingerprint_fp, "#protocol|src_ip|dst_ip|dst_port|family|fingerprint\n");
-}
-
-/* ********************************** */
-
 void printCSVHeader() {
   if(!csv_fp) return;
 
@@ -1460,7 +1452,6 @@ static void parseOptions(int argc, char **argv) {
     exit(0);
 
   printCSVHeader();
-  printFingerprintHeader();
   
 #ifndef USE_DPDK
   if(do_extcap_capture) {

@@ -1042,34 +1042,37 @@ u_int8_t plen2slot(u_int16_t plen) {
 
 /* ****************************************************** */
 
-static void dump_raw_fingerprint(struct ndpi_workflow * workflow,
-				 struct ndpi_flow_info *flow,
-				 char *fingerprint_family,
-				 char *fingerprint) {
-  char buf[64];
+static void dump_flow_fingerprint(struct ndpi_workflow * workflow,
+				  struct ndpi_flow_info *flow) {
+  ndpi_serializer serializer;
+  bool rc;
+  
+  if(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) == -1)
+    return;
 
-  fprintf(fingerprint_fp, "%u|%s|%s|%u|%s|%s|%s\n",
-	  flow->protocol,flow->src_name, flow->dst_name, ntohs(flow->dst_port),
-	  ndpi_protocol2name(workflow->ndpi_struct, flow->detected_protocol, buf, sizeof(buf)),
-	  fingerprint_family, fingerprint);
-}
+  ndpi_serialize_start_of_block(&serializer, "fingerprint");
+  rc = ndpi_serialize_flow_fingerprint(flow->ndpi_flow, &serializer);
+  ndpi_serialize_end_of_block(&serializer);
 
-/* ****************************************************** */
+  if(rc) {
+    char buf[64], *buffer;
+    u_int32_t buffer_len;
 
-static void dump_flow_fingerprint(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
-  if(is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) || is_ndpi_proto(flow, NDPI_PROTOCOL_QUIC)) {
-    if(flow->ndpi_flow->protos.tls_quic.ja4_client_raw != NULL)
-      dump_raw_fingerprint(workflow, flow, "JA4r", flow->ndpi_flow->protos.tls_quic.ja4_client_raw);
-  } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DHCP)
-	    && (flow->ndpi_flow->protos.dhcp.fingerprint[0] != '\0')) {
-    char buf[256];
+    ndpi_serialize_string_uint32(&serializer, "proto", flow->protocol);
+    ndpi_serialize_string_string(&serializer, "cli_ip", flow->src_name);
+    ndpi_serialize_string_uint32(&serializer, "cli_port", ntohs(flow->src_port));
+    ndpi_serialize_string_string(&serializer, "srv_ip", flow->dst_name);
+    ndpi_serialize_string_uint32(&serializer, "srv_port", ntohs(flow->dst_port));
+    ndpi_serialize_string_string(&serializer, "proto",
+				 ndpi_protocol2name(workflow->ndpi_struct,
+						    flow->detected_protocol,
+						    buf, sizeof(buf)));
 
-    snprintf(buf, sizeof(buf), "%s_%s",
-	     flow->ndpi_flow->protos.dhcp.options,
-	     flow->ndpi_flow->protos.dhcp.fingerprint);
-    
-    dump_raw_fingerprint(workflow, flow, "DHCP_r", buf);
+    buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+    fprintf(fingerprint_fp, "%s\n", buffer);
   }
+  
+  ndpi_term_serializer(&serializer);  
 }
 
 /* ****************************************************** */
