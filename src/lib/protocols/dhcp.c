@@ -147,7 +147,7 @@ static void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struc
           u_int8_t len = ndpi_min(dhcp->options[i+1] /* len as found in the packet */,
 				  dhcp_options_size - (i+2) /* 1 for the type and 1 for the value */);
 
-          if(len == 0)
+          if(len == 0 || opt_offset >= sizeof(flow->protos.dhcp.options))
             break;
 
 	  rc = ndpi_snprintf((char*)&flow->protos.dhcp.options[opt_offset],
