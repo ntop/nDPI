@@ -320,7 +320,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	  x++;
       }
     } else {
-      ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid DNS Header");
+      if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+        ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid DNS Header");
       return(1 /* invalid */);
     }
   } else {
