@@ -372,6 +372,9 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
     return 1;
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(module, &all);
+  /* Try to be fast: we need only the protocol name -> protocol id mapping! */
+  ndpi_set_config(module, "any", "ip_list.load", "0");
+  ndpi_set_config(module, NULL, "flow_risk_lists.load", "0");
   ndpi_finalize_initialization(module);
 
   for(n = strtok(str,_proto_delim); n && *n; n = strtok(NULL,_proto_delim)) {
