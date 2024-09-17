@@ -417,6 +417,10 @@ static int search_heur_opcode(struct ndpi_detection_module_struct* ndpi_struct,
                       iter, offset, pdu_len);
       if(pdu_len < 14)
         return 1; /* Exclude */
+      if(pdu_len > 4 * 1500) { /* 4 full size packets: simple threshold to avoid false positives */
+        NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: pdu_len %d too big. Exclude\n", pdu_len);
+        return 1; /* Exclude */
+      }
       rc = search_heur_opcode_common(ndpi_struct, flow, *(ovpn_payload + offset + 2));
       NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: TCP, rc %d\n", rc);
       if(rc > 0) /* Exclude || Found --> stop */
