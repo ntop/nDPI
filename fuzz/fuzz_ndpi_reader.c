@@ -22,6 +22,7 @@ u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 0, max_num_tcp_dissected_pkts = 0; /* Disable limits at application layer */;
 int malloc_size_stats = 0;
 FILE *fingerprint_fp = NULL;
+bool do_load_lists = false;
 
 extern void ndpi_report_payload_stats(FILE *out);
 

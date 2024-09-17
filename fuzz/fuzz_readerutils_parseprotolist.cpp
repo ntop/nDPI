@@ -12,6 +12,7 @@ u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Signal requires more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 int malloc_size_stats = 0;
 FILE *fingerprint_fp = NULL;
+bool do_load_lists = false;
 
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
