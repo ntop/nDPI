@@ -43,6 +43,7 @@
 #include <netinet/ip.h>
 #endif
 #include <assert.h>
+#include <sys/stat.h>
 
 #include "reader_util.h"
 
@@ -81,7 +82,7 @@ static u_int32_t flow_id = 0;
 extern FILE *fingerprint_fp;
 
 u_int8_t enable_doh_dot_detection = 0;
-
+extern bool do_load_lists;
 extern int malloc_size_stats;
 
 /* ****************************************************** */
@@ -409,6 +410,23 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
 
 /* ***************************************************** */
 
+bool load_public_lists(struct ndpi_detection_module_struct *ndpi_str) {
+  char *lists_path = "../lists/public_suffix_list.dat";
+  struct stat st;
+
+  if(stat(lists_path, &st) != 0)
+    lists_path = &lists_path[1]; /* use local file */
+
+  if(stat(lists_path, &st) == 0) {
+    if(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0)
+      return(true);
+  }
+
+  return(false);
+}
+
+/* ***************************************************** */
+
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle, int do_init_flows_root,
 					 ndpi_serialization_format serialization_format,
@@ -446,6 +464,9 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   }
 
   workflow->ndpi_serialization_format = serialization_format;
+
+  if(do_load_lists)
+    load_public_lists(module);
 
   return workflow;
 }
@@ -1049,12 +1070,12 @@ static void dump_flow_fingerprint(struct ndpi_workflow * workflow,
 				  struct ndpi_flow_info *flow) {
   ndpi_serializer serializer;
   bool rc;
-  
+
   if(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) == -1)
     return;
 
   ndpi_serialize_start_of_block(&serializer, "fingerprint");
-  rc = ndpi_serialize_flow_fingerprint(flow->ndpi_flow, &serializer);
+  rc = ndpi_serialize_flow_fingerprint(workflow->ndpi_struct, flow->ndpi_flow, &serializer);
   ndpi_serialize_end_of_block(&serializer);
 
   if(rc) {
@@ -1074,8 +1095,8 @@ static void dump_flow_fingerprint(struct ndpi_workflow * workflow,
     buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
     fprintf(fingerprint_fp, "%s\n", buffer);
   }
-  
-  ndpi_term_serializer(&serializer);  
+
+  ndpi_term_serializer(&serializer);
 }
 
 /* ****************************************************** */

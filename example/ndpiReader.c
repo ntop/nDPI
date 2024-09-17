@@ -91,13 +91,12 @@ static ndpi_serialization_format serialization_format = ndpi_serialization_forma
 static char* domain_to_check = NULL;
 static char* ip_port_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
-
 FILE *fingerprint_fp         = NULL; /**< for flow fingerprint export */
-
 
 /** User preferences **/
 u_int8_t enable_realtime_output = 0, enable_protocol_guess = NDPI_GIVEUP_GUESS_BY_PORT | NDPI_GIVEUP_GUESS_BY_IP, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
+bool do_load_lists = false;
 
 struct cfg {
   char *proto;
@@ -1122,11 +1121,13 @@ static void parseOptions(int argc, char **argv) {
         printf("Unable to write on fingerprint file %s: %s\n", optarg, strerror(errno));
         exit(1);
       }
-      
+
       if(reader_add_cfg("tls", "metadata.ja4r_fingerprint", "1", 1) == -1) {
 	printf("Unable to enable JA4r fingerprints\n");
 	exit(1);
       }
+
+      do_load_lists = true;
       break;
 
     case 'i':
@@ -1453,7 +1454,7 @@ static void parseOptions(int argc, char **argv) {
     exit(0);
 
   printCSVHeader();
-  
+
 #ifndef USE_DPDK
   if(do_extcap_capture) {
     quiet_mode = 1;
@@ -6175,7 +6176,7 @@ void ballTreeUnitTest() {
 			    num_columns, nun_results);
 
   assert(result.n_samples == 2);
-  
+
   for (i = 0; i < result.n_samples; i++) {
     printf("{\"knn_idx\": [");
     for (j = 0; j < result.n_neighbors; j++)
