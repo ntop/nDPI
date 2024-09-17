@@ -3622,23 +3622,35 @@ static u_int8_t is_ndpi_proto(struct ndpi_flow_struct *flow, u_int16_t id) {
 
 /* ****************************************************** */
 
-bool ndpi_serialize_flow_fingerprint(struct ndpi_flow_struct *flow, ndpi_serializer *serializer) {
+bool ndpi_serialize_flow_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
+				     struct ndpi_flow_struct *flow, ndpi_serializer *serializer) {
   if(is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) || is_ndpi_proto(flow, NDPI_PROTOCOL_QUIC)) {
     if((flow->protos.tls_quic.ja4_client_raw != NULL)
        || (flow->protos.tls_quic.ja4_client[0] != '\0')) {
 
       if(flow->protos.tls_quic.ja4_client_raw != NULL)
 	ndpi_serialize_string_string(serializer, "JA4r", flow->protos.tls_quic.ja4_client_raw);
-      
+
       ndpi_serialize_string_string(serializer, "JA4", flow->protos.tls_quic.ja4_client);
+
+      if(flow->host_server_name[0] != '\0') {
+	ndpi_serialize_string_string(serializer, "sni", flow->host_server_name);
+
+	ndpi_serialize_string_string(serializer, "sni_domain",
+				     ndpi_get_host_domain(ndpi_str,
+							  flow->host_server_name));
+      }
+
       return(true);
     }
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DHCP)
 	    && (flow->protos.dhcp.fingerprint[0] != '\0')) {
     ndpi_serialize_string_string(serializer, "options", flow->protos.dhcp.options);
     ndpi_serialize_string_string(serializer, "fingerprint", flow->protos.dhcp.fingerprint);
-    ndpi_serialize_string_string(serializer, "class_identifier", flow->protos.dhcp.class_ident);
-    
+
+    if(flow->protos.dhcp.class_ident[0] != '\0')
+      ndpi_serialize_string_string(serializer, "class_identifier", flow->protos.dhcp.class_ident);
+
     return(true);
   } else if(is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)
 	    && (flow->protos.ssh.hassh_client[0] != '\0')) {
@@ -3647,7 +3659,7 @@ bool ndpi_serialize_flow_fingerprint(struct ndpi_flow_struct *flow, ndpi_seriali
     ndpi_serialize_string_string(serializer, "client_signature", flow->protos.ssh.client_signature);
     ndpi_serialize_string_string(serializer, "hassh_server", flow->protos.ssh.hassh_server);
     ndpi_serialize_string_string(serializer, "server_signature", flow->protos.ssh.server_signature);
-    
+
     return(true);
   }
 
