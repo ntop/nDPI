@@ -7131,7 +7131,8 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
 	/* check tcp sequence counters */
 	if(((u_int32_t)(ntohl(tcph->seq) - flow->next_tcp_seq_nr[packet->packet_direction])) >
 	   ndpi_str->tcp_max_retransmission_window_size) {
-	  packet->tcp_retransmission = 1;
+	  if(flow->last_tcp_pkt_payload_len > 0)
+	    packet->tcp_retransmission = 1;
 
 	  /* CHECK IF PARTIAL RETRY IS HAPPENING */
 	  if((flow->next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq) <
@@ -7149,6 +7150,8 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
 	flow->next_tcp_seq_nr[0] = 0;
 	flow->next_tcp_seq_nr[1] = 0;
       }
+
+      flow->last_tcp_pkt_payload_len = packet->payload_packet_len;
     } else if(udph != NULL) {
       if(ndpi_str->cfg.direction_detect_enabled &&
          (udph->source != udph->dest))

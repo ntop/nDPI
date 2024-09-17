@@ -1,20 +1,20 @@
-Guessed flow protos:	26
+Guessed flow protos:	25
 
-DPI Packets (TCP):	104	(2.67 pkts/flow)
+DPI Packets (TCP):	103	(2.64 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Unknown          : 3 (flows)
-Confidence Match by port    : 26 (flows)
-Confidence DPI              : 11 (flows)
-Num dissector calls: 1167 (29.17 diss/flow)
+Confidence Match by port    : 25 (flows)
+Confidence DPI              : 12 (flows)
+Num dissector calls: 1194 (29.85 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/87/0 (insert/search/found)
+LRU cache bittorrent: 0/84/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/29/0 (insert/search/found)
+LRU cache mining:     0/28/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    0/31/0 (insert/search/found)
-Automa host:          4/0 (search/found)
-Automa domain:        4/0 (search/found)
+Automa host:          5/0 (search/found)
+Automa domain:        5/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
@@ -34,7 +34,7 @@ Unrated                          3 655           3
 	1	TCP 172.20.3.5:2601 <-> 172.20.3.13:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 13][cat: Web/5][9 pkts/6343 bytes <-> 4 pkts/409 bytes][Goodput ratio: 92/46][11.25 sec][bytes ratio: 0.879 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/104 67/128 469/152 164/24][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 705/102 1514/243 721/81][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 7.527 (Encrypted or Random?)][PLAIN TEXT (POST /servlets/mms HTTP/1.1)][Plen Bins: 16,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,0,0]
 	2	TCP 172.20.3.5:2606 <-> 172.20.3.13:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 12][cat: Web/5][8 pkts/2287 bytes <-> 5 pkts/2963 bytes][Goodput ratio: 80/91][11.18 sec][Hostname/SNI: 172.20.3.13][bytes ratio: -0.129 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 58/58 177/172 83/81][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 286/593 1514/1514 478/662][URL: 172.20.3.13/servlets/mms?message-id=189301][Risk: ** HTTP Susp User-Agent **** HTTP/TLS/QUIC Numeric Hostname/SNI **][Risk Score: 110][Risk Info: Found host 172.20.3.13 / Empty or missing User-Agent][PLAIN TEXT (GET /servlets/mms)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,50,0,0]
 	3	TCP 172.20.3.5:2604 <-> 172.20.3.13:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][5 pkts/1754 bytes <-> 4 pkts/583 bytes][Goodput ratio: 83/62][11.17 sec][Hostname/SNI: 172.20.3.13][bytes ratio: 0.501 (Upload)][IAT c2s/s2c min/avg/max/stddev: 307/81 2793/3724 10864/10997 4662/5143][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 351/146 1514/417 582/157][URL: 172.20.3.13/servlets/mms?message-id=189001][StatusCode: 200][Server: Resin/2.0.1][User-Agent: SonyEricssonT68/R201A][Risk: ** HTTP/TLS/QUIC Numeric Hostname/SNI **][Risk Score: 10][Risk Info: Found host 172.20.3.13][PLAIN TEXT (GET /servlets/mms)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
-	4	TCP 172.20.3.13:53132 <-> 172.20.3.5:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 13][cat: Web/5][9 pkts/1650 bytes <-> 4 pkts/240 bytes][Goodput ratio: 70/0][5.14 sec][bytes ratio: 0.746 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 734/1 4911/1 1706/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 183/60 894/60 270/0][PLAIN TEXT (POST /ppgctrl/ppgcontrollogic.d)][Plen Bins: 0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 172.20.3.13:53132 <-> 172.20.3.5:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 12][cat: Web/5][9 pkts/1650 bytes <-> 4 pkts/240 bytes][Goodput ratio: 70/0][5.14 sec][Hostname/SNI: %s][bytes ratio: 0.746 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 734/1 4911/1 1706/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 183/60 894/60 270/0][URL: %s][Req Content-Type: multipart/related][User-Agent: MMS-Relay-DeliveryInitiator][Risk: ** Clear-Text Credentials **** Non-Printable/Invalid Chars Detected **** Possible Exploit Attempt **][Risk Score: 350][Risk Info: Found credentials in HTTP Auth Line / Invalid host %s / Suspicious hostname: attack ?][PLAIN TEXT (POST /ppgctrl/ppgcontrollogic.d)][Plen Bins: 0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	5	TCP 172.20.3.5:2602 <-> 172.20.3.13:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 3][cat: Web/5][4 pkts/942 bytes <-> 4 pkts/703 bytes][Goodput ratio: 75/69][11.10 sec][Hostname/SNI: 172.20.3.13][bytes ratio: 0.145 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/106 3699/5548 10844/10989 5054/5442][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 236/176 762/541 304/211][URL: 172.20.3.13.servlets/mms][StatusCode: 200][Req Content-Type: application/xml][Content-Type: application/xml][Server: Resin/2.0.1][Risk: ** HTTP Susp User-Agent **** HTTP/TLS/QUIC Numeric Hostname/SNI **][Risk Score: 110][Risk Info: Found host 172.20.3.13 / Empty or missing User-Agent][PLAIN TEXT (POST .servlets/mms HTTP/1.1)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	6	TCP 172.20.3.13:53136 <-> 172.20.3.5:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][5 pkts/586 bytes <-> 6 pkts/999 bytes][Goodput ratio: 54/66][5.21 sec][Hostname/SNI: 172.20.3.5][bytes ratio: -0.261 (Download)][IAT c2s/s2c min/avg/max/stddev: 1/96 1737/1302 4910/5010 2247/2141][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 117/166 370/481 126/150][StatusCode: 100][Req Content-Type: multipart/related][Server: Microsoft-IIS/4.0][User-Agent: MMS-Relay-DeliveryInitiator][PLAIN TEXT (POST /ppgctrl/ppgcon)][Plen Bins: 0,0,25,0,25,0,0,0,0,25,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	7	TCP 172.20.3.5:9587 -> 172.20.3.13:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1514 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][Risk: ** HTTP Susp User-Agent **** Unidirectional Traffic **][Risk Score: 110][Risk Info: No server to client traffic / Empty or missing User-Agent][PLAIN TEXT (POST /servlets/mms HTTP/)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0]

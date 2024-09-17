@@ -1245,7 +1245,8 @@ struct ndpi_flow_struct {
     tcp sequence number connection tracking
   */
   u_int32_t next_tcp_seq_nr[2];
-
+  u_int16_t last_tcp_pkt_payload_len;
+  
   /* Flow addresses (useful for LRU lookups in ndpi_detection_giveup())
      and ports. All in *network* byte order.
      Client and server.
