@@ -1068,6 +1068,13 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	*/
 	flow->l4.tcp.tls.num_tls_blocks = 0;
       }
+#ifdef DEBUG_TLS
+      printf("[TLS] Change Cipher Spec\n");
+#endif
+      flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
+      /* Further data is encrypted so we are not able to parse it without
+         erros and without setting `something_went_wrong` variable */
+      break;
     } else if(content_type == 0x15 /* Alert */) {
       /* https://techcommunity.microsoft.com/t5/iis-support-blog/ssl-tls-alert-protocol-and-the-alert-codes/ba-p/377132 */
 #ifdef DEBUG_TLS
@@ -1091,8 +1098,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     }
 
     if((len > 9)
-       && (content_type != 0x17 /* Application Data */)
-       && (!flow->tls_quic.certificate_processed)) {
+       && (content_type != 0x17 /* Application Data */)) {
       /* Split the element in blocks */
       u_int32_t processed = 5;
 
@@ -1177,7 +1183,13 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
      || ((ndpi_struct->num_tls_blocks_to_follow > 0)
 	 && (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->num_tls_blocks_to_follow))
      || ((ndpi_struct->num_tls_blocks_to_follow == 0)
-	 && (flow->tls_quic.certificate_processed == 1))
+	 && (/* Common path: found handshake on both directions */
+	     (flow->tls_quic.certificate_processed == 1 && flow->protos.tls_quic.client_hello_processed) ||
+	     /* No handshake at all but Application Data on both directions */
+	     (flow->l4.tcp.tls.app_data_seen[0] == 1 && flow->l4.tcp.tls.app_data_seen[1] == 1) ||
+	     /* Handshake on one direction and Application Data on the other */
+	     (flow->protos.tls_quic.client_hello_processed && flow->l4.tcp.tls.app_data_seen[!flow->protos.tls_quic.ch_direction] == 1) ||
+	     (flow->protos.tls_quic.server_hello_processed && flow->l4.tcp.tls.app_data_seen[flow->protos.tls_quic.ch_direction] == 1)))
      ) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] No more blocks\n");
