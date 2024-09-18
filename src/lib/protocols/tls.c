@@ -931,7 +931,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     flow->protos.tls_quic.server_hello_processed = 1;
     flow->protos.tls_quic.ch_direction = !packet->packet_direction;
     processClientServerHello(ndpi_struct, flow, 0);
-    //ndpi_int_tls_add_connection(ndpi_struct, flow);
+    ndpi_int_tls_add_connection(ndpi_struct, flow);
 
 #ifdef DEBUG_TLS
     printf("*** TLS [version: %02X][Server Hello]\n",
@@ -941,7 +941,6 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     if(!is_dtls && flow->protos.tls_quic.ssl_version >= 0x0304 /* TLS 1.3 */) {
       flow->tls_quic.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
     }
-    
     if(is_dtls && flow->protos.tls_quic.ssl_version == 0xFEFC /* DTLS 1.3 */) {
       flow->tls_quic.certificate_processed = 1; /* No Certificate with DTLS 1.3+ */
     }
@@ -967,7 +966,6 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
         printf("[TLS] Certificate from client. Ignoring it\n");
 #endif
       }
-
       flow->tls_quic.certificate_processed = 1;
     }
     break;
@@ -1000,17 +998,11 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	 packet->payload_packet_len, packet->packet_direction);
 #endif
 
-  /* printf("[TLS] **** ndpi_search_tls_tcp(len=%u)\n", packet->payload_packet_len); */
-  
-  /*
-    This function is also called by "extra dissection" data path. Unfortunately,
-    generic "extra function" code doesn't honour protocol bitmask.
-
-    TODO: handle that in ndpi_main.c for all the protocols
-  */
-  if(packet->payload_packet_len == 0
-     || packet->tcp_retransmission
-    ) {
+  /* This function is also called by "extra dissection" data path. Unfortunately,
+     generic "extra function" code doesn't honour protocol bitmask.
+     TODO: handle that in ndpi_main.c for all the protocols */
+  if(packet->payload_packet_len == 0 ||
+     packet->tcp_retransmission) {
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Ack or retransmission %d/%d. Skip\n",
            packet->payload_packet_len, packet->tcp_retransmission);
@@ -1067,8 +1059,6 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     p = packet->payload;
     p_len = packet->payload_packet_len; /* Backup */
 
-    /* printf("[TLS] **** content_type: %u\n", content_type); */
-    
     if(content_type == 0x14 /* Change Cipher Spec */) {
       if(ndpi_struct->skip_tls_blocks_until_change_cipher) {
 	/*
@@ -1078,6 +1068,13 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	*/
 	flow->l4.tcp.tls.num_tls_blocks = 0;
       }
+#ifdef DEBUG_TLS
+      printf("[TLS] Change Cipher Spec\n");
+#endif
+      flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
+      /* Further data is encrypted so we are not able to parse it without
+         erros and without setting `something_went_wrong` variable */
+      break;
     } else if(content_type == 0x15 /* Alert */) {
       /* https://techcommunity.microsoft.com/t5/iis-support-blog/ssl-tls-alert-protocol-and-the-alert-codes/ba-p/377132 */
 #ifdef DEBUG_TLS
@@ -1101,10 +1098,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     }
 
     if((len > 9)
-       && (content_type != 0x17 /* Application Data */)
-       && ((!flow->tls_quic.certificate_processed)
-	   || (!flow->protos.tls_quic.client_hello_processed))
-      ) {
+       && (content_type != 0x17 /* Application Data */)) {
       /* Split the element in blocks */
       u_int32_t processed = 5;
 
@@ -1113,7 +1107,7 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	u_int32_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
 
 	if(/* (block_len == 0) || */ /* Note blocks can have zero lenght */
-	  (block_len > len) || ((block[1] != 0x0))) {
+	   (block_len > len) || ((block[1] != 0x0))) {
 	  something_went_wrong = 1;
 	  break;
 	}
@@ -1189,7 +1183,13 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
      || ((ndpi_struct->num_tls_blocks_to_follow > 0)
 	 && (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->num_tls_blocks_to_follow))
      || ((ndpi_struct->num_tls_blocks_to_follow == 0)
-	 && (flow->tls_quic.certificate_processed == 1))
+	 && (/* Common path: found handshake on both directions */
+	     (flow->tls_quic.certificate_processed == 1 && flow->protos.tls_quic.client_hello_processed) ||
+	     /* No handshake at all but Application Data on both directions */
+	     (flow->l4.tcp.tls.app_data_seen[0] == 1 && flow->l4.tcp.tls.app_data_seen[1] == 1) ||
+	     /* Handshake on one direction and Application Data on the other */
+	     (flow->protos.tls_quic.client_hello_processed && flow->l4.tcp.tls.app_data_seen[!flow->protos.tls_quic.ch_direction] == 1) ||
+	     (flow->protos.tls_quic.server_hello_processed && flow->l4.tcp.tls.app_data_seen[flow->protos.tls_quic.ch_direction] == 1)))
      ) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] No more blocks\n");
@@ -1211,16 +1211,13 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       /* TLS over port 8080 usually triggers that risk; clear it */
       ndpi_unset_risk(flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
       flow->extra_packets_func = NULL;
-      
       return(0); /* That's all */
-    } else if(flow->protos.tls_quic.client_hello_processed) {
+    } else {
       flow->extra_packets_func = NULL;
-      
       return(0); /* That's all */
     }
-  }
-  
-  return(1);
+  } else
+    return(1);
 }
 
 /* **************************************** */
@@ -1425,7 +1422,7 @@ static void tlsInitExtraPacketProcessing(struct ndpi_detection_module_struct *nd
 
   /* At most 12 packets should almost always be enough to find the server certificate if it's there.
      Exception: DTLS traffic with fragments, retransmissions and STUN packets */
-  flow->max_extra_packets_to_check = ((packet->udp != NULL) ? 20 : 16) + (ndpi_struct->num_tls_blocks_to_follow*4);
+  flow->max_extra_packets_to_check = ((packet->udp != NULL) ? 20 : 12) + (ndpi_struct->num_tls_blocks_to_follow*4);
   flow->extra_packets_func = (packet->udp != NULL) ? ndpi_search_tls_udp : ndpi_search_tls_tcp;
 }
 
