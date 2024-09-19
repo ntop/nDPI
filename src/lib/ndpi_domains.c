@@ -122,7 +122,7 @@ const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndp
   return(hostname);
 }
 
-/* ******************************* */
+
 
 /*
   Example
@@ -146,7 +146,7 @@ const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
   if((ret == NULL) || (ret == hostname))
     return(hostname);
 
-  dot = strstr(hostname, ret);
+  dot = ndpi_strrstr(hostname, ret);
 
   if(dot == NULL || dot == hostname)
     return(hostname);

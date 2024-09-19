@@ -3424,8 +3424,8 @@ int tpkt_verify_hdr(const struct ndpi_packet_struct * const packet)
 
 /* ******************************************* */
 
-int64_t ndpi_strtonum(const char *numstr, int64_t minval, int64_t maxval, const char **errstrp, int base)
-{
+int64_t ndpi_strtonum(const char *numstr, int64_t minval,
+		      int64_t maxval, const char **errstrp, int base) {
   int64_t val = 0;
   char* endptr;
 
@@ -3441,14 +3441,17 @@ int64_t ndpi_strtonum(const char *numstr, int64_t minval, int64_t maxval, const 
     *errstrp = "value too small";
     return 0;
   }
+
   if((val == LLONG_MAX && errno == ERANGE) || (val > maxval )) {
     *errstrp = "value too large";
     return 0;
   }
+
   if(errno != 0 && val == 0) {
     *errstrp = "generic error";
     return 0;
   }
+
   if(endptr == numstr) {
     *errstrp = "No digits were found";
     return 0;
@@ -3457,6 +3460,25 @@ int64_t ndpi_strtonum(const char *numstr, int64_t minval, int64_t maxval, const 
 
   *errstrp = NULL;
   return val;
+}
+
+/* ****************************************************** */
+
+char* ndpi_strrstr(const char *haystack, const char *needle) {
+  char *ret = NULL;
+  
+  while(true) {
+    char *s = strstr(haystack, needle);
+    
+    if(s == NULL)
+      break;
+    else {
+      ret = s;
+      haystack = &s[1]; /* Skip the first char */
+    }
+  }
+
+  return(ret);
 }
 
 /* ******************************************* */
