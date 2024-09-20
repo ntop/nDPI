@@ -7904,9 +7904,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
 
     ndpi_set_detected_protocol(ndpi_str, flow,
-              flow->guessed_protocol_id_by_ip,
-        ret.proto.master_protocol,
-              NDPI_CONFIDENCE_MATCH_BY_IP);
+			       flow->guessed_protocol_id_by_ip,
+			       ret.proto.master_protocol,
+			       NDPI_CONFIDENCE_MATCH_BY_IP);
     ret.proto.app_protocol = flow->detected_protocol_stack[0];
     }
   }
