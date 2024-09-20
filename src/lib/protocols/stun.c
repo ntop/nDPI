@@ -110,7 +110,7 @@ static int is_new_subclassification_better(struct ndpi_detection_module_struct *
   if(new_app_proto != NDPI_PROTOCOL_UNKNOWN &&
      is_subclassification_real(flow) &&
      new_app_proto != flow->detected_protocol_stack[0]) {
-    NDPI_LOG_ERR(ndpi_struct, "Incoherent sub-classification change %d/%d->%d \n",
+    NDPI_LOG_DBG(ndpi_struct, "Incoherent sub-classification change %d/%d->%d \n",
                  flow->detected_protocol_stack[1],
                  flow->detected_protocol_stack[0], new_app_proto);
   }
@@ -850,7 +850,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
         packet->payload_packet_len = orig_payload_length;
 
       } else {
-        NDPI_LOG_ERR(ndpi_struct, "Invalid MS channel length %d %d\n",
+        NDPI_LOG_DBG(ndpi_struct, "Invalid MS channel length %d %d\n",
                      ch_len, packet->payload_packet_len - 4);
       }
     } else {
