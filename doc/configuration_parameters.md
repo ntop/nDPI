@@ -14,6 +14,7 @@ TODO
 | NULL         | "dpi.compute_entropy"                     | 1             | NULL      | NULL      | Enable/disable computation of flow entropy |
 | NULL         | "fpc"                                     | enable        | NULL      | NULL      | Enable/disable First Packet Classification |
 | NULL         | "dpi.guess_on_giveup"                     | 0x03          | 0x00      | 0x03      | Tell the library to guess flow classification, if any DPI algorithms/logics fail.  The value is a bitmask. Values: 0x0 = disabled; 0x01 = enable guessing by port; 0x02 = enable guessing by ip |
+| NULL         | "dpi.guess_ip_before_port"                | disable       | NULL      | NULL      | Enable/disable guessing by IP first when guessing flow classifcation. Disabled = guess by port first. |
 | NULL         | "flow_risk_lists.load"                    | 1             | NULL      | NULL      | Enable/disable loading of every IP addresses lists used to check any flow risks |
 | NULL         | "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load" | 1             | NULL      | NULL      | Enable/disable loading of internal iCouldPrivateRealy IP address list used to check `NDPI_ANONYMOUS_SUBSCRIBER` flow risk |
 | NULL         | "flow_risk.anonymous_subscriber.list.protonvpn.load"          | 1             | NULL      | NULL      | Enable/disable loading of internal IP address list of ProtonVPN exit nodes used to check `NDPI_ANONYMOUS_SUBSCRIBER` flow risk  |
