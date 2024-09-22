@@ -3470,7 +3470,7 @@ char* ndpi_strrstr(const char *haystack, const char *needle) {
   while(true) {
     char *s = strstr(haystack, needle);
     
-    if(s == NULL)
+    if(s == NULL || s[0] == '\0')
       break;
     else {
       ret = s;
