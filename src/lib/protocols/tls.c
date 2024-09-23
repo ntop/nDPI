@@ -1068,13 +1068,18 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	*/
 	flow->l4.tcp.tls.num_tls_blocks = 0;
       }
+      if(len == 6 &&
+         message->buffer[1] == 0x03 && /* TLS >= 1.0 */
+         ((message->buffer[3] << 8) + (message->buffer[4])) == 1) {
 #ifdef DEBUG_TLS
-      printf("[TLS] Change Cipher Spec\n");
+        printf("[TLS] Change Cipher Spec\n");
 #endif
-      flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
-      /* Further data is encrypted so we are not able to parse it without
-         erros and without setting `something_went_wrong` variable */
-      break;
+        ndpi_int_tls_add_connection(ndpi_struct, flow);
+        flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
+        /* Further data is encrypted so we are not able to parse it without
+           erros and without setting `something_went_wrong` variable */
+        break;
+      }
     } else if(content_type == 0x15 /* Alert */) {
       /* https://techcommunity.microsoft.com/t5/iis-support-blog/ssl-tls-alert-protocol-and-the-alert-codes/ba-p/377132 */
 #ifdef DEBUG_TLS
