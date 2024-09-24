@@ -6203,6 +6203,24 @@ void ballTreeUnitTest() {
 
 /* *********************************************** */
 
+void cryptDecryptUnitTest() {
+  u_char enc_dec_key[64] = "9dedb817e5a8805c1de62eb8982665b9a2b4715174c34d23b9a46ffafacfb2a7" /* SHA256("nDPI") */;
+  const char *test_string = "The quick brown fox jumps over the lazy dog";
+  char *enc, *dec;
+  
+  enc = ndpi_quick_encrypt(test_string, strlen(test_string), enc_dec_key);
+  assert(enc != NULL);
+  dec = ndpi_quick_decrypt((const char*)enc, strlen(enc), enc_dec_key);
+  assert(dec != NULL);
+  
+  assert(strcmp(dec, test_string) == 0);
+
+  ndpi_free(enc);
+  ndpi_free(dec);
+}
+
+/* *********************************************** */
+
 void encodeDomainsUnitTest() {
   NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
@@ -6383,6 +6401,7 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    cryptDecryptUnitTest();
     kdUnitTest();
     encodeDomainsUnitTest();
     loadStressTest();

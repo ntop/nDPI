@@ -2307,6 +2307,16 @@ extern "C" {
 
   /* ******************************* */
 
+  char* ndpi_quick_encrypt(const char *cleartext_msg,
+			   u_int16_t cleartext_msg_len,
+			   u_char encrypt_key[64]);
+  
+  char* ndpi_quick_decrypt(const char *encrypted_msg,
+			   u_int16_t encrypted_msg_len,
+			   u_char decrypt_key[64]);
+ 
+  /* ******************************* */
+
   bool ndpi_serialize_flow_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 				       struct ndpi_flow_struct *flow, ndpi_serializer *serializer);
 
