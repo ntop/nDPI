@@ -653,8 +653,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 		    if(matched_name == 0) {
 #if DEBUG_TLS
 		      printf("[TLS] Trying to match '%s' with '%s'\n",
-			     flow->host_server_name,
-			     dNSName);
+			     flow->host_server_name, dNSName);
 #endif
 
 		      if(dNSName[0] == '*') {
@@ -667,8 +666,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 			    matched_name = 1;
 			  }
 			}
-		      }
-		      else if(strcmp(flow->host_server_name, dNSName) == 0) {
+		      } else if(strcmp(flow->host_server_name, dNSName) == 0) {
 			matched_name = 1;
 		      }
 		    }

@@ -1,0 +1,32 @@
+DPI Packets (TCP):	10	(10.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 3 (3.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   1/2/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          2/0 (search/found)
+Automa domain:        2/0 (search/found)
+Automa tls cert:      1/1 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Sonos	44	16059	1
+
+Fun                             44 16059         1            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 192.168.1.29             	 1      
+
+
+	1	TCP 192.168.1.29:52425 <-> 192.168.1.70:1443 [proto: 91.430/TLS.Sonos][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 10][cat: Music/25][23 pkts/2258 bytes <-> 21 pkts/13801 bytes][Goodput ratio: 32/90][0.09 sec][Hostname/SNI: 192.168.1.70][bytes ratio: -0.719 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/3 76/36 17/9][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 98/657 333/1514 74/647][Risk: ** Known Proto on Non Std Port **** Weak TLS Cipher **** TLS Cert Mismatch **** TLS (probably) Not Carrying HTTPS **][Risk Score: 260][Risk Info: No ALPN / Cipher TLS_RSA_WITH_AES_128_GCM_SHA256 / 192.168.1.70 vs sonos-347e5cffa26e.local][TLSv1.2][JA3C: ae25e09391d7275844ccf16316569582][JA4: t12i130700_88f5d26691c7_cdbdbcd6f742][ServerNames: sonos-347e5cffa26e.local][JA3S: 2fbcb4e196d5bcba6896e593c6016e09 (WEAK)][Issuer: C=US, ST=California, L=Santa Barbara, O=Sonos, Inc, OU=Sonos Devices, CN=Sonos Device Authentication Root CA][Subject: CN=347E5CFFA26E, OU=Sonos Devices, O=Sonos, Inc, L=Santa Barbara, ST=California, C=US][Certificate SHA-1: 48:71:C5:C1:80:17:50:20:E2:25:2E:E3:C3:F9:AE:76:62:1C:26:7E][Firefox][Validity: 2024-01-03 08:21:55 - 2025-01-29 08:20:55][Cipher: TLS_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 20,14,0,0,4,4,0,4,4,0,0,4,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,0,0]

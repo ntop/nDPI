@@ -1688,6 +1688,9 @@ static ndpi_protocol_match host_match[] =
    { "windscribe.com",                   "Windscribe", NDPI_PROTOCOL_WINDSCRIBE, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "whiskergalaxy.com",                "Windscribe", NDPI_PROTOCOL_WINDSCRIBE, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "sonos.com",                        "Sonos", NDPI_PROTOCOL_SONOS, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "sonos.radio",                      "Sonos", NDPI_PROTOCOL_SONOS, NDPI_PROTOCOL_CATEGORY_MUSIC, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif
@@ -1717,7 +1720,7 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "O=NoMachine",                     NDPI_PROTOCOL_NOMACHINE },
   { "O=Private Internet Access",       NDPI_PROTOCOL_PIA },
   { "O=Windscribe",                    NDPI_PROTOCOL_WINDSCRIBE },
-
+  { "O=Sonos, Inc",                    NDPI_PROTOCOL_SONOS      },  
   { "CN=Snapchat Inc.",                NDPI_PROTOCOL_SNAPCHAT_CALL },
   { "CN=NVIDIA GameStream",            NDPI_PROTOCOL_GEFORCENOW },
 
