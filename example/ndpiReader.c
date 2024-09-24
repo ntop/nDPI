@@ -6207,13 +6207,15 @@ void cryptDecryptUnitTest() {
   u_char enc_dec_key[64] = "9dedb817e5a8805c1de62eb8982665b9a2b4715174c34d23b9a46ffafacfb2a7" /* SHA256("nDPI") */;
   const char *test_string = "The quick brown fox jumps over the lazy dog";
   char *enc, *dec;
+  u_int16_t e_len, d_len, t_len = strlen(test_string);
   
-  enc = ndpi_quick_encrypt(test_string, strlen(test_string), enc_dec_key);
+  enc = ndpi_quick_encrypt(test_string, t_len, &e_len, enc_dec_key);
   assert(enc != NULL);
-  dec = ndpi_quick_decrypt((const char*)enc, strlen(enc), enc_dec_key);
+  dec = ndpi_quick_decrypt((const char*)enc, e_len, &d_len, enc_dec_key);
   assert(dec != NULL);
+  assert(t_len == d_len);
   
-  assert(strcmp(dec, test_string) == 0);
+  assert(strncmp(dec, test_string, e_len) == 0);
 
   ndpi_free(enc);
   ndpi_free(dec);
@@ -6387,7 +6389,7 @@ int main(int argc, char **argv) {
     printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
     return(-1);
   }
-
+  
   if(!skip_unit_tests) {
 #ifndef DEBUG_TRACE
     /* Skip tests when debugging */

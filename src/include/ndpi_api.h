@@ -2314,10 +2314,12 @@ extern "C" {
 
   char* ndpi_quick_encrypt(const char *cleartext_msg,
 			   u_int16_t cleartext_msg_len,
+			   u_int16_t *encrypted_msg_len,
 			   u_char encrypt_key[64]);
   
   char* ndpi_quick_decrypt(const char *encrypted_msg,
 			   u_int16_t encrypted_msg_len,
+			   u_int16_t *decrypted_msg_len,
 			   u_char decrypt_key[64]);
  
   /* ******************************* */
