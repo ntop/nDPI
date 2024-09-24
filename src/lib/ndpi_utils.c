@@ -3465,20 +3465,28 @@ int64_t ndpi_strtonum(const char *numstr, int64_t minval,
 /* ****************************************************** */
 
 char* ndpi_strrstr(const char *haystack, const char *needle) {
-  char *ret = NULL;
-  
-  while(true) {
-    char *s = strstr(haystack, needle);
-    
-    if(s == NULL || s[0] == '\0')
-      break;
-    else {
-      ret = s;
-      haystack = &s[1]; /* Skip the first char */
-    }
+  if (!haystack || !needle) {
+    return NULL;
   }
 
-  return(ret);
+  if (*needle == '\0') {
+    return (char*) haystack + strlen(haystack);
+  }
+
+  const char *last_occurrence = NULL;
+
+  while (true) {
+    const char *current_pos = strstr(haystack, needle);
+
+    if (!current_pos) {
+      break;
+    }
+
+    last_occurrence = current_pos;
+    haystack = current_pos + 1;
+  }
+
+  return (char*) last_occurrence;
 }
 
 /* ******************************************* */
