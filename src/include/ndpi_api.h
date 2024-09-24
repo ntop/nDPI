@@ -1772,6 +1772,11 @@ extern "C" {
 
   /* ******************************* */
 
+  u_int ndpi_hex2bin(u_char *out, u_int out_len, u_char* in, u_int in_len);
+  u_int ndpi_bin2hex(u_char *out, u_int out_len, u_char* in, u_int in_len);
+  
+  /* ******************************* */
+
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
   int ndpi_des_add_value(struct ndpi_des_struct *des, const double _value, double *forecast, double *confidence_band);
   void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, float *ret_beta);
