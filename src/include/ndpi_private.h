@@ -121,6 +121,7 @@ struct ndpi_packet_struct {
   struct ndpi_int_one_line_struct http_origin;
   struct ndpi_int_one_line_struct server_line;
   struct ndpi_int_one_line_struct http_method;
+  struct ndpi_int_one_line_struct upgrade_line;
   struct ndpi_int_one_line_struct http_response; /* the first "word" in this pointer is the
 						    response code in the packet (200, etc) */
 
@@ -233,6 +234,8 @@ struct ndpi_detection_module_config_struct {
 
   int tls_certificate_expire_in_x_days;
   int tls_app_blocks_tracking_enabled;
+  int tls_heuristics;
+  int tls_heuristics_max_packets;
   int tls_sha1_fingerprint_enabled;
   int tls_ja3c_fingerprint_enabled;
   int tls_ja3s_fingerprint_enabled;
@@ -642,7 +645,8 @@ void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
 int is_dtls(const u_int8_t *buf, u_int32_t buf_len, u_int32_t *block_len);
 void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow);
-
+void switch_extra_dissection_to_tls_obfuscated_heur(struct ndpi_detection_module_struct* ndpi_struct,
+                                                    struct ndpi_flow_struct* flow);
 /* HTTP */
 void http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow,

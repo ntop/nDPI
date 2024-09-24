@@ -795,6 +795,11 @@ struct ndpi_lru_cache {
 /* OpenVPN */
 #define NDPI_HEURISTICS_OPENVPN_OPCODE			0x01 /* Enable heuristic based on opcode frequency */
 
+/* TLS */
+#define NDPI_HEURISTICS_TLS_OBFUSCATED_PLAIN		0x01 /* Enable heuristic to detect proxied/obfuscated TLS flows over generic/unknown flows */
+#define NDPI_HEURISTICS_TLS_OBFUSCATED_TLS		0x02 /* Enable heuristic to detect proxied/obfuscated TLS flows over TLS tunnels, i.e. TLS over TLS */
+#define NDPI_HEURISTICS_TLS_OBFUSCATED_HTTP		0x04 /* Enable heuristic to detect proxied/obfuscated TLS flows over HTTP/WebSocket */
+
 
 /* ************************************************** */
 
@@ -1304,6 +1309,7 @@ struct ndpi_flow_struct {
   struct {
     ndpi_http_method method;
     u_int8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
+    u_int8_t websocket:1, _pad:7;
     u_int16_t response_status_code; /* 200, 404, etc. */
     char *url, *content_type /* response */, *request_content_type /* e.g. for POST */, *user_agent, *server;
     char *detected_os; /* Via HTTP/QUIC User-Agent */
@@ -1330,7 +1336,8 @@ struct ndpi_flow_struct {
 
   struct {
     message_t message[2]; /* Directions */
-    u_int8_t certificate_processed:1, _pad:7;
+    u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, pad:4;
+    struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
   } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
   union {
@@ -1549,7 +1556,7 @@ struct ndpi_flow_struct {
   /* Flow payload */
   u_int16_t flow_payload_len;
   char *flow_payload;
-  
+
   /* 
      Leave this field below at the end
      The field below can be used by third
@@ -1563,8 +1570,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 264,
                "Size of the struct member protocols increased to more than 264 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1152,
-               "Size of the flow struct increased to more than 1152 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1160,
+               "Size of the flow struct increased to more than 1160 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

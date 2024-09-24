@@ -1,0 +1,44 @@
+DPI Packets (TCP):	38	(12.67 pkts/flow)
+DPI Packets (UDP):	3	(3.00 pkts/flow)
+Confidence Unknown          : 1 (flows)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 416 (104.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    1/3/0 (insert/search/found)
+Automa host:          4/4 (search/found)
+Automa domain:        4/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   1/0 (search/found)
+Patricia protocols:   6/0 (search/found)
+Patricia protocols IPv6: 1/1 (search/found)
+
+Unknown	29	22543	1
+YouTube	41	25855	2
+SOCKS	30	21345	1
+
+Acceptable                      30 21345         1            
+Fun                             41 25855         2            
+Unrated                         29 22543         1            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 2001:b07:a3d:c112:8628:88aa:8b00:913c 	 1      
+
+
+	1	TCP [2001:b07:a3d:c112:8628:88aa:8b00:913c]:48302 <-> [2a00:1450:4006:80d::200e]:443 [proto: 91.124/TLS.YouTube][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 126/Google, Confidence: IP address][DPI packets: 8][cat: Media/1][19 pkts/2517 bytes <-> 18 pkts/22438 bytes][Goodput ratio: 33/93][2.20 sec][Hostname/SNI: www.youtube.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.798 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 146/10 1024/77 344/20][Pkt Len c2s/s2c min/avg/max/stddev: 88/88 132/1247 605/2504 117/854][TLSv1.3][JA3C: 4ea056e63b7910cbf543f0c095064dfe][JA4: t13d3113h2_e8f1e7e78f70_ce5650b735ce][JA3S: 907bf3ecef1c987c889946b737b43de8][Firefox][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 10,5,5,0,5,0,0,5,0,0,0,0,0,0,0,0,5,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,30,0,5,0,0,0,0,0,0,0,25]
+	2	TCP 127.0.0.1:37218 <-> 127.0.0.1:1080 [proto: 172/SOCKS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][15 pkts/1875 bytes <-> 15 pkts/19470 bytes][Goodput ratio: 45/95][2.27 sec][bytes ratio: -0.824 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 185/178 2080/2039 572/561][Pkt Len c2s/s2c min/avg/max/stddev: 68/68 125/1298 585/7183 125/2425][PLAIN TEXT (www.youtube.com)][Plen Bins: 34,26,6,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20]
+	3	UDP 127.0.0.1:35957 <-> 127.0.0.53:53 [proto: 5.124/DNS.YouTube][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.124/DNS.YouTube, Confidence: DPI][DPI packets: 3][cat: Network/14][2 pkts/176 bytes <-> 2 pkts/724 bytes][Goodput ratio: 50/88][0.00 sec][Hostname/SNI: www.youtube.com][172.217.18.46][PLAIN TEXT (youtube)][Plen Bins: 0,50,0,0,0,25,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	TCP 127.0.0.1:40818 <-> 127.0.0.1:1234 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 24][13 pkts/2126 bytes <-> 16 pkts/20417 bytes][Goodput ratio: 58/95][2.27 sec][bytes ratio: -0.811 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 225/171 2079/2079 619/551][Pkt Len c2s/s2c min/avg/max/stddev: 68/68 164/1276 749/4794 178/1603][Risk: ** Fully Encrypted Flow **][Risk Score: 50][PLAIN TEXT (Zy61zL)][Plen Bins: 0,0,6,20,13,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,33]

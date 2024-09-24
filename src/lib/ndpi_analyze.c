@@ -2141,3 +2141,42 @@ void ndpi_free_knn(ndpi_knn knn) { free_knn(knn, knn.n_samples); }
 
 void ndpi_free_btree(ndpi_btree *b) { free_tree((t_btree*)b); }
 
+/* ********************************************************************************* */
+
+/* It provides the Mahalanobis distance (https://en.wikipedia.org/wiki/Mahalanobis_distance)
+   between a point x and a distribution with mean u and inverted covariant matrix i_s.
+   Parameters:
+    x: input array (with dimension "size")
+    u: means array (with dimension "size")
+    i_s: inverted covariant matrix (with dimension "size" * "size")
+
+   Bottom line: distance = sqrt([x - u] * [i_s] * [x - u]^T)
+*/
+float ndpi_mahalanobis_distance(const u_int32_t *x, u_int32_t size, const float *u, const float *i_s)
+{
+  float md = 0;
+  float *diff; /* [x - u] */
+  float *tmp;  /* Result of [x - u] * [i_s] */
+  u_int32_t i, j;
+
+  /* Could we get rid of these allocations? */
+  diff = ndpi_calloc(sizeof(float), size);
+  tmp = ndpi_calloc(sizeof(float), size);
+  if(diff && tmp) {
+    for (i = 0; i < size; i++)
+      diff[i] = x[i] - u[i];
+
+    /* Naive implementation of matrix multiplication(s) */
+    for(i = 0; i < size; i++) {
+      for(j = 0; j < size; j++) {
+        tmp[i] += diff[j] * i_s[size * j + i];
+      }
+    }
+    for(i = 0; i < size; i++)
+      md += tmp[i] * diff[i];
+  }
+  ndpi_free(diff);
+  ndpi_free(tmp);
+
+  return sqrt(md);
+}
