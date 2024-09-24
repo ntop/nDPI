@@ -2226,7 +2226,22 @@ extern "C" {
   */
   u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 			   char *domain, char *out, u_int out_len);
-    
+
+  /* ******************************* */
+
+  char* ndpi_quick_encrypt(const char *cleartext_msg,
+			   u_int16_t cleartext_msg_len,
+			   u_char encrypt_key[64]);
+  
+  char* ndpi_quick_decrypt(const char *encrypted_msg,
+			   u_int16_t encrypted_msg_len,
+			   u_char decrypt_key[64]);
+ 
+  /* ******************************* */
+
+  bool ndpi_serialize_flow_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
+				       struct ndpi_flow_struct *flow, ndpi_serializer *serializer);
+
   /* ******************************* */
 
   const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx);

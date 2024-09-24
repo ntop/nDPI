@@ -3360,3 +3360,115 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 
   return(out_idx);
 }
+
+/* ****************************************************** */
+/* ****************************************************** */
+
+#include "third_party/include/aes.h"
+
+static void ndpi_key_hex2bin(u_char *out, u_char* key, u_int key_len) {
+  u_int i, j;
+
+  for(i=0, j=0; i<key_len; i += 2, j++) {
+    char buf[3];
+
+    buf[0] = key[i], buf[1] = key[i+1], buf[2] = '\0';
+    out[j] = strtol(buf, NULL, 16);
+  }
+}
+
+/* ****************************************************** */
+
+/*
+  IMPORTANT: the returned string (if not NULL) must be freed
+*/
+char* ndpi_quick_encrypt(const char *cleartext_msg,
+			 u_int16_t cleartext_msg_len,
+			 u_char encrypt_key[64]) {
+  char *encoded = NULL, *encoded_buf;
+  struct AES_ctx ctx;
+  int encoded_len, i, n_padding;
+  u_char nonce[24] = { 0x0 };
+  u_char binary_encrypt_key[32];
+
+  /* AES, as a block cipher, does not change the size. The input size is always the output size.
+   * But AES, being a block cipher, requires the input to be multiple of block size (16 bytes). */
+  encoded_len = cleartext_msg_len + 16 - (cleartext_msg_len % 16);
+
+  encoded_buf = (char *)ndpi_calloc(encoded_len, 1);
+
+  if (encoded_buf == NULL) {
+    /* Allocation failure */
+    return(NULL);
+  }
+
+  ndpi_key_hex2bin(binary_encrypt_key, (u_char*)encrypt_key, 64);
+
+  memcpy(encoded_buf, cleartext_msg, cleartext_msg_len);
+
+  /* PKCS5 Padding (https://www.cryptosys.net/pki/manpki/pki_paddingschemes.html) */
+  n_padding = encoded_len - cleartext_msg_len;
+
+  for(i = encoded_len - n_padding; i < encoded_len; i++)
+    encoded_buf[i] = n_padding;
+
+  AES_init_ctx_iv(&ctx, binary_encrypt_key, nonce);
+  AES_CBC_encrypt_buffer(&ctx, (uint8_t*)encoded_buf, encoded_len);
+
+  encoded = ndpi_base64_encode((const unsigned char *)encoded_buf, encoded_len);
+  ndpi_free(encoded_buf);
+
+  return(encoded);
+}
+
+/* ************************************************************** */
+
+char* ndpi_quick_decrypt(const char *encrypted_msg,
+			 u_int16_t encrypted_msg_len,
+			 u_char decrypt_key[64]) {
+  u_char nonce[24] = { 0x0 };
+  u_char binary_decrypt_key[32];
+  u_char *content;
+  size_t content_len, allocated_decoded_string = encrypted_msg_len + 8 /* padding */;
+  char *decoded_string = (char*)ndpi_calloc(sizeof(u_char), allocated_decoded_string);
+  u_int n_padding;
+  struct AES_ctx ctx;
+
+  if(decoded_string == NULL) {
+    /* Allocation failure */
+    return(NULL);
+  }
+
+  ndpi_key_hex2bin(binary_decrypt_key, (u_char*)decrypt_key, 64);
+
+  content = ndpi_base64_decode((const u_char*)encrypted_msg, encrypted_msg_len, &content_len);
+
+  if((content == NULL) || (content_len == 0)) {
+    /* Base64 decoding error */
+    ndpi_free(content);
+    return(NULL);
+  }
+
+  if(allocated_decoded_string < (content_len+1)) {
+    /* Buffer size failure */
+    free(content);
+    return(NULL);
+  }
+
+  /* AES - https://github.com/kokke/tiny-AES-c */
+  AES_init_ctx_iv(&ctx, binary_decrypt_key, nonce);
+  memcpy(decoded_string, content, content_len);
+  AES_CBC_decrypt_buffer(&ctx, (uint8_t*)decoded_string, content_len);
+
+  /* Remove PKCS5 padding */
+  n_padding = decoded_string[content_len-1];
+
+  if(content_len > n_padding) {
+    content_len = content_len - n_padding;
+    decoded_string[content_len] = 0;
+  }
+
+  ndpi_free(content);
+
+  return(decoded_string);
+}
