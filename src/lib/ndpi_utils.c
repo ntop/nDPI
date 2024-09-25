@@ -3366,24 +3366,12 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 
 #include "third_party/include/aes.h"
 
-static void ndpi_key_hex2bin(u_char *out, u_char* key, u_int key_len) {
-  u_int i, j;
-
-  for(i=0, j=0; i<key_len; i += 2, j++) {
-    char buf[3];
-
-    buf[0] = key[i], buf[1] = key[i+1], buf[2] = '\0';
-    out[j] = strtol(buf, NULL, 16);
-  }
-}
-
-/* ****************************************************** */
-
 /*
   IMPORTANT: the returned string (if not NULL) must be freed
 */
 char* ndpi_quick_encrypt(const char *cleartext_msg,
 			 u_int16_t cleartext_msg_len,
+			 u_int16_t *encrypted_msg_len,
 			 u_char encrypt_key[64]) {
   char *encoded = NULL, *encoded_buf;
   struct AES_ctx ctx;
@@ -3395,6 +3383,7 @@ char* ndpi_quick_encrypt(const char *cleartext_msg,
    * But AES, being a block cipher, requires the input to be multiple of block size (16 bytes). */
   encoded_len = cleartext_msg_len + 16 - (cleartext_msg_len % 16);
 
+  *encrypted_msg_len = 0;
   encoded_buf = (char *)ndpi_calloc(encoded_len, 1);
 
   if (encoded_buf == NULL) {
@@ -3402,7 +3391,7 @@ char* ndpi_quick_encrypt(const char *cleartext_msg,
     return(NULL);
   }
 
-  ndpi_key_hex2bin(binary_encrypt_key, (u_char*)encrypt_key, 64);
+  ndpi_hex2bin(binary_encrypt_key, sizeof(binary_encrypt_key), (u_char*)encrypt_key, 64);
 
   memcpy(encoded_buf, cleartext_msg, cleartext_msg_len);
 
@@ -3418,6 +3407,8 @@ char* ndpi_quick_encrypt(const char *cleartext_msg,
   encoded = ndpi_base64_encode((const unsigned char *)encoded_buf, encoded_len);
   ndpi_free(encoded_buf);
 
+  *encrypted_msg_len = strlen(encoded);
+  
   return(encoded);
 }
 
@@ -3425,6 +3416,7 @@ char* ndpi_quick_encrypt(const char *cleartext_msg,
 
 char* ndpi_quick_decrypt(const char *encrypted_msg,
 			 u_int16_t encrypted_msg_len,
+			 u_int16_t *decrypted_msg_len,
 			 u_char decrypt_key[64]) {
   u_char nonce[24] = { 0x0 };
   u_char binary_decrypt_key[32];
@@ -3434,12 +3426,14 @@ char* ndpi_quick_decrypt(const char *encrypted_msg,
   u_int n_padding;
   struct AES_ctx ctx;
 
+  *decrypted_msg_len = 0;
+  
   if(decoded_string == NULL) {
     /* Allocation failure */
     return(NULL);
   }
 
-  ndpi_key_hex2bin(binary_decrypt_key, (u_char*)decrypt_key, 64);
+  ndpi_hex2bin(binary_decrypt_key, sizeof(binary_decrypt_key), (u_char*)decrypt_key, 64);
 
   content = ndpi_base64_decode((const u_char*)encrypted_msg, encrypted_msg_len, &content_len);
 
@@ -3468,7 +3462,45 @@ char* ndpi_quick_decrypt(const char *encrypted_msg,
     decoded_string[content_len] = 0;
   }
 
+  *decrypted_msg_len = content_len;
+    
   ndpi_free(content);
 
   return(decoded_string);
+}
+
+/* ****************************************************** */
+
+u_int ndpi_hex2bin(u_char *out, u_int out_len, u_char* in, u_int in_len) {
+  u_int i, j;
+
+  if(((in_len+1) / 2) > out_len)
+    return(0);
+
+  for(i=0, j=0; i<in_len; i += 2, j++) {
+    char buf[3];
+
+    buf[0] = in[i], buf[1] = in[i+1], buf[2] = '\0';
+    out[j] = strtol(buf, NULL, 16);
+  }
+
+  return(j);
+}
+
+/* ****************************************************** */
+
+u_int ndpi_bin2hex(u_char *out, u_int out_len, u_char* in, u_int in_len) {
+  u_int i, j;
+
+  if (out_len < (in_len*2)+1) {
+    out[0] = '\0';
+    return(0);
+  }
+
+  for(i=0, j=0; i<in_len; i++) {
+    snprintf((char*)&out[j], out_len-j, "%02X", in[i]);
+    j += 2;
+  }
+
+  return(j);
 }

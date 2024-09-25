@@ -1749,6 +1749,11 @@ extern "C" {
 
   /* ******************************* */
 
+  u_int ndpi_hex2bin(u_char *out, u_int out_len, u_char* in, u_int in_len);
+  u_int ndpi_bin2hex(u_char *out, u_int out_len, u_char* in, u_int in_len);
+
+  /* ******************************* */
+
   int ndpi_des_init(struct ndpi_des_struct *des, double alpha, double beta, float significance);
   int ndpi_des_add_value(struct ndpi_des_struct *des, const double _value, double *forecast, double *confidence_band);
   void ndpi_des_fitting(double *values, u_int32_t num_values, float *ret_alpha, float *ret_beta);
@@ -2231,10 +2236,12 @@ extern "C" {
 
   char* ndpi_quick_encrypt(const char *cleartext_msg,
 			   u_int16_t cleartext_msg_len,
+			   u_int16_t *encrypted_msg_len,
 			   u_char encrypt_key[64]);
   
   char* ndpi_quick_decrypt(const char *encrypted_msg,
 			   u_int16_t encrypted_msg_len,
+			   u_int16_t *decrypted_msg_len,
 			   u_char decrypt_key[64]);
  
   /* ******************************* */
