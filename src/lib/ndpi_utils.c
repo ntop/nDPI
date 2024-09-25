@@ -3711,7 +3711,7 @@ u_int ndpi_hex2bin(u_char *out, u_int out_len, u_char* in, u_int in_len) {
 u_int ndpi_bin2hex(u_char *out, u_int out_len, u_char* in, u_int in_len) {
   u_int i, j;
 
-  if (out_len < (in_len*2)+1) {
+  if (out_len < (in_len*2)) {
     out[0] = '\0';
     return(0);
   }
