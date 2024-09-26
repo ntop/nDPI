@@ -334,7 +334,7 @@ extern "C" {
 				 const unsigned char *packet,
 				 const unsigned short packetlen,
 				 const u_int64_t packet_time_ms,
-				 const struct ndpi_flow_input_info *input_info);
+				 struct ndpi_flow_input_info *input_info);
 
   /**
    * Processes one packet and returns the ID of the detected protocol.
@@ -354,7 +354,7 @@ extern "C" {
 					      const unsigned char *packet,
 					      const unsigned short packetlen,
 					      const u_int64_t packet_time_ms,
-					      const struct ndpi_flow_input_info *input_info);
+					      struct ndpi_flow_input_info *input_info);
   /**
    * Get the main protocol of the passed flows for the detected module
    *

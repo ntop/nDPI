@@ -182,7 +182,7 @@ typedef struct ndpi_flow_info {
   struct ndpi_in6_addr dst_ip6; /* network order */
   u_int16_t src_port; /* network order */
   u_int16_t dst_port; /* network order */
-  u_int8_t detection_completed, protocol, bidirectional, check_extra_packets;
+  u_int8_t detection_completed, protocol, bidirectional, check_extra_packets, current_pkt_from_client_to_server;
   u_int16_t vlan_id;
   ndpi_packet_tunnel tunnel_type;
   struct ndpi_flow_struct *ndpi_flow;

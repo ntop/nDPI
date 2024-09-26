@@ -57,7 +57,7 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
                                             const unsigned char *packet,
                                             const unsigned short packetlen,
                                             const u_int64_t packet_time_ms,
-                                            const struct ndpi_flow_input_info *input_info);
+                                            struct ndpi_flow_input_info *input_info);
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
                                     struct ndpi_flow_struct *flow,
                                     u_int8_t *protocol_was_guessed);

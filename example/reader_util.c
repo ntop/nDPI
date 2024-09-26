@@ -1733,7 +1733,6 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     flow->detected_protocol = ndpi_detection_process_packet(workflow->ndpi_struct, ndpi_flow,
 							    iph ? (uint8_t *)iph : (uint8_t *)iph6,
 							    ipsize, time_ms, &input_info);
-
     enough_packets |= ndpi_flow->fail_with_unknown;
     if(enough_packets || (flow->detected_protocol.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
       if((!enough_packets)
@@ -1754,7 +1753,12 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	process_ndpi_collected_info(workflow, flow);
       }
     }
+    /* Let's try to save client-server direction */
+    flow->current_pkt_from_client_to_server = input_info.in_pkt_dir;
+
     malloc_size_stats = 0;
+  } else {
+    flow->current_pkt_from_client_to_server = NDPI_IN_PKT_DIR_UNKNOWN; /* Unknown */
   }
 
 #if 0

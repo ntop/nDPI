@@ -402,7 +402,7 @@ struct ndpi_detection_module_struct {
 
   /* Current packet */
   struct ndpi_packet_struct packet;
-  const struct ndpi_flow_input_info *input_info;
+  struct ndpi_flow_input_info *input_info;
 
 #ifdef HAVE_NBPF
   u_int8_t num_nbpf_custom_proto;
