@@ -201,6 +201,8 @@ struct ndpi_detection_module_config_struct {
   int compute_entropy;
   int fpc_enabled;
   int guess_ip_before_port;
+  int use_client_ip_in_guess;
+  int use_client_port_in_guess;
   
   char filename_config[CFG_MAX_LEN];
 
