@@ -75,8 +75,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        # macOS-latest == macos-14 on **ARM64**
-        # There are some issues with external dependencies on macOS-latest. Disable it for the time being
+        # macOS-latest == macos-14 on **ARM64**. Also macos-15 is on arm64
+        # There are some issues with external dependencies on macOS-14/15. Disable it for the time being
         os: ["ubuntu-20.04", "ubuntu-22.04", "ubuntu-24.04", "macOS-12", "macOS-13", "windows-latest"]
         arch: ["x86_64"]
         gcrypt: ["--with-local-libgcrypt", ""]
@@ -184,6 +184,14 @@ jobs:
             nBPF: ""
           - compiler: "cc"
             os: macos-14
+            arch: "x86_64"
+            gcrypt: ""
+            pcre: ""
+            maxminddb: ""
+            msan: "" # Disable sanitizer on macos
+            nBPF: ""
+          - compiler: "cc"
+            os: macos-15
             arch: "x86_64"
             gcrypt: ""
             pcre: ""
@@ -307,13 +315,13 @@ jobs:
           msys2 -c 'make -j all'
           msys2 -c 'ldd ./example/ndpiReader.exe'
       - name: Build nDPI
-        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.os, 'macos-14')
+        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.os, 'macos-14') && !startsWith(matrix.os, 'macos-15')
         run: |
           make -j all
           make -C example ndpiSimpleIntegration
           make -C rrdtool
       - name: Build nDPI (MacOS M1)
-        if: startsWith(matrix.os, 'macos-14')
+        if: startsWith(matrix.os, 'macos-14') || startsWith(matrix.os, 'macos-15')
         run: |
           make -j all
           make -C example ndpiSimpleIntegration
@@ -340,7 +348,7 @@ jobs:
           NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
       - name: Test nDPI [UNIT]
         #Some issues with masan + json-c. Disable the test as workaround
-        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.msan, '--with-memory-sanitizer') && !startsWith(matrix.os, 'macos-14')
+        if: startsWith(matrix.arch, 'x86_64') && !startsWith(matrix.os, 'windows') && !startsWith(matrix.msan, '--with-memory-sanitizer') && !startsWith(matrix.os, 'macos-14') && !startsWith(matrix.os, 'macos-15')
         run: |
           ./tests/do-unit.sh
       - name: Test nDPI [DGA]
