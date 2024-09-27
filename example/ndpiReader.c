@@ -236,6 +236,7 @@ struct ndpi_packet_trailer {
   u_int32_t magic; /* WIRESHARK_NTOP_MAGIC */
   ndpi_master_app_protocol proto;
   char name[16];
+  u_int8_t flags;
   ndpi_risk flow_risk;
   u_int16_t flow_score;
   u_int16_t flow_risk_info_len;
@@ -248,7 +249,7 @@ struct ndpi_packet_trailer {
 
 static pcap_dumper_t *extcap_dumper = NULL;
 static pcap_t *extcap_fifo_h = NULL;
-static char extcap_buf[16384];
+static char extcap_buf[65536 + sizeof(struct ndpi_packet_trailer)];
 static char *extcap_capture_fifo    = NULL;
 static u_int16_t extcap_packet_filter = (u_int16_t)-1;
 static int do_extcap_capture = 0;
@@ -4565,13 +4566,19 @@ static void ndpi_process_packet(u_char *args,
     memcpy(extcap_buf, packet, h.caplen);
     memset(trailer, 0, sizeof(struct ndpi_packet_trailer));
     trailer->magic = htonl(WIRESHARK_NTOP_MAGIC);
+    if(flow) {
+      trailer->flags = flow->current_pkt_from_client_to_server;
+      trailer->flags |= (flow->detection_completed << 2);
+    } else {
+      trailer->flags = 0 | (2 << 2);
+    }
     trailer->flow_risk = htonl64(flow_risk);
     trailer->flow_score = htons(ndpi_risk2score(flow_risk, &cli_score, &srv_score));
     trailer->flow_risk_info_len = ntohs(WIRESHARK_FLOW_RISK_INFO_SIZE);
-    if(flow->risk_str) {
+    if(flow && flow->risk_str) {
       strncpy(trailer->flow_risk_info, flow->risk_str, sizeof(trailer->flow_risk_info));
-      trailer->flow_risk_info[sizeof(trailer->flow_risk_info) - 1] = '\0';
     }
+    trailer->flow_risk_info[sizeof(trailer->flow_risk_info) - 1] = '\0';
     trailer->proto.master_protocol = htons(p.proto.master_protocol), trailer->proto.app_protocol = htons(p.proto.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
 

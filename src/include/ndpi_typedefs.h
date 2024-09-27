@@ -645,7 +645,7 @@ struct ndpi_gre_basehdr {
  * Optional information about flow management (per packet)
  */
 struct ndpi_flow_input_info {
-  unsigned char in_pkt_dir;
+  unsigned char in_pkt_dir; /* If unknown, the library might *returns* to the application the direction calculated internally */
   unsigned char seen_flow_beginning;
 };
 

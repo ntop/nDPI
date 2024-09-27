@@ -35,6 +35,19 @@ ndpi_fds.magic                = ProtoField.new("nDPI Magic", "ndpi.magic", ftype
 ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
+ndpi_fds.flags                = ProtoField.new("nDPI Flags", "ndpi.flags", ftypes.UINT8, nil, base.HEX)
+local dir_types = {
+        [0] = "Unknown Direction",
+        [1] = "Client to Server Direction",
+        [2] = "Server to Client Direction",
+}
+ndpi_fds.flags_direction      = ProtoField.new("nDPI Direction", "ndpi.flags.direction", ftypes.UINT8, dir_types, base.DEC, 0x03)
+local dpi_state_types = {
+        [0] = "Inspecting",
+        [1] = "From Inspecting to Done",
+        [2] = "Done",
+}
+ndpi_fds.flags_dpi_state      = ProtoField.new("nDPI DPI state", "ndpi.flags.dpi_state", ftypes.UINT8, dpi_state_types, base.DEC, 0xC)
 ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64, nil, base.HEX)
 ndpi_fds.flow_score           = ProtoField.new("nDPI Flow Score", "ndpi.flow_score", ftypes.UINT32)
 ndpi_fds.flow_risk_info_len   = ProtoField.new("nDPI Flow Risk Info Length", "ndpi.flow_risk_info_len", ftypes.UINT16, nil, base.DEC)
@@ -54,8 +67,6 @@ ndpi_fds.metadata_length      = ProtoField.new("nDPI Metadata Length", "ndpi.met
 ndpi_fds.metadata_value       = ProtoField.new("nDPI Metadata Value", "ndpi.metadata.value", ftypes.BYTES)
 -- Specific fields
 ndpi_fds.metadata_server_name = ProtoField.new("nDPI Server Name", "ndpi.metadata.server_name", ftypes.STRING)
-ndpi_fds.metadata_ja3c        = ProtoField.new("nDPI JA3C", "ndpi.metadata.ja3c", ftypes.STRING)
-ndpi_fds.metadata_ja3s        = ProtoField.new("nDPI JA3S", "ndpi.metadata.ja3s", ftypes.STRING)
 ndpi_fds.metadata_ja4c        = ProtoField.new("nDPI JA4C", "ndpi.metadata.ja4c", ftypes.STRING)
 
 
@@ -193,6 +204,9 @@ local tot_tls_flows          = 0
 local http_ua                = {}
 local tot_http_ua_flows      = 0
 
+local possible_obfuscated_servers = {}
+local tot_obfuscated_flows        = 0
+
 local flows                  = {}
 local tot_flows              = 0
 
@@ -219,6 +233,8 @@ local max_appl_lat_discard   = 15000 -- 15 sec
 local debug                  = false
 
 local dump_timeseries = false
+
+local track_obfuscated_servers = true
 
 local dissect_ndpi_trailer = true
 
@@ -439,6 +455,10 @@ function ndpi_proto.init()
    -- HTTP
    http_ua                = {}
    tot_http_ua_flows      = 0
+
+   -- Obfuscated servers
+   possible_obfuscated_servers = {}
+   tot_obfuscated_flows        = 0
 
    -- Flows
    flows                  = {}
@@ -1111,6 +1131,13 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       --print(network_protocol .. "/" .. application_protocol .. "/".. name)
 	    end
 
+	    ndpi_subtree:add(ndpi_fds.flags, trailer_tvb(offset, 1))
+	    ndpi_subtree:add(ndpi_fds.flags_direction, trailer_tvb(offset, 1))
+	    local direction = trailer_tvb(offset, 1):bitfield(6,2) -- From left to right!! -> inverted values
+	    ndpi_subtree:add(ndpi_fds.flags_dpi_state, trailer_tvb(offset, 1))
+	    local dpi_state = trailer_tvb(offset, 1):bitfield(4,2) -- From left to right!! -> inverted values
+	    offset = offset + 1
+
 	    flow_risk_tree = ndpi_subtree:add(ndpi_fds.flow_risk, trailer_tvb(offset, 8))
 	    flow_risk = trailer_tvb(offset, 8):uint64() -- UInt64 object!
 	    offset = offset + 8
@@ -1133,11 +1160,15 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       
 	       for i=0,63 do
 		 if flow_risks[i] ~= nil then
-	            flow_risk_tree:add(flow_risks[i], trailer_tvb(24, 8))
+	            flow_risk_tree:add(flow_risks[i], trailer_tvb(25, 8))
 		 end
 
 	       end
-	       flow_risk_tree:add(flow_risks[64], trailer_tvb(24, 8)) -- Unused bits in flow risk bitmask
+	       flow_risk_tree:add(flow_risks[64], trailer_tvb(25, 8)) -- Unused bits in flow risk bitmask
+
+	       flow_risk_obfuscated_traffic = trailer_tvb(25, 8):bitfield(7,1) -- From left to right
+	    else
+	       flow_risk_obfuscated_traffic = 0
 	    end
 	    
 	    if(flow_score > 0) then
@@ -1225,6 +1256,29 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       end
 
 	       ndpi_flows[flowkey] = ndpi_flows[flowkey] + pinfo.len
+	    end
+
+	    if(track_obfuscated_servers and pinfo.visited == false) then
+	      -- Only once per flow, when DPI ends
+	      if(dpi_state == 1) then
+		if(direction == 2) then -- current packet from server to client
+	          key = tostring(pinfo.src) .. ":" .. getstring(pinfo.src_port) .. " " .. name
+		else
+	          key = tostring(pinfo.dst) .. ":" .. getstring(pinfo.dst_port) .. " " .. name
+		end
+		if(possible_obfuscated_servers[key] == nil) then
+		  possible_obfuscated_servers[key] = {1, flow_risk_obfuscated_traffic}
+		else
+		  possible_obfuscated_servers[key][1] = possible_obfuscated_servers[key][1] + 1
+		  if(flow_risk_obfuscated_traffic == 1) then
+		    possible_obfuscated_servers[key][2] = possible_obfuscated_servers[key][2] + 1
+		  end
+		end
+
+		if(flow_risk_obfuscated_traffic == 1) then
+		  tot_obfuscated_flows = tot_obfuscated_flows + 1
+		end
+	      end
 	    end
 	 end
       end -- nDPI
@@ -1569,6 +1623,32 @@ end
 
 -- ###############################################
 
+local function obfuscated_servers_dialog_menu()
+   local win = TextWindow.new("Obfuscated Servers Analysis");
+   local label = ""
+   local tot = 0
+   local i
+
+   if(tot_obfuscated_flows > 0) then
+      i = 0
+      label = label .. "Server\t\tProtocol\tTotal Flows\tObfuscated flows\n"
+      for k,v in pairsByKeys(possible_obfuscated_servers, rev) do
+         for token in string.gmatch(k, "[^%s]+") do -- split key in two token (for beter formatting): ip:port and protocol
+	   label = label .. token .. "\t"
+         end
+	 label = label .. v[1] .. "\t\t" .. v[2] .. "\n"
+      end
+      label = label .. "\n\nTotal obfuscated flows: " .. tot_obfuscated_flows .. "\n"
+   else
+      label = "No possible Obfuscated Servers detected"
+   end
+
+   win:set(label)
+   win:add_button("Clear", function() win:clear() end)
+end
+
+-- ###############################################
+
 local function http_ua_dialog_menu()
    local win = TextWindow.new("HTTP User Agent");
    local label = ""
@@ -1766,6 +1846,7 @@ register_menu("ntop/TCP Analysis", tcp_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/VLAN",         vlan_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Network",      rtt_dialog_menu, MENU_TOOLS_UNSORTED)
 register_menu("ntop/Latency/Application",  appl_rtt_dialog_menu, MENU_TOOLS_UNSORTED)
+register_menu("ntop/Obfuscated Servers Analysis", obfuscated_servers_dialog_menu, MENU_TOOLS_UNSORTED)
 
 -- ###############################################
 
