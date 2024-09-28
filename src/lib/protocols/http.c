@@ -967,8 +967,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
 
   if(packet->upgrade_line.ptr != NULL) {
-    if(flow->http.response_status_code == 101 &&
-       memcmp((char *)packet->upgrade_line.ptr, "websocket", 9) == 0)
+    if((flow->http.response_status_code == 101)
+       && (packet->upgrade_line.len >= 9)
+       && memcmp((char *)packet->upgrade_line.ptr, "websocket", 9) == 0)
       flow->http.websocket = 1;
   }
 
