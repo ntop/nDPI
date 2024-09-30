@@ -441,7 +441,10 @@ void switch_extra_dissection_to_tls_obfuscated_heur(struct ndpi_detection_module
 {
   NDPI_LOG_DBG(ndpi_struct, "Switching to TLS Obfuscated heuristic\n");
 
-  flow->tls_quic.obfuscated_heur_state = ndpi_calloc(1, sizeof(struct tls_obfuscated_heuristic_state));
+  if(flow->tls_quic.obfuscated_heur_state == NULL)
+    flow->tls_quic.obfuscated_heur_state = ndpi_calloc(1, sizeof(struct tls_obfuscated_heuristic_state));
+  else /* If state has been already allocated (because of NDPI_HEURISTICS_TLS_OBFUSCATED_PLAIN) reset it */
+    memset(flow->tls_quic.obfuscated_heur_state, '\0', sizeof(struct tls_obfuscated_heuristic_state));
 
   /* "* 2" to take into account ACKs. The "real" check is performend against
      "tls_heuristics_max_packets" in tls_obfuscated_heur_search, as expected */
@@ -3377,23 +3380,24 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
     else
       rc = ndpi_search_tls_tcp(ndpi_struct, flow);
 
-    if(rc == 0)
+     /* We should check for this TLS heuristic if:
+      * the feature is enabled
+      * this flow doesn't seem a real TLS/DTLS one
+      * we are not here from STUN code or from opportunistic tls path (mails/ftp)
+      * with TCP, we got the 3WHS (so that we can process the beginning of the flow)
+      */
+    if(rc == 0 &&
+       (ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_PLAIN) &&
+       flow->stun.maybe_dtls == 0 &&
+       flow->tls_quic.from_opportunistic_tls == 0 &&
+       ((flow->l4_proto == IPPROTO_TCP && ndpi_seen_flow_beginning(flow)) ||
+        flow->l4_proto == IPPROTO_UDP) &&
+       !is_flow_addr_informative(flow) /* The proxy server is likely hosted on some cloud providers */ ) {
       flow->tls_quic.obfuscated_heur_state = ndpi_calloc(1, sizeof(struct tls_obfuscated_heuristic_state));
+    }
   }
 
-  /* We should check for this TLS heuristic if:
-     * the feature is enabled
-     * this flow doesn't seem a real TLS/DTLS one
-     * we are not here from STUN code or from opportunistic tls path (mails/ftp)
-     * with TCP, we got the 3WHS (so that we can process the beginning of the flow)
-  */
-  if(flow->tls_quic.obfuscated_heur_state &&
-     (ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_PLAIN) &&
-     flow->stun.maybe_dtls == 0 &&
-     flow->tls_quic.from_opportunistic_tls == 0 &&
-     ((flow->l4_proto == IPPROTO_TCP && ndpi_seen_flow_beginning(flow)) ||
-      flow->l4_proto == IPPROTO_UDP) &&
-     !is_flow_addr_informative(flow) /* The proxy server is likely hosted on some cloud providers */ ) {
+  if(flow->tls_quic.obfuscated_heur_state) {
     tls_obfuscated_heur_search_again(ndpi_struct, flow);
   } else if(rc == 0) {
     if(packet->udp != NULL || flow->stun.maybe_dtls)
