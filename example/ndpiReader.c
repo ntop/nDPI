@@ -692,6 +692,10 @@ static void help(u_int long_help) {
          "  -A                        | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
          "  -M                        | Memory allocation stats on data-path (only by the library).\n"
 	 "                            | It works only on single-thread configuration\n"
+         "  --openvp_heuristics       | Enable OpenVPN heuristics.\n"
+         "                            | It is a shortcut to --cfg=openvpn.heuristics,0x01\n"
+         "  --tls_heuristics          | Enable TLS heuristics.\n"
+         "                            | It is a shortcut to --cfg=tls.heuristics,0x07\n"
          "  --cfg=proto,param,value   | Configure the specific attribute of this protocol\n"
          ,
          human_readeable_string_len,
@@ -751,6 +755,8 @@ static void help(u_int long_help) {
 
 
 #define OPTLONG_VALUE_CFG		3000
+#define OPTLONG_VALUE_OPENVPN_HEURISTICS	3001
+#define OPTLONG_VALUE_TLS_HEURISTICS		3002
 
 static struct option longopts[] = {
   /* mandatory extcap options */
@@ -794,6 +800,8 @@ static struct option longopts[] = {
   { "quiet", no_argument, NULL, 'q'},
 
   { "cfg", required_argument, NULL, OPTLONG_VALUE_CFG},
+  { "openvpn_heuristics", no_argument, NULL, OPTLONG_VALUE_OPENVPN_HEURISTICS},
+  { "tls_heuristics", no_argument, NULL, OPTLONG_VALUE_TLS_HEURISTICS},
 
   {0, 0, 0, 0}
 };
@@ -887,7 +895,7 @@ void extcap_config() {
   protos = (struct ndpi_proto_sorter*)ndpi_malloc(sizeof(struct ndpi_proto_sorter) * ndpi_num_supported_protocols);
   if(!protos) exit(0);
 
-  printf("arg {number=%d}{call=--ndpi-proto-filter}{display=nDPI Protocol Filter}{type=selector}{group=Filter}"
+  printf("arg {number=%d}{call=--ndpi-proto-filter}{display=nDPI Protocol Filter}{type=selector}{group=Options}"
          "{tooltip=nDPI Protocol to be filtered}\n", argidx);
 
   printf("value {arg=%d}{value=%d}{display=%s}{default=true}\n", argidx, (u_int32_t)-1, "No nDPI filtering");
@@ -904,6 +912,12 @@ void extcap_config() {
            protos[i].name, protos[i].id);
 
   ndpi_free(protos);
+  argidx++;
+
+  printf("arg {number=%d}{call=--openvp_heuristics}{display=Enable Obfuscated OpenVPN heuristics}"
+	 "{tooltip=Enable Obfuscated OpenVPN heuristics}{type=boolflag}{group=Options}\n", argidx++);
+  printf("arg {number=%d}{call=--tls_heuristics}{display=Enable Obfuscated TLS heuristics}"
+	 "{tooltip=Enable Obfuscated TLS heuristics}{type=boolflag}{group=Options}\n", argidx++);
 
   ndpi_exit_detection_module(ndpi_str);
 
@@ -1360,6 +1374,20 @@ static void parseOptions(int argc, char **argv) {
         exit(1);
       }
       reader_log_level = 0;
+      break;
+
+    case OPTLONG_VALUE_OPENVPN_HEURISTICS:
+      if(reader_add_cfg("openvpn", "dpi.heuristics", "0x01", 1) == 1) {
+        printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
+      break;
+
+    case OPTLONG_VALUE_TLS_HEURISTICS:
+      if(reader_add_cfg("tls", "dpi.heuristics", "0x07", 1) == 1) {
+        printf("Invalid cfg [num:%d/%d]\n", num_cfgs, MAX_NUM_CFGS);
+        exit(1);
+      }
       break;
 
       /* Extcap */
