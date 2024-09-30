@@ -648,12 +648,13 @@ static ndpi_protocol_match host_match[] =
    { "adservice.google.com",         "Google",           NDPI_PROTOCOL_GOOGLE, CUSTOM_CATEGORY_ADVERTISEMENT, NDPI_PROTOCOL_TRACKER_ADS, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "gvt1.com",                                 "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "gvt2.com",                                 "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { "telephony.goog",                            "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { "connectivitycheck.android.com",             "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { "connectivitycheck.gstatic.com",             "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "telephony.goog",                           "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "connectivitycheck.android.com",            "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "connectivitycheck.gstatic.com",            "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ampproject.org",                           "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ampproject.net",                           "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { "app-measurement.com",                       "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "app-measurement.com",                      "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "pki.goog",                                 "Google",           NDPI_PROTOCOL_GOOGLE, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    /* Google Meet */
    { "meet.google.com",                           "GoogleMeet", NDPI_PROTOCOL_GOOGLE_MEET, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
