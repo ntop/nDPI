@@ -385,8 +385,8 @@ fuzz_ds_bitmap64_fuse_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_ds_bitmap64_fuse_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_domain_classify_SOURCES = fuzz_ds_domain_classify.cpp fuzz_common_code.c
-fuzz_ds_domain_classify_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
-fuzz_ds_domain_classify_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+fuzz_ds_domain_classify_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_domain_classify_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_ds_domain_classify_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ds_domain_classify_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
