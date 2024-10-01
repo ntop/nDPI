@@ -1,0 +1,32 @@
+DPI Packets (TCP):	32	(32.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 284 (284.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/1/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+TLS	428	119100	1
+
+Safe                           428 119100        1            
+
+JA3 Host Stats: 
+		 IP Address                  	 # JA3C     
+	1	 172.30.84.193            	 1      
+
+
+	1	TCP 172.30.84.193:40640 <-> 208.253.217.142:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 32][cat: Web/5][194 pkts/51762 bytes <-> 234 pkts/67338 bytes][Goodput ratio: 75/77][31.67 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.131 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 135/123 2012/2189 352/307][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 267/288 1090/1514 287/409][Risk: ** Missing SNI TLS Extn **** ALPN/SNI Mismatch **** Obfuscated Traffic **][Risk Score: 200][Risk Info: Abnormal Client Hello/Padding length / SNI should always be present / h2][TLSv1.2][JA3C: 66d6080b942b0b593896bf729f3fd326][JA4: t13d1811h2_f71e3e15ae0d_5c3a8cf9b2bc][Firefox][Plen Bins: 0,0,7,52,4,3,7,1,2,0,2,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,10,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0]
