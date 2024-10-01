@@ -3197,6 +3197,15 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  }
 		  s_offset += param_len;
 		}
+	      } else if(extension_id == 21) { /* Padding */
+		/* Padding is usually some hundreds byte long. Longer padding
+		   might be used as obfuscation technique to force unusual CH fragmentation */
+		if(extension_len > 500 /* Arbitrary value */) {
+#ifdef DEBUG_TLS
+		  printf("Padding length: %d\n", extension_len);
+#endif
+		  ndpi_set_risk(flow, NDPI_OBFUSCATED_TRAFFIC, "Abnormal Client Hello/Padding length");
+		}
 	      }
 
 	      extension_offset += extension_len; /* Move to the next extension */

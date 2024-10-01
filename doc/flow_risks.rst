@@ -339,4 +339,10 @@ HTTP only: this risk indicates that a binary file/data application transfer (att
 
 NDPI_PROBING_ATTEMPT
 ====================
-Connection with no data exchagef that looks like a probing attempt
+Connection with no data exchaged that looks like a probing attempt
+
+.. _Risk 056:
+
+NDPI_OBFUSCATED_TRAFFIC
+=======================
+This risk is triggered when a connection is likely using some obfuscation technique to try to "look like" something else, hiding its true nature
