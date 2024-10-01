@@ -2839,7 +2839,7 @@ static int is_realtime_protocol(ndpi_protocol proto)
 static void dump_realtime_protocol(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow)
 {
   FILE *out = results_file ? results_file : stdout;
-  char srcip[64], dstip[64];
+  char srcip[70], dstip[70];
   char ip_proto[64], app_name[64];
   char date[64];
   int ret = is_realtime_protocol(flow->detected_protocol);
