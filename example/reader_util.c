@@ -1221,19 +1221,36 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
   /* DNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_DNS)) {
-    if(flow->ndpi_flow->protos.dns.rsp_type == 0x1)
+    if(flow->ndpi_flow->protos.dns.is_rsp_addr_ipv6[0] == 0)
     {
       flow->info_type = INFO_GENERIC;
-      inet_ntop(AF_INET, &flow->ndpi_flow->protos.dns.rsp_addr.ipv4, flow->info, sizeof(flow->info));
+      inet_ntop(AF_INET, &flow->ndpi_flow->protos.dns.rsp_addr[0].ipv4, flow->info, sizeof(flow->info));
     } else {
       flow->info_type = INFO_GENERIC;
-      inet_ntop(AF_INET6, &flow->ndpi_flow->protos.dns.rsp_addr.ipv6, flow->info, sizeof(flow->info));
+      inet_ntop(AF_INET6, &flow->ndpi_flow->protos.dns.rsp_addr[0].ipv6, flow->info, sizeof(flow->info));
 
       /* For consistency across platforms replace :0: with :: */
       ndpi_patchIPv6Address(flow->info);
     }
+    
     if(flow->ndpi_flow->protos.dns.geolocation_iata_code[0] != '\0')
       strcpy(flow->dns.geolocation_iata_code, flow->ndpi_flow->protos.dns.geolocation_iata_code);
+
+    if(0) {
+      u_int8_t i;
+      
+      for(i=0; i<flow->ndpi_flow->protos.dns.num_rsp_addr; i++) {
+	char buf[64];
+	
+	if(flow->ndpi_flow->protos.dns.is_rsp_addr_ipv6[i] == 0) {
+	  inet_ntop(AF_INET, &flow->ndpi_flow->protos.dns.rsp_addr[i].ipv4, buf, sizeof(buf));
+	} else {
+	  inet_ntop(AF_INET6, &flow->ndpi_flow->protos.dns.rsp_addr[i].ipv6, buf, sizeof(buf));	  
+	}
+
+	printf("(%s) %s [ttl: %u]\n", flow->host_server_name, buf, flow->ndpi_flow->protos.dns.rsp_addr_ttl[i]);
+      }      
+    }
   }
   /* MDNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_MDNS)) {

@@ -7483,10 +7483,10 @@ static u_int64_t make_fpc_dns_cache_key(struct ndpi_flow_struct *flow) {
 u_int64_t fpc_dns_cache_key_from_dns_info(struct ndpi_flow_struct *flow) {
   u_int64_t key;
 
-  if(flow->protos.dns.is_rsp_addr_ipv6)
-    key = ndpi_quick_hash64((const char *)&flow->protos.dns.rsp_addr.ipv6, 16);
+  if(flow->protos.dns.is_rsp_addr_ipv6[0])
+    key = ndpi_quick_hash64((const char *)&flow->protos.dns.rsp_addr[0].ipv6, 16);
   else
-    key = (u_int64_t)(flow->protos.dns.rsp_addr.ipv4);
+    key = (u_int64_t)(flow->protos.dns.rsp_addr[0].ipv4);
 
   return key;
 }

@@ -1207,6 +1207,7 @@ typedef enum {
 } ndpi_cipher_weakness;
 
 #define MAX_NUM_TLS_SIGNATURE_ALGORITHMS 16
+#define MAX_NUM_DNS_RSP_ADDRESSES         4
 
 typedef struct {
   union {
@@ -1343,10 +1344,12 @@ struct ndpi_flow_struct {
   union {
     /* the only fields useful for nDPI and ntopng */
     struct {
-      u_int8_t num_queries, num_answers, reply_code;
-      u_int8_t is_query:1, is_rsp_addr_ipv6:1, pad:6;
+      u_int8_t num_queries, num_answers, reply_code, num_rsp_addr;
+      u_int8_t is_query:1, pad:7;
       u_int16_t query_type, query_class, rsp_type, edns0_udp_payload_size;
-      ndpi_ip_addr_t rsp_addr; /* The first address in a DNS response packet (A and AAAA) */
+      u_int8_t is_rsp_addr_ipv6[MAX_NUM_DNS_RSP_ADDRESSES];
+      ndpi_ip_addr_t rsp_addr[MAX_NUM_DNS_RSP_ADDRESSES]; /* The first num_rsp_addr address in a DNS response packet (A and AAAA) */
+      u_int32_t rsp_addr_ttl[MAX_NUM_DNS_RSP_ADDRESSES];
       char geolocation_iata_code[4];
       char ptr_domain_name[64 /* large enough but smaller than { } tls */];
     } dns;
