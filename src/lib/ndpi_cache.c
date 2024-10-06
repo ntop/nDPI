@@ -47,6 +47,7 @@ struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl,
 
   c->ttl = ttl & 0x7FFFFFFF;
   c->shared = !!shared;
+
 #ifdef USE_GLOBAL_CONTEXT
   if(c->shared) {
     if(pthread_mutex_init(&c->mutex, NULL) != 0) {
@@ -55,6 +56,7 @@ struct ndpi_lru_cache *ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl,
     }
   }
 #endif
+
   c->entries = (struct ndpi_lru_cache_entry *) ndpi_calloc(num_entries, sizeof(struct ndpi_lru_cache_entry));
 
   if(!c->entries) {
@@ -113,8 +115,10 @@ u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int64_t key,
      now_sec >= c->entries[slot].timestamp &&
      (c->ttl == 0 || now_sec - c->entries[slot].timestamp <= c->ttl)) {
     *value = c->entries[slot].value;
+    
     if(clean_key_when_found)
       c->entries[slot].is_full = 0;
+    
     c->stats.n_found++;
     ret = 1;
   } else
@@ -133,7 +137,8 @@ void ndpi_lru_add_to_cache(struct ndpi_lru_cache *c, u_int64_t key, u_int16_t va
   __lru_cache_lock(c);
 
   c->stats.n_insert++;
-  c->entries[slot].is_full = 1, c->entries[slot].key = key, c->entries[slot].value = value, c->entries[slot].timestamp = now_sec;
+  c->entries[slot].is_full = 1, c->entries[slot].key = key,
+    c->entries[slot].value = value, c->entries[slot].timestamp = now_sec;
 
   __lru_cache_unlock(c);
 }
@@ -169,9 +174,12 @@ int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
   } else {
     snprintf(param, sizeof(param), "lru.%s.scope", ndpi_lru_cache_idx_to_name(cache_type));
     rc = ndpi_get_config(ndpi_struct, NULL, param, buf, sizeof(buf));
+
     if(rc == NULL)
       return -1;
+
     scope = atoi(buf);
+
     if(scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
       is_local = 0;
       if(!g_ctx)
