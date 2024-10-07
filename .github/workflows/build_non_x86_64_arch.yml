@@ -1,0 +1,98 @@
+name: Build on non-x86_64 archs
+on: [push, pull_request]
+
+jobs:
+  build_job:
+    # The host should always be linux
+    runs-on: ubuntu-22.04
+    name: Build on ${{ matrix.distro }} ${{ matrix.arch }} ${{ matrix.masan }}
+
+    strategy:
+      matrix:
+        include:
+          - arch: aarch64
+            distro: ubuntu22.04
+            msan: "--with-sanitizer"
+            pcre: "--with-pcre2"
+            maxminddb: "--with-maxminddb"
+          - arch: armv7
+            distro: ubuntu22.04
+            msan: "--with-sanitizer"
+            pcre: "--with-pcre2"
+            maxminddb: "--with-maxminddb"
+          - arch: s390x
+            distro: ubuntu22.04
+            msan: #"--with-sanitizer"
+            pcre: "--with-pcre2"
+            maxminddb: "--with-maxminddb"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: uraimo/run-on-arch-action@v2.7.2
+        name: Build and run tests
+        id: build
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
+
+          # Not required, but speeds up builds
+          githubToken: ${{ github.token }}
+
+          # Create an artifacts directory
+          setup: |
+            mkdir -p "${PWD}/artifacts"
+
+          # Mount the artifacts directory as /artifacts in the container
+          dockerRunArgs: |
+            --privileged --volume "${PWD}/artifacts:/artifacts"
+
+          # Pass some environment variables to the container
+          env: | # YAML, but pipe character is necessary
+            artifact_name: ndpi-${{ matrix.distro }}_${{ matrix.arch }}
+
+          # The shell to run commands with in the container
+          shell: /bin/bash
+
+          # Install some dependencies in the container. This speeds up builds if
+          # you are also using githubToken. Any dependencies installed here will
+          # be part of the container image that gets cached, so subsequent
+          # builds don't have to re-install them. The image layer is cached
+          # publicly in your project's package repository, so it is vital that
+          # no secrets are present in the container state or logs.
+          install: |
+            case "${{ matrix.distro }}" in
+              ubuntu*|jessie|stretch|buster|bullseye)
+                apt-get update -q -y
+                apt-get install -q -y make git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev libpcre3-dev libmaxminddb-dev rrdtool librrd-dev parallel
+                ;;
+              fedora*)
+                dnf -y update
+                #TODO
+                ;;
+              alpine*)
+                apk update
+                #TODO
+                ;;
+            esac
+
+          run: |
+            lscpu | grep Endian
+            lscpu | grep Architecture
+            lscpu
+            #ps -p $$
+            git config --global --add safe.directory $(realpath .)
+            NDPI_CFLAGS='-Wextra -Werror' ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }}
+            make -j $(nproc) all
+            make -C example ndpiSimpleIntegration
+            make -C rrdtool
+            LSAN_OPTIONS=verbosity=1:log_threads=1 ./example/ndpiReader -H
+            #echo ${SHELL}
+            #ps -p $$
+            LSAN_OPTIONS=verbosity=1:log_threads=1 ./tests/do.sh
+            ./tests/do-unit.sh
+            ./tests/do-dga.sh
+
+      - name: Show the artifact
+        # Items placed in /artifacts in the container will be in
+        # ${PWD}/artifacts on the host.
+        run: |
+          ls -al "${PWD}/artifacts"
