@@ -37,8 +37,9 @@ static void ndpi_search_dingtalk(struct ndpi_detection_module_struct *ndpi_struc
 
   if (packet->payload_packet_len > 90 && packet->payload[0] == 0x10)
   {
-    if (get_u_int32_t(packet->payload, 2) == 0x18087 && get_u_int32_t(packet->payload, 6) == 0x20001 &&
-        get_u_int32_t(packet->payload, 10) == 0x36B6402 && get_u_int16_t(packet->payload, 14) == 0x2000)
+    if (ntohl(get_u_int32_t(packet->payload, 2)) == 0x87800100 &&
+        ntohl(get_u_int32_t(packet->payload, 6)) == 0x1000200  &&
+        ntohl(get_u_int32_t(packet->payload, 10)) == 0x2646B03 && ntohs(get_u_int16_t(packet->payload, 14)) == 0x20)
     {
       NDPI_LOG_INFO(ndpi_struct, "found DingTalk\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DINGTALK,
