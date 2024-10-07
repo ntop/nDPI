@@ -459,6 +459,7 @@ typedef enum {
   NDPI_PROTOCOL_CACTUSVPN             = 428,
   NDPI_PROTOCOL_WINDSCRIBE            = 429,
   NDPI_PROTOCOL_SONOS                 = 430,
+  NDPI_PROTOCOL_DINGTALK              = 431,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

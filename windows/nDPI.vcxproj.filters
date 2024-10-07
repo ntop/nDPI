@@ -156,6 +156,7 @@
     <ClCompile Include="..\src\lib\protocols\cnp-ip.c" />
     <ClCompile Include="..\src\lib\protocols\trdp.c" />
     <ClCompile Include="..\src\lib\protocols\lustre.c" />
+    <ClCompile Include="..\src\lib\protocols\dingtalk.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />

@@ -1,6 +1,6 @@
-DPI Packets (TCP):	6	(6.00 pkts/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 163 (163.00 diss/flow)
+Num dissector calls: 156 (156.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -17,11 +17,11 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia protocols:   1/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-PostgreSQL	19	3076	1
+DingTalk	4	292	1
 
-Acceptable                      19 3076          1            
+Acceptable                       4 292           1            
 
-	1	TCP 10.220.20.67:58574 <-> 10.220.20.67:60102 [proto: 19/PostgreSQL][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Database/11][10 pkts/1252 bytes <-> 9 pkts/1824 bytes][Goodput ratio: 64/78][0.01 sec][bytes ratio: -0.186 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 2/2 1/1][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 125/203 372/1360 119/410][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Plen Bins: 25,0,12,25,0,0,0,0,0,12,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0]
+	1	TCP 10.215.173.1:48910 <-> 47.246.133.39:443 [proto: 431/DingTalk][IP: 274/Alibaba][ClearText][Confidence: DPI][FPC: 274/Alibaba, Confidence: IP address][DPI packets: 4][cat: Chat/9][3 pkts/244 bytes <-> 1 pkts/48 bytes][Goodput ratio: 42/0][0.02 sec][PLAIN TEXT (android/3.0.28)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
