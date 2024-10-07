@@ -115,10 +115,10 @@ u_int8_t ndpi_lru_find_cache(struct ndpi_lru_cache *c, u_int64_t key,
      now_sec >= c->entries[slot].timestamp &&
      (c->ttl == 0 || now_sec - c->entries[slot].timestamp <= c->ttl)) {
     *value = c->entries[slot].value;
-    
+
     if(clean_key_when_found)
       c->entries[slot].is_full = 0;
-    
+
     c->stats.n_found++;
     ret = 1;
   } else
@@ -215,3 +215,209 @@ int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
 }
 
 /* ******************************************************************** */
+/* ******************************************************************** */
+
+struct ndpi_address_cache* ndpi_init_address_cache(u_int32_t max_num_entries) {
+  struct ndpi_address_cache *ret = (struct ndpi_address_cache*)ndpi_malloc(sizeof(struct ndpi_address_cache));
+
+  if(ret == NULL) return(ret);
+
+  ret->num_cached_addresses = 0, ret->num_entries = 0,
+    ret->max_num_entries = max_num_entries,
+    ret->num_root_nodes = ndpi_min(NDPI_NUM_DEFAULT_ROOT_NODES, max_num_entries/16);
+  ret->address_cache_root = (struct ndpi_address_cache_item**)ndpi_calloc(ret->num_root_nodes, sizeof(struct ndpi_address_cache_item*));
+
+  if(ret->address_cache_root == NULL) {
+    ndpi_free(ret);
+    return(NULL);
+  } else
+    return(ret);
+}
+
+/* ***************************************************** */
+
+static void ndpi_free_addr_item(struct ndpi_address_cache_item *addr) {
+  ndpi_free(addr->hostname);
+  ndpi_free(addr);
+}
+
+/* ***************************************************** */
+
+void ndpi_term_address_cache(struct ndpi_address_cache *cache) {
+  u_int i;
+
+  for(i=0; i<cache->num_root_nodes; i++) {
+    struct ndpi_address_cache_item *root = cache->address_cache_root[i];
+
+    while(root != NULL) {
+      struct ndpi_address_cache_item *next = root->next;
+
+      ndpi_free_addr_item(root);
+      root = next;
+    }
+  }
+
+  ndpi_free(cache->address_cache_root);
+}
+
+/* ***************************************************** */
+
+/* Return the number of purged entries */
+u_int ndpi_address_cache_flush_expired(struct ndpi_address_cache *cache,
+				       u_int32_t epoch_now) {
+  u_int i, num_purged = 0;
+
+  for(i=0; i<cache->num_root_nodes; i++) {
+    struct ndpi_address_cache_item *root = cache->address_cache_root[i];
+    struct ndpi_address_cache_item *prev = NULL;
+
+    while(root != NULL) {
+      struct ndpi_address_cache_item *next = root->next;
+
+      if(root->expire_epoch > epoch_now) {
+	/* Time to purge */
+
+	if(prev == NULL) {
+	  /* Head element */
+	  cache->address_cache_root[i] = next;
+	} else {
+	  /* Middle element */
+	  prev->next = next;
+	}
+
+	ndpi_free_addr_item(root), num_purged++;
+      } else {
+	prev = root;
+      }
+
+      root = next;
+    } /* while */
+  } /* for */
+
+  cache->num_entries -= num_purged;
+
+  return(num_purged);
+}
+
+
+/* ***************************************************** */
+
+struct ndpi_address_cache_item* ndpi_address_cache_find(struct ndpi_address_cache *cache,
+							ndpi_ip_addr_t ip_addr, u_int32_t epoch_now) {
+  u_int32_t hash_id = ndpi_quick_hash((const unsigned char *)&ip_addr, sizeof(ip_addr)) % cache->num_root_nodes;
+  struct ndpi_address_cache_item *root = cache->address_cache_root[hash_id], *prev = NULL;
+
+  while(root != NULL) {
+    if((epoch_now != 0) && (root->expire_epoch < epoch_now)) {
+      /* Expired entry: let's remove it */
+      struct ndpi_address_cache_item *next = root->next;
+
+      if(prev == NULL)
+	cache->address_cache_root[hash_id] = next;
+      else
+	prev->next = next;
+
+      ndpi_free_addr_item(root);
+      root = next, cache->num_entries--;
+
+      continue; /* Skip this entry */
+    }
+
+    if(memcmp(&root->addr, &ip_addr, sizeof(ndpi_ip_addr_t)) == 0) {
+      return(root);
+    } else
+      root = root->next;
+  }
+
+  return(NULL);
+}
+
+/* ***************************************************** */
+
+bool ndpi_address_cache_insert(struct ndpi_address_cache *cache,
+			       ndpi_ip_addr_t ip_addr, char *hostname,
+			       u_int32_t epoch_now,
+			       u_int32_t ttl) {
+  u_int32_t hash_id = ndpi_quick_hash((const unsigned char *)&ip_addr, sizeof(ip_addr)) % cache->num_root_nodes;
+  struct ndpi_address_cache addr;
+  struct ndpi_address_cache_item *ret;
+  u_int32_t epoch_valid_until;
+
+  if(epoch_now == 0) epoch_now = (u_int32_t)time(NULL);
+  ret = ndpi_address_cache_find(cache, ip_addr, epoch_now);
+  epoch_valid_until = epoch_now + ttl;
+
+  /* printf("**** %s [%u][ttl: %u]\n", hostname, epoch_now, ttl); */
+
+  if(ret == NULL) {
+    if(cache->num_entries == cache->max_num_entries) {
+      ndpi_address_cache_flush_expired(cache, epoch_now);
+
+      if(cache->num_entries == cache->max_num_entries)
+	return(false); /* Still no room left */
+
+      /* We have room to add the new element */
+      /* Let's continue */
+    }
+
+    /* We have room to insert the new element */
+    ret = (struct ndpi_address_cache_item*)ndpi_malloc(sizeof(struct ndpi_address_cache_item));
+    if(ret == NULL)
+      return(false); /* No memory */
+
+    memcpy(&ret->addr, &ip_addr, sizeof(addr)),
+      ret->expire_epoch = epoch_valid_until,
+      ret->next = cache->address_cache_root[hash_id];
+
+    /* Create linked list */
+    cache->address_cache_root[hash_id] = ret;
+
+    if((ret->hostname = strdup(hostname)) == NULL) {
+      ndpi_free(ret);
+      return(false);
+    }
+  } else {
+    /* Element found: update TTL of the existing element */
+    ret->expire_epoch = ndpi_max(ret->expire_epoch, epoch_valid_until);
+
+    if(strcmp(ret->hostname, hostname)) {
+      /* Hostnames are different: we overwrite it */
+      char *new_hostname = ndpi_strdup(hostname);
+
+      if(new_hostname) {
+	/* Allocation ok */
+	ndpi_free(ret->hostname);
+	ret->hostname = new_hostname;
+      }
+    }
+  }
+
+  cache->num_entries++;
+  return(true);
+}
+
+/* ***************************************************** */
+/* ***************************************************** */
+
+bool ndpi_cache_address(struct ndpi_detection_module_struct *ndpi_struct,
+			ndpi_ip_addr_t ip_addr, char *hostname,
+			u_int32_t epoch_now, u_int32_t ttl) {
+  if(ndpi_struct->cfg.address_cache_size == 0) return(false);
+
+  if(ndpi_struct->address_cache == NULL)
+    ndpi_struct->address_cache = ndpi_init_address_cache(ndpi_struct->cfg.address_cache_size);
+
+  if(ndpi_struct->address_cache)
+    return(ndpi_address_cache_insert(ndpi_struct->address_cache, ip_addr, hostname, epoch_now, ttl));
+  else
+    return(false);
+}
+
+/* ***************************************************** */
+
+struct ndpi_address_cache_item* ndpi_cache_address_find(struct ndpi_detection_module_struct *ndpi_struct,
+							ndpi_ip_addr_t ip_addr) {
+  if(ndpi_struct->address_cache == NULL) return(NULL);
+
+  return(ndpi_address_cache_find(ndpi_struct->address_cache, ip_addr, 0));
+}

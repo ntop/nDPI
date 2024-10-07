@@ -1862,6 +1862,21 @@ struct ndpi_des_struct {
 
 /* **************************************** */
 
+struct ndpi_address_cache_item {
+  ndpi_ip_addr_t addr; /* key */
+  char *hostname; /* value */
+  u_int32_t expire_epoch;
+  struct ndpi_address_cache_item *next; /* Linked list */
+};
+
+struct ndpi_address_cache {
+  u_int32_t num_cached_addresses, num_root_nodes;
+  u_int32_t num_entries, max_num_entries;
+  struct ndpi_address_cache_item **address_cache_root;
+};
+
+/* **************************************** */
+
 /* Prototype used to define custom DGA detection function */
 typedef int (*ndpi_custom_dga_predict_fctn)(const char* domain, int domain_length);
 

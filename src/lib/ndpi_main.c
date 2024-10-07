@@ -4385,6 +4385,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->public_domain_suffixes)
       ndpi_hash_free(&ndpi_str->public_domain_suffixes);
 
+    if(ndpi_str->address_cache)
+      ndpi_term_address_cache(ndpi_str->address_cache);
+    
     ndpi_free(ndpi_str);
   }
 
@@ -8539,7 +8542,6 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
 {
   u_int16_t fpc_dns_cached_proto;
 
-
   if(!ndpi_str->cfg.fpc_enabled)
     return;
 
@@ -11384,6 +11386,7 @@ static const struct cfg_param {
   { NULL,            "dpi.guess_on_giveup",                     "0x3", "0", "3", CFG_PARAM_INT, __OFF(guess_on_giveup), NULL },
   { NULL,            "dpi.guess_ip_before_port",                "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(guess_ip_before_port), NULL},
   { NULL,            "dpi.compute_entropy",                     "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(compute_entropy), NULL },
+  { NULL,            "dpi.address_cache_size",                  "0", "0", "16777215", CFG_PARAM_INT, __OFF(address_cache_size), NULL },
   { NULL,            "fpc",                                     "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fpc_enabled), NULL },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },

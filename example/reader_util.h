@@ -259,6 +259,7 @@ typedef struct ndpi_flow_info {
   ndpi_serializer ndpi_flow_serializer;
 
   char host_server_name[80]; /* Hostname/SNI */
+  char *server_hostname;
   char *bittorent_hash;
   char *dhcp_fingerprint;
   char *dhcp_class_ident;

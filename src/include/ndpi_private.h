@@ -199,6 +199,7 @@ struct ndpi_detection_module_config_struct {
   int libgcrypt_init;
   int guess_on_giveup;
   int compute_entropy;
+  int address_cache_size;
   int fpc_enabled;
   int guess_ip_before_port;
   int use_client_ip_in_guess;
@@ -414,6 +415,7 @@ struct ndpi_detection_module_struct {
   u_int16_t max_payload_track_len;
 
   ndpi_str_hash *public_domain_suffixes;
+  struct ndpi_address_cache *address_cache;
 };
 
 
@@ -560,10 +562,6 @@ struct ndpi_detection_module_struct {
 #define NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V6_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
 #define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
 
-
-
-
-
 /* Generic */
 
 char *strptime(const char *s, const char *format, struct tm *tm);
@@ -635,8 +633,11 @@ int load_category_file_fd(struct ndpi_detection_module_struct *ndpi_str,
 
 u_int64_t fpc_dns_cache_key_from_dns_info(struct ndpi_flow_struct *flow);
 
+bool ndpi_cache_address(struct ndpi_detection_module_struct *ndpi_struct,
+			ndpi_ip_addr_t ip_addr, char *hostname,
+			u_int32_t epoch_now, u_int32_t ttl);
 
-/* TLS */
+  /* TLS */
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow, uint32_t quic_version);
 void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct,

@@ -475,9 +475,20 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			 || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
 			 )) {
 		if(found == 0) {
+		  /* Necessary for IP address comparison */
+		  memset(&flow->protos.dns.rsp_addr[flow->protos.dns.num_rsp_addr], 0, sizeof(ndpi_ip_addr_t));
+		  
 		  memcpy(&flow->protos.dns.rsp_addr[flow->protos.dns.num_rsp_addr], packet->payload + x, data_len);
 		  flow->protos.dns.is_rsp_addr_ipv6[flow->protos.dns.num_rsp_addr] = (data_len == 16) ? 1 : 0;
 		  flow->protos.dns.rsp_addr_ttl[flow->protos.dns.num_rsp_addr] = ttl;
+
+		  if(ndpi_struct->cfg.address_cache_size)
+		    ndpi_cache_address(ndpi_struct,
+				       flow->protos.dns.rsp_addr[flow->protos.dns.num_rsp_addr],
+				       flow->host_server_name,
+				       packet->current_time_ms/1000,
+				       flow->protos.dns.rsp_addr_ttl[flow->protos.dns.num_rsp_addr]);		
+		  
 		  if(++flow->protos.dns.num_rsp_addr == MAX_NUM_DNS_RSP_ADDRESSES)
 		    found = 1;
 		}

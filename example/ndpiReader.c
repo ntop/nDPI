@@ -6262,13 +6262,13 @@ void cryptDecryptUnitTest() {
   const char *test_string = "The quick brown fox jumps over the lazy dog";
   char *enc, *dec;
   u_int16_t e_len, d_len, t_len = strlen(test_string);
-  
+
   enc = ndpi_quick_encrypt(test_string, t_len, &e_len, enc_dec_key);
   assert(enc != NULL);
   dec = ndpi_quick_decrypt((const char*)enc, e_len, &d_len, enc_dec_key);
   assert(dec != NULL);
   assert(t_len == d_len);
-  
+
   assert(strncmp(dec, test_string, e_len) == 0);
 
   ndpi_free(enc);
@@ -6414,6 +6414,31 @@ void domainSearchUnitTest2() {
 
 /* *********************************************** */
 
+void domainCacheTestUnit() {
+  struct ndpi_address_cache *cache = ndpi_init_address_cache(32000);
+  ndpi_ip_addr_t ip;
+  u_int32_t epoch_now = (u_int32_t)time(NULL);
+  struct ndpi_address_cache_item *ret;
+
+  assert(cache);
+
+  memset(&ip, 0, sizeof(ip));
+  ip.ipv4 = 12345678;
+  assert(ndpi_address_cache_insert(cache, ip, "nodomain.local", epoch_now, 0) == true);
+
+  ip.ipv4 = 87654321;
+  assert(ndpi_address_cache_insert(cache, ip, "hello.local", epoch_now, 0) == true);
+
+  assert((ret = ndpi_address_cache_find(cache, ip, epoch_now)) != NULL);
+  assert(strcmp(ret->hostname, "hello.local") == 0);
+  sleep(1);
+  assert(ndpi_address_cache_find(cache, ip, 0 /* computed by the API */) == NULL);
+
+  ndpi_term_address_cache(cache);
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -6443,7 +6468,7 @@ int main(int argc, char **argv) {
     printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
     return(-1);
   }
-  
+
   if(!skip_unit_tests) {
 #ifndef DEBUG_TRACE
     /* Skip tests when debugging */
@@ -6457,6 +6482,7 @@ int main(int argc, char **argv) {
     exit(0);
 #endif
 
+    domainCacheTestUnit();
     cryptDecryptUnitTest();
     kdUnitTest();
     encodeDomainsUnitTest();

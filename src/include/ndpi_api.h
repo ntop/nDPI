@@ -2334,6 +2334,19 @@ extern "C" {
 
   /* ******************************* */
 
+  /* Address cache API */
+  struct ndpi_address_cache* ndpi_init_address_cache(u_int32_t max_num_entries);
+  void ndpi_term_address_cache(struct ndpi_address_cache *cache);
+  u_int ndpi_address_cache_flush_expired(struct ndpi_address_cache *cache, u_int32_t epoch_now);
+  struct ndpi_address_cache_item* ndpi_address_cache_find(struct ndpi_address_cache *cache, ndpi_ip_addr_t ip_addr, u_int32_t epoch_now);
+  bool ndpi_address_cache_insert(struct ndpi_address_cache *cache, ndpi_ip_addr_t ip_addr, char *hostname,
+				 u_int32_t epoch_now, u_int32_t ttl);
+
+  struct ndpi_address_cache_item* ndpi_cache_address_find(struct ndpi_detection_module_struct *ndpi_struct,
+							  ndpi_ip_addr_t ip_addr);
+  
+  /* ******************************* */
+
   const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx);
 
   /**
