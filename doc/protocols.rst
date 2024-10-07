@@ -974,3 +974,21 @@ References: `Main site: <https://cactusvpn.com/>`_
 Windscribe is a commercial, cross-platform virtual private network (VPN) service provider based in Canada.
 
 References: `Main site: <https://windscribe.com/>`_
+
+
+.. _Proto 430:
+
+`NDPI_PROTOCOL_SONOS`
+=========================
+Sonos is a company that provides high-quality, wireless sound systems allowing users to stream audio through a variety of speakers seamlessly throughout their home.
+
+References: `Main site: <https://www.sonos.com/>`_
+
+
+.. _Proto 431:
+
+`NDPI_PROTOCOL_DINGTALK`
+=========================
+DingTalk is a versatile communication and collaboration platform developed by Alibaba Group.
+
+References: `Main site: <https://www.dingtalk.com/en>`_
