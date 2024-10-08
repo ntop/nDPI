@@ -365,7 +365,7 @@ bool ndpi_address_cache_insert(struct ndpi_address_cache *cache,
     if(ret == NULL)
       return(false); /* No memory */
 
-    memcpy(&ret->addr, &ip_addr, sizeof(addr)),
+    memcpy(&ret->addr, &ip_addr, sizeof(ip_addr)),
       ret->expire_epoch = epoch_valid_until,
       ret->next = cache->address_cache_root[hash_id];
 
