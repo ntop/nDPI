@@ -152,6 +152,7 @@
 #define ndpi_min(a,b)   ((a < b) ? a : b)
 #define ndpi_max(a,b)   ((a > b) ? a : b)
 
+#define NDPI_NUM_DEFAULT_ROOT_NODES        512
 
 #define NDPI_IPSEC_PROTOCOL_ESP    50
 #define NDPI_IPSEC_PROTOCOL_AH     51
