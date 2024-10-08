@@ -1,0 +1,1 @@
+See also https://github.com/baderj/domain_generation_algorithms for a collection of malware DGAs
