@@ -1,5 +1,5 @@
 --
--- (C) 2017-21 - ntop.org
+-- (C) 2017-24 - ntop.org
 --
 -- This plugin is part of nDPI (https://github.com/ntop/nDPI)
 --
@@ -17,35 +17,40 @@
 -- along with this program; if not, write to the Free Software Foundation,
 -- Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 --
+-- STUN code courtesy of Lorenzo Iannarella <l.iannarela@studenti.unpi.it>
+--
+
+-- ##############################################
 
 function bit(p) -- 0-based indexing; returning a UInt64 object!
    if p < 32 then
-       return UInt64(2 ^ p, 0)
+      return UInt64(2 ^ p, 0)
    else
-       return UInt64(0, 2 ^ (p - 32))
+      return UInt64(0, 2 ^ (p - 32))
    end
 end
 
+-- ##############################################
 
-local ndpi_proto = Proto("ndpi", "nDPI Protocol Interpreter")
+local ndpi_proto  = Proto("ndpi", "nDPI Protocol Interpreter")
 ndpi_proto.fields = {}
 
-local ndpi_fds    = ndpi_proto.fields
+local ndpi_fds                = ndpi_proto.fields
 ndpi_fds.magic                = ProtoField.new("nDPI Magic", "ndpi.magic", ftypes.UINT32, nil, base.HEX)
 ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
-ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT8, nil, base.DEC)
+ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT16, nil, base.DEC)
 ndpi_fds.name                 = ProtoField.new("nDPI Protocol Name", "ndpi.protocol.name", ftypes.STRING)
 ndpi_fds.flags                = ProtoField.new("nDPI Flags", "ndpi.flags", ftypes.UINT8, nil, base.HEX)
 local dir_types = {
-        [0] = "Unknown Direction",
-        [1] = "Client to Server Direction",
-        [2] = "Server to Client Direction",
+   [0] = "Unknown Direction",
+   [1] = "Client to Server Direction",
+   [2] = "Server to Client Direction",
 }
 ndpi_fds.flags_direction      = ProtoField.new("nDPI Direction", "ndpi.flags.direction", ftypes.UINT8, dir_types, base.DEC, 0x03)
 local dpi_state_types = {
-        [0] = "Inspecting",
-        [1] = "From Inspecting to Done",
-        [2] = "Done",
+   [0] = "Inspecting",
+   [1] = "From Inspecting to Done",
+   [2] = "Done",
 }
 ndpi_fds.flags_dpi_state      = ProtoField.new("nDPI DPI state", "ndpi.flags.dpi_state", ftypes.UINT8, dpi_state_types, base.DEC, 0xC)
 ndpi_fds.flow_risk            = ProtoField.new("nDPI Flow Risk", "ndpi.flow_risk", ftypes.UINT64, nil, base.HEX)
@@ -57,9 +62,9 @@ ndpi_fds.metadata_list_len    = ProtoField.new("nDPI Metadata List Length", "ndp
 ndpi_fds.metadata_list        = ProtoField.new("nDPI Metadata List", "ndpi.metadata_list", ftypes.NONE)
 ndpi_fds.metadata             = ProtoField.new("nDPI Metadata", "ndpi.metadata", ftypes.NONE)
 local mtd_types = {
-        [0] = "Padding",
-        [1] = "Server Name",
-        [2] = "JA4C"
+   [0] = "Padding",
+   [1] = "Server Name",
+   [2] = "JA4C"
 }
 ndpi_fds.metadata_type        = ProtoField.new("nDPI Metadata Type", "ndpi.metadata.type", ftypes.UINT16, mtd_types)
 ndpi_fds.metadata_length      = ProtoField.new("nDPI Metadata Length", "ndpi.metadata.length", ftypes.UINT16)
@@ -135,8 +140,14 @@ flow_risks[56] = ProtoField.bool("ndpi.flow_risk.obfuscated_traffic", "Obfuscate
 flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT64, nil, base.HEX, bit(64) - bit(57))
 
 for _,v in pairs(flow_risks) do
-  ndpi_fds[#ndpi_fds + 1] = v
+   ndpi_fds[#ndpi_fds + 1] = v
 end
+
+local stun_request_table = {}
+local stun_flows_table = {}
+local stun_processed_packets = {}
+local stun_old_id_packet = 0
+
 
 local ntop_proto = Proto("ntop", "ntop Extensions")
 ntop_proto.fields = {}
@@ -170,6 +181,25 @@ local f_rpc_xid           = Field.new('rpc.xid')
 local f_rpc_msgtyp        = Field.new('rpc.msgtyp')
 local f_user_agent        = Field.new('http.user_agent')
 local f_dhcp_request_item = Field.new('dhcp.option.request_list_item')
+
+local f_stun_type           = Field.new("stun.type")
+local f_stun_classic_type   = Field.new("classicstun.type")
+local f_stun_length         = Field.new("stun.length")
+local f_stun_username       = Field.new("stun.att.username")
+local f_stun_tie_breaker    = Field.new("stun.att.tie-breaker")
+local f_stun_unknown_att    = Field.new("stun.unknown_attribute")
+local f_stun_realm          = Field.new("stun.att.realm")
+local f_stun_nonce          = Field.new("stun.att.nonce")
+local f_stun_software       = Field.new("stun.att.software")
+local f_stun_ip_xor         = Field.new("stun.att.ipv4-xord")
+local f_stun_ms_version     = Field.new("stun.att.ms.version")
+local f_stun_ms_version_ice = Field.new("stun.att.ms.version.ice")
+local f_stun_response_to    = Field.new("stun.response-to")
+local f_udp_traffic         = Field.new("udp")
+local f_src_ip              = Field.new("ip.src")
+local f_dst_ip              = Field.new("ip.dst")
+local f_src_port            = Field.new("udp.srcport")
+local f_dst_port            = Field.new("udp.dstport")
 
 local ndpi_protos            = {}
 local ndpi_flows             = {}
@@ -241,6 +271,12 @@ local dissect_ndpi_trailer = true
 local dump_file = "/tmp/wireshark-influx.txt"
 local file
 
+local ndpi_proto_unknown  = ""           -- NDPI_PROTOCOL_UNKNOWN
+local ndpi_proto_whatsapp = "WhatApp"    -- NDPI_PROTOCOL_WHATSAPP_CALL
+local ndpi_proto_telegram = "Telegram"   -- NDPI_PROTOCOL_TELEGRAM
+local ndpi_proto_teams    = "Teams"      -- NDPI_PROTOCOL_SKYPE_TEAMS_CALL
+local ndpi_proto_meet     = "GoogleMeet" -- NDPI_PROTOCOL_GOOGLE_MEET
+   
 -- ##############################################
 
 function string.contains(String,Start)
@@ -269,6 +305,16 @@ function string.ends(String,End)
 end
 
 -- ###############################################
+
+local function stun_develop_table(tab, key1, key2, protocol)
+   if tab[key1] == nil then
+      if tab[key2] ==  nil then 
+	 tab[key1] = protocol
+      end
+   end
+   
+   return tab
+end
 
 function round(num, idp)
    return tonumber(string.format("%." .. (idp or 0) .. "f", num))
@@ -354,19 +400,19 @@ end
 -- ###############################################
 
 function pairsByKeys(t, f)
-  local a = {}
+   local a = {}
 
-  -- io.write(debug.traceback().."\n")
-  for n in pairs(t) do table.insert(a, n) end
-  table.sort(a, f)
-  local i = 0      -- iterator variable
-  local iter = function ()   -- iterator function
-    i = i + 1
-    if a[i] == nil then return nil
-    else return a[i], t[a[i]]
-    end
-  end
-  return iter
+   -- io.write(debug.traceback().."\n")
+   for n in pairs(t) do table.insert(a, n) end
+   table.sort(a, f)
+   local i = 0      -- iterator variable
+   local iter = function ()   -- iterator function
+      i = i + 1
+      if a[i] == nil then return nil
+      else return a[i], t[a[i]]
+      end
+   end
+   return iter
 end
 
 -- ###############################################
@@ -505,6 +551,10 @@ function ndpi_proto.init()
    -- RPC
    rpc_ts                = {}   
 
+   -- STUN
+   stun_request_table = {}
+   stun_flows_table = {}
+   
    if(dump_timeseries) then
       file = assert(io.open(dump_file, "a"))
       print("Writing to "..dump_file.."\n")
@@ -689,7 +739,7 @@ function timeseries_dissector(tvb, pinfo, tree)
    if(pinfo.dst_port ~= 0) then
       local rev_key = getstring(pinfo.dst)..":"..getstring(pinfo.dst_port).."-"..getstring(pinfo.src)..":"..getstring(pinfo.src_port)
       local k
-            
+      
       if(flows[rev_key] ~= nil) then
 	 flows[rev_key][2] = flows[rev_key][2] + pinfo.len
 	 k = rev_key
@@ -725,7 +775,7 @@ function timeseries_dissector(tvb, pinfo, tree)
 
       row = "wireshark,host="..getstring(pinfo.dst).." rcvd=".. pinfo.len .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000"   
       file:write(row.."\n")
-   
+      
       -- print(row)
 
       file:flush()
@@ -738,7 +788,7 @@ function risk_dissector(tvb, pinfo, tree)
    if(pinfo.dst_port ~= 0) then
       local rev_key = getstring(pinfo.dst)..":"..getstring(pinfo.dst_port).."-"..getstring(pinfo.src)..":"..getstring(pinfo.src_port)
       local k
-            
+      
       if(flows[rev_key] ~= nil) then
 	 flows[rev_key][2] = flows[rev_key][2] + pinfo.len
 	 k = rev_key
@@ -774,7 +824,7 @@ function risk_dissector(tvb, pinfo, tree)
 
       row = "wireshark,host="..getstring(pinfo.dst).." rcvd=".. pinfo.len .. " ".. (tonumber(pinfo.abs_ts)*10000).."00000"   
       file:write(row.."\n")
-   
+      
       -- print(row)
 
       file:flush()
@@ -882,6 +932,7 @@ function rpc_dissector(tvb, pinfo, tree)
 	    
 	    if((appl_latency > 0) and (appl_latency < max_appl_lat_discard)) then
 	       local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
+	       
 	       ntop_subtree:add(ntop_fds.appl_latency_rtt, appl_latency)
 	    end
 	 end
@@ -940,7 +991,7 @@ function latency_dissector(tvb, pinfo, tree)
       end
 
       if(((ip_len ~= nil) and (tcp_header_len ~= nil) and (ip_hdr_len ~= nil))
-	    or (udp_len ~= nil)
+	 or (udp_len ~= nil)
       ) then
 	 local payloadLen
 
@@ -963,10 +1014,11 @@ function latency_dissector(tvb, pinfo, tree)
 
 	       if((appl_latency > 0) and (appl_latency < max_appl_lat_discard)
 		  -- The trick below is used to set only the first latency packet
-		     and ((first_payload_id[revkey] == nil) or (first_payload_id[revkey] == pinfo.number))
+		  and ((first_payload_id[revkey] == nil) or (first_payload_id[revkey] == pinfo.number))
 	       ) then
 		  local ntop_subtree = tree:add(ntop_proto, tvb(), "ntop")
 		  local server = getstring(pinfo.src)
+		  
 		  if(rtt_debug) then print("==> Appl Latency @ "..pinfo.number..": "..appl_latency) end
 
 		  ntop_subtree:add(ntop_fds.appl_latency_rtt, appl_latency)
@@ -1094,14 +1146,14 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	 local ndpi_trailer
 	 local trailer_tvb
 	 if (eth_trailer[#eth_trailer] ~= nil) then
-	     ndpi_trailer = getval(eth_trailer[#eth_trailer])
-	     trailer_tvb = eth_trailer[#eth_trailer].range()
+	    ndpi_trailer = getval(eth_trailer[#eth_trailer])
+	    trailer_tvb = eth_trailer[#eth_trailer].range()
 	 elseif(vlan_trailer[#vlan_trailer] ~= nil) then
-	     ndpi_trailer = getval(vlan_trailer[#vlan_trailer])
-	     trailer_tvb = vlan_trailer[#vlan_trailer].range()
+	    ndpi_trailer = getval(vlan_trailer[#vlan_trailer])
+	    trailer_tvb = vlan_trailer[#vlan_trailer].range()
 	 else
-	     ndpi_trailer = getval(sll_trailer[#sll_trailer])
-	     trailer_tvb = sll_trailer[#sll_trailer].range()
+	    ndpi_trailer = getval(sll_trailer[#sll_trailer])
+	    trailer_tvb = sll_trailer[#sll_trailer].range()
 	 end
 	 local magic = string.sub(ndpi_trailer, 1, 11)
 
@@ -1117,7 +1169,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    offset = offset + 4
 	    ndpi_subtree:add(ndpi_fds.network_protocol, trailer_tvb(offset, 2))
 	    offset = offset + 2
-	    ndpi_subtree:add(ndpi_fds.application_protocol, trailer_tvb(offset, 2))
+	    ndpi_subtree:add(ndpi_fds.name, trailer_tvb(offset, 2))
 	    application_protocol = trailer_tvb(offset, 2):int()
 	    offset = offset + 2
 
@@ -1151,7 +1203,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
 	          if(flows_with_risks[rev_key] == nil) then
 		     local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).." - "..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
-		  
+		     
 		     if(flows_with_risks[key] == nil) then
 		        flows_with_risks[key] = flow_score
 		     end
@@ -1159,9 +1211,9 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
                end
 	       
 	       for i=0,63 do
-		 if flow_risks[i] ~= nil then
-	            flow_risk_tree:add(flow_risks[i], trailer_tvb(25, 8))
-		 end
+		  if flow_risks[i] ~= nil then
+		     flow_risk_tree:add(flow_risks[i], trailer_tvb(25, 8))
+		  end
 
 	       end
 	       flow_risk_tree:add(flow_risks[64], trailer_tvb(25, 8)) -- Unused bits in flow risk bitmask
@@ -1207,18 +1259,18 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
 	       -- Specific fields: there is definitely a better way...
 	       if mtd_type == 0 then
-	         metadata_tree:append_text(" Padding")
-	         -- Generic field
-	         metadata_tree:add(ndpi_fds.metadata_value, trailer_tvb(offset + 4, mtd_length))
+		  metadata_tree:append_text(" Padding")
+		  -- Generic field
+		  metadata_tree:add(ndpi_fds.metadata_value, trailer_tvb(offset + 4, mtd_length))
 	       elseif mtd_type == 1 then
-	         metadata_tree:append_text(" ServerName: " .. trailer_tvb(offset + 4, mtd_length):string())
-	         metadata_tree:add(ndpi_fds.metadata_server_name, trailer_tvb(offset + 4, mtd_length))
+		  metadata_tree:append_text(" ServerName: " .. trailer_tvb(offset + 4, mtd_length):string())
+		  metadata_tree:add(ndpi_fds.metadata_server_name, trailer_tvb(offset + 4, mtd_length))
 	       elseif mtd_type == 2 then
-	         metadata_tree:append_text(" JA4C: " .. trailer_tvb(offset + 4, mtd_length):string())
-	         metadata_tree:add(ndpi_fds.metadata_ja4c, trailer_tvb(offset + 4, mtd_length))
+		  metadata_tree:append_text(" JA4C: " .. trailer_tvb(offset + 4, mtd_length):string())
+		  metadata_tree:add(ndpi_fds.metadata_ja4c, trailer_tvb(offset + 4, mtd_length))
 	       else
-	         -- Generic field
-	         metadata_tree:add(ndpi_fds.metadata_value, trailer_tvb(offset + 4, mtd_length))
+		  -- Generic field
+		  metadata_tree:add(ndpi_fds.metadata_value, trailer_tvb(offset + 4, mtd_length))
 	       end
 
 	       offset = offset + 4 + mtd_length
@@ -1259,26 +1311,26 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    end
 
 	    if(track_obfuscated_servers and pinfo.visited == false) then
-	      -- Only once per flow, when DPI ends
-	      if(dpi_state == 1) then
-		if(direction == 2) then -- current packet from server to client
-	          key = tostring(pinfo.src) .. ":" .. getstring(pinfo.src_port) .. " " .. name
-		else
-	          key = tostring(pinfo.dst) .. ":" .. getstring(pinfo.dst_port) .. " " .. name
-		end
-		if(possible_obfuscated_servers[key] == nil) then
-		  possible_obfuscated_servers[key] = {1, flow_risk_obfuscated_traffic}
-		else
-		  possible_obfuscated_servers[key][1] = possible_obfuscated_servers[key][1] + 1
-		  if(flow_risk_obfuscated_traffic == 1) then
-		    possible_obfuscated_servers[key][2] = possible_obfuscated_servers[key][2] + 1
+	       -- Only once per flow, when DPI ends
+	       if(dpi_state == 1) then
+		  if(direction == 2) then -- current packet from server to client
+		     key = tostring(pinfo.src) .. ":" .. getstring(pinfo.src_port) .. " " .. name
+		  else
+		     key = tostring(pinfo.dst) .. ":" .. getstring(pinfo.dst_port) .. " " .. name
 		  end
-		end
+		  if(possible_obfuscated_servers[key] == nil) then
+		     possible_obfuscated_servers[key] = {1, flow_risk_obfuscated_traffic}
+		  else
+		     possible_obfuscated_servers[key][1] = possible_obfuscated_servers[key][1] + 1
+		     if(flow_risk_obfuscated_traffic == 1) then
+			possible_obfuscated_servers[key][2] = possible_obfuscated_servers[key][2] + 1
+		     end
+		  end
 
-		if(flow_risk_obfuscated_traffic == 1) then
-		  tot_obfuscated_flows = tot_obfuscated_flows + 1
-		end
-	      end
+		  if(flow_risk_obfuscated_traffic == 1) then
+		     tot_obfuscated_flows = tot_obfuscated_flows + 1
+		  end
+	       end
 	    end
 	 end
       end -- nDPI
@@ -1292,7 +1344,185 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 
    -- As we do not need to add fields to the dissection
    -- there is no need to process the packet multiple times
-   if(pinfo.visited == true) then return end
+   if(pinfo.visited == true) then
+      local id_packet = pinfo.number
+      local udp_traffic = f_udp_traffic()
+      
+      if udp_traffic then	 
+	 if stun_old_id_packet > id_packet then
+	    stun_processed_packets = stun_flows_table
+	    stun_flows_table = {}
+	    stun_old_id_packet = id_packet
+	 end
+	 
+	 local src = getstring(f_src_ip())
+	 local dst = getstring(f_dst_ip())
+	 local src_port = getstring(f_src_port())
+	 local dst_port = getstring(f_dst_port())
+	 local stun_type = getstring(f_stun_type())
+	 local stun_length = getstring(f_stun_length())
+	 local classic_type = getstring(f_stun_classic_type())
+	 local stun_username = f_stun_username()
+	 local stun_tie_breaker = f_stun_tie_breaker()
+	 local stun_unknown_att = f_stun_unknown_att()
+	 local stun_realm = f_stun_realm()
+	 local stun_nonce = f_stun_nonce()
+	 local stun_software = f_stun_software()
+	 local stun_ip_xor = f_stun_ip_xor()
+	 local stun_ms_version = f_stun_ms_version()
+	 local stun_ms_version_ice = f_stun_ms_version_ice()
+	 local stun_request = f_stun_response_to()
+	 local protocol = ndpi_proto_unknown
+
+	 local key = src..":"..src_port.." <--> "..dst..":"..dst_port
+	 local key2 = dst..":"..dst_port.." <--> "..src..":"..src_port
+
+	 --         Send Data       
+	 if stun_type == "0x0016"  then
+	    -- da sistemare, guarda meet_test1.pcap
+	    protocol = (stun_flows_table[key] ~= nil) and stun_flows_table[key] or (stun_flows_table[key2] ~= nil) and stun_flows_table[key2] or ndpi_proto_unknown
+	    
+	    --  Data Indication 
+	 elseif stun_type == "0x0017" then
+	    protocol = (stun_software ~= nil) and ndpi_proto_telegram or ndpi_proto_teams
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+
+	    --	Create Permission Request 
+	 elseif stun_type == "0x0008" then
+	    protocol = (getstring(stun_realm) == "telegram.org") and ndpi_proto_telegram or ndpi_proto_teams
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+	    
+	    -- Refresh Request
+	 elseif stun_type == "0x0004" then
+	    protocol = (stun_ms_version ~= nil and stun_username ~= nil) and ndpi_proto_teams or (getstring(stun_realm) == "telegram.org") and ndpi_proto_telegram or ndpi_proto_teams
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+	    
+	    -- Create Permission Response
+	 elseif stun_type =="0x0108" then
+	    protocol = (stun_software ~= nil) and ndpi_proto_telegram or ndpi_proto_teams
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+	    
+	    -- Refresh Success Response
+	 elseif stun_type == "0x0104" then
+	    protocol = (stun_software ~= nil) and ndpi_proto_telegram or ndpi_proto_teams
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+	    
+	    -- unknown request whatsapp
+	 elseif stun_type == "0x0800" then
+	    protocol = ndpi_proto_whatsapp
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+
+	    -- binding request   
+	 elseif stun_type == "0x0001" then  
+	    local telegram_tie_breaker = "00:00:00:00:00:00:00:00"
+	    
+	    if (stun_username and stun_unknown_att) or stun_ms_version_ice ~= nil or stun_ms_version  ~= nil then
+	       protocol = ndpi_proto_teams
+	    elseif stun_tie_breaker ~= nil and stun_username ~= nil then
+	       if getstring(stun_tie_breaker) == telegram_tie_breaker   and getstring(stun_username):len()== 9 then 
+		  protocol = ndpi_proto_telegram
+	       elseif getstring(stun_tie_breaker) ~= telegram_tie_breaker and getstring(stun_username):len()== 9  then
+		  protocol = ndpi_proto_teams
+	       elseif getstring(stun_username):len() == 73 then
+		  protocol = "Zoom"
+	       elseif getstring(stun_tie_breaker) ~= telegram_tie_breaker and getstring(stun_username):len()~= 9  then
+		  protocol = ndpi_proto_meet
+	       end	
+	    elseif tonumber(stun_length) == 0 then
+	       protocol = (stun_flows_table[key] ~= nil) and stun_flows_table[key] or (stun_flows_table[key2] ~= nil) and stun_flows_table[key2] or ndpi_proto_unknown
+
+	    elseif tonumber(stun_length) == 24 then
+	       protocol = ndpi_proto_whatsapp
+	    end
+
+	    stun_request_table[getstring(pinfo.number)]= protocol
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+
+	    -- binding request
+	 elseif classic_type == "0x0001" then
+	    protocol = "Zoom"
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+
+	    -- binding success response 
+	 elseif classic_type == "0x0101"then
+	    protocol = "Zoom"
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+	    
+	    -- shared Secret Request
+	 elseif classic_type == "0x0002" then
+	    protocol = "Zoom"
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+	    
+	    -- allocate request
+	 elseif stun_type == "0x0003" then
+	    if stun_ms_version then
+	       protocol = ndpi_proto_teams
+	    elseif stun_unknown_att then 
+	       protocol = ndpi_proto_whatsapp
+	    elseif stun_realm and stun_nonce and stun_username then 
+	       protocol = ndpi_proto_telegram
+	    else
+	       protocol = ndpi_proto_telegram
+	    end
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+	    
+	    -- binding success response
+	 elseif stun_type == "0x0101" then
+
+	    if tonumber(stun_length) == 44 or tonumber(stun_length) == 12 then
+	       protocol = stun_request_table[getstring(stun_request)]
+	    else
+	       if stun_ms_version_ice then 
+		  protocol = ndpi_proto_teams
+	       elseif stun_software then 
+		  protocol = ndpi_proto_telegram
+	       elseif (stun_software == nil) and stun_ip_xor then
+		  protocol = ndpi_proto_meet
+	       elseif tonumber(stun_length) == 24 then
+		  protocol = ndpi_proto_whatsapp
+	       end
+	    end
+	    if stun_request_table[getstring(stun_request)] ~= 0 and protocol ~= stun_request_table[getstring(stun_request)] then
+	       protocol = stun_request_table[getstring(stun_request)]
+	       
+	    end
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+	    
+	    -- Allocate Success Response
+	 elseif stun_type == "0x0103" then
+	    protocol = (stun_ms_version ~= nil) and ndpi_proto_teams or (stun_software ~= nil) and ndpi_proto_telegram or ndpi_proto_whatsapp
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+
+	    -- Allocate Error Response
+	 elseif stun_type == "0x0113"  then
+	    protocol = (stun_ms_version ~= nil) and ndpi_proto_teams or (stun_realm ~= nil) and ndpi_proto_telegram or ndpi_proto_unknown
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+
+	    -- Create permission error response
+	 elseif stun_type == "0x0118"  then 
+	    protocol = ndpi_proto_telegram
+	    stun_flows_table = stun_develop_table(stun_flows_table,key,key2,protocol)
+	 end
+
+	 local ndpi_subtree = tree:add(ndpi_proto, trailer_tvb, "nDPI Protocol")
+	 
+	 if(protocol ~= ndpi_proto_unknown) then
+	    ndpi_subtree:add(ndpi_fds.name, protocol)
+	    stun_old_id_packet = id_packet
+	 elseif(protocol == ndpi_proto_unknown) then
+	    if stun_flows_table[key] ~= nil then 
+	       ndpi_subtree:add(ndpi_fds.name,stun_flows_table[key])
+	    elseif stun_flows_table[key2] ~= nil then
+	       ndpi_subtree:add(ndpi_fds.name,stun_flows_table[key2])
+	    elseif stun_old_id_packet > id_packet then
+	       protocol = stun_processed_packets[key] ~= nil and stun_processed_packets[key] or stun_processed_packets[key2] ~= nil and stun_processed_packets[key2] or ndpi_proto_unknown
+	       ndpi_subtree:add(ndpi_fds.name,protocol)
+	    end
+	    
+	    stun_old_id_packet = id_packet
+	 end
+      end
+   end
 
    num_pkts = num_pkts + 1
    if((num_pkts > 1) and (pinfo.number == 1)) then return end
@@ -1634,7 +1864,7 @@ local function obfuscated_servers_dialog_menu()
       label = label .. "Server\t\tProtocol\tTotal Flows\tObfuscated flows\n"
       for k,v in pairsByKeys(possible_obfuscated_servers, rev) do
          for token in string.gmatch(k, "[^%s]+") do -- split key in two token (for beter formatting): ip:port and protocol
-	   label = label .. token .. "\t"
+	    label = label .. token .. "\t"
          end
 	 label = label .. v[1] .. "\t\t" .. v[2] .. "\n"
       end
@@ -1728,7 +1958,7 @@ local function dhcp_dialog_menu()
       ['0102030F060C2C'] = 'Apple AirPort',
       ['01792103060F1C333A3B77'] = 'Android',
    }
-      
+   
    if(dhcp_fingerprints ~= {}) then
       i = 0
       
@@ -1755,7 +1985,7 @@ local function dhcp_dialog_menu()
 	    if(i == 0) then
 	       label = label .. "\n\nClient\t\tUnknown Fingerprint\n"
 	    end
-	 
+	    
 	    label = label .. k.."\t"..v.."\n"
 	    if(i == 50) then break else i = i + 1 end
 	 end
