@@ -6432,7 +6432,7 @@ void domainCacheTestUnit() {
   assert((ret = ndpi_address_cache_find(cache, ip, epoch_now)) != NULL);
   assert(strcmp(ret->hostname, "hello.local") == 0);
   sleep(1);
-  assert(ndpi_address_cache_find(cache, ip, 0 /* computed by the API */) == NULL);
+  assert(ndpi_address_cache_find(cache, ip, time(NULL)) == NULL);
 
   ndpi_term_address_cache(cache);
 }
@@ -6449,7 +6449,7 @@ int main(int argc, char **argv) {
 #else
   int skip_unit_tests = 1;
 #endif
-
+  
 #ifdef DEBUG_TRACE
   trace = fopen("/tmp/ndpiReader.log", "a");
 
