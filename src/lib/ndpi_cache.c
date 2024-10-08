@@ -258,6 +258,7 @@ void ndpi_term_address_cache(struct ndpi_address_cache *cache) {
   }
 
   ndpi_free(cache->address_cache_root);
+  ndpi_free(cache);
 }
 
 /* ***************************************************** */
