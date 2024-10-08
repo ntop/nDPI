@@ -339,7 +339,6 @@ bool ndpi_address_cache_insert(struct ndpi_address_cache *cache,
 			       u_int32_t epoch_now,
 			       u_int32_t ttl) {
   u_int32_t hash_id = ndpi_quick_hash((const unsigned char *)&ip_addr, sizeof(ip_addr)) % cache->num_root_nodes;
-  struct ndpi_address_cache addr;
   struct ndpi_address_cache_item *ret;
   u_int32_t epoch_valid_until;
 
