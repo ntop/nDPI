@@ -23,6 +23,7 @@ u_int8_t max_num_udp_dissected_pkts = 0, max_num_tcp_dissected_pkts = 0; /* Disa
 int malloc_size_stats = 0;
 FILE *fingerprint_fp = NULL;
 bool do_load_lists = false;
+char *addr_dump_path = NULL;
 
 extern void ndpi_report_payload_stats(FILE *out);
 
