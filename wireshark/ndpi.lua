@@ -173,6 +173,8 @@ local f_tcp_header_len    = Field.new("tcp.hdr_len")
 local f_ip_len            = Field.new("ip.len")
 local f_ip_hdr_len        = Field.new("ip.hdr_len")
 local f_tls_server_name   = Field.new("tls.handshake.extensions_server_name")
+-- local f_tls_ja4           = Field.new("tls.handshake.ja4")
+local f_tls_ja4           = Field.new("tls.handshake.ja4_r")
 local f_tcp_flags         = Field.new('tcp.flags')
 local f_tcp_retrans       = Field.new('tcp.analysis.retransmission')
 local f_tcp_ooo           = Field.new('tcp.analysis.out_of_order')
@@ -197,6 +199,7 @@ local f_stun_ms_version_ice = Field.new("stun.att.ms.version.ice")
 local f_stun_response_to    = Field.new("stun.response-to")
 local f_udp_traffic         = Field.new("udp")
 local f_src_ip              = Field.new("ip.src")
+local f_src_ipv6            = Field.new("ipv6.src")
 local f_dst_ip              = Field.new("ip.dst")
 local f_src_port            = Field.new("udp.srcport")
 local f_dst_port            = Field.new("udp.dstport")
@@ -230,6 +233,7 @@ local max_num_dns_queries    = 50
 
 local tls_server_names       = {}
 local tot_tls_flows          = 0
+local tot_tls_ja4_flows      = 0 -- # of JA4 flows per signature
 
 local http_ua                = {}
 local tot_http_ua_flows      = 0
@@ -497,6 +501,8 @@ function ndpi_proto.init()
    -- TLS
    tls_server_names       = {}
    tot_tls_flows          = 0
+   tls_ja4_flows          = {}
+   tls_ja4_clients        = {} -- JA4 signature per client
    
    -- HTTP
    http_ua                = {}
@@ -700,6 +706,9 @@ end
 
 function tls_dissector(tvb, pinfo, tree)
    local tls_server_name = f_tls_server_name()
+   local tls_ja4         = f_tls_ja4()
+   local src_ip          = f_src_ip()
+   
    if(tls_server_name ~= nil) then
       tls_server_name = getval(tls_server_name)
 
@@ -709,6 +718,30 @@ function tls_dissector(tvb, pinfo, tree)
 
       tls_server_names[tls_server_name] = tls_server_names[tls_server_name] + 1
       tot_tls_flows = tot_tls_flows + 1
+   end
+
+   if(tls_ja4 ~= nil) then
+      tls_ja4 = getval(tls_ja4)
+      if(src_ip == nil) then
+	 src_ip = f_src_ipv6()
+      end
+      
+      src_ip  = getval(src_ip)
+
+      if(src_ip ~= nil) then
+	 if(tls_ja4_clients[tls_ja4] == nil) then
+	    tls_ja4_clients[tls_ja4] = {}
+	 end
+	       
+	 tls_ja4_clients[tls_ja4][src_ip] = true
+      end
+      
+      if(tls_ja4_flows[tls_ja4] == nil) then
+	 tls_ja4_flows[tls_ja4] = 0
+      end
+
+      tls_ja4_flows[tls_ja4] = tls_ja4_flows[tls_ja4] + 1
+      tot_tls_ja4_flows = tot_tls_ja4_flows + 1
    end
 end
 
@@ -2022,6 +2055,38 @@ local function tls_dialog_menu()
       end
    else
       label = "No TLS server certificates detected"
+   end
+
+   if(tot_tls_ja4_flows > 0) then
+      i = 0
+      label = label .. "\n\nJA4\t\t\t\t# Flows\n"
+      for k,v in pairsByValues(tls_ja4_flows, rev) do
+	 local pctg
+
+	 v = tonumber(v)
+	 pctg = formatPctg((v * 100) / tot_tls_flows)
+	 label = label .. string.format("%-32s", shortenString(k,32)).."\t"..v.." [".. pctg.." %]\n"
+	 
+	 if(i == 50) then break else i = i + 1 end
+      end
+
+
+      i = 0
+      label = label .. "\n\nJA4\t\t\t\t# Client Hosts\n"
+      for k,v in pairs(tls_ja4_clients) do
+	 clients = ""
+	 
+	 for k1,v1 in pairs(v) do
+	    if(k1 ~= nil) then
+	       clients = clients .. " " .. k1
+	    end
+	 end
+	 
+	 -- label = label .. string.format("%-64s", shortenString(k,64)).."\t["..clients.." ]\n"
+	 label = label .. k.."\t["..clients.." ]\n"
+      end
+
+
    end
 
    win:set(label)
