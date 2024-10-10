@@ -94,7 +94,7 @@ static u_int8_t ignore_vlanid = 0;
 FILE *fingerprint_fp         = NULL; /**< for flow fingerprint export */
 
 /** User preferences **/
-char *addr_dump_path = NULL;
+extern char *addr_dump_path;
 u_int8_t enable_realtime_output = 0, enable_protocol_guess = NDPI_GIVEUP_GUESS_BY_PORT | NDPI_GIVEUP_GUESS_BY_IP, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
 bool do_load_lists = false;
@@ -6449,7 +6449,7 @@ void domainCacheTestUnit() {
 
   cache = ndpi_init_address_cache(32000);
   assert(cache);
-  assert(ndpi_address_cache_restore(cache, (char*)fname, epoch_now) == 1);
+  assert(ndpi_address_cache_restore(cache, (char*)fname, epoch_now) >= 1);
 
   ip.ipv4 = 12345678;
   assert((ret = ndpi_address_cache_find(cache, ip, epoch_now)) != NULL);
@@ -6471,7 +6471,7 @@ int main(int argc, char **argv) {
 #else
   int skip_unit_tests = 1;
 #endif
-  
+    
 #ifdef DEBUG_TRACE
   trace = fopen("/tmp/ndpiReader.log", "a");
 

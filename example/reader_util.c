@@ -80,8 +80,8 @@ extern u_int8_t verbose, human_readeable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 24 */, max_num_tcp_dissected_pkts /* 80 */;
 static u_int32_t flow_id = 0;
 extern FILE *fingerprint_fp;
-extern char *addr_dump_path;
 u_int8_t enable_doh_dot_detection = 0;
+char *addr_dump_path = NULL;
 extern bool do_load_lists;
 extern int malloc_size_stats;
 
