@@ -6428,9 +6428,13 @@ void domainCacheTestUnit() {
   ndpi_ip_addr_t ip;
   u_int32_t epoch_now = (u_int32_t)time(NULL);
   struct ndpi_address_cache_item *ret;
-  const char *fname = "/tmp/cache.dump";
-  
+  char fname[64] = {0};
+
   assert(cache);
+
+  /* On GitHub Actions, ndpiReader might be called multiple times in parallel, so
+    every instance must use its own file */
+  snprintf(fname, sizeof(fname), "./cache.%u.dump", (unsigned int)getpid());
 
   memset(&ip, 0, sizeof(ip));
   ip.ipv4 = 12345678;
@@ -6441,15 +6445,14 @@ void domainCacheTestUnit() {
 
   assert((ret = ndpi_address_cache_find(cache, ip, epoch_now)) != NULL);
   assert(strcmp(ret->hostname, "hello.local") == 0);
-  sleep(1);
-  assert(ndpi_address_cache_find(cache, ip, time(NULL)) == NULL);
+  assert(ndpi_address_cache_find(cache, ip, epoch_now + 1) == NULL);
 
-  assert(ndpi_address_cache_dump(cache, (char*)fname, epoch_now));
+  assert(ndpi_address_cache_dump(cache, fname, epoch_now));
   ndpi_term_address_cache(cache);
 
   cache = ndpi_init_address_cache(32000);
   assert(cache);
-  assert(ndpi_address_cache_restore(cache, (char*)fname, epoch_now) == 1);
+  assert(ndpi_address_cache_restore(cache, fname, epoch_now) == 1);
 
   ip.ipv4 = 12345678;
   assert((ret = ndpi_address_cache_find(cache, ip, epoch_now)) != NULL);
