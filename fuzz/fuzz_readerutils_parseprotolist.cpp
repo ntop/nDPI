@@ -13,7 +13,7 @@ u_int8_t max_num_udp_dissected_pkts = 16 /* 8 is enough for most protocols, Sign
 int malloc_size_stats = 0;
 FILE *fingerprint_fp = NULL;
 bool do_load_lists = false;
-
+char *addr_dump_path = NULL;
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
