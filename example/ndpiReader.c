@@ -94,6 +94,7 @@ static u_int8_t ignore_vlanid = 0;
 FILE *fingerprint_fp         = NULL; /**< for flow fingerprint export */
 
 /** User preferences **/
+char *addr_dump_path = NULL;
 u_int8_t enable_realtime_output = 0, enable_protocol_guess = NDPI_GIVEUP_GUESS_BY_PORT | NDPI_GIVEUP_GUESS_BY_IP, enable_payload_analyzer = 0, num_bin_clusters = 0, extcap_exit = 0;
 u_int8_t verbose = 0, enable_flow_stats = 0;
 bool do_load_lists = false;
@@ -468,8 +469,8 @@ static void ndpiCheckIPMatch(char *testChar) {
     ndpi_load_protocols_file(ndpi_str, _protoFilePath);
 
   for(i = 0; i < num_cfgs; i++) {
-    rc = ndpi_set_config(ndpi_str,
-			 cfgs[i].proto, cfgs[i].param, cfgs[i].value);
+    rc = ndpi_set_config(ndpi_str, cfgs[i].proto, cfgs[i].param, cfgs[i].value);
+    
     if (rc != NDPI_CFG_OK) {
       fprintf(stderr, "Error setting config [%s][%s][%s]: %s (%d)\n",
 	      (cfgs[i].proto != NULL ? cfgs[i].proto : ""),
@@ -623,7 +624,7 @@ static void help(u_int long_help) {
 #endif
          "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
          "          [-p <protos>][-l <loops> [-q][-d][-h][-H][-D][-e <len>][-E <path>][-t][-v <level>]\n"
-         "          [-n <threads>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
+         "          [-n <threads>][-N <path>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
          "          [-r <file>][-R][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>]\n"
          "          [-a <mode>][-B proto_list]\n\n"
          "Usage:\n"
@@ -636,6 +637,7 @@ static void help(u_int long_help) {
          "  -l <num loops>            | Number of detection loops (test only)\n"
          "  -n <num threads>          | Number of threads. Default: number of interfaces in -i.\n"
          "                            | Ignored with pcap files.\n"
+	 "  -N <path>                 | Address cache dump/restore pathxo.\n"
          "  -b <num bin clusters>     | Number of bin clusters\n"
          "  -k <file>                 | Specify a file to write serialized detection results\n"
          "  -K <format>               | Specify the serialization format for `-k'\n"
@@ -781,6 +783,7 @@ static struct option longopts[] = {
   { "load-categories", required_argument, NULL, 'G'},
   { "loops", required_argument, NULL, 'l'},
   { "num-threads", required_argument, NULL, 'n'},
+  { "address-cache-dump", required_argument, NULL, 'N'},
   { "ignore-vlanid", no_argument, NULL, 'I'},
 
   { "protos", required_argument, NULL, 'p'},
@@ -1094,7 +1097,7 @@ static void parseOptions(int argc, char **argv) {
 #endif
 
   while((opt = getopt_long(argc, argv,
-			   "a:Ab:B:e:E:c:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:Rs:tu:v:V:n:rp:x:X:w:q0123:456:7:89:m:MT:U:",
+			   "a:Ab:B:e:E:c:C:dDFf:g:G:i:Ij:k:K:S:hHp:pP:l:r:Rs:tu:v:V:n:rp:x:X:w:q0123:456:7:89:m:MN:T:U:",
                            longopts, &option_idx)) != EOF) {
 #ifdef DEBUG_TRACE
     if(trace) fprintf(trace, " #### Handling option -%c [%s] #### \n", opt, optarg ? optarg : "");
@@ -1189,6 +1192,10 @@ static void parseOptions(int argc, char **argv) {
 
     case 'n':
       num_threads = atoi(optarg);
+      break;
+
+    case 'N':
+      addr_dump_path = optarg;
       break;
 
     case 'p':
@@ -2901,8 +2908,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
 
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
-                                                            serialization_format,
-							    g_ctx);
+                                                            serialization_format, g_ctx);
 
   /* Protocols to enable/disable. Default: everything is enabled */
   NDPI_BITMASK_SET_ALL(enabled_bitmask);
@@ -2970,6 +2976,9 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
   if(enable_doh_dot_detection)
     ndpi_set_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, "tls", "application_blocks_tracking", "enable");
 
+  if(addr_dump_path != NULL)
+    ndpi_cache_address_restore(ndpi_thread_info[thread_id].workflow->ndpi_struct, addr_dump_path, 0);  
+  
   ret = ndpi_finalize_initialization(ndpi_thread_info[thread_id].workflow->ndpi_struct);
   if(ret != 0) {
     fprintf(stderr, "Error ndpi_finalize_initialization: %d\n", ret);

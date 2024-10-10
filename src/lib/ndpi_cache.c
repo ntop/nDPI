@@ -264,10 +264,10 @@ void ndpi_term_address_cache(struct ndpi_address_cache *cache) {
 /* ***************************************************** */
 
 /* Return the number of purged entries */
-u_int ndpi_address_cache_flush_expired(struct ndpi_address_cache *cache,
-				       u_int32_t epoch_now) {
-  u_int i, num_purged = 0;
-
+u_int32_t ndpi_address_cache_flush_expired(struct ndpi_address_cache *cache,
+					   u_int32_t epoch_now) {
+  u_int32_t i, num_purged = 0;
+  
   for(i=0; i<cache->num_root_nodes; i++) {
     struct ndpi_address_cache_item *root = cache->address_cache_root[i];
     struct ndpi_address_cache_item *prev = NULL;
@@ -487,4 +487,35 @@ struct ndpi_address_cache_item* ndpi_cache_address_find(struct ndpi_detection_mo
   if(ndpi_struct->address_cache == NULL) return(NULL);
 
   return(ndpi_address_cache_find(ndpi_struct->address_cache, ip_addr, 0));
+}
+
+/* ***************************************************** */
+
+bool ndpi_cache_address_dump(struct ndpi_detection_module_struct *ndpi_struct, char *path, u_int32_t epoch_now) {
+  if(ndpi_struct->address_cache == NULL) return(false);
+
+  return(ndpi_address_cache_dump(ndpi_struct->address_cache, path, epoch_now));
+}
+
+/* ***************************************************** */
+
+u_int32_t ndpi_cache_address_restore(struct ndpi_detection_module_struct *ndpi_struct, char *path, u_int32_t epoch_now) {
+  if(ndpi_struct->address_cache == NULL) {
+    if(ndpi_struct->cfg.address_cache_size == 0)
+      return(0);
+
+    if((ndpi_struct->address_cache = ndpi_init_address_cache(ndpi_struct->cfg.address_cache_size)) == 0)
+      return(0);
+  }
+
+  return(ndpi_address_cache_restore(ndpi_struct->address_cache, path, epoch_now));
+}
+
+/* ***************************************************** */
+
+u_int32_t ndpi_cache_address_flush_expired(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t epoch_now) {
+  if(ndpi_struct->address_cache == NULL)
+    return(0);
+  else
+    return(ndpi_address_cache_flush_expired(ndpi_struct->address_cache, epoch_now));
 }
