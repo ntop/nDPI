@@ -2344,6 +2344,8 @@ extern "C" {
 
   struct ndpi_address_cache_item* ndpi_cache_address_find(struct ndpi_detection_module_struct *ndpi_struct,
 							  ndpi_ip_addr_t ip_addr);
+  bool ndpi_address_cache_dump(struct ndpi_address_cache *cache, char *path, u_int32_t epoch_now);
+  u_int32_t ndpi_address_cache_restore(struct ndpi_address_cache *cache, char *path, u_int32_t epoch_now);
   
   /* ******************************* */
 

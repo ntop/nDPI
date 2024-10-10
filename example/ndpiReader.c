@@ -6419,12 +6419,13 @@ void domainCacheTestUnit() {
   ndpi_ip_addr_t ip;
   u_int32_t epoch_now = (u_int32_t)time(NULL);
   struct ndpi_address_cache_item *ret;
-
+  const char *fname = "/tmp/cache.dump";
+  
   assert(cache);
 
   memset(&ip, 0, sizeof(ip));
   ip.ipv4 = 12345678;
-  assert(ndpi_address_cache_insert(cache, ip, "nodomain.local", epoch_now, 0) == true);
+  assert(ndpi_address_cache_insert(cache, ip, "nodomain.local", epoch_now, 32) == true);
 
   ip.ipv4 = 87654321;
   assert(ndpi_address_cache_insert(cache, ip, "hello.local", epoch_now, 0) == true);
@@ -6434,7 +6435,19 @@ void domainCacheTestUnit() {
   sleep(1);
   assert(ndpi_address_cache_find(cache, ip, time(NULL)) == NULL);
 
+  assert(ndpi_address_cache_dump(cache, (char*)fname, epoch_now));
   ndpi_term_address_cache(cache);
+
+  cache = ndpi_init_address_cache(32000);
+  assert(cache);
+  assert(ndpi_address_cache_restore(cache, (char*)fname, epoch_now) == 1);
+
+  ip.ipv4 = 12345678;
+  assert((ret = ndpi_address_cache_find(cache, ip, epoch_now)) != NULL);
+  assert(strcmp(ret->hostname, "nodomain.local") == 0);
+  
+  ndpi_term_address_cache(cache);
+  unlink(fname);
 }
 
 /* *********************************************** */

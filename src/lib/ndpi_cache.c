@@ -397,6 +397,73 @@ bool ndpi_address_cache_insert(struct ndpi_address_cache *cache,
 }
 
 /* ***************************************************** */
+
+bool ndpi_address_cache_dump(struct ndpi_address_cache *cache,
+			     char *path, u_int32_t epoch_now) {
+  FILE *fd = fopen(path, "w");
+  u_int i;
+  
+  if(!fd) return(false);
+
+  for(i=0; i<cache->num_root_nodes; i++) {
+    struct ndpi_address_cache_item *root = cache->address_cache_root[i];
+
+    while(root != NULL) {
+      char buf[33];
+      u_char *a = (u_char*)&(root->addr);
+      u_int j, idx;
+      
+      if(epoch_now && (root->expire_epoch < epoch_now))
+	continue; /* Expired epoch */
+      
+      for(j=0, idx=0; j<sizeof(ndpi_ip_addr_t); j++, idx += 2)
+	snprintf(&buf[idx], sizeof(buf)-idx, "%02X", a[j]);	 
+      
+      fprintf(fd, "%s\t%s\t%u\n", buf, root->hostname, root->expire_epoch);
+      
+      root = root->next;
+    }
+  }
+  
+  fclose(fd);
+  return(true);
+}
+
+/* ***************************************************** */
+
+/* Return the number of items restored */
+u_int32_t ndpi_address_cache_restore(struct ndpi_address_cache *cache, char *path, u_int32_t epoch_now) {
+  FILE *fd = fopen(path,  "r");
+  char ip[33], hostname[256];
+  u_int32_t epoch, num_added = 0;
+  
+  if(!fd) return(false);
+
+  while(fscanf(fd, "%s\t%s\t%u\n", ip, hostname, &epoch) > 0) {    
+    if(epoch >= epoch_now) { /* Entry not yet expired */
+      u_int ttl = epoch-epoch_now;
+      ndpi_ip_addr_t addr;
+      char *a = (char*)&addr;
+      u_int i, j;
+      
+      for(i=0, j=0; i<(sizeof(ndpi_ip_addr_t)*2); i += 2, j++) {
+	char buf[3];
+	
+	buf[0] = ip[i], buf[1] = ip[i+1], buf[2] = '\0';
+	a[j] = strtol(buf, NULL, 16);
+      }
+      
+      if(ndpi_address_cache_insert(cache, addr, hostname, epoch_now, ttl))
+	num_added++;
+    }
+  }
+  
+  fclose(fd);
+  
+  return(num_added);
+}
+
+/* ***************************************************** */
 /* ***************************************************** */
 
 bool ndpi_cache_address(struct ndpi_detection_module_struct *ndpi_struct,
