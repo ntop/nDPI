@@ -549,6 +549,11 @@ static void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
     ndpi_free(flow->ssh_tls.encrypted_sni.esni);
     flow->ssh_tls.encrypted_sni.esni = NULL;
   }
+
+  if(flow->ssh_tls.ja4_client_raw) {
+    ndpi_free(flow->ssh_tls.ja4_client_raw);
+    flow->ssh_tls.ja4_client_raw = NULL;
+  }
 }
 
 /* ***************************************************** */
@@ -1353,7 +1358,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	     flow->ndpi_flow->protos.tls_quic.ja3_client);
     ndpi_snprintf(flow->ssh_tls.ja4_client, sizeof(flow->ssh_tls.ja4_client), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja4_client);
-    ndpi_snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
+
+    if(flow->ndpi_flow->protos.tls_quic.ja4_client_raw)
+      flow->ssh_tls.ja4_client_raw = strdup(flow->ndpi_flow->protos.tls_quic.ja4_client_raw);
+    
+   ndpi_snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja3_server);
     flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.tls_quic.server_unsafe_cipher;
     flow->ssh_tls.server_cipher = flow->ndpi_flow->protos.tls_quic.server_cipher;

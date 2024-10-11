@@ -29,7 +29,7 @@
 #include "ndpi_encryption.h"
 #include "ndpi_private.h"
 
-#define JA4R_DECIMAL 1 
+//#define JA4R_DECIMAL 1 
 
 static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow);
@@ -2029,7 +2029,9 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
     _
     (sha256 hash of the list of cipher hex codes sorted in hex order, truncated to 12 characters)
     _
-    (sha256 hash of (the list of extension hex codes sorted in hex order)_(the list of signature algorithms), truncated to 12 characters)
+    (sha256 hash of (the list of extension hex codes sorted in hex order)
+    _
+    (the list of signature algorithms), truncated to 12 characters)
   */
   ja_str[0] = is_dtls ? 'd' : ((quic_version != 0) ? 'q' : 't');
 
