@@ -406,7 +406,6 @@
     <ClCompile Include="..\src\lib\third_party\src\strptime.c" />
     <ClCompile Include="..\src\lib\third_party\src\hll\MurmurHash3.c" />
     <ClCompile Include="..\src\lib\third_party\src\hll\hll.c" />
-    <ClCompile Include="..\src\lib\third_party\src\hll\sonos.c" />
     <ClCompile Include="src\getopt.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
