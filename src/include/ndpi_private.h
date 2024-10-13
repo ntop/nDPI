@@ -786,6 +786,7 @@ void init_smb_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int3
 void init_snmp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_socrates_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_socks_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_sonos_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_spotify_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_ssh_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_tls_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);

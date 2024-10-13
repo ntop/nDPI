@@ -170,8 +170,16 @@ local f_dns_ret_code      = Field.new("dns.flags.rcode")
 local f_dns_response      = Field.new("dns.flags.response")
 local f_udp_len           = Field.new("udp.length")
 local f_tcp_header_len    = Field.new("tcp.hdr_len")
+local f_tcp_win           = Field.new("tcp.window_size_value")
+local f_tcp_mss           = Field.new("tcp.options.mss_val")
+local f_tcp_wscale        = Field.new("tcp.options.wscale.shift")
 local f_tcp_stream        = Field.new("tcp.stream")
+local f_tcp_options       = Field.new("tcp.options")
 local f_ip_len            = Field.new("ip.len")
+local f_ip_proto          = Field.new("ip.proto")
+local f_ipv6_next_hdr     = Field.new("ipv6.nxt")
+local f_ip_ttl            = Field.new("ip.ttl")
+local f_ipv6_hlim         = Field.new("ipv6.hlim")
 local f_ip_hdr_len        = Field.new("ip.hdr_len")
 local f_tls_server_name   = Field.new("tls.handshake.extensions_server_name")
 local f_tls_ja4           = Field.new("tls.handshake.ja4")
@@ -1075,11 +1083,37 @@ end
 
 -- ###############################################
 
-function tcp_dissector(tvb, pinfo, tree)
+function tcp_fingerprint(tvb, pinfo, tree, ip_version)
+   local ip_ttl
+   local tcp_flags = getval(f_tcp_flags())
+
+   if(tcp_flags == "0x0002") then -- SYN
+      local tcp_win = getval(f_tcp_win())
+      local tcp_mss = getval(f_tcp_mss())
+      local tcp_wss = getval(f_tcp_wscale())
+      local tcp_options = f_tcp_options()
+
+      tprint(tcp_options)
+      if(ip_version == 6) then
+	 ip_ttl = getval(f_ipv6_hlim())
+      else
+	 ip_ttl = getval(f_ip_ttl())
+      end
+      
+
+      tprint(ip_ttl .."_".. tcp_win .."_".. tcp_mss .."_".. tcp_wss)
+   end
+end
+
+-- ###############################################
+
+function tcp_dissector(tvb, pinfo, tree, ip_version)
    local _tcp_retrans      = f_tcp_retrans()
    local _tcp_ooo          = f_tcp_ooo()
    local _tcp_lost_segment = f_tcp_lost_segment()
 
+   tcp_fingerprint(tvb, pinfo, tree, ip_version)
+   
    if(_tcp_retrans ~= nil) then
       local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).." -> "..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
       num_tcp_retrans = num_tcp_retrans + 1
@@ -1440,6 +1474,9 @@ end
 
 -- the dissector function callback
 function ndpi_proto.dissector(tvb, pinfo, tree)
+   local ip_proto     = getval(f_ip_proto())
+   local ip6_next_hdr = getval(f_ipv6_next_hdr())
+   
    -- Wireshark dissects the packet twice. General rule:
    --  * proto fields must be add in both cases (to be compatible with tshark)
    --  * statistics should be gather onl on first pass
@@ -1680,7 +1717,12 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
       timeseries_dissector(tvb, pinfo, tree)
    end
 
-   tcp_dissector(tvb, pinfo, tree)
+   if(ip_proto == "6") then
+      tcp_dissector(tvb, pinfo, tree, 4)
+   elseif(ip6_next_hdr == "6") then
+      tcp_dissector(tvb, pinfo, tree, 6)
+   end
+   
    mac_dissector(tvb, pinfo, tree)
    arp_dissector(tvb, pinfo, tree)
    vlan_dissector(tvb, pinfo, tree)
