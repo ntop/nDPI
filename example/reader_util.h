@@ -172,6 +172,12 @@ enum info_type {
     INFO_NATPMP,
 };
 
+typedef struct {
+  ndpi_address_port *aps;
+  unsigned int num_aps;
+  unsigned int num_aps_allocated;
+} ndpi_address_port_list;
+
 // flow tracking
 typedef struct ndpi_flow_info {
   u_int32_t flow_id;
@@ -303,7 +309,7 @@ typedef struct ndpi_flow_info {
   } http;
 
   struct {
-    ndpi_address_port mapped_address, peer_address,
+    ndpi_address_port_list mapped_address, peer_address,
       relayed_address, response_origin, other_address;
   } stun;
   

@@ -1232,6 +1232,18 @@ struct ndpi_risk_information {
   char *info;  
 };
 
+struct ndpi_metadata_monitoring {
+  union {
+    struct {
+      ndpi_address_port mapped_address;
+      ndpi_address_port peer_address;
+      ndpi_address_port relayed_address;
+      ndpi_address_port response_origin;
+      ndpi_address_port other_address;
+    } dtls_stun_rtp;
+  } protos;
+};
+
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
 
@@ -1239,6 +1251,7 @@ struct ndpi_flow_struct {
   u_int16_t guessed_protocol_id, guessed_protocol_id_by_ip, guessed_category, guessed_header_category;
   u_int8_t l4_proto, protocol_id_already_guessed:1, fail_with_unknown:1,
     init_finished:1, client_packet_direction:1, packet_direction:1, is_ipv6:1, first_pkt_fully_encrypted:1, skip_entropy_check: 1;
+  u_int8_t monitoring: 1, _pad:7;
 
   u_int16_t num_dissector_calls;
   ndpi_confidence_t confidence; /* ndpi_confidence_t */
@@ -1486,7 +1499,8 @@ struct ndpi_flow_struct {
     } slp;
   } protos;
 
-  /*** ALL protocol specific 64 bit variables here ***/
+  /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
+  struct ndpi_metadata_monitoring *monit;
 
   /* protocols which have marked a connection as this connection cannot be protocol XXX, multiple u_int64_t */
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
@@ -1573,8 +1587,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 264,
                "Size of the struct member protocols increased to more than 264 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1160,
-               "Size of the flow struct increased to more than 1160 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1176,
+               "Size of the flow struct increased to more than 1176 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

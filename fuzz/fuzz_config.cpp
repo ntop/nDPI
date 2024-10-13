@@ -295,6 +295,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    snprintf(cfg_proto, sizeof(cfg_proto), "%d", pid);
+    ndpi_set_config(ndpi_info_mod, cfg_proto, "monitoring", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 255 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "packets_limit_per_flow", cfg_value);

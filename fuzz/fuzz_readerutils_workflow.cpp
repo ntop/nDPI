@@ -16,6 +16,7 @@ int malloc_size_stats = 0;
 FILE *fingerprint_fp = NULL;
 bool do_load_lists = false;
 char *addr_dump_path = NULL;
+int monitoring_enabled = 0;
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);

@@ -284,6 +284,7 @@ struct ndpi_detection_module_config_struct {
 
   NDPI_PROTOCOL_BITMASK debug_bitmask;
   NDPI_PROTOCOL_BITMASK ip_list_bitmask;
+  NDPI_PROTOCOL_BITMASK monitoring;
 
   int flow_risk_lists_enabled;
   int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
@@ -636,6 +637,8 @@ u_int64_t fpc_dns_cache_key_from_dns_info(struct ndpi_flow_struct *flow);
 bool ndpi_cache_address(struct ndpi_detection_module_struct *ndpi_struct,
 			ndpi_ip_addr_t ip_addr, char *hostname,
 			u_int32_t epoch_now, u_int32_t ttl);
+
+int is_monitoring_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId);
 
   /* TLS */
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
