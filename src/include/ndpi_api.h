@@ -1200,6 +1200,7 @@ extern "C" {
   void ndpi_ptree_destroy(ndpi_ptree_t *tree);
 
   /* General purpose utilities */
+  u_int8_t ndpi_is_public_ipv4(u_int32_t a /* host byte order */);
   u_int64_t ndpi_htonll(u_int64_t v);
   u_int64_t ndpi_ntohll(u_int64_t v);
   u_int8_t ndpi_is_valid_protoId(u_int16_t protoId);
