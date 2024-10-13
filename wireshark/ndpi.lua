@@ -244,6 +244,8 @@ local tls_server_names       = {}
 local tot_tls_flows          = 0
 local tot_tls_ja4_flows      = 0 -- # of JA4 flows per signature
 
+local tcp_host_fingerprints  = {}
+local tcp_fingerprint_hosts  = {}
 local http_ua                = {}
 local tot_http_ua_flows      = 0
 
@@ -794,17 +796,17 @@ function tls_dissector(tvb, pinfo, tree)
    local src_ip          = f_src_ip()
    local stream_id       = f_tcp_stream()
    local app
-   
+
    stream_id = getval(stream_id)
 
    app = stream_app[stream_id]
    if(app ~= nil) then
       local ndpi_subtree = tree:add(ndpi_proto, trailer_tvb)
-      
+
       ndpi_subtree:add(ndpi_fds.name, app)
       return
    end
-   
+
    if(tls_server_name ~= nil) then
       tls_server_name = getval(tls_server_name)
 
@@ -846,7 +848,7 @@ function tls_dissector(tvb, pinfo, tree)
       if(ja4_db[key] ~= nil) then
 	 local value = ja4_db[key]
 	 local ndpi_subtree = tree:add(ndpi_proto, trailer_tvb)
-	 
+
 	 ndpi_subtree:add(ndpi_fds.name, value)
 	 stream_app[stream_id] = value
       end
@@ -1084,24 +1086,83 @@ end
 -- ###############################################
 
 function tcp_fingerprint(tvb, pinfo, tree, ip_version)
-   local ip_ttl
    local tcp_flags = getval(f_tcp_flags())
 
-   if(tcp_flags == "0x0002") then -- SYN
+   if(tcp_flags == "0x0002") then -- SYN      
       local tcp_win = getval(f_tcp_win())
       local tcp_mss = getval(f_tcp_mss())
       local tcp_wss = getval(f_tcp_wscale())
       local tcp_options = f_tcp_options()
+      local d_tcp_options = tcp_options.display
+      local fingerprint = ""
+      local d_tcp_options_len = d_tcp_options:len()
+      local tcp_opt_debug = false
+      
+      i = 1
+      while(i < d_tcp_options_len) do
+	 if(tcp_opt_debug) then tprint("[offset "..i .. "/".. d_tcp_options:len().."]") end
+	 
+	 local kind = d_tcp_options:sub(i,i+1)
 
-      tprint(tcp_options)
-      if(ip_version == 6) then
-	 ip_ttl = getval(f_ipv6_hlim())
-      else
-	 ip_ttl = getval(f_ip_ttl())
+	 if(tcp_opt_debug) then tprint("[Kind: " .. kind .."] *** ") end
+	 
+	 i = i + 2 -- Skip kind
+
+	 fingerprint = fingerprint .. kind
+	 
+	 if(kind == "00") then
+	    -- EOL
+	    if(tcp_opt_debug) then tprint("[" .. kind .."][EOL]") end
+	 elseif(kind == "01") then
+	    -- NOP
+	    if(tcp_opt_debug) then tprint("[" .. kind .."][NOP]") end
+	 else
+	    local len = d_tcp_options:sub(i, i+1)
+
+	    if(tcp_opt_debug) then tprint("[Len: " .. len .."] *** ") end
+
+	    len = tonumber(len, 16)
+	    i = i + 2 -- Skip len
+
+	    if(len > 0) then
+	       local value_len = 2 * (len-2)
+	       local value	   
+	       
+	       if(tcp_opt_debug) then tprint("[ValueLen: " .. value_len .."] *** ") end
+	       
+	       value = d_tcp_options:sub(i, i+value_len)
+	       if(tcp_opt_debug) then tprint("[" .. kind .."][len: ".. len .."][value: ".. value.."]") end
+
+	       -- Skip timestamps
+	       if(kind ~= "08") then
+		  fingerprint = fingerprint .. value
+	       end
+	       
+	       i = i + value_len
+	    end
+	 end
       end
       
+      -- tprint("Fingerprint: "..fingerprint)
 
-      tprint(ip_ttl .."_".. tcp_win .."_".. tcp_mss .."_".. tcp_wss)
+      local ip_ttl
+      local src_ip
+      
+      if(ip_version == 6) then
+	 ip_ttl = getval(f_ipv6_hlim())
+	 src_ip = f_src_ipv6()
+      else
+	 ip_ttl = getval(f_ip_ttl())
+	 src_ip = f_src_ip()
+      end
+
+      src_ip  = getval(src_ip)
+
+      -- local f_print = string.upper(ip_ttl .."_".. tcp_win .."_".. tcp_mss .."_".. tcp_wss.."_".. fingerprint)
+      local f_print = string.upper(tcp_win .."_".. tcp_mss .."_".. tcp_wss.."_".. fingerprint)
+      tcp_host_fingerprints[src_ip] = f_print
+
+      tcp_fingerprint_hosts[f_print] = src_ip
    end
 end
 
@@ -1112,7 +1173,9 @@ function tcp_dissector(tvb, pinfo, tree, ip_version)
    local _tcp_ooo          = f_tcp_ooo()
    local _tcp_lost_segment = f_tcp_lost_segment()
 
-   tcp_fingerprint(tvb, pinfo, tree, ip_version)
+   if(pinfo.visited == true) then
+      tcp_fingerprint(tvb, pinfo, tree, ip_version)
+   end
    
    if(_tcp_retrans ~= nil) then
       local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).." -> "..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
@@ -1467,7 +1530,7 @@ function stun_dissector(tvb, pinfo, tree)
 end
 
 -- end########################################
-   
+
 function hasbit(x, p)
    return x % (p + p) >= p
 end
@@ -1476,7 +1539,7 @@ end
 function ndpi_proto.dissector(tvb, pinfo, tree)
    local ip_proto     = getval(f_ip_proto())
    local ip6_next_hdr = getval(f_ipv6_next_hdr())
-   
+
    -- Wireshark dissects the packet twice. General rule:
    --  * proto fields must be add in both cases (to be compatible with tshark)
    --  * statistics should be gather onl on first pass
@@ -1717,12 +1780,13 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
       timeseries_dissector(tvb, pinfo, tree)
    end
 
+   
    if(ip_proto == "6") then
-      tcp_dissector(tvb, pinfo, tree, 4)
+      tcp_dissector(tvb, pinfo, tree, 4)      
    elseif(ip6_next_hdr == "6") then
       tcp_dissector(tvb, pinfo, tree, 6)
    end
-   
+
    mac_dissector(tvb, pinfo, tree)
    arp_dissector(tvb, pinfo, tree)
    vlan_dissector(tvb, pinfo, tree)
@@ -2242,7 +2306,19 @@ local function tcp_dialog_menu()
    local win = TextWindow.new("TCP Packets Analysis");
    local label = ""
 
-   label = label .. "Total Retransmissions : "..num_tcp_retrans.."\n"
+   label = label .. "TCP Host Fingerprints\n"
+   for k,v in pairsByValues(tcp_host_fingerprints, rev) do
+      label = label .. string.format("%-32s", shortenString(k,32)).."\t"..v.."\n"
+      if(i == 10) then break else i = i + 1 end
+   end
+   
+   label = label .. "\nTCP Fingerprint Hosts\n"
+   for k,v in pairsByValues(tcp_fingerprint_hosts, rev) do
+      label = label .. string.format("%-64s", shortenString(k,64)).."\t"..v.."\n"
+      if(i == 10) then break else i = i + 1 end
+   end
+   
+   label = label .. "\nTotal Retransmissions : "..num_tcp_retrans.."\n"
    if(num_tcp_retrans > 0) then
       i = 0
       label = label .. "-----------------------------\n"
