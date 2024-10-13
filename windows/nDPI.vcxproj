@@ -307,6 +307,7 @@
     <ClCompile Include="..\src\lib\protocols\slp.c" />
     <ClCompile Include="..\src\lib\protocols\smb.c" />
     <ClCompile Include="..\src\lib\protocols\socks45.c" />
+    <ClCompile Include="..\src\lib\protocols\sonos.c" />
     <ClCompile Include="..\src\lib\protocols\source_engine.c" />
     <ClCompile Include="..\src\lib\protocols\spotify.c" />
     <ClCompile Include="..\src\lib\protocols\ssdp.c" />
