@@ -24,6 +24,7 @@ int malloc_size_stats = 0;
 FILE *fingerprint_fp = NULL;
 bool do_load_lists = false;
 char *addr_dump_path = NULL;
+int monitoring_enabled = 0;
 
 extern void ndpi_report_payload_stats(FILE *out);
 
@@ -95,6 +96,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, "openvpn", "dpi.heuristics.num_messages", "255");
     ndpi_set_config(workflow->ndpi_struct, "tls", "dpi.heuristics", "0x07");
     ndpi_set_config(workflow->ndpi_struct, "tls", "dpi.heuristics.max_packets_extra_dissection", "255");
+    ndpi_set_config(workflow->ndpi_struct, "stun", "monitoring", "1");
 
     ndpi_finalize_initialization(workflow->ndpi_struct);
 

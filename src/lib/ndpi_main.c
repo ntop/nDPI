@@ -3590,6 +3590,15 @@ static int is_ip_list_enabled(struct ndpi_detection_module_struct *ndpi_str, int
 
 /* *********************************************** */
 
+int is_monitoring_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId)
+{
+  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_str->cfg.monitoring, protoId) == 0)
+    return 0;
+  return 1;
+}
+
+/* *********************************************** */
+
 int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) {
   u_int i;
 
@@ -6742,6 +6751,9 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
 
+    if(flow->monit)
+      ndpi_free(flow->monit);
+
    if(flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
        flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
@@ -7997,11 +8009,10 @@ void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_str,
 
   /* call the extra packet function (which may add more data/info to flow) */
   if(flow->extra_packets_func) {
-    if((flow->extra_packets_func(ndpi_str, flow)) == 0)
-      flow->extra_packets_func = NULL; /* Enough packets detected */
-
-    if(++flow->num_extra_packets_checked == flow->max_extra_packets_to_check)
-      flow->extra_packets_func = NULL; /* Enough packets detected */
+    if((flow->extra_packets_func(ndpi_str, flow) == 0) ||
+       (!flow->monitoring && ++flow->num_extra_packets_checked == flow->max_extra_packets_to_check)) {
+      flow->extra_packets_func = NULL; /* Done */
+    }
   }
 }
 
@@ -8610,12 +8621,17 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   ret.protocol_by_ip = flow->guessed_protocol_id_by_ip;
   ret.category = flow->category;
 
+  if(flow->monit)
+    memset(flow->monit, '\0', sizeof(*flow->monit));
+
   if(flow->fail_with_unknown) {
     // printf("%s(): FAIL_WITH_UNKNOWN\n", __FUNCTION__);
     return(ret);
   }
 
-  if(ndpi_str->cfg.max_packets_to_process > 0 && flow->num_processed_pkts >= ndpi_str->cfg.max_packets_to_process) {
+  if(ndpi_str->cfg.max_packets_to_process > 0 &&
+     flow->num_processed_pkts >= ndpi_str->cfg.max_packets_to_process &&
+     !flow->monitoring) {
     flow->extra_packets_func = NULL; /* To allow ndpi_extra_dissection_possible() to fail */
     flow->fail_with_unknown = 1;
     /* Let's try to update ndpi_str->input_info->in_pkt_dir even in this case.
@@ -9319,6 +9335,13 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, s
 				u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
 				ndpi_confidence_t confidence) {
   ndpi_protocol ret;
+
+  if(flow->monitoring) {
+    NDPI_LOG_ERR(ndpi_str, "Impossible to update classification while in monitoring state! %d/%d->%d/%d\n",
+                 flow->detected_protocol_stack[1], flow->detected_protocol_stack[0],
+                 upper_detected_protocol, lower_detected_protocol);
+    return;
+  }
 
   ndpi_int_change_protocol(flow, upper_detected_protocol, lower_detected_protocol, confidence);
   ret.proto.master_protocol = flow->detected_protocol_stack[1], ret.proto.app_protocol = flow->detected_protocol_stack[0];
@@ -11380,6 +11403,7 @@ static const struct cfg_param {
 
   { "$PROTO_NAME_OR_ID", "log",                                 "disable", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(debug_bitmask), NULL },
   { "$PROTO_NAME_OR_ID", "ip_list.load",                        "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask), NULL },
+  { "$PROTO_NAME_OR_ID", "monitoring",                          "disable", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(monitoring), NULL },
 
   /* Global parameters */
 

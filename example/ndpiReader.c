@@ -144,6 +144,8 @@ static int enable_malloc_bins = 0;
 static int max_malloc_bins = 14;
 int malloc_size_stats = 0;
 
+int monitoring_enabled;
+
 struct flow_info {
   struct ndpi_flow_info *flow;
   u_int16_t thread_id;
@@ -1605,18 +1607,30 @@ void print_bin(FILE *fout, const char *label, struct ndpi_bin *b) {
 
 /* ********************************** */
 
-static void print_ndpi_address_port_file(FILE *out, const char *label, ndpi_address_port *ap) {
-  if(ap->port != 0) {
-    char buf[INET6_ADDRSTRLEN];
+static void print_ndpi_address_port_list_file(FILE *out, const char *label, ndpi_address_port_list *list) {
+  unsigned int i;
+  ndpi_address_port *ap;
 
-    if(ap->is_ipv6) {
-      inet_ntop(AF_INET6, &ap->address, buf, sizeof(buf));
-      fprintf(out, "[%s: [%s]:%u]", label, buf, ap->port);
-    } else {
-      inet_ntop(AF_INET, &ap->address, buf, sizeof(buf));
-      fprintf(out, "[%s: %s:%u]", label, buf, ap->port);
+  if(list->num_aps == 0)
+    return;
+  fprintf(out, "[%s: ", label);
+  for(i = 0; i < list->num_aps; i++) {
+    ap = &list->aps[i];
+    if(ap->port != 0) {
+      char buf[INET6_ADDRSTRLEN];
+
+      if(ap->is_ipv6) {
+        inet_ntop(AF_INET6, &ap->address, buf, sizeof(buf));
+        fprintf(out, "[%s]:%u", buf, ap->port);
+      } else {
+        inet_ntop(AF_INET, &ap->address, buf, sizeof(buf));
+        fprintf(out, "%s:%u", buf, ap->port);
+      }
+      if(i != list->num_aps - 1)
+	fprintf(out, ", ");
     }
   }
+  fprintf(out, "]");
 }
 
 /* ********************************** */
@@ -1989,11 +2003,11 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       }
     }
 
-    print_ndpi_address_port_file(out, "Mapped IP/Port", &flow->stun.mapped_address);
-    print_ndpi_address_port_file(out, "Peer IP/Port", &flow->stun.peer_address);
-    print_ndpi_address_port_file(out, "Relayed IP/Port", &flow->stun.relayed_address);
-    print_ndpi_address_port_file(out, "Rsp Origin IP/Port", &flow->stun.response_origin);
-    print_ndpi_address_port_file(out, "Other IP/Port", &flow->stun.other_address);
+    print_ndpi_address_port_list_file(out, "Mapped IP/Port", &flow->stun.mapped_address);
+    print_ndpi_address_port_list_file(out, "Peer IP/Port", &flow->stun.peer_address);
+    print_ndpi_address_port_list_file(out, "Relayed IP/Port", &flow->stun.relayed_address);
+    print_ndpi_address_port_list_file(out, "Rsp Origin IP/Port", &flow->stun.response_origin);
+    print_ndpi_address_port_list_file(out, "Other IP/Port", &flow->stun.other_address);
 
     if(flow->http.url[0] != '\0') {
       ndpi_risk_enum risk = ndpi_validate_url(flow->http.url);
@@ -2985,6 +2999,12 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
   if(ret != 0) {
     fprintf(stderr, "Error ndpi_finalize_initialization: %d\n", ret);
     exit(-1);
+  }
+
+  char buf[16];
+  if(ndpi_get_config(ndpi_thread_info[thread_id].workflow->ndpi_struct, "stun", "monitoring", buf, sizeof(buf)) != NULL) {
+    if(atoi(buf))
+      monitoring_enabled = 1;
   }
 }
 
