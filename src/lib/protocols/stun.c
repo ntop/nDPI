@@ -625,9 +625,6 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
   if(flow->monitoring)
     return 1;
 
-  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_ZOOM)
-    return 0;
-
   if(flow->num_extra_packets_checked + 1 == flow->max_extra_packets_to_check) {
     if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_STUN)) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling monitoring (end extra dissection)\n");
@@ -657,12 +654,23 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
     return 0;
   }
 
-  /* Exception WA: only relayed and mapped address attributes */
+  /* Exception WA: only relayed and mapped address attributes but we keep looking for RTP packets */
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_WHATSAPP_CALL &&
+     flow->detected_protocol_stack[1] == NDPI_PROTOCOL_SRTP &&
      (flow->stun.mapped_address.port || !ndpi_struct->cfg.stun_mapped_address_enabled) &&
      (flow->stun.relayed_address.port || !ndpi_struct->cfg.stun_relayed_address_enabled)) {
     if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_STUN)) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling monitor (found all metadata; wa case)\n");
+      flow->monitoring = 1;
+      return 1;
+    }
+    return 0;
+  }
+
+  /* Exception Zoom: no metadata */
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_ZOOM) {
+    if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_STUN)) {
+      NDPI_LOG_DBG(ndpi_struct, "Enabling monitor (zoom case)\n");
       flow->monitoring = 1;
       return 1;
     }
@@ -702,7 +710,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
      * same msg split across multiple segments */
 
   if(packet->payload_packet_len == 0)
-    return 1;
+    return keep_extra_dissection(ndpi_struct, flow);
 
   first_byte = packet->payload[0];
 
