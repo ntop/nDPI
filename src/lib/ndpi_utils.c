@@ -1267,11 +1267,12 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_serialize_proto(ndpi_struct, serializer, flow->risk, flow->confidence, l7_protocol);
 
   host_server_name = ndpi_get_flow_info(flow, &l7_protocol);
-  if (host_server_name != NULL)
-  {
-    ndpi_serialize_string_string(serializer, "hostname", host_server_name);
-  }
 
+  if (host_server_name != NULL) {
+    ndpi_serialize_string_string(serializer, "hostname", host_server_name);
+    ndpi_serialize_string_string(serializer, "domainame", ndpi_get_host_domain(ndpi_struct, host_server_name));
+  }
+  
   switch(l7_protocol.proto.master_protocol ? l7_protocol.proto.master_protocol : l7_protocol.proto.app_protocol) {
   case NDPI_PROTOCOL_IP_ICMP:
     if(flow->entropy > 0.0f) {
