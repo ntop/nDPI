@@ -77,6 +77,7 @@ static int is_subclassification_real_by_proto(u_int16_t proto)
   if(proto == NDPI_PROTOCOL_UNKNOWN ||
      proto == NDPI_PROTOCOL_STUN ||
      proto == NDPI_PROTOCOL_RTP ||
+     proto == NDPI_PROTOCOL_RTCP ||
      proto == NDPI_PROTOCOL_SRTP ||
      proto == NDPI_PROTOCOL_DTLS)
     return 0;
