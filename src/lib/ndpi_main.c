@@ -60,6 +60,8 @@
 #define TH_PUSH       0x08
 #define TH_ACK        0x10
 #define TH_URG        0x20
+#define TH_ECE        0x40
+#define TH_CWR        0x80
 #endif
 
 #if defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
@@ -4400,7 +4402,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     if(ndpi_str->address_cache)
       ndpi_term_address_cache(ndpi_str->address_cache);
-    
+
     ndpi_free(ndpi_str);
   }
 
@@ -4794,7 +4796,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
     def = NULL;
   else
     def = &ndpi_str->proto_defaults[subprotocol_id];
-  
+
   if(def == NULL) {
       ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
       char *equal = strchr(proto, '=');
@@ -6724,6 +6726,9 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 	ndpi_free(flow->risk_infos[i].info);
     }
 
+    if(flow->tcp.fingerprint)
+      ndpi_free(flow->tcp.fingerprint);
+
     if(flow->http.url)
       ndpi_free(flow->http.url);
 
@@ -6904,14 +6909,86 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
   /* TCP / UDP detection */
   if(l4protocol == IPPROTO_TCP) {
+    u_int16_t header_len;
+
     if(l4_packet_len < 20 /* min size of tcp */)
       return(1);
 
     /* tcp */
     packet->tcp = (struct ndpi_tcphdr *) l4ptr;
-    if(l4_packet_len >= packet->tcp->doff * 4) {
-      packet->payload_packet_len = l4_packet_len - packet->tcp->doff * 4;
-      packet->payload = ((u_int8_t *) packet->tcp) + (packet->tcp->doff * 4);
+    header_len = packet->tcp->doff * 4;
+
+    if(l4_packet_len >= header_len) {
+      if(flow->tcp.fingerprint == NULL) {
+	u_int8_t *t = (u_int8_t*)packet->tcp;
+	u_int16_t flags = ntohs(*((u_int16_t*)&t[12]));
+
+	if((flags & (TH_SYN | TH_ECE | TH_CWR)) == TH_SYN) {
+	  u_int8_t *options = (u_int8_t*)(&t[sizeof(struct ndpi_tcphdr)]);
+	  char fingerprint[128], options_fp[128];
+	  u_int8_t i, fp_idx = 0, options_fp_idx = 0;
+	  u_int8_t options_len = header_len - sizeof(struct ndpi_tcphdr);
+	  u_int16_t tcp_win = ntohs(packet->tcp->window);
+	  u_int8_t ip_ttl;
+	  u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
+	  
+	  if(packet->iph)
+	    ip_ttl = packet->iph->ttl;
+	  else
+	    ip_ttl = packet->iphv6->ip6_hdr.ip6_un1_hlim;
+
+	  if(ip_ttl <= 32) ip_ttl = 32;
+	  else if(ip_ttl <= 64)  ip_ttl = 64;
+	  else if(ip_ttl <= 128) ip_ttl = 128;
+	  else if(ip_ttl <= 192) ip_ttl = 192;
+	  else ip_ttl = 255;
+	  
+	  fp_idx = snprintf(fingerprint, sizeof(fingerprint), "%u_%u_", ip_ttl, tcp_win);
+	  
+	  for(i=0; i<options_len; ) {
+	    u_int8_t kind = options[i];
+	    int rc;
+
+	    rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", kind);
+ 	    options_fp_idx += rc;
+
+	    if(kind == 0) /* EOF */
+	      break;
+	    else if(kind == 1) /* NOP */
+	      i++;
+	    else {
+	      u_int8_t len = options[i+1];
+
+	      if(len == 0)
+		break;
+	      else if(kind == 8) {
+		/* Timestamp: ignore it */
+	      } else {
+		int j = i+2;
+		u_int8_t opt_len = len - 2;
+
+		while(opt_len > 0) {
+		  rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", options[j]);
+		  options_fp_idx += rc;
+		  j++, opt_len--;
+		}
+	      }
+
+	      i += len;
+	    }
+	  } /* for */
+
+	  ndpi_sha256((const u_char*)options_fp, options_fp_idx, sha_hash);
+	  snprintf(&fingerprint[fp_idx], sizeof(fingerprint)-fp_idx, "%02x%02x%02x%02x%02x%02x",
+		   sha_hash[0], sha_hash[1], sha_hash[2],
+		   sha_hash[3], sha_hash[4], sha_hash[5]);
+
+	  flow->tcp.fingerprint = ndpi_strdup(fingerprint);
+	}
+      }
+
+      packet->payload_packet_len = l4_packet_len - header_len;
+      packet->payload = ((u_int8_t *) packet->tcp) + header_len;
     } else {
       /* tcp header not complete */
       return(1);
@@ -7546,7 +7623,7 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 				       struct ndpi_flow_struct *flow,
 				       u_int16_t master) {
   /* This function can NOT access &ndpi_str->packet since it is called also from ndpi_detection_giveup(), via ndpi_reconcile_protocols() */
-  
+
   if(flow->l4_proto == IPPROTO_UDP) {
     u_int16_t sport = ntohs(flow->c_port);
     u_int16_t dport = ntohs(flow->s_port);
@@ -7694,7 +7771,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 				 NDPI_CONFIDENCE_DPI_PARTIAL);
       }
     break;
-    
+
   case NDPI_PROTOCOL_SKYPE_TEAMS:
   case NDPI_PROTOCOL_SKYPE_TEAMS_CALL:
     if(flow->l4_proto == IPPROTO_UDP && ndpi_str->msteams_cache) {
@@ -9066,8 +9143,7 @@ struct header_line {
   struct ndpi_int_one_line_struct *line;
 };
 
-static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str)
-{
+static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_str) {
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
   struct ndpi_int_one_line_struct *line;
   size_t length;
@@ -11366,7 +11442,7 @@ static const struct cfg_param {
   { "tls",           "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_subclassification_enabled), NULL },
 
   { "quic",          "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(quic_subclassification_enabled), NULL },
-    
+
   { "smtp",          "tls_dissection",                          "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled), NULL },
 
   { "imap",          "tls_dissection",                          "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(imap_opportunistic_tls_enabled), NULL },

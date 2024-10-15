@@ -32,10 +32,13 @@ end
 
 -- ##############################################
 
-local ndpi_proto  = Proto("ndpi", "nDPI Protocol Interpreter")
+local ndpi_proto = Proto("ndpi", "nDPI Protocol Interpreter")
+local tcp_fprint = Proto("ndpi.tcp_fingerprint", "TCP Fingerprint")
+
 ndpi_proto.fields = {}
 
 local ndpi_fds                = ndpi_proto.fields
+local tcp_fprint_fds          = tcp_fprint.fields
 ndpi_fds.magic                = ProtoField.new("nDPI Magic", "ndpi.magic", ftypes.UINT32, nil, base.HEX)
 ndpi_fds.network_protocol     = ProtoField.new("nDPI Network Protocol", "ndpi.protocol.network", ftypes.UINT8, nil, base.DEC)
 ndpi_fds.application_protocol = ProtoField.new("nDPI Application Protocol", "ndpi.protocol.application", ftypes.UINT16, nil, base.DEC)
@@ -153,9 +156,10 @@ local ntop_proto = Proto("ntop", "ntop Extensions")
 ntop_proto.fields = {}
 
 local ntop_fds = ntop_proto.fields
-ntop_fds.client_nw_rtt    = ProtoField.new("TCP client network RTT (msec)",  "ntop.latency.client_rtt", ftypes.FLOAT, nil, base.NONE)
-ntop_fds.server_nw_rtt    = ProtoField.new("TCP server network RTT (msec)",  "ntop.latency.server_rtt", ftypes.FLOAT, nil, base.NONE)
-ntop_fds.appl_latency_rtt = ProtoField.new("Application Latency RTT (msec)", "ntop.latency.appl_rtt",   ftypes.FLOAT, nil, base.NONE)
+ntop_fds.client_nw_rtt    = ProtoField.new("TCP client network RTT (msec)",  "ntop.latency.client_rtt", ftypes.FLOAT,  nil, base.NONE)
+ntop_fds.server_nw_rtt    = ProtoField.new("TCP server network RTT (msec)",  "ntop.latency.server_rtt", ftypes.FLOAT,  nil, base.NONE)
+ntop_fds.appl_latency_rtt = ProtoField.new("Application Latency RTT (msec)", "ntop.latency.appl_rtt",   ftypes.FLOAT,  nil, base.NONE)
+ntop_fds.tcp_fingerprint  = ProtoField.new("TCP Fingerprint",                "ntop.tcp_fingerprint",    ftypes.STRING, nil, base.NONE)
 
 local f_eth_source        = Field.new("eth.src")
 local f_eth_trailer       = Field.new("eth.trailer")
@@ -171,8 +175,6 @@ local f_dns_response      = Field.new("dns.flags.response")
 local f_udp_len           = Field.new("udp.length")
 local f_tcp_header_len    = Field.new("tcp.hdr_len")
 local f_tcp_win           = Field.new("tcp.window_size_value")
-local f_tcp_mss           = Field.new("tcp.options.mss_val")
-local f_tcp_wscale        = Field.new("tcp.options.wscale.shift")
 local f_tcp_stream        = Field.new("tcp.stream")
 local f_tcp_options       = Field.new("tcp.options")
 local f_ip_len            = Field.new("ip.len")
@@ -368,11 +370,211 @@ local ja4_db = {
 }
 
 -- ##############################################
+-- ##############################################
+
+-- From http://pastebin.com/gsFrNjbt linked from http://www.computercraft.info/forums2/index.php?/topic/8169-sha-256-in-pure-lua/
+
+--
+--  Adaptation of the Secure Hashing Algorithm (SHA-244/256)
+--  Found Here: http://lua-users.org/wiki/SecureHashAlgorithm
+--
+--  Using an adapted version of the bit library
+--  Found Here: https://bitbucket.org/Boolsheet/bslf/src/1ee664885805/bit.lua
+--
+
+local MOD = 2^32
+local MODM = MOD-1
+
+local function memoize(f)
+   local mt = {}
+   local t = setmetatable({}, mt)
+   function mt:__index(k)
+      local v = f(k)
+      t[k] = v
+      return v
+   end
+   return t
+end
+
+local function make_bitop_uncached(t, m)
+   local function bitop(a, b)
+      local res,p = 0,1
+      while a ~= 0 and b ~= 0 do
+	 local am, bm = a % m, b % m
+	 res = res + t[am][bm] * p
+	 a = (a - am) / m
+	 b = (b - bm) / m
+	 p = p*m
+      end
+      res = res + (a + b) * p
+      return res
+   end
+   return bitop
+end
+
+local function make_bitop(t)
+   local op1 = make_bitop_uncached(t,2^1)
+   local op2 = memoize(function(a) return memoize(function(b) return op1(a, b) end) end)
+   return make_bitop_uncached(op2, 2 ^ (t.n or 1))
+end
+
+local bxor1 = make_bitop({[0] = {[0] = 0,[1] = 1}, [1] = {[0] = 1, [1] = 0}, n = 4})
+
+local function bxor(a, b, c, ...)
+   local z = nil
+   if b then
+      a = a % MOD
+      b = b % MOD
+      z = bxor1(a, b)
+      if c then z = bxor(z, c, ...) end
+      return z
+   elseif a then return a % MOD
+   else return 0 end
+end
+
+local function band(a, b, c, ...)
+   local z
+   if b then
+      a = a % MOD
+      b = b % MOD
+      z = ((a + b) - bxor1(a,b)) / 2
+      if c then z = bit32_band(z, c, ...) end
+      return z
+   elseif a then return a % MOD
+   else return MODM end
+end
+
+local function bnot(x) return (-1 - x) % MOD end
+
+local function rshift1(a, disp)
+   if disp < 0 then return lshift(a,-disp) end
+   return math.floor(a % 2 ^ 32 / 2 ^ disp)
+end
+
+local function rshift(x, disp)
+   if disp > 31 or disp < -31 then return 0 end
+   return rshift1(x % MOD, disp)
+end
+
+local function lshift(a, disp)
+   if disp < 0 then return rshift(a,-disp) end
+   return (a * 2 ^ disp) % 2 ^ 32
+end
+
+local function rrotate(x, disp)
+   x = x % MOD
+   disp = disp % 32
+   local low = band(x, 2 ^ disp - 1)
+   return rshift(x, disp) + lshift(low, 32 - disp)
+end
+
+local k = {
+   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
+   0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+   0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
+   0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+   0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc,
+   0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+   0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
+   0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+   0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
+   0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+   0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3,
+   0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+   0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5,
+   0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+   0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
+   0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+}
+
+local function str2hexa(s)
+   return (string.gsub(s, ".", function(c) return string.format("%02x", string.byte(c)) end))
+end
+
+local function num2s(l, n)
+   local s = ""
+   for i = 1, n do
+      local rem = l % 256
+      s = string.char(rem) .. s
+      l = (l - rem) / 256
+   end
+   return s
+end
+
+local function s232num(s, i)
+   local n = 0
+   for i = i, i + 3 do n = n*256 + string.byte(s, i) end
+   return n
+end
+
+local function preproc(msg, len)
+   local extra = 64 - ((len + 9) % 64)
+   len = num2s(8 * len, 8)
+   msg = msg .. "\128" .. string.rep("\0", extra) .. len
+   assert(#msg % 64 == 0)
+   return msg
+end
+
+local function initH256(H)
+   H[1] = 0x6a09e667
+   H[2] = 0xbb67ae85
+   H[3] = 0x3c6ef372
+   H[4] = 0xa54ff53a
+   H[5] = 0x510e527f
+   H[6] = 0x9b05688c
+   H[7] = 0x1f83d9ab
+   H[8] = 0x5be0cd19
+   return H
+end
+
+local function digestblock(msg, i, H)
+   local w = {}
+   for j = 1, 16 do w[j] = s232num(msg, i + (j - 1)*4) end
+   for j = 17, 64 do
+      local v = w[j - 15]
+      local s0 = bxor(rrotate(v, 7), rrotate(v, 18), rshift(v, 3))
+      v = w[j - 2]
+      w[j] = w[j - 16] + s0 + w[j - 7] + bxor(rrotate(v, 17), rrotate(v, 19), rshift(v, 10))
+   end
+
+   local a, b, c, d, e, f, g, h = H[1], H[2], H[3], H[4], H[5], H[6], H[7], H[8]
+   for i = 1, 64 do
+      local s0 = bxor(rrotate(a, 2), rrotate(a, 13), rrotate(a, 22))
+      local maj = bxor(band(a, b), band(a, c), band(b, c))
+      local t2 = s0 + maj
+      local s1 = bxor(rrotate(e, 6), rrotate(e, 11), rrotate(e, 25))
+      local ch = bxor (band(e, f), band(bnot(e), g))
+      local t1 = h + s1 + ch + k[i] + w[i]
+      h, g, f, e, d, c, b, a = g, f, e, d + t1, c, b, a, t1 + t2
+   end
+
+   H[1] = band(H[1] + a)
+   H[2] = band(H[2] + b)
+   H[3] = band(H[3] + c)
+   H[4] = band(H[4] + d)
+   H[5] = band(H[5] + e)
+   H[6] = band(H[6] + f)
+   H[7] = band(H[7] + g)
+   H[8] = band(H[8] + h)
+end
+
+-- Made this global
+function sha256(msg)
+   msg = preproc(msg, #msg)
+   local H = initH256({})
+   for i = 1, #msg, 64 do digestblock(msg, i, H) end
+   return str2hexa(num2s(H[1], 4) .. num2s(H[2], 4) .. num2s(H[3], 4) .. num2s(H[4], 4) ..
+		   num2s(H[5], 4) .. num2s(H[6], 4) .. num2s(H[7], 4) .. num2s(H[8], 4))
+end
+
+-- ##############################################
+-- ##############################################
 
 function string.contains(String,Start)
    if type(String) ~= 'string' or type(Start) ~= 'string' then
       return false
    end
+   
    return(string.find(String,Start,1) ~= nil)
 end
 
@@ -1088,81 +1290,103 @@ end
 function tcp_fingerprint(tvb, pinfo, tree, ip_version)
    local tcp_flags = getval(f_tcp_flags())
 
-   if(tcp_flags == "0x0002") then -- SYN      
-      local tcp_win = getval(f_tcp_win())
-      local tcp_mss = getval(f_tcp_mss())
-      local tcp_wss = getval(f_tcp_wscale())
+   if(tcp_flags == "0x0002") then -- SYN
       local tcp_options = f_tcp_options()
-      local d_tcp_options = tcp_options.display
-      local fingerprint = ""
-      local d_tcp_options_len = d_tcp_options:len()
-      local tcp_opt_debug = false
       
-      i = 1
-      while(i < d_tcp_options_len) do
-	 if(tcp_opt_debug) then tprint("[offset "..i .. "/".. d_tcp_options:len().."]") end
+      if(tcp_options ~= nil) then
+	 local tcp_win = getval(f_tcp_win())
+	 local fingerprint = ""	 
+	 local d_tcp_options = tcp_options.display
+	 local d_tcp_options_len = d_tcp_options:len()
+	 local tcp_opt_debug = false
+
+	 if(tcp_win == "nil") then tcp_win = 0 end
 	 
-	 local kind = d_tcp_options:sub(i,i+1)
+	 i = 1
+	 while(i < d_tcp_options_len) do
+	    if(tcp_opt_debug) then tprint("[offset "..i .. "/".. d_tcp_options:len().."]") end
+	    
+	    local kind = d_tcp_options:sub(i,i+1)
 
-	 if(tcp_opt_debug) then tprint("[Kind: " .. kind .."] *** ") end
-	 
-	 i = i + 2 -- Skip kind
+	    if(tcp_opt_debug) then tprint("[Kind: " .. kind .."] *** ") end
+	    
+	    i = i + 2 -- Skip kind
 
-	 fingerprint = fingerprint .. kind
-	 
-	 if(kind == "00") then
-	    -- EOL
-	    if(tcp_opt_debug) then tprint("[" .. kind .."][EOL]") end
-	 elseif(kind == "01") then
-	    -- NOP
-	    if(tcp_opt_debug) then tprint("[" .. kind .."][NOP]") end
-	 else
-	    local len = d_tcp_options:sub(i, i+1)
+	    fingerprint = fingerprint .. kind
+	    
+	    if(kind == "00") then
+	       -- EOL
+	       if(tcp_opt_debug) then tprint("[" .. kind .."][EOL]") end
+	    elseif(kind == "01") then
+	       -- NOP
+	       if(tcp_opt_debug) then tprint("[" .. kind .."][NOP]") end
+	    else
+	       local len = d_tcp_options:sub(i, i+1)
 
-	    if(tcp_opt_debug) then tprint("[Len: " .. len .."] *** ") end
+	       if(tcp_opt_debug) then tprint("[Len: " .. len .."] *** ") end
 
-	    len = tonumber(len, 16)
-	    i = i + 2 -- Skip len
+	       len = tonumber(len, 16)
+	       i = i + 2 -- Skip len
 
-	    if(len > 0) then
-	       local value_len = 2 * (len-2)
-	       local value	   
-	       
-	       if(tcp_opt_debug) then tprint("[ValueLen: " .. value_len .."] *** ") end
-	       
-	       value = d_tcp_options:sub(i, i+value_len)
-	       if(tcp_opt_debug) then tprint("[" .. kind .."][len: ".. len .."][value: ".. value.."]") end
+	       if((len ~= nil) and (len > 0)) then
+		  local value_len = 2 * (len-2)
+		  local value	   
+		  
+		  if(tcp_opt_debug) then tprint("[ValueLen: " .. value_len .."] *** ") end
 
-	       -- Skip timestamps
-	       if(kind ~= "08") then
-		  fingerprint = fingerprint .. value
+		  -- Skip timestamps
+		  if((kind ~= "08") and (value_len > 0)) then		     		  
+		     value = d_tcp_options:sub(i, i+value_len)
+		     value = value:sub(1, value_len) -- make sure the lenght is correct
+		     if(tcp_opt_debug) then tprint("[" .. kind .."][len: ".. len .."][value: ".. value.."]") end
+
+		     fingerprint = fingerprint .. value
+		  end
+		  
+		  i = i + value_len
 	       end
-	       
-	       i = i + value_len
 	    end
+	 end -- while
+	 
+	 local ip_ttl
+	 local src_ip
+	 
+	 if(ip_version == 6) then
+	    ip_ttl = getval(f_ipv6_hlim())
+	    src_ip = f_src_ipv6()
+	 else
+	    ip_ttl = getval(f_ip_ttl())
+	    src_ip = f_src_ip()
 	 end
+	 
+	 src_ip  = getval(src_ip)
+
+	 -- Normalize TTL
+	 ip_ttl = tonumber(ip_ttl)
+	 if(ip_ttl <= 32) then      ip_ttl = 32
+	 elseif(ip_ttl <= 64)  then ip_ttl = 64
+	 elseif(ip_ttl <= 128) then ip_ttl = 128
+	 elseif(ip_ttl <= 192) then ip_ttl = 192
+	 else ip_ttl = 255     end
+
+	 fingerprint = string.lower(fingerprint)
+	 local f_print
+
+	 if(true) then
+	    -- Use SHA256
+	    f_print = string.lower(ip_ttl .."_".. tcp_win .."_".. string.sub(sha256(fingerprint), 1, 12))
+	 else
+	    f_print = string.upper(ip_ttl .."_".. tcp_win .."_".. fingerprint)
+	 end
+	 
+	 if(tcp_opt_debug) then tprint("Fingerprint: " .. f_print) end
+	 
+	 local tcp_f_entry = tree:add(ntop_proto, tvb())
+	 tcp_f_entry:add(ntop_fds.tcp_fingerprint, f_print)
+	 
+	 tcp_host_fingerprints[src_ip] = f_print	 
+	 tcp_fingerprint_hosts[f_print] = src_ip
       end
-      
-      -- tprint("Fingerprint: "..fingerprint)
-
-      local ip_ttl
-      local src_ip
-      
-      if(ip_version == 6) then
-	 ip_ttl = getval(f_ipv6_hlim())
-	 src_ip = f_src_ipv6()
-      else
-	 ip_ttl = getval(f_ip_ttl())
-	 src_ip = f_src_ip()
-      end
-
-      src_ip  = getval(src_ip)
-
-      -- local f_print = string.upper(ip_ttl .."_".. tcp_win .."_".. tcp_mss .."_".. tcp_wss.."_".. fingerprint)
-      local f_print = string.upper(tcp_win .."_".. tcp_mss .."_".. tcp_wss.."_".. fingerprint)
-      tcp_host_fingerprints[src_ip] = f_print
-
-      tcp_fingerprint_hosts[f_print] = src_ip
    end
 end
 
@@ -2305,13 +2529,16 @@ end
 local function tcp_dialog_menu()
    local win = TextWindow.new("TCP Packets Analysis");
    local label = ""
+   local i
 
+   i = 0
    label = label .. "TCP Host Fingerprints\n"
    for k,v in pairsByValues(tcp_host_fingerprints, rev) do
       label = label .. string.format("%-32s", shortenString(k,32)).."\t"..v.."\n"
       if(i == 10) then break else i = i + 1 end
    end
-   
+
+   i = 0
    label = label .. "\nTCP Fingerprint Hosts\n"
    for k,v in pairsByValues(tcp_fingerprint_hosts, rev) do
       label = label .. string.format("%-64s", shortenString(k,64)).."\t"..v.."\n"

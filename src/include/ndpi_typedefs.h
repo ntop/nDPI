@@ -1312,6 +1312,10 @@ struct ndpi_flow_struct {
   ndpi_risk risk, risk_shadow; /* Issues found with this flow [bitmask of ndpi_risk] */
   struct ndpi_risk_information risk_infos[MAX_NUM_RISK_INFOS]; /* String that contains information about the risks found */
   u_int8_t num_risk_infos;
+
+  struct {
+    char *fingerprint;
+  } tcp;
   
   /*
     This structure below will not not stay inside the protos

@@ -2056,6 +2056,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	fprintf(out, "[Risk Info: %s]", flow->risk_str);
     }
 
+    if(flow->tcp_fingerprint)
+      fprintf(out, "[TCP Fingerprint: %s]", flow->tcp_fingerprint);
+    
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(buf_ver, sizeof(buf_ver),
 										 flow->ssh_tls.ssl_version, &known_tls));
 

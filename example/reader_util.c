@@ -609,8 +609,9 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
   ndpi_free_bin(&flow->payload_len_bin);
 #endif
 
-  if(flow->risk_str)     ndpi_free(flow->risk_str);
-  if(flow->flow_payload) ndpi_free(flow->flow_payload);
+  if(flow->tcp_fingerprint) ndpi_free(flow->tcp_fingerprint);
+  if(flow->risk_str)        ndpi_free(flow->risk_str);
+  if(flow->flow_payload)    ndpi_free(flow->flow_payload);
 }
 
 /* ***************************************************** */
@@ -623,7 +624,7 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow) {
 
   if(addr_dump_path != NULL)
     ndpi_cache_address_dump(workflow->ndpi_struct, addr_dump_path, 0);
-  
+
   ndpi_exit_detection_module(workflow->ndpi_struct);
   ndpi_free(workflow->ndpi_flows_root);
   ndpi_free(workflow);
@@ -1131,7 +1132,7 @@ static void dump_flow_fingerprint(struct ndpi_workflow * workflow,
 
     if(flow->server_hostname)
       ndpi_serialize_string_string(&serializer, "server_hostname", flow->server_hostname);
-    
+
     buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
     fprintf(fingerprint_fp, "%s\n", buffer);
   }
@@ -1408,24 +1409,24 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       /* For consistency across platforms replace :0: with :: */
       ndpi_patchIPv6Address(flow->info);
     }
-    
+
     if(flow->ndpi_flow->protos.dns.geolocation_iata_code[0] != '\0')
       strcpy(flow->dns.geolocation_iata_code, flow->ndpi_flow->protos.dns.geolocation_iata_code);
 
     if(0) {
       u_int8_t i;
-      
+
       for(i=0; i<flow->ndpi_flow->protos.dns.num_rsp_addr; i++) {
 	char buf[64];
-	
+
 	if(flow->ndpi_flow->protos.dns.is_rsp_addr_ipv6[i] == 0) {
 	  inet_ntop(AF_INET, &flow->ndpi_flow->protos.dns.rsp_addr[i].ipv4, buf, sizeof(buf));
 	} else {
-	  inet_ntop(AF_INET6, &flow->ndpi_flow->protos.dns.rsp_addr[i].ipv6, buf, sizeof(buf));	  
+	  inet_ntop(AF_INET6, &flow->ndpi_flow->protos.dns.rsp_addr[i].ipv6, buf, sizeof(buf));
 	}
 
 	printf("(%s) %s [ttl: %u]\n", flow->host_server_name, buf, flow->ndpi_flow->protos.dns.rsp_addr_ttl[i]);
-      }      
+      }
     }
   }
   /* MDNS */
@@ -1520,7 +1521,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(flow->ndpi_flow->protos.tls_quic.ja4_client_raw)
       flow->ssh_tls.ja4_client_raw = strdup(flow->ndpi_flow->protos.tls_quic.ja4_client_raw);
-    
+
    ndpi_snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja3_server);
     flow->ssh_tls.server_unsafe_cipher = flow->ndpi_flow->protos.tls_quic.server_unsafe_cipher;
@@ -1585,6 +1586,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   flow->multimedia_flow_type = flow->ndpi_flow->flow_multimedia_type;
 
+  if(flow->ndpi_flow->tcp.fingerprint)
+    flow->tcp_fingerprint = ndpi_strdup(flow->ndpi_flow->tcp.fingerprint);
+
   /* HTTP metadata are "global" not in `flow->ndpi_flow->protos` union; for example, we can have
      HTTP/BitTorrent and in that case we want to export also HTTP attributes */
   if(is_ndpi_proto(flow, NDPI_PROTOCOL_HTTP)
@@ -1608,16 +1612,16 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   {
     ndpi_ip_addr_t ip_addr;
     struct ndpi_address_cache_item *c;
-    
+
     memset(&ip_addr, 0, sizeof(ip_addr));
-    
+
     if(flow->ip_version == 4)
       ip_addr.ipv4 = flow->dst_ip;
     else
       memcpy(&ip_addr.ipv6, &flow->dst_ip6, sizeof(struct ndpi_in6_addr));
 
     c = ndpi_cache_address_find(workflow->ndpi_struct, ip_addr);
-				
+
     if(c) {
       flow->server_hostname = ndpi_strdup(c->hostname);
     }
@@ -2205,7 +2209,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     /* At the first packet flush expired cached addresses */
     ndpi_cache_address_flush_expired(workflow->ndpi_struct, header->ts.tv_sec);
   }
-  
+
   /* Increment raw packet counter */
   workflow->stats.raw_packet_count++;
 
