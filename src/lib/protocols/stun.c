@@ -199,12 +199,18 @@ static void parse_ip_port_attribute(const u_int8_t *payload, u_int16_t payload_l
       u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
       u_int32_t ip   = ntohl(*((u_int32_t*)&payload[off+8]));
 
-      ap->port = port;
-      ap->address.v4 = htonl(ip);
-      ap->is_ipv6 = 0;
+      /* Only the first attribute ever in the flow */
+      if(ap->port == 0) {
+        ap->port = port;
+        ap->address.v4 = htonl(ip);
+        ap->is_ipv6 = 0;
+      }
 
-      if(ap_monit)
-        memcpy(ap_monit, ap, sizeof(*ap_monit));
+      if(ap_monit) {
+        ap_monit->port = port;
+        ap_monit->address.v4 = htonl(ip);
+        ap_monit->is_ipv6 = 0;
+      }
     } else if(protocol_family == 0x02 /* IPv6 */ &&
               real_len == 20) {
       u_int16_t port = ntohs(*((u_int16_t*)&payload[off+6]));
@@ -215,12 +221,18 @@ static void parse_ip_port_attribute(const u_int8_t *payload, u_int16_t payload_l
       ip[2] = *((u_int32_t *)&payload[off + 16]);
       ip[3] = *((u_int32_t *)&payload[off + 20]);
 
-      ap->port = port;
-      memcpy(&ap->address, &ip, 16);
-      ap->is_ipv6 = 1;
+      /* Only the first attribute ever in the flow */
+      if(ap->port == 0) {
+        ap->port = port;
+        memcpy(&ap->address, &ip, 16);
+        ap->is_ipv6 = 1;
+      }
 
-      if(ap_monit)
-        memcpy(ap_monit, ap, sizeof(*ap_monit));
+      if(ap_monit) {
+        ap_monit->port = port;
+        memcpy(&ap_monit->address, &ip, 16);
+        ap_monit->is_ipv6 = 1;
+      }
     }
   }
 }
@@ -249,12 +261,18 @@ static void parse_xor_ip_port_attribute(struct ndpi_detection_module_struct *ndp
       port = ntohs(*((u_int16_t *)&payload[off + 6])) ^ (magic_cookie >> 16);
       ip = *((u_int32_t *)&payload[off + 8]) ^ htonl(magic_cookie);
 
-      ap->port = port;
-      ap->address.v4 = ip;
-      ap->is_ipv6 = 0;
+      /* Only the first attribute ever in the flow */
+      if(ap->port == 0) {
+        ap->port = port;
+        ap->address.v4 = ip;
+        ap->is_ipv6 = 0;
+      }
 
-      if(ap_monit)
-        memcpy(ap_monit, ap, sizeof(*ap_monit));
+      if(ap_monit) {
+          ap_monit->port = port;
+          ap_monit->address.v4 = ip;
+          ap_monit->is_ipv6 = 0;
+      }
 
       if(add_to_cache) {
         NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
@@ -284,12 +302,18 @@ static void parse_xor_ip_port_attribute(struct ndpi_detection_module_struct *ndp
       ip[2] = *((u_int32_t *)&payload[off + 16]) ^ htonl(transaction_id[1]);
       ip[3] = *((u_int32_t *)&payload[off + 20]) ^ htonl(transaction_id[2]);
 
-      ap->port = port;
-      memcpy(&ap->address, &ip, 16);
-      ap->is_ipv6 = 1;
+      /* Only the first attribute ever in the flow */
+      if(ap->port == 0) {
+        ap->port = port;
+        memcpy(&ap->address, &ip, 16);
+        ap->is_ipv6 = 1;
+      }
 
-      if(ap_monit)
-        memcpy(ap_monit, ap, sizeof(*ap_monit));
+      if(ap_monit) {
+        ap_monit->port = port;
+        memcpy(&ap_monit->address, &ip, 16);
+        ap_monit->is_ipv6 = 1;
+      }
 
       if(add_to_cache) {
         NDPI_LOG_DBG(ndpi_struct, "Peer %s:%d [proto %d]\n",
