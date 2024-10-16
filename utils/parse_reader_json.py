@@ -17,7 +17,13 @@ if(len(sys.argv) != 2):
     
 fname = sys.argv[1]
 
-fingeprints = {}
+#shorten_ja4 = True
+shorten_ja4 = False
+use_domainame = True
+
+client_fingerprints = {}
+hostname_fingerprints = {}
+fingerprints        = {}
 
 # Open and read the JSON file
 with open(fname, 'r') as file:
@@ -30,23 +36,76 @@ with open(fname, 'r') as file:
            and ('hostname' in data['ndpi'])
            and ('ja4' in data['ndpi']['tls'])
            ):
+            src_ip = data['src_ip']
             tcp_fingerprint = data['tcp_fingerprint']
             ja4 = data['ndpi']['tls']['ja4']
-            domainame = data['ndpi']['domainame']
-            hostname = data['ndpi']['hostname']
 
+            if(shorten_ja4):
+                items = ja4.split("_")
+                ja4   = items[1] + "_" + items[2]
+            
+            if(use_domainame):
+                hostname = data['ndpi']['domainame']
+            else:
+                hostname = data['ndpi']['hostname']
+                
             key = tcp_fingerprint+"-"+ja4
-            if(not(key in fingeprints)):
-                fingeprints[key] = {}
+            if(not(src_ip in client_fingerprints)):
+                client_fingerprints[src_ip] = {}
+
+            if(not(key in client_fingerprints[src_ip])):
+                client_fingerprints[src_ip][key] = {}
 
             value = hostname
-            fingeprints[key][value] = True
+            client_fingerprints[src_ip][key][value] = True
 
+            #####################
 
-for k in fingeprints.keys():
-    print(k, end =" [ ")
+            if(not(key in fingerprints)):
+                fingerprints[key] = {}
 
-    for host in fingeprints[k]:
-        print(host, end =" ")
+            fingerprints[key][src_ip] = hostname
+
+            #####################
+
+            if(not(hostname in hostname_fingerprints)):
+                hostname_fingerprints[hostname] = {}
+                
+            hostname_fingerprints[hostname][key] = True
+            
+####################
+
+for host in client_fingerprints.keys():
+    print(host+" [" + str(len(client_fingerprints[host].keys())) + " fingerprints]")
+    for k in client_fingerprints[host].keys():
+        print(k, end =" [ ")
+
+        for client in client_fingerprints[host][k]:
+            print(client, end =" ")
+
+        print("]")
+
+    print("")
+
+print("------------------------")
+
+for key in fingerprints:
+    print(key, end =" [ ")
+    
+    for client in fingerprints[key]:
+        print(client, end =" ")
 
     print("]")
+
+sys.exit(0)
+
+print("------------------------")
+
+for hostname in hostname_fingerprints:
+    print(hostname, end ="\n[ ")
+    
+    for f_print in hostname_fingerprints[hostname]:
+        print(f_print, end =" ")
+
+    print("]\n")
+
