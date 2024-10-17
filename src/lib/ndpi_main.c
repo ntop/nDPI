@@ -6911,7 +6911,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
   if(l4protocol == IPPROTO_TCP) {
     u_int16_t header_len;
 
-    if(l4_packet_len < 20 /* min size of tcp */)
+    if(l4_packet_len < sizeof(struct ndpi_tcphdr) /* min size of tcp */)
       return(1);
 
     /* tcp */
@@ -6927,63 +6927,66 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	  u_int8_t *options = (u_int8_t*)(&t[sizeof(struct ndpi_tcphdr)]);
 	  char fingerprint[128], options_fp[128];
 	  u_int8_t i, fp_idx = 0, options_fp_idx = 0;
-	  u_int8_t options_len = header_len - sizeof(struct ndpi_tcphdr);
-	  u_int16_t tcp_win = ntohs(packet->tcp->window);
-	  u_int8_t ip_ttl;
-	  u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
+
+	  if(header_len >= sizeof(struct ndpi_tcphdr)) {
+	    u_int8_t options_len = header_len - sizeof(struct ndpi_tcphdr);
+	    u_int16_t tcp_win = ntohs(packet->tcp->window);
+	    u_int8_t ip_ttl;
+	    u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
 	  
-	  if(packet->iph)
-	    ip_ttl = packet->iph->ttl;
-	  else
-	    ip_ttl = packet->iphv6->ip6_hdr.ip6_un1_hlim;
+	    if(packet->iph)
+	      ip_ttl = packet->iph->ttl;
+	    else
+	      ip_ttl = packet->iphv6->ip6_hdr.ip6_un1_hlim;
 
-	  if(ip_ttl <= 32) ip_ttl = 32;
-	  else if(ip_ttl <= 64)  ip_ttl = 64;
-	  else if(ip_ttl <= 128) ip_ttl = 128;
-	  else if(ip_ttl <= 192) ip_ttl = 192;
-	  else ip_ttl = 255;
+	    if(ip_ttl <= 32) ip_ttl = 32;
+	    else if(ip_ttl <= 64)  ip_ttl = 64;
+	    else if(ip_ttl <= 128) ip_ttl = 128;
+	    else if(ip_ttl <= 192) ip_ttl = 192;
+	    else ip_ttl = 255;
 	  
-	  fp_idx = snprintf(fingerprint, sizeof(fingerprint), "%u_%u_", ip_ttl, tcp_win);
+	    fp_idx = snprintf(fingerprint, sizeof(fingerprint), "%u_%u_", ip_ttl, tcp_win);
 	  
-	  for(i=0; i<options_len; ) {
-	    u_int8_t kind = options[i];
-	    int rc;
+	    for(i=0; i<options_len; ) {
+	      u_int8_t kind = options[i];
+	      int rc;
 
-	    rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", kind);
- 	    options_fp_idx += rc;
+	      rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", kind);
+	      options_fp_idx += rc;
 
-	    if(kind == 0) /* EOF */
-	      break;
-	    else if(kind == 1) /* NOP */
-	      i++;
-	    else {
-	      u_int8_t len = options[i+1];
-
-	      if(len == 0)
+	      if(kind == 0) /* EOF */
 		break;
-	      else if(kind == 8) {
-		/* Timestamp: ignore it */
-	      } else {
-		int j = i+2;
-		u_int8_t opt_len = len - 2;
+	      else if(kind == 1) /* NOP */
+		i++;
+	      else {
+		u_int8_t len = options[i+1];
 
-		while((opt_len > 0) && (j < options_len)) {
-		  rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", options[j]);
-		  options_fp_idx += rc;
-		  j++, opt_len--;
+		if(len == 0)
+		  break;
+		else if(kind == 8) {
+		  /* Timestamp: ignore it */
+		} else {
+		  int j = i+2;
+		  u_int8_t opt_len = len - 2;
+
+		  while((opt_len > 0) && (j < options_len)) {
+		    rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", options[j]);
+		    options_fp_idx += rc;
+		    j++, opt_len--;
+		  }
 		}
+
+		i += len;
 	      }
+	    } /* for */
 
-	      i += len;
-	    }
-	  } /* for */
+	    ndpi_sha256((const u_char*)options_fp, options_fp_idx, sha_hash);
+	    snprintf(&fingerprint[fp_idx], sizeof(fingerprint)-fp_idx, "%02x%02x%02x%02x%02x%02x",
+		     sha_hash[0], sha_hash[1], sha_hash[2],
+		     sha_hash[3], sha_hash[4], sha_hash[5]);
 
-	  ndpi_sha256((const u_char*)options_fp, options_fp_idx, sha_hash);
-	  snprintf(&fingerprint[fp_idx], sizeof(fingerprint)-fp_idx, "%02x%02x%02x%02x%02x%02x",
-		   sha_hash[0], sha_hash[1], sha_hash[2],
-		   sha_hash[3], sha_hash[4], sha_hash[5]);
-
-	  flow->tcp.fingerprint = ndpi_strdup(fingerprint);
+	    flow->tcp.fingerprint = ndpi_strdup(fingerprint);
+	  }
 	}
       }
 
