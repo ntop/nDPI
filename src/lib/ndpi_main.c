@@ -6967,7 +6967,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		int j = i+2;
 		u_int8_t opt_len = len - 2;
 
-		while(opt_len > 0) {
+		while((opt_len > 0) && (j < options_len)) {
 		  rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", options[j]);
 		  options_fp_idx += rc;
 		  j++, opt_len--;
