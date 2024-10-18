@@ -6909,31 +6909,31 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
   /* TCP / UDP detection */
   if(l4protocol == IPPROTO_TCP) {
-    u_int16_t header_len;
+    u_int16_t tcp_header_len;
 
     if(l4_packet_len < sizeof(struct ndpi_tcphdr) /* min size of tcp */)
       return(1);
 
     /* tcp */
     packet->tcp = (struct ndpi_tcphdr *) l4ptr;
-    header_len = packet->tcp->doff * 4;
+    tcp_header_len = packet->tcp->doff * 4;
 
-    if(l4_packet_len >= header_len) {
+    if(l4_packet_len >= tcp_header_len) {
       if(flow->tcp.fingerprint == NULL) {
 	u_int8_t *t = (u_int8_t*)packet->tcp;
 	u_int16_t flags = ntohs(*((u_int16_t*)&t[12]));
 
 	if((flags & (TH_SYN | TH_ECE | TH_CWR)) == TH_SYN) {
-	  u_int8_t *options = (u_int8_t*)(&t[sizeof(struct ndpi_tcphdr)]);
 	  char fingerprint[128], options_fp[128];
 	  u_int8_t i, fp_idx = 0, options_fp_idx = 0;
 
-	  if(header_len >= sizeof(struct ndpi_tcphdr)) {
-	    u_int8_t options_len = header_len - sizeof(struct ndpi_tcphdr);
+	  if(tcp_header_len > sizeof(struct ndpi_tcphdr)) {
+	    u_int8_t *options = (u_int8_t*)(&t[sizeof(struct ndpi_tcphdr)]);
+	    u_int8_t options_len = tcp_header_len - sizeof(struct ndpi_tcphdr);
 	    u_int16_t tcp_win = ntohs(packet->tcp->window);
 	    u_int8_t ip_ttl;
 	    u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
-	  
+
 	    if(packet->iph)
 	      ip_ttl = packet->iph->ttl;
 	    else
@@ -6944,33 +6944,44 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	    else if(ip_ttl <= 128) ip_ttl = 128;
 	    else if(ip_ttl <= 192) ip_ttl = 192;
 	    else ip_ttl = 255;
-	  
+
 	    fp_idx = snprintf(fingerprint, sizeof(fingerprint), "%u_%u_", ip_ttl, tcp_win);
-	  
+
 	    for(i=0; i<options_len; ) {
 	      u_int8_t kind = options[i];
 	      int rc;
 
+#ifdef DEBUG_TCP_OPTIONS
+	      printf("Option kind: %u\n", kind);
+#endif
 	      rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", kind);
+	      if((rc < 0) || ((int)(options_fp_idx + rc) == sizeof(options_fp))) break;
+
 	      options_fp_idx += rc;
 
 	      if(kind == 0) /* EOF */
 		break;
 	      else if(kind == 1) /* NOP */
 		i++;
-	      else {
+	      else if((i+1) < options_len) {
 		u_int8_t len = options[i+1];
+
+#ifdef DEBUG_TCP_OPTIONS
+		printf("\tOption len: %u\n", len);
+#endif
 
 		if(len == 0)
 		  break;
 		else if(kind == 8) {
 		  /* Timestamp: ignore it */
-		} else {
+		} else if(len > 2) {
 		  int j = i+2;
 		  u_int8_t opt_len = len - 2;
 
 		  while((opt_len > 0) && (j < options_len)) {
 		    rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", options[j]);
+		    if((rc < 0) || ((int)(options_fp_idx + rc) == sizeof(options_fp))) break;
+
 		    options_fp_idx += rc;
 		    j++, opt_len--;
 		  }
@@ -6990,8 +7001,8 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	}
       }
 
-      packet->payload_packet_len = l4_packet_len - header_len;
-      packet->payload = ((u_int8_t *) packet->tcp) + header_len;
+      packet->payload_packet_len = l4_packet_len - tcp_header_len;
+      packet->payload = ((u_int8_t *) packet->tcp) + tcp_header_len;
     } else {
       /* tcp header not complete */
       return(1);
