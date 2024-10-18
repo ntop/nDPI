@@ -6955,7 +6955,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	      printf("Option kind: %u\n", kind);
 #endif
 	      rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", kind);
-	      if(rc <= 0) break;
+	      if((rc < 0) || ((int)(options_fp_idx + rc) == sizeof(options_fp))) break;
 
 	      options_fp_idx += rc;
 
@@ -6980,7 +6980,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
 		  while((opt_len > 0) && (j < options_len)) {
 		    rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", options[j]);
-		    if(rc <= 0) break;
+		    if((rc < 0) || ((int)(options_fp_idx + rc) == sizeof(options_fp))) break;
 
 		    options_fp_idx += rc;
 		    j++, opt_len--;
