@@ -143,6 +143,19 @@ static void (*_ndpi_flow_free)(void *ptr);
 
 /* ****************************************** */
 
+  static struct os_fingerprint tcp_fps[] = {
+  { "32770_128_64240_6bb88f5575fd", os_windows     },
+  { "45058_64_65535_dd5737e4fedb",  os_macos       },
+  { "45250_64_65535_dd5737e4fedb",  os_macos       },
+  { "40962_64_65535_d876f498b09e",  os_android     },
+  { "45250_64_65535_63970bc57fac",  os_ios_ipad_os },
+  { "40962_64_65535_8bf9e292397e",  os_freebsd     },
+  { "40962_64_64800_83b2f9a5576c",  os_linux       },
+  { "40962_64_64240_2e3cee914fc1",  os_linux       },
+  { "40962_64_29200_2e3cee914fc1",  os_linux       },
+  { NULL,  os_unknown                              },
+};
+
 static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_NO_RISK,                               NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY  },
   { NDPI_URL_POSSIBLE_XSS,                      NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
@@ -6923,10 +6936,11 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
          flow->tcp.fingerprint == NULL) {
 	u_int8_t *t = (u_int8_t*)packet->tcp;
 	u_int16_t flags = ntohs(*((u_int16_t*)&t[12]));
-
-	if((flags & (TH_SYN | TH_ECE | TH_CWR)) == TH_SYN) {
+	u_int16_t syn_mask = TH_SYN | TH_ECE | TH_CWR;
+	  
+	if((flags & syn_mask) && ((flags & TH_ACK) == 0)) {
 	  char fingerprint[128], options_fp[128];
-	  u_int8_t i, fp_idx = 0, options_fp_idx = 0;
+	  u_int8_t i, fp_idx = 0, options_fp_len = 0;
 
 	  if(tcp_header_len > sizeof(struct ndpi_tcphdr)) {
 	    u_int8_t *options = (u_int8_t*)(&t[sizeof(struct ndpi_tcphdr)]);
@@ -6946,7 +6960,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	    else if(ip_ttl <= 192) ip_ttl = 192;
 	    else ip_ttl = 255;
 
-	    fp_idx = snprintf(fingerprint, sizeof(fingerprint), "%u_%u_", ip_ttl, tcp_win);
+	    fp_idx = snprintf(fingerprint, sizeof(fingerprint), "%u_%u_%u_", flags, ip_ttl, tcp_win);
 
 	    for(i=0; i<options_len; ) {
 	      u_int8_t kind = options[i];
@@ -6955,10 +6969,10 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 #ifdef DEBUG_TCP_OPTIONS
 	      printf("Option kind: %u\n", kind);
 #endif
-	      rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", kind);
-	      if((rc < 0) || ((int)(options_fp_idx + rc) == sizeof(options_fp))) break;
+	      rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", kind);
+	      if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp))) break;
 
-	      options_fp_idx += rc;
+	      options_fp_len += rc;
 
 	      if(kind == 0) /* EOF */
 		break;
@@ -6980,10 +6994,10 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		  u_int8_t opt_len = len - 2;
 
 		  while((opt_len > 0) && (j < options_len)) {
-		    rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", options[j]);
-		    if((rc < 0) || ((int)(options_fp_idx + rc) == sizeof(options_fp))) break;
+		    rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", options[j]);
+		    if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp))) break;
 
-		    options_fp_idx += rc;
+		    options_fp_len += rc;
 		    j++, opt_len--;
 		  }
 		}
@@ -6992,12 +7006,20 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	      }
 	    } /* for */
 
-	    ndpi_sha256((const u_char*)options_fp, options_fp_idx, sha_hash);
+	    ndpi_sha256((const u_char*)options_fp, options_fp_len, sha_hash);
+
 	    snprintf(&fingerprint[fp_idx], sizeof(fingerprint)-fp_idx, "%02x%02x%02x%02x%02x%02x",
 		     sha_hash[0], sha_hash[1], sha_hash[2],
 		     sha_hash[3], sha_hash[4], sha_hash[5]);
 
-	    flow->tcp.fingerprint = ndpi_strdup(fingerprint);
+	    flow->tcp.fingerprint = ndpi_strdup(fingerprint), flow->tcp.os_hint = os_unknown;
+
+	    for(i=0; tcp_fps[i].fingerprint != NULL; i++) {
+	      if(strcmp(tcp_fps[i].fingerprint, fingerprint) == 0) {
+		flow->tcp.os_hint = tcp_fps[i].os;
+		break;
+	      }
+	    }
 	  }
 	}
       }

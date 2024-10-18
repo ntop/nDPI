@@ -3845,3 +3845,17 @@ char* ndpi_quick_decrypt(const char *encrypted_msg,
   return(decoded_string);
 }
 
+/* ************************************************************** */
+
+const char* ndpi_print_os_hint(u_int8_t os_hint) {
+  switch(os_hint) {
+  case os_windows:          return("Win");     
+  case os_macos:            return("macOS");
+  case os_ios_ipad_os:      return("iOS/iPad");
+  case os_android:          return("Android");
+  case os_linux:            return("Linux");
+  case os_freebsd:          return("FreeBSD");
+  }
+
+  return("Unknown");
+}

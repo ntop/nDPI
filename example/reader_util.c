@@ -1586,9 +1586,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   flow->multimedia_flow_type = flow->ndpi_flow->flow_multimedia_type;
 
-  if(flow->ndpi_flow->tcp.fingerprint)
-    flow->tcp_fingerprint = ndpi_strdup(flow->ndpi_flow->tcp.fingerprint);
+  if(flow->ndpi_flow->tcp.fingerprint) {
+    char buf[128];
 
+    snprintf(buf, sizeof(buf), "%s/%s", flow->ndpi_flow->tcp.fingerprint,
+	     ndpi_print_os_hint(flow->ndpi_flow->tcp.os_hint));
+    flow->tcp_fingerprint = ndpi_strdup(buf);
+  }
+  
   /* HTTP metadata are "global" not in `flow->ndpi_flow->protos` union; for example, we can have
      HTTP/BitTorrent and in that case we want to export also HTTP attributes */
   if(is_ndpi_proto(flow, NDPI_PROTOCOL_HTTP)

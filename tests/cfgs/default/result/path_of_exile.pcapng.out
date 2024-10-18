@@ -24,4 +24,4 @@ PathofExile	4	311	1
 
 Fun                              4 311           1            
 
-	1	TCP 192.168.88.231:36262 <-> 198.50.120.150:6112 [proto: 403/PathofExile][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Game/8][3 pkts/237 bytes <-> 1 pkts/74 bytes][Goodput ratio: 13/0][0.14 sec][TCP Fingerprint: 64_32120_2e3cee914fc1][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.88.231:36262 <-> 198.50.120.150:6112 [proto: 403/PathofExile][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Game/8][3 pkts/237 bytes <-> 1 pkts/74 bytes][Goodput ratio: 13/0][0.14 sec][TCP Fingerprint: 40962_64_32120_2e3cee914fc1/Unknown][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

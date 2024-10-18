@@ -2330,6 +2330,10 @@ extern "C" {
  
   /* ******************************* */
 
+  const char* ndpi_print_os_hint(u_int8_t os_hint);
+  
+  /* ******************************* */
+
   bool ndpi_serialize_flow_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 				       struct ndpi_flow_struct *flow, ndpi_serializer *serializer);
 

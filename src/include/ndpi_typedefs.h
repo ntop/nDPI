@@ -1244,6 +1244,22 @@ struct ndpi_metadata_monitoring {
   } protos;
 };
 
+enum operating_system_hint {
+  os_unknown     = 0,
+  os_windows     = 1,
+  os_macos       = 2,
+  os_ios_ipad_os = 3,
+  os_android     = 4,
+  os_linux       = 5,
+  os_freebsd     = 6,
+  os_unused2     = 7
+};
+
+struct os_fingerprint {
+  const char *fingerprint;
+  enum operating_system_hint os;
+};
+
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
 
@@ -1315,6 +1331,7 @@ struct ndpi_flow_struct {
 
   struct {
     char *fingerprint;
+    u_int8_t os_hint;
   } tcp;
   
   /*
@@ -1591,8 +1608,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 264,
                "Size of the struct member protocols increased to more than 264 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1184,
-               "Size of the flow struct increased to more than 1184 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1185,
+               "Size of the flow struct increased to more than 1186 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif
