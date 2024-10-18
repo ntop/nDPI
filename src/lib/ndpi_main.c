@@ -6963,7 +6963,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		break;
 	      else if(kind == 1) /* NOP */
 		i++;
-	      else {
+	      else if((i+1) < options_len) {
 		u_int8_t len = options[i+1];
 
 #ifdef DEBUG_TCP_OPTIONS
