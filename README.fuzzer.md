@@ -1,11 +1,11 @@
 ## Compiling nDPI with Fuzzer
 
-- Install the latest clang (sudo apt-get install clang-10)
+- Install the latest clang (sudo apt-get install clang-18)
 - Export environamental variables to prefer clang over g++ (of installed)
-  - export CC=/usr/bin/clang-10
-  - export CPP=/usr/bin/clang-cpp-10
-  - export CXX=/usr/bin/clang++-10
-  - export LD=/usr/bin/ld.lld-10
+  - export CC=/usr/bin/clang-18
+  - export CPP=/usr/bin/clang-cpp-18
+  - export CXX=/usr/bin/clang++-18
+  - export LD=/usr/bin/ld.lld-18
 - Run autogen.sh
   - ./autogen.sh --with-sanitizer --enable-fuzztargets 
 
