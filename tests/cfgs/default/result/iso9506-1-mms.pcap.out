@@ -24,4 +24,4 @@ ISO9506-1-MMS	22	1907	1
 
 Acceptable                      22 1907          1            
 
-	1	TCP 172.16.0.101:1345 <-> 172.16.202.5:102 [proto: 366/ISO9506-1-MMS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][cat: IoT-Scada/31][11 pkts/1000 bytes <-> 11 pkts/907 bytes][Goodput ratio: 37/31][0.61 sec][bytes ratio: 0.049 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 63/28 218/100 83/42][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 91/82 221/200 47/39][Plen Bins: 51,16,16,0,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 172.16.0.101:1345 <-> 172.16.202.5:102 [proto: 366/ISO9506-1-MMS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][cat: IoT-Scada/31][11 pkts/1000 bytes <-> 11 pkts/907 bytes][Goodput ratio: 37/31][0.61 sec][bytes ratio: 0.049 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 63/28 218/100 83/42][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 91/82 221/200 47/39][TCP Fingerprint: 128_65535_44bd01ba086e][Plen Bins: 51,16,16,0,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -1591,8 +1591,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 264,
                "Size of the struct member protocols increased to more than 264 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1176,
-               "Size of the flow struct increased to more than 1176 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1184,
+               "Size of the flow struct increased to more than 1184 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

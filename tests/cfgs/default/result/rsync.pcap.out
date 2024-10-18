@@ -24,4 +24,4 @@ RSYNC	30	2493	1
 
 Acceptable                      30 2493          1            
 
-	1	TCP 127.0.0.1:54489 <-> 127.0.0.1:873 [proto: 166/RSYNC][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: DataTransfer/4][16 pkts/1150 bytes <-> 14 pkts/1343 bytes][Goodput ratio: 7/31][0.14 sec][bytes ratio: -0.077 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 8/10 39/39 14/16][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 72/96 101/412 9/88][PLAIN TEXT (@RSYNCD)][Plen Bins: 87,6,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 127.0.0.1:54489 <-> 127.0.0.1:873 [proto: 166/RSYNC][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: DataTransfer/4][16 pkts/1150 bytes <-> 14 pkts/1343 bytes][Goodput ratio: 7/31][0.14 sec][bytes ratio: -0.077 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 8/10 39/39 14/16][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 72/96 101/412 9/88][TCP Fingerprint: 64_43690_4282f7101799][PLAIN TEXT (@RSYNCD)][Plen Bins: 87,6,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
