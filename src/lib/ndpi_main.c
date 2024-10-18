@@ -6933,7 +6933,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	    u_int16_t tcp_win = ntohs(packet->tcp->window);
 	    u_int8_t ip_ttl;
 	    u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
-	    
+
 	    if(packet->iph)
 	      ip_ttl = packet->iph->ttl;
 	    else
@@ -6944,9 +6944,9 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	    else if(ip_ttl <= 128) ip_ttl = 128;
 	    else if(ip_ttl <= 192) ip_ttl = 192;
 	    else ip_ttl = 255;
-	  
+
 	    fp_idx = snprintf(fingerprint, sizeof(fingerprint), "%u_%u_", ip_ttl, tcp_win);
-	  
+
 	    for(i=0; i<options_len; ) {
 	      u_int8_t kind = options[i];
 	      int rc;
@@ -6955,6 +6955,8 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	      printf("Option kind: %u\n", kind);
 #endif
 	      rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", kind);
+	      if(rc <= 0) break;
+
 	      options_fp_idx += rc;
 
 	      if(kind == 0) /* EOF */
@@ -6963,7 +6965,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		i++;
 	      else {
 		u_int8_t len = options[i+1];
-		
+
 #ifdef DEBUG_TCP_OPTIONS
 		printf("\tOption len: %u\n", len);
 #endif
@@ -6978,6 +6980,8 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
 		  while((opt_len > 0) && (j < options_len)) {
 		    rc = snprintf(&options_fp[options_fp_idx], sizeof(options_fp)-options_fp_idx, "%02x", options[j]);
+		    if(rc <= 0) break;
+
 		    options_fp_idx += rc;
 		    j++, opt_len--;
 		  }
