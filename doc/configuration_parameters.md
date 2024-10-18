@@ -15,6 +15,7 @@ TODO
 | NULL         | "libgcrypt.init"                          | 1             | NULL      | NULL      | Enable/disable initialization of libgcrypt. When using the external libgcrypt (instead of the internal crypto code) the libgcrypt runtime must be initialized. If, for whatever reasons, the application alread does it, nDPI must be told to skip it. Note that, by default, nDPI uses the crypto code and not libgcrypt: in that case this parameter is ignored |
 | NULL         | "dpi.compute_entropy"                     | 1             | NULL      | NULL      | Enable/disable computation of flow entropy |
 | NULL         | "fpc"                                     | enable        | NULL      | NULL      | Enable/disable First Packet Classification |
+| NULL         | "metadata.tcp_fingerprint"                | enable        | NULL      | NULL      | Enable/disable computation and export of TCP fingerprint for all TCP flows
 | NULL         | "dpi.guess_on_giveup"                     | 0x03          | 0x00      | 0x03      | Tell the library to guess flow classification, if any DPI algorithms/logics fail.  The value is a bitmask. Values: 0x0 = disabled; 0x01 = enable guessing by port; 0x02 = enable guessing by ip |
 | NULL         | "dpi.guess_ip_before_port"                | disable       | NULL      | NULL      | Enable/disable guessing by IP first when guessing flow classifcation. Disabled = guess by port first. |
 | NULL         | "flow_risk_lists.load"                    | 1             | NULL      | NULL      | Enable/disable loading of every IP addresses lists used to check any flow risks |
@@ -34,6 +35,7 @@ TODO
 | "tls"        | "metadata.ja3c_fingerprint"               | enable        | NULL      | NULL      | Enable/disable computation and export of JA3C fingerprint for TLS flows. Note that if it is disable, the flow risk `NDPI_MALICIOUS_JA3` is not checked |
 | "tls"        | "metadata.ja3s_fingerprint"               | enable        | NULL      | NULL      | Enable/disable computation and export of JA3S fingerprint for TLS flows |
 | "tls"        | "metadata.ja4c_fingerprint"               | enable        | NULL      | NULL      | Enable/disable computation and export of JA4C fingerprint for TLS flows |
+| "tls"        | "metadata.ja4r_fingerprint"               | disable       | NULL      | NULL      | Enable/disable computation and export of JA4C fingerprint for TLS flows also in raw format |
 | "tls"        | "subclassification"                       | enable        | NULL      | NULL      | Enable/disable sub-classification of TLS/DTLS flows |
 | "quic"       | "subclassification"                       | enable        | NULL      | NULL      | Enable/disable sub-classification of QUIC flows |
 | "smtp"       | "tls_dissection"                          | enable        | NULL      | NULL      | Enable/disable dissection of TLS packets in cleartext SMTP flows (because of opportunistic TLS, via STARTTLS msg) |

@@ -6919,7 +6919,8 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
     tcp_header_len = packet->tcp->doff * 4;
 
     if(l4_packet_len >= tcp_header_len) {
-      if(flow->tcp.fingerprint == NULL) {
+      if(ndpi_str->cfg.tcp_fingerprint_enabled &&
+         flow->tcp.fingerprint == NULL) {
 	u_int8_t *t = (u_int8_t*)packet->tcp;
 	u_int16_t flags = ntohs(*((u_int16_t*)&t[12]));
 
@@ -11510,6 +11511,8 @@ static const struct cfg_param {
   { NULL,            "dpi.compute_entropy",                     "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(compute_entropy), NULL },
   { NULL,            "dpi.address_cache_size",                  "0", "0", "16777215", CFG_PARAM_INT, __OFF(address_cache_size), NULL },
   { NULL,            "fpc",                                     "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fpc_enabled), NULL },
+
+  { NULL,            "metadata.tcp_fingerprint",                "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_fingerprint_enabled), NULL },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },
 
