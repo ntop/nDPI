@@ -2202,6 +2202,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
   u_int16_t ip_offset = 0, ip_len;
   u_int16_t frag_off = 0, vlan_id = 0;
   u_int8_t proto = 0, recheck_type;
+  u_int8_t ip_ver, ppp_type;
   /*u_int32_t label;*/
 
   /* counters */
@@ -2270,7 +2271,13 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
       type = ntohs(chdlc->proto_code);
     } else {
       ip_offset = eth_offset + 2;
-      type = ntohs(*((u_int16_t*)&packet[eth_offset]));
+      ppp_type = ntohs(*((u_int16_t*)&packet[eth_offset]));
+      if(ppp_type == 0x0021)
+        type = ETH_P_IP;
+      else if(ppp_type == 0x0057)
+        type = ETH_P_IPV6;
+      else
+        return(nproto);
     }
     break;
 
@@ -2364,6 +2371,15 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
   case DLT_RAW:
     ip_offset = eth_offset;
+    /* Heuristic: no explicit field with next protocol */
+    ip_ver = (packet[ip_offset] & 0xF0) >> 4;
+    if(ip_ver == 4)
+      type = ETH_P_IP;
+    else if(ip_ver == 6)
+      type = ETH_P_IPV6;
+    else
+      return(nproto);
+
     break;
 
   case DLT_PPI:
@@ -2430,8 +2446,13 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     recheck_type = 1;
     break;
 
-  default:
+  case ETH_P_IP:
+  case ETH_P_IPV6:
+    /* Good let's keep decoding */
     break;
+
+  default:
+    return(nproto);
   }
 
   if(recheck_type)
