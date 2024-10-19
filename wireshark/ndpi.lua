@@ -613,6 +613,8 @@ function round(num, idp)
 end
 
 function formatPctg(p)
+   if(p == nil) then p = 0 end
+   
    local p = round(p, 1)
 
    if(p < 1) then return("< 1 %") end
@@ -2063,6 +2065,8 @@ local function ndpi_dialog_menu()
       end
 
       i = 0
+      if(tot == 0) then return end
+      
       for k,v in pairsByValues(ndpi_protos, rev) do
 	 local pctg = formatPctg((v * 100) / tot)
 	 label = label .. string.format("%-32s\t\t%s\t", k, bytesToSize(v)).. "\t["..pctg.."]\n"
