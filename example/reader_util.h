@@ -217,6 +217,8 @@ typedef struct ndpi_flow_info {
   struct ndpi_fpc_info fpc;
   u_int16_t num_dissector_calls;
   u_int16_t dpi_packets;
+  u_int8_t monitoring_state;
+  u_int16_t num_packets_before_monitoring;
 
   // Flow data analysis
   pkt_timeval src2dst_last_pkt_time, dst2src_last_pkt_time, flow_last_pkt_time;

@@ -1859,6 +1859,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 #endif
     fprintf(out, "[DPI packets: %d]", flow->dpi_packets);
 
+    if(flow->num_packets_before_monitoring > 0)
+      fprintf(out, "[DPI packets before monitoring: %d]", flow->num_packets_before_monitoring);
+
     if(flow->detected_protocol.category != 0)
       fprintf(out, "[cat: %s/%u]",
 	      ndpi_category_get_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
