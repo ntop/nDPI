@@ -144,16 +144,16 @@ static void (*_ndpi_flow_free)(void *ptr);
 /* ****************************************** */
 
   static struct os_fingerprint tcp_fps[] = {
-  { "32770_128_64240_6bb88f5575fd", os_windows     },
-  { "45058_64_65535_dd5737e4fedb",  os_macos       },
-  { "45250_64_65535_dd5737e4fedb",  os_macos       },
-  { "40962_64_65535_d876f498b09e",  os_android     },
-  { "45250_64_65535_63970bc57fac",  os_ios_ipad_os },
-  { "40962_64_65535_8bf9e292397e",  os_freebsd     },
-  { "40962_64_64800_83b2f9a5576c",  os_linux       },
-  { "40962_64_64240_2e3cee914fc1",  os_linux       },
-  { "40962_64_29200_2e3cee914fc1",  os_linux       },
-  { NULL,  os_unknown                              },
+  { "32770_128_64240_6bb88f5575fd", os_hint_windows     },
+  { "45058_64_65535_dd5737e4fedb",  os_hint_macos       },
+  { "45250_64_65535_dd5737e4fedb",  os_hint_macos       },
+  { "40962_64_65535_d876f498b09e",  os_hint_android     },
+  { "45250_64_65535_63970bc57fac",  os_hint_ios_ipad_os },
+  { "40962_64_65535_8bf9e292397e",  os_hint_freebsd     },
+  { "40962_64_64800_83b2f9a5576c",  os_hint_linux       },
+  { "40962_64_64240_2e3cee914fc1",  os_hint_linux       },
+  { "40962_64_29200_2e3cee914fc1",  os_hint_linux       },
+  { NULL,  os_hint_unknown                              },
 };
 
 static ndpi_risk_info ndpi_known_risks[] = {
@@ -7012,7 +7012,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		     sha_hash[0], sha_hash[1], sha_hash[2],
 		     sha_hash[3], sha_hash[4], sha_hash[5]);
 
-	    flow->tcp.fingerprint = ndpi_strdup(fingerprint), flow->tcp.os_hint = os_unknown;
+	    flow->tcp.fingerprint = ndpi_strdup(fingerprint), flow->tcp.os_hint = os_hint_unknown;
 
 	    for(i=0; tcp_fps[i].fingerprint != NULL; i++) {
 	      if(strcmp(tcp_fps[i].fingerprint, fingerprint) == 0) {

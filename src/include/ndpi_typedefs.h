@@ -1245,14 +1245,14 @@ struct ndpi_metadata_monitoring {
 };
 
 enum operating_system_hint {
-  os_unknown     = 0,
-  os_windows     = 1,
-  os_macos       = 2,
-  os_ios_ipad_os = 3,
-  os_android     = 4,
-  os_linux       = 5,
-  os_freebsd     = 6,
-  os_unused2     = 7
+  os_hint_unknown     = 0,
+  os_hint_windows     = 1,
+  os_hint_macos       = 2,
+  os_hint_ios_ipad_os = 3,
+  os_hint_android     = 4,
+  os_hint_linux       = 5,
+  os_hint_freebsd     = 6,
+  os_hint_unused2     = 7
 };
 
 struct os_fingerprint {
