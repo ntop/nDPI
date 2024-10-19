@@ -67,6 +67,14 @@
 #define NDPI_CAPWAP_DATA_PORT          5247
 #define TZSP_PORT                      37008
 
+#ifndef ETHERTYPE_IP
+#define	ETHERTYPE_IP		0x0800	/* IP protocol */
+#endif
+
+#ifndef ETHERTYPE_IPV6
+#define	ETHERTYPE_IPV6		0x86DD	/* IPv6 protocol */
+#endif
+
 #ifndef DLT_LINUX_SLL
 #define DLT_LINUX_SLL  113
 #endif
@@ -2430,8 +2438,13 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     recheck_type = 1;
     break;
 
-  default:
+  case ETHERTYPE_IP:
+  case ETHERTYPE_IPV6:
+    /* Good let's keep decoding */
     break;
+    
+  default:
+    return(nproto);
   }
 
   if(recheck_type)

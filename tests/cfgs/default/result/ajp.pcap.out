@@ -1,13 +1,11 @@
 DPI Packets (TCP):	8	(4.00 pkts/flow)
-DPI Packets (other):	6	(3.00 pkts/flow)
-Confidence Unknown          : 2 (flows)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 2 (0.50 diss/flow)
+Num dissector calls: 2 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/6/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/2/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    0/2/0 (insert/search/found)
 Automa host:          0/0 (search/found)
@@ -22,16 +20,9 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   4/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Unknown	6	2200	2
 AJP	26	4446	2
 
 Acceptable                      26 4446          2            
-Unrated                          6 2200          2            
 
 	1	TCP 172.29.9.146:38856 <-> 172.29.9.147:8009 [VLAN: 7][proto: 139/AJP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][Goodput ratio: 68/36][0.17 sec][bytes ratio: 0.398 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 222/112 896/300 286/84][TCP Fingerprint: 40962_64_14600_2e3cee914fc1/Unknown][PLAIN TEXT (HTTP/1.1)][Plen Bins: 50,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 172.29.9.146:38856 <-> 172.29.9.147:8010 [VLAN: 7][proto: 139/AJP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][7 pkts/1554 bytes <-> 6 pkts/669 bytes][Goodput ratio: 68/36][< 1 sec][bytes ratio: 0.398 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 222/112 896/300 286/84][TCP Fingerprint: 40962_64_14600_2e3cee914fc1/Unknown][PLAIN TEXT (HTTP/1.1)][Plen Bins: 50,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-
-Undetected flows:
-	1	80 93.88.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][4 pkts/2012 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][0.17 sec][PLAIN TEXT (HTTP/1.1)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	80 142.243.129.0:0 -> 0.7.8.0:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][2 pkts/188 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][0.17 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
