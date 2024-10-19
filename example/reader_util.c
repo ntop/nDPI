@@ -1173,6 +1173,13 @@ static void process_ndpi_monitoring_info(struct ndpi_flow_info *flow) {
   if(!flow->ndpi_flow || !flow->ndpi_flow->monit)
     return;
 
+  if(flow->monitoring_state == 0 &&
+     flow->ndpi_flow->monitoring) {
+    /* We just moved to monitoring state */
+    flow->monitoring_state = 1;
+    flow->num_packets_before_monitoring = flow->ndpi_flow->packet_direction_complete_counter[0] + flow->ndpi_flow->packet_direction_complete_counter[1];
+  }
+
   /* In theory, we should check only for STUN.
      However since we sometimes might not have STUN in protocol classification
      (because we have only two protocols in flow->ndpi_flow->detected_protocol_stack[])
