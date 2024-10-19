@@ -242,6 +242,8 @@ static int check_set(struct ndpi_detection_module_struct* ndpi_struct,
   return 0;
 }
 
+/* **************************************** */
+
 static int tls_obfuscated_heur_search(struct ndpi_detection_module_struct* ndpi_struct,
                                       struct ndpi_flow_struct* flow) {
   struct ndpi_packet_struct* packet = &ndpi_struct->packet;
@@ -396,9 +398,10 @@ static int tls_obfuscated_heur_search(struct ndpi_detection_module_struct* ndpi_
   return 0; /* Continue */
 }
 
+/* **************************************** */
+
 static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct* ndpi_struct,
-                                            struct ndpi_flow_struct* flow)
-{
+					    struct ndpi_flow_struct* flow) {
   int rc;
 
   NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: extra dissection\n");
@@ -435,6 +438,8 @@ static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct*
                                             but we need it with the plain heuristic */
   return 0; /* Stop */
 }
+
+/* **************************************** */
 
 void switch_extra_dissection_to_tls_obfuscated_heur(struct ndpi_detection_module_struct* ndpi_struct,
                                                     struct ndpi_flow_struct* flow)
@@ -1287,8 +1292,8 @@ static void ndpi_looks_like_tls(struct ndpi_detection_module_struct *ndpi_struct
 
 /* **************************************** */
 
-static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-			       struct ndpi_flow_struct *flow) {
+int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+			struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t something_went_wrong = 0;
   message_t *message;
@@ -1346,7 +1351,6 @@ static int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
       break;
     }
-
 
 #ifdef DEBUG_TLS_MEMORY
     printf("[TLS Mem] Processing %u bytes message\n", len);
@@ -1863,10 +1867,18 @@ static void ndpi_int_tls_add_connection(struct ndpi_detection_module_struct *ndp
   printf("[TLS] %s()\n", __FUNCTION__);
 #endif
 
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_RDP) {
+    /* RDP over TLS */
+    ndpi_set_detected_protocol(ndpi_struct, flow,
+			       NDPI_PROTOCOL_RDP, NDPI_PROTOCOL_TLS, NDPI_CONFIDENCE_DPI);
+    return;
+  }
+  
   if((flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) ||
      (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN)) {
     if(!flow->extra_packets_func)
       tlsInitExtraPacketProcessing(ndpi_struct, flow);
+    
     return;
   }
 
