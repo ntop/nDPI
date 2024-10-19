@@ -902,7 +902,10 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
                 flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
         /* From RTP dissector; if we have RTP and RTCP multiplexed together (but not STUN, yet) we always
 	   use RTP, as we do in RTP dissector */
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP, NDPI_CONFIDENCE_DPI);
+        if(!flow->monitoring)
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP, NDPI_CONFIDENCE_DPI);
+        else
+          NDPI_LOG_DBG(ndpi_struct, "Skip RTP packet because in monitoring\n");
       }
     } else if(rtp_rtcp == IS_RTCP) {
       NDPI_LOG_DBG(ndpi_struct, "RTCP\n");
