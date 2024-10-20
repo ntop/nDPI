@@ -158,6 +158,7 @@ static void (*_ndpi_flow_free)(void *ptr);
     { "194_64_65535_dd5737e4fedb",  os_hint_ios_ipad_os },
     { "194_64_65535_d29295416479",  os_hint_macos       },
     { "2_64_65535_d29295416479",    os_hint_macos       },
+    { "2_64_65535_dd5737e4fedb",    os_hint_macos       },
     { NULL,                         os_hint_unknown     },
   };
 
