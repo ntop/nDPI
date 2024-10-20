@@ -3849,7 +3849,7 @@ char* ndpi_quick_decrypt(const char *encrypted_msg,
 
 const char* ndpi_print_os_hint(u_int8_t os_hint) {
   switch(os_hint) {
-  case os_hint_windows:          return("Win");     
+  case os_hint_windows:          return("Windows");     
   case os_hint_macos:            return("macOS");
   case os_hint_ios_ipad_os:      return("iOS/iPad");
   case os_hint_android:          return("Android");

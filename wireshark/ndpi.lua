@@ -298,6 +298,20 @@ local ndpi_proto_meet     = "GoogleMeet" -- NDPI_PROTOCOL_GOOGLE_MEET
 
 -- ##############################################
 
+local tcp_fingeprint_db = {
+   [ '2_64_65535_8bf9e292397e']   = "FreeBSD",
+   [ '2_64_64800_83b2f9a5576c']   = "Linux",
+   [ '2_64_64240_2e3cee914fc1']   = "Linux",
+   [ '2_64_29200_2e3cee914fc1']   = "Linux",
+   [ '2_64_65535_d876f498b09e']   = "Android",
+   [ '2_128_64240_6bb88f5575fd']  = "Windows",
+   [ '194_64_65535_15db81ff8b0d'] = "iOS/iPad OS",
+   [ '194_64_65535_d29295416479'] = "macOS",
+   [ '2_64_65535_d29295416479']   = "macOS",
+}
+
+-- ##############################################
+
 local ja4_db = {
    ['02e81d9f7c9f_736b2a1ed4d3'] = 'Chrome',
    ['07be0c029dc8_ad97e2351c08'] = 'Firefox',
@@ -787,6 +801,8 @@ function ndpi_proto.init()
    -- TCP
    syn                    = {}
    synack                 = {}
+   tcp_host_fingerprints  = {}
+   tcp_fingerprint_hosts  = {}
 
    -- TLS
    tls_server_names       = {}
@@ -1292,7 +1308,9 @@ end
 function tcp_fingerprint(tvb, pinfo, tree, ip_version)
    local tcp_flags = getval(f_tcp_flags())
 
-   if(tcp_flags == "0x0002") then -- SYN
+   if((tcp_flags == "0x0002")-- SYN
+      or (tcp_flags == "0x00c2") -- SYN / ECE/ CWR
+   ) then
       local tcp_options = f_tcp_options()
       
       if(tcp_options ~= nil) then
@@ -1372,22 +1390,30 @@ function tcp_fingerprint(tvb, pinfo, tree, ip_version)
 	 else ip_ttl = 255     end
 
 	 fingerprint = string.lower(fingerprint)
+
 	 local f_print
+	 local num_tcp_flags = tostring(tonumber(string.sub(tcp_flags, 3), 16))
 
 	 if(true) then
 	    -- Use SHA256
-	    f_print = string.lower(ip_ttl .."_".. tcp_win .."_".. string.sub(sha256(fingerprint), 1, 12))
+	    f_print = string.lower(num_tcp_flags.."_"..ip_ttl .."_".. tcp_win .."_".. string.sub(sha256(fingerprint), 1, 12))
 	 else
-	    f_print = string.upper(ip_ttl .."_".. tcp_win .."_".. fingerprint)
+	    f_print = string.upper(num_tcp_flags.."_"..ip_ttl .."_".. tcp_win .."_".. fingerprint)
 	 end
-	 
+
+
 	 if(tcp_opt_debug) then tprint("Fingerprint: " .. f_print) end
 	 
 	 local tcp_f_entry = tree:add(ntop_proto, tvb())
 	 tcp_f_entry:add(ntop_fds.tcp_fingerprint, f_print)
 	 
 	 tcp_host_fingerprints[src_ip] = f_print	 
-	 tcp_fingerprint_hosts[f_print] = src_ip
+
+	 if(tcp_fingerprint_hosts[f_print] == nil) then
+	    tcp_fingerprint_hosts[f_print] = {}
+	 end
+	 
+	 tcp_fingerprint_hosts[f_print][src_ip] = 1
       end
    end
 end
@@ -1399,9 +1425,7 @@ function tcp_dissector(tvb, pinfo, tree, ip_version)
    local _tcp_ooo          = f_tcp_ooo()
    local _tcp_lost_segment = f_tcp_lost_segment()
 
-   if(pinfo.visited == true) then
-      tcp_fingerprint(tvb, pinfo, tree, ip_version)
-   end
+   tcp_fingerprint(tvb, pinfo, tree, ip_version)
    
    if(_tcp_retrans ~= nil) then
       local key = getstring(pinfo.src)..":"..getstring(pinfo.src_port).." -> "..getstring(pinfo.dst)..":"..getstring(pinfo.dst_port)
@@ -2503,8 +2527,8 @@ local function tls_dialog_menu()
 	 local pctg
 
 	 v = tonumber(v)
-	 pctg = formatPctg((v * 100) / tot_tls_flows)
-	 label = label .. k .."\t"..v.." [".. pctg.." %]\n"
+	 pctg = formatPctg((v * 100) / tot_tls_ja4_flows)
+	 label = label .. k .."\t"..v.." [".. pctg.."]\n"
 
 	 if(i == 50) then break else i = i + 1 end
       end
@@ -2538,15 +2562,25 @@ local function tcp_dialog_menu()
    i = 0
    label = label .. "TCP Host Fingerprints\n"
    for k,v in pairsByValues(tcp_host_fingerprints, rev) do
+      if(tcp_fingeprint_db[v] ~= nil) then
+	 v = v .. " [" .. tcp_fingeprint_db[v] .."]"
+      end
       label = label .. string.format("%-32s", shortenString(k,32)).."\t"..v.."\n"
-      if(i == 10) then break else i = i + 1 end
+      if(i == 50) then break else i = i + 1 end
    end
 
    i = 0
    label = label .. "\nTCP Fingerprint Hosts\n"
-   for k,v in pairsByValues(tcp_fingerprint_hosts, rev) do
-      label = label .. string.format("%-64s", shortenString(k,64)).."\t"..v.."\n"
-      if(i == 10) then break else i = i + 1 end
+   for k,v in pairs(tcp_fingerprint_hosts) do
+      label = label .. string.format("%-32s", shortenString(k,32)).."\t["
+
+      for h,_ in  pairsByValues(v, rev) do
+	 label = label .. " " .. h
+      end
+
+      label = label .. " ]\n"
+
+      if(i == 50) then break else i = i + 1 end
    end
    
    label = label .. "\nTotal Retransmissions : "..num_tcp_retrans.."\n"
@@ -2555,7 +2589,7 @@ local function tcp_dialog_menu()
       label = label .. "-----------------------------\n"
       for k,v in pairsByValues(tcp_retrans, rev) do
 	 label = label .. string.format("%-48s", shortenString(k,48)).."\t"..v.."\n"
-	 if(i == 10) then break else i = i + 1 end
+	 if(i == 50) then break else i = i + 1 end
       end
    end
 
@@ -2565,7 +2599,7 @@ local function tcp_dialog_menu()
       label = label .. "-----------------------------\n"
       for k,v in pairsByValues(tcp_ooo, rev) do
 	 label = label .. string.format("%-48s", shortenString(k,48)).."\t"..v.."\n"
-	 if(i == 10) then break else i = i + 1 end
+	 if(i == 50) then break else i = i + 1 end
       end
    end
 
@@ -2575,7 +2609,7 @@ local function tcp_dialog_menu()
       label = label .. "-----------------------------\n"
       for k,v in pairsByValues(tcp_lost_segment, rev) do
 	 label = label .. string.format("%-48s", shortenString(k,48)).."\t"..v.."\n"
-	 if(i == 10) then break else i = i + 1 end
+	 if(i == 50) then break else i = i + 1 end
       end
    end
 

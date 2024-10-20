@@ -144,17 +144,17 @@ static void (*_ndpi_flow_free)(void *ptr);
 /* ****************************************** */
 
   static struct os_fingerprint tcp_fps[] = {
-  { "32770_128_64240_6bb88f5575fd", os_hint_windows     },
-  { "45058_64_65535_dd5737e4fedb",  os_hint_macos       },
-  { "45250_64_65535_dd5737e4fedb",  os_hint_macos       },
-  { "40962_64_65535_d876f498b09e",  os_hint_android     },
-  { "45250_64_65535_63970bc57fac",  os_hint_ios_ipad_os },
-  { "40962_64_65535_8bf9e292397e",  os_hint_freebsd     },
-  { "40962_64_64800_83b2f9a5576c",  os_hint_linux       },
-  { "40962_64_64240_2e3cee914fc1",  os_hint_linux       },
-  { "40962_64_29200_2e3cee914fc1",  os_hint_linux       },
-  { NULL,  os_hint_unknown                              },
-};
+    { "2_64_65535_8bf9e292397e",    os_hint_freebsd     },
+    { "2_64_64800_83b2f9a5576c",    os_hint_linux       },
+    { "2_64_64240_2e3cee914fc1",    os_hint_linux       },
+    { "2_64_29200_2e3cee914fc1",    os_hint_linux       },
+    { "2_64_65535_d876f498b09e",    os_hint_android     },    
+    { "2_128_64240_6bb88f5575fd",   os_hint_windows     },
+    { "194_64_65535_15db81ff8b0d",  os_hint_ios_ipad_os },    
+    { "194_64_65535_d29295416479",  os_hint_macos       },
+    { "2_64_65535_d29295416479",    os_hint_macos       },
+    { NULL,                         os_hint_unknown     },
+  };
 
 static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_NO_RISK,                               NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY  },
@@ -6935,7 +6935,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
       if(ndpi_str->cfg.tcp_fingerprint_enabled &&
          flow->tcp.fingerprint == NULL) {
 	u_int8_t *t = (u_int8_t*)packet->tcp;
-	u_int16_t flags = ntohs(*((u_int16_t*)&t[12]));
+	u_int16_t flags = ntohs(*((u_int16_t*)&t[12])) & 0xFFF;
 	u_int16_t syn_mask = TH_SYN | TH_ECE | TH_CWR;
 	  
 	if((flags & syn_mask) && ((flags & TH_ACK) == 0)) {
