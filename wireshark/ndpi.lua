@@ -299,15 +299,20 @@ local ndpi_proto_meet     = "GoogleMeet" -- NDPI_PROTOCOL_GOOGLE_MEET
 -- ##############################################
 
 local tcp_fingeprint_db = {
-   [ '2_64_65535_8bf9e292397e']   = "FreeBSD",
-   [ '2_64_64800_83b2f9a5576c']   = "Linux",
-   [ '2_64_64240_2e3cee914fc1']   = "Linux",
-   [ '2_64_29200_2e3cee914fc1']   = "Linux",
-   [ '2_64_65535_d876f498b09e']   = "Android",
-   [ '2_128_64240_6bb88f5575fd']  = "Windows",
-   [ '194_64_65535_15db81ff8b0d'] = "iOS/iPad OS",
-   [ '194_64_65535_d29295416479'] = "macOS",
-   [ '2_64_65535_d29295416479']   = "macOS",
+   ['2_64_65535_8bf9e292397e']   = "FreeBSD",
+   ['2_64_64800_83b2f9a5576c']   = "Linux",
+   ['2_64_64240_2e3cee914fc1']   = "Linux",
+   ['2_64_29200_2e3cee914fc1']   = "Linux",
+   ['2_64_29200_d853e95bd80f']   = "Linux",
+   ['2_64_65535_d876f498b09e']   = "Android",
+   ['2_64_65535_685ad951a756']   = "Android",
+   ['2_64_65535_41a9d5af7dd3']   = "Android",
+   ['2_128_64240_6bb88f5575fd']  = "Windows",
+   ['194_64_65535_15db81ff8b0d'] = "iOS/iPad OS",
+   ['2_64_65535_41a9d5af7dd3']   = "iOS/iPad OS",
+   ['194_64_65535_dd5737e4fedb'] = "iOS/iPad OS",
+   ['194_64_65535_d29295416479'] = "macOS",
+   ['2_64_65535_d29295416479']   = "macOS",
 }
 
 -- ##############################################
@@ -1309,7 +1314,7 @@ function tcp_fingerprint(tvb, pinfo, tree, ip_version)
    local tcp_flags = getval(f_tcp_flags())
 
    if((tcp_flags == "0x0002")-- SYN
-      or (tcp_flags == "0x00c2") -- SYN / ECE/ CWR
+      or (tcp_flags == "0x00c2") -- SYN / ECE / CWR
    ) then
       local tcp_options = f_tcp_options()
       
