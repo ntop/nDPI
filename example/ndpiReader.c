@@ -699,9 +699,9 @@ static void help(u_int long_help) {
          "  -M                        | Memory allocation stats on data-path (only by the library).\n"
 	 "                            | It works only on single-thread configuration\n"
          "  --openvp_heuristics       | Enable OpenVPN heuristics.\n"
-         "                            | It is a shortcut to --cfg=openvpn.heuristics,0x01\n"
+         "                            | It is a shortcut to --cfg=openvpn,dpi.heuristics,0x01\n"
          "  --tls_heuristics          | Enable TLS heuristics.\n"
-         "                            | It is a shortcut to --cfg=tls.heuristics,0x07\n"
+         "                            | It is a shortcut to --cfg=tls,dpi.heuristics,0x07\n"
          "  --cfg=proto,param,value   | Configure the specific attribute of this protocol\n"
          ,
          human_readeable_string_len,
@@ -922,7 +922,7 @@ void extcap_config() {
   ndpi_free(protos);
   argidx++;
 
-  printf("arg {number=%d}{call=--openvp_heuristics}{display=Enable Obfuscated OpenVPN heuristics}"
+  printf("arg {number=%d}{call=--openvpn_heuristics}{display=Enable Obfuscated OpenVPN heuristics}"
 	 "{tooltip=Enable Obfuscated OpenVPN heuristics}{type=boolflag}{group=Options}\n", argidx++);
   printf("arg {number=%d}{call=--tls_heuristics}{display=Enable Obfuscated TLS heuristics}"
 	 "{tooltip=Enable Obfuscated TLS heuristics}{type=boolflag}{group=Options}\n", argidx++);
