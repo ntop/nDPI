@@ -300,18 +300,33 @@ local ndpi_proto_meet     = "GoogleMeet" -- NDPI_PROTOCOL_GOOGLE_MEET
 
 local tcp_fingeprint_db = {
    ['2_64_65535_8bf9e292397e']   = "FreeBSD",
+
    ['2_64_64800_83b2f9a5576c']   = "Linux",
    ['2_64_64240_2e3cee914fc1']   = "Linux",
    ['2_64_29200_2e3cee914fc1']   = "Linux",
    ['2_64_29200_d853e95bd80f']   = "Linux",
+   ['2_64_14600_8c07a80cc645']   = "Linux",
+   ['2_64_64240_2e3cee914fc1']   = "Linux",
+   ['2_64_29200_90541420d839']   = "Linux",
+   
    ['2_64_65535_d876f498b09e']   = "Android",
    ['2_64_65535_685ad951a756']   = "Android",
    ['2_64_65535_41a9d5af7dd3']   = "Android",
-   ['2_128_64240_6bb88f5575fd']  = "Windows",
+   ['2_64_65535_148107a0d970']   = "Android",
+   ['2_64_65535_f518bfb025b0']   = "Android",
+
+   ['2_128_64240_6bb88f5575fd']    = "Windows",
+   ['194_128_64240_0c6c715fcb8e']  = "Windows",
+   ['194_128_64240_29659b8d8574']  = "Windows",
+   ['194_128_32768_e75eea53a4fd']  = "Windows",
+   ['194_128_32768_84fee6d35dde']  = "Windows",
+   
    ['194_64_65535_15db81ff8b0d'] = "iOS/iPad OS",
    ['2_64_65535_41a9d5af7dd3']   = "iOS/iPad OS",
    ['194_64_65535_dd5737e4fedb'] = "iOS/iPad OS",
+   
    ['194_64_65535_d29295416479'] = "macOS",
+   ['194_64_65535_78dd6871cb6d'] = "macOS",
    ['2_64_65535_d29295416479']   = "macOS",
    ['2_64_65535_dd5737e4fedb']   = "macOS",
 }
