@@ -75,7 +75,7 @@ u_int8_t rtp_get_stream_type(u_int8_t payloadType, u_int8_t *s_type, u_int16_t s
   }
 
   /* Microsoft; from https://learn.microsoft.com/en-us/openspecs/office_protocols/ms-rtp/3b8dc3c6-34b8-4827-9b38-3b00154f471c */
-  if(sub_proto == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
+  if(sub_proto == NDPI_PROTOCOL_MSTEAMS_CALL) {
     switch(payloadType) {
     case 103: /* SILK Narrowband */
     case 104: /* SILK Wideband */

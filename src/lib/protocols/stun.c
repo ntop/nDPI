@@ -589,7 +589,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       }
       break;
 
-    /* Proprietary fields found on skype calls */
+    /* Proprietary fields found on Microsoft Teams/Skype calls */
     case 0x8054: /* Candidate Identifier: Either skype for business or "normal" skype with multiparty call */
     case 0x24DF:
     case 0x3802:
@@ -599,7 +599,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
     case 0x8006:
     case 0x8070: /* MS Implementation Version */
     case 0x8055: /* MS Service Quality */
-      *app_proto = NDPI_PROTOCOL_SKYPE_TEAMS_CALL;
+      *app_proto = NDPI_PROTOCOL_MSTEAMS_CALL;
       break;
 
     case 0x8029: /* ICE-CONTROLLED */
@@ -1010,7 +1010,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
        See: https://msopenspecs.azureedge.net/files/MS-TURN/%5bMS-TURN%5d.pdf 2.2.3 */
     if(packet->payload_packet_len >= 12 &&
        ntohs(get_u_int16_t(packet->payload, 0)) == 0xFF10 &&
-       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
+       flow->detected_protocol_stack[0] == NDPI_PROTOCOL_MSTEAMS_CALL) {
       u_int16_t ch_len;
 
       ch_len = ntohs(get_u_int16_t(packet->payload, 2));

@@ -5,7 +5,7 @@ cd "$(dirname "${0}")" || exit 1
 . ./common.sh || exit 1
 
 DEST_OUTLOOK=../src/lib/inc_generated/ndpi_ms_outlook_match.c.inc
-DEST_SKYPE_MSTEAMS=../src/lib/inc_generated/ndpi_ms_skype_teams_match.c.inc
+DEST_SKYPE_MSTEAMS=../src/lib/inc_generated/ndpi_msteams_match.c.inc
 DEST_ONEDRIVE=../src/lib/inc_generated/ndpi_ms_onedrive_match.c.inc
 DEST_OFFICE365=../src/lib/inc_generated/ndpi_ms_office365_match.c.inc
 TMP=/tmp/ms.json
@@ -45,7 +45,7 @@ jq -r '.[] | select(.serviceArea=="Skype") | .ips[]?' < $TMP | grep ':' | sort -
 is_file_empty "${LIST6}"
 ./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
 is_file_empty "${LIST6_MERGED}"
-./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_SKYPE_TEAMS $LIST6_MERGED > $DEST_SKYPE_MSTEAMS
+./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_MSTEAMS $LIST6_MERGED > $DEST_SKYPE_MSTEAMS
 is_file_empty "${DEST_SKYPE_MSTEAMS}"
 
 #ONEDRIVE

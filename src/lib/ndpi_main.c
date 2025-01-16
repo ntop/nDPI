@@ -82,7 +82,7 @@
 #include "inc_generated/ndpi_ms_office365_match.c.inc"
 #include "inc_generated/ndpi_ms_onedrive_match.c.inc"
 #include "inc_generated/ndpi_ms_outlook_match.c.inc"
-#include "inc_generated/ndpi_ms_skype_teams_match.c.inc"
+#include "inc_generated/ndpi_msteams_match.c.inc"
 #include "inc_generated/ndpi_google_match.c.inc"
 #include "inc_generated/ndpi_google_cloud_match.c.inc"
 #include "inc_generated/ndpi_crawlers_match.c.inc"
@@ -1187,16 +1187,16 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "BitTorrent", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT,
 			  ndpi_build_default_ports(ports_a, 51413, 53646, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 6771, 51413, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYPE_TEAMS,
-			  "Skype_Teams", NDPI_PROTOCOL_CATEGORY_VOIP,
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_FREE_125,
+			  "FREE_125", NDPI_PROTOCOL_CATEGORY_VOIP,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GOOGLE,
                           "Google", NDPI_PROTOCOL_CATEGORY_WEB,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SKYPE_TEAMS_CALL,
-			  "Skype_TeamsCall", NDPI_PROTOCOL_CATEGORY_VOIP,
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MSTEAMS_CALL,
+			  "TeamsCall", NDPI_PROTOCOL_CATEGORY_VOIP,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_TIKTOK,
@@ -3659,9 +3659,9 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_ms_outlook_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_ms_outlook_protocol_list_6);
   }
-  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_SKYPE_TEAMS)) {
-    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_skype_teams_protocol_list);
-    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_skype_teams_protocol_list_6);
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_MSTEAMS)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_msteams_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_msteams_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_PROTONVPN)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_protonvpn_protocol_list);
@@ -7645,7 +7645,7 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 
     if(s_match || d_match) {
       ndpi_int_change_protocol(flow,
-			       NDPI_PROTOCOL_SKYPE_TEAMS_CALL, master,
+			       NDPI_PROTOCOL_MSTEAMS_CALL, master,
 			       /* Keep the same confidence */
 			       flow->confidence);
 
@@ -7690,7 +7690,7 @@ static int ndpi_reconcile_msteams_call_udp_port(struct ndpi_flow_struct *flow,
 /* ********************************************************************************* */
 
 static void ndpi_reconcile_msteams_call_udp(struct ndpi_flow_struct *flow) {
-  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_MSTEAMS_CALL) {
     if(flow->l4_proto == IPPROTO_UDP) {
       u_int16_t sport = ntohs(flow->c_port);
       u_int16_t dport = ntohs(flow->s_port);
@@ -7775,7 +7775,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 			     &dummy, 0 /* Don't remove it as it can be used for other connections */,
 			     ndpi_get_current_time(flow))) {
 	ndpi_int_change_protocol(flow,
-				 NDPI_PROTOCOL_SKYPE_TEAMS, NDPI_PROTOCOL_TLS,
+				 NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_TLS,
 				 NDPI_CONFIDENCE_DPI_PARTIAL);
       }
     } else if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_TELEGRAM) {
@@ -7785,24 +7785,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       }
     break;
 
-  case NDPI_PROTOCOL_SKYPE_TEAMS:
-  case NDPI_PROTOCOL_SKYPE_TEAMS_CALL:
-    if(flow->l4_proto == IPPROTO_UDP && ndpi_str->msteams_cache) {
-      u_int16_t dummy;
-
-      if(ndpi_lru_find_cache(ndpi_str->msteams_cache, make_msteams_key(flow, 1 /* client */),
-			     &dummy, 0 /* Don't remove it as it can be used for other connections */,
-			     ndpi_get_current_time(flow))) {
-	  ret->proto.app_protocol = NDPI_PROTOCOL_MSTEAMS;
-
-	  /* Refresh cache */
-	  ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
-				make_msteams_key(flow, 1 /* client */),
-				0 /* dummy */,
-				ndpi_get_current_time(flow));
-      }
-    }
-
+  case NDPI_PROTOCOL_MSTEAMS_CALL:
     ndpi_reconcile_msteams_call_udp(flow);
     break;
 
@@ -7821,7 +7804,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
     case NDPI_PROTOCOL_MICROSOFT_365:
     case NDPI_PROTOCOL_MS_ONE_DRIVE:
     case NDPI_PROTOCOL_MS_OUTLOOK:
-    case NDPI_PROTOCOL_SKYPE_TEAMS:
+    case NDPI_PROTOCOL_MSTEAMS:
       ndpi_int_change_protocol(flow,
 			       flow->guessed_protocol_id_by_ip, flow->detected_protocol_stack[1],
 			       NDPI_CONFIDENCE_DPI_PARTIAL);

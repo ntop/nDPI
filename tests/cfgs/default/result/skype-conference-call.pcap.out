@@ -6,7 +6,7 @@ LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       2/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
-LRU cache msteams:    0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
@@ -20,8 +20,8 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   1/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Skype_TeamsCall	200	39687	1
+TeamsCall	200	39687	1
 
 Acceptable                     200 39687         1            
 
-	1	UDP 192.168.2.20:49282 <-> 104.46.40.49:60642 [proto: 78.38/STUN.Skype_TeamsCall][IP: 276/Azure][ClearText][Confidence: DPI][FPC: 78.38/STUN.Skype_TeamsCall, Confidence: DPI][DPI packets: 7][cat: VoIP/10][133 pkts/24845 bytes <-> 67 pkts/14842 bytes][Goodput ratio: 78/81][1.50 sec][bytes ratio: 0.252 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 10/8 147/120 22/27][Pkt Len c2s/s2c min/avg/max/stddev: 74/77 187/222 957/957 244/233][Mapped IP/Port: 104.46.40.49:60642][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 3478][Plen Bins: 0,41,17,28,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.2.20:49282 <-> 104.46.40.49:60642 [proto: 78.38/STUN.TeamsCall][IP: 276/Azure][ClearText][Confidence: DPI][FPC: 78.38/STUN.TeamsCall, Confidence: DPI][DPI packets: 7][cat: VoIP/10][133 pkts/24845 bytes <-> 67 pkts/14842 bytes][Goodput ratio: 78/81][1.50 sec][bytes ratio: 0.252 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 10/8 147/120 22/27][Pkt Len c2s/s2c min/avg/max/stddev: 74/77 187/222 957/957 244/233][Mapped IP/Port: 104.46.40.49:60642][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 3478][Plen Bins: 0,41,17,28,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
