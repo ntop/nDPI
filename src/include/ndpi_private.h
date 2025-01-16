@@ -242,7 +242,15 @@ struct ndpi_detection_module_config_struct {
   int tls_app_blocks_tracking_enabled;
   int tls_heuristics;
   int tls_heuristics_max_packets;
+  int tls_versions_supported_enabled;
+  int tls_alpn_negotiated_enabled;
+  int tls_cipher_enabled;
   int tls_sha1_fingerprint_enabled;
+  int tls_cert_server_names_enabled;
+  int tls_cert_validity_enabled;
+  int tls_cert_issuer_enabled;
+  int tls_cert_subject_enabled;
+  int tls_broswer_enabled;
   int tls_ja3s_fingerprint_enabled;
   int tls_ja4c_fingerprint_enabled;
   int tls_ja4r_fingerprint_enabled;

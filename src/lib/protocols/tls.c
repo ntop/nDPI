@@ -152,6 +152,50 @@ static u_int32_t __get_master(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
+/* TODO: rename */
+static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+                                     struct ndpi_flow_struct *flow)
+{
+  /* Common path: found handshake on both directions */
+  if(flow->tls_quic.certificate_processed == 1 && flow->protos.tls_quic.client_hello_processed)
+    return 0;
+  /* Application Data on both directions: handshake already ended (did we miss it?) */
+  if(flow->l4.tcp.tls.app_data_seen[0] == 1 && flow->l4.tcp.tls.app_data_seen[1] == 1)
+    return 0;
+  /* Handshake on one direction and Application Data on the other */
+  if((flow->protos.tls_quic.client_hello_processed && flow->l4.tcp.tls.app_data_seen[!flow->protos.tls_quic.ch_direction] == 1) ||
+     (flow->protos.tls_quic.server_hello_processed && flow->l4.tcp.tls.app_data_seen[flow->protos.tls_quic.ch_direction] == 1))
+    return 0;
+
+  /* Are we interested only in the (sub)-classification? */
+
+  if(/* Subclassification */
+     flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN &&
+     /* No metadata from SH or certificate */
+     !ndpi_struct->cfg.tls_alpn_negotiated_enabled &&
+     !ndpi_struct->cfg.tls_cipher_enabled &&
+     !ndpi_struct->cfg.tls_sha1_fingerprint_enabled &&
+     !ndpi_struct->cfg.tls_cert_server_names_enabled &&
+     !ndpi_struct->cfg.tls_cert_validity_enabled &&
+     !ndpi_struct->cfg.tls_cert_issuer_enabled &&
+     !ndpi_struct->cfg.tls_cert_subject_enabled &&
+     !ndpi_struct->cfg.tls_broswer_enabled &&
+     !ndpi_struct->cfg.tls_ja3s_fingerprint_enabled &&
+     /* No flow risks from SH or certificate: we should have disabled all
+        metadata needed for flow risks, so we should not need to explicitly
+        check them */
+     /* Ookla aggressiveness has no impact here because it is evaluated only
+        without sub-classification */
+     /* TLS heuristics */
+     (ndpi_struct->cfg.tls_heuristics == 0 || is_flow_addr_informative(flow)))
+    return 0;
+
+  return 1;
+}
+
+
+/* **************************************** */
+
 /* Heuristic to detect proxied/obfuscated TLS flows, based on
    https://www.usenix.org/conference/usenixsecurity24/presentation/xue-fingerprinting.
    Main differences between the paper and our implementation:
@@ -767,7 +811,8 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	printf("[TLS] %s() IssuerDN [%s]\n", __FUNCTION__, rdnSeqBuf);
 #endif
 
-	if(rdn_len && (flow->protos.tls_quic.issuerDN == NULL)) {
+	if(rdn_len && (flow->protos.tls_quic.issuerDN == NULL) &&
+	   ndpi_struct->cfg.tls_cert_issuer_enabled) {
 	  flow->protos.tls_quic.issuerDN = ndpi_strdup(rdnSeqBuf);
 	  if(ndpi_normalize_printable_string(rdnSeqBuf, rdn_len) == 0) {
 	    char str[64];
@@ -781,7 +826,8 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
       }
 
       if(i + 3 < certificate_len &&
-	 (offset+packet->payload[i+3]) < packet->payload_packet_len) {
+	 (offset+packet->payload[i+3]) < packet->payload_packet_len &&
+	 ndpi_struct->cfg.tls_cert_validity_enabled) {
 	char utcDate[32];
         u_int8_t len = packet->payload[i+3];
 
@@ -992,22 +1038,24 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 		      }
 		    }
 
-		    if(flow->protos.tls_quic.server_names == NULL)
-		      flow->protos.tls_quic.server_names = ndpi_strdup(dNSName),
-			flow->protos.tls_quic.server_names_len = strlen(dNSName);
-		    else if((u_int16_t)(flow->protos.tls_quic.server_names_len + dNSName_len + 1) > flow->protos.tls_quic.server_names_len) {
-		      u_int16_t newstr_len = flow->protos.tls_quic.server_names_len + dNSName_len + 1;
-		      char *newstr = (char*)ndpi_realloc(flow->protos.tls_quic.server_names,
-							 flow->protos.tls_quic.server_names_len+1, newstr_len+1);
+		    if(ndpi_struct->cfg.tls_cert_server_names_enabled) {
+                      if(flow->protos.tls_quic.server_names == NULL) {
+                        flow->protos.tls_quic.server_names = ndpi_strdup(dNSName);
+                        flow->protos.tls_quic.server_names_len = strlen(dNSName);
+                      } else if((u_int16_t)(flow->protos.tls_quic.server_names_len + dNSName_len + 1) > flow->protos.tls_quic.server_names_len) {
+                        u_int16_t newstr_len = flow->protos.tls_quic.server_names_len + dNSName_len + 1;
+                        char *newstr = (char*)ndpi_realloc(flow->protos.tls_quic.server_names,
+                                                           flow->protos.tls_quic.server_names_len+1, newstr_len+1);
 
-		      if(newstr) {
-			flow->protos.tls_quic.server_names = newstr;
-			flow->protos.tls_quic.server_names[flow->protos.tls_quic.server_names_len] = ',';
-			strncpy(&flow->protos.tls_quic.server_names[flow->protos.tls_quic.server_names_len+1],
-				dNSName, dNSName_len+1);
-			flow->protos.tls_quic.server_names[newstr_len] = '\0';
-			flow->protos.tls_quic.server_names_len = newstr_len;
-		      }
+                        if(newstr) {
+                          flow->protos.tls_quic.server_names = newstr;
+                          flow->protos.tls_quic.server_names[flow->protos.tls_quic.server_names_len] = ',';
+                          strncpy(&flow->protos.tls_quic.server_names[flow->protos.tls_quic.server_names_len+1],
+                                  dNSName, dNSName_len+1);
+                          flow->protos.tls_quic.server_names[newstr_len] = '\0';
+                          flow->protos.tls_quic.server_names_len = newstr_len;
+                        }
+                      }
 		    }
 
 		    if(ndpi_struct->cfg.tls_subclassification_enabled &&
@@ -1047,7 +1095,8 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
   } /* for */
 
   if(rdn_len && (flow->protos.tls_quic.subjectDN == NULL)) {
-    flow->protos.tls_quic.subjectDN = ndpi_strdup(rdnSeqBuf);
+    if(ndpi_struct->cfg.tls_cert_subject_enabled)
+      flow->protos.tls_quic.subjectDN = ndpi_strdup(rdnSeqBuf);
 
     if(ndpi_struct->cfg.tls_subclassification_enabled &&
        flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
@@ -1307,7 +1356,7 @@ static void ndpi_looks_like_tls(struct ndpi_detection_module_struct *ndpi_struct
 /* **************************************** */
 
 int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-			struct ndpi_flow_struct *flow) {
+                        struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t something_went_wrong = 0;
   message_t *message;
@@ -1506,17 +1555,15 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
   }
 
+#ifdef DEBUG_TLS_MEMORY
+  printf("[TLS] Eval if keep going [%p]\n", flow->extra_packets_func);
+#endif
+
   if(something_went_wrong
      || ((ndpi_struct->num_tls_blocks_to_follow > 0)
 	 && (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->num_tls_blocks_to_follow))
      || ((ndpi_struct->num_tls_blocks_to_follow == 0)
-	 && (/* Common path: found handshake on both directions */
-	     (flow->tls_quic.certificate_processed == 1 && flow->protos.tls_quic.client_hello_processed) ||
-	     /* No handshake at all but Application Data on both directions */
-	     (flow->l4.tcp.tls.app_data_seen[0] == 1 && flow->l4.tcp.tls.app_data_seen[1] == 1) ||
-	     /* Handshake on one direction and Application Data on the other */
-	     (flow->protos.tls_quic.client_hello_processed && flow->l4.tcp.tls.app_data_seen[!flow->protos.tls_quic.ch_direction] == 1) ||
-	     (flow->protos.tls_quic.server_hello_processed && flow->l4.tcp.tls.app_data_seen[flow->protos.tls_quic.ch_direction] == 1)))
+	 && (!keep_extra_dissection_tcp(ndpi_struct, flow)))
      ) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] No more blocks\n");
@@ -2297,15 +2344,18 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	return(0); /* Not found */
 
       ja.server.num_ciphers = 1, ja.server.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
-      if((flow->protos.tls_quic.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja.server.cipher[0])) != NDPI_CIPHER_SAFE) {
-	char str[64];
-	char unknown_cipher[8];
 
-	snprintf(str, sizeof(str), "Cipher %s", ndpi_cipher2str(ja.server.cipher[0], unknown_cipher));
-	ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_WEAK_CIPHER, str);
+      if(ndpi_struct->cfg.tls_cipher_enabled) {
+        if((flow->protos.tls_quic.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja.server.cipher[0])) != NDPI_CIPHER_SAFE) {
+          char str[64];
+          char unknown_cipher[8];
+
+          snprintf(str, sizeof(str), "Cipher %s", ndpi_cipher2str(ja.server.cipher[0], unknown_cipher));
+          ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_WEAK_CIPHER, str);
+        }
+
+        flow->protos.tls_quic.server_cipher = ja.server.cipher[0];
       }
-
-      flow->protos.tls_quic.server_cipher = ja.server.cipher[0];
 
 #ifdef DEBUG_TLS
       printf("TLS [server][session_id_len: %u][cipher: %04X]\n", session_id_len, ja.server.cipher[0]);
@@ -2409,7 +2459,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  if(ndpi_normalize_printable_string(alpn_str, alpn_str_len) == 0)
 	    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, alpn_str);
 
-	  if(flow->protos.tls_quic.negotiated_alpn == NULL)
+	  if(flow->protos.tls_quic.negotiated_alpn == NULL &&
+	     ndpi_struct->cfg.tls_alpn_negotiated_enabled)
 	    flow->protos.tls_quic.negotiated_alpn = ndpi_strdup(alpn_str);
 
 	  /* Check ALPN only if not already checked (client-side) */
@@ -2626,27 +2677,29 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  i += 2;
 	} /* for */
 
-	/* NOTE:
-	   we do not check for duplicates as with signatures because
-	   this is time consuming and we want to avoid overhead whem possible
-	*/
-	if(this_is_not_safari)
-	  flow->protos.tls_quic.browser_heuristics.is_safari_tls = 0;
-	else if((safari_ciphers == 12) || (this_is_not_safari && looks_like_safari_on_big_sur))
-	  flow->protos.tls_quic.browser_heuristics.is_safari_tls = 1;
+	if(ndpi_struct->cfg.tls_broswer_enabled) {
+          /* NOTE:
+             we do not check for duplicates as with signatures because
+             this is time consuming and we want to avoid overhead whem possible
+          */
+          if(this_is_not_safari)
+            flow->protos.tls_quic.browser_heuristics.is_safari_tls = 0;
+          else if((safari_ciphers == 12) || (this_is_not_safari && looks_like_safari_on_big_sur))
+            flow->protos.tls_quic.browser_heuristics.is_safari_tls = 1;
 
-	if(chrome_ciphers == 13)
-	  flow->protos.tls_quic.browser_heuristics.is_chrome_tls = 1;
+          if(chrome_ciphers == 13)
+            flow->protos.tls_quic.browser_heuristics.is_chrome_tls = 1;
 
-	/* Note that both Safari and Chrome can overlap */
+          /* Note that both Safari and Chrome can overlap */
 #ifdef DEBUG_HEURISTIC
-	printf("[CIPHERS] [is_chrome_tls: %u (%u)][is_safari_tls: %u (%u)][this_is_not_safari: %u]\n",
-	       flow->protos.tls_quic.browser_heuristics.is_chrome_tls,
-	       chrome_ciphers,
-	       flow->protos.tls_quic.browser_heuristics.is_safari_tls,
-	       safari_ciphers,
-	       this_is_not_safari);
+          printf("[CIPHERS] [is_chrome_tls: %u (%u)][is_safari_tls: %u (%u)][this_is_not_safari: %u]\n",
+                 flow->protos.tls_quic.browser_heuristics.is_chrome_tls,
+                 chrome_ciphers,
+                 flow->protos.tls_quic.browser_heuristics.is_safari_tls,
+                 safari_ciphers,
+                 this_is_not_safari);
 #endif
+	}
       } else {
 	invalid_ja = 1;
 #ifdef DEBUG_TLS
@@ -2847,8 +2900,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 	      } else if(extension_id == 13 /* signature algorithms */ &&
 	                offset+extension_offset+1 < total_len) {
-		int s_offset = offset+extension_offset, safari_signature_algorithms = 0,
-		  chrome_signature_algorithms = 0, duplicate_found = 0, last_signature = 0, id;
+		int s_offset = offset+extension_offset, safari_signature_algorithms = 0, id;
 		u_int16_t tot_signature_algorithms_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
 
 #ifdef DEBUG_TLS
@@ -2880,95 +2932,99 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  if(rc < 0) break;
 		}
 
-		for(i=0; i<tot_signature_algorithms_len && s_offset + (int)i + 2 < packet->payload_packet_len; i+=2) {
-		  u_int16_t signature_algo = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
+		if(ndpi_struct->cfg.tls_broswer_enabled) {
+	          int chrome_signature_algorithms = 0, duplicate_found = 0, last_signature = 0;
 
-		  if(last_signature == signature_algo) {
-		    /* Consecutive duplication */
-		    duplicate_found = 1;
-		    continue;
-		  } else {
-		    /* Check for other duplications */
-		    u_int all_ok = 1;
+                  for(i=0; i<tot_signature_algorithms_len && s_offset + (int)i + 2 < packet->payload_packet_len; i+=2) {
+                    u_int16_t signature_algo = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 
-		    for(j=0; j<tot_signature_algorithms_len; j+=2) {
-		      if(j != i && s_offset + (int)j + 2 < packet->payload_packet_len) {
-			u_int16_t j_signature_algo = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+j]));
+                    if(last_signature == signature_algo) {
+                      /* Consecutive duplication */
+                      duplicate_found = 1;
+                      continue;
+                    } else {
+                      /* Check for other duplications */
+                      u_int all_ok = 1;
 
-			if((signature_algo == j_signature_algo)
-			   && (i < j) /* Don't skip both of them */) {
+                      for(j=0; j<tot_signature_algorithms_len; j+=2) {
+                        if(j != i && s_offset + (int)j + 2 < packet->payload_packet_len) {
+                          u_int16_t j_signature_algo = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+j]));
+
+                          if((signature_algo == j_signature_algo)
+                             && (i < j) /* Don't skip both of them */) {
 #ifdef DEBUG_HEURISTIC
-			  printf("[SIGNATURE] [TLS Signature Algorithm] Skipping duplicate 0x%04X\n", signature_algo);
+                            printf("[SIGNATURE] [TLS Signature Algorithm] Skipping duplicate 0x%04X\n", signature_algo);
 #endif
 
-			  duplicate_found = 1, all_ok = 0;
-			  break;
-			}
-		      }
-		    }
+                            duplicate_found = 1, all_ok = 0;
+                            break;
+                          }
+                        }
+                      }
 
-		    if(!all_ok)
-		      continue;
-		  }
+                      if(!all_ok)
+                        continue;
+                    }
 
-		  last_signature = signature_algo;
+                    last_signature = signature_algo;
 
 #ifdef DEBUG_HEURISTIC
-		  printf("[SIGNATURE] [TLS Signature Algorithm] 0x%04X\n", signature_algo);
+                    printf("[SIGNATURE] [TLS Signature Algorithm] 0x%04X\n", signature_algo);
 #endif
-		  switch(signature_algo) {
-		  case ECDSA_SECP521R1_SHA512:
-		    flow->protos.tls_quic.browser_heuristics.is_firefox_tls = 1;
-		    break;
+                    switch(signature_algo) {
+                    case ECDSA_SECP521R1_SHA512:
+                      flow->protos.tls_quic.browser_heuristics.is_firefox_tls = 1;
+                      break;
 
-		  case ECDSA_SECP256R1_SHA256:
-		  case ECDSA_SECP384R1_SHA384:
-		  case RSA_PKCS1_SHA256:
-		  case RSA_PKCS1_SHA384:
-		  case RSA_PKCS1_SHA512:
-		  case RSA_PSS_RSAE_SHA256:
-		  case RSA_PSS_RSAE_SHA384:
-		  case RSA_PSS_RSAE_SHA512:
-		    chrome_signature_algorithms++, safari_signature_algorithms++;
+                    case ECDSA_SECP256R1_SHA256:
+                    case ECDSA_SECP384R1_SHA384:
+                    case RSA_PKCS1_SHA256:
+                    case RSA_PKCS1_SHA384:
+                    case RSA_PKCS1_SHA512:
+                    case RSA_PSS_RSAE_SHA256:
+                    case RSA_PSS_RSAE_SHA384:
+                    case RSA_PSS_RSAE_SHA512:
+                      chrome_signature_algorithms++, safari_signature_algorithms++;
 #ifdef DEBUG_HEURISTIC
-		    printf("[SIGNATURE] [Chrome/Safari] Found 0x%04X [chrome: %u][safari: %u]\n",
-			   signature_algo, chrome_signature_algorithms, safari_signature_algorithms);
+                      printf("[SIGNATURE] [Chrome/Safari] Found 0x%04X [chrome: %u][safari: %u]\n",
+                             signature_algo, chrome_signature_algorithms, safari_signature_algorithms);
 #endif
 
-		    break;
-		  }
+                      break;
+                    }
+                  }
+
+#ifdef DEBUG_HEURISTIC
+                  printf("[SIGNATURE] [safari_signature_algorithms: %u][chrome_signature_algorithms: %u]\n",
+                         safari_signature_algorithms, chrome_signature_algorithms);
+#endif
+
+                  if(flow->protos.tls_quic.browser_heuristics.is_firefox_tls)
+                    flow->protos.tls_quic.browser_heuristics.is_safari_tls = 0,
+                      flow->protos.tls_quic.browser_heuristics.is_chrome_tls = 0;
+
+                  if(safari_signature_algorithms != 8)
+                    flow->protos.tls_quic.browser_heuristics.is_safari_tls = 0;
+
+                  if((chrome_signature_algorithms != 8) || duplicate_found)
+                    flow->protos.tls_quic.browser_heuristics.is_chrome_tls = 0;
+
+                  /* Avoid Chrome and Safari overlaps, thing that cannot happen with Firefox */
+                  if(flow->protos.tls_quic.browser_heuristics.is_safari_tls)
+                    flow->protos.tls_quic.browser_heuristics.is_chrome_tls = 0;
+
+                  if((flow->protos.tls_quic.browser_heuristics.is_chrome_tls == 0)
+                     && duplicate_found)
+                    flow->protos.tls_quic.browser_heuristics.is_safari_tls = 1; /* Safari */
+
+#ifdef DEBUG_HEURISTIC
+                  printf("[SIGNATURE] [is_firefox_tls: %u][is_chrome_tls: %u][is_safari_tls: %u][duplicate_found: %u]\n",
+                         flow->protos.tls_quic.browser_heuristics.is_firefox_tls,
+                         flow->protos.tls_quic.browser_heuristics.is_chrome_tls,
+                         flow->protos.tls_quic.browser_heuristics.is_safari_tls,
+                         duplicate_found);
+#endif
 		}
-
-#ifdef DEBUG_HEURISTIC
-		printf("[SIGNATURE] [safari_signature_algorithms: %u][chrome_signature_algorithms: %u]\n",
-		       safari_signature_algorithms, chrome_signature_algorithms);
-#endif
-
-		if(flow->protos.tls_quic.browser_heuristics.is_firefox_tls)
-		  flow->protos.tls_quic.browser_heuristics.is_safari_tls = 0,
-		    flow->protos.tls_quic.browser_heuristics.is_chrome_tls = 0;
-
-		if(safari_signature_algorithms != 8)
-		  flow->protos.tls_quic.browser_heuristics.is_safari_tls = 0;
-
-		if((chrome_signature_algorithms != 8) || duplicate_found)
-		  flow->protos.tls_quic.browser_heuristics.is_chrome_tls = 0;
-
-		/* Avoid Chrome and Safari overlaps, thing that cannot happen with Firefox */
-		if(flow->protos.tls_quic.browser_heuristics.is_safari_tls)
-		  flow->protos.tls_quic.browser_heuristics.is_chrome_tls = 0;
-
-		if((flow->protos.tls_quic.browser_heuristics.is_chrome_tls == 0)
-		   && duplicate_found)
-		  flow->protos.tls_quic.browser_heuristics.is_safari_tls = 1; /* Safari */
-
-#ifdef DEBUG_HEURISTIC
-		printf("[SIGNATURE] [is_firefox_tls: %u][is_chrome_tls: %u][is_safari_tls: %u][duplicate_found: %u]\n",
-		       flow->protos.tls_quic.browser_heuristics.is_firefox_tls,
-		       flow->protos.tls_quic.browser_heuristics.is_chrome_tls,
-		       flow->protos.tls_quic.browser_heuristics.is_safari_tls,
-		       duplicate_found);
-#endif
 
 		if(i > 0 && i >= tot_signature_algorithms_len) {
 		  ja.client.signature_algorithms_str[i*2 - 1] = '\0';
@@ -3100,7 +3156,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  printf("Client TLS [SUPPORTED_VERSIONS: %s]\n", version_str);
 #endif
 
-		  if(flow->protos.tls_quic.tls_supported_versions == NULL)
+		  if(flow->protos.tls_quic.tls_supported_versions == NULL &&
+		     ndpi_struct->cfg.tls_versions_supported_enabled)
 		    flow->protos.tls_quic.tls_supported_versions = ndpi_strdup(version_str);
 		}
 	      } else if(extension_id == 65486 /* encrypted server name */) {
