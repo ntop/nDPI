@@ -7281,7 +7281,7 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
       if(ndpi_str->cfg.tcp_ack_paylod_heuristic && tcp_ack_padding(packet)) {
         NDPI_LOG_DBG2(ndpi_str, "TCP ACK with zero padding. Ignoring\n");
         packet->tcp_retransmission = 1;
-      } else if(flow->next_tcp_seq_nr[0] == 0 || flow->next_tcp_seq_nr[1] == 0 ||
+      } else if(flow->l4.tcp.next_tcp_seq_nr[0] == 0 || flow->l4.tcp.next_tcp_seq_nr[1] == 0 ||
 	 (tcph->syn && flow->packet_counter == 0)) {
 	/* initialize tcp sequence counters */
 	/* the ack flag needs to be set to get valid sequence numbers from the other
@@ -7294,7 +7294,7 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
 	 * If we receive multiple syn-ack (before any real data), keep the last one
 	 */
 	if(tcph->ack != 0) {
-	  flow->next_tcp_seq_nr[packet->packet_direction] =
+	  flow->l4.tcp.next_tcp_seq_nr[packet->packet_direction] =
 	    ntohl(tcph->seq) + (tcph->syn ? 1 : packet->payload_packet_len);
 
 	  /*
@@ -7302,33 +7302,33 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
 	    but that is already started when nDPI being to process it. See also (***) below
 	  */
 	  if(flow->num_processed_pkts > 1)
-	    flow->next_tcp_seq_nr[1 - packet->packet_direction] = ntohl(tcph->ack_seq);
+	    flow->l4.tcp.next_tcp_seq_nr[1 - packet->packet_direction] = ntohl(tcph->ack_seq);
 	}
       } else if(packet->payload_packet_len > 0) {
 	/* check tcp sequence counters */
-	if(((u_int32_t)(ntohl(tcph->seq) - flow->next_tcp_seq_nr[packet->packet_direction])) >
+	if(((u_int32_t)(ntohl(tcph->seq) - flow->l4.tcp.next_tcp_seq_nr[packet->packet_direction])) >
 	   ndpi_str->tcp_max_retransmission_window_size) {
-	  if(flow->last_tcp_pkt_payload_len > 0)
+	  if(flow->l4.tcp.last_tcp_pkt_payload_len > 0)
 	    packet->tcp_retransmission = 1;
 
 	  /* CHECK IF PARTIAL RETRY IS HAPPENING */
-	  if((flow->next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq) <
+	  if((flow->l4.tcp.next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq) <
 	      packet->payload_packet_len)) {
 	    if(flow->num_processed_pkts > 1) /* See also (***) above */
-	      flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
+	      flow->l4.tcp.next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
 	  }
 	}
 	else {
-	  flow->next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
+	  flow->l4.tcp.next_tcp_seq_nr[packet->packet_direction] = ntohl(tcph->seq) + packet->payload_packet_len;
 	}
       }
 
       if(tcph->rst) {
-	flow->next_tcp_seq_nr[0] = 0;
-	flow->next_tcp_seq_nr[1] = 0;
+	flow->l4.tcp.next_tcp_seq_nr[0] = 0;
+	flow->l4.tcp.next_tcp_seq_nr[1] = 0;
       }
 
-      flow->last_tcp_pkt_payload_len = packet->payload_packet_len;
+      flow->l4.tcp.last_tcp_pkt_payload_len = packet->payload_packet_len;
     } else if(udph != NULL) {
       if(ndpi_str->cfg.direction_detect_enabled &&
          (udph->source != udph->dest))
@@ -7418,9 +7418,6 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
     if(flow->packet_direction_complete_counter[packet->packet_direction] < MAX_PACKET_COUNTER) {
       flow->packet_direction_complete_counter[packet->packet_direction]++;
     }
-
-    if(packet->payload_packet_len > 0)
-      flow->packet_direction_with_payload_observed[packet->packet_direction] = 1;
 
     if(!ndpi_is_multi_or_broadcast(packet)) {
       /* ! (multicast or broadcast) */
@@ -8002,8 +7999,8 @@ static void ndpi_check_probing_attempt(struct ndpi_detection_module_struct *ndpi
   if((flow->l4_proto == IPPROTO_TCP)
      && (flow->l4.tcp.cli2srv_tcp_flags & TH_PUSH)
      && (flow->l4.tcp.srv2cli_tcp_flags & TH_PUSH)) {
-    if(flow->packet_direction_with_payload_observed[0]
-       && flow->packet_direction_with_payload_observed[1]) {
+    if(flow->packet_direction_counter[0]
+       && flow->packet_direction_counter[1]) {
       /* Both directions observed */
       /* Nothing to do */
     } else {

@@ -805,6 +805,51 @@ struct ndpi_lru_cache {
 /* ************************************************** */
 
 struct ndpi_flow_tcp_struct {
+  /* TCP sequence number */
+  u_int32_t next_tcp_seq_nr[2];
+  u_int16_t last_tcp_pkt_payload_len;
+
+  /* Part of the TCP header */
+  u_int8_t cli2srv_tcp_flags, srv2cli_tcp_flags;
+  u_int32_t seen_syn:1, seen_syn_ack:1, seen_ack:1;
+
+  /* NDPI_PROTOCOL_IRC */
+  u_int32_t irc_3a_counter:3;
+
+  /* NDPI_PROTOCOL_USENET */
+  u_int32_t usenet_stage:2;
+
+  /* NDPI_PROTOCOL_HTTP */
+  u_int32_t http_stage:3;
+  u_int32_t http_asymmetric_stage:2;
+
+  /* NDPI_PROTOCOL_GNUTELLA */
+  u_int32_t gnutella_stage:2;                  // 0 - 2
+
+  /* NDPI_PROTOCOL_SSH */
+  u_int32_t ssh_stage:3;
+
+  /* NDPI_PROTOCOL_VNC */
+  u_int32_t vnc_stage:2;                        // 0 - 3
+
+  /* NDPI_PROTOCOL_TELNET */
+  u_int32_t telnet_stage:2;                     // 0 - 2
+
+  /* NDPI_PROTOCOL_RADMIN */
+  u_int32_t radmin_stage:1;
+
+  /* NDPI_PROTOCOL_FTP_CONTROL */
+  u_int32_t ftp_control_stage:2;
+
+  /* NDPI_PROTOCOL_SOAP */
+  u_int32_t soap_stage:1;
+
+  /* NDPI_PROTOCOL_SOCKS */
+  u_int32_t socks5_stage:2, socks4_stage:2;
+
+  /* NDPI_PROTOCOL_Z3950 */
+  u_int32_t z3950_stage:2;
+
   /* NDPI_PROTOCOL_MAIL_SMTP */
   /* NDPI_PROTOCOL_MAIL_POP */
   /* NDPI_PROTOCOL_MAIL_IMAP */
@@ -814,6 +859,9 @@ struct ndpi_flow_tcp_struct {
     u_int8_t auth_found:1, auth_failed:1, auth_tls:1, auth_done:1, _pad:4;
     char username[32], password[16];
   } ftp_imap_pop_smtp;
+
+  /* NDPI_PROTOCOL_LOTUS_NOTES */
+  u_int8_t lotus_notes_packet_id;
 
   /* NDPI_PROTOCOL_MAIL_SMTP */
   u_int16_t smtp_command_bitmask;
@@ -830,31 +878,11 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_GNUTELLA */
   u_int8_t gnutella_msg_id[3];
 
-  /* NDPI_PROTOCOL_IRC */
-  u_int32_t irc_3a_counter:3;
+  /* NDPI_PROTOCOL_NEST_LOG_SINK */
+  u_int8_t nest_log_sink_matches;
 
-  /* NDPI_PROTOCOL_USENET */
-  u_int32_t usenet_stage:2;
-
-  /* NDPI_PROTOCOL_HTTP */
-  u_int32_t http_stage:3;
-  u_int32_t http_asymmetric_stage:2;
-
-  /* NDPI_PROTOCOL_GNUTELLA */
-  u_int32_t gnutella_stage:2;		       // 0 - 2
-
-  /* NDPI_PROTOCOL_SSH */
-  u_int32_t ssh_stage:3;
-
-  /* NDPI_PROTOCOL_VNC */
-  u_int32_t vnc_stage:2;			// 0 - 3
-
-  /* NDPI_PROTOCOL_TELNET */
-  u_int32_t telnet_stage:2;			// 0 - 2
-
-  /* NDPI_PROTOCOL_RTMP */
-  u_int32_t rtmp_stage:2;
-  u_int16_t rtmp_client_buffer_len;
+  /* NDPI_PROTOCOL_MEMCACHED */
+  u_int8_t memcached_matches;
 
   struct {
     /* NDPI_PROTOCOL_TLS */
@@ -863,12 +891,16 @@ struct ndpi_flow_tcp_struct {
     int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
   } tls;
 
+  /* NDPI_PROTOCOL_ZMQ */
+  u_char prev_zmq_pkt[10];
+  u_int8_t prev_zmq_pkt_len;
+
+  /* NDPI_PROTOCOL_RTMP */
+  u_int16_t rtmp_client_buffer_len;
+  u_int32_t rtmp_stage:2;
+
   /* NDPI_PROTOCOL_POSTGRES */
   u_int32_t postgres_stage:3;
-
-  /* Part of the TCP header. */
-  u_int32_t seen_syn:1, seen_syn_ack:1, seen_ack:1, __notused:29;
-  u_int8_t cli2srv_tcp_flags, srv2cli_tcp_flags;
   
   /* NDPI_PROTOCOL_ICECAST */
   u_int32_t icecast_stage:1;
@@ -884,25 +916,6 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_MAIL_IMAP */
   u_int32_t mail_imap_stage:3, mail_imap_starttls:2;
-
-  /* NDPI_PROTOCOL_SOAP */
-  u_int32_t soap_stage:1;
-
-  /* NDPI_PROTOCOL_LOTUS_NOTES */
-  u_int8_t lotus_notes_packet_id;
-
-  /* NDPI_PROTOCOL_ZMQ */
-  u_int8_t prev_zmq_pkt_len;
-  u_char prev_zmq_pkt[10];
-
-  /* NDPI_PROTOCOL_MEMCACHED */
-  u_int8_t memcached_matches;
-
-  /* NDPI_PROTOCOL_NEST_LOG_SINK */
-  u_int8_t nest_log_sink_matches;
-
-  /* NDPI_PROTOCOL_RADMIN */
-  u_int32_t radmin_stage:1;
 };
 
 /* ************************************************** */
@@ -928,27 +941,33 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_ZOOM */
   u_int32_t zoom_p2p:1;
 
-  /* NDPI_PROTOCOL_EPICGAMES */
-  u_int32_t epicgames_stage:1;
-  u_int32_t epicgames_word;
-
   /* NDPI_PROTOCOL_RAKNET */
   u_int32_t raknet_custom:1;
 
-  /* NDPI_PROTOCOL_EAQ */
-  u_int8_t eaq_pkt_id;
-  u_int32_t eaq_sequence;
+  /* NDPI_PROTOCOL_MUMBLE */
+  u_int32_t mumble_stage:1;
+
+  /* NDPI_PROTOCOL_EPICGAMES */
+  u_int32_t epicgames_stage:1;
+  u_int32_t epicgames_word;
 
   /* NDPI_PROTOCOL_RX */
   u_int32_t rx_conn_epoch;
   u_int32_t rx_conn_id;
 
+  /* NDPI_PROTOCOL_WIREGUARD */
+  u_int32_t wireguard_peer_index[2];
+  u_int8_t wireguard_stage;
+
   /* NDPI_PROTOCOL_MEMCACHED */
   u_int8_t memcached_matches;
 
-  /* NDPI_PROTOCOL_WIREGUARD */
-  u_int8_t wireguard_stage;
-  u_int32_t wireguard_peer_index[2];
+  /* NDPI_PROTOCOL_EAQ */
+  u_int8_t eaq_pkt_id;
+  u_int32_t eaq_sequence;
+
+  /* NDPI_PROTOCOL_MUMBLE */
+  u_int64_t mumble_ident;
 
   /* NDPI_PROTOCOL_QUIC */
   u_int8_t *quic_reasm_buf;
@@ -975,9 +994,6 @@ struct ndpi_flow_udp_struct {
   u_int16_t tftp_data_num;
   u_int16_t tftp_ack_num;
 
-  /* NDPI_PROTOCOL_MUMBLE */
-  u_int8_t mumble_stage:1;
-  u_int64_t mumble_ident;
 };
 
 /* ************************************************** */
@@ -1272,7 +1288,7 @@ struct ndpi_flow_struct {
   u_int16_t guessed_protocol_id;       /* Classification by-port. Set with the first pkt and never updated */
   u_int16_t guessed_protocol_id_by_ip; /* Classification by-ip. Set with the first pkt and never updated */
   u_int16_t fast_callback_protocol_id; /* Partial/incomplete classification. Used internally as first callback when iterating all the protocols */
-  u_int16_t guessed_category, guessed_header_category;
+  u_int16_t guessed_header_category;
   u_int8_t l4_proto, protocol_id_already_guessed:1, fail_with_unknown:1,
     init_finished:1, client_packet_direction:1, packet_direction:1, is_ipv6:1, first_pkt_fully_encrypted:1, skip_entropy_check: 1;
   u_int8_t monitoring:1, _pad:7;
@@ -1282,13 +1298,6 @@ struct ndpi_flow_struct {
 
   /* First Packet Classification info */
   struct ndpi_fpc_info fpc;
-
-  /*
-    if ndpi_struct->direction_detect_disable == 1
-    tcp sequence number connection tracking
-  */
-  u_int32_t next_tcp_seq_nr[2];
-  u_int16_t last_tcp_pkt_payload_len;
   
   /* Flow addresses (useful for LRU lookups in ndpi_detection_giveup())
      and ports. All in *network* byte order.
@@ -1309,6 +1318,15 @@ struct ndpi_flow_struct {
   int (*extra_packets_func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
 
   u_int64_t last_packet_time_ms;
+
+  ndpi_protocol_category_t category;
+
+  /* Counters with only packets with L5 data (ie no TCP SYN, pure ACKs, ...) */
+  u_int16_t packet_counter;
+  u_int16_t packet_direction_counter[2];
+  /* Counters with all packets even those without payload */
+  u_int16_t all_packets_counter;
+  u_int16_t packet_direction_complete_counter[2];
 
   /*
     the tcp / udp / other l4 value union
@@ -1548,17 +1566,6 @@ struct ndpi_flow_struct {
   /* protocols which have marked a connection as this connection cannot be protocol XXX, multiple u_int64_t */
   NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
 
-  ndpi_protocol_category_t category;
-
-  /* Only packets with L5 data (ie no TCP SYN, pure ACKs, ...) */
-  u_int16_t packet_counter;		      // can be 0 - 65000
-  u_int16_t packet_direction_counter[2];
-  u_int8_t  packet_direction_with_payload_observed[2]; /* 0 = no packet with payload observed, 1 = at least one packet with payload observed */
-
-  /* All packets even those without payload */
-  u_int16_t all_packets_counter;
-  u_int16_t packet_direction_complete_counter[2];      // can be 0 - 65000
-
   /* NDPI_PROTOCOL_BITTORRENT */
   u_int8_t bittorrent_stage;		      // can be 0 - 255
   u_int8_t bt_check_performed : 1;
@@ -1569,17 +1576,8 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_ZATTOO */
   u_int8_t zattoo_stage:3;
 
-  /* NDPI_PROTOCOL_SOCKS */
-  u_int8_t socks5_stage:2, socks4_stage:2;      // 0 - 3
-
-  /* NDPI_PROTOCOL_FTP_CONTROL */
-  u_int8_t ftp_control_stage:2;
-
   /* NDPI_PROTOCOL_STARCRAFT */
   u_int8_t starcraft_udp_stage : 3;	// 0-7
-
-  /* NDPI_PROTOCOL_Z3950 */
-  u_int8_t z3950_stage : 2; // 0-3
 
   /* NDPI_PROTOCOL_OOKLA */
   u_int8_t ookla_stage : 1;
