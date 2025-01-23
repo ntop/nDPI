@@ -285,6 +285,8 @@ struct ndpi_detection_module_config_struct {
   int stun_relayed_address_enabled;
   int stun_peer_address_enabled;
 
+  int bittorrent_hash_enabled;
+
   int dns_subclassification_enabled;
   int dns_parse_response_enabled;
 

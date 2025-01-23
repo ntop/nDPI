@@ -184,13 +184,15 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
 					      struct ndpi_flow_struct *flow,
 					      int bt_offset, int check_hash,
 					      ndpi_confidence_t confidence) {
-  if(check_hash)
+  if(ndpi_struct->cfg.bittorrent_hash_enabled &&
+     check_hash)
     ndpi_search_bittorrent_hash(ndpi_struct, flow, bt_offset);
 
   ndpi_set_detected_protocol_keeping_master(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT,
 					    confidence);
   
-  if(flow->protos.bittorrent.hash[0] == '\0') {
+  if(ndpi_struct->cfg.bittorrent_hash_enabled &&
+     flow->protos.bittorrent.hash[0] == '\0') {
     /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
     flow->max_extra_packets_to_check = 3;
     flow->extra_packets_func = search_bittorrent_again;
@@ -511,6 +513,8 @@ static u_int8_t is_port(u_int16_t a, u_int16_t b, u_int16_t what) {
 
 static void ndpi_skip_bittorrent(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_BITTORRENT)
+    return;
   if(search_into_bittorrent_cache(ndpi_struct, flow))
     ndpi_add_connection_as_bittorrent(ndpi_struct, flow, -1, 0, NDPI_CONFIDENCE_DPI_CACHE);
   else
