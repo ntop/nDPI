@@ -22,9 +22,9 @@ u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 0, max_num_tcp_dissected_pkts = 0; /* Disable limits at application layer */;
 int malloc_size_stats = 0;
 FILE *fingerprint_fp = NULL;
-bool do_load_lists = false;
+bool do_load_lists = true;
 char *addr_dump_path = NULL;
-int monitoring_enabled = 0;
+int monitoring_enabled = 1;
 
 extern void ndpi_report_payload_stats(FILE *out);
 
@@ -38,6 +38,26 @@ size_t LLVMFuzzerCustomMutator(uint8_t *Data, size_t Size,
   return pl7m_mutator(Data, Size, MaxSize, Seed);
 }
 #endif
+
+static void node_cleanup_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
+  struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
+
+  (void)depth;
+  (void)user_data;
+
+  if(flow == NULL) return;
+
+  if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
+    if((!flow->detection_completed) && flow->ndpi_flow) {
+      u_int8_t proto_guessed;
+
+      flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
+                                                      flow->ndpi_flow, &proto_guessed);
+    }
+
+    process_ndpi_collected_info(workflow, flow);
+  }
+}
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   pcap_t * pkts;
@@ -160,8 +180,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   pcap_close(pkts);
 
   /* Free flow trees */
-  for(i = 0; i < workflow->prefs.num_roots; i++)
+  for(i = 0; i < workflow->prefs.num_roots; i++) {
+    ndpi_twalk(workflow->ndpi_flows_root[i], node_cleanup_walker, NULL);
     ndpi_tdestroy(workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
+  }
   ndpi_free(workflow->ndpi_flows_root);
   /* Free payload analyzer data */
   if(enable_payload_analyzer)

@@ -750,6 +750,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_lru_cache_stats(g_ctx, ndpi_info_mod, static_cast<lru_cache_type>(i), &lru_stats);
   for(i = 0; i < NDPI_PTREE_MAX + 1; i++) /* + 1 to test invalid type */
     ndpi_get_patricia_stats(ndpi_info_mod, static_cast<ptree_type>(i), &patricia_stats);
+  ndpi_patricia_get_stats(NULL, &patricia_stats);
   for(i = 0; i < NDPI_AUTOMA_MAX + 1; i++) /* + 1 to test invalid type */
     ndpi_get_automa_stats(ndpi_info_mod, static_cast<automa_type>(i), &automa_stats);
 

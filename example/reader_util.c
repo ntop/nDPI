@@ -1418,6 +1418,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     if(flow->ndpi_flow->protos.dns.geolocation_iata_code[0] != '\0')
       strcpy(flow->dns.geolocation_iata_code, flow->ndpi_flow->protos.dns.geolocation_iata_code);
 
+#if 0
     if(0) {
       u_int8_t i;
 
@@ -1433,6 +1434,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	printf("(%s) %s [ttl: %u]\n", flow->host_server_name, buf, flow->ndpi_flow->protos.dns.rsp_addr_ttl[i]);
       }
     }
+#endif
   }
   /* MDNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_MDNS)) {
