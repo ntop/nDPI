@@ -22,8 +22,8 @@ sys.path.append( "breathe/" )
 extensions = [
     'sphinx.ext.intersphinx',
     'breathe',
-    'exhale',
-    'myst_parser'
+    'exhale'
+    # 'myst_parser'
 ]
 
 # Workaround for platforms where swaggerdoc is not available
