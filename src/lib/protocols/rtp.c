@@ -186,6 +186,7 @@ u_int8_t rtp_get_stream_type(u_int8_t payloadType, u_int8_t *s_type, u_int16_t s
       *s_type |= ndpi_multimedia_audio_flow;
       return(1);
 
+    case 108:
     case 120:
       *s_type |= ndpi_multimedia_video_flow;
       return(1);
