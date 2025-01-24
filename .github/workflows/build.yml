@@ -68,7 +68,7 @@ jobs:
           git diff-index --quiet HEAD -- || true
 
   test:
-    name: ${{ matrix.os }} ${{ matrix.gcrypt }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }} ${{matrix.global_context}}
+    name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }} ${{matrix.global_context}}
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
@@ -78,7 +78,6 @@ jobs:
       matrix:
         # macos-14 and 15 are on **ARM64**
         os: ["ubuntu-22.04", "ubuntu-24.04", "macOS-13", "macOS-14", "macOS-15", "ubuntu-22.04-arm", "ubuntu-24.04-arm"]
-        gcrypt: ["--with-local-libgcrypt", ""]
         compiler: ["cc"]
         pcre: [""]
         maxminddb: [""]
@@ -88,42 +87,36 @@ jobs:
         include:
           - compiler: "gcc-4.9" # "Oldest" gcc easily available. To simulate RHEL7
             os: ubuntu-22.04
-            gcrypt: ""
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
           - compiler: "gcc-14" # "Newest" gcc easily available
             os: ubuntu-24.04
-            gcrypt: ""
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
           - compiler: "clang-12" # "Oldest" clang easily available
             os: ubuntu-22.04
-            gcrypt: ""
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
           - compiler: "clang-18" # "Newest" clang easily available. See also below...
             os: ubuntu-24.04
-            gcrypt: ""
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
           - compiler: "cc"
             os: ubuntu-latest
-            gcrypt: ""
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: ""
             nBPF: "nBPF"
           - compiler: "cc"
             os: ubuntu-latest
-            gcrypt: ""
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: ""
@@ -131,7 +124,6 @@ jobs:
             global_context: "--disable-global-context-support"
           - compiler: "cc"
             os: macOS-latest
-            gcrypt: ""
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: ""
@@ -150,10 +142,6 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && !endsWith(matrix.os, 'arm') && !startsWith(matrix.msan, '--with-') && !startsWith(matrix.nBPF, 'nBPF') && !startsWith(matrix.global_context, '--without') # Only on a few "standard" builds
         run: |
           sudo apt-get install gcc-mingw-w64 libc6-dev
-      - name: Install Ubuntu Prerequisites (libgcrypt)
-        if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
-        run: |
-          sudo apt-get install libgcrypt20-dev
       - name: Install Ubuntu Prerequisites (libpcre2)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.pcre, '--with-pcre2')
         run: |
@@ -184,10 +172,6 @@ jobs:
         run: |
           # Avoid (re)installing pkg-config. See: https://github.com/actions/runner-images/issues/10984
           brew install coreutils wdiff colordiff autoconf automake libtool gettext json-c rrdtool parallel
-      - name: Install MacOS Prerequisites (libgcrypt)
-        if: startsWith(matrix.os, 'macOS') && startsWith(matrix.gcrypt, '--with-local-libgcrypt')
-        run: |
-          brew install libgcrypt
       - name: Install MacOS Prerequisites (libpcre2)
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.pcre, '--with-pcre2')
         run: |
@@ -198,7 +182,7 @@ jobs:
           brew install libmaxminddb
       - name: Configure nDPI
         run: |
-          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.gcrypt }} ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs ${{ matrix.global_context}}
+          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs ${{ matrix.global_context}}
       - name: Build nDPI
         run: |
           make -j all
@@ -286,7 +270,7 @@ jobs:
           cd ./example && ./ndpiReader -H
 
   test-windows:
-    name: ${{ matrix.os }} (msys2) ${{ matrix.gcrypt }}
+    name: ${{ matrix.os }} (msys2)
     runs-on: ${{ matrix.os }}
     env:
       CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
@@ -294,7 +278,6 @@ jobs:
       fail-fast: true
       matrix:
         os: ["windows-latest"]
-        gcrypt: ["--with-local-libgcrypt", ""]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -304,10 +287,10 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap mingw-w64-x86_64-libgcrypt parallel
+          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap parallel
       - name: Configure nDPI on Windows msys2
         run: |
-          msys2 -c './autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap ${{ matrix.gcrypt }}'
+          msys2 -c './autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap'
       - name: Build nDPI on Windows msys2
         run: |
           msys2 -c 'make -j all'

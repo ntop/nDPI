@@ -132,3 +132,74 @@ jobs:
       - name: Tests
         run: |
           NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+
+  localgcrypt:
+    name: Local gcrypt on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    env:
+      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+    strategy:
+      fail-fast: true
+      matrix:
+        # macos-14 and 15 are on **ARM64**
+        os: ["ubuntu-22.04", "ubuntu-24.04", "macOS-13", "macOS-14", "macOS-15", "ubuntu-22.04-arm", "ubuntu-24.04-arm"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libjson-c-dev libpcap-dev rrdtool librrd-dev parallel libgcrypt20-dev
+      - name: Installing MacOS prerequisites
+        if: startsWith(matrix.os, 'macOS')
+        run: |
+          # Avoid (re)installing pkg-config. See: https://github.com/actions/runner-images/issues/10984
+          brew install coreutils wdiff colordiff autoconf automake libtool gettext json-c rrdtool parallel libgcrypt
+      - name: Configure nDPI
+        run: |
+          ./autogen.sh --enable-option-checking=fatal --with-local-libgcrypt
+      - name: Build nDPI
+        run: |
+          make -j $(nproc) all
+          make -j $(nproc) -C example ndpiSimpleIntegration
+          make -j $(nproc) -C rrdtool
+      - name: Tests
+        run: |
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          ./tests/do-unit.sh
+          ./tests/do-dga.sh
+
+  localgcrypt-windows:
+    name: Local gcrypt on ${{ matrix.os }} (msys2)
+    runs-on: ${{ matrix.os }}
+    env:
+      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ["windows-latest"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Install Windows msys2 prerequisites
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap mingw-w64-x86_64-libgcrypt parallel
+      - name: Configure nDPI on Windows msys2
+        run: |
+          msys2 -c './autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap --with-local-libgcrypt'
+      - name: Build nDPI on Windows msys2
+        run: |
+          msys2 -c 'make -j all'
+          msys2 -c 'ldd ./example/ndpiReader.exe'
+      - name: Tests
+        run: |
+          msys2 -c 'NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh'
+          msys2 -c './tests/do-unit.sh'
+          msys2 -c './tests/do-dga.sh'
+
