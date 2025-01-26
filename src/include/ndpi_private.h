@@ -238,6 +238,12 @@ struct ndpi_detection_module_config_struct {
   
   /* Protocols */
 
+  int http_request_content_type_enabled;
+  int http_referer_enabled;
+  int http_host_enabled;
+  int http_username_enabled;
+  int http_password_enabled;
+
   int tls_certificate_expire_in_x_days;
   int tls_app_blocks_tracking_enabled;
   int tls_heuristics;

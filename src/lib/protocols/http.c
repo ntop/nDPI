@@ -647,7 +647,8 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     if(flow->http.first_payload_after_header_observed == 0) {
       /* Skip the last part of the HTTP request */
       flow->http.first_payload_after_header_observed = 1;
-    } else if(flow->http.is_form && (packet->payload_packet_len > 0)) {
+    } else if(flow->http.is_form && (packet->payload_packet_len > 0) &&
+              (ndpi_struct->cfg.http_username_enabled || ndpi_struct->cfg.http_password_enabled)) {
       /* Response payload */
       char *dup = ndpi_strndup((const char *)packet->payload, packet->payload_packet_len);
 
@@ -664,9 +665,9 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 	    break;
 
 	  if((strcmp(key, "user") == 0) || (strcmp(key, "username") == 0)) {
-	    if(!flow->http.username) flow->http.username = ndpi_strdup(value);
+	    if(!flow->http.username && ndpi_struct->cfg.http_username_enabled) flow->http.username = ndpi_strdup(value);
 	  } else if((strcmp(key, "pwd") == 0) || (strcmp(key, "password") == 0)) {
-	    if(!flow->http.password) flow->http.password = ndpi_strdup(value);
+	    if(!flow->http.password && ndpi_struct->cfg.http_password_enabled) flow->http.password = ndpi_strdup(value);
 	    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
 	  }
 
@@ -1025,7 +1026,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     }
   }
 
-  if(packet->authorization_line.ptr != NULL) {
+  if(packet->authorization_line.ptr != NULL &&
+     (ndpi_struct->cfg.http_username_enabled || ndpi_struct->cfg.http_password_enabled)) {
     const char *a = NULL, *b = NULL;
 
     NDPI_LOG_DBG2(ndpi_struct, "Authorization line found %.*s\n",
@@ -1048,8 +1050,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
 	    if(double_dot) {
 	      double_dot[0] = '\0';
-	      flow->http.username = ndpi_strdup((char*)content);
-	      flow->http.password = ndpi_strdup(&double_dot[1]);
+	      if(ndpi_struct->cfg.http_username_enabled)
+	        flow->http.username = ndpi_strdup((char*)content);
+	      if(ndpi_struct->cfg.http_password_enabled)
+	        flow->http.password = ndpi_strdup(&double_dot[1]);
 	    }
 
 	    ndpi_free(content);
@@ -1063,10 +1067,12 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
 
   if((packet->referer_line.ptr != NULL) && (flow->http.referer == NULL))
-    flow->http.referer = ndpi_strndup((const char *)packet->referer_line.ptr, packet->referer_line.len);
+    if(ndpi_struct->cfg.http_referer_enabled)
+      flow->http.referer = ndpi_strndup((const char *)packet->referer_line.ptr, packet->referer_line.len);
 
   if((packet->host_line.ptr != NULL) && (flow->http.host == NULL))
-    flow->http.host = ndpi_strndup((const char *)packet->host_line.ptr, packet->host_line.len);
+    if(ndpi_struct->cfg.http_host_enabled)
+      flow->http.host = ndpi_strndup((const char *)packet->host_line.ptr, packet->host_line.len);
 
   if(packet->content_line.ptr != NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "Content Type line found %.*s\n",
@@ -1075,16 +1081,18 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     if(flow->http.response_status_code == 0) {
       /* Request */
       if((flow->http.request_content_type == NULL) && (packet->content_line.len > 0)) {
-	int len = packet->content_line.len + 1;
+	if(ndpi_struct->cfg.http_request_content_type_enabled) {
+	  int len = packet->content_line.len + 1;
 
-	flow->http.request_content_type = ndpi_malloc(len);
-	if(flow->http.request_content_type) {
-	  strncpy(flow->http.request_content_type, (char*)packet->content_line.ptr,
-		  packet->content_line.len);
-	  flow->http.request_content_type[packet->content_line.len] = '\0';
+          flow->http.request_content_type = ndpi_malloc(len);
+          if(flow->http.request_content_type) {
+            strncpy(flow->http.request_content_type, (char*)packet->content_line.ptr,
+                    packet->content_line.len);
+            flow->http.request_content_type[packet->content_line.len] = '\0';
+          }
 	}
 
-	if(ndpi_strnstr(flow->http.request_content_type, "x-www-form-urlencoded", packet->content_line.len))
+	if(ndpi_strnstr((char*)packet->content_line.ptr, "x-www-form-urlencoded", packet->content_line.len))
 	   flow->http.is_form = 1;
       }
     } else {
@@ -1490,7 +1498,7 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG2(ndpi_struct, "Reset status and risks\n");
 
-  /* Reset everthing in flow->http.
+  /* Reset everything in flow->http.
      TODO: Could we be smarter? Probably some info don't change across
      different req-res transactions... */
 
@@ -1517,6 +1525,14 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_free(flow->http.server);
     flow->http.server = NULL;
   }
+  if(flow->http.referer) {
+    ndpi_free(flow->http.referer);
+    flow->http.referer = NULL;
+  }
+  if(flow->http.host) {
+    ndpi_free(flow->http.host);
+    flow->http.host = NULL;
+  }
   if(flow->http.detected_os) {
     ndpi_free(flow->http.detected_os);
     flow->http.detected_os = NULL;
@@ -1528,6 +1544,14 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->http.filename) {
     ndpi_free(flow->http.filename);
     flow->http.filename = NULL;
+  }
+  if(flow->http.username) {
+    ndpi_free(flow->http.username);
+    flow->http.username = NULL;
+  }
+  if(flow->http.password) {
+    ndpi_free(flow->http.password);
+    flow->http.password = NULL;
   }
 
   /* Reset flow risks. We should reset only those risks triggered by

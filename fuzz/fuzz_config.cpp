@@ -119,6 +119,31 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   }
 
   if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "http", "metadata.request_content_type", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "http", "metadata.referer", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "http", "metadata.host", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "http", "metadata.username", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, "http", "metadata.password", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 365 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     ndpi_set_config(ndpi_info_mod, "tls", "certificate_expiration_threshold", cfg_value);
