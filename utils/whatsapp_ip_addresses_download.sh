@@ -12,7 +12,7 @@ IP_LINK_URL='https://developers.facebook.com/docs/whatsapp/guides/network-requir
 
 
 echo "(1) Scraping Facebook WhatsApp IP Adresses and Ranges..."
-ORIGIN="$(curl -s "${IP_LINK_URL}" | sed -ne 's/.*<a href="\([^"]*\)" target="_blank">WhatsApp server IP addresses and ranges (.zip file)<\/a>.*/\1/gp' | sed -e 's/\&amp;/\&/g')"
+ORIGIN="$(curl -H "Accept-Language: en" -s "${IP_LINK_URL}" | sed -ne 's/.*<a href="\([^"]*\)" target="_blank">WhatsApp server IP addresses and ranges (.zip file)<\/a>.*/\1/gp' | sed -e 's/\&amp;/\&/g')"
 is_str_empty "${ORIGIN}" "IP webpage list does not contain any addresses. A REGEX update may be required."
 
 echo "(2) Downloading file... ${ORIGIN}"
