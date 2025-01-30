@@ -819,22 +819,28 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     }
     
     if(len > 0) {
-      if(ndpi_struct->cfg.dns_subclassification_enabled) {
+      if(ndpi_struct->cfg.dns_subclassification_enabled || ndpi_struct->cfg.fpc_enabled) {
         ndpi_protocol_match_result ret_match;
 
-        ret.proto.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
+        /* Avoid writing on flow (i.e. updating classification) if subclassification is disabled */
+        ret.proto.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, ndpi_struct->cfg.dns_subclassification_enabled ? flow : NULL,
 						       flow->host_server_name,
 						       strlen(flow->host_server_name),
 						       &ret_match,
 						       NDPI_PROTOCOL_DNS);
         /* Add to FPC DNS cache */
-        if(ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN &&
+        if(ndpi_struct->cfg.fpc_enabled &&
+           ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN &&
+           ret.proto.app_protocol != NDPI_PROTOCOL_DNS &&
            (flow->protos.dns.rsp_type == 0x1 || flow->protos.dns.rsp_type == 0x1c) && /* A, AAAA */
            ndpi_struct->fpc_dns_cache) {
             ndpi_lru_add_to_cache(ndpi_struct->fpc_dns_cache,
                                   fpc_dns_cache_key_from_dns_info(flow), ret.proto.app_protocol,
                                   ndpi_get_current_time(flow));
         }
+
+        if(!ndpi_struct->cfg.dns_subclassification_enabled)
+          ret.proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
 
         if(ret.proto.app_protocol == NDPI_PROTOCOL_UNKNOWN)
 	  ret.proto.master_protocol = checkDNSSubprotocol(s_port, d_port);

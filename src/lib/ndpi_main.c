@@ -10281,7 +10281,8 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
   }
 #endif
 
-  if((matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) &&
+  if(flow &&
+     (matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) &&
      (!ndpi_is_more_generic_protocol(flow->detected_protocol_stack[0], matching_protocol_id))) {
     /* Move the protocol on slot 0 down one position */
     flow->detected_protocol_stack[1] = master_protocol_id,
@@ -10348,12 +10349,14 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   if(ndpi_get_custom_category_match(ndpi_str, string_to_match,
 				    string_to_match_len, &id) != -1) {
     /* if(id != -1) */ {
-      flow->category = ret_match->protocol_category = id;
+      ret_match->protocol_category = id;
+      if(flow)
+        flow->category = id;
       rc = master_protocol_id;
     }
   }
 
-  if(ndpi_str->risky_domain_automa.ac_automa != NULL) {
+  if(flow && ndpi_str->risky_domain_automa.ac_automa != NULL) {
     u_int32_t proto_id;
     u_int16_t rc1 = ndpi_match_string_common(ndpi_str->risky_domain_automa.ac_automa,
 					     string_to_match, string_to_match_len,
@@ -10367,7 +10370,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   }
 
   /* Add punycode check */
-  if(ndpi_check_punycode_string(string_to_match, string_to_match_len)) {
+  if(flow && ndpi_check_punycode_string(string_to_match, string_to_match_len)) {
     char str[64] = { '\0' };
 
     strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
