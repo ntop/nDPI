@@ -10343,6 +10343,8 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 
     return(flow->detected_protocol_stack[0]);
   }
+  if(!flow && matching_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+    return matching_protocol_id;
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   {
