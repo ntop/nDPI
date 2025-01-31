@@ -630,9 +630,13 @@ static ndpi_protocol_match host_match[] =
 
    /* Microsoft domains (NDPI_PROTOCOL_MS_OUTLOOK, NDPI_PROTOCOL_MSTEAMS, NDPI_PROTOCOL_MS_ONE_DRIVE, NDPI_PROTOCOL_MICROSOFT_365,
       NDPI_PROTOCOL_MICROSOFT_AZURE) are auto-generated!
-      Add here some specific extensions, exceptions, "catch-all"...
+      Add here some specific extensions, exceptions, "catch-all" or "old" domains still useful/used for unit tests...
     */
-   { "microsoft.com",      "Microsoft", NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "microsoft.com",      "Microsoft", NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "msn.com",            "Microsoft", NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "bing.com",           "Microsoft", NDPI_PROTOCOL_MICROSOFT, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "hotmail.com",        "Outlook", NDPI_PROTOCOL_MS_OUTLOOK, NDPI_PROTOCOL_CATEGORY_MAIL, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "azure.com",          "Azure", NDPI_PROTOCOL_MICROSOFT_AZURE, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    /*
      See https://better.fyi/trackers/
