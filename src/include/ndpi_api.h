@@ -1142,6 +1142,25 @@ extern "C" {
   int ndpi_has_human_readeable_string(char *buffer, u_int buffer_size,
 				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
 				      char *outbuf, u_int outbuf_len);
+
+  /**
+   * @struct string_list_t
+   * @brief Represents a dynamic list of strings.
+   *
+   * This structure manages a dynamic array of strings, keeping track of the number of
+   * stored items and the allocated capacity.
+   */
+  typedef struct {
+    char **items;   ///< Array of strings
+    size_t count;   ///< Number of strings currently stored
+    size_t capacity; ///< Allocated capacity of the list
+  } string_list_t;
+
+  void string_list_free(string_list_t *list);
+
+  string_list_t* extract_readable_strings(const unsigned char *buffer, size_t buffer_len,
+      size_t min_len, size_t list_limit, bool (*filter_func)(char *));
+
   /* Return a flow info string (summarized). Does only work for DNS/HTTP/TLS/QUIC. */
   const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
                                  ndpi_protocol const * const l7_protocol);
