@@ -283,7 +283,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   memcpy(dns_header, (struct ndpi_dns_packet_header*)&packet->payload[x],
 	 sizeof(struct ndpi_dns_packet_header));
 
-  flow->protos.dns.transaction_id = dns_header->tr_id = ntohs(dns_header->tr_id);
+  dns_header->tr_id = ntohs(dns_header->tr_id);
   dns_header->flags = ntohs(dns_header->flags);
   dns_header->num_queries = ntohs(dns_header->num_queries);
   dns_header->num_answers = ntohs(dns_header->num_answers);
@@ -320,6 +320,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	} else
 	  x++;
       }
+      flow->protos.dns.transaction_id = dns_header->tr_id;
     } else {
       if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
         ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid DNS Header");
@@ -345,6 +346,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       }
     }
 
+    flow->protos.dns.transaction_id = dns_header->tr_id;
     flow->protos.dns.reply_code = dns_header->flags & 0x0F;
 
     if(flow->protos.dns.reply_code != 0) {
