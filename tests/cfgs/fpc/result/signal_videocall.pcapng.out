@@ -1,0 +1,32 @@
+DPI Packets (UDP):	21	(7.00 pkts/flow)
+Confidence DPI (cache)      : 2 (flows)
+Confidence DPI              : 1 (flows)
+FPC Confidence DPI              : 3 (flows)
+Num dissector calls: 8 (2.67 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       6/10/2 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   6/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   3/3 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+STUN	0	0	0	36	3764	2	(*)
+SignalVoip	334	123259	3	298	119495	1	(*)
+
+Acceptable                     334 123259        3            
+
+	1	UDP 192.168.12.67:47926 <-> 35.219.252.146:56377 [proto: 78.269/STUN.SignalVoip][IP: 284/GoogleCloud][ClearText][Confidence: DPI (cache)][FPC: 78.269/STUN.SignalVoip, Confidence: DPI][DPI packets: 7][cat: VoIP/10][167 pkts/87565 bytes <-> 131 pkts/31930 bytes][Goodput ratio: 92/83][10.75 sec][bytes ratio: 0.466 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 64/82 2304/2449 291/279][Pkt Len c2s/s2c min/avg/max/stddev: 70/70 524/244 1223/900 385/198][Mapped IP/Port: 93.35.168.30:45266][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 3478][PLAIN TEXT (17uAgN)][Plen Bins: 3,28,9,7,0,0,0,0,16,8,1,0,0,1,1,0,1,1,0,1,0,0,0,0,7,3,0,1,0,0,1,1,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.12.67:47926 <-> 35.219.252.146:3478 [proto: 78.269/STUN.SignalVoip][IP: 284/GoogleCloud][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 7][cat: VoIP/10][13 pkts/1258 bytes <-> 13 pkts/1454 bytes][Goodput ratio: 57/62][10.01 sec][Hostname/SNI: signal.org][bytes ratio: -0.072 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 6/6 804/804 4015/4015 1248/1248][Pkt Len c2s/s2c min/avg/max/stddev: 62/94 97/112 162/126 43/14][Mapped IP/Port: 93.35.168.30:45265][Relayed IP/Port: 35.219.252.146:40378][PLAIN TEXT (BFODsIPgWuCIX)][Plen Bins: 34,19,30,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.12.67:47926 <-> 35.216.234.234:3478 [proto: 78.269/STUN.SignalVoip][IP: 284/GoogleCloud][ClearText][Confidence: DPI (cache)][FPC: 78/STUN, Confidence: DPI][DPI packets: 7][cat: VoIP/10][5 pkts/510 bytes <-> 5 pkts/542 bytes][Goodput ratio: 59/61][10.02 sec][Hostname/SNI: signal.org][bytes ratio: -0.030 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 5/4 2503/2503 9988/9988 4321/4321][Pkt Len c2s/s2c min/avg/max/stddev: 62/94 102/108 158/126 46/15][Mapped IP/Port: 93.35.168.30:45265][Relayed IP/Port: 35.216.234.234:29688][PLAIN TEXT (42oPBlgi)][Plen Bins: 30,30,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

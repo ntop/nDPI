@@ -24,9 +24,9 @@ Cloudflare	10	4226	1
 
 Acceptable                      10 4226          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 2001:b07:a3d:c112:ce16:b409:3d0a:9177 	 1      
 
 
-	1	TCP [2001:b07:a3d:c112:ce16:b409:3d0a:9177]:47460 <-> [2606:4700::6812:1e4e]:443 [proto: 91.220/TLS.Cloudflare][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 6][cat: Web/5][6 pkts/1172 bytes <-> 4 pkts/3054 bytes][Goodput ratio: 55/88][0.07 sec][Hostname/SNI: performance.radar.cloudflare.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.445 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/3 13/5 49/7 18/2][Pkt Len c2s/s2c min/avg/max/stddev: 86/86 195/764 670/2260 213/890][TCP Fingerprint: 2_64_65320_5c453b01be6e/Unknown][TLSv1.3][JA3C: 6820f114cf3b0809ffdcb30cb277848a][JA4: t13d1516h2_8daaf6152771_02713d6af862][JA3S: eb1d94daa7e0344597e756a1fb6e7054][ECH: version 0xfe0d][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25]
+	1	TCP [2001:b07:a3d:c112:ce16:b409:3d0a:9177]:47460 <-> [2606:4700::6812:1e4e]:443 [proto: 91.220/TLS.Cloudflare][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 6][cat: Web/5][6 pkts/1172 bytes <-> 4 pkts/3054 bytes][Goodput ratio: 55/88][0.07 sec][Hostname/SNI: performance.radar.cloudflare.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.445 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/3 13/5 49/7 18/2][Pkt Len c2s/s2c min/avg/max/stddev: 86/86 195/764 670/2260 213/890][TCP Fingerprint: 2_64_65320_5c453b01be6e/Unknown][TLSv1.3][JA4: t13d1516h2_8daaf6152771_02713d6af862][JA3S: eb1d94daa7e0344597e756a1fb6e7054][ECH: version 0xfe0d][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25]

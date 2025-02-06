@@ -24,9 +24,9 @@ DoH_DoT	142	20362	1
 
 Acceptable                     142 20362         1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 172.20.10.4              	 1      
 
 
-	1	TCP 172.20.10.4:49877 <-> 104.16.248.249:443 [proto: 91.196/TLS.DoH_DoT][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 6][cat: Network/14][86 pkts/8460 bytes <-> 56 pkts/11902 bytes][Goodput ratio: 45/74][3.24 sec][Hostname/SNI: mozilla.cloudflare-dns.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.169 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 26/31 535/580 86/115][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 98/213 571/1354 69/257][TCP Fingerprint: 2_64_65535_d29295416479/macOS][TLSv1.3][JA3C: b20b44b18b853ef29ab773e921b03422][JA4: t13d1814h2_29a2cd9e9f10_d267a5f792d4][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 23,21,20,2,1,1,13,3,0,0,7,0,0,0,1,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0]
+	1	TCP 172.20.10.4:49877 <-> 104.16.248.249:443 [proto: 91.196/TLS.DoH_DoT][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 6][cat: Network/14][86 pkts/8460 bytes <-> 56 pkts/11902 bytes][Goodput ratio: 45/74][3.24 sec][Hostname/SNI: mozilla.cloudflare-dns.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.169 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 26/31 535/580 86/115][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 98/213 571/1354 69/257][TCP Fingerprint: 2_64_65535_d29295416479/macOS][TLSv1.3][JA4: t13d1814h2_29a2cd9e9f10_d267a5f792d4][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 23,21,20,2,1,1,13,3,0,0,7,0,0,0,1,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0]

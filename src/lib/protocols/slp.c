@@ -285,7 +285,7 @@ static void ndpi_dissect_slp_v2(struct ndpi_detection_module_struct *ndpi_struct
       }
     } else if (url_entry_count_offset > 0 && packet->payload_packet_len > sizeof(*hdr) + url_entry_count_offset + 2) {
       if (slp_dissect_url_entries(ndpi_struct, flow, sizeof(*hdr) + url_entry_count_offset) != 0) {
-        ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid URL entries");
+        ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid URL entries");
       }
     } else if (packet->payload_packet_len > sizeof(*hdr) + url_offset + 2) {
       url_length_or_count = ntohs(*(uint16_t *)&packet->payload[sizeof(*hdr) + url_offset]); // FID_SrvReg or FID_SrvDeReg

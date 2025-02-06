@@ -24,9 +24,9 @@ RDP	19	3868	1
 
 Acceptable                      19 3868          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 91.238.181.21            	 1      
 
 
-	1	TCP 91.238.181.21:35888 <-> 89.31.79.12:3389 [VLAN: 77][proto: 91.88/TLS.RDP][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][cat: RemoteAccess/12][11 pkts/1862 bytes <-> 8 pkts/2006 bytes][Goodput ratio: 64/76][1.25 sec][bytes ratio: -0.037 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/34 135/196 1035/961 319/342][Pkt Len c2s/s2c min/avg/max/stddev: 64/64 169/251 696/1255 175/385][Risk: ** Self-signed Cert **** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **** Desktop/File Sharing **][Risk Score: 170][Risk Info: Found RDP / No ALPN / SNI should always be present / CN=topsalon][TCP Fingerprint: 194_128_8192_6bb88f5575fd/Unknown][TLSv1.2][JA3C: 043c543b63b895881d9abfbc320cb863][JA4: t12d280600_bbd4f008d9b2_f28add8e7af0][JA3S: ae4edc6faf64d08308082ad26be60767][Issuer: CN=topsalon][Subject: CN=topsalon][Certificate SHA-1: A2:FF:78:9D:71:42:7A:00:97:9C:96:C2:E7:D1:C1:AD:A1:82:CC:2C][Firefox][Validity: 2024-07-26 06:03:40 - 2025-01-25 06:03:40][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][Plen Bins: 16,25,16,0,8,8,8,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 91.238.181.21:35888 <-> 89.31.79.12:3389 [VLAN: 77][proto: 91.88/TLS.RDP][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][cat: RemoteAccess/12][11 pkts/1862 bytes <-> 8 pkts/2006 bytes][Goodput ratio: 64/76][1.25 sec][bytes ratio: -0.037 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/34 135/196 1035/961 319/342][Pkt Len c2s/s2c min/avg/max/stddev: 64/64 169/251 696/1255 175/385][Risk: ** Self-signed Cert **** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **** Desktop/File Sharing **][Risk Score: 170][Risk Info: Found RDP / No ALPN / SNI should always be present / CN=topsalon][TCP Fingerprint: 194_128_8192_6bb88f5575fd/Unknown][TLSv1.2][JA4: t12d280600_bbd4f008d9b2_f28add8e7af0][JA3S: ae4edc6faf64d08308082ad26be60767][Issuer: CN=topsalon][Subject: CN=topsalon][Certificate SHA-1: A2:FF:78:9D:71:42:7A:00:97:9C:96:C2:E7:D1:C1:AD:A1:82:CC:2C][Firefox][Validity: 2024-07-26 06:03:40 - 2025-01-25 06:03:40][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][Plen Bins: 16,25,16,0,8,8,8,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0]

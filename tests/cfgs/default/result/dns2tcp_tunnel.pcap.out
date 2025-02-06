@@ -24,9 +24,9 @@ TLS	50	8960	1
 
 Safe                            50 8960          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.20.211           	 1      
 
 
-	1	TCP 192.168.20.211:44404 <-> 1.1.1.1:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][22 pkts/2595 bytes <-> 28 pkts/6365 bytes][Goodput ratio: 52/74][8.11 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.421 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 289/346 3093/3078 792/900][Pkt Len c2s/s2c min/avg/max/stddev: 56/62 118/227 317/1644 68/386][Risk: ** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 100][Risk Info: SNI should always be present / h2][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][TLSv1.3][JA3C: 547df21d727c7b3a5dcb59aa0fd97c2c][JA4: t13d1910h2_9dc949149365_d811adc85aab][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 26,0,11,26,0,3,14,0,7,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,3]
+	1	TCP 192.168.20.211:44404 <-> 1.1.1.1:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][22 pkts/2595 bytes <-> 28 pkts/6365 bytes][Goodput ratio: 52/74][8.11 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.421 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 289/346 3093/3078 792/900][Pkt Len c2s/s2c min/avg/max/stddev: 56/62 118/227 317/1644 68/386][Risk: ** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 100][Risk Info: SNI should always be present / h2][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][TLSv1.3][JA4: t13d1910h2_9dc949149365_d811adc85aab][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 26,0,11,26,0,3,14,0,7,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,3]

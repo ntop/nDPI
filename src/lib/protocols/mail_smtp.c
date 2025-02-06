@@ -66,7 +66,8 @@ static void smtpInitExtraPacketProcessing(struct ndpi_flow_struct *flow);
 
 /* **************************************** */
 
-static void get_credentials_auth_plain(struct ndpi_flow_struct *flow,
+static void get_credentials_auth_plain(struct ndpi_detection_module_struct *ndpi_struct,
+                                       struct ndpi_flow_struct *flow,
 				       const u_int8_t *line, u_int16_t line_len)
 {
   u_int8_t buf[255];
@@ -101,7 +102,7 @@ static void get_credentials_auth_plain(struct ndpi_flow_struct *flow,
 
     snprintf(buf, sizeof(buf), "Found username (%s)",
 	     flow->l4.tcp.ftp_imap_pop_smtp.username);
-    ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
 
     if(1 + user_len + 1 < out_len) {
       unsigned int pwd_len;
@@ -221,7 +222,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
 	    } else if(packet->line[a].ptr[5] == 'P' || packet->line[a].ptr[5] == 'p') {
 	      flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH_PLAIN;
 	      /* AUTH PLAIN: username and pwd here */
-	      get_credentials_auth_plain(flow,
+	      get_credentials_auth_plain(ndpi_struct, flow,
 					 packet->line[a].ptr, packet->line[a].len);
 	      flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
 	    }
@@ -261,7 +262,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
 		
 		snprintf(msg, sizeof(msg), "Found SMTP username (%s)",
 			 flow->l4.tcp.ftp_imap_pop_smtp.username);
-		ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
+		ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
 	      } else if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') {
 		/* Password */
 		u_int8_t buf[48];
@@ -286,7 +287,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
 		  ndpi_free(out);
 		}
 
-		ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
+		ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
 
 		flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
 	      } else {

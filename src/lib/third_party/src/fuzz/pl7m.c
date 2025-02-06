@@ -1085,7 +1085,7 @@ static void swap_direction(struct m_pkt *p)
 	case IPPROTO_UDP:
 		udp_h = (struct udphdr *)(p->raw_data + p->l4_offset);
 		tmp_port = udp_h->source;
-		udp_h->source = udp_h->source;
+		udp_h->source = udp_h->dest;
 		udp_h->dest = tmp_port;
 		break;
 	case IPPROTO_TCP:

@@ -1,1 +1,0 @@
---cfg=tls,metadata.ja3s_fingerprint,0

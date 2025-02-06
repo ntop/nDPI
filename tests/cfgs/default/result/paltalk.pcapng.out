@@ -1,6 +1,6 @@
 DPI Packets (TCP):	17	(4.25 pkts/flow)
 Confidence DPI              : 4 (flows)
-Num dissector calls: 332 (83.00 diss/flow)
+Num dissector calls: 333 (83.25 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -24,12 +24,12 @@ Paltalk	17	3511	4
 
 Acceptable                      17 3511          4            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.88.208           	 1      
 
 
-	1	TCP 192.168.88.208:51807 <-> 3.162.112.93:443 [proto: 91.432/TLS.Paltalk][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 6][cat: Chat/9][3 pkts/356 bytes <-> 3 pkts/1620 bytes][Goodput ratio: 51/89][0.25 sec][Hostname/SNI: paltalk.com][bytes ratio: -0.640 (Download)][IAT c2s/s2c min/avg/max/stddev: 19/0 66/66 112/132 46/66][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 119/540 236/1494 83/675][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][TLSv1.2][JA3C: ce5f3254611a8c095a3d821d44539877][JA4: t12d210800_76e208dd3e22_7af1ed941c26][JA3S: 7da0ae90f9693272ed42e89898421495][Firefox][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
+	1	TCP 192.168.88.208:51807 <-> 3.162.112.93:443 [proto: 91.432/TLS.Paltalk][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 6][cat: Chat/9][3 pkts/356 bytes <-> 3 pkts/1620 bytes][Goodput ratio: 51/89][0.25 sec][Hostname/SNI: paltalk.com][bytes ratio: -0.640 (Download)][IAT c2s/s2c min/avg/max/stddev: 19/0 66/66 112/132 46/66][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 119/540 236/1494 83/675][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][TLSv1.2][JA4: t12d210800_76e208dd3e22_7af1ed941c26][JA3S: 7da0ae90f9693272ed42e89898421495][Firefox][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
 	2	TCP 192.168.88.208:51825 <-> 44.194.181.195:80 [proto: 7.432/HTTP.Paltalk][IP: 265/AmazonAWS][ClearText][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 4][cat: Chat/9][3 pkts/1017 bytes <-> 1 pkts/66 bytes][Goodput ratio: 83/0][< 1 sec][Hostname/SNI: qos.paltalkconnect.com][URL: qos.paltalkconnect.com//qos/client][Req Content-Type: application/json][User-Agent: PaltalkQOS][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][PLAIN TEXT (POST //qos/client HTTP/1.1)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.88.208:50728 <-> 84.17.44.229:7970 [proto: 432/Paltalk][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Chat/9][3 pkts/196 bytes <-> 1 pkts/66 bytes][Goodput ratio: 11/0][0.17 sec][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	TCP 158.69.169.104:6845 <-> 192.168.88.208:51887 [proto: 432/Paltalk][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Chat/9][1 pkts/62 bytes <-> 2 pkts/128 bytes][Goodput ratio: 0/16][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

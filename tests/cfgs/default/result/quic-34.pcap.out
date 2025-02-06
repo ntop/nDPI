@@ -24,9 +24,9 @@ QUIC	4	4836	1
 
 Acceptable                       4 4836          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.56.1             	 1      
 
 
-	1	UDP 192.168.56.1:55880 <-> 192.168.56.198:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1294 bytes <-> 3 pkts/3542 bytes][Goodput ratio: 97/96][0.00 sec][(Advertised) ALPNs: h3-34;hq-34;h3-33;hq-33;h3-32;hq-32;h3-31;hq-31;h3-29;hq-29;h3-30;hq-30;h3-28;hq-28;h3-27;hq-27;h3;hq-interop][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 150][Risk Info: No server to client traffic / SNI should always be present / h3-34 / Expected on port 443][TLSv1.3][QUIC ver: Draft-34][JA3C: 0299b052ace53a14c3a04aceb5efd247][JA4: q00d0307h3_55b375c5d22e_af0a630e9e67][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,25,0,0]
+	1	UDP 192.168.56.1:55880 <-> 192.168.56.198:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1294 bytes <-> 3 pkts/3542 bytes][Goodput ratio: 97/96][0.00 sec][(Advertised) ALPNs: h3-34;hq-34;h3-33;hq-33;h3-32;hq-32;h3-31;hq-31;h3-29;hq-29;h3-30;hq-30;h3-28;hq-28;h3-27;hq-27;h3;hq-interop][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 150][Risk Info: No server to client traffic / SNI should always be present / h3-34 / Expected on port 443][TLSv1.3][QUIC ver: Draft-34][JA4: q00d0307h3_55b375c5d22e_af0a630e9e67][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,25,0,0]

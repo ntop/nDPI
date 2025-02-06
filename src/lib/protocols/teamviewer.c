@@ -51,7 +51,7 @@ static void ndpi_search_teamview(struct ndpi_detection_module_struct *ndpi_struc
 	if (flow->teamviewer_stage == 4 ||
 	    packet->udp->dest == ntohs(5938) || packet->udp->source == ntohs(5938)) {
 	  ndpi_int_teamview_add_connection(ndpi_struct, flow);
-	  ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found TeamViewer"); /* Remote assistance (UDP only) */
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found TeamViewer"); /* Remote assistance (UDP only) */
 	}
 	return;
       }

@@ -2,13 +2,13 @@ bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail 
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr fuzz_alg_quick_encryption
 #Data structures
-bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64_fuse fuzz_ds_domain_classify
+bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64_fuse fuzz_ds_domain_classify fuzz_ds_kdtree fuzz_ds_btree
 #Third party
 bin_PROGRAMS += fuzz_libinjection fuzz_binaryfusefilter
 #Internal crypto
 bin_PROGRAMS += fuzz_gcrypt_light fuzz_gcrypt_aes fuzz_gcrypt_gcm fuzz_gcrypt_cipher
 #Configuration files
-bin_PROGRAMS += fuzz_filecfg_protocols fuzz_filecfg_categories fuzz_filecfg_malicious_sha1 fuzz_filecfg_malicious_ja3 fuzz_filecfg_risk_domains fuzz_filecfg_config fuzz_filecfg_category
+bin_PROGRAMS += fuzz_filecfg_protocols fuzz_filecfg_categories fuzz_filecfg_malicious_sha1 fuzz_filecfg_malicious_ja4 fuzz_filecfg_risk_domains fuzz_filecfg_config fuzz_filecfg_category
 #Reader utils
 bin_PROGRAMS += fuzz_readerutils_workflow fuzz_readerutils_parseprotolist
 #Mutators
@@ -414,6 +414,36 @@ fuzz_ds_domain_classify_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_domain_classify_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
+fuzz_ds_kdtree_SOURCES = fuzz_ds_kdtree.cpp fuzz_common_code.c
+fuzz_ds_kdtree_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_kdtree_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_kdtree_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_ds_kdtree_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_ds_kdtree_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_kdtree_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_kdtree_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_ds_kdtree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_ds_kdtree_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_ds_btree_SOURCES = fuzz_ds_btree.cpp fuzz_common_code.c
+fuzz_ds_btree_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_btree_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_btree_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_ds_btree_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_ds_btree_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_btree_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_btree_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_ds_btree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_ds_btree_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
 fuzz_libinjection_SOURCES = fuzz_libinjection.c
 fuzz_libinjection_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
 fuzz_libinjection_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
@@ -593,18 +623,18 @@ fuzz_filecfg_malicious_sha1_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAG
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_filecfg_malicious_sha1_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_filecfg_malicious_ja3_SOURCES = fuzz_filecfg_malicious_ja3.c fuzz_common_code.c
-fuzz_filecfg_malicious_ja3_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
-fuzz_filecfg_malicious_ja3_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
-fuzz_filecfg_malicious_ja3_LDFLAGS = $(LIBS)
+fuzz_filecfg_malicious_ja4_SOURCES = fuzz_filecfg_malicious_ja4.c fuzz_common_code.c
+fuzz_filecfg_malicious_ja4_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_filecfg_malicious_ja4_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_filecfg_malicious_ja4_LDFLAGS = $(LIBS)
 if HAS_FUZZLDFLAGS
-fuzz_filecfg_malicious_ja3_CFLAGS += $(LIB_FUZZING_ENGINE)
-fuzz_filecfg_malicious_ja3_LDFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_filecfg_malicious_ja4_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_filecfg_malicious_ja4_LDFLAGS += $(LIB_FUZZING_ENGINE)
 endif
 # force usage of CXX for linker
-fuzz_filecfg_malicious_ja3_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+fuzz_filecfg_malicious_ja4_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
-    $(fuzz_filecfg_malicious_ja3_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+    $(fuzz_filecfg_malicious_ja4_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_filecfg_risk_domains_SOURCES = fuzz_filecfg_risk_domains.c fuzz_common_code.c
 fuzz_filecfg_risk_domains_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
@@ -844,9 +874,9 @@ files_corpus_fuzz_filecfg_malicious_sha1 :=  $(wildcard corpus/fuzz_filecfg_mali
 fuzz_filecfg_malicious_sha1_seed_corpus.zip: $(files_corpus_fuzz_filecfg_malicious_sha1)
 	zip -j fuzz_filecfg_malicious_sha1_seed_corpus.zip $(files_corpus_fuzz_filecfg_malicious_sha1)
 
-files_corpus_fuzz_filecfg_malicious_ja3 :=  $(wildcard corpus/fuzz_filecfg_malicious_ja3/*)
-fuzz_filecfg_malicious_ja3_seed_corpus.zip: $(files_corpus_fuzz_filecfg_malicious_ja3)
-	zip -j fuzz_filecfg_malicious_ja3_seed_corpus.zip $(files_corpus_fuzz_filecfg_malicious_ja3)
+files_corpus_fuzz_filecfg_malicious_ja4 :=  $(wildcard corpus/fuzz_filecfg_malicious_ja4/*)
+fuzz_filecfg_malicious_ja4_seed_corpus.zip: $(files_corpus_fuzz_filecfg_malicious_ja4)
+	zip -j fuzz_filecfg_malicious_ja4_seed_corpus.zip $(files_corpus_fuzz_filecfg_malicious_ja4)
 
 files_corpus_fuzz_filecfg_risk_domains :=  $(wildcard corpus/fuzz_filecfg_risk_domains/*)
 fuzz_filecfg_risk_domains_seed_corpus.zip: $(files_corpus_fuzz_filecfg_risk_domains)
@@ -876,7 +906,7 @@ files_corpus_fuzz_ds_domain_classify :=  $(wildcard corpus/fuzz_ds_domain_classi
 fuzz_ds_domain_classify_seed_corpus.zip: $(files_corpus_fuzz_ds_domain_classify)
 	zip -j fuzz_ds_domain_classify_seed_corpus.zip $(files_corpus_fuzz_ds_domain_classify)
 
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_fuse_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip fuzz_ndpi_reader_pl7m_seed_corpus.zip fuzz_ndpi_reader_pl7m_64k_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_readerutils_parseprotolist_seed_corpus.zip fuzz_ds_bitmap64_fuse_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip fuzz_ndpi_reader_pl7m_seed_corpus.zip fuzz_ndpi_reader_pl7m_64k_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip fuzz_filecfg_malicious_ja4_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip
 	cp corpus/fuzz_*seed_corpus.zip .
 
 #Create dictionaries exactly as expected by oss-fuzz.
@@ -908,7 +938,7 @@ distdir:
 		-o -path './corpus/fuzz_filecfg_protocols/*' \
 		-o -path './corpus/fuzz_filecfg_categories/*' \
 		-o -path './corpus/fuzz_filecfg_malicious_sha1/*' \
-		-o -path './corpus/fuzz_filecfg_malicious_ja3/*' \
+		-o -path './corpus/fuzz_filecfg_malicious_ja4/*' \
 		-o -path './corpus/fuzz_filecfg_risk_domains/*' \
 		-o -path './corpus/fuzz_filecfg_config/*' \
 		-o -path './corpus/fuzz_filecfg_category/*' \

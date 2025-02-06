@@ -82,13 +82,15 @@ typedef struct default_ports_tree_node {
 
 #define LINE_ENDS(ndpi_int_one_line_struct, string_to_compare) \
   ((ndpi_int_one_line_struct).len >= strlen(string_to_compare) && \
-   memcmp((ndpi_int_one_line_struct).ptr + \
-          ((ndpi_int_one_line_struct).len - strlen(string_to_compare)), \
-          string_to_compare, strlen(string_to_compare)) == 0)
+   ndpi_strncasestr((const char *)((ndpi_int_one_line_struct).ptr) + \
+                    ((ndpi_int_one_line_struct).len - strlen(string_to_compare)), \
+                    string_to_compare, strlen(string_to_compare)) == \
+   (const char *)((ndpi_int_one_line_struct).ptr) + ((ndpi_int_one_line_struct).len - strlen(string_to_compare)))
 
 #define LINE_CMP(ndpi_int_one_line_struct, string_to_compare, string_to_compare_length) \
   ((ndpi_int_one_line_struct).ptr != NULL && \
-   memcmp((ndpi_int_one_line_struct).ptr, string_to_compare, string_to_compare_length) == 0)
+   ndpi_strncasestr((const char *)((ndpi_int_one_line_struct).ptr), string_to_compare, \
+                    string_to_compare_length) == (const char *)((ndpi_int_one_line_struct).ptr))
 
 #define NDPI_MAX_PARSE_LINES_PER_PACKET                         64
 
@@ -236,12 +238,25 @@ struct ndpi_detection_module_config_struct {
   
   /* Protocols */
 
+  int http_request_content_type_enabled;
+  int http_referer_enabled;
+  int http_host_enabled;
+  int http_username_enabled;
+  int http_password_enabled;
+
   int tls_certificate_expire_in_x_days;
   int tls_app_blocks_tracking_enabled;
   int tls_heuristics;
   int tls_heuristics_max_packets;
+  int tls_versions_supported_enabled;
+  int tls_alpn_negotiated_enabled;
+  int tls_cipher_enabled;
   int tls_sha1_fingerprint_enabled;
-  int tls_ja3c_fingerprint_enabled;
+  int tls_cert_server_names_enabled;
+  int tls_cert_validity_enabled;
+  int tls_cert_issuer_enabled;
+  int tls_cert_subject_enabled;
+  int tls_broswer_enabled;
   int tls_ja3s_fingerprint_enabled;
   int tls_ja4c_fingerprint_enabled;
   int tls_ja4r_fingerprint_enabled;
@@ -270,6 +285,8 @@ struct ndpi_detection_module_config_struct {
   int stun_relayed_address_enabled;
   int stun_peer_address_enabled;
 
+  int bittorrent_hash_enabled;
+
   int dns_subclassification_enabled;
   int dns_parse_response_enabled;
 
@@ -291,6 +308,8 @@ struct ndpi_detection_module_config_struct {
   NDPI_PROTOCOL_BITMASK debug_bitmask;
   NDPI_PROTOCOL_BITMASK ip_list_bitmask;
   NDPI_PROTOCOL_BITMASK monitoring;
+
+  NDPI_PROTOCOL_BITMASK flowrisk_bitmask;
 
   int flow_risk_lists_enabled;
   int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
@@ -348,7 +367,7 @@ struct ndpi_detection_module_struct {
    * update automa_type above
    */
 
-  ndpi_str_hash *malicious_ja3_hashmap, *malicious_sha1_hashmap;
+  ndpi_str_hash *malicious_ja4_hashmap, *malicious_sha1_hashmap;
 
   ndpi_list *trusted_issuer_dn;
 
@@ -606,7 +625,7 @@ u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
 
 int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len);
 
-u_int8_t ips_match(u_int32_t src, u_int32_t dst,
+u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
 		   u_int32_t net, u_int32_t num_bits);
 
 u_int8_t ends_with(struct ndpi_detection_module_struct *ndpi_struct,
@@ -629,7 +648,7 @@ ndpi_risk_enum ndpi_network_risk_ptree_match(struct ndpi_detection_module_struct
 int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_mod, FILE *fd);
 int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd, void *user_data);
 int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
-int load_malicious_ja3_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
+int load_malicious_ja4_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 int load_risk_domain_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 int load_config_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd);
 int load_category_file_fd(struct ndpi_detection_module_struct *ndpi_str,
@@ -656,10 +675,6 @@ void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_st
 				    struct ndpi_flow_struct *flow);
 void switch_extra_dissection_to_tls_obfuscated_heur(struct ndpi_detection_module_struct* ndpi_struct,
                                                     struct ndpi_flow_struct* flow);
-/* HTTP */
-void http_process_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
-                             struct ndpi_flow_struct *flow,
-                             const u_int8_t *ua_ptr, u_int16_t ua_ptr_len);
 
 /* OOKLA */
 int ookla_search_into_cache(struct ndpi_detection_module_struct* ndpi_struct,
@@ -672,6 +687,7 @@ int quic_len(const uint8_t *buf, uint64_t *value);
 int quic_len_buffer_still_required(uint8_t value);
 int is_version_with_var_int_transport_params(uint32_t version);
 int is_version_with_tls(uint32_t version);
+int is_quic_ver_greater_than(uint32_t version, uint8_t min_version);
 void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
                   struct ndpi_flow_struct *flow,
                   const u_int8_t *crypto_data, uint32_t crypto_data_len);
@@ -700,7 +716,7 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
 int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
             struct ndpi_flow_struct *flow,
             u_int16_t *app_proto);
-void switch_extra_dissection_to_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+void switch_extra_dissection_to_stun(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow, int std_callback);
 
 /* TPKT */
 int tpkt_verify_hdr(const struct ndpi_packet_struct * const packet);
@@ -968,7 +984,13 @@ void init_lustre_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_i
 void init_dingtalk_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_paltalk_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_dicom_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-  
+
+
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+  #include "../../../nDPI-custom/custom_ndpi_private.h"
+#endif
+
 #endif
 
 #ifdef __cplusplus

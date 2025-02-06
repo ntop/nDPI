@@ -24,9 +24,9 @@ DTLS	7	994	1
 
 Safe                             7 994           1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 37.188.4.115             	 1      
 
 
-	1	UDP 37.188.4.115:56453 <-> 70.66.6.128:443 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 30/DTLS, Confidence: DPI][DPI packets: 7][cat: Web/5][4 pkts/584 bytes <-> 3 pkts/410 bytes][Goodput ratio: 71/69][7.22 sec][bytes ratio: 0.175 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1003/2008 2377/3064 4119/4119 1298/1055][Pkt Len c2s/s2c min/avg/max/stddev: 141/90 146/137 161/230 9/66][Risk: ** Obsolete TLS (v1.1 or older) **** Weak TLS Cipher **][Risk Score: 200][Risk Info: TLS (0100) / Cipher TLS_RSA_WITH_AES_256_CBC_SHA][TLS (0100)][JA3C: be3660f0bdab46442f52b205919fee37][JA4: ds3d010000_692296a295db_e3b0c44298fc][JA3S: 8f48e117ae3543615168a2b087cda528 (WEAK)][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA][Plen Bins: 0,28,0,57,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 37.188.4.115:56453 <-> 70.66.6.128:443 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 30/DTLS, Confidence: DPI][DPI packets: 7][cat: Web/5][4 pkts/584 bytes <-> 3 pkts/410 bytes][Goodput ratio: 71/69][7.22 sec][bytes ratio: 0.175 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1003/2008 2377/3064 4119/4119 1298/1055][Pkt Len c2s/s2c min/avg/max/stddev: 141/90 146/137 161/230 9/66][Risk: ** Obsolete TLS (v1.1 or older) **** Weak TLS Cipher **][Risk Score: 200][Risk Info: TLS (0100) / Cipher TLS_RSA_WITH_AES_256_CBC_SHA][TLS (0100)][JA4: d00d010000_692296a295db_e3b0c44298fc][JA3S: 8f48e117ae3543615168a2b087cda528][Cipher: TLS_RSA_WITH_AES_256_CBC_SHA][Plen Bins: 0,28,0,57,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

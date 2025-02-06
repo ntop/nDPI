@@ -1,0 +1,9 @@
+################################################################
+# List of malicious/suspicious JA4C fingerprints               #
+#                                                              #
+# This is only an example. You can extend this list, putting   #
+# one fingeprint per row                                       #
+################################################################
+#
+# ja4c,comment
+t13d1517h2_8daaf6152771_b0da82dd1658,this_is_not_a_real_malicious_fingerprint!!!!!

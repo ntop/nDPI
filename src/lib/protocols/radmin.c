@@ -36,7 +36,7 @@ static void ndpi_int_radmin_add_connection(struct ndpi_detection_module_struct *
   ndpi_set_detected_protocol(ndpi_struct, flow,
                              NDPI_PROTOCOL_RADMIN, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
-  ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found Radmin");
+  ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found Radmin");
 }
 
 static void ndpi_search_radmin(struct ndpi_detection_module_struct *ndpi_struct,

@@ -24,9 +24,9 @@ SnapchatCall	477	365314	1
 
 Acceptable                     477 365314        1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.12.169           	 1      
 
 
-	1	UDP 192.168.12.169:47520 <-> 34.246.231.140:443 [proto: 188.255/QUIC.SnapchatCall][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 188.199/QUIC.Snapchat, Confidence: DPI][DPI packets: 20][cat: VoIP/10][386 pkts/353569 bytes <-> 91 pkts/11745 bytes][Goodput ratio: 95/67][9.53 sec][Hostname/SNI: str1-euwest1-34-246-231-140.addlive.io][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: 0.936 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/89 284/262 25/53][Pkt Len c2s/s2c min/avg/max/stddev: 70/67 916/129 1301/1242 282/178][TLSv1.3][QUIC ver: V-1][JA3C: f4545fa40dda0c87b1bd81d9a55985a2][JA4: q13d0309h0_55b375c5d22e_08189d42dc81][PLAIN TEXT (ktmbPg)][Plen Bins: 1,23,2,0,0,0,0,0,0,0,0,0,1,0,0,3,0,0,1,1,0,4,1,2,1,1,1,3,6,3,3,4,4,7,4,7,1,1,3,1,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.12.169:47520 <-> 34.246.231.140:443 [proto: 188.255/QUIC.SnapchatCall][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 188.199/QUIC.Snapchat, Confidence: DPI][DPI packets: 20][cat: VoIP/10][386 pkts/353569 bytes <-> 91 pkts/11745 bytes][Goodput ratio: 95/67][9.53 sec][Hostname/SNI: str1-euwest1-34-246-231-140.addlive.io][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: 0.936 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/89 284/262 25/53][Pkt Len c2s/s2c min/avg/max/stddev: 70/67 916/129 1301/1242 282/178][TLSv1.3][QUIC ver: V-1][JA4: q13d0309h0_55b375c5d22e_08189d42dc81][PLAIN TEXT (ktmbPg)][Plen Bins: 1,23,2,0,0,0,0,0,0,0,0,0,1,0,0,3,0,0,1,1,0,4,1,2,1,1,1,3,6,3,3,4,4,7,4,7,1,1,3,1,0,0,0,0,0,0,0,0]

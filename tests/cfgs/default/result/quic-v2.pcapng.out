@@ -24,9 +24,9 @@ QUIC	19	12970	1
 
 Acceptable                      19 12970         1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 ::1                      	 1      
 
 
-	1	UDP [::1]:42086 <-> [::1]:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][8 pkts/2734 bytes <-> 11 pkts/10236 bytes][Goodput ratio: 81/93][0.54 sec][Hostname/SNI: test][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: -0.578 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 90/44 251/100 114/43][Pkt Len c2s/s2c min/avg/max/stddev: 119/119 342/931 1296/2098 370/669][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic / Expected on port 443][TLSv1.3][QUIC ver: V-2][JA3C: 5e685944fc983af5eabcc813add3dca1][JA4: q13d0310h0_55b375c5d22e_0a3b52e28cea][Plen Bins: 0,26,0,0,5,15,0,0,0,5,0,0,0,10,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,21,0,5]
+	1	UDP [::1]:42086 <-> [::1]:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][8 pkts/2734 bytes <-> 11 pkts/10236 bytes][Goodput ratio: 81/93][0.54 sec][Hostname/SNI: test][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: -0.578 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 90/44 251/100 114/43][Pkt Len c2s/s2c min/avg/max/stddev: 119/119 342/931 1296/2098 370/669][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic / Expected on port 443][TLSv1.3][QUIC ver: V-2][JA4: q13d0310h0_55b375c5d22e_0a3b52e28cea][Plen Bins: 0,26,0,0,5,15,0,0,0,5,0,0,0,10,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,21,0,5]

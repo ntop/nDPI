@@ -24,8 +24,8 @@ TLS	10	1978	1
 
 Safe                            10 1978          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 
 
 	1	TCP 172.67.21.133:443 -> 192.168.12.156:39958 [proto: 91/TLS][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 10][cat: Web/5][10 pkts/1978 bytes -> 0 pkts/0 bytes][Goodput ratio: 72/0][0.30 sec][(Negotiated) ALPN: http/1.1][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 33/0 88/0 32/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 198/0 1284/0 365/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][TLSv1.2][JA3S: 5badad76fbdd6e8b6296e2e9f4024401][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,33,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0]

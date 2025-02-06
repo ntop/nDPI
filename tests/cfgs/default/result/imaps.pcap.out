@@ -17,7 +17,7 @@ Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   4/0 (search/found)
+Patricia protocols:   3/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 ntop	20	5196	1
@@ -25,11 +25,11 @@ IMAPS	8	4378	1
 
 Safe                            28 9574          2            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.0.1              	 1      
 	2	 192.168.1.8              	 1      
 
 
-	1	TCP 192.168.1.8:50506 <-> 167.99.215.164:993 [proto: 51.26/IMAPS.ntop][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][cat: Email/3][10 pkts/1220 bytes <-> 10 pkts/3976 bytes][Goodput ratio: 45/83][0.33 sec][Hostname/SNI: mail.ntop.org][bytes ratio: -0.530 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 33/22 77/43 26/19][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 122/398 293/1506 78/557][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][TLSv1.2][JA3C: 4923a265be4d81c68ecda45bb89cdf6a][JA4: t12d330700_81acdcf97981_3304d8368043][ServerNames: mail.ntop.org][JA3S: b653c251b0ee54c3088fe7bb997cf59d][Issuer: C=US, O=Let's Encrypt, CN=Let's Encrypt Authority X3][Subject: CN=mail.ntop.org][Certificate SHA-1: F1:9A:35:30:96:57:5E:56:81:28:2C:D9:45:A5:83:21:9E:E8:C5:DF][Firefox][Validity: 2020-04-18 00:15:22 - 2020-07-17 00:15:22][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][PLAIN TEXT (mail.ntop.org)][Plen Bins: 0,20,10,10,20,10,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0]
-	2	TCP 192.168.0.1:51529 <-> 10.10.10.1:993 [proto: 51/IMAPS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 8][cat: Email/3][4 pkts/1322 bytes <-> 4 pkts/3056 bytes][Goodput ratio: 78/91][0.22 sec][Hostname/SNI: imap.asia.secureserver.net][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.396 (Download)][IAT c2s/s2c min/avg/max/stddev: 1/0 46/68 136/135 64/68][Pkt Len c2s/s2c min/avg/max/stddev: 78/74 330/764 583/1454 252/690][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_64_65535_afa647335257/Unknown][TLSv1.2][JA3C: 66b2d7acea2c20aeeebd69c8d44089d7][JA4: t13d261200_2802a3db6c62_845d286b0d67][JA3S: a9e3ed16ee3208291487c8d2aa2ad924][Safari][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][PLAIN TEXT (imap.asia.secureserver.net)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0]
+	1	TCP 192.168.1.8:50506 <-> 167.99.215.164:993 [proto: 51.26/IMAPS.ntop][IP: 442/DigitalOcean][Encrypted][Confidence: DPI][FPC: 442/DigitalOcean, Confidence: IP address][DPI packets: 7][cat: Email/3][10 pkts/1220 bytes <-> 10 pkts/3976 bytes][Goodput ratio: 45/83][0.33 sec][Hostname/SNI: mail.ntop.org][bytes ratio: -0.530 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 33/22 77/43 26/19][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 122/398 293/1506 78/557][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][TLSv1.2][JA4: t12d330700_81acdcf97981_3304d8368043][ServerNames: mail.ntop.org][JA3S: b653c251b0ee54c3088fe7bb997cf59d][Issuer: C=US, O=Let's Encrypt, CN=Let's Encrypt Authority X3][Subject: CN=mail.ntop.org][Certificate SHA-1: F1:9A:35:30:96:57:5E:56:81:28:2C:D9:45:A5:83:21:9E:E8:C5:DF][Firefox][Validity: 2020-04-18 00:15:22 - 2020-07-17 00:15:22][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][PLAIN TEXT (mail.ntop.org)][Plen Bins: 0,20,10,10,20,10,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0]
+	2	TCP 192.168.0.1:51529 <-> 10.10.10.1:993 [proto: 51/IMAPS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 8][cat: Email/3][4 pkts/1322 bytes <-> 4 pkts/3056 bytes][Goodput ratio: 78/91][0.22 sec][Hostname/SNI: imap.asia.secureserver.net][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.396 (Download)][IAT c2s/s2c min/avg/max/stddev: 1/0 46/68 136/135 64/68][Pkt Len c2s/s2c min/avg/max/stddev: 78/74 330/764 583/1454 252/690][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_64_65535_afa647335257/Unknown][TLSv1.2][JA4: t13d261200_2802a3db6c62_845d286b0d67][JA3S: a9e3ed16ee3208291487c8d2aa2ad924][Safari][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][PLAIN TEXT (imap.asia.secureserver.net)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0]

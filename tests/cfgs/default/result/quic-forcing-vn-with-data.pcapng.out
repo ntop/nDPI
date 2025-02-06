@@ -24,9 +24,9 @@ QUIC	21	9039	1
 
 Acceptable                      21 9039          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.56.103           	 1      
 
 
-	1	UDP 192.168.56.103:55523 <-> 192.168.56.104:4433 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 3][cat: Web/5][13 pkts/6012 bytes <-> 8 pkts/3027 bytes][Goodput ratio: 91/89][0.01 sec][(Advertised) ALPNs: h3;h3-29;h3-28;h3-27;hq-interop;hq-29;hq-28;hq-27;http/0.9][TLS Supported Versions: TLSv1.3][bytes ratio: 0.330 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 4/4 1/1][Pkt Len c2s/s2c min/avg/max/stddev: 85/86 462/378 1242/1242 522/371][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 150][Risk Info: Expected on port 443 / SNI should always be present / h3][TLSv1.3][QUIC ver: V-1][JA3C: 86871fd0d48de0c82beec154cd3f1744][JA4: q13d0307h3_55b375c5d22e_f0736a66fa6b][PLAIN TEXT (quiche)][Plen Bins: 0,44,4,9,0,0,4,0,4,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.56.103:55523 <-> 192.168.56.104:4433 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 3][cat: Web/5][13 pkts/6012 bytes <-> 8 pkts/3027 bytes][Goodput ratio: 91/89][0.01 sec][(Advertised) ALPNs: h3;h3-29;h3-28;h3-27;hq-interop;hq-29;hq-28;hq-27;http/0.9][TLS Supported Versions: TLSv1.3][bytes ratio: 0.330 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 4/4 1/1][Pkt Len c2s/s2c min/avg/max/stddev: 85/86 462/378 1242/1242 522/371][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 150][Risk Info: Expected on port 443 / SNI should always be present / h3][TLSv1.3][QUIC ver: V-1][JA4: q13d0307h3_55b375c5d22e_f0736a66fa6b][PLAIN TEXT (quiche)][Plen Bins: 0,44,4,9,0,0,4,0,4,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0]

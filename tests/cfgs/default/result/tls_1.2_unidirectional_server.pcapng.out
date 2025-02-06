@@ -24,8 +24,8 @@ YouTubeUpload	18	7218	1
 
 Fun                             18 7218          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 
 
 	1	TCP 216.58.209.42:443 -> 192.168.12.156:43854 [proto: 91.136/TLS.YouTubeUpload][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 126/Google, Confidence: IP address][DPI packets: 15][cat: Media/1][18 pkts/7218 bytes -> 0 pkts/0 bytes][Goodput ratio: 83/0][0.43 sec][(Negotiated) ALPN: h2][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 26/0 233/0 57/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 401/0 1484/0 503/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][TLSv1.2][ServerNames: upload.video.google.com,*.clients.google.com,*.docs.google.com,*.drive.google.com,*.gdata.youtube.com,*.googleapis.com,*.photos.google.com,*.youtube-3rd-party.com,upload.google.com,*.upload.google.com,upload.youtube.com,*.upload.youtube.com,uploads.stage.gdata.youtube.com,bg-call-donation.goog,bg-call-donation-alpha.goog,bg-call-donation-canary.goog,bg-call-donation-dev.goog][JA3S: eca9b8f0f3eae50309eaf901cb822d9b][Issuer: C=US, O=Google Trust Services LLC, CN=GTS CA 1C3][Subject: CN=upload.video.google.com][Certificate SHA-1: A9:8F:37:B3:54:4F:D0:01:B7:8D:0F:88:21:37:4A:EB:F7:E3:D3:F2][Validity: 2022-06-06 09:17:59 - 2022-08-29 09:17:58][Cipher: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,25,8,0,8,0,0,0,0,8,16,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0]

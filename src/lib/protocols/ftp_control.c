@@ -42,7 +42,8 @@ static void ndpi_int_ftp_control_add_connection(struct ndpi_detection_module_str
 
 /* *************************************************************** */
 
-static int ndpi_ftp_control_check_request(struct ndpi_flow_struct *flow,
+static int ndpi_ftp_control_check_request(struct ndpi_detection_module_struct *ndpi_struct,
+                                          struct ndpi_flow_struct *flow,
 					  const u_int8_t *payload,
 					  size_t payload_len) {
 #ifdef FTP_DEBUG
@@ -58,7 +59,7 @@ static int ndpi_ftp_control_check_request(struct ndpi_flow_struct *flow,
 
     snprintf(buf, sizeof(buf), "Found FTP username (%s)",
 	     flow->l4.tcp.ftp_imap_pop_smtp.username);
-    ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
+    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
     return 1;
   }
 
@@ -599,10 +600,10 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
   }
 
   /* Check if we so far detected the protocol in the request or not. */
-  if(flow->ftp_control_stage == 0) {
+  if(flow->l4.tcp.ftp_control_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "FTP_CONTROL stage 0: \n");
 
-    if((payload_len > 0) && ndpi_ftp_control_check_request(flow,
+    if((payload_len > 0) && ndpi_ftp_control_check_request(ndpi_struct, flow,
 							   packet->payload, payload_len)) {
       NDPI_LOG_DBG2(ndpi_struct,
 		    "Possible FTP_CONTROL request detected, we will look further for the response..\n");
@@ -611,16 +612,16 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
 	Encode the direction of the packet in the stage, so we will know when we need
 	to look for the response packet. 
       */
-      flow->ftp_control_stage = packet->packet_direction + 1;
+      flow->l4.tcp.ftp_control_stage = packet->packet_direction + 1;
     }
   } else {
-    NDPI_LOG_DBG2(ndpi_struct, "FTP_CONTROL stage %u: \n", flow->ftp_control_stage);
+    NDPI_LOG_DBG2(ndpi_struct, "FTP_CONTROL stage %u: \n", flow->l4.tcp.ftp_control_stage);
 
     /*
       At first check, if this is for sure a response packet (in another direction.
       If not, do nothing now and return. 
     */
-    if((flow->ftp_control_stage - packet->packet_direction) == 1) {
+    if((flow->l4.tcp.ftp_control_stage - packet->packet_direction) == 1) {
       return;
     }
       
@@ -636,7 +637,7 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
       if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0' &&
 	 flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 0 &&
 	 flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 0) {
-	flow->ftp_control_stage = 0;
+	flow->l4.tcp.ftp_control_stage = 0;
       } else if (flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 &&
 		 ndpi_struct->cfg.ftp_opportunistic_tls_enabled) {
 	flow->host_server_name[0] = '\0'; /* Remove any data set by other dissectors (eg. SMTP) */
@@ -653,7 +654,7 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
     } else {
       NDPI_LOG_DBG2(ndpi_struct, "The reply did not seem to belong to FTP_CONTROL, "
 		    "resetting the stage to 0\n");
-      flow->ftp_control_stage = 0;
+      flow->l4.tcp.ftp_control_stage = 0;
     }
   }
 }

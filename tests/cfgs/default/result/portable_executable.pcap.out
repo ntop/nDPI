@@ -1,8 +1,8 @@
-Guessed flow protos:	1
+Guessed flow protos:	2
 
 DPI Packets (TCP):	30	(15.00 pkts/flow)
-Confidence Unknown          : 1 (flows)
 Confidence Match by port    : 1 (flows)
+Confidence Match by IP      : 1 (flows)
 Num dissector calls: 481 (240.50 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/6/0 (insert/search/found)
@@ -16,21 +16,18 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   4/0 (search/found)
+Patricia protocols:   2/2 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Unknown	15	12160	1
 DNS	15	12154	1
+DigitalOcean	15	12160	1
 
+Safe                            15 12160         1            
 Acceptable                      15 12154         1            
-Unrated                         15 12160         1            
 
-	1	TCP 64.227.107.71:53 <-> 172.16.99.10:49652 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 15][cat: Network/14][11 pkts/11914 bytes <-> 4 pkts/240 bytes][Goodput ratio: 95/0][0.37 sec][0.0.0.0][bytes ratio: 0.961 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 40/182 362/364 114/182][Pkt Len c2s/s2c min/avg/max/stddev: 58/60 1083/60 1310/60 481/0][Risk: ** Binary App Transfer **** Susp Entropy **][Risk Score: 160][Risk Info: Portable Executable (PE32/PE32+) found / Entropy: 5.990 (Executable?)][PLAIN TEXT (This program cannot be run in D)][Plen Bins: 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,0,0,0,0,0,0,0,0]
-
-
-Undetected flows:
-	1	TCP 172.16.99.201:1732 <-> 64.227.107.71:4444 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 15][4 pkts/246 bytes <-> 11 pkts/11914 bytes][Goodput ratio: 0/95][0.73 sec][bytes ratio: -0.960 (Download)][IAT c2s/s2c min/avg/max/stddev: 329/0 364/45 398/398 34/125][Pkt Len c2s/s2c min/avg/max/stddev: 60/58 62/1083 66/1310 3/481][Risk: ** Binary App Transfer **** Susp Entropy **][Risk Score: 160][Risk Info: Portable Executable (PE32/PE32+) found / Entropy: 6.154 (Executable?)][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][PLAIN TEXT (This program cannot be run in D)][Plen Bins: 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,0,0,0,0,0,0,0,0]
+	1	TCP 172.16.99.201:1732 <-> 64.227.107.71:4444 [proto: 442/DigitalOcean][IP: 442/DigitalOcean][Encrypted][Confidence: Match by IP][FPC: 442/DigitalOcean, Confidence: IP address][DPI packets: 15][cat: Web/5][4 pkts/246 bytes <-> 11 pkts/11914 bytes][Goodput ratio: 0/95][0.73 sec][bytes ratio: -0.960 (Download)][IAT c2s/s2c min/avg/max/stddev: 329/0 364/45 398/398 34/125][Pkt Len c2s/s2c min/avg/max/stddev: 60/58 62/1083 66/1310 3/481][Risk: ** Binary App Transfer **** Susp Entropy **][Risk Score: 160][Risk Info: Portable Executable (PE32/PE32+) found / Entropy: 6.154 (Executable?)][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][PLAIN TEXT (This program cannot be run in D)][Plen Bins: 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,0,0,0,0,0,0,0,0]
+	2	TCP 64.227.107.71:53 <-> 172.16.99.10:49652 [proto: 5/DNS][IP: 442/DigitalOcean][ClearText][Confidence: Match by port][FPC: 442/DigitalOcean, Confidence: IP address][DPI packets: 15][cat: Network/14][11 pkts/11914 bytes <-> 4 pkts/240 bytes][Goodput ratio: 95/0][0.37 sec][0.0.0.0][bytes ratio: 0.961 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 40/182 362/364 114/182][Pkt Len c2s/s2c min/avg/max/stddev: 58/60 1083/60 1310/60 481/0][Risk: ** Binary App Transfer **** Susp Entropy **][Risk Score: 160][Risk Info: Portable Executable (PE32/PE32+) found / Entropy: 5.990 (Executable?)][PLAIN TEXT (This program cannot be run in D)][Plen Bins: 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,0,0,0,0,0,0,0,0]

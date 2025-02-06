@@ -24,9 +24,9 @@ Instagram	14	6907	1
 
 Fun                             14 6907          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.91.186.174           	 1      
 
 
-	1	TCP 192.91.186.174:443 <-> 25.137.80.32:38134 [proto: 91.211/TLS.Instagram][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: SocialNetwork/6][11 pkts/4419 bytes <-> 3 pkts/2488 bytes][Goodput ratio: 83/92][0.95 sec][Hostname/SNI: i.instagram.com][(Advertised) ALPNs: h2;h2-fb;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.3 (Fizz)][bytes ratio: 0.280 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/15 105/232 465/449 152/217][Pkt Len c2s/s2c min/avg/max/stddev: 74/470 402/829 1414/1414 483/417][TLSv1.3 (Fizz)][JA3C: 44dab16d680ef93487bc16ad23b3ffb1][JA4: t00d0309h2_55b375c5d22e_566d5108064c][JA3S: fcb2d4d0991292272fcb1e464eedfd43][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 7,0,24,7,0,7,7,7,0,0,0,0,7,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,0,0,0,0,0]
+	1	TCP 192.91.186.174:443 <-> 25.137.80.32:38134 [proto: 91.211/TLS.Instagram][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: SocialNetwork/6][11 pkts/4419 bytes <-> 3 pkts/2488 bytes][Goodput ratio: 83/92][0.95 sec][Hostname/SNI: i.instagram.com][(Advertised) ALPNs: h2;h2-fb;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.3 (Fizz)][bytes ratio: 0.280 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/15 105/232 465/449 152/217][Pkt Len c2s/s2c min/avg/max/stddev: 74/470 402/829 1414/1414 483/417][TLSv1.3 (Fizz)][JA4: t00d0309h2_55b375c5d22e_566d5108064c][JA3S: fcb2d4d0991292272fcb1e464eedfd43][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 7,0,24,7,0,7,7,7,0,0,0,0,7,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,0,0,0,0,0]

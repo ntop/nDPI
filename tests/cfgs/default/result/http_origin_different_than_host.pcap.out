@@ -1,6 +1,6 @@
 DPI Packets (TCP):	4	(4.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 15 (15.00 diss/flow)
+Num dissector calls: 22 (22.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -20,8 +20,8 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   1/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-HTTP	4	1229	1
+WebSocket	4	1229	1
 
 Acceptable                       4 1229          1            
 
-	1	TCP 10.140.206.74:34536 <-> 18.135.206.102:80 [VLAN: 113][proto: GTP:7/HTTP][IP: 265/AmazonAWS][ClearText][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 4][cat: Web/5][2 pkts/835 bytes <-> 2 pkts/394 bytes][Goodput ratio: 73/42][0.35 sec][Hostname/SNI: csb.performgroup.io][URL: csb.performgroup.io/?topreferer=optawidgets.365scores.com][StatusCode: 101][User-Agent: Mozilla/5.0 (Linux; Android 9; JKM-LX1 Build/HUAWEIJKM-LX1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/106.0.5249.118 Mobile Safari/537.36][TCP Fingerprint: 2_64_65535_41a9d5af7dd3/Android][PLAIN TEXT (topreferer)][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 10.140.206.74:34536 <-> 18.135.206.102:80 [VLAN: 113][proto: GTP:7.251/HTTP.WebSocket][IP: 265/AmazonAWS][ClearText][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 4][cat: Web/5][2 pkts/835 bytes <-> 2 pkts/394 bytes][Goodput ratio: 73/42][0.35 sec][Hostname/SNI: csb.performgroup.io][URL: csb.performgroup.io/?topreferer=optawidgets.365scores.com][StatusCode: 101][User-Agent: Mozilla/5.0 (Linux; Android 9; JKM-LX1 Build/HUAWEIJKM-LX1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/106.0.5249.118 Mobile Safari/537.36][TCP Fingerprint: 2_64_65535_41a9d5af7dd3/Android][PLAIN TEXT (topreferer)][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -8,16 +8,25 @@ Work in progress!
 .. _Proto 32:
 
 `NDPI_PROTOCOL_BFCP`
-=======================
+====================
 BFCP (Binary Floor Control Protocol) is used for controlling and coordinating real-time data sharing and collaboration during video conferencing sessions.
 
 References: `RFC: <https://datatracker.ietf.org/doc/html/rfc8855>`_
 
 
+.. _Proto 38:
+
+`NDPI_PROTOCOL_MSTEAMS_CALL`
+============================
+Audio/video calls made by (any) Microsoft applications: mainly MsTeams, but also Skype.
+
+References: `Main site: <https://www.microsoft.com/it-it/microsoft-teams/group-chat-software>`_
+
+
 .. _Proto 54:
 
 `NDPI_PROTOCOL_IQIYI`
-===========================
+=====================
 iQIYI is a Chinese online video platform that offers a wide range of original and licensed content including movies, dramas, variety shows, and anime.
 
 References: `Main site: <https://www.iqiyi.com/>`_
@@ -125,6 +134,19 @@ References: `Main site: <https://meet.google.com/>`_
 Steam Datagram Relay (SDR) is Valve's virtual private gaming network. Used in all modern games from Valve, but can also be used by developers via the Steamworks SDK for their games.
 
 References: `Main site: <https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay>`_
+
+
+.. _Proto 350:
+
+`NDPI_PROTOCOL_MSTEAMS`
+=======================
+Microsoft Teams is a team collaboration application developed by Microsoft as part of the Microsoft 365 family of products, offering workspace chat and video conferencing, file storage, and integration of proprietary and third-party applications and services.
+
+References: `Main site: <https://www.microsoft.com/it-it/microsoft-teams/group-chat-software>`_
+
+Notes:
+
+- This same id is also used for Skype traffic
 
 
 .. _Proto 338:
@@ -1069,7 +1091,25 @@ References: `Main site <https://www.paramountplus.com/>`_
 .. _Proto 440:
 
 `NDPI_PROTOCOL_YANDEX_ALICE`
-=============================
+============================
 Yandex Alice is a voice assistant developed by Yandex, providing answers, performing tasks, and supporting smart home integration, similar to Alexa or Google Assistant.
 
 References: `Main site <https://yandex.ru/dev/dialogs/alice/doc/ru/protocol/>`_
+
+
+.. _Proto 441:
+
+`NDPI_PROTOCOL_VIVOX`
+=====================
+Vivox is a voice and text chat technology platform that provides real-time communication solutions for online games and applications.
+
+References: `Main site <https://unity.com/products/vivox-voice-chat>`_
+
+
+.. _Proto 442:
+
+`NDPI_PROTOCOL_DIGITALOCEAN`
+============================
+DigitalOcean is a cloud service provider.
+
+References: `Main site <https://www.digitalocean.com/>`_

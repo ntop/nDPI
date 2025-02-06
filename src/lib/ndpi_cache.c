@@ -439,7 +439,7 @@ u_int32_t ndpi_address_cache_restore(struct ndpi_address_cache *cache, char *pat
   
   if(!fd) return(false);
 
-  while(fscanf(fd, "%s\t%s\t%u\n", ip, hostname, &epoch) > 0) {    
+  while(fscanf(fd, "%32s\t%255s\t%u\n", ip, hostname, &epoch) > 0) {    
     if(epoch >= epoch_now) { /* Entry not yet expired */
       u_int ttl = epoch-epoch_now;
       ndpi_ip_addr_t addr;

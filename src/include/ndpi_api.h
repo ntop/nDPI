@@ -153,6 +153,8 @@ extern "C" {
    */
   u_int16_t ndpi_network_ptree_match(struct ndpi_detection_module_struct *ndpi_struct,
 				     struct in_addr *pin);
+  u_int16_t ndpi_network_ptree6_match(struct ndpi_detection_module_struct *ndpi_str,
+				      struct in6_addr *pin);
 
   /**
    * Returns the nDPI protocol id for IP+port-based protocol detection
@@ -850,14 +852,14 @@ extern "C" {
   int ndpi_load_risk_domain_file(struct ndpi_detection_module_struct *ndpi_str, const char* path);
 
   /**
-   * Read a file and load the list of malicious JA3 signatures
+   * Read a file and load the list of malicious JA4 signatures
    *
    * @par     ndpi_mod = the detection module
    * @par     path     = the path of the file
    * @return  0 if the file is loaded correctly;
    *          -1 else
    */
-  int ndpi_load_malicious_ja3_file(struct ndpi_detection_module_struct *ndpi_str, const char *path);
+  int ndpi_load_malicious_ja4_file(struct ndpi_detection_module_struct *ndpi_str, const char *path);
 
   /**
    * Read a file and load the list of malicious SSL certificate SHA1 fingerprints.
@@ -1728,6 +1730,7 @@ extern "C" {
   float ndpi_data_variance(struct ndpi_analyze_struct *s);
   float ndpi_data_stddev(struct ndpi_analyze_struct *s);
   float ndpi_data_mean(struct ndpi_analyze_struct *s);
+  float ndpi_data_jitter(struct ndpi_analyze_struct *s);
   u_int64_t ndpi_data_last(struct ndpi_analyze_struct *s);
   u_int64_t ndpi_data_min(struct ndpi_analyze_struct *s);
   u_int64_t ndpi_data_max(struct ndpi_analyze_struct *s);

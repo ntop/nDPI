@@ -24,8 +24,8 @@ DTLS	6	1563	1
 
 Safe                             6 1563          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 
 
 	1	UDP 33.35.223.103:540 -> 26.83.9.81:57567 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 6][cat: Network/14][6 pkts/1563 bytes -> 0 pkts/0 bytes][Goodput ratio: 84/0][1.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 232/0 299/0 116/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/0 260/0 958/0 312/0][Mapped IP/Port: 5.36.191.232:57567][Risk: ** Self-signed Cert **** Unidirectional Traffic **][Risk Score: 110][Risk Info: No client to server traffic / CN=LiveFoundry Inc.][DTLSv1.0][JA3S: 1974c5c625e99dc22d0477079a54aed3][Issuer: CN=LiveFoundry Inc.][Subject: CN=LiveFoundry Inc.][Certificate SHA-1: 23:F4:E7:42:93:22:91:BB:A3:54:70:97:94:2A:DE:AF:26:61:18:98][Validity: 2015-08-27 09:07:05 - 2016-08-27 09:07:05][Cipher: TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA][PLAIN TEXT (LiveFoundry Inc.0)][Plen Bins: 0,0,67,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -24,9 +24,9 @@ Google	12	9296	1
 
 Acceptable                      12 9296          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 187.227.136.152          	 1      
 
 
-	1	UDP 187.227.136.152:55356 <-> 211.247.147.90:443 [proto: 188.126/QUIC.Google][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188.126/QUIC.Google, Confidence: DPI][DPI packets: 1][cat: Web/5][6 pkts/3140 bytes <-> 6 pkts/6156 bytes][Goodput ratio: 92/96][0.24 sec][Hostname/SNI: www.google.com][(Advertised) ALPNs: h3-T051][TLS Supported Versions: TLSv1.3][bytes ratio: -0.324 (Download)][IAT c2s/s2c min/avg/max/stddev: 2/0 47/47 113/110 46/49][Pkt Len c2s/s2c min/avg/max/stddev: 75/68 523/1026 1392/1392 614/501][User-Agent: dev Chrome/86.0.4240.9 Windows NT 6.1; Win64; x64][TLSv1.3][QUIC ver: T051][JA3C: 92e76078d514999cd950474995dab2b5][JA4: q13d0308h3_55b375c5d22e_e7bc1e4f333e][Plen Bins: 8,25,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,41,0,0,0,0,0]
+	1	UDP 187.227.136.152:55356 <-> 211.247.147.90:443 [proto: 188.126/QUIC.Google][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188.126/QUIC.Google, Confidence: DPI][DPI packets: 1][cat: Web/5][6 pkts/3140 bytes <-> 6 pkts/6156 bytes][Goodput ratio: 92/96][0.24 sec][Hostname/SNI: www.google.com][(Advertised) ALPNs: h3-T051][TLS Supported Versions: TLSv1.3][bytes ratio: -0.324 (Download)][IAT c2s/s2c min/avg/max/stddev: 2/0 47/47 113/110 46/49][Pkt Len c2s/s2c min/avg/max/stddev: 75/68 523/1026 1392/1392 614/501][TLSv1.3][QUIC ver: T051][JA4: q13d0308h3_55b375c5d22e_e7bc1e4f333e][Plen Bins: 8,25,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,41,0,0,0,0,0]

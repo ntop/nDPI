@@ -1,0 +1,28 @@
+DPI Packets (TCP):	8	(4.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 44 (22.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          1/0 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+WebSocket	9	1243	2
+
+Acceptable                       9 1243          2            
+
+	1	TCP 172.18.82.242:41986 <-> 172.18.82.243:80 [proto: 7.251/HTTP.WebSocket][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][3 pkts/429 bytes <-> 4 pkts/477 bytes][Goodput ratio: 52/43][0.52 sec][Hostname/SNI: something1.tld][bytes ratio: -0.053 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 106/102 213/307 106/145][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 143/119 289/247 103/74][StatusCode: 101][Server: nginx][User-Agent: Go-http-client/1.1][Risk: ** Obfuscated Traffic **][Risk Score: 100][Risk Info: Obfuscated SSH-in-HTTP-WebSocket traffic][TCP Fingerprint: 2_64_65500_c9121a61c67d/Unknown][PLAIN TEXT (GET / H)][Plen Bins: 33,0,0,0,0,33,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 172.18.82.243:80 -> 172.18.82.242:51634 [proto: 7.251/HTTP.WebSocket][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7.251/HTTP.WebSocket, Confidence: DPI][DPI packets: 2][cat: Web/5][2 pkts/337 bytes -> 0 pkts/0 bytes][Goodput ratio: 61/0][< 1 sec][StatusCode: 101][Server: nginx][Risk: ** HTTP Susp User-Agent **** Unidirectional Traffic **][Risk Score: 110][Risk Info: No client to server traffic / Empty or missing User-Agent][PLAIN TEXT (HTTP/1.1 101 Switching Protocol)][Plen Bins: 50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

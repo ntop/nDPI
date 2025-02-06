@@ -1,0 +1,36 @@
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+DPI Packets (UDP):	3	(3.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 163 (81.50 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/2/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/2 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+RTP	3	361	1
+Vivox	4	509	1
+
+Acceptable                       3 361           1            
+Fun                              4 509           1            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.1.13             	 1      
+
+
+	1	TCP 192.168.1.13:40434 <-> 85.236.98.21:443 [proto: 91.441/TLS.Vivox][IP: 441/Vivox][Encrypted][Confidence: DPI][FPC: 441/Vivox, Confidence: IP address][DPI packets: 4][cat: Game/8][3 pkts/435 bytes <-> 1 pkts/74 bytes][Goodput ratio: 53/0][0.12 sec][Hostname/SNI: mt1s.www.vivox.com][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][TLSv1.2][JA4: t12d251000_7415a186c913_577ffa9d9a5c][Firefox][PLAIN TEXT (s.www.vivox.com)][Plen Bins: 0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.1.13:55921 -> 85.236.96.158:40354 [proto: 87/RTP][IP: 441/Vivox][ClearText][Confidence: DPI][FPC: 441/Vivox, Confidence: IP address][DPI packets: 3][cat: Media/1][3 pkts/361 bytes -> 0 pkts/0 bytes][Goodput ratio: 65/0][0.06 sec][Plen Bins: 0,33,33,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

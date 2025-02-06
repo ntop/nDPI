@@ -26,10 +26,10 @@ Google	11	952	1
 Safe                             7 533           1            
 Acceptable                      11 952           1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.1.192            	 1      
 
 
-	1	TCP 192.168.1.192:63158 <-> 192.168.1.20:443 [proto: 91.126/TLS.Google][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 11][cat: Advertisement/101][6 pkts/607 bytes <-> 5 pkts/345 bytes][Goodput ratio: 33/2][0.00 sec][Hostname/SNI: www.google-analytics.com][(Advertised) ALPNs: h2;h2-16;h2-15;h2-14;spdy/3.1;spdy/3;http/1.1][bytes ratio: 0.275 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 101/69 265/74 73/4][Risk: ** Obsolete TLS (v1.1 or older) **** TLS Fatal Alert **][Risk Score: 110][Risk Info: TLSv1 / Found fatal TLS alert][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][TLSv1][JA3C: d78489b860c8bf7838a6ff0b4d131541][JA4: t10d0909h2_61c4dbd01224_cc731f12afbb][Plen Bins: 50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.1.192:63158 <-> 192.168.1.20:443 [proto: 91.126/TLS.Google][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 11][cat: Advertisement/101][6 pkts/607 bytes <-> 5 pkts/345 bytes][Goodput ratio: 33/2][0.00 sec][Hostname/SNI: www.google-analytics.com][(Advertised) ALPNs: h2;h2-16;h2-15;h2-14;spdy/3.1;spdy/3;http/1.1][bytes ratio: 0.275 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 101/69 265/74 73/4][Risk: ** Obsolete TLS (v1.1 or older) **** TLS Fatal Alert **][Risk Score: 110][Risk Info: TLSv1 / Found fatal TLS alert][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][TLSv1][JA4: t10d0909h2_61c4dbd01224_cc731f12afbb][Plen Bins: 50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.2.100:37780 -> 160.44.202.202:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 1][cat: Web/5][7 pkts/533 bytes -> 0 pkts/0 bytes][Goodput ratio: 29/0][3.67 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 3/0 612/0 1878/0 656/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 76/0 85/0 14/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

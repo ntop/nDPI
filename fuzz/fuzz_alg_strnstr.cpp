@@ -14,5 +14,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   ndpi_strnstr(haystack.c_str(), needle.c_str(), len);
 
+  ndpi_str_endswith(haystack.c_str(), needle.c_str());
+
   return 0;
 }

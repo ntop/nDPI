@@ -171,7 +171,8 @@ echo "(3) Line IPs are available in $DEST"
 
 echo "(1) Downloading VK..."
 DEST=../src/lib/inc_generated/ndpi_asn_vk.c.inc
-create_list NDPI_PROTOCOL_VK $DEST "" "AS47541"
+# https://bgpview.io/search/vkontakte
+create_list NDPI_PROTOCOL_VK $DEST "" "AS47541" "AS207581" "AS28709" "AS47542" "AS62243"
 echo "(3) VK IPs are available in $DEST"
 
 echo "(1) Downloading Yandex..."

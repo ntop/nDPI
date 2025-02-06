@@ -24,8 +24,8 @@ WindowsUpdate	1	1486	1
 
 Safe                             1 1486          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 
 
 	1	UDP 191.62.60.190:443 -> 163.205.15.180:38876 [proto: 30.147/DTLS.WindowsUpdate][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 30.147/DTLS.WindowsUpdate, Confidence: DPI][DPI packets: 1][cat: SoftwareUpdate/19][1 pkts/1486 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Risk: ** TLS Cert Expired **** Unidirectional Traffic **][Risk Score: 110][Risk Info: No client to server traffic / 27/Feb/2017 12:00:00 - 27/Feb/2019 00:00:00][DTLSv1.2][JA3S: 953c1507994f72697446de4eff6e300b][Issuer: C=US, ST=Washington, L=Redmond, O=Microsoft Corporation, CN=Microsoft Update Secure Server CA 1][Subject: C=US, ST=Washington, L=Redmond, O=Microsoft, OU=DSP, CN=www.update.microsoft.com][Certificate SHA-1: D1:88:0F:51:C1:01:91:72:A1:A4:6E:69:F4:33:7F:FE:3E:C4:F0:39][Validity: 2017-02-27 12:00:00 - 2019-02-27 00:00:00][Cipher: TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384][PLAIN TEXT (Washington1)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0]

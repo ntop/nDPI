@@ -1,6 +1,6 @@
 DPI Packets (TCP):	10	(5.00 pkts/flow)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 15 (7.50 diss/flow)
+Num dissector calls: 16 (8.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -24,10 +24,10 @@ Zattoo	32	13467	2
 
 Fun                             32 13467         2            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 10.101.0.2               	 1      
 
 
 	1	TCP 10.101.0.2:2936 <-> 10.102.0.2:80 [proto: 7.55/HTTP.Zattoo][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Video/26][11 pkts/6399 bytes <-> 10 pkts/2814 bytes][Goodput ratio: 90/80][0.01 sec][Hostname/SNI: zattosecurehd2-f.akamaihd.net][bytes ratio: 0.389 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 2/0 1/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 582/281 1015/458 378/118][URL: zattosecurehd2-f.akamaihd.net/crossdomain.xml][StatusCode: 200][Content-Type: text/html][User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:6.0) Gecko/20100101 Firefox/6.0][TCP Fingerprint: 2_128_32769_7704c7190476/Unknown][PLAIN TEXT (GET /crossdomain.xml HTTP/1.1)][Plen Bins: 0,0,0,0,0,0,0,6,38,0,0,6,12,0,0,6,0,0,0,0,0,0,0,0,0,0,0,12,12,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	TCP 10.101.0.2:2930 <-> 10.102.0.2:443 [proto: 91.55/TLS.Zattoo][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Video/26][6 pkts/1940 bytes <-> 5 pkts/2314 bytes][Goodput ratio: 82/88][0.00 sec][Hostname/SNI: zattoo.com][bytes ratio: -0.088 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/1 1/2 0/1][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 323/463 1219/1126 416/477][Risk: ** Weak TLS Cipher **** TLS (probably) Not Carrying HTTPS **** TLS Cert Validity Too Long **][Risk Score: 160][Risk Info: No ALPN / Cipher TLS_RSA_WITH_AES_128_GCM_SHA256 / TLS Cert lasts 3650 days][TCP Fingerprint: 2_128_32769_7704c7190476/Unknown][TLSv1.2][JA3C: 64bb849b426bd19378dcd61a6396fef1][JA4: t12d020300_798dd72d0aaa_b23915e3e4f5][JA3S: 5ea8fd3044cb27a1d12e476d60e0668c (WEAK)][Issuer: C=US, ST=California, L=San Jose, O=Spirent Communications Inc., OU=IT, CN=www.spirent.com][Subject: C=US, ST=California, L=San Jose, O=zattoo.com, OU=Marketing, CN=zattoo.com][Certificate SHA-1: A8:F3:C0:1B:32:F1:73:F3:11:90:A0:01:3E:1B:3E:D5:0C:00:EB:D2][Firefox][Validity: 2021-03-04 02:42:42 - 2031-03-02 02:42:42][Cipher: TLS_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,16,0,16,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,16,0,0,16,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 10.101.0.2:2930 <-> 10.102.0.2:443 [proto: 91.55/TLS.Zattoo][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Video/26][6 pkts/1940 bytes <-> 5 pkts/2314 bytes][Goodput ratio: 82/88][0.00 sec][Hostname/SNI: zattoo.com][bytes ratio: -0.088 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/1 1/2 0/1][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 323/463 1219/1126 416/477][Risk: ** Weak TLS Cipher **** TLS (probably) Not Carrying HTTPS **** TLS Cert Validity Too Long **][Risk Score: 160][Risk Info: No ALPN / Cipher TLS_RSA_WITH_AES_128_GCM_SHA256 / TLS Cert lasts 3650 days][TCP Fingerprint: 2_128_32769_7704c7190476/Unknown][TLSv1.2][JA4: t12d020300_798dd72d0aaa_b23915e3e4f5][JA3S: 5ea8fd3044cb27a1d12e476d60e0668c][Issuer: C=US, ST=California, L=San Jose, O=Spirent Communications Inc., OU=IT, CN=www.spirent.com][Subject: C=US, ST=California, L=San Jose, O=zattoo.com, OU=Marketing, CN=zattoo.com][Certificate SHA-1: A8:F3:C0:1B:32:F1:73:F3:11:90:A0:01:3E:1B:3E:D5:0C:00:EB:D2][Firefox][Validity: 2021-03-04 02:42:42 - 2031-03-02 02:42:42][Cipher: TLS_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,16,0,16,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,16,0,0,16,0,0,0,0,0,0,0,0,0,0,0]

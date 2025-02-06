@@ -24,8 +24,8 @@ TLS	9	1651	1
 
 Safe                             9 1651          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 
 
 	1	TCP 142.250.184.68:443 -> 192.168.12.156:39750 [proto: 91/TLS][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 126/Google, Confidence: IP address][DPI packets: 9][cat: Web/5][9 pkts/1651 bytes -> 0 pkts/0 bytes][Goodput ratio: 65/0][0.07 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 8/0 20/0 7/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 183/0 921/0 270/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][TLSv1.3][JA3S: 2b0648ab686ee45e0e7c35fcfb0eea7e][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

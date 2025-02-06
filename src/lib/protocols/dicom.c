@@ -34,29 +34,24 @@ PACK_ON struct dicom_header {
 static void ndpi_search_dicom(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int16_t dicom_port = ntohs(104);
 
   NDPI_LOG_DBG(ndpi_struct, "search DICOM\n");
 
   if(packet->iph && (packet->payload_packet_len > sizeof(struct dicom_header))) {
-    if(packet->tcp->dest == dicom_port) {
-      struct dicom_header *h = (struct dicom_header*)packet->payload;
-
-      if((h->pdu_type == 0x01 /* A-ASSOCIATE */)
-	 && (h->pad == 0x0)
-	 && (packet->payload_packet_len <= (ntohl(h->pdu_len)+6))
-	 && (packet->payload_packet_len > 9)
-	 && (packet->payload[6] == 0x0) && (packet->payload[7] == 0x1) /* Protocol Version */
-	 && (packet->payload[8] == 0x0) && (packet->payload[9] == 0x0) /* Pad */
-	 
-	) {
-	ndpi_set_detected_protocol(ndpi_struct, flow,
-				   NDPI_PROTOCOL_DICOM,
-				   NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      } else
-	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    } else if(packet->tcp->dest != dicom_port)
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow); /* At least one port must be the DICOM port */
+    struct dicom_header *h = (struct dicom_header*)packet->payload;
+    
+    if((h->pdu_type == 0x01 /* A-ASSOCIATE */)
+       && (h->pad == 0x0)
+       && (packet->payload_packet_len <= (ntohl(h->pdu_len)+6))
+       && (packet->payload_packet_len > 9)
+       && (packet->payload[6] == 0x0) && (packet->payload[7] == 0x1) /* Protocol Version */
+       && (packet->payload[8] == 0x0) && (packet->payload[9] == 0x0) /* Pad */       
+       ) {
+      ndpi_set_detected_protocol(ndpi_struct, flow,
+				 NDPI_PROTOCOL_DICOM,
+				 NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+    } else
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   } else
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }

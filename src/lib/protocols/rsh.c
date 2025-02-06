@@ -139,7 +139,7 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
                      flow->protos.rsh.command) < 0)
           str[0] = '\0';
         
-        ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, str);
+        ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, str);
       }
       return;
 

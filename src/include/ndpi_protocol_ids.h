@@ -66,7 +66,7 @@ typedef enum {
   NDPI_PROTOCOL_GNUTELLA              = 35,
   NDPI_PROTOCOL_EDONKEY               = 36,
   NDPI_PROTOCOL_BITTORRENT            = 37,
-  NDPI_PROTOCOL_SKYPE_TEAMS_CALL      = 38, /* Skype call and videocalls */
+  NDPI_PROTOCOL_MSTEAMS_CALL          = 38, /* MS Teams (and Skype) videocalls */
   NDPI_PROTOCOL_SIGNAL                = 39,
   NDPI_PROTOCOL_MEMCACHED             = 40, /* Memcached */
   NDPI_PROTOCOL_SMBV23                = 41, /* SMB version 2/3 */
@@ -153,7 +153,7 @@ typedef enum {
   NDPI_PROTOCOL_GMAIL                 = 122,
   NDPI_PROTOCOL_GOOGLE_MAPS           = 123,
   NDPI_PROTOCOL_YOUTUBE               = 124,
-  NDPI_PROTOCOL_SKYPE_TEAMS           = 125,
+  NDPI_PROTOCOL_FREE_125              = 125, /* FREE */
   NDPI_PROTOCOL_GOOGLE                = 126,
   NDPI_PROTOCOL_MS_RPCH               = 127,
   NDPI_PROTOCOL_NETFLOW               = 128,
@@ -469,6 +469,8 @@ typedef enum {
   NDPI_PROTOCOL_DICOM                 = 438, /* Hospital Protocol */
   NDPI_PROTOCOL_PARAMOUNTPLUS         = 439,
   NDPI_PROTOCOL_YANDEX_ALICE          = 440,
+  NDPI_PROTOCOL_VIVOX                 = 441,
+  NDPI_PROTOCOL_DIGITALOCEAN          = 442,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

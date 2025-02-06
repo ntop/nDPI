@@ -24,8 +24,8 @@ TLS	14	10082	1
 
 Safe                            14 10082         1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 
 
 	1	TCP 10.10.10.1:443 <-> 192.168.0.1:33063 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 14][cat: Web/5][6 pkts/6525 bytes <-> 8 pkts/3557 bytes][Goodput ratio: 94/85][0.38 sec][bytes ratio: 0.294 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 40/13 161/59 70/23][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 1088/445 2023/1090 747/434][TLSv1.3][JA3S: 907bf3ecef1c987c889946b737b43de8][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 0,0,11,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,0,33,0,0,0,11]

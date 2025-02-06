@@ -25,11 +25,11 @@ Mumble	10	2551	3
 
 Fun                             10 2551          3            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.88.208           	 1      
 
 
-	1	TCP 192.168.88.208:50059 <-> 151.101.66.217:443 [proto: 91.387/TLS.Mumble][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: VoIP/10][3 pkts/691 bytes <-> 3 pkts/1620 bytes][Goodput ratio: 75/89][< 1 sec][Hostname/SNI: publist.mumble.info][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.402 (Download)][IAT c2s/s2c min/avg/max/stddev: 2/36 21/146 40/255 19/110][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 230/540 571/1494 241/675][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][TLSv1.2][JA3C: 57fbe0aefee44901190849b0e877a5e1][JA4: t13d571100_131602cb7446_24695f2957a7][JA3S: 1d8db21618511d0ab31a2c2a0de6d7a7][Firefox][Cipher: TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
+	1	TCP 192.168.88.208:50059 <-> 151.101.66.217:443 [proto: 91.387/TLS.Mumble][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: VoIP/10][3 pkts/691 bytes <-> 3 pkts/1620 bytes][Goodput ratio: 75/89][< 1 sec][Hostname/SNI: publist.mumble.info][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.402 (Download)][IAT c2s/s2c min/avg/max/stddev: 2/36 21/146 40/255 19/110][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 230/540 571/1494 241/675][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][TLSv1.2][JA4: t13d571100_131602cb7446_24695f2957a7][JA3S: 1d8db21618511d0ab31a2c2a0de6d7a7][Firefox][Cipher: TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
 	2	UDP 192.168.88.208:50085 <-> 5.39.185.162:64738 [proto: 387/Mumble][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VoIP/10][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 22/36][0.05 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.88.208:50085 <-> 87.122.110.156:64738 [proto: 387/Mumble][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VoIP/10][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 22/36][0.05 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

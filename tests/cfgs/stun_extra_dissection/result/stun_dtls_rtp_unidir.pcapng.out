@@ -24,10 +24,10 @@ SRTP	43	10358	2
 
 Acceptable                      43 10358         2            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 10.10.0.1                	 1      
 
 
 	1	UDP 10.1.0.3:5853 -> 10.10.0.1:2808 [proto: 30.338/DTLS.SRTP][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 18][cat: Media/1][18 pkts/5384 bytes -> 0 pkts/0 bytes][Goodput ratio: 86/0][7.17 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 386/0 4001/0 979/0][Pkt Len c2s/s2c min/avg/max/stddev: 102/0 299/0 750/0 221/0][Mapped IP/Port: 10.10.0.1:26378][Peer IP/Port: 10.0.0.147:60770][Relayed IP/Port: 10.1.0.3:60815][Risk: ** Self-signed Cert **** Unidirectional Traffic **][Risk Score: 110][Risk Info: No server to client traffic / CN=8][DTLSv1.0][JA3S: 1cfcbe58451407e23669f1dd08565519][Issuer: CN=8][Subject: CN=8][Certificate SHA-1: 94:8C:6F:C3:00:6A:A1:63:F1:52:7E:7F:1F:A7:93:90:46:3B:B1:2D][Validity: 2015-12-10 05:41:43 - 2016-01-10 05:41:43][Cipher: TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA][PLAIN TEXT (Coturn)][Plen Bins: 0,5,5,5,34,22,0,0,0,5,0,0,0,0,0,5,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 10.10.0.1:65226 -> 10.1.0.3:57730 [proto: 30.338/DTLS.SRTP][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 25][cat: Media/1][25 pkts/4974 bytes -> 0 pkts/0 bytes][Goodput ratio: 79/0][7.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 324/0 4001/0 904/0][Pkt Len c2s/s2c min/avg/max/stddev: 78/0 199/0 478/0 92/0][Mapped IP/Port: 10.0.0.147:60770][Peer IP/Port: 192.168.2.105:60770][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][DTLSv1.0][JA3C: fd8faf73d274d5614a51dae82304be0a][JA4: dd1d250500_c70d7c76d4be_255c854b9f77][PLAIN TEXT (username1)][Plen Bins: 0,8,16,16,32,0,4,8,0,12,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.10.0.1:65226 -> 10.1.0.3:57730 [proto: 30.338/DTLS.SRTP][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 25][cat: Media/1][25 pkts/4974 bytes -> 0 pkts/0 bytes][Goodput ratio: 79/0][7.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 324/0 4001/0 904/0][Pkt Len c2s/s2c min/avg/max/stddev: 78/0 199/0 478/0 92/0][Mapped IP/Port: 10.0.0.147:60770][Peer IP/Port: 192.168.2.105:60770][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][DTLSv1.0][JA4: dd1d250500_c70d7c76d4be_255c854b9f77][PLAIN TEXT (username1)][Plen Bins: 0,8,16,16,32,0,4,8,0,12,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

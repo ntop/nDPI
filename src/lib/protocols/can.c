@@ -67,7 +67,7 @@ static void ndpi_search_can(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_int_can_add_connection(ndpi_struct, flow);
 
   if (can_header->version != 0x01) {
-    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid CAN Header");
+    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid CAN Header");
   }
 }
 

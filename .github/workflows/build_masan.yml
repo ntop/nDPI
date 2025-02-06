@@ -1,0 +1,47 @@
+name: Memory Sanitizer
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+    types: [opened, synchronize, reopened]
+  release:
+    types: [created]
+  workflow_dispatch:
+  schedule:
+    #At the end of every day
+    - cron: '0 0 * * *'
+
+jobs:
+  memorysanitizer:
+    name: masan (ubuntu-22.04)
+    runs-on: ubuntu-22.04 # TODO: some issues with masan/clang/ubuntu-24.04
+    env:
+      CC: clang
+      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      # Idea to have significant faster tests while pushing/merging: test all pcaps only on schedule runs; otherwise tests only the pcaps updated/added recently
+      NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS: ${{ (github.event_name == 'schedule') && '0' || '1' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libjson-c-dev libpcap-dev rrdtool librrd-dev parallel libpcre3-dev libmaxminddb-dev
+      - name: Configure nDPI
+        run: |
+          ./autogen.sh --enable-option-checking=fatal --with-pcre2 --with-maxminddb --with-memory-sanitizer --disable-memory-track-origins
+      - name: Build nDPI
+        run: |
+          make -j $(nproc) all
+          make -j $(nproc) -C example ndpiSimpleIntegration
+          make -j $(nproc) -C rrdtool
+      - name: Tests
+        run: |
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          # Some issues with masan + json-c. Disable the test as workaround
+          # ./tests/do-unit.sh
+          ./tests/do-dga.sh

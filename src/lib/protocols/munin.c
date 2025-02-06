@@ -64,7 +64,7 @@ static void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (packet->payload[packet->payload_packet_len - 1] != '\n')
   {
-    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Missing Munin Hostname");
+    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Missing Munin Hostname");
     return;
   }
 
@@ -73,7 +73,7 @@ static void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
   {
     ndpi_hostname_sni_set(flow, packet->payload + NDPI_STATICSTRING_LEN(munin_prefix), host_len, NDPI_HOSTNAME_NORM_ALL);
   } else {
-    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Missing Munin Hostname");
+    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Missing Munin Hostname");
   }
 }
 

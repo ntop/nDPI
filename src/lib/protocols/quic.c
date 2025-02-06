@@ -129,8 +129,7 @@ static int is_quic_ver_less_than(uint32_t version, uint8_t max_version)
   uint8_t u8_ver = get_u8_quic_ver(version);
   return u8_ver && u8_ver <= max_version;
 }
-
-static int is_quic_ver_greater_than(uint32_t version, uint8_t min_version)
+int is_quic_ver_greater_than(uint32_t version, uint8_t min_version)
 {
   return get_u8_quic_ver(version) >= min_version;
 }
@@ -1424,7 +1423,7 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
   uint32_t prev_offset;
   uint32_t tag_offset_start, offset, len;
   ndpi_protocol_match_result ret_match;
-  int sni_found = 0, ua_found = 0;
+  int sni_found = 0, icsl_found = 0;
 
   if(crypto_data_len < 6)
     return;
@@ -1472,26 +1471,25 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 	char str[128];
 
 	snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
-	ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, str);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
 	
 	/* This looks like an attack */
-	ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
+	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
       }
       
       sni_found = 1;
-      if (ua_found)
+      if(icsl_found)
         return;
     }
 
-    if(memcmp(tag, "UAID", 4) == 0) {
-      u_int uaid_offset = tag_offset_start + prev_offset;
-            
-      NDPI_LOG_DBG2(ndpi_struct, "UA: [%.*s]\n", len, &crypto_data[uaid_offset]);
-	
-      http_process_user_agent(ndpi_struct, flow, &crypto_data[uaid_offset], len); /* http.c */
-      ua_found = 1;
-	
-      if (sni_found)
+    if(memcmp(tag, "ICSL", 4) == 0 && len >= 4) {
+      u_int icsl_offset = tag_offset_start + prev_offset;
+
+      flow->protos.tls_quic.quic_idle_timeout_sec = le32toh((*(uint32_t *)&crypto_data[icsl_offset]));
+      NDPI_LOG_DBG2(ndpi_struct, "ICSL: %d\n", flow->protos.tls_quic.quic_idle_timeout_sec);
+      icsl_found = 1;
+
+      if(sni_found)
         return;
     }
 
@@ -1503,7 +1501,7 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
   /* Add check for missing SNI */
   if(flow->host_server_name[0] == '\0') {
     /* This is a bit suspicious */
-    ndpi_set_risk(flow, NDPI_TLS_MISSING_SNI, "SNI should be present all time: attack ?");
+    ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_MISSING_SNI, "SNI should be present all time: attack ?");
   }
 }
 

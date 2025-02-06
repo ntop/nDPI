@@ -97,24 +97,24 @@ extern int dpdk_port_deinit(int port);
 extern "C" {
 #endif
 
-// inner hash table (ja3 -> security state)
-typedef struct ndpi_ja3_info {
-  char * ja3;
+// inner hash table (ja -> security state)
+typedef struct ndpi_ja_info {
+  char * ja;
   ndpi_cipher_weakness unsafe_cipher;
   UT_hash_handle hh;
-} ndpi_ja3_info;
+} ndpi_ja_info;
 
-// external hash table (host ip -> <ip string, hash table ja3c, hash table ja3s>)
+// external hash table (host ip -> <ip string, hash table ja4c, hash table ja3s>)
 // used to aggregate ja3 fingerprints by hosts
-typedef struct ndpi_host_ja3_fingerprints {
+typedef struct ndpi_host_ja_fingerprints {
   u_int32_t ip;
   char *ip_string;
   char *dns_name;
-  ndpi_ja3_info *host_client_info_hasht;
-  ndpi_ja3_info *host_server_info_hasht;
+  ndpi_ja_info *host_client_info_hasht;
+  ndpi_ja_info *host_server_info_hasht;
 
   UT_hash_handle hh;
-} ndpi_host_ja3_fingerprints;
+} ndpi_host_ja_fingerprints;
 
 
 //inner hash table
@@ -125,13 +125,13 @@ typedef struct ndpi_ip_dns{
   UT_hash_handle hh;
 } ndpi_ip_dns;
 
-//hash table ja3 -> <host, ip, security>, used to aggregate host by ja3 fingerprints
-typedef struct ndpi_ja3_fingerprints_host{
-  char *ja3; //key
+//hash table ja -> <host, ip, security>, used to aggregate host by ja fingerprints
+typedef struct ndpi_ja_fingerprints_host{
+  char *ja; //key
   ndpi_cipher_weakness unsafe_cipher;
   ndpi_ip_dns *ipToDNS_ht;
   UT_hash_handle hh;
-} ndpi_ja3_fingerprints_host;
+} ndpi_ja_fingerprints_host;
 
 struct flow_metrics {
   float entropy, average, stddev;
@@ -279,6 +279,7 @@ typedef struct ndpi_flow_info {
   char *bittorent_hash;
   char *dhcp_fingerprint;
   char *dhcp_class_ident;
+  uint32_t idle_timeout_sec;
   ndpi_risk risk;
 
   struct {
@@ -291,15 +292,10 @@ typedef struct ndpi_flow_info {
       client_hassh[33], server_hassh[33], *server_names,
       *advertised_alpns, *negotiated_alpn, *tls_supported_versions,
       *tls_issuerDN, *tls_subjectDN,
-      ja3_client[33], ja3_server[33], ja4_client[37], *ja4_client_raw,
+      ja3_server[33], ja4_client[37], *ja4_client_raw,
       sha1_cert_fingerprint[20];
     u_int8_t sha1_cert_fingerprint_set;
     struct tls_heuristics browser_heuristics;
-    
-    struct {
-      u_int16_t cipher_suite;
-      char *esni;
-    } encrypted_sni;    
 
     struct {
       u_int16_t version;
@@ -323,6 +319,7 @@ typedef struct ndpi_flow_info {
   struct {
     ndpi_address_port_list mapped_address, peer_address,
       relayed_address, response_origin, other_address;
+    u_int16_t rtp_counters[2];
   } stun;
   
   struct {
@@ -362,6 +359,9 @@ typedef struct ndpi_stats {
   u_int64_t protocol_counter[NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1];
   u_int64_t protocol_counter_bytes[NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1];
   u_int32_t protocol_flows[NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1];
+  u_int64_t fpc_protocol_counter[NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1];
+  u_int64_t fpc_protocol_counter_bytes[NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1];
+  u_int32_t fpc_protocol_flows[NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1];
   u_int32_t ndpi_flow_count;
   u_int32_t flow_count[3];
   u_int64_t tcp_count, udp_count;
@@ -370,6 +370,7 @@ typedef struct ndpi_stats {
   u_int16_t max_packet_len;
   u_int64_t dpi_packet_count[3];
   u_int64_t flow_confidence[NDPI_CONFIDENCE_MAX];
+  u_int64_t fpc_flow_confidence[NDPI_FPC_CONFIDENCE_MAX];
   u_int64_t num_dissector_calls;
 
   struct ndpi_lru_cache_stats lru_stats[NDPI_LRUCACHE_MAX];

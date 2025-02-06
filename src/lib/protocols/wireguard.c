@@ -174,7 +174,7 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
     u_int32_t receiver_index = get_u_int32_t(payload, 4);
 
     /* We speculate this is wireguard, so let's remember it */
-    flow->guessed_protocol_id = NDPI_PROTOCOL_WIREGUARD;
+    flow->fast_callback_protocol_id = NDPI_PROTOCOL_WIREGUARD;
     
     if (flow->l4.udp.wireguard_stage == 0) {
       flow->l4.udp.wireguard_stage = 3 + packet->packet_direction;

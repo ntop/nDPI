@@ -93,8 +93,8 @@ extern "C" {
 			       ndpi_protocol_category_t protoCategory,
 			       ndpi_port_range *tcpDefPorts,
 			       ndpi_port_range *udpDefPorts);
-  void ndpi_set_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r,
-		     char *risk_message);
+  void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                     ndpi_risk_enum r, char *risk_message);
   void ndpi_unset_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r);
   int ndpi_isset_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r);
   int ndpi_is_printable_buffer(u_int8_t const * const buf, size_t len);
@@ -108,7 +108,7 @@ extern "C" {
 #define NDPI_ENTROPY_ENCRYPTED_OR_RANDOM(entropy) (entropy >= 7.312f)
   float ndpi_entropy(u_int8_t const * const buf, size_t len);
   char *ndpi_entropy2str(float entropy, char *buf, size_t len);
-  void ndpi_entropy2risk(struct ndpi_flow_struct *flow);
+  void ndpi_entropy2risk(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
 
 #ifdef __cplusplus
 }

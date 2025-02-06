@@ -155,7 +155,7 @@ static inline binary_hashes_t binary_fuse8_hash_batch(uint64_t hash,
 static inline uint32_t binary_fuse8_hash(int index, uint64_t hash,
                                         const binary_fuse8_t *filter) {
     uint64_t h = binary_fuse_mulhi(hash, filter->SegmentCountLength);
-    h += index * filter->SegmentLength;
+    h += (uint64_t)index * filter->SegmentLength;
     // keep the lower 36 bits
     uint64_t hh = hash & ((1ULL << 36) - 1);
     // index 0: right shift by 36; index 1: right shift by 18; index 2: no shift
@@ -475,7 +475,7 @@ static inline binary_hashes_t binary_fuse16_hash_batch(uint64_t hash,
 static inline uint32_t binary_fuse16_hash(int index, uint64_t hash,
                                         const binary_fuse16_t *filter) {
     uint64_t h = binary_fuse_mulhi(hash, filter->SegmentCountLength);
-    h += index * filter->SegmentLength;
+    h += (uint64_t)index * filter->SegmentLength;
     // keep the lower 36 bits
     uint64_t hh = hash & ((1ULL << 36) - 1);
     // index 0: right shift by 36; index 1: right shift by 18; index 2: no shift

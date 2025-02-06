@@ -24,9 +24,9 @@ DTLS	6	1708	1
 
 Safe                             6 1708          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 26.83.9.81               	 1      
 
 
-	1	UDP 26.83.9.81:57567 -> 33.35.223.103:540 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 6][cat: Network/14][6 pkts/1708 bytes -> 0 pkts/0 bytes][Goodput ratio: 85/0][1.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 232/0 299/0 116/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/0 285/0 873/0 267/0][Mapped IP/Port: 104.193.187.21:540][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][DTLSv1.0][JA3C: f5eee7bc59657db39e2b9cdd401d78b7][JA4: dd1d350400_23b9269eae60_dbc12469f409][PLAIN TEXT (ugPnBzE)][Plen Bins: 0,0,16,51,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 26.83.9.81:57567 -> 33.35.223.103:540 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 6][cat: Network/14][6 pkts/1708 bytes -> 0 pkts/0 bytes][Goodput ratio: 85/0][1.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 232/0 299/0 116/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/0 285/0 873/0 267/0][Mapped IP/Port: 104.193.187.21:540][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][DTLSv1.0][JA4: dd1d350400_23b9269eae60_dbc12469f409][PLAIN TEXT (ugPnBzE)][Plen Bins: 0,0,16,51,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

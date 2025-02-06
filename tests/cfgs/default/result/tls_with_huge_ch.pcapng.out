@@ -24,9 +24,9 @@ TLS	428	119100	1
 
 Safe                           428 119100        1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 172.30.84.193            	 1      
 
 
-	1	TCP 172.30.84.193:40640 <-> 208.253.217.142:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 32][cat: Web/5][194 pkts/51762 bytes <-> 234 pkts/67338 bytes][Goodput ratio: 75/77][31.67 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.131 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 135/123 2012/2189 352/307][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 267/288 1090/1514 287/409][Risk: ** Missing SNI TLS Extn **** ALPN/SNI Mismatch **** Obfuscated Traffic **][Risk Score: 200][Risk Info: Abnormal Client Hello/Padding length / SNI should always be present / h2][TCP Fingerprint: 2_64_65535_685ad951a756/Android][TLSv1.2][JA3C: 66d6080b942b0b593896bf729f3fd326][JA4: t13d1811h2_f71e3e15ae0d_5c3a8cf9b2bc][Firefox][Plen Bins: 0,0,7,52,4,3,7,1,2,0,2,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,10,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0]
+	1	TCP 172.30.84.193:40640 <-> 208.253.217.142:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 32][cat: Web/5][194 pkts/51762 bytes <-> 234 pkts/67338 bytes][Goodput ratio: 75/77][31.67 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.131 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 135/123 2012/2189 352/307][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 267/288 1090/1514 287/409][Risk: ** Missing SNI TLS Extn **** ALPN/SNI Mismatch **** Obfuscated Traffic **][Risk Score: 200][Risk Info: Abnormal Client Hello/Padding length / SNI should always be present / h2][TCP Fingerprint: 2_64_65535_685ad951a756/Android][TLSv1.2][JA4: t13d1811h2_f71e3e15ae0d_5c3a8cf9b2bc][Firefox][Plen Bins: 0,0,7,52,4,3,7,1,2,0,2,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,10,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0]

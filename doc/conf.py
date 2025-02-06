@@ -23,6 +23,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'breathe',
     'exhale'
+    # 'myst_parser'
 ]
 
 # Workaround for platforms where swaggerdoc is not available
@@ -49,7 +50,7 @@ templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
-source_suffix = ['.rst', '.md']
+source_suffix = {'.rst': 'restructuredtext', '.md': 'restructuredtext'}
 #source_suffix = '.rst'
 
 # The encoding of source files.
@@ -152,7 +153,7 @@ html_logo = "img/logo.png"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -298,7 +299,8 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
 
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
 
 def setup(app):
     app.add_css_file('css/ntop.css')
+    app.add_css_file('custom.css')

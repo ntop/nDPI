@@ -27,4 +27,4 @@ Unrated                          1 197           1
 
 
 Undetected flows:
-	1	TCP [3400:3a30:3035:2f75:706c:6f32:643f:6c3d]:44288 -> [302e::3d00::8001]:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][1 pkts/197 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No server to client traffic][PLAIN TEXT (005/uplo2)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP [3400:3a30:3035:2f75:706c:6f32:643f:6c3d]:44288 -> [302e::3d00:0:8001]:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][1 pkts/197 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No server to client traffic][PLAIN TEXT (005/uplo2)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

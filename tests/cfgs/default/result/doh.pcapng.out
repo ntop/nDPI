@@ -24,9 +24,9 @@ TLS	120	14592	1
 
 Safe                           120 14592         1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.1.253            	 1      
 
 
-	1	TCP 192.168.1.253:35996 <-> 1.1.1.1:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][61 pkts/5381 bytes <-> 59 pkts/9211 bytes][Goodput ratio: 35/63][122.79 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.262 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1965/1934 15360/15360 4993/4853][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 88/156 315/1514 41/267][Risk: ** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 100][Risk Info: SNI should always be present / h2][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][TLSv1.3][JA3C: 7c1e207beb00684bbbe144f1b0abe1d5][JA4: t13d1909h2_9dc949149365_97f8aa674fd9][JA3S: d75f9129bb5d05492a65ff78e081bcb2][Firefox][Cipher: TLS_CHACHA20_POLY1305_SHA256][Plen Bins: 22,26,24,1,1,7,5,5,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0]
+	1	TCP 192.168.1.253:35996 <-> 1.1.1.1:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][61 pkts/5381 bytes <-> 59 pkts/9211 bytes][Goodput ratio: 35/63][122.79 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.262 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1965/1934 15360/15360 4993/4853][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 88/156 315/1514 41/267][Risk: ** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 100][Risk Info: SNI should always be present / h2][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][TLSv1.3][JA4: t13d1909h2_9dc949149365_97f8aa674fd9][JA3S: d75f9129bb5d05492a65ff78e081bcb2][Firefox][Cipher: TLS_CHACHA20_POLY1305_SHA256][Plen Bins: 22,26,24,1,1,7,5,5,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0]

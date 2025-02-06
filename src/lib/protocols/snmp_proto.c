@@ -129,7 +129,7 @@ static void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
                   char str[64];
 
                   snprintf(str, sizeof(str), "SNMP Error %d", error_status);
-                  ndpi_set_risk(flow, NDPI_ERROR_CODE_DETECTED, str);
+                  ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, str);
 	        }
               }
             }

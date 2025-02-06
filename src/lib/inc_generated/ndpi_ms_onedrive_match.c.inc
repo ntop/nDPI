@@ -32,6 +32,7 @@ static ndpi_network ndpi_protocol_ms_one_drive_protocol_list[] = {
 
 static ndpi_network6 ndpi_protocol_ms_one_drive_protocol_list_6[] = {
  { "2603:1061:1300::", 40, NDPI_PROTOCOL_MS_ONE_DRIVE },
+ { "2603:1063:6000::", 35, NDPI_PROTOCOL_MS_ONE_DRIVE },
  { "2620:1ec:8f8::", 46, NDPI_PROTOCOL_MS_ONE_DRIVE },
  { "2620:1ec:908::", 46, NDPI_PROTOCOL_MS_ONE_DRIVE },
  { "2a01:111:f402::", 48, NDPI_PROTOCOL_MS_ONE_DRIVE },

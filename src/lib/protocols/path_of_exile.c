@@ -36,6 +36,19 @@ static void ndpi_search_pathofexile(struct ndpi_detection_module_struct *ndpi_st
 
   NDPI_LOG_DBG(ndpi_struct, "search Path of Exile\n");
 
+  /* Path of Exile 2 */
+  if (packet->payload_packet_len == 19 && packet->payload[0] == 0) {
+    if (ntohs(get_u_int16_t(packet->payload, 1)) == 0x300 &&
+        ntohs(get_u_int16_t(packet->payload, 7)) == 0x200 &&
+        ntohl(get_u_int32_t(packet->payload, 14)) == 0x40)
+    {
+      NDPI_LOG_INFO(ndpi_struct, "found Path of Exile 2\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PATHOFEXILE, NDPI_PROTOCOL_UNKNOWN,
+                                 NDPI_CONFIDENCE_DPI);
+      return;
+    }
+  }
+
   /* The first packet always contains these signatures and the character's 
    * nickname (from 4 to 23 chars).
    */

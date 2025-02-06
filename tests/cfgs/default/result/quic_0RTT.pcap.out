@@ -25,11 +25,11 @@ QUIC	2	2588	1
 
 Acceptable                      17 7766          2            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.2.100            	 1      
 	2	 ::1                      	 1      
 
 
-	1	UDP 192.168.2.100:51972 <-> 142.250.181.227:443 [proto: 188.126/QUIC.Google][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 126/Google, Confidence: IP address][DPI packets: 3][cat: Web/5][7 pkts/2168 bytes <-> 8 pkts/3010 bytes][Goodput ratio: 86/89][0.23 sec][Hostname/SNI: ssl.gstatic.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: -0.163 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 36/10 121/30 45/14][Pkt Len c2s/s2c min/avg/max/stddev: 75/67 310/376 1292/1292 416/426][TLSv1.3][QUIC ver: V-1][JA3C: 06b6b2a2cba0b7deeaaa6a3d8374d627][JA4: q13d0312h0_55b375c5d22e_73e2d9e6cde6][Plen Bins: 26,20,20,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0]
-	2	UDP [::1]:60459 <-> [::1]:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/1294 bytes][Goodput ratio: 95/95][0.00 sec][Hostname/SNI: abcd][(Advertised) ALPNs: h3-32][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic / Expected on port 443][TLSv1.3][QUIC ver: Draft-28][JA3C: a7b629a5bd67bfc25e2c78b3daa4c12f][JA4: q00d0310h3_55b375c5d22e_060ec1c6a056][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.2.100:51972 <-> 142.250.181.227:443 [proto: 188.126/QUIC.Google][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 126/Google, Confidence: IP address][DPI packets: 3][cat: Web/5][7 pkts/2168 bytes <-> 8 pkts/3010 bytes][Goodput ratio: 86/89][0.23 sec][Hostname/SNI: ssl.gstatic.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: -0.163 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 36/10 121/30 45/14][Pkt Len c2s/s2c min/avg/max/stddev: 75/67 310/376 1292/1292 416/426][TLSv1.3][QUIC ver: V-1][JA4: q13d0312h0_55b375c5d22e_73e2d9e6cde6][Plen Bins: 26,20,20,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0]
+	2	UDP [::1]:60459 <-> [::1]:4443 [proto: 188/QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][1 pkts/1294 bytes <-> 1 pkts/1294 bytes][Goodput ratio: 95/95][0.00 sec][Hostname/SNI: abcd][(Advertised) ALPNs: h3-32][TLS Supported Versions: TLSv1.3;TLSv1.3 (draft);TLSv1.3 (draft);TLSv1.3 (draft)][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic / Expected on port 443][TLSv1.3][QUIC ver: Draft-28][JA4: q00d0310h3_55b375c5d22e_060ec1c6a056][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0]

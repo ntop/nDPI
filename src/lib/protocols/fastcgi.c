@@ -204,7 +204,7 @@ static void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct
 
     if (fcgi_parse_params(flow, packet) != 0)
     {
-      ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid FastCGI PARAMS header");
+      ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid FastCGI PARAMS header");
       ndpi_int_fastcgi_add_connection(ndpi_struct, flow, NULL);
     } else {
       ndpi_match_host_subprotocol(ndpi_struct, flow,
@@ -218,10 +218,10 @@ static void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct
         char str[128];
 
         snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
-        ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, str);
+        ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
 
         /* This looks like an attack */
-        ndpi_set_risk(flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
+        ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
       }
       ndpi_int_fastcgi_add_connection(ndpi_struct, flow, &ret_match);
     }

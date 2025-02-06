@@ -75,7 +75,7 @@ u_int8_t rtp_get_stream_type(u_int8_t payloadType, u_int8_t *s_type, u_int16_t s
   }
 
   /* Microsoft; from https://learn.microsoft.com/en-us/openspecs/office_protocols/ms-rtp/3b8dc3c6-34b8-4827-9b38-3b00154f471c */
-  if(sub_proto == NDPI_PROTOCOL_SKYPE_TEAMS_CALL) {
+  if(sub_proto == NDPI_PROTOCOL_MSTEAMS_CALL) {
     switch(payloadType) {
     case 103: /* SILK Narrowband */
     case 104: /* SILK Wideband */
@@ -186,6 +186,7 @@ u_int8_t rtp_get_stream_type(u_int8_t payloadType, u_int8_t *s_type, u_int16_t s
       *s_type |= ndpi_multimedia_audio_flow;
       return(1);
 
+    case 108:
     case 120:
       *s_type |= ndpi_multimedia_video_flow;
       return(1);
@@ -269,7 +270,7 @@ static void ndpi_int_rtp_add_connection(struct ndpi_detection_module_struct *ndp
        from the beginning */
     if(!(flow->l4_proto == IPPROTO_TCP && ndpi_seen_flow_beginning(flow))) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling (STUN) extra dissection\n");
-      switch_extra_dissection_to_stun(ndpi_struct, flow);
+      switch_extra_dissection_to_stun(ndpi_struct, flow, 1);
     }
   }
 }

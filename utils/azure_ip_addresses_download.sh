@@ -11,16 +11,16 @@ LIST=/tmp/azure.list
 LIST6=/tmp/azure.list6
 LIST_MERGED=/tmp/azure.list_m
 LIST6_MERGED=/tmp/azure.list6_m
-# https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519
+# https://www.microsoft.com/en-us/download/details.aspx?id=56519
 # Azure links have the format https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_<date>.json
-LINK_ORIGIN="https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519"
+LINK_ORIGIN="https://www.microsoft.com/en-us/download/details.aspx?id=56519"
 
 echo "(1) Downloading file... ${LINK_ORIGIN}"
 http_response=$(curl -s -o ${LINK_TMP} -w "%{http_code}" "${LINK_ORIGIN}")
 check_http_response "${http_response}"
 is_file_empty "${LINK_TMP}"
 
-ORIGIN="$(grep -E 'ServiceTags_Public_[[:digit:]]+.json' ${LINK_TMP} | grep -o -E 'href="[^"]+' | sed 's/href="//' | uniq)"
+ORIGIN="$(grep -Eoi '<a [^>]+>' ${LINK_TMP} | grep -Eo 'href="[^\"]+"' | grep "download.microsoft.com/download/" | grep -m 1 -Eo '(http|https)://[^"]+')"
 rm -f ${LINK_TMP}
 is_str_empty "${ORIGIN}" "${LINK_ORIGIN} does not contain the url format!"
 

@@ -546,11 +546,6 @@ static void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
     flow->ssh_tls.tls_subjectDN = NULL;
   }
 
-  if(flow->ssh_tls.encrypted_sni.esni) {
-    ndpi_free(flow->ssh_tls.encrypted_sni.esni);
-    flow->ssh_tls.encrypted_sni.esni = NULL;
-  }
-
   if(flow->ssh_tls.ja4_client_raw) {
     ndpi_free(flow->ssh_tls.ja4_client_raw);
     flow->ssh_tls.ja4_client_raw = NULL;
@@ -1199,6 +1194,9 @@ static void process_ndpi_monitoring_info(struct ndpi_flow_info *flow) {
     add_to_address_port_list(&flow->stun.relayed_address, &flow->ndpi_flow->monit->protos.dtls_stun_rtp.relayed_address);
     add_to_address_port_list(&flow->stun.response_origin, &flow->ndpi_flow->monit->protos.dtls_stun_rtp.response_origin);
     flow->multimedia_flow_types |= flow->ndpi_flow->flow_multimedia_types;
+
+    flow->stun.rtp_counters[0] = flow->ndpi_flow->stun.rtp_counters[0];
+    flow->stun.rtp_counters[1] = flow->ndpi_flow->stun.rtp_counters[1];
   }
 }
 
@@ -1373,7 +1371,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->info_type = INFO_GENERIC;
     flow->info[0] = 0;
     if (flow->ndpi_flow->protos.slp.url_count > 0)
-      strncat(flow->info, "URL(s): ", sizeof(flow->info));
+      strncat(flow->info, "URL(s): ", sizeof(flow->info)-1);
 
     for (i = 0; i < flow->ndpi_flow->protos.slp.url_count; ++i) {
       size_t length = strlen(flow->info);
@@ -1420,6 +1418,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     if(flow->ndpi_flow->protos.dns.geolocation_iata_code[0] != '\0')
       strcpy(flow->dns.geolocation_iata_code, flow->ndpi_flow->protos.dns.geolocation_iata_code);
 
+#if 0
     if(0) {
       u_int8_t i;
 
@@ -1435,6 +1434,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	printf("(%s) %s [ttl: %u]\n", flow->host_server_name, buf, flow->ndpi_flow->protos.dns.rsp_addr_ttl[i]);
       }
     }
+#endif
   }
   /* MDNS */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_MDNS)) {
@@ -1528,13 +1528,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->ssh_tls.ssl_version = flow->ndpi_flow->protos.tls_quic.ssl_version;
     flow->ssh_tls.quic_version = flow->ndpi_flow->protos.tls_quic.quic_version;
 
+    if (is_quic)
+      flow->idle_timeout_sec = flow->ndpi_flow->protos.tls_quic.quic_idle_timeout_sec;
+
     if(flow->ndpi_flow->protos.tls_quic.server_names_len > 0 && flow->ndpi_flow->protos.tls_quic.server_names)
       flow->ssh_tls.server_names = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.server_names);
 
     flow->ssh_tls.notBefore = flow->ndpi_flow->protos.tls_quic.notBefore;
     flow->ssh_tls.notAfter = flow->ndpi_flow->protos.tls_quic.notAfter;
-    ndpi_snprintf(flow->ssh_tls.ja3_client, sizeof(flow->ssh_tls.ja3_client), "%s",
-	     flow->ndpi_flow->protos.tls_quic.ja3_client);
     ndpi_snprintf(flow->ssh_tls.ja4_client, sizeof(flow->ssh_tls.ja4_client), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja4_client);
 
@@ -1559,11 +1560,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(flow->ndpi_flow->protos.tls_quic.subjectDN)
       flow->ssh_tls.tls_subjectDN = strdup(flow->ndpi_flow->protos.tls_quic.subjectDN);
-
-    if(flow->ndpi_flow->protos.tls_quic.encrypted_sni.esni) {
-      flow->ssh_tls.encrypted_sni.esni = strdup(flow->ndpi_flow->protos.tls_quic.encrypted_sni.esni);
-      flow->ssh_tls.encrypted_sni.cipher_suite = flow->ndpi_flow->protos.tls_quic.encrypted_sni.cipher_suite;
-    }
 
     flow->ssh_tls.encrypted_ch.version = flow->ndpi_flow->protos.tls_quic.encrypted_ch.version;
 

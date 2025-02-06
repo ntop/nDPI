@@ -93,6 +93,14 @@ static void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struc
 
 	if(found == 12)	{
 	  ndpi_int_telegram_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
+	  /* It seems this kind of traffic is used:
+             * for "normal" stuff (at least years ago... and now? TODO)
+             * for calls, as a custom encapsulation of STUN/DTLS/RTP packets
+             Since we are not able to tell the former from the latter, always
+             switch to STUN dissection. If we find STUN/DTLS/RTP stuff we will
+             update the classification to something like STUN/Telegram_voip,
+             otherwise it will remain Telegram */
+	  switch_extra_dissection_to_stun(ndpi_struct, flow, 0);
 	  return;
 	}
       }

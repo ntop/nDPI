@@ -29,8 +29,8 @@ Cloudflare	9	8862	3
 
 Acceptable                      88 20854         12           
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 
 
 	1	UDP [32fb:f967:681e:e96b:face:b00c::74fd]:3478 <-> [20ed:470f:6f73:ce60:60be:8b4f:df37:b080]:45658 [proto: 165/RTCP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: VoIP/10][14 pkts/1612 bytes <-> 16 pkts/1838 bytes][Goodput ratio: 46/46][2.71 sec][bytes ratio: -0.066 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 12/1 188/155 778/396 231/147][Pkt Len c2s/s2c min/avg/max/stddev: 84/84 115/115 214/206 44/39][PLAIN TEXT (4/WtFTidwfa)][Plen Bins: 46,23,16,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

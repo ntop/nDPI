@@ -1,0 +1,42 @@
+Guessed flow protos:	2
+
+DPI Packets (TCP):	23	(11.50 pkts/flow)
+DPI Packets (UDP):	11	(5.50 pkts/flow)
+Confidence Match by port    : 1 (flows)
+Confidence DPI              : 2 (flows)
+Confidence Match by IP      : 1 (flows)
+Num dissector calls: 607 (151.75 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/6/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/2/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/4/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   6/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/4 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+POPS	53	15226	1
+NordVPN	90	31147	3
+
+Safe                            53 15226         1            
+Acceptable                      90 31147         3            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.1.204            	 1      
+
+
+	1	TCP 192.168.1.204:49766 <-> 212.129.45.224:995 [proto: 23/POPS][IP: 426/NordVPN][Encrypted][Confidence: Match by port][FPC: 426/NordVPN, Confidence: IP address][DPI packets: 17][cat: Email/3][26 pkts/7219 bytes <-> 27 pkts/8007 bytes][Goodput ratio: 80/80][3.96 sec][bytes ratio: -0.052 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 180/158 1717/1722 369/370][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 278/297 1471/1514 322/465][Risk: ** Fully Encrypted Flow **][Risk Score: 50][TCP Fingerprint: 2_128_65535_2a201047a47f/Unknown][PLAIN TEXT (mkPfffZo)][Plen Bins: 0,0,6,41,9,0,9,0,3,0,3,6,0,0,0,0,0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,3,9,0,0]
+	2	UDP 192.168.1.204:63670 <-> 192.145.125.35:1198 [proto: 426/NordVPN][IP: 426/NordVPN][Encrypted][Confidence: Match by IP][FPC: 426/NordVPN, Confidence: IP address][DPI packets: 9][cat: VPN/2][32 pkts/5641 bytes <-> 11 pkts/6972 bytes][Goodput ratio: 76/93][4.38 sec][bytes ratio: -0.106 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 154/143 1822/1082 389/355][Pkt Len c2s/s2c min/avg/max/stddev: 115/136 176/634 721/1158 110/439][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 6.077 (Executable?)][PLAIN TEXT (BNLpzpx)][Plen Bins: 0,0,13,53,9,2,0,0,2,0,2,4,0,0,0,0,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 192.168.1.204:49788 <-> 45.80.28.142:8443 [proto: 91.426/TLS.NordVPN][IP: 426/NordVPN][Encrypted][Confidence: DPI][FPC: 426/NordVPN, Confidence: IP address][DPI packets: 6][cat: VPN/2][12 pkts/3514 bytes <-> 13 pkts/5904 bytes][Goodput ratio: 81/87][0.91 sec][Hostname/SNI: it315.nordvpn.com][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.254 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 90/18 592/94 180/29][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 293/454 1514/1514 396/602][Risk: ** Known Proto on Non Std Port **** TLS (probably) Not Carrying HTTPS **][Risk Score: 60][Risk Info: No ALPN / Expected on port 443][TCP Fingerprint: 2_128_65535_6bb88f5575fd/Windows][TLSv1.3][JA4: t13d101000_61a7ad8aa9b6_b082c14843f9][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Safari][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 7,0,7,7,15,0,0,0,7,0,7,0,0,0,7,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,0,0]
+	4	UDP 192.168.1.204:53465 <-> 138.199.54.231:51820 [proto: 206.426/WireGuard.NordVPN][IP: 426/NordVPN][Encrypted][Confidence: DPI][FPC: 426/NordVPN, Confidence: IP address][DPI packets: 2][cat: VPN/2][14 pkts/2480 bytes <-> 8 pkts/6636 bytes][Goodput ratio: 76/95][1.28 sec][bytes ratio: -0.456 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 108/4 419/10 151/5][Pkt Len c2s/s2c min/avg/max/stddev: 74/122 177/830 810/1494 177/666][Plen Bins: 0,4,41,22,4,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,0,0]

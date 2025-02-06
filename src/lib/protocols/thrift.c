@@ -110,27 +110,29 @@ static int thrift_validate_type(uint8_t message_type)
   return message_type < TMT_TYPE_MAX;
 }
 
-static void thrift_set_method(struct ndpi_flow_struct *flow,
+static void thrift_set_method(struct ndpi_detection_module_struct *ndpi_struct,
+                              struct ndpi_flow_struct *flow,
                               char const * const method, size_t method_length)
 {
   if (thrift_validate_method(method, method_length) == 0) {
-    ndpi_set_risk(flow, NDPI_INVALID_CHARACTERS, "Invalid method name");
+    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, "Invalid method name");
     flow->protos.thrift.method[0] = '\0';
   } else {
     strncpy(flow->protos.thrift.method, method, ndpi_min(sizeof(flow->protos.thrift.method), method_length));
   }
 }
 
-static void thrift_set_type(struct ndpi_flow_struct *flow,
+static void thrift_set_type(struct ndpi_detection_module_struct *ndpi_struct,
+                            struct ndpi_flow_struct *flow,
                             uint8_t message_type)
 {
   if (message_type == TMT_INVALID_TMESSAGE_TYPE) {
-    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid message type");
+    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid message type");
   }
   flow->protos.thrift.message_type = message_type;
 
   if (message_type == TMT_EXCEPTION) {
-    ndpi_set_risk(flow, NDPI_ERROR_CODE_DETECTED, "Apache Thrift Exception");
+    ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, "Apache Thrift Exception");
   }
 }
 
@@ -163,8 +165,8 @@ static void ndpi_dissect_strict_hdr(struct ndpi_detection_module_struct *ndpi_st
 
   ndpi_int_thrift_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 
-  thrift_set_method(flow, strict_hdr->method, method_length);
-  thrift_set_type(flow, strict_hdr->message_type);
+  thrift_set_method(ndpi_struct, flow, strict_hdr->method, method_length);
+  thrift_set_type(ndpi_struct, flow, strict_hdr->message_type);
 }
 
 static void ndpi_dissect_compact_hdr(struct ndpi_detection_module_struct *ndpi_struct,
@@ -195,8 +197,8 @@ static void ndpi_dissect_compact_hdr(struct ndpi_detection_module_struct *ndpi_s
 
   ndpi_int_thrift_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
 
-  thrift_set_method(flow, compact_hdr->method, compact_hdr->method_length);
-  thrift_set_type(flow, compact_hdr->message_type);
+  thrift_set_method(ndpi_struct, flow, compact_hdr->method, compact_hdr->method_length);
+  thrift_set_type(ndpi_struct, flow, compact_hdr->message_type);
 }
 
 static void ndpi_search_thrift_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,

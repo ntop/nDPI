@@ -2,3 +2,4 @@ breathe
 exhale
 sphinx-rtd-theme
 sphinxcontrib-swaggerdoc
+#myst_parser

@@ -6,7 +6,7 @@ LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       2/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
-LRU cache msteams:    0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
@@ -20,8 +20,8 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Skype_TeamsCall	12	5944	1
+TeamsCall	12	5944	1
 
 Acceptable                      12 5944          1            
 
-	1	UDP 52.115.136.55:3479 -> 10.0.0.1:50006 [proto: 78.38/STUN.Skype_TeamsCall][IP: 276/Azure][Stream Content: Audio][ClearText][Confidence: DPI][FPC: 78.38/STUN.Skype_TeamsCall, Confidence: DPI][DPI packets: 7][cat: VoIP/10][12 pkts/5944 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][4.53 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 453/0 1210/0 379/0][Pkt Len c2s/s2c min/avg/max/stddev: 81/0 495/0 1257/0 539/0][Mapped IP/Port: 82.178.63.123:50006][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic / Expected on port 3478][Plen Bins: 0,16,33,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 52.115.136.55:3479 -> 10.0.0.1:50006 [proto: 78.38/STUN.TeamsCall][IP: 276/Azure][Stream Content: Audio][ClearText][Confidence: DPI][FPC: 78.38/STUN.TeamsCall, Confidence: DPI][DPI packets: 7][cat: VoIP/10][12 pkts/5944 bytes -> 0 pkts/0 bytes][Goodput ratio: 92/0][4.53 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 453/0 1210/0 379/0][Pkt Len c2s/s2c min/avg/max/stddev: 81/0 495/0 1257/0 539/0][Mapped IP/Port: 82.178.63.123:50006][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic / Expected on port 3478][Plen Bins: 0,16,33,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0]

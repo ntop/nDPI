@@ -24,4 +24,4 @@ DoH_DoT	2	1464	1
 
 Acceptable                       2 1464          1            
 
-	1	UDP 51.120.20.202:49241 <-> 72.119.217.29:443 [proto: 188.196/QUIC.DoH_DoT][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 188.196/QUIC.DoH_DoT, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/1392 bytes <-> 1 pkts/72 bytes][Goodput ratio: 97/41][0.05 sec][Hostname/SNI: dns.google.com][QUIC ver: Q043][PLAIN TEXT (dns.google.com)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0]
+	1	UDP 51.120.20.202:49241 <-> 72.119.217.29:443 [proto: 188.196/QUIC.DoH_DoT][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 188.196/QUIC.DoH_DoT, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/1392 bytes <-> 1 pkts/72 bytes][Goodput ratio: 97/41][0.05 sec][Hostname/SNI: dns.google.com][QUIC ver: Q043][Idle Timeout: 30][PLAIN TEXT (dns.google.com)][Plen Bins: 50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0]

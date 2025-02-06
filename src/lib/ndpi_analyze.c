@@ -116,6 +116,12 @@ void ndpi_data_add_value(struct ndpi_analyze_struct *s, const u_int64_t value) {
   if(!s)
     return;
 
+  if(s->num_data_entries > 0) {
+    u_int64_t last = ndpi_data_last(s);
+    
+    s->jitter_total += (last > value) ? (last - value) : (value - last);
+  }
+  
   if(s->sum_total == 0)
     s->min_val = s->max_val = value;
   else {
@@ -201,6 +207,15 @@ float ndpi_data_stddev(struct ndpi_analyze_struct *s) {
 */
 float ndpi_data_mean(struct ndpi_analyze_struct *s) {
   return(ndpi_data_average(s));
+}
+
+/* ********************************************************************************* */
+
+float ndpi_data_jitter(struct ndpi_analyze_struct *s) {
+  if(s->num_data_entries < 2)
+    return(0);
+  else
+    return((float)s->jitter_total / (float)(s->num_data_entries - 1));
 }
 
 /* ********************************************************************************* */

@@ -33,7 +33,6 @@ static ndpi_network ndpi_protocol_apple_protocol_list[] = {
 
 static ndpi_network6 ndpi_protocol_apple_protocol_list_6[] = {
  { "2403:300::", 32, NDPI_PROTOCOL_APPLE },
- { "2620:0:1b00::", 48, NDPI_PROTOCOL_APPLE },
  { "2620:149::", 32, NDPI_PROTOCOL_APPLE },
  { "2a01:b740::", 32, NDPI_PROTOCOL_APPLE },
  { "2a01:b747::", 32, NDPI_PROTOCOL_APPLE },

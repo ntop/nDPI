@@ -24,9 +24,9 @@ POPS	5	2998	1
 
 Safe                             5 2998          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.0.1              	 1      
 
 
-	1	TCP 192.168.0.1:55077 <-> 10.10.10.1:995 [proto: 23/POPS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Email/3][2 pkts/304 bytes <-> 3 pkts/2694 bytes][Goodput ratio: 60/94][0.55 sec][Hostname/SNI: pop.secureserver.net][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_128_8192_cac1e007206f/Unknown][TLSv1.2][JA3C: 36f7277af969a6947a61ae0b815907a1][JA4: t12d280600_76ec540469e1_8b5687d2b2b8][JA3S: 245de059547a730e42852c315cdc5a02][Firefox][Cipher: TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384][PLAIN TEXT (pop.secureserver.net)][Plen Bins: 0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,66,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.0.1:55077 <-> 10.10.10.1:995 [proto: 23/POPS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Email/3][2 pkts/304 bytes <-> 3 pkts/2694 bytes][Goodput ratio: 60/94][0.55 sec][Hostname/SNI: pop.secureserver.net][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][TCP Fingerprint: 2_128_8192_cac1e007206f/Unknown][TLSv1.2][JA4: t12d280600_76ec540469e1_8b5687d2b2b8][JA3S: 245de059547a730e42852c315cdc5a02][Firefox][Cipher: TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384][PLAIN TEXT (pop.secureserver.net)][Plen Bins: 0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,66,0,0,0,0,0,0,0,0]

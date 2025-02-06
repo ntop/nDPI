@@ -24,9 +24,9 @@ Cloudflare	3	3826	1
 
 Acceptable                       3 3826          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 129.21.84.33             	 1      
 
 
-	1	UDP 129.21.84.33:37229 <-> 73.185.34.172:443 [proto: 188.220/QUIC.Cloudflare][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 3][cat: Media/1][2 pkts/2584 bytes <-> 1 pkts/1242 bytes][Goodput ratio: 97/97][0.26 sec][Hostname/SNI: cdnjs.cloudflare.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][TLSv1.3][QUIC ver: V-1][JA3C: 77f2e7e7117b061992c6529845aa351c][JA4: q13d0311h0_55b375c5d22e_5a1f323ef56d][ECH: version 0xfe0d][PLAIN TEXT (27B@yd)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,66,0,0,0,0,0,0,0,0]
+	1	UDP 129.21.84.33:37229 <-> 73.185.34.172:443 [proto: 188.220/QUIC.Cloudflare][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 3][cat: Media/1][2 pkts/2584 bytes <-> 1 pkts/1242 bytes][Goodput ratio: 97/97][0.26 sec][Hostname/SNI: cdnjs.cloudflare.com][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][TLSv1.3][QUIC ver: V-1][JA4: q13d0311h0_55b375c5d22e_5a1f323ef56d][ECH: version 0xfe0d][PLAIN TEXT (27B@yd)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,66,0,0,0,0,0,0,0,0]

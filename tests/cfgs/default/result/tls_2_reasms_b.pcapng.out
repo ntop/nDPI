@@ -24,9 +24,9 @@ FbookReelStory	15	13455	1
 
 Fun                             15 13455         1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 88.14.137.195            	 1      
 
 
-	1	TCP 88.14.137.195:443 <-> 196.234.165.216:37658 [proto: 91.337/TLS.FbookReelStory][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: SocialNetwork/6][12 pkts/11078 bytes <-> 3 pkts/2377 bytes][Goodput ratio: 93/92][1.05 sec][Hostname/SNI: video.fmct2-3.fna.fbcdn.net][(Advertised) ALPNs: http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.3 (Fizz)][bytes ratio: 0.647 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/4 105/8 1002/12 299/4][Pkt Len c2s/s2c min/avg/max/stddev: 74/478 923/792 1414/1414 599/440][TLSv1.3 (Fizz)][JA3C: 44dab16d680ef93487bc16ad23b3ffb1][JA4: t00d0309ht_55b375c5d22e_566d5108064c][JA3S: fcb2d4d0991292272fcb1e464eedfd43][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 7,0,0,0,0,0,7,0,0,0,0,0,7,7,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,63,0,0,0,0,0]
+	1	TCP 88.14.137.195:443 <-> 196.234.165.216:37658 [proto: 91.337/TLS.FbookReelStory][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: SocialNetwork/6][12 pkts/11078 bytes <-> 3 pkts/2377 bytes][Goodput ratio: 93/92][1.05 sec][Hostname/SNI: video.fmct2-3.fna.fbcdn.net][(Advertised) ALPNs: http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.3 (Fizz)][bytes ratio: 0.647 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/4 105/8 1002/12 299/4][Pkt Len c2s/s2c min/avg/max/stddev: 74/478 923/792 1414/1414 599/440][TLSv1.3 (Fizz)][JA4: t00d0309ht_55b375c5d22e_566d5108064c][JA3S: fcb2d4d0991292272fcb1e464eedfd43][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 7,0,0,0,0,0,7,0,0,0,0,0,7,7,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,63,0,0,0,0,0]

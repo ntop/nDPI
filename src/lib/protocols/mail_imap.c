@@ -33,7 +33,6 @@
 
 static void ndpi_int_mail_imap_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow,
 					      u_int16_t protocol) {
-  flow->guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN; /* Avoid IMAPS to be used s sub-protocol */
   ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -186,7 +185,7 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
 
 	    snprintf(buf, sizeof(buf), "Found IMAP username (%s)",
 		     flow->l4.tcp.ftp_imap_pop_smtp.username);
-	    ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
 
 	    pwd = strtok_r(NULL, " \"\r\n", &saveptr);
 	    if(pwd) {

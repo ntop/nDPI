@@ -1,9 +1,9 @@
-DPI Packets (UDP):	20	(2.50 pkts/flow)
+DPI Packets (UDP):	38	(4.75 pkts/flow)
 Confidence DPI              : 8 (flows)
 Num dissector calls: 204 (25.50 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
-LRU cache stun:       4/18/0 (insert/search/found)
+LRU cache stun:       10/18/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
@@ -22,15 +22,14 @@ Patricia protocols IPv6: 2/0 (search/found)
 
 MDNS	2	194	2
 STUN	8	560	2
-Telegram	61	9370	3
-TelegramVoip	244	121141	1
+TelegramVoip	305	130511	4
 
 Acceptable                     315 131265        8            
 
 	1	UDP 192.168.12.67:39968 <-> 91.108.9.106:1400 [proto: 78.355/STUN.TelegramVoip][IP: 185/Telegram][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 7][cat: VoIP/10][124 pkts/50596 bytes <-> 120 pkts/70545 bytes][Goodput ratio: 90/93][2.48 sec][Hostname/SNI: telegram.org][bytes ratio: -0.165 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 19/20 633/629 67/66][Pkt Len c2s/s2c min/avg/max/stddev: 70/84 408/588 1253/1235 406/467][Mapped IP/Port: 93.35.170.144:39295][Peer IP/Port: 91.108.9.106:52874][Relayed IP/Port: 91.108.9.106:37674][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 3478][PLAIN TEXT (1/talggGwr)][Plen Bins: 0,22,11,4,10,2,6,1,7,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,3,6,4,2,0,0,1,4,6,3,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 192.168.12.67:44275 <-> 91.108.9.10:597 [proto: 185/Telegram][IP: 185/Telegram][Encrypted][Confidence: DPI][FPC: 185/Telegram, Confidence: DPI][DPI packets: 1][cat: Chat/9][17 pkts/2958 bytes <-> 16 pkts/2740 bytes][Goodput ratio: 76/75][2.07 sec][bytes ratio: 0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 85/139 514/688 135/213][Pkt Len c2s/s2c min/avg/max/stddev: 82/106 174/171 638/614 119/118][PLAIN TEXT (OUePGE4)][Plen Bins: 0,6,42,39,3,3,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	3	UDP 192.168.12.67:42417 <-> 91.108.13.26:598 [proto: 185/Telegram][IP: 185/Telegram][Encrypted][Confidence: DPI][FPC: 185/Telegram, Confidence: DPI][DPI packets: 1][cat: Chat/9][9 pkts/1266 bytes <-> 9 pkts/1154 bytes][Goodput ratio: 70/67][1.72 sec][bytes ratio: 0.046 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 51/42 198/214 514/512 144/169][Pkt Len c2s/s2c min/avg/max/stddev: 82/106 141/128 162/162 33/15][PLAIN TEXT (03U/SsH)][Plen Bins: 0,11,50,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	4	UDP 192.168.12.67:46675 <-> 91.108.17.8:597 [proto: 185/Telegram][IP: 185/Telegram][Encrypted][Confidence: DPI][FPC: 185/Telegram, Confidence: DPI][DPI packets: 1][cat: Chat/9][5 pkts/650 bytes <-> 5 pkts/602 bytes][Goodput ratio: 68/65][1.68 sec][bytes ratio: 0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 191/190 333/382 514/569 125/162][Pkt Len c2s/s2c min/avg/max/stddev: 82/106 130/120 162/130 39/12][Plen Bins: 0,20,50,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.12.67:44275 <-> 91.108.9.10:597 [proto: 78.355/STUN.TelegramVoip][IP: 185/Telegram][ClearText][Confidence: DPI][FPC: 185/Telegram, Confidence: DPI][DPI packets: 7][cat: VoIP/10][17 pkts/2958 bytes <-> 16 pkts/2740 bytes][Goodput ratio: 76/75][2.07 sec][bytes ratio: 0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 85/139 514/688 135/213][Pkt Len c2s/s2c min/avg/max/stddev: 82/106 174/171 638/614 119/118][Mapped IP/Port: 91.108.9.10:597][PLAIN TEXT (OUePGE4)][Plen Bins: 0,6,42,39,3,3,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.12.67:42417 <-> 91.108.13.26:598 [proto: 78.355/STUN.TelegramVoip][IP: 185/Telegram][ClearText][Confidence: DPI][FPC: 185/Telegram, Confidence: DPI][DPI packets: 7][cat: VoIP/10][9 pkts/1266 bytes <-> 9 pkts/1154 bytes][Goodput ratio: 70/67][1.72 sec][bytes ratio: 0.046 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 51/42 198/214 514/512 144/169][Pkt Len c2s/s2c min/avg/max/stddev: 82/106 141/128 162/162 33/15][Mapped IP/Port: 91.108.13.26:598][PLAIN TEXT (03U/SsH)][Plen Bins: 0,11,50,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.168.12.67:46675 <-> 91.108.17.8:597 [proto: 78.355/STUN.TelegramVoip][IP: 185/Telegram][ClearText][Confidence: DPI][FPC: 185/Telegram, Confidence: DPI][DPI packets: 7][cat: VoIP/10][5 pkts/650 bytes <-> 5 pkts/602 bytes][Goodput ratio: 68/65][1.68 sec][bytes ratio: 0.038 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 191/190 333/382 514/569 125/162][Pkt Len c2s/s2c min/avg/max/stddev: 82/106 130/120 162/130 39/12][Mapped IP/Port: 91.108.17.8:597][Plen Bins: 0,20,50,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	5	UDP 192.168.12.67:39329 -> 91.108.13.3:1400 [proto: 78/STUN][IP: 185/Telegram][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 4][cat: Network/14][4 pkts/280 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][1.75 sec][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic / Expected on port 3478][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	6	UDP 192.168.12.67:44679 -> 91.108.17.49:1400 [proto: 78/STUN][IP: 185/Telegram][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 4][cat: Network/14][4 pkts/280 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][1.75 sec][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic / Expected on port 3478][PLAIN TEXT (sENzap5)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	7	UDP [fe80::76da:38ff:feed:5332]:5353 -> [ff02::fb]:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 8/MDNS, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/107 bytes -> 0 pkts/0 bytes][Goodput ratio: 42/0][< 1 sec][Hostname/SNI: _ipps._tcp.local][_ipps._tcp.local][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

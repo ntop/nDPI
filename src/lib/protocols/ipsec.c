@@ -43,7 +43,7 @@ static void ndpi_int_ipsec_add_connection(struct ndpi_detection_module_struct * 
       return;
     case ISAKMP_MALFORMED:
       NDPI_LOG_INFO(ndpi_struct, "found malformed ISAKMP (UDP)\n");
-      ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Invalid IPSec/ISAKMP Header");
+      ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid IPSec/ISAKMP Header");
       break;
     case ISAKMP_V1:
       NDPI_LOG_INFO(ndpi_struct, "found ISAKMPv1 (UDP)\n");

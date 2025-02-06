@@ -49,7 +49,6 @@ static void ndpi_int_mail_pop_add_connection(struct ndpi_detection_module_struct
 					     u_int16_t protocol) {
 
   NDPI_LOG_INFO(ndpi_struct, "mail_pop identified\n");
-  flow->guessed_protocol_id = NDPI_PROTOCOL_UNKNOWN; /* Avoid POP3S to be used s sub-protocol */
   ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -88,7 +87,7 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
 
       snprintf(buf, sizeof(buf), "Found username (%s)",
 	       flow->l4.tcp.ftp_imap_pop_smtp.username);
-      ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
       
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_USER;
       return 1;
@@ -100,7 +99,7 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
 				 sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password), 5,
 				 packet->payload, packet->payload_packet_len);
 
-      ndpi_set_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
+      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_PASS;
       return 1;
     } else if((packet->payload[0] == 'C' || packet->payload[0] == 'c')

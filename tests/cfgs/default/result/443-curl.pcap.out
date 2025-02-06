@@ -24,9 +24,9 @@ ntop	109	73982	1
 
 Safe                           109 73982         1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.1.13             	 1      
 
 
-	1	TCP 192.168.1.13:55523 <-> 178.62.197.130:443 [proto: 91.26/TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 7][cat: Network/14][51 pkts/4260 bytes <-> 58 pkts/69722 bytes][Goodput ratio: 22/94][1.10 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][bytes ratio: -0.885 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 25/19 784/784 122/114][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 84/1202 583/1506 74/562][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][TLSv1.2][JA3C: 2a26b1a62e40d25d4de3babc9d532f30][JA4: t12d6707h2_2955a3196ffa_c83f907a73d3][ServerNames: www.ntop.org][JA3S: ae53107a2e47ea20c72ac44821a728bf][Issuer: C=US, O=Let's Encrypt, CN=Let's Encrypt Authority X3][Subject: CN=www.ntop.org][Certificate SHA-1: DB:A7:E4:3E:6D:BB:21:AB:68:47:35:E8:0B:8F:15:DF:DB:C7:C9:6F][Firefox][Validity: 2019-12-17 01:17:28 - 2020-03-16 01:17:28][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 3,13,1,1,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,1,0,73,0,0]
+	1	TCP 192.168.1.13:55523 <-> 178.62.197.130:443 [proto: 91.26/TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 7][cat: Network/14][51 pkts/4260 bytes <-> 58 pkts/69722 bytes][Goodput ratio: 22/94][1.10 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][bytes ratio: -0.885 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 25/19 784/784 122/114][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 84/1202 583/1506 74/562][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][TLSv1.2][JA4: t12d6707h2_2955a3196ffa_c83f907a73d3][ServerNames: www.ntop.org][JA3S: ae53107a2e47ea20c72ac44821a728bf][Issuer: C=US, O=Let's Encrypt, CN=Let's Encrypt Authority X3][Subject: CN=www.ntop.org][Certificate SHA-1: DB:A7:E4:3E:6D:BB:21:AB:68:47:35:E8:0B:8F:15:DF:DB:C7:C9:6F][Firefox][Validity: 2019-12-17 01:17:28 - 2020-03-16 01:17:28][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 3,13,1,1,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,1,0,73,0,0]

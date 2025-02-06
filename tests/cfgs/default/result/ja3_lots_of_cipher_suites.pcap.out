@@ -24,8 +24,8 @@ TLS	11	5132	1
 
 Safe                            11 5132          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 
 
 	1	TCP 10.206.131.18:58657 <-> 10.206.65.249:443 [VLAN: 258][proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][cat: Web/5][5 pkts/1144 bytes <-> 6 pkts/3988 bytes][Goodput ratio: 70/90][0.22 sec][bytes ratio: -0.554 (Download)][IAT c2s/s2c min/avg/max/stddev: 1/0 64/39 164/136 72/50][Pkt Len c2s/s2c min/avg/max/stddev: 68/68 229/665 866/1522 319/650][Risk: ** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **][Risk Score: 60][Risk Info: No ALPN / SNI should always be present][TCP Fingerprint: 2_64_29200_7f0b1e49d59f/Unknown][TLSv1.2][JA3S: 9d456958a9e86bb0d503543beaf1a65b][Issuer: C=US, ST=New York, L=Rochester, O=Xerox Corporation, OU=Generic Root Certificate Authority, CN=Xerox Generic Root Certificate Authority][Subject: C=US, ST=Connecticut, L=Norwalk, O=Xerox Corporation, OU=Global Product Delivery Group, CN=XRX9C934E949FEF, C=US, ST=Connecticut, L=Norwalk, O=Xerox Corporation, OU=Global Product Delivery Group, CN=XRX9C934E949FEF][Certificate SHA-1: 3B:2B:5E:58:6E:3E:30:1F:52:BF:9B:81:20:47:DE:10:A0:67:8E:FA][Firefox][Validity: 2018-11-29 18:57:22 - 2023-11-29 18:57:22][Cipher: TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]

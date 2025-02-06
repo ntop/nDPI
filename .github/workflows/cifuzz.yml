@@ -18,7 +18,7 @@ jobs:
         uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
         with:
           oss-fuzz-project-name: 'ndpi'
-          fuzz-seconds: 1200
+          fuzz-seconds: 600
           dry-run: false
           sanitizer: ${{ matrix.sanitizer }}
       - name: Check Crash (fails when a crash is detected)

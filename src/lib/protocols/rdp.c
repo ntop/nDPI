@@ -41,7 +41,7 @@ static void ndpi_int_rdp_add_connection(struct ndpi_detection_module_struct *ndp
 					struct ndpi_flow_struct *flow) {
   NDPI_LOG_INFO(ndpi_struct, "found RDP\n");
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RDP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-  ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found RDP"); /* Remote assistance */
+  ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found RDP"); /* Remote assistance */
 }
 
 /* **************************************** */

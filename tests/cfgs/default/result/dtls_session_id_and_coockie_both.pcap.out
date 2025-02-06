@@ -24,9 +24,9 @@ DTLS	4	604	1
 
 Safe                             4 604           1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 185.196.113.239          	 1      
 
 
-	1	UDP 185.196.113.239:50257 <-> 223.116.105.247:44443 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 30/DTLS, Confidence: DPI][DPI packets: 4][cat: Web/5][2 pkts/302 bytes <-> 2 pkts/302 bytes][Goodput ratio: 72/72][0.06 sec][Risk: ** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **][Risk Score: 60][Risk Info: No ALPN / SNI should always be present][DTLSv1.2][JA3C: e15c510766789ed8f49de0e37951c1da][JA4: dd2d010000_653ffb6f323e_e3b0c44298fc][JA3S: a1d48eca741e476d8ee735578a26bdbd][Cipher: TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384][Plen Bins: 0,25,0,50,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 185.196.113.239:50257 <-> 223.116.105.247:44443 [proto: 30/DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 30/DTLS, Confidence: DPI][DPI packets: 4][cat: Web/5][2 pkts/302 bytes <-> 2 pkts/302 bytes][Goodput ratio: 72/72][0.06 sec][Risk: ** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **][Risk Score: 60][Risk Info: No ALPN / SNI should always be present][DTLSv1.2][JA4: dd2d010000_653ffb6f323e_e3b0c44298fc][JA3S: a1d48eca741e476d8ee735578a26bdbd][Cipher: TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384][Plen Bins: 0,25,0,50,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -3,7 +3,7 @@ Guessed flow protos:	9
 DPI Packets (TCP):	183	(7.32 pkts/flow)
 Confidence Match by port    : 9 (flows)
 Confidence DPI              : 16 (flows)
-Num dissector calls: 240 (9.60 diss/flow)
+Num dissector calls: 256 (10.24 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/27/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)

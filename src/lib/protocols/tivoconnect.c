@@ -55,7 +55,7 @@ static void dissect_tivoconnect_data(struct ndpi_detection_module_struct *ndpi_s
 
     if (value == NULL)
     {
-      ndpi_set_risk(flow, NDPI_MALFORMED_PACKET, "Missing value type in TiViConnect beacon");
+      ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Missing value type in TiViConnect beacon");
       continue;
     }
     value++;
@@ -108,7 +108,7 @@ static void dissect_tivoconnect_data(struct ndpi_detection_module_struct *ndpi_s
 
   if ((size_t)(key - payload) != payload_len)
   {
-    ndpi_set_risk(flow, NDPI_MALFORMED_PACKET,
+    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET,
                   "TiViConnect beacon malformed packet");
   }
 }

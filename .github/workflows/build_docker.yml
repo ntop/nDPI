@@ -1,0 +1,83 @@
+name: ARM builds with docker
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+    types: [opened, synchronize, reopened]
+  release:
+    types: [created]
+  schedule:
+    # At the end of every day
+    - cron: '0 0 * * *'
+jobs:
+
+  test:
+    name: Ubuntu ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      # Idea to have significant faster tests while pushing/merging: test all pcaps only on schedule runs; otherwise tests only the pcaps updated/added recently
+      NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS: ${{ (github.event_name == 'schedule') && '0' || '1' }}
+    strategy:
+      fail-fast: true
+      matrix:
+        arch: ["armhf", "s390x"]
+    steps:
+      - name: Setup multiarch/qemu-user-static
+        run: |
+          docker run --rm --privileged multiarch/qemu-user-static:register --reset
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Display qemu specified architecture (armhf - little endian)
+        if: startsWith(matrix.arch, 'armhf')
+        uses: docker://multiarch/ubuntu-core:armhf-bionic
+        with:
+          args: >
+            bash -c
+            "uname -a &&
+            lscpu | grep Endian
+            "
+      - name: Configure, compile and test using qemu for the specified architecture (armhf - little endian)
+        if: startsWith(matrix.arch, 'armhf')
+        uses: docker://multiarch/ubuntu-core:armhf-bionic
+        with:
+          args: >
+            bash -c
+            "apt-get -y update &&
+            apt-get -y install git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
+            git config --global --add safe.directory $(realpath .) &&
+            env CC=gcc ./autogen.sh --enable-option-checking=fatal --enable-debug-messages &&
+            make -j $(nproc) all &&
+            make -C example ndpiSimpleIntegration &&
+            make -C rrdtool &&
+            make check VERBOSE=1
+            "
+      - name: Display qemu specified architecture (s390x - big endian)
+        if: startsWith(matrix.arch, 's390x')
+        uses: docker://multiarch/ubuntu-core:s390x-bionic
+        with:
+          args: >
+            bash -c
+            "uname -a &&
+            lscpu | grep Endian
+            "
+      - name: Configure and compile using qemu for the specified architecture (s390x - big endian)
+        if: startsWith(matrix.arch, 's390x')
+        uses: docker://multiarch/ubuntu-core:s390x-bionic
+        with:
+          args: >
+            bash -c
+            "apt-get -y update &&
+            apt-get -y install git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
+            git config --global --add safe.directory $(realpath .) &&
+            env CC=gcc ./autogen.sh --enable-option-checking=fatal --enable-debug-messages &&
+            make -j $(nproc) all &&
+            make -C example ndpiSimpleIntegration &&
+            make -C rrdtool &&
+            make check VERBOSE=1
+            "
+

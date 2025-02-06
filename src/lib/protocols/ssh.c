@@ -68,7 +68,8 @@ typedef struct {
 
 /* ************************************************************************ */
 
-static void ssh_analyze_signature_version(struct ndpi_flow_struct *flow,
+static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *ndpi_struct,
+                                          struct ndpi_flow_struct *flow,
 					  char *str_to_check,
 					  u_int8_t is_client_signature) {
   u_int i;
@@ -111,14 +112,15 @@ static void ssh_analyze_signature_version(struct ndpi_flow_struct *flow,
   }
   
   if(obsolete_ssh_version)
-    NDPI_SET_BIT(flow->risk,
-		 is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER :
-		 NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER);
+    ndpi_set_risk(ndpi_struct, flow,
+                  (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER),
+                  NULL);
 }
   
 /* ************************************************************************ */
 
-static void ssh_analyse_cipher(struct ndpi_flow_struct *flow,
+static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
+                               struct ndpi_flow_struct *flow,
 			       char *ciphers, u_int cipher_len,
 			       u_int8_t is_client_signature) {
 
@@ -174,7 +176,7 @@ static void ssh_analyse_cipher(struct ndpi_flow_struct *flow,
     char str[64];
 
     snprintf(str, sizeof(str), "Found cipher %s", obsolete_ciphers[found_obsolete_cipher]);
-    ndpi_set_risk(flow,
+    ndpi_set_risk(ndpi_struct, flow,
 		  (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER),
 		  str);
   }
@@ -213,7 +215,8 @@ static void ndpi_int_ssh_add_connection(struct ndpi_detection_module_struct
 
 /* ************************************************************************ */
 
-static u_int16_t concat_hash_string(struct ndpi_flow_struct *flow,
+static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_struct,
+                                    struct ndpi_flow_struct *flow,
 				    struct ndpi_packet_struct *packet,
 				    char *buf, u_int8_t client_hash) {
   u_int32_t offset = 22, len, buf_out_len = 0, max_payload_len = packet->payload_packet_len-sizeof(u_int32_t);
@@ -256,7 +259,7 @@ static u_int16_t concat_hash_string(struct ndpi_flow_struct *flow,
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
-    ssh_analyse_cipher(flow, (char*)&packet->payload[offset], len, 1 /* client */);
+    ssh_analyse_cipher(ndpi_struct, flow, (char*)&packet->payload[offset], len, 1 /* client */);
     buf_out_len += len;
     buf[buf_out_len++] = ';';
   }
@@ -277,7 +280,7 @@ static u_int16_t concat_hash_string(struct ndpi_flow_struct *flow,
       goto invalid_payload;
 
     strncpy(&buf[buf_out_len], (const char *)&packet->payload[offset], len);
-    ssh_analyse_cipher(flow, (char*)&packet->payload[offset], len, 0 /* server */);
+    ssh_analyse_cipher(ndpi_struct, flow, (char*)&packet->payload[offset], len, 0 /* server */);
     buf_out_len += len;
     buf[buf_out_len++] = ';';
   }
@@ -411,7 +414,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
       flow->protos.ssh.client_signature[len] = '\0';
       ndpi_ssh_zap_cr(flow->protos.ssh.client_signature, len);
 
-      ssh_analyze_signature_version(flow, flow->protos.ssh.client_signature, 1);
+      ssh_analyze_signature_version(ndpi_struct, flow, flow->protos.ssh.client_signature, 1);
       
 #ifdef SSH_DEBUG
       printf("[SSH] [client_signature: %s]\n", flow->protos.ssh.client_signature);
@@ -431,14 +434,14 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
       flow->protos.ssh.server_signature[len] = '\0';
       ndpi_ssh_zap_cr(flow->protos.ssh.server_signature, len);
 
-      ssh_analyze_signature_version(flow, flow->protos.ssh.server_signature, 0);
+      ssh_analyze_signature_version(ndpi_struct, flow, flow->protos.ssh.server_signature, 0);
       
 #ifdef SSH_DEBUG
       printf("[SSH] [server_signature: %s]\n", flow->protos.ssh.server_signature);
 #endif
       
       NDPI_LOG_DBG2(ndpi_struct, "ssh stage 1 passed\n");
-      flow->guessed_protocol_id = NDPI_PROTOCOL_SSH;
+      flow->fast_callback_protocol_id = NDPI_PROTOCOL_SSH;
       
 #ifdef SSH_DEBUG
       printf("[SSH] [completed stage: %u]\n", flow->l4.tcp.ssh_stage);
@@ -463,7 +466,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	if(packet->packet_direction == 0 /* client */) {
 	  u_char fingerprint_client[16];
 
-	  len = concat_hash_string(flow, packet, hassh_buf, 1 /* client */);
+	  len = concat_hash_string(ndpi_struct, flow, packet, hassh_buf, 1 /* client */);
 
 	  ndpi_MD5Init(&ctx);
 	  ndpi_MD5Update(&ctx, (const unsigned char *)hassh_buf, len);
@@ -485,7 +488,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	} else {
 	  u_char fingerprint_server[16];
 
-	  len = concat_hash_string(flow, packet, hassh_buf, 0 /* server */);
+	  len = concat_hash_string(ndpi_struct, flow, packet, hassh_buf, 0 /* server */);
 
 	  ndpi_MD5Init(&ctx);
 	  ndpi_MD5Update(&ctx, (const unsigned char *)hassh_buf, len);

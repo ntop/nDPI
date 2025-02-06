@@ -1,1 +1,0 @@
---cfg=tls,metadata.sha1_fingerprint,0 --cfg=tls,metadata.ja3c_fingerprint,0 --cfg=tls,metadata.ja3s_fingerprint,0 --cfg=tls,metadata.ja4c_fingerprint,0 --cfg=metadata.tcp_fingerprint,0 --cfg=sip,metadata.attribute.from,0 --cfg=sip,metadata.attribute.to,0 

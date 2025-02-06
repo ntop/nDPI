@@ -1,5 +1,208 @@
 # CHANGELOG
 
+#### nDPI 4.12 (Dec 2024)
+
+## Major Changes
+
+- Added detection of encrypted/obfuscated OpenVPN flows (https://github.com/ntop/nDPI/pull/2547, https://github.com/ntop/nDPI/pull/2560)
+- Added detection of encrypted/obfuscated/proxied TLS flows (https://github.com/ntop/nDPI/pull/2553)
+- Implemented nDPI TCP fingerprint (https://github.com/ntop/nDPI/commit/6b6dad4fdb2e60cd2887f7d381bcab2387ba9507)
+
+For further details on these three topics, see https://www.ntop.org/ntop/a-deep-dive-into-traffic-fingerprints/
+
+## New Supported Protocols and Services
+
+This is the list of the new supported protocols, grouped by category.
+Information about these new protocols is available on https://github.com/ntop/nDPI/blob/dev/doc/protocols.rst
+
+* `NDPI_PROTOCOL_CATEGORY_IOT_SCADA`:
+  * `NDPI_PROTOCOL_CNP_IP` (https://github.com/ntop/nDPI/pull/2521, https://github.com/ntop/nDPI/pull/2531)
+  * `NDPI_PROTOCOL_ATG`  (https://github.com/ntop/nDPI/pull/2527)
+  * `NDPI_PROTOCOL_TRDP` (https://github.com/ntop/nDPI/pull/2528)
+  * `NDPI_PROTOCOL_DICOM` (https://github.com/ntop/nDPI/commit/4fd12278b111eeaf1068876f77fb0a6176f69a34)
+* `NDPI_PROTOCOL_CATEGORY_DATA_TRANSFER`:
+  * `NDPI_PROTOCOL_LUSTRE` (https://github.com/ntop/nDPI/pull/2544)
+* `NDPI_PROTOCOL_CATEGORY_VPN`:
+  * `NDPI_PROTOCOL_NORDVPN` (https://github.com/ntop/nDPI/commit/f350379e95935448c22a387a561b57d50251f422)
+  * `NDPI_PROTOCOL_SURFSHARK` (https://github.com/ntop/nDPI/commit/5b0374c28b60a39f5720cb44ea5f711774c511af)
+  * `NDPI_PROTOCOL_CACTUSVPN` (https://github.com/ntop/nDPI/commit/c99646e4afee9489de9b62d7cb9b81176f6c01a3)
+  * `NDPI_PROTOCOL_WINDSCRIBE` (https://github.com/ntop/nDPI/commit/2964c23ca1f9af4df5c93e337987c6823b2ac663)
+* ` NDPI_PROTOCOL_CATEGORY_MUSIC`:
+  * `NDPI_PROTOCOL_SONOS` (https://github.com/ntop/nDPI/commit/806f47337d591b82ba2db211629b2b25429cc21e)
+* `NDPI_PROTOCOL_CATEGORY_CHAT`:
+  * `NDPI_PROTOCOL_DINGTALK` (https://github.com/ntop/nDPI/pull/2581)
+  * `NDPI_PROTOCOL_PALTALK` (https://github.com/ntop/nDPI/pull/2606)
+* `NDPI_PROTOCOL_CATEGORY_WEB`:
+  * `NDPI_PROTOCOL_NAVER` (https://github.com/ntop/nDPI/pull/2610)
+* `NDPI_PROTOCOL_CATEGORY_SHOPPING`:
+  * `NDPI_PROTOCOL_SHEIN` (https://github.com/ntop/nDPI/pull/2615)
+  * `NDPI_PROTOCOL_TEMU` (https://github.com/ntop/nDPI/pull/2615)
+  * `NDPI_PROTOCOL_TAOBAO`  (https://github.com/ntop/nDPI/pull/2615)
+* `NDPI_PROTOCOL_CATEGORY_NETWORK`:
+  * `NDPI_PROTOCOL_MIKROTIK` (https://github.com/ntop/nDPI/pull/2618)
+* `NDPI_PROTOCOL_CATEGORY_STREAMING`:
+  * `NDPI_PROTOCOL_PARAMOUNTPLUS` (https://github.com/ntop/nDPI/pull/2628)
+* `NDPI_PROTOCOL_CATEGORY_VIRTUAL_ASSISTANT`:
+  * `NDPI_PROTOCOL_YANDEX_ALICE` (https://github.com/ntop/nDPI/pull/2633)
+
+## New features
+
+* Implemented JA4 raw fingerprint (https://github.com/ntop/nDPI/commit/42ded07139e41c54a9ae2c8875a9e2c56d50af41)
+* Add monitoring capability (for STUN flows) (https://github.com/ntop/nDPI/pull/2588). See also: https://github.com/ntop/nDPI/blob/dev/doc/monitoring.md
+* Implemented DNS host cache (https://github.com/ntop/nDPI/commit/55fa92490af593358a0b13ad1708ee9b14eec128)
+* Add a configuration file to `ndpiReader` (https://github.com/ntop/nDPI/pull/2629)
+
+## New algorithms
+
+* Implemented algorithms for K-Nearest Neighbor Search (KNN)  (https://github.com/ntop/nDPI/pull/2554)
+* Added `ndpi_quick_encrypt()` and  `ndpi_quick_decrypt()` API calls (https://github.com/ntop/nDPI/pull/2568)
+
+## New configuration knobs
+
+Further information is available on https://github.com/ntop/nDPI/blob/dev/doc/configuration_parameters.md
+
+* `tls,subclassification`, `quic,subclassification`, `http,subclassification`: enable/disable subclassification (https://github.com/ntop/nDPI/pull/2533)
+* `openvpn,subclassification_by_ip`, `wiregurad,subclassification_by_ip`: enable/disable sub-classification using server IP. Useful to detect the specific VPN application/app (https://github.com/ntop/nDPI/commit/85ebda434d44f93e656ee5d3e52dc258134495d0)
+* `openvpn,dpi.heuristics`, `openvpn,dpi.heuristics.num_messages`: configure heuristics to detect OpenVPN flows (https://github.com/ntop/nDPI/pull/2547)
+* `dpi.guess_ip_before_port`: enable/disable guessing by IP first when guessing flow classifcation (https://github.com/ntop/nDPI/pull/2562)
+* `tls,dpi.heuristics`, `tls,dpi.heuristics.max_packets_extra_dissection`: configure heuristics to detect TLS flows (https://github.com/ntop/nDPI/pull/2553)
+* `flow.use_client_ip_in_guess`, `flow.use_client_port_in_guess`: configure guessing algorithm (https://github.com/ntop/nDPI/pull/2569)
+* `$PROTO_NAME,monitoring`: enable/disable monitoring state (https://github.com/ntop/nDPI/pull/2588)
+* `metadata.tcp_fingerprint`, `tls,metadata.ja4r_fingerprint`: enable/disable some fingerprints (https://github.com/ntop/nDPI/commit/6b6dad4fdb2e60cd2887f7d381bcab2387ba9507, https://github.com/ntop/nDPI/commit/42ded07139e41c54a9ae2c8875a9e2c56d50af41)
+* `sip,metadata.attribute.XXX`: enable/disable extraction of some SIP metadata (https://github.com/ntop/nDPI/pull/2614)
+
+## Improvements
+
+* Fixed probing attempt risk that was creating false positives (https://github.com/ntop/nDPI/commit/fc4fb4d409c43af8b9bdbd9d0cf8d9b742408f26)
+* Fixes Viber false positive detection (https://github.com/ntop/nDPI/commit/5610145c6c2f0aebd6adee7717145ab44c29f848)
+* ahocorasick: fix mem leaked AC_NODE_T object (https://github.com/ntop/nDPI/pull/2258, https://github.com/ntop/nDPI/pull/2522)
+* Endian-independent implementation of IEEE 802.3 CRC32 (https://github.com/ntop/nDPI/pull/2529)
+* Improved Yahoo matching for Japanese traffic (https://github.com/ntop/nDPI/pull/2539)
+* HTTP, QUIC, TLS: allow to disable sub-classification (https://github.com/ntop/nDPI/pull/2533)
+* Bittorrent fixes (https://github.com/ntop/nDPI/pull/2538)
+* bins: fix `ndpi_set_bin`, `ndpi_inc_bin` and `ndpi_get_bin_value` (https://github.com/ntop/nDPI/pull/2536)
+* TLS: better state about handshake (https://github.com/ntop/nDPI/pull/2534)
+* OpenVPN: improve detection (https://github.com/ntop/nDPI/commit/c713c894b6146c7884e24895cd3df1d7e35ee120)
+* OpenVPN, Wireguard: improve sub-classification (https://github.com/ntop/nDPI/commit/85ebda434d44f93e656ee5d3e52dc258134495d0)
+* oracle: fix dissector (https://github.com/ntop/nDPI/pull/2548)
+* RTMP: improve detection (https://github.com/ntop/nDPI/pull/2549)
+* RTP: fix identification over TCP (https://github.com/ntop/nDPI/commit/def86ba0a9f090cebda3d2e521e22f5d8f2f0f35)
+* QUIC: add a basic heuristic to detect mid-flows (https://github.com/ntop/nDPI/pull/2550)
+* Enhanced DHCP fingerprint (https://github.com/ntop/nDPI/commit/b77d3e3ab6d216cda9a092794a5fb8b1eac86fe6)
+* dns: add a check before setting `NDPI_MALFORMED_PACKET` risk (https://github.com/ntop/nDPI/pull/2558)
+* Tls out of order (https://github.com/ntop/nDPI/pull/2561)
+* Added DHCP class identifier (https://github.com/ntop/nDPI/commit/7cc2432098ccd85c6de34e177f1115272c8d382b)
+* Improved fingerprint serialization (https://github.com/ntop/nDPI/commit/40fefd59a7bcf087c89c1f62adfc2fb8eccb126a)
+* Fixed handling of spurious TCP retransmissions (https://github.com/ntop/nDPI/commit/eeb1c281adae5002d8f9c981c0b145a88a814548)
+* TLS: improve handling of Change Cipher message (https://github.com/ntop/nDPI/pull/2564)
+* Added pki.goog domain name (https://github.com/ntop/nDPI/commit/26b1899d9274b07b04032468e33a14a36756a63f)
+* TTL Cache Fix (https://github.com/ntop/nDPI/pull/2582)
+* Added STUN fingerprint code (https://github.com/ntop/nDPI/commit/ab3e07335409f5c0710cdffbbf7091578f18f128)
+* TLS: heuristics: fix memory allocations (https://github.com/ntop/nDPI/pull/2577)
+* TLS: detect abnormal padding usage (https://github.com/ntop/nDPI/pull/2579)
+* Enhanced DHCP fingerprint (https://github.com/ntop/nDPI/commit/4df60a888b374e4b41298d0d63f98fcaff05786d)
+* STUN: fix monitoring of Whatsapp and Zoom flows (https://github.com/ntop/nDPI/pull/2590
+* Exports DNS A/AAAA responses (up to 4 addresses) (https://github.com/ntop/nDPI/commit/45323e3bf8a0fc56fd5f74c12f78e2f27429e701)
+* Added new API calls for serializing/restoring the DNS cache (https://github.com/ntop/nDPI/commit/b9348e9d6e0e754c4b17661c643ca258f1540ca1)
+* Fixed JA4 invalid computation due to code bug and uninitialized values (https://github.com/ntop/nDPI/commit/2b4061108215304c131aea314229719975c8f1d9)
+* Add configuration of TCP fingerprint computation (https://github.com/ntop/nDPI/pull/2598)
+* STUN: if the same metadata is found multiple times, keep the first value (https://github.com/ntop/nDPI/pull/2591)
+* STUN: minor fix for RTCP traffic (https://github.com/ntop/nDPI/pull/2593)
+* Added support for RDP over TLS (https://github.com/ntop/nDPI/commit/6dc4533c3cc0786c740f91cedab74e54623349b2)
+* STUN: fix monitoring with RTCP flows (https://github.com/ntop/nDPI/pull/2603)
+* Fixes TCP fingerprint calculation when multiple EOL are specified (https://github.com/ntop/nDPI/commit/d5236c0aafe0b9622da752147ff4fbafd52e7582)
+* Added DHCP fingerprint (https://github.com/ntop/nDPI/commit/fecc378e0426cbad42da636bb075dadb3fb24e61)
+* DNS reponse addresses are now serialized in JSON (https://github.com/ntop/nDPI/commit/0d4c1e9179d03ee099a943f8420c54174c976da7)
+* TikTok cleanup (https://github.com/ntop/nDPI/commit/a97a130e59d635c5acfccf6049499d201dc90ba3)
+* Added HTTP credentials extraction (https://github.com/ntop/nDPI/commit/412ca8700fc53da705c6aa386c736a400279a614)
+* TLS: export heuristic fingerprint as metadata (https://github.com/ntop/nDPI/pull/2609)
+* SIP: rework detection and extract metadata (https://github.com/ntop/nDPI/pull/2614)
+* Zoom: fix heap-buffer-overflow (https://github.com/ntop/nDPI/pull/2621)
+* Small updates on domains list (https://github.com/ntop/nDPI/pull/2623)
+* RTP, STUN: improve detection of multimedia flow type (https://github.com/ntop/nDPI/pull/2620)
+* Update `flow->flow_multimedia_types` to a bitmask (https://github.com/ntop/nDPI/pull/2625)
+* Improved TCP probing attempt (https://github.com/ntop/nDPI/commit/9e67885aff6bbfc41157c620752a6770b6b62b23)
+* When triggering risk "Known Proto on Non Std Port", nDPi now reports the port that was supposed to be used as default (https://github.com/ntop/nDPI/commit/56e52448c43ee069b283501327bd15067d877d57)
+* SIP: export metadata via json (https://github.com/ntop/nDPI/pull/2630)
+* STUN: improve Whatsapp monitoring (https://github.com/ntop/nDPI/pull/2635)
+* Enhanced STUN stats](https://github.com/ntop/nDPI/commit/6b6b5c7c4e4e6112dcd6722a8685ee3517d7d5bc)
+* Added STUN custom support (https://github.com/ntop/nDPI/commit/ea1b8dc1cb3caffbe4937c9b8ca1a3ecde4c3351)
+* signal: improve detection of chats and calls (https://github.com/ntop/nDPI/pull/2637)
+* STUN: fix monitoring (https://github.com/ntop/nDPI/pull/2639)
+* STUN/RTP: improve metadata extraction (https://github.com/ntop/nDPI/pull/2641)
+* Added minor Citrix improvement (https://github.com/ntop/nDPI/commit/727d08deef1de94409db1b9aa45a49cf016a547a)
+* Telegram STUN improvement (https://github.com/ntop/nDPI/commit/4d17dc635cac296ae2f526c1d56a90c6d60170d8)
+
+## Misc
+
+* Fix `verify_dist_tarball.sh` after latest release (https://github.com/ntop/nDPI/pull/2519)
+* Removed unnecessary includes (https://github.com/ntop/nDPI/pull/2525)
+* Fixed initialization (https://github.com/ntop/nDPI/commit/e72255445c5654d1d1f932583fbf5f01c187e946, https://github.com/ntop/nDPI/commit/9b1736aa8960170d32eac7c954194eff9436fbbc)
+* Fix url for downloading X/Twitter crawler IPs (https://github.com/ntop/nDPI/pull/2526)
+* Introduced `ndpi_master_app_protocol` typedef (https://github.com/ntop/nDPI/commit/53a6bae365618f9b301cf51e5f3f9d5450b0e280)
+* Added `ndpi_get_protocol_by_name*` API call (https://github.com/ntop/nDPI/commit/f7ee92c690ebce8841f1ab973b3d63146952f912)
+* Changed `NDPI_MALICIOUS_JA3` to `NDPI_MALICIOUS_FINGERPRINT` (https://github.com/ntop/nDPI/commit/bad0e60813e0b23a0cd96c92e58b9caa08eb8dec)
+* Added `ndpi_is_proto_*` and `ndpi_get_proto_by_*` API call (https://github.com/ntop/nDPI/commit/9263d4dd873c4e2068e392a692b20609b1ec5a9a)
+* Added `ndpi_risk2code` and `ndpi_code2risk` API call (https://github.com/ntop/nDPI/commit/5436dddef55e068095ca56b114715a91a551bf26)
+* Added `print_ndpi_address_port` in nDPi API (https://github.com/ntop/nDPI/commit/d769b23e05f93158302cf6904b182860b05545e9)
+* Print risk code in `ndpi_dump_risks_score` (https://github.com/ntop/nDPI/commit/69fd4aadf3ed362ba67f03975f8b72c733bca7f7)
+* Align serialized risk names to all others (first letter; uppercase letter) (https://github.com/ntop/nDPI/pull/2541)
+* wireshark: extcap: fix output data link type (https://github.com/ntop/nDPI/pull/2543)
+* wireshark: extcap: export flow risk info (https://github.com/ntop/nDPI/commit/23ae3d0c265590a138f156c2193998e3b8f2fdd5)
+* Added -E option for dumping flow fingerprint (https://github.com/ntop/nDPI/commit/fda3730cf0bdec6b4a1cd8e38d3a88c33f0d0ef1)
+* Reworked fingerprint export now in JSON (https://github.com/ntop/nDPI/commit/6de91c78955a0d85d97518c273366bd9d6ede5de)
+* wireshark: extcap: rework trailer header (https://github.com/ntop/nDPI/pull/2557)
+* fuzz: try to be a little bit faster (https://github.com/ntop/nDPI/pull/2559, https://github.com/ntop/nDPI/pull/2570, https://github.com/ntop/nDPI/pull/2578)
+* domain lists are not loaded when -E is used (https://github.com/ntop/nDPI/commit/1d1edfc1c787bfe91d457f632c148447f8912842)
+* Implemented ndpi_strrstr() (https://github.com/ntop/nDPI/commit/191694f797639fc0b56adcf050bc9cfa8dc02f3d, https://github.com/ntop/nDPI/pull/2570)
+* Allow IP guess before port in `ndpi_detection_giveup` (https://github.com/ntop/nDPI/pull/2562)
+* Replaced traces with debug messages (https://github.com/ntop/nDPI/commit/08a37dc779dde9f85989459a946195e1d22914fc)
+* wireshark: lua: add script for QUIC fingerprints (https://github.com/ntop/nDPI/pull/2566)
+* Added new API calls `ndpi_hex2bin` and `ndpi_bin2hex` (https://github.com/ntop/nDPI/commit/42cfd29cc3d7dd2c883c8fd3c5f53319f752fbfc) 
+* Add enable/disable guessing using client IP/port (https://github.com/ntop/nDPI/pull/2569)
+* CI: add tests on macos-15 (https://github.com/ntop/nDPI/pull/2571)
+* Let the library returning the packet direction calculated internally (https://github.com/ntop/nDPI/pull/2572)
+* wireshark: extcap: allow configuration of OpenVPN/TLS heuristics via GUI (https://github.com/ntop/nDPI/pull/2576)
+* CI: remove macos-12 (https://github.com/ntop/nDPI/pull/2592)
+* Moved ndpi_lru in a separate file (https://github.com/ntop/nDPI/commit/7629b94a2671611b302a7d95a5392f78c6729f77)
+* Added -N option for dumping/restoring the DNS cache (when enabled) (https://github.com/ntop/nDPI/commit/2e5edd2cc956b420f6b9e2a2ffec7d435694a69a)
+* Added JA4 stats (https://github.com/ntop/nDPI/commit/b53e4fc661377fe7f9cc135d46db2d5dd15060ab)
+* Added support for printing JA4r when enabled (https://github.com/ntop/nDPI/commit/faaa5c5799440117f7a9cc78499433396dba7eb3)
+* Added TLS fingerprints (https://github.com/ntop/nDPI/commit/37a654e33fc03c2cd0c956e860b634b2ad7d5b60)
+* Added `ndpi_is_public_ipv4` (https://github.com/ntop/nDPI/commit/3e04321eab515992ef2af96af916fa5155f07a7e)
+* Parser for ndpiReader JSON files (https://github.com/ntop/nDPI/commit/97ce7293920646d3b8e052ef467d23f086baf982)
+* Added -L <domain suffix> for loading domain suffixes (https://github.com/ntop/nDPI/commit/afc4d9e34d61a45c5daeffcdcc187bc0b105ef3e)
+* ndpiReader: add some statistics about monitoring (https://github.com/ntop/nDPI/pull/2602)
+* ndpiReader: explicitly remove non ipv4/6 packets (https://github.com/ntop/nDPI/pull/2601)
+* Fix `ndpi_tot_allocated_memory` calculation if `ndpi_calloc()` used (https://github.com/ntop/nDPI/pull/2604)
+* ndpiReader: fix command line options used by wireshark (https://github.com/ntop/nDPI/pull/2605)
+* ml tests for dga detection (https://github.com/ntop/nDPI/pull/2607)
+* Add new json serialization type `ndpi_serialization_format_inner_json` (https://github.com/ntop/nDPI/commit/8ad34b381ca5d352dc4f877f93bc0f7625d8b28c)
+* fuzz: improve coverage (https://github.com/ntop/nDPI/pull/2612)
+* Exported `is_ndpi_proto` definition (https://github.com/ntop/nDPI/commit/183175fc6b4c9e610fb22dfd69946cc7063b6a63)
+* Crash fix when -f is specified with a non-existing pcap file (-i) (https://github.com/ntop/nDPI/commit/35ef56cc2467e907fa1827a4e8058893dea0b8a7)
+* Unify ndpi debug logging to always use a u16 protocol id (https://github.com/ntop/nDPI/pull/2613)
+* Added ndpi_intoav6() (https://github.com/ntop/nDPI/commit/de8c326cd218867b88c25b0e6c0be9e2c909b1e9)
+* Debian/Ubuntu packaging: use `--enable-no-sign` to build `*.deb` packages w/o signing those (https://github.com/ntop/nDPI/pull/2616)
+* ndpiReader: fix statistic about total number of flows (https://github.com/ntop/nDPI/pull/2622)
+* Update GitHub CI actions (https://github.com/ntop/nDPI/pull/2627)
+* Removed old USE_LEGACY_AHO_CORASICK code (https://github.com/ntop/nDPI/commit/170849f156fe7b803eb08f91722bfaa576f3084f)
+* Fix license typo (https://github.com/ntop/nDPI/pull/2638)
+* Update script to download Azure IP list ranges (https://github.com/ntop/nDPI/pull/2640)
+* Update all IPS lists (https://github.com/ntop/nDPI/pull/2643)
+
+## New Contributors
+
+* @wssxsxxsx made their first contribution in https://github.com/ntop/nDPI/pull/2527
+* @liwilson1 made their first contribution in https://github.com/ntop/nDPI/pull/2539
+* @YellowMan02 made their first contribution in https://github.com/ntop/nDPI/pull/2607
+* @Klavishnik made their first contribution in https://github.com/ntop/nDPI/pull/2633
+* @adipierro made their first contribution in https://github.com/ntop/nDPI/pull/2638
+
+**Full Changelog**: https://github.com/ntop/nDPI/compare/4.10...4.12
+
+
+
 #### nDPI 4.10 (Aug 2024)
 
 ## Major Changes

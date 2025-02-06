@@ -1,6 +1,6 @@
 DPI Packets (TCP):	6	(6.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 15 (15.00 diss/flow)
+Num dissector calls: 16 (16.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -17,11 +17,11 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   2/0 (search/found)
+Patricia protocols:   1/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
 ntop	19	10643	1
 
 Safe                            19 10643         1            
 
-	1	TCP 192.168.80.160:55804 <-> 46.101.157.119:80 [proto: 7.26/HTTP.ntop][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Media/1][9 pkts/754 bytes <-> 10 pkts/9889 bytes][Goodput ratio: 20/93][0.18 sec][Hostname/SNI: luca.ntop.org][bytes ratio: -0.858 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 25/6 77/41 28/14][Pkt Len c2s/s2c min/avg/max/stddev: 66/68 84/989 214/1502 46/649][URL: luca.ntop.org/0.mp3][StatusCode: 200][Content-Type: audio/mpeg][Server: Apache/2.4.7 (Ubuntu)][User-Agent: Wget/1.16.3 (darwin14.1.0)][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][PLAIN TEXT (GET /0.mp)][Plen Bins: 0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0]
+	1	TCP 192.168.80.160:55804 <-> 46.101.157.119:80 [proto: 7.26/HTTP.ntop][IP: 442/DigitalOcean][ClearText][Confidence: DPI][FPC: 442/DigitalOcean, Confidence: IP address][DPI packets: 6][cat: Media/1][9 pkts/754 bytes <-> 10 pkts/9889 bytes][Goodput ratio: 20/93][0.18 sec][Hostname/SNI: luca.ntop.org][bytes ratio: -0.858 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 25/6 77/41 28/14][Pkt Len c2s/s2c min/avg/max/stddev: 66/68 84/989 214/1502 46/649][URL: luca.ntop.org/0.mp3][StatusCode: 200][Content-Type: audio/mpeg][Server: Apache/2.4.7 (Ubuntu)][User-Agent: Wget/1.16.3 (darwin14.1.0)][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][PLAIN TEXT (GET /0.mp)][Plen Bins: 0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0]

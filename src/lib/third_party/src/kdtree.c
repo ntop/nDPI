@@ -160,6 +160,9 @@ static void clear_rec(struct kdnode *node, void (*destr)(void*))
 
 void kd_clear(struct kdtree *tree)
 {
+  if (!tree)
+    return;
+
   clear_rec(tree->root, tree->destr);
   tree->root = 0;
 
@@ -206,6 +209,9 @@ static int insert_rec(struct kdnode **nptr, const double *pos, void *data, int d
 
 int kd_insert(struct kdtree *tree, const double *pos, void *data)
 {
+  if (!tree)
+    return -1;
+
   if (insert_rec(&tree->root, pos, data, 0, tree->dim)) {
     return -1;
   }

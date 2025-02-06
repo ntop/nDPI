@@ -1,6 +1,7 @@
+
 # FAQ
 
-From https://www.ntop.org/ndpi/ndpi-internals-and-frequent-questions/
+From [blog post](https://www.ntop.org/ndpi/ndpi-internals-and-frequent-questions/)
 
 **Q**: How nDPI implements protocol detection?\
 **A**: nDPI includes a list of protocol dissectors (364 as of today) that are able to dissect protocols such as WhatsApp or TLS. As soon as a new flow is submitted to nDPI, the library applies in sequence dissectors that can potentially match the protocols (i.e. telnet is a TCP-based protocol, and it will not be considered for UDP flows). We start from the dissector that can most probably match using the port number. This means for traffic on TCP/22 nDPI will start with the SSH dissectors and if not matching continue with the others. Dissection completes as soon as a protocol matches or when none of them matched and in this case the flow will be labelled as Unknown.

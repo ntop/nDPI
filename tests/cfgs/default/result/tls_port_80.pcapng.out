@@ -24,9 +24,9 @@ TLS	13	2439	1
 
 Safe                            13 2439          1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 57.91.202.194            	 1      
 
 
-	1	TCP 57.91.202.194:50541 <-> 132.49.141.56:80 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 13][cat: Web/5][5 pkts/563 bytes <-> 8 pkts/1876 bytes][Goodput ratio: 43/72][14.65 sec][bytes ratio: -0.538 (Download)][IAT c2s/s2c min/avg/max/stddev: 1011/3433 2355/3433 3621/3433 1067/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 113/234 299/1414 93/446][Risk: ** Known Proto on Non Std Port **** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **][Risk Score: 110][Risk Info: No ALPN / SNI should always be present / Expected on port 443][TCP Fingerprint: 2_128_64240_5e2eda046ca7/Unknown][TLSv1.2][JA3C: 3f2fba0262b1a22b739126dfb2fe7a7d][JA4: t12d550500_168bb377f8c8_a1e935682795][JA3S: 107030a763c7224285717ff1569a17f3][Firefox][Cipher: TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384][PLAIN TEXT (AnyNet Root CA1 0)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0]
+	1	TCP 57.91.202.194:50541 <-> 132.49.141.56:80 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 13][cat: Web/5][5 pkts/563 bytes <-> 8 pkts/1876 bytes][Goodput ratio: 43/72][14.65 sec][bytes ratio: -0.538 (Download)][IAT c2s/s2c min/avg/max/stddev: 1011/3433 2355/3433 3621/3433 1067/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 113/234 299/1414 93/446][Risk: ** Known Proto on Non Std Port **** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **][Risk Score: 110][Risk Info: No ALPN / SNI should always be present / Expected on port 443][TCP Fingerprint: 2_128_64240_5e2eda046ca7/Unknown][TLSv1.2][JA4: t12d550500_168bb377f8c8_a1e935682795][JA3S: 107030a763c7224285717ff1569a17f3][Firefox][Cipher: TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384][PLAIN TEXT (AnyNet Root CA1 0)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0]

@@ -35,7 +35,7 @@ static void ndpi_int_nomachine_add_connection(struct ndpi_detection_module_struc
   NDPI_LOG_INFO(ndpi_struct, "found NoMachine\n");
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NOMACHINE,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-  ndpi_set_risk(flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found NoMachine");
+  ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found NoMachine");
 }
 
 static void ndpi_search_nomachine(struct ndpi_detection_module_struct *ndpi_struct,

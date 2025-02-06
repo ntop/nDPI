@@ -4,7 +4,7 @@ DPI Packets (TCP):	100	(3.33 pkts/flow)
 DPI Packets (UDP):	35	(2.50 pkts/flow)
 Confidence Match by port    : 21 (flows)
 Confidence DPI              : 23 (flows)
-Num dissector calls: 539 (12.25 diss/flow)
+Num dissector calls: 549 (12.48 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/63/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -37,8 +37,8 @@ Safe                            23 1578          15
 Acceptable                      45 6147          11           
 Fun                            430 259830        18           
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 192.168.1.105            	 1      
 
 
@@ -54,7 +54,7 @@ JA3 Host Stats:
 	10	TCP 192.168.1.105:59119 <-> 114.134.80.162:80 [proto: 7.356/HTTP.SinaWeibo][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 356/SinaWeibo, Confidence: DNS][DPI packets: 6][cat: SocialNetwork/6][5 pkts/736 bytes <-> 4 pkts/863 bytes][Goodput ratio: 61/73][1.05 sec][Hostname/SNI: weibo.com][bytes ratio: -0.079 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/347 176/348 353/348 174/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 147/216 500/689 177/273][URL: weibo.com/login.php?lang=en-us][StatusCode: 301][Content-Type: text/html][Server: Apache][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36][TCP Fingerprint: 2_64_29200_2e3cee914fc1/Linux][PLAIN TEXT (GET /login.php)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	11	TCP 192.168.1.105:35811 <-> 93.188.134.246:80 [proto: 7.200/HTTP.Sina][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 200/Sina, Confidence: DNS][DPI packets: 5][cat: SocialNetwork/6][3 pkts/604 bytes <-> 2 pkts/140 bytes][Goodput ratio: 66/0][0.46 sec][Hostname/SNI: js.t.sinajs.cn][URL: js.t.sinajs.cn/t5/register/js/v6/pl/base.js?version=201605130537][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36][TCP Fingerprint: 2_64_29200_2e3cee914fc1/Linux][PLAIN TEXT (KGET /t)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	12	TCP 192.168.1.105:42275 <-> 222.73.28.96:80 [proto: 7.200/HTTP.Sina][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 200/Sina, Confidence: DNS][DPI packets: 4][cat: SocialNetwork/6][3 pkts/610 bytes <-> 1 pkts/66 bytes][Goodput ratio: 70/0][0.38 sec][Hostname/SNI: u1.img.mobile.sina.cn][URL: u1.img.mobile.sina.cn/public/files/image/620x300_img5653d57c6dab2.png][User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36][TCP Fingerprint: 2_64_29200_2e3cee914fc1/Linux][PLAIN TEXT (GET /public/files/image/620)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	13	TCP 192.168.1.105:50827 <-> 47.89.65.229:443 [proto: 91.274/TLS.Alibaba][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 274/Alibaba, Confidence: DNS][DPI packets: 4][cat: Web/5][3 pkts/382 bytes <-> 1 pkts/66 bytes][Goodput ratio: 52/0][0.16 sec][Hostname/SNI: g.alicdn.com][(Advertised) ALPNs: h2;spdy/3.1;http/1.1][TCP Fingerprint: 2_64_29200_2e3cee914fc1/Linux][TLSv1.2][JA3C: 58e7f64db6e4fe4941dd9691d421196c][JA4: t12d1412h2_20a10634286c_ce3753e6c77f][Firefox][PLAIN TEXT (g.alicdn.com)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	TCP 192.168.1.105:50827 <-> 47.89.65.229:443 [proto: 91.274/TLS.Alibaba][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 274/Alibaba, Confidence: DNS][DPI packets: 4][cat: Web/5][3 pkts/382 bytes <-> 1 pkts/66 bytes][Goodput ratio: 52/0][0.16 sec][Hostname/SNI: g.alicdn.com][(Advertised) ALPNs: h2;spdy/3.1;http/1.1][TCP Fingerprint: 2_64_29200_2e3cee914fc1/Linux][TLSv1.2][JA4: t12d1412h2_20a10634286c_ce3753e6c77f][Firefox][PLAIN TEXT (g.alicdn.com)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	14	UDP 192.168.1.105:53543 <-> 192.168.1.1:53 [proto: 5.200/DNS.Sina][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.200/DNS.Sina, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/75 bytes <-> 1 pkts/191 bytes][Goodput ratio: 43/78][0.11 sec][Hostname/SNI: img.t.sinajs.cn][93.188.134.246][Risk: ** Minor Issues **][Risk Score: 10][Risk Info: DNS Record with zero TTL][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	15	UDP 192.168.1.105:41352 <-> 192.168.1.1:53 [proto: 5.200/DNS.Sina][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.200/DNS.Sina, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/190 bytes][Goodput ratio: 43/77][0.54 sec][Hostname/SNI: js.t.sinajs.cn][93.188.134.246][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	16	UDP 192.168.1.105:51440 <-> 192.168.1.1:53 [proto: 5.274/DNS.Alibaba][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.274/DNS.Alibaba, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/72 bytes <-> 1 pkts/171 bytes][Goodput ratio: 41/75][0.19 sec][Hostname/SNI: g.alicdn.com][47.89.65.229][PLAIN TEXT (alicdn)][Plen Bins: 50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

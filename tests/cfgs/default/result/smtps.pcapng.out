@@ -24,9 +24,9 @@ SMTPS	4	936	1
 
 Safe                             4 936           1            
 
-JA3 Host Stats: 
-		 IP Address                  	 # JA3C     
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
 	1	 62.43.36.99              	 1      
 
 
-	1	TCP 62.43.36.99:37682 <-> 21.65.95.132:465 [proto: 29/SMTPS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Email/3][2 pkts/637 bytes <-> 2 pkts/299 bytes][Goodput ratio: 81/60][0.47 sec][Risk: ** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **][Risk Score: 60][Risk Info: No ALPN / SNI should always be present][TCP Fingerprint: 2_64_5808_41501c10fc77/Unknown][TLSv1.2][JA3C: f17ca639ecdcaa65b4521c49e3515ef9][JA4: t12d860600_e18388e7f3a3_4446390ac224][Firefox][PLAIN TEXT (4223.hostgator.com ESMTP Exim 4)][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 62.43.36.99:37682 <-> 21.65.95.132:465 [proto: 29/SMTPS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Email/3][2 pkts/637 bytes <-> 2 pkts/299 bytes][Goodput ratio: 81/60][0.47 sec][Risk: ** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **][Risk Score: 60][Risk Info: No ALPN / SNI should always be present][TCP Fingerprint: 2_64_5808_41501c10fc77/Unknown][TLSv1.2][JA4: t12d860600_e18388e7f3a3_4446390ac224][Firefox][PLAIN TEXT (4223.hostgator.com ESMTP Exim 4)][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

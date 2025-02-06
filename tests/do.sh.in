@@ -31,6 +31,11 @@ if [ "${NDPI_SKIP_PARALLEL_BAR}" = "1" ]; then
    SKIP_PARALLEL_BAR=1
 fi
 
+TEST_ONLY_RECENTLY_UPDATED_PCAPS=0
+if [ "${NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS}" = "1" ]; then
+   TEST_ONLY_RECENTLY_UPDATED_PCAPS=1
+fi
+
 #Remember: valgrind and *SAN are incompatible!
 CMD_PREFIX="${CMD_PREFIX}"
 if [ "${NDPI_TESTS_WINE}" = "1" ]; then
@@ -51,7 +56,7 @@ NBPF_ENABLED=@NBPF_ENABLED@
 NBPF_PCAPS="h323-overflow.pcap"
 GLOBAL_CONTEXT_ENABLED=@GLOBAL_CONTEXT_ENABLED@
 GLOBAL_CONTEXT_CFGS="caches_global"
-READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,../../../example/config.txt -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja3_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -G ../../../lists -q -K JSON -k /dev/null -t -v 2"
+READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,../../../example/config.txt -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja4_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -G ../../../lists -q -K JSON -k /dev/null -t -v 2"
 
 
 #These exports are used in parallel mode
@@ -103,10 +108,10 @@ fuzzy_testing() {
 	cp ../example/protos.txt .
 	cp ../example/categories.txt .
 	cp ../example/risky_domains.txt .
-	cp ../example/ja3_fingerprints.csv .
+	cp ../example/ja4_fingerprints.csv .
 	cp ../example/sha1_fingerprints.csv .
 	../fuzz/fuzz_ndpi_reader -dict=../fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" cfgs/default/pcap/
-	rm -f protos.txt categories.txt risky_domains.txt ja3_fingerprints.csv sha1_fingerprints.csv
+	rm -f protos.txt categories.txt risky_domains.txt ja4_fingerprints.csv sha1_fingerprints.csv
     fi
 }
 
@@ -239,10 +244,16 @@ for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
 
     cd ./cfgs/"$(basename "$d")" || exit 1
 
-    if [ "$#" -ne 0 ]; then
-        PCAPS=$*
+    if [ $TEST_ONLY_RECENTLY_UPDATED_PCAPS -eq 1 ]; then
+        # Latest 10 pcaps updatetd recently (to be more precise, pcap which triggered a change
+        # in their results lately)
+        PCAPS=$(cd result || exit 1; find * -type f -print0  | xargs -0 ls -t | head -10 | xargs basename -s .out)
     else
-        PCAPS=$(cd pcap || exit 1; /bin/ls -- *.*cap*)
+        if [ "$#" -ne 0 ]; then
+            PCAPS=$*
+        else
+            PCAPS=$(cd pcap || exit 1; /bin/ls -- *.*cap*)
+        fi
     fi
     FAILURES=()
     READER_EXTRA_PARAM=""
