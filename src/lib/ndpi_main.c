@@ -600,9 +600,6 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
 			     ndpi_port_range *udpDefPorts) {
   char *name;
   int j;
-
-  if(protoId == NDPI_PROTOCOL_NETFLIX)
-    printf("Hello\n");
   
   if(!ndpi_str || !protoName)
     return;
