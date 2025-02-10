@@ -329,28 +329,29 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   } else {
     /* DNS Reply */
 
-    flow->protos.dns.transaction_id = dns_header->tr_id;
-    flow->protos.dns.reply_code = dns_header->flags & 0x0F;
-
-    if(flow->protos.dns.reply_code != 0) {
-      char str[32], buf[16];
-
-      snprintf(str, sizeof(str), "DNS Error Code %s",
-	       dns_error_code2string(flow->protos.dns.reply_code, buf, sizeof(buf)));
-      ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, str);
-    } else {
-      if(ndpi_isset_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN)) {
-	ndpi_set_risk(ndpi_struct, flow, NDPI_RISKY_DOMAIN, "DGA Name Query with no Error Code");
-      }
-    }
-
     if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
        && ((((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
 	    || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))
-	    || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS))))
+	    || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
+            || (dns_header->num_answers == 0 && dns_header->authority_rrs == 0 && dns_header->additional_rrs == 0))
        ) {
       /* This is a good reply: we dissect it both for request and response */
       
+      flow->protos.dns.transaction_id = dns_header->tr_id;
+      flow->protos.dns.reply_code = dns_header->flags & 0x0F;
+
+      if(flow->protos.dns.reply_code != 0) {
+        char str[32], buf[16];
+
+        snprintf(str, sizeof(str), "DNS Error Code %s",
+                 dns_error_code2string(flow->protos.dns.reply_code, buf, sizeof(buf)));
+        ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, str);
+      } else {
+        if(ndpi_isset_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN)) {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_RISKY_DOMAIN, "DGA Name Query with no Error Code");
+        }
+      }
+
       if(dns_header->num_queries > 0) {
 	u_int16_t rsp_type;
 	u_int16_t num;
