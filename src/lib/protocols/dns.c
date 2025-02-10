@@ -329,23 +329,6 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   } else {
     /* DNS Reply */
 
-    if(flow->protos.dns.query_type == 0) {
-      /* In case we missed the query packet... */
-
-      while(x+2 < packet->payload_packet_len) {
-	if(packet->payload[x] == '\0') {
-          x++;
-          flow->protos.dns.query_type = get16(&x, packet->payload);
-#ifdef DNS_DEBUG
-          NDPI_LOG_DBG2(ndpi_struct, "query_type=%2d\n", flow->protos.dns.query_type);
-	  printf("[DNS] [request] query_type=%d\n", flow->protos.dns.query_type);
-#endif
-	  break;
-	} else
-	  x++;
-      }
-    }
-
     flow->protos.dns.transaction_id = dns_header->tr_id;
     flow->protos.dns.reply_code = dns_header->flags & 0x0F;
 
@@ -369,9 +352,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
       /* This is a good reply: we dissect it both for request and response */
       
       if(dns_header->num_queries > 0) {
-#ifdef DNS_DEBUG
 	u_int16_t rsp_type;
-#endif
 	u_int16_t num;
 
 	for(num = 0; num < dns_header->num_queries; num++) {
@@ -391,16 +372,15 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	    break;
 	  }
 
-	  /* To avoid warning: variable ‘rsp_type’ set but not used [-Wunused-but-set-variable] */
-#ifdef DNS_DEBUG
 	  rsp_type = get16(&x, packet->payload);
-#else
-	  get16(&x, packet->payload);
-#endif
 
 #ifdef DNS_DEBUG
 	  printf("[DNS] [response (query)] response_type=%d\n", rsp_type);
 #endif
+	  if(flow->protos.dns.query_type == 0) {
+	    /* In case we missed the query packet... */
+	    flow->protos.dns.query_type = rsp_type;
+	  }
 
 	  /* here x points to the response "class" field */
 	  x += 2; /* Skip class */
