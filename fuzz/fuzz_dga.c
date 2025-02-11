@@ -29,7 +29,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if (name) {
     memcpy(name, data, size);
     name[size] = '\0';
-    ndpi_check_dga_name(ndpi_struct, ndpi_flow, name, 1, 1);
+    ndpi_check_dga_name(ndpi_struct, ndpi_flow, name, 1, 1, 0);
     ndpi_free(name);
   }
 

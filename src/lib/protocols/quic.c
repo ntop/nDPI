@@ -1464,7 +1464,7 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
       flow->protos.tls_quic.client_hello_processed = 1; /* Allow matching of custom categories */
 
       ndpi_check_dga_name(ndpi_struct, flow,
-                          flow->host_server_name, 1, 0);
+                          flow->host_server_name, 1, 0, 0);
 
       if(ndpi_is_valid_hostname((char *)&crypto_data[tag_offset_start + prev_offset],
 				len) == 0) {

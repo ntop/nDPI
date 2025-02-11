@@ -822,6 +822,8 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
                               ndpi_get_current_time(flow));
       }
 
+      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0, ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN);
+
       if(!ndpi_struct->cfg.dns_subclassification_enabled)
         ret.proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
 
@@ -829,8 +831,6 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 	ret.proto.master_protocol = checkDNSSubprotocol(s_port, d_port);
       else
 	ret.proto.master_protocol = NDPI_PROTOCOL_DNS;
-
-      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0);
 
       /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
       flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
@@ -853,6 +853,8 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       }
       return; /* The response will set the verdict */
     }
+
+    if(strlen(flow->host_server_name) > 0)
 
     flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
       flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);

@@ -5187,12 +5187,12 @@ static void dgaUnitTest() {
 
   for(i=0; non_dga[i] != NULL; i++) {
     if(debug) printf("Checking non DGA %s\n", non_dga[i]);
-    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)non_dga[i], 1, 1) == 0);
+    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)non_dga[i], 1, 1, 0) == 0);
   }
 
   for(i=0; dga[i] != NULL; i++) {
     if(debug) printf("Checking DGA %s\n", non_dga[i]);
-    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)dga[i], 1, 1) == 1);
+    assert(ndpi_check_dga_name(ndpi_str, NULL, (char*)dga[i], 1, 1, 0) == 1);
   }
 
   ndpi_exit_detection_module(ndpi_str);

@@ -1227,7 +1227,8 @@ extern "C" {
   /* DGA */
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			  struct ndpi_flow_struct *flow,
-			  char *name, u_int8_t is_hostname, u_int8_t check_subproto);
+			  char *name, u_int8_t is_hostname, u_int8_t check_subproto,
+			  u_int8_t flow_fully_classified);
 
   /* Serializer (supports JSON, TLV, CSV) */
 

@@ -10830,7 +10830,8 @@ static int ndpi_is_vowel(char c) {
 
 int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			struct ndpi_flow_struct *flow,
-			char *name, u_int8_t is_hostname, u_int8_t check_subproto) {
+			char *name, u_int8_t is_hostname, u_int8_t check_subproto,
+			u_int8_t flow_fully_classified) {
 
   /* Get domain name if ndpi_load_domain_suffixes(..) has been called */
   name = (char*)ndpi_get_host_domain(ndpi_str, name);
@@ -10863,7 +10864,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
        )
       return(0);
 
-    if(flow && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN))
+    if(flow && (flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN || flow_fully_classified))
       return(0); /* Ignore DGA check for protocols already fully detected */
 
     if(check_subproto &&

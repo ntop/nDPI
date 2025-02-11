@@ -105,7 +105,7 @@ static void ndpi_int_netbios_add_connection(struct ndpi_detection_module_struct 
 		 (u_int)(packet->payload_packet_len - off), name, sizeof(name)-1) > 0) {
       ndpi_hostname_sni_set(flow, (const u_int8_t *)name, strlen((char *)name), NDPI_HOSTNAME_NORM_ALL);
 
-      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 1);
+      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 1, 0);
   }
 
   if(sub_protocol == NDPI_PROTOCOL_UNKNOWN)
