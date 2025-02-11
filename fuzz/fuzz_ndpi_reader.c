@@ -108,6 +108,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "packets_limit_per_flow", "255");
     ndpi_set_config(workflow->ndpi_struct, NULL, "flow.track_payload", "1");
     ndpi_set_config(workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic", "1");
+    ndpi_set_config(workflow->ndpi_struct, "dns", "subclassification", "1");
     ndpi_set_config(workflow->ndpi_struct, "tls", "application_blocks_tracking", "1");
     ndpi_set_config(workflow->ndpi_struct, "stun", "max_packets_extra_dissection", "40");
     ndpi_set_config(workflow->ndpi_struct, "zoom", "max_packets_extra_dissection", "255");

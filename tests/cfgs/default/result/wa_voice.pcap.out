@@ -25,6 +25,7 @@ Patricia protocols:   44/10 (search/found)
 Patricia protocols IPv6: 2/0 (search/found)
 
 Unknown	2	120	1
+DNS	8	738	4
 MDNS	10	1188	2
 SSDP	8	1365	5
 DHCP	5	1710	1
@@ -32,11 +33,10 @@ WhatsAppCall	261	43719	7
 ICMP	4	280	1
 TLS	8	542	1
 Dropbox	4	1528	1
-Google	2	164	1
-WhatsApp	352	86475	4
+WhatsApp	348	86095	2
 Spotify	2	172	1
 ApplePush	24	8007	1
-WhatsAppFiles	52	24946	2
+WhatsAppFiles	50	24752	1
 
 Safe                             8 542           1            
 Acceptable                     722 169382        25           
@@ -66,15 +66,15 @@ JA Host Stats:
 	16	UDP 192.168.2.12:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 8/MDNS, Confidence: DPI][DPI packets: 5][cat: Network/14][5 pkts/544 bytes -> 0 pkts/0 bytes][Goodput ratio: 61/0][32.02 sec][Hostname/SNI: _homekit._tcp.local][_homekit._tcp.local][PLAIN TEXT (airplay)][Plen Bins: 0,80,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	17	TCP 17.171.47.85:443 <-> 192.168.2.12:50502 [proto: 91/TLS][IP: 140/Apple][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 1][cat: Web/5][4 pkts/271 bytes <-> 4 pkts/271 bytes][Goodput ratio: 11/11][0.28 sec][bytes ratio: 0.000 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 94/0 278/0 130/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 68/68 97/97 18/18][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	18	ICMP 192.168.2.12:0 -> 91.252.56.51:0 [proto: 81/ICMP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 81/ICMP, Confidence: DPI][DPI packets: 1][cat: Network/14][4 pkts/280 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][0.92 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	19	UDP 192.168.2.12:55296 <-> 192.168.2.1:53 [proto: 5.242/DNS.WhatsAppFiles][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.242/DNS.WhatsAppFiles, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/89 bytes <-> 1 pkts/105 bytes][Goodput ratio: 52/59][0.03 sec][Hostname/SNI: media-mxp1-1.cdn.whatsapp.net][31.13.86.51][PLAIN TEXT (whatsapp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	20	UDP 192.168.2.12:60549 <-> 192.168.2.1:53 [proto: 5.142/DNS.WhatsApp][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.142/DNS.WhatsApp, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/76 bytes <-> 1 pkts/117 bytes][Goodput ratio: 44/64][0.04 sec][Hostname/SNI: pps.whatsapp.net][157.240.20.52][PLAIN TEXT (whatsapp)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	21	UDP 192.168.2.12:60765 <-> 192.168.2.1:53 [proto: 5.142/DNS.WhatsApp][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.142/DNS.WhatsApp, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/113 bytes][Goodput ratio: 43/62][0.03 sec][Hostname/SNI: g.whatsapp.net][157.240.20.53][PLAIN TEXT (whatsapp)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	19	UDP 192.168.2.12:55296 <-> 192.168.2.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/89 bytes <-> 1 pkts/105 bytes][Goodput ratio: 52/59][0.03 sec][Hostname/SNI: media-mxp1-1.cdn.whatsapp.net][31.13.86.51][PLAIN TEXT (whatsapp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	20	UDP 192.168.2.12:60549 <-> 192.168.2.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/76 bytes <-> 1 pkts/117 bytes][Goodput ratio: 44/64][0.04 sec][Hostname/SNI: pps.whatsapp.net][157.240.20.52][PLAIN TEXT (whatsapp)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	21	UDP 192.168.2.12:60765 <-> 192.168.2.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/113 bytes][Goodput ratio: 43/62][0.03 sec][Hostname/SNI: g.whatsapp.net][157.240.20.53][PLAIN TEXT (whatsapp)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	22	UDP 192.168.2.12:50191 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/179 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][< 1 sec][Hostname/SNI: 239.255.255.250:1900][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	23	UDP 192.168.2.12:57546 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/179 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][< 1 sec][Hostname/SNI: 239.255.255.250:1900][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	24	UDP 192.168.2.1:57621 -> 192.168.2.255:57621 [proto: 156/Spotify][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 156/Spotify, Confidence: DPI][DPI packets: 1][cat: Music/25][2 pkts/172 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][38.00 sec][PLAIN TEXT (KTSpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	25	UDP 169.254.162.244:50384 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/168 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Hostname/SNI: 239.255.255.250:1900][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	26	UDP 192.168.2.1:50384 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/168 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Hostname/SNI: 239.255.255.250:1900][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	27	UDP 192.168.2.12:51431 <-> 192.168.2.1:53 [proto: 5.126/DNS.Google][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5.126/DNS.Google, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/90 bytes][Goodput ratio: 43/53][0.00 sec][Hostname/SNI: www.google.com][216.239.38.120][PLAIN TEXT (google)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	27	UDP 192.168.2.12:51431 <-> 192.168.2.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/74 bytes <-> 1 pkts/90 bytes][Goodput ratio: 43/53][0.00 sec][Hostname/SNI: www.google.com][216.239.38.120][PLAIN TEXT (google)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 Undetected flows:

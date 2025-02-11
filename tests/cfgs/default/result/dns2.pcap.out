@@ -20,8 +20,8 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   1/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-Github	4	405	1
+DNS	4	405	1
 
 Acceptable                       4 405           1            
 
-	1	UDP 192.168.255.251:56550 <-> 8.8.8.8:53 [proto: 5.203/DNS.Github][IP: 126/Google][ClearText][Confidence: DPI][FPC: 5.203/DNS.Github, Confidence: DPI][DPI packets: 3][cat: Network/14][2 pkts/148 bytes <-> 2 pkts/257 bytes][Goodput ratio: 43/67][0.03 sec][Hostname/SNI: www.github.com][0.0.0.0][PLAIN TEXT (github)][Plen Bins: 0,75,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.255.251:56550 <-> 8.8.8.8:53 [proto: 5/DNS][IP: 126/Google][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 3][cat: Network/14][2 pkts/148 bytes <-> 2 pkts/257 bytes][Goodput ratio: 43/67][0.03 sec][Hostname/SNI: www.github.com][0.0.0.0][PLAIN TEXT (github)][Plen Bins: 0,75,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
