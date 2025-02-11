@@ -488,6 +488,7 @@ extern "C" {
    * @par    string_to_match_len = the length of the string
    * @par    ret_match           = completed returned match information
    * @par    master_protocol_id  = value of the ID associated to the master protocol detected
+   * @par    update_flow_classification = update or not protocol (sub)classification
    * @return the ID of the matched subprotocol
    *
    */
@@ -496,7 +497,8 @@ extern "C" {
 					char *string_to_match,
 					u_int string_to_match_len,
 					ndpi_protocol_match_result *ret_match,
-					u_int16_t master_protocol_id);
+					u_int16_t master_protocol_id,
+					int update_flow_classification);
 
   /**
    * Check if the string content passed match with a protocol

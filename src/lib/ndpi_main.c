@@ -10413,7 +10413,8 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 				      struct ndpi_flow_struct *flow,
 				      char *string_to_match, u_int string_to_match_len,
 				      ndpi_protocol_match_result *ret_match,
-				      u_int16_t master_protocol_id) {
+				      u_int16_t master_protocol_id,
+				      int update_flow_classification) {
   u_int16_t rc;
   ndpi_protocol_category_t id;
 
@@ -10421,7 +10422,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 
   memset(ret_match, 0, sizeof(*ret_match));
 
-  rc = ndpi_automa_match_string_subprotocol(ndpi_str, flow,
+  rc = ndpi_automa_match_string_subprotocol(ndpi_str, update_flow_classification ? flow : NULL,
 					    string_to_match, string_to_match_len,
 					    master_protocol_id, ret_match);
   id = ret_match->protocol_category;
@@ -10430,13 +10431,12 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 				    string_to_match_len, &id) != -1) {
     /* if(id != -1) */ {
       ret_match->protocol_category = id;
-      if(flow)
-        flow->category = id;
+      flow->category = id;
       rc = master_protocol_id;
     }
   }
 
-  if(flow && ndpi_str->risky_domain_automa.ac_automa != NULL) {
+  if(ndpi_str->risky_domain_automa.ac_automa != NULL) {
     u_int32_t proto_id;
     u_int16_t rc1 = ndpi_match_string_common(ndpi_str->risky_domain_automa.ac_automa,
 					     string_to_match, string_to_match_len,
@@ -10450,7 +10450,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   }
 
   /* Add punycode check */
-  if(flow && ndpi_check_punycode_string(string_to_match, string_to_match_len)) {
+  if(ndpi_check_punycode_string(string_to_match, string_to_match_len)) {
     char str[64] = { '\0' };
 
     strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
@@ -10477,7 +10477,7 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
     what = name, what_len = name_len;
 
   subproto = ndpi_match_host_subprotocol(ndpi_struct, flow, what, what_len,
-					 &ret_match, master_protocol);
+					 &ret_match, master_protocol, 1);
 
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
     ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol, NDPI_CONFIDENCE_DPI);

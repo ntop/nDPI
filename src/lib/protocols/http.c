@@ -571,7 +571,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 				    origin_hostname,
 				    origin_hostname_len,
 				    &ret_match,
-				    master_protocol);
+				    master_protocol, 1);
       }
     }
   }
