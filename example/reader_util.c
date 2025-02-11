@@ -1418,6 +1418,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     if(flow->ndpi_flow->protos.dns.geolocation_iata_code[0] != '\0')
       strcpy(flow->dns.geolocation_iata_code, flow->ndpi_flow->protos.dns.geolocation_iata_code);
 
+    if(flow->ndpi_flow->protos.dns.ptr_domain_name[0] != '\0')
+      strcpy(flow->dns.ptr_domain_name, flow->ndpi_flow->protos.dns.ptr_domain_name);
+
+    flow->dns.transaction_id = flow->ndpi_flow->protos.dns.transaction_id;
+
 #if 0
     if(0) {
       u_int8_t i;

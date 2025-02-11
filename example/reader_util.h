@@ -328,6 +328,8 @@ typedef struct ndpi_flow_info {
 
   struct {
     char geolocation_iata_code[4];
+    char ptr_domain_name[64];
+    u_int16_t transaction_id;
   } dns;
 
   u_int8_t multimedia_flow_types;
