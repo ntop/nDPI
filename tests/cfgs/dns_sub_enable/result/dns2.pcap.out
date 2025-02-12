@@ -1,0 +1,27 @@
+DPI Packets (UDP):	3	(3.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          3/3 (search/found)
+Automa domain:        3/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Github	4	405	1
+
+Acceptable                       4 405           1            
+
+	1	UDP 192.168.255.251:56550 <-> 8.8.8.8:53 [proto: 5.203/DNS.Github][IP: 126/Google][ClearText][Confidence: DPI][FPC: 5.203/DNS.Github, Confidence: DPI][DPI packets: 3][cat: Network/14][2 pkts/148 bytes <-> 2 pkts/257 bytes][Goodput ratio: 43/67][0.03 sec][Hostname/SNI: www.github.com][0.0.0.0][DNS Id: 0xeaef][PLAIN TEXT (github)][Plen Bins: 0,75,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

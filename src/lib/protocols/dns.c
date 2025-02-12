@@ -625,17 +625,6 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 	      x += data_len;
 	  }
 	}
-
-	if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
-	   || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
-	  /* Request already set the protocol */
-	  // flow->extra_packets_func = NULL; /* Removed so the caller can keep dissecting DNS flows */
-	} else {
-	  /* We missed the request */
-	  u_int16_t s_port = packet->udp ? ntohs(packet->udp->source) : ntohs(packet->tcp->source);
-
-	  ndpi_set_detected_protocol(ndpi_struct, flow, checkPort(s_port), NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	}
       }
     }
   }
@@ -839,20 +828,24 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     /* Report if this is a DNS query or reply */
     flow->protos.dns.is_query = is_query;
 
-    if(is_query) {
-      /* In this case we say that the protocol has been detected just to let apps carry on with their activities */
+    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN ||
+       ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
+
       ndpi_set_detected_protocol(ndpi_struct, flow, ret.proto.app_protocol, ret.proto.master_protocol, NDPI_CONFIDENCE_DPI);
 
-      if(ndpi_struct->cfg.dns_parse_response_enabled) {
-        /* We have never triggered extra-dissection for LLMNR. Keep the old behaviour */
-        if(ret.proto.master_protocol != NDPI_PROTOCOL_LLMNR) {
-          /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
-          flow->max_extra_packets_to_check = 5;
-          flow->extra_packets_func = search_dns_again;
+      if(is_query) {
+        if(ndpi_struct->cfg.dns_parse_response_enabled) {
+          /* We have never triggered extra-dissection for LLMNR. Keep the old behavior */
+          if(ret.proto.master_protocol != NDPI_PROTOCOL_LLMNR) {
+            /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
+            flow->max_extra_packets_to_check = 5;
+            flow->extra_packets_func = search_dns_again;
+          }
 	}
       }
-      return; /* The response will set the verdict */
     }
+    if(is_query)
+      return;
 
     if(strlen(flow->host_server_name) > 0)
 
@@ -865,21 +858,6 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 		  flow->protos.dns.reply_code, flow->protos.dns.rsp_type, flow->host_server_name
 		  );
 #endif
-
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-      /**
-	 Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
-	 matched a subprotocol
-      **/
-      NDPI_LOG_INFO(ndpi_struct, "found DNS\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, ret.proto.app_protocol, ret.proto.master_protocol, NDPI_CONFIDENCE_DPI);
-    } else {
-      if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
-	 || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS))
-	;
-      else
-	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    }
   }
 
   if(flow->packet_counter > 3)
