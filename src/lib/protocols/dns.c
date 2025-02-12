@@ -39,8 +39,8 @@
 #define PKT_LEN_ALERT 512
 
 
-static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct,
-			    struct ndpi_flow_struct *flow);
+static void search_dns(struct ndpi_detection_module_struct *ndpi_struct,
+		       struct ndpi_flow_struct *flow);
 
 /* *********************************************** */
 
@@ -637,7 +637,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
 static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   /* possibly dissect the DNS reply */
-  ndpi_search_dns(ndpi_struct, flow);
+  search_dns(ndpi_struct, flow);
 
   if(flow->protos.dns.num_answers != 0)
     return(0);
@@ -648,31 +648,16 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 
 /* *********************************************** */
 
-static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  int payload_offset;
+  int payload_offset = 0;
   u_int8_t is_query, is_mdns;
   u_int16_t s_port = 0, d_port = 0;
-
-  NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
 
   if(packet->udp != NULL) {
     s_port = ntohs(packet->udp->source);
     d_port = ntohs(packet->udp->dest);
     payload_offset = 0;
-
-    /* For MDNS/LLMNR: If the packet is not a response, dest addr needs to be multicast. */
-    if ((d_port == MDNS_PORT && isMDNSMulticastAddress(packet) == 0) ||
-        (d_port == LLMNR_PORT && isLLMNRMulticastAddress(packet) == 0))
-    {
-      if (packet->payload_packet_len > 5 &&
-          ntohs(get_u_int16_t(packet->payload, 2)) != 0 &&
-          ntohs(get_u_int16_t(packet->payload, 4)) != 0)
-      {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-        return;
-      }
-    }
   } else if(packet->tcp != NULL) /* pkt size > 512 bytes */ {
     s_port = ntohs(packet->tcp->source);
     d_port = ntohs(packet->tcp->dest);
@@ -680,11 +665,8 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
   }
 
   is_mdns = ((s_port == MDNS_PORT) || (d_port == MDNS_PORT)) ? 1 : 0;
-  
-  if(((s_port == DNS_PORT) || (d_port == DNS_PORT)
-      || is_mdns
-      || (d_port == LLMNR_PORT))
-     && (packet->payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset)) {
+
+  if(packet->payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset) {
     struct ndpi_dns_packet_header dns_header;
     char *dot;
     u_int len, off;
@@ -697,6 +679,9 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
     ret.proto.app_protocol    = (d_port == LLMNR_PORT) ? NDPI_PROTOCOL_LLMNR : (((d_port == MDNS_PORT) && isLLMNRMulticastAddress(packet) ) ? NDPI_PROTOCOL_MDNS : NDPI_PROTOCOL_DNS);
 
     if(invalid) {
+#ifdef DNS_DEBUG
+      pritf("[DNS] invalid packet\n");
+#endif
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
@@ -860,9 +845,6 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 #endif
   }
 
-  if(flow->packet_counter > 3)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-
   if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
      || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
     /* TODO: add support to RFC6891 to avoid some false positives */
@@ -894,6 +876,59 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
       }
     }
   }
+}
+
+/* *********************************************** */
+
+static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int16_t s_port = 0, d_port = 0;
+  int payload_offset = 0;
+
+  NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
+
+  if(packet->udp != NULL) {
+    s_port = ntohs(packet->udp->source);
+    d_port = ntohs(packet->udp->dest);
+    payload_offset = 0;
+
+    /* For MDNS/LLMNR: If the packet is not a response, dest addr needs to be multicast. */
+    if ((d_port == MDNS_PORT && isMDNSMulticastAddress(packet) == 0) ||
+        (d_port == LLMNR_PORT && isLLMNRMulticastAddress(packet) == 0))
+    {
+      if (packet->payload_packet_len > 5 &&
+          ntohs(get_u_int16_t(packet->payload, 2)) != 0 &&
+          ntohs(get_u_int16_t(packet->payload, 4)) != 0)
+      {
+        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        return;
+      }
+    }
+  } else if(packet->tcp != NULL) {
+    s_port = ntohs(packet->tcp->source);
+    d_port = ntohs(packet->tcp->dest);
+    payload_offset = 2;
+  }
+
+  /* We are able to detect DNS/MDNS/LLMNR only on standard ports (see #1788) */
+  if(!(s_port == DNS_PORT || d_port == DNS_PORT ||
+       s_port == MDNS_PORT || d_port == MDNS_PORT ||
+       d_port == LLMNR_PORT)) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
+
+  /* Since:
+      UDP: every packet must contains a complete/valid DNS message;
+      TCP: we are not able to handle DNS messages spanning multiple TCP packets;
+     we must be able to detect these protocols on the first packet
+  */
+  if(packet->payload_packet_len < sizeof(struct ndpi_dns_packet_header) + payload_offset) {
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    return;
+  }
+
+  search_dns(ndpi_struct, flow);
 }
 
 /* *********************************************** */
