@@ -648,6 +648,85 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 
 /* *********************************************** */
 
+static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
+                            struct ndpi_flow_struct *flow,
+                            ndpi_master_app_protocol *proto) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  char *dot;
+  u_int len, is_mdns, off = sizeof(struct ndpi_dns_packet_header) + (packet->tcp ? 2 : 0);
+  char _hostname[256];
+  u_int8_t hostname_is_valid;
+
+  is_mdns = (proto->master_protocol == NDPI_PROTOCOL_MDNS);
+
+  /* TODO: should we overwrite existing hostname?
+     For the time being, keep the old/current behavior */
+
+  hostname_is_valid = ndpi_grab_dns_name(packet, &off, _hostname, sizeof(_hostname), &len, is_mdns);
+
+#ifdef DNS_DEBUG
+  printf("[DNS] [%s]\n", _hostname);
+#endif
+
+  ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len, is_mdns ? NDPI_HOSTNAME_NORM_LC : NDPI_HOSTNAME_NORM_ALL);
+
+  if (hostname_is_valid == 0)
+    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, "Invalid chars detected in domain name");
+
+  /* Ignore reverse DNS queries */
+  if(strstr(_hostname, ".in-addr.") == NULL) {
+    dot = strchr(_hostname, '.');
+
+    if(dot) {
+      uintptr_t first_element_len = dot - _hostname;
+
+      if((first_element_len > 48) && (!is_mdns)) {
+        /*
+          The length of the first element in the query is very long
+          and this might be an issue or indicate an exfiltration
+        */
+
+        if(ends_with(ndpi_struct, _hostname, "multi.surbl.org")
+           || ends_with(ndpi_struct, _hostname, "spamhaus.org")
+           || ends_with(ndpi_struct, _hostname, "rackcdn.com")
+           || ends_with(ndpi_struct, _hostname, "akamaiedge.net")
+           || ends_with(ndpi_struct, _hostname, "mx-verification.google.com")
+           || ends_with(ndpi_struct, _hostname, "amazonaws.com")
+           )
+          ; /* Check common domain exceptions [TODO: if the list grows too much use a different datastructure] */
+        else
+          ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, "Long DNS host name");
+      }
+    }
+  }
+
+  if(strlen(flow->host_server_name) > 0) {
+    ndpi_protocol_match_result ret_match;
+
+    /* Avoid updating classification if subclassification is disabled */
+    proto->app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
+                                                      flow->host_server_name,
+                                                      strlen(flow->host_server_name),
+                                                      &ret_match,
+                                                      proto->master_protocol,
+                                                      ndpi_struct->cfg.dns_subclassification_enabled ? 1 : 0);
+    /* Add to FPC DNS cache */
+    if(ndpi_struct->cfg.fpc_enabled &&
+       proto->app_protocol != NDPI_PROTOCOL_UNKNOWN &&
+       proto->app_protocol != proto->master_protocol &&
+       (flow->protos.dns.rsp_type == 0x1 || flow->protos.dns.rsp_type == 0x1c) && /* A, AAAA */
+       ndpi_struct->fpc_dns_cache) {
+      ndpi_lru_add_to_cache(ndpi_struct->fpc_dns_cache,
+                            fpc_dns_cache_key_from_dns_info(flow), proto->app_protocol,
+                            ndpi_get_current_time(flow));
+    }
+
+    ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0, proto->app_protocol != NDPI_PROTOCOL_UNKNOWN);
+  }
+
+  return 0;
+}
+
 static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int payload_offset = 0;
@@ -668,19 +747,17 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
   if(packet->payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset) {
     struct ndpi_dns_packet_header dns_header;
-    char *dot;
-    u_int len, off;
+    u_int off;
     int invalid = search_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query, is_mdns);
     ndpi_protocol ret;
     u_int num_queries, idx;
-    char _hostname[256];
 
-    ret.proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
-    ret.proto.app_protocol    = (d_port == LLMNR_PORT) ? NDPI_PROTOCOL_LLMNR : (((d_port == MDNS_PORT) && isLLMNRMulticastAddress(packet) ) ? NDPI_PROTOCOL_MDNS : NDPI_PROTOCOL_DNS);
+    ret.proto.master_protocol = checkDNSSubprotocol(s_port, d_port);
+    ret.proto.app_protocol    = NDPI_PROTOCOL_UNKNOWN;
 
     if(invalid) {
 #ifdef DNS_DEBUG
-      pritf("[DNS] invalid packet\n");
+      printf("[DNS] invalid packet\n");
 #endif
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
@@ -741,77 +818,13 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
       }
     } /* for */
 
-    u_int8_t hostname_is_valid = ndpi_grab_dns_name(packet, &off, _hostname, sizeof(_hostname), &len, is_mdns);
-
-    ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len, is_mdns ? NDPI_HOSTNAME_NORM_LC : NDPI_HOSTNAME_NORM_ALL);
-
-    if (hostname_is_valid == 0)
-      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, "Invalid chars detected in domain name");
-
-    /* Ignore reverse DNS queries */
-    if(strstr(_hostname, ".in-addr.") == NULL) {
-      dot = strchr(_hostname, '.');
-      
-      if(dot) {
-	uintptr_t first_element_len = dot - _hostname;
-
-	if((first_element_len > 48) && (!is_mdns)) {
-	  /*
-	    The lenght of the first element in the query is very long
-	    and this might be an issue or indicate an exfiltration
-	  */
-
-	  if(ends_with(ndpi_struct, _hostname, "multi.surbl.org")
-	     || ends_with(ndpi_struct, _hostname, "spamhaus.org")
-	     || ends_with(ndpi_struct, _hostname, "rackcdn.com")
-	     || ends_with(ndpi_struct, _hostname, "akamaiedge.net")
-	     || ends_with(ndpi_struct, _hostname, "mx-verification.google.com")
-	     || ends_with(ndpi_struct, _hostname, "amazonaws.com")
-	     )
-	    ; /* Check common domain exceptions [TODO: if the list grows too much use a different datastructure] */
-	  else
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, "Long DNS host name");
-	}
-      }
-    }
-    
-    if(strlen(flow->host_server_name) > 0) {
-      ndpi_protocol_match_result ret_match;
-
-      /* Avoid updating classification if subclassification is disabled */
-      ret.proto.app_protocol = ndpi_match_host_subprotocol(ndpi_struct, flow,
-                                                           flow->host_server_name,
-                                                           strlen(flow->host_server_name),
-                                                           &ret_match,
-                                                           NDPI_PROTOCOL_DNS,
-                                                           ndpi_struct->cfg.dns_subclassification_enabled ? 1 : 0);
-      /* Add to FPC DNS cache */
-      if(ndpi_struct->cfg.fpc_enabled &&
-         ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN &&
-         ret.proto.app_protocol != NDPI_PROTOCOL_DNS &&
-         (flow->protos.dns.rsp_type == 0x1 || flow->protos.dns.rsp_type == 0x1c) && /* A, AAAA */
-         ndpi_struct->fpc_dns_cache) {
-        ndpi_lru_add_to_cache(ndpi_struct->fpc_dns_cache,
-                              fpc_dns_cache_key_from_dns_info(flow), ret.proto.app_protocol,
-                              ndpi_get_current_time(flow));
-      }
-
-      ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0, ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN);
-
-      if(!ndpi_struct->cfg.dns_subclassification_enabled)
-        ret.proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
-
-      if(ret.proto.app_protocol == NDPI_PROTOCOL_UNKNOWN)
-	ret.proto.master_protocol = checkDNSSubprotocol(s_port, d_port);
-      else
-	ret.proto.master_protocol = NDPI_PROTOCOL_DNS;
-
-      /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
-      flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
-    }
+    process_hostname(ndpi_struct, flow, &ret.proto);
 
     /* Report if this is a DNS query or reply */
     flow->protos.dns.is_query = is_query;
+
+    if(!ndpi_struct->cfg.dns_subclassification_enabled)
+      ret.proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
 
     if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN ||
        ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
@@ -821,7 +834,8 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
       if(is_query) {
         if(ndpi_struct->cfg.dns_parse_response_enabled) {
           /* We have never triggered extra-dissection for LLMNR. Keep the old behavior */
-          if(ret.proto.master_protocol != NDPI_PROTOCOL_LLMNR) {
+          if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_LLMNR &&
+             flow->detected_protocol_stack[1] != NDPI_PROTOCOL_LLMNR) {
             /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
             flow->max_extra_packets_to_check = 5;
             flow->extra_packets_func = search_dns_again;
@@ -829,6 +843,9 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
 	}
       }
     }
+    /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
+    flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
+
     if(is_query)
       return;
 
