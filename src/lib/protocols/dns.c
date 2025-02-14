@@ -272,6 +272,317 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 
 /* *********************************************** */
 
+static int process_queries(struct ndpi_detection_module_struct *ndpi_struct,
+                           struct ndpi_flow_struct *flow,
+                           struct ndpi_dns_packet_header *dns_header,
+                           u_int payload_offset) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int x = payload_offset;
+
+  if(dns_header->num_queries > 0) {
+    u_int16_t rsp_type;
+    u_int16_t num;
+
+    for(num = 0; num < dns_header->num_queries; num++) {
+      u_int16_t data_len;
+
+      if((x+6) >= packet->payload_packet_len) {
+        return -1;
+      }
+
+      if((data_len = getNameLength(x, packet->payload,
+                                   packet->payload_packet_len)) == 0) {
+        return -1;
+      } else
+        x += data_len;
+
+      if((x+4) > packet->payload_packet_len) {
+        return -1;
+      }
+
+      rsp_type = get16(&x, packet->payload);
+
+#ifdef DNS_DEBUG
+      printf("[DNS] [response (query)] response_type=%d\n", rsp_type);
+#endif
+      if(flow->protos.dns.query_type == 0) {
+        /* In case we missed the query packet... */
+        flow->protos.dns.query_type = rsp_type;
+      }
+
+      /* here x points to the response "class" field */
+      x += 2; /* Skip class */
+    }
+  }
+  return x;
+}
+
+static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
+                           struct ndpi_flow_struct *flow,
+                           struct ndpi_dns_packet_header *dns_header,
+                           u_int payload_offset, u_int8_t ignore_checks) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int x = payload_offset;
+
+  if(dns_header->num_answers > 0) {
+    u_int16_t rsp_type;
+    u_int32_t rsp_ttl;
+    u_int16_t num;
+    u_int8_t found = 0;
+
+    for(num = 0; num < dns_header->num_answers; num++) {
+      u_int16_t data_len;
+
+      if((x+6) >= packet->payload_packet_len) {
+        return -1;
+      }
+
+      if((data_len = getNameLength(x, packet->payload,
+                                   packet->payload_packet_len)) == 0) {
+        return -1;
+      } else
+        x += data_len;
+
+      if((x+8) >= packet->payload_packet_len) {
+        return -1;
+      }
+
+      rsp_type = get16(&x, packet->payload);
+      rsp_ttl  = ntohl(*((u_int32_t*)&packet->payload[x+2]));
+
+      if(rsp_ttl == 0)
+        ndpi_set_risk(ndpi_struct, flow, NDPI_MINOR_ISSUES, "DNS Record with zero TTL");
+
+#ifdef DNS_DEBUG
+      printf("[DNS] TTL = %u\n", rsp_ttl);
+      printf("[DNS] [response] response_type=%d\n", rsp_type);
+#endif
+
+      if(found == 0) {
+        ndpi_check_dns_type(ndpi_struct, flow, rsp_type);
+        flow->protos.dns.rsp_type = rsp_type;
+      }
+
+      /* x points to the response "class" field */
+      if((x+12) <= packet->payload_packet_len) {
+        u_int32_t ttl = ntohl(*((u_int32_t*)&packet->payload[x+2]));
+
+        x += 6;
+        data_len = get16(&x, packet->payload);
+
+        if((x + data_len) <= packet->payload_packet_len) {
+#ifdef DNS_DEBUG
+          printf("[DNS] [rsp_type: %u][data_len: %u]\n", rsp_type, data_len);
+#endif
+
+          if(rsp_type == 0x05 /* CNAME */) {
+            ;
+          } else if(rsp_type == 0x0C /* PTR */) {
+            u_int16_t ptr_len = (packet->payload[x-2] << 8) + packet->payload[x-1];
+
+            if((x + ptr_len) <= packet->payload_packet_len) {
+              if(found == 0) {
+                u_int len;
+
+                ndpi_grab_dns_name(packet, &x,
+                                   flow->protos.dns.ptr_domain_name,
+                                   sizeof(flow->protos.dns.ptr_domain_name), &len,
+                                   ignore_checks);
+                found = 1;
+              }
+            }
+          } else if((((rsp_type == 0x1) && (data_len == 4)) /* A */
+                     || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
+                     )) {
+            if(found == 0) {
+
+              if(flow->protos.dns.num_rsp_addr < MAX_NUM_DNS_RSP_ADDRESSES) {
+                /* Necessary for IP address comparison */
+                memset(&flow->protos.dns.rsp_addr[flow->protos.dns.num_rsp_addr], 0, sizeof(ndpi_ip_addr_t));
+
+                memcpy(&flow->protos.dns.rsp_addr[flow->protos.dns.num_rsp_addr], packet->payload + x, data_len);
+                flow->protos.dns.is_rsp_addr_ipv6[flow->protos.dns.num_rsp_addr] = (data_len == 16) ? 1 : 0;
+                flow->protos.dns.rsp_addr_ttl[flow->protos.dns.num_rsp_addr] = ttl;
+
+                if(ndpi_struct->cfg.address_cache_size)
+                  ndpi_cache_address(ndpi_struct,
+                                     flow->protos.dns.rsp_addr[flow->protos.dns.num_rsp_addr],
+                                     flow->host_server_name,
+                                     packet->current_time_ms/1000,
+                                     flow->protos.dns.rsp_addr_ttl[flow->protos.dns.num_rsp_addr]);
+
+                ++flow->protos.dns.num_rsp_addr;
+              }
+
+              if(flow->protos.dns.num_rsp_addr >= MAX_NUM_DNS_RSP_ADDRESSES)
+                found = 1;
+            }
+          }
+
+          x += data_len;
+        }
+      }
+
+      if(found && (dns_header->additional_rrs == 0)) {
+        /*
+          In case we have RR we need to iterate
+          all the answers and not just consider the
+          first one as we need to properly move 'x'
+          to the right offset
+        */
+        break;
+      }
+    }
+  }
+  return x;
+}
+
+static int process_additionals(struct ndpi_detection_module_struct *ndpi_struct,
+                               struct ndpi_flow_struct *flow,
+                               struct ndpi_dns_packet_header *dns_header,
+                               u_int payload_offset) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int x = payload_offset;
+
+  /*
+    Dissect the rest of the packet only if there are
+    additional_rrs as we need to check for:
+     * EDNS(0)
+     * NSID
+
+    In this case we need to go through the whole packet
+    as we need to update the 'x' offset
+  */
+
+  if(dns_header->additional_rrs == 0)
+    return x;
+
+  if(dns_header->authority_rrs > 0) {
+#ifdef DNS_DEBUG
+    u_int16_t rsp_type;
+#endif
+    u_int16_t num;
+
+    for(num = 0; num < dns_header->authority_rrs; num++) {
+      u_int16_t data_len;
+
+      if((x+6) >= packet->payload_packet_len) {
+        return -1;
+      }
+
+      if((data_len = getNameLength(x, packet->payload,
+                                   packet->payload_packet_len)) == 0) {
+        return -1;
+      } else
+        x += data_len;
+
+      if((x+8) >= packet->payload_packet_len) {
+        return -1;
+      }
+
+      /* To avoid warning: variable ‘rsp_type’ set but not used [-Wunused-but-set-variable] */
+#ifdef DNS_DEBUG
+      rsp_type = get16(&x, packet->payload);
+#else
+      get16(&x, packet->payload);
+#endif
+
+#ifdef DNS_DEBUG
+      printf("[DNS] [RRS response] response_type=%d\n", rsp_type);
+#endif
+
+      /* here x points to the response "class" field */
+      if((x+12) <= packet->payload_packet_len) {
+        x += 6;
+        data_len = get16(&x, packet->payload);
+
+        if((x + data_len) <= packet->payload_packet_len)
+          x += data_len;
+      }
+    }
+  }
+
+  if(dns_header->additional_rrs > 0) {
+    u_int16_t rsp_type;
+    u_int16_t num;
+
+    for(num = 0; num < dns_header->additional_rrs; num++) {
+      u_int16_t data_len, rdata_len, opt_code, opt_len;
+      const unsigned char *opt;
+
+#ifdef DNS_DEBUG
+      printf("[DNS] [RR response %d/%d]\n", num + 1, dns_header->additional_rrs);
+#endif
+
+      if((x+6) > packet->payload_packet_len) {
+        return -1;
+      }
+
+      if((data_len = getNameLength(x, packet->payload, packet->payload_packet_len)) == 0) {
+        return -1;
+      } else
+        x += data_len;
+
+      if((x+10) > packet->payload_packet_len) {
+        return -1;
+      }
+
+      rsp_type = get16(&x, packet->payload);
+
+#ifdef DNS_DEBUG
+      printf("[DNS] [RR response] response_type=%d\n", rsp_type);
+#endif
+
+      if(rsp_type == 41 /* OPT */) {
+        /* https://en.wikipedia.org/wiki/Extension_Mechanisms_for_DNS */
+        flow->protos.dns.edns0_udp_payload_size = ntohs(*((u_int16_t*)&packet->payload[x])); /* EDNS(0) */
+
+#ifdef DNS_DEBUG
+        printf("[DNS] [response] edns0_udp_payload_size: %u\n", flow->protos.dns.edns0_udp_payload_size);
+#endif
+        x += 6;
+
+        rdata_len = ntohs(*((u_int16_t *)&packet->payload[x]));
+#ifdef DNS_DEBUG
+        printf("[DNS] [response] rdata len: %u\n", rdata_len);
+#endif
+        if(rdata_len > 0 &&
+           x + 6 <= packet->payload_packet_len) {
+          opt_code = ntohs(*((u_int16_t *)&packet->payload[x + 2]));
+          opt_len = ntohs(*((u_int16_t *)&packet->payload[x + 4]));
+          opt = &packet->payload[x + 6];
+          /* TODO: parse the TLV list */
+          if(opt_code == 0x03 &&
+             opt_len <= rdata_len + 4 &&
+             opt_len > 6 &&
+             x + 6 + opt_len <= packet->payload_packet_len) {
+#ifdef DNS_DEBUG
+            printf("[DNS] NSID: [%.*s]\n", opt_len, opt);
+#endif
+            if(memcmp(opt, "gpdns-", 6) == 0) {
+#ifdef DNS_DEBUG
+              printf("[DNS] NSID Airport code [%.*s]\n", opt_len - 6, opt + 6);
+#endif
+              memcpy(flow->protos.dns.geolocation_iata_code, opt + 6,
+                     ndpi_min(opt_len - 6, (int)sizeof(flow->protos.dns.geolocation_iata_code) - 1));
+            }
+          }
+
+        }
+      } else {
+        x += 6;
+      }
+
+      if((data_len = getNameLength(x, packet->payload, packet->payload_packet_len)) == 0) {
+        return -1;
+      } else
+        x += data_len;
+    }
+  }
+
+  return x;
+}
+
 static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow,
 			    struct ndpi_dns_packet_header *dns_header,
@@ -279,6 +590,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			    u_int8_t ignore_checks) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int x = payload_offset;
+  int rc;
 
   memcpy(dns_header, (struct ndpi_dns_packet_header*)&packet->payload[x],
 	 sizeof(struct ndpi_dns_packet_header));
@@ -336,7 +648,7 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
             || (dns_header->num_answers == 0 && dns_header->authority_rrs == 0 && dns_header->additional_rrs == 0))
        ) {
       /* This is a good reply: we dissect it both for request and response */
-      
+
       flow->protos.dns.transaction_id = dns_header->tr_id;
       flow->protos.dns.reply_code = dns_header->flags & 0x0F;
 
@@ -352,279 +664,26 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
         }
       }
 
-      if(dns_header->num_queries > 0) {
-	u_int16_t rsp_type;
-	u_int16_t num;
-
-	for(num = 0; num < dns_header->num_queries; num++) {
-	  u_int16_t data_len;
-
-	  if((x+6) >= packet->payload_packet_len) {
-	    break;
-	  }
-
-	  if((data_len = getNameLength(x, packet->payload,
-				       packet->payload_packet_len)) == 0) {
-	    break;
-	  } else
-	    x += data_len;
-
-	  if((x+8) >= packet->payload_packet_len) {
-	    break;
-	  }
-
-	  rsp_type = get16(&x, packet->payload);
-
+      rc = process_queries(ndpi_struct, flow, dns_header, x);
+      if(rc == -1) {
 #ifdef DNS_DEBUG
-	  printf("[DNS] [response (query)] response_type=%d\n", rsp_type);
+        printf("[DNS] Error queries\n");
 #endif
-	  if(flow->protos.dns.query_type == 0) {
-	    /* In case we missed the query packet... */
-	    flow->protos.dns.query_type = rsp_type;
-	  }
-
-	  /* here x points to the response "class" field */
-	  x += 2; /* Skip class */
-	}
-      }
-
-      if(dns_header->num_answers > 0) {
-	u_int16_t rsp_type;
-	u_int32_t rsp_ttl;
-	u_int16_t num;
-	u_int8_t found = 0;
-
-	for(num = 0; num < dns_header->num_answers; num++) {
-	  u_int16_t data_len;
-
-	  if((x+6) >= packet->payload_packet_len) {
-	    break;
-	  }
-
-	  if((data_len = getNameLength(x, packet->payload,
-				       packet->payload_packet_len)) == 0) {
-	    break;
-	  } else
-	    x += data_len;
-
-	  if((x+8) >= packet->payload_packet_len) {
-	    break;
-	  }
-
-	  rsp_type = get16(&x, packet->payload);
-	  rsp_ttl  = ntohl(*((u_int32_t*)&packet->payload[x+2]));
-
-	  if(rsp_ttl == 0)
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_MINOR_ISSUES, "DNS Record with zero TTL");
-	  
+      } else {
+        x = rc;
+        rc = process_answers(ndpi_struct, flow, dns_header, x, ignore_checks);
+        if(rc == -1) {
 #ifdef DNS_DEBUG
-	  printf("[DNS] TTL = %u\n", rsp_ttl);
-	  printf("[DNS] [response] response_type=%d\n", rsp_type);
+          printf("[DNS] Error answers\n");
 #endif
-
-	  if(found == 0) {
-	    ndpi_check_dns_type(ndpi_struct, flow, rsp_type);
-	    flow->protos.dns.rsp_type = rsp_type;
-	  }
-	  
-	  /* x points to the response "class" field */
-	  if((x+12) <= packet->payload_packet_len) {
-	    u_int32_t ttl = ntohl(*((u_int32_t*)&packet->payload[x+2]));
-	    
-	    x += 6;
-	    data_len = get16(&x, packet->payload);
-
-	    if((x + data_len) <= packet->payload_packet_len) {
+        } else {
+          x = rc;
+          rc = process_additionals(ndpi_struct, flow, dns_header, x);
 #ifdef DNS_DEBUG
-	      printf("[DNS] [rsp_type: %u][data_len: %u]\n", rsp_type, data_len);
+          if(rc == -1)
+            printf("[DNS] Error additionals\n");
 #endif
-
-	      if(rsp_type == 0x05 /* CNAME */) {
-		;
-	      } else if(rsp_type == 0x0C /* PTR */) {
-		u_int16_t ptr_len = (packet->payload[x-2] << 8) + packet->payload[x-1];
-
-		if((x + ptr_len) <= packet->payload_packet_len) {
-		  if(found == 0) {
-		    u_int len;
-
-		    ndpi_grab_dns_name(packet, &x,
-				       flow->protos.dns.ptr_domain_name,
-				       sizeof(flow->protos.dns.ptr_domain_name), &len,
-				       ignore_checks);
-		    found = 1;
-		  }
-		}
-	      } else if((((rsp_type == 0x1) && (data_len == 4)) /* A */
-			 || ((rsp_type == 0x1c) && (data_len == 16)) /* AAAA */
-			 )) {
-		if(found == 0) {
-		  
-		  if(flow->protos.dns.num_rsp_addr < MAX_NUM_DNS_RSP_ADDRESSES) {
-		    /* Necessary for IP address comparison */
-		    memset(&flow->protos.dns.rsp_addr[flow->protos.dns.num_rsp_addr], 0, sizeof(ndpi_ip_addr_t));
-		  
-		    memcpy(&flow->protos.dns.rsp_addr[flow->protos.dns.num_rsp_addr], packet->payload + x, data_len);
-		    flow->protos.dns.is_rsp_addr_ipv6[flow->protos.dns.num_rsp_addr] = (data_len == 16) ? 1 : 0;
-		    flow->protos.dns.rsp_addr_ttl[flow->protos.dns.num_rsp_addr] = ttl;
-
-		    if(ndpi_struct->cfg.address_cache_size)
-		      ndpi_cache_address(ndpi_struct,
-				         flow->protos.dns.rsp_addr[flow->protos.dns.num_rsp_addr],
-				         flow->host_server_name,
-				         packet->current_time_ms/1000,
-				         flow->protos.dns.rsp_addr_ttl[flow->protos.dns.num_rsp_addr]);
-
-		    ++flow->protos.dns.num_rsp_addr;
-		  }
-
-		  if(flow->protos.dns.num_rsp_addr >= MAX_NUM_DNS_RSP_ADDRESSES)
-		    found = 1;
-		}
-	      }
-	      
-	      x += data_len;
-	    }
-	  }
-	  
-	  if(found && (dns_header->additional_rrs == 0)) {
-	    /*
-	      In case we have RR we need to iterate
-	      all the answers and not just consider the
-	      first one as we need to properly move 'x'
-	      to the right offset
-	    */
-	    break;
-	  }
-	}
-      }
-
-      if(dns_header->additional_rrs > 0) {
-	/*
-	  Dissect the rest of the packet only if there are
-	  additional_rrs as we need to check fo EDNS(0)
-
-	  In this case we need to go through the whole packet
-	  as we need to update the 'x' offset
-	*/
-	if(dns_header->authority_rrs > 0) {
-#ifdef DNS_DEBUG
-	  u_int16_t rsp_type;
-#endif
-	  u_int16_t num;
-
-	  for(num = 0; num < dns_header->authority_rrs; num++) {
-	    u_int16_t data_len;
-
-	    if((x+6) >= packet->payload_packet_len) {
-	      break;
-	    }
-
-	    if((data_len = getNameLength(x, packet->payload,
-					 packet->payload_packet_len)) == 0) {
-	      break;
-	    } else
-	      x += data_len;
-
-	    if((x+8) >= packet->payload_packet_len) {
-	      break;
-	    }
-
-	    /* To avoid warning: variable ‘rsp_type’ set but not used [-Wunused-but-set-variable] */
-#ifdef DNS_DEBUG
-	    rsp_type = get16(&x, packet->payload);
-#else
-	    get16(&x, packet->payload);
-#endif
-
-#ifdef DNS_DEBUG
-	    printf("[DNS] [RRS response] response_type=%d\n", rsp_type);
-#endif
-
-	    /* here x points to the response "class" field */
-	    if((x+12) <= packet->payload_packet_len) {
-	      x += 6;
-	      data_len = get16(&x, packet->payload);
-
-	      if((x + data_len) <= packet->payload_packet_len)
-		x += data_len;
-	    }
-	  }
-	}
-
-	if(dns_header->additional_rrs > 0) {
-	  u_int16_t rsp_type;
-	  u_int16_t num;
-
-	  for(num = 0; num < dns_header->additional_rrs; num++) {
-	    u_int16_t data_len, rdata_len, opt_code, opt_len;
-	    const unsigned char *opt;
-
-	    if((x+6) > packet->payload_packet_len) {
-	      break;
-	    }
-
-	    if((data_len = getNameLength(x, packet->payload, packet->payload_packet_len)) == 0) {
-	      break;
-	    } else
-	      x += data_len;
-
-	    if((x+10) > packet->payload_packet_len) {
-	      break;
-	    }
-
-	    rsp_type = get16(&x, packet->payload);
-
-#ifdef DNS_DEBUG
-	    printf("[DNS] [RR response] response_type=%d\n", rsp_type);
-#endif
-
-	    if(rsp_type == 41 /* OPT */) {
-	      /* https://en.wikipedia.org/wiki/Extension_Mechanisms_for_DNS */
-	      flow->protos.dns.edns0_udp_payload_size = ntohs(*((u_int16_t*)&packet->payload[x])); /* EDNS(0) */
-
-#ifdef DNS_DEBUG
-	      printf("[DNS] [response] edns0_udp_payload_size: %u\n", flow->protos.dns.edns0_udp_payload_size);
-#endif
-	      x += 6;
-
-	      rdata_len = ntohs(*((u_int16_t *)&packet->payload[x]));
-#ifdef DNS_DEBUG
-	      printf("[DNS] [response] rdata len: %u\n", rdata_len);
-#endif
-	      if(rdata_len > 0 &&
-		 x + 6 <= packet->payload_packet_len) {
-		opt_code = ntohs(*((u_int16_t *)&packet->payload[x + 2]));
-		opt_len = ntohs(*((u_int16_t *)&packet->payload[x + 4]));
-		opt = &packet->payload[x + 6];
-		/* TODO: parse the TLV list */
-		if(opt_code == 0x03 &&
-		   opt_len <= rdata_len + 4 &&
-		   opt_len > 6 &&
-		   x + 6 + opt_len <= packet->payload_packet_len) {
-#ifdef DNS_DEBUG
-		  printf("[DNS] NSID: [%.*s]\n", opt_len, opt);
-#endif
-		  if(memcmp(opt, "gpdns-", 6) == 0) {
-#ifdef DNS_DEBUG
-		    printf("[DNS] NSID Airport code [%.*s]\n", opt_len - 6, opt + 6);
-#endif
-		    memcpy(flow->protos.dns.geolocation_iata_code, opt + 6,
-			   ndpi_min(opt_len - 6, (int)sizeof(flow->protos.dns.geolocation_iata_code) - 1));
-		  }
-		}
-
-	      }
-	    } else {
-	      x += 6;
-	    }
-
-	    if((data_len = getNameLength(x, packet->payload, packet->payload_packet_len)) == 0) {
-	      break;
-	    } else
-	      x += data_len;
-	  }
-	}
+        }
       }
     }
   }
