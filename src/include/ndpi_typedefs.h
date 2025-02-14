@@ -1439,8 +1439,8 @@ struct ndpi_flow_struct {
     } dns;
 
     struct {
-      u_int8_t request_code;
       u_int8_t version;
+      u_int8_t mode;
     } ntp;
 
     struct {

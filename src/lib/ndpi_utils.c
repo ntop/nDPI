@@ -1383,8 +1383,8 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_NTP:
     ndpi_serialize_start_of_block(serializer, "ntp");
-    ndpi_serialize_string_uint32(serializer, "request_code", flow->protos.ntp.request_code);
-    ndpi_serialize_string_uint32(serializer, "version", flow->protos.ntp.request_code);
+    ndpi_serialize_string_uint32(serializer, "version", flow->protos.ntp.version);
+    ndpi_serialize_string_uint32(serializer, "mode", flow->protos.ntp.mode);
     ndpi_serialize_end_of_block(serializer);
     break;
 

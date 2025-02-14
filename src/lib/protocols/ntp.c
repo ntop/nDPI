@@ -44,15 +44,11 @@ static void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct
   if (packet->udp->dest == htons(123) || packet->udp->source == htons(123)) {
   
     NDPI_LOG_DBG2(ndpi_struct, "NTP port and length detected\n");
-  
-    if ((((packet->payload[0] & 0x38) >> 3) <= 4)) {
-    
-      // 38 in binary representation is 00111000 
-      flow->protos.ntp.version = (packet->payload[0] & 0x38) >> 3;
-    
-      if (packet->payload_packet_len > 3 && flow->protos.ntp.version == 2) {
-        flow->protos.ntp.request_code = packet->payload[3];
-      }
+    uint8_t version = (packet->payload[0] & 56) >> 3;
+
+    if (version <= 4) {
+      flow->protos.ntp.version = version;
+      flow->protos.ntp.mode = packet->payload[0] & 7;
     
       NDPI_LOG_INFO(ndpi_struct, "found NTP\n");
       ndpi_int_ntp_add_connection(ndpi_struct, flow);
