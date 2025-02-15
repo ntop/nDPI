@@ -592,6 +592,9 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int x = payload_offset;
 
+  if(packet->payload_packet_len < sizeof(struct ndpi_dns_packet_header) + payload_offset)
+    return 0;
+
   memcpy(dns_header, (struct ndpi_dns_packet_header*)&packet->payload[x],
 	 sizeof(struct ndpi_dns_packet_header));
 
@@ -623,10 +626,16 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
     if(((dns_header->num_queries > 0 && dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) || /* Don't assume that num_queries must be zero */
         (checkDNSSubprotocol(ntohs(flow->c_port), ntohs(flow->s_port)) == NDPI_PROTOCOL_MDNS && dns_header->num_queries == 0)) &&
        ((dns_header->num_answers > 0 && dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS) ||
-	(dns_header->authority_rrs > 0 && dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS) ||
-	(dns_header->additional_rrs > 0 && dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS) ||
+        (dns_header->authority_rrs > 0 && dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS) ||
+        (dns_header->additional_rrs > 0 && dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS) ||
         (dns_header->num_answers == 0 && dns_header->authority_rrs == 0 && dns_header->additional_rrs == 0))) {
       /* This is a good reply */
+      return 1;
+    }
+    if(dns_header->num_queries == 0 && dns_header->num_answers == 0 &&
+       dns_header->authority_rrs == 0 && dns_header->additional_rrs == 0 &&
+       packet->payload_packet_len == sizeof(struct ndpi_dns_packet_header)) {
+      /* This is a good empty reply */
       return 1;
     }
   }
@@ -636,6 +645,11 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 /* *********************************************** */
 
 static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+  if(packet->tcp_retransmission || packet->payload_packet_len == 0)
+    return(1);
+
   /* possibly dissect the DNS reply */
   search_dns(ndpi_struct, flow);
 
@@ -735,6 +749,10 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
   int payload_offset = 0;
   u_int8_t is_query, is_mdns;
   u_int16_t s_port = 0, d_port = 0;
+  struct ndpi_dns_packet_header dns_header;
+  u_int off;
+  ndpi_master_app_protocol proto;
+  int rc;
 
   if(packet->udp != NULL) {
     s_port = ntohs(packet->udp->source);
@@ -748,117 +766,110 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
   is_mdns = ((s_port == MDNS_PORT) || (d_port == MDNS_PORT)) ? 1 : 0;
 
-  if(packet->payload_packet_len > sizeof(struct ndpi_dns_packet_header)+payload_offset) {
-    struct ndpi_dns_packet_header dns_header;
-    u_int off;
-    ndpi_master_app_protocol proto;
-    int rc;
-
-    if(!is_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query)) {
+  if(!is_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query)) {
 #ifdef DNS_DEBUG
-      printf("[DNS] invalid packet\n");
+    printf("[DNS] invalid packet\n");
 #endif
-      if(flow->extra_packets_func == NULL) {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-      } else {
-        ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid DNS Header");
+    if(flow->extra_packets_func == NULL) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    } else {
+      ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid DNS Header");
+    }
+    return;
+  }
+
+  off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
+
+  if(is_query) {
+
+    flow->protos.dns.transaction_id = dns_header.tr_id;
+
+    process_queries(ndpi_struct, flow, &dns_header, off);
+#ifdef DNS_DEBUG
+    if(rc == -1) {
+      printf("[DNS] Error queries (query msg)\n");
+#endif
+  } else {
+    flow->protos.dns.transaction_id = dns_header.tr_id;
+    flow->protos.dns.reply_code = dns_header.flags & 0x0F;
+
+    if(flow->protos.dns.reply_code != 0) {
+      char str[32], buf[16];
+
+      snprintf(str, sizeof(str), "DNS Error Code %s",
+               dns_error_code2string(flow->protos.dns.reply_code, buf, sizeof(buf)));
+      ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, str);
+    } else {
+      if(ndpi_isset_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN)) {
+        ndpi_set_risk(ndpi_struct, flow, NDPI_RISKY_DOMAIN, "DGA Name Query with no Error Code");
       }
-      return;
     }
 
-    off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
-
-    if(is_query) {
-
-      flow->protos.dns.transaction_id = dns_header.tr_id;
-
-      process_queries(ndpi_struct, flow, &dns_header, off);
+    rc = process_queries(ndpi_struct, flow, &dns_header, off);
+    if(rc == -1) {
 #ifdef DNS_DEBUG
-      if(rc == -1) {
-        printf("[DNS] Error queries (query msg)\n");
+      printf("[DNS] Error queries (response msg)\n");
 #endif
     } else {
-      flow->protos.dns.transaction_id = dns_header.tr_id;
-      flow->protos.dns.reply_code = dns_header.flags & 0x0F;
-
-      if(flow->protos.dns.reply_code != 0) {
-        char str[32], buf[16];
-
-        snprintf(str, sizeof(str), "DNS Error Code %s",
-                 dns_error_code2string(flow->protos.dns.reply_code, buf, sizeof(buf)));
-        ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, str);
-      } else {
-        if(ndpi_isset_risk(flow, NDPI_SUSPICIOUS_DGA_DOMAIN)) {
-          ndpi_set_risk(ndpi_struct, flow, NDPI_RISKY_DOMAIN, "DGA Name Query with no Error Code");
-        }
-      }
-
-      rc = process_queries(ndpi_struct, flow, &dns_header, off);
+      off = rc;
+      rc = process_answers(ndpi_struct, flow, &dns_header, off, is_mdns);
       if(rc == -1) {
 #ifdef DNS_DEBUG
-        printf("[DNS] Error queries (response msg)\n");
+        printf("[DNS] Error answers\n");
 #endif
       } else {
         off = rc;
-        rc = process_answers(ndpi_struct, flow, &dns_header, off, is_mdns);
-        if(rc == -1) {
+        rc = process_additionals(ndpi_struct, flow, &dns_header, off);
 #ifdef DNS_DEBUG
-          printf("[DNS] Error answers\n");
+        if(rc == -1)
+          printf("[DNS] Error additionals\n");
 #endif
-        } else {
-          off = rc;
-          rc = process_additionals(ndpi_struct, flow, &dns_header, off);
-#ifdef DNS_DEBUG
-          if(rc == -1)
-            printf("[DNS] Error additionals\n");
-#endif
+      }
+    }
+  }
+
+  process_hostname(ndpi_struct, flow, &proto);
+
+  /* Report if this is a DNS query or reply */
+  flow->protos.dns.is_query = is_query;
+
+  if(!ndpi_struct->cfg.dns_subclassification_enabled)
+    proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
+
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN ||
+     proto.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
+
+    ndpi_set_detected_protocol(ndpi_struct, flow, proto.app_protocol, proto.master_protocol, NDPI_CONFIDENCE_DPI);
+
+    if(is_query) {
+      if(ndpi_struct->cfg.dns_parse_response_enabled) {
+        /* We have never triggered extra-dissection for LLMNR. Keep the old behavior */
+        if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_LLMNR &&
+           flow->detected_protocol_stack[1] != NDPI_PROTOCOL_LLMNR) {
+          /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
+          flow->max_extra_packets_to_check = 5;
+          flow->extra_packets_func = search_dns_again;
         }
       }
     }
+  }
+  /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
+  flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
 
-    process_hostname(ndpi_struct, flow, &proto);
+  if(is_query)
+    return;
 
-    /* Report if this is a DNS query or reply */
-    flow->protos.dns.is_query = is_query;
+  if(strlen(flow->host_server_name) > 0)
 
-    if(!ndpi_struct->cfg.dns_subclassification_enabled)
-      proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
-
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN ||
-       proto.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
-
-      ndpi_set_detected_protocol(ndpi_struct, flow, proto.app_protocol, proto.master_protocol, NDPI_CONFIDENCE_DPI);
-
-      if(is_query) {
-        if(ndpi_struct->cfg.dns_parse_response_enabled) {
-          /* We have never triggered extra-dissection for LLMNR. Keep the old behavior */
-          if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_LLMNR &&
-             flow->detected_protocol_stack[1] != NDPI_PROTOCOL_LLMNR) {
-            /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
-            flow->max_extra_packets_to_check = 5;
-            flow->extra_packets_func = search_dns_again;
-          }
-	}
-      }
-    }
-    /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
-    flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
-
-    if(is_query)
-      return;
-
-    if(strlen(flow->host_server_name) > 0)
-
-    flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
-      flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
+  flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
+    flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
 
 #ifdef DNS_DEBUG
-    NDPI_LOG_DBG2(ndpi_struct, "[num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
-		  flow->protos.dns.num_queries, flow->protos.dns.num_answers,
-		  flow->protos.dns.reply_code, flow->protos.dns.rsp_type, flow->host_server_name
-		  );
+  NDPI_LOG_DBG2(ndpi_struct, "[num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
+                flow->protos.dns.num_queries, flow->protos.dns.num_answers,
+                flow->protos.dns.reply_code, flow->protos.dns.rsp_type, flow->host_server_name
+                );
 #endif
-  }
 
   if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
      || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
