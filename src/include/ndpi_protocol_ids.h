@@ -471,6 +471,7 @@ typedef enum {
   NDPI_PROTOCOL_YANDEX_ALICE          = 440,
   NDPI_PROTOCOL_VIVOX                 = 441,
   NDPI_PROTOCOL_DIGITALOCEAN          = 442,
+  NDPI_PROTOCOL_RUTUBE                = 443,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

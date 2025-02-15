@@ -1113,3 +1113,11 @@ References: `Main site <https://unity.com/products/vivox-voice-chat>`_
 DigitalOcean is a cloud service provider.
 
 References: `Main site <https://www.digitalocean.com/>`_
+
+.. _Proto 443:
+
+`NDPI_PROTOCOL_RUTUBE`
+============================
+RUTUBE is a Russian video platform. It includes a library of licensed content including movies, series, cartoons, shows, and live broadcasts. It also hosts blogs, podcasts, video game streams, and educational content.
+
+References: `Main site <http://rutube.ru/>`_
