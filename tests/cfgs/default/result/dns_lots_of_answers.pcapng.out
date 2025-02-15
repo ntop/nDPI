@@ -1,0 +1,29 @@
+DPI Packets (TCP):	9	(9.00 pkts/flow)
+DPI Packets (UDP):	2	(2.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    2/1/0 (insert/search/found)
+Automa host:          4/4 (search/found)
+Automa domain:        4/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+DNS	16	2200	2
+
+Acceptable                      16 2200          2            
+
+	1	TCP 192.168.12.169:4026 <-> 192.168.12.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 9][cat: Network/14][8 pkts/586 bytes <-> 6 pkts/1118 bytes][Goodput ratio: 7/62][3.17 sec][Hostname/SNI: bstream.hzmklvdieo.com][169.197.119.239][DNS Id: 0x474c][bytes ratio: -0.312 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/2 443/359 1056/716 375/357][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 73/186 108/764 14/258][TCP Fingerprint: 2_64_65535_685ad951a756/Android][PLAIN TEXT (bstream)][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.12.156:54660 <-> 192.168.12.1:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][1 pkts/91 bytes <-> 1 pkts/405 bytes][Goodput ratio: 53/89][0.32 sec][Hostname/SNI: dinamicx.alibabausercontent.com][163.181.50.229][DNS Id: 0x0c54][PLAIN TEXT (dinamic)][Plen Bins: 0,50,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
