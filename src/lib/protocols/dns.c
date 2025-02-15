@@ -641,7 +641,8 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   } else {
     /* DNS Reply */
 
-    if((dns_header->num_queries > 0) && (dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) /* Don't assume that num_queries must be zero */
+    if(((dns_header->num_queries > 0 && dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) || /* Don't assume that num_queries must be zero */
+        (checkDNSSubprotocol(ntohs(flow->c_port), ntohs(flow->s_port)) == NDPI_PROTOCOL_MDNS && dns_header->num_queries == 0))
        && ((((dns_header->num_answers > 0) && (dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS))
 	    || ((dns_header->authority_rrs > 0) && (dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS))
 	    || ((dns_header->additional_rrs > 0) && (dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS)))
@@ -685,6 +686,10 @@ static int search_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
         }
       }
+    } else {
+      if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+        ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid DNS Header");
+      return(1 /* invalid */);
     }
   }
 
