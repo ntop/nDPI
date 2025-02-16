@@ -29,6 +29,13 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
+static struct SSDP {
+  const char *detection_line;
+  const char *method;
+} SSDP_METHODS[] = {
+        { "M-SEARCH * HTTP/1.1", "M-SEARCH" },
+        { "NOTIFY * HTTP/1.1", "NOTIFY" }
+};
 
 static void ssdp_parse_lines(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -187,14 +194,18 @@ static void ndpi_search_ssdp(struct ndpi_detection_module_struct *ndpi_struct, s
   if (packet->udp != NULL) {
 
     if (packet->payload_packet_len >= 19) {
-      if ((memcmp(packet->payload, "M-SEARCH * HTTP/1.1", 19) == 0)
-	  || memcmp(packet->payload, "NOTIFY * HTTP/1.1", 17) == 0) {
-
-
-	NDPI_LOG_INFO(ndpi_struct, "found ssdp\n");
-	ndpi_int_ssdp_add_connection(ndpi_struct, flow);
-	return;
-      }
+      for (unsigned int i=0; i < sizeof(SSDP_METHODS)/sizeof(SSDP_METHODS[0]); i++) {
+        if(memcmp(packet->payload, SSDP_METHODS[i].detection_line, strlen(SSDP_METHODS[i].detection_line)) == 0) {
+          flow->protos.ssdp.method = ndpi_malloc(strlen(SSDP_METHODS[i].detection_line) + 1);
+          if (flow->protos.ssdp.method) {
+            memcpy(flow->protos.ssdp.method, SSDP_METHODS[i].method, strlen(SSDP_METHODS[i].method));
+            flow->protos.ssdp.method[strlen(SSDP_METHODS[i].method)] = '\0';
+          }
+          NDPI_LOG_INFO(ndpi_struct, "found ssdp\n");
+          ndpi_int_ssdp_add_connection(ndpi_struct, flow);
+          return;
+        }
+    }
 
 #define SSDP_HTTP "HTTP/1.1 200 OK\r\n"
       if(memcmp(packet->payload, SSDP_HTTP, strlen(SSDP_HTTP)) == 0) {

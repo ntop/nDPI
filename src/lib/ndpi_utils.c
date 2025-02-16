@@ -1595,6 +1595,10 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_SSDP:
     ndpi_serialize_start_of_block(serializer, "ssdp");
 
+    if (flow->protos.ssdp.method) {
+      ndpi_serialize_string_string(serializer, "METHOD", flow->protos.ssdp.method);
+    }
+
     if (flow->protos.ssdp.cache_controle) {
       ndpi_serialize_string_string(serializer, "CACHE-CONTROL", flow->protos.ssdp.cache_controle);
     }

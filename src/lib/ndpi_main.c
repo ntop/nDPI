@@ -6903,6 +6903,9 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 
       if(flow->protos.ssdp.server)
         ndpi_free(flow->protos.ssdp.server);
+      
+      if(flow->protos.ssdp.method)
+        ndpi_free(flow->protos.ssdp.method);
     }
 
     if(flow->tls_quic.message[0].buffer)
