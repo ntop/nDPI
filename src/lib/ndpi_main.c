@@ -6858,6 +6858,53 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
         ndpi_free(flow->protos.sip.to);
     }
 
+    if (flow_is_proto(flow, NDPI_PROTOCOL_SSDP)) {
+      if(flow->protos.ssdp.bootid)
+      ndpi_free(flow->protos.ssdp.bootid);
+    
+      if(flow->protos.ssdp.usn)
+        ndpi_free(flow->protos.ssdp.usn);
+      
+      if(flow->protos.ssdp.cache_controle)
+        ndpi_free(flow->protos.ssdp.cache_controle);
+
+      if(flow->protos.ssdp.location)
+        ndpi_free(flow->protos.ssdp.location);
+      
+      if(flow->protos.ssdp.household_smart_speaker_audio)
+        ndpi_free(flow->protos.ssdp.household_smart_speaker_audio);
+      
+      if(flow->protos.ssdp.rincon_household)
+        ndpi_free(flow->protos.ssdp.rincon_household);
+
+      if(flow->protos.ssdp.rincon_bootseq)
+        ndpi_free(flow->protos.ssdp.rincon_bootseq);
+      
+      if(flow->protos.ssdp.rincon_wifimode)
+        ndpi_free(flow->protos.ssdp.rincon_wifimode);
+
+      if(flow->protos.ssdp.rincon_variant)
+        ndpi_free(flow->protos.ssdp.rincon_variant);
+
+      if(flow->protos.ssdp.sonos_securelocation)
+        ndpi_free(flow->protos.ssdp.sonos_securelocation);
+
+      if(flow->protos.ssdp.securelocation_upnp)
+        ndpi_free(flow->protos.ssdp.securelocation_upnp);
+      
+      if(flow->protos.ssdp.location_smart_speaker_audio)
+        ndpi_free(flow->protos.ssdp.location_smart_speaker_audio);
+
+      if(flow->protos.ssdp.nt)  
+        ndpi_free(flow->protos.ssdp.nt);
+
+      if(flow->protos.ssdp.nts)
+        ndpi_free(flow->protos.ssdp.nts);
+
+      if(flow->protos.ssdp.server)
+        ndpi_free(flow->protos.ssdp.server);
+    }
+
     if(flow->tls_quic.message[0].buffer)
       ndpi_free(flow->tls_quic.message[0].buffer);
     if(flow->tls_quic.message[1].buffer)
@@ -6877,51 +6924,6 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
       ndpi_free(flow->tls_quic.obfuscated_heur_state);
     if(flow->tls_quic.obfuscated_heur_matching_set)
       ndpi_free(flow->tls_quic.obfuscated_heur_matching_set);
-
-    if(flow->protos.ssdp.bootid)
-      ndpi_free(flow->protos.ssdp.bootid);
-    
-    if(flow->protos.ssdp.usn)
-      ndpi_free(flow->protos.ssdp.usn);
-    
-    if(flow->protos.ssdp.cache_controle)
-      ndpi_free(flow->protos.ssdp.cache_controle);
-
-    if(flow->protos.ssdp.location)
-      ndpi_free(flow->protos.ssdp.location);
-    
-    if(flow->protos.ssdp.household_smart_speaker_audio)
-      ndpi_free(flow->protos.ssdp.household_smart_speaker_audio);
-    
-    if(flow->protos.ssdp.rincon_household)
-      ndpi_free(flow->protos.ssdp.rincon_household);
-
-    if(flow->protos.ssdp.rincon_bootseq)
-      ndpi_free(flow->protos.ssdp.rincon_bootseq);
-    
-    if(flow->protos.ssdp.rincon_wifimode)
-      ndpi_free(flow->protos.ssdp.rincon_wifimode);
-
-    if(flow->protos.ssdp.rincon_variant)
-      ndpi_free(flow->protos.ssdp.rincon_variant);
-
-    if(flow->protos.ssdp.sonos_securelocation)
-      ndpi_free(flow->protos.ssdp.sonos_securelocation);
-
-    if(flow->protos.ssdp.securelocation_upnp)
-      ndpi_free(flow->protos.ssdp.securelocation_upnp);
-    
-    if(flow->protos.ssdp.location_smart_speaker_audio)
-      ndpi_free(flow->protos.ssdp.location_smart_speaker_audio);
-
-    if(flow->protos.ssdp.nt)  
-      ndpi_free(flow->protos.ssdp.nt);
-
-    if(flow->protos.ssdp.nts)
-      ndpi_free(flow->protos.ssdp.nts);
-
-    if(flow->protos.ssdp.server)
-      ndpi_free(flow->protos.ssdp.server);
   }
 }
 
@@ -8556,7 +8558,21 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
     packet->server_line.len = 0, packet->http_method.ptr = NULL, packet->http_method.len = 0,
     packet->http_response.ptr = NULL, packet->http_response.len = 0,
     packet->forwarded_line.ptr = NULL, packet->forwarded_line.len = 0;
-  packet->upgrade_line.ptr = NULL, packet->upgrade_line.len = 0;
+    packet->upgrade_line.ptr = NULL, packet->upgrade_line.len = 0;
+    packet->bootid.ptr = NULL, packet->bootid.len = 0;
+    packet->usn.ptr = NULL, packet->usn.len = 0;
+    packet->cache_controle.ptr = NULL, packet->cache_controle.len = 0;
+    packet->location.ptr = NULL, packet->location.len = 0;
+    packet->household_smart_speaker_audio.ptr = NULL, packet->household_smart_speaker_audio.len = 0;
+    packet->rincon_household.ptr = NULL, packet->rincon_household.len = 0;
+    packet->rincon_bootseq.ptr = NULL, packet->rincon_bootseq.len = 0;
+    packet->rincon_wifimode.ptr = NULL, packet->rincon_wifimode.len = 0;
+    packet->rincon_variant.ptr = NULL, packet->rincon_variant.len = 0;
+    packet->sonos_securelocation.ptr = NULL, packet->sonos_securelocation.len = 0;
+    packet->securelocation_upnp.ptr = NULL, packet->securelocation_upnp.len = 0;
+    packet->location_smart_speaker_audio.ptr = NULL, packet->location_smart_speaker_audio.len = 0;
+    packet->nt.ptr = NULL, packet->nt.len = 0;
+    packet->nts.ptr = NULL, packet->nts.len = 0;
 }
 
 /* ********************************************************************************* */
