@@ -6878,21 +6878,50 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->tls_quic.obfuscated_heur_matching_set)
       ndpi_free(flow->tls_quic.obfuscated_heur_matching_set);
 
-    free(flow->protos.ssdp.bootid);
-    free(flow->protos.ssdp.usn);
-    free(flow->protos.ssdp.cache_controle);
-    free(flow->protos.ssdp.location);
-    free(flow->protos.ssdp.household_smart_speaker_audio);
-    free(flow->protos.ssdp.rincon_household);
-    free(flow->protos.ssdp.rincon_bootseq);
-    free(flow->protos.ssdp.rincon_wifimode);
-    free(flow->protos.ssdp.rincon_variant);
-    free(flow->protos.ssdp.sonos_securelocation);
-    free(flow->protos.ssdp.securelocation_upnp);
-    free(flow->protos.ssdp.location_smart_speaker_audio);
-    free(flow->protos.ssdp.nt);
-    free(flow->protos.ssdp.nts);
-    free(flow->protos.ssdp.server);
+    if(flow->protos.ssdp.bootid)
+      ndpi_free(flow->protos.ssdp.bootid);
+    
+    if(flow->protos.ssdp.usn)
+      ndpi_free(flow->protos.ssdp.usn);
+    
+    if(flow->protos.ssdp.cache_controle)
+      ndpi_free(flow->protos.ssdp.cache_controle);
+
+    if(flow->protos.ssdp.location)
+      ndpi_free(flow->protos.ssdp.location);
+    
+    if(flow->protos.ssdp.household_smart_speaker_audio)
+      ndpi_free(flow->protos.ssdp.household_smart_speaker_audio);
+    
+    if(flow->protos.ssdp.rincon_household)
+      ndpi_free(flow->protos.ssdp.rincon_household);
+
+    if(flow->protos.ssdp.rincon_bootseq)
+      ndpi_free(flow->protos.ssdp.rincon_bootseq);
+    
+    if(flow->protos.ssdp.rincon_wifimode)
+      ndpi_free(flow->protos.ssdp.rincon_wifimode);
+
+    if(flow->protos.ssdp.rincon_variant)
+      ndpi_free(flow->protos.ssdp.rincon_variant);
+
+    if(flow->protos.ssdp.sonos_securelocation)
+      ndpi_free(flow->protos.ssdp.sonos_securelocation);
+
+    if(flow->protos.ssdp.securelocation_upnp)
+      ndpi_free(flow->protos.ssdp.securelocation_upnp);
+    
+    if(flow->protos.ssdp.location_smart_speaker_audio)
+      ndpi_free(flow->protos.ssdp.location_smart_speaker_audio);
+
+    if(flow->protos.ssdp.nt)  
+      ndpi_free(flow->protos.ssdp.nt);
+
+    if(flow->protos.ssdp.nts)
+      ndpi_free(flow->protos.ssdp.nts);
+
+    if(flow->protos.ssdp.server)
+      ndpi_free(flow->protos.ssdp.server);
   }
 }
 
