@@ -706,6 +706,7 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 
 static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow,
+                            struct ndpi_dns_packet_header *dns_header,
                             ndpi_master_app_protocol *proto) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   char *dot;
@@ -715,6 +716,10 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
 
   proto->master_protocol = checkDNSSubprotocol(ntohs(flow->c_port), ntohs(flow->s_port));
   proto->app_protocol = NDPI_PROTOCOL_UNKNOWN;
+
+  /* We try to get hostname only from "standard" query/answer */
+  if(dns_header->num_queries == 0 && dns_header->num_answers == 0)
+    return -1;
 
   is_mdns = (proto->master_protocol == NDPI_PROTOCOL_MDNS);
 
@@ -803,7 +808,7 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
     return;
   }
 
-  process_hostname(ndpi_struct, flow, &proto);
+  process_hostname(ndpi_struct, flow, &dns_header, &proto);
 
   off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
 
