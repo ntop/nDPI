@@ -1577,6 +1577,25 @@ struct ndpi_flow_struct {
       u_int32_t ipv4_addr, uptime;
       struct ndpi_in6_addr ipv6_addr;
     } mikrotik;
+
+    struct {
+      char *method;
+      char *bootid;
+      char *usn;
+      char *cache_controle;
+      char *location;
+      char *household_smart_speaker_audio;
+      char *rincon_household;
+      char *rincon_bootseq;
+      char *rincon_wifimode;
+      char *rincon_variant;
+      char *sonos_securelocation;
+      char *securelocation_upnp;
+      char *location_smart_speaker_audio;
+      char *nt;
+      char *nts;
+      char *server;
+    } ssdp;
 } protos;
 
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */

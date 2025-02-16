@@ -126,6 +126,20 @@ struct ndpi_packet_struct {
   struct ndpi_int_one_line_struct upgrade_line;
   struct ndpi_int_one_line_struct http_response; /* the first "word" in this pointer is the
 						    response code in the packet (200, etc) */
+  struct ndpi_int_one_line_struct bootid;
+  struct ndpi_int_one_line_struct usn;
+  struct ndpi_int_one_line_struct cache_controle;
+  struct ndpi_int_one_line_struct location;
+  struct ndpi_int_one_line_struct household_smart_speaker_audio;
+  struct ndpi_int_one_line_struct rincon_household;
+  struct ndpi_int_one_line_struct rincon_bootseq;
+  struct ndpi_int_one_line_struct rincon_wifimode;
+  struct ndpi_int_one_line_struct rincon_variant;
+  struct ndpi_int_one_line_struct sonos_securelocation;
+  struct ndpi_int_one_line_struct securelocation_upnp;
+  struct ndpi_int_one_line_struct location_smart_speaker_audio;
+  struct ndpi_int_one_line_struct nt;
+  struct ndpi_int_one_line_struct nts;
 
   u_int16_t l3_packet_len;
   u_int16_t payload_packet_len;

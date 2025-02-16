@@ -6877,6 +6877,21 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
       ndpi_free(flow->tls_quic.obfuscated_heur_state);
     if(flow->tls_quic.obfuscated_heur_matching_set)
       ndpi_free(flow->tls_quic.obfuscated_heur_matching_set);
+
+    free(flow->protos.ssdp.bootid);
+    free(flow->protos.ssdp.usn);
+    free(flow->protos.ssdp.cache_controle);
+    free(flow->protos.ssdp.location);
+    free(flow->protos.ssdp.household_smart_speaker_audio);
+    free(flow->protos.ssdp.rincon_household);
+    free(flow->protos.ssdp.rincon_bootseq);
+    free(flow->protos.ssdp.rincon_wifimode);
+    free(flow->protos.ssdp.rincon_variant);
+    free(flow->protos.ssdp.sonos_securelocation);
+    free(flow->protos.ssdp.securelocation_upnp);
+    free(flow->protos.ssdp.location_smart_speaker_audio);
+    free(flow->protos.ssdp.nt);
+    free(flow->protos.ssdp.nts);
   }
 }
 
@@ -9255,23 +9270,39 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
   struct header_line headers_a[] = { { "Accept:", &packet->accept_line },
                                      { "Authorization:", &packet->authorization_line },
                                      { NULL, NULL} };
+  struct header_line headers_b[] = { { "BOOTID.UPNP.ORG:", &packet->bootid},
+                                     { NULL, NULL} };
   struct header_line headers_u[] = { { "User-agent:", &packet->user_agent_line },
                                      { "Upgrade:", &packet->upgrade_line },
+                                     { "USN:", &packet->usn },
                                      { NULL, NULL} };
   struct header_line headers_c[] = { { "Content-Disposition:", &packet->content_disposition_line },
                                      { "Content-type:", &packet->content_line },
+                                     { "CACHE-CONTROL:", &packet->cache_controle},
                                      { NULL, NULL} };
   struct header_line headers_o[] = { { "Origin:", &packet->http_origin },
                                      { NULL, NULL} };
   struct header_line headers_h[] = { { "Host:", &packet->host_line },
+                                     { "HOUSEHOLD.SMARTSPEAKER.AUDIO:", &packet->household_smart_speaker_audio },
                                      { NULL, NULL} };
   struct header_line headers_x[] = { { "X-Forwarded-For:", &packet->forwarded_line },
+                                     { "X-RINCON-HOUSEHOLD:", &packet->rincon_household },
+                                     { "X-RINCON-BOOTSEQ:", &packet->rincon_bootseq },
+                                     { "X-RINCON-WIFIMODE:", &packet->rincon_wifimode },
+                                     { "X-RINCON-VARIANT:", &packet->rincon_variant },
+                                     { "X-SONOS-HHSECURELOCATION:", &packet->sonos_securelocation },
                                      { NULL, NULL} };
   struct header_line headers_r[] = { { "Referer:", &packet->referer_line },
                                      { NULL, NULL} };
   struct header_line headers_s[] = { { "Server:", &packet->server_line },
+                                     { "SECURELOCATION.UPNP.ORG:", &packet->securelocation_upnp },
                                      { NULL, NULL} };
-
+  struct header_line headers_l[] = { { "LOCATION:", &packet->location },
+                                     { "LOCATION.SMARTSPEAKER.AUDIO:", &packet->location_smart_speaker_audio },
+                                     { NULL, NULL}};
+  struct header_line headers_n[] = { { "NT:", &packet->nt },
+                                     { "NTS:", &packet->nts },
+                                     { NULL, NULL}};
 
   line = &packet->line[packet->parsed_lines];
   if(line->len == 0)
@@ -9300,6 +9331,10 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
   case 'A':
     hs = headers_a;
     break;
+  case 'b':
+  case 'B':
+    hs = headers_b;
+    break;
   case 'c':
   case 'C':
     hs = headers_c;
@@ -9327,6 +9362,14 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
   case 'x':
   case 'X':
     hs = headers_x;
+    break;
+  case 'l':
+  case 'L':
+    hs = headers_l;
+    break;
+  case 'n':
+  case 'N':
+    hs = headers_n;
     break;
   default:
     return;

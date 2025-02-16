@@ -49,6 +49,96 @@ static void ssdp_parse_lines(struct ndpi_detection_module_struct
   if (packet->host_line.ptr != NULL && packet->host_line.len > 0) {
     ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
   }
+
+  if (packet->bootid.ptr != NULL && packet->bootid.len > 0) {
+    flow->protos.ssdp.bootid = ndpi_malloc(packet->bootid.len + 1);
+    memcpy(flow->protos.ssdp.bootid, packet->bootid.ptr, packet->bootid.len);
+    flow->protos.ssdp.bootid[packet->bootid.len] = '\0';
+  }
+
+  if (packet->usn.ptr != NULL && packet->usn.len > 0) {
+    flow->protos.ssdp.usn = ndpi_malloc(packet->usn.len + 1);
+    memcpy(flow->protos.ssdp.usn, packet->usn.ptr, packet->usn.len);
+    flow->protos.ssdp.usn[packet->usn.len] = '\0';
+  }
+
+  if (packet->cache_controle.ptr != NULL && packet->cache_controle.len > 0) { 
+    flow->protos.ssdp.cache_controle = ndpi_malloc(packet->cache_controle.len + 1);
+    memcpy(flow->protos.ssdp.cache_controle, packet->cache_controle.ptr, packet->cache_controle.len);
+    flow->protos.ssdp.cache_controle[packet->cache_controle.len] = '\0';
+  }
+
+  if (packet->location.ptr != NULL && packet->location.len > 0) {
+    flow->protos.ssdp.location = ndpi_malloc(packet->location.len + 1);
+    memcpy(flow->protos.ssdp.location, packet->location.ptr, packet->location.len);
+    flow->protos.ssdp.location[packet->location.len] = '\0';
+  }
+
+  if (packet->household_smart_speaker_audio.ptr != NULL && packet->household_smart_speaker_audio.len > 0) {
+    flow->protos.ssdp.household_smart_speaker_audio = ndpi_malloc(packet->household_smart_speaker_audio.len + 1);
+    memcpy(flow->protos.ssdp.household_smart_speaker_audio, packet->household_smart_speaker_audio.ptr, packet->household_smart_speaker_audio.len);
+    flow->protos.ssdp.household_smart_speaker_audio[packet->household_smart_speaker_audio.len] = '\0';
+  }
+
+  if (packet->rincon_household.ptr != NULL && packet->rincon_household.len > 0) {
+    flow->protos.ssdp.rincon_household = ndpi_malloc(packet->rincon_household.len + 1);
+    memcpy(flow->protos.ssdp.rincon_household, packet->rincon_household.ptr, packet->rincon_household.len);
+    flow->protos.ssdp.rincon_household[packet->rincon_household.len] = '\0';
+  }
+
+  if (packet->rincon_bootseq.ptr != NULL && packet->rincon_bootseq.len > 0) {
+    flow->protos.ssdp.rincon_bootseq = ndpi_malloc(packet->rincon_bootseq.len + 1);
+    memcpy(flow->protos.ssdp.rincon_bootseq, packet->rincon_bootseq.ptr, packet->rincon_bootseq.len);
+    flow->protos.ssdp.rincon_bootseq[packet->rincon_bootseq.len] = '\0';
+  }
+
+  if (packet->rincon_wifimode.ptr != NULL && packet->rincon_wifimode.len > 0) {
+    flow->protos.ssdp.rincon_wifimode = ndpi_malloc(packet->rincon_wifimode.len + 1);
+    memcpy(flow->protos.ssdp.rincon_wifimode, packet->rincon_wifimode.ptr, packet->rincon_wifimode.len);
+    flow->protos.ssdp.rincon_wifimode[packet->rincon_wifimode.len] = '\0';
+  }
+
+  if (packet->rincon_variant.ptr != NULL && packet->rincon_variant.len > 0) {
+    flow->protos.ssdp.rincon_variant = ndpi_malloc(packet->rincon_variant.len + 1);
+    memcpy(flow->protos.ssdp.rincon_variant, packet->rincon_variant.ptr, packet->rincon_variant.len);
+    flow->protos.ssdp.rincon_variant[packet->rincon_variant.len] = '\0';
+  }
+
+  if (packet->sonos_securelocation.ptr != NULL && packet->sonos_securelocation.len > 0) {
+    flow->protos.ssdp.sonos_securelocation = ndpi_malloc(packet->sonos_securelocation.len + 1);
+    memcpy(flow->protos.ssdp.sonos_securelocation, packet->sonos_securelocation.ptr, packet->sonos_securelocation.len);
+    flow->protos.ssdp.sonos_securelocation[packet->sonos_securelocation.len] = '\0';
+  }
+
+  if (packet->securelocation_upnp.ptr != NULL && packet->securelocation_upnp.len > 0) {
+    flow->protos.ssdp.securelocation_upnp = ndpi_malloc(packet->securelocation_upnp.len + 1);
+    memcpy(flow->protos.ssdp.securelocation_upnp, packet->securelocation_upnp.ptr, packet->securelocation_upnp.len);
+    flow->protos.ssdp.securelocation_upnp[packet->securelocation_upnp.len] = '\0';
+  }
+
+  if (packet->location_smart_speaker_audio.ptr != NULL && packet->location_smart_speaker_audio.len > 0) {
+    flow->protos.ssdp.location_smart_speaker_audio = ndpi_malloc(packet->location_smart_speaker_audio.len + 1);
+    memcpy(flow->protos.ssdp.location_smart_speaker_audio, packet->location_smart_speaker_audio.ptr, packet->location_smart_speaker_audio.len);
+    flow->protos.ssdp.location_smart_speaker_audio[packet->location_smart_speaker_audio.len] = '\0';
+  }
+
+  if (packet->nt.ptr != NULL && packet->nt.len > 0) {
+    flow->protos.ssdp.nt = ndpi_malloc(packet->nt.len + 1);
+    memcpy(flow->protos.ssdp.nt, packet->nt.ptr, packet->nt.len);
+    flow->protos.ssdp.nt[packet->nt.len] = '\0';
+  }
+
+  if (packet->nts.ptr != NULL && packet->nts.len > 0) {
+    flow->protos.ssdp.nts = ndpi_malloc(packet->nts.len + 1);
+    memcpy(flow->protos.ssdp.nts, packet->nts.ptr, packet->nts.len);
+    flow->protos.ssdp.nts[packet->nts.len] = '\0';
+  }
+
+  if (packet->server_line.ptr != NULL && packet->server_line.len > 0) {
+    flow->protos.ssdp.server = ndpi_malloc(packet->server_line.len + 1);
+    memcpy(flow->protos.ssdp.server, packet->server_line.ptr, packet->server_line.len);
+    flow->protos.ssdp.server[packet->server_line.len] = '\0';
+  }
 }
 
 static void ndpi_int_ssdp_add_connection(struct ndpi_detection_module_struct

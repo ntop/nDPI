@@ -1592,6 +1592,72 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     }
     break;
 
+  case NDPI_PROTOCOL_SSDP:
+    ndpi_serialize_start_of_block(serializer, "ssdp");
+
+    if (flow->protos.ssdp.cache_controle) {
+      ndpi_serialize_string_string(serializer, "CACHE-CONTROL", flow->protos.ssdp.cache_controle);
+    }
+
+    if (flow->protos.ssdp.location) {
+      ndpi_serialize_string_string(serializer, "LOCATION", flow->protos.ssdp.location);
+    }
+
+    if (flow->protos.ssdp.nt) {
+      ndpi_serialize_string_string(serializer, "NT", flow->protos.ssdp.nt);
+    }
+
+    if (flow->protos.ssdp.nts) {
+      ndpi_serialize_string_string(serializer, "NTS", flow->protos.ssdp.nts);
+    }
+
+    if (flow->protos.ssdp.server) {
+      ndpi_serialize_string_string(serializer, "SERVER", flow->protos.ssdp.server);
+    }
+
+    if (flow->protos.ssdp.usn) {
+      ndpi_serialize_string_string(serializer, "USN", flow->protos.ssdp.usn);
+    }
+
+    if (flow->protos.ssdp.rincon_household) {
+      ndpi_serialize_string_string(serializer, "X-RINCON-HOUSEHOLD", flow->protos.ssdp.rincon_household);
+    }
+
+    if (flow->protos.ssdp.rincon_bootseq) {
+      ndpi_serialize_string_string(serializer, "X-RINCON-BOOTSEQ", flow->protos.ssdp.rincon_bootseq);
+    }
+
+    if (flow->protos.ssdp.bootid) {
+      ndpi_serialize_string_string(serializer, "BOOTID.UPNP.ORG", flow->protos.ssdp.bootid);
+    }
+
+    if (flow->protos.ssdp.rincon_wifimode) {
+      ndpi_serialize_string_string(serializer, "X-RINCON-WIFIMODE", flow->protos.ssdp.rincon_wifimode);
+    }
+
+    if (flow->protos.ssdp.rincon_variant) {
+      ndpi_serialize_string_string(serializer, "X-RINCON-VARIANT", flow->protos.ssdp.rincon_variant);
+    }
+
+    if (flow->protos.ssdp.household_smart_speaker_audio) {
+      ndpi_serialize_string_string(serializer, "HOUSEHOLD.SMARTSPEAKER.AUDIO", flow->protos.ssdp.household_smart_speaker_audio);
+    }
+
+    if (flow->protos.ssdp.location_smart_speaker_audio) {
+      ndpi_serialize_string_string(serializer, "LOCATION.SMARTSPEAKER.AUDIO", flow->protos.ssdp.location_smart_speaker_audio);
+    }
+
+    if (flow->protos.ssdp.securelocation_upnp) {
+      ndpi_serialize_string_string(serializer, "SECURELOCATION.UPNP.ORG", flow->protos.ssdp.securelocation_upnp);
+    }
+
+    if (flow->protos.ssdp.sonos_securelocation) {
+      ndpi_serialize_string_string(serializer, "X-SONOS-HHSECURELOCATION", flow->protos.ssdp.sonos_securelocation);
+    }
+
+    ndpi_serialize_end_of_block(serializer);
+    break;
+
   case NDPI_PROTOCOL_DISCORD:
     if (l7_protocol.proto.master_protocol != NDPI_PROTOCOL_TLS) {
       ndpi_serialize_start_of_block(serializer, "discord");
