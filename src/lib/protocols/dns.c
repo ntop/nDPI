@@ -254,13 +254,16 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
   while((j < max_len)
 	&& ((*off) < packet->payload_packet_len)
 	&& (packet->payload[(*off)] != '\0')) {
-    u_int8_t c, cl = packet->payload[(*off)++];
+    u_int8_t c, cl = packet->payload[*off];
 
     if(((cl & 0xc0) != 0) || // we not support compressed names in query
-       ((*off) + cl  >= packet->payload_packet_len)) {
+       (((*off)+1) + cl  >= packet->payload_packet_len)) {
+      /* Don't update the offset */
       j = 0;
       break;
     }
+
+    (*off)++;
 
     if(j && (j < max_len)) _hostname[j++] = '.';
 
@@ -312,10 +315,6 @@ static int process_queries(struct ndpi_detection_module_struct *ndpi_struct,
   for(num = 0; num < dns_header->num_queries; num++) {
     u_int16_t data_len;
 
-    if((x+6) >= packet->payload_packet_len) {
-      return -1;
-    }
-
     if((data_len = getNameLength(x, packet->payload,
                                  packet->payload_packet_len)) == 0) {
       return -1;
@@ -365,10 +364,6 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
   for(num = 0; num < dns_header->num_answers; num++) {
     u_int16_t data_len;
 
-    if((x+6) >= packet->payload_packet_len) {
-      return -1;
-    }
-
     if((data_len = getNameLength(x, packet->payload,
                                  packet->payload_packet_len)) == 0) {
       return -1;
@@ -386,7 +381,7 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_set_risk(ndpi_struct, flow, NDPI_MINOR_ISSUES, "DNS Record with zero TTL");
 
 #ifdef DNS_DEBUG
-    printf("[DNS] TTL = %u\n", rsp_ttl);
+    printf("[DNS] Date len %u; TTL = %u\n", data_len, rsp_ttl);
     printf("[DNS] [response] response_type=%d\n", rsp_type);
 #endif
 
@@ -414,12 +409,16 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 
           if((x + ptr_len) <= packet->payload_packet_len) {
             if(found == 0) {
-              u_int len;
+              u_int len, orig_x;
 
+              orig_x = x;
               ndpi_grab_dns_name(packet, &x,
                                  flow->protos.dns.ptr_domain_name,
                                  sizeof(flow->protos.dns.ptr_domain_name), &len,
                                  ignore_checks);
+              /* ndpi_grab_dns_name doesn't update the offset if it failed.
+                 We unconditionally update it at the end of the for loop */
+              x = orig_x;
               found = 1;
             }
           }
@@ -816,9 +815,9 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
     flow->protos.dns.transaction_id = dns_header.tr_id;
 
-    process_queries(ndpi_struct, flow, &dns_header, off);
+    rc = process_queries(ndpi_struct, flow, &dns_header, off);
 #ifdef DNS_DEBUG
-    if(rc == -1) {
+    if(rc == -1)
       printf("[DNS] Error queries (query msg)\n");
 #endif
   } else {
