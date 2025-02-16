@@ -140,6 +140,9 @@ struct ndpi_packet_struct {
   struct ndpi_int_one_line_struct location_smart_speaker_audio;
   struct ndpi_int_one_line_struct nt;
   struct ndpi_int_one_line_struct nts;
+  struct ndpi_int_one_line_struct man;
+  struct ndpi_int_one_line_struct mx;
+  struct ndpi_int_one_line_struct st;
 
   u_int16_t l3_packet_len;
   u_int16_t payload_packet_len;

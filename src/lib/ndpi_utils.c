@@ -1659,6 +1659,22 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_serialize_string_string(serializer, "X-SONOS-HHSECURELOCATION", flow->protos.ssdp.sonos_securelocation);
     }
 
+    if (flow->protos.ssdp.man) {
+      ndpi_serialize_string_string(serializer, "MAN", flow->protos.ssdp.man);
+    }
+
+    if (flow->protos.ssdp.mx) {
+      ndpi_serialize_string_string(serializer, "MX", flow->protos.ssdp.mx);
+    }
+
+    if (flow->protos.ssdp.st) {
+      ndpi_serialize_string_string(serializer, "ST", flow->protos.ssdp.st);
+    }
+
+    if (flow->protos.ssdp.user_agent) {
+      ndpi_serialize_string_string(serializer, "USER_AGENT", flow->protos.ssdp.user_agent);
+    }
+
     ndpi_serialize_end_of_block(serializer);
     break;
 

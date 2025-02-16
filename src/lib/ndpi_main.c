@@ -6906,6 +6906,18 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
       
       if(flow->protos.ssdp.method)
         ndpi_free(flow->protos.ssdp.method);
+      
+      if(flow->protos.ssdp.man)
+        ndpi_free(flow->protos.ssdp.man);
+
+      if(flow->protos.ssdp.mx)
+        ndpi_free(flow->protos.ssdp.mx);
+
+      if(flow->protos.ssdp.st)
+        ndpi_free(flow->protos.ssdp.st);
+      
+      if(flow->protos.ssdp.user_agent)
+        ndpi_free(flow->protos.ssdp.user_agent);
     }
 
     if(flow->tls_quic.message[0].buffer)
@@ -8550,6 +8562,9 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
     packet->location_smart_speaker_audio.ptr = NULL, packet->location_smart_speaker_audio.len = 0;
     packet->nt.ptr = NULL, packet->nt.len = 0;
     packet->nts.ptr = NULL, packet->nts.len = 0;
+    packet->man.ptr = NULL, packet->man.len = 0;
+    packet->mx.ptr = NULL, packet->mx.len = 0;
+    packet->st.ptr = NULL, packet->st.len = 0;
 }
 
 /* ********************************************************************************* */
@@ -9319,9 +9334,13 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
                                      { NULL, NULL} };
   struct header_line headers_s[] = { { "Server:", &packet->server_line },
                                      { "SECURELOCATION.UPNP.ORG:", &packet->securelocation_upnp },
+                                     { "ST", &packet->st },
                                      { NULL, NULL} };
   struct header_line headers_l[] = { { "LOCATION:", &packet->location },
                                      { "LOCATION.SMARTSPEAKER.AUDIO:", &packet->location_smart_speaker_audio },
+                                     { NULL, NULL}};
+  struct header_line headers_m[] = { { "MAN:", &packet->man },
+                                     { "MX:", &packet->mx },
                                      { NULL, NULL}};
   struct header_line headers_n[] = { { "NT:", &packet->nt },
                                      { "NTS:", &packet->nts },
@@ -9390,6 +9409,10 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
   case 'L':
     hs = headers_l;
     break;
+  case 'm':
+  case 'M':
+      hs = headers_m;
+      break;
   case 'n':
   case 'N':
     hs = headers_n;

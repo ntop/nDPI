@@ -176,6 +176,38 @@ static void ssdp_parse_lines(struct ndpi_detection_module_struct
       flow->protos.ssdp.server[packet->server_line.len] = '\0';
     }
   }
+
+  if (packet->man.ptr != NULL && packet->man.len > 0) {
+    flow->protos.ssdp.man = ndpi_malloc(packet->man.len + 1);
+    if (flow->protos.ssdp.man) {
+      memcpy(flow->protos.ssdp.man, packet->man.ptr, packet->man.len);
+      flow->protos.ssdp.man[packet->man.len] = '\0';
+    }
+  }
+
+  if (packet->mx.ptr != NULL && packet->mx.len > 0) {
+    flow->protos.ssdp.mx = ndpi_malloc(packet->mx.len + 1);
+    if (flow->protos.ssdp.mx) {
+      memcpy(flow->protos.ssdp.mx, packet->mx.ptr, packet->mx.len);
+      flow->protos.ssdp.mx[packet->mx.len] = '\0';
+    }
+  }
+
+  if (packet->st.ptr != NULL && packet->st.len > 0) {
+    flow->protos.ssdp.st = ndpi_malloc(packet->st.len + 1);
+    if (flow->protos.ssdp.st) {
+      memcpy(flow->protos.ssdp.st, packet->st.ptr, packet->st.len);
+      flow->protos.ssdp.st[packet->st.len] = '\0';
+    }
+  }
+
+  if (packet->user_agent_line.ptr != NULL && packet->user_agent_line.len > 0) {
+    flow->protos.ssdp.user_agent = ndpi_malloc(packet->user_agent_line.len + 1);
+    if (flow->protos.ssdp.user_agent) {
+      memcpy(flow->protos.ssdp.user_agent, packet->user_agent_line.ptr, packet->user_agent_line.len);
+      flow->protos.ssdp.user_agent[packet->user_agent_line.len] = '\0';
+    }
+  }
 }
 
 static void ndpi_int_ssdp_add_connection(struct ndpi_detection_module_struct

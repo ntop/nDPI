@@ -1595,6 +1595,10 @@ struct ndpi_flow_struct {
       char *nt;
       char *nts;
       char *server;
+      char *man;
+      char *mx;
+      char *st;
+      char *user_agent;
     } ssdp;
 } protos;
 
