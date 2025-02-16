@@ -654,7 +654,7 @@ int load_config_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd)
 int load_category_file_fd(struct ndpi_detection_module_struct *ndpi_str,
 			  FILE *fd, ndpi_protocol_category_t category_id);
 
-u_int64_t fpc_dns_cache_key_from_dns_info(struct ndpi_flow_struct *flow);
+u_int64_t fpc_dns_cache_key_from_flow(struct ndpi_flow_struct *flow);
 
 bool ndpi_cache_address(struct ndpi_detection_module_struct *ndpi_struct,
 			ndpi_ip_addr_t ip_addr, char *hostname,

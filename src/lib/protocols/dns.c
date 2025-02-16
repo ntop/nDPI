@@ -215,6 +215,32 @@ static char* dns_error_code2string(u_int16_t error_code, char *buf, u_int buf_le
 
 /* *********************************************** */
 
+u_int64_t fpc_dns_cache_key_from_flow(struct ndpi_flow_struct *flow) {
+  u_int64_t key;
+
+  if(flow->is_ipv6)
+    key = ndpi_quick_hash64((const char *)flow->s_address.v6, 16);
+  else
+    key = (u_int64_t)(flow->s_address.v4);
+
+  return key;
+}
+
+/* *********************************************** */
+
+static u_int64_t fpc_dns_cache_key_from_packet(const unsigned char *ip, int ip_len) {
+  u_int64_t key;
+
+  if(ip_len == 16)
+    key = ndpi_quick_hash64((const char *)ip, 16);
+  else
+    key = (u_int64_t)(*(u_int32_t *)ip);
+
+  return key;
+}
+
+/* *********************************************** */
+
 static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 				   u_int *off /* payload offset */,
 				   char *_hostname, u_int max_len,
@@ -324,13 +350,17 @@ static int process_queries(struct ndpi_detection_module_struct *ndpi_struct,
 static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
                            struct ndpi_flow_struct *flow,
                            struct ndpi_dns_packet_header *dns_header,
-                           u_int payload_offset, u_int8_t ignore_checks) {
+                           u_int payload_offset,
+                           ndpi_master_app_protocol *proto) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int x = payload_offset;
   u_int16_t rsp_type;
   u_int32_t rsp_ttl;
   u_int16_t num;
   u_int8_t found = 0;
+  int ignore_checks;
+
+  ignore_checks = (proto->master_protocol == NDPI_PROTOCOL_MDNS);
 
   for(num = 0; num < dns_header->num_answers; num++) {
     u_int16_t data_len;
@@ -418,6 +448,18 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 
             if(flow->protos.dns.num_rsp_addr >= MAX_NUM_DNS_RSP_ADDRESSES)
               found = 1;
+          }
+
+          /* Add to FPC DNS cache */
+          if(flow->protos.dns.num_rsp_addr == 1 && /* Only the first one */
+             ndpi_struct->cfg.fpc_enabled &&
+             proto->app_protocol != NDPI_PROTOCOL_UNKNOWN &&
+             proto->app_protocol != proto->master_protocol &&
+             ndpi_struct->fpc_dns_cache) {
+            ndpi_lru_add_to_cache(ndpi_struct->fpc_dns_cache,
+                                  fpc_dns_cache_key_from_packet(packet->payload + x, data_len),
+                                  proto->app_protocol,
+                                  ndpi_get_current_time(flow));
           }
         }
 
@@ -727,16 +769,6 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
                                                       &ret_match,
                                                       proto->master_protocol,
                                                       ndpi_struct->cfg.dns_subclassification_enabled ? 1 : 0);
-    /* Add to FPC DNS cache */
-    if(ndpi_struct->cfg.fpc_enabled &&
-       proto->app_protocol != NDPI_PROTOCOL_UNKNOWN &&
-       proto->app_protocol != proto->master_protocol &&
-       (flow->protos.dns.rsp_type == 0x1 || flow->protos.dns.rsp_type == 0x1c) && /* A, AAAA */
-       ndpi_struct->fpc_dns_cache) {
-      ndpi_lru_add_to_cache(ndpi_struct->fpc_dns_cache,
-                            fpc_dns_cache_key_from_dns_info(flow), proto->app_protocol,
-                            ndpi_get_current_time(flow));
-    }
 
     ndpi_check_dga_name(ndpi_struct, flow, flow->host_server_name, 1, 0, proto->app_protocol != NDPI_PROTOCOL_UNKNOWN);
   }
@@ -747,24 +779,17 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
 static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int payload_offset = 0;
-  u_int8_t is_query, is_mdns;
-  u_int16_t s_port = 0, d_port = 0;
+  u_int8_t is_query;
   struct ndpi_dns_packet_header dns_header;
   u_int off;
   ndpi_master_app_protocol proto;
   int rc;
 
   if(packet->udp != NULL) {
-    s_port = ntohs(packet->udp->source);
-    d_port = ntohs(packet->udp->dest);
     payload_offset = 0;
-  } else if(packet->tcp != NULL) /* pkt size > 512 bytes */ {
-    s_port = ntohs(packet->tcp->source);
-    d_port = ntohs(packet->tcp->dest);
+  } else if(packet->tcp != NULL) {
     payload_offset = 2;
   }
-
-  is_mdns = ((s_port == MDNS_PORT) || (d_port == MDNS_PORT)) ? 1 : 0;
 
   if(!is_valid_dns(ndpi_struct, flow, &dns_header, payload_offset, &is_query)) {
 #ifdef DNS_DEBUG
@@ -777,6 +802,8 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
     }
     return;
   }
+
+  process_hostname(ndpi_struct, flow, &proto);
 
   off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
 
@@ -812,7 +839,7 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
 #endif
     } else {
       off = rc;
-      rc = process_answers(ndpi_struct, flow, &dns_header, off, is_mdns);
+      rc = process_answers(ndpi_struct, flow, &dns_header, off, &proto);
       if(rc == -1) {
 #ifdef DNS_DEBUG
         printf("[DNS] Error answers\n");
@@ -827,8 +854,6 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
       }
     }
   }
-
-  process_hostname(ndpi_struct, flow, &proto);
 
   /* Report if this is a DNS query or reply */
   flow->protos.dns.is_query = is_query;

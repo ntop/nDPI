@@ -7671,32 +7671,6 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
 /* ********************************************************************************* */
 
-static u_int64_t make_fpc_dns_cache_key(struct ndpi_flow_struct *flow) {
-  u_int64_t key;
-
-  if(flow->is_ipv6)
-    key = ndpi_quick_hash64((const char *)flow->s_address.v6, 16);
-  else
-    key = (u_int64_t)(flow->s_address.v4);
-
-  return key;
-}
-
-/* ********************************************************************************* */
-
-u_int64_t fpc_dns_cache_key_from_dns_info(struct ndpi_flow_struct *flow) {
-  u_int64_t key;
-
-  if(flow->protos.dns.is_rsp_addr_ipv6[0])
-    key = ndpi_quick_hash64((const char *)&flow->protos.dns.rsp_addr[0].ipv6, 16);
-  else
-    key = (u_int64_t)(flow->protos.dns.rsp_addr[0].ipv4);
-
-  return key;
-}
-
-/* ********************************************************************************* */
-
 static u_int64_t make_msteams_key(struct ndpi_flow_struct *flow, u_int8_t use_client) {
   u_int64_t key;
 
@@ -8724,7 +8698,7 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
 
   /* Check via fpc DNS cache */
   if(ndpi_str->fpc_dns_cache &&
-     ndpi_lru_find_cache(ndpi_str->fpc_dns_cache, make_fpc_dns_cache_key(flow),
+     ndpi_lru_find_cache(ndpi_str->fpc_dns_cache, fpc_dns_cache_key_from_flow(flow),
                          &fpc_dns_cached_proto, 0 /* Don't remove it as it can be used for other connections */,
                          ndpi_get_current_time(flow))) {
     fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
