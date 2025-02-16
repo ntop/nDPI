@@ -6892,6 +6892,7 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     free(flow->protos.ssdp.location_smart_speaker_audio);
     free(flow->protos.ssdp.nt);
     free(flow->protos.ssdp.nts);
+    free(flow->protos.ssdp.server);
   }
 }
 
