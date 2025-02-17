@@ -683,20 +683,25 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* *********************************************** */
 
+static int keep_extra_dissection(struct ndpi_flow_struct *flow)
+{
+  /* As a general rule, we wait for a valid response
+     (in the ideal world, we want to process the request/response pair) */
+  return !(!flow->protos.dns.is_query && flow->protos.dns.num_answers != 0);
+}
+
+/* *********************************************** */
+
 static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if(packet->tcp_retransmission || packet->payload_packet_len == 0)
-    return(1);
+    return keep_extra_dissection(flow);
 
   /* possibly dissect the DNS reply */
   search_dns(ndpi_struct, flow);
 
-  if(flow->protos.dns.num_answers != 0)
-    return(0);
-
-  /* Possibly more processing */
-  return(1);
+  return keep_extra_dissection(flow);
 }
 
 /* *********************************************** */
@@ -810,7 +815,7 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
   off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
 
   if(is_query) {
-
+    flow->protos.dns.is_query = 1;
     flow->protos.dns.transaction_id = dns_header.tr_id;
 
     rc = process_queries(ndpi_struct, flow, &dns_header, off);
@@ -819,8 +824,11 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
       printf("[DNS] Error queries (query msg)\n");
 #endif
   } else {
+    flow->protos.dns.is_query = 0;
     flow->protos.dns.transaction_id = dns_header.tr_id;
     flow->protos.dns.reply_code = dns_header.flags & 0x0F;
+    flow->protos.dns.num_queries = dns_header.num_queries;
+    flow->protos.dns.num_answers = dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs;
 
     if(flow->protos.dns.reply_code != 0) {
       char str[32], buf[16];
@@ -855,61 +863,48 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
 #endif
       }
     }
-  }
 
-  /* Report if this is a DNS query or reply */
-  flow->protos.dns.is_query = is_query;
-
-  if(!ndpi_struct->cfg.dns_subclassification_enabled)
-    proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
-
-  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN ||
-     proto.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
-
-    ndpi_set_detected_protocol(ndpi_struct, flow, proto.app_protocol, proto.master_protocol, NDPI_CONFIDENCE_DPI);
-
-    if(is_query) {
-      if(ndpi_struct->cfg.dns_parse_response_enabled) {
-        /* We have never triggered extra-dissection for LLMNR. Keep the old behavior */
-        if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_LLMNR &&
-           flow->detected_protocol_stack[1] != NDPI_PROTOCOL_LLMNR) {
-          /* Don't use just 1 as in TCP DNS more packets could be returned (e.g. ACK). */
-          flow->max_extra_packets_to_check = 5;
-          flow->extra_packets_func = search_dns_again;
-        }
-      }
-    }
-  }
-  /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
-  flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
-
-  if(is_query)
-    return;
-
-  if(strlen(flow->host_server_name) > 0)
-
-  flow->protos.dns.num_queries = (u_int8_t)dns_header.num_queries,
-    flow->protos.dns.num_answers = (u_int8_t) (dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs);
-
-#ifdef DNS_DEBUG
-  NDPI_LOG_DBG2(ndpi_struct, "[num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
-                flow->protos.dns.num_queries, flow->protos.dns.num_answers,
-                flow->protos.dns.reply_code, flow->protos.dns.rsp_type, flow->host_server_name
-                );
-#endif
-
-  if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
-     || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
-    /* TODO: add support to RFC6891 to avoid some false positives */
-    if((packet->udp != NULL)
-       && (packet->payload_packet_len > PKT_LEN_ALERT)
-       && (packet->payload_packet_len > flow->protos.dns.edns0_udp_payload_size)
-       ) {
+    if(proto.master_protocol == NDPI_PROTOCOL_DNS &&
+      /* TODO: add support to RFC6891 to avoid some false positives */
+       packet->udp &&
+       packet->payload_packet_len > PKT_LEN_ALERT &&
+       packet->payload_packet_len > flow->protos.dns.edns0_udp_payload_size) {
       char str[48];
 
       snprintf(str, sizeof(str), "%u Bytes DNS Packet", packet->payload_packet_len);
       ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_LARGE_PACKET, str);
     }
+
+    NDPI_LOG_DBG2(ndpi_struct, "Response: [num_queries=%d][num_answers=%d][reply_code=%u][rsp_type=%u][host_server_name=%s]\n",
+                  flow->protos.dns.num_queries, flow->protos.dns.num_answers,
+                  flow->protos.dns.reply_code, flow->protos.dns.rsp_type, flow->host_server_name);
+  }
+
+  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+    if(ndpi_struct->cfg.dns_subclassification_enabled)
+      ndpi_set_detected_protocol(ndpi_struct, flow, proto.app_protocol, proto.master_protocol, NDPI_CONFIDENCE_DPI);
+    else
+      ndpi_set_detected_protocol(ndpi_struct, flow, proto.master_protocol, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  }
+  /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
+  flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
+
+  if(!flow->extra_packets_func &&
+     ndpi_struct->cfg.dns_parse_response_enabled &&
+     /* We have never triggered extra-dissection for LLMNR. Keep the old behavior */
+     flow->detected_protocol_stack[0] != NDPI_PROTOCOL_LLMNR &&
+     flow->detected_protocol_stack[1] != NDPI_PROTOCOL_LLMNR) {
+    if(keep_extra_dissection(flow)) {
+      NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
+      flow->max_extra_packets_to_check = 5;
+      flow->extra_packets_func = search_dns_again;
+    }
+  }
+
+  /* The bigger packets are usually the replies, but it shouldn't harm
+     to check the requests, too */
+  if((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DNS)
+     || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_DNS)) {
 
     if(packet->iph != NULL) {
       /* IPv4 */
