@@ -222,6 +222,9 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 #define NDPI_MINOR                              0
 #define NDPI_PATCH                              0
 
+#define NDPI_MAX_DNS_REQUESTS                   48
+#define NDPI_MIN_NUM_STUN_DETECTION             8
+
 /* IMPORTANT: order according to its severity */
 #define NDPI_CIPHER_SAFE                        0
 #define NDPI_CIPHER_WEAK                        1

@@ -38,8 +38,6 @@
 
 #define PKT_LEN_ALERT 512
 
-#define NDPI_MAX_DNS_REQUESTS   48
-
 
 static void search_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		       struct ndpi_flow_struct *flow);
