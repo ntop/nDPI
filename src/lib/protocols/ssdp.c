@@ -213,7 +213,8 @@ static void ssdp_parse_lines(struct ndpi_detection_module_struct
 static void ndpi_int_ssdp_add_connection(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ssdp_parse_lines(ndpi_struct, flow);
+  if(ndpi_struct->cfg.ssdp_metadata_enabled)
+    ssdp_parse_lines(ndpi_struct, flow);
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSDP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -228,10 +229,12 @@ static void ndpi_search_ssdp(struct ndpi_detection_module_struct *ndpi_struct, s
     if (packet->payload_packet_len >= 19) {
       for (unsigned int i=0; i < sizeof(SSDP_METHODS)/sizeof(SSDP_METHODS[0]); i++) {
         if(memcmp(packet->payload, SSDP_METHODS[i].detection_line, strlen(SSDP_METHODS[i].detection_line)) == 0) {
-          flow->protos.ssdp.method = ndpi_malloc(strlen(SSDP_METHODS[i].detection_line) + 1);
-          if (flow->protos.ssdp.method) {
-            memcpy(flow->protos.ssdp.method, SSDP_METHODS[i].method, strlen(SSDP_METHODS[i].method));
-            flow->protos.ssdp.method[strlen(SSDP_METHODS[i].method)] = '\0';
+          if(ndpi_struct->cfg.ssdp_metadata_enabled) {
+            flow->protos.ssdp.method = ndpi_malloc(strlen(SSDP_METHODS[i].detection_line) + 1);
+            if (flow->protos.ssdp.method) {
+              memcpy(flow->protos.ssdp.method, SSDP_METHODS[i].method, strlen(SSDP_METHODS[i].method));
+              flow->protos.ssdp.method[strlen(SSDP_METHODS[i].method)] = '\0';
+            }
           }
           NDPI_LOG_INFO(ndpi_struct, "found ssdp\n");
           ndpi_int_ssdp_add_connection(ndpi_struct, flow);
