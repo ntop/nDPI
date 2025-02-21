@@ -1637,7 +1637,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   }
 
   if(is_ndpi_proto(flow, NDPI_PROTOCOL_RTP))
-    memcpy(&flow->rtp, &flow->ndpi_flow->protos.rtp, sizeof(flow->rtp));
+    memcpy(&flow->rtp, &flow->ndpi_flow->rtp, sizeof(flow->rtp));
      
   ndpi_snprintf(flow->http.user_agent,
                 sizeof(flow->http.user_agent),

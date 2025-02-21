@@ -1303,8 +1303,8 @@ struct ndpi_tls_obfuscated_heuristic_matching_set {
 
 struct rtp_info {
   u_int8_t payload_type;
-  u_int32_t evs_subtype;
   bool payload_detected;
+  u_int32_t evs_subtype;
 };
 
 struct ndpi_flow_struct {
@@ -1430,6 +1430,8 @@ struct ndpi_flow_struct {
     struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
     struct ndpi_tls_obfuscated_heuristic_matching_set *obfuscated_heur_matching_set;
   } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
+
+  struct rtp_info rtp[2 /* directions */];
 
   union {
     /* the only fields useful for nDPI and ntopng */
@@ -1607,7 +1609,6 @@ struct ndpi_flow_struct {
       char *user_agent;
     } ssdp;
 
-    struct rtp_info rtp[2 /* directions */];
   } protos;
 
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */

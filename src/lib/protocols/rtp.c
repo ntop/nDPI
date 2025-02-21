@@ -275,7 +275,7 @@ static int rtp_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   /* printf("***** AGAIN *****\n"); */
   ndpi_rtp_search(ndpi_struct, flow);
 
-  return(((flow->protos.rtp[0].payload_detected && flow->protos.rtp[1].payload_detected)) ? false :true);
+  return(((flow->rtp[0].payload_detected && flow->rtp[1].payload_detected)) ? false :true);
 }
 
 /* *************************************************************** */
@@ -295,7 +295,7 @@ static void ndpi_int_rtp_add_connection(struct ndpi_detection_module_struct *ndp
       switch_extra_dissection_to_stun(ndpi_struct, flow, 1);
     }
   } else if(proto == NDPI_PROTOCOL_RTP) {
-    if(flow->protos.rtp[0].payload_detected && flow->protos.rtp[1].payload_detected)
+    if(flow->rtp[0].payload_detected && flow->rtp[1].payload_detected)
       ; /* Nothing to do */
     else {
       if(!flow->extra_packets_func) {
@@ -348,14 +348,14 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   if(is_rtp == IS_RTP) {
     u_int8_t packet_direction = current_pkt_from_client_to_server(ndpi_struct, flow) ? 0 : 1;
     
-    if(flow->protos.rtp[packet_direction].payload_type == 0x0) {
-      flow->protos.rtp[packet_direction].payload_type = payload[1] & 0x7F;
-      flow->protos.rtp[packet_direction].payload_detected = true;
+    if(flow->rtp[packet_direction].payload_type == 0x0) {
+      flow->rtp[packet_direction].payload_type = payload[1] & 0x7F;
+      flow->rtp[packet_direction].payload_detected = true;
       
       /* printf("********* [direction: %d] payload_type=%u\n", packet_direction, flow->protos.rtp[packet_direction].payload_type);  */
       
-      if(((flow->protos.rtp[packet_direction].payload_type == 126 /* Enhanced Voice Services (EVS) */)
-	  || (flow->protos.rtp[packet_direction].payload_type == 127 /* Enhanced Voice Services (EVS) */))
+      if(((flow->rtp[packet_direction].payload_type == 126 /* Enhanced Voice Services (EVS) */)
+	  || (flow->rtp[packet_direction].payload_type == 127 /* Enhanced Voice Services (EVS) */))
 	 && (payload_len > 12 /* RTP header */)) {
 	const u_int8_t *evs = &payload[12];
 	u_int packet_len = payload_len - 12;
@@ -368,9 +368,9 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 	  /* A.2.1.3 Special case for 56 bit payload size (EVS Primary or EVS AMR-WB IO SID) */
 
 	  if((evs[0] & 0x80) == 0)
-	    flow->protos.rtp[packet_direction].evs_subtype = evs[0] & 0xF;
+	    flow->rtp[packet_direction].evs_subtype = evs[0] & 0xF;
 	  else
-	    flow->protos.rtp[packet_direction].evs_subtype = evs[1] & 0xF;
+	    flow->rtp[packet_direction].evs_subtype = evs[1] & 0xF;
 	} else {
 
 	  /* See ndpi_rtp_payload_type2str() */
@@ -396,7 +396,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 	  case  1280:
 	  case  1920:
 	  case  2560:
-	    flow->protos.rtp[packet_direction].evs_subtype = num_bits;
+	    flow->rtp[packet_direction].evs_subtype = num_bits;
 	    break;
 
 	  default:
@@ -404,13 +404,13 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 	      /* EVS Codec Mode Request (EVS-CMR) */
 	      u_int8_t d_bits = evs[0] & 0X0F;
 	      
-	      flow->protos.rtp[packet_direction].evs_subtype = d_bits + 30 /* dummy offset */;
+	      flow->rtp[packet_direction].evs_subtype = d_bits + 30 /* dummy offset */;
 	    }
 	    break;
 	  }
 	}	
 
-	if(flow->protos.rtp[0].payload_detected && flow->protos.rtp[1].payload_detected)
+	if(flow->rtp[0].payload_detected && flow->rtp[1].payload_detected)
 	  flow->extra_packets_func = NULL; /* Nothing to do */	 
       }
     }
@@ -432,7 +432,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
         NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
         NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
       } else {
-        rtp_get_stream_type(flow->protos.rtp[packet->packet_direction].payload_type,
+        rtp_get_stream_type(flow->rtp[packet->packet_direction].payload_type,
 			    &flow->flow_multimedia_types, NDPI_PROTOCOL_UNKNOWN);
 
         NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
