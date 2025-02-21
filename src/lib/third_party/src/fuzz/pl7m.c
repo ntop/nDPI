@@ -957,7 +957,7 @@ static size_t internal_FuzzerMutate(uint8_t *Data, size_t Size, size_t MaxSize)
 }
 #endif
 
-
+#ifndef PL7M_USE_SIMPLEST_MUTATOR
 static void update_do_l7(struct m_pkt *p)
 {
 	struct udphdr *udp_h;
@@ -1044,6 +1044,7 @@ static void update_do_l7(struct m_pkt *p)
 	p->header.len = p->header.caplen;
 	assert(p->header.caplen <= MAX_PKT_LENGTH);
 }
+#endif
 
 #ifdef PL7M_USE_SIMPLEST_MUTATOR
 static void update_do_simplest(struct m_pkt *p)

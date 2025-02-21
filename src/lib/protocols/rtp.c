@@ -318,6 +318,11 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   u_int16_t seq;
 
   if(packet->tcp != NULL) {
+    if (payload_len < 2) {
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
+      return;
+    }
     payload += 2; /* Skip the length field */
     payload_len -= 2;
   }
