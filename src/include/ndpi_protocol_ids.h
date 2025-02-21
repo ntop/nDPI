@@ -153,7 +153,7 @@ typedef enum {
   NDPI_PROTOCOL_GMAIL                 = 122,
   NDPI_PROTOCOL_GOOGLE_MAPS           = 123,
   NDPI_PROTOCOL_YOUTUBE               = 124,
-  NDPI_PROTOCOL_FREE_125              = 125, /* FREE */
+  NDPI_PROTOCOL_MOZILLA               = 125,
   NDPI_PROTOCOL_GOOGLE                = 126,
   NDPI_PROTOCOL_MS_RPCH               = 127,
   NDPI_PROTOCOL_NETFLOW               = 128,
