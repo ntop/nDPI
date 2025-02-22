@@ -7863,7 +7863,6 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
 
   case NDPI_PROTOCOL_NETFLOW:
   case NDPI_PROTOCOL_SFLOW:
-  case NDPI_PROTOCOL_RTP:
   case NDPI_PROTOCOL_COLLECTD:
     /* Remove NDPI_UNIDIRECTIONAL_TRAFFIC from unidirectional protocols */
     ndpi_unset_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
@@ -7872,6 +7871,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   case NDPI_PROTOCOL_SYSLOG:
   case NDPI_PROTOCOL_MDNS:
   case NDPI_PROTOCOL_SONOS:
+  case NDPI_PROTOCOL_RTP:
     if(flow->l4_proto == IPPROTO_UDP)
       ndpi_unset_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
     break;
