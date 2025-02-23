@@ -1526,7 +1526,7 @@ struct ndpi_flow_struct {
     } discord;
 
     struct {
-      char version[32];
+      char version[64];
     } ubntac2;
 
     /* In TLS.Bittorent flows there is no hash.

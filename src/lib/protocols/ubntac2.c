@@ -35,47 +35,37 @@ static void ndpi_int_ubntac2_add_connection(struct ndpi_detection_module_struct 
 static void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  u_int8_t tlv_type;
+  u_int16_t tlv_length, version_len;
+  int off;
 
   NDPI_LOG_DBG(ndpi_struct, "search ubntac2\n");
-  NDPI_LOG_DBG2(ndpi_struct, "UBNTAC2 detection... plen:%i %i:%i\n", packet->payload_packet_len, ntohs(packet->udp->source), ntohs(packet->udp->dest));
 
-  if(packet->udp) {
-    if(packet->payload_packet_len >= 135 &&
-       (packet->udp->source == htons(10001) || packet->udp->dest == htons(10001))) {
-      int found = 0;
-      
-      if(memcmp(&(packet->payload[36]), "UBNT", 4) == 0) {
-	found = 36+5;
-      } else if(memcmp(&(packet->payload[49]), "ubnt", 4) == 0) {
-	found = 49+5;
+  if(packet->payload_packet_len >= 4 &&
+     (packet->udp->source == htons(10001) || packet->udp->dest == htons(10001)) &&
+     packet->payload[0] == 0x02 &&
+     packet->payload[1] == 0x06 &&
+     (4 + ntohs(*(u_int16_t *)&packet->payload[2]) == packet->payload_packet_len)) {
+    NDPI_LOG_INFO(ndpi_struct, "UBNT AirControl 2 request\n");
+    ndpi_int_ubntac2_add_connection(ndpi_struct, flow);
+
+    /* Parse TLV list: 1 byte type + 2 byte length + (optional) data */
+    off = 4;
+    while (off + 3 < packet->payload_packet_len) {
+      tlv_type = packet->payload[off];
+      tlv_length = ntohs(*(u_int16_t *)&packet->payload[off + 1]);
+
+      NDPI_LOG_DBG2(ndpi_struct, "0x%x Len %d\n", tlv_type, tlv_length);
+
+      if(tlv_type == 0x03 && off + 3 + tlv_length < packet->payload_packet_len) {
+	version_len = ndpi_min(sizeof(flow->protos.ubntac2.version) - 1, tlv_length);
+	memcpy(flow->protos.ubntac2.version, (const char *)&packet->payload[off + 3], version_len);
+	flow->protos.ubntac2.version[version_len] = '\0';
       }
 
-      if(found) {
-	found += packet->payload[found+1] + 4; /* Skip model name */
-	found++; /* Skip len */
-	
-	if(found < packet->payload_packet_len) {
-	  char version[256];
-	  int len;
-	  u_int i, j;
-	  
-	  for(i=found, j=0; (i < packet->payload_packet_len)
-		&& (i < (sizeof(version)-1))
-		&& (packet->payload[i] != 0); i++)
-	    version[j++] = packet->payload[i];
-	  
-	  version[j] = '\0';
-
-	  len = ndpi_min(sizeof(flow->protos.ubntac2.version) - 1, j);
-	  memcpy(flow->protos.ubntac2.version, (const char *)version, len);
-	  flow->protos.ubntac2.version[len] = '\0';
-	}
-	
-	NDPI_LOG_INFO(ndpi_struct, "UBNT AirControl 2 request\n");
-	
-	ndpi_int_ubntac2_add_connection(ndpi_struct, flow);
-      }
+      off += 3 + tlv_length;
     }
+    return;
   }
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
