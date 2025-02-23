@@ -1650,6 +1650,10 @@ static ndpi_protocol_match host_match[] =
 
    { "rutube.ru",			 "RUTUBE", NDPI_PROTOCOL_RUTUBE, NDPI_PROTOCOL_CATEGORY_MEDIA, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   /* LagoFast */
+   { "6fast.com",                        "LagoFast", NDPI_PROTOCOL_LAGOFAST, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "lagofast.com",                     "LagoFast", NDPI_PROTOCOL_LAGOFAST, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif

@@ -1131,3 +1131,11 @@ References: `Main site <https://www.digitalocean.com/>`_
 RUTUBE is a Russian video platform. It includes a library of licensed content including movies, series, cartoons, shows, and live broadcasts. It also hosts blogs, podcasts, video game streams, and educational content.
 
 References: `Main site <http://rutube.ru/>`_
+
+.. _Proto 444:
+
+`NDPI_PROTOCOL_LAGOFAST`
+========================
+LagoFast Game Booster ensures ultra-smooth gaming on any device with reduced lag, packet loss, and increased FPS. Guaranteeing faster connections, maximum performance, and network stability for every game.
+
+References: `Main site <https://www.lagofast.com/>`_
