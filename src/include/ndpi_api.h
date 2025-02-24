@@ -2090,6 +2090,10 @@ extern "C" {
   int ndpi_get_geoip_country_continent(struct ndpi_detection_module_struct *ndpi_str, char *ip,
 				       char *country_code, u_int8_t country_code_len,
 				       char *continent, u_int8_t continent_len);
+	int ndpi_get_geoip_country_continent_city(struct ndpi_detection_module_struct *ndpi_str, char *ip,
+				       char *country_code, u_int8_t country_code_len,
+				       char *continent, u_int8_t continent_len,
+				       char *city, u_int8_t city_len);
 
   /* ******************************* */
 
