@@ -36,6 +36,8 @@ RETVAL=$(( RETVAL + $? ))
 RETVAL=$(( RETVAL + $? ))
 ./digitalocean_ip_addresses_download.sh
 RETVAL=$(( RETVAL + $? ))
+./tor_exit_nodes_ip_addresses_download.sh
+RETVAL=$(( RETVAL + $? ))
 
 ./asn_update.sh
 RETVAL=$(( RETVAL + $? ))
