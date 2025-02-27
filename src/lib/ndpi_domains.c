@@ -135,7 +135,7 @@ const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
   char *dot, *first_dc;
   u_int16_t domain_id, len;
   
-  if(!ndpi_str)
+  if(!ndpi_str || !hostname)
     return NULL;
 
   if(ndpi_str->public_domain_suffixes == NULL)
