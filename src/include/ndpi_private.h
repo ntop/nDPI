@@ -104,7 +104,6 @@ struct ndpi_packet_struct {
   const struct ndpi_ipv6hdr *iphv6;
   const struct ndpi_tcphdr *tcp;
   const struct ndpi_udphdr *udp;
-  const u_int8_t *generic_l4_ptr;	/* is set only for non tcp-udp traffic */
   const u_int8_t *payload;
 
   u_int64_t current_time_ms;
