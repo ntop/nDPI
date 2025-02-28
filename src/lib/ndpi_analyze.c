@@ -208,7 +208,7 @@ float ndpi_data_mean(struct ndpi_analyze_struct *s) {
 /* ********************************************************************************* */
 
 float ndpi_data_jitter(struct ndpi_analyze_struct *s) {
-  if(s->num_data_entries < 2)
+  if(!s || s->num_data_entries < 2)
     return(0);
   else
     return((float)s->jitter_total / (float)(s->num_data_entries - 1));

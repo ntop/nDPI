@@ -123,6 +123,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     ndpi_finalize_initialization(workflow->ndpi_struct);
 
+#ifdef ENABLE_FINGERPRINT_FP
+    fingerprint_fp = stdout;
+#endif
+
 #ifdef CRYPT_FORCE_NO_AESNI
     force_no_aesni = 1;
 #endif
