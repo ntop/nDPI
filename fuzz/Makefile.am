@@ -2,7 +2,7 @@ bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail 
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr fuzz_alg_quick_encryption
 #Data structures
-bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64_fuse fuzz_ds_domain_classify fuzz_ds_kdtree fuzz_ds_btree
+bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64_fuse fuzz_ds_domain_classify fuzz_ds_kdtree fuzz_ds_btree fuzz_ds_address_cache
 #Third party
 bin_PROGRAMS += fuzz_libinjection fuzz_binaryfusefilter
 #Internal crypto
@@ -443,6 +443,21 @@ endif
 fuzz_ds_btree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_btree_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_ds_address_cache_SOURCES = fuzz_ds_address_cache.cpp fuzz_common_code.c
+fuzz_ds_address_cache_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_address_cache_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_address_cache_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+fuzz_ds_address_cache_LDFLAGS = $(LIBS)
+if HAS_FUZZLDFLAGS
+fuzz_ds_address_cache_CXXFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_address_cache_CFLAGS += $(LIB_FUZZING_ENGINE)
+fuzz_ds_address_cache_LDFLAGS += $(LIB_FUZZING_ENGINE)
+endif
+# force usage of CXX for linker
+fuzz_ds_address_cache_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_ds_address_cache_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_libinjection_SOURCES = fuzz_libinjection.c
 fuzz_libinjection_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
