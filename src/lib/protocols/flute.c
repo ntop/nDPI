@@ -44,7 +44,7 @@ static void ndpi_search_flute(struct ndpi_detection_module_struct *ndpi_struct,
     }
 
     u_int16_t lct_hdr_len = packet->payload[2] * 4;
-    if (packet->payload_packet_len <= lct_hdr_len + 43) {
+    if (packet->payload_packet_len <= lct_hdr_len + 43 + NDPI_STATICSTRING_LEN("<FDT")) {
       goto not_flute;
     }
 
