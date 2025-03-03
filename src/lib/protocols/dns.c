@@ -167,10 +167,7 @@ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
     u_int8_t len = payload[i];
     u_int8_t off = len + 1;
 
-    if(off == 0) /* Bad packet */
-      return(0);
-    else
-      return(off + getNameLength(i+off, payload, payloadLen));
+    return(off + getNameLength(i+off, payload, payloadLen));
   }
 }
 /*
