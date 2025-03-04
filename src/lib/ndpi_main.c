@@ -7124,7 +7124,7 @@ static u_int8_t ndpi_is_multi_or_broadcast(struct ndpi_packet_struct *packet) {
     /* IPv4 */
     u_int32_t daddr = ntohl(packet->iph->daddr);
 
-    if(((daddr & 0xE0000000) == 0xE0000000 /* multicast */)
+    if(((daddr & 0xF0000000) == 0xE0000000 /* multicast 224.0.0.0/4 */)
        || ((daddr & 0x000000FF) == 0x000000FF /* last byte is 0xFF, not super correct, but a good approximation */)
        || ((daddr & 0x000000FF) == 0x00000000 /* last byte is 0x00, not super correct, but a good approximation */)
        || (daddr == 0xFFFFFFFF))
