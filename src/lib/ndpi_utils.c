@@ -3525,28 +3525,48 @@ int ndpi_snprintf(char * str, size_t size, char const * format, ...) {
 
 /* ******************************************* */
 
+static int risk_infos_pair_cmp (const void *_a, const void *_b)
+{
+  struct ndpi_risk_information *a = (struct ndpi_risk_information *)_a;
+  struct ndpi_risk_information *b = (struct ndpi_risk_information *)_b;
+
+  return b->id - a->id;
+}
+
+/* ******************************************* */
+
 char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 			      char *out, u_int out_len,
 			      u_int8_t use_json) {
   u_int i, offset = 0;
+  struct ndpi_risk_information *ordered_risk_infos;
 
   if((out == NULL)
      || (flow == NULL)
      || (flow->num_risk_infos == 0))
     return(NULL);
 
+  /* Ordered list of flow risk infos */
+  ordered_risk_infos = ndpi_malloc(sizeof(flow->risk_infos));
+  if(!ordered_risk_infos)
+    return(NULL);
+  memcpy(ordered_risk_infos, flow->risk_infos, sizeof(flow->risk_infos));
+  qsort(ordered_risk_infos, flow->num_risk_infos, sizeof(struct ndpi_risk_information), risk_infos_pair_cmp);
+
   if(use_json) {
     ndpi_serializer serializer;
     u_int32_t buffer_len;
     char *buffer;
 
-    if(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) == -1)
+    if(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) == -1) {
+      ndpi_free(ordered_risk_infos);
       return(NULL);
+    }
 
     for(i=0; i<flow->num_risk_infos; i++)
       ndpi_serialize_uint32_string(&serializer,
-				   flow->risk_infos[i].id,
-				   flow->risk_infos[i].info);
+                                   ordered_risk_infos[i].id,
+                                   ordered_risk_infos[i].info);
 
     buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
 
@@ -3559,6 +3579,7 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 
     ndpi_term_serializer(&serializer);
 
+    ndpi_free(ordered_risk_infos);
     return(out);
   } else {
     out[0] = '\0', out_len--;
@@ -3566,7 +3587,7 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
     for(i=0; (i<flow->num_risk_infos) && (out_len > offset); i++) {
       int rc = snprintf(&out[offset], out_len-offset, "%s%s",
 			(i == 0) ? "" : " / ",
-			flow->risk_infos[i].info);
+			ordered_risk_infos[i].info);
 
       if(rc <= 0)
 	break;
@@ -3578,6 +3599,7 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 
     out[offset] = '\0';
 
+    ndpi_free(ordered_risk_infos);
     return(out[0] == '\0' ? NULL : out);
   }
 }
