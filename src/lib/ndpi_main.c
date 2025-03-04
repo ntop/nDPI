@@ -8655,12 +8655,8 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
     }
 
     if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-      if(flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
-        u_int8_t protocol_was_guessed;
-
-        *ret = ndpi_detection_giveup(ndpi_str, flow, &protocol_was_guessed);
-      }
-
+      ret->proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
+      ret->proto.app_protocol = flow->guessed_protocol_id;
       flow->confidence = NDPI_CONFIDENCE_CUSTOM_RULE;
       ndpi_fill_protocol_category(ndpi_str, flow, ret);
       return(-1);
