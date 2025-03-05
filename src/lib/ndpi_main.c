@@ -7465,7 +7465,7 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
     else if(flow->packet_direction_complete_counter[!flow->client_packet_direction] == 0)
       ndpi_set_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No server to client traffic");
     else {
-      ndpi_unset_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
+      ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
     }
   }
 
@@ -7813,7 +7813,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   case NDPI_PROTOCOL_SFLOW:
   case NDPI_PROTOCOL_COLLECTD:
     /* Remove NDPI_UNIDIRECTIONAL_TRAFFIC from unidirectional protocols */
-    ndpi_unset_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
+    ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
     break;
 
   case NDPI_PROTOCOL_SYSLOG:
@@ -7821,7 +7821,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   case NDPI_PROTOCOL_SONOS:
   case NDPI_PROTOCOL_RTP:
     if(flow->l4_proto == IPPROTO_UDP)
-      ndpi_unset_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
+      ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
     break;
 
   case NDPI_PROTOCOL_TLS:
@@ -10471,19 +10471,27 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 					     string_to_match, string_to_match_len,
 					     &proto_id, NULL, NULL);
     if(rc1 > 0) {
-      char str[64] = { '\0' };
+      if(ndpi_str->cfg.flow_risk_infos_enabled) {
+        char str[64] = { '\0' };
 
-      strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
-      ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN, str);
+        strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
+        ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN, str);
+      } else {
+        ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN, NULL);
+      }
     }
   }
 
   /* Add punycode check */
   if(ndpi_check_punycode_string(string_to_match, string_to_match_len)) {
-    char str[64] = { '\0' };
+    if(ndpi_str->cfg.flow_risk_infos_enabled) {
+      char str[64] = { '\0' };
 
-    strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
-    ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, str);
+      strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
+      ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, str);
+    } else {
+      ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, NULL);
+    }
   }
 
   return(rc);
@@ -11762,6 +11770,7 @@ static const struct cfg_param {
   { NULL,            "metadata.tcp_fingerprint",                "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_fingerprint_enabled), NULL },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },
+  { NULL,            "flow_risk_infos",                         "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_infos_enabled), NULL },
 
   { NULL,            "flow_risk.$FLOWRISK_NAME_OR_ID",          "enable", NULL, NULL, CFG_PARAM_FLOWRISK_ENABLE_DISABLE, __OFF(flowrisk_bitmask), NULL },
 

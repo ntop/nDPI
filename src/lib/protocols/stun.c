@@ -882,7 +882,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
           reset_detected_protocol(flow);
           /* We keep the category related to STUN traffic */
           /* STUN often triggers this risk; clear it. TODO: clear other risks? */
-          ndpi_unset_risk(flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+          ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
 
           /* Give room for DTLS handshake, where we might have
              retransmissions and fragments */

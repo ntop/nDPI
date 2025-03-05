@@ -199,11 +199,15 @@ static void ndpi_http_check_human_redeable_content(struct ndpi_detection_module_
 	 && (content[3] == 0x00)) {
 	/* Looks like compressed data */
       } else {
-	char str[32];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+	  char str[32];
 
-	snprintf(str, sizeof(str), "Susp content %02X%02X%02X%02X",
-		 content[0], content[1], content[2], content[3]);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_CONTENT, str);
+	  snprintf(str, sizeof(str), "Susp content %02X%02X%02X%02X",
+		   content[0], content[1], content[2], content[3]);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_CONTENT, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_CONTENT, NULL);
+        }
       }
     }
   }
@@ -493,7 +497,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
   if(packet->server_line.len > 7 &&
      strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
-    ndpi_unset_risk(flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+    ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
   }
 
   /* Matching on Content-Type.
@@ -714,10 +718,14 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
       float upper_case_ratio = (float)upper_case_count / (float)ua_len;
 
       if (upper_case_ratio >= 0.2f) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "UA %s", ua);
-        ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, str);
+	  snprintf(str, sizeof(str), "UA %s", ua);
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, NULL);
+        }
       }
     }
   }
@@ -725,20 +733,28 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
   if((!strncmp(ua, "<?", 2))
      || strchr(ua, '$')
      ) {
-    char str[64];
+    if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+      char str[64];
 
-    snprintf(str, sizeof(str), "UA %s", ua);
-    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, str);
+      snprintf(str, sizeof(str), "UA %s", ua);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, str);
+    } else {
+      ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, NULL);
+    }
   }
 
   if((double_slash = strstr(ua, "://")) != NULL) {
     if(double_slash != ua) /* We're not at the beginning of the user agent */{
       if((double_slash[-1] != 'p') /* http:// */
 	 && (double_slash[-1] != 's') /* https:// */) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "UA %s", ua);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, str);
+	  snprintf(str, sizeof(str), "UA %s", ua);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT, NULL);
+        }
       }
     }
   }
@@ -766,11 +782,15 @@ static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_stru
      || ndpi_strncasestr(ua, "Crawler", ua_len)
      || ndpi_strncasestr(ua, "Bot", ua_len) /* bot/robot */
      ) {
-    char str[64];
+    if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+      char str[64];
 
-    snprintf(str, sizeof(str), "UA %s", ua);
+      snprintf(str, sizeof(str), "UA %s", ua);
 
-    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_CRAWLER_BOT, str);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_CRAWLER_BOT, str);
+    } else {
+      ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_CRAWLER_BOT, NULL);
+    }
   }
 }
 
@@ -839,7 +859,7 @@ static void http_process_user_agent(struct ndpi_detection_module_struct *ndpi_st
   }
 
   if(ndpi_user_agent_set(flow, ua_ptr, ua_ptr_len) != NULL) {
-    ndpi_unset_risk(flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+    ndpi_unset_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
     ndpi_check_user_agent(ndpi_struct, flow, flow->http.user_agent, ua_ptr_len);
   } else {
     NDPI_LOG_DBG2(ndpi_struct, "Could not set HTTP user agent (already set?)\n");
@@ -865,10 +885,14 @@ static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_stru
 
   ip_addr.s_addr = inet_addr(buf);
   if(strcmp(inet_ntoa(ip_addr), buf) == 0) {
-    char str[64];
+    if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+      char str[64];
 
-    snprintf(str, sizeof(str), "Found host %s", buf);
-    ndpi_set_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST, str);
+      snprintf(str, sizeof(str), "Found host %s", buf);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST, str);
+    } else {
+      ndpi_set_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST, NULL);
+    }
   }
 }
 
@@ -911,11 +935,19 @@ static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_str
 	  char msg[64];
 
 	  if((off == 7) && (version < MIN_APACHE_VERSION)) {
-	    snprintf(msg, sizeof(msg), "Obsolete Apache server %s", buf);
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
+	    if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+	      snprintf(msg, sizeof(msg), "Obsolete Apache server %s", buf);
+	      ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
+	    } else {
+	      ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, NULL);
+	    }
 	  } else if((off == 6) && (version < MIN_NGINX_VERSION)) {
-	    snprintf(msg, sizeof(msg), "Obsolete nginx server %s", buf);
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
+	    if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+	      snprintf(msg, sizeof(msg), "Obsolete nginx server %s", buf);
+	      ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, msg);
+	    } else {
+	      ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER, NULL);
+	    }
 	  }
 	}
       }
@@ -1129,10 +1161,14 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
       if(ndpi_is_valid_hostname((char *)packet->host_line.ptr,
 				packet->host_line.len) == 0) {
-	char str[128];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+	  char str[128];
 
-	snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
+	  snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, NULL);
+        }
 
 	/* This looks like an attack */
 	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
@@ -1145,11 +1181,15 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
         /* IPv4 */
 
         if(ndpi_struct->packet.iph->daddr != inet_addr(flow->host_server_name)) {
-	  char buf[64], msg[128];
+          if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+            char buf[64], msg[128];
 
-	  snprintf(msg, sizeof(msg), "Expected %s, found %s",
-		   ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)), flow->host_server_name);
-	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
+	    snprintf(msg, sizeof(msg), "Expected %s, found %s",
+		     ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)), flow->host_server_name);
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
+          } else {
+            ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+          }
         }
       }
     }
@@ -1286,82 +1326,118 @@ static void ndpi_check_http_header(struct ndpi_detection_module_struct *ndpi_str
     switch(packet->line[i].ptr[0]) {
     case 'A':
       if(is_a_suspicious_header(suspicious_http_header_keys_A, packet->line[i])) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+	  snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+        }
 	return;
       }
       break;
     case 'C':
       if(is_a_suspicious_header(suspicious_http_header_keys_C, packet->line[i])) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+	  snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+        }
 	return;
       }
       break;
     case 'M':
       if(is_a_suspicious_header(suspicious_http_header_keys_M, packet->line[i])) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+	  snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+        }
 	return;
       }
       break;
     case 'O':
       if(is_a_suspicious_header(suspicious_http_header_keys_O, packet->line[i])) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+	  snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+        }
 	return;
       }
       break;
     case 'R':
       if(is_a_suspicious_header(suspicious_http_header_keys_R, packet->line[i])) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+	  snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+        }
 	return;
       }
       break;
     case 'S':
       if(is_a_suspicious_header(suspicious_http_header_keys_S, packet->line[i])) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+	  snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+        }
 	return;
       }
       break;
     case 'T':
       if(is_a_suspicious_header(suspicious_http_header_keys_T, packet->line[i])) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+	  snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+        }
 	return;
       }
       break;
     case 'U':
       if(is_a_suspicious_header(suspicious_http_header_keys_U, packet->line[i])) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+	  snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+        }
 	return;
       }
       break;
     case 'X':
       if(is_a_suspicious_header(suspicious_http_header_keys_X, packet->line[i])) {
-	char str[64];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[64];
 
-	snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+	  snprintf(str, sizeof(str), "Found %.*s", packet->line[i].len, packet->line[i].ptr);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
+        }
 	return;
       }
 
@@ -1557,19 +1633,19 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
   /* Reset flow risks. We should reset only those risks triggered by
      the previous HTTP response... */
   /* TODO */
-  ndpi_unset_risk(flow, NDPI_BINARY_APPLICATION_TRANSFER);
-  ndpi_unset_risk(flow, NDPI_HTTP_SUSPICIOUS_CONTENT);
-  ndpi_unset_risk(flow, NDPI_POSSIBLE_EXPLOIT);
-  ndpi_unset_risk(flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
-  ndpi_unset_risk(flow, NDPI_HTTP_CRAWLER_BOT);
-  ndpi_unset_risk(flow, NDPI_NUMERIC_IP_HOST);
-  ndpi_unset_risk(flow, NDPI_URL_POSSIBLE_RCE_INJECTION);
-  ndpi_unset_risk(flow, NDPI_HTTP_OBSOLETE_SERVER);
-  ndpi_unset_risk(flow, NDPI_CLEAR_TEXT_CREDENTIALS);
-  ndpi_unset_risk(flow, NDPI_INVALID_CHARACTERS);
-  ndpi_unset_risk(flow, NDPI_HTTP_SUSPICIOUS_HEADER);
-  ndpi_unset_risk(flow, NDPI_ERROR_CODE_DETECTED);
-  ndpi_unset_risk(flow, NDPI_MALFORMED_PACKET);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_BINARY_APPLICATION_TRANSFER);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_CONTENT);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_HTTP_CRAWLER_BOT);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_URL_POSSIBLE_RCE_INJECTION);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_HTTP_OBSOLETE_SERVER);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET);
 }
 
 static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,

@@ -3103,7 +3103,8 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_fl
     // ndpi_handle_risk_exceptions(ndpi_str, flow);
 
     if(flow->risk != 0 /* check if it has been masked */) {
-      if(risk_message != NULL) {
+      if(ndpi_str->cfg.flow_risk_infos_enabled &&
+         risk_message != NULL) {
 	if(flow->num_risk_infos < MAX_NUM_RISK_INFOS) {
 	  char *s = ndpi_strdup(risk_message);
 
@@ -3115,7 +3116,7 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_fl
 	}
       }
     }
-  } else if(risk_message) {
+  } else if(ndpi_str->cfg.flow_risk_infos_enabled && risk_message) {
     u_int8_t i;
 
     for(i = 0; i < flow->num_risk_infos; i++)
@@ -3140,12 +3141,16 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_fl
 
 /* ******************************************************************** */
 
-void ndpi_unset_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
+void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
+                     struct ndpi_flow_struct *flow, ndpi_risk_enum r) {
   if(ndpi_isset_risk(flow, r)) {
     u_int8_t i, j;
     ndpi_risk v = 1ull << r;
 
     flow->risk &= ~v;
+
+    if(!ndpi_str->cfg.flow_risk_infos_enabled)
+      return;
 
     for(i = 0; i < flow->num_risk_infos; i++) {
       if(flow->risk_infos[i].id == r) {
@@ -3321,7 +3326,7 @@ void ndpi_entropy2risk(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
 reset_risk:
-  ndpi_unset_risk(flow, NDPI_SUSPICIOUS_ENTROPY);
+  ndpi_unset_risk(ndpi_struct, flow, NDPI_SUSPICIOUS_ENTROPY);
 }
 
 /* ******************************************************************** */

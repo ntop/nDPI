@@ -331,6 +331,7 @@ struct ndpi_detection_module_config_struct {
   NDPI_PROTOCOL_BITMASK flowrisk_bitmask;
 
   int flow_risk_lists_enabled;
+  int flow_risk_infos_enabled;
   int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
   int risk_anonymous_subscriber_list_protonvpn_enabled;
   int risk_anonymous_subscriber_list_tor_exit_nodes_enabled;
