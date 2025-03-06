@@ -1668,6 +1668,10 @@ static ndpi_protocol_match host_match[] =
    { "6fast.com",                        "LagoFast", NDPI_PROTOCOL_LAGOFAST, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "lagofast.com",                     "LagoFast", NDPI_PROTOCOL_LAGOFAST, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   /* GearUP Booster */
+   { "gearupportal.com.cdn.cloudflare.net", "GearUP_Booster", NDPI_PROTOCOL_GEARUP_BOOSTER, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "gearupportal.com",                 "GearUP_Booster", NDPI_PROTOCOL_GEARUP_BOOSTER, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif

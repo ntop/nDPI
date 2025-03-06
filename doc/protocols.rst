@@ -1139,3 +1139,11 @@ References: `Main site <http://rutube.ru/>`_
 LagoFast Game Booster ensures ultra-smooth gaming on any device with reduced lag, packet loss, and increased FPS. Guaranteeing faster connections, maximum performance, and network stability for every game.
 
 References: `Main site <https://www.lagofast.com/>`_
+
+.. _Proto 445:
+
+`NDPI_PROTOCOL_GEARUP_BOOSTER`
+==============================
+A game booster that reduces game lag.
+
+References: `Main site <https://www.gearupbooster.com/>`_

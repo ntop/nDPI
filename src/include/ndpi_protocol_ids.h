@@ -473,6 +473,7 @@ typedef enum {
   NDPI_PROTOCOL_DIGITALOCEAN          = 442,
   NDPI_PROTOCOL_RUTUBE                = 443,
   NDPI_PROTOCOL_LAGOFAST              = 444,
+  NDPI_PROTOCOL_GEARUP_BOOSTER        = 445,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
