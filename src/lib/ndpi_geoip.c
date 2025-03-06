@@ -123,6 +123,49 @@ int ndpi_get_geoip_asn(struct ndpi_detection_module_struct *ndpi_str, char *ip, 
   return (-2);
 }
 
+int ndpi_get_geoip_aso(struct ndpi_detection_module_struct *ndpi_str, char *ip, char *aso, u_int8_t aso_len)
+{
+#ifdef HAVE_MAXMINDDB
+  int gai_error, mmdb_error, status;
+  MMDB_lookup_result_s result;
+  MMDB_entry_data_s entry_data;
+
+  if (ndpi_str->mmdb_as_loaded && aso_len > 0)
+  {
+    result = MMDB_lookup_string((MMDB_s *)ndpi_str->mmdb_as, ip, &gai_error, &mmdb_error);
+
+    if ((gai_error != 0) || (mmdb_error != MMDB_SUCCESS) || (!result.found_entry))
+      aso[0] = '\0';
+    else
+    {
+      /* Get the ASO */
+      if (aso_len > 0)
+      {
+        status = MMDB_get_value(&result.entry, &entry_data, "autonomous_system_organization", NULL);
+        if (status != MMDB_SUCCESS || !entry_data.has_data)
+          aso[0] = '\0';
+        else
+        {
+          int str_len = ndpi_min(entry_data.data_size, aso_len);
+
+          memcpy(aso, entry_data.utf8_string, str_len);
+          aso[str_len] = '\0';
+        }
+      }
+    }
+
+    return (0);
+  }
+#else
+  (void)ndpi_str;
+  (void)ip;
+  (void)aso;
+  (void)aso_len;
+#endif
+
+  return (-2);
+}
+
 /* ********************************************************************************* */
 
 int ndpi_get_geoip_country_continent(struct ndpi_detection_module_struct *ndpi_str, char *ip,

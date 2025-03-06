@@ -18,16 +18,17 @@ int main()
         return 1;
     }
 
-    char country[50], continent[50], city[50];
+    char country[50], continent[50], city[50], aso[50];
+    u_int32_t asn;
 
-    ndpi_get_geoip_country_continent_city(ndpi_info_mod, "24.124.1.8", country, sizeof(country), continent, sizeof(continent), city, sizeof(city));
-    printf("1\n\tCountry: %s\n\tContinent: %s\n\tCity: %s\n", country, continent, city);
-    ndpi_get_geoip_country_continent_city(ndpi_info_mod, "8.8.8.8", country, sizeof(country), continent, sizeof(continent), city, sizeof(city));
-    printf("2\n\tCountry: %s\n\tContinent: %s\n\tCity: %s\n", country, continent, city);
-    ndpi_get_geoip_country_continent_city(ndpi_info_mod, "161.148.164.31", country, sizeof(country), continent, sizeof(continent), city, sizeof(city));
-    printf("3\n\tCountry: %s\n\tContinent: %s\n\tCity: %s\n", country, continent, city);
-    ndpi_get_geoip_country_continent_city(ndpi_info_mod, "184.74.73.88", country, sizeof(country), continent, sizeof(continent), city, sizeof(city));
-    printf("4\n\tCountry: %s\n\tContinent: %s\n\tCity: %s\n", country, continent, city);
+    char *ips[] = {"24.124.1.8", "8.8.8.8", "161.148.164.31", "184.74.73.88"};
+
+    for (u_int8_t i = 0; i < sizeof(ips)/sizeof(ips[0]); i++) {
+        ndpi_get_geoip_country_continent_city(ndpi_info_mod, ips[i], country, sizeof(country), continent, sizeof(continent), city, sizeof(city));
+        ndpi_get_geoip_aso(ndpi_info_mod, ips[i], aso, sizeof(aso));
+        ndpi_get_geoip_asn(ndpi_info_mod, ips[i], &asn);
+        printf("%u\n\tCountry: %s\n\tContinent: %s\n\tCity: %s\n\tASN: %u\n\tASO: %s\n\n", i + 1, country, continent, city, asn, aso);
+    }
 
     ndpi_exit_detection_module(ndpi_info_mod);
 

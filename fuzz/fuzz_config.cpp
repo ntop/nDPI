@@ -830,6 +830,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   }
   /* TODO: stub for geo stuff */
   ndpi_get_geoip_asn(ndpi_info_mod, NULL, NULL);
+  ndpi_get_geoip_aso(ndpi_info_mod, NULL, NULL, 0);
   ndpi_get_geoip_country_continent(ndpi_info_mod, NULL, NULL, 0, NULL, 0);
   ndpi_get_geoip_country_continent_city(ndpi_info_mod, NULL, NULL, 0, NULL, 0, NULL, 0);
 
