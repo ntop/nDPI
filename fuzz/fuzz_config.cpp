@@ -491,6 +491,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk_infos", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
@@ -688,6 +693,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_proto_by_name(ndpi_info_mod, NULL); /* Error */
   ndpi_get_proto_by_name(ndpi_info_mod, "foo"); /* Invalid protocol */
   ndpi_get_proto_name(ndpi_info_mod, pid);
+  ndpi_find_protocol_qoe(ndpi_info_mod, pid);
 
   struct in_addr pin;
   struct in6_addr pin6;
@@ -753,6 +759,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   proto2.app_protocol = fuzzed_data.ConsumeIntegral<u_int16_t>();
   proto2.master_protocol = fuzzed_data.ConsumeIntegral<u_int16_t>();
   ndpi_is_proto_equals(proto1, proto2, fuzzed_data.ConsumeBool());
+
+  ndpi_rtp_payload_type2str(fuzzed_data.ConsumeIntegral<u_int8_t>(), fuzzed_data.ConsumeIntegral<u_int32_t>());
 
   char buf2[16];
   ndpi_entropy2str(fuzzed_data.ConsumeFloatingPoint<float>(), fuzzed_data.ConsumeBool() ? buf2 : NULL, sizeof(buf2));

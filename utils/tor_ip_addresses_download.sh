@@ -7,26 +7,34 @@ cd "$(dirname "${0}")" || exit 1
 DEST=../src/lib/inc_generated/ndpi_tor_match.c.inc
 LIST=/tmp/tor.list
 LIST_MERGED=/tmp/tor.list_m
-# There are at least two lists:
-#  * https://torstatus.rueckgr.at/ip_list_all.php/Tor_ip_list_ALL.csv
-#  * https://check.torproject.org/torbulkexitlist
-# The latter seems to be more "stable" (the former changes every few seconds!)
-ORIGIN="https://check.torproject.org/torbulkexitlist"
-
+LIST6_MERGED=/tmp/tor.list_m6
+LIST_MERGED_U=/tmp/tor.list_m_u
+LIST6_MERGED_U=/tmp/tor.list_m6_u
+#Only the ingress addresses, since this list is used for classification!
+ORIGIN="https://raw.githubusercontent.com/alireza-rezaee/tor-nodes/refs/heads/main/latest.guards.csv"
 
 echo "(1) Downloading file... ${ORIGIN}"
 http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${LIST}"
-./mergeipaddrlist.py $LIST > $LIST_MERGED
-is_file_empty "${LIST_MERGED}"
-
-#TODO: TOR relays don't support ipv6 yet
 
 echo "(2) Processing IP addresses..."
-./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_TOR > $DEST
-rm -f "${LIST}" "${LIST_MERGED}"
+cat "${LIST}" | cut -d ',' -f 2 | grep '\.' | tr -d '[:blank:]' > "${LIST}.ipv4"
+cat "${LIST}" | cut -d ',' -f 2 | grep ':'  | tr -d '[:blank:]' > "${LIST}.ipv6"
+
+./mergeipaddrlist.py ${LIST}.ipv4 > $LIST_MERGED
+is_file_empty "${LIST_MERGED}"
+
+./mergeipaddrlist.py ${LIST}.ipv6 > $LIST6_MERGED
+is_file_empty "${LIST6_MERGED}"
+
+sort -u $LIST_MERGED  > $LIST_MERGED_U
+sort -u $LIST6_MERGED > $LIST6_MERGED_U
+
+./ipaddr2list.py $LIST_MERGED_U NDPI_PROTOCOL_TOR $LIST6_MERGED_U > $DEST
 is_file_empty "${DEST}"
+
+rm -f ${TMP} ${LIST} ${LIST}.ipv4 ${LIST}.ipv6 ${LIST_MERGED} ${LIST6_MERGED} ${LIST_MERGED_U} ${LIST6_MERGED_U}
 
 echo "(3) TOR IPs are available in $DEST"
 exit 0

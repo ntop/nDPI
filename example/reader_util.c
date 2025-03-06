@@ -1935,13 +1935,9 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
     if((human_readeable_string_len != 0) && (!flow->has_human_readeable_strings)) {
       u_int8_t skip = 0;
 
-      if((proto == IPPROTO_TCP)
-	 && (
-	     is_ndpi_proto(flow, NDPI_PROTOCOL_TLS)
-	     || (flow->detected_protocol.proto.master_protocol == NDPI_PROTOCOL_TLS)
-	     || is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)
-	     || (flow->detected_protocol.proto.master_protocol == NDPI_PROTOCOL_SSH))
-	 ) {
+      if(proto == IPPROTO_TCP &&
+	 (is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) ||
+	  is_ndpi_proto(flow, NDPI_PROTOCOL_SSH))) {
 	if((flow->src2dst_packets+flow->dst2src_packets) < 10 /* MIN_NUM_ENCRYPT_SKIP_PACKETS */)
 	  skip = 1; /* Skip initial negotiation packets */
       }
@@ -1954,13 +1950,9 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 	  flow->has_human_readeable_strings = 1;
       }
     } else {
-      if((proto == IPPROTO_TCP)
-	 && (
-	     is_ndpi_proto(flow, NDPI_PROTOCOL_TLS)
-	     || (flow->detected_protocol.proto.master_protocol == NDPI_PROTOCOL_TLS)
-	     || is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)
-	     || (flow->detected_protocol.proto.master_protocol == NDPI_PROTOCOL_SSH))
-	 )
+      if(proto == IPPROTO_TCP &&
+         (is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) ||
+          is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)))
 	flow->has_human_readeable_strings = 0;
     }
   } else { // flow is NULL

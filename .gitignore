@@ -82,6 +82,7 @@
 /fuzz/fuzz_ds_domain_classify
 /fuzz/fuzz_ds_kdtree
 /fuzz/fuzz_ds_btree
+/fuzz/fuzz_ds_address_cache
 /fuzz/fuzz_libinjection
 /fuzz/fuzz_binaryfusefilter
 /fuzz/fuzz_tls_certificate

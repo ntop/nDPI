@@ -69,6 +69,7 @@
 #include "ndpi_dga_match.c.inc"
 #include "inc_generated/ndpi_azure_match.c.inc"
 #include "inc_generated/ndpi_tor_match.c.inc"
+#include "inc_generated/ndpi_tor_exit_nodes_match.c.inc"
 #include "inc_generated/ndpi_whatsapp_match.c.inc"
 #include "inc_generated/ndpi_amazon_aws_match.c.inc"
 #include "inc_generated/ndpi_ethereum_match.c.inc"
@@ -471,6 +472,8 @@ int is_flow_addr_informative(const struct ndpi_flow_struct *flow)
     /* This is basically the list of VPNs (with **entry** addresses) supported by nDPI */
   case NDPI_PROTOCOL_NORDVPN:
   case NDPI_PROTOCOL_PROTONVPN:
+  case NDPI_PROTOCOL_SURFSHARK:
+  case NDPI_PROTOCOL_TOR:
     return 0;
   default:
     return 1;
@@ -3925,6 +3928,11 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
       ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk->v6, ndpi_anonymous_subscriber_protonvpn_protocol_list_6);
     }
 
+    if(ndpi_str->cfg.risk_anonymous_subscriber_list_tor_exit_nodes_enabled) {
+      ndpi_init_ptree_ipv4(ndpi_str->ip_risk->v4, ndpi_anonymous_subscriber_tor_exit_nodes_protocol_list);
+      ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk->v6, ndpi_anonymous_subscriber_tor_exit_nodes_protocol_list_6);
+    }
+
     if(ndpi_str->cfg.risk_crawler_bot_list_enabled) {
       ndpi_init_ptree_ipv4(ndpi_str->ip_risk->v4, ndpi_http_crawler_bot_protocol_list);
       ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk->v6, ndpi_http_crawler_bot_protocol_list_6);
@@ -4500,9 +4508,8 @@ static default_ports_tree_node_t *ndpi_get_guessed_protocol_id(struct ndpi_detec
 
 /* ****************************************************** */
 
-static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str,
                                    u_int8_t proto, u_int16_t sport, u_int16_t dport, u_int8_t *user_defined_proto) {
-  struct ndpi_packet_struct *packet = &ndpi_str->packet;
   *user_defined_proto = 0; /* Default */
 
   if(sport && dport) {
@@ -4528,46 +4535,6 @@ static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str
     case NDPI_PIM_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_PIM);
     case NDPI_ICMP_PROTOCOL_TYPE:
-      if(flow && (packet->payload_packet_len > 0)) {
-        flow->entropy = 0.0f;
-	/* Run some basic consistency tests */
-
-	if(packet->payload_packet_len < sizeof(struct ndpi_icmphdr)) {
-	  char buf[64];
-
-	  snprintf(buf, sizeof(buf), "Packet too short (%d vs %u)",
-		   packet->payload_packet_len, (unsigned int)sizeof(struct ndpi_icmphdr));
-	  ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, buf);
-	} else {
-	  u_int8_t icmp_type = (u_int8_t)packet->payload[0];
-	  u_int8_t icmp_code = (u_int8_t)packet->payload[1];
-
-	  /* https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml */
-	  if(((icmp_type >= 44) && (icmp_type <= 252))
-	     || (icmp_code > 15)) {
-	    char buf[64];
-
-	    snprintf(buf, sizeof(buf), "Invalid type (%u)/code(%u)",
-		     icmp_type, icmp_code);
-
-	    ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, buf);
-	  }
-
-	  if(packet->payload_packet_len > sizeof(struct ndpi_icmphdr)) {
-	    if(ndpi_str->cfg.compute_entropy && (flow->skip_entropy_check == 0)) {
-	      flow->entropy = ndpi_entropy(packet->payload + sizeof(struct ndpi_icmphdr),
-	                                   packet->payload_packet_len - sizeof(struct ndpi_icmphdr));
-	      ndpi_entropy2risk(ndpi_str, flow);
-	    }
-
-	    u_int16_t chksm = icmp4_checksum(packet->payload, packet->payload_packet_len);
-
-	    if(chksm) {
-	      ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, "Invalid ICMP checksum");
-	    }
-	  }
-	}
-      }
       return(NDPI_PROTOCOL_IP_ICMP);
     case NDPI_IGMP_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_IGMP);
@@ -4580,32 +4547,6 @@ static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str
     case NDPI_IPIP_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_IP_IN_IP);
     case NDPI_ICMPV6_PROTOCOL_TYPE:
-      if(flow && (packet->payload_packet_len > 0 /* is 0 when guessing */)) {
-	/* Run some basic consistency tests */
-
-	if(packet->payload_packet_len < sizeof(struct ndpi_icmp6hdr)) {
-	  char buf[64];
-
-	  snprintf(buf, sizeof(buf), "Packet too short (%d vs %u)",
-		   packet->payload_packet_len, (unsigned int)sizeof(struct ndpi_icmp6hdr));
-
-	  ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, buf);
-	} else {
-	  u_int8_t icmp6_type = (u_int8_t)packet->payload[0];
-	  u_int8_t icmp6_code = (u_int8_t)packet->payload[1];
-
-	  /* https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6 */
-	  if(((icmp6_type >= 5) && (icmp6_type <= 127))
-	     || ((icmp6_code >= 156) && (icmp6_type != 255))) {
- 	    char buf[64];
-
-	    snprintf(buf, sizeof(buf), "Invalid type (%u)/code(%u)",
-		     icmp6_type, icmp6_code);
-
-	    ndpi_set_risk(ndpi_str, flow, NDPI_MALFORMED_PACKET, buf);
-	  }
-	}
-      }
       return(NDPI_PROTOCOL_IP_ICMPV6);
     case NDPI_VRRP_PROTOCOL_TYPE:
       return(NDPI_PROTOCOL_IP_VRRP);
@@ -6997,7 +6938,6 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
   packet->l3_packet_len = packetlen;
 
   packet->tcp = NULL, packet->udp = NULL;
-  packet->generic_l4_ptr = NULL;
   packet->iphv6 = NULL;
 
   l3len = packet->l3_packet_len;
@@ -7169,7 +7109,8 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
     packet->payload = ((u_int8_t *) l4ptr);
     packet->payload_packet_len = l4_packet_len;
   } else {
-    packet->generic_l4_ptr = l4ptr;
+    packet->payload = ((u_int8_t *) l4ptr);
+    packet->payload_packet_len = l4_packet_len;
   }
 
   return(0);
@@ -7183,7 +7124,7 @@ static u_int8_t ndpi_is_multi_or_broadcast(struct ndpi_packet_struct *packet) {
     /* IPv4 */
     u_int32_t daddr = ntohl(packet->iph->daddr);
 
-    if(((daddr & 0xE0000000) == 0xE0000000 /* multicast */)
+    if(((daddr & 0xF0000000) == 0xE0000000 /* multicast 224.0.0.0/4 */)
        || ((daddr & 0x000000FF) == 0x000000FF /* last byte is 0xFF, not super correct, but a good approximation */)
        || ((daddr & 0x000000FF) == 0x00000000 /* last byte is 0x00, not super correct, but a good approximation */)
        || (daddr == 0xFFFFFFFF))
@@ -7524,7 +7465,7 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
     else if(flow->packet_direction_complete_counter[!flow->client_packet_direction] == 0)
       ndpi_set_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No server to client traffic");
     else {
-      ndpi_unset_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
+      ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
     }
   }
 
@@ -7872,7 +7813,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   case NDPI_PROTOCOL_SFLOW:
   case NDPI_PROTOCOL_COLLECTD:
     /* Remove NDPI_UNIDIRECTIONAL_TRAFFIC from unidirectional protocols */
-    ndpi_unset_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
+    ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
     break;
 
   case NDPI_PROTOCOL_SYSLOG:
@@ -7880,7 +7821,7 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
   case NDPI_PROTOCOL_SONOS:
   case NDPI_PROTOCOL_RTP:
     if(flow->l4_proto == IPPROTO_UDP)
-      ndpi_unset_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
+      ndpi_unset_risk(ndpi_str, flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
     break;
 
   case NDPI_PROTOCOL_TLS:
@@ -8686,7 +8627,7 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
     u_int8_t user_defined_proto;
 
     /* guess protocol */
-    flow->guessed_protocol_id = (int16_t) guess_protocol_id(ndpi_str, flow, flow->l4_proto,
+    flow->guessed_protocol_id = (int16_t) guess_protocol_id(ndpi_str, flow->l4_proto,
 							    ntohs(flow->c_port), ntohs(flow->s_port),
 							    &user_defined_proto);
     flow->guessed_protocol_id_by_ip = ndpi_guess_host_protocol_id(ndpi_str, flow);
@@ -8714,12 +8655,8 @@ static int ndpi_do_guess(struct ndpi_detection_module_struct *ndpi_str, struct n
     }
 
     if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
-      if(flow->guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
-        u_int8_t protocol_was_guessed;
-
-        *ret = ndpi_detection_giveup(ndpi_str, flow, &protocol_was_guessed);
-      }
-
+      ret->proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
+      ret->proto.app_protocol = flow->guessed_protocol_id;
       flow->confidence = NDPI_CONFIDENCE_CUSTOM_RULE;
       ndpi_fill_protocol_category(ndpi_str, flow, ret);
       return(-1);
@@ -9823,7 +9760,7 @@ static ndpi_protocol ndpi_internal_guess_undetected_protocol(struct ndpi_detecti
       ret.proto.app_protocol = NDPI_PROTOCOL_BITTORRENT;
     }
   } else {
-    ret.proto.app_protocol = guess_protocol_id(ndpi_str, flow, proto, 0, 0, &user_defined_proto);
+    ret.proto.app_protocol = guess_protocol_id(ndpi_str, proto, 0, 0, &user_defined_proto);
   }
 
   ret.category = ndpi_get_proto_category(ndpi_str, ret);
@@ -9858,12 +9795,12 @@ ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_str
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
       ret.proto.app_protocol = rc,
-	ret.proto.master_protocol = guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto);
+	ret.proto.master_protocol = guess_protocol_id(ndpi_str, proto, sport, dport, &user_defined_proto);
 
       if(ret.proto.app_protocol == ret.proto.master_protocol)
 	ret.proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     } else {
-      ret.proto.app_protocol = guess_protocol_id(ndpi_str, flow, proto, sport, dport, &user_defined_proto),
+      ret.proto.app_protocol = guess_protocol_id(ndpi_str, proto, sport, dport, &user_defined_proto),
 	ret.proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     }
 
@@ -10534,19 +10471,27 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 					     string_to_match, string_to_match_len,
 					     &proto_id, NULL, NULL);
     if(rc1 > 0) {
-      char str[64] = { '\0' };
+      if(ndpi_str->cfg.flow_risk_infos_enabled) {
+        char str[64] = { '\0' };
 
-      strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
-      ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN, str);
+        strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
+        ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN, str);
+      } else {
+        ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN, NULL);
+      }
     }
   }
 
   /* Add punycode check */
   if(ndpi_check_punycode_string(string_to_match, string_to_match_len)) {
-    char str[64] = { '\0' };
+    if(ndpi_str->cfg.flow_risk_infos_enabled) {
+      char str[64] = { '\0' };
 
-    strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
-    ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, str);
+      strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
+      ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, str);
+    } else {
+      ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, NULL);
+    }
   }
 
   return(rc);
@@ -11825,11 +11770,13 @@ static const struct cfg_param {
   { NULL,            "metadata.tcp_fingerprint",                "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_fingerprint_enabled), NULL },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },
+  { NULL,            "flow_risk_infos",                         "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_infos_enabled), NULL },
 
   { NULL,            "flow_risk.$FLOWRISK_NAME_OR_ID",          "enable", NULL, NULL, CFG_PARAM_FLOWRISK_ENABLE_DISABLE, __OFF(flowrisk_bitmask), NULL },
 
   { NULL,            "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_icloudprivaterelay_enabled), NULL },
   { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_protonvpn_enabled), NULL },
+  { NULL,            "flow_risk.anonymous_subscriber.list.tor.load",                "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_tor_exit_nodes_enabled), NULL },
   { NULL,            "flow_risk.crawler_bot.list.load",                             "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_crawler_bot_list_enabled), NULL },
 
   { NULL,            "filename.config",                         NULL, NULL, NULL, CFG_PARAM_FILENAME_CONFIG, __OFF(filename_config), NULL },

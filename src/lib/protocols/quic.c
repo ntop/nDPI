@@ -1468,10 +1468,14 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 
       if(ndpi_is_valid_hostname((char *)&crypto_data[tag_offset_start + prev_offset],
 				len) == 0) {
-	char str[128];
+        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+          char str[128];
 
-	snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
+	  snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
+        } else {
+          ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, NULL);
+        }
 	
 	/* This looks like an attack */
 	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");

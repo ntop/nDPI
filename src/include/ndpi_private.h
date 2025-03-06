@@ -104,7 +104,6 @@ struct ndpi_packet_struct {
   const struct ndpi_ipv6hdr *iphv6;
   const struct ndpi_tcphdr *tcp;
   const struct ndpi_udphdr *udp;
-  const u_int8_t *generic_l4_ptr;	/* is set only for non tcp-udp traffic */
   const u_int8_t *payload;
 
   u_int64_t current_time_ms;
@@ -332,8 +331,10 @@ struct ndpi_detection_module_config_struct {
   NDPI_PROTOCOL_BITMASK flowrisk_bitmask;
 
   int flow_risk_lists_enabled;
+  int flow_risk_infos_enabled;
   int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
   int risk_anonymous_subscriber_list_protonvpn_enabled;
+  int risk_anonymous_subscriber_list_tor_exit_nodes_enabled;
   int risk_crawler_bot_list_enabled;
 };
 
