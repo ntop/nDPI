@@ -1006,6 +1006,7 @@ void init_dingtalk_dissector(struct ndpi_detection_module_struct *ndpi_struct, u
 void init_paltalk_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_dicom_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_lagofast_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_gearup_booster_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS

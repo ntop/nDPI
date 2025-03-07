@@ -245,6 +245,7 @@
     <ClCompile Include="..\src\lib\protocols\edonkey.c" />
     <ClCompile Include="..\src\lib\protocols\ftp_control.c" />
     <ClCompile Include="..\src\lib\protocols\ftp_data.c" />
+    <ClCompile Include="..\src\lib\protocols\gearup_booster.c" />
     <ClCompile Include="..\src\lib\protocols\git.c" />
     <ClCompile Include="..\src\lib\protocols\gnutella.c" />
     <ClCompile Include="..\src\lib\protocols\gtp.c" />
