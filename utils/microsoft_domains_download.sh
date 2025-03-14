@@ -47,12 +47,21 @@ jq -r '.[] | select(.serviceArea=="SharePoint") | .urls[]?' < $TMP | sed 's/^\*\
 #OFFICE
 # On .id 125 there are mainly some generic domains for certificate management like digicert, verisign. Specific
 # microsoft domains are classified via the generic "catch-all" rules in ndpi_content_match.c.in
-jq -r '.[] | select(.serviceArea=="Common" and .id != 125) | .urls[]?' < $TMP | sed 's/^\*\.//' | sort -u | uniq > $LIST
-#TODO: NDPI_PROTOCOL_MICROSOFT_365 or NDPI_PROTOCOL_MICROSOFT?
+#
+# Skip also the three generic domains (on .id 50 and 78): *.microsoft.com, *.msocdn.com, *.onmicrosoft.com
+# As reported in the web page:
+#  "Some Office 365 features require endpoints within these domains (including CDNs). Many specific
+#   FQDNs within these wildcards have been published recently as we work to either remove or better
+#   explain our guidance relating to these wildcards"
+#
+# We will handle them via the generic "catch-all" rules as well
+#
+jq -r '.[] | select(.serviceArea=="Common" and .id != 125 and .id != 50 and .id != 78) | .urls[]?' < $TMP | sed -n '/\*\.\.com/!p' | sed 's/^\*\.//' | sort -u | uniq > $LIST
 ./domains2list.py $LIST "Microsoft365" NDPI_PROTOCOL_MICROSOFT_365 NDPI_PROTOCOL_CATEGORY_COLLABORATIVE NDPI_PROTOCOL_ACCEPTABLE > $DEST_OFFICE365
 
 #AZURE
-cat $TMP_AZURE | sed -ne 's/<td>\*.\(.*\)<\/td>/\1/gp' | sed 's/\/ /\n/g' | sed 's/^\*\.//' | sort -u | uniq > $LIST
+#Skip *.onmicrosoft.com; see above
+cat $TMP_AZURE | sed -ne 's/<td>\*.\(.*\)<\/td>/\1/gp' | sed 's/\/ /\n/g' | sed -e '/\*\.onmicrosoft\.com/d' | sed 's/^\*\.//' | sort -u | uniq > $LIST
 ./domains2list.py $LIST "Azure" NDPI_PROTOCOL_MICROSOFT_AZURE NDPI_PROTOCOL_CATEGORY_CLOUD NDPI_PROTOCOL_ACCEPTABLE > $DEST_AZURE
 
 rm -f $TMP $TMP_AZURE $LIST
