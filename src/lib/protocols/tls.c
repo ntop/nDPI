@@ -1087,7 +1087,8 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 		    }
 
 		    if(ndpi_struct->cfg.tls_subclassification_enabled &&
-		       !flow->protos.tls_quic.subprotocol_detected) {
+		       !flow->protos.tls_quic.subprotocol_detected &&
+		       !flow->tls_quic.from_rdp) { /* No (other) sub-classification; we will have TLS.RDP anyway */
 		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, __get_master(ndpi_struct, flow), dNSName, dNSName_len)) {
 			flow->protos.tls_quic.subprotocol_detected = 1;
 		        ndpi_unset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST);
@@ -2855,10 +2856,14 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		    if(!is_quic) {
 		      if(ndpi_struct->cfg.tls_subclassification_enabled &&
+		         flow->protos.tls_quic.subprotocol_detected == 0 &&
+		         !flow->tls_quic.from_rdp && /* No (other) sub-classification; we will have TLS.RDP anyway */
 		         ndpi_match_hostname_protocol(ndpi_struct, flow, __get_master(ndpi_struct, flow), sni, sni_len))
 		        flow->protos.tls_quic.subprotocol_detected = 1;
 		    } else {
 		      if(ndpi_struct->cfg.quic_subclassification_enabled &&
+		         flow->protos.tls_quic.subprotocol_detected == 0 &&
+		         !flow->tls_quic.from_rdp && /* No (other) sub-classification; we will have TLS.RDP anyway */
 		         ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, sni, sni_len))
 		        flow->protos.tls_quic.subprotocol_detected = 1;
 		    }

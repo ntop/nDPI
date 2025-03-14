@@ -91,7 +91,7 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 	    if((rdp_requested_proto & 0x1) == 0x1) {
 	      /* RDP Response + Client Hello + Server hello */
 	      flow->max_extra_packets_to_check = 5;
-	      
+	      flow->tls_quic.from_rdp = 1;
 	      flow->extra_packets_func = ndpi_search_tls_over_rdp;
 	    }
 	  }
