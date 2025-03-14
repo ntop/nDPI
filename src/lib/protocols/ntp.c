@@ -29,6 +29,7 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
+
 static void ndpi_int_ntp_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -49,11 +50,46 @@ static void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct
     if (version <= 4) {
       flow->protos.ntp.version = version;
       flow->protos.ntp.mode = packet->payload[0] & 7;
-    
+      flow->protos.ntp.leap_indicator = (packet->payload[0] & 192) >> 6;
+
+      if (packet->payload_packet_len >= 48) {
+        u_int32_t tmp = 0;
+        flow->protos.ntp.stratum = packet->payload[1];
+        flow->protos.ntp.ppol = (int8_t)packet->payload[2];
+        flow->protos.ntp.precision = (int8_t)packet->payload[3];
+
+        // https://github.com/wireshark/wireshark/blob/c383ce5173cb15463259ca862cd5b469c2a3aab8/epan/dissectors/packet-ntp.c#L1574
+        tmp = ntohl(get_u_int32_t(packet->payload, 4));
+        flow->protos.ntp.root_delay = (tmp >> 16) + (tmp & 0xffff) / 65536.0;
+        tmp = ntohl(get_u_int32_t(packet->payload, 8));
+        flow->protos.ntp.root_dispersion = (tmp >> 16) + (tmp & 0xffff) / 65536.0;
+
+        if (flow->protos.ntp.stratum == 0 || flow->protos.ntp.stratum == 1) {
+          ndpi_snprintf(flow->protos.ntp.ref_id, sizeof(flow->protos.ntp.ref_id), "%c%c%c%c", packet->payload[12],
+                                                              packet->payload[13],
+                                                              packet->payload[14],
+                                                              packet->payload[15]);
+        } else {
+          if(packet->iph) {
+            tmp = get_u_int32_t(packet->payload, 12);
+            inet_ntop(AF_INET, &tmp, flow->protos.ntp.ref_id, sizeof(flow->protos.ntp.ref_id));
+          } else {
+            ndpi_snprintf(flow->protos.ntp.ref_id, sizeof(flow->protos.ntp.ref_id), "%c%c%c%c", packet->payload[12],
+                                                              packet->payload[13],
+                                                              packet->payload[14],
+                                                              packet->payload[15]);
+          }
+        }
+        flow->protos.ntp.ref_time = get_u_int64_t(packet->payload, 16);
+        flow->protos.ntp.org_time = get_u_int64_t(packet->payload, 24);
+        flow->protos.ntp.rec_time = get_u_int64_t(packet->payload, 32);
+        flow->protos.ntp.trans_time = get_u_int64_t(packet->payload, 40);
+      }
+    }
+
       NDPI_LOG_INFO(ndpi_struct, "found NTP\n");
       ndpi_int_ntp_add_connection(ndpi_struct, flow);
       return;
-    }
   }
 
   NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);

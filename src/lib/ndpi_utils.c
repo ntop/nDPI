@@ -1626,8 +1626,19 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_NTP:
     ndpi_serialize_start_of_block(serializer, "ntp");
+    ndpi_serialize_string_uint32(serializer, "leap_indicator", flow->protos.ntp.leap_indicator);
     ndpi_serialize_string_uint32(serializer, "version", flow->protos.ntp.version);
     ndpi_serialize_string_uint32(serializer, "mode", flow->protos.ntp.mode);
+    ndpi_serialize_string_uint32(serializer, "stratum", flow->protos.ntp.stratum);
+    ndpi_serialize_string_int32(serializer, "ppol", flow->protos.ntp.ppol);
+    ndpi_serialize_string_int32(serializer, "precision", flow->protos.ntp.precision);
+    ndpi_serialize_string_float(serializer, "root_delay", flow->protos.ntp.root_delay, "%f");
+    ndpi_serialize_string_float(serializer, "root_dispersion", flow->protos.ntp.root_dispersion, "%f");
+    ndpi_serialize_string_string(serializer, "ref_id", flow->protos.ntp.ref_id);
+    ndpi_serialize_string_uint64(serializer, "ref_time", flow->protos.ntp.ref_time);
+    ndpi_serialize_string_uint64(serializer, "org_time", flow->protos.ntp.org_time);
+    ndpi_serialize_string_uint64(serializer, "rec_time", flow->protos.ntp.rec_time);
+    ndpi_serialize_string_uint64(serializer, "trans_time", flow->protos.ntp.trans_time);
     ndpi_serialize_end_of_block(serializer);
     break;
 

@@ -1717,8 +1717,12 @@ struct ndpi_flow_struct {
     } dns;
 
     struct {
-      u_int8_t version;
-      u_int8_t mode;
+      u_int8_t leap_indicator: 2, version: 3, mode: 3;
+      u_int8_t stratum;
+      int8_t ppol, precision;
+      float root_delay, root_dispersion;
+      char ref_id[16];
+      uint64_t ref_time, org_time, rec_time, trans_time;
     } ntp;
 
     struct {
