@@ -747,7 +747,7 @@ fuzz_ndpi_reader_pl7m_simplest_internal_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM
     $(fuzz_ndpi_reader_pl7m_simplest_internal_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_pl7m_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_CFLAGS =  -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -I../src/lib/third_party/include/ -DENABLE_PCAP_L7_MUTATOR
+fuzz_ndpi_reader_pl7m_CFLAGS =  -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -I../src/lib/third_party/include/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_CONFIG2
 fuzz_ndpi_reader_pl7m_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_pl7m_LDFLAGS = $(PCAP_LIB) $(LIBS)
 if HAS_FUZZLDFLAGS

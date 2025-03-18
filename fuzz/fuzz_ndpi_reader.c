@@ -110,8 +110,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "tcp_ack_payload_heuristic", "1");
     ndpi_set_config(workflow->ndpi_struct, "dns", "subclassification", "1");
     ndpi_set_config(workflow->ndpi_struct, "tls", "application_blocks_tracking", "1");
+#ifndef ENABLE_CONFIG2
     ndpi_set_config(workflow->ndpi_struct, "stun", "max_packets_extra_dissection", "40");
     ndpi_set_config(workflow->ndpi_struct, "zoom", "max_packets_extra_dissection", "255");
+#endif
     ndpi_set_config(workflow->ndpi_struct, "rtp", "search_for_stun", "1");
     ndpi_set_config(workflow->ndpi_struct, "openvpn", "dpi.heuristics", "0x01");
     ndpi_set_config(workflow->ndpi_struct, "openvpn", "dpi.heuristics.num_messages", "20");
@@ -120,6 +122,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, "tls", "dpi.heuristics.max_packets_extra_dissection", "40");
     ndpi_set_config(workflow->ndpi_struct, "stun", "monitoring", "1");
     ndpi_set_config(workflow->ndpi_struct, NULL, "dpi.address_cache_size", "8192");
+
+#ifdef ENABLE_CONFIG2
+    ndpi_set_config(workflow->ndpi_struct, NULL, "flow_risk_infos", "0");
+#endif
 
     ndpi_finalize_initialization(workflow->ndpi_struct);
 
