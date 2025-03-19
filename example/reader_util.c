@@ -1594,6 +1594,13 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
       }
     }
   }
+  /* FASTCGI */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_FASTCGI)) {
+    flow->info_type = INFO_FASTCGI;
+    flow->fast_cgi.method = flow->ndpi_flow->protos.fast_cgi.method;
+    ndpi_snprintf(flow->fast_cgi.user_agent, sizeof(flow->fast_cgi.user_agent), "%s", flow->ndpi_flow->protos.fast_cgi.user_agent);
+    ndpi_snprintf(flow->fast_cgi.url, sizeof(flow->fast_cgi.url), "%s", flow->ndpi_flow->protos.fast_cgi.url);
+  }
 
   if(flow->ndpi_flow->tls_quic.obfuscated_heur_state && flow->ndpi_flow->tls_quic.obfuscated_heur_matching_set)
     memcpy(&flow->ssh_tls.obfuscated_heur_matching_set, flow->ndpi_flow->tls_quic.obfuscated_heur_matching_set,

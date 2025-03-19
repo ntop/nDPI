@@ -2055,6 +2055,17 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	      }
 	  }
         break;
+
+      case INFO_FASTCGI:
+        if (flow->fast_cgi.url[0] != '\0')
+          {
+            fprintf(out, "[Url: %s]", flow->fast_cgi.url);
+          }
+        if (flow->fast_cgi.user_agent[0] != '\0')
+          {
+            fprintf(out, "[User-agent: %s]", flow->fast_cgi.user_agent);
+          }
+        break;
       }
 
     if(flow->ssh_tls.advertised_alpns)

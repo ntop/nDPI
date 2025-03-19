@@ -1609,6 +1609,12 @@ struct ndpi_flow_struct {
       char *user_agent;
     } ssdp;
 
+    struct {
+      ndpi_http_method method;
+      char user_agent[32];
+      char url[64];
+    } fast_cgi;
+
   } protos;
 
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */

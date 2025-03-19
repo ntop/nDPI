@@ -171,6 +171,7 @@ enum info_type {
     INFO_FTP_IMAP_POP_SMTP,
     INFO_NATPMP,
     INFO_SIP,
+    INFO_FASTCGI,
 };
 
 typedef struct {
@@ -270,6 +271,12 @@ typedef struct ndpi_flow_info {
       char to[256];
       char to_imsi[16];
     } sip;
+
+    struct {
+      ndpi_http_method method;
+      char user_agent[32];
+      char url[64];
+    } fast_cgi;
   };
 
   ndpi_serializer ndpi_flow_serializer;
