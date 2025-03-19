@@ -141,7 +141,7 @@ typedef enum {
   NDPI_PROTOCOL_AMAZON_ALEXA          = 110,
   NDPI_PROTOCOL_KERBEROS              = 111,
   NDPI_PROTOCOL_LDAP                  = 112,
-  NDPI_PROTOCOL_MAPLESTORY            = 113,
+  NDPI_PROTOCOL_NEXON                 = 113,
   NDPI_PROTOCOL_MSSQL_TDS             = 114,
   NDPI_PROTOCOL_PPTP                  = 115,
   NDPI_PROTOCOL_WARCRAFT3             = 116,

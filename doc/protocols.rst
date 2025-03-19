@@ -68,6 +68,15 @@ TFTP is a very simple protocol used to transfer files. It is from this that its 
 References: `RFC1350 <https://datatracker.ietf.org/doc/html/rfc1350>`_ and `RFC2347 <https://datatracker.ietf.org/doc/html/rfc2347>`_ and `RFC2349 <https://datatracker.ietf.org/doc/html/rfc2349>`_
 
 
+.. _Proto 113:
+
+`NDPI_PROTOCOL_NEXON`
+=====================
+Nexon is a South Korean video game developer and publisher. It develops and publishes titles including MapleStory, Crazyracing Kartrider, Sudden Attack, Dungeon & Fighter, and Blue Archive. 
+
+References: `Main site: <https://www.nexon.com>`_
+
+
 .. _Proto 125:
 
 `NDPI_PROTOCOL_MOZILLA`

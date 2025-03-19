@@ -45,7 +45,7 @@
     <ClCompile Include="..\src\lib\protocols\mail_imap.c" />
     <ClCompile Include="..\src\lib\protocols\mail_pop.c" />
     <ClCompile Include="..\src\lib\protocols\mail_smtp.c" />
-    <ClCompile Include="..\src\lib\protocols\maplestory.c" />
+    <ClCompile Include="..\src\lib\protocols\nexon.c" />
     <ClCompile Include="..\src\lib\protocols\megaco.c" />
     <ClCompile Include="..\src\lib\protocols\mgcp.c" />
     <ClCompile Include="..\src\lib\protocols\mikrotik.c" />

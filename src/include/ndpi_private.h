@@ -789,7 +789,7 @@ void init_lotus_notes_dissector(struct ndpi_detection_module_struct *ndpi_struct
 void init_mail_imap_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mail_pop_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mail_smtp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_maplestory_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_nexon_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_megaco_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mgcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_mining_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
