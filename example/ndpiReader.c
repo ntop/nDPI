@@ -678,7 +678,7 @@ static void help(u_int long_help) {
          "                            | <b> = max pattern len to search\n"
          "                            | <c> = max num packets per flow\n"
          "                            | <d> = max packet payload dissection\n"
-         "                            | <d> = max num reported payloads\n"
+         "                            | <e> = max num reported payloads\n"
          "                            | Default: %u:%u:%u:%u:%u\n"
          "  -c <path>                 | Load custom categories from the specified file\n"
          "  -C <path>                 | Write output in CSV format on the specified file\n"
