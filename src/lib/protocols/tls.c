@@ -2007,7 +2007,7 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* see: https://www.wireshark.org/docs/wsar_html/packet-tls-utils_8h_source.html */
   static u_int16_t const allowed_non_iana_extensions[] = {
-    65486 /* ESNI */, 13172 /* NPN - Next Proto Neg */, 17513 /* ALPS */,
+      /* 65486 ESNI is suspicious nowadays */ 13172 /* NPN - Next Proto Neg */, 17513 /* ALPS */,
       30032 /* Channel ID */, 65445 /* QUIC transport params */,
       /* GREASE extensions */
       2570, 6682, 10794, 14906, 19018, 23130, 27242,
@@ -3220,9 +3220,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		     ndpi_struct->cfg.tls_versions_supported_enabled)
 		    flow->protos.tls_quic.tls_supported_versions = ndpi_strdup(version_str);
 		}
-	      } else if(extension_id == 65486 /* encrypted server name */) {
-		/* ESNI has been superseded by ECH */
-	        ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_SUSPICIOUS_ESNI_USAGE, NULL);
 	      } else if(extension_id == 65037 /* ECH: latest drafts */) {
 #ifdef DEBUG_TLS
 		printf("Client TLS: ECH version 0x%x\n", extension_id);
