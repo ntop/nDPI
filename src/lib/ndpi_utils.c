@@ -3023,6 +3023,15 @@ static int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, nd
 
 /* ********************************************************************************* */
 
+int is_flowrisk_info_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id)
+{
+  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_str->cfg.flowrisk_info_bitmask, flowrisk_id) == 0)
+    return 0;
+  return 1;
+}
+
+/* ********************************************************************************* */
+
 void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 				 struct ndpi_flow_struct *flow) {
   if(flow->risk == 0) return; /* Nothing to do */
@@ -3100,7 +3109,7 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_fl
     // ndpi_handle_risk_exceptions(ndpi_str, flow);
 
     if(flow->risk != 0 /* check if it has been masked */) {
-      if(ndpi_str->cfg.flow_risk_infos_enabled &&
+      if(is_flowrisk_info_enabled(ndpi_str, r) &&
          risk_message != NULL) {
 	if(flow->num_risk_infos < MAX_NUM_RISK_INFOS) {
 	  char *s = ndpi_strdup(risk_message);
@@ -3113,7 +3122,7 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_fl
 	}
       }
     }
-  } else if(ndpi_str->cfg.flow_risk_infos_enabled && risk_message) {
+  } else if(is_flowrisk_info_enabled(ndpi_str, r) && risk_message) {
     u_int8_t i;
 
     for(i = 0; i < flow->num_risk_infos; i++)
@@ -3146,7 +3155,7 @@ void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str,
 
     flow->risk &= ~v;
 
-    if(!ndpi_str->cfg.flow_risk_infos_enabled)
+    if(!is_flowrisk_info_enabled(ndpi_str, r))
       return;
 
     for(i = 0; i < flow->num_risk_infos; i++) {

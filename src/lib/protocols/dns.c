@@ -828,7 +828,7 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
     flow->protos.dns.num_answers = dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs;
 
     if(flow->protos.dns.reply_code != 0) {
-      if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+      if(is_flowrisk_info_enabled(ndpi_struct, NDPI_ERROR_CODE_DETECTED)) {
         char str[32], buf[16];
 
         snprintf(str, sizeof(str), "DNS Error Code %s",
@@ -870,7 +870,7 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
        packet->udp &&
        packet->payload_packet_len > PKT_LEN_ALERT &&
        packet->payload_packet_len > flow->protos.dns.edns0_udp_payload_size) {
-      if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+      if(is_flowrisk_info_enabled(ndpi_struct, NDPI_DNS_LARGE_PACKET)) {
         char str[48];
 
         snprintf(str, sizeof(str), "%u Bytes DNS Packet", packet->payload_packet_len);

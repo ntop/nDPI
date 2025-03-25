@@ -1468,7 +1468,7 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 
       if(ndpi_is_valid_hostname((char *)&crypto_data[tag_offset_start + prev_offset],
 				len) == 0) {
-        if(ndpi_struct->cfg.flow_risk_infos_enabled) {
+        if(is_flowrisk_info_enabled(ndpi_struct, NDPI_INVALID_CHARACTERS)) {
           char str[128];
 
 	  snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);

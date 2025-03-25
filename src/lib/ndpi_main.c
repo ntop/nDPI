@@ -10654,7 +10654,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 					     string_to_match, string_to_match_len,
 					     &proto_id, NULL, NULL);
     if(rc1 > 0) {
-      if(ndpi_str->cfg.flow_risk_infos_enabled) {
+      if(is_flowrisk_info_enabled(ndpi_str, NDPI_RISKY_DOMAIN)) {
         char str[64] = { '\0' };
 
         strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
@@ -10667,7 +10667,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 
   /* Add punycode check */
   if(ndpi_check_punycode_string(string_to_match, string_to_match_len)) {
-    if(ndpi_str->cfg.flow_risk_infos_enabled) {
+    if(is_flowrisk_info_enabled(ndpi_str, NDPI_PUNYCODE_IDN)) {
       char str[64] = { '\0' };
 
       strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
@@ -11753,20 +11753,27 @@ static char *_get_param_flowrisk_enable_disable(void *_variable, const char *pro
 static ndpi_cfg_error _set_param_flowrisk_enable_disable(struct ndpi_detection_module_struct *ndpi_str,
                                                          void *_variable, const char *value,
                                                          const char *min_value, const char *max_value,
-                                                         const char *proto, const char *param)
+                                                         const char *proto, const char *_param)
 {
   NDPI_PROTOCOL_BITMASK *bitmask = (NDPI_PROTOCOL_BITMASK *)_variable;
   ndpi_risk_enum flowrisk_id;
+  char param[128] = {0};
 
   (void)ndpi_str;
   (void)min_value;
   (void)max_value;
   (void)proto;
 
-  if(strncmp(param, "flow_risk.", 10) != 0)
+  if(strncmp(_param, "flow_risk.", 10) != 0)
     return NDPI_CFG_INVALID_PARAM;
 
-  param += 10; /* Strip initial "flow_risk." */
+  _param += 10; /* Strip initial "flow_risk." */
+
+  if(strlen(_param) > 5 &&
+     strncmp(_param + (strlen(_param) - 5), ".info", 5) == 0)
+    memcpy(param, _param, ndpi_min(strlen(_param) - 5, sizeof(param))); /* Strip trailing ".info" */
+  else
+    strncpy(param, _param, sizeof(param));
 
   if(strcmp(param, "any") == 0 ||
      strcmp(param, "all") == 0 ||
@@ -11953,9 +11960,9 @@ static const struct cfg_param {
   { NULL,            "metadata.tcp_fingerprint",                "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_fingerprint_enabled), NULL },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },
-  { NULL,            "flow_risk_infos",                         "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_infos_enabled), NULL },
 
   { NULL,            "flow_risk.$FLOWRISK_NAME_OR_ID",          "enable", NULL, NULL, CFG_PARAM_FLOWRISK_ENABLE_DISABLE, __OFF(flowrisk_bitmask), NULL },
+  { NULL,            "flow_risk.$FLOWRISK_NAME_OR_ID.info",     "enable", NULL, NULL, CFG_PARAM_FLOWRISK_ENABLE_DISABLE, __OFF(flowrisk_info_bitmask), NULL },
 
   { NULL,            "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_icloudprivaterelay_enabled), NULL },
   { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_protonvpn_enabled), NULL },
@@ -12033,8 +12040,13 @@ ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
 	strcmp(c->proto, "$PROTO_NAME_OR_ID") == 0 &&
 	strcmp(param, c->param) == 0) ||
        (proto == NULL && c->proto == NULL &&
-	strncmp(c->param, "flow_risk.", 10) == 0 &&
-	strncmp(param, "flow_risk.", 10) == 0)) {
+	strncmp(c->param, "flow_risk.$FLOWRISK_NAME_OR_ID", 30) == 0 &&
+	strncmp(param, "flow_risk.", 10) == 0 &&
+	!ndpi_str_endswith(param, ".info")) ||
+       (proto == NULL && c->proto == NULL &&
+	strncmp(c->param, "flow_risk.$FLOWRISK_NAME_OR_ID.info", 35) == 0 &&
+	strncmp(param, "flow_risk.", 10) == 0 &&
+	ndpi_str_endswith(param, ".info"))) {
 
       rc = cfg_ops[c->type].fn_set(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset),
                                    value, c->min_value, c->max_value, proto, param);

@@ -482,16 +482,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       snprintf(cfg_param, sizeof(cfg_param), "flow_risk.%d", pid);
     ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
     ndpi_get_config(ndpi_info_mod, NULL, cfg_param, cfg_value, sizeof(cfg_value));
+
+    if(fuzzed_data.ConsumeBool() && pid < NDPI_MAX_RISK)
+      snprintf(cfg_param, sizeof(cfg_param), "flow_risk.%s.info", ndpi_risk_shortnames[pid]);
+    else
+      snprintf(cfg_param, sizeof(cfg_param), "flow_risk.%d.info", pid);
+    ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "flow_risk_lists.load", cfg_value);
-  }
-  if(fuzzed_data.ConsumeBool()) {
-    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
-    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk_infos", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
