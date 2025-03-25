@@ -834,7 +834,7 @@ void init_sonos_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
 void init_spotify_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_ssh_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_tls_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_starcraft_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
+void init_blizzard_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_steam_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_stun_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_syslog_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);

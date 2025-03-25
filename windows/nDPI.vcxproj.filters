@@ -82,7 +82,7 @@
     <ClCompile Include="..\src\lib\protocols\spotify.c" />
     <ClCompile Include="..\src\lib\protocols\ssdp.c" />
     <ClCompile Include="..\src\lib\protocols\ssh.c" />
-    <ClCompile Include="..\src\lib\protocols\starcraft.c" />
+    <ClCompile Include="..\src\lib\protocols\blizzard.c" />
     <ClCompile Include="..\src\lib\protocols\steam.c" />
     <ClCompile Include="..\src\lib\protocols\stun.c" />
     <ClCompile Include="..\src\lib\protocols\syslog.c" />

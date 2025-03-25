@@ -241,7 +241,7 @@ typedef enum {
   NDPI_PROTOCOL_DEEZER                = 210,
   NDPI_PROTOCOL_INSTAGRAM             = 211,
   NDPI_PROTOCOL_MICROSOFT             = 212,
-  NDPI_PROTOCOL_STARCRAFT             = 213,
+  NDPI_PROTOCOL_BLIZZARD              = 213,
   NDPI_PROTOCOL_TEREDO                = 214,
   NDPI_PROTOCOL_HOTSPOT_SHIELD        = 215,
   NDPI_PROTOCOL_IMO                   = 216,

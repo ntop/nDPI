@@ -145,6 +145,15 @@ Google Meet is a video conferencing service from Google.
 References: `Main site: <https://meet.google.com/>`_
 
 
+.. _Proto 213:
+
+`NDPI_PROTOCOL_BLIZZARD`
+========================
+Blizzard Entertainment is an American video game developer and publisher, and a subsidiary of Activision Blizzard. The company is best known for producing the role-playing game World of Warcraft as well as video game franchises Diablo, StarCraft, and Overwatch.
+
+References: `Main site: <https://www.blizzard.com>`_
+
+
 .. _Proto 235:
 
 `NDPI_PROTOCOL_VALVE_SDR`

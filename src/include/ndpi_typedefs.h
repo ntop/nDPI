@@ -1635,9 +1635,6 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_ZATTOO */
   u_int8_t zattoo_stage:3;
 
-  /* NDPI_PROTOCOL_STARCRAFT */
-  u_int8_t starcraft_udp_stage : 3;	// 0-7
-
   /* NDPI_PROTOCOL_OOKLA */
   u_int8_t ookla_stage : 1;
 

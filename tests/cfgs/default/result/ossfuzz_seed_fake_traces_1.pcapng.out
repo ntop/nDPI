@@ -1,15 +1,18 @@
+Guessed flow protos:	4
+
 DPI Packets (TCP):	8	(1.33 pkts/flow)
 DPI Packets (UDP):	9	(2.25 pkts/flow)
 Confidence Unknown          : 2 (flows)
-Confidence DPI              : 8 (flows)
-Num dissector calls: 985 (98.50 diss/flow)
+Confidence Match by port    : 4 (flows)
+Confidence DPI              : 4 (flows)
+Num dissector calls: 1610 (161.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/9/0 (insert/search/found)
+LRU cache bittorrent: 0/21/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/2/0 (insert/search/found)
+LRU cache mining:     0/6/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/6/0 (insert/search/found)
+LRU cache fpc_dns:    0/10/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -25,7 +28,7 @@ Patricia protocols IPv6: 0/0 (search/found)
 Unknown	3	209	2
 Gnutella	4	333	2
 HalfLife2	2	96	1
-Starcraft	4	200	4
+Blizzard	4	200	4
 Protobuf	8	2487	1
 
 Safe                             8 2487          1            
@@ -37,10 +40,10 @@ Unrated                          3 209           2
 	2	TCP 192.168.1.128:1 -> 1.2.3.4:10 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Download/7][2 pkts/170 bytes -> 0 pkts/0 bytes][Goodput ratio: 53/0][< 1 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 70][Risk Info: TCP NULL scan / No server to client traffic][Plen Bins: 50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.1.128:1 -> 1.2.3.4:11 [proto: 35/Gnutella][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Download/7][2 pkts/163 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][293.20 sec][Risk: ** Unsafe Protocol **** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 70][Risk Info: TCP NULL scan / No server to client traffic][Plen Bins: 50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	UDP 127.0.0.1:1 <-> 127.0.0.1:2 [proto: 75/HalfLife2][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Game/8][1 pkts/48 bytes <-> 1 pkts/48 bytes][Goodput ratio: 41/41][9.65 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	5	TCP 192.168.1.128:1 -> 12.129.206.130:1119 [proto: 213/Starcraft][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 213/Starcraft, Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	6	TCP 192.168.1.128:1 -> 12.129.236.254:1119 [proto: 213/Starcraft][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 213/Starcraft, Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	7	TCP 192.168.1.128:1 -> 121.254.200.130:1119 [proto: 213/Starcraft][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 213/Starcraft, Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	8	TCP 192.168.1.128:1 -> 202.9.66.76:1119 [proto: 213/Starcraft][IP: 213/Starcraft][ClearText][Confidence: DPI][FPC: 213/Starcraft, Confidence: DPI][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	TCP 192.168.1.128:1 -> 12.129.206.130:1119 [proto: 213/Blizzard][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	TCP 192.168.1.128:1 -> 12.129.236.254:1119 [proto: 213/Blizzard][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	TCP 192.168.1.128:1 -> 121.254.200.130:1119 [proto: 213/Blizzard][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	TCP 192.168.1.128:1 -> 202.9.66.76:1119 [proto: 213/Blizzard][IP: 213/Blizzard][ClearText][Confidence: Match by port][FPC: 213/Blizzard, Confidence: IP address][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 Undetected flows:
