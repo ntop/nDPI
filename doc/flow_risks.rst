@@ -313,9 +313,9 @@ Relevant TCP connection issues such as connection refused, scan, or probe attemp
 
 .. _Risk 051
 
-NDPI_FULLY_ENCRYPTED
-====================
-Flow with Unknown protocol containing encrypted traffic.
+NDPI_FREE_51
+============
+Placeholder; not really used.
 
 .. _Risk 052
 

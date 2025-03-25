@@ -162,7 +162,7 @@ typedef enum {
   NDPI_PERIODIC_FLOW,          /* Set in case a flow repeats at a specific pace [used by apps on top of nDPI] */
   NDPI_MINOR_ISSUES,           /* Generic packet issues (e.g. DNS with 0 TTL) */
   NDPI_TCP_ISSUES,    /* 50 */ /* TCP issues such as connection failed or scan */
-  NDPI_FULLY_ENCRYPTED,        /* This (unknown) session is fully encrypted */
+  NDPI_FREE_51,                                         /* FREE */
   NDPI_TLS_ALPN_SNI_MISMATCH,  /* Invalid ALPN/SNI combination */
   NDPI_MALWARE_HOST_CONTACTED, /* Flow client contacted a malware host */
   NDPI_BINARY_DATA_TRANSFER,   /* Attempt to transfer something in binary format */

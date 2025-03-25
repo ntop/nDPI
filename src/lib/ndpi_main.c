@@ -201,7 +201,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_PERIODIC_FLOW,                         NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE,  NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_MINOR_ISSUES,                          NDPI_RISK_LOW,    CLIENT_LOW_RISK_PERCENTAGE,  NDPI_BOTH_ACCOUNTABLE   },
   { NDPI_TCP_ISSUES,                            NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
-  { NDPI_FULLY_ENCRYPTED,                       NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
+  { NDPI_FREE_51,                               NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_TLS_ALPN_SNI_MISMATCH,                 NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_MALWARE_HOST_CONTACTED,                NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_BINARY_DATA_TRANSFER,                  NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
@@ -8155,7 +8155,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   /* TODO: not sure about the best "order" among fully encrypted logic, classification by-port and classification by-ip...*/
   if(ret.proto.app_protocol == NDPI_PROTOCOL_UNKNOWN &&
      flow->first_pkt_fully_encrypted == 1) {
-    ndpi_set_risk(ndpi_str, flow, NDPI_FULLY_ENCRYPTED, NULL);
+    ndpi_set_risk(ndpi_str, flow, NDPI_OBFUSCATED_TRAFFIC, "Fully Encrypted");
   }
 
   /* If guess_ip_before_port is enabled, classify by-ip first */
@@ -11836,7 +11836,7 @@ static const struct cfg_param {
   { NULL,            "flow.use_client_ip_in_guess",             "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(use_client_ip_in_guess), NULL},
   { NULL,            "flow.use_client_port_in_guess",           "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(use_client_port_in_guess), NULL},
   { NULL,            "tcp_ack_payload_heuristic",               "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_ack_paylod_heuristic), NULL },
-  { NULL,            "fully_encrypted_heuristic",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic), NULL },
+  { NULL,            "fully_encrypted_heuristic",               "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fully_encrypted_heuristic), NULL },
   { NULL,            "libgcrypt.init",                          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(libgcrypt_init), NULL },
   { NULL,            "dpi.guess_on_giveup",                     "0x3", "0", "3", CFG_PARAM_INT, __OFF(guess_on_giveup), NULL },
   { NULL,            "dpi.guess_ip_before_port",                "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(guess_ip_before_port), NULL},
