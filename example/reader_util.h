@@ -314,7 +314,6 @@ typedef struct ndpi_flow_info {
 
     u_int32_t quic_version;
 
-    struct ndpi_tls_obfuscated_heuristic_matching_set obfuscated_heur_matching_set;
   } ssh_tls;
 
   struct {

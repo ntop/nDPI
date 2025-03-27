@@ -1299,11 +1299,6 @@ struct os_fingerprint {
   enum operating_system_hint os;
 };
 
-struct ndpi_tls_obfuscated_heuristic_matching_set {
-  u_int32_t bytes[4];
-  u_int32_t pkts[4];
-};
-
 struct rtp_info {
   u_int8_t payload_type;
   bool payload_detected;
@@ -1431,7 +1426,6 @@ struct ndpi_flow_struct {
     message_t message[2]; /* Directions */
     u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, pad:3;
     struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
-    struct ndpi_tls_obfuscated_heuristic_matching_set *obfuscated_heur_matching_set;
   } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
   struct rtp_info rtp[2 /* directions */];

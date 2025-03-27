@@ -70,7 +70,6 @@ local mtd_types = {
    [0] = "Padding",
    [1] = "Server Name",
    [2] = "JA4C",
-   [3] = "TLS Heuristic Fingerprint",
 }
 ndpi_fds.metadata_type        = ProtoField.new("nDPI Metadata Type", "ndpi.metadata.type", ftypes.UINT16, mtd_types)
 ndpi_fds.metadata_length      = ProtoField.new("nDPI Metadata Length", "ndpi.metadata.length", ftypes.UINT16)
@@ -79,16 +78,6 @@ ndpi_fds.metadata_value       = ProtoField.new("nDPI Metadata Value", "ndpi.meta
 -- Specific fields
 ndpi_fds.metadata_server_name = ProtoField.new("nDPI Server Name", "ndpi.metadata.server_name", ftypes.STRING)
 ndpi_fds.metadata_ja4c        = ProtoField.new("nDPI JA4C", "ndpi.metadata.ja4c", ftypes.STRING)
-ndpi_fds.metadata             = ProtoField.new("nDPI Metadata", "ndpi.metadata", ftypes.NONE)
-ndpi_fds.metadata_tls_heuristic_fingerprint = ProtoField.new("nDPI TLS Heuristic Fingerprint", "ndpi.metadata.tls_heuristic_fingerprint", ftypes.NONE)
-ndpi_fds.metadata_tls_heuristic_fingerprint_bytes0 = ProtoField.new("Bytes[0]", "ndpi.metadata.tls_heuristic_fingerprint.bytes0", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_bytes1 = ProtoField.new("Bytes[1]", "ndpi.metadata.tls_heuristic_fingerprint.bytes1", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_bytes2 = ProtoField.new("Bytes[2]", "ndpi.metadata.tls_heuristic_fingerprint.bytes2", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_bytes3 = ProtoField.new("Bytes[3]", "ndpi.metadata.tls_heuristic_fingerprint.bytes3", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_pkts0 = ProtoField.new("Pkts[0]", "ndpi.metadata.tls_heuristic_fingerprint.pkts0", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_pkts1 = ProtoField.new("Pkts[1]", "ndpi.metadata.tls_heuristic_fingerprint.pkts1", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_pkts2 = ProtoField.new("Pkts[2]", "ndpi.metadata.tls_heuristic_fingerprint.pkts2", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_pkts3 = ProtoField.new("Pkts[3]", "ndpi.metadata.tls_heuristic_fingerprint.pkts3", ftypes.UINT32)
 
 
 local flow_risks = {}
@@ -1976,17 +1965,6 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       elseif mtd_type == 2 then
 	          metadata_tree:append_text(" JA4C: " .. trailer_tvb(offset + 4, mtd_length):string())
 	          metadata_tree:add(ndpi_fds.metadata_ja4c, trailer_tvb(offset + 4, mtd_length))
-	       elseif mtd_type == 3 then
-	          metadata_tree:append_text(" TLS Heuristic Fingerprint")
-	          tls_tree = metadata_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint, trailer_tvb(offset + 4, mtd_length))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_bytes0, trailer_tvb(offset + 4, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_bytes1, trailer_tvb(offset + 8, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_bytes2, trailer_tvb(offset + 12, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_bytes3, trailer_tvb(offset + 16, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_pkts0, trailer_tvb(offset + 20, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_pkts1, trailer_tvb(offset + 24, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_pkts2, trailer_tvb(offset + 28, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_pkts3, trailer_tvb(offset + 32, 4))
 	       else
 		  -- Generic field
 		  metadata_tree:add(ndpi_fds.metadata_value, trailer_tvb(offset + 4, mtd_length))

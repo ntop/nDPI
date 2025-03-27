@@ -1602,10 +1602,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_snprintf(flow->fast_cgi.url, sizeof(flow->fast_cgi.url), "%s", flow->ndpi_flow->protos.fast_cgi.url);
   }
 
-  if(flow->ndpi_flow->tls_quic.obfuscated_heur_state && flow->ndpi_flow->tls_quic.obfuscated_heur_matching_set)
-    memcpy(&flow->ssh_tls.obfuscated_heur_matching_set, flow->ndpi_flow->tls_quic.obfuscated_heur_matching_set,
-           sizeof(struct ndpi_tls_obfuscated_heuristic_matching_set));
-
   if(!monitoring_enabled) {
     add_to_address_port_list(&flow->stun.mapped_address, &flow->ndpi_flow->stun.mapped_address);
     add_to_address_port_list(&flow->stun.peer_address, &flow->ndpi_flow->stun.peer_address);

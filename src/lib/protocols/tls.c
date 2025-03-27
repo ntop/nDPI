@@ -438,19 +438,6 @@ static int tls_obfuscated_heur_search(struct ndpi_detection_module_struct* ndpi_
       if(check_set(ndpi_struct, set)) {
         /* Heuristic match */
 
-        /* Export the matching set as metadata */
-        flow->tls_quic.obfuscated_heur_matching_set = ndpi_calloc(1, sizeof(struct ndpi_tls_obfuscated_heuristic_matching_set));
-        if(flow->tls_quic.obfuscated_heur_matching_set) {
-          flow->tls_quic.obfuscated_heur_matching_set->bytes[0] = set->bytes[0];
-          flow->tls_quic.obfuscated_heur_matching_set->bytes[1] = set->bytes[1];
-          flow->tls_quic.obfuscated_heur_matching_set->bytes[2] = set->bytes[2];
-          flow->tls_quic.obfuscated_heur_matching_set->bytes[3] = set->bytes[3];
-          flow->tls_quic.obfuscated_heur_matching_set->pkts[0] = set->pkts[0];
-          flow->tls_quic.obfuscated_heur_matching_set->pkts[1] = set->pkts[1];
-          flow->tls_quic.obfuscated_heur_matching_set->pkts[2] = set->pkts[2];
-          flow->tls_quic.obfuscated_heur_matching_set->pkts[3] = set->pkts[3];
-        }
-
         return 2; /* Found */
       } else {
         /* Close this set and open a new one... */

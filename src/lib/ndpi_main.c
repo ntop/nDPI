@@ -6999,8 +6999,6 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 
     if(flow->tls_quic.obfuscated_heur_state)
       ndpi_free(flow->tls_quic.obfuscated_heur_state);
-    if(flow->tls_quic.obfuscated_heur_matching_set)
-      ndpi_free(flow->tls_quic.obfuscated_heur_matching_set);
   }
 }
 
