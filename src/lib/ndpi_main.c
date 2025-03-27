@@ -11771,9 +11771,9 @@ static ndpi_cfg_error _set_param_flowrisk_enable_disable(struct ndpi_detection_m
 
   if(strlen(_param) > 5 &&
      strncmp(_param + (strlen(_param) - 5), ".info", 5) == 0)
-    memcpy(param, _param, ndpi_min(strlen(_param) - 5, sizeof(param))); /* Strip trailing ".info" */
+    memcpy(param, _param, ndpi_min(strlen(_param) - 5, sizeof(param) - 1)); /* Strip trailing ".info" */
   else
-    strncpy(param, _param, sizeof(param));
+    strncpy(param, _param, sizeof(param) - 1);
 
   if(strcmp(param, "any") == 0 ||
      strcmp(param, "all") == 0 ||
