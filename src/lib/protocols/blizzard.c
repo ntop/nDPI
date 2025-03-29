@@ -30,6 +30,7 @@
 static void search_blizzard_tcp(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow)
 {
   struct ndpi_packet_struct* packet = &ndpi_struct->packet;
+  char wow_string[] = "WORLD OF WARCRAFT CONNECTION";
 
   NDPI_LOG_DBG(ndpi_struct, "search Blizzard\n");
 
@@ -54,6 +55,16 @@ static void search_blizzard_tcp(struct ndpi_detection_module_struct* ndpi_struct
      le32toh(*(uint32_t *)&packet->payload[4]) == (u_int32_t)(packet->payload_packet_len - 8)) {
     NDPI_LOG_INFO(ndpi_struct, "Found Blizzard\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+    return;
+  }
+
+  /* Pattern found on WoW */
+  if(packet->payload_packet_len >= NDPI_STATICSTRING_LEN(wow_string) &&
+     memcmp(packet->payload, wow_string, NDPI_STATICSTRING_LEN(wow_string)) == 0) {
+    NDPI_LOG_INFO(ndpi_struct, "Found Blizzard (wow)\n");
+    /* Which id? It should be NDPI_PROTOCOL_BLIZZARD, but we already have NDPI_PROTOCOL_WORLDOFWARCRAFT.
+       Keep using the latter for the time being.... */
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WORLDOFWARCRAFT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     return;
   }
 
@@ -88,8 +99,6 @@ static void search_blizzard_udp(struct ndpi_detection_module_struct* ndpi_struct
   }
 
   /* TODO: other patterns */
-
-  /* TODO: should we remove WoW dissector, update it and move the new code here? */
 
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }

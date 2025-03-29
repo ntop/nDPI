@@ -909,9 +909,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_DOFUS */
   u_int32_t dofus_stage:1;
 
-  /* NDPI_PROTOCOL_WORLDOFWARCRAFT */
-  u_int32_t wow_stage:2;
-
   /* NDPI_PROTOCOL_MAIL_POP */
   u_int32_t mail_pop_stage:2;
 

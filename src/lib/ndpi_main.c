@@ -1147,7 +1147,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			      NDPI_PROTOCOL_WEBSOCKET,
 			      NDPI_PROTOCOL_CROSSFIRE, NDPI_PROTOCOL_SOAP,
 			      NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_GNUTELLA,
-			      NDPI_PROTOCOL_ZATTOO, NDPI_PROTOCOL_WORLDOFWARCRAFT,
+			      NDPI_PROTOCOL_ZATTOO,
 			      NDPI_PROTOCOL_IRC,
 			      NDPI_PROTOCOL_IPP,
 			      NDPI_PROTOCOL_MPEGDASH,
@@ -5861,9 +5861,6 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* SSDP */
   init_ssdp_dissector(ndpi_str, &a);
-
-  /* WORLD_OF_WARCRAFT */
-  init_world_of_warcraft_dissector(ndpi_str, &a);
 
   /* POSTGRES */
   init_postgres_dissector(ndpi_str, &a);

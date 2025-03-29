@@ -489,6 +489,7 @@ static ndpi_protocol_match host_match[] =
    { "bnetaccount.akamaized.net",               "Blizzard", NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "blz-contentstack-images.akamaized.net",   "Blizzard", NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "blz-contentstack-assets.akamaized.net",   "Blizzard", NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "blzddist1-a.akamaihd.net",                "Blizzard", NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "blzprofile.akamaized.net",                "Blizzard", NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "bnetstorefront.akamaized.net",            "Blizzard", NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "bnetcmsus-a.akamaihd.net",                "Blizzard", NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },

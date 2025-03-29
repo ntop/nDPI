@@ -339,7 +339,6 @@
     <ClCompile Include="..\src\lib\protocols\warcraft3.c" />
     <ClCompile Include="..\src\lib\protocols\whoisdas.c" />
     <ClCompile Include="..\src\lib\protocols\world_of_kung_fu.c" />
-    <ClCompile Include="..\src\lib\protocols\world_of_warcraft.c" />
     <ClCompile Include="..\src\lib\protocols\xbox.c" />
     <ClCompile Include="..\src\lib\protocols\xdmcp.c" />
     <ClCompile Include="..\src\lib\protocols\zattoo.c" />
