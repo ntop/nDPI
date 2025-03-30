@@ -39,14 +39,13 @@ static void search_blizzard_tcp(struct ndpi_detection_module_struct* ndpi_struct
   /* Generic Battle.net traffic */
   if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_BLIZZARD &&
      flow->s_port == htons(1119)) {
-    /* Looking for the first pkt sent by the client.
-       Sometimes the server sent a packet earlier */
-    if(current_pkt_from_client_to_server(ndpi_struct, flow)) {
-      if(ndpi_match_strprefix(packet->payload, packet->payload_packet_len, "\x41\x00\x00\x0a\x66\x52\xed\xc6")) {
-        NDPI_LOG_INFO(ndpi_struct, "Found Blizzard\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-        return;
-      }
+    /* Looking for the first pkt sent by the server */
+    if(current_pkt_from_server_to_client(ndpi_struct, flow) &&
+       packet->payload_packet_len == 2 &&
+       packet->payload[0] == 0x52 && packet->payload[1] == 0x08) {
+      NDPI_LOG_INFO(ndpi_struct, "Found Blizzard (battle.net)\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      return;
     } else if(flow->packet_direction_counter[packet->packet_direction] == 1) {
       return;
     }
