@@ -94,11 +94,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   }
 
   epoch_now += fuzzed_data.ConsumeIntegral<u_int8_t>();
-  rc = ndpi_cache_address_dump(&ndpi_struct, path, epoch_now);
-  if(rc) {
-    epoch_now += fuzzed_data.ConsumeIntegral<u_int8_t>();
-    ndpi_cache_address_restore(&ndpi_struct, path, epoch_now);
-  }
+  ndpi_cache_address_dump(&ndpi_struct, path, epoch_now);
+  epoch_now += fuzzed_data.ConsumeIntegral<u_int8_t>();
+  ndpi_cache_address_restore(&ndpi_struct, path, epoch_now);
 
   ndpi_term_address_cache(ndpi_struct.address_cache);
 

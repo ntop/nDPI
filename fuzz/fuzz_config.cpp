@@ -705,6 +705,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   for(i = 0; i < 16; i++)
     pin6.s6_addr[i] = fuzzed_data.ConsumeIntegral<u_int8_t>();
   ndpi_network_port_ptree6_match(ndpi_info_mod, &pin6, fuzzed_data.ConsumeIntegral<u_int16_t>());
+  ndpi_network_ptree6_match(ndpi_info_mod, &pin6);
 
   ndpi_get_host_domain_suffix(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "www.bbc.co.uk", &suffix_id);
   ndpi_get_host_domain(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "www.bbc.co.uk");

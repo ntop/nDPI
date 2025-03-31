@@ -61,6 +61,7 @@ cp example/risky_domains.txt "$OUT"/
 cp example/ja4_fingerprints.csv "$OUT"/
 cp example/sha1_fingerprints.csv "$OUT"/
 cp example/config.txt "$OUT"/
+cp example/*.conf "$OUT"/
 cp lists/public_suffix_list.dat "$OUT"/
 cp fuzz/ipv*_addresses.txt "$OUT"/
 cp fuzz/bd_param.txt "$OUT"/
