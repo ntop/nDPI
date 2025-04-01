@@ -621,7 +621,7 @@ static void cleanupServerName(char *buffer, u_int buffer_len) {
 /*
   Return code
   -1: error (buffer too short)
-  0: OK but buffer is not human readeable (so something went wrong)
+  0: OK but buffer is not human readable (so something went wrong)
   1: OK
 */
 static int extractRDNSequence(struct ndpi_packet_struct *packet,

@@ -123,7 +123,7 @@ static int num_cfgs = 0;
 int reader_log_level = 0;
 char *_disabled_protocols = NULL;
 static u_int8_t stats_flag = 0;
-u_int8_t human_readeable_string_len = 5;
+u_int8_t human_readable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 24 /* 8 is enough for most protocols, Signal and SnapchatCall require more */, max_num_tcp_dissected_pkts = 80 /* due to telnet */;
 static u_int32_t pcap_analysis_duration = (u_int32_t)-1;
 static u_int32_t risk_stats[NDPI_MAX_RISK] = { 0 }, risks_found = 0, flows_with_risks = 0;
@@ -669,7 +669,7 @@ static void help(u_int long_help) {
          "                            | 2 - List known risks\n"
          "  -d                        | Disable protocol guess (by ip and by port) and use only DPI.\n"
 	 "                            | It is a shortcut to --cfg=dpi.guess_on_giveup,0\n"
-         "  -e <len>                  | Min human readeable string match len. Default %u\n"
+         "  -e <len>                  | Min human readable string match len. Default %u\n"
          "  -q                        | Quiet mode\n"
          "  -F                        | Enable flow stats\n"
          "  -t                        | Dissect GTP/TZSP tunnels\n"
@@ -719,7 +719,7 @@ static void help(u_int long_help) {
          "  --cfg=proto,param,value   | Configure the specific attribute of this protocol\n"
          "  --dump-fpc-stats          | Print FPC statistics\n"
          ,
-         human_readeable_string_len,
+         human_readable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
          max_num_reported_top_payloads, max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts);
 
@@ -1133,7 +1133,7 @@ static void parse_parameters(int argc, char **argv)
       break;
 
     case 'e':
-      human_readeable_string_len = atoi(optarg);
+      human_readable_string_len = atoi(optarg);
       break;
 
     case 'E':
@@ -2223,8 +2223,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->dhcp_class_ident) fprintf(out, "[DHCP Class Ident: %s]",
 				       flow->dhcp_class_ident);
 
-    if(flow->has_human_readeable_strings) fprintf(out, "[PLAIN TEXT (%s)]",
-						  flow->human_readeable_string_buffer);
+    if(flow->has_human_readable_strings) fprintf(out, "[PLAIN TEXT (%s)]",
+						  flow->human_readable_string_buffer);
 
 #ifdef DIRECTION_BINS
     print_bin(out, "Plen c2s", &flow->payload_len_bin_src2dst);
@@ -2952,7 +2952,7 @@ static void dump_realtime_protocol(struct ndpi_workflow * workflow, struct ndpi_
     fprintf(out, "Detected Realtime protocol %s --> [%s] %s:%d <--> %s:%d app=%s <%s>\n",
             date, ndpi_get_ip_proto_name(flow->protocol, ip_proto, sizeof(ip_proto)),
             srcip, ntohs(flow->src_port), dstip, ntohs(flow->dst_port),
-            app_name, flow->human_readeable_string_buffer);
+            app_name, flow->human_readable_string_buffer);
   }
 }
 

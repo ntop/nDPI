@@ -76,7 +76,7 @@
 #include "ndpi_classify.h"
 
 extern u_int8_t enable_flow_stats, enable_payload_analyzer;
-extern u_int8_t verbose, human_readeable_string_len;
+extern u_int8_t verbose, human_readable_string_len;
 extern u_int8_t max_num_udp_dissected_pkts /* 24 */, max_num_tcp_dissected_pkts /* 80 */;
 static u_int32_t flow_id = 0;
 extern FILE *fingerprint_fp;
@@ -1751,6 +1751,140 @@ void update_tcp_flags_count(struct ndpi_flow_info* flow, struct ndpi_tcphdr* tcp
 
 /* ****************************************************** */
 
+#define MIN_ENTROPY 2.5
+#define MAX_ENTROPY 4.8
+/**
+ * @brief Calculates the Shannon entropy of a given string to estimate its randomness.
+ *
+ * This function computes the Shannon entropy of the input string by analyzing the
+ * frequency distribution of its characters. Higher entropy indicates more randomness,
+ * while lower entropy suggests more predictable or structured content.
+ *
+ * The function is useful for detecting potentially random or pseudo-random strings,
+ * such as passwords, tokens, or hashes.
+ *
+ * @param str A null-terminated input string to analyze.
+ * @return The calculated entropy as a double. Returns 0.0 for empty strings.
+ *
+ * @note Typical entropy values range between MIN_ENTROPY (2.5) and MAX_ENTROPY (4.8)
+ *       for short strings. These thresholds can be used to classify the randomness
+ *       level of the string.
+ */
+static double calculate_entropy(const char *str) {
+  int freq[256] = {0};
+  int len = strlen(str);
+  if (len == 0) return 0.0;
+
+  for (int i = 0; i < len; i++)
+    freq[(unsigned char)str[i]]++;
+
+  double entropy = 0.0;
+  for (int i = 0; i < 256; i++) {
+    if (freq[i] > 0) {
+      double p = (double)freq[i] / len;
+      entropy -= p * log2(p);
+    }
+  }
+  return entropy;
+}
+
+/**
+ * @brief Checks if a character is valid for inclusion in a readable string.
+ *
+ * This function determines whether the given character is acceptable as part of
+ * a "readable" string based on specific rules:
+ *
+ * - Accepts the following characters explicitly: ':', '.', space, '@', and '/'.
+ * - Rejects characters classified as punctuation (via ndpi_ispunct).
+ * - Accepts alphanumeric characters (via ndpi_isdigit and ndpi_isalpha).
+ *
+ * @param c The character to validate.
+ * @return int
+ * - 1 if the character is considered valid.
+ * - 0 otherwise.
+ */
+static int readable_string_is_valid_char(char c) {
+  const char allowed[] = ":. @/";
+
+  if (strchr(allowed, c))
+    return 1;
+
+  if (ndpi_ispunct(c))
+    return 0;
+
+  return (ndpi_isdigit(c) || ndpi_isalpha(c));
+}
+
+/**
+ * @brief Validates if a string is considered human-readable.
+ *
+ * This function applies a set of heuristic rules to determine whether the provided string
+ * contains meaningful, human-readable content. It filters out strings that are too short,
+ * contain excessive special characters, or appear to be random or overly repetitive.
+ *
+ * Rules applied:
+ * - Must be at least 3 characters long.
+ * - Maximum length allowed is 1024 characters.
+ * - Must contain at least 2 alphabetic characters.
+ * - More than half the characters must not be special symbols.
+ * - No 3 or more consecutive non-alphanumeric, non-space characters.
+ * - Entropy must be within the defined range [MIN_ENTROPY, MAX_ENTROPY].
+ * - Each character must be validated by readable_string_is_valid_char().
+ *
+ * @note Ensure that the string is null-terminated before calling this function.
+ *
+ * @param str A pointer to the null-terminated string to validate.
+ * @return true if the string is considered human-readable, false otherwise.
+ */
+static bool ndpi_filter_readable_string(char *str) {
+  if (!str || strlen(str) < 3)
+    return false;
+
+  size_t len = strlen(str);
+  if (len > 1024)
+    return false;
+
+  size_t letters = 0, digits = 0, specials = 0, spaces = 0;
+  for (size_t i = 0; i < len; i++) {
+    if (isalpha(str[i])) letters++;
+    else if (isdigit(str[i])) digits++;
+    else if (isspace(str[i])) spaces++;
+    else specials++;
+
+    if (!readable_string_is_valid_char(str[i]))
+      return false;
+  }
+
+  // Reject if too few alphabetic characters
+  if (letters < 2)
+    return false;
+
+  // Reject if half or more of the characters are special symbols
+  if (specials > len / 2)
+    return false;
+
+  // Reject if there are 3 or more consecutive uncommon symbols
+  int consecutive_specials = 0;
+  for (size_t i = 0; i < len; i++) {
+    if (!isalnum(str[i]) && !isspace(str[i])) {
+      consecutive_specials++;
+      if (consecutive_specials >= 3)
+        return false;
+    } else {
+      consecutive_specials = 0;
+    }
+  }
+
+  // Reject if entropy is too low (monotonous) or too high (random noise)
+  double entropy = calculate_entropy(str);
+  if (entropy < MIN_ENTROPY || entropy > MAX_ENTROPY)
+    return false;
+
+  return true;
+}
+
+/* ****************************************************** */
+
 /**
    Function to process the packet:
    determine the flow of a packet and try to decode it
@@ -1932,28 +2066,55 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       memset(&flow->flow_last_pkt_time, '\0', sizeof(flow->flow_last_pkt_time));
     }
 
-    if((human_readeable_string_len != 0) && (!flow->has_human_readeable_strings)) {
+    if ((human_readable_string_len != 0) && (!flow->has_human_readable_strings)) {
       u_int8_t skip = 0;
 
-      if(proto == IPPROTO_TCP &&
-	 (is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) ||
-	  is_ndpi_proto(flow, NDPI_PROTOCOL_SSH))) {
-	if((flow->src2dst_packets+flow->dst2src_packets) < 10 /* MIN_NUM_ENCRYPT_SKIP_PACKETS */)
-	  skip = 1; /* Skip initial negotiation packets */
+      if (proto == IPPROTO_TCP && (is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) ||
+            is_ndpi_proto(flow, NDPI_PROTOCOL_SSH))) {
+        if ((flow->src2dst_packets+flow->dst2src_packets) <
+            10 /* MIN_NUM_ENCRYPT_SKIP_PACKETS */)
+          skip = 1; /* Skip initial negotiation packets */
       }
 
-      if((!skip) && ((flow->src2dst_packets+flow->dst2src_packets) < 100)) {
-	if(ndpi_has_human_readeable_string((char*)packet, header->caplen,
-					   human_readeable_string_len,
-					   flow->human_readeable_string_buffer,
-					   sizeof(flow->human_readeable_string_buffer)) == 1)
-	  flow->has_human_readeable_strings = 1;
+      if ((!skip) && ((flow->src2dst_packets+flow->dst2src_packets) < 100)) {
+        ndpi_string_list_t* human_readable_string_list =
+          ndpi_extract_readable_strings(
+              (const unsigned char*)packet,
+              header->caplen,
+              human_readable_string_len,
+              2,
+              ndpi_filter_readable_string
+              );
+        if (human_readable_string_list) {
+          if (human_readable_string_list->count > 0 && human_readable_string_list->items[0]) {
+            if (human_readable_string_list->count > 1 &&
+                human_readable_string_list->items[1] &&
+                strcmp(human_readable_string_list->items[0],
+                  human_readable_string_list->items[1]) != 0) {
+              snprintf(flow->human_readable_string_buffer,
+                  sizeof(flow->human_readable_string_buffer),
+                  "%s %s",
+                  human_readable_string_list->items[0],
+                  human_readable_string_list->items[1]);
+            } else {
+              snprintf(flow->human_readable_string_buffer,
+                  sizeof(flow->human_readable_string_buffer),
+                  "%s",
+                  human_readable_string_list->items[0]);
+            }
+
+            flow->has_human_readable_strings = 1;
+          }
+
+          ndpi_string_list_free(human_readable_string_list);
+        }
       }
     } else {
-      if(proto == IPPROTO_TCP &&
-         (is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) ||
-          is_ndpi_proto(flow, NDPI_PROTOCOL_SSH)))
-	flow->has_human_readeable_strings = 0;
+      if (proto == IPPROTO_TCP &&
+          (is_ndpi_proto(flow, NDPI_PROTOCOL_TLS) ||
+           is_ndpi_proto(flow, NDPI_PROTOCOL_SSH))){
+        flow->has_human_readable_strings = 0;
+      }
     }
   } else { // flow is NULL
     workflow->stats.total_discarded_bytes += header->len;

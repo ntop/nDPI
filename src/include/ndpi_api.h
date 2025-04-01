@@ -1148,9 +1148,25 @@ extern "C" {
   const char* ndpi_tunnel2str(ndpi_packet_tunnel tt);
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow);
-  int ndpi_has_human_readeable_string(char *buffer, u_int buffer_size,
-				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
-				      char *outbuf, u_int outbuf_len);
+
+  /**
+   * @struct ndpi_string_list_t
+   * @brief Represents a dynamic list of strings.
+   *
+   * This structure manages a dynamic array of strings, keeping track of the number of
+   * stored items and the allocated capacity.
+   */
+  typedef struct {
+    char **items;   ///< Array of strings
+    size_t count;   ///< Number of strings currently stored
+    size_t capacity; ///< Allocated capacity of the list
+  } ndpi_string_list_t;
+
+  void ndpi_string_list_free(ndpi_string_list_t *list);
+
+  ndpi_string_list_t* ndpi_extract_readable_strings(const unsigned char *buffer, size_t buffer_len,
+      size_t min_len, size_t list_limit, bool (*filter_func)(char *));
+
   /* Return a flow info string (summarized). Does only work for DNS/HTTP/TLS/QUIC. */
   const char* ndpi_get_flow_info(struct ndpi_flow_struct const * const flow,
                                  ndpi_protocol const * const l7_protocol);

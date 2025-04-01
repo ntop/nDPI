@@ -232,7 +232,7 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
        || ndpi_strnstr((const char *)packet->content_line.ptr, "text/", packet->content_line.len)
        || ndpi_strnstr((const char *)packet->content_line.ptr, "/json", packet->content_line.len)
        ) {
-      /* This is supposed to be a human-readeable text file */
+      /* This is supposed to be a human-readable text file */
       packet->http_check_content = 1;
 
       if(len >= 8 /* 4 chars for \r\n\r\n and at least 4 charts for content guess */) {

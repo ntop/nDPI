@@ -154,7 +154,7 @@ TLS needs to carry the the `SNI <https://en.wikipedia.org/wiki/Server_Name_Indic
 
 NDPI_HTTP_SUSPICIOUS_CONTENT
 ============================
-HTTP only: risk reported when HTTP carries content in expected format. Example the HTTP header indicates that the context is text/html but the real content is not readeable (i.e. it can transport binary data). In general this is an attempt to use a valid MIME type to carry data that does not match the type.
+HTTP only: risk reported when HTTP carries content in expected format. Example the HTTP header indicates that the context is text/html but the real content is not readable (i.e. it can transport binary data). In general this is an attempt to use a valid MIME type to carry data that does not match the type.
 
 .. _Risk 026:
 
