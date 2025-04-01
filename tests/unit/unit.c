@@ -95,16 +95,23 @@ int serializerUnitTest() {
 
     for(i=0; i<16; i++) {
       char kbuf[32], vbuf[32];
-      ndpi_snprintf(kbuf, sizeof(kbuf), "Key %d", i);
+      int j = 0;
       ndpi_snprintf(vbuf, sizeof(vbuf), "Value %d", i);
-      assert(ndpi_serialize_uint32_uint32(&serializer, i, i*i) != -1);
-      assert(ndpi_serialize_uint32_string(&serializer, i, "Data") != -1);
+      assert(ndpi_serialize_uint32_uint32(&serializer, j++, i*i) != -1);
+      assert(ndpi_serialize_uint32_string(&serializer, j++, "Data") != -1);
+      ndpi_snprintf(kbuf, sizeof(kbuf), "Key %d", j++);
       assert(ndpi_serialize_string_string(&serializer, kbuf, vbuf) != -1);
+      ndpi_snprintf(kbuf, sizeof(kbuf), "Key %d", j++);
       assert(ndpi_serialize_string_uint32(&serializer, kbuf, i*i) != -1);
+      ndpi_snprintf(kbuf, sizeof(kbuf), "Key %d", j++);
       assert(ndpi_serialize_string_float(&serializer,  kbuf, (float)(i*i), "%f") != -1);
-      if (fmt != ndpi_serialization_format_tlv)
+      if (fmt != ndpi_serialization_format_tlv) {
+        ndpi_snprintf(kbuf, sizeof(kbuf), "Key %d", j++);
         assert(ndpi_serialize_string_double(&serializer, kbuf, ((double)(FLT_MAX))*2, "%lf") != -1);
+      }
+      ndpi_snprintf(kbuf, sizeof(kbuf), "Key %d", j++);
       assert(ndpi_serialize_string_int64(&serializer,  kbuf, INT64_MAX) != -1);
+      assert(ndpi_serialize_string_string(&serializer, "utf-8", "küche") != -1);
       if ((i&0x3) == 0x3) ndpi_serialize_end_of_record(&serializer);
     }
 

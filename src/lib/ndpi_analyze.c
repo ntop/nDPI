@@ -1367,9 +1367,16 @@ int ndpi_ses_add_value(struct ndpi_ses_struct *ses, const double _value, double 
 
   if(ses->num_values == 0)
     *forecast = value;
-  else
+  else {
+#if 1
+    /* "Classic" formula */
+    *forecast = (ses->params.alpha * value) + ((1 - ses->params.alpha) * ses->last_forecast);
+#else
+    /* Alternative formula */
     *forecast = (ses->params.alpha * (ses->last_value - ses->last_forecast)) + ses->last_forecast;
-
+#endif
+  }
+  
   error  = value - *forecast;
   sq_error =  error * error;
   ses->sum_square_error += sq_error, ses->prev_error.sum_square_error += sq_error;

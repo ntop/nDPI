@@ -69,8 +69,7 @@ static void ndpi_search_checkmk(struct ndpi_detection_module_struct *ndpi_struct
     }
   }
 
-  NDPI_LOG_DBG(ndpi_struct, "Check_MK excluded.\n");
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_CHECKMK);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

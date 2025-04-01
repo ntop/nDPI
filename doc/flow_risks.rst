@@ -127,9 +127,9 @@ This risk indicates that the `SMB <https://en.wikipedia.org/wiki/Server_Message_
 
 .. _Risk 021:
 
-NDPI_TLS_SUSPICIOUS_ESNI_USAGE
-==============================
-`SNI <https://en.wikipedia.org/wiki/Server_Name_Indication>`_ is a way to carry in TLS the host/domain name we're accessing. ESNI means encrypted SNI and it is a way to mask SNI (carried in clear text in the TLS header) with encryption. While this practice is legal, it could be used for hiding data or for attacks such as a suspicious `domain fronting <https://github.com/SixGenInc/Noctilucent/blob/master/docs/>`_.
+NDPI_FREE_21
+============
+Placeholder; not really used.
 
 .. _Risk 022:
 
@@ -313,9 +313,9 @@ Relevant TCP connection issues such as connection refused, scan, or probe attemp
 
 .. _Risk 051
 
-NDPI_FULLY_ENCRYPTED
-====================
-Flow with Unknown protocol containing encrypted traffic.
+NDPI_FREE_51
+============
+Placeholder; not really used.
 
 .. _Risk 052
 

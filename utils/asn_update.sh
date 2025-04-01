@@ -94,10 +94,10 @@ DEST=../src/lib/inc_generated/ndpi_asn_dropbox.c.inc
 create_list NDPI_PROTOCOL_DROPBOX $DEST "" "AS62190" "AS54372" "AS393874" "AS203719" "AS200499" "AS19679"
 echo "(3) Dropbox IPs are available in $DEST"
 
-echo "(1) Downloading Starcraft routes..." #Starcraft or a more generic Blizzard stuff?
-DEST=../src/lib/inc_generated/ndpi_asn_starcraft.c.inc
-create_list NDPI_PROTOCOL_STARCRAFT $DEST "" "AS57976" "AS32163"
-echo "(3) Starcraft IPs are available in $DEST"
+echo "(1) Downloading Blizzard routes..."
+DEST=../src/lib/inc_generated/ndpi_asn_blizzard.c.inc
+create_list NDPI_PROTOCOL_BLIZZARD $DEST "" "AS57976" "AS32163"
+echo "(3) Blizzard IPs are available in $DEST"
 
 echo "(1) Downloading UbuntuOne routes..." #Canonical
 DEST=../src/lib/inc_generated/ndpi_asn_ubuntuone.c.inc

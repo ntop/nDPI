@@ -5,6 +5,7 @@
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   u_int16_t len;
+  u_char out[4096];
 
   /* No real memory allocations involved */
 
@@ -15,6 +16,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_strnstr(haystack.c_str(), needle.c_str(), len);
 
   ndpi_str_endswith(haystack.c_str(), needle.c_str());
+
+  ndpi_str_to_utf8((u_char *)haystack.c_str(), strlen(haystack.c_str()), out, sizeof(out));
 
   return 0;
 }

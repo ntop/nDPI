@@ -239,7 +239,6 @@ struct receiver *receivers = NULL, *topReceivers = NULL;
 
 #define WIRESHARK_METADATA_SERVERNAME	0x01
 #define WIRESHARK_METADATA_JA4C		0x02
-#define WIRESHARK_METADATA_TLS_HEURISTICS_MATCHING_FINGERPRINT	0x03
 
 struct ndpi_packet_tlv {
   u_int16_t type;
@@ -678,7 +677,7 @@ static void help(u_int long_help) {
          "                            | <b> = max pattern len to search\n"
          "                            | <c> = max num packets per flow\n"
          "                            | <d> = max packet payload dissection\n"
-         "                            | <d> = max num reported payloads\n"
+         "                            | <e> = max num reported payloads\n"
          "                            | Default: %u:%u:%u:%u:%u\n"
          "  -c <path>                 | Load custom categories from the specified file\n"
          "  -C <path>                 | Write output in CSV format on the specified file\n"
@@ -2054,6 +2053,17 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 		fprintf(out, "[%s]", "Auth Failed");
 	      }
 	  }
+        break;
+
+      case INFO_FASTCGI:
+        if (flow->fast_cgi.url[0] != '\0')
+          {
+            fprintf(out, "[Url: %s]", flow->fast_cgi.url);
+          }
+        if (flow->fast_cgi.user_agent[0] != '\0')
+          {
+            fprintf(out, "[User-agent: %s]", flow->fast_cgi.user_agent);
+          }
         break;
       }
 
@@ -4775,22 +4785,6 @@ static void ndpi_process_packet(u_char *args,
         tlv->type = ntohs(WIRESHARK_METADATA_JA4C);
         tlv->length = ntohs(sizeof(flow->ssh_tls.ja4_client));
         memcpy(tlv->data, flow->ssh_tls.ja4_client, sizeof(flow->ssh_tls.ja4_client));
-        /* TODO: boundary check */
-        tot_len += 4 + htons(tlv->length);
-        tlv = (struct ndpi_packet_tlv *)&trailer->metadata[tot_len];
-      }
-      if(flow->ssh_tls.obfuscated_heur_matching_set.pkts[0] != 0) {
-        tlv->type = ntohs(WIRESHARK_METADATA_TLS_HEURISTICS_MATCHING_FINGERPRINT);
-        tlv->length = ntohs(sizeof(struct ndpi_tls_obfuscated_heuristic_matching_set));
-        struct ndpi_tls_obfuscated_heuristic_matching_set *s =  (struct ndpi_tls_obfuscated_heuristic_matching_set *)tlv->data;
-        s->bytes[0] = ntohl(flow->ssh_tls.obfuscated_heur_matching_set.bytes[0]);
-        s->bytes[1] = ntohl(flow->ssh_tls.obfuscated_heur_matching_set.bytes[1]);
-        s->bytes[2] = ntohl(flow->ssh_tls.obfuscated_heur_matching_set.bytes[2]);
-        s->bytes[3] = ntohl(flow->ssh_tls.obfuscated_heur_matching_set.bytes[3]);
-        s->pkts[0] = ntohl(flow->ssh_tls.obfuscated_heur_matching_set.pkts[0]);
-        s->pkts[1] = ntohl(flow->ssh_tls.obfuscated_heur_matching_set.pkts[1]);
-        s->pkts[2] = ntohl(flow->ssh_tls.obfuscated_heur_matching_set.pkts[2]);
-        s->pkts[3] = ntohl(flow->ssh_tls.obfuscated_heur_matching_set.pkts[3]);
         /* TODO: boundary check */
         tot_len += 4 + htons(tlv->length);
         tlv = (struct ndpi_packet_tlv *)&trailer->metadata[tot_len];

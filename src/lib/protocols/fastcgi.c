@@ -136,20 +136,13 @@ static int fcgi_parse_params(struct ndpi_flow_struct * const flow,
     return 1;
   }
 
-  flow->http.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
-                                           (u_int16_t)packet->http_method.len);
+  flow->protos.fast_cgi.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
+                                                      (u_int16_t)packet->http_method.len);
   ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
-  ndpi_user_agent_set(flow, packet->user_agent_line.ptr, packet->user_agent_line.len);
-
-  if (flow->http.url == NULL && packet->http_url_name.len > 0)
-  {
-    flow->http.url = ndpi_malloc(packet->http_url_name.len + 1);
-    if (flow->http.url != NULL)
-    {
-      strncpy(flow->http.url, (char const *)packet->http_url_name.ptr, packet->http_url_name.len);
-      flow->http.url[packet->http_url_name.len] = '\0';
-    }
-  }
+  strncpy(flow->protos.fast_cgi.user_agent, (char *)packet->user_agent_line.ptr,
+          ndpi_min(sizeof(flow->protos.fast_cgi.user_agent) - 1, packet->user_agent_line.len));
+  strncpy(flow->protos.fast_cgi.url, (char *)packet->http_url_name.ptr,
+          ndpi_min(sizeof(flow->protos.fast_cgi.url) - 1, packet->http_url_name.len));
 
   return 0;
 }

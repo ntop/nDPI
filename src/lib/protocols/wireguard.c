@@ -139,7 +139,8 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
       u_int32_t receiver_index = get_u_int32_t(payload, 8);
 
       if (receiver_index == flow->l4.udp.wireguard_peer_index[1 - packet->packet_direction]) {
-        if(packet->payload_packet_len == 100)
+        if(packet->payload_packet_len == 100 &&
+           ndpi_struct->cfg.wireguard_subclassification_by_ip /* TODO: the right option? */)
           ndpi_int_wireguard_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_TUNNELBEAR);
         else
           ndpi_int_wireguard_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);

@@ -1,1 +1,1 @@
---cfg=flow_risk_infos,0
+--cfg=flow_risk.all.info,0

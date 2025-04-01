@@ -88,47 +88,71 @@ static int ndpi_is_number(const char *str, u_int32_t str_len) {
  * Upon successful return, these functions return the number of characters printed (excluding the null byte used to terminate the string).
  */
 int ndpi_json_string_escape(const char *src, int src_len, char *dst, int dst_max_len) {
-  char c = 0;
+  u_char c = 0;
   int i, j = 0;
 
   dst[j++] = '"';
 
   for(i = 0; i < src_len && j < dst_max_len; i++) {
 
-    c = src[i];
+    c = (u_char) src[i];
 
-    switch (c) {
-    case '\\':
-    case '"':
-    case '/':
-      dst[j++] = '\\';
+    if (c < 0x20 /* ' ' */ || c == 0x7F) {
+      ; // Non-printable ASCII character (skip)
+    } else if (c >= 0x20 && c <= 0x7E) {
+      // Valid ASCII character (escape if required by JSON)
+      switch (c) {
+      case '\\':
+      case '"':
+      case '/':
+        dst[j++] = '\\';
+        dst[j++] = c;
+        break;
+      case '\b':
+        dst[j++] = '\\';
+        dst[j++] = 'b';
+        break;
+      case '\t':
+        dst[j++] = '\\';
+        dst[j++] = 't';
+        break;
+      case '\n':
+        dst[j++] = '\\';
+        dst[j++] = 'n';
+        break;
+      case '\f':
+        dst[j++] = '\\';
+        dst[j++] = 'f';
+        break;
+      case '\r':
+        dst[j++] = '\\';
+        dst[j++] = 'r';
+        break;
+      default:
+  	dst[j++] = c;
+      }
+
+    } else if ((c >= 0xC2 && c <= 0xDF) && (src_len - i) >= 2 && 
+               ((u_char) src[i+1] >= 0x80 && (u_char) src[i+1] <= 0xBF)) {
+      // 2-byte sequence (U+0080 to U+07FF)
       dst[j++] = c;
-      break;
-    case '\b':
-      dst[j++] = '\\';
-      dst[j++] = 'b';
-      break;
-    case '\t':
-      dst[j++] = '\\';
-      dst[j++] = 't';
-      break;
-    case '\n':
-      dst[j++] = '\\';
-      dst[j++] = 'n';
-      break;
-    case '\f':
-      dst[j++] = '\\';
-      dst[j++] = 'f';
-      break;
-    case '\r':
-      dst[j++] = '\\';
-      dst[j++] = 'r';
-      break;
-    default:
-      if(c < ' ')
-	; /* non printable */
-      else
-	dst[j++] = c;
+      dst[j++] = src[++i];
+    } else if ((c >= 0xE0 && c <= 0xEF) && (src_len - i) >= 3 &&
+               ((u_char) src[i+1] >= 0x80 && (u_char) src[i+1] <= 0xBF) &&
+               ((u_char) src[i+2] >= 0x80 && (u_char) src[i+2] <= 0xBF)) {
+      // 3-byte sequence (U+0800 to U+FFFF)
+      dst[j++] = c;
+      dst[j++] = src[++i];
+      dst[j++] = src[++i];
+    } else if ((c >= 0xF0 && c <= 0xF4) && (src_len - i) >= 4 &&
+               ((u_char) src[i+1] >= 0x80 && (u_char) src[i+1] <= 0xBF) &&
+               ((u_char) src[i+2] >= 0x80 && (u_char) src[i+2] <= 0xBF) &&
+               ((u_char) src[i+3] >= 0x80 && (u_char) src[i+3] <= 0xBF)) {
+      // 4-byte sequence (U+10000 to U+10FFiFF)
+      dst[j++] = c;
+      dst[j++] = src[++i];
+      dst[j++] = src[++i];
+      dst[j++] = src[++i];
     }
   }
 
@@ -1274,7 +1298,7 @@ int ndpi_serialize_uint32_binary(ndpi_serializer *_serializer,
   int rc;
 
   if(serializer->fmt == ndpi_serialization_format_json)
-    needed += 24 + slen;
+    needed += 24 + slen*2 /* account escape (x2) */;
 
   if(buff_diff < needed) {
     if(ndpi_extend_serializer_buffer(&serializer->buffer, needed - buff_diff) < 0)

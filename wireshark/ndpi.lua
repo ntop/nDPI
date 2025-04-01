@@ -70,7 +70,6 @@ local mtd_types = {
    [0] = "Padding",
    [1] = "Server Name",
    [2] = "JA4C",
-   [3] = "TLS Heuristic Fingerprint",
 }
 ndpi_fds.metadata_type        = ProtoField.new("nDPI Metadata Type", "ndpi.metadata.type", ftypes.UINT16, mtd_types)
 ndpi_fds.metadata_length      = ProtoField.new("nDPI Metadata Length", "ndpi.metadata.length", ftypes.UINT16)
@@ -79,16 +78,6 @@ ndpi_fds.metadata_value       = ProtoField.new("nDPI Metadata Value", "ndpi.meta
 -- Specific fields
 ndpi_fds.metadata_server_name = ProtoField.new("nDPI Server Name", "ndpi.metadata.server_name", ftypes.STRING)
 ndpi_fds.metadata_ja4c        = ProtoField.new("nDPI JA4C", "ndpi.metadata.ja4c", ftypes.STRING)
-ndpi_fds.metadata             = ProtoField.new("nDPI Metadata", "ndpi.metadata", ftypes.NONE)
-ndpi_fds.metadata_tls_heuristic_fingerprint = ProtoField.new("nDPI TLS Heuristic Fingerprint", "ndpi.metadata.tls_heuristic_fingerprint", ftypes.NONE)
-ndpi_fds.metadata_tls_heuristic_fingerprint_bytes0 = ProtoField.new("Bytes[0]", "ndpi.metadata.tls_heuristic_fingerprint.bytes0", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_bytes1 = ProtoField.new("Bytes[1]", "ndpi.metadata.tls_heuristic_fingerprint.bytes1", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_bytes2 = ProtoField.new("Bytes[2]", "ndpi.metadata.tls_heuristic_fingerprint.bytes2", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_bytes3 = ProtoField.new("Bytes[3]", "ndpi.metadata.tls_heuristic_fingerprint.bytes3", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_pkts0 = ProtoField.new("Pkts[0]", "ndpi.metadata.tls_heuristic_fingerprint.pkts0", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_pkts1 = ProtoField.new("Pkts[1]", "ndpi.metadata.tls_heuristic_fingerprint.pkts1", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_pkts2 = ProtoField.new("Pkts[2]", "ndpi.metadata.tls_heuristic_fingerprint.pkts2", ftypes.UINT32)
-ndpi_fds.metadata_tls_heuristic_fingerprint_pkts3 = ProtoField.new("Pkts[3]", "ndpi.metadata.tls_heuristic_fingerprint.pkts3", ftypes.UINT32)
 
 
 local flow_risks = {}
@@ -115,7 +104,7 @@ flow_risks[17] = ProtoField.bool("ndpi.flow_risk.malformed_packet", "Malformed p
 flow_risks[18] = ProtoField.bool("ndpi.flow_risk.ssh_obsolete_client", "SSH Obsolete Client Version/Cipher", num_bits_flow_risks, nil, bit(18), "nDPI Flow Risk: SSH Obsolete Client Version/Cipher")
 flow_risks[19] = ProtoField.bool("ndpi.flow_risk.ssh_obsolete_server", "SSH Obsolete Server Version/Cipher", num_bits_flow_risks, nil, bit(19), "nDPI Flow Risk: SSH Obsolete Server Version/Cipher")
 flow_risks[20] = ProtoField.bool("ndpi.flow_risk.smb_insecure_version", "SMB Insecure Version", num_bits_flow_risks, nil, bit(20), "nDPI Flow Risk: SMB Insecure Version")
-flow_risks[21] = ProtoField.bool("ndpi.flow_risk.tls_suspicious_esni", "TLS Suspicious ESNI Usage", num_bits_flow_risks, nil, bit(21), "nDPI Flow Risk: TLS Suspicious ESNI Usage")
+flow_risks[21] = ProtoField.bool("ndpi.flow_risk.free_21", "FREE21", num_bits_flow_risks, nil, bit(21), "nDPI Flow Risk: FREE21")
 flow_risks[22] = ProtoField.bool("ndpi.flow_risk.unsafe_protocol", "Unsafe Protocol", num_bits_flow_risks, nil, bit(22), "nDPI Flow Risk: Unsafe Protocol")
 flow_risks[23] = ProtoField.bool("ndpi.flow_risk.suspicious_dns_traffic", "Suspicious DNS traffic", num_bits_flow_risks, nil, bit(23), "nDPI Flow Risk: Suspicious DNS traffic")
 flow_risks[24] = ProtoField.bool("ndpi.flow_risk.sni_tls_extension_missing", "SNI TLS extension was missing", num_bits_flow_risks, nil, bit(24), "nDPI Flow Risk: SNI TLS extension was missing")
@@ -145,7 +134,7 @@ flow_risks[47] = ProtoField.bool("ndpi.flow_risk.http_obsolete_server", "Obsolet
 flow_risks[48] = ProtoField.bool("ndpi.flow_risk.periodic_flow", "Periodic Flow", num_bits_flow_risks, nil, bit(48), "nDPI Flow Risk: Periodic Flow")
 flow_risks[49] = ProtoField.bool("ndpi.flow_risk.minor_issues", "Minor flow issues", num_bits_flow_risks, nil, bit(49), "nDPI Flow Risk: Minor flow issues")
 flow_risks[50] = ProtoField.bool("ndpi.flow_risk.tcp_issues", "TCP connection issues", num_bits_flow_risks, nil, bit(50), "nDPI Flow Risk: TCP connection issues")
-flow_risks[51] = ProtoField.bool("ndpi.flow_risk.fully_encrypted", "Fully encrypted connection", num_bits_flow_risks, nil, bit(51), "nDPI Flow Risk: Fully encrypted connection")
+flow_risks[51] = ProtoField.bool("ndpi.flow_risk.free_51", "FREE51", num_bits_flow_risks, nil, bit(51), "nDPI Flow Risk: FREE51")
 flow_risks[52] = ProtoField.bool("ndpi.flow_risk.tls_alpn_sni_mismatch", "ALPN/SNI Mismatch", num_bits_flow_risks, nil, bit(52), "nDPI Flow Risk: ALPN/SNI Mismatch")
 flow_risks[53] = ProtoField.bool("ndpi.flow_risk.malware_contact", "Contact with a malware host", num_bits_flow_risks, nil, bit(53), "nDPI Flow Risk: Malware host contacted")
 flow_risks[54] = ProtoField.bool("ndpi.flow_risk.binary_data_transfer", "Attempt to transfer a binary file", num_bits_flow_risks, nil, bit(54), "nDPI Flow Risk: binary data file transfer")
@@ -1976,17 +1965,6 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	       elseif mtd_type == 2 then
 	          metadata_tree:append_text(" JA4C: " .. trailer_tvb(offset + 4, mtd_length):string())
 	          metadata_tree:add(ndpi_fds.metadata_ja4c, trailer_tvb(offset + 4, mtd_length))
-	       elseif mtd_type == 3 then
-	          metadata_tree:append_text(" TLS Heuristic Fingerprint")
-	          tls_tree = metadata_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint, trailer_tvb(offset + 4, mtd_length))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_bytes0, trailer_tvb(offset + 4, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_bytes1, trailer_tvb(offset + 8, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_bytes2, trailer_tvb(offset + 12, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_bytes3, trailer_tvb(offset + 16, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_pkts0, trailer_tvb(offset + 20, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_pkts1, trailer_tvb(offset + 24, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_pkts2, trailer_tvb(offset + 28, 4))
-	          tls_tree:add(ndpi_fds.metadata_tls_heuristic_fingerprint_pkts3, trailer_tvb(offset + 32, 4))
 	       else
 		  -- Generic field
 		  metadata_tree:add(ndpi_fds.metadata_value, trailer_tvb(offset + 4, mtd_length))

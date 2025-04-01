@@ -530,7 +530,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 #endif
 
   NDPI_LOG_DBG(ndpi_struct, "excluding ssh at stage %d\n", flow->l4.tcp.ssh_stage);
-  NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SSH);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 /* ************************************************************************ */

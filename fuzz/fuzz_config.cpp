@@ -482,16 +482,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       snprintf(cfg_param, sizeof(cfg_param), "flow_risk.%d", pid);
     ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
     ndpi_get_config(ndpi_info_mod, NULL, cfg_param, cfg_value, sizeof(cfg_value));
+
+    if(fuzzed_data.ConsumeBool() && pid < NDPI_MAX_RISK)
+      snprintf(cfg_param, sizeof(cfg_param), "flow_risk.%s.info", ndpi_risk_shortnames[pid]);
+    else
+      snprintf(cfg_param, sizeof(cfg_param), "flow_risk.%d.info", pid);
+    ndpi_set_config(ndpi_info_mod, NULL, cfg_param, cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     ndpi_set_config(ndpi_info_mod, NULL, "flow_risk_lists.load", cfg_value);
-  }
-  if(fuzzed_data.ConsumeBool()) {
-    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
-    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
-    ndpi_set_config(ndpi_info_mod, NULL, "flow_risk_infos", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
@@ -704,6 +705,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   for(i = 0; i < 16; i++)
     pin6.s6_addr[i] = fuzzed_data.ConsumeIntegral<u_int8_t>();
   ndpi_network_port_ptree6_match(ndpi_info_mod, &pin6, fuzzed_data.ConsumeIntegral<u_int16_t>());
+  ndpi_network_ptree6_match(ndpi_info_mod, &pin6);
 
   ndpi_get_host_domain_suffix(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "www.bbc.co.uk", &suffix_id);
   ndpi_get_host_domain(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : "www.bbc.co.uk");

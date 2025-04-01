@@ -101,7 +101,7 @@ static void ndpi_search_someip(struct ndpi_detection_module_struct *ndpi_struct,
   if (packet->payload_packet_len < 16) {
     NDPI_LOG_DBG(ndpi_struct,
 	     "Excluding SOME/IP .. mandatory header not found (not enough data for all fields)\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
   
@@ -122,7 +122,7 @@ static void ndpi_search_someip(struct ndpi_detection_module_struct *ndpi_struct,
   u_int32_t someip_len = ntohl(someip_data_cover_32(&packet->payload[4]));
   if (packet->payload_packet_len != (someip_len + 8)) {
     NDPI_LOG_DBG(ndpi_struct, "Excluding SOME/IP .. Length field invalid!\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
@@ -130,7 +130,7 @@ static void ndpi_search_someip(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG2(ndpi_struct,"====>>>> SOME/IP protocol version: [%d]\n",protocol_version);
   if (protocol_version != LEGAL_PROTOCOL_VERSION){
     NDPI_LOG_DBG(ndpi_struct, "Excluding SOME/IP .. invalid protocol version!\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
@@ -144,7 +144,7 @@ static void ndpi_search_someip(struct ndpi_detection_module_struct *ndpi_struct,
       (message_type != SOMEIP_REQUEST_NO_RETURN_ACK) && (message_type != SOMEIP_NOTIFICATION_ACK) && (message_type != SOMEIP_RESPONSE) && 
       (message_type != SOMEIP_ERROR) && (message_type != SOMEIP_RESPONSE_ACK) && (message_type != SOMEIP_ERROR_ACK)) {
     NDPI_LOG_DBG(ndpi_struct, "Excluding SOME/IP .. invalid message type!\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 
@@ -152,7 +152,7 @@ static void ndpi_search_someip(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG2(ndpi_struct,"====>>>> SOME/IP return code: [%d]\n", return_code);
   if ((return_code >= E_RETURN_CODE_LEGAL_THRESHOLD)) {
     NDPI_LOG_DBG(ndpi_struct, "Excluding SOME/IP .. invalid return code!\n");
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
     return;
   }
 	
@@ -165,7 +165,7 @@ static void ndpi_search_someip(struct ndpi_detection_module_struct *ndpi_struct,
     }											
     else{
       NDPI_LOG_DBG(ndpi_struct, "Excluding SOME/IP, invalid header for Magic Cookie\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
   }
@@ -179,7 +179,7 @@ static void ndpi_search_someip(struct ndpi_detection_module_struct *ndpi_struct,
     }											
     else{
       NDPI_LOG_DBG(ndpi_struct, "Excluding SOME/IP, invalid header for Magic Cookie ACK\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_SOMEIP);
+      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
       return;
     }
   }
