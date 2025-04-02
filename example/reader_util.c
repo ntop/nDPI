@@ -1847,10 +1847,9 @@ static bool ndpi_filter_readable_string(char *str) {
   if (len > 1024)
     return false;
 
-  size_t letters = 0, digits = 0, specials = 0;
+  size_t letters = 0, specials = 0;
   for (size_t i = 0; i < len; i++) {
     if (isalpha(str[i])) letters++;
-    else if (isdigit(str[i])) digits++;
     else specials++;
 
     if (!readable_string_is_valid_char(str[i]))
