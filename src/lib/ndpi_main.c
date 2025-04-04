@@ -11999,19 +11999,19 @@ static const struct cfg_param {
   { NULL,            "lru.ookla.scope",                         "0", "0", "1", CFG_PARAM_INT, __OFF(ookla_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.bittorrent.size",                     "32768", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_num_entries), NULL },
-  { NULL,            "lru.bittorrent.ttl",                      "0", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_ttl), NULL },
+  { NULL,            "lru.bittorrent.ttl",                      "300", "0", "16777215", CFG_PARAM_INT, __OFF(bittorrent_cache_ttl), NULL },
   { NULL,            "lru.bittorrent.scope",                    "0", "0", "1", CFG_PARAM_INT, __OFF(bittorrent_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.stun.size",                           "1024", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_num_entries), NULL },
-  { NULL,            "lru.stun.ttl",                            "0", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_ttl), NULL },
+  { NULL,            "lru.stun.ttl",                            "300", "0", "16777215", CFG_PARAM_INT, __OFF(stun_cache_ttl), NULL },
   { NULL,            "lru.stun.scope",                          "0", "0", "1", CFG_PARAM_INT, __OFF(stun_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.tls_cert.size",                       "1024", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_num_entries), NULL },
-  { NULL,            "lru.tls_cert.ttl",                        "0", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_ttl), NULL },
+  { NULL,            "lru.tls_cert.ttl",                        "300", "0", "16777215", CFG_PARAM_INT, __OFF(tls_cert_cache_ttl), NULL },
   { NULL,            "lru.tls_cert.scope",                      "0", "0", "1", CFG_PARAM_INT, __OFF(tls_cert_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.mining.size",                         "1024", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_num_entries), NULL },
-  { NULL,            "lru.mining.ttl",                          "0", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_ttl), NULL },
+  { NULL,            "lru.mining.ttl",                          "300", "0", "16777215", CFG_PARAM_INT, __OFF(mining_cache_ttl), NULL },
   { NULL,            "lru.mining.scope",                        "0", "0", "1", CFG_PARAM_INT, __OFF(mining_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.msteams.size",                        "1024", "0", "16777215", CFG_PARAM_INT, __OFF(msteams_cache_num_entries), NULL },
@@ -12023,7 +12023,7 @@ static const struct cfg_param {
   { NULL,            "lru.fpc_dns.scope",                       "0", "0", "1", CFG_PARAM_INT, __OFF(fpc_dns_cache_scope), clbk_only_with_global_ctx },
 
   { NULL,            "lru.signal.size",                         "32768", "0", "16777215", CFG_PARAM_INT, __OFF(signal_cache_num_entries), NULL },
-  { NULL,            "lru.signal.ttl",                          "0", "0", "16777215", CFG_PARAM_INT, __OFF(signal_cache_ttl), NULL },
+  { NULL,            "lru.signal.ttl",                          "300", "0", "16777215", CFG_PARAM_INT, __OFF(signal_cache_ttl), NULL },
   { NULL,            "lru.signal.scope",                        "0", "0", "1", CFG_PARAM_INT, __OFF(signal_cache_scope), clbk_only_with_global_ctx },
 
   { NULL, NULL, NULL, NULL, NULL, 0, -1, NULL },
