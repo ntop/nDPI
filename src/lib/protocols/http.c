@@ -646,6 +646,10 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STEAM, master_protocol, NDPI_CONFIDENCE_DPI);
   }
 
+  if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) &&
+      flow->http.user_agent && strstr(flow->http.user_agent, "AirControl Agent v1.0")) {
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UBNTAC2, master_protocol, NDPI_CONFIDENCE_DPI);
+  }
 
   if(flow->http.request_header_observed) {
     if(flow->http.first_payload_after_header_observed == 0) {
