@@ -444,9 +444,8 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
               found = 1;
           }
 
-          /* Add to FPC DNS cache */
-          if(flow->protos.dns.num_rsp_addr == 1 && /* Only the first one */
-             ndpi_struct->cfg.fpc_enabled &&
+          /* Add (all addresses) to FPC DNS cache */
+          if(ndpi_struct->cfg.fpc_enabled &&
              proto->app_protocol != NDPI_PROTOCOL_UNKNOWN &&
              proto->app_protocol != proto->master_protocol &&
              ndpi_struct->fpc_dns_cache) {
@@ -454,6 +453,9 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
                                   fpc_dns_cache_key_from_packet(packet->payload + x, data_len),
                                   proto->app_protocol,
                                   ndpi_get_current_time(flow));
+
+            NDPI_LOG_DBG(ndpi_struct, "Adding entry to fpc_dns: %s proto %d\n",
+                         data_len == 4 ? "ipv4" : "ipv6", proto->app_protocol);
           }
         }
 
