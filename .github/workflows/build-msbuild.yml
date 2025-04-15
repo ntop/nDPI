@@ -11,8 +11,12 @@ on:
     types: [created]
 jobs:
   test:
-    name: MSBuild
-    runs-on: windows-latest
+    name: MSBuild ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ["windows-latest", "windows-11-arm"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,10 +31,10 @@ jobs:
         run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug
 
       - name: Download Npcap
-        run: Invoke-WebRequest -Uri 'https://npcap.com/dist/npcap-1.71.exe' -OutFile 'C:\npcap-1.71.exe'
+        run: Invoke-WebRequest -Uri 'https://npcap.com/dist/npcap-1.81.exe' -OutFile 'C:\npcap-1.81.exe'
 
       - name: Install Npcap
-        run: C:\npcap-1.71.exe /S /winpcap_mode=yes
+        run: C:\npcap-1.81.exe /S /winpcap_mode=yes
 
       - name: Build ndpiReader (debug)
         run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug-ndpiReader
@@ -38,6 +42,6 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
+          name: build-artifacts-${{ matrix.os }}
           path: windows/bin
           retention-days: 14

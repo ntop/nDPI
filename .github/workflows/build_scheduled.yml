@@ -199,7 +199,9 @@ jobs:
           msys2 -c 'ldd ./example/ndpiReader.exe'
       - name: Tests
         run: |
-          msys2 -c 'NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh'
+          # Don't know why but lately the script in parallel mode is stuck...
+          #msys2 -c 'NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh'
+          msys2 -c './tests/do.sh'
           msys2 -c './tests/do-unit.sh'
           msys2 -c './tests/do-dga.sh'
 
