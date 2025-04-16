@@ -5,6 +5,16 @@ This page provides the list of the protocols/applications supported by nDPI. For
 
 Work in progress!
 
+
+.. _Proto 31
+
+`NDPI_PROTOCOL_UBNTAC2`
+=======================
+AirControl network management application by Ubiquiti Networks.
+
+References: `Main site: <https://community.ui.com/questions/Introduction-to-airControl/7cdb2648-113c-480f-b000-659b803d1afe/>`_
+
+
 .. _Proto 32:
 
 `NDPI_PROTOCOL_BFCP`
@@ -1176,3 +1186,12 @@ References: `Main site <https://www.gearupbooster.com/>`_
 Traffic about generic LLM services (i.e. chatgpt, deepseek, gemini,...).
 
 References: `OpenAI <https://openai.com/>`_, `DeepSeek <https://www.deepseek.com/>`_
+
+
+.. _Proto 447:
+
+`NDPI_PROTOCOL_UBIQUITY`
+========================
+Generic traffic from Ubiquity site and services
+
+References: `Main site <https://www.ui.com/>`_
