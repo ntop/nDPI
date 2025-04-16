@@ -5,8 +5,8 @@
 // Please pull this list from, and only from https://publicsuffix.org/list/public_suffix_list.dat,
 // rather than any other VCS sites. Pulling from any other URL is not guaranteed to be supported.
 
-// VERSION: 2024-12-12_06-49-35_UTC
-// COMMIT: dbba928143b54b632b622a6beb444a75091da102
+// VERSION: 2025-04-15_21-29-38_UTC
+// COMMIT: b1d38256593253c7b333958910661e16234565cb
 
 // Instructions on pulling and using this list can be found at https://publicsuffix.org/list/.
 
@@ -25,7 +25,7 @@ org.ac
 // Confirmed by Amadeu Abril i Abril (CORE) <amadeu.abril@corenic.org> 2024-11-17
 ad
 
-// ae : https://tdra.gov.ae/en/aeda/ae-policies
+// ae : https://www.iana.org/domains/root/db/ae.html
 ae
 ac.ae
 co.ae
@@ -168,6 +168,7 @@ net.al
 org.al
 
 // am : https://www.amnic.net/policy/en/Policy_EN.pdf
+// Confirmed by ISOC AM <isoc@isoc.am> 2024-11-18
 am
 co.am
 com.am
@@ -176,7 +177,7 @@ net.am
 org.am
 
 // ao : https://www.iana.org/domains/root/db/ao.html
-// http://www.dns.ao/REGISTR.DOC
+// https://www.dns.ao/ao/
 ao
 co.ao
 ed.ao
@@ -205,6 +206,7 @@ musica.ar
 mutual.ar
 net.ar
 org.ar
+seg.ar
 senasa.ar
 tur.ar
 
@@ -236,7 +238,7 @@ gv.at
 or.at
 
 // au : https://www.iana.org/domains/root/db/au.html
-// http://www.auda.org.au/
+// https://www.auda.org.au/
 // Confirmed by registry <general@auda.org.au> 2024-11-17
 au
 // 2LDs
@@ -250,7 +252,7 @@ org.au
 // Historic 2LDs (closed to new registration, but sites still exist)
 conf.au
 oz.au
-// CGDNs - http://www.cgdn.org.au/
+// CGDNs : https://www.auda.org.au/au-domain-names/the-different-au-domain-names/state-and-territory-domain-names/
 act.au
 nsw.au
 nt.au
@@ -270,9 +272,9 @@ sa.edu.au
 tas.edu.au
 vic.edu.au
 wa.edu.au
-// act.gov.au  Bug 984824 - Removed at request of Greg Tankard
-// nsw.gov.au  Bug 547985 - Removed at request of <Shae.Donelan@services.nsw.gov.au>
-// nt.gov.au  Bug 940478 - Removed at request of Greg Connors <Greg.Connors@nt.gov.au>
+// act.gov.au - Bug 984824 - Removed at request of Greg Tankard
+// nsw.gov.au - Bug 547985 - Removed at request of <Shae.Donelan@services.nsw.gov.au>
+// nt.gov.au - Bug 940478 - Removed at request of Greg Connors <Greg.Connors@nt.gov.au>
 qld.gov.au
 sa.gov.au
 tas.gov.au
@@ -290,9 +292,10 @@ com.aw
 ax
 
 // az : https://www.iana.org/domains/root/db/az.html
-// https://whois.az/?page_id=10
+// Confirmed via https://whois.az/?page_id=10 2024-12-11
 az
 biz.az
+co.az
 com.az
 edu.az
 gov.az
@@ -303,9 +306,11 @@ name.az
 net.az
 org.az
 pp.az
+// No longer available for registration, however domains exist as of 2024-12-11
+// see https://whois.az/?page_id=783
 pro.az
 
-// ba : http://nic.ba/users_data/files/pravilnik_o_registraciji.pdf
+// ba : https://www.iana.org/domains/root/db/ba.html
 ba
 com.ba
 edu.ba
@@ -400,7 +405,7 @@ org.bi
 biz
 
 // bj : https://nic.bj/bj-suffixes.txt
-// submitted by registry <contact@nic.bj>
+// Submitted by registry <contact@nic.bj>
 bj
 africa.bj
 agro.bj
@@ -423,7 +428,7 @@ resto.bj
 tourism.bj
 univ.bj
 
-// bm : http://www.bermudanic.bm/dnr-text.txt
+// bm : https://www.bermudanic.bm/domain-registration/index.php
 bm
 com.bm
 edu.bm
@@ -681,10 +686,12 @@ org.bt
 bv
 
 // bw : https://www.iana.org/domains/root/db/bw.html
-// http://www.gobin.info/domainname/bw.doc
-// list of other 2nd level tlds ?
+// https://nic.net.bw/bw-name-structure
 bw
+ac.bw
 co.bw
+gov.bw
+net.bw
 org.bw
 
 // by : https://www.iana.org/domains/root/db/by.html
@@ -738,7 +745,7 @@ cat
 cc
 
 // cd : https://www.iana.org/domains/root/db/cd.html
-// see also: https://www.nic.cd/domain/insertDomain_2.jsp?act=1
+// https://www.nic.cd
 cd
 gov.cd
 
@@ -752,7 +759,6 @@ cg
 ch
 
 // ci : https://www.iana.org/domains/root/db/ci.html
-// http://www.nic.ci/index.php?page=charte
 ci
 ac.ci
 aéroport.ci
@@ -837,7 +843,6 @@ yn.cn
 zj.cn
 
 // co : https://www.iana.org/domains/root/db/co.html
-// https://www.cointernet.com.co/registra
 // https://www.cointernet.com.co/como-funciona-un-dominio-restringido
 // Confirmed by registry <gonzalo@cointernet.com.co> 2024-11-18
 co
@@ -855,7 +860,7 @@ com
 // coop : https://www.iana.org/domains/root/db/coop.html
 coop
 
-// cr : http://www.nic.cr/niccr_publico/showRegistroDominiosScreen.do
+// cr : https://nic.cr/capitulo-1-registro-de-un-nombre-de-dominio/
 cr
 ac.cr
 co.cr
@@ -902,8 +907,8 @@ cx
 gov.cx
 
 // cy : http://www.nic.cy/
-// Submitted by registry Panayiotou Fotia <cydns@ucy.ac.cy>
-// namespace policies URL https://www.nic.cy/portal//sites/default/files/symfonia_gia_eggrafi.pdf
+// Submitted by Panayiotou Fotia <cydns@ucy.ac.cy>
+// https://nic.cy/wp-content/uploads/2024/01/Create-Request-for-domain-name-registration-1.pdf
 cy
 ac.cy
 biz.cy
@@ -970,7 +975,7 @@ pol.dz
 soc.dz
 tm.dz
 
-// ec : http://www.nic.ec/reg/paso1.asp
+// ec : https://www.nic.ec/
 // Submitted by registry <vabboud@nic.ec>
 ec
 com.ec
@@ -989,7 +994,7 @@ pro.ec
 // edu : https://www.iana.org/domains/root/db/edu.html
 edu
 
-// ee : http://www.eenet.ee/EENet/dom_reeglid.html#lisa_B
+// ee : https://www.internet.ee/domains/general-domains-and-procedure-for-registration-of-sub-domains-under-general-domains
 ee
 aip.ee
 com.ee
@@ -1023,7 +1028,7 @@ tv.eg
 // er : https://www.iana.org/domains/root/db/er.html
 *.er
 
-// es : https://www.nic.es/site_ingles/ingles/dominios/index.html
+// es : https://www.dominios.es/en
 es
 com.es
 edu.es
@@ -1120,7 +1125,7 @@ school.ge
 // gf : https://www.iana.org/domains/root/db/gf.html
 gf
 
-// gg : http://www.channelisles.net/register-domains/
+// gg : https://www.channelisles.net/register-1/register-direct
 // Confirmed by registry <nigel@channelisles.net> 2013-11-28
 gg
 co.gg
@@ -1128,7 +1133,7 @@ net.gg
 org.gg
 
 // gh : https://www.iana.org/domains/root/db/gh.html
-// see also: http://www.nic.gh/reg_now.php
+// https://www.nic.gh/
 // Although domains directly at second level are not possible at the moment,
 // they have been possible for some time and may come back.
 gh
@@ -1184,7 +1189,7 @@ org.gp
 // gq : https://www.iana.org/domains/root/db/gq.html
 gq
 
-// gr : https://grweb.ics.forth.gr/english/1617-B-2005.html
+// gr : https://www.iana.org/domains/root/db/gr.html
 // Submitted by registry <segred@ics.forth.gr>
 gr
 com.gr
@@ -1261,7 +1266,7 @@ org.hk
 // hm : https://www.iana.org/domains/root/db/hm.html
 hm
 
-// hn : http://www.nic.hn/politicas/ps02,,05.html
+// hn : https://www.iana.org/domains/root/db/hn.html
 hn
 com.hn
 edu.hn
@@ -1297,7 +1302,7 @@ pro.ht
 rel.ht
 shop.ht
 
-// hu : http://www.domain.hu/domain/English/sld.html
+// hu : https://www.iana.org/domains/root/db/hu.html
 // Confirmed by registry <pasztor@iszt.hu> 2008-06-12
 hu
 2000.hu
@@ -1332,7 +1337,7 @@ tozsde.hu
 utazas.hu
 video.hu
 
-// id : https://pandi.id/en/domain/registration-requirements/
+// id : https://www.iana.org/domains/root/db/id.html
 id
 ac.id
 biz.id
@@ -1351,9 +1356,9 @@ web.id
 ie
 gov.ie
 
-// il :         http://www.isoc.org.il/domains/
-// see also:    https://en.isoc.org.il/il-cctld/registration-rules
-// ISOC-IL      (operated by .il Registry)
+// il : http://www.isoc.org.il/domains/
+// see also: https://en.isoc.org.il/il-cctld/registration-rules
+// ISOC-IL (operated by .il Registry)
 il
 ac.il
 co.il
@@ -1895,7 +1900,7 @@ vs.it
 vt.it
 vv.it
 
-// je : http://www.channelisles.net/register-domains/
+// je : https://www.iana.org/domains/root/db/je.html
 // Confirmed by registry <nigel@channelisles.net> 2013-11-28
 je
 co.je
@@ -1941,9 +1946,6 @@ lg.jp
 ne.jp
 or.jp
 // jp prefecture type names
-// 2024-11-22: JPRS confirmed that regional .jp suffixes no longer accept new registrations.
-// Once all existing registrations expire (marking full discontinuation), these suffixes
-// will be removed from the PSL.
 aichi.jp
 akita.jp
 aomori.jp
@@ -2040,6 +2042,9 @@ yamanashi.jp
 鹿児島.jp
 // jp geographic type names
 // http://jprs.jp/doc/rule/saisoku-1.html
+// 2024-11-22: JPRS confirmed that jp geographic type names no longer accept new registrations.
+// Once all existing registrations expire (marking full discontinuation), these suffixes
+// will be removed from the PSL.
 *.kawasaki.jp
 !city.kawasaki.jp
 *.kitakyushu.jp
@@ -3753,7 +3758,7 @@ org.kg
 // kh : http://www.mptc.gov.kh/dns_registration.htm
 *.kh
 
-// ki : http://www.ki/dns/index.html
+// ki : https://www.iana.org/domains/root/db/ki.html
 ki
 biz.ki
 com.ki
@@ -3804,14 +3809,18 @@ rep.kp
 tra.kp
 
 // kr : https://www.iana.org/domains/root/db/kr.html
-// see also: http://domain.nida.or.kr/eng/registration.jsp
+// see also: https://krnic.kisa.or.kr/jsp/infoboard/law/domBylawsReg.jsp
 kr
 ac.kr
+ai.kr
 co.kr
 es.kr
 go.kr
 hs.kr
+io.kr
+it.kr
 kg.kr
+me.kr
 mil.kr
 ms.kr
 ne.kr
@@ -3900,7 +3909,7 @@ org.lc
 // li : https://www.iana.org/domains/root/db/li.html
 li
 
-// lk : https://www.nic.lk/index.php/domain-registration/lk-domain-naming-structure
+// lk : https://www.iana.org/domains/root/db/lk.html
 lk
 ac.lk
 assn.lk
@@ -3948,7 +3957,7 @@ gov.lt
 // lu : http://www.dns.lu/en/
 lu
 
-// lv : http://www.nic.lv/DNS/En/generic.php
+// lv : https://www.iana.org/domains/root/db/lv.html
 lv
 asn.lv
 com.lv
@@ -4029,15 +4038,21 @@ name.mk
 net.mk
 org.mk
 
-// ml : http://www.gobin.info/domainname/ml-template.doc
-// see also: https://www.iana.org/domains/root/db/ml.html
+// ml : https://www.iana.org/domains/root/db/ml.html
+// Confirmed by Boubacar NDIAYE <bndiaye@agetic.gouv.ml> 2024-12-31
 ml
+ac.ml
+art.ml
+asso.ml
 com.ml
 edu.ml
 gouv.ml
 gov.ml
+info.ml
+inst.ml
 net.ml
 org.ml
+pr.ml
 presse.ml
 
 // mm : https://www.iana.org/domains/root/db/mm.html
@@ -4071,7 +4086,7 @@ mq
 mr
 gov.mr
 
-// ms : http://www.nic.ms/pdf/MS_Domain_Name_Rules.pdf
+// ms : https://www.iana.org/domains/root/db/ms.html
 ms
 com.ms
 edu.ms
@@ -4232,8 +4247,7 @@ org.ni
 web.ni
 
 // nl : https://www.iana.org/domains/root/db/nl.html
-//      https://www.sidn.nl/
-//      ccTLD for the Netherlands
+// https://www.sidn.nl/
 nl
 
 // no : https://www.norid.no/en/om-domenenavn/regelverk-for-no/
@@ -5093,7 +5107,7 @@ org.pf
 // pg : https://www.iana.org/domains/root/db/pg.html
 *.pg
 
-// ph : http://www.domains.ph/FAQ2.asp
+// ph : https://www.iana.org/domains/root/db/ph.html
 // Submitted by registry <jed@email.com.ph>
 ph
 com.ph
@@ -5105,10 +5119,8 @@ net.ph
 ngo.ph
 org.ph
 
-// pk : https://pknic.net.pk
-// pk : http://pk5.pknic.net.pk/pk5/msgNamepk.PK + grandfathered old gon.pk
-// Contact Email: staff@pknic.net.pk    PKNIC .PK Registry
-
+// pk : https://pk5.pknic.net.pk/pk5/msgNamepk.PK
+// Contact Email: staff@pknic.net.pk
 pk
 ac.pk
 biz.pk
@@ -5119,7 +5131,6 @@ gkp.pk
 gob.pk
 gog.pk
 gok.pk
-gon.pk
 gop.pk
 gos.pk
 gov.pk
@@ -5346,7 +5357,7 @@ zgorzelec.pl
 // pm : https://www.afnic.fr/wp-media/uploads/2022/12/afnic-naming-policy-2023-01-01.pdf
 pm
 
-// pn : http://www.government.pn/PnRegistry/policies.htm
+// pn : https://www.iana.org/domains/root/db/pn.html
 pn
 co.pn
 edu.pn
@@ -5415,7 +5426,7 @@ publ.pt
 pw
 gov.pw
 
-// py : http://www.nic.py/pautas.html#seccion_9
+// py : https://www.iana.org/domains/root/db/py.html
 // Submitted by registry
 py
 com.py
@@ -5471,7 +5482,7 @@ org.rs
 // Submitted by George Georgievsky <gug@cctld.ru>
 ru
 
-// rw : https://www.ricta.org.rw/sites/default/files/resources/registry_registrar_contract_0.pdf
+// rw : https://www.iana.org/domains/root/db/rw.html
 rw
 ac.rw
 co.rw
@@ -5509,7 +5520,7 @@ gov.sc
 net.sc
 org.sc
 
-// sd : http://www.isoc.sd/sudanic.isoc.sd/billing_pricing.htm
+// sd : https://www.iana.org/domains/root/db/sd.html
 // Submitted by registry <admin@isoc.sd>
 sd
 com.sd
@@ -5656,7 +5667,7 @@ store.st
 // su : https://www.iana.org/domains/root/db/su.html
 su
 
-// sv : http://www.svnet.org.sv/niveldos.pdf
+// sv : https://www.iana.org/domains/root/db/sv.html
 sv
 com.sv
 edu.sv
@@ -5670,7 +5681,6 @@ sx
 gov.sx
 
 // sy : https://www.iana.org/domains/root/db/sy.html
-// see also: http://www.gobin.info/domainname/sy.doc
 sy
 com.sy
 edu.sy
@@ -5692,7 +5702,7 @@ tc
 // td : https://www.iana.org/domains/root/db/td.html
 td
 
-// tel: https://www.iana.org/domains/root/db/tel.html
+// tel : https://www.iana.org/domains/root/db/tel.html
 // http://www.telnic.org/
 tel
 
@@ -5740,7 +5750,7 @@ tl
 gov.tl
 
 // tm : https://www.nic.tm/local.html
-// Confirmed by registry <admin@nic.TM> - 2024-11-19
+// Confirmed by registry <admin@nic.TM> 2024-11-19
 tm
 co.tm
 com.tm
@@ -5809,7 +5819,7 @@ nc.tr
 gov.nc.tr
 
 // tt : https://www.nic.tt/
-// Confirmed by registry <admin@nic.tt> - 2024-11-19
+// Confirmed by registry <admin@nic.tt> 2024-11-19
 tt
 biz.tt
 co.tt
@@ -5946,15 +5956,21 @@ zp.ua
 zt.ua
 
 // ug : https://www.registry.co.ug/
+// https://www.registry.co.ug, https://whois.co.ug
+// Confirmed by registry <support@i3c.co.ug> 2025-01-20
 ug
 ac.ug
 co.ug
 com.ug
+edu.ug
 go.ug
+gov.ug
+mil.ug
 ne.ug
 or.ug
 org.ug
 sc.ug
+us.ug
 
 // uk : https://www.iana.org/domains/root/db/uk.html
 // Submitted by registry <Michael.Daly@nominet.org.uk>
@@ -5972,7 +5988,7 @@ police.uk
 *.sch.uk
 
 // us : https://www.iana.org/domains/root/db/us.html
-// Confirmed via the .us zone file by William Harrison - 2024-12-10
+// Confirmed via the .us zone file by William Harrison 2024-12-10
 us
 dni.us
 isa.us
@@ -6051,7 +6067,7 @@ k12.dc.us
 k12.fl.us
 k12.ga.us
 k12.gu.us
-// k12.hi.us  Bug 614565 - Hawaii has a state-wide DOE login
+// k12.hi.us - Bug 614565 - Hawaii has a state-wide DOE login
 k12.ia.us
 k12.id.us
 k12.il.us
@@ -6068,7 +6084,7 @@ k12.mo.us
 k12.ms.us
 k12.mt.us
 k12.nc.us
-// k12.nd.us  Bug 1028347 - Removed at request of Travis Rosso <trossow@nd.gov>
+// k12.nd.us - Bug 1028347 - Removed at request of Travis Rosso <trossow@nd.gov>
 k12.ne.us
 k12.nh.us
 k12.nj.us
@@ -6080,9 +6096,9 @@ k12.ok.us
 k12.or.us
 k12.pa.us
 k12.pr.us
-// k12.ri.us  Removed at request of Kim Cournoyer <netsupport@staff.ri.net>
+// k12.ri.us - Removed at request of Kim Cournoyer <netsupport@staff.ri.net>
 k12.sc.us
-// k12.sd.us  Bug 934131 - Removed at request of James Booze <James.Booze@k12.sd.us>
+// k12.sd.us - Bug 934131 - Removed at request of James Booze <James.Booze@k12.sd.us>
 k12.tn.us
 k12.tx.us
 k12.ut.us
@@ -6091,7 +6107,7 @@ k12.vi.us
 k12.vt.us
 k12.wa.us
 k12.wi.us
-// k12.wv.us  Bug 947705 - Removed at request of Verne Britton <verne@wvnet.edu>
+// k12.wv.us - Bug 947705 - Removed at request of Verne Britton <verne@wvnet.edu>
 cc.ak.us
 lib.ak.us
 cc.al.us
@@ -6157,7 +6173,7 @@ cc.wi.us
 cc.wv.us
 cc.wy.us
 k12.wy.us
-// lib.de.us  Issue #243 - Moved to Private section at request of Ed Moore <Ed.Moore@lib.de.us>
+// lib.de.us - Issue #243 - Moved to Private section at request of Ed Moore <Ed.Moore@lib.de.us>
 lib.fl.us
 lib.ga.us
 lib.gu.us
@@ -6201,7 +6217,7 @@ lib.vi.us
 lib.vt.us
 lib.wa.us
 lib.wi.us
-// lib.wv.us  Bug 941670 - Removed at request of Larry W Arnold <arnold@wvlc.lib.wv.us>
+// lib.wv.us - Bug 941670 - Removed at request of Larry W Arnold <arnold@wvlc.lib.wv.us>
 lib.wy.us
 // k12.ma.us contains school districts in Massachusetts. The 4LDs are
 // managed independently except for private (PVT), charter (CHTR) and
@@ -6260,6 +6276,7 @@ co.ve
 com.ve
 e12.ve
 edu.ve
+emprende.ve
 firm.ve
 gob.ve
 gov.ve
@@ -6276,12 +6293,11 @@ tec.ve
 web.ve
 
 // vg : https://www.iana.org/domains/root/db/vg.html
+// Confirmed by registry <tld.ops@centralnic.com> 2025-01-10
 vg
+edu.vg
 
-// vi : http://www.nic.vi/newdomainform.htm
-// http://www.nic.vi/Domain_Rules/body_domain_rules.html indicates some other
-// TLDs are "reserved", such as edu.vi and gov.vi, but doesn't actually say they
-// are available for registration (which they do not seem to be).
+// vi : https://www.iana.org/domains/root/db/vi.html
 vi
 co.vi
 com.vi
@@ -6620,7 +6636,7 @@ yt
 // http://www.nic.net.sa/
 السعودية
 
-// xn--mgberp4a5d4a87g ("AlSaudiah", Arabic, variant)  : SA
+// xn--mgberp4a5d4a87g ("AlSaudiah", Arabic, variant): SA
 السعودیة
 
 // xn--mgbqly7c0a67fbc ("AlSaudiah", Arabic, variant) : SA
@@ -6688,7 +6704,7 @@ mil.ye
 net.ye
 org.ye
 
-// za : https://www.zadna.org.za/content/page/domain-information/
+// za : https://www.iana.org/domains/root/db/za.html
 ac.za
 agric.za
 alt.za
@@ -6734,7 +6750,7 @@ org.zw
 
 // newGTLDs
 
-// List of new gTLDs imported from https://www.icann.org/resources/registries/gtlds/v2/gtlds.json on 2024-12-10T15:19:18Z
+// List of new gTLDs imported from https://www.icann.org/resources/registries/gtlds/v2/gtlds.json on 2025-03-28T15:18:17Z
 // This list is auto-generated, don't edit it manually.
 // aaa : American Automobile Association, Inc.
 // https://www.iana.org/domains/root/db/aaa.html
@@ -6964,7 +6980,7 @@ art
 // https://www.iana.org/domains/root/db/arte.html
 arte
 
-// asda : Wal-Mart Stores, Inc.
+// asda : Asda Stores Limited
 // https://www.iana.org/domains/root/db/asda.html
 asda
 
@@ -8172,7 +8188,7 @@ ftr
 // https://www.iana.org/domains/root/db/fujitsu.html
 fujitsu
 
-// fun : Radix Technologies Inc.
+// fun : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/fun.html
 fun
 
@@ -8504,7 +8520,7 @@ horse
 // https://www.iana.org/domains/root/db/hospital.html
 hospital
 
-// host : Radix Technologies Inc.
+// host : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/host.html
 host
 
@@ -8744,10 +8760,6 @@ kddi
 // https://www.iana.org/domains/root/db/kerryhotels.html
 kerryhotels
 
-// kerrylogistics : Kerry Trading Co. Limited
-// https://www.iana.org/domains/root/db/kerrylogistics.html
-kerrylogistics
-
 // kerryproperties : Kerry Trading Co. Limited
 // https://www.iana.org/domains/root/db/kerryproperties.html
 kerryproperties
@@ -8944,10 +8956,6 @@ lincoln
 // https://www.iana.org/domains/root/db/link.html
 link
 
-// lipsy : Lipsy Ltd
-// https://www.iana.org/domains/root/db/lipsy.html
-lipsy
-
 // live : Dog Beach, LLC
 // https://www.iana.org/domains/root/db/live.html
 live
@@ -9080,7 +9088,7 @@ marriott
 // https://www.iana.org/domains/root/db/marshalls.html
 marshalls
 
-// mattel : Mattel Sites, Inc.
+// mattel : Mattel IT Services, Inc.
 // https://www.iana.org/domains/root/db/mattel.html
 mattel
 
@@ -9348,7 +9356,7 @@ norton
 // https://www.iana.org/domains/root/db/now.html
 now
 
-// nowruz : Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+// nowruz
 // https://www.iana.org/domains/root/db/nowruz.html
 nowruz
 
@@ -9416,7 +9424,7 @@ ong
 // https://www.iana.org/domains/root/db/onl.html
 onl
 
-// online : Radix Technologies Inc.
+// online : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/online.html
 online
 
@@ -9472,7 +9480,7 @@ panasonic
 // https://www.iana.org/domains/root/db/paris.html
 paris
 
-// pars : Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+// pars
 // https://www.iana.org/domains/root/db/pars.html
 pars
 
@@ -9620,7 +9628,7 @@ pramerica
 // https://www.iana.org/domains/root/db/praxi.html
 praxi
 
-// press : Radix Technologies Inc.
+// press : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/press.html
 press
 
@@ -10028,7 +10036,7 @@ sharp
 // https://www.iana.org/domains/root/db/shell.html
 shell
 
-// shia : Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+// shia
 // https://www.iana.org/domains/root/db/shia.html
 shia
 
@@ -10068,7 +10076,7 @@ sina
 // https://www.iana.org/domains/root/db/singles.html
 singles
 
-// site : Radix Technologies Inc.
+// site : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/site.html
 site
 
@@ -10148,7 +10156,7 @@ soy
 // https://www.iana.org/domains/root/db/spa.html
 spa
 
-// space : Radix Technologies Inc.
+// space : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/space.html
 space
 
@@ -10200,7 +10208,7 @@ stockholm
 // https://www.iana.org/domains/root/db/storage.html
 storage
 
-// store : Radix Technologies Inc.
+// store : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/store.html
 store
 
@@ -10304,7 +10312,7 @@ tax
 // https://www.iana.org/domains/root/db/taxi.html
 taxi
 
-// tci : Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+// tci
 // https://www.iana.org/domains/root/db/tci.html
 tci
 
@@ -10316,7 +10324,7 @@ tdk
 // https://www.iana.org/domains/root/db/team.html
 team
 
-// tech : Radix Technologies Inc.
+// tech : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/tech.html
 tech
 
@@ -10500,7 +10508,7 @@ unicom
 // https://www.iana.org/domains/root/db/university.html
 university
 
-// uno : Radix Technologies Inc.
+// uno : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/uno.html
 uno
 
@@ -10664,7 +10672,7 @@ webcam
 // https://www.iana.org/domains/root/db/weber.html
 weber
 
-// website : Radix Technologies Inc.
+// website : Radix Technologies Inc SEZC
 // https://www.iana.org/domains/root/db/website.html
 website
 
@@ -11012,7 +11020,7 @@ xin
 // https://www.iana.org/domains/root/db/xn--mgbi4ecexp.html
 كاثوليك
 
-// xn--mgbt3dhd : Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+// xn--mgbt3dhd
 // https://www.iana.org/domains/root/db/xn--mgbt3dhd.html
 همراه
 
@@ -11144,7 +11152,7 @@ yahoo
 // https://www.iana.org/domains/root/db/yamaxun.html
 yamaxun
 
-// yandex : ADC Tech Netherlands B.V.
+// yandex : YANDEX, LLC
 // https://www.iana.org/domains/root/db/yandex.html
 yandex
 
@@ -11202,7 +11210,7 @@ zuerich
 
 // (Note: these are in alphabetical order by company name)
 
-// .KRD : http://nic.krd/data/krd/Registration%20Policy.pdf
+// .KRD : https://nic.krd
 co.krd
 edu.krd
 
@@ -11218,7 +11226,7 @@ zakopane.pl
 // Submitted by Ed Moore <Ed.Moore@lib.de.us>
 lib.de.us
 
-// 12CHARS: https://12chars.com
+// 12CHARS : https://12chars.com
 // Submitted by Kenny Niehage <psl@12chars.com>
 12chars.dev
 12chars.it
@@ -11242,7 +11250,7 @@ cpserver.com
 // Submitted by Craig Jellick <domains@acorn.io>
 *.on-acorn.io
 
-// ActiveTrail: https://www.activetrail.biz/
+// ActiveTrail : https://www.activetrail.biz/
 // Submitted by Ofer Kalaora <postmaster@activetrail.com>
 activetrail.biz
 
@@ -11319,11 +11327,15 @@ barsy.ca
 *.compute.estate
 *.alces.network
 
+// Alibaba Cloud API Gateway
+// Submitted by Alibaba Cloud Security <cloud_product_security_team@alibaba-inc.com>
+alibabacloudcs.com
+
 // all-inkl.com : https://all-inkl.com
 // Submitted by Werner Kaltofen <wk@all-inkl.com>
 kasserver.com
 
-// Altervista: https://www.altervista.org
+// Altervista : https://www.altervista.org
 // Submitted by Carlo Cannas <tech_staff@altervista.it>
 altervista.org
 
@@ -11384,7 +11396,7 @@ cloudfront.net
 
 // Amazon Cognito
 // Submitted by AWS Security <psl-maintainers@amazon.com>
-// Reference: cb38c251-c93d-4cda-81ec-e72c4f0fdb72
+// Reference: eb4652f0-20f0-43f5-b323-e6cc6ae02ad7
 auth.af-south-1.amazoncognito.com
 auth.ap-east-1.amazoncognito.com
 auth.ap-northeast-1.amazoncognito.com
@@ -11396,6 +11408,7 @@ auth.ap-southeast-1.amazoncognito.com
 auth.ap-southeast-2.amazoncognito.com
 auth.ap-southeast-3.amazoncognito.com
 auth.ap-southeast-4.amazoncognito.com
+auth.ap-southeast-5.amazoncognito.com
 auth.ca-central-1.amazoncognito.com
 auth.ca-west-1.amazoncognito.com
 auth.eu-central-1.amazoncognito.com
@@ -11414,6 +11427,7 @@ auth.us-east-1.amazoncognito.com
 auth-fips.us-east-1.amazoncognito.com
 auth.us-east-2.amazoncognito.com
 auth-fips.us-east-2.amazoncognito.com
+auth-fips.us-gov-east-1.amazoncognito.com
 auth-fips.us-gov-west-1.amazoncognito.com
 auth.us-west-1.amazoncognito.com
 auth-fips.us-west-1.amazoncognito.com
@@ -11937,7 +11951,7 @@ notebook.cn-northwest-1.sagemaker.com.cn
 
 // Amazon SageMaker Studio
 // Submitted by AWS Security <psl-maintainers@amazon.com>
-// Reference: 69c723d9-6e1a-4bff-a203-48eecd203183
+// Reference: 475f237e-ab88-4041-9f41-7cfccdf66aeb
 studio.af-south-1.sagemaker.aws
 studio.ap-east-1.sagemaker.aws
 studio.ap-northeast-1.sagemaker.aws
@@ -11949,6 +11963,7 @@ studio.ap-southeast-2.sagemaker.aws
 studio.ap-southeast-3.sagemaker.aws
 studio.ca-central-1.sagemaker.aws
 studio.eu-central-1.sagemaker.aws
+studio.eu-central-2.sagemaker.aws
 studio.eu-north-1.sagemaker.aws
 studio.eu-south-1.sagemaker.aws
 studio.eu-south-2.sagemaker.aws
@@ -11988,6 +12003,11 @@ analytics-gateway.eu-west-1.amazonaws.com
 analytics-gateway.us-east-1.amazonaws.com
 analytics-gateway.us-east-2.amazonaws.com
 analytics-gateway.us-west-2.amazonaws.com
+
+// Appwrite : https://appwrite.io
+// Submitted by Steven Nguyen <security@appwrite.io>
+appwrite.global
+*.appwrite.run
 
 // AWS Amplify
 // Submitted by AWS Security <psl-maintainers@amazon.com>
@@ -12120,6 +12140,19 @@ awsglobalaccelerator.com
 // Submitted by AWS Security <psl-maintainers@amazon.com>
 // Reference: 83385945-225f-416e-9aa0-ad0632bfdcee
 *.private.repost.aws
+
+// AWS Transfer Family web apps
+// Submitted by AWS Security <psl-maintainers@amazon.com>
+// Reference: 67e9cfe6-ac57-49c7-b197-6652711c8e8d
+transfer-webapp.ap-northeast-1.on.aws
+transfer-webapp.ap-southeast-1.on.aws
+transfer-webapp.ap-southeast-2.on.aws
+transfer-webapp.eu-central-1.on.aws
+transfer-webapp.eu-north-1.on.aws
+transfer-webapp.eu-west-1.on.aws
+transfer-webapp.us-east-1.on.aws
+transfer-webapp.us-east-2.on.aws
+transfer-webapp.us-west-2.on.aws
 
 // eero
 // Submitted by Yue Kang <eero-dynamic-dns@amazon.com>
@@ -12258,6 +12291,10 @@ blackbaudcdn.net
 // Submitted by Luke Bratch <luke@bratch.co.uk>
 of.je
 
+// Block, Inc. : https://block.xyz
+// Submitted by Jonathan Boice <security@block.xyz>
+square.site
+
 // Blue Bite, LLC : https://bluebite.com
 // Submitted by Joshua Weiss <admin.engineering@bluebite.com>
 bluebite.io
@@ -12285,6 +12322,9 @@ square7.net
 
 // Brave : https://brave.com
 // Submitted by Andrea Brancaleoni <abrancaleoni@brave.com>
+brave.app
+*.s.brave.app
+brave.io
 *.s.brave.io
 
 // Brendly : https://brendly.rs
@@ -12300,6 +12340,11 @@ browsersafetymark.io
 // Submitted by Gavin Brown <gavin.brown@centralnic.com>
 radio.am
 radio.fm
+
+// Bubble : https://bubble.io/
+// Submitted by Merlin Zhao <devops@bubble.io>
+cdn.bubble.io
+bubbleapps.io
 
 // Bytemark Hosting : https://www.bytemark.co.uk
 // Submitted by Paul Cammish <paul.cammish@bytemark.co.uk>
@@ -12340,7 +12385,7 @@ c.cdn77.org
 rsc.cdn77.org
 ssl.origin.cdn77-secure.org
 
-// CentralNic : http://www.centralnic.com/names/domains
+// CentralNic : https://teaminternet.com/
 // Submitted by registry <gavin.brown@centralnic.com>
 za.bz
 br.com
@@ -12363,7 +12408,7 @@ uk.net
 ae.org
 com.se
 
-// Cityhost LLC  : https://cityhost.ua
+// Cityhost LLC : https://cityhost.ua
 // Submitted by Maksym Rivtin <support@cityhost.net.ua>
 cx.ua
 
@@ -12433,6 +12478,10 @@ cloudaccess.host
 freesite.host
 cloudaccess.net
 
+// Cloudbees, Inc. : https://www.cloudbees.com/
+// Submitted by Mohideen Shajith <jaas-sre-infra@cloudbees.com>
+cloudbeesusercontent.io
+
 // Cloudera, Inc. : https://www.cloudera.com/
 // Submitted by Kedarnath Waikar <security@cloudera.com>
 *.cloudera.site
@@ -12489,6 +12538,10 @@ preview.csb.app
 co.nl
 co.no
 
+// Cognition AI, Inc. : https://cognition.ai
+// Submitted by Philip Papurt <domains@cognition.ai>
+*.devinapps.com
+
 // Combell.com : https://www.combell.com
 // Submitted by Thomas Wouters <thomas.wouters@combellgroup.com>
 webhosting.be
@@ -12500,6 +12553,8 @@ ctfcloud.net
 
 // Convex : https://convex.dev/
 // Submitted by James Cowling <security@convex.dev>
+convex.app
+convex.cloud
 convex.site
 
 // Coordination Center for TLD RU and XN--P1AI : https://cctld.ru/en/domains/domens_ru/reserved/
@@ -12537,10 +12592,6 @@ on.crisp.email
 // Cryptonomic : https://cryptonomic.net/
 // Submitted by Andrew Cady <public-suffix-list@cryptonomic.net>
 *.cryptonomic.net
-
-// Curv UG : https://curv-labs.de/
-// Submitted by Marvin Wiesner <Marvin@curv-labs.de>
-curv.dev
 
 // cyber_Folks S.A. : https://cyberfolks.pl
 // Submitted by Bartlomiej Kida <security@cyberfolks.pl>
@@ -12611,17 +12662,18 @@ definima.net
 // Submitted by Luca Casonato <hostmaster@deno.com>
 deno.dev
 deno-staging.dev
+deno.net
 
 // deSEC : https://desec.io/
 // Submitted by Peter Thomassen <peter@desec.io>
 dedyn.io
 
-// Deta: https://www.deta.sh/
+// Deta : https://www.deta.sh/
 // Submitted by Aavash Shrestha <aavash@deta.sh>
 deta.app
 deta.dev
 
-// dhosting.pl Sp. z o.o.: https://dhosting.pl/
+// dhosting.pl Sp. z o.o. : https://dhosting.pl/
 // Submitted by Michal Kokoszkiewicz <bok@dhosting.pl>
 dfirma.pl
 dkonto.pl
@@ -12638,18 +12690,14 @@ ondigitalocean.app
 // DigitalPlat : https://www.digitalplat.org/
 // Submitted by Edward Hsing <contact@digitalplat.org>
 us.kg
-
-// Diher Solutions : https://diher.solutions
-// Submitted by Didi Hermawan <mail@diher.solutions>
-rss.my.id
-diher.solutions
+dpdns.org
 
 // Discord Inc : https://discord.com
 // Submitted by Sahn Lam <slam@discordapp.com>
 discordsays.com
 discordsez.com
 
-// DNS Africa Ltd https://dns.business
+// DNS Africa Ltd : https://dns.business
 // Submitted by Calvin Browne <calvin@dns.business>
 jozi.biz
 
@@ -12681,11 +12729,6 @@ durumis.com
 // Drobo : http://www.drobo.com/
 // Submitted by Ricardo Padilha <rpadilha@drobo.com>
 mydrobo.com
-
-// Drud Holdings, LLC. : https://www.drud.com/
-// Submitted by Kevin Bridges <kevin@drud.com>
-drud.io
-drud.us
 
 // DuckDNS : http://www.duckdns.org/
 // Submitted by Richard Harper <richard@duckdns.org>
@@ -13038,12 +13081,12 @@ elementor.cool
 // Submitted by Emmanuel Raviart <emmanuel@raviart.com>
 en-root.fr
 
-// Enalean SAS: https://www.enalean.com
+// Enalean SAS : https://www.enalean.com
 // Submitted by Enalean Security Team <security@enalean.com>
 mytuleap.com
 tuleap-partners.com
 
-// Encoretivity AB: https://encore.dev
+// Encoretivity AB : https://encore.dev
 // Submitted by André Eriksson <andre@encore.dev>
 encr.app
 encoreapi.com
@@ -13052,7 +13095,7 @@ encoreapi.com
 // Submitted by Marcel Daus <cloudops@encoway.de>
 eu.encoway.cloud
 
-// EU.org https://eu.org/
+// EU.org : https://eu.org/
 // Submitted by Pierre Beyssac <hostmaster@eu.org>
 eu.org
 al.eu.org
@@ -13246,13 +13289,13 @@ fastvps.site
 myfast.space
 
 // FearWorks Media Ltd. : https://fearworksmedia.co.uk
-// submitted by Keith Fairley <domains@fearworksmedia.co.uk>
+// Submitted by Keith Fairley <domains@fearworksmedia.co.uk>
 conn.uk
 copro.uk
 hosp.uk
 
 // Fedora : https://fedoraproject.org/
-// submitted by Patrick Uiterwijk <puiterwijk@fedoraproject.org>
+// Submitted by Patrick Uiterwijk <puiterwijk@fedoraproject.org>
 fedorainfracloud.org
 fedorapeople.org
 cloud.fedoraproject.org
@@ -13260,12 +13303,16 @@ app.os.fedoraproject.org
 app.os.stg.fedoraproject.org
 
 // Fermax : https://fermax.com/
-// submitted by Koen Van Isterdael <k.vanisterdael@fermax.be>
+// Submitted by Koen Van Isterdael <k.vanisterdael@fermax.be>
 mydobiss.com
 
 // FH Muenster : https://www.fh-muenster.de
 // Submitted by Robin Naundorf <r.naundorf@fh-muenster.de>
 fh-muenster.io
+
+// Figma : https://www.figma.com
+// Submitted by Nick Frost <psl@figma.com>
+figma.site
 
 // Filegear Inc. : https://www.filegear.com
 // Submitted by Jason Zhu <jason@owtware.com>
@@ -13287,7 +13334,7 @@ on-fleek.app
 // Submitted by Anton Emelyanov <anton@flutterflow.io>
 flutterflow.app
 
-// fly.io: https://fly.io
+// fly.io : https://fly.io
 // Submitted by Kurt Mackey <kurt@fly.io>
 fly.dev
 shw.io
@@ -13297,6 +13344,10 @@ edgeapp.net
 // Submitted by Roderick Parr <roderick.parr@forgerock.com>
 forgeblocks.com
 id.forgerock.io
+
+// FoundryLabs, Inc : https://e2b.dev/
+// Submitted by Jiri Sveceny <security@e2b.dev>
+e2b.app
 
 // Framer : https://www.framer.com
 // Submitted by Koen Rouwhorst <security@framer.com>
@@ -13391,10 +13442,9 @@ usercontent.jp
 // Submitted by Tom Klein <tom@gentlent.com>
 gentapps.com
 gentlentapis.com
-lab.ms
 cdn-edges.net
 
-// GignoSystemJapan: http://gsj.bz
+// GignoSystemJapan : http://gsj.bz
 // Submitted by GignoSystemJapan <kakutou-ec@gsj.bz>
 gsj.bz
 
@@ -13404,11 +13454,11 @@ githubusercontent.com
 githubpreview.dev
 github.io
 
-// GitLab, Inc.
+// GitLab, Inc. : https://about.gitlab.com/
 // Submitted by Alex Hanselka <alex@gitlab.com>
 gitlab.io
 
-// Gitplac.si - https://gitplac.si
+// Gitplac.si : https://gitplac.si
 // Submitted by Aljaž Starc <me@aljaxus.eu>
 gitapp.si
 gitpage.si
@@ -13578,11 +13628,11 @@ pymnt.uk
 cloudapps.digital
 london.cloudapps.digital
 
-// Government of the Netherlands: https://www.government.nl
+// Government of the Netherlands : https://www.government.nl
 // Submitted by <domeinnaam@minaz.nl>
 gov.nl
 
-// Grafana Labs: https://grafana.com/
+// Grafana Labs : https://grafana.com/
 // Submitted by Platform Engineering <info@grafana.com>
 grafana-dev.net
 
@@ -13595,15 +13645,7 @@ grayjayleagues.com
 günstigbestellen.de
 günstigliefern.de
 
-// Hakaran group: http://hakaran.cz
-// Submitted by Arseniy Sokolov <security@hakaran.cz>
-fin.ci
-free.hr
-caa.li
-ua.rs
-conf.se
-
-// Häkkinen.fi
+// Häkkinen.fi : https://www.häkkinen.fi/
 // Submitted by Eero Häkkinen <Eero+psl@Häkkinen.fi>
 häkkinen.fi
 
@@ -13628,12 +13670,12 @@ hatenablog.jp
 hatenadiary.jp
 hatenadiary.org
 
-// Heilbronn University of Applied Sciences - Faculty Informatics (GitLab Pages): https://www.hs-heilbronn.de
+// Heilbronn University of Applied Sciences - Faculty Informatics (GitLab Pages) : https://www.hs-heilbronn.de
 // Submitted by Richard Zowalla <it-admin@hs-heilbronn.de>
 pages.it.hs-heilbronn.de
 pages-research.it.hs-heilbronn.de
 
-// HeiyuSpace: https://lazycat.cloud
+// HeiyuSpace : https://lazycat.cloud
 // Submitted by Xia Bin <admin@lazycat.cloud>
 heiyu.space
 
@@ -13662,7 +13704,7 @@ ravendb.community
 development.run
 ravendb.run
 
-// home.pl S.A.: https://home.pl
+// home.pl S.A. : https://home.pl
 // Submitted by Krzysztof Wolski <krzysztof.wolski@home.eu>
 homesklep.pl
 
@@ -13671,10 +13713,6 @@ homesklep.pl
 *.kin.one
 *.id.pub
 *.kin.pub
-
-// Hong Kong Productivity Council: https://www.hkpc.org/
-// Submitted by SECaaS Team <summchan@hkpc.org>
-secaas.hk
 
 // Hoplix : https://www.hoplix.com
 // Submitted by Danilo De Franco<info@hoplix.shop>
@@ -13697,14 +13735,10 @@ ltd.ng
 ngo.ng
 plc.ng
 
-// HostFly : https://www.ie.ua
-// Submitted by Bohdan Dub <support@hostfly.com.ua>
-ie.ua
-
 // HostyHosting : https://hostyhosting.com
 hostyhosting.io
 
-// Hugging Face: https://huggingface.co
+// Hugging Face : https://huggingface.co
 // Submitted by Eliott Coyac <website@huggingface.co>
 hf.space
 static.hf.space
@@ -13760,6 +13794,10 @@ in-vpn.net
 in-dsl.org
 in-vpn.org
 
+// Inferno Communications : https://inferno.co.uk
+// Submitted by Connor McFarlane <noc@inferno.co.uk>
+oninferno.net
+
 // info.at : http://www.info.at/
 biz.at
 info.at
@@ -13806,9 +13844,18 @@ pixolino.com
 // Submitted by Vasiliy Sheredeko <piphon@gmail.com>
 na4u.ru
 
-// IONOS SE : https://www.ionos.com/,
-// IONOS Group SE: https://www.ionos-group.com/
-// submitted by Henrik Willert <security@ionos.com>
+// Inventor Services : https://inventor.gg/
+// Submitted by Inventor Team <psl@inventor.gg>
+botdash.app
+botdash.dev
+botdash.gg
+botdash.net
+botda.sh
+botdash.xyz
+
+// IONOS SE : https://www.ionos.com/
+// IONOS Group SE : https://www.ionos-group.com/
+// Submitted by Henrik Willert <security@ionos.com>
 apps-1and1.com
 live-website.com
 apps-1and1.net
@@ -13821,7 +13868,9 @@ iopsys.se
 
 // IPFS Project : https://ipfs.tech/
 // Submitted by Interplanetary Shipyard <domains@ipshipyard.com>
+*.inbrowser.dev
 *.dweb.link
+*.inbrowser.link
 
 // IPiFony Systems, Inc. : https://www.ipifony.com/
 // Submitted by Matthew Hardeman <mhardeman@ipifony.com>
@@ -13956,7 +14005,7 @@ khplay.nl
 // Submitted by Tomi Juntunen <erani@kapsi.fi>
 kapsi.fi
 
-// Katholieke Universiteit Leuven: https://www.kuleuven.be
+// Katholieke Universiteit Leuven : https://www.kuleuven.be
 // Submitted by Abuse KU Leuven <abuse@kuleuven.be>
 ezproxy.kuleuven.be
 kuleuven.cloud
@@ -13974,7 +14023,7 @@ uni5.net
 // Submitted by Roy Keene <rkeene@knightpoint.com>
 knightpoint.systems
 
-// KoobinEvent, SL: https://www.koobin.com
+// KoobinEvent, SL : https://www.koobin.com
 // Submitted by Iván Oliva <ivan.oliva@koobin.com>
 koobin.events
 
@@ -13987,6 +14036,10 @@ krellian.net
 // Submitted by DisposaBoy <security@oya.to>
 oya.to
 
+// Laravel Holdings, Inc. : https://laravel.com
+// Submitted by André Valentin <security@laravel.com>
+laravel.cloud
+
 // LCube - Professional hosting e.K. : https://www.lcube-webhosting.de
 // Submitted by Lars Laehn <info@lcube.de>
 git-repos.de
@@ -13998,6 +14051,11 @@ svn-repos.de
 leadpages.co
 lpages.co
 lpusercontent.com
+
+// Liara : https://liara.ir
+// Submitted by Amirhossein Badinloo <info@liara.ir>
+liara.run
+iran.liara.run
 
 // libp2p project : https://libp2p.io
 // Submitted by Interplanetary Shipyard <domains@ipshipyard.com>
@@ -14017,7 +14075,7 @@ co.network
 co.place
 co.technology
 
-// linkyard ldt: https://www.linkyard.ch/
+// linkyard ldt : https://www.linkyard.ch/
 // Submitted by Mario Siegenthaler <mario.siegenthaler@linkyard.ch>
 linkyard-cloud.ch
 linkyard.cloud
@@ -14047,7 +14105,12 @@ ggff.net
 localcert.net
 localhostcert.net
 
-// Lodz University of Technology LODMAN regional domains https://www.man.lodz.pl/dns
+// Localtonet : https://localtonet.com/
+// Submitted by Burak Isleyici <support@localtonet.com>
+localtonet.com
+*.localto.net
+
+// Lodz University of Technology LODMAN regional domains : https://www.man.lodz.pl/dns
 // Submitted by Piotr Wilk <dns@man.lodz.pl>
 lodz.pl
 pabianice.pl
@@ -14064,13 +14127,18 @@ loginline.io
 loginline.services
 loginline.site
 
-// Lõhmus Family, The
-// Submitted by Heiki Lõhmus <hostmaster at lohmus dot me>
+// Lõhmus Family, The : https://lohmus.me/
+// Submitted by Heiki Lõhmus <hostmaster@lohmus.me>
 lohmus.me
 
 // Lokalized : https://lokalized.nl
 // Submitted by Noah Taheij <noah@lokalized.nl>
 servers.run
+
+// Lovable : https://lovable.dev
+// Submitted by Fabian Hedin <security@lovable.dev>
+lovable.app
+lovableproject.com
 
 // LubMAN UMCS Sp. z o.o : https://lubman.pl/
 // Submitted by Ireneusz Maliszewski <ireneusz.maliszewski@lubman.pl>
@@ -14140,7 +14208,7 @@ polyspace.com
 mayfirst.info
 mayfirst.org
 
-// Maze Play: https://www.mazeplay.com
+// Maze Play : https://www.mazeplay.com
 // Submitted by Adam Humpherys <adam@mws.dev>
 mazeplay.com
 
@@ -14221,7 +14289,7 @@ trafficmanager.net
 blob.core.windows.net
 servicebus.windows.net
 
-// MikroTik: https://mikrotik.com
+// MikroTik : https://mikrotik.com
 // Submitted by MikroTik SysAdmin Team <support@mikrotik.com>
 routingthecloud.com
 sn.mynetname.net
@@ -14325,7 +14393,7 @@ us.ngrok.io
 ngrok.pizza
 ngrok.pro
 
-// Nicolaus Copernicus University in Torun - MSK TORMAN (https://www.man.torun.pl)
+// Nicolaus Copernicus University in Torun - MSK TORMAN : https://www.man.torun.pl
 torun.pl
 
 // Nimbus Hosting Ltd. : https://www.nimbushosting.co.uk/
@@ -14450,8 +14518,6 @@ notion.site
 // Submitted by Steve Russell <steve@now-dns.com>
 dnsking.ch
 mypi.co
-n4t.co
-001www.com
 myiphost.com
 forumz.info
 soundcast.me
@@ -14464,7 +14530,6 @@ vpndns.net
 dynserv.org
 now-dns.org
 x443.pw
-now-dns.top
 ntdll.top
 freeddns.us
 
@@ -14481,7 +14546,7 @@ nyc.mn
 // Submitted by the prvcy.page Registry Team <info@o3o.foundation>
 prvcy.page
 
-// Obl.ong : <https://obl.ong>
+// Obl.ong : https://obl.ong
 // Submitted by Reese Armstrong <team@obl.ong>
 obl.ong
 
@@ -14498,11 +14563,11 @@ omg.lol
 // Submitted by Cole Estep <cole@omnibond.com>
 cloudycluster.net
 
-// OmniWe Limited: https://omniwe.com
+// OmniWe Limited : https://omniwe.com
 // Submitted by Vicary Archangel <vicary@omniwe.com>
 omniwe.site
 
-// One.com: https://www.one.com/
+// One.com : https://www.one.com/
 // Submitted by Jacob Bunk Nielsen <jbn@one.com>
 123webseite.at
 123website.be
@@ -14546,7 +14611,7 @@ opencraft.hosting
 32-b.it
 64-b.it
 
-// OpenResearch GmbH: https://openresearch.com/
+// OpenResearch GmbH : https://openresearch.com/
 // Submitted by Philipp Schmid <ops@openresearch.com>
 orsites.com
 
@@ -14570,12 +14635,12 @@ operaunite.com
 tech.orange
 
 // OsSav Technology Ltd. : https://ossav.com/
-// TLD Nic: http://nic.can.re - TLD Whois Server: whois.can.re
 // Submitted by OsSav Technology Ltd. <support@ossav.com>
+// https://nic.can.re
 can.re
 
-// Oursky Limited : https://authgear.com/, https://skygear.io/
-// Submitted by Authgear Team <hello@authgear.com>, Skygear Developer <hello@skygear.io>
+// Oursky Limited : https://authgear.com/
+// Submitted by Authgear Team <hello@authgear.com> & Skygear Developer <hello@skygear.io>
 authgear-staging.com
 authgearapps.com
 skygearapp.com
@@ -14584,12 +14649,12 @@ skygearapp.com
 // Submitted by Duarte Santos <domain-admin@outsystemscloud.com>
 outsystemscloud.com
 
-// OVHcloud: https://ovhcloud.com
+// OVHcloud : https://ovhcloud.com
 // Submitted by Vincent Cassé <vincent.casse@ovhcloud.com>
 *.hosting.ovh.net
 *.webpaas.ovh.net
 
-// OwnProvider GmbH: http://www.ownprovider.com
+// OwnProvider GmbH : http://www.ownprovider.com
 // Submitted by Jan Moennich <jan.moennich@ownprovider.com>
 ownprovider.com
 own.pm
@@ -14623,7 +14688,7 @@ pantheonsite.io
 // Submitted by Daniel Netzer <dan@paywhirl.com>
 *.paywhirl.com
 
-// pcarrier.ca Software Inc: https://pcarrier.ca/
+// pcarrier.ca Software Inc : https://pcarrier.ca/
 // Submitted by Pierre Carrier <pc@rrier.ca>
 *.xmit.co
 xmit.dev
@@ -14658,9 +14723,8 @@ us.platform.sh
 *.platformsh.site
 *.tst.site
 
-// Platter: https://platter.dev
+// Platter : https://platter.dev
 // Submitted by Patrick Flor <patrick@platter.dev>
-platter-app.com
 platter-app.dev
 platterp.us
 
@@ -14695,26 +14759,39 @@ xen.prgmr.com
 // Submitted by registry <lendl@nic.at>
 priv.at
 
+// PROJECT ELIV : https://eliv.kr/
+// Submitted by ELIV Team <team@eliv.kr>
+c01.kr
+eliv-dns.kr
+
 // Protonet GmbH : http://protonet.io
 // Submitted by Martin Meier <admin@protonet.io>
 protonet.io
+
+// PSL Sandbox : https://psl.hrsn.dev
+// Submitted by William Harrison <psl@hrsn.net>
+sub.psl.hrsn.dev
+*.wc.psl.hrsn.dev
+!ignored.wc.psl.hrsn.dev
+*.sub.wc.psl.hrsn.dev
+!ignored.sub.wc.psl.hrsn.dev
 
 // Publication Presse Communication SARL : https://ppcom.fr
 // Submitted by Yaacov Akiba Slama <admin@chirurgiens-dentistes-en-france.fr>
 chirurgiens-dentistes-en-france.fr
 byen.site
 
-// pubtls.org: https://www.pubtls.org
+// pubtls.org : https://www.pubtls.org
 // Submitted by Kor Nielsen <kor@pubtls.org>
 pubtls.org
 
-// PythonAnywhere LLP: https://www.pythonanywhere.com
+// PythonAnywhere LLP : https://www.pythonanywhere.com
 // Submitted by Giles Thomas <giles@pythonanywhere.com>
 pythonanywhere.com
 eu.pythonanywhere.com
 
 // QA2
-// Submitted by Daniel Dent (https://www.danieldent.com/)
+// Submitted by Daniel Dent : https://www.danieldent.com/
 qa2.com
 
 // QCX
@@ -14743,7 +14820,7 @@ qualifioapp.com
 // Submitted by Vasyl Tsalko <vtsalko@qualityunit.com>
 ladesk.com
 
-// QuickBackend: https://www.quickbackend.com
+// QuickBackend : https://www.quickbackend.com
 // Submitted by Dani Biro <dani@pymet.com>
 qbuser.com
 
@@ -14761,7 +14838,7 @@ vaporcloud.io
 rackmaze.com
 rackmaze.net
 
-// Rad Web Hosting: https://radwebhosting.com
+// Rad Web Hosting : https://radwebhosting.com
 // Submitted by Scott Claeys <s.claeys@radwebhosting.com>
 cloudsite.builders
 myradweb.net
@@ -14796,7 +14873,7 @@ readthedocs.io
 // Submitted by Tim Kramer <tkramer@rhcloud.com>
 rhcloud.com
 
-// Redgate Software: https://red-gate.com
+// Redgate Software : https://red-gate.com
 // Submitted by Andrew Farries <andrew.farries@red-gate.com>
 instances.spawn.cc
 
@@ -14864,6 +14941,11 @@ itcouldbewor.se
 aus.basketball
 nz.basketball
 
+// ROBOT PAYMENT INC. : https://www.robotpayment.co.jp/
+// Submitted by Kentaro Takamori <takamori.kentaro@robotpayment.co.jp>
+subsc-pay.com
+subsc-pay.net
+
 // Rochester Institute of Technology : http://www.rit.edu/
 // Submitted by Jennifer Herting <jchits@rit.edu>
 git-pages.rit.edu
@@ -14872,13 +14954,13 @@ git-pages.rit.edu
 // Submitted by Neil Hanlon <neil@resf.org>
 rocky.page
 
-// Ruhr University Bochum http://ruhr-uni-bochum.de
+// Ruhr University Bochum : https://www.ruhr-uni-bochum.de/
 // Submitted by Andreas Jobs <noc@ruhr-uni-bochum.de>
 rub.de
 ruhr-uni-bochum.de
 io.noc.ruhr-uni-bochum.de
 
-// Rusnames Limited: http://rusnames.ru/
+// Rusnames Limited : http://rusnames.ru/
 // Submitted by Sergey Zotov <admin@rusnames.ru>
 биз.рус
 ком.рус
@@ -14949,7 +15031,7 @@ x0.to
 from.tv
 sakura.tv
 
-// Salesforce.com, Inc. https://salesforce.com/
+// Salesforce.com, Inc. : https://salesforce.com/
 // Submitted by Salesforce Public Suffix List Team <public-suffix-list@salesforce.com>
 *.builder.code.com
 *.dev-builder.code.com
@@ -15008,7 +15090,7 @@ dedibox.fr
 // Submitted by Hanno Böck <hanno@schokokeks.org>
 schokokeks.net
 
-// Scottish Government: https://www.gov.scot
+// Scottish Government : https://www.gov.scot
 // Submitted by Martin Ellis <martin.ellis@gov.scot>
 gov.scot
 service.gov.scot
@@ -15042,7 +15124,7 @@ seidat.net
 // Submitted by Yuriy Romadin <contact@sellfy.com>
 sellfy.store
 
-// Sendmsg: https://www.sendmsg.co.il
+// Sendmsg : https://www.sendmsg.co.il
 // Submitted by Assaf Stern <domains@comstar.co.il>
 minisite.ms
 
@@ -15050,7 +15132,7 @@ minisite.ms
 // Submitted by Felix Mönckemeyer <f.moenckemeyer@senseering.de>
 senseering.net
 
-// Servebolt AS: https://servebolt.com
+// Servebolt AS : https://servebolt.com
 // Submitted by Daniel Kjeserud <cloudops@servebolt.com>
 servebolt.cloud
 
@@ -15067,10 +15149,6 @@ as.sh.cn
 // Sheezy.Art : https://sheezy.art
 // Submitted by Nyoom <admin@sheezy.art>
 sheezy.games
-
-// ShiftEdit : https://shiftedit.net/
-// Submitted by Adam Jimenez <adam@shiftcreate.com>
-shiftedit.io
 
 // Shopblocks : http://www.shopblocks.com/
 // Submitted by Alex Bowers <alex@shopblocks.com>
@@ -15109,7 +15187,7 @@ siteleaf.net
 // Submitted by Aral Balkan <aral@small-tech.org>
 small-web.org
 
-// Smallregistry by Promopixel SARL: https://www.smallregistry.net
+// Smallregistry by Promopixel SARL : https://www.smallregistry.net
 // Former AFNIC's SLDs
 // Submitted by Jérôme Lipowicz <support@promopixel.com>
 aeroport.fr
@@ -15155,15 +15233,11 @@ srht.site
 apps.lair.io
 *.stolos.io
 
-// SpaceKit : https://www.spacekit.io/
-// Submitted by Reza Akhavan <spacekit.io@gmail.com>
-spacekit.io
-
 // SparrowHost : https://sparrowhost.in/
 // Submitted by Anant Pandey <info@sparrowhost.in>
 ind.mom
 
-// SpeedPartner GmbH: https://www.speedpartner.de/
+// SpeedPartner GmbH : https://www.speedpartner.de/
 // Submitted by Stefan Neufeind <info@speedpartner.de>
 customer.speedpartner.de
 
@@ -15230,6 +15304,11 @@ researched.cx
 tests.cx
 surveys.so
 
+// Storacha Network : https://storacha.network
+// Submitted by Alan Shaw <support@storacha.network>
+ipfs.storacha.link
+ipfs.w3s.link
+
 // Storebase : https://www.storebase.io
 // Submitted by Tony Schirmer <tony@storebase.io>
 storebase.store
@@ -15247,7 +15326,7 @@ storj.farm
 strapiapp.com
 media.strapiapp.com
 
-// Strategic System Consulting (eApps Hosting): https://www.eapps.com/
+// Strategic System Consulting (eApps Hosting) : https://www.eapps.com/
 // Submitted by Alex Oancea <aoancea@cloudscale365.com>
 vps-host.net
 atl.jelastic.vps-host.net
@@ -15269,7 +15348,7 @@ user.srcf.net
 // Submitted by Silke Hofstra <syscom@snt.utwente.nl>
 utwente.io
 
-// Sub 6 Limited: http://www.sub6.com
+// Sub 6 Limited : http://www.sub6.com
 // Submitted by Dan Miller <dm@sub6.com>
 temp-dns.com
 
@@ -15317,7 +15396,7 @@ taifun-dns.de
 ts.net
 *.c.ts.net
 
-// TASK geographical domains (https://www.task.gda.pl/uslugi/dns)
+// TASK geographical domains : https://task.gda.pl/en/services/for-entrepreneurs/
 gda.pl
 gdansk.pl
 gdynia.pl
@@ -15333,7 +15412,7 @@ taveusercontent.com
 p.tawk.email
 p.tawkto.email
 
-// team.blue https://team.blue
+// team.blue : https://team.blue
 // Submitted by Cedric Dubois <cedric.dubois@team.blue>
 site.tb-hosting.com
 
@@ -15435,7 +15514,7 @@ diskstation.org
 typedream.app
 
 // Typeform : https://www.typeform.com
-// Submitted by Sergi Ferriz <sergi.ferriz@typeform.com>
+// Submitted by Typeform <ops@typeform.com>
 pro.typeform.com
 
 // Uberspace : https://uberspace.de
@@ -15463,6 +15542,10 @@ unison-services.cloud
 virtual-user.de
 virtualuser.de
 
+// United States Writing Corporation : https://uswriting.co
+// Submitted by Andrew Sampson <security@obj.ag>
+obj.ag
+
 // UNIVERSAL DOMAIN REGISTRY : https://www.udr.org.yt/
 // see also: whois -h whois.udr.org.yt help
 // Submitted by Atanunu Igbunuroghene <publicsuffixlist@udr.org.yt>
@@ -15477,7 +15560,7 @@ org.yt
 // Submitted by Marko Ivanovic <kormang@hotmail.rs>
 rs.ba
 
-// University of Bielsko-Biala regional domain: http://dns.bielsko.pl/
+// University of Bielsko-Biala regional domain : http://dns.bielsko.pl/
 // Submitted by Marcin <dns@ath.bielsko.pl>
 bielsko.pl
 
@@ -15511,15 +15594,15 @@ now.sh
 // Submitted by Danko Aleksejevs <danko@very.lv>
 2038.io
 
-// Viprinet Europe GmbH : http://www.viprinet.com
-// Submitted by Simon Kissel <hostmaster@viprinet.com>
-router.management
-
 // Virtual-Info : https://www.virtual-info.info/
 // Submitted by Adnan RIHAN <hostmaster@v-info.info>
 v-info.info
 
-// Voorloper.com: https://voorloper.com
+// Viva Republica, Inc. : https://toss.im/
+// Submitted by Deus Team <deus@toss.im>
+deus-canvas.com
+
+// Voorloper.com : https://voorloper.com
 // Submitted by Nathan van Bakel <info@voorloper.com>
 voorloper.cloud
 
@@ -15554,6 +15637,7 @@ pleskns.com
 wp2.host
 pdns.page
 plesk.page
+cpanel.site
 wpsquared.site
 
 // WebWaddle Ltd : https://webwaddle.com/
@@ -15578,9 +15662,14 @@ toolforge.org
 wmcloud.org
 wmflabs.org
 
-// William Harrison : https://wdh.gg
-// Submitted by William Harrison <william@harrison.id.au>
+// William Harrison : https://wharrison.com.au
+// Submitted by William Harrison <psl@wharrison.com.au>
 wdh.app
+
+// Windsurf : https://windsurf.com
+// Submitted by Douglas Chen <psl@windsurf.com>
+windsurf.app
+windsurf.build
 
 // WISP : https://wisp.gg
 // Submitted by Stepan Fedotov <stepan@wisp.gg>
@@ -15620,7 +15709,7 @@ weeklylottery.org.uk
 wpenginepowered.com
 js.wpenginepowered.com
 
-// XenonCloud GbR: https://xenoncloud.net
+// XenonCloud GbR : https://xenoncloud.net
 // Submitted by Julian Uphoff <publicsuffixlist@xenoncloud.net>
 half.host
 
@@ -15669,6 +15758,10 @@ zap.cloud
 // Submitted by Zeabur Team <contact@zeabur.com>
 zeabur.app
 
+// Zerops : https://zerops.io/
+// Submitted by Zerops Team <security@zerops.io>
+*.zerops.app
+
 // Zine EOOD : https://zine.bg/
 // Submitted by Martin Angelov <martin@zine.bg>
 bss.design
@@ -15678,5 +15771,9 @@ bss.design
 basicserver.io
 virtualserver.io
 enterprisecloud.nu
+
+// Zone.ID: https://zone.id
+// Submitted by Gx1.org <security@gx1.org>
+zone.id
 
 // ===END PRIVATE DOMAINS===

@@ -25,7 +25,6 @@ static ndpi_network ndpi_protocol_roblox_protocol_list[] = {
  { 0x80740000 /* 128.116.0.0/17 */, 17, NDPI_PROTOCOL_ROBLOX },
  { 0x8DC10300 /* 141.193.3.0/24 */, 24, NDPI_PROTOCOL_ROBLOX },
  { 0xCDC93E00 /* 205.201.62.0/24 */, 24, NDPI_PROTOCOL_ROBLOX },
- { 0xD1CE2800 /* 209.206.40.0/21 */, 21, NDPI_PROTOCOL_ROBLOX },
  /* End */
  { 0x0, 0, 0 }
 };
