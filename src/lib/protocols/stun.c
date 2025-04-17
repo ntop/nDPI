@@ -973,6 +973,13 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
       /* TODO: store RTP information in 'struct rtp_info' */
       NDPI_LOG_INFO(ndpi_struct, "Found RTP over STUN\n");
 
+      if(flow->stun.t_start != 0) {
+        flow->stun.t_end = ndpi_get_current_time(flow);
+      } else if(flow->stun.rtp_counters[0] != 0 && flow->stun.rtp_counters[1] != 0) {
+        flow->stun.t_start = ndpi_get_current_time(flow);
+        flow->stun.t_end = ndpi_get_current_time(flow);
+      }
+
       rtp_get_stream_type(packet->payload[1] & 0x7F, &flow->flow_multimedia_types, flow->detected_protocol_stack[0]);
 
       if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RTP &&

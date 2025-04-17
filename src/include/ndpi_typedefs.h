@@ -1417,6 +1417,7 @@ struct ndpi_flow_struct {
     u_int8_t num_xor_relayed_addresses, num_xor_mapped_addresses;
     u_int8_t num_non_stun_pkt, non_stun_pkt_len[2];
     u_int16_t rtp_counters[2];
+    u_int32_t t_start, t_end;
   } stun;
 
   struct {
