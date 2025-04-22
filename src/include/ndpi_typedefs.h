@@ -1054,6 +1054,9 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_TFTP */
   u_int16_t tftp_data_num;
   u_int16_t tftp_ack_num;
+
+  /* NDPI_PROTOCOL_NTP*/
+  u_int8_t ntp_stage;
 };
 
 /* ************************************************** */
@@ -1716,14 +1719,14 @@ struct ndpi_flow_struct {
       char ptr_domain_name[64 /* large enough but smaller than { } tls */];
     } dns;
 
-    struct {
+    struct ntp_info {
       u_int8_t leap_indicator: 2, version: 3, mode: 3;
       u_int8_t stratum;
       int8_t ppol, precision;
       float root_delay, root_dispersion;
-      char ref_id[16];
+      char ref_id[20];
       uint64_t ref_time, org_time, rec_time, trans_time;
-    } ntp;
+    } ntp[2];
 
     struct {
       char hostname[48], domain[48], username[48];

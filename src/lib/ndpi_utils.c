@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <math.h>
 #include <sys/types.h>
+#include <time.h>
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
@@ -76,7 +77,37 @@ typedef struct {
   UT_hash_handle hh;
 } ndpi_str_hash_priv;
 
+typedef struct {
+  uint32_t seconds;
+  uint32_t fraction;
+} ntp_t;
+
+#define NTP_DELTA 2208988800UL
+
 /* ****************************************** */
+
+// https://tickelton.gitlab.io/articles/ntp-timestamps/
+void ntp_ts_to_string(uint64_t timestamp, char *buffer, size_t buffer_size) {
+
+  if (timestamp == 0) {
+    buffer[0] = '\0';
+    return;
+  }
+
+  ntp_t ntp;
+
+  memcpy(&ntp, &timestamp, sizeof(uint64_t));
+
+  time_t sec = ntohl(ntp.seconds) - NTP_DELTA;
+  uint32_t usec = (uint32_t)((double)ntohl(ntp.fraction) * 1.0e9 / (double)(1LL << 32));
+
+  struct tm tm;
+
+  (void)ndpi_gmtime_r(&sec, &tm);
+  size_t offset = strftime(buffer, buffer_size, "%Y-%m-%d %H:%M:%S", &tm);
+  snprintf(buffer + offset, buffer_size - offset, ".%d", usec);
+}
+
 
 /* implementation of the punycode check function */
 int ndpi_check_punycode_string(char * buffer , int len) {
@@ -1626,19 +1657,30 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_NTP:
     ndpi_serialize_start_of_block(serializer, "ntp");
-    ndpi_serialize_string_uint32(serializer, "leap_indicator", flow->protos.ntp.leap_indicator);
-    ndpi_serialize_string_uint32(serializer, "version", flow->protos.ntp.version);
-    ndpi_serialize_string_uint32(serializer, "mode", flow->protos.ntp.mode);
-    ndpi_serialize_string_uint32(serializer, "stratum", flow->protos.ntp.stratum);
-    ndpi_serialize_string_int32(serializer, "ppol", flow->protos.ntp.ppol);
-    ndpi_serialize_string_int32(serializer, "precision", flow->protos.ntp.precision);
-    ndpi_serialize_string_float(serializer, "root_delay", flow->protos.ntp.root_delay, "%f");
-    ndpi_serialize_string_float(serializer, "root_dispersion", flow->protos.ntp.root_dispersion, "%f");
-    ndpi_serialize_string_string(serializer, "ref_id", flow->protos.ntp.ref_id);
-    ndpi_serialize_string_uint64(serializer, "ref_time", flow->protos.ntp.ref_time);
-    ndpi_serialize_string_uint64(serializer, "org_time", flow->protos.ntp.org_time);
-    ndpi_serialize_string_uint64(serializer, "rec_time", flow->protos.ntp.rec_time);
-    ndpi_serialize_string_uint64(serializer, "trans_time", flow->protos.ntp.trans_time);
+    for (i = 0; i < 2; i++) {
+      ndpi_serialize_start_of_block_uint32(serializer,i);
+      ndpi_serialize_string_uint32(serializer, "leap_indicator", flow->protos.ntp[i].leap_indicator);
+      ndpi_serialize_string_uint32(serializer, "version", flow->protos.ntp[i].version);
+      ndpi_serialize_string_uint32(serializer, "mode", flow->protos.ntp[i].mode);
+      ndpi_serialize_string_uint32(serializer, "stratum", flow->protos.ntp[i].stratum);
+      ndpi_serialize_string_int32(serializer, "ppol", flow->protos.ntp[i].ppol);
+      ndpi_serialize_string_int32(serializer, "precision", flow->protos.ntp[i].precision);
+      ndpi_serialize_string_float(serializer, "root_delay", flow->protos.ntp[i].root_delay, "%f");
+      ndpi_serialize_string_float(serializer, "root_dispersion", flow->protos.ntp[i].root_dispersion, "%f");
+      ndpi_serialize_string_string(serializer, "ref_id", flow->protos.ntp[i].ref_id);
+
+
+      char timestamp[64];
+      ntp_ts_to_string(flow->protos.ntp[i].ref_time, timestamp, sizeof timestamp);
+      ndpi_serialize_string_string(serializer, "ref_time", timestamp);
+      ntp_ts_to_string(flow->protos.ntp[i].org_time, timestamp, sizeof timestamp);
+      ndpi_serialize_string_string(serializer, "org_time", timestamp);
+      ntp_ts_to_string(flow->protos.ntp[i].rec_time, timestamp, sizeof timestamp);
+      ndpi_serialize_string_string(serializer, "rec_time", timestamp);
+      ntp_ts_to_string(flow->protos.ntp[i].trans_time, timestamp, sizeof timestamp);
+      ndpi_serialize_string_string(serializer, "trans_time", timestamp);
+      ndpi_serialize_end_of_block(serializer);
+    }
     ndpi_serialize_end_of_block(serializer);
     break;
 
