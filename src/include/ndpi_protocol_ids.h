@@ -476,6 +476,7 @@ typedef enum {
   NDPI_PROTOCOL_GEARUP_BOOSTER        = 445,
   NDPI_PROTOCOL_LLM                   = 446, /* Large Language Models */
   NDPI_PROTOCOL_UBIQUITY              = 447,
+  NDPI_PROTOCOL_MSDO                  = 448,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

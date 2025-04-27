@@ -26,7 +26,7 @@
 
 #include "ndpi_protocol_ids.h"
 
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_WINDOWS_UPDATE
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_MSDO
 
 #include "ndpi_api.h"
 #include "ndpi_private.h"
@@ -36,7 +36,7 @@ static void ndpi_int_msdo_add_connection(struct ndpi_detection_module_struct * c
 {
   NDPI_LOG_INFO(ndpi_struct, "found Microsoft Delivery Optimization protocol\n");
   ndpi_set_detected_protocol(ndpi_struct, flow,
-                             NDPI_PROTOCOL_WINDOWS_UPDATE,
+                             NDPI_PROTOCOL_MSDO,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }
@@ -66,8 +66,8 @@ static void ndpi_search_msdo(struct ndpi_detection_module_struct *ndpi_struct, s
 
 void init_msdo_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
 {
-  ndpi_set_bitmask_protocol_detection("WindowsUpdate", ndpi_struct, *id,
-              NDPI_PROTOCOL_WINDOWS_UPDATE,
+  ndpi_set_bitmask_protocol_detection("MSDO", ndpi_struct, *id,
+              NDPI_PROTOCOL_MSDO,
               ndpi_search_msdo,
               NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
               SAVE_DETECTION_BITMASK_AS_UNKNOWN,

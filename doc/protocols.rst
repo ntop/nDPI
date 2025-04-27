@@ -1195,3 +1195,12 @@ References: `OpenAI <https://openai.com/>`_, `DeepSeek <https://www.deepseek.com
 Generic traffic from Ubiquity site and services
 
 References: `Main site <https://www.ui.com/>`_
+
+
+.. _Proto 448:
+
+`NDPI_PROTOCOL_MSDO`
+========================
+Microsoft Delivery Optimization is a cloud-managed, peer-to-peer distribution service that enables efficient delivery of Windows updates, apps, and content by allowing devices to share download data with each other on local networks or the internet.
+
+References: `Main site <https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization>`_
