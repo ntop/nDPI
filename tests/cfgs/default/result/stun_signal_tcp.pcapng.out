@@ -11,9 +11,9 @@ LRU cache fpc_dns:    0/1/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
-Automa risk mask:     0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
@@ -24,4 +24,4 @@ SignalVoip	500	114216	1
 
 Acceptable                     500 114216        1            
 
-	1	TCP 192.168.1.117:51296 <-> 35.219.252.146:80 [proto: 78.269/STUN.SignalVoip][IP: 284/GoogleCloud][ClearText][Confidence: DPI][FPC: 284/GoogleCloud, Confidence: IP address][DPI packets: 10][cat: VoIP/10][226 pkts/71104 bytes <-> 274 pkts/43112 bytes][Goodput ratio: 82/64][17.42 sec][Hostname/SNI: signal.org][bytes ratio: 0.245 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 80/68 2434/2433 281/278][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 315/157 1242/1474 338/185][Mapped IP/Port: 93.35.171.86:51262][Peer IP/Port: 93.33.26.150:37920][Relayed IP/Port: 35.219.252.146:13140][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][PLAIN TEXT (LODkFIIf)][Plen Bins: 0,21,18,20,5,0,0,0,21,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.1.117:51296 <-> 35.219.252.146:80 [proto: 78.269/STUN.SignalVoip][IP: 284/GoogleCloud][ClearText][Confidence: DPI][FPC: 284/GoogleCloud, Confidence: IP address][DPI packets: 10][cat: VoIP/10][226 pkts/71104 bytes <-> 274 pkts/43112 bytes][Goodput ratio: 82/64][17.42 sec][Hostname/SNI: signal.org][bytes ratio: 0.245 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 80/68 2434/2433 281/278][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 315/157 1242/1474 338/185][Mapped IP/Port: 93.35.171.86:51262][Peer IP/Port: 93.33.26.150:37920][Relayed IP/Port: 35.219.252.146:13140][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 3478][TCP Fingerprint: 2_128_64240_6bb88f5575fd/Windows][PLAIN TEXT (LODkFIIf)][Plen Bins: 0,21,18,20,5,0,0,0,21,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
