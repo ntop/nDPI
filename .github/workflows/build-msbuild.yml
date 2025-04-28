@@ -31,10 +31,10 @@ jobs:
         run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug
 
       - name: Download Npcap
-        run: Invoke-WebRequest -Uri 'https://npcap.com/dist/npcap-1.81.exe' -OutFile 'C:\npcap-1.81.exe'
+        run: Invoke-WebRequest -Uri 'https://npcap.com/dist/npcap-1.79.exe' -OutFile 'C:\npcap-1.79.exe'
 
       - name: Install Npcap
-        run: C:\npcap-1.81.exe /S /winpcap_mode=yes
+        run: C:\npcap-1.79.exe /S /winpcap_mode=yes
 
       - name: Build ndpiReader (debug)
         run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug-ndpiReader
