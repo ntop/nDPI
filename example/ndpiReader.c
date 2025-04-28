@@ -6412,7 +6412,7 @@ void ballTreeUnitTest() {
 /* *********************************************** */
 
 void cryptDecryptUnitTest() {
-  u_char enc_dec_key[64] = "9dedb817e5a8805c1de62eb8982665b9a2b4715174c34d23b9a46ffafacfb2a7" /* SHA256("nDPI") */;
+  u_char enc_dec_key[] = "9dedb817e5a8805c1de62eb8982665b9a2b4715174c34d23b9a46ffafacfb2a7" /* SHA256("nDPI") */;
   const char *test_string = "The quick brown fox jumps over the lazy dog";
   char *enc, *dec;
   u_int16_t e_len, d_len, t_len = strlen(test_string);
