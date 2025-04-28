@@ -1743,7 +1743,11 @@ static ndpi_protocol_match host_match[] =
    { "perplexity.ai",                    "LLM", NDPI_PROTOCOL_LLM, NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ollama.com",                       "LLM", NDPI_PROTOCOL_LLM, NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "huggingface.com",                  "LLM", NDPI_PROTOCOL_LLM, NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   
+
+   { "rsg.sc",                                         "RockstarGames", NDPI_PROTOCOL_ROCKSTAR_GAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "rockstargames.com",                              "RockstarGames", NDPI_PROTOCOL_ROCKSTAR_GAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "gamedownloads-rockstargames-com.akamaized.net",  "RockstarGames", NDPI_PROTOCOL_ROCKSTAR_GAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif
@@ -1776,6 +1780,7 @@ static ndpi_tls_cert_name_match tls_certificate_match [] = {
   { "O=Sonos, Inc",                    NDPI_PROTOCOL_SONOS      },  
   { "CN=Snapchat Inc.",                NDPI_PROTOCOL_SNAPCHAT_CALL },
   { "CN=NVIDIA GameStream",            NDPI_PROTOCOL_GEFORCENOW },
+  { "CN=*.relay.ros.rockstargames.com", NDPI_PROTOCOL_ROCKSTAR_GAMES },
 
   { NULL, 0 }
 };

@@ -1204,3 +1204,12 @@ References: `Main site <https://www.ui.com/>`_
 Microsoft Delivery Optimization is a cloud-managed, peer-to-peer distribution service that enables efficient delivery of Windows updates, apps, and content by allowing devices to share download data with each other on local networks or the internet.
 
 References: `Main site <https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization>`_
+
+
+.. _Proto 449:
+
+`NDPI_PROTOCOL_ROCKSTAR_GAMES`
+===============================
+Traffic related to Rockstar Games services, including game downloads, authentication, online services, and Rockstar Launcher activities.
+
+References: `Main site <https://www.rockstargames.com/>`_
