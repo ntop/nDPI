@@ -10520,10 +10520,18 @@ const char * ndpi_strncasestr(const char *s, const char *find, size_t len) {
 
   const size_t s_len = strnlen(s, len);
 
+  /* If 'find' is longer than 's', no match is possible */
+  if (find_len > s_len) {
+    return NULL;
+  }
+
   const char *const end_of_search = s + s_len - find_len + 1;
 
+  /* Cache the lowercased first character of 'find' */
+  const unsigned char fc = tolower((unsigned char) *find);
+
   for (; s < end_of_search; ++s) {
-    if (tolower((unsigned char)*s) == tolower((unsigned char)*find)) {
+    if (tolower((unsigned char)*s) == fc) {
       if (strncasecmp(s + 1, find + 1, find_len - 1) == 0) {
         return s;
       }

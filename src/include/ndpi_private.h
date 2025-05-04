@@ -72,25 +72,16 @@ typedef struct default_ports_tree_node {
 } default_ports_tree_node_t;
 
 
-#define LINE_EQUALS(ndpi_int_one_line_struct, string_to_compare) \
-  ((ndpi_int_one_line_struct).len == strlen(string_to_compare) && \
-   LINE_CMP(ndpi_int_one_line_struct, string_to_compare, strlen(string_to_compare)) == 1)
-
 #define LINE_STARTS(ndpi_int_one_line_struct, string_to_compare) \
-  ((ndpi_int_one_line_struct).len >= strlen(string_to_compare) && \
-   LINE_CMP(ndpi_int_one_line_struct, string_to_compare, strlen(string_to_compare)) == 1)
+  ((ndpi_int_one_line_struct).ptr != NULL && \
+   (ndpi_int_one_line_struct).len >= strlen(string_to_compare) && \
+   strncasecmp((const char *)((ndpi_int_one_line_struct).ptr), string_to_compare, strlen(string_to_compare)) == 0)
 
 #define LINE_ENDS(ndpi_int_one_line_struct, string_to_compare) \
   ((ndpi_int_one_line_struct).len >= strlen(string_to_compare) && \
-   ndpi_strncasestr((const char *)((ndpi_int_one_line_struct).ptr) + \
-                    ((ndpi_int_one_line_struct).len - strlen(string_to_compare)), \
-                    string_to_compare, strlen(string_to_compare)) == \
-   (const char *)((ndpi_int_one_line_struct).ptr) + ((ndpi_int_one_line_struct).len - strlen(string_to_compare)))
-
-#define LINE_CMP(ndpi_int_one_line_struct, string_to_compare, string_to_compare_length) \
-  ((ndpi_int_one_line_struct).ptr != NULL && \
-   ndpi_strncasestr((const char *)((ndpi_int_one_line_struct).ptr), string_to_compare, \
-                    string_to_compare_length) == (const char *)((ndpi_int_one_line_struct).ptr))
+   strncasecmp((const char *)((ndpi_int_one_line_struct).ptr) + \
+              ((ndpi_int_one_line_struct).len - strlen(string_to_compare)), \
+              string_to_compare, strlen(string_to_compare)) == 0)
 
 #define NDPI_MAX_PARSE_LINES_PER_PACKET                         64
 
