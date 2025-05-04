@@ -7804,7 +7804,6 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
       addr.s_addr = flow->c_address.v4;
       ret = ndpi_network_port_ptree_match(ndpi_str, &addr, flow->c_port);
     }
-
   } else {
     struct in6_addr addr;
 
@@ -7815,7 +7814,6 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
       addr = *(struct in6_addr *)&flow->c_address.v6;
       ret = ndpi_network_port_ptree6_match(ndpi_str, &addr, flow->c_port);
     }
-
   }
 
   return(ret);
@@ -10002,7 +10000,7 @@ ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_str
 						struct ndpi_flow_struct *flow, u_int8_t proto,
 						u_int32_t shost /* host byte order */, u_int16_t sport,
 						u_int32_t dhost /* host byte order */, u_int16_t dport) {
-  u_int32_t rc;
+  u_int32_t rc = NDPI_PROTOCOL_UNKNOWN;
   ndpi_protocol ret = NDPI_PROTOCOL_NULL;
   u_int8_t user_defined_proto;
 
@@ -10010,9 +10008,24 @@ ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_str
     return ret;
 
   if((proto == IPPROTO_TCP) || (proto == IPPROTO_UDP)) {
-    if(shost && dhost)
-      rc = ndpi_search_tcp_or_udp_raw(ndpi_str, flow, shost, dhost);
-    else
+    if(shost && dhost) {
+      struct in_addr addr;
+      u_int16_t rcode = NDPI_PROTOCOL_UNKNOWN;
+      
+      /* guess host protocol; server first */
+      addr.s_addr = htonl(shost);
+      rcode = ndpi_network_port_ptree_match(ndpi_str, &addr, htons(sport));
+      
+      if(rcode == NDPI_PROTOCOL_UNKNOWN) {
+	addr.s_addr = htonl(dhost);
+	rcode = ndpi_network_port_ptree_match(ndpi_str, &addr, htons(dport));
+      }
+
+      if(rcode == NDPI_PROTOCOL_UNKNOWN)
+	rc = ndpi_search_tcp_or_udp_raw(ndpi_str, flow, shost, dhost);
+      else
+	rc = (u_int32_t)rcode;
+    } else
       rc = NDPI_PROTOCOL_UNKNOWN;
 
     if(rc != NDPI_PROTOCOL_UNKNOWN) {
