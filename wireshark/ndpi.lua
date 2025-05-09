@@ -1866,7 +1866,7 @@ function ndpi_proto.dissector(tvb, pinfo, tree)
 	    offset = offset + 4
 	    ndpi_subtree:add(ndpi_fds.network_protocol, trailer_tvb(offset, 2))
 	    offset = offset + 2
-	    ndpi_subtree:add(ndpi_fds.name, trailer_tvb(offset, 2))
+	    ndpi_subtree:add(ndpi_fds.application_protocol, trailer_tvb(offset, 2))
 	    application_protocol = trailer_tvb(offset, 2):int()
 	    offset = offset + 2
 
