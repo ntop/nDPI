@@ -48,8 +48,6 @@ RETVAL=$(( RETVAL + $? ))
 RETVAL=$(( RETVAL + $? ))
 ./mullvad_ip_addresses_download.sh
 RETVAL=$(( RETVAL + $? ))
-./protonvpn_ip_addresses_download.sh
-RETVAL=$(( RETVAL + $? ))
 ./public_suffix_list_download.sh
 RETVAL=$(( RETVAL + $? ))
 
