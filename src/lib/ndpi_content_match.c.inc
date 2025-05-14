@@ -1749,6 +1749,8 @@ static ndpi_protocol_match host_match[] =
    { "rockstargames.com",                              "RockstarGames", NDPI_PROTOCOL_ROCKSTAR_GAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "gamedownloads-rockstargames-com.akamaized.net",  "RockstarGames", NDPI_PROTOCOL_ROCKSTAR_GAMES, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "kick.com",                                       "Kick", NDPI_PROTOCOL_KICK, NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
 #endif

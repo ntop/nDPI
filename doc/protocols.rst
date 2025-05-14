@@ -1213,3 +1213,12 @@ References: `Main site <https://learn.microsoft.com/en-us/windows/deployment/do/
 Traffic related to Rockstar Games services, including game downloads, authentication, online services, and Rockstar Launcher activities.
 
 References: `Main site <https://www.rockstargames.com/>`_
+
+
+.. _Proto 450:
+
+`NDPI_PROTOCOL_KICK`
+========================
+Traffic related to Kick.com, a live streaming platform that enables users to broadcast and watch live video content. This includes video streams, chat, authentication, and related API requests.
+
+References: `Main site <https://kick.com/>`_
