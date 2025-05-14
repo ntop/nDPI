@@ -605,6 +605,7 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
 #endif
 
   if(flow->tcp_fingerprint) ndpi_free(flow->tcp_fingerprint);
+  if(flow->tcp_fingerprint_raw) ndpi_free(flow->tcp_fingerprint_raw);
   if(flow->risk_str)        ndpi_free(flow->risk_str);
   if(flow->flow_payload)    ndpi_free(flow->flow_payload);
 }

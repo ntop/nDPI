@@ -1867,6 +1867,9 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->tcp.fingerprint)
     ndpi_serialize_string_string(serializer, "tcp_fingerprint", flow->tcp.fingerprint);
 
+  if(flow->tcp.fingerprint_raw)
+    ndpi_serialize_string_string(serializer, "tcp_fingerprint", flow->tcp.fingerprint_raw);
+
   ndpi_serialize_string_string(serializer, "proto",
 			       ndpi_get_ip_proto_name(l4_protocol, l4_proto_name, sizeof(l4_proto_name)));
 

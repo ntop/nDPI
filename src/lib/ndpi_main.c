@@ -7236,6 +7236,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		     sha_hash[3], sha_hash[4], sha_hash[5]);
 
 	    flow->tcp.fingerprint = ndpi_strdup(fingerprint), flow->tcp.os_hint = ndpi_os_unknown;
+		flow->tcp.fingerprint_raw = ndpi_strdup(options_fp);
 
 	    if(ndpi_str->tcp_fingerprint_hashmap != NULL) {
 	      u_int16_t ret;

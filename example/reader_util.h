@@ -344,6 +344,7 @@ typedef struct ndpi_flow_info {
   
   void *src_id, *dst_id;
   char *tcp_fingerprint;
+  char *tcp_fingerprint_raw;
   struct ndpi_entropy *entropy;
   struct ndpi_entropy *last_entropy;
 

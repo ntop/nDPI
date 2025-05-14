@@ -1394,6 +1394,7 @@ struct ndpi_flow_struct {
 
   struct {
     char *fingerprint;
+    char *fingerprint_raw;
     ndpi_os os_hint;
   } tcp;
 
