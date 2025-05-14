@@ -6883,6 +6883,9 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->tcp.fingerprint)
       ndpi_free(flow->tcp.fingerprint);
 
+    if(flow->tcp.fingerprint_raw)
+      ndpi_free(flow->tcp.fingerprint_raw);
+
     if(flow->http.url)
       ndpi_free(flow->http.url);
 
@@ -7236,7 +7239,9 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		     sha_hash[3], sha_hash[4], sha_hash[5]);
 
 	    flow->tcp.fingerprint = ndpi_strdup(fingerprint), flow->tcp.os_hint = ndpi_os_unknown;
-		flow->tcp.fingerprint_raw = ndpi_strdup(options_fp);
+
+	    if(ndpi_str->cfg.tcp_fingerprint_raw_enabled)
+		     flow->tcp.fingerprint_raw = ndpi_strdup(options_fp);
 
 	    if(ndpi_str->tcp_fingerprint_hashmap != NULL) {
 	      u_int16_t ret;
@@ -12019,6 +12024,7 @@ static const struct cfg_param {
   { NULL,            "fpc",                                     "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(fpc_enabled), NULL },
 
   { NULL,            "metadata.tcp_fingerprint",                "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_fingerprint_enabled), NULL },
+  { NULL,            "metadata.tcp_fingerprint_raw",            "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_fingerprint_raw_enabled), NULL },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },
 
