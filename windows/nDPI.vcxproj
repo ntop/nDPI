@@ -265,7 +265,7 @@
     <ClCompile Include="..\src\lib\protocols\kerberos.c" />
     <ClCompile Include="..\src\lib\protocols\lagofast.c" />
     <ClCompile Include="..\src\lib\protocols\ldap.c" />
-    <ClCompile Include="..\src\lib\protocols\lotus_notes.c" />
+    <ClCompile Include="..\src\lib\protocols\hcl_notes.c" />
     <ClCompile Include="..\src\lib\protocols\mail_imap.c" />
     <ClCompile Include="..\src\lib\protocols\mail_pop.c" />
     <ClCompile Include="..\src\lib\protocols\mail_smtp.c" />

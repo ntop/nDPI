@@ -861,8 +861,8 @@ struct ndpi_flow_tcp_struct {
     char username[32], password[16];
   } ftp_imap_pop_smtp;
 
-  /* NDPI_PROTOCOL_LOTUS_NOTES */
-  u_int8_t lotus_notes_packet_id;
+  /* NDPI_PROTOCOL_HCL_NOTES */
+  u_int8_t hcl_notes_packet_id;
 
   /* NDPI_PROTOCOL_MAIL_SMTP */
   u_int16_t smtp_command_bitmask;

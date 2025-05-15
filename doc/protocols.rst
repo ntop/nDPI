@@ -119,6 +119,15 @@ Notes:
 - IPv6 is not supported
 
 
+.. _Proto 150:
+
+`NDPI_PROTOCOL_HCL_NOTES`
+==========================
+HCL Notes (formerly IBM Lotus Notes) is a client-server collaborative application that provides email, calendar, and database functionality. Developed by HCL Technologies, it is widely used in enterprise environments for secure communication and data management.
+
+References: `Main site: <https://www.hcl-software.com/notes>`_
+
+
 .. _Proto 174:
 
 `NDPI_PROTOCOL_RTMP`

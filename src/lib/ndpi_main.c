@@ -1604,8 +1604,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "TeamViewer", NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS, NDPI_PROTOCOL_QOE_CATEGORY_REMOTE_ACCESS,
 			  ndpi_build_default_ports(ports_a, 5938, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 5938, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LOTUS_NOTES,
-			  "LotusNotes", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HCL_NOTES,
+			  "HCL_Notes", NDPI_PROTOCOL_CATEGORY_COLLABORATIVE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 1352, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SAP,
@@ -5990,8 +5990,8 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* CITRIX */
   init_citrix_dissector(ndpi_str, &a);
 
-  /* LOTUS_NOTES */
-  init_lotus_notes_dissector(ndpi_str, &a);
+  /* HCL Notes */
+  init_hcl_notes_dissector(ndpi_str, &a);
 
   /* GTP */
   init_gtp_dissector(ndpi_str, &a);
