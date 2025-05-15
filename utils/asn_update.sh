@@ -99,10 +99,10 @@ DEST=../src/lib/inc_generated/ndpi_asn_blizzard.c.inc
 create_list NDPI_PROTOCOL_BLIZZARD $DEST "" "AS57976" "AS32163"
 echo "(3) Blizzard IPs are available in $DEST"
 
-echo "(1) Downloading UbuntuOne routes..." #Canonical
-DEST=../src/lib/inc_generated/ndpi_asn_ubuntuone.c.inc
-create_list NDPI_PROTOCOL_UBUNTUONE $DEST "" "AS41231" "AS11210"
-echo "(3) UbuntuOne IPs are available in $DEST"
+echo "(1) Downloading Canonical routes..." #Canonical
+DEST=../src/lib/inc_generated/ndpi_asn_canonical.c.inc
+create_list NDPI_PROTOCOL_CANONICAL $DEST "" "AS41231" "AS11210"
+echo "(3) Canonical IPs are available in $DEST"
 
 echo "(1) Downloading Twitch routes..."
 DEST=../src/lib/inc_generated/ndpi_asn_twitch.c.inc

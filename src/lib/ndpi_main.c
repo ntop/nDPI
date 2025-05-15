@@ -101,7 +101,7 @@
 #include "inc_generated/ndpi_asn_opendns.c.inc"
 #include "inc_generated/ndpi_asn_dropbox.c.inc"
 #include "inc_generated/ndpi_asn_blizzard.c.inc"
-#include "inc_generated/ndpi_asn_ubuntuone.c.inc"
+#include "inc_generated/ndpi_asn_canonical.c.inc"
 #include "inc_generated/ndpi_asn_twitch.c.inc"
 #include "inc_generated/ndpi_asn_hotspotshield.c.inc"
 #include "inc_generated/ndpi_asn_github.c.inc"
@@ -1744,8 +1744,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "Corba", NDPI_PROTOCOL_CATEGORY_RPC, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_UBUNTUONE,
-			  "UbuntuONE", NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_CANONICAL,
+			  "Canonical", NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_WHOIS_DAS,
@@ -3858,9 +3858,9 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_blizzard_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_blizzard_protocol_list_6);
   }
-  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_UBUNTUONE)) {
-    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_ubuntuone_protocol_list);
-    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_ubuntuone_protocol_list_6);
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_CANONICAL)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_canonical_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_canonical_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_TWITCH)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_twitch_protocol_list);

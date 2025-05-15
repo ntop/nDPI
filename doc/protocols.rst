@@ -128,6 +128,15 @@ HCL Notes (formerly IBM Lotus Notes) is a client-server collaborative applicatio
 References: `Main site: <https://www.hcl-software.com/notes>`_
 
 
+.. _Proto 169:
+
+`NDPI_PROTOCOL_CANONICAL`
+==========================
+Canonical Ltd. is a technology company known for developing open-source software solutions, including the Ubuntu Linux distribution and related cloud and IoT services.
+
+References: `Main site: <https://canonical.com/>`
+
+
 .. _Proto 174:
 
 `NDPI_PROTOCOL_RTMP`

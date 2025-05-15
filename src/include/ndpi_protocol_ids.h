@@ -197,7 +197,7 @@ typedef enum {
   NDPI_PROTOCOL_RSYNC                 = 166,
   NDPI_PROTOCOL_ORACLE                = 167,
   NDPI_PROTOCOL_CORBA                 = 168,
-  NDPI_PROTOCOL_UBUNTUONE             = 169,
+  NDPI_PROTOCOL_CANONICAL             = 169,
   NDPI_PROTOCOL_WHOIS_DAS             = 170,
   NDPI_PROTOCOL_SD_RTN                = 171, /* Agora SD-RTN: https://www.agora.io/en */
   NDPI_PROTOCOL_SOCKS                 = 172,
