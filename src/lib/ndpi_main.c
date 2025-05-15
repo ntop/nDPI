@@ -1784,10 +1784,10 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "ZeroMQ", NDPI_PROTOCOL_CATEGORY_RPC, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),  /* TCP */
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0)); /* UDP */
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_VHUA,
-			  "VHUA", NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_QOE_CATEGORY_VOIP_CALLS,
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_184,
+			  "Free184", NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_QOE_CATEGORY_VOIP_CALLS,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),      /* TCP */
-			  ndpi_build_default_ports(ports_b, 58267, 0, 0, 0, 0)); /* UDP */
+			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0)); /* UDP */
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_BLIZZARD,
 			  "Blizzard", NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_QOE_CATEGORY_ONLINE_GAMING,
 			  ndpi_build_default_ports(ports_a, 1119, 0, 0, 0, 0),  /* TCP */
@@ -6052,9 +6052,6 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* RESP */
   init_resp_dissector(ndpi_str, &a);
-
-  /* VHUA */
-  init_vhua_dissector(ndpi_str, &a);
 
   /* ZMQ */
   init_zmq_dissector(ndpi_str, &a);

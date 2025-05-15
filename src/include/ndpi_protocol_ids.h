@@ -212,7 +212,7 @@ typedef enum {
   NDPI_PROTOCOL_MEGACO                = 181,
   NDPI_PROTOCOL_RESP                  = 182,
   NDPI_PROTOCOL_PINTEREST             = 183,
-  NDPI_PROTOCOL_VHUA                  = 184,
+  NDPI_PROTOCOL_FREE_184              = 184,
   NDPI_PROTOCOL_TELEGRAM              = 185,
   NDPI_PROTOCOL_COD_MOBILE            = 186,
   NDPI_PROTOCOL_PANDORA               = 187,

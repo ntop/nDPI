@@ -855,7 +855,6 @@ void init_tftp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int
 void init_usenet_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_wsd_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_veohtv_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_vhua_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_viber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_vmware_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_vnc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);

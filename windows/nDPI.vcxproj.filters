@@ -98,7 +98,6 @@
     <ClCompile Include="..\src\lib\protocols\tuya_lp.c" />
     <ClCompile Include="..\src\lib\protocols\ubntac2.c" />
     <ClCompile Include="..\src\lib\protocols\usenet.c" />
-    <ClCompile Include="..\src\lib\protocols\vhua.c" />
     <ClCompile Include="..\src\lib\protocols\viber.c" />
     <ClCompile Include="..\src\lib\protocols\vmware.c" />
     <ClCompile Include="..\src\lib\protocols\vnc.c" />
