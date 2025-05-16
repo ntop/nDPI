@@ -1,7 +1,7 @@
 /*
  * source_engine.c
  *
- * Source Engine Protocol
+ * Source Engine Protocol (Valve’s A2S protocol)
  *
  * Copyright (C) 2023 - ntop.org
  *
@@ -45,31 +45,51 @@ static void ndpi_search_source_engine(struct ndpi_detection_module_struct *ndpi_
                                       struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
-  char const source_engine_query[] = "Source Engine Query";
-  size_t const source_engine_query_len = strlen(source_engine_query);
 
   NDPI_LOG_DBG(ndpi_struct, "search Source Engine\n");
 
-  if (packet->payload_packet_len < source_engine_query_len + 1 /* '\0' */)
+  /* https://developer.valvesoftware.com/wiki/Server_queries */
+
+  /* A2S request */
+  if (current_pkt_from_client_to_server(ndpi_struct, flow) &&
+      (packet->payload_packet_len > 8 && packet->payload_packet_len < 30) &&
+      get_u_int32_t(packet->payload, 0) == 0xFFFFFFFF)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
+    if (packet->payload[4] == 'T' || /* A2S_INFO */
+        packet->payload[4] == 'U' || /* A2S_PLAYER */
+        packet->payload[4] == 'V')   /* A2S_RULES */
+    {
+      ndpi_int_source_engine_add_connection(ndpi_struct, flow);
+      return;
+    }
   }
 
-  if (packet->payload[packet->payload_packet_len - 1] != '\0')
+  /* A2S response */
+  if (current_pkt_from_server_to_client(ndpi_struct, flow))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
+    /* Challenge response */
+    if (packet->payload_packet_len == 9 && 
+        get_u_int32_t(packet->payload, 0) == 0xFFFFFFFF &&
+        packet->payload[4] == 'A')
+    {
+      ndpi_int_source_engine_add_connection(ndpi_struct, flow);
+      return;
+    }
+
+    if (packet->payload_packet_len > 30 && /* A reasonable length for euristics */
+        get_u_int32_t(packet->payload, 0) == 0xFFFFFFFF)
+    {
+      if (packet->payload[4] == 'I' || /* A2S_INFO */
+          packet->payload[4] == 'D' || /* A2S_PLAYER */
+          packet->payload[4] == 'E')   /* A2S_RULES */
+      {
+        ndpi_int_source_engine_add_connection(ndpi_struct, flow);
+        return;
+      }
+    }
   }
 
-  if (strncmp((char const *)&packet->payload[packet->payload_packet_len - source_engine_query_len - 1],
-              source_engine_query, source_engine_query_len) != 0)
-  {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
-  }
-
-  ndpi_int_source_engine_add_connection(ndpi_struct, flow);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 /* ***************************************************** */

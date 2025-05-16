@@ -919,9 +919,6 @@ struct ndpi_flow_tcp_struct {
 /* ************************************************** */
 
 struct ndpi_flow_udp_struct {
-  /* NDPI_PROTOCOL_HALFLIFE2 */
-  u_int32_t halflife2_stage:2;		  // 0 - 2
-
   /* NDPI_PROTOCOL_TFTP */
   u_int32_t tftp_stage:2;
 

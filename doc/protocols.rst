@@ -191,7 +191,7 @@ Steam Datagram Relay (SDR) is Valve's virtual private gaming network. Used in al
 References: `Main site: <https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay>`_
 
 
-.. _Proto 350:
+.. _Proto 250:
 
 `NDPI_PROTOCOL_MSTEAMS`
 =======================
@@ -202,6 +202,20 @@ References: `Main site: <https://www.microsoft.com/it-it/microsoft-teams/group-c
 Notes:
 
 - This same id is also used for Skype traffic
+
+
+.. _Proto 333:
+
+`NDPI_PROTOCOL_SOURCE_ENGINE`
+=============================
+
+Source Engine protocol (also known as A2S) is a popular UDP-based game server query protocol maintained by Valve Software as part of the Steam SDK.
+
+References: `Valve Developer Wiki: Server Queries <https://developer.valvesoftware.com/wiki/Server_queries>`_
+
+Notes:
+
+- Modern Valve games use Steam Datagram Relay (SDR) instead of this protocol.
 
 
 .. _Proto 338:

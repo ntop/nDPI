@@ -103,7 +103,7 @@ typedef enum {
   NDPI_PROTOCOL_HART_IP               = 72,
   NDPI_PROTOCOL_IP_VRRP               = 73,
   NDPI_PROTOCOL_STEAM                 = 74,
-  NDPI_PROTOCOL_HALFLIFE2             = 75,
+  NDPI_PROTOCOL_FREE_75               = 75,
   NDPI_PROTOCOL_WORLDOFWARCRAFT       = 76,
   NDPI_PROTOCOL_TELNET                = 77,
   NDPI_PROTOCOL_STUN                  = 78,
