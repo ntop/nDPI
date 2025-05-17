@@ -33,6 +33,7 @@
 static void ndpi_int_rtsp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow)
 {
+  NDPI_LOG_INFO(ndpi_struct, "found RTSP\n");
   ndpi_set_detected_protocol_keeping_master(ndpi_struct, flow, NDPI_PROTOCOL_RTSP,
 					    NDPI_CONFIDENCE_DPI);
 }
@@ -52,8 +53,10 @@ static void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct *ndpi_s
 
   if (packet->parsed_lines > 0 &&
       (LINE_ENDS(packet->line[0], "RTSP/1.0") != 0 ||
+       LINE_STARTS(packet->line[0], "RTSP/1.0") != 0 || /* Response */
        LINE_ENDS(packet->accept_line, "application/x-rtsp-tunnelled") != 0 ||
-       LINE_ENDS(packet->content_line, "application/x-rtsp-tunnelled") != 0))
+       LINE_ENDS(packet->content_line, "application/x-rtsp-tunnelled") != 0
+       /* Should we also check for "rtsp://" in the packet? */))
   {
     ndpi_int_rtsp_add_connection(ndpi_struct, flow);
 
@@ -64,49 +67,7 @@ static void ndpi_search_rtsp_tcp_udp(struct ndpi_detection_module_struct *ndpi_s
     return;
   }
 
-  if (flow->rtsprdt_stage == 0
-      && !(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_RTCP)
-      ) {
-    flow->rtsprdt_stage = 1 + packet->packet_direction;
-    NDPI_LOG_DBG2(ndpi_struct, "maybe handshake 1; need next packet, return\n");
-    return;
-  }
-
-  if (flow->packet_counter < 3 && flow->rtsprdt_stage == 1 + packet->packet_direction) {
-
-    NDPI_LOG_DBG2(ndpi_struct, "maybe handshake 2; need next packet\n");
-    return;
-  }
-
-  if (packet->payload_packet_len > 20 && flow->rtsprdt_stage == 2 - packet->packet_direction) {
-    char buf[32] = { 0 };
-    u_int len = packet->payload_packet_len;
-
-    if(len >= (sizeof(buf)-1)) len = sizeof(buf)-1;
-    strncpy(buf, (const char*)packet->payload, len);
-
-    // RTSP Server Message
-    if((memcmp(packet->payload, "RTSP/1.0 ", 9) == 0)
-       || (strstr(buf, "rtsp://") != NULL)) {
-      NDPI_LOG_DBG2(ndpi_struct, "found RTSP/1.0 \n");
-      NDPI_LOG_INFO(ndpi_struct, "found RTSP\n");
-      ndpi_int_rtsp_add_connection(ndpi_struct, flow);
-      return;
-    }
-  }
-
-  if (packet->udp != NULL && flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN
-      && ((NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTP) == 0)
-	  || (NDPI_COMPARE_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_RTCP) == 0)
-	  )) {
-    NDPI_LOG_DBG2(ndpi_struct,
-	     "maybe RTSP RTP, RTSP RTCP, RDT; need next packet.\n");
-    return;
-  }
-
-
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-  return;
 }
 
 
