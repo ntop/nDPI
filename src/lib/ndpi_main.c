@@ -4584,32 +4584,58 @@ static u_int16_t guess_protocol_id(struct ndpi_detection_module_struct *ndpi_str
   } else {
     /* No TCP/UDP */
 
+    /* All these calls to `is_proto_enabled()` are needed to avoid classification by-port
+       if the protocol is disabled */
     switch(proto) {
     case NDPI_IPSEC_PROTOCOL_ESP:
     case NDPI_IPSEC_PROTOCOL_AH:
-      return(NDPI_PROTOCOL_IPSEC);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IPSEC))
+        return(NDPI_PROTOCOL_IPSEC);
+      break;
     case NDPI_GRE_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_GRE);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IPSEC))
+        return(NDPI_PROTOCOL_IP_GRE);
+      break;
     case NDPI_PGM_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_PGM);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_PGM))
+        return(NDPI_PROTOCOL_IP_PGM);
+      break;
     case NDPI_PIM_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_PIM);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_PIM))
+        return(NDPI_PROTOCOL_IP_PIM);
+      break;
     case NDPI_ICMP_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_ICMP);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_ICMP))
+        return(NDPI_PROTOCOL_IP_ICMP);
+      break;
     case NDPI_IGMP_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_IGMP);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_IGMP))
+        return(NDPI_PROTOCOL_IP_IGMP);
+      break;
     case NDPI_EGP_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_EGP);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_EGP))
+        return(NDPI_PROTOCOL_IP_EGP);
+      break;
     case NDPI_SCTP_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_SCTP);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_SCTP))
+        return(NDPI_PROTOCOL_IP_SCTP);
+      break;
     case NDPI_OSPF_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_OSPF);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_OSPF))
+        return(NDPI_PROTOCOL_IP_OSPF);
+      break;
     case NDPI_IPIP_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_IP_IN_IP);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_IP_IN_IP))
+        return(NDPI_PROTOCOL_IP_IP_IN_IP);
+      break;
     case NDPI_ICMPV6_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_ICMPV6);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_ICMPV6))
+        return(NDPI_PROTOCOL_IP_ICMPV6);
+      break;
     case NDPI_VRRP_PROTOCOL_TYPE:
-      return(NDPI_PROTOCOL_IP_VRRP);
+      if(is_proto_enabled(ndpi_str, NDPI_PROTOCOL_IP_VRRP))
+        return(NDPI_PROTOCOL_IP_VRRP);
+      break;
     }
   }
 
