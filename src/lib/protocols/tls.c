@@ -1998,7 +1998,7 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* see: https://www.wireshark.org/docs/wsar_html/packet-tls-utils_8h_source.html */
   static u_int16_t const allowed_non_iana_extensions[] = {
-      /* 65486 ESNI is suspicious nowadays */ 13172 /* NPN - Next Proto Neg */, 17513 /* ALPS */,
+      /* 65486 ESNI is suspicious nowadays */ 13172 /* NPN - Next Proto Neg */,
       30032 /* Channel ID */, 65445 /* QUIC transport params */,
       /* GREASE extensions */
       2570, 6682, 10794, 14906, 19018, 23130, 27242,
@@ -2010,7 +2010,7 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
       102, 129, 52243, 52244, 57363, 65279, 65413,
       /* ECH */
       65037,
-      /* ExtensionType value from draft-vvv-tls-alps. This is not an IANA defined extension number. */
+      /* ALPS */
       17513, 17613
   };
   size_t const allowed_non_iana_extensions_size = sizeof(allowed_non_iana_extensions) /
