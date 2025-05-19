@@ -144,7 +144,7 @@ typedef enum {
   NDPI_PROTOCOL_NEXON                 = 113,
   NDPI_PROTOCOL_MSSQL_TDS             = 114,
   NDPI_PROTOCOL_PPTP                  = 115,
-  NDPI_PROTOCOL_WARCRAFT3             = 116,
+  NDPI_PROTOCOL_FREE_116              = 116,
   NDPI_PROTOCOL_FREE_117              = 117,
   NDPI_PROTOCOL_SLACK                 = 118,
   NDPI_PROTOCOL_FACEBOOK              = 119,

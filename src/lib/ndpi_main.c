@@ -1554,8 +1554,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  "PPTP", NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_WARCRAFT3,
-			  "Warcraft3", NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_QOE_CATEGORY_ONLINE_GAMING,
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_116,
+			  "Free116", NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_QOE_CATEGORY_ONLINE_GAMING,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE_117,
@@ -5955,9 +5955,6 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* LDAP */
   init_ldap_dissector(ndpi_str, &a);
-
-  /* WARCRAFT3 */
-  init_warcraft3_dissector(ndpi_str, &a);
 
   /* XDMCP */
   init_xdmcp_dissector(ndpi_str, &a);

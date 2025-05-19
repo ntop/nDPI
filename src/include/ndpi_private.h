@@ -858,7 +858,6 @@ void init_viber_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_in
 void init_vmware_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_vnc_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_vxlan_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
-void init_warcraft3_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_whois_das_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_xbox_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
 void init_xdmcp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id);
