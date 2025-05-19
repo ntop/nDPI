@@ -273,29 +273,6 @@ extern "C" {
   void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct);
 
   /**
-   * Sets a single protocol bitmask
-   * This function does not increment the index of the callback_buffer
-   *
-   * @par label                    = string for the protocol name
-   * @par ndpi_struct              = the detection module
-   * @par idx                      = the index of the callback_buffer
-   * @par func                     = function pointer of the protocol search
-   * @par ndpi_selection_bitmask   = the protocol selected bitmask
-   * @par b_save_bitmask_unknow    = if set as "true" save the detection bitmask as unknow
-   * @par b_add_detection_bitmask  = if set as "true" add the protocol bitmask to the detection bitmask
-   *
-   */
-  void ndpi_set_bitmask_protocol_detection(char *label,
-					   struct ndpi_detection_module_struct *ndpi_struct,
-					   const u_int32_t idx,
-					   u_int16_t ndpi_protocol_id,
-					   void (*func) (struct ndpi_detection_module_struct *,
-							 struct ndpi_flow_struct *flow),
-					   const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
-					   u_int8_t b_save_bitmask_unknow,
-					   u_int8_t b_add_detection_bitmask);
-
-  /**
    * Sets the protocol bitmask2
    *
    * @par ndpi_struct        = the detection module

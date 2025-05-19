@@ -272,6 +272,18 @@ typedef struct ndpi_protocol_bitmask_struct {
   ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS];
 } ndpi_protocol_bitmask_struct_t;
 
+
+#define NDPI_MAX_NUM_DISSECTORS         288      /* Multiple of 32, i.e. 8 * sizeof(ndpi_ndpi_mask) */
+#ifdef NDPI_CFFI_PREPROCESSING
+#undef NDPI_NUM_FDS_BITS
+#define NDPI_NUM_FDS_BITS_DISSECTORS    9
+#else
+#define NDPI_NUM_FDS_BITS_DISSECTORS    NDPI_MAX_NUM_DISSECTORS / (8 * sizeof(ndpi_ndpi_mask))
+#endif
+typedef struct ndpi_dissector_bitmask_struct {
+  ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS_DISSECTORS];
+} ndpi_dissector_bitmask_struct_t;
+
 struct ndpi_detection_module_struct;
 
 /* NDPI_DEBUG_FUNCTION_PTR (cast) */
@@ -1191,7 +1203,7 @@ typedef struct ndpi_proto_defaults {
   u_int8_t isClearTextProto:1, isAppProtocol:1, _notused:6;
   u_int16_t *subprotocols;
   u_int32_t subprotocol_count;
-  u_int16_t protoId, protoIdx;
+  u_int16_t protoId, dissector_idx;
   u_int16_t tcp_default_ports[MAX_DEFAULT_PORTS], udp_default_ports[MAX_DEFAULT_PORTS];
   ndpi_protocol_breed_t protoBreed;
   ndpi_protocol_qoe_category_t qoeCategory;
@@ -1630,8 +1642,7 @@ struct ndpi_flow_struct {
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
   struct ndpi_metadata_monitoring *monit;
 
-  /* protocols which have marked a connection as this connection cannot be protocol XXX, multiple u_int64_t */
-  NDPI_PROTOCOL_BITMASK excluded_protocol_bitmask;
+  NDPI_DISSECTOR_BITMASK excluded_dissectors_bitmask;
 
   /* NDPI_PROTOCOL_BITTORRENT */
   u_int8_t bittorrent_stage;		      // can be 0 - 255

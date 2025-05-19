@@ -526,7 +526,7 @@ void ndpi_exclude_protocol(struct ndpi_detection_module_struct *ndpi_str, struct
     (void)_func;
     (void)_line;
 #endif
-    NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, protocol_id);
+    NDPI_DISSECTOR_BITMASK_SET(flow->excluded_dissectors_bitmask, ndpi_str->proto_defaults[protocol_id].dissector_idx);
   }
 }
 
@@ -5733,7 +5733,6 @@ int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *
 
 /* ******************************************************************** */
 
-/* ntop */
 void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_module_struct *ndpi_str,
                                          const u_int32_t idx,
                                          u_int16_t ndpi_protocol_id,
@@ -5742,9 +5741,20 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
                                          const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
                                          u_int8_t b_save_bitmask_unknow, u_int8_t b_add_detection_bitmask) {
   (void)label;
-  /*
-    Compare specify protocol bitmask with main detection bitmask
-  */
+
+
+  if(idx >= NDPI_MAX_NUM_DISSECTORS) {
+    /*
+     * You need to increase NDPI_MAX_NUM_DISSECTORS define and recompile everything!
+     * Please note that custom protocols are independent from NDPI_MAX_NUM_DISSECTORS, so
+     * if you hit this error is because you are already changing the code
+     * (adding a new dissector)...
+     */
+    NDPI_LOG_ERR(ndpi_str, "[NDPI] Internal Error. Too many dissectors!!\n");
+    /* Not sure what to do here...*/
+    return;
+  }
+
   if(is_proto_enabled(ndpi_str, ndpi_protocol_id)) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
     NDPI_LOG_DBG2(ndpi_str,
@@ -5753,7 +5763,7 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
 		  label, idx, ndpi_protocol_id);
 #endif
 
-    if(ndpi_str->proto_defaults[ndpi_protocol_id].protoIdx != 0) {
+    if(ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx != 0) {
       NDPI_LOG_DBG2(ndpi_str, "[NDPI] Internal error: protocol %s/%u has been already registered\n", label,
 		    ndpi_protocol_id);
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
@@ -5766,7 +5776,7 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
       Set function and index protocol within proto_default structure for port protocol detection
       and callback_buffer function for DPI protocol detection
     */
-    ndpi_str->proto_defaults[ndpi_protocol_id].protoIdx = idx;
+    ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx = idx;
     ndpi_str->proto_defaults[ndpi_protocol_id].func = ndpi_str->callback_buffer[idx].func = func;
     ndpi_str->callback_buffer[idx].ndpi_protocol_id = ndpi_protocol_id;
 
@@ -6588,8 +6598,12 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   ndpi_enabled_callbacks_init(ndpi_str,detection_bitmask,0);
 
-  /*   When the module ends, it is necessary to free the memory ndpi_str->callback_buffer and
-       ndpi_str->callback_buffer_tcp_payload  */
+  NDPI_LOG_DBG(ndpi_str, "Tot num dissectors: %d (TCP: %d, TCP_NO_PAYLOAD: %d, UDP: %d, NO_TCP_UDP: %d\n",
+               ndpi_str->callback_buffer_size,
+               ndpi_str->callback_buffer_size_tcp_payload,
+               ndpi_str->callback_buffer_size_tcp_no_payload,
+               ndpi_str->callback_buffer_size_udp,
+               ndpi_str->callback_buffer_size_non_tcp_udp);
 
   return 0;
 }
@@ -7666,12 +7680,11 @@ static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * c
       continue;
     }
 
-    u_int16_t subproto_index = ndpi_str->proto_defaults[subproto_id].protoIdx;
+    u_int16_t subproto_index = ndpi_str->proto_defaults[subproto_id].dissector_idx;
 
     if((ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask & ndpi_selection_packet) ==
        ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask &&
-       NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
-			    ndpi_str->callback_buffer[subproto_index].excluded_protocol_bitmask) == 0 &&
+       !NDPI_DISSECTOR_BITMASK_IS_SET(flow->excluded_dissectors_bitmask, subproto_index) &&
        NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer[subproto_index].detection_bitmask,
 			    detection_bitmask) != 0) {
       ndpi_str->callback_buffer[subproto_index].func(ndpi_str, flow);
@@ -7688,49 +7701,42 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
 					   struct ndpi_flow_struct * const flow,
 					   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE const ndpi_selection_packet,
 					   struct call_function_struct const * const callback_buffer,
-					   uint32_t callback_buffer_size,
-					   int is_tcp_without_payload) {
+					   uint32_t callback_buffer_size) {
   void *func = NULL;
   u_int32_t num_calls = 0;
   /* First callback is associated to classification by-port,
      if we don't already have a partial classification */
   u_int16_t fast_callback_protocol_id = flow->fast_callback_protocol_id ? flow->fast_callback_protocol_id : flow->guessed_protocol_id;
-  u_int16_t proto_index = ndpi_str->proto_defaults[fast_callback_protocol_id].protoIdx;
-  u_int16_t proto_id = ndpi_str->proto_defaults[fast_callback_protocol_id].protoId;
+  u_int16_t dissector_idx = ndpi_str->proto_defaults[fast_callback_protocol_id].dissector_idx;
+  u_int16_t proto_id;
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   u_int32_t a;
 
   NDPI_SAVE_AS_BITMASK(detection_bitmask, flow->detected_protocol_stack[0]);
 
-  if((proto_id != NDPI_PROTOCOL_UNKNOWN) &&
-     NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
-			  ndpi_str->callback_buffer[proto_index].excluded_protocol_bitmask) == 0 &&
-     NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer[proto_index].detection_bitmask, detection_bitmask) != 0 &&
-     (ndpi_str->callback_buffer[proto_index].ndpi_selection_bitmask & ndpi_selection_packet) ==
-     ndpi_str->callback_buffer[proto_index].ndpi_selection_bitmask)
-    {
-      if((fast_callback_protocol_id != NDPI_PROTOCOL_UNKNOWN) &&
-	 (ndpi_str->proto_defaults[fast_callback_protocol_id].func != NULL) &&
-	 (is_tcp_without_payload == 0 ||
-	  ((ndpi_str->callback_buffer[proto_index].ndpi_selection_bitmask &
-	    NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD) == 0)))
-	{
-	  ndpi_str->proto_defaults[fast_callback_protocol_id].func(ndpi_str, flow);
-	  func = ndpi_str->proto_defaults[fast_callback_protocol_id].func;
-	  num_calls++;
-	}
-    }
+  if(fast_callback_protocol_id != NDPI_PROTOCOL_UNKNOWN &&
+     ndpi_str->proto_defaults[fast_callback_protocol_id].func &&
+     !NDPI_DISSECTOR_BITMASK_IS_SET(flow->excluded_dissectors_bitmask, dissector_idx) &&
+     (ndpi_str->callback_buffer[dissector_idx].ndpi_selection_bitmask & ndpi_selection_packet) ==
+     ndpi_str->callback_buffer[dissector_idx].ndpi_selection_bitmask &&
+     NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer[dissector_idx].detection_bitmask, detection_bitmask) != 0) {
+    ndpi_str->proto_defaults[fast_callback_protocol_id].func(ndpi_str, flow);
+    func = ndpi_str->proto_defaults[fast_callback_protocol_id].func;
+    num_calls++;
+  }
 
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
     {
       /* TODO: optimize as today we're doing a linear scan */
 
       for (a = 0; a < callback_buffer_size; a++) {
+        proto_id = callback_buffer[a].ndpi_protocol_id;
+        dissector_idx = ndpi_str->proto_defaults[proto_id].dissector_idx;
+
         if((func != callback_buffer[a].func) &&
 	   (callback_buffer[a].ndpi_selection_bitmask & ndpi_selection_packet) ==
 	   callback_buffer[a].ndpi_selection_bitmask &&
-	   NDPI_BITMASK_COMPARE(flow->excluded_protocol_bitmask,
-				callback_buffer[a].excluded_protocol_bitmask) == 0 &&
+	   !NDPI_DISSECTOR_BITMASK_IS_SET(flow->excluded_dissectors_bitmask, dissector_idx) &&
 	   NDPI_BITMASK_COMPARE(callback_buffer[a].detection_bitmask,
 				detection_bitmask) != 0)
 	  {
@@ -7761,7 +7767,7 @@ u_int32_t check_ndpi_other_flow_func(struct ndpi_detection_module_struct *ndpi_s
 {
   return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				   ndpi_str->callback_buffer_non_tcp_udp,
-				   ndpi_str->callback_buffer_size_non_tcp_udp, 0);
+				   ndpi_str->callback_buffer_size_non_tcp_udp);
 }
 
 /* ************************************************ */
@@ -7771,7 +7777,7 @@ static u_int32_t check_ndpi_udp_flow_func(struct ndpi_detection_module_struct *n
 					  NDPI_SELECTION_BITMASK_PROTOCOL_SIZE *ndpi_selection_packet) {
   return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				   ndpi_str->callback_buffer_udp,
-				   ndpi_str->callback_buffer_size_udp, 0);
+				   ndpi_str->callback_buffer_size_udp);
 }
 
 /* ************************************************ */
@@ -7783,12 +7789,12 @@ static u_int32_t check_ndpi_tcp_flow_func(struct ndpi_detection_module_struct *n
   if(ndpi_str->packet.payload_packet_len != 0) {
     return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				     ndpi_str->callback_buffer_tcp_payload,
-				     ndpi_str->callback_buffer_size_tcp_payload, 0);
+				     ndpi_str->callback_buffer_size_tcp_payload);
   } else {
     /* no payload */
     return check_ndpi_detection_func(ndpi_str, flow, *ndpi_selection_packet,
 				     ndpi_str->callback_buffer_tcp_no_payload,
-				     ndpi_str->callback_buffer_size_tcp_no_payload, 1);
+				     ndpi_str->callback_buffer_size_tcp_no_payload);
   }
 }
 
@@ -10930,7 +10936,7 @@ const char *ndpi_get_l4_proto_name(ndpi_l4_proto_info proto) {
 ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct,
 					  u_int16_t ndpi_proto_id) {
   if(ndpi_struct && ndpi_proto_id < ndpi_struct->ndpi_num_supported_protocols) {
-    u_int16_t idx = ndpi_struct->proto_defaults[ndpi_proto_id].protoIdx;
+    u_int16_t idx = ndpi_struct->proto_defaults[ndpi_proto_id].dissector_idx;
     NDPI_SELECTION_BITMASK_PROTOCOL_SIZE bm = ndpi_struct->callback_buffer[idx].ndpi_selection_bitmask;
 
     if(bm & NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP)

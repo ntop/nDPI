@@ -58,7 +58,6 @@ struct call_function_struct {
   void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
   NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask;
   u_int16_t ndpi_protocol_id;
-  u_int8_t detection_feature;
 };
 
 struct subprotocol_conf_struct {
@@ -607,6 +606,16 @@ struct ndpi_detection_module_struct {
 #define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
 
 /* Generic */
+
+void ndpi_set_bitmask_protocol_detection(char *label,
+                                         struct ndpi_detection_module_struct *ndpi_struct,
+                                         const u_int32_t idx,
+                                         u_int16_t ndpi_protocol_id,
+                                         void (*func) (struct ndpi_detection_module_struct *,
+                                                       struct ndpi_flow_struct *flow),
+                                         const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
+                                         u_int8_t b_save_bitmask_unknow,
+                                         u_int8_t b_add_detection_bitmask);
 
 char *strptime(const char *s, const char *format, struct tm *tm);
 
