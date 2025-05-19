@@ -402,7 +402,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->tcp != NULL) {
     if (payload_len < 2) {
       NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-      NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
       return;
     }
     payload += 2; /* Skip the length field */
@@ -419,7 +418,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
      flow->rtp_stage == 0 &&
      flow->rtcp_stage == 0) {
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
     return;
   }
 
@@ -441,7 +439,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
         flow->rtp_stage = 0;
         flow->rtcp_stage = 0;
         NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-        NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
       } else {
         get_rtp_info(ndpi_struct, flow, payload, payload_len);
         rtp_get_stream_type(flow->rtp[packet->packet_direction].payload_type,
@@ -477,7 +474,6 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
         flow->rtp_stage = 0;
         flow->rtcp_stage = 0;
         NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-        NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
       }
     }
   }
@@ -500,14 +496,12 @@ static void ndpi_search_rtp_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
   if(packet->payload_packet_len < 4){ /* (2) len field + (2) min rtp/rtcp*/
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
     return;
   }
 
   u_int16_t len = ntohs(get_u_int16_t(payload, 0));
   if(len + sizeof(len) != packet->payload_packet_len) { /*fragmented packets are not handled*/
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
   } else {
     ndpi_rtp_search(ndpi_struct, flow);
   }
@@ -531,7 +525,6 @@ static void ndpi_search_rtp_udp(struct ndpi_detection_module_struct *ndpi_struct
      || (dest == 9600  /* FINS_PORT */)
      || (dest <= 1023)){
     NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
     return;
   }
   ndpi_rtp_search(ndpi_struct, flow);

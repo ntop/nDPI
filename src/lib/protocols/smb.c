@@ -76,8 +76,7 @@ static void ndpi_search_smb_tcp(struct ndpi_detection_module_struct *ndpi_struct
     }
   }
 
-  NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_SMBV1);
-  NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_SMBV23);
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 

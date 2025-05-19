@@ -3427,10 +3427,7 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
   if(flow->tls_quic.obfuscated_heur_state) {
     tls_obfuscated_heur_search_again(ndpi_struct, flow);
   } else if(rc == 0) {
-    if(packet->udp != NULL || flow->stun.maybe_dtls)
-      NDPI_EXCLUDE_PROTO_EXT(ndpi_struct, flow, NDPI_PROTOCOL_DTLS);
-    else
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
   }
 }
 
@@ -3441,18 +3438,7 @@ void init_tls_dissector(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_set_bitmask_protocol_detection("TLS", ndpi_struct, *id,
 				      NDPI_PROTOCOL_TLS,
 				      ndpi_search_tls_wrapper,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
-
-  /* *************************************************** */
-
-  ndpi_set_bitmask_protocol_detection("DTLS", ndpi_struct, *id,
-				      NDPI_PROTOCOL_DTLS,
-				      ndpi_search_tls_wrapper,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
 

@@ -98,7 +98,6 @@
 #define MAX_DEFAULT_PORTS                                        5
 
 #define NDPI_EXCLUDE_PROTO(mod,flow) ndpi_exclude_protocol(mod, flow, NDPI_CURRENT_PROTO, __FILE__, __FUNCTION__, __LINE__)
-#define NDPI_EXCLUDE_PROTO_EXT(mod,flow,proto) ndpi_exclude_protocol(mod, flow, proto, __FILE__, __FUNCTION__, __LINE__)
 
 /**
  * macro for getting the string len of a static string
