@@ -888,9 +888,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_IRC */
   u_int8_t irc_stage;
 
-  /* NDPI_PROTOCOL_GNUTELLA */
-  u_int8_t gnutella_msg_id[3];
-
   /* NDPI_PROTOCOL_NEST_LOG_SINK */
   u_int8_t nest_log_sink_matches;
 

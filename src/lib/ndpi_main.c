@@ -1146,7 +1146,7 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
   ndpi_set_proto_subprotocols(ndpi_str, NDPI_PROTOCOL_HTTP,
 			      NDPI_PROTOCOL_WEBSOCKET,
 			      NDPI_PROTOCOL_CROSSFIRE, NDPI_PROTOCOL_SOAP,
-			      NDPI_PROTOCOL_BITTORRENT, NDPI_PROTOCOL_GNUTELLA,
+			      NDPI_PROTOCOL_BITTORRENT,
 			      NDPI_PROTOCOL_ZATTOO,
 			      NDPI_PROTOCOL_IRC,
 			      NDPI_PROTOCOL_IPP,
