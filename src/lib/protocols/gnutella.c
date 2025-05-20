@@ -59,13 +59,10 @@ static void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struc
     if (packet->payload_packet_len > 23) {
       u_int32_t gnutella_payload_len = le32toh(get_u_int32_t(packet->payload, 19));
 
-      /* Some of the Mojito-DHT packets have also this pattern:
-           ntohl(get_u_int32_t(packet->payload, 24)) == 0x47544b47 GTKG
-         but not all of them, and sometime not the first packets in the flow.
-         If the following check is not enough to avoid false positives, we could add
-         that pattern back somehow... */
-
-      if (gnutella_payload_len == (u_int32_t)packet->payload_packet_len - 23) {
+      if (gnutella_payload_len == (u_int32_t)packet->payload_packet_len - 23 &&
+          ((packet->payload_packet_len > 27 &&
+           ntohl(get_u_int32_t(packet->payload, 24)) == 0x47544b47 /* GTKG */) ||
+           ntohl(get_u_int32_t(packet->payload, packet->payload_packet_len - 4)) == 0x82514b40)) {
         NDPI_LOG_DBG2(ndpi_struct, "detected mojito-dht/gnutella udp\n");
         ndpi_int_gnutella_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
         return;
