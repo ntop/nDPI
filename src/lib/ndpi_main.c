@@ -85,8 +85,6 @@
 #include "inc_generated/ndpi_google_cloud_match.c.inc"
 #include "inc_generated/ndpi_crawlers_match.c.inc"
 #include "inc_generated/ndpi_icloud_private_relay_match.c.inc"
-#include "inc_generated/ndpi_protonvpn_in_match.c.inc"
-#include "inc_generated/ndpi_protonvpn_out_match.c.inc"
 #include "inc_generated/ndpi_mullvad_match.c.inc"
 #include "inc_generated/ndpi_nordvpn_match.c.inc"
 #include "inc_generated/ndpi_surfshark_match.c.inc"
@@ -475,7 +473,6 @@ int is_flow_addr_informative(const struct ndpi_flow_struct *flow)
     return 0;
     /* This is basically the list of VPNs (with **entry** addresses) supported by nDPI */
   case NDPI_PROTOCOL_NORDVPN:
-  case NDPI_PROTOCOL_PROTONVPN:
   case NDPI_PROTOCOL_SURFSHARK:
   case NDPI_PROTOCOL_TOR:
     return 0;
@@ -3782,10 +3779,6 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_msteams_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_msteams_protocol_list_6);
   }
-  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_PROTONVPN)) {
-    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_protonvpn_protocol_list);
-    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_protonvpn_protocol_list_6);
-  }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_TOR)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_tor_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_tor_protocol_list_6);
@@ -3956,11 +3949,6 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     if(ndpi_str->cfg.risk_anonymous_subscriber_list_icloudprivaterelay_enabled) {
       ndpi_init_ptree_ipv4(ndpi_str->ip_risk->v4, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list);
       ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk->v6, ndpi_anonymous_subscriber_icloud_private_relay_protocol_list_6);
-    }
-
-    if(ndpi_str->cfg.risk_anonymous_subscriber_list_protonvpn_enabled) {
-      ndpi_init_ptree_ipv4(ndpi_str->ip_risk->v4, ndpi_anonymous_subscriber_protonvpn_protocol_list);
-      ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->ip_risk->v6, ndpi_anonymous_subscriber_protonvpn_protocol_list_6);
     }
 
     if(ndpi_str->cfg.risk_anonymous_subscriber_list_tor_exit_nodes_enabled) {
@@ -12051,7 +12039,6 @@ static const struct cfg_param {
   { NULL,            "flow_risk.$FLOWRISK_NAME_OR_ID.info",     "enable", NULL, NULL, CFG_PARAM_FLOWRISK_ENABLE_DISABLE, __OFF(flowrisk_info_bitmask), NULL },
 
   { NULL,            "flow_risk.anonymous_subscriber.list.icloudprivaterelay.load", "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_icloudprivaterelay_enabled), NULL },
-  { NULL,            "flow_risk.anonymous_subscriber.list.protonvpn.load",          "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_protonvpn_enabled), NULL },
   { NULL,            "flow_risk.anonymous_subscriber.list.tor.load",                "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_anonymous_subscriber_list_tor_exit_nodes_enabled), NULL },
   { NULL,            "flow_risk.crawler_bot.list.load",                             "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(risk_crawler_bot_list_enabled), NULL },
 

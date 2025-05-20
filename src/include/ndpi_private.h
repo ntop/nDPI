@@ -329,7 +329,6 @@ struct ndpi_detection_module_config_struct {
 
   int flow_risk_lists_enabled;
   int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
-  int risk_anonymous_subscriber_list_protonvpn_enabled;
   int risk_anonymous_subscriber_list_tor_exit_nodes_enabled;
   int risk_crawler_bot_list_enabled;
 };
