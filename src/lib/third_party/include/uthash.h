@@ -73,10 +73,10 @@ do {                                                                            
 #endif
 
 #ifndef uthash_malloc
-#define uthash_malloc(sz) malloc(sz)      /* malloc fcn                      */
+#define uthash_malloc(sz) ndpi_malloc(sz)      /* malloc fcn                      */
 #endif
 #ifndef uthash_free
-#define uthash_free(ptr,sz) free(ptr)     /* free fcn                        */
+#define uthash_free(ptr,sz) ndpi_free(ptr)     /* free fcn                        */
 #endif
 #ifndef uthash_bzero
 #define uthash_bzero(a,n) memset(a,'\0',n)
