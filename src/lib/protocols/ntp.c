@@ -60,15 +60,13 @@ static void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct
 }
 
 
-void init_ntp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_ntp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("NTP", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("NTP", ndpi_struct,
 				      NDPI_PROTOCOL_NTP,
 				      ndpi_search_ntp_udp,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }
 

@@ -273,14 +273,12 @@ static void ndpi_search_sip(struct ndpi_detection_module_struct *ndpi_struct, st
 
 /* ********************************************************** */
 
-void init_sip_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id) {
-  ndpi_set_bitmask_protocol_detection("SIP", ndpi_struct, *id,
+void init_sip_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
+  ndpi_set_bitmask_protocol_detection("SIP", ndpi_struct,
 				      NDPI_PROTOCOL_SIP,
 				      ndpi_search_sip,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,/* Fix courtesy of Miguel Quesada <mquesadab@gmail.com> */
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }
 

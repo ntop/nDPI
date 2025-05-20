@@ -149,14 +149,12 @@ static void ndpi_search_coap(struct ndpi_detection_module_struct *ndpi_struct,
 /**
  * Entry point for the ndpi library
  */
-void init_coap_dissector (struct ndpi_detection_module_struct *ndpi_struct,
-			  u_int32_t *id)
+void init_coap_dissector (struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection ("COAP", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection ("COAP", ndpi_struct,
 				       NDPI_PROTOCOL_COAP,
 				       ndpi_search_coap,
 				       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				       SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
-  *id +=1;
 }
 

@@ -57,15 +57,13 @@ static void ndpi_search_hpvirtgrp(struct ndpi_detection_module_struct *ndpi_stru
 
 /* ***************************************************************** */
 
-void init_hpvirtgrp_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_hpvirtgrp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
   ndpi_set_bitmask_protocol_detection("HP Virtual Machine Group Management",
-                                      ndpi_struct, *id,
+                                      ndpi_struct,
                                       NDPI_PROTOCOL_HPVIRTGRP,
                                       ndpi_search_hpvirtgrp,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

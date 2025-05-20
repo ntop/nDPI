@@ -183,17 +183,14 @@ static void ndpi_search_ipsec(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_int_ipsec_add_connection(ndpi_struct, flow, isakmp_type);
 }
 
-void init_ipsec_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                          u_int32_t *id)
+void init_ipsec_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("IPSec", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("IPSec", ndpi_struct,
     NDPI_PROTOCOL_IPSEC,
     ndpi_search_ipsec,
     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
     SAVE_DETECTION_BITMASK_AS_UNKNOWN,
     ADD_TO_DETECTION_BITMASK
   );
-
-  *id += 1;
 }
 

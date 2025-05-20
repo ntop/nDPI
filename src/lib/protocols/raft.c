@@ -96,16 +96,13 @@ static void ndpi_search_raft(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_int_raft_add_connection(ndpi_struct, flow);
 }
 
-void init_raft_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                         u_int32_t *id)
+void init_raft_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Raft", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("Raft", ndpi_struct,
                                       NDPI_PROTOCOL_RAFT,
                                       ndpi_search_raft,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }
 

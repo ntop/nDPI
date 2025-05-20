@@ -67,16 +67,13 @@ static void ndpi_search_crynet(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_int_crynet_add_connection(ndpi_struct, flow);
 }
 
-void init_crynet_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                           u_int32_t *id)
+void init_crynet_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("CryNetwork", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("CryNetwork", ndpi_struct,
     NDPI_PROTOCOL_CRYNET,
     ndpi_search_crynet,
     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
     SAVE_DETECTION_BITMASK_AS_UNKNOWN,
     ADD_TO_DETECTION_BITMASK
   );
-
-  *id += 1;
 }

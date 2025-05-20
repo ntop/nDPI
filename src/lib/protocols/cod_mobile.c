@@ -70,14 +70,12 @@ static void ndpi_search_cod_mobile(struct ndpi_detection_module_struct *ndpi_str
   }
 }
 
-void init_cod_mobile_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_cod_mobile_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("CoD_Mobile", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("CoD_Mobile", ndpi_struct,
                                       NDPI_PROTOCOL_COD_MOBILE,
                                       ndpi_search_cod_mobile,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

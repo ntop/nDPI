@@ -59,15 +59,12 @@ static void ndpi_search_ripe_atlas(struct ndpi_detection_module_struct *ndpi_str
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void init_ripe_atlas_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                               u_int32_t *id)
+void init_ripe_atlas_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("RipeAtlas", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("RipeAtlas", ndpi_struct,
 				      NDPI_PROTOCOL_RIPE_ATLAS,
 				      ndpi_search_ripe_atlas,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

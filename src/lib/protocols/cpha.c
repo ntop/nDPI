@@ -52,13 +52,11 @@ static void ndpi_search_cpha(struct ndpi_detection_module_struct *ndpi_struct, s
 }
 
 
-void init_cpha_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id) {
-  ndpi_set_bitmask_protocol_detection("CPHA", ndpi_struct, *id,
+void init_cpha_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
+  ndpi_set_bitmask_protocol_detection("CPHA", ndpi_struct,
 				      NDPI_PROTOCOL_CPHA,
 				      ndpi_search_cpha,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD, /* TODO: ipv6 support? */
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

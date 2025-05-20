@@ -543,14 +543,11 @@ static void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, st
 
 /* *************************************************************** */
 
-void init_rtp_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-			u_int32_t *id) {
-  ndpi_set_bitmask_protocol_detection("RTP", ndpi_struct, *id,
+void init_rtp_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
+  ndpi_set_bitmask_protocol_detection("RTP", ndpi_struct,
 				      NDPI_PROTOCOL_RTP,
 				      ndpi_search_rtp,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

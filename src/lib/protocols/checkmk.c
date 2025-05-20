@@ -73,14 +73,12 @@ static void ndpi_search_checkmk(struct ndpi_detection_module_struct *ndpi_struct
 }
 
 
-void init_checkmk_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-			    u_int32_t *id)
+void init_checkmk_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("CHECKMK", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("CHECKMK", ndpi_struct,
 				      NDPI_PROTOCOL_CHECKMK,
 				      ndpi_search_checkmk,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-  *id += 1;
 }

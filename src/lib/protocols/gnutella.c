@@ -80,15 +80,13 @@ static void ndpi_search_gnutella(struct ndpi_detection_module_struct *ndpi_struc
 }
 
 
-void init_gnutella_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_gnutella_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Gnutella", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("Gnutella", ndpi_struct,
 				      NDPI_PROTOCOL_GNUTELLA,
 				      ndpi_search_gnutella,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }
 

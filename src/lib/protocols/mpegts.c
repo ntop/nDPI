@@ -52,15 +52,13 @@ static void ndpi_search_mpegts(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 
-void init_mpegts_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_mpegts_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("MPEG_TS", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("MPEG_TS", ndpi_struct,
 				      NDPI_PROTOCOL_MPEGTS,
 				      ndpi_search_mpegts,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }
 

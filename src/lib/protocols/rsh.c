@@ -150,14 +150,11 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
 }
 
 
-void init_rsh_dissector(struct ndpi_detection_module_struct * ndpi_struct,
-                        u_int32_t * id)
+void init_rsh_dissector(struct ndpi_detection_module_struct * ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("RSH", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("RSH", ndpi_struct,
                                       NDPI_PROTOCOL_RSH, ndpi_search_rsh,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

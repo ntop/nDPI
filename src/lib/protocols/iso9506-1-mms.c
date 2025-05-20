@@ -72,14 +72,12 @@ static void ndpi_search_iso9506_1_mms(struct ndpi_detection_module_struct *ndpi_
   }
 }
 
-void init_iso9506_1_mms_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                                  u_int32_t *id)
+void init_iso9506_1_mms_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("ISO9506-1-MMS", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("ISO9506-1-MMS", ndpi_struct,
 				      NDPI_PROTOCOL_ISO9506_1_MMS,
 				      ndpi_search_iso9506_1_mms,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-  *id += 1;
 }

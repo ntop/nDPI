@@ -94,16 +94,13 @@ static void ndpi_search_source_engine(struct ndpi_detection_module_struct *ndpi_
 
 /* ***************************************************** */
   
-void init_source_engine_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                                  u_int32_t *id)
+void init_source_engine_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Source_Engine", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("Source_Engine", ndpi_struct,
                                       NDPI_PROTOCOL_SOURCE_ENGINE,
                                       ndpi_search_source_engine,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK
                                      );
-
-  *id += 1;
 }

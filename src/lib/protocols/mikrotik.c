@@ -108,13 +108,10 @@ static void ndpi_search_mikrotik(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ********************************* */
 
-void init_mikrotik_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-			     u_int32_t *id) {
+void init_mikrotik_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_set_bitmask_protocol_detection("MIKROTIK", ndpi_struct,
-				      *id, NDPI_PROTOCOL_MIKROTIK, ndpi_search_mikrotik,
+				      NDPI_PROTOCOL_MIKROTIK, ndpi_search_mikrotik,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

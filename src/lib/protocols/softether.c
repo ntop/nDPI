@@ -347,15 +347,12 @@ static int ndpi_search_softether_again(struct ndpi_detection_module_struct *ndpi
 
 /* ***************************************************** */
   
-void init_softether_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-			      u_int32_t *id) {
-  ndpi_set_bitmask_protocol_detection("Softether", ndpi_struct, *id,
+void init_softether_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
+  ndpi_set_bitmask_protocol_detection("Softether", ndpi_struct,
 				      NDPI_PROTOCOL_SOFTETHER,
 				      ndpi_search_softether,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK
 				      );
-
-  *id += 1;
 }

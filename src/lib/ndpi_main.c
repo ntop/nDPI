@@ -5722,7 +5722,6 @@ int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *
 /* ******************************************************************** */
 
 void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_module_struct *ndpi_str,
-                                         const u_int32_t idx,
                                          u_int16_t ndpi_protocol_id,
                                          void (*func)(struct ndpi_detection_module_struct *,
                                                       struct ndpi_flow_struct *flow),
@@ -5730,6 +5729,7 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
                                          u_int8_t b_save_bitmask_unknow, u_int8_t b_add_detection_bitmask) {
   (void)label;
 
+  u_int32_t idx = ndpi_str->callback_buffer_num;
 
   if(idx >= NDPI_MAX_NUM_DISSECTORS) {
     /*
@@ -5744,20 +5744,16 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
   }
 
   if(is_proto_enabled(ndpi_str, ndpi_protocol_id)) {
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
     NDPI_LOG_DBG2(ndpi_str,
 		  "[NDPI] ndpi_set_bitmask_protocol_detection: %s : [callback_buffer] idx= %u, [proto_defaults] "
 		  "protocol_id=%u\n",
 		  label, idx, ndpi_protocol_id);
-#endif
 
     if(ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx != 0) {
       NDPI_LOG_DBG2(ndpi_str, "[NDPI] Internal error: protocol %s/%u has been already registered\n", label,
 		    ndpi_protocol_id);
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
     } else {
       NDPI_LOG_DBG2(ndpi_str, "[NDPI] Adding %s with protocol id %d\n", label, ndpi_protocol_id);
-#endif
     }
 
     /*
@@ -5785,6 +5781,8 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
   } else {
     NDPI_LOG_DBG(ndpi_str, "[NDPI] Protocol %s/%u disabled\n", label, ndpi_protocol_id);
   }
+
+  ndpi_str->callback_buffer_num++;
 }
 
 /* ******************************************************************** */
@@ -5793,761 +5791,757 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   NDPI_PROTOCOL_BITMASK *detection_bitmask = &ndpi_str->detection_bitmask;
   struct call_function_struct *all_cb = NULL;
-  u_int32_t a = 0;
 
   if(ndpi_str->callback_buffer) return 0;
 
   ndpi_str->callback_buffer = ndpi_calloc(NDPI_MAX_SUPPORTED_PROTOCOLS+1,sizeof(struct call_function_struct));
   if(!ndpi_str->callback_buffer) return 1;
 
-  /* set this here to zero to be interrupt safe */
-  ndpi_str->callback_buffer_size = 0;
-
   /* HTTP */
-  init_http_dissector(ndpi_str, &a);
+  init_http_dissector(ndpi_str);
 
   /* BLIZZARD */
-  init_blizzard_dissector(ndpi_str, &a);
+  init_blizzard_dissector(ndpi_str);
 
   /* TLS+DTLS */
-  init_tls_dissector(ndpi_str, &a);
+  init_tls_dissector(ndpi_str);
 
   /* RTP */
-  init_rtp_dissector(ndpi_str, &a);
+  init_rtp_dissector(ndpi_str);
 
   /* RTSP */
-  init_rtsp_dissector(ndpi_str, &a);
+  init_rtsp_dissector(ndpi_str);
 
   /* RDP */
-  init_rdp_dissector(ndpi_str, &a);
+  init_rdp_dissector(ndpi_str);
 
   /* STUN */
-  init_stun_dissector(ndpi_str, &a);
+  init_stun_dissector(ndpi_str);
 
   /* SIP */
-  init_sip_dissector(ndpi_str, &a);
+  init_sip_dissector(ndpi_str);
 
   /* IMO */
-  init_imo_dissector(ndpi_str, &a);
+  init_imo_dissector(ndpi_str);
 
   /* Teredo */
-  init_teredo_dissector(ndpi_str, &a);
+  init_teredo_dissector(ndpi_str);
 
   /* EDONKEY */
-  init_edonkey_dissector(ndpi_str, &a);
+  init_edonkey_dissector(ndpi_str);
 
   /* GNUTELLA */
-  init_gnutella_dissector(ndpi_str, &a);
+  init_gnutella_dissector(ndpi_str);
 
   /* NATS */
-  init_nats_dissector(ndpi_str, &a);
+  init_nats_dissector(ndpi_str);
 
   /* SOCKS */
-  init_socks_dissector(ndpi_str, &a);
+  init_socks_dissector(ndpi_str);
 
   /* IRC */
-  init_irc_dissector(ndpi_str, &a);
+  init_irc_dissector(ndpi_str);
 
   /* JABBER */
-  init_jabber_dissector(ndpi_str, &a);
+  init_jabber_dissector(ndpi_str);
 
   /* MAIL_POP */
-  init_mail_pop_dissector(ndpi_str, &a);
+  init_mail_pop_dissector(ndpi_str);
 
   /* MAIL_IMAP */
-  init_mail_imap_dissector(ndpi_str, &a);
+  init_mail_imap_dissector(ndpi_str);
 
   /* MAIL_SMTP */
-  init_mail_smtp_dissector(ndpi_str, &a);
+  init_mail_smtp_dissector(ndpi_str);
 
   /* USENET */
-  init_usenet_dissector(ndpi_str, &a);
+  init_usenet_dissector(ndpi_str);
 
   /* DNS */
-  init_dns_dissector(ndpi_str, &a);
+  init_dns_dissector(ndpi_str);
 
   /* VMWARE */
-  init_vmware_dissector(ndpi_str, &a);
+  init_vmware_dissector(ndpi_str);
 
   /* NON_TCP_UDP */
-  init_non_tcp_udp_dissector(ndpi_str, &a);
+  init_non_tcp_udp_dissector(ndpi_str);
 
   /* IAX */
-  init_iax_dissector(ndpi_str, &a);
+  init_iax_dissector(ndpi_str);
 
   /* Media Gateway Control Protocol */
-  init_mgcp_dissector(ndpi_str, &a);
+  init_mgcp_dissector(ndpi_str);
 
   /* ZATTOO */
-  init_zattoo_dissector(ndpi_str, &a);
+  init_zattoo_dissector(ndpi_str);
 
   /* QQ */
-  init_qq_dissector(ndpi_str, &a);
+  init_qq_dissector(ndpi_str);
 
   /* SSH */
-  init_ssh_dissector(ndpi_str, &a);
+  init_ssh_dissector(ndpi_str);
 
   /* VNC */
-  init_vnc_dissector(ndpi_str, &a);
+  init_vnc_dissector(ndpi_str);
 
   /* VXLAN */
-  init_vxlan_dissector(ndpi_str, &a);
+  init_vxlan_dissector(ndpi_str);
 
   /* TEAMVIEWER */
-  init_teamviewer_dissector(ndpi_str, &a);
+  init_teamviewer_dissector(ndpi_str);
 
   /* DHCP */
-  init_dhcp_dissector(ndpi_str, &a);
+  init_dhcp_dissector(ndpi_str);
 
   /* STEAM */
-  init_steam_dissector(ndpi_str, &a);
+  init_steam_dissector(ndpi_str);
 
   /* XBOX */
-  init_xbox_dissector(ndpi_str, &a);
+  init_xbox_dissector(ndpi_str);
 
   /* SMB */
-  init_smb_dissector(ndpi_str, &a);
+  init_smb_dissector(ndpi_str);
 
   /* MINING */
-  init_mining_dissector(ndpi_str, &a);
+  init_mining_dissector(ndpi_str);
 
   /* TELNET */
-  init_telnet_dissector(ndpi_str, &a);
+  init_telnet_dissector(ndpi_str);
 
   /* NTP */
-  init_ntp_dissector(ndpi_str, &a);
+  init_ntp_dissector(ndpi_str);
 
   /* NFS */
-  init_nfs_dissector(ndpi_str, &a);
+  init_nfs_dissector(ndpi_str);
 
   /* SSDP */
-  init_ssdp_dissector(ndpi_str, &a);
+  init_ssdp_dissector(ndpi_str);
 
   /* POSTGRES */
-  init_postgres_dissector(ndpi_str, &a);
+  init_postgres_dissector(ndpi_str);
 
   /* MYSQL */
-  init_mysql_dissector(ndpi_str, &a);
+  init_mysql_dissector(ndpi_str);
 
   /* BGP */
-  init_bgp_dissector(ndpi_str, &a);
+  init_bgp_dissector(ndpi_str);
 
   /* SNMP */
-  init_snmp_dissector(ndpi_str, &a);
+  init_snmp_dissector(ndpi_str);
 
   /* ICECAST */
-  init_icecast_dissector(ndpi_str, &a);
+  init_icecast_dissector(ndpi_str);
 
   /* KERBEROS */
-  init_kerberos_dissector(ndpi_str, &a);
+  init_kerberos_dissector(ndpi_str);
 
   /* SYSLOG */
-  init_syslog_dissector(ndpi_str, &a);
+  init_syslog_dissector(ndpi_str);
 
   /* NETBIOS */
-  init_netbios_dissector(ndpi_str, &a);
+  init_netbios_dissector(ndpi_str);
 
   /* IPP */
-  init_ipp_dissector(ndpi_str, &a);
+  init_ipp_dissector(ndpi_str);
 
   /* LDAP */
-  init_ldap_dissector(ndpi_str, &a);
+  init_ldap_dissector(ndpi_str);
 
   /* XDMCP */
-  init_xdmcp_dissector(ndpi_str, &a);
+  init_xdmcp_dissector(ndpi_str);
 
   /* TFTP */
-  init_tftp_dissector(ndpi_str, &a);
+  init_tftp_dissector(ndpi_str);
 
   /* MSSQL_TDS */
-  init_mssql_tds_dissector(ndpi_str, &a);
+  init_mssql_tds_dissector(ndpi_str);
 
   /* PPTP */
-  init_pptp_dissector(ndpi_str, &a);
+  init_pptp_dissector(ndpi_str);
 
   /* DHCPV6 */
-  init_dhcpv6_dissector(ndpi_str, &a);
+  init_dhcpv6_dissector(ndpi_str);
 
   /* AFP */
-  init_afp_dissector(ndpi_str, &a);
+  init_afp_dissector(ndpi_str);
 
   /* check_mk */
-  init_checkmk_dissector(ndpi_str, &a);
+  init_checkmk_dissector(ndpi_str);
 
   /* cpha */
-  init_cpha_dissector(ndpi_str, &a);
+  init_cpha_dissector(ndpi_str);
 
   /* NEXON */
-  init_nexon_dissector(ndpi_str, &a);
+  init_nexon_dissector(ndpi_str);
 
   /* DOFUS */
-  init_dofus_dissector(ndpi_str, &a);
+  init_dofus_dissector(ndpi_str);
 
   /* CROSSIFIRE */
-  init_crossfire_dissector(ndpi_str, &a);
+  init_crossfire_dissector(ndpi_str);
 
   /* GUILDWARS */
-  init_guildwars_dissector(ndpi_str, &a);
+  init_guildwars_dissector(ndpi_str);
 
   /* ARMAGETRON */
-  init_armagetron_dissector(ndpi_str, &a);
+  init_armagetron_dissector(ndpi_str);
 
   /* DROPBOX */
-  init_dropbox_dissector(ndpi_str, &a);
+  init_dropbox_dissector(ndpi_str);
 
   /* SONOS */
-  init_sonos_dissector(ndpi_str, &a);
+  init_sonos_dissector(ndpi_str);
 
   /* SPOTIFY */
-  init_spotify_dissector(ndpi_str, &a);
+  init_spotify_dissector(ndpi_str);
 
   /* RADIUS */
-  init_radius_dissector(ndpi_str, &a);
+  init_radius_dissector(ndpi_str);
 
   /* CITRIX */
-  init_citrix_dissector(ndpi_str, &a);
+  init_citrix_dissector(ndpi_str);
 
   /* HCL Notes */
-  init_hcl_notes_dissector(ndpi_str, &a);
+  init_hcl_notes_dissector(ndpi_str);
 
   /* GTP */
-  init_gtp_dissector(ndpi_str, &a);
+  init_gtp_dissector(ndpi_str);
 
   /* HSRP */
-  init_hsrp_dissector(ndpi_str, &a);
+  init_hsrp_dissector(ndpi_str);
 
   /* DCERPC */
-  init_dcerpc_dissector(ndpi_str, &a);
+  init_dcerpc_dissector(ndpi_str);
 
   /* NETFLOW */
-  init_netflow_dissector(ndpi_str, &a);
+  init_netflow_dissector(ndpi_str);
 
   /* SFLOW */
-  init_sflow_dissector(ndpi_str, &a);
+  init_sflow_dissector(ndpi_str);
 
   /* H323 */
-  init_h323_dissector(ndpi_str, &a);
+  init_h323_dissector(ndpi_str);
 
   /* OPENVPN */
-  init_openvpn_dissector(ndpi_str, &a);
+  init_openvpn_dissector(ndpi_str);
 
   /* NOE */
-  init_noe_dissector(ndpi_str, &a);
+  init_noe_dissector(ndpi_str);
 
   /* CISCOVPN */
-  init_ciscovpn_dissector(ndpi_str, &a);
+  init_ciscovpn_dissector(ndpi_str);
 
   /* TEAMSPEAK */
-  init_teamspeak_dissector(ndpi_str, &a);
+  init_teamspeak_dissector(ndpi_str);
 
   /* SKINNY */
-  init_skinny_dissector(ndpi_str, &a);
+  init_skinny_dissector(ndpi_str);
 
   /* RSYNC */
-  init_rsync_dissector(ndpi_str, &a);
+  init_rsync_dissector(ndpi_str);
 
   /* WHOIS_DAS */
-  init_whois_das_dissector(ndpi_str, &a);
+  init_whois_das_dissector(ndpi_str);
 
   /* ORACLE */
-  init_oracle_dissector(ndpi_str, &a);
+  init_oracle_dissector(ndpi_str);
 
   /* CORBA */
-  init_corba_dissector(ndpi_str, &a);
+  init_corba_dissector(ndpi_str);
 
   /* RTMP */
-  init_rtmp_dissector(ndpi_str, &a);
+  init_rtmp_dissector(ndpi_str);
 
   /* FTP_CONTROL */
-  init_ftp_control_dissector(ndpi_str, &a);
+  init_ftp_control_dissector(ndpi_str);
 
   /* FTP_DATA */
-  init_ftp_data_dissector(ndpi_str, &a);
+  init_ftp_data_dissector(ndpi_str);
 
   /* MEGACO */
-  init_megaco_dissector(ndpi_str, &a);
+  init_megaco_dissector(ndpi_str);
 
   /* RESP */
-  init_resp_dissector(ndpi_str, &a);
+  init_resp_dissector(ndpi_str);
 
   /* ZMQ */
-  init_zmq_dissector(ndpi_str, &a);
+  init_zmq_dissector(ndpi_str);
 
   /* TELEGRAM */
-  init_telegram_dissector(ndpi_str, &a);
+  init_telegram_dissector(ndpi_str);
 
   /* QUIC */
-  init_quic_dissector(ndpi_str, &a);
+  init_quic_dissector(ndpi_str);
 
   /* DIAMETER */
-  init_diameter_dissector(ndpi_str, &a);
+  init_diameter_dissector(ndpi_str);
 
   /* APPLE_PUSH */
-  init_apple_push_dissector(ndpi_str, &a);
+  init_apple_push_dissector(ndpi_str);
 
   /* EAQ */
-  init_eaq_dissector(ndpi_str, &a);
+  init_eaq_dissector(ndpi_str);
 
   /* KAKAOTALK_VOICE */
-  init_kakaotalk_voice_dissector(ndpi_str, &a);
+  init_kakaotalk_voice_dissector(ndpi_str);
 
   /* MIKROTIK */
-  init_mikrotik_dissector(ndpi_str, &a);
+  init_mikrotik_dissector(ndpi_str);
 
   /* MPEGTS */
-  init_mpegts_dissector(ndpi_str, &a);
+  init_mpegts_dissector(ndpi_str);
 
   /* UBNTAC2 */
-  init_ubntac2_dissector(ndpi_str, &a);
+  init_ubntac2_dissector(ndpi_str);
 
   /* COAP */
-  init_coap_dissector(ndpi_str, &a);
+  init_coap_dissector(ndpi_str);
 
   /* MQTT */
-  init_mqtt_dissector(ndpi_str, &a);
+  init_mqtt_dissector(ndpi_str);
 
   /* SOME/IP */
-  init_someip_dissector(ndpi_str, &a);
+  init_someip_dissector(ndpi_str);
 
   /* RX */
-  init_rx_dissector(ndpi_str, &a);
+  init_rx_dissector(ndpi_str);
 
   /* GIT */
-  init_git_dissector(ndpi_str, &a);
+  init_git_dissector(ndpi_str);
 
   /* DRDA */
-  init_drda_dissector(ndpi_str, &a);
+  init_drda_dissector(ndpi_str);
 
   /* BJNP */
-  init_bjnp_dissector(ndpi_str, &a);
+  init_bjnp_dissector(ndpi_str);
 
   /* SMPP */
-  init_smpp_dissector(ndpi_str, &a);
+  init_smpp_dissector(ndpi_str);
 
   /* TINC */
-  init_tinc_dissector(ndpi_str, &a);
+  init_tinc_dissector(ndpi_str);
 
   /* FIX */
-  init_fix_dissector(ndpi_str, &a);
+  init_fix_dissector(ndpi_str);
 
   /* NINTENDO */
-  init_nintendo_dissector(ndpi_str, &a);
+  init_nintendo_dissector(ndpi_str);
 
   /* MODBUS */
-  init_modbus_dissector(ndpi_str, &a);
+  init_modbus_dissector(ndpi_str);
 
   /* CAPWAP */
-  init_capwap_dissector(ndpi_str, &a);
+  init_capwap_dissector(ndpi_str);
 
   /* ZABBIX */
-  init_zabbix_dissector(ndpi_str, &a);
+  init_zabbix_dissector(ndpi_str);
 
   /*** Put false-positive sensitive protocols at the end ***/
 
   /* VIBER */
-  init_viber_dissector(ndpi_str, &a);
+  init_viber_dissector(ndpi_str);
 
   /* BITTORRENT */
-  init_bittorrent_dissector(ndpi_str, &a);
+  init_bittorrent_dissector(ndpi_str);
 
   /* WHATSAPP */
-  init_whatsapp_dissector(ndpi_str, &a);
+  init_whatsapp_dissector(ndpi_str);
 
   /* OOKLA */
-  init_ookla_dissector(ndpi_str, &a);
+  init_ookla_dissector(ndpi_str);
 
   /* AMQP */
-  init_amqp_dissector(ndpi_str, &a);
+  init_amqp_dissector(ndpi_str);
 
   /* Steam Datagram Relay */
-  init_valve_sdr_dissector(ndpi_str, &a);
+  init_valve_sdr_dissector(ndpi_str);
 
   /* LISP */
-  init_lisp_dissector(ndpi_str, &a);
+  init_lisp_dissector(ndpi_str);
 
   /* AJP */
-  init_ajp_dissector(ndpi_str, &a);
+  init_ajp_dissector(ndpi_str);
 
   /* Memcached */
-  init_memcached_dissector(ndpi_str, &a);
+  init_memcached_dissector(ndpi_str);
 
   /* Nest Log Sink */
-  init_nest_log_sink_dissector(ndpi_str, &a);
+  init_nest_log_sink_dissector(ndpi_str);
 
   /* WireGuard VPN */
-  init_wireguard_dissector(ndpi_str, &a);
+  init_wireguard_dissector(ndpi_str);
 
   /* Amazon_Video */
-  init_amazon_video_dissector(ndpi_str, &a);
+  init_amazon_video_dissector(ndpi_str);
 
   /* S7 comm */
-  init_s7comm_dissector(ndpi_str, &a);
+  init_s7comm_dissector(ndpi_str);
 
   /* IEC 60870-5-104 */
-  init_104_dissector(ndpi_str, &a);
+  init_104_dissector(ndpi_str);
 
   /* DNP3 */
-  init_dnp3_dissector(ndpi_str, &a);
+  init_dnp3_dissector(ndpi_str);
 
   /* WEBSOCKET */
-  init_websocket_dissector(ndpi_str, &a);
+  init_websocket_dissector(ndpi_str);
 
   /* SOAP */
-  init_soap_dissector(ndpi_str, &a);
+  init_soap_dissector(ndpi_str);
 
   /* DNScrypt */
-  init_dnscrypt_dissector(ndpi_str, &a);
+  init_dnscrypt_dissector(ndpi_str);
 
   /* MongoDB */
-  init_mongodb_dissector(ndpi_str, &a);
+  init_mongodb_dissector(ndpi_str);
 
   /* AmongUS */
-  init_among_us_dissector(ndpi_str, &a);
+  init_among_us_dissector(ndpi_str);
 
   /* HP Virtual Machine Group Management */
-  init_hpvirtgrp_dissector(ndpi_str, &a);
+  init_hpvirtgrp_dissector(ndpi_str);
 
   /* Genshin Impact */
-  init_genshin_impact_dissector(ndpi_str, &a);
+  init_genshin_impact_dissector(ndpi_str);
 
   /* Z39.50 international standard client–server, application layer communications protocol */
-  init_z3950_dissector(ndpi_str, &a);
+  init_z3950_dissector(ndpi_str);
 
   /* AVAST SecureDNS */
-  init_avast_securedns_dissector(ndpi_str, &a);
+  init_avast_securedns_dissector(ndpi_str);
 
   /* Cassandra */
-  init_cassandra_dissector(ndpi_str, &a);
+  init_cassandra_dissector(ndpi_str);
 
   /* EthernetIP */
-  init_ethernet_ip_dissector(ndpi_str, &a);
+  init_ethernet_ip_dissector(ndpi_str);
 
   /* WSD */
-  init_wsd_dissector(ndpi_str, &a);
+  init_wsd_dissector(ndpi_str);
 
   /* TocaBoca */
-  init_toca_boca_dissector(ndpi_str, &a);
+  init_toca_boca_dissector(ndpi_str);
 
   /* SD-RTN Software Defined Real-time Network */
-  init_sd_rtn_dissector(ndpi_str, &a);
+  init_sd_rtn_dissector(ndpi_str);
 
   /* RakNet */
-  init_raknet_dissector(ndpi_str, &a);
+  init_raknet_dissector(ndpi_str);
 
   /* Xiaomi */
-  init_xiaomi_dissector(ndpi_str, &a);
+  init_xiaomi_dissector(ndpi_str);
 
   /* MpegDash */
-  init_mpegdash_dissector(ndpi_str, &a);
+  init_mpegdash_dissector(ndpi_str);
 
   /* RSH */
-  init_rsh_dissector(ndpi_str, &a);
+  init_rsh_dissector(ndpi_str);
 
   /* IPsec */
-  init_ipsec_dissector(ndpi_str, &a);
+  init_ipsec_dissector(ndpi_str);
 
   /* collectd */
-  init_collectd_dissector(ndpi_str, &a);
+  init_collectd_dissector(ndpi_str);
 
   /* i3D */
-  init_i3d_dissector(ndpi_str, &a);
+  init_i3d_dissector(ndpi_str);
 
   /* RiotGames */
-  init_riotgames_dissector(ndpi_str, &a);
+  init_riotgames_dissector(ndpi_str);
 
   /* UltraSurf */
-  init_ultrasurf_dissector(ndpi_str, &a);
+  init_ultrasurf_dissector(ndpi_str);
 
   /* Threema */
-  init_threema_dissector(ndpi_str, &a);
+  init_threema_dissector(ndpi_str);
 
   /* AliCloud */
-  init_alicloud_dissector(ndpi_str, &a);
+  init_alicloud_dissector(ndpi_str);
 
   /* AVAST */
-  init_avast_dissector(ndpi_str, &a);
+  init_avast_dissector(ndpi_str);
 
   /* Softether */
-  init_softether_dissector(ndpi_str, &a);
+  init_softether_dissector(ndpi_str);
 
   /* Activision */
-  init_activision_dissector(ndpi_str, &a);
+  init_activision_dissector(ndpi_str);
 
   /* Discord */
-  init_discord_dissector(ndpi_str, &a);
+  init_discord_dissector(ndpi_str);
 
   /* TiVoConnect */
-  init_tivoconnect_dissector(ndpi_str, &a);
+  init_tivoconnect_dissector(ndpi_str);
 
   /* Kismet */
-  init_kismet_dissector(ndpi_str, &a);
+  init_kismet_dissector(ndpi_str);
 
   /* FastCGI */
-  init_fastcgi_dissector(ndpi_str, &a);
+  init_fastcgi_dissector(ndpi_str);
 
   /* NATPMP */
-  init_natpmp_dissector(ndpi_str, &a);
+  init_natpmp_dissector(ndpi_str);
 
   /* Syncthing */
-  init_syncthing_dissector(ndpi_str, &a);
+  init_syncthing_dissector(ndpi_str);
 
   /* CryNetwork */
-  init_crynet_dissector(ndpi_str, &a);
+  init_crynet_dissector(ndpi_str);
 
   /* Line voip */
-  init_line_dissector(ndpi_str, &a);
+  init_line_dissector(ndpi_str);
 
   /* Munin */
-  init_munin_dissector(ndpi_str, &a);
+  init_munin_dissector(ndpi_str);
 
   /* Elasticsearch */
-  init_elasticsearch_dissector(ndpi_str, &a);
+  init_elasticsearch_dissector(ndpi_str);
 
   /* TUYA LP */
-  init_tuya_lp_dissector(ndpi_str, &a);
+  init_tuya_lp_dissector(ndpi_str);
 
   /* TPLINK_SHP */
-  init_tplink_shp_dissector(ndpi_str, &a);
+  init_tplink_shp_dissector(ndpi_str);
 
   /* Meraki Cloud */
-  init_merakicloud_dissector(ndpi_str, &a);
+  init_merakicloud_dissector(ndpi_str);
 
   /* Tailscale */
-  init_tailscale_dissector(ndpi_str, &a);
+  init_tailscale_dissector(ndpi_str);
 
   /* Source Engine */
-  init_source_engine_dissector(ndpi_str, &a);
+  init_source_engine_dissector(ndpi_str);
 
   /* BACnet */
-  init_bacnet_dissector(ndpi_str, &a);
+  init_bacnet_dissector(ndpi_str);
 
   /* OICQ */
-  init_oicq_dissector(ndpi_str, &a);
+  init_oicq_dissector(ndpi_str);
 
   /* Heroes of the Storm */
-  init_hots_dissector(ndpi_str, &a);
+  init_hots_dissector(ndpi_str);
 
   /* EpicGames */
-  init_epicgames_dissector(ndpi_str, &a);
+  init_epicgames_dissector(ndpi_str);
 
   /*BITCOIN*/
-  init_bitcoin_dissector(ndpi_str, &a);
+  init_bitcoin_dissector(ndpi_str);
 
   /* Apache Thrift */
-  init_apache_thrift_dissector(ndpi_str, &a);
+  init_apache_thrift_dissector(ndpi_str);
 
   /* Service Location Protocol */
-  init_slp_dissector(ndpi_str, &a);
+  init_slp_dissector(ndpi_str);
 
   /* HTTP/2 */
-  init_http2_dissector(ndpi_str, &a);
+  init_http2_dissector(ndpi_str);
 
   /* HAProxy */
-  init_haproxy_dissector(ndpi_str, &a);
+  init_haproxy_dissector(ndpi_str);
 
   /* RMCP */
-  init_rmcp_dissector(ndpi_str, &a);
+  init_rmcp_dissector(ndpi_str);
 
   /* Controller Area Network */
-  init_can_dissector(ndpi_str, &a);
+  init_can_dissector(ndpi_str);
 
   /* Protobuf */
-  init_protobuf_dissector(ndpi_str, &a);
+  init_protobuf_dissector(ndpi_str);
 
   /* ETHEREUM */
-  init_ethereum_dissector(ndpi_str, &a);
+  init_ethereum_dissector(ndpi_str);
 
   /* Precision Time Protocol v2 */
-  init_ptpv2_dissector(ndpi_str, &a);
+  init_ptpv2_dissector(ndpi_str);
 
   /* Highway Addressable Remote Transducer over IP */
-  init_hart_ip_dissector(ndpi_str, &a);
+  init_hart_ip_dissector(ndpi_str);
 
   /* Real-time Publish-Subscribe Protocol */
-  init_rtps_dissector(ndpi_str, &a);
+  init_rtps_dissector(ndpi_str);
 
   /* OPC Unified Architecture */
-  init_opc_ua_dissector(ndpi_str, &a);
+  init_opc_ua_dissector(ndpi_str);
 
   /* Factory Interface Network Service */
-  init_fins_dissector(ndpi_str, &a);
+  init_fins_dissector(ndpi_str);
 
   /* Ether-S-I/O */
-  init_ethersio_dissector(ndpi_str, &a);
+  init_ethersio_dissector(ndpi_str);
 
   /* Automation Device Specification */
-  init_beckhoff_ads_dissector(ndpi_str, &a);
+  init_beckhoff_ads_dissector(ndpi_str);
 
   /* Manufacturing Message Specification */
-  init_iso9506_1_mms_dissector(ndpi_str, &a);
+  init_iso9506_1_mms_dissector(ndpi_str);
 
   /* IEEE C37.118 Synchrophasor Protocol */
-  init_ieee_c37118_dissector(ndpi_str, &a);
+  init_ieee_c37118_dissector(ndpi_str);
 
   /* Ether-S-Bus */
-  init_ethersbus_dissector(ndpi_str, &a);
+  init_ethersbus_dissector(ndpi_str);
 
   /* Monero Protocol */
-  init_monero_dissector(ndpi_str, &a);
+  init_monero_dissector(ndpi_str);
 
   /* PROFINET/IO */
-  init_profinet_io_dissector(ndpi_str, &a);
+  init_profinet_io_dissector(ndpi_str);
 
   /* HiSLIP */
-  init_hislip_dissector(ndpi_str, &a);
+  init_hislip_dissector(ndpi_str);
 
   /* UFTP */
-  init_uftp_dissector(ndpi_str, &a);
+  init_uftp_dissector(ndpi_str);
 
   /* OpenFlow */
-  init_openflow_dissector(ndpi_str, &a);
+  init_openflow_dissector(ndpi_str);
 
   /* JSON-RPC */
-  init_json_rpc_dissector(ndpi_str, &a);
+  init_json_rpc_dissector(ndpi_str);
 
   /* Apache Kafka */
-  init_kafka_dissector(ndpi_str, &a);
+  init_kafka_dissector(ndpi_str);
 
   /* NoMachine */
-  init_nomachine_dissector(ndpi_str, &a);
+  init_nomachine_dissector(ndpi_str);
 
   /* IEC 62056 */
-  init_iec62056_dissector(ndpi_str, &a);
+  init_iec62056_dissector(ndpi_str);
 
   /* HL7 */
-  init_hl7_dissector(ndpi_str, &a);
+  init_hl7_dissector(ndpi_str);
 
   /* DICOM */
-  init_dicom_dissector(ndpi_str, &a);
+  init_dicom_dissector(ndpi_str);
 
   /* Ceph */
-  init_ceph_dissector(ndpi_str, &a);
+  init_ceph_dissector(ndpi_str);
 
   /* Roughtime */
-  init_roughtime_dissector(ndpi_str, &a);
+  init_roughtime_dissector(ndpi_str);
 
   /* KCP */
-  init_kcp_dissector(ndpi_str, &a);
+  init_kcp_dissector(ndpi_str);
 
   /* Mumble */
-  init_mumble_dissector(ndpi_str, &a);
+  init_mumble_dissector(ndpi_str);
 
   /* Zoom */
-  init_zoom_dissector(ndpi_str, &a);
+  init_zoom_dissector(ndpi_str);
 
   /* Yojimbo */
-  init_yojimbo_dissector(ndpi_str, &a);
+  init_yojimbo_dissector(ndpi_str);
 
   /* STOMP */
-  init_stomp_dissector(ndpi_str, &a);
+  init_stomp_dissector(ndpi_str);
 
   /* RDP */
-  init_radmin_dissector(ndpi_str, &a);
+  init_radmin_dissector(ndpi_str);
 
   /* Raft */
-  init_raft_dissector(ndpi_str, &a);
+  init_raft_dissector(ndpi_str);
 
   /* CIP (Common Industrial Protocol) */
-  init_cip_dissector(ndpi_str, &a);
+  init_cip_dissector(ndpi_str);
 
   /* Gearman */
-  init_gearman_dissector(ndpi_str, &a);
+  init_gearman_dissector(ndpi_str);
 
   /* Tencent Games */
-  init_tencent_games_dissector(ndpi_str, &a);
+  init_tencent_games_dissector(ndpi_str);
 
   /* Gaijin Entertainment */
-  init_gaijin_dissector(ndpi_str, &a);
+  init_gaijin_dissector(ndpi_str);
 
   /* ANSI C12.22 / IEEE 1703 */
-  init_c1222_dissector(ndpi_str, &a);
+  init_c1222_dissector(ndpi_str);
 
   /* Dynamic Link Exchange Protocol */
-  init_dlep_dissector(ndpi_str, &a);
+  init_dlep_dissector(ndpi_str);
 
   /* Bidirectional Forwarding Detection */
-  init_bfd_dissector(ndpi_str, &a);
+  init_bfd_dissector(ndpi_str);
 
   /* NetEase Games */
-  init_netease_games_dissector(ndpi_str, &a);
+  init_netease_games_dissector(ndpi_str);
 
   /* Path of Exile */
-  init_pathofexile_dissector(ndpi_str, &a);
+  init_pathofexile_dissector(ndpi_str);
 
   /* Packet Forwarding Control Protocol */
-  init_pfcp_dissector(ndpi_str, &a);
+  init_pfcp_dissector(ndpi_str);
 
   /* File Delivery over Unidirectional Transport */
-  init_flute_dissector(ndpi_str, &a);
+  init_flute_dissector(ndpi_str);
 
   /* League of Legends: Wild Rift */
-  init_lolwildrift_dissector(ndpi_str, &a);
+  init_lolwildrift_dissector(ndpi_str);
 
   /* The Elder Scrolls Online */
-  init_teso_dissector(ndpi_str, &a);
+  init_teso_dissector(ndpi_str);
 
   /* Label Distribution Protocol */
-  init_ldp_dissector(ndpi_str, &a);
+  init_ldp_dissector(ndpi_str);
 
   /* KNXnet/IP */
-  init_knxnet_ip_dissector(ndpi_str, &a);
+  init_knxnet_ip_dissector(ndpi_str);
 
   /* Binary Floor Control Protocol */
-  init_bfcp_dissector(ndpi_str, &a);
+  init_bfcp_dissector(ndpi_str);
 
   /* iQIYI */
-  init_iqiyi_dissector(ndpi_str, &a);
+  init_iqiyi_dissector(ndpi_str);
 
   /* Ethernet Global Data */
-  init_egd_dissector(ndpi_str, &a);
+  init_egd_dissector(ndpi_str);
 
   /* Call of Duty: Mobile */
-  init_cod_mobile_dissector(ndpi_str, &a);
+  init_cod_mobile_dissector(ndpi_str);
 
   /* ZUG */
-  init_zug_dissector(ndpi_str, &a);
+  init_zug_dissector(ndpi_str);
 
   /* JRMI Java Remote Method Invocation*/
-  init_jrmi_dissector(ndpi_str, &a);
+  init_jrmi_dissector(ndpi_str);
 
   /* (Magellan) Ripe Atlas */
-  init_ripe_atlas_dissector(ndpi_str, &a);
+  init_ripe_atlas_dissector(ndpi_str);
 
   /* Cloudflare WARP */
-  init_cloudflare_warp_dissector(ndpi_str, &a);
+  init_cloudflare_warp_dissector(ndpi_str);
 
   /* Nano Cryptocurrency Protocol */
-  init_nano_dissector(ndpi_str, &a);
+  init_nano_dissector(ndpi_str);
 
   /* OpenWire */
-  init_openwire_dissector(ndpi_str, &a);
+  init_openwire_dissector(ndpi_str);
 
   /* ISO/IEC 14908-4 */
-  init_cnp_ip_dissector(ndpi_str, &a);
+  init_cnp_ip_dissector(ndpi_str);
 
   /* ATG */
-  init_atg_dissector(ndpi_str, &a);
+  init_atg_dissector(ndpi_str);
 
   /* Train Real Time Data Protocol */
-  init_trdp_dissector(ndpi_str, &a);
+  init_trdp_dissector(ndpi_str);
 
   /* Lustre */
-  init_lustre_dissector(ndpi_str, &a);
+  init_lustre_dissector(ndpi_str);
 
   /* DingTalk */
-  init_dingtalk_dissector(ndpi_str, &a);
+  init_dingtalk_dissector(ndpi_str);
 
   /* Paltalk */
-  init_paltalk_dissector(ndpi_str, &a);
+  init_paltalk_dissector(ndpi_str);
 
   /* LagoFast */
-  init_lagofast_dissector(ndpi_str, &a);
+  init_lagofast_dissector(ndpi_str);
 
   /* GearUP Booster */
-  init_gearup_booster_dissector(ndpi_str, &a);
+  init_gearup_booster_dissector(ndpi_str);
 
   /* Microsoft Delivery Optimization */
-  init_msdo_dissector(ndpi_str, &a);
+  init_msdo_dissector(ndpi_str);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
@@ -6555,12 +6549,12 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* ----------------------------------------------------------------- */
 
-  ndpi_str->callback_buffer_size = a;
+  ndpi_str->callback_buffer_size = ndpi_str->callback_buffer_num;
 
   /* Resize callback_buffer */
-  all_cb = ndpi_calloc(a+1,sizeof(struct call_function_struct));
+  all_cb = ndpi_calloc(ndpi_str->callback_buffer_size+1,sizeof(struct call_function_struct));
   if(all_cb) {
-    memcpy((char *)all_cb,(char *)ndpi_str->callback_buffer, (a+1) * sizeof(struct call_function_struct));
+    memcpy((char *)all_cb,(char *)ndpi_str->callback_buffer, (ndpi_str->callback_buffer_size+1) * sizeof(struct call_function_struct));
     ndpi_free(ndpi_str->callback_buffer);
     ndpi_str->callback_buffer = all_cb;
   }

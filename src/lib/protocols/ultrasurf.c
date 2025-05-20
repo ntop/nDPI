@@ -58,16 +58,13 @@ static void ndpi_search_ultrasurf(struct ndpi_detection_module_struct *ndpi_stru
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void init_ultrasurf_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                              u_int32_t *id)
+void init_ultrasurf_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("UltraSurf", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("UltraSurf", ndpi_struct,
     NDPI_PROTOCOL_ULTRASURF,
     ndpi_search_ultrasurf,
     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
     SAVE_DETECTION_BITMASK_AS_UNKNOWN,
     ADD_TO_DETECTION_BITMASK
   );
-
-  *id += 1;
 }

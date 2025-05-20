@@ -53,14 +53,12 @@ static void ndpi_search_whois_das(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 
-void init_whois_das_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_whois_das_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Whois-DAS", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("Whois-DAS", ndpi_struct,
 				      NDPI_PROTOCOL_WHOIS_DAS,
 				      ndpi_search_whois_das,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK); 
-
-  *id += 1;
 }

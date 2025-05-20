@@ -61,15 +61,12 @@ not_mumble:
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void init_mumble_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                           u_int32_t *id)
+void init_mumble_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Mumble", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("Mumble", ndpi_struct,
                                       NDPI_PROTOCOL_MUMBLE,
                                       ndpi_search_mumble,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

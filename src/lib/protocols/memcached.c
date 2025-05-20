@@ -174,16 +174,13 @@ static void ndpi_search_memcached(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 void init_memcached_dissector(
-			      struct ndpi_detection_module_struct *ndpi_struct,
-			      u_int32_t *id)
+			      struct ndpi_detection_module_struct *ndpi_struct)
 {
   ndpi_set_bitmask_protocol_detection("MEMCACHED",
-				      ndpi_struct, *id,
+				      ndpi_struct,
 				      NDPI_PROTOCOL_MEMCACHED,
 				      ndpi_search_memcached,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

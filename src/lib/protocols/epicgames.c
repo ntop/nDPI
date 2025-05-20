@@ -74,15 +74,12 @@ static void ndpi_search_epicgames(struct ndpi_detection_module_struct *ndpi_stru
   }
 }
 
-void init_epicgames_dissector(struct ndpi_detection_module_struct *ndpi_struct,
-                              u_int32_t *id)
+void init_epicgames_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("EpicGames", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("EpicGames", ndpi_struct,
                                       NDPI_PROTOCOL_EPICGAMES,
                                       ndpi_search_epicgames,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

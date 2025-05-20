@@ -89,14 +89,12 @@ static void ndpi_search_zmq(struct ndpi_detection_module_struct *ndpi_struct, st
 }
 
 
-void init_zmq_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_zmq_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("ZeroMQ", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("ZeroMQ", ndpi_struct,
 				      NDPI_PROTOCOL_ZMQ,
 				      ndpi_search_zmq, /* TODO: add UDP support */
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

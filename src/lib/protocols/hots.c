@@ -64,13 +64,12 @@ void ndpi_search_hots(struct ndpi_detection_module_struct *ndpi_struct, struct n
 }
 
 
-void init_hots_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_hots_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("HOTS", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("HOTS", ndpi_struct,
 				      NDPI_PROTOCOL_HOTS,
 				      ndpi_search_hots,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD, /* Only IPv4 UDP traffic is expected. */
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-  *id += 1;
 }

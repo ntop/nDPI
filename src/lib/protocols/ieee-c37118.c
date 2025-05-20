@@ -66,14 +66,12 @@ static void ndpi_search_ieee_c37118(struct ndpi_detection_module_struct *ndpi_st
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void init_ieee_c37118_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_ieee_c37118_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("IEEE-C37118", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("IEEE-C37118", ndpi_struct,
                                       NDPI_PROTOCOL_IEEE_C37118,
                                       ndpi_search_ieee_c37118,
                                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                                       SAVE_DETECTION_BITMASK_AS_UNKNOWN,
                                       ADD_TO_DETECTION_BITMASK);
-
-  *id += 1;
 }

@@ -85,13 +85,12 @@ static void ndpi_search_kafka(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
-void init_kafka_dissector(struct ndpi_detection_module_struct *ndpi_struct, u_int32_t *id)
+void init_kafka_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Kafka", ndpi_struct, *id,
+  ndpi_set_bitmask_protocol_detection("Kafka", ndpi_struct,
 				      NDPI_PROTOCOL_APACHE_KAFKA,
 				      ndpi_search_kafka,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
-  *id += 1;
 }
