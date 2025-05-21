@@ -28,7 +28,7 @@
     <ClCompile Include="..\src\lib\protocols\git.c" />
     <ClCompile Include="..\src\lib\protocols\gnutella.c" />
     <ClCompile Include="..\src\lib\protocols\gtp.c" />
-    <ClCompile Include="..\src\lib\protocols\guildwars.c" />
+    <ClCompile Include="..\src\lib\protocols\guildwars2.c" />
     <ClCompile Include="..\src\lib\protocols\h323.c" />
     <ClCompile Include="..\src\lib\protocols\http.c" />
     <ClCompile Include="..\src\lib\protocols\http2.c" />

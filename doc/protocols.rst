@@ -917,11 +917,11 @@ References: `Dofus official site: <https://www.dofus.com/>`_
 
 .. _Proto_109:
 
-`NDPI_PROTOCOL_GUILDWARS`
+`NDPI_PROTOCOL_GUILDWARS2`
 ==========================
 Guild Wars is an online RPG known for dynamic events and PvP.
 
-References: `Guild Wars official site: <https://www.guildwars.com/>`_
+References: `Guild Wars 2 official site: <https://www.guildwars2.com/>`_
 
 
 .. _Proto_110:

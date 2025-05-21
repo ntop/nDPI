@@ -787,7 +787,7 @@ void init_ftp_data_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_gnutella_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_gtp_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_hsrp_dissector(struct ndpi_detection_module_struct *ndpi_struct);
-void init_guildwars_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_guildwars2_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_h323_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_hots_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct);
