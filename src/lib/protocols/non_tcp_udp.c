@@ -249,4 +249,11 @@ void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct
 				      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
 				      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);
+
+  ndpi_set_bitmask_protocol_detection("VRRP", ndpi_struct,
+                                      NDPI_PROTOCOL_IP_VRRP,
+                                      ndpi_search_in_non_tcp_udp,
+                                      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
+                                      NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN,
+                                      ADD_TO_DETECTION_BITMASK);
 }
