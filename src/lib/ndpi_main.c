@@ -233,7 +233,7 @@ static void ndpi_int_change_protocol(struct ndpi_flow_struct *flow,
 
 static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str);
 static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndpi_str,
-					const NDPI_PROTOCOL_BITMASK *dbm, int count_only);
+					int count_only);
 
 static void set_default_config(struct ndpi_detection_module_config_struct *cfg);
 
@@ -5762,7 +5762,7 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
     */
     ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx = idx;
     ndpi_str->proto_defaults[ndpi_protocol_id].func = ndpi_str->callback_buffer[idx].func = func;
-    ndpi_str->callback_buffer[idx].ndpi_protocol_id = ndpi_protocol_id;
+    ndpi_str->callback_buffer[idx].dissector_idx = idx;
 
     /*
       Set ndpi_selection_bitmask for protocol
@@ -5789,7 +5789,6 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
 
 static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
-  NDPI_PROTOCOL_BITMASK *detection_bitmask = &ndpi_str->detection_bitmask;
   struct call_function_struct *all_cb = NULL;
 
   if(ndpi_str->callback_buffer) return 0;
@@ -6561,7 +6560,7 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   NDPI_LOG_DBG2(ndpi_str, "callback_buffer_size is %u\n", ndpi_str->callback_buffer_size);
   /* Calculating the size of an array for callback functions */
-  ndpi_enabled_callbacks_init(ndpi_str,detection_bitmask,1);
+  ndpi_enabled_callbacks_init(ndpi_str, 1);
   all_cb = ndpi_calloc(ndpi_str->callback_buffer_size_tcp_payload +
 		       ndpi_str->callback_buffer_size_tcp_no_payload +
 		       ndpi_str->callback_buffer_size_udp +
@@ -6577,7 +6576,7 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
   all_cb += ndpi_str->callback_buffer_size_udp;
   ndpi_str->callback_buffer_non_tcp_udp = all_cb;
 
-  ndpi_enabled_callbacks_init(ndpi_str,detection_bitmask,0);
+  ndpi_enabled_callbacks_init(ndpi_str, 0);
 
   NDPI_LOG_DBG(ndpi_str, "Tot num dissectors: %d (TCP: %d, TCP_NO_PAYLOAD: %d, UDP: %d, NO_TCP_UDP: %d\n",
                ndpi_str->callback_buffer_size,
@@ -6633,7 +6632,7 @@ static inline int ndpi_proto_cb_other(const struct ndpi_detection_module_struct 
 /* ******************************************************************** */
 
 static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndpi_str,
-					const NDPI_PROTOCOL_BITMASK *dbm, int count_only) {
+					int count_only) {
   uint32_t a;
 
   /* now build the specific buffer for tcp, udp and non_tcp_udp */
@@ -6641,7 +6640,6 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
   ndpi_str->callback_buffer_size_tcp_no_payload = 0;
 
   for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
-    if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_tcp_payload(ndpi_str,a)) continue;
     if(!count_only) {
       NDPI_LOG_DBG2(ndpi_str, "callback_buffer_tcp_payload, adding buffer %u as entry %u\n", a,
@@ -6653,7 +6651,6 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
   }
 
   for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
-    if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_tcp_nopayload(ndpi_str,a)) continue;
     if(!count_only) {
       NDPI_LOG_DBG2(ndpi_str,
@@ -6667,7 +6664,6 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
   ndpi_str->callback_buffer_size_udp = 0;
 
   for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
-    if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_udp(ndpi_str,a)) continue;
     if(!count_only) {
       NDPI_LOG_DBG2(ndpi_str, "callback_buffer_size_udp: adding buffer : %u\n", a);
@@ -6681,7 +6677,6 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
   ndpi_str->callback_buffer_size_non_tcp_udp = 0;
 
   for(a = 0; a < ndpi_str->callback_buffer_size; a++) {
-    if(!NDPI_ISSET(dbm,ndpi_str->callback_buffer[a].ndpi_protocol_id)) continue;
     if(!ndpi_proto_cb_other(ndpi_str,a)) continue;
     if(!count_only) {
       NDPI_LOG_DBG2(ndpi_str, "callback_buffer_non_tcp_udp: adding buffer : %u\n", a);
@@ -7066,7 +7061,7 @@ int ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *nd
 
   ndpi_init_protocol_defaults(ndpi_str);
 
-  ndpi_enabled_callbacks_init(ndpi_str,dbm,0);
+  ndpi_enabled_callbacks_init(ndpi_str, 0);
 
   if(ndpi_callback_init(ndpi_str)) {
     NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating callbacks\n");
@@ -7689,7 +7684,6 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
      if we don't already have a partial classification */
   u_int16_t fast_callback_protocol_id = flow->fast_callback_protocol_id ? flow->fast_callback_protocol_id : flow->guessed_protocol_id;
   u_int16_t dissector_idx = ndpi_str->proto_defaults[fast_callback_protocol_id].dissector_idx;
-  u_int16_t proto_id;
   NDPI_PROTOCOL_BITMASK detection_bitmask;
   u_int32_t a;
 
@@ -7711,8 +7705,7 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
       /* TODO: optimize as today we're doing a linear scan */
 
       for (a = 0; a < callback_buffer_size; a++) {
-        proto_id = callback_buffer[a].ndpi_protocol_id;
-        dissector_idx = ndpi_str->proto_defaults[proto_id].dissector_idx;
+        dissector_idx = callback_buffer[a].dissector_idx;
 
         if((func != callback_buffer[a].func) &&
 	   (callback_buffer[a].ndpi_selection_bitmask & ndpi_selection_packet) ==
