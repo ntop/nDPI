@@ -76,7 +76,7 @@ The entire procedure of adding new protocols in detail:
 1. Add new protocol together with its unique ID to: `src/include/ndpi_protocol_ids.h`
 2. Create a new protocol in: `src/lib/protocols/`
 3. Variables to be kept for the duration of the entire flow (as state variables) need to be placed in: `src/include/ndpi_typedefs.h` in `ndpi_flow_tcp_struct` (for TCP only), `ndpi_flow_udp_struct` (for UDP only), or `ndpi_flow_struct` (for both).
-4. Add a new entry for the search function for the new protocol in: `src/include/ndpi_protocols.h`
+4. Add a new entry for the search function for the new protocol in: `src/include/ndpi_private.h`
 5. Choose (do not change anything) a selection bitmask from: `src/include/ndpi_define.h`
 6. Set protocol default ports in `ndpi_init_protocol_defaults` in: `src/lib/ndpi_main.c`
 7. Be sure to have nBPF support, cloning `PF_RING` in the same directory where you cloned `nDPI`: `git clone https://github.com/ntop/PF_RING/ && cd PF_RING/userland/nbpf && ./configure && make`. You can ignore the `/bin/sh: 1: ../lib/pfring_config: not found` error
