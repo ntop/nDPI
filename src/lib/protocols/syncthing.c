@@ -45,7 +45,7 @@ static void ndpi_search_syncthing(struct ndpi_detection_module_struct *ndpi_stru
 
   if (packet->payload_packet_len <= 4)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -56,17 +56,14 @@ static void ndpi_search_syncthing(struct ndpi_detection_module_struct *ndpi_stru
     return;
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   return;
 }
 
 void init_syncthing_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Syncthing", ndpi_struct,
-    NDPI_PROTOCOL_SYNCTHING,
-    ndpi_search_syncthing,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("Syncthing", ndpi_struct,
+                     ndpi_search_syncthing,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_SYNCTHING);
 }

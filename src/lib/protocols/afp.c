@@ -58,7 +58,7 @@ static void ndpi_search_afp(struct ndpi_detection_module_struct *ndpi_struct, st
 	as they are not an indication that this flow is not AFP	
       */
       if(flow->packet_counter > 5)
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -72,17 +72,15 @@ static void ndpi_search_afp(struct ndpi_detection_module_struct *ndpi_struct, st
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_afp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("AFP", ndpi_struct,
-				      NDPI_PROTOCOL_AFP,
-				      ndpi_search_afp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("AFP", ndpi_struct,
+                     ndpi_search_afp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_AFP);
 }
 

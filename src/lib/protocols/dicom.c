@@ -51,17 +51,16 @@ static void ndpi_search_dicom(struct ndpi_detection_module_struct *ndpi_struct,
 				 NDPI_PROTOCOL_DICOM,
 				 NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     } else
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   } else
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 /* ********************************* */
 
 void init_dicom_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("DICOM", ndpi_struct,
-				      NDPI_PROTOCOL_DICOM, ndpi_search_dicom,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("DICOM", ndpi_struct,
+                     ndpi_search_dicom,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_DICOM);
 }

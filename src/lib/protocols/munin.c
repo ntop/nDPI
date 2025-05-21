@@ -50,13 +50,13 @@ static void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
   // "# munin node at "
   if (packet->payload_packet_len < NDPI_STATICSTRING_LEN(munin_prefix))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (memcmp(packet->payload, munin_prefix, NDPI_STATICSTRING_LEN(munin_prefix)) != 0)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -81,11 +81,8 @@ static void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
   
 void init_munin_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Munin", ndpi_struct,
-				      NDPI_PROTOCOL_MUNIN,
-				      ndpi_search_munin,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK
-				      );
+  register_dissector("Munin", ndpi_struct,
+                     ndpi_search_munin,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      1, NDPI_PROTOCOL_MUNIN);
 }

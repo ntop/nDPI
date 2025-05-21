@@ -61,7 +61,7 @@ static void ndpi_search_imo(struct ndpi_detection_module_struct *ndpi_struct, st
     ndpi_int_imo_add_connection(ndpi_struct, flow);
   } else {
     if(flow->num_processed_pkts > 5)
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     else
       flow->l4.udp.imo_last_one_byte_pkt = 0;
   }
@@ -69,11 +69,9 @@ static void ndpi_search_imo(struct ndpi_detection_module_struct *ndpi_struct, st
 
 
 void init_imo_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("IMO", ndpi_struct,
-                                      NDPI_PROTOCOL_IMO,
-                                      ndpi_search_imo,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("IMO", ndpi_struct,
+                     ndpi_search_imo,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_IMO);
 }
 

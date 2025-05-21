@@ -66,15 +66,13 @@ static void ndpi_search_pathofexile(struct ndpi_detection_module_struct *ndpi_st
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_pathofexile_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("PathofExile", ndpi_struct,
-              NDPI_PROTOCOL_PATHOFEXILE,
-              ndpi_search_pathofexile,
-              NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-              SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-              ADD_TO_DETECTION_BITMASK);
+  register_dissector("PathofExile", ndpi_struct,
+                     ndpi_search_pathofexile,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_PATHOFEXILE);
 }

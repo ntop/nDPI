@@ -507,24 +507,25 @@ u_int8_t ndpi_is_subprotocol_informative(u_int16_t protoId) {
     return(0);
   }
 }
+
 /* ********************************************************************************** */
 
-void ndpi_exclude_protocol(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-                           u_int16_t protocol_id, const char *_file, const char *_func, int _line) {
-  if(ndpi_is_valid_protoId(protocol_id)) {
+void exclude_dissector(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                       u_int16_t dissector_idx, const char *_file, const char *_func, int _line) {
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
-    if(ndpi_str && ndpi_str->cfg.log_level >= NDPI_LOG_DEBUG && ndpi_str->ndpi_debug_printf != NULL) {
-      (*(ndpi_str->ndpi_debug_printf))(protocol_id, ndpi_str, NDPI_LOG_DEBUG, _file, _func, _line, "exclude %s\n",
-				       ndpi_get_proto_name(ndpi_str, protocol_id));
-    }
-#else
-    (void)ndpi_str;
-    (void)_file;
-    (void)_func;
-    (void)_line;
-#endif
-    NDPI_DISSECTOR_BITMASK_SET(flow->excluded_dissectors_bitmask, ndpi_str->proto_defaults[protocol_id].dissector_idx);
+  /* TODO */
+  if(ndpi_str->cfg.log_level >= NDPI_LOG_DEBUG && ndpi_str->ndpi_debug_printf != NULL) {
+    (*(ndpi_str->ndpi_debug_printf))(ndpi_str->callback_buffer[dissector_idx].first_protocol_id,
+                                     ndpi_str, NDPI_LOG_DEBUG, _file, _func, _line, "exclude %s\n",
+                                     ndpi_str->callback_buffer[dissector_idx].name);
   }
+#else
+  (void)ndpi_str;
+  (void)_file;
+  (void)_func;
+  (void)_line;
+#endif
+  NDPI_DISSECTOR_BITMASK_SET(flow->excluded_dissectors_bitmask, dissector_idx);
 }
 
 /* ********************************************************************************** */
@@ -5724,14 +5725,14 @@ int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *
 
 /* ******************************************************************** */
 
-void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_module_struct *ndpi_str,
-                                         u_int16_t ndpi_protocol_id,
-                                         void (*func)(struct ndpi_detection_module_struct *,
-                                                      struct ndpi_flow_struct *flow),
-                                         const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
-                                         u_int8_t b_save_bitmask_unknow, u_int8_t b_add_detection_bitmask) {
-  (void)label;
-
+void register_dissector(char *dissector_name, struct ndpi_detection_module_struct *ndpi_str,
+                        void (*func)(struct ndpi_detection_module_struct *,
+                                     struct ndpi_flow_struct *flow),
+                        const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
+                        int num_protocol_ids, ...)
+{
+  va_list ap;
+  int i, dissector_enabled = 0, first_protocol_id = -1;
   u_int32_t idx = ndpi_str->callback_buffer_num;
 
   if(idx >= NDPI_MAX_NUM_DISSECTORS) {
@@ -5746,46 +5747,48 @@ void ndpi_set_bitmask_protocol_detection(char *label, struct ndpi_detection_modu
     return;
   }
 
-  if(is_proto_enabled(ndpi_str, ndpi_protocol_id)) {
-    NDPI_LOG_DBG2(ndpi_str,
-		  "[NDPI] ndpi_set_bitmask_protocol_detection: %s : [callback_buffer] idx= %u, [proto_defaults] "
-		  "protocol_id=%u\n",
-		  label, idx, ndpi_protocol_id);
-
-    if(ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx != 0) {
-      NDPI_LOG_DBG2(ndpi_str, "[NDPI] Internal error: protocol %s/%u has been already registered\n", label,
-		    ndpi_protocol_id);
+  va_start(ap, num_protocol_ids);
+  for(i = 0; i < num_protocol_ids; i++) {
+    int ndpi_protocol_id = va_arg(ap, int);
+    if(!is_proto_enabled(ndpi_str, ndpi_protocol_id)) {
+      NDPI_LOG_DBG(ndpi_str, "Protocol %d not enabled for dissector %s\n",
+                   ndpi_protocol_id, dissector_name);
     } else {
-      NDPI_LOG_DBG2(ndpi_str, "[NDPI] Adding %s with protocol id %d\n", label, ndpi_protocol_id);
+
+      if(ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx != 0) {
+        NDPI_LOG_ERR(ndpi_str, "Internal error: protocol %d/%s has been already registered (%d/%d)\n",
+                     ndpi_protocol_id, dissector_name,
+                     ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx,
+                     idx);
+        /* TODO */
+      } else {
+
+        if(first_protocol_id == -1)
+          first_protocol_id = ndpi_protocol_id;
+
+        ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx = idx;
+        ndpi_str->proto_defaults[ndpi_protocol_id].func = func;
+      }
+      dissector_enabled = 1;
     }
-
-    /*
-      Set function and index protocol within proto_default structure for port protocol detection
-      and callback_buffer function for DPI protocol detection
-    */
-    ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx = idx;
-    ndpi_str->proto_defaults[ndpi_protocol_id].func = ndpi_str->callback_buffer[idx].func = func;
-    ndpi_str->callback_buffer[idx].dissector_idx = idx;
-
-    /*
-      Set ndpi_selection_bitmask for protocol
-    */
-    ndpi_str->callback_buffer[idx].ndpi_selection_bitmask = ndpi_selection_bitmask;
-
-    /*
-      Reset protocol detection bitmask via NDPI_PROTOCOL_UNKNOWN and than add specify protocol bitmast to callback
-      buffer.
-    */
-    if(b_save_bitmask_unknow)
-      NDPI_SAVE_AS_BITMASK(ndpi_str->callback_buffer[idx].detection_bitmask, NDPI_PROTOCOL_UNKNOWN);
-    if(b_add_detection_bitmask)
-      NDPI_ADD_PROTOCOL_TO_BITMASK(ndpi_str->callback_buffer[idx].detection_bitmask, ndpi_protocol_id);
-
-  } else {
-    NDPI_LOG_DBG(ndpi_str, "[NDPI] Protocol %s/%u disabled\n", label, ndpi_protocol_id);
   }
+  va_end(ap);
 
-  ndpi_str->callback_buffer_num++;
+  if(dissector_enabled) {
+    NDPI_LOG_DBG2(ndpi_str, "Dissector %s enabled. Registering %d...\n", dissector_name, idx);
+
+    memcpy(ndpi_str->callback_buffer[idx].name, dissector_name,
+           ndpi_min(sizeof(ndpi_str->callback_buffer[idx].name) - 1, strlen(dissector_name)));
+    ndpi_str->callback_buffer[idx].func = func;
+    ndpi_str->callback_buffer[idx].dissector_idx = idx;
+    ndpi_str->callback_buffer[idx].ndpi_selection_bitmask = ndpi_selection_bitmask;
+    ndpi_str->callback_buffer[idx].first_protocol_id = first_protocol_id; /* Just for logging */
+
+    ndpi_str->callback_buffer_num++;
+  } else {
+    NDPI_LOG_DBG(ndpi_str, "Dissector %s disabled\n", dissector_name);
+  }
+  return;
 }
 
 /* ******************************************************************** */
@@ -6584,7 +6587,7 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   ndpi_enabled_callbacks_init(ndpi_str, 0);
 
-  NDPI_LOG_DBG(ndpi_str, "Tot num dissectors: %d (TCP: %d, TCP_NO_PAYLOAD: %d, UDP: %d, NO_TCP_UDP: %d\n",
+  NDPI_LOG_DBG(ndpi_str, "Tot num dissectors: %d (TCP: %d, TCP_NO_PAYLOAD: %d, UDP: %d, NO_TCP_UDP: %d)\n",
                ndpi_str->callback_buffer_size,
                ndpi_str->callback_buffer_size_tcp_payload,
                ndpi_str->callback_buffer_size_tcp_no_payload,
@@ -7736,7 +7739,6 @@ static void ndpi_connection_tracking(struct ndpi_detection_module_struct *ndpi_s
 static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * const ndpi_str,
                                          struct ndpi_flow_struct * const flow,
                                          NDPI_SELECTION_BITMASK_PROTOCOL_SIZE const ndpi_selection_packet,
-                                         NDPI_PROTOCOL_BITMASK detection_bitmask,
                                          u_int16_t detected_protocol)
 {
   u_int32_t num_calls = 0, a;
@@ -7757,9 +7759,8 @@ static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * c
 
     if((ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask & ndpi_selection_packet) ==
        ndpi_str->callback_buffer[subproto_index].ndpi_selection_bitmask &&
-       !NDPI_DISSECTOR_BITMASK_IS_SET(flow->excluded_dissectors_bitmask, subproto_index) &&
-       NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer[subproto_index].detection_bitmask,
-			    detection_bitmask) != 0) {
+       !NDPI_DISSECTOR_BITMASK_IS_SET(flow->excluded_dissectors_bitmask, subproto_index)) {
+      ndpi_str->current_dissector_idx = subproto_index;
       ndpi_str->callback_buffer[subproto_index].func(ndpi_str, flow);
       num_calls++;
     }
@@ -7781,17 +7782,15 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
      if we don't already have a partial classification */
   u_int16_t fast_callback_protocol_id = flow->fast_callback_protocol_id ? flow->fast_callback_protocol_id : flow->guessed_protocol_id;
   u_int16_t dissector_idx = ndpi_str->proto_defaults[fast_callback_protocol_id].dissector_idx;
-  NDPI_PROTOCOL_BITMASK detection_bitmask;
   u_int32_t a;
-
-  NDPI_SAVE_AS_BITMASK(detection_bitmask, flow->detected_protocol_stack[0]);
 
   if(fast_callback_protocol_id != NDPI_PROTOCOL_UNKNOWN &&
      ndpi_str->proto_defaults[fast_callback_protocol_id].func &&
      !NDPI_DISSECTOR_BITMASK_IS_SET(flow->excluded_dissectors_bitmask, dissector_idx) &&
      (ndpi_str->callback_buffer[dissector_idx].ndpi_selection_bitmask & ndpi_selection_packet) ==
-     ndpi_str->callback_buffer[dissector_idx].ndpi_selection_bitmask &&
-     NDPI_BITMASK_COMPARE(ndpi_str->callback_buffer[dissector_idx].detection_bitmask, detection_bitmask) != 0) {
+     ndpi_str->callback_buffer[dissector_idx].ndpi_selection_bitmask) {
+
+    ndpi_str->current_dissector_idx = dissector_idx;
     ndpi_str->proto_defaults[fast_callback_protocol_id].func(ndpi_str, flow);
     func = ndpi_str->proto_defaults[fast_callback_protocol_id].func;
     num_calls++;
@@ -7807,10 +7806,9 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
         if((func != callback_buffer[a].func) &&
 	   (callback_buffer[a].ndpi_selection_bitmask & ndpi_selection_packet) ==
 	   callback_buffer[a].ndpi_selection_bitmask &&
-	   !NDPI_DISSECTOR_BITMASK_IS_SET(flow->excluded_dissectors_bitmask, dissector_idx) &&
-	   NDPI_BITMASK_COMPARE(callback_buffer[a].detection_bitmask,
-				detection_bitmask) != 0)
+	   !NDPI_DISSECTOR_BITMASK_IS_SET(flow->excluded_dissectors_bitmask, dissector_idx))
 	  {
+            ndpi_str->current_dissector_idx = dissector_idx;
 	    callback_buffer[a].func(ndpi_str, flow);
 	    num_calls++;
 
@@ -7822,9 +7820,9 @@ static u_int32_t check_ndpi_detection_func(struct ndpi_detection_module_struct *
       }
     }
 
-  num_calls += check_ndpi_subprotocols(ndpi_str, flow, ndpi_selection_packet, detection_bitmask,
+  num_calls += check_ndpi_subprotocols(ndpi_str, flow, ndpi_selection_packet,
                                        flow->detected_protocol_stack[0]);
-  num_calls += check_ndpi_subprotocols(ndpi_str, flow, ndpi_selection_packet, detection_bitmask,
+  num_calls += check_ndpi_subprotocols(ndpi_str, flow, ndpi_selection_packet,
                                        flow->detected_protocol_stack[1]);
 
   return num_calls;

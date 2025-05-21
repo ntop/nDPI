@@ -79,7 +79,7 @@ static void exclude_proto(struct ndpi_detection_module_struct *ndpi_struct,
        other protocols too. Keep the generic classification, for the time being */
     ndpi_int_raknet_add_connection(ndpi_struct, flow);
   } else {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }
 
@@ -393,10 +393,8 @@ static void ndpi_search_raknet(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_raknet_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("RakNet", ndpi_struct,
-				      NDPI_PROTOCOL_RAKNET,
-				      ndpi_search_raknet,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("RakNet", ndpi_struct,
+                     ndpi_search_raknet,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_RAKNET);
 }

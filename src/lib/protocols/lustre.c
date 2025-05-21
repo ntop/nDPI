@@ -74,15 +74,13 @@ static void ndpi_search_lustre(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_lustre_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Lustre", ndpi_struct,
-				      NDPI_PROTOCOL_LUSTRE,
-				      ndpi_search_lustre,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION /* Ipv4 only; Lustre doesn't support IPv6 */,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Lustre", ndpi_struct,
+                     ndpi_search_lustre,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION, /* Ipv4 only; Lustre doesn't support IPv6 */
+                      1, NDPI_PROTOCOL_LUSTRE);
 }

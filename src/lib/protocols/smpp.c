@@ -48,7 +48,7 @@ static void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struc
   if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SMPP){
     // min SMPP packet length = 16 bytes
     if (packet->payload_packet_len < 16) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
     // get PDU length
@@ -60,7 +60,7 @@ static void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struc
 
     // if PDU size was invalid, try the following TCP segments, 3 attempts max
     if(flow->packet_counter > 3) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
     // verify PDU length
@@ -100,7 +100,7 @@ static void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struc
     u_int32_t pdu_type = ntohl(get_u_int32_t(packet->payload, 4));
     // first byte of PDU type is either 0x00 of 0x80
     if(!(packet->payload[4] == 0x00 || packet->payload[4] == 0x80)) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
     // remove 0x80, get request type pdu
@@ -305,17 +305,15 @@ static void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struc
       }
     }
 
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }
 
 
 void init_smpp_dissector(struct ndpi_detection_module_struct* ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("SMPP", ndpi_struct,
-				      NDPI_PROTOCOL_SMPP,
-				      ndpi_search_smpp_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("SMPP", ndpi_struct,
+                     ndpi_search_smpp_tcp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_SMPP);
 }

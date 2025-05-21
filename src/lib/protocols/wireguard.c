@@ -82,14 +82,14 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
    * Note that handshake packets have a slightly different structure, but they are larger.
    */
   if (packet->payload_packet_len < 32) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
   /*
    * The next three bytes after the message type are reserved and set to zero.
    */
   if (payload[1] != 0 || payload[2] != 0 || payload[3] != 0) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -145,7 +145,7 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
         else
           ndpi_int_wireguard_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
       } else {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
     }
     /* need more packets before deciding */
@@ -161,7 +161,7 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
       if (receiver_index == flow->l4.udp.wireguard_peer_index[1 - packet->packet_direction]) {
         ndpi_int_wireguard_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
       } else {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
     }
     /* need more packets before deciding */
@@ -189,21 +189,19 @@ static void ndpi_search_wireguard(struct ndpi_detection_module_struct *ndpi_stru
       if (receiver_index == flow->l4.udp.wireguard_peer_index[packet->packet_direction]) {
         ndpi_int_wireguard_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN);
       } else {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
     }
     /* need more packets before deciding */
   } else {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }
 
 void init_wireguard_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("WireGuard", ndpi_struct,
-				      NDPI_PROTOCOL_WIREGUARD,
-				      ndpi_search_wireguard,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("WireGuard", ndpi_struct,
+                     ndpi_search_wireguard,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_WIREGUARD);
 }

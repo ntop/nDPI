@@ -492,8 +492,8 @@ static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct*
     ndpi_protocol ret = { { __get_master(ndpi_struct, flow), NDPI_PROTOCOL_UNKNOWN }, NDPI_PROTOCOL_UNKNOWN /* unused */, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
     flow->category = ndpi_get_proto_category(ndpi_struct, ret);
   }
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow); /* Not necessary in extra-dissection data path,
-                                            but we need it with the plain heuristic */
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow); /* Not necessary in extra-dissection data path,
+                                                but we need it with the plain heuristic */
   return 0; /* Stop */
 }
 
@@ -3426,17 +3426,17 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
   if(flow->tls_quic.obfuscated_heur_state) {
     tls_obfuscated_heur_search_again(ndpi_struct, flow);
   } else if(rc == 0) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }
 
 /* **************************************** */
 
 void init_tls_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("TLS", ndpi_struct,
-				      NDPI_PROTOCOL_TLS,
-				      ndpi_search_tls_wrapper,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("(D)TLS", ndpi_struct,
+                     ndpi_search_tls_wrapper,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     2,
+                     NDPI_PROTOCOL_TLS,
+                     NDPI_PROTOCOL_DTLS);
 }

@@ -48,15 +48,13 @@ static void ndpi_search_cpha(struct ndpi_detection_module_struct *ndpi_struct, s
      ) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CPHA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   } else
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);      
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);      
 }
 
 
 void init_cpha_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("CPHA", ndpi_struct,
-				      NDPI_PROTOCOL_CPHA,
-				      ndpi_search_cpha,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD, /* TODO: ipv6 support? */
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("CPHA", ndpi_struct,
+                     ndpi_search_cpha,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD, /* TODO: ipv6 support? */
+                     1, NDPI_PROTOCOL_CPHA);
 }

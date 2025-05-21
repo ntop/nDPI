@@ -85,18 +85,9 @@
 
 #define NDPI_SELECTION_BITMASK_PROTOCOL_SIZE			u_int32_t
 
-/**
- * convenience macro to check for excluded protocol
- * a protocol is excluded if the flow is known and either the protocol is not detected at all
- * or the excluded bitmask contains the protocol
- */
-#define NDPI_FLOW_PROTOCOL_EXCLUDED(ndpi_struct,flow,protocol) ((flow) != NULL && \
-								( NDPI_COMPARE_PROTOCOL_TO_BITMASK((ndpi_struct)->detection_bitmask, (protocol)) == 0 || \
-								  NDPI_COMPARE_PROTOCOL_TO_BITMASK((flow)->excluded_protocol_bitmask, (protocol)) != 0 ) )
-
 #define MAX_DEFAULT_PORTS                                        5
 
-#define NDPI_EXCLUDE_PROTO(mod,flow) ndpi_exclude_protocol(mod, flow, NDPI_CURRENT_PROTO, __FILE__, __FUNCTION__, __LINE__)
+#define NDPI_EXCLUDE_DISSECTOR(mod,flow) exclude_dissector(mod, flow, mod->current_dissector_idx, __FILE__, __FUNCTION__, __LINE__)
 
 /**
  * macro for getting the string len of a static string
@@ -138,9 +129,11 @@
 #define NDPI_ISSET_BIT(num, n)  (num & (1ULL << ( n )))
 #define NDPI_ZERO_BIT(num)      num = 0
 
+#define NDPI_MAX_NUM_DISSECTORS                 288      /* Multiple of 32, i.e. NDPI_BITS */
+#define NDPI_NUM_FDS_BITS_DISSECTORS            howmanybits(NDPI_MAX_NUM_DISSECTORS, NDPI_BITS)
 #define NDPI_DISSECTOR_BITMASK                  ndpi_dissector_bitmask_struct_t
 #define NDPI_DISSECTOR_BITMASK_IS_SET(p, n)     NDPI_ISSET(&(p), (n))
-#define NDPI_DISSECTOR_BITMASK_SET(p, n)        NDPI_SET(&(p), (n) & NDPI_NUM_BITS_MASK)
+#define NDPI_DISSECTOR_BITMASK_SET(p, n)        NDPI_SET(&(p), (n))
 
 /* this is a very very tricky macro *g*,
  * the compiler will remove all shifts here if the protocol is static...

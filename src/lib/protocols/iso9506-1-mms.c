@@ -68,16 +68,14 @@ static void ndpi_search_iso9506_1_mms(struct ndpi_detection_module_struct *ndpi_
   }
 
   if (flow->packet_direction_counter[packet->packet_direction] > 2) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }
 
 void init_iso9506_1_mms_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("ISO9506-1-MMS", ndpi_struct,
-				      NDPI_PROTOCOL_ISO9506_1_MMS,
-				      ndpi_search_iso9506_1_mms,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("ISO9506-1-MMS", ndpi_struct,
+                     ndpi_search_iso9506_1_mms,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_ISO9506_1_MMS);
 }

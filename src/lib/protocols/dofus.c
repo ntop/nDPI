@@ -129,7 +129,7 @@ static void ndpi_search_dofus(struct ndpi_detection_module_struct *ndpi_struct, 
     }
   }
 exclude:
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   return;
 
 maybe_dofus:
@@ -141,11 +141,9 @@ maybe_dofus:
 
 void init_dofus_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Dofus", ndpi_struct,
-				      NDPI_PROTOCOL_DOFUS,
-				      ndpi_search_dofus,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Dofus", ndpi_struct,
+                     ndpi_search_dofus,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_DOFUS);
 }
 

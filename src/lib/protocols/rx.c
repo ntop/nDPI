@@ -88,7 +88,7 @@ static void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* Check that packet is long enough */
   if (payload_len < sizeof(struct ndpi_rx_header)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
   
@@ -111,7 +111,7 @@ static void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   
   /* TYPE field */
   if((header->type < RX_DATA) || (header->type > RX_VERS)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -164,11 +164,11 @@ static void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
       case RX_VERS:
 	goto security;
       default:
-	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 	return;
     } // switch
   } else { // FLAG
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -176,7 +176,7 @@ static void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   /* SECURITY field */
   if(header->security > 3)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
   
@@ -194,7 +194,7 @@ static void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
     /* https://www.central.org/frameless/numbers/rxservice.html. */
     else
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   } else {
@@ -214,11 +214,9 @@ static void ndpi_search_rx(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_rx_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("RX", ndpi_struct,
-				      NDPI_PROTOCOL_RX,
-				      ndpi_search_rx,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("RX", ndpi_struct,
+                     ndpi_search_rx,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_RX);
 }
 

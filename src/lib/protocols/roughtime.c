@@ -77,7 +77,7 @@ static void ndpi_search_roughtime(struct ndpi_detection_module_struct *ndpi_stru
 
   if (packet->payload_packet_len < 4)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -88,7 +88,7 @@ static void ndpi_search_roughtime(struct ndpi_detection_module_struct *ndpi_stru
   if (number_of_tags < 1 || packet->payload_packet_len < minimum_length ||
       number_of_tags > NDPI_ARRAY_LENGTH(valid_tags))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -96,7 +96,7 @@ static void ndpi_search_roughtime(struct ndpi_detection_module_struct *ndpi_stru
     u_int32_t tag_offset = le32toh(get_u_int32_t(packet->payload, 4 + (number_of_tags - 2) * 4));
     if (packet->payload_packet_len < 4 + (number_of_tags - 1) * 4 + tag_offset)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   }
@@ -116,7 +116,7 @@ static void ndpi_search_roughtime(struct ndpi_detection_module_struct *ndpi_stru
     }
     if (j == NDPI_ARRAY_LENGTH(valid_tags))
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   }
@@ -126,11 +126,8 @@ static void ndpi_search_roughtime(struct ndpi_detection_module_struct *ndpi_stru
 
 void init_roughtime_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Roughtime", ndpi_struct,
-    NDPI_PROTOCOL_ROUGHTIME,
-    ndpi_search_roughtime,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("Roughtime", ndpi_struct,
+                     ndpi_search_roughtime,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_ROUGHTIME);
 }

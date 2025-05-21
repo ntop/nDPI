@@ -52,7 +52,7 @@ static void ndpi_search_checkmk(struct ndpi_detection_module_struct *ndpi_struct
 	as they are not an indication that this flow is not AFP
       */
       if(flow->packet_counter > 6)
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -69,16 +69,14 @@ static void ndpi_search_checkmk(struct ndpi_detection_module_struct *ndpi_struct
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_checkmk_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("CHECKMK", ndpi_struct,
-				      NDPI_PROTOCOL_CHECKMK,
-				      ndpi_search_checkmk,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("CHECKMK", ndpi_struct,
+                     ndpi_search_checkmk,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_CHECKMK);
 }

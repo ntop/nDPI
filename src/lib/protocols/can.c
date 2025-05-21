@@ -54,13 +54,13 @@ static void ndpi_search_can(struct ndpi_detection_module_struct *ndpi_struct,
 
   u_int64_t const signature = 0x49534f3131383938; // "ISO11898"
   if (packet->payload_packet_len < sizeof(struct can_hdr)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   struct can_hdr const * const can_header = (struct can_hdr *)packet->payload;
   if (ndpi_ntohll(can_header->signature) != signature) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -73,10 +73,8 @@ static void ndpi_search_can(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_can_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Controller_Area_Network", ndpi_struct,
-                                      NDPI_PROTOCOL_CAN,
-                                      ndpi_search_can,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Controller_Area_Network", ndpi_struct,
+                     ndpi_search_can,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_CAN);
 }

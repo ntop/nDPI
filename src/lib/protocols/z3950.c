@@ -94,7 +94,7 @@ static void ndpi_search_z3950(struct ndpi_detection_module_struct *ndpi_struct,
     int ret = z3950_parse_sequences(packet, minimum_expected_sequences);
 
     if(ret < 0) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -107,24 +107,21 @@ static void ndpi_search_z3950(struct ndpi_detection_module_struct *ndpi_struct,
       if(flow->packet_direction_counter[0] && flow->packet_direction_counter[1])
 	ndpi_int_z3950_add_connection(ndpi_struct, flow);
       else
-	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);  /* Skip if unidirectional traffic */
+	NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);  /* Skip if unidirectional traffic */
     } else
       flow->l4.tcp.z3950_stage++;
 
     return;
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 /* ***************************************************************** */
 
 void init_z3950_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("Z3950",
-                                      ndpi_struct,
-                                      NDPI_PROTOCOL_Z3950,
-                                      ndpi_search_z3950,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Z3950", ndpi_struct,
+                     ndpi_search_z3950,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_Z3950);
 }

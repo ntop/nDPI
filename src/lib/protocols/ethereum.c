@@ -86,7 +86,7 @@ static void ndpi_search_ethereum_udp(struct ndpi_detection_module_struct *ndpi_s
       return;
     }
   }
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 /* ************************************************************************** */
@@ -132,7 +132,7 @@ static void ndpi_search_ethereum_tcp(struct ndpi_detection_module_struct *ndpi_s
     } 
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 /* ************************************************************************** */
@@ -151,11 +151,9 @@ static void ndpi_search_ethereum(struct ndpi_detection_module_struct *ndpi_struc
 
 void init_ethereum_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Ethereum", ndpi_struct,
-				      NDPI_PROTOCOL_ETHEREUM,
-				      ndpi_search_ethereum,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Ethereum", ndpi_struct,
+                     ndpi_search_ethereum,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_ETHEREUM);
 }
 

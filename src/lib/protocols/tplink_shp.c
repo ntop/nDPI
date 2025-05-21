@@ -57,7 +57,7 @@ static void ndpi_search_tplink_shp(struct ndpi_detection_module_struct *ndpi_str
 
   if (packet->payload_packet_len - offset < _TPLSHP_MIN_LEN)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -72,7 +72,7 @@ static void ndpi_search_tplink_shp(struct ndpi_detection_module_struct *ndpi_str
 
   if (b[0] != '{' || (b[1] != '}' && b[1] != '"'))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -83,11 +83,8 @@ static void ndpi_search_tplink_shp(struct ndpi_detection_module_struct *ndpi_str
   
 void init_tplink_shp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("TPLINK SHP", ndpi_struct,
-                                      NDPI_PROTOCOL_TPLINK_SHP,
-                                      ndpi_search_tplink_shp,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK
-                                     );
+  register_dissector("TPLINK SHP", ndpi_struct,
+                     ndpi_search_tplink_shp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_TPLINK_SHP);
 }

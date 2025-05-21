@@ -73,15 +73,13 @@ static void ndpi_search_netease(struct ndpi_detection_module_struct *ndpi_struct
 
   /* TODO: add more NetEase Games signatures */
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_netease_games_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("NetEaseGames", ndpi_struct,
-                                      NDPI_PROTOCOL_NETEASE_GAMES,
-                                      ndpi_search_netease,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("NetEaseGames", ndpi_struct,
+                     ndpi_search_netease,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_NETEASE_GAMES);
 }

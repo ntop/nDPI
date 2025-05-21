@@ -45,7 +45,7 @@ static void ndpi_search_viber(struct ndpi_detection_module_struct *ndpi_struct, 
   if(packet->udp && packet->iph) {
     /* ignore broadcast as this isn't viber */
     if((packet->iph->saddr == 0xFFFFFFFF) || (packet->iph->daddr == 0xFFFFFFFF)) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   }
@@ -71,7 +71,7 @@ static void ndpi_search_viber(struct ndpi_detection_module_struct *ndpi_struct, 
       }
     }
 
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -89,22 +89,20 @@ static void ndpi_search_viber(struct ndpi_detection_module_struct *ndpi_struct, 
       return;
     }
 
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if(flow->packet_counter > 3)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_viber_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Viber", ndpi_struct,
-				      NDPI_PROTOCOL_VIBER,
-				      ndpi_search_viber,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Viber", ndpi_struct,
+                     ndpi_search_viber,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_VIBER);
 }
 

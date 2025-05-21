@@ -401,7 +401,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->tcp != NULL) {
     if (payload_len < 2) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
     payload += 2; /* Skip the length field */
@@ -417,7 +417,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->packet_counter > 3 &&
      flow->rtp_stage == 0 &&
      flow->rtcp_stage == 0) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -438,7 +438,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
         NDPI_LOG_DBG(ndpi_struct, "Same seq on consecutive pkts\n");
         flow->rtp_stage = 0;
         flow->rtcp_stage = 0;
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       } else {
         get_rtp_info(ndpi_struct, flow, payload, payload_len);
         rtp_get_stream_type(flow->rtp[packet->packet_direction].payload_type,
@@ -473,7 +473,7 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
          !is_dtls(packet->payload, packet->payload_packet_len, &unused)) {
         flow->rtp_stage = 0;
         flow->rtcp_stage = 0;
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
     }
   }
@@ -495,13 +495,13 @@ static void ndpi_search_rtp_tcp(struct ndpi_detection_module_struct *ndpi_struct
   const u_int8_t *payload = packet->payload;
 
   if(packet->payload_packet_len < 4){ /* (2) len field + (2) min rtp/rtcp*/
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   u_int16_t len = ntohs(get_u_int16_t(payload, 0));
   if(len + sizeof(len) != packet->payload_packet_len) { /*fragmented packets are not handled*/
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   } else {
     ndpi_rtp_search(ndpi_struct, flow);
   }
@@ -524,7 +524,7 @@ static void ndpi_search_rtp_udp(struct ndpi_detection_module_struct *ndpi_struct
      || (dest == 5353  /* MDNS_PORT */)
      || (dest == 9600  /* FINS_PORT */)
      || (dest <= 1023)){
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
   ndpi_rtp_search(ndpi_struct, flow);
@@ -544,10 +544,8 @@ static void ndpi_search_rtp(struct ndpi_detection_module_struct *ndpi_struct, st
 /* *************************************************************** */
 
 void init_rtp_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("RTP", ndpi_struct,
-				      NDPI_PROTOCOL_RTP,
-				      ndpi_search_rtp,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("RT(C)P", ndpi_struct,
+                     ndpi_search_rtp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     2, NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_RTCP);
 }

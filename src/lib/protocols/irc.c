@@ -99,7 +99,7 @@ static void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct
   NDPI_LOG_DBG(ndpi_struct, "search irc\n");
   if((flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC && (flow->packet_counter > 10))
      || (flow->packet_counter >= 10)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -226,11 +226,9 @@ static void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
 void init_irc_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("IRC", ndpi_struct,
-				      NDPI_PROTOCOL_IRC,
-				      ndpi_search_irc_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("IRC", ndpi_struct,
+                     ndpi_search_irc_tcp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_IRC);
 }
 

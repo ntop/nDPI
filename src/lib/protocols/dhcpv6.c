@@ -53,16 +53,14 @@ static void ndpi_search_dhcpv6_udp(struct ndpi_detection_module_struct *ndpi_str
 		return;
 	}
 
-	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_dhcpv6_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("DHCPV6", ndpi_struct,
-				      NDPI_PROTOCOL_DHCPV6,
-				      ndpi_search_dhcpv6_udp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("DHCPV6", ndpi_struct,
+                     ndpi_search_dhcpv6_udp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_DHCPV6);
 }

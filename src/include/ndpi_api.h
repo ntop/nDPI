@@ -36,11 +36,6 @@ extern "C" {
 #define NDPI_DETECTION_ONLY_IPV4              ( 1 << 0 )
 #define NDPI_DETECTION_ONLY_IPV6              ( 1 << 1 )
 
-#define ADD_TO_DETECTION_BITMASK              1
-#define NO_ADD_TO_DETECTION_BITMASK           0
-#define SAVE_DETECTION_BITMASK_AS_UNKNOWN     1
-#define NO_SAVE_DETECTION_BITMASK_AS_UNKNOWN  0
-
   /*
     In case a custom DGA function is used, the fucntion
     below must be overwritten,
@@ -487,18 +482,6 @@ extern "C" {
   void ndpi_check_subprotocol_risk(struct ndpi_detection_module_struct *ndpi_str,
 				 struct ndpi_flow_struct *flow, u_int16_t subprotocol_id);
 
-  /**
-   * Exclude protocol from search
-   *
-   * @par    ndpi_struct         = the detection module
-   * @par    flow                = the flow where match the host
-   * @par    master_protocol_id  = value of the ID associated to the master protocol detected
-   *
-   */
-  void ndpi_exclude_protocol(struct ndpi_detection_module_struct *ndpi_struct,
-			     struct ndpi_flow_struct *flow,
-			     u_int16_t master_protocol_id,
-			     const char *_file, const char *_func,int _line);
   /**
    * Check if the string -bigram_to_match- match with a bigram of -automa-
    *

@@ -61,7 +61,7 @@ static void ndpi_search_raft(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (packet->payload_packet_len < sizeof(*raft_header))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -77,7 +77,7 @@ static void ndpi_search_raft(struct ndpi_detection_module_struct *ndpi_struct,
       break;
 
     default:
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
   }
 
@@ -98,11 +98,9 @@ static void ndpi_search_raft(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_raft_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Raft", ndpi_struct,
-                                      NDPI_PROTOCOL_RAFT,
-                                      ndpi_search_raft,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Raft", ndpi_struct,
+                     ndpi_search_raft,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_RAFT);
 }
 

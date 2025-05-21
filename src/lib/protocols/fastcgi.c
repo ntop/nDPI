@@ -160,7 +160,7 @@ static void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct
 
   if (packet->payload_packet_len < sizeof(struct FCGI_Header))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -168,21 +168,21 @@ static void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct
 
   if (fcgi_hdr->version != 0x01)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   fcgi_type = (enum FCGI_Type)fcgi_hdr->type;
   if (fcgi_type < FCGI_MIN || fcgi_type > FCGI_MAX)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   content_len = ntohs(fcgi_hdr->contentLength);
   if (packet->payload_packet_len != sizeof(*fcgi_hdr) + content_len + fcgi_hdr->paddingLength)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -237,11 +237,8 @@ static int ndpi_search_fastcgi_extra(struct ndpi_detection_module_struct * ndpi_
 
 void init_fastcgi_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("FastCGI", ndpi_struct,
-    NDPI_PROTOCOL_FASTCGI,
-    ndpi_search_fastcgi,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("FastCGI", ndpi_struct,
+                     ndpi_search_fastcgi,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_FASTCGI);
 }

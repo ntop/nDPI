@@ -63,17 +63,14 @@ static void ndpi_search_riotgames(struct ndpi_detection_module_struct *ndpi_stru
    * Please add new patterns for games made by RiotGames here
    */
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   return;
 }
 
 void init_riotgames_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("RiotGames", ndpi_struct,
-    NDPI_PROTOCOL_RIOTGAMES,
-    ndpi_search_riotgames,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("RiotGames", ndpi_struct,
+                     ndpi_search_riotgames,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_RIOTGAMES);
 }

@@ -142,7 +142,7 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
   if (packet->payload_packet_len < 4 /* min. header size */ ||
       get_u_int8_t(packet->payload, 0) != 0x00)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -156,7 +156,7 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
 
         if (packet->payload[packet->payload_packet_len - 1] != 0x00 /* last pdu element is a nul terminated string */)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
           return;
         }
 
@@ -170,19 +170,19 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
           /* Exclude the flow as TFPT if there was no filename and mode in the first two strings. */
           if (filename_len == 0 || ndpi_is_printable_buffer((uint8_t *)filename_start, filename_len) == 0)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
           }
 
           if (tftp_dissect_mode(packet, &offset) != 0)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
           }
 
           if (tftp_dissect_options(packet, &offset) != 0)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
           }
 
@@ -201,7 +201,7 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
         /* Data (DATA) */
         if (packet->payload_packet_len <= 4 /* min DATA header size */)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
           return;
         }
         /* First 2 bytes were opcode so next 16 bits are the block number.
@@ -220,7 +220,7 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
 
         if (packet->payload_packet_len != 4 /* ACK has a fixed packet size */)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
           return;
         }
         /* First 2 bytes were opcode so next 16 bits are the block number.
@@ -241,7 +241,7 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
             packet->payload[packet->payload_packet_len - 1] != 0x00 ||
             packet->payload[2] != 0x00 || packet->payload[3] > 0x07)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
           return;
         }
         break;
@@ -254,7 +254,7 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
 
           if (tftp_dissect_options(packet, &offset) != 0)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
           }
         }
@@ -265,7 +265,7 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
         break;
 
     default:
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
   }
 
@@ -283,11 +283,9 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_tftp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("TFTP", ndpi_struct,
-				      NDPI_PROTOCOL_TFTP,
-				      ndpi_search_tftp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("TFTP", ndpi_struct,
+                     ndpi_search_tftp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_TFTP);
 }
 
