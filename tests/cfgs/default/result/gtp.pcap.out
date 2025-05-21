@@ -1,0 +1,32 @@
+DPI Packets (UDP):	6	(1.00 pkts/flow)
+Confidence DPI              : 6 (flows)
+Num dissector calls: 6 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   12/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+GTP_U	7	438	6
+
+Acceptable                       7 438           6            
+
+	1	UDP 10.132.109.23:2152 <-> 10.238.71.40:2152 [VLAN: 808][proto: 152.271/GTP.GTP_U][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 152.271/GTP.GTP_U, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/78 bytes <-> 1 pkts/60 bytes][Goodput ratio: 41/13][585.72 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.132.76.6:2152 -> 10.238.71.40:2152 [VLAN: 808][proto: 152.271/GTP.GTP_U][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 152.271/GTP.GTP_U, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 10.238.19.137:2152 -> 10.238.71.40:2152 [VLAN: 508][proto: 152.271/GTP.GTP_U][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 152.271/GTP.GTP_U, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 10.238.71.40:2152 -> 10.238.18.86:2152 [VLAN: 708][proto: 152.271/GTP.GTP_U][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 152.271/GTP.GTP_U, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 13/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 10.238.143.10:2152 -> 10.238.71.40:2152 [VLAN: 408][proto: 152.271/GTP.GTP_U][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 152.271/GTP.GTP_U, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 10.238.143.24:2152 -> 10.238.71.40:2152 [VLAN: 408][proto: 152.271/GTP.GTP_U][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 152.271/GTP.GTP_U, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 23/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
