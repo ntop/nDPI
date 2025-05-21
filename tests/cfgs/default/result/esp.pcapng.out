@@ -21,9 +21,10 @@ Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   4/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-IPSec	6	1856	2
+IPSec	4	1524	1
+ESP	2	332	1
 
 Safe                             6 1856          2            
 
 	1	UDP 10.2.3.2:500 <-> 10.3.4.4:500 [proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 79/IPSec, Confidence: DPI][DPI packets: 1][cat: VPN/2][2 pkts/786 bytes <-> 2 pkts/738 bytes][Goodput ratio: 89/88][0.02 sec][PLAIN TEXT (DELETE)][Plen Bins: 0,0,0,0,0,0,0,0,0,25,25,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	ESP 10.2.3.2:0 <-> 10.3.4.4:0 [proto: 79/IPSec][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 79/IPSec, Confidence: DPI][DPI packets: 1][cat: VPN/2][1 pkts/166 bytes <-> 1 pkts/166 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	ESP 10.2.3.2:0 <-> 10.3.4.4:0 [proto: 117/ESP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 117/ESP, Confidence: DPI][DPI packets: 1][cat: VPN/2][1 pkts/166 bytes <-> 1 pkts/166 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

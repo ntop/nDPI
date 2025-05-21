@@ -1,21 +1,19 @@
-Guessed flow protos:	2
-
 DPI Packets (other):	2	(1.00 pkts/flow)
-Confidence Match by port    : 2 (flows)
-Num dissector calls: 0 (0.00 diss/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/6/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/2/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/2/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
@@ -26,5 +24,5 @@ SCTP	4	340	2
 
 Acceptable                       4 340           2            
 
-	1	SCTP 10.28.6.43:0 <-> 10.28.6.44:0 [proto: 84/SCTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][1 pkts/138 bytes <-> 1 pkts/62 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: No server to client traffic / Entropy: 5.478 (Executable?)][PLAIN TEXT (MEGACO/2 )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	SCTP 10.28.6.42:0 <-> 10.28.6.44:0 [proto: 84/SCTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Network/14][1 pkts/70 bytes <-> 1 pkts/70 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	SCTP 10.28.6.43:0 <-> 10.28.6.44:0 [proto: 84/SCTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 84/SCTP, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/138 bytes <-> 1 pkts/62 bytes][Goodput ratio: 0/0][< 1 sec][PLAIN TEXT (MEGACO/2 )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	SCTP 10.28.6.42:0 <-> 10.28.6.44:0 [proto: 84/SCTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 84/SCTP, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/70 bytes <-> 1 pkts/70 bytes][Goodput ratio: 0/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

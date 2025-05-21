@@ -1,6 +1,6 @@
-DPI Packets (other):	1	(1.00 pkts/flow)
+DPI Packets (other):	2	(2.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
-Num dissector calls: 0 (0.00 diss/flow)
+Num dissector calls: 2 (2.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -27,4 +27,4 @@ Unrated                          2 200           1
 
 
 Undetected flows:
-	1	OSPF 10.1.10.10:0 <-> 10.1.10.1:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][1 pkts/122 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][2.51 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	OSPF 10.1.10.10:0 <-> 10.1.10.1:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][1 pkts/122 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][2.51 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
