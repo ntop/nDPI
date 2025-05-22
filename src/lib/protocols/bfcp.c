@@ -50,7 +50,12 @@ static void ndpi_search_bfcp(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   u_int8_t primitive = packet->payload[1];
-  if (primitive < 1 || primitive > 17) {
+  if (primitive < 1 || primitive > 18) {
+    goto not_bfcp;
+  }
+
+  u_int16_t bfcp_payload_len = packet->payload_packet_len - 12;
+  if (bfcp_payload_len != ntohs(get_u_int16_t(packet->payload, 2))) {
     goto not_bfcp;
   }
 
