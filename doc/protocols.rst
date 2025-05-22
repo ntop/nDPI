@@ -636,6 +636,15 @@ Steam is a digital distribution platform developed by Valve Corporation for game
 References: `Steam official site: <https://store.steampowered.com/>`_
 
 
+.. _Proto_75:
+
+`NDPI_PROTOCOL_MELSEC`
+======================
+MELSEC is a proprietary industrial protocol used by Mitsubishi Electric PLCs for communication and control.
+
+References: `MELSEC Communication Protocol Manual: <https://dl.mitsubishielectric.com/dl/fa/document/manual/plc/sh080008/sh080008ab.pdf>`_
+
+
 .. _Proto_76:
 
 `NDPI_PROTOCOL_WORLDOFWARCRAFT`

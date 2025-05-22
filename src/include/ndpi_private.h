@@ -1018,6 +1018,7 @@ void init_dicom_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_lagofast_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_gearup_booster_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_msdo_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_melsec_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_private.h"
