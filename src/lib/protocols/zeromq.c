@@ -24,68 +24,24 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
-static void ndpi_int_zmq_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZMQ, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-  NDPI_LOG_INFO(ndpi_struct, "found ZMQ\n");
-}
+static const u_int8_t zmtp_signature[] = { 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7F };
 
+static void ndpi_search_zmq(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
-static void ndpi_check_zmq(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int32_t payload_len = packet->payload_packet_len;
-  u_char p0[] =  { 0x00, 0x00, 0x00, 0x05, 0x01, 0x66, 0x6c, 0x6f, 0x77 };
-  u_char p1[] =  { 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7f };
-  u_char p2[] =  { 0x28, 0x66, 0x6c, 0x6f, 0x77, 0x00 };
-
-  /* Break after 10 packets. */
-  if(flow->packet_counter > 10) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
-    return;
-  }
-
-  if(flow->l4.tcp.prev_zmq_pkt_len == 0) {
-    flow->l4.tcp.prev_zmq_pkt_len = ndpi_min(packet->payload_packet_len, 10);
-    memcpy(flow->l4.tcp.prev_zmq_pkt, packet->payload, flow->l4.tcp.prev_zmq_pkt_len);
-    return; /* Too early */
-  }
-  if(payload_len == 2) {
-    if(flow->l4.tcp.prev_zmq_pkt_len == 2) {
-      if((memcmp(packet->payload, "\01\01", 2) == 0)
-	 && (memcmp(flow->l4.tcp.prev_zmq_pkt, "\01\02", 2) == 0)) {
-	ndpi_int_zmq_add_connection(ndpi_struct, flow);
-	return;
-      }
-    } else if(flow->l4.tcp.prev_zmq_pkt_len == 9) {
-      if((memcmp(packet->payload, "\00\00", 2) == 0)
-	 && (memcmp(flow->l4.tcp.prev_zmq_pkt, p0, 9) == 0)) {
-	ndpi_int_zmq_add_connection(ndpi_struct, flow);
-	return;
-      }
-    } else if(flow->l4.tcp.prev_zmq_pkt_len == 10) {
-      if((memcmp(packet->payload, "\01\02", 2) == 0)
-	 && (memcmp(flow->l4.tcp.prev_zmq_pkt, p1, 10) == 0)) {
-	ndpi_int_zmq_add_connection(ndpi_struct, flow);
-	return;
-      }
-    }
-  } else if(payload_len >= 10) {
-    if(flow->l4.tcp.prev_zmq_pkt_len == 10) {
-      if(((memcmp(packet->payload, p1, 10) == 0)
-	  && (memcmp(flow->l4.tcp.prev_zmq_pkt, p1, 10) == 0))
-	 || ((memcmp(&packet->payload[1], p2, sizeof(p2)) == 0)
-	     && (memcmp(&flow->l4.tcp.prev_zmq_pkt[1], p2, sizeof(p2)) == 0))) {
-	ndpi_int_zmq_add_connection(ndpi_struct, flow);
-	return;
-      }
-    }
-  }
-}
-
-static void ndpi_search_zmq(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search ZMQ\n");
 
-  ndpi_check_zmq(ndpi_struct, flow);
+  if (packet->payload_packet_len > 9) {
+    if (memcmp(packet->payload, zmtp_signature, sizeof(zmtp_signature)) == 0) {
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZMQ,
+                                 NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      NDPI_LOG_INFO(ndpi_struct, "found ZMQ\n");
+      return;
+    }
+  }
+
+  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
 }
 
 
@@ -93,7 +49,7 @@ void init_zmq_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
   ndpi_set_bitmask_protocol_detection("ZeroMQ", ndpi_struct,
 				      NDPI_PROTOCOL_ZMQ,
-				      ndpi_search_zmq, /* TODO: add UDP support */
+				      ndpi_search_zmq,
 				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
 				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
 				      ADD_TO_DETECTION_BITMASK);

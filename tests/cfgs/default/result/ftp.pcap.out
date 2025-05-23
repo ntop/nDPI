@@ -1,7 +1,7 @@
-DPI Packets (TCP):	39	(13.00 pkts/flow)
+DPI Packets (TCP):	37	(12.33 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence DPI              : 2 (flows)
-Num dissector calls: 542 (180.67 diss/flow)
+Num dissector calls: 529 (176.33 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -34,4 +34,4 @@ Unrated                        132 118184        1
 
 
 Undetected flows:
-	1	TCP 192.168.1.212:50696 <-> 90.130.70.73:24523 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 23][54 pkts/3588 bytes <-> 78 pkts/114596 bytes][Goodput ratio: 0/95][0.15 sec][bytes ratio: -0.939 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 2/1 29/29 6/4][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 66/1469 78/1506 2/227][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0]
+	1	TCP 192.168.1.212:50696 <-> 90.130.70.73:24523 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 21][54 pkts/3588 bytes <-> 78 pkts/114596 bytes][Goodput ratio: 0/95][0.15 sec][bytes ratio: -0.939 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 2/1 29/29 6/4][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 66/1469 78/1506 2/227][TCP Fingerprint: 2_64_65535_15db81ff8b0d/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0]

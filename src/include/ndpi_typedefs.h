@@ -901,10 +901,6 @@ struct ndpi_flow_tcp_struct {
     int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
   } tls;
 
-  /* NDPI_PROTOCOL_ZMQ */
-  u_char prev_zmq_pkt[10];
-  u_int8_t prev_zmq_pkt_len;
-
   /* NDPI_PROTOCOL_RTMP */
   u_int16_t rtmp_client_buffer_len;
   u_int32_t rtmp_stage:2;
