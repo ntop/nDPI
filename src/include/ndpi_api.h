@@ -2463,8 +2463,25 @@ extern "C" {
    * @return The destination string buffer
    */
   u_char* ndpi_str_to_utf8(u_char *in, u_int in_len, u_char *out, u_int out_len);
-  
-    
+
+  /**
+   * Performs a case-insensitive comparison of two memory regions
+   *
+   * @par    s1    Pointer to the first memory region
+   * @par    s2    Pointer to the second memory region
+   * @par    n     Number of bytes to compare
+   * @return       < 0 if s1 is less than s2 in a case-insensitive comparison
+   *               = 0 if s1 matches s2 in a case-insensitive comparison
+   *               > 0 if s1 is greater than s2 in a case-insensitive comparison
+   *               If s1 is NULL and s2 is not, returns -1
+   *               If s2 is NULL and s1 is not, returns 1
+   *               If both are NULL, returns 0
+   *
+   * This function works similarly to memcmp() but performs case-insensitive
+   * comparison.
+   */
+  int ndpi_memcasecmp(const void *s1, const void *s2, size_t n);
+
 #ifdef __cplusplus
 }
 #endif

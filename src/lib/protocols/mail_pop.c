@@ -63,22 +63,13 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
   if(packet->payload_packet_len > 4) {
-    if((packet->payload[0] == 'A' || packet->payload[0] == 'a')
-	&& (packet->payload[1] == 'U' || packet->payload[1] == 'u')
-	&& (packet->payload[2] == 'T' || packet->payload[2] == 't')
-	&& (packet->payload[3] == 'H' || packet->payload[3] == 'h')) {
+    if(ndpi_memcasecmp(packet->payload, "AUTH", 4) == 0) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_AUTH;
       return 1;
-    } else if((packet->payload[0] == 'A' || packet->payload[0] == 'a')
-	       && (packet->payload[1] == 'P' || packet->payload[1] == 'p')
-	       && (packet->payload[2] == 'O' || packet->payload[2] == 'o')
-	       && (packet->payload[3] == 'P' || packet->payload[3] == 'p')) {
+    } else if(ndpi_memcasecmp(packet->payload, "APOP", 4) == 0) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_APOP;
       return 1;
-    } else if((packet->payload[0] == 'U' || packet->payload[0] == 'u')
-	       && (packet->payload[1] == 'S' || packet->payload[1] == 's')
-	       && (packet->payload[2] == 'E' || packet->payload[2] == 'e')
-	       && (packet->payload[3] == 'R' || packet->payload[3] == 'r')) {
+    } else if(ndpi_memcasecmp(packet->payload, "USER", 4) == 0) {
       char buf[64];
 	
       ndpi_user_pwd_payload_copy((u_int8_t*)flow->l4.tcp.ftp_imap_pop_smtp.username,
@@ -91,10 +82,7 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
       
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_USER;
       return 1;
-    } else if((packet->payload[0] == 'P' || packet->payload[0] == 'p')
-	      && (packet->payload[1] == 'A' || packet->payload[1] == 'a')
-	      && (packet->payload[2] == 'S' || packet->payload[2] == 's')
-	      && (packet->payload[3] == 'S' || packet->payload[3] == 's')) {
+    } else if(ndpi_memcasecmp(packet->payload, "PASS", 4) == 0) {
       ndpi_user_pwd_payload_copy((u_int8_t*)flow->l4.tcp.ftp_imap_pop_smtp.password,
 				 sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password), 5,
 				 packet->payload, packet->payload_packet_len);
@@ -102,46 +90,25 @@ static int ndpi_int_mail_pop_check_for_client_commands(struct ndpi_detection_mod
       ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_PASS;
       return 1;
-    } else if((packet->payload[0] == 'C' || packet->payload[0] == 'c')
-	       && (packet->payload[1] == 'A' || packet->payload[1] == 'a')
-	       && (packet->payload[2] == 'P' || packet->payload[2] == 'p')
-	       && (packet->payload[3] == 'A' || packet->payload[3] == 'a')) {
+    } else if(ndpi_memcasecmp(packet->payload, "CAPA", 4) == 0) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_CAPA;
       return 1;
-    } else if((packet->payload[0] == 'L' || packet->payload[0] == 'l')
-	       && (packet->payload[1] == 'I' || packet->payload[1] == 'i')
-	       && (packet->payload[2] == 'S' || packet->payload[2] == 's')
-	       && (packet->payload[3] == 'T' || packet->payload[3] == 't')) {
+    } else if(ndpi_memcasecmp(packet->payload, "LIST", 4) == 0) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_LIST;
       return 1;
-    } else if((packet->payload[0] == 'S' || packet->payload[0] == 's')
-	       && (packet->payload[1] == 'T' || packet->payload[1] == 't')
-	       && (packet->payload[2] == 'A' || packet->payload[2] == 'a')
-	       && (packet->payload[3] == 'T' || packet->payload[3] == 't')) {
+    } else if(ndpi_memcasecmp(packet->payload, "STAT", 4) == 0) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_STAT;
       return 1;
-    } else if((packet->payload[0] == 'U' || packet->payload[0] == 'u')
-	       && (packet->payload[1] == 'I' || packet->payload[1] == 'i')
-	       && (packet->payload[2] == 'D' || packet->payload[2] == 'd')
-	       && (packet->payload[3] == 'L' || packet->payload[3] == 'l')) {
+    } else if(ndpi_memcasecmp(packet->payload, "UIDL", 4) == 0) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_UIDL;
       return 1;
-    } else if((packet->payload[0] == 'R' || packet->payload[0] == 'r')
-	       && (packet->payload[1] == 'E' || packet->payload[1] == 'e')
-	       && (packet->payload[2] == 'T' || packet->payload[2] == 't')
-	       && (packet->payload[3] == 'R' || packet->payload[3] == 'r')) {
+    } else if(ndpi_memcasecmp(packet->payload, "RETR", 4) == 0) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_RETR;
       return 1;
-    } else if((packet->payload[0] == 'D' || packet->payload[0] == 'd')
-	       && (packet->payload[1] == 'E' || packet->payload[1] == 'e')
-	       && (packet->payload[2] == 'L' || packet->payload[2] == 'l')
-	       && (packet->payload[3] == 'E' || packet->payload[3] == 'e')) {
+    } else if(ndpi_memcasecmp(packet->payload, "DELE", 4) == 0) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_DELE;
       return 1;
-    } else if((packet->payload[0] == 'S' || packet->payload[0] == 's')
-	       && (packet->payload[1] == 'T' || packet->payload[1] == 't')
-	       && (packet->payload[2] == 'L' || packet->payload[2] == 'l')
-	       && (packet->payload[3] == 'S' || packet->payload[3] == 's')) {
+    } else if(ndpi_memcasecmp(packet->payload, "STLS", 4) == 0) {
       flow->l4.tcp.pop_command_bitmask |= POP_BIT_STLS;
       flow->l4.tcp.mail_imap_starttls = 1;
       return 1;
@@ -162,12 +129,9 @@ static void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct
   NDPI_LOG_DBG(ndpi_struct, "search mail_pop\n");
 
   if((packet->payload_packet_len > 3
-       && (packet->payload[0] == '+' && (packet->payload[1] == 'O' || packet->payload[1] == 'o')
-	   && (packet->payload[2] == 'K' || packet->payload[2] == 'k')))
+      && ndpi_memcasecmp(packet->payload, "+OK", 3) == 0)
       || (packet->payload_packet_len > 4
-	  && (packet->payload[0] == '-' && (packet->payload[1] == 'E' || packet->payload[1] == 'e')
-	      && (packet->payload[2] == 'R' || packet->payload[2] == 'r')
-	      && (packet->payload[3] == 'R' || packet->payload[3] == 'r')))) {
+	  && ndpi_memcasecmp(packet->payload, "-ERR", 4) == 0)) {
     // +OK or -ERR seen
     flow->l4.tcp.mail_pop_stage += 1;
     if(packet->payload[0] == '+' && flow->l4.tcp.mail_imap_starttls == 1) {

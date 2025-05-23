@@ -6168,6 +6168,60 @@ void memmemUnitTest(void) {
 
 /* *********************************************** */
 
+void memcasecmpUnitTest(void)
+{
+  /* Test 1: NULL pointers */
+  assert(ndpi_memcasecmp(NULL, NULL, 5) == 0);
+  assert(ndpi_memcasecmp(NULL, "string", 6) == -1);
+  assert(ndpi_memcasecmp("string", NULL, 6) == 1);
+
+  /* Test 2: Zero length */
+  assert(ndpi_memcasecmp("string", "different", 0) == 0);
+
+  /* Test 3: Single byte comparison */
+  assert(ndpi_memcasecmp("a", "a", 1) == 0);
+  assert(ndpi_memcasecmp("a", "A", 1) == 0);
+  assert(ndpi_memcasecmp("a", "b", 1) < 0);
+  assert(ndpi_memcasecmp("b", "a", 1) > 0);
+
+  /* Test 4: Case insensitivity */
+  assert(ndpi_memcasecmp("STRING", "string", 6) == 0);
+  assert(ndpi_memcasecmp("String", "sTrInG", 6) == 0);
+
+  /* Test 5: Various string comparisons */
+  assert(ndpi_memcasecmp("string", "string", 6) == 0);
+  assert(ndpi_memcasecmp("string", "strong", 6) < 0);
+  assert(ndpi_memcasecmp("strong", "string", 6) > 0);
+  assert(ndpi_memcasecmp("abc", "abcd", 3) == 0);
+  assert(ndpi_memcasecmp("abcd", "abc", 3) == 0);
+
+  /* Test 6: Optimization for checking first and last bytes */
+  assert(ndpi_memcasecmp("aBc", "abc", 3) == 0);
+  assert(ndpi_memcasecmp("abc", "abC", 3) == 0);
+  assert(ndpi_memcasecmp("abc", "def", 3) < 0);
+  assert(ndpi_memcasecmp("abz", "abx", 3) > 0);
+  assert(ndpi_memcasecmp("axc", "ayc", 3) < 0);
+
+  /* Test 7: Edge cases with non-printable characters and embedded zeros */
+  const char str1[] = {0, 'a', 'b', 'c'};
+  const char str2[] = {0, 'a', 'b', 'c'};
+  assert(ndpi_memcasecmp(str1, str2, 4) == 0);
+
+  const char str3[] = {0, 'a', 'b', 'c'};
+  const char str4[] = {1, 'a', 'b', 'c'};
+  assert(ndpi_memcasecmp(str3, str4, 4) < 0);
+
+  const char str5[] = {'a', 'b', 'c', 0};
+  const char str6[] = {'a', 'b', 'c', 1};
+  assert(ndpi_memcasecmp(str5, str6, 4) < 0);
+
+  const char str7[] = {'a', 'b', 0, 'd'};
+  const char str8[] = {'a', 'b', 1, 'd'};
+  assert(ndpi_memcasecmp(str7, str8, 4) < 0);
+}
+
+/* *********************************************** */
+
 void mahalanobisUnitTest()
 {
   /* Example based on: https://supplychenmanagement.com/2019/03/06/calculating-mahalanobis-distance/ */
@@ -6721,6 +6775,7 @@ int main(int argc, char **argv) {
     strnstrUnitTest();
     strncasestrUnitTest();
     memmemUnitTest();
+    memcasecmpUnitTest();
     mahalanobisUnitTest();
 #endif
   }

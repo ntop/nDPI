@@ -12279,3 +12279,50 @@ size_t ndpi_strlcpy(char *dst, const char* src, size_t dst_len, size_t src_len) 
 
   return src_len;
 }
+
+int ndpi_memcasecmp(const void *s1, const void *s2, size_t n) {
+  if (s1 == NULL && s2 == NULL) {
+    return 0;
+  }
+
+  if (s1 == NULL) {
+    return -1;
+  }
+
+  if (s2 == NULL) {
+    return 1;
+  }
+
+  if (n == 0) {
+    return 0;
+  }
+
+  const unsigned char *p1 = (const unsigned char *)s1;
+  const unsigned char *p2 = (const unsigned char *)s2;
+
+  if (n == 1) {
+    return tolower(*p1) - tolower(*p2);
+  }
+
+  /* Early exit optimization - check first and last bytes */
+
+  int first_cmp = tolower(p1[0]) - tolower(p2[0]);
+  if (first_cmp != 0) {
+    return first_cmp;
+  }
+
+  int last_cmp = tolower(p1[n-1]) - tolower(p2[n-1]);
+  if (last_cmp != 0) {
+    return last_cmp;
+  }
+
+  size_t i;
+  for (i = 1; i < n-1; i++) {
+    int cmp = tolower(p1[i]) - tolower(p2[i]);
+    if (cmp != 0) {
+      return cmp;
+    }
+  }
+
+  return 0;
+}

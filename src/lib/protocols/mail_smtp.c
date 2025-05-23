@@ -179,38 +179,21 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
 
       // expected client requests
       if(packet->line[a].len >= 5) {
-	if((((packet->line[a].ptr[0] == 'H' || packet->line[a].ptr[0] == 'h')
-	     && (packet->line[a].ptr[1] == 'E' || packet->line[a].ptr[1] == 'e'))
-	    || ((packet->line[a].ptr[0] == 'E' || packet->line[a].ptr[0] == 'e')
-		&& (packet->line[a].ptr[1] == 'H' || packet->line[a].ptr[1] == 'h')))
-	   && (packet->line[a].ptr[2] == 'L' || packet->line[a].ptr[2] == 'l')
-	   && (packet->line[a].ptr[3] == 'O' || packet->line[a].ptr[3] == 'o')
-	   && packet->line[a].ptr[4] == ' ') {
+	if(ndpi_memcasecmp(packet->line[a].ptr, "HELO ", 5) == 0 ||
+	   ndpi_memcasecmp(packet->line[a].ptr, "EHLO ", 5) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_HELO_EHLO;
 	  flow->l4.tcp.ftp_imap_pop_smtp.auth_found = 0;
-	} else if((packet->line[a].ptr[0] == 'M' || packet->line[a].ptr[0] == 'm')
-		  && (packet->line[a].ptr[1] == 'A' || packet->line[a].ptr[1] == 'a')
-		  && (packet->line[a].ptr[2] == 'I' || packet->line[a].ptr[2] == 'i')
-		  && (packet->line[a].ptr[3] == 'L' || packet->line[a].ptr[3] == 'l')
-		  && packet->line[a].ptr[4] == ' ') {
+	} else if(ndpi_memcasecmp(packet->line[a].ptr, "MAIL ", 5) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_MAIL;
 	  flow->l4.tcp.ftp_imap_pop_smtp.auth_found = 0;
 	  /* We shouldn't be here if there are credentials */
 	  flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
-	} else if((packet->line[a].ptr[0] == 'R' || packet->line[a].ptr[0] == 'r')
-		  && (packet->line[a].ptr[1] == 'C' || packet->line[a].ptr[1] == 'c')
-		  && (packet->line[a].ptr[2] == 'P' || packet->line[a].ptr[2] == 'p')
-		  && (packet->line[a].ptr[3] == 'T' || packet->line[a].ptr[3] == 't')
-		  && packet->line[a].ptr[4] == ' ') {
+	} else if(ndpi_memcasecmp(packet->line[a].ptr, "RCPT ", 5) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_RCPT;
 	  flow->l4.tcp.ftp_imap_pop_smtp.auth_found = 0;
 	  /* We shouldn't be here if there are credentials */
 	  flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
-	} else if((packet->line[a].ptr[0] == 'A' || packet->line[a].ptr[0] == 'a')
-		  && (packet->line[a].ptr[1] == 'U' || packet->line[a].ptr[1] == 'u')
-		  && (packet->line[a].ptr[2] == 'T' || packet->line[a].ptr[2] == 't')
-		  && (packet->line[a].ptr[3] == 'H' || packet->line[a].ptr[3] == 'h')
-		  && packet->line[a].ptr[4] == ' ') {
+	} else if(ndpi_memcasecmp(packet->line[a].ptr, "AUTH ", 5) == 0) {
 #ifdef SMTP_DEBUG
 	  printf("%s() AUTH [%.*s]\n", __FUNCTION__, packet->line[a].len, packet->line[a].ptr);
 #endif
@@ -301,14 +284,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
       }
 
   if(packet->line[a].len >= 8) {
-    if((packet->line[a].ptr[0] == 'S' || packet->line[a].ptr[0] == 's')
-	   && (packet->line[a].ptr[1] == 'T' || packet->line[a].ptr[1] == 't')
-	   && (packet->line[a].ptr[2] == 'A' || packet->line[a].ptr[2] == 'a')
-	   && (packet->line[a].ptr[3] == 'R' || packet->line[a].ptr[3] == 'r')
-	   && (packet->line[a].ptr[4] == 'T' || packet->line[a].ptr[4] == 't')
-	   && (packet->line[a].ptr[5] == 'T' || packet->line[a].ptr[5] == 't')
-	   && (packet->line[a].ptr[6] == 'L' || packet->line[a].ptr[6] == 'l')
-	   && (packet->line[a].ptr[7] == 'S' || packet->line[a].ptr[7] == 's')) {
+    if(ndpi_memcasecmp(packet->line[a].ptr, "STARTTLS", 8) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
 	  flow->l4.tcp.ftp_imap_pop_smtp.auth_tls = 1;
       flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 0;
@@ -316,20 +292,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
   }
 
       if(packet->line[a].len >= 14) {
-        if((packet->line[a].ptr[0] == 'X' || packet->line[a].ptr[0] == 'x')
-            && (packet->line[a].ptr[1] == '-' || packet->line[a].ptr[1] == '-')
-            && (packet->line[a].ptr[2] == 'A' || packet->line[a].ptr[2] == 'a')
-            && (packet->line[a].ptr[3] == 'N' || packet->line[a].ptr[3] == 'n')
-            && (packet->line[a].ptr[4] == 'O' || packet->line[a].ptr[4] == 'o')
-            && (packet->line[a].ptr[5] == 'N' || packet->line[a].ptr[5] == 'n')
-            && (packet->line[a].ptr[6] == 'Y' || packet->line[a].ptr[6] == 'y')
-            && (packet->line[a].ptr[7] == 'M' || packet->line[a].ptr[6] == 'm')
-            && (packet->line[a].ptr[8] == 'O' || packet->line[a].ptr[6] == 'o')
-            && (packet->line[a].ptr[9] == 'U' || packet->line[a].ptr[6] == 'u')
-            && (packet->line[a].ptr[10] == 'S' || packet->line[a].ptr[6] == 's')
-            && (packet->line[a].ptr[11] == 'T' || packet->line[a].ptr[6] == 't')
-            && (packet->line[a].ptr[12] == 'L' || packet->line[a].ptr[6] == 'l')
-            && (packet->line[a].ptr[13] == 'S' || packet->line[a].ptr[7] == 's')) {
+        if(ndpi_memcasecmp(packet->line[a].ptr, "X-AnonymousTLS", 14) == 0) {
           flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
           flow->l4.tcp.ftp_imap_pop_smtp.auth_tls = 1;
           flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 0;
@@ -337,20 +300,11 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
       }
 
       if(packet->line[a].len >= 4) {
-	if((packet->line[a].ptr[0] == 'D' || packet->line[a].ptr[0] == 'd')
-	   && (packet->line[a].ptr[1] == 'A' || packet->line[a].ptr[1] == 'a')
-	   && (packet->line[a].ptr[2] == 'T' || packet->line[a].ptr[2] == 't')
-	   && (packet->line[a].ptr[3] == 'A' || packet->line[a].ptr[3] == 'a')) {
+	if(ndpi_memcasecmp(packet->line[a].ptr, "DATA", 4) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_DATA;
-	} else if((packet->line[a].ptr[0] == 'N' || packet->line[a].ptr[0] == 'n')
-		  && (packet->line[a].ptr[1] == 'O' || packet->line[a].ptr[1] == 'o')
-		  && (packet->line[a].ptr[2] == 'O' || packet->line[a].ptr[2] == 'o')
-		  && (packet->line[a].ptr[3] == 'P' || packet->line[a].ptr[3] == 'p')) {
+	} else if(ndpi_memcasecmp(packet->line[a].ptr, "NOOP", 4) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_NOOP;
-	} else if((packet->line[a].ptr[0] == 'R' || packet->line[a].ptr[0] == 'r')
-		  && (packet->line[a].ptr[1] == 'S' || packet->line[a].ptr[1] == 's')
-		  && (packet->line[a].ptr[2] == 'E' || packet->line[a].ptr[2] == 'e')
-		  && (packet->line[a].ptr[3] == 'T' || packet->line[a].ptr[3] == 't')) {
+	} else if(ndpi_memcasecmp(packet->line[a].ptr, "RSET", 4) == 0) {
 	  flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_RSET;
 	}
       }
