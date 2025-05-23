@@ -820,48 +820,6 @@ struct ndpi_lru_cache {
 struct ndpi_flow_tcp_struct {
   /* TCP sequence number */
   u_int32_t next_tcp_seq_nr[2];
-  u_int16_t last_tcp_pkt_payload_len;
-
-  /* Part of the TCP header */
-  u_int8_t cli2srv_tcp_flags, srv2cli_tcp_flags;
-  u_int32_t seen_syn:1, seen_syn_ack:1, seen_ack:1;
-
-  /* NDPI_PROTOCOL_IRC */
-  u_int32_t irc_3a_counter:3;
-
-  /* NDPI_PROTOCOL_USENET */
-  u_int32_t usenet_stage:2;
-
-  /* NDPI_PROTOCOL_HTTP */
-  u_int32_t http_stage:3;
-  u_int32_t http_asymmetric_stage:2;
-
-  /* NDPI_PROTOCOL_GNUTELLA */
-  u_int32_t gnutella_stage:2;                  // 0 - 2
-
-  /* NDPI_PROTOCOL_SSH */
-  u_int32_t ssh_stage:3;
-
-  /* NDPI_PROTOCOL_VNC */
-  u_int32_t vnc_stage:2;                        // 0 - 3
-
-  /* NDPI_PROTOCOL_TELNET */
-  u_int32_t telnet_stage:2;                     // 0 - 2
-
-  /* NDPI_PROTOCOL_RADMIN */
-  u_int32_t radmin_stage:1;
-
-  /* NDPI_PROTOCOL_FTP_CONTROL */
-  u_int32_t ftp_control_stage:2;
-
-  /* NDPI_PROTOCOL_SOAP */
-  u_int32_t soap_stage:1;
-
-  /* NDPI_PROTOCOL_SOCKS */
-  u_int32_t socks5_stage:2, socks4_stage:2;
-
-  /* NDPI_PROTOCOL_Z3950 */
-  u_int32_t z3950_stage:2;
 
   /* NDPI_PROTOCOL_MAIL_SMTP */
   /* NDPI_PROTOCOL_MAIL_POP */
@@ -873,14 +831,29 @@ struct ndpi_flow_tcp_struct {
     char username[32], password[16];
   } ftp_imap_pop_smtp;
 
-  /* NDPI_PROTOCOL_HCL_NOTES */
-  u_int8_t hcl_notes_packet_id;
+  struct {
+    /* NDPI_PROTOCOL_TLS */
+    u_int8_t app_data_seen[2];
+    u_int8_t num_tls_blocks;
+    int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
+  } tls;
+
+  u_int16_t last_tcp_pkt_payload_len;
 
   /* NDPI_PROTOCOL_MAIL_SMTP */
   u_int16_t smtp_command_bitmask;
 
   /* NDPI_PROTOCOL_MAIL_POP */
   u_int16_t pop_command_bitmask;
+
+  /* NDPI_PROTOCOL_RTMP */
+  u_int16_t rtmp_client_buffer_len;
+
+  /* Part of the TCP header */
+  u_int8_t cli2srv_tcp_flags, srv2cli_tcp_flags;
+
+  /* NDPI_PROTOCOL_HCL_NOTES */
+  u_int8_t hcl_notes_packet_id;
 
   /* NDPI_PROTOCOL_WHATSAPP */
   u_int8_t wa_matched_so_far;
@@ -894,31 +867,68 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_MEMCACHED */
   u_int8_t memcached_matches;
 
-  struct {
-    /* NDPI_PROTOCOL_TLS */
-    u_int8_t app_data_seen[2];
-    u_int8_t num_tls_blocks;
-    int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
-  } tls;
+  /* Part of the TCP header */
+  u_int64_t seen_syn:1, seen_syn_ack:1, seen_ack:1;
+
+  /* NDPI_PROTOCOL_IRC */
+  u_int64_t irc_3a_counter:3;
+
+  /* NDPI_PROTOCOL_USENET */
+  u_int64_t usenet_stage:2;
+
+  /* NDPI_PROTOCOL_HTTP */
+  u_int64_t http_stage:3;
+  u_int64_t http_asymmetric_stage:2;
+
+  /* NDPI_PROTOCOL_GNUTELLA */
+  u_int64_t gnutella_stage:2;
+
+  /* NDPI_PROTOCOL_SSH */
+  u_int64_t ssh_stage:3;
+
+  /* NDPI_PROTOCOL_VNC */
+  u_int64_t vnc_stage:2;
+
+  /* NDPI_PROTOCOL_TELNET */
+  u_int64_t telnet_stage:2;
+
+  /* NDPI_PROTOCOL_RADMIN */
+  u_int64_t radmin_stage:1;
+
+  /* NDPI_PROTOCOL_FTP_CONTROL */
+  u_int64_t ftp_control_stage:2;
+
+  /* NDPI_PROTOCOL_SOAP */
+  u_int64_t soap_stage:1;
+
+  /* NDPI_PROTOCOL_SOCKS */
+  u_int64_t socks5_stage:2;
+  u_int64_t socks4_stage:2;
+
+  /* NDPI_PROTOCOL_Z3950 */
+  u_int64_t z3950_stage:2;
 
   /* NDPI_PROTOCOL_RTMP */
-  u_int16_t rtmp_client_buffer_len;
-  u_int32_t rtmp_stage:2;
+  u_int64_t rtmp_stage:2;
 
   /* NDPI_PROTOCOL_POSTGRES */
-  u_int32_t postgres_stage:3;
+  u_int64_t postgres_stage:3;
 
   /* NDPI_PROTOCOL_ICECAST */
-  u_int32_t icecast_stage:1;
+  u_int64_t icecast_stage:1;
 
   /* NDPI_PROTOCOL_DOFUS */
-  u_int32_t dofus_stage:1;
+  u_int64_t dofus_stage:1;
 
   /* NDPI_PROTOCOL_MAIL_POP */
-  u_int32_t mail_pop_stage:2;
+  u_int64_t mail_pop_stage:2;
 
   /* NDPI_PROTOCOL_MAIL_IMAP */
-  u_int32_t mail_imap_stage:3, mail_imap_starttls:2;
+  u_int64_t mail_imap_stage:3;
+  u_int64_t mail_imap_starttls:2;
+
+  /* Reserved for future use */
+  u_int64_t reserved:18;
 };
 
 /* ************************************************** */
