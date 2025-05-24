@@ -45,14 +45,12 @@ static void ndpi_search_tailscale(struct ndpi_detection_module_struct *ndpi_stru
     return;
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_tailscale_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("Tailscale", ndpi_struct,
-				      NDPI_PROTOCOL_TAILSCALE,
-				      ndpi_search_tailscale,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Tailscale", ndpi_struct,
+                     ndpi_search_tailscale,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_TAILSCALE);
 }

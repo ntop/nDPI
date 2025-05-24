@@ -461,7 +461,7 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
   if(packet->payload_packet_len > 10 &&
      ntohl(*(u_int32_t *)&packet->payload[4 + 2 * (packet->tcp != NULL)]) == 0x2112A442) {
     NDPI_LOG_DBG2(ndpi_struct, "Avoid collision with STUN\n");
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -491,16 +491,14 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
     ndpi_set_risk(ndpi_struct, flow, NDPI_OBFUSCATED_TRAFFIC, "Obfuscated OpenVPN");
   } else if(flow->ovpn_alg_standard_state == 1 &&
             flow->ovpn_alg_heur_opcode_state == 1) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 
 }
 
 void init_openvpn_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("OpenVPN", ndpi_struct,
-				      NDPI_PROTOCOL_OPENVPN,
-				      ndpi_search_openvpn,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("OpenVPN", ndpi_struct,
+                     ndpi_search_openvpn,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_OPENVPN);
 }

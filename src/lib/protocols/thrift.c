@@ -144,22 +144,22 @@ static void ndpi_dissect_strict_hdr(struct ndpi_detection_module_struct *ndpi_st
   const size_t method_length = ntohl(strict_hdr->method_length);
 
   if (packet->tcp == NULL) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (packet->payload_packet_len < sizeof(*strict_hdr) + method_length) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (thrift_validate_version(strict_hdr->version) == 0) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (thrift_validate_type(strict_hdr->message_type) == 0) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -176,22 +176,22 @@ static void ndpi_dissect_compact_hdr(struct ndpi_detection_module_struct *ndpi_s
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
   if (packet->udp == NULL) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (packet->payload_packet_len < sizeof(*compact_hdr) + compact_hdr->method_length) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (thrift_validate_version(compact_hdr->version) == 0) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (thrift_validate_type(compact_hdr->message_type) == 0) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -235,7 +235,7 @@ static void ndpi_search_thrift_tcp_udp(struct ndpi_detection_module_struct *ndpi
       /* Strict Binary Protocol */
       if (packet->payload_packet_len < sizeof(*thrift_data.strict_hdr))
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
       }
 
@@ -247,20 +247,18 @@ static void ndpi_search_thrift_tcp_udp(struct ndpi_detection_module_struct *ndpi
       return;
     } else {
       /* Probably not Apache Thrift. */
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_apache_thrift_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Thrift", ndpi_struct,
-                                      NDPI_PROTOCOL_APACHE_THRIFT,
-                                      ndpi_search_thrift_tcp_udp,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Thrift", ndpi_struct,
+                     ndpi_search_thrift_tcp_udp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_APACHE_THRIFT);
 }

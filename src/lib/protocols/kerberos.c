@@ -314,7 +314,7 @@ static void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struc
   u_int16_t original_payload_packet_len = 0;
 
   if((sport != KERBEROS_PORT) && (dport != KERBEROS_PORT)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
   
@@ -672,7 +672,7 @@ static void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struc
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_struct,
@@ -698,10 +698,8 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
 }
 
 void init_kerberos_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("Kerberos", ndpi_struct,
-				      NDPI_PROTOCOL_KERBEROS,
-				      ndpi_search_kerberos,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Kerberos", ndpi_struct,
+                     ndpi_search_kerberos,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      1, NDPI_PROTOCOL_KERBEROS);
 }

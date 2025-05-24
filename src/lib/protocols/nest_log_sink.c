@@ -42,13 +42,13 @@ static void ndpi_search_nest_log_sink(struct ndpi_detection_module_struct *ndpi_
     NDPI_LOG_DBG(ndpi_struct, "search nest_log_sink\n");
 
     if (packet->payload_packet_len < NEST_LOG_SINK_MIN_LEN) {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
     }
 
     if (ntohs(packet->tcp->source) != NEST_LOG_SINK_PORT &&
             ntohs(packet->tcp->dest) != NEST_LOG_SINK_PORT) {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
     }
 
@@ -63,14 +63,10 @@ static void ndpi_search_nest_log_sink(struct ndpi_detection_module_struct *ndpi_
     }
 }
 
-void init_nest_log_sink_dissector(
-        struct ndpi_detection_module_struct *ndpi_struct)
+void init_nest_log_sink_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-    ndpi_set_bitmask_protocol_detection("NEST_LOG_SINK",
-            ndpi_struct,
-            NDPI_PROTOCOL_NEST_LOG_SINK,
-            ndpi_search_nest_log_sink,
-            NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-            SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-            ADD_TO_DETECTION_BITMASK);
+  register_dissector("NEST_LOG_SINK", ndpi_struct,
+                     ndpi_search_nest_log_sink,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_NEST_LOG_SINK);
 }

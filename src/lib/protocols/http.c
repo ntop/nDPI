@@ -1689,7 +1689,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
       /* The first pkt is neither a request nor a response -> no http */
       NDPI_LOG_DBG2(ndpi_struct, "Neither req nor response -> exclude\n");
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
     NDPI_LOG_DBG2(ndpi_struct, "Request where expected\n");
@@ -1767,7 +1767,7 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
 				 struct ndpi_flow_struct *flow) {
   /* Break after 20 packets. */
   if(flow->packet_counter > 20) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -1823,10 +1823,8 @@ char* ndpi_get_http_content_type(struct ndpi_flow_struct *flow) {
 
 
 void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("HTTP",ndpi_struct,
-				      NDPI_PROTOCOL_HTTP,
-				      ndpi_search_http_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("HTTP", ndpi_struct,
+                     ndpi_search_http_tcp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_HTTP);
 }

@@ -56,15 +56,13 @@ static void ndpi_search_ethernet_ip(struct ndpi_detection_module_struct *ndpi_st
     }
   }
   
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow); /* No luck this time */
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow); /* No luck this time */
 }
   
 
 void init_ethernet_ip_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("EthernetIP", ndpi_struct,
-				      NDPI_PROTOCOL_ETHERNET_IP,
-				      ndpi_search_ethernet_ip,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("EthernetIP", ndpi_struct,
+                     ndpi_search_ethernet_ip,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_ETHERNET_IP);
 }

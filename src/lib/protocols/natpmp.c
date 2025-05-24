@@ -173,7 +173,7 @@ static void ndpi_search_natpmp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (natpmp_is_valid(packet, &natpmp_type) == 0)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -190,11 +190,8 @@ static void ndpi_search_natpmp(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_natpmp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("NAT-PMP", ndpi_struct,
-    NDPI_PROTOCOL_NATPMP,
-    ndpi_search_natpmp,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("NAT-PMP", ndpi_struct,
+                     ndpi_search_natpmp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_NATPMP);
 }

@@ -49,7 +49,7 @@ static void ndpi_search_teso(struct ndpi_detection_module_struct *ndpi_struct,
   if (packet->payload_packet_len < 600 ||
       ntohl(get_u_int32_t(packet->payload, 0)) != (u_int32_t)(packet->payload_packet_len-4))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -75,15 +75,13 @@ static void ndpi_search_teso(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_teso_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("TES_Online", ndpi_struct,
-              NDPI_PROTOCOL_TESO,
-              ndpi_search_teso,
-              NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-              SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-              ADD_TO_DETECTION_BITMASK);
+  register_dissector("TES_Online", ndpi_struct,
+                     ndpi_search_teso,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_TESO);
 }

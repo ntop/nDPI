@@ -125,7 +125,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
     enum protobuf_type type = protobuf_dissect_tag(tag, &field_number);
     if (type == PT_INVALID || field_number == 0 || field_number > (UINT_MAX >> 3))
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -139,7 +139,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
         uint64_t value;
         if (protobuf_dissect_varint(packet, &offset, &value) != 0)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
           return;
         }
 #ifdef DEBUG_PROTOBUF
@@ -151,7 +151,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
       case PT_I64: {
         if (packet->payload_packet_len < offset + sizeof(uint64_t))
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
           return;
         }
 #ifdef DEBUG_PROTOBUF
@@ -176,13 +176,13 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
           {
             break; // We are not excluding the protocol immediately. Let's wait for more packets to arrive..
           } else {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
           }
         }
         if (length == 0 || length > INT_MAX)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
           return;
         }
         offset += length;
@@ -195,12 +195,12 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
       case PT_SGROUP:
       case PT_EGROUP:
         // Start/End groups are deprecated and therefor ignored to reduce false positives.
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
       case PT_I32: {
         if (packet->payload_packet_len < offset + sizeof(uint32_t))
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
           return;
         }
 #ifdef DEBUG_PROTOBUF
@@ -245,16 +245,14 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
     return; // We probably need more packets to dissect.
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_protobuf_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Protobuf", ndpi_struct,
-                                      NDPI_PROTOCOL_PROTOBUF,
-                                      ndpi_search_protobuf,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Protobuf", ndpi_struct,
+                     ndpi_search_protobuf,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_PROTOBUF);
 }

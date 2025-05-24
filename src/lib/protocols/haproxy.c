@@ -39,13 +39,13 @@ static void ndpi_search_haproxy(struct ndpi_detection_module_struct *ndpi_struct
 
   if (packet->payload_packet_len < NDPI_STATICSTRING_LEN("PROXY TCP"))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (strncmp((char *)packet->payload, "PROXY TCP", NDPI_STATICSTRING_LEN("PROXY TCP")) != 0)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -53,13 +53,13 @@ static void ndpi_search_haproxy(struct ndpi_detection_module_struct *ndpi_struct
   haproxy_end = (uint8_t *)ndpi_strnstr((char *)packet->payload, "\r\n", packet->payload_packet_len);
   if (haproxy_end == NULL)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
   haproxy_end += 2;
   if (packet->payload_packet_len - (haproxy_end - packet->payload) == 0)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -68,10 +68,8 @@ static void ndpi_search_haproxy(struct ndpi_detection_module_struct *ndpi_struct
 
 void init_haproxy_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("HAProxy", ndpi_struct,
-                                      NDPI_PROTOCOL_HAPROXY,
-                                      ndpi_search_haproxy,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("HAProxy", ndpi_struct,
+                     ndpi_search_haproxy,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_HAPROXY);
 }

@@ -48,21 +48,21 @@ static void ndpi_search_tuya_lp(struct ndpi_detection_module_struct *ndpi_struct
 
   if (packet->payload_packet_len < 16)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   /* https://github.com/tuya/tuya-iotos-embeded-sdk-wifi-ble-bk7231n/blob/0eff617610cc97e0d134bb8136cebb518a2a403b/sdk/include/lan_protocol.h#L73 */
   if (ntohl(get_u_int32_t(packet->payload, 0)) != 0x000055AA)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (packet->payload_packet_len < 
     ntohl(get_u_int32_t(packet->payload, 4)))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -71,7 +71,7 @@ static void ndpi_search_tuya_lp(struct ndpi_detection_module_struct *ndpi_struct
       packet->payload[packet->payload_packet_len - 2] != 0xAA ||
       packet->payload[packet->payload_packet_len - 1] != 0x55)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -82,11 +82,8 @@ static void ndpi_search_tuya_lp(struct ndpi_detection_module_struct *ndpi_struct
   
 void init_tuya_lp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("TUYA LP", ndpi_struct,
-                                      NDPI_PROTOCOL_TUYA_LP,
-                                      ndpi_search_tuya_lp,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK
-                                     );
+  register_dissector("TUYA LP", ndpi_struct,
+                     ndpi_search_tuya_lp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_TUYA_LP);
 }

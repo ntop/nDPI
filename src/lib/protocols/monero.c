@@ -55,7 +55,7 @@ static void ndpi_search_monero(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (packet->payload_packet_len < 8)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -65,15 +65,13 @@ static void ndpi_search_monero(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_monero_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Monero", ndpi_struct,
-                                      NDPI_PROTOCOL_MONERO,
-                                      ndpi_search_monero,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Monero", ndpi_struct,
+                     ndpi_search_monero,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      1, NDPI_PROTOCOL_MONERO);
 }

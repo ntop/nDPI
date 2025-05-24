@@ -50,7 +50,7 @@ static void ndpi_search_c1222(struct ndpi_detection_module_struct *ndpi_struct,
   if ((packet->payload_packet_len < 50) || (packet->payload[0] != 0x60) ||
       ((u_int8_t)(packet->payload_packet_len-2) != packet->payload[1]))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -59,15 +59,13 @@ static void ndpi_search_c1222(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_c1222_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("ANSI_C1222", ndpi_struct,
-                                      NDPI_PROTOCOL_C1222,
-                                      ndpi_search_c1222,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("ANSI_C1222", ndpi_struct,
+                     ndpi_search_c1222,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_C1222);
 }

@@ -40,7 +40,7 @@ static void ndpi_search_mikrotik(struct ndpi_detection_module_struct *ndpi_struc
       u_int16_t offset;
     
       if (packet->payload_packet_len < 8) {
-	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 	return;
       } else {
 	offset = 4;
@@ -103,15 +103,14 @@ static void ndpi_search_mikrotik(struct ndpi_detection_module_struct *ndpi_struc
 				 NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     }
   } else
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 /* ********************************* */
 
 void init_mikrotik_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("MIKROTIK", ndpi_struct,
-				      NDPI_PROTOCOL_MIKROTIK, ndpi_search_mikrotik,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("MIKROTIK", ndpi_struct,
+                     ndpi_search_mikrotik,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                      1, NDPI_PROTOCOL_MIKROTIK);
 }

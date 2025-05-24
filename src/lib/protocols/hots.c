@@ -60,16 +60,14 @@ void ndpi_search_hots(struct ndpi_detection_module_struct *ndpi_struct, struct n
       break;
     }
   }
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_hots_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("HOTS", ndpi_struct,
-				      NDPI_PROTOCOL_HOTS,
-				      ndpi_search_hots,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD, /* Only IPv4 UDP traffic is expected. */
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("HOTS", ndpi_struct,
+                     ndpi_search_hots,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD, /* Only IPv4 UDP traffic is expected. */
+                     1, NDPI_PROTOCOL_HOTS);
 }

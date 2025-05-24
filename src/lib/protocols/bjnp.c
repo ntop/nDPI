@@ -29,7 +29,7 @@ static void ndpi_check_bjnp(struct ndpi_detection_module_struct *ndpi_struct, st
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 static void ndpi_search_bjnp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -42,10 +42,8 @@ static void ndpi_search_bjnp(struct ndpi_detection_module_struct *ndpi_struct, s
 
 void init_bjnp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("BJNP", ndpi_struct,
-				      NDPI_PROTOCOL_BJNP,
-				      ndpi_search_bjnp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("BJNP", ndpi_struct,
+                     ndpi_search_bjnp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_BJNP);
 }

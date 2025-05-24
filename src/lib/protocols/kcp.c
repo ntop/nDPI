@@ -66,7 +66,7 @@ static void ndpi_search_kcp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (packet->payload_packet_len < sizeof(*kcp_header))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -78,14 +78,14 @@ static void ndpi_search_kcp(struct ndpi_detection_module_struct *ndpi_struct,
     case IKCP_CMD_WINS:
       break;
     default:
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
   }
 
   uint32_t const kcp_pdu_length = le32toh(kcp_header->length);
   if (kcp_pdu_length + sizeof(*kcp_header) != packet->payload_packet_len)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -94,11 +94,8 @@ static void ndpi_search_kcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_kcp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("KCP", ndpi_struct,
-    NDPI_PROTOCOL_KCP,
-    ndpi_search_kcp,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("KCP", ndpi_struct,
+                     ndpi_search_kcp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      1, NDPI_PROTOCOL_KCP);
 }

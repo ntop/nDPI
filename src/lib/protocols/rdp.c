@@ -110,7 +110,7 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       }
     }
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   } else if(packet->udp != NULL) {
     u_int16_t s_port = ntohs(packet->udp->source);
     u_int16_t d_port = ntohs(packet->udp->dest);
@@ -137,7 +137,7 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 	  }
 	} else {
 	  if(memcmp(flow->l4.udp.rdp_from_srv, packet->payload, 3) != 0)
-	    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 	  else {
 	    flow->l4.udp.rdp_from_srv_pkts = 2 /* stage 2 */;
 
@@ -163,7 +163,7 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 	  }
 	} else {
 	  if(memcmp(flow->l4.udp.rdp_to_srv, packet->payload, 3) != 0)
-	    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 	  else {
 	    flow->l4.udp.rdp_to_srv_pkts = 2 /* stage 2 */;
 	    
@@ -175,7 +175,7 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       }
     } else
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }
 
@@ -183,10 +183,8 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_rdp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("RDP", ndpi_struct,
-				      NDPI_PROTOCOL_RDP,
-				      ndpi_search_rdp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("RDP", ndpi_struct,
+                     ndpi_search_rdp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_RDP);
 }

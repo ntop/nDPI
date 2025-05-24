@@ -83,7 +83,7 @@ static void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
  no_drda:
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
@@ -92,10 +92,8 @@ static void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_drda_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("DRDA", ndpi_struct,
-				      NDPI_PROTOCOL_DRDA,
-				      ndpi_search_drda,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("DRDA", ndpi_struct,
+                     ndpi_search_drda,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_DRDA);
 }

@@ -49,20 +49,20 @@ static void ndpi_search_elasticsearch(struct ndpi_detection_module_struct *ndpi_
 
   if (packet->payload_packet_len < 6)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (ntohs(get_u_int16_t(packet->payload, 0)) != 0x4553 /* "ES" */)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   message_length = ntohl(get_u_int32_t(packet->payload, 2));
   if (packet->payload_packet_len < message_length + 6)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -73,11 +73,8 @@ static void ndpi_search_elasticsearch(struct ndpi_detection_module_struct *ndpi_
   
 void init_elasticsearch_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Elasticsearch", ndpi_struct,
-                                      NDPI_PROTOCOL_ELASTICSEARCH,
-                                      ndpi_search_elasticsearch,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK
-                                     );
+  register_dissector("Elasticsearch", ndpi_struct,
+                     ndpi_search_elasticsearch,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_ELASTICSEARCH);
 }

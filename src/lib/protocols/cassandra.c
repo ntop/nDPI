@@ -71,12 +71,12 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
       (!ndpi_validate_cassandra_response(packet->payload[0]) ||
        !ndpi_validate_cassandra_request(packet->payload[0])))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
   
   if (flow->packet_direction_counter[packet->packet_direction] > 2) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
   
@@ -93,12 +93,8 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 void init_cassandra_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-
-  ndpi_set_bitmask_protocol_detection("Cassandra",
-                                      ndpi_struct,
-                                      NDPI_PROTOCOL_CASSANDRA,
-                                      ndpi_search_cassandra,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Cassandra", ndpi_struct,
+                     ndpi_search_cassandra,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_CASSANDRA);
 }

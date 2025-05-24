@@ -39,7 +39,7 @@ static void ndpi_int_ipsec_add_connection(struct ndpi_detection_module_struct * 
   switch (isakmp_type)
   {
     case ISAKMP_INVALID:
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     case ISAKMP_MALFORMED:
       NDPI_LOG_INFO(ndpi_struct, "found malformed ISAKMP (UDP)\n");
@@ -138,7 +138,7 @@ static void ndpi_search_ipsec(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (packet->payload_packet_len < 28)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -148,7 +148,7 @@ static void ndpi_search_ipsec(struct ndpi_detection_module_struct *ndpi_struct,
     isakmp_offset = 4;
     if (packet->payload_packet_len < 32)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   }
@@ -157,7 +157,7 @@ static void ndpi_search_ipsec(struct ndpi_detection_module_struct *ndpi_struct,
   {
     if (packet->payload[isakmp_offset + 17] != 0x10 /* Major Version 1 */)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     } else {
       /* Version 1 is obsolete, but still used by some embedded devices. */
@@ -169,7 +169,7 @@ static void ndpi_search_ipsec(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (ntohl(get_u_int32_t(packet->payload, isakmp_offset + 24)) != (u_int32_t)packet->payload_packet_len - isakmp_offset)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -185,12 +185,9 @@ static void ndpi_search_ipsec(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_ipsec_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("IPSec", ndpi_struct,
-    NDPI_PROTOCOL_IPSEC,
-    ndpi_search_ipsec,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("IPSec", ndpi_struct,
+                     ndpi_search_ipsec,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_IPSEC);
 }
 

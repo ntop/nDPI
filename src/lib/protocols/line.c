@@ -98,7 +98,7 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
             if(flow->l4.udp.line_base_cnt[0] != flow->l4.udp.line_base_cnt[1])
               ndpi_int_line_add_connection(ndpi_struct, flow);
             else
-              NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+              NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 	  }
           return;
         }
@@ -106,16 +106,14 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   return;
 }
 
 void init_line_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("LineCall", ndpi_struct,
-				      NDPI_PROTOCOL_LINE_CALL,
-				      ndpi_search_line,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("LineCall", ndpi_struct,
+                     ndpi_search_line,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                      1, NDPI_PROTOCOL_LINE_CALL);
 }

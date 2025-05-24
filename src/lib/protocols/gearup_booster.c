@@ -44,7 +44,7 @@ static void ndpi_search_gearup_booster(struct ndpi_detection_module_struct *ndpi
 
   if (packet->udp->source != htons(9999) && packet->udp->dest != htons(9999))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -52,7 +52,7 @@ static void ndpi_search_gearup_booster(struct ndpi_detection_module_struct *ndpi
   {
     if (packet->packet_direction != 0 || packet->udp->dest != htons(9999))
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   }
@@ -62,7 +62,7 @@ static void ndpi_search_gearup_booster(struct ndpi_detection_module_struct *ndpi
     // mobile version
     if (ntohl(get_u_int32_t(packet->payload, 0)) == 0x00000000)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   } else if (packet->payload_packet_len == 8)
@@ -71,11 +71,11 @@ static void ndpi_search_gearup_booster(struct ndpi_detection_module_struct *ndpi
     if (ntohl(get_u_int32_t(packet->payload, 0)) == 0x00000000 ||
         packet->payload[7] != 0x00 || packet->payload[6] != 0x00 || packet->payload[5] != 0x00)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   } else {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -84,11 +84,9 @@ static void ndpi_search_gearup_booster(struct ndpi_detection_module_struct *ndpi
 
 void init_gearup_booster_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("GeaUP_Booster", ndpi_struct,
-				      NDPI_PROTOCOL_GEARUP_BOOSTER,
-				      ndpi_search_gearup_booster,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("GeaUP_Booster", ndpi_struct,
+                     ndpi_search_gearup_booster,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_GEARUP_BOOSTER);
 }
 

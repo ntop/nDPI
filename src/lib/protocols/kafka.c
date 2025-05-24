@@ -52,7 +52,7 @@ static void ndpi_search_kafka(struct ndpi_detection_module_struct *ndpi_struct,
   if (packet->payload_packet_len < 8 /* min. required packet length */ ||
       ntohl(get_u_int32_t(packet->payload, 0)) != (uint32_t)(packet->payload_packet_len - 4))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -62,19 +62,19 @@ static void ndpi_search_kafka(struct ndpi_detection_module_struct *ndpi_struct,
   {
     if (packet->payload_packet_len < 14)
     {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
     }
 
     const uint16_t client_id_len = ntohs(get_u_int16_t(packet->payload, 12));
     if (client_id_len + 12 + 2 > packet->payload_packet_len)
     {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
     }
     if (ndpi_is_printable_buffer(&packet->payload[14], client_id_len) == 0)
     {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
     }
 
@@ -82,15 +82,13 @@ static void ndpi_search_kafka(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_kafka_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Kafka", ndpi_struct,
-				      NDPI_PROTOCOL_APACHE_KAFKA,
-				      ndpi_search_kafka,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Kafka", ndpi_struct,
+                     ndpi_search_kafka,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      1, NDPI_PROTOCOL_APACHE_KAFKA);
 }

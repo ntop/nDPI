@@ -66,15 +66,13 @@ static void ndpi_search_hl7(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_hl7_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("HL7", ndpi_struct,
-              NDPI_PROTOCOL_HL7,
-              ndpi_search_hl7,
-              NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-              SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-              ADD_TO_DETECTION_BITMASK);
+  register_dissector("HL7", ndpi_struct,
+                     ndpi_search_hl7,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_HL7);
 }

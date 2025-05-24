@@ -802,7 +802,7 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
     printf("[DNS] invalid packet\n");
 #endif
     if(flow->extra_packets_func == NULL) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     } else {
       ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid DNS Header");
     }
@@ -955,7 +955,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
           ntohs(get_u_int16_t(packet->payload, 2)) != 0 &&
           ntohs(get_u_int16_t(packet->payload, 4)) != 0)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
       }
     }
@@ -969,7 +969,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
   if(!(s_port == DNS_PORT || d_port == DNS_PORT ||
        s_port == MDNS_PORT || d_port == MDNS_PORT ||
        d_port == LLMNR_PORT)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -979,7 +979,7 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
      we must be able to detect these protocols on the first packet
   */
   if(packet->payload_packet_len < sizeof(struct ndpi_dns_packet_header) + payload_offset) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -989,10 +989,8 @@ static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, st
 /* *********************************************** */
 
 void init_dns_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("DNS", ndpi_struct,
-				      NDPI_PROTOCOL_DNS,
-				      ndpi_search_dns,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("DNS", ndpi_struct,
+                     ndpi_search_dns,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_DNS);
 }

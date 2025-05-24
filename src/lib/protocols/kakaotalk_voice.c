@@ -61,17 +61,15 @@ static void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndp
     } 
   }
   
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_kakaotalk_voice_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("KakaoTalk_Voice", ndpi_struct,
-				      NDPI_PROTOCOL_KAKAOTALK_VOICE,
-				      ndpi_search_kakaotalk_voice,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("KakaoTalk_Voice", ndpi_struct,
+                     ndpi_search_kakaotalk_voice,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                      1, NDPI_PROTOCOL_KAKAOTALK_VOICE);
 }
 

@@ -49,18 +49,16 @@ static void ndpi_search_dnp3_tcp(struct ndpi_detection_module_struct *ndpi_struc
       return;
     }
   }
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
    
 }
 
 /* ******************************************************** */
 
 void init_dnp3_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-	
-  ndpi_set_bitmask_protocol_detection("DNP3", ndpi_struct,
-				      NDPI_PROTOCOL_DNP3,
-				      ndpi_search_dnp3_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+
+  register_dissector("DNP3", ndpi_struct,
+                     ndpi_search_dnp3_tcp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_DNP3);
 }

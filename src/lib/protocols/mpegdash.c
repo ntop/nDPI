@@ -49,7 +49,7 @@ static void ndpi_search_mpegdash_http(struct ndpi_detection_module_struct *ndpi_
   {
     if (flow->packet_counter > 2)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     }
     return;
   }
@@ -83,16 +83,14 @@ static void ndpi_search_mpegdash_http(struct ndpi_detection_module_struct *ndpi_
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   return;
 }
 
 void init_mpegdash_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("MpegDash", ndpi_struct,
-				      NDPI_PROTOCOL_MPEGDASH,
-				      ndpi_search_mpegdash_http,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("MpegDash", ndpi_struct,
+                     ndpi_search_mpegdash_http,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      1, NDPI_PROTOCOL_MPEGDASH);
 }

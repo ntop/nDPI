@@ -84,17 +84,15 @@ static void ndpi_search_nfs(struct ndpi_detection_module_struct *ndpi_struct, st
 	return;
 
   exclude_nfs:
-	NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+	NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_nfs_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("NFS", ndpi_struct,
-				      NDPI_PROTOCOL_NFS,
-				      ndpi_search_nfs,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("NFS", ndpi_struct,
+                     ndpi_search_nfs,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_NFS);
 }
 

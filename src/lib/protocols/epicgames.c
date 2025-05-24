@@ -54,7 +54,7 @@ static void ndpi_search_epicgames(struct ndpi_detection_module_struct *ndpi_stru
       flow->l4.udp.epicgames_word = ntohl(get_u_int32_t(packet->payload, 0));
       return;
     } else {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   } else if(flow->l4.udp.epicgames_stage == 2 - packet->packet_direction) {
@@ -63,23 +63,21 @@ static void ndpi_search_epicgames(struct ndpi_detection_module_struct *ndpi_stru
       ndpi_int_epicgames_add_connection(ndpi_struct, flow);
       return;
     } else {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   }
 
   if(flow->packet_counter >= 4) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 }
 
 void init_epicgames_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("EpicGames", ndpi_struct,
-                                      NDPI_PROTOCOL_EPICGAMES,
-                                      ndpi_search_epicgames,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("EpicGames", ndpi_struct,
+                     ndpi_search_epicgames,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_EPICGAMES);
 }

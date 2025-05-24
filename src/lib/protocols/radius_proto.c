@@ -48,7 +48,7 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
     struct radius_header *h = (struct radius_header*)packet->payload;
     /* RFC2865: The minimum length is 20 and maximum length is 4096. */
     if((payload_len < 20) || (payload_len > 4096)) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
     
@@ -61,7 +61,7 @@ static void ndpi_check_radius(struct ndpi_detection_module_struct *ndpi_struct, 
     }
   }
   if(flow->packet_counter > 3)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   return;
 }
 
@@ -75,10 +75,8 @@ static void ndpi_search_radius(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_radius_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Radius", ndpi_struct,
-				      NDPI_PROTOCOL_RADIUS,
-				      ndpi_search_radius,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Radius", ndpi_struct,
+                     ndpi_search_radius,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_RADIUS);
 }

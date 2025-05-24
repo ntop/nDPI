@@ -112,7 +112,7 @@ static void ndpi_search_memcached(struct ndpi_detection_module_struct *ndpi_stru
 
   if (packet->tcp != NULL) {
     if (packet->payload_packet_len < MEMCACHED_MIN_LEN) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -120,13 +120,13 @@ static void ndpi_search_memcached(struct ndpi_detection_module_struct *ndpi_stru
   }
   else if (packet->udp != NULL) {
     if (packet->payload_packet_len < MEMCACHED_MIN_UDP_LEN) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
     if ((offset[4] == 0x00 && offset[5] == 0x00) ||
 	offset[6] != 0x00 || offset[7] != 0x00) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -170,17 +170,13 @@ static void ndpi_search_memcached(struct ndpi_detection_module_struct *ndpi_stru
   if (*matches >= MEMCACHED_MIN_MATCH)
     ndpi_int_memcached_add_connection(ndpi_struct, flow);
   else if(flow->packet_counter > 5)
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);    
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);    
 }
 
-void init_memcached_dissector(
-			      struct ndpi_detection_module_struct *ndpi_struct)
+void init_memcached_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("MEMCACHED",
-				      ndpi_struct,
-				      NDPI_PROTOCOL_MEMCACHED,
-				      ndpi_search_memcached,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("MEMCACHED", ndpi_struct,
+                     ndpi_search_memcached,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      1, NDPI_PROTOCOL_MEMCACHED);
 }
