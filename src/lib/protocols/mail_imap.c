@@ -31,7 +31,7 @@
 
 /* Safely increments IMAP stage counter preventing 3-bit mail_imap_stage overflow.
  * Even though current tests don't trigger overflow, better safe than sorry. */
-#define NDPI_SAFE_INC_IMAP_STAGE(flow) \
+#define SAFE_INC_IMAP_STAGE(flow) \
 	do { \
 		if ((flow)->l4.tcp.mail_imap_stage < 7) { \
 			(flow)->l4.tcp.mail_imap_stage += 1; \
@@ -63,7 +63,7 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
   if(packet->payload_packet_len >= 4 && ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a) {
     // the DONE command appears without a tag
     if(packet->payload_packet_len == 6 && ndpi_memcasecmp(packet->payload, "DONE", 4) == 0) {
-      NDPI_SAFE_INC_IMAP_STAGE(flow);
+      SAFE_INC_IMAP_STAGE(flow);
       saw_command = 1;
     } else {
       if(flow->l4.tcp.mail_imap_stage < 5) {
@@ -109,7 +109,7 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
 
       if((command_start + 3) < packet->payload_packet_len) {
 	if(ndpi_memcasecmp(packet->payload + command_start, "OK ", 3) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  if(flow->l4.tcp.mail_imap_starttls == 1) {
 	    NDPI_LOG_DBG2(ndpi_struct, "starttls detected\n");
 	    ndpi_int_mail_imap_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_IMAPS);
@@ -123,10 +123,10 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
 	  }
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "UID", 3) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "NO ", 3) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  if(flow->l4.tcp.mail_imap_starttls == 1)
 	    flow->l4.tcp.mail_imap_starttls = 0;
 	  saw_command = 1;
@@ -134,13 +134,13 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
       }
       if((command_start + 10) < packet->payload_packet_len) {
 	if(ndpi_memcasecmp(packet->payload + command_start, "CAPABILITY", 10) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	}
       }
       if((command_start + 8) < packet->payload_packet_len) {
 	if(ndpi_memcasecmp(packet->payload + command_start, "STARTTLS", 8) == 0) {
-        NDPI_SAFE_INC_IMAP_STAGE(flow);
+        SAFE_INC_IMAP_STAGE(flow);
         flow->l4.tcp.mail_imap_starttls = 1;
         saw_command = 1;
 	}
@@ -174,25 +174,25 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
 	    }
 	  }
 	  
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "FETCH", 5) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "FLAGS", 5) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "CHECK", 5) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "STORE", 5) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	}
       }
       if((command_start + 12) < packet->payload_packet_len) {
 	if(ndpi_memcasecmp(packet->payload + command_start, "AUTHENTICATE", 12) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  /* Authenticate phase may have multiple messages. Ignore them since they are
 	     somehow encrypted anyway. */
           ndpi_int_mail_imap_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_IMAPS);
@@ -201,34 +201,34 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
       }
       if((command_start + 9) < packet->payload_packet_len) {
 	if(ndpi_memcasecmp(packet->payload + command_start, "NAMESPACE", 9) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	}
       }
       if((command_start + 4) < packet->payload_packet_len) {
 	if(ndpi_memcasecmp(packet->payload + command_start, "LSUB", 4) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "LIST", 4) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "NOOP", 4) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "IDLE", 4) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	}
       }
       if((command_start + 6) < packet->payload_packet_len) {
 	if(ndpi_memcasecmp(packet->payload + command_start, "SELECT", 6) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "EXISTS", 6) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	} else if(ndpi_memcasecmp(packet->payload + command_start, "APPEND", 6) == 0) {
-	  NDPI_SAFE_INC_IMAP_STAGE(flow);
+	  SAFE_INC_IMAP_STAGE(flow);
 	  saw_command = 1;
 	}
       }
