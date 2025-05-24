@@ -818,6 +818,10 @@ struct ndpi_lru_cache {
 struct ndpi_flow_tcp_struct {
   /* TCP sequence number */
   u_int32_t next_tcp_seq_nr[2];
+  u_int16_t last_tcp_pkt_payload_len;
+
+  /* Part of the TCP header */
+  u_int8_t cli2srv_tcp_flags, srv2cli_tcp_flags;
 
   /* NDPI_PROTOCOL_MAIL_SMTP */
   /* NDPI_PROTOCOL_MAIL_POP */
@@ -836,7 +840,7 @@ struct ndpi_flow_tcp_struct {
     int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
   } tls;
 
-  u_int16_t last_tcp_pkt_payload_len;
+
 
   /* NDPI_PROTOCOL_MAIL_SMTP */
   u_int16_t smtp_command_bitmask;
@@ -846,9 +850,6 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_RTMP */
   u_int16_t rtmp_client_buffer_len;
-
-  /* Part of the TCP header */
-  u_int8_t cli2srv_tcp_flags, srv2cli_tcp_flags;
 
   /* NDPI_PROTOCOL_HCL_NOTES */
   u_int8_t hcl_notes_packet_id;
@@ -923,10 +924,10 @@ struct ndpi_flow_tcp_struct {
 
   /* NDPI_PROTOCOL_MAIL_IMAP */
   u_int64_t mail_imap_stage:3;
-  u_int64_t mail_imap_starttls:2;
+  u_int64_t mail_imap_starttls:1;
 
   /* Reserved for future use */
-  u_int64_t reserved:18;
+  u_int64_t reserved:19;
 };
 
 /* ************************************************** */
