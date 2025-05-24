@@ -378,8 +378,6 @@ int main(int argc, char **argv) {
 #endif
   (void)argc;
   (void)argv;
-
-  NDPI_PROTOCOL_BITMASK all;
   
   if (ndpi_get_api_version() != NDPI_API_VERSION) {
     printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
@@ -391,8 +389,6 @@ int main(int argc, char **argv) {
   if (ndpi_info_mod == NULL)
     return -1;
 
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_info_mod, &all);
   ndpi_finalize_initialization(ndpi_info_mod);
 
 /*

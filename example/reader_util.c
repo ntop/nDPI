@@ -359,12 +359,11 @@ static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod,
 /* ***************************************************** */
 
 static char _proto_delim[] = " \t,:;";
-int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverted_logic) {
+int parse_proto_name_list(char *str, NDPI_INTERNAL_PROTOCOL_BITMASK *bitmask, int inverted_logic) {
   char *n;
   uint16_t proto;
   char op;
   struct ndpi_detection_module_struct *module;
-  NDPI_PROTOCOL_BITMASK all;
 
   if(!inverted_logic)
    op = 1; /* Default action: add to the bitmask */
@@ -374,8 +373,6 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
   module = ndpi_init_detection_module(NULL);
   if(!module)
     return 1;
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(module, &all);
   /* Try to be fast: we need only the protocol name -> protocol id mapping! */
   ndpi_set_config(module, "any", "ip_list.load", "0");
   ndpi_set_config(module, NULL, "flow_risk_lists.load", "0");
@@ -391,9 +388,9 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
     }
     if(!strcmp(n,"all")) {
       if(op)
-	NDPI_BITMASK_SET_ALL(*bitmask);
+        NDPI_INTERNAL_PROTOCOL_SET_ALL(*bitmask);
       else
-	NDPI_BITMASK_RESET(*bitmask);
+        NDPI_INTERNAL_PROTOCOL_RESET(*bitmask);
       continue;
     }
     proto = ndpi_get_proto_id(module, n);
@@ -403,9 +400,9 @@ int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask, int inverte
       return 1;
     }
     if(op)
-      NDPI_BITMASK_ADD(*bitmask,proto);
+      NDPI_INTERNAL_PROTOCOL_ADD(*bitmask,proto);
     else
-      NDPI_BITMASK_DEL(*bitmask,proto);
+      NDPI_INTERNAL_PROTOCOL_DEL(*bitmask,proto);
   }
 
   ndpi_exit_detection_module(module);
@@ -434,11 +431,12 @@ bool load_public_lists(struct ndpi_detection_module_struct *ndpi_str) {
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle, int do_init_flows_root,
 					 ndpi_serialization_format serialization_format,
-					 struct ndpi_global_context *g_ctx) {
+					 struct ndpi_global_context *g_ctx,
+					 NDPI_INTERNAL_PROTOCOL_BITMASK *enabled_bitmask) {
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
 
-  module = ndpi_init_detection_module(g_ctx);
+  module = ndpi_init_detection_module_ext(g_ctx, enabled_bitmask);
 
   if(module == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");

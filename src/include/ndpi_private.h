@@ -63,10 +63,6 @@ struct call_function_struct {
                                    is (still) for protocol, not for dissector */
 };
 
-struct subprotocol_conf_struct {
-  void (*func) (struct ndpi_detection_module_struct *, char *attr, char *value, int protocol_id);
-};
-
 typedef struct default_ports_tree_node {
   ndpi_proto_defaults_t *proto;
   u_int8_t customUserProto;
@@ -335,12 +331,12 @@ struct ndpi_detection_module_config_struct {
 
   int wireguard_subclassification_by_ip;
 
-  NDPI_PROTOCOL_BITMASK debug_bitmask;
-  NDPI_PROTOCOL_BITMASK ip_list_bitmask;
-  NDPI_PROTOCOL_BITMASK monitoring;
+  NDPI_INTERNAL_PROTOCOL_BITMASK debug_bitmask;
+  NDPI_INTERNAL_PROTOCOL_BITMASK ip_list_bitmask;
+  NDPI_INTERNAL_PROTOCOL_BITMASK monitoring;
 
-  NDPI_PROTOCOL_BITMASK flowrisk_bitmask;
-  NDPI_PROTOCOL_BITMASK flowrisk_info_bitmask;
+  NDPI_INTERNAL_PROTOCOL_BITMASK flowrisk_bitmask;
+  NDPI_INTERNAL_PROTOCOL_BITMASK flowrisk_info_bitmask;
 
   int flow_risk_lists_enabled;
   int risk_anonymous_subscriber_list_icloudprivaterelay_enabled;
@@ -349,7 +345,7 @@ struct ndpi_detection_module_config_struct {
 };
 
 struct ndpi_detection_module_struct {
-  NDPI_PROTOCOL_BITMASK detection_bitmask;
+  NDPI_INTERNAL_PROTOCOL_BITMASK detection_bitmask;
 
   u_int64_t current_ts;
   u_int16_t num_tls_blocks_to_follow;
@@ -384,9 +380,6 @@ struct ndpi_detection_module_struct {
 
   /* misc parameters */
   u_int32_t tcp_max_retransmission_window_size;
-
-  /* subprotocol registration handler */
-  struct subprotocol_conf_struct subprotocol_conf[NDPI_MAX_SUPPORTED_PROTOCOLS + 1];
 
   u_int ndpi_num_supported_protocols;
   u_int ndpi_num_custom_protocols;
@@ -621,6 +614,8 @@ struct ndpi_detection_module_struct {
 #define NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION	(NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_NO_TCP_RETRANSMISSION | NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD)
 
 /* Generic */
+
+int is_proto_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId);
 
 void register_dissector(char *dissector_name, struct ndpi_detection_module_struct *ndpi_str,
                         void (*func)(struct ndpi_detection_module_struct *,

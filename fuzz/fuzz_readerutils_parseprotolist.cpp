@@ -19,7 +19,7 @@ int monitoring_enabled = 0;
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   int inverted_logic;
-  NDPI_PROTOCOL_BITMASK bitmask;
+  NDPI_INTERNAL_PROTOCOL_BITMASK bitmask;
   char *str;
 
   /* To allow memory allocation failures */
@@ -27,9 +27,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   inverted_logic = size % 2; /* pseudo-random */
   if(inverted_logic) {
-    NDPI_BITMASK_SET_ALL(bitmask);
+    NDPI_INTERNAL_PROTOCOL_SET_ALL(bitmask);
   } else {
-    NDPI_BITMASK_RESET(bitmask);
+    NDPI_INTERNAL_PROTOCOL_RESET(bitmask);
   }
 
   str = (char *)ndpi_malloc(size + 1); /* We need a null-terminated string */

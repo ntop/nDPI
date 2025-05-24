@@ -30,9 +30,6 @@ void ndpi_py_setup_detection_module(struct ndpi_detection_module_struct *mod) {
   if (mod == NULL) {
     return;
   } else {
-    NDPI_PROTOCOL_BITMASK protos;
-    NDPI_BITMASK_SET_ALL(protos); // Set bitmask for ALL protocols
-    ndpi_set_protocol_detection_bitmask2(mod, &protos);
     ndpi_finalize_initialization(mod);
   }
 };

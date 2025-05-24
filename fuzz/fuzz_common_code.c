@@ -37,16 +37,11 @@ void fuzz_set_alloc_callbacks_and_seed(int seed)
 void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_mod,
                                 struct ndpi_global_context *g_ctx)
 {
-  NDPI_PROTOCOL_BITMASK all;
-
   if(*ndpi_info_mod == NULL) {
     *ndpi_info_mod = ndpi_init_detection_module(g_ctx);
 
     ndpi_set_config_u64(*ndpi_info_mod, NULL, "log.level", 3);
     ndpi_set_config(*ndpi_info_mod, "all", "log", "enable");
-
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(*ndpi_info_mod, &all);
 
     ndpi_load_domain_suffixes(*ndpi_info_mod, "public_suffix_list.dat");
     ndpi_load_categories_dir(*ndpi_info_mod, "./lists/");

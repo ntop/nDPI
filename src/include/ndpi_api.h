@@ -224,14 +224,27 @@ extern "C" {
    * it do not forget to call first ndpi_finalize_initialization()
    *
    * You can call this function multiple times, (i.e. to create multiple
-   * indipendent detection contexts) but all these calls MUST NOT run
+   * independent detection contexts) but all these calls MUST NOT run
    * in parallel
    *
-   * @g_ctx = global context associated to the new detection module; NULL if no global context is needed
+   * @par g_ctx = global context associated to the new detection module; NULL if no global context is needed
    * @return  the initialized detection module
    *
    */
   struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx);
+
+
+  /**
+   * Similar to `ndpi_init_detection_module` but you can also set the protocol bitmask
+   * By default, all protocols are enabled
+   *
+   * @par g_ctx = global context associated to the new detection module; NULL if no global context is needed
+   * @par detection_bitmask = protocol bitmask. If NULL, all protocols will be enabled
+   * @return  the initialized detection module
+   *
+   */
+  struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_global_context *g_ctx,
+                                                                      const NDPI_INTERNAL_PROTOCOL_BITMASK *detection_bitmask);
 
   /**
    * Completes the initialization (2nd step)
@@ -266,17 +279,6 @@ extern "C" {
    *
    */
   void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct);
-
-  /**
-   * Sets the protocol bitmask2
-   *
-   * @par ndpi_struct        = the detection module
-   * @par detection_bitmask  = the protocol bitmask to set
-   * @return 0 if ok, -1 if error
-   *
-   */
-  int ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *ndpi_struct,
-					    const NDPI_PROTOCOL_BITMASK * detection_bitmask);
 
   /**
    *  Function to be called before we give up with detection for a given flow.

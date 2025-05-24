@@ -3019,7 +3019,7 @@ static u_int8_t ndpi_check_ipv6_exception(struct ndpi_detection_module_struct *n
 
 static int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id)
 {
-  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_str->cfg.flowrisk_bitmask, flowrisk_id) == 0)
+  if(NDPI_INTERNAL_PROTOCOL_IS_SET(ndpi_str->cfg.flowrisk_bitmask, flowrisk_id) == 0)
     return 0;
   return 1;
 }
@@ -3028,7 +3028,7 @@ static int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, nd
 
 int is_flowrisk_info_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id)
 {
-  if(NDPI_COMPARE_PROTOCOL_TO_BITMASK(ndpi_str->cfg.flowrisk_info_bitmask, flowrisk_id) == 0)
+  if(NDPI_INTERNAL_PROTOCOL_IS_SET(ndpi_str->cfg.flowrisk_info_bitmask, flowrisk_id) == 0)
     return 0;
   return 1;
 }

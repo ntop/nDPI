@@ -302,7 +302,7 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 void test_lib(); /* Forward */
 
 extern void ndpi_report_payload_stats(FILE *out);
-extern int parse_proto_name_list(char *str, NDPI_PROTOCOL_BITMASK *bitmask,
+extern int parse_proto_name_list(char *str, NDPI_INTERNAL_PROTOCOL_BITMASK *bitmask,
 				 int inverted_logic);
 extern u_int8_t is_ndpi_proto(struct ndpi_flow_info *flow, u_int16_t id);
 
@@ -407,14 +407,11 @@ void ndpiCheckHostStringMatch(char *testChar) {
   char appBufStr[64];
   ndpi_protocol detected_protocol;
   struct ndpi_detection_module_struct *ndpi_str;
-  NDPI_PROTOCOL_BITMASK all;
 
   if(!testChar)
     return;
 
   ndpi_str = ndpi_init_detection_module(NULL);
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
   ndpi_finalize_initialization(ndpi_str);
 
   testRes =  ndpi_match_string_subprotocol(ndpi_str,
@@ -476,14 +473,11 @@ static void ndpiCheckIPMatch(char *testChar) {
   ndpi_protocol detected_protocol;
   int i;
   ndpi_cfg_error rc;
-  NDPI_PROTOCOL_BITMASK all;
 
   if(!testChar)
     return;
 
   ndpi_str = ndpi_init_detection_module(NULL);
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_str, _protoFilePath);
@@ -727,11 +721,7 @@ static void help(u_int long_help) {
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
          max_num_reported_top_payloads, max_num_tcp_dissected_pkts, max_num_udp_dissected_pkts);
 
-  NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
-
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_str, _protoFilePath);
@@ -905,13 +895,9 @@ void extcap_config() {
   u_int ndpi_num_supported_protocols;
   int i;
   ndpi_proto_defaults_t *proto_defaults;
-  NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
 
   if(!ndpi_str) exit(0);
-
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
   ndpi_finalize_initialization(ndpi_str);
 
@@ -1495,10 +1481,7 @@ static void parse_parameters(int argc, char **argv)
     case '9':
       {
         struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
-        NDPI_PROTOCOL_BITMASK all;
 
-        NDPI_BITMASK_SET_ALL(all);
-        ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
         ndpi_finalize_initialization(ndpi_str);
 
         extcap_packet_filter = ndpi_get_proto_by_name(ndpi_str, optarg);
@@ -3017,7 +3000,7 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
                            struct ndpi_global_context *g_ctx) {
-  NDPI_PROTOCOL_BITMASK enabled_bitmask;
+  NDPI_INTERNAL_PROTOCOL_BITMASK enabled_bitmask;
   struct ndpi_workflow_prefs prefs;
   int i, ret;
   ndpi_cfg_error rc;
@@ -3029,16 +3012,16 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
   prefs.quiet_mode = quiet_mode;
   prefs.ignore_vlanid = ignore_vlanid;
 
-  memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
-  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
-                                                            serialization_format, g_ctx);
-
   /* Protocols to enable/disable. Default: everything is enabled */
-  NDPI_BITMASK_SET_ALL(enabled_bitmask);
+  NDPI_INTERNAL_PROTOCOL_SET_ALL(enabled_bitmask);
   if(_disabled_protocols != NULL) {
     if(parse_proto_name_list(_disabled_protocols, &enabled_bitmask, 1))
       exit(-1);
   }
+
+  memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
+  ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
+                                                            serialization_format, g_ctx, &enabled_bitmask);
 
   if(_categoriesDirPath) {
     int failed_files = ndpi_load_categories_dir(ndpi_thread_info[thread_id].workflow->ndpi_struct, _categoriesDirPath);
@@ -3079,9 +3062,6 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
 
   ndpi_workflow_set_flow_callback(ndpi_thread_info[thread_id].workflow,
                                   on_protocol_discovered, NULL);
-
-  /* Make sure to load lists before finalizing the initialization */
-  ndpi_set_protocol_detection_bitmask2(ndpi_thread_info[thread_id].workflow->ndpi_struct, &enabled_bitmask);
 
   if(_protoFilePath != NULL)
     ndpi_load_protocols_file(ndpi_thread_info[thread_id].workflow->ndpi_struct, _protoFilePath);
@@ -5228,13 +5208,9 @@ static void dgaUnitTest() {
     NULL
   };
   int debug = 0, i;
-  NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
 
   assert(ndpi_str != NULL);
-
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
   ndpi_finalize_initialization(ndpi_str);
 
@@ -6392,13 +6368,9 @@ void outlierUnitTest() {
 
 void loadStressTest() {
   struct ndpi_detection_module_struct *ndpi_struct_shadow = ndpi_init_detection_module(NULL);
-  NDPI_PROTOCOL_BITMASK all;
 
   if(ndpi_struct_shadow) {
     int i;
-
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(ndpi_struct_shadow, &all);
 
     for(i=1; i<100000; i++) {
       char name[32];
@@ -6526,7 +6498,6 @@ void cryptDecryptUnitTest() {
 /* *********************************************** */
 
 void encodeDomainsUnitTest() {
-  NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   const char *lists_path = "../lists/public_suffix_list.dat";
   struct stat st;
@@ -6536,9 +6507,6 @@ void encodeDomainsUnitTest() {
     char out[256];
     char *str;
     ndpi_protocol_category_t id;
-
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
     assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
 
@@ -6579,16 +6547,12 @@ void checkProtocolIDsUnitTest() {
 /* *********************************************** */
 
 void domainsUnitTest() {
-  NDPI_PROTOCOL_BITMASK all;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   const char *lists_path = "../lists/public_suffix_list.dat";
   struct stat st;
 
   if(stat(lists_path, &st) == 0) {
     u_int16_t suffix_id;
-
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
 
     assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
 
@@ -6621,13 +6585,10 @@ void domainSearchUnitTest() {
   u_int16_t class_id;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   u_int8_t trace = 0;
-  NDPI_PROTOCOL_BITMASK all;
 
   assert(ndpi_str);
   assert(sc);
 
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
   ndpi_finalize_initialization(ndpi_str);
 
   ndpi_domain_classify_add(ndpi_str, sc, NDPI_PROTOCOL_NTOP, ".ntop.org");
@@ -6657,13 +6618,10 @@ void domainSearchUnitTest2() {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   ndpi_domain_classify *c = ndpi_domain_classify_alloc();
   u_int16_t class_id = 9;
-  NDPI_PROTOCOL_BITMASK all;
 
   assert(ndpi_str);
   assert(c);
 
-  NDPI_BITMASK_SET_ALL(all);
-  ndpi_set_protocol_detection_bitmask2(ndpi_str, &all);
   ndpi_finalize_initialization(ndpi_str);
 
   ndpi_domain_classify_add(ndpi_str, c, class_id, "ntop.org");
