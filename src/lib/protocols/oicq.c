@@ -59,19 +59,19 @@ static void ndpi_search_oicq(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (packet->payload_packet_len < sizeof(*hdr))
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (hdr->flag != 0x02)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (ntohs(hdr->version) != 0x3b0b)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -79,7 +79,7 @@ static void ndpi_search_oicq(struct ndpi_detection_module_struct *ndpi_struct,
   if (command == 0x0000 || (command > 0x00b5 && command < 0x03f7) ||
       command > 0x03f7)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -90,11 +90,8 @@ static void ndpi_search_oicq(struct ndpi_detection_module_struct *ndpi_struct,
   
 void init_oicq_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("OICQ", ndpi_struct,
-                                      NDPI_PROTOCOL_OICQ,
-                                      ndpi_search_oicq,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK
-                                     );
+  register_dissector("OICQ", ndpi_struct,
+                     ndpi_search_oicq,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_OICQ);
 }

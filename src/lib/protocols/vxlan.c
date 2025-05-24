@@ -53,7 +53,7 @@ static void ndpi_check_vxlan(struct ndpi_detection_module_struct *ndpi_struct, s
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   return;
 }
 
@@ -66,10 +66,8 @@ static void ndpi_search_vxlan(struct ndpi_detection_module_struct *ndpi_struct, 
 
 void init_vxlan_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("VXLAN", ndpi_struct,
-              NDPI_PROTOCOL_VXLAN,
-              ndpi_search_vxlan,
-              NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-              SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-              ADD_TO_DETECTION_BITMASK);
+  register_dissector("VXLAN", ndpi_struct,
+                     ndpi_search_vxlan,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_VXLAN);
 }

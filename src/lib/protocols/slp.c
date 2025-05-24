@@ -101,7 +101,7 @@ static int slp_check_packet_length(struct ndpi_detection_module_struct *ndpi_str
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
   if (packet->payload_packet_len != packet_length) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return 1;
   }
 
@@ -113,25 +113,25 @@ static int slp_check_fid(struct ndpi_detection_module_struct *ndpi_struct,
                          enum function_id fid, uint8_t slp_version)
 {
   if (fid <= FID_UNKNOWN) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return 1;
   }
 
   switch (slp_version) {
     case 0x01:
       if (fid >= FID_MAX_v1) {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return 1;
       }
       break;
     case 0x02:
       if (fid >= FID_MAX) {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return 1;
       }
       break;
     default:
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return 1;
   }
 
@@ -199,7 +199,7 @@ static void ndpi_search_slp_v1(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search Service Location Protocol v1\n");
 
   if (packet->payload_packet_len < sizeof(*hdr)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -222,7 +222,7 @@ static int ndpi_search_slp_v2(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search Service Location Protocol v2\n");
 
   if (packet->payload_packet_len < sizeof(*hdr)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return 1;
   }
 
@@ -316,17 +316,15 @@ static void ndpi_search_slp(struct ndpi_detection_module_struct *ndpi_struct,
       }
       break;
     default:
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       break;
   }
 }
 
 void init_slp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Service_Location_Protocol", ndpi_struct,
-                                      NDPI_PROTOCOL_SERVICE_LOCATION,
-                                      ndpi_search_slp,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Service_Location_Protocol", ndpi_struct,
+                     ndpi_search_slp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_SERVICE_LOCATION);
 }

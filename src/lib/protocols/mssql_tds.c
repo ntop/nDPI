@@ -58,7 +58,7 @@ static void ndpi_search_mssql_tds(struct ndpi_detection_module_struct *ndpi_stru
        to this potocol and it can cause false positives 
      */
      || (packet->tcp->dest == ntohs(102))) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
   
@@ -72,16 +72,14 @@ static void ndpi_search_mssql_tds(struct ndpi_detection_module_struct *ndpi_stru
     }
   }
   
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_mssql_tds_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("MsSQL_TDS", ndpi_struct,
-				      NDPI_PROTOCOL_MSSQL_TDS,
-				      ndpi_search_mssql_tds,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("MsSQL_TDS", ndpi_struct,
+                     ndpi_search_mssql_tds,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      1, NDPI_PROTOCOL_MSSQL_TDS);
 }

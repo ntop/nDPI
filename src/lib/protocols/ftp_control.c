@@ -589,13 +589,13 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
     
   /* Exclude SMTP, which uses similar commands. */
   if(packet->tcp->dest == twentyfive || packet->tcp->source == twentyfive) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   /* Break after 8 packets. */
   if(flow->packet_counter > 8) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -671,10 +671,8 @@ static void ndpi_search_ftp_control(struct ndpi_detection_module_struct *ndpi_st
 /* *************************************************************** */
 
 void init_ftp_control_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("FTP_CONTROL", ndpi_struct,
-				      NDPI_PROTOCOL_FTP_CONTROL,
-				      ndpi_search_ftp_control,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("FTP_CONTROL", ndpi_struct,
+                     ndpi_search_ftp_control,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_FTP_CONTROL);
 }

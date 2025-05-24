@@ -58,27 +58,27 @@ static void ndpi_search_rmcp(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search RMCP\n");
 
   if (packet->payload_packet_len < sizeof(struct rmcp_header)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   struct rmcp_header const * const rmcp_header = (struct rmcp_header *)packet->payload;
 
   if (rmcp_header->version != 0x06 || rmcp_header->reserved != 0x00) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (rmcp_header->type != 0 && rmcp_header->sequence == 0xFF) {
     // No ACK allowed if SEQUENCE number is 255.
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (rmcp_header->class != 0x06 /* Alert Standard Forum (ASF)*/
       && rmcp_header->class != 0x07 /* Intelligent Platform Management Interface (IPMI) */)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -88,11 +88,9 @@ static void ndpi_search_rmcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_rmcp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("RMCP", ndpi_struct,
-                                      NDPI_PROTOCOL_RMCP,
-                                      ndpi_search_rmcp,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("RMCP", ndpi_struct,
+                     ndpi_search_rmcp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_RMCP);
 }
 

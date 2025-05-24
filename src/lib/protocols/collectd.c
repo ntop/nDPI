@@ -169,7 +169,7 @@ static void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struc
             block_length < COLLECTD_ENCR_AES256_MIN_BLOCK_SIZE ||
             ndpi_int_collectd_dissect_username(flow, packet) != 0)
         {
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         } else {
           ndpi_int_collectd_add_connection(ndpi_struct, flow);
         }
@@ -180,7 +180,7 @@ static void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struc
 
   if (num_blocks < COLLECTD_MIN_BLOCKS_REQUIRED)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -192,11 +192,8 @@ static void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struc
 
 void init_collectd_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("collectd", ndpi_struct,
-    NDPI_PROTOCOL_COLLECTD,
-    ndpi_search_collectd,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("collectd", ndpi_struct,
+                     ndpi_search_collectd,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_COLLECTD);
 }

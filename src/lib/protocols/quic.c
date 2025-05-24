@@ -1977,7 +1977,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
       if(ret == -1) {
         NDPI_LOG_DBG2(ndpi_struct, "Keep looking for SH by client\n");
         if(flow->packet_counter > 10 /* TODO */)
-          NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 	return;
       }
       ret = may_be_gquic_rej(ndpi_struct);
@@ -1988,7 +1988,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 	return;
       }
     }
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -2006,7 +2006,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(!is_version_supported(version)) {
     NDPI_LOG_DBG(ndpi_struct, "Unsupported version 0x%x\n", version);
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -2029,7 +2029,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
    */
   clear_payload = get_clear_payload(ndpi_struct, flow, version, &clear_payload_len);
   if(!clear_payload) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -2061,7 +2061,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
     flow->max_extra_packets_to_check = 24; /* TODO */
     flow->extra_packets_func = ndpi_search_quic_extra;
   } else if(!crypto_data) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }
 
@@ -2069,8 +2069,8 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_quic_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("QUIC", ndpi_struct,
-				      NDPI_PROTOCOL_QUIC, ndpi_search_quic,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
+  register_dissector("QUIC", ndpi_struct,
+                     ndpi_search_quic,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_QUIC);
 }

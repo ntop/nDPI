@@ -63,7 +63,7 @@ static void ndpi_check_websocket(struct ndpi_detection_module_struct *ndpi_struc
 
   if (packet->payload_packet_len < sizeof(u_int16_t))
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -75,7 +75,7 @@ static void ndpi_check_websocket(struct ndpi_detection_module_struct *ndpi_struc
   if (packet->payload_packet_len != hdr_size + websocket_payload_length)
     {
       NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload");
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -89,7 +89,7 @@ static void ndpi_check_websocket(struct ndpi_detection_module_struct *ndpi_struc
 
   } else {
     NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload");
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 }
@@ -99,7 +99,7 @@ static void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_stru
   // Break after 6 packets.
   if (flow->packet_counter > 10)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -133,7 +133,7 @@ static void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_stru
     }
     if (i == packet->parsed_lines)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   }
@@ -145,7 +145,8 @@ static void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_stru
 
 void init_websocket_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("WEBSOCKET", ndpi_struct, NDPI_PROTOCOL_WEBSOCKET,
-                                     ndpi_search_websocket, NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                     SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
+  register_dissector("WEBSOCKET", ndpi_struct,
+                     ndpi_search_websocket,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_WEBSOCKET);
 }

@@ -45,7 +45,7 @@ static void ndpi_search_activision(struct ndpi_detection_module_struct *ndpi_str
 
   if (packet->payload_packet_len < 18)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -55,20 +55,20 @@ static void ndpi_search_activision(struct ndpi_detection_module_struct *ndpi_str
     {
       if (ntohs(get_u_int16_t(packet->payload, 0)) != 0x0c02)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
       }
     } else {
       if (ntohs(get_u_int16_t(packet->payload, 0)) != 0x0d02)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
       }
     }
 
     if (packet->payload_packet_len < 29)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -81,13 +81,13 @@ static void ndpi_search_activision(struct ndpi_detection_module_struct *ndpi_str
   } else if (packet->packet_direction == 0) {
     if (packet->payload[0] != 0x29)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   } else if (packet->packet_direction == 1) {
     if (packet->payload[0] != 0x28)
     {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   }
@@ -100,11 +100,8 @@ static void ndpi_search_activision(struct ndpi_detection_module_struct *ndpi_str
 
 void init_activision_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Activision", ndpi_struct,
-    NDPI_PROTOCOL_ACTIVISION,
-    ndpi_search_activision,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("Activision", ndpi_struct,
+                     ndpi_search_activision,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_ACTIVISION);
 }

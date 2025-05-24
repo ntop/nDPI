@@ -66,16 +66,14 @@ static void ndpi_search_cod_mobile(struct ndpi_detection_module_struct *ndpi_str
   }
 
   if (flow->packet_counter >= 4) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }
 
 void init_cod_mobile_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("CoD_Mobile", ndpi_struct,
-                                      NDPI_PROTOCOL_COD_MOBILE,
-                                      ndpi_search_cod_mobile,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("CoD_Mobile", ndpi_struct,
+                     ndpi_search_cod_mobile,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_COD_MOBILE);
 }

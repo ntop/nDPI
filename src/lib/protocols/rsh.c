@@ -71,12 +71,12 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
         {
           if (ndpi_isdigit(packet->payload[i]) == 0)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
           }
         }
       } else {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
       return;
 
@@ -84,7 +84,7 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
       if (packet->payload_packet_len < 3 ||
           packet->payload[packet->payload_packet_len - 1] != '\0')
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
       }
 
@@ -103,7 +103,7 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
               ndpi_is_printable_buffer((uint8_t const *)dissected_info[i - 1],
                                        (dissected_info[i] - dissected_info[i - 1])) == 0)
           {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
           }
 
@@ -111,7 +111,7 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
           {
             if (dissected_info[NDPI_ARRAY_LENGTH(dissected_info) - 1] == NULL)
             {
-              NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+              NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
               return;
             }
             break;
@@ -144,7 +144,7 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
       return;
 
     default:
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
   }
 }
@@ -152,9 +152,8 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
 
 void init_rsh_dissector(struct ndpi_detection_module_struct * ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("RSH", ndpi_struct,
-                                      NDPI_PROTOCOL_RSH, ndpi_search_rsh,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("RSH", ndpi_struct,
+                     ndpi_search_rsh,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_RSH);
 }

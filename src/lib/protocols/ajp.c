@@ -72,7 +72,7 @@ static void ndpi_check_ajp(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if (packet->payload_packet_len < sizeof(ajp_hdr)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -89,7 +89,7 @@ static void ndpi_check_ajp(struct ndpi_detection_module_struct *ndpi_struct,
 
     } else {
       NDPI_LOG_DBG(ndpi_struct, "Invalid AJP request type");
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     }
   } else if (ajp_hdr.len > 0 && ajp_hdr.magic == AJP_CONTAINER_TO_SERVER) {
     if (ajp_hdr.code == AJP_SEND_BODY_CHUNK || ajp_hdr.code == AJP_SEND_HEADERS
@@ -100,11 +100,11 @@ static void ndpi_check_ajp(struct ndpi_detection_module_struct *ndpi_struct,
 
     } else {
       NDPI_LOG_DBG(ndpi_struct, "Invalid AJP response type");
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     }
   } else {
     NDPI_LOG_DBG(ndpi_struct,"Invalid AJP packet\n");
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }
 
@@ -122,9 +122,8 @@ static void ndpi_search_ajp(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_ajp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("AJP", ndpi_struct,
-				      NDPI_PROTOCOL_AJP, ndpi_search_ajp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("AJP", ndpi_struct,
+                     ndpi_search_ajp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_AJP);
 }

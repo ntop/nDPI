@@ -92,7 +92,7 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
   NDPI_LOG_DBG(ndpi_struct, "Ookla detection\n");
 
   if(ntohs(flow->s_port) != ookla_port && ntohs(flow->c_port) != ookla_port) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -113,16 +113,14 @@ void ndpi_search_ookla(struct ndpi_detection_module_struct* ndpi_struct, struct 
     return;
   }
   
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 /* ************************************************************* */
 
 void init_ookla_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("Ookla", ndpi_struct,
-				      NDPI_PROTOCOL_OOKLA,
-				      ndpi_search_ookla,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Ookla", ndpi_struct,
+                     ndpi_search_ookla,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_OOKLA);
 }

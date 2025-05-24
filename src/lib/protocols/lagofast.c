@@ -42,20 +42,20 @@ static void ndpi_search_lagofast(struct ndpi_detection_module_struct *ndpi_struc
 
   NDPI_LOG_DBG(ndpi_struct, "search LagoFast\n");
   if (packet->payload_packet_len < 6) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   // LagoFast identifier
   if (get_u_int32_t(packet->payload, 0) != htonl(0x006e5d03)) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   // Check encoded length
   const uint16_t encoded_length = ntohs(get_u_int16_t(packet->payload, 4));
   if (packet->payload_packet_len != encoded_length + 6 /* identifier + length */) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -64,11 +64,9 @@ static void ndpi_search_lagofast(struct ndpi_detection_module_struct *ndpi_struc
 
 void init_lagofast_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("LagoFast", ndpi_struct,
-				      NDPI_PROTOCOL_LAGOFAST,
-				      ndpi_search_lagofast,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("LagoFast", ndpi_struct,
+                     ndpi_search_lagofast,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                      1, NDPI_PROTOCOL_LAGOFAST);
 }
 

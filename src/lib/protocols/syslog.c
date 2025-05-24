@@ -56,7 +56,7 @@ static void ndpi_search_syslog(struct ndpi_detection_module_struct *ndpi_struct,
 
     if (packet->payload[i++] != '>') {
       NDPI_LOG_DBG(ndpi_struct, "excluded, there is no > following the number\n");
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     } else {
       NDPI_LOG_DBG2(ndpi_struct, "a > following the number\n");
@@ -79,7 +79,7 @@ static void ndpi_search_syslog(struct ndpi_detection_module_struct *ndpi_struct,
             {
                 break;
             }
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
         }
 
@@ -91,7 +91,7 @@ static void ndpi_search_syslog(struct ndpi_detection_module_struct *ndpi_struct,
         if (++i >= packet->payload_packet_len ||
             packet->payload[i] != ' ')
         {
-            NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
         }
     }
@@ -100,16 +100,14 @@ static void ndpi_search_syslog(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_int_syslog_add_connection(ndpi_struct, flow);
     return;
   }
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_syslog_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Syslog", ndpi_struct,
-				      NDPI_PROTOCOL_SYSLOG,
-				      ndpi_search_syslog,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("Syslog", ndpi_struct,
+                     ndpi_search_syslog,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_SYSLOG);
 }

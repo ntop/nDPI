@@ -119,7 +119,7 @@ static void ndpi_search_coap(struct ndpi_detection_module_struct *ndpi_struct,
 
     if((!isCoAPport(s_port) && !isCoAPport(d_port))
        || (packet->payload_packet_len < 4) ) {   // header too short
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
 
@@ -142,7 +142,7 @@ static void ndpi_search_coap(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   return;
 }
 
@@ -151,10 +151,9 @@ static void ndpi_search_coap(struct ndpi_detection_module_struct *ndpi_struct,
  */
 void init_coap_dissector (struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection ("COAP", ndpi_struct,
-				       NDPI_PROTOCOL_COAP,
-				       ndpi_search_coap,
-				       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-				       SAVE_DETECTION_BITMASK_AS_UNKNOWN, ADD_TO_DETECTION_BITMASK);
+  register_dissector("COAP", ndpi_struct,
+                     ndpi_search_coap,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_COAP);
 }
 

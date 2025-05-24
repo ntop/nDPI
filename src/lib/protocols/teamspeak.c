@@ -81,7 +81,7 @@ static void ndpi_search_teamspeak(struct ndpi_detection_module_struct *ndpi_stru
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   return;
 
 ts3_license_weblist:
@@ -95,11 +95,9 @@ ts3_license_weblist:
 
 void init_teamspeak_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("TeamSpeak", ndpi_struct,
-                                      NDPI_PROTOCOL_TEAMSPEAK,
-                                      ndpi_search_teamspeak,
-                                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                                      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-                                      ADD_TO_DETECTION_BITMASK);
+  register_dissector("TeamSpeak", ndpi_struct,
+                     ndpi_search_teamspeak,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_TEAMSPEAK);
 }
 

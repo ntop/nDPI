@@ -292,7 +292,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
 		flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
 	      } else {
 		flow->host_server_name[0] = '\0';
-		NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+		NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 		return;
 	      }
 	    }
@@ -397,7 +397,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
   }
 
   if((!flow->extra_packets_func) || (flow->packet_counter > 12))
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 /* **************************************** */
@@ -471,10 +471,8 @@ static void smtpInitExtraPacketProcessing(struct ndpi_flow_struct *flow) {
 /* **************************************** */
 
 void init_mail_smtp_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  ndpi_set_bitmask_protocol_detection("MAIL_SMTP", ndpi_struct,
-				      NDPI_PROTOCOL_MAIL_SMTP,
-				      ndpi_search_mail_smtp_tcp,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("MAIL_SMTP", ndpi_struct,
+                     ndpi_search_mail_smtp_tcp,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      1, NDPI_PROTOCOL_MAIL_SMTP);
 }

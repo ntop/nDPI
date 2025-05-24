@@ -43,7 +43,7 @@ static void ndpi_search_threema(struct ndpi_detection_module_struct *ndpi_struct
   NDPI_LOG_DBG(ndpi_struct, "search Threema\n");
 
   if (ntohs(packet->tcp->source) != 5222 && ntohs(packet->tcp->dest) != 5222) {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -52,19 +52,19 @@ static void ndpi_search_threema(struct ndpi_detection_module_struct *ndpi_struct
     case 1:
       if (packet->payload_packet_len != 48)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
       return;
     case 2:
       if (packet->payload_packet_len != 80)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
       return;
     case 3:
       if (packet->payload_packet_len != 191)
       {
-        NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
       return;
     case 4:
@@ -75,14 +75,14 @@ static void ndpi_search_threema(struct ndpi_detection_module_struct *ndpi_struct
 
   if (packet->payload_packet_len < 2)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   uint16_t len = le16toh(get_u_int16_t(packet->payload, 0));
   if (len + 2 != packet->payload_packet_len)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -91,11 +91,8 @@ static void ndpi_search_threema(struct ndpi_detection_module_struct *ndpi_struct
 
 void init_threema_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("Threema", ndpi_struct,
-    NDPI_PROTOCOL_THREEMA,
-    ndpi_search_threema,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("Threema", ndpi_struct,
+                     ndpi_search_threema,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_THREEMA);
 }

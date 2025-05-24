@@ -45,13 +45,13 @@ static void ndpi_search_crynet(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (packet->payload_packet_len < 26)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
   if (packet->payload_packet_len != packet->payload[0] + 10)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -60,7 +60,7 @@ static void ndpi_search_crynet(struct ndpi_detection_module_struct *ndpi_struct,
       packet->payload[20] != 0x07 ||
       ntohs(get_u_int16_t(packet->payload, 24)) != 0x0307)
   {
-    NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
@@ -69,11 +69,8 @@ static void ndpi_search_crynet(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_crynet_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("CryNetwork", ndpi_struct,
-    NDPI_PROTOCOL_CRYNET,
-    ndpi_search_crynet,
-    NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
-    SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-    ADD_TO_DETECTION_BITMASK
-  );
+  register_dissector("CryNetwork", ndpi_struct,
+                     ndpi_search_crynet,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     1, NDPI_PROTOCOL_CRYNET);
 }

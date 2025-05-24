@@ -44,7 +44,7 @@ static void ndpi_search_edonkey(struct ndpi_detection_module_struct *ndpi_struct
     protocol = packet->payload[0];
     /* 0xE3: Edonkey, 0xC5: eMule extensions, 0xD4: eMule compressed */
     if(protocol != 0xE3 && protocol != 0xC5 && protocol != 0xD4) {
-      NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
     message_length = packet->payload_packet_len - 5;
@@ -54,17 +54,15 @@ static void ndpi_search_edonkey(struct ndpi_detection_module_struct *ndpi_struct
     }
   }
 
-  NDPI_EXCLUDE_PROTO(ndpi_struct, flow);
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
 void init_edonkey_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  ndpi_set_bitmask_protocol_detection("eDonkey", ndpi_struct,
-				      NDPI_PROTOCOL_EDONKEY,
-				      ndpi_search_edonkey,
-				      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-				      SAVE_DETECTION_BITMASK_AS_UNKNOWN,
-				      ADD_TO_DETECTION_BITMASK);
+  register_dissector("eDonkey", ndpi_struct,
+                     ndpi_search_edonkey,
+                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     1, NDPI_PROTOCOL_EDONKEY);
 }
 
