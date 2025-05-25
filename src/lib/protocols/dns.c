@@ -628,12 +628,11 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 			struct ndpi_dns_packet_header *dns_header,
 			u_int payload_offset, u_int8_t *is_query) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int x = payload_offset;
 
   if(packet->payload_packet_len < sizeof(struct ndpi_dns_packet_header) + payload_offset)
     return 0;
 
-  memcpy(dns_header, (struct ndpi_dns_packet_header*)&packet->payload[x],
+  memcpy(dns_header, (struct ndpi_dns_packet_header*)&packet->payload[payload_offset],
 	 sizeof(struct ndpi_dns_packet_header));
 
   dns_header->tr_id = ntohs(dns_header->tr_id);
@@ -642,8 +641,6 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
   dns_header->num_answers = ntohs(dns_header->num_answers);
   dns_header->authority_rrs = ntohs(dns_header->authority_rrs);
   dns_header->additional_rrs = ntohs(dns_header->additional_rrs);
-
-  x += sizeof(struct ndpi_dns_packet_header);
 
   if((dns_header->flags & FLAGS_MASK) == 0x0000)
     *is_query = 1;

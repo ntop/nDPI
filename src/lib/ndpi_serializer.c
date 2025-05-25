@@ -3041,9 +3041,9 @@ int ndpi_deserialize_clone_item(ndpi_deserializer *_deserializer, ndpi_serialize
 /* Clone all elements in deserializer to serializer (this can be used to convert a TLV record to JSON) */
 int ndpi_deserialize_clone_all(ndpi_deserializer *deserializer, ndpi_serializer *serializer) {
   ndpi_serialization_type kt, et;
-  u_int32_t u32, k32;
+  u_int32_t u32, k32 = 0;
   int32_t i32;
-  u_int64_t u64;
+  u_int64_t u64 = 0;
   int64_t i64;
   float f;
   ndpi_string vs, ks;

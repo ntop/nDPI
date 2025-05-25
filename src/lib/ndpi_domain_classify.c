@@ -150,7 +150,6 @@ bool ndpi_domain_classify_hostname(struct ndpi_detection_module_struct *ndpi_mod
 				   ndpi_domain_classify *s,
 				   u_int16_t *class_id /* out */,
 				   char *hostname) {
-  u_int32_t len;
   const char *dot;
   char *item;
 
@@ -159,7 +158,7 @@ bool ndpi_domain_classify_hostname(struct ndpi_detection_module_struct *ndpi_mod
   *class_id = 0; /* Unknown class_id */
 
   if(!hostname || !s)                                       return(false);
-  if((len = strlen(hostname)) == 0)                         return(false);
+  if(strlen(hostname) == 0)                                 return(false);
   if((dot = strrchr(hostname, '.')) == NULL)                return(false);
   if((!strcmp(dot, ".arpa")) || (!strcmp(dot, ".local")))   return(false);
 

@@ -118,7 +118,7 @@ static void ndpi_search_memcached(struct ndpi_detection_module_struct *ndpi_stru
 
     matches = &flow->l4.tcp.memcached_matches;
   }
-  else if (packet->udp != NULL) {
+  else {
     if (packet->payload_packet_len < MEMCACHED_MIN_UDP_LEN) {
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;

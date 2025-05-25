@@ -38,12 +38,15 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
     return(-2);
 
   if(ndpi_str->public_domain_suffixes != NULL) {
-    /* An existing license was aleady loaded: free it and start over */
+    /* An existing license was already loaded: free it and start over */
+    fclose(fd);
     ndpi_hash_free(&ndpi_str->public_domain_suffixes);
   }
 
-  if(ndpi_hash_init(&ndpi_str->public_domain_suffixes) != 0)
+  if(ndpi_hash_init(&ndpi_str->public_domain_suffixes) != 0) {
+    fclose(fd);
     return(-3);
+  }
 
   while((line = fgets(buf, sizeof(buf), fd)) != NULL) {
     u_int offset, len;

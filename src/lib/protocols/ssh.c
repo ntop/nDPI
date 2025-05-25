@@ -362,7 +362,6 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
 
   if(len > len_max)
     goto invalid_payload;
-  offset += len;
 
   /* ssh.languages_client_to_server [None] */
 
