@@ -916,9 +916,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_ICECAST */
   u_int64_t icecast_stage:1;
 
-  /* NDPI_PROTOCOL_DOFUS */
-  u_int64_t dofus_stage:1;
-
   /* NDPI_PROTOCOL_MAIL_POP */
   u_int64_t mail_pop_stage:2;
 
@@ -927,7 +924,7 @@ struct ndpi_flow_tcp_struct {
   u_int64_t mail_imap_starttls:1;
 
   /* Reserved for future use */
-  u_int64_t reserved:19;
+  u_int64_t reserved:20;
 };
 
 /* ************************************************** */

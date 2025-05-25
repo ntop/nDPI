@@ -1,0 +1,37 @@
+DPI Packets (TCP):	32	(6.40 pkts/flow)
+Confidence DPI              : 5 (flows)
+Num dissector calls: 403 (80.60 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/5/0 (insert/search/found)
+Automa host:          3/3 (search/found)
+Automa domain:        3/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     2/0 (search/found)
+Automa common alpns:  6/6 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   5/5 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+Dofus	73	27258	5
+
+Fun                             73 27258         5            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 10.215.173.1             	 1      
+	2	 192.168.1.204            	 1      
+
+
+	1	TCP 192.168.1.204:49716 <-> 46.137.53.123:5555 [proto: 106/Dofus][IP: 265/AmazonAWS][ClearText][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 4][cat: Game/8][10 pkts/971 bytes <-> 19 pkts/8207 bytes][Goodput ratio: 43/87][0.59 sec][bytes ratio: -0.788 (Download)][IAT c2s/s2c min/avg/max/stddev: 6/0 73/26 203/251 59/65][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 97/432 322/1514 79/534][TCP Fingerprint: 2_128_65535_6bb88f5575fd/Windows][PLAIN TEXT (type.ankama.com/j)][Plen Bins: 30,15,15,0,0,0,0,0,5,5,0,0,5,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,0,0]
+	2	TCP 192.168.1.204:49684 <-> 18.65.82.75:443 [proto: 91.106/TLS.Dofus][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 6][cat: Game/8][4 pkts/745 bytes <-> 6 pkts/5168 bytes][Goodput ratio: 69/93][0.03 sec][Hostname/SNI: launcher.cdn.ankama.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.748 (Download)][IAT c2s/s2c min/avg/max/stddev: 2/0 8/3 11/13 4/5][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 186/861 571/1494 222/654][TCP Fingerprint: 2_128_65535_6bb88f5575fd/Windows][TLSv1.3][JA4: t13d1516h2_8daaf6152771_e5627efa2ab1][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,60,0,0]
+	3	TCP 10.215.173.1:42784 <-> 54.246.120.81:443 [proto: 91.106/TLS.Dofus][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 9][cat: Game/8][6 pkts/926 bytes <-> 4 pkts/4506 bytes][Goodput ratio: 63/95][0.16 sec][Hostname/SNI: event-mediator.dofus-touch.com][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.659 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/1 31/21 91/61 38/29][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 154/1126 566/2910 186/1182][TCP Fingerprint: 2_64_65535_b8d6cf600040/Unknown][TLSv1.2][JA4: t13d1516h2_8daaf6152771_02713d6af862][ServerNames: *.dofus-touch.com,dofus-touch.com][JA3S: bfc90d56141386ee83b56cda231cccfc][Issuer: C=US, O=Amazon, CN=Amazon RSA 2048 M03][Subject: CN=*.dofus-touch.com][ECH: version 0xfe0d][Certificate SHA-1: 6D:13:FC:5E:53:C6:F6:F0:7A:40:A5:AD:45:E1:D2:3D:C2:70:26:65][Chrome][Validity: 2024-12-15 00:00:00 - 2026-01-14 23:59:59][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,25]
+	4	TCP 10.215.173.1:42430 <-> 34.240.68.19:443 [proto: 91.106/TLS.Dofus][IP: 265/AmazonAWS][Encrypted][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 9][cat: Game/8][6 pkts/906 bytes <-> 4 pkts/4494 bytes][Goodput ratio: 62/95][0.12 sec][Hostname/SNI: dt-proxy-production-login.ankama-games.com][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.664 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/19 62/56 29/26][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 151/1124 566/2910 186/1181][TCP Fingerprint: 2_64_65535_b8d6cf600040/Unknown][TLSv1.2][JA4: t13d1516h2_8daaf6152771_02713d6af862][ServerNames: *.ankama-games.com][JA3S: bfc90d56141386ee83b56cda231cccfc][Issuer: C=US, O=Amazon, CN=Amazon RSA 2048 M02][Subject: CN=*.ankama-games.com][ECH: version 0xfe0d][Certificate SHA-1: A8:D5:A9:6D:53:95:1E:F5:F8:9C:76:F5:71:A0:E4:17:58:D1:B1:EA][Chrome][Validity: 2025-01-30 00:00:00 - 2026-03-01 23:59:59][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,25]
+	5	TCP 192.168.1.204:49715 <-> 75.2.115.63:5555 [proto: 106/Dofus][IP: 265/AmazonAWS][ClearText][Confidence: DPI][FPC: 265/AmazonAWS, Confidence: IP address][DPI packets: 4][cat: Game/8][7 pkts/526 bytes <-> 7 pkts/809 bytes][Goodput ratio: 26/49][2.59 sec][bytes ratio: -0.212 (Download)][IAT c2s/s2c min/avg/max/stddev: 1/8 507/516 2184/2247 842/867][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 75/116 179/365 43/105][TCP Fingerprint: 2_128_65535_6bb88f5575fd/Windows][PLAIN TEXT (@B01BE050)][Plen Bins: 25,0,25,25,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
