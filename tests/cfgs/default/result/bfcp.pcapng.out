@@ -1,14 +1,14 @@
-DPI Packets (TCP):	6	(6.00 pkts/flow)
-DPI Packets (UDP):	2	(2.00 pkts/flow)
-Confidence DPI              : 2 (flows)
-Num dissector calls: 333 (166.50 diss/flow)
+DPI Packets (TCP):	4	(4.00 pkts/flow)
+DPI Packets (UDP):	2	(1.00 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 417 (139.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/2/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -18,12 +18,13 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   4/0 (search/found)
+Patricia protocols:   6/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-BFCP	32	2224	2
+BFCP	65	4458	3
 
-Acceptable                      32 2224          2            
+Acceptable                      65 4458          3            
 
-	1	TCP 127.0.0.1:58984 <-> 127.0.0.1:5070 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Video/26][10 pkts/704 bytes <-> 6 pkts/512 bytes][Goodput ratio: 5/21][123.11 sec][bytes ratio: 0.158 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 12579/31975 92304/92304 30186/42684][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 70/85 78/150 5/29][TCP Fingerprint: 2_64_65495_db1b9381215d/Unknown][Plen Bins: 83,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	UDP 192.168.3.134:57020 <-> 192.168.9.100:16500 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Video/26][7 pkts/470 bytes <-> 9 pkts/538 bytes][Goodput ratio: 34/30][16.68 sec][bytes ratio: -0.067 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/0 102/2377 449/16165 174/5631][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 67/60 90/98 10/14][Plen Bins: 87,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 10.0.200.73:3238 <-> 10.0.102.79:36633 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 32/BFCP, Confidence: DPI][DPI packets: 1][cat: Video/26][15 pkts/1170 bytes <-> 18 pkts/1064 bytes][Goodput ratio: 46/29][30.22 sec][Conference Id: 1][User Id: 2][bytes ratio: 0.047 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 53/53 2043/1956 3945/5000 1050/1401][Pkt Len c2s/s2c min/avg/max/stddev: 58/54 78/59 94/94 12/12][Plen Bins: 60,39,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 127.0.0.1:58984 <-> 127.0.0.1:5070 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Video/26][10 pkts/704 bytes <-> 6 pkts/512 bytes][Goodput ratio: 5/21][123.11 sec][Conference Id: 1927653396][User Id: 2055][bytes ratio: 0.158 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 12579/31975 92304/92304 30186/42684][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 70/85 78/150 5/29][TCP Fingerprint: 2_64_65495_db1b9381215d/Unknown][Plen Bins: 83,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.3.134:57020 <-> 192.168.9.100:16500 [proto: 32/BFCP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 32/BFCP, Confidence: DPI][DPI packets: 1][cat: Video/26][7 pkts/470 bytes <-> 9 pkts/538 bytes][Goodput ratio: 34/30][16.68 sec][Conference Id: 1927653397][User Id: 2056][bytes ratio: -0.067 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/0 102/2377 449/16165 174/5631][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 67/60 90/98 10/14][Plen Bins: 87,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

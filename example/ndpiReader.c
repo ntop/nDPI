@@ -2088,6 +2088,11 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
             fprintf(out, "[User-agent: %s]", flow->fast_cgi.user_agent);
           }
         break;
+
+      case INFO_BFCP:
+        fprintf(out, "[Conference Id: %d]", flow->bfcp.conference_id);
+        fprintf(out, "[User Id: %d]", flow->bfcp.user_id);
+        break;
       }
 
     if(flow->ssh_tls.advertised_alpns)

@@ -1636,6 +1636,11 @@ struct ndpi_flow_struct {
       char url[64];
     } fast_cgi;
 
+    struct {
+      u_int32_t conference_id;
+      u_int16_t user_id;
+    } bfcp;
+
   } protos;
 
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
@@ -1655,10 +1660,6 @@ struct ndpi_flow_struct {
 
   /* NDPI_PROTOCOL_TEAMVIEWER */
   u_int8_t teamviewer_stage : 3;
-
-  /* NDPI_PROTOCOL_BFCP */
-  u_int8_t bfcp_stage:1;
-  u_int32_t bfcp_conference_id;
 
   /* NDPI_PROTOCOL_OPENVPN */
   u_int8_t ovpn_session_id[2][8];

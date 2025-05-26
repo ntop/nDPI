@@ -1503,6 +1503,12 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     if(flow->ndpi_flow->protos.sip.to_imsi[0] != '\0')
       ndpi_snprintf(flow->sip.to_imsi, sizeof(flow->sip.to_imsi), "%s", flow->ndpi_flow->protos.sip.to_imsi);
   }
+  /* BFCP */
+  else if(is_ndpi_proto(flow, NDPI_PROTOCOL_BFCP)) {
+    flow->info_type = INFO_BFCP;
+    flow->bfcp.conference_id = flow->ndpi_flow->protos.bfcp.conference_id;
+    flow->bfcp.user_id = flow->ndpi_flow->protos.bfcp.user_id;
+  }
   /* TELNET */
   else if(is_ndpi_proto(flow, NDPI_PROTOCOL_TELNET)) {
     if(flow->ndpi_flow->protos.telnet.username[0] != '\0')

@@ -172,6 +172,7 @@ enum info_type {
     INFO_NATPMP,
     INFO_SIP,
     INFO_FASTCGI,
+    INFO_BFCP,
 };
 
 typedef struct {
@@ -277,6 +278,11 @@ typedef struct ndpi_flow_info {
       char user_agent[32];
       char url[64];
     } fast_cgi;
+
+    struct {
+      u_int32_t conference_id;
+      u_int16_t user_id;
+    } bfcp;
   };
 
   ndpi_serializer ndpi_flow_serializer;
