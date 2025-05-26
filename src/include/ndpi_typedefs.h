@@ -1206,7 +1206,6 @@ typedef struct ndpi_proto_defaults {
   u_int16_t tcp_default_ports[MAX_DEFAULT_PORTS], udp_default_ports[MAX_DEFAULT_PORTS];
   ndpi_protocol_breed_t protoBreed;
   ndpi_protocol_qoe_category_t qoeCategory;
-  void (*func) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
 } ndpi_proto_defaults_t;
 
 
