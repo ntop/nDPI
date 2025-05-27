@@ -49,7 +49,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   NDPI_INTERNAL_PROTOCOL_SET_ALL(enabled_bitmask);
   if(fuzzed_data.ConsumeBool()) {
     NDPI_INTERNAL_PROTOCOL_RESET(enabled_bitmask);
-    for(i = 0; i < NDPI_MAX_INTERNAL_PROTOCOLS; i++) {
+    for(i = 0; i < ndpi_get_num_internal_protocols(); i++) {
       if(fuzzed_data.ConsumeBool())
         NDPI_INTERNAL_PROTOCOL_ADD(enabled_bitmask, i);
     }
@@ -369,7 +369,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_config(ndpi_info_mod, "any", "log", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
-    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_internal_protocols() + 1); /* + 1 to trigger invalid pid */
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     snprintf(cfg_proto, sizeof(cfg_proto), "%d", pid);
@@ -384,7 +384,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_config(ndpi_info_mod, "any", "ip_list.load", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
-    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_internal_protocols() + 1); /* + 1 to trigger invalid pid */
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     snprintf(cfg_proto, sizeof(cfg_proto), "%d", pid);
@@ -392,7 +392,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
-    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_internal_protocols() + 1); /* + 1 to trigger invalid pid */
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     snprintf(cfg_proto, sizeof(cfg_proto), "%d", pid);
@@ -686,12 +686,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_finalize_initialization(ndpi_info_mod);
 
   /* Random protocol configuration */
-  pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
+  pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_protocols(ndpi_info_mod) + 1); /* + 1 to trigger invalid pid */
   protoname = ndpi_get_proto_by_id(ndpi_info_mod, pid);
   if (protoname) {
     ndpi_get_proto_by_name(ndpi_info_mod, protoname);
 
-    pid2 = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS + 1); /* + 1 to trigger invalid pid */
+    pid2 = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_protocols(ndpi_info_mod) + 1); /* + 1 to trigger invalid pid */
     protoname2 = ndpi_get_proto_by_id(ndpi_info_mod, pid2);
     if(protoname2) {
       snprintf(pids_name, sizeof(pids_name), "%s.%s", protoname, protoname2);
@@ -703,7 +703,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_map_ndpi_id_to_user_proto_id(ndpi_info_mod, pid);
   ndpi_set_proto_breed(ndpi_info_mod, pid, NDPI_PROTOCOL_SAFE);
   ndpi_set_proto_category(ndpi_info_mod, pid, NDPI_PROTOCOL_CATEGORY_MEDIA);
-  ndpi_is_subprotocol_informative(pid);
+  ndpi_is_subprotocol_informative(ndpi_info_mod, pid);
   ndpi_get_proto_breed(ndpi_info_mod, pid);
 
   ndpi_port_range d_port[MAX_DEFAULT_PORTS] = {};
@@ -742,10 +742,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_tunnel2str(static_cast<ndpi_packet_tunnel>(fuzzed_data.ConsumeIntegralInRange(static_cast<int>(ndpi_no_tunnel),
                                                                                      static_cast<int>(ndpi_gre_tunnel + 1)))); /* + 1 to trigger invalid value */
 
-  ndpi_get_num_supported_protocols(ndpi_info_mod);
+  ndpi_get_num_protocols(ndpi_info_mod);
   ndpi_get_proto_defaults(ndpi_info_mod);
-  ndpi_get_ndpi_num_custom_protocols(ndpi_info_mod);
-  ndpi_get_ndpi_num_supported_protocols(ndpi_info_mod);
 
   ndpi_self_check_host_match(stdout);
 
@@ -814,10 +812,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_flow_ndpi_proto(&flow, &p2);
   ndpi_is_proto(p.proto, NDPI_PROTOCOL_TLS);
   ndpi_http_method2str(flow.http.method);
-  ndpi_is_subprotocol_informative(p.proto.app_protocol);
-  ndpi_get_http_method(bool_value ? &flow : NULL);
-  ndpi_get_http_url(&flow);
-  ndpi_get_http_content_type(&flow);
+  ndpi_is_subprotocol_informative(ndpi_info_mod, p.proto.app_protocol);
   ndpi_get_flow_name(bool_value ? &flow : NULL);
   /* ndpi_guess_undetected_protocol() is a "strange" function. Try fuzzing it, here */
   if(!ndpi_is_protocol_detected(p)) {

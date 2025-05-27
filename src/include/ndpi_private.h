@@ -381,8 +381,8 @@ struct ndpi_detection_module_struct {
   /* misc parameters */
   u_int32_t tcp_max_retransmission_window_size;
 
-  u_int ndpi_num_supported_protocols;
-  u_int ndpi_num_custom_protocols;
+  u_int num_supported_protocols;
+  u_int num_custom_protocols;
 
   /* HTTP/DNS/HTTPS/QUIC host matching */
   ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
@@ -443,7 +443,9 @@ struct ndpi_detection_module_struct {
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
-  u_int16_t ndpi_to_user_proto_id[NDPI_MAX_NUM_CUSTOM_PROTOCOLS]; /* custom protocolId mapping */
+  u_int16_t *ndpi_to_user_proto_id; /* custom protocolId mapping */
+  u_int16_t ndpi_to_user_proto_id_num_allocated;
+
   ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
@@ -701,6 +703,10 @@ bool ndpi_cache_address(struct ndpi_detection_module_struct *ndpi_struct,
 
 int is_monitoring_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId);
 int is_flowrisk_info_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id);
+
+u_int8_t ndpi_is_valid_protoId(struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId);
+
+u_int ndpi_get_num_internal_protocols(void);
 
   /* TLS */
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,

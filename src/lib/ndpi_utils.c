@@ -3453,17 +3453,19 @@ u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************* */
 
-u_int8_t ndpi_is_valid_protoId(u_int16_t protoId) {
-  return((protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS) ? 0 : 1);
+u_int8_t ndpi_is_valid_protoId(struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId) {
+  if(!ndpi_str)
+    return 0;
+  return(protoId >= ndpi_str->num_supported_protocols ? 0 : 1);
 }
 
 /* ******************************************* */
 
 u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
 				 ndpi_protocol proto) {
-  if(proto.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN && ndpi_is_valid_protoId(proto.proto.app_protocol)) {
+  if(proto.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN && ndpi_is_valid_protoId(ndpi_str, proto.proto.app_protocol)) {
     return(!ndpi_str->proto_defaults[proto.proto.app_protocol].isClearTextProto);
-  } else if(ndpi_is_valid_protoId(proto.proto.master_protocol) && ndpi_is_valid_protoId(proto.proto.app_protocol)) {
+  } else if(ndpi_is_valid_protoId(ndpi_str, proto.proto.master_protocol) && ndpi_is_valid_protoId(ndpi_str, proto.proto.app_protocol)) {
     if(ndpi_str->proto_defaults[proto.proto.master_protocol].isClearTextProto
        && (!ndpi_str->proto_defaults[proto.proto.app_protocol].isClearTextProto))
       return(0);
@@ -4266,7 +4268,7 @@ char *ndpi_strip_leading_trailing_spaces(char *ptr, int *ptr_len) {
 
 ndpi_protocol_qoe_category_t ndpi_find_protocol_qoe(struct ndpi_detection_module_struct *ndpi_str,
 						    u_int16_t protoId) {
-  if((ndpi_str == NULL) || (!ndpi_is_valid_protoId(protoId)))
+  if(!ndpi_is_valid_protoId(ndpi_str, protoId))
     return(NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED);
   else
     return(ndpi_str->proto_defaults[protoId].qoeCategory);
@@ -4399,7 +4401,7 @@ u_char* ndpi_str_to_utf8(u_char *in, u_int in_len, u_char *out, u_int out_len) {
 */
 bool ndpi_is_master_only_protocol(struct ndpi_detection_module_struct *ndpi_str,
 				  u_int16_t proto_id) {
-  if(!ndpi_is_valid_protoId(proto_id))
+  if(!ndpi_is_valid_protoId(ndpi_str, proto_id))
     return(false);
   else
     return(ndpi_str->proto_defaults[proto_id].isAppProtocol ? false : true);

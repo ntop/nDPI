@@ -901,7 +901,7 @@ void extcap_config() {
 
   ndpi_finalize_initialization(ndpi_str);
 
-  ndpi_num_supported_protocols = ndpi_get_ndpi_num_supported_protocols(ndpi_str);
+  ndpi_num_supported_protocols = ndpi_get_num_protocols(ndpi_str);
   proto_defaults = ndpi_get_proto_defaults(ndpi_str);
 
   /* -i <interface> */
@@ -3096,6 +3096,23 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
     if(atoi(buf))
       monitoring_enabled = 1;
   }
+
+  unsigned int num_protocols = ndpi_get_num_protocols(ndpi_thread_info[thread_id].workflow->ndpi_struct);
+  ndpi_thread_info[thread_id].workflow->stats.protocol_counter = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  ndpi_thread_info[thread_id].workflow->stats.protocol_flows = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  ndpi_thread_info[thread_id].workflow->stats.fpc_protocol_counter = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  ndpi_thread_info[thread_id].workflow->stats.fpc_protocol_counter_bytes = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  ndpi_thread_info[thread_id].workflow->stats.fpc_protocol_flows = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  if(!ndpi_thread_info[thread_id].workflow->stats.protocol_counter ||
+     !ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes ||
+     !ndpi_thread_info[thread_id].workflow->stats.protocol_flows ||
+     !ndpi_thread_info[thread_id].workflow->stats.fpc_protocol_counter ||
+     !ndpi_thread_info[thread_id].workflow->stats.fpc_protocol_counter_bytes ||
+     !ndpi_thread_info[thread_id].workflow->stats.fpc_protocol_flows) {
+    exit(-1);
+  }
+
 }
 
 /* *********************************************** */
@@ -4003,8 +4020,26 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   long long unsigned int breed_stats_pkts[NUM_BREEDS] = { 0 };
   long long unsigned int breed_stats_bytes[NUM_BREEDS] = { 0 };
   long long unsigned int breed_stats_flows[NUM_BREEDS] = { 0 };
+  unsigned int num_protocols;
 
   memset(&cumulative_stats, 0, sizeof(cumulative_stats));
+
+  /* In ndpiReader all the contexts have the same configuration */
+  num_protocols = ndpi_get_num_protocols(ndpi_thread_info[0].workflow->ndpi_struct);
+  cumulative_stats.protocol_counter = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  cumulative_stats.protocol_counter_bytes = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  cumulative_stats.protocol_flows = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  cumulative_stats.fpc_protocol_counter = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  cumulative_stats.fpc_protocol_counter_bytes = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  cumulative_stats.fpc_protocol_flows = ndpi_calloc(sizeof(u_int64_t), num_protocols);
+  if(!cumulative_stats.protocol_counter ||
+     !cumulative_stats.protocol_counter_bytes ||
+     !cumulative_stats.protocol_flows ||
+     !cumulative_stats.fpc_protocol_counter ||
+     !cumulative_stats.fpc_protocol_counter_bytes ||
+     !cumulative_stats.fpc_protocol_flows) {
+    goto free_stats;
+  }
 
   for(thread_id = 0; thread_id < num_threads; thread_id++) {
     if((ndpi_thread_info[thread_id].workflow->stats.total_wire_bytes == 0)
@@ -4026,7 +4061,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     cumulative_stats.total_ip_bytes += ndpi_thread_info[thread_id].workflow->stats.total_ip_bytes;
     cumulative_stats.total_discarded_bytes += ndpi_thread_info[thread_id].workflow->stats.total_discarded_bytes;
 
-    for(i = 0; i < ndpi_get_num_supported_protocols(ndpi_thread_info[0].workflow->ndpi_struct); i++) {
+    for(i = 0; i < ndpi_get_num_protocols(ndpi_thread_info[0].workflow->ndpi_struct); i++) {
       cumulative_stats.protocol_counter[i] += ndpi_thread_info[thread_id].workflow->stats.protocol_counter[i];
       cumulative_stats.protocol_counter_bytes[i] += ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[i];
       cumulative_stats.protocol_flows[i] += ndpi_thread_info[thread_id].workflow->stats.protocol_flows[i];
@@ -4403,7 +4438,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   }
 
   if(!quiet_mode) printf("\n\nDetected protocols:\n");
-  for(i = 0; i <= ndpi_get_num_supported_protocols(ndpi_thread_info[0].workflow->ndpi_struct); i++) {
+  for(i = 0; i < ndpi_get_num_protocols(ndpi_thread_info[0].workflow->ndpi_struct); i++) {
     ndpi_protocol_breed_t breed = ndpi_get_proto_breed(ndpi_thread_info[0].workflow->ndpi_struct,
                                                        ndpi_map_ndpi_id_to_user_proto_id(ndpi_thread_info[0].workflow->ndpi_struct, i));
 
@@ -4524,6 +4559,13 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     deletePortsStats(dstStats);
     dstStats = NULL;
   }
+
+  ndpi_free(cumulative_stats.protocol_counter);
+  ndpi_free(cumulative_stats.protocol_counter_bytes);
+  ndpi_free(cumulative_stats.protocol_flows);
+  ndpi_free(cumulative_stats.fpc_protocol_counter);
+  ndpi_free(cumulative_stats.fpc_protocol_counter_bytes);
+  ndpi_free(cumulative_stats.fpc_protocol_flows);
 }
 
 /**

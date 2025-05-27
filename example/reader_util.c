@@ -336,28 +336,6 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
 
 /* ***************************************************** */
 
-static uint16_t ndpi_get_proto_id(struct ndpi_detection_module_struct *ndpi_mod, const char *name) {
-  uint16_t proto_id;
-  char *e;
-  unsigned long p = strtol(name,&e,0);
-  ndpi_proto_defaults_t *proto_defaults = ndpi_get_proto_defaults(ndpi_mod);
-
-  if(e && !*e) {
-    if(p < NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS &&
-       proto_defaults[p].protoName) return (uint16_t)p;
-    return NDPI_PROTOCOL_UNKNOWN;
-  }
-
-  for(proto_id=NDPI_PROTOCOL_UNKNOWN; proto_id < NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS; proto_id++) {
-    if(proto_defaults[proto_id].protoName &&
-       !strcasecmp(proto_defaults[proto_id].protoName,name))
-      return proto_id;
-  }
-  return NDPI_PROTOCOL_UNKNOWN;
-}
-
-/* ***************************************************** */
-
 static char _proto_delim[] = " \t,:;";
 int parse_proto_name_list(char *str, NDPI_INTERNAL_PROTOCOL_BITMASK *bitmask, int inverted_logic) {
   char *n;
@@ -393,7 +371,7 @@ int parse_proto_name_list(char *str, NDPI_INTERNAL_PROTOCOL_BITMASK *bitmask, in
         NDPI_INTERNAL_PROTOCOL_RESET(*bitmask);
       continue;
     }
-    proto = ndpi_get_proto_id(module, n);
+    proto = ndpi_get_proto_by_name(module, n);
     if(proto == NDPI_PROTOCOL_UNKNOWN && strcmp(n,"unknown") && strcmp(n,"0")) {
       LOG(NDPI_LOG_ERROR, "Invalid protocol %s\n", n);
       ndpi_exit_detection_module(module);
@@ -625,6 +603,14 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow) {
 
   ndpi_exit_detection_module(workflow->ndpi_struct);
   ndpi_free(workflow->ndpi_flows_root);
+
+  ndpi_free(workflow->stats.protocol_counter);
+  ndpi_free(workflow->stats.protocol_counter_bytes);
+  ndpi_free(workflow->stats.protocol_flows);
+  ndpi_free(workflow->stats.fpc_protocol_counter);
+  ndpi_free(workflow->stats.fpc_protocol_counter_bytes);
+  ndpi_free(workflow->stats.fpc_protocol_flows);
+
   ndpi_free(workflow);
 }
 
