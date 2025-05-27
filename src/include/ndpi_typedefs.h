@@ -1203,7 +1203,7 @@ typedef struct ndpi_proto_defaults {
   u_int16_t *subprotocols;
   u_int32_t subprotocol_count;
   u_int16_t protoId, dissector_idx;
-  u_int16_t tcp_default_ports[MAX_DEFAULT_PORTS], udp_default_ports[MAX_DEFAULT_PORTS];
+  ndpi_port_range tcp_default_ports[MAX_DEFAULT_PORTS], udp_default_ports[MAX_DEFAULT_PORTS];
   ndpi_protocol_breed_t protoBreed;
   ndpi_protocol_qoe_category_t qoeCategory;
 } ndpi_proto_defaults_t;

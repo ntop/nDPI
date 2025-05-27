@@ -409,6 +409,28 @@ u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct 
 
 /* ************************************************************************************* */
 
+static ndpi_port_range *ndpi_build_default_ports_range(ndpi_port_range *ports, u_int16_t portA_low, u_int16_t portA_high,
+                                                       u_int16_t portB_low, u_int16_t portB_high, u_int16_t portC_low,
+                                                       u_int16_t portC_high, u_int16_t portD_low, u_int16_t portD_high,
+                                                       u_int16_t portE_low, u_int16_t portE_high) {
+  int i = 0;
+
+  ports[i].port_low = portA_low, ports[i].port_high = portA_high;
+  i++;
+  ports[i].port_low = portB_low, ports[i].port_high = portB_high;
+  i++;
+  ports[i].port_low = portC_low, ports[i].port_high = portC_high;
+  i++;
+  ports[i].port_low = portD_low, ports[i].port_high = portD_high;
+  i++;
+  ports[i].port_low = portE_low, ports[i].port_high = portE_high;
+
+  return(ports);
+}
+
+
+/* ************************************************************************************* */
+
 ndpi_port_range *ndpi_build_default_ports(ndpi_port_range *ports, u_int16_t portA, u_int16_t portB, u_int16_t portC,
                                           u_int16_t portD, u_int16_t portE) {
   int i = 0;
@@ -652,9 +674,8 @@ void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
       addDefaultPort(ndpi_str, &tcpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->tcpRoot,
 		     __FUNCTION__, __LINE__);
 
-    /* No port range, just the lower port */
-    ndpi_str->proto_defaults[protoId].tcp_default_ports[j] = tcpDefPorts[j].port_low;
-    ndpi_str->proto_defaults[protoId].udp_default_ports[j] = udpDefPorts[j].port_low;
+    ndpi_str->proto_defaults[protoId].tcp_default_ports[j] = tcpDefPorts[j];
+    ndpi_str->proto_defaults[protoId].udp_default_ports[j] = udpDefPorts[j];
   }
 }
 
@@ -1497,8 +1518,8 @@ static void ndpi_init_protocol_defaults(struct ndpi_detection_module_struct *ndp
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SIP,
 			  "SIP", NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_QOE_CATEGORY_VOIP_CALLS,
-			  ndpi_build_default_ports(ports_a, 5060, 5061, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 5060, 5061, 0, 0, 0) /* UDP */);
+			  ndpi_build_default_ports_range(ports_a, 5060, 5061, 0, 0, 0, 0, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports_range(ports_b, 5060, 5061, 0, 0, 0, 0, 0, 0, 0, 0) /* UDP */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TRUPHONE,
 			  "TruPhone", NDPI_PROTOCOL_CATEGORY_VOIP, NDPI_PROTOCOL_QOE_CATEGORY_VOIP_CALLS,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -8927,17 +8948,26 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ********************************************************************************* */
 
-static char* ndpi_expected_ports_str(u_int16_t *default_ports, char *str, u_int str_len) {
+static char* ndpi_expected_ports_str(ndpi_port_range *default_ports, char *str, u_int str_len) {
+  int rc;
+
   str[0] = '\0';
 
-  if(default_ports[0] != 0) {
+  if(default_ports[0].port_low != 0) {
     u_int8_t i, offset;
 
     offset = snprintf(str, str_len, "Expected on port ");
 
-    for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i] != 0); i++) {
-      int rc = snprintf(&str[offset], str_len-offset, "%s%u",
-			(i > 0) ? "," : "", default_ports[i]);
+    for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i].port_low != 0); i++) {
+      if(default_ports[i].port_low == default_ports[i].port_high)
+        rc = snprintf(&str[offset], str_len-offset, "%s%u",
+		      (i > 0) ? "," : "",
+		      default_ports[i].port_low);
+      else
+        rc = snprintf(&str[offset], str_len-offset, "%s%u-%u",
+                      (i > 0) ? "," : "",
+                      default_ports[i].port_low,
+                      default_ports[i].port_high);
 
       if(rc > 0)
 	offset += rc;
@@ -9133,7 +9163,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
      && ((ret.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) || (ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN))
      ) {
     default_ports_tree_node_t *found;
-    u_int16_t *default_ports;
+    ndpi_port_range *default_ports;
 
     if(packet->udp)
       found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_UDP,
@@ -9163,8 +9193,9 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 	*/
 	u_int8_t found = 0, i;
 
-	for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i] != 0); i++) {
-	  if(default_ports[i] == ntohs(flow->s_port)) {
+	for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i].port_low != 0); i++) {
+	  if(default_ports[i].port_low >= ntohs(flow->s_port) &&
+	     default_ports[i].port_high <= ntohs(flow->s_port)) {
 	    found = 1;
 	    break;
 	  }
@@ -9176,7 +9207,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 
 	  if((r == NULL)
 	     || ((r->proto->protoId != ret.proto.app_protocol) && (r->proto->protoId != ret.proto.master_protocol))) {
-	    if(default_ports && (default_ports[0] != 0)) {
+	    if(default_ports && (default_ports[0].port_low != 0)) {
 	      char str[64];
 
 	      ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,
@@ -9185,12 +9216,15 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 	  }
 	}
       }
-    } else if((!ndpi_is_ntop_protocol(&ret)) && default_ports && (default_ports[0] != 0)) {
+    } else if((!ndpi_is_ntop_protocol(&ret)) && default_ports && (default_ports[0].port_low != 0)) {
       u_int8_t found = 0, i, num_loops = 0;
 
     check_default_ports:
-      for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i] != 0); i++) {
-	if((default_ports[i] == ntohs(flow->c_port)) || (default_ports[i] == ntohs(flow->s_port))) {
+      for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i].port_low != 0); i++) {
+	if((default_ports[i].port_low >= ntohs(flow->c_port) &&
+            default_ports[i].port_high <= ntohs(flow->c_port)) ||
+           (default_ports[i].port_low >= ntohs(flow->s_port) &&
+            default_ports[i].port_high <= ntohs(flow->s_port))) {
 	  found = 1;
 	  break;
 	}
@@ -9214,7 +9248,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 	   || ((r->proto->protoId != ret.proto.app_protocol)
 	       && (r->proto->protoId != ret.proto.master_protocol))) {
 	  if(ret.proto.app_protocol != NDPI_PROTOCOL_FTP_DATA) {
-	    u_int16_t *default_ports;
+	    ndpi_port_range *default_ports;
 
 	    if(packet->udp)
 	      default_ports = ndpi_str->proto_defaults[ret.proto.master_protocol ? ret.proto.master_protocol : ret.proto.app_protocol].udp_default_ports;
@@ -9223,7 +9257,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 	    else
 	      default_ports = NULL;
 
-	    if(default_ports && (default_ports[0] != 0)) {
+	    if(default_ports && (default_ports[0].port_low != 0)) {
 	      char str[64];
 
 	      ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,
@@ -10358,22 +10392,24 @@ int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_str, char *ca
 /* ****************************************************** */
 
 
-static char *default_ports_string(char *ports_str,u_int16_t *default_ports){
+static char *default_ports_string(char *ports_str, ndpi_port_range *default_ports){
 
   //dont display zero ports on help screen
-  if (default_ports[0] == 0)
+  if (default_ports[0].port_low == 0)
     //- for readability
     return "-";
 
   int j=0;
   do
     {
-      //max port len 5(eg 65535) + comma + nul
-      char port[7];
-      sprintf(port,"%d,",default_ports[j]);
+      char port[18];
+      if(default_ports[j].port_low == default_ports[j].port_high)
+        sprintf(port,"%d,",default_ports[j].port_low);
+      else
+        sprintf(port,"%d-%d,",default_ports[j].port_low, default_ports[j].port_high);
       strcat(ports_str,port);
       j++;
-    } while (j < MAX_DEFAULT_PORTS && default_ports[j]!= 0);
+    } while (j < MAX_DEFAULT_PORTS && default_ports[j].port_low != 0);
 
   //remove last comma
   ports_str[strlen(ports_str)-1] = '\0';
@@ -10391,9 +10427,9 @@ void ndpi_dump_protocols(struct ndpi_detection_module_struct *ndpi_str, FILE *du
   if(!ndpi_str || !dump_out) return;
 
   for(i = 0; i < (int) ndpi_str->ndpi_num_supported_protocols; i++) {
-    //max port size(eg 65535) * 5 + 4 commas + nul
-    char udp_ports[30] = "";
-    char tcp_ports[30] = "";
+
+    char udp_ports[128] = "";
+    char tcp_ports[128] = "";
 
     fprintf(dump_out, "%3d %8d %-22s %-10s %-8s %-12s %-18s %-31s %-31s\n",
 	    i, ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, i),
