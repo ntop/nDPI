@@ -12154,7 +12154,8 @@ ndpi_cfg_error ndpi_set_config(struct ndpi_detection_module_struct *ndpi_str,
        (proto == NULL && c->proto == NULL &&
 	strncmp(c->param, "flow_risk.$FLOWRISK_NAME_OR_ID", 30) == 0 &&
 	strncmp(param, "flow_risk.", 10) == 0 &&
-	!ndpi_str_endswith(param, ".info")) ||
+	!ndpi_str_endswith(param, ".info") &&
+	!ndpi_str_endswith(param, ".load")) ||
        (proto == NULL && c->proto == NULL &&
 	strncmp(c->param, "flow_risk.$FLOWRISK_NAME_OR_ID.info", 35) == 0 &&
 	strncmp(param, "flow_risk.", 10) == 0 &&
