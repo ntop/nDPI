@@ -396,6 +396,7 @@
     <ClCompile Include="..\src\lib\protocols\paltalk.c" />
     <ClCompile Include="..\src\lib\protocols\msdo.c" />
     <ClCompile Include="..\src\lib\protocols\melsec.c" />
+    <ClCompile Include="..\src\lib\protocols\hamachi.c" />
     <ClCompile Include="..\src\lib\third_party\src\gcrypt_light.c" />
     <ClCompile Include="..\src\lib\third_party\src\libcache.c" />
     <ClCompile Include="..\src\lib\third_party\src\libinjection_html5.c" />

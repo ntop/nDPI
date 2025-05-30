@@ -3720,3 +3720,12 @@ References: `Rockstar Games official site: <https://www.rockstargames.com/>`_
 Kick.com live streaming platform.
 
 References: `Kick official site: <https://kick.com/>`_
+
+
+.. _Proto_451:
+
+`NDPI_PROTOCOL_HAMACHI`
+===============================
+LogMeIn Hamachi VPN service (primarily used for gaming and remote access). Unlike anonymity VPNs, Hamachi creates virtual LAN networks between devices.
+
+References: `LogMeIn Hamachi official site: <https://vpn.net/>`_

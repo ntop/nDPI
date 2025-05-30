@@ -479,6 +479,7 @@ typedef enum {
   NDPI_PROTOCOL_MSDO                  = 448,
   NDPI_PROTOCOL_ROCKSTAR_GAMES        = 449,
   NDPI_PROTOCOL_KICK                  = 450,
+  NDPI_PROTOCOL_HAMACHI               = 451,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"
