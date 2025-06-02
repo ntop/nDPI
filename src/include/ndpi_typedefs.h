@@ -1215,11 +1215,10 @@ typedef enum {
   NDPI_PROTOCOL_QOE_CATEGORY_MAX                 /* Leave it as last entry !!!                   */
 } ndpi_protocol_qoe_category_t;
 
-/* ntop extensions */
 typedef struct ndpi_proto_defaults {
   char *protoName;
   ndpi_protocol_category_t protoCategory;
-  u_int8_t isClearTextProto:1, isAppProtocol:1, _notused:6;
+  u_int8_t isClearTextProto:1, isAppProtocol:1, isCustomProto:1, _notused:5;
   u_int16_t *subprotocols;
   u_int32_t subprotocol_count;
   u_int16_t protoId, dissector_idx;

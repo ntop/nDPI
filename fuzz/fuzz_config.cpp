@@ -706,12 +706,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_is_subprotocol_informative(ndpi_info_mod, pid);
   ndpi_get_proto_breed(ndpi_info_mod, pid);
 
-  ndpi_port_range d_port[MAX_DEFAULT_PORTS] = {};
-  ndpi_set_proto_defaults(ndpi_info_mod, 0, 0, NDPI_PROTOCOL_SAFE, pid,
-                          protoname, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
-			  NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
-			  d_port, d_port);
-
   ndpi_get_proto_by_name(ndpi_info_mod, NULL); /* Error */
   ndpi_get_proto_by_name(ndpi_info_mod, "foo"); /* Invalid protocol */
   ndpi_get_proto_name(ndpi_info_mod, pid);
