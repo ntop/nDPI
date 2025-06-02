@@ -84,7 +84,6 @@ static void search_hamachi_udp(struct ndpi_detection_module_struct* ndpi_struct,
     goto exclude_hamachi;
   }
 
-
   u_int32_t hamachi_l = ntohl(get_u_int32_t(packet->payload, 0));
   u_int16_t hamachi_s = ntohs(get_u_int16_t(packet->payload, 8));
 
@@ -114,48 +113,35 @@ static void search_hamachi_udp(struct ndpi_detection_module_struct* ndpi_struct,
     return;
   }
 
-  if (flow->l4.udp.hamachi_stage == 1) {
-    /* We have dir=0 signature, waiting for dir=1 */
-    if (dir == 0) {
-      /* Same direction - verify consistency with stored signature */
-      if (hamachi_l != flow->l4.udp.hamachi_long[0] ||
-          hamachi_s != flow->l4.udp.hamachi_short[0])
+  if (flow->l4.udp.hamachi_stage == 1 || flow->l4.udp.hamachi_stage == 2) {
+    u_int8_t stored_dir = flow->l4.udp.hamachi_stage - 1;
+    /* Current packet is same direction - verify */
+    if (dir == stored_dir) {
+      if (hamachi_l != flow->l4.udp.hamachi_long[dir] ||
+          hamachi_s != flow->l4.udp.hamachi_short[dir])
       {
         goto exclude_hamachi;
       }
-    } else {
-      /* Different direction - store signature and complete verification */
-      flow->l4.udp.hamachi_long[1] = hamachi_l;
-      flow->l4.udp.hamachi_short[1] = hamachi_s;
-      flow->l4.udp.hamachi_stage = 3;
+      return; /* Still waiting for opposite direction */
     }
-    return;
-  }
 
-  if (flow->l4.udp.hamachi_stage == 2) {
-    /* We have dir=1 signature, waiting for dir=0 */
-    if (dir == 1) {
-      /* Same direction - verify consistency with stored signature */
-      if (hamachi_l != flow->l4.udp.hamachi_long[1] ||
-          hamachi_s != flow->l4.udp.hamachi_short[1])
-      {
-        goto exclude_hamachi;
-      }
-    } else {
-      /* Different direction - store signature and complete verification */
-      flow->l4.udp.hamachi_long[0] = hamachi_l;
-      flow->l4.udp.hamachi_short[0] = hamachi_s;
-      flow->l4.udp.hamachi_stage = 3;
+    /* Opposite direction - verify signatures differ */
+    if (hamachi_l == flow->l4.udp.hamachi_long[stored_dir] ||
+       hamachi_s == flow->l4.udp.hamachi_short[stored_dir])
+    {
+      goto exclude_hamachi;
     }
+
+    flow->l4.udp.hamachi_long[dir] = hamachi_l;
+    flow->l4.udp.hamachi_short[dir] = hamachi_s;
+    flow->l4.udp.hamachi_stage = 3;
     return;
   }
 
   if (flow->l4.udp.hamachi_stage == 3) {
-    /* Both directions verified - final consistency check before protocol identification */
-    if ((hamachi_l != flow->l4.udp.hamachi_long[dir]  ||
-        hamachi_s != flow->l4.udp.hamachi_short[dir]) &&
-        (flow->l4.udp.hamachi_long[0] == flow->l4.udp.hamachi_long[1] ||
-         flow->l4.udp.hamachi_short[0] == flow->l4.udp.hamachi_short[1]))
+    /* Final consistency check */
+    if (hamachi_l != flow->l4.udp.hamachi_long[dir] ||
+        hamachi_s != flow->l4.udp.hamachi_short[dir])
     {
       goto exclude_hamachi;
     }
