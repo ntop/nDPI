@@ -136,6 +136,14 @@
 #define NDPI_DISSECTOR_BITMASK_IS_SET(p, n)     NDPI_ISSET(&(p), (n))
 #define NDPI_DISSECTOR_BITMASK_SET(p, n)        NDPI_SET(&(p), (n))
 
+#define NDPI_NUM_FDS_BITS_INTERNAL              howmanybits(NDPI_MAX_INTERNAL_PROTOCOLS, NDPI_BITS)
+#define NDPI_INTERNAL_PROTOCOL_BITMASK          ndpi_internal_protocol_bitmask_struct_t
+#define NDPI_INTERNAL_PROTOCOL_SET_ALL(a)        NDPI_ONE(&a)
+#define NDPI_INTERNAL_PROTOCOL_RESET(a)          NDPI_ZERO(&a)
+#define NDPI_INTERNAL_PROTOCOL_ADD(p, n)         NDPI_SET(&(p), (n))
+#define NDPI_INTERNAL_PROTOCOL_DEL(a,b)          NDPI_CLR(&a,b)
+#define NDPI_INTERNAL_PROTOCOL_IS_SET(p, n)      NDPI_ISSET(&(p), (n))
+
 /* this is a very very tricky macro *g*,
  * the compiler will remove all shifts here if the protocol is static...
  */

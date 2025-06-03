@@ -1794,34 +1794,6 @@ static void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struc
   }
 }
 
-/* ********************************* */
-
-ndpi_http_method ndpi_get_http_method(struct ndpi_flow_struct *flow) {
-  if(!flow) {
-    return(NDPI_HTTP_METHOD_UNKNOWN);
-  } else
-    return(flow->http.method);
-}
-
-/* ********************************* */
-
-char* ndpi_get_http_url(struct ndpi_flow_struct *flow) {
-  if((!flow) || (!flow->http.url))
-    return("");
-  else
-    return(flow->http.url);
-}
-
-/* ********************************* */
-
-char* ndpi_get_http_content_type(struct ndpi_flow_struct *flow) {
-  if((!flow) || (!flow->http.content_type))
-    return("");
-  else
-    return(flow->http.content_type);
-}
-
-
 void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   register_dissector("HTTP", ndpi_struct,
                      ndpi_search_http_tcp,

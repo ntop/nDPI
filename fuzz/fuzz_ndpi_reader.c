@@ -65,7 +65,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   struct pcap_pkthdr *header;
   int r;
   char errbuf[PCAP_ERRBUF_SIZE];
-  NDPI_PROTOCOL_BITMASK all;
   u_int i;
   FILE *fd;
 
@@ -86,7 +85,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     g_ctx = ndpi_global_init();
 
-    workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json, g_ctx);
+    workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json, g_ctx, NULL);
 
     ndpi_workflow_set_flow_callback(workflow, NULL, NULL); /* No real callback */
 
@@ -100,10 +99,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_load_risk_domain_file(workflow->ndpi_struct, "risky_domains.txt");
     ndpi_load_malicious_ja4_file(workflow->ndpi_struct, "ja4_fingerprints.csv");
     ndpi_load_malicious_sha1_file(workflow->ndpi_struct, "sha1_fingerprints.csv");
-
-    // enable all protocols
-    NDPI_BITMASK_SET_ALL(all);
-    ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &all);
 
 #ifdef ENABLE_ONLY_SUBCLASSIFICATION
     ndpi_set_config(workflow->ndpi_struct, NULL, "filename.config", "only_classification.conf");

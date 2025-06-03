@@ -282,6 +282,15 @@ typedef struct ndpi_dissector_bitmask_struct {
   ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS_DISSECTORS];
 } ndpi_dissector_bitmask_struct_t;
 
+#ifdef NDPI_CFFI_PREPROCESSING
+#undef NDPI_NUM_FDS_BITS_INTERNAL
+#define NDPI_NUM_FDS_BITS_INTERNAL     15
+#endif
+
+typedef struct ndpi_internal_protocol_bitmask_struct {
+  ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS_INTERNAL];
+} ndpi_internal_protocol_bitmask_struct_t;
+
 struct ndpi_detection_module_struct;
 
 /* NDPI_DEBUG_FUNCTION_PTR (cast) */

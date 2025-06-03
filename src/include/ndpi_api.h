@@ -224,14 +224,27 @@ extern "C" {
    * it do not forget to call first ndpi_finalize_initialization()
    *
    * You can call this function multiple times, (i.e. to create multiple
-   * indipendent detection contexts) but all these calls MUST NOT run
+   * independent detection contexts) but all these calls MUST NOT run
    * in parallel
    *
-   * @g_ctx = global context associated to the new detection module; NULL if no global context is needed
+   * @par g_ctx = global context associated to the new detection module; NULL if no global context is needed
    * @return  the initialized detection module
    *
    */
   struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx);
+
+
+  /**
+   * Similar to `ndpi_init_detection_module` but you can also set the protocol bitmask
+   * By default, all protocols are enabled
+   *
+   * @par g_ctx = global context associated to the new detection module; NULL if no global context is needed
+   * @par detection_bitmask = protocol bitmask. If NULL, all protocols will be enabled
+   * @return  the initialized detection module
+   *
+   */
+  struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_global_context *g_ctx,
+                                                                      const NDPI_INTERNAL_PROTOCOL_BITMASK *detection_bitmask);
 
   /**
    * Completes the initialization (2nd step)
@@ -266,17 +279,6 @@ extern "C" {
    *
    */
   void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_struct);
-
-  /**
-   * Sets the protocol bitmask2
-   *
-   * @par ndpi_struct        = the detection module
-   * @par detection_bitmask  = the protocol bitmask to set
-   * @return 0 if ok, -1 if error
-   *
-   */
-  int ndpi_set_protocol_detection_bitmask2(struct ndpi_detection_module_struct *ndpi_struct,
-					    const NDPI_PROTOCOL_BITMASK * detection_bitmask);
 
   /**
    *  Function to be called before we give up with detection for a given flow.
@@ -572,11 +574,12 @@ extern "C" {
    * Check if subprotocols of the specified master protocol are just
    * informative (and not real)
    *
+   * @par ndpi_mod          = the detection module
    * @par     protoId       = the (master) protocol identifier to query
    * @return  1 = the subprotocol is informative, 0 otherwise.
    *
    */
-  u_int8_t ndpi_is_subprotocol_informative(u_int16_t protoId);
+  u_int8_t ndpi_is_subprotocol_informative(struct ndpi_detection_module_struct *ndpi_mod, u_int16_t protoId);
 
   /**
    * Set hostname-based protocol
@@ -889,13 +892,15 @@ extern "C" {
 					   char *tcp_fingerprint);
     
   /**
-   * Get the total number of the supported protocols
+   * Get the total number of the defined protocols (internals and custom).
+   * It can be called only with finalized context, i.e. after having called
+   * ndpi_finalize_initialization()
    *
    * @par     ndpi_mod = the detection module
    * @return  the number of protocols
    *
    */
-  u_int ndpi_get_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod);
+  u_int ndpi_get_num_protocols(struct ndpi_detection_module_struct *ndpi_mod);
 
   /**
    * Get the nDPI version release
@@ -914,34 +919,6 @@ extern "C" {
    */
   void ndpi_set_automa(struct ndpi_detection_module_struct *ndpi_struct,
 		       void* automa);
-
-  /* NDPI_PROTOCOL_HTTP */
-  /**
-   * Retrieve information for HTTP flows
-   *
-   * @par     flow     = the detected flow
-   * @return  the HTTP method information about the flow
-   *
-   */
-  ndpi_http_method ndpi_get_http_method(struct ndpi_flow_struct *flow);
-
-  /**
-   * Get the HTTP url
-   *
-   * @par     flow     = the detected flow
-   * @return  the HTTP method information about the flow
-   *
-   */
-  char* ndpi_get_http_url(struct ndpi_flow_struct *flow);
-
-  /**
-   * Get the HTTP content-type
-   *
-   * @par     flow     = the detected flow
-   * @return  the HTTP method information about the flow
-   *
-   */
-  char* ndpi_get_http_content_type(struct ndpi_flow_struct *flow);
 
   /* NDPI_PROTOCOL_TOR */
   /**
@@ -1084,8 +1061,6 @@ extern "C" {
   bool ndpi_is_proto_equals(ndpi_master_app_protocol to_check, ndpi_master_app_protocol to_match, bool exact_match_only);
 
   ndpi_proto_defaults_t* ndpi_get_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod);
-  u_int ndpi_get_ndpi_num_supported_protocols(struct ndpi_detection_module_struct *ndpi_mod);
-  u_int ndpi_get_ndpi_num_custom_protocols(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_detection_module_size(void);
 
   /* Simple helper to get current time, in sec */
@@ -1227,7 +1202,6 @@ extern "C" {
   u_int8_t ndpi_is_public_ipv4(u_int32_t a /* host byte order */);
   u_int64_t ndpi_htonll(u_int64_t v);
   u_int64_t ndpi_ntohll(u_int64_t v);
-  u_int8_t ndpi_is_valid_protoId(u_int16_t protoId);
   u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str, ndpi_protocol proto);
 
   /* DGA */

@@ -210,9 +210,6 @@ static struct nDPI_workflow * init_workflow(char const * const file_or_device)
     return NULL;
   }
 
-  NDPI_PROTOCOL_BITMASK protos;
-  NDPI_BITMASK_SET_ALL(protos);
-  ndpi_set_protocol_detection_bitmask2(workflow->ndpi_struct, &protos);
   ndpi_finalize_initialization(workflow->ndpi_struct);
 
   return workflow;
