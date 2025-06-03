@@ -667,7 +667,7 @@ static void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_st
   }
 
   if(ndpi_str->proto_defaults[protoId].protoName != NULL) {
-    if(strcmp(ndpi_str->proto_defaults[protoId].protoName, protoName) != 0) {
+    if(strcasecmp(ndpi_str->proto_defaults[protoId].protoName, protoName) != 0) {
       NDPI_LOG_ERR(ndpi_str, "Error. Same protocol id %d with different names [%s][%s]!\n",
                    protoId, ndpi_str->proto_defaults[protoId].protoName, protoName);
     } else {
@@ -696,21 +696,7 @@ static void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_st
   ndpi_str->proto_defaults[protoId].qoeCategory = qoeCategory;
   ndpi_str->proto_defaults[protoId].subprotocols = NULL;
   ndpi_str->proto_defaults[protoId].subprotocol_count = 0;
-
-  if(!is_proto_enabled(ndpi_str, protoId)) {
-    NDPI_LOG_DBG(ndpi_str, "[NDPI] Skip default ports for %s/protoId=%d: disabled\n", protoName, protoId);
-    return;
-  }
-
   for(j = 0; j < MAX_DEFAULT_PORTS; j++) {
-    if(udpDefPorts[j].port_low != 0)
-      addDefaultPort(ndpi_str, &udpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->udpRoot,
-		     __FUNCTION__, __LINE__);
-
-    if(tcpDefPorts[j].port_low != 0)
-      addDefaultPort(ndpi_str, &tcpDefPorts[j], &ndpi_str->proto_defaults[protoId], 0, &ndpi_str->tcpRoot,
-		     __FUNCTION__, __LINE__);
-
     ndpi_str->proto_defaults[protoId].tcp_default_ports[j] = tcpDefPorts[j];
     ndpi_str->proto_defaults[protoId].udp_default_ports[j] = udpDefPorts[j];
   }
@@ -757,7 +743,7 @@ static int addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
 						     default_ports_tree_node_t_cmp); /* Add it to the tree */
 
     if(ret == NULL) {
-      NDPI_LOG_DBG(ndpi_str, "[NDPI] %s:%d error searching for port %u\n", _func, _line, port);
+      NDPI_LOG_ERR(ndpi_str, "[NDPI] %s:%d error searching for port %u\n", _func, _line, port);
       ndpi_free(node);
       break;
     }
@@ -773,6 +759,33 @@ static int addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   return(0);
+}
+
+/* ****************************************************** */
+
+static void load_default_ports(struct ndpi_detection_module_struct *ndpi_str)
+{
+  u_int32_t proto_id, j;
+
+  for(proto_id = 0; proto_id < ndpi_str->num_supported_protocols; proto_id++) {
+    if(!is_proto_enabled(ndpi_str, proto_id)) {
+      NDPI_LOG_DBG(ndpi_str, "Skip default ports for %s/protoId=%d: disabled\n",
+                   ndpi_str->proto_defaults[proto_id].protoName, proto_id);
+      continue;
+    }
+
+    for(j = 0; j < MAX_DEFAULT_PORTS; j++) {
+      if(ndpi_str->proto_defaults[proto_id].udp_default_ports[j].port_low != 0)
+        addDefaultPort(ndpi_str, &ndpi_str->proto_defaults[proto_id].udp_default_ports[j],
+                       &ndpi_str->proto_defaults[proto_id], 0, &ndpi_str->udpRoot,
+                       __FUNCTION__, __LINE__);
+
+      if(ndpi_str->proto_defaults[proto_id].tcp_default_ports[j].port_low != 0)
+        addDefaultPort(ndpi_str, &ndpi_str->proto_defaults[proto_id].tcp_default_ports[j],
+                       &ndpi_str->proto_defaults[proto_id], 0, &ndpi_str->tcpRoot,
+                       __FUNCTION__, __LINE__);
+    }
+  }
 }
 
 /* ****************************************************** */
@@ -919,59 +932,48 @@ int ndpi_init_empty_app_protocol(ndpi_protocol_match const * const hostname_list
 int ndpi_init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
                            ndpi_protocol_match const * const match) {
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
+  ndpi_protocol_qoe_category_t qoeCategory;
 
-  if(ndpi_str->proto_defaults[match->protocol_id].protoName == NULL) {
-    ndpi_str->proto_defaults[match->protocol_id].protoName = ndpi_strdup(match->proto_name);
+  switch(match->protocol_category) {
+  case NDPI_PROTOCOL_CATEGORY_WEB:
+    qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_WEB_BROWSING;
+    break;
 
-    if(!ndpi_str->proto_defaults[match->protocol_id].protoName)
-      return 1;
+  case NDPI_PROTOCOL_CATEGORY_GAME:
+    qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_ONLINE_GAMING;
+    break;
 
-    ndpi_str->proto_defaults[match->protocol_id].isAppProtocol = 1;
-    ndpi_str->proto_defaults[match->protocol_id].protoId = match->protocol_id;
-    ndpi_str->proto_defaults[match->protocol_id].protoCategory = match->protocol_category;
-    ndpi_str->proto_defaults[match->protocol_id].protoBreed = match->protocol_breed;
+  case NDPI_PROTOCOL_CATEGORY_VOIP:
+    qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_VOIP_CALLS;
+    break;
 
-    switch(match->protocol_category) {
-    case NDPI_PROTOCOL_CATEGORY_WEB:
-      ndpi_str->proto_defaults[match->protocol_id].qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_WEB_BROWSING;
-      break;
+  case NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS:
+    qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_REMOTE_ACCESS;
+    break;
 
-    case NDPI_PROTOCOL_CATEGORY_GAME:
-      ndpi_str->proto_defaults[match->protocol_id].qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_ONLINE_GAMING;
-      break;
+  case NDPI_PROTOCOL_CATEGORY_MEDIA:
+  case NDPI_PROTOCOL_CATEGORY_STREAMING:
+  case NDPI_PROTOCOL_CATEGORY_MUSIC:
+  case NDPI_PROTOCOL_CATEGORY_VIDEO:
+    qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_BUFFERED_STREAMING;
+    break;
 
-    case NDPI_PROTOCOL_CATEGORY_VOIP:
-      ndpi_str->proto_defaults[match->protocol_id].qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_VOIP_CALLS;
-      break;
-
-    case NDPI_PROTOCOL_CATEGORY_REMOTE_ACCESS:
-      ndpi_str->proto_defaults[match->protocol_id].qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_REMOTE_ACCESS;
-      break;
-
-    case NDPI_PROTOCOL_CATEGORY_MEDIA:
-    case NDPI_PROTOCOL_CATEGORY_STREAMING:
-    case NDPI_PROTOCOL_CATEGORY_MUSIC:
-    case NDPI_PROTOCOL_CATEGORY_VIDEO:
-      ndpi_str->proto_defaults[match->protocol_id].qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_BUFFERED_STREAMING;
-      break;
-
-    default:
-      ndpi_str->proto_defaults[match->protocol_id].qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED;
-      break;
-    }
-
-    ndpi_set_proto_defaults(ndpi_str,
-			    ndpi_str->proto_defaults[match->protocol_id].isClearTextProto,
-			    ndpi_str->proto_defaults[match->protocol_id].isAppProtocol,
-			    ndpi_str->proto_defaults[match->protocol_id].protoBreed,
-			    ndpi_str->proto_defaults[match->protocol_id].protoId,
-			    ndpi_str->proto_defaults[match->protocol_id].protoName,
-			    ndpi_str->proto_defaults[match->protocol_id].protoCategory,
-			    ndpi_str->proto_defaults[match->protocol_id].qoeCategory,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
-			    1 /* custom protocol */);
+  default:
+    qoeCategory = NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED;
+    break;
   }
+
+  ndpi_set_proto_defaults(ndpi_str,
+                          0, /* isClearTextProto */
+                          1, /* isAppProtocol */
+                          match->protocol_breed,
+                          match->protocol_id,
+                          match->proto_name,
+                          match->protocol_category,
+                          qoeCategory,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          1 /* custom protocol */);
 
   if(!is_proto_enabled(ndpi_str, match->protocol_id)) {
     NDPI_LOG_DBG(ndpi_str, "[NDPI] Skip protocol match for %s/protoId=%d: disabled\n",
@@ -4132,11 +4134,13 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   if(!ndpi_str)
     return -1;
 
+  if(ndpi_str->finalized) /* Already finalized */
+    return 0;
+
   if(!ndpi_str->custom_categories.categories_loaded)
     ndpi_enable_loaded_categories(ndpi_str);
 
-  if(ndpi_str->finalized) /* Already finalized */
-    return 0;
+  load_default_ports(ndpi_str);
 
   if(ndpi_str->cfg.libgcrypt_init) {
     if(!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P)) {
