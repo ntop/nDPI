@@ -65,15 +65,14 @@ static void search_hamachi_udp(struct ndpi_detection_module_struct* ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search Hamachi over UDP\n");
 
   /* Skip initial 76-byte handshake (relay mode only) */
-  if (flow->packet_counter <= 2) {
-    /* Quick zero-check for first 8 and last 8 bytes */
-    if (packet->payload_packet_len == 76 &&
-        get_u_int64_t(packet->payload, 0) == 0 && 
-        get_u_int64_t(packet->payload, 68) == 0)
+  if (flow->packet_counter <= 2 && packet->payload_packet_len == 76)
+  {
+    if (get_u_int64_t(packet->payload, 0) != 0 ||
+        get_u_int64_t(packet->payload, 68) != 0)
     {
-      return; /* Likely Hamachi handshake */
+      goto exclude_hamachi;
     }
-    goto exclude_hamachi;
+    return; /* Likely Hamachi handshake */
   }
 
   /* Empirically observed minimum */
