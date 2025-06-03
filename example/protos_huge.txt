@@ -1,0 +1,3026 @@
+# 3com-amp3
+tcp:629@3com-amp3
+udp:629@3com-amp3
+
+# 3com-tsmux
+tcp:106@3com-tsmux
+udp:106@3com-tsmux
+
+# 914c/g
+tcp:211@914c/g
+udp:211@914c/g
+
+# 9pfs
+tcp:564@9pfs
+udp:564@9pfs
+
+# acap
+tcp:674@acap
+udp:674@acap
+
+# acas
+tcp:62@acas
+udp:62@acas
+
+# accessbuilder
+tcp:888@accessbuilder
+udp:888@accessbuilder
+
+# accessnetwork
+tcp:699@accessnetwork
+udp:699@accessnetwork
+
+# aci
+tcp:187@aci
+udp:187@aci
+
+# acp
+tcp:599@acp
+udp:599@acp
+
+# acr-nema
+tcp:104@acr-nema
+udp:104@acr-nema
+
+# activesync
+tcp:1034@activesync
+udp:1034@activesync
+
+# adobeserver
+tcp:1102-1103.0@adobeserver
+udp:1102@adobeserver
+
+# aed-512
+tcp:149@aed-512
+udp:149@aed-512
+
+# afp
+tcp:548@afp
+udp:548@afp
+
+# afrog
+tcp:1042@afrog
+udp:1042@afrog
+
+# agentx
+tcp:705@agentx
+udp:705@agentx
+
+# alpes
+tcp:463@alpes
+udp:463@alpes
+
+# ampr-rcmd
+tcp:459@ampr-rcmd
+udp:459@ampr-rcmd
+
+# ams
+tcp:1037@ams
+udp:1037@ams
+
+# amt-esd-prot
+tcp:1082@amt-esd-prot
+udp:1082@amt-esd-prot
+
+# anet
+tcp:212@anet
+udp:212@anet
+
+# ansanotify
+tcp:116@ansanotify
+udp:116@ansanotify
+
+# ansatrader
+tcp:124@ansatrader
+udp:124@ansatrader
+
+# ansoft-lm
+tcp:1083-1084.0@ansoft-lm
+udp:1083@ansoft-lm
+
+# ansyslmd
+tcp:1055@ansyslmd
+udp:1055@ansyslmd
+
+# aodv
+tcp:654@aodv
+udp:654@aodv
+
+# aol
+tcp:5190@aol
+udp:5190@aol
+
+# apertus
+tcp:539@apertus
+udp:539@apertus
+
+# apex
+tcp:912-913.0@apex
+udp:912@apex
+
+# apple-game
+udp:4398@apple-game
+
+# apple-push
+tcp:2195-2196.0@apple-push
+
+# appleqtc
+tcp:458@appleqtc
+udp:458@appleqtc
+
+# appleqtc
+tcp:545@appleqtc
+udp:545@appleqtc
+
+# apple-sasl
+tcp:3659@apple-sasl
+udp:3659@apple-sasl
+
+# AppleTalk
+tcp:201-208.0@AppleTalk
+udp:201@AppleTalk
+
+# apple-ugcontrol
+tcp:2336@apple-ugcontrol
+udp:2336@apple-ugcontrol
+
+# arcisdms
+tcp:262@arcisdms
+udp:262@arcisdms
+
+# arcp
+tcp:7070@arcp
+udp:7070@arcp
+
+# ardus
+tcp:1115-1117.0@ardus
+udp:1115@ardus
+
+# ariel
+tcp:419@ariel
+udp:419@ariel
+
+# ariel
+tcp:421-422.0@ariel
+udp:421@ariel
+
+# arns
+tcp:384@arns
+udp:384@arns
+
+# asa
+tcp:386@asa
+udp:386@asa
+
+# asa-appl-proto
+tcp:502@asa-appl-proto
+udp:502@asa-appl-proto
+
+# asap-tls
+tcp:3864@asap-tls
+
+# asia
+tcp:626@asia
+udp:626@asia
+
+# asip
+tcp:311@asip
+udp:311@asip
+
+# asipwismar
+tcp:687@asipwismar
+udp:687@asipwismar
+
+# asprovatalk
+tcp:1079@asprovatalk
+udp:1079@asprovatalk
+
+# as-servermap
+tcp:449@as-servermap
+udp:449@as-servermap
+
+# audit
+tcp:182@audit
+udp:182@audit
+
+# auditd
+tcp:48@auditd
+udp:48@auditd
+
+# aurora
+tcp:364@aurora
+udp:364@aurora
+
+# aurp
+tcp:387@aurp
+udp:387@aurp
+
+# auth
+tcp:113@auth
+udp:113@auth
+
+# availant-mgr
+tcp:1122@availant-mgr
+udp:1122@availant-mgr
+
+# avian
+tcp:486@avian
+udp:486@avian
+
+# avocent-proxy
+tcp:1078@avocent-proxy
+udp:1078@avocent-proxy
+
+# awacs-ice
+tcp:4488@awacs-ice
+udp:4488@awacs-ice
+
+# banyan
+tcp:567@banyan
+udp:567@banyan
+
+# banyan
+tcp:573@banyan
+udp:573@banyan
+
+# bdp
+tcp:581@bdp
+udp:581@bdp
+
+# bftp
+tcp:152@bftp
+udp:152@bftp
+
+# bgmp
+tcp:264@bgmp
+udp:264@bgmp
+
+# bgp
+tcp:179@bgp
+udp:179@bgp
+
+# bgs-nsi
+tcp:482@bgs-nsi
+udp:482@bgs-nsi
+
+# bh611
+tcp:354@bh611
+udp:354@bh611
+
+# bhevent
+tcp:357@bhevent
+udp:357@bhevent
+
+# bhfhs
+tcp:248@bhfhs
+udp:248@bhfhs
+
+# bhmds
+tcp:310@bhmds
+udp:310@bhmds
+
+# bitTorrent
+tcp:6881-6888.0@bitTorrent
+udp:6881@bitTorrent
+
+# bl-idm
+tcp:142@bl-idm
+udp:142@bl-idm
+
+# bmpp
+tcp:632@bmpp
+udp:632@bmpp
+
+# bnet
+tcp:415@bnet
+udp:415@bnet
+
+# bootp
+tcp:67-68.0@bootp
+udp:67@bootp
+
+# borland-dsj
+tcp:707@borland-dsj
+udp:707@borland-dsj
+
+# busboy/puparp
+tcp:998@busboy/puparp
+udp:998@busboy/puparp
+
+# cableport-ax
+tcp:282@cableport-ax
+udp:282@cableport-ax
+
+# cab-protocol
+tcp:595@cab-protocol
+udp:595@cab-protocol
+
+# cadlock
+tcp:770@cadlock
+udp:770@cadlock
+
+# cadlock2
+tcp:1000@cadlock2
+udp:1000@cadlock2
+
+# cadview-3d
+tcp:649@cadview-3d
+udp:649@cadview-3d
+
+# CAIlic
+tcp:216@CAIlic
+udp:216@CAIlic
+
+# cal
+tcp:588@cal
+udp:588@cal
+
+# carboncopy
+tcp:1023@carboncopy
+
+# cdc
+tcp:223@cdc
+udp:223@cdc
+
+# cert-responder
+tcp:1640@cert-responder
+udp:1640@cert-responder
+
+# cfdptkt
+tcp:120@cfdptkt
+udp:120@cfdptkt
+
+# chargen
+tcp:19@chargen
+udp:19@chargen
+
+# CheckMK_DistrMon
+tcp:6557@CheckMK_DistrMon
+
+# chshell
+tcp:562@chshell
+udp:562@chshell
+
+# cimplex
+tcp:673@cimplex
+udp:673@cimplex
+
+# cisco-fna
+tcp:130-132.0@cisco-fna
+udp:130@cisco-fna
+
+# cisco-tdp
+tcp:711@cisco-tdp
+udp:711@cisco-tdp
+
+# citadel
+tcp:504@citadel
+udp:504@citadel
+
+# citrix_ica
+tcp:1494@citrix_ica
+udp:1494@citrix_ica
+
+# citrix_ica
+tcp:2598@citrix_ica
+udp:2598@citrix_ica
+
+# citrix_rtp
+udp:16500-16509.0@citrix_rtp
+
+# cl/1
+tcp:172@cl/1
+udp:172@cl/1
+
+# clearcase
+tcp:371@clearcase
+udp:371@clearcase
+
+# cloanto
+tcp:356@cloanto
+udp:356@cloanto
+
+# cmip
+tcp:163-164.0@cmip
+udp:163@cmip
+
+# codaauth2
+tcp:370@codaauth2
+udp:370@codaauth2
+
+# collaborator
+tcp:622@collaborator
+udp:622@collaborator
+
+# commerce
+tcp:542@commerce
+udp:542@commerce
+
+# compaq-evm
+tcp:619@compaq-evm
+udp:619@compaq-evm
+
+# compressnet
+tcp:2-3.0@compressnet
+udp:2@compressnet
+
+# comscm
+tcp:437@comscm
+udp:437@comscm
+
+# con
+tcp:759@con
+udp:759@con
+
+# conference
+tcp:531@conference
+udp:531@conference
+
+# connendp
+tcp:693@connendp
+udp:693@connendp
+
+# corba-iiop
+tcp:683-684.0@corba-iiop
+udp:683@corba-iiop
+
+# corerjd
+tcp:284@corerjd
+udp:284@corerjd
+
+# courier
+tcp:530@courier
+udp:530@courier
+
+# covia
+tcp:64@covia
+udp:64@covia
+
+# creative
+tcp:453-455.0@creative
+udp:453@creative
+
+# crs
+tcp:507@crs
+udp:507@crs
+
+# cryptoadmin
+tcp:624@cryptoadmin
+udp:624@cryptoadmin
+
+# csi-sgwp
+tcp:348@csi-sgwp
+udp:348@csi-sgwp
+
+# cso
+tcp:105@cso
+udp:105@cso
+
+# csoftragent
+tcp:3004@csoftragent
+udp:3004@csoftragent
+
+# ctf
+tcp:84@ctf
+udp:84@ctf
+
+# CU-SeeMe
+tcp:7648-7649.0@CU-SeeMe
+udp:7648@CU-SeeMe
+
+# custix
+tcp:528@custix
+udp:528@custix
+
+# cvc_hostd
+tcp:442@cvc_hostd
+udp:442@cvc_hostd
+
+# cvspserver
+tcp:2401@cvspserver
+udp:2401@cvspserver
+
+# cybercash
+tcp:551@cybercash
+udp:551@cybercash
+
+# cycleserv
+tcp:763@cycleserv
+udp:763@cycleserv
+
+# cycleserv2
+tcp:772@cycleserv2
+udp:772@cycleserv2
+
+# dantz
+tcp:497@dantz
+udp:497@dantz
+
+# dasp
+tcp:439@dasp
+udp:439@dasp
+
+# datasurf
+tcp:461-462.0@datasurf
+udp:461@datasurf
+
+# datex
+tcp:355@datex
+udp:355@datex
+
+# daytime
+tcp:13@daytime
+udp:13@daytime
+
+# dbase
+tcp:217@dbase
+udp:217@dbase
+
+# dcp
+tcp:93@dcp
+udp:93@dcp
+
+# dctp
+tcp:675@dctp
+udp:675@dctp
+
+# ddm
+tcp:446-448.0@ddm
+udp:446@ddm
+
+# dec_dlm
+tcp:625@dec_dlm
+udp:625@dec_dlm
+
+# decap
+tcp:403@decap
+udp:403@decap
+
+# decauth
+tcp:316@decauth
+udp:316@decauth
+
+# decbsrv
+tcp:579@decbsrv
+udp:579@decbsrv
+
+# decladebug
+tcp:410@decladebug
+udp:410@decladebug
+
+# decvms-sysmgt
+tcp:441@decvms-sysmgt
+udp:441@decvms-sysmgt
+
+# dei
+tcp:618@dei
+udp:618@dei
+
+# deos
+tcp:76@deos
+udp:76@deos
+
+# device
+tcp:801@device
+udp:801@device
+
+# devshr-nts
+tcp:552@devshr-nts
+udp:552@devshr-nts
+
+# dhcp-failover
+tcp:647@dhcp-failover
+udp:647@dhcp-failover
+
+# dhcp-failover
+tcp:847@dhcp-failover
+udp:847@dhcp-failover
+
+# dhcpv6
+tcp:546-547.0@dhcpv6
+udp:546@dhcpv6
+
+# diameter
+tcp:3868@diameter
+
+# digital-vrc
+tcp:466@digital-vrc
+udp:466@digital-vrc
+
+# direct
+tcp:242@direct
+udp:242@direct
+
+# discard
+tcp:9@discard
+udp:9@discard
+
+# disclose
+tcp:667@disclose
+udp:667@disclose
+
+# distcc
+tcp:3632@distcc
+udp:3632@distcc
+
+# dixie
+tcp:96@dixie
+udp:96@dixie
+
+# dls
+tcp:197-198.0@dls
+udp:197@dls
+
+# dna-cml
+tcp:436@dna-cml
+udp:436@dna-cml
+
+# dns6
+tcp:195-196.0@dns6
+udp:195@dns6
+
+# dnsix
+tcp:90@dnsix
+udp:90@dnsix
+
+# domain
+tcp:53@domain
+udp:53@domain
+
+# dpsi
+tcp:315@dpsi
+udp:315@dpsi
+
+# dra
+tcp:630@dra
+udp:630@dra
+
+# dsf
+tcp:555@dsf
+udp:555@dsf
+
+# dsfgw
+tcp:438@dsfgw
+udp:438@dsfgw
+
+# dsp
+tcp:33@dsp
+udp:33@dsp
+
+# dsp3270
+tcp:246@dsp3270
+udp:246@dsp3270
+
+# dtag-ste
+tcp:352@dtag-ste
+udp:352@dtag-ste
+
+# dtk
+tcp:365@dtk
+udp:365@dtk
+
+# dwr
+tcp:644@dwr
+udp:644@dwr
+
+# eai
+tcp:52100-52102.0@eai
+
+# eai
+tcp:53100-53102.0@eai
+
+# echo
+tcp:7@echo
+udp:7@echo
+
+# eDonkey
+tcp:4662@eDonkey
+
+# eDonkey
+tcp:4665@eDonkey
+
+# efs/router
+tcp:520@efs/router
+udp:520@efs/router
+
+# elcsd
+tcp:704@elcsd
+udp:704@elcsd
+
+# embl-ndt
+tcp:394@embl-ndt
+udp:394@embl-ndt
+
+# emfis
+tcp:140-141.0@emfis
+udp:140@emfis
+
+# enrp
+udp:9901-9902.0@enrp
+
+# entomb/acmaint_transd
+tcp:775@entomb/acmaint_transd
+udp:775@entomb/acmaint_transd
+
+# entrust
+tcp:680-681.0@entrust
+udp:680@entrust
+
+# entrust
+tcp:709-710.0@entrust
+udp:709@entrust
+
+# entrust-sps
+tcp:640@entrust-sps
+udp:640@entrust-sps
+
+# entrusttime
+tcp:309@entrusttime
+udp:309@entrusttime
+
+# epmap
+tcp:135@epmap
+udp:135@epmap
+
+# epp
+tcp:700@epp
+udp:700@epp
+
+# eppc
+tcp:3031@eppc
+udp:3031@eppc
+
+# erpc
+tcp:121@erpc
+udp:121@erpc
+
+# escp-ip
+tcp:621@escp-ip
+udp:621@escp-ip
+
+# esro
+tcp:259@esro
+udp:259@esro
+
+# esro-emsdp
+tcp:642@esro-emsdp
+udp:642@esro-emsdp
+
+# ETOS
+tcp:377-378.0@ETOS
+udp:377@ETOS
+
+# eudora-set
+tcp:592@eudora-set
+udp:592@eudora-set
+
+# exec/comsat
+tcp:512@exec/comsat
+udp:512@exec/comsat
+
+# exp1
+tcp:1021@exp1
+udp:1021@exp1
+
+# exp2
+tcp:1022@exp2
+udp:1022@exp2
+
+# eyelink
+tcp:589@eyelink
+udp:589@eyelink
+
+# fatserv
+tcp:347@fatserv
+udp:347@fatserv
+
+# fcp
+tcp:510@fcp
+udp:510@fcp
+
+# fcp-udp
+tcp:810@fcp-udp
+udp:810@fcp-udp
+
+# finger
+tcp:79@finger
+udp:79@finger
+
+# flexlm
+tcp:744@flexlm
+udp:744@flexlm
+
+# fln-spx
+tcp:221@fln-spx
+udp:221@fln-spx
+
+# fmpro-internal
+tcp:5003@fmpro-internal
+udp:5003@fmpro-internal
+
+# ftp
+tcp:20-21.0@ftp
+udp:20@ftp
+
+# ftp-agent
+tcp:574@ftp-agent
+udp:574@ftp-agent
+
+# ftps
+tcp:989-990.0@ftps
+udp:989@ftps
+
+# fujitsu-dev
+tcp:747@fujitsu-dev
+udp:747@fujitsu-dev
+
+# fxp
+tcp:286@fxp
+udp:286@fxp
+
+# gacp
+tcp:190@gacp
+udp:190@gacp
+
+# garcon/applix
+tcp:999@garcon/applix
+udp:999@garcon/applix
+
+# gdoi
+tcp:848@gdoi
+udp:848@gdoi
+
+# gdomap
+tcp:538@gdomap
+udp:538@gdomap
+
+# genie
+tcp:402@genie
+udp:402@genie
+
+# genrad
+tcp:176@genrad
+udp:176@genrad
+
+# ggf-ncp
+tcp:678@ggf-ncp
+udp:678@ggf-ncp
+
+# ginad
+tcp:634@ginad
+udp:634@ginad
+
+# gist
+udp:270@gist
+
+# git
+tcp:9418@git
+udp:9418@git
+
+# gnutella
+tcp:6346-6347.0@gnutella
+udp:6346@gnutella
+
+# go-login
+tcp:491@go-login
+udp:491@go-login
+
+# gopher
+tcp:70@gopher
+udp:70@gopher
+
+# GoToMeeting
+tcp:8200@GoToMeeting
+udp:8200@GoToMeeting
+
+# gppitnp
+tcp:103@gppitnp
+udp:103@gppitnp
+
+# graphics
+tcp:41@graphics
+udp:41@graphics
+
+# gss
+tcp:488@gss
+udp:488@gss
+
+# gss-xlicen
+tcp:128@gss-xlicen
+udp:128@gss-xlicen
+
+# ha-cluster
+tcp:694@ha-cluster
+udp:694@ha-cluster
+
+# hap
+tcp:661@hap
+udp:661@hap
+
+# hassle
+tcp:375@hassle
+udp:375@hassle
+
+# hcp-wismar
+tcp:686@hcp-wismar
+udp:686@hcp-wismar
+
+# hdap
+tcp:263@hdap
+udp:263@hdap
+
+# hello-port
+tcp:652@hello-port
+udp:652@hello-port
+
+# hems
+tcp:151@hems
+udp:151@hems
+
+# hmmp
+tcp:612-613.0@hmmp
+udp:612@hmmp
+
+# hostname
+tcp:101@hostname
+udp:101@hostname
+
+# hp
+tcp:381-383.0@hp
+udp:381@hp
+
+# hp-3000-telnet
+tcp:2564@hp-3000-telnet
+
+# http
+tcp:80-81.0@http
+udp:80@http
+
+# http
+tcp:8000@http
+udp:8000@http
+
+# http
+tcp:8080@http
+udp:8080@http
+
+# http-alt
+tcp:591@http-alt
+udp:591@http-alt
+
+# http-mgm
+tcp:280@http-mgm
+udp:280@http-mgm
+
+# http-rpc-epmap
+tcp:593@http-rpc-epmap
+udp:593@http-rpc-epmap
+
+# https
+tcp:443@https
+
+# http-s_alt
+tcp:8008@http-s_alt
+udp:8008@http-s_alt
+
+# http-s_alt
+tcp:9443@http-s_alt
+udp:9443@http-s_alt
+
+# hybrid-pop
+tcp:473@hybrid-pop
+udp:473@hybrid-pop
+
+# hyper-g
+tcp:418@hyper-g
+udp:418@hyper-g
+
+# hyperwave-isp
+tcp:692@hyperwave-isp
+udp:692@hyperwave-isp
+
+# iaf
+tcp:479-480.0@iaf
+udp:479@iaf
+
+# iasd
+tcp:432@iasd
+udp:432@iasd
+
+# IBM_i_as
+tcp:8470-8476.0@IBM_i_as
+
+# IBM_i_as
+tcp:9470-9476.0@IBM_i_as
+
+# IBM_WebSphere-App
+tcp:9080@IBM_WebSphere-App
+udp:9080@IBM_WebSphere-App
+
+# ibm-app
+tcp:385@ibm-app
+udp:385@ibm-app
+
+# ibm-db2
+tcp:523@ibm-db2
+udp:523@ibm-db2
+
+# icad-elL
+tcp:425@icad-elL
+udp:425@icad-elL
+
+# iclcnet
+tcp:886-887.0@iclcnet
+udp:886@iclcnet
+
+# icq
+tcp:4000@icq
+
+# ideafarm
+tcp:902-903.0@ideafarm
+udp:902@ideafarm
+
+# idfp
+tcp:549@idfp
+udp:549@idfp
+
+# idxp
+tcp:603@idxp
+udp:603@idxp
+
+# ieee-mms
+tcp:651@ieee-mms
+udp:651@ieee-mms
+
+# ieee-mms-ssl
+tcp:695@ieee-mms-ssl
+udp:695@ieee-mms-ssl
+
+# iiop
+tcp:535@iiop
+udp:535@iiop
+
+# imap
+tcp:143@imap
+udp:143@imap
+
+# imap3
+tcp:220@imap3
+udp:220@imap3
+
+# imaps
+tcp:993@imaps
+udp:993@imaps
+
+# imsp
+tcp:406@imsp
+udp:406@imsp
+
+# inbusiness
+tcp:244@inbusiness
+udp:244@inbusiness
+
+# infoseek
+tcp:414@infoseek
+udp:414@infoseek
+
+# ingres-net
+tcp:134@ingres-net
+udp:134@ingres-net
+
+# intecourier
+tcp:495@intecourier
+udp:495@intecourier
+
+# integra
+tcp:484@integra
+udp:484@integra
+
+# intrinsa
+tcp:503@intrinsa
+udp:503@intrinsa
+
+# ipcd
+tcp:576@ipcd
+udp:576@ipcd
+
+# ipcserver
+tcp:600@ipcserver
+udp:600@ipcserver
+
+# ipdd
+tcp:578@ipdd
+udp:578@ipdd
+
+# ipfixs
+tcp:4740@ipfixs
+udp:4740@ipfixs
+
+# ipp
+tcp:631@ipp
+udp:631@ipp
+
+# ipsec-nat-t
+tcp:4500@ipsec-nat-t
+udp:4500@ipsec-nat-t
+
+# IpswitchIM
+tcp:5177@IpswitchIM
+udp:5177@IpswitchIM
+
+# IPSwitch_IMail
+tcp:8181@IPSwitch_IMail
+udp:8181@IPSwitch_IMail
+
+# IPSwitch_IMail
+tcp:8383@IPSwitch_IMail
+udp:8383@IPSwitch_IMail
+
+# ipx
+tcp:213@ipx
+udp:213@ipx
+
+# irc
+tcp:6667@irc
+
+# irc
+tcp:194@irc
+udp:194@irc
+
+# ircs
+tcp:994@ircs
+udp:994@ircs
+
+# irc-serv
+tcp:529@irc-serv
+udp:529@irc-serv
+
+# iris
+tcp:713-715.0@iris
+udp:713@iris
+
+# is99
+tcp:379-380.0@is99
+udp:379@is99
+
+# isakmp
+tcp:500@isakmp
+udp:500@isakmp
+
+# iscsi
+tcp:860@iscsi
+udp:860@iscsi
+
+# isi-gl
+tcp:55@isi-gl
+udp:55@isi-gl
+
+# iso-ill
+tcp:499@iso-ill
+udp:499@iso-ill
+
+# iso-tp
+tcp:146-147.0@iso-tp
+udp:146@iso-tp
+
+# iso-tsap
+tcp:102@iso-tsap
+udp:102@iso-tsap
+
+# iso-tsap-c2
+tcp:399@iso-tsap-c2
+udp:399@iso-tsap-c2
+
+# itm-mcell-s
+tcp:828@itm-mcell-s
+udp:828@itm-mcell-s
+
+# iTunes
+tcp:3689@iTunes
+udp:3689@iTunes
+
+# jargon
+tcp:148@jargon
+udp:148@jargon
+
+# jserv
+tcp:8007@jserv
+
+# Kazaa
+tcp:1214@Kazaa
+udp:1214@Kazaa
+
+# k-block
+tcp:287@k-block
+udp:287@k-block
+
+# kerberos
+tcp:88@kerberos
+udp:88@kerberos
+
+# kerberos
+tcp:749@kerberos
+udp:749@kerberos
+
+# kermit
+tcp:1649@kermit
+udp:1649@kermit
+
+# keyserver
+tcp:584@keyserver
+udp:584@keyserver
+
+# kink
+tcp:910@kink
+udp:910@kink
+
+# kis
+tcp:185-186.0@kis
+udp:185@kis
+
+# klogin
+tcp:543@klogin
+udp:543@klogin
+
+# knet
+tcp:157@knet
+udp:157@knet
+
+# kpasswd
+tcp:464@kpasswd
+udp:464@kpasswd
+
+# kryptolan
+tcp:398@kryptolan
+udp:398@kryptolan
+
+# kshell
+tcp:544@kshell
+udp:544@kshell
+
+# l2f
+tcp:1701@l2f
+udp:1701@l2f
+
+# la-maint
+tcp:51@la-maint
+udp:51@la-maint
+
+# lanserver
+tcp:637@lanserver
+udp:637@lanserver
+
+# laplink
+tcp:1547@laplink
+
+# ldap
+tcp:389@ldap
+udp:389@ldap
+
+# ldaps
+tcp:636@ldaps
+udp:636@ldaps
+
+# ldp
+tcp:646@ldp
+udp:646@ldp
+
+# legent
+tcp:373-374.0@legent
+udp:373@legent
+
+# link
+tcp:245@link
+udp:245@link
+
+# ljk-login
+tcp:472@ljk-login
+udp:472@ljk-login
+
+# lmp
+tcp:701-702.0@lmp
+udp:701@lmp
+
+# locus
+tcp:125@locus
+udp:125@locus
+
+# locus
+tcp:127@locus
+udp:127@locus
+
+# login/who
+tcp:513@login/who
+udp:513@login/who
+
+# lotusnote
+tcp:1352@lotusnote
+udp:1352@lotusnote
+
+# lutcp
+tcp:4913@lutcp
+
+# m2pa
+tcp:3565@m2pa
+
+# m3ua
+tcp:2905@m3ua
+
+# macom
+tcp:456@macom
+udp:456@macom
+
+# mac-srvr
+tcp:660@mac-srvr
+udp:660@mac-srvr
+
+# madcap
+tcp:2535@madcap
+udp:2535@madcap
+
+# magenta
+tcp:313@magenta
+udp:313@magenta
+
+# mailbox-lm
+tcp:505@mailbox-lm
+udp:505@mailbox-lm
+
+# mailq
+tcp:174@mailq
+udp:174@mailq
+
+# maitrd
+tcp:997@maitrd
+udp:997@maitrd
+
+# manet
+tcp:269@manet
+udp:269@manet
+
+# masqdialer
+tcp:224@masqdialer
+udp:224@masqdialer
+
+# matip
+tcp:350-351.0@matip
+udp:350@matip
+
+# mcidas
+tcp:112@mcidas
+udp:112@mcidas
+
+# mcns-sec
+tcp:638@mcns-sec
+udp:638@mcns-sec
+
+# mdbs_daemon
+tcp:800@mdbs_daemon
+udp:800@mdbs_daemon
+
+# mdc-portmapper
+tcp:685@mdc-portmapper
+udp:685@mdc-portmapper
+
+# mdqs
+tcp:666@mdqs
+udp:666@mdqs
+
+# mecomm
+tcp:668@mecomm
+udp:668@mecomm
+
+# menandmice_noh
+tcp:4151@menandmice_noh
+udp:4151@menandmice_noh
+
+# meraki
+udp:7351@meraki
+
+# meraki
+tcp:7734@meraki
+
+# meraki
+tcp:7752@meraki
+
+# meregister
+tcp:669@meregister
+udp:669@meregister
+
+# meta5
+tcp:393@meta5
+udp:393@meta5
+
+# metagram
+tcp:99@metagram
+udp:99@metagram
+
+# meter
+tcp:570-571.0@meter
+udp:570@meter
+
+# mfcobol
+tcp:86@mfcobol
+udp:86@mfcobol
+
+# mftp
+tcp:349@mftp
+udp:349@mftp
+
+# micom
+tcp:490@micom
+udp:490@micom
+
+# microsoft-ds
+tcp:445@microsoft-ds
+udp:445@microsoft-ds
+
+# mira
+tcp:3454@mira
+
+# mit-dov
+tcp:91@mit-dov
+udp:91@mit-dov
+
+# mit-ml
+tcp:83@mit-ml
+udp:83@mit-ml
+
+# mit-ml
+tcp:85@mit-ml
+udp:85@mit-ml
+
+# mobileip
+tcp:434-435.0@mobileip
+udp:434@mobileip
+
+# mondex
+tcp:471@mondex
+udp:471@mondex
+
+# monitor
+tcp:560-561.0@monitor
+udp:560@monitor
+
+# mortgageware
+tcp:367@mortgageware
+udp:367@mortgageware
+
+# mpm
+tcp:44-45.0@mpm
+udp:44@mpm
+
+# mpm-send
+tcp:46@mpm-send
+udp:46@mpm-send
+
+# mpp
+tcp:218@mpp
+udp:218@mpp
+
+# mptn
+tcp:397@mptn
+udp:397@mptn
+
+# mrm
+tcp:679@mrm
+udp:679@mrm
+
+# MSNetShow
+tcp:1755@MSNetShow
+udp:1755@MSNetShow
+
+# ms-cluster-net
+tcp:3343@ms-cluster-net
+udp:3343@ms-cluster-net
+
+# msdp
+tcp:639@msdp
+udp:639@msdp
+
+# msexch-routing
+tcp:691@msexch-routing
+udp:691@msexch-routing
+
+# msft-gc
+tcp:3268-3269.0@msft-gc
+udp:3268@msft-gc
+
+# msg
+tcp:29@msg
+udp:29@msg
+
+# msg
+tcp:31@msg
+udp:31@msg
+
+# msmq
+tcp:1801@msmq
+udp:1801@msmq
+
+# MSN
+tcp:1863@MSN
+
+# msnmessenger
+tcp:6901@msnmessenger
+udp:6901@msnmessenger
+
+# msp
+tcp:18@msp
+udp:18@msp
+
+# ms-rome
+tcp:569@ms-rome
+udp:569@ms-rome
+
+# ms-shuttle
+tcp:568@ms-shuttle
+udp:568@ms-shuttle
+
+# ms-sql
+tcp:1433-1434.0@ms-sql
+udp:1433@ms-sql
+
+# MulticastDNS
+tcp:5353@MulticastDNS
+udp:5353@MulticastDNS
+
+# multiling-http
+tcp:777@multiling-http
+udp:777@multiling-http
+
+# multiplex
+tcp:171@multiplex
+udp:171@multiplex
+
+# mumps
+tcp:188@mumps
+udp:188@mumps
+
+# mylex-mapd
+tcp:467@mylex-mapd
+udp:467@mylex-mapd
+
+# mysql
+tcp:3306@mysql
+udp:3306@mysql
+
+# namp
+tcp:167@namp
+udp:167@namp
+
+# nas
+tcp:991@nas
+udp:991@nas
+
+# nced
+tcp:404@nced
+udp:404@nced
+
+# ncld
+tcp:405@ncld
+udp:405@ncld
+
+# ncp
+tcp:524@ncp
+udp:524@ncp
+
+# ndsauth
+tcp:353@ndsauth
+udp:353@ndsauth
+
+# NessusSecScan
+tcp:3001@NessusSecScan
+
+# nest
+tcp:489@nest
+udp:489@nest
+
+# Net2Phone
+tcp:6800@Net2Phone
+
+# Net2Phone
+udp:6801@Net2Phone
+
+# net-assistant
+tcp:3283@net-assistant
+udp:3283@net-assistant
+
+# netbios
+tcp:137-139.0@netbios
+udp:137@netbios
+
+# netconf
+tcp:830-833.0@netconf
+udp:830@netconf
+
+# netcp
+tcp:395@netcp
+udp:395@netcp
+
+# NetFlow
+udp:2055@NetFlow
+
+# NetFlow_WU_local
+udp:9999@NetFlow_WU_local
+
+# netgw
+tcp:741@netgw
+udp:741@netgw
+
+# netmeeting
+tcp:1503@netmeeting
+
+# netmeeting
+tcp:1720@netmeeting
+
+# netmeeting
+tcp:1731@netmeeting
+
+# netnews
+tcp:532@netnews
+udp:532@netnews
+
+# netrcs
+tcp:742@netrcs
+udp:742@netrcs
+
+# netrjs
+tcp:71-74.0@netrjs
+udp:71@netrjs
+
+# netsc
+tcp:154-155.0@netsc
+udp:154@netsc
+
+# netviewdm
+tcp:729-731.0@netviewdm
+udp:729@netviewdm
+
+# netwall
+tcp:533@netwall
+udp:533@netwall
+
+# netware-ip
+tcp:396@netware-ip
+udp:396@netware-ip
+
+# new-rwho
+tcp:550@new-rwho
+udp:550@new-rwho
+
+# nextstep
+tcp:178@nextstep
+udp:178@nextstep
+
+# nfs
+tcp:2049@nfs
+udp:2049@nfs
+
+# nfsd
+tcp:1110@nfsd
+
+# nicname
+tcp:43@nicname
+udp:43@nicname
+
+# ni-ftp
+tcp:47@ni-ftp
+udp:47@ni-ftp
+
+# nilinkanalyst
+tcp:25902@nilinkanalyst
+
+# ni-mail
+tcp:61@ni-mail
+udp:61@ni-mail
+
+# nip
+tcp:376@nip
+udp:376@nip
+
+# nlogin
+tcp:758@nlogin
+udp:758@nlogin
+
+# nmap
+tcp:689@nmap
+udp:689@nmap
+
+# nmsp
+tcp:537@nmsp
+udp:537@nmsp
+
+# nnsp
+tcp:433@nnsp
+udp:433@nnsp
+
+# nntp
+tcp:119@nntp
+udp:119@nntp
+
+# nntps
+tcp:563@nntps
+udp:563@nntps
+
+# novastorbakcup
+tcp:308@novastorbakcup
+udp:308@novastorbakcup
+
+# npmp
+tcp:609-611.0@npmp
+udp:609@npmp
+
+# npp
+tcp:92@npp
+udp:92@npp
+
+# nqs
+tcp:607@nqs
+udp:607@nqs
+
+# ns
+tcp:760@ns
+udp:760@ns
+
+# nsiiops
+tcp:261@nsiiops
+udp:261@nsiiops
+
+# nsrmp
+tcp:359@nsrmp
+udp:359@nsrmp
+
+# nss-routing
+tcp:159@nss-routing
+udp:159@nss-routing
+
+# nsw-fe
+tcp:27@nsw-fe
+udp:27@nsw-fe
+
+# ntalk
+tcp:518@ntalk
+udp:518@ntalk
+
+# ntp
+tcp:123@ntp
+udp:123@ntp
+
+# nxedit
+tcp:126@nxedit
+udp:126@nxedit
+
+# obex
+tcp:650@obex
+udp:650@obex
+
+# objcall
+tcp:94@objcall
+udp:94@objcall
+
+# ocbinder
+tcp:183@ocbinder
+udp:183@ocbinder
+
+# ocs
+tcp:428-429.0@ocs
+udp:428@ocs
+
+# ocserver
+tcp:184@ocserver
+udp:184@ocserver
+
+# odmr
+tcp:366@odmr
+udp:366@odmr
+
+# ohimsrv
+tcp:506@ohimsrv
+udp:506@ohimsrv
+
+# olsr
+tcp:698@olsr
+udp:698@olsr
+
+# omginitialrefs
+tcp:900@omginitialrefs
+udp:900@omginitialrefs
+
+# omserv
+tcp:764@omserv
+udp:764@omserv
+
+# onmux
+tcp:417@onmux
+udp:417@onmux
+
+# oob-ws-http/asf-rmcp
+tcp:623@oob-ws-http/asf-rmcp
+udp:623@oob-ws-http/asf-rmcp
+
+# oob-ws-https/asf-secure-rmcp
+tcp:664@oob-ws-https/asf-secure-rmcp
+udp:664@oob-ws-https/asf-secure-rmcp
+
+# opalis-robot
+tcp:314@opalis-robot
+udp:314@opalis-robot
+
+# opc-job
+tcp:423-424.0@opc-job
+udp:423@opc-job
+
+# openport
+tcp:260@openport
+udp:260@openport
+
+# openvms
+tcp:557@openvms
+udp:557@openvms
+
+# OpenVPN
+tcp:1194@OpenVPN
+udp:1194@OpenVPN
+
+# opolis
+tcp:536@opolis
+udp:536@opolis
+
+# oracle
+tcp:1521@oracle
+
+# oracle_1522-1546
+tcp:1522-1546.0@oracle_1522-1546
+
+# osu-nms
+tcp:192@osu-nms
+udp:192@osu-nms
+
+# owamp-control
+tcp:861@owamp-control
+udp:861@owamp-control
+
+# pana
+udp:716@pana
+
+# passgo
+tcp:511@passgo
+udp:511@passgo
+
+# passgo-tivoli
+tcp:627@passgo-tivoli
+udp:627@passgo-tivoli
+
+# password-chg
+tcp:586@password-chg
+udp:586@password-chg
+
+# pawserv
+tcp:345@pawserv
+udp:345@pawserv
+
+# pcanywhere
+tcp:5631-5632.0@pcanywhere
+udp:5631@pcanywhere
+
+# pcmail
+tcp:158@pcmail
+udp:158@pcmail
+
+# pcsync-https
+tcp:8443@pcsync-https
+udp:8443@pcsync-https
+
+# pdap
+tcp:344@pdap
+udp:344@pdap
+
+# perforce
+tcp:1666@perforce
+
+# personal-link
+tcp:281@personal-link
+udp:281@personal-link
+
+# pftp
+tcp:662@pftp
+udp:662@pftp
+
+# ph
+tcp:481@ph
+udp:481@ph
+
+# philips-vc
+tcp:583@philips-vc
+udp:583@philips-vc
+
+# phonebook
+tcp:767@phonebook
+udp:767@phonebook
+
+# photuris
+tcp:468@photuris
+udp:468@photuris
+
+# pim-rp-disc
+tcp:496@pim-rp-disc
+udp:496@pim-rp-disc
+
+# pip
+tcp:321@pip
+udp:321@pip
+
+# pirp
+tcp:553@pirp
+udp:553@pirp
+
+# pkix-3-ca-ra
+tcp:829@pkix-3-ca-ra
+udp:829@pkix-3-ca-ra
+
+# pkix-timestamp
+tcp:318@pkix-timestamp
+udp:318@pkix-timestamp
+
+# pop2
+tcp:109@pop2
+udp:109@pop2
+
+# pop3
+tcp:110@pop3
+udp:110@pop3
+
+# pop3s
+tcp:995@pop3s
+udp:995@pop3s
+
+# port301
+tcp:301@port301
+udp:301@port301
+
+# postgresql
+tcp:5432@postgresql
+udp:5432@postgresql
+
+# pov-ray
+tcp:494@pov-ray
+udp:494@pov-ray
+
+# pptp
+tcp:1723@pptp
+udp:1723@pptp
+
+# printer
+tcp:515@printer
+udp:515@printer
+
+# printer_pdl
+tcp:9100@printer_pdl
+udp:9100@printer_pdl
+
+# print-srv
+tcp:170@print-srv
+udp:170@print-srv
+
+# prm
+tcp:408-409.0@prm
+udp:408@prm
+
+# profile
+tcp:136@profile
+udp:136@profile
+
+# Prolin
+tcp:30998-30999.0@Prolin
+udp:30998@Prolin
+
+# Prolin
+tcp:5555@Prolin
+udp:5555@Prolin
+
+# Prolin
+tcp:30980@Prolin
+udp:30980@Prolin
+
+# Prolin
+tcp:40999@Prolin
+udp:40999@Prolin
+
+# prospero
+tcp:191@prospero
+udp:191@prospero
+
+# pssc
+tcp:645@pssc
+udp:645@pssc
+
+# ptcnameservice
+tcp:597@ptcnameservice
+udp:597@ptcnameservice
+
+# ptp
+tcp:319-320.0@ptp
+udp:319@ptp
+
+# pt-tls
+tcp:271@pt-tls
+
+# pump
+tcp:751@pump
+udp:751@pump
+
+# purenoise
+tcp:663@purenoise
+udp:663@purenoise
+
+# pwdgen
+tcp:129@pwdgen
+udp:129@pwdgen
+
+# pwerburst
+tcp:485@pwerburst
+udp:485@pwerburst
+
+# qbikgdp
+tcp:368@qbikgdp
+udp:368@qbikgdp
+
+# qft
+tcp:189@qft
+udp:189@qft
+
+# qmqp
+tcp:628@qmqp
+udp:628@qmqp
+
+# qmtp
+tcp:209@qmtp
+udp:209@qmtp
+
+# qotd
+tcp:17@qotd
+udp:17@qotd
+
+# qrh
+tcp:752@qrh
+udp:752@qrh
+
+# qt-serveradmin
+tcp:1220@qt-serveradmin
+udp:1220@qt-serveradmin
+
+# quake
+tcp:26000@quake
+udp:26000@quake
+
+# quake
+tcp:27950@quake
+udp:27950@quake
+
+# quake
+tcp:28004@quake
+udp:28004@quake
+
+# quic_443_udp
+udp:443@quic_443_udp
+
+# quotad
+tcp:762@quotad
+udp:762@quotad
+
+# radan-http
+tcp:8088@radan-http
+udp:8088@radan-http
+
+# radius
+tcp:1812-1813.0@radius
+udp:1812@radius
+
+# rap
+tcp:38@rap
+udp:38@rap
+
+# rap
+tcp:256@rap
+udp:256@rap
+
+# rcip-itu
+tcp:2225@rcip-itu
+
+# rcp
+tcp:469@rcp
+udp:469@rcp
+
+# real
+tcp:688@real
+udp:688@real
+
+# re-mail-ck
+tcp:50@re-mail-ck
+udp:50@re-mail-ck
+
+# remotedesktop
+tcp:3389@remotedesktop
+udp:3389@remotedesktop
+
+# remotefs
+tcp:556@remotefs
+udp:556@remotefs
+
+# repcmd
+tcp:641@repcmd
+udp:641@repcmd
+
+# repscmd
+tcp:653@repscmd
+udp:653@repscmd
+
+# rescap
+tcp:283@rescap
+udp:283@rescap
+
+# rfile/loadav
+tcp:750@rfile/loadav
+udp:750@rfile/loadav
+
+# ripng
+tcp:521@ripng
+udp:521@ripng
+
+# ris
+tcp:180@ris
+udp:180@ris
+
+# ris-cm
+tcp:748@ris-cm
+udp:748@ris-cm
+
+# rje
+tcp:5@rje
+udp:5@rje
+
+# rlp
+tcp:39@rlp
+udp:39@rlp
+
+# rlzdbase
+tcp:635@rlzdbase
+udp:635@rlzdbase
+
+# rmc
+tcp:657@rmc
+udp:657@rmc
+
+# rmi
+tcp:1098-1099.0@rmi
+udp:1098@rmi
+
+# rmt
+tcp:411@rmt
+udp:411@rmt
+
+# rpasswd/acmaint_dbd
+tcp:774@rpasswd/acmaint_dbd
+udp:774@rpasswd/acmaint_dbd
+
+# rpc2portmap
+tcp:369@rpc2portmap
+udp:369@rpc2portmap
+
+# rpki
+tcp:323-324.0@rpki
+udp:323@rpki
+
+# rrac
+tcp:5678@rrac
+udp:5678@rrac
+
+# rrh
+tcp:753@rrh
+udp:753@rrh
+
+# rrp
+tcp:648@rrp
+udp:648@rrp
+
+# rsh-spx
+tcp:222@rsh-spx
+udp:222@rsh-spx
+
+# rsvd
+tcp:168@rsvd
+udp:168@rsvd
+
+# rsvp
+tcp:363@rsvp
+udp:363@rsvp
+
+# rsync
+tcp:873@rsync
+udp:873@rsync
+
+# rtelnet
+tcp:107@rtelnet
+udp:107@rtelnet
+
+# rtip
+tcp:771@rtip
+udp:771@rtip
+
+# rtmp
+tcp:1935@rtmp
+
+# rtp
+tcp:5004-5005.0@rtp
+udp:5004@rtp
+
+# rtsp
+tcp:554@rtsp
+udp:554@rtsp
+
+# rtsps
+tcp:322@rtsps
+udp:322@rtsps
+
+# rushd
+tcp:696@rushd
+udp:696@rushd
+
+# rxe
+tcp:761@rxe
+udp:761@rxe
+
+# saft
+tcp:487@saft
+udp:487@saft
+
+# saiseh
+tcp:1644@saiseh
+
+# sanity
+tcp:643@sanity
+udp:643@sanity
+
+# sccm_wsus_rm
+tcp:10123@sccm_wsus_rm
+
+# sccm_wsus_rm
+tcp:8530-8531.0@sccm_wsus_rm
+
+# sccm_wsus_rm
+tcp:5985-5986.0@sccm_wsus_rm
+
+# scc-security
+tcp:582@scc-security
+udp:582@scc-security
+
+# sco
+tcp:615-617.0@sco
+udp:615@sco
+
+# sco
+tcp:620@sco
+udp:620@sco
+
+# scohelp
+tcp:457@scohelp
+udp:457@scohelp
+
+# scoi2odialog
+tcp:360@scoi2odialog
+udp:360@scoi2odialog
+
+# sco-websrvrmg3
+tcp:598@sco-websrvrmg3
+udp:598@sco-websrvrmg3
+
+# scx-proxy
+tcp:470@scx-proxy
+udp:470@scx-proxy
+
+# sdnskmp
+tcp:558@sdnskmp
+udp:558@sdnskmp
+
+# semantix
+tcp:361@semantix
+udp:361@semantix
+
+# send
+tcp:169@send
+udp:169@send
+
+# servstat
+tcp:633@servstat
+udp:633@servstat
+
+# set
+tcp:257@set
+udp:257@set
+
+# sfs
+tcp:451-452.0@sfs
+udp:451@sfs
+
+# sftp
+tcp:115@sftp
+udp:115@sftp
+
+# sgcp
+tcp:440@sgcp
+udp:440@sgcp
+
+# sgmp
+tcp:153@sgmp
+udp:153@sgmp
+
+# sgmp
+tcp:160@sgmp
+udp:160@sgmp
+
+# shell/syslog
+tcp:514@shell/syslog
+udp:514@shell/syslog
+
+# shrinkwrap
+tcp:358@shrinkwrap
+udp:358@shrinkwrap
+
+# siam
+tcp:498@siam
+udp:498@siam
+
+# sift-uft
+tcp:608@sift-uft
+udp:608@sift-uft
+
+# silc
+tcp:706@silc
+udp:706@silc
+
+# silverplatter
+tcp:416@silverplatter
+udp:416@silverplatter
+
+# simco
+tcp:8009@simco
+
+# simco
+tcp:7626@simco
+
+# sip
+tcp:5060@sip
+udp:5060@sip
+
+# sip_secure
+tcp:5061@sip_secure
+
+# skip-cert
+tcp:6455-6456.0@skip-cert
+udp:6455@skip-cert
+
+# skronk
+tcp:460@skronk
+udp:460@skronk
+
+# smakynet
+tcp:122@smakynet
+udp:122@smakynet
+
+# smartsdp
+tcp:426@smartsdp
+udp:426@smartsdp
+
+# smpnameres
+tcp:901@smpnameres
+udp:901@smpnameres
+
+# smpte
+tcp:420@smpte
+udp:420@smpte
+
+# sms
+tcp:2701-2704.0@sms
+udp:2701@sms
+
+# smsd
+tcp:596@smsd
+udp:596@smsd
+
+# smsp
+tcp:413@smsp
+udp:413@smsp
+
+# smtp
+tcp:25@smtp
+udp:25@smtp
+
+# smux
+tcp:199@smux
+udp:199@smux
+
+# snagas
+tcp:108@snagas
+udp:108@snagas
+
+# snare
+tcp:509@snare
+udp:509@snare
+
+# s-net
+tcp:166@s-net
+udp:166@s-net
+
+# snmp
+tcp:161-162.0@snmp
+udp:161@snmp
+
+# snpp
+tcp:444@snpp
+udp:444@snpp
+
+# sntp-heartbeat
+tcp:580@sntp-heartbeat
+udp:580@sntp-heartbeat
+
+# soap-beep
+tcp:605@soap-beep
+udp:605@soap-beep
+
+# socalia
+tcp:5100@socalia
+udp:5100@socalia
+
+# Socks
+tcp:1080@Socks
+
+# softpc
+tcp:215@softpc
+udp:215@softpc
+
+# sonar
+tcp:572@sonar
+udp:572@sonar
+
+# spmp
+tcp:656@spmp
+udp:656@spmp
+
+# spsc
+tcp:478@spsc
+udp:478@spsc
+
+# sql*net
+tcp:66@sql*net
+udp:66@sql*net
+
+# sql*net
+tcp:150@sql*net
+udp:150@sql*net
+
+# sql*net
+tcp:156@sql*net
+udp:156@sql*net
+
+# sqlserv
+tcp:118@sqlserv
+udp:118@sqlserv
+
+# squid-proxy
+tcp:3128@squid-proxy
+udp:3128@squid-proxy
+
+# src
+tcp:200@src
+udp:200@src
+
+# srmp
+tcp:193@srmp
+udp:193@srmp
+
+# srssend
+tcp:362@srssend
+udp:362@srssend
+
+# ss7ns
+tcp:477@ss7ns
+udp:477@ss7ns
+
+# ssdp
+tcp:1900@ssdp
+udp:1900@ssdp
+
+# ssh
+tcp:22@ssh
+udp:22@ssh
+
+# sshell
+tcp:614@sshell
+udp:614@sshell
+
+# sst
+tcp:266@sst
+udp:266@sst
+
+# statsrv
+tcp:133@statsrv
+udp:133@statsrv
+
+# stmf
+tcp:501@stmf
+udp:501@stmf
+
+# streettalk
+tcp:566@streettalk
+udp:566@streettalk
+
+# stun/turn
+udp:3478-3481.0@stun/turn
+
+# stx
+tcp:527@stx
+udp:527@stx
+
+# submission
+tcp:587@submission
+udp:587@submission
+
+# submit/notify
+tcp:773@submit/notify
+udp:773@submit/notify
+
+# subntbcst
+tcp:247@subntbcst
+udp:247@subntbcst
+
+# su-mit-tg
+tcp:89@su-mit-tg
+udp:89@su-mit-tg
+
+# sun-dr
+tcp:665@sun-dr
+udp:665@sun-dr
+
+# sunrpc
+tcp:111@sunrpc
+udp:111@sunrpc
+
+# sunwebadmin
+tcp:8800@sunwebadmin
+udp:8800@sunwebadmin
+
+# supdup
+tcp:95@supdup
+udp:95@supdup
+
+# surf
+tcp:1010@surf
+udp:1010@surf
+
+# sur-meas
+tcp:243@sur-meas
+udp:243@sur-meas
+
+# svn
+tcp:3690@svn
+udp:3690@svn
+
+# svrloc
+tcp:427@svrloc
+udp:427@svrloc
+
+# swift
+tcp:97@swift
+udp:97@swift
+
+# synoptics
+tcp:412@synoptics
+udp:412@synoptics
+
+# synotics
+tcp:391-392.0@synotics
+udp:391@synotics
+
+# syslog-conn
+tcp:601@syslog-conn
+udp:601@syslog-conn
+
+# systat
+tcp:11@systat
+udp:11@systat
+
+# tacacs
+tcp:49@tacacs
+udp:49@tacacs
+
+# tacacs
+tcp:65@tacacs
+udp:65@tacacs
+
+# tacnews
+tcp:98@tacnews
+udp:98@tacnews
+
+# talk
+tcp:517@talk
+udp:517@talk
+
+# tbrpf
+tcp:712@tbrpf
+udp:712@tbrpf
+
+# tcpmux
+tcp:1@tcpmux
+udp:1@tcpmux
+
+# tcpnethaspsrv
+tcp:475@tcpnethaspsrv
+udp:475@tcpnethaspsrv
+
+# td
+tcp:267-268.0@td
+udp:267@td
+
+# teamviewer
+tcp:5938@teamviewer
+udp:5938@teamviewer
+
+# teedtap
+tcp:559@teedtap
+udp:559@teedtap
+
+# tell
+tcp:754@tell
+udp:754@tell
+
+# telnet
+tcp:23@telnet
+udp:23@telnet
+
+# telnets
+tcp:992@telnets
+udp:992@telnets
+
+# tempo
+tcp:526@tempo
+udp:526@tempo
+
+# tenfold
+tcp:658@tenfold
+udp:658@tenfold
+
+# texar
+tcp:333@texar
+udp:333@texar
+
+# tftp
+tcp:69@tftp
+udp:69@tftp
+
+# ticf
+tcp:492-493.0@ticf
+udp:492@ticf
+
+# timbuktu
+tcp:407@timbuktu
+udp:407@timbuktu
+
+# time
+tcp:37@time
+udp:37@time
+
+# timed
+tcp:525@timed
+udp:525@timed
+
+# tinc
+tcp:655@tinc
+udp:655@tinc
+
+# tns-cml
+tcp:590@tns-cml
+udp:590@tns-cml
+
+# tn-tl
+tcp:474@tn-tl
+udp:474@tn-tl
+
+# tn-tl-fd1
+tcp:476@tn-tl-fd1
+udp:476@tn-tl-fd1
+
+# tpip
+tcp:594@tpip
+udp:594@tpip
+
+# tserver
+tcp:450@tserver
+udp:450@tserver
+
+# tunnel
+tcp:604@tunnel
+udp:604@tunnel
+
+# twamp-control
+tcp:862@twamp-control
+udp:862@twamp-control
+
+# uaac
+tcp:145@uaac
+udp:145@uaac
+
+# uarps
+tcp:219@uarps
+udp:219@uarps
+
+# udp_8888
+udp:8888@udp_8888
+
+# uis
+tcp:390@uis
+udp:390@uis
+
+# ulistproc
+tcp:372@ulistproc
+udp:372@ulistproc
+
+# ulp
+tcp:522@ulp
+udp:522@ulp
+
+# ulpnet
+tcp:483@ulpnet
+udp:483@ulpnet
+
+# uma
+tcp:144@uma
+udp:144@uma
+
+# Unclassified
+tcp:0@Unclassified
+udp:0@Unclassified
+
+# unidata
+tcp:388@unidata
+udp:388@unidata
+
+# unify
+tcp:181@unify
+udp:181@unify
+
+# ups
+tcp:401@ups
+udp:401@ups
+
+# urd/igmpv3lite
+tcp:465@urd/igmpv3lite
+udp:465@urd/igmpv3lite
+
+# urm
+tcp:606@urm
+udp:606@urm
+
+# utime
+tcp:519@utime
+udp:519@utime
+
+# utmp
+tcp:430-431.0@utmp
+udp:430@utmp
+
+# uucp
+tcp:540-541.0@uucp
+udp:540@uucp
+
+# uucp-path
+tcp:117@uucp-path
+udp:117@uucp-path
+
+# uuidgen
+tcp:697@uuidgen
+udp:697@uuidgen
+
+# vacdsm
+tcp:670-671.0@vacdsm
+udp:670@vacdsm
+
+# vatp
+tcp:690@vatp
+udp:690@vatp
+
+# vemmi
+tcp:575@vemmi
+udp:575@vemmi
+
+# vettcp
+tcp:78@vettcp
+udp:78@vettcp
+
+# vid
+tcp:769@vid
+udp:769@vid
+
+# videotex
+tcp:516@videotex
+udp:516@videotex
+
+# vmnet
+tcp:175@vmnet
+udp:175@vmnet
+
+# vmpwscs
+tcp:214@vmpwscs
+udp:214@vmpwscs
+
+# vnas
+tcp:577@vnas
+udp:577@vnas
+
+# vnc
+tcp:5800@vnc
+udp:5800@vnc
+
+# vnc
+tcp:5900@vnc
+udp:5900@vnc
+
+# VocalTecphone
+tcp:1490@VocalTecphone
+udp:1490@VocalTecphone
+
+# vonage
+udp:5061@vonage
+
+# vpp
+tcp:676-677.0@vpp
+udp:676@vpp
+
+# vpps-qua
+tcp:672@vpps-qua
+udp:672@vpps-qua
+
+# vsinet
+tcp:996@vsinet
+udp:996@vsinet
+
+# vslmp
+tcp:312@vslmp
+udp:312@vslmp
+
+# Waste
+tcp:1337@Waste
+udp:1337@Waste
+
+# wbem-http
+tcp:5988@wbem-http
+udp:5988@wbem-http
+
+# webobjects
+tcp:1085@webobjects
+udp:1085@webobjects
+
+# webster
+tcp:765@webster
+udp:765@webster
+
+# WhatsUp
+tcp:9051@WhatsUp
+
+# WhatsUp
+tcp:9394@WhatsUp
+
+# WhatsUp
+tcp:8733@WhatsUp
+
+# whoami
+tcp:565@whoami
+udp:565@whoami
+
+# whois
+tcp:63@whois
+udp:63@whois
+
+# windream
+tcp:534@windream
+udp:534@windream
+
+# winfs
+tcp:5009@winfs
+udp:5009@winfs
+
+# WinMX
+udp:6257@WinMX
+
+# WinMX
+udp:6699@WinMX
+
+# wins
+tcp:42@wins
+udp:42@wins
+
+# work-sol
+tcp:400@work-sol
+udp:400@work-sol
+
+# WorldofWarcraft
+tcp:3724@WorldofWarcraft
+
+# wpages
+tcp:776@wpages
+udp:776@wpages
+
+# wpgs
+tcp:780@wpgs
+udp:780@wpgs
+
+# XWindow
+tcp:6000@XWindow
+udp:6000@XWindow
+
+# xact-backup
+tcp:911@xact-backup
+udp:911@xact-backup
+
+# x-bone
+tcp:265@x-bone
+udp:265@x-bone
+
+# xbox
+tcp:3074@xbox
+udp:3074@xbox
+
+# xdmcp
+tcp:177@xdmcp
+udp:177@xdmcp
+
+# xfer
+tcp:82@xfer
+udp:82@xfer
+
+# xfr
+tcp:682@xfr
+udp:682@xfr
+
+# xgrid
+tcp:4111@xgrid
+udp:4111@xgrid
+
+# xmlrpc-beep
+tcp:602@xmlrpc-beep
+udp:602@xmlrpc-beep
+
+# xmpp/jabber
+tcp:5222@xmpp/jabber
+udp:5222@xmpp/jabber
+
+# xmpp/jabber
+tcp:5269@xmpp/jabber
+udp:5269@xmpp/jabber
+
+# xns
+tcp:56@xns
+udp:56@xns
+
+# xns
+tcp:58@xns
+udp:58@xns
+
+# xns
+tcp:165@xns
+udp:165@xns
+
+# xns-ch
+tcp:54@xns-ch
+udp:54@xns-ch
+
+# xns-time
+tcp:52@xns-time
+udp:52@xns-time
+
+# xvttp
+tcp:508@xvttp
+udp:508@xvttp
+
+# xyplex-mux
+tcp:173@xyplex-mux
+udp:173@xyplex-mux
+
+# YahooMessenger
+tcp:5010@YahooMessenger
+
+# YahooMessenger
+tcp:5050@YahooMessenger
+
+# z39.50
+tcp:210@z39.50
+udp:210@z39.50
+
+# zannet
+tcp:317@zannet
+udp:317@zannet
+
+# zserv
+tcp:346@zserv
+udp:346@zserv
+

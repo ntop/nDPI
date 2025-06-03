@@ -1,0 +1,91 @@
+#  Format:
+#  <tcp|udp>:<port>,<tcp|udp>:<port>,.....@<proto>
+
+tcp:81,tcp:8181@HTTP
+udp:5062@SIP
+tcp:860,udp:860,tcp:3260,udp:3260@iSCSI
+tcp:9200@Elasticsearch
+tcp:5601@Kibana
+tcp:65535@TestProto
+
+#
+# nBPF filters (https://github.com/ntop/PF_RING/tree/dev/userland/nbpf))
+#
+# NOTE: they are evaluated in the same order they are defined !
+#
+nbpf:"host 192.168.1.1 and port 80"@HomeRouter
+
+
+#  Subprotocols
+#  Format:
+#  host:"<value>",host:"<value>",.....@<subproto>
+
+host:"disneyplus.com",host:"cdn.registerdisney.go.com",host:"disney-portal.my.onetrust.com",host:"disneyplus.bn5x.net",host:"disney-plus.net"@DisneyPlus
+host:"*.lvlt.dash.us.aiv-cdn.net.c.footprint.net"@AmazonVideo
+host:"api-global.netflix.com"@Netflix
+#  IP based Subprotocols
+#  Format:
+#  ip:<value>,ip:<value>,.....@<subproto>
+#  ipv6:[<value>],ipv6:[<value>],.....@<subproto>
+
+#
+# NOTES
+# 1) The port of a custom protocol is optional but if
+#    specified it must match the port.
+# 2) You can specify up to 1 port per IP address.
+# 3) If you specify a custom ip:<IP>:<PORT> rule,
+#    even if the <PORT> doesn't match the <IP>
+#    (if best match during the search) will
+#    have priority as best match. Example if
+#    you specify a <Google IP>:<port 9999> and
+#    in your traffic have match for such IP but
+#    with a port other than 9999, the IP address
+#    being the best match will have preference over
+#    <Google IP> so this protocol will not be
+#    detected as <L7 proto>.Google but only
+#    as <L7 proto>
+#
+ip:213.75.170.11/32:443@CustomProtocol
+ip:8.248.73.247:443@AmazonPrime
+ip:54.80.47.130@AmazonPrime
+
+#You can specify a protocol Id. In that case you probably want to avoid conflict with internal ids.
+#You can use any number up to 65535
+
+ip:3.3.3.3:443@CustomProtocolA
+ip:3.3.3.3:444@CustomProtocolB
+ip:3.3.3.3:446@CustomProtocolC=800
+
+ipv6:[3ffe:507:0:1:200:86ff:fe05:80da]@CustomProtocolD=1024
+ipv6:[247f:855b:5e16:3caf::]/64:100@CustomProtocolE=2048
+ipv6:[247f:855b:5e16:3caf::]/64@CustomProtocolF=2049
+ipv6:[fe80::76ac:b9ff:fe6c:c124]:12717@CustomProtocolG=2050
+ipv6:[fe80::76ac:b9ff:fe6c:c124]:12718@CustomProtocolH=65535
+ipv6:[fe80::76ac:b9ff:fe6c:c124]:12719@CustomProtocolI=65534
+
+#
+# You can use symbolic IP addreses if you want
+#
+ip:www.ntop.org@ntop
+ipv6:www.ntop.org@ntop
+
+#
+# Risk Exceptions
+#
+# ip_risk_mask:   used to mask flow risks for IP addresses
+# host_risk_mask: used to mask exceptions for domain names and hosts
+#
+# Syntax: <name>=<64 bit mask to be put in AND with the risk
+#
+# For IPs, the flow risk is put in AND (source IP mask OR destination IP mask)
+# For Flows with a hostname (e.g. TLS) the risk is also put in AND with the host_risk_mask
+#ip_risk_mask:192.168.1.0/24=0
+ip_risk_mask:10.10.120.0/24=0
+ip_risk_mask:10.196.157.228=0
+ipv6_risk_mask:[fe80::356b:e047:3695:0]/112=0
+ipv6_risk_mask:[fe80::7c0:e74e:87c3:5d93]=0
+host_risk_mask:".home"=0
+
+
+# Custom certification autorities we trust
+trusted_issuer_dn:"CN=813845657003339838, O=Code42, OU=TEST, ST=MN, C=US"
