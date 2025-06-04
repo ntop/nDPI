@@ -64,7 +64,7 @@ struct call_function_struct {
 };
 
 typedef struct default_ports_tree_node {
-  ndpi_proto_defaults_t *proto;
+  u_int16_t proto_idx;
   u_int8_t customUserProto;
   u_int16_t default_port;
 } default_ports_tree_node_t;
@@ -446,7 +446,8 @@ struct ndpi_detection_module_struct {
   u_int16_t *ndpi_to_user_proto_id; /* custom protocolId mapping */
   u_int16_t ndpi_to_user_proto_id_num_allocated;
 
-  ndpi_proto_defaults_t proto_defaults[NDPI_MAX_SUPPORTED_PROTOCOLS+NDPI_MAX_NUM_CUSTOM_PROTOCOLS];
+  ndpi_proto_defaults_t *proto_defaults;
+  u_int16_t proto_defaults_num_allocated;
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_typedefs.h"
