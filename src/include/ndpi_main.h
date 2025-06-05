@@ -46,8 +46,6 @@ extern "C" {
   void ndpi_twalk(const void *, void (*)(const void *, ndpi_VISIT, int, void*), void *user_data);
   void ndpi_tdestroy(void *vrootp, void (*freefct)(void *));
 
-  int NDPI_BITMASK_COMPARE(NDPI_PROTOCOL_BITMASK a, NDPI_PROTOCOL_BITMASK b);
-
   u_int16_t ntohs_ndpi_bytestream_to_number(const u_int8_t * str,
 					    u_int16_t max_chars_to_read,
 					    u_int16_t * bytes_read);

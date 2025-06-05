@@ -3022,7 +3022,7 @@ static u_int8_t ndpi_check_ipv6_exception(struct ndpi_detection_module_struct *n
 
 static int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id)
 {
-  if(NDPI_INTERNAL_PROTOCOL_IS_SET(ndpi_str->cfg.flowrisk_bitmask, flowrisk_id) == 0)
+  if(ndpi_bitmask_is_set(&ndpi_str->cfg.flowrisk_bitmask, flowrisk_id) == 0)
     return 0;
   return 1;
 }
@@ -3031,7 +3031,7 @@ static int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, nd
 
 int is_flowrisk_info_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id)
 {
-  if(NDPI_INTERNAL_PROTOCOL_IS_SET(ndpi_str->cfg.flowrisk_info_bitmask, flowrisk_id) == 0)
+  if(ndpi_bitmask_is_set(&ndpi_str->cfg.flowrisk_info_bitmask, flowrisk_id) == 0)
     return 0;
   return 1;
 }
@@ -4444,4 +4444,74 @@ bool ndpi_normalize_protocol(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   return(false);
+}
+
+
+
+int ndpi_bitmask_alloc(struct ndpi_bitmask *b, u_int16_t max_bits)
+{
+  if(!b)
+    return -1;
+  b->fds = ndpi_calloc(howmanybits(max_bits, sizeof(ndpi_ndpi_mask)), sizeof(ndpi_ndpi_mask));
+  if(!b->fds)
+    return -1;
+  b->max_bits = max_bits;
+  b->num_fds = howmanybits(max_bits, sizeof(ndpi_ndpi_mask));
+  return 0;
+}
+
+void ndpi_bitmask_dealloc(struct ndpi_bitmask *b)
+{
+  if(b) {
+    ndpi_free(b->fds);
+    b->num_fds = 0;
+  }
+}
+
+void ndpi_bitmask_set(struct ndpi_bitmask *b, u_int16_t bit)
+{
+  if(b && b->fds && bit < b->max_bits)
+    b->fds[bit / 32] |= (1ul << (bit % 32));
+}
+
+void ndpi_bitmask_clear(struct ndpi_bitmask *b, u_int16_t bit)
+{
+  if(b && b->fds && bit < b->max_bits)
+    b->fds[bit / 32] &= ~(1ul << (bit % 32));
+}
+
+int ndpi_bitmask_is_set(const struct ndpi_bitmask *b, u_int16_t bit)
+{
+  if(b && b->fds && bit < b->max_bits)
+    return b->fds[bit / 32] & (1ul << (bit % 32));
+  return -1;
+}
+
+void ndpi_bitmask_set_all(struct ndpi_bitmask *b)
+{
+  if(b && b->fds)
+    memset(b->fds, 0xFF, b->num_fds * sizeof(ndpi_ndpi_mask));
+}
+
+void ndpi_bitmask_reset(struct ndpi_bitmask *b)
+{
+  if(b && b->fds)
+    memset(b->fds, 0x00, b->num_fds * sizeof(ndpi_ndpi_mask));
+}
+
+struct ndpi_bitmask *ndpi_bitmask_clone(const struct ndpi_bitmask *b)
+{
+  struct ndpi_bitmask *a;
+
+  if(!b)
+    return NULL;
+  a = ndpi_calloc(1, sizeof(*a));
+  if(!a)
+    return NULL;
+  if(ndpi_bitmask_alloc(a, b->max_bits) != 0) {
+    ndpi_free(a);
+    return NULL;
+  }
+  memcpy(a->fds, b->fds, b->num_fds * sizeof(ndpi_ndpi_mask));
+  return a;
 }

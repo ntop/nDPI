@@ -102,57 +102,15 @@
   ((x.u6_addr.u6_addr64[0] < y.u6_addr.u6_addr64[0]) || ((x.u6_addr.u6_addr64[0] == y.u6_addr.u6_addr64[0]) && (x.u6_addr.u6_addr64[1] < y.u6_addr.u6_addr64[1])))
 
 #define NDPI_NUM_BITS              512
-#define NDPI_NUM_BITS_MASK         (512-1)
 
-#define NDPI_BITS /* 32 */ (sizeof(ndpi_ndpi_mask) * 8 /* number of bits in a byte */)        /* bits per mask */
 #define howmanybits(x, y)   (((x)+((y)-1))/(y))
-
-
-#define NDPI_SET(p, n)    ((p)->fds_bits[(n)/NDPI_BITS] |=  (1ul << (((u_int32_t)n) % NDPI_BITS)))
-#define NDPI_CLR(p, n)    ((p)->fds_bits[(n)/NDPI_BITS] &= ~(1ul << (((u_int32_t)n) % NDPI_BITS)))
-#define NDPI_ISSET(p, n)  ((p)->fds_bits[(n)/NDPI_BITS] &   (1ul << (((u_int32_t)n) % NDPI_BITS)))
-#define NDPI_ZERO(p)      memset((char *)(p), 0, sizeof(*(p)))
-#define NDPI_ONE(p)       memset((char *)(p), 0xFF, sizeof(*(p)))
-
-#define NDPI_NUM_FDS_BITS     howmanybits(NDPI_NUM_BITS, NDPI_BITS)
-
-#define NDPI_PROTOCOL_BITMASK ndpi_protocol_bitmask_struct_t
-
-#define NDPI_BITMASK_ADD(a,b)     NDPI_SET(&a,b)
-#define NDPI_BITMASK_DEL(a,b)     NDPI_CLR(&a,b)
-#define NDPI_BITMASK_RESET(a)     NDPI_ZERO(&a)
-#define NDPI_BITMASK_SET_ALL(a)   NDPI_ONE(&a)
-#define NDPI_BITMASK_SET(a, b)    { memcpy(&a, &b, sizeof(NDPI_PROTOCOL_BITMASK)); }
 
 #define NDPI_SET_BIT(num, n)    num |= 1ULL << ( n )
 #define NDPI_CLR_BIT(num, n)    num &= ~(1ULL << ( n ))
 #define NDPI_CLR_BIT(num, n)    num &= ~(1ULL << ( n ))
 #define NDPI_ISSET_BIT(num, n)  (num & (1ULL << ( n )))
 #define NDPI_ZERO_BIT(num)      num = 0
-
-#define NDPI_MAX_NUM_DISSECTORS                 288      /* Multiple of 32, i.e. NDPI_BITS */
-#define NDPI_NUM_FDS_BITS_DISSECTORS            howmanybits(NDPI_MAX_NUM_DISSECTORS, NDPI_BITS)
-#define NDPI_DISSECTOR_BITMASK                  ndpi_dissector_bitmask_struct_t
-#define NDPI_DISSECTOR_BITMASK_IS_SET(p, n)     NDPI_ISSET(&(p), (n))
-#define NDPI_DISSECTOR_BITMASK_SET(p, n)        NDPI_SET(&(p), (n))
-
-#define NDPI_NUM_FDS_BITS_INTERNAL              howmanybits(NDPI_MAX_INTERNAL_PROTOCOLS, NDPI_BITS)
-#define NDPI_INTERNAL_PROTOCOL_BITMASK          ndpi_internal_protocol_bitmask_struct_t
-#define NDPI_INTERNAL_PROTOCOL_SET_ALL(a)        NDPI_ONE(&a)
-#define NDPI_INTERNAL_PROTOCOL_RESET(a)          NDPI_ZERO(&a)
-#define NDPI_INTERNAL_PROTOCOL_ADD(p, n)         NDPI_SET(&(p), (n))
-#define NDPI_INTERNAL_PROTOCOL_DEL(a,b)          NDPI_CLR(&a,b)
-#define NDPI_INTERNAL_PROTOCOL_IS_SET(p, n)      NDPI_ISSET(&(p), (n))
-
-/* this is a very very tricky macro *g*,
- * the compiler will remove all shifts here if the protocol is static...
- */
-#define NDPI_ADD_PROTOCOL_TO_BITMASK(bmask,value)     NDPI_SET(&bmask,   value & NDPI_NUM_BITS_MASK)
-#define NDPI_DEL_PROTOCOL_FROM_BITMASK(bmask,value)   NDPI_CLR(&bmask,   value & NDPI_NUM_BITS_MASK)
-#define NDPI_COMPARE_PROTOCOL_TO_BITMASK(bmask,value) NDPI_ISSET(&bmask, value & NDPI_NUM_BITS_MASK)
-
-#define NDPI_SAVE_AS_BITMASK(bmask,value)  { NDPI_ZERO(&bmask) ; NDPI_ADD_PROTOCOL_TO_BITMASK(bmask, value); }
-
+#define NDPI_ONES_BIT(num)      num = -1;
 
 #define ndpi_min(a,b)   ((a < b) ? a : b)
 #define ndpi_max(a,b)   ((a > b) ? a : b)

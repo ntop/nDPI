@@ -262,34 +262,25 @@ typedef u_int32_t ndpi_ndpi_mask;
 
 #define MAX_NUM_RISK_INFOS    8
 
-/* NDPI_PROTO_BITMASK_STRUCT */
-#ifdef NDPI_CFFI_PREPROCESSING
-#undef NDPI_NUM_FDS_BITS
-#define NDPI_NUM_FDS_BITS     16
+struct ndpi_bitmask {
+  u_int16_t max_bits;
+  u_int16_t num_fds;
+  ndpi_ndpi_mask *fds;
+};
+
+#define NDPI_MAX_NUM_DISSECTORS                 288      /* Multiple of 32 */
+#ifndef NDPI_CFFI_PREPROCESSING
+#define NDPI_NUM_FDS_DISSECTORS                 howmanybits(NDPI_MAX_NUM_DISSECTORS, 32)
+#else
+#define NDPI_NUM_FDS_DISSECTORS    9
 #endif
 
-typedef struct ndpi_protocol_bitmask_struct {
-  ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS];
-} ndpi_protocol_bitmask_struct_t;
-
-
-#ifdef NDPI_CFFI_PREPROCESSING
-#undef NDPI_NUM_FDS_BITS_DISSECTORS
-#define NDPI_NUM_FDS_BITS_DISSECTORS    9
-#endif
-
-typedef struct ndpi_dissector_bitmask_struct {
-  ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS_DISSECTORS];
-} ndpi_dissector_bitmask_struct_t;
-
-#ifdef NDPI_CFFI_PREPROCESSING
-#undef NDPI_NUM_FDS_BITS_INTERNAL
-#define NDPI_NUM_FDS_BITS_INTERNAL     15
-#endif
-
-typedef struct ndpi_internal_protocol_bitmask_struct {
-  ndpi_ndpi_mask fds_bits[NDPI_NUM_FDS_BITS_INTERNAL];
-} ndpi_internal_protocol_bitmask_struct_t;
+/* Similar to `struct ndpi_bitmask` but with pre-allocated memory, i.e. fixed size.
+   Used only internally in `ndpi_flow_struct`
+ */
+struct ndpi_dissector_bitmask {
+  ndpi_ndpi_mask fds[NDPI_NUM_FDS_DISSECTORS];
+};
 
 struct ndpi_detection_module_struct;
 
@@ -1664,7 +1655,7 @@ struct ndpi_flow_struct {
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
   struct ndpi_metadata_monitoring *monit;
 
-  NDPI_DISSECTOR_BITMASK excluded_dissectors_bitmask;
+  struct ndpi_dissector_bitmask excluded_dissectors_bitmask;
 
   /* NDPI_PROTOCOL_BITTORRENT */
   u_int8_t bittorrent_stage;		      // can be 0 - 255

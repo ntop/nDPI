@@ -15,7 +15,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int8_t protocol_was_guessed, unused;
   u_int32_t i, ret;
   u_int16_t bool_value;
-  NDPI_INTERNAL_PROTOCOL_BITMASK enabled_bitmask;
+  struct ndpi_bitmask enabled_bitmask;
   struct ndpi_lru_cache_stats lru_stats;
   struct ndpi_patricia_tree_stats patricia_stats;
   struct ndpi_automa_stats automa_stats;
@@ -46,16 +46,20 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   else
     g_ctx = NULL;
 
-  NDPI_INTERNAL_PROTOCOL_SET_ALL(enabled_bitmask);
-  if(fuzzed_data.ConsumeBool()) {
-    NDPI_INTERNAL_PROTOCOL_RESET(enabled_bitmask);
-    for(i = 0; i < ndpi_get_num_internal_protocols(); i++) {
-      if(fuzzed_data.ConsumeBool())
-        NDPI_INTERNAL_PROTOCOL_ADD(enabled_bitmask, i);
+  if(ndpi_bitmask_alloc(&enabled_bitmask, ndpi_get_num_internal_protocols()) == 0) {
+    ndpi_bitmask_set_all(&enabled_bitmask);
+    if(fuzzed_data.ConsumeBool()) {
+      ndpi_bitmask_reset(&enabled_bitmask);
+      for(i = 0; i < ndpi_get_num_internal_protocols(); i++) {
+        if(fuzzed_data.ConsumeBool())
+          ndpi_bitmask_set(&enabled_bitmask, i);
+      }
     }
+    ndpi_info_mod = ndpi_init_detection_module_ext(g_ctx, &enabled_bitmask);
+    ndpi_bitmask_dealloc(&enabled_bitmask);
+  } else {
+    ndpi_info_mod = ndpi_init_detection_module_ext(g_ctx, NULL);
   }
-
-  ndpi_info_mod = ndpi_init_detection_module_ext(g_ctx, &enabled_bitmask);
 
   set_ndpi_debug_function(ndpi_info_mod, NULL);
 

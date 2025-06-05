@@ -302,7 +302,7 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 void test_lib(); /* Forward */
 
 extern void ndpi_report_payload_stats(FILE *out);
-extern int parse_proto_name_list(char *str, NDPI_INTERNAL_PROTOCOL_BITMASK *bitmask,
+extern int parse_proto_name_list(char *str, struct ndpi_bitmask *bitmask,
 				 int inverted_logic);
 extern u_int8_t is_ndpi_proto(struct ndpi_flow_info *flow, u_int16_t id);
 
@@ -2994,7 +2994,7 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
                            struct ndpi_global_context *g_ctx) {
-  NDPI_INTERNAL_PROTOCOL_BITMASK enabled_bitmask;
+  struct ndpi_bitmask enabled_bitmask, *enabled_bitmask_ptr = NULL;
   struct ndpi_workflow_prefs prefs;
   int i, ret;
   ndpi_cfg_error rc;
@@ -3007,15 +3007,19 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
   prefs.ignore_vlanid = ignore_vlanid;
 
   /* Protocols to enable/disable. Default: everything is enabled */
-  NDPI_INTERNAL_PROTOCOL_SET_ALL(enabled_bitmask);
   if(_disabled_protocols != NULL) {
+    if(ndpi_bitmask_alloc(&enabled_bitmask, ndpi_get_num_internal_protocols()) != 0)
+      exit(-1);
+    ndpi_bitmask_set_all(&enabled_bitmask);
     if(parse_proto_name_list(_disabled_protocols, &enabled_bitmask, 1))
       exit(-1);
+    enabled_bitmask_ptr = &enabled_bitmask;
   }
 
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
-                                                            serialization_format, g_ctx, &enabled_bitmask);
+                                                            serialization_format, g_ctx, enabled_bitmask_ptr);
+  ndpi_bitmask_dealloc(enabled_bitmask_ptr);
 
   if(_categoriesDirPath) {
     int failed_files = ndpi_load_categories_dir(ndpi_thread_info[thread_id].workflow->ndpi_struct, _categoriesDirPath);
@@ -6265,6 +6269,36 @@ void mahalanobisUnitTest()
 
 /* *********************************************** */
 
+void bitmaskUnitTest()
+{
+  struct ndpi_bitmask b;
+  int i;
+
+  assert(ndpi_bitmask_alloc(&b, 512) == 0);
+  for(i = 0; i < b.max_bits; i++) {
+    ndpi_bitmask_set(&b, i);
+    assert(ndpi_bitmask_is_set(&b, i));
+  }
+  for(i = 0; i < b.max_bits; i++) {
+    ndpi_bitmask_clear(&b, i);
+    assert(!ndpi_bitmask_is_set(&b, i));
+  }
+  ndpi_bitmask_set_all(&b);
+  for(i = 0; i < b.max_bits; i++)
+    assert(ndpi_bitmask_is_set(&b, i));
+  ndpi_bitmask_reset(&b);
+  for(i = 0; i < b.max_bits; i++)
+    assert(!ndpi_bitmask_is_set(&b, i));
+  for(i = 0; i < b.max_bits; i++) {
+    ndpi_bitmask_set(&b, i);
+    assert(ndpi_bitmask_is_set(&b, i));
+  }
+
+  ndpi_bitmask_dealloc(&b);
+}
+
+/* *********************************************** */
+
 void filterUnitTest() {
   ndpi_filter* f = ndpi_filter_alloc();
   u_int32_t v, i;
@@ -6798,6 +6832,7 @@ int main(int argc, char **argv) {
     memmemUnitTest();
     memcasecmpUnitTest();
     mahalanobisUnitTest();
+    bitmaskUnitTest();
 #endif
   }
 
