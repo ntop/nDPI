@@ -10972,13 +10972,21 @@ u_int16_t ndpi_get_protocol_id(struct ndpi_detection_module_struct *ndpi_str, ch
 int ndpi_get_category_id(struct ndpi_detection_module_struct *ndpi_str, char *cat) {
   int i;
 
-  if(!ndpi_str) return(-1);
+  if(!ndpi_str || !cat)
+    return(-1);
+
+  if (*cat == '\0')
+   return(-1);
+
+  /* Cache the lowercased first character of 'cat' */
+  const unsigned char fc = tolower((unsigned char)*cat);
 
   for(i = 0; i < NDPI_PROTOCOL_NUM_CATEGORIES; i++) {
     const char *name = ndpi_category_get_name(ndpi_str, i);
-
-    if(strcasecmp(cat, name) == 0)
-      return(i);
+    if(name && tolower((unsigned char)*name) == fc) {
+      if(strcasecmp(name + 1, cat + 1) == 0)
+        return(i);
+    }
   }
 
   return(-1);
