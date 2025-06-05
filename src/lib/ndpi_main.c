@@ -301,12 +301,20 @@ u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_str, 
   if(!ndpi_str || !name)
     return(NDPI_PROTOCOL_UNKNOWN);
 
+  if (*name == '\0')
+    return(NDPI_PROTOCOL_UNKNOWN);
+
   num = ndpi_str->num_supported_protocols;
+
+  /* Cache the lowercased first character of 'name' */
+  const unsigned char fc = tolower((unsigned char)*name);
 
   for(i = 0; i < num; i++) {
     p = ndpi_get_proto_by_id(ndpi_str, i);
-    if(p && strcasecmp(p, name) == 0)
-      return(i);
+    if (p && tolower((unsigned char)*p) == fc) {
+      if(strcasecmp(p + 1, name + 1) == 0)
+        return(i);
+    }
   }
 
   return(NDPI_PROTOCOL_UNKNOWN);

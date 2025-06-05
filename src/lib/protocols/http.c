@@ -910,12 +910,22 @@ static void ndpi_check_numeric_ip(struct ndpi_detection_module_struct *ndpi_stru
 static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct,
                                 struct ndpi_flow_struct *flow,
 				char *url) {
-  if(strstr(url, "<php>") != NULL /* PHP code in the URL */)
-    ndpi_set_risk(ndpi_struct, flow, NDPI_URL_POSSIBLE_RCE_INJECTION, "PHP code in URL");
-  else if(strncmp(url, "/shell?", 7) == 0)
-    ndpi_set_risk(ndpi_struct, flow, NDPI_URL_POSSIBLE_RCE_INJECTION, "Possible WebShell detected");
-  else if(strncmp(url, "/.", 2) == 0)
-    ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "URL starting with dot");
+  char msg[512];
+  ndpi_risk_enum r;
+  
+  if(strstr(url, "<php>") != NULL /* PHP code in the URL */) {
+    r = NDPI_URL_POSSIBLE_RCE_INJECTION;
+    snprintf(msg, sizeof(msg), "PHP code in URL [%s]", url);
+  } else if(strncmp(url, "/shell?", 7) == 0) {
+    r = NDPI_URL_POSSIBLE_RCE_INJECTION;
+    snprintf(msg, sizeof(msg), "Possible WebShell detected [%s]", url);
+  } else if(strncmp(url, "/.", 2) == 0) {
+    r = NDPI_POSSIBLE_EXPLOIT;
+    snprintf(msg, sizeof(msg), "URL starting with dot [%s]", url);
+  } else
+    return;
+
+  ndpi_set_risk(ndpi_struct, flow, r, msg);
 }
 
 /* ************************************************************* */
