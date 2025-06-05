@@ -669,6 +669,15 @@ extern "C" {
 					     u_int16_t proto);
 
   /**
+   * Get the protocol breed ID associated to the breed name
+   *
+   * @par     name          = the string name of the breed
+   * @return  the breed ID associated to the name, or NDPI_PROTOCOL_UNRATED if not found
+   *
+   */
+  ndpi_protocol_breed_t ndpi_get_breed_by_name(const char *name);
+
+  /**
    * Return the string name of the protocol breed
    *
    * @par     ndpi_struct   = the detection module
