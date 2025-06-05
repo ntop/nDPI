@@ -10848,6 +10848,32 @@ const char *ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_str
   return(categories[category]);
 }
 
+ndpi_protocol_category_t ndpi_get_category_by_name(struct ndpi_detection_module_struct *ndpi_mod,
+				   const char *name)
+{
+  ndpi_protocol_category_t i;
+  const char *cat_name = NULL;
+
+  if(!ndpi_mod || !name)
+    return(NDPI_PROTOCOL_CATEGORY_UNSPECIFIED);
+
+  if (*name == '\0')
+    return(NDPI_PROTOCOL_CATEGORY_UNSPECIFIED);
+
+  /* Cache the lowercased first character of 'name' */
+  const unsigned char fc = tolower((unsigned char)*name);
+
+  for(i = 0; i < NDPI_PROTOCOL_NUM_CATEGORIES; i++) {
+    cat_name = ndpi_category_get_name(ndpi_mod, i);
+    if (cat_name && tolower((unsigned char)*cat_name) == fc) {
+      if(strcasecmp(cat_name + 1, name + 1) == 0)
+        return(i);
+    }
+  }
+
+  return(NDPI_PROTOCOL_CATEGORY_UNSPECIFIED);
+}
+
 /* ****************************************************** */
 
 static int category_depends_on_master(int proto)

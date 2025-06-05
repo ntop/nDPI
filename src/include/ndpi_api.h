@@ -608,6 +608,17 @@ extern "C" {
 				     ndpi_protocol_category_t category);
 
   /**
+   * Get protocol category by name
+   *
+   * @par     ndpi_mod      = the detection module
+   * @par     name          = the category name
+   * @return  the category ID, or NDPI_PROTOCOL_CATEGORY_UNSPECIFIED if not found
+   *
+   */
+  ndpi_protocol_category_t ndpi_get_category_by_name(struct ndpi_detection_module_struct *ndpi_mod,
+				     const char *name);
+
+  /**
    * Get classification confidence as string
    *
    * @par     confidence      = the confidence value
