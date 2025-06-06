@@ -63,6 +63,22 @@ ipv6:[fe80::76ac:b9ff:fe6c:c124]:12717@CustomProtocolG=2050
 ipv6:[fe80::76ac:b9ff:fe6c:c124]:12718@CustomProtocolH=65535
 ipv6:[fe80::76ac:b9ff:fe6c:c124]:12719@CustomProtocolI=65534
 
+ipv6:[2001:db8::1]:443@CustomProtocolJ=3000,cat=3,breed=0
+ipv6:[2001:db8::2]:80@CustomProtocolK=3001,cat=7
+ipv6:[2001:db8::3]:8080@CustomProtocolL=3002,breed=6
+ipv6:[2001:db8::4]@CustomProtocolM=3003,cat=106,breed=5
+
+
+host:"api.example.com"@CustomProtocolN=4000,cat=5,breed=2
+host:"*.test.example.org"@CustomProtocolO=4001,cat=101,breed=6
+
+ip:192.0.2.1:443@CustomProtocolP=5000,cat=14,breed=0
+ip:203.0.113.0/24@CustomProtocolQ=5001,cat=107,breed=3
+
+
+tcp:9999@CustomProtocolR=6000,cat=8,breed=3
+udp:53239@CustomProtocolS=6001,cat=14,breed=0
+
 #
 # You can use symbolic IP addreses if you want
 #

@@ -5265,6 +5265,10 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
   u_int subprotocol_id, i;
   int ret = 0;
 
+  char *additional_params = NULL;
+  ndpi_protocol_category_t category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
+  ndpi_protocol_breed_t breed = NDPI_PROTOCOL_ACCEPTABLE;
+
   at = strrchr(rule, '@');
   if(at == NULL) {
     /* This looks like a mask rule or an invalid rule */
@@ -5326,36 +5330,80 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 
   if(def == NULL) {
     ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
-    char *equal = strchr(proto, '=');
     u_int16_t user_proto_id, proto_id;
 
     proto_id = ndpi_str->num_supported_protocols; /* First free id */
     user_proto_id = proto_id; /* By default, external id is equal to the internal one */
 
+    char *first_comma = strchr(proto, ',');
+    char *proto_name = proto;
+    
+    if(first_comma != NULL) {
+      first_comma[0] = '\0';
+      additional_params = &first_comma[1];
+    }
+
+    char *equal = strchr(proto_name, '=');
+    
     if(equal != NULL) {
-      /* PROTO=VALUE */
-
       equal[0] = '\0';
-      user_proto_id = atoi(&equal[1]);
+      char *id_part = &equal[1];
+      
+      const char *errstrp;
+      user_proto_id = ndpi_strtonum(id_part, ndpi_str->num_supported_protocols, 65535, &errstrp, 10);
+      if(errstrp != NULL) {
+        NDPI_LOG_ERR(ndpi_str, "Invalid protocol ID '%s': %s\n", id_part, errstrp);
+        return(-1);
+      }
 
-      NDPI_LOG_DBG(ndpi_str, "***** ADDING MAPPING %s: %u -> %u\n", proto, proto_id, user_proto_id);
+      NDPI_LOG_DBG(ndpi_str, "***** ADDING MAPPING %s: %u -> %u\n", proto_name, proto_id, user_proto_id);
     }
 
     /* TODO */
     if(ndpi_str->num_custom_protocols >= (NDPI_MAX_NUM_CUSTOM_PROTOCOLS - 1)) {
       NDPI_LOG_ERR(ndpi_str, "Too many protocols defined (%u): skipping protocol %s\n",
-		   ndpi_str->num_custom_protocols, proto);
+		   ndpi_str->num_custom_protocols, proto_name);
       return(-2);
     }
 
     ndpi_add_user_proto_id_mapping(ndpi_str, proto_id, user_proto_id);
 
+    /* Parse additional parameters like cat= and breed= */
+    if(additional_params != NULL) {
+      char *param = NULL;
+      char *params_copy = additional_params;
+
+      while((param = strsep(&params_copy, ",")) != NULL) {
+        if(strncmp(param, "cat=", 4) == 0) {
+          char *cat_value = &param[4];
+          const char *errstrp;
+          
+          int cat_id = ndpi_strtonum(cat_value, 1, NDPI_PROTOCOL_NUM_CATEGORIES-1, &errstrp, 10);
+          if(errstrp == NULL) {
+            category = (ndpi_protocol_category_t)cat_id;
+          } else {
+            NDPI_LOG_ERR(ndpi_str, "Invalid category ID '%s': %s\n", cat_value, errstrp);
+          }
+        } else if (strncmp(param, "breed=", 6) == 0) {
+          char *breed_value = &param[6];
+          const char *errstrp;
+          
+          int breed_id = ndpi_strtonum(breed_value, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_UNRATED-1, &errstrp, 10);
+          if(errstrp == NULL) {
+            breed = (ndpi_protocol_breed_t)breed_id;
+          } else {
+            NDPI_LOG_ERR(ndpi_str, "Invalid breed ID '%s': %s\n", breed_value, errstrp);
+          }
+        }
+      }
+    }
+
     ndpi_set_proto_defaults(ndpi_str, 1 /* is_cleartext */,
 			    1 /* is_app_protocol */,
-			    NDPI_PROTOCOL_ACCEPTABLE, /* TODO add protocol breed support in rules */
+			    breed,
 			    proto_id,
 			    proto, /* protoName */
-			    NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, /* TODO add protocol category support in rules */
+			    category,
 			    NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
@@ -5446,8 +5494,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       if(rc != 0)
 	return(rc);
     } else {
-      ndpi_add_host_url_subprotocol(ndpi_str, value, subprotocol_id, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
-				    NDPI_PROTOCOL_ACCEPTABLE, 0);
+      ndpi_add_host_url_subprotocol(ndpi_str, value, subprotocol_id, category, breed, 0);
     }
   }
 
