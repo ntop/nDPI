@@ -126,7 +126,7 @@ Safe                            14 812           14
 Acceptable                     197 11456         182          
 Fun                              8 464           8            
 Unsafe                          14 812           14           
-Potentially Dangerous             2 116           2            
+Potentially_Dangerous             2 116           2            
 Unrated                       1776 103012        1774         
 
 	1	TCP 172.16.0.8:36050 <-> 64.13.134.52:22 [proto: 92/SSH][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: RemoteAccess/12][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.68 sec][TCP Fingerprint: 2_64_1024_6bbe28597824/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

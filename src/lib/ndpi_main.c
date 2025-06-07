@@ -3831,12 +3831,12 @@ static const char *categories[NDPI_PROTOCOL_NUM_CATEGORIES] = {
   "Sport",
   "Business",
   "Internet",
-  "BlockChain/Cypto",
-  "Blog/Forum",
+  "BlockChain_Cypto",
+  "Blog_Forum",
   "Government",
   "Education",
-  "CNR/Proxy",
-  "Hw/Sw",
+  "CNR_Proxy",
+  "Hw_Sw",
   "Dating",
   "Travel",
   "Food",
@@ -10973,9 +10973,9 @@ char *ndpi_get_proto_breed_name(ndpi_protocol_breed_t breed_id) {
   case NDPI_PROTOCOL_UNSAFE:
     return("Unsafe");
   case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
-    return("Potentially Dangerous");
+    return("Potentially_Dangerous");
   case NDPI_PROTOCOL_TRACKER_ADS:
-    return("Tracker/Ads");
+    return("Tracker_Ads");
   case NDPI_PROTOCOL_DANGEROUS:
     return("Dangerous");
   case NDPI_PROTOCOL_UNRATED:
