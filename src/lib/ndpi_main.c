@@ -121,6 +121,8 @@
 #include "inc_generated/ndpi_asn_epicgames.c.inc"
 #include "inc_generated/ndpi_asn_nvidia.c.inc"
 #include "inc_generated/ndpi_asn_roblox.c.inc"
+#include "inc_generated/ndpi_asn_imo.c.inc"
+#include "inc_generated/ndpi_asn_badoo.c.inc"
 #include "inc_generated/ndpi_domains_ms_office365_match.c.inc"
 #include "inc_generated/ndpi_domains_ms_onedrive_match.c.inc"
 #include "inc_generated/ndpi_domains_ms_outlook_match.c.inc"
@@ -3829,12 +3831,12 @@ static const char *categories[NDPI_PROTOCOL_NUM_CATEGORIES] = {
   "Sport",
   "Business",
   "Internet",
-  "BlockChain/Cypto",
-  "Blog/Forum",
+  "BlockChain_Cypto",
+  "Blog_Forum",
   "Government",
   "Education",
-  "CNR/Proxy",
-  "Hw/Sw",
+  "CNR_Proxy",
+  "Hw_Sw",
   "Dating",
   "Travel",
   "Food",
@@ -4386,6 +4388,14 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_ROBLOX)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_roblox_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_roblox_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_IMO)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_imo_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_imo_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_BADOO)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_badoo_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_badoo_protocol_list_6);
   }
 
   if(ndpi_str->cfg.flow_risk_lists_enabled) {
@@ -11010,9 +11020,9 @@ char *ndpi_get_proto_breed_name(ndpi_protocol_breed_t breed_id) {
   case NDPI_PROTOCOL_UNSAFE:
     return("Unsafe");
   case NDPI_PROTOCOL_POTENTIALLY_DANGEROUS:
-    return("Potentially Dangerous");
+    return("Potentially_Dangerous");
   case NDPI_PROTOCOL_TRACKER_ADS:
-    return("Tracker/Ads");
+    return("Tracker_Ads");
   case NDPI_PROTOCOL_DANGEROUS:
     return("Dangerous");
   case NDPI_PROTOCOL_UNRATED:
@@ -11023,6 +11033,8 @@ char *ndpi_get_proto_breed_name(ndpi_protocol_breed_t breed_id) {
 }
 
 ndpi_protocol_breed_t ndpi_get_breed_by_name(const char *name) {
+  int i;
+  
   if(!name)
     return(NDPI_PROTOCOL_UNRATED);
 
@@ -11031,9 +11043,10 @@ ndpi_protocol_breed_t ndpi_get_breed_by_name(const char *name) {
 
   /* Cache the lowercased first character of 'name' */
   const unsigned char fc = tolower((unsigned char)*name);
-
-  for(int i = NDPI_PROTOCOL_SAFE; i <= NDPI_PROTOCOL_UNRATED; i++) {
+  
+  for(i = NDPI_PROTOCOL_SAFE; i <= NDPI_PROTOCOL_UNRATED; i++) {
     char *breed_name = ndpi_get_proto_breed_name((ndpi_protocol_breed_t)i);
+    
     if(breed_name && tolower((unsigned char)*breed_name) == fc) {
       if(strcasecmp(breed_name + 1, name + 1) == 0)
         return((ndpi_protocol_breed_t)i);

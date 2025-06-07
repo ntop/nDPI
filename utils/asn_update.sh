@@ -81,7 +81,7 @@ echo "(3) Webex IPs are available in $DEST"
 
 echo "(1) Downloading Tencent routes..."
 DEST=../src/lib/inc_generated/ndpi_asn_tencent.c.inc
-create_list NDPI_PROTOCOL_TENCENT $DEST "" "AS45090" "AS137876" "AS133478" "AS132591" "AS132203"
+create_list NDPI_PROTOCOL_TENCENT $DEST "" "AS45090" "AS137876" "AS133478" "AS132591" "AS132203" "AS139341"
 echo "(3) Tencent IPs are available in $DEST"
 
 echo "(1) Downloading OpenDNS routes..."
@@ -209,6 +209,16 @@ echo "(1) Downloading Roblox..."
 DEST=../src/lib/inc_generated/ndpi_asn_roblox.c.inc
 create_list NDPI_PROTOCOL_ROBLOX $DEST "" "AS22697"
 echo "(3) Roblox IPs are available in $DEST"
+
+echo "(1) Downloading Badoo..."
+DEST=../src/lib/inc_generated/ndpi_asn_badoo.c.inc
+create_list NDPI_PROTOCOL_BADOO $DEST "" "AS12678"
+echo "(3) Badoo IPs are available in $DEST"
+
+echo "(1) Downloading IMO..."
+DEST=../src/lib/inc_generated/ndpi_asn_imo.c.inc
+create_list NDPI_PROTOCOL_IMO $DEST "" "AS36131" "AS212879"
+echo "(3) IMO IPs are available in $DEST"
 
 if [ ${TOTAL_ASN} -eq 0 ] || [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"

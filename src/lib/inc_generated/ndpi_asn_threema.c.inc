@@ -86,6 +86,7 @@ static ndpi_network6 ndpi_protocol_threema_protocol_list_6[] = {
  { "2a00:c38::", 32, NDPI_PROTOCOL_THREEMA },
  { "2a01:a480::", 32, NDPI_PROTOCOL_THREEMA },
  { "2a02:418::", 29, NDPI_PROTOCOL_THREEMA },
+ { "2a02:ce40::", 32, NDPI_PROTOCOL_THREEMA },
  { "2a03:580::", 32, NDPI_PROTOCOL_THREEMA },
  { "2a06:5100::", 29, NDPI_PROTOCOL_THREEMA },
  { "2a06:6400::", 29, NDPI_PROTOCOL_THREEMA },
