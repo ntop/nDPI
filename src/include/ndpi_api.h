@@ -1772,7 +1772,8 @@ extern "C" {
 
   void ndpi_data_print_window_values(struct ndpi_analyze_struct *s); /* debug */
 
-  ndpi_risk_enum ndpi_validate_url(char *url);
+  ndpi_risk_enum ndpi_validate_url(struct ndpi_detection_module_struct *ndpi_str,
+				   struct ndpi_flow_struct *flow, char *url);
 
   u_int8_t ndpi_is_protocol_detected(ndpi_protocol proto);
   void ndpi_serialize_risk(ndpi_serializer *serializer, ndpi_risk risk);

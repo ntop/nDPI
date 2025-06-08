@@ -1465,32 +1465,26 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_HTTP_CONNECT:
   case NDPI_PROTOCOL_HTTP_PROXY:
     ndpi_serialize_start_of_block(serializer, "http");
+
     if(flow->http.url != NULL) {
-      ndpi_risk_enum risk = ndpi_validate_url(flow->http.url);
-      if (risk != NDPI_NO_RISK)
-      {
-        NDPI_SET_BIT(flow->risk, risk);
-      }
       ndpi_serialize_string_string(serializer, "url", flow->http.url);
       ndpi_serialize_string_uint32(serializer, "code", flow->http.response_status_code);
       ndpi_serialize_string_string(serializer, "content_type", flow->http.content_type);
       ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
     }
+
     if (flow->http.request_content_type != NULL)
-    {
       ndpi_serialize_string_string(serializer, "request_content_type",
                                    flow->http.request_content_type);
-    }
+
     if (flow->http.detected_os != NULL)
-    {
       ndpi_serialize_string_string(serializer, "detected_os",
                                    flow->http.detected_os);
-    }
+
     if (flow->http.nat_ip != NULL)
-    {
       ndpi_serialize_string_string(serializer, "nat_ip",
                                    flow->http.nat_ip);
-    }
+
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -2066,7 +2060,9 @@ static int ndpi_is_rce_injection(char* query) {
 
 /* ********************************** */
 
-ndpi_risk_enum ndpi_validate_url(char *url) {
+ndpi_risk_enum ndpi_validate_url(struct ndpi_detection_module_struct *ndpi_str,
+				 struct ndpi_flow_struct *flow,
+				 char *url) {
   char *orig_str = NULL, *str = NULL, *question_mark = strchr(url, '?');
   ndpi_risk_enum rc = NDPI_NO_RISK;
 
@@ -2113,8 +2109,15 @@ ndpi_risk_enum ndpi_validate_url(char *url) {
 
 	ndpi_free(decoded);
 
-	if(rc != NDPI_NO_RISK)
+	if(rc != NDPI_NO_RISK) {
+	  if(flow != NULL) {
+	    char msg[128];
+
+	    snprintf(msg, sizeof(msg), "Suspicious URL [%s]", url);
+	    ndpi_set_risk(ndpi_str, flow, rc, msg);
+	  }
 	  break;
+	}
       }
 
       str = strtok_r(NULL, "&", &tmp);

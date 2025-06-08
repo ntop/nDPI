@@ -2136,14 +2136,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->num_packets_before_monitoring > 0)
       fprintf(out, "[RTP packets: %d/%d]", flow->stun.rtp_counters[0], flow->stun.rtp_counters[1]);
 
-    if(flow->http.url[0] != '\0') {
-      ndpi_risk_enum risk = ndpi_validate_url(flow->http.url);
-
-      if(risk != NDPI_NO_RISK)
-	NDPI_SET_BIT(flow->risk, risk);
-
-      fprintf(out, "[URL: %s]", flow->http.url);
-    }
+    if(flow->http.url[0] != '\0')
+      fprintf(out, "[URL: %s]", flow->http.url);    
 
     if(flow->http.response_status_code)
       fprintf(out, "[StatusCode: %u]", flow->http.response_status_code);

@@ -922,9 +922,11 @@ static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct
   } else if(strncmp(url, "/.", 2) == 0) {
     r = NDPI_POSSIBLE_EXPLOIT;
     snprintf(msg, sizeof(msg), "URL starting with dot [%s]", url);
-  } else
+  } else {
+    r = ndpi_validate_url(ndpi_struct, flow, url);
     return;
-
+  }
+  
   ndpi_set_risk(ndpi_struct, flow, r, msg);
 }
 
@@ -974,7 +976,11 @@ static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_str
       /* Check server content */
       for(i=0; i<server_len; i++) {
 	if(!ndpi_isprint(server[i])) {
-	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, "Suspicious Agent");
+	  char msg[64];
+
+	  snprintf(msg, sizeof(msg), "Suspicious Agent [%s]", server);
+
+	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
 	  break;
 	}
       }
@@ -1180,9 +1186,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
       if(ndpi_is_valid_hostname((char *)packet->host_line.ptr,
 				packet->host_line.len) == 0) {
+	char str[128];
+	
         if(is_flowrisk_info_enabled(ndpi_struct, NDPI_INVALID_CHARACTERS)) {
-	  char str[128];
-
 	  snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
 	  ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
         } else {
@@ -1190,7 +1196,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
         }
 
 	/* This looks like an attack */
-	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
+
+	snprintf(str, sizeof(str), "Suspicious hostname [%.*s]: attack ?", packet->host_line.len, (char *)packet->host_line.ptr);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, str);
       }
 
       double_col = strchr((char*)flow->host_server_name, ':');
@@ -1497,7 +1505,10 @@ static void parse_response_code(struct ndpi_detection_module_struct *ndpi_struct
 	    || ((flow->http.method == NDPI_HTTP_METHOD_GET) && (strncmp(slash, "/wp-content/uploads/", 20) == 0))
 	   )) {
           /* Example of popular exploits https://www.wordfence.com/blog/2022/05/millions-of-attacks-target-tatsu-builder-plugin/ */
-          ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Possible Wordpress Exploit");
+	  char str[128];
+
+	  snprintf(str, sizeof(str), "Possible Wordpress Exploit [%s]", slash);
+          ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, str);
 	}
       }
     }
