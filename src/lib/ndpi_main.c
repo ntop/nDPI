@@ -5511,6 +5511,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
   return(ret);
 }
 
+
 /* ******************************************************************** */
 
 /*
