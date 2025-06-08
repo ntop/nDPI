@@ -978,7 +978,7 @@ static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_str
 	if(!ndpi_isprint(server[i])) {
 	  char msg[64];
 
-	  snprintf(msg, sizeof(msg), "Suspicious Agent [%s]", server);
+	  snprintf(msg, sizeof(msg), "Suspicious Agent [%.*s]", server_len, server);
 
 	  ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
 	  break;
