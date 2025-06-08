@@ -63,6 +63,11 @@ ipv6:[fe80::76ac:b9ff:fe6c:c124]:12717@CustomProtocolG=2050
 ipv6:[fe80::76ac:b9ff:fe6c:c124]:12718@CustomProtocolH=65535
 ipv6:[fe80::76ac:b9ff:fe6c:c124]:12719@CustomProtocolI=65534
 
+ipv6:[2001:db8::c2fd:b817:5ca8:82dd]:16690@CustomProtocolJ,breed=1
+ipv6:[2001:db8::cba5:51b2:8733:6d9e]:38542@CustomProtocolK,cat=3
+ipv6:[2001:db8::cc14:67e6:fcd:b96d]:37464@CustomProtocolL=3002,cat=5,breed=3
+ipv6:[2003:db8::4]@CustomProtocolM=3003,cat=106,breed=5
+
 #
 # You can use symbolic IP addreses if you want
 #

@@ -1,0 +1,1 @@
+ipv6:[2003:db8::4]@CustomProtocolM=3003,cat=106,breed=5
