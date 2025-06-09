@@ -100,8 +100,6 @@
 #define NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(x,y)  \
   ((x.u6_addr.u6_addr64[0] < y.u6_addr.u6_addr64[0]) || ((x.u6_addr.u6_addr64[0] == y.u6_addr.u6_addr64[0]) && (x.u6_addr.u6_addr64[1] < y.u6_addr.u6_addr64[1])))
 
-#define NDPI_NUM_BITS              512
-
 #define howmanybits(x, y)   (((x)+((y)-1))/(y))
 
 #define NDPI_SET_BIT(num, n)    num |= 1ULL << ( n )

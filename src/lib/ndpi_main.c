@@ -381,7 +381,7 @@ static void ndpi_add_user_proto_id_mapping(struct ndpi_detection_module_struct *
 		ndpi_proto_id, ndpi_get_num_internal_protocols(),
 		user_proto_id);
 
-  if(!ndpi_is_custom_protocol(ndpi_str, ndpi_proto_id)) {
+  if(ndpi_proto_id < ndpi_get_num_internal_protocols()){
     NDPI_LOG_ERR(ndpi_str, "Something is seriously wrong with new custom protocol %d/%d/%d\n",
                  ndpi_proto_id, user_proto_id, ndpi_get_num_internal_protocols());
     return; /* We shoudn't ever be here...*/
@@ -423,7 +423,7 @@ u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct 
   if(!ndpi_str)
     return(0);
 
-  if(!ndpi_is_custom_protocol(ndpi_str, user_proto_id))
+  if(user_proto_id < ndpi_get_num_internal_protocols())
     return(user_proto_id);
   else {
     u_int idx, idx_max = ndpi_str->num_supported_protocols - ndpi_get_num_internal_protocols();
@@ -689,14 +689,9 @@ static void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_st
   char *name;
   int j;
 
-  if(!ndpi_str || !protoName)
-    return;
-
-  /* TODO */
-  if(protoId >= NDPI_MAX_SUPPORTED_PROTOCOLS + NDPI_MAX_NUM_CUSTOM_PROTOCOLS) {
-    NDPI_LOG_ERR(ndpi_str, "[NDPI] %s/protoId=%d: INTERNAL ERROR\n", protoName, protoId);
-    return;
-  }
+  /* There is no real limit on protocols number/id; the hard limit being the u_int16_t
+     data typer used for the ids...
+   */
 
   if(protoId >= ndpi_str->proto_defaults_num_allocated) {
     int new_num;
@@ -3700,7 +3695,7 @@ void ndpi_debug_printf(u_int16_t proto, struct ndpi_detection_module_struct *ndp
   va_list args;
 #define MAX_STR_LEN 250
   char str[MAX_STR_LEN];
-  if(ndpi_str != NULL && log_level > NDPI_LOG_ERROR && proto > 0 && proto < ndpi_get_num_internal_protocols() &&
+  if(ndpi_str != NULL && log_level > NDPI_LOG_ERROR && proto > 0 &&
      !ndpi_bitmask_is_set(&ndpi_str->cfg.debug_bitmask, proto))
     return;
   va_start(args, format);
@@ -5140,17 +5135,18 @@ u_int ndpi_get_num_protocols(struct ndpi_detection_module_struct *ndpi_str) {
 
 /* ******************************************************************** */
 
+/* TODO: try to remove this function (and the define...) */
 u_int ndpi_get_num_internal_protocols(void) {
-  return NDPI_MAX_SUPPORTED_PROTOCOLS;
+  return NDPI_LAST_IMPLEMENTED_PROTOCOL;
 }
 
 /* ******************************************************************** */
 
 int ndpi_is_custom_protocol(struct ndpi_detection_module_struct *ndpi_str, u_int16_t proto_id)
 {
-  if(!ndpi_str)
+  if(!ndpi_str || proto_id >= ndpi_str->proto_defaults_num_allocated)
     return 0;
-  return proto_id >= ndpi_get_num_internal_protocols();
+  return ndpi_str->proto_defaults[proto_id].isCustomProto;
 }
 
 /* ******************************************************************** */
@@ -5378,6 +5374,13 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
     ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
     u_int16_t user_proto_id, proto_id;
 
+    /* The hard limit on protocols number depends on protocol ids being u_int16_t */
+    if(ndpi_str->num_supported_protocols >= 65535) {
+      NDPI_LOG_ERR(ndpi_str, "Too many protocols defined (%u): skipping protocol\n",
+                   ndpi_str->num_custom_protocols);
+      return(-2);
+    }
+
     proto_id = ndpi_str->num_supported_protocols; /* First free id */
     user_proto_id = proto_id; /* By default, external id is equal to the internal one */
 
@@ -5403,13 +5406,6 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       }
 
       NDPI_LOG_DBG(ndpi_str, "***** ADDING MAPPING %s: %u -> %u\n", proto_name, proto_id, user_proto_id);
-    }
-
-    /* TODO */
-    if(ndpi_str->num_custom_protocols >= (NDPI_MAX_NUM_CUSTOM_PROTOCOLS - 1)) {
-      NDPI_LOG_ERR(ndpi_str, "Too many protocols defined (%u): skipping protocol %s\n",
-		   ndpi_str->num_custom_protocols, proto_name);
-      return(-2);
     }
 
     ndpi_add_user_proto_id_mapping(ndpi_str, proto_id, user_proto_id);
@@ -9570,7 +9566,7 @@ static int do_guess(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_f
     return(-1);
   }
 
-  if(flow->guessed_protocol_id_by_ip >= ndpi_get_num_internal_protocols()) {
+  if(ndpi_is_custom_protocol(ndpi_str, flow->guessed_protocol_id_by_ip)) {
     /* This is a custom protocol and it has priority over everything else */
     ret->proto.master_protocol = flow->guessed_protocol_id;
     ret->proto.app_protocol = flow->guessed_protocol_id_by_ip;
