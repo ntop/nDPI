@@ -7826,6 +7826,9 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
 	      ndpi_set_risk(ndpi_str, flow, NDPI_MALICIOUS_FINGERPRINT, (char*)msg);
 	    } else {
+#ifdef DEBUG_TCP_OPTIONS
+              printf("Options len: %u\n", options_len);
+#endif
 	      for(i=0; i<options_len; /* don't increase here */) {
 		u_int8_t kind = options[i];
 
@@ -7880,7 +7883,8 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		    int j = i+2;
 		    u_int8_t opt_len = len - 2;
 
-		    if((kind == 2 /* Maximum segment size */) || (kind == 3 /* TCP window scale */)) {
+		    if(((kind == 2 /* Maximum segment size */) || (kind == 3 /* TCP window scale */)) &&
+		       j + opt_len - 1 < options_len){
 		      u_int32_t val = 0;
 
 		      if(opt_len == 1)
