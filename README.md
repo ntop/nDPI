@@ -7,7 +7,7 @@
 
 nDPI® is an open source LGPLv3 library for deep-packet inspection.
 
-A generic FAQ about nDPI® is available [here](https://github.com/ntop/nDPI/blob/dev/doc/FAQ.md)
+A generic FAQ about nDPI is available [here](https://github.com/ntop/nDPI/blob/dev/doc/FAQ.rst)
 
 ### How To Compile nDPI
 
