@@ -159,6 +159,7 @@
     <ClCompile Include="..\src\lib\protocols\msdo.c" />
     <ClCompile Include="..\src\lib\protocols\melsec.c" />
     <ClCompile Include="..\src\lib\protocols\hamachi.c" />
+    <ClCompile Include="..\src\lib\protocols\glbp.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />

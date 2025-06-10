@@ -3729,3 +3729,12 @@ References: `Kick official site: <https://kick.com/>`_
 LogMeIn Hamachi VPN service (primarily used for gaming and remote access). Unlike anonymity VPNs, Hamachi creates virtual LAN networks between devices.
 
 References: `LogMeIn Hamachi official site: <https://vpn.net/>`_
+
+
+.. _Proto_452:
+
+`NDPI_PROTOCOL_GLBP`
+=====================
+Gateway Load Balancing Protocol (GLBP) - Cisco proprietary protocol that provides first-hop redundancy and load balancing for IPv4 and IPv6 networks.
+
+References: `Cisco GLBP Configuration Guide <https://www.cisco.com/en/US/docs/ios/12_2t/12_2t15/feature/guide/ft_glbp.html>`_
