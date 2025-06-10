@@ -3,8 +3,8 @@
  *
  * Gateway Load Balancing Protocol
  * 
- * Copyright (C) 2024 - ntop.org
- * Copyright (C) 2024 - V.G <v.gavrilov@securitycode.ru>
+ * Copyright (C) 2025 - ntop.org
+ * Copyright (C) 2025 - V.G <v.gavrilov@securitycode.ru>
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
