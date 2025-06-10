@@ -125,6 +125,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
 #ifdef ENABLE_CONFIG2
     ndpi_set_config(workflow->ndpi_struct, NULL, "flow_risk.all.info", "0");
+    ndpi_set_config(workflow->ndpi_struct, NULL, "metadata.tcp_fingerprint_format", "1");
 #endif
 
 #endif /* ENABLE_ONLY_SUBCLASSIFICATION */
