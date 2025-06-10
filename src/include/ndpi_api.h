@@ -263,27 +263,6 @@ extern "C" {
 				      u_int8_t *protocol_was_guessed);
 
   /**
-   * Processes an extra packet in order to get more information for a given protocol
-   * (like SSL getting both client and server certificate even if we already know after
-   * seeing the client certificate what the protocol is)
-   *
-   * @par    ndpi_struct    = the detection module
-   * @par    flow           = pointer to the connection state machine
-   * @par    packet         = unsigned char pointer to the Layer 3 (IP header)
-   * @par    packetlen      = the length of the packet
-   * @par    packet_time_ms = the current timestamp for the packet (expressed in msec)
-   * @par    input_info     = (optional) flow information provided by the (external) flow manager
-   * @return void
-   *
-   */
-  void ndpi_process_extra_packet(struct ndpi_detection_module_struct *ndpi_struct,
-				 struct ndpi_flow_struct *flow,
-				 const unsigned char *packet,
-				 const unsigned short packetlen,
-				 const u_int64_t packet_time_ms,
-				 struct ndpi_flow_input_info *input_info);
-
-  /**
    * Processes one packet and returns the ID of the detected protocol.
    * This is the MAIN PACKET PROCESSING FUNCTION.
    *
