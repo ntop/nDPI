@@ -743,8 +743,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_num_protocols(ndpi_info_mod);
   ndpi_get_proto_defaults(ndpi_info_mod);
 
-  ndpi_self_check_host_match(stdout);
-
   ndpi_dump_protocols(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : stdout);
   ndpi_generate_options(fuzzed_data.ConsumeIntegralInRange(0, 4), fuzzed_data.ConsumeBool() ? NULL : stdout);
   ndpi_dump_risks_score(fuzzed_data.ConsumeBool() ? NULL : stdout);
@@ -868,8 +866,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   ndpi_get_ndpi_detection_module_size();
   ndpi_detection_get_sizeof_ndpi_flow_struct();
-  ndpi_detection_get_sizeof_ndpi_flow_tcp_struct();
-  ndpi_detection_get_sizeof_ndpi_flow_udp_struct();
 
   ndpi_get_tot_allocated_memory();
   ndpi_log_timestamp(log_ts, sizeof(log_ts));

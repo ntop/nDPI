@@ -63,24 +63,6 @@ extern "C" {
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void);
 
-
-  /**
-   * Get the size of the flow tcp struct
-   *
-   * @return the size of the flow tcp struct
-   *
-   */
-  u_int32_t ndpi_detection_get_sizeof_ndpi_flow_tcp_struct(void);
-
-
-  /**
-   * Get the size of the flow udp struct
-   *
-   * @return the size of the flow udp struct
-   *
-   */
-  u_int32_t ndpi_detection_get_sizeof_ndpi_flow_udp_struct(void);
-
   /*
     Same as the API call above but used for matching raw id's added
     via ndpi_add_string_value_to_automa()
@@ -884,20 +866,6 @@ extern "C" {
   void ndpi_set_automa(struct ndpi_detection_module_struct *ndpi_struct,
 		       void* automa);
 
-  /* NDPI_PROTOCOL_TOR */
-  /**
-   * Check if the flow could be detected as TOR protocol
-   *
-   * @par     ndpi_struct = the detection module
-   * @par     flow = the detected flow
-   * @par     certificate = the SSL/TLS certificate
-   * @return  1 if the flow is TOR;
-   *          0 else
-   *
-   */
-  int ndpi_is_tls_tor(struct ndpi_detection_module_struct *ndpi_struct,
-		      struct ndpi_flow_struct *flow, char *certificate);
-
   /* Wrappers functions */
   /**
    * Init Aho-Corasick automata
@@ -1012,7 +980,6 @@ extern "C" {
 					      u_int16_t user_proto_id);
   u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct *ndpi_str,
 					      u_int16_t ndpi_proto_id);
-  void ndpi_self_check_host_match(FILE *error_out);
 
   /* Tells to called on what l4 protocol given application protocol can be found */
   ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t ndpi_proto_id);
