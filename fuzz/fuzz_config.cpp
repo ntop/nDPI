@@ -38,8 +38,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int16_t unused1, unused2;
   ndpi_master_app_protocol proto1, proto2;
 
-  /* To allow memory allocation failures */
-  fuzz_set_alloc_callbacks_and_seed(size);
+  /* Make allocation failures more unlikely */
+  if(fuzzed_data.ConsumeBool())
+    fuzz_set_alloc_callbacks_and_seed(size);
+  else
+    fuzz_set_alloc_callbacks_and_seed(0);
 
   if(fuzzed_data.ConsumeBool())
     g_ctx = ndpi_global_init();
@@ -687,7 +690,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
                           (char *)fuzzed_data.ConsumeBytesAsString(32).c_str(),
                           static_cast<ndpi_risk>(fuzzed_data.ConsumeIntegral<u_int64_t>()));
 
-  ndpi_finalize_initialization(ndpi_info_mod);
+  ret = ndpi_finalize_initialization(ndpi_info_mod);
+  if(ret != 0) {
+    ndpi_exit_detection_module(ndpi_info_mod);
+    ndpi_info_mod = NULL;
+  }
 
   /* Random protocol configuration */
   pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_protocols(ndpi_info_mod) + 1); /* + 1 to trigger invalid pid */

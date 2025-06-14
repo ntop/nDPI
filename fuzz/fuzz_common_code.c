@@ -13,7 +13,7 @@ static int fastrand ()
 }
 
 static void *malloc_wrapper(size_t size) {
-  return (fastrand () % 256) ? malloc (size) : NULL;
+  return (fastrand () % 16) ? malloc (size) : NULL;
 }
 static void free_wrapper(void *freeable) {
   free(freeable);
