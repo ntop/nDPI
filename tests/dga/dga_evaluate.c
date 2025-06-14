@@ -96,8 +96,7 @@ int main(int argc, char **argv) {
   assert(ndpi_str != NULL);
   ndpi_set_config(ndpi_str, NULL, "log.level", "3"); /* NDPI_LOG_DEBUG_EXTRA */
   set_ndpi_debug_function(ndpi_str, ndpi_dbg_fn);
-  ndpi_finalize_initialization(ndpi_str);
-  assert(ndpi_str != NULL);
+  assert(ndpi_finalize_initialization(ndpi_str) == 0);
 
 
   while(fgets(buffer, sizeof(buffer), fd) != NULL) {

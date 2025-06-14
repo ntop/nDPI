@@ -899,7 +899,7 @@ void extcap_config() {
 
   if(!ndpi_str) exit(0);
 
-  ndpi_finalize_initialization(ndpi_str);
+  if(ndpi_finalize_initialization(ndpi_str) != 0) exit(0);
 
   ndpi_num_supported_protocols = ndpi_get_num_protocols(ndpi_str);
   proto_defaults = ndpi_get_proto_defaults(ndpi_str);
@@ -5252,9 +5252,7 @@ static void dgaUnitTest() {
 
   assert(ndpi_str != NULL);
 
-  ndpi_finalize_initialization(ndpi_str);
-
-  assert(ndpi_str != NULL);
+  assert(ndpi_finalize_initialization(ndpi_str) ==0);
 
   for(i=0; non_dga[i] != NULL; i++) {
     if(debug) printf("Checking non DGA %s\n", non_dga[i]);
@@ -6659,7 +6657,7 @@ void domainSearchUnitTest() {
   assert(ndpi_str);
   assert(sc);
 
-  ndpi_finalize_initialization(ndpi_str);
+  assert(ndpi_finalize_initialization(ndpi_str) == 0);
 
   ndpi_domain_classify_add(ndpi_str, sc, NDPI_PROTOCOL_NTOP, ".ntop.org");
   ndpi_domain_classify_add(ndpi_str, sc, NDPI_PROTOCOL_NTOP, domain);
@@ -6692,7 +6690,7 @@ void domainSearchUnitTest2() {
   assert(ndpi_str);
   assert(c);
 
-  ndpi_finalize_initialization(ndpi_str);
+  assert(ndpi_finalize_initialization(ndpi_str) == 0);
 
   ndpi_domain_classify_add(ndpi_str, c, class_id, "ntop.org");
   ndpi_domain_classify_add(ndpi_str, c, class_id, "apple.com");

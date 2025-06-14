@@ -210,7 +210,10 @@ static struct nDPI_workflow * init_workflow(char const * const file_or_device)
     return NULL;
   }
 
-  ndpi_finalize_initialization(workflow->ndpi_struct);
+  if(ndpi_finalize_initialization(workflow->ndpi_struct) != 0) {
+    free_workflow(&workflow);
+    return NULL;
+  }
 
   return workflow;
 }

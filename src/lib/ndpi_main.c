@@ -11157,7 +11157,10 @@ void ndpi_generate_options(u_int opt, FILE *options_out) {
   ndpi_str = ndpi_init_detection_module(NULL);
   if (!ndpi_str) return;
 
-  ndpi_finalize_initialization(ndpi_str);
+  if(ndpi_finalize_initialization(ndpi_str) != 0) {
+    ndpi_exit_detection_module(ndpi_str);
+    return;
+  }
 
   switch(opt) {
   case 0: /* List known protocols */

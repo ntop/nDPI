@@ -10,7 +10,8 @@ int main()
     if (ndpi_info_mod == NULL)
         return 1;
 
-    ndpi_finalize_initialization(ndpi_info_mod);
+    if(ndpi_finalize_initialization(ndpi_info_mod) != 0)
+      return 1;
 
     rc = ndpi_load_geoip(ndpi_info_mod, "GeoLite2-City.mmdb", "GeoLite2-ASN.mmdb");
     if(rc != 0) {

@@ -389,7 +389,8 @@ int main(int argc, char **argv) {
   if (ndpi_info_mod == NULL)
     return -1;
 
-  ndpi_finalize_initialization(ndpi_info_mod);
+  if(ndpi_finalize_initialization(ndpi_info_mod) != 0)
+    return -1;
 
 /*
  * If we want argument parsing on Windows,
