@@ -383,6 +383,7 @@ struct ndpi_detection_module_struct {
 
   u_int num_supported_protocols;
   u_int num_custom_protocols;
+  u_int num_internal_protocols;
 
   /* HTTP/DNS/HTTPS/QUIC host matching */
   ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
@@ -706,8 +707,6 @@ int is_monitoring_enabled(struct ndpi_detection_module_struct *ndpi_str, int pro
 int is_flowrisk_info_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id);
 
 u_int8_t ndpi_is_valid_protoId(struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId);
-
-u_int ndpi_get_num_internal_protocols(void);
 
   /* TLS */
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,

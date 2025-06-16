@@ -856,7 +856,7 @@ extern "C" {
    * @return  the number of protocols
    *
    */
-  u_int ndpi_get_num_internal_protocols(void);
+  u_int ndpi_get_num_internal_protocols(void); /* TODO: try to avoid using this function: we would like to remove it */
 
   /**
    * Get the nDPI version release

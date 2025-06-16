@@ -59,7 +59,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   }
 
   ndpi_domain_classify_add_domains(ndpi_struct, d,
-				   fuzzed_data.ConsumeIntegralInRange(0, (int)ndpi_get_num_internal_protocols()),
+				   fuzzed_data.ConsumeIntegralInRange(0, 512),
 				   fuzzed_data.ConsumeBool() ? (char *)"random_list.list" : (char *)"wrong_path");
 
   /* "Random" search */

@@ -22,7 +22,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_bitmask bitmask;
   char *str;
 
-  ndpi_bitmask_alloc(&bitmask, ndpi_get_num_internal_protocols()); /* Don't make this call to fail...*/
+  /* Don't make the next function to fail...*/
+  fuzz_set_alloc_callbacks_and_seed(0);
+
+  ndpi_bitmask_alloc(&bitmask, ndpi_get_num_internal_protocols());
 
   /* To allow memory allocation failures */
   fuzz_set_alloc_callbacks_and_seed(size);

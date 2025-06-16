@@ -364,18 +364,18 @@ static void ndpi_add_user_proto_id_mapping(struct ndpi_detection_module_struct *
   int idx;
 
   NDPI_LOG_DBG2(ndpi_str, "*** %u (>= %u)-> %u\n",
-		ndpi_proto_id, ndpi_get_num_internal_protocols(),
+		ndpi_proto_id, ndpi_str->num_internal_protocols,
 		user_proto_id);
 
-  if(ndpi_proto_id < ndpi_get_num_internal_protocols()){
+  if(ndpi_proto_id < ndpi_str->num_internal_protocols){
     NDPI_LOG_ERR(ndpi_str, "Something is seriously wrong with new custom protocol %d/%d/%d\n",
-                 ndpi_proto_id, user_proto_id, ndpi_get_num_internal_protocols());
+                 ndpi_proto_id, user_proto_id, ndpi_str->num_internal_protocols);
     return; /* We shoudn't ever be here...*/
   }
 
   /* Note that this mean we need to register *all* the internal protocols before adding
      *any* custom protocols... */
-  idx = ndpi_proto_id - ndpi_get_num_internal_protocols();
+  idx = ndpi_proto_id - ndpi_str->num_internal_protocols;
 
   if(idx >= ndpi_str->ndpi_to_user_proto_id_num_allocated) {
     int new_num;
@@ -409,17 +409,17 @@ u_int16_t ndpi_map_user_proto_id_to_ndpi_id(struct ndpi_detection_module_struct 
   if(!ndpi_str)
     return(0);
 
-  if(user_proto_id < ndpi_get_num_internal_protocols())
+  if(user_proto_id < ndpi_str->num_internal_protocols)
     return(user_proto_id);
   else {
-    u_int idx, idx_max = ndpi_str->num_supported_protocols - ndpi_get_num_internal_protocols();
+    u_int idx, idx_max = ndpi_str->num_supported_protocols - ndpi_str->num_internal_protocols;
 
     /* TODO: improve it and remove linear scan */
     for(idx = 0; idx < idx_max; idx++) {
       if(ndpi_str->ndpi_to_user_proto_id[idx] == 0)
 	break;
       else if(ndpi_str->ndpi_to_user_proto_id[idx] == user_proto_id) {
-	return(idx + ndpi_get_num_internal_protocols());
+	return(idx + ndpi_str->num_internal_protocols);
       }
     }
   }
@@ -442,7 +442,7 @@ u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct 
   if(!ndpi_is_custom_protocol(ndpi_str, ndpi_proto_id))
     return(ndpi_proto_id);
   else if(ndpi_proto_id < ndpi_str->num_supported_protocols) {
-    u_int idx = ndpi_proto_id - ndpi_get_num_internal_protocols();
+    u_int idx = ndpi_proto_id - ndpi_str->num_internal_protocols;
 
     if(idx < ndpi_str->num_supported_protocols)
       return(ndpi_str->ndpi_to_user_proto_id[idx]);
@@ -736,6 +736,8 @@ static void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_st
   ndpi_str->num_supported_protocols++;
   if(is_custom_protocol)
     ndpi_str->num_custom_protocols++;
+  else
+    ndpi_str->num_internal_protocols++;
 
   if(!is_proto_enabled(ndpi_str, protoId)) {
     NDPI_LOG_DBG(ndpi_str, "Skip default ports for %s/protoId=%d: disabled\n",
@@ -3972,6 +3974,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
 
   ndpi_str->num_supported_protocols = 0;
   ndpi_str->num_custom_protocols = 0;
+  ndpi_str->num_internal_protocols = 0;
 
   ndpi_str->host_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
   if(!ndpi_str->host_automa.ac_automa) {
@@ -4067,15 +4070,22 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
      the custom protocols!
      Only the first **consecutive** `ndpi_str->num_supported_protocols` entries in the
      array `ndpi_str->proto_defaults[]` MUST have been initialized!
-     In other words, all the other functions can safely access to  `ndpi_str->num_supported_protocols`
+     In other words, all the other functions can safely access to  `ndpi_str->num_supported_protocols` and
+     `ndpi_str->num_internal_protocols`
 
      Sanity checks
   */
-  if(ndpi_str->num_supported_protocols != ndpi_get_num_internal_protocols() ||
-     ndpi_str->num_custom_protocols != 0) {
-    NDPI_LOG_ERR(ndpi_str, "INTERNAL ERROR protocols %d %d %d\n",
-                 ndpi_str->num_supported_protocols,
-                 ndpi_get_num_internal_protocols(), ndpi_str->num_custom_protocols);
+  for(i = 0; i < (int)ndpi_str->num_supported_protocols; i++) {
+    if(ndpi_str->proto_defaults[i].protoName == NULL ||
+       ndpi_str->proto_defaults[i].isCustomProto) {
+      NDPI_LOG_ERR(ndpi_str, "INTERNAL ERROR protocols %d/%d %d\n",
+                   i, ndpi_str->num_supported_protocols,
+                   ndpi_str->proto_defaults[i].isCustomProto);
+      ndpi_exit_detection_module(ndpi_str);
+      return(NULL);
+    }
+  }
+  if(ndpi_str->num_supported_protocols != ndpi_str->num_internal_protocols) {
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
@@ -4084,7 +4094,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
      (we need the number to proper initialize the bitmasks)*/
   if(set_default_config(&ndpi_str->cfg,
                         ndpi_str->num_supported_protocols) != 0) {
-    NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating set_default_config\n");
+    NDPI_LOG_ERR(ndpi_str, "Error allocating set_default_config\n");
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
@@ -5974,7 +5984,7 @@ int ndpi_load_protocols_dir(struct ndpi_detection_module_struct *ndpi_str,
       const char *errstrp;
 
       underscore[0] = '\0';
-      proto_id = ndpi_strtonum(dp->d_name, 1, ndpi_get_num_internal_protocols() - 1, &errstrp, 10);
+      proto_id = ndpi_strtonum(dp->d_name, 1, ndpi_str->num_internal_protocols - 1, &errstrp, 10);
       if(errstrp == NULL) {
 	/* Valid file */
 	char path[512];
@@ -6406,7 +6416,7 @@ static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   struct call_function_struct *all_cb = NULL;
 
-  ndpi_str->callback_buffer = ndpi_calloc(ndpi_get_num_internal_protocols() + 1,sizeof(struct call_function_struct));
+  ndpi_str->callback_buffer = ndpi_calloc(NDPI_MAX_NUM_DISSECTORS, sizeof(struct call_function_struct));
   if(!ndpi_str->callback_buffer) return 1;
 
   /* HTTP */
@@ -12238,7 +12248,7 @@ void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
 
 /* ******************************************************************** */
 
-static u_int16_t __get_proto_id(const char *proto_name_or_id)
+static u_int16_t __get_proto_id(const struct ndpi_detection_module_struct *ndpi_str, const char *proto_name_or_id)
 {
   struct ndpi_detection_module_struct *module;
   u_int16_t proto_id;
@@ -12251,7 +12261,7 @@ static u_int16_t __get_proto_id(const char *proto_name_or_id)
   errno = 0;    /* To distinguish success/failure after call */
   val = strtol(proto_name_or_id, &endptr, 10);
   if(errno == 0 && *endptr == '\0' &&
-     (val >= 0 && val < (long)ndpi_get_num_internal_protocols())) {
+     (val >= 0 && val < (long)ndpi_str->num_internal_protocols)) {
     return val;
 
   }
@@ -12360,9 +12370,11 @@ static ndpi_cfg_error _set_param_int(struct ndpi_detection_module_struct *ndpi_s
 
 /* ******************************************************************** */
 
-static char *_get_param_int(void *_variable, const char *proto, char *buf, int buf_len) {
+static char *_get_param_int(struct ndpi_detection_module_struct *ndpi_str,
+                            void *_variable, const char *proto, char *buf, int buf_len) {
   int *variable = (int *)_variable;
 
+  (void)ndpi_str;
   (void)proto;
 
   snprintf(buf, buf_len, "%d", *variable);
@@ -12372,9 +12384,11 @@ static char *_get_param_int(void *_variable, const char *proto, char *buf, int b
 
 /* ******************************************************************** */
 
-static char *_get_param_string(void *_variable, const char *proto, char *buf, int buf_len) {
+static char *_get_param_string(struct ndpi_detection_module_struct *ndpi_str,
+                               void *_variable, const char *proto, char *buf, int buf_len) {
   char *variable = (char *)_variable;
 
+  (void)ndpi_str;
   (void)proto;
 
   snprintf(buf, buf_len, "%s", variable);
@@ -12437,13 +12451,14 @@ static ndpi_cfg_error _set_param_filename_config(struct ndpi_detection_module_st
 
 /* ******************************************************************** */
 
-static char *_get_param_protocol_enable_disable(void *_variable, const char *proto,
+static char *_get_param_protocol_enable_disable(struct ndpi_detection_module_struct *ndpi_str,
+                                                void *_variable, const char *proto,
 						char *buf, int buf_len)
 {
   struct ndpi_bitmask *bitmask = (struct ndpi_bitmask *)_variable;
   u_int16_t proto_id;
 
-  proto_id = __get_proto_id(proto);
+  proto_id = __get_proto_id(ndpi_str, proto);
   if(proto_id == NDPI_PROTOCOL_UNKNOWN)
     return NULL;
 
@@ -12480,7 +12495,7 @@ static ndpi_cfg_error _set_param_protocol_enable_disable(struct ndpi_detection_m
     }
   }
 
-  proto_id = __get_proto_id(proto);
+  proto_id = __get_proto_id(ndpi_str, proto);
   if(proto_id == NDPI_PROTOCOL_UNKNOWN)
     return NDPI_CFG_INVALID_PARAM;
 
@@ -12497,11 +12512,14 @@ static ndpi_cfg_error _set_param_protocol_enable_disable(struct ndpi_detection_m
   return NDPI_CFG_INVALID_PARAM;
 }
 
-static char *_get_param_flowrisk_enable_disable(void *_variable, const char *proto,
+static char *_get_param_flowrisk_enable_disable(struct ndpi_detection_module_struct *ndpi_str,
+                                                void *_variable, const char *proto,
                                                 char *buf, int buf_len)
 {
   struct ndpi_bitmask *bitmask = (struct ndpi_bitmask *)_variable;
   ndpi_risk_enum flowrisk_id;
+
+  (void)ndpi_str;
 
   flowrisk_id = __get_flowrisk_id(proto);
   if(flowrisk_id == NDPI_NO_RISK)
@@ -12599,7 +12617,7 @@ typedef ndpi_cfg_error (*cfg_set)(struct ndpi_detection_module_struct *ndpi_str,
                                   void *_variable, const char *value,
                                   const char *min_value, const char *max_value,
                                   const char *proto, const char *param);
-typedef char *(*cfg_get)(void *_variable, const char *proto, char *buf, int buf_len);
+typedef char *(*cfg_get)(struct ndpi_detection_module_struct *ndpi_str, void *_variable, const char *proto, char *buf, int buf_len);
 typedef int (*cfg_calback)(struct ndpi_detection_module_struct *ndpi_str, void *_variable, const char *proto, const char *param);
 
 static const struct cfg_op {
@@ -12880,7 +12898,7 @@ char *ndpi_get_config(struct ndpi_detection_module_struct *ndpi_str,
 	strcmp(c->param, "flow_risk.$FLOWRISK_NAME_OR_ID") == 0 &&
 	strcmp(param, c->param) == 0)) {
 
-      return cfg_ops[c->type].fn_get((void *)((char *)&ndpi_str->cfg + c->offset), proto, buf, buf_len);
+      return cfg_ops[c->type].fn_get(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset), proto, buf, buf_len);
     }
   }
   return NULL;
@@ -12903,7 +12921,7 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) 
       fprintf(fd, " *) %s %s: %s [%s]",
               c->proto ? c->proto : "NULL",
               c->param,
-              _get_param_int((void *)((char *)&ndpi_str->cfg + c->offset), c->proto, buf, sizeof(buf)),
+              _get_param_int(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset), c->proto, buf, sizeof(buf)),
 	      c->default_value);
       if(c->min_value && c->max_value)
         fprintf(fd, " [%s-%s]", c->min_value, c->max_value);
@@ -12913,7 +12931,7 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) 
       fprintf(fd, " *) %s %s: %s [%s]",
               c->proto ? c->proto : "NULL",
               c->param,
-	      _get_param_string((void *)((char *)&ndpi_str->cfg + c->offset), c->proto, buf, sizeof(buf)),
+	      _get_param_string(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset), c->proto, buf, sizeof(buf)),
 	      c->default_value);
       fprintf(fd, "\n");
       break;
@@ -12922,7 +12940,7 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) 
       fprintf(fd, " *) %s %s: %s [all %s]",
               c->proto,
               c->param,
-              /* TODO */ _get_param_protocol_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), "any", buf, sizeof(buf)),
+              /* TODO */ _get_param_protocol_enable_disable(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset), "any", buf, sizeof(buf)),
 	      c->default_value);
       fprintf(fd, "\n");
       break;
@@ -12931,7 +12949,7 @@ char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) 
       fprintf(fd, " *) %s %s: %s [all %s]",
 	      c->proto ? c->proto : "NULL",
 	      c->param,
-	      /* TODO */ _get_param_flowrisk_enable_disable((void *)((char *)&ndpi_str->cfg + c->offset), "any", buf, sizeof(buf)),
+	      /* TODO */ _get_param_flowrisk_enable_disable(ndpi_str, (void *)((char *)&ndpi_str->cfg + c->offset), "any", buf, sizeof(buf)),
 	      c->default_value);
       fprintf(fd, "\n");
       break;
