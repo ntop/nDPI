@@ -3456,7 +3456,7 @@ u_int8_t is_a_common_alpn(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************* */
 
-u_int8_t ndpi_is_valid_protoId(struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId) {
+u_int8_t ndpi_is_valid_protoId(const struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId) {
   if(!ndpi_str)
     return 0;
   return(protoId >= ndpi_str->num_supported_protocols ? 0 : 1);

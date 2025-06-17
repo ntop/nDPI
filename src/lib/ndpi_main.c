@@ -280,7 +280,7 @@ u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void) {
 
 /* *********************************************************************************** */
 
-char *ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_str, u_int id) {
+char *ndpi_get_proto_by_id(const struct ndpi_detection_module_struct *ndpi_str, u_int id) {
   return(!ndpi_is_valid_protoId(ndpi_str, id) ? NULL : ndpi_str->proto_defaults[id].protoName);
 }
 
@@ -301,7 +301,7 @@ static int dissector_bitmask_is_set(const struct ndpi_dissector_bitmask *b, u_in
 /* *********************************************************************************** */
 
 /* NOTE: name can be HTTP or YouTube but not TLS.YouTube */
-u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_str, const char *name) {
+u_int16_t ndpi_get_proto_by_name(const struct ndpi_detection_module_struct *ndpi_str, const char *name) {
   u_int16_t i, num;
   char *p;
 
@@ -12248,7 +12248,6 @@ void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
 
 static u_int16_t __get_proto_id(const struct ndpi_detection_module_struct *ndpi_str, const char *proto_name_or_id)
 {
-  struct ndpi_detection_module_struct *module;
   u_int16_t proto_id;
   char *endptr;
   long val;
@@ -12265,16 +12264,10 @@ static u_int16_t __get_proto_id(const struct ndpi_detection_module_struct *ndpi_
   }
 
   /* Try to decode the string as protocol name */
-  /* Use a temporary module with all protocols enabled */
-  module = ndpi_init_detection_module(NULL);
-  if(!module)
-    return NDPI_PROTOCOL_UNKNOWN;
-  /* Try to be fast: we need only the protocol name -> protocol id mapping! */
-  ndpi_set_config(module, "any", "ip_list.load", "0");
-  ndpi_set_config(module, NULL, "flow_risk_lists.load", "0");
-  ndpi_finalize_initialization(module);
-  proto_id = ndpi_get_proto_by_name(module, proto_name_or_id);
-  ndpi_exit_detection_module(module);
+  /* Use the current module, even if `ndpi_finalize_initialization` has not
+     been called yet: internal protocols have been already initialized
+     and we can get the name of disabled protocols, too */
+  proto_id = ndpi_get_proto_by_name(ndpi_str, proto_name_or_id);
 
   return proto_id;
 }

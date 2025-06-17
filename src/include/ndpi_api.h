@@ -634,7 +634,7 @@ extern "C" {
    * @return  the ID of the protocol
    *
    */
-  extern u_int16_t ndpi_get_proto_by_name(struct ndpi_detection_module_struct *ndpi_mod, const char *name);
+  extern u_int16_t ndpi_get_proto_by_name(const struct ndpi_detection_module_struct *ndpi_mod, const char *name);
 
   /**
    * Return the name of the protocol given its ID
@@ -644,7 +644,7 @@ extern "C" {
    * @return  the name of the protocol
    *
    */
-  extern char* ndpi_get_proto_by_id(struct ndpi_detection_module_struct *ndpi_mod, u_int id);
+  extern char* ndpi_get_proto_by_id(const struct ndpi_detection_module_struct *ndpi_mod, u_int id);
 
   /**
    * Return the name of the protocol given its ID. You can specify TLS.YouTube or just TLS
