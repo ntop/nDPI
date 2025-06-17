@@ -228,7 +228,7 @@ static void ndpi_int_change_protocol(struct ndpi_flow_struct *flow,
 				     u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
 				     ndpi_confidence_t confidence);
 
-static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str);
+static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str);
 static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndpi_str,
 					int count_only);
 
@@ -4099,13 +4099,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
     return(NULL);
   }
 
-  /* TODO: should we move that into ndpi_finalize_initialization()? */
-  if(ndpi_callback_init(ndpi_str)) {
-    NDPI_LOG_ERR(ndpi_str, "[NDPI] Error allocating callbacks\n");
-    ndpi_exit_detection_module(ndpi_str);
-    return(NULL);
-  }
-
   return(ndpi_str);
 }
 
@@ -4183,6 +4176,11 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
 
   if(ndpi_str->finalized) /* Already finalized */
     return 0;
+
+  if(dissectors_init(ndpi_str)) {
+    NDPI_LOG_ERR(ndpi_str, "Error dissectors_init\n");
+    return -1;
+  }
 
   if(!ndpi_str->custom_categories.categories_loaded)
     ndpi_enable_loaded_categories(ndpi_str);
@@ -6412,7 +6410,7 @@ void register_dissector(char *dissector_name, struct ndpi_detection_module_struc
 
 /* ******************************************************************** */
 
-static int ndpi_callback_init(struct ndpi_detection_module_struct *ndpi_str) {
+static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   struct call_function_struct *all_cb = NULL;
 
