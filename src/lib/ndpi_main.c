@@ -3958,9 +3958,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
     return NULL;
   }
 
-  ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, host_protocol_list);
-  ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, host_protocol_list_6);
-
   ndpi_str->ip_risk_mask = ndpi_ptree_create();
 
   ndpi_str->g_ctx = g_ctx;
@@ -3976,38 +3973,18 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
   ndpi_str->num_custom_protocols = 0;
   ndpi_str->num_internal_protocols = 0;
 
+  /* We don't really need to check if these init functions fail; the code
+     correctly handles that case (due only to memory allocation failures) */
   ndpi_str->host_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
-  if(!ndpi_str->host_automa.ac_automa) {
-    ndpi_exit_detection_module(ndpi_str);
-    return(NULL);
-  }
-
   ndpi_str->host_risk_mask_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
-  if(!ndpi_str->host_risk_mask_automa.ac_automa) {
-    ndpi_exit_detection_module(ndpi_str);
-    return(NULL);
-  }
-
   ndpi_str->common_alpns_automa.ac_automa = ac_automata_init(ac_domain_match_handler);
-  if(!ndpi_str->common_alpns_automa.ac_automa) {
-    ndpi_exit_detection_module(ndpi_str);
-    return(NULL);
-  }
-
-  load_common_alpns(ndpi_str);
-
   ndpi_str->tls_cert_subject_automa.ac_automa = ac_automata_init(NULL);
-  if(!ndpi_str->tls_cert_subject_automa.ac_automa) {
-    ndpi_exit_detection_module(ndpi_str);
-    return(NULL);
-  }
+  ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
 
   ndpi_str->malicious_ja4_hashmap = NULL;   /* Initialized on demand */
   ndpi_str->malicious_sha1_hashmap = NULL;  /* Initialized on demand */
 
-  ndpi_load_tcp_fingerprints(ndpi_str);
-  ndpi_str->risky_domain_automa.ac_automa = NULL; /* Initialized on demand */
-  ndpi_str->trusted_issuer_dn = NULL;
+  ndpi_str->trusted_issuer_dn = NULL; /* Initialized on demand */
 
   ndpi_str->custom_categories.sc_hostnames        = ndpi_domain_classify_alloc();
   if(!ndpi_str->custom_categories.sc_hostnames) {
@@ -4200,6 +4177,10 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   } else {
     NDPI_LOG_DBG(ndpi_str, "Libgcrypt initialization skipped\n");
   }
+
+  /* Hard-coded lists */
+  ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, host_protocol_list);
+  ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, host_protocol_list_6);
 
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AMAZON_AWS)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_amazon_aws_protocol_list);
@@ -4440,6 +4421,10 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   }
 
   ndpi_add_domain_risk_exceptions(ndpi_str);
+
+  load_common_alpns(ndpi_str);
+
+  ndpi_load_tcp_fingerprints(ndpi_str);
 
   if(ndpi_str->cfg.ookla_cache_num_entries > 0) {
     if(ndpi_str->cfg.ookla_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
