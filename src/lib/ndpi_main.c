@@ -3916,21 +3916,86 @@ void ndpi_global_deinit(struct ndpi_global_context *g_ctx) {
     if(g_ctx->signal_global_cache)
       ndpi_lru_free_cache(g_ctx->signal_global_cache);
 
+    ndpi_bitmask_free(&g_ctx->enabled_bitmask);
+    ndpi_exit_detection_module(g_ctx->tmp_module);
+
     ndpi_free(g_ctx);
   }
+}
+
+ndpi_cfg_error ndpi_set_protocol_enable(struct ndpi_global_context *g_ctx,
+                                        const char *proto_name, int is_enabled)
+{
+  u_int16_t protocol_id;
+
+  /*  Note that we don't have yet an easy way to log from this function */
+
+  if(!g_ctx)
+    return NDPI_CFG_INVALID_CONTEXT;
+  if(is_enabled != 0 && is_enabled != 1)
+    return NDPI_CFG_INVALID_PARAM;
+
+  if(!g_ctx->tmp_module) {
+    g_ctx->tmp_module = ndpi_init_detection_module(NULL);
+    if(!g_ctx->tmp_module)
+      return NDPI_CFG_ALLOCATION_ERROR;
+    /* We don't need to call ndpi_finalize_initialization() */
+  }
+
+  if(strcasecmp(proto_name, "any") == 0 || strcasecmp(proto_name, "all") == 0) {
+    return ndpi_set_protocol_enable_by_id(g_ctx, 0, is_enabled);
+  } else {
+    protocol_id = ndpi_get_proto_by_name(g_ctx->tmp_module, proto_name);
+    if(protocol_id == NDPI_PROTOCOL_UNKNOWN)
+      return NDPI_CFG_INVALID_PARAM;
+
+    return ndpi_set_protocol_enable_by_id(g_ctx, protocol_id, is_enabled);
+  }
+}
+
+ndpi_cfg_error ndpi_set_protocol_enable_by_id(struct ndpi_global_context *g_ctx,
+                                              u_int16_t protocol_id, int is_enabled)
+{
+  /*  Note that we don't have yet an easy way to log from this function */
+
+  if(!g_ctx)
+    return NDPI_CFG_INVALID_CONTEXT;
+  if(is_enabled != 0 && is_enabled != 1)
+    return NDPI_CFG_INVALID_PARAM;
+
+  if(!g_ctx->tmp_module) {
+    g_ctx->tmp_module = ndpi_init_detection_module(NULL);
+    if(!g_ctx->tmp_module)
+      return NDPI_CFG_ALLOCATION_ERROR;
+    /* We don't need to call ndpi_finalize_initialization() */
+  }
+  if(g_ctx->enabled_bitmask.num_fds == 0) {
+    if(ndpi_bitmask_alloc(&g_ctx->enabled_bitmask, g_ctx->tmp_module->num_internal_protocols) != 0)
+      return NDPI_CFG_ALLOCATION_ERROR;
+    /* By default, all protocols are enabled */
+    ndpi_bitmask_set_all(&g_ctx->enabled_bitmask);
+  }
+
+  if(protocol_id == 0) {
+    if(is_enabled == 0)
+      ndpi_bitmask_reset(&g_ctx->enabled_bitmask);
+    else
+      ndpi_bitmask_set_all(&g_ctx->enabled_bitmask);
+  } else {
+
+    if(is_enabled == 0)
+      ndpi_bitmask_clear(&g_ctx->enabled_bitmask, protocol_id);
+    else
+      ndpi_bitmask_set(&g_ctx->enabled_bitmask, protocol_id);
+  }
+
+  return NDPI_CFG_OK;
+
 }
 
 /* ******************************************************************** */
 
 struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx) {
-  /* By default, all protocols are enabled */
-  return ndpi_init_detection_module_ext(g_ctx, NULL);
-}
-
-/* ******************************************************************** */
-
-struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_global_context *g_ctx,
-                                                                    const struct ndpi_bitmask *detection_bitmask) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_calloc(1, sizeof(struct ndpi_detection_module_struct));
   int i;
 
@@ -3962,8 +4027,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
 
   ndpi_str->g_ctx = g_ctx;
 
-  if(detection_bitmask)
-    ndpi_str->detection_bitmask = ndpi_bitmask_clone(detection_bitmask);
+  if(g_ctx)
+    ndpi_str->detection_bitmask = ndpi_bitmask_clone(&g_ctx->enabled_bitmask);
 
   ndpi_str->user_data = NULL;
 
@@ -5110,13 +5175,6 @@ u_int ndpi_get_num_protocols(struct ndpi_detection_module_struct *ndpi_str) {
   if(!ndpi_str || !ndpi_str->finalized)
     return 0;
   return ndpi_str->num_supported_protocols;
-}
-
-/* ******************************************************************** */
-
-/* TODO: try to remove this function (and the define...) */
-u_int ndpi_get_num_internal_protocols(void) {
-  return NDPI_LAST_IMPLEMENTED_PROTOCOL;
 }
 
 /* ******************************************************************** */

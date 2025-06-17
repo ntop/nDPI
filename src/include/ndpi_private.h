@@ -182,6 +182,18 @@ struct ndpi_global_context {
 
   /* Signal STUN cache */
   struct ndpi_lru_cache *signal_global_cache;
+
+  /* A temporary context used to:
+       * get the number of internal protocols
+       * map protocol name -> protocol id
+     when enabling/disabling a protocol.
+     For performance reason, it is initialized only if needed, and it is
+     used for all `ndpi_set_protocol_enable()` calls, i.e. it is freed
+     only during `ndpi_global_deinit()`
+  */
+  struct ndpi_detection_module_struct *tmp_module;
+  /* Protocols enabled/disabled */
+  struct ndpi_bitmask enabled_bitmask;
 };
 
 #define CFG_MAX_LEN	256

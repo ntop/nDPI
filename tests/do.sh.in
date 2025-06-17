@@ -55,7 +55,7 @@ PCRE_PCAPS="WebattackRCE.pcap"
 NBPF_ENABLED=@NBPF_ENABLED@
 NBPF_PCAPS="h323-overflow.pcap"
 GLOBAL_CONTEXT_ENABLED=@GLOBAL_CONTEXT_ENABLED@
-GLOBAL_CONTEXT_CFGS="caches_global"
+GLOBAL_CONTEXT_CFGS="caches_global disable_protocols"
 READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,../../../example/config.txt -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja4_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -G ../../../lists -q -K JSON -k /dev/null -t -v 2"
 
 

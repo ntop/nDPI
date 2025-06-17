@@ -82,3 +82,54 @@ A more complex example, with global context and a shared Oookla LRU cache (all t
         
         ndpi_global_deinit(g_ctx);
 
+
+
+By default, all protocols are enabled. If you want to disable some protocols, you need a global context. Example:
+
+.. code:: c
+        
+        struct ndpi_global_context *g_ctx;
+        struct ndpi_detection_module_struct *ndpi_structs;
+        ndpi_cfg_error rc;
+        
+        g_ctx = ndpi_global_init();
+        if(!g_ctx) {
+            ERROR;
+        }
+        
+        rc = ndpi_set_protocol_enable(g_ctx, "DNS", 0 /* disabled */);
+        if(rc != NDPI_CFG_OK) {
+            ERROR;
+        }
+        
+        ndpi_structs = ndpi_init_detection_module(g_ctx);
+        
+        [...]
+        
+
+
+Another example with all protocols disabled, but SIP:
+
+.. code:: c
+        
+        struct ndpi_global_context *g_ctx;
+        struct ndpi_detection_module_struct *ndpi_structs;
+        ndpi_cfg_error rc;
+        
+        g_ctx = ndpi_global_init();
+        if(!g_ctx) {
+            ERROR;
+        }
+        
+        rc = ndpi_set_protocol_enable(g_ctx, "any", 0 /* disabled */);
+        if(rc != NDPI_CFG_OK) {
+            ERROR;
+        }
+        rc = ndpi_set_protocol_enable(g_ctx, "SIP", 1 /* enabled */);
+        if(rc != NDPI_CFG_OK) {
+            ERROR;
+        }
+        
+        ndpi_structs = ndpi_init_detection_module(g_ctx);
+        
+        [...]

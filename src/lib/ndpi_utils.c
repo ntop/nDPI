@@ -4512,6 +4512,7 @@ struct ndpi_bitmask *ndpi_bitmask_clone(const struct ndpi_bitmask *b)
     ndpi_free(a);
     return NULL;
   }
-  memcpy(a->fds, b->fds, b->num_fds * sizeof(ndpi_ndpi_mask));
+  if(b->num_fds > 0)
+    memcpy(a->fds, b->fds, b->num_fds * sizeof(ndpi_ndpi_mask));
   return a;
 }

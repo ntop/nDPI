@@ -168,6 +168,36 @@ extern "C" {
   void ndpi_global_deinit(struct ndpi_global_context *g_ctx);
 
   /**
+   * Enable/disable a specific protocol. By default, all protocols are enabled.
+   * This configuration is shared among all the detection modules having
+   * the same global context.
+   * You need to call this function before initializing any local contexts
+   *
+   * @par g_ctx = global context
+   * @par protocol_name = protocol name; "any" or "all" for enable/disable all protocols
+   * @par is_enabled = 1: protocol enabled; 0: protocol disabled
+   *
+   * @return  NDPI_CFG_OK if successful, otherwise another NDPI_CFG_* value
+   *
+   */
+  ndpi_cfg_error ndpi_set_protocol_enable(struct ndpi_global_context *g_ctx,
+                                          const char *proto_name, int is_enabled);
+
+  /**
+   * Similar to `ndpi_set_protocol_enable` but the protocol is specified via numeric id,
+   * not via the name.
+   *
+   * @par g_ctx = global context
+   * @par protocol_id = protocol id; 0 for ANY protocols
+   * @par is_enabled = 1: protocol enabled; 0: protocol disabled
+   *
+   * @return  NDPI_CFG_OK if successful, otherwise another NDPI_CFG_* value
+   *
+   */
+  ndpi_cfg_error ndpi_set_protocol_enable_by_id(struct ndpi_global_context *g_ctx,
+                                                u_int16_t protocol_id, int is_enabled);
+
+  /**
    * Returns a new initialized detection module
    * Note that before you can use it you can still load
    * hosts and do other things. As soon as you are ready to use
@@ -182,19 +212,6 @@ extern "C" {
    *
    */
   struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx);
-
-
-  /**
-   * Similar to `ndpi_init_detection_module` but you can also set the protocol bitmask
-   * By default, all protocols are enabled
-   *
-   * @par g_ctx = global context associated to the new detection module; NULL if no global context is needed
-   * @par detection_bitmask = protocol bitmask. If NULL, all protocols will be enabled
-   * @return  the initialized detection module
-   *
-   */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_global_context *g_ctx,
-                                                                      const struct ndpi_bitmask *detection_bitmask);
 
   /**
    * Completes the initialization (2nd step)
@@ -849,14 +866,6 @@ extern "C" {
    *
    */
   u_int ndpi_get_num_protocols(struct ndpi_detection_module_struct *ndpi_mod);
-
-  /**
-   * Get the number of the internal protocols.
-   *
-   * @return  the number of protocols
-   *
-   */
-  u_int ndpi_get_num_internal_protocols(void); /* TODO: try to avoid using this function: we would like to remove it */
 
   /**
    * Get the nDPI version release

@@ -302,8 +302,6 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 void test_lib(); /* Forward */
 
 extern void ndpi_report_payload_stats(FILE *out);
-extern int parse_proto_name_list(char *str, struct ndpi_bitmask *bitmask,
-				 int inverted_logic);
 extern u_int8_t is_ndpi_proto(struct ndpi_flow_info *flow, u_int16_t id);
 
 /* ********************************** */
@@ -456,6 +454,8 @@ ndpi_cfg_error2string(ndpi_cfg_error const err)
       return "Configuration context already initialized";
     case NDPI_CFG_CALLBACK_ERROR:
       return "Configuration callback error";
+    case NDPI_CFG_ALLOCATION_ERROR:
+      return "Configuration memory allocation error";
     case NDPI_CFG_OK:
       return "Success";
     }
@@ -2994,7 +2994,6 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
                            struct ndpi_global_context *g_ctx) {
-  struct ndpi_bitmask enabled_bitmask, *enabled_bitmask_ptr = NULL;
   struct ndpi_workflow_prefs prefs;
   int i, ret;
   ndpi_cfg_error rc;
@@ -3006,20 +3005,9 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
   prefs.quiet_mode = quiet_mode;
   prefs.ignore_vlanid = ignore_vlanid;
 
-  /* Protocols to enable/disable. Default: everything is enabled */
-  if(_disabled_protocols != NULL) {
-    if(ndpi_bitmask_alloc(&enabled_bitmask, ndpi_get_num_internal_protocols()) != 0)
-      exit(-1);
-    ndpi_bitmask_set_all(&enabled_bitmask);
-    if(parse_proto_name_list(_disabled_protocols, &enabled_bitmask, 1))
-      exit(-1);
-    enabled_bitmask_ptr = &enabled_bitmask;
-  }
-
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
-                                                            serialization_format, g_ctx, enabled_bitmask_ptr);
-  ndpi_bitmask_free(enabled_bitmask_ptr);
+                                                            serialization_format, g_ctx);
 
   if(_categoriesDirPath) {
     int failed_files = ndpi_load_categories_dir(ndpi_thread_info[thread_id].workflow->ndpi_struct, _categoriesDirPath);
@@ -5055,6 +5043,12 @@ void test_lib() {
   if(!g_ctx) {
     fprintf(stderr, "Error ndpi_global_init\n");
     exit(-1);
+  }
+
+  /* Protocols to enable/disable. Default: everything is enabled */
+  if(_disabled_protocols != NULL) {
+    if(parse_proto_name_list(g_ctx, _disabled_protocols, 1))
+      exit(-1);
   }
 #endif
 
