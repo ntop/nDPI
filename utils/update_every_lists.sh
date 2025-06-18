@@ -54,5 +54,8 @@ RETVAL=$(( RETVAL + $? ))
 ./microsoft_domains_download.sh
 RETVAL=$(( RETVAL + $? ))
 
+./crypto_mining_lists_download.sh
+RETVAL=$(( RETVAL + $? ))
+
 test ${RETVAL} -ne 0 && printf '%s: %s\n' "${0}" "${RETVAL} script(s) failed"
 exit ${RETVAL}
