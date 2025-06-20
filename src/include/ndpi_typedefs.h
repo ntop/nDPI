@@ -1018,6 +1018,7 @@ struct ndpi_flow_struct;
 
 typedef struct {
   u_int16_t port_low, port_high;
+  u_int8_t is_custom;            /* Is this range created by a custom rules? */
 } ndpi_port_range;
 
 typedef enum {
@@ -1208,7 +1209,7 @@ typedef enum {
 } ndpi_protocol_qoe_category_t;
 
 typedef struct ndpi_proto_defaults {
-  char *protoName;
+  char protoName[32];
   ndpi_protocol_category_t protoCategory;
   u_int8_t isClearTextProto:1, isAppProtocol:1, isCustomProto:1, _notused:5;
   u_int16_t *subprotocols;
