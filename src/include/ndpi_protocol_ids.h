@@ -493,8 +493,9 @@ typedef enum {
     (placeholders to avoid protocol renumbering)
   */
 
-  /* IMPORTANT:NDPI_LAST_IMPLEMENTED_PROTOCOL MUST BE THE LAST ELEMENT */
-  NDPI_LAST_IMPLEMENTED_PROTOCOL /* TODO: try to not use it; we would like to remove this define in the next future... */
+  /* IMPORTANT: DO NOT ADD A "_LAST" or "_MAX" ENTRY HERE!!!
+     The number of protocols is calculated at runtime!
+   */
 } ndpi_protocol_id_t;
 
 #endif /* __NDPI_PROTOCOL_IDS_H__ */

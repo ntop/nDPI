@@ -33,17 +33,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   int r;
   char errbuf[PCAP_ERRBUF_SIZE];
   FILE *fd;
-  u_int8_t debug_protos_index;
-  char *_debug_protocols;
-  const char *strs[] = { "all",
-			 "dns,quic",
-			 "+dns:-quic",
-			 "all;-http",
-			 "foo",
-			 "openvpn",
-			 "+bar;-foo",
-			 NULL,
-			 "http;bar" };
 
 
   /* Data structure: 8 bytes header for random values + pcap file */
@@ -63,36 +52,28 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   serialization_format = static_cast<ndpi_serialization_format>(fuzzed_data.ConsumeIntegralInRange(1, 4));
 
-  debug_protos_index = fuzzed_data.ConsumeIntegralInRange(0,  static_cast<int>(sizeof(strs) / sizeof(char *) - 1));
-  _debug_protocols = ndpi_strdup(strs[debug_protos_index]);
-
   /* byte8 is still unused */
 
   enable_doh_dot_detection = 1;
 
   fd = buffer_to_file(data + 8, size - 8);
   if(fd == NULL) {
-    ndpi_free(_debug_protocols);
     return 0;
   }
 
   pcap_handle = pcap_fopen_offline(fd, errbuf);
   if(pcap_handle == NULL) {
     fclose(fd);
-    ndpi_free(_debug_protocols);
     return 0;
   }
   if(ndpi_is_datalink_supported(pcap_datalink(pcap_handle)) == 0) {
     pcap_close(pcap_handle);
-    ndpi_free(_debug_protocols);
     return 0;
   }
 
   g_ctx = ndpi_global_init();
 
-
-
-  w = ndpi_workflow_init(&prefs, pcap_handle, 1, serialization_format, g_ctx, NULL);
+  w = ndpi_workflow_init(&prefs, pcap_handle, 1, serialization_format, g_ctx);
   if(w) {
     ndpi_finalize_initialization(w->ndpi_struct);
 
@@ -108,8 +89,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   pcap_close(pcap_handle);
 
   ndpi_global_deinit(g_ctx);
-
-  ndpi_free(_debug_protocols);
 
   return 0;
 }

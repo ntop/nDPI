@@ -598,10 +598,7 @@ int is_proto_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId)
   /* Custom protocols are always enabled */
   if(ndpi_is_custom_protocol(ndpi_str, protoId))
     return 1;
-  /* By default, all protocols are enabled */
-  if(ndpi_str->detection_bitmask == NULL)
-    return 1;
-  if(ndpi_bitmask_is_set(ndpi_str->detection_bitmask, protoId))
+  if(ndpi_bitmask_is_set(&ndpi_str->cfg.detection_bitmask, protoId))
     return 1;
   return 0;
 }
@@ -927,8 +924,8 @@ static int ndpi_add_host_url_subprotocol(struct ndpi_detection_module_struct *nd
 
 /* ******************************************************************** */
 
-int ndpi_init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
-                           ndpi_protocol_match const * const match) {
+static void init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
+                              ndpi_protocol_match const * const match) {
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
   ndpi_protocol_qoe_category_t qoeCategory;
 
@@ -972,25 +969,22 @@ int ndpi_init_app_protocol(struct ndpi_detection_module_struct *ndpi_str,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
                           0 /* Internal protocol, no custom */);
-
-  if(!is_proto_enabled(ndpi_str, match->protocol_id)) {
-    NDPI_LOG_DBG(ndpi_str, "[NDPI] Skip protocol match for %s/protoId=%d: disabled\n",
-		 match->string_to_match, match->protocol_id);
-    return 1;
-  }
-
-  return 0;
 }
 
 /* ******************************************************************** */
 
-void ndpi_init_protocol_match(struct ndpi_detection_module_struct *ndpi_str,
-                              ndpi_protocol_match const * const match) {
-  if (ndpi_init_app_protocol(ndpi_str, match) == 0) {
-    ndpi_add_host_url_subprotocol(ndpi_str, match->string_to_match,
-				  match->protocol_id, match->protocol_category,
-				  match->protocol_breed, match->level);
+void load_protocol_match(struct ndpi_detection_module_struct *ndpi_str,
+                         ndpi_protocol_match const * const match) {
+
+  if(!is_proto_enabled(ndpi_str, match->protocol_id)) {
+    NDPI_LOG_DBG(ndpi_str, "[NDPI] Skip protocol match for %s/protoId=%d: disabled\n",
+                 match->string_to_match, match->protocol_id);
+    return;
   }
+
+  ndpi_add_host_url_subprotocol(ndpi_str, match->string_to_match,
+				match->protocol_id, match->protocol_category,
+				match->protocol_breed, match->level);
 }
 
 /* ******************************************************************** */
@@ -1068,36 +1062,19 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   self_check_host_match(ndpi_str, azure_host_match);
 
   for(i = 0; host_match[i].string_to_match != NULL; i++)
-    ndpi_init_protocol_match(ndpi_str, &host_match[i]);
+    init_app_protocol(ndpi_str, &host_match[i]);
   for(i = 0; teams_host_match[i].string_to_match != NULL; i++)
-    ndpi_init_protocol_match(ndpi_str, &teams_host_match[i]);
+    init_app_protocol(ndpi_str, &teams_host_match[i]);
   for(i = 0; outlook_host_match[i].string_to_match != NULL; i++)
-    ndpi_init_protocol_match(ndpi_str, &outlook_host_match[i]);
+    init_app_protocol(ndpi_str, &outlook_host_match[i]);
   for(i = 0; ms_onedrive_host_match[i].string_to_match != NULL; i++)
-    ndpi_init_protocol_match(ndpi_str, &ms_onedrive_host_match[i]);
+    init_app_protocol(ndpi_str, &ms_onedrive_host_match[i]);
   for(i = 0; microsoft365_host_match[i].string_to_match != NULL; i++)
-    ndpi_init_protocol_match(ndpi_str, &microsoft365_host_match[i]);
+    init_app_protocol(ndpi_str, &microsoft365_host_match[i]);
   for(i = 0; azure_host_match[i].string_to_match != NULL; i++)
-    ndpi_init_protocol_match(ndpi_str, &azure_host_match[i]);
+    init_app_protocol(ndpi_str, &azure_host_match[i]);
 
   /* ************************ */
-
-  for(i = 0; tls_certificate_match[i].string_to_match != NULL; i++) {
-    if(!is_proto_enabled(ndpi_str, tls_certificate_match[i].protocol_id)) {
-      NDPI_LOG_DBG(ndpi_str, "[NDPI] Skip tls cert match for %s/protoId=%d: disabled\n",
-		   tls_certificate_match[i].string_to_match, tls_certificate_match[i].protocol_id);
-      continue;
-    }
-    /* Note: string_to_match is not malloc'ed here as ac_automata_release is
-     * called with free_pattern = 0 */
-    ndpi_add_string_value_to_automa(ndpi_str->tls_cert_subject_automa.ac_automa,
-				    tls_certificate_match[i].string_to_match,
-                                    tls_certificate_match[i].protocol_id);
-  }
-
-  /* ************************ */
-
-  //ndpi_enable_loaded_categories(ndpi_str);
 
   if(!ndpi_xgrams_inited) {
     ndpi_xgrams_inited = 1;
@@ -1108,6 +1085,40 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
 		     ndpi_en_impossible_bigrams,sizeof(ndpi_en_impossible_bigrams)/sizeof(ndpi_en_impossible_bigrams[0]), 2);
     ndpi_xgrams_init(ndpi_str,trigrams_bitmap,sizeof(trigrams_bitmap),
 		     ndpi_en_trigrams,sizeof(ndpi_en_trigrams)/sizeof(ndpi_en_trigrams[0]), 3);
+  }
+}
+
+/* ******************************************************************** */
+
+static void load_string_based_protocols(struct ndpi_detection_module_struct *ndpi_str) {
+  int i;
+
+  for(i = 0; host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &host_match[i]);
+  for(i = 0; teams_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &teams_host_match[i]);
+  for(i = 0; outlook_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &outlook_host_match[i]);
+  for(i = 0; ms_onedrive_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &ms_onedrive_host_match[i]);
+  for(i = 0; microsoft365_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &microsoft365_host_match[i]);
+  for(i = 0; azure_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &azure_host_match[i]);
+
+  /* ************************ */
+
+  for(i = 0; tls_certificate_match[i].string_to_match != NULL; i++) {
+    if(!is_proto_enabled(ndpi_str, tls_certificate_match[i].protocol_id)) {
+      NDPI_LOG_DBG(ndpi_str, "[NDPI] Skip tls cert match for %s/protoId=%d: disabled\n",
+                   tls_certificate_match[i].string_to_match, tls_certificate_match[i].protocol_id);
+      continue;
+    }
+    /* Note: string_to_match is not malloc'ed here as ac_automata_release is
+     * called with free_pattern = 0 */
+    ndpi_add_string_value_to_automa(ndpi_str->tls_cert_subject_automa.ac_automa,
+                                    tls_certificate_match[i].string_to_match,
+                                    tls_certificate_match[i].protocol_id);
   }
 }
 
@@ -3922,14 +3933,6 @@ void ndpi_global_deinit(struct ndpi_global_context *g_ctx) {
 /* ******************************************************************** */
 
 struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx) {
-  /* By default, all protocols are enabled */
-  return ndpi_init_detection_module_ext(g_ctx, NULL);
-}
-
-/* ******************************************************************** */
-
-struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_global_context *g_ctx,
-                                                                    const struct ndpi_bitmask *detection_bitmask) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_calloc(1, sizeof(struct ndpi_detection_module_struct));
   int i;
 
@@ -3960,9 +3963,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
   ndpi_str->ip_risk_mask = ndpi_ptree_create();
 
   ndpi_str->g_ctx = g_ctx;
-
-  if(detection_bitmask)
-    ndpi_str->detection_bitmask = ndpi_bitmask_clone(detection_bitmask);
 
   ndpi_str->user_data = NULL;
 
@@ -4038,8 +4038,11 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
     ndpi_snprintf(ndpi_str->custom_category_labels[i], CUSTOM_CATEGORY_LABEL_LEN, "User custom category %u",
 		  (unsigned int) (i + 1));
 
-  /* From this point, we must know which (internals) protocol is enabled and which one is not */
+  /*
+     *** Note that we don't know if a (internal) protocol is enabled or not until `ndpi_finalize_initialization()` ***
+  */
 
+  /* Build `ndpi_str->proto_defaults[]` array. This array does NOT depend on protocols being enable or not! */
   init_protocol_defaults(ndpi_str);
 
   /* At this point, we MUST have loaded ALL the internal protocols and NONE of
@@ -4069,7 +4072,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_
   /* When we know the number of internal protocols, we can set the default configuration
      (we need the number to proper initialize the bitmasks)*/
   if(set_default_config(&ndpi_str->cfg,
-                        ndpi_str->num_supported_protocols) != 0) {
+                        ndpi_str->num_internal_protocols) != 0) {
     NDPI_LOG_ERR(ndpi_str, "Error allocating set_default_config\n");
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
@@ -4152,6 +4155,8 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
 
   if(ndpi_str->finalized) /* Already finalized */
     return 0;
+
+  load_string_based_protocols(ndpi_str);
 
   if(dissectors_init(ndpi_str)) {
     NDPI_LOG_ERR(ndpi_str, "Error dissectors_init\n");
@@ -4849,9 +4854,8 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
   if(ndpi_str != NULL) {
     unsigned int i;
 
-    ndpi_bitmask_free(ndpi_str->detection_bitmask);
-    ndpi_free(ndpi_str->detection_bitmask);
 
+    ndpi_bitmask_free(&ndpi_str->cfg.detection_bitmask);
     ndpi_bitmask_free(&ndpi_str->cfg.debug_bitmask);
     ndpi_bitmask_free(&ndpi_str->cfg.ip_list_bitmask);
     ndpi_bitmask_free(&ndpi_str->cfg.monitoring);
@@ -5109,13 +5113,6 @@ u_int ndpi_get_num_protocols(struct ndpi_detection_module_struct *ndpi_str) {
   if(!ndpi_str || !ndpi_str->finalized)
     return 0;
   return ndpi_str->num_supported_protocols;
-}
-
-/* ******************************************************************** */
-
-/* TODO: try to remove this function (and the define...) */
-u_int ndpi_get_num_internal_protocols(void) {
-  return NDPI_LAST_IMPLEMENTED_PROTOCOL;
 }
 
 /* ******************************************************************** */
@@ -12734,6 +12731,7 @@ static const struct cfg_param {
   { "$PROTO_NAME_OR_ID", "log",                                 "disable", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(debug_bitmask), NULL },
   { "$PROTO_NAME_OR_ID", "ip_list.load",                        "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(ip_list_bitmask), NULL },
   { "$PROTO_NAME_OR_ID", "monitoring",                          "disable", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(monitoring), NULL },
+  { "$PROTO_NAME_OR_ID", "enable",                              "1", NULL, NULL, CFG_PARAM_PROTOCOL_ENABLE_DISABLE, __OFF(detection_bitmask), NULL },
 
   /* Global parameters */
 
@@ -12812,7 +12810,8 @@ static int set_default_config(struct ndpi_detection_module_config_struct *cfg,
 {
   const struct cfg_param *c;
 
-  if(ndpi_bitmask_alloc(&cfg->debug_bitmask, max_internal_proto) != 0 ||
+  if(ndpi_bitmask_alloc(&cfg->detection_bitmask, max_internal_proto) != 0 ||
+     ndpi_bitmask_alloc(&cfg->debug_bitmask, max_internal_proto) != 0 ||
      ndpi_bitmask_alloc(&cfg->ip_list_bitmask, max_internal_proto) != 0 ||
      ndpi_bitmask_alloc(&cfg->monitoring, max_internal_proto) != 0 ||
      ndpi_bitmask_alloc(&cfg->flowrisk_bitmask, NDPI_MAX_RISK) != 0 ||

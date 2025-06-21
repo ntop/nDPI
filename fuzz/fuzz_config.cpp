@@ -15,7 +15,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int8_t protocol_was_guessed, unused;
   u_int32_t i, ret;
   u_int16_t bool_value;
-  struct ndpi_bitmask enabled_bitmask;
   struct ndpi_lru_cache_stats lru_stats;
   struct ndpi_patricia_tree_stats patricia_stats;
   struct ndpi_automa_stats automa_stats;
@@ -49,20 +48,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   else
     g_ctx = NULL;
 
-  if(ndpi_bitmask_alloc(&enabled_bitmask, ndpi_get_num_internal_protocols()) == 0) {
-    ndpi_bitmask_set_all(&enabled_bitmask);
-    if(fuzzed_data.ConsumeBool()) {
-      ndpi_bitmask_reset(&enabled_bitmask);
-      for(i = 0; i < ndpi_get_num_internal_protocols(); i++) {
-        if(fuzzed_data.ConsumeBool())
-          ndpi_bitmask_set(&enabled_bitmask, i);
-      }
-    }
-    ndpi_info_mod = ndpi_init_detection_module_ext(g_ctx, &enabled_bitmask);
-    ndpi_bitmask_free(&enabled_bitmask);
-  } else {
-    ndpi_info_mod = ndpi_init_detection_module_ext(g_ctx, NULL);
-  }
+  ndpi_info_mod = ndpi_init_detection_module(g_ctx);
 
   set_ndpi_debug_function(ndpi_info_mod, NULL);
 
@@ -376,7 +362,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_config(ndpi_info_mod, "any", "log", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
-    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_internal_protocols() + 1); /* + 1 to trigger invalid pid */
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_info_mod ? ndpi_info_mod->num_internal_protocols + 1 : 0); /* + 1 to trigger invalid pid */
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     snprintf(cfg_proto, sizeof(cfg_proto), "%d", pid);
@@ -391,7 +377,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_config(ndpi_info_mod, "any", "ip_list.load", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
-    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_internal_protocols() + 1); /* + 1 to trigger invalid pid */
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_info_mod ? ndpi_info_mod->num_internal_protocols + 1 : 0); /* + 1 to trigger invalid pid */
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     snprintf(cfg_proto, sizeof(cfg_proto), "%d", pid);
@@ -399,11 +385,18 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_get_config(ndpi_info_mod, cfg_proto, "ip_list.load", cfg_value, sizeof(cfg_value));
   }
   if(fuzzed_data.ConsumeBool()) {
-    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_internal_protocols() + 1); /* + 1 to trigger invalid pid */
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_info_mod ? ndpi_info_mod->num_internal_protocols + 1 : 0); /* + 1 to trigger invalid pid */
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
     snprintf(cfg_proto, sizeof(cfg_proto), "%d", pid);
     ndpi_set_config(ndpi_info_mod, cfg_proto, "monitoring", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_info_mod ? ndpi_info_mod->num_internal_protocols + 1 : 0); /* + 1 to trigger invalid pid */
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    snprintf(cfg_proto, sizeof(cfg_proto), "%d", pid);
+    ndpi_set_config(ndpi_info_mod, cfg_proto, "enable", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
     value = fuzzed_data.ConsumeIntegralInRange(0, 255 + 1);
@@ -751,7 +744,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_proto_defaults(ndpi_info_mod);
 
   ndpi_dump_protocols(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : stdout);
-  ndpi_generate_options(fuzzed_data.ConsumeIntegralInRange(0, 4), fuzzed_data.ConsumeBool() ? NULL : stdout);
+  if(fuzzed_data.ConsumeBool())
+    ndpi_generate_options(fuzzed_data.ConsumeIntegralInRange(0, 4), fuzzed_data.ConsumeBool() ? NULL : stdout);
   ndpi_dump_risks_score(fuzzed_data.ConsumeBool() ? NULL : stdout);
   ndpi_dump_config(ndpi_info_mod, fuzzed_data.ConsumeBool() ? NULL : stdout);
 

@@ -202,5 +202,7 @@ List of the supported configuration options:
 |              |                                                               |                 |            |            | This knob is valid only for the following protocols: Stun. Monitoring allows nDPI to process the entire flow (i.e. all its packets), without any limits.          |
 |              |                                                               |                 |            |            | See doc/monitoring.md for further details                                                                                                                         |
 +--------------+---------------------------------------------------------------+-----------------+------------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $PROTO_NAME  | "enable"                                                      | enable          | NULL       | NULL       | Enable/disable the specific protocol. Use "any" or "all" as protocol name if you want to easily enable/disable all protocols.                                     |
++--------------+---------------------------------------------------------------+-----------------+------------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 

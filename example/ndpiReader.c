@@ -304,9 +304,8 @@ static int dpdk_port_id = 0, dpdk_run_capture = 1;
 void test_lib(); /* Forward */
 
 extern void ndpi_report_payload_stats(FILE *out);
-extern int parse_proto_name_list(char *str, struct ndpi_bitmask *bitmask,
-				 int inverted_logic);
 extern u_int8_t is_ndpi_proto(struct ndpi_flow_info *flow, u_int16_t id);
+static char const *ndpi_cfg_error2string(ndpi_cfg_error const err);
 
 /* ********************************** */
 
@@ -398,6 +397,40 @@ static u_int check_bin_doh_similarity(struct ndpi_bin *bin, float *similarity) {
   *similarity = lowest_similarity;
 
   return(0);
+}
+
+/* *********************************************** */
+
+static char _proto_delim[] = " \t,:;";
+static int enable_disable_protocols_list(struct ndpi_detection_module_struct *ndpi_str, char *str, int inverted_logic) {
+  char *n;
+  char op;
+  ndpi_cfg_error rc;
+
+  if(!inverted_logic)
+   op = 1; /* Default action: enable protocol */
+  else
+   op = 0; /* Default action: disable protocol */
+
+  for(n = strtok(str,_proto_delim); n && *n; n = strtok(NULL,_proto_delim)) {
+    if(*n == '-') {
+      op = !inverted_logic ? 0 : 1;
+      n++;
+    } else if(*n == '+') {
+      op = !inverted_logic ? 1 : 0;
+      n++;
+    }
+    if(op)
+      rc = ndpi_set_config(ndpi_str, n, "enable", "1");
+    else
+      rc = ndpi_set_config(ndpi_str, n, "enable", "0");
+    if(rc != NDPI_CFG_OK) {
+      LOG(NDPI_LOG_ERROR, "Error enabling/disabling protocol [%s]: %s (%d)\n",
+          n, ndpi_cfg_error2string(rc), rc);
+    }
+  }
+
+  return 0;
 }
 
 /* *********************************************** */
@@ -3002,7 +3035,6 @@ static void on_protocol_discovered(struct ndpi_workflow * workflow,
  */
 static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
                            struct ndpi_global_context *g_ctx) {
-  struct ndpi_bitmask enabled_bitmask, *enabled_bitmask_ptr = NULL;
   struct ndpi_workflow_prefs prefs;
   int i, ret;
   ndpi_cfg_error rc;
@@ -3014,20 +3046,14 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
   prefs.quiet_mode = quiet_mode;
   prefs.ignore_vlanid = ignore_vlanid;
 
-  /* Protocols to enable/disable. Default: everything is enabled */
-  if(_disabled_protocols != NULL) {
-    if(ndpi_bitmask_alloc(&enabled_bitmask, ndpi_get_num_internal_protocols()) != 0)
-      exit(-1);
-    ndpi_bitmask_set_all(&enabled_bitmask);
-    if(parse_proto_name_list(_disabled_protocols, &enabled_bitmask, 1))
-      exit(-1);
-    enabled_bitmask_ptr = &enabled_bitmask;
-  }
-
   memset(&ndpi_thread_info[thread_id], 0, sizeof(ndpi_thread_info[thread_id]));
   ndpi_thread_info[thread_id].workflow = ndpi_workflow_init(&prefs, pcap_handle, 1,
-                                                            serialization_format, g_ctx, enabled_bitmask_ptr);
-  ndpi_bitmask_free(enabled_bitmask_ptr);
+                                                            serialization_format, g_ctx);
+
+  /* Protocols to enable/disable. Default: everything is enabled */
+  if(_disabled_protocols != NULL) {
+    enable_disable_protocols_list(ndpi_thread_info[thread_id].workflow->ndpi_struct, _disabled_protocols, 1);
+  }
 
   if(_categoriesDirPath) {
     int failed_files = ndpi_load_categories_dir(ndpi_thread_info[thread_id].workflow->ndpi_struct, _categoriesDirPath);

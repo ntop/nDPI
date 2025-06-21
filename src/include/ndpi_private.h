@@ -331,6 +331,8 @@ struct ndpi_detection_module_config_struct {
 
   int wireguard_subclassification_by_ip;
 
+  struct ndpi_bitmask detection_bitmask;
+
   struct ndpi_bitmask debug_bitmask;
   struct ndpi_bitmask ip_list_bitmask;
   struct ndpi_bitmask monitoring;
@@ -345,8 +347,6 @@ struct ndpi_detection_module_config_struct {
 };
 
 struct ndpi_detection_module_struct {
-  struct ndpi_bitmask *detection_bitmask;
-
   u_int64_t current_ts;
   u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, finalized:1, _notused:6;

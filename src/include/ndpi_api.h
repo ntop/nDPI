@@ -183,19 +183,6 @@ extern "C" {
    */
   struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx);
 
-
-  /**
-   * Similar to `ndpi_init_detection_module` but you can also set the protocol bitmask
-   * By default, all protocols are enabled
-   *
-   * @par g_ctx = global context associated to the new detection module; NULL if no global context is needed
-   * @par detection_bitmask = protocol bitmask. If NULL, all protocols will be enabled
-   * @return  the initialized detection module
-   *
-   */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module_ext(struct ndpi_global_context *g_ctx,
-                                                                      const struct ndpi_bitmask *detection_bitmask);
-
   /**
    * Completes the initialization (2nd step)
    *
@@ -849,14 +836,6 @@ extern "C" {
    *
    */
   u_int ndpi_get_num_protocols(struct ndpi_detection_module_struct *ndpi_mod);
-
-  /**
-   * Get the number of the internal protocols.
-   *
-   * @return  the number of protocols
-   *
-   */
-  u_int ndpi_get_num_internal_protocols(void); /* TODO: try to avoid using this function: we would like to remove it */
 
   /**
    * Get the nDPI version release
