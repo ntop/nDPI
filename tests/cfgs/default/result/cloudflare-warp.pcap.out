@@ -35,6 +35,10 @@ CloudflareWarp	37	10500	3
 Safe                             5 294           2            
 Acceptable                      73 14433         7            
 
+VPN                             37 10500         3            
+Web                             24 1858          5            
+Chat                            17 2369          1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.8.0.1                 	 3      

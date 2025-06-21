@@ -24,6 +24,8 @@ SRTP	43	10358	2
 
 Acceptable                      43 10358         2            
 
+Media                           43 10358         2            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.10.0.1                	 1      

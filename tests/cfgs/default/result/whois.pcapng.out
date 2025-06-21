@@ -29,6 +29,9 @@ Whois-DAS	16	4294	2
 Safe                             7 2046          1            
 Acceptable                      16 4294          2            
 
+Web                              7 2046          1            
+Network                         16 4294          2            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.17.34.139             	 1      

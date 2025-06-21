@@ -37,6 +37,12 @@ Safe                            25 3056          2
 Acceptable                      61 6957          14           
 Fun                            860 57372         4            
 
+Media                          860 57372         4            
+DataTransfer                    20 2715          1            
+Web                             52 6407          6            
+Cloud                            6 360           1            
+Network                          8 531           8            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.180.2            	 4      

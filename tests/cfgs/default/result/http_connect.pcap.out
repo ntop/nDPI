@@ -28,6 +28,9 @@ HTTP_Connect	40	26841	1
 Safe                            58 36496         1            
 Acceptable                      42 27019         2            
 
+Web                             98 63337         2            
+Network                          2 178           1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.1.146            	 1      

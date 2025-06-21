@@ -45,6 +45,13 @@ Potentially_Dangerous          3374 495188        634
 Dangerous                        5 1215          1            
 Unrated                        298 19232         86           
 
+Unspecified                    298 19232         86           
+Media                           21 10027         2            
+Web                             21 4395          1            
+Download                      3353 485161        632          
+Network                        123 46960         29           
+System                          66 11715         10           
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.0.2.15                	 1      

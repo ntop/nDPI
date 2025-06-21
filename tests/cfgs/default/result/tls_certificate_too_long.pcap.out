@@ -38,6 +38,12 @@ Safe                           249 100762        15
 Acceptable                      53 6650          19           
 Unrated                         13 5582          1            
 
+Unspecified                     13 5582          1            
+Web                            227 94723         13           
+Download                        22 6039          2            
+Network                         45 5930          15           
+System                           8 720           4            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.1.121            	 1      

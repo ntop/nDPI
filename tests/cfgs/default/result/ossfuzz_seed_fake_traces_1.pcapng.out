@@ -33,6 +33,10 @@ Safe                             8 2487          1
 Fun                              4 200           4            
 Unrated                          9 638           5            
 
+Unspecified                      9 638           5            
+Game                             4 200           4            
+Network                          8 2487          1            
+
 	1	UDP 127.0.0.1:1119 -> 127.0.0.1:1120 [proto: 353/Protobuf][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][8 pkts/2487 bytes -> 0 pkts/0 bytes][Goodput ratio: 91/0][204.53 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 8008/0 29219/0 105424/0 32476/0][Pkt Len c2s/s2c min/avg/max/stddev: 48/0 311/0 576/0 250/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 37,0,12,0,0,0,0,0,0,0,0,0,0,0,0,12,0,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.1.128:1 -> 12.129.206.130:1119 [proto: 213/Blizzard][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.1.128:1 -> 12.129.236.254:1119 [proto: 213/Blizzard][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Game/8][1 pkts/50 bytes -> 0 pkts/0 bytes][Goodput ratio: 20/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No client to server traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -33,6 +33,11 @@ Safe                           250 28977         20
 Acceptable                     835 524428        33           
 Unrated                         25 1701          4            
 
+Unspecified                     25 1701          4            
+Web                            272 32159         22           
+VoIP                           796 514871        30           
+Advertisement                   17 6375          1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.8.0.1                 	 6      

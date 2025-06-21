@@ -26,6 +26,9 @@ DoH_DoT	268	31882	1
 Safe                           174 50253         7            
 Acceptable                     268 31882         1            
 
+Web                            174 50253         7            
+Network                        268 31882         1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.1.119            	 4      

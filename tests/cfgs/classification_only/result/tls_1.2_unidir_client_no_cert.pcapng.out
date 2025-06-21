@@ -24,4 +24,6 @@ TLS	10	1549	1
 
 Safe                            10 1549          1            
 
+Web                             10 1549          1            
+
 	1	TCP 192.168.12.156:39958 -> 172.67.21.133:443 [proto: 91/TLS][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 10][cat: Web/5][10 pkts/1549 bytes -> 0 pkts/0 bytes][Goodput ratio: 64/0][0.30 sec][Hostname/SNI: sb.adtidy.org][(Advertised) ALPNs: http/1.1][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 33/0 154/0 47/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 155/0 571/0 179/0][TLSv1.2][Plen Bins: 25,25,0,0,0,0,0,0,0,0,0,0,25,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

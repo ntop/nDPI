@@ -41,6 +41,13 @@ Unsafe                          36 2569          12
 Dangerous                        6 1377          3            
 Unrated                         33 4066          33           
 
+Unspecified                     33 4066          33           
+Media                            5 1070          1            
+Download                        36 2569          12           
+VoIP                            82 37904         15           
+Network                        291 26520         156          
+System                         109 10824         29           
+
 	1	UDP 212.242.33.35:5060 <-> 192.168.1.2:5060 [proto: 100/SIP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 100/SIP, Confidence: DPI][DPI packets: 1][cat: VoIP/10][23 pkts/11772 bytes <-> 34 pkts/13107 bytes][Goodput ratio: 91/89][1521.43 sec][SIP From: <sip:voi18063@sip.cyQercity.dk>;tag=903df0a][SIP To: <sip:voi18063@sip.cybercity.dk.;tag=00-04092-1701af62-120c67172][bytes ratio: -0.054 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 13/227 35489/46479 167478/304738 41896/60093][Pkt Len c2s/s2c min/avg/max/stddev: 344/47 512/386 711/1118 86/355][PLAIN TEXT (SIP/2.0 401 Unauthorized)][Plen Bins: 29,0,0,0,0,0,0,0,0,3,7,0,3,7,8,14,1,0,3,0,1,14,0,0,0,3,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.1.2:5060 <-> 200.68.120.81:5060 [proto: 100/SIP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VoIP/10][9 pkts/4647 bytes <-> 3 pkts/1944 bytes][Goodput ratio: 92/93][66.58 sec][SIP From: "arik" <sip:816666@voip.brurjula.net>;tag=6433ef9][SIP To: <sip:97239287044@voip.brujula.net>][bytes ratio: 0.410 (Upload)][IAT c2s/s2c min/avg/max/stddev: 507/34556 8170/34556 32608/34556 10578/0][Pkt Len c2s/s2c min/avg/max/stddev: 417/637 516/648 864/656 186/8][PLAIN TEXT (INVITEKsip)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,59,0,0,0,0,0,0,8,16,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 192.168.1.2:137 -> 192.168.1.255:137 [proto: 10/NetBIOS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 10/NetBIOS, Confidence: DPI][DPI packets: 1][cat: System/18][69 pkts/6348 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][1527.12 sec][Hostname/SNI: eci_domain][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 741/0 21619/0 93225/0 24386/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/0 92/0 92/0 0/0][PLAIN TEXT ( EFEDEJ)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -29,6 +29,10 @@ TelegramVoip	853	161775	5
 
 Acceptable                     868 163553        10           
 
+Chat                             6 564           1            
+VoIP                           853 161775        5            
+Network                          9 1214          4            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.12.67            	 1      

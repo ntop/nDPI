@@ -27,6 +27,9 @@ TLS	170	45725	5
 Safe                           170 45725         5            
 Acceptable                       4 392           2            
 
+Web                            170 45725         5            
+Network                          4 392           2            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.1.178            	 1      

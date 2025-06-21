@@ -24,6 +24,8 @@ RipeAtlas	7	469	7
 
 Acceptable                       7 469           7            
 
+Network                          7 469           7            
+
 	1	UDP 9.160.203.32:41059 -> 68.90.0.255:38409 [proto: 417/RipeAtlas][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 417/RipeAtlas, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][PLAIN TEXT (11.111.11.111)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 23.57.157.60:36137 -> 152.246.227.169:4712 [proto: 417/RipeAtlas][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 417/RipeAtlas, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (11.111.11.111)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 147.63.105.185:48224 -> 128.53.92.31:2164 [proto: 417/RipeAtlas][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 417/RipeAtlas, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (11.111.11.111)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

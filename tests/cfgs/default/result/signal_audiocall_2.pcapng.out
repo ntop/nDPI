@@ -28,6 +28,9 @@ SignalVoip	167	33543	3
 Acceptable                     167 33543         3            
 Fun                             91 23664         2            
 
+Chat                            91 23664         2            
+VoIP                           167 33543         3            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.12.67            	 1      

@@ -35,6 +35,12 @@ Acceptable                      16 2766          2
 Potentially_Dangerous           112 39736         3            
 Dangerous                        1 252           1            
 
+VPN                            112 39736         3            
+Web                            220 93832         5            
+Cloud                           10 1860          1            
+Network                          6 906           1            
+System                           1 252           1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.1.252            	 1      

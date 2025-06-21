@@ -28,6 +28,10 @@ AnyDesk	150	44008	4
 Safe                            20 1717          1            
 Acceptable                     154 44400         6            
 
+Web                             20 1717          1            
+RemoteAccess                   150 44008         4            
+Network                          4 392           2            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.1.178            	 1      

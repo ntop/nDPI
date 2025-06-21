@@ -45,6 +45,15 @@ Acceptable                     714 378066        54
 Fun                              1 82            1            
 Unrated                          4 456           1            
 
+Unspecified                      4 456           1            
+Web                             20 11474         2            
+Chat                             3 186           1            
+VoIP                           124 33394         13           
+Cloud                            2 1054          2            
+Network                         91 18328         27           
+Collaborative                 1253 612021        36           
+Music                            1 82            1            
+
 	1	TCP 192.168.1.6:60543 <-> 52.114.77.33:443 [proto: 91.219/TLS.Microsoft365][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 276/Azure, Confidence: IP address][DPI packets: 4][cat: Collaborative/15][67 pkts/86089 bytes <-> 40 pkts/7347 bytes][Goodput ratio: 95/64][0.72 sec][Hostname/SNI: mobile.pipe.aria.microsoft.com][bytes ratio: 0.843 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 8/16 152/86 28/26][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 1285/184 1494/1506 497/372][TLSv1.2][Plen Bins: 1,1,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,89,3,0,0]
 	2	TCP 192.168.1.6:60532 <-> 52.114.77.33:443 [proto: 91.219/TLS.Microsoft365][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 276/Azure, Confidence: IP address][DPI packets: 4][cat: Collaborative/15][49 pkts/58592 bytes <-> 28 pkts/6555 bytes][Goodput ratio: 94/72][0.71 sec][Hostname/SNI: mobile.pipe.aria.microsoft.com][bytes ratio: 0.799 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 13/29 177/221 32/57][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 1196/234 1494/1506 564/435][TLSv1.2][Plen Bins: 2,2,2,0,0,2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,81,4,0,0]
 	3	TCP 192.168.1.6:60554 <-> 52.113.194.132:443 [proto: 91.250/TLS.Teams][IP: 250/Teams][Encrypted][Confidence: DPI][FPC: 250/Teams, Confidence: IP address][DPI packets: 4][cat: Collaborative/15][24 pkts/2746 bytes <-> 28 pkts/30546 bytes][Goodput ratio: 52/95][0.23 sec][Hostname/SNI: config.teams.microsoft.com][bytes ratio: -0.835 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/9 21/140 7/29][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 114/1091 1136/1506 217/607][TLSv1.2][Plen Bins: 0,7,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,3,0,0,3,0,0,0,0,0,7,0,0,0,0,0,65,0,0]

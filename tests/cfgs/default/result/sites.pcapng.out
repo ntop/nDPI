@@ -81,6 +81,24 @@ Acceptable                     247 137549        29
 Fun                            482 310458        34           
 Potentially_Dangerous             4 2225          1            
 
+Media                           99 104198        1            
+VPN                             43 23426         2            
+Email                            9 5954          1            
+Web                            132 48664         12           
+SocialNetwork                  187 120668        10           
+Download                         4 2225          1            
+Game                            41 22792         6            
+Chat                            26 16492         4            
+VoIP                            31 10555         1            
+Cloud                          102 64539         12           
+Network                         18 8375          1            
+Collaborative                   13 8908          3            
+Streaming                       85 31043         7            
+Music                           12 6665          3            
+Video                           30 16616         6            
+Shopping                         4 2245          1            
+VirtAssistant                    4 2245          1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.1.128            	 5      

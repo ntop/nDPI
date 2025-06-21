@@ -26,6 +26,9 @@ TelegramVoip	305	130511	4
 
 Acceptable                     315 131265        8            
 
+VoIP                           305 130511        4            
+Network                         10 754           4            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.12.67            	 1      

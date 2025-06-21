@@ -27,6 +27,10 @@ TLS	32	10095	2
 Safe                            32 10095         2            
 Acceptable                     137 89149         4            
 
+Email                           50 18605         1            
+Web                             90 60310         3            
+Download                        29 20329         2            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.4.25.101              	 1      

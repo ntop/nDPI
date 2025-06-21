@@ -24,6 +24,8 @@ QUIC	15	8000	1
 
 Acceptable                      15 8000          1            
 
+Web                             15 8000          1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.9.0.1                 	 1      

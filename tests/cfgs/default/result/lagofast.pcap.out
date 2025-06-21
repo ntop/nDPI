@@ -28,6 +28,10 @@ LagoFast	20	5732	20
 Safe                             5 6130          5            
 Acceptable                      25 6140          25           
 
+VPN                             20 5732          20           
+Web                              5 6130          5            
+Network                          5 408           5            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 180.239.121.250          	 1      

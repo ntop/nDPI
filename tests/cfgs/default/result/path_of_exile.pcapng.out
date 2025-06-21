@@ -24,6 +24,8 @@ PathofExile	16	1208	4
 
 Fun                             16 1208          4            
 
+Game                            16 1208          4            
+
 	1	TCP 192.168.88.231:36262 <-> 198.50.120.150:6112 [proto: 403/PathofExile][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Game/8][3 pkts/237 bytes <-> 1 pkts/74 bytes][Goodput ratio: 13/0][0.14 sec][TCP Fingerprint: 2_64_32120_2e3cee914fc1/Linux][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.1.13:36492 <-> 203.57.83.5:21360 [proto: 403/PathofExile][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Game/8][3 pkts/225 bytes <-> 1 pkts/74 bytes][Goodput ratio: 8/0][0.06 sec][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.1.13:49554 <-> 91.206.197.210:21360 [proto: 403/PathofExile][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Game/8][3 pkts/225 bytes <-> 1 pkts/74 bytes][Goodput ratio: 8/0][0.01 sec][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

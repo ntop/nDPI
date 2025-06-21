@@ -24,6 +24,8 @@ TLS	120	14592	1
 
 Safe                           120 14592         1            
 
+Web                            120 14592         1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.1.253            	 1      

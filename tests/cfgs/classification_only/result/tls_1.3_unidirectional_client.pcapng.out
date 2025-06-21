@@ -24,4 +24,6 @@ Google	9	1488	1
 
 Acceptable                       9 1488          1            
 
+Web                              9 1488          1            
+
 	1	TCP 192.168.12.156:39750 -> 142.250.184.68:443 [proto: 91.126/TLS.Google][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 126/Google, Confidence: IP address][DPI packets: 3][cat: Web/5][9 pkts/1488 bytes -> 0 pkts/0 bytes][Goodput ratio: 60/0][0.07 sec][Hostname/SNI: www.google.com][(Advertised) ALPNs: http/1.1][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 8/0 25/0 7/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 165/0 630/0 179/0][TLSv1.2][Plen Bins: 25,0,25,0,0,0,0,25,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

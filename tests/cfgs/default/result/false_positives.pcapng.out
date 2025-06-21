@@ -30,6 +30,11 @@ WebSocket	4	973	1
 Acceptable                     119 21853         6            
 Unrated                          6 460           1            
 
+Unspecified                      6 460           1            
+Media                          110 19309         4            
+Web                              4 973           1            
+RemoteAccess                     5 1571          1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 91.238.181.21            	 1      

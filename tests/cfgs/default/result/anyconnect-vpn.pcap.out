@@ -45,6 +45,14 @@ Safe                           357 93023         14
 Acceptable                     209 36536         53           
 Unrated                         19 1054          2            
 
+Unspecified                     19 1054          2            
+VPN                              3 198           1            
+Web                            383 97857         18           
+Network                         94 12819         35           
+Collaborative                   27 4825          1            
+System                          30 7167          10           
+ConnCheck                       29 6693          2            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.0.0.227               	 5      

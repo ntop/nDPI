@@ -32,6 +32,10 @@ Safe                            31 10988         2
 Acceptable                      21 10489         2            
 Potentially_Dangerous           113 57510         5            
 
+VPN                            113 57510         5            
+Web                             31 10988         2            
+Network                         21 10489         2            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 192.168.0.123            	 2      

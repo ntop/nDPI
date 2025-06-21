@@ -24,6 +24,8 @@ DTLS	24	8508	3
 
 Safe                            24 8508          3            
 
+Web                             24 8508          3            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.191.227.13            	 1      

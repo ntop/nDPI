@@ -378,6 +378,9 @@ typedef struct ndpi_stats {
   u_int64_t *fpc_protocol_counter;
   u_int64_t *fpc_protocol_counter_bytes;
   u_int32_t *fpc_protocol_flows;
+  u_int64_t category_counter[NDPI_PROTOCOL_NUM_CATEGORIES];
+  u_int64_t category_counter_bytes[NDPI_PROTOCOL_NUM_CATEGORIES];
+  u_int32_t category_flows[NDPI_PROTOCOL_NUM_CATEGORIES];
   u_int32_t ndpi_flow_count;
   u_int32_t flow_count[3];
   u_int64_t tcp_count, udp_count;

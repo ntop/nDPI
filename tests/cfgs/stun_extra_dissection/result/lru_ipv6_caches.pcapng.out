@@ -29,6 +29,11 @@ Cloudflare	9	8862	3
 
 Acceptable                      88 20854         12           
 
+Media                           30 3450          1            
+Web                              9 8862          3            
+Download                        25 4546          5            
+VoIP                            24 3996          3            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 

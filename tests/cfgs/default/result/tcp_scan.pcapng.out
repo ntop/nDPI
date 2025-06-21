@@ -33,6 +33,11 @@ Safe                             4 272           1
 Acceptable                       8 528           3            
 Unrated                          6 342           3            
 
+Unspecified                      6 342           3            
+Web                              8 544           2            
+RemoteAccess                     2 118           1            
+System                           2 138           1            
+
 	1	TCP 192.168.1.178:56272 <-> 192.168.1.2:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][3 pkts/198 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.00 sec][Risk: ** TCP Connection Issues **** Probing Attempt **][Risk Score: 100][Risk Info: TCP probing attempt / Connection refused (client)][TCP Fingerprint: 2_255_65535_15db81ff8b0d/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 192.168.1.178:56273 <-> 192.168.1.2:443 [proto: 91/TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][3 pkts/198 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.00 sec][Risk: ** TCP Connection Issues **** Probing Attempt **][Risk Score: 100][Risk Info: TCP probing attempt / Connection refused (client)][TCP Fingerprint: 2_255_65535_15db81ff8b0d/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.1.178:56274 <-> 192.168.1.2:445 [proto: 41/SMBv23][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: System/18][1 pkts/78 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.00 sec][Risk: ** TCP Connection Issues **** Probing Attempt **][Risk Score: 100][Risk Info: TCP probing attempt / Connection refused (server)][TCP Fingerprint: 2_255_65535_15db81ff8b0d/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

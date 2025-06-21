@@ -45,6 +45,14 @@ Safe                           136 23093         12
 Acceptable                    2919 1140556       147          
 Tracker_Ads                     19 6096          1            
 
+Web                           1530 685327        56           
+Cloud                          373 141134        14           
+Network                         81 8859          39           
+SoftwareUpdate                  19 7852          1            
+ConnCheck                       14 1498          2            
+VirtAssistant                 1038 318979        47           
+Advertisement                   19 6096          1            
+
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 172.16.42.216            	 8      

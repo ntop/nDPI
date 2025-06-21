@@ -24,4 +24,6 @@ Cybersec	48	22229	1
 
 Safe                            48 22229         1            
 
+Cybersecurity                   48 22229         1            
+
 	1	TCP 192.168.1.160:54804 <-> 151.101.66.49:443 [proto: 91.283/TLS.Cybersec][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Cybersecurity/33][24 pkts/2404 bytes <-> 24 pkts/19825 bytes][Goodput ratio: 35/92][0.09 sec][Hostname/SNI: feodotracker.abuse.ch][(Advertised) ALPNs: http/1.1][bytes ratio: -0.784 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/4 15/21 5/7][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 100/826 583/1434 109/662][TLSv1.2][Plen Bins: 12,16,0,4,0,4,4,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,55,0,0,0,0,0]

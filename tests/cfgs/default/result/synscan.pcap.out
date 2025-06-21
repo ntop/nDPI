@@ -95,6 +95,24 @@ Fun                              8 464           8
 Unsafe                           8 464           8            
 Unrated                       1848 107192        1844         
 
+Unspecified                   1850 107308        1846         
+Media                            4 232           4            
+VPN                              6 348           6            
+Email                           14 814           13           
+DataTransfer                    10 580           10           
+Web                             21 1226          17           
+Download                         4 232           4            
+Game                             4 232           4            
+VoIP                            10 580           10           
+Database                        12 696           12           
+RemoteAccess                    21 1226          17           
+Network                         27 1574          23           
+Collaborative                    4 232           4            
+RPC                              6 348           6            
+System                          12 696           12           
+IoT-Scada                        4 232           4            
+Crypto_Currency                  2 116           2            
+
 	1	TCP 172.16.0.8:36050 <-> 64.13.134.52:22 [proto: 92/SSH][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: RemoteAccess/12][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.68 sec][TCP Fingerprint: 2_64_1024_6bbe28597824/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	TCP 172.16.0.8:36050 <-> 64.13.134.52:53 [proto: 5/DNS][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Network/14][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.09 sec][0.0.0.0][TCP Fingerprint: 2_64_3072_6bbe28597824/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 172.16.0.8:36050 <-> 64.13.134.52:80 [proto: 7/HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Web/5][1 pkts/58 bytes <-> 4 pkts/240 bytes][Goodput ratio: 0/0][21.27 sec][TCP Fingerprint: 2_64_3072_6bbe28597824/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
