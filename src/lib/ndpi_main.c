@@ -676,15 +676,15 @@ static void load_default_ports(struct ndpi_detection_module_struct *ndpi_str)
 
 /* ********************************************************************************** */
 
-static void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
-			            u_int8_t is_cleartext, u_int8_t is_app_protocol,
-			            ndpi_protocol_breed_t breed,
-			            u_int16_t protoId, char *protoName,
-			            ndpi_protocol_category_t protoCategory,
-			            ndpi_protocol_qoe_category_t qoeCategory,
-			            ndpi_port_range *tcpDefPorts,
-			            ndpi_port_range *udpDefPorts,
-			            u_int8_t is_custom_protocol) {
+static int ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
+			           u_int8_t is_cleartext, u_int8_t is_app_protocol,
+			           ndpi_protocol_breed_t breed,
+			           u_int16_t protoId, char *protoName,
+			           ndpi_protocol_category_t protoCategory,
+			           ndpi_protocol_qoe_category_t qoeCategory,
+			           ndpi_port_range *tcpDefPorts,
+			           ndpi_port_range *udpDefPorts,
+			           u_int8_t is_custom_protocol) {
   int j;
 
 
@@ -702,7 +702,7 @@ static void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_st
                            new_num * sizeof(ndpi_proto_defaults_t));
     if(!new_ptr) {
       NDPI_LOG_DBG(ndpi_str, "Realloc error\n");
-      return;
+      return -1;
     }
     memset(&new_ptr[ndpi_str->proto_defaults_num_allocated],
            '\0',
@@ -718,7 +718,7 @@ static void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_st
     } else {
       NDPI_LOG_DBG2(ndpi_str, "[NDPI] %s/protoId=%d: already initialized. Ignoring it\n", protoName, protoId);
     }
-    return;
+    return 0;
   }
 
   strncpy(ndpi_str->proto_defaults[protoId].protoName,
@@ -749,6 +749,8 @@ static void ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_st
     ndpi_str->num_custom_protocols++;
   else
     ndpi_str->num_internal_protocols++;
+
+  return 0;
 }
 
 /* ******************************************************************** */
@@ -5417,16 +5419,20 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       }
     }
 
-    ndpi_set_proto_defaults(ndpi_str, 1 /* is_cleartext */,
-			    1 /* is_app_protocol */,
-			    breed,
-			    proto_id,
-			    proto, /* protoName */
-			    category,
-			    NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
-			    ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			    ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
-			    1 /* custom protocol */);
+    ret = ndpi_set_proto_defaults(ndpi_str, 1 /* is_cleartext */,
+			          1 /* is_app_protocol */,
+			          breed,
+			          proto_id,
+			          proto, /* protoName */
+			          category,
+			          NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+			          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+			          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+			          1 /* custom protocol */);
+    if(ret != 0) {
+      NDPI_LOG_ERR(ndpi_str, "Error ndpi_set_proto_defaults. Skip rule\n");
+      return(-3);
+    }
 
     def = &ndpi_str->proto_defaults[proto_id];
     subprotocol_id = proto_id;
