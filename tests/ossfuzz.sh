@@ -70,3 +70,5 @@ cp fuzz/random_list.list "$OUT"/
 mkdir -p "$OUT"/lists
 # Ignore a huge list to speed up init time
 find lists/*.list ! -name 100_malware.list -exec cp -t "$OUT"/lists/ {} +
+mkdir -p "$OUT"/lists/protocols
+find lists/protocols/*.list -exec cp -t "$OUT"/lists/protocols/ {} +

@@ -85,8 +85,7 @@ u_int8_t enable_doh_dot_detection = 0;
 extern bool do_load_lists;
 extern int malloc_size_stats;
 extern int monitoring_enabled;
-
-char *protocolsDirPath;
+extern char *protocolsDirPath;
 
 /* ****************************************************** */
 

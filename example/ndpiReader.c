@@ -162,6 +162,8 @@ int malloc_size_stats = 0;
 
 int monitoring_enabled;
 
+char *protocolsDirPath;
+
 struct flow_info {
   struct ndpi_flow_info *flow;
   u_int16_t thread_id;

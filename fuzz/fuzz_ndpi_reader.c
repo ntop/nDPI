@@ -25,6 +25,7 @@ FILE *fingerprint_fp = NULL;
 bool do_load_lists = true;
 char *addr_dump_path = NULL;
 int monitoring_enabled = 1;
+char *protocolsDirPath = "./lists/protocols/";
 
 extern void ndpi_report_payload_stats(FILE *out);
 
