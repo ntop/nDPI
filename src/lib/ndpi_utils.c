@@ -3020,7 +3020,7 @@ static u_int8_t ndpi_check_ipv6_exception(struct ndpi_detection_module_struct *n
 
 /* ********************************************************************************* */
 
-static int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id)
+int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id)
 {
   if(ndpi_bitmask_is_set(&ndpi_str->cfg.flowrisk_bitmask, flowrisk_id) == 0)
     return 0;

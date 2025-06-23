@@ -9678,6 +9678,9 @@ static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct
   default_ports_tree_node_t *found;
   ndpi_port_range *default_ports;
 
+  if(!is_flowrisk_enabled(ndpi_str, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT))
+    return;
+
   if(packet->udp)
     found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_UDP,
                                          ntohs(flow->c_port),
