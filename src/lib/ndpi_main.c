@@ -9417,7 +9417,7 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
 
 /* ********************************************************************************* */
 
-static int ndpi_is_ntop_protocol(ndpi_protocol *ret) {
+static int is_ntop_protocol(const ndpi_protocol *ret) {
   if((ret->proto.master_protocol == NDPI_PROTOCOL_HTTP) && (ret->proto.app_protocol == NDPI_PROTOCOL_NTOP))
     return(1);
   else
@@ -9497,15 +9497,15 @@ static void ndpi_search_portable_executable(struct ndpi_detection_module_struct 
 
 /* ********************************************************************************* */
 
-static int ndpi_check_protocol_port_mismatch_exceptions(default_ports_tree_node_t *expected_proto,
-							ndpi_protocol *returned_proto) {
+static int check_protocol_port_mismatch_exceptions(default_ports_tree_node_t *expected_proto,
+						   const ndpi_protocol *returned_proto) {
   /*
     For TLS (and other protocols) it is not simple to guess the exact protocol so before
     triggering an alert we need to make sure what we have exhausted all the possible
     options available
   */
 
-  if(ndpi_is_ntop_protocol(returned_proto)) return(1);
+  if(is_ntop_protocol(returned_proto)) return(1);
 
   if(returned_proto->proto.master_protocol == NDPI_PROTOCOL_TLS) {
     switch(expected_proto->proto_idx) {
@@ -9669,6 +9669,132 @@ static char* ndpi_expected_ports_str(ndpi_port_range *default_ports, char *str, 
 }
 
 /* ********************************************************************************* */
+
+static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct *ndpi_str,
+                                             struct ndpi_flow_struct *flow,
+                                             const ndpi_protocol *ret)
+{
+  struct ndpi_packet_struct *packet = &ndpi_str->packet;
+  default_ports_tree_node_t *found;
+  ndpi_port_range *default_ports;
+
+  if(packet->udp)
+    found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_UDP,
+                                         ntohs(flow->c_port),
+                                         ntohs(flow->s_port)),
+      default_ports = ndpi_str->proto_defaults[ret->proto.master_protocol ? ret->proto.master_protocol : ret->proto.app_protocol].udp_default_ports;
+  else if(packet->tcp)
+    found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_TCP,
+                                         ntohs(flow->c_port),
+                                         ntohs(flow->s_port)),
+      default_ports = ndpi_str->proto_defaults[ret->proto.master_protocol ? ret->proto.master_protocol : ret->proto.app_protocol].tcp_default_ports;
+  else
+    found = NULL, default_ports = NULL;
+
+  if(found
+     && (found->proto_idx != NDPI_PROTOCOL_UNKNOWN)
+     && (found->proto_idx != ret->proto.master_protocol)
+     && (found->proto_idx != ret->proto.app_protocol)
+     ) {
+    // printf("******** %u / %u\n", found->proto->protoId, ret->proto.master_protocol);
+
+    if(!check_protocol_port_mismatch_exceptions(found, ret)) {
+      /*
+        Before triggering the alert we need to make some extra checks
+        - the protocol found is not running on the port we have found
+        (i.e. two or more protools share the same default port)
+      */
+      u_int8_t found = 0, i;
+
+      for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i].port_low != 0); i++) {
+        if(default_ports[i].port_low >= ntohs(flow->s_port) &&
+           default_ports[i].port_high <= ntohs(flow->s_port)) {
+          found = 1;
+          break;
+        }
+      } /* for */
+
+      if(!found) {
+        default_ports_tree_node_t *r = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
+                                                                    ntohs(flow->c_port), ntohs(flow->s_port));
+
+        if((r == NULL)
+           || ((r->proto_idx != ret->proto.app_protocol) && (r->proto_idx != ret->proto.master_protocol))) {
+          if(default_ports && (default_ports[0].port_low != 0)) {
+            char str[64];
+            int only_custom = 1;
+
+            /* "Default ports" set via custom rules are ignored */
+            for(i = 0; i < MAX_DEFAULT_PORTS && (default_ports[i].port_low != 0); i++)
+              if(!default_ports[i].is_custom)
+                only_custom = 0;
+
+            if(!only_custom)
+              ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,
+                            ndpi_expected_ports_str(default_ports, str, sizeof(str)));
+          }
+        }
+      }
+    }
+  } else if((!is_ntop_protocol(ret)) && default_ports && (default_ports[0].port_low != 0)) {
+    u_int8_t found = 0, i, num_loops = 0;
+
+  check_default_ports:
+    for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i].port_low != 0); i++) {
+      if((default_ports[i].port_low >= ntohs(flow->c_port) &&
+          default_ports[i].port_high <= ntohs(flow->c_port)) ||
+         (default_ports[i].port_low >= ntohs(flow->s_port) &&
+          default_ports[i].port_high <= ntohs(flow->s_port))) {
+        found = 1;
+        break;
+      }
+    } /* for */
+
+    if((num_loops == 0) && (!found)) {
+      if(packet->udp)
+        default_ports = ndpi_str->proto_defaults[ret->proto.app_protocol].udp_default_ports;
+      else
+        default_ports = ndpi_str->proto_defaults[ret->proto.app_protocol].tcp_default_ports;
+
+      num_loops = 1;
+      goto check_default_ports;
+    }
+
+    if(!found) {
+      default_ports_tree_node_t *r = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
+                                                                  ntohs(flow->c_port), ntohs(flow->s_port));
+
+      if((r == NULL)
+         || ((r->proto_idx != ret->proto.app_protocol)
+             && (r->proto_idx != ret->proto.master_protocol))) {
+        if(ret->proto.app_protocol != NDPI_PROTOCOL_FTP_DATA) {
+          ndpi_port_range *default_ports;
+
+          if(packet->udp)
+            default_ports = ndpi_str->proto_defaults[ret->proto.master_protocol ? ret->proto.master_protocol : ret->proto.app_protocol].udp_default_ports;
+          else if(packet->tcp)
+            default_ports = ndpi_str->proto_defaults[ret->proto.master_protocol ? ret->proto.master_protocol : ret->proto.app_protocol].tcp_default_ports;
+          else
+            default_ports = NULL;
+
+          if(default_ports && (default_ports[0].port_low != 0)) {
+            char str[64];
+            int only_custom = 1;
+
+            /* "Default ports" set via custom rules are ignored */
+            for(i = 0; i < MAX_DEFAULT_PORTS && (default_ports[i].port_low != 0); i++)
+              if(!default_ports[i].is_custom)
+                only_custom = 0;
+
+            if(!only_custom)
+              ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,
+                            ndpi_expected_ports_str(default_ports, str, sizeof(str)));
+          }
+        }
+      }
+    }
+  }
+}
 
 static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detection_module_struct *ndpi_str,
 							    struct ndpi_flow_struct *flow,
@@ -9842,125 +9968,8 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   if((!flow->risk_checked)
      && ((ret.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) || (ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN))
      ) {
-    default_ports_tree_node_t *found;
-    ndpi_port_range *default_ports;
 
-    if(packet->udp)
-      found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_UDP,
-					   ntohs(flow->c_port),
-					   ntohs(flow->s_port)),
-	default_ports = ndpi_str->proto_defaults[ret.proto.master_protocol ? ret.proto.master_protocol : ret.proto.app_protocol].udp_default_ports;
-    else if(packet->tcp)
-      found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_TCP,
-					   ntohs(flow->c_port),
-					   ntohs(flow->s_port)),
-	default_ports = ndpi_str->proto_defaults[ret.proto.master_protocol ? ret.proto.master_protocol : ret.proto.app_protocol].tcp_default_ports;
-    else
-      found = NULL, default_ports = NULL;
-
-    if(found
-       && (found->proto_idx != NDPI_PROTOCOL_UNKNOWN)
-       && (found->proto_idx != ret.proto.master_protocol)
-       && (found->proto_idx != ret.proto.app_protocol)
-       ) {
-      // printf("******** %u / %u\n", found->proto->protoId, ret.proto.master_protocol);
-
-      if(!ndpi_check_protocol_port_mismatch_exceptions(found, &ret)) {
-	/*
-	  Before triggering the alert we need to make some extra checks
-	  - the protocol found is not running on the port we have found
-	  (i.e. two or more protools share the same default port)
-	*/
-	u_int8_t found = 0, i;
-
-	for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i].port_low != 0); i++) {
-	  if(default_ports[i].port_low >= ntohs(flow->s_port) &&
-	     default_ports[i].port_high <= ntohs(flow->s_port)) {
-	    found = 1;
-	    break;
-	  }
-	} /* for */
-
-	if(!found) {
-	  default_ports_tree_node_t *r = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
-								      ntohs(flow->c_port), ntohs(flow->s_port));
-
-	  if((r == NULL)
-	     || ((r->proto_idx != ret.proto.app_protocol) && (r->proto_idx != ret.proto.master_protocol))) {
-	    if(default_ports && (default_ports[0].port_low != 0)) {
-	      char str[64];
-	      int only_custom = 1;
-
-	      /* "Default ports" set via custom rules are ignored */
-	      for(i = 0; i < MAX_DEFAULT_PORTS && (default_ports[i].port_low != 0); i++)
-	        if(!default_ports[i].is_custom)
-	          only_custom = 0;
-
-	      if(!only_custom)
-	        ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,
-			      ndpi_expected_ports_str(default_ports, str, sizeof(str)));
-	    }
-	  }
-	}
-      }
-    } else if((!ndpi_is_ntop_protocol(&ret)) && default_ports && (default_ports[0].port_low != 0)) {
-      u_int8_t found = 0, i, num_loops = 0;
-
-    check_default_ports:
-      for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i].port_low != 0); i++) {
-	if((default_ports[i].port_low >= ntohs(flow->c_port) &&
-            default_ports[i].port_high <= ntohs(flow->c_port)) ||
-           (default_ports[i].port_low >= ntohs(flow->s_port) &&
-            default_ports[i].port_high <= ntohs(flow->s_port))) {
-	  found = 1;
-	  break;
-	}
-      } /* for */
-
-      if((num_loops == 0) && (!found)) {
-	if(packet->udp)
-	  default_ports = ndpi_str->proto_defaults[ret.proto.app_protocol].udp_default_ports;
-	else
-	  default_ports = ndpi_str->proto_defaults[ret.proto.app_protocol].tcp_default_ports;
-
-	num_loops = 1;
-	goto check_default_ports;
-      }
-
-      if(!found) {
-	default_ports_tree_node_t *r = ndpi_get_guessed_protocol_id(ndpi_str, packet->udp ? IPPROTO_UDP : IPPROTO_TCP,
-								    ntohs(flow->c_port), ntohs(flow->s_port));
-
-	if((r == NULL)
-	   || ((r->proto_idx != ret.proto.app_protocol)
-	       && (r->proto_idx != ret.proto.master_protocol))) {
-	  if(ret.proto.app_protocol != NDPI_PROTOCOL_FTP_DATA) {
-	    ndpi_port_range *default_ports;
-
-	    if(packet->udp)
-	      default_ports = ndpi_str->proto_defaults[ret.proto.master_protocol ? ret.proto.master_protocol : ret.proto.app_protocol].udp_default_ports;
-	    else if(packet->tcp)
-	      default_ports = ndpi_str->proto_defaults[ret.proto.master_protocol ? ret.proto.master_protocol : ret.proto.app_protocol].tcp_default_ports;
-	    else
-	      default_ports = NULL;
-
-	    if(default_ports && (default_ports[0].port_low != 0)) {
-	      char str[64];
-	      int only_custom = 1;
-
-	      /* "Default ports" set via custom rules are ignored */
-	      for(i = 0; i < MAX_DEFAULT_PORTS && (default_ports[i].port_low != 0); i++)
-	        if(!default_ports[i].is_custom)
-	          only_custom = 0;
-
-	      if(!only_custom)
-	        ndpi_set_risk(ndpi_str, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,
-			      ndpi_expected_ports_str(default_ports, str, sizeof(str)));
-	    }
-	  }
-	}
-      }
-    }
+    check_proto_on_non_std_port_risk(ndpi_str, flow, &ret);
 
     flow->risk_checked = 1;
   }
