@@ -372,6 +372,7 @@ typedef struct ndpi_stats {
   u_int64_t raw_packet_count;
   u_int64_t ip_packet_count;
   u_int64_t total_wire_bytes, total_ip_bytes, total_discarded_bytes;
+  u_int32_t num_protocols;
   u_int64_t *protocol_counter;
   u_int64_t *protocol_counter_bytes;
   u_int32_t *protocol_flows;
@@ -436,6 +437,9 @@ typedef struct ndpi_workflow {
   ndpi_serialization_format ndpi_serialization_format;
 } ndpi_workflow_t;
 
+void ndpi_stats_free(ndpi_stats_t *s);
+int ndpi_stats_init(ndpi_stats_t *s, uint32_t num_protocols);
+void ndpi_stats_reset(ndpi_stats_t *s);
 
 /* TODO: remove wrappers parameters and use ndpi global, when their initialization will be fixed... */
 struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle, int do_init_flows_root, ndpi_serialization_format serialization_format, struct ndpi_global_context *g_ctx);

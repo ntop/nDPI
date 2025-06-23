@@ -352,6 +352,78 @@ bool load_public_lists(struct ndpi_detection_module_struct *ndpi_str) {
 
 /* ***************************************************** */
 
+void ndpi_stats_free(ndpi_stats_t *s) {
+  if (s->protocol_counter)           ndpi_free(s->protocol_counter);
+  if (s->protocol_counter_bytes)     ndpi_free(s->protocol_counter_bytes);
+  if (s->protocol_flows)             ndpi_free(s->protocol_flows);
+  if (s->fpc_protocol_counter)       ndpi_free(s->fpc_protocol_counter);
+  if (s->fpc_protocol_counter_bytes) ndpi_free(s->fpc_protocol_counter_bytes);
+  if (s->fpc_protocol_flows)         ndpi_free(s->fpc_protocol_flows);
+
+  s->num_protocols = 0;
+}
+
+int ndpi_stats_init(ndpi_stats_t *s, uint32_t num_protocols) {
+  memset(s, 0, sizeof(*s));
+  s->num_protocols = num_protocols;
+
+  s->protocol_counter           = ndpi_calloc(num_protocols, sizeof(u_int64_t));
+  s->protocol_counter_bytes     = ndpi_calloc(num_protocols, sizeof(u_int64_t));
+  s->protocol_flows             = ndpi_calloc(num_protocols, sizeof(u_int32_t));
+  s->fpc_protocol_counter       = ndpi_calloc(num_protocols, sizeof(u_int64_t));
+  s->fpc_protocol_counter_bytes = ndpi_calloc(num_protocols, sizeof(u_int64_t));
+  s->fpc_protocol_flows         = ndpi_calloc(num_protocols, sizeof(u_int32_t));
+
+  if(!s->protocol_counter || !s->protocol_counter_bytes || !s->protocol_flows ||
+     !s->fpc_protocol_counter || !s->fpc_protocol_counter_bytes || !s->fpc_protocol_flows) {
+
+    ndpi_stats_free(s);
+
+    LOG(NDPI_LOG_ERROR, "[NDPI] %s: error allocating memory for ndpi_stats\n", __FUNCTION__);
+    return 0;
+  }
+  return 1;
+}
+
+void ndpi_stats_reset(ndpi_stats_t *s) {
+  memset(s->flow_count, 0, sizeof(s->flow_count));
+  s->guessed_flow_protocols = 0;
+  s->raw_packet_count = 0;
+  s->ip_packet_count = 0;
+  s->total_wire_bytes = 0;
+  s->total_ip_bytes = 0;
+  s->total_discarded_bytes = 0;
+  s->ndpi_flow_count = 0;
+  s->tcp_count = 0;
+  s->udp_count = 0;
+  s->mpls_count = 0;
+  s->pppoe_count = 0;
+  s->vlan_count = 0;
+  s->fragmented_count = 0;
+  s->max_packet_len = 0;
+  s->num_dissector_calls = 0;
+
+  memset(s->packet_len, 0, sizeof(s->packet_len));
+  memset(s->dpi_packet_count, 0, sizeof(s->dpi_packet_count));
+  memset(s->flow_confidence, 0, sizeof(s->flow_confidence));
+  memset(s->fpc_flow_confidence, 0, sizeof(s->fpc_flow_confidence));
+  memset(s->category_counter, 0, sizeof(s->category_counter));
+  memset(s->category_counter_bytes, 0, sizeof(s->category_counter_bytes));
+  memset(s->category_flows, 0, sizeof(s->category_flows));
+  memset(s->lru_stats, 0, sizeof(s->lru_stats));
+  memset(s->automa_stats, 0, sizeof(s->automa_stats));
+  memset(s->patricia_stats, 0, sizeof(s->patricia_stats));
+
+  if (s->protocol_counter)           memset(s->protocol_counter,           0, sizeof(u_int64_t) * s->num_protocols);
+  if (s->protocol_counter_bytes)     memset(s->protocol_counter_bytes,     0, sizeof(u_int64_t) * s->num_protocols);
+  if (s->protocol_flows)             memset(s->protocol_flows,             0, sizeof(u_int32_t) * s->num_protocols);
+  if (s->fpc_protocol_counter)       memset(s->fpc_protocol_counter,       0, sizeof(u_int64_t) * s->num_protocols);
+  if (s->fpc_protocol_counter_bytes) memset(s->fpc_protocol_counter_bytes, 0, sizeof(u_int64_t) * s->num_protocols);
+  if (s->fpc_protocol_flows)         memset(s->fpc_protocol_flows,         0, sizeof(u_int32_t) * s->num_protocols);
+}
+
+/* ***************************************************** */
+
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle, int do_init_flows_root,
 					 ndpi_serialization_format serialization_format,
@@ -549,12 +621,7 @@ void ndpi_workflow_free(struct ndpi_workflow * workflow) {
   ndpi_exit_detection_module(workflow->ndpi_struct);
   ndpi_free(workflow->ndpi_flows_root);
 
-  ndpi_free(workflow->stats.protocol_counter);
-  ndpi_free(workflow->stats.protocol_counter_bytes);
-  ndpi_free(workflow->stats.protocol_flows);
-  ndpi_free(workflow->stats.fpc_protocol_counter);
-  ndpi_free(workflow->stats.fpc_protocol_counter_bytes);
-  ndpi_free(workflow->stats.fpc_protocol_flows);
+  ndpi_stats_free(&workflow->stats);
 
   ndpi_free(workflow);
 }
