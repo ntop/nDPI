@@ -9716,6 +9716,13 @@ static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct
   if(!is_flowrisk_enabled(ndpi_str, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT))
     return;
 
+  /* Exceptions:
+      * STUN has a default port (used for TURN) but all p2p traffic is on random ports
+   */
+  if(ret->proto.master_protocol == NDPI_PROTOCOL_STUN ||
+     ret->proto.app_protocol == NDPI_PROTOCOL_STUN)
+    return;
+
   if(packet->udp)
     found = ndpi_get_guessed_protocol_id(ndpi_str, IPPROTO_UDP,
                                          ntohs(flow->c_port),

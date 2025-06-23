@@ -13,7 +13,7 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
@@ -26,4 +26,4 @@ Acceptable                      22 1624          1
 
 Media                           22 1624          1            
 
-	1	UDP 172.16.63.224:55050 <-> 172.16.63.21:13958 [proto: 78.87/STUN.RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 7][cat: Media/1][9 pkts/662 bytes <-> 13 pkts/962 bytes][Goodput ratio: 43/43][0.23 sec][bytes ratio: -0.185 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/0 32/17 101/42 32/11][Pkt Len c2s/s2c min/avg/max/stddev: 70/74 74/74 74/74 1/0][Mapped IP/Port: 172.16.63.224:55050][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 3478][Plen Bins: 4,95,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 172.16.63.224:55050 <-> 172.16.63.21:13958 [proto: 78.87/STUN.RTP][IP: 0/Unknown][Stream Content: Audio][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 7][cat: Media/1][9 pkts/662 bytes <-> 13 pkts/962 bytes][Goodput ratio: 43/43][0.23 sec][bytes ratio: -0.185 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/0 32/17 101/42 32/11][Pkt Len c2s/s2c min/avg/max/stddev: 70/74 74/74 74/74 1/0][Mapped IP/Port: 172.16.63.224:55050][Plen Bins: 4,95,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
