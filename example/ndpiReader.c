@@ -4935,9 +4935,8 @@ static void ndpi_process_packet(u_char *args,
     for(i=0; i<ndpi_thread_info[thread_id].workflow->prefs.num_roots; i++) {
       ndpi_tdestroy(ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i], ndpi_flow_info_freer);
       ndpi_thread_info[thread_id].workflow->ndpi_flows_root[i] = NULL;
-
-      ndpi_stats_reset(&ndpi_thread_info[thread_id].workflow->stats);
     }
+    ndpi_stats_reset(&ndpi_thread_info[thread_id].workflow->stats);
 
     if(!quiet_mode)
       printf("\n-------------------------------------------\n\n");
