@@ -5334,6 +5334,18 @@ static void ndpi_process_packet(u_char *args,
   }
 }
 
+
+#define timespec_diff_macro(a, b, result)             \
+  do {                                                \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;     \
+    (result)->tv_nsec = (a)->tv_nsec - (b)->tv_nsec;  \
+    if ((result)->tv_nsec < 0) {                      \
+      --(result)->tv_sec;                             \
+      (result)->tv_nsec += 1000000000;                \
+    }                                                 \
+  } while (0)
+
+
 #ifndef USE_DPDK
 /**
  * @brief Call pcap_loop() to process packets from a live capture or savefile
@@ -5341,6 +5353,25 @@ static void ndpi_process_packet(u_char *args,
 static void runPcapLoop(u_int16_t thread_id) {
   if((!shutdown_app) && (ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)) {
     int datalink_type = pcap_datalink(ndpi_thread_info[thread_id].workflow->pcap_handle);
+    int ret;
+    int perf_ctl_fd = -1;
+    int perf_ctl_ack_fd = -1;
+    char ack[5];
+    char *env;
+#ifdef PRINT_RUNTIME
+    struct timespec start, end, diff;
+#endif
+
+   /* Enable perf only for "runtime" functions, not for initialization phase.
+      See: example/perf.sh */
+    if(num_threads == 1) {
+      env = getenv("PERF_CTL_FD");
+      if(env)
+        perf_ctl_fd = atoi(env);
+      env = getenv("PERF_CTL_ACK_FD");
+      if(env)
+        perf_ctl_ack_fd =atoi(env);
+    }
 
     /* When using as extcap interface, the output/dumper pcap must have the same datalink
        type of the input traffic [to be able to use, for example, input pcaps with
@@ -5356,9 +5387,41 @@ static void runPcapLoop(u_int16_t thread_id) {
       printf("Unsupported datalink %d. Skip pcap\n", datalink_type);
       return;
     }
-    int ret = pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &ndpi_process_packet, (u_char*)&thread_id);
+
+    if(perf_ctl_fd != -1 && perf_ctl_ack_fd != -1) {
+      /* Start the performance counter and read the ack */
+      ret = write(perf_ctl_fd, "enable\n", 8);
+      assert(ret >= 0);
+      ret = read(perf_ctl_ack_fd, ack, 5);
+      assert(ret >= 0);
+      assert(strcmp(ack, "ack\n") == 0);
+    }
+
+#ifdef PRINT_RUNTIME
+    clock_gettime(CLOCK_MONOTONIC, &start);
+#endif
+
+    ret = pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &ndpi_process_packet, (u_char*)&thread_id);
     if (ret == -1)
       printf("Error while reading pcap file: '%s'\n", pcap_geterr(ndpi_thread_info[thread_id].workflow->pcap_handle));
+
+#ifdef PRINT_RUNTIME
+    clock_gettime(CLOCK_MONOTONIC, &end);
+#endif
+
+    if(perf_ctl_fd != -1 && perf_ctl_ack_fd != -1) {
+      /* Stop the performance counter and read the ack */
+      ret = write(perf_ctl_fd, "disable\n", 9);
+      assert(ret >= 0);
+      ret = read(perf_ctl_ack_fd, ack, 5);
+      assert(ret >= 0);
+      assert(strcmp(ack, "ack\n") == 0);
+    }
+
+#ifdef PRINT_RUNTIME
+    timespec_diff_macro(&end, &start, &diff);
+    printf("(Run-)Time: %ld.%ld\n", diff.tv_sec, diff.tv_nsec);
+#endif
   }
 }
 #endif
