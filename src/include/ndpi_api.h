@@ -979,6 +979,14 @@ extern "C" {
   bool ndpi_is_proto(ndpi_master_app_protocol proto, u_int16_t p);
   bool ndpi_is_proto_unknown(ndpi_master_app_protocol proto);
   bool ndpi_is_proto_equals(ndpi_master_app_protocol to_check, ndpi_master_app_protocol to_match, bool exact_match_only);
+  u_int16_t ndpi_stack_get_lower_proto(struct ndpi_proto_stack *s);
+  u_int16_t ndpi_stack_get_upper_proto(struct ndpi_proto_stack *s);
+  bool ndpi_stack_contains(struct ndpi_proto_stack *s, u_int16_t proto_id);
+  bool ndpi_stack_is_tls_like(struct ndpi_proto_stack *s);
+  bool ndpi_stack_is_http_like(struct ndpi_proto_stack *s);
+
+  char *ndpi_stack2str(struct ndpi_detection_module_struct *ndpi_str,
+                       struct ndpi_proto_stack *stack, char *buf, u_int buf_len);
 
   ndpi_proto_defaults_t* ndpi_get_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_detection_module_size(void);

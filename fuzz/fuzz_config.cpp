@@ -813,8 +813,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   assert(p.category == ndpi_get_flow_category(&flow));
   ndpi_is_master_only_protocol(ndpi_info_mod, p.proto.app_protocol);
   ndpi_normalize_protocol(ndpi_info_mod, &p.proto);
-  ndpi_get_lower_proto(p);
-  ndpi_get_upper_proto(p);
+  assert(ndpi_stack_get_upper_proto(&p.protocol_stack) == ndpi_get_upper_proto(p));
+  assert(ndpi_stack_get_lower_proto(&p.protocol_stack) == ndpi_get_lower_proto(p));
   ndpi_get_flow_error_code(&flow);
   ndpi_get_flow_risk_info(&flow, out, sizeof(out), 1);
   ndpi_get_flow_ndpi_proto(&flow, &p2);

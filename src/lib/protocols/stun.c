@@ -1229,7 +1229,11 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
     /* In "normal" data-path the generic code in `ndpi_internal_detection_process_packet()`
        takes care of setting the category */
     if(flow->extra_packets_func) {
-      ndpi_protocol ret = { { master_proto, app_proto }, NDPI_PROTOCOL_UNKNOWN /* unused */, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL};
+      ndpi_protocol ret;
+
+      ret.proto.master_protocol = master_proto;
+      ret.proto.app_protocol = app_proto;
+      ret.category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
 
       flow->category = ndpi_get_proto_category(ndpi_struct, ret);
     }

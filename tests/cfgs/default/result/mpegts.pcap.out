@@ -26,4 +26,4 @@ Fun                              1 1362          1
 
 Media                            1 1362          1            
 
-	1	UDP 10.1.16.48:40737 -> 230.200.201.23:1234 [VLAN: 3359][proto: 198/MPEG_TS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 198/MPEG_TS, Confidence: DPI][DPI packets: 1][cat: Media/1][Breed: Fun][1 pkts/1362 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0]
+	1	UDP 10.1.16.48:40737 -> 230.200.201.23:1234 [VLAN: 3359][proto: 198/MPEG_TS][Stack: MPEG_TS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 198/MPEG_TS, Confidence: DPI][DPI packets: 1][cat: Media/1][Breed: Fun][1 pkts/1362 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0]

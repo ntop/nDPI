@@ -245,6 +245,8 @@ static int addDefaultPort(struct ndpi_detection_module_struct *ndpi_str,
                           u_int8_t customUserProto,
                           default_ports_tree_node_t **root);
 
+static void proto_stack_update(struct ndpi_proto_stack *s, u_int16_t lower_proto, u_int16_t upper_proto);
+
 /* ****************************************** */
 
 ndpi_custom_dga_predict_fctn ndpi_dga_function = NULL;
@@ -8979,12 +8981,13 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
 
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
 				    u_int8_t *protocol_was_guessed) {
-  ndpi_protocol ret = NDPI_PROTOCOL_NULL;
+  ndpi_protocol ret;
   u_int16_t cached_proto;
 
   /* *** We can't access ndpi_str->packet from this function!! *** */
 
   *protocol_was_guessed = 0;
+  memset(&ret, '\0', sizeof(ret));
 
   if(!ndpi_str || !flow)
     return(ret);
@@ -8995,8 +8998,9 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   }
 
   /* Init defaults */
-  ret.proto.master_protocol = flow->detected_protocol_stack[1],
-    ret.proto.app_protocol = flow->detected_protocol_stack[0];
+  ret.proto.master_protocol = flow->detected_protocol_stack[1];
+  ret.proto.app_protocol = flow->detected_protocol_stack[0];
+  ret.protocol_stack = flow->protocol_stack;
   ret.protocol_by_ip = flow->guessed_protocol_id_by_ip;
   ret.category = flow->category;
 
@@ -9086,6 +9090,7 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
   /* Reason: public "ndpi_detection_giveup" */
   internal_giveup(ndpi_str, flow, &ret);
 
+  ret.protocol_stack = flow->protocol_stack;
   return(ret);
 }
 
@@ -9575,6 +9580,8 @@ static int do_guess(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_f
     /* This is a custom protocol and it has priority over everything else */
     ret->proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     ret->proto.app_protocol = flow->guessed_protocol_id;
+    flow->detected_protocol_stack[0] = flow->guessed_protocol_id;
+    proto_stack_update(&flow->protocol_stack, ret->proto.master_protocol, ret->proto.app_protocol);
     flow->confidence = NDPI_CONFIDENCE_CUSTOM_RULE;
     ndpi_fill_protocol_category(ndpi_str, flow, ret);
     return(-1);
@@ -9584,6 +9591,8 @@ static int do_guess(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_f
     /* This is a custom protocol/range and it has priority over everything else */
     ret->proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     ret->proto.app_protocol = flow->guessed_protocol_id;
+    flow->detected_protocol_stack[0] = flow->guessed_protocol_id;
+    proto_stack_update(&flow->protocol_stack, ret->proto.master_protocol, ret->proto.app_protocol);
     flow->confidence = NDPI_CONFIDENCE_CUSTOM_RULE;
     ndpi_fill_protocol_category(ndpi_str, flow, ret);
     return(-1);
@@ -9593,6 +9602,9 @@ static int do_guess(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_f
     /* This is a custom protocol and it has priority over everything else */
     ret->proto.master_protocol = flow->guessed_protocol_id;
     ret->proto.app_protocol = flow->guessed_protocol_id_by_ip;
+    flow->detected_protocol_stack[0] = flow->guessed_protocol_id_by_ip;
+    flow->detected_protocol_stack[1] = flow->guessed_protocol_id;
+    proto_stack_update(&flow->protocol_stack, ret->proto.master_protocol, ret->proto.app_protocol);
     flow->confidence = NDPI_CONFIDENCE_CUSTOM_RULE;
     ndpi_fill_protocol_category(ndpi_str, flow, ret);
     return(-1);
@@ -9939,6 +9951,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 	  /* match found */
 	  ret.proto.master_protocol = ret.proto.app_protocol = ndpi_str->nbpf_custom_proto[i].l7_protocol;
 	  ndpi_fill_protocol_category(ndpi_str, flow, &ret);
+	  proto_stack_update(&flow->protocol_stack, ret.proto.master_protocol, ret.proto.app_protocol);
 	  flow->confidence = NDPI_CONFIDENCE_NBPF;
 
 	  return(ret);
@@ -10093,12 +10106,18 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 					    struct ndpi_flow_struct *flow, const unsigned char *packet_data,
 					    const unsigned short packetlen, const u_int64_t current_time_ms,
 					    struct ndpi_flow_input_info *input_info) {
+  unsigned int i;
+
   ndpi_protocol p  = ndpi_internal_detection_process_packet(ndpi_str, flow, packet_data,
 							    packetlen, current_time_ms,
 							    input_info);
 
   p.proto.master_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.proto.master_protocol);
   p.proto.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.proto.app_protocol);
+  p.protocol_stack = flow->protocol_stack;
+  for(i = 0; i < p.protocol_stack.protos_num; i++) {
+    p.protocol_stack.protos[i] = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.protocol_stack.protos[i]);
+  }
   p.protocol_by_ip = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.protocol_by_ip);
 
   return(p);
@@ -10537,6 +10556,8 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str, s
   ndpi_int_change_protocol(flow, upper_detected_protocol, lower_detected_protocol, confidence);
   ret.proto.master_protocol = flow->detected_protocol_stack[1], ret.proto.app_protocol = flow->detected_protocol_stack[0];
   ndpi_reconcile_protocols(ndpi_str, flow, &ret);
+
+  proto_stack_update(&flow->protocol_stack, flow->detected_protocol_stack[1], flow->detected_protocol_stack[0]);
 }
 
 /* ********************************************************************************* */
@@ -10576,13 +10597,195 @@ void ndpi_get_flow_ndpi_proto(struct ndpi_flow_struct *flow,
   ndpi_proto->category = ndpi_get_flow_category(flow);
 }
 
+// #define DEBUG_STACK
+#ifdef DEBUG_STACK
+#include <assert.h>
+#endif
+
+static void proto_stack_push(struct ndpi_proto_stack *s, u_int16_t proto)
+{
+#ifdef DEBUG_STACK
+  assert(proto != NDPI_PROTOCOL_UNKNOWN);
+#endif
+  if(s->protos_num < NDPI_PROTOCOL_STACK_SIZE - 1) {
+    if(s->protos_num > 0 &&  s->protos[s->protos_num - 1] == proto) {
+      return;
+    }
+    s->protos[s->protos_num++] = proto;
+  }
+}
+
+/* ********************************************************************************* */
+
+static void proto_stack_update(struct ndpi_proto_stack *s, u_int16_t lower_proto, u_int16_t upper_proto)
+{
+#ifdef DEBUG_STACK
+  printf("%s %d %d/%d/%d + %d/%d",
+         __func__, s->protos_num,
+         s->protos[0], s->protos[1], s->protos[2],
+         lower_proto, upper_proto);
+#endif
+
+  /* On the stack we want APP/SRTP instead of what we have with legacy master/app, i.e. SRTP/APP */
+  if(lower_proto == NDPI_PROTOCOL_SRTP) {
+    lower_proto = upper_proto;
+    upper_proto = NDPI_PROTOCOL_SRTP;
+  }
+  /* STUN/APP + DTLS -> STUN/DTLS/APP */
+  if(lower_proto == NDPI_PROTOCOL_UNKNOWN &&
+     (upper_proto == NDPI_PROTOCOL_TLS || upper_proto == NDPI_PROTOCOL_DTLS) &&
+     s->protos_num >= 2) {
+    lower_proto = upper_proto;
+    upper_proto = s->protos[s->protos_num - 1];
+  }
+  /* RTCP + STUN/RTP -> STUN/RTP */
+  if(s->protos_num == 1 &&
+     (s->protos[s->protos_num - 1] == NDPI_PROTOCOL_RTP || s->protos[s->protos_num - 1] == NDPI_PROTOCOL_RTCP) &&
+     lower_proto == NDPI_PROTOCOL_STUN) {
+    s->protos_num--;
+  }
+  /* STUN/APP + DTLS/APP -> STUN/DTLS/APP */
+  if(s->protos_num >= 2 &&
+     (s->protos[s->protos_num - 1] == upper_proto)) {
+    s->protos_num--;
+  }
+  /* RDP + TLS/RDP -> RDP/TLS */
+  if(s->protos_num == 1 &&
+     s->protos[s->protos_num - 1] == upper_proto &&
+     lower_proto == NDPI_PROTOCOL_TLS) {
+    lower_proto = NDPI_PROTOCOL_UNKNOWN;
+    upper_proto = NDPI_PROTOCOL_TLS;
+  }
+
+#ifdef DEBUG_STACK
+  printf(" --> %d %d/%d/%d + %d/%d",
+         s->protos_num,
+         s->protos[0], s->protos[1], s->protos[2],
+         lower_proto, upper_proto);
+#endif
+
+  if(s->protos_num > 0 && s->protos[0] == lower_proto) {
+    proto_stack_push(s, upper_proto);
+  } else {
+    if(lower_proto != NDPI_PROTOCOL_UNKNOWN)
+      proto_stack_push(s, lower_proto);
+    proto_stack_push(s, upper_proto);
+  }
+
+#ifdef DEBUG_STACK
+  printf(" ----> %d %d/%d/%d/%d\n",
+         s->protos_num, s->protos[0], s->protos[1],
+         s->protos[2], s->protos[3]);
+#endif
+}
+
+/* ********************************************************************************* */
+
+u_int16_t ndpi_stack_get_upper_proto(struct ndpi_proto_stack *s)
+{
+  if(!s || s->protos_num == 0)
+    return NDPI_PROTOCOL_UNKNOWN;
+  if(s->protos_num == 1)
+    return s->protos[0];
+
+  if(s->protos[s->protos_num - 1] == NDPI_PROTOCOL_TLS)
+    return s->protos[s->protos_num - 2];
+
+  if(s->protos[s->protos_num - 1] == NDPI_PROTOCOL_SRTP &&
+     s->protos[s->protos_num - 2] != NDPI_PROTOCOL_DTLS)
+      return s->protos[s->protos_num - 2];
+
+  return s->protos[s->protos_num - 1];
+}
+
+/* ********************************************************************************* */
+
+u_int16_t ndpi_stack_get_lower_proto(struct ndpi_proto_stack *s)
+{
+  unsigned int i;
+
+  if(!s || s->protos_num == 0)
+    return NDPI_PROTOCOL_UNKNOWN;
+  if(s->protos_num == 1)
+    return s->protos[0];
+
+  for(i = 0; i < s->protos_num; i++)
+    if(s->protos[i] == NDPI_PROTOCOL_TLS ||
+       s->protos[i] == NDPI_PROTOCOL_DTLS ||
+       s->protos[i] == NDPI_PROTOCOL_QUIC ||
+       s->protos[i] == NDPI_PROTOCOL_MAIL_POPS ||
+       s->protos[i] == NDPI_PROTOCOL_MAIL_IMAPS ||
+       s->protos[i] == NDPI_PROTOCOL_MAIL_SMTPS ||
+       s->protos[i] == NDPI_PROTOCOL_FTPS)
+      return s->protos[i];
+  for(i = 0; i < s->protos_num; i++)
+    if(s->protos[i] == NDPI_PROTOCOL_SRTP)
+      return s->protos[i];
+  for(i = 0; i < s->protos_num; i++)
+    if(s->protos[i] == NDPI_PROTOCOL_STUN)
+      return s->protos[i];
+
+  return s->protos[0];
+}
+
+/* ********************************************************************************* */
+
+bool ndpi_stack_contains(struct ndpi_proto_stack *s, u_int16_t proto_id)
+{
+  unsigned int i;
+
+  if(!s)
+    return false;
+  for(i = 0; i < s->protos_num; i++)
+      if(s->protos[i] == proto_id)
+        return true;
+  return false;
+}
+
+/* ********************************************************************************* */
+
+bool ndpi_stack_is_tls_like(struct ndpi_proto_stack *s)
+{
+  unsigned int i;
+
+  if(!s)
+    return false;
+  for(i = 0; i < s->protos_num; i++)
+      if(s->protos[i] == NDPI_PROTOCOL_TLS ||
+         s->protos[i] == NDPI_PROTOCOL_DTLS ||
+         s->protos[i] == NDPI_PROTOCOL_QUIC ||
+         s->protos[i] == NDPI_PROTOCOL_MAIL_SMTPS ||
+         s->protos[i] == NDPI_PROTOCOL_MAIL_POPS ||
+         s->protos[i] == NDPI_PROTOCOL_MAIL_IMAPS ||
+         s->protos[i] == NDPI_PROTOCOL_FTPS)
+        return true;
+  return false;
+}
+
+/* ********************************************************************************* */
+
+bool ndpi_stack_is_http_like(struct ndpi_proto_stack *s)
+{
+  unsigned int i;
+
+  if(!s)
+    return false;
+  for(i = 0; i < s->protos_num; i++)
+      if(s->protos[i] == NDPI_PROTOCOL_HTTP ||
+         s->protos[i] == NDPI_PROTOCOL_HTTP_CONNECT ||
+         s->protos[i] == NDPI_PROTOCOL_HTTP_PROXY)
+        return true;
+  return false;
+}
+
 /* ********************************************************************************* */
 
 static void ndpi_int_change_flow_protocol(struct ndpi_flow_struct *flow,
 					  u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
 					  ndpi_confidence_t confidence) {
-  flow->detected_protocol_stack[0] = upper_detected_protocol,
-    flow->detected_protocol_stack[1] = lower_detected_protocol;
+  flow->detected_protocol_stack[0] = upper_detected_protocol;
+  flow->detected_protocol_stack[1] = lower_detected_protocol;
+
   flow->confidence = confidence;
 }
 
@@ -10715,8 +10918,10 @@ u_int16_t ndpi_get_upper_proto(ndpi_protocol proto) {
 
 static ndpi_protocol ndpi_internal_guess_undetected_protocol(struct ndpi_detection_module_struct *ndpi_str,
 							     struct ndpi_flow_struct *flow, u_int8_t proto) {
-  ndpi_protocol ret = NDPI_PROTOCOL_NULL;
+  ndpi_protocol ret;
   u_int8_t user_defined_proto;
+
+  memset(&ret, '\0', sizeof(ret));
 
   if(!ndpi_str)
     return(ret);
@@ -10764,8 +10969,10 @@ ndpi_protocol ndpi_guess_undetected_protocol_v4(struct ndpi_detection_module_str
 						u_int32_t shost /* host byte order */, u_int16_t sport,
 						u_int32_t dhost /* host byte order */, u_int16_t dport) {
   u_int32_t rc = NDPI_PROTOCOL_UNKNOWN;
-  ndpi_protocol ret = NDPI_PROTOCOL_NULL;
-  u_int8_t user_defined_proto;
+  ndpi_protocol ret;
+  u_int8_t user_defined_proto;\
+
+  memset(&ret, '\0', sizeof(ret));
 
   if(!ndpi_str)
     return ret;
@@ -13079,3 +13286,30 @@ int ndpi_memcasecmp(const void *s1, const void *s2, size_t n) {
 
   return 0;
 }
+
+char *ndpi_stack2str(struct ndpi_detection_module_struct *ndpi_str,
+                     struct ndpi_proto_stack *stack, char *buf, u_int buf_len) {
+  int ret, used = 0, i = 0;
+
+  if(!ndpi_str || buf == NULL || buf_len == 0)
+    return NULL;
+
+  buf[0] = '\0';
+
+  if(stack->protos_num == 0) {
+    ndpi_snprintf(buf, buf_len, "Unknown");
+    return buf;
+  }
+
+  while((int64_t)buf_len - used > 0 && i < stack->protos_num) {
+    ret = ndpi_snprintf(buf + used, buf_len - used, "%s%s",
+                       i != 0 ? "." : "",
+                      ndpi_get_proto_name(ndpi_str, stack->protos[i]));
+    if(ret <= 0)
+      break;
+    used += ret;
+    i++;
+  }
+  return buf;
+}
+

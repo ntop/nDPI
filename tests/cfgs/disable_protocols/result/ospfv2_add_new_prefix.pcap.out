@@ -29,4 +29,4 @@ Unspecified                      2 200           1
 
 
 Undetected flows:
-	1	OSPF 10.1.10.10:0 <-> 10.1.10.1:0 [proto: 0/Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/122 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][2.51 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	OSPF 10.1.10.10:0 <-> 10.1.10.1:0 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/122 bytes <-> 1 pkts/78 bytes][Goodput ratio: 0/0][2.51 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -26,6 +26,7 @@
 #define __NDPI_PROTOCOL_IDS_H__
 
 #define NDPI_PROTOCOL_SIZE                  2
+#define NDPI_PROTOCOL_STACK_SIZE            8
 
 typedef enum {
   NDPI_PROTOCOL_UNKNOWN               = 0,

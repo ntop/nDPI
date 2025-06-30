@@ -26,4 +26,4 @@ Acceptable                       4 450           1
 
 Network                          4 450           1            
 
-	1	UDP 37.41.101.140:11892 <-> 208.67.222.222:53 [VLAN: 103][proto: 5/DNS][IP: 225/OpenDNS][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 3][cat: Network/14][Breed: Acceptable][2 pkts/150 bytes <-> 2 pkts/300 bytes][Goodput ratio: 38/69][0.20 sec][Hostname/SNI: api.msn.com][204.79.197.203][DNS Id: 0xb8e2][PLAIN TEXT (msedge)][Plen Bins: 50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 37.41.101.140:11892 <-> 208.67.222.222:53 [VLAN: 103][proto: 5/DNS][Stack: DNS][IP: 225/OpenDNS][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 3][cat: Network/14][Breed: Acceptable][2 pkts/150 bytes <-> 2 pkts/300 bytes][Goodput ratio: 38/69][0.20 sec][Hostname/SNI: api.msn.com][204.79.197.203][DNS Id: 0xb8e2][PLAIN TEXT (msedge)][Plen Bins: 50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

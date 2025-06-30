@@ -1273,14 +1273,18 @@ struct ndpi_fpc_info {
   ndpi_fpc_confidence_t confidence;
 };
 
+typedef struct ndpi_proto_stack {
+  u_int16_t protos[NDPI_PROTOCOL_STACK_SIZE];
+  u_int16_t protos_num;
+} ndpi_proto_stack;
+
 typedef struct ndpi_proto {
   ndpi_master_app_protocol proto;
+  struct ndpi_proto_stack protocol_stack;
   u_int16_t protocol_by_ip;
   ndpi_protocol_category_t category;
   void *custom_category_userdata;
 } ndpi_protocol;
-
-#define NDPI_PROTOCOL_NULL { { NDPI_PROTOCOL_UNKNOWN , NDPI_PROTOCOL_UNKNOWN }, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NULL }
 
 #define NUM_CUSTOM_CATEGORIES      5
 #define CUSTOM_CATEGORY_LABEL_LEN 32
@@ -1371,6 +1375,7 @@ struct rtp_info {
 
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
+  struct ndpi_proto_stack protocol_stack;
 
   u_int16_t guessed_protocol_id;       /* Classification by-port. Set with the first pkt and never updated */
   u_int16_t guessed_protocol_id_by_ip; /* Classification by-ip. Set with the first pkt and never updated */

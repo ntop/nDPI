@@ -1016,7 +1016,7 @@ void extcap_capture(int datalink_type) {
 void printCSVHeader() {
   if(!csv_fp) return;
 
-  fprintf(csv_fp, "#flow_id|protocol|first_seen|last_seen|duration|src_ip|src_port|dst_ip|dst_port|ndpi_proto_num|ndpi_proto|proto_by_ip|server_name_sni|");
+  fprintf(csv_fp, "#flow_id|protocol|first_seen|last_seen|duration|src_ip|src_port|dst_ip|dst_port|ndpi_proto_num|ndpi_proto|proto_stack|proto_by_ip|server_name_sni|");
   fprintf(csv_fp, "c_to_s_pkts|c_to_s_bytes|c_to_s_goodput_bytes|s_to_c_pkts|s_to_c_bytes|s_to_c_goodput_bytes|");
   fprintf(csv_fp, "data_ratio|str_data_ratio|c_to_s_goodput_ratio|s_to_c_goodput_ratio|");
 
@@ -1738,7 +1738,7 @@ static void print_ndpi_address_port_list_file(FILE *out, const char *label, ndpi
 static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t thread_id) {
   FILE *out = results_file ? results_file : stdout;
   u_int8_t known_tls;
-  char buf[32], buf1[64];
+  char buf[32], buf1[64], buf2[256];
   char buf_ver[16];
   char buf2_ver[16];
   char l4_proto_name[32];
@@ -1763,9 +1763,11 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     fprintf(csv_fp, "%s|",
             ndpi_protocol2id(flow->detected_protocol, buf, sizeof(buf)));
 
-    fprintf(csv_fp, "%s|%s|%s|",
+    fprintf(csv_fp, "%s|%s|%s|%s|",
             ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                                flow->detected_protocol, buf, sizeof(buf)),
+            ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                           &flow->detected_protocol.protocol_stack, buf2, sizeof(buf2)),
             ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                                 flow->detected_protocol.protocol_by_ip),
             flow->host_server_name);
@@ -1907,11 +1909,53 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       }
     }
 #endif
+// #define SHOW_STACK_DIFFERENT_FROM_STANDARD_MASTER_APP
+#ifdef SHOW_STACK_DIFFERENT_FROM_STANDARD_MASTER_APP
+    struct ndpi_proto_stack *s = &flow->detected_protocol.protocol_stack;
 
-    fprintf(out, "%s/%s][IP: %u/%s]",
+    if(s->protos_num > 2 ||
+       (s->protos_num == 1 &&
+        flow->detected_protocol.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN &&
+        flow->detected_protocol.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN) ||
+       (s->protos_num == 2 &&
+        flow->detected_protocol.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN)) {
+      printf("[Stack %s vs %s]\n",
+             ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                            s, buf2, sizeof(buf2)),
+             ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                flow->detected_protocol, buf1, sizeof(buf1)));
+    } else if(flow->detected_protocol.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) {
+      if(s->protos[0] != flow->detected_protocol.proto.master_protocol ||
+         s->protos[1] != flow->detected_protocol.proto.app_protocol) {
+        printf("[Stack %s vs %s]",
+               ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                              s, buf2, sizeof(buf2)),
+               ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                  flow->detected_protocol, buf1, sizeof(buf1)));
+      }
+    } else {
+      if(s->protos[0] != flow->detected_protocol.proto.app_protocol) {
+        printf("[Stack %s vs %s]\n",
+               ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                              s, buf2, sizeof(buf2)),
+               ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                  flow->detected_protocol, buf1, sizeof(buf1)));
+      }
+    }
+#endif
+
+#ifdef NDPI_EXTENDED_SANITY_CHECKS
+    /* Be sure new stack logic is compatible with legacy code */
+    assert(ndpi_stack_get_upper_proto(&flow->detected_protocol.protocol_stack) == ndpi_get_upper_proto(flow->detected_protocol));
+    assert(ndpi_stack_get_lower_proto(&flow->detected_protocol.protocol_stack) == ndpi_get_lower_proto(flow->detected_protocol));
+#endif
+
+    fprintf(out, "%s/%s][Stack: %s][IP: %u/%s]",
 	    ndpi_protocol2id(flow->detected_protocol, buf, sizeof(buf)),
 	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 			       flow->detected_protocol, buf1, sizeof(buf1)),
+	    ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+		           &flow->detected_protocol.protocol_stack, buf2, sizeof(buf2)),
 	    flow->detected_protocol.protocol_by_ip,
 	    ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				flow->detected_protocol.protocol_by_ip));
