@@ -9944,7 +9944,6 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 	  /* match found */
 	  ret.proto.master_protocol = ret.proto.app_protocol = ndpi_str->nbpf_custom_proto[i].l7_protocol;
 	  ndpi_fill_protocol_category(ndpi_str, flow, &ret);
-	  ndpi_reconcile_protocols(ndpi_str, flow, &ret);
 	  flow->confidence = NDPI_CONFIDENCE_NBPF;
 
 	  return(ret);
