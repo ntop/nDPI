@@ -3,7 +3,7 @@ Guessed flow protos:	2
 DPI Packets (TCP):	36	(3.60 pkts/flow)
 DPI Packets (UDP):	91	(4.79 pkts/flow)
 DPI Packets (other):	5	(1.00 pkts/flow)
-Confidence DPI (partial)    : 1 (flows)
+Confidence Match by port    : 1 (flows)
 Confidence DPI (cache)      : 10 (flows)
 Confidence DPI              : 15 (flows)
 Confidence Match by IP      : 8 (flows)
@@ -29,18 +29,18 @@ Patricia protocols IPv6: 6/0 (search/found)
 
 MDNS	2	194	2
 ICMP	6	828	3
-TLS	4	295	1
+TLS	7	497	2
 ICMPV6	5	350	2
 Dropbox	2	348	1
-Telegram	636	339253	8
+Telegram	633	339051	7
 AmazonAWS	4	288	1
 TelegramVoip	228	41561	16
 
-Safe                             4 295           1            
-Acceptable                     883 382822        33           
+Safe                             7 497           2            
+Acceptable                     880 382620        32           
 
-Web                              4 295           1            
-Chat                           636 339253        8            
+Web                              7 497           2            
+Chat                           633 339051        7            
 VoIP                           228 41561         16           
 Cloud                            6 636           2            
 Network                         13 1372          7            
@@ -75,7 +75,7 @@ Network                         13 1372          7
 	28	ICMP 192.168.12.169:0 -> 91.108.9.35:0 [proto: 81/ICMP][IP: 185/Telegram][ClearText][Confidence: DPI][FPC: 81/ICMP, Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/276 bytes -> 0 pkts/0 bytes][Goodput ratio: 69/0][0.00 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic / Entropy: 5.590 (Executable?)][PLAIN TEXT (ORtRLoo/fpi)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	29	ICMP 192.168.12.169:0 -> 91.108.13.23:0 [proto: 81/ICMP][IP: 185/Telegram][ClearText][Confidence: DPI][FPC: 81/ICMP, Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/276 bytes -> 0 pkts/0 bytes][Goodput ratio: 69/0][0.00 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic / Entropy: 5.612 (Executable?)][PLAIN TEXT (BuBNffVSd)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	30	ICMP 192.168.12.169:0 -> 91.108.17.2:0 [proto: 81/ICMP][IP: 185/Telegram][ClearText][Confidence: DPI][FPC: 81/ICMP, Confidence: DPI][DPI packets: 1][cat: Network/14][2 pkts/276 bytes -> 0 pkts/0 bytes][Goodput ratio: 69/0][0.01 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic / Entropy: 5.737 (Executable?)][PLAIN TEXT (KHOirrFTCqEz)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	31	TCP 192.168.12.169:37948 <-> 149.154.167.91:443 [proto: 185/Telegram][IP: 185/Telegram][Encrypted][Confidence: DPI (partial)][FPC: 185/Telegram, Confidence: IP address][DPI packets: 3][cat: Chat/9][2 pkts/128 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.03 sec][Risk: ** TCP Connection Issues **** Probing Attempt **][Risk Score: 100][Risk Info: TCP probing attempt / Connection refused (client)][TCP Fingerprint: 2_64_65535_685ad951a756/Android][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	31	TCP 192.168.12.169:37948 <-> 149.154.167.91:443 [proto: 91/TLS][IP: 185/Telegram][Encrypted][Confidence: Match by port][FPC: 185/Telegram, Confidence: IP address][DPI packets: 3][cat: Web/5][2 pkts/128 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.03 sec][Risk: ** TCP Connection Issues **** Probing Attempt **][Risk Score: 100][Risk Info: TCP probing attempt / Connection refused (client)][TCP Fingerprint: 2_64_65535_685ad951a756/Android][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	UDP [fe80::abe:acff:fe0b:176e]:5353 -> [ff02::fb]:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 8/MDNS, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/107 bytes -> 0 pkts/0 bytes][Goodput ratio: 42/0][< 1 sec][Hostname/SNI: _ipps._tcp.local][_ipps._tcp.local][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	UDP 192.168.12.1:5353 -> 224.0.0.251:5353 [proto: 8/MDNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 8/MDNS, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/87 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Hostname/SNI: _ipps._tcp.local][_ipps._tcp.local][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	34	ICMPV6 [fe80::abe:acff:fe0b:176e]:0 -> [ff02::2]:0 [proto: 102/ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 102/ICMPV6, Confidence: DPI][DPI packets: 1][cat: Network/14][1 pkts/70 bytes -> 0 pkts/0 bytes][Goodput ratio: 11/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
