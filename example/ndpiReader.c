@@ -1754,8 +1754,10 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
             flow->protocol,
             f/1000.0, l/1000.0,
             (l-f)/1000.0,
-            flow->src_name, ntohs(flow->src_port),
-            flow->dst_name, ntohs(flow->dst_port)
+            flow->src_name ? flow->src_name : "",
+            ntohs(flow->src_port),
+            flow->dst_name ? flow->dst_name : "",
+            ntohs(flow->dst_port)
             );
 
     fprintf(csv_fp, "%s|",
@@ -1862,10 +1864,12 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     fprintf(out, "%s%s%s:%u %s %s%s%s:%u ",
 	    (flow->ip_version == 6) ? "[" : "",
-	    flow->src_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->src_port),
+      flow->src_name ? flow->src_name : "",
+      (flow->ip_version == 6) ? "]" : "", ntohs(flow->src_port),
 	    flow->bidirectional ? "<->" : "->",
 	    (flow->ip_version == 6) ? "[" : "",
-	    flow->dst_name, (flow->ip_version == 6) ? "]" : "", ntohs(flow->dst_port)
+      flow->dst_name ? flow->dst_name : "",
+      (flow->ip_version == 6) ? "]" : "", ntohs(flow->dst_port)
 	    );
 
     if(flow->vlan_id > 0) fprintf(out, "[VLAN: %u]", flow->vlan_id);
@@ -3006,8 +3010,8 @@ static void dump_realtime_protocol(struct ndpi_workflow * workflow, struct ndpi_
     inet_ntop(AF_INET, &flow->src_ip, srcip, sizeof(srcip));
     inet_ntop(AF_INET, &flow->dst_ip, dstip, sizeof(dstip));
   } else {
-    snprintf(srcip, sizeof(srcip), "[%s]", flow->src_name);
-    snprintf(dstip, sizeof(dstip), "[%s]", flow->dst_name);
+    snprintf(srcip, sizeof(srcip), "[%s]", flow->src_name ? flow->src_name : "");
+    snprintf(dstip, sizeof(dstip), "[%s]", flow->dst_name ? flow->dst_name : "");
   }
 
   ndpi_protocol2name(workflow->ndpi_struct, flow->detected_protocol, app_name, sizeof(app_name));
@@ -3420,7 +3424,7 @@ static void printFlowsStats() {
             ndpi_host_ja_fingerprints *newHost = ndpi_malloc(sizeof(ndpi_host_ja_fingerprints));
             newHost->host_client_info_hasht = NULL;
             newHost->host_server_info_hasht = NULL;
-            newHost->ip_string = all_flows[i].flow->src_name;
+            newHost->ip_string = all_flows[i].flow->src_name ? all_flows[i].flow->src_name : NULL;
             newHost->ip = all_flows[i].flow->src_ip;
             newHost->dns_name = all_flows[i].flow->host_server_name;
 
@@ -3454,7 +3458,7 @@ static void printFlowsStats() {
             ndpi_ip_dns *newHost = ndpi_malloc(sizeof(ndpi_ip_dns));
 
             newHost->ip = all_flows[i].flow->src_ip;
-            newHost->ip_string = all_flows[i].flow->src_name;
+            newHost->ip_string = all_flows[i].flow->src_name ? all_flows[i].flow->src_name : NULL;
             newHost->dns_name = all_flows[i].flow->host_server_name;
 
             ndpi_ja_fingerprints_host *newElement = ndpi_malloc(sizeof(ndpi_ja_fingerprints_host));
@@ -3471,7 +3475,7 @@ static void printFlowsStats() {
             if(innerElement == NULL) {
               ndpi_ip_dns *newInnerElement = ndpi_malloc(sizeof(ndpi_ip_dns));
               newInnerElement->ip = all_flows[i].flow->src_ip;
-              newInnerElement->ip_string = all_flows[i].flow->src_name;
+              newInnerElement->ip_string = all_flows[i].flow->src_name ? all_flows[i].flow->src_name : NULL;
               newInnerElement->dns_name = all_flows[i].flow->host_server_name;
               HASH_ADD_INT(hostByJAFound->ipToDNS_ht, ip, newInnerElement);
             }
@@ -3486,7 +3490,7 @@ static void printFlowsStats() {
             ndpi_host_ja_fingerprints *newHost = ndpi_malloc(sizeof(ndpi_host_ja_fingerprints));
             newHost->host_client_info_hasht = NULL;
             newHost->host_server_info_hasht = NULL;
-            newHost->ip_string = all_flows[i].flow->dst_name;
+            newHost->ip_string = all_flows[i].flow->dst_name ? all_flows[i].flow->dst_name : NULL;
             newHost->ip = all_flows[i].flow->dst_ip;
             newHost->dns_name = all_flows[i].flow->ssh_tls.server_info;
 
@@ -3517,7 +3521,7 @@ static void printFlowsStats() {
             ndpi_ip_dns *newHost = ndpi_malloc(sizeof(ndpi_ip_dns));
 
             newHost->ip = all_flows[i].flow->dst_ip;
-            newHost->ip_string = all_flows[i].flow->dst_name;
+            newHost->ip_string = all_flows[i].flow->dst_name ? all_flows[i].flow->dst_name : NULL;
             newHost->dns_name = all_flows[i].flow->ssh_tls.server_info;;
 
             ndpi_ja_fingerprints_host *newElement = ndpi_malloc(sizeof(ndpi_ja_fingerprints_host));
@@ -3535,7 +3539,7 @@ static void printFlowsStats() {
             if(innerElement == NULL) {
               ndpi_ip_dns *newInnerElement = ndpi_malloc(sizeof(ndpi_ip_dns));
               newInnerElement->ip = all_flows[i].flow->dst_ip;
-              newInnerElement->ip_string = all_flows[i].flow->dst_name;
+              newInnerElement->ip_string = all_flows[i].flow->dst_name ? all_flows[i].flow->dst_name : NULL;
               newInnerElement->dns_name = all_flows[i].flow->ssh_tls.server_info;
               HASH_ADD_INT(hostByJAFound->ipToDNS_ht, ip, newInnerElement);
             }
@@ -3921,9 +3925,9 @@ static void printFlowsStats() {
                       i,
                       ndpi_protocol2name(ndpi_thread_info[0].workflow->ndpi_struct,
                                          all_flows[i].flow->detected_protocol, buf, sizeof(buf)),
-                      all_flows[i].flow->src_name,
+                      all_flows[i].flow->src_name ? all_flows[i].flow->src_name : "",
                       ntohs(all_flows[i].flow->src_port),
-                      all_flows[i].flow->dst_name,
+                      all_flows[i].flow->dst_name ? all_flows[i].flow->dst_name : "",
                       ntohs(all_flows[i].flow->dst_port));
 
               print_bin(out, NULL, &bins[i]);

@@ -207,8 +207,10 @@ void ndpi_payload_analyzer(struct ndpi_flow_info *flow,
 #ifdef DEBUG_PAYLOAD
     printf("[hashval: %u][proto: %u][vlan: %u][%s:%u <-> %s:%u][direction: %s][payload_len: %u]\n",
 	   flow->hashval, flow->protocol, flow->vlan_id,
-	   flow->src_name, flow->src_port,
-	   flow->dst_name, flow->dst_port,
+     flow->src_name ? flow->src_name : "",
+     flow->src_port,
+     flow->dst_name ? flow->dst_name : "",
+     flow->dst_port,
 	   src_to_dst_direction ? "s2d" : "d2s",
 	   payload_len);
 #endif
@@ -602,6 +604,8 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
   ndpi_free_bin(&flow->payload_len_bin);
 #endif
 
+  if(flow->src_name)        ndpi_free(flow->src_name);
+  if(flow->dst_name)        ndpi_free(flow->dst_name);
   if(flow->tcp_fingerprint) ndpi_free(flow->tcp_fingerprint);
   if(flow->risk_str)        ndpi_free(flow->risk_str);
   if(flow->flow_payload)    ndpi_free(flow->flow_payload);
@@ -913,18 +917,29 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
       ndpi_init_bin(&newflow->payload_len_bin, ndpi_bin_family8, PLEN_NUM_BINS);
 #endif
 
-      if(version == IPVERSION) {
-	inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, sizeof(newflow->src_name));
-	inet_ntop(AF_INET, &newflow->dst_ip, newflow->dst_name, sizeof(newflow->dst_name));
-      } else {
-        newflow->src_ip6 = *(struct ndpi_in6_addr *)&iph6->ip6_src;
-        inet_ntop(AF_INET6, &newflow->src_ip6,
-                  newflow->src_name, sizeof(newflow->src_name));
-        newflow->dst_ip6 = *(struct ndpi_in6_addr *)&iph6->ip6_dst;
-        inet_ntop(AF_INET6, &newflow->dst_ip6,
-                  newflow->dst_name, sizeof(newflow->dst_name));
-        /* For consistency across platforms replace :0: with :: */
-        ndpi_patchIPv6Address(newflow->src_name), ndpi_patchIPv6Address(newflow->dst_name);
+      if (version == 4 || version == 6) {
+        uint16_t inet_addrlen = (version == 4) ? INET_ADDRSTRLEN : INET6_ADDRSTRLEN;
+        newflow->src_name = ndpi_malloc(inet_addrlen);
+        newflow->dst_name = ndpi_malloc(inet_addrlen);
+
+        if(version == 4) {
+          if (newflow->src_name)
+            inet_ntop(AF_INET, &newflow->src_ip, newflow->src_name, inet_addrlen);
+          if (newflow->dst_name)
+            inet_ntop(AF_INET, &newflow->dst_ip, newflow->dst_name, inet_addrlen);
+        } else if (version == 6) {
+          newflow->src_ip6 = *(struct ndpi_in6_addr *)&iph6->ip6_src;
+          newflow->dst_ip6 = *(struct ndpi_in6_addr *)&iph6->ip6_dst;
+
+          if (newflow->src_name)
+            inet_ntop(AF_INET6, &newflow->src_ip6, newflow->src_name, inet_addrlen);
+          if (newflow->dst_name)
+            inet_ntop(AF_INET6, &newflow->dst_ip6, newflow->dst_name, inet_addrlen);
+
+          /* For consistency across platforms replace :0: with :: */
+          if (newflow->src_name) ndpi_patchIPv6Address(newflow->src_name);
+          if (newflow->dst_name) ndpi_patchIPv6Address(newflow->dst_name);
+        }
       }
 
       if((newflow->ndpi_flow = ndpi_flow_malloc(SIZEOF_FLOW_STRUCT)) == NULL) {
@@ -1117,9 +1132,9 @@ static void dump_flow_fingerprint(struct ndpi_workflow * workflow,
     u_int32_t buffer_len;
 
     ndpi_serialize_string_uint32(&serializer, "proto", flow->protocol);
-    ndpi_serialize_string_string(&serializer, "cli_ip", flow->src_name);
+    ndpi_serialize_string_string(&serializer, "cli_ip", flow->src_name ? flow->src_name : "");
     ndpi_serialize_string_uint32(&serializer, "cli_port", ntohs(flow->src_port));
-    ndpi_serialize_string_string(&serializer, "srv_ip", flow->dst_name);
+    ndpi_serialize_string_string(&serializer, "srv_ip", flow->dst_name ? flow->dst_name : "");
     ndpi_serialize_string_uint32(&serializer, "srv_port", ntohs(flow->dst_port));
     ndpi_serialize_string_string(&serializer, "proto",
 				 ndpi_protocol2name(workflow->ndpi_struct,
