@@ -74,7 +74,7 @@ static void ndpi_check_websocket(struct ndpi_detection_module_struct *ndpi_struc
 
   if (packet->payload_packet_len != hdr_size + websocket_payload_length)
     {
-      NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload");
+      NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload\n");
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
@@ -88,7 +88,7 @@ static void ndpi_check_websocket(struct ndpi_detection_module_struct *ndpi_struc
     set_websocket_detected(ndpi_struct, flow);
 
   } else {
-    NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload");
+    NDPI_LOG_DBG(ndpi_struct, "Invalid WEBSOCKET payload\n");
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
@@ -96,7 +96,7 @@ static void ndpi_check_websocket(struct ndpi_detection_module_struct *ndpi_struc
 
 static void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  // Break after 6 packets.
+  // Break after 10 packets.
   if (flow->packet_counter > 10)
     {
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
@@ -112,17 +112,21 @@ static void ndpi_search_websocket(struct ndpi_detection_module_struct *ndpi_stru
   {
     struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
     uint16_t i;
+    int found = 0;
 
     NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct, flow, packet);
     for (i = 0; i < packet->parsed_lines; i++) {
       if (LINE_STARTS(packet->line[i], "upgrade:") != 0 &&
           LINE_ENDS(packet->line[i], "websocket") != 0)
       {
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBSOCKET,
-                                   NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+        if(found == 0)
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBSOCKET,
+                                     NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+        found = 1;
       } else if (LINE_STARTS(packet->line[i], "sec-websocket") != 0) {
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBSOCKET,
-                                   NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+        if(found == 0)
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBSOCKET,
+                                     NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
         if (ndpi_strncasestr((const char *)packet->line[i].ptr, "chisel",
                              packet->line[i].len) != NULL)
         {
