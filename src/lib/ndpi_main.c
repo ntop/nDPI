@@ -11380,34 +11380,11 @@ int ndpi_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
   return rc < 0 ? rc : (int)ret_match->protocol_id;
 }
 
-/* **************************************** */
-
-static u_int8_t ndpi_is_more_generic_protocol(u_int16_t previous_proto, u_int16_t new_proto) {
-  /* Sometimes certificates are more generic than previously identified protocols */
-
-  if((previous_proto == NDPI_PROTOCOL_UNKNOWN) || (previous_proto == new_proto))
-    return(0);
-
-  switch(previous_proto) {
-  case NDPI_PROTOCOL_WHATSAPP_CALL:
-  case NDPI_PROTOCOL_WHATSAPP_FILES:
-    if(new_proto == NDPI_PROTOCOL_WHATSAPP)
-      return(1);
-    break;
-  case NDPI_PROTOCOL_FACEBOOK_VOIP:
-    if(new_proto == NDPI_PROTOCOL_FACEBOOK)
-      return(1);
-    break;
-  }
-
-  return(0);
-}
-
 /* ****************************************************** */
 
 static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
-						      struct ndpi_flow_struct *flow, char *string_to_match,
-						      u_int string_to_match_len, u_int16_t master_protocol_id,
+						      char *string_to_match,
+						      u_int string_to_match_len,
 						      ndpi_protocol_match_result *ret_match) {
   int matching_protocol_id;
 
@@ -11430,20 +11407,7 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
   }
 #endif
 
-  if(flow &&
-     (matching_protocol_id != NDPI_PROTOCOL_UNKNOWN) &&
-     (!ndpi_is_more_generic_protocol(flow->detected_protocol_stack[0], matching_protocol_id))) {
-    /* Move the protocol on slot 0 down one position */
-    flow->detected_protocol_stack[1] = master_protocol_id,
-      flow->detected_protocol_stack[0] = matching_protocol_id;
-    flow->confidence = NDPI_CONFIDENCE_DPI;
-    if(!category_depends_on_master(master_protocol_id) &&
-       flow->category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
-      flow->category = ret_match->protocol_category;
-
-    return(flow->detected_protocol_stack[0]);
-  }
-  if(!flow && matching_protocol_id != NDPI_PROTOCOL_UNKNOWN)
+  if(matching_protocol_id != NDPI_PROTOCOL_UNKNOWN)
     return matching_protocol_id;
 
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
@@ -11493,19 +11457,27 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 
   memset(ret_match, 0, sizeof(*ret_match));
 
-  rc = ndpi_automa_match_string_subprotocol(ndpi_str, update_flow_classification ? flow : NULL,
+  rc = ndpi_automa_match_string_subprotocol(ndpi_str,
 					    string_to_match, string_to_match_len,
-					    master_protocol_id, ret_match);
+					    ret_match);
   id = ret_match->protocol_category;
 
   if(ndpi_get_custom_category_match(ndpi_str, string_to_match,
 				    string_to_match_len, &id) != -1) {
-    /* if(id != -1) */ {
-      ret_match->protocol_category = id;
-      flow->category = id;
-      rc = master_protocol_id;
+    ret_match->protocol_category = id;
+    rc = master_protocol_id;
+  }
+
+  if(update_flow_classification && ret_match->protocol_id != NDPI_PROTOCOL_UNKNOWN ) {
+    ndpi_set_detected_protocol(ndpi_str, flow, ret_match->protocol_id, master_protocol_id, NDPI_CONFIDENCE_DPI);
+
+    if(ret_match->protocol_id == NDPI_PROTOCOL_OOKLA) {
+      ookla_add_to_cache(ndpi_str, flow);
     }
   }
+  if(!category_depends_on_master(master_protocol_id) &&
+     ret_match->protocol_category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+    flow->category = ret_match->protocol_category;
 
   if(ndpi_str->risky_domain_automa.ac_automa != NULL) {
     u_int32_t proto_id;
@@ -11559,14 +11531,6 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
 					 &ret_match, master_protocol, 1);
 
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, subproto, master_protocol, NDPI_CONFIDENCE_DPI);
-    if(!category_depends_on_master(master_protocol))
-      change_category(flow, ret_match.protocol_category);
-
-    if(subproto == NDPI_PROTOCOL_OOKLA) {
-      ookla_add_to_cache(ndpi_struct, flow);
-    }
-
     return(1);
   } else
     return(0);
