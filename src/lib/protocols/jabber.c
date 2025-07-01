@@ -42,9 +42,10 @@ static struct jabber_string jabber_strings[] = {
 
 static void ndpi_int_jabber_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					   struct ndpi_flow_struct *flow,
+					   u_int32_t master,
 					   u_int32_t protocol, ndpi_confidence_t confidence)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, NDPI_PROTOCOL_UNKNOWN, confidence);
+  ndpi_set_detected_protocol(ndpi_struct, flow, protocol, master, confidence);
 }
 
 static void check_content_type_and_change_protocol(struct ndpi_detection_module_struct *ndpi_struct,
@@ -55,7 +56,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
   for(i=0; jabber_strings[i].string != NULL; i++) {
     if(ndpi_strnstr((const char*)&packet->payload[x], jabber_strings[i].string, left) != NULL) {    
-      ndpi_int_jabber_add_connection(ndpi_struct, flow, jabber_strings[i].ndpi_protocol, NDPI_CONFIDENCE_DPI);
+      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, jabber_strings[i].ndpi_protocol, NDPI_CONFIDENCE_DPI);
       return;
     }
   }  
@@ -76,7 +77,7 @@ static void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_str
     /* Old style Jabber/XMPP SSL. */
     if (flow->packet_counter > max_packets - 1)
     {
-      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
       return;
     }
     for (i = 0; i < NDPI_ARRAY_LENGTH(valid_patterns); ++i)
@@ -97,7 +98,7 @@ static void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_str
       ndpi_strnstr((const char *)&packet->payload[0],
                    "xmlns='http://jabber.org/protocol/", packet->payload_packet_len) != NULL)
   {
-    ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+    ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
     return;
   }
 
@@ -106,14 +107,14 @@ static void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_str
       ndpi_strnstr((const char *)&packet->payload[0],
                    "xmlns='http://jabber.org/protocol/commands'", packet->payload_packet_len) != NULL)
   {
-    ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+    ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
     return;
   }
 
   if (packet->payload_packet_len == NDPI_STATICSTRING_LEN("</stream:stream>") &&
       memcmp(packet->payload, "</stream:stream>", NDPI_STATICSTRING_LEN("</stream:stream>")) == 0)
   {
-    ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+    ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
     return;
   }
 
@@ -126,7 +127,7 @@ static void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_str
        || ndpi_strnstr((const char *)&packet->payload[13], "xmlns:stream=\"http://etherx.jabber.org/streams\"", start)) {
   
       /* Protocol family */
-      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
+      ndpi_int_jabber_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_JABBER, NDPI_CONFIDENCE_DPI);
 
       /* search for subprotocols */
       check_content_type_and_change_protocol(ndpi_struct, flow, 13);
