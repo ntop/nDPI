@@ -1,0 +1,29 @@
+DPI Packets (UDP):	1	(1.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 149 (149.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+
+EasyWeather	12	1056	1
+
+Acceptable                      12 1056          1            
+
+Network                         12 1056          1            
+
+	1	UDP 192.168.178.101:2525 -> 255.255.255.255:59387 [proto: 453/EasyWeather][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 453/EasyWeather, Confidence: DPI][DPI packets: 1][cat: Network/14][12 pkts/1056 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][24.00 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1945/0 2194/0 4001/0 604/0][Pkt Len c2s/s2c min/avg/max/stddev: 88/0 88/0 88/0 0/0][PLAIN TEXT (EasyWeather)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

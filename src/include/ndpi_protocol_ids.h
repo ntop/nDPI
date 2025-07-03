@@ -481,6 +481,7 @@ typedef enum {
   NDPI_PROTOCOL_KICK                  = 450,
   NDPI_PROTOCOL_HAMACHI               = 451,
   NDPI_PROTOCOL_GLBP                  = 452,
+  NDPI_PROTOCOL_EASYWEATHER           = 453,
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_protocol_ids.h"

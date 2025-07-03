@@ -3729,3 +3729,10 @@ References: `LogMeIn Hamachi official site: <https://vpn.net/>`_
 Gateway Load Balancing Protocol (GLBP) - Cisco proprietary protocol that provides first-hop redundancy and load balancing for IPv4 and IPv6 networks.
 
 References: `Cisco GLBP Configuration Guide <https://www.cisco.com/en/US/docs/ios/12_2t/12_2t15/feature/guide/ft_glbp.html>`_
+
+
+.. _Proto_453:
+
+`NDPI_PROTOCOL_EASYWEATHER`
+===========================
+The EasyWeather protocol is a proprietary UDP based protocool used by some weather stations to announce and export weather data over a network.
