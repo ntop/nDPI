@@ -70,6 +70,7 @@ union ja_info {
     u_int16_t num_signature_algorithms, signature_algorithms[MAX_NUM_JA];
     u_int16_t num_supported_versions, supported_versions[MAX_NUM_JA];
     char signature_algorithms_str[MAX_JA_STRLEN], alpn[MAX_JA_STRLEN];
+    char alpn_original_last;  /* Store original last character before null terminator */
   } client;
 
   struct {
@@ -2207,10 +2208,19 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   ja_str[3] = ndpi_isset_risk(flow, NDPI_NUMERIC_IP_HOST) ? 'i' : 'd', ja_str_len = 4;
 
   /* JA4_a */
+  /* first + last character of the ALPN string (or '0' if missing) */
+  char alpn_first = (ja->client.alpn[0] != '\0') ? ja->client.alpn[0] : '0';
+  char alpn_last  = ja->client.alpn_original_last;  /* Use original last character before null terminator */
+
+#ifdef DEBUG_JA
+  size_t alpn_len = strlen(ja->client.alpn);
+  printf("[JA4 DEBUG] ALPN string: '%s' (len=%zu)\n", ja->client.alpn, alpn_len);
+  printf("[JA4 DEBUG] First='%c', Last='%c'\n", alpn_first, alpn_last);
+#endif
+
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len, "%02u%02u%c%c_",
 		     ja->client.num_ciphers, ja->client.num_tls_extensions,
-		     (ja->client.alpn[0] == '\0') ? '0' : ja->client.alpn[0],
-		     (ja->client.alpn[0] == '\0') ? '0' : ja->client.alpn[strlen(ja->client.alpn)-1]);
+		     alpn_first, alpn_last);
   if((rc > 0) && (ja_str_len + rc < JA_STR_LEN)) ja_str_len += rc;
 
   /* Sort ciphers and extensions */
@@ -2614,6 +2624,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       ja.client.num_supported_versions = 0;
       ja.client.signature_algorithms_str[0] = '\0';
       ja.client.alpn[0] = '\0', ja.client.alpn[1] = '\0' /* used by JA4 */;
+      ja.client.alpn_original_last = '0'; /* Initialize to '0' if no ALPN */
 
       flow->protos.tls_quic.ssl_version = ja.client.tls_handshake_version = tls_version;
       if(flow->protos.tls_quic.ssl_version < 0x0303) /* < TLSv1.2 */ {
@@ -3158,6 +3169,22 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
                 alpn_str_len = ndpi_min(sizeof(ja.client.alpn), (size_t)alpn_str_len);
 		memcpy(ja.client.alpn, alpn_str, alpn_str_len);
+		
+		/* Store the last character of the first ALPN protocol (before any semicolon) */
+		ja.client.alpn_original_last = '0';
+		if(alpn_str_len > 0) {
+		  /* Find the end of the first ALPN protocol (before semicolon or comma) */
+		  int first_alpn_end = 0;
+		  for(first_alpn_end = 0; first_alpn_end < alpn_str_len; first_alpn_end++) {
+		    if(ja.client.alpn[first_alpn_end] == ';' || ja.client.alpn[first_alpn_end] == ',') {
+		      break;
+		    }
+		  }
+		  if(first_alpn_end > 0) {
+		    ja.client.alpn_original_last = ja.client.alpn[first_alpn_end - 1];
+		  }
+		}
+		
 		if(alpn_str_len > 0)
 		  ja.client.alpn[alpn_str_len - 1] = '\0';
 
