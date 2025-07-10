@@ -2205,7 +2205,15 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
     break;
   }
 
-  ja_str[3] = ndpi_isset_risk(flow, NDPI_NUMERIC_IP_HOST) ? 'i' : 'd', ja_str_len = 4;
+  /* Check if SNI extension exists at all */
+  if(flow->host_server_name[0] == '\0') {
+    ja_str[3] = 'i';  /* No SNI extension */
+  } else if(ndpi_isset_risk(flow, NDPI_NUMERIC_IP_HOST)) {
+    ja_str[3] = 'i';  /* SNI contains IP address */
+  } else {
+    ja_str[3] = 'd';  /* SNI contains domain name */
+  }
+  ja_str_len = 4;
 
   /* JA4_a */
   /* first + last character of the ALPN string (or '0' if missing) */
