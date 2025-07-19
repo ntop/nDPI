@@ -11447,7 +11447,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 
   if(!ndpi_str) return(-1);
 
-  snprintf(buf, sizeof(buf), "%*s", _string_to_match_len, _string_to_match);
+  snprintf(buf, sizeof(buf), "%.*s", _string_to_match_len, _string_to_match);
   string_to_match = (char*)ndpi_get_host_domain(ndpi_str, buf);
   string_to_match_len = strlen(string_to_match);
 
