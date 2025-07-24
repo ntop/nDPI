@@ -42,9 +42,7 @@ fi
 
 # build project
 cd ndpi
-# Set LDFLAGS variable as workaround for the "missing
-# dependencies errors" in the introspector build. See #8939
-RANLIB=llvm-ranlib LDFLAGS="-L/usr/local/lib -lpcap" ./autogen.sh --enable-fuzztargets --enable-tls-sigs
+RANLIB=llvm-ranlib ./autogen.sh --enable-fuzztargets --enable-tls-sigs
 make -j$(nproc)
 # Copy fuzzers
 ls fuzz/fuzz* | grep -v "\." | while read -r i; do cp "$i" "$OUT"/; done
