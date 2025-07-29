@@ -8,7 +8,8 @@
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
-  u_int16_t value16, i, rc, num_iteration, data_len, is_added = 0;
+  u_int16_t i, rc, num_iteration, data_len, is_added = 0;
+  u_int32_t value32;
   std::vector<char>value_added;
   ndpi_str_hash *h = NULL;
 
@@ -44,11 +45,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     data_len = fuzzed_data.ConsumeIntegralInRange(0, 127);
     std::vector<char>data = fuzzed_data.ConsumeBytes<char>(data_len);
 
-    ndpi_hash_find_entry(h, data.data(), data.size(), &value16);
+    ndpi_hash_find_entry(h, data.data(), data.size(), &value32);
   }
   /* Search of an added entry */
   if (is_added) {
-    ndpi_hash_find_entry(h, value_added.data(), value_added.size(), &value16);
+    ndpi_hash_find_entry(h, value_added.data(), value_added.size(), &value32);
   }
 
   if (fuzzed_data.ConsumeBool())

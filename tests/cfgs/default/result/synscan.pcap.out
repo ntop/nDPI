@@ -90,11 +90,11 @@ LDP	2	116	2
 JRMI	2	116	2
 iSCSI	2	116	2
 
+Unrated                       1846 107076        1842         
 Safe                            14 812           14           
 Acceptable                     135 7856          122          
 Fun                              8 464           8            
 Unsafe                           8 464           8            
-Unrated                       1846 107076        1842         
 
 Unspecified                   1848 107192        1844         
 Media                            4 232           4            

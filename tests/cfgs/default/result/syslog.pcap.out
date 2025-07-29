@@ -25,8 +25,8 @@ Patricia protocols IPv6: 2/0 (search/found)
 Unknown	1	78	1
 Syslog	93	20321	21
 
-Acceptable                      93 20321         21           
 Unrated                          1 78            1            
+Acceptable                      93 20321         21           
 
 Unspecified                      1 78            1            
 System                          93 20321         21           

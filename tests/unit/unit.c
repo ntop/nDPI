@@ -295,7 +295,8 @@ int serializeProtoUnitTest(void)
     ndpi_proto.proto.master_protocol = NDPI_PROTOCOL_TLS,
       ndpi_proto.proto.app_protocol = NDPI_PROTOCOL_FACEBOOK,
       ndpi_proto.protocol_by_ip = NDPI_PROTOCOL_FACEBOOK,
-      ndpi_proto.category = NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK;
+      ndpi_proto.category = NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK,
+      ndpi_proto.breed = NDPI_PROTOCOL_FUN;
        
     NDPI_SET_BIT(risks, NDPI_MALFORMED_PACKET);
     NDPI_SET_BIT(risks, NDPI_TLS_WEAK_CIPHER);

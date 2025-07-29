@@ -73,7 +73,7 @@ u_int32_t ndpi_domain_classify_size(ndpi_domain_classify *s) {
 
 bool ndpi_domain_classify_add(struct ndpi_detection_module_struct *ndpi_str,
 			      ndpi_domain_classify *s,
-			      u_int16_t class_id,
+			      u_int32_t class_id,
 			      char *domain) {
 #ifdef ENCODE_DATA
   u_int32_t out_len;
@@ -107,7 +107,7 @@ bool ndpi_domain_classify_add(struct ndpi_detection_module_struct *ndpi_str,
 
 u_int32_t ndpi_domain_classify_add_domains(struct ndpi_detection_module_struct *ndpi_mod,
 					   ndpi_domain_classify *s,
-					   u_int16_t class_id,
+					   u_int32_t class_id,
 					   char *file_path) {
   u_int32_t num_added = 0;
   char buf[256];
@@ -148,7 +148,7 @@ u_int32_t ndpi_domain_classify_add_domains(struct ndpi_detection_module_struct *
 
 bool ndpi_domain_classify_hostname(struct ndpi_detection_module_struct *ndpi_mod,
 				   ndpi_domain_classify *s,
-				   u_int16_t *class_id /* out */,
+				   u_int32_t *class_id /* out */,
 				   char *hostname) {
   const char *dot;
   char *item;

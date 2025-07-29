@@ -29,8 +29,8 @@ SMBv23	6	1914	3
 Kerberos	48	19194	24
 LDAP	14	4152	7
 
-Acceptable                      68 25260         34           
 Unrated                          9 3031          2            
+Acceptable                      68 25260         34           
 
 Unspecified                      9 3031          2            
 Network                         48 19194         24           

@@ -450,11 +450,11 @@ static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct*
         ndpi_set_risk(ndpi_struct, flow, NDPI_OBFUSCATED_TRAFFIC, "Obfuscated TLS-in-HTTP-WebSocket traffic");
     }
 
-    ndpi_protocol ret;
-    ret.proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
-    ret.proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
-    ret.category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
-    flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+    ndpi_master_app_protocol proto;
+    proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
+    proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
+    flow->category = get_proto_category(ndpi_struct, proto);
+    flow->breed = get_proto_breed(ndpi_struct, proto);
   }
   NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow); /* Not necessary in extra-dissection data path,
                                                 but we need it with the plain heuristic */
@@ -680,13 +680,13 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
       if(ndpi_lru_find_cache(ndpi_struct->tls_cert_cache, key,
 			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */,
 			     ndpi_get_current_time(flow))) {
-	ndpi_protocol ret;
+        ndpi_master_app_protocol proto;
 
 	ndpi_set_detected_protocol(ndpi_struct, flow, cached_proto, ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI_CACHE);
-	ret.proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
-	ret.proto.app_protocol = cached_proto;
-	ret.category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
-	flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+	proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
+	proto.app_protocol = cached_proto;
+	flow->category = get_proto_category(ndpi_struct, proto);
+	flow->breed = get_proto_breed(ndpi_struct, proto);
 	ndpi_check_subprotocol_risk(ndpi_struct, flow, cached_proto);
 	ndpi_unset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST);
       }
@@ -1095,13 +1095,13 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
       if(rc == 0) {
 	/* Match found */
 	u_int16_t proto_id = (u_int16_t)val;
-	ndpi_protocol ret;
+	ndpi_master_app_protocol proto;
 
 	ndpi_set_detected_protocol(ndpi_struct, flow, proto_id, ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI);
-	ret.proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
-	ret.proto.app_protocol = proto_id;
-	ret.category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
-	flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+	proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
+	proto.app_protocol = proto_id;
+	flow->category = get_proto_category(ndpi_struct, proto);
+	flow->breed = get_proto_breed(ndpi_struct, proto);
 	ndpi_check_subprotocol_risk(ndpi_struct, flow, proto_id);
 	ndpi_unset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST);
 
@@ -1764,11 +1764,11 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
       /* DTLS mid session: no need to further inspect the flow */
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DTLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
-      ndpi_protocol ret;
-      ret.proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
-      ret.proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
-      ret.category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
-      flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+      ndpi_master_app_protocol proto;
+      proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
+      proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
+      flow->category = get_proto_category(ndpi_struct, proto);
+      flow->breed = get_proto_breed(ndpi_struct, proto);
 
       flow->tls_quic.certificate_processed = 1; /* Fake, to avoid extra dissection */
       break;
@@ -3332,7 +3332,7 @@ compute_ja4c:
 	        ndpi_compute_ja4(ndpi_struct, flow, quic_version, &ja);		
 		
 		if(ndpi_struct->ja4_custom_protos != NULL) {
-		  u_int16_t proto_id;
+		  u_int32_t proto_id;
 
 		  /* This protocol has been defined in protos.txt-like files */
 		  if(ndpi_hash_find_entry(ndpi_struct->ja4_custom_protos,

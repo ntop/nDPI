@@ -39,11 +39,11 @@ WSD	41	39162	4
 LLMNR	10	770	6
 NAT-PMP	4	176	4
 
+Unrated                        298 19232         86           
 Safe                            21 4395          1            
 Acceptable                     184 57460         38           
 Potentially_Dangerous          3374 495188        634          
 Dangerous                        5 1215          1            
-Unrated                        298 19232         86           
 
 Unspecified                    298 19232         86           
 Media                           21 10027         2            

@@ -897,8 +897,9 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
     else
       ndpi_set_detected_protocol(ndpi_struct, flow, proto.master_protocol, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   }
-  /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol */
+  /* Category is always NDPI_PROTOCOL_CATEGORY_NETWORK, regardless of the subprotocol. Same for the breed */
   flow->category = NDPI_PROTOCOL_CATEGORY_NETWORK;
+  flow->breed = NDPI_PROTOCOL_ACCEPTABLE;
 
   if(!flow->extra_packets_func &&
      ndpi_struct->cfg.dns_parse_response_enabled &&

@@ -25,8 +25,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 Unknown	4	1524	1
 ESP	2	332	1
 
-Safe                             2 332           1            
 Unrated                          4 1524          1            
+Safe                             2 332           1            
 
 Unspecified                      4 1524          1            
 VPN                              2 332           1            

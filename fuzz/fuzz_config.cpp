@@ -738,7 +738,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   struct in_addr pin;
   struct in6_addr pin6;
-  u_int16_t suffix_id;
+  u_int32_t suffix_id;
   
   pin.s_addr = fuzzed_data.ConsumeIntegral<u_int32_t>();
   ndpi_network_port_ptree_match(ndpi_info_mod, &pin, fuzzed_data.ConsumeIntegral<u_int16_t>());

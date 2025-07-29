@@ -1066,17 +1066,17 @@ typedef enum {
 } ndpi_fpc_confidence_t;
 
 typedef enum {
-  NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn't provide risks for the network. (e.g., a news site) */
+  NDPI_PROTOCOL_UNRATED = 0,           /* No idea, not implemented or impossible to classify */
+  NDPI_PROTOCOL_SAFE,                  /* Surely doesn't provide risks for the network. (e.g., a news site) */
   NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn't provide risks, but could be malicious (e.g., Dropbox) */
   NDPI_PROTOCOL_FUN,                   /* Pure fun protocol, which may be prohibited by the user policy (e.g., Netflix) */
   NDPI_PROTOCOL_UNSAFE,                /* Probably provides risks, but could be a normal traffic. Unencrypted protocols with clear pass should be here (e.g., telnet) */
   NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Possibly dangerous (ex. Tor). */
   NDPI_PROTOCOL_DANGEROUS,             /* Surely is dangerous (ex. smbv1). Be prepared to troubles */
   NDPI_PROTOCOL_TRACKER_ADS,           /* Trackers, Advertisements... */
-  NDPI_PROTOCOL_UNRATED                /* No idea, not implemented or impossible to classify */
 } ndpi_protocol_breed_t;
 
-#define NUM_BREEDS (NDPI_PROTOCOL_UNRATED+1)
+#define NDPI_NUM_BREEDS (NDPI_PROTOCOL_TRACKER_ADS+1)
 
 /*
   Abstract categories to group the protocols.
@@ -1285,8 +1285,10 @@ typedef struct ndpi_proto {
   struct ndpi_proto_stack protocol_stack;
   u_int16_t protocol_by_ip;
   ndpi_protocol_category_t category;
+  ndpi_protocol_breed_t breed;
   void *custom_category_userdata;
 } ndpi_protocol;
+
 
 #define NUM_CUSTOM_CATEGORIES      5
 #define CUSTOM_CATEGORY_LABEL_LEN 32
@@ -1414,6 +1416,7 @@ struct ndpi_flow_struct {
   u_int64_t last_packet_time_ms;
 
   ndpi_protocol_category_t category;
+  ndpi_protocol_breed_t breed;
 
   /* Counters with only packets with L5 data (ie no TCP SYN, pure ACKs, ...) */
   u_int16_t packet_counter;

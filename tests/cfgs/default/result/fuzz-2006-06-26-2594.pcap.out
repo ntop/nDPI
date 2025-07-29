@@ -36,10 +36,10 @@ SMBv23	3	186	1
 RTP	5	1070	1
 SIP	82	37904	15
 
+Unrated                         33 4066          33           
 Acceptable                     481 74941         198          
 Unsafe                          36 2569          12           
 Dangerous                        6 1377          3            
-Unrated                         33 4066          33           
 
 Unspecified                     33 4066          33           
 Media                            5 1070          1            
