@@ -37,8 +37,13 @@ static void ndpi_search_whois_das(struct ndpi_detection_module_struct *ndpi_stru
     if((((sport == 43) || (dport == 43)) || ((sport == 4343) || (dport == 4343))) &&
        packet->payload_packet_len > 2 &&
        packet->payload[packet->payload_packet_len - 2] == '\r' &&
-       packet->payload[packet->payload_packet_len - 1] == '\n') {
-	
+       packet->payload[packet->payload_packet_len - 1] == '\n' &&
+       /* To avoid false positives with other cleartext protocol (i.e. mails).
+          This check is maybe not perfect, but WHOIS/DAS is not the most
+          important/used protocols nowadays
+        */
+       ndpi_is_valid_hostname((char * const)&packet->payload[0], packet->payload_packet_len - 2)) {
+
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHOIS_DAS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
       if((dport == 43) || (dport == 4343)) { /* Request */
