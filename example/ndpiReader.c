@@ -1743,6 +1743,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
   char buf2_ver[16];
   char l4_proto_name[32];
   u_int i;
+  ndpi_protocol_breed_t breed;
 
   if(csv_fp != NULL) {
     float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
@@ -1979,6 +1980,10 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	      ndpi_category_get_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				     flow->detected_protocol.category),
 	      (unsigned int)flow->detected_protocol.category);
+
+    breed = ndpi_get_proto_breed(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                 ndpi_get_upper_proto(flow->detected_protocol));
+    fprintf(out, "[Breed: %s]", ndpi_get_proto_breed_name(breed));
 
     fprintf(out, "[%u pkts/%llu bytes ", flow->src2dst_packets, (long long unsigned int) flow->src2dst_bytes);
     fprintf(out, "%s %u pkts/%llu bytes]",

@@ -26,4 +26,4 @@ Acceptable                       2 144           1
 
 IoT-Scada                        2 144           1            
 
-	1	UDP 127.0.0.1:39819 -> 127.0.0.1:1628 [proto: 422/CNP-IP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 422/CNP-IP, Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][2 pkts/144 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][0.01 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 127.0.0.1:39819 -> 127.0.0.1:1628 [proto: 422/CNP-IP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 422/CNP-IP, Confidence: DPI][DPI packets: 1][cat: IoT-Scada/31][Breed: Acceptable][2 pkts/144 bytes -> 0 pkts/0 bytes][Goodput ratio: 41/0][0.01 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

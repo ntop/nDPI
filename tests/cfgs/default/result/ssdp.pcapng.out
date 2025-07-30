@@ -26,4 +26,4 @@ Acceptable                       1 848           1
 
 System                           1 848           1            
 
-	1	UDP 192.168.1.173:58006 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][1 pkts/848 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Hostname/SNI: 239.255.255.250][PLAIN TEXT (ENOTIFY )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.1.173:58006 -> 239.255.255.250:1900 [proto: 12/SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Acceptable][1 pkts/848 bytes -> 0 pkts/0 bytes][Goodput ratio: 95/0][< 1 sec][Hostname/SNI: 239.255.255.250][PLAIN TEXT (ENOTIFY )][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
