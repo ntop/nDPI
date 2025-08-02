@@ -128,6 +128,7 @@
 #include "inc_generated/ndpi_domains_ms_outlook_match.c.inc"
 #include "inc_generated/ndpi_domains_ms_teams_match.c.inc"
 #include "inc_generated/ndpi_domains_ms_azure_match.c.inc"
+#include "inc_generated/ndpi_domains_ms_generic_match.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -1064,6 +1065,7 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   self_check_host_match(ndpi_str, ms_onedrive_host_match);
   self_check_host_match(ndpi_str, microsoft365_host_match);
   self_check_host_match(ndpi_str, azure_host_match);
+  self_check_host_match(ndpi_str, microsoft_host_match);
 
   for(i = 0; host_match[i].string_to_match != NULL; i++)
     init_app_protocol(ndpi_str, &host_match[i]);
@@ -1077,6 +1079,8 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
     init_app_protocol(ndpi_str, &microsoft365_host_match[i]);
   for(i = 0; azure_host_match[i].string_to_match != NULL; i++)
     init_app_protocol(ndpi_str, &azure_host_match[i]);
+  for(i = 0; microsoft_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &microsoft_host_match[i]);
 
   /* ************************ */
 
@@ -1109,6 +1113,8 @@ static void load_string_based_protocols(struct ndpi_detection_module_struct *ndp
     load_protocol_match(ndpi_str, &microsoft365_host_match[i]);
   for(i = 0; azure_host_match[i].string_to_match != NULL; i++)
     load_protocol_match(ndpi_str, &azure_host_match[i]);
+  for(i = 0; microsoft_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &microsoft_host_match[i]);
 
   /* ************************ */
 
