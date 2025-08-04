@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2023-24 Ivan Nardi <nardi.ivan@gmail.com>
+Copyright (c) 2023-25 Ivan Nardi <nardi.ivan@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -68,6 +68,9 @@ extern "C"
 	  the standard size (~1526). Useful for handling TSO packets or for
 	  checking integer overflow on u_int16_t variables (i.e. ip length...).
 	  Note that this option might lead to significant bigger corpus
+	* PL7M_ENABLE_RANDOMIZE_PORTS: randomize also L4 ports but keeps flows.
+	  The output trace contains the same flows of the inputs trace, but with
+	  different ports
 
 	Mutations happens at two different levels:
 	* packet level: each packet might be dropped, duplicated, swapped or
@@ -1072,6 +1075,37 @@ static void update_do(struct m_pkt *p)
 #endif
 }
 
+#ifdef PL7M_ENABLE_RANDOMIZE_PORTS
+static void randomize_ports(struct m_pkt *p, unsigned int seed)
+{
+	struct udphdr *udp_h;
+	struct tcphdr *tcp_h;
+
+	/* Length fields don't change */
+
+	if (p->skip_l4_dissection == 1)
+		return;
+
+	switch (p->l4_proto) {
+	case IPPROTO_UDP:
+		udp_h = (struct udphdr *)(p->raw_data + p->l4_offset);
+		udp_h->source = 1 + ((udp_h->source * (u_int64_t)seed) % 65534);
+		udp_h->dest = 1 + ((udp_h->dest * (u_int64_t)seed) % 65534);
+		break;
+	case IPPROTO_TCP:
+		tcp_h = (struct tcphdr *)(p->raw_data + p->l4_offset);
+		tcp_h->source = 1 + ((tcp_h->source * (u_int64_t)seed) % 65534);
+		tcp_h->dest = 1 + ((tcp_h->dest * (u_int64_t)seed) % 65534);
+		break;
+	default:
+		/* Nothing to do */
+		break;
+	}
+
+	return;
+}
+#endif
+
 static void swap_direction(struct m_pkt *p)
 {
 	struct udphdr *udp_h;
@@ -1438,6 +1472,9 @@ static void __mutate(struct pl7m_handle *h, unsigned int seed)
 	p = h->head;
 	prev = NULL;
 	while (p) {
+#ifdef PL7M_ENABLE_RANDOMIZE_PORTS
+		randomize_ports(p, seed);
+#endif
 		r = rand();
 		/* TODO: do these ratios [33%, 33%, 33%] make sense? */
 		switch (r % 3) {

@@ -338,7 +338,11 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
 /* ***************************************************** */
 
 bool load_public_lists(struct ndpi_detection_module_struct *ndpi_str) {
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
   char *lists_path = "../lists/public_suffix_list.dat";
+#else
+  char *lists_path = "public_suffix_list.dat";
+#endif
   struct stat st;
 
   if(stat(lists_path, &st) != 0)
@@ -378,8 +382,6 @@ int ndpi_stats_init(ndpi_stats_t *s, uint32_t num_protocols) {
 
   if(!s->protocol_counter || !s->protocol_counter_bytes || !s->protocol_flows ||
      !s->fpc_protocol_counter || !s->fpc_protocol_counter_bytes || !s->fpc_protocol_flows) {
-
-    ndpi_stats_free(s);
 
     LOG(NDPI_LOG_ERROR, "[NDPI] %s: error allocating memory for ndpi_stats\n", __FUNCTION__);
     return 0;

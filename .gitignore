@@ -97,6 +97,7 @@
 /fuzz/fuzz_ndpi_reader_payload_analyzer
 /fuzz/fuzz_ndpi_reader_pl7m_simplest
 /fuzz/fuzz_ndpi_reader_pl7m_only_subclassification
+/fuzz/fuzz_ndpi_reader_pl7m_randomize_ports
 /fuzz/fuzz_ndpi_reader_pl7m_simplest_internal
 /fuzz/fuzz_ndpi_reader_pl7m
 /fuzz/fuzz_ndpi_reader_pl7m_64k
@@ -117,6 +118,7 @@
 /fuzz/fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_pl7m_only_subclassification_seed_corpus.zip
+/fuzz/fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip
 /fuzz/fuzz_quic_get_crypto_data_seed_corpus.zip
 /fuzz/fuzz_community_id_seed_corpus.zip

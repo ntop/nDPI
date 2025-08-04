@@ -77,13 +77,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   if(w) {
     ndpi_finalize_initialization(w->ndpi_struct);
 
-    header = NULL;
-    r = pcap_next_ex(pcap_handle, &header, &pkt);
-    while (r > 0) {
-      ndpi_workflow_process_packet(w, header, pkt, &flow_risk, &flow);
-      r = pcap_next_ex(pcap_handle, &header, &pkt);
-    }
+    if(ndpi_stats_init(&w->stats, ndpi_get_num_protocols(w->ndpi_struct))) {
+      header = NULL;
 
+      r = pcap_next_ex(pcap_handle, &header, &pkt);
+      while (r > 0) {
+        ndpi_workflow_process_packet(w, header, pkt, &flow_risk, &flow);
+        r = pcap_next_ex(pcap_handle, &header, &pkt);
+      }
+
+      ndpi_stats_reset(&w->stats);
+    }
     ndpi_workflow_free(w);
   }
   pcap_close(pcap_handle);
