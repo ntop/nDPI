@@ -1734,6 +1734,11 @@ static ndpi_category_match category_match[] = {
    { "ollama.com",                       NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE },
    { "huggingface.com",                  NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE },
 
+   /* Same games. We don't have yet (or we don't want...) specific ID for this stuff */
+   { "callofduty.com",                   NDPI_PROTOCOL_CATEGORY_GAME },
+   { "king.com",                         NDPI_PROTOCOL_CATEGORY_GAME },
+   { "supercell.com",                    NDPI_PROTOCOL_CATEGORY_GAME },
+
    /* ADS & Tracking & Analytics */
    /* Chartbeat is a technology company that provides data and analytics to global publishers */
    { "chartbeat.com",                    NDPI_PROTOCOL_CATEGORY_ADVERTISEMENT },
