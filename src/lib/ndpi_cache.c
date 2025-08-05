@@ -556,6 +556,8 @@ static u_int32_t ndpi_cache_hash_hostname_ip(ndpi_ip_addr_t *ip_addr, char *host
       printf("[DEBUG] Hashing %s [len=%u]\n", hostname, len);
 #endif
     }
+  } else {
+    len = sizeof(buf);
   }
   
   return(ndpi_quick_hash(buf, len));
