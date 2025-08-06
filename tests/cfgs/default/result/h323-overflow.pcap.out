@@ -26,4 +26,4 @@ Acceptable                       1 58            1
 
 Unspecified                      1 58            1            
 
-	1	TCP 192.168.1.1:31337 -> 192.168.1.2:80 [proto: 457/HomeRouter][Stack: HomeRouter][IP: 0/Unknown][ClearText][Confidence: nBPF][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Acceptable][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.1.1:31337 -> 192.168.1.2:80 [proto: 458/HomeRouter][Stack: HomeRouter][IP: 0/Unknown][ClearText][Confidence: nBPF][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Acceptable][1 pkts/58 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
