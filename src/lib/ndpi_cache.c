@@ -270,7 +270,7 @@ void ndpi_term_address_cache(struct ndpi_address_cache *cache) {
 u_int32_t ndpi_address_cache_flush_expired(struct ndpi_address_cache *cache,
 					   u_int32_t epoch_now) {
   u_int32_t i, num_purged = 0;
-  
+
   for(i=0; i<cache->num_root_nodes; i++) {
     struct ndpi_address_cache_item *root = cache->address_cache_root[i];
     struct ndpi_address_cache_item *prev = NULL;
@@ -410,7 +410,7 @@ bool ndpi_address_cache_dump(struct ndpi_address_cache *cache,
 			     char *path, u_int32_t epoch_now) {
   FILE *fd = fopen(path, "w");
   u_int i;
-  
+
   if(!fd) return(false);
 
   for(i=0; i<cache->num_root_nodes; i++) {
@@ -420,21 +420,21 @@ bool ndpi_address_cache_dump(struct ndpi_address_cache *cache,
       char buf[33];
       u_char *a = (u_char*)&(root->addr);
       u_int j, idx;
-      
+
       if(epoch_now && (root->expire_epoch < epoch_now)) {
         root = root->next;
 	continue; /* Expired epoch */
       }
-      
+
       for(j=0, idx=0; j<sizeof(ndpi_ip_addr_t); j++, idx += 2)
-	snprintf(&buf[idx], sizeof(buf)-idx, "%02X", a[j]);	 
-      
+	snprintf(&buf[idx], sizeof(buf)-idx, "%02X", a[j]);
+
       fprintf(fd, "%s\t%s\t%u\n", buf, root->hostname, root->expire_epoch);
-      
+
       root = root->next;
     }
   }
-  
+
   fclose(fd);
   return(true);
 }
@@ -446,7 +446,7 @@ u_int32_t ndpi_address_cache_restore(struct ndpi_address_cache *cache, char *pat
   FILE *fd = fopen(path,  "r");
   char ip[33], hostname[256];
   u_int32_t epoch, num_added = 0;
-  
+
   if(!fd) return(false);
 
   while(fscanf(fd, "%32s\t%255s\t%u\n", ip, hostname, &epoch) == 3) {
@@ -455,21 +455,21 @@ u_int32_t ndpi_address_cache_restore(struct ndpi_address_cache *cache, char *pat
       ndpi_ip_addr_t addr;
       char *a = (char*)&addr;
       u_int i, j;
-      
+
       for(i=0, j=0; i<(sizeof(ndpi_ip_addr_t)*2); i += 2, j++) {
 	char buf[3];
-	
+
 	buf[0] = ip[i], buf[1] = ip[i+1], buf[2] = '\0';
 	a[j] = strtol(buf, NULL, 16);
       }
-      
+
       if(ndpi_address_cache_insert(cache, addr, hostname, epoch_now, ttl))
 	num_added++;
     }
   }
-  
+
   fclose(fd);
-  
+
   return(num_added);
 }
 
@@ -536,32 +536,44 @@ u_int32_t ndpi_cache_address_flush_expired(struct ndpi_detection_module_struct *
 /*
   Used to cache resolved IP addresses in order to trigger
   risk NDPI_UNRESOLVED_HOSTNAME
- */
-static u_int32_t ndpi_cache_hash_hostname_ip(ndpi_ip_addr_t *ip_addr, char *hostname) {
+*/
+static u_int32_t ndpi_cache_hash_hostname_ip(struct ndpi_detection_module_struct *ndpi_struct,
+					     ndpi_ip_addr_t *ip_addr, char *_hostname,
+					     bool use_domain_name) {
   u_char buf[128];
+  const char *hostname = use_domain_name ? ndpi_get_host_domain(ndpi_struct, _hostname) : _hostname;
   u_int32_t len = snprintf((char*)buf, sizeof(buf), "%s", hostname);
-  
+  char *double_column = strchr((char*)buf, ':');
+
+  if(double_column != NULL) {
+    double_column[0] = '\0';
+    len = strlen(double_column);
+  }
+
   if(len < sizeof(buf)) {
     int32_t leftover = sizeof(buf) - len;
 
     if(leftover > 0) {
       u_int32_t to_add = ndpi_min((u_int32_t)leftover, sizeof(ndpi_ip_addr_t));
-      
+
       if((u_int32_t)leftover >= to_add) {
 	memcpy(&buf[len], ip_addr, to_add);
 	len += to_add;
       }
-      
+
 #ifdef DEBUG_ADDR_CACHE
       printf("[DEBUG] Hashing %s [len=%u]\n", hostname, len);
 #endif
     }
+  } else {
+    len = sizeof(buf);
   }
-  
+
   return(ndpi_quick_hash(buf, len));
 }
 
-// #define DEBUG_ADDR_CACHE
+/* #define DEBUG_ADDR_CACHE */
+
 /* ***************************************************** */
 
 /*
@@ -571,20 +583,25 @@ static u_int32_t ndpi_cache_hash_hostname_ip(ndpi_ip_addr_t *ip_addr, char *host
 bool ndpi_cache_hostname_ip(struct ndpi_detection_module_struct *ndpi_struct,
 			    ndpi_ip_addr_t *ip_addr, char *hostname) {
   if(ndpi_struct->dns_hostname.cache == NULL)
-    ndpi_struct->dns_hostname.cache = ndpi_filter_alloc();  
+    ndpi_struct->dns_hostname.cache = ndpi_filter_alloc();
 
   if(ndpi_struct->dns_hostname.cache) {
-    u_int32_t hashval = ndpi_cache_hash_hostname_ip(ip_addr, hostname);
-  
+    u_int32_t hashval = ndpi_cache_hash_hostname_ip(ndpi_struct, ip_addr, hostname, false);
+
     NDPI_LOG_DBG2(ndpi_struct, "[DEBUG] ->>> %s [%u]\n", hostname, hashval);
 
 #ifdef DEBUG_ADDR_CACHE
-    printf("[DEBUG] Adding %s [%u][%u]\n", hostname, ip_addr->ipv4, hashval);
+    {
+      char buf[64];
+
+      printf("[DEBUG] Adding %s [%u][%s/%u]\n", hostname, ip_addr->ipv4,
+	     ndpi_intoav4(ntohl(ip_addr->ipv4), buf, sizeof(buf)), hashval);
+    }
 #endif
-    
+
     return(ndpi_filter_add(ndpi_struct->dns_hostname.cache, hashval));
   }
-  
+
   return(false);
 }
 
@@ -599,18 +616,25 @@ bool ndpi_cache_hostname_ip(struct ndpi_detection_module_struct *ndpi_struct,
 bool ndpi_cache_find_hostname_ip(struct ndpi_detection_module_struct *ndpi_struct,
 				 ndpi_ip_addr_t *ip_addr, char *hostname) {
   if(ndpi_struct->dns_hostname.cache) {
-    u_int32_t hashval = ndpi_cache_hash_hostname_ip(ip_addr, hostname);
+    u_int32_t hashval = ndpi_cache_hash_hostname_ip(ndpi_struct, ip_addr, hostname, false);
     bool ret;
-    
-#ifdef DEBUG_ADDR_CACHE
-    printf("[DEBUG] ->>> Searching %s [%u][%u]\n", hostname, ip_addr->ipv4, hashval);
-#endif
-    
+
     ret = ndpi_filter_contains(ndpi_struct->dns_hostname.cache, hashval);
 
     if((!ret) && (ndpi_struct->dns_hostname.cache_shadow != NULL))
       ret = ndpi_filter_contains(ndpi_struct->dns_hostname.cache_shadow, hashval);
-    
+
+#ifdef DEBUG_ADDR_CACHE
+    {
+      char buf[64];
+
+      printf("[DEBUG] ->>> Searching %s [%u/%s][%u]: %s\n",
+	     hostname, ip_addr->ipv4,
+	     ndpi_intoav4(ntohl(ip_addr->ipv4), buf, sizeof(buf)),
+	     hashval, ret ? "found" : "NOT FOUND");
+    }
+#endif
+
     return(ret);
   }
 
@@ -620,9 +644,17 @@ bool ndpi_cache_find_hostname_ip(struct ndpi_detection_module_struct *ndpi_struc
 /* ***************************************************** */
 
 void ndpi_cache_hostname_ip_swap(struct ndpi_detection_module_struct *ndpi_struct) {
-  if(ndpi_struct->dns_hostname.cache_shadow)
-    ndpi_filter_free(ndpi_struct->dns_hostname.cache_shadow);
+  if(ndpi_struct->cfg.hostname_dns_check_enabled) {
+    if(ndpi_struct->dns_hostname.cache_shadow)
+      ndpi_filter_free(ndpi_struct->dns_hostname.cache_shadow);
 
-  ndpi_struct->dns_hostname.cache_shadow = ndpi_struct->dns_hostname.cache;
-  ndpi_struct->dns_hostname.cache        = ndpi_filter_alloc();
+    ndpi_struct->dns_hostname.cache_shadow = ndpi_struct->dns_hostname.cache;
+    ndpi_struct->dns_hostname.cache        = ndpi_filter_alloc();
+  }
+}
+
+/* ***************************************************** */
+
+void ndpi_cache_enable(struct ndpi_detection_module_struct *ndpi_struct) {
+  ndpi_struct->cfg.hostname_dns_check_enabled = 1;
 }

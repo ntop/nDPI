@@ -454,7 +454,7 @@ extern "C" {
    *
    */
   bool ndpi_is_custom_protocol(struct ndpi_detection_module_struct *ndpi_str, u_int16_t proto_id);
-  
+
   /**
    * Overwrite a protocol category defined by nDPI with the custom category
    *
@@ -825,7 +825,7 @@ extern "C" {
   void ndpi_load_tcp_fingerprints(struct ndpi_detection_module_struct *ndpi_str);
   ndpi_os ndpi_get_os_from_tcp_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 					   char *tcp_fingerprint);
-    
+
   /**
    * Get the total number of the defined protocols (internals and custom).
    * It can be called only with finalized context, i.e. after having called
@@ -2300,7 +2300,8 @@ extern "C" {
   bool ndpi_cache_find_hostname_ip(struct ndpi_detection_module_struct *ndpi_struct,
 				   ndpi_ip_addr_t *ip_addr, char *hostname);
   void ndpi_cache_hostname_ip_swap(struct ndpi_detection_module_struct *ndpi_struct);
-    
+  void ndpi_cache_enable(struct ndpi_detection_module_struct *ndpi_struct);
+
   /* Protocol normalization functions */
   /**
    * Checks if the specified protocol identifier can be placed only on the master_protocol field of ndpi_master_app_protocol
@@ -2360,7 +2361,7 @@ extern "C" {
    * @return Length of src string
    */
   size_t ndpi_strlcpy(char* dst, const char* src, size_t dst_len, size_t src_len);
-  
+
   /**
    * @brief Converts a string from ISO 8859 to UTF-8
    *
@@ -2399,6 +2400,8 @@ extern "C" {
   int ndpi_bitmask_is_set(const struct ndpi_bitmask *b, u_int16_t bit);
   void ndpi_bitmask_set_all(struct ndpi_bitmask *b);
   void ndpi_bitmask_reset(struct ndpi_bitmask *b);
+
+  bool ndpi_check_is_numeric_ip(char *host);
 
 #ifdef __cplusplus
 }
