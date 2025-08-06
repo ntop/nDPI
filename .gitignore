@@ -79,6 +79,8 @@
 /fuzz/fuzz_ds_hash
 /fuzz/fuzz_ds_ahocorasick
 /fuzz/fuzz_ds_bitmap64_fuse
+/fuzz/fuzz_ds_bitmap
+/fuzz/fuzz_ds_filter
 /fuzz/fuzz_ds_domain_classify
 /fuzz/fuzz_ds_kdtree
 /fuzz/fuzz_ds_btree
