@@ -64,7 +64,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\lib\;$(ProjectDir)..\src\lib\;$(ProjectDir)..\src\include\;$(ProjectDir)..\;$(ProjectDir)..\src\lib\third_party\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDPI_LIB_COMPILATION;WIN32;_WIN64;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_OLD_ROARING;NDPI_LIB_COMPILATION;WIN32;_WIN64;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -93,7 +93,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\lib\;$(ProjectDir)..\src\lib\;$(ProjectDir)..\src\include\;$(ProjectDir)..\;$(ProjectDir)..\src\lib\third_party\include\;$(ProjectDir)..\windows\WpdPack\Include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>PTW32_STATIC_LIB;STATIC_GETOPT;NDPI_LIB_COMPILATION;HAVE_STRUCT_TIMESPEC;WIN32;_WIN64;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PTW32_STATIC_LIB;STATIC_GETOPT;USE_OLD_ROARING;NDPI_LIB_COMPILATION;HAVE_STRUCT_TIMESPEC;WIN32;_WIN64;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -222,6 +222,7 @@
     <ClCompile Include="..\src\lib\protocols\zabbix.c" />
     <ClCompile Include="..\src\lib\third_party\src\ahocorasick.c" />
     <ClCompile Include="..\src\lib\third_party\src\roaring.c" />
+    <ClCompile Include="..\src\lib\third_party\src\roaring_v2.c" />
     <ClCompile Include="..\src\lib\third_party\src\shoco.c" />
     <ClCompile Include="..\src\lib\third_party\src\kdtree.c" />
     <ClCompile Include="..\src\lib\third_party\src\ball.c" />
@@ -446,6 +447,7 @@
     <ClInclude Include="..\src\lib\third_party\include\ndpi_sha1.h" />
     <ClInclude Include="..\src\lib\third_party\include\rce_injection.h" />
     <ClInclude Include="..\src\lib\third_party\include\roaring.h" />
+    <ClInclude Include="..\src\lib\third_party\include\roaring_v2.h" />
     <ClInclude Include="..\src\lib\third_party\include\uthash.h" />
     <ClInclude Include="..\src\lib\ndpi_private.h" />
     <ClInclude Include="arpa\inet.h" />

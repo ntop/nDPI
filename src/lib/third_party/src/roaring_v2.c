@@ -1,6 +1,6 @@
 #include "ndpi_config.h"
 
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
 // !!! DO NOT EDIT - THIS IS AN AUTO-GENERATED FILE !!!
 // Created by amalgamation.sh on 2023-02-12T11:34:02Z
 
@@ -662,7 +662,7 @@ static inline uint32_t croaring_detect_supported_architectures() {
 #define ROARING_DISABLE_AVX
 #undef __AVX2__
 /* CentOS 7 */
-static inline uint32_t croaring_detect_supported_architectures() {
+uint32_t croaring_detect_supported_architectures() {
   return(dynamic_croaring_detect_supported_architectures());
 }
 #else
@@ -681,7 +681,7 @@ static inline uint32_t croaring_detect_supported_architectures() {
 #endif // CROARING_REGULAR_VISUAL_STUDIO
 
 #ifdef ROARING_DISABLE_AVX
-static inline bool croaring_avx2() {
+bool croaring_avx2() {
   return false;
 }
 #elif defined(__AVX2__)
