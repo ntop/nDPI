@@ -1042,6 +1042,7 @@ void init_melsec_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_hamachi_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_glbp_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_easyweather_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_mudfish_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_private.h"

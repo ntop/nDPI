@@ -3763,3 +3763,12 @@ References: `Cisco GLBP Configuration Guide <https://www.cisco.com/en/US/docs/io
 `NDPI_PROTOCOL_EASYWEATHER`
 ===========================
 The EasyWeather protocol is a proprietary UDP based protocool used by some weather stations to announce and export weather data over a network.
+
+
+.. _Proto_454:
+
+`NDPI_PROTOCOL_MUDFISH`
+=======================
+Mudfish is a VPN dedicated for games to reduce lag and improve connection quality.
+
+References: `Mudfish official site: <https://mudfish.net/>`_
