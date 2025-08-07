@@ -10637,6 +10637,20 @@ static void proto_stack_push(struct ndpi_proto_stack *s, u_int16_t proto)
 
 /* ********************************************************************************* */
 
+void proto_stack_reset(struct ndpi_proto_stack *s)
+{
+  unsigned int i;
+
+#ifdef DEBUG_STACK
+  printf("%s\n", __func__);
+#endif
+  for(i = 0; i < s->protos_num; i++)
+    s->protos[i] = NDPI_PROTOCOL_UNKNOWN;
+  s->protos_num = 0;
+}
+
+/* ********************************************************************************* */
+
 static void proto_stack_update(struct ndpi_proto_stack *s, u_int16_t lower_proto, u_int16_t upper_proto)
 {
 #ifdef DEBUG_STACK

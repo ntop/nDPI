@@ -446,6 +446,10 @@ static void ndpi_int_http_add_connection(struct ndpi_detection_module_struct *nd
      MPEGDASH, SOAP, ....) */
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
     NDPI_LOG_DBG2(ndpi_struct, "Master: %d\n", master_protocol);
+    if(flow->detected_protocol_stack[0] != master_protocol) {
+      NDPI_LOG_DBG2(ndpi_struct, "Previous master was different\n");
+      proto_stack_reset(&flow->protocol_stack);
+    }
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN,
 			       master_protocol, NDPI_CONFIDENCE_DPI);
   }

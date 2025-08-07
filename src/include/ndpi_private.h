@@ -710,6 +710,8 @@ bool ndpi_cache_address(struct ndpi_detection_module_struct *ndpi_struct,
 int is_monitoring_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId);
 int is_flowrisk_info_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id);
 
+void proto_stack_reset(struct ndpi_proto_stack *s);
+
 u_int8_t ndpi_is_valid_protoId(const struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId);
 
   /* TLS */
