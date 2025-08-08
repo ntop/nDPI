@@ -34,7 +34,7 @@ static void ndpi_int_z3950_add_connection(struct ndpi_detection_module_struct *n
 
 /* ***************************************************************** */
 
-static int z3950_parse_sequences(struct ndpi_packet_struct const * const packet,
+static int z3950_parse_sequences(struct ndpi_flow_struct *flow, struct ndpi_packet_struct const * const packet,
                                  int max_sequences) {
   size_t payload_offset = 2;
   int cur_sequences = 0;
@@ -44,6 +44,12 @@ static int z3950_parse_sequences(struct ndpi_packet_struct const * const packet,
 
   if((pdu_type < 20) || ((pdu_type > 36) && ((pdu_type < 43) || (pdu_type > 48))))
     return(-1);  
+
+  /* Simple check to avoid false positives: the first pkt after the 3WHS
+     should be a initRequest or a initResponse */
+  if(ndpi_seen_flow_beginning(flow) && flow->packet_counter == 1 &&
+     pdu_type != 20 && pdu_type != 21)
+    return(-1);
 
   while(cur_sequences++ < max_sequences) {
     u_int8_t const * payload;
@@ -91,7 +97,7 @@ static void ndpi_search_z3950(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(packet->tcp != NULL && packet->payload_packet_len >= 6 &&
      flow->packet_counter >= 1 && flow->packet_counter <= 8) {
-    int ret = z3950_parse_sequences(packet, minimum_expected_sequences);
+    int ret = z3950_parse_sequences(flow, packet, minimum_expected_sequences);
 
     if(ret < 0) {
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
