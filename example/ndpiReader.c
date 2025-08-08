@@ -2552,7 +2552,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
       u_int8_t proto_guessed;
 
       malloc_size_stats = 1;
-      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[0].workflow->ndpi_struct,
+      flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                                                       flow->ndpi_flow, &proto_guessed);
       malloc_size_stats = 0;
 
