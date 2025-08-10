@@ -285,6 +285,11 @@ typedef struct ndpi_flow_info {
     } bfcp;
   };
 
+  struct {
+    uint8_t num_services;
+    struct ndpi_mdns_rsp_entry services[MAX_NUM_MDNS_ADVERTISED_SERVICES];
+  } mdns_metadata;
+
   ndpi_serializer ndpi_flow_serializer;
 
   char host_server_name[80]; /* Hostname/SNI */

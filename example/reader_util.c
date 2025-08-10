@@ -28,6 +28,8 @@
 #include <math.h>
 #include <float.h>
 
+#include "../src/include/ndpi_typedefs.h"
+
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
 #include <windows.h>
@@ -611,6 +613,12 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
   if(flow->tcp_fingerprint) ndpi_free(flow->tcp_fingerprint);
   if(flow->risk_str)        ndpi_free(flow->risk_str);
   if(flow->flow_payload)    ndpi_free(flow->flow_payload);
+
+
+  for(int i = 0; i < flow->mdns_metadata.num_services; ++i) {
+    ndpi_free(flow->mdns_metadata.services[i].name);
+    ndpi_free(flow->mdns_metadata.services[i].data);
+  }
 }
 
 /* ***************************************************** */
@@ -1618,6 +1626,21 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->fast_cgi.method = flow->ndpi_flow->protos.fast_cgi.method;
     ndpi_snprintf(flow->fast_cgi.user_agent, sizeof(flow->fast_cgi.user_agent), "%s", flow->ndpi_flow->protos.fast_cgi.user_agent);
     ndpi_snprintf(flow->fast_cgi.url, sizeof(flow->fast_cgi.url), "%s", flow->ndpi_flow->protos.fast_cgi.url);
+  }
+
+  flow->mdns_metadata.num_services = flow->ndpi_flow->mdns_metadata.num_services;
+
+  for(int idx = 0; idx < flow->mdns_metadata.num_services; ++idx) {
+    struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[idx];
+    struct ndpi_mdns_rsp_entry *reference = &flow->ndpi_flow->mdns_metadata.services[idx];
+
+    service->rsp_type = reference->rsp_type;
+    service->rsp_class = reference->rsp_class;
+    service->ttl = reference->ttl;
+    service->data_len = reference->data_len;
+    service->name = ndpi_strdup(reference->name);
+    service->data = ndpi_strdup(reference->data);
+    service->srv_port = reference->srv_port;
   }
 
   if(!monitoring_enabled) {

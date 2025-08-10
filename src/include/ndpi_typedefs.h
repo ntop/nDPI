@@ -402,6 +402,9 @@ struct ndpi_mdns_rsp_entry {
   u_int16_t rsp_type, rsp_class;
   u_int32_t ttl;
   u_int16_t data_len;
+  char *name; // hostname
+  char *data; // metadata
+  u_int16_t srv_port;
 } PACK_OFF;
 
 /* +++++++++++++++++++ LLC header (IEEE 802.2) ++++++++++++++++ */
@@ -1317,6 +1320,7 @@ typedef enum {
 
 #define MAX_NUM_TLS_SIGNATURE_ALGORITHMS 16
 #define MAX_NUM_DNS_RSP_ADDRESSES         4
+#define MAX_NUM_MDNS_ADVERTISED_SERVICES  8
 
 typedef struct {
   union {
@@ -1692,6 +1696,11 @@ struct ndpi_flow_struct {
 
   } protos;
 
+  struct {
+    uint8_t num_services;
+    struct ndpi_mdns_rsp_entry services[MAX_NUM_MDNS_ADVERTISED_SERVICES];
+  } mdns_metadata;
+
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
   struct ndpi_metadata_monitoring *monit;
 
@@ -1749,8 +1758,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 264,
                "Size of the struct member protocols increased to more than 264 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1232,
-               "Size of the flow struct increased to more than 1232 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1408,
+               "Size of the flow struct increased to more than 1408 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

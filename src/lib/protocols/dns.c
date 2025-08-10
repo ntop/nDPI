@@ -251,8 +251,33 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 	&& (packet->payload[(*off)] != '\0')) {
     u_int8_t c, cl = packet->payload[*off];
 
-    if(((cl & 0xc0) != 0) || // we not support compressed names in query
-       (((*off)+1) + cl  >= packet->payload_packet_len)) {
+    if((cl & 0xc0) == 0xc0) { /* start of a compressed name */
+      if(*off + 1 >= packet->payload_packet_len) {
+        hostname_is_valid = 0;
+        j = 0;
+        break;
+      }
+
+      (*off)++;
+      u_int8_t byte2 = packet->payload[(*off)++];
+      /* works for little and big endian. We don't need to check for (*off) < packet->payload_packet_len
+       * since it's checked in the recursive call */
+      u_int32_t ptr = ((cl & 0x3F) << 8 | byte2) + (packet->tcp ? 2 : 0);
+
+      if (j && j < max_len) {
+        _hostname[j++] = '.';
+      }
+
+      u_int nested_len;
+      hostname_is_valid = ndpi_grab_dns_name(packet, &ptr, &_hostname[j], max_len - j,
+        &nested_len, ignore_checks) && hostname_is_valid;
+
+      j += nested_len;
+      /* compressed names are always terminal */
+      break;
+    }
+
+    if(((*off)+1) + cl  >= packet->payload_packet_len) {
       /* Don't update the offset */
       j = 0;
       break;
@@ -297,6 +322,30 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 }
 
 /* *********************************************** */
+
+static int add_to_mdns_metadata(struct ndpi_flow_struct *flow,
+                                u_int16_t rsp_type, u_int16_t rsp_class, u_int32_t ttl,
+                                u_int16_t data_len, u_int16_t srv_port, char *data,
+                                u_int16_t name_len, const char *name) {
+  struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[flow->mdns_metadata.num_services];
+  service->rsp_class = rsp_class;
+  service->rsp_type = rsp_type;
+  service->ttl = ttl;
+  service->data_len = data_len; /* already host */
+
+  if((service->name = ndpi_malloc(name_len + 1)) == NULL) {
+    return -1;
+  }
+  memcpy(service->name, name, name_len);
+  service->name[name_len] = 0;
+
+  service->data = data; /* already host */
+
+  service->srv_port = srv_port; /* already checked if is zero */
+
+  ++flow->mdns_metadata.num_services;
+  return 0;
+}
 
 static int process_queries(struct ndpi_detection_module_struct *ndpi_struct,
                            struct ndpi_flow_struct *flow,
@@ -358,12 +407,23 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 
   for(num = 0; num < dns_header->num_answers; num++) {
     u_int16_t data_len;
+    u_int y = x;  /* we need a copy of x when x points to name */
 
     if((data_len = getNameLength(x, packet->payload,
                                  packet->payload_packet_len)) == 0) {
       return -1;
-    } else
-      x += data_len;
+    }
+    x += data_len;
+
+    u_int name_len;
+
+    char name[255]; /* DNS names are max 254 bytes long +1 null-byte */
+    if(ndpi_grab_dns_name(packet, &y, name, sizeof(name),
+    &name_len, ignore_checks) == 0) {
+        // todo: invalid name, maybe set a risk here
+    }
+
+    char *data = NULL;
 
     if((x+8) >= packet->payload_packet_len) {
       return -1;
@@ -387,6 +447,8 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 
     /* x points to the response "class" field */
     if((x+12) <= packet->payload_packet_len) {
+      u_int16_t srv_port = 0;
+      u_int16_t rsp_class = ntohl(*(u_int16_t *) &packet->payload[x]);
       u_int32_t ttl = ntohl(*((u_int32_t*)&packet->payload[x+2]));
 
       x += 6;
@@ -403,7 +465,7 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
           u_int16_t ptr_len = (packet->payload[x-2] << 8) + packet->payload[x-1];
 
           if((x + ptr_len) <= packet->payload_packet_len) {
-            if(found == 0) {
+            if(found == 0 || proto->master_protocol == NDPI_PROTOCOL_MDNS) {
               u_int len, orig_x;
 
               orig_x = x;
@@ -415,6 +477,16 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
                  We unconditionally update it at the end of the for loop */
               x = orig_x;
               found = 1;
+              if(proto->master_protocol == NDPI_PROTOCOL_MDNS && len > 0) {
+                if((data = ndpi_malloc(len + 1)) == NULL) {
+#ifdef DNS_DEBUG
+                  printf("[DNS] Out of memory\n");
+#endif
+                  return -1; /* todo: either continue or fail */
+                }
+                memcpy(data, flow->protos.dns.ptr_domain_name, len);
+                data[len] = '\0';
+              }
             }
           }
         } else if((((rsp_type == 0x1) && (data_len == 4)) /* A */
@@ -462,18 +534,117 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
             NDPI_LOG_DBG(ndpi_struct, "Adding entry to fpc_dns: %s proto %d\n",
                          data_len == 4 ? "ipv4" : "ipv6", proto->app_protocol);
           }
+        } else if(rsp_type == 0x10 /* TXT */) {
+          if(proto->master_protocol == NDPI_PROTOCOL_MDNS) {
+            char sep[] = ", ";
+            size_t sep_len = sizeof(sep) - 1;
+
+            /* We alloc more space than needed since we need space for separators.
+             * Also notice TXT fields don't use name compression, so we base our size
+             * on data_len. */
+            if((data = ndpi_malloc(data_len + (sep_len * data_len) + 1)) == NULL) {
+#ifdef DNS_DEBUG
+              printf("[DNS] Out of memory\n");
+#endif
+              return -1; /* todo: maybe this is not the correct behavior */
+            }
+            u_int x_orig = x;
+            data[0] = 0; /* it surely exists due to its size being minimum 1 (if data_len = 0) */
+            int is_invalid = 1;
+
+            size_t bytes_read = 0;
+            size_t data_offset = 0;
+
+            while(bytes_read < data_len) {
+              u_int8_t txt_subfield_len = packet->payload[x_orig++];
+              bytes_read++;
+
+              is_invalid = txt_subfield_len + bytes_read > data_len ||
+                           txt_subfield_len > packet->payload_packet_len - x_orig;
+              if(is_invalid) {
+                ndpi_free(data);
+                /* todo: this is a malformed DNS packet, maybe set_risk here */
+                break;
+              }
+              if(txt_subfield_len == 0) {
+                /* todo: maybe "txt subfield with zero len" can be a minor issue risk */
+                continue; /* nothing to do for an empty string */
+              }
+
+              memcpy(data + data_offset, &packet->payload[x_orig], txt_subfield_len);
+              data_offset += txt_subfield_len;
+              memcpy(data + data_offset, sep, sep_len);
+              data_offset += sep_len;
+
+              x_orig += txt_subfield_len;
+              bytes_read += txt_subfield_len;
+            }
+            if(!is_invalid) {  /* check needed because *data might point to deallocated memory */
+              if(data_offset >= sep_len) { /* if the while cycle didn't do any iteration, data_offset is 0 */
+                data[data_offset - sep_len] = 0; /* - sep_len removes the last separator */
+              } else {
+                data[data_offset] = 0;
+              }
+            }
+          }
+        } else if(rsp_type == 0x21 /* SRV */) {
+          if(proto->master_protocol == NDPI_PROTOCOL_MDNS) {
+            u_int x_orig = x;
+            x_orig += 4; /* skip priority and weight */
+            srv_port = ntohs(*(u_int16_t*)&packet->payload[x_orig]);
+            x_orig += 2; /* skip port */
+
+            if(srv_port == 0) {
+              /* todo: this is malformed since ports can't be zero, maybe set_risk here */
+              continue;
+            }
+            /* Target might use compression, and we can't determine its length a priori,
+             * so unfortunately we need to first find it and then copy it */
+            char target[255];
+            u_int target_len = 0;
+
+            if((ndpi_grab_dns_name(packet, &x_orig, target, sizeof(target),
+                &target_len, ignore_checks)) == 0) {
+              /* todo: maybe set_risk here, malformed name */
+              continue;
+            }
+            if(target_len <= 0) { /* name is good but contains nothing */
+              continue;
+            }
+            if((data = ndpi_malloc(target_len + 1)) == NULL) {
+#ifdef DNS_DEBUG
+              printf("[DNS] Out of memory\n");
+#endif
+              return -1; /* todo: maybe this is not the correct behavior */
+            }
+            memcpy(data, target, target_len);
+            data[target_len] = 0;
+          }
         }
 
         x += data_len;
       }
+
+      if(proto->master_protocol == NDPI_PROTOCOL_MDNS && name_len > 0 && data != NULL &&
+         flow->mdns_metadata.num_services < MAX_NUM_MDNS_ADVERTISED_SERVICES) {
+          if(add_to_mdns_metadata(flow, rsp_type, rsp_class, rsp_ttl, data_len, srv_port, data, name_len, name) < 0) {
+#ifdef DNS_DEBUG
+            printf("[DNS] Out of memory\n");
+#endif
+            /* todo: maybe return */
+          }
+      }
     }
 
-    if(found && (dns_header->additional_rrs == 0)) {
+    if((found && (dns_header->additional_rrs == 0)) &&
+      proto->master_protocol != NDPI_PROTOCOL_MDNS) {
       /*
         In case we have RR we need to iterate
         all the answers and not just consider the
         first one as we need to properly move 'x'
         to the right offset
+
+        Also keep searching for mdns services
       */
       break;
     }
@@ -822,10 +993,29 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
     flow->protos.dns.transaction_id = dns_header.tr_id;
 
     rc = process_queries(ndpi_struct, flow, &dns_header, off);
+    if(rc == -1) {
 #ifdef DNS_DEBUG
-    if(rc == -1)
       printf("[DNS] Error queries (query msg)\n");
 #endif
+    } else {
+      off = rc;
+      rc = process_answers(ndpi_struct, flow, &dns_header, off, &proto);
+      if(rc == -1) {
+#ifdef DNS_DEBUG
+        printf("[DNS] Error answers (query msg)\n");
+#endif
+      } else {
+        off = rc;
+        rc = process_additionals(ndpi_struct, flow, &dns_header, off);
+        if(rc == -1) {
+#ifdef DNS_DEBUG
+          printf("[DNS] Error additionals (query msg)\n");
+#endif
+        }
+        // we do not care about this in queries even if it is modified in process_additionals
+        flow->protos.dns.edns0_udp_payload_size = 0;
+      }
+    }
   } else {
     flow->protos.dns.is_query = 0;
     flow->protos.dns.transaction_id = dns_header.tr_id;

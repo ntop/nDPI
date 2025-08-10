@@ -32,6 +32,8 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <float.h> /* FLT_EPSILON */
+
+#include "../src/include/ndpi_typedefs.h"
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
 #include <windows.h>
@@ -1984,6 +1986,48 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	    fprintf(out, "]");
 	}
       }
+
+    if(flow->mdns_metadata.num_services > 0) {
+      fprintf(out, "[MDNS advertised services (found %d) - ", flow->mdns_metadata.num_services);
+
+      for(int i = 0; i < flow->mdns_metadata.num_services - 1; i++) {
+        struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[i];
+
+        fprintf(out, "rsp_class: %d ", service->rsp_class);
+        fprintf(out, "ttl: %ds ", service->ttl);
+        fprintf(out, "rdatalength: %d ", service->data_len);
+
+        fprintf(out, "rsp_type: ");
+        switch (service -> rsp_type) {
+          case 0x0C: /* PTR */
+            fprintf(out, "PTR data: %s advertised %s; ", service->name, service->data); break;
+          case 0x10: /* TXT */
+            fprintf(out, "TXT data: %s additional info %s; ", service->name, service->data); break;
+          case 0x21: /* SRV */
+            fprintf(out, "SRV data: %s is on port %d; ", service->name, service->srv_port); break;
+          case 0x05: /* CNAME */
+            break;
+        }
+      }
+      /* last line without spacing at the end */
+      struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[flow->mdns_metadata.num_services - 1];
+
+      fprintf(out, "rsp_class: %d ", service->rsp_class);
+      fprintf(out, "ttl: %ds ", service->ttl);
+      fprintf(out, "rdatalength: %d ", service->data_len);
+
+      fprintf(out, "rsp_type: ");
+      switch (service -> rsp_type) {
+        case 0x0C: /* PTR */
+          fprintf(out, "PTR data: %s advertised %s]", service->name, service->data); break;
+        case 0x10: /* TXT */
+          fprintf(out, "TXT data: %s additional info %s]", service->name, service->data); break;
+        case 0x21: /* SRV */
+          fprintf(out, "SRV data: %s is on port %d]", service->name, service->srv_port); break;
+        case 0x05: /* CNAME */
+          break;
+      }
+    }
 
     fprintf(out, "[%s]",
 	    ndpi_is_encrypted_proto(ndpi_thread_info[thread_id].workflow->ndpi_struct,
