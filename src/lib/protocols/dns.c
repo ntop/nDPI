@@ -334,6 +334,25 @@ static int add_to_mdns_metadata(struct ndpi_flow_struct *flow,
     }
   }
 
+  /* check for duplicates: we ignore them and free data */
+  for(int i = 0; i < flow->mdns_metadata.num_services; i++) {
+    struct ndpi_mdns_rsp_entry *svc = &flow->mdns_metadata.services[i];
+    size_t dl; /* data len */
+
+    if(svc->rsp_type == rsp_type &&
+       svc->rsp_class == rsp_class &&
+       svc->ttl == ttl &&
+       svc->data_len == data_len &&
+       svc->srv_port == srv_port &&
+       strlen(svc->name) == name_len &&
+       strlen(svc->data) == (dl = strlen(data)) &&
+       memcmp(svc->name, name, name_len) == 0 &&
+       memcmp(svc->data, data, dl) == 0) {
+      if(data) ndpi_free(data);
+      return 0;
+    }
+  }
+
   struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[flow->mdns_metadata.num_services];
   service->rsp_class = rsp_class;
   service->rsp_type = rsp_type;
