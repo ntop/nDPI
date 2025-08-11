@@ -22,6 +22,8 @@
 #include <errno.h>
 #include <sys/types.h>
 
+#include "../include/ndpi_typedefs.h"
+
 #ifdef __APPLE__
 #include <netinet/ip.h>
 #endif
@@ -7731,6 +7733,14 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 
     if(flow->tls_quic.obfuscated_heur_state)
       ndpi_free(flow->tls_quic.obfuscated_heur_state);
+
+  	if(flow->mdns_metadata.num_services > 0) {
+  	  for(int i = 0; i < flow->mdns_metadata.num_services; i++) {
+  	  	ndpi_free(flow->mdns_metadata.services[i].name);
+  	  	ndpi_free(flow->mdns_metadata.services[i].data);
+  	  }
+  	  ndpi_free(flow->mdns_metadata.services);
+  	}
   }
 }
 

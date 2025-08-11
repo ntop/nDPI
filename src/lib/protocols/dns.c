@@ -327,6 +327,13 @@ static int add_to_mdns_metadata(struct ndpi_flow_struct *flow,
                                 u_int16_t rsp_type, u_int16_t rsp_class, u_int32_t ttl,
                                 u_int16_t data_len, u_int16_t srv_port, char *data,
                                 u_int16_t name_len, const char *name) {
+  if(flow->mdns_metadata.services == NULL) {
+    if((flow->mdns_metadata.services = ndpi_malloc(
+      sizeof(struct ndpi_mdns_rsp_entry) * MAX_NUM_MDNS_ADVERTISED_SERVICES)) == NULL) {
+      return -1;
+    }
+  }
+
   struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[flow->mdns_metadata.num_services];
   service->rsp_class = rsp_class;
   service->rsp_type = rsp_type;
@@ -625,9 +632,12 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
         x += data_len;
       }
 
-      if(proto->master_protocol == NDPI_PROTOCOL_MDNS && name_len > 0 && data != NULL &&
-         flow->mdns_metadata.num_services < MAX_NUM_MDNS_ADVERTISED_SERVICES) {
-          if(add_to_mdns_metadata(flow, rsp_type, rsp_class, rsp_ttl, data_len, srv_port, data, name_len, name) < 0) {
+      if(proto->master_protocol == NDPI_PROTOCOL_MDNS && data != NULL) {
+          if(name_len <= 0 ||
+            flow->mdns_metadata.num_services >= MAX_NUM_MDNS_ADVERTISED_SERVICES) {
+            /* info was useless or we reached the limit */
+            ndpi_free(data);
+          } else if(add_to_mdns_metadata(flow, rsp_type, rsp_class, rsp_ttl, data_len, srv_port, data, name_len, name) < 0) {
 #ifdef DNS_DEBUG
             printf("[DNS] Out of memory\n");
 #endif

@@ -619,6 +619,7 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
     ndpi_free(flow->mdns_metadata.services[i].name);
     ndpi_free(flow->mdns_metadata.services[i].data);
   }
+  if(flow->mdns_metadata.services) ndpi_free(flow->mdns_metadata.services);
 }
 
 /* ***************************************************** */
@@ -1630,17 +1631,22 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   flow->mdns_metadata.num_services = flow->ndpi_flow->mdns_metadata.num_services;
 
-  for(int idx = 0; idx < flow->mdns_metadata.num_services; ++idx) {
-    struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[idx];
-    struct ndpi_mdns_rsp_entry *reference = &flow->ndpi_flow->mdns_metadata.services[idx];
+  if(flow->mdns_metadata.num_services > 0) {
+    flow->mdns_metadata.services = ndpi_malloc(
+      sizeof(struct ndpi_mdns_rsp_entry) * flow->mdns_metadata.num_services);
 
-    service->rsp_type = reference->rsp_type;
-    service->rsp_class = reference->rsp_class;
-    service->ttl = reference->ttl;
-    service->data_len = reference->data_len;
-    service->name = ndpi_strdup(reference->name);
-    service->data = ndpi_strdup(reference->data);
-    service->srv_port = reference->srv_port;
+    for(int idx = 0; idx < flow->mdns_metadata.num_services; ++idx) {
+      struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[idx];
+      struct ndpi_mdns_rsp_entry *reference = &flow->ndpi_flow->mdns_metadata.services[idx];
+
+      service->rsp_type = reference->rsp_type;
+      service->rsp_class = reference->rsp_class;
+      service->ttl = reference->ttl;
+      service->data_len = reference->data_len;
+      service->name = ndpi_strdup(reference->name);
+      service->data = ndpi_strdup(reference->data);
+      service->srv_port = reference->srv_port;
+    }
   }
 
   if(!monitoring_enabled) {

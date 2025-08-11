@@ -1698,7 +1698,7 @@ struct ndpi_flow_struct {
 
   struct {
     uint8_t num_services;
-    struct ndpi_mdns_rsp_entry services[MAX_NUM_MDNS_ADVERTISED_SERVICES];
+    struct ndpi_mdns_rsp_entry *services;
   } mdns_metadata;
 
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
@@ -1758,7 +1758,7 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 264,
                "Size of the struct member protocols increased to more than 264 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1408,
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1232,
                "Size of the flow struct increased to more than 1408 bytes, "
                "please check if this change is necessary.");
 #endif
