@@ -56,11 +56,10 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
                                             const u_int64_t packet_time_ms,
                                             struct ndpi_flow_input_info *input_info);
 ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
-                                    struct ndpi_flow_struct *flow,
-                                    u_int8_t *protocol_was_guessed);
+                                    struct ndpi_flow_struct *flow);
 void ndpi_py_setup_detection_module(struct ndpi_detection_module_struct *mod);
 struct ndpi_flow_struct * ndpi_py_initialize_flow(void);
-char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol proto, char *buf, u_int buf_len);
+char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod, ndpi_master_app_protocol proto, char *buf, u_int buf_len);
 const char* ndpi_category_get_name(struct ndpi_detection_module_struct *ndpi_mod, ndpi_protocol_category_t category);
 const char* ndpi_confidence_get_name(ndpi_confidence_t confidence);
 """

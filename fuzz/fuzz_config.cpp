@@ -12,7 +12,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   struct ndpi_detection_module_struct *ndpi_info_mod;
   struct ndpi_flow_struct flow;
-  u_int8_t protocol_was_guessed, unused;
+  u_int8_t unused;
   u_int32_t i, ret;
   u_int16_t bool_value;
   struct ndpi_lru_cache_stats lru_stats;
@@ -833,15 +833,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_detection_get_l4(pkt.data(), pkt.size(), &l4_return, &l4_len_return, &l4_protocol_return, NDPI_DETECTION_ONLY_IPV4);
 
   ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt.data(), pkt.size(), 0, &input_info);
-  p = ndpi_detection_giveup(ndpi_info_mod, &flow, &protocol_was_guessed);
+  p = ndpi_detection_giveup(ndpi_info_mod, &flow);
 
   assert(p.proto.master_protocol == ndpi_get_flow_masterprotocol(&flow));
   assert(p.proto.app_protocol == ndpi_get_flow_appprotocol(&flow));
   assert(p.category == ndpi_get_flow_category(&flow));
   ndpi_is_master_only_protocol(ndpi_info_mod, p.proto.app_protocol);
   ndpi_normalize_protocol(ndpi_info_mod, &p.proto);
-  assert(ndpi_stack_get_upper_proto(&p.protocol_stack) == ndpi_get_upper_proto(p));
-  assert(ndpi_stack_get_lower_proto(&p.protocol_stack) == ndpi_get_lower_proto(p));
+  assert(ndpi_stack_get_upper_proto(&p.protocol_stack) == ndpi_get_upper_proto(p.proto));
+  assert(ndpi_stack_get_lower_proto(&p.protocol_stack) == ndpi_get_lower_proto(p.proto));
   ndpi_get_flow_error_code(&flow);
   ndpi_get_flow_risk_info(&flow, out, sizeof(out), 1);
   ndpi_get_flow_ndpi_proto(&flow, &p2);

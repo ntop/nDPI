@@ -1193,12 +1193,12 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_serialize_risk(serializer, risk);
   ndpi_serialize_confidence(serializer, confidence);
-  ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol, buf, sizeof(buf)));
-  ndpi_serialize_string_string(serializer, "proto_id", ndpi_protocol2id(l7_protocol, buf, sizeof(buf)));
+  ndpi_serialize_string_string(serializer, "proto", ndpi_protocol2name(ndpi_struct, l7_protocol.proto, buf, sizeof(buf)));
+  ndpi_serialize_string_string(serializer, "proto_id", ndpi_protocol2id(l7_protocol.proto, buf, sizeof(buf)));
   ndpi_serialize_string_string(serializer, "proto_by_ip", ndpi_get_proto_name(ndpi_struct,
                                                                               l7_protocol.protocol_by_ip));
   ndpi_serialize_string_uint32(serializer, "proto_by_ip_id", l7_protocol.protocol_by_ip);
-  ndpi_serialize_string_uint32(serializer, "encrypted", ndpi_is_encrypted_proto(ndpi_struct, l7_protocol));
+  ndpi_serialize_string_uint32(serializer, "encrypted", ndpi_is_encrypted_proto(ndpi_struct, l7_protocol.proto));
   ndpi_serialize_string_string(serializer, "breed", ndpi_get_proto_breed_name(l7_protocol.breed));
   ndpi_serialize_string_uint32(serializer, "category_id", l7_protocol.category);
   ndpi_serialize_string_string(serializer, "category", ndpi_category_get_name(ndpi_struct, l7_protocol.category));
@@ -3617,16 +3617,16 @@ u_int8_t ndpi_is_valid_protoId(const struct ndpi_detection_module_struct *ndpi_s
 /* ******************************************* */
 
 u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
-				 ndpi_protocol proto) {
-  if(proto.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN && ndpi_is_valid_protoId(ndpi_str, proto.proto.app_protocol)) {
-    return(!ndpi_str->proto_defaults[proto.proto.app_protocol].isClearTextProto);
-  } else if(ndpi_is_valid_protoId(ndpi_str, proto.proto.master_protocol) && ndpi_is_valid_protoId(ndpi_str, proto.proto.app_protocol)) {
-    if(ndpi_str->proto_defaults[proto.proto.master_protocol].isClearTextProto
-       && (!ndpi_str->proto_defaults[proto.proto.app_protocol].isClearTextProto))
+                                 ndpi_master_app_protocol proto) {
+  if(proto.master_protocol == NDPI_PROTOCOL_UNKNOWN && ndpi_is_valid_protoId(ndpi_str, proto.app_protocol)) {
+    return(!ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto);
+  } else if(ndpi_is_valid_protoId(ndpi_str, proto.master_protocol) && ndpi_is_valid_protoId(ndpi_str, proto.app_protocol)) {
+    if(ndpi_str->proto_defaults[proto.master_protocol].isClearTextProto
+       && (!ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto))
       return(0);
     else
-      return((ndpi_str->proto_defaults[proto.proto.master_protocol].isClearTextProto
-	      && ndpi_str->proto_defaults[proto.proto.app_protocol].isClearTextProto) ? 0 : 1);
+      return((ndpi_str->proto_defaults[proto.master_protocol].isClearTextProto
+	      && ndpi_str->proto_defaults[proto.app_protocol].isClearTextProto) ? 0 : 1);
   } else
     return(0);
 }

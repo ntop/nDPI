@@ -1118,7 +1118,7 @@ static void dump_flow_fingerprint(struct ndpi_workflow * workflow,
     ndpi_serialize_string_uint32(&serializer, "srv_port", ntohs(flow->dst_port));
     ndpi_serialize_string_string(&serializer, "proto",
 				 ndpi_protocol2name(workflow->ndpi_struct,
-						    flow->detected_protocol,
+						    flow->detected_protocol.proto,
 						    buf, sizeof(buf)));
 
     if(flow->server_hostname)
@@ -1165,7 +1165,7 @@ static void process_ndpi_monitoring_info(struct ndpi_flow_info *flow) {
     return;
 
   if(flow->monitoring_state == 0 &&
-     flow->ndpi_flow->monitoring) {
+     flow->ndpi_flow->state == NDPI_STATE_MONITORING) {
     /* We just moved to monitoring state */
     flow->monitoring_state = 1;
     flow->num_packets_before_monitoring = flow->ndpi_flow->packet_direction_complete_counter[0] + flow->ndpi_flow->packet_direction_complete_counter[1];
@@ -1675,7 +1675,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_serialize_string_uint32(&flow->ndpi_flow_serializer, "detection_completed", flow->detection_completed);
     ndpi_serialize_string_uint32(&flow->ndpi_flow_serializer, "check_extra_packets", flow->check_extra_packets);
 
-    if(flow->ndpi_flow->monitoring) {
+    if(flow->ndpi_flow->state == NDPI_STATE_MONITORING) {
       serialize_monitoring_metadata(flow);
     }
 
@@ -1989,26 +1989,19 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
 							    ipsize, time_ms, &input_info);
     if(monitoring_enabled)
       process_ndpi_monitoring_info(flow);
-    enough_packets |= ndpi_flow->fail_with_unknown;
-    if(enough_packets || (flow->detected_protocol.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)) {
-      if((!enough_packets)
-	 && ndpi_extra_dissection_possible(workflow->ndpi_struct, ndpi_flow))
-	; /* Wait for further metadata */
-      else {
-	/* New protocol detected or give up */
-	flow->detection_completed = 1;
+    if(flow->detected_protocol.state == NDPI_STATE_CLASSIFIED ||
+       enough_packets) {
 
-	if(flow->detected_protocol.proto.app_protocol == NDPI_PROTOCOL_UNKNOWN) {
-	  u_int8_t proto_guessed;
+      flow->detection_completed = 1;
 
-	  flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow,
-							  &proto_guessed);
-	  if(proto_guessed) workflow->stats.guessed_flow_protocols++;
-	}
-
-	process_ndpi_collected_info(workflow, flow);
+      if(flow->detected_protocol.state != NDPI_STATE_CLASSIFIED) {
+         flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct, flow->ndpi_flow);
       }
+
+      if(flow->ndpi_flow->protocol_was_guessed) workflow->stats.guessed_flow_protocols++;
+      process_ndpi_collected_info(workflow, flow);
     }
+
     /* Let's try to save client-server direction */
     flow->current_pkt_from_client_to_server = input_info.in_pkt_dir;
 

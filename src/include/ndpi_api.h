@@ -307,13 +307,11 @@ extern "C" {
    *
    * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
-   * @par    protocol_was_guessed = 1 if the protocol was guessed (requires enable_guess = 1), 0 otherwise
    * @return the detected protocol even if the flow is not completed;
    *
    */
   ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_struct,
-				      struct ndpi_flow_struct *flow,
-				      u_int8_t *protocol_was_guessed);
+				      struct ndpi_flow_struct *flow);
 
   /**
    * Processes one packet and returns the ID of the detected protocol.
@@ -499,26 +497,26 @@ extern "C" {
    * Write the protocol name in the buffer -buf- as master_protocol.protocol
    *
    * @par     ndpi_mod      = the detection module
-   * @par     proto         = the struct ndpi_protocol contain the protocols name
+   * @par     proto         = the struct ndpi_master_app_protocol contain the protocols name
    * @par     buf           = the buffer to write the name of the protocols
    * @par     buf_len       = the length of the buffer
    * @return  the buffer contains the master_protocol and protocol name
    *
    */
   char* ndpi_protocol2name(struct ndpi_detection_module_struct *ndpi_mod,
-			   ndpi_protocol proto, char *buf, u_int buf_len);
+                           ndpi_master_app_protocol proto, char *buf, u_int buf_len);
 
   /**
    * Same as ndpi_protocol2name() with the difference that the numeric protocol
    * name is returned
    *
-   * @par     proto         = the struct ndpi_protocol contain the protocols name
+   * @par     proto         = the struct ndpi_master_app_protocol contain the protocols name
    * @par     buf           = the buffer to write the name of the protocols
    * @par     buf_len       = the length of the buffer
    * @return  the buffer contains the master_protocol and protocol name
    *
    */
-  char* ndpi_protocol2id(ndpi_protocol proto, char *buf, u_int buf_len);
+  char* ndpi_protocol2id(ndpi_master_app_protocol proto, char *buf, u_int buf_len);
 
   /**
    * Find out if a given category is custom/user-defined
@@ -1059,8 +1057,8 @@ extern "C" {
   ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t ndpi_proto_id);
   const char* ndpi_get_l4_proto_name(ndpi_l4_proto_info proto);
 
-  u_int16_t ndpi_get_lower_proto(ndpi_protocol proto);
-  u_int16_t ndpi_get_upper_proto(ndpi_protocol proto);
+  u_int16_t ndpi_get_lower_proto(ndpi_master_app_protocol proto);
+  u_int16_t ndpi_get_upper_proto(ndpi_master_app_protocol proto);
   bool ndpi_is_proto(ndpi_master_app_protocol proto, u_int16_t p);
   bool ndpi_is_proto_unknown(ndpi_master_app_protocol proto);
   bool ndpi_is_proto_equals(ndpi_master_app_protocol to_check, ndpi_master_app_protocol to_match, bool exact_match_only);
@@ -1196,8 +1194,6 @@ extern "C" {
   int ndpi_flowv6_flow_hash(u_int8_t l4_proto, const struct ndpi_in6_addr *src_ip, const struct ndpi_in6_addr *dst_ip,
 			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
 			    u_char *hash_buf, u_int8_t hash_buf_len);
-  u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndpi_str,
-                                          struct ndpi_flow_struct *flow);
   u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher);
   const char* ndpi_cipher2str(u_int32_t cipher, char unknown_cipher[8]);
   const char* ndpi_tunnel2str(ndpi_packet_tunnel tt);
@@ -1290,7 +1286,7 @@ extern "C" {
   u_int8_t ndpi_is_public_ipv4(u_int32_t a /* host byte order */);
   u_int64_t ndpi_htonll(u_int64_t v);
   u_int64_t ndpi_ntohll(u_int64_t v);
-  u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str, ndpi_protocol proto);
+  u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str, ndpi_master_app_protocol proto);
 
   /* DGA */
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,

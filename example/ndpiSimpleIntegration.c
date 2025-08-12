@@ -876,12 +876,10 @@ static void ndpi_process_packet(uint8_t * const args,
     return;
   } else if (flow_to_process->ndpi_flow->num_processed_pkts == 0xFE) {
     /* last chance to guess something, better then nothing */
-    uint8_t protocol_was_guessed = 0;
     flow_to_process->guessed_protocol =
       ndpi_detection_giveup(workflow->ndpi_struct,
-			    flow_to_process->ndpi_flow,
-			    &protocol_was_guessed);
-    if (protocol_was_guessed != 0) {
+			    flow_to_process->ndpi_flow);
+    if (flow_to_process->ndpi_flow->protocol_was_guessed != 0) {
       printf("[%8llu, %d, %4d][GUESSED] protocol: %s | app protocol: %s | category: %s\n",
 	     workflow->packets_captured,
 	     reader_thread->array_index,

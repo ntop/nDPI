@@ -563,7 +563,7 @@ void ndpiCheckHostStringMatch(char *testChar) {
            detected_protocol.proto.app_protocol,
            detected_protocol.breed,
            detected_protocol.category,
-           ndpi_protocol2name(ndpi_str, detected_protocol, appBufStr,
+           ndpi_protocol2name(ndpi_str, detected_protocol.proto, appBufStr,
                               sizeof(appBufStr)),
            ndpi_get_proto_breed_name(detected_protocol.breed),
            ndpi_category_get_name(ndpi_str, detected_protocol.category));
@@ -640,7 +640,7 @@ void ndpiCheckHostsFileStringMatch(const char *domains_file) {
 
       printf("Domain [%s] -> %s %s %s\n",
              line,
-             ndpi_protocol2name(ndpi_str, detected_protocol, appBufStr,
+             ndpi_protocol2name(ndpi_str, detected_protocol.proto, appBufStr,
                                 sizeof(appBufStr)),
              ndpi_get_proto_breed_name(detected_protocol.breed),
              ndpi_category_get_name(ndpi_str, detected_protocol.category));
@@ -725,7 +725,7 @@ static void ndpiCheckIPMatch(char *testChar) {
     memset(&detected_protocol, 0, sizeof(ndpi_protocol));
     detected_protocol.proto.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, ret);
 
-    ndpi_protocol2name(ndpi_str, detected_protocol, appBufStr,
+    ndpi_protocol2name(ndpi_str, detected_protocol.proto, appBufStr,
                        sizeof(appBufStr));
 
     printf("Match Found for IP %s, port %d -> %s (%d)\n",
@@ -1947,11 +1947,11 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
             );
 
     fprintf(csv_fp, "%s|",
-            ndpi_protocol2id(flow->detected_protocol, buf, sizeof(buf)));
+            ndpi_protocol2id(flow->detected_protocol.proto, buf, sizeof(buf)));
 
     fprintf(csv_fp, "%s|%s|%s|%s|",
             ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                               flow->detected_protocol, buf, sizeof(buf)),
+                               flow->detected_protocol.proto, buf, sizeof(buf)),
             ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                            &flow->detected_protocol.protocol_stack, buf2, sizeof(buf2)),
             ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
@@ -2090,7 +2090,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	       flow->detected_protocol.proto.master_protocol,
 	       flow->detected_protocol.proto.app_protocol,
 	       ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				  flow->detected_protocol, buf1, sizeof(buf1))
+				  flow->detected_protocol.proto, buf1, sizeof(buf1))
 	  );
       }
     }
@@ -2132,14 +2132,14 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
 #ifdef NDPI_EXTENDED_SANITY_CHECKS
     /* Be sure new stack logic is compatible with legacy code */
-    assert(ndpi_stack_get_upper_proto(&flow->detected_protocol.protocol_stack) == ndpi_get_upper_proto(flow->detected_protocol));
-    assert(ndpi_stack_get_lower_proto(&flow->detected_protocol.protocol_stack) == ndpi_get_lower_proto(flow->detected_protocol));
+    assert(ndpi_stack_get_upper_proto(&flow->detected_protocol.protocol_stack) == ndpi_get_upper_proto(flow->detected_protocol.proto));
+    assert(ndpi_stack_get_lower_proto(&flow->detected_protocol.protocol_stack) == ndpi_get_lower_proto(flow->detected_protocol.proto));
 #endif
 
     fprintf(out, "%s/%s][Stack: %s][IP: %u/%s]",
-	    ndpi_protocol2id(flow->detected_protocol, buf, sizeof(buf)),
+	    ndpi_protocol2id(flow->detected_protocol.proto, buf, sizeof(buf)),
 	    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-			       flow->detected_protocol, buf1, sizeof(buf1)),
+			       flow->detected_protocol.proto, buf1, sizeof(buf1)),
 	    ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 		           &flow->detected_protocol.protocol_stack, buf2, sizeof(buf2)),
 	    flow->detected_protocol.protocol_by_ip,
@@ -2173,7 +2173,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     fprintf(out, "[%s]",
 	    ndpi_is_encrypted_proto(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				    flow->detected_protocol) ? "Encrypted" : "ClearText");
+				    flow->detected_protocol.proto) ? "Encrypted" : "ClearText");
 
     fprintf(out, "[Confidence: %s]", ndpi_confidence_get_name(flow->confidence));
 
@@ -2738,14 +2738,13 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if((!flow->detection_completed) && flow->ndpi_flow) {
-      u_int8_t proto_guessed;
 
       malloc_size_stats = 1;
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                                      flow->ndpi_flow, &proto_guessed);
+                                                      flow->ndpi_flow);
       malloc_size_stats = 0;
 
-      if(proto_guessed) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
+      if(flow->ndpi_flow->protocol_was_guessed) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
     }
 
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);
@@ -3147,7 +3146,7 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
     /* get app level protocol */
     if(flow->detected_protocol.proto.master_protocol) {
       ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                         flow->detected_protocol, proto, sizeof(proto));
+                         flow->detected_protocol.proto, proto, sizeof(proto));
     } else {
       strncpy(proto, ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                                          flow->detected_protocol.proto.app_protocol),sizeof(proto) - 1);
@@ -3255,7 +3254,7 @@ static void dump_realtime_protocol(struct ndpi_workflow * workflow, struct ndpi_
     snprintf(dstip, sizeof(dstip), "[%s]", flow->dst_name ? flow->dst_name : "");
   }
 
-  ndpi_protocol2name(workflow->ndpi_struct, flow->detected_protocol, app_name, sizeof(app_name));
+  ndpi_protocol2name(workflow->ndpi_struct, flow->detected_protocol.proto, app_name, sizeof(app_name));
 
   if (ret == 1) {
     fprintf(out, "Detected Realtime protocol %s --> [%s] %s:%d <--> %s:%d app=%s <%s>\n",
@@ -4104,7 +4103,7 @@ static void printFlowsStats() {
               fprintf(out, "\t%u\t%-10s\t%s:%u <-> %s:%u\t[",
                       i,
                       ndpi_protocol2name(ndpi_thread_info[0].workflow->ndpi_struct,
-                                         all_flows[i].flow->detected_protocol, buf, sizeof(buf)),
+                                         all_flows[i].flow->detected_protocol.proto, buf, sizeof(buf)),
                       all_flows[i].flow->src_name ? all_flows[i].flow->src_name : "",
                       ntohs(all_flows[i].flow->src_port),
                       all_flows[i].flow->dst_name ? all_flows[i].flow->dst_name : "",
@@ -5103,7 +5102,7 @@ static void ndpi_process_packet(u_char *args,
     }
     trailer->flow_risk_info[sizeof(trailer->flow_risk_info) - 1] = '\0';
     trailer->proto.master_protocol = htons(p.proto.master_protocol), trailer->proto.app_protocol = htons(p.proto.app_protocol);
-    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p, trailer->name, sizeof(trailer->name));
+    ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p.proto, trailer->name, sizeof(trailer->name));
 
     /* Metadata */
     /* Metadata are (all) available in `flow` only after nDPI completed its work!

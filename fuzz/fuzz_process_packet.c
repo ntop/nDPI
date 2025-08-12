@@ -10,8 +10,6 @@ static ndpi_serializer json_serializer = {};
 static ndpi_serializer csv_serializer = {};
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
-  uint8_t protocol_was_guessed;
-
   if (ndpi_info_mod == NULL) {
     fuzz_init_detection_module(&ndpi_info_mod, NULL);
 
@@ -22,19 +20,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   memset(&ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
   ndpi_protocol detected_protocol =
     ndpi_detection_process_packet(ndpi_info_mod, &ndpi_flow, Data, Size, 0, NULL);
-  ndpi_protocol guessed_protocol =
-    ndpi_detection_giveup(ndpi_info_mod, &ndpi_flow, &protocol_was_guessed);
+  detected_protocol = ndpi_detection_giveup(ndpi_info_mod, &ndpi_flow);
 
   ndpi_reset_serializer(&json_serializer);
   ndpi_reset_serializer(&csv_serializer);
-  if (protocol_was_guessed == 0)
-  {
-    ndpi_dpi2json(ndpi_info_mod, &ndpi_flow, detected_protocol, &json_serializer);
-    ndpi_dpi2json(ndpi_info_mod, &ndpi_flow, detected_protocol, &csv_serializer);
-  } else {
-    ndpi_dpi2json(ndpi_info_mod, &ndpi_flow, guessed_protocol, &json_serializer);
-    ndpi_dpi2json(ndpi_info_mod, &ndpi_flow, guessed_protocol, &csv_serializer);
-  }
+  ndpi_dpi2json(ndpi_info_mod, &ndpi_flow, detected_protocol, &json_serializer);
+  ndpi_dpi2json(ndpi_info_mod, &ndpi_flow, detected_protocol, &csv_serializer);
   ndpi_free_flow_data(&ndpi_flow);
 
   return 0;

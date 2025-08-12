@@ -47,10 +47,8 @@ static void node_cleanup_walker(const void *node, ndpi_VISIT which, int depth, v
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if((!flow->detection_completed) && flow->ndpi_flow) {
-      u_int8_t proto_guessed;
-
       flow->detected_protocol = ndpi_detection_giveup(workflow->ndpi_struct,
-                                                      flow->ndpi_flow, &proto_guessed);
+                                                      flow->ndpi_flow);
     }
 
     process_ndpi_collected_info(workflow, flow);

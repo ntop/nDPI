@@ -1297,6 +1297,17 @@ typedef struct ndpi_proto_stack {
   u_int16_t protos_num;
 } ndpi_proto_stack;
 
+/* Flow classification state */
+typedef enum ndpi_classification_state {
+  NDPI_STATE_INSPECTING = 0, /* Initial state; work in progress: nDPI is trying to get a proper classification and all metadata */
+  NDPI_STATE_PARTIAL,        /* Work in progress: we have a partial/temporary classification that can change/improve later.
+                                More metadata might be extracted */
+  NDPI_STATE_MONITORING,     /* Classification is final, but nDPI will keep processing all the flow packets to extract more metadata.
+                                Note that a flow in this state will never move to classified state */
+  NDPI_STATE_CLASSIFIED,     /* Job done; the flow is fully classified and all metadata have been extracted. nDPI doesn't want/need more packets for this flow */
+
+} ndpi_classification_state;
+
 typedef struct ndpi_proto {
   ndpi_master_app_protocol proto;
   struct ndpi_proto_stack protocol_stack;
@@ -1305,6 +1316,7 @@ typedef struct ndpi_proto {
   ndpi_protocol_breed_t breed;
   struct ndpi_fpc_info fpc;
   void *custom_category_userdata;
+  ndpi_classification_state state;
 } ndpi_protocol;
 
 
@@ -1398,14 +1410,15 @@ struct rtp_info {
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   struct ndpi_proto_stack protocol_stack;
+  ndpi_classification_state state;
 
   u_int16_t guessed_protocol_id;       /* Classification by-port. Set with the first pkt and never updated */
   u_int16_t guessed_protocol_id_by_ip; /* Classification by-ip. Set with the first pkt and never updated */
   u_int16_t fast_callback_protocol_id; /* Partial/incomplete classification. Used internally as first callback when iterating all the protocols */
   u_int16_t guessed_header_category;
-  u_int8_t l4_proto, protocol_id_already_guessed:1, fail_with_unknown:1,
-    init_finished:1, client_packet_direction:1, packet_direction:1, is_ipv6:1, first_pkt_fully_encrypted:1, skip_entropy_check: 1;
-  u_int8_t monitoring:1, already_gaveup:1, _pad:6;
+  u_int8_t l4_proto, protocol_id_already_guessed:1,
+    init_finished:1, client_packet_direction:1, packet_direction:1, is_ipv6:1, first_pkt_fully_encrypted:1, skip_entropy_check: 1, protocol_was_guessed:1;
+  u_int8_t already_gaveup:1, _pad:6;
   void *custom_category_userdata;
 
   u_int16_t num_dissector_calls;

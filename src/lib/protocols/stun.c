@@ -727,13 +727,13 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
     }
   }
 
-  if(flow->monitoring)
+  if(flow->state == NDPI_STATE_MONITORING)
     return 1;
 
   if(flow->num_extra_packets_checked + 1 == flow->max_extra_packets_to_check) {
     if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_STUN)) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling monitoring (end extra dissection)\n");
-      flow->monitoring = 1;
+      flow->state = NDPI_STATE_MONITORING;
       return 1;
     }
   }
@@ -758,7 +758,7 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
      (flow->stun.other_address.port || !ndpi_struct->cfg.stun_other_address_enabled)) {
     if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_STUN)) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling monitoring (found all metadata)\n");
-      flow->monitoring = 1;
+      flow->state = NDPI_STATE_MONITORING;
       return 1;
     }
     return 0;
@@ -771,7 +771,7 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
      (flow->stun.relayed_address.port || !ndpi_struct->cfg.stun_relayed_address_enabled)) {
     if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_STUN)) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling monitor (found all metadata; wa case)\n");
-      flow->monitoring = 1;
+      flow->state = NDPI_STATE_MONITORING;
       return 1;
     }
     return 0;
@@ -781,7 +781,7 @@ static int keep_extra_dissection(struct ndpi_detection_module_struct *ndpi_struc
   if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_ZOOM) {
     if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_STUN)) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling monitor (zoom case)\n");
-      flow->monitoring = 1;
+      flow->state = NDPI_STATE_MONITORING;
       return 1;
     }
     return 0;
@@ -818,7 +818,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG2(ndpi_struct, "Packet counter %d protos %d/%d Monitoring? %d\n",
                 flow->packet_counter,
                 flow->detected_protocol_stack[0], flow->detected_protocol_stack[1],
-                flow->monitoring);
+                flow->state == NDPI_STATE_MONITORING);
 
   /* TODO: check TCP support. We need to pay some attention because:
      * multiple msg in the same TCP segment
@@ -878,7 +878,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
       if(flow->tls_quic.certificate_processed == 1) {
         NDPI_LOG_DBG(ndpi_struct, "Interesting DTLS stuff already processed. Ignoring\n");
-      } else if(!flow->monitoring) {
+      } else if(flow->state != NDPI_STATE_MONITORING) {
         NDPI_LOG_DBG(ndpi_struct, "Switch to DTLS (%d/%d)\n",
                      flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
 
@@ -1012,7 +1012,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
                 flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
         /* From RTP dissector; if we have RTP and RTCP multiplexed together (but not STUN, yet) we always
 	   use RTP, as we do in RTP dissector */
-        if(!flow->monitoring)
+        if(flow->state != NDPI_STATE_MONITORING)
           ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RTP, NDPI_CONFIDENCE_DPI);
         else
           NDPI_LOG_DBG(ndpi_struct, "Skip RTP packet because in monitoring\n");
@@ -1076,7 +1076,7 @@ static int stun_telegram_search_again(struct ndpi_detection_module_struct *ndpi_
   NDPI_LOG_DBG2(ndpi_struct, "[T] Packet counter %d protos %d/%d Monitoring? %d\n",
                 flow->packet_counter,
                 flow->detected_protocol_stack[0], flow->detected_protocol_stack[1],
-                flow->monitoring);
+                flow->state == NDPI_STATE_MONITORING);
 
   /* For SOME of its STUN flows, Telegram uses a custom encapsulation
      There is no documentation. It seems:
@@ -1156,7 +1156,7 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
   u_int16_t new_app_proto;
 
   /* In monitoring the classification can't change again */
-  if(flow->monitoring)
+  if(flow->state == NDPI_STATE_MONITORING)
     return;
 
   NDPI_LOG_DBG(ndpi_struct, "Wanting %d/%d\n", master_proto, app_proto);

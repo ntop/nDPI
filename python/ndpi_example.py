@@ -151,8 +151,8 @@ if __name__ == "__main__":
             flow.detected_protocol = nDPI.giveup(flow.ndpi_flow)  # We try to guess it (port matching, LRU, etc.)
         FLOW_EXPORT = FLOW_STR.format(flow.index,
                                       key,
-                                      nDPI.protocol_name(flow.detected_protocol),
-                                      nDPI.protocol_category_name(flow.detected_protocol),
+                                      nDPI.protocol_name(flow.detected_protocol.proto),
+                                      nDPI.protocol_category_name(flow.detected_protocol.proto),
                                       flow.ndpi_flow.confidence.name,
                                       flow.pkts,
                                       flow.bytes)
