@@ -474,7 +474,18 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
     /* x points to the response "class" field */
     if((x+12) <= packet->payload_packet_len) {
       u_int16_t srv_port = 0;
-      u_int16_t rsp_class = ntohl(*(u_int16_t *) &packet->payload[x]);
+      u_int16_t raw_rsp_class = ntohs(*(u_int16_t *) &packet->payload[x]);;
+      u_int16_t rsp_class;
+
+      if(proto->master_protocol == NDPI_PROTOCOL_MDNS) {
+#ifdef DNS_DEBUG  /* avoid warning "unused variable ‘cache_flush’ [-Wunused-variable]" */
+        u_int8_t cache_flush = (raw_rsp_class & 0x8000) != 0;
+#endif
+        rsp_class = raw_rsp_class & 0x7FFF;
+      } else {
+        rsp_class = raw_rsp_class;
+      }
+
       u_int32_t ttl = ntohl(*((u_int32_t*)&packet->payload[x+2]));
 
       x += 6;
@@ -629,8 +640,8 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
             char target[255];
             u_int target_len = 0;
 
-            if((ndpi_grab_dns_name(packet, &x_orig, target, sizeof(target),
-                &target_len, ignore_checks)) == 0) {
+            if(ndpi_grab_dns_name(packet, &x_orig, target, sizeof(target),
+                &target_len, ignore_checks) == 0) {
               /* todo: maybe set_risk here, malformed name */
               continue;
             }
@@ -656,7 +667,8 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
             flow->mdns_metadata.num_services >= MAX_NUM_MDNS_ADVERTISED_SERVICES) {
             /* info was useless or we reached the limit */
             ndpi_free(data);
-          } else if(add_to_mdns_metadata(flow, rsp_type, rsp_class, rsp_ttl, data_len, srv_port, data, name_len, name) < 0) {
+          } else if(add_to_mdns_metadata(flow, rsp_type, rsp_class, rsp_ttl,
+                                         data_len,srv_port, data, name_len, name) < 0) {
 #ifdef DNS_DEBUG
             printf("[DNS] Out of memory\n");
 #endif

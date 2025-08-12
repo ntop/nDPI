@@ -397,7 +397,7 @@ struct ndpi_dhcphdr {
 } PACK_OFF;
 
 /* +++++++++++++++ MDNS rsp header +++++++++++++++ */
-PACK_ON
+
 struct ndpi_mdns_rsp_entry {
   u_int16_t rsp_type, rsp_class;
   u_int32_t ttl;
@@ -405,7 +405,7 @@ struct ndpi_mdns_rsp_entry {
   char *name; // hostname
   char *data; // metadata
   u_int16_t srv_port;
-} PACK_OFF;
+};
 
 /* +++++++++++++++++++ LLC header (IEEE 802.2) ++++++++++++++++ */
 
