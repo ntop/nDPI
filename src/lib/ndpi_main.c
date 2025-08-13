@@ -9965,6 +9965,8 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 	  ndpi_fill_protocol_category(ndpi_str, flow, &ret);
 	  proto_stack_update(&flow->protocol_stack, ret.proto.master_protocol, ret.proto.app_protocol);
 	  flow->confidence = NDPI_CONFIDENCE_NBPF;
+	  /* Reason: nBPF match */
+	  internal_giveup(ndpi_str, flow, &ret);
 
 	  return(ret);
 	}
