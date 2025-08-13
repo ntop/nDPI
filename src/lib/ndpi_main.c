@@ -8874,15 +8874,7 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ********************************************************************************* */
 
-/*
-  NOTE:
-
-  This function is called only by ndpi_detection_giveup() as it checks
-  flows that have anomalous conditions such as SYN+RST ACK+RST....
-  As these conditions won't happen with nDPI protocol-detected protocols
-  it is not necessary to call this function elsewhere
-*/
-static void ndpi_check_tcp_flags(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static void check_tcp_flags(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   // printf("[TOTAL] %u / %u [tot: %u]\n", flow->packet_direction_complete_counter[0], flow->packet_direction_complete_counter[1], flow->all_packets_counter);
   bool is_probing = false;
 
@@ -8903,8 +8895,8 @@ static void ndpi_check_tcp_flags(struct ndpi_detection_module_struct *ndpi_struc
 
 /* ******************************************************************** */
 
-static void ndpi_check_probing_attempt(struct ndpi_detection_module_struct *ndpi_str,
-                                       struct ndpi_flow_struct *flow) {
+static void check_probing_attempt(struct ndpi_detection_module_struct *ndpi_str,
+                                  struct ndpi_flow_struct *flow) {
   /* TODO: check UDP traffic too */
 
   if((flow->l4_proto == IPPROTO_TCP)
@@ -8969,7 +8961,7 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
   }
   flow->already_gaveup = 1;
 
-  NDPI_LOG_DBG2(ndpi_struct, "");
+  NDPI_LOG_DBG2(ndpi_struct, "\n");
 
   /* This (internal) function is expected to be called for **every** flows,
      exactly once, as **last** code processing the flow itself */
@@ -8993,6 +8985,11 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_set_risk(ndpi_struct, flow, NDPI_UNIDIRECTIONAL_TRAFFIC, "No server to client traffic");
   }
 
+  if(flow->l4_proto == IPPROTO_TCP) {
+    check_tcp_flags(ndpi_struct, flow);
+    check_probing_attempt(ndpi_struct, flow);
+  }
+
   /* TODO */
   (void)ret;
 }
@@ -9011,11 +9008,6 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   if(!ndpi_str || !flow)
     return(ret);
-
-  if(flow->l4_proto == IPPROTO_TCP) {
-    ndpi_check_tcp_flags(ndpi_str, flow);
-    ndpi_check_probing_attempt(ndpi_str, flow);
-  }
 
   /* Init defaults */
   ret.proto.master_protocol = flow->detected_protocol_stack[1];
@@ -11864,7 +11856,6 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 		!!flow->extra_packets_func);
 
   if(!flow->extra_packets_func) {
-    ndpi_check_probing_attempt(ndpi_str, flow);
     return(0);
   }
 
