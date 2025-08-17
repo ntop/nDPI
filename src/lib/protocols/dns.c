@@ -20,6 +20,7 @@
  * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "ndpi_define.h"
 
 #include "ndpi_protocol_ids.h"
 
