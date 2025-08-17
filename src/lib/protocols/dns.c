@@ -516,14 +516,14 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
               x = orig_x;
               found = 1;
               if(proto->master_protocol == NDPI_PROTOCOL_MDNS && len > 0) {
-                if((data = ndpi_malloc(len + 1)) == NULL) {
+                if((data = ndpi_malloc(len + 1)) != NULL) {
+                  memcpy(data, flow->protos.dns.ptr_domain_name, len);
+                  data[len] = '\0';
+                } else {
 #ifdef DNS_DEBUG
                   printf("[DNS] Out of memory\n");
 #endif
-                  return -1; /* todo: either continue or fail */
                 }
-                memcpy(data, flow->protos.dns.ptr_domain_name, len);
-                data[len] = '\0';
               }
             }
           }
@@ -580,49 +580,49 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
             /* We alloc more space than needed since we need space for separators.
              * Also notice TXT fields don't use name compression, so we base our size
              * on data_len. */
-            if((data = ndpi_malloc(data_len + (sep_len * data_len) + 1)) == NULL) {
+            if((data = ndpi_malloc(data_len + (sep_len * data_len) + 1)) != NULL) {
+              u_int x_orig = x;
+              data[0] = 0; /* it surely exists due to its size being minimum 1 (if data_len = 0) */
+              int is_invalid = 1;
+
+              size_t bytes_read = 0;
+              size_t data_offset = 0;
+
+              while(bytes_read < data_len) {
+                u_int8_t txt_subfield_len = packet->payload[x_orig++];
+                bytes_read++;
+
+                is_invalid = txt_subfield_len + bytes_read > data_len ||
+                             txt_subfield_len > packet->payload_packet_len - x_orig;
+                if(is_invalid) {
+                  ndpi_free(data);
+                  /* todo: this is a malformed DNS packet, maybe set_risk here */
+                  break;
+                }
+                if(txt_subfield_len == 0) {
+                  /* todo: maybe "txt subfield with zero len" can be a minor issue risk */
+                  continue; /* nothing to do for an empty string */
+                }
+
+                memcpy(data + data_offset, &packet->payload[x_orig], txt_subfield_len);
+                data_offset += txt_subfield_len;
+                memcpy(data + data_offset, sep, sep_len);
+                data_offset += sep_len;
+
+                x_orig += txt_subfield_len;
+                bytes_read += txt_subfield_len;
+              }
+              if(!is_invalid) {  /* check needed because *data might point to deallocated memory */
+                if(data_offset >= sep_len) { /* if the while cycle didn't do any iteration, data_offset is 0 */
+                  data[data_offset - sep_len] = 0; /* - sep_len removes the last separator */
+                } else {
+                  data[data_offset] = 0;
+                }
+              }
+            } else {
 #ifdef DNS_DEBUG
               printf("[DNS] Out of memory\n");
 #endif
-              return -1; /* todo: maybe this is not the correct behavior */
-            }
-            u_int x_orig = x;
-            data[0] = 0; /* it surely exists due to its size being minimum 1 (if data_len = 0) */
-            int is_invalid = 1;
-
-            size_t bytes_read = 0;
-            size_t data_offset = 0;
-
-            while(bytes_read < data_len) {
-              u_int8_t txt_subfield_len = packet->payload[x_orig++];
-              bytes_read++;
-
-              is_invalid = txt_subfield_len + bytes_read > data_len ||
-                           txt_subfield_len > packet->payload_packet_len - x_orig;
-              if(is_invalid) {
-                ndpi_free(data);
-                /* todo: this is a malformed DNS packet, maybe set_risk here */
-                break;
-              }
-              if(txt_subfield_len == 0) {
-                /* todo: maybe "txt subfield with zero len" can be a minor issue risk */
-                continue; /* nothing to do for an empty string */
-              }
-
-              memcpy(data + data_offset, &packet->payload[x_orig], txt_subfield_len);
-              data_offset += txt_subfield_len;
-              memcpy(data + data_offset, sep, sep_len);
-              data_offset += sep_len;
-
-              x_orig += txt_subfield_len;
-              bytes_read += txt_subfield_len;
-            }
-            if(!is_invalid) {  /* check needed because *data might point to deallocated memory */
-              if(data_offset >= sep_len) { /* if the while cycle didn't do any iteration, data_offset is 0 */
-                data[data_offset - sep_len] = 0; /* - sep_len removes the last separator */
-              } else {
-                data[data_offset] = 0;
-              }
             }
           }
         } else if(rsp_type == 0x21 /* SRV */) {
@@ -632,31 +632,30 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
             srv_port = ntohs(*(u_int16_t*)&packet->payload[x_orig]);
             x_orig += 2; /* skip port */
 
-            if(srv_port == 0) {
-              /* todo: this is malformed since ports can't be zero, maybe set_risk here */
-              continue;
-            }
-            /* Target might use compression, and we can't determine its length a priori,
-             * so unfortunately we need to first find it and then copy it */
-            char target[255];
-            u_int target_len = 0;
+            if(srv_port != 0) {
+              /* Target might use compression, and we can't determine its length a priori,
+               * so unfortunately we need to first find it and then copy it */
+              char target[255];
+              u_int target_len = 0;
 
-            if(ndpi_grab_dns_name(packet, &x_orig, target, sizeof(target),
-                &target_len, ignore_checks) == 0) {
-              /* todo: maybe set_risk here, malformed name */
-              continue;
-            }
-            if(target_len <= 0) { /* name is good but contains nothing */
-              continue;
-            }
-            if((data = ndpi_malloc(target_len + 1)) == NULL) {
+              if(ndpi_grab_dns_name(packet, &x_orig, target, sizeof(target),
+                  &target_len, ignore_checks)) {
+                if(target_len > 0) {
+                  if((data = ndpi_malloc(target_len + 1)) != NULL) {
+                    memcpy(data, target, target_len);
+                    data[target_len] = 0;
+                  } else {
 #ifdef DNS_DEBUG
-              printf("[DNS] Out of memory\n");
+                  printf("[DNS] Out of memory\n");
 #endif
-              return -1; /* todo: maybe this is not the correct behavior */
+                  }
+                }
+              } else {
+                /* todo: maybe set_risk here, malformed name */
+              }
+            } else {
+              /* todo: this is malformed since ports can't be zero, maybe set_risk here */
             }
-            memcpy(data, target, target_len);
-            data[target_len] = 0;
           }
         }
 
@@ -673,7 +672,6 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DNS_DEBUG
             printf("[DNS] Out of memory\n");
 #endif
-            /* todo: maybe return */
           }
       }
     }
