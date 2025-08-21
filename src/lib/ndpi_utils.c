@@ -4678,6 +4678,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 
     s = snprintf((char*)fp_buf, sizeof(fp_buf)-1, "%s-%s-%s", l4_fp, l7_pf, l7_pf_server);
     if(s > 0) {
+      s = ndpi_min(s, sizeof(fp_buf)-1);
       ndpi_sha256(fp_buf, s, sha_hash);
 
       ndpi_snprintf((char*)fp_buf, sizeof(fp_buf),
