@@ -201,8 +201,8 @@ struct ndpi_global_context {
     in ndpi_main.c
    */
   typedef enum  {
-    NDPI_CLIENT_SERVER_NDPI_FINGERPRINT = 0,
-    NDPI_CLIENT_ONLY_NDPI_FINGERPRINT
+    NDPI_CLIENT_ONLY_NDPI_FINGERPRINT = 0, /* Default */
+    NDPI_CLIENT_SERVER_NDPI_FINGERPRINT
   } ndpi_fingerprint_format;
 
 struct ndpi_detection_module_config_struct {

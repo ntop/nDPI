@@ -13068,7 +13068,7 @@ static const struct cfg_param {
   { NULL,            "metadata.tcp_fingerprint_format",         "0", "0" /* min */, "1" /* max */, CFG_PARAM_INT, __OFF(tcp_fingerprint_format), NULL },
 
   { NULL,            "metadata.ndpi_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ndpi_fingerprint_enabled), NULL },
-  { NULL,            "metadata.ndpi_fingerprint_format",         "0", "0" /* include server info */, "1" /* client only */, CFG_PARAM_INT, __OFF(ndpi_fingerprint_format), NULL },
+  { NULL,            "metadata.ndpi_fingerprint_format",         "0", "0" /* client-only */, "1" /* client+server only */, CFG_PARAM_INT, __OFF(ndpi_fingerprint_format), NULL },
 
   { NULL,            "flow_risk_lists.load",                    "1", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(flow_risk_lists_enabled), NULL },
 
