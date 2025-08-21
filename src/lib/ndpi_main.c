@@ -3532,7 +3532,7 @@ static int ndpi_add_ja4_subprotocol(struct ndpi_detection_module_struct *ndpi_st
   }
 
   if(ndpi_str->ja4_custom_protos == NULL) {
-    if(ndpi_hash_init(&ndpi_str->malicious_ja4_hashmap) != 0)
+    if(ndpi_hash_init(&ndpi_str->ja4_custom_protos) != 0)
       return(-2);
   }
 
