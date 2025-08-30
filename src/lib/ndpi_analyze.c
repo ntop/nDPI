@@ -2205,6 +2205,7 @@ float ndpi_mahalanobis_distance(const u_int32_t *x, u_int32_t size, const float 
 /* *********************** */
 
 void ndpi_init_ranking(ndpi_ranking *rank, u_int16_t max_num_entries, u_int16_t num_epochs) {
+  memset(rank, '\0', sizeof(ndpi_ranking)); /* To initialize padding */
   rank->header.ranking_version   = NDPI_RANKING_VERSION;
   rank->header.max_num_entries   = max_num_entries;
   rank->header.num_epochs        = (u_int16_t)ndpi_min(num_epochs, 1024);
@@ -2227,7 +2228,7 @@ bool ndpi_serialize_ranking(ndpi_ranking *rank, const char *path) {
   if(fd == NULL) return(false);
 
   fwrite(&rank->header, sizeof(ndpi_ranking_header), 1, fd);
-  fwrite(&rank->epochs, rank->header.epochs_memory_len, 1, fd);
+  fwrite(rank->epochs, rank->header.epochs_memory_len, 1, fd);
   fclose(fd);
 
   return(true);
@@ -2236,13 +2237,17 @@ bool ndpi_serialize_ranking(ndpi_ranking *rank, const char *path) {
 /* *********************** */
 
 bool ndpi_deserialize_ranking(ndpi_ranking *rank, const char *path) {
+  size_t n_read;
   FILE *fd = fopen(path, "rb");
   bool ret = true;
 
   if(fd == NULL) return(false);
 
-  fread(&rank->header, sizeof(ndpi_ranking_header), 1, fd);
-  rank->epochs = (char*)ndpi_calloc(1, rank->header.epochs_memory_len);
+  n_read = fread(&rank->header, sizeof(ndpi_ranking_header), 1, fd);
+  if(n_read != 1)
+    ret = false;
+  else
+    rank->epochs = (char*)ndpi_calloc(1, rank->header.epochs_memory_len);
 
   if(rank->epochs)
     fwrite(&rank->epochs, rank->header.epochs_memory_len, 1, fd);

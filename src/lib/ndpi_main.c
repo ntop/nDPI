@@ -11795,7 +11795,8 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
       if(is_flowrisk_info_enabled(ndpi_str, NDPI_RISKY_DOMAIN)) {
         char str[64] = { '\0' };
 
-        strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
+        strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)));
+        str[sizeof(str) - 1] = '\0';
         ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN, str);
       } else {
         ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN, NULL);
@@ -11808,7 +11809,8 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
     if(is_flowrisk_info_enabled(ndpi_str, NDPI_PUNYCODE_IDN)) {
       char str[64] = { '\0' };
 
-      strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)-1));
+      strncpy(str, string_to_match, ndpi_min(string_to_match_len, sizeof(str)));
+      str[sizeof(str) - 1] = '\0';
       ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, str);
     } else {
       ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, NULL);

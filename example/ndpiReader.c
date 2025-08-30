@@ -6844,7 +6844,7 @@ void domainCacheTestUnit() {
 
 void checkRankingUnitTest() {
   ndpi_ranking rank;
-  const char *path = "/tmp/ranking.test";
+  char path[64] = {0};
   const u_int num = 3;
   ndpi_ranking_epoch_entry entries[3];
   u_int i, j;
@@ -6853,6 +6853,10 @@ void checkRankingUnitTest() {
   bool do_trace = false;
 
   srand(now);
+
+  /* On GitHub Actions, ndpiReader might be called multiple times in parallel, so
+     every instance must use its own file */
+  snprintf(path, sizeof(path), "/tmp/ranking.%u.test", (unsigned int)getpid());
 
   ndpi_init_ranking(&rank, 5 /* max_num_items */, 8 /* num_epochs */);
   assert(ndpi_serialize_ranking(&rank, path) == true);
