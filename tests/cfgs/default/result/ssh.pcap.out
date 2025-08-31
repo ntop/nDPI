@@ -1,30 +1,31 @@
-DPI Packets (TCP):	19	(9.50 pkts/flow)
-Confidence DPI              : 2 (flows)
-Num dissector calls: 182 (91.00 diss/flow)
+DPI Packets (TCP):	38	(12.67 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 342 (114.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/2/0 (insert/search/found)
+LRU cache fpc_dns:    0/3/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   2/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
-Patricia risk:        0/0 (search/found)
+Patricia risk:        1/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   4/0 (search/found)
+Patricia protocols:   6/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-SSH	295	44977	2
+SSH	322	49563	3
 
-Acceptable                     295 44977         2            
+Acceptable                     322 49563         3            
 
-RemoteAccess                   295 44977         2            
+RemoteAccess                   322 49563         3            
 
 	1	TCP 172.16.238.1:58395 <-> 172.16.238.168:22 [proto: 92/SSH][Stack: SSH][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 10][cat: RemoteAccess/12][Breed: Acceptable][159 pkts/15615 bytes <-> 99 pkts/19931 bytes][Goodput ratio: 33/67][248.48 sec][Hostname/SNI: SSH-2.0-OpenSSH_5.6][bytes ratio: -0.121 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1846/2934 166223/166224 14794/19692][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 98/201 970/1346 83/283][Risk: ** SSH Obsolete Cli Vers/Cipher **** SSH Obsolete Ser Vers/Cipher **][Risk Score: 150][Risk Info: Found cipher arcfour128 / Found cipher arcfour128][TCP Fingerprint: 2_64_65535_b6a8548bc8e8/Unknown][HASSH-C: 21B457A327CE7A2D4FCE5EF2C42400BD][Server: SSH-2.0-OpenSSH_5.3][HASSH-S: B1C6C0D56317555B85C7005A3DE29325][Plen Bins: 2,76,12,2,3,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0]
 	2	TCP 127.0.0.1:58496 <-> 127.0.0.1:8000 [proto: 92/SSH][Stack: SSH][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 9][cat: RemoteAccess/12][Breed: Acceptable][20 pkts/5598 bytes <-> 17 pkts/3833 bytes][Goodput ratio: 76/71][2.18 sec][Hostname/SNI: SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.11][bytes ratio: 0.187 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/1 119/162 1760/1760 424/463][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 280/225 1602/1098 437/270][Risk: ** Known Proto on Non Std Port **** SSH Obsolete Ser Vers/Cipher **][Risk Score: 100][Risk Info: Found cipher arcfour128 / Expected on port 22][TCP Fingerprint: 2_64_65495_db1b9381215d/Unknown][HASSH-C: C11B200866CF918393E62EA25D851D90][Server: SSH-2.0-APACHE-SSHD-2.5.0][HASSH-S: CA6DD86B2D9A44E4A3F1A55C53E6B0FA][Plen Bins: 13,4,42,4,4,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,4,0,0,0,0,0,4]
+	3	TCP 177.225.151.243:1240 <-> 147.83.42.187:22 [proto: 92/SSH][Stack: SSH][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 19][cat: RemoteAccess/12][Breed: Acceptable][13 pkts/1811 bytes <-> 14 pkts/2775 bytes][Goodput ratio: 59/72][11.58 sec][Hostname/SNI: SSH-2.0-libssh2_1.0][bytes ratio: -0.210 (Download)][IAT c2s/s2c min/avg/max/stddev: 235/0 873/821 2338/2700 583/811][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 139/198 643/1038 162/317][Risk: ** SSH Obsolete Ser Vers/Cipher **][Risk Score: 50][Risk Info: Found cipher arcfour128][TCP Fingerprint: 2_128_65535_44bd01ba086e/Unknown][Server: SSH-2.0-OpenSSH_6.0p1 Debian-3ubuntu1][HASSH-S: CE3C327F37EA2EC21F317FBC3FD1EA43][Plen Bins: 9,36,18,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,9,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
