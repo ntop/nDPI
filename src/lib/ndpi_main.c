@@ -9056,6 +9056,8 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
     check_probing_attempt(ndpi_struct, flow);
   }
 
+  ndpi_compute_ndpi_flow_fingerprint(ndpi_struct, flow);
+
   /* TODO */
   (void)ret;
 }
@@ -11930,10 +11932,8 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 		flow->detected_protocol_stack[1],
 		!!flow->extra_packets_func);
 
-  if(!flow->extra_packets_func) {
-    ndpi_compute_ndpi_flow_fingerprint(ndpi_str, flow);
+  if(!flow->extra_packets_func)
     return(0);
-  }
 
   return(1);
 }
