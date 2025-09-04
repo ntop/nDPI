@@ -2278,7 +2278,7 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
     return("Risky Domain Name");
 
   case NDPI_MALICIOUS_FINGERPRINT:
-    return("Malicious Fingerpint");
+    return("Malicious Fingerprint");
 
   case NDPI_MALICIOUS_SHA1_CERTIFICATE:
     return("Malicious SSL Cert/SHA1 Fingerp.");
