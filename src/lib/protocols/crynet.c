@@ -43,28 +43,38 @@ static void ndpi_search_crynet(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "search crynetwork\n");
 
-  if (packet->payload_packet_len < 26)
+  if (packet->payload_packet_len < 30)
   {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
-  if (packet->payload_packet_len != packet->payload[0] + 10)
+  if (packet->payload_packet_len != packet->payload[0] + 10 &&
+      packet->payload_packet_len != packet->payload[4] + 6)
   {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
-  if (packet->payload[0] != 0x3c ||
-      packet->payload[16] != 0x01 ||
-      packet->payload[20] != 0x07 ||
-      ntohs(get_u_int16_t(packet->payload, 24)) != 0x0307)
+  if (packet->payload[0] == 0x3c &&
+      packet->payload[16] == 0x01 &&
+      packet->payload[20] == 0x07 &&
+      ntohs(get_u_int16_t(packet->payload, 24)) == 0x0307)
   {
-    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+    ndpi_int_crynet_add_connection(ndpi_struct, flow);
     return;
   }
 
-  ndpi_int_crynet_add_connection(ndpi_struct, flow);
+  if (packet->payload[0] == 0x05 &&
+      packet->payload[4] == 0x44 &&
+      packet->payload[24] == 0x07 &&
+      ntohs(get_u_int16_t(packet->payload, 28)) == 0x0307)
+  {
+    ndpi_int_crynet_add_connection(ndpi_struct, flow);
+    return;
+  }
+
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_crynet_dissector(struct ndpi_detection_module_struct *ndpi_struct)
