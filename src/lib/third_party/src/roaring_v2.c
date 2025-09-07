@@ -4437,9 +4437,11 @@ static inline container_t *get_writable_copy_if_shared(
  * End of shared container code
  */
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 static const char *container_names[] = {"bitset", "array", "run", "shared"};
 static const char *shared_container_names[] = {
     "bitset (shared)", "array (shared)", "run (shared)"};
+#endif
 
 // no matter what the initial container was, convert it to a bitset
 // if a new container is produced, caller responsible for freeing the previous
@@ -4487,6 +4489,7 @@ static inline bitset_container_t *container_to_bitset(
     }
 }*/
 
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
 static inline const char *get_full_container_name(
     const container_t *c, uint8_t typecode
 ){
@@ -4519,6 +4522,7 @@ static inline const char *get_full_container_name(
     __builtin_unreachable();
     return NULL;
 }
+#endif
 
 /**
  * Get the container cardinality (number of elements), requires a  typecode
