@@ -1206,7 +1206,7 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ********************************** */
 
-static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *flow)
+static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *flow, bool is_tls_proto)
 {
   if(flow->protos.tls_quic.ssl_version)
   {
@@ -1291,7 +1291,10 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
         ndpi_serialize_string_string(serializer, "fingerprint", buf);
       }
 
-      ndpi_serialize_string_uint32(serializer, "blocks", flow->l4.tcp.tls.num_tls_blocks);
+      if (is_tls_proto == true)
+      {
+        ndpi_serialize_string_uint32(serializer, "blocks", flow->l4.tcp.tls.num_tls_blocks);
+      }
 #ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
       ndpi_serialize_string_uint32(serializer, "sig_algs", flow->protos.tls_quic.num_tls_signature_algorithms);
 #endif
@@ -1535,7 +1538,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
                           flow->protos.tls_quic.quic_version);
     ndpi_serialize_string_string(serializer, "quic_version", quic_version);
 
-    ndpi_tls2json(serializer, flow);
+    ndpi_tls2json(serializer, flow, false);
 
     ndpi_serialize_end_of_block(serializer);
     break;
@@ -1766,11 +1769,11 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case NDPI_PROTOCOL_TLS:
-    ndpi_tls2json(serializer, flow);
+    ndpi_tls2json(serializer, flow, true);
     break;
 
   case NDPI_PROTOCOL_DTLS:
-    ndpi_tls2json(serializer, flow);
+    ndpi_tls2json(serializer, flow, false);
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/ndpi_utils_dpi2json_dtls.c"
 #endif
