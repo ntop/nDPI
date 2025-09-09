@@ -23,8 +23,6 @@
 static ndpi_network ndpi_protocol_msteams_protocol_list[] = {
  { 0x34700000 /* 52.112.0.0/14 */, 14, NDPI_PROTOCOL_MSTEAMS },
  { 0x347A0000 /* 52.122.0.0/15 */, 15, NDPI_PROTOCOL_MSTEAMS },
- { 0x34EE778D /* 52.238.119.141/32 */, 32, NDPI_PROTOCOL_MSTEAMS },
- { 0x34F4A0CF /* 52.244.160.207/32 */, 32, NDPI_PROTOCOL_MSTEAMS },
  /* End */
  { 0x0, 0, 0 }
 };
