@@ -4656,7 +4656,9 @@ u_int16_t ndpi_get_master_proto(struct ndpi_detection_module_struct *ndpi_struct
 
 char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 					 struct ndpi_flow_struct *flow) {
-  if(ndpi_str->cfg.ndpi_fingerprint_enabled && (flow->ndpi.fingerprint == NULL)) {
+  if(ndpi_str->cfg.ndpi_fingerprint_enabled &&
+     (flow->ndpi.fingerprint == NULL) &&
+     ndpi_stack_is_tls_like(&flow->protocol_stack)) {
     char *l4_fp = flow->tcp.fingerprint ? flow->tcp.fingerprint : "no_l4_fp";
     char *l7_pf = "no_app_fp_cli";
     char *l7_pf_server = "no_app_fp_srv";
