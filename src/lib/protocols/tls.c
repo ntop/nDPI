@@ -3320,41 +3320,43 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    }
 		  }
 		}
-	      } else if(extension_id == 51) /* key_share */ {
+	      } else if(extension_id == 51 &&  /* key_share */
+	                offset + extension_offset < total_len) {
 		u_int16_t extn_offset        = extn_off + 4;
-#ifdef DEBUG_TLS
-		u_int16_t key_share_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
-#endif
 		u_int16_t extn_end           = extn_offset + extension_len;
 
+		if(extn_offset + extension_len <= total_len) {
 #ifdef DEBUG_TLS
-		printf("[key_share] [len=%u][key_share_extn_len: %u][%02X %02X]\n",
-		       extension_len, key_share_extn_len,
-		       (packet->payload[extn_offset] & 0xFF),
-		       (packet->payload[extn_offset+1] & 0xFF));
+                  u_int16_t key_share_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
+
+                  printf("[key_share] [len=%u][key_share_extn_len: %u][%02X %02X]\n",
+                         extension_len, key_share_extn_len,
+                         (packet->payload[extn_offset] & 0xFF),
+                         (packet->payload[extn_offset+1] & 0xFF));
 #endif
 
-		extn_offset += 2;
+                  extn_offset += 2;
 
-		while(extn_offset < extn_end) {
-		  u_int16_t group_id     = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
-		  u_int16_t key_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset + 2])));
+                  while(extn_offset + 4 < extn_end) {
+                    u_int16_t group_id     = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
+                    u_int16_t key_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset + 2])));
 
-#ifdef DEBUG_TLS
-		  printf("\t[%02X %02X][extn_offset: %u][group_id: %u][key_extn_len: %u]\n",
-			 (packet->payload[extn_offset] & 0xFF),
-			 (packet->payload[extn_offset+1] & 0xFF),
-			 extn_offset,
-			 group_id, key_extn_len);
-#endif
+  #ifdef DEBUG_TLS
+                    printf("\t[%02X %02X][extn_offset: %u][group_id: %u][key_extn_len: %u]\n",
+                           (packet->payload[extn_offset] & 0xFF),
+                           (packet->payload[extn_offset+1] & 0xFF),
+                           extn_offset,
+                           group_id, key_extn_len);
+  #endif
 
-		  switch(group_id) {
-		  case 0x11EC: /* X25519MLKEM768 */
-		    flow->protos.tls_quic.pq_key_share = 1;
-		    break;
-		  }
+                    switch(group_id) {
+                    case 0x11EC: /* X25519MLKEM768 */
+                      flow->protos.tls_quic.pq_key_share = 1;
+                      break;
+                    }
 
-		  extn_offset += key_extn_len + 4;
+                    extn_offset += key_extn_len + 4;
+                  }
 		}
 
 #ifdef DEBUG_TLS
