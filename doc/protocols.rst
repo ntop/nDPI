@@ -3772,3 +3772,12 @@ The EasyWeather protocol is a proprietary UDP based protocool used by some weath
 Mudfish is a VPN dedicated for games to reduce lag and improve connection quality.
 
 References: `Mudfish official site: <https://mudfish.net/>`_
+
+
+.. _Proto_455:
+
+`NDPI_PROTOCOL_TRISTATION`
+==========================
+Proprietary, industrial grade, Safety Instrumented Systems (SIS) protocol for safety-shutdown technologies.
+
+References: `Triconex Honeypot: https://github.com/NozomiNetworks/tricotools`_
