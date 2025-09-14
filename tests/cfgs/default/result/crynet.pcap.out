@@ -1,13 +1,13 @@
-DPI Packets (UDP):	12	(1.00 pkts/flow)
-Confidence DPI              : 12 (flows)
-Num dissector calls: 1104 (92.00 diss/flow)
+DPI Packets (UDP):	52	(3.25 pkts/flow)
+Confidence DPI              : 16 (flows)
+Num dissector calls: 1936 (121.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/12/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/4/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -17,14 +17,14 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   24/0 (search/found)
+Patricia protocols:   32/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 
-CryNetwork	180	24116	12
+CryNetwork	235	26989	16
 
-Fun                            180 24116         12           
+Fun                            235 26989         16           
 
-Game                           180 24116         12           
+Game                           235 26989         16           
 
 	1	UDP 192.168.1.94:63584 <-> 78.159.118.197:29584 [proto: 314/CryNetwork][Stack: CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 314/CryNetwork, Confidence: DPI][DPI packets: 1][cat: Game/8][Breed: Fun][10 pkts/1430 bytes <-> 5 pkts/674 bytes][Goodput ratio: 71/69][0.52 sec][bytes ratio: 0.359 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/26 58/20 178/33 68/14][Pkt Len c2s/s2c min/avg/max/stddev: 92/92 143/135 283/175 72/34][Plen Bins: 0,33,33,6,13,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 192.168.2.100:55460 <-> 78.159.118.143:21931 [proto: 314/CryNetwork][Stack: CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 314/CryNetwork, Confidence: DPI][DPI packets: 1][cat: Game/8][Breed: Fun][12 pkts/1562 bytes <-> 3 pkts/525 bytes][Goodput ratio: 68/76][0.94 sec][bytes ratio: 0.497 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/48 88/48 266/48 102/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 130/175 267/175 62/0][Plen Bins: 0,33,33,0,20,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -38,3 +38,7 @@ Game                           180 24116         12
 	10	UDP 192.168.2.100:61837 <-> 78.159.118.97:25383 [proto: 314/CryNetwork][Stack: CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 314/CryNetwork, Confidence: DPI][DPI packets: 1][cat: Game/8][Breed: Fun][14 pkts/1754 bytes <-> 1 pkts/175 bytes][Goodput ratio: 66/76][0.44 sec][bytes ratio: 0.819 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 34/0 112/0 26/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 125/175 283/175 65/0][Plen Bins: 0,46,33,0,6,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	11	UDP 192.168.2.100:60751 <-> 84.16.248.143:30098 [proto: 314/CryNetwork][Stack: CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 314/CryNetwork, Confidence: DPI][DPI packets: 1][cat: Game/8][Breed: Fun][14 pkts/1738 bytes <-> 1 pkts/175 bytes][Goodput ratio: 66/76][0.47 sec][bytes ratio: 0.817 (Upload)][IAT c2s/s2c min/avg/max/stddev: 5/0 36/0 145/0 34/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 124/175 267/175 59/0][Plen Bins: 0,46,33,0,6,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	12	UDP 192.168.1.94:60063 <-> 178.162.197.242:28944 [proto: 314/CryNetwork][Stack: CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 314/CryNetwork, Confidence: DPI][DPI packets: 1][cat: Game/8][Breed: Fun][14 pkts/1726 bytes <-> 1 pkts/175 bytes][Goodput ratio: 66/76][0.44 sec][bytes ratio: 0.816 (Upload)][IAT c2s/s2c min/avg/max/stddev: 8/0 33/0 112/0 25/0][Pkt Len c2s/s2c min/avg/max/stddev: 92/175 123/175 267/175 60/0][Plen Bins: 0,54,26,0,6,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	UDP 192.168.1.94:55118 <-> 46.165.211.36:61088 [proto: 314/CryNetwork][Stack: CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 10][cat: Game/8][Breed: Fun][8 pkts/368 bytes <-> 7 pkts/420 bytes][Goodput ratio: 9/7][32.37 sec][bytes ratio: -0.066 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1000/1000 1000/1000 1001/1001 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 46/60 46/60 46/60 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	14	UDP 192.168.1.94:63564 <-> 189.1.173.216:61088 [proto: 314/CryNetwork][Stack: CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 10][cat: Game/8][Breed: Fun][8 pkts/360 bytes <-> 7 pkts/420 bytes][Goodput ratio: 7/5][31.43 sec][bytes ratio: -0.077 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1000/1000 1000/6044 1001/25221 0/9596][Pkt Len c2s/s2c min/avg/max/stddev: 45/60 45/60 45/60 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	15	UDP 192.168.1.94:64498 <-> 46.165.211.36:61088 [proto: 314/CryNetwork][Stack: CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 10][cat: Game/8][Breed: Fun][8 pkts/360 bytes <-> 7 pkts/420 bytes][Goodput ratio: 7/5][32.37 sec][bytes ratio: -0.077 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1000/1000 1000/1001 1001/1001 0/1][Pkt Len c2s/s2c min/avg/max/stddev: 45/60 45/60 45/60 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	16	UDP 192.168.1.94:60588 <-> 23.81.180.139:61088 [proto: 314/CryNetwork][Stack: CryNetwork][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 10][cat: Game/8][Breed: Fun][5 pkts/225 bytes <-> 5 pkts/300 bytes][Goodput ratio: 7/5][4.17 sec][bytes ratio: -0.143 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1000/1000 1000/1000 1001/1001 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 45/60 45/60 45/60 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

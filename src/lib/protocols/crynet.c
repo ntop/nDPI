@@ -29,7 +29,7 @@
 static void ndpi_int_crynet_add_connection(struct ndpi_detection_module_struct * const ndpi_struct,
                                            struct ndpi_flow_struct * const flow)
 {
-  NDPI_LOG_INFO(ndpi_struct, "found crynetwork\n");
+  NDPI_LOG_INFO(ndpi_struct, "found CryNetwork\n");
   ndpi_set_detected_protocol(ndpi_struct, flow,
                              NDPI_PROTOCOL_CRYNET,
                              NDPI_PROTOCOL_UNKNOWN,
@@ -41,7 +41,31 @@ static void ndpi_search_crynet(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
-  NDPI_LOG_DBG(ndpi_struct, "search crynetwork\n");
+  NDPI_LOG_DBG(ndpi_struct, "search CryNetwork\n");
+
+  if (packet->payload_packet_len <= 4)
+  {
+    if (flow->packet_counter == 1 && ntohs(packet->udp->dest) != 61088) {
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return;
+    }
+
+    size_t i;
+
+    for (i = 0; i < packet->payload_packet_len; ++i) {
+      if (ndpi_isdigit(packet->payload[i]) == 0) {
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+        return;
+      }
+    }
+
+    if (flow->packet_counter >= 10) {
+      ndpi_int_crynet_add_connection(ndpi_struct, flow);
+      return;
+    }
+
+    return;
+  }
 
   if (packet->payload_packet_len < 30)
   {
