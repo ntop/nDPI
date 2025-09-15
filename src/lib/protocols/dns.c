@@ -237,11 +237,12 @@ static u_int64_t fpc_dns_cache_key_from_packet(const unsigned char *ip, int ip_l
 
 /* *********************************************** */
 
-static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
+static u_int8_t ndpi_grab_dns_name_internal(struct ndpi_packet_struct *packet,
 				   u_int *off /* payload offset */,
 				   char *_hostname, u_int max_len,
 				   u_int *_hostname_len,
-				   u_int8_t ignore_checks) {
+				   u_int8_t ignore_checks,
+				   ndpi_bitmap *bitmap) {
   u_int8_t hostname_is_valid = 1;
   u_int j = 0;
 
@@ -265,13 +266,20 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
        * since it's checked in the recursive call */
       u_int32_t ptr = ((cl & 0x3F) << 8 | byte2) + (packet->tcp ? 2 : 0);
 
+      if (ndpi_bitmap_isset(bitmap, ptr)) {
+        // TODO: malformed packet since there is a recursive name, maybe set_risk here
+        return 0;
+      }
+
+      ndpi_bitmap_set(bitmap, ptr);
+
       if (j && j < max_len) {
         _hostname[j++] = '.';
       }
 
       u_int nested_len;
-      hostname_is_valid = ndpi_grab_dns_name(packet, &ptr, &_hostname[j], max_len - j,
-        &nested_len, ignore_checks) && hostname_is_valid;
+      hostname_is_valid = ndpi_grab_dns_name_internal(packet, &ptr, &_hostname[j], max_len - j,
+        &nested_len, ignore_checks, bitmap) && hostname_is_valid;
 
       j += nested_len;
       /* compressed names are always terminal */
@@ -320,6 +328,18 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
   _hostname[j] = '\0', *_hostname_len = j;
 
   return(hostname_is_valid);
+}
+
+static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
+           u_int *off /* payload offset */,
+           char *_hostname, u_int max_len,
+           u_int *_hostname_len,
+           u_int8_t ignore_checks) {
+  ndpi_bitmap *visited_indexes = ndpi_bitmap_alloc();
+  const int hostname_is_valid = ndpi_grab_dns_name_internal(packet, off, _hostname, max_len,
+              _hostname_len, ignore_checks, visited_indexes);
+  ndpi_bitmap_free(visited_indexes);
+  return hostname_is_valid;
 }
 
 /* *********************************************** */
@@ -595,7 +615,6 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
                 is_invalid = txt_subfield_len + bytes_read > data_len ||
                              txt_subfield_len > packet->payload_packet_len - x_orig;
                 if(is_invalid) {
-                  ndpi_free(data);
                   /* todo: this is a malformed DNS packet, maybe set_risk here */
                   break;
                 }
@@ -612,7 +631,10 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
                 x_orig += txt_subfield_len;
                 bytes_read += txt_subfield_len;
               }
-              if(!is_invalid) {  /* check needed because *data might point to deallocated memory */
+              if(is_invalid) {
+                ndpi_free(data);
+                data = NULL;
+              } else {
                 if(data_offset >= sep_len) { /* if the while cycle didn't do any iteration, data_offset is 0 */
                   data[data_offset - sep_len] = 0; /* - sep_len removes the last separator */
                 } else {
@@ -998,6 +1020,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  printf("Packet---\n");
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int payload_offset = 0;
   u_int8_t is_query;
