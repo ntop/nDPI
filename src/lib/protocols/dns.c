@@ -1020,7 +1020,6 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
-  printf("Packet---\n");
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int payload_offset = 0;
   u_int8_t is_query;
