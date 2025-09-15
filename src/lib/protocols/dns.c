@@ -267,7 +267,7 @@ static u_int8_t ndpi_grab_dns_name_internal(struct ndpi_packet_struct *packet,
       u_int32_t ptr = ((cl & 0x3F) << 8 | byte2) + (packet->tcp ? 2 : 0);
 
       if (ndpi_bitmap_isset(bitmap, ptr)) {
-        // TODO: malformed packet since there is a recursive name, maybe set_risk here
+        // TODO: malformed packet since there is an infinite loop compressed name, maybe set_risk here
         return 0;
       }
 
@@ -277,7 +277,7 @@ static u_int8_t ndpi_grab_dns_name_internal(struct ndpi_packet_struct *packet,
         _hostname[j++] = '.';
       }
 
-      u_int nested_len;
+      u_int nested_len = 0;
       hostname_is_valid = ndpi_grab_dns_name_internal(packet, &ptr, &_hostname[j], max_len - j,
         &nested_len, ignore_checks, bitmap) && hostname_is_valid;
 
@@ -335,11 +335,18 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
            char *_hostname, u_int max_len,
            u_int *_hostname_len,
            u_int8_t ignore_checks) {
-  ndpi_bitmap *visited_indexes = ndpi_bitmap_alloc();
-  const int hostname_is_valid = ndpi_grab_dns_name_internal(packet, off, _hostname, max_len,
-              _hostname_len, ignore_checks, visited_indexes);
-  ndpi_bitmap_free(visited_indexes);
-  return hostname_is_valid;
+  ndpi_bitmap *visited_indexes;
+  if ((visited_indexes = ndpi_bitmap_alloc()) != NULL) {
+    const int hostname_is_valid = ndpi_grab_dns_name_internal(packet, off, _hostname, max_len,
+                _hostname_len, ignore_checks, visited_indexes);
+    ndpi_bitmap_free(visited_indexes);
+    return hostname_is_valid;
+  }
+  *_hostname_len = 0;
+#ifndef DNS_DEBUG
+  printf("[DNS] Out of memory\n");
+#endif
+  return 0;
 }
 
 /* *********************************************** */
