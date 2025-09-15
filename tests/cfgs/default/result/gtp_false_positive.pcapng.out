@@ -3,7 +3,7 @@ Guessed flow protos:	2
 DPI Packets (UDP):	7	(2.33 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence Match by port    : 2 (flows)
-Num dissector calls: 496 (165.33 diss/flow)
+Num dissector calls: 502 (167.33 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/9/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -26,8 +26,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 Unknown	5	428	1
 GTP	2	424	2
 
-Acceptable                       2 424           2            
 Unrated                          5 428           1            
+Acceptable                       2 424           2            
 
 Unspecified                      5 428           1            
 Network                          2 424           2            

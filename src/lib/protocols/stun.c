@@ -892,7 +892,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
           /* TODO: right way? It is a bit scary... do we need to reset something else too? */
           reset_detected_protocol(flow);
-          /* We keep the category related to STUN traffic */
+          /* We keep the category/breed related to STUN traffic */
           /* TODO: clear some risks? */
 
           /* Give room for DTLS handshake, where we might have
@@ -1229,13 +1229,12 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
     /* In "normal" data-path the generic code in `ndpi_internal_detection_process_packet()`
        takes care of setting the category */
     if(flow->extra_packets_func) {
-      ndpi_protocol ret;
+      ndpi_master_app_protocol proto;
 
-      ret.proto.master_protocol = master_proto;
-      ret.proto.app_protocol = app_proto;
-      ret.category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
-
-      flow->category = ndpi_get_proto_category(ndpi_struct, ret);
+      proto.master_protocol = master_proto;
+      proto.app_protocol = app_proto;
+      flow->category = get_proto_category(ndpi_struct, proto);
+      flow->breed = get_proto_breed(ndpi_struct, proto);
     }
   }
   

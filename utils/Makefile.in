@@ -2,5 +2,10 @@ SRCHOME=../src
 LIBNDPI=$(SRCHOME)/lib/libndpi.a
 LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
 
+all: hosts2domains print_rank
+
 hosts2domains: hosts2domains.c Makefile
 	$(CC) -I$(SRCHOME)/include -g hosts2domains.c -o hosts2domains $(LIBS)
+
+print_rank: print_rank.c Makefile
+	$(CC) -I$(SRCHOME)/include -g print_rank.c -o print_rank $(LIBS)

@@ -16,7 +16,7 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   8/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
@@ -29,9 +29,9 @@ SMBv23	2	138	1
 RDP	2	118	1
 TLS	4	272	1
 
+Unrated                          6 342           3            
 Safe                             4 272           1            
 Acceptable                       8 528           3            
-Unrated                          6 342           3            
 
 Unspecified                      6 342           3            
 Web                              8 544           2            

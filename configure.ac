@@ -31,6 +31,7 @@ AC_ARG_WITH(lto-and-gold-linker, AS_HELP_STRING([--with-lto-and-gold-linker], [B
 AC_ARG_ENABLE(debug-build, AS_HELP_STRING([--enable-debug-build], [Enable debug build (`-g` flag)]),[enable_debugbuild=$enableval],[enable_debugbuild=no])
 AC_ARG_ENABLE(global-context-support, AS_HELP_STRING([--disable-global-context-support], [Disable support for global context. No external dependency on libpthread]))
 AC_ARG_ENABLE(memory-track-origins, AS_HELP_STRING([--disable-memory-track-origins], [Don't add -fsanitize-memory-track-origins flag when compiling with MASAN support. Useful for faster CI]))
+AC_ARG_ENABLE(old-croaring, AS_HELP_STRING([--enable-old-croaring], [Always use old croaring version, instead of try to auto-detect if v4 works. Useful with old compilers]),[enable_oldcroaring=$enableval],[enable_oldcroaring=no])
 
 NDPI_CFLAGS="${NDPI_CFLAGS} -D_DEFAULT_SOURCE=1 -D_GNU_SOURCE=1"
 
@@ -124,27 +125,26 @@ AC_CHECK_TOOL(AR, ar, [false])
 
 AC_LANG_WERROR
 
-AC_MSG_CHECKING([whether roaring v3 works])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-	    #if __has_include (<stdio.h>)
-	    #endif
-	    ]])],
-	    [
-	      AC_MSG_RESULT([yes])
-	      ],
-	      [
-	        AC_MSG_RESULT([no])
-		  AC_DEFINE_UNQUOTED(USE_ROARING_V2, "1", [Use CRoaring 2.1.x])
-  ])
+#We should use latest croaring version, but with old compilers we need to
+#fallback to old/legacy code
+AS_IF([test "x${enable_oldcroaring}" = "xyes"], [
+  NDPI_CFLAGS="${NDPI_CFLAGS} -DUSE_OLD_ROARING"
+  echo "Using old croaring (forced by user)"
+], [
+  #TODO: try to autodetect if roaring v4 works.
+  #For the time being, check (only) compiler version
+  GCC_VERSION=`$CC --version | cut -d ' ' -f 3 | head -1|cut -d '.' -f 1`
+  if test "${GCC_VERSION}" == "version" ; then
+    GCC_VERSION=`$CC --version | cut -d ' ' -f 4 | head -1|cut -d '.' -f 1`
+  fi
 
-GCC_VERSION=`gcc --version | cut -d ' ' -f 3 | head -1|cut -d '.' -f 1`
-if test "${GCC_VERSION}" == "version" ; then
-  GCC_VERSION=`gcc --version | cut -d ' ' -f 4 | head -1|cut -d '.' -f 1`
-fi
-
-if test "${GCC_VERSION}" -lt "7" ; then
- AC_DEFINE_UNQUOTED(USE_ROARING_V2, "1", [Use CRoaring 2.1.x])
-fi
+  if test "${GCC_VERSION}" -lt "7" ; then
+    NDPI_CFLAGS="${NDPI_CFLAGS} -DUSE_OLD_ROARING"
+    echo "Using old croaring (autodetect)"
+  else
+    echo "Using croaring v4 (autodetect)"
+  fi
+])
 
 
 NDPI_MAJOR=`echo "${PACKAGE_VERSION}" | cut -d . -f 1`

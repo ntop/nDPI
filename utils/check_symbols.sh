@@ -35,7 +35,7 @@ for line in $(nm -P -u "${NDPI_LIB}"); do
             ;;
             '[roaring.o]')
                 case "${FOUND_SYMBOL}" in
-                    'malloc'|'calloc'|'realloc'|'free') SKIP=1 ;;
+                    'malloc'|'calloc'|'realloc'|'free'|'printf'|'fprintf') SKIP=1 ;;
                 esac
             ;;
             '[ndpi_utils.o]'|'[ndpi_memory.o]')

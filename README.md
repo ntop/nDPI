@@ -16,6 +16,11 @@ In order to compile this project do
 - ./autogen.sh
 - make
 
+If you get some errors while compiling `croaring.c`, try:
+
+- ./autogen.sh --enable-old-croaring
+- make
+
 To compile the library w/o any tools or tests:
 
 - ./autogen.sh --with-only-libndpi

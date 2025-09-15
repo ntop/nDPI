@@ -94,3 +94,10 @@ host_risk_mask:".home"=0
 
 # Custom certification autorities we trust
 trusted_issuer_dn:"CN=813845657003339838, O=Code42, OU=TEST, ST=MN, C=US"
+
+# JA4
+ja4:t12d1409h1_c866b44c5a26_b39be8c56777@CustomJA4Proto=2060
+
+# nDPI Fingerprint
+ndpifp:8ae775daeb30f7aa5790706158288639@CustomnDPIFPProto=2061
+ndpifp:2d3ea0b7f090060fa1b9f3783362f862@CustomnDPIFPProto2=2062

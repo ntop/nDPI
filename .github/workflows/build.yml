@@ -226,7 +226,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && !endsWith(matrix.os, 'arm') && !startsWith(matrix.msan, '--with-') && !startsWith(matrix.nBPF, 'nBPF') && !startsWith(matrix.global_context, '--without') # Only on a few "standard" builds
         run: |
           make distclean
-          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --host=x86_64-w64-mingw32
+          ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --host=x86_64-w64-mingw32 --enable-old-croaring
           make -j $(nproc) all
         env:
           CC:

@@ -272,6 +272,17 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
 
 /* *********************************************** */
 
+static void update_category_and_breed(struct ndpi_detection_module_struct *ndpi_struct,
+                                      struct ndpi_flow_struct *flow) {
+  ndpi_master_app_protocol proto;
+  proto.master_protocol = flow->detected_protocol_stack[1];
+  proto.app_protocol = flow->detected_protocol_stack[0];
+  flow->category = get_proto_category(ndpi_struct, proto);
+  flow->breed = get_proto_breed(ndpi_struct, proto);
+}
+
+/* *********************************************** */
+
 /* https://www.freeformatter.com/mime-types-list.html */
 static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_module_struct *ndpi_struct,
 							struct ndpi_flow_struct *flow) {
@@ -500,7 +511,8 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 
   if(packet->server_line.len > 7 &&
      strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
     ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
   }
 
@@ -512,6 +524,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
      strncmp((const char *)packet->content_line.ptr, "application/ocsp-", 17) == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "Found OCSP\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OCSP, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
   }
 
   /* HTTP Live Streaming */
@@ -521,12 +534,14 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
       strncmp((const char *)packet->content_line.ptr, "application/x-mpegurl", 21) == 0)) {
     NDPI_LOG_DBG2(ndpi_struct, "Found HLS\n");
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HLS, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
   }
 
   if((flow->http.method == NDPI_HTTP_METHOD_RPC_CONNECT) ||
      (flow->http.method == NDPI_HTTP_METHOD_RPC_IN_DATA) ||
      (flow->http.method == NDPI_HTTP_METHOD_RPC_OUT_DATA)) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_RPCH, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
   }
 
   switch (flow->http.method) {
@@ -538,6 +553,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
     case NDPI_HTTP_METHOD_PROPFIND:
     case NDPI_HTTP_METHOD_PROPPATCH:
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WEBDAV, master_protocol, NDPI_CONFIDENCE_DPI);
+      update_category_and_breed(ndpi_struct, flow);
       break;
     default:
       break;
@@ -600,6 +616,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
       (strstr(flow->http.url, ":8080/upload?n=0.") != NULL))) {
     /* This looks like Ookla speedtest */
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
     ookla_add_to_cache(ndpi_struct, flow);
   }
 
@@ -607,12 +624,14 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
      flow->http.url != NULL &&
      strstr(flow->http.url, "micloud.xiaomi.net") != NULL) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_XIAOMI, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
   }
 
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
      packet->referer_line.len > 0 &&
      ndpi_strnstr((const char *)packet->referer_line.ptr, "www.speedtest.net", packet->referer_line.len)) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
     ookla_add_to_cache(ndpi_struct, flow);
   }
 
@@ -624,6 +643,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
      strstr(flow->http.user_agent, "Microsoft-Delivery-Optimization/") &&
      ndpi_isset_risk(flow, NDPI_NUMERIC_IP_HOST)) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WINDOWS_UPDATE, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
   }
 
   if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
@@ -637,27 +657,32 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
       </cross-domain-policy>
      */
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
     ookla_add_to_cache(ndpi_struct, flow);
   }
 
   if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) &&
       flow->http.user_agent && strstr(flow->http.user_agent, "MSRPC")) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MS_RPCH, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
   }
 
   if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) &&
       flow->http.user_agent && strstr(flow->http.user_agent, "Valve/Steam HTTP Client")) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STEAM, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
   }
 
   if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) &&
       flow->http.user_agent && strstr(flow->http.user_agent, "AirControl Agent v1.0")) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UBNTAC2, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
   }
 
   if ((flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) &&
       flow->http.user_agent && strstr(flow->http.user_agent, "gtk-gnutella")) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GNUTELLA, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
   }
 
   if(flow->http.request_header_observed) {

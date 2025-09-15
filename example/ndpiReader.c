@@ -470,8 +470,23 @@ void ndpiCheckHostStringMatch(char *testChar) {
 	   match.protocol_category, appBufStr,
 	   ndpi_get_proto_breed_name(match.protocol_breed ),
 	   ndpi_category_get_name(ndpi_str, match.protocol_category));
-  } else
-    printf("Match NOT Found for string: %s\n\n", testChar );
+  } else {
+    ndpi_protocol_category_t category;
+    ndpi_protocol_breed_t breed;
+
+    /* No protocol match (on the ahocorasick); let's find out if we have
+     * at least the category */
+
+    if(ndpi_match_custom_category(ndpi_str, testChar, strlen(testChar), &category, &breed) == 0) {
+      printf("Match Found for string [%s] (no protocol) -> B(%d) C(%d) => %s %s\n",
+             testChar, breed, category,
+             ndpi_get_proto_breed_name(breed),
+             ndpi_category_get_name(ndpi_str, category));
+
+    } else {
+      printf("Match NOT Found for string: %s\n\n", testChar );
+    }
+  }
 
   ndpi_exit_detection_module(ndpi_str);
 }
@@ -1557,7 +1572,7 @@ static void parse_parameters(int argc, char **argv)
     case 180:
       protocolsDirPath = optarg;
       break;
-      
+
     default:
 #ifdef DEBUG_TRACE
       if(trace) fprintf(trace, " #### Unknown option -%c: skipping it #### \n", opt);
@@ -2069,8 +2084,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 				     flow->detected_protocol.category),
 	      (unsigned int)flow->detected_protocol.category);
 
-    breed = ndpi_get_proto_breed(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                 ndpi_get_upper_proto(flow->detected_protocol));
+    breed = flow->detected_protocol.breed;
     fprintf(out, "[Breed: %s]", ndpi_get_proto_breed_name(breed));
 
     fprintf(out, "[%u pkts/%llu bytes ", flow->src2dst_packets, (long long unsigned int) flow->src2dst_bytes);
@@ -2269,7 +2283,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fprintf(out, "[RTP packets: %d/%d]", flow->stun.rtp_counters[0], flow->stun.rtp_counters[1]);
 
     if(flow->http.url[0] != '\0')
-      fprintf(out, "[URL: %s]", flow->http.url);    
+      fprintf(out, "[URL: %s]", flow->http.url);
 
     if(flow->http.response_status_code)
       fprintf(out, "[StatusCode: %u]", flow->http.response_status_code);
@@ -2308,6 +2322,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       if(flow->risk_str)
 	fprintf(out, "[Risk Info: %s]", flow->risk_str);
     }
+
+    if(flow->ndpi_fingerprint)
+      fprintf(out, "[nDPI Fingerprint: %s]", flow->ndpi_fingerprint);
 
     if(flow->tcp_fingerprint)
       fprintf(out, "[TCP Fingerprint: %s]", flow->tcp_fingerprint);
@@ -2586,6 +2603,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
   u_int16_t thread_id = *((u_int16_t *) user_data), proto, fpc_proto;
   ndpi_protocol_category_t category;
+  ndpi_protocol_breed_t breed;
 
   (void)depth;
 
@@ -2612,6 +2630,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     fpc_proto = ndpi_map_user_proto_id_to_ndpi_id(ndpi_thread_info[thread_id].workflow->ndpi_struct, fpc_proto);
 
     category = flow->detected_protocol.category;
+    breed = flow->detected_protocol.breed;
 
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter[proto]       += flow->src2dst_packets + flow->dst2src_packets;
     ndpi_thread_info[thread_id].workflow->stats.protocol_counter_bytes[proto] += flow->src2dst_bytes + flow->dst2src_bytes;
@@ -2625,6 +2644,9 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     ndpi_thread_info[thread_id].workflow->stats.category_counter[category]       += flow->src2dst_packets + flow->dst2src_packets;
     ndpi_thread_info[thread_id].workflow->stats.category_counter_bytes[category] += flow->src2dst_bytes + flow->dst2src_bytes;
     ndpi_thread_info[thread_id].workflow->stats.category_flows[category]++;
+    ndpi_thread_info[thread_id].workflow->stats.breed_counter[breed]       += flow->src2dst_packets + flow->dst2src_packets;
+    ndpi_thread_info[thread_id].workflow->stats.breed_counter_bytes[breed] += flow->src2dst_bytes + flow->dst2src_bytes;
+    ndpi_thread_info[thread_id].workflow->stats.breed_flows[breed]++;
   }
 }
 
@@ -3189,7 +3211,7 @@ static void setupDetection(u_int16_t thread_id, pcap_t * pcap_handle,
 
   if(ndpi_thread_info[thread_id].workflow == NULL)
     exit(-1); /* Some initialiation functions failed */
-  
+
   ndpi_thread_info[thread_id].workflow->g_ctx = g_ctx;
 
   ndpi_workflow_set_flow_callback(ndpi_thread_info[thread_id].workflow,
@@ -4138,9 +4160,6 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   u_int32_t avg_pkt_size = 0;
   int thread_id;
   char buf[32];
-  long long unsigned int breed_stats_pkts[NUM_BREEDS] = { 0 };
-  long long unsigned int breed_stats_bytes[NUM_BREEDS] = { 0 };
-  long long unsigned int breed_stats_flows[NUM_BREEDS] = { 0 };
 
   /* In ndpiReader all the contexts have the same configuration */
   if (!cumulative_stats_initialized) {
@@ -4185,6 +4204,12 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       cumulative_stats.category_counter[i] += ndpi_thread_info[thread_id].workflow->stats.category_counter[i];
       cumulative_stats.category_counter_bytes[i] += ndpi_thread_info[thread_id].workflow->stats.category_counter_bytes[i];
       cumulative_stats.category_flows[i] += ndpi_thread_info[thread_id].workflow->stats.category_flows[i];
+    }
+
+    for(i = 0; i < NDPI_NUM_BREEDS; i++) {
+      cumulative_stats.breed_counter[i] += ndpi_thread_info[thread_id].workflow->stats.breed_counter[i];
+      cumulative_stats.breed_counter_bytes[i] += ndpi_thread_info[thread_id].workflow->stats.breed_counter_bytes[i];
+      cumulative_stats.breed_flows[i] += ndpi_thread_info[thread_id].workflow->stats.breed_flows[i];
     }
 
     cumulative_stats.ndpi_flow_count += ndpi_thread_info[thread_id].workflow->stats.ndpi_flow_count;
@@ -4555,14 +4580,9 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 
   if(!quiet_mode) printf("\n\nDetected protocols:\n");
   for(i = 0; i < cumulative_stats.num_protocols; i++) {
-    ndpi_protocol_breed_t breed = ndpi_get_proto_breed(ndpi_thread_info[0].workflow->ndpi_struct,
-                                                       ndpi_map_ndpi_id_to_user_proto_id(ndpi_thread_info[0].workflow->ndpi_struct, i));
 
     if(cumulative_stats.protocol_counter[i] > 0 ||
        (dump_fpc_stats && cumulative_stats.fpc_protocol_counter[i] > 0)) {
-      breed_stats_bytes[breed] += (long long unsigned int)cumulative_stats.protocol_counter_bytes[i];
-      breed_stats_pkts[breed] += (long long unsigned int)cumulative_stats.protocol_counter[i];
-      breed_stats_flows[breed] += (long long unsigned int)cumulative_stats.protocol_flows[i];
 
       if(results_file) {
 	fprintf(results_file, "%s\t%llu\t%llu\t%u",
@@ -4614,22 +4634,26 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
   if(!quiet_mode) {
     printf("\n\nProtocol statistics:\n");
 
-    for(i=0; i < NUM_BREEDS; i++) {
-      if(breed_stats_pkts[i] > 0) {
+    for(i=0; i < NDPI_NUM_BREEDS; i++) {
+      if(cumulative_stats.breed_counter[i] > 0) {
 	printf("\t%-20s packets: %-13llu bytes: %-13llu "
 	       "flows: %-13llu\n",
 	       ndpi_get_proto_breed_name(i),
-	       breed_stats_pkts[i], breed_stats_bytes[i], breed_stats_flows[i]);
+	       (long long unsigned int)cumulative_stats.breed_counter[i],
+	       (long long unsigned int)cumulative_stats.breed_counter_bytes[i],
+	       (long long unsigned int)cumulative_stats.breed_flows[i]);
       }
     }
   }
   if(results_file) {
     fprintf(results_file, "\n");
-    for(i=0; i < NUM_BREEDS; i++) {
-      if(breed_stats_pkts[i] > 0) {
+    for(i=0; i < NDPI_NUM_BREEDS; i++) {
+      if(cumulative_stats.breed_counter[i] > 0) {
 	fprintf(results_file, "%-20s %13llu %-13llu %-13llu\n",
 	        ndpi_get_proto_breed_name(i),
-	        breed_stats_pkts[i], breed_stats_bytes[i], breed_stats_flows[i]);
+	        (long long unsigned int)cumulative_stats.breed_counter[i],
+	        (long long unsigned int)cumulative_stats.breed_counter_bytes[i],
+	        (long long unsigned int)cumulative_stats.breed_flows[i]);
       }
     }
   }
@@ -5689,14 +5713,14 @@ void rsiUnitTest() {
 void hashUnitTest() {
   ndpi_str_hash *h;
   char * const dict[] = { "hello", "world", NULL };
-  u_int16_t i;
+  u_int32_t i;
 
   assert(ndpi_hash_init(&h) == 0);
   assert(h == NULL);
 
   for(i=0; dict[i] != NULL; i++) {
     u_int8_t l = strlen(dict[i]);
-    u_int16_t v;
+    u_int32_t v;
 
     assert(ndpi_hash_add_entry(&h, dict[i], l, i) == 0);
     assert(ndpi_hash_find_entry(h, dict[i], l, &v) == 0);
@@ -6582,10 +6606,11 @@ void loadStressTest() {
     for(i=1; i<100000; i++) {
       char name[32];
       ndpi_protocol_category_t id = NDPI_PROTOCOL_CATEGORY_MALWARE;
+      ndpi_protocol_breed_t breed = NDPI_PROTOCOL_SAFE;
       u_int8_t value = (u_int8_t)i;
 
       snprintf(name, sizeof(name), "%d.com", i);
-      ndpi_load_hostname_category(ndpi_struct_shadow, name, id);
+      ndpi_load_hostname_category(ndpi_struct_shadow, name, id, breed);
 
       snprintf(name, sizeof(name), "%u.%u.%u.%u", value, value, value, value);
       ndpi_load_ip_category(ndpi_struct_shadow, name, id, (void *)"My list");
@@ -6710,10 +6735,11 @@ void encodeDomainsUnitTest() {
   struct stat st;
 
   if(stat(lists_path, &st) == 0) {
-    u_int16_t suffix_id;
+    u_int32_t suffix_id;
     char out[256];
     char *str;
     ndpi_protocol_category_t id;
+    ndpi_protocol_breed_t breed;
 
     assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
 
@@ -6727,13 +6753,13 @@ void encodeDomainsUnitTest() {
     assert(ndpi_load_categories_dir(ndpi_str, "../lists"));
     assert(ndpi_load_categories_file(ndpi_str, "./categories.txt", "categories.txt"));
 
-    str = (char*)"2001:db8:1::1"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 100);
-    str = (char*)"www.internetbadguys.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 100);
-    str = (char*)"0grand-casino.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 107);
-    str = (char*)"222.0grand-casino.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 107);
-    str = (char*)"10bet.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 107);
-    str = (char*)"www.ntop.org"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == -1); assert(id == 0);
-    str = (char*)"lifyqyi.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id) == 0); assert(id == 100);
+    str = (char*)"2001:db8:1::1"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 100);
+    str = (char*)"www.internetbadguys.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 100);
+    str = (char*)"0grand-casino.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 107);
+    str = (char*)"222.0grand-casino.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 107);
+    str = (char*)"10bet.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 107);
+    str = (char*)"www.ntop.org"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1); assert(id == 0);
+    str = (char*)"lifyqyi.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 100);
   }
 
   ndpi_exit_detection_module(ndpi_str);
@@ -6759,7 +6785,7 @@ void domainsUnitTest() {
   struct stat st;
 
   if(stat(lists_path, &st) == 0) {
-    u_int16_t suffix_id;
+    u_int32_t suffix_id;
 
     assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
 
@@ -6789,7 +6815,7 @@ void domainsUnitTest() {
 void domainSearchUnitTest() {
   ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
   char *domain = "ntop.org";
-  u_int16_t class_id;
+  u_int32_t class_id;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   u_int8_t trace = 0;
 
@@ -6798,18 +6824,20 @@ void domainSearchUnitTest() {
 
   assert(ndpi_finalize_initialization(ndpi_str) == 0);
 
-  ndpi_domain_classify_add(ndpi_str, sc, NDPI_PROTOCOL_NTOP, ".ntop.org");
-  ndpi_domain_classify_add(ndpi_str, sc, NDPI_PROTOCOL_NTOP, domain);
+  ndpi_domain_classify_add(ndpi_str, sc, (NDPI_PROTOCOL_SAFE << 16) | NDPI_PROTOCOL_NTOP, ".ntop.org");
+  ndpi_domain_classify_add(ndpi_str, sc, (NDPI_PROTOCOL_SAFE << 16) | NDPI_PROTOCOL_NTOP, domain);
   assert(ndpi_domain_classify_hostname(ndpi_str, sc, &class_id, domain));
-  assert(class_id == NDPI_PROTOCOL_NTOP);
+  assert((class_id & 0xFFFF) == NDPI_PROTOCOL_NTOP);
+  assert(((class_id & 0xFFFF0000) >> 16) == NDPI_PROTOCOL_SAFE);
 
-  ndpi_domain_classify_add(ndpi_str, sc, NDPI_PROTOCOL_CATEGORY_GAMBLING, "123vc.club");
+  ndpi_domain_classify_add(ndpi_str, sc, (NDPI_PROTOCOL_UNSAFE << 16) | NDPI_PROTOCOL_CATEGORY_GAMBLING, "123vc.club");
   assert(ndpi_domain_classify_hostname(ndpi_str, sc, &class_id, "123vc.club"));
-  assert(class_id == NDPI_PROTOCOL_CATEGORY_GAMBLING);
+  assert((class_id & 0xFFFF) == NDPI_PROTOCOL_CATEGORY_GAMBLING);
+  assert(((class_id & 0xFFFF0000) >> 16) == NDPI_PROTOCOL_UNSAFE);
 
   /* Subdomain check */
   assert(ndpi_domain_classify_hostname(ndpi_str, sc, &class_id, "blog.ntop.org"));
-  assert(class_id == NDPI_PROTOCOL_NTOP);
+  assert((class_id & 0xFFFF) == NDPI_PROTOCOL_NTOP);
 
   u_int32_t s = ndpi_domain_classify_size(sc);
   if(trace) printf("ndpi_domain_classify size: %u \n",s);
@@ -6824,7 +6852,7 @@ void domainSearchUnitTest() {
 void domainSearchUnitTest2() {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   ndpi_domain_classify *c = ndpi_domain_classify_alloc();
-  u_int16_t class_id = 9;
+  u_int32_t class_id = 9;
 
   assert(ndpi_str);
   assert(c);
@@ -6883,6 +6911,53 @@ void domainCacheTestUnit() {
 
 /* *********************************************** */
 
+void checkRankingUnitTest() {
+  ndpi_ranking rank;
+  char path[64] = {0};
+  const u_int num = 3;
+  ndpi_ranking_epoch_entry entries[3];
+  u_int i, j;
+  ndpi_ranking_change curr_ranking[3], prev_ranking[3];
+  u_int32_t now = (u_int32_t)time(NULL);
+  bool do_trace = false;
+
+  srand(now);
+
+  /* On GitHub Actions, ndpiReader might be called multiple times in parallel, so
+     every instance must use its own file */
+  snprintf(path, sizeof(path), "/tmp/ranking.%u.test", (unsigned int)getpid());
+
+  ndpi_init_ranking(&rank, 5 /* max_num_items */, 8 /* num_epochs */);
+  assert(ndpi_serialize_ranking(&rank, path) == true);
+  if(do_trace)  ndpi_print_ranking(&rank);
+  ndpi_term_ranking(&rank);
+
+  assert(ndpi_deserialize_ranking(&rank, path) == true);
+
+  for(j=0; j<5; j++) {
+    u_int16_t num_changes;
+    
+    for(i=0; i<num; i++) entries[i].item_unique_id = i+1, entries[i].value = rand();
+
+    num_changes = ndpi_ranking_add_epoch(&rank, now, entries, num,
+					 curr_ranking, prev_ranking);
+
+    if(do_trace) {
+      if(num_changes > 0)
+	printf("%u ranking changes at epoch %u\n", num_changes, now);
+      else
+	printf("No ranking changes at epoch %u\n", now);
+    }
+
+    now++;
+  }
+
+  if(do_trace) ndpi_print_ranking(&rank);
+  ndpi_term_ranking(&rank);
+}
+
+/* *********************************************** */
+
 /**
    @brief MAIN FUNCTION
 **/
@@ -6894,9 +6969,8 @@ int main(int argc, char **argv) {
   int skip_unit_tests = 1;
 #endif
 
+  // checkRankingUnitTest(); return(0);
 
-  //checkProtocolIDsUnitTest(); return(0);
-  
 #ifdef DEBUG_TRACE
   trace = fopen("/tmp/ndpiReader.log", "a");
 
@@ -6919,6 +6993,8 @@ int main(int argc, char **argv) {
   if(!skip_unit_tests) {
 #ifndef DEBUG_TRACE
     /* Skip tests when debugging */
+
+    checkRankingUnitTest();
 
 #ifdef HW_TEST
     hwUnitTest2();

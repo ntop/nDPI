@@ -107,7 +107,7 @@ typedef enum {
   3. Add the risk to the array risk_enum_to_alert_type in src/FlowRiskAlerts.cpp
   4. Create a new file in scripts/lua/modules/alert_definitions/flow/ with the new alert risk defined
   5. Update scripts/lua/modules/alert_keys/flow_alert_keys.lua adding a new risk
-  
+
   Example: https://github.com/ntop/ntopng/commit/aecc1e3e6505a0522439dbb2b295a3703d3d0f9a
  */
 typedef enum {
@@ -1069,17 +1069,17 @@ typedef enum {
 } ndpi_fpc_confidence_t;
 
 typedef enum {
-  NDPI_PROTOCOL_SAFE = 0,              /* Surely doesn't provide risks for the network. (e.g., a news site) */
+  NDPI_PROTOCOL_UNRATED = 0,           /* No idea, not implemented or impossible to classify */
+  NDPI_PROTOCOL_SAFE,                  /* Surely doesn't provide risks for the network. (e.g., a news site) */
   NDPI_PROTOCOL_ACCEPTABLE,            /* Probably doesn't provide risks, but could be malicious (e.g., Dropbox) */
   NDPI_PROTOCOL_FUN,                   /* Pure fun protocol, which may be prohibited by the user policy (e.g., Netflix) */
   NDPI_PROTOCOL_UNSAFE,                /* Probably provides risks, but could be a normal traffic. Unencrypted protocols with clear pass should be here (e.g., telnet) */
   NDPI_PROTOCOL_POTENTIALLY_DANGEROUS, /* Possibly dangerous (ex. Tor). */
   NDPI_PROTOCOL_DANGEROUS,             /* Surely is dangerous (ex. smbv1). Be prepared to troubles */
   NDPI_PROTOCOL_TRACKER_ADS,           /* Trackers, Advertisements... */
-  NDPI_PROTOCOL_UNRATED                /* No idea, not implemented or impossible to classify */
 } ndpi_protocol_breed_t;
 
-#define NUM_BREEDS (NDPI_PROTOCOL_UNRATED+1)
+#define NDPI_NUM_BREEDS (NDPI_PROTOCOL_TRACKER_ADS+1)
 
 /*
   Abstract categories to group the protocols.
@@ -1288,8 +1288,10 @@ typedef struct ndpi_proto {
   struct ndpi_proto_stack protocol_stack;
   u_int16_t protocol_by_ip;
   ndpi_protocol_category_t category;
+  ndpi_protocol_breed_t breed;
   void *custom_category_userdata;
 } ndpi_protocol;
+
 
 #define NUM_CUSTOM_CATEGORIES      5
 #define CUSTOM_CATEGORY_LABEL_LEN 32
@@ -1418,6 +1420,7 @@ struct ndpi_flow_struct {
   u_int64_t last_packet_time_ms;
 
   ndpi_protocol_category_t category;
+  ndpi_protocol_breed_t breed;
 
   /* Counters with only packets with L5 data (ie no TCP SYN, pure ACKs, ...) */
   u_int16_t packet_counter;
@@ -1458,6 +1461,10 @@ struct ndpi_flow_struct {
     char *fingerprint_raw;
     ndpi_os os_hint;
   } tcp;
+
+  struct {
+    char *fingerprint;
+  } ndpi;
 
   /*
     This structure below will not not stay inside the protos
@@ -1546,7 +1553,9 @@ struct ndpi_flow_struct {
       char ja3_server[33], ja4_client[37], *ja4_client_raw;
       u_int16_t server_cipher;
       u_int8_t sha1_certificate_fingerprint[20];
-      u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1, server_hello_processed:1, fingerprint_set:1, webrtc:1, _pad:2;
+      u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1,
+	server_hello_processed:1, fingerprint_set:1, webrtc:1,
+	pq_key_share:1, pq_supported_groups:1;
 
 #ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
       /* Under #ifdef to save memory for those who do not need them */
@@ -1555,7 +1564,6 @@ struct ndpi_flow_struct {
 #endif
 
       struct tls_heuristics browser_heuristics;
-
       u_int16_t ssl_version, server_names_len;
 
       struct {
@@ -2067,6 +2075,35 @@ struct ndpi_address_cache {
 
 /* Prototype used to define custom DGA detection function */
 typedef int (*ndpi_custom_dga_predict_fctn)(const char* domain, int domain_length);
+
+/* **************************************** */
+
+#define NDPI_RANKING_VERSION  1
+
+typedef struct {
+  u_int32_t item_unique_id; /* e.g. IP address or ASN */
+  u_int64_t value;          /* current measurement */
+} ndpi_ranking_epoch_entry;
+
+typedef ndpi_ranking_epoch_entry ndpi_ranking_change;
+
+typedef struct {
+  u_int32_t epoch;
+  ndpi_ranking_epoch_entry *entries;
+} ndpi_ranking_epoch;
+
+typedef struct {
+  u_int8_t  ranking_version;
+  u_int32_t epochs_memory_len;
+  u_int16_t max_num_entries;
+  u_int8_t  num_epochs;    /* max # of recently stored measurements */
+  u_int8_t  next_epoch_id; /* Next epoch to be written */
+} ndpi_ranking_header;
+
+typedef struct {
+  ndpi_ranking_header header;
+  char *epochs;
+} ndpi_ranking;
 
 /* **************************************** */
 

@@ -1,7 +1,7 @@
 DPI Packets (UDP):	6	(1.50 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence DPI              : 3 (flows)
-Num dissector calls: 316 (79.00 diss/flow)
+Num dissector calls: 320 (80.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -25,8 +25,8 @@ Unknown	1	146	1
 RTP	9	1926	1
 SIP	102	47087	2
 
-Acceptable                     111 49013         3            
 Unrated                          1 146           1            
+Acceptable                     111 49013         3            
 
 Unspecified                      1 146           1            
 Media                            9 1926          1            

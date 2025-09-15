@@ -555,6 +555,11 @@ static void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
     flow->ssh_tls.ja4_client_raw = NULL;
   }
 
+  if(flow->ndpi_fingerprint) {
+    ndpi_free(flow->ndpi_fingerprint);
+    flow->ndpi_fingerprint = NULL;
+  }
+
   if(flow->stun.mapped_address.aps) {
     ndpi_free(flow->stun.mapped_address.aps);
     flow->stun.mapped_address.aps = NULL;
@@ -1570,8 +1575,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_snprintf(flow->ssh_tls.ja4_client, sizeof(flow->ssh_tls.ja4_client), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja4_client);
 
+    if(flow->ndpi_flow->ndpi.fingerprint)
+      flow->ndpi_fingerprint = ndpi_strdup(flow->ndpi_flow->ndpi.fingerprint);
+	
     if(flow->ndpi_flow->protos.tls_quic.ja4_client_raw)
-      flow->ssh_tls.ja4_client_raw = strdup(flow->ndpi_flow->protos.tls_quic.ja4_client_raw);
+      flow->ssh_tls.ja4_client_raw = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.ja4_client_raw);
 
     ndpi_snprintf(flow->ssh_tls.ja3_server, sizeof(flow->ssh_tls.ja3_server), "%s",
 	          flow->ndpi_flow->protos.tls_quic.ja3_server);
@@ -1587,10 +1595,10 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->ssh_tls.browser_heuristics = flow->ndpi_flow->protos.tls_quic.browser_heuristics;
 
     if(flow->ndpi_flow->protos.tls_quic.issuerDN)
-      flow->ssh_tls.tls_issuerDN = strdup(flow->ndpi_flow->protos.tls_quic.issuerDN);
+      flow->ssh_tls.tls_issuerDN = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.issuerDN);
 
     if(flow->ndpi_flow->protos.tls_quic.subjectDN)
-      flow->ssh_tls.tls_subjectDN = strdup(flow->ndpi_flow->protos.tls_quic.subjectDN);
+      flow->ssh_tls.tls_subjectDN = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.subjectDN);
 
     flow->ssh_tls.encrypted_ch.version = flow->ndpi_flow->protos.tls_quic.encrypted_ch.version;
 

@@ -42,7 +42,8 @@ fi
 
 # build project
 cd ndpi
-RANLIB=llvm-ranlib ./autogen.sh --enable-fuzztargets --enable-tls-sigs
+#Workaround for introspector builds
+RANLIB=llvm-ranlib LDFLAGS="-L/usr/local/lib -lpcap" ./autogen.sh --enable-fuzztargets --enable-tls-sigs
 make -j$(nproc)
 # Copy fuzzers
 ls fuzz/fuzz* | grep -v "\." | while read -r i; do cp "$i" "$OUT"/; done

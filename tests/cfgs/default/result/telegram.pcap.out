@@ -1,7 +1,7 @@
 DPI Packets (UDP):	148	(3.08 pkts/flow)
 Confidence Unknown          : 3 (flows)
 Confidence DPI              : 45 (flows)
-Num dissector calls: 1470 (30.62 diss/flow)
+Num dissector calls: 1476 (30.75 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/9/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -9,7 +9,7 @@ LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/3/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    3/3/0 (insert/search/found)
-Automa host:          40/11 (search/found)
+Automa host:          68/11 (search/found)
 Automa domain:        39/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     2/2 (search/found)
@@ -33,10 +33,10 @@ Google	6	5708	2
 Spotify	9	742	2
 Telegram	908	185304	12
 
+Unrated                        306 72708         3            
 Acceptable                    1250 263132        42           
 Fun                              9 742           2            
 Dangerous                        1 243           1            
-Unrated                        306 72708         3            
 
 Unspecified                    306 72708         3            
 Web                              6 5708          2            

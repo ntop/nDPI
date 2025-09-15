@@ -484,6 +484,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_set_config(ndpi_info_mod, NULL, "metadata.tcp_fingerprint_format", cfg_value);
   }
   if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "metadata.ndpi_fingerprint", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
+    value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
+    snprintf(cfg_value, sizeof(cfg_value), "%d", value);
+    ndpi_set_config(ndpi_info_mod, NULL, "metadata.ndpi_fingerprint_format", cfg_value);
+  }
+  if(fuzzed_data.ConsumeBool()) {
     pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, NDPI_MAX_RISK + 1); /* + 1 to trigger invalid pid */
     value = fuzzed_data.ConsumeIntegralInRange(0, 1 + 1);
     snprintf(cfg_value, sizeof(cfg_value), "%d", value);
@@ -728,7 +738,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   struct in_addr pin;
   struct in6_addr pin6;
-  u_int16_t suffix_id;
+  u_int32_t suffix_id;
   
   pin.s_addr = fuzzed_data.ConsumeIntegral<u_int32_t>();
   ndpi_network_port_ptree_match(ndpi_info_mod, &pin, fuzzed_data.ConsumeIntegral<u_int16_t>());

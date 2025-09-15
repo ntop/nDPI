@@ -32,7 +32,7 @@
 #include "ndpi_includes.h"
 #include "ndpi_encryption.h"
 
-#ifdef USE_ROARING_V2 
+#ifdef USE_OLD_ROARING
 #include "third_party/include/roaring_v2.h"
 #else
 #include "third_party/include/roaring.h"
@@ -41,7 +41,7 @@
 /* ******************************************* */
 
 ndpi_bitmap* ndpi_bitmap_alloc() {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   return((ndpi_bitmap*)roaring_bitmap_create());
 #else
   return((ndpi_bitmap*)roaring64_bitmap_create());
@@ -51,7 +51,7 @@ ndpi_bitmap* ndpi_bitmap_alloc() {
 /* ******************************************* */
 
 void ndpi_bitmap_free(ndpi_bitmap* b) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   roaring_bitmap_free((const roaring_bitmap_t *)b);
 #else
   roaring64_bitmap_free((roaring64_bitmap_t *)b);
@@ -61,7 +61,7 @@ void ndpi_bitmap_free(ndpi_bitmap* b) {
 /* ******************************************* */
 
 ndpi_bitmap* ndpi_bitmap_copy(ndpi_bitmap* b) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   return(roaring_bitmap_copy(b));
 #else
   return(roaring64_bitmap_copy(b));
@@ -71,7 +71,7 @@ ndpi_bitmap* ndpi_bitmap_copy(ndpi_bitmap* b) {
 /* ******************************************* */
 
 u_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   return(roaring_bitmap_get_cardinality((const roaring_bitmap_t *)b));
 #else
   return(roaring64_bitmap_get_cardinality((roaring64_bitmap_t *)b));
@@ -81,7 +81,7 @@ u_int64_t ndpi_bitmap_cardinality(ndpi_bitmap* b) {
 /* ******************************************* */
 
 void ndpi_bitmap_set(ndpi_bitmap* b, u_int64_t value) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   roaring_bitmap_add((roaring_bitmap_t *)b, value);
 #else
   roaring64_bitmap_add((roaring64_bitmap_t *)b, value);
@@ -91,7 +91,7 @@ void ndpi_bitmap_set(ndpi_bitmap* b, u_int64_t value) {
 /* ******************************************* */
 
 void ndpi_bitmap_unset(ndpi_bitmap* b, u_int64_t value) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   roaring_bitmap_remove((roaring_bitmap_t *)b, value);
 #else
   roaring64_bitmap_remove((roaring64_bitmap_t *)b, value);
@@ -103,7 +103,7 @@ void ndpi_bitmap_unset(ndpi_bitmap* b, u_int64_t value) {
 bool ndpi_bitmap_isset(ndpi_bitmap* b, u_int64_t value) {
   bool ret;
   
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   ret = roaring_bitmap_contains((const roaring_bitmap_t *)b, value);
 #else
   ret = roaring64_bitmap_contains((const roaring64_bitmap_t *)b, value);
@@ -117,7 +117,7 @@ bool ndpi_bitmap_isset(ndpi_bitmap* b, u_int64_t value) {
 size_t ndpi_bitmap_serialize(ndpi_bitmap* b, char **buf) {
   size_t s;
 
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   const roaring_bitmap_t *r = (const roaring_bitmap_t *)b;
   
   s = roaring_bitmap_portable_size_in_bytes(r);
@@ -131,7 +131,7 @@ size_t ndpi_bitmap_serialize(ndpi_bitmap* b, char **buf) {
 
   if((*buf) == NULL) return(0);
 
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   return(roaring_bitmap_portable_serialize(r, *buf));
 #else
   return(roaring64_bitmap_portable_serialize(r, *buf));
@@ -141,7 +141,7 @@ size_t ndpi_bitmap_serialize(ndpi_bitmap* b, char **buf) {
 /* ******************************************* */
 
 ndpi_bitmap* ndpi_bitmap_deserialize(char *buf, size_t buf_len) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   return((ndpi_bitmap*)roaring_bitmap_portable_deserialize_safe(buf, buf_len));
 #else
   return((ndpi_bitmap*)roaring64_bitmap_portable_deserialize_safe(buf, buf_len));
@@ -152,7 +152,7 @@ ndpi_bitmap* ndpi_bitmap_deserialize(char *buf, size_t buf_len) {
 
 /* b = b & b_and */
 void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   roaring_bitmap_and_inplace((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_and);
 #else
   roaring64_bitmap_and_inplace((roaring64_bitmap_t*)a, (roaring64_bitmap_t*)b_and);
@@ -163,7 +163,7 @@ void ndpi_bitmap_and(ndpi_bitmap* a, ndpi_bitmap* b_and) {
 
 /* b = b & b_and */
 ndpi_bitmap* ndpi_bitmap_and_alloc(ndpi_bitmap* a, ndpi_bitmap* b_and) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   return((ndpi_bitmap*)roaring_bitmap_and((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_and));
 #else
   return((ndpi_bitmap*)roaring64_bitmap_and((roaring64_bitmap_t*)a, (roaring64_bitmap_t*)b_and));
@@ -174,7 +174,7 @@ ndpi_bitmap* ndpi_bitmap_and_alloc(ndpi_bitmap* a, ndpi_bitmap* b_and) {
 
 /* b = b & !b_and */
 void ndpi_bitmap_andnot(ndpi_bitmap* a, ndpi_bitmap* b_and) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   roaring_bitmap_andnot_inplace((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_and);
 #else
   roaring64_bitmap_andnot_inplace((roaring64_bitmap_t*)a, (roaring64_bitmap_t*)b_and);
@@ -185,7 +185,7 @@ void ndpi_bitmap_andnot(ndpi_bitmap* a, ndpi_bitmap* b_and) {
 
 /* b = b | b_or */
 void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   roaring_bitmap_or_inplace((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_or);
 #else
   roaring64_bitmap_or_inplace((roaring64_bitmap_t*)a, (roaring64_bitmap_t*)b_or);
@@ -196,7 +196,7 @@ void ndpi_bitmap_or(ndpi_bitmap* a, ndpi_bitmap* b_or) {
 
 /* b = b | b_or */
 ndpi_bitmap* ndpi_bitmap_or_alloc(ndpi_bitmap* a, ndpi_bitmap* b_or) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   return((ndpi_bitmap*)roaring_bitmap_or((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_or));
 #else
   return((ndpi_bitmap*)roaring64_bitmap_or((roaring64_bitmap_t*)a, (roaring64_bitmap_t*)b_or));
@@ -207,7 +207,7 @@ ndpi_bitmap* ndpi_bitmap_or_alloc(ndpi_bitmap* a, ndpi_bitmap* b_or) {
 
 /* b = b ^ b_xor */
 void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   roaring_bitmap_xor_inplace((roaring_bitmap_t*)a, (roaring_bitmap_t*)b_xor);
 #else
   roaring64_bitmap_xor_inplace((roaring64_bitmap_t*)a, (roaring64_bitmap_t*)b_xor);
@@ -217,7 +217,7 @@ void ndpi_bitmap_xor(ndpi_bitmap* a, ndpi_bitmap* b_xor) {
 /* ******************************************* */
 
 void ndpi_bitmap_optimize(ndpi_bitmap* a) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   roaring_bitmap_run_optimize(a);
 #else
   roaring64_bitmap_run_optimize(a);
@@ -227,7 +227,7 @@ void ndpi_bitmap_optimize(ndpi_bitmap* a) {
 /* ******************************************* */
 
 ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
-#ifdef USE_ROARING_V2 
+#ifdef USE_OLD_ROARING
   return((ndpi_bitmap_iterator*)roaring_create_iterator((roaring_bitmap_t*)b));
 #else
   return((ndpi_bitmap_iterator*)roaring64_iterator_create((const roaring64_bitmap_t*)b));
@@ -237,7 +237,7 @@ ndpi_bitmap_iterator* ndpi_bitmap_iterator_alloc(ndpi_bitmap* b) {
 /* ******************************************* */
 
 void ndpi_bitmap_iterator_free(ndpi_bitmap* b) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   roaring_free_uint32_iterator((roaring_uint32_iterator_t*)b);
 #else
   roaring64_iterator_free((roaring64_iterator_t*)b);
@@ -247,7 +247,7 @@ void ndpi_bitmap_iterator_free(ndpi_bitmap* b) {
 /* ******************************************* */
 
 bool ndpi_bitmap_is_empty(ndpi_bitmap* b) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   return(roaring_bitmap_is_empty((roaring_bitmap_t*)b));
 #else
   return(roaring64_bitmap_is_empty((roaring64_bitmap_t*)b));
@@ -261,7 +261,7 @@ bool ndpi_bitmap_is_empty(ndpi_bitmap* b) {
    true is returned when a value is present, false when we reached the end 
 */
 bool ndpi_bitmap_iterator_next(ndpi_bitmap_iterator* i, u_int64_t *value) {
-#ifdef USE_ROARING_V2
+#ifdef USE_OLD_ROARING
   uint32_t ret;
   uint32_t num = roaring_read_uint32_iterator((roaring_uint32_iterator_t*)i, &ret, 1);
 

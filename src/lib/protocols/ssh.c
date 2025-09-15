@@ -384,14 +384,13 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
 /* ************************************************************************ */
 
 static void ndpi_ssh_zap_cr(char *str, int len) {
-  len--;
+  int i;
 
-  while(len > 0) {
-    if((str[len] == '\n') || (str[len] == '\r')) {
-      str[len] = '\0';
-      len--;
-    } else
+  for(i = 0; i < len; i++) {
+    if((str[i] == '\n') || (str[i] == '\r')) {
+      str[i] = '\0';
       break;
+    }
   }
 }
 

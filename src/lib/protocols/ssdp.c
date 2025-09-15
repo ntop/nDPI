@@ -54,7 +54,7 @@ static void ssdp_parse_lines(struct ndpi_detection_module_struct
 
   /* Save host which provides a service if available */
   if (packet->host_line.ptr != NULL && packet->host_line.len > 0) {
-    ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
+    ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL | NDPI_HOSTNAME_NORM_STRIP_PORT);
   }
 
   if (packet->bootid.ptr != NULL && packet->bootid.len > 0) {

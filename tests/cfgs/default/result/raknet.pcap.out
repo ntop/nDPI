@@ -1,7 +1,7 @@
 DPI Packets (UDP):	26	(2.17 pkts/flow)
 Confidence Unknown          : 2 (flows)
 Confidence DPI              : 10 (flows)
-Num dissector calls: 1746 (145.50 diss/flow)
+Num dissector calls: 1764 (147.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/6/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -24,8 +24,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 Unknown	2	314	2
 RakNet	64	9286	10
 
-Fun                             64 9286          10           
 Unrated                          2 314           2            
+Fun                             64 9286          10           
 
 Unspecified                      2 314           2            
 Game                            64 9286          10           

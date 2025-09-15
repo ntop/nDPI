@@ -1,4 +1,4 @@
-# Generated at 2025-06-18T20:59:19.738276
+# Generated at 2025-09-09T16:22:16.646343
 2miners.com
 51pool.online
 ae.2miners.com
@@ -6,7 +6,6 @@ aeon.minercountry.com
 aergo.eu.mine.zpool.ca
 aergo.jp.mine.zpool.ca
 aergo.na.mine.zpool.ca
-ahamay.net
 aikapool.com
 aionmine.org
 aka.2miners.com
@@ -62,6 +61,7 @@ arrow.dapool.io
 arrr-eu.luxor.tech
 arrr-us.luxor.tech
 arrr.luxor.tech
+arw.snowmining.com
 asia-ae.2miners.com
 asia-beam.2miners.com
 asia-btg.2miners.com
@@ -83,7 +83,6 @@ asia.groestl.mining-dutch.nl
 asia.kawpow-hub.miningpoolhub.com
 asia.keccak.mining-dutch.nl
 asia.lyra2rev2.mining-dutch.nl
-asia.mecrypto.club
 asia.miner.tokyo
 asia.myrgro.mining-dutch.nl
 asia.neoscrypt.mining-dutch.nl
@@ -108,6 +107,7 @@ aspac1-eth.hiveon.net
 astralhash.eu.mine.zpool.ca
 astralhash.na.mine.zpool.ca
 atheios.wattpool.net
+atomis.coinmine.pl
 au-01.miningrigrentals.com
 axe.antpool.com
 b4c.f2pool.com
@@ -205,11 +205,12 @@ c11.na.mine.zpool.ca
 ca-qrl.miningocean.org
 ca-tor01.miningrigrentals.com
 ca-upx.miningocean.org
-ca.haven.miner.rocks
 ca.monero.herominers.com
 ca.rvn.minermore.com
 ca.stratu.ms
 ca.stratum.slushpool.com
+cash-eu.coinmine.pl
+cash.coinmine.pl
 cfx-eu.ss.poolflare.net
 cfx-eu.ss.poolflare.net
 cfx-us.ss.poolflare.net
@@ -229,7 +230,6 @@ cnpool.cc
 coinotron.com
 coins4u.cc
 comining.io
-conceal.miner.rocks
 coolpool.top
 cpacoin.my-mining-pool.de
 cpu-pool.com
@@ -239,7 +239,7 @@ cpupower.eu.mine.zpool.ca
 cpupower.mine.zergpool.com
 crypit.net
 cryptodredge-ax16r-oeu.bsod.pw
-cryptonote.social
+cryptonote.club
 ctxc.2miners.com
 cuckoo.cortexmint.com
 cuckoocycle.br.nicehash.com
@@ -256,13 +256,16 @@ daggerhashimoto.jp.nicehash.com
 daggerhashimoto.usa.nicehash.com
 dash-asia.luxor.tech
 dash-eu.luxor.tech
+dash.coinmine.pl
 dash.f2pool.com
 dash.ss.poolin.com
-dash.suprnova.cc
 dbix-us.maxhash.org
 dbix.hashcity.org
+dcr-eu.coinmine.pl
 dcr-eu.luxor.tech
+dcr-us.coinmine.pl
 dcr-us.luxor.tech
+dcr.coinmine.pl
 de.ckpool.org
 de.stratu.ms
 de01.supportxmr.com
@@ -273,7 +276,6 @@ decred.na.mine.zpool.ca
 dedal.eu.mine.zpool.ca
 defis-us.ravepool.com
 dero.antpool.com
-dero.miner.rocks
 dero.ss.dxpool.com
 dgbo.suprnova.cc
 dgbq.suprnova.cc
@@ -284,7 +286,6 @@ donate.v2.xmrig.com
 duckiepool.com
 dvt.gomine.pro
 dxpool.com
-dyn.suprnova.cc
 eaglesong.eu.nicehash.com
 eaglesong.hk.nicehash.com
 eaglesong.usa.nicehash.com
@@ -294,7 +295,6 @@ egem-esoteria.icanmining.ru
 egem.digipools.org
 ella.2miners.com
 ella.digipools.org
-em.huobipool.com
 emc2.suprnova.cc
 equihash.asia.mine.zergpool.com
 equihash.br.nicehash.com
@@ -336,7 +336,6 @@ equihash192.na.mine.zpool.ca
 equihash192.sea.mine.zpool.ca
 equihash96.eu.mine.zpool.ca
 equihash96.na.mine.zpool.ca
-es.huobipool.com
 etc-eu.maxhash.org
 etc-solo.baikalmine.com
 etc-solo.wattpool.net
@@ -362,6 +361,7 @@ eth-us.f2pool.com
 eth-us.maxhash.org
 eth.2miners.com
 eth.altpool.pro
+eth.coinmine.pl
 eth.digipools.org
 eth.ethashpool.com
 eth.f2pool.com
@@ -402,6 +402,7 @@ eu-zel.equihub.pro
 eu-zel.zellabs.net
 eu-zer.equihub.pro
 eu-zero.equihub.pro
+eu-zil.rustpool.xyz
 eu.aionpool.tech
 eu.altpool.eu
 eu.bsod.pw
@@ -413,7 +414,6 @@ eu.equihub.pro
 eu.frostypool.com
 eu.gethash.cc
 eu.luckpool.net
-eu.mecrypto.club
 eu.nimpool.io
 eu.pool.ms
 eu.poolmine.xyz
@@ -433,6 +433,7 @@ eu1.ltc.sigmapool.com
 eu1.mastermining.net
 eu1.whalesburg.com
 eu1.zhash.pro
+eu2-zil.rustpool.xyz
 eu2.emcd.io
 eu2.whalesburg.com
 eupool.sinovate.io
@@ -481,7 +482,6 @@ handshake-de.6block.com
 handshake-us.6block.com
 handshake.6block.com
 hathor.acc-pool.pw
-haven.miner.rocks
 hc.antpool.com
 hex.eu.mine.zpool.ca
 hex.jp.mine.zpool.ca
@@ -500,7 +500,6 @@ honeycomb.eu.mine.zpool.ca
 honeycomb.na.mine.zpool.ca
 hub.miningpoolhub.com
 hush.2miners.com
-hush.suprnova.cc
 icemining.ca
 in.stratu.ms
 infinity.ultranote.org
@@ -551,7 +550,6 @@ keccakc.jp.mine.zpool.ca
 keccakc.mine.zergpool.com
 keccakc.na.mine.zpool.ca
 kp.unmineable.com
-kreds.suprnova.cc
 kva.ss.dxpool.com
 kz.emcd.io
 lb.geo.egempool.eu
@@ -563,17 +561,13 @@ lbk3.jp.mine.zpool.ca
 lbk3.na.mine.zpool.ca
 lbry.asia.mine.zergpool.com
 lbry.eu.mine.zpool.ca
-lbry.eu.nicehash.com
-lbry.hk.nicehash.com
 lbry.jp.mine.zpool.ca
 lbry.mine.zergpool.com
 lbry.na.mine.zpool.ca
 lbry.suprnova.cc
-lbry.usa.nicehash.com
 letshash.it
 lidonia.com
 litecoinpool.org
-ls.huobipool.com
 ltc-eu.f2pool.com
 ltc-us.f2pool.com
 ltc.f2pool.com
@@ -608,7 +602,6 @@ m7m.jp.mine.zpool.ca
 m7m.mine.zergpool.com
 m7m.na.mine.zpool.ca
 m7m.sea.mine.zpool.ca
-masari.miner.rocks
 mcmpool.eu
 megabtx.asia.mine.zergpool.com
 megabtx.eu.mine.zpool.ca
@@ -711,6 +704,7 @@ p2p-spb.xyz
 p2p-usa.xyz
 padihash.eu.mine.zpool.ca
 pasl.fairpool.xyz
+pavhash.mooo.com
 pawelhash.eu.mine.zpool.ca
 pgc.minerpool.net
 phi.asia.mine.zergpool.com
@@ -724,6 +718,7 @@ phi2.na.mine.zpool.ca
 pirl-solo.wattpool.net
 pirl.2miners.com
 pirl.coinminer.space
+pmeer.666pool.cn
 polytimos.eu.mine.zpool.ca
 polytimos.jp.mine.zpool.ca
 polytimos.na.mine.zpool.ca
@@ -731,20 +726,24 @@ pool-eu.ethosdistro.com
 pool-usa.ethosdistro.com
 pool.0cash.org
 pool.572133.club
+pool.acemining.co
+pool.aionmine.org
 pool.bibop.net
 pool.bitcoinote.org
+pool.bloc.money
 pool.blocpal.com
 pool.bsod.pw
 pool.btcp.network
 pool.ckpool.org
-pool.cryptohost.top
 pool.dgb256.online
 pool.ehpro.ca
 pool.electroneropulse.org
 pool.erstweal.com
 pool.esn.today
+pool.ethercore.io
 pool.expanse.tech
 pool.hashvault.pro
+pool.helpico.tech
 pool.krb.fairhash.org
 pool.lanacoin.com
 pool.mangocoin.online
@@ -782,12 +781,9 @@ qrl.herominers.com
 qrl.miningocean.org
 quark.asia.mine.zergpool.com
 quark.eu.mine.zpool.ca
-quark.eu.nicehash.com
-quark.hk.nicehash.com
 quark.jp.mine.zpool.ca
 quark.mine.zergpool.com
 quark.na.mine.zpool.ca
-quark.usa.nicehash.com
 qubit.asia.mine.zergpool.com
 qubit.br.nicehash.com
 qubit.eu.mine.zpool.ca
@@ -804,7 +800,6 @@ randomarq.asia.mine.zergpool.com
 randomarq.mine.zergpool.com
 randomsfx.asia.mine.zergpool.com
 randomsfx.eu.mine.zergpool.com
-randomsfx.mine.zergpool.com
 randomx.eu.mine.zergpool.com
 randomx.mine.zergpool.com
 randomx.na.mine.zergpool.com
@@ -836,7 +831,6 @@ rvn.suprnova.cc
 rx.unmineable.com
 ryo-eu.leafpool.com
 ryo.bohemianpool.com
-ryo.miner.rocks
 ryopool.cryptosewer.com
 s-eu.comining.io
 s-jp.comining.io
@@ -873,7 +867,7 @@ scryptn2.eu.mine.zergpool.com
 scryptn2.mine.zergpool.com
 seu-eth.hiveon.net
 sfx.pool-pay.com
-sg.haven.miner.rocks
+sg-zil.rustpool.xyz
 sg.qrl.herominers.com
 sg.stratu.ms
 sg.stratum.slushpool.com
@@ -911,9 +905,7 @@ sib.eu.mine.zpool.ca
 sib.jp.mine.zpool.ca
 sib.mine.zergpool.com
 sib.na.mine.zpool.ca
-sib.suprnova.cc
 singapore01.hashvault.pro
-sipc.matpool.io
 sipc.simpool.vip
 skein.asia.mine.zergpool.com
 skein.eu.mine.zergpool.com
@@ -958,7 +950,6 @@ sonoa.eu.mine.zpool.ca
 sonoa.jp.mine.zpool.ca
 sonoa.mine.zergpool.com
 sonoa.na.mine.zpool.ca
-spookypool.nl
 ss.antpool.com
 ss.bfcpool.com
 stellite.ingest-asia.cryptoknight.cc
@@ -975,15 +966,14 @@ stratum-sc.antpool.com
 stratum-xmc.antpool.com
 stratum-zec.antpool.com
 stratum.aikapool.com
+stratum.aionmine.org
 stratum.antpool.com
 stratum.bcmonster.com
-stratum.coinminerz.com
 stratum.cudopool.com
 stratum.f2pool.com
 stratum.gpuhot.com
 stratum.icemining.ca
 stratum.kano.is
-stratum.mecrypto.club
 stratum.naw.warihash.com
 stratum.node5.mainnet.hathor.network
 stratum.piratepool.io
@@ -1057,6 +1047,7 @@ us-west01.miningrigrentals.com
 us-zec.2miners.com
 us-zel.zellabs.net
 us-zen.2miners.com
+us-zil.rustpool.xyz
 us.0769.it
 us.bsod.pw
 us.btgpool.pro
@@ -1077,12 +1068,14 @@ us.stratu.ms
 us1.fairpool.pro
 us1.stratu.ms
 us1.zhash.pro
+us2-zil.rustpool.xyz
 us2.litecoinpool.org
 us2mine.com
 usa-west.dgb256.online
 uspool.electroneropulse.org
 uupool.cn
 vdl.raptorpool.org
+vds.666pool.cn
 vegas-backup.xmrpool.net
 veil-eu.coinblockers.com
 veil-us.coinblockers.com
@@ -1182,7 +1175,6 @@ x25x.mine.zpool.ca
 x25x.na.mine.zpool.ca
 xao.pool.mine2gether.com
 xd.frostypool.com
-xdna.suprnova.cc
 xeq.pool-pay.com
 xevan.asia.mine.zergpool.com
 xevan.eu.mine.zergpool.com
@@ -1249,7 +1241,6 @@ yoc.2miners.com
 zano.luckypool.io
 zcl.2miners.com
 zcl.altpool.pro
-zcl.suprnova.cc
 zcoin-eu.mintpond.com
 zcoin-us.mintpond.com
 zcoin.dapool.io
@@ -1268,7 +1259,6 @@ zen-eu.luxor.tech
 zen-us.luxor.tech
 zen.2miners.com
 zen.luxor.tech
-zencash.f2pool.com
 zer.equihub.pro
 zergpool.com
 zeropool.io
@@ -1278,5 +1268,6 @@ zhash.hk.nicehash.com
 zhash.in.nicehash.com
 zhash.jp.nicehash.com
 zhash.usa.nicehash.com
+zil.rustpool.xyz
 zp-eu.leafpool.com
 zpool.ca
