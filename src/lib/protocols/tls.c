@@ -3322,7 +3322,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 	      } else if(extension_id == 51 &&  /* key_share */
 	                offset + extension_offset < total_len) {
-		u_int16_t extn_offset        = extn_off + 4;
+		u_int32_t extn_offset        = extn_off + 4;
 		u_int16_t extn_end           = extn_offset + extension_len;
 
 		if(extn_offset + extension_len <= total_len) {
