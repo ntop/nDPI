@@ -22,8 +22,6 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#include "../include/ndpi_typedefs.h"
-
 #ifdef __APPLE__
 #include <netinet/ip.h>
 #endif
