@@ -28,8 +28,6 @@
 #include <math.h>
 #include <float.h>
 
-#include "../src/include/ndpi_typedefs.h"
-
 #ifdef WIN32
 #include <winsock2.h> /* winsock.h is included automatically */
 #include <windows.h>
