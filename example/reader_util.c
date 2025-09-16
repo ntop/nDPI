@@ -1641,17 +1641,19 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->mdns_metadata.services = ndpi_malloc(
       sizeof(struct ndpi_mdns_rsp_entry) * flow->mdns_metadata.num_services);
 
-    for(int idx = 0; idx < flow->mdns_metadata.num_services; ++idx) {
-      struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[idx];
-      struct ndpi_mdns_rsp_entry *reference = &flow->ndpi_flow->mdns_metadata.services[idx];
+    if (flow->mdns_metadata.services) {
+      for(int idx = 0; idx < flow->mdns_metadata.num_services; ++idx) {
+        struct ndpi_mdns_rsp_entry *service = &flow->mdns_metadata.services[idx];
+        struct ndpi_mdns_rsp_entry *reference = &flow->ndpi_flow->mdns_metadata.services[idx];
 
-      service->rsp_type = reference->rsp_type;
-      service->rsp_class = reference->rsp_class;
-      service->ttl = reference->ttl;
-      service->data_len = reference->data_len;
-      service->name = ndpi_strdup(reference->name);
-      service->data = ndpi_strdup(reference->data);
-      service->srv_port = reference->srv_port;
+        service->rsp_type = reference->rsp_type;
+        service->rsp_class = reference->rsp_class;
+        service->ttl = reference->ttl;
+        service->data_len = reference->data_len;
+        service->name = ndpi_strdup(reference->name);
+        service->data = ndpi_strdup(reference->data);
+        service->srv_port = reference->srv_port;
+      }
     }
   }
 
