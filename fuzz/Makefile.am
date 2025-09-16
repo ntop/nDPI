@@ -761,7 +761,7 @@ fuzz_ndpi_reader_pl7m_simplest_internal_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_simplest_internal_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_pl7m_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_SOURCES = fuzz_ndpi_reader_pl7m.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_CFLAGS =  -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -I../src/lib/third_party/include/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_CONFIG2
 fuzz_ndpi_reader_pl7m_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_pl7m_LDFLAGS = $(PCAP_LIB) $(LIBS)
@@ -774,7 +774,7 @@ fuzz_ndpi_reader_pl7m_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_pl7m_64k_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_64k_SOURCES = fuzz_ndpi_reader_pl7m_64k.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_64k_CFLAGS =  -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -I../src/lib/third_party/include/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_64K_PACKETS
 fuzz_ndpi_reader_pl7m_64k_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_pl7m_64k_LDFLAGS = $(PCAP_LIB) $(LIBS)
@@ -1017,5 +1017,6 @@ distdir:
 		-o -path './corpus/fuzz_ds_bitmap64_fuse/*' \
 		-o -path './corpus/fuzz_ds_domain_classify/*' \
 		-o -path './corpus/fuzz_ds_ptree/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
+	find . -type l -name '*.c' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 
 all: corpus dictionaries
