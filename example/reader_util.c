@@ -617,12 +617,13 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
   if(flow->risk_str)        ndpi_free(flow->risk_str);
   if(flow->flow_payload)    ndpi_free(flow->flow_payload);
 
-
-  for(int i = 0; i < flow->mdns_metadata.num_services; ++i) {
-    if (flow->mdns_metadata.services[i].name) ndpi_free(flow->mdns_metadata.services[i].name);
-    if (flow->mdns_metadata.services[i].data) ndpi_free(flow->mdns_metadata.services[i].data);
+  if (flow->mdns_metadata.services) {
+    for(int i = 0; i < flow->mdns_metadata.num_services; i++) {
+      if (flow->mdns_metadata.services[i].name) ndpi_free(flow->mdns_metadata.services[i].name);
+      if (flow->mdns_metadata.services[i].data) ndpi_free(flow->mdns_metadata.services[i].data);
+    }
+    ndpi_free(flow->mdns_metadata.services);
   }
-  if(flow->mdns_metadata.services) ndpi_free(flow->mdns_metadata.services);
 }
 
 /* ***************************************************** */

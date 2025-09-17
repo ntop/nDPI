@@ -675,7 +675,7 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
                     data[target_len] = 0;
                   } else {
 #ifdef DNS_DEBUG
-                  printf("[DNS] Out of memory\n");
+                    printf("[DNS] Out of memory\n");
 #endif
                   }
                 }
@@ -691,7 +691,8 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
         x += data_len;
       }
 
-      if(proto->master_protocol == NDPI_PROTOCOL_MDNS && data != NULL) {
+      if (data != NULL) {
+        if(proto->master_protocol == NDPI_PROTOCOL_MDNS) {
           if(name_len <= 0 ||
             flow->mdns_metadata.num_services >= MAX_NUM_MDNS_ADVERTISED_SERVICES) {
             /* info was useless or we reached the limit */
@@ -701,7 +702,11 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DNS_DEBUG
             printf("[DNS] Out of memory\n");
 #endif
+            /* if calloc/malloc fails inside add_to_mdns_metadata(), num_services won't be incremented.
+             * So we need to free data now, otherwise it will never be. */
+            ndpi_free(data);
           }
+        }
       }
     }
 
