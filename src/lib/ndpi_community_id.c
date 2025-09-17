@@ -156,7 +156,7 @@ static int ndpi_community_id_peer_v4_is_less_than(u_int32_t ip1, u_int32_t ip2, 
 
 /* **************************************************** */
 
-static int ndpi_community_id_peer_v6_is_less_than(struct ndpi_in6_addr *ip1, struct ndpi_in6_addr *ip2, u_int16_t p1, u_int16_t p2) {
+static int ndpi_community_id_peer_v6_is_less_than(const struct ndpi_in6_addr *ip1, const struct ndpi_in6_addr *ip2, u_int16_t p1, u_int16_t p2) {
   int comp = memcmp(ip1, ip2, sizeof(struct ndpi_in6_addr));
 
   return comp < 0 || (comp == 0 && p1 < p2);
@@ -318,14 +318,14 @@ int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip, u_int32_t dst_ip,
 
 /* **************************************************** */
 
-int ndpi_flowv6_flow_hash(u_int8_t l4_proto, struct ndpi_in6_addr *src_ip, struct ndpi_in6_addr *dst_ip,
+int ndpi_flowv6_flow_hash(u_int8_t l4_proto, const struct ndpi_in6_addr *src_ip, const struct ndpi_in6_addr *dst_ip,
                           u_int16_t src_port, u_int16_t dst_port,
                           u_int8_t icmp_type, u_int8_t icmp_code,
                           u_char *hash_buf, u_int8_t hash_buf_len) {
   u_int8_t comm_buf[40] = { 0 };
   u_int16_t off = 0;
   u_int16_t seed = 0;
-  struct ndpi_in6_addr *ip_a_ptr, *ip_b_ptr;
+  const struct ndpi_in6_addr *ip_a_ptr, *ip_b_ptr;
   u_int16_t port_a, port_b;
   int icmp_one_way = 0;
 
