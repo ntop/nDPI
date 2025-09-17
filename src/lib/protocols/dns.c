@@ -356,8 +356,8 @@ static int add_to_mdns_metadata(struct ndpi_flow_struct *flow,
                                 u_int16_t data_len, u_int16_t srv_port, char *data,
                                 u_int16_t name_len, const char *name) {
   if(flow->mdns_metadata.services == NULL) {
-    if((flow->mdns_metadata.services = ndpi_malloc(
-      sizeof(struct ndpi_mdns_rsp_entry) * MAX_NUM_MDNS_ADVERTISED_SERVICES)) == NULL) {
+    if((flow->mdns_metadata.services = ndpi_calloc(
+      MAX_NUM_MDNS_ADVERTISED_SERVICES, sizeof(struct ndpi_mdns_rsp_entry))) == NULL) {
       return -1;
     }
   }

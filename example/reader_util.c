@@ -619,8 +619,8 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
 
 
   for(int i = 0; i < flow->mdns_metadata.num_services; ++i) {
-    ndpi_free(flow->mdns_metadata.services[i].name);
-    ndpi_free(flow->mdns_metadata.services[i].data);
+    if (flow->mdns_metadata.services[i].name) ndpi_free(flow->mdns_metadata.services[i].name);
+    if (flow->mdns_metadata.services[i].data) ndpi_free(flow->mdns_metadata.services[i].data);
   }
   if(flow->mdns_metadata.services) ndpi_free(flow->mdns_metadata.services);
 }
