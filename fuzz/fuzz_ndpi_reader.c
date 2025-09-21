@@ -46,8 +46,6 @@ static void node_cleanup_walker(const void *node, ndpi_VISIT which, int depth, v
   (void)depth;
   (void)user_data;
 
-  if(flow == NULL) return;
-
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if((!flow->detection_completed) && flow->ndpi_flow) {
       u_int8_t proto_guessed;
@@ -70,11 +68,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   FILE *fd;
 
   if (prefs == NULL) {
-    prefs = calloc(sizeof(struct ndpi_workflow_prefs), 1);
-    if (prefs == NULL) {
-      //should not happen
-      return 1;
-    }
+    prefs = calloc(sizeof(struct ndpi_workflow_prefs), 1); /* No failure here */
     prefs->decode_tunnels = 1;
     prefs->num_roots = 16;
     prefs->max_ndpi_flows = 16 * 1024 * 1024;

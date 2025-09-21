@@ -40,7 +40,7 @@ fuzz_ndpi_reader_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c
+fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader_alloc_fail.c fuzz_common_code.c ../example/reader_util.c
 fuzz_ndpi_reader_alloc_fail_CFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -DENABLE_MEM_ALLOC_FAILURES -DCRYPT_FORCE_NO_AESNI -DENABLE_FINGERPRINT_FP
 fuzz_ndpi_reader_alloc_fail_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_alloc_fail_LDFLAGS = $(PCAP_LIB) $(LIBS)
@@ -53,7 +53,7 @@ fuzz_ndpi_reader_alloc_fail_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAG
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_alloc_fail_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_payload_analyzer_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c
+fuzz_ndpi_reader_payload_analyzer_SOURCES = fuzz_ndpi_reader_payload_analyzer.c fuzz_common_code.c ../example/reader_util.c
 fuzz_ndpi_reader_payload_analyzer_CFLAGS = -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -DENABLE_MEM_ALLOC_FAILURES -DENABLE_PAYLOAD_ANALYZER
 fuzz_ndpi_reader_payload_analyzer_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_payload_analyzer_LDFLAGS = $(PCAP_LIB) $(LIBS)
@@ -556,7 +556,7 @@ fuzz_is_stun_udp_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_is_stun_udp_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_is_stun_tcp_SOURCES = fuzz_is_stun.c fuzz_common_code.c
+fuzz_is_stun_tcp_SOURCES = fuzz_is_stun_tcp.c fuzz_common_code.c
 fuzz_is_stun_tcp_CFLAGS = -I../src/lib/ @NDPI_CFLAGS@ $(CXXFLAGS) -DNDPI_LIB_COMPILATION -DSTUN_TCP
 fuzz_is_stun_tcp_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_is_stun_tcp_LDFLAGS = $(LIBS)
@@ -735,7 +735,7 @@ fuzz_readerutils_workflow_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS)
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_readerutils_workflow_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_pl7m_simplest_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_simplest_SOURCES = fuzz_ndpi_reader_pl7m_simplest.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_simplest_CFLAGS =  -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -I../src/lib/third_party/include/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR
 fuzz_ndpi_reader_pl7m_simplest_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_pl7m_simplest_LDFLAGS = $(PCAP_LIB) $(LIBS)
@@ -748,7 +748,7 @@ fuzz_ndpi_reader_pl7m_simplest_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLF
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_simplest_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_pl7m_simplest_internal_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_simplest_internal_SOURCES = fuzz_ndpi_reader_pl7m_simplest_internal.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_simplest_internal_CFLAGS =  -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -I../src/lib/third_party/include/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
 fuzz_ndpi_reader_pl7m_simplest_internal_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_pl7m_simplest_internal_LDFLAGS = $(PCAP_LIB) $(LIBS)
@@ -787,7 +787,7 @@ fuzz_ndpi_reader_pl7m_64k_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS)
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_64k_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_pl7m_internal_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_internal_SOURCES = fuzz_ndpi_reader_pl7m_internal.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_internal_CFLAGS =  -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -I../src/lib/third_party/include/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
 fuzz_ndpi_reader_pl7m_internal_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_pl7m_internal_LDFLAGS = $(PCAP_LIB) $(LIBS)
@@ -800,7 +800,7 @@ fuzz_ndpi_reader_pl7m_internal_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLF
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_internal_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_pl7m_only_subclassification_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_only_subclassification_SOURCES = fuzz_ndpi_reader_pl7m_only_subclassification.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_only_subclassification_CFLAGS =  -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -I../src/lib/third_party/include/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_ONLY_SUBCLASSIFICATION
 fuzz_ndpi_reader_pl7m_only_subclassification_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_pl7m_only_subclassification_LDFLAGS = $(PCAP_LIB) $(LIBS)
@@ -813,7 +813,7 @@ fuzz_ndpi_reader_pl7m_only_subclassification_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_only_subclassification_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
-fuzz_ndpi_reader_pl7m_randomize_ports_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_randomize_ports_SOURCES = fuzz_ndpi_reader_pl7m_randomize_ports.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_randomize_ports_CFLAGS =  -I../example/ @NDPI_CFLAGS@ $(CXXFLAGS) -I../src/lib/third_party/include/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_ENABLE_RANDOMIZE_PORTS
 fuzz_ndpi_reader_pl7m_randomize_ports_LDADD = ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 fuzz_ndpi_reader_pl7m_randomize_ports_LDFLAGS = $(PCAP_LIB) $(LIBS)
