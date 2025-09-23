@@ -1101,7 +1101,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
 
   if(packet->server_line.ptr != NULL) {
-    if(flow->http.server == NULL) {
+    if(flow->http.server == NULL && ndpi_struct->cfg.http_resp_server_enabled) {
       len = packet->server_line.len + 1;
       flow->http.server = ndpi_malloc(len);
       if(flow->http.server) {
@@ -1218,16 +1218,19 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     } else {
       /* Response */
       if((flow->http.content_type == NULL) && (packet->content_line.len > 0)) {
-	int len = packet->content_line.len + 1;
+        if(ndpi_struct->cfg.http_resp_content_type_enabled) {
 
-	flow->http.content_type = ndpi_malloc(len);
-	if(flow->http.content_type) {
-	  strncpy(flow->http.content_type, (char*)packet->content_line.ptr,
-		  packet->content_line.len);
-	  flow->http.content_type[packet->content_line.len] = '\0';
+          int len = packet->content_line.len + 1;
 
-	  flow->category = ndpi_http_check_content(ndpi_struct, flow);
-	}
+	  flow->http.content_type = ndpi_malloc(len);
+	  if(flow->http.content_type) {
+	    strncpy(flow->http.content_type, (char*)packet->content_line.ptr,
+		    packet->content_line.len);
+	    flow->http.content_type[packet->content_line.len] = '\0';
+	  }
+        }
+
+	flow->category = ndpi_http_check_content(ndpi_struct, flow);
       }
     }
   }

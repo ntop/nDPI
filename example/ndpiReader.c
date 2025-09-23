@@ -120,7 +120,7 @@ struct cfg {
   char *param;
   char *value;
 };
-#define MAX_NUM_CFGS 32
+#define MAX_NUM_CFGS 64
 static struct cfg cfgs[MAX_NUM_CFGS];
 static int num_cfgs = 0;
 

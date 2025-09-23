@@ -279,6 +279,8 @@ struct ndpi_detection_module_config_struct {
   int http_host_enabled;
   int http_username_enabled;
   int http_password_enabled;
+  int http_resp_content_type_enabled;
+  int http_resp_server_enabled;
 
   int tls_certificate_expire_in_x_days;
   int tls_app_blocks_tracking_enabled;
