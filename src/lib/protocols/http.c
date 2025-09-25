@@ -298,7 +298,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
       if(strncasecmp(app, "mpeg", app_len_avail) == 0) {
 	flow->category = NDPI_PROTOCOL_CATEGORY_STREAMING;
 	return(flow->category);
-      } else {
+      } else if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_WINDOWS_UPDATE) {
 	if(app_len_avail > 3) {
 	  const char** cmp_mimes = NULL;
 	  bool found = false;
@@ -317,7 +317,7 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 		char str[64];
 
 		flow->category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
-		NDPI_LOG_INFO(ndpi_struct, "found HTTP file transfer");
+		NDPI_LOG_INFO(ndpi_struct, "found HTTP file transfer\n");
 
 		snprintf(str, sizeof(str), "Found binary mime %s", cmp_mimes[i]);
 		ndpi_set_binary_data_transfer(ndpi_struct, flow, str);
