@@ -3292,7 +3292,7 @@ bool ndpi_is_valid_hostname(char * const hostname, size_t len) {
   /* Check each label (part between dots) */
   p = hostname;
 
-  while ((idx < len) && p[idx]) {
+  while ((idx < len) && *p) {
     if(*p == '.') {
       /* Check previous label */
       if(label_len == 0 || (label_len > 63))
@@ -3300,6 +3300,7 @@ bool ndpi_is_valid_hostname(char * const hostname, size_t len) {
 
       label_len = 0;
       idx++;
+      p++;
       has_valid_label = true;
       continue;
     }
@@ -3318,13 +3319,14 @@ bool ndpi_is_valid_hostname(char * const hostname, size_t len) {
       return(false); /* Label too long */
 
     idx++;
+    p++;
   }
 
   /* Check last label */
   if(label_len == 0)
     return(false); /* Ends with a dot */
 
-  if(!isalnum(p[idx-1]))
+  if(!isalnum(hostname[idx-1]))
     return(false); /* Label must end with letter or digit */
 
   return(has_valid_label || len > 0); /* At least one label exists */
@@ -3939,6 +3941,20 @@ char* ndpi_strrstr(const char *haystack, const char *needle) {
 
   return (char*) last_occurrence;
 }
+
+/* ************************************************************** */
+
+void *ndpi_memrchr(const void *m, int c, size_t n) {
+  const unsigned char *s = m;
+
+  c = (unsigned char)c;
+  while(n--)
+    if(s[n]==c)
+      return (void *)(s+n);
+
+  return 0;
+}
+
 
 /* ************************************************************** */
 

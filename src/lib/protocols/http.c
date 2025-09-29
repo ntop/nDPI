@@ -22,6 +22,7 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 
 #include "ndpi_protocol_ids.h"
 
@@ -1242,16 +1243,43 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 		  packet->host_line.len, packet->host_line.ptr);
 
     /* Copy result for nDPI apps */
-    ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
+    ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL | NDPI_HOSTNAME_NORM_STRIP_PORT);
 
     if(strlen(flow->host_server_name) > 0) {
       char *double_col;
       int a, b, c, d;
+      u_int16_t host_line_length;
 
       hostname_just_set = 1;
+      host_line_length = packet->host_line.len;
+
+      /* If hostname is $hostame:$port, ignore the trailing port. Check
+         that it is a valid port */
+      double_col = ndpi_memrchr(packet->host_line.ptr, ':', packet->host_line.len);
+      if(double_col) {
+        char *endptr, port_str[6]; /* 65535 + \0 */
+        int port_str_len;
+        long port;
+
+        port_str_len = (char *)packet->host_line.ptr +  packet->host_line.len - double_col - 1;
+
+        if(port_str_len > 0 && port_str_len < 6) {
+          memcpy(port_str, double_col + 1, port_str_len);
+          port_str[port_str_len] = '\0';
+
+          /* We can't easily use ndpi_strtonum because we want to be sure that there are no
+             others characters after the number */
+          errno = 0;    /* To distinguish success/failure after call */
+          port = strtol(port_str, &endptr, 10);
+          if(errno == 0 && *endptr == '\0' &&
+             (port >= 0 && port <= 65535)) {
+            host_line_length = double_col - (char *)packet->host_line.ptr;
+          }
+        }
+      }
 
       if(ndpi_is_valid_hostname((char *)packet->host_line.ptr,
-				packet->host_line.len) == 0) {
+                                host_line_length) == 0) {
 	char str[128];
 	
         if(is_flowrisk_info_enabled(ndpi_struct, NDPI_INVALID_CHARACTERS)) {
@@ -1267,8 +1295,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, str);
       }
 
-      double_col = strchr((char*)flow->host_server_name, ':');
-      if(double_col) double_col[0] = '\0';
       if(ndpi_struct->packet.iph
          && (sscanf(flow->host_server_name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)) {
         /* IPv4 */

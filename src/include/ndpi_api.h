@@ -2242,6 +2242,7 @@ extern "C" {
   int ndpi_snprintf(char * str, size_t size, char const * format, ...);
   struct tm *ndpi_gmtime_r(const time_t *timep, struct tm *result);
   char* ndpi_strrstr(const char *haystack, const char *needle);
+  void *ndpi_memrchr(const void *m, int c, size_t n);
   int ndpi_str_endswith(const char *s, const char *suffix);
 
   /* ******************************* */

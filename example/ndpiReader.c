@@ -6867,6 +6867,19 @@ void domainCacheTestUnit() {
 
 /* *********************************************** */
 
+void checkmemrchrUnitTest() {
+  char a[] = "string";
+
+
+  assert(ndpi_memrchr(a, 's', sizeof(a) -1) == a);
+  assert(ndpi_memrchr(a, 'b', sizeof(a) - 1) == NULL);
+  assert(ndpi_memrchr(a, 't', sizeof(a) - 1) == a + 1);
+  assert(ndpi_memrchr(a, 'g', sizeof(a) - 1) == a + 5);
+  assert(ndpi_memrchr(a, '\0', sizeof(a) - 1) == NULL);
+}
+
+/* *********************************************** */
+
 void checkRankingUnitTest(bool do_trace) {
   ndpi_ranking rank;
   char path[64] = {0};
@@ -7077,6 +7090,7 @@ int main(int argc, char **argv) {
     memcasecmpUnitTest();
     mahalanobisUnitTest();
     bitmaskUnitTest();
+    checkmemrchrUnitTest();
 #endif
   }
 

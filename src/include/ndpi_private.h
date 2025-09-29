@@ -498,7 +498,7 @@ struct ndpi_detection_module_struct {
 #define NDPI_HOSTNAME_NORM_LC 1
 #define NDPI_HOSTNAME_NORM_REPLACE_IC 2
 #define NDPI_HOSTNAME_NORM_STRIP_EOLSP 4
-#define NDPI_HOSTNAME_NORM_STRIP_PORT 8 /* Used only by SSDP, for the time being */
+#define NDPI_HOSTNAME_NORM_STRIP_PORT 8 /* Used by SSDP/HTTP, for the time being */
 #define NDPI_HOSTNAME_NORM_ALL (NDPI_HOSTNAME_NORM_LC | NDPI_HOSTNAME_NORM_REPLACE_IC | NDPI_HOSTNAME_NORM_STRIP_EOLSP)
 
 
