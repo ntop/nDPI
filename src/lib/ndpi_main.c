@@ -72,6 +72,12 @@
 #include "inc_generated/ndpi_tor_exit_nodes_match.c.inc"
 #include "inc_generated/ndpi_whatsapp_match.c.inc"
 #include "inc_generated/ndpi_amazon_aws_match.c.inc"
+#include "inc_generated/ndpi_amazon_aws_api_gateway_match.c.inc"
+#include "inc_generated/ndpi_amazon_aws_kinesis_match.c.inc"
+#include "inc_generated/ndpi_amazon_aws_ec2_match.c.inc"
+#include "inc_generated/ndpi_amazon_aws_s3_match.c.inc"
+#include "inc_generated/ndpi_amazon_aws_cloudfront_match.c.inc"
+#include "inc_generated/ndpi_amazon_aws_dynamodb_match.c.inc"
 #include "inc_generated/ndpi_ethereum_match.c.inc"
 #include "inc_generated/ndpi_zoom_match.c.inc"
 #include "inc_generated/ndpi_cachefly_match.c.inc"
@@ -129,6 +135,12 @@
 #include "inc_generated/ndpi_domains_ms_teams_match.c.inc"
 #include "inc_generated/ndpi_domains_ms_azure_match.c.inc"
 #include "inc_generated/ndpi_domains_ms_generic_match.c.inc"
+#include "inc_generated/ndpi_domains_aws_api_gateway_match.c.inc"
+#include "inc_generated/ndpi_domains_aws_cloudfront_match.c.inc"
+#include "inc_generated/ndpi_domains_aws_cognito_match.c.inc"
+#include "inc_generated/ndpi_domains_aws_ec2_match.c.inc"
+#include "inc_generated/ndpi_domains_aws_emr_match.c.inc"
+#include "inc_generated/ndpi_domains_aws_s3_match.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -530,6 +542,9 @@ int is_flow_addr_informative(const struct ndpi_flow_struct *flow)
   case NDPI_PROTOCOL_ALIBABA:
   case NDPI_PROTOCOL_YANDEX_CLOUD:
   case NDPI_PROTOCOL_AMAZON_AWS:
+  case NDPI_PROTOCOL_AWS_CLOUDFRONT:
+  case NDPI_PROTOCOL_AWS_EC2:
+  /* TODO: do we need to add the other NDPI_PROTOCOL_AWS_* ? */
   case NDPI_PROTOCOL_MICROSOFT_AZURE:
   case NDPI_PROTOCOL_CACHEFLY:
   case NDPI_PROTOCOL_CLOUDFLARE:
@@ -1066,6 +1081,12 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   self_check_host_match(ndpi_str, microsoft365_host_match);
   self_check_host_match(ndpi_str, azure_host_match);
   self_check_host_match(ndpi_str, microsoft_host_match);
+  self_check_host_match(ndpi_str, aws_api_gateway_host_match);
+  self_check_host_match(ndpi_str, aws_cloudfront_host_match);
+  self_check_host_match(ndpi_str, aws_cognito_host_match);
+  self_check_host_match(ndpi_str, aws_ec2_host_match);
+  self_check_host_match(ndpi_str, aws_emr_host_match);
+  self_check_host_match(ndpi_str, aws_s3_host_match);
 
   for(i = 0; host_match[i].string_to_match != NULL; i++)
     init_app_protocol(ndpi_str, &host_match[i]);
@@ -1081,6 +1102,18 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
     init_app_protocol(ndpi_str, &azure_host_match[i]);
   for(i = 0; microsoft_host_match[i].string_to_match != NULL; i++)
     init_app_protocol(ndpi_str, &microsoft_host_match[i]);
+  for(i = 0; aws_api_gateway_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &aws_api_gateway_host_match[i]);
+  for(i = 0; aws_cloudfront_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &aws_cloudfront_host_match[i]);
+  for(i = 0; aws_cognito_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &aws_cognito_host_match[i]);
+  for(i = 0; aws_ec2_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &aws_ec2_host_match[i]);
+  for(i = 0; aws_emr_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &aws_emr_host_match[i]);
+  for(i = 0; aws_s3_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &aws_s3_host_match[i]);
 
   /* ************************ */
 
@@ -1115,6 +1148,18 @@ static void load_string_based_protocols(struct ndpi_detection_module_struct *ndp
     load_protocol_match(ndpi_str, &azure_host_match[i]);
   for(i = 0; microsoft_host_match[i].string_to_match != NULL; i++)
     load_protocol_match(ndpi_str, &microsoft_host_match[i]);
+  for(i = 0; aws_api_gateway_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &aws_api_gateway_host_match[i]);
+  for(i = 0; aws_cloudfront_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &aws_cloudfront_host_match[i]);
+  for(i = 0; aws_cognito_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &aws_cognito_host_match[i]);
+  for(i = 0; aws_ec2_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &aws_ec2_host_match[i]);
+  for(i = 0; aws_emr_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &aws_emr_host_match[i]);
+  for(i = 0; aws_s3_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &aws_s3_host_match[i]);
 
   /* ************************ */
 
@@ -2932,6 +2977,11 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */ ,
                           ndpi_build_default_ports(ports_b, 5540, 5542, 0, 0, 0) /* UDP */,
                           0);
+  ndpi_set_proto_defaults(ndpi_str, 1 , 1 , NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AWS_DYNAMODB,
+                          "AWS_DynamoDB", NDPI_PROTOCOL_CATEGORY_DATABASE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */ ,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
@@ -4294,6 +4344,30 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AMAZON_AWS)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_amazon_aws_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_amazon_aws_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AWS_API_GATEWAY)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_aws_api_gateway_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_aws_api_gateway_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AWS_KINESIS)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_aws_kinesis_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_aws_kinesis_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AWS_EC2)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_aws_ec2_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_aws_ec2_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AWS_S3)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_aws_s3_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_aws_s3_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AWS_CLOUDFRONT)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_aws_cloudfront_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_aws_cloudfront_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AWS_DYNAMODB)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_aws_dynamodb_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_aws_dynamodb_protocol_list_6);
   }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_MICROSOFT_AZURE)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_microsoft_azure_protocol_list);

@@ -1463,8 +1463,8 @@ References: `ZeroMQ official site: <https://zeromq.org/>`_
 .. _Proto_178:
 
 `NDPI_PROTOCOL_AMAZON`
-=======================
-Amazon network traffic including retail, AWS, and content delivery.
+======================
+Amazon generic network traffic including retail, AWS, and content delivery.
 
 References: `Amazon official site: <https://www.amazon.com>`_
 
@@ -2061,8 +2061,8 @@ References: `Cassandra official site: <https://cassandra.apache.org>`_
 .. _Proto_265:
 
 `NDPI_PROTOCOL_AMAZON_AWS`
-===========================
-Amazon Web Services (AWS) cloud computing platform.
+==========================
+Generic traffic from Amazon Web Services (AWS) cloud computing platform.
 
 References: `AWS official site: <https://aws.amazon.com>`_
 
@@ -3798,3 +3798,75 @@ Matter is an open-source, royalty-free connectivity standard for smart home devi
 It is designed to improve interoperability between IoT ecosystems, enabling secure and reliable communication primarily over IPv6 using UDP.
 
 References: `Matter official site <https://csa-iot.org/all-solutions/matter/>`_
+
+
+.. _Proto_458:
+
+`NDPI_PROTOCOL_AWS_COGNITO`
+===========================
+Amazon Cognito is an identity platform for web and mobile apps. It’s a user directory, an authentication server, and an authorization service for OAuth 2.0 access tokens and AWS credentials.
+
+References: `Official site <https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html/>`_
+
+
+.. _Proto_459:
+
+`NDPI_PROTOCOL_AWS_API_GATEWAY`
+===============================
+Amazon API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale.
+
+References: `Official site <https://aws.amazon.com/api-gateway/>`_
+
+
+.. _Proto_460:
+
+`NDPI_PROTOCOL_AWS_KINESIS`
+===========================
+Amazon Kinesis is a family of services provided by Amazon Web Services (AWS) for processing and analyzing real-time streaming data at a large scale.
+
+References: `Official site <https://aws.amazon.com/kinesis//>`_
+
+
+.. _Proto_461:
+
+`NDPI_PROTOCOL_AWS_EC2`
+=======================
+Amazon Elastic Compute Cloud (EC2) is a part of Amazon's cloud-computing platform, Amazon Web Services (AWS), that allows users to rent virtual computers on which to run their own computer applications.
+
+References: `Official site <https://aws.amazon.com/ec2/>`_
+
+
+.. _Proto_462:
+
+`NDPI_PROTOCOL_AWS_EMR`
+=======================
+Amazon EMR, which was previously called Amazon Elastic MapReduce, is a managed cluster platform that simplifies running big data frameworks, such as Apache Hadoop and Apache Spark, on AWS to process and analyze vast amounts of data.
+
+References: `Official site <https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-what-is-emr.html>`_
+
+
+.. _Proto_463:
+
+`NDPI_PROTOCOL_AWS_S3`
+======================
+Amazon Simple Storage Service (Amazon S3) is an object storage service that offers industry-leading scalability, data availability, security, and performance.
+
+References: `Official site <https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html>`_
+
+
+.. _Proto_464:
+
+`NDPI_PROTOCOL_AWS_CLOUDFRONT`
+==============================
+Amazon CloudFront is a web service that speeds up distribution of your static and dynamic web content, such as .html, .css, .js, and image files, to your users. CloudFront delivers your content through a worldwide network of data centers called edge locations.
+
+References: `Official site <https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html>`_
+
+
+.. _Proto_465:
+
+`NDPI_PROTOCOL_AWS_DYNAMODB`
+============================
+Amazon DynamoDB is a fully managed NoSQL database service from Amazon Web Services that offers high-performance, serverless, and infinitely scalable storage for both key-value and document data.
+
+References: `Official site <https://aws.amazon.com/dynamodb/>`_

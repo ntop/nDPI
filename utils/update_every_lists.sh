@@ -53,6 +53,8 @@ RETVAL=$(( RETVAL + $? ))
 
 ./microsoft_domains_download.sh
 RETVAL=$(( RETVAL + $? ))
+./aws_domains_download.sh
+RETVAL=$(( RETVAL + $? ))
 
 ./crypto_mining_lists_download.sh
 RETVAL=$(( RETVAL + $? ))
