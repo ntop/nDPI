@@ -11,6 +11,9 @@ TMP3=/tmp/bot_google_c3.json
 TMP_BING=/tmp/bot_bing.json
 TMP_FB=/tmp/bot_fb.list
 TMP_TW=/tmp/bot_tw.list
+TMP_CHATGPT_USER=/tmp/bot_chatgpt_user.json
+TMP_CHATGPT_SEARCH=/tmp/bot_chatgpt_search.json
+TMP_CHATGPT=/tmp/bot_chatgpt.json
 LIST=/tmp/bot.list
 LIST6=/tmp/bot.list6
 LIST_MERGED=/tmp/bot.list_m
@@ -26,6 +29,12 @@ ORIGIN_BING="https://www.bing.com/toolbox/bingbot.json"
 #Facebook Bot: https://developers.facebook.com/docs/sharing/webmasters/crawler/
 #TwitterBot
 ORIGIN_TW="https://developer.x.com/en/docs/x-for-websites/cards/guides/troubleshooting-cards"
+#Chatgpt-user
+ORIGIN_CHATGPT_USER="https://openai.com/chatgpt-user.json"
+#Chatgpt-search
+ORIGIN_CHATGPT_SEARCH="https://openai.com/searchbot.json"
+#Chatgpt
+ORIGIN_CHATGPT="https://openai.com/gptbot.json"
 
 echo "(1) Downloading file... ${ORIGIN1}"
 http_response=$(curl -s -o $TMP1 -w "%{http_code}" ${ORIGIN1})
@@ -56,6 +65,21 @@ http_response=$(curl -s -o $TMP_TW -w "%{http_code}" ${ORIGIN_TW})
 check_http_response "${http_response}"
 is_file_empty "${TMP_TW}"
 
+echo "(1) Downloading file... ${ORIGIN_CHATGPT_USER}"
+http_response=$(curl -s -o $TMP_CHATGPT_USER -w "%{http_code}" ${ORIGIN_CHATGPT_USER})
+check_http_response "${http_response}"
+is_file_empty "${TMP_CHATGPT_USER}"
+
+echo "(1) Downloading file... ${ORIGIN_CHATGPT_SEARCH}"
+http_response=$(curl -s -o $TMP_CHATGPT_SEARCH -w "%{http_code}" ${ORIGIN_CHATGPT_SEARCH})
+check_http_response "${http_response}"
+is_file_empty "${TMP_CHATGPT_SEARCH}"
+
+echo "(1) Downloading file... ${ORIGIN_CHATGPT}"
+http_response=$(curl -s -o $TMP_CHATGPT -w "%{http_code}" ${ORIGIN_CHATGPT})
+check_http_response "${http_response}"
+is_file_empty "${TMP_CHATGPT}"
+
 
 echo "(2) Processing IP addresses..."
 {
@@ -65,6 +89,9 @@ echo "(2) Processing IP addresses..."
     jq -r '.prefixes | .[].ipv4Prefix  | select( . != null )' $TMP_BING
     grep -v route6 $TMP_FB | tr -d 'route:^ '
     grep "IP ranges are" $TMP_TW | grep -E -o "[^^][0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/[0-9]{1,2}" | tr -d ' ' # TODO: ipv4 only
+    jq -r '.prefixes | .[].ipv4Prefix  | select( . != null )' $TMP_CHATGPT_USER
+    jq -r '.prefixes | .[].ipv4Prefix  | select( . != null )' $TMP_CHATGPT_SEARCH
+    jq -r '.prefixes | .[].ipv4Prefix  | select( . != null )' $TMP_CHATGPT
 } > $LIST
 is_file_empty "${LIST}"
 ./mergeipaddrlist.py "${LIST}" > "${LIST_MERGED}"
@@ -75,13 +102,16 @@ is_file_empty "${LIST_MERGED}"
     jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP3
     jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP_BING
     grep route6 $TMP_FB | cut -c9- | tr -d ' '
+    jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP_CHATGPT_USER
+    jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP_CHATGPT_SEARCH
+    jq -r '.prefixes | .[].ipv6Prefix  | select( . != null )' $TMP_CHATGPT
 } > $LIST6
 is_file_empty "${LIST6}"
 ./mergeipaddrlist.py "${LIST6}" > "${LIST6_MERGED}"
 is_file_empty "${LIST6_MERGED}"
 ./ipaddr2list.py $LIST_MERGED NDPI_HTTP_CRAWLER_BOT $LIST6_MERGED > $DEST
 is_file_empty "${DEST}"
-rm -f $TMP1 $TMP2 $TMP3 $TMP_BING $TMP_FB $TMP_TW $LIST $LIST6 $LIST_MERGED $LIST6_MERGED
+rm -f $TMP1 $TMP2 $TMP3 $TMP_BING $TMP_FB $TMP_TW $TMP_CHATGPT_USER $TMP_CHATGPT_SEARCH $TMP_CHATGPT $LIST $LIST6 $LIST_MERGED $LIST6_MERGED
 
 echo "(3) Crawlers IPs are available in $DEST"
 exit 0
