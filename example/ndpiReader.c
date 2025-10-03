@@ -93,6 +93,7 @@ static FILE *csv_fp                 = NULL; /**< for CSV export */
 static FILE *serialization_fp       = NULL; /**< for TLV,CSV,JSON export */
 static ndpi_serialization_format serialization_format = ndpi_serialization_format_unknown;
 static char* domain_to_check = NULL;
+static char* domains_file_to_check = NULL;
 static char* ip_port_to_check = NULL;
 static u_int8_t ignore_vlanid = 0;
 extern char *protocolsDirPath; /**< Directory containing protocol files */
@@ -491,6 +492,104 @@ void ndpiCheckHostStringMatch(char *testChar) {
 
 /* *********************************************** */
 
+void ndpiCheckHostsFileStringMatch(const char *domains_file) {
+  struct ndpi_detection_module_struct *ndpi_str;
+  FILE *fd;
+  char buffer[512], *line;
+  char **not_matches = NULL;
+  int len, i, not_maches_num = 0;
+
+  if(!domains_file)
+    return;
+
+  if(strcmp(domains_file, "-") == 0) {
+    fd = stdin;
+  } else {
+    fd = fopen(domains_file, "r");
+    if(!fd) {
+      printf("Error opening [%s]\n", domains_file);
+      return;
+    }
+  }
+
+  ndpi_str = ndpi_init_detection_module(NULL);
+  ndpi_finalize_initialization(ndpi_str);
+
+
+  while(1) {
+    ndpi_protocol_match_result match = { NDPI_PROTOCOL_UNKNOWN,
+                                         NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_UNRATED };
+    char appBufStr[64];
+    int testRes;
+    ndpi_protocol detected_protocol;
+
+    line = fgets(buffer, sizeof(buffer), fd);
+
+    if(line == NULL)
+      break;
+
+    len = strlen(line);
+
+    if((len <= 1) || (line[0] == '#'))
+      continue;
+
+    line[len - 1] = '\0';
+    /* printf("[%s]\n", line); */
+
+    memset(&detected_protocol, 0, sizeof(ndpi_protocol) );
+
+    testRes = ndpi_match_string_subprotocol(ndpi_str,
+                                            line, strlen(line), &match);
+    if(testRes) {
+      detected_protocol.proto.app_protocol    = match.protocol_id;
+      detected_protocol.proto.master_protocol = 0;
+      detected_protocol.category              = match.protocol_category;
+      detected_protocol.breed                 = match.protocol_breed;
+    }
+
+    ndpi_match_custom_category(ndpi_str, line, strlen(line),
+                               &detected_protocol.category,
+                               &detected_protocol.breed);
+
+    if(detected_protocol.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN ||
+       detected_protocol.category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED) {
+
+      ndpi_protocol2name(ndpi_str, detected_protocol, appBufStr,
+                         sizeof(appBufStr));
+
+      printf("Domain [%s] -> %s %s %s\n",
+             line, appBufStr,
+             ndpi_get_proto_breed_name(detected_protocol.breed),
+             ndpi_category_get_name(ndpi_str, detected_protocol.category));
+    } else {
+      printf("Domain [%s] NOT Found!!\n", line);
+
+      /* Not very efficient but it should be ok */
+      not_matches = ndpi_realloc(not_matches, not_maches_num * sizeof(char *),
+                                 (not_maches_num + 1) * sizeof(char *));
+      not_matches[not_maches_num] = ndpi_strdup(line);
+      not_maches_num += 1;
+    }
+
+  }
+
+  if(not_maches_num > 0) {
+    printf("\nDomains without any matches:\n");
+    for(i = 0; i < not_maches_num; i++) {
+      printf("%s\n", not_matches[i]);
+    }
+  }
+
+  for(i = 0; i < not_maches_num; i++)
+    ndpi_free(not_matches[i]);
+  ndpi_free(not_matches);
+  if(strcmp(domains_file, "-") != 0)
+    fclose(fd);
+  ndpi_exit_detection_module(ndpi_str);
+}
+
+/* *********************************************** */
+
 static char const *
 ndpi_cfg_error2string(ndpi_cfg_error const err)
 {
@@ -756,6 +855,7 @@ static void help(u_int long_help) {
          "  -U <num>                   | Max number of UDP processed packets before giving up [default: %u]\n"
          "  -D                         | Enable DoH traffic analysis based on content (no DPI)\n"
          "  -x <domain>                | Check domain name [Test only]\n"
+         "  --x-file <filename>        | Similar to '-x` but it process a list of domains, provided via file\n"
          "  -I                         | Ignore VLAN id for flow hash calculation\n"
          "  -A                         | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
          "  -M                         | Memory allocation stats on data-path (only by the library).\n"
@@ -824,6 +924,7 @@ static void help(u_int long_help) {
 #define OPTLONG_VALUE_TLS_HEURISTICS		3002
 #define OPTLONG_VALUE_CONF                      3003
 #define OPTLONG_VALUE_FPC_STATS                 3004
+#define OPTLONG_VALUE_DOMAINS_FILE              3005
 
 static struct option longopts[] = {
   /* mandatory extcap options */
@@ -874,6 +975,8 @@ static struct option longopts[] = {
   { "tls_heuristics", no_argument, NULL, OPTLONG_VALUE_TLS_HEURISTICS},
   { "conf", required_argument, NULL, OPTLONG_VALUE_CONF},
   { "dump-fpc-stats", no_argument, NULL, OPTLONG_VALUE_FPC_STATS},
+
+  { "x-file", required_argument, NULL, OPTLONG_VALUE_DOMAINS_FILE},
 
   {0, 0, 0, 0}
 };
@@ -1551,6 +1654,10 @@ static void parse_parameters(int argc, char **argv)
       domain_to_check = optarg;
       break;
 
+    case OPTLONG_VALUE_DOMAINS_FILE:
+      domains_file_to_check = optarg;
+      break;
+
     case 'X':
       ip_port_to_check = optarg;
       break;
@@ -1627,7 +1734,7 @@ static void parseOptions(int argc, char **argv) {
     quiet_mode = 1;
   }
 
-  if(!domain_to_check && !ip_port_to_check) {
+  if(!domain_to_check && !ip_port_to_check && !domains_file_to_check) {
     if(_pcap_file[0] == NULL)
       help(0);
 
@@ -7104,6 +7211,11 @@ int main(int argc, char **argv) {
 
   if(domain_to_check) {
     ndpiCheckHostStringMatch(domain_to_check);
+    exit(0);
+  }
+
+  if(domains_file_to_check) {
+    ndpiCheckHostsFileStringMatch(domains_file_to_check);
     exit(0);
   }
 
