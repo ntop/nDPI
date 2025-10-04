@@ -22,10 +22,9 @@ u_int8_t human_readeable_string_len = 5;
 u_int8_t max_num_udp_dissected_pkts = 0, max_num_tcp_dissected_pkts = 0; /* Disable limits at application layer */;
 int malloc_size_stats = 0;
 FILE *fingerprint_fp = NULL;
-bool do_load_lists = true;
 char *addr_dump_path = NULL;
 int monitoring_enabled = 1;
-char *protocolsDirPath = "./lists/protocols/";
+u_int8_t enable_doh_dot_detection = 0;
 
 extern void ndpi_report_payload_stats(FILE *out);
 
@@ -87,8 +86,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "log.level", "3");
     ndpi_set_config(workflow->ndpi_struct, "all", "log", "1");
 
+    load_public_lists(workflow->ndpi_struct);
+
     ndpi_load_domain_suffixes(workflow->ndpi_struct, "public_suffix_list.dat");
     ndpi_load_categories_dir(workflow->ndpi_struct, "./lists/");
+    ndpi_load_protocols_dir(workflow->ndpi_struct, "./lists/protocols/");
     ndpi_load_protocols_file(workflow->ndpi_struct, "protos.txt");
     ndpi_load_categories_file(workflow->ndpi_struct, "categories.txt", NULL);
     ndpi_load_risk_domain_file(workflow->ndpi_struct, "risky_domains.txt");

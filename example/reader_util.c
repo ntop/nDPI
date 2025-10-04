@@ -81,11 +81,9 @@ extern u_int8_t max_num_udp_dissected_pkts /* 24 */, max_num_tcp_dissected_pkts 
 static u_int32_t flow_id = 0;
 extern FILE *fingerprint_fp;
 extern char *addr_dump_path;
-u_int8_t enable_doh_dot_detection = 0;
-extern bool do_load_lists;
+extern u_int8_t enable_doh_dot_detection;
 extern int malloc_size_stats;
 extern int monitoring_enabled;
-extern char *protocolsDirPath;
 
 /* ****************************************************** */
 
@@ -115,6 +113,7 @@ u_int32_t max_packet_payload_dissection = 128;
 u_int32_t max_num_reported_top_payloads = 25;
 u_int16_t min_pattern_len               = 4;
 u_int16_t max_pattern_len               = 8;
+
 
 /* *********************************************************** */
 
@@ -441,9 +440,6 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");
     return NULL;
   }
-
-  if(protocolsDirPath != NULL)
-    ndpi_load_protocols_dir(module, protocolsDirPath);
   
   workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
   if(workflow == NULL) {
@@ -469,9 +465,6 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
   }
 
   workflow->ndpi_serialization_format = serialization_format;
-
-  if(do_load_lists)
-    load_public_lists(module);
 
   return workflow;
 }
