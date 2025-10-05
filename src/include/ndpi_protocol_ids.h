@@ -495,6 +495,7 @@ typedef enum {
   NDPI_PROTOCOL_AWS_S3                = 463,
   NDPI_PROTOCOL_AWS_CLOUDFRONT        = 464,
   NDPI_PROTOCOL_AWS_DYNAMODB          = 465,
+  NDPI_PROTOCOL_ESPN                  = 466,
 
 
 #ifdef CUSTOM_NDPI_PROTOCOLS

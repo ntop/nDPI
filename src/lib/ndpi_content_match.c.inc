@@ -1085,7 +1085,7 @@ static ndpi_protocol_match host_match[] =
    { "dssott.com",                             "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "disneyplus.com.ssl.sc.omtrdc.net",       "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "bamgrid.com",                            "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { "registerdisney.go.com",                  "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "go.com",                                 "DisneyPlus",        NDPI_PROTOCOL_DISNEYPLUS, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    /*
      Likee app
@@ -1531,6 +1531,15 @@ static ndpi_protocol_match host_match[] =
    { "kinesis.eu-west-1.amazonaws.com",                "AWS_Kinesis", NDPI_PROTOCOL_AWS_KINESIS, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "kinesis.us-east-1.amazonaws.com",                "AWS_Kinesis", NDPI_PROTOCOL_AWS_KINESIS, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "kinesis.us-west-2.amazonaws.com",                "AWS_Kinesis", NDPI_PROTOCOL_AWS_KINESIS, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
+   { "espn.com",                                "Espn", NDPI_PROTOCOL_ESPN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "espncdn.com",                             "Espn", NDPI_PROTOCOL_ESPN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "fn-pz.com",                               "Espn", NDPI_PROTOCOL_ESPN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "espn.connections.edge.bamgrid.com",       "Espn", NDPI_PROTOCOL_ESPN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "espn.api.edge.bamgrid.com",               "Espn", NDPI_PROTOCOL_ESPN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "espn.net",                                "Espn", NDPI_PROTOCOL_ESPN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "espn.playback.edge.bamgrid.com",          "Espn", NDPI_PROTOCOL_ESPN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"
