@@ -58,6 +58,7 @@ cp example/protos.txt "$OUT"/
 cp example/categories.txt "$OUT"/
 cp example/risky_domains.txt "$OUT"/
 cp example/ja4_fingerprints.csv "$OUT"/
+cp example/tcp_fingerprints.csv "$OUT"/
 cp example/sha1_fingerprints.csv "$OUT"/
 cp example/config.txt "$OUT"/
 cp example/*.conf "$OUT"/

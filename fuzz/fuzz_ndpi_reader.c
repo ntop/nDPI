@@ -86,8 +86,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "log.level", "3");
     ndpi_set_config(workflow->ndpi_struct, "all", "log", "1");
 
-    load_public_lists(workflow->ndpi_struct);
-
     ndpi_load_domain_suffixes(workflow->ndpi_struct, "public_suffix_list.dat");
     ndpi_load_categories_dir(workflow->ndpi_struct, "./lists/");
     ndpi_load_protocols_dir(workflow->ndpi_struct, "./lists/protocols/");
@@ -95,6 +93,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_load_categories_file(workflow->ndpi_struct, "categories.txt", NULL);
     ndpi_load_risk_domain_file(workflow->ndpi_struct, "risky_domains.txt");
     ndpi_load_malicious_ja4_file(workflow->ndpi_struct, "ja4_fingerprints.csv");
+    ndpi_load_tcp_fingerprint_file(workflow->ndpi_struct, "tcp_fingerprints.csv");
     ndpi_load_malicious_sha1_file(workflow->ndpi_struct, "sha1_fingerprints.csv");
 
 #ifdef ENABLE_ONLY_SUBCLASSIFICATION

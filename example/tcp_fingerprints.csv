@@ -1,0 +1,10 @@
+################################################################
+# List of TCP fingerprints                                     #
+#                                                              #
+# This is only an example. You can extend this list, putting   #
+# one fingeprint per row                                       #
+################################################################
+#
+# <TCP fingerprint>,<numeric OS>
+
+2_64_14600_8c07a80cc645,3

@@ -480,7 +480,6 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 void ndpi_flow_info_free_data(struct ndpi_flow_info *flow);
 void ndpi_flow_info_freer(void *node);
 const char* print_cipher_id(u_int32_t cipher);
-bool load_public_lists(struct ndpi_detection_module_struct *ndpi_str);
 
 extern int reader_log_level;
 

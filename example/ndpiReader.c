@@ -436,6 +436,23 @@ static int enable_disable_protocols_list(struct ndpi_detection_module_struct *nd
 
 /* *********************************************** */
 
+static bool load_public_lists(struct ndpi_detection_module_struct *ndpi_str) {
+  char *lists_path = "../lists/public_suffix_list.dat";
+  struct stat st;
+
+  if(stat(lists_path, &st) != 0)
+    lists_path = &lists_path[1]; /* use local file */
+
+  if(stat(lists_path, &st) == 0) {
+    if(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0)
+      return(true);
+  }
+
+  return(false);
+}
+
+/* *********************************************** */
+
 static void configure_ndpi(struct ndpi_detection_module_struct *ndpi_struct) {
   int i;
   ndpi_cfg_error rc;
@@ -1827,7 +1844,7 @@ static void parseOptions(int argc, char **argv) {
 #endif
 }
 
-/* ********************************** */
+/* ***************************************************** */
 
 static char* print_cipher(ndpi_cipher_weakness c) {
   switch(c) {

@@ -1109,7 +1109,7 @@ u_char* ndpi_hex_decode(const u_char *src, size_t len, size_t *out_len) {
     u_int i, ret_idx = 0;
 
     for(i=0; i<*out_len; i++) {
-      sscanf((const char*)&src[ret_idx], "%02X", (unsigned int*)&ret[i]);
+      sscanf((const char*)&src[ret_idx], "%02hhX", &ret[i]);
       ret_idx += 2;
     }
 

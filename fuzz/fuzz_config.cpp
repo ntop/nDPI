@@ -33,6 +33,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char cfg_value[32];
   char cfg_proto[32];
   char cfg_param[32];
+  char buf_stack[16];
   u_int64_t cat_userdata = 0;
   u_int16_t unused1, unused2;
   ndpi_master_app_protocol proto1, proto2;
@@ -847,6 +848,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_http_method2str(flow.http.method);
   ndpi_is_subprotocol_informative(ndpi_info_mod, p.proto.app_protocol);
   ndpi_get_flow_name(bool_value ? &flow : NULL);
+  ndpi_stack2str(ndpi_info_mod, &flow.protocol_stack, buf_stack, sizeof(buf_stack));
   /* ndpi_guess_undetected_protocol() is a "strange" function. Try fuzzing it, here */
   if(!ndpi_is_protocol_detected(p)) {
     ndpi_guess_undetected_protocol(ndpi_info_mod, bool_value ? &flow : NULL,
@@ -885,6 +887,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_geoip_country_continent(ndpi_info_mod, NULL, NULL, 0, NULL, 0);
   ndpi_get_geoip_country_continent_city(ndpi_info_mod, NULL, NULL, 0, NULL, 0, NULL, 0);
 
+  ndpi_fill_randombytes((unsigned char *)buf_stack, sizeof(buf_stack));
+
   ndpi_free_flow_data(&flow);
 
   /* Get some final stats */
@@ -905,6 +909,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_detection_get_sizeof_ndpi_flow_struct();
 
   ndpi_get_tot_allocated_memory();
+  ndpi_strdup(NULL);
   ndpi_log_timestamp(log_ts, sizeof(log_ts));
 
   ndpi_free_geoip(ndpi_info_mod);
