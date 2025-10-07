@@ -60,7 +60,7 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
       return(1);
     }
       
-    if(packet->payload[0] == '\r') {
+    if(packet->payload[0] == '\r' || packet->payload[0] == '\n') {
       if(!flow->protos.telnet.password_found)
 	return(1);
 	
@@ -90,7 +90,7 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
     return(1);
   }
 
-  if(packet->payload[0] == '\r') {
+  if(packet->payload[0] == '\r' || packet->payload[0] == '\n') {
     char buf[64];
     
     flow->protos.telnet.username_detected = 1;
@@ -175,7 +175,7 @@ u_int8_t search_iac(struct ndpi_detection_module_struct *ndpi_struct) {
 	   && (packet->payload[a + 2] <= 0x28))))
       return(0);
 
-    a++;
+    a += 3;
   }
 
   return 1;
@@ -189,29 +189,13 @@ static void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct *ndpi_str
   NDPI_LOG_DBG(ndpi_struct, "search telnet\n");
 
   if(search_iac(ndpi_struct) == 1) {
-    if(flow->l4.tcp.telnet_stage == 2) {
-      NDPI_LOG_INFO(ndpi_struct, "found telnet\n");
-      ndpi_int_telnet_add_connection(ndpi_struct, flow);
-      return;
-    }
-
-    flow->l4.tcp.telnet_stage++;
-    NDPI_LOG_DBG2(ndpi_struct, "telnet stage %u\n", flow->l4.tcp.telnet_stage);
+    NDPI_LOG_INFO(ndpi_struct, "found telnet\n");
+    ndpi_int_telnet_add_connection(ndpi_struct, flow);
     return;
   }
 
-  if(((flow->packet_counter < 12) && (flow->l4.tcp.telnet_stage > 0)) || (flow->packet_counter < 6)) {
-#ifdef TELNET_DEBUG
-    printf("==> [%s:%d] %s()\n", __FILE__, __LINE__, __FUNCTION__);
-#endif
-    return;
-  } else {
-#ifdef TELNET_DEBUG
-    printf("==> [%s:%d] %s()\n", __FILE__, __LINE__, __FUNCTION__);
-#endif
-    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-  }
-  
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+
   return;
 }
 

@@ -890,9 +890,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_VNC */
   u_int64_t vnc_stage:2;
 
-  /* NDPI_PROTOCOL_TELNET */
-  u_int64_t telnet_stage:2;
-
   /* NDPI_PROTOCOL_RADMIN */
   u_int64_t radmin_stage:1;
 
