@@ -10299,7 +10299,9 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
      /* The following protocols do their own entropy calculation/classification. */
      ret.proto.app_protocol != NDPI_PROTOCOL_IP_ICMP) {
 
-    if (ret.proto.app_protocol != NDPI_PROTOCOL_HTTP &&
+    if (/* We are not interest into entropy for encrypted flows */
+        !ndpi_stack_is_tls_like(&flow->protocol_stack) &&
+        ret.proto.app_protocol != NDPI_PROTOCOL_HTTP &&
         ret.proto.master_protocol != NDPI_PROTOCOL_HTTP) {
       flow->entropy = ndpi_entropy(packet->payload, packet->payload_packet_len);
     }
