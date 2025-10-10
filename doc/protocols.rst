@@ -492,6 +492,42 @@ iQIYI is a Chinese online video platform with original and licensed movies, dram
 References: `iQIYI official site: <https://www.iqiyi.com/>`_
 
 
+
+.. _Proto_55:
+
+`NDPI_PROTOCOL_ZATTOO`
+======================
+Zattoo is a TV streaming service providing live and on-demand television content over the Internet.
+
+References: `Zattoo official site <https://zattoo.com/>`_
+
+
+.. _Proto_56:
+
+`NDPI_PROTOCOL_YANDEX_MARKET`
+=============================
+Yandex.Market is a Russian e-commerce platform for price comparison and online shopping operated by Yandex.
+
+References: `Yandex.Market official site <https://market.yandex.ru/>`_
+
+
+.. _Proto_57:
+
+`NDPI_PROTOCOL_YANDEX_DISK`
+===========================
+Yandex.Disk is a cloud storage service provided by Yandex, offering file synchronization and sharing.
+
+References: `Yandex.Disk official site <https://disk.yandex.com/>`_
+
+
+.. _Proto_58:
+
+`NDPI_PROTOCOL_DISCORD`
+=======================
+Discord is a VoIP, instant messaging and digital distribution platform designed for creating communities. Popular among gamers but also used for business and education.
+
+References: `Discord official site <https://discord.com/>`_, `Protocol info <https://discord.com/developers/docs/intro>`_
+
 .. _Proto_59:
 
 `NDPI_PROTOCOL_ADOBE_CONNECT`
@@ -615,7 +651,7 @@ References: `Disney+ official site: <https://www.disneyplus.com/>`_
 =======================
 Highway Addressable Remote Transducer over IP.
 
-References: `HART-IP Protocol Specs: <https://library.fieldcommgroup.org/20085/TS20085>`_
+References: `HART-IP Protocol Specs: <https://library.fieldcommgroup.org/20085/TS20085>`_, `HART Communication Foundation <https://www.fieldcommgroup.org/technologies/hart>`_
 
 
 .. _Proto_73:
@@ -987,6 +1023,24 @@ Nexon is a South Korean video game developer and publisher.
 References: `Nexon official site: <https://www.nexon.com>`_
 
 
+
+.. _Proto_114:
+
+`NDPI_PROTOCOL_MSSQL_TDS`
+=========================
+TDS (Tabular Data Stream) is the protocol used by Microsoft SQL Server for client-server communication. It handles database queries, responses, and stored procedure calls.
+
+References: `TDS Protocol Documentation <https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-tds/>`_, `Wikipedia <https://en.wikipedia.org/wiki/Tabular_Data_Stream>`_
+
+
+.. _Proto_115:
+
+`NDPI_PROTOCOL_PPTP`
+====================
+PPTP (Point-to-Point Tunneling Protocol) is a VPN protocol that creates secure tunnels for remote access. Note: PPTP is considered obsolete due to security vulnerabilities.
+
+References: `RFC 2637 <https://datatracker.ietf.org/doc/html/rfc2637>`_
+
 .. _Proto_116:
 
 `NDPI_PROTOCOL_IP_AH`
@@ -1004,6 +1058,69 @@ Encapsulating Security Payload (ESP) is a crucial protocol within the IPsec fram
 
 References: `RFC4303: <https://datatracker.ietf.org/doc/html/rfc4303>`_
 
+
+
+.. _Proto_118:
+
+`NDPI_PROTOCOL_SLACK`
+=====================
+Slack is a business communication platform offering chat, file sharing, and integrations. Widely used for team collaboration and project management.
+
+References: `Slack official site <https://slack.com/>`_, `Slack API <https://api.slack.com/>`_
+
+
+.. _Proto_119:
+
+`NDPI_PROTOCOL_FACEBOOK`
+========================
+Facebook (Meta) is a social networking service and platform. Traffic includes web browsing, mobile app usage, and various Meta services.
+
+References: `Facebook official site <https://www.facebook.com/>`_, `Meta for Developers <https://developers.facebook.com/>`_
+
+
+.. _Proto_120:
+
+`NDPI_PROTOCOL_TWITTER`
+=======================
+Twitter (now X) is a microblogging and social networking service. Traffic includes tweets, direct messages, media uploads, and API access.
+
+References: `X (Twitter) official site <https://twitter.com/>`_, `X API Documentation <https://developer.twitter.com/>`_
+
+
+.. _Proto_121:
+
+`NDPI_PROTOCOL_DROPBOX`
+=======================
+Dropbox is a cloud storage and file synchronization service. Provides file hosting, sharing, and collaboration features.
+
+References: `Dropbox official site <https://www.dropbox.com/>`_, `Dropbox API <https://www.dropbox.com/developers>`_
+
+
+.. _Proto_122:
+
+`NDPI_PROTOCOL_GMAIL`
+=====================
+Gmail is Google's email service. Traffic includes webmail access, IMAP/SMTP for email clients, and mobile app communication.
+
+References: `Gmail official site <https://mail.google.com/>`_, `Gmail API <https://developers.google.com/gmail/api>`_
+
+
+.. _Proto_123:
+
+`NDPI_PROTOCOL_GOOGLE_MAPS`
+===========================
+Google Maps is a web mapping platform offering satellite imagery, street maps, real-time traffic, and route planning.
+
+References: `Google Maps <https://maps.google.com/>`_, `Maps Platform <https://developers.google.com/maps>`_
+
+
+.. _Proto_124:
+
+`NDPI_PROTOCOL_YOUTUBE`
+=======================
+YouTube is a video sharing and streaming platform owned by Google. Handles video playback, uploads, live streams, and user interactions.
+
+References: `YouTube official site <https://www.youtube.com/>`_, `YouTube API <https://developers.google.com/youtube>`_
 
 .. _Proto_125:
 
@@ -1027,7 +1144,7 @@ References: `Google official site: <https://www.google.com/>`_
 
 `NDPI_PROTOCOL_MS_RPCH`
 =======================
-Microsoft RPC protocol over HTTP.
+MS-RPCH (Microsoft RPC over HTTP) is a protocol that tunnels RPC traffic over HTTP/HTTPS, commonly used by Microsoft Exchange and Outlook for email access through firewalls.
 
 References: `Microsoft RPCH specs: <https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rpch/c0f4c9c5-1a61-4d10-b8e2-005378d1d212>`_
 
@@ -1058,6 +1175,15 @@ HTTP CONNECT method is used to establish a tunnel to the server, typically for S
 
 References: `RFC7231: <https://tools.ietf.org/html/rfc7231#section-4.3.6>`_
 
+
+
+.. _Proto_131:
+
+`NDPI_PROTOCOL_HTTP_PROXY`
+==========================
+HTTP PROXY traffic represents connections through HTTP proxy servers, used for web content caching, filtering, and anonymization.
+
+References: `RFC 7230 (HTTP Proxy) <https://datatracker.ietf.org/doc/html/rfc7230#section-5.7>`_
 
 .. _Proto_132:
 
@@ -1094,6 +1220,15 @@ Waze is a GPS navigation app providing real-time traffic and road info.
 
 References: `Waze official site: <https://www.waze.com/>`_
 
+
+
+.. _Proto_136:
+
+`NDPI_PROTOCOL_YOUTUBE_UPLOAD`
+==============================
+YouTube upload traffic specifically identifies video and content uploads to YouTube platform, distinct from normal viewing traffic.
+
+References: `YouTube Upload Guide <https://support.google.com/youtube/answer/57407>`_
 
 .. _Proto_137:
 
@@ -1184,6 +1319,15 @@ RADIUS protocol provides centralized Authentication, Authorization, and Accounti
 
 References: `RFC2865: <https://tools.ietf.org/html/rfc2865>`_
 
+
+
+.. _Proto_147:
+
+`NDPI_PROTOCOL_WINDOWS_UPDATE`
+==============================
+Windows Update service traffic used by Microsoft Windows to deliver OS updates, security patches, and driver updates.
+
+References: `Windows Update FAQ <https://support.microsoft.com/en-us/windows/windows-update-faq-8a903416-6f45-0718-f5c7-375e92dddeb2>`_
 
 .. _Proto_148:
 
@@ -1367,7 +1511,7 @@ References: `Rsync homepage: <https://rsync.samba.org/>`_
 =======================
 Oracle database communication protocol.
 
-References: `Oracle Net Services docs: <https://docs.oracle.com/en/database/oracle/oracle-database/19/netrf/index.html>`_
+References: `Oracle Net Services docs: <https://docs.oracle.com/en/database/oracle/oracle-database/19/netrf/index.html>`_, `Oracle Documentation <https://docs.oracle.com/en/database/>`_
 
 
 .. _Proto_168:
@@ -1500,7 +1644,7 @@ References: `ITU-T H.248: <https://www.itu.int/rec/T-REC-H.248.1>`_
 
 `NDPI_PROTOCOL_RESP`
 =======================
-Redis Serialization Protocol.
+RESP (REdis Serialization Protocol) is the wire protocol used by Redis clients to communicate with Redis servers. It's a simple, text-based protocol designed for high performance.
 
 References: `Redis Protocol Specs: <https://redis.io/docs/reference/protocol-spec/>`_
 
@@ -1784,6 +1928,195 @@ Blizzard Entertainment is a game developer known for WoW, Diablo, StarCraft.
 References: `Blizzard official site: <https://www.blizzard.com>`_
 
 
+
+.. _Proto_214:
+
+`NDPI_PROTOCOL_TEREDO`
+======================
+Teredo is an IPv6 transition technology that provides IPv6 connectivity through IPv4 NAT. Uses UDP tunneling over port 3544.
+
+References: `RFC 4380 <https://datatracker.ietf.org/doc/html/rfc4380>`_, `Wikipedia <https://en.wikipedia.org/wiki/Teredo_tunneling>`_
+
+
+.. _Proto_215:
+
+`NDPI_PROTOCOL_HOTSPOT_SHIELD`
+==============================
+Hotspot Shield is a VPN service providing encrypted internet connections and privacy protection.
+
+References: `Hotspot Shield official site <https://www.hotspotshield.com/>`_
+
+
+.. _Proto_216:
+
+`NDPI_PROTOCOL_IMO`
+===================
+imo is a free video calling and instant messaging application. Popular in regions with expensive mobile data.
+
+References: `imo official site <https://imo.im/>`_
+
+
+.. _Proto_217:
+
+`NDPI_PROTOCOL_GOOGLE_DRIVE`
+============================
+Google Drive is a cloud storage and file synchronization service. Provides file backup, sharing, and collaborative editing.
+
+References: `Google Drive <https://drive.google.com/>`_, `Drive API <https://developers.google.com/drive>`_
+
+
+.. _Proto_218:
+
+`NDPI_PROTOCOL_OCS`
+===================
+OCS (Office Communications Server) is Microsoft's enterprise instant messaging and conferencing platform, predecessor to Lync and Skype for Business.
+
+References: `Microsoft OCS Documentation <https://docs.microsoft.com/en-us/previous-versions/office/communications-server/>`_
+
+
+.. _Proto_219:
+
+`NDPI_PROTOCOL_MICROSOFT_365`
+=============================
+Microsoft 365 (formerly Office 365) is a cloud-based subscription service combining Office apps, cloud storage, and collaboration tools.
+
+References: `Microsoft 365 official site <https://www.microsoft.com/en-us/microsoft-365>`_, `M365 Network Connectivity <https://docs.microsoft.com/en-us/microsoft-365/enterprise/microsoft-365-networking-overview>`_
+
+
+.. _Proto_220:
+
+`NDPI_PROTOCOL_CLOUDFLARE`
+==========================
+Cloudflare is a web infrastructure and security company providing CDN, DDoS protection, DNS services, and security solutions.
+
+References: `Cloudflare official site <https://www.cloudflare.com/>`_, `Cloudflare API <https://developers.cloudflare.com/>`_
+
+
+.. _Proto_221:
+
+`NDPI_PROTOCOL_MS_ONE_DRIVE`
+============================
+Microsoft OneDrive is a cloud storage service integrated with Microsoft 365, providing file hosting, synchronization, and sharing.
+
+References: `OneDrive official site <https://onedrive.live.com/>`_, `OneDrive Dev Center <https://developer.microsoft.com/en-us/onedrive>`_
+
+
+.. _Proto_222:
+
+`NDPI_PROTOCOL_MQTT`
+====================
+MQTT (Message Queuing Telemetry Transport) is a lightweight publish-subscribe messaging protocol widely used in IoT applications for device communication.
+
+References: `MQTT official site <https://mqtt.org/>`_, `MQTT v3.1.1 <http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html>`_, `MQTT v5.0 <https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html>`_
+
+
+.. _Proto_223:
+
+`NDPI_PROTOCOL_RX`
+==================
+RX (Remote Execution) is a remote procedure call protocol developed by Carnegie Mellon University, used by AFS (Andrew File System).
+
+References: `RX Protocol Specification <https://www.citi.umich.edu/techreports/reports/citi-tr-89-14.pdf>`_
+
+
+.. _Proto_224:
+
+`NDPI_PROTOCOL_APPLESTORE`
+==========================
+Apple App Store traffic includes app downloads, updates, in-app purchases, and related Apple services communication.
+
+References: `Apple App Store <https://www.apple.com/app-store/>`_
+
+
+.. _Proto_225:
+
+`NDPI_PROTOCOL_OPENDNS`
+=======================
+OpenDNS (now part of Cisco Umbrella) provides DNS resolution services with security filtering, phishing protection, and content filtering.
+
+References: `Cisco Umbrella (OpenDNS) <https://www.opendns.com/>`_, `Umbrella Documentation <https://docs.umbrella.com/>`_
+
+
+.. _Proto_226:
+
+`NDPI_PROTOCOL_GIT`
+===================
+Git protocol traffic for distributed version control operations including clone, fetch, push, and pull operations.
+
+References: `Git Protocol Documentation <https://git-scm.com/book/en/v2/Git-on-the-Server-The-Protocols>`_, `Git official site <https://git-scm.com/>`_
+
+
+.. _Proto_227:
+
+`NDPI_PROTOCOL_DRDA`
+====================
+DRDA (Distributed Relational Database Architecture) is a protocol for distributed database communication, primarily used by IBM DB2 and other database systems.
+
+References: `DRDA Specification <http://www.opengroup.org/dbiop/>`_, `Wikipedia <https://en.wikipedia.org/wiki/DRDA>`_
+
+
+.. _Proto_228:
+
+`NDPI_PROTOCOL_PLAYSTORE`
+=========================
+Google Play Store traffic for Android app downloads, updates, in-app purchases, and Google Play services communication.
+
+References: `Google Play Store <https://play.google.com/>`_, `Play Console <https://play.google.com/console>`_
+
+
+.. _Proto_229:
+
+`NDPI_PROTOCOL_SOMEIP`
+======================
+SOME/IP (Scalable service-Oriented MiddlewarE over IP) is an automotive middleware solution for service-oriented communication in vehicles (ECU-to-ECU).
+
+References: `AUTOSAR SOME/IP Specification <https://www.autosar.org/standards/classic-platform/>`_
+
+
+.. _Proto_230:
+
+`NDPI_PROTOCOL_FIX`
+===================
+FIX (Financial Information eXchange) protocol is an industry-standard messaging protocol for real-time electronic securities trading and market data.
+
+References: `FIX Trading Community <https://www.fixtrading.org/>`_, `FIX Protocol Specification <https://www.fixtrading.org/standards/>`_
+
+
+.. _Proto_231:
+
+`NDPI_PROTOCOL_PLAYSTATION`
+===========================
+PlayStation Network (PSN) traffic for Sony's gaming platform, including game downloads, multiplayer gaming, streaming, and store access.
+
+References: `PlayStation Network <https://www.playstation.com/network/>`_
+
+
+.. _Proto_232:
+
+`NDPI_PROTOCOL_PASTEBIN`
+========================
+Pastebin is a web application for storing and sharing text content. Often used by developers for code sharing and by security researchers.
+
+References: `Pastebin official site <https://pastebin.com/>`_, `Pastebin API <https://pastebin.com/doc_api>`_
+
+
+.. _Proto_233:
+
+`NDPI_PROTOCOL_LINKEDIN`
+========================
+LinkedIn is a professional networking platform owned by Microsoft, used for career development, job searching, and business networking.
+
+References: `LinkedIn official site <https://www.linkedin.com/>`_, `LinkedIn API <https://developer.linkedin.com/>`_
+
+
+.. _Proto_234:
+
+`NDPI_PROTOCOL_SOUNDCLOUD`
+==========================
+SoundCloud is an audio streaming and distribution platform popular with musicians for sharing and discovering music.
+
+References: `SoundCloud official site <https://soundcloud.com/>`_, `SoundCloud API <https://developers.soundcloud.com/>`_
+
 .. _Proto_235:
 
 `NDPI_PROTOCOL_VALVE_SDR`
@@ -1835,7 +2168,7 @@ References: No single official site; includes googleapis.com, googletagmanager.c
 =============================
 Amazon Video is Amazon's video streaming service.
 
-References: `Amazon Video site: <https://www.amazon.com/gp/video/storefront>`_
+References: `Amazon Video site: <https://www.amazon.com/gp/video/storefront>`_, `Prime Video official site <https://www.amazon.com/primevideo>`_
 
 
 .. _Proto_241:
@@ -1914,7 +2247,7 @@ References: `Zabbix Documentation: <https://www.zabbix.com/documentation>`_
 
 `NDPI_PROTOCOL_S7COMM`
 =======================
-S7Comm is Siemens PLC communication protocol.
+S7comm (S7 Communication) is a Siemens proprietary protocol used for PLC (Programmable Logic Controller) communication in industrial automation systems, particularly with SIMATIC S7 PLCs.
 
 References: `Wireshark S7comm wiki: <https://wiki.wireshark.org/S7comm>`_
 
@@ -2118,7 +2451,7 @@ References: `Fuze official site: <https://www.fuze.com>`_
 ========================
 GTP-U carries user data within mobile networks.
 
-References: `3GPP TS 29.060: <https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=1595>`_
+References: `3GPP TS 29.060: <https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=1595>`_, `3GPP TS 29.281 <https://www.3gpp.org/DynaReport/29281.htm>`_
 
 
 .. _Proto_272:
@@ -2217,8 +2550,17 @@ References: `Google Classroom: <https://classroom.google.com>`_
 =====================
 HSRP provides IP network failover and redundancy.
 
-References: `Cisco HSRP guide: <https://www.cisco.com/c/en/us/support/docs/ip/hot-standby-router-protocol-hsrp/9234-hsrpguidetoc.html>`_
+References: `Cisco HSRP guide: <https://www.cisco.com/c/en/us/support/docs/ip/hot-standby-router-protocol-hsrp/9234-hsrpguidetoc.html>`_, `Cisco HSRP Configuration Guide <https://www.cisco.com/c/en/us/support/docs/ip/hot-standby-router-protocol-hsrp/9234-hsrpguidetoc.html>`_
 
+
+
+.. _Proto_283:
+
+`NDPI_PROTOCOL_CYBERSECURITY`
+=============================
+Traffic to/from cybersecurity companies and services, including threat intelligence feeds, security software updates, and malware analysis services.
+
+References: Various cybersecurity vendors and threat intelligence platforms
 
 .. _Proto_284:
 
@@ -2244,7 +2586,7 @@ References: `Tencent official site: <https://www.tencent.com/en-us>`_
 ========================
 RakNet is a C++ game networking engine.
 
-References: `RakNet on GitHub: <https://github.com/OculusVR/RakNet>`_
+References: `RakNet on GitHub: <https://github.com/OculusVR/RakNet>`_, `RakNet (archived) <https://github.com/facebookarchive/RakNet>`_
 
 
 .. _Proto_287:
@@ -2255,6 +2597,15 @@ Xiaomi communication protocols for devices and IoT.
 
 References: `Xiaomi official site: <https://www.mi.com/global/>`_
 
+
+
+.. _Proto_288:
+
+`NDPI_PROTOCOL_EDGECAST`
+========================
+EdgeCast (now part of Edgio/Verizon Media) is a CDN (Content Delivery Network) providing global content acceleration and delivery services.
+
+References: `Edgio Platform <https://edg.io/>`_
 
 .. _Proto_289:
 
@@ -2325,7 +2676,7 @@ References: `1Kxun official site: <https://1kxun.mobi/>`_
 =======================
 PGM is a reliable multicast transport protocol.
 
-References: `RFC3208: <https://datatracker.ietf.org/doc/html/rfc3208>`_
+References: `RFC3208: <https://datatracker.ietf.org/doc/html/rfc3208>`_, `RFC 3208 <https://datatracker.ietf.org/doc/html/rfc3208>`_
 
 
 .. _Proto_297:
@@ -2895,6 +3246,15 @@ Chinese microblogging site Sina Weibo.
 References: `Sina Weibo Wikipedia: <https://en.wikipedia.org/wiki/Sina_Weibo>`_
 
 
+
+.. _Proto_357:
+
+`NDPI_PROTOCOL_TESLA_SERVICES`
+==============================
+Tesla services traffic including vehicle telemetry, over-the-air software updates, navigation data, and mobile app communication.
+
+References: `Tesla official site <https://www.tesla.com/>`_, `Tesla API (unofficial) <https://tesla-api.timdorr.com/>`_
+
 .. _Proto_358:
 
 `NDPI_PROTOCOL_PTPV2`
@@ -3222,6 +3582,15 @@ Raft is a consensus protocol for distributed logs.
 
 References: `Raft C implementation: <https://github.com/canonical/raft>`_, `Raft paper: <https://raft.github.io/raft.pdf>`_
 
+
+
+.. _Proto_393:
+
+`NDPI_PROTOCOL_CIP`
+===================
+CIP (Common Industrial Protocol) is an industrial protocol used in automation and control systems, particularly in Ethernet/IP and DeviceNet networks.
+
+References: `ODVA CIP Specification <https://www.odva.org/technology-standards/key-technologies/common-industrial-protocol-cip/>`_, `Wikipedia <https://en.wikipedia.org/wiki/Common_Industrial_Protocol>`_
 
 .. _Proto_394:
 
