@@ -723,7 +723,7 @@ static int ndpi_find_non_eng_bigrams(char *str) {
 
 /* #define PRINT_STRINGS 1 */
 
-int ndpi_has_human_readeable_string(char *buffer, u_int buffer_size,
+int ndpi_has_human_readable_string(char *buffer, u_int buffer_size,
 				    u_int8_t min_string_match_len,
 				    char *outbuf, u_int outbuf_len) {
   u_int ret = 0, i, do_cr = 0, len = 0, o_idx = 0, being_o_idx = 0;

@@ -1944,7 +1944,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       }
 
       if((!skip) && ((flow->src2dst_packets+flow->dst2src_packets) < 100)) {
-	if(ndpi_has_human_readeable_string((char*)packet, header->caplen,
+	if(ndpi_has_human_readable_string((char*)packet, header->caplen,
 					   human_readeable_string_len,
 					   flow->human_readeable_string_buffer,
 					   sizeof(flow->human_readeable_string_buffer)) == 1)
