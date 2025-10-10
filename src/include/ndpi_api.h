@@ -37,7 +37,7 @@ extern "C" {
 #define NDPI_DETECTION_ONLY_IPV6              ( 1 << 1 )
 
   /*
-    In case a custom DGA function is used, the fucntion
+    In case a custom DGA function is used, the function
     below must be overwritten,
   */
   extern ndpi_custom_dga_predict_fctn ndpi_dga_function;
@@ -46,7 +46,7 @@ extern "C" {
    * Check if a string is encoded with punycode
    * ( https://tools.ietf.org/html/rfc3492 )
    *
-   * @par    buff = pointer to the string to ckeck
+   * @par    buff = pointer to the string to check
    * @par    len  = len of the string
    * @return 1 if the string is punycoded;
    *         else 0
@@ -63,10 +63,17 @@ extern "C" {
    */
   u_int32_t ndpi_detection_get_sizeof_ndpi_flow_struct(void);
 
-  /*
-    Same as the API call above but used for matching raw id's added
-    via ndpi_add_string_value_to_automa()
-  */
+  /**
+   * Match a string against an automaton and retrieve its associated numeric value.
+   * This function is similar to ndpi_match_string_subprotocol() but is used for
+   * matching raw IDs that were added via ndpi_add_string_value_to_automa().
+   *
+   * @param _automa Automaton created with ndpi_init_automa()
+   * @param string_to_match String to search for
+   * @param match_len Length of the string to match
+   * @param num Pointer to store the associated numeric value (output parameter)
+   * @return 1 if a match was found, 0 otherwise
+   */
   int ndpi_match_string_value(void *_automa, char *string_to_match,
 			      u_int match_len, u_int32_t *num);
 
@@ -80,18 +87,95 @@ extern "C" {
   u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow);
 
   /**
-   * nDPI personal allocation and free functions
-   **/
+   * Allocate memory using nDPI's memory allocator.
+   * This function can be customized via ndpi_set_malloc() to use a custom allocator.
+   *
+   * @param size Number of bytes to allocate
+   * @return Pointer to allocated memory, or NULL on failure
+   */
   void * ndpi_malloc(size_t size);
+
+  /**
+   * Allocate and zero-initialize memory using nDPI's memory allocator.
+   * This function can be customized via ndpi_set_calloc() to use a custom allocator.
+   *
+   * @param count Number of elements to allocate
+   * @param size Size of each element in bytes
+   * @return Pointer to zero-initialized memory, or NULL on failure
+   */
   void * ndpi_calloc(unsigned long count, size_t size);
+
+  /**
+   * Reallocate memory using nDPI's memory allocator.
+   * This function can be customized via ndpi_set_realloc() to use a custom allocator.
+   *
+   * @param ptr Pointer to previously allocated memory (or NULL for new allocation)
+   * @param old_size Current size of the allocated block in bytes
+   * @param new_size Desired new size in bytes
+   * @return Pointer to reallocated memory, or NULL on failure
+   */
   void * ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
+
+  /**
+   * Duplicate a string using nDPI's memory allocator.
+   * The returned string must be freed with ndpi_free().
+   *
+   * @param s String to duplicate (null-terminated)
+   * @return Pointer to newly allocated string copy, or NULL on failure
+   */
   char * ndpi_strdup(const char *s);
+
+  /**
+   * Duplicate a string with length limit using nDPI's memory allocator.
+   * The returned string must be freed with ndpi_free().
+   *
+   * @param s String to duplicate
+   * @param size Maximum number of characters to copy (excluding null terminator)
+   * @return Pointer to newly allocated string copy, or NULL on failure
+   */
   char * ndpi_strndup(const char *s, size_t size);
+
+  /**
+   * Free memory allocated by nDPI's memory allocator.
+   * This function can be customized via ndpi_set_free() to use a custom deallocator.
+   *
+   * @param ptr Pointer to memory to free (NULL is safe to pass)
+   */
   void   ndpi_free(void *ptr);
+
+  /**
+   * Allocate memory for flow-specific data using nDPI's flow allocator.
+   * Flow memory can use a separate allocator from general memory for better
+   * memory management in high-throughput scenarios.
+   *
+   * @param size Number of bytes to allocate
+   * @return Pointer to allocated memory, or NULL on failure
+   */
   void * ndpi_flow_malloc(size_t size);
+
+  /**
+   * Free memory allocated by ndpi_flow_malloc().
+   *
+   * @param ptr Pointer to flow memory to free (NULL is safe to pass)
+   */
   void   ndpi_flow_free(void *ptr);
+
+  /**
+   * Get the total amount of memory allocated by nDPI.
+   * This tracks memory allocated via ndpi_malloc(), ndpi_calloc(), ndpi_realloc(),
+   * ndpi_strdup(), and ndpi_strndup() (but not flow allocations).
+   *
+   * @return Total number of bytes currently allocated
+   */
   u_int32_t ndpi_get_tot_allocated_memory(void);
 
+  /**
+   * Remove leading and trailing whitespace from a string in-place.
+   *
+   * @param ptr Pointer to the string to process (modified in-place)
+   * @param ptr_len Pointer to the string length (updated to new length after stripping)
+   * @return Pointer to the start of the trimmed string (within the original buffer)
+   */
   char *ndpi_strip_leading_trailing_spaces(char *ptr, int *ptr_len) ;
 
   /**
@@ -223,7 +307,7 @@ extern "C" {
    *
    * @par    ndpi_struct  = the detection module
    * @par    flow         = the flow given for the detection module
-   * @par    protocol_was_guessed = 1 if the protocol was guesses (requires enable_guess = 1), 0 otherwise
+   * @par    protocol_was_guessed = 1 if the protocol was guessed (requires enable_guess = 1), 0 otherwise
    * @return the detected protocol even if the flow is not completed;
    *
    */
@@ -481,7 +565,7 @@ extern "C" {
    * Find the QoE category for the specified protocol
    *
    * @par     ndpi_mod      = the detection module
-   * @par     protoId       = the protocol identifier we're searhing
+   * @par     protoId       = the protocol identifier we're searching
    *
    */
   ndpi_protocol_qoe_category_t ndpi_find_protocol_qoe(struct ndpi_detection_module_struct *ndpi_str,
@@ -556,7 +640,7 @@ extern "C" {
    *
    * @par     mod           = the detection module
    * @par     category      = the category associated to the protocol
-   * @paw     name          = the string name of the category
+   * @par     name          = the string name of the category
    *
    */
   void ndpi_category_set_name(struct ndpi_detection_module_struct *ndpi_mod,
@@ -879,7 +963,7 @@ extern "C" {
    * @par     The automata initialized with ndpi_init_automa();
    * @par     The (sub)string to search (malloc'ed memory)
    * @par     The number associated with this string
-   * @return  0 in case of no error, or -2 if the string has been already addeed, or -1 if an error occurred.
+   * @return  0 in case of no error, or -2 if the string has been already added, or -1 if an error occurred.
    *
    */
   int ndpi_add_string_value_to_automa(void *_automa, char *str, u_int32_t num);
@@ -1023,22 +1107,92 @@ extern "C" {
 				    ndpi_protocol_category_t *category,
 				    ndpi_protocol_breed_t *breed);
 
+  /**
+   * Handle risk exceptions for a flow by unsetting risks that should be ignored
+   * based on the exception rules configured via ndpi_load_risk_domain_exceptions().
+   *
+   * @param ndpi_str The detection module
+   * @param flow The flow to process for risk exceptions
+   */
   void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 				   struct ndpi_flow_struct *flow);
 
-  /* Utility functions to set ndpi malloc/free/print wrappers */
+  /**
+   * Set a custom malloc function for nDPI's general memory allocator.
+   *
+   * @param __ndpi_malloc Function pointer to the custom malloc implementation
+   */
   void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
+
+  /**
+   * Set a custom free function for nDPI's general memory allocator.
+   *
+   * @param __ndpi_free Function pointer to the custom free implementation
+   */
   void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
+
+  /**
+   * Set a custom malloc function for nDPI's flow-specific memory allocator.
+   *
+   * @param __ndpi_flow_malloc Function pointer to the custom flow malloc implementation
+   */
   void set_ndpi_flow_malloc(void* (*__ndpi_flow_malloc)(size_t size));
+
+  /**
+   * Set a custom free function for nDPI's flow-specific memory allocator.
+   *
+   * @param __ndpi_flow_free Function pointer to the custom flow free implementation
+   */
   void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr));
+
+  /**
+   * Set a custom debug/logging function for nDPI.
+   *
+   * @param ndpi_str The detection module
+   * @param ndpi_debug_printf Function pointer to the custom debug printf implementation
+   */
   void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str,
 			       ndpi_debug_function_ptr ndpi_debug_printf);
   u_int16_t ndpi_get_api_version(void);
   const char *ndpi_get_gcrypt_version(void);
 
-  /* https://github.com/corelight/community-id-spec */
+  /**
+   * Compute the Community ID hash for an IPv4 flow.
+   * Community ID is a standard for flow hashing that enables correlation of
+   * network traffic across different monitoring tools.
+   * Specification: https://github.com/corelight/community-id-spec
+   *
+   * @param l4_proto Layer 4 protocol (e.g., IPPROTO_TCP, IPPROTO_UDP)
+   * @param src_ip Source IPv4 address in host byte order
+   * @param dst_ip Destination IPv4 address in host byte order
+   * @param src_port Source port (host byte order), or 0 for non-port protocols
+   * @param dst_port Destination port (host byte order), or 0 for non-port protocols
+   * @param icmp_type ICMP type (for ICMP), or 0 otherwise
+   * @param icmp_code ICMP code (for ICMP), or 0 otherwise
+   * @param hash_buf Buffer to store the resulting hash
+   * @param hash_buf_len Length of hash_buf (must be at least 20 bytes for SHA1)
+   * @return 0 on success, -1 on error
+   */
   int ndpi_flowv4_flow_hash(u_int8_t l4_proto, u_int32_t src_ip, u_int32_t dst_ip, u_int16_t src_port, u_int16_t dst_port,
 			    u_int8_t icmp_type, u_int8_t icmp_code, u_char *hash_buf, u_int8_t hash_buf_len);
+
+  /**
+   * Compute the Community ID hash for an IPv6 flow.
+   * Community ID is a standard for flow hashing that enables correlation of
+   * network traffic across different monitoring tools.
+   * Specification: https://github.com/corelight/community-id-spec
+   *
+   * @param l4_proto Layer 4 protocol (e.g., IPPROTO_TCP, IPPROTO_UDP)
+   * @param src_ip Source IPv6 address
+   * @param dst_ip Destination IPv6 address
+   * @param src_port Source port (host byte order), or 0 for non-port protocols
+   * @param dst_port Destination port (host byte order), or 0 for non-port protocols
+   * @param icmp_type ICMPv6 type (for ICMPv6), or 0 otherwise
+   * @param icmp_code ICMPv6 code (for ICMPv6), or 0 otherwise
+   * @param hash_buf Buffer to store the resulting hash
+   * @param hash_buf_len Length of hash_buf (must be at least 20 bytes for SHA1)
+   * @return 0 on success, -1 on error
+   */
   int ndpi_flowv6_flow_hash(u_int8_t l4_proto, const struct ndpi_in6_addr *src_ip, const struct ndpi_in6_addr *dst_ip,
 			    u_int16_t src_port, u_int16_t dst_port, u_int8_t icmp_type, u_int8_t icmp_code,
 			    u_char *hash_buf, u_int8_t hash_buf_len);
@@ -1049,7 +1203,7 @@ extern "C" {
   const char* ndpi_tunnel2str(ndpi_packet_tunnel tt);
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow);
-  int ndpi_has_human_readeable_string(char *buffer, u_int buffer_size,
+  int ndpi_has_human_readable_string(char *buffer, u_int buffer_size,
 				      u_int8_t min_string_match_len, /* Will return 0 if no string > min_string_match_len have been found */
 				      char *outbuf, u_int outbuf_len);
   /* Return a flow info string (summarized). Does only work for DNS/HTTP/TLS/QUIC. */
@@ -1176,7 +1330,7 @@ extern "C" {
   void ndpi_reset_serializer(ndpi_serializer *serializer);
 
   /**
-   * Hint to not create the header (used to avoid creaign the header when not used)
+   * Hint to not create the header (used to avoid creating the header when not used)
    * @param serializer The serializer handle
    */
   void ndpi_serializer_skip_header(ndpi_serializer *serializer);
@@ -1870,7 +2024,7 @@ extern "C" {
    *
    * @par    values      = pointer to the individual values to be analyzed [in]
    * @par    outliers    = pointer to a list of outliers identified        [out]
-   * @par    num_values  = lenght of values and outliers that MUST have the same lenght [in]
+   * @par    num_values  = length of values and outliers that MUST have the same length [in]
    *
    * @return The number of outliers found
   */
@@ -2204,7 +2358,7 @@ extern "C" {
    * @par ndpi_str = the struct created for the protocol detection
    * @par hostname = the hostname from which the domain name has to be extracted
    *
-   * @return The host domain name or the hosti tself if not found.
+   * @return The host domain name or the host itself if not found.
    *
    */
   const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
@@ -2376,7 +2530,7 @@ extern "C" {
    * @brief Converts a string from ISO 8859 to UTF-8
    *
    * @param in String to convert
-   * @param in_len Source string lenght
+   * @param in_len Source string length
    * @param out Destination string buffer (UTF-8)
    * @param out_len Length of destination string buffer. It must be at least (2*in_len)+1
    *
