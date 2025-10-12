@@ -296,8 +296,8 @@ typedef struct ndpi_id {
   struct ndpi_id_struct *ndpi_id;  // nDpi worker structure
 } ndpi_id_t;
 
-// used memory counters
-static u_int32_t current_ndpi_memory = 0, max_ndpi_memory = 0;
+
+static u_int32_t tot_ndpi_memory = 0;
 #ifdef USE_DPDK
 static int dpdk_port_id = 0, dpdk_run_capture = 1;
 #endif
@@ -333,10 +333,7 @@ static u_int32_t reader_slot_malloc_bins(u_int64_t v)
  * @brief ndpi_malloc wrapper function
  */
 static void *ndpi_malloc_wrapper(size_t size) {
-  current_ndpi_memory += size;
-
-  if(current_ndpi_memory > max_ndpi_memory)
-    max_ndpi_memory = current_ndpi_memory;
+  tot_ndpi_memory += size;
 
   if(enable_malloc_bins && malloc_size_stats)
     ndpi_inc_bin(&malloc_bins, reader_slot_malloc_bins(size), 1);
@@ -4351,8 +4348,7 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
     printf("\nnDPI Memory statistics:\n");
     printf("\tnDPI Memory (once):      %-13s\n", formatBytes(ndpi_get_ndpi_detection_module_size(), buf, sizeof(buf)));
     printf("\tFlow Memory (per flow):  %-13s\n", formatBytes(ndpi_detection_get_sizeof_ndpi_flow_struct(), buf, sizeof(buf)));
-    printf("\tActual Memory:           %-13s\n", formatBytes(current_ndpi_memory, buf, sizeof(buf)));
-    printf("\tPeak Memory:             %-13s\n", formatBytes(max_ndpi_memory, buf, sizeof(buf)));
+    printf("\tTotal memory allocated:  %-13s\n", formatBytes(tot_ndpi_memory, buf, sizeof(buf)));
     printf("\tSetup Time:              %lu msec\n", (unsigned long)(setup_time_usec/1000));
     printf("\tPacket Processing Time:  %lu msec\n", (unsigned long)(processing_time_usec/1000));
 
