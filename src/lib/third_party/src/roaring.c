@@ -25163,7 +25163,7 @@ void roaring64_bitmap_remove_bulk(roaring64_bitmap_t *r,
         }
         if (!container_nonzero_cardinality(container2, typecode2)) {
             container_free(container2, typecode2);
-            leaf_t leaf;
+            leaf_t leaf = 0;
             bool erased = art_erase(art, high48, (art_val_t *)&leaf);
             assert(erased);
             (void)erased;
