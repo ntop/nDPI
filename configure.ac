@@ -238,6 +238,12 @@ if ! test "${with_only_libndpi+set}" = set; then :
         ])
       ;;
     esac
+    dnl > RRD
+    AC_CHECK_LIB([rrd], [rrd_fetch_r], [LIBRRD=-lrrd])
+    if test "x$ac_cv_lib_rrd_rrd_fetch_r" = xyes; then :
+        AC_DEFINE_UNQUOTED(HAVE_RRDTOOL, "1", [rrdtool is present])
+        EXTRA_TARGETS="$EXTRA_TARGETS rrdtool"
+    fi
 fi
 AM_CONDITIONAL([BUILD_UNITTESTS], [test "x$build_unittests" = "xyes"])
 
@@ -253,12 +259,6 @@ AS_IF([test "${with_lto_and_gold_linker+set}" = set], [
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h math.h float.h])
 AC_CHECK_LIB([m], [sqrt], [], [LIBM="-lm"])
-AC_CHECK_LIB([rrd], [rrd_fetch_r], [LIBRRD=-lrrd])
-
-if test "x$ac_cv_lib_rrd_rrd_fetch_r" = xyes; then :
-   AC_DEFINE_UNQUOTED(HAVE_RRDTOOL, "1", [rrdtool is present])
-   EXTRA_TARGETS="$EXTRA_TARGETS rrdtool"
-fi
 
 GLOBAL_CONTEXT_ENABLED=0
 AS_IF([test "x$enable_global_context_support" != "xno"], [

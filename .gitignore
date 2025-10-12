@@ -52,6 +52,9 @@
 /example/ndpiReader
 /example/ndpiReader.exe
 /example/ndpiSimpleIntegration
+/utils/Makefile
+/utils/hosts2domains
+/utils/print_rank
 /fuzz/.deps/
 /fuzz/Makefile
 /fuzz/fuzz_ndpi_reader
