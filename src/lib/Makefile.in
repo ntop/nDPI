@@ -11,9 +11,12 @@ RANLIB = @RANLIB@
 #
 # Installation directories
 #
-PREFIX     = @prefix@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
 libdir     = @libdir@
 includedir = @includedir@/ndpi
+# For backwards compatibility
+PREFIX = $(prefix)
 ifneq ($(OS),Windows_NT)
 OS := $(shell uname)
 endif
@@ -96,10 +99,10 @@ cppcheck:
 	cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I ../include *.c protocols/*.c
 
 install: $(NDPI_LIBS)
-	mkdir -p $(DESTDIR)$(PREFIX)$(libdir)
-	cp $(NDPI_LIBS) $(DESTDIR)$(PREFIX)$(libdir)/
-	cp -P $(NDPI_LIB_SHARED_BASE) $(DESTDIR)$(PREFIX)$(libdir)/
-	cp -P $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) $(DESTDIR)$(PREFIX)$(libdir)/
-	mkdir -p $(DESTDIR)$(PREFIX)$(includedir)
+	mkdir -p $(DESTDIR)@libdir@
+	cp $(NDPI_LIBS) $(DESTDIR)@libdir@/
+	cp -P $(NDPI_LIB_SHARED_BASE) $(DESTDIR)@libdir@/
+	cp -P $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) $(DESTDIR)@libdir@/
+	mkdir -p $(DESTDIR)@includedir@/ndpi
 	#Avoid installing private header
-	find ../include/*.h ! -name ndpi_private.h -exec cp "{}" $(DESTDIR)$(PREFIX)$(includedir)/ \;
+	find ../include/*.h ! -name ndpi_private.h -exec cp "{}" $(DESTDIR)@includedir@/ndpi/ \;
