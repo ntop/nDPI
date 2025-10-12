@@ -131,19 +131,31 @@ AS_IF([test "x${enable_oldcroaring}" = "xyes"], [
   NDPI_CFLAGS="${NDPI_CFLAGS} -DUSE_OLD_ROARING"
   echo "Using old croaring (forced by user)"
 ], [
-  #TODO: try to autodetect if roaring v4 works.
-  #For the time being, check (only) compiler version
-  GCC_VERSION=`$CC --version | cut -d ' ' -f 3 | head -1|cut -d '.' -f 1`
-  if test "${GCC_VERSION}" == "version" ; then
-    GCC_VERSION=`$CC --version | cut -d ' ' -f 4 | head -1|cut -d '.' -f 1`
-  fi
-
-  if test "${GCC_VERSION}" -lt "7" ; then
+  # Test if the compiler supports C11 atomics (required by roaring v4)
+  # Roaring v4 requires __STDC_VERSION__ >= 201112L and working C11 atomics
+  AC_MSG_CHECKING([whether C compiler supports C11 atomics for roaring v4])
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+    #include <stdatomic.h>
+    #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L
+    #error "C11 not supported"
+    #endif
+    #if defined(__STDC_NO_ATOMICS__)
+    #error "C11 atomics not supported"
+    #endif
+    typedef _Atomic(unsigned int) test_atomic_t;
+    int main() {
+      test_atomic_t val = 0;
+      atomic_fetch_add_explicit(&val, 1, memory_order_relaxed);
+      return atomic_load_explicit(&val, memory_order_relaxed);
+    }
+  ]])], [
+    AC_MSG_RESULT(yes)
+    echo "Using croaring v4 (autodetect: C11 atomics available)"
+  ], [
+    AC_MSG_RESULT(no)
     NDPI_CFLAGS="${NDPI_CFLAGS} -DUSE_OLD_ROARING"
-    echo "Using old croaring (autodetect)"
-  else
-    echo "Using croaring v4 (autodetect)"
-  fi
+    echo "Using old croaring (autodetect: C11 atomics not available)"
+  ])
 ])
 
 
