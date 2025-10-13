@@ -115,7 +115,6 @@
 /fuzz/fuzz_filecfg_risk_domains
 /fuzz/fuzz_filecfg_config
 /fuzz/fuzz_readerutils_workflow
-/fuzz/fuzz_readerutils_parseprotolist
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_pl7m_seed_corpus.zip
