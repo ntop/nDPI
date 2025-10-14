@@ -341,11 +341,15 @@ jobs:
         run: |
           cd ./build-standard/example && ./ndpiReader -H && cd -
           cd ./build-fuzzing/example && ./ndpiReader -H && cd -
-      - name: Tests
+      - name: Tests #We are only intersting into tests scripts being valid --> less tests than usual
         run: |
           cd build-standard
-          make check # all tests
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS=1 ./tests/do.sh
+          ./tests/do-unit.sh
+          ./tests/do-dga.sh
           cd -
           cd build-fuzzing
-          NDPI_FORCE_PARALLEL_UTESTS=1 ./tests/do.sh # Less tests with sanitizer to be faster
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS=1 ./tests/do.sh
+          ./tests/do-unit.sh
+          ./tests/do-dga.sh
           cd -
