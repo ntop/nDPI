@@ -23,7 +23,7 @@ jobs:
           sudo apt-get install libpcre3-dev libmaxminddb-dev lcov
           sudo apt-get install wdiff colordiff
       - name: Configure
-        run: ./autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre2 --with-maxminddb --enable-tls-sigs
+        run: ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre2 --with-maxminddb --enable-tls-sigs
       - name: Build
         run: make all
       - name: Test
@@ -55,7 +55,7 @@ jobs:
           sudo apt-get install autoconf automake libtool pkg-config gettext flex bison doxygen
       - name: Configure nDPI library
         run: |
-          ./autogen.sh --with-only-libndpi --enable-option-checking=fatal --enable-debug-build
+          ./autogen.sh && ./configure --with-only-libndpi --enable-option-checking=fatal --enable-debug-build
       - name: Generate Documentation
         run: |
           pip install --upgrade pip
@@ -89,7 +89,7 @@ jobs:
           pprof -h
       - name: Configure nDPI library
         run: |
-          ./autogen.sh --enable-gprof --enable-option-checking=fatal --with-pcre2 --with-maxminddb --enable-tls-sigs
+          ./autogen.sh && ./configure --enable-gprof --enable-option-checking=fatal --with-pcre2 --with-maxminddb --enable-tls-sigs
       - name: Build nDPI library
         run: |
           make -j
@@ -123,7 +123,7 @@ jobs:
           sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libjson-c-dev libpcap-dev rrdtool librrd-dev parallel
       - name: Configure nDPI
         run: |
-          ./autogen.sh --enable-option-checking=fatal --with-thread-sanitizer
+          ./autogen.sh && ./configure --enable-option-checking=fatal --with-thread-sanitizer
       - name: Build nDPI
         run: |
           make -j $(nproc) all
@@ -159,7 +159,7 @@ jobs:
           brew install coreutils wdiff colordiff autoconf automake libtool gettext json-c rrdtool parallel libgcrypt
       - name: Configure nDPI
         run: |
-          ./autogen.sh --enable-option-checking=fatal --with-local-libgcrypt
+          ./autogen.sh && ./configure --enable-option-checking=fatal --with-local-libgcrypt
       - name: Build nDPI
         run: |
           make -j $(nproc) all
@@ -192,7 +192,7 @@ jobs:
           install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap mingw-w64-x86_64-libgcrypt parallel
       - name: Configure nDPI on Windows msys2
         run: |
-          msys2 -c './autogen.sh --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap --with-local-libgcrypt'
+          msys2 -c './autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap --with-local-libgcrypt'
       - name: Build nDPI on Windows msys2
         run: |
           msys2 -c 'make -j all'

@@ -22,7 +22,7 @@ jobs:
         echo 'CentOS Linux release 7.9.2009 (Core)' | sudo tee /etc/centos-release
         # symlink source directory for ndpi.spec
         ln -sr . $HOME/nDPI
-        ./autogen.sh
+        ./autogen.sh && ./configure
         cd packages/rpm
         ./configure
 

@@ -2,7 +2,11 @@
 
 cd "$(dirname "${0}")" || exit 1
 
-UNIT="./unit/unit"
+TOP_BUILDDIR="@top_builddir@"
+ABS_BUILDDIR=$(cd ${TOP_BUILDDIR} && pwd)
+EXE_SUFFIX=@EXE_SUFFIX@
+
+UNIT="${ABS_BUILDDIR}/tests/unit/unit${EXE_SUFFIX}"
 
 RC=0
 

@@ -13,8 +13,6 @@ AS_IF([test "${with_only_libndpi+set}" = set],[
   EXTRA_TARGETS=""
 ])
 
-PWD=`pwd`
-
 
 AC_ARG_WITH(sanitizer, AS_HELP_STRING([--with-sanitizer], [Build with support for address, undefined and leak sanitizer]))
 AC_ARG_WITH(thread-sanitizer, AS_HELP_STRING([--with-thread-sanitizer], [Build with support for thread sanitizer]))
@@ -26,7 +24,7 @@ AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate 
 AC_ARG_WITH(local-libgcrypt, AS_HELP_STRING([--with-local-libgcrypt], [Build with libgcrypt (if present) instead of the enclosed gcrypt light]))
 AC_ARG_ENABLE(tls-sigs, AS_HELP_STRING([--enable-tls-sigs], [Enable TLS Client signature algorithm dissection. Rarely used, but requires significantly more memory.]))
 AC_ARG_ENABLE(npcap, AS_HELP_STRING([--disable-npcap], [msys2 only: Disable linkage against the wpcap/npcap import library in windows/WpdPack/Lib.]))
-AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom path; default: ${PWD}/../PF_RING/userland/nbpf]),[NBPF_HOME=$withval],[NBPF_HOME=${PWD}/../PF_RING/userland/nbpf])
+AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom path; default: ${srcdir}/../PF_RING/userland/nbpf]),[NBPF_HOME=$withval],[NBPF_HOME="`cd ${srcdir}/../PF_RING/userland/nbpf 2>/dev/null && pwd || echo ${srcdir}/../PF_RING/userland/nbpf`"])
 AC_ARG_WITH(lto-and-gold-linker, AS_HELP_STRING([--with-lto-and-gold-linker], [Build with LTO and Gold linker]))
 AC_ARG_ENABLE(debug-build, AS_HELP_STRING([--enable-debug-build], [Enable debug build (`-g` flag)]),[enable_debugbuild=$enableval],[enable_debugbuild=no])
 AC_ARG_ENABLE(global-context-support, AS_HELP_STRING([--disable-global-context-support], [Disable support for global context. No external dependency on libpthread]))
@@ -170,23 +168,23 @@ AC_DEFINE_UNQUOTED(NDPI_PATCH_LEVEL,   "${NDPI_PATCH}", [nDPI patch level])
 
 # .git as directory in a cloned repo
 # .git as file in submodule based integration
-if test -d ".git" || test -r ".git"; then
-     GIT_TAG=`git log -1 --abbrev=7 --format=%h`
-     GIT_DATE=`git log -1 --abbrev=7 --format=%cd`
+if test -d "${srcdir}/.git" || test -r "${srcdir}/.git"; then
+     GIT_TAG=`cd ${srcdir} && git log -1 --abbrev=7 --format=%h`
+     GIT_DATE=`cd ${srcdir} && git log -1 --abbrev=7 --format=%cd`
      #
      # On CentOS 6 `git rev-list HEAD --count` does not work
      #
      #
-     GIT_NUM=`git log --pretty=oneline | wc -l | tr -d '[[:space:]]'`
+     GIT_NUM=`cd ${srcdir} && git log --pretty=oneline | wc -l | tr -d '[[:space:]]'`
      GIT_RELEASE="${PACKAGE_VERSION}-${GIT_NUM}-${GIT_TAG}"
 
-     A=`git log src/include/ndpi_typedefs.h|wc -l`
-     B=`git log src/include/ndpi_protocol_ids.h|wc -l`
-     C=`git log src/include/ndpi_api.h|wc -l`
+     A=`cd ${srcdir} && git log src/include/ndpi_typedefs.h|wc -l`
+     B=`cd ${srcdir} && git log src/include/ndpi_protocol_ids.h|wc -l`
+     C=`cd ${srcdir} && git log src/include/ndpi_api.h|wc -l`
      NDPI_API_VERSION=$((A+B+C))
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
-     GIT_DATE=`date -u -r CHANGELOG.md`
+     GIT_DATE=`date -u -r ${srcdir}/CHANGELOG.md`
      if test -z "$SOURCE_DATE_EPOCH" ; then :
          SOURCE_DATE_EPOCH=`date +%s`
      fi
@@ -293,7 +291,7 @@ else
 fi
 
 if ! test -d $PCAP_HOME; then :
-     PCAP_HOME=`pwd`/../../PF_RING/userland
+     PCAP_HOME=${srcdir}/../../PF_RING/userland
 fi
 SHORT_MACHINE=`uname -m | cut -b1-3`
 if test $SHORT_MACHINE = "arm"; then
@@ -318,7 +316,7 @@ else
 fi
 
 CUSTOM_NDPI=
-if test -d ../nDPI-custom; then :
+if test -d ${srcdir}/../nDPI-custom; then :
    CUSTOM_NDPI="-DCUSTOM_NDPI_PROTOCOLS"
    AC_MSG_RESULT([Compiling with custom nDPI protocols])
 fi
@@ -458,7 +456,10 @@ if test "${with_maxminddb+set}" = set; then :
   fi
 fi
 
-AC_DEFINE_UNQUOTED(NDPI_BASE_DIR, "${PWD}", [nDPI base directory])
+dnl> Use absolute source directory for NDPI_BASE_DIR
+NDPI_ABS_SRCDIR="`cd ${srcdir} && pwd`"
+AC_DEFINE_UNQUOTED(NDPI_BASE_DIR, "${NDPI_ABS_SRCDIR}", [nDPI base directory])
+AC_SUBST(NDPI_BASE_DIR, "${NDPI_ABS_SRCDIR}")
 
 dnl> Curl
 dnl> AC_CHECK_LIB([curl], [curl_easy_perform])
@@ -471,6 +472,8 @@ dnl> fi
 
 AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile influxdb/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile fuzz/Makefile doc/Doxyfile.cfg utils/Makefile])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
+AC_CONFIG_FILES([tests/do-dga.sh], [chmod +x tests/do-dga.sh])
+AC_CONFIG_FILES([tests/do-unit.sh], [chmod +x tests/do-unit.sh])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(NDPI_MAJOR)

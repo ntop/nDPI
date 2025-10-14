@@ -15,11 +15,11 @@ bin_PROGRAMS += fuzz_readerutils_workflow
 bin_PROGRAMS += fuzz_ndpi_reader_pl7m fuzz_ndpi_reader_pl7m_64k fuzz_ndpi_reader_pl7m_simplest fuzz_ndpi_reader_pl7m_internal fuzz_ndpi_reader_pl7m_simplest_internal fuzz_ndpi_reader_pl7m_only_subclassification fuzz_ndpi_reader_pl7m_randomize_ports
 
 #Common flags
-AM_CPPFLAGS = -I ../src/lib/third_party/include/
+AM_CPPFLAGS = -I $(top_srcdir)/src/include -I $(top_srcdir)/src/lib/third_party/include/
 AM_LDFLAGS = $(LIBS)
 AM_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
 AM_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
-LDADD = $(PCAP_LIB) ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
+LDADD = $(PCAP_LIB) $(top_builddir)/src/lib/libndpi.a $(ADDITIONAL_LIBS)
 if HAS_FUZZLDFLAGS
 CFLAGS += $(LIB_FUZZING_ENGINE)
 LDFLAGS += $(LIB_FUZZING_ENGINE)
@@ -34,21 +34,21 @@ fuzz_process_packet_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_process_packet_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c
-fuzz_ndpi_reader_CFLAGS = -I../example/
+fuzz_ndpi_reader_CFLAGS = -I$(top_srcdir)/example/
 # force usage of CXX for linker
 fuzz_ndpi_reader_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader_alloc_fail.c fuzz_common_code.c ../example/reader_util.c
-fuzz_ndpi_reader_alloc_fail_CFLAGS = -I../example/ -DENABLE_MEM_ALLOC_FAILURES -DCRYPT_FORCE_NO_AESNI -DENABLE_FINGERPRINT_FP
+fuzz_ndpi_reader_alloc_fail_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DCRYPT_FORCE_NO_AESNI -DENABLE_FINGERPRINT_FP
 # force usage of CXX for linker
 fuzz_ndpi_reader_alloc_fail_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_alloc_fail_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_payload_analyzer_SOURCES = fuzz_ndpi_reader_payload_analyzer.c fuzz_common_code.c ../example/reader_util.c
-fuzz_ndpi_reader_payload_analyzer_CFLAGS = -I../example/ -DENABLE_MEM_ALLOC_FAILURES -DENABLE_PAYLOAD_ANALYZER
+fuzz_ndpi_reader_payload_analyzer_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DENABLE_PAYLOAD_ANALYZER
 # force usage of CXX for linker
 fuzz_ndpi_reader_payload_analyzer_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -348,56 +348,56 @@ fuzz_filecfg_category_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_filecfg_category_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_readerutils_workflow_SOURCES = fuzz_readerutils_workflow.cpp fuzz_common_code.c ../example/reader_util.c
-fuzz_readerutils_workflow_CXXFLAGS = -I../example/
+fuzz_readerutils_workflow_CXXFLAGS = -I$(top_srcdir)/example/
 # force usage of CXX for linker
 fuzz_readerutils_workflow_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_readerutils_workflow_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_pl7m_simplest_SOURCES = fuzz_ndpi_reader_pl7m_simplest.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_simplest_CFLAGS =  -I../example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR
+fuzz_ndpi_reader_pl7m_simplest_CFLAGS =  -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR
 # force usage of CXX for linker
 fuzz_ndpi_reader_pl7m_simplest_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_simplest_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_pl7m_simplest_internal_SOURCES = fuzz_ndpi_reader_pl7m_simplest_internal.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_simplest_internal_CFLAGS =  -I../example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
+fuzz_ndpi_reader_pl7m_simplest_internal_CFLAGS =  -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
 # force usage of CXX for linker
 fuzz_ndpi_reader_pl7m_simplest_internal_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_simplest_internal_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_pl7m_SOURCES = fuzz_ndpi_reader_pl7m.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_CFLAGS =  -I../example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_CONFIG2
+fuzz_ndpi_reader_pl7m_CFLAGS =  -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_CONFIG2
 # force usage of CXX for linker
 fuzz_ndpi_reader_pl7m_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_pl7m_64k_SOURCES = fuzz_ndpi_reader_pl7m_64k.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_64k_CFLAGS =  -I../example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_64K_PACKETS
+fuzz_ndpi_reader_pl7m_64k_CFLAGS =  -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_64K_PACKETS
 # force usage of CXX for linker
 fuzz_ndpi_reader_pl7m_64k_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_64k_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_pl7m_internal_SOURCES = fuzz_ndpi_reader_pl7m_internal.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_internal_CFLAGS =  -I../example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
+fuzz_ndpi_reader_pl7m_internal_CFLAGS =  -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
 # force usage of CXX for linker
 fuzz_ndpi_reader_pl7m_internal_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_internal_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_pl7m_only_subclassification_SOURCES = fuzz_ndpi_reader_pl7m_only_subclassification.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_only_subclassification_CFLAGS =  -I../example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_ONLY_SUBCLASSIFICATION
+fuzz_ndpi_reader_pl7m_only_subclassification_CFLAGS =  -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_ONLY_SUBCLASSIFICATION
 # force usage of CXX for linker
 fuzz_ndpi_reader_pl7m_only_subclassification_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ndpi_reader_pl7m_only_subclassification_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ndpi_reader_pl7m_randomize_ports_SOURCES = fuzz_ndpi_reader_pl7m_randomize_ports.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_randomize_ports_CFLAGS =  -I../example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_ENABLE_RANDOMIZE_PORTS
+fuzz_ndpi_reader_pl7m_randomize_ports_CFLAGS =  -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_ENABLE_RANDOMIZE_PORTS
 # force usage of CXX for linker
 fuzz_ndpi_reader_pl7m_randomize_ports_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -406,7 +406,7 @@ fuzz_ndpi_reader_pl7m_randomize_ports_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_L
 
 # required for Google oss-fuzz
 # see https://github.com/google/oss-fuzz/tree/master/projects/ndpi
-testpcaps := $(wildcard ../tests/cfgs/default/pcap/*.pcap*)
+testpcaps := $(wildcard $(top_srcdir)/tests/cfgs/default/pcap/*.pcap*)
 
 testpcaps.zip: $(testpcaps)
 	zip -j testpcaps.zip $(testpcaps)
@@ -441,118 +441,118 @@ fuzz_ndpi_reader_pl7m_only_subclassification_seed_corpus.zip: testpcaps.zip
 fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip: testpcaps.zip
 	cp testpcaps.zip fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip
 
-files_corpus_fuzz_quic_get_crypto_data :=  $(wildcard corpus/fuzz_quic_get_crypto_data/*)
+files_corpus_fuzz_quic_get_crypto_data :=  $(wildcard $(srcdir)/corpus/fuzz_quic_get_crypto_data/*)
 fuzz_quic_get_crypto_data_seed_corpus.zip: $(files_corpus_fuzz_quic_get_crypto_data)
 	zip -j fuzz_quic_get_crypto_data_seed_corpus.zip $(files_corpus_fuzz_quic_get_crypto_data)
 
-files_corpus_fuzz_serialization :=  $(wildcard corpus/fuzz_serialization/*)
+files_corpus_fuzz_serialization :=  $(wildcard $(srcdir)/corpus/fuzz_serialization/*)
 fuzz_serialization_seed_corpus.zip: $(files_corpus_fuzz_serialization)
 	zip -j fuzz_serialization_seed_corpus.zip $(files_corpus_fuzz_serialization)
 
-files_corpus_fuzz_community_id :=  $(wildcard corpus/fuzz_community_id/*)
+files_corpus_fuzz_community_id :=  $(wildcard $(srcdir)/corpus/fuzz_community_id/*)
 fuzz_community_id_seed_corpus.zip: $(files_corpus_fuzz_community_id)
 	zip -j fuzz_community_id_seed_corpus.zip $(files_corpus_fuzz_community_id)
 
-files_corpus_fuzz_is_stun_udp :=  $(wildcard corpus/fuzz_is_stun_udp/*)
+files_corpus_fuzz_is_stun_udp :=  $(wildcard $(srcdir)/corpus/fuzz_is_stun_udp/*)
 fuzz_is_stun_udp_seed_corpus.zip: $(files_corpus_fuzz_is_stun_udp)
 	zip -j fuzz_is_stun_udp_seed_corpus.zip $(files_corpus_fuzz_is_stun_udp)
 
-files_corpus_fuzz_is_stun_tcp :=  $(wildcard corpus/fuzz_is_stun_tcp/*)
+files_corpus_fuzz_is_stun_tcp :=  $(wildcard $(srcdir)/corpus/fuzz_is_stun_tcp/*)
 fuzz_is_stun_tcp_seed_corpus.zip: $(files_corpus_fuzz_is_stun_tcp)
 	zip -j fuzz_is_stun_tcp_seed_corpus.zip $(files_corpus_fuzz_is_stun_tcp)
 
-files_corpus_fuzz_alg_ses_des :=  $(wildcard corpus/fuzz_alg_ses_des/*)
+files_corpus_fuzz_alg_ses_des :=  $(wildcard $(srcdir)/corpus/fuzz_alg_ses_des/*)
 fuzz_alg_ses_des_seed_corpus.zip: $(files_corpus_fuzz_alg_ses_des)
 	zip -j fuzz_alg_ses_des_seed_corpus.zip $(files_corpus_fuzz_alg_ses_des)
 
-files_corpus_fuzz_alg_bins :=  $(wildcard corpus/fuzz_alg_bins/*)
+files_corpus_fuzz_alg_bins :=  $(wildcard $(srcdir)/corpus/fuzz_alg_bins/*)
 fuzz_alg_bins_seed_corpus.zip: $(files_corpus_fuzz_alg_bins)
 	zip -j fuzz_alg_bins_seed_corpus.zip $(files_corpus_fuzz_alg_bins)
 
-files_corpus_fuzz_alg_hll :=  $(wildcard corpus/fuzz_alg_hll/*)
+files_corpus_fuzz_alg_hll :=  $(wildcard $(srcdir)/corpus/fuzz_alg_hll/*)
 fuzz_alg_hll_seed_corpus.zip: $(files_corpus_fuzz_alg_hll)
 	zip -j fuzz_alg_hll_seed_corpus.zip $(files_corpus_fuzz_alg_hll)
 
-files_corpus_fuzz_alg_jitter :=  $(wildcard corpus/fuzz_alg_jitter/*)
+files_corpus_fuzz_alg_jitter :=  $(wildcard $(srcdir)/corpus/fuzz_alg_jitter/*)
 fuzz_alg_jitter_seed_corpus.zip: $(files_corpus_fuzz_alg_jitter)
 	zip -j fuzz_alg_jitter_seed_corpus.zip $(files_corpus_fuzz_alg_jitter)
 
-files_corpus_fuzz_alg_crc32_md5 :=  $(wildcard corpus/fuzz_alg_crc32_md5/*)
+files_corpus_fuzz_alg_crc32_md5 :=  $(wildcard $(srcdir)/corpus/fuzz_alg_crc32_md5/*)
 fuzz_alg_crc32_md5_seed_corpus.zip: $(files_corpus_fuzz_alg_crc32_md5)
 	zip -j fuzz_alg_crc32_md5_seed_corpus.zip $(files_corpus_fuzz_alg_crc32_md5)
 
-files_corpus_fuzz_ds_libcache :=  $(wildcard corpus/fuzz_ds_libcache/*)
+files_corpus_fuzz_ds_libcache :=  $(wildcard $(srcdir)/corpus/fuzz_ds_libcache/*)
 fuzz_ds_libcache_seed_corpus.zip: $(files_corpus_fuzz_ds_libcache)
 	zip -j fuzz_ds_libcache_seed_corpus.zip $(files_corpus_fuzz_ds_libcache)
 
-files_corpus_fuzz_ds_ptree :=  $(wildcard corpus/fuzz_ds_ptree/*)
+files_corpus_fuzz_ds_ptree :=  $(wildcard $(srcdir)/corpus/fuzz_ds_ptree/*)
 fuzz_ds_ptree_seed_corpus.zip: $(files_corpus_fuzz_ds_ptree)
 	zip -j fuzz_ds_ptree_seed_corpus.zip $(files_corpus_fuzz_ds_ptree)
 
-files_corpus_fuzz_alg_bytestream :=  $(wildcard corpus/fuzz_alg_bytestream/*)
+files_corpus_fuzz_alg_bytestream :=  $(wildcard $(srcdir)/corpus/fuzz_alg_bytestream/*)
 fuzz_alg_bytestream_seed_corpus.zip: $(files_corpus_fuzz_alg_bytestream)
 	zip -j fuzz_alg_bytestream_seed_corpus.zip $(files_corpus_fuzz_alg_bytestream)
 
-files_corpus_fuzz_libinjection :=  $(wildcard corpus/fuzz_libinjection/*)
+files_corpus_fuzz_libinjection :=  $(wildcard $(srcdir)/corpus/fuzz_libinjection/*)
 fuzz_libinjection_seed_corpus.zip: $(files_corpus_fuzz_libinjection)
 	zip -j fuzz_libinjection_seed_corpus.zip $(files_corpus_fuzz_libinjection)
 
-files_corpus_fuzz_tls_certificate :=  $(wildcard corpus/fuzz_tls_certificate/*)
+files_corpus_fuzz_tls_certificate :=  $(wildcard $(srcdir)/corpus/fuzz_tls_certificate/*)
 fuzz_tls_certificate_seed_corpus.zip: $(files_corpus_fuzz_tls_certificate)
 	zip -j fuzz_tls_certificate_seed_corpus.zip $(files_corpus_fuzz_tls_certificate)
 
-files_corpus_fuzz_filecfg_protocols :=  $(wildcard corpus/fuzz_filecfg_protocols/*)
+files_corpus_fuzz_filecfg_protocols :=  $(wildcard $(srcdir)/corpus/fuzz_filecfg_protocols/*)
 fuzz_filecfg_protocols_seed_corpus.zip: $(files_corpus_fuzz_filecfg_protocols)
 	zip -j fuzz_filecfg_protocols_seed_corpus.zip $(files_corpus_fuzz_filecfg_protocols)
 
-files_corpus_fuzz_filecfg_categories :=  $(wildcard corpus/fuzz_filecfg_categories/*)
+files_corpus_fuzz_filecfg_categories :=  $(wildcard $(srcdir)/corpus/fuzz_filecfg_categories/*)
 fuzz_filecfg_categories_seed_corpus.zip: $(files_corpus_fuzz_filecfg_categories)
 	zip -j fuzz_filecfg_categories_seed_corpus.zip $(files_corpus_fuzz_filecfg_categories)
 
-files_corpus_fuzz_filecfg_malicious_sha1 :=  $(wildcard corpus/fuzz_filecfg_malicious_sha1/*)
+files_corpus_fuzz_filecfg_malicious_sha1 :=  $(wildcard $(srcdir)/corpus/fuzz_filecfg_malicious_sha1/*)
 fuzz_filecfg_malicious_sha1_seed_corpus.zip: $(files_corpus_fuzz_filecfg_malicious_sha1)
 	zip -j fuzz_filecfg_malicious_sha1_seed_corpus.zip $(files_corpus_fuzz_filecfg_malicious_sha1)
 
-files_corpus_fuzz_filecfg_malicious_ja4 :=  $(wildcard corpus/fuzz_filecfg_malicious_ja4/*)
+files_corpus_fuzz_filecfg_malicious_ja4 :=  $(wildcard $(srcdir)/corpus/fuzz_filecfg_malicious_ja4/*)
 fuzz_filecfg_malicious_ja4_seed_corpus.zip: $(files_corpus_fuzz_filecfg_malicious_ja4)
 	zip -j fuzz_filecfg_malicious_ja4_seed_corpus.zip $(files_corpus_fuzz_filecfg_malicious_ja4)
 
-files_corpus_fuzz_filecfg_risk_domains :=  $(wildcard corpus/fuzz_filecfg_risk_domains/*)
+files_corpus_fuzz_filecfg_risk_domains :=  $(wildcard $(srcdir)/corpus/fuzz_filecfg_risk_domains/*)
 fuzz_filecfg_risk_domains_seed_corpus.zip: $(files_corpus_fuzz_filecfg_risk_domains)
 	zip -j fuzz_filecfg_risk_domains_seed_corpus.zip $(files_corpus_fuzz_filecfg_risk_domains)
 
-files_corpus_fuzz_filecfg_config :=  $(wildcard corpus/fuzz_filecfg_config/*)
+files_corpus_fuzz_filecfg_config :=  $(wildcard $(srcdir)/corpus/fuzz_filecfg_config/*)
 fuzz_filecfg_config_seed_corpus.zip: $(files_corpus_fuzz_filecfg_config)
 	zip -j fuzz_filecfg_config_seed_corpus.zip $(files_corpus_fuzz_filecfg_config)
 
-files_corpus_fuzz_filecfg_category :=  $(wildcard corpus/fuzz_filecfg_category/*)
+files_corpus_fuzz_filecfg_category :=  $(wildcard $(srcdir)/corpus/fuzz_filecfg_category/*)
 fuzz_filecfg_category_seed_corpus.zip: $(files_corpus_fuzz_filecfg_category)
 	zip -j fuzz_filecfg_category_seed_corpus.zip $(files_corpus_fuzz_filecfg_category)
 
-files_corpus_fuzz_readerutils_workflow :=  $(wildcard corpus/fuzz_readerutils_workflow/*)
+files_corpus_fuzz_readerutils_workflow :=  $(wildcard $(srcdir)/corpus/fuzz_readerutils_workflow/*)
 fuzz_readerutils_workflow_seed_corpus.zip: $(files_corpus_fuzz_readerutils_workflow)
 	zip -j fuzz_readerutils_workflow_seed_corpus.zip $(files_corpus_fuzz_readerutils_workflow)
 
-files_corpus_fuzz_ds_bitmap64_fuse :=  $(wildcard corpus/fuzz_ds_bitmap64_fuse/*)
+files_corpus_fuzz_ds_bitmap64_fuse :=  $(wildcard $(srcdir)/corpus/fuzz_ds_bitmap64_fuse/*)
 fuzz_ds_bitmap64_fuse_seed_corpus.zip: $(files_corpus_fuzz_ds_bitmap64_fuse)
 	zip -j fuzz_ds_bitmap64_fuse_seed_corpus.zip $(files_corpus_fuzz_ds_bitmap64_fuse)
 
-files_corpus_fuzz_ds_domain_classify :=  $(wildcard corpus/fuzz_ds_domain_classify/*)
+files_corpus_fuzz_ds_domain_classify :=  $(wildcard $(srcdir)/corpus/fuzz_ds_domain_classify/*)
 fuzz_ds_domain_classify_seed_corpus.zip: $(files_corpus_fuzz_ds_domain_classify)
 	zip -j fuzz_ds_domain_classify_seed_corpus.zip $(files_corpus_fuzz_ds_domain_classify)
 
 corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_ds_bitmap64_fuse_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip fuzz_ndpi_reader_pl7m_seed_corpus.zip fuzz_ndpi_reader_pl7m_64k_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_only_subclassification_seed_corpus.zip fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip fuzz_filecfg_malicious_ja4_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip
-	cp corpus/fuzz_*seed_corpus.zip .
+	cp $(srcdir)/corpus/fuzz_*seed_corpus.zip .
 
 #Create dictionaries exactly as expected by oss-fuzz.
 #This way, if we need to change/update/add something,
 #we don't need to update scripts in oss-fuzz repository
 dictionaries:
-	cp dictionary.dict fuzz_ndpi_reader.dict
-	cp dictionary.dict fuzz_ndpi_reader_alloc_fail.dict
-	cp dictionary.dict fuzz_ndpi_reader_payload_analyzer.dict
-	cp dictionary.dict fuzz_process_packet.dict
-	cp dictionary_tls_certificate.dict fuzz_tls_certificate.dict
+	cp $(srcdir)/dictionary.dict fuzz_ndpi_reader.dict
+	cp $(srcdir)/dictionary.dict fuzz_ndpi_reader_alloc_fail.dict
+	cp $(srcdir)/dictionary.dict fuzz_ndpi_reader_payload_analyzer.dict
+	cp $(srcdir)/dictionary.dict fuzz_process_packet.dict
+	cp $(srcdir)/dictionary_tls_certificate.dict fuzz_tls_certificate.dict
 
 clean:
 	rm -f *.o $(bin_PROGRAMS)
@@ -561,8 +561,8 @@ clean:
 	rm -f fuzz*.dict
 
 distdir:
-	find . -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
-	find . -type f -name '*.c' \
+	find $(srcdir) -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
+	find $(srcdir) -type f -name '*.c' \
 		-o -name '*.am' \
 		-o -name '*.h' \
 		-o -name '*.cpp' \
@@ -572,34 +572,34 @@ distdir:
 		-o -name 'bd_param.txt' \
 		-o -name 'splt_param.txt' \
 		-o -name 'random_list.list' \
-		-o -path './dictionary.dict' \
-		-o -path './dictionary_tls_certificate.dict' \
-		-o -path './corpus/fuzz_*.zip' \
-		-o -path './corpus/fuzz_quic_get_crypto_data/*' \
-		-o -path './corpus/fuzz_filecfg_protocols/*' \
-		-o -path './corpus/fuzz_filecfg_categories/*' \
-		-o -path './corpus/fuzz_filecfg_malicious_sha1/*' \
-		-o -path './corpus/fuzz_filecfg_malicious_ja4/*' \
-		-o -path './corpus/fuzz_filecfg_risk_domains/*' \
-		-o -path './corpus/fuzz_filecfg_config/*' \
-		-o -path './corpus/fuzz_filecfg_category/*' \
-		-o -path './corpus/fuzz_readerutils_workflow/*' \
-		-o -path './corpus/fuzz_is_stun_udp/*' \
-		-o -path './corpus/fuzz_is_stun_tcp/*' \
-		-o -path './corpus/fuzz_serialization/*' \
-		-o -path './corpus/fuzz_community_id/*' \
-		-o -path './corpus/fuzz_libinjection/*' \
-		-o -path './corpus/fuzz_tls_certificate/*' \
-		-o -path './corpus/fuzz_alg_ses_des/*' \
-		-o -path './corpus/fuzz_alg_bins/*' \
-		-o -path './corpus/fuzz_alg_hll/*' \
-		-o -path './corpus/fuzz_alg_jitter/*' \
-		-o -path './corpus/fuzz_alg_crc32_md5/*' \
-		-o -path './corpus/fuzz_alg_bytestream/*' \
-		-o -path './corpus/fuzz_ds_libcache/*' \
-		-o -path './corpus/fuzz_ds_bitmap64_fuse/*' \
-		-o -path './corpus/fuzz_ds_domain_classify/*' \
-		-o -path './corpus/fuzz_ds_ptree/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
+		-o -path '$(srcdir)/dictionary.dict' \
+		-o -path '$(srcdir)/dictionary_tls_certificate.dict' \
+		-o -path '$(srcdir)/corpus/fuzz_*.zip' \
+		-o -path '$(srcdir)/corpus/fuzz_quic_get_crypto_data/*' \
+		-o -path '$(srcdir)/corpus/fuzz_filecfg_protocols/*' \
+		-o -path '$(srcdir)/corpus/fuzz_filecfg_categories/*' \
+		-o -path '$(srcdir)/corpus/fuzz_filecfg_malicious_sha1/*' \
+		-o -path '$(srcdir)/corpus/fuzz_filecfg_malicious_ja4/*' \
+		-o -path '$(srcdir)/corpus/fuzz_filecfg_risk_domains/*' \
+		-o -path '$(srcdir)/corpus/fuzz_filecfg_config/*' \
+		-o -path '$(srcdir)/corpus/fuzz_filecfg_category/*' \
+		-o -path '$(srcdir)/corpus/fuzz_readerutils_workflow/*' \
+		-o -path '$(srcdir)/corpus/fuzz_is_stun_udp/*' \
+		-o -path '$(srcdir)/corpus/fuzz_is_stun_tcp/*' \
+		-o -path '$(srcdir)/corpus/fuzz_serialization/*' \
+		-o -path '$(srcdir)/corpus/fuzz_community_id/*' \
+		-o -path '$(srcdir)/corpus/fuzz_libinjection/*' \
+		-o -path '$(srcdir)/corpus/fuzz_tls_certificate/*' \
+		-o -path '$(srcdir)/corpus/fuzz_alg_ses_des/*' \
+		-o -path '$(srcdir)/corpus/fuzz_alg_bins/*' \
+		-o -path '$(srcdir)/corpus/fuzz_alg_hll/*' \
+		-o -path '$(srcdir)/corpus/fuzz_alg_jitter/*' \
+		-o -path '$(srcdir)/corpus/fuzz_alg_crc32_md5/*' \
+		-o -path '$(srcdir)/corpus/fuzz_alg_bytestream/*' \
+		-o -path '$(srcdir)/corpus/fuzz_ds_libcache/*' \
+		-o -path '$(srcdir)/corpus/fuzz_ds_bitmap64_fuse/*' \
+		-o -path '$(srcdir)/corpus/fuzz_ds_domain_classify/*' \
+		-o -path '$(srcdir)/corpus/fuzz_ds_ptree/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 	find . -type l -name '*.c' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 
 all: corpus dictionaries

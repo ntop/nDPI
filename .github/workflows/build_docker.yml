@@ -50,7 +50,7 @@ jobs:
             "apt-get -y update &&
             apt-get -y install git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
             git config --global --add safe.directory $(realpath .) &&
-            env CC=gcc ./autogen.sh --enable-option-checking=fatal --enable-debug-messages &&
+            env CC=gcc ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages &&
             make -j $(nproc) all &&
             make -C example ndpiSimpleIntegration &&
             make -C rrdtool &&
@@ -74,7 +74,7 @@ jobs:
             "apt-get -y update &&
             apt-get -y install git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
             git config --global --add safe.directory $(realpath .) &&
-            env CC=gcc ./autogen.sh --enable-option-checking=fatal --enable-debug-messages &&
+            env CC=gcc ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages &&
             make -j $(nproc) all &&
             make -C example ndpiSimpleIntegration &&
             make -C rrdtool &&

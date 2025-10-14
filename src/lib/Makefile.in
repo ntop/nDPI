@@ -5,6 +5,12 @@
 # cd src/lib
 # make Makefile
 #
+# Support for out-of-tree builds (VPATH)
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+top_builddir = @top_builddir@
+VPATH = @srcdir@:@srcdir@/protocols:@srcdir@/third_party/src:@srcdir@/third_party/src/hll
+
 AR = @AR@
 CC = @CC@
 RANLIB = @RANLIB@
@@ -23,17 +29,17 @@ endif
 ifneq ($(OS),Windows_NT)
 CFLAGS     += -fPIC -DPIC
 endif
-CFLAGS     += -I. -I../include -Ithird_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
+CFLAGS     += -I$(srcdir) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include -I$(srcdir)/third_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
 CFLAGS_ndpi_bitmap.c := -Wno-unused-function
 CFLAGS_ndpi_bitmap64_fuse.c := -Wno-unused-function
-CFLAGS_third_party/src/gcrypt_light.c := -Wno-unused-function -Wno-unused-parameter
-CFLAGS_third_party/src/ahocorasick.c := -Wno-unused-function -Wno-unused-parameter
-CFLAGS_third_party/src/roaring.c := -Wno-unused-function -Wno-attributes
+CFLAGS_gcrypt_light.c := -Wno-unused-function -Wno-unused-parameter
+CFLAGS_ahocorasick.c := -Wno-unused-function -Wno-unused-parameter
+CFLAGS_roaring.c := -Wno-unused-function -Wno-attributes
 LDFLAGS    += @NDPI_LDFLAGS@
 LIBS       = @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
 
-OBJECTS   = $(patsubst protocols/%.c, protocols/%.o, $(wildcard protocols/*.c)) $(patsubst third_party/src/%.c, third_party/src/%.o, $(wildcard third_party/src/*.c)) $(patsubst third_party/src/hll/%.c, third_party/src/hll/%.o, $(wildcard third_party/src/hll/*.c)) $(patsubst ./%.c, ./%.o, $(wildcard ./*.c))
-HEADERS   = $(wildcard ../include/*.h) $(wildcard *.h)
+OBJECTS   = $(patsubst $(srcdir)/protocols/%.c, %.o, $(wildcard $(srcdir)/protocols/*.c)) $(patsubst $(srcdir)/third_party/src/%.c, %.o, $(wildcard $(srcdir)/third_party/src/*.c)) $(patsubst $(srcdir)/third_party/src/hll/%.c, %.o, $(wildcard $(srcdir)/third_party/src/hll/*.c)) $(patsubst $(srcdir)/%.c, %.o, $(wildcard $(srcdir)/*.c))
+HEADERS   = $(wildcard $(top_srcdir)/src/include/*.h) $(wildcard $(top_builddir)/src/include/*.h) $(wildcard $(srcdir)/*.h)
 NDPI_VERSION_MAJOR   = @NDPI_MAJOR@
 NDPI_LIB_STATIC      = libndpi.a
 NDPI_LIB_SHARED_BASE = libndpi.so
@@ -62,7 +68,7 @@ endif
 
 all: $(NDPI_LIBS)
 
-ndpi_main.c: ndpi_content_match.c.inc
+ndpi_main.o: $(srcdir)/ndpi_content_match.c.inc
 
 $(NDPI_LIB_STATIC): $(OBJECTS)
 	   $(AR) rc $@ $(OBJECTS)
@@ -74,17 +80,17 @@ $(NDPI_LIB_SHARED): $(OBJECTS)
 	ln -fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
 
 %.o: %.c $(HEADERS) Makefile
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(CFLAGS_$<) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(CFLAGS_$(notdir $<)) -c $< -o $@
 
 clean:
 	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo libndpi.so*
 
 distdir:
-	find . -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
-	find ../include -type f -name '*.h' \
+	find $(srcdir) -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
+	find $(top_srcdir)/src/include -type f -name '*.h' \
 		-a '!' -name 'ndpi_config.h' \
 		-a '!' -name 'ndpi_define.h' | xargs -I'{}' cp '{}' '$(distdir)/{}'
-	find . -type f -name '*.c' \
+	find $(srcdir) -type f -name '*.c' \
 		-o -name '*.cc' \
 		-o -name '*.c.inc' \
 		-o -name '*.h' | xargs -I'{}' cp '{}' '$(distdir)/{}'
@@ -96,7 +102,7 @@ check:
 	true # nothing to do here
 
 cppcheck:
-	cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I ../include *.c protocols/*.c
+	cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I $(top_srcdir)/src/include $(srcdir)/*.c $(srcdir)/protocols/*.c
 
 install: $(NDPI_LIBS)
 	mkdir -p $(DESTDIR)@libdir@
@@ -105,4 +111,4 @@ install: $(NDPI_LIBS)
 	cp -P $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) $(DESTDIR)@libdir@/
 	mkdir -p $(DESTDIR)@includedir@
 	#Avoid installing private header
-	find ../include/*.h ! -name ndpi_private.h -exec cp "{}" $(DESTDIR)@includedir@/ \;
+	find $(top_srcdir)/src/include/*.h ! -name ndpi_private.h -exec cp "{}" $(DESTDIR)@includedir@/ \;

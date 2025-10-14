@@ -42,6 +42,6 @@ fi
 
 autoreconf -ivf
 
-echo "./configure $*"
-chmod +x configure
-./configure "$@"
+#####
+# Don't call `configure` here!!!! It breaks out-of-tree builds
+#####

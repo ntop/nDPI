@@ -7,7 +7,7 @@
   - export CXX=/usr/bin/clang++-18
   - export LD=/usr/bin/ld.lld-18
 - Run autogen.sh
-  - ./autogen.sh --with-sanitizer --enable-fuzztargets 
+  - ./autogen.sh && ./configure --with-sanitizer --enable-fuzztargets 
 
 
 ## Testing nDPI with ClusterFuzz Artifacts

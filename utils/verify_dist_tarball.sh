@@ -12,7 +12,7 @@ git ls-tree --full-tree --name-only -r HEAD | grep -vE "${EXCLUDE_PATTERN}" | so
 TARBALL="${1}"
 if [ -z "${TARBALL}" ]; then
 	if [ ! -r Makefile ]; then
-		./autogen.sh
+		./autogen.sh && ./configure
 	fi
 	make dist
 	AC_VERSION="$(sed -n 's/^AC_INIT.*\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*$/\1/gp' < configure.ac)"

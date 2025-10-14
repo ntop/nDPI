@@ -56,7 +56,11 @@ NBPF_ENABLED=@NBPF_ENABLED@
 NBPF_PCAPS="h323-overflow.pcap"
 GLOBAL_CONTEXT_ENABLED=@GLOBAL_CONTEXT_ENABLED@
 GLOBAL_CONTEXT_CFGS="caches_global"
-READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,../../../example/config.txt -A -p ../../../example/protos.txt -c ../../../example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja4_fingerprints.csv -S ../../../example/sha1_fingerprints.csv -G ../../../lists -q -K JSON -k /dev/null -t -v 2"
+TOP_BUILDDIR="@top_builddir@"
+TOP_SRCDIR="@top_srcdir@"
+ABS_SRCDIR=@NDPI_BASE_DIR@
+ABS_BUILDDIR=$(cd ${TOP_BUILDDIR} && pwd)
+READER="${CMD_PREFIX} ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,${ABS_SRCDIR}/example/config.txt -A -p ${ABS_SRCDIR}/example/protos.txt -c ${ABS_SRCDIR}/example/categories.txt -r ${ABS_SRCDIR}/example/risky_domains.txt -j ${ABS_SRCDIR}/example/ja4_fingerprints.csv -S ${ABS_SRCDIR}/example/sha1_fingerprints.csv -G ${ABS_SRCDIR}/lists -q -K JSON -k /dev/null -t -v 2"
 
 
 #These exports are used in parallel mode
@@ -74,8 +78,8 @@ export FORCE_PARALLEL_UTESTS
 
 RC=0
 
-if [ ! -x "../example/ndpiReader${EXE_SUFFIX}" ]; then
-  echo "$0: Missing ../example/ndpiReader${EXE_SUFFIX}"
+if [ ! -x "${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX}" ]; then
+  echo "$0: Missing ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX}"
   echo "$0: Run ./configure and make first"
   exit 1
 fi
@@ -104,13 +108,13 @@ else
 fi
 
 fuzzy_testing() {
-    if [ -f ../fuzz/fuzz_ndpi_reader ]; then
-	cp ../example/protos.txt .
-	cp ../example/categories.txt .
-	cp ../example/risky_domains.txt .
-	cp ../example/ja4_fingerprints.csv .
-	cp ../example/sha1_fingerprints.csv .
-	../fuzz/fuzz_ndpi_reader -dict=../fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" cfgs/default/pcap/
+    if [ -f ${ABS_BUILDDIR}/fuzz/fuzz_ndpi_reader ]; then
+	cp ${TOP_SRCDIR}/example/protos.txt .
+	cp ${TOP_SRCDIR}/example/categories.txt .
+	cp ${TOP_SRCDIR}/example/risky_domains.txt .
+	cp ${TOP_SRCDIR}/example/ja4_fingerprints.csv .
+	cp ${TOP_SRCDIR}/example/sha1_fingerprints.csv .
+	${ABS_BUILDDIR}/fuzz/fuzz_ndpi_reader -dict=${TOP_SRCDIR}/fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" cfgs/default/pcap/
 	rm -f protos.txt categories.txt risky_domains.txt ja4_fingerprints.csv sha1_fingerprints.csv
     fi
 }
@@ -215,10 +219,10 @@ check_results() {
 
     if [ ${GPROF_ENABLED} -eq 1 ]; then
       GPROF_ARGS='-nodecount 100 -nodefraction 0 -symbolize=fastlocal'
-      ${GPROF} -top ${GPROF_ARGS} ../../../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
-      ${GPROF} -png -output ./result/cpu_profile.png ${GPROF_ARGS} ../../../example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
-      ${GPROF} -top ${GPROF_ARGS} -sample_index=alloc_space  ../../../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
-      ${GPROF} -png -output ./result/heap_profile.png ${GPROF_ARGS} -sample_index=alloc_space ../../../example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
+      ${GPROF} -top ${GPROF_ARGS} ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -png -output ./result/cpu_profile.png ${GPROF_ARGS} ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -top ${GPROF_ARGS} -sample_index=alloc_space  ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
+      ${GPROF} -png -output ./result/heap_profile.png ${GPROF_ARGS} -sample_index=alloc_space ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
     fi
 }
 
@@ -226,7 +230,7 @@ if [ $FUZZY_TESTING_ENABLED -eq 1 ]; then
     fuzzy_testing
 fi
 
-for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
+for d in $(find ${ABS_SRCDIR}/tests/cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
 
     SKIP_CFG=0
     if [ $GLOBAL_CONTEXT_ENABLED -eq 0 ]; then
@@ -242,7 +246,7 @@ for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
         continue
     fi
 
-    cd ./cfgs/"$(basename "$d")" || exit 1
+    cd ${ABS_SRCDIR}/tests/cfgs/"$(basename "$d")" || exit 1
 
     if [ $TEST_ONLY_RECENTLY_UPDATED_PCAPS -eq 1 ]; then
         # Latest 10 pcaps updatetd recently (to be more precise, pcap which triggered a change
@@ -267,7 +271,7 @@ for d in $(find ./cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
     test ${#FAILURES} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
     test ${#FAILURES} -ne 0 && echo "Failed: " "${FAILURES[@]}"
 
-    cd ../../
+    cd ${ABS_SRCDIR}/tests
 done
 
 exit $RC

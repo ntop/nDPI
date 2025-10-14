@@ -13,18 +13,24 @@ A generic FAQ about nDPI is available [here](https://github.com/ntop/nDPI/blob/d
 
 In order to compile this project do
 
-- ./autogen.sh
+- ./autogen.sh && ./configure
 - make
 
 If you get some errors while compiling `croaring.c`, try:
 
-- ./autogen.sh --enable-old-croaring
+- ./autogen.sh && ./configure --enable-old-croaring
 - make
 
 To compile the library w/o any tools or tests:
 
-- ./autogen.sh --with-only-libndpi
+- ./autogen.sh && ./configure --with-only-libndpi
 - make
+
+Out-of-tree builds are supported:
+- ./autogen.sh
+- mkdir build
+- cd build
+- ../configure && make
 
 To run tests do additionally:
 
@@ -85,7 +91,7 @@ The entire procedure of adding new protocols in detail:
 5. Choose (do not change anything) a selection bitmask from: `src/include/ndpi_define.h`
 6. Set protocol default ports in `ndpi_init_protocol_defaults` in: `src/lib/ndpi_main.c`
 7. Be sure to have nBPF support, cloning `PF_RING` in the same directory where you cloned `nDPI`: `git clone https://github.com/ntop/PF_RING/ && cd PF_RING/userland/nbpf && ./configure && make`. You can ignore the `/bin/sh: 1: ../lib/pfring_config: not found` error
-8. From the `nDPI` root directory, `./autogen.sh --with-pcre2` (nBPF and PCRE2 are usually optional, but they are needed to run/update *all* the unit tests)
+8. From the `nDPI` root directory, `./autogen.sh && ./configure --with-pcre2` (nBPF and PCRE2 are usually optional, but they are needed to run/update *all* the unit tests)
 9. `make`
 10. `make check`
 11. Update the documentation, adding this new protocol to `doc/protocols.rst`
