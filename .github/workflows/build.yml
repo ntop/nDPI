@@ -307,7 +307,6 @@ jobs:
     name: Out-of-tree builds
     runs-on: ubuntu-latest
     env:
-      CC: ${{ matrix.compiler }}
       CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
     steps:
       - uses: actions/checkout@v4
