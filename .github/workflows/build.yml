@@ -332,7 +332,7 @@ jobs:
         run: |
           mkdir -p build-fuzzing
           cd build-fuzzing
-          AR=llvm-ar RANLIB=llvm-ranlib CC=clang CXX=clang++ ../configure --with-sanitizer --enable-fuzztargets
+          CC=clang CXX=clang++ ../configure --with-sanitizer --enable-fuzztargets
           make -j $(nproc) all
           make -j $(nproc) -C example ndpiSimpleIntegration
           make -j $(nproc) -C rrdtool
