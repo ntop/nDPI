@@ -322,7 +322,7 @@ jobs:
       - name: Configure and build nDPI (standard)
         run: |
           mkdir -p build-standard
-          cd standard
+          cd build-standard
           ./configure
           make -j $(nproc) all
           make -j $(nproc) -C example ndpiSimpleIntegration
@@ -331,7 +331,7 @@ jobs:
       - name: Configure and build nDPI (fuzzing)
         run: |
           mkdir -p build-fuzzing
-          cd fuzzing
+          cd build-fuzzing
           CC=clang CXX=clang++ ./configure --with-sanitizer --enable-fuzztargets
           make -j $(nproc) all
           make -j $(nproc) -C example ndpiSimpleIntegration
