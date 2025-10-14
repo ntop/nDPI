@@ -339,5 +339,13 @@ jobs:
           cd -
       - name: Print nDPI long help
         run: |
-          cd ./build-standard/example && ./ndpiReader -H
-          cd ./build-fuzzing/example && ./ndpiReader -H
+          cd ./build-standard/example && ./ndpiReader -H && cd -
+          cd ./build-fuzzing/example && ./ndpiReader -H && cd -
+      - name: Tests
+        run: |
+          cd build-standard
+          make check # all tests
+          cd -
+          cd build-fuzzing
+          NDPI_FORCE_PARALLEL_UTESTS=1 ./tests/do.sh # Less tests with sanitizer to be faster
+          cd -
