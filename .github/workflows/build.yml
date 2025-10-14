@@ -259,7 +259,7 @@ jobs:
           sudo apt-get install autoconf automake debhelper libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev parallel
       - name: Configure nDPI
         run: |
-          AR=${{ matrix.ar }} RANLIB=${{ matrix.ranlib }} ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --with-sanitizer --with-lto-and-gold-linker
+          ./autogen.sh && AR=${{ matrix.ar }} RANLIB=${{ matrix.ranlib }} ./configure --enable-option-checking=fatal --enable-debug-messages --with-sanitizer --with-lto-and-gold-linker
       - name: Build nDPI
         run: |
           make -j $(nproc) all
@@ -323,7 +323,7 @@ jobs:
         run: |
           mkdir -p build-standard
           cd build-standard
-          ./configure
+          ../configure
           make -j $(nproc) all
           make -j $(nproc) -C example ndpiSimpleIntegration
           make -j $(nproc) -C rrdtool
@@ -332,7 +332,7 @@ jobs:
         run: |
           mkdir -p build-fuzzing
           cd build-fuzzing
-          CC=clang CXX=clang++ ./configure --with-sanitizer --enable-fuzztargets
+          AR=llvm-ar RANLIB=llvm-ranlib CC=clang CXX=clang++ ../configure --with-sanitizer --enable-fuzztargets
           make -j $(nproc) all
           make -j $(nproc) -C example ndpiSimpleIntegration
           make -j $(nproc) -C rrdtool
