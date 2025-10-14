@@ -328,7 +328,7 @@ jobs:
           make -j $(nproc) -C example ndpiSimpleIntegration
           make -j $(nproc) -C rrdtool
           cd -
-       - name: Configure and build nDPI (fuzzing)
+      - name: Configure and build nDPI (fuzzing)
         run: |
           mkdir -p build-fuzzing
           cd fuzzing
