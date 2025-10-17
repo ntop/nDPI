@@ -23,6 +23,12 @@ Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   15/0 (search/found)
 Patricia protocols:   0/0 (search/found)
 Patricia protocols IPv6: 18/12 (search/found)
+Hash malicious ja4:        6/0 (search/found)
+Hash malicious sha1:       6/0 (search/found)
+Hash TCP fingerprints:     6/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    6/0 (search/found)
+Hash fp custom protos:     8/0 (search/found)
 
 ntop	80	36401	4
 TLS	26	3245	7

@@ -2140,6 +2140,11 @@ extern "C" {
    */
   int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_t value);
 
+  void ndpi_hash_get_stats(ndpi_str_hash *h, struct ndpi_str_hash_stats *stats);
+  int ndpi_get_hash_stats(struct ndpi_detection_module_struct *ndpi_struct,
+                          str_hash_type hash_type,
+                          struct ndpi_str_hash_stats *stats);
+
   /* ******************************* */
 
   int ndpi_load_geoip(struct ndpi_detection_module_struct *ndpi_str,

@@ -395,6 +395,7 @@ void ndpi_stats_reset(ndpi_stats_t *s) {
   memset(s->lru_stats, 0, sizeof(s->lru_stats));
   memset(s->automa_stats, 0, sizeof(s->automa_stats));
   memset(s->patricia_stats, 0, sizeof(s->patricia_stats));
+  memset(s->hash_stats, 0, sizeof(s->hash_stats));
 
   if (s->protocol_counter)           memset(s->protocol_counter,           0, sizeof(u_int64_t) * s->num_protocols);
   if (s->protocol_counter_bytes)     memset(s->protocol_counter_bytes,     0, sizeof(u_int64_t) * s->num_protocols);

@@ -398,6 +398,7 @@ typedef struct ndpi_stats {
   struct ndpi_lru_cache_stats lru_stats[NDPI_LRUCACHE_MAX];
   struct ndpi_automa_stats automa_stats[NDPI_AUTOMA_MAX];
   struct ndpi_patricia_tree_stats patricia_stats[NDPI_PTREE_MAX];
+  struct ndpi_str_hash_stats hash_stats[NDPI_STR_HASH_MAX];
 } ndpi_stats_t;
 
 

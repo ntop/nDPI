@@ -4339,6 +4339,14 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       cumulative_stats.patricia_stats[i].n_search += s.n_search;
       cumulative_stats.patricia_stats[i].n_found += s.n_found;
     }
+
+    /* Hashes */
+    for(i = 0; i < NDPI_STR_HASH_MAX; i++) {
+      struct ndpi_str_hash_stats s;
+      ndpi_get_hash_stats(ndpi_thread_info[thread_id].workflow->ndpi_struct, i, &s);
+      cumulative_stats.hash_stats[i].n_search += s.n_search;
+      cumulative_stats.hash_stats[i].n_found += s.n_found;
+    }
   }
 
   if(cumulative_stats.total_wire_bytes == 0)
@@ -4526,6 +4534,25 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_search,
 	     (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_found);
 
+      printf("\tHash malicious ja4:        %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_MALICIOUS_JA4].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_MALICIOUS_JA4].n_found);
+      printf("\tHash malicious sha1:       %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_MALICIOUS_SHA1].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_MALICIOUS_SHA1].n_found);
+      printf("\tHash TCP fingerprints:     %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_TCP_FINGERPRINTS].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_TCP_FINGERPRINTS].n_found);
+      printf("\tHash public domain suffix: %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_PUBLIC_DOMAIN_SUFFIX].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_PUBLIC_DOMAIN_SUFFIX].n_found);
+      printf("\tHash ja4 custom protos:    %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_JA4_CUSTOM_PROTOS].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_JA4_CUSTOM_PROTOS].n_found);
+      printf("\tHash fp custom protos:     %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_FP_CUSTOM_PROTOS].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_FP_CUSTOM_PROTOS].n_found);
+
       if(enable_malloc_bins)
 	printf("\tData-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
     }
@@ -4635,6 +4662,25 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
       fprintf(results_file, "Patricia protocols IPv6: %llu/%llu (search/found)\n",
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_search,
 	      (long long unsigned int)cumulative_stats.patricia_stats[NDPI_PTREE_PROTOCOLS6].n_found);
+
+      fprintf(results_file, "Hash malicious ja4:        %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_MALICIOUS_JA4].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_MALICIOUS_JA4].n_found);
+      fprintf(results_file, "Hash malicious sha1:       %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_MALICIOUS_SHA1].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_MALICIOUS_SHA1].n_found);
+      fprintf(results_file, "Hash TCP fingerprints:     %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_TCP_FINGERPRINTS].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_TCP_FINGERPRINTS].n_found);
+      fprintf(results_file, "Hash public domain suffix: %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_PUBLIC_DOMAIN_SUFFIX].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_PUBLIC_DOMAIN_SUFFIX].n_found);
+      fprintf(results_file, "Hash ja4 custom protos:    %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_JA4_CUSTOM_PROTOS].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_JA4_CUSTOM_PROTOS].n_found);
+      fprintf(results_file, "Hash fp custom protos:     %llu/%llu (search/found)\n",
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_FP_CUSTOM_PROTOS].n_search,
+             (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_FP_CUSTOM_PROTOS].n_found);
 
       if(enable_malloc_bins)
         fprintf(results_file, "Data-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
@@ -5781,7 +5827,7 @@ void hashUnitTest() {
   u_int32_t i;
 
   assert(ndpi_hash_init(&h) == 0);
-  assert(h == NULL);
+  assert(h->priv == NULL);
 
   for(i=0; dict[i] != NULL; i++) {
     u_int8_t l = strlen(dict[i]);

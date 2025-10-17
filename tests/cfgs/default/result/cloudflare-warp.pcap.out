@@ -24,6 +24,12 @@ Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   10/8 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        4/0 (search/found)
+Hash malicious sha1:       2/0 (search/found)
+Hash TCP fingerprints:     6/6 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    4/0 (search/found)
+Hash fp custom protos:     3/0 (search/found)
 
 Jabber	11	890	1
 TLS	5	294	2

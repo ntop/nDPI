@@ -756,6 +756,22 @@ struct ndpi_automa_stats {
 };
 
 typedef enum {
+  NDPI_STR_HASH_MALICIOUS_JA4 = 0,
+  NDPI_STR_HASH_MALICIOUS_SHA1,
+  NDPI_STR_HASH_TCP_FINGERPRINTS,
+  NDPI_STR_HASH_PUBLIC_DOMAIN_SUFFIX,
+  NDPI_STR_HASH_JA4_CUSTOM_PROTOS,
+  NDPI_STR_HASH_FP_CUSTOM_PROTOS,
+
+  NDPI_STR_HASH_MAX       /* Last one! */
+} str_hash_type;
+
+struct ndpi_str_hash_stats {
+  u_int64_t n_search;
+  u_int64_t n_found;
+};
+
+typedef enum {
   NDPI_LRUCACHE_OOKLA = 0,
   NDPI_LRUCACHE_BITTORRENT,
   NDPI_LRUCACHE_STUN,
@@ -1256,7 +1272,10 @@ typedef struct _ndpi_automa {
   struct ndpi_automa_stats stats;
 } ndpi_automa;
 
-typedef void ndpi_str_hash;
+typedef struct ndpi_str_hash {
+  void *priv;
+  struct ndpi_str_hash_stats stats;
+} ndpi_str_hash;
 
 typedef struct {
   /*

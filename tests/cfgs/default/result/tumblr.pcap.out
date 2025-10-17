@@ -22,6 +22,12 @@ Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   47/0 (search/found)
 Patricia protocols:   0/0 (search/found)
 Patricia protocols IPv6: 73/21 (search/found)
+Hash malicious ja4:        9/0 (search/found)
+Hash malicious sha1:       1/0 (search/found)
+Hash TCP fingerprints:     9/9 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    9/0 (search/found)
+Hash fp custom protos:     19/0 (search/found)
 
 Yahoo	31	9933	1
 Tumblr	84	38260	2

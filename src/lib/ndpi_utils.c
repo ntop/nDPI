@@ -2855,15 +2855,17 @@ int ndpi_hash_init(ndpi_str_hash **h) {
   if (h == NULL)
     return 1;
 
-  *h = NULL;
+  *h = ndpi_calloc(1, sizeof(**h));
+  if(!*h)
+    return 1;
   return 0;
 }
 
 /* ******************************************************************** */
 
 void ndpi_hash_free(ndpi_str_hash **h) {
-  if(h != NULL) {
-    ndpi_str_hash_priv *h_priv = *((ndpi_str_hash_priv **)h);
+  if(h && *h) {
+    ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)((*h)->priv);
     ndpi_str_hash_priv *current, *tmp;
 
     HASH_ITER(hh, h_priv, current, tmp) {
@@ -2872,6 +2874,7 @@ void ndpi_hash_free(ndpi_str_hash **h) {
       ndpi_free(current);
     }
 
+    ndpi_free(*h);
     *h = NULL;
   }
 }
@@ -2879,18 +2882,22 @@ void ndpi_hash_free(ndpi_str_hash **h) {
 /* ******************************************************************** */
 
 int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int32_t *value) {
-  ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)h;
+  ndpi_str_hash_priv *h_priv;
   ndpi_str_hash_priv *item;
 
-  if(!key || key_len == 0)
+  if(!h || !key || key_len == 0)
     return(2);
 
+  h_priv = (ndpi_str_hash_priv *)((h)->priv);
+
+  h->stats.n_search++;
   HASH_FIND(hh, h_priv, key, key_len, item);
 
   if (item != NULL) {
     if(value != NULL)
       *value = item->value32;
 
+    h->stats.n_found++;
     return 0;
   } else
     return 1;
@@ -2899,11 +2906,13 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int32_t *
 /* ******************************************************************** */
 
 int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_t value) {
-  ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)*h;
+  ndpi_str_hash_priv *h_priv;
   ndpi_str_hash_priv *item, *ret_found;
 
-  if(!key || key_len == 0)
+  if(!h || !*h || !key || key_len == 0)
     return(3);
+
+  h_priv = (ndpi_str_hash_priv *)((*h)->priv);
 
   HASH_FIND(hh, h_priv, key, key_len, item);
 
@@ -2928,9 +2937,9 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_
 
   item->value32 = value;
 
-  HASH_ADD(hh, *((ndpi_str_hash_priv **)h), key[0], key_len, item);
+  HASH_ADD(hh, *(ndpi_str_hash_priv **)&((*h)->priv), key[0], key_len, item);
 
-  HASH_FIND(hh, *((ndpi_str_hash_priv **)h), key, key_len, ret_found);
+  HASH_FIND(hh, *(ndpi_str_hash_priv **)&((*h)->priv), key, key_len, ret_found);
   if(ret_found == NULL) { /* The insertion failed (because of a memory allocation error) */
     ndpi_free(item->key);
     ndpi_free(item);
@@ -2938,6 +2947,56 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_
   }
 
   return 0;
+}
+
+/* ******************************************************************** */
+
+void ndpi_hash_get_stats(ndpi_str_hash *h, struct ndpi_str_hash_stats *stats) {
+  if(h) {
+    stats->n_search = h->stats.n_search;
+    stats->n_found = h->stats.n_found;
+  } else {
+    stats->n_search = 0;
+    stats->n_found = 0;
+  }
+}
+/* ******************************************************************** */
+
+int ndpi_get_hash_stats(struct ndpi_detection_module_struct *ndpi_struct,
+                        str_hash_type hash_type,
+                        struct ndpi_str_hash_stats *stats)
+{
+  if(!ndpi_struct || !stats)
+    return -1;
+
+  switch(hash_type) {
+  case NDPI_STR_HASH_MALICIOUS_JA4:
+    ndpi_hash_get_stats(ndpi_struct->malicious_ja4_hashmap, stats);
+    return 0;
+
+  case NDPI_STR_HASH_MALICIOUS_SHA1:
+    ndpi_hash_get_stats(ndpi_struct->malicious_sha1_hashmap, stats);
+    return 0;
+
+  case NDPI_STR_HASH_TCP_FINGERPRINTS:
+    ndpi_hash_get_stats(ndpi_struct->tcp_fingerprint_hashmap, stats);
+    return 0;
+
+  case NDPI_STR_HASH_PUBLIC_DOMAIN_SUFFIX:
+    ndpi_hash_get_stats(ndpi_struct->public_domain_suffixes, stats);
+    return 0;
+
+  case NDPI_STR_HASH_JA4_CUSTOM_PROTOS:
+    ndpi_hash_get_stats(ndpi_struct->ja4_custom_protos, stats);
+    return 0;
+
+  case NDPI_STR_HASH_FP_CUSTOM_PROTOS:
+    ndpi_hash_get_stats(ndpi_struct->ndpifp_custom_protos, stats);
+    return 0;
+
+  default:
+    return -1;
+  }
 }
 
 /* ********************************************************************************* */

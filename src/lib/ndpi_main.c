@@ -4759,6 +4759,16 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   if(ndpi_str->cfg.track_payload_enabled)
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
 
+  /* Reset hash statistics: we are interested only on "runtime" search/found,
+     not the ones during the init phase.
+     See ndpi_add_tcp_fingerprint() where we call ndpi_hash_find_entry() to
+     avoid duplicates.
+     TODO: similar code for the other hashes? */
+  if(ndpi_str->tcp_fingerprint_hashmap) {
+    ndpi_str->tcp_fingerprint_hashmap->stats.n_found = 0;
+    ndpi_str->tcp_fingerprint_hashmap->stats.n_search = 0;
+  }
+
   ndpi_str->finalized = 1;
 
   return 0;
