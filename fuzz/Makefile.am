@@ -15,9 +15,9 @@ bin_PROGRAMS += fuzz_readerutils_workflow
 bin_PROGRAMS += fuzz_ndpi_reader_pl7m fuzz_ndpi_reader_pl7m_64k fuzz_ndpi_reader_pl7m_simplest fuzz_ndpi_reader_pl7m_internal fuzz_ndpi_reader_pl7m_simplest_internal fuzz_ndpi_reader_pl7m_only_subclassification fuzz_ndpi_reader_pl7m_randomize_ports
 
 #Common flags
-AM_CPPFLAGS = -I ../src/lib/third_party/include/
+AM_CPPFLAGS = -I ../src/lib/third_party/include/ @NDPI_CFLAGS@
 AM_LDFLAGS = $(LIBS)
-AM_CFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+AM_CFLAGS = @NDPI_CFLAGS@ $(CFLAGS)
 AM_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
 LDADD = $(PCAP_LIB) ../src/lib/libndpi.a $(ADDITIONAL_LIBS)
 if HAS_FUZZLDFLAGS
@@ -555,7 +555,7 @@ dictionaries:
 	cp dictionary_tls_certificate.dict fuzz_tls_certificate.dict
 
 clean:
-	rm -f *.o $(bin_PROGRAMS)
+	rm -f *.o $(bin_PROGRAMS) ../example/fuzz_*.o ../src/lib/third_party/src/fuzz_*.o ../src/lib/third_party/src/fuzz/fuzz_*.o
 	rm -f testpcaps.zip
 	rm -f *_seed_corpus.zip
 	rm -f fuzz*.dict
