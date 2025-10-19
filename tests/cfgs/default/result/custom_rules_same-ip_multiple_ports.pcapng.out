@@ -1,16 +1,13 @@
-Guessed flow protos:	1
-
-DPI Packets (TCP):	5	(1.67 pkts/flow)
-Confidence Match by IP      : 1 (flows)
-Confidence Match by custom rule: 2 (flows)
+DPI Packets (TCP):	3	(1.00 pkts/flow)
+Confidence Match by custom rule: 3 (flows)
 Num dissector calls: 0 (0.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/1/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -33,12 +30,11 @@ CustomProtocolA	3	222	1
 CustomProtocolB	2	148	1
 CustomProtocolC	3	222	1
 
-Unrated                          3 222           1            
-Acceptable                       5 370           2            
+Acceptable                       8 592           3            
 
 Unspecified                      5 370           2            
 Web                              3 222           1            
 
 	1	TCP 192.168.1.245:56866 -> 3.3.3.3:443 [proto: 91.474/TLS.CustomProtocolA][Stack: TLS.CustomProtocolA][IP: 474/CustomProtocolA][Encrypted][Confidence: Match by custom rule][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Web/5][Breed: Acceptable][3 pkts/222 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][3.05 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Fingerprint: ed4184cfab060a404adb67ebea5b2f97][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	2	TCP 192.168.1.245:58288 -> 3.3.3.3:446 [proto: 800/CustomProtocolC][Stack: CustomProtocolC][IP: 800/CustomProtocolC][ClearText][Confidence: Match by IP][FPC: 800/CustomProtocolC, Confidence: IP address][DPI packets: 3][Breed: Unrated][3 pkts/222 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][3.04 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.1.245:58288 -> 3.3.3.3:446 [proto: 800/CustomProtocolC][Stack: CustomProtocolC][IP: 800/CustomProtocolC][ClearText][Confidence: Match by custom rule][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Acceptable][3 pkts/222 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][3.04 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	TCP 192.168.1.245:59682 -> 3.3.3.3:444 [proto: 475/CustomProtocolB][Stack: CustomProtocolB][IP: 475/CustomProtocolB][ClearText][Confidence: Match by custom rule][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Acceptable][2 pkts/148 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][1.02 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

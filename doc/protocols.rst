@@ -4248,3 +4248,12 @@ References: `Official site <https://aws.amazon.com/dynamodb/>`_
 Visit ESPN to get up-to-the-minute sports news coverage, scores, highlights and commentary for NHL, NFL, MLB, NBA, College Football, NCAA Basketball and more.
 
 References: `Official site <https://www.espn.com/>`_
+
+
+.. _Proto_467:
+
+`NDPI_PROTOCOL_AKAMAI`
+======================
+Akamai Technologies, Inc. is an American company specialized in content delivery network (CDN), cybersecurity, DDoS mitigation, and cloud services.
+
+References: `Official site <https://www.akamai.com>`_

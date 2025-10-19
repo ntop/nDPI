@@ -8804,7 +8804,7 @@ u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_
     }
   }
 
-  return(ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, ret));
+  return(ret);
 }
 
 /* ********************************************************************************* */
@@ -9231,7 +9231,7 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
     check_probing_attempt(ndpi_struct, flow);
   }
 
-  if((ret->proto.app_protocol < ndpi_struct->proto_defaults_num_allocated)
+  if(!ndpi_is_custom_protocol(ndpi_struct, ret->proto.app_protocol)
      && ndpi_struct->proto_defaults[ret->proto.app_protocol].performIPcheck
      && (ret->proto.app_protocol != ret->protocol_by_ip)) {
     /* Handle exceptions */
