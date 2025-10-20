@@ -24,7 +24,7 @@ Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     0/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
 Hash ja4 custom protos:    0/0 (search/found)
-Hash fp custom protos:     1/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
 
 Google	1	1392	1
 
@@ -32,4 +32,4 @@ Acceptable                       1 1392          1
 
 Web                              1 1392          1            
 
-	1	UDP 10.44.5.25:61097 -> 216.58.213.163:443 [proto: 188.126/QUIC.Google][Stack: QUIC.Google][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 188.126/QUIC.Google, Confidence: DPI][DPI packets: 1][cat: Web/5][Breed: Acceptable][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Hostname/SNI: www.gstatic.com][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Fingerprint: d9b1e7338e475c535e75d9f1f452155e][QUIC ver: Q050][Idle Timeout: 30][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+	1	UDP 10.44.5.25:61097 -> 216.58.213.163:443 [proto: 188.126/QUIC.Google][Stack: QUIC.Google][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 188.126/QUIC.Google, Confidence: DPI][DPI packets: 1][cat: Web/5][Breed: Acceptable][1 pkts/1392 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][Hostname/SNI: www.gstatic.com][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][QUIC ver: Q050][Idle Timeout: 30][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]

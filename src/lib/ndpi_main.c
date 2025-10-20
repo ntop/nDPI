@@ -9224,6 +9224,19 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
     check_probing_attempt(ndpi_struct, flow);
   }
 
+  if(flow->confidence != NDPI_CONFIDENCE_MATCH_BY_PORT &&
+     flow->confidence != NDPI_CONFIDENCE_MATCH_BY_IP) {
+    if(ndpi_compute_ndpi_flow_fingerprint(ndpi_struct, flow)) {
+      /* Classification might have been changed */
+      ret->proto.master_protocol = flow->detected_protocol_stack[1];
+      ret->proto.app_protocol = flow->detected_protocol_stack[0];
+      ret->protocol_stack = flow->protocol_stack;
+      ret->protocol_by_ip = flow->guessed_protocol_id_by_ip;
+      ret->category = flow->category;
+      ret->breed = flow->breed;
+    }
+  }
+
   if(!ndpi_is_custom_protocol(ndpi_struct, ret->proto.app_protocol)
      && ndpi_struct->proto_defaults[ret->proto.app_protocol].performIPcheck
      && (ret->proto.app_protocol != ret->protocol_by_ip)) {
@@ -9366,9 +9379,6 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_set_risk(ndpi_struct, flow, NDPI_MISMATCHING_PROTOCOL_WITH_IP,
 		    "nDPI protocol does not match the server IP address");
   }
-
-  /* TODO */
-  (void)ret;
 }
 
 /* ********************************************************************************* */
@@ -10347,6 +10357,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
 	if(nbpf_match(ndpi_str->nbpf_custom_proto[i].tree, &t)) {
 	  /* match found */
 	  ret.proto.master_protocol = ret.proto.app_protocol = ndpi_str->nbpf_custom_proto[i].l7_protocol;
+	  flow->detected_protocol_stack[0] = flow->detected_protocol_stack[1] = ndpi_str->nbpf_custom_proto[i].l7_protocol;
 	  ndpi_fill_protocol_category_and_breed(ndpi_str, flow, &ret);
 	  proto_stack_update(&flow->protocol_stack, ret.proto.master_protocol, ret.proto.app_protocol);
 	  flow->confidence = NDPI_CONFIDENCE_NBPF;
@@ -12307,7 +12318,6 @@ u_int8_t ndpi_extra_dissection_possible(struct ndpi_detection_module_struct *ndp
 		!!flow->extra_packets_func);
 
   if(!flow->extra_packets_func) {
-    ndpi_compute_ndpi_flow_fingerprint(ndpi_str, flow);
     return(0);
   }
 

@@ -136,7 +136,6 @@ static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_s
      || ((flow->protos.tls_quic.client_hello_processed && flow->l4.tcp.tls.app_data_seen[!flow->protos.tls_quic.ch_direction] == 1) ||
 	 (flow->protos.tls_quic.server_hello_processed && flow->l4.tcp.tls.app_data_seen[flow->protos.tls_quic.ch_direction] == 1))
      ) {
-    ndpi_compute_ndpi_flow_fingerprint(ndpi_struct, flow);
     return 0;
   }
 
@@ -161,7 +160,6 @@ static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_s
         without sub-classification */
      /* TLS heuristics */
      (ndpi_struct->cfg.tls_heuristics == 0 || is_flow_addr_informative(flow))) {
-    ndpi_compute_ndpi_flow_fingerprint(ndpi_struct, flow);
     return 0;
   }
 

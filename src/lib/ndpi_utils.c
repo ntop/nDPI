@@ -4733,7 +4733,14 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 					 struct ndpi_flow_struct *flow) {
   if(ndpi_str->cfg.ndpi_fingerprint_enabled &&
      (flow->ndpi.fingerprint == NULL) &&
-     ndpi_stack_is_tls_like(&flow->protocol_stack)) {
+     ndpi_stack_is_tls_like(&flow->protocol_stack) &&
+     /* We need TCP & TLS handshake. What should we do if we don't have them?
+        For the time being, keep calculating the fingerprint if we have at least
+        one of them. That means:
+          * we might have a fingerprint also for DTS/QUIC
+          * no fingerprint for mid-flows
+        TODO: is that what we really want? */
+     (flow->tcp.fingerprint || flow->protos.tls_quic.ja4_client[0] != '\0')) {
     char *l4_fp = flow->tcp.fingerprint ? flow->tcp.fingerprint : "no_l4_fp";
     char *l7_pf = "no_app_fp_cli";
     char *l7_pf_server = "no_app_fp_srv";

@@ -24,7 +24,7 @@ Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     0/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
 Hash ja4 custom protos:    1/0 (search/found)
-Hash fp custom protos:     0/0 (search/found)
+Hash fp custom protos:     1/0 (search/found)
 
 DTLS	6	1708	1
 
@@ -37,4 +37,4 @@ JA Host Stats:
 	1	 26.83.9.81               	 1      
 
 
-	1	UDP 26.83.9.81:57567 -> 33.35.223.103:540 [proto: 30/DTLS][Stack: STUN.DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 6][cat: Network/14][Breed: Acceptable][6 pkts/1708 bytes -> 0 pkts/0 bytes][Goodput ratio: 85/0][1.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 232/0 299/0 116/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/0 285/0 873/0 267/0][Mapped IP/Port: 104.193.187.21:540][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][DTLSv1.0][JA4: dd1i350400_23b9269eae60_dbc12469f409][PLAIN TEXT (ugPnBzE)][Plen Bins: 0,0,16,51,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 26.83.9.81:57567 -> 33.35.223.103:540 [proto: 30/DTLS][Stack: STUN.DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 6][cat: Network/14][Breed: Acceptable][6 pkts/1708 bytes -> 0 pkts/0 bytes][Goodput ratio: 85/0][1.16 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1/0 232/0 299/0 116/0][Pkt Len c2s/s2c min/avg/max/stddev: 106/0 285/0 873/0 267/0][Mapped IP/Port: 104.193.187.21:540][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Fingerprint: abfa30337942f106827cb35c5d15cce9][DTLSv1.0][JA4: dd1i350400_23b9269eae60_dbc12469f409][PLAIN TEXT (ugPnBzE)][Plen Bins: 0,0,16,51,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
