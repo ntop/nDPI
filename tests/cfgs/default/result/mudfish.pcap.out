@@ -18,8 +18,14 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   21/1 (search/found)
+Patricia protocols:   20/2 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
 
 Mudfish	89	77795	11
 
@@ -33,7 +39,7 @@ VPN                             89 77795         11
 	4	UDP 192.168.0.102:60976 <-> 45.120.157.78:10007 [proto: 454/Mudfish][Stack: Mudfish][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VPN/2][Breed: Acceptable][1 pkts/60 bytes <-> 1 pkts/43 bytes][Goodput ratio: 2/2][0.23 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	5	UDP 192.168.0.102:60976 <-> 58.228.231.36:10007 [proto: 454/Mudfish][Stack: Mudfish][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VPN/2][Breed: Acceptable][1 pkts/60 bytes <-> 1 pkts/43 bytes][Goodput ratio: 2/2][0.28 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	6	UDP 192.168.0.102:60976 <-> 108.181.0.36:10007 [proto: 454/Mudfish][Stack: Mudfish][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VPN/2][Breed: Acceptable][1 pkts/60 bytes <-> 1 pkts/43 bytes][Goodput ratio: 2/2][0.16 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	7	UDP 192.168.0.102:60976 <-> 172.233.67.67:10007 [proto: 454/Mudfish][Stack: Mudfish][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VPN/2][Breed: Acceptable][1 pkts/60 bytes <-> 1 pkts/43 bytes][Goodput ratio: 2/2][0.33 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 192.168.0.102:60976 <-> 172.233.67.67:10007 [proto: 454/Mudfish][Stack: Mudfish][IP: 467/Akamai][Encrypted][Confidence: DPI][FPC: 467/Akamai, Confidence: IP address][DPI packets: 2][cat: VPN/2][Breed: Acceptable][1 pkts/60 bytes <-> 1 pkts/43 bytes][Goodput ratio: 2/2][0.33 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	8	UDP 192.168.0.102:60976 <-> 180.149.230.60:10007 [proto: 454/Mudfish][Stack: Mudfish][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VPN/2][Breed: Acceptable][1 pkts/60 bytes <-> 1 pkts/43 bytes][Goodput ratio: 2/2][0.26 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	9	UDP 192.168.0.102:60976 <-> 211.253.26.155:10007 [proto: 454/Mudfish][Stack: Mudfish][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VPN/2][Breed: Acceptable][1 pkts/60 bytes <-> 1 pkts/43 bytes][Goodput ratio: 2/2][0.27 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	10	UDP 192.168.0.102:60977 <-> 46.173.30.40:10007 [proto: 454/Mudfish][Stack: Mudfish][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: VPN/2][Breed: Acceptable][1 pkts/60 bytes <-> 1 pkts/43 bytes][Goodput ratio: 2/2][0.16 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

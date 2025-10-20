@@ -21,6 +21,12 @@ Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   10/1 (search/found)
 Patricia protocols:   0/0 (search/found)
 Patricia protocols IPv6: 11/10 (search/found)
+Hash malicious ja4:        2/0 (search/found)
+Hash malicious sha1:       2/0 (search/found)
+Hash TCP fingerprints:     3/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    2/0 (search/found)
+Hash fp custom protos:     2/0 (search/found)
 
 DNS	4	800	2
 HTTP	10	1792	1

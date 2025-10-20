@@ -23,8 +23,14 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        1/0 (search/found)
 Patricia risk IPv6:   2/0 (search/found)
-Patricia protocols:   73/37 (search/found)
+Patricia protocols:   72/38 (search/found)
 Patricia protocols IPv6: 4/0 (search/found)
+Hash malicious ja4:        3/0 (search/found)
+Hash malicious sha1:       1/0 (search/found)
+Hash TCP fingerprints:     5/5 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    3/0 (search/found)
+Hash fp custom protos:     5/0 (search/found)
 
 DNS	4	610	2
 HTTP	11	726	3
@@ -88,7 +94,7 @@ JA Host Stats:
 	27	UDP 192.168.2.4:52794 <-> 31.13.93.48:3478 [proto: 78.45/STUN.WhatsAppCall][Stack: STUN.WhatsAppCall][IP: 119/Facebook][ClearText][Confidence: DPI][FPC: 78.45/STUN.WhatsAppCall, Confidence: DPI][DPI packets: 5][cat: VoIP/10][Breed: Acceptable][3 pkts/504 bytes <-> 2 pkts/172 bytes][Goodput ratio: 75/51][14.33 sec][Mapped IP/Port: 79.35.21.197:38779][Plen Bins: 0,40,0,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	28	UDP 192.168.2.4:52794 <-> 173.252.114.1:3478 [proto: 78.45/STUN.WhatsAppCall][Stack: STUN.WhatsAppCall][IP: 119/Facebook][ClearText][Confidence: DPI][FPC: 78.45/STUN.WhatsAppCall, Confidence: DPI][DPI packets: 5][cat: VoIP/10][Breed: Acceptable][3 pkts/504 bytes <-> 2 pkts/172 bytes][Goodput ratio: 75/51][14.33 sec][Mapped IP/Port: 79.35.21.197:38779][Plen Bins: 0,40,0,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	29	UDP 192.168.2.4:52794 <-> 179.60.192.48:3478 [proto: 78.45/STUN.WhatsAppCall][Stack: STUN.WhatsAppCall][IP: 119/Facebook][ClearText][Confidence: DPI][FPC: 78.45/STUN.WhatsAppCall, Confidence: DPI][DPI packets: 5][cat: VoIP/10][Breed: Acceptable][3 pkts/504 bytes <-> 2 pkts/172 bytes][Goodput ratio: 75/51][14.33 sec][Mapped IP/Port: 79.35.21.197:38779][Plen Bins: 0,40,0,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	30	TCP 192.168.2.4:49172 <-> 23.50.148.228:443 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Web/5][Breed: Safe][3 pkts/174 bytes <-> 2 pkts/217 bytes][Goodput ratio: 0/39][0.03 sec][nDPI Fingerprint: d9b1e7338e475c535e75d9f1f452155e][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	30	TCP 192.168.2.4:49172 <-> 23.50.148.228:443 [proto: 91/TLS][Stack: TLS][IP: 467/Akamai][Encrypted][Confidence: DPI][FPC: 467/Akamai, Confidence: IP address][DPI packets: 2][cat: Web/5][Breed: Safe][3 pkts/174 bytes <-> 2 pkts/217 bytes][Goodput ratio: 0/39][0.03 sec][nDPI Fingerprint: d9b1e7338e475c535e75d9f1f452155e][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	TCP 192.168.2.4:49192 <-> 93.186.135.8:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Web/5][Breed: Acceptable][3 pkts/198 bytes <-> 2 pkts/132 bytes][Goodput ratio: 0/0][0.20 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	UDP 192.168.2.4:51897 <-> 192.168.2.1:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/79 bytes <-> 1 pkts/251 bytes][Goodput ratio: 46/83][0.07 sec][Hostname/SNI: query.ess.apple.com][17.178.104.12][DNS Id: 0x34f8][PLAIN TEXT (akadns)][Plen Bins: 0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	33	UDP 192.168.2.4:52190 <-> 192.168.2.1:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/76 bytes <-> 1 pkts/204 bytes][Goodput ratio: 44/79][0.03 sec][Hostname/SNI: e13.whatsapp.net][158.85.233.52][DNS Id: 0xdfa3][PLAIN TEXT (whatsapp)][Plen Bins: 0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

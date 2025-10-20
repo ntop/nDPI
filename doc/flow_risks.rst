@@ -127,9 +127,9 @@ This risk indicates that the `SMB <https://en.wikipedia.org/wiki/Server_Message_
 
 .. _Risk 021:
 
-NDPI_FREE_21
-============
-Placeholder; not really used.
+NDPI_MISMATCHING_PROTOCOL_WITH_IP
+=================================
+This risk indicates that the nDPI protocol detected for this flow (e.g. Facebook), does not resolve to a numeric flow server IP address that matches the known IPs for such protocol (in the above example the IP address do not belong to Facebook/Meta).
 
 .. _Risk 022:
 

@@ -67,6 +67,7 @@
 
 #include "ndpi_content_match.c.inc"
 #include "ndpi_dga_match.c.inc"
+#include "inc_generated/ndpi_akamai_match.c.inc"
 #include "inc_generated/ndpi_azure_match.c.inc"
 #include "inc_generated/ndpi_tor_match.c.inc"
 #include "inc_generated/ndpi_tor_exit_nodes_match.c.inc"
@@ -183,7 +184,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER, NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER, NDPI_RISK_MEDIUM, CLIENT_LOW_RISK_PERCENTAGE,  NDPI_SERVER_ACCOUNTABLE },
   { NDPI_SMB_INSECURE_VERSION,                  NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
-  { NDPI_FREE_21,                               NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
+  { NDPI_MISMATCHING_PROTOCOL_WITH_IP,          NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_UNSAFE_PROTOCOL,                       NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE   },
   { NDPI_DNS_SUSPICIOUS_TRAFFIC,                NDPI_RISK_MEDIUM, CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_TLS_MISSING_SNI,                       NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
@@ -450,8 +451,8 @@ u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct 
   NDPI_LOG_DBG2(ndpi_str, "[DEBUG] ***** %s(%u)\n", __FUNCTION__, ndpi_proto_id);
 #endif
 
-  if(!ndpi_str)
-    return(0);
+  if((!ndpi_str) || (ndpi_proto_id == NDPI_PROTOCOL_UNKNOWN))
+    return(NDPI_PROTOCOL_UNKNOWN);
 
   if(!ndpi_is_custom_protocol(ndpi_str, ndpi_proto_id))
     return(ndpi_proto_id);
@@ -703,10 +704,9 @@ static int ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str
 			           u_int8_t is_custom_protocol) {
   int j;
 
-
   /* There is no real limit on protocols number/id; the hard limit being the u_int16_t
      data typer used for the ids...
-   */
+  */
 
   if(protoId >= ndpi_str->proto_defaults_num_allocated) {
     int new_num;
@@ -721,8 +721,8 @@ static int ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str
       NDPI_LOG_DBG(ndpi_str, "Realloc error\n");
       return -1;
     }
-    memset(&new_ptr[ndpi_str->proto_defaults_num_allocated],
-           '\0',
+
+    memset(&new_ptr[ndpi_str->proto_defaults_num_allocated], '\0',
            sizeof(ndpi_proto_defaults_t) * (new_num - ndpi_str->proto_defaults_num_allocated));
     ndpi_str->proto_defaults = new_ptr;
     ndpi_str->proto_defaults_num_allocated = new_num;
@@ -750,12 +750,14 @@ static int ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str
   */
   ndpi_str->proto_defaults[protoId].isAppProtocol = is_app_protocol;
   ndpi_str->proto_defaults[protoId].isCustomProto = is_custom_protocol;
+  ndpi_str->proto_defaults[protoId].performIPcheck = 0;
   ndpi_str->proto_defaults[protoId].protoCategory = protoCategory;
   ndpi_str->proto_defaults[protoId].protoId = protoId;
   ndpi_str->proto_defaults[protoId].protoBreed = breed;
   ndpi_str->proto_defaults[protoId].qoeCategory = qoeCategory;
   ndpi_str->proto_defaults[protoId].subprotocols = NULL;
   ndpi_str->proto_defaults[protoId].subprotocol_count = 0;
+
   for(j = 0; j < MAX_DEFAULT_PORTS; j++) {
     ndpi_str->proto_defaults[protoId].tcp_default_ports[j] = tcpDefPorts[j];
     ndpi_str->proto_defaults[protoId].udp_default_ports[j] = udpDefPorts[j];
@@ -2983,6 +2985,12 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
                           0);
 
+  ndpi_set_proto_defaults(ndpi_str, 1 , 1 , NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AKAMAI,
+                          "Akamai", NDPI_PROTOCOL_CATEGORY_DATABASE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */ ,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0);
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main.c"
 #endif
@@ -3070,6 +3078,7 @@ int ac_domain_match_handler(AC_MATCH_t *m, AC_TEXT_t *txt, AC_REP_t *match) {
       continue;
     }
   }
+
   return 0;
 }
 
@@ -4230,7 +4239,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
 
    */
   load_string_based_protocols(ndpi_str);
-  
+
   return(ndpi_str);
 }
 
@@ -4286,6 +4295,9 @@ static int is_ip_list_enabled(struct ndpi_detection_module_struct *ndpi_str, int
 {
   if(ndpi_bitmask_is_set(&ndpi_str->cfg.ip_list_bitmask, protoId) == 0)
     return 0;
+
+  ndpi_str->proto_defaults[protoId].performIPcheck = 1;
+
   return 1;
 }
 
@@ -4341,6 +4353,10 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, host_protocol_list);
   ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, host_protocol_list_6);
 
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AKAMAI)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_akamai_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_akamai_protocol_list_6);
+  }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_AMAZON_AWS)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_amazon_aws_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_amazon_aws_protocol_list_6);
@@ -4758,6 +4774,16 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
 
   if(ndpi_str->cfg.track_payload_enabled)
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
+
+  /* Reset hash statistics: we are interested only on "runtime" search/found,
+     not the ones during the init phase.
+     See ndpi_add_tcp_fingerprint() where we call ndpi_hash_find_entry() to
+     avoid duplicates.
+     TODO: similar code for the other hashes? */
+  if(ndpi_str->tcp_fingerprint_hashmap) {
+    ndpi_str->tcp_fingerprint_hashmap->stats.n_found = 0;
+    ndpi_str->tcp_fingerprint_hashmap->stats.n_search = 0;
+  }
 
   ndpi_str->finalized = 1;
 
@@ -6639,7 +6665,6 @@ void register_dissector(char *dissector_name, struct ndpi_detection_module_struc
 /* ******************************************************************** */
 
 static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
-
   struct call_function_struct *all_cb = NULL;
 
   ndpi_str->callback_buffer = ndpi_calloc(NDPI_MAX_NUM_DISSECTORS, sizeof(struct call_function_struct));
@@ -9143,6 +9168,30 @@ static int is_unidir_traffic_exception(struct ndpi_flow_struct *flow) {
 
 /* ********************************************************************************* */
 
+bool ndpi_is_cnd_cloud_provider(u_int16_t proto_id) {
+  switch(proto_id) {
+  case NDPI_PROTOCOL_GOOGLE_CLOUD:
+  case NDPI_PROTOCOL_CLOUDFLARE:
+  case NDPI_PROTOCOL_AMAZON_AWS:
+  case NDPI_PROTOCOL_AWS_COGNITO:
+  case NDPI_PROTOCOL_AWS_API_GATEWAY:
+  case NDPI_PROTOCOL_AWS_KINESIS:
+  case NDPI_PROTOCOL_AWS_EC2:
+  case NDPI_PROTOCOL_AWS_EMR:
+  case NDPI_PROTOCOL_AWS_S3:
+  case NDPI_PROTOCOL_AWS_CLOUDFRONT:
+  case NDPI_PROTOCOL_AWS_DYNAMODB:
+  case NDPI_PROTOCOL_TENCENT:
+  case NDPI_PROTOCOL_AKAMAI:
+    return(true);
+
+  default:
+    return(false);
+  }
+}
+
+/* ********************************************************************************* */
+
 static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow,
                             ndpi_protocol *ret) {
@@ -9162,7 +9211,7 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
      or to have two more distinct logics...
      The/A critical point is that ndpi_detection_giveup() is public and it is always used by
      any programs linking to libnDPI: we must be sure to not change the external behavior
-   */
+  */
 
   /* ***
    * *** We can't access ndpi_str->packet from this function!!
@@ -9180,6 +9229,149 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->l4_proto == IPPROTO_TCP) {
     check_tcp_flags(ndpi_struct, flow);
     check_probing_attempt(ndpi_struct, flow);
+  }
+
+  if(!ndpi_is_custom_protocol(ndpi_struct, ret->proto.app_protocol)
+     && ndpi_struct->proto_defaults[ret->proto.app_protocol].performIPcheck
+     && (ret->proto.app_protocol != ret->protocol_by_ip)) {
+    /* Handle exceptions */
+    bool trigger_risk = false;
+
+    if((ret->proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)
+       && (ret->protocol_by_ip != NDPI_PROTOCOL_UNKNOWN)) {
+      /*
+	Check if a known service is serverd by an IP that
+	belong to the service organization
+      */
+
+      trigger_risk = true;
+
+      switch(ret->proto.app_protocol) {
+      case NDPI_PROTOCOL_MSTEAMS_CALL:
+      case NDPI_PROTOCOL_MSTEAMS:
+      case NDPI_PROTOCOL_MS_OUTLOOK:
+      case NDPI_PROTOCOL_MICROSOFT:
+      case NDPI_PROTOCOL_MICROSOFT_365:
+	switch(ret->protocol_by_ip) {
+	case NDPI_PROTOCOL_MICROSOFT_AZURE:
+	case NDPI_PROTOCOL_MS_OUTLOOK:
+	case NDPI_PROTOCOL_MSTEAMS:
+	  trigger_risk = false;
+	  break;
+	}
+	break;
+
+      case NDPI_PROTOCOL_AMAZON_AWS:
+	switch(ret->protocol_by_ip) {
+	case NDPI_PROTOCOL_AWS_COGNITO:
+	case NDPI_PROTOCOL_AWS_API_GATEWAY:
+	case NDPI_PROTOCOL_AWS_KINESIS:
+	case NDPI_PROTOCOL_AWS_EC2:
+	case NDPI_PROTOCOL_AWS_EMR:
+	case NDPI_PROTOCOL_AWS_S3:
+	case NDPI_PROTOCOL_AWS_CLOUDFRONT:
+	case NDPI_PROTOCOL_AWS_DYNAMODB:
+	  trigger_risk = false;
+	  break;
+	}
+	break;
+
+      case NDPI_PROTOCOL_FACEBOOK:
+      case NDPI_PROTOCOL_FACEBOOK_MESSENGER:
+      case NDPI_PROTOCOL_FACEBOOK_VOIP:
+      case NDPI_PROTOCOL_FACEBOOK_REEL_STORY:
+	if(ret->protocol_by_ip == NDPI_PROTOCOL_FACEBOOK)
+	  trigger_risk = false;
+	break;
+
+      case NDPI_PROTOCOL_GMAIL:
+      case NDPI_PROTOCOL_GOOGLE_MAPS:
+      case NDPI_PROTOCOL_YOUTUBE:
+      case NDPI_PROTOCOL_GOOGLE:
+      case NDPI_PROTOCOL_YOUTUBE_UPLOAD:
+      case NDPI_PROTOCOL_PLAYSTORE:
+	switch(ret->protocol_by_ip) {
+	case NDPI_PROTOCOL_GOOGLE_CLOUD:
+	  trigger_risk = false;
+	  break;
+	}
+	break;
+
+      case NDPI_PROTOCOL_APPLE:
+      case NDPI_PROTOCOL_APPLE_ICLOUD:
+      case NDPI_PROTOCOL_APPLE_ITUNES:
+      case NDPI_PROTOCOL_APPLESTORE:
+      case NDPI_PROTOCOL_APPLE_PUSH:
+      case NDPI_PROTOCOL_APPLE_SIRI:
+      case NDPI_PROTOCOL_APPLETVPLUS:
+	switch(ret->protocol_by_ip) {
+	case NDPI_PROTOCOL_APPLE:
+	case NDPI_PROTOCOL_AKAMAI:
+	  trigger_risk = false;
+	  break;
+	}
+	break;
+
+      default:
+	trigger_risk = false;
+	break;
+      }
+    } else if((ret->proto.app_protocol != NDPI_PROTOCOL_UNKNOWN)
+	      && (ret->protocol_by_ip == NDPI_PROTOCOL_UNKNOWN)) {
+      /*
+	Check if a known service has an unknown IP
+	Example www.apple.com is not handled by an Apple server
+      */
+      switch(ret->proto.app_protocol) {
+	/* Microsoft */
+      case NDPI_PROTOCOL_MSTEAMS_CALL:
+      case NDPI_PROTOCOL_MSTEAMS:
+      case NDPI_PROTOCOL_MS_OUTLOOK:
+      case NDPI_PROTOCOL_MICROSOFT:
+      case NDPI_PROTOCOL_MICROSOFT_365:
+      case NDPI_PROTOCOL_MICROSOFT_AZURE:
+	/* Amazon */
+      case NDPI_PROTOCOL_AMAZON_AWS:
+      case NDPI_PROTOCOL_AWS_COGNITO:
+      case NDPI_PROTOCOL_AWS_API_GATEWAY:
+      case NDPI_PROTOCOL_AWS_KINESIS:
+      case NDPI_PROTOCOL_AWS_EC2:
+      case NDPI_PROTOCOL_AWS_EMR:
+      case NDPI_PROTOCOL_AWS_S3:
+      case NDPI_PROTOCOL_AWS_CLOUDFRONT:
+      case NDPI_PROTOCOL_AWS_DYNAMODB:
+	/* Meta */
+      case NDPI_PROTOCOL_FACEBOOK:
+      case NDPI_PROTOCOL_FACEBOOK_MESSENGER:
+      case NDPI_PROTOCOL_FACEBOOK_VOIP:
+      case NDPI_PROTOCOL_FACEBOOK_REEL_STORY:
+	/* Google */
+      case NDPI_PROTOCOL_GMAIL:
+      case NDPI_PROTOCOL_GOOGLE_MAPS:
+      case NDPI_PROTOCOL_YOUTUBE:
+      case NDPI_PROTOCOL_GOOGLE:
+      case NDPI_PROTOCOL_YOUTUBE_UPLOAD:
+      case NDPI_PROTOCOL_PLAYSTORE:
+	/* Apple */
+      case NDPI_PROTOCOL_APPLE:
+      case NDPI_PROTOCOL_APPLE_ICLOUD:
+      case NDPI_PROTOCOL_APPLE_ITUNES:
+      case NDPI_PROTOCOL_APPLESTORE:
+      case NDPI_PROTOCOL_APPLE_PUSH:
+      case NDPI_PROTOCOL_APPLE_SIRI:
+      case NDPI_PROTOCOL_APPLETVPLUS:
+	trigger_risk = true;
+	break;
+
+      default:
+	trigger_risk = false;
+	break;
+      }
+    }
+
+    if(trigger_risk)
+      ndpi_set_risk(ndpi_struct, flow, NDPI_MISMATCHING_PROTOCOL_WITH_IP,
+		    "nDPI protocol does not match the server IP address");
   }
 
   /* TODO */
@@ -10048,6 +10240,8 @@ static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct
     }
   }
 }
+
+/* ************************************************************************************* */
 
 static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detection_module_struct *ndpi_str,
 							    struct ndpi_flow_struct *flow,
@@ -11945,7 +12139,7 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   if((rc = ndpi_automa_match_string_subprotocol(ndpi_str, string_to_match, string_to_match_len, ret_match)) == NDPI_PROTOCOL_UNKNOWN) {
     string_to_match = (char*)ndpi_get_host_domain(ndpi_str, buf);
     string_to_match_len = strlen(string_to_match);
-    
+
     /* In case of failure try the domain name as last resort */
     rc = ndpi_automa_match_string_subprotocol(ndpi_str, string_to_match, string_to_match_len, ret_match);
   }

@@ -17,8 +17,14 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   4/0 (search/found)
+Patricia protocols:   3/1 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
 
 Service_Location_Protocol	2	490	2
 
@@ -26,5 +32,5 @@ Acceptable                       2 490           2
 
 RPC                              2 490           2            
 
-	1	UDP 23.220.116.175:427 -> 192.168.199.71:57782 [proto: 347/Service_Location_Protocol][Stack: Service_Location_Protocol][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 347/Service_Location_Protocol, Confidence: DPI][DPI packets: 1][cat: RPC/16][Breed: Acceptable][1 pkts/404 bytes -> 0 pkts/0 bytes][Goodput ratio: 89/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (Stella4)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 23.220.116.175:427 -> 192.168.199.71:57782 [proto: 347/Service_Location_Protocol][Stack: Service_Location_Protocol][IP: 467/Akamai][ClearText][Confidence: DPI][FPC: 347/Service_Location_Protocol, Confidence: DPI][DPI packets: 1][cat: RPC/16][Breed: Acceptable][1 pkts/404 bytes -> 0 pkts/0 bytes][Goodput ratio: 89/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (Stella4)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 250.83.105.78:51708 -> 172.30.246.115:427 [proto: 347/Service_Location_Protocol][Stack: Service_Location_Protocol][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 347/Service_Location_Protocol, Confidence: DPI][DPI packets: 1][cat: RPC/16][Breed: Acceptable][1 pkts/86 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (service)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

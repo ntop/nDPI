@@ -46,7 +46,7 @@ typedef __kernel_size_t size_t;
 #include "../../../include/ndpi_replace_printf.h"
 
 /* TODO: For different depth of node, number of outgoing edges differs
-   considerably, It is efficient to use different chunk size for 
+   considerably, It is efficient to use different chunk size for
    different depths */
 
 /* Private function prototype */
@@ -252,7 +252,7 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
           n = next;
           continue;
       }
-      if(!(next = node_create_next(n, alpha))) 
+      if(!(next = node_create_next(n, alpha)))
               return ACERR_ERROR;
       next->id = ++thiz->id;
       thiz->all_nodes_num++;
@@ -279,7 +279,7 @@ AC_ERROR_t ac_automata_add (AC_AUTOMATA_t * thiz, AC_PATTERN_t * patt)
 
   if(node_register_matchstr(n, patt, 0))
       return ACERR_ERROR;
- 
+
   thiz->total_patterns++;
 
   return ACERR_SUCCESS;
@@ -416,10 +416,36 @@ int ac_automata_exact_match(AC_PATTERNS_t *mp,int pos, AC_TEXT_t *txt) {
             break;
         }
         if(patterns->rep.at_end) {
-            if(pos == txt->length) 
+            if(pos == txt->length)
                 matched[2] = patterns, match_map |= 1 << i;
             break;
         }
+
+	{
+	  /*
+	    nDPI
+
+	    Handle matches such as google. that should match
+	    google.it and google.com but not google.hello.com
+	  */
+	  size_t len = strlen(patterns->astring);
+
+	  if((len > 0) && (patterns->astring[len-1] == '.') /* google. */) {
+	    char *dot = strchr(&txt->astring[pos], '.');
+
+	    if(dot != NULL) {
+	      /* We're happy to match google.com but not google.hello.com */
+
+	      if(dot[1] == '0') {
+		; /* google.com */
+	      } else {
+		/* google.hello.com */
+		continue;
+	      }
+	    }
+	  }
+	} /* end nDPI */
+
         matched[3] = patterns, match_map |= 1 << i;
       } while(0);
     }
@@ -558,7 +584,7 @@ int ac_automata_search (AC_AUTOMATA_t * thiz,
  * Release all allocated memories to the automata
  * PARAMS:
  * AC_AUTOMATA_t * thiz: the pointer to the automata
- * free_pattern: 
+ * free_pattern:
  *  0 - free all struct w/o free pattern
  *  1 - free all struct and pattern
  *  2 - clean struct w/o free pattern
@@ -624,7 +650,7 @@ static void dump_node_header(AC_NODE_t * n, struct aho_dump_info *ai) {
     fprintf(ai->file," d:%d %c",n->depth, n->use ? '+':'-');
     ai->memcnt += sizeof(*n);
     if(n->matched_patterns) {
-        ai->memcnt += sizeof(n->matched_patterns) + 
+        ai->memcnt += sizeof(n->matched_patterns) +
                 n->matched_patterns->max*sizeof(n->matched_patterns->patterns[0]);
     }
     if(!n->use) { fprintf(ai->file,"\n"); return; }
@@ -830,7 +856,7 @@ static void node_release(AC_NODE_t * thiz, int free_pattern)
   if(thiz->root && (free_pattern & 0x4) == 0) return;
 
   if(free_pattern & 1) node_release_pattern(thiz);
- 
+
   if(thiz->matched_patterns) {
     acho_free(thiz->matched_patterns);
     thiz->matched_patterns = NULL;
@@ -846,7 +872,7 @@ static void node_release(AC_NODE_t * thiz, int free_pattern)
 #undef UNALIGNED /* Windows defined it but differently from what Aho expects */
 #define UNALIGNED(X) ((intptr_t)X & (__SIZEOF_LONG__ - 1))
 
-#define LBLOCKSIZE __SIZEOF_LONG__ 
+#define LBLOCKSIZE __SIZEOF_LONG__
 
 #if __SIZEOF_LONG__ == 4
 #define DETECTNULL(X) (((X) - 0x01010101UL) & ~(X) & 0x80808080UL)
@@ -975,20 +1001,20 @@ static AC_NODE_t *node_findbs_next_ac (AC_NODE_t * thiz, uint8_t alpha,int icase
 static int node_has_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * newstr)
 {
   int i;
-  
+
   if(!thiz->matched_patterns) return 0;
-  
+
   for (i=0; i < thiz->matched_patterns->num; i++)
   {
     AC_PATTERN_t *str = &(thiz->matched_patterns->patterns[i]);
-    
+
     if (str->length != newstr->length)
       continue;
-    
+
     if(!memcmp(str->astring,newstr->astring,str->length))
-      return 1;    
+      return 1;
   }
-  
+
   return 0;
 }
 
@@ -1061,7 +1087,7 @@ static int node_register_matchstr (AC_NODE_t * thiz, AC_PATTERN_t * str,int is_e
   if (thiz->matched_patterns->num >= thiz->matched_patterns->max) {
       AC_PATTERNS_t *new_mp = node_resize_mp(thiz->matched_patterns);
       if(!new_mp) return 1;
-      thiz->matched_patterns = new_mp; 
+      thiz->matched_patterns = new_mp;
     }
   l = &thiz->matched_patterns->patterns[thiz->matched_patterns->num];
   l->astring = str->astring;
@@ -1124,7 +1150,7 @@ static int node_register_outgoing
         o = thiz->outgoing;
 
   if(!o) return 1;
- 
+
   if(o->degree >= o->max)
     {
         struct edge *new_o = node_resize_outgoing(thiz->outgoing,0);
@@ -1230,7 +1256,7 @@ static int node_range_edges (AC_AUTOMATA_t *thiz, AC_NODE_t * node)
 static inline void node_sort_edges (AC_NODE_t * thiz)
 {
 
-  acho_sort (thiz->outgoing, thiz->outgoing->degree, 
+  acho_sort (thiz->outgoing, thiz->outgoing->degree,
         node_edge_compare, node_edge_swap);
 }
 
@@ -1299,4 +1325,3 @@ void ac_automata_get_stats(AC_AUTOMATA_t * thiz, struct ac_stats *stats)
 }
 
 /* vim: set ts=4 sw=4 et :  */
-

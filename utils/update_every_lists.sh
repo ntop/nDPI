@@ -4,6 +4,8 @@ cd "$(dirname "${0}")" || exit 1
 
 RETVAL=0
 
+./akamai_ip_addresses_download.sh
+RETVAL=$(( RETVAL + $? ))
 ./aws_ip_addresses_download.sh
 RETVAL=$(( RETVAL + $? ))
 ./azure_ip_addresses_download.sh

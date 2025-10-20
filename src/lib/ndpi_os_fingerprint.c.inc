@@ -16,6 +16,7 @@ static struct os_fingerprint tcp_fps[] = {
     { "2_64_65535_41a9d5af7dd3",    ndpi_os_android     },
     { "2_64_65535_148107a0d970",    ndpi_os_android     },
     { "2_64_65535_f518bfb025b0",    ndpi_os_android     },
+    { "2_64_65535_2e3cee914fc1",    ndpi_os_android     },
 
     { "2_128_64240_6bb88f5575fd",   ndpi_os_windows     },
     { "2_128_8192_4697958db063",    ndpi_os_windows     }, /* Windows 7 */

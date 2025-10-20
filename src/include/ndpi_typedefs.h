@@ -106,7 +106,6 @@ typedef enum {
   2. Add the very same flow alert key to the table flow_alert_keys in scripts/lua/modules/alert_keys/flow_alert_keys.lua
   3. Add the risk to the array risk_enum_to_alert_type in src/FlowRiskAlerts.cpp
   4. Create a new file in scripts/lua/modules/alert_definitions/flow/ with the new alert risk defined
-  5. Update scripts/lua/modules/alert_keys/flow_alert_keys.lua adding a new risk
 
   Example: https://github.com/ntop/ntopng/commit/aecc1e3e6505a0522439dbb2b295a3703d3d0f9a
  */
@@ -132,7 +131,7 @@ typedef enum {
   NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER,
   NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER,
   NDPI_SMB_INSECURE_VERSION, /* 20 */
-  NDPI_FREE_21,                                          /* FREE */
+  NDPI_MISMATCHING_PROTOCOL_WITH_IP,
   NDPI_UNSAFE_PROTOCOL,
   NDPI_DNS_SUSPICIOUS_TRAFFIC,
   NDPI_TLS_MISSING_SNI,
@@ -756,6 +755,22 @@ struct ndpi_automa_stats {
 };
 
 typedef enum {
+  NDPI_STR_HASH_MALICIOUS_JA4 = 0,
+  NDPI_STR_HASH_MALICIOUS_SHA1,
+  NDPI_STR_HASH_TCP_FINGERPRINTS,
+  NDPI_STR_HASH_PUBLIC_DOMAIN_SUFFIX,
+  NDPI_STR_HASH_JA4_CUSTOM_PROTOS,
+  NDPI_STR_HASH_FP_CUSTOM_PROTOS,
+
+  NDPI_STR_HASH_MAX       /* Last one! */
+} str_hash_type;
+
+struct ndpi_str_hash_stats {
+  u_int64_t n_search;
+  u_int64_t n_found;
+};
+
+typedef enum {
   NDPI_LRUCACHE_OOKLA = 0,
   NDPI_LRUCACHE_BITTORRENT,
   NDPI_LRUCACHE_STUN,
@@ -1241,7 +1256,7 @@ typedef enum {
 typedef struct ndpi_proto_defaults {
   char protoName[32];
   ndpi_protocol_category_t protoCategory;
-  u_int8_t isClearTextProto:1, isAppProtocol:1, isCustomProto:1, _notused:5;
+  u_int8_t isClearTextProto:1, isAppProtocol:1, isCustomProto:1, performIPcheck:1, _notused:4;
   u_int16_t *subprotocols;
   u_int32_t subprotocol_count;
   u_int16_t protoId, dissector_idx;
@@ -1256,7 +1271,10 @@ typedef struct _ndpi_automa {
   struct ndpi_automa_stats stats;
 } ndpi_automa;
 
-typedef void ndpi_str_hash;
+typedef struct ndpi_str_hash {
+  void *priv;
+  struct ndpi_str_hash_stats stats;
+} ndpi_str_hash;
 
 typedef struct {
   /*

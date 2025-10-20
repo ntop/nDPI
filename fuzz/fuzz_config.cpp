@@ -18,6 +18,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   struct ndpi_lru_cache_stats lru_stats;
   struct ndpi_patricia_tree_stats patricia_stats;
   struct ndpi_automa_stats automa_stats;
+  struct ndpi_str_hash_stats hash_stats;
   int cat, idx;
   u_int16_t pid, pid2;
   char *protoname, *protoname2;
@@ -899,6 +900,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_patricia_get_stats(NULL, &patricia_stats);
   for(i = 0; i < NDPI_AUTOMA_MAX + 1; i++) /* + 1 to test invalid type */
     ndpi_get_automa_stats(ndpi_info_mod, static_cast<automa_type>(i), &automa_stats);
+  for(i = 0; i < NDPI_STR_HASH_MAX + 1; i++) /* + 1 to test invalid type */
+      ndpi_get_hash_stats(ndpi_info_mod, static_cast<str_hash_type>(i), &hash_stats);
 
 
   ndpi_revision();

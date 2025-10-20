@@ -723,7 +723,7 @@ static int ndpi_find_non_eng_bigrams(char *str) {
 
 /* #define PRINT_STRINGS 1 */
 
-int ndpi_has_human_readeable_string(char *buffer, u_int buffer_size,
+int ndpi_has_human_readable_string(char *buffer, u_int buffer_size,
 				    u_int8_t min_string_match_len,
 				    char *outbuf, u_int outbuf_len) {
   u_int ret = 0, i, do_cr = 0, len = 0, o_idx = 0, being_o_idx = 0;
@@ -2259,8 +2259,8 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_SMB_INSECURE_VERSION:
     return("SMB Insecure Vers");
 
-  case NDPI_FREE_21:
-    return("FREE21");
+  case NDPI_MISMATCHING_PROTOCOL_WITH_IP:
+    return("Mismatching Protocol with server IP address");
 
   case NDPI_UNSAFE_PROTOCOL:
     return("Unsafe Protocol");
@@ -2421,8 +2421,8 @@ const char* ndpi_risk2code(ndpi_risk_enum risk) {
     return STRINGIFY(NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER);
   case NDPI_SMB_INSECURE_VERSION:
     return STRINGIFY(NDPI_SMB_INSECURE_VERSION);
-  case NDPI_FREE_21:
-    return STRINGIFY(NDPI_FREE_21);
+  case NDPI_MISMATCHING_PROTOCOL_WITH_IP:
+    return STRINGIFY(NDPI_MISMATCHING_PROTOCOL_WITH_IP);
   case NDPI_UNSAFE_PROTOCOL:
     return STRINGIFY(NDPI_TLS_SUSPICIOUS_ESNI_USAGE);
   case NDPI_DNS_SUSPICIOUS_TRAFFIC:
@@ -2544,8 +2544,8 @@ ndpi_risk_enum ndpi_code2risk(const char* risk) {
     return(NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER);
   else if(strcmp(STRINGIFY(NDPI_SMB_INSECURE_VERSION), risk) == 0)
     return(NDPI_SMB_INSECURE_VERSION);
-  else if(strcmp(STRINGIFY(NDPI_FREE_21), risk) == 0)
-    return(NDPI_FREE_21);
+  else if(strcmp(STRINGIFY(NDPI_MISMATCHING_PROTOCOL_WITH_IP), risk) == 0)
+    return(NDPI_MISMATCHING_PROTOCOL_WITH_IP);
   else if(strcmp(STRINGIFY(NDPI_UNSAFE_PROTOCOL), risk) == 0)
     return(NDPI_UNSAFE_PROTOCOL);
   else if(strcmp(STRINGIFY(NDPI_DNS_SUSPICIOUS_TRAFFIC), risk) == 0)
@@ -2723,7 +2723,7 @@ const char *ndpi_risk_shortnames[NDPI_MAX_RISK] = {
   "ssh_obsolete_client",
   "ssh_obsolete_server",
   "smb_insecure_ver",           /* NDPI_SMB_INSECURE_VERSION */
-  "free21",
+  "mismatching_hostname_with_ip",
   "unsafe_proto",
   "dns_susp",
   "tls_no_sni",
@@ -2855,15 +2855,17 @@ int ndpi_hash_init(ndpi_str_hash **h) {
   if (h == NULL)
     return 1;
 
-  *h = NULL;
+  *h = ndpi_calloc(1, sizeof(**h));
+  if(!*h)
+    return 1;
   return 0;
 }
 
 /* ******************************************************************** */
 
 void ndpi_hash_free(ndpi_str_hash **h) {
-  if(h != NULL) {
-    ndpi_str_hash_priv *h_priv = *((ndpi_str_hash_priv **)h);
+  if(h && *h) {
+    ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)((*h)->priv);
     ndpi_str_hash_priv *current, *tmp;
 
     HASH_ITER(hh, h_priv, current, tmp) {
@@ -2872,6 +2874,7 @@ void ndpi_hash_free(ndpi_str_hash **h) {
       ndpi_free(current);
     }
 
+    ndpi_free(*h);
     *h = NULL;
   }
 }
@@ -2879,18 +2882,22 @@ void ndpi_hash_free(ndpi_str_hash **h) {
 /* ******************************************************************** */
 
 int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int32_t *value) {
-  ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)h;
+  ndpi_str_hash_priv *h_priv;
   ndpi_str_hash_priv *item;
 
-  if(!key || key_len == 0)
+  if(!h || !key || key_len == 0)
     return(2);
 
+  h_priv = (ndpi_str_hash_priv *)((h)->priv);
+
+  h->stats.n_search++;
   HASH_FIND(hh, h_priv, key, key_len, item);
 
   if (item != NULL) {
     if(value != NULL)
       *value = item->value32;
 
+    h->stats.n_found++;
     return 0;
   } else
     return 1;
@@ -2899,11 +2906,13 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int32_t *
 /* ******************************************************************** */
 
 int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_t value) {
-  ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)*h;
+  ndpi_str_hash_priv *h_priv;
   ndpi_str_hash_priv *item, *ret_found;
 
-  if(!key || key_len == 0)
+  if(!h || !*h || !key || key_len == 0)
     return(3);
+
+  h_priv = (ndpi_str_hash_priv *)((*h)->priv);
 
   HASH_FIND(hh, h_priv, key, key_len, item);
 
@@ -2928,9 +2937,9 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_
 
   item->value32 = value;
 
-  HASH_ADD(hh, *((ndpi_str_hash_priv **)h), key[0], key_len, item);
+  HASH_ADD(hh, *(ndpi_str_hash_priv **)&((*h)->priv), key[0], key_len, item);
 
-  HASH_FIND(hh, *((ndpi_str_hash_priv **)h), key, key_len, ret_found);
+  HASH_FIND(hh, *(ndpi_str_hash_priv **)&((*h)->priv), key, key_len, ret_found);
   if(ret_found == NULL) { /* The insertion failed (because of a memory allocation error) */
     ndpi_free(item->key);
     ndpi_free(item);
@@ -2938,6 +2947,56 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_
   }
 
   return 0;
+}
+
+/* ******************************************************************** */
+
+void ndpi_hash_get_stats(ndpi_str_hash *h, struct ndpi_str_hash_stats *stats) {
+  if(h) {
+    stats->n_search = h->stats.n_search;
+    stats->n_found = h->stats.n_found;
+  } else {
+    stats->n_search = 0;
+    stats->n_found = 0;
+  }
+}
+/* ******************************************************************** */
+
+int ndpi_get_hash_stats(struct ndpi_detection_module_struct *ndpi_struct,
+                        str_hash_type hash_type,
+                        struct ndpi_str_hash_stats *stats)
+{
+  if(!ndpi_struct || !stats)
+    return -1;
+
+  switch(hash_type) {
+  case NDPI_STR_HASH_MALICIOUS_JA4:
+    ndpi_hash_get_stats(ndpi_struct->malicious_ja4_hashmap, stats);
+    return 0;
+
+  case NDPI_STR_HASH_MALICIOUS_SHA1:
+    ndpi_hash_get_stats(ndpi_struct->malicious_sha1_hashmap, stats);
+    return 0;
+
+  case NDPI_STR_HASH_TCP_FINGERPRINTS:
+    ndpi_hash_get_stats(ndpi_struct->tcp_fingerprint_hashmap, stats);
+    return 0;
+
+  case NDPI_STR_HASH_PUBLIC_DOMAIN_SUFFIX:
+    ndpi_hash_get_stats(ndpi_struct->public_domain_suffixes, stats);
+    return 0;
+
+  case NDPI_STR_HASH_JA4_CUSTOM_PROTOS:
+    ndpi_hash_get_stats(ndpi_struct->ja4_custom_protos, stats);
+    return 0;
+
+  case NDPI_STR_HASH_FP_CUSTOM_PROTOS:
+    ndpi_hash_get_stats(ndpi_struct->ndpifp_custom_protos, stats);
+    return 0;
+
+  default:
+    return -1;
+  }
 }
 
 /* ********************************************************************************* */
