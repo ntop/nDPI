@@ -1,0 +1,5 @@
+#An example of custom rules where we overwrite the protocol associated to some domains
+
+host:"apple.com"@CUSTOMPROTO=64000
+host:"accounts.google.com"@CUSTOMPROTO=64000
+
