@@ -7,19 +7,20 @@ on:
 
 jobs:
   build:
+    name: Build / RPM (Alma Linux)
     runs-on: ubuntu-latest
+    container:
+      image: almalinux:8
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Ubuntu Prerequisites
+    - name: Install Alma Linux Prerequisites
       run: |
-        sudo apt-get update
-        sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
+        dnf -y --enablerepo=powertools install libpcap-devel
+        yum install -y autoconf automake make rpm-build libtool pkg-config gettext json-c-devel flex bison
 
     - name: Configure nDPI
       run: |
-        # fake CentOS 7 env
-        echo 'CentOS Linux release 7.9.2009 (Core)' | sudo tee /etc/centos-release
         # symlink source directory for ndpi.spec
         ln -sr . $HOME/nDPI
         ./autogen.sh
@@ -29,3 +30,9 @@ jobs:
     - name: Build RPM package
       run: |
         make -C packages/rpm package
+
+    - name: Test RPM package
+      run: |
+        yum install -y ${HOME}/rpmbuild/RPMS/x86_64/*.rpm
+        ndpiReader -i ./tests/pcap/quic-v2.pcapng
+        test -d /usr/include/ndpi
