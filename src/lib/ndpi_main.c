@@ -4770,12 +4770,16 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
 
   /* Reset hash statistics: we are interested only on "runtime" search/found,
      not the ones during the init phase.
-     See ndpi_add_tcp_fingerprint() where we call ndpi_hash_find_entry() to
+     Example: ndpi_add_tcp_fingerprint() where we call ndpi_hash_find_entry() to
      avoid duplicates.
      TODO: similar code for the other hashes? */
   if(ndpi_str->tcp_fingerprint_hashmap) {
     ndpi_str->tcp_fingerprint_hashmap->stats.n_found = 0;
     ndpi_str->tcp_fingerprint_hashmap->stats.n_search = 0;
+  }
+  if(ndpi_str->public_domain_suffixes) {
+    ndpi_str->public_domain_suffixes->stats.n_found = 0;
+    ndpi_str->public_domain_suffixes->stats.n_search = 0;
   }
 
   ndpi_str->finalized = 1;
@@ -12179,9 +12183,9 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
     if(rc1 > 0) {
       if(is_flowrisk_info_enabled(ndpi_str, NDPI_RISKY_DOMAIN)) {
         char str[64] = { '\0' };
-        const size_t len = ndpi_min(string_to_match_len, sizeof(str) - 1);
+        const size_t len = ndpi_min(_string_to_match_len, sizeof(str) - 1);
 
-        memcpy(str, string_to_match, len);
+        memcpy(str, _string_to_match, len);
         str[len] = '\0';
         ndpi_set_risk(ndpi_str, flow, NDPI_RISKY_DOMAIN, str);
       } else {
@@ -12194,9 +12198,9 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   if(ndpi_check_punycode_string(string_to_match, string_to_match_len)) {
     if(is_flowrisk_info_enabled(ndpi_str, NDPI_PUNYCODE_IDN)) {
       char str[64] = { '\0' };
-      const size_t len = ndpi_min(string_to_match_len, sizeof(str) - 1);
+      const size_t len = ndpi_min(_string_to_match_len, sizeof(str) - 1);
 
-      memcpy(str, string_to_match, len);
+      memcpy(str, _string_to_match, len);
       str[len] = '\0';
       ndpi_set_risk(ndpi_str, flow, NDPI_PUNYCODE_IDN, str);
     } else {
@@ -12549,11 +12553,11 @@ static int ndpi_is_vowel(char c) {
 
 int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 			struct ndpi_flow_struct *flow,
-			char *name, u_int8_t is_hostname, u_int8_t check_subproto,
+			char *_name, u_int8_t is_hostname, u_int8_t check_subproto,
 			u_int8_t flow_fully_classified) {
 
   /* Get domain name if ndpi_load_domain_suffixes(..) has been called */
-  name = (char*)ndpi_get_host_domain(ndpi_str, name);
+  char *name = (char*)ndpi_get_host_domain(ndpi_str, _name);
 
   if(ndpi_dga_function != NULL) {
     /* A custom DGA function is defined */
@@ -12561,7 +12565,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
     if(rc) {
       if(flow)
-	ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN, name);
+	ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN, _name);
     }
 
     return(rc);
@@ -12708,7 +12712,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	 || ((max_domain_element_len >= 19 /* word too long. Example bbcbedxhgjmdobdprmen.com */) && ((num_char_repetitions > 1) || (num_digits > 1)))
 	 ) {
 	if(flow) {
-	  ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN, name);
+	  ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN, _name);
 	}
 
 	NDPI_LOG_DBG2(ndpi_str, "[DGA] Found!");
@@ -12862,7 +12866,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     NDPI_LOG_DBG2(ndpi_str, "[DGA] Result: %u\n", rc);
 
     if(rc && flow)
-      ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN, name);
+      ndpi_set_risk(ndpi_str, flow, NDPI_SUSPICIOUS_DGA_DOMAIN, _name);
 
     return(rc);
   }
