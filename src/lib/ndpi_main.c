@@ -9435,6 +9435,9 @@ static ndpi_protocol ndpi_internal_detection_giveup(struct ndpi_detection_module
   ret.protocol_by_ip = flow->guessed_protocol_id_by_ip;
   ret.category = flow->category;
   ret.breed = flow->breed;
+  ret.fpc.proto.master_protocol = flow->fpc.proto.master_protocol;
+  ret.fpc.proto.app_protocol = flow->fpc.proto.app_protocol;
+  ret.fpc.confidence = flow->fpc.confidence;
 
   /* Ensure that we don't change our mind if detection is already complete */
   if(ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN) {
@@ -9550,6 +9553,8 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
     p.protocol_stack.protos[i] = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.protocol_stack.protos[i]);
   }
   p.protocol_by_ip = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.protocol_by_ip);
+  p.fpc.proto.master_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.fpc.proto.master_protocol);
+  p.fpc.proto.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.fpc.proto.app_protocol);
 
   return(p);
 }
@@ -10336,6 +10341,9 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   ret.protocol_by_ip = flow->guessed_protocol_id_by_ip;
   ret.category = flow->category;
   ret.breed = flow->breed;
+  ret.fpc.proto.master_protocol = flow->fpc.proto.master_protocol;
+  ret.fpc.proto.app_protocol = flow->fpc.proto.app_protocol;
+  ret.fpc.confidence = flow->fpc.confidence;
 
   if(flow->monit)
     memset(flow->monit, '\0', sizeof(*flow->monit));
@@ -10373,6 +10381,7 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
     ret.proto.app_protocol = flow->detected_protocol_stack[0];
     ret.category = flow->category;
     ret.breed = flow->breed;
+    /* We don't need to update fpc data */
 
     if(flow->extra_packets_func == NULL) {
       /* Reason: extra dissection ended */
@@ -10461,6 +10470,11 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
       proto_stack_update(&flow->protocol_stack, ret.proto.master_protocol, ret.proto.app_protocol);
       flow->confidence = NDPI_CONFIDENCE_CUSTOM_RULE;
       ndpi_fill_protocol_category_and_breed(ndpi_str, flow, &ret);
+
+      fpc_check_eval(ndpi_str, flow);
+      ret.fpc.proto.master_protocol = flow->fpc.proto.master_protocol;
+      ret.fpc.proto.app_protocol = flow->fpc.proto.app_protocol;
+      ret.fpc.confidence = flow->fpc.confidence;
 
       /* Reason: custom rules */
       internal_giveup(ndpi_str, flow, &ret);
@@ -10568,8 +10582,12 @@ static ndpi_protocol ndpi_internal_detection_process_packet(struct ndpi_detectio
   }
 
   /* First Packet Classification */
-  if(flow->all_packets_counter == 1)
+  if(flow->all_packets_counter == 1) {
     fpc_check_eval(ndpi_str, flow);
+    ret.fpc.proto.master_protocol = flow->fpc.proto.master_protocol;
+    ret.fpc.proto.app_protocol = flow->fpc.proto.app_protocol;
+    ret.fpc.confidence = flow->fpc.confidence;
+  }
 
   if(ret.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN &&
      flow->extra_packets_func == NULL) {
@@ -10599,6 +10617,8 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
     p.protocol_stack.protos[i] = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.protocol_stack.protos[i]);
   }
   p.protocol_by_ip = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.protocol_by_ip);
+  p.fpc.proto.master_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.fpc.proto.master_protocol);
+  p.fpc.proto.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.fpc.proto.app_protocol);
 
   return(p);
 }

@@ -1302,6 +1302,7 @@ typedef struct ndpi_proto {
   u_int16_t protocol_by_ip;
   ndpi_protocol_category_t category;
   ndpi_protocol_breed_t breed;
+  struct ndpi_fpc_info fpc;
   void *custom_category_userdata;
 } ndpi_protocol;
 

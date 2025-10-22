@@ -2177,22 +2177,22 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     fprintf(out, "[Confidence: %s]", ndpi_confidence_get_name(flow->confidence));
 
-    if(flow->fpc.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN) {
+    if(flow->detected_protocol.fpc.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN) {
       fprintf(out, "[FPC: %u/%s, ",
-              flow->fpc.proto.app_protocol,
+              flow->detected_protocol.fpc.proto.app_protocol,
               ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				  flow->fpc.proto.app_protocol));
+				  flow->detected_protocol.fpc.proto.app_protocol));
     } else {
       fprintf(out, "[FPC: %u.%u/%s.%s, ",
-              flow->fpc.proto.master_protocol,
-              flow->fpc.proto.app_protocol,
+              flow->detected_protocol.fpc.proto.master_protocol,
+              flow->detected_protocol.fpc.proto.app_protocol,
               ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				  flow->fpc.proto.master_protocol),
+				  flow->detected_protocol.fpc.proto.master_protocol),
               ndpi_get_proto_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-				  flow->fpc.proto.app_protocol));
+				  flow->detected_protocol.fpc.proto.app_protocol));
     }
     fprintf(out, "Confidence: %s]",
-	    ndpi_fpc_confidence_get_name(flow->fpc.confidence));
+	    ndpi_fpc_confidence_get_name(flow->detected_protocol.fpc.confidence));
 
     /* If someone wants to have the num_dissector_calls variable per flow, he can print it here.
        Disabled by default to avoid too many diffs in the unit tests...
@@ -2753,7 +2753,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     proto = flow->detected_protocol.proto.app_protocol ? flow->detected_protocol.proto.app_protocol : flow->detected_protocol.proto.master_protocol;
     proto = ndpi_map_user_proto_id_to_ndpi_id(ndpi_thread_info[thread_id].workflow->ndpi_struct, proto);
 
-    fpc_proto = flow->fpc.proto.app_protocol ? flow->fpc.proto.app_protocol : flow->fpc.proto.master_protocol;
+    fpc_proto = flow->detected_protocol.fpc.proto.app_protocol ? flow->detected_protocol.fpc.proto.app_protocol : flow->detected_protocol.fpc.proto.master_protocol;
     fpc_proto = ndpi_map_user_proto_id_to_ndpi_id(ndpi_thread_info[thread_id].workflow->ndpi_struct, fpc_proto);
 
     category = flow->detected_protocol.category;
@@ -2767,7 +2767,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
     ndpi_thread_info[thread_id].workflow->stats.fpc_protocol_counter[fpc_proto]       += flow->src2dst_packets + flow->dst2src_packets;
     ndpi_thread_info[thread_id].workflow->stats.fpc_protocol_counter_bytes[fpc_proto] += flow->src2dst_bytes + flow->dst2src_bytes;
     ndpi_thread_info[thread_id].workflow->stats.fpc_protocol_flows[fpc_proto]++;
-    ndpi_thread_info[thread_id].workflow->stats.fpc_flow_confidence[flow->fpc.confidence]++;
+    ndpi_thread_info[thread_id].workflow->stats.fpc_flow_confidence[flow->detected_protocol.fpc.confidence]++;
     ndpi_thread_info[thread_id].workflow->stats.category_counter[category]       += flow->src2dst_packets + flow->dst2src_packets;
     ndpi_thread_info[thread_id].workflow->stats.category_counter_bytes[category] += flow->src2dst_bytes + flow->dst2src_bytes;
     ndpi_thread_info[thread_id].workflow->stats.category_flows[category]++;
