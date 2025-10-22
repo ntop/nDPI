@@ -9420,18 +9420,14 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* ********************************************************************************* */
 
-ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
-				    u_int8_t *protocol_was_guessed) {
+static ndpi_protocol ndpi_internal_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                                                    u_int8_t *protocol_was_guessed) {
   ndpi_protocol ret;
   u_int16_t cached_proto;
 
   /* *** We can't access ndpi_str->packet from this function!! *** */
 
   *protocol_was_guessed = 0;
-  memset(&ret, '\0', sizeof(ret));
-
-  if(!ndpi_str || !flow)
-    return(ret);
 
   /* Init defaults */
   ret.proto.master_protocol = flow->detected_protocol_stack[1];
@@ -9529,6 +9525,34 @@ ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_st
 
   ret.protocol_stack = flow->protocol_stack;
   return(ret);
+}
+
+/* ********************************************************************************* */
+
+ndpi_protocol ndpi_detection_giveup(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+                                    u_int8_t *protocol_was_guessed) {
+  ndpi_protocol p;
+  unsigned int i;
+
+  /* *** We can't access ndpi_str->packet from this function!! *** */
+
+  *protocol_was_guessed = 0;
+  memset(&p, '\0', sizeof(p));
+
+  if(!ndpi_str || !flow)
+    return(p);
+
+  p  = ndpi_internal_detection_giveup(ndpi_str, flow, protocol_was_guessed);
+
+  p.proto.master_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.proto.master_protocol);
+  p.proto.app_protocol = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.proto.app_protocol);
+  p.protocol_stack = flow->protocol_stack;
+  for(i = 0; i < p.protocol_stack.protos_num; i++) {
+    p.protocol_stack.protos[i] = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.protocol_stack.protos[i]);
+  }
+  p.protocol_by_ip = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, p.protocol_by_ip);
+
+  return(p);
 }
 
 /* ********************************************************************************* */
