@@ -3610,7 +3610,6 @@ static int ndpi_add_ja4_subprotocol(struct ndpi_detection_module_struct *ndpi_st
       return(-2);
   }
 
-  protocol_id = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, protocol_id);
   return(ndpi_hash_add_entry(&ndpi_str->ja4_custom_protos, ja4, ja4_len, protocol_id));
 }
 
@@ -3630,7 +3629,6 @@ static int ndpi_add_ndpifp_subprotocol(struct ndpi_detection_module_struct *ndpi
       return(-2);
   }
 
-  protocol_id = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, protocol_id);
   return(ndpi_hash_add_entry(&ndpi_str->ndpifp_custom_protos, ndpifp, ndpifp_len, protocol_id));
 }
 
@@ -3645,7 +3643,6 @@ static int ndpi_add_http_url_subprotocol(struct ndpi_detection_module_struct *nd
       return(-2);
   }
 
-  protocol_id = ndpi_map_ndpi_id_to_user_proto_id(ndpi_str, protocol_id);
   return(ndpi_hash_add_entry(&ndpi_str->http_url_hashmap, url, url_len, protocol_id));
 }
 
@@ -8671,9 +8668,6 @@ static u_int32_t check_ndpi_subprotocols(struct ndpi_detection_module_struct * c
   if(detected_protocol == NDPI_PROTOCOL_UNKNOWN)
     return num_calls;
 
-  if(detected_protocol > ndpi_str->num_supported_protocols)
-    detected_protocol = ndpi_map_user_proto_id_to_ndpi_id(ndpi_str, detected_protocol);
-  
   for (a = 0; a < ndpi_str->proto_defaults[detected_protocol].subprotocol_count; a++) {
     u_int16_t subproto_id = ndpi_str->proto_defaults[detected_protocol].subprotocols[a];
 
