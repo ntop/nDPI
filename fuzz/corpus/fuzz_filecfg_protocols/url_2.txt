@@ -1,0 +1,1 @@
+url:connectivitycheck.gstatic.com/generate_204@GoogleConnCheck

@@ -4,11 +4,12 @@
 #You can specify a protocol Id. In that case you probably want to avoid conflict with internal ids.
 #You can use any number up to 65535
 #If you don't specify an explicit protocol Id, nDPI will pick one for you
+#Note that you can't specify a new Id for internal protocols
 
 tcp:81,tcp:8181@HTTP
 udp:5062@SIP
 tcp:860,udp:860,tcp:3260,udp:3260@iSCSI=59000
-tcp:9200@Elasticsearch=59001
+tcp:9200@Elasticsearch
 tcp:5601@Kibana=59002
 tcp:65535@TestProto=59003
 
@@ -51,7 +52,7 @@ host:"api-global.netflix.com"@Netflix
 #
 ip:213.75.170.11/32:443@CustomProtocol=60000
 ip:8.248.73.247:443@AmazonPrime=60001
-ip:54.80.47.130@AmazonPrime=60002
+ip:54.80.47.130@AmazonPrime=60001
 
 ip:3.3.3.3:443@CustomProtocolA=798
 ip:3.3.3.3:444@CustomProtocolB=799

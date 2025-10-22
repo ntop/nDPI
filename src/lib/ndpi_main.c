@@ -5511,11 +5511,12 @@ int ndpi_add_trusted_issuer_dn(struct ndpi_detection_module_struct *ndpi_str, ch
 
 static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 		            char *rule) {
-  char *at, *proto, *elem, *equal;
+  char *at, *proto, *elem, *equal, *first_comma;
   ndpi_proto_defaults_t *def;
   u_int subprotocol_id, i;
   int ret = 0;
   char *additional_params = NULL;
+  uint16_t user_proto_id = 0;
   ndpi_protocol_category_t category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
   ndpi_protocol_breed_t breed = NDPI_PROTOCOL_ACCEPTABLE;
 
@@ -5571,14 +5572,60 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
     }
   }
 
-  equal = strchr(proto, '=');
-  if(equal)
-    equal[0] = '\0';
-  
-  subprotocol_id = ndpi_get_proto_by_name(ndpi_str, proto);
+  /* Parsing: protoname=proto_id,cat=cat_id,breed=breed_id */
 
-  if(equal)
-    equal[0] = '=';
+  first_comma = strchr(proto, ',');
+  if(first_comma != NULL) {
+    first_comma[0] = '\0';
+    additional_params = &first_comma[1];
+  }
+  equal = strchr(proto, '=');
+  if(equal != NULL) {
+    equal[0] = '\0';
+    char *id_part = &equal[1];
+
+    const char *errstrp;
+    user_proto_id = ndpi_strtonum(id_part, ndpi_str->num_supported_protocols, 65535, &errstrp, 10);
+    if(errstrp != NULL) {
+      NDPI_LOG_ERR(ndpi_str, "Invalid protocol ID '%s': %s\n", id_part, errstrp);
+      return(-1);
+    }
+  }
+  /* Category and breed */
+  if(additional_params != NULL) {
+    char *param = NULL;
+    char *params_copy = additional_params;
+
+    while((param = strsep(&params_copy, ",")) != NULL) {
+      if(strncmp(param, "cat=", 4) == 0) {
+        char *cat_value = &param[4];
+        const char *errstrp;
+
+        int cat_id = ndpi_strtonum(cat_value, 1, NDPI_PROTOCOL_NUM_CATEGORIES-1, &errstrp, 10);
+        if(errstrp == NULL) {
+          category = (ndpi_protocol_category_t)cat_id;
+        } else {
+          NDPI_LOG_ERR(ndpi_str, "Invalid category ID '%s': %s\n", cat_value, errstrp);
+        }
+      } else if (strncmp(param, "breed=", 6) == 0) {
+        char *breed_value = &param[6];
+        const char *errstrp;
+
+        int breed_id = ndpi_strtonum(breed_value, 0, NDPI_NUM_BREEDS-1, &errstrp, 10);
+        if(errstrp == NULL) {
+          breed = (ndpi_protocol_breed_t)breed_id;
+        } else {
+          NDPI_LOG_ERR(ndpi_str, "Invalid breed ID '%s': %s\n", breed_value, errstrp);
+        }
+      }
+    }
+  }
+  NDPI_LOG_DBG(ndpi_str, "Protocol [%s] user_id %d, cat %d, breed %d\n", proto, user_proto_id, category, breed);
+
+  /* All parameters have been extracted */
+
+  /* Is it a new protocol? */
+  subprotocol_id = ndpi_get_proto_by_name(ndpi_str, proto);
   
   if(subprotocol_id == NDPI_PROTOCOL_UNKNOWN) {
     def = NULL;
@@ -5586,11 +5633,16 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
     category = ndpi_str->proto_defaults[subprotocol_id].protoCategory;
     breed = ndpi_str->proto_defaults[subprotocol_id].protoBreed;
     def = &ndpi_str->proto_defaults[subprotocol_id];
+
+    /* TODO: should we overwrite user_proto_id/cat/breed for existing protocols?
+     * With internals one we should have some problems because the data structures
+     * used for id<->user_id mapping work only with custom protocols...
+     */
   }
 
   if(def == NULL) {
     ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
-    u_int16_t user_proto_id, proto_id;
+    u_int16_t proto_id;
 
     /* The hard limit on protocols number depends on protocol ids being u_int16_t */
     if(ndpi_str->num_supported_protocols >= 65535) {
@@ -5600,63 +5652,10 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     proto_id = ndpi_str->num_supported_protocols; /* First free id */
-    user_proto_id = proto_id; /* By default, external id is equal to the internal one */
-
-    char *first_comma = strchr(proto, ',');
-    char *proto_name = proto;
-
-    if(first_comma != NULL) {
-      first_comma[0] = '\0';
-      additional_params = &first_comma[1];
-    }
-
-    char *equal = strchr(proto_name, '=');
-
-    if(equal != NULL) {
-      equal[0] = '\0';
-      char *id_part = &equal[1];
-
-      const char *errstrp;
-      user_proto_id = ndpi_strtonum(id_part, ndpi_str->num_supported_protocols, 65535, &errstrp, 10);
-      if(errstrp != NULL) {
-        NDPI_LOG_ERR(ndpi_str, "Invalid protocol ID '%s': %s\n", id_part, errstrp);
-        return(-1);
-      }
-
-      NDPI_LOG_DBG(ndpi_str, "***** ADDING MAPPING %s: %u -> %u\n", proto_name, proto_id, user_proto_id);
-    }
+    if(user_proto_id == 0)
+      user_proto_id = proto_id; /* By default, external id is equal to the internal one */
 
     ndpi_add_user_proto_id_mapping(ndpi_str, proto_id, user_proto_id);
-
-    /* Parse additional parameters like cat= and breed= */
-    if(additional_params != NULL) {
-      char *param = NULL;
-      char *params_copy = additional_params;
-
-      while((param = strsep(&params_copy, ",")) != NULL) {
-        if(strncmp(param, "cat=", 4) == 0) {
-          char *cat_value = &param[4];
-          const char *errstrp;
-
-          int cat_id = ndpi_strtonum(cat_value, 1, NDPI_PROTOCOL_NUM_CATEGORIES-1, &errstrp, 10);
-          if(errstrp == NULL) {
-            category = (ndpi_protocol_category_t)cat_id;
-          } else {
-            NDPI_LOG_ERR(ndpi_str, "Invalid category ID '%s': %s\n", cat_value, errstrp);
-          }
-        } else if (strncmp(param, "breed=", 6) == 0) {
-          char *breed_value = &param[6];
-          const char *errstrp;
-
-          int breed_id = ndpi_strtonum(breed_value, 0, NDPI_NUM_BREEDS-1, &errstrp, 10);
-          if(errstrp == NULL) {
-            breed = (ndpi_protocol_breed_t)breed_id;
-          } else {
-            NDPI_LOG_ERR(ndpi_str, "Invalid breed ID '%s': %s\n", breed_value, errstrp);
-          }
-        }
-      }
-    }
 
     ret = ndpi_set_proto_defaults(ndpi_str, 1 /* is_cleartext */,
 			          1 /* is_app_protocol */,
