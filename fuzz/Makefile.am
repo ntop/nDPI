@@ -445,14 +445,6 @@ files_corpus_fuzz_quic_get_crypto_data :=  $(wildcard corpus/fuzz_quic_get_crypt
 fuzz_quic_get_crypto_data_seed_corpus.zip: $(files_corpus_fuzz_quic_get_crypto_data)
 	zip -j fuzz_quic_get_crypto_data_seed_corpus.zip $(files_corpus_fuzz_quic_get_crypto_data)
 
-files_corpus_fuzz_serialization :=  $(wildcard corpus/fuzz_serialization/*)
-fuzz_serialization_seed_corpus.zip: $(files_corpus_fuzz_serialization)
-	zip -j fuzz_serialization_seed_corpus.zip $(files_corpus_fuzz_serialization)
-
-files_corpus_fuzz_community_id :=  $(wildcard corpus/fuzz_community_id/*)
-fuzz_community_id_seed_corpus.zip: $(files_corpus_fuzz_community_id)
-	zip -j fuzz_community_id_seed_corpus.zip $(files_corpus_fuzz_community_id)
-
 files_corpus_fuzz_is_stun_udp :=  $(wildcard corpus/fuzz_is_stun_udp/*)
 fuzz_is_stun_udp_seed_corpus.zip: $(files_corpus_fuzz_is_stun_udp)
 	zip -j fuzz_is_stun_udp_seed_corpus.zip $(files_corpus_fuzz_is_stun_udp)
@@ -460,38 +452,6 @@ fuzz_is_stun_udp_seed_corpus.zip: $(files_corpus_fuzz_is_stun_udp)
 files_corpus_fuzz_is_stun_tcp :=  $(wildcard corpus/fuzz_is_stun_tcp/*)
 fuzz_is_stun_tcp_seed_corpus.zip: $(files_corpus_fuzz_is_stun_tcp)
 	zip -j fuzz_is_stun_tcp_seed_corpus.zip $(files_corpus_fuzz_is_stun_tcp)
-
-files_corpus_fuzz_alg_ses_des :=  $(wildcard corpus/fuzz_alg_ses_des/*)
-fuzz_alg_ses_des_seed_corpus.zip: $(files_corpus_fuzz_alg_ses_des)
-	zip -j fuzz_alg_ses_des_seed_corpus.zip $(files_corpus_fuzz_alg_ses_des)
-
-files_corpus_fuzz_alg_bins :=  $(wildcard corpus/fuzz_alg_bins/*)
-fuzz_alg_bins_seed_corpus.zip: $(files_corpus_fuzz_alg_bins)
-	zip -j fuzz_alg_bins_seed_corpus.zip $(files_corpus_fuzz_alg_bins)
-
-files_corpus_fuzz_alg_hll :=  $(wildcard corpus/fuzz_alg_hll/*)
-fuzz_alg_hll_seed_corpus.zip: $(files_corpus_fuzz_alg_hll)
-	zip -j fuzz_alg_hll_seed_corpus.zip $(files_corpus_fuzz_alg_hll)
-
-files_corpus_fuzz_alg_jitter :=  $(wildcard corpus/fuzz_alg_jitter/*)
-fuzz_alg_jitter_seed_corpus.zip: $(files_corpus_fuzz_alg_jitter)
-	zip -j fuzz_alg_jitter_seed_corpus.zip $(files_corpus_fuzz_alg_jitter)
-
-files_corpus_fuzz_alg_crc32_md5 :=  $(wildcard corpus/fuzz_alg_crc32_md5/*)
-fuzz_alg_crc32_md5_seed_corpus.zip: $(files_corpus_fuzz_alg_crc32_md5)
-	zip -j fuzz_alg_crc32_md5_seed_corpus.zip $(files_corpus_fuzz_alg_crc32_md5)
-
-files_corpus_fuzz_ds_libcache :=  $(wildcard corpus/fuzz_ds_libcache/*)
-fuzz_ds_libcache_seed_corpus.zip: $(files_corpus_fuzz_ds_libcache)
-	zip -j fuzz_ds_libcache_seed_corpus.zip $(files_corpus_fuzz_ds_libcache)
-
-files_corpus_fuzz_ds_ptree :=  $(wildcard corpus/fuzz_ds_ptree/*)
-fuzz_ds_ptree_seed_corpus.zip: $(files_corpus_fuzz_ds_ptree)
-	zip -j fuzz_ds_ptree_seed_corpus.zip $(files_corpus_fuzz_ds_ptree)
-
-files_corpus_fuzz_alg_bytestream :=  $(wildcard corpus/fuzz_alg_bytestream/*)
-fuzz_alg_bytestream_seed_corpus.zip: $(files_corpus_fuzz_alg_bytestream)
-	zip -j fuzz_alg_bytestream_seed_corpus.zip $(files_corpus_fuzz_alg_bytestream)
 
 files_corpus_fuzz_libinjection :=  $(wildcard corpus/fuzz_libinjection/*)
 fuzz_libinjection_seed_corpus.zip: $(files_corpus_fuzz_libinjection)
@@ -529,19 +489,7 @@ files_corpus_fuzz_filecfg_category :=  $(wildcard corpus/fuzz_filecfg_category/*
 fuzz_filecfg_category_seed_corpus.zip: $(files_corpus_fuzz_filecfg_category)
 	zip -j fuzz_filecfg_category_seed_corpus.zip $(files_corpus_fuzz_filecfg_category)
 
-files_corpus_fuzz_readerutils_workflow :=  $(wildcard corpus/fuzz_readerutils_workflow/*)
-fuzz_readerutils_workflow_seed_corpus.zip: $(files_corpus_fuzz_readerutils_workflow)
-	zip -j fuzz_readerutils_workflow_seed_corpus.zip $(files_corpus_fuzz_readerutils_workflow)
-
-files_corpus_fuzz_ds_bitmap64_fuse :=  $(wildcard corpus/fuzz_ds_bitmap64_fuse/*)
-fuzz_ds_bitmap64_fuse_seed_corpus.zip: $(files_corpus_fuzz_ds_bitmap64_fuse)
-	zip -j fuzz_ds_bitmap64_fuse_seed_corpus.zip $(files_corpus_fuzz_ds_bitmap64_fuse)
-
-files_corpus_fuzz_ds_domain_classify :=  $(wildcard corpus/fuzz_ds_domain_classify/*)
-fuzz_ds_domain_classify_seed_corpus.zip: $(files_corpus_fuzz_ds_domain_classify)
-	zip -j fuzz_ds_domain_classify_seed_corpus.zip $(files_corpus_fuzz_ds_domain_classify)
-
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_alg_ses_des_seed_corpus.zip fuzz_alg_bins_seed_corpus.zip fuzz_alg_hll_seed_corpus.zip fuzz_alg_jitter_seed_corpus.zip fuzz_ds_libcache_seed_corpus.zip fuzz_community_id_seed_corpus.zip fuzz_serialization_seed_corpus.zip fuzz_ds_ptree_seed_corpus.zip fuzz_alg_crc32_md5_seed_corpus.zip fuzz_alg_bytestream_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_readerutils_workflow_seed_corpus.zip fuzz_ds_bitmap64_fuse_seed_corpus.zip fuzz_ds_domain_classify_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip fuzz_ndpi_reader_pl7m_seed_corpus.zip fuzz_ndpi_reader_pl7m_64k_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_only_subclassification_seed_corpus.zip fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip fuzz_filecfg_malicious_ja4_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip fuzz_ndpi_reader_pl7m_seed_corpus.zip fuzz_ndpi_reader_pl7m_64k_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_only_subclassification_seed_corpus.zip fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip fuzz_filecfg_malicious_ja4_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip
 	cp corpus/fuzz_*seed_corpus.zip .
 
 #Create dictionaries exactly as expected by oss-fuzz.
@@ -583,23 +531,10 @@ distdir:
 		-o -path './corpus/fuzz_filecfg_risk_domains/*' \
 		-o -path './corpus/fuzz_filecfg_config/*' \
 		-o -path './corpus/fuzz_filecfg_category/*' \
-		-o -path './corpus/fuzz_readerutils_workflow/*' \
 		-o -path './corpus/fuzz_is_stun_udp/*' \
 		-o -path './corpus/fuzz_is_stun_tcp/*' \
-		-o -path './corpus/fuzz_serialization/*' \
-		-o -path './corpus/fuzz_community_id/*' \
 		-o -path './corpus/fuzz_libinjection/*' \
-		-o -path './corpus/fuzz_tls_certificate/*' \
-		-o -path './corpus/fuzz_alg_ses_des/*' \
-		-o -path './corpus/fuzz_alg_bins/*' \
-		-o -path './corpus/fuzz_alg_hll/*' \
-		-o -path './corpus/fuzz_alg_jitter/*' \
-		-o -path './corpus/fuzz_alg_crc32_md5/*' \
-		-o -path './corpus/fuzz_alg_bytestream/*' \
-		-o -path './corpus/fuzz_ds_libcache/*' \
-		-o -path './corpus/fuzz_ds_bitmap64_fuse/*' \
-		-o -path './corpus/fuzz_ds_domain_classify/*' \
-		-o -path './corpus/fuzz_ds_ptree/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
+		-o -path './corpus/fuzz_tls_certificate/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 	find . -type l -name '*.c' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 
 all: corpus dictionaries
