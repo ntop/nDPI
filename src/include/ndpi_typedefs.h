@@ -1406,6 +1406,7 @@ struct ndpi_flow_struct {
   u_int8_t l4_proto, protocol_id_already_guessed:1, fail_with_unknown:1,
     init_finished:1, client_packet_direction:1, packet_direction:1, is_ipv6:1, first_pkt_fully_encrypted:1, skip_entropy_check: 1;
   u_int8_t monitoring:1, already_gaveup:1, _pad:6;
+  void *custom_category_userdata;
 
   u_int16_t num_dissector_calls;
   ndpi_confidence_t confidence; /* ndpi_confidence_t */

@@ -729,9 +729,8 @@ void proto_stack_reset(struct ndpi_proto_stack *s);
 
 u_int8_t ndpi_is_valid_protoId(const struct ndpi_detection_module_struct *ndpi_str, u_int16_t protoId);
 
-void ndpi_fill_protocol_category_and_breed(struct ndpi_detection_module_struct *ndpi_struct,
-                                           struct ndpi_flow_struct *flow,
-                                           ndpi_protocol *ret);
+void fill_protocol_category_and_breed(struct ndpi_detection_module_struct *ndpi_struct,
+                                           struct ndpi_flow_struct *flow);
 ndpi_protocol_breed_t get_proto_breed(struct ndpi_detection_module_struct *ndpi_str,
                                       ndpi_master_app_protocol proto);
 ndpi_protocol_category_t get_proto_category(struct ndpi_detection_module_struct *ndpi_str,
