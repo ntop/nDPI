@@ -10053,26 +10053,32 @@ static int do_guess(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_f
 
   if(ndpi_is_custom_protocol(ndpi_str, flow->guessed_protocol_id)) {
     /* This is a custom protocol and it has priority over everything else */
+    ndpi_set_detected_protocol(ndpi_str, flow,
+                               flow->guessed_protocol_id,
+                               NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_CUSTOM_RULE);
     ret->proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     ret->proto.app_protocol = flow->guessed_protocol_id;
-    flow->detected_protocol_stack[0] = flow->guessed_protocol_id;
     return(-1);
   }
 
   if(user_defined_proto && flow->guessed_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
     /* This is a custom protocol/range and it has priority over everything else */
+    ndpi_set_detected_protocol(ndpi_str, flow,
+                               flow->guessed_protocol_id,
+                               NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_CUSTOM_RULE);
     ret->proto.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     ret->proto.app_protocol = flow->guessed_protocol_id;
-    flow->detected_protocol_stack[0] = flow->guessed_protocol_id;
     return(-1);
   }
 
   if(ndpi_is_custom_protocol(ndpi_str, flow->guessed_protocol_id_by_ip)) {
     /* This is a custom protocol and it has priority over everything else */
+    ndpi_set_detected_protocol(ndpi_str, flow,
+                               flow->guessed_protocol_id_by_ip,
+                               flow->guessed_protocol_id,
+                               NDPI_CONFIDENCE_CUSTOM_RULE);
     ret->proto.master_protocol = flow->guessed_protocol_id;
     ret->proto.app_protocol = flow->guessed_protocol_id_by_ip;
-    flow->detected_protocol_stack[0] = flow->guessed_protocol_id_by_ip;
-    flow->detected_protocol_stack[1] = flow->guessed_protocol_id;
     return(-1);
   }
 
