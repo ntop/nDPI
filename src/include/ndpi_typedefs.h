@@ -1065,6 +1065,7 @@ typedef enum {
   NDPI_FPC_CONFIDENCE_IP,                       /* FPC based on IP address */
   NDPI_FPC_CONFIDENCE_DNS,                      /* FPC based on DNS information */
   NDPI_FPC_CONFIDENCE_DPI,                      /* FPC based on DPI information (i.e. flow classified via DPI with only one packet)*/
+  NDPI_FPC_CONFIDENCE_CUSTOM_RULE,              /* FPC based on custom rule matching (i.e. flow classified via custom rule with only one packet) */
 
   /*
     IMPORTANT

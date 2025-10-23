@@ -10108,6 +10108,13 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
 
   /* Order by most reliable logic */
 
+  /* Custom rules on first packet */
+  if(flow->confidence == NDPI_CONFIDENCE_CUSTOM_RULE) {
+    fpc_update(ndpi_str, flow, flow->detected_protocol_stack[1],
+               flow->detected_protocol_stack[0], NDPI_FPC_CONFIDENCE_CUSTOM_RULE);
+    return;
+  }
+
   /* DPI */
   if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     fpc_update(ndpi_str, flow, flow->detected_protocol_stack[1],
@@ -11680,6 +11687,9 @@ const char *ndpi_fpc_confidence_get_name(ndpi_fpc_confidence_t fpc_confidence)
 
   case NDPI_FPC_CONFIDENCE_DPI:
     return "DPI";
+
+  case NDPI_FPC_CONFIDENCE_CUSTOM_RULE:
+    return "Match by custom rule";
 
   default:
     return "Invalid"; /* Out of sync with ndpi_fpc_confidence_t definition */
