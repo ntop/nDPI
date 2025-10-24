@@ -110,7 +110,7 @@ url:connectivitycheck.gstatic.com/generate_204@GoogleConnCheck=2063,cat=30
 url:www.google.com/generate_204@GoogleConnCheck=2063,cat=30
 url:connectivitycheck.android.com/generate_204@GoogleConnCheck=2063,cat=30
 url:clients3.google.com/generate_204@GoogleConnCheck=2063,cat=30
-url:play.googleapis.com/generate_204@GoogleConnCheck=2063,cat=30
+url:play.googleapis.com/generate_204@GoogleConnCheck=2063,cat=29,breed=5
 
 
 

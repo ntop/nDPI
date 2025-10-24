@@ -955,24 +955,38 @@ static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct
 /* Check custom protocol */
 static void ndpi_check_http_url_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow) {
+  int custom_category = 0;
+
   if(flow->http.url) {
     if(ndpi_struct->http_url_hashmap) {
-      u_int64_t proto_id;
+      u_int64_t id;
+      u_int16_t proto, category, breed;
       
       /* This protocol has been defined in protos.txt-like files */
       if(ndpi_hash_find_entry(ndpi_struct->http_url_hashmap,
 			      flow->http.url, strlen(flow->http.url),
-			      &proto_id) == 0) {
-	ndpi_set_detected_protocol(ndpi_struct, flow, proto_id,
+			      &id) == 0) {
+        proto = id & 0xFFFF;
+        category = (id & 0xFFFF0000) >> 16;
+        breed = (id & 0xFFFF00000000) >> 32;
+	ndpi_set_detected_protocol(ndpi_struct, flow, proto,
 				   ndpi_get_master_proto(ndpi_struct, flow),
 				   NDPI_CONFIDENCE_CUSTOM_RULE);
+	flow->category = category;
+	flow->breed = breed;
+
+	if(category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+	  custom_category = 1;
+
 	return;
       }
     }
 
-    if(ends_with(ndpi_struct, (char*)flow->http.url, "/generate_204")
-       || ends_with(ndpi_struct, (char*)flow->http.url, "/generate204")) {
-      flow->category = NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK;      
+    if(!custom_category) { /* Category from custom rule always wins */
+      if(ends_with(ndpi_struct, (char*)flow->http.url, "/generate_204")
+         || ends_with(ndpi_struct, (char*)flow->http.url, "/generate204")) {
+        flow->category = NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK;
+      }
     }    
   }
 }
