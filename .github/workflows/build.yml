@@ -195,6 +195,10 @@ jobs:
         run: |
           DESTDIR=/tmp/ndpi make install
           ls -alhHR /tmp/ndpi
+          file /tmp/ndpi/usr/include/ndpi/ndpi_api.h
+          test ! -r /tmp/ndpi/usr/include/ndpi/ndpi_private.h
+          file /tmp/ndpi/usr/lib/libndpi.a
+          file /tmp/ndpi/usr/lib/libndpi.so*
       - name: Test nDPI [SYMBOLS]
         if: startsWith(matrix.os, 'ubuntu') && !endsWith(matrix.os, 'arm') && !startsWith(matrix.msan, '--with-') && !startsWith(matrix.nBPF, 'nBPF') && !startsWith(matrix.global_context, '--without') # Only on a few "standard" builds
         run: |
