@@ -72,7 +72,7 @@ struct pcre2_struct {
 
 typedef struct {
   char *key;
-  u_int32_t value32;
+  u_int64_t value64;
   UT_hash_handle hh;
 } ndpi_str_hash_priv;
 
@@ -2881,7 +2881,7 @@ void ndpi_hash_free(ndpi_str_hash **h) {
 
 /* ******************************************************************** */
 
-int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int32_t *value) {
+int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int64_t *value) {
   ndpi_str_hash_priv *h_priv;
   ndpi_str_hash_priv *item;
 
@@ -2895,7 +2895,7 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int32_t *
 
   if (item != NULL) {
     if(value != NULL)
-      *value = item->value32;
+      *value = item->value64;
 
     h->stats.n_found++;
     return 0;
@@ -2905,7 +2905,7 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int32_t *
 
 /* ******************************************************************** */
 
-int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_t value) {
+int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int64_t value) {
   ndpi_str_hash_priv *h_priv;
   ndpi_str_hash_priv *item, *ret_found;
 
@@ -2917,7 +2917,7 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_
   HASH_FIND(hh, h_priv, key, key_len, item);
 
   if(item != NULL) {
-    item->value32 = value;
+    item->value64 = value;
     return(1); /* Entry already present */
   }
 
@@ -2935,7 +2935,7 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_
     item->key[key_len] = '\0';
   }
 
-  item->value32 = value;
+  item->value64 = value;
 
   HASH_ADD(hh, *(ndpi_str_hash_priv **)&((*h)->priv), key[0], key_len, item);
 
@@ -4092,7 +4092,7 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
   u_int out_idx = 0, i, buf_shift = 0, domain_buf_len, compressed_len, suffix_len, domain_len;
   u_int32_t value = 0;
   u_char domain_buf[256], compressed[128];
-  u_int32_t domain_id = 0;
+  u_int64_t domain_id = 0;
   const char *suffix;
 
   if(!ndpi_domain_mapper_initialized) {
@@ -4782,7 +4782,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 
       if(flow->ndpi.fingerprint != NULL &&
          ndpi_str->ndpifp_custom_protos != NULL) {
-	u_int32_t proto_id;
+	u_int64_t proto_id;
 
 	/* This protocol has been defined in protos.txt-like files */
 	if(ndpi_hash_find_entry(ndpi_str->ndpifp_custom_protos,

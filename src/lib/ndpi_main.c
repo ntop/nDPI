@@ -4983,7 +4983,7 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
                                ndpi_protocol_category_t *category,
                                ndpi_protocol_breed_t *breed) {
   char buf[128];
-  u_int32_t class_id;
+  u_int64_t class_id;
   u_int max_len = sizeof(buf)-1;
 
   if(!ndpi_str->custom_categories.categories_loaded)

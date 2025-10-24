@@ -2125,7 +2125,7 @@ extern "C" {
    * @return 0 if an entry with that key was found, 1 otherwise
    *
    */
-  int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int32_t *value);
+  int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int64_t *value);
 
   /**
    * Add an entry to the hashmap.
@@ -2138,7 +2138,7 @@ extern "C" {
    * @return 0 if the entry was added, 1 otherwise
    *
    */
-  int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int32_t value);
+  int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int64_t value);
 
   void ndpi_hash_get_stats(ndpi_str_hash *h, struct ndpi_str_hash_stats *stats);
   int ndpi_get_hash_stats(struct ndpi_detection_module_struct *ndpi_struct,
@@ -2275,7 +2275,7 @@ extern "C" {
 					     char *file_path);
   bool ndpi_domain_classify_hostname(struct ndpi_detection_module_struct *ndpi_mod,
 				     ndpi_domain_classify *s,
-				     u_int32_t *class_id /* out */,
+				     u_int64_t *class_id /* out */,
 				     char *hostname);
 
   /* ******************************* */
@@ -2352,7 +2352,7 @@ extern "C" {
    */
   const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndpi_str,
 					  const char *hostname,
-					  u_int32_t *suffix_id /* out */);
+					  u_int64_t *suffix_id /* out */);
 
   /**
    * Returns the domain (including the TLS) suffix out of the specified hostname.

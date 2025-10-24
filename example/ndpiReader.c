@@ -5831,14 +5831,14 @@ void rsiUnitTest() {
 void hashUnitTest() {
   ndpi_str_hash *h;
   char * const dict[] = { "hello", "world", NULL };
-  u_int32_t i;
+  u_int64_t i;
 
   assert(ndpi_hash_init(&h) == 0);
   assert(h->priv == NULL);
 
   for(i=0; dict[i] != NULL; i++) {
     u_int8_t l = strlen(dict[i]);
-    u_int32_t v;
+    u_int64_t v;
 
     assert(ndpi_hash_add_entry(&h, dict[i], l, i) == 0);
     assert(ndpi_hash_find_entry(h, dict[i], l, &v) == 0);
@@ -6853,7 +6853,7 @@ void encodeDomainsUnitTest() {
   struct stat st;
 
   if(stat(lists_path, &st) == 0) {
-    u_int32_t suffix_id;
+    u_int64_t suffix_id;
     char out[256];
     char *str;
     ndpi_protocol_category_t id;
@@ -6903,7 +6903,7 @@ void domainsUnitTest() {
   struct stat st;
 
   if(stat(lists_path, &st) == 0) {
-    u_int32_t suffix_id;
+    u_int64_t suffix_id;
 
     assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
 
@@ -6933,7 +6933,7 @@ void domainsUnitTest() {
 void domainSearchUnitTest() {
   ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
   char *domain = "ntop.org";
-  u_int32_t class_id;
+  u_int64_t class_id;
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   u_int8_t trace = 0;
 
@@ -6970,7 +6970,7 @@ void domainSearchUnitTest() {
 void domainSearchUnitTest2() {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   ndpi_domain_classify *c = ndpi_domain_classify_alloc();
-  u_int32_t class_id = 9;
+  u_int64_t class_id = 9;
 
   assert(ndpi_str);
   assert(c);

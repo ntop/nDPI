@@ -957,7 +957,7 @@ static void ndpi_check_http_url_subprotocol(struct ndpi_detection_module_struct 
 					    struct ndpi_flow_struct *flow) {
   if(flow->http.url) {
     if(ndpi_struct->http_url_hashmap) {
-      u_int32_t proto_id;
+      u_int64_t proto_id;
       
       /* This protocol has been defined in protos.txt-like files */
       if(ndpi_hash_find_entry(ndpi_struct->http_url_hashmap,

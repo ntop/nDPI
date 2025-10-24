@@ -21,7 +21,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int16_t i, num_iteration, is_added = 0;
   bool rc;
   ndpi_domain_classify *d;
-  u_int32_t class_id;
+  u_int64_t class_id;
   std::string value, value_added;
 
   /* We don't need a complete (and costly to set up) context!
@@ -47,7 +47,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   
   for (i = 0; i < num_iteration; i++) {
     value = fuzzed_data.ConsumeBytesAsString(fuzzed_data.ConsumeIntegral<u_int8_t>());
-    class_id = fuzzed_data.ConsumeIntegral<u_int32_t>();
+    class_id = fuzzed_data.ConsumeIntegral<u_int64_t>();
     rc = ndpi_domain_classify_add(fuzzed_data.ConsumeBool() ? ndpi_struct : NULL,
                                   d, class_id, (char*)value.c_str());
     

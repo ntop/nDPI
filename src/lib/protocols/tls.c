@@ -3377,7 +3377,7 @@ compute_ja4c:
 	        ndpi_compute_ja4(ndpi_struct, flow, quic_version, &ja);
 
 		if(ndpi_struct->ja4_custom_protos != NULL) {
-		  u_int32_t proto_id;
+		  u_int64_t proto_id;
 
 		  /* This protocol has been defined in protos.txt-like files */
 		  if(ndpi_hash_find_entry(ndpi_struct->ja4_custom_protos,
