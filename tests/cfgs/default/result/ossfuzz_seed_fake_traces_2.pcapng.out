@@ -29,6 +29,7 @@ Hash TCP fingerprints:     6/2 (search/found)
 Hash public domain suffix: 0/0 (search/found)
 Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
 
 PostgreSQL	10	689	1
 Usenet	12	1099	2

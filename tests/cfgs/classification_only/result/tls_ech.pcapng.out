@@ -19,12 +19,13 @@ Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   1/0 (search/found)
 Patricia protocols:   0/0 (search/found)
 Patricia protocols IPv6: 1/1 (search/found)
-Hash malicious ja4:        0/0 (search/found)
+Hash malicious ja4:        1/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     0/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
-Hash ja4 custom protos:    0/0 (search/found)
+Hash ja4 custom protos:    1/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
 
 Cloudflare	10	4226	1
 
@@ -32,4 +33,9 @@ Acceptable                      10 4226          1
 
 Web                             10 4226          1            
 
-	1	TCP [2001:b07:a3d:c112:ce16:b409:3d0a:9177]:47460 <-> [2606:4700::6812:1e4e]:443 [proto: 91.220/TLS.Cloudflare][Stack: TLS.Cloudflare][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 4][cat: Web/5][Breed: Acceptable][6 pkts/1172 bytes <-> 4 pkts/3054 bytes][Goodput ratio: 55/88][0.07 sec][Hostname/SNI: performance.radar.cloudflare.com][(Advertised) ALPNs: h2;http/1.1][bytes ratio: -0.445 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/3 13/5 49/7 18/2][Pkt Len c2s/s2c min/avg/max/stddev: 86/86 195/764 670/2260 213/890][TLSv1.2][ECH: version 0xfe0d][Plen Bins: 0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25]
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 2001:b07:a3d:c112:ce16:b409:3d0a:9177 	 1      
+
+
+	1	TCP [2001:b07:a3d:c112:ce16:b409:3d0a:9177]:47460 <-> [2606:4700::6812:1e4e]:443 [proto: 91.220/TLS.Cloudflare][Stack: TLS.Cloudflare][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 4][cat: Web/5][Breed: Acceptable][6 pkts/1172 bytes <-> 4 pkts/3054 bytes][Goodput ratio: 55/88][0.07 sec][Hostname/SNI: performance.radar.cloudflare.com][(Advertised) ALPNs: h2;http/1.1][bytes ratio: -0.445 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/3 13/5 49/7 18/2][Pkt Len c2s/s2c min/avg/max/stddev: 86/86 195/764 670/2260 213/890][TLSv1.2][JA4: t13d1516h2_8daaf6152771_02713d6af862][ECH: version 0xfe0d][Plen Bins: 0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25]

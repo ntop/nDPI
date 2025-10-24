@@ -1,5 +1,6 @@
 DPI Packets (TCP):	78	(3.71 pkts/flow)
-Confidence DPI              : 21 (flows)
+Confidence DPI              : 20 (flows)
+Confidence Match by custom rule: 1 (flows)
 Num dissector calls: 213 (10.14 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
@@ -8,8 +9,8 @@ LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    0/0/0 (insert/search/found)
-Automa host:          32/10 (search/found)
-Automa domain:        21/0 (search/found)
+Automa host:          31/9 (search/found)
+Automa domain:        20/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
@@ -25,12 +26,13 @@ Hash TCP fingerprints:     0/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
 Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    45/1 (search/found)
 
 HTTP	133	96179	11
 QQ	12	4781	5
 Facebook	6	1740	3
-Google	2	378	1
 Xiaomi	2	1469	1
+GoogleConnCheck	2	378	1
 
 Acceptable                       2 378           1            
 Fun                            153 104169        20           
@@ -62,4 +64,4 @@ ConnCheck                        2 378           1
 	18	TCP 10.54.169.250:52288 <-> 173.252.74.22:80 [proto: 7.119/HTTP.Facebook][Stack: HTTP.Facebook][IP: 119/Facebook][ClearText][Confidence: DPI][FPC: 7.119/HTTP.Facebook, Confidence: DPI][DPI packets: 2][cat: SocialNetwork/6][Breed: Fun][1 pkts/243 bytes <-> 1 pkts/339 bytes][Goodput ratio: 77/83][0.46 sec][Hostname/SNI: www.facebook.com][URL: www.facebook.com/mobile/status.php][StatusCode: 204][User-Agent: Dalvik/1.6.0 (Linux; U; Android 4.4.4; MI 3W MIUI/V6.4.2.0.KXDMICB)][PLAIN TEXT (GET /mobile/status.php HTTP/1.1)][Plen Bins: 0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	19	TCP 10.54.169.250:44793 <-> 31.13.68.49:80 [proto: 7.119/HTTP.Facebook][Stack: HTTP.Facebook][IP: 119/Facebook][ClearText][Confidence: DPI][FPC: 7.119/HTTP.Facebook, Confidence: DPI][DPI packets: 2][cat: SocialNetwork/6][Breed: Fun][1 pkts/237 bytes <-> 1 pkts/339 bytes][Goodput ratio: 76/83][0.34 sec][Hostname/SNI: www.facebook.com][URL: www.facebook.com/mobile/status.php][StatusCode: 204][User-Agent: Dalvik/1.6.0 (Linux; U; Android 4.4.2; GT-I9505 Build/KOT49H)][PLAIN TEXT (GET /mobile/status.php HTTP/1.1)][Plen Bins: 0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	20	TCP 10.54.169.250:33064 <-> 120.28.5.18:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 2][cat: Streaming/17][Breed: Fun][1 pkts/358 bytes <-> 1 pkts/109 bytes][Goodput ratio: 84/48][0.31 sec][Hostname/SNI: api-singtelhawk.quickplay.com][URL: api-singtelhawk.quickplay.com/solr/RestApiSingTel_PH/restapi/home?apiKey=qwerty&device=androidmobile&locale=eng&network=WIFI&pageNumber=1&pageSize=50][User-Agent: Dalvik/1.6.0 (Linux; U; Android 4.4.4; MI 3W MIUI/V6.4.2.0.KXDMICB)][PLAIN TEXT (GET /solr/RestApiSingTel)][Plen Bins: 0,50,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	21	TCP 10.54.169.250:33277 <-> 120.28.26.231:80 [proto: 7.126/HTTP.Google][Stack: HTTP.Google][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7.126/HTTP.Google, Confidence: DPI][DPI packets: 2][cat: ConnCheck/30][Breed: Acceptable][1 pkts/241 bytes <-> 1 pkts/137 bytes][Goodput ratio: 76/59][0.06 sec][Hostname/SNI: clients3.google.com][URL: clients3.google.com/generate_204][StatusCode: 204][Server: GFE/2.0][User-Agent: Dalvik/1.6.0 (Linux; U; Android 4.4.4; MI 3W MIUI/V6.4.2.0.KXDMICB)][Risk: ** Mismatching Protocol with server IP address **][Risk Score: 100][Risk Info: nDPI protocol does not match the server IP address][PLAIN TEXT (GET /generate)][Plen Bins: 0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	21	TCP 10.54.169.250:33277 <-> 120.28.26.231:80 [proto: 7.2063/HTTP.GoogleConnCheck][Stack: HTTP.GoogleConnCheck][IP: 0/Unknown][ClearText][Confidence: Match by custom rule][FPC: 7.2063/HTTP.GoogleConnCheck, Confidence: Match by custom rule][DPI packets: 2][cat: ConnCheck/30][Breed: Acceptable][1 pkts/241 bytes <-> 1 pkts/137 bytes][Goodput ratio: 76/59][0.06 sec][Hostname/SNI: clients3.google.com][URL: clients3.google.com/generate_204][StatusCode: 204][Server: GFE/2.0][User-Agent: Dalvik/1.6.0 (Linux; U; Android 4.4.4; MI 3W MIUI/V6.4.2.0.KXDMICB)][PLAIN TEXT (GET /generate)][Plen Bins: 0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

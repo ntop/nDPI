@@ -1,12 +1,17 @@
 #  Format:
 #  <tcp|udp>:<port>,<tcp|udp>:<port>,.....@<proto>
 
+#You can specify a protocol Id. In that case you probably want to avoid conflict with internal ids.
+#You can use any number up to 65535
+#If you don't specify an explicit protocol Id, nDPI will pick one for you
+#Note that you can't specify a new Id for internal protocols
+
 tcp:81,tcp:8181@HTTP
 udp:5062@SIP
-tcp:860,udp:860,tcp:3260,udp:3260@iSCSI=65531
+tcp:860,udp:860,tcp:3260,udp:3260@iSCSI=59000
 tcp:9200@Elasticsearch
-tcp:5601@Kibana
-tcp:65535@TestProto
+tcp:5601@Kibana=59002
+tcp:65535@TestProto=59003
 
 #
 # nBPF filters (https://github.com/ntop/PF_RING/tree/dev/userland/nbpf))
@@ -45,15 +50,12 @@ host:"api-global.netflix.com"@Netflix
 #    detected as <L7 proto>.Google but only
 #    as <L7 proto>
 #
-ip:213.75.170.11/32:443@CustomProtocol
-ip:8.248.73.247:443@AmazonPrime
-ip:54.80.47.130@AmazonPrime
+ip:213.75.170.11/32:443@CustomProtocol=60000
+ip:8.248.73.247:443@AmazonPrime=60001
+ip:54.80.47.130@AmazonPrime=60001
 
-#You can specify a protocol Id. In that case you probably want to avoid conflict with internal ids.
-#You can use any number up to 65535
-
-ip:3.3.3.3:443@CustomProtocolA
-ip:3.3.3.3:444@CustomProtocolB
+ip:3.3.3.3:443@CustomProtocolA=798
+ip:3.3.3.3:444@CustomProtocolB=799
 ip:3.3.3.3:446@CustomProtocolC=800
 
 ipv6:[3ffe:507:0:1:200:86ff:fe05:80da]@CustomProtocolD=1024
@@ -101,3 +103,14 @@ ja4:t12d1409h1_c866b44c5a26_b39be8c56777@CustomJA4Proto=2060
 # nDPI Fingerprint
 ndpifp:8ae775daeb30f7aa5790706158288639@CustomnDPIFPProto=2061
 ndpifp:2d3ea0b7f090060fa1b9f3783362f862@CustomnDPIFPProto2=2062
+
+# HTTP URLs
+url:www.ntop.org/blog/feed/@GoogleConnCheck=2063,cat=30
+url:connectivitycheck.gstatic.com/generate_204@GoogleConnCheck=2063,cat=30
+url:www.google.com/generate_204@GoogleConnCheck=2063,cat=30
+url:connectivitycheck.android.com/generate_204@GoogleConnCheck=2063,cat=30
+url:clients3.google.com/generate_204@GoogleConnCheck=2063,cat=30
+url:play.googleapis.com/generate_204@GoogleConnCheck=2063,cat=30
+
+
+

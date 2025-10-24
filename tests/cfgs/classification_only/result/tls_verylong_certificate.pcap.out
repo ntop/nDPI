@@ -19,12 +19,13 @@ Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
 Patricia protocols:   2/0 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
-Hash malicious ja4:        0/0 (search/found)
+Hash malicious ja4:        1/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     0/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
-Hash ja4 custom protos:    0/0 (search/found)
+Hash ja4 custom protos:    1/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
 
 Cybersec	48	22229	1
 
@@ -32,4 +33,9 @@ Safe                            48 22229         1
 
 Cybersecurity                   48 22229         1            
 
-	1	TCP 192.168.1.160:54804 <-> 151.101.66.49:443 [proto: 91.283/TLS.Cybersec][Stack: TLS.Cybersec][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Cybersecurity/33][Breed: Safe][24 pkts/2404 bytes <-> 24 pkts/19825 bytes][Goodput ratio: 35/92][0.09 sec][Hostname/SNI: feodotracker.abuse.ch][(Advertised) ALPNs: http/1.1][bytes ratio: -0.784 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/4 15/21 5/7][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 100/826 583/1434 109/662][TLSv1.2][Plen Bins: 12,16,0,4,0,4,4,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,55,0,0,0,0,0]
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.1.160            	 1      
+
+
+	1	TCP 192.168.1.160:54804 <-> 151.101.66.49:443 [proto: 91.283/TLS.Cybersec][Stack: TLS.Cybersec][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Cybersecurity/33][Breed: Safe][24 pkts/2404 bytes <-> 24 pkts/19825 bytes][Goodput ratio: 35/92][0.09 sec][Hostname/SNI: feodotracker.abuse.ch][(Advertised) ALPNs: http/1.1][bytes ratio: -0.784 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/4 15/21 5/7][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 100/826 583/1434 109/662][TLSv1.2][JA4: t12d6707h1_2955a3196ffa_c83f907a73d3][Plen Bins: 12,16,0,4,0,4,4,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,55,0,0,0,0,0]

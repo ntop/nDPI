@@ -1,0 +1,43 @@
+DPI Packets (TCP):	23	(7.67 pkts/flow)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 3 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/3/0 (insert/search/found)
+Automa host:          3/3 (search/found)
+Automa domain:        3/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  6/6 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   3/3 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        3/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     3/3 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+CUSTOMPROTO	63	23564	3
+
+Acceptable                      63 23564         3            
+
+Web                             63 23564         3            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.1.143            	 2      
+
+
+	1	TCP 192.168.1.143:46326 <-> 64.233.167.84:443 [proto: 91.64000/TLS.CUSTOMPROTO][Stack: TLS.CUSTOMPROTO][IP: 126/Google][ClearText][Confidence: DPI][FPC: 126/Google, Confidence: IP address][DPI packets: 10][cat: Web/5][Breed: Acceptable][16 pkts/8181 bytes <-> 18 pkts/5890 bytes][Goodput ratio: 87/80][0.13 sec][Hostname/SNI: accounts.google.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: 0.163 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/3 22/20 7/7][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 511/327 4485/1924 1186/518][nDPI Fingerprint: 7b573c8ed36ea56fb9f2ebe2e42f6024][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][TLSv1.3][JA4: t13d1718h2_5b57614c22b0_e7cacf613b58][JA3S: 2b0648ab686ee45e0e7c35fcfb0eea7e][ECH: version 0xfe0d][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 30,24,5,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,17]
+	2	TCP 192.168.1.143:46116 <-> 17.253.144.10:443 [proto: 91.64000/TLS.CUSTOMPROTO][Stack: TLS.CUSTOMPROTO][IP: 140/Apple][ClearText][Confidence: DPI][FPC: 140/Apple, Confidence: IP address][DPI packets: 6][cat: Web/5][Breed: Acceptable][9 pkts/3774 bytes <-> 10 pkts/2074 bytes][Goodput ratio: 84/68][0.08 sec][Hostname/SNI: apple.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: 0.291 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/8 19/20 8/10][Pkt Len c2s/s2c min/avg/max/stddev: 66/60 419/207 2467/916 754/260][nDPI Fingerprint: 79d10b99ca3d1ab3bd1067e0d027daf2][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][TLSv1.3][JA4: t13d1717h2_5b57614c22b0_e6dcd7ae0a9e][JA3S: 2b0648ab686ee45e0e7c35fcfb0eea7e][ECH: version 0xfe0d][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 25,0,12,0,0,0,12,0,0,0,12,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12]
+	3	TCP 192.168.1.143:43052 <-> 23.60.189.51:443 [proto: 91.64000/TLS.CUSTOMPROTO][Stack: TLS.CUSTOMPROTO][IP: 467/Akamai][ClearText][Confidence: DPI][FPC: 467/Akamai, Confidence: IP address][DPI packets: 7][cat: Web/5][Breed: Acceptable][6 pkts/3109 bytes <-> 4 pkts/536 bytes][Goodput ratio: 87/49][0.04 sec][Hostname/SNI: www.apple.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: 0.706 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 7/6 16/17 8/8][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 518/134 2599/330 931/113][nDPI Fingerprint: 79d10b99ca3d1ab3bd1067e0d027daf2][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][TLSv1.3][JA4: t13d1717h2_5b57614c22b0_e6dcd7ae0a9e][JA3S: 2253c82f03b621c5144709b393fde2c9][ECH: version 0xfe0d][Firefox][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 0,0,50,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25]

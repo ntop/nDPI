@@ -31,6 +31,7 @@ Hash TCP fingerprints:     5/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
 Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
 
 Unknown	33	4066	33
 FTP_CONTROL	36	2569	12

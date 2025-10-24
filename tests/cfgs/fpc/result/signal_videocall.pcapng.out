@@ -27,6 +27,7 @@ Hash TCP fingerprints:     0/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
 Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
 
 STUN	0	0	0	36	3764	2	(*)
 SignalVoip	334	123259	3	298	119495	1	(*)

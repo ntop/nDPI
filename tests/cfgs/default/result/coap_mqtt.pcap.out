@@ -26,6 +26,7 @@ Hash TCP fingerprints:     1/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
 Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
 
 COAP	19	1614	8
 Dropbox	800	80676	4

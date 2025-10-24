@@ -761,6 +761,7 @@ typedef enum {
   NDPI_STR_HASH_PUBLIC_DOMAIN_SUFFIX,
   NDPI_STR_HASH_JA4_CUSTOM_PROTOS,
   NDPI_STR_HASH_FP_CUSTOM_PROTOS,
+  NDPI_STR_HASH_HTTP_URL,
 
   NDPI_STR_HASH_MAX       /* Last one! */
 } str_hash_type;
@@ -1064,6 +1065,7 @@ typedef enum {
   NDPI_FPC_CONFIDENCE_IP,                       /* FPC based on IP address */
   NDPI_FPC_CONFIDENCE_DNS,                      /* FPC based on DNS information */
   NDPI_FPC_CONFIDENCE_DPI,                      /* FPC based on DPI information (i.e. flow classified via DPI with only one packet)*/
+  NDPI_FPC_CONFIDENCE_CUSTOM_RULE,              /* FPC based on custom rule matching (i.e. flow classified via custom rule with only one packet) */
 
   /*
     IMPORTANT
@@ -1301,6 +1303,7 @@ typedef struct ndpi_proto {
   u_int16_t protocol_by_ip;
   ndpi_protocol_category_t category;
   ndpi_protocol_breed_t breed;
+  struct ndpi_fpc_info fpc;
   void *custom_category_userdata;
 } ndpi_protocol;
 
@@ -1403,6 +1406,7 @@ struct ndpi_flow_struct {
   u_int8_t l4_proto, protocol_id_already_guessed:1, fail_with_unknown:1,
     init_finished:1, client_packet_direction:1, packet_direction:1, is_ipv6:1, first_pkt_fully_encrypted:1, skip_entropy_check: 1;
   u_int8_t monitoring:1, already_gaveup:1, _pad:6;
+  void *custom_category_userdata;
 
   u_int16_t num_dissector_calls;
   ndpi_confidence_t confidence; /* ndpi_confidence_t */
