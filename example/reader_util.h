@@ -357,7 +357,12 @@ typedef struct ndpi_flow_info {
 #else
   struct ndpi_bin payload_len_bin;
 #endif
-
+  
+  struct {
+    u_int8_t num_blocks;
+    struct ndpi_tls_block blocks[NDPI_MAX_NUM_TLS_APPL_BLOCKS];
+  } tls;
+  
   /* Flow payload */
   u_int16_t flow_payload_len;
   char *flow_payload;  

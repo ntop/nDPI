@@ -2531,6 +2531,19 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     print_bin(out, "Plen Bins", &flow->payload_len_bin);
 #endif
 
+    if(flow->tls.num_blocks > 0) {
+      int i;
+
+      fprintf(out, "[TLS blocks: ");
+
+      for(i=0; i<flow->tls.num_blocks; i++) {
+	fprintf(out, "%s%u/%d", (i > 0) ? "," : "", flow->tls.blocks[i].block_type, flow->tls.blocks[i].len);
+	//fprintf(out, "%s%u", (i > 0) ? "," : "", flow->tls.blocks[i].block_type);
+      }
+
+      fprintf(out, "]");
+    }
+
     if(flow->flow_payload && (flow->flow_payload_len > 0)) {
       u_int i;
 

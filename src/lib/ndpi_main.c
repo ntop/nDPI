@@ -13433,6 +13433,7 @@ static const struct cfg_param {
   { "tls",           "metadata.ja4c_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja4c_fingerprint_enabled), NULL },
   { "tls",           "metadata.ja4r_fingerprint",               "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja4r_fingerprint_enabled), NULL },
   { "tls",           "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_subclassification_enabled), NULL },
+  { "tls",           "blocks_analysis",                         "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_blocks_analysis_enabled), NULL },
 
   { "quic",          "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(quic_subclassification_enabled), NULL },
 

@@ -34,7 +34,7 @@
 static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow);
 
-// #define DEBUG_TLS_MEMORY       1
+//  #define DEBUG_TLS_MEMORY       1
 // #define DEBUG_TLS              1
 // #define DEBUG_TLS_BLOCKS       1
 // #define DEBUG_CERTIFICATE_HASH
@@ -123,8 +123,10 @@ static bool str_contains_digit(char *str) {
 
 /* TODO: rename */
 static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-                                     struct ndpi_flow_struct *flow)
-{
+                                     struct ndpi_flow_struct *flow) {
+  if(ndpi_struct->cfg.tls_blocks_analysis_enabled)
+    return(1); /* Process as much TLS blocks as the max packet number */
+  
   /* Common path: found handshake on both directions */
   if(
      (flow->tls_quic.certificate_processed == 1 && flow->protos.tls_quic.client_hello_processed)
@@ -169,7 +171,7 @@ static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_s
 /* **************************************** */
 
 /* Heuristic to detect proxied/obfuscated TLS flows, based on
-   https://www.usenix.org/conference/usenixsecurity24/presentation/xue-fingerprinting.
+   https://www.usenix.org/conference/usenixsecurity24/preosentation/xue-fingerprinting.
    Main differences between the paper and our implementation:
     * only Mahalanobis Distance, no Chi-squared Test
     * instead of 3-grams, we use 4-grams, always starting from the Client -> Server direction
@@ -680,7 +682,8 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
 			     ndpi_get_current_time(flow))) {
         ndpi_master_app_protocol proto;
 
-	ndpi_set_detected_protocol(ndpi_struct, flow, cached_proto, ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI_CACHE);
+	ndpi_set_detected_protocol(ndpi_struct, flow, cached_proto,
+				   ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI_CACHE);
 	proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
 	proto.app_protocol = cached_proto;
 	flow->category = get_proto_category(ndpi_struct, proto);
@@ -1352,6 +1355,9 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->tcp == NULL)
     return 0; /* Error -> stop (this doesn't seem to be TCP) */
 
+  if(packet->payload_packet_len == 0)
+    return 1;
+
 #ifdef DEBUG_TLS_MEMORY
   printf("[TLS Mem] ndpi_search_tls_tcp() Processing new packet [payload_packet_len: %u][Dir: %u]\n",
 	 packet->payload_packet_len, packet->packet_direction);
@@ -1374,6 +1380,11 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 			    packet->payload_packet_len, ntohl(packet->tcp->seq),
 			    message) == -1)
     return 0; /* Error -> stop */
+
+#ifdef DEBUG_TLS
+  printf("[TLS] Processing packet [payload_packet_len: %u][Dir: %u]\n",
+	 packet->payload_packet_len, packet->packet_direction);
+#endif
 
   /* Valid TLS Content Types:
      https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5 */
@@ -1412,6 +1423,28 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
     content_type = message->buffer[0];
 
+#ifdef DEBUG_TLS
+    printf("*** [TLS] Processing block [content_type: %u/0x%02X][len: %u][Dir: %u]\n",
+	   content_type, content_type, len, packet->packet_direction);
+#endif
+
+    if(ndpi_struct->cfg.tls_blocks_analysis_enabled) {
+      if(flow->l4.tcp.tls.num_tls_blocks < NDPI_MAX_NUM_TLS_APPL_BLOCKS) {
+	int16_t blen = len-5;
+	
+	/* Use positive values for c->s and negative for s->c */
+	if(packet->packet_direction != 0) blen = -blen;
+	
+	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen;
+	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type = content_type;
+	
+#ifdef DEBUG_TLS_BLOCKS
+	printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
+	       len-5, flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->num_tls_blocks_to_follow);
+#endif
+      }
+    }
+    
     /* Overwriting packet payload */
     p = packet->payload;
     p_len = packet->payload_packet_len; /* Backup */
@@ -1439,8 +1472,8 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
         ndpi_int_tls_add_connection(ndpi_struct, flow);
         flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
         /* Further data is encrypted so we are not able to parse it without
-           erros and without setting `something_went_wrong` variable */
-        break;
+           errors and without setting `something_went_wrong` variable */
+        // break;
       }
     } else if(content_type == 0x15 /* Alert */) {
       /* https://techcommunity.microsoft.com/t5/iis-support-blog/ssl-tls-alert-protocol-and-the-alert-codes/ba-p/377132 */
@@ -1513,22 +1546,6 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
 	if(flow->l4.tcp.tls.app_data_seen[!packet->packet_direction] == 1)
 	  flow->tls_quic.certificate_processed = 1;
-
-	if(flow->tls_quic.certificate_processed) {
-	  if(flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->num_tls_blocks_to_follow) {
-	    int16_t blen = len-5;
-
-	    /* Use positive values for c->s e negative for s->c */
-	    if(packet->packet_direction != 0) blen = -blen;
-
-	    flow->l4.tcp.tls.tls_application_blocks_len[flow->l4.tcp.tls.num_tls_blocks++] = blen;
-	  }
-
-#ifdef DEBUG_TLS_BLOCKS
-	  printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
-		 len-5, flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->num_tls_blocks_to_follow);
-#endif
-	}
       }
     }
 
@@ -1671,7 +1688,6 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
         handshake_frag_off = (block[19] << 16) + (block[20] << 8) + block[21];
         handshake_frag_len = (block[22] << 16) + (block[23] << 8) + block[24];
         message = &flow->tls_quic.message[packet->packet_direction];
-
 
 #ifdef DEBUG_TLS
         printf("[TLS] DTLS frag off %d len %d\n", handshake_frag_off, handshake_frag_len);
