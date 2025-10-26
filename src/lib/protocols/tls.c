@@ -1473,7 +1473,14 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
         flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
         /* Further data is encrypted so we are not able to parse it without
            errors and without setting `something_went_wrong` variable */
-        // break;
+
+        if(!ndpi_struct->cfg.tls_blocks_analysis_enabled) {
+	  /*
+	    In case of TLS blocks analysis we want to analize all the blocks
+	    whereas in "standard" mode we can use this shortcut and break
+	  */
+	  break;
+	}
       }
     } else if(content_type == 0x15 /* Alert */) {
       /* https://techcommunity.microsoft.com/t5/iis-support-blog/ssl-tls-alert-protocol-and-the-alert-codes/ba-p/377132 */
