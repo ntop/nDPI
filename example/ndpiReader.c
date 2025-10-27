@@ -2513,9 +2513,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     char unknown_cipher[8];
     if(flow->ssh_tls.server_cipher != '\0')
-      {
-	fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.server_cipher, unknown_cipher));
-      }
+      fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.server_cipher, unknown_cipher));
+    
     if(flow->bittorent_hash != NULL) fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
     if(flow->dhcp_fingerprint != NULL) fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
     if(flow->dhcp_class_ident) fprintf(out, "[DHCP Class Ident: %s]",
@@ -2531,15 +2530,13 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     print_bin(out, "Plen Bins", &flow->payload_len_bin);
 #endif
 
-    if(flow->tls.num_blocks > 0) {
+    if(flow->ssh_tls.num_blocks > 0) {
       int i;
 
       fprintf(out, "[TLS blocks: ");
 
-      for(i=0; i<flow->tls.num_blocks; i++) {
-	fprintf(out, "%s%u/%d", (i > 0) ? "," : "", flow->tls.blocks[i].block_type, flow->tls.blocks[i].len);
-	//fprintf(out, "%s%u", (i > 0) ? "," : "", flow->tls.blocks[i].block_type);
-      }
+      for(i=0; i<flow->ssh_tls.num_blocks; i++)
+	fprintf(out, "%s%u/%d", (i > 0) ? "," : "", flow->ssh_tls.blocks[i].block_type, flow->ssh_tls.blocks[i].len);
 
       fprintf(out, "]");
     }
