@@ -34,7 +34,7 @@
 static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
 				    struct ndpi_flow_struct *flow);
 
-//  #define DEBUG_TLS_MEMORY       1
+// #define DEBUG_TLS_MEMORY       1
 // #define DEBUG_TLS              1
 // #define DEBUG_TLS_BLOCKS       1
 // #define DEBUG_CERTIFICATE_HASH
@@ -171,7 +171,7 @@ static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_s
 /* **************************************** */
 
 /* Heuristic to detect proxied/obfuscated TLS flows, based on
-   https://www.usenix.org/conference/usenixsecurity24/preosentation/xue-fingerprinting.
+   https://www.usenix.org/conference/usenixsecurity24/presentation/xue-fingerprinting.
    Main differences between the paper and our implementation:
     * only Mahalanobis Distance, no Chi-squared Test
     * instead of 3-grams, we use 4-grams, always starting from the Client -> Server direction
@@ -682,8 +682,7 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
 			     ndpi_get_current_time(flow))) {
         ndpi_master_app_protocol proto;
 
-	ndpi_set_detected_protocol(ndpi_struct, flow, cached_proto,
-				   ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI_CACHE);
+	ndpi_set_detected_protocol(ndpi_struct, flow, cached_proto, ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI_CACHE);
 	proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
 	proto.app_protocol = cached_proto;
 	flow->category = get_proto_category(ndpi_struct, proto);
@@ -1248,7 +1247,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if((ndpi_struct->num_tls_blocks_to_follow != 0)
-     && (flow->l4.tcp.tls.num_tls_blocks >= ndpi_struct->num_tls_blocks_to_follow)) {
+     && (flow->l4.tcp.tls.num_processed_tls_blocks >= ndpi_struct->num_tls_blocks_to_follow)) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] Enough blocks dissected\n");
 #endif
@@ -1355,9 +1354,6 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->tcp == NULL)
     return 0; /* Error -> stop (this doesn't seem to be TCP) */
 
-  if(packet->payload_packet_len == 0)
-    return 1;
-
 #ifdef DEBUG_TLS_MEMORY
   printf("[TLS Mem] ndpi_search_tls_tcp() Processing new packet [payload_packet_len: %u][Dir: %u]\n",
 	 packet->payload_packet_len, packet->packet_direction);
@@ -1380,11 +1376,6 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 			    packet->payload_packet_len, ntohl(packet->tcp->seq),
 			    message) == -1)
     return 0; /* Error -> stop */
-
-#ifdef DEBUG_TLS
-  printf("[TLS] Processing packet [payload_packet_len: %u][Dir: %u]\n",
-	 packet->payload_packet_len, packet->packet_direction);
-#endif
 
   /* Valid TLS Content Types:
      https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5 */
@@ -1423,11 +1414,6 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
     content_type = message->buffer[0];
 
-#ifdef DEBUG_TLS
-    printf("*** [TLS] Processing block [content_type: %u/0x%02X][len: %u][Dir: %u]\n",
-	   content_type, content_type, len, packet->packet_direction);
-#endif
-
     if(ndpi_struct->cfg.tls_blocks_analysis_enabled) {
       if(flow->l4.tcp.tls.num_tls_blocks < NDPI_MAX_NUM_TLS_APPL_BLOCKS) {
 	int16_t blen = len-5;
@@ -1444,7 +1430,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
       }
     }
-    
+
     /* Overwriting packet payload */
     p = packet->payload;
     p_len = packet->payload_packet_len; /* Backup */
@@ -1456,7 +1442,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	  so in this case we reset the number of observed
 	  TLS blocks
 	*/
-	flow->l4.tcp.tls.num_tls_blocks = 0;
+	flow->l4.tcp.tls.num_processed_tls_blocks = 0;
       }
       if(len == 6 &&
          message->buffer[1] == 0x03 && /* TLS >= 1.0 */
@@ -1474,7 +1460,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
         /* Further data is encrypted so we are not able to parse it without
            errors and without setting `something_went_wrong` variable */
 
-        if(!ndpi_struct->cfg.tls_blocks_analysis_enabled) {
+	if(!ndpi_struct->cfg.tls_blocks_analysis_enabled) {
 	  /*
 	    In case of TLS blocks analysis we want to analize all the blocks
 	    whereas in "standard" mode we can use this shortcut and break
@@ -1576,7 +1562,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(something_went_wrong
      || ((ndpi_struct->num_tls_blocks_to_follow > 0)
-	 && (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->num_tls_blocks_to_follow))
+	 && (flow->l4.tcp.tls.num_processed_tls_blocks == ndpi_struct->num_tls_blocks_to_follow))
      || ((ndpi_struct->num_tls_blocks_to_follow == 0)
 	 && (!keep_extra_dissection_tcp(ndpi_struct, flow)))
      ) {
@@ -1695,6 +1681,7 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
         handshake_frag_off = (block[19] << 16) + (block[20] << 8) + block[21];
         handshake_frag_len = (block[22] << 16) + (block[23] << 8) + block[24];
         message = &flow->tls_quic.message[packet->packet_direction];
+
 
 #ifdef DEBUG_TLS
         printf("[TLS] DTLS frag off %d len %d\n", handshake_frag_off, handshake_frag_len);

@@ -1579,20 +1579,22 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	correct_csv_data_field(flow->ssh_tls.negotiated_alpn);
     }
 
-    if(enable_doh_dot_detection) {
-      /* For TLS we use TLS block lenght instead of payload lenght */
-      ndpi_reset_bin(&flow->payload_len_bin);
-
-      for(i=0; i<flow->ndpi_flow->l4.tcp.tls.num_tls_blocks; i++) {
-	u_int16_t len = abs(flow->ndpi_flow->l4.tcp.tls.tls_blocks[i].len);
-
-	/* printf("[TLS_LEN] %u\n", len); */
-	ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
+    if(flow->protocol == IPPROTO_TCP) {
+      if(enable_doh_dot_detection) {
+	/* For TLS we use TLS block lenght instead of payload lenght */
+	ndpi_reset_bin(&flow->payload_len_bin);
+	
+	for(i=0; i<flow->ndpi_flow->l4.tcp.tls.num_tls_blocks; i++) {
+	  u_int16_t len = abs(flow->ndpi_flow->l4.tcp.tls.tls_blocks[i].len);
+	  
+	  /* printf("[TLS_LEN] %u\n", len); */
+	  ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
+	}
       }
+      
+      flow->ssh_tls.num_blocks = flow->ndpi_flow->l4.tcp.tls.num_tls_blocks;
+      memcpy(flow->ssh_tls.blocks, flow->ndpi_flow->l4.tcp.tls.tls_blocks, sizeof(flow->ndpi_flow->l4.tcp.tls.tls_blocks));
     }
-
-    flow->ssh_tls.num_blocks = flow->ndpi_flow->l4.tcp.tls.num_tls_blocks;
-    memcpy(flow->ssh_tls.blocks, flow->ndpi_flow->l4.tcp.tls.tls_blocks, sizeof(flow->ndpi_flow->l4.tcp.tls.tls_blocks));
   }
   /* FASTCGI */
   else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_FASTCGI)) {
