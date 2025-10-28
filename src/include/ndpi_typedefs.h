@@ -830,8 +830,12 @@ struct ndpi_lru_cache {
 #define NDPI_HEURISTICS_TLS_OBFUSCATED_TLS		0x02 /* Enable heuristic to detect proxied/obfuscated TLS flows over TLS tunnels, i.e. TLS over TLS */
 #define NDPI_HEURISTICS_TLS_OBFUSCATED_HTTP		0x04 /* Enable heuristic to detect proxied/obfuscated TLS flows over HTTP/WebSocket */
 
-
 /* ************************************************** */
+
+struct ndpi_tls_block {
+  u_int8_t block_type; /* + = src->dst, - = dst->src */
+  int16_t len;
+};
 
 struct ndpi_flow_tcp_struct {
   /* TCP sequence number */
@@ -854,11 +858,9 @@ struct ndpi_flow_tcp_struct {
   struct {
     /* NDPI_PROTOCOL_TLS */
     u_int8_t app_data_seen[2];
-    u_int8_t num_tls_blocks;
-    int16_t tls_application_blocks_len[NDPI_MAX_NUM_TLS_APPL_BLOCKS]; /* + = src->dst, - = dst->src */
+    u_int8_t num_tls_blocks, num_processed_tls_blocks /* used internally for dissection */;
+    struct ndpi_tls_block tls_blocks[NDPI_MAX_NUM_TLS_APPL_BLOCKS];
   } tls;
-
-
 
   /* NDPI_PROTOCOL_MAIL_SMTP */
   u_int16_t smtp_command_bitmask;

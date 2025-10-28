@@ -420,7 +420,7 @@ struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * pref
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");
     return NULL;
   }
-  
+
   workflow = ndpi_calloc(1, sizeof(struct ndpi_workflow));
   if(workflow == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");
@@ -1539,7 +1539,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(flow->ndpi_flow->ndpi.fingerprint)
       flow->ndpi_fingerprint = ndpi_strdup(flow->ndpi_flow->ndpi.fingerprint);
-	
+
     if(flow->ndpi_flow->protos.tls_quic.ja4_client_raw)
       flow->ssh_tls.ja4_client_raw = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.ja4_client_raw);
 
@@ -1579,16 +1579,21 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	correct_csv_data_field(flow->ssh_tls.negotiated_alpn);
     }
 
-    if(enable_doh_dot_detection) {
-      /* For TLS we use TLS block lenght instead of payload lenght */
-      ndpi_reset_bin(&flow->payload_len_bin);
-
-      for(i=0; i<flow->ndpi_flow->l4.tcp.tls.num_tls_blocks; i++) {
-	u_int16_t len = abs(flow->ndpi_flow->l4.tcp.tls.tls_application_blocks_len[i]);
-
-	/* printf("[TLS_LEN] %u\n", len); */
-	ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
+    if(flow->protocol == IPPROTO_TCP) {
+      if(enable_doh_dot_detection) {
+	/* For TLS we use TLS block lenght instead of payload lenght */
+	ndpi_reset_bin(&flow->payload_len_bin);
+	
+	for(i=0; i<flow->ndpi_flow->l4.tcp.tls.num_tls_blocks; i++) {
+	  u_int16_t len = abs(flow->ndpi_flow->l4.tcp.tls.tls_blocks[i].len);
+	  
+	  /* printf("[TLS_LEN] %u\n", len); */
+	  ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);
+	}
       }
+      
+      flow->ssh_tls.num_blocks = flow->ndpi_flow->l4.tcp.tls.num_tls_blocks;
+      memcpy(flow->ssh_tls.blocks, flow->ndpi_flow->l4.tcp.tls.tls_blocks, sizeof(flow->ndpi_flow->l4.tcp.tls.tls_blocks));
     }
   }
   /* FASTCGI */
@@ -1616,14 +1621,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	     ndpi_print_os_hint(flow->ndpi_flow->tcp.os_hint));
     flow->tcp_fingerprint = ndpi_strdup(buf);
   }
-  
+
   /* HTTP metadata are "global" not in `flow->ndpi_flow->protos` union; for example, we can have
      HTTP/BitTorrent and in that case we want to export also HTTP attributes */
   if(ndpi_stack_is_http_like(&flow->detected_protocol.protocol_stack)) { /* HTTP, HTTP_PROXY, HTTP_CONNECT */
     if(flow->ndpi_flow->http.url != NULL) {
       ndpi_snprintf(flow->http.url, sizeof(flow->http.url), "%s", flow->ndpi_flow->http.url);
     }
-    
+
     flow->http.response_status_code = flow->ndpi_flow->http.response_status_code;
     ndpi_snprintf(flow->http.content_type, sizeof(flow->http.content_type), "%s", flow->ndpi_flow->http.content_type ? flow->ndpi_flow->http.content_type : "");
     ndpi_snprintf(flow->http.server, sizeof(flow->http.server), "%s", flow->ndpi_flow->http.server ? flow->ndpi_flow->http.server : "");
@@ -1636,7 +1641,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_RTP))
     memcpy(&flow->rtp, &flow->ndpi_flow->rtp, sizeof(flow->rtp));
-     
+
   ndpi_snprintf(flow->http.user_agent,
                 sizeof(flow->http.user_agent),
                 "%s", (flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : ""));

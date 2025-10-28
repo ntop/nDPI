@@ -3634,15 +3634,19 @@ static int ndpi_add_ndpifp_subprotocol(struct ndpi_detection_module_struct *ndpi
 /* ******************************************* */
 
 static int ndpi_add_http_url_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
-					 char *url, u_int16_t protocol_id) {
+					 char *url, u_int16_t protocol_id,
+					 u_int16_t category, u_int16_t breed) {
   int url_len = strlen(url);
+  u_int64_t id;
 
   if(ndpi_str->http_url_hashmap == NULL) {
     if(ndpi_hash_init(&ndpi_str->http_url_hashmap) != 0)
       return(-2);
   }
 
-  return(ndpi_hash_add_entry(&ndpi_str->http_url_hashmap, url, url_len, protocol_id));
+  id = (u_int64_t)(breed & 0xFFFF) << 32 | (category & 0xFFFF) << 16 | (protocol_id & 0xFFFF);
+
+  return(ndpi_hash_add_entry(&ndpi_str->http_url_hashmap, url, url_len, id));
 }
 
 /* ******************************************* */
@@ -4983,7 +4987,7 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
                                ndpi_protocol_category_t *category,
                                ndpi_protocol_breed_t *breed) {
   char buf[128];
-  u_int32_t class_id;
+  u_int64_t class_id;
   u_int max_len = sizeof(buf)-1;
 
   if(!ndpi_str->custom_categories.categories_loaded)
@@ -5629,14 +5633,18 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
   if(subprotocol_id == NDPI_PROTOCOL_UNKNOWN) {
     def = NULL;
   } else {
-    category = ndpi_str->proto_defaults[subprotocol_id].protoCategory;
-    breed = ndpi_str->proto_defaults[subprotocol_id].protoBreed;
+    /* Custom category and breed always win over default ones.
+       We can also have multiple rules, with the same custom protocol and
+       different category/breed */
+    if(category == NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
+      category = ndpi_str->proto_defaults[subprotocol_id].protoCategory;
+    if(breed == NDPI_PROTOCOL_ACCEPTABLE)
+      breed = ndpi_str->proto_defaults[subprotocol_id].protoBreed;
+
     def = &ndpi_str->proto_defaults[subprotocol_id];
 
-    /* TODO: should we overwrite user_proto_id/cat/breed for existing protocols?
-     * With internals one we should have some problems because the data structures
-     * used for id<->user_id mapping work only with custom protocols...
-     */
+    /* We can't have internals protocols with custom id because the data structures
+       used for id<->user_id mapping work only with custom protocols... */
   }
 
   if(def == NULL) {
@@ -5788,7 +5796,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       if(rc != 0)
 	return(rc);
     } else if(is_httpurl) {
-      int rc = ndpi_add_http_url_subprotocol(ndpi_str, value, subprotocol_id);
+      int rc = ndpi_add_http_url_subprotocol(ndpi_str, value, subprotocol_id, category, breed);
 
       if(rc != 0)
 	return(rc);
@@ -13425,6 +13433,7 @@ static const struct cfg_param {
   { "tls",           "metadata.ja4c_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja4c_fingerprint_enabled), NULL },
   { "tls",           "metadata.ja4r_fingerprint",               "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja4r_fingerprint_enabled), NULL },
   { "tls",           "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_subclassification_enabled), NULL },
+  { "tls",           "blocks_analysis",                         "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_blocks_analysis_enabled), NULL },
 
   { "quic",          "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(quic_subclassification_enabled), NULL },
 

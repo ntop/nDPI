@@ -148,7 +148,7 @@ u_int32_t ndpi_domain_classify_add_domains(struct ndpi_detection_module_struct *
 
 bool ndpi_domain_classify_hostname(struct ndpi_detection_module_struct *ndpi_mod,
 				   ndpi_domain_classify *s,
-				   u_int32_t *class_id /* out */,
+				   u_int64_t *class_id /* out */,
 				   char *hostname) {
   const char *dot;
   char *item;

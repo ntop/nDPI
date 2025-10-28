@@ -49,7 +49,7 @@ void ndpi_load_tcp_fingerprints(struct ndpi_detection_module_struct *ndpi_str) {
 ndpi_os ndpi_get_os_from_tcp_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 					 char *tcp_fingerprint) {  
   if(tcp_fingerprint && (ndpi_str->tcp_fingerprint_hashmap != NULL)) {
-    u_int32_t ret;
+    u_int64_t ret;
     
     if(ndpi_hash_find_entry(ndpi_str->tcp_fingerprint_hashmap,
 			    tcp_fingerprint, strlen(tcp_fingerprint), &ret) == 0)
@@ -72,7 +72,7 @@ ndpi_os ndpi_get_os_from_tcp_fingerprint(struct ndpi_detection_module_struct *nd
 int ndpi_add_tcp_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 			     char *fingerprint, ndpi_os os) {
   u_int len;
-  u_int32_t ret;
+  u_int64_t ret;
 
   len = strlen(fingerprint);
 
@@ -82,7 +82,7 @@ int ndpi_add_tcp_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
     return(-1);
   } else {
     if(ndpi_hash_add_entry(&ndpi_str->tcp_fingerprint_hashmap, fingerprint, len,
-			   (u_int32_t)os) == 0) {
+			   (u_int64_t)os) == 0) {
       return(0);
     } else
       return(-2);
