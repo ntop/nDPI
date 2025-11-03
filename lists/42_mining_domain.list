@@ -1,4 +1,4 @@
-# Generated at 2025-09-09T16:22:16.646343
+# Generated at 2025-11-03T12:29:38.539895
 2miners.com
 51pool.online
 ae.2miners.com
@@ -7,7 +7,6 @@ aergo.eu.mine.zpool.ca
 aergo.jp.mine.zpool.ca
 aergo.na.mine.zpool.ca
 aikapool.com
-aionmine.org
 aka.2miners.com
 akroma.wattpool.net
 allium.asia.mine.zergpool.com
@@ -189,7 +188,6 @@ btcp.2miners.com
 btcp.suprnova.cc
 btcv.gomine.pro
 btcz.2miners.com
-btcz.altpool.pro
 btcz.suprnova.cc
 btg.2miners.com
 btg.hashcity.org
@@ -239,7 +237,7 @@ cpupower.eu.mine.zpool.ca
 cpupower.mine.zergpool.com
 crypit.net
 cryptodredge-ax16r-oeu.bsod.pw
-cryptonote.club
+cryptonote.social
 ctxc.2miners.com
 cuckoo.cortexmint.com
 cuckoocycle.br.nicehash.com
@@ -350,7 +348,6 @@ etc.pool.minergate.com
 etc.pool.zet-tech.eu
 etc.solomine.org
 etcc.mole-pool.net
-etcturk.com
 eth-esoteria.icanmining.ru
 eth-eu.f2pool.com
 eth-eu.maxhash.org
@@ -412,7 +409,6 @@ eu.crazypool.org
 eu.emcd.io
 eu.equihub.pro
 eu.frostypool.com
-eu.gethash.cc
 eu.luckpool.net
 eu.nimpool.io
 eu.pool.ms
@@ -425,6 +421,7 @@ eu.sandbox.pool.ms
 eu.siamining.com
 eu.ss.dpool.top
 eu.stratum.slushpool.com
+eu.ubiqpool.io
 eu1-3g.whalesburg.com
 eu1.bsod.pw
 eu1.equihub.pro
@@ -536,14 +533,11 @@ kda.ss.poolflare.net
 kda.stratum.hashpool.com
 keccak.asia.mine.zergpool.com
 keccak.eu.mine.zpool.ca
-keccak.eu.nicehash.com
-keccak.hk.nicehash.com
 keccak.jp.mine.zpool.ca
 keccak.mine.zergpool.com
 keccak.mining-dutch.nl
 keccak.na.mine.zergpool.com
 keccak.na.mine.zpool.ca
-keccak.usa.nicehash.com
 keccakc.asia.mine.zergpool.com
 keccakc.eu.mine.zpool.ca
 keccakc.jp.mine.zpool.ca
@@ -609,17 +603,14 @@ megabtx.mine.zergpool.com
 megamec.asia.mine.zergpool.com
 megamec.mine.zergpool.com
 mine-beam-testnet.leafpool.com
-mine.arqma.com
 mine.bittubecash.fairpool.xyz
 mine.c3pool.com
 mine.etc.fairpool.xyz
 mine.loki.fairpool.xyz
 mine.msr.fairpool.xyz
 mine.music.mypool.online
-mine.nlpool.nl
 mine.nuko.fairpool.xyz
 mine.pgc.fairpool.xyz
-mine.realpool.eu
 mine.ryo.fairpool.xyz
 mine.swap.fairpool.xyz
 mine.thegrinpool.com
@@ -632,6 +623,7 @@ mine.zergpool.com
 mine.zpool.ca
 mineit.io
 minepool.com
+minepool.online
 miner-control.de
 miner.rocks
 minerpool.net
@@ -689,7 +681,6 @@ nist5.jp.mine.zpool.ca
 nist5.mine.zergpool.com
 nist5.na.mine.zpool.ca
 nl.stratu.ms
-nlpool.nl
 noncepool.com
 nuko.minerpool.net
 nuko.mofumofu.me
@@ -717,7 +708,6 @@ phi2.jp.mine.zpool.ca
 phi2.na.mine.zpool.ca
 pirl-solo.wattpool.net
 pirl.2miners.com
-pirl.coinminer.space
 pmeer.666pool.cn
 polytimos.eu.mine.zpool.ca
 polytimos.jp.mine.zpool.ca
@@ -726,11 +716,8 @@ pool-eu.ethosdistro.com
 pool-usa.ethosdistro.com
 pool.0cash.org
 pool.572133.club
-pool.acemining.co
-pool.aionmine.org
 pool.bibop.net
 pool.bitcoinote.org
-pool.bloc.money
 pool.blocpal.com
 pool.bsod.pw
 pool.btcp.network
@@ -743,10 +730,8 @@ pool.esn.today
 pool.ethercore.io
 pool.expanse.tech
 pool.hashvault.pro
-pool.helpico.tech
 pool.krb.fairhash.org
 pool.lanacoin.com
-pool.mangocoin.online
 pool.monerov.online
 pool.ms
 pool.nashcash.net
@@ -966,17 +951,19 @@ stratum-sc.antpool.com
 stratum-xmc.antpool.com
 stratum-zec.antpool.com
 stratum.aikapool.com
-stratum.aionmine.org
 stratum.antpool.com
 stratum.bcmonster.com
+stratum.coinminerz.com
 stratum.cudopool.com
 stratum.f2pool.com
 stratum.gpuhot.com
 stratum.icemining.ca
 stratum.kano.is
+stratum.miner-world.com
 stratum.naw.warihash.com
 stratum.node5.mainnet.hathor.network
 stratum.piratepool.io
+stratum.pool.bitgrin.dev
 stratum.ravenminer.com
 stratum.sephira.co
 stratum.slushpool.com
@@ -1065,6 +1052,7 @@ us.ravenminer.com
 us.rito.minermore.com
 us.rvn.minermore.com
 us.stratu.ms
+us.ubiqpool.io
 us1.fairpool.pro
 us1.stratu.ms
 us1.zhash.pro
@@ -1124,19 +1112,13 @@ x15.eu.mine.zpool.ca
 x15.jp.mine.zpool.ca
 x15.na.mine.zpool.ca
 x16r.asia.mine.zergpool.com
-x16r.br.nicehash.com
 x16r.eu.mine.zergpool.com
 x16r.eu.mine.zpool.ca
-x16r.eu.nicehash.com
-x16r.hk.nicehash.com
-x16r.in.nicehash.com
 x16r.jp.mine.zpool.ca
-x16r.jp.nicehash.com
 x16r.mine.zergpool.com
 x16r.na.mine.zergpool.com
 x16r.na.mine.zpool.ca
 x16r.sea.mine.zpool.ca
-x16r.usa.nicehash.com
 x16rt.asia.mine.zergpool.com
 x16rt.eu.mine.zpool.ca
 x16rt.mine.zergpool.com

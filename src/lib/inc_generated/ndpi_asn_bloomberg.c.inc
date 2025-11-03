@@ -33,7 +33,6 @@ static ndpi_network ndpi_protocol_bloomberg_protocol_list[] = {
  { 0xC7ACA900 /* 199.172.169.0/24 */, 24, NDPI_PROTOCOL_BLOOMBERG },
  { 0xCCB3F000 /* 204.179.240.0/24 */, 24, NDPI_PROTOCOL_BLOOMBERG },
  { 0xCDD87000 /* 205.216.112.0/24 */, 24, NDPI_PROTOCOL_BLOOMBERG },
- { 0xCE9C3500 /* 206.156.53.0/24 */, 24, NDPI_PROTOCOL_BLOOMBERG },
  { 0xD0163800 /* 208.22.56.0/23 */, 23, NDPI_PROTOCOL_BLOOMBERG },
  /* End */
  { 0x0, 0, 0 }
