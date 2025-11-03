@@ -472,7 +472,7 @@ dnl> fi
 
 dnl> ndpiReader has some hard-coded unit tests: in the out-of-tree builds we need some configuration files in the expected path
 if test "${srcdir}" != . ; then :
-  cp ${srcdir}/example/categories.txt example/
+  cp -p ${srcdir}/example/categories.txt example/
   cp -R ${srcdir}/lists lists/
 fi
 
