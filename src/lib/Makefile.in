@@ -49,7 +49,7 @@ USE_HOST_LIBGCRYPT   = @USE_HOST_LIBGCRYPT@
 
 ifneq ($(USE_HOST_LIBGCRYPT),0)
 TMP_OBJS := $(OBJECTS)
-OBJECTS   = $(filter-out third_party/src/gcrypt_light.o,$(TMP_OBJS))
+OBJECTS   = $(filter-out gcrypt_light.o,$(TMP_OBJS))
 endif
 
 BUILD_MINGW    		 = @BUILD_MINGW@
