@@ -109,13 +109,21 @@ fi
 
 fuzzy_testing() {
     if [ -f ${ABS_BUILDDIR}/fuzz/fuzz_ndpi_reader ]; then
-	cp ${TOP_SRCDIR}/example/protos.txt .
-	cp ${TOP_SRCDIR}/example/categories.txt .
-	cp ${TOP_SRCDIR}/example/risky_domains.txt .
-	cp ${TOP_SRCDIR}/example/ja4_fingerprints.csv .
-	cp ${TOP_SRCDIR}/example/sha1_fingerprints.csv .
-	${ABS_BUILDDIR}/fuzz/fuzz_ndpi_reader -dict=${TOP_SRCDIR}/fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" ${ABS_SRCDIR}/tests/cfgs/default/pcap/
-	rm -f protos.txt categories.txt risky_domains.txt ja4_fingerprints.csv sha1_fingerprints.csv
+	cd ${ABS_BUILDDIR}/fuzz
+
+	cp ${TOP_SRCDIR}/example/*.txt .
+	cp ${TOP_SRCDIR}/example/*csv .
+	cp ${TOP_SRCDIR}/example/*.conf .
+	cp ${TOP_SRCDIR}/lists/*.dat .
+	mkdir -p lists
+	find ${TOP_SRCDIR}/lists/*.list ! -name 100_malware.list -exec cp -t lists/ {} +
+	mkdir -p lists/protocols
+	find ${TOP_SRCDIR}/lists/protocols/*.list -exec cp -t lists/protocols/ {} +
+	./fuzz_ndpi_reader -dict=${TOP_SRCDIR}/fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" ${ABS_SRCDIR}/tests/cfgs/default/pcap/
+	rm -f *.txt *csv *.conf *.dat
+	rm -rf lists
+
+	cd -
     fi
 }
 

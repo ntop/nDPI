@@ -54,13 +54,8 @@ cp fuzz/*.zip "$OUT"/
 # Copy options
 cp fuzz/*.options "$OUT"/
 # Copy configuration files
-cp example/protos.txt "$OUT"/
-cp example/categories.txt "$OUT"/
-cp example/risky_domains.txt "$OUT"/
-cp example/ja4_fingerprints.csv "$OUT"/
-cp example/tcp_fingerprints.csv "$OUT"/
-cp example/sha1_fingerprints.csv "$OUT"/
-cp example/config.txt "$OUT"/
+cp example/*.txt "$OUT"/
+cp example/*.csv "$OUT"/
 cp example/*.conf "$OUT"/
 cp lists/public_suffix_list.dat "$OUT"/
 cp fuzz/ipv*_addresses.txt "$OUT"/

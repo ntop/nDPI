@@ -6184,11 +6184,11 @@ int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
   int num_loaded = 0;
 
   if(!ndpi_str || !dir_path)
-    return(0);
+    return(-1);
 
   dirp = opendir(dir_path);
   if (dirp == NULL)
-    return(0);
+    return(-1);
 
   while((dp = readdir(dirp)) != NULL) {
     char *underscore, *extn;
@@ -6248,11 +6248,11 @@ int ndpi_load_protocols_dir(struct ndpi_detection_module_struct *ndpi_str,
   int num_loaded = 0;
 
   if(!ndpi_str || !dir_path)
-    return(0);
+    return(-1);
 
   dirp = opendir(dir_path);
   if (dirp == NULL)
-    return(0);
+    return(-1);
 
   while((dp = readdir(dirp)) != NULL) {
     char *underscore, *extn;

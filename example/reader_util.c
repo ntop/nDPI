@@ -2108,8 +2108,6 @@ static inline u_int ndpi_skip_vxlan(u_int16_t ip_offset, u_int16_t ip_len){
 static uint32_t ndpi_is_valid_gre_tunnel(const struct pcap_pkthdr *header,
                 const u_char *packet, const u_int16_t ip_offset,
                 const u_int16_t ip_len) {
-  if(header->caplen < ip_offset + ip_len + sizeof(struct ndpi_gre_basehdr))
-    return 0; /* Too short for GRE header*/
   uint32_t offset = ip_offset + ip_len;
   struct ndpi_gre_basehdr *grehdr = (struct ndpi_gre_basehdr*)&packet[offset];
   offset += sizeof(struct ndpi_gre_basehdr);

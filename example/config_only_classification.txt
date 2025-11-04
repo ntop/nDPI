@@ -1,0 +1,48 @@
+#Example of configuration if you are interested ONLY in flow (sub)-classification
+#(i.e. no metadata at all and no flow risks)
+
+#No flow risks
+flow_risk.all,0
+
+#General metadata
+metadata.tcp_fingerprint,0
+metadata.ndpi_fingerprint,0
+dpi.compute_entropy,0
+#BITTORRENT
+bittorrent,metadata.hash,0
+#SSDP
+ssdp,metadata,0
+#TLS (we might need ja4c for subclassification)
+tls,metadata.sha1_fingerprint,0
+tls,metadata.ja3s_fingerprint,0
+tls,metadata.cert_server_names,0
+tls,metadata.cert_validity,0
+tls,metadata.cert_issuer,0
+tls,metadata.cert_subject,0
+tls,metadata.alpn_negotiated,0
+tls,metadata.versions_supported,0
+tls,metadata.cipher,0
+tls,metadata.browser,0
+#SIP
+sip,metadata.attribute.from,0
+sip,metadata.attribute.to,0
+#STUN
+stun,metadata.attribute.mapped_address,0
+stun,metadata.attribute.peer_address,0
+stun,metadata.attribute.relayed_address,0
+stun,metadata.attribute.response_origin,0
+stun,metadata.attribute.other_address,0
+#HTTP
+http,metadata.req.content_type,0
+http,metadata.req.referer,0
+http,metadata.req.host,0
+http,metadata.req.username,0
+http,metadata.req.password,0
+http,metadata.resp.content_type,0
+http,metadata.resp.server,0
+
+#DNS:we need only the request for sub-classification
+dns,process_response,0
+
+#RTP
+rtp,max_packets_extra_dissection,0

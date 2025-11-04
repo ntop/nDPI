@@ -36,7 +36,9 @@
 /* ************************************************************** */
 
 void ndpi_load_tcp_fingerprints(struct ndpi_detection_module_struct *ndpi_str) {
-  if(ndpi_hash_init(&ndpi_str->tcp_fingerprint_hashmap) == 0) {
+
+  if(ndpi_str->tcp_fingerprint_hashmap ||
+     ndpi_hash_init(&ndpi_str->tcp_fingerprint_hashmap) == 0) {
     u_int i;
     
     for(i=0; tcp_fps[i].fingerprint != NULL; i++)

@@ -7,6 +7,8 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <assert.h>
+#include <libgen.h>
 
 #ifdef ENABLE_PCAP_L7_MUTATOR
 #include "pl7m.h"
@@ -26,6 +28,8 @@ char *addr_dump_path = NULL;
 int monitoring_enabled = 1;
 u_int8_t enable_doh_dot_detection = 0;
 
+static char *path = NULL;
+
 extern void ndpi_report_payload_stats(FILE *out);
 
 #ifdef CRYPT_FORCE_NO_AESNI
@@ -38,6 +42,13 @@ size_t LLVMFuzzerCustomMutator(uint8_t *Data, size_t Size,
   return pl7m_mutator(Data, Size, MaxSize, Seed);
 }
 #endif
+
+int LLVMFuzzerInitialize(int *argc, char ***argv) {
+  (void)argc;
+
+  path = dirname(strdup(*argv[0])); /* No errors; no free! */
+  return 0;
+}
 
 static void node_cleanup_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info **) node;
@@ -55,6 +66,13 @@ static void node_cleanup_walker(const void *node, ndpi_VISIT which, int depth, v
   }
 }
 
+static void fn_flow_callback(struct ndpi_workflow *w, struct ndpi_flow_info *f, void *d)
+{
+  (void)w;
+  (void)f;
+  (void)d;
+}
+
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   pcap_t * pkts;
   const u_char *pkt;
@@ -63,6 +81,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   char errbuf[PCAP_ERRBUF_SIZE];
   u_int i;
   FILE *fd;
+  char name[256];
 
   if (prefs == NULL) {
     prefs = calloc(sizeof(struct ndpi_workflow_prefs), 1); /* No failure here */
@@ -79,23 +98,33 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     workflow = ndpi_workflow_init(prefs, NULL /* pcap handler will be set later */, 0, ndpi_serialization_format_json, g_ctx);
 
-    ndpi_workflow_set_flow_callback(workflow, NULL, NULL); /* No real callback */
+    ndpi_workflow_set_flow_callback(workflow, fn_flow_callback, NULL);
 
     ndpi_set_config(workflow->ndpi_struct, NULL, "log.level", "3");
     ndpi_set_config(workflow->ndpi_struct, "all", "log", "1");
 
-    ndpi_load_domain_suffixes(workflow->ndpi_struct, "public_suffix_list.dat");
-    ndpi_load_categories_dir(workflow->ndpi_struct, "./lists/");
-    ndpi_load_protocols_dir(workflow->ndpi_struct, "./lists/protocols/");
-    ndpi_load_protocols_file(workflow->ndpi_struct, "protos.txt");
-    ndpi_load_categories_file(workflow->ndpi_struct, "categories.txt", NULL);
-    ndpi_load_risk_domain_file(workflow->ndpi_struct, "risky_domains.txt");
-    ndpi_load_malicious_ja4_file(workflow->ndpi_struct, "ja4_fingerprints.csv");
-    ndpi_load_tcp_fingerprint_file(workflow->ndpi_struct, "tcp_fingerprints.csv");
-    ndpi_load_malicious_sha1_file(workflow->ndpi_struct, "sha1_fingerprints.csv");
+    sprintf(name, "%s/public_suffix_list.dat", path);
+    assert(ndpi_load_domain_suffixes(workflow->ndpi_struct, name) >= 0);
+    sprintf(name, "%s/lists/", path);
+    assert(ndpi_load_categories_dir(workflow->ndpi_struct, name) >= 0);
+    sprintf(name, "%s/lists/protocols/", path);
+    assert(ndpi_load_protocols_dir(workflow->ndpi_struct, name) >= 0);
+    sprintf(name, "%s/protos.txt", path);
+    assert(ndpi_load_protocols_file(workflow->ndpi_struct, name) >= 0);
+    sprintf(name, "%s/categories.txt", path);
+    assert(ndpi_load_categories_file(workflow->ndpi_struct, name, NULL) >= 0);
+    sprintf(name, "%s/risky_domains.txt", path);
+    assert(ndpi_load_risk_domain_file(workflow->ndpi_struct, name) >= 0);
+    sprintf(name, "%s/ja4_fingerprints.csv", path);
+    assert(ndpi_load_malicious_ja4_file(workflow->ndpi_struct, name) >= 0);
+    sprintf(name, "%s/tcp_fingerprints.csv", path);
+    assert(ndpi_load_tcp_fingerprint_file(workflow->ndpi_struct, name) >= 0);
+    sprintf(name, "%s/sha1_fingerprints.csv", path);
+    assert(ndpi_load_malicious_sha1_file(workflow->ndpi_struct, name) >= 0);
 
 #ifdef ENABLE_ONLY_SUBCLASSIFICATION
-    ndpi_set_config(workflow->ndpi_struct, NULL, "filename.config", "only_classification.conf");
+    sprintf(name, "%s/config_only_classification.txt", path);
+    assert(ndpi_set_config(workflow->ndpi_struct, NULL, "filename.config", name) == 0);
 #else
 
     ndpi_set_config(workflow->ndpi_struct, NULL, "packets_limit_per_flow", "255");
@@ -122,6 +151,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     ndpi_set_config(workflow->ndpi_struct, NULL, "flow_risk.all.info", "0");
     ndpi_set_config(workflow->ndpi_struct, NULL, "metadata.tcp_fingerprint_format", "1");
     ndpi_set_config(workflow->ndpi_struct, NULL, "metadata.ndpi_fingerprint_format", "1");
+    ndpi_set_config(workflow->ndpi_struct, "tls", "blocks_analysis", "1");
+
+    addr_dump_path = "/tmp/";
 #endif
 
 #endif /* ENABLE_ONLY_SUBCLASSIFICATION */
