@@ -156,11 +156,6 @@
 
 /* ****************************************** */
 
-static void *(*_ndpi_flow_malloc)(size_t size);
-static void (*_ndpi_flow_free)(void *ptr);
-
-/* ****************************************** */
-
 
 static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_NO_RISK,                               NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY  },
@@ -268,21 +263,6 @@ ndpi_custom_dga_predict_fctn ndpi_dga_function = NULL;
 
 static inline u_int8_t flow_is_proto(struct ndpi_flow_struct *flow, u_int16_t p) {
   return((flow->detected_protocol_stack[0] == p) || (flow->detected_protocol_stack[1] == p));
-}
-
-/* ****************************************** */
-
-void *ndpi_flow_malloc(size_t size) {
-  return(_ndpi_flow_malloc ? _ndpi_flow_malloc(size) : ndpi_malloc(size));
-}
-
-/* ****************************************** */
-
-void ndpi_flow_free(void *ptr) {
-  if(_ndpi_flow_free)
-    _ndpi_flow_free(ptr);
-  else
-    ndpi_free_flow((struct ndpi_flow_struct *) ptr);
 }
 
 /* *********************************************************************************** */
@@ -397,7 +377,6 @@ static void ndpi_add_user_proto_id_mapping(struct ndpi_detection_module_struct *
     new_num = ndpi_max(64, ndpi_str->ndpi_to_user_proto_id_num_allocated * 2);
     new_num = ndpi_min(new_num, 65535); /* ndpi_str->ndpi_to_user_proto_id_num_allocated is uint16_t */
     new_ptr = ndpi_realloc(ndpi_str->ndpi_to_user_proto_id,
-                           ndpi_str->ndpi_to_user_proto_id_num_allocated * sizeof(u_int16_t),
                            new_num * sizeof(u_int16_t));
     if(!new_ptr) {
       NDPI_LOG_DBG(ndpi_str, "Realloc error\n");
@@ -714,7 +693,6 @@ static int ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str
     new_num = ndpi_max(512, ndpi_nearest_power_of_two(protoId + 1));
     new_num = ndpi_min(new_num, 65535); /* ndpi_str->proto_defaults_num_allocated is uint16_t */
     new_ptr = ndpi_realloc(ndpi_str->proto_defaults,
-                           ndpi_str->proto_defaults_num_allocated * sizeof(ndpi_proto_defaults_t),
                            new_num * sizeof(ndpi_proto_defaults_t));
     if(!new_ptr) {
       NDPI_LOG_DBG(ndpi_str, "Realloc error\n");
@@ -3816,14 +3794,6 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   return(0);
 }
 
-void set_ndpi_flow_malloc(void *(*__ndpi_flow_malloc)(size_t size)) {
-  _ndpi_flow_malloc = __ndpi_flow_malloc;
-}
-
-void set_ndpi_flow_free(void (*__ndpi_flow_free)(void *ptr)) {
-  _ndpi_flow_free = __ndpi_flow_free;
-}
-
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
 void ndpi_debug_printf(u_int16_t proto, struct ndpi_detection_module_struct *ndpi_str, ndpi_log_level_t log_level,
                        const char *file_name, const char *func_name, unsigned int line_number, const char *format, ...) {
@@ -6568,7 +6538,7 @@ int ndpi_load_protocols_file(struct ndpi_detection_module_struct *ndpi_str, cons
 
 int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd) {
   char *buffer, *old_buffer;
-  int chunk_len = 1024, buffer_len = chunk_len, old_buffer_len;
+  int chunk_len = 1024, buffer_len = chunk_len;
   int i;
 
   if(!ndpi_str || !fd)
@@ -6589,10 +6559,9 @@ int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *
 	  && (line[strlen(line) - 1] != '\n')) {
       i = strlen(line);
       old_buffer = buffer;
-      old_buffer_len = buffer_len;
       buffer_len += chunk_len;
 
-      buffer = ndpi_realloc(old_buffer, old_buffer_len, buffer_len);
+      buffer = ndpi_realloc(old_buffer, buffer_len);
       if(buffer == NULL) {
 	NDPI_LOG_ERR(ndpi_str, "Memory allocation failure\n");
 	ndpi_free(old_buffer);

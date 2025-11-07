@@ -510,8 +510,7 @@ static int ndpi_search_tls_memory(const u_int8_t *payload,
 
   if(avail_bytes < payload_len) {
     u_int new_len = message->buffer_len + payload_len - avail_bytes + 1;
-    void *newbuf  = ndpi_realloc(message->buffer,
-				 message->buffer_len, new_len);
+    void *newbuf  = ndpi_realloc(message->buffer, new_len);
     if(!newbuf) return -1;
 
 #ifdef DEBUG_TLS_MEMORY
@@ -1027,7 +1026,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
                       } else if((u_int16_t)(flow->protos.tls_quic.server_names_len + dNSName_len + 1) > flow->protos.tls_quic.server_names_len) {
                         u_int16_t newstr_len = flow->protos.tls_quic.server_names_len + dNSName_len + 1;
                         char *newstr = (char*)ndpi_realloc(flow->protos.tls_quic.server_names,
-                                                           flow->protos.tls_quic.server_names_len+1, newstr_len+1);
+                                                           newstr_len + 1);
 
                         if(newstr) {
                           flow->protos.tls_quic.server_names = newstr;

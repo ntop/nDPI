@@ -1148,7 +1148,7 @@ static void add_to_address_port_list(ndpi_address_port_list *list, ndpi_address_
 
   if(list->num_aps == list->num_aps_allocated) {
     new_num = 1 + list->num_aps_allocated * 2;
-    new_buf = ndpi_realloc(list->aps, list->num_aps_allocated * sizeof(ndpi_address_port),
+    new_buf = ndpi_realloc(list->aps,
 	                   new_num * sizeof(ndpi_address_port));
     if(!new_buf)
       return;

@@ -19824,6 +19824,8 @@ int croaring_hardware_support(void) {
 extern int posix_memalign(void** __memptr, size_t __alignment, size_t __size);
 #endif  //__cplusplus // C++ does not have a well defined signature
 
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+
 // portable version of  posix_memalign
 static void* roaring_bitmap_aligned_malloc(size_t alignment, size_t size) {
     void* p;
@@ -19849,6 +19851,24 @@ static void roaring_bitmap_aligned_free(void* memblock) {
 #endif
 }
 
+#endif
+
+#include <ndpi_api.h> /* For memory allocations */
+
+/* croaring doesn't handle memory allocation failure, so avoid
+   custom allocator while fuzzing.
+   See: https://github.com/RoaringBitmap/CRoaring/issues/638
+ */
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+static roaring_memory_t global_memory_hook = {
+    .malloc = ndpi_malloc,
+    .realloc = ndpi_realloc,
+    .calloc = ndpi_calloc,
+    .free = ndpi_free,
+    .aligned_malloc = ndpi_aligned_malloc,
+    .aligned_free = ndpi_aligned_free,
+};
+#else
 static roaring_memory_t global_memory_hook = {
     .malloc = malloc,
     .realloc = realloc,
@@ -19857,6 +19877,7 @@ static roaring_memory_t global_memory_hook = {
     .aligned_malloc = roaring_bitmap_aligned_malloc,
     .aligned_free = roaring_bitmap_aligned_free,
 };
+#endif
 
 void roaring_init_memory_hook(roaring_memory_t memory_hook) {
     global_memory_hook = memory_hook;

@@ -60,7 +60,6 @@ bool ndpi_binary_bitmap_set(ndpi_binary_bitmap *b, u_int64_t value, u_int8_t cat
     u_int32_t new_len = b->num_allocated_entries + NDPI_BINARY_BITMAP_REALLOC_SIZE;
 
     rc = (struct ndpi_binary_bitmap_entry*)ndpi_realloc(b->entries,
-							sizeof(struct ndpi_binary_bitmap_entry)*b->num_allocated_entries,
 							sizeof(struct ndpi_binary_bitmap_entry)*new_len);
     if(rc == NULL) return(false);
 
@@ -126,7 +125,6 @@ bool ndpi_binary_bitmap_compress(ndpi_binary_bitmap *b) {
     
     b->entries = (struct ndpi_binary_bitmap_entry*)
       ndpi_realloc(b->entries,
-		   sizeof(struct ndpi_binary_bitmap_entry)*b->num_allocated_entries,
 		   sizeof(struct ndpi_binary_bitmap_entry)*new_len);
 
     b->num_used_entries = b->num_allocated_entries = new_len;

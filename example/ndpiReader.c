@@ -332,7 +332,7 @@ static u_int32_t reader_slot_malloc_bins(u_int64_t v)
 /**
  * @brief ndpi_malloc wrapper function
  */
-static void *ndpi_malloc_wrapper(size_t size) {
+static void *malloc_wrapper(size_t size) {
   tot_ndpi_memory += size;
 
   if(enable_malloc_bins && malloc_size_stats)
@@ -347,6 +347,73 @@ static void *ndpi_malloc_wrapper(size_t size) {
  * @brief free wrapper function
  */
 static void free_wrapper(void *freeable) {
+  free(freeable); /* Don't change to ndpi_free !!!!! */
+}
+
+/* ***************************************************** */
+
+static void *calloc_wrapper(size_t nmemb, size_t size) {
+  tot_ndpi_memory += (nmemb * size);
+
+  if(enable_malloc_bins && malloc_size_stats)
+    ndpi_inc_bin(&malloc_bins, reader_slot_malloc_bins(nmemb * size), 1);
+
+  return(calloc(nmemb, size)); /* Don't change to ndpi_calloc !!!!! */
+}
+
+/* ***************************************************** */
+
+static void *realloc_wrapper(void *ptr, size_t size) {
+  tot_ndpi_memory += size;
+
+  if(enable_malloc_bins && malloc_size_stats)
+    ndpi_inc_bin(&malloc_bins, reader_slot_malloc_bins(size), 1);
+
+  return(realloc(ptr, size)); /* Don't change to ndpi_realloc !!!!! */
+}
+
+/* ***************************************************** */
+
+static void *aligned_malloc_wrapper(size_t alignment, size_t size) {
+  tot_ndpi_memory += size;
+
+  if(enable_malloc_bins && malloc_size_stats)
+    ndpi_inc_bin(&malloc_bins, reader_slot_malloc_bins(size), 1);
+
+  void* p;
+#ifdef _MSC_VER
+  p = _aligned_malloc(size, alignment);
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+  p = __mingw_aligned_malloc(size, alignment);
+#else
+  if (posix_memalign(&p, alignment, size) != 0)
+    return NULL;
+#endif
+  return p;
+}
+
+/* ***************************************************** */
+
+static void aligned_free_wrapper(void *ptr) {
+#ifdef _MSC_VER
+  _aligned_free(ptr);
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+  __mingw_aligned_free(ptr);
+#else
+  free(ptr); /* Don't change to ndpi_free !!!!! */
+#endif
+}
+
+/* ***************************************************** */
+
+static void *flow_malloc_wrapper(size_t size) {
+  /* No stats; this memory is allocated by application, not from the library */
+  return(malloc(size)); /* Don't change to ndpi_malloc !!!!! */
+}
+
+/* ***************************************************** */
+
+static void flow_free_wrapper(void *freeable) {
   free(freeable); /* Don't change to ndpi_free !!!!! */
 }
 
@@ -648,7 +715,7 @@ void ndpiCheckHostsFileStringMatch(const char *domains_file) {
       printf("Domain [%s] NOT Found!!\n", line);
 
       /* Not very efficient but it should be ok */
-      not_matches = ndpi_realloc(not_matches, not_maches_num * sizeof(char *),
+      not_matches = ndpi_realloc(not_matches,
                                  (not_maches_num + 1) * sizeof(char *));
       not_matches[not_maches_num] = ndpi_strdup(line);
       not_maches_num += 1;
@@ -5332,8 +5399,14 @@ void test_lib() {
 #endif
   struct ndpi_global_context *g_ctx;
 
-  set_ndpi_malloc(ndpi_malloc_wrapper), set_ndpi_free(free_wrapper);
-  set_ndpi_flow_malloc(NULL), set_ndpi_flow_free(NULL);
+  ndpi_set_memory_alloction_functions(malloc_wrapper,
+                                      free_wrapper,
+                                      calloc_wrapper,
+                                      realloc_wrapper,
+                                      aligned_malloc_wrapper,
+                                      aligned_free_wrapper,
+                                      flow_malloc_wrapper,
+                                      flow_free_wrapper);
 
 #ifndef USE_GLOBAL_CONTEXT
   /* ndpiReader works even if libnDPI has been compiled without global context support,

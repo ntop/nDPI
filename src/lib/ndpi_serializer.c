@@ -280,7 +280,7 @@ static inline int ndpi_extend_serializer_buffer(ndpi_private_serializer_buffer *
   new_size = buffer->size + min_len;
   new_size = ((new_size / 4) + 1) * 4; /* required by zmq encryption */
 
-  r = ndpi_realloc((void *) buffer->data, buffer->size, new_size);
+  r = ndpi_realloc((void *) buffer->data, new_size);
 
   if(r == NULL)
     return(-1);

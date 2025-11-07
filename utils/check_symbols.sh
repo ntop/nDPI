@@ -40,7 +40,7 @@ for line in $(nm -P -u "${NDPI_LIB}"); do
             ;;
             '[ndpi_utils.o]'|'[ndpi_memory.o]')
                 case "${FOUND_SYMBOL}" in
-                    'malloc'|'calloc'|'free') SKIP=1 ;;
+                    'malloc'|'calloc'|'free'|'realloc') SKIP=1 ;;
                 esac
             ;;
             '[gcrypt_light.o]')

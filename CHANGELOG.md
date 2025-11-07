@@ -22,6 +22,7 @@
  - Remove `NDPI_PROTOCOL_BITMASK` (because its size is hardcoded to 512). Create a new structure, `ndpi_bitmask`, where the max number of bits is specified at runtime
  - Change the return parameter of `ndpi_detection_process_packet()`; get rid of `ndpi_extra_dissection_possible()`. See: https://github.com/ntop/nDPI/pull/2942
  - Remove `NDPI_PROTOCOL_ADULT_CONTENT`, `NDPI_PROTOCOL_LLM` and `NDPI_PROTOCOL_ADS_ANALYTICS_TRACK` because they are not real protocol: keep only the categories with a similar name
+ - Modify the API to set a custom memory allocator
 
 Further information are available at https://github.com/ntop/nDPI/issues/2862
 

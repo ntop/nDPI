@@ -88,7 +88,7 @@ extern "C" {
 
   /**
    * Allocate memory using nDPI's memory allocator.
-   * This function can be customized via ndpi_set_malloc() to use a custom allocator.
+   * This function can be customized via ndpi_set_memory_alloction_functions() to use a custom allocator.
    *
    * @param size Number of bytes to allocate
    * @return Pointer to allocated memory, or NULL on failure
@@ -97,24 +97,34 @@ extern "C" {
 
   /**
    * Allocate and zero-initialize memory using nDPI's memory allocator.
-   * This function can be customized via ndpi_set_calloc() to use a custom allocator.
+   * This function can be customized via ndpi_set_memory_alloction_functions() to use a custom allocator.
    *
    * @param count Number of elements to allocate
    * @param size Size of each element in bytes
    * @return Pointer to zero-initialized memory, or NULL on failure
    */
-  void * ndpi_calloc(unsigned long count, size_t size);
+  void * ndpi_calloc(size_t nmemb, size_t size);
 
   /**
    * Reallocate memory using nDPI's memory allocator.
-   * This function can be customized via ndpi_set_realloc() to use a custom allocator.
+   * This function can be customized via ndpi_set_memory_alloction_functions() to use a custom allocator.
    *
    * @param ptr Pointer to previously allocated memory (or NULL for new allocation)
    * @param old_size Current size of the allocated block in bytes
    * @param new_size Desired new size in bytes
    * @return Pointer to reallocated memory, or NULL on failure
    */
-  void * ndpi_realloc(void *ptr, size_t old_size, size_t new_size);
+  void * ndpi_realloc(void *ptr, size_t size);
+
+  /**
+   * Allocate aligned memory using nDPI's memory allocator.
+   * This function can be customized via ndpi_set_memory_alloction_functions() to use a custom allocator.
+   *
+   * @param the address of the allocated memory will be a multiple of `alignment`
+   * @param size Number of bytes to allocate
+   * @return Pointer to allocated memory, or NULL on failure
+   */
+  void * ndpi_aligned_malloc(size_t alignment, size_t size);
 
   /**
    * Duplicate a string using nDPI's memory allocator.
@@ -137,16 +147,25 @@ extern "C" {
 
   /**
    * Free memory allocated by nDPI's memory allocator.
-   * This function can be customized via ndpi_set_free() to use a custom deallocator.
+   * This function can be customized via ndpi_set_memory_alloction_functions() to use a custom deallocator.
    *
    * @param ptr Pointer to memory to free (NULL is safe to pass)
    */
   void   ndpi_free(void *ptr);
 
   /**
+   * Free aligned memory allocated by nDPI's memory allocator.
+   * This function can be customized via ndpi_set_memory_alloction_functions() to use a custom deallocator.
+   *
+   * @param ptr Pointer to memory to free (NULL is safe to pass)
+   */
+  void   ndpi_aligned_free(void *ptr);
+
+  /**
    * Allocate memory for flow-specific data using nDPI's flow allocator.
    * Flow memory can use a separate allocator from general memory for better
    * memory management in high-throughput scenarios.
+   * This function can be customized via ndpi_set_memory_alloction_functions() to use a custom allocator.
    *
    * @param size Number of bytes to allocate
    * @return Pointer to allocated memory, or NULL on failure
@@ -155,6 +174,7 @@ extern "C" {
 
   /**
    * Free memory allocated by ndpi_flow_malloc().
+   * This function can be customized via ndpi_set_memory_alloction_functions() to use a custom deallocator.
    *
    * @param ptr Pointer to flow memory to free (NULL is safe to pass)
    */
@@ -1116,32 +1136,37 @@ extern "C" {
 				   struct ndpi_flow_struct *flow);
 
   /**
-   * Set a custom malloc function for nDPI's general memory allocator.
+   * Set custom memory allocation functions for nDPI's general memory allocator.
    *
-   * @param __ndpi_malloc Function pointer to the custom malloc implementation
+   * @param __ndpi_malloc         Function pointer to the custom malloc implementation
+   * @param __ndpi_free           Function pointer to the custom free implementation
+   * @param __ndpi_calloc         Function pointer to the custom calloc implementation
+   * @param __ndpi_realloc        Function pointer to the custom realloc implementation
+   * @param __ndpi_aligned_malloc Function pointer to the custom aligned allocation implementation
+   * @param __ndpi_aligned_free   Function pointer to the custom aligned free implementation
+   * @param __ndpi_flow_malloc    Function pointer to the custom allocation of flows
+   * @param __ndpi_flow_free      Function pointer to the custom free of flows
+   *
+   * This function is optional, but if used, it MUST be called before ANY other nDPI functions!!
+   *
+   * The first 4 parameters are mandatory.
+   * If you want to set a custom allocator for aligned memory, you must specify `__ndpi_aligned_malloc`
+   * and `__ndpi_aligned_free`, both
+   * If you want to set a custom allocator for flow memory, you must specify `__ndpi_flow_malloc`
+   * and `__ndpi_flow_free`, both
+   *
+   * Flow memory can use a separate allocator from general memory for better
+   * memory management in high-throughput scenarios.
    */
-  void set_ndpi_malloc(void* (*__ndpi_malloc)(size_t size));
 
-  /**
-   * Set a custom free function for nDPI's general memory allocator.
-   *
-   * @param __ndpi_free Function pointer to the custom free implementation
-   */
-  void set_ndpi_free(void  (*__ndpi_free)(void *ptr));
-
-  /**
-   * Set a custom malloc function for nDPI's flow-specific memory allocator.
-   *
-   * @param __ndpi_flow_malloc Function pointer to the custom flow malloc implementation
-   */
-  void set_ndpi_flow_malloc(void* (*__ndpi_flow_malloc)(size_t size));
-
-  /**
-   * Set a custom free function for nDPI's flow-specific memory allocator.
-   *
-   * @param __ndpi_flow_free Function pointer to the custom flow free implementation
-   */
-  void set_ndpi_flow_free(void  (*__ndpi_flow_free)(void *ptr));
+  void ndpi_set_memory_alloction_functions(void *(*__ndpi_malloc)(size_t size),
+                                           void (*__ndpi_free)(void *ptr),
+                                           void *(*__ndpi_calloc)(size_t nmemb, size_t size),
+                                           void *(*__ndpi_realloc)(void *ptr, size_t size),
+                                           void *(*__ndpi_aligned_malloc)(size_t alignment, size_t size),
+                                           void (*__ndpi_aligned_free)(void *ptr),
+                                           void *(*__ndpi_flow_malloc)(size_t size),
+                                           void (*__ndpi_flow_free)(void *ptr));
 
   /**
    * Set a custom debug/logging function for nDPI.

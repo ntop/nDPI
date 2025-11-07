@@ -18,11 +18,26 @@ static void *malloc_wrapper(size_t size) {
 static void free_wrapper(void *freeable) {
   free(freeable);
 }
+static void *calloc_wrapper(size_t nmemb, size_t size) {
+  return (fastrand () % 16) ? calloc (nmemb, size) : NULL;
+}
+static void *realloc_wrapper(void *ptr, size_t size) {
+  return (fastrand () % 16) ? realloc (ptr, size) : NULL;
+}
 
 void fuzz_set_alloc_callbacks(void)
 {
-  set_ndpi_malloc(malloc_wrapper);
-  set_ndpi_free(free_wrapper);
+  ndpi_set_memory_alloction_functions(malloc_wrapper,
+                                      free_wrapper,
+                                      calloc_wrapper,
+                                      realloc_wrapper,
+                                      /* Aligned allocations are used only by croaring,
+                                         but no during fuzzing. So no point to set
+                                         these two wrappers here */
+                                      NULL, NULL,
+                                      /* No interested in flow allocator, because it
+                                         is used only by the application */
+                                      NULL, NULL);
 }
 void fuzz_set_alloc_seed(int seed)
 {

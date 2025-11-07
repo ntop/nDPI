@@ -149,7 +149,6 @@ bool ndpi_bitmap64_fuse_set(ndpi_bitmap64_fuse *_b, u_int64_t value) {
     u_int32_t new_len = b->num_allocated_entries + NDPI_BITMAP64_FUSE_REALLOC_SIZE;
 
     rc = (u_int64_t*)ndpi_realloc(b->entries,
-				  sizeof(u_int64_t)*b->num_allocated_entries,
 				  sizeof(u_int64_t)*new_len);
     if(rc == NULL) {
       b->is_compressed = false;
