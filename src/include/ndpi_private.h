@@ -501,7 +501,6 @@ struct ndpi_detection_module_struct {
 #define NDPI_HOSTNAME_NORM_STRIP_PORT 8 /* Used by SSDP/HTTP, for the time being */
 #define NDPI_HOSTNAME_NORM_ALL (NDPI_HOSTNAME_NORM_LC | NDPI_HOSTNAME_NORM_REPLACE_IC | NDPI_HOSTNAME_NORM_STRIP_EOLSP)
 
-
 #define NDPI_DEFAULT_MAX_TCP_RETRANSMISSION_WINDOW_SIZE 0x10000
 
 #define NDPI_PARSE_PACKET_LINE_INFO(ndpi_struct,flow,packet)		\
@@ -706,6 +705,9 @@ u_int16_t icmp4_checksum(u_int8_t const * const buf, size_t len);
 
 ndpi_risk_enum ndpi_network_risk_ptree_match(struct ndpi_detection_module_struct *ndpi_str,
 					     struct in_addr *pin /* network byte order */);
+
+int ndpi_set_default_config(struct ndpi_detection_module_config_struct *cfg,
+			    u_int16_t max_internal_proto);
 
 int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_mod, FILE *fd);
 int load_categories_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *fd, void *user_data);

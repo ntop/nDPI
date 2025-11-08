@@ -4798,3 +4798,133 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 
   return(flow->ndpi.fingerprint);
 }
+
+/* ****************************************** */
+
+void* ndpi_memmem(const void* haystack, size_t haystack_len, const void* needle, size_t needle_len) {
+  if (!haystack || !needle || haystack_len < needle_len) {
+    return NULL;
+  }
+
+  if (needle_len == 0) {
+    return (void *)haystack;
+  }
+
+  if (needle_len == 1) {
+    return (void *)memchr(haystack, *(const u_int8_t *)needle, haystack_len);
+  }
+
+  const u_int8_t *const end_of_search = (const u_int8_t *)haystack + haystack_len - needle_len + 1;
+
+  const u_int8_t *current = (const u_int8_t *)haystack;
+
+  while (1) {
+    /* Find the first occurrence of the first character from the needle */
+    current = (const u_int8_t *)memchr(current, *(const u_int8_t *)needle, end_of_search - current);
+
+    if (!current) {
+      return NULL;
+    }
+
+    /* Check the rest of the needle for a match */
+    if (memcmp(current, needle, needle_len) == 0) {
+      return (void *)current;
+    }
+
+    /* Shift one character to the right for the next search */
+    current++;
+  }
+
+  return NULL;
+}
+
+/* ****************************************** */
+
+size_t ndpi_strlcpy(char *dst, const char* src, size_t dst_len, size_t src_len) {
+  if (!dst || !src || dst_len == 0) {
+    return 0;
+  }
+
+  size_t copy_len = ndpi_min(src_len, dst_len - 1);
+  memmove(dst, src, copy_len);
+  dst[copy_len] = '\0';
+
+  return src_len;
+}
+
+/* ****************************************** */
+
+int ndpi_memcasecmp(const void *s1, const void *s2, size_t n) {
+  if (s1 == NULL && s2 == NULL) {
+    return 0;
+  }
+
+  if (s1 == NULL) {
+    return -1;
+  }
+
+  if (s2 == NULL) {
+    return 1;
+  }
+
+  if (n == 0) {
+    return 0;
+  }
+
+  const unsigned char *p1 = (const unsigned char *)s1;
+  const unsigned char *p2 = (const unsigned char *)s2;
+
+  if (n == 1) {
+    return tolower(*p1) - tolower(*p2);
+  }
+
+  /* Early exit optimization - check first and last bytes */
+
+  int first_cmp = tolower(p1[0]) - tolower(p2[0]);
+  if (first_cmp != 0) {
+    return first_cmp;
+  }
+
+  int last_cmp = tolower(p1[n-1]) - tolower(p2[n-1]);
+  if (last_cmp != 0) {
+    return last_cmp;
+  }
+
+  size_t i;
+  for (i = 1; i < n-1; i++) {
+    int cmp = tolower(p1[i]) - tolower(p2[i]);
+    if (cmp != 0) {
+      return cmp;
+    }
+  }
+
+  return 0;
+}
+
+/* ****************************************** */
+
+char *ndpi_stack2str(struct ndpi_detection_module_struct *ndpi_str,
+                     struct ndpi_proto_stack *stack, char *buf, u_int buf_len) {
+  int ret, used = 0, i = 0;
+
+  if(!ndpi_str || buf == NULL || buf_len == 0)
+    return NULL;
+
+  buf[0] = '\0';
+
+  if(stack->protos_num == 0) {
+    ndpi_snprintf(buf, buf_len, "Unknown");
+    return buf;
+  }
+
+  while((int64_t)buf_len - used > 0 && i < stack->protos_num) {
+    ret = ndpi_snprintf(buf + used, buf_len - used, "%s%s",
+                       i != 0 ? "." : "",
+                      ndpi_get_proto_name(ndpi_str, stack->protos[i]));
+    if(ret <= 0)
+      break;
+    used += ret;
+    i++;
+  }
+  return buf;
+}
