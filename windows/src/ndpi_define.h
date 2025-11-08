@@ -287,4 +287,7 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 
 #define MAX_NBPF_CUSTOM_PROTO  8
 
+/* Unused parameters can be silenced as follows */
+#define __ndpi_unused_param(x) (void)(x)
+
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */
