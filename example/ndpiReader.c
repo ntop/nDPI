@@ -7191,7 +7191,7 @@ void checkRankingUnitTest(bool do_trace) {
 static void hash_walker(char *key, u_int64_t value, void *data) {
   __ndpi_unused_param(data);
 
-  printf("%s\t%llu\n", key, value);
+  printf("%s\t%llu\n", key, (unsigned long long)value);
 }
 
 
