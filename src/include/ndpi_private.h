@@ -70,7 +70,6 @@ typedef struct default_ports_tree_node {
   u_int16_t default_port;
 } default_ports_tree_node_t;
 
-
 #define LINE_STARTS(ndpi_int_one_line_struct, string_to_compare) \
   ((ndpi_int_one_line_struct).ptr != NULL && \
    (ndpi_int_one_line_struct).len >= strlen(string_to_compare) && \

@@ -2960,6 +2960,20 @@ void ndpi_hash_get_stats(ndpi_str_hash *h, struct ndpi_str_hash_stats *stats) {
     stats->n_found = 0;
   }
 }
+
+/* ******************************************************************** */
+
+void ndpi_hash_walk(ndpi_str_hash **h, ndpi_hash_walk_iter cb, void *data) {
+  if(h && *h) {
+    ndpi_str_hash_priv *h_priv = (ndpi_str_hash_priv *)((*h)->priv);
+    ndpi_str_hash_priv *current, *tmp;
+
+    HASH_ITER(hh, h_priv, current, tmp) {
+      cb(current->key, current->value64, data);
+    }
+  }
+}
+
 /* ******************************************************************** */
 
 int ndpi_get_hash_stats(struct ndpi_detection_module_struct *ndpi_struct,
@@ -4926,5 +4940,6 @@ char *ndpi_stack2str(struct ndpi_detection_module_struct *ndpi_str,
     used += ret;
     i++;
   }
+
   return buf;
 }

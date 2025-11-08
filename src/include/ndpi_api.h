@@ -2136,6 +2136,9 @@ extern "C" {
    */
   int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int64_t value);
 
+  typedef void (*ndpi_hash_walk_iter)(char *key, u_int64_t value64, void *data);
+  void ndpi_hash_walk(ndpi_str_hash **h, ndpi_hash_walk_iter cb, void *data);
+  
   void ndpi_hash_get_stats(ndpi_str_hash *h, struct ndpi_str_hash_stats *stats);
   int ndpi_get_hash_stats(struct ndpi_detection_module_struct *ndpi_struct,
                           str_hash_type hash_type,
@@ -2375,6 +2378,11 @@ extern "C" {
 			const char *proto, const char *param, char *buf, int buf_len);
   char *ndpi_dump_config(struct ndpi_detection_module_struct *ndpi_str,
 			 FILE *fd);
+
+  void ndpi_dump_host_based_protocol_id(struct ndpi_detection_module_struct *ndpi_str,
+					ndpi_hash_walk_iter walker, void *data);
+  void ndpi_dump_host_based_category_id(struct ndpi_detection_module_struct *ndpi_str,
+					ndpi_hash_walk_iter walker, void *data);
 
   /* ******************************* */
 

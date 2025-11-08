@@ -158,6 +158,8 @@ u_int8_t dump_internal_stats;
 static struct ndpi_bin malloc_bins;
 static int enable_malloc_bins = 0;
 static int max_malloc_bins = 14;
+static u_int8_t dump_hosts_mode = 0;
+
 int malloc_size_stats = 0;
 
 int monitoring_enabled;
@@ -854,9 +856,9 @@ static void help(u_int long_help) {
 #endif
          "[-f <filter>][-s <duration>][-m <duration>][-b <num bin clusters>]\n"
          "          [-p <protos>][-l <loops> [-q][-d][-h][-H][-D][-e <len>][-E <path>][-t][-v <level>]\n"
-         "          [-n <threads>][-N <path>][-w <file>][-c <file>][-C <file>][-j <file>][-x <file>]\n"
+         "          [-n <threads>][-N <path>][-w <file>][-c <file>][-C <file>][-x <file>]\n"
          "          [-r <file>][-R][-j <file>][-S <file>][-T <num>][-U <num>] [-x <domain>]\n"
-         "          [-a <mode>][-B proto_list][-L <domain suffixes>]\n\n"
+         "          [-a <mode>][-B proto_list][-L <domain suffixes>][--protos-dump <mode>]\n\n"
          "Usage:\n"
          "  -i <file.pcap|device>      | Specify a pcap file/playlist to read packets from or a\n"
          "                             | device for live capture (comma-separated list)\n"
@@ -933,6 +935,7 @@ static void help(u_int long_help) {
          "                             | It is a shortcut to --cfg=tls,dpi.heuristics,0x07\n"
          "  --cfg=proto,param,value    | Configure the specific attribute of this protocol\n"
          "  --dump-fpc-stats           | Print FPC statistics\n"
+	 "  --protos-dump <mode>       | Dump host-based protocolId (mode=1) and categoryId (mode=2)\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -1018,6 +1021,8 @@ static struct option longopts[] = {
   { "ignore-vlanid", no_argument, NULL, 'I'},
 
   { "protos", required_argument, NULL, 'p'},
+  { "payload-analysis", required_argument, NULL, 'P'},
+  { "protos-dump", required_argument, NULL, 169},
   { "capture-duration", required_argument, NULL, 's'},
   { "decode-tunnels", no_argument, NULL, 't'},
   { "revision", no_argument, NULL, 'r'},
@@ -1029,7 +1034,7 @@ static struct option longopts[] = {
   { "long-help", no_argument, NULL, 'H'},
   { "serialization-outfile", required_argument, NULL, 'k'},
   { "serialization-format", required_argument, NULL, 'K'},
-  { "payload-analysis", required_argument, NULL, 'P'},
+
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
   { "protocols-list-dir", required_argument, NULL, 180},
@@ -1303,7 +1308,6 @@ int reader_add_cfg(char *proto, char *param, char *value, int dup)
 
 /* ********************************** */
 
-
 static void parse_parameters(int argc, char **argv)
 {
   int option_idx = 0;
@@ -1556,6 +1560,15 @@ static void parse_parameters(int argc, char **argv)
       ndpi_init_bin(&malloc_bins, ndpi_bin_family64, max_malloc_bins);
       break;
 
+    case 169:
+      dump_hosts_mode = atoi(optarg);
+      if(dump_hosts_mode > 2) {
+	printf("Invalid -S value specified\n");
+	help(0);
+	exit(0);
+      }
+      break;
+
     case 'k':
       errno = 0;
       if((serialization_fp = fopen(optarg, "w")) == NULL)
@@ -1798,7 +1811,7 @@ static void parseOptions(int argc, char **argv) {
     quiet_mode = 1;
   }
 
-  if(!domain_to_check && !ip_port_to_check && !domains_file_to_check) {
+  if(!domain_to_check && !ip_port_to_check && !domains_file_to_check && !dump_hosts_mode) {
     if(_pcap_file[0] == NULL)
       help(0);
 
@@ -2695,7 +2708,7 @@ static void node_print_unknown_proto_walker(const void *node,
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
-  (void)depth;
+  __ndpi_unused_param(depth);
 
   if((flow->detected_protocol.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN)
      || (flow->detected_protocol.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN))
@@ -2718,7 +2731,7 @@ static void node_print_known_proto_walker(const void *node,
   struct ndpi_flow_info *flow = *(struct ndpi_flow_info**)node;
   u_int16_t thread_id = *((u_int16_t*)user_data);
 
-  (void)depth;
+  __ndpi_unused_param(depth);
 
   if((flow->detected_protocol.proto.master_protocol == NDPI_PROTOCOL_UNKNOWN)
      && (flow->detected_protocol.proto.app_protocol == NDPI_PROTOCOL_UNKNOWN))
@@ -2742,7 +2755,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   ndpi_protocol_category_t category;
   ndpi_protocol_breed_t breed;
 
-  (void)depth;
+  __ndpi_unused_param(depth);
 
   if(flow == NULL) return;
 
@@ -3149,7 +3162,7 @@ static void port_stats_walker(const void *node, ndpi_VISIT which, int depth, voi
     u_int16_t sport, dport;
     char proto[16];
 
-    (void)depth;
+    __ndpi_unused_param(depth);
 
     sport = ntohs(flow->src_port), dport = ntohs(flow->dst_port);
 
@@ -3484,8 +3497,8 @@ void printPortStats(struct port_stats *stats) {
 static void node_flow_risk_walker(const void *node, ndpi_VISIT which, int depth, void *user_data) {
   struct ndpi_flow_info *f = *(struct ndpi_flow_info**)node;
 
-  (void)depth;
-  (void)user_data;
+  __ndpi_unused_param(depth);
+  __ndpi_unused_param(user_data);
 
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if(f->risk) {
@@ -7173,6 +7186,15 @@ void checkRankingUnitTest(bool do_trace) {
   ndpi_term_ranking(&rank);
 }
 
+/* ****************************************** */
+
+static void hash_walker(char *key, u_int64_t value, void *data) {
+  __ndpi_unused_param(data);
+
+  printf("%s\t%llu\n", key, value);
+}
+
+
 /* *********************************************** */
 
 /**
@@ -7277,6 +7299,28 @@ int main(int argc, char **argv) {
 
   parseOptions(argc, argv);
 
+  if(dump_hosts_mode > 0) {
+    struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
+
+    configure_ndpi(ndpi_str);
+    ndpi_finalize_initialization(ndpi_str);
+
+    switch(dump_hosts_mode) {
+    case 1:
+      printf("ProtocolName\t\tProtocolId\n");
+      ndpi_dump_host_based_protocol_id(ndpi_str, hash_walker, NULL);
+      break;
+
+    case 2:
+      printf("ProtocolName\t\tCategoryId\n");
+      ndpi_dump_host_based_category_id(ndpi_str, hash_walker, NULL);
+      break;
+    }
+
+    ndpi_exit_detection_module(ndpi_str);
+    exit(0);
+  }
+
   if(domain_to_check) {
     ndpiCheckHostStringMatch(domain_to_check);
     exit(0);
@@ -7320,10 +7364,10 @@ int main(int argc, char **argv) {
   }
 
   signal(SIGINT, sigproc);
-
+  
   for(i=0; i<num_loops; i++)
-    test_lib();
-
+    test_lib();  
+  
   if(results_path)  ndpi_free(results_path);
   if(results_file)  fclose(results_file);
   if(extcap_dumper) pcap_dump_close(extcap_dumper);

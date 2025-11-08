@@ -32,6 +32,7 @@
 #include "ndpi_config.h"
 #include "ndpi_api.h"
 #include "ndpi_private.h"
+#include "ahocorasick.h"
 
 #ifndef WIN32
 #include <unistd.h>
@@ -815,4 +816,75 @@ static ndpi_cfg_error _set_param_flowrisk_enable_disable(struct ndpi_detection_m
     return NDPI_CFG_OK;
   }
   return NDPI_CFG_INVALID_PARAM;
+}
+
+/* ****************************************** */
+/* ****************************************** */
+
+static AC_ERROR_t ac_walk_proto_id(AC_AUTOMATA_t *thiz, AC_NODE_t *n, int idx, void *data) {
+  __ndpi_unused_param(thiz);
+  __ndpi_unused_param(idx);
+  __ndpi_unused_param(data);
+
+  if(n->matched_patterns) {
+    ndpi_str_hash *h = (ndpi_str_hash*)data;
+    int i;
+
+    for(i=0; i<n->matched_patterns->num; i++) {
+      AC_PATTERN_t *p = &n->matched_patterns->patterns[i];
+
+      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.number);
+    }
+  }
+
+  return ACERR_SUCCESS;
+}
+
+/* ****************************************** */
+
+static AC_ERROR_t ac_walk_category_id(AC_AUTOMATA_t *thiz, AC_NODE_t *n, int idx, void *data) {
+  __ndpi_unused_param(thiz);
+  __ndpi_unused_param(idx);
+  __ndpi_unused_param(data);
+
+  if(n->matched_patterns) {
+    ndpi_str_hash *h = (ndpi_str_hash*)data;
+    int i;
+
+    for(i=0; i<n->matched_patterns->num; i++) {
+      AC_PATTERN_t *p = &n->matched_patterns->patterns[i];
+
+      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.category);
+    }
+  }
+
+  return ACERR_SUCCESS;
+}
+
+/* ****************************************** */
+
+static void _dump_host_based_protocol(struct ndpi_detection_module_struct *ndpi_str,
+				      ndpi_hash_walk_iter walker, bool walk_proto_id,
+				      void *data) {
+  ndpi_str_hash *h;
+
+  ndpi_hash_init(&h);
+  ac_automata_walk((AC_AUTOMATA_t *)ndpi_str->host_automa.ac_automa,
+		   walk_proto_id ? ac_walk_proto_id : ac_walk_category_id, NULL, h);
+  ndpi_hash_walk(&h, walker, data);
+  ndpi_hash_free(&h);
+}
+
+/* ****************************************** */
+
+void ndpi_dump_host_based_protocol_id(struct ndpi_detection_module_struct *ndpi_str,
+				      ndpi_hash_walk_iter walker, void *data) {
+  _dump_host_based_protocol(ndpi_str, walker, true /* protocol id */, data);
+}
+
+/* ****************************************** */
+
+void ndpi_dump_host_based_category_id(struct ndpi_detection_module_struct *ndpi_str,
+				      ndpi_hash_walk_iter walker, void *data) {
+  _dump_host_based_protocol(ndpi_str, walker, false /* category */, data);
 }

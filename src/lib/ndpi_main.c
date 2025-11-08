@@ -597,10 +597,10 @@ void exclude_dissector(struct ndpi_detection_module_struct *ndpi_str, struct ndp
                                      ndpi_str->callback_buffer[dissector_idx].name);
   }
 #else
-  (void)ndpi_str;
-  (void)_file;
-  (void)_func;
-  (void)_line;
+  __ndpi_unused_param(ndpi_str);
+  __ndpi_unused_param(_file);
+  __ndpi_unused_param(_func);
+  __ndpi_unused_param(_line);
 #endif
   dissector_bitmask_set(&flow->excluded_dissectors_bitmask, dissector_idx);
 }
@@ -3842,9 +3842,9 @@ void ndpi_debug_printf(u_int16_t proto, struct ndpi_detection_module_struct *ndp
     printf("Proto: %u, %s", proto, str);
   }
 #else
-  (void)file_name;
-  (void)func_name;
-  (void)line_number;
+  __ndpi_unused_param(file_name);
+  __ndpi_unused_param(func_name);
+  __ndpi_unused_param(line_number);
 #endif
 
 }
@@ -3857,8 +3857,8 @@ void set_ndpi_debug_function(struct ndpi_detection_module_struct *ndpi_str, ndpi
   if(ndpi_str)
     ndpi_str->ndpi_debug_printf = ndpi_debug_printf;
 #else
-  (void)ndpi_str;
-  (void)ndpi_debug_printf;
+  __ndpi_unused_param(ndpi_str);
+  __ndpi_unused_param(ndpi_debug_printf);
 #endif
 }
 
@@ -5999,7 +5999,7 @@ int load_category_file_fd(struct ndpi_detection_module_struct *ndpi_str,
   unsigned int lines_read = 0;
   ndpi_protocol_breed_t breed;
 
-  (void)lines_read;
+  __ndpi_unused_param(lines_read);
 
   if(!ndpi_str || !fd || !ndpi_str->protocols)
     return(0);
@@ -6079,7 +6079,7 @@ int load_protocol_id_file_fd(struct ndpi_detection_module_struct *ndpi_str,
   unsigned int failed_lines = 0;
   unsigned int lines_read = 0;
 
-  (void)lines_read;
+  __ndpi_unused_param(lines_read);
 
   if(!ndpi_str || !fd || !ndpi_str->protocols)
     return(0);
