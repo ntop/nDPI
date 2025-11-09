@@ -1,6 +1,6 @@
 bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp
 #Alghoritms
-bin_PROGRAMS += fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr fuzz_alg_quick_encryption
+bin_PROGRAMS += fuzz_alg_ranking fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr fuzz_alg_quick_encryption
 #Data structures
 bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64_fuse fuzz_ds_domain_classify fuzz_ds_kdtree fuzz_ds_btree fuzz_ds_address_cache fuzz_ds_bitmap fuzz_ds_filter
 #Third party
@@ -79,6 +79,12 @@ fuzz_serialization_SOURCES = fuzz_serialization.cpp fuzz_common_code.c
 fuzz_serialization_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_serialization_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+
+fuzz_alg_ranking_SOURCES = fuzz_alg_ranking.cpp fuzz_common_code.c
+# force usage of CXX for linker
+fuzz_alg_ranking_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(fuzz_alg_ranking_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_bins_SOURCES = fuzz_alg_bins.cpp fuzz_common_code.c
 # force usage of CXX for linker
