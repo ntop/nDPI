@@ -28,7 +28,7 @@ fi
 # build libpcap
 tar -xvzf libpcap-1.9.1.tar.gz
 cd libpcap-1.9.1
-./configure --disable-shared
+./configure --disable-shared --disable-dbus --without-libnl --disable-rdma --disable-usb
 make -j$(nproc)
 make install
 cd ..
@@ -42,8 +42,10 @@ fi
 
 # build project
 cd ndpi
-#Workaround for introspector builds
-RANLIB=llvm-ranlib LDFLAGS="-L/usr/local/lib -lpcap" ./autogen.sh && ./configure --enable-fuzztargets --enable-tls-sigs
+#There are two workarounds:
+# * pcap stuff + --with-only-libndpi: for introspector builds. As reported in #8939, configure is not able to detect external libraries in introspector builds
+# * ADDITIONAL_* stuff: to be able run tests/unit/unit (via chronos/check_tests.sh) even with the previous workaround
+./autogen.sh && AR=llvm-ar RANLIB=llvm-ranlib NDPI_LDFLAGS="-L/usr/local/lib -lpcap" ADDITIONAL_INCS="-I/usr/local/include/json-c/" ADDITIONAL_LIBS="-L/usr/local/lib -ljson-c" ./configure --enable-fuzztargets --enable-tls-sigs --with-only-libndpi
 make -j$(nproc)
 # Copy fuzzers
 ls fuzz/fuzz* | grep -v "\." | while read -r i; do cp "$i" "$OUT"/; done

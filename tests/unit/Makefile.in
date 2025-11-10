@@ -14,7 +14,7 @@ SRCHOME=$(top_srcdir)/src
 ifneq ($(OS),Windows_NT)
 CFLAGS+=-fPIC -DPIC
 endif
-CFLAGS+=-g -I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @JSONC_CFLAGS@ @PCAP_INC@
+CFLAGS+=-g -I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @JSONC_CFLAGS@ @PCAP_INC@ @ADDITIONAL_INCS@
 LIBNDPI=$(top_builddir)/src/lib/libndpi.a
 LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ @LIBS@
 LDFLAGS+=@NDPI_LDFLAGS@

@@ -28,6 +28,7 @@ endif
 #TODO: find a generic way to always use CXX as linker
 
 fuzz_process_packet_SOURCES = fuzz_process_packet.c fuzz_common_code.c
+fuzz_process_packet_CFLAGS =
 # force usage of CXX for linker
 fuzz_process_packet_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -63,48 +64,63 @@ fuzz_quic_get_crypto_data_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS)
 
 fuzz_config_SOURCES = fuzz_config.cpp fuzz_common_code.c
 fuzz_config_CXXFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_config_CFLAGS = -DNDPI_LIB_COMPILATION
 # force usage of CXX for linker
 fuzz_config_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_config_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_community_id_SOURCES = fuzz_community_id.cpp fuzz_common_code.c
+fuzz_community_id_CXXFLAGS =
+fuzz_community_id_CFLAGS =
 # force usage of CXX for linker
 fuzz_community_id_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_community_id_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_serialization_SOURCES = fuzz_serialization.cpp fuzz_common_code.c
+fuzz_serialization_CXXFLAGS =
+fuzz_serialization_CFLAGS =
 # force usage of CXX for linker
 fuzz_serialization_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_serialization_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_ranking_SOURCES = fuzz_alg_ranking.cpp fuzz_common_code.c
+fuzz_alg_ranking_CXXFLAGS =
+fuzz_alg_ranking_CFLAGS =
 # force usage of CXX for linker
 fuzz_alg_ranking_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_alg_ranking_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_bins_SOURCES = fuzz_alg_bins.cpp fuzz_common_code.c
+fuzz_alg_bins_CXXFLAGS =
+fuzz_alg_bins_CFLAGS =
 # force usage of CXX for linker
 fuzz_alg_bins_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_alg_bins_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_hll_SOURCES = fuzz_alg_hll.cpp fuzz_common_code.c
+fuzz_alg_hll_CXXFLAGS =
+fuzz_alg_hll_CFLAGS =
 # force usage of CXX for linker
 fuzz_alg_hll_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_alg_hll_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_hw_rsi_outliers_da_SOURCES = fuzz_alg_hw_rsi_outliers_da.cpp fuzz_common_code.c
+fuzz_alg_hw_rsi_outliers_da_CXXFLAGS =
+fuzz_alg_hw_rsi_outliers_da_CFLAGS =
 # force usage of CXX for linker
 fuzz_alg_hw_rsi_outliers_da_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_alg_hw_rsi_outliers_da_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_jitter_SOURCES = fuzz_alg_jitter.cpp fuzz_common_code.c
+fuzz_alg_jitter_CXXFLAGS =
+fuzz_alg_jitter_CFLAGS =
 # force usage of CXX for linker
 fuzz_alg_jitter_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -141,60 +157,80 @@ fuzz_alg_strnstr_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_alg_strnstr_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_quick_encryption_SOURCES = fuzz_alg_quick_encryption.cpp fuzz_common_code.c
+fuzz_alg_quick_encryption_CXXFLAGS =
+fuzz_alg_quick_encryption_CFLAGS =
 # force usage of CXX for linker
 fuzz_alg_quick_encryption_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_alg_quick_encryption_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_alg_ses_des_SOURCES = fuzz_alg_ses_des.cpp fuzz_common_code.c
+fuzz_alg_ses_des_CXXFLAGS =
+fuzz_alg_ses_des_CFLAGS =
 # force usage of CXX for linker
 fuzz_alg_ses_des_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_alg_ses_des_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_patricia_SOURCES = fuzz_ds_patricia.cpp fuzz_common_code.c
+fuzz_ds_patricia_CXXFLAGS =
+fuzz_ds_patricia_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_patricia_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_patricia_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_ahocorasick_SOURCES = fuzz_ds_ahocorasick.cpp fuzz_common_code.c
+fuzz_ds_ahocorasick_CXXFLAGS =
+fuzz_ds_ahocorasick_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_ahocorasick_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_ahocorasick_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_libcache_SOURCES = fuzz_ds_libcache.cpp fuzz_common_code.c
+fuzz_ds_libcache_CXXFLAGS =
+fuzz_ds_libcache_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_libcache_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_libcache_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_tree_SOURCES = fuzz_ds_tree.cpp fuzz_common_code.c
+fuzz_ds_tree_CXXFLAGS =
+fuzz_ds_tree_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_tree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_tree_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_ptree_SOURCES = fuzz_ds_ptree.cpp fuzz_common_code.c
+fuzz_ds_ptree_CXXFLAGS =
+fuzz_ds_ptree_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_ptree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_ptree_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_hash_SOURCES = fuzz_ds_hash.cpp fuzz_common_code.c
+fuzz_ds_hash_CXXFLAGS =
+fuzz_ds_hash_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_hash_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_hash_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_cmsketch_SOURCES = fuzz_ds_cmsketch.cpp fuzz_common_code.c
+fuzz_ds_cmsketch_CXXFLAGS =
+fuzz_ds_cmsketch_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_cmsketch_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_cmsketch_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_bitmap64_fuse_SOURCES = fuzz_ds_bitmap64_fuse.cpp fuzz_common_code.c
+fuzz_ds_bitmap64_fuse_CXXFLAGS =
+fuzz_ds_bitmap64_fuse_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_bitmap64_fuse_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -202,12 +238,15 @@ fuzz_ds_bitmap64_fuse_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 
 fuzz_ds_domain_classify_SOURCES = fuzz_ds_domain_classify.cpp fuzz_common_code.c
 fuzz_ds_domain_classify_CXXFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_ds_domain_classify_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_domain_classify_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
     $(fuzz_ds_domain_classify_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_ds_kdtree_SOURCES = fuzz_ds_kdtree.cpp fuzz_common_code.c
+fuzz_ds_kdtree_CXXFLAGS =
+fuzz_ds_kdtree_CFLAGS =
 # force usage of CXX for linker
 fuzz_ds_kdtree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -215,6 +254,7 @@ fuzz_ds_kdtree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 
 fuzz_ds_btree_SOURCES = fuzz_ds_btree.cpp fuzz_common_code.c
 fuzz_ds_btree_CXXFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_ds_btree_CFLAGS = -DNDPI_LIB_COMPILATION
 # force usage of CXX for linker
 fuzz_ds_btree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -222,6 +262,7 @@ fuzz_ds_btree_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 
 fuzz_ds_address_cache_SOURCES = fuzz_ds_address_cache.cpp fuzz_common_code.c
 fuzz_ds_address_cache_CXXFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_ds_address_cache_CFLAGS = -DNDPI_LIB_COMPILATION
 # force usage of CXX for linker
 fuzz_ds_address_cache_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -229,6 +270,7 @@ fuzz_ds_address_cache_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 
 fuzz_ds_bitmap_SOURCES = fuzz_ds_bitmap.cpp fuzz_common_code.c
 fuzz_ds_bitmap_CXXFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_ds_bitmap_CFLAGS = -DNDPI_LIB_COMPILATION
 # force usage of CXX for linker
 fuzz_ds_bitmap_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -236,6 +278,7 @@ fuzz_ds_bitmap_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 
 fuzz_ds_filter_SOURCES = fuzz_ds_filter.cpp fuzz_common_code.c
 fuzz_ds_filter_CXXFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_ds_filter_CFLAGS = -DNDPI_LIB_COMPILATION
 # force usage of CXX for linker
 fuzz_ds_filter_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -248,6 +291,8 @@ fuzz_libinjection_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_libinjection_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_binaryfusefilter_SOURCES = fuzz_binaryfusefilter.cpp fuzz_common_code.c
+fuzz_binaryfusefilter_CXXFLAGS =
+fuzz_binaryfusefilter_CFLAGS =
 # force usage of CXX for linker
 fuzz_binaryfusefilter_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -261,6 +306,7 @@ fuzz_tls_certificate_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_tls_certificate_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_dga_SOURCES = fuzz_dga.c fuzz_common_code.c
+fuzz_dga_CFLAGS =
 # force usage of CXX for linker
 fuzz_dga_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -281,6 +327,8 @@ fuzz_is_stun_tcp_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(fuzz_is_stun_tcp_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 fuzz_gcrypt_light_SOURCES = fuzz_gcrypt_light.cpp fuzz_common_code.c
+fuzz_gcrypt_light_CXXFLAGS =
+fuzz_gcrypt_light_CFLAGS =
 # force usage of CXX for linker
 fuzz_gcrypt_light_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -355,6 +403,7 @@ fuzz_filecfg_category_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 
 fuzz_readerutils_workflow_SOURCES = fuzz_readerutils_workflow.cpp fuzz_common_code.c ../example/reader_util.c
 fuzz_readerutils_workflow_CXXFLAGS = -I$(top_srcdir)/example/
+fuzz_readerutils_workflow_CFLAGS = -I$(top_srcdir)/example/
 # force usage of CXX for linker
 fuzz_readerutils_workflow_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -362,6 +411,8 @@ fuzz_readerutils_workflow_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS)
 
 fuzz_ndpi_reader_pl7m_simplest_SOURCES = fuzz_ndpi_reader_pl7m_simplest.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_simplest_CFLAGS =  -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR
+fuzz__CXXFLAGS =
+fuzz__CFLAGS =
 # force usage of CXX for linker
 fuzz_ndpi_reader_pl7m_simplest_LINK=$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
