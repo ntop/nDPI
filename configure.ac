@@ -44,13 +44,13 @@ AS_IF([test "x$enable_debugbuild" = "xyes"], [
 ])
 
 AS_IF([test "${with_sanitizer+set}" = set -a "${with_thread_sanitizer+set}" = set],[
-  AC_MSG_ERROR([Configure options `--with-sanitizer' and `--with_thread_sanitizer' can not used at the same time.])
+  AC_MSG_ERROR([Configure options `--with-sanitizer' and `--with-thread-sanitizer' can not used at the same time.])
 ])
 AS_IF([test "${with_sanitizer+set}" = set -a "${with_memory_sanitizer+set}" = set],[
-  AC_MSG_ERROR([Configure options `--with-sanitizer' and `--with_memory_sanitizer' can not used at the same time.])
+  AC_MSG_ERROR([Configure options `--with-sanitizer' and `--with-memory-sanitizer' can not used at the same time.])
 ])
 AS_IF([test "${with_thread_sanitizer+set}" = set -a "${with_memory_sanitizer+set}" = set],[
-  AC_MSG_ERROR([Configure options `--with_thread_sanitizer' and `--with_memory_sanitizer' can not used at the same time.])
+  AC_MSG_ERROR([Configure options `--with-thread-sanitizer' and `--with-memory-sanitizer' can not used at the same time.])
 ])
 AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set -o "${with_memory_sanitizer+set}" = set],[
   NDPI_CFLAGS="${NDPI_CFLAGS} -O0 -g3"
@@ -60,7 +60,7 @@ AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = se
 ])
 AS_IF([test "${with_sanitizer+set}" = set -o "${with_thread_sanitizer+set}" = set -o "${with_memory_sanitizer+set}" = set],[
   AS_IF([test "x$enable_gprof" = "xyes"], [
-    AC_MSG_ERROR([Configure options `--with-sanitizer' / `--with_thread_sanitizer' / `--with_memory_sanitizer' can not used together with `--enable-gprof'.])
+    AC_MSG_ERROR([Configure options `--with-sanitizer' / `--with-thread-sanitizer' / `--with-memory-sanitizer' can not used together with `--enable-gprof'.])
   ])
 ])
 
@@ -118,7 +118,7 @@ else
   AC_PROG_CXX
 fi
 
-dnl> Can't iuse AM_PROG_AR because not all of our Makefiles are automake (yet?)
+dnl> Can't use AM_PROG_AR because not all of our Makefiles are automake (yet?)
 AC_CHECK_TOOL(AR, ar, [false])
 
 AC_LANG_WERROR
@@ -168,23 +168,52 @@ AC_DEFINE_UNQUOTED(NDPI_PATCH_LEVEL,   "${NDPI_PATCH}", [nDPI patch level])
 
 # .git as directory in a cloned repo
 # .git as file in submodule based integration
+# Improved git detection with better error handling
 if test -d "${srcdir}/.git" || test -r "${srcdir}/.git"; then
-     GIT_TAG=`cd ${srcdir} && git log -1 --abbrev=7 --format=%h`
-     GIT_DATE=`cd ${srcdir} && git log -1 --abbrev=7 --format=%cd`
-     #
-     # On CentOS 6 `git rev-list HEAD --count` does not work
-     #
-     #
-     GIT_NUM=`cd ${srcdir} && git log --pretty=oneline | wc -l | tr -d '[[:space:]]'`
-     GIT_RELEASE="${PACKAGE_VERSION}-${GIT_NUM}-${GIT_TAG}"
+     # Check if git command is available
+     if command -v git >/dev/null 2>&1; then
+          GIT_TAG=`cd ${srcdir} && git log -1 --abbrev=7 --format=%h 2>/dev/null || echo "unknown"`
+          GIT_DATE=`cd ${srcdir} && git log -1 --abbrev=7 --format=%cd 2>/dev/null || date -u`
+          #
+          # On CentOS 6 `git rev-list HEAD --count` does not work
+          #
+          #
+          GIT_NUM=`cd ${srcdir} && git log --pretty=oneline 2>/dev/null | wc -l | tr -d '[[:space:]]'`
 
-     A=`cd ${srcdir} && git log src/include/ndpi_typedefs.h|wc -l`
-     B=`cd ${srcdir} && git log src/include/ndpi_protocol_ids.h|wc -l`
-     C=`cd ${srcdir} && git log src/include/ndpi_api.h|wc -l`
-     NDPI_API_VERSION=$((A+B+C))
+          # Fallback to 0 if git commands failed
+          if test -z "${GIT_NUM}" || test "${GIT_NUM}" = "0"; then
+               GIT_NUM="0"
+               AC_MSG_WARN([Could not determine git commit count, using 0])
+          fi
+
+          GIT_RELEASE="${PACKAGE_VERSION}-${GIT_NUM}-${GIT_TAG}"
+
+          A=`cd ${srcdir} && git log src/include/ndpi_typedefs.h 2>/dev/null|wc -l`
+          B=`cd ${srcdir} && git log src/include/ndpi_protocol_ids.h 2>/dev/null|wc -l`
+          C=`cd ${srcdir} && git log src/include/ndpi_api.h 2>/dev/null|wc -l`
+          NDPI_API_VERSION=$((A+B+C))
+     else
+          AC_MSG_WARN([Git repository detected but git command not found])
+          GIT_RELEASE="${PACKAGE_VERSION}"
+          GIT_TAG="nogit"
+          GIT_DATE=`date -u`
+          # Use SOURCE_DATE_EPOCH or current timestamp for reproducible builds
+          if test -z "$SOURCE_DATE_EPOCH" ; then :
+               SOURCE_DATE_EPOCH=`date +%s`
+          fi
+          NDPI_API_VERSION=$((SOURCE_DATE_EPOCH % 65536))
+     fi
 else
      GIT_RELEASE="${PACKAGE_VERSION}"
-     GIT_DATE=`date -u -r ${srcdir}/CHANGELOG.md`
+     GIT_TAG="tarball"
+     # Better fallback for GIT_DATE when not in git repo
+     if test -f "${srcdir}/CHANGELOG.md"; then
+          GIT_DATE=`date -u -r ${srcdir}/CHANGELOG.md 2>/dev/null || date -u`
+     else
+          GIT_DATE=`date -u`
+          AC_MSG_WARN([CHANGELOG.md not found, using current date])
+     fi
+     # Use SOURCE_DATE_EPOCH for reproducible builds, with better fallback
      if test -z "$SOURCE_DATE_EPOCH" ; then :
          SOURCE_DATE_EPOCH=`date +%s`
      fi
@@ -248,8 +277,11 @@ if ! test "${with_only_libndpi+set}" = set; then :
         ])
       ;;
     esac
-    dnl > RRD
-    AC_CHECK_LIB([rrd], [rrd_fetch_r], [LIBRRD=-lrrd])
+    dnl > RRD (optional dependency)
+    AC_CHECK_LIB([rrd], [rrd_fetch_r], [LIBRRD=-lrrd], [
+        AC_MSG_WARN([librrd not found. RRDtool support will be disabled.])
+        AC_MSG_WARN([Install librrd-dev or rrdtool-devel to enable RRDtool integration.])
+    ])
     if test "x$ac_cv_lib_rrd_rrd_fetch_r" = xyes; then :
         AC_DEFINE_UNQUOTED(HAVE_RRDTOOL, "1", [rrdtool is present])
         EXTRA_TARGETS="$EXTRA_TARGETS rrdtool"
@@ -297,7 +329,10 @@ SHORT_MACHINE=`uname -m | cut -b1-3`
 if test $SHORT_MACHINE = "arm"; then
      LIBNUMA=""
 else
-     AC_CHECK_LIB([numa], [numa_available], [LIBNUMA="-lnuma"])
+     AC_CHECK_LIB([numa], [numa_available], [LIBNUMA="-lnuma"], [
+        AC_MSG_WARN([libnuma not found. NUMA optimizations will be disabled.])
+        AC_MSG_WARN([Install libnuma-dev or numactl-devel for better performance on NUMA systems.])
+     ])
 fi
 
 MACHINE=`uname -m`
@@ -433,23 +468,33 @@ AS_IF([test "${with_local_libgcrypt+set}" = set],[
   AC_DEFINE_UNQUOTED(USE_HOST_LIBGCRYPT, 1, [Use locally installed libgcrypt instead of builtin gcrypt-light])
 ])
 
-dnl> PCRE2
+dnl> PCRE2 (optional dependency)
 PCRE2_ENABLED=0
 AC_ARG_WITH(pcre2, AS_HELP_STRING([--with-pcre2], [Enable nDPI build with libpcre2]))
 if test "${with_pcre2+set}" = set; then :
-  AC_CHECK_LIB(pcre2-8, pcre2_compile_8, AC_DEFINE_UNQUOTED(HAVE_PCRE2, 1, [libpcre2(-dev) is present]))
-  
+  AC_CHECK_LIB(pcre2-8, pcre2_compile_8, [
+    AC_DEFINE_UNQUOTED(HAVE_PCRE2, 1, [libpcre2(-dev) is present])
+  ], [
+    AC_MSG_WARN([libpcre2-8 not found. PCRE2 support requested but unavailable.])
+    AC_MSG_WARN([Install libpcre2-dev to enable advanced pattern matching features.])
+  ])
+
  if test "x$ac_cv_lib_pcre2_8_pcre2_compile_8" = xyes; then :
    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lpcre2-8"
    PCRE2_ENABLED=1
  fi
 fi
 
-dnl> GeoIP
+dnl> GeoIP (optional dependency)
 AC_ARG_WITH(maxminddb, AS_HELP_STRING([--with-maxminddb], [Enable nDPI build with libmaxminddb]))
 if test "${with_maxminddb+set}" = set; then :
-  AC_CHECK_LIB([maxminddb], [MMDB_lookup_sockaddr])
-  AC_CHECK_HEADERS([maxminddb.h])
+  AC_CHECK_LIB([maxminddb], [MMDB_lookup_sockaddr], [], [
+    AC_MSG_WARN([libmaxminddb not found. GeoIP support requested but unavailable.])
+    AC_MSG_WARN([Install libmaxminddb-dev to enable geographic IP lookups.])
+  ])
+  AC_CHECK_HEADERS([maxminddb.h], [], [
+    AC_MSG_WARN([maxminddb.h header not found.])
+  ])
   if test ".${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = ".yes" && test ".${ac_cv_header_maxminddb_h}" = ".yes"; then
     ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lmaxminddb"
     AC_DEFINE_UNQUOTED(HAVE_MAXMINDDB, 1, [MaxMind DB support])

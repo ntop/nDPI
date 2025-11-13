@@ -11,36 +11,50 @@ PKG_CONFIG=$(command -v pkg-config)
 MAKE=$(command -v make)
 
 if test -z "${AUTOCONF}"; then
-    echo "autoconf is missing: please install it and try again"
-    exit
+    echo "ERROR: autoconf is missing" >&2
+    echo "Please install autotools package (e.g., apt-get install autoconf)" >&2
+    exit 1
 fi
 
 if test -z "${AUTOMAKE}"; then
-    echo "automake is missing: please install it and try again"
-    exit
+    echo "ERROR: automake is missing" >&2
+    echo "Please install automake package (e.g., apt-get install automake)" >&2
+    exit 1
 fi
 
 if test -z "${LIBTOOL}" && test -z "${LIBTOOLIZE}"; then
-    echo "libtool and libtoolize is missing: please install it and try again"
-    exit
+    echo "ERROR: libtool and libtoolize are both missing" >&2
+    echo "Please install libtool package (e.g., apt-get install libtool)" >&2
+    exit 1
 fi
 
 if test -z "${AUTORECONF}"; then
-    echo "autoreconf is missing: please install it and try again"
-    exit
+    echo "ERROR: autoreconf is missing" >&2
+    echo "Please install autoconf package (e.g., apt-get install autoconf)" >&2
+    exit 1
 fi
 
 if test -z "${PKG_CONFIG}"; then
-    echo "pkg-config is missing: please install it (apt-get install pkg-config) and try again"
-    exit
+    echo "ERROR: pkg-config is missing" >&2
+    echo "Please install pkg-config package (e.g., apt-get install pkg-config)" >&2
+    exit 1
 fi
 
 if test -z "${MAKE}"; then
-    echo "make is missing; please install it (apt-get install make) and try again"
-    exit
+    echo "ERROR: make is missing" >&2
+    echo "Please install make package (e.g., apt-get install make)" >&2
+    exit 1
 fi
 
-autoreconf -ivf
+echo "Running autoreconf to generate build system..."
+autoreconf -ivf || {
+    echo "ERROR: autoreconf failed" >&2
+    echo "Please check that all autotools are properly installed" >&2
+    exit 1
+}
+
+echo "Build system generated successfully!"
+echo "You can now run: ./configure && make"
 
 #####
 # Don't call `configure` here!!!! It breaks out-of-tree builds
