@@ -95,7 +95,7 @@ jobs:
           make -j
       - name: Performance Profiling
         run: |
-          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
           mkdir ndpi-performance-upload
           for d in $(find ./tests/cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
             PROFILE="$(basename $d)"
@@ -131,7 +131,7 @@ jobs:
           make -j $(nproc) -C rrdtool
       - name: Tests
         run: |
-          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
 
   localgcrypt:
     name: Local gcrypt on ${{ matrix.os }}
@@ -167,7 +167,7 @@ jobs:
           make -j $(nproc) -C rrdtool
       - name: Tests
         run: |
-          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
           ./tests/do-unit.sh
           ./tests/do-dga.sh
 
@@ -200,7 +200,7 @@ jobs:
       - name: Tests
         run: |
           # Don't know why but lately the script in parallel mode is stuck...
-          #msys2 -c 'NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh'
+          #msys2 -c 'NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh'
           msys2 -c './tests/do.sh'
           msys2 -c './tests/do-unit.sh'
           msys2 -c './tests/do-dga.sh'

@@ -3,11 +3,19 @@
 #
 # Use (to override results)
 #
-# NDPI_FORCE_UPDATING_UTESTS_RESULTS=1 ./do.sh 
+# NDPI_FORCE_UPDATING_UTESTS_RESULTS=1 ./do.sh
 #
 # To run tests in parallel: (you need **GNU** `parallel` program)
 #
 # NDPI_FORCE_PARALLEL_UTESTS=1 ./do.sh
+#
+# To run configurations in parallel (recommended for best performance):
+#
+# NDPI_FORCE_PARALLEL_CONFIGS=1 ./do.sh
+#
+# To fail fast on first error (useful for CI):
+#
+# NDPI_FAIL_FAST=1 ./do.sh
 
 cd "$(dirname "${0}")" || exit 1
 
@@ -34,6 +42,16 @@ fi
 TEST_ONLY_RECENTLY_UPDATED_PCAPS=0
 if [ "${NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS}" = "1" ]; then
    TEST_ONLY_RECENTLY_UPDATED_PCAPS=1
+fi
+
+PARALLEL_CONFIGS=0
+if [ "${NDPI_FORCE_PARALLEL_CONFIGS}" = "1" ]; then
+   PARALLEL_CONFIGS=1
+fi
+
+FAIL_FAST=0
+if [ "${NDPI_FAIL_FAST}" = "1" ]; then
+   FAIL_FAST=1
 fi
 
 #Remember: valgrind and *SAN are incompatible!
@@ -74,6 +92,16 @@ export NBPF_PCAPS
 export READER
 export FORCE_UPDATING_UTESTS_RESULTS
 export FORCE_PARALLEL_UTESTS
+export SKIP_PARALLEL_BAR
+export TEST_ONLY_RECENTLY_UPDATED_PCAPS
+export GLOBAL_CONTEXT_ENABLED
+export GLOBAL_CONTEXT_CFGS
+export ABS_SRCDIR
+export ABS_BUILDDIR
+export EXE_SUFFIX
+export GPROF_ENABLED
+export GPROF
+export FAIL_FAST
 
 
 RC=0
@@ -86,9 +114,9 @@ fi
 
 #For parallel tests you need `parallel` from GNU, not from `moreutils` package!
 #On Ubuntu, for example, you might need to explicitly run `apt install parallel`
-if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
+if [ $FORCE_PARALLEL_UTESTS -eq 1 ] || [ $PARALLEL_CONFIGS -eq 1 ]; then
   if ! parallel -V | grep -qoE 'GNU parallel'; then
-    echo "$0: To run the test in parallel mode you need **GNU** 'parallel'"
+    echo "$0: To run tests in parallel mode you need **GNU** 'parallel'"
     echo "$0: Try something like 'apt install parallel'"
     exit 1
   fi
@@ -175,7 +203,6 @@ run_single_pcap()
             printf "ERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n"
         else
             printf "%-48s\tERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n" "$f"
-	    FAILURES+=("$f") #TODO: find a way to update this variable also in parallel mode
         fi
 	return 1
     fi
@@ -184,13 +211,13 @@ run_single_pcap()
         if [ $FORCE_PARALLEL_UTESTS -eq 0 ]; then
             printf "%-48s\tOK\n" "$f"
         fi
+        /bin/rm -f /tmp/reader.$$.out
         return 0
     else
         if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
             printf "ERROR\n"
         else
             printf "%-48s\tERROR\n" "$f"
-	    FAILURES+=("$f") #TODO: find a way to update this variable also in parallel mode
 	fi
         echo "$CMD [old vs new]"
         ${CMD_DIFF} "result/$f.out" /tmp/reader.$$.out
@@ -208,38 +235,12 @@ run_single_pcap()
 }
 export -f run_single_pcap
 
-check_results() {
-    if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
-        if [ $SKIP_PARALLEL_BAR -eq 1 ]; then
-            parallel --tag "run_single_pcap" ::: $PCAPS
-        else
-            parallel --bar --tag "run_single_pcap" ::: $PCAPS
-        fi
-	RET=$? #Number of failed job up to 100
-	RC=$(( RC + RET ))
-    else
-        for f in $PCAPS; do
-	    run_single_pcap "$f"
-	    RET=$?
-	    RC=$(( RC + RET ))
-        done
-    fi
+process_single_config() {
+    local d=$1
+    shift
+    local PCAPS_ARG="$*"
 
-    if [ ${GPROF_ENABLED} -eq 1 ]; then
-      GPROF_ARGS='-nodecount 100 -nodefraction 0 -symbolize=fastlocal'
-      ${GPROF} -top ${GPROF_ARGS} ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
-      ${GPROF} -png -output ./result/cpu_profile.png ${GPROF_ARGS} ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
-      ${GPROF} -top ${GPROF_ARGS} -sample_index=alloc_space  ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
-      ${GPROF} -png -output ./result/heap_profile.png ${GPROF_ARGS} -sample_index=alloc_space ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
-    fi
-}
-
-if [ $FUZZY_TESTING_ENABLED -eq 1 ]; then
-    fuzzy_testing
-fi
-
-for d in $(find ${ABS_SRCDIR}/tests/cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
-
+    # Check if configuration should be skipped
     SKIP_CFG=0
     if [ $GLOBAL_CONTEXT_ENABLED -eq 0 ]; then
         for c in $GLOBAL_CONTEXT_CFGS; do
@@ -251,35 +252,98 @@ for d in $(find ${ABS_SRCDIR}/tests/cfgs/* -type d -maxdepth 0 2>/dev/null) ; do
     fi
     if [ $SKIP_CFG -eq 1 ]; then
         printf "Configuration \"$(basename "$d")\" %-18s\tSKIPPED\n"
-        continue
+        return 0
     fi
 
-    cd ${ABS_SRCDIR}/tests/cfgs/"$(basename "$d")" || exit 1
+    CFG_DIR="${ABS_SRCDIR}/tests/cfgs/$(basename "$d")"
+    cd "$CFG_DIR" || return 1
 
+    # Determine PCAPS to test
     if [ $TEST_ONLY_RECENTLY_UPDATED_PCAPS -eq 1 ]; then
-        # Latest 10 pcaps updatetd recently (to be more precise, pcap which triggered a change
-        # in their results lately)
         PCAPS=$(cd result || exit 1; find * -type f -print0  | xargs -0 ls -t | head -10 | xargs basename -s .out)
     else
-        if [ "$#" -ne 0 ]; then
-            PCAPS=$*
+        if [ -n "$PCAPS_ARG" ]; then
+            PCAPS="$PCAPS_ARG"
         else
             PCAPS=$(cd pcap || exit 1; /bin/ls -- *.*cap*)
         fi
     fi
-    FAILURES=()
+
     READER_EXTRA_PARAM=""
     [ -f config.txt ] && READER_EXTRA_PARAM=$(< config.txt)
     export READER_EXTRA_PARAM
 
     echo "Run configuration \"$(basename "$d")\" [$READER_EXTRA_PARAM]"
 
-    check_results
+    if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
+        PARALLEL_OPTS="--tag"
+        [ $SKIP_PARALLEL_BAR -eq 0 ] && PARALLEL_OPTS="$PARALLEL_OPTS --bar"
+        [ $FAIL_FAST -eq 1 ] && PARALLEL_OPTS="$PARALLEL_OPTS --halt now,fail=1"
 
-    test ${#FAILURES} -ne 0 && printf '%s: %s\n' "${0}" "${RC} pcap(s) failed"
-    test ${#FAILURES} -ne 0 && echo "Failed: " "${FAILURES[@]}"
+        parallel $PARALLEL_OPTS "run_single_pcap" ::: $PCAPS
+	RET=$? #Number of failed jobs (up to 100)
+    else
+        RET=0
+        for f in $PCAPS; do
+	    run_single_pcap "$f"
+	    PCAP_RET=$?
+	    RET=$(( RET + PCAP_RET ))
+            [ $FAIL_FAST -eq 1 ] && [ $PCAP_RET -ne 0 ] && break
+        done
+    fi
 
-    cd ${ABS_SRCDIR}/tests
-done
+    if [ ${GPROF_ENABLED} -eq 1 ]; then
+      GPROF_ARGS='-nodecount 100 -nodefraction 0 -symbolize=fastlocal'
+      ${GPROF} -top ${GPROF_ARGS} ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -png -output ./result/cpu_profile.png ${GPROF_ARGS} ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.cprof || exit 1
+      ${GPROF} -top ${GPROF_ARGS} -sample_index=alloc_space  ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
+      ${GPROF} -png -output ./result/heap_profile.png ${GPROF_ARGS} -sample_index=alloc_space ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} ./result/*.heap || exit 1
+    fi
+
+    return $RET
+}
+export -f process_single_config
+
+if [ $FUZZY_TESTING_ENABLED -eq 1 ]; then
+    fuzzy_testing
+fi
+
+# Get list of configuration directories
+CONFIGS=$(find ${ABS_SRCDIR}/tests/cfgs/* -type d -maxdepth 0 2>/dev/null)
+
+if [ $PARALLEL_CONFIGS -eq 1 ]; then
+    # Run configurations in parallel
+    echo "Running configurations in parallel mode..."
+
+    #PARALLEL_OPTS="--tag"
+    [ $FAIL_FAST -eq 1 ] && PARALLEL_OPTS="$PARALLEL_OPTS --halt now,fail=1"
+
+    # Use parallel to process configurations
+    # Pass any command-line args (specific PCAPs) to each config
+    if [ "$#" -ne 0 ]; then
+        echo "$CONFIGS" | parallel $PARALLEL_OPTS process_single_config {} "$@"
+    else
+        echo "$CONFIGS" | parallel $PARALLEL_OPTS process_single_config {}
+    fi
+    RC=$?
+else
+    # Original sequential mode
+    for d in $CONFIGS ; do
+        if [ "$#" -ne 0 ]; then
+            process_single_config "$d" "$@"
+        else
+            process_single_config "$d"
+        fi
+        CFG_RET=$?
+        RC=$(( RC + CFG_RET ))
+        [ $FAIL_FAST -eq 1 ] && [ $CFG_RET -ne 0 ] && break
+    done
+fi
+
+cd ${ABS_SRCDIR}/tests
+
+if [ $RC -ne 0 ]; then
+    echo "Total failures: $RC"
+fi
 
 exit $RC

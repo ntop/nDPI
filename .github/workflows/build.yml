@@ -207,7 +207,7 @@ jobs:
           NDPI_LIB: src/lib/libndpi.a
       - name: Test nDPI [DIFF]
         run: |
-          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
       - name: Test nDPI [UNIT]
         run: |
           ./tests/do-unit.sh
@@ -302,7 +302,7 @@ jobs:
       - name: Tests
         run: |
           # Don't know why but lately the script in parallel mode is stuck...
-          #msys2 -c 'NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh'
+          #msys2 -c 'NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh'
           msys2 -c './tests/do.sh'
           msys2 -c './tests/do-unit.sh'
           msys2 -c './tests/do-dga.sh'
@@ -348,12 +348,12 @@ jobs:
       - name: Tests #We are only intersting into tests scripts being valid --> less tests than usual
         run: |
           cd build-standard
-          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS=1 ./tests/do.sh
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS=1 ./tests/do.sh
           ./tests/do-unit.sh
           ./tests/do-dga.sh
           cd -
           cd build-fuzzing
-          MAX_TOTAL_TIME=10 NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS=1 ./tests/do.sh
+          MAX_TOTAL_TIME=10 NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS=1 ./tests/do.sh
           ./tests/do-unit.sh
           ./tests/do-dga.sh
           cd -

@@ -41,7 +41,7 @@ jobs:
           make -j $(nproc) -C rrdtool
       - name: Tests
         run: |
-          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
           # Some issues with masan + json-c. Disable the test as workaround
           # ./tests/do-unit.sh
           ./tests/do-dga.sh
