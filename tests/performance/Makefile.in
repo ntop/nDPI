@@ -17,19 +17,19 @@ all: $(TESTS)
 tools: $(TOOLS)
 
 gcrypt-int: $(srcdir)/gcrypt.c Makefile $(GEN_HEADERS)
-	$(CC) $(INC) @CFLAGS@ $(srcdir)/gcrypt.c -o $@
+	$(CC) $(INC) @NDPI_CFLAGS@ @CFLAGS@ $(srcdir)/gcrypt.c -o $@
 
 gcrypt-gnu: $(srcdir)/gcrypt.c Makefile $(GEN_HEADERS)
-	$(CC) $(INC) @CFLAGS@ -DHAVE_LIBGCRYPT $(srcdir)/gcrypt.c -o $@ -lgcrypt
+	$(CC) $(INC) @NDPI_CFLAGS@ @CFLAGS@ -DHAVE_LIBGCRYPT $(srcdir)/gcrypt.c -o $@ -lgcrypt
 
 substringsearch: $(srcdir)/substringsearch.c Makefile $(GEN_HEADERS)
-	$(CC) $(INC) @CFLAGS@ $(srcdir)/substringsearch.c -o substringsearch $(LIB)
+	$(CC) $(INC) @NDPI_CFLAGS@ @CFLAGS@ $(srcdir)/substringsearch.c -o substringsearch $(LIB)
 
 strnstr: $(srcdir)/strnstr.cpp Makefile $(GEN_HEADERS)
-	$(CXX) $(INC) @CFLAGS@ $(srcdir)/strnstr.cpp -o strnstr
+	$(CXX) $(INC) @NDPI_CFLAGS@ @CFLAGS@ $(srcdir)/strnstr.cpp -o strnstr
 
 geo: $(srcdir)/geo.c Makefile $(GEN_HEADERS)
-	$(CC) $(INC) @CFLAGS@ $(srcdir)/geo.c -o geo $(LIB)
+	$(CC) $(INC) @NDPI_CFLAGS@ @CFLAGS@ $(srcdir)/geo.c -o geo $(LIB)
 
 substring_test: substringsearch top-1m.csv
 	./substringsearch
@@ -43,7 +43,7 @@ geo_test: geo
 #
 
 patriciasearch: $(srcdir)/patriciasearch.c Makefile $(GEN_HEADERS)
-	$(CC) $(INC) @CFLAGS@ $(srcdir)/patriciasearch.c -o patriciasearch $(LIB)
+	$(CC) $(INC) @NDPI_CFLAGS@ @CFLAGS@ $(srcdir)/patriciasearch.c -o patriciasearch $(LIB)
 
 patricia_test: patriciasearch blacklist-ip.txt
 	./patriciasearch
