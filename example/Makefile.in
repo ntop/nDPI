@@ -24,9 +24,10 @@ endif
 CFLAGS+=-I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @PCAP_INC@ @GPROF_CFLAGS@ @CUSTOM_NDPI@
 LDFLAGS+=@NDPI_LDFLAGS@
 LIBNDPI=$(top_builddir)/src/lib/libndpi.a
-LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
+LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @GPROF_LIBS@ @LIBS@
 HEADERS=reader_util.h $(SRCHOME)/include/ndpi_api.h \
         $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
+HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 PREFIX?=@prefix@
 
 ifneq ($(BUILD_MINGW),)
@@ -72,8 +73,8 @@ ndpiSimpleIntegration$(EXE_SUFFIX): ndpiSimpleIntegration.o
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 install: ndpiReader$(EXE_SUFFIX)
-	mkdir -p $(DESTDIR)$(PREFIX)/bin/
-	mkdir -p $(DESTDIR)$(PREFIX)/share/ndpi
+	@MKDIR_P@ $(DESTDIR)$(PREFIX)/bin/
+	@MKDIR_P@ $(DESTDIR)$(PREFIX)/share/ndpi
 	cp ndpiReader$(EXE_SUFFIX) $(DESTDIR)$(PREFIX)/bin/
 	cp $(srcdir)/protos.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiProtos.txt
 	cp $(srcdir)/mining_hosts.txt $(DESTDIR)$(PREFIX)/share/ndpi/ndpiCustomCategory.txt

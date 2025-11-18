@@ -3,7 +3,7 @@ AC_INIT([libndpi],[5.1.0])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([foreign subdir-objects])
+AM_INIT_AUTOMAKE([foreign subdir-objects parallel-tests])
 
 AC_PREFIX_DEFAULT(/usr)
 
@@ -310,7 +310,7 @@ AS_IF([test "x$enable_global_context_support" != "xno"], [
 ])
 
 ADDITIONAL_INCS="${ADDITIONAL_INCS}"
-ADDITIONAL_LIBS="${ADDITIONAL_LIBS} $LIBM"
+ADDITIONAL_LIBS="${ADDITIONAL_LIBS}"
 PCAP_HOME=$HOME/PF_RING/userland
 
 DPDK_TARGET=
@@ -501,6 +501,10 @@ if test "${with_maxminddb+set}" = set; then :
   fi
 fi
 
+dnl> Add base system libraries last (lowest-level dependencies)
+dnl> This ensures proper linking order: high-level libs -> low-level libs
+ADDITIONAL_LIBS="${ADDITIONAL_LIBS} $LIBM"
+
 dnl> Use absolute source directory for NDPI_BASE_DIR
 NDPI_ABS_SRCDIR="`cd ${srcdir} && pwd`"
 AC_DEFINE_UNQUOTED(NDPI_BASE_DIR, "${NDPI_ABS_SRCDIR}", [nDPI base directory])
@@ -517,9 +521,10 @@ dnl> fi
 
 dnl> ndpiReader has some hard-coded unit tests: in the out-of-tree builds we need some configuration files in the expected path
 if test "${srcdir}" != . ; then :
-  mkdir -p example
+  $MKDIR_P example
+  $MKDIR_P lists
   cp ${srcdir}/example/categories.txt example/
-  cp -R ${srcdir}/lists lists/
+  cp -R ${srcdir}/lists/* lists/
 fi
 
 AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile influxdb/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile fuzz/Makefile doc/Doxyfile.cfg utils/Makefile])

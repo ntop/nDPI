@@ -19,7 +19,7 @@ AM_CPPFLAGS = -I $(top_srcdir)/src/include -I $(top_srcdir)/src/lib/third_party/
 AM_LDFLAGS = $(LIBS)
 AM_CFLAGS = @NDPI_CFLAGS@ $(CFLAGS)
 AM_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
-LDADD = $(PCAP_LIB) $(top_builddir)/src/lib/libndpi.a $(ADDITIONAL_LIBS)
+LDADD = $(top_builddir)/src/lib/libndpi.a $(PCAP_LIB) $(ADDITIONAL_LIBS)
 if HAS_FUZZLDFLAGS
 CFLAGS += $(LIB_FUZZING_ENGINE)
 LDFLAGS += $(LIB_FUZZING_ENGINE)

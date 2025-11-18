@@ -9,13 +9,14 @@ INC=-I $(top_srcdir)/src/include -I $(top_builddir)/src/include -I/usr/local/inc
 LIBDPI=$(top_builddir)/src/lib/libndpi.a
 CFLAGS+=@NDPI_CFLAGS@
 LDFLAGS+=@NDPI_LDFLAGS@
-LIB=$(LIBDPI) -lm @ADDITIONAL_LIBS@ @LIBS@
+LIB=$(LIBDPI) @ADDITIONAL_LIBS@ @LIBS@ -lm
+GEN_HEADERS=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 
 TOOLS=metric_anomaly
 
 all: $(TOOLS)
 
-metric_anomaly: $(srcdir)/metric_anomaly.c Makefile $(LIBDPI)
+metric_anomaly: $(srcdir)/metric_anomaly.c Makefile $(LIBDPI) $(GEN_HEADERS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -g $(INC) $(LDFLAGS) $(srcdir)/metric_anomaly.c -o metric_anomaly $(LIB)
 
 clean:

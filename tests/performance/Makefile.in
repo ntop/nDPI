@@ -6,6 +6,7 @@ VPATH = @srcdir@
 
 INC=-I $(top_srcdir)/src/include/ -I $(top_builddir)/src/include/ -I $(top_srcdir)/src/lib/third_party/include/
 LIB=$(top_builddir)/src/lib/libndpi.a @ADDITIONAL_LIBS@ @LIBS@
+GEN_HEADERS=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 
 TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu strnstr
 TESTS=substring_test patricia_test strnstr_test geo_test
@@ -15,19 +16,19 @@ all: $(TESTS)
 
 tools: $(TOOLS)
 
-gcrypt-int: $(srcdir)/gcrypt.c Makefile
+gcrypt-int: $(srcdir)/gcrypt.c Makefile $(GEN_HEADERS)
 	$(CC) $(INC) @CFLAGS@ $(srcdir)/gcrypt.c -o $@
 
-gcrypt-gnu: $(srcdir)/gcrypt.c Makefile
+gcrypt-gnu: $(srcdir)/gcrypt.c Makefile $(GEN_HEADERS)
 	$(CC) $(INC) @CFLAGS@ -DHAVE_LIBGCRYPT $(srcdir)/gcrypt.c -o $@ -lgcrypt
 
-substringsearch: $(srcdir)/substringsearch.c Makefile
+substringsearch: $(srcdir)/substringsearch.c Makefile $(GEN_HEADERS)
 	$(CC) $(INC) @CFLAGS@ $(srcdir)/substringsearch.c -o substringsearch $(LIB)
 
-strnstr: $(srcdir)/strnstr.cpp Makefile
+strnstr: $(srcdir)/strnstr.cpp Makefile $(GEN_HEADERS)
 	$(CXX) $(INC) @CFLAGS@ $(srcdir)/strnstr.cpp -o strnstr
 
-geo: $(srcdir)/geo.c Makefile
+geo: $(srcdir)/geo.c Makefile $(GEN_HEADERS)
 	$(CC) $(INC) @CFLAGS@ $(srcdir)/geo.c -o geo $(LIB)
 
 substring_test: substringsearch top-1m.csv
@@ -41,7 +42,7 @@ geo_test: geo
 
 #
 
-patriciasearch: $(srcdir)/patriciasearch.c Makefile
+patriciasearch: $(srcdir)/patriciasearch.c Makefile $(GEN_HEADERS)
 	$(CC) $(INC) @CFLAGS@ $(srcdir)/patriciasearch.c -o patriciasearch $(LIB)
 
 patricia_test: patriciasearch blacklist-ip.txt

@@ -43,7 +43,7 @@ doc-view:
 	python3 -m http.server --bind 127.0.0.1 --directory doc/_build/html 8080
 
 coverage: all
-	mkdir -vp coverage_report/ndpi_coverage_report
+	$(MKDIR_P) coverage_report/ndpi_coverage_report
 	lcov --directory . --capture --output-file lcov.info
 	genhtml -o coverage_report/ndpi_coverage_report lcov.info
 
@@ -60,3 +60,6 @@ changelog:
 	cd $(top_srcdir) && git log --since={`curl -s https://github.com/ntop/ndpi/releases | grep datetime | head -n1 | egrep -o "[0-9]+\-[0-9]+\-[0-9]+"`} --name-only --pretty=format:" - %s" | grep  "^ " > CHANGELOG.latest
 
 .PHONY: doc doc-view coverage clean-coverage changelog
+
+# Prevent parallel execution of clean/distclean to avoid potential race conditions
+.NOTPARALLEL: clean distclean

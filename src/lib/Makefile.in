@@ -39,7 +39,8 @@ LDFLAGS    += @NDPI_LDFLAGS@
 LIBS       = @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
 
 OBJECTS   = $(patsubst $(srcdir)/protocols/%.c, %.o, $(wildcard $(srcdir)/protocols/*.c)) $(patsubst $(srcdir)/third_party/src/%.c, %.o, $(wildcard $(srcdir)/third_party/src/*.c)) $(patsubst $(srcdir)/third_party/src/hll/%.c, %.o, $(wildcard $(srcdir)/third_party/src/hll/*.c)) $(patsubst $(srcdir)/%.c, %.o, $(wildcard $(srcdir)/*.c))
-HEADERS   = $(wildcard $(top_srcdir)/src/include/*.h) $(wildcard $(top_builddir)/src/include/*.h) $(wildcard $(srcdir)/*.h)
+HEADERS   = $(wildcard $(top_srcdir)/src/include/*.h) $(wildcard $(srcdir)/*.h)
+HEADERS  += $(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 NDPI_VERSION_MAJOR   = @NDPI_MAJOR@
 NDPI_LIB_STATIC      = libndpi.a
 NDPI_LIB_SHARED_BASE = libndpi.so
@@ -70,6 +71,8 @@ all: $(NDPI_LIBS)
 
 ndpi_main.o: $(srcdir)/ndpi_content_match.c.inc
 
+$(OBJECTS): $(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
+
 $(NDPI_LIB_STATIC): $(OBJECTS)
 	   $(AR) rc $@ $(OBJECTS)
 	   $(RANLIB) $@      
@@ -83,7 +86,8 @@ $(NDPI_LIB_SHARED): $(OBJECTS)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(CFLAGS_$(notdir $<)) -c $< -o $@
 
 clean:
-	/bin/rm -f $(NDPI_LIB_STATIC) $(OBJECTS) *.o *.so *.lo libndpi.so*
+	/bin/rm -f $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED) $(OBJECTS) *.o *.so *.so.* *.lo *.dll
+	/bin/rm -f $(NDPI_LIB_SHARED_BASE) $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
 
 distdir:
 	find $(srcdir) -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
@@ -105,11 +109,11 @@ cppcheck:
 	cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I $(top_srcdir)/src/include $(srcdir)/*.c $(srcdir)/protocols/*.c
 
 install: $(NDPI_LIBS)
-	mkdir -p $(DESTDIR)@libdir@
+	@MKDIR_P@ $(DESTDIR)@libdir@
 	cp $(NDPI_LIBS) $(DESTDIR)@libdir@/
 	cp -P $(NDPI_LIB_SHARED_BASE) $(DESTDIR)@libdir@/
 	cp -P $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) $(DESTDIR)@libdir@/
-	mkdir -p $(DESTDIR)@includedir@/ndpi
+	@MKDIR_P@ $(DESTDIR)@includedir@/ndpi
 	#Avoid installing private header
 	# Installing header files to $(DESTDIR)@includedir@/ndpi
 	find $(top_srcdir)/src/include/*.h ! -name ndpi_private.h -exec cp "{}" $(DESTDIR)@includedir@/ndpi \;
