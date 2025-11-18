@@ -35,9 +35,8 @@ void fuzz_set_alloc_callbacks(void)
                                          but no during fuzzing. So no point to set
                                          these two wrappers here */
                                       NULL, NULL,
-                                      /* No interested in flow allocator, because it
-                                         is used only by the application */
-                                      NULL, NULL);
+                                      malloc_wrapper,
+                                      free_wrapper);
 }
 void fuzz_set_alloc_seed(int seed)
 {
