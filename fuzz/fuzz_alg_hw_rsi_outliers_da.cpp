@@ -21,7 +21,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int32_t value_to_check;
   bool *outliers;
 
-  /* Use the same (integral) dataset to peform: RSI, Data analysis, HW, outliers,
+  /* Use the same (integral) dataset to perform: RSI, Data analysis, HW, outliers,
      linear regression, Pearson correlation */
 
   /* Just to have some data */
