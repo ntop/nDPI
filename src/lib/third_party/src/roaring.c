@@ -6,7 +6,7 @@
 #endif
 
 // !!! DO NOT EDIT - THIS IS AN AUTO-GENERATED FILE !!!
-// Created by amalgamation.sh on 2025-07-28T20:50:27Z
+// Created by amalgamation.sh on 2025-10-06T13:58:48Z
 
 /*
  * The CRoaring project is under a dual license (Apache/MIT).
@@ -1408,7 +1408,7 @@ void array_container_free(array_container_t *array);
 array_container_t *array_container_clone(const array_container_t *src);
 
 /* Get the cardinality of `array'. */
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 static inline int array_container_cardinality(const array_container_t *array) {
     return array->cardinality;
 }
@@ -1546,7 +1546,7 @@ int32_t array_container_read(int32_t cardinality, array_container_t *container,
  * that the cardinality of the container is already known.
  *
  */
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 static inline int32_t array_container_size_in_bytes(
     const array_container_t *container) {
     return container->cardinality * sizeof(uint16_t);
@@ -1555,7 +1555,7 @@ static inline int32_t array_container_size_in_bytes(
 /**
  * Return true if the two arrays have the same content.
  */
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 static inline bool array_container_equals(const array_container_t *container1,
                                           const array_container_t *container2) {
     if (container1->cardinality != container2->cardinality) {
@@ -2090,7 +2090,7 @@ static inline bool bitset_container_contains_range(
 }
 
 /* Get the number of bits set */
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 static inline int bitset_container_cardinality(
     const bitset_container_t *bitset) {
     return bitset->cardinality;
@@ -2848,7 +2848,7 @@ int32_t run_container_read(int32_t cardinality, run_container_t *container,
  * Return the serialized size in bytes of a container (see run_container_write).
  * This is meant to be compatible with the Java and Go versions of Roaring.
  */
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 static inline int32_t run_container_size_in_bytes(
     const run_container_t *container) {
     return run_container_serialized_size_in_bytes(container->n_runs);
@@ -2857,7 +2857,7 @@ static inline int32_t run_container_size_in_bytes(
 /**
  * Return true if the two containers have the same content.
  */
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 static inline bool run_container_equals(const run_container_t *container1,
                                         const run_container_t *container2) {
     if (container1->n_runs != container2->n_runs) {
@@ -6430,6 +6430,40 @@ bool container_iterator_read_into_uint64(const container_t *c, uint8_t typecode,
                                          uint32_t count, uint32_t *consumed,
                                          uint16_t *value_out);
 
+/**
+ * Skips the next `skip_count` entries in the container iterator. Returns true
+ * and sets `value_out` if a value is present after skipping. Returns false if
+ * the end of the container is reached during the skip operation. Sets
+ * consumed_count to the number of values actually skipped (which may be less
+ * than skip_count if the end of the container is reached).
+ *
+ * value_out must be initialized to the previous value yielded by the iterator.
+ *
+ * skip_count must be greater than zero.
+ */
+bool container_iterator_skip(const container_t *c, uint8_t typecode,
+                             roaring_container_iterator_t *it,
+                             uint32_t skip_count, uint32_t *consumed_count,
+                             uint16_t *value_out);
+
+/**
+ * Skips the previous `skip_count` entries in the container iterator (moves
+ * backwards). Returns true and sets `value_out` if a value is present after
+ * skipping backwards. Returns false if the beginning of the container is
+ * reached during the skip operation. Sets consumed_count to the number of
+ * values actually skipped backwards (which may be less than skip_count if
+ * the beginning of the container is reached).
+ *
+ * value_out must be initialized to the current value yielded by the iterator.
+ *
+ * skip_count must be greater than zero.
+ */
+bool container_iterator_skip_backward(const container_t *c, uint8_t typecode,
+                                      roaring_container_iterator_t *it,
+                                      uint32_t skip_count,
+                                      uint32_t *consumed_count,
+                                      uint16_t *value_out);
+
 #ifdef __cplusplus
 }
 }
@@ -6637,9 +6671,6 @@ inline void ra_replace_key_and_container_at_index(roaring_array_t *ra,
 
 // write set bits to an array
 void ra_to_uint32_array(const roaring_array_t *ra, uint32_t *ans);
-
-bool ra_range_uint32_array(const roaring_array_t *ra, size_t offset,
-                           size_t limit, uint32_t *ans);
 
 /**
  * write a bitmap to a buffer. This is meant to be compatible with
@@ -7445,7 +7476,7 @@ int32_t intersect_vector16(const uint16_t *__restrict__ A, size_t s_a,
     return (int32_t)count;
 }
 
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 int array_container_to_uint32_array_vector16(void *vout, const uint16_t *array,
                                              size_t cardinality,
                                              uint32_t base) {
@@ -9122,7 +9153,7 @@ bool memequals(const void *s1, const void *s2, size_t n) {
 #if CROARING_IS_X64
 #if CROARING_COMPILER_SUPPORTS_AVX512
 CROARING_TARGET_AVX512
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 int avx512_array_container_to_uint32_array(void *vout, const uint16_t *array,
                                            size_t cardinality, uint32_t base) {
     int outpos = 0;
@@ -13279,7 +13310,7 @@ array_container_t *array_container_create_range(uint32_t min, uint32_t max) {
 }
 
 /* Duplicate container */
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 array_container_t *array_container_clone(const array_container_t *src) {
     array_container_t *newcontainer =
         array_container_create_given_capacity(src->capacity);
@@ -13589,7 +13620,7 @@ void array_container_intersection_inplace(array_container_t *src_1,
     }
 }
 
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 int array_container_to_uint32_array(void *vout, const array_container_t *cont,
                                     uint32_t base) {
 #if CROARING_IS_X64
@@ -13891,7 +13922,7 @@ void bitset_container_free(bitset_container_t *bitset) {
 }
 
 /* duplicate container. */
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 bitset_container_t *bitset_container_clone(const bitset_container_t *src) {
     bitset_container_t *bitset =
         (bitset_container_t *)roaring_malloc(sizeof(bitset_container_t));
@@ -14686,7 +14717,7 @@ CROARING_BITSET_CONTAINER_FN(andnot, &~, _mm256_andnot_si256, vbicq_u64)
 // clang-format On
 
 
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 int bitset_container_to_uint32_array(
     uint32_t *out,
     const bitset_container_t *bc,
@@ -14849,7 +14880,7 @@ bool bitset_container_iterate64(const bitset_container_t *cont, uint32_t base, r
 #if CROARING_IS_X64
 #if CROARING_COMPILER_SUPPORTS_AVX512
 CROARING_TARGET_AVX512
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 static inline bool _avx512_bitset_container_equals(const bitset_container_t *container1, const bitset_container_t *container2) {
   const __m512i *ptr1 = (const __m512i*)container1->words;
   const __m512i *ptr2 = (const __m512i*)container2->words;
@@ -14866,7 +14897,7 @@ static inline bool _avx512_bitset_container_equals(const bitset_container_t *con
 CROARING_UNTARGET_AVX512
 #endif // CROARING_COMPILER_SUPPORTS_AVX512
 CROARING_TARGET_AVX2
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 static inline bool _avx2_bitset_container_equals(const bitset_container_t *container1, const bitset_container_t *container2) {
     const __m256i *ptr1 = (const __m256i*)container1->words;
     const __m256i *ptr2 = (const __m256i*)container2->words;
@@ -14883,7 +14914,7 @@ static inline bool _avx2_bitset_container_equals(const bitset_container_t *conta
 CROARING_UNTARGET_AVX2
 #endif // CROARING_IS_X64
 
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 bool bitset_container_equals(const bitset_container_t *container1, const bitset_container_t *container2) {
   if((container1->cardinality != BITSET_UNKNOWN_CARDINALITY) && (container2->cardinality != BITSET_UNKNOWN_CARDINALITY)) {
     if(container1->cardinality != container2->cardinality) {
@@ -15764,6 +15795,205 @@ bool container_iterator_read_into_uint64(const container_t *c, uint8_t typecode,
             roaring_unreachable;
             return 0;
     }
+}
+
+bool container_iterator_skip(const container_t *c, uint8_t typecode,
+                             roaring_container_iterator_t *it,
+                             uint32_t skip_count, uint32_t *consumed_count,
+                             uint16_t *value_out) {
+    uint32_t actually_skipped;
+    bool has_value;
+    skip_count = minimum_uint32(skip_count, (uint32_t)UINT16_MAX + 1);
+    switch (typecode) {
+        case ARRAY_CONTAINER_TYPE: {
+            const array_container_t *ac = const_CAST_array(c);
+            actually_skipped =
+                minimum_uint32(ac->cardinality - it->index, skip_count);
+            it->index += actually_skipped;
+            has_value = it->index < ac->cardinality;
+            if (has_value) {
+                *value_out = ac->array[it->index];
+            }
+            break;
+        }
+        case BITSET_CONTAINER_TYPE: {
+            const bitset_container_t *bc = const_CAST_bitset(c);
+
+            uint32_t remaining_skip = skip_count;
+            uint32_t current_index = it->index;
+            uint64_t word_mask = UINT64_MAX << (current_index % 64);
+            has_value = false;
+
+            for (uint32_t word_index = current_index / 64;
+                 word_index < BITSET_CONTAINER_SIZE_IN_WORDS; word_index++) {
+                uint64_t word = bc->words[word_index] & word_mask;
+                word_mask = ~0;  // Only apply mask for the first word
+
+                uint32_t bits_in_word = roaring_hamming(word);
+                if (bits_in_word > remaining_skip) {
+                    // Unset the lowest bit `remaining_skip` times
+                    for (; remaining_skip > 0; --remaining_skip) {
+                        word &= word - 1;
+                    }
+                    has_value = true;
+                    *value_out = it->index =
+                        roaring_trailing_zeroes(word) + word_index * 64;
+                    break;
+                }
+                // Skip all set bits in this word
+                remaining_skip -= bits_in_word;
+            }
+            actually_skipped = skip_count - remaining_skip;
+            break;
+        }
+        case RUN_CONTAINER_TYPE: {
+            const run_container_t *rc = const_CAST_run(c);
+
+            uint16_t current_value = *value_out;
+            uint32_t remaining_skip = skip_count;
+            int32_t run_index;
+
+            // Process skips by iterating through runs
+            for (run_index = it->index;
+                 remaining_skip > 0 && run_index < rc->n_runs; run_index++) {
+                // max value (inclusive) in current run
+                uint32_t run_max_inc =
+                    rc->runs[run_index].value + rc->runs[run_index].length;
+                // Max to skip in this run (we can skip from the current value
+                // to the last value in the run, plus one to move past this run)
+                uint32_t max_skip_this_run = run_max_inc - current_value + 1;
+                uint32_t consume =
+                    minimum_uint32(remaining_skip, max_skip_this_run);
+                remaining_skip -= consume;
+                if (consume < max_skip_this_run) {
+                    current_value += consume;
+                    break;
+                }
+                // Skip past the end of this run, to the next if there is one
+                if (run_index + 1 < rc->n_runs) {
+                    current_value = rc->runs[run_index + 1].value;
+                }
+            }
+
+            // Update final state
+            it->index = run_index;
+            actually_skipped = skip_count - remaining_skip;
+            has_value = run_index < rc->n_runs;
+            if (has_value) {
+                *value_out = current_value;
+            }
+            break;
+        }
+        default:
+            assert(false);
+            roaring_unreachable;
+            return false;
+    }
+    *consumed_count = actually_skipped;
+    return has_value;
+}
+
+bool container_iterator_skip_backward(const container_t *c, uint8_t typecode,
+                                      roaring_container_iterator_t *it,
+                                      uint32_t skip_count,
+                                      uint32_t *consumed_count,
+                                      uint16_t *value_out) {
+    uint32_t actually_skipped;
+    bool has_value;
+    skip_count = minimum_uint32(skip_count, (uint32_t)UINT16_MAX + 1);
+    switch (typecode) {
+        case ARRAY_CONTAINER_TYPE: {
+            const array_container_t *ac = const_CAST_array(c);
+            // Allow skipping back to -1
+            actually_skipped = minimum_uint32(it->index + 1, skip_count);
+            it->index -= actually_skipped;
+            has_value = it->index >= 0;
+            if (has_value) {
+                *value_out = ac->array[it->index];
+            }
+            break;
+        }
+        case BITSET_CONTAINER_TYPE: {
+            const bitset_container_t *bc = const_CAST_bitset(c);
+
+            uint32_t remaining_skip = skip_count;
+            uint32_t current_index = it->index;
+            uint64_t word_mask = UINT64_MAX >> (63 - (current_index % 64));
+            has_value = false;
+
+            // Start from the word containing current index and go backwards
+            for (int32_t word_index = current_index / 64; word_index >= 0;
+                 word_index--) {
+                uint64_t word = bc->words[word_index] & word_mask;
+                word_mask = ~0;  // Only apply mask for the first word
+
+                uint32_t bits_in_word = roaring_hamming(word);
+                if (bits_in_word > remaining_skip) {
+                    // Unset the highest bit `remaining_skip` times
+                    for (; remaining_skip > 0; --remaining_skip) {
+                        uint64_t high_bit =
+                            UINT64_C(1) << (63 - roaring_leading_zeroes(word));
+                        // Clear the highest set bit
+                        word &= ~high_bit;
+                    }
+                    has_value = true;
+                    *value_out = it->index =
+                        (63 - roaring_leading_zeroes(word)) + word_index * 64;
+                    break;
+                }
+                // Skip all set bits in this word
+                remaining_skip -= bits_in_word;
+            }
+            actually_skipped = skip_count - remaining_skip;
+            break;
+        }
+        case RUN_CONTAINER_TYPE: {
+            const run_container_t *rc = const_CAST_run(c);
+
+            uint16_t current_value = *value_out;
+            uint32_t remaining_skip = skip_count;
+            int32_t run_index;
+
+            // Process skips by iterating through runs backwards
+            for (run_index = it->index; remaining_skip > 0 && run_index >= 0;
+                 run_index--) {
+                // min value (inclusive) in current run
+                uint32_t run_min_inc = rc->runs[run_index].value;
+                // Max to skip in this run (we can skip from the current value
+                // back to the first value in the run, plus one to move before
+                // this run)
+                uint32_t max_skip_this_run = current_value - run_min_inc + 1;
+                uint32_t consume =
+                    minimum_uint32(remaining_skip, max_skip_this_run);
+                remaining_skip -= consume;
+                if (consume < max_skip_this_run) {
+                    current_value -= consume;
+                    break;
+                }
+                // Skip past the beginning of this run, to the previous if there
+                // is one
+                if (run_index - 1 >= 0) {
+                    current_value = rc->runs[run_index - 1].value +
+                                    rc->runs[run_index - 1].length;
+                }
+            }
+
+            // Update final state
+            it->index = run_index;
+            actually_skipped = skip_count - remaining_skip;
+            has_value = run_index >= 0;
+            if (has_value) {
+                *value_out = current_value;
+            }
+            break;
+        }
+        default:
+            assert(false);
+            roaring_unreachable;
+            return false;
+    }
+    *consumed_count = actually_skipped;
+    return has_value;
 }
 
 #ifdef __cplusplus
@@ -18449,7 +18679,7 @@ run_container_t *run_container_create(void) {
     return run_container_create_given_capacity(RUN_DEFAULT_INIT_SIZE);
 }
 
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 run_container_t *run_container_clone(const run_container_t *src) {
     run_container_t *run = run_container_create_given_capacity(src->capacity);
     if (run == NULL) return NULL;
@@ -19261,49 +19491,34 @@ int run_container_get_index(const run_container_t *container, uint16_t x) {
 #if defined(CROARING_IS_X64) && CROARING_COMPILER_SUPPORTS_AVX512
 
 CROARING_TARGET_AVX512
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 /* Get the cardinality of `run'. Requires an actual computation. */
 static inline int _avx512_run_container_cardinality(
     const run_container_t *run) {
     const int32_t n_runs = run->n_runs;
     const rle16_t *runs = run->runs;
 
-    /* by initializing with n_runs, we omit counting the +1 for each pair. */
-    int sum = n_runs;
     int32_t k = 0;
-    const int32_t step = sizeof(__m512i) / sizeof(rle16_t);
-    if (n_runs > step) {
-        __m512i total = _mm512_setzero_si512();
-        for (; k + step <= n_runs; k += step) {
-            __m512i ymm1 = _mm512_loadu_si512((const __m512i *)(runs + k));
-            __m512i justlengths = _mm512_srli_epi32(ymm1, 16);
-            total = _mm512_add_epi32(total, justlengths);
-        }
-
-        __m256i lo = _mm512_extracti32x8_epi32(total, 0);
-        __m256i hi = _mm512_extracti32x8_epi32(total, 1);
-
-        // a store might be faster than extract?
-        uint32_t buffer[sizeof(__m256i) / sizeof(rle16_t)];
-        _mm256_storeu_si256((__m256i *)buffer, lo);
-        sum += (buffer[0] + buffer[1]) + (buffer[2] + buffer[3]) +
-               (buffer[4] + buffer[5]) + (buffer[6] + buffer[7]);
-
-        _mm256_storeu_si256((__m256i *)buffer, hi);
-        sum += (buffer[0] + buffer[1]) + (buffer[2] + buffer[3]) +
-               (buffer[4] + buffer[5]) + (buffer[6] + buffer[7]);
+    const int32_t step512 = sizeof(__m512i) / sizeof(rle16_t);
+    __m512i total = _mm512_setzero_si512();
+    for (; k + step512 <= n_runs; k += step512) {
+        __m512i ymm1 = _mm512_loadu_si512((const __m512i *)(runs + k));
+        __m512i justlengths = _mm512_srli_epi32(ymm1, 16);
+        total = _mm512_add_epi32(total, justlengths);
     }
-    for (; k < n_runs; ++k) {
-        sum += runs[k].length;
+    if (k < n_runs) {
+        __m512i ymm1 = _mm512_maskz_loadu_epi32((1 << (n_runs - k)) - 1,
+                                                (const __m512i *)(runs + k));
+        __m512i justlengths = _mm512_srli_epi32(ymm1, 16);
+        total = _mm512_add_epi32(total, justlengths);
     }
-
-    return sum;
+    return _mm512_reduce_add_epi32(total) + n_runs;
 }
 
 CROARING_UNTARGET_AVX512
 
 CROARING_TARGET_AVX2
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 /* Get the cardinality of `run'. Requires an actual computation. */
 static inline int _avx2_run_container_cardinality(const run_container_t *run) {
     const int32_t n_runs = run->n_runs;
@@ -19333,7 +19548,7 @@ static inline int _avx2_run_container_cardinality(const run_container_t *run) {
     return sum;
 }
 
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 int _avx2_run_container_to_uint32_array(void *vout, const run_container_t *cont,
                                         uint32_t base) {
     int outpos = 0;
@@ -19392,7 +19607,10 @@ static inline int _scalar_run_container_cardinality(
 }
 
 int run_container_cardinality(const run_container_t *run) {
-#if CROARING_COMPILER_SUPPORTS_AVX512
+    // Empirically AVX-512 is not always faster than AVX2
+#define CROARING_ENABLE_AVX512_RUN_CONTAINER_CARDINALITY 0
+#if CROARING_COMPILER_SUPPORTS_AVX512 && \
+    CROARING_ENABLE_AVX512_RUN_CONTAINER_CARDINALITY
     if (croaring_hardware_support() & ROARING_SUPPORTS_AVX512) {
         return _avx512_run_container_cardinality(run);
     } else
@@ -19434,7 +19652,7 @@ int run_container_to_uint32_array(void *vout, const run_container_t *cont,
 #else
 
 /* Get the cardinality of `run'. Requires an actual computation. */
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 int run_container_cardinality(const run_container_t *run) {
     const int32_t n_runs = run->n_runs;
     const rle16_t *runs = run->runs;
@@ -19448,7 +19666,7 @@ int run_container_cardinality(const run_container_t *run) {
     return sum;
 }
 
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 int run_container_to_uint32_array(void *vout, const run_container_t *cont,
                                   uint32_t base) {
     int outpos = 0;
@@ -20333,89 +20551,6 @@ void ra_to_uint32_array(const roaring_array_t *ra, uint32_t *ans) {
     }
 }
 
-bool ra_range_uint32_array(const roaring_array_t *ra, size_t offset,
-                           size_t limit, uint32_t *ans) {
-    size_t ctr = 0;
-    size_t dtr = 0;
-
-    size_t t_limit = 0;
-
-    bool first = false;
-    size_t first_skip = 0;
-
-    uint32_t *t_ans = NULL;
-    size_t cur_len = 0;
-
-    for (int i = 0; i < ra->size; ++i) {
-        const container_t *c =
-            container_unwrap_shared(ra->containers[i], &ra->typecodes[i]);
-        switch (ra->typecodes[i]) {
-            case BITSET_CONTAINER_TYPE:
-                t_limit = (const_CAST_bitset(c))->cardinality;
-                break;
-            case ARRAY_CONTAINER_TYPE:
-                t_limit = (const_CAST_array(c))->cardinality;
-                break;
-            case RUN_CONTAINER_TYPE:
-                t_limit = run_container_cardinality(const_CAST_run(c));
-                break;
-        }
-        if (ctr + t_limit - 1 >= offset && ctr < offset + limit) {
-            if (!first) {
-                // first_skip = t_limit - (ctr + t_limit - offset);
-                first_skip = offset - ctr;
-                first = true;
-                t_ans = (uint32_t *)roaring_malloc(sizeof(*t_ans) *
-                                                   (first_skip + limit));
-                if (t_ans == NULL) {
-                    return false;
-                }
-                memset(t_ans, 0, sizeof(*t_ans) * (first_skip + limit));
-                cur_len = first_skip + limit;
-            }
-            if (dtr + t_limit > cur_len) {
-                uint32_t *append_ans = (uint32_t *)roaring_malloc(
-                    sizeof(*append_ans) * (cur_len + t_limit));
-                if (append_ans == NULL) {
-                    if (t_ans != NULL) roaring_free(t_ans);
-                    return false;
-                }
-                memset(append_ans, 0,
-                       sizeof(*append_ans) * (cur_len + t_limit));
-                cur_len = cur_len + t_limit;
-                memcpy(append_ans, t_ans, dtr * sizeof(uint32_t));
-                roaring_free(t_ans);
-                t_ans = append_ans;
-            }
-            switch (ra->typecodes[i]) {
-                case BITSET_CONTAINER_TYPE:
-                    container_to_uint32_array(t_ans + dtr, const_CAST_bitset(c),
-                                              ra->typecodes[i],
-                                              ((uint32_t)ra->keys[i]) << 16);
-                    break;
-                case ARRAY_CONTAINER_TYPE:
-                    container_to_uint32_array(t_ans + dtr, const_CAST_array(c),
-                                              ra->typecodes[i],
-                                              ((uint32_t)ra->keys[i]) << 16);
-                    break;
-                case RUN_CONTAINER_TYPE:
-                    container_to_uint32_array(t_ans + dtr, const_CAST_run(c),
-                                              ra->typecodes[i],
-                                              ((uint32_t)ra->keys[i]) << 16);
-                    break;
-            }
-            dtr += t_limit;
-        }
-        ctr += t_limit;
-        if (dtr - first_skip >= limit) break;
-    }
-    if (t_ans != NULL) {
-        memcpy(ans, t_ans + first_skip, limit * sizeof(uint32_t));
-        free(t_ans);
-    }
-    return true;
-}
-
 bool ra_has_run_container(const roaring_array_t *ra) {
     for (int32_t k = 0; k < ra->size; ++k) {
         if (get_container_type(ra->containers[k], ra->typecodes[k]) ==
@@ -20457,17 +20592,14 @@ size_t ra_portable_serialize(const roaring_array_t *ra, char *buf) {
         memcpy(buf, &cookie, sizeof(cookie));
         buf += sizeof(cookie);
         uint32_t s = (ra->size + 7) / 8;
-        uint8_t *bitmapOfRunContainers = (uint8_t *)roaring_calloc(s, 1);
-        assert(bitmapOfRunContainers != NULL);  // todo: handle
+        memset(buf, 0, s);
         for (int32_t i = 0; i < ra->size; ++i) {
             if (get_container_type(ra->containers[i], ra->typecodes[i]) ==
                 RUN_CONTAINER_TYPE) {
-                bitmapOfRunContainers[i / 8] |= (1 << (i % 8));
+                buf[i / 8] |= 1 << (i % 8);
             }
         }
-        memcpy(buf, bitmapOfRunContainers, s);
         buf += s;
-        roaring_free(bitmapOfRunContainers);
         if (ra->size < NO_OFFSET_THRESHOLD) {
             startOffset = 4 + 4 * ra->size + s;
         } else {
@@ -20551,7 +20683,7 @@ size_t ra_portable_deserialize_size(const char *buf, const size_t maxbytes) {
     }
     bytestotal += size * 2 * sizeof(uint16_t);
     if (bytestotal > maxbytes) return 0;
-    uint16_t *keyscards = (uint16_t *)buf;
+    const char *keyscards = buf;
     buf += size * 2 * sizeof(uint16_t);
     if ((!hasrun) || (size >= NO_OFFSET_THRESHOLD)) {
         // skipping the offsets
@@ -20562,7 +20694,7 @@ size_t ra_portable_deserialize_size(const char *buf, const size_t maxbytes) {
     // Reading the containers
     for (int32_t k = 0; k < size; ++k) {
         uint16_t tmp;
-        memcpy(&tmp, keyscards + 2 * k + 1, sizeof(tmp));
+        memcpy(&tmp, keyscards + 4 * k + 2, sizeof(tmp));
         uint32_t thiscard = tmp + 1;
         bool isbitmap = (thiscard > DEFAULT_MAX_SIZE);
         bool isrun = false;
@@ -20653,7 +20785,7 @@ bool ra_portable_deserialize(roaring_array_t *answer, const char *buf,
         bitmapOfRunContainers = buf;
         buf += s;
     }
-    uint16_t *keyscards = (uint16_t *)buf;
+    const char *keyscards = buf;
 
     *readbytes += size * 2 * sizeof(uint16_t);
     if (*readbytes > maxbytes) {
@@ -20670,7 +20802,7 @@ bool ra_portable_deserialize(roaring_array_t *answer, const char *buf,
 
     for (int32_t k = 0; k < size; ++k) {
         uint16_t tmp;
-        memcpy(&tmp, keyscards + 2 * k, sizeof(tmp));
+        memcpy(&tmp, keyscards + 4 * k, sizeof(tmp));
         answer->keys[k] = tmp;
     }
     if ((!hasrun) || (size >= NO_OFFSET_THRESHOLD)) {
@@ -20688,7 +20820,7 @@ bool ra_portable_deserialize(roaring_array_t *answer, const char *buf,
     // Reading the containers
     for (int32_t k = 0; k < size; ++k) {
         uint16_t tmp;
-        memcpy(&tmp, keyscards + 2 * k + 1, sizeof(tmp));
+        memcpy(&tmp, keyscards + 4 * k + 2, sizeof(tmp));
         uint32_t thiscard = tmp + 1;
         bool isbitmap = (thiscard > DEFAULT_MAX_SIZE);
         bool isrun = false;
@@ -21454,6 +21586,30 @@ void roaring_bitmap_statistics(const roaring_bitmap_t *r,
     }
 }
 
+bool roaring_contains_shared(const roaring_bitmap_t *r) {
+    const roaring_array_t *ra = &r->high_low_container;
+    for (int i = 0; i < ra->size; ++i) {
+        if (ra->typecodes[i] == SHARED_CONTAINER_TYPE) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool roaring_unshare_all(roaring_bitmap_t *r) {
+    const roaring_array_t *ra = &r->high_low_container;
+    bool unshared = false;
+    for (int i = 0; i < ra->size; ++i) {
+        uint8_t typecode = ra->typecodes[i];
+        if (typecode == SHARED_CONTAINER_TYPE) {
+            ra->containers[i] = get_writable_copy_if_shared(ra->containers[i],
+                                                            &ra->typecodes[i]);
+            unshared = true;
+        }
+    }
+    return unshared;
+}
+
 /*
  * Checks that:
  * - Array containers are sorted and contain no duplicates
@@ -21461,6 +21617,7 @@ void roaring_bitmap_statistics(const roaring_bitmap_t *r,
  * - Roaring containers are sorted by key and there are no duplicate keys
  * - The correct container type is use for each container (e.g. bitmaps aren't
  * used for small containers)
+ * - Shared containers are only used when the bitmap is COW
  */
 bool roaring_bitmap_internal_validate(const roaring_bitmap_t *r,
                                       const char **reason) {
@@ -21513,7 +21670,13 @@ bool roaring_bitmap_internal_validate(const roaring_bitmap_t *r,
         prev_key = ra->keys[i];
     }
 
+    bool cow = roaring_bitmap_get_copy_on_write(r);
+
     for (int32_t i = 0; i < ra->size; ++i) {
+        if (ra->typecodes[i] == SHARED_CONTAINER_TYPE && !cow) {
+            *reason = "shared container in non-COW bitmap";
+            return false;
+        }
         if (!container_internal_validate(ra->containers[i], ra->typecodes[i],
                                          reason)) {
             // reason should already be set
@@ -22437,7 +22600,13 @@ void roaring_bitmap_to_uint32_array(const roaring_bitmap_t *r, uint32_t *ans) {
 
 bool roaring_bitmap_range_uint32_array(const roaring_bitmap_t *r, size_t offset,
                                        size_t limit, uint32_t *ans) {
-    return ra_range_uint32_array(&r->high_low_container, offset, limit, ans);
+    roaring_uint32_iterator_t it;
+    roaring_iterator_init(r, &it);
+    roaring_uint32_iterator_skip(&it, offset);
+    roaring_uint32_iterator_read(&it, ans, limit);
+
+    // This function always succeeds
+    return true;
 }
 
 /** convert array and bitmap containers to run containers when it is more
@@ -22634,7 +22803,7 @@ roaring_bitmap_t *roaring_bitmap_deserialize_safe(const void *buf,
         for (uint32_t i = 0; i < card; i++) {
             // elems may not be aligned, read with memcpy
             uint32_t elem;
-            memcpy(&elem, elems + i, sizeof(elem));
+            memcpy((char *)&elem, (char *)(elems + i), sizeof(elem));
             roaring_bitmap_add_bulk(bitmap, &context, elem);
         }
         return bitmap;
@@ -22870,11 +23039,63 @@ uint32_t roaring_uint32_iterator_read(roaring_uint32_iterator_t *it,
         if (has_value) {
             it->has_value = true;
             it->current_value = it->highbits | low16;
+            // If the container still has values, we must have stopped because
+            // we skipped enough values.
             assert(ret == count);
             return ret;
         }
         it->container_index++;
         it->has_value = loadfirstvalue(it);
+    }
+    return ret;
+}
+
+uint32_t roaring_uint32_iterator_skip(roaring_uint32_iterator_t *it,
+                                      uint32_t count) {
+    uint32_t ret = 0;
+    while (it->has_value && ret < count) {
+        uint32_t consumed;
+        uint16_t low16 = (uint16_t)it->current_value;
+        bool has_value = container_iterator_skip(it->container, it->typecode,
+                                                 &it->container_it, count - ret,
+                                                 &consumed, &low16);
+        ret += consumed;
+        if (has_value) {
+            it->has_value = true;
+            it->current_value = it->highbits | low16;
+            // If the container still has values, we must have stopped because
+            // we skipped enough values.
+            assert(ret == count);
+            return ret;
+        }
+        // We have skipped over all items in the current container, so set
+        // ourselves at the first item of the next container.
+        // We do NOT need to count another item skipped here.
+        it->container_index++;
+        it->has_value = loadfirstvalue(it);
+    }
+    return ret;
+}
+
+uint32_t roaring_uint32_iterator_skip_backward(roaring_uint32_iterator_t *it,
+                                               uint32_t count) {
+    uint32_t ret = 0;
+    while (it->has_value && ret < count) {
+        uint32_t consumed;
+        uint16_t low16 = (uint16_t)it->current_value;
+        bool has_value = container_iterator_skip_backward(
+            it->container, it->typecode, &it->container_it, count - ret,
+            &consumed, &low16);
+        ret += consumed;
+        if (has_value) {
+            it->has_value = true;
+            it->current_value = it->highbits | low16;
+            return ret;
+        }
+        // We have skipped over all items in the current container backwards.
+        // Moving to the previous container counts as consuming one more skip.
+        it->container_index--;
+        it->has_value = loadlastvalue(it);
     }
     return ret;
 }
@@ -24054,7 +24275,7 @@ void roaring_bitmap_frozen_serialize(const roaring_bitmap_t *rb, char *buf) {
     uint16_t *key_zone = (uint16_t *)arena_alloc(&buf, 2 * ra->size);
     uint16_t *count_zone = (uint16_t *)arena_alloc(&buf, 2 * ra->size);
     uint8_t *typecode_zone = (uint8_t *)arena_alloc(&buf, ra->size);
-    uint32_t *header_zone = (uint32_t *)arena_alloc(&buf, 4);
+    char *header_zone = (char *)arena_alloc(&buf, 4);
 
     for (int32_t i = 0; i < ra->size; i++) {
         uint16_t count;
@@ -24230,7 +24451,7 @@ const roaring_bitmap_t *roaring_bitmap_frozen_view(const char *buf,
     return rb;
 }
 
-ALLOW_UNALIGNED
+CROARING_ALLOW_UNALIGNED
 roaring_bitmap_t *roaring_bitmap_portable_deserialize_frozen(const char *buf) {
     char *start_of_buf = (char *)buf;
     uint32_t cookie;
@@ -25189,6 +25410,7 @@ void roaring64_bitmap_remove_bulk(roaring64_bitmap_t *r,
             assert(erased);
             (void)erased;
             remove_container(r, leaf);
+            context->leaf = NULL;
         }
     } else {
         // We're not positioned anywhere yet or the high bits of the key
@@ -27139,6 +27361,8 @@ uint64_t roaring64_iterator_read(roaring64_iterator_t *it, uint64_t *buf,
         it->has_value = art_iterator_next(&it->art_it);
         if (it->has_value) {
             roaring64_iterator_init_at_leaf_first(it);
+        } else {
+            it->saturated_forward = true;
         }
     }
     return consumed;
