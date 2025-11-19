@@ -31,7 +31,10 @@ AC_ARG_ENABLE(global-context-support, AS_HELP_STRING([--disable-global-context-s
 AC_ARG_ENABLE(memory-track-origins, AS_HELP_STRING([--disable-memory-track-origins], [Don't add -fsanitize-memory-track-origins flag when compiling with MASAN support. Useful for faster CI]))
 AC_ARG_ENABLE(old-croaring, AS_HELP_STRING([--enable-old-croaring], [Always use old croaring version, instead of try to auto-detect if v4 works. Useful with old compilers]),[enable_oldcroaring=$enableval],[enable_oldcroaring=no])
 
-NDPI_CFLAGS="${NDPI_CFLAGS} -D_DEFAULT_SOURCE=1 -D_GNU_SOURCE=1"
+#These two variables are not supposed to be set/changed by the user:
+#he should use standard CFLAGS/LDFLAGS, instead
+NDPI_CFLAGS="-D_DEFAULT_SOURCE=1 -D_GNU_SOURCE=1"
+NDPI_LDFLAGS=""
 
 AS_IF([test "x$enable_fuzztargets" = "xyes"], [
   BUILD_FUZZTARGETS=1

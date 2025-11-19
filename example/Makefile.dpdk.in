@@ -19,8 +19,9 @@ LIBNDPI = $(PWD)/../src/lib/libndpi.a
 
 SRCS-y := reader_util.c ndpiReader.c
 
-CFLAGS += -g
-CFLAGS += -Wno-strict-prototypes -Wno-missing-prototypes -Wno-missing-declarations -Wno-unused-parameter -I $(PWD)/../src/include @CFLAGS@ -DUSE_DPDK
+# Preserve user's CFLAGS from configure and add package flags
+USER_CFLAGS = @CFLAGS@
+CFLAGS += -Wno-strict-prototypes -Wno-missing-prototypes -Wno-missing-declarations -Wno-unused-parameter -I $(PWD)/../src/include -DUSE_DPDK $(USER_CFLAGS)
 LDLIBS = $(LIBNDPI) @PCAP_LIB@ @LIBS@ @ADDITIONAL_LIBS@ -lpthread @LDFLAGS@
 
 include $(RTE_SDK)/mk/rte.extapp.mk

@@ -17,19 +17,20 @@ bin_PROGRAMS += fuzz_ndpi_reader_pl7m fuzz_ndpi_reader_pl7m_64k fuzz_ndpi_reader
 #Common flags
 AM_CPPFLAGS = -I $(top_srcdir)/src/include -I $(top_srcdir)/src/lib/third_party/include/ @NDPI_CFLAGS@
 AM_LDFLAGS = $(LIBS)
-AM_CFLAGS = @NDPI_CFLAGS@ $(CFLAGS)
-AM_CXXFLAGS = @NDPI_CFLAGS@ $(CXXFLAGS)
+# Use AM_CFLAGS for package flags, never modify or embed user's CFLAGS
+AM_CFLAGS = @NDPI_CFLAGS@
+AM_CXXFLAGS = @NDPI_CFLAGS@
 LDADD = $(top_builddir)/src/lib/libndpi.a $(PCAP_LIB) $(ADDITIONAL_LIBS)
 if HAS_FUZZLDFLAGS
-CFLAGS += $(LIB_FUZZING_ENGINE)
-LDFLAGS += $(LIB_FUZZING_ENGINE)
-CXXFLAGS += $(LIB_FUZZING_ENGINE)
+AM_CFLAGS += $(LIB_FUZZING_ENGINE)
+AM_LDFLAGS += $(LIB_FUZZING_ENGINE)
+AM_CXXFLAGS += $(LIB_FUZZING_ENGINE)
 endif
 
 # Common linker command template for all fuzz targets
 # All fuzz targets need to use CXX as linker (required by libFuzzer)
 FUZZ_LINK_COMMAND = $(AM_V_CCLD)$(LIBTOOL) $(AM_V_lt) --silent --tag=CC $(AM_LIBTOOLFLAGS) \
-    $(LIBTOOLFLAGS) --mode=link $(CXX) @NDPI_CFLAGS@ $(AM_CXXFLAGS) $(CXXFLAGS) \
+    $(LIBTOOLFLAGS) --mode=link $(CXX) $(AM_CXXFLAGS) $(CXXFLAGS) \
     $($@_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
 
 # Define sources and flags for each fuzz target

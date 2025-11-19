@@ -5,18 +5,22 @@ top_builddir = @top_builddir@
 VPATH = @srcdir@
 
 CC=@CC@
+LDFLAGS=@LDFLAGS@
 CXX=@CXX@
+CFLAGS=@CFLAGS@
 EXE_SUFFIX=@EXE_SUFFIX@
 
 SRCHOME=$(top_srcdir)/src
 
 ifneq ($(OS),Windows_NT)
-CFLAGS+=-fPIC -DPIC
+AM_CFLAGS=-fPIC -DPIC
+else
+AM_CFLAGS=
 endif
-CFLAGS+=-g -I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@
+AM_CFLAGS+=-I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@
 LIBNDPI=$(top_builddir)/src/lib/libndpi.a
 LIBS=$(LIBNDPI) @ADDITIONAL_LIBS@ @LIBS@ -lpthread
-LDFLAGS+=@NDPI_LDFLAGS@
+AM_LDFLAGS=@NDPI_LDFLAGS@
 HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 OBJS=dga_evaluate
@@ -28,10 +32,10 @@ EXECUTABLE_SOURCES := dga_evaluate.c
 COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
 
 dga_evaluate$(EXE_SUFFIX): $(LIBNDPI) dga_evaluate.o
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) dga_evaluate.o $(LIBS) -o $@
+	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(AM_LDFLAGS) $(LDFLAGS) dga_evaluate.o $(LIBS) -o $@
 
 %.o: %.c $(HEADERS) Makefile
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
 
 clean:
 	/bin/rm -f *.o dga_evaluate$(EXE_SUFFIX)

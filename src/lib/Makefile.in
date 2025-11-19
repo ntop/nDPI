@@ -14,6 +14,9 @@ VPATH = @srcdir@:@srcdir@/protocols:@srcdir@/third_party/src:@srcdir@/third_part
 AR = @AR@
 CC = @CC@
 RANLIB = @RANLIB@
+# Preserve user's CFLAGS and LDFLAGS from configure
+CFLAGS = @CFLAGS@
+LDFLAGS = @LDFLAGS@
 #
 # Installation directories
 #
@@ -27,15 +30,18 @@ ifneq ($(OS),Windows_NT)
 OS := $(shell uname)
 endif
 ifneq ($(OS),Windows_NT)
-CFLAGS     += -fPIC -DPIC
+AM_CFLAGS  = -fPIC -DPIC
+else
+AM_CFLAGS  =
 endif
-CFLAGS     += -I$(srcdir) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include -I$(srcdir)/third_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
+AM_CFLAGS += -I$(srcdir) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include -I$(srcdir)/third_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
 CFLAGS_ndpi_bitmap.c := -Wno-unused-function
 CFLAGS_ndpi_bitmap64_fuse.c := -Wno-unused-function
 CFLAGS_gcrypt_light.c := -Wno-unused-function -Wno-unused-parameter
 CFLAGS_ahocorasick.c := -Wno-unused-function -Wno-unused-parameter
 CFLAGS_roaring.c := -Wno-unused-function -Wno-attributes
-LDFLAGS    += @NDPI_LDFLAGS@
+# Use AM_LDFLAGS for package flags, never modify user's LDFLAGS
+AM_LDFLAGS = @NDPI_LDFLAGS@
 LIBS       = @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
 
 OBJECTS   = $(patsubst $(srcdir)/protocols/%.c, %.o, $(wildcard $(srcdir)/protocols/*.c)) $(patsubst $(srcdir)/third_party/src/%.c, %.o, $(wildcard $(srcdir)/third_party/src/*.c)) $(patsubst $(srcdir)/third_party/src/hll/%.c, %.o, $(wildcard $(srcdir)/third_party/src/hll/*.c)) $(patsubst $(srcdir)/%.c, %.o, $(wildcard $(srcdir)/*.c))
@@ -78,12 +84,12 @@ $(NDPI_LIB_STATIC): $(OBJECTS)
 	   $(RANLIB) $@      
 
 $(NDPI_LIB_SHARED): $(OBJECTS)
-	$(CC) -shared -fPIC $(CFLAGS) $(SONAME_FLAG) -o $@ $(LDFLAGS) $(OBJECTS) $(LIBS)
+	$(CC) -shared -fPIC $(AM_CFLAGS) $(CFLAGS) $(SONAME_FLAG) -o $@ $(AM_LDFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS)
 	ln -fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE)
 	ln -fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
 
 %.o: %.c $(HEADERS) Makefile
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(CFLAGS_$(notdir $<)) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(CFLAGS_$(notdir $<)) -c $< -o $@
 
 clean:
 	/bin/rm -f $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED) $(OBJECTS) *.o *.so *.so.* *.lo *.dll

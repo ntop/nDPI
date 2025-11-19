@@ -7,6 +7,8 @@ VPATH = @srcdir@
 AR=@AR@
 CC=@CC@
 CXX=@CXX@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
 ifneq ($(OS),Windows_NT)
 OS := $(shell uname)
 endif
@@ -19,10 +21,12 @@ DISABLE_NPCAP=@DISABLE_NPCAP@
 EXE_SUFFIX=@EXE_SUFFIX@
 SRCHOME=$(top_srcdir)/src
 ifneq ($(OS),Windows_NT)
-CFLAGS+=-fPIC -DPIC
+AM_CFLAGS=-fPIC -DPIC
+else
+AM_CFLAGS=
 endif
-CFLAGS+=-I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @PCAP_INC@ @GPROF_CFLAGS@ @CUSTOM_NDPI@
-LDFLAGS+=@NDPI_LDFLAGS@
+AM_CFLAGS+=-I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @PCAP_INC@ @GPROF_CFLAGS@ @CUSTOM_NDPI@
+AM_LDFLAGS=@NDPI_LDFLAGS@
 LIBNDPI=$(top_builddir)/src/lib/libndpi.a
 LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @GPROF_LIBS@ @LIBS@
 HEADERS=reader_util.h $(SRCHOME)/include/ndpi_api.h \
@@ -33,9 +37,9 @@ PREFIX?=@prefix@
 ifneq ($(BUILD_MINGW),)
 
 ifeq ($(DISABLE_NPCAP),0)
-CFLAGS+=-I@srcdir@/../windows/WpdPack/Include -I@srcdir@/../windows/WpdPack/Include/pcap
+AM_CFLAGS+=-I@srcdir@/../windows/WpdPack/Include -I@srcdir@/../windows/WpdPack/Include/pcap
 else
-CFLAGS+=-DDISABLE_NPCAP
+AM_CFLAGS+=-DDISABLE_NPCAP
 endif
 
 ifeq ($(DISABLE_NPCAP),0)
@@ -53,7 +57,7 @@ else
 LIBS+=-pthread
 endif
 
-CFLAGS+=-pthread
+AM_CFLAGS+=-pthread
 
 all: ndpiReader$(EXE_SUFFIX) @DPDK_TARGET@
 
@@ -64,13 +68,13 @@ libndpiReader.a: $(COMMON_SOURCES:%.c=%.o) $(LIBNDPI)
 	$(AR) rsv libndpiReader.a $(COMMON_SOURCES:%.c=%.o)
 
 ndpiReader$(EXE_SUFFIX): libndpiReader.a $(LIBNDPI) ndpiReader.o
-	$(CC) $(CFLAGS) $(LDFLAGS) ndpiReader.o libndpiReader.a $(LIBS) -o $@
+	$(CC) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) ndpiReader.o libndpiReader.a $(LIBS) -o $@
 
 ndpiSimpleIntegration$(EXE_SUFFIX): ndpiSimpleIntegration.o
-	$(CC) $(CFLAGS) $(LDFLAGS) $< $(LIBS) -o $@
+	$(CC) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $< $(LIBS) -o $@
 
 %.o: %.c $(HEADERS) Makefile
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
 
 install: ndpiReader$(EXE_SUFFIX)
 	@MKDIR_P@ $(DESTDIR)$(PREFIX)/bin/

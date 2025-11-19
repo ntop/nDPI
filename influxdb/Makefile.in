@@ -5,10 +5,12 @@ top_builddir = @top_builddir@
 VPATH = @srcdir@
 
 CC=@CC@
+LDFLAGS=@LDFLAGS@
+CFLAGS=@CFLAGS@
+AM_CFLAGS=@NDPI_CFLAGS@
 INC=-I $(top_srcdir)/src/include -I $(top_builddir)/src/include -I/usr/local/include
 LIBDPI=$(top_builddir)/src/lib/libndpi.a
-CFLAGS+=@NDPI_CFLAGS@
-LDFLAGS+=@NDPI_LDFLAGS@
+AM_LDFLAGS=@NDPI_LDFLAGS@
 LIB=$(LIBDPI) @ADDITIONAL_LIBS@ @LIBS@ -lm
 GEN_HEADERS=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 
@@ -17,7 +19,7 @@ TOOLS=metric_anomaly
 all: $(TOOLS)
 
 metric_anomaly: $(srcdir)/metric_anomaly.c Makefile $(LIBDPI) $(GEN_HEADERS)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -g $(INC) $(LDFLAGS) $(srcdir)/metric_anomaly.c -o metric_anomaly $(LIB)
+	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(INC) $(AM_LDFLAGS) $(LDFLAGS) $(srcdir)/metric_anomaly.c -o metric_anomaly $(LIB)
 
 clean:
 	/bin/rm -f *.o $(TOOLS) *~

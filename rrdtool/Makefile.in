@@ -5,10 +5,12 @@ top_builddir = @top_builddir@
 VPATH = @srcdir@
 
 CC=@CC@
+LDFLAGS=@LDFLAGS@
+CFLAGS=@CFLAGS@
+AM_CFLAGS=@NDPI_CFLAGS@
 INC=-I $(top_srcdir)/src/include -I $(top_builddir)/src/include -I/usr/local/include
 LIBDPI=$(top_builddir)/src/lib/libndpi.a
-CFLAGS+=@NDPI_CFLAGS@
-LDFLAGS+=@NDPI_LDFLAGS@
+AM_LDFLAGS=@NDPI_LDFLAGS@
 LIB=$(LIBDPI) @ADDITIONAL_LIBS@ @LIBRRD@ @LIBS@ -lm -lpthread
 GEN_HEADERS=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 
@@ -17,10 +19,10 @@ TOOLS=rrd_anomaly rrd_similarity
 all: $(TOOLS)
 
 rrd_anomaly: $(srcdir)/rrd_anomaly.c Makefile $(LIBDPI) $(GEN_HEADERS)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -g $(INC) $(LDFLAGS) $(srcdir)/rrd_anomaly.c -o rrd_anomaly $(LIB)
+	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(INC) $(AM_LDFLAGS) $(LDFLAGS) $(srcdir)/rrd_anomaly.c -o rrd_anomaly $(LIB)
 
 rrd_similarity: $(srcdir)/rrd_similarity.c Makefile $(LIBDPI) $(GEN_HEADERS)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -g $(INC) $(LDFLAGS) $(srcdir)/rrd_similarity.c -o rrd_similarity $(LIB)
+	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(INC) $(AM_LDFLAGS) $(LDFLAGS) $(srcdir)/rrd_similarity.c -o rrd_similarity $(LIB)
 
 clean:
 	/bin/rm -f *.o $(TOOLS) *~
