@@ -9,18 +9,13 @@ CC=@CC@
 CXX=@CXX@
 CFLAGS=@CFLAGS@
 LDFLAGS=@LDFLAGS@
-ifneq ($(OS),Windows_NT)
-OS := $(shell uname)
-endif
-ifeq ($(OS),Darwin)
-CC=clang -fno-color-diagnostics
-endif
+OS_TYPE=@OS_TYPE@
 BUILD_MINGW=@BUILD_MINGW@
 BUILD_MINGW_X64=@BUILD_MINGW_X64@
 DISABLE_NPCAP=@DISABLE_NPCAP@
 EXE_SUFFIX=@EXE_SUFFIX@
 SRCHOME=$(top_srcdir)/src
-ifneq ($(OS),Windows_NT)
+ifneq ($(OS_TYPE),Windows_NT)
 AM_CFLAGS=-fPIC -DPIC
 else
 AM_CFLAGS=

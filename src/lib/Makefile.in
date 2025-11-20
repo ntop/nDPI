@@ -26,10 +26,8 @@ libdir     = @libdir@
 includedir = @includedir@/ndpi
 # For backwards compatibility
 PREFIX = $(prefix)
-ifneq ($(OS),Windows_NT)
-OS := $(shell uname)
-endif
-ifneq ($(OS),Windows_NT)
+OS_TYPE = @OS_TYPE@
+ifneq ($(OS_TYPE),Windows_NT)
 AM_CFLAGS  = -fPIC -DPIC
 else
 AM_CFLAGS  =
@@ -61,8 +59,8 @@ endif
 
 BUILD_MINGW    		 = @BUILD_MINGW@
 
-ifeq ($(OS),Darwin)
-CC=clang -fno-color-diagnostics
+# Platform-specific settings
+ifeq ($(OS_TYPE),Darwin)
 SONAME_FLAG=
 else
 ifneq ($(BUILD_MINGW),)

@@ -107,24 +107,46 @@ LT_INIT
 LT_LIB_M
 PKG_PROG_PKG_CONFIG
 
+# Detect build and host system for cross-compilation support
+# Must be called early, before AC_PROG_CC
+AC_CANONICAL_HOST
+
 AC_PROG_CC
 AC_PROG_CPP_WERROR
 AC_C_INLINE
 
-SYSTEM=`uname -s`
-if test $SYSTEM = "Darwin"; then
-dnl>  AC_PROG_CC(clang gcc)
-  AM_PROG_CC_C_O(clang gcc)
-  AC_PROG_CXX(clang++ g++)
-else
-  AC_PROG_CC_C_O
-  AC_PROG_CXX
-fi
+# Prefer clang on Darwin if user didn't explicitly set CC
+case "$host_os" in
+  darwin*)
+    dnl>  AC_PROG_CC(clang gcc)
+    AM_PROG_CC_C_O(clang gcc)
+    AC_PROG_CXX(clang++ g++)
+    ;;
+  *)
+    AC_PROG_CC_C_O
+    AC_PROG_CXX
+    ;;
+esac
 
 dnl> Can't use AM_PROG_AR because not all of our Makefiles are automake (yet?)
 AC_CHECK_TOOL(AR, ar, [false])
+AC_CHECK_TOOL([RANLIB], [ranlib], [:])
 
 AC_LANG_WERROR
+
+# Set OS_TYPE for Makefiles based on host system
+case "$host_os" in
+  darwin*)
+    OS_TYPE="Darwin"
+    ;;
+  mingw*|msys*)
+    OS_TYPE="Windows_NT"
+    ;;
+  *)
+    OS_TYPE="Unix"
+    ;;
+esac
+AC_SUBST(OS_TYPE)
 
 #We should use latest croaring version, but with old compilers we need to
 #fallback to old/legacy code
@@ -328,17 +350,15 @@ fi
 if ! test -d $PCAP_HOME; then :
      PCAP_HOME=${srcdir}/../../PF_RING/userland
 fi
-SHORT_MACHINE=`uname -m | cut -b1-3`
-if test $SHORT_MACHINE = "arm"; then
-     LIBNUMA=""
-else
-     AC_CHECK_LIB([numa], [numa_available], [LIBNUMA="-lnuma"], [
-        AC_MSG_WARN([libnuma not found. NUMA optimizations will be disabled.])
-        AC_MSG_WARN([Install libnuma-dev or numactl-devel for better performance on NUMA systems.])
-     ])
-fi
 
-MACHINE=`uname -m`
+AC_CHECK_LIB([numa], [numa_available], [LIBNUMA="-lnuma"], [
+    AC_MSG_WARN([libnuma not found. NUMA optimizations will be disabled.])
+    AC_MSG_WARN([Install libnuma-dev or numactl-devel for better performance on NUMA systems.])
+])
+
+# Set MACHINE from host_cpu for compatibility with existing code
+MACHINE="$host_cpu"
+AC_SUBST(MACHINE)
 
 NBPF_ENABLED=0
 AC_MSG_CHECKING([PF_RING nBPF ($NBPF_HOME)])
