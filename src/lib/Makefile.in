@@ -73,7 +73,11 @@ endif
 
 all: $(NDPI_LIBS)
 
-ndpi_main.o: $(srcdir)/ndpi_content_match.c.inc
+ndpi_main.o: $(srcdir)/ndpi_content_match.c.inc \
+             $(srcdir)/ndpi_dga_match.c.inc \
+             $(wildcard $(srcdir)/inc_generated/*.c.inc)
+
+ndpi_fingerprint.o: $(srcdir)/ndpi_os_fingerprint.c.inc
 
 $(OBJECTS): $(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 
