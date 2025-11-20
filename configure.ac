@@ -590,3 +590,191 @@ AC_SUBST(NDPI_CFLAGS)
 AC_SUBST(NDPI_LDFLAGS)
 AC_SUBST(NDPI_BASE_DIR)
 AC_OUTPUT
+
+dnl> ========================================================================
+dnl> Configuration Summary
+dnl> ========================================================================
+
+dnl> Build summary message dynamically
+SUMMARY="
+========================================================================
+nDPI Configuration Summary
+========================================================================
+
+Package Information:
+  Version:                 ${PACKAGE_VERSION} (${GIT_RELEASE})
+  API Version:             ${NDPI_API_VERSION}
+  Git Date:                ${GIT_DATE}
+
+Installation Paths:
+  Prefix:                  ${prefix}
+  Exec prefix:             ${exec_prefix}
+  Library path:            ${libdir}
+  Include path:            ${includedir}
+  Binary path:             ${bindir}
+
+Build Configuration:
+  Host system:             ${host}
+  C Compiler:              ${CC}
+  C++ Compiler:            ${CXX}"
+
+AS_IF([test "x${enable_debugbuild}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  Debug build:             enabled (-g)"],
+  [SUMMARY="${SUMMARY}
+  Debug build:             disabled"])
+
+AS_IF([test "${with_sanitizer+set}" = set],
+  [SUMMARY="${SUMMARY}
+  Sanitizers:              address, undefined, leak"],
+  [AS_IF([test "${with_thread_sanitizer+set}" = set],
+    [SUMMARY="${SUMMARY}
+  Sanitizers:              thread"],
+    [AS_IF([test "${with_memory_sanitizer+set}" = set],
+      [SUMMARY="${SUMMARY}
+  Sanitizers:              memory"],
+      [AS_IF([test "${with_macos_memory_sanitizer+set}" = set],
+        [SUMMARY="${SUMMARY}
+  Sanitizers:              macOS memory"],
+        [SUMMARY="${SUMMARY}
+  Sanitizers:              none"])])])])
+
+AS_IF([test "x${enable_code_coverage}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  Code coverage:           enabled"],
+  [SUMMARY="${SUMMARY}
+  Code coverage:           disabled"])
+
+AS_IF([test "${with_lto_and_gold_linker+set}" = set],
+  [SUMMARY="${SUMMARY}
+  LTO + Gold linker:       enabled"],
+  [SUMMARY="${SUMMARY}
+  LTO + Gold linker:       disabled"])
+
+AS_IF([test "x${DPDK_TARGET}" = "xdpdk"],
+  [SUMMARY="${SUMMARY}
+  DPDK support:            enabled"],
+  [SUMMARY="${SUMMARY}
+  DPDK support:            disabled"])
+
+AS_IF([test "x${GPROF_ENABLED}" = "x1"],
+  [SUMMARY="${SUMMARY}
+  gperftools profiling:    enabled"],
+  [SUMMARY="${SUMMARY}
+  gperftools profiling:    disabled"])
+
+SUMMARY="${SUMMARY}
+
+Core Features:"
+
+AS_IF([test "x${PCRE2_ENABLED}" = "x1"],
+  [SUMMARY="${SUMMARY}
+  PCRE2:                   enabled"],
+  [SUMMARY="${SUMMARY}
+  PCRE2:                   disabled"])
+
+AS_IF([test "x${NBPF_ENABLED}" = "x1"],
+  [SUMMARY="${SUMMARY}
+  nBPF:                    enabled (${NBPF_HOME})"],
+  [SUMMARY="${SUMMARY}
+  nBPF:                    disabled"])
+
+AS_IF([test "x${USE_HOST_LIBGCRYPT}" = "x1"],
+  [SUMMARY="${SUMMARY}
+  Crypto library:          external libgcrypt"],
+  [SUMMARY="${SUMMARY}
+  Crypto library:          built-in gcrypt-light"])
+
+AS_IF([test "x${GLOBAL_CONTEXT_ENABLED}" = "x1"],
+  [SUMMARY="${SUMMARY}
+  Global context:          enabled (with pthread)"],
+  [SUMMARY="${SUMMARY}
+  Global context:          disabled"])
+
+AS_IF([test "x${enable_tls_sigs}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  TLS signatures:          enabled"],
+  [SUMMARY="${SUMMARY}
+  TLS signatures:          disabled"])
+
+AS_IF([test "x${enable_oldcroaring}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  CRoaring version:        legacy (forced)"],
+  [AS_IF([test "x${NDPI_CFLAGS}" = "x${NDPI_CFLAGS/USE_OLD_ROARING/}"],
+    [SUMMARY="${SUMMARY}
+  CRoaring version:        v4 (C11 atomics)"],
+    [SUMMARY="${SUMMARY}
+  CRoaring version:        legacy (autodetected)"])])
+
+AS_IF([test "x${CUSTOM_NDPI}" = "x-DCUSTOM_NDPI_PROTOCOLS"],
+  [SUMMARY="${SUMMARY}
+  Custom protocols:        yes (../nDPI-custom)"],
+  [SUMMARY="${SUMMARY}
+  Custom protocols:        no"])
+
+SUMMARY="${SUMMARY}
+
+Optional Dependencies:"
+
+AS_IF([test "x${ac_cv_lib_maxminddb_MMDB_lookup_sockaddr}" = "xyes" -a "x${ac_cv_header_maxminddb_h}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  MaxMindDB (GeoIP):       yes"],
+  [SUMMARY="${SUMMARY}
+  MaxMindDB (GeoIP):       no"])
+
+AS_IF([test "x${ac_cv_lib_json_c_json_object_put}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  JSON-C:                  yes"],
+  [SUMMARY="${SUMMARY}
+  JSON-C:                  no"])
+
+AS_IF([test "x${ac_cv_lib_rrd_rrd_fetch_r}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  RRDtool:                 yes"],
+  [SUMMARY="${SUMMARY}
+  RRDtool:                 no"])
+
+AS_IF([test "x${LIBNUMA}" = "x-lnuma"],
+  [SUMMARY="${SUMMARY}
+  libnuma:                 yes"],
+  [SUMMARY="${SUMMARY}
+  libnuma:                 no"])
+
+SUMMARY="${SUMMARY}
+
+Build Targets:"
+
+AS_IF([test "x${EXTRA_TARGETS}" = "x"],
+  [SUMMARY="${SUMMARY}
+  Library only:            yes
+  Application examples:    no"],
+  [SUMMARY="${SUMMARY}
+  Library only:            no
+  Application examples:    yes"])
+
+AS_IF([test "x${build_unittests}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  Unit tests:              yes"],
+  [SUMMARY="${SUMMARY}
+  Unit tests:              no"])
+
+AS_IF([test "x${enable_fuzztargets}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  Fuzz targets:            yes"],
+  [SUMMARY="${SUMMARY}
+  Fuzz targets:            no"])
+
+SUMMARY="${SUMMARY}
+
+Compiler Flags:
+  CFLAGS:                  ${CFLAGS}
+  NDPI_CFLAGS:             ${NDPI_CFLAGS}
+  LDFLAGS:                 ${LDFLAGS}
+  NDPI_LDFLAGS:            ${NDPI_LDFLAGS}
+  Additional libs:         ${ADDITIONAL_LIBS}
+
+========================================================================
+Configuration complete. Now run 'make' to build nDPI.
+========================================================================"
+
+AC_MSG_NOTICE([${SUMMARY}])
