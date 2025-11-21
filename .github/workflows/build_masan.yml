@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-22.04 # TODO: some issues with masan/clang/ubuntu-24.04
     env:
       CC: clang
-      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS
       # Idea to have significant faster tests while pushing/merging: test all pcaps only on schedule runs; otherwise tests only the pcaps updated/added recently
       NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS: ${{ (github.event_name == 'schedule') && '0' || '1' }}
     steps:

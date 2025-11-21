@@ -14,7 +14,7 @@ jobs:
     name: Python Bindings (ubuntu-latest)
     runs-on: ubuntu-latest
     env:
-      CFLAGS: -Wextra -Werror
+      CFLAGS: -Werror
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,11 +68,11 @@ jobs:
           git diff-index --quiet HEAD -- || true
 
   test:
-    name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }} ${{matrix.global_context}}
+    name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.cflags }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }} ${{matrix.global_context}}
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
-      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS ${{ matrix.cflags }}
     strategy:
       fail-fast: true
       matrix:
@@ -84,6 +84,7 @@ jobs:
         msan: [""]
         nBPF: [""]
         global_context: [""] # Enable by default
+        cflags: ["-g -O2"] # Default value if you do not specify CFLAGS variable
         include:
           - compiler: "gcc-4.9" # "Oldest" gcc easily available. To simulate RHEL7
             os: ubuntu-22.04
@@ -91,24 +92,28 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
+            cflags: "-O0"
           - compiler: "gcc-14" # "Newest" gcc easily available
             os: ubuntu-24.04
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
+            cflags: "-O1"
           - compiler: "clang-12" # "Oldest" clang easily available
             os: ubuntu-22.04
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
+            cflags: "-Os"
           - compiler: "clang-18" # "Newest" clang easily available. See also below...
             os: ubuntu-24.04
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
             nBPF: ""
+            cflags: "-O3"
           - compiler: "cc"
             os: ubuntu-latest
             pcre: "--with-pcre2"
@@ -241,7 +246,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       CC: ${{ matrix.compiler }}
-      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS
     strategy:
       fail-fast: true
       matrix:
@@ -277,7 +282,7 @@ jobs:
     name: ${{ matrix.os }} (msys2)
     runs-on: ${{ matrix.os }}
     env:
-      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
     strategy:
       fail-fast: true
       matrix:
@@ -311,7 +316,7 @@ jobs:
     name: Out-of-tree builds
     runs-on: ubuntu-latest
     env:
-      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
     steps:
       - uses: actions/checkout@v4
         with:

@@ -28,6 +28,11 @@ for line in $(nm -P -u "${NDPI_LIB}"); do
                     'printf'|'fprintf') SKIP=1 ;;
                 esac
             ;;
+            '[ndpi_analyze.o]'|'[ndpi_cache.o]'|'[ndpi_config.o]')
+                case "${FOUND_SYMBOL}" in
+                    'fprintf') SKIP=1 ;;
+                esac
+            ;;
             '[ahocorasick.o]')
                 case "${FOUND_SYMBOL}" in
                     'fprintf') SKIP=1 ;;

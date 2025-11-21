@@ -54,7 +54,7 @@ endif
 
 AM_CFLAGS+=-pthread
 
-all: ndpiReader$(EXE_SUFFIX) @DPDK_TARGET@
+all: ndpiReader$(EXE_SUFFIX) ndpiSimpleIntegration$(EXE_SUFFIX) @DPDK_TARGET@
 
 EXECUTABLE_SOURCES := ndpiReader.c ndpiSimpleIntegration.c
 COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(notdir $(wildcard $(srcdir)/*.c)))

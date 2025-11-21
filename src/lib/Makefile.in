@@ -37,7 +37,7 @@ CFLAGS_ndpi_bitmap.c := -Wno-unused-function
 CFLAGS_ndpi_bitmap64_fuse.c := -Wno-unused-function
 CFLAGS_gcrypt_light.c := -Wno-unused-function -Wno-unused-parameter
 CFLAGS_ahocorasick.c := -Wno-unused-function -Wno-unused-parameter
-CFLAGS_roaring.c := -Wno-unused-function -Wno-attributes
+CFLAGS_roaring.c := -Wno-unused-function -Wno-attributes -Wno-missing-braces -Wno-missing-field-initializers
 # Use AM_LDFLAGS for package flags, never modify user's LDFLAGS
 AM_LDFLAGS = @NDPI_LDFLAGS@
 LIBS       = @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@

@@ -5188,9 +5188,9 @@ static void ndpi_process_packet(u_char *args,
     trailer->flow_score = htons(ndpi_risk2score(flow_risk, &cli_score, &srv_score));
     trailer->flow_risk_info_len = ntohs(WIRESHARK_FLOW_RISK_INFO_SIZE);
     if(flow && flow->risk_str) {
-      strncpy(trailer->flow_risk_info, flow->risk_str, sizeof(trailer->flow_risk_info));
+      strncpy(trailer->flow_risk_info, flow->risk_str, sizeof(trailer->flow_risk_info) - 1);
+      trailer->flow_risk_info[sizeof(trailer->flow_risk_info) - 1] = '\0';
     }
-    trailer->flow_risk_info[sizeof(trailer->flow_risk_info) - 1] = '\0';
     trailer->proto.master_protocol = htons(p.proto.master_protocol), trailer->proto.app_protocol = htons(p.proto.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p.proto, trailer->name, sizeof(trailer->name));
 

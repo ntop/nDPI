@@ -112,7 +112,7 @@ jobs:
     name: Thread Sanitizer (ubuntu-latest)
     runs-on: ubuntu-latest
     env:
-      CFLAGS: -Wextra -Werror
+      CFLAGS: -Werror
     steps:
       - uses: actions/checkout@v4
         with:
@@ -137,7 +137,7 @@ jobs:
     name: Local gcrypt on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     env:
-      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS
     strategy:
       fail-fast: true
       matrix:
@@ -175,7 +175,7 @@ jobs:
     name: Local gcrypt on ${{ matrix.os }} (msys2)
     runs-on: ${{ matrix.os }}
     env:
-      CFLAGS: -Wextra -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS
     strategy:
       fail-fast: true
       matrix:

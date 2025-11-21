@@ -178,7 +178,7 @@ static int dissect_softether_host_fqdn(struct ndpi_flow_struct *flow,
   u_int8_t const *payload = packet->payload;
   u_int16_t payload_len = packet->payload_packet_len;
   u_int32_t tuple_count;
-  size_t value_siz, hostname_len, fqdn_len;
+  size_t value_siz, hostname_len = 0, fqdn_len;
   struct softether_value val1, val2;
   uint8_t got_hostname = 0, got_fqdn = 0;
   const char *hostname_ptr = NULL, *fqdn_ptr = NULL;
