@@ -36,7 +36,7 @@ struct kcp_header {
   uint32_t serial_number;
   uint32_t unacknowledged_serial_number;
   uint32_t length;
-  uint8_t data[0];
+  uint8_t data[];
 } PACK_OFF;
 
 enum kcp_commands {

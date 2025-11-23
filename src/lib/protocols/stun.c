@@ -1069,8 +1069,8 @@ static int stun_telegram_search_again(struct ndpi_detection_module_struct *ndpi_
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *orig_payload;
   u_int16_t orig_payload_length;
-  char pattern[12] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+  u_char pattern[12] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
   u_int16_t length;
 
   NDPI_LOG_DBG2(ndpi_struct, "[T] Packet counter %d protos %d/%d Monitoring? %d\n",

@@ -41,7 +41,7 @@ struct thrift_strict_hdr {
   uint8_t unused_byte_pad;
   uint8_t message_type;
   uint32_t method_length;
-  char method[0];
+  char method[];
 } PACK_OFF;
 
 // TCompactProtocol
@@ -59,7 +59,7 @@ struct thrift_compact_hdr {
 #endif
   uint8_t sequence_id[3];
   uint8_t method_length;
-  char method[0];
+  char method[];
 } PACK_OFF;
 
 enum thrift_message_type {

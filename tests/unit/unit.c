@@ -139,7 +139,7 @@ int serializerUnitTest() {
       j = json_tokener_parse_verbose(buffer, &jerr);
       if (j == NULL) {
         printf("%s: ERROR (json validation failed: `%s')\n",
-               __FUNCTION__, json_tokener_error_desc(jerr));
+               __func__, json_tokener_error_desc(jerr));
         return -1;
       } else {
         /* Validation ok */
@@ -195,7 +195,7 @@ int serializerUnitTest() {
             }
 	    break;
           default:
-            printf("%s: ERROR Unsupported TLV key type %u (value type %u)\n", __FUNCTION__, kt, et);
+            printf("%s: ERROR Unsupported TLV key type %u (value type %u)\n", __func__, kt, et);
 	    return -1;
 	  }
 
@@ -232,7 +232,7 @@ int serializerUnitTest() {
 
           default:
 	    if (verbose) printf("\n");
-            printf("%s: ERROR Unsupported TLV value type %u (key type %u)\n", __FUNCTION__, et, kt);
+            printf("%s: ERROR Unsupported TLV value type %u (key type %u)\n", __func__, et, kt);
 	    return -1;
 	  }
 	}
@@ -256,7 +256,7 @@ int serializerUnitTest() {
     ndpi_term_serializer(&serializer);
   }
 
-  printf("%30s                      OK\n", __FUNCTION__);
+  printf("%30s                      OK\n", __func__);
   return 0;
 }
 
@@ -316,8 +316,8 @@ int serializeProtoUnitTest(void)
 
       if (strncmp(buffer, expected_json_str, buffer_len) != 0)
       {
-        printf("%s: ERROR: expected JSON str: \"%s\"\n", __FUNCTION__, expected_json_str);
-        printf("%s: ERROR: got JSON str.....: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
+        printf("%s: ERROR: expected JSON str: \"%s\"\n", __func__, expected_json_str);
+        printf("%s: ERROR: got JSON str.....: \"%.*s\"\n", __func__, (int)buffer_len, buffer);
         return -1;
       }
 #endif
@@ -330,7 +330,7 @@ int serializeProtoUnitTest(void)
       json_object * const j = json_tokener_parse_verbose(buffer, &jerr);
       if (j == NULL) {
         printf("%s: ERROR (json validation failed: `%s')\n",
-               __FUNCTION__, json_tokener_error_desc(jerr));
+               __func__, json_tokener_error_desc(jerr));
         return -1;
       } else {
         /* Validation ok */
@@ -346,8 +346,8 @@ int serializeProtoUnitTest(void)
         printf("%s\n", buffer);
       if (strncmp(buffer, expected_csv_hdr_str, buffer_len) != 0)
       {
-        printf("%s: ERROR: expected CSV str: \"%s\"\n", __FUNCTION__, expected_csv_hdr_str);
-        printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
+        printf("%s: ERROR: expected CSV str: \"%s\"\n", __func__, expected_csv_hdr_str);
+        printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __func__, (int)buffer_len, buffer);
       }
 
       char const * const expected_csv_buf_str = "Self-signed Cert,High,300,270,30,Obsolete TLS (v1.1 or older),High,310,275,35,Weak TLS Cipher,High,150,135,15,Malformed Packet,Low,160,80,80,DPI,TLS.Facebook,91.119,Facebook,119,1,Fun,6,SocialNetwork,340282346638528859811704183484516925440.000000,680564693277057719623408366969033850880.000000";
@@ -358,15 +358,15 @@ int serializeProtoUnitTest(void)
           printf("%s\n", buffer);
       if (strncmp(buffer, expected_csv_buf_str, buffer_len) != 0)
       {
-        printf("%s: ERROR: expected CSV str: \"%s\"\n", __FUNCTION__, expected_csv_buf_str);
-        printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __FUNCTION__, (int)buffer_len, buffer);
+        printf("%s: ERROR: expected CSV str: \"%s\"\n", __func__, expected_csv_buf_str);
+        printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __func__, (int)buffer_len, buffer);
       }
     }
 
     ndpi_term_serializer(&serializer);
   }
 
-  printf("%30s                      OK\n", __FUNCTION__);
+  printf("%30s                      OK\n", __func__);
 
   return 0;
 }

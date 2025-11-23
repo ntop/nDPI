@@ -142,8 +142,9 @@ static void ndpi_search_ethereum(struct ndpi_detection_module_struct *ndpi_struc
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   if(packet->tcp)
-    return ndpi_search_ethereum_tcp(ndpi_struct, flow);
-  return ndpi_search_ethereum_udp(ndpi_struct, flow);
+    ndpi_search_ethereum_tcp(ndpi_struct, flow);
+  else
+    ndpi_search_ethereum_udp(ndpi_struct, flow);
 }
 
 

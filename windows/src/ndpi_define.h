@@ -87,7 +87,7 @@
 
 #define MAX_DEFAULT_PORTS                                        5
 
-#define NDPI_EXCLUDE_DISSECTOR(mod,flow) exclude_dissector(mod, flow, mod->current_dissector_idx, __FILE__, __FUNCTION__, __LINE__)
+#define NDPI_EXCLUDE_DISSECTOR(mod,flow) exclude_dissector(mod, flow, mod->current_dissector_idx, __FILE__, __func__, __LINE__)
 
 /**
  * macro for getting the string len of a static string

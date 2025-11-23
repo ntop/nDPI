@@ -1012,7 +1012,7 @@ static void ndpi_check_http_server(struct ndpi_detection_module_struct *ndpi_str
 	      && (ndpi_isdigit(server[i]) || (server[i] == '.')); i++)
 	  buf[j++] = server[i];
 
-	if(sscanf(buf, "%d.%d.%d", &a, &b, &c) == 3) {
+	if(sscanf(buf, "%u.%u.%u", &a, &b, &c) == 3) {
 	  u_int32_t version = (a * 1000000) + (b * 1000) + c;
 	  char msg[64];
 
@@ -1903,7 +1903,7 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
     reset(ndpi_struct, flow);
     flow->l4.tcp.http_stage = 0;
-    return ndpi_check_http_tcp(ndpi_struct, flow);
+    ndpi_check_http_tcp(ndpi_struct, flow);
   }
 }
 
