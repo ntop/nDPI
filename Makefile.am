@@ -48,9 +48,14 @@ coverage: all
 	genhtml -o coverage_report/ndpi_coverage_report lcov.info
 
 clean-coverage:
-	rm -f lcov.info
+	$(RM) lcov.info
 	find . -type f -name "*.gcda" -exec rm "{}" +
 	find . -type f -name "*.gcno" -exec rm "{}" +
+
+distclean-local:
+	$(RM) -r autom4te.cache
+	$(RM) libtool config.status config.cache config.log
+	$(RM) src/include/stamp-h1
 
 pull:
 	cd $(top_srcdir) && git pull --rebase

@@ -15,3 +15,9 @@ hosts2domains: $(srcdir)/hosts2domains.c Makefile
 
 print_rank: $(srcdir)/print_rank.c Makefile
 	$(CC) $(INC) -g $(srcdir)/print_rank.c -o print_rank $(LIBS)
+
+clean:
+	$(RM) hosts2domains print_rank *.o
+
+distclean: clean
+	$(RM) Makefile

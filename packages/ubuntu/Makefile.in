@@ -2,7 +2,7 @@ NDPI_HOME=$(PWD)/../..
 NDPI_BUILD="$(realpath ${NDPI_HOME}/packages/ubuntu)"
 
 ndpi:
-	\rm -rf ./debian/ndpi-tmp ./debian/ndpi-dev-tmp ./debian/ndpi ./debian/ndpi-dev
+	$(RM) -r ./debian/ndpi-tmp ./debian/ndpi-dev-tmp ./debian/ndpi ./debian/ndpi-dev
 	mkdir -p ./debian/ndpi-tmp ./debian/ndpi-dev-tmp
 	mkdir -p  ./debian/ndpi-tmp/usr/lib ./debian/ndpi-tmp/usr/bin ./debian/ndpi-tmp/usr/share/ndpi
 	mkdir -p ./debian/ndpi-dev-tmp/usr/lib ./debian/ndpi-dev-tmp/usr/include/ndpi ./debian/ndpi-dev-tmp/usr/lib/pkgconfig
@@ -15,13 +15,13 @@ ndpi:
 	cp $(NDPI_HOME)/example/ndpiReader ./debian/ndpi-tmp/usr/bin/
 	cp $(NDPI_HOME)/src/include/*.h ./debian/ndpi-dev-tmp/usr/include/ndpi/
 	cp $(NDPI_HOME)/libndpi.pc ./debian/ndpi-dev-tmp/usr/lib/pkgconfig/
-	-rm -fr ./debian/ndpi-dev-tmp/usr/include/ndpi/ndpi_win32.h*
+	-$(RM) -r ./debian/ndpi-dev-tmp/usr/include/ndpi/ndpi_win32.h*
 	@echo
-	@find ./debian/ndpi-tmp -name "*~" -exec /bin/rm {} ';'
-	@find ./debian/ndpi-dev-tmp -name "*~" -exec /bin/rm {} ';'
+	@find ./debian/ndpi-tmp -name "*~" -exec rm {} ';'
+	@find ./debian/ndpi-dev-tmp -name "*~" -exec rm {} ';'
 	dpkg-buildpackage -rfakeroot -d -us -uc
 	@SIGN_CMD@ --sign builder -k D1EB60BE ../ndpi*deb
-	@\rm -f ../ndpi*dsc ../ndpi*.gz ../ndpi*changes
+	@$(RM) ../ndpi*dsc ../ndpi*.gz ../ndpi*changes
 	@/bin/mv ../ndpi*deb .
 	@echo
 	@echo "Package built."
@@ -41,4 +41,4 @@ install:
 
 clean:
 	-cd ${NDPI_HOME} && $(MAKE) clean
-	-rm -rf *~ *deb ./usr ./debian/ndpi ./debian/ndpi-dev ./debian/ndpi ./debian/ndpi-dev
+	-$(RM) -r *~ *deb ./usr ./debian/ndpi ./debian/ndpi-dev ./debian/ndpi ./debian/ndpi-dev

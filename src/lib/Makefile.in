@@ -94,8 +94,9 @@ $(NDPI_LIB_SHARED): $(OBJECTS)
 	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(CFLAGS_$(notdir $<)) -c $< -o $@
 
 clean:
-	/bin/rm -f $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED) $(OBJECTS) *.o *.so *.so.* *.lo *.dll
-	/bin/rm -f $(NDPI_LIB_SHARED_BASE) $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
+	$(RM) $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED) $(OBJECTS) *.o *.so *.so.* *.lo *.dll *.la
+	$(RM) $(NDPI_LIB_SHARED_BASE) $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
+	$(RM) -r .libs .deps
 
 distdir:
 	find $(srcdir) -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'
@@ -108,7 +109,7 @@ distdir:
 		-o -name '*.h' | xargs -I'{}' cp '{}' '$(distdir)/{}'
 
 distclean: clean
-	/bin/rm -f Makefile
+	$(RM) Makefile
 
 check:
 	true # nothing to do here

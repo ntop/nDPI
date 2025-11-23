@@ -38,9 +38,9 @@ dga_evaluate$(EXE_SUFFIX): $(LIBNDPI) dga_evaluate.o
 	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
 
 clean:
-	/bin/rm -f *.o dga_evaluate$(EXE_SUFFIX)
-	/bin/rm -f .*.o.cmd .*.o.d
-	/bin/rm -rf build
+	$(RM) *.o *.lo dga_evaluate$(EXE_SUFFIX)
+	$(RM) .*.o.cmd .*.o.d
+	$(RM) -r build .libs .deps
 
 install:
 	echo ""
@@ -48,7 +48,7 @@ install:
 distdir:
 
 distclean: clean
-	/bin/rm -f Makefile
+	$(RM) Makefile
 
 check:
 	true # nothing to do here, done by invoking tests/do-dga.sh

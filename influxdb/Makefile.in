@@ -22,10 +22,11 @@ metric_anomaly: $(srcdir)/metric_anomaly.c Makefile $(LIBDPI) $(GEN_HEADERS)
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(INC) $(AM_LDFLAGS) $(LDFLAGS) $(srcdir)/metric_anomaly.c -o metric_anomaly $(LIB)
 
 clean:
-	/bin/rm -f *.o $(TOOLS) *~
+	$(RM) *.o *.lo $(TOOLS) *~
+	$(RM) -r .libs .deps
 
 distclean: clean
-	/bin/rm -f Makefile
+	$(RM) Makefile
 
 distdir:
 	find $(srcdir) -type f -name '*.c' \

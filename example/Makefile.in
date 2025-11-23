@@ -91,10 +91,10 @@ cppcheck:
 	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I$(SRCHOME)/include $(srcdir)/*.c
 
 clean:
-	/bin/rm -f *.o ndpiReader ndpiSimpleIntegration ndpiReader$(EXE_SUFFIX) ndpiSimpleIntegration$(EXE_SUFFIX) ndpiReader.dpdk libndpiReader.a
-	/bin/rm -f .*.dpdk.cmd .*.o.cmd *.dpdk.map .*.o.d
-	/bin/rm -f _install _postbuild _postinstall _preinstall
-	/bin/rm -rf build
+	$(RM) *.o *.lo ndpiReader ndpiSimpleIntegration ndpiReader$(EXE_SUFFIX) ndpiSimpleIntegration$(EXE_SUFFIX) ndpiReader.dpdk libndpiReader.a
+	$(RM) .*.dpdk.cmd .*.o.cmd *.dpdk.map .*.o.d
+	$(RM) _install _postbuild _postinstall _preinstall
+	$(RM) -r build .libs .deps
 
 distdir:
 	cp $(srcdir)/README.DPDK '$(distdir)/'
@@ -106,5 +106,5 @@ distdir:
 		-o -name '*.csv' | xargs -I'{}' cp '{}' '$(distdir)/{}'
 
 distclean: clean
-	/bin/rm -f Makefile.dpdk
-	/bin/rm -f Makefile
+	$(RM) Makefile.dpdk
+	$(RM) Makefile

@@ -530,15 +530,6 @@ NDPI_ABS_SRCDIR="`cd ${srcdir} && pwd`"
 AC_DEFINE_UNQUOTED(NDPI_BASE_DIR, "${NDPI_ABS_SRCDIR}", [nDPI base directory])
 AC_SUBST(NDPI_BASE_DIR, "${NDPI_ABS_SRCDIR}")
 
-dnl> Curl
-dnl> AC_CHECK_LIB([curl], [curl_easy_perform])
-dnl> if test ${ac_cv_lib_curl_curl_easy_perform} = "no"; then
-dnl>    echo "Please install libcurl4-openssl-dev (http://curl.haxx.se/) in order to enable curl support"
-dnl> else
-dnl>   ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lcurl"
-dnl>   AC_DEFINE_UNQUOTED(HAVE_CURL, 1, [curl is present])
-dnl> fi
-
 dnl> ndpiReader has some hard-coded unit tests: in the out-of-tree builds we need some configuration files in the expected path
 if test "${srcdir}" != . ; then :
   $MKDIR_P example

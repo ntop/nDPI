@@ -62,9 +62,9 @@ unit$(EXE_SUFFIX): $(LIBNDPI) unit.o
 	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
 
 clean:
-	/bin/rm -f *.o unit$(EXE_SUFFIX)
-	/bin/rm -f .*.o.cmd .*.o.d
-	/bin/rm -rf build
+	$(RM) *.o *.lo unit$(EXE_SUFFIX)
+	$(RM) .*.o.cmd .*.o.d
+	$(RM) -r build .libs .deps
 
 install:
 	echo ""
@@ -72,7 +72,7 @@ install:
 distdir:
 
 distclean: clean
-	/bin/rm -f Makefile
+	$(RM) Makefile
 
 check:
 	true # nothing to do here, done by invoking tests/do-unit.sh

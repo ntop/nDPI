@@ -61,6 +61,13 @@ blacklist-ip.txt:
 	wget http://blacklists.ntop.org/blacklist-ip.txt
 
 clean:
-	/bin/rm -f *zip top-1m.csv blacklist-ip.txt
+	$(RM) $(TOOLS) $(TESTS) *.o *.lo
+	$(RM) *zip top-1m.csv blacklist-ip.txt
+	$(RM) -r .libs .deps
 
+distclean: clean
+	$(RM) Makefile
+
+check:
+	true # nothing to do here, tests run via make all
 

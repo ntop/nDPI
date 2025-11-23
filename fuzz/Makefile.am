@@ -405,11 +405,18 @@ fuzz_process_packet.dict: $(srcdir)/dictionary.dict
 fuzz_tls_certificate.dict: $(srcdir)/dictionary_tls_certificate.dict
 	@cp $(srcdir)/dictionary_tls_certificate.dict $@
 
-clean:
-	rm -f *.o $(bin_PROGRAMS) ../example/fuzz_*.o ../src/lib/third_party/src/fuzz_*.o ../src/lib/third_party/src/fuzz/fuzz_*.o
-	rm -f testpcaps.zip
-	rm -f *_seed_corpus.zip
-	rm -f fuzz*.dict
+clean-local:
+	$(RM) *.o $(bin_PROGRAMS)
+	$(RM) $(top_builddir)/example/fuzz_*.o
+	$(RM) $(top_builddir)/src/lib/third_party/src/fuzz_*.o
+	$(RM) $(top_builddir)/src/lib/third_party/src/fuzz/fuzz_*.o
+	$(RM) testpcaps.zip
+	$(RM) *_seed_corpus.zip
+	$(RM) fuzz*.dict
+	$(RM) -r .libs .deps
+
+distclean-local:
+	$(RM) Makefile
 
 distdir:
 	find $(srcdir) -type d | xargs -I'{}' mkdir -p '$(distdir)/{}'

@@ -211,7 +211,7 @@ run_single_pcap()
         if [ $FORCE_PARALLEL_UTESTS -eq 0 ]; then
             printf "%-48s\tOK\n" "$f"
         fi
-        /bin/rm -f /tmp/reader.$$.out
+        rm -f /tmp/reader.$$.out
         return 0
     else
         if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
@@ -229,7 +229,7 @@ run_single_pcap()
         fi
     fi
 
-    /bin/rm -f /tmp/reader.$$.out
+    rm -f /tmp/reader.$$.out
 
     return 1
 }

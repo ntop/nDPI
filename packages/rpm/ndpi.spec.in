@@ -73,8 +73,8 @@ rm -rf $RPM_BUILD_ROOT/usr/sbin/ndpi
 rm -f $RPM_BUILD_ROOT/usr/bin/ndpiSimpleIntegration
 strip $RPM_BUILD_ROOT%{bindir}/*
 rm -fr %{buildroot}%{includedir}/ndpi_win32.h
-if test -f $RPM_BUILD_ROOT/usr/lib/pkgconfig/libndpi.pc; then /bin/rm -f $RPM_BUILD_ROOT/usr/lib/pkgconfig/libndpi.pc; fi
-if test -f $RPM_BUILD_ROOT/usr/lib64/pkgconfig/libndpi.pc; then /bin/rm -f $RPM_BUILD_ROOT/usr/lib64/pkgconfig/libndpi.pc; fi
+if test -f $RPM_BUILD_ROOT/usr/lib/pkgconfig/libndpi.pc; then rm -f $RPM_BUILD_ROOT/usr/lib/pkgconfig/libndpi.pc; fi
+if test -f $RPM_BUILD_ROOT/usr/lib64/pkgconfig/libndpi.pc; then rm -f $RPM_BUILD_ROOT/usr/lib64/pkgconfig/libndpi.pc; fi
 
 %clean
 rm -fr $RPM_BUILD_ROOT

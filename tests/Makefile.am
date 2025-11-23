@@ -11,3 +11,6 @@ EXTRA_DIST = cfgs/*/pcap cfgs/*/result cfgs/*/*.txt performance \
 
 all:
 	@echo -n ""
+
+distclean-local:
+	$(RM) do.sh do-dga.sh do-unit.sh

@@ -50,7 +50,11 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR)/* api doxygen
+	$(RM) -r $(BUILDDIR)/* api doxygen
+
+.PHONY: distclean
+distclean: clean
+	$(RM) Doxyfile.cfg
 
 .PHONY: html
 html:

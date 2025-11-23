@@ -15,19 +15,19 @@ build-src:
 	cd ../..; ./autogen.sh; ./configure; make clean; make
 
 cleanup-rpm:
-	rm -rf $(HOME)/rpmbuild/BUILD/ndpi* $(HOME)/rpmbuild/SOURCES/ndpi*
+	$(RM) -r $(HOME)/rpmbuild/BUILD/ndpi* $(HOME)/rpmbuild/SOURCES/ndpi*
 
 build-rpm: build-src cleanup-rpm
-	-rm -rf ndpi-@PACKAGE_VERSION@
+	-$(RM) -r ndpi-@PACKAGE_VERSION@
 	mkdir -p ndpi-@PACKAGE_VERSION@/packages
 	cp ndpi.spec.in ndpi-@PACKAGE_VERSION@/packages
 	cp ../../Makefile.* ../../libtool ../../configure* ../../config.* ../../install-sh ../../autogen.sh ndpi-@PACKAGE_VERSION@
-	cp -rf ../../src ndpi-@PACKAGE_VERSION@ 
-	cp ../../CHANGELOG.md ../../COPYING ndpi-@PACKAGE_VERSION@ 
-	\rm -f ndpi-@PACKAGE_VERSION@/config.status
+	cp -rf ../../src ndpi-@PACKAGE_VERSION@
+	cp ../../CHANGELOG.md ../../COPYING ndpi-@PACKAGE_VERSION@
+	$(RM) ndpi-@PACKAGE_VERSION@/config.status
 	mkdir -p $(HOME)/rpmbuild/SOURCES
 	tar cvfz $(HOME)/rpmbuild/SOURCES/ndpi-@PACKAGE_VERSION@.tgz ndpi-@PACKAGE_VERSION@
-	@rm -f $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
+	@$(RM) $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
 	@rpmbuild -bb ./$(APPL).spec --define "buildnumber $(GIT_REVISION)"
 	@if [[ $EUID -ne 0 ]]; then @RPM_SIGN_CMD@ $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE); fi
 	@if [[ $EUID -ne 0 ]]; then @RPM_SIGN_CMD@ $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(DEV_PACKAGE); fi

@@ -25,10 +25,11 @@ rrd_similarity: $(srcdir)/rrd_similarity.c Makefile $(LIBDPI) $(GEN_HEADERS)
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(INC) $(AM_LDFLAGS) $(LDFLAGS) $(srcdir)/rrd_similarity.c -o rrd_similarity $(LIB)
 
 clean:
-	/bin/rm -f *.o $(TOOLS) *~
+	$(RM) *.o *.lo $(TOOLS) *~
+	$(RM) -r .libs .deps
 
 distclean: clean
-	/bin/rm -f Makefile
+	$(RM) Makefile
 
 distdir:
 	find $(srcdir) -type f -name '*.c' \
