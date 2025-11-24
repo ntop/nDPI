@@ -40,17 +40,17 @@ fuzz_process_packet_CFLAGS =
 fuzz_process_packet_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_process_packet_DEPENDENCIES = $(srcdir)/dictionary.dict
 
-fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c ../example/reader_util.c
+fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
 fuzz_ndpi_reader_CFLAGS = -I$(top_srcdir)/example/
 fuzz_ndpi_reader_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_ndpi_reader_DEPENDENCIES = $(srcdir)/dictionary.dict
 
-fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader_alloc_fail.c fuzz_common_code.c ../example/reader_util.c
+fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader_alloc_fail.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
 fuzz_ndpi_reader_alloc_fail_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DCRYPT_FORCE_NO_AESNI -DENABLE_FINGERPRINT_FP
 fuzz_ndpi_reader_alloc_fail_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_ndpi_reader_alloc_fail_DEPENDENCIES = $(srcdir)/dictionary.dict
 
-fuzz_ndpi_reader_payload_analyzer_SOURCES = fuzz_ndpi_reader_payload_analyzer.c fuzz_common_code.c ../example/reader_util.c
+fuzz_ndpi_reader_payload_analyzer_SOURCES = fuzz_ndpi_reader_payload_analyzer.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
 fuzz_ndpi_reader_payload_analyzer_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DENABLE_PAYLOAD_ANALYZER
 fuzz_ndpi_reader_payload_analyzer_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_ndpi_reader_payload_analyzer_DEPENDENCIES = $(srcdir)/dictionary.dict
@@ -261,36 +261,36 @@ fuzz_filecfg_category_SOURCES = fuzz_filecfg_category.c fuzz_common_code.c
 fuzz_filecfg_category_CFLAGS = -DNDPI_LIB_COMPILATION
 fuzz_filecfg_category_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_readerutils_workflow_SOURCES = fuzz_readerutils_workflow.cpp fuzz_common_code.c ../example/reader_util.c
+fuzz_readerutils_workflow_SOURCES = fuzz_readerutils_workflow.cpp fuzz_common_code.c $(top_srcdir)/example/reader_util.c
 fuzz_readerutils_workflow_CXXFLAGS = -I$(top_srcdir)/example/
 fuzz_readerutils_workflow_CFLAGS = -I$(top_srcdir)/example/
 fuzz_readerutils_workflow_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_ndpi_reader_pl7m_simplest_SOURCES = fuzz_ndpi_reader_pl7m_simplest.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_simplest_SOURCES = fuzz_ndpi_reader_pl7m_simplest.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_simplest_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR
 fuzz_ndpi_reader_pl7m_simplest_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_ndpi_reader_pl7m_simplest_internal_SOURCES = fuzz_ndpi_reader_pl7m_simplest_internal.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_simplest_internal_SOURCES = fuzz_ndpi_reader_pl7m_simplest_internal.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_simplest_internal_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
 fuzz_ndpi_reader_pl7m_simplest_internal_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_ndpi_reader_pl7m_SOURCES = fuzz_ndpi_reader_pl7m.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_SOURCES = fuzz_ndpi_reader_pl7m.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_CONFIG2
 fuzz_ndpi_reader_pl7m_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_ndpi_reader_pl7m_64k_SOURCES = fuzz_ndpi_reader_pl7m_64k.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_64k_SOURCES = fuzz_ndpi_reader_pl7m_64k.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_64k_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_64K_PACKETS
 fuzz_ndpi_reader_pl7m_64k_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_ndpi_reader_pl7m_internal_SOURCES = fuzz_ndpi_reader_pl7m_internal.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_internal_SOURCES = fuzz_ndpi_reader_pl7m_internal.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_internal_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
 fuzz_ndpi_reader_pl7m_internal_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_ndpi_reader_pl7m_only_subclassification_SOURCES = fuzz_ndpi_reader_pl7m_only_subclassification.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_only_subclassification_SOURCES = fuzz_ndpi_reader_pl7m_only_subclassification.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_only_subclassification_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_ONLY_SUBCLASSIFICATION
 fuzz_ndpi_reader_pl7m_only_subclassification_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_ndpi_reader_pl7m_randomize_ports_SOURCES = fuzz_ndpi_reader_pl7m_randomize_ports.c fuzz_common_code.c ../example/reader_util.c ../src/lib/third_party/src/fuzz/pl7m.c
+fuzz_ndpi_reader_pl7m_randomize_ports_SOURCES = fuzz_ndpi_reader_pl7m_randomize_ports.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
 fuzz_ndpi_reader_pl7m_randomize_ports_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_ENABLE_RANDOMIZE_PORTS
 fuzz_ndpi_reader_pl7m_randomize_ports_LINK = $(FUZZ_LINK_COMMAND)
 
