@@ -22,7 +22,15 @@ AM_CFLAGS=
 endif
 AM_CFLAGS+=-I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @PCAP_INC@ @GPROF_CFLAGS@ @CUSTOM_NDPI@
 AM_LDFLAGS=@NDPI_LDFLAGS@
+ENABLE_STATIC        = @enable_static@
+ifeq ($(ENABLE_STATIC),yes)
 LIBNDPI=$(top_builddir)/src/lib/libndpi.a
+LIBNDPI_DEP=$(LIBNDPI)
+else
+LIBNDPI=-lndpi
+LIBNDPI_DEP=$(top_builddir)/src/lib/libndpi.so
+AM_LDFLAGS+=-L$(top_builddir)/src/lib
+endif
 LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @GPROF_LIBS@ @LIBS@
 HEADERS=reader_util.h $(SRCHOME)/include/ndpi_api.h \
         $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
@@ -59,7 +67,7 @@ all: ndpiReader$(EXE_SUFFIX) ndpiSimpleIntegration$(EXE_SUFFIX) @DPDK_TARGET@
 EXECUTABLE_SOURCES := ndpiReader.c ndpiSimpleIntegration.c
 COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(notdir $(wildcard $(srcdir)/*.c)))
 
-ndpiReader$(EXE_SUFFIX): $(COMMON_SOURCES:%.c=%.o) ndpiReader.o $(LIBNDPI)
+ndpiReader$(EXE_SUFFIX): $(COMMON_SOURCES:%.c=%.o) ndpiReader.o $(LIBNDPI_DEP)
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) ndpiReader.o $(COMMON_SOURCES:%.c=%.o) $(LIBS) -o $@
 
 ndpiSimpleIntegration$(EXE_SUFFIX): ndpiSimpleIntegration.o

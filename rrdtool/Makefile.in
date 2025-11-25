@@ -9,8 +9,16 @@ LDFLAGS=@LDFLAGS@
 CFLAGS=@CFLAGS@
 AM_CFLAGS=@NDPI_CFLAGS@
 INC=-I $(top_srcdir)/src/include -I $(top_builddir)/src/include -I/usr/local/include
-LIBDPI=$(top_builddir)/src/lib/libndpi.a
 AM_LDFLAGS=@NDPI_LDFLAGS@
+ENABLE_STATIC        = @enable_static@
+ifeq ($(ENABLE_STATIC),yes)
+LIBDPI=$(top_builddir)/src/lib/libndpi.a
+LIBDPI_DEP=$(LIBDPI)
+else
+LIBDPI=-lndpi
+LIBDPI_DEP=$(top_builddir)/src/lib/libndpi.so
+AM_LDFLAGS+=-L$(top_builddir)/src/lib
+endif
 LIB=$(LIBDPI) @ADDITIONAL_LIBS@ @LIBRRD@ @LIBS@ -lm -lpthread
 GEN_HEADERS=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 
@@ -18,10 +26,10 @@ TOOLS=rrd_anomaly rrd_similarity
 
 all: $(TOOLS)
 
-rrd_anomaly: $(srcdir)/rrd_anomaly.c Makefile $(LIBDPI) $(GEN_HEADERS)
+rrd_anomaly: $(srcdir)/rrd_anomaly.c Makefile $(LIBDPI_DEP) $(GEN_HEADERS)
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(INC) $(AM_LDFLAGS) $(LDFLAGS) $(srcdir)/rrd_anomaly.c -o rrd_anomaly $(LIB)
 
-rrd_similarity: $(srcdir)/rrd_similarity.c Makefile $(LIBDPI) $(GEN_HEADERS)
+rrd_similarity: $(srcdir)/rrd_similarity.c Makefile $(LIBDPI_DEP) $(GEN_HEADERS)
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(INC) $(AM_LDFLAGS) $(LDFLAGS) $(srcdir)/rrd_similarity.c -o rrd_similarity $(LIB)
 
 clean:

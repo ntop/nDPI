@@ -18,9 +18,17 @@ else
 AM_CFLAGS=
 endif
 AM_CFLAGS+=-I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@
-LIBNDPI=$(top_builddir)/src/lib/libndpi.a
-LIBS=$(LIBNDPI) @ADDITIONAL_LIBS@ @LIBS@ -lpthread
 AM_LDFLAGS=@NDPI_LDFLAGS@
+ENABLE_STATIC        = @enable_static@
+ifeq ($(ENABLE_STATIC),yes)
+LIBNDPI=$(top_builddir)/src/lib/libndpi.a
+LIBNDPI_DEP=$(LIBNDPI)
+else
+LIBNDPI=-lndpi
+LIBNDPI_DEP=$(top_builddir)/src/lib/libndpi.so
+AM_LDFLAGS+=-L$(top_builddir)/src/lib
+endif
+LIBS=$(LIBNDPI) @ADDITIONAL_LIBS@ @LIBS@ -lpthread
 HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 OBJS=dga_evaluate
@@ -31,7 +39,7 @@ all: dga_evaluate$(EXE_SUFFIX)
 EXECUTABLE_SOURCES := dga_evaluate.c
 COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
 
-dga_evaluate$(EXE_SUFFIX): $(LIBNDPI) dga_evaluate.o
+dga_evaluate$(EXE_SUFFIX): $(LIBNDPI_DEP) dga_evaluate.o
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(AM_LDFLAGS) $(LDFLAGS) dga_evaluate.o $(LIBS) -o $@
 
 %.o: %.c $(HEADERS) Makefile

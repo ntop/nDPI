@@ -19,9 +19,17 @@ else
 AM_CFLAGS=
 endif
 AM_CFLAGS+=-I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @JSONC_CFLAGS@ @PCAP_INC@ @ADDITIONAL_INCS@
-LIBNDPI=$(top_builddir)/src/lib/libndpi.a
-LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ @LIBS@
 AM_LDFLAGS=@NDPI_LDFLAGS@
+ENABLE_STATIC        = @enable_static@
+ifeq ($(ENABLE_STATIC),yes)
+LIBNDPI=$(top_builddir)/src/lib/libndpi.a
+LIBNDPI_DEP=$(LIBNDPI)
+else
+LIBNDPI=-lndpi
+LIBNDPI_DEP=$(top_builddir)/src/lib/libndpi.so
+AM_LDFLAGS+=-L$(top_builddir)/src/lib
+endif
+LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ @LIBS@
 HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
 HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 OBJS=unit
@@ -55,7 +63,7 @@ all: unit$(EXE_SUFFIX)
 EXECUTABLE_SOURCES := unit.c
 COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
 
-unit$(EXE_SUFFIX): $(LIBNDPI) unit.o
+unit$(EXE_SUFFIX): $(LIBNDPI_DEP) unit.o
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(AM_LDFLAGS) $(LDFLAGS) unit.o $(LIBS) -o $@
 
 %.o: %.c $(HEADERS) Makefile

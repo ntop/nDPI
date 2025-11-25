@@ -49,7 +49,8 @@ NDPI_VERSION_MAJOR   = @NDPI_MAJOR@
 NDPI_LIB_STATIC      = libndpi.a
 NDPI_LIB_SHARED_BASE = libndpi.so
 NDPI_LIB_SHARED      = $(NDPI_LIB_SHARED_BASE).@NDPI_VERSION_SHORT@
-NDPI_LIBS            = $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED)
+ENABLE_SHARED        = @enable_shared@
+ENABLE_STATIC        = @enable_static@
 USE_HOST_LIBGCRYPT   = @USE_HOST_LIBGCRYPT@
 
 ifneq ($(USE_HOST_LIBGCRYPT),0)
@@ -69,6 +70,20 @@ NDPI_LIB_SHARED      = $(NDPI_LIB_SHARED_BASE)-@NDPI_VERSION_SHORT@.dll
 else
 SONAME_FLAG=-Wl,-soname,$(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
 endif
+endif
+
+# Conditionally build libraries based on configure flags
+NDPI_LIBS =
+ifeq ($(ENABLE_STATIC),yes)
+NDPI_LIBS += $(NDPI_LIB_STATIC)
+endif
+ifeq ($(ENABLE_SHARED),yes)
+NDPI_LIBS += $(NDPI_LIB_SHARED)
+endif
+
+# Sanity check: at least one library type must be enabled
+ifeq ($(NDPI_LIBS),)
+$(error Cannot build with both --disable-shared and --disable-static)
 endif
 
 all: $(NDPI_LIBS)
@@ -120,8 +135,10 @@ cppcheck:
 install: $(NDPI_LIBS)
 	@MKDIR_P@ $(DESTDIR)@libdir@
 	cp $(NDPI_LIBS) $(DESTDIR)@libdir@/
+ifeq ($(ENABLE_SHARED),yes)
 	cp -P $(NDPI_LIB_SHARED_BASE) $(DESTDIR)@libdir@/
 	cp -P $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR) $(DESTDIR)@libdir@/
+endif
 	@MKDIR_P@ $(DESTDIR)@includedir@/ndpi
 	#Avoid installing private header
 	# Installing header files to $(DESTDIR)@includedir@/ndpi
