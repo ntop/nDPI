@@ -20,7 +20,7 @@ In other words:
 - "(current) packet metadata" is saved in ``ndpi_flow->monitor``, only if monitor is enabled.
 
 Monitoring must be explicitly enabled with something like: ``--cfg=stun,monitoring,1``.  
-To enable/disable monitoring for all protocols you can use ``--cfg=any,monitoring,1`` but only STUN is supported right now.
+To enable/disable monitoring for all protocols you can use ``--cfg=any,monitoring,1`` but only STUN and S7COMM are supported right now.
 
 Since monitoring processes *all* the flow packets, it might have an impact on performances.
 

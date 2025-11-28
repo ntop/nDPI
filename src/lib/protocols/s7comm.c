@@ -76,6 +76,9 @@ static void ndpi_parse_s7comm_message(struct ndpi_detection_module_struct *ndpi_
   if (s7comm_len < S7COMM_HEADER_MIN_LEN)
     return;
 
+  if(flow->monit == NULL)
+    flow->monit = ndpi_calloc(1, sizeof(struct ndpi_metadata_monitoring));
+
   msg_type = s7comm_header[S7COMM_HEADER_MSG_TYPE];
   param_len = get_u_int16_t(s7comm_header, S7COMM_HEADER_PARAM_LEN);
 
@@ -188,6 +191,7 @@ static void ndpi_search_s7comm(struct ndpi_detection_module_struct *ndpi_struct,
         NDPI_LOG_INFO(ndpi_struct, "found S7CommPlus\n");
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM_PLUS,
                                    NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+        /* TODO: monitoring? */
         return;
       }
     } else if (packet->payload[s7comm_offset] == S7COMM_MAGIC_BYTE) {
@@ -198,17 +202,18 @@ static void ndpi_search_s7comm(struct ndpi_detection_module_struct *ndpi_struct,
         ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_S7COMM,
                                    NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
-        /* Parse this first message for statistics */
-        ndpi_parse_s7comm_message(ndpi_struct, flow,
-                                  &packet->payload[s7comm_offset],
-                                  packet->payload_packet_len - s7comm_offset);
+        if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_S7COMM)) {
+          /* Parse this first message for statistics.
+           * It makes sense only in monitoring */
+          ndpi_parse_s7comm_message(ndpi_struct, flow,
+                                    &packet->payload[s7comm_offset],
+                                    packet->payload_packet_len - s7comm_offset);
 
-        /* Enable extra dissection to analyze all packets throughout the session */
-        flow->max_extra_packets_to_check = 1; /* Unused with MONITORING state, but required */
-        flow->extra_packets_func = ndpi_search_s7comm_again;
-        flow->state = NDPI_STATE_MONITORING; /* Continue processing indefinitely */
-
-        NDPI_LOG_DBG(ndpi_struct, "S7Comm: enabled continuous monitoring\n");
+          NDPI_LOG_DBG(ndpi_struct, "Enabled monitoring\n");
+          flow->state = NDPI_STATE_MONITORING;
+          /* No extra dissection, we move directly to monitor state */
+          flow->extra_packets_func = ndpi_search_s7comm_again;
+        }
         return;
       }
     }
