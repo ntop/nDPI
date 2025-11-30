@@ -443,7 +443,7 @@ u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct 
 
 /* ************************************************************************************* */
 
-static ndpi_port_range *ndpi_build_default_ports_range(ndpi_port_range *ports, u_int16_t portA_low, u_int16_t portA_high,
+ndpi_port_range *ndpi_build_default_ports_range(ndpi_port_range *ports, u_int16_t portA_low, u_int16_t portA_high,
                                                        u_int16_t portB_low, u_int16_t portB_high, u_int16_t portC_low,
                                                        u_int16_t portC_high, u_int16_t portD_low, u_int16_t portD_high,
                                                        u_int16_t portE_low, u_int16_t portE_high) {
@@ -668,7 +668,7 @@ static void load_default_ports(struct ndpi_detection_module_struct *ndpi_str)
 
 /* ********************************************************************************** */
 
-static int ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
+int ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
 			           u_int8_t is_cleartext, u_int8_t is_app_protocol,
 			           ndpi_protocol_breed_t breed,
 			           u_int16_t protoId, char *protoName,
@@ -4218,6 +4218,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
     return(NULL);
   }
 
+  ndpi_str->callback_buffer = ndpi_calloc(NDPI_MAX_NUM_DISSECTORS, sizeof(struct call_function_struct));
+  
   return(ndpi_str);
 }
 
@@ -5042,7 +5044,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
   if(ndpi_str != NULL) {
     unsigned int i;
 
-
+    /* Unload plugins (if any) */
+    ndpi_unload_protocol_plugins(ndpi_str);
+    
     ndpi_bitmask_free(&ndpi_str->cfg.detection_bitmask);
     ndpi_bitmask_free(&ndpi_str->cfg.debug_bitmask);
     ndpi_bitmask_free(&ndpi_str->cfg.ip_list_bitmask);
@@ -6669,7 +6673,6 @@ void register_dissector(char *dissector_name, struct ndpi_detection_module_struc
 static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
   struct call_function_struct *all_cb = NULL;
 
-  ndpi_str->callback_buffer = ndpi_calloc(NDPI_MAX_NUM_DISSECTORS, sizeof(struct call_function_struct));
   if(!ndpi_str->callback_buffer) return 1;
 
   /* HTTP */

@@ -2151,4 +2151,16 @@ typedef struct {
 
 /* **************************************** */
 
+typedef void (*nDPIPluginFctn)(struct ndpi_detection_module_struct *ndpi_struct);
+
+typedef struct ndpi_protocol_plugin {
+  u_int32_t ndpi_revision;
+  const char *protocol_name, *version, *description, *author;
+  nDPIPluginFctn initFctn;
+} NDPIProtocolPluginEntryPoint;
+
+extern NDPIProtocolPluginEntryPoint* NDPIPluginEntryFctn(void);
+
+/* **************************************** */
+
 #endif /* __NDPI_TYPEDEFS_H__ */

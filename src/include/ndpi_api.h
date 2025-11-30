@@ -352,11 +352,43 @@ extern "C" {
 					      const unsigned short packetlen,
 					      const u_int64_t packet_time_ms,
 					      struct ndpi_flow_input_info *input_info);
+
+  /**
+   * Set protocol default ports
+   *
+   */
+  ndpi_port_range *ndpi_build_default_ports(ndpi_port_range *ports, u_int16_t portA, u_int16_t portB, u_int16_t portC,
+					    u_int16_t portD, u_int16_t portE);
+    
+  /**
+   * Set protocol default
+   *
+   */
+  int ndpi_set_proto_defaults(struct ndpi_detection_module_struct *ndpi_str,
+			      u_int8_t is_cleartext, u_int8_t is_app_protocol,
+			      ndpi_protocol_breed_t breed,
+			      u_int16_t protoId, char *protoName,
+			      ndpi_protocol_category_t protoCategory,
+			      ndpi_protocol_qoe_category_t qoeCategory,
+			      ndpi_port_range *tcpDefPorts,
+			      ndpi_port_range *udpDefPorts,
+			      u_int8_t is_custom_protocol);
+  /**
+   * Dynamically load protocol plugins
+   *
+   *
+   * @par    ndpi_struct    = the detection module 
+   * @return number of loaded protocols
+   *
+   */
+  u_int ndpi_load_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struct,
+				 char *dir_path);
+
   /**
    * Get the main protocol of the passed flows for the detected module
    *
    *
-   * @par    flow         = the flow given for the detection module
+   ** @par    flow         = the flow given for the detection module
    * @return the ID of the master protocol detected
    *
    */

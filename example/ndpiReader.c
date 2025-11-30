@@ -164,7 +164,7 @@ int malloc_size_stats = 0;
 
 int monitoring_enabled;
 
-static char *protocolsDirPath;
+static char *protocolsDirPath, *pluginsDirPath;
 u_int8_t enable_doh_dot_detection = 0;
 
 struct flow_info {
@@ -589,6 +589,9 @@ static void configure_ndpi(struct ndpi_detection_module_struct *ndpi_struct) {
 
   if(addr_dump_path != NULL)
     ndpi_cache_address_restore(ndpi_struct, addr_dump_path, 0);
+
+  if(pluginsDirPath != NULL)
+    ndpi_load_protocol_plugins(ndpi_struct, pluginsDirPath); 
 }
 
 /* *********************************************** */
@@ -1003,6 +1006,7 @@ static void help(u_int long_help) {
          "  --cfg=proto,param,value    | Configure the specific attribute of this protocol\n"
          "  --dump-fpc-stats           | Print FPC statistics\n"
 	 "  --protos-dump <mode>       | Dump host-based protocolId (mode=1) and categoryId (mode=2)\n"
+	 "  --plugins-dir <dir>        | Directory from which plugins are dynamically loaded\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -1104,6 +1108,7 @@ static struct option longopts[] = {
 
   { "result-path", required_argument, NULL, 'w'},
   { "quiet", no_argument, NULL, 'q'},
+  { "plugins-dir", required_argument, NULL, 179},
   { "protocols-list-dir", required_argument, NULL, 180},
 
   { "cfg", required_argument, NULL, OPTLONG_VALUE_CFG},
@@ -1816,6 +1821,10 @@ static void parse_parameters(int argc, char **argv)
         printf("Invalid parameter [%s] [num:%d/%d]\n", optarg, num_cfgs, MAX_NUM_CFGS);
         exit(1);
       }
+      break;
+
+    case 179:
+      pluginsDirPath = optarg;
       break;
 
     case 180:
