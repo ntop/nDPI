@@ -55,12 +55,16 @@
 #define S7COMM_HEADER_PDU_REF       4  /* PDU reference (2 bytes) */
 #define S7COMM_HEADER_PARAM_LEN     6  /* Parameter length (2 bytes) */
 #define S7COMM_HEADER_DATA_LEN      8  /* Data length (2 bytes) */
+#define S7COMM_HEADER_ERR_CLASS    10  /* Error class (1 bytes); only in Ack or Ack-Data messages */
+#define S7COMM_HEADER_ERR_CODE     11  /* Error code (1 bytes); only in Ack or Ack-Data messages */
 #define S7COMM_HEADER_MIN_LEN      10  /* Minimum header length */
+#define S7COMM_HEADER_MIN_LEN_ACKS 12  /* Minimum header length (for Ack or Ack-Data messages) */
 
 /* For Ack_Data messages, there's an error code before parameters */
 #define S7COMM_ACK_DATA_ERROR_CODE  10 /* Error code (2 bytes, only in Ack_Data) */
 #define S7COMM_ACK_DATA_PARAM_START 12 /* Parameter start for Ack_Data */
 #define S7COMM_JOB_PARAM_START      10 /* Parameter start for Job */
+#define S7COMM_USERDATA_PARAM_START 10 /* Parameter start for Userdata */
 
 /* Helper function to parse S7Comm message and update statistics */
 static void ndpi_parse_s7comm_message(struct ndpi_detection_module_struct *ndpi_struct,
@@ -80,7 +84,12 @@ static void ndpi_parse_s7comm_message(struct ndpi_detection_module_struct *ndpi_
     flow->monit = ndpi_calloc(1, sizeof(struct ndpi_metadata_monitoring));
 
   msg_type = s7comm_header[S7COMM_HEADER_MSG_TYPE];
-  param_len = get_u_int16_t(s7comm_header, S7COMM_HEADER_PARAM_LEN);
+  param_len = ntohs(get_u_int16_t(s7comm_header, S7COMM_HEADER_PARAM_LEN));
+
+  /* Ack and Ack_data header is longer */
+  if((msg_type == S7COMM_MSG_ACK || msg_type == S7COMM_MSG_ACK_DATA) &&
+     s7comm_len < S7COMM_HEADER_MIN_LEN_ACKS)
+    return;
 
   NDPI_LOG_DBG2(ndpi_struct, "S7Comm msg_type=0x%02x, param_len=%u\n", msg_type, param_len);
 

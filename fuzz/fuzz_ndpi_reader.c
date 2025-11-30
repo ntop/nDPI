@@ -143,7 +143,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     assert(ndpi_set_config(workflow->ndpi_struct, "tls", "metadata.ja4r_fingerprint", "1") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, "tls", "dpi.heuristics", "0x07") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, "tls", "dpi.heuristics.max_packets_extra_dissection", "40") == NDPI_CFG_OK);
-    assert(ndpi_set_config(workflow->ndpi_struct, "stun", "monitoring", "1") == NDPI_CFG_OK);
+    assert(ndpi_set_config(workflow->ndpi_struct, "all", "monitoring", "1") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "dpi.address_cache_size", "8192") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "hostname_dns_check", "1") == NDPI_CFG_OK);
 
