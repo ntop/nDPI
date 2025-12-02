@@ -290,4 +290,7 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 /* Unused parameters can be silenced as follows */
 #define __ndpi_unused_param(x) (void)(x)
 
+/* Maximum number of plugins supported by nDPI */
+#define NDPI_MAX_NUM_PLUGINS    32
+
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */

@@ -334,6 +334,7 @@ AS_IF([test "${with_lto_and_gold_linker+set}" = set], [
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h math.h float.h])
 AC_CHECK_LIB([m], [sqrt], [], [LIBM="-lm"])
+AC_CHECK_LIB([dl], [dlopen], [LIBDL="-ldl"])
 
 GLOBAL_CONTEXT_ENABLED=0
 AS_IF([test "x$enable_global_context_support" != "xno"], [
@@ -534,7 +535,7 @@ fi
 
 dnl> Add base system libraries last (lowest-level dependencies)
 dnl> This ensures proper linking order: high-level libs -> low-level libs
-ADDITIONAL_LIBS="${ADDITIONAL_LIBS} $LIBM"
+ADDITIONAL_LIBS="${ADDITIONAL_LIBS} $LIBM $LIBDL"
 
 dnl> Use absolute source directory for NDPI_BASE_DIR
 NDPI_ABS_SRCDIR="`cd ${srcdir} && pwd`"
