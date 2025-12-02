@@ -4217,8 +4217,6 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
-
-  ndpi_str->callback_buffer = ndpi_calloc(NDPI_MAX_NUM_DISSECTORS, sizeof(struct call_function_struct));
   
   return(ndpi_str);
 }
@@ -6673,6 +6671,7 @@ void register_dissector(char *dissector_name, struct ndpi_detection_module_struc
 static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
   struct call_function_struct *all_cb = NULL;
 
+  ndpi_str->callback_buffer = ndpi_calloc(NDPI_MAX_NUM_DISSECTORS, sizeof(struct call_function_struct));
   if(!ndpi_str->callback_buffer) return 1;
 
   /* HTTP */
@@ -7450,6 +7449,8 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
 #endif
 
   /* ----------------------------------------------------------------- */
+
+  ndpi_init_protocol_plugins(ndpi_str);
 
   ndpi_str->callback_buffer_size = ndpi_str->callback_buffer_num;
 

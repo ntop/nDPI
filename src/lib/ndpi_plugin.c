@@ -43,9 +43,7 @@
 static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *plugin_path) {
   void *pluginEntryFctnPtr;
-  NDPIProtocolPluginEntryPoint* (*pluginEntryFctn)(void);
   void *pluginPtr;
-  NDPIProtocolPluginEntryPoint *pluginInfo;
 
   if(ndpi_struct->proto_plugins.num_loaded_plugins == (NDPI_MAX_NUM_PLUGINS-1)) {
 #ifdef NDPI_PLUGIN_DEBUG
@@ -58,7 +56,7 @@ static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_
   
   if(pluginPtr == NULL) {
 #ifdef NDPI_PLUGIN_DEBUG
-    printf("WARNING: unable to load plugin '%s': %s", plugin_path, dlerror());
+    printf("WARNING: unable to load plugin '%s': %s\n", plugin_path, dlerror());
 #endif
     return(false);
   }
@@ -66,28 +64,20 @@ static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_
   pluginEntryFctnPtr = (void*)dlsym(pluginPtr, "PluginEntryFctn");
   if(pluginEntryFctnPtr == NULL) {
 #ifdef NDPI_PLUGIN_DEBUG
-    printf("WARNING: unable to locate plugin entryfunction %s", plugin_path);
+    printf("WARNING: unable to locate plugin entryfunction %s\n", plugin_path);
 #endif
     return(false);
   }
 
-  pluginEntryFctn = (NDPIProtocolPluginEntryPoint*(*)(void))pluginEntryFctnPtr;
-  pluginInfo = pluginEntryFctn();
-
 #ifdef NDPI_PLUGIN_DEBUG
-  printf("Loaded plugin %s [v.%s][%s][%s]\n",
-	 pluginInfo->protocol_name,
-	 pluginInfo->version,
-	 pluginInfo->author,
-	 plugin_path);
+  printf("Loaded plugin %s\n", plugin_path);
 #endif
-  
 
-  /* Execute init function */
-  pluginInfo->initFctn(ndpi_struct);
+  /* Init function will be called later, during ndpi_finalize_initialization()
+   * [via dissectors_init()] */
   
   ndpi_struct->proto_plugins.plugin[ndpi_struct->proto_plugins.num_loaded_plugins++] = pluginPtr;
-  return(false);
+  return(true);
 }
 #endif
 
@@ -145,6 +135,45 @@ void ndpi_unload_protocol_plugins(struct ndpi_detection_module_struct *ndpi_stru
     dlclose(ndpi_struct->proto_plugins.plugin[i]);
 #else
   __ndpi_unused_param(ndpi_struct);
+#endif
+}
+
+/* ************************************** */
+
+u_int ndpi_init_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struct) {
+#if defined(WIN32) || defined(WIN64)
+  __ndpi_unused_param(ndpi_struct);
+  return(0);
+#else
+  u_int i;
+  void *pluginEntryFctnPtr;
+  NDPIProtocolPluginEntryPoint* (*pluginEntryFctn)(void);
+  NDPIProtocolPluginEntryPoint *pluginInfo;
+
+  for(i=0; i<ndpi_struct->proto_plugins.num_loaded_plugins; i++) {
+
+    pluginEntryFctnPtr = (void*)dlsym(ndpi_struct->proto_plugins.plugin[i], "PluginEntryFctn");
+    if(pluginEntryFctnPtr == NULL) {
+#ifdef NDPI_PLUGIN_DEBUG
+      printf("WARNING: unable to locate plugin entryfunction for index %d\n", i);
+#endif
+      continue;
+    }
+
+    pluginEntryFctn = (NDPIProtocolPluginEntryPoint *(*)(void))pluginEntryFctnPtr;
+    pluginInfo = pluginEntryFctn();
+
+    /* Execute init function */
+    pluginInfo->initFctn(ndpi_struct);
+
+#ifdef NDPI_PLUGIN_DEBUG
+  printf("Initialized plugin %s [v.%s][%s]\n",
+         pluginInfo->protocol_name,
+         pluginInfo->version,
+         pluginInfo->author);
+#endif
+  }
+  return(0);
 #endif
 }
 

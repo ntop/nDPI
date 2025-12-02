@@ -79,7 +79,7 @@ static void myprotoInitFctn(struct ndpi_detection_module_struct *ndpi_struct) {
                           NDPI_PROTOCOL_CATEGORY_IOT_SCADA, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
-                          0);
+                          1);
 
   register_dissector(NDPI_PROTOCOL_MYPROTO_NAME, ndpi_struct,
                      ndpi_search_myproto,

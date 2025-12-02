@@ -743,6 +743,8 @@ ndpi_protocol_breed_t get_proto_breed(struct ndpi_detection_module_struct *ndpi_
 ndpi_protocol_category_t get_proto_category(struct ndpi_detection_module_struct *ndpi_str,
                                             ndpi_master_app_protocol proto);
 
+u_int ndpi_init_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struct);
+
   /* TLS */
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow, uint32_t quic_version);
