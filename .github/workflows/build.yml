@@ -381,7 +381,7 @@ jobs:
           ./autogen.sh
       - name: Configure and build nDPI (with plugins)
         run: |
-          ../configure
+          ./configure
           make -j $(nproc) all
           make -j $(nproc) -C src/lib/plugins
           make -j $(nproc) -C example
