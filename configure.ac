@@ -343,6 +343,12 @@ AS_IF([test "x$enable_global_context_support" != "xno"], [
   GLOBAL_CONTEXT_ENABLED=1
 ])
 
+PLUGINS_ENABLED=1
+AS_IF([test "x${enable_shared}" = "xno"],[
+  AC_MSG_WARN([plugins require shared library.])
+  PLUGINS_ENABLED=0
+])
+
 ADDITIONAL_INCS="${ADDITIONAL_INCS}"
 ADDITIONAL_LIBS="${ADDITIONAL_LIBS}"
 PCAP_HOME=$HOME/PF_RING/userland
@@ -392,6 +398,7 @@ case "$host" in
    *-*-mingw32*|*-*-msys)
       PCAP_INC=""
       PCAP_LIB=""
+      PLUGINS_ENABLED=0
       case "$host" in
         x86_64-*)
           BUILD_MINGW_X64=1
@@ -583,6 +590,7 @@ AC_SUBST(USE_HOST_LIBGCRYPT)
 AC_SUBST(PCRE2_ENABLED)
 AC_SUBST(NBPF_ENABLED)
 AC_SUBST(GLOBAL_CONTEXT_ENABLED)
+AC_SUBST(PLUGINS_ENABLED)
 AC_SUBST(HANDLE_TLS_SIGS)
 AC_SUBST(DISABLE_NPCAP)
 AC_SUBST(EXE_SUFFIX)
@@ -704,6 +712,12 @@ AS_IF([test "x${GLOBAL_CONTEXT_ENABLED}" = "x1"],
   Global context:          enabled (with pthread)"],
   [SUMMARY="${SUMMARY}
   Global context:          disabled"])
+
+AS_IF([test "x${PLUGINS_ENABLED}" = "x1"],
+  [SUMMARY="${SUMMARY}
+  Plugins:                 enabled"],
+  [SUMMARY="${SUMMARY}
+  Plugins:                 disabled"])
 
 AS_IF([test "x${enable_tls_sigs}" = "xyes"],
   [SUMMARY="${SUMMARY}

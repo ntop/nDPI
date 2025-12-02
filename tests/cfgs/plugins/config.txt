@@ -1,0 +1,2 @@
+#TODO: this configuration doesn't work yet!!!!!
+--plugins-dir=../../../src/lib/plugins
