@@ -39,13 +39,9 @@
 /* ************************************** */
 
 /* Load a single protocol plugin */
+#if !(defined(WIN32) || defined(WIN64))
 static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *plugin_path) {
-#if defined(WIN32) || defined(WIN64)
-  __ndpi_unused_param(ndpi_struct);
-  __ndpi_unused_param(plugin_path);
-  return(false);
-#else
   void *pluginEntryFctnPtr;
   NDPIProtocolPluginEntryPoint* (*pluginEntryFctn)(void);
   void *pluginPtr;
@@ -92,8 +88,8 @@ static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_
   
   ndpi_struct->proto_plugins.plugin[ndpi_struct->proto_plugins.num_loaded_plugins++] = pluginPtr;
   return(false);
-#endif
 }
+#endif
 
 /* ************************************** */
 

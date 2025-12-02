@@ -349,8 +349,8 @@ ndpi_master_app_protocol ndpi_get_protocol_by_name(struct ndpi_detection_module_
 /* ************************************************************************************* */
 /* ************************************************************************************* */
 
-static void ndpi_add_user_proto_id_mapping(struct ndpi_detection_module_struct *ndpi_str,
-					   u_int16_t ndpi_proto_id, u_int16_t user_proto_id) {
+void ndpi_add_user_proto_id_mapping(struct ndpi_detection_module_struct *ndpi_str,
+                                    u_int16_t ndpi_proto_id, u_int16_t user_proto_id) {
   int idx;
 
   NDPI_LOG_DBG2(ndpi_str, "*** %u (>= %u)-> %u\n",

@@ -511,7 +511,6 @@ typedef enum {
     (placeholders to avoid protocol renumbering)
   */
 
-  NDPI_NUM_DEFINED_STATIC_PROTOCOL_IDS
   /* IMPORTANT: DO NOT ADD A "_LAST" or "_MAX" ENTRY HERE!!!
      The number of protocols is calculated at runtime!
    */

@@ -2159,8 +2159,6 @@ typedef struct ndpi_protocol_plugin {
   nDPIPluginFctn initFctn;
 } NDPIProtocolPluginEntryPoint;
 
-extern NDPIProtocolPluginEntryPoint* NDPIPluginEntryFctn(void);
-
 /* **************************************** */
 
 #endif /* __NDPI_TYPEDEFS_H__ */

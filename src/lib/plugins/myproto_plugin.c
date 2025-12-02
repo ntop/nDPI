@@ -22,8 +22,11 @@
 
 #include "ndpi_protocol_ids.h"
 
-#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_S7COMM
-#define NDPI_LIB_COMPILATION
+/* TODO: this define is used only for logging. We don't have static id for
+   dissectors/protocols loaded via plugin, so use the generic
+   NDPI_PROTOCOL_UNKNOWN instead
+ */
+#define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
 #include "ndpi_config.h"
 #include "ndpi_api.h"
@@ -32,8 +35,9 @@
 
 /* *********************************************** */
 
-#define NDPI_PROTOCOL_MYPROTO_ID    NDPI_NUM_DEFINED_STATIC_PROTOCOL_IDS
 #define NDPI_PROTOCOL_MYPROTO_NAME  "myproto"
+
+static u_int16_t myproto_id;
 
 /* *********************************************** */
 
@@ -42,7 +46,7 @@ static void ndpi_search_myproto(struct ndpi_detection_module_struct *ndpi_struct
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
   if((packet->payload_packet_len > 0) && (packet->payload[0] != '\0')) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MYPROTO_ID,
+    ndpi_set_detected_protocol(ndpi_struct, flow, myproto_id,
 			       NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 #ifdef DEBUG
     printf("### Protocol %s found\n", NDPI_PROTOCOL_MYPROTO_NAME);
@@ -55,11 +59,22 @@ static void ndpi_search_myproto(struct ndpi_detection_module_struct *ndpi_struct
 
 static void myprotoInitFctn(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
+  u_int16_t user_proto_id;
 
   printf("Welcome to %s_plugin\n", NDPI_PROTOCOL_MYPROTO_NAME);
 
-  ndpi_set_proto_defaults(ndpi_struct, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE,
-			  NDPI_PROTOCOL_MYPROTO_ID, NDPI_PROTOCOL_MYPROTO_NAME,
+  /* Internal id: dynamically allocated by the library */
+  myproto_id = ndpi_struct->num_supported_protocols; /* First free id */
+
+  /* If you want to set an explicit, constant, id for this protocol, set it here.
+     It is the same logic used for custom protocols (via protos.txt file)
+   */
+  user_proto_id = myproto_id; /* By default, external id is equal to the internal one */
+  ndpi_add_user_proto_id_mapping(ndpi_struct, myproto_id, user_proto_id);
+
+  ndpi_set_proto_defaults(ndpi_struct, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE,
+                          myproto_id,
+			  NDPI_PROTOCOL_MYPROTO_NAME,
 			  NDPI_PROTOCOL_CATEGORY_IOT_SCADA, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
@@ -68,7 +83,7 @@ static void myprotoInitFctn(struct ndpi_detection_module_struct *ndpi_struct) {
   register_dissector(NDPI_PROTOCOL_MYPROTO_NAME, ndpi_struct,
                      ndpi_search_myproto,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                     1, NDPI_PROTOCOL_MYPROTO_ID);
+                     1, myproto_id);
 }
 
 /* *********************************************** */
