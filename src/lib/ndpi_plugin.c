@@ -42,6 +42,8 @@
 static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *plugin_path) {
 #if defined(WIN32) || defined(WIN64)
+  __ndpi_unused_param(ndpi_struct);
+  __ndpi_unused_param(plugin_path);
   return(false);
 #else
   void *pluginEntryFctnPtr;
@@ -98,6 +100,8 @@ static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_
 u_int ndpi_load_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struct,
 				char *dir_path) {
 #if defined(WIN32) || defined(WIN64)
+  __ndpi_unused_param(ndpi_struct);
+  __ndpi_unused_param(dir_path);
   return(0);
 #else
   DIR *dirp;
@@ -113,7 +117,7 @@ u_int ndpi_load_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struc
     return(-1);
 
   while((dp = readdir(dirp)) != NULL) {
-    char *extn, path[256];
+    char *extn, path[512];
 
     if(dp->d_name[0] == '.') continue;
     extn = strrchr(dp->d_name, '.');
@@ -143,6 +147,8 @@ void ndpi_unload_protocol_plugins(struct ndpi_detection_module_struct *ndpi_stru
 
   for(i=0; i<ndpi_struct->proto_plugins.num_loaded_plugins; i++)
     dlclose(ndpi_struct->proto_plugins.plugin[i]);
+#else
+  __ndpi_unused_param(ndpi_struct);
 #endif
 }
 
