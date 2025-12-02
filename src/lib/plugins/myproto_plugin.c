@@ -45,14 +45,14 @@ static void ndpi_search_myproto(struct ndpi_detection_module_struct *ndpi_struct
 				struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
-  if((packet->payload_packet_len > 0) && (packet->payload[0] != '\0')) {
+  if(packet->payload_packet_len == NDPI_STATICSTRING_LEN("MyProto") &&
+     memcmp(packet->payload, "MyProto", NDPI_STATICSTRING_LEN("MyProto")) == 0) {
     ndpi_set_detected_protocol(ndpi_struct, flow, myproto_id,
 			       NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-#ifdef DEBUG
-    printf("### Protocol %s found\n", NDPI_PROTOCOL_MYPROTO_NAME);
-#endif
-  } else
+    NDPI_LOG_INFO(ndpi_struct, "Protocol %s found\n", NDPI_PROTOCOL_MYPROTO_NAME);
+  } else {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+  }
 }
 
 /* *********************************************** */
@@ -61,7 +61,7 @@ static void myprotoInitFctn(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
   u_int16_t user_proto_id;
 
-  printf("Welcome to %s_plugin\n", NDPI_PROTOCOL_MYPROTO_NAME);
+  NDPI_LOG_DBG(ndpi_struct, "Welcome to %s_plugin\n", NDPI_PROTOCOL_MYPROTO_NAME);
 
   /* Internal id: dynamically allocated by the library */
   myproto_id = ndpi_struct->num_supported_protocols; /* First free id */
