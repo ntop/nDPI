@@ -188,6 +188,7 @@
 /rrdtool/rrd_similarity
 /src/include/Makefile
 /src/include/ndpi_config.h
+/src/include/ndpi_config.h.in
 /src/include/ndpi_define.h
 /src/lib/.deps/
 /src/lib/Makefile
