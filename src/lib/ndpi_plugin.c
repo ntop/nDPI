@@ -153,12 +153,7 @@ u_int ndpi_init_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struc
   for(i=0; i<ndpi_struct->proto_plugins.num_loaded_plugins; i++) {
 
     pluginEntryFctnPtr = (void*)dlsym(ndpi_struct->proto_plugins.plugin[i], "PluginEntryFctn");
-    if(pluginEntryFctnPtr == NULL) {
-#ifdef NDPI_PLUGIN_DEBUG
-      printf("WARNING: unable to locate plugin entryfunction for index %d\n", i);
-#endif
-      continue;
-    }
+    /* It can't fail: we already check for that in `ndpi_load_protocol_plugin()` */
 
     pluginEntryFctn = (NDPIProtocolPluginEntryPoint *(*)(void))pluginEntryFctnPtr;
     pluginInfo = pluginEntryFctn();

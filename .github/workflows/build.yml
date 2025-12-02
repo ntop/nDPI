@@ -387,5 +387,5 @@ jobs:
           make -j $(nproc) -C example
       - name: Tests
         run: |
-          #TODO: enable tests with plugins
+          #TODO: we need to find a way to run the tests with plugins
           #NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh

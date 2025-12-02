@@ -4217,7 +4217,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
     ndpi_exit_detection_module(ndpi_str);
     return(NULL);
   }
-  
+
   return(ndpi_str);
 }
 
