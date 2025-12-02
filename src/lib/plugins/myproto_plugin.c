@@ -23,7 +23,7 @@
 #include "ndpi_protocol_ids.h"
 
 /* TODO: this define is used only for logging. We don't have static id for
-   dissectors/protocols loaded via plugin, so use the generic
+   dissectors/protocols loaded via plugin, so we use the generic
    NDPI_PROTOCOL_UNKNOWN instead
  */
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
@@ -67,9 +67,10 @@ static void myprotoInitFctn(struct ndpi_detection_module_struct *ndpi_struct) {
   myproto_id = ndpi_struct->num_supported_protocols; /* First free id */
 
   /* If you want to set an explicit, constant, id for this protocol, set it here.
-     It is the same logic used for custom protocols (via protos.txt file)
+     It is the same logic used for custom protocols (via protos.txt file).
+     By default, external id is equal to the internal one
    */
-  user_proto_id = myproto_id; /* By default, external id is equal to the internal one */
+  user_proto_id = 5000;
   ndpi_add_user_proto_id_mapping(ndpi_struct, myproto_id, user_proto_id);
 
   ndpi_set_proto_defaults(ndpi_struct, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE,

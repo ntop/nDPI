@@ -3,7 +3,6 @@
 *.db-*
 *.dll
 *.ilk
-*.in
 *.ipch
 *.ko
 *.la
@@ -31,6 +30,7 @@
 /.idea/
 /.vscode/
 /Makefile
+/Makefile.in
 /aclocal.m4
 /autom4te.cache/
 /build
@@ -60,6 +60,7 @@
 /utils/print_rank
 /fuzz/.deps/
 /fuzz/Makefile
+/fuzz/Makefile.in
 /fuzz/fuzz_ndpi_reader
 /fuzz/fuzz_process_packet
 /fuzz/fuzz_ndpi_reader_alloc_fail
@@ -198,13 +199,19 @@
 /src/lib/protocols/.deps/
 /src/lib/third_party/src/.deps/
 /src/lib/third_party/src/fuzz/.deps/
+/src/lib/plugins/myproto_plugin.so
+/src/lib/plugins/Makefile
+/src/Makefile.in
 /tags
 /test-driver
 /tests/Makefile
+/tests/Makefile.in
 /tests/dga/Makefile
 /tests/dga/dga_evaluate
 /tests/dga/dga_evaluate.exe
 /tests/do.sh
+/tests/do-dga.sh
+/tests/do-unit.sh
 /tests/performance/Makefile
 /tests/unit/Makefile
 /tests/unit/unit

@@ -373,6 +373,14 @@ extern "C" {
 			      ndpi_port_range *tcpDefPorts,
 			      ndpi_port_range *udpDefPorts,
 			      u_int8_t is_custom_protocol);
+
+  /**
+   * Set protocol ids mapping
+   *
+   */
+  void ndpi_add_user_proto_id_mapping(struct ndpi_detection_module_struct *ndpi_str,
+                                      u_int16_t ndpi_proto_id, u_int16_t user_proto_id);
+
   /**
    * Dynamically load protocol plugins
    *
@@ -388,7 +396,7 @@ extern "C" {
    * Get the main protocol of the passed flows for the detected module
    *
    *
-   ** @par    flow         = the flow given for the detection module
+   * @par    flow         = the flow given for the detection module
    * @return the ID of the master protocol detected
    *
    */

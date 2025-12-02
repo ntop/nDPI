@@ -1,0 +1,37 @@
+# Support for out-of-tree builds (VPATH)
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+top_builddir = @top_builddir@
+VPATH = @srcdir@
+
+AR=@AR@
+CC=@CC@
+CXX=@CXX@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
+# For plugins, we need: 
+#  * dynamic library
+#  * Linux or Mac
+AM_CFLAGS+=-fPIC -DPIC -DNDPI_LIB_COMPILATION -I$(top_srcdir)/src/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @CUSTOM_NDPI@
+AM_LDFLAGS=-L$(top_builddir)/src/lib @NDPI_LDFLAGS@
+LIBNDPI_DEP=$(top_builddir)/src/lib/libndpi.so
+LIBS=-lndpi @ADDITIONAL_LIBS@ @LIBS@
+HEADERS=$(top_srcdir)/src/include/ndpi_api.h \
+        $(top_srcdir)/src/include/ndpi_typedefs.h $(top_srcdir)/src/include/ndpi_protocol_ids.h
+HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
+PREFIX?=@prefix@
+
+
+all: myproto_plugin.so
+
+myproto_plugin.so: myproto_plugin.o $(LIBNDPI_DEP)
+	$(CC) $(AM_CFLAGS) $(CFLAGS) -shared $(AM_LDFLAGS) $(LDFLAGS) $< $(LIBS) -o $@
+
+%.o: %.c $(HEADERS) Makefile
+	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
+
+clean:
+	$(RM) *.o *~ *.so
+
+distclean:
+	$(RM) Makefile
