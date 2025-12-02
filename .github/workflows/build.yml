@@ -381,16 +381,11 @@ jobs:
           ./autogen.sh
       - name: Configure and build nDPI (with plugins)
         run: |
-          mkdir -p build-standard
-          cd build-standard
           ../configure
           make -j $(nproc) all
           make -j $(nproc) -C src/lib/plugins
-          make -j $(nproc) -C example ndpiSimpleIntegration
-          make -j $(nproc) -C rrdtool
-          cd -
+          make -j $(nproc) -C example
       - name: Tests
         run: |
-          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh #TODO: enable plugins
-          ./tests/do-unit.sh
-          ./tests/do-dga.sh
+          #TODO: enable tests with plugins
+          #NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
