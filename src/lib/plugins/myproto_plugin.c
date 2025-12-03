@@ -89,13 +89,28 @@ static void myprotoInitFctn(struct ndpi_detection_module_struct *ndpi_struct) {
 
 /* *********************************************** */
 
+void myprotoFreeFlowFctn(struct ndpi_flow_struct *flow) {
+
+}
+
+/* *********************************************** */
+
+void myprotoExportFctn(struct ndpi_detection_module_struct *ndpi_struct,
+		       struct ndpi_flow_struct *flow) {
+
+}
+
+/* *********************************************** */
+
 static NDPIProtocolPluginEntryPoint myprotoPlugin = {
   NDPI_API_VERSION /* ndpi_revision */,
   NDPI_PROTOCOL_MYPROTO_NAME /* protocol_name */,
   "0.1" /* version */,
   "Dummy plugin used for demonstration purpose" /* description */,
   "ntop.org" /* author */,
-  myprotoInitFctn
+  myprotoInitFctn,
+  myprotoFreeFlowFctn,
+  myprotoExportFctn,
 };
 
 NDPIProtocolPluginEntryPoint* PluginEntryFctn(void) {

@@ -12291,6 +12291,10 @@ int ndpi_match_trigram(const char *str) {
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
     ndpi_free_flow_data(flow);
+
+    if(flow->custom.plugin != NULL)
+      flow->custom.plugin->freeFlowFctn(flow); 
+    
     ndpi_free(flow);
   }
 }

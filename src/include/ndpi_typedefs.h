@@ -1411,6 +1411,23 @@ struct rtp_info {
   u_int32_t evs_subtype;
 };
 
+/* **************************************** */
+
+typedef void (*nDPIPluginFctn)(struct ndpi_detection_module_struct *ndpi_struct);
+typedef void (*nDPIPluginFlowFctn)(struct ndpi_flow_struct *flow);
+typedef void (*nDPIPluginJsonExportFlowFctn)(struct ndpi_detection_module_struct *ndpi_struct,
+					     struct ndpi_flow_struct *flow);
+
+typedef struct ndpi_protocol_plugin {
+  u_int32_t ndpi_revision;
+  const char *protocol_name, *version, *description, *author;
+  nDPIPluginFctn initFctn;
+  nDPIPluginFlowFctn freeFlowFctn;
+  nDPIPluginJsonExportFlowFctn jsonExportFctn;
+} NDPIProtocolPluginEntryPoint;
+
+/* **************************************** */
+
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   struct ndpi_proto_stack protocol_stack;
@@ -1752,6 +1769,11 @@ struct ndpi_flow_struct {
 
   } protos;
 
+  struct {
+    NDPIProtocolPluginEntryPoint *plugin;
+    void *plugin_data;
+  } custom;
+  
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
   struct ndpi_metadata_monitoring *monit;
 
@@ -2148,16 +2170,6 @@ typedef struct {
   char *epochs;
   u_int32_t num_updates_without_ranking_changes;
 } ndpi_ranking;
-
-/* **************************************** */
-
-typedef void (*nDPIPluginFctn)(struct ndpi_detection_module_struct *ndpi_struct);
-
-typedef struct ndpi_protocol_plugin {
-  u_int32_t ndpi_revision;
-  const char *protocol_name, *version, *description, *author;
-  nDPIPluginFctn initFctn;
-} NDPIProtocolPluginEntryPoint;
 
 /* **************************************** */
 
