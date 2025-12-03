@@ -1784,6 +1784,10 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
   } /* switch */
 
+  if((flow->custom.plugin != NULL)
+     && (flow->custom.plugin->jsonExportFctn != NULL))
+    flow->custom.plugin->jsonExportFctn(ndpi_struct, flow, serializer); 
+  
   ndpi_serialize_end_of_block(serializer); // "ndpi"
 
   return(0);
@@ -1909,7 +1913,8 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_string_string(serializer, "ndpi_fingerprint", flow->ndpi.fingerprint);
 
   ndpi_serialize_string_string(serializer, "proto",
-			       ndpi_get_ip_proto_name(l4_protocol, l4_proto_name, sizeof(l4_proto_name)));
+			       ndpi_get_ip_proto_name(l4_protocol,
+						      l4_proto_name, sizeof(l4_proto_name)));
 
   return(ndpi_dpi2json(ndpi_struct, flow, l7_protocol, serializer));
 }

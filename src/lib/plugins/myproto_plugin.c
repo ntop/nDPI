@@ -73,10 +73,12 @@ static void myprotoInitFctn(struct ndpi_detection_module_struct *ndpi_struct) {
   user_proto_id = 5000;
   ndpi_add_user_proto_id_mapping(ndpi_struct, myproto_id, user_proto_id);
 
-  ndpi_set_proto_defaults(ndpi_struct, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE,
+  ndpi_set_proto_defaults(ndpi_struct, 1 /* cleartext */, 1 /* app proto */,
+			  NDPI_PROTOCOL_ACCEPTABLE,
                           myproto_id,
                           NDPI_PROTOCOL_MYPROTO_NAME,
-                          NDPI_PROTOCOL_CATEGORY_IOT_SCADA, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          NDPI_PROTOCOL_CATEGORY_IOT_SCADA,
+			  NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
                           1);
@@ -89,15 +91,22 @@ static void myprotoInitFctn(struct ndpi_detection_module_struct *ndpi_struct) {
 
 /* *********************************************** */
 
-void myprotoFreeFlowFctn(struct ndpi_flow_struct *flow) {
+void myprotoFreeFlowFctn(void *plugin_data) {
+  __ndpi_unused_param(plugin_data);
 
+  /* Add you logic here */
 }
 
 /* *********************************************** */
 
-void myprotoExportFctn(struct ndpi_detection_module_struct *ndpi_struct,
-		       struct ndpi_flow_struct *flow) {
+void myprotoExportFctn(struct ndpi_detection_module_struct *ndpi_str,
+		       struct ndpi_flow_struct *flow,
+		       ndpi_serializer *serializer) {
+  __ndpi_unused_param(ndpi_str);
+  __ndpi_unused_param(flow);
+  __ndpi_unused_param(serializer);
 
+  /* Add you logic here */
 }
 
 /* *********************************************** */
@@ -112,6 +121,8 @@ static NDPIProtocolPluginEntryPoint myprotoPlugin = {
   myprotoFreeFlowFctn,
   myprotoExportFctn,
 };
+
+/* *********************************************** */
 
 NDPIProtocolPluginEntryPoint* PluginEntryFctn(void) {
   return(&myprotoPlugin);

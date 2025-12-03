@@ -1411,18 +1411,106 @@ struct rtp_info {
   u_int32_t evs_subtype;
 };
 
+typedef enum {
+  ndpi_serialization_format_unknown = 0,
+  ndpi_serialization_format_tlv,
+  ndpi_serialization_format_json,
+  ndpi_serialization_format_csv,
+  ndpi_serialization_format_multiline_json, /* new-line separated records */
+  ndpi_serialization_format_inner_json /* no outer braces */
+} ndpi_serialization_format;
+
+/* Note:
+ * - up to 16 types (TLV encoding: "4 bit key type" << 4 | "4 bit value type")
+ * - key supports string and uint32 (compressed to uint8/uint16) only, this is also enforced by the API
+ * - always add new enum at the end of the list (to avoid breaking backward compatibility) */
+typedef enum {
+  ndpi_serialization_unknown        =  0,
+  ndpi_serialization_end_of_record  =  1,
+  ndpi_serialization_uint8          =  2,
+  ndpi_serialization_uint16         =  3,
+  ndpi_serialization_uint32         =  4,
+  ndpi_serialization_uint64         =  5,
+  ndpi_serialization_int8           =  6,
+  ndpi_serialization_int16          =  7,
+  ndpi_serialization_int32          =  8,
+  ndpi_serialization_int64          =  9,
+  ndpi_serialization_float          = 10,
+  ndpi_serialization_string         = 11,
+  ndpi_serialization_start_of_block = 12,
+  ndpi_serialization_end_of_block   = 13,
+  ndpi_serialization_start_of_list  = 14,
+  ndpi_serialization_end_of_list    = 15,
+  /* Do not add new types!
+   * Exceeding 16 types requires reworking the TLV encoding due to key type limit (4 bit) */
+  ndpi_serialization_double         = 16 /* FIXX this is currently unusable */
+} ndpi_serialization_type;
+
+#define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024
+#define NDPI_SERIALIZER_DEFAULT_BUFFER_SIZE  256
+#define NDPI_SERIALIZER_DEFAULT_BUFFER_INCR 1024
+
+#define NDPI_SERIALIZER_STATUS_COMMA     (1 << 0)
+#define NDPI_SERIALIZER_STATUS_ARRAY     (1 << 1)
+#define NDPI_SERIALIZER_STATUS_EOR       (1 << 2)
+#define NDPI_SERIALIZER_STATUS_SOB       (1 << 3)
+#define NDPI_SERIALIZER_STATUS_NOT_EMPTY (1 << 4)
+#define NDPI_SERIALIZER_STATUS_LIST      (1 << 5)
+#define NDPI_SERIALIZER_STATUS_SOL       (1 << 6)
+#define NDPI_SERIALIZER_STATUS_HDR_DONE  (1 << 7)
+#define NDPI_SERIALIZER_STATUS_CEOB      (1 << 8)
+
+typedef struct {
+  u_int32_t size_used;
+} ndpi_private_serializer_buffer_status;
+
+typedef struct {
+  u_int32_t flags;
+  ndpi_private_serializer_buffer_status buffer;
+  ndpi_private_serializer_buffer_status header;
+} ndpi_private_serializer_status;
+
+typedef struct {
+  u_int32_t initial_size;
+  u_int32_t size;
+  u_int8_t *data;
+} ndpi_private_serializer_buffer;
+
+typedef struct {
+  ndpi_private_serializer_status status;
+  ndpi_private_serializer_buffer buffer;
+  ndpi_private_serializer_buffer header;
+  ndpi_serialization_format fmt;
+  char csv_separator[2];
+  u_int8_t has_snapshot;
+  u_int8_t multiline_json_array;
+  u_int8_t inner_json;
+  ndpi_private_serializer_status snapshot;
+} ndpi_private_serializer;
+
+#define ndpi_private_deserializer ndpi_private_serializer
+
+#ifdef NDPI_CFFI_PREPROCESSING
+typedef struct { char c[72]; } ndpi_serializer;
+#else
+typedef struct { char c[sizeof(ndpi_private_serializer)]; } ndpi_serializer;
+#endif
+
+#define ndpi_deserializer ndpi_serializer
+
 /* **************************************** */
 
 typedef void (*nDPIPluginFctn)(struct ndpi_detection_module_struct *ndpi_struct);
-typedef void (*nDPIPluginFlowFctn)(struct ndpi_flow_struct *flow);
+typedef void (*nDPIPluginFreeFlowFctn)(void *plugin_data);
 typedef void (*nDPIPluginJsonExportFlowFctn)(struct ndpi_detection_module_struct *ndpi_struct,
-					     struct ndpi_flow_struct *flow);
+					     struct ndpi_flow_struct *flow,
+					     ndpi_serializer *serializer);
 
 typedef struct ndpi_protocol_plugin {
   u_int32_t ndpi_revision;
   const char *protocol_name, *version, *description, *author;
   nDPIPluginFctn initFctn;
-  nDPIPluginFlowFctn freeFlowFctn;
+  nDPIPluginFreeFlowFctn freeFlowFctn;
   nDPIPluginJsonExportFlowFctn jsonExportFctn;
 } NDPIProtocolPluginEntryPoint;
 
@@ -1864,93 +1952,6 @@ typedef struct {
   ndpi_protocol_category_t protocol_category;
   ndpi_protocol_breed_t protocol_breed;
 } ndpi_protocol_match_result;
-
-typedef enum {
-  ndpi_serialization_format_unknown = 0,
-  ndpi_serialization_format_tlv,
-  ndpi_serialization_format_json,
-  ndpi_serialization_format_csv,
-  ndpi_serialization_format_multiline_json, /* new-line separated records */
-  ndpi_serialization_format_inner_json /* no outer braces */
-} ndpi_serialization_format;
-
-/* Note:
- * - up to 16 types (TLV encoding: "4 bit key type" << 4 | "4 bit value type")
- * - key supports string and uint32 (compressed to uint8/uint16) only, this is also enforced by the API
- * - always add new enum at the end of the list (to avoid breaking backward compatibility) */
-typedef enum {
-  ndpi_serialization_unknown        =  0,
-  ndpi_serialization_end_of_record  =  1,
-  ndpi_serialization_uint8          =  2,
-  ndpi_serialization_uint16         =  3,
-  ndpi_serialization_uint32         =  4,
-  ndpi_serialization_uint64         =  5,
-  ndpi_serialization_int8           =  6,
-  ndpi_serialization_int16          =  7,
-  ndpi_serialization_int32          =  8,
-  ndpi_serialization_int64          =  9,
-  ndpi_serialization_float          = 10,
-  ndpi_serialization_string         = 11,
-  ndpi_serialization_start_of_block = 12,
-  ndpi_serialization_end_of_block   = 13,
-  ndpi_serialization_start_of_list  = 14,
-  ndpi_serialization_end_of_list    = 15,
-  /* Do not add new types!
-   * Exceeding 16 types requires reworking the TLV encoding due to key type limit (4 bit) */
-  ndpi_serialization_double         = 16 /* FIXX this is currently unusable */
-} ndpi_serialization_type;
-
-#define NDPI_SERIALIZER_DEFAULT_HEADER_SIZE 1024
-#define NDPI_SERIALIZER_DEFAULT_BUFFER_SIZE  256
-#define NDPI_SERIALIZER_DEFAULT_BUFFER_INCR 1024
-
-#define NDPI_SERIALIZER_STATUS_COMMA     (1 << 0)
-#define NDPI_SERIALIZER_STATUS_ARRAY     (1 << 1)
-#define NDPI_SERIALIZER_STATUS_EOR       (1 << 2)
-#define NDPI_SERIALIZER_STATUS_SOB       (1 << 3)
-#define NDPI_SERIALIZER_STATUS_NOT_EMPTY (1 << 4)
-#define NDPI_SERIALIZER_STATUS_LIST      (1 << 5)
-#define NDPI_SERIALIZER_STATUS_SOL       (1 << 6)
-#define NDPI_SERIALIZER_STATUS_HDR_DONE  (1 << 7)
-#define NDPI_SERIALIZER_STATUS_CEOB      (1 << 8)
-
-typedef struct {
-  u_int32_t size_used;
-} ndpi_private_serializer_buffer_status;
-
-typedef struct {
-  u_int32_t flags;
-  ndpi_private_serializer_buffer_status buffer;
-  ndpi_private_serializer_buffer_status header;
-} ndpi_private_serializer_status;
-
-typedef struct {
-  u_int32_t initial_size;
-  u_int32_t size;
-  u_int8_t *data;
-} ndpi_private_serializer_buffer;
-
-typedef struct {
-  ndpi_private_serializer_status status;
-  ndpi_private_serializer_buffer buffer;
-  ndpi_private_serializer_buffer header;
-  ndpi_serialization_format fmt;
-  char csv_separator[2];
-  u_int8_t has_snapshot;
-  u_int8_t multiline_json_array;
-  u_int8_t inner_json;
-  ndpi_private_serializer_status snapshot;
-} ndpi_private_serializer;
-
-#define ndpi_private_deserializer ndpi_private_serializer
-
-#ifdef NDPI_CFFI_PREPROCESSING
-typedef struct { char c[72]; } ndpi_serializer;
-#else
-typedef struct { char c[sizeof(ndpi_private_serializer)]; } ndpi_serializer;
-#endif
-
-#define ndpi_deserializer ndpi_serializer
 
 typedef struct {
   char *str;
