@@ -35,7 +35,7 @@ EXTRA_DIST = README.md README.fuzzer.md CHANGELOG.md CONTRIBUTING.md \
 		lists/README.md \
 		lists/protocols/README.md \
 	sonar-project.properties .github .ci-ignore \
-	src/lib/plugins/README
+	src/lib/plugins/README.md
 
 doc:
 	make -C doc html
