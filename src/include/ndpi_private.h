@@ -492,7 +492,10 @@ struct ndpi_detection_module_struct {
 
   struct {
     u_int num_loaded_plugins /* 0 ... NDPI_MAX_NUM_PLUGINS-1 */;
-    NDPIProtocolPluginEntryPoint *plugin[NDPI_MAX_NUM_PLUGINS];
+    struct {
+      NDPIProtocolPluginEntryPoint *pluginPtr;
+      NDPIProtocolPluginEntryPoint *entryPoint;
+    } plugin[NDPI_MAX_NUM_PLUGINS];
   } proto_plugins;
 };
 
