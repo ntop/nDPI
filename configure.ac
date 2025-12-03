@@ -156,6 +156,11 @@ case "$host_os" in
 esac
 AC_SUBST(OS_TYPE)
 
+if test $OS_TYPE = "Darwin"; then
+   CC="clang -fno-color-diagnostics -fPIE"
+   CXX="clang++ -fno-color-diagnostics -fPIE -stdlib=libc++"
+fi
+
 #We should use latest croaring version, but with old compilers we need to
 #fallback to old/legacy code
 AS_IF([test "x${enable_oldcroaring}" = "xyes"], [
