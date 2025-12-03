@@ -29,7 +29,7 @@
 #include "ndpi_includes.h"
 #include "ndpi_private.h"
 
-#if !(defined(WIN32) || defined(WIN64))
+#ifdef HAVE_PLUGINS
 #include <dlfcn.h>
 #include <dirent.h>
 #endif
@@ -39,7 +39,7 @@
 /* ************************************** */
 
 /* Load a single protocol plugin */
-#if !(defined(WIN32) || defined(WIN64))
+#ifdef HAVE_PLUGINS
 static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *plugin_path) {
   void *pluginEntryFctnPtr;
@@ -101,11 +101,7 @@ static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_
 
 u_int ndpi_load_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struct,
 				char *dir_path) {
-#if defined(WIN32) || defined(WIN64)
-  __ndpi_unused_param(ndpi_struct);
-  __ndpi_unused_param(dir_path);
-  return(0);
-#else
+#ifdef HAVE_PLUGINS
   DIR *dirp;
   struct dirent *dp;
   int failed_files = 0;
@@ -138,13 +134,17 @@ u_int ndpi_load_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struc
     return(-1 * failed_files);
 
   return(num_loaded);
+#else
+  __ndpi_unused_param(ndpi_struct);
+  __ndpi_unused_param(dir_path);
+  return(0);
 #endif
 }
 
 /* ************************************** */
 
 void ndpi_unload_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struct) {
-#if !(defined(WIN32) || defined(WIN64))
+#ifdef HAVE_PLUGINS
   u_int i;
 
   for(i=0; i<ndpi_struct->proto_plugins.num_loaded_plugins; i++)
@@ -157,10 +157,7 @@ void ndpi_unload_protocol_plugins(struct ndpi_detection_module_struct *ndpi_stru
 /* ************************************** */
 
 u_int ndpi_init_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struct) {
-#if defined(WIN32) || defined(WIN64)
-  __ndpi_unused_param(ndpi_struct);
-  return(0);
-#else
+#ifdef HAVE_PLUGINS
   u_int i;
 
   for(i=0; i<ndpi_struct->proto_plugins.num_loaded_plugins; i++) {
@@ -176,6 +173,9 @@ u_int ndpi_init_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struc
          pluginInfo->author);
 #endif
   }
+  return(0);
+#else
+  __ndpi_unused_param(ndpi_struct);
   return(0);
 #endif
 }

@@ -557,6 +557,10 @@ if test "${srcdir}" != . ; then :
   cp -R ${srcdir}/lists/* lists/
 fi
 
+AS_IF([test "x${PLUGINS_ENABLED}" = "x1"], [
+  AC_DEFINE_UNQUOTED(HAVE_PLUGINS, "1", [plugins are supported])
+])
+
 AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile influxdb/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile src/lib/plugins/Makefile fuzz/Makefile doc/Doxyfile.cfg utils/Makefile])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
 AC_CONFIG_FILES([tests/do-dga.sh], [chmod +x tests/do-dga.sh])
