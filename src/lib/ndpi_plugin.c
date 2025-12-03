@@ -111,7 +111,7 @@ u_int ndpi_load_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struc
     return(-1);
 
   dirp = opendir(dir_path);
-  if (dirp == NULL)
+  if(dirp == NULL)
     return(-1);
 
   while((dp = readdir(dirp)) != NULL) {
@@ -126,6 +126,8 @@ u_int ndpi_load_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struc
     snprintf(path, sizeof(path), "%s/%s", dir_path, dp->d_name);
     if(ndpi_load_protocol_plugin(ndpi_struct, path))
       num_loaded++;
+    else
+      failed_files++;
   } /* while */
 
   (void)closedir(dirp);
