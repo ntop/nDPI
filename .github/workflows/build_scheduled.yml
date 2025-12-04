@@ -141,8 +141,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        # macos-14 and 15 are on **ARM64**
-        os: ["ubuntu-22.04", "ubuntu-24.04", "macOS-13", "macOS-14", "macOS-15", "ubuntu-22.04-arm", "ubuntu-24.04-arm"]
+        # macos-14,15 and 26 are on **ARM64**
+        os: ["ubuntu-22.04", "ubuntu-24.04", "macos-15-intel", "macOS-14", "macOS-15", "macOS-26", "ubuntu-22.04-arm", "ubuntu-24.04-arm"]
     steps:
       - uses: actions/checkout@v4
         with:
