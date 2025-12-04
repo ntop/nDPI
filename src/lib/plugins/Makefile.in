@@ -33,6 +33,8 @@ myproto_plugin.so: myproto_plugin.o $(LIBNDPI_DEP)
 #TODO
 install:
 
+distdir:
+
 clean:
 	$(RM) *.o *~ *.so
 
