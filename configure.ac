@@ -339,7 +339,6 @@ AS_IF([test "${with_lto_and_gold_linker+set}" = set], [
 
 AC_CHECK_HEADERS([netinet/in.h stdint.h stdlib.h string.h unistd.h math.h float.h])
 AC_CHECK_LIB([m], [sqrt], [], [LIBM="-lm"])
-AC_CHECK_LIB([dl], [dlopen], [LIBDL="-ldl"])
 
 GLOBAL_CONTEXT_ENABLED=0
 AS_IF([test "x$enable_global_context_support" != "xno"], [
@@ -545,6 +544,12 @@ if test "${with_maxminddb+set}" = set; then :
   fi
 fi
 
+AS_IF([test "x${PLUGINS_ENABLED}" = "x1"], [
+  AC_DEFINE_UNQUOTED(HAVE_PLUGINS, "1", [plugins are supported])
+  AC_CHECK_LIB([dl], [dlopen], [LIBDL="-ldl"])
+])
+AM_CONDITIONAL([PLUGINS_ENABLED], [test "x${PLUGINS_ENABLED}" = "x1"])
+
 dnl> Add base system libraries last (lowest-level dependencies)
 dnl> This ensures proper linking order: high-level libs -> low-level libs
 ADDITIONAL_LIBS="${ADDITIONAL_LIBS} $LIBM $LIBDL"
@@ -561,10 +566,6 @@ if test "${srcdir}" != . ; then :
   cp ${srcdir}/example/categories.txt example/
   cp -R ${srcdir}/lists/* lists/
 fi
-
-AS_IF([test "x${PLUGINS_ENABLED}" = "x1"], [
-  AC_DEFINE_UNQUOTED(HAVE_PLUGINS, "1", [plugins are supported])
-])
 
 AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile influxdb/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile src/lib/plugins/Makefile fuzz/Makefile doc/Doxyfile.cfg utils/Makefile])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])

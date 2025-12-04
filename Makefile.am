@@ -1,5 +1,12 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src/lib @EXTRA_TARGETS@
+
+SUBDIRS = src/lib
+
+if PLUGINS_ENABLED
+SUBDIRS += src/lib/plugins
+endif
+
+SUBDIRS += @EXTRA_TARGETS@
 
 if BUILD_FUZZTARGETS
 SUBDIRS += fuzz

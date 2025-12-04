@@ -87,7 +87,6 @@ $(error Cannot build with both --disable-shared and --disable-static)
 endif
 
 all: $(NDPI_LIBS)
-	cd plugins; make
 
 ndpi_main.o: $(srcdir)/ndpi_content_match.c.inc \
              $(srcdir)/ndpi_dga_match.c.inc \
