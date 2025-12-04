@@ -2,10 +2,8 @@
 
 cd "$(dirname "${0}")" || exit 1
 
-TOP_SRCDIR="@top_srcdir@"
-TOP_BUILDDIR="@top_builddir@"
-ABS_SRCDIR=@NDPI_BASE_DIR@
-ABS_BUILDDIR=$(cd ${TOP_BUILDDIR} && pwd)
+ABS_SRCDIR="@abs_top_srcdir@"
+ABS_BUILDDIR="@abs_top_builddir@"
 
 # Baseline performances ------------------------------------------------------------------------------------------------
 # Important notes: BASE values must be integers examples and represents percentage (e.g. 79%, 98%).

@@ -554,11 +554,6 @@ dnl> Add base system libraries last (lowest-level dependencies)
 dnl> This ensures proper linking order: high-level libs -> low-level libs
 ADDITIONAL_LIBS="${ADDITIONAL_LIBS} $LIBM $LIBDL"
 
-dnl> Use absolute source directory for NDPI_BASE_DIR
-NDPI_ABS_SRCDIR="`cd ${srcdir} && pwd`"
-AC_DEFINE_UNQUOTED(NDPI_BASE_DIR, "${NDPI_ABS_SRCDIR}", [nDPI base directory])
-AC_SUBST(NDPI_BASE_DIR, "${NDPI_ABS_SRCDIR}")
-
 dnl> ndpiReader has some hard-coded unit tests: in the out-of-tree builds we need some configuration files in the expected path
 if test "${srcdir}" != . ; then :
   $MKDIR_P example
@@ -639,7 +634,6 @@ AC_SUBST(DISABLE_NPCAP)
 AC_SUBST(EXE_SUFFIX)
 AC_SUBST(NDPI_CFLAGS)
 AC_SUBST(NDPI_LDFLAGS)
-AC_SUBST(NDPI_BASE_DIR)
 AC_SUBST(enable_shared)
 AC_SUBST(enable_static)
 AC_OUTPUT
