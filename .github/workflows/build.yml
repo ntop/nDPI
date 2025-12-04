@@ -362,30 +362,3 @@ jobs:
           ./tests/do-unit.sh
           ./tests/do-dga.sh
           cd -
-
-  test-plugins:
-    name: Plugins
-    runs-on: ubuntu-latest
-    env:
-      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Install Ubuntu Prerequisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install autoconf automake debhelper libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev parallel
-      - name: Autogen nDPI
-        run: |
-          ./autogen.sh
-      - name: Configure and build nDPI (with plugins)
-        run: |
-          ./configure
-          make -j $(nproc) all
-          make -j $(nproc) -C src/lib/plugins
-          make -j $(nproc) -C example
-      - name: Tests
-        run: |
-          #TODO: we need to find a way to run the tests with plugins
-          #NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
