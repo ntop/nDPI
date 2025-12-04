@@ -287,8 +287,8 @@ process_single_config() {
     fi
 
     READER_EXTRA_PARAM=""
+    #Configuration files (if any) are always auto-generated --> build dir
     [ -f ${ABS_BUILDDIR}/tests/cfgs/$(basename "$d")/config.txt ] && READER_EXTRA_PARAM=$(< ${ABS_BUILDDIR}/tests/cfgs/$(basename "$d")/config.txt)
-    [ -f config.txt ] && READER_EXTRA_PARAM=$(< config.txt)
     export READER_EXTRA_PARAM
 
     echo "Run configuration \"$(basename "$d")\" [$READER_EXTRA_PARAM]"
