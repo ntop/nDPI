@@ -30,6 +30,9 @@ myproto_plugin.so: myproto_plugin.o $(LIBNDPI_DEP)
 %.o: %.c $(HEADERS) Makefile
 	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
 
+#TODO
+install:
+
 clean:
 	$(RM) *.o *~ *.so
 
