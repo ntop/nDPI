@@ -157,8 +157,8 @@ esac
 AC_SUBST(OS_TYPE)
 
 if test $OS_TYPE = "Darwin"; then
-   CC="clang -fno-color-diagnostics -fPIE"
-   CXX="clang++ -fno-color-diagnostics -fPIE -stdlib=libc++"
+   NDPI_CFLAGS="${NDPI_CFLAGS} -fno-color-diagnostics -fPIE"
+   NDPI_LDFLAGS="${NDPI_LDFLAGS} -fno-color-diagnostics -fPIE"
 fi
 
 #We should use latest croaring version, but with old compilers we need to
