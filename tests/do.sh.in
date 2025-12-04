@@ -81,7 +81,7 @@ TOP_SRCDIR="@top_srcdir@"
 ABS_SRCDIR=@NDPI_BASE_DIR@
 ABS_BUILDDIR=$(cd ${TOP_BUILDDIR} && pwd)
 READER="${CMD_PREFIX} ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,${ABS_SRCDIR}/example/config.txt -A -p ${ABS_SRCDIR}/example/protos.txt -c ${ABS_SRCDIR}/example/categories.txt -r ${ABS_SRCDIR}/example/risky_domains.txt -j ${ABS_SRCDIR}/example/ja4_fingerprints.csv -S ${ABS_SRCDIR}/example/sha1_fingerprints.csv -G ${ABS_SRCDIR}/lists -q -K JSON -k /dev/null -t -v 2"
-#Used by plugins; different variables for Linux and MacOS: set both of them
+#Used by plugins; different variables for Linux and MacOS: no harm in setting always both of them
 LD_LIBRARY_PATH=${ABS_BUILDDIR}/src/lib/
 DYLD_LIBRARY_PATH=${ABS_BUILDDIR}/src/lib/
 
@@ -287,6 +287,7 @@ process_single_config() {
     fi
 
     READER_EXTRA_PARAM=""
+    [ -f ${ABS_BUILDDIR}/tests/cfgs/$(basename "$d")/config.txt ] && READER_EXTRA_PARAM=$(< ${ABS_BUILDDIR}/tests/cfgs/$(basename "$d")/config.txt)
     [ -f config.txt ] && READER_EXTRA_PARAM=$(< config.txt)
     export READER_EXTRA_PARAM
 

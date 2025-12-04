@@ -571,6 +571,8 @@ AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile 
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
 AC_CONFIG_FILES([tests/do-dga.sh], [chmod +x tests/do-dga.sh])
 AC_CONFIG_FILES([tests/do-unit.sh], [chmod +x tests/do-unit.sh])
+#TODO: For uniformity, we should auto-generate all the config.txt files
+AC_CONFIG_FILES([tests/cfgs/plugins/config.txt])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(NDPI_MAJOR)
