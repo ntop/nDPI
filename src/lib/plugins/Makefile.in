@@ -35,6 +35,9 @@ install:
 
 distdir:
 
+check:
+	true # nothing to do here
+
 clean:
 	$(RM) *.o *~ *.so
 
