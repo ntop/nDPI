@@ -216,6 +216,7 @@
 /tests/performance/Makefile
 /tests/unit/Makefile
 /tests/unit/unit
+/tests/cfgs/plugins/config.txt
 compile
 stamp-h1
 /windows/packages/pthreads.2.9.1.4

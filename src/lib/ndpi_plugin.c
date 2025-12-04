@@ -34,7 +34,7 @@
 #include <dirent.h>
 #endif
 
-#define NDPI_PLUGIN_DEBUG
+/* #define NDPI_PLUGIN_DEBUG */
 
 /* ************************************** */
 
