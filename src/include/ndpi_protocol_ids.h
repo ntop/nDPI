@@ -498,6 +498,7 @@ typedef enum {
   NDPI_PROTOCOL_ESPN                  = 466,
   NDPI_PROTOCOL_AKAMAI                = 467,
   NDPI_PROTOCOL_JSON                  = 468,
+  NDPI_PROTOCOL_MSGPACK               = 469,
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 

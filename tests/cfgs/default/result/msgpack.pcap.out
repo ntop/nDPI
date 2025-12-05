@@ -1,0 +1,53 @@
+DPI Packets (TCP):	12	(4.00 pkts/flow)
+DPI Packets (UDP):	11	(1.57 pkts/flow)
+Confidence Unknown          : 1 (flows)
+Confidence DPI              : 9 (flows)
+Num dissector calls: 1632 (163.20 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/4/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   20/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Unknown	8	573	1
+MessagePack	33	3174	9
+
+Unrated                          8 573           1            
+Acceptable                      33 3174          9            
+
+Unspecified                      8 573           1            
+Network                         33 3174          9            
+
+	1	UDP 127.0.0.1:47907 -> 127.0.0.1:5056 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/1069 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 127.0.0.1:41948 <-> 127.0.0.1:1337 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][4 pkts/295 bytes <-> 3 pkts/198 bytes][Goodput ratio: 10/0][70.18 sec][bytes ratio: 0.197 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/48728 23393/48728 48728/48728 19940/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 74/66 86/66 8/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 127.0.0.1:31337 -> 127.0.0.1:1339 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][8 pkts/442 bytes -> 0 pkts/0 bytes][Goodput ratio: 24/0][230.35 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 9924/0 32906/0 100215/0 29632/0][Pkt Len c2s/s2c min/avg/max/stddev: 43/0 55/0 75/0 12/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 87,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 127.0.0.1:37856 <-> 127.0.0.1:1337 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Network/14][Breed: Acceptable][3 pkts/242 bytes <-> 2 pkts/132 bytes][Goodput ratio: 18/0][106.61 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 127.0.0.1:31337 -> 127.0.0.1:1337 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Network/14][Breed: Acceptable][5 pkts/267 bytes -> 0 pkts/0 bytes][Goodput ratio: 21/0][104.86 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 127.0.0.1:31337 -> 127.0.0.1:1338 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][4 pkts/181 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][40.79 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 127.0.0.1:15913 -> 127.0.0.1:16549 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/172 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 127.0.0.1:33861 -> 127.0.0.1:55471 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/88 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (Hello World)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 127.0.0.1:58940 -> 127.0.0.1:19044 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/88 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (Hello World)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	TCP 127.0.0.1:38090 <-> 127.0.0.1:1337 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 8][Breed: Unrated][5 pkts/367 bytes <-> 3 pkts/206 bytes][Goodput ratio: 8/0][22.43 sec][bytes ratio: 0.281 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/14872 5606/14872 14872/14872 6175/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 73/69 95/74 11/4][TCP Fingerprint: 2_192_65495_db1b9381215d/Unknown][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

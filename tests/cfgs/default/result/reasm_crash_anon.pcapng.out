@@ -1,11 +1,11 @@
-DPI Packets (TCP):	21	(21.00 pkts/flow)
-Confidence Unknown          : 1 (flows)
-Num dissector calls: 234 (234.00 diss/flow)
+DPI Packets (TCP):	3	(3.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 203 (203.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
-LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
-LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    0/1/0 (insert/search/found)
 Automa host:          0/0 (search/found)
@@ -27,13 +27,10 @@ Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
 
-Unknown	200	20067	1
+MessagePack	200	20067	1
 
-Unrated                        200 20067         1            
+Acceptable                     200 20067         1            
 
-Unspecified                    200 20067         1            
+Network                        200 20067         1            
 
-
-
-Undetected flows:
-	1	TCP 192.168.145.147:51218 <-> 10.209.8.148:21999 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 21][Breed: Unrated][187 pkts/13776 bytes <-> 13 pkts/6291 bytes][Goodput ratio: 7/86][1475.07 sec][bytes ratio: 0.373 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 8292/21500 30100/30165 13444/13597][Pkt Len c2s/s2c min/avg/max/stddev: 60/122 74/484 113/793 8/332][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 5.046 (Executable?)][PLAIN TEXT (details /)][Plen Bins: 80,8,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.145.147:51218 <-> 10.209.8.148:21999 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Network/14][Breed: Acceptable][187 pkts/13776 bytes <-> 13 pkts/6291 bytes][Goodput ratio: 7/86][1475.07 sec][bytes ratio: 0.373 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/1 8292/21500 30100/30165 13444/13597][Pkt Len c2s/s2c min/avg/max/stddev: 60/122 74/484 113/793 8/332][PLAIN TEXT (details /)][Plen Bins: 82,8,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

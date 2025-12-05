@@ -4264,3 +4264,12 @@ References: `Official site <https://www.akamai.com>`_
 `NDPI_PROTOCOL_JSON`
 ====================
 JSON (JavaScript Object Notation) is an open standard file format and data interchange format that uses human-readable text.
+
+
+.. _Proto_469:
+
+`NDPI_PROTOCOL_MSGPACK`
+=======================
+MessagePack is an extremely efficient object serialization library. It's like JSON, but very fast and small.
+
+References: `MessagePack Protocol Specs <https://github.com/msgpack/msgpack/blob/master/spec.md>`_

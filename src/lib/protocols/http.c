@@ -33,6 +33,8 @@
 
 extern void ndpi_search_json(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow);
+extern void ndpi_search_msgpack(struct ndpi_detection_module_struct *ndpi_struct,
+                                struct ndpi_flow_struct *flow);
 
 static const char* binary_exec_file_mimes_e[] = { "exe", NULL };
 static const char* binary_exec_file_mimes_j[] = { "java-vm", NULL };
@@ -169,6 +171,9 @@ static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_
 
   if (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
     ndpi_search_json(ndpi_struct, flow);
+  }
+  if (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
+    ndpi_search_msgpack(ndpi_struct, flow);
   }
 
   /* Possibly more processing */

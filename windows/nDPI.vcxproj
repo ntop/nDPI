@@ -279,6 +279,7 @@
     <ClCompile Include="..\src\lib\protocols\monero.c" />
     <ClCompile Include="..\src\lib\protocols\mpegts.c" />
     <ClCompile Include="..\src\lib\protocols\mqtt.c" />
+    <ClCompile Include="..\src\lib\protocols\msgpack.c" />
     <ClCompile Include="..\src\lib\protocols\mssql_tds.c" />
     <ClCompile Include="..\src\lib\protocols\mudfish.c" />
     <ClCompile Include="..\src\lib\protocols\munin.c" />
