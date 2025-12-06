@@ -76,10 +76,9 @@ GLOBAL_CONTEXT_ENABLED=@GLOBAL_CONTEXT_ENABLED@
 GLOBAL_CONTEXT_CFGS="caches_global"
 PLUGINS_ENABLED=@PLUGINS_ENABLED@
 PLUGINS_CFGS="plugins"
-TOP_SRCDIR="@top_srcdir@"
 ABS_SRCDIR="@abs_top_srcdir@"
 ABS_BUILDDIR="@abs_top_builddir@"
-READER="${CMD_PREFIX} ${ABS_BUILDDIR}/example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,${ABS_SRCDIR}/example/config.txt -A -p ${ABS_SRCDIR}/example/protos.txt -c ${ABS_SRCDIR}/example/categories.txt -r ${ABS_SRCDIR}/example/risky_domains.txt -j ${ABS_SRCDIR}/example/ja4_fingerprints.csv -S ${ABS_SRCDIR}/example/sha1_fingerprints.csv -G ${ABS_SRCDIR}/lists -q -K JSON -k /dev/null -t -v 2"
+READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,../../../example/config.txt -A -p ../../..//example/protos.txt -c ../../..//example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja4_fingerprints.csv -S ../../..//example/sha1_fingerprints.csv -G ../../../lists -q -K JSON -k /dev/null -t -v 2"
 #Used by plugins; different variables for Linux and MacOS: no harm in setting always both of them
 LD_LIBRARY_PATH=${ABS_BUILDDIR}/src/lib/
 DYLD_LIBRARY_PATH=${ABS_BUILDDIR}/src/lib/
@@ -147,15 +146,15 @@ fuzzy_testing() {
     if [ -f ${ABS_BUILDDIR}/fuzz/fuzz_ndpi_reader ]; then
 	cd ${ABS_BUILDDIR}/fuzz
 
-	cp ${TOP_SRCDIR}/example/*.txt .
-	cp ${TOP_SRCDIR}/example/*csv .
-	cp ${TOP_SRCDIR}/example/*.conf .
-	cp ${TOP_SRCDIR}/lists/*.dat .
+	cp ../example/*.txt .
+	cp ../example/*csv .
+	cp ../example/*.conf .
+	cp ../lists/*.dat .
 	mkdir -p lists
-	find ${TOP_SRCDIR}/lists/*.list ! -name 100_malware.list -exec cp -t lists/ {} +
+	find ../lists/*.list ! -name 100_malware.list -exec cp -t lists/ {} +
 	mkdir -p lists/protocols
-	find ${TOP_SRCDIR}/lists/protocols/*.list -exec cp -t lists/protocols/ {} +
-	./fuzz_ndpi_reader -dict=${TOP_SRCDIR}/fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" ${ABS_SRCDIR}/tests/cfgs/default/pcap/
+	find ../lists/protocols/*.list -exec cp -t lists/protocols/ {} +
+	./fuzz_ndpi_reader -dict=${ABS_SRCDIR}/fuzz/dictionary.dict -max_total_time="${MAX_TOTAL_TIME:-592}" -print_pcs=1 -workers="${FUZZY_WORKERS:-0}" -jobs="${FUZZY_JOBS:-0}" ${ABS_SRCDIR}/tests/cfgs/default/pcap/
 	rm -f *.txt *csv *.conf *.dat
 	rm -rf lists
 
@@ -167,14 +166,17 @@ run_single_pcap()
 {
     f=$1
 
-    if [ ! -f "./pcap/$f" ]; then
+    if [ ! -f "$f" ]; then
         return 0
     fi
+
+    PCAP_NAME="$(basename "$f")"
+    RESULT_PATH="$(dirname "$f")/../result/"
 
     SKIP_PCAP=0;
     if [ $PCRE2_ENABLED -eq 0 ]; then
         for p in $PCRE_PCAPS; do
-            if [ "$f" = "$p" ]; then
+            if [ "$PCAP_NAME" = "$p" ]; then
                 SKIP_PCAP=1
                 break
             fi
@@ -182,7 +184,7 @@ run_single_pcap()
     fi
     if [ $NBPF_ENABLED -eq 0 ]; then
         for p in $NBPF_PCAPS; do
-            if [ "$f" = "$p" ]; then
+            if [ "$PCAP_NAME" = "$p" ]; then
                 SKIP_PCAP=1
                 break
             fi
@@ -192,32 +194,32 @@ run_single_pcap()
         if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
             printf "SKIPPED\n"
         else
-            printf "%-48s\tSKIPPED\n" "$f"
+            printf "%-48s\tSKIPPED\n" "$PCAP_NAME"
         fi
         return 0
     fi
 
-    CMD="$READER -i pcap/$f -w /tmp/reader.$$.out $READER_EXTRA_PARAM"
-    CPUPROFILE=./result/$f.cprof HEAPPROFILE=./result/$f $CMD
+    CMD="$READER -i $f -w /tmp/reader.$$.out $READER_EXTRA_PARAM"
+    CPUPROFILE=./result/$PCAP_NAME.cprof HEAPPROFILE=./result/$PCAP_NAME $CMD
     CMD_RET=$?
     if [ $CMD_RET -eq 0 ] && [ -f /tmp/reader.$$.out ]; then
 	# create result files if not present
-        if [ ! -f "result/$f.out" ]; then
-            cp /tmp/reader.$$.out "result/$f.out"
+        if [ ! -f "$RESULT_PATH/$PCAP_NAME.out" ]; then
+            cp /tmp/reader.$$.out "$RESULT_PATH/$PCAP_NAME.out"
 	fi
-        NUM_DIFF=$(${CMD_DIFF} "result/$f.out" /tmp/reader.$$.out | wc -l)
+        NUM_DIFF=$(${CMD_DIFF} "$RESULT_PATH/$PCAP_NAME.out" /tmp/reader.$$.out | wc -l)
     else
         if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
             printf "ERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n"
         else
-            printf "%-48s\tERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n" "$f"
+            printf "%-48s\tERROR (ndpiReader${EXE_SUFFIX} exit code: ${CMD_RET})\n" "$PCAP_NAME"
         fi
 	return 1
     fi
 
     if [ "$NUM_DIFF" -eq 0 ]; then
         if [ $FORCE_PARALLEL_UTESTS -eq 0 ]; then
-            printf "%-48s\tOK\n" "$f"
+            printf "%-48s\tOK\n" "$PCAP_NAME"
         fi
         rm -f /tmp/reader.$$.out
         return 0
@@ -225,15 +227,15 @@ run_single_pcap()
         if [ $FORCE_PARALLEL_UTESTS -eq 1 ]; then
             printf "ERROR\n"
         else
-            printf "%-48s\tERROR\n" "$f"
+            printf "%-48s\tERROR\n" "$PCAP_NAME"
 	fi
         echo "$CMD [old vs new]"
-        ${CMD_DIFF} "result/$f.out" /tmp/reader.$$.out
+        ${CMD_DIFF} "$RESULT_PATH/$PCAP_NAME.out" /tmp/reader.$$.out
         if [ ! -z "${CMD_COLORDIFF}" ] && [ ! -z "${CMD_WDIFF}" ]; then
-            ${CMD_WDIFF} -n -3 "result/$f.out" /tmp/reader.$$.out | sort | uniq | ${CMD_COLORDIFF}
+            ${CMD_WDIFF} -n -3 "$RESULT_PATH/$PCAP_NAME.out" /tmp/reader.$$.out | sort | uniq | ${CMD_COLORDIFF}
         fi
         if [ $FORCE_UPDATING_UTESTS_RESULTS -eq 1 ]; then
-            cp /tmp/reader.$$.out "result/$f.out"
+            cp /tmp/reader.$$.out "$RESULT_PATH/$PCAP_NAME.out"
         fi
     fi
 
@@ -271,23 +273,21 @@ process_single_config() {
         return 0
     fi
 
-    CFG_DIR="${ABS_SRCDIR}/tests/cfgs/$(basename "$d")"
-    cd "$CFG_DIR" || return 1
+    cd ${ABS_BUILDDIR}/tests/cfgs/"$(basename "$d")" || return 1
 
     # Determine PCAPS to test
     if [ $TEST_ONLY_RECENTLY_UPDATED_PCAPS -eq 1 ]; then
-        PCAPS=$(cd result || exit 1; find * -type f -print0  | xargs -0 ls -t | head -10 | xargs basename -s .out)
+        PCAPS=$(cd ${ABS_SRCDIR}/tests/"$d"/result || exit 1; find * -type f -print0  | xargs -0 ls -t | head -10 | xargs basename -s .out)
     else
         if [ -n "$PCAPS_ARG" ]; then
             PCAPS="$PCAPS_ARG"
         else
-            PCAPS=$(cd pcap || exit 1; /bin/ls -- *.*cap*)
+            PCAPS=$(cd ${ABS_SRCDIR}/tests/"$d"/pcap || exit 1; find "$PWD" -name "*.*cap*" | sort)
         fi
     fi
 
     READER_EXTRA_PARAM=""
-    #Configuration files (if any) are always auto-generated --> build dir
-    [ -f ${ABS_BUILDDIR}/tests/cfgs/$(basename "$d")/config.txt ] && READER_EXTRA_PARAM=$(< ${ABS_BUILDDIR}/tests/cfgs/$(basename "$d")/config.txt)
+    [ -f config.txt ] && READER_EXTRA_PARAM=$(< config.txt)
     export READER_EXTRA_PARAM
 
     echo "Run configuration \"$(basename "$d")\" [$READER_EXTRA_PARAM]"
@@ -326,7 +326,7 @@ if [ $FUZZY_TESTING_ENABLED -eq 1 ]; then
 fi
 
 # Get list of configuration directories
-CONFIGS=$(find ${ABS_SRCDIR}/tests/cfgs/* -type d -maxdepth 0 2>/dev/null)
+CONFIGS=$(find ./cfgs/* -type d -maxdepth 0 2>/dev/null)
 
 if [ $PARALLEL_CONFIGS -eq 1 ]; then
     # Run configurations in parallel
@@ -357,7 +357,7 @@ else
     done
 fi
 
-cd ${ABS_SRCDIR}/tests
+cd ../../
 
 if [ $RC -ne 0 ]; then
     echo "Total failures: $RC"

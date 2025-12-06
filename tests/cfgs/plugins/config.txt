@@ -1,0 +1,1 @@
+--plugins-dir=../../../src/lib/plugins

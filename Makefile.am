@@ -72,6 +72,38 @@ pull:
 changelog:
 	cd $(top_srcdir) && git log --since={`curl -s https://github.com/ntop/ndpi/releases | grep datetime | head -n1 | egrep -o "[0-9]+\-[0-9]+\-[0-9]+"`} --name-only --pretty=format:" - %s" | grep  "^ " > CHANGELOG.latest
 
+# For out-of-tree builds: copy required configuration files
+# ndpiReader has some hard-coded paths in some unit tests: in the out-of-tree builds we need
+# some configuration files in the expected path
+all-local:
+	@if test "$(srcdir)" != . ; then \
+	  echo "Setting up out-of-tree build configuration files..."; \
+	  $(MKDIR_P) example lists tests/cfgs; \
+	  $(INSTALL_DATA) $(srcdir)/example/*.txt example/; \
+	  $(INSTALL_DATA) $(srcdir)/example/*.conf example/; \
+	  $(INSTALL_DATA) $(srcdir)/example/*.csv example/; \
+	  if test -d $(srcdir)/lists && test -n "$$(ls -A $(srcdir)/lists 2>/dev/null)"; then \
+	    cp -R $(srcdir)/lists/* lists/; \
+	  fi; \
+	  for cfg_dir in $(srcdir)/tests/cfgs/*/ ; do \
+	    cfg_name=$$(basename "$$cfg_dir"); \
+	    $(MKDIR_P) tests/cfgs/$$cfg_name; \
+	    if test -f "$$cfg_dir/config.txt" ; then \
+	      cp "$$cfg_dir/config.txt" tests/cfgs/$$cfg_name/config.txt; \
+	    fi; \
+	  done; \
+	fi
+
+clean-local:
+	@if test "$(srcdir)" != . ; then \
+	  echo "Cleaning out-of-tree build configuration files..."; \
+	  -$(RM) example/*.txt; \
+	  -$(RM) example/*.conf; \
+	  -$(RM) example/*.csv; \
+	  -$(RM) -r lists/*; \
+	  -$(RM) tests/cfgs/*/config.txt; \
+	fi
+
 .PHONY: doc doc-view coverage clean-coverage changelog
 
 # Prevent parallel execution of clean/distclean to avoid potential race conditions

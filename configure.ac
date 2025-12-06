@@ -554,51 +554,10 @@ dnl> Add base system libraries last (lowest-level dependencies)
 dnl> This ensures proper linking order: high-level libs -> low-level libs
 ADDITIONAL_LIBS="${ADDITIONAL_LIBS} $LIBM $LIBDL"
 
-dnl> ndpiReader has some hard-coded unit tests: in the out-of-tree builds we need some configuration files in the expected path
-if test "${srcdir}" != . ; then :
-  $MKDIR_P example
-  $MKDIR_P lists
-  cp ${srcdir}/example/categories.txt example/
-  cp -R ${srcdir}/lists/* lists/
-fi
-
 AC_CONFIG_FILES([Makefile example/Makefile example/Makefile.dpdk tests/Makefile tests/unit/Makefile tests/performance/Makefile tests/dga/Makefile rrdtool/Makefile influxdb/Makefile libndpi.pc src/include/ndpi_define.h src/lib/Makefile src/lib/plugins/Makefile fuzz/Makefile doc/Doxyfile.cfg utils/Makefile])
 AC_CONFIG_FILES([tests/do.sh], [chmod +x tests/do.sh])
 AC_CONFIG_FILES([tests/do-dga.sh], [chmod +x tests/do-dga.sh])
 AC_CONFIG_FILES([tests/do-unit.sh], [chmod +x tests/do-unit.sh])
-AC_CONFIG_FILES([tests/cfgs/caches_cfg/config.txt])
-AC_CONFIG_FILES([tests/cfgs/caches_global/config.txt])
-AC_CONFIG_FILES([tests/cfgs/classification_only//config.txt])
-AC_CONFIG_FILES([tests/cfgs/custom_rules//config.txt])
-#No config.txt file in default
-AC_CONFIG_FILES([tests/cfgs/disable_aggressiveness//config.txt])
-AC_CONFIG_FILES([tests/cfgs/disable_protocols//config.txt])
-AC_CONFIG_FILES([tests/cfgs/disable_use_client_ip//config.txt])
-AC_CONFIG_FILES([tests/cfgs/disable_use_client_port//config.txt])
-AC_CONFIG_FILES([tests/cfgs/dns_subclassification_and_process_response_disable//config.txt])
-AC_CONFIG_FILES([tests/cfgs/dns_sub_enable//config.txt])
-AC_CONFIG_FILES([tests/cfgs/enable_doh_heuristic//config.txt])
-AC_CONFIG_FILES([tests/cfgs/enable_payload_stat//config.txt])
-AC_CONFIG_FILES([tests/cfgs/flow_risk_infos_disabled//config.txt])
-AC_CONFIG_FILES([tests/cfgs/flow_risk_list_disable//config.txt])
-AC_CONFIG_FILES([tests/cfgs/fpc//config.txt])
-AC_CONFIG_FILES([tests/cfgs/fpc_disabled//config.txt])
-AC_CONFIG_FILES([tests/cfgs/guessing_disable//config.txt])
-AC_CONFIG_FILES([tests/cfgs/guess_ip_before_port_enabled//config.txt])
-AC_CONFIG_FILES([tests/cfgs/hostname_dns_check//config.txt])
-AC_CONFIG_FILES([tests/cfgs/http_process_response_disable//config.txt])
-AC_CONFIG_FILES([tests/cfgs/huge_number_of_custom_protocols//config.txt])
-AC_CONFIG_FILES([tests/cfgs/ip_lists_disable//config.txt])
-AC_CONFIG_FILES([tests/cfgs/monitoring//config.txt])
-AC_CONFIG_FILES([tests/cfgs/ndpireader_conf_file//config.txt])
-AC_CONFIG_FILES([tests/cfgs/openvpn_heuristic_enabled//config.txt])
-AC_CONFIG_FILES([tests/cfgs/packets_limit_per_flow//config.txt])
-AC_CONFIG_FILES([tests/cfgs/plugins//config.txt])
-AC_CONFIG_FILES([tests/cfgs/stun_extra_dissection//config.txt])
-AC_CONFIG_FILES([tests/cfgs/stun_only_peer_address_enabled//config.txt])
-AC_CONFIG_FILES([tests/cfgs/subclassification_disable//config.txt])
-AC_CONFIG_FILES([tests/cfgs/tls_heuristics_enabled//config.txt])
-AC_CONFIG_FILES([tests/cfgs/zoom_extra_dissection//config.txt])
 AC_CONFIG_HEADERS(src/include/ndpi_config.h)
 AC_SUBST(GIT_RELEASE)
 AC_SUBST(NDPI_MAJOR)
