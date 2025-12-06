@@ -4257,3 +4257,10 @@ References: `Official site <https://www.espn.com/>`_
 Akamai Technologies, Inc. is an American company specialized in content delivery network (CDN), cybersecurity, DDoS mitigation, and cloud services.
 
 References: `Official site <https://www.akamai.com>`_
+
+
+.. _Proto_468:
+
+`NDPI_PROTOCOL_JSON`
+====================
+JSON (JavaScript Object Notation) is an open standard file format and data interchange format that uses human-readable text.
