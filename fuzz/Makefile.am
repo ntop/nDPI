@@ -31,72 +31,57 @@ endif
 # All fuzz targets need to use CXX as linker (required by libFuzzer)
 FUZZ_LINK_COMMAND = $(AM_V_CCLD)$(LIBTOOL) $(AM_V_lt) --silent --tag=CC $(AM_LIBTOOLFLAGS) \
     $(LIBTOOLFLAGS) --mode=link $(CXX) $(AM_CXXFLAGS) $(CXXFLAGS) \
-    $($@_LDFLAGS) @NDPI_LDFLAGS@ $(LDFLAGS) -o $@
+    $($@_LDFLAGS) @NDPI_LDFLAGS@ $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 # Define sources and flags for each fuzz target
 # Note: Fuzz targets with dictionaries should depend on them for proper rebuilds
 fuzz_process_packet_SOURCES = fuzz_process_packet.c fuzz_common_code.c
-fuzz_process_packet_CFLAGS =
 fuzz_process_packet_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_process_packet_DEPENDENCIES = $(srcdir)/dictionary.dict
 
 fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
-fuzz_ndpi_reader_CFLAGS = -I$(top_srcdir)/example/
+fuzz_ndpi_reader_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/
 fuzz_ndpi_reader_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_ndpi_reader_DEPENDENCIES = $(srcdir)/dictionary.dict
 
 fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader_alloc_fail.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
-fuzz_ndpi_reader_alloc_fail_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DCRYPT_FORCE_NO_AESNI -DENABLE_FINGERPRINT_FP
+fuzz_ndpi_reader_alloc_fail_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DCRYPT_FORCE_NO_AESNI -DENABLE_FINGERPRINT_FP
 fuzz_ndpi_reader_alloc_fail_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_ndpi_reader_alloc_fail_DEPENDENCIES = $(srcdir)/dictionary.dict
 
 fuzz_ndpi_reader_payload_analyzer_SOURCES = fuzz_ndpi_reader_payload_analyzer.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
-fuzz_ndpi_reader_payload_analyzer_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DENABLE_PAYLOAD_ANALYZER
+fuzz_ndpi_reader_payload_analyzer_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DENABLE_PAYLOAD_ANALYZER
 fuzz_ndpi_reader_payload_analyzer_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_ndpi_reader_payload_analyzer_DEPENDENCIES = $(srcdir)/dictionary.dict
 
 fuzz_quic_get_crypto_data_SOURCES = fuzz_quic_get_crypto_data.c fuzz_common_code.c
-fuzz_quic_get_crypto_data_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_quic_get_crypto_data_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_quic_get_crypto_data_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_config_SOURCES = fuzz_config.cpp fuzz_common_code.c
-fuzz_config_CXXFLAGS = -DNDPI_LIB_COMPILATION
-fuzz_config_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_config_CXXFLAGS = $(AM_CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_config_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_config_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_community_id_SOURCES = fuzz_community_id.cpp fuzz_common_code.c
-fuzz_community_id_CXXFLAGS =
-fuzz_community_id_CFLAGS =
 fuzz_community_id_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_serialization_SOURCES = fuzz_serialization.cpp fuzz_common_code.c
-fuzz_serialization_CXXFLAGS =
-fuzz_serialization_CFLAGS =
 fuzz_serialization_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_ranking_SOURCES = fuzz_alg_ranking.cpp fuzz_common_code.c
-fuzz_alg_ranking_CXXFLAGS =
-fuzz_alg_ranking_CFLAGS =
 fuzz_alg_ranking_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_bins_SOURCES = fuzz_alg_bins.cpp fuzz_common_code.c
-fuzz_alg_bins_CXXFLAGS =
-fuzz_alg_bins_CFLAGS =
 fuzz_alg_bins_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_hll_SOURCES = fuzz_alg_hll.cpp fuzz_common_code.c
-fuzz_alg_hll_CXXFLAGS =
-fuzz_alg_hll_CFLAGS =
 fuzz_alg_hll_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_hw_rsi_outliers_da_SOURCES = fuzz_alg_hw_rsi_outliers_da.cpp fuzz_common_code.c
-fuzz_alg_hw_rsi_outliers_da_CXXFLAGS =
-fuzz_alg_hw_rsi_outliers_da_CFLAGS =
 fuzz_alg_hw_rsi_outliers_da_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_jitter_SOURCES = fuzz_alg_jitter.cpp fuzz_common_code.c
-fuzz_alg_jitter_CXXFLAGS =
-fuzz_alg_jitter_CFLAGS =
 fuzz_alg_jitter_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_crc32_md5_SOURCES = fuzz_alg_crc32_md5.c
@@ -115,113 +100,85 @@ fuzz_alg_strnstr_SOURCES = fuzz_alg_strnstr.cpp
 fuzz_alg_strnstr_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_quick_encryption_SOURCES = fuzz_alg_quick_encryption.cpp fuzz_common_code.c
-fuzz_alg_quick_encryption_CXXFLAGS =
-fuzz_alg_quick_encryption_CFLAGS =
 fuzz_alg_quick_encryption_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_ses_des_SOURCES = fuzz_alg_ses_des.cpp fuzz_common_code.c
-fuzz_alg_ses_des_CXXFLAGS =
-fuzz_alg_ses_des_CFLAGS =
 fuzz_alg_ses_des_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_patricia_SOURCES = fuzz_ds_patricia.cpp fuzz_common_code.c
-fuzz_ds_patricia_CXXFLAGS =
-fuzz_ds_patricia_CFLAGS =
 fuzz_ds_patricia_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_ahocorasick_SOURCES = fuzz_ds_ahocorasick.cpp fuzz_common_code.c
-fuzz_ds_ahocorasick_CXXFLAGS =
-fuzz_ds_ahocorasick_CFLAGS =
 fuzz_ds_ahocorasick_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_libcache_SOURCES = fuzz_ds_libcache.cpp fuzz_common_code.c
-fuzz_ds_libcache_CXXFLAGS =
-fuzz_ds_libcache_CFLAGS =
 fuzz_ds_libcache_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_tree_SOURCES = fuzz_ds_tree.cpp fuzz_common_code.c
-fuzz_ds_tree_CXXFLAGS =
-fuzz_ds_tree_CFLAGS =
 fuzz_ds_tree_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_ptree_SOURCES = fuzz_ds_ptree.cpp fuzz_common_code.c
-fuzz_ds_ptree_CXXFLAGS =
-fuzz_ds_ptree_CFLAGS =
 fuzz_ds_ptree_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_hash_SOURCES = fuzz_ds_hash.cpp fuzz_common_code.c
-fuzz_ds_hash_CXXFLAGS =
-fuzz_ds_hash_CFLAGS =
 fuzz_ds_hash_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_cmsketch_SOURCES = fuzz_ds_cmsketch.cpp fuzz_common_code.c
-fuzz_ds_cmsketch_CXXFLAGS =
-fuzz_ds_cmsketch_CFLAGS =
 fuzz_ds_cmsketch_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_bitmap64_fuse_SOURCES = fuzz_ds_bitmap64_fuse.cpp fuzz_common_code.c
-fuzz_ds_bitmap64_fuse_CXXFLAGS =
-fuzz_ds_bitmap64_fuse_CFLAGS =
 fuzz_ds_bitmap64_fuse_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_domain_classify_SOURCES = fuzz_ds_domain_classify.cpp fuzz_common_code.c
-fuzz_ds_domain_classify_CXXFLAGS = -DNDPI_LIB_COMPILATION
-fuzz_ds_domain_classify_CFLAGS =
+fuzz_ds_domain_classify_CXXFLAGS = $(AM_CXXFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_ds_domain_classify_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_kdtree_SOURCES = fuzz_ds_kdtree.cpp fuzz_common_code.c
-fuzz_ds_kdtree_CXXFLAGS =
-fuzz_ds_kdtree_CFLAGS =
 fuzz_ds_kdtree_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_btree_SOURCES = fuzz_ds_btree.cpp fuzz_common_code.c
-fuzz_ds_btree_CXXFLAGS = -DNDPI_LIB_COMPILATION
-fuzz_ds_btree_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_ds_btree_CXXFLAGS = $(AM_CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_btree_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_ds_btree_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_address_cache_SOURCES = fuzz_ds_address_cache.cpp fuzz_common_code.c
-fuzz_ds_address_cache_CXXFLAGS = -DNDPI_LIB_COMPILATION
-fuzz_ds_address_cache_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_ds_address_cache_CXXFLAGS = $(AM_CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_address_cache_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_ds_address_cache_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_bitmap_SOURCES = fuzz_ds_bitmap.cpp fuzz_common_code.c
-fuzz_ds_bitmap_CXXFLAGS = -DNDPI_LIB_COMPILATION
-fuzz_ds_bitmap_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_ds_bitmap_CXXFLAGS = $(AM_CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_bitmap_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_ds_bitmap_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ds_filter_SOURCES = fuzz_ds_filter.cpp fuzz_common_code.c
-fuzz_ds_filter_CXXFLAGS = -DNDPI_LIB_COMPILATION
-fuzz_ds_filter_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_ds_filter_CXXFLAGS = $(AM_CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_ds_filter_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_ds_filter_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_libinjection_SOURCES = fuzz_libinjection.c
 fuzz_libinjection_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_binaryfusefilter_SOURCES = fuzz_binaryfusefilter.cpp fuzz_common_code.c
-fuzz_binaryfusefilter_CXXFLAGS =
-fuzz_binaryfusefilter_CFLAGS =
 fuzz_binaryfusefilter_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_tls_certificate_SOURCES = fuzz_tls_certificate.c fuzz_common_code.c
-fuzz_tls_certificate_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_tls_certificate_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_tls_certificate_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_tls_certificate_DEPENDENCIES = $(srcdir)/dictionary_tls_certificate.dict
 
 fuzz_dga_SOURCES = fuzz_dga.c fuzz_common_code.c
-fuzz_dga_CFLAGS =
 fuzz_dga_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_is_stun_udp_SOURCES = fuzz_is_stun.c fuzz_common_code.c
-fuzz_is_stun_udp_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_is_stun_udp_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_is_stun_udp_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_is_stun_tcp_SOURCES = fuzz_is_stun_tcp.c fuzz_common_code.c
-fuzz_is_stun_tcp_CFLAGS = -DNDPI_LIB_COMPILATION -DSTUN_TCP
+fuzz_is_stun_tcp_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION -DSTUN_TCP
 fuzz_is_stun_tcp_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_gcrypt_light_SOURCES = fuzz_gcrypt_light.cpp fuzz_common_code.c
-fuzz_gcrypt_light_CXXFLAGS =
-fuzz_gcrypt_light_CFLAGS =
 fuzz_gcrypt_light_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_gcrypt_aes_SOURCES = fuzz_gcrypt_aes.cpp
@@ -234,64 +191,64 @@ fuzz_gcrypt_cipher_SOURCES = fuzz_gcrypt_cipher.cpp
 fuzz_gcrypt_cipher_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_filecfg_protocols_SOURCES = fuzz_filecfg_protocols.c fuzz_common_code.c
-fuzz_filecfg_protocols_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_filecfg_protocols_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_filecfg_protocols_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_filecfg_categories_SOURCES = fuzz_filecfg_categories.c fuzz_common_code.c
-fuzz_filecfg_categories_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_filecfg_categories_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_filecfg_categories_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_filecfg_malicious_sha1_SOURCES = fuzz_filecfg_malicious_sha1.c fuzz_common_code.c
-fuzz_filecfg_malicious_sha1_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_filecfg_malicious_sha1_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_filecfg_malicious_sha1_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_filecfg_malicious_ja4_SOURCES = fuzz_filecfg_malicious_ja4.c fuzz_common_code.c
-fuzz_filecfg_malicious_ja4_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_filecfg_malicious_ja4_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_filecfg_malicious_ja4_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_filecfg_risk_domains_SOURCES = fuzz_filecfg_risk_domains.c fuzz_common_code.c
-fuzz_filecfg_risk_domains_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_filecfg_risk_domains_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_filecfg_risk_domains_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_filecfg_config_SOURCES = fuzz_filecfg_config.c fuzz_common_code.c
-fuzz_filecfg_config_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_filecfg_config_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_filecfg_config_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_filecfg_category_SOURCES = fuzz_filecfg_category.c fuzz_common_code.c
-fuzz_filecfg_category_CFLAGS = -DNDPI_LIB_COMPILATION
+fuzz_filecfg_category_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_filecfg_category_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_readerutils_workflow_SOURCES = fuzz_readerutils_workflow.cpp fuzz_common_code.c $(top_srcdir)/example/reader_util.c
-fuzz_readerutils_workflow_CXXFLAGS = -I$(top_srcdir)/example/
-fuzz_readerutils_workflow_CFLAGS = -I$(top_srcdir)/example/
+fuzz_readerutils_workflow_CXXFLAGS = $(AM_CXXFLAGS) -I$(top_srcdir)/example/
+fuzz_readerutils_workflow_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/
 fuzz_readerutils_workflow_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ndpi_reader_pl7m_simplest_SOURCES = fuzz_ndpi_reader_pl7m_simplest.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_simplest_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR
+fuzz_ndpi_reader_pl7m_simplest_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR
 fuzz_ndpi_reader_pl7m_simplest_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ndpi_reader_pl7m_simplest_internal_SOURCES = fuzz_ndpi_reader_pl7m_simplest_internal.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_simplest_internal_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
+fuzz_ndpi_reader_pl7m_simplest_internal_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_SIMPLEST_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
 fuzz_ndpi_reader_pl7m_simplest_internal_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ndpi_reader_pl7m_SOURCES = fuzz_ndpi_reader_pl7m.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_CONFIG2
+fuzz_ndpi_reader_pl7m_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_CONFIG2
 fuzz_ndpi_reader_pl7m_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ndpi_reader_pl7m_64k_SOURCES = fuzz_ndpi_reader_pl7m_64k.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_64k_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_64K_PACKETS
+fuzz_ndpi_reader_pl7m_64k_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_64K_PACKETS
 fuzz_ndpi_reader_pl7m_64k_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ndpi_reader_pl7m_internal_SOURCES = fuzz_ndpi_reader_pl7m_internal.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_internal_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
+fuzz_ndpi_reader_pl7m_internal_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_USE_INTERNAL_FUZZER_MUTATE
 fuzz_ndpi_reader_pl7m_internal_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ndpi_reader_pl7m_only_subclassification_SOURCES = fuzz_ndpi_reader_pl7m_only_subclassification.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_only_subclassification_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_ONLY_SUBCLASSIFICATION
+fuzz_ndpi_reader_pl7m_only_subclassification_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DENABLE_ONLY_SUBCLASSIFICATION
 fuzz_ndpi_reader_pl7m_only_subclassification_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ndpi_reader_pl7m_randomize_ports_SOURCES = fuzz_ndpi_reader_pl7m_randomize_ports.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c $(top_srcdir)/src/lib/third_party/src/fuzz/pl7m.c
-fuzz_ndpi_reader_pl7m_randomize_ports_CFLAGS = -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_ENABLE_RANDOMIZE_PORTS
+fuzz_ndpi_reader_pl7m_randomize_ports_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_PCAP_L7_MUTATOR -DPL7M_ENABLE_RANDOMIZE_PORTS
 fuzz_ndpi_reader_pl7m_randomize_ports_LINK = $(FUZZ_LINK_COMMAND)
 
 
