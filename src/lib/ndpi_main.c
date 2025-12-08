@@ -9237,6 +9237,8 @@ static ndpi_protocol create_public_results(struct ndpi_detection_module_struct *
 static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow) {
 
+  if(flow->state == NDPI_STATE_MONITORING) return;
+					     
   if(flow->already_gaveup) {
     NDPI_LOG_ERR(ndpi_struct, "Already called!\n"); /* We shoudn't be here ...*/
     return;
@@ -10538,8 +10540,8 @@ ret_protocols:
     fpc_check_eval(ndpi_str, flow);
   }
 
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN &&
-     flow->extra_packets_func == NULL) {
+  if((flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+     && (flow->extra_packets_func == NULL)) {
     /* Reason: "normal" classification, without extra dissection */
     internal_giveup(ndpi_str, flow);
   }
