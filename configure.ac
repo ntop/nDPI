@@ -165,6 +165,7 @@ fi
 #fallback to old/legacy code
 AS_IF([test "x${enable_oldcroaring}" = "xyes"], [
   NDPI_CFLAGS="${NDPI_CFLAGS} -DUSE_OLD_ROARING"
+  USE_OLD_ROARING=yes
   echo "Using old croaring (forced by user)"
 ], [
   # Test if the compiler supports C11 atomics (required by roaring v4)
@@ -190,6 +191,7 @@ AS_IF([test "x${enable_oldcroaring}" = "xyes"], [
   ], [
     AC_MSG_RESULT(no)
     NDPI_CFLAGS="${NDPI_CFLAGS} -DUSE_OLD_ROARING"
+    USE_OLD_ROARING=yes
     echo "Using old croaring (autodetect: C11 atomics not available)"
   ])
 ])
@@ -765,7 +767,7 @@ AS_IF([test "x${enable_tls_sigs}" = "xyes"],
 AS_IF([test "x${enable_oldcroaring}" = "xyes"],
   [SUMMARY="${SUMMARY}
   CRoaring version:        legacy (forced)"],
-  [AS_IF([test "x${NDPI_CFLAGS}" = "x${NDPI_CFLAGS/USE_OLD_ROARING/}"],
+  [AS_IF([test "x${USE_OLD_ROARING}" != "xyes"],
     [SUMMARY="${SUMMARY}
   CRoaring version:        v4 (C11 atomics)"],
     [SUMMARY="${SUMMARY}
