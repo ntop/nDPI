@@ -68,7 +68,7 @@ jobs:
           git diff-index --quiet HEAD -- || true
 
   test:
-    name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.cflags }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }} ${{matrix.global_context}}
+    name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.cflags }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} ${{ matrix.msan }} ${{ matrix.nBPF }} ${{matrix.global_context}} ${{matrix.plugins}}
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
@@ -84,6 +84,7 @@ jobs:
         msan: [""]
         nBPF: [""]
         global_context: [""] # Enable by default
+        plugins: [""] # Enable by default
         cflags: ["-g -O2"] # Default value if you do not specify CFLAGS variable
         include:
           - compiler: "gcc-4.9" # "Oldest" gcc easily available. To simulate RHEL7
@@ -127,6 +128,7 @@ jobs:
             msan: ""
             nBPF: ""
             global_context: "--disable-global-context-support"
+            plugins: "--disable-plugin-support"
           - compiler: "cc"
             os: macOS-latest
             pcre: "--with-pcre2"
@@ -144,7 +146,7 @@ jobs:
           sudo apt-get install autoconf automake debhelper libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
           sudo apt-get install rrdtool librrd-dev parallel
       - name: Install Ubuntu Prerequisites [Mingw-w64] (runs only on ubuntu jobs)
-        if: startsWith(matrix.os, 'ubuntu') && !endsWith(matrix.os, 'arm') && !startsWith(matrix.msan, '--with-') && !startsWith(matrix.nBPF, 'nBPF') && !startsWith(matrix.global_context, '--without') # Only on a few "standard" builds
+        if: startsWith(matrix.os, 'ubuntu') && !endsWith(matrix.os, 'arm') && !startsWith(matrix.msan, '--with-') && !startsWith(matrix.nBPF, 'nBPF') && !startsWith(matrix.global_context, '--disable') && !startsWith(matrix.plugins, '--disable') # Only on a few "standard" builds
         run: |
           sudo apt-get install gcc-mingw-w64 libc6-dev
       - name: Install Ubuntu Prerequisites (libpcre2)
@@ -187,7 +189,7 @@ jobs:
           brew install libmaxminddb
       - name: Configure nDPI
         run: |
-          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs ${{ matrix.global_context}}
+          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs ${{ matrix.global_context}} ${{ matrix.plugins}}
       - name: Build nDPI
         run: |
           make -j all
@@ -205,7 +207,7 @@ jobs:
           file /tmp/ndpi/usr/lib/libndpi.a
           file /tmp/ndpi/usr/lib/libndpi.so*
       - name: Test nDPI [SYMBOLS]
-        if: startsWith(matrix.os, 'ubuntu') && !endsWith(matrix.os, 'arm') && !startsWith(matrix.msan, '--with-') && !startsWith(matrix.nBPF, 'nBPF') && !startsWith(matrix.global_context, '--without') # Only on a few "standard" builds
+        if: startsWith(matrix.os, 'ubuntu') && !endsWith(matrix.os, 'arm') && !startsWith(matrix.msan, '--with-') && !startsWith(matrix.nBPF, 'nBPF') && !startsWith(matrix.global_context, '--disable') && !startsWith(matrix.plugins, '--disable') # Only on a few "standard" builds
         run: |
           ./utils/check_symbols.sh || { FAILED=$?; echo "::error file=${NDPI_LIB}::Unwanted libc symbols found: ${FAILED}. Please make sure to use only ndpi_malloc/ndpi_calloc/ndpi_realloc/ndpi_free wrapper instead of malloc/calloc/realloc/free."; false; }
         env:
@@ -232,7 +234,7 @@ jobs:
           make
           cd ../..
       - name: Build nDPI [Mingw-w64] (runs only on ubuntu jobs)
-        if: startsWith(matrix.os, 'ubuntu') && !endsWith(matrix.os, 'arm') && !startsWith(matrix.msan, '--with-') && !startsWith(matrix.nBPF, 'nBPF') && !startsWith(matrix.global_context, '--without') # Only on a few "standard" builds
+        if: startsWith(matrix.os, 'ubuntu') && !endsWith(matrix.os, 'arm') && !startsWith(matrix.msan, '--with-') && !startsWith(matrix.nBPF, 'nBPF') && !startsWith(matrix.global_context, '--disable') && !startsWith(matrix.plugins, '--disable') # Only on a few "standard" builds
         run: |
           make distclean
           ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --host=x86_64-w64-mingw32

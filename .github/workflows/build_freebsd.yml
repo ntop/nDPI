@@ -1,0 +1,38 @@
+name: FreeBSD Build
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+    types: [opened, synchronize, reopened]
+  release:
+    types: [created]
+jobs:
+  test:
+    name: FreeBSD
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
+    steps:
+    - uses: actions/checkout@v4
+    - name: Test in FreeBSD
+      id: test
+      uses: vmactions/freebsd-vm@1885b78bae4c4c4b331b4b0461d23cc14cc72387 #v1.2.9
+      with:
+        envs: 'CFLAGS'
+        usesh: true
+        copyback: false
+        release: "15.0"
+        prepare: |
+          pkg install -y gcc git gettext flex bison libtool autoconf automake devel/pkgconf gmake libpcap json-c
+        run: |
+          echo "Working Directory: $(pwd)"
+          echo "User.............: $(whoami)"
+          echo "FreeBSD Version..: $(freebsd-version)"
+          ./autogen.sh && ./configure
+          gmake -j $(nproc) all
+          gmake -j $(nproc) -C example
+          ./example/ndpiReader -H
+          #Avoid running tests to be fast: we are only interested in basic compilation
