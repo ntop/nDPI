@@ -27,6 +27,7 @@ AC_ARG_ENABLE(npcap, AS_HELP_STRING([--disable-npcap], [msys2 only: Disable link
 AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom path; default: ${srcdir}/../PF_RING/userland/nbpf]),[NBPF_HOME=$withval],[NBPF_HOME="`cd ${srcdir}/../PF_RING/userland/nbpf 2>/dev/null && pwd || echo ${srcdir}/../PF_RING/userland/nbpf`"])
 AC_ARG_WITH(lto-and-gold-linker, AS_HELP_STRING([--with-lto-and-gold-linker], [Build with LTO and Gold linker]))
 AC_ARG_ENABLE(debug-build, AS_HELP_STRING([--enable-debug-build], [Enable debug build (`-g` flag)]),[enable_debugbuild=$enableval],[enable_debugbuild=no])
+AC_ARG_ENABLE(plugin-support, AS_HELP_STRING([--disable-plugin-support], [Disable plugin system]))
 AC_ARG_ENABLE(global-context-support, AS_HELP_STRING([--disable-global-context-support], [Disable support for global context. No external dependency on libpthread]))
 AC_ARG_ENABLE(memory-track-origins, AS_HELP_STRING([--disable-memory-track-origins], [Don't add -fsanitize-memory-track-origins flag when compiling with MASAN support. Useful for faster CI]))
 AC_ARG_ENABLE(old-croaring, AS_HELP_STRING([--enable-old-croaring], [Always use old croaring version, instead of try to auto-detect if v4 works. Useful with old compilers]),[enable_oldcroaring=$enableval],[enable_oldcroaring=no])
@@ -348,6 +349,9 @@ AS_IF([test "x$enable_global_context_support" != "xno"], [
 ])
 
 PLUGINS_ENABLED=1
+AS_IF([test "x$enable_plugin_support" = "xno"], [
+  PLUGINS_ENABLED=0
+])
 AS_IF([test "x${enable_shared}" = "xno"],[
   AC_MSG_WARN([plugins require shared library.])
   PLUGINS_ENABLED=0
