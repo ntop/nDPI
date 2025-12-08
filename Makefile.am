@@ -75,8 +75,9 @@ changelog:
 # For out-of-tree builds: copy required configuration files
 # ndpiReader has some hard-coded paths in some unit tests: in the out-of-tree builds we need
 # some configuration files in the expected path
+# Avoid all of that if we are compiling only the library
 all-local:
-	@if test "$(srcdir)" != . ; then \
+	@if test "$(srcdir)" != . && test -n "@EXTRA_TARGETS@" ; then \
 	  echo "Setting up out-of-tree build configuration files..."; \
 	  $(MKDIR_P) example lists tests/cfgs; \
 	  $(INSTALL_DATA) $(srcdir)/example/*.txt example/; \
@@ -95,7 +96,7 @@ all-local:
 	fi
 
 clean-local:
-	@if test "$(srcdir)" != . ; then \
+	@if test "$(srcdir)" != . && test -n "@EXTRA_TARGETS@" ; then \
 	  echo "Cleaning out-of-tree build configuration files..."; \
 	  -$(RM) example/*.txt; \
 	  -$(RM) example/*.conf; \
