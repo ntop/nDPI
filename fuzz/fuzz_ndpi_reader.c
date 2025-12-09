@@ -121,6 +121,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     assert(ndpi_load_tcp_fingerprint_file(workflow->ndpi_struct, name) >= 0);
     sprintf(name, "%s/sha1_fingerprints.csv", path);
     assert(ndpi_load_malicious_sha1_file(workflow->ndpi_struct, name) >= 0);
+    sprintf(name, "%s", path);
+    assert(ndpi_load_protocol_plugins(workflow->ndpi_struct, name) >= 0); /* Plugins are not really used while fuzzing, yet */
 
 #ifdef ENABLE_ONLY_SUBCLASSIFICATION
     sprintf(name, "%s/config_only_classification.txt", path);

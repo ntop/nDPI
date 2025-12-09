@@ -8,6 +8,12 @@
 #include <assert.h>
 #include "fuzzer/FuzzedDataProvider.h"
 
+static void hash_walker(char *key, u_int64_t value, void *data) {
+  __ndpi_unused_param(key);
+  __ndpi_unused_param(value);
+  __ndpi_unused_param(data);
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   struct ndpi_detection_module_struct *ndpi_info_mod;
@@ -716,6 +722,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ndpi_exit_detection_module(ndpi_info_mod);
     ndpi_info_mod = NULL;
   }
+
+  ndpi_dump_host_based_protocol_id(ndpi_info_mod, hash_walker, NULL);
+  ndpi_dump_host_based_category_id(ndpi_info_mod, hash_walker, NULL);
 
   /* Random protocol configuration */
   pid = fuzzed_data.ConsumeIntegralInRange<u_int16_t>(0, ndpi_get_num_protocols(ndpi_info_mod) + 1); /* + 1 to trigger invalid pid */

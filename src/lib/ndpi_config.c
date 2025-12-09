@@ -868,6 +868,9 @@ static void _dump_host_based_protocol(struct ndpi_detection_module_struct *ndpi_
 				      void *data) {
   ndpi_str_hash *h;
 
+  if(!ndpi_str->host_automa.ac_automa)
+    return;
+
   ndpi_hash_init(&h);
   ac_automata_walk((AC_AUTOMATA_t *)ndpi_str->host_automa.ac_automa,
 		   walk_proto_id ? ac_walk_proto_id : ac_walk_category_id, NULL, h);
@@ -879,6 +882,8 @@ static void _dump_host_based_protocol(struct ndpi_detection_module_struct *ndpi_
 
 void ndpi_dump_host_based_protocol_id(struct ndpi_detection_module_struct *ndpi_str,
 				      ndpi_hash_walk_iter walker, void *data) {
+  if(!ndpi_str)
+    return;
   _dump_host_based_protocol(ndpi_str, walker, true /* protocol id */, data);
 }
 
@@ -886,5 +891,7 @@ void ndpi_dump_host_based_protocol_id(struct ndpi_detection_module_struct *ndpi_
 
 void ndpi_dump_host_based_category_id(struct ndpi_detection_module_struct *ndpi_str,
 				      ndpi_hash_walk_iter walker, void *data) {
+  if(!ndpi_str)
+    return;
   _dump_host_based_protocol(ndpi_str, walker, false /* category */, data);
 }

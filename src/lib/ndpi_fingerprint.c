@@ -142,10 +142,10 @@ int load_tcp_fingerprint_file_fd(struct ndpi_detection_module_struct *ndpi_str, 
     if(len <= 1 || buffer[0] == '#')
       continue;
 
-    fingerprint = strtok_r(buffer, "\t", &tmp);
+    fingerprint = strtok_r(buffer, ",", &tmp);
     if(!fingerprint) continue;
 
-    os = strtok_r(NULL, "\t", &tmp);
+    os = strtok_r(NULL, "\n", &tmp);
     if(!os) continue; else os_num = (ndpi_os)atoi(os);
 
     if(os_num >= ndpi_os_MAX_OS) continue;
