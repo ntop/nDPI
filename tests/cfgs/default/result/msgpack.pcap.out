@@ -1,15 +1,15 @@
 DPI Packets (TCP):	12	(4.00 pkts/flow)
-DPI Packets (UDP):	11	(1.57 pkts/flow)
+DPI Packets (UDP):	12	(1.71 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence DPI              : 9 (flows)
-Num dissector calls: 1632 (163.20 diss/flow)
+Num dissector calls: 1647 (164.70 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
 LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/1/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
-LRU cache fpc_dns:    0/4/0 (insert/search/found)
+LRU cache fpc_dns:    0/5/0 (insert/search/found)
 Automa host:          0/0 (search/found)
 Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
@@ -43,7 +43,7 @@ Network                         33 3174          9
 	3	UDP 127.0.0.1:31337 -> 127.0.0.1:1339 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][8 pkts/442 bytes -> 0 pkts/0 bytes][Goodput ratio: 24/0][230.35 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 9924/0 32906/0 100215/0 29632/0][Pkt Len c2s/s2c min/avg/max/stddev: 43/0 55/0 75/0 12/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 87,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	TCP 127.0.0.1:37856 <-> 127.0.0.1:1337 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Network/14][Breed: Acceptable][3 pkts/242 bytes <-> 2 pkts/132 bytes][Goodput ratio: 18/0][106.61 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	5	UDP 127.0.0.1:31337 -> 127.0.0.1:1337 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Network/14][Breed: Acceptable][5 pkts/267 bytes -> 0 pkts/0 bytes][Goodput ratio: 21/0][104.86 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	6	UDP 127.0.0.1:31337 -> 127.0.0.1:1338 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][4 pkts/181 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][40.79 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 127.0.0.1:31337 -> 127.0.0.1:1338 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Network/14][Breed: Acceptable][4 pkts/181 bytes -> 0 pkts/0 bytes][Goodput ratio: 7/0][40.79 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	7	UDP 127.0.0.1:15913 -> 127.0.0.1:16549 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/172 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	8	UDP 127.0.0.1:33861 -> 127.0.0.1:55471 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/88 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (Hello World)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	9	UDP 127.0.0.1:58940 -> 127.0.0.1:19044 [proto: 469/MessagePack][Stack: MessagePack][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 469/MessagePack, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/88 bytes -> 0 pkts/0 bytes][Goodput ratio: 52/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (Hello World)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

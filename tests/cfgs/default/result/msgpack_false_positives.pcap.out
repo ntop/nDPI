@@ -1,0 +1,46 @@
+DPI Packets (UDP):	12	(3.00 pkts/flow)
+Confidence Unknown          : 3 (flows)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 681 (170.25 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/9/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/3/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/4/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   1/0 (search/found)
+Patricia protocols:   6/0 (search/found)
+Patricia protocols IPv6: 2/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Unknown	9	1079	3
+IMO	5952	4147544	1
+
+Unrated                          9 1079          3            
+Acceptable                    5952 4147544       1            
+
+Unspecified                      9 1079          3            
+VoIP                          5952 4147544       1            
+
+	1	UDP 192.168.12.67:48612 <-> 93.38.195.192:42034 [proto: 216/IMO][Stack: IMO][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: VoIP/10][Breed: Acceptable][2128 pkts/1514574 bytes <-> 3824 pkts/2632970 bytes][Goodput ratio: 94/94][22.16 sec][bytes ratio: -0.270 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 7/4 643/964 36/29][Pkt Len c2s/s2c min/avg/max/stddev: 43/43 712/689 1198/1217 444/447][Plen Bins: 36,0,1,1,1,0,1,2,0,0,1,1,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,10,11,7,9,5,3,1,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	UDP 192.168.1.204:28707 <-> 178.184.92.158:17534 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][Breed: Unrated][3 pkts/283 bytes <-> 3 pkts/453 bytes][Goodput ratio: 55/72][8.84 sec][bytes ratio: -0.231 (Download)][IAT c2s/s2c min/avg/max/stddev: 364/348 4348/4168 8333/7989 3984/3820][Pkt Len c2s/s2c min/avg/max/stddev: 87/90 94/151 109/273 10/86][Plen Bins: 0,66,16,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.1.204:28707 <-> 77.35.229.111:21324 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/109 bytes <-> 1 pkts/111 bytes][Goodput ratio: 61/62][0.18 sec][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP [2001:b07:a3d:c112:d881:db12:ed03:a477]:28707 -> [2a04:4a43:843f:fdf5:a1f2:e9fe:bd28:d36b]:29695 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Unrated][1 pkts/123 bytes -> 0 pkts/0 bytes][Goodput ratio: 49/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
