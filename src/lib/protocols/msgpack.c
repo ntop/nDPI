@@ -120,18 +120,24 @@ static u_int32_t msgpack_dissect_next(u_int8_t const ** const start,
     if (*size < 3)
       return 0;
     next_size += 3 + get_u_int8_t(*start, 1);
+    if (next_size < 3) // check for possible overflow
+      return 0;
   }
   else if (first_byte == 0xC8 /* ext16 */)
   {
     if (*size < 4)
       return 0;
     next_size += 4 + ntohs(get_u_int16_t(*start, 1));
+    if (next_size < 4) // check for possible overflow
+      return 0;
   }
   else if (first_byte == 0xC9 /* ext32 */)
   {
     if (*size < 6)
       return 0;
     next_size += 6 + ntohl(get_u_int32_t(*start, 1));
+    if (next_size < 6) // check for possible overflow
+      return 0;
   }
   // map / array / string / bin format
   else if ((first_byte & 0xF0) == 0x80 /* fixmap: 1000 xxxx */ ||
@@ -142,6 +148,8 @@ static u_int32_t msgpack_dissect_next(u_int8_t const ** const start,
   else if ((first_byte & 0xE0) == 0xA0 /* fixstr: 101x xxxx */)
   {
     next_size += 1 + (first_byte & 0x1F);
+    if (next_size < 1) // check for possible overflow
+      return 0;
   }
   else if (first_byte == 0xDE /* map16 */ ||
            first_byte == 0xDC /* array16 */)
@@ -159,6 +167,8 @@ static u_int32_t msgpack_dissect_next(u_int8_t const ** const start,
     if (*size < 2)
       return 0;
     next_size += 2 + get_u_int8_t(*start, 1);
+    if (next_size < 2) // check for possible overflow
+      return 0;
   }
   else if (first_byte == 0xDA /* str16 */ ||
            first_byte == 0xC5 /* bin16 */)
@@ -166,6 +176,8 @@ static u_int32_t msgpack_dissect_next(u_int8_t const ** const start,
     if (*size < 3)
       return 0;
     next_size += 3 + ntohs(get_u_int16_t(*start, 1));
+    if (next_size < 3) // check for possible overflow
+      return 0;
   }
   else if (first_byte == 0xDB /* str32 */ ||
            first_byte == 0xC6 /* bin32 */)
@@ -173,6 +185,8 @@ static u_int32_t msgpack_dissect_next(u_int8_t const ** const start,
     if (*size < 5)
       return 0;
     next_size += 5 + ntohl(get_u_int32_t(*start, 1));
+    if (next_size < 5) // check for possible overflow
+      return 0;
   }
 
   if (next_size == 0)
@@ -243,9 +257,9 @@ void ndpi_search_msgpack(struct ndpi_detection_module_struct *ndpi_struct,
     }
     if (type_size >= 2) {
       // check for variable sized ext's / str's / bin's
-      if ((first_byte >= 0xC4 && first_byte <= 0xC9)
-          || (first_byte & 0xE0) == 0xA0
-          || (first_byte >= 0xD9 && first_byte <= 0xDB))
+      if ((first_byte >= 0xC4 && first_byte <= 0xC9 /* bin8, bin16, bin32, ext8, ext16, ext32 */)
+          || (first_byte & 0xE0) == 0xA0 /* fixstr */
+          || (first_byte >= 0xD9 && first_byte <= 0xDB /* str8, str16, str32 */))
       {
         tlv_objects++;
       }
