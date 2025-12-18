@@ -2217,7 +2217,8 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len, "%02u%02u%c%c_",
-		     ja->client.num_ciphers, ja->client.num_tls_extensions,
+		     ndpi_min(99, ja->client.num_ciphers),
+		     ndpi_min(99, ja->client.num_tls_extensions),
 		     alpn_first, alpn_last);
   if((rc > 0) && (ja_str_len + rc < JA_STR_LEN)) ja_str_len += rc;
 
