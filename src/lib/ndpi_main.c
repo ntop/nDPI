@@ -12957,6 +12957,23 @@ ndpi_risk_info* ndpi_risk2severity(ndpi_risk_enum risk) {
 
 /* ******************************************************************** */
 
+static int is_valid_port(const char *port_str) {
+  char *endptr;
+  long port;
+
+  /* We can't easily use ndpi_strtonum because we want to be sure that there are no
+     others characters after the number */
+  errno = 0;    /* To distinguish success/failure after call */
+  port = strtol(port_str, &endptr, 10);
+  if(errno == 0 && *endptr == '\0' &&
+     (port >= 0 && port <= 65535)) {
+    return 1;
+  }
+  return 0;
+}
+
+/* ******************************************************************** */
+
 char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
 			    const u_int8_t *value, size_t value_len,
 			    int normalize) {
@@ -12984,12 +13001,26 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
 
     dst[i] = '\0';
     if(normalize & NDPI_HOSTNAME_NORM_STRIP_PORT) {
-      /* Skip port in "239.255.255.250:1900" or "[ff02::c]:1900" */
+      /* Skip port in "239.255.255.250:1900", "[ff02::c]:1900" or "domain.com:1900" */
       double_column = strrchr(dst, ':');
       if(double_column) {
-        *double_column = '\0';
-        i = double_column - dst;
+        if(dst[0] == '[' &&
+           dst[double_column - dst - 1] == ']' &&
+           is_valid_port(double_column + 1)) {
+          *double_column = '\0';
+          i = double_column - dst;
+        } else {
+          /* It can still be a literal IPV6 address (without port)*/
+          struct in6_addr addr6;
+
+          if(inet_pton(AF_INET6, dst, &addr6) != 1 &&
+             is_valid_port(double_column + 1)) {
+            *double_column = '\0';
+            i = double_column - dst;
+          }
+        }
       }
+
     }
     if(normalize & NDPI_HOSTNAME_NORM_STRIP_EOLSP) {
       /* Removing spaces at the end of a line */
