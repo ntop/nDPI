@@ -57,30 +57,10 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
 */
 
 #define JA_STR_LEN        1024
-#define MAX_NUM_JA         128
-#define MAX_JA_STRLEN      256
 
-union ja_info {
-  struct {
-    u_int16_t tls_handshake_version;
-    u_int16_t num_ciphers, cipher[MAX_NUM_JA];
-    u_int16_t num_tls_extensions, tls_extension[MAX_NUM_JA];
-    u_int16_t num_elliptic_curve, elliptic_curve[MAX_NUM_JA];
-    u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA];
-    u_int16_t num_signature_algorithms, signature_algorithms[MAX_NUM_JA];
-    u_int16_t num_supported_versions, supported_versions[MAX_NUM_JA];
-    char signature_algorithms_str[MAX_JA_STRLEN], alpn[MAX_JA_STRLEN];
-    char alpn_original_last;  /* Store original last character before null terminator */
-  } client;
-
-  struct {
-    u_int16_t tls_handshake_version;
-    u_int16_t num_ciphers, cipher[MAX_NUM_JA];
-    u_int16_t num_tls_extensions, tls_extension[MAX_NUM_JA];
-    u_int16_t tls_supported_version;
-    u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA];
-    char alpn[MAX_JA_STRLEN];
-  } server;
+union ndpi_ja_info {
+  ndpi_tls_client_info client;
+  ndpi_tls_server_info server;
 };
 
 /*
@@ -2081,7 +2061,7 @@ static bool is_grease_version(u_int16_t version) {
 static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow,
 			     u_int32_t quic_version,
-			     union ja_info *ja) {
+			     union ndpi_ja_info *ja) {
   u_int8_t tmp_str[JA_STR_LEN];
   u_int tmp_str_len, num_extn;
   u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
@@ -2115,9 +2095,9 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   ja_str[0] = is_dtls ? 'd' : ((quic_version != 0) ? 'q' : 't');
 
   for(i=0; i<ja->client.num_supported_versions; i++) {
-    if((!is_grease_version(ja->client.supported_versions[i]))
-       && (tls_handshake_version < ja->client.supported_versions[i]))
-      tls_handshake_version = ja->client.supported_versions[i];
+    if((!is_grease_version(ja->client.supported_version[i]))
+       && (tls_handshake_version < ja->client.supported_version[i]))
+      tls_handshake_version = ja->client.supported_version[i];
   }
 
   switch(tls_handshake_version) {
@@ -2255,7 +2235,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 
   for(i=0; i<ja->client.num_signature_algorithms; i++) {
     rc = ndpi_snprintf((char *)&tmp_str[tmp_str_len], JA_STR_LEN-tmp_str_len, "%s%04x",
-		       (i > 0) ? "," : "_", ja->client.signature_algorithms[i]);
+		       (i > 0) ? "," : "_", ja->client.signature_algorithm[i]);
     if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;
   }
 
@@ -2297,7 +2277,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow, u_int32_t quic_version) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  union ja_info ja;
+  union ndpi_ja_info ja;
   u_int8_t invalid_ja = 0;
   u_int16_t tls_version;
   u_int32_t i, j;
@@ -2341,11 +2321,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     if(handshake_type == 0x02 /* Server Hello */) {
       int rc;
 
-      ja.server.num_ciphers = 0;
-      ja.server.num_tls_extensions = 0;
-      ja.server.num_elliptic_curve_point_format = 0;
-      ja.server.alpn[0] = '\0';
-
+      memset(&ja.server, 0, sizeof(ja.server));
+      
       ja.server.tls_handshake_version = tls_version;
 
 #ifdef DEBUG_TLS
@@ -2586,21 +2563,23 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
         printf("[JA3] Server: %s \n", flow->protos.tls_quic.ja3_server);
 #endif
+
+	if(ndpi_struct->cfg.tls_ja_data_enabled) {
+	  if(flow->protos.tls_quic.ja_server == NULL) {
+	    flow->protos.tls_quic.ja_server = ndpi_malloc(sizeof(ndpi_tls_server_info));
+
+	    if(flow->protos.tls_quic.ja_server != NULL)
+	      memcpy(flow->protos.tls_quic.ja_server, &ja.server, sizeof(ndpi_tls_server_info));
+	  }
+	}
       }
     } else if(handshake_type == 0x01 /* Client Hello */) {
       u_int16_t cipher_len, cipher_offset;
       u_int8_t cookie_len = 0;
 
-      ja.client.num_ciphers = 0;
-      ja.client.num_tls_extensions = 0;
-      ja.client.num_elliptic_curve = 0;
-      ja.client.num_elliptic_curve_point_format = 0;
-      ja.client.num_signature_algorithms = 0;
-      ja.client.num_supported_versions = 0;
-      ja.client.signature_algorithms_str[0] = '\0';
-      ja.client.alpn[0] = '\0', ja.client.alpn[1] = '\0' /* used by JA4 */;
+      memset(&ja.client, 0, sizeof(ja.client));
       ja.client.alpn_original_last = '0'; /* Initialize to '0' if no ALPN */
-
+      
       flow->protos.tls_quic.ssl_version = ja.client.tls_handshake_version = tls_version;
       if(flow->protos.tls_quic.ssl_version < 0x0303) /* < TLSv1.2 */ {
         if(is_flowrisk_info_enabled(ndpi_struct, NDPI_TLS_OBSOLETE_VERSION)) {
@@ -2916,21 +2895,16 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("Client TLS [EllipticCurve: %u/0x%04X]\n", s_group, s_group);
 #endif
-		    switch(s_group) {
-		    case 0x11EC: /* X25519MLKEM768 */
-		      flow->protos.tls_quic.pq_supported_groups = 1;
-		      break;
-		    }
-
+		    
 		    if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1])
 		       || ((packet->payload[s_offset+i] & 0xF) != 0xA)) {
 		      /* Skip GREASE */
-		      if(ja.client.num_elliptic_curve < MAX_NUM_JA)
-			ja.client.elliptic_curve[ja.client.num_elliptic_curve++] = s_group;
+		      if(ja.client.num_elliptic_curve_groups < MAX_NUM_JA)
+			ja.client.elliptic_curve_group[ja.client.num_elliptic_curve_groups++] = s_group;
 		      else {
 			invalid_ja = 1;
 #ifdef DEBUG_TLS
-			printf("Client TLS Invalid num elliptic %u\n", ja.client.num_elliptic_curve);
+			printf("Client TLS Invalid num elliptic group %u\n", ja.client.num_elliptic_curve_groups);
 #endif
 		      }
 		    }
@@ -2992,9 +2966,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		}
 #endif
 
-		for(i=0, id=0; i<tot_signature_algorithms_len && s_offset+i+1<total_len; i += 2) {
-		  ja.client.signature_algorithms[id++] = ntohs(*(u_int16_t*)&packet->payload[s_offset+i]);
-		}
+		for(i=0, id=0; i<tot_signature_algorithms_len && s_offset+i+1<total_len; i += 2)
+		  ja.client.signature_algorithm[id++] = ntohs(*(u_int16_t*)&packet->payload[s_offset+i]);
+		
 		ja.client.num_signature_algorithms = id;
 
 		for(i=0, id=0; i<tot_signature_algorithms_len && s_offset+i+1<total_len; i++) {
@@ -3236,7 +3210,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			version_str_len += rc;
 
 		      if(ja.client.num_supported_versions < MAX_NUM_JA)
-			ja.client.supported_versions[ja.client.num_supported_versions++] = tls_version;
+			ja.client.supported_version[ja.client.num_supported_versions++] = tls_version;
 		    }
 		  }
 
@@ -3355,13 +3329,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
                            extn_offset,
                            group_id, key_extn_len);
   #endif
-
-                    switch(group_id) {
-                    case 0x11EC: /* X25519MLKEM768 */
-                      flow->protos.tls_quic.pq_key_share = 1;
-                      break;
-                    }
-
+		    if(group_id != 0x2a2a /* Skip GREASE */) {
+		      if(ja.client.num_key_share_groups < MAX_NUM_JA)
+			ja.client.key_share_group[ja.client.num_key_share_groups++] = group_id;
+		    }
+		    
                     extn_offset += key_extn_len + 4;
                   }
 		}
@@ -3384,10 +3356,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 compute_ja4c:
 	      if(ndpi_struct->cfg.tls_ja4c_fingerprint_enabled) {
 	        ndpi_compute_ja4(ndpi_struct, flow, quic_version, &ja);
-
+		
 		if(ndpi_struct->ja4_custom_protos != NULL) {
 		  u_int64_t proto_id;
-
+		  
 		  /* This protocol has been defined in protos.txt-like files */
 		  if(ndpi_hash_find_entry(ndpi_struct->ja4_custom_protos,
 					  flow->protos.tls_quic.ja4_client,
@@ -3409,6 +3381,16 @@ compute_ja4c:
                     ndpi_set_risk(ndpi_struct, flow, NDPI_MALICIOUS_FINGERPRINT, flow->protos.tls_quic.ja4_client);
                 }
 	      }
+
+	      if(ndpi_struct->cfg.tls_ja_data_enabled) {
+		if(flow->protos.tls_quic.ja_client == NULL) {
+		  flow->protos.tls_quic.ja_client = ndpi_malloc(sizeof(ndpi_tls_client_info));
+		  
+		  if(flow->protos.tls_quic.ja_client != NULL)
+		    memcpy(flow->protos.tls_quic.ja_client, &ja.client, sizeof(ndpi_tls_client_info));
+		}
+	      }
+	      
 	      /* End JA4 */
 	    }
 

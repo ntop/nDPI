@@ -7890,6 +7890,12 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 
       if(flow->protos.tls_quic.ja4_client_raw)
 	ndpi_free(flow->protos.tls_quic.ja4_client_raw);
+
+      if(flow->protos.tls_quic.ja_client)
+	ndpi_free(flow->protos.tls_quic.ja_client);
+
+      if(flow->protos.tls_quic.ja_server)
+	ndpi_free(flow->protos.tls_quic.ja_server);
     }
 
     if(flow_is_proto(flow, NDPI_PROTOCOL_SIP)) {

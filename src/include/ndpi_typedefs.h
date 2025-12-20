@@ -1518,6 +1518,28 @@ typedef struct ndpi_protocol_plugin {
 
 typedef int (*ProcessExtraPacketsFunc) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
 
+typedef struct {
+  u_int16_t tls_handshake_version;
+  u_int16_t num_ciphers, cipher[MAX_NUM_JA];
+  u_int16_t num_tls_extensions, tls_extension[MAX_NUM_JA];
+  u_int16_t num_elliptic_curve_groups, elliptic_curve_group[MAX_NUM_JA];
+  u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA];
+  u_int16_t num_signature_algorithms, signature_algorithm[MAX_NUM_JA];
+  u_int16_t num_supported_versions, supported_version[MAX_NUM_JA];
+  u_int16_t num_key_share_groups, key_share_group[MAX_NUM_JA];
+  char signature_algorithms_str[MAX_JA_STRLEN], alpn[MAX_JA_STRLEN];
+  char alpn_original_last;  /* Store original last character before null terminator */  
+} ndpi_tls_client_info;
+
+typedef struct {
+  u_int16_t tls_handshake_version;
+  u_int16_t num_ciphers, cipher[MAX_NUM_JA];
+  u_int16_t num_tls_extensions, tls_extension[MAX_NUM_JA];
+  u_int16_t tls_supported_version;
+  u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA];
+  char alpn[MAX_JA_STRLEN];  
+} ndpi_tls_server_info;
+
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   struct ndpi_proto_stack protocol_stack;
@@ -1693,8 +1715,7 @@ struct ndpi_flow_struct {
       u_int16_t server_cipher;
       u_int8_t sha1_certificate_fingerprint[20];
       u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1,
-	server_hello_processed:1, fingerprint_set:1, webrtc:1,
-	pq_key_share:1, pq_supported_groups:1;
+	server_hello_processed:1, fingerprint_set:1, webrtc:1;
 
 #ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
       /* Under #ifdef to save memory for those who do not need them */
@@ -1713,6 +1734,10 @@ struct ndpi_flow_struct {
 
       u_int32_t quic_version;
       u_int32_t quic_idle_timeout_sec;
+
+      /* Optionally allocated based on nDPI configuration */
+      ndpi_tls_client_info *ja_client;
+      ndpi_tls_server_info *ja_server;
     } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
     struct {

@@ -1208,8 +1208,7 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
 
 static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *flow, bool is_tls_proto)
 {
-  if(flow->protos.tls_quic.ssl_version)
-  {
+  if(flow->protos.tls_quic.ssl_version) {
     char buf[64];
     char notBefore[32], notAfter[32];
     struct tm a, b, *before = NULL, *after = NULL;
@@ -1220,33 +1219,26 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
     ndpi_ssl_version2str(version, sizeof(version), flow->protos.tls_quic.ssl_version, &unknown_tls_version);
 
     if(flow->protos.tls_quic.notBefore)
-    {
       before = ndpi_gmtime_r((const time_t *)&flow->protos.tls_quic.notBefore, &a);
-    }
-    if(flow->protos.tls_quic.notAfter)
-    {
-      after = ndpi_gmtime_r((const time_t *)&flow->protos.tls_quic.notAfter, &b);
-    }
 
-    if(!unknown_tls_version)
-    {
+    if(flow->protos.tls_quic.notAfter)
+      after = ndpi_gmtime_r((const time_t *)&flow->protos.tls_quic.notAfter, &b);
+
+    if(!unknown_tls_version) {
       ndpi_serialize_start_of_block(serializer, "tls");
       ndpi_serialize_string_string(serializer, "version", version);
 
-      if(flow->protos.tls_quic.server_names)
-      {
+      if(flow->protos.tls_quic.server_names) {
         ndpi_serialize_string_string(serializer, "server_names",
                                      flow->protos.tls_quic.server_names);
       }
 
-      if(before)
-      {
+      if(before) {
         strftime(notBefore, sizeof(notBefore), "%Y-%m-%d %H:%M:%S", before);
         ndpi_serialize_string_string(serializer, "notbefore", notBefore);
       }
 
-      if(after)
-      {
+      if(after) {
         strftime(notAfter, sizeof(notAfter), "%Y-%m-%d %H:%M:%S", after);
         ndpi_serialize_string_string(serializer, "notafter", notAfter);
       }
@@ -1258,30 +1250,22 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
                                    ndpi_cipher2str(flow->protos.tls_quic.server_cipher, unknown_cipher));
 
       if(flow->protos.tls_quic.issuerDN)
-      {
         ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.tls_quic.issuerDN);
-      }
-      if(flow->protos.tls_quic.subjectDN)
-      {
-        ndpi_serialize_string_string(serializer, "subjectDN", flow->protos.tls_quic.subjectDN);
-      }
-      if(flow->protos.tls_quic.advertised_alpns)
-      {
-        ndpi_serialize_string_string(serializer, "advertised_alpns", flow->protos.tls_quic.advertised_alpns);
-      }
-      if(flow->protos.tls_quic.negotiated_alpn)
-      {
-        ndpi_serialize_string_string(serializer, "negotiated_alpn", flow->protos.tls_quic.negotiated_alpn);
-      }
-      if(flow->protos.tls_quic.tls_supported_versions)
-      {
-        ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.tls_quic.tls_supported_versions);
-      }
 
-      if(flow->protos.tls_quic.sha1_certificate_fingerprint[0] != '\0')
-      {
-        for(i=0, off=0; i<20; i++)
-        {
+      if(flow->protos.tls_quic.subjectDN)
+        ndpi_serialize_string_string(serializer, "subjectDN", flow->protos.tls_quic.subjectDN);
+
+      if(flow->protos.tls_quic.advertised_alpns)
+        ndpi_serialize_string_string(serializer, "advertised_alpns", flow->protos.tls_quic.advertised_alpns);
+
+      if(flow->protos.tls_quic.negotiated_alpn)
+        ndpi_serialize_string_string(serializer, "negotiated_alpn", flow->protos.tls_quic.negotiated_alpn);
+
+      if(flow->protos.tls_quic.tls_supported_versions)
+        ndpi_serialize_string_string(serializer, "tls_supported_versions", flow->protos.tls_quic.tls_supported_versions);
+
+      if(flow->protos.tls_quic.sha1_certificate_fingerprint[0] != '\0') {
+        for(i=0, off=0; i<20; i++) {
           int rc = ndpi_snprintf(&buf[off], sizeof(buf)-off,"%s%02X", (i > 0) ? ":" : "",
                                flow->protos.tls_quic.sha1_certificate_fingerprint[i] & 0xFF);
 
@@ -1292,13 +1276,120 @@ static void ndpi_tls2json(ndpi_serializer *serializer, struct ndpi_flow_struct *
       }
 
       if (is_tls_proto == true)
-      {
         ndpi_serialize_string_uint32(serializer, "blocks", flow->l4.tcp.tls.num_tls_blocks);
-      }
+
 #ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
       ndpi_serialize_string_uint32(serializer, "sig_algs", flow->protos.tls_quic.num_tls_signature_algorithms);
 #endif
 
+      if(flow->protos.tls_quic.ja_client != NULL) {
+	ndpi_tls_client_info *c = flow->protos.tls_quic.ja_client;
+	u_int16_t i;
+	
+	ndpi_serialize_start_of_block(serializer, "client_data");
+
+	if(c->num_ciphers > 0) {
+	  ndpi_serialize_start_of_list(serializer, "ciphers");
+	  
+	  for(i=0; i<c->num_ciphers; i++)
+	    ndpi_serialize_string_uint32(serializer, "", c->cipher[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+
+	if(c->num_tls_extensions > 0) {
+	  ndpi_serialize_start_of_list(serializer, "tls_extensions");
+	  
+	  for(i=0; i<c->num_tls_extensions; i++)
+	    ndpi_serialize_string_uint32(serializer, "", c->tls_extension[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+
+	if(c->num_elliptic_curve_groups > 0) {
+	  ndpi_serialize_start_of_list(serializer, "elliptic_curve_groups");
+	  
+	  for(i=0; i<c->num_elliptic_curve_groups; i++)
+	    ndpi_serialize_string_uint32(serializer, "", c->elliptic_curve_group[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+
+	if(c->num_elliptic_curve_point_format > 0) {
+	  ndpi_serialize_start_of_list(serializer, "elliptic_curve_point_format");
+	  
+	  for(i=0; i<c->num_elliptic_curve_point_format; i++)
+	    ndpi_serialize_string_uint32(serializer, "", c->elliptic_curve_point_format[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+	
+	if(c->num_signature_algorithms > 0) {
+	  ndpi_serialize_start_of_list(serializer, "signature_algorithms");
+	  
+	  for(i=0; i<c->num_signature_algorithms; i++)
+	    ndpi_serialize_string_uint32(serializer, "", c->signature_algorithm[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+
+	if(c->num_key_share_groups > 0) {
+	  ndpi_serialize_start_of_list(serializer, "key_share_groups");
+	  
+	  for(i=0; i<c->num_key_share_groups; i++)
+	    ndpi_serialize_string_uint32(serializer, "", c->key_share_group[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+
+	if(c->num_supported_versions > 0) {
+	  ndpi_serialize_start_of_list(serializer, "supported_versions");
+	  
+	  for(i=0; i<c->num_supported_versions; i++)
+	    ndpi_serialize_string_uint32(serializer, "", c->supported_version[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+
+	ndpi_serialize_end_of_block(serializer);
+      }
+      
+      if(flow->protos.tls_quic.ja_server != NULL) {
+	ndpi_tls_server_info *s = flow->protos.tls_quic.ja_server;
+	u_int16_t i;
+	
+	ndpi_serialize_start_of_block(serializer, "server_data");
+
+	if(s->num_ciphers > 0) {
+	  ndpi_serialize_start_of_list(serializer, "ciphers");
+	  
+	  for(i=0; i<s->num_ciphers; i++)
+	    ndpi_serialize_string_uint32(serializer, "", s->cipher[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+
+	if(s->num_tls_extensions > 0) {
+	  ndpi_serialize_start_of_list(serializer, "tls_extensions");
+	  
+	  for(i=0; i<s->num_tls_extensions; i++)
+	    ndpi_serialize_string_uint32(serializer, "", s->tls_extension[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+
+	if(s->num_elliptic_curve_point_format > 0) {
+	  ndpi_serialize_start_of_list(serializer, "elliptic_curve_point_format");
+	  
+	  for(i=0; i<s->num_elliptic_curve_point_format; i++)
+	    ndpi_serialize_string_uint32(serializer, "", s->elliptic_curve_point_format[i]);
+
+	  ndpi_serialize_end_of_list(serializer);
+	}
+	
+	ndpi_serialize_end_of_block(serializer);
+      }
+      
       ndpi_serialize_end_of_block(serializer);
     }
   }

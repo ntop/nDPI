@@ -297,6 +297,7 @@ struct ndpi_detection_module_config_struct {
   int tls_ja3s_fingerprint_enabled;
   int tls_ja4c_fingerprint_enabled;
   int tls_ja4r_fingerprint_enabled;
+  int tls_ja_data_enabled;
   int tls_subclassification_enabled;
   int tls_blocks_analysis_enabled;
   int quic_subclassification_enabled;
