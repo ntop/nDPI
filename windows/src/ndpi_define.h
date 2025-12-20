@@ -293,4 +293,8 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 /* Maximum number of plugins supported by nDPI */
 #define NDPI_MAX_NUM_PLUGINS    32
 
+/* JA3/4 Information */
+#define MAX_NUM_JA         128
+#define MAX_JA_STRLEN      256
+
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */
