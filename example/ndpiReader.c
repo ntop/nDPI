@@ -7292,10 +7292,6 @@ int main(int argc, char **argv) {
   int skip_unit_tests = 1;
 #endif
 
-  printf("%u\n", sizeof(((struct ndpi_flow_struct *)0)->protos));
-  printf("%u\n", sizeof(struct ndpi_flow_struct));
-  exit(0);
-  
 #ifdef FORCE_RANKING_CHECK
   checkRankingUnitTest(true);
   exit(0);
