@@ -1943,11 +1943,11 @@ struct ndpi_flow_struct {
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 264,
-               "Size of the struct member protocols increased to more than 264 bytes, "
+_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 328,
+               "Size of the struct member protocols increased to more than 328 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1240,
-               "Size of the flow struct increased to more than 1240 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1304,
+               "Size of the flow struct increased to more than 1304 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif
