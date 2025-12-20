@@ -2563,6 +2563,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if(flow->ssh_tls.server_names) fprintf(out, "[ServerNames: %s]", flow->ssh_tls.server_names);
     if(flow->ssh_tls.server_hassh[0] != '\0') fprintf(out, "[HASSH-S: %s]", flow->ssh_tls.server_hassh);
+    if(flow->ssh_tls.ssh_key_exchange_method[0] != '\0')
+      fprintf(out, "[Kex Method: %s]", flow->ssh_tls.ssh_key_exchange_method);
 
     if(flow->ssh_tls.ja3_server[0] != '\0') fprintf(out, "[JA3S: %s]", flow->ssh_tls.ja3_server);
 

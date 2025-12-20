@@ -7898,6 +7898,17 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 	ndpi_free(flow->protos.tls_quic.ja_server);
     }
 
+    if(flow_is_proto(flow, NDPI_PROTOCOL_SSH)) {
+      if(flow->protos.ssh.client_key_exchange_algorithms)
+	ndpi_free(flow->protos.ssh.client_key_exchange_algorithms);
+
+      if(flow->protos.ssh.server_key_exchange_algorithms)
+	ndpi_free(flow->protos.ssh.server_key_exchange_algorithms);
+
+      if(flow->protos.ssh.key_exchange_method)
+	ndpi_free(flow->protos.ssh.key_exchange_method);
+    }
+
     if(flow_is_proto(flow, NDPI_PROTOCOL_SIP)) {
       if(flow->protos.sip.from)
         ndpi_free(flow->protos.sip.from);

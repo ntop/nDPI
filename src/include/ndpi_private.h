@@ -315,6 +315,9 @@ struct ndpi_detection_module_config_struct {
   int sip_attribute_to_enabled;
   int sip_attribute_to_imsi_enabled;
 
+  int ssh_hassh_fingerprint_enabled;
+  int ssh_hassh_data_enabled;
+  
   int stun_opportunistic_tls_enabled;
   int stun_max_packets_extra_dissection;
   int rtp_max_packets_extra_dissection;

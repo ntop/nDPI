@@ -1413,6 +1413,48 @@ char* print_ndpi_address_port(ndpi_address_port *ap, char *buf, u_int buf_len) {
 
 /* ********************************** */
 
+void ndpi_ssh_serialize_csv(ndpi_serializer *serializer,
+			    const char *csv_string,
+			    const char* label) {
+  u_int offset=0;
+  
+  if(!csv_string) return;
+  
+  ndpi_serialize_start_of_list(serializer, label);
+
+  while(csv_string[offset] != '\0') {
+    u_int len = 0, new_offset = offset;
+    /*
+      ext-info-c is a special keyword used in the Secure Shell (SSH)
+      protocol's initial key exchange (KEXINIT) to signal that the
+      client supports the SSH Extension Negotiation mechanism (RFC 8308),
+      allowing it to send additional information (like
+      supported algorithms) to the server via SSH_MSG_EXT_INFO
+      messages after the KEX starts.
+    */
+    const char *toskip = "ext-info-";
+      
+    while((csv_string[new_offset] != ',')
+	  && (csv_string[new_offset] != '\0'))
+      new_offset++, len++;
+
+    if(ndpi_strnstr(&csv_string[offset], toskip, len) == NULL)
+      ndpi_serialize_string_string_len(serializer, "",
+				       &csv_string[offset], len);
+    
+    offset += len;
+    
+    if(csv_string[offset] == ',')
+      offset++;
+    else
+      break;
+  }
+  
+  ndpi_serialize_end_of_list(serializer);
+}
+
+/* ********************************** */
+
 /* NOTE: serializer must have been already initialized */
 int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 		  struct ndpi_flow_struct *flow,
@@ -1813,8 +1855,28 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "ssh");
     ndpi_serialize_string_string(serializer,  "client_signature", flow->protos.ssh.client_signature);
     ndpi_serialize_string_string(serializer,  "server_signature", flow->protos.ssh.server_signature);
-    ndpi_serialize_string_string(serializer,  "hassh_client", flow->protos.ssh.hassh_client);
-    ndpi_serialize_string_string(serializer,  "hassh_server", flow->protos.ssh.hassh_server);
+
+    if(ndpi_struct->cfg.ssh_hassh_fingerprint_enabled) {
+      ndpi_serialize_string_string(serializer,  "hassh_client", flow->protos.ssh.hassh_client);
+      ndpi_serialize_string_string(serializer,  "hassh_server", flow->protos.ssh.hassh_server);
+    }
+
+    if(ndpi_struct->cfg.ssh_hassh_data_enabled) {
+      ndpi_serialize_start_of_block(serializer, "key_exchange_algorithms");
+      
+      if(flow->protos.ssh.client_key_exchange_algorithms)
+	ndpi_ssh_serialize_csv(serializer, flow->protos.ssh.client_key_exchange_algorithms, "client");
+
+      if(flow->protos.ssh.server_key_exchange_algorithms)
+	ndpi_ssh_serialize_csv(serializer, flow->protos.ssh.server_key_exchange_algorithms, "server");
+
+      if(flow->protos.ssh.key_exchange_method)
+	ndpi_serialize_string_string(serializer,
+				     "key_exchange_method",
+				     flow->protos.ssh.key_exchange_method);
+      ndpi_serialize_end_of_block(serializer);
+    }
+    
     ndpi_serialize_end_of_block(serializer);
     break;
 

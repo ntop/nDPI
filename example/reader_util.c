@@ -1516,10 +1516,19 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	     flow->ndpi_flow->protos.ssh.client_signature);
     ndpi_snprintf(flow->ssh_tls.server_info, sizeof(flow->ssh_tls.server_info), "%s",
 	     flow->ndpi_flow->protos.ssh.server_signature);
-    ndpi_snprintf(flow->ssh_tls.client_hassh, sizeof(flow->ssh_tls.client_hassh), "%s",
-	     flow->ndpi_flow->protos.ssh.hassh_client);
-    ndpi_snprintf(flow->ssh_tls.server_hassh, sizeof(flow->ssh_tls.server_hassh), "%s",
-	     flow->ndpi_flow->protos.ssh.hassh_server);
+
+    if(flow->ndpi_flow->protos.ssh.hassh_client[0] != '\0')
+      ndpi_snprintf(flow->ssh_tls.client_hassh, sizeof(flow->ssh_tls.client_hassh), "%s",
+		    flow->ndpi_flow->protos.ssh.hassh_client);
+    
+    if(flow->ndpi_flow->protos.ssh.hassh_server[0] != '\0')
+      ndpi_snprintf(flow->ssh_tls.server_hassh, sizeof(flow->ssh_tls.server_hassh), "%s",
+		    flow->ndpi_flow->protos.ssh.hassh_server);
+    
+    if(flow->ndpi_flow->protos.ssh.key_exchange_method)
+      ndpi_snprintf(flow->ssh_tls.ssh_key_exchange_method,
+		    sizeof(flow->ssh_tls.ssh_key_exchange_method), "%s",
+		    flow->ndpi_flow->protos.ssh.key_exchange_method);
   }
   /* TLS/QUIC/DTLS/MAIL_S/FTPS */
   else if(ndpi_stack_is_tls_like(&flow->detected_protocol.protocol_stack)) {

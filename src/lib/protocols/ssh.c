@@ -231,9 +231,54 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
   /* -1 for ';' */
   if((offset >= packet->payload_packet_len) || (len >= packet->payload_packet_len-offset-1))
     goto invalid_payload;
-
+    
   /* ssh.kex_algorithms [C/S] */
   strncpy(buf, (const char *)&packet->payload[offset], buf_out_len = len);
+
+  if(ndpi_struct->cfg.ssh_hassh_data_enabled) {
+    buf[buf_out_len] = '\0';
+    
+    if(client_hash)
+      flow->protos.ssh.client_key_exchange_algorithms = ndpi_strdup(buf);
+    else
+      flow->protos.ssh.server_key_exchange_algorithms = ndpi_strdup(buf);
+
+    if(flow->protos.ssh.client_key_exchange_algorithms
+       && flow->protos.ssh.server_key_exchange_algorithms) {
+      /* Compute the negotiated key exchange algorithm */
+      u_int offset = 0;
+      char *csv_string = flow->protos.ssh.client_key_exchange_algorithms;
+      char buf[64];
+      
+      while(csv_string[offset] != '\0') {
+	u_int len = 0, new_offset = offset;
+	
+	while((csv_string[new_offset] != ',')
+	      && (csv_string[new_offset] != '\0'))
+	  new_offset++, len++;
+
+	len = ndpi_min(sizeof(buf)-1, len);	
+	strncpy(buf, &csv_string[offset], len);
+	buf[len] = '\0';
+	
+	if(strstr(flow->protos.ssh.server_key_exchange_algorithms, buf) != NULL) {
+	  flow->protos.ssh.key_exchange_method = ndpi_strdup(buf);
+	  break; /* Found what we looked for */
+	}
+	
+	offset += len;
+	
+	if(csv_string[offset] == ',')
+	  offset++;
+	else
+	  break;	
+      }
+    }
+  }
+
+  if(!ndpi_struct->cfg.ssh_hassh_fingerprint_enabled)
+    return(0);
+    
   buf[buf_out_len++] = ';';
   offset += len;
 
@@ -396,9 +441,10 @@ static void ndpi_ssh_zap_cr(char *str, int len) {
 
 /* ************************************************************************ */
 
-static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-
+  
 #ifdef SSH_DEBUG
   printf("[SSH] %s()\n", __FUNCTION__);
 #endif
@@ -448,63 +494,69 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
     ndpi_MD5_CTX ctx;
     
     if(msgcode == 20 /* key exchange init */) {
-      char *hassh_buf = ndpi_calloc(packet->payload_packet_len, sizeof(char));
-      u_int i, len;
+      if(ndpi_struct->cfg.ssh_hassh_fingerprint_enabled || ndpi_struct->cfg.ssh_hassh_data_enabled) {
+	char *hassh_buf = ndpi_calloc(packet->payload_packet_len, sizeof(char));
+	u_int i, len;
 
 #ifdef SSH_DEBUG
-      printf("[SSH] [stage: %u][msg: %u][direction: %u][key exchange init]\n", flow->l4.tcp.ssh_stage, msgcode, packet->packet_direction);
+	printf("[SSH] [stage: %u][msg: %u][direction: %u][key exchange init]\n", flow->l4.tcp.ssh_stage, msgcode, packet->packet_direction);
 #endif
 
-      if(hassh_buf) {
-	if(packet->packet_direction == 0 /* client */) {
-	  u_char fingerprint_client[16];
+	if(hassh_buf) {
+	  if(packet->packet_direction == 0 /* client */) {
+	    u_char fingerprint_client[16];
 
-	  len = concat_hash_string(ndpi_struct, flow, packet, hassh_buf, 1 /* client */);
+	    len = concat_hash_string(ndpi_struct, flow, packet, hassh_buf, 1 /* client */);
 
-	  ndpi_MD5Init(&ctx);
-	  ndpi_MD5Update(&ctx, (const unsigned char *)hassh_buf, len);
-	  ndpi_MD5Final(fingerprint_client, &ctx);
+	    if(ndpi_struct->cfg.ssh_hassh_fingerprint_enabled) {
+	      ndpi_MD5Init(&ctx);
+	      ndpi_MD5Update(&ctx, (const unsigned char *)hassh_buf, len);
+	      ndpi_MD5Final(fingerprint_client, &ctx);
 
 #ifdef SSH_DEBUG
-	  {
-	    printf("[SSH] [client][%s][", hassh_buf);
-	    for(i=0; i<16; i++) printf("%02X", fingerprint_client[i]);
-	    printf("]\n");
-	  }
+	      {
+		printf("[SSH] [client][%s][", hassh_buf);
+		for(i=0; i<16; i++) printf("%02X", fingerprint_client[i]);
+		printf("]\n");
+	      }
 #endif
-	  for(i=0; i<16; i++)
-	    snprintf(&flow->protos.ssh.hassh_client[i*2],
-		     sizeof(flow->protos.ssh.hassh_client) - (i*2),
-		     "%02X", fingerprint_client[i] & 0xFF);
+	      for(i=0; i<16; i++)
+		snprintf(&flow->protos.ssh.hassh_client[i*2],
+			 sizeof(flow->protos.ssh.hassh_client) - (i*2),
+			 "%02X", fingerprint_client[i] & 0xFF);
 	  
-	  flow->protos.ssh.hassh_client[32] = '\0';
-	} else {
-	  u_char fingerprint_server[16];
+	      flow->protos.ssh.hassh_client[32] = '\0';
+	    }
+	  } else {
+	    u_char fingerprint_server[16];
 
-	  len = concat_hash_string(ndpi_struct, flow, packet, hassh_buf, 0 /* server */);
+	    len = concat_hash_string(ndpi_struct, flow, packet, hassh_buf, 0 /* server */);
 
-	  ndpi_MD5Init(&ctx);
-	  ndpi_MD5Update(&ctx, (const unsigned char *)hassh_buf, len);
-	  ndpi_MD5Final(fingerprint_server, &ctx);
+	    if(ndpi_struct->cfg.ssh_hassh_fingerprint_enabled) {
+	      ndpi_MD5Init(&ctx);
+	      ndpi_MD5Update(&ctx, (const unsigned char *)hassh_buf, len);
+	      ndpi_MD5Final(fingerprint_server, &ctx);
 
 #ifdef SSH_DEBUG
-	  {
-	    printf("[SSH] [server][%s][", hassh_buf);
-	    for(i=0; i<16; i++) printf("%02X", fingerprint_server[i]);
-	    printf("]\n");
-	  }
+	      {
+		printf("[SSH] [server][%s][", hassh_buf);
+		for(i=0; i<16; i++) printf("%02X", fingerprint_server[i]);
+		printf("]\n");
+	      }
 #endif
 
-	  for(i=0; i<16; i++)
-	    snprintf(&flow->protos.ssh.hassh_server[i*2],
-		     sizeof(flow->protos.ssh.hassh_server) - (i*2),
-		     "%02X", fingerprint_server[i] & 0xFF);
-	  flow->protos.ssh.hassh_server[32] = '\0';
+	      for(i=0; i<16; i++)
+		snprintf(&flow->protos.ssh.hassh_server[i*2],
+			 sizeof(flow->protos.ssh.hassh_server) - (i*2),
+			 "%02X", fingerprint_server[i] & 0xFF);
+	      flow->protos.ssh.hassh_server[32] = '\0';
+	    }
+	  }
+
+	  ndpi_free(hassh_buf);
 	}
-
-	ndpi_free(hassh_buf);
       }
-
+      
       ndpi_int_ssh_add_connection(ndpi_struct, flow);
     }
 

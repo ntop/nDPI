@@ -152,8 +152,8 @@ static const struct cfg_param {
   { "tls",           "metadata.ja4r_fingerprint",               "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja4r_fingerprint_enabled), NULL },
   { "tls",           "metadata.ja_data",                        "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja_data_enabled), NULL },
   { "tls",           "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_subclassification_enabled), NULL },
-  { "tls",           "blocks_analysis",                         "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_blocks_analysis_enabled), NULL },
-
+  { "tls",           "blocks_analysis",                         "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_blocks_analysis_enabled), NULL },  
+  
   { "quic",          "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(quic_subclassification_enabled), NULL },
 
   { "smtp",          "tls_dissection",                          "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled), NULL },
@@ -169,6 +169,9 @@ static const struct cfg_param {
   { "sip",           "metadata.attribute.to",                   "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(sip_attribute_to_enabled), NULL },
   { "sip",           "metadata.attribute.to_imsi",              "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(sip_attribute_to_imsi_enabled), NULL },
 
+  { "ssh",           "metadata.hassh_fingerprint",              "enable",  NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ssh_hassh_fingerprint_enabled), NULL },
+  { "ssh",           "metadata.ssh_data",                       "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ssh_hassh_data_enabled), NULL },
+  
   { "stun",          "tls_dissection",                          "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_opportunistic_tls_enabled), NULL },
   { "stun",          "max_packets_extra_dissection",            "6", "0", "255", CFG_PARAM_INT, __OFF(stun_max_packets_extra_dissection), NULL },
   { "stun",          "metadata.attribute.mapped_address",       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(stun_mapped_address_enabled), NULL },

@@ -1743,6 +1743,9 @@ struct ndpi_flow_struct {
     struct {
       char client_signature[48], server_signature[48];
       char hassh_client[33], hassh_server[33];
+      char *client_key_exchange_algorithms,
+	*server_key_exchange_algorithms,
+	*key_exchange_method;
     } ssh;
 
     struct {
