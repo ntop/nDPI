@@ -821,6 +821,8 @@ static struct ndpi_flow_info *get_ndpi_flow_info(struct ndpi_workflow * workflow
     l4_data_len = l4_packet_len - sizeof(struct ndpi_icmp6hdr);
     *sport = *dport = 0;
   } else {
+    *payload = NULL;
+    *payload_len = 0;
     // non tcp/udp protocols
     *sport = *dport = 0;
     l4_data_len = 0;
