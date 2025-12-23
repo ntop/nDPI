@@ -2244,7 +2244,11 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s_", tmp_str); if(i > 0) ja4_r_len += i;
 #endif
 
-  ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+  if(ja->client.num_ciphers > 0) {
+    ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+  } else {
+    memset(sha_hash, '\0', 6);
+  }
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x_",
@@ -2300,7 +2304,11 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
   }
 
-  ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+  if(ja->client.num_tls_extensions > 0) {
+    ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+  } else {
+    memset(sha_hash, '\0', 6);
+  }
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x",
