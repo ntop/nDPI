@@ -1957,21 +1957,28 @@ char* sprint_bin(char *buf, u_int buf_len, struct ndpi_bin *b,
   if(normalize) ndpi_normalize_bin(b);
   
   for(i=0; i<b->num_bins; i++) {
-    int l = -1;
-    char *s  = (i > 0) ? sep : (char*)"";
+    int l;
+
+    if(i > 0) {
+      l = snprintf(&buf[idx], buf_len-idx,  "%s", sep);
+      if(l < 0) break; else idx += l;
+    }
     
     switch(b->family) {
     case ndpi_bin_family8:
-      l = snprintf(&buf[idx], buf_len-idx,  "%s%u", s, b->u.bins8[i]);
+      l = snprintf(&buf[idx], buf_len-idx,  "%u", b->u.bins8[i]);
       break;
     case ndpi_bin_family16:
-      l = snprintf(&buf[idx], buf_len-idx,  "%s%u", s, b->u.bins16[i]);
+      l = snprintf(&buf[idx], buf_len-idx,  "%u", b->u.bins16[i]);
       break;
     case ndpi_bin_family32:
-      l = snprintf(&buf[idx], buf_len-idx,  "%s%u", s, b->u.bins32[i]);
+      l = snprintf(&buf[idx], buf_len-idx,  "%u", b->u.bins32[i]);
       break;
     case ndpi_bin_family64:
-      l = snprintf(&buf[idx], buf_len-idx,  "%s%" PRIu64 "", s, b->u.bins64[i]);
+      l = snprintf(&buf[idx], buf_len-idx,  "%" PRIu64 "", b->u.bins64[i]);
+      break;
+    default:
+      l = -1;
       break;
     }
 
