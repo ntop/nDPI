@@ -1976,7 +1976,7 @@ char* sprint_bin(char *buf, u_int buf_len, struct ndpi_bin *b,
       break;
     case ndpi_bin_family64:
 #ifdef __MINGW64__
-      l = snprintf(&buf[idx], buf_len - idx, "%llu", b->u.bins64[i]);
+      l = snprintf(&buf[idx], buf_len - idx, "%lu", (unsigned long)b->u.bins64[i]);
 #else
       l = snprintf(&buf[idx], buf_len - idx, "%" PRIu64, b->u.bins64[i]);
 #endif
