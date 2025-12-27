@@ -1356,8 +1356,10 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 			    message) == -1)
     return 0; /* Error -> stop */
 
-  /* Valid TLS Content Types:
-     https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5 */
+  /*
+    Valid TLS Content Types:
+    https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5
+  */
   if(!(message->buffer[0] >= 20 &&
        message->buffer[0] <= 26)) {
     something_went_wrong = 1;
@@ -1401,7 +1403,8 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	if(packet->packet_direction != 0) blen = -blen;
 	
 	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen;
-	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type = content_type;
+	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type =
+	  ndpi_encode_tls_block_type(content_type, (len > 5) ? message->buffer[5] : 0);
 	
 #ifdef DEBUG_TLS_BLOCKS
 	printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
@@ -2776,9 +2779,19 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		 ((packet->payload[extn_off] & 0xF) != 0xA)) {
 		/* Skip GREASE */
 
-		if(ja.client.num_tls_extensions < MAX_NUM_JA)
+		if(ja.client.num_tls_extensions < MAX_NUM_JA) {
+		  if((extension_id == 0xFE0D /* ECHO */)
+		     && ndpi_struct->cfg.tls_blocks_analysis_enabled
+		     && (flow->l4.tcp.tls.num_tls_blocks > 0) /* It should always be like that */) {
+		    /*
+		      Taking EncryptedClientHello (ECHO) lenght out of the block lenght
+		      allows us to have a consistent measurement regardless of the SNI being used
+		      and other information put in ECHO across requests
+		    */
+		    flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks-1].len -= extension_len - 4 /* id + len */;
+		  }
 		  ja.client.tls_extension[ja.client.num_tls_extensions++] = extension_id;
-		else {
+		} else {
 		  invalid_ja = 1;
 #ifdef DEBUG_TLS
 		  printf("Client TLS Invalid extensions %u\n", ja.client.num_tls_extensions);
@@ -2802,6 +2815,17 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 		    printf("[TLS] SNI: [%s]\n", sni);
 #endif
+		    if(sni /* It should always be like that */
+		       && ndpi_struct->cfg.tls_blocks_analysis_enabled
+		       && (flow->l4.tcp.tls.num_tls_blocks > 0) /* It should always be like that */
+		       ) {
+		      /*
+			Taking SNI lenght out of the block lenght allows us to have a consistent
+			measurement regardless of the SNI being used
+		      */
+		      flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks-1].len -= sni_len;
+		    }
+		    
 		    if(ndpi_is_valid_hostname((char *)&packet->payload[offset+extension_offset+5], len) == 0) {
 		      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, sni);
 

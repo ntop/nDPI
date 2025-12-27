@@ -5101,3 +5101,73 @@ char *ndpi_stack2str(struct ndpi_detection_module_struct *ndpi_str,
 
   return buf;
 }
+
+/* ****************************************** */
+
+ndpi_tls_block ndpi_encode_tls_block_type(u_int8_t block_type, u_int8_t handshake_type) {
+  switch(block_type) {
+  case 20: /* Change Cipher */    
+    return(tls_change_cipher);
+  case 21: /* Alert */
+    return(tls_alert);
+  case 22: /* Handshake */
+    switch(handshake_type) {
+    case 0: /* Hello Request */
+      return(tls_handshake_hello_request);
+    case 1: /* Client Hello */
+      return(tls_handshake_client_hello);
+    case 2: /* Server Hello */
+      return(tls_handshake_server_hello);
+    case 4: /* New Session Ticket */
+      return(tls_handshake_new_session_ticket);
+    case 8: /* Encrypted Extn (1.3 only) */
+      return(tls_handshake_encrypted_extn);
+    case 11: /* Certificate */
+      return(tls_handshake_certificate);
+    case 12: /* Server Key Exchange */
+      return(tls_handshake_server_key_exchange);
+    case 13: /* Certificate Request */
+      return(tls_handshake_certificate_request);
+    case 14: /* Server Hello Done */
+      return(tls_handshake_server_hello_done);
+    case 15: /* Certificate Verify */
+      return(tls_handshake_certificate_verify);
+    case 16: /* Client Key Exchange */
+      return(tls_handshake_client_key_exchange);
+    case 20: /* Finished */
+      return(tls_handshake_finished);
+    }
+    break;
+  case 23: /* Application Data */
+    return(tls_application_data);
+  case 24: /* Heartbeat */
+    return(tls_heartbeat);
+  }
+
+  return(tls_unknown);
+}
+
+/* ****************************************** */
+
+const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block block_type) {
+  switch(block_type) {
+  case tls_change_cipher: return("ChangeCipher"); 
+  case tls_alert: return("Alert");
+  case tls_handshake_hello_request: return("Handshake:HelloRequest");
+  case tls_handshake_client_hello: return("Handshake:ClientHello");
+  case tls_handshake_server_hello: return("Handshake:ServerHello");
+  case tls_handshake_new_session_ticket: return("Handshake:NewSessTicket");
+  case tls_handshake_encrypted_extn: return("Handshake:EncryptedExtn");
+  case tls_handshake_certificate: return("Handshake:Certificate");
+  case tls_handshake_server_key_exchange: return("Handshake:ServerKeyExch");
+  case tls_handshake_certificate_request: return("Handshake:CertRequest");
+  case tls_handshake_server_hello_done: return("Handshake:ServerHelloDone");
+  case tls_handshake_certificate_verify: return("Handshake:CertVerify");
+  case tls_handshake_client_key_exchange: return("Handshake:ClientKeyExch");
+  case tls_handshake_finished: return("Handshake:Finished");
+  case tls_application_data: return("AppData");
+  case tls_heartbeat: return("Heartbeat");
+  default: return("Unknown");
+  }
+}
+

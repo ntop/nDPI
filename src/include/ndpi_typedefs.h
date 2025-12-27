@@ -832,9 +832,29 @@ struct ndpi_lru_cache {
 
 /* ************************************************** */
 
+typedef enum {
+  tls_unknown = 0,
+  tls_change_cipher,
+  tls_alert,
+  tls_handshake_hello_request,
+  tls_handshake_client_hello,
+  tls_handshake_server_hello,
+  tls_handshake_new_session_ticket,
+  tls_handshake_encrypted_extn,
+  tls_handshake_certificate,
+  tls_handshake_server_key_exchange,
+  tls_handshake_certificate_request,
+  tls_handshake_server_hello_done,
+  tls_handshake_certificate_verify,
+  tls_handshake_client_key_exchange,
+  tls_handshake_finished,
+  tls_application_data,
+  tls_heartbeat,
+} ndpi_tls_block;
+
 struct ndpi_tls_block {
-  u_int8_t block_type; /* + = src->dst, - = dst->src */
-  int16_t len;
+  ndpi_tls_block block_type;
+  int16_t len; /* + = src->dst, - = dst->src */
 };
 
 struct ndpi_flow_tcp_struct {
