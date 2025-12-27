@@ -30,9 +30,7 @@
 
 #include <stdio.h>
 #include <sys/types.h>
-#ifdef HAVE_INTTYPES_H
 #include <inttypes.h> /* Needed by PRIu64 */
-#endif
 #include <stdlib.h>
 #include <getopt.h>
 #include <float.h> /* FLT_EPSILON */
@@ -1977,7 +1975,7 @@ char* sprint_bin(char *buf, u_int buf_len, struct ndpi_bin *b,
       l = snprintf(&buf[idx], buf_len-idx,  "%u", b->u.bins32[i]);
       break;
     case ndpi_bin_family64:
-      l = snprintf(&buf[idx], buf_len - idx, "%" PRIu64, b->u.bins64[i]);
+      l = snprintf(&buf[idx], buf_len - idx, "%lu", b->u.bins64[i]);
       break;
     default:
       l = -1;
