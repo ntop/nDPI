@@ -1957,19 +1957,20 @@ char* sprint_bin(char *buf, u_int buf_len, struct ndpi_bin *b,
   
   for(i=0; i<b->num_bins; i++) {
     int l = -1;
+    char *s  = (i > 0) ? sep : (char*)"";
     
     switch(b->family) {
     case ndpi_bin_family8:
-      l = snprintf(&buf[idx], buf_len-idx,  "%s%u", (i > 0) ? sep : "", b->u.bins8[i]);
+      l = snprintf(&buf[idx], buf_len-idx,  "%s%u", s, b->u.bins8[i]);
       break;
     case ndpi_bin_family16:
-      l = snprintf(&buf[idx], buf_len-idx,  "%s%u", (i > 0) ? sep : "", b->u.bins16[i]);
+      l = snprintf(&buf[idx], buf_len-idx,  "%s%u", s, b->u.bins16[i]);
       break;
     case ndpi_bin_family32:
-      l = snprintf(&buf[idx], buf_len-idx,  "%s%u", (i > 0) ? sep : "", b->u.bins32[i]);
+      l = snprintf(&buf[idx], buf_len-idx,  "%s%u", s, b->u.bins32[i]);
       break;
     case ndpi_bin_family64:
-      l = snprintf(&buf[idx], buf_len-idx,  "%s%llu", (i > 0) ? sep : "", (unsigned long long)b->u.bins64[i]);
+      l = snprintf(&buf[idx], buf_len-idx,  "%s%llu", s, (unsigned long long)b->u.bins64[i]);
       break;
     }
 
