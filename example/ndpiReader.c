@@ -1970,7 +1970,7 @@ char* sprint_bin(char *buf, u_int buf_len, struct ndpi_bin *b,
       l = snprintf(&buf[idx], buf_len-idx,  "%s%u", s, b->u.bins32[i]);
       break;
     case ndpi_bin_family64:
-      l = snprintf(&buf[idx], buf_len-idx,  "%s%llu", s, (unsigned long long)b->u.bins64[i]);
+      l = snprintf(&buf[idx], buf_len-idx,  "%s%" PRIu64, s, (unsigned long long)b->u.bins64[i]);
       break;
     }
 
