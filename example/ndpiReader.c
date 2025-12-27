@@ -60,6 +60,7 @@
 #include <libgen.h>
 #endif
 #include <errno.h>
+#include <inttypes.h> /* Needed by PRIu64 */
 
 #include "reader_util.h"
 
