@@ -3122,38 +3122,50 @@ int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
 
   switch(ptree_type) {
   case NDPI_PTREE_RISK_MASK:
-    if(!ndpi_struct->ip_risk_mask)
+    if(!ndpi_struct->ip_risk_mask) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->ip_risk_mask->v4, stats);
     return 0;
 
   case NDPI_PTREE_RISK_MASK6:
-    if(!ndpi_struct->ip_risk_mask)
+    if(!ndpi_struct->ip_risk_mask) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->ip_risk_mask->v6, stats);
     return 0;
 
   case NDPI_PTREE_RISK:
-    if(!ndpi_struct->ip_risk)
+    if(!ndpi_struct->ip_risk) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->ip_risk->v4, stats);
     return 0;
 
   case NDPI_PTREE_RISK6:
-    if(!ndpi_struct->ip_risk)
+    if(!ndpi_struct->ip_risk) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->ip_risk->v6, stats);
     return 0;
 
   case NDPI_PTREE_PROTOCOLS:
-    if(!ndpi_struct->protocols)
+    if(!ndpi_struct->protocols) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->protocols->v4, stats);
     return 0;
 
   case NDPI_PTREE_PROTOCOLS6:
-    if(!ndpi_struct->protocols)
+    if(!ndpi_struct->protocols) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->protocols->v6, stats);
     return 0;
 
