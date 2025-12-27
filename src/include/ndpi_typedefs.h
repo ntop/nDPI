@@ -850,10 +850,10 @@ typedef enum {
   tls_handshake_finished,
   tls_application_data,
   tls_heartbeat,
-} ndpi_tls_block;
+} ndpi_tls_block_type;
 
 struct ndpi_tls_block {
-  ndpi_tls_block block_type;
+  ndpi_tls_block_type block_type;
   int16_t len; /* + = src->dst, - = dst->src */
 };
 

@@ -5104,7 +5104,7 @@ char *ndpi_stack2str(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ****************************************** */
 
-ndpi_tls_block ndpi_encode_tls_block_type(u_int8_t block_type, u_int8_t handshake_type) {
+ndpi_tls_block_type ndpi_encode_tls_block_type(u_int8_t block_type, u_int8_t handshake_type) {
   switch(block_type) {
   case 20: /* Change Cipher */    
     return(tls_change_cipher);
@@ -5149,7 +5149,7 @@ ndpi_tls_block ndpi_encode_tls_block_type(u_int8_t block_type, u_int8_t handshak
 
 /* ****************************************** */
 
-const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block block_type) {
+const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block_type block_type) {
   switch(block_type) {
   case tls_change_cipher: return("ChangeCipher"); 
   case tls_alert: return("Alert");
