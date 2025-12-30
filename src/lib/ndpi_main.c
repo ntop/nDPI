@@ -7803,66 +7803,8 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
 
 /* ****************************************************** */
 
-void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
+void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
   if(flow) {
-    if(flow->num_risk_infos) {
-      u_int i;
-
-      for(i=0; i<flow->num_risk_infos; i++)
-	ndpi_free(flow->risk_infos[i].info);
-    }
-
-    if(flow->tcp.fingerprint)
-      ndpi_free(flow->tcp.fingerprint);
-
-    if(flow->tcp.fingerprint_raw)
-      ndpi_free(flow->tcp.fingerprint_raw);
-
-    if(flow->ndpi.fingerprint)
-      ndpi_free(flow->ndpi.fingerprint);
-
-    if(flow->http.url)
-      ndpi_free(flow->http.url);
-
-    if(flow->http.content_type)
-      ndpi_free(flow->http.content_type);
-
-    if(flow->http.request_content_type)
-      ndpi_free(flow->http.request_content_type);
-
-    if(flow->http.referer)
-      ndpi_free(flow->http.referer);
-
-    if(flow->http.host)
-      ndpi_free(flow->http.host);
-
-    if(flow->http.user_agent)
-      ndpi_free(flow->http.user_agent);
-
-    if(flow->http.nat_ip)
-      ndpi_free(flow->http.nat_ip);
-
-    if(flow->http.detected_os)
-      ndpi_free(flow->http.detected_os);
-
-    if(flow->http.server)
-      ndpi_free(flow->http.server);
-
-    if(flow->http.filename)
-      ndpi_free(flow->http.filename);
-
-    if(flow->http.username)
-      ndpi_free(flow->http.username);
-
-    if(flow->http.password)
-      ndpi_free(flow->http.password);
-
-    if(flow->kerberos_buf.pktbuf)
-      ndpi_free(flow->kerberos_buf.pktbuf);
-
-    if(flow->monit)
-      ndpi_free(flow->monit);
-
     if(flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
        flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
@@ -7977,7 +7919,73 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
       if(flow->protos.ssdp.user_agent)
         ndpi_free(flow->protos.ssdp.user_agent);
     }
+  }
+}
 
+/* ****************************************************** */
+
+void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
+  if(flow) {
+    if(flow->num_risk_infos) {
+      u_int i;
+
+      for(i=0; i<flow->num_risk_infos; i++)
+	ndpi_free(flow->risk_infos[i].info);
+    }
+
+    if(flow->tcp.fingerprint)
+      ndpi_free(flow->tcp.fingerprint);
+
+    if(flow->tcp.fingerprint_raw)
+      ndpi_free(flow->tcp.fingerprint_raw);
+
+    if(flow->ndpi.fingerprint)
+      ndpi_free(flow->ndpi.fingerprint);
+
+    if(flow->http.url)
+      ndpi_free(flow->http.url);
+
+    if(flow->http.content_type)
+      ndpi_free(flow->http.content_type);
+
+    if(flow->http.request_content_type)
+      ndpi_free(flow->http.request_content_type);
+
+    if(flow->http.referer)
+      ndpi_free(flow->http.referer);
+
+    if(flow->http.host)
+      ndpi_free(flow->http.host);
+
+    if(flow->http.user_agent)
+      ndpi_free(flow->http.user_agent);
+
+    if(flow->http.nat_ip)
+      ndpi_free(flow->http.nat_ip);
+
+    if(flow->http.detected_os)
+      ndpi_free(flow->http.detected_os);
+
+    if(flow->http.server)
+      ndpi_free(flow->http.server);
+
+    if(flow->http.filename)
+      ndpi_free(flow->http.filename);
+
+    if(flow->http.username)
+      ndpi_free(flow->http.username);
+
+    if(flow->http.password)
+      ndpi_free(flow->http.password);
+
+    if(flow->kerberos_buf.pktbuf)
+      ndpi_free(flow->kerberos_buf.pktbuf);
+
+    if(flow->monit)
+      ndpi_free(flow->monit);
+
+    ndpi_free_flow_data_protos(flow);
+    
     if(flow->tls_quic.message[0].buffer)
       ndpi_free(flow->tls_quic.message[0].buffer);
     if(flow->tls_quic.message[1].buffer)
@@ -11280,6 +11288,29 @@ bool ndpi_stack_is_http_like(struct ndpi_proto_stack *s)
 static void ndpi_int_change_flow_protocol(struct ndpi_flow_struct *flow,
 					  u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
 					  ndpi_confidence_t confidence) {
+
+  if((flow->detected_protocol_stack[0] != upper_detected_protocol)
+     && (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+     && (flow->detected_protocol_stack[0] != lower_detected_protocol)
+     && (flow->detected_protocol_stack[1] != lower_detected_protocol)
+     ) {
+#if 0
+    printf("***** %s() [%u.%u -> %u.%u]\n", __FUNCTION__,
+	   flow->detected_protocol_stack[0],
+	   flow->detected_protocol_stack[1],
+	   upper_detected_protocol, lower_detected_protocol);
+#endif
+    /*
+      When the protocol is totally different this can be an indication
+      that something went wrong so better start over and clanuo things
+      as flow->protos is an union and this can lead to inconsistencies.
+
+      TODO
+      In the future we should handle protocol reconfiguration better
+    */
+    ndpi_free_flow_data_protos(flow);   memset(&flow->protos, 0, sizeof(flow->protos));
+  }
+  
   flow->detected_protocol_stack[0] = upper_detected_protocol;
   flow->detected_protocol_stack[1] = lower_detected_protocol;
 

@@ -1904,7 +1904,6 @@ struct ndpi_flow_struct {
       u_int8_t num_plc_stop;        /* PLC Stop (0x29) */
       u_int8_t num_other_funcs;     /* Other function codes */
     } s7comm;
-
   } protos;
 
   struct {
