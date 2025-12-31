@@ -38,10 +38,11 @@
 
 /* ************************************** */
 
+#ifdef HAVE_PLUGINS
+
 /* Load a single protocol plugin */
 static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_struct,
 				      char *plugin_path) {
-#ifdef HAVE_PLUGINS
   void *pluginEntryFctnPtr;
   void *pluginPtr;
   NDPIProtocolPluginEntryPoint* (*pluginEntryFctn)(void);
@@ -94,17 +95,13 @@ static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_
   }
   
   return(true);
-#else
-  __ndpi_unused_param(ndpi_struct);
-  __ndpi_unused_param(plugin_path);
-  return(false);
-#endif
 }
+#endif
 
 /* ************************************** */
 
 u_int ndpi_load_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struct,
-				char *dir_path) {
+				 char *dir_path) {
 #ifdef HAVE_PLUGINS
   DIR *dirp;
   struct dirent *dp;
