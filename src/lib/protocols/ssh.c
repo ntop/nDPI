@@ -238,10 +238,13 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
   if(ndpi_struct->cfg.ssh_hassh_data_enabled) {
     buf[buf_out_len] = '\0';
     
-    if(client_hash)
-      flow->protos.ssh.client_key_exchange_algorithms = ndpi_strdup(buf);
-    else
-      flow->protos.ssh.server_key_exchange_algorithms = ndpi_strdup(buf);
+    if(client_hash) {
+      if(flow->protos.ssh.client_key_exchange_algorithms == NULL)
+        flow->protos.ssh.client_key_exchange_algorithms = ndpi_strdup(buf);
+    } else {
+      if(flow->protos.ssh.server_key_exchange_algorithms == NULL)
+        flow->protos.ssh.server_key_exchange_algorithms = ndpi_strdup(buf);
+    }
 
     if(flow->protos.ssh.client_key_exchange_algorithms
        && flow->protos.ssh.server_key_exchange_algorithms) {

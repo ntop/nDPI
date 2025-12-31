@@ -135,6 +135,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "fully_encrypted_heuristic", "1") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, "dns", "subclassification", "1") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, "tls", "application_blocks_tracking", "1") == NDPI_CFG_OK);
+    assert(ndpi_set_config(workflow->ndpi_struct, "tls", "blocks_analysis", "1") == NDPI_CFG_OK);
+    assert(ndpi_set_config(workflow->ndpi_struct, "tls", "metadata.ja_data", "1") == NDPI_CFG_OK);
+    assert(ndpi_set_config(workflow->ndpi_struct, "ssh", "metadata.ssh_data", "1") == NDPI_CFG_OK);
 #ifndef ENABLE_CONFIG2
     assert(ndpi_set_config(workflow->ndpi_struct, "stun", "max_packets_extra_dissection", "40") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, "zoom", "max_packets_extra_dissection", "255") == NDPI_CFG_OK);

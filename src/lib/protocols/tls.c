@@ -2781,6 +2781,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		if(ja.client.num_tls_extensions < MAX_NUM_JA) {
 		  if((extension_id == 0xFE0D /* ECHO */)
+		     && (flow->l4_proto == IPPROTO_TCP)
 		     && ndpi_struct->cfg.tls_blocks_analysis_enabled
 		     && (flow->l4.tcp.tls.num_tls_blocks > 0) /* It should always be like that */) {
 		    /*
@@ -2816,6 +2817,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    printf("[TLS] SNI: [%s]\n", sni);
 #endif
 		    if(sni /* It should always be like that */
+		       && (flow->l4_proto == IPPROTO_TCP)
 		       && ndpi_struct->cfg.tls_blocks_analysis_enabled
 		       && (flow->l4.tcp.tls.num_tls_blocks > 0) /* It should always be like that */
 		       ) {
