@@ -293,7 +293,7 @@ struct ndpi_detection_module_config_struct {
   int tls_cert_validity_enabled;
   int tls_cert_issuer_enabled;
   int tls_cert_subject_enabled;
-  int tls_broswer_enabled;
+  int tls_browser_enabled;
   int tls_ja3s_fingerprint_enabled;
   int tls_ja4c_fingerprint_enabled;
   int tls_ja4r_fingerprint_enabled;

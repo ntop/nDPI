@@ -133,7 +133,7 @@ static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_s
      !ndpi_struct->cfg.tls_cert_validity_enabled &&
      !ndpi_struct->cfg.tls_cert_issuer_enabled &&
      !ndpi_struct->cfg.tls_cert_subject_enabled &&
-     !ndpi_struct->cfg.tls_broswer_enabled &&
+     !ndpi_struct->cfg.tls_browser_enabled &&
      !ndpi_struct->cfg.tls_ja3s_fingerprint_enabled &&
      /* No flow risks from SH or certificate: we should have disabled all
         metadata needed for flow risks, so we should not need to explicitly
@@ -2691,7 +2691,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  i += 2;
 	} /* for */
 
-	if(ndpi_struct->cfg.tls_broswer_enabled) {
+	if(ndpi_struct->cfg.tls_browser_enabled) {
           /* NOTE:
              we do not check for duplicates as with signatures because
              this is time consuming and we want to avoid overhead whem possible
@@ -3004,7 +3004,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  if(rc < 0) break;
 		}
 
-		if(ndpi_struct->cfg.tls_broswer_enabled) {
+		if(ndpi_struct->cfg.tls_browser_enabled) {
 	          int chrome_signature_algorithms = 0, duplicate_found = 0, last_signature = 0;
 
                   for(i=0; i<tot_signature_algorithms_len && s_offset + (int)i + 2 < packet->payload_packet_len; i+=2) {

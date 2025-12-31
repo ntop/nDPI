@@ -146,7 +146,7 @@ static const struct cfg_param {
   { "tls",           "metadata.cert_validity",                  "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_cert_validity_enabled), NULL },
   { "tls",           "metadata.cert_issuer",                    "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_cert_issuer_enabled), NULL },
   { "tls",           "metadata.cert_subject",                   "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_cert_subject_enabled), NULL },
-  { "tls",           "metadata.browser",                        "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_broswer_enabled), NULL },
+  { "tls",           "metadata.browser",                        "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_browser_enabled), NULL },
   { "tls",           "metadata.ja3s_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja3s_fingerprint_enabled), NULL },
   { "tls",           "metadata.ja4c_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja4c_fingerprint_enabled), NULL },
   { "tls",           "metadata.ja4r_fingerprint",               "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ja4r_fingerprint_enabled), NULL },
