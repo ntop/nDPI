@@ -19,11 +19,12 @@ http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${TMP}"
 
+\rm -f ${LIST}
 echo "(2) Processing domains..."
 jq -r '.[] | .connectionName' $TMP > $LIST_DOMAINS
 while read -r DOMAIN
 do
-    dig +short "${DOMAIN}" A >> ${LIST}
+    dig +short "${DOMAIN}" A  | grep -v '^;' >> ${LIST}
 #    dig +short "${DOMAIN}" AAAA >> ${LIST6}
 done < "${LIST_DOMAINS}"
 
