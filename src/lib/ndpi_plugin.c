@@ -95,6 +95,8 @@ static bool ndpi_load_protocol_plugin(struct ndpi_detection_module_struct *ndpi_
   
   return(true);
 #else
+  __ndpi_unused_param(ndpi_struct);
+  __ndpi_unused_param(plugin_path);
   return(false);
 #endif
 }
