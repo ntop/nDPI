@@ -11302,13 +11302,14 @@ static void ndpi_int_change_flow_protocol(struct ndpi_flow_struct *flow,
 #endif
     /*
       When the protocol is totally different this can be an indication
-      that something went wrong so better start over and clanuo things
+      that something went wrong so better start over and clanup things
       as flow->protos is an union and this can lead to inconsistencies.
 
       TODO
       In the future we should handle protocol reconfiguration better
     */
-    ndpi_free_flow_data_protos(flow);   memset(&flow->protos, 0, sizeof(flow->protos));
+    ndpi_free_flow_data_protos(flow);
+    memset(&flow->protos, 0, sizeof(flow->protos));
   }
   
   flow->detected_protocol_stack[0] = upper_detected_protocol;
