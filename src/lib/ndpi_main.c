@@ -11289,17 +11289,12 @@ static void ndpi_int_change_flow_protocol(struct ndpi_flow_struct *flow,
 					  u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
 					  ndpi_confidence_t confidence) {
 
+#ifdef TO_IMPLEMENT_A_BETTER_CHECK
   if((flow->detected_protocol_stack[0] != upper_detected_protocol)
      && (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
      && (flow->detected_protocol_stack[0] != lower_detected_protocol)
      && (flow->detected_protocol_stack[1] != lower_detected_protocol)
      ) {
-#if 0
-    printf("***** %s() [%u.%u -> %u.%u]\n", __FUNCTION__,
-	   flow->detected_protocol_stack[0],
-	   flow->detected_protocol_stack[1],
-	   upper_detected_protocol, lower_detected_protocol);
-#endif
     /*
       When the protocol is totally different this can be an indication
       that something went wrong so better start over and clanup things
@@ -11311,6 +11306,7 @@ static void ndpi_int_change_flow_protocol(struct ndpi_flow_struct *flow,
     ndpi_free_flow_data_protos(flow);
     memset(&flow->protos, 0, sizeof(flow->protos));
   }
+#endif
   
   flow->detected_protocol_stack[0] = upper_detected_protocol;
   flow->detected_protocol_stack[1] = lower_detected_protocol;
