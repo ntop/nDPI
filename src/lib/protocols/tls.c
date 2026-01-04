@@ -1241,20 +1241,20 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow, bool same_packet) {
-  if((flow->l4.tcp.tls.num_tls_blocks < NDPI_MAX_NUM_TLS_APPL_BLOCKS)
-     && (flow->l4_proto == IPPROTO_TCP)
-     && ndpi_struct->cfg.tls_blocks_analysis_enabled
-     ) {
+  if(flow->l4.tcp.tls.num_tls_blocks < NDPI_MAX_NUM_TLS_APPL_BLOCKS) {
     struct ndpi_packet_struct *packet = &ndpi_struct->packet;
     message_t *message = &flow->tls_quic.message[packet->packet_direction];
-    u_int32_t len = (message->buffer[3] << 8) + message->buffer[4] + 5;
-    int16_t blen = len-5;
-    u_int8_t content_type = message->buffer[0];
 
-    flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
-      flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
-    flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type =
-      ndpi_encode_tls_block_type(content_type, (len > 5) ? message->buffer[5] : 0);
+    if(message->buffer != NULL) {
+      u_int32_t len = (message->buffer[3] << 8) + message->buffer[4] + 5;
+      int16_t blen = len-5;
+      u_int8_t content_type = message->buffer[0];
+
+      flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
+	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
+      flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type =
+	ndpi_encode_tls_block_type(content_type, (len > 5) ? message->buffer[5] : 0);
+    }
   }
 }
 
@@ -1307,7 +1307,8 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case 0x0b: /* Certificate */
-    if(ndpi_struct->cfg.tls_blocks_analysis_enabled)
+    if(ndpi_struct->cfg.tls_blocks_analysis_enabled
+       && (flow->l4_proto == IPPROTO_TCP))
       handleTLSBlockStat(ndpi_struct, flow, true);
 
     /* Important: populate the tls union fields only after
@@ -1332,7 +1333,8 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   default:
-    if(ndpi_struct->cfg.tls_blocks_analysis_enabled)
+    if(ndpi_struct->cfg.tls_blocks_analysis_enabled
+       && (flow->l4_proto == IPPROTO_TCP))
       handleTLSBlockStat(ndpi_struct, flow, true);
     else
       return(-1);
@@ -1424,29 +1426,10 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     content_type = message->buffer[0];
 
     if(ndpi_struct->cfg.tls_blocks_analysis_enabled) {
-#if 1
-      handleTLSBlockStat(ndpi_struct, flow, same_packet);
+      if(flow->l4_proto == IPPROTO_TCP)
+	handleTLSBlockStat(ndpi_struct, flow, same_packet);
+
       same_packet = true;
-#else
-      if(flow->l4.tcp.tls.num_tls_blocks < NDPI_MAX_NUM_TLS_APPL_BLOCKS) {
-	int16_t blen = len-5;
-
-	/* Use positive values for c->s and negative for s->c */
-	if(packet->packet_direction != 0) blen = -blen;
-
-	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
-	  flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
-	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type =
-	  ndpi_encode_tls_block_type(content_type, (len > 5) ? message->buffer[5] : 0);
-
-	same_packet = true;
-
-#ifdef DEBUG_TLS_BLOCKS
-	printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
-	       len-5, flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->num_tls_blocks_to_follow);
-#endif
-      }
-#endif
     }
 
     /* Overwriting packet payload */
