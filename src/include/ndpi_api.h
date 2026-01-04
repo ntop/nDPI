@@ -1131,7 +1131,7 @@ extern "C" {
   char *ndpi_stack2str(struct ndpi_detection_module_struct *ndpi_str,
                        struct ndpi_proto_stack *stack, char *buf, u_int buf_len);
   ndpi_tls_block_type ndpi_encode_tls_block_type(u_int8_t block_type, u_int8_t handshake_type);
-  const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block_type block_type);
+  const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block_type block_type, bool numeric_mode);
   
   ndpi_proto_defaults_t* ndpi_get_proto_defaults(struct ndpi_detection_module_struct *ndpi_mod);
   u_int ndpi_get_ndpi_detection_module_size(void);

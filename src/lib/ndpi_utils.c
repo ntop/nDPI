@@ -1296,15 +1296,15 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
 
 	    ret = snprintf(&buf[idx], sizeof(buf)-1, "%s%s=%d",
 			   (idx > 0) ? "," : "",
-			   ndpi_print_encoded_tls_block_type(flow->l4.tcp.tls.tls_blocks[i].block_type),
+			   ndpi_print_encoded_tls_block_type(flow->l4.tcp.tls.tls_blocks[i].block_type, true),
 			   flow->l4.tcp.tls.tls_blocks[i].len);
 
-	    if(ret > 0) idx += ret; else break;	    
+	    if(ret > 0) idx += ret; else break;
 	  } /* for */
 
 	  if(idx > 0) {
 	    ndpi_serialize_string_string(serializer, "", buf);
-	    
+
 	    ndpi_serialize_end_of_list(serializer);
 
 	    ndpi_serialize_end_of_block(serializer);
@@ -1428,7 +1428,7 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
     }
   }
 }
- 
+
 /* ********************************** */
 
 char* print_ndpi_address_port(ndpi_address_port *ap, char *buf, u_int buf_len) {
@@ -4939,6 +4939,56 @@ u_int16_t ndpi_get_master_proto(struct ndpi_detection_module_struct *ndpi_struct
 
 /* **************************************** */
 
+static char* ndpi_compute_tls_blocks_flow_fingerprint(struct ndpi_flow_struct *flow,
+						      char *fp_buf, u_int fp_buf_len) {
+  u_int16_t i, idx = 0;
+  int ret;
+  bool first = true;
+  u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
+
+  if((flow->l4_proto != IPPROTO_TCP) || (flow->l4.tcp.tls.num_tls_blocks == 0))
+    return("");
+
+  fp_buf[0] = '\0'; /* Not really necessary, but just to be sure */
+
+  for(i=0; i< flow->l4.tcp.tls.num_tls_blocks; i++) {
+    if(!flow->l4.tcp.tls.tls_blocks[i].same_pkt) {
+      if(idx > 0) {
+	ret = snprintf(&fp_buf[idx], fp_buf_len-1, ";");
+	if(ret > 0) idx += ret; else break;
+	first = true;
+      }
+    } else
+      first = false;
+
+    ret = snprintf(&fp_buf[idx], fp_buf_len-1, "%s%s=%d",
+		   (!first) ? "," : "",
+		   ndpi_print_encoded_tls_block_type(flow->l4.tcp.tls.tls_blocks[i].block_type, true),
+		   flow->l4.tcp.tls.tls_blocks[i].len);
+
+    if(ret > 0) idx += ret; else break;
+  } /* for */
+
+#if 0
+  fprintf(stderr, "#### [sport=%u] %s\n", ntohs(flow->c_port), fp_buf);
+#endif
+
+  ndpi_sha256((u_char*)fp_buf, idx, sha_hash);
+
+  ndpi_snprintf((char*)fp_buf, fp_buf_len-1,
+		"%02x%02x%02x%02x%02x%02x%02x%02x"
+		"%02x%02x%02x%02x%02x%02x%02x%02x",
+		sha_hash[0], sha_hash[1], sha_hash[2],    sha_hash[3],
+		sha_hash[4], sha_hash[5], sha_hash[6],    sha_hash[7],
+		sha_hash[8], sha_hash[9], sha_hash[10],   sha_hash[11],
+		sha_hash[12], sha_hash[13], sha_hash[14], sha_hash[15]
+		);
+
+  return(fp_buf);
+}
+
+/* **************************************** */
+
 char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 					 struct ndpi_flow_struct *flow) {
   if(ndpi_str->cfg.ndpi_fingerprint_enabled &&
@@ -4953,13 +5003,19 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
      (flow->tcp.fingerprint || flow->protos.tls_quic.ja4_client[0] != '\0')) {
     char *l4_fp = flow->tcp.fingerprint ? flow->tcp.fingerprint : "no_l4_fp";
     char *l7_pf = "no_app_fp_cli";
+    char *l7_pf_tls_blocks = "";
     char *l7_pf_server = "no_app_fp_srv";
     u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
     size_t s;
     u_int8_t fp_buf[128];
+    char l7_pf_tls_blocks_buf[64];
 
     if(flow->protos.tls_quic.ja4_client[0] != '\0')
       l7_pf = flow->protos.tls_quic.ja4_client;
+
+    if(ndpi_str->cfg.tls_blocks_analysis_enabled)
+      l7_pf_tls_blocks = ndpi_compute_tls_blocks_flow_fingerprint(flow,
+								  l7_pf_tls_blocks_buf, sizeof(l7_pf_tls_blocks_buf));
 
     if(ndpi_str->cfg.ndpi_fingerprint_format == NDPI_CLIENT_SERVER_NDPI_FINGERPRINT) {
       if(flow->protos.tls_quic.sha1_certificate_fingerprint[0] != '\0')
@@ -4970,7 +5026,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
       }
     }
 
-    s = snprintf((char*)fp_buf, sizeof(fp_buf)-1, "%s-%s-%s", l4_fp, l7_pf, l7_pf_server);
+    s = snprintf((char*)fp_buf, sizeof(fp_buf)-1, "%s-%s%s-%s", l4_fp, l7_pf, l7_pf_tls_blocks, l7_pf_server);
     if(s > 0) {
       s = ndpi_min(s, sizeof(fp_buf)-1);
       ndpi_sha256(fp_buf, s, sha_hash);
@@ -5183,24 +5239,24 @@ ndpi_tls_block_type ndpi_encode_tls_block_type(u_int8_t block_type, u_int8_t han
 
 /* ****************************************** */
 
-const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block_type block_type) {
+const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block_type block_type, bool numeric_mode) {
   switch(block_type) {
-  case tls_change_cipher:                 return("ChangeCipher");
-  case tls_alert:                         return("Alert");
-  case tls_handshake_hello_request:       return("Handshake:HelloRequest");
-  case tls_handshake_client_hello:        return("Handshake:ClientHello");
-  case tls_handshake_server_hello:        return("Handshake:ServerHello");
-  case tls_handshake_new_session_ticket:  return("Handshake:NewSessTicket");
-  case tls_handshake_encrypted_extn:      return("Handshake:EncryptedExtn");
-  case tls_handshake_certificate:         return("Handshake:Certificate");
-  case tls_handshake_server_key_exchange: return("Handshake:ServerKeyExch");
-  case tls_handshake_certificate_request: return("Handshake:CertRequest");
-  case tls_handshake_server_hello_done:   return("Handshake:ServerHelloDone");
-  case tls_handshake_certificate_verify:  return("Handshake:CertVerify");
-  case tls_handshake_client_key_exchange: return("Handshake:ClientKeyExch");
-  case tls_handshake_finished:            return("Handshake:Finished");
-  case tls_application_data:              return("AppData");
-  case tls_heartbeat:                     return("Heartbeat");
-  default:                                return("Unknown");
+  case tls_change_cipher:                 return(numeric_mode ? "20"    : "ChangeCipher");
+  case tls_alert:                         return(numeric_mode ? "21"    : "Alert");
+  case tls_handshake_hello_request:       return(numeric_mode ? "22:0"  : "Handshake:HelloRequest");
+  case tls_handshake_client_hello:        return(numeric_mode ? "22:1"  : "Handshake:ClientHello");
+  case tls_handshake_server_hello:        return(numeric_mode ? "22:2"  : "Handshake:ServerHello");
+  case tls_handshake_new_session_ticket:  return(numeric_mode ? "22:4"  : "Handshake:NewSessTicket");
+  case tls_handshake_encrypted_extn:      return(numeric_mode ? "22:8"  : "Handshake:EncryptedExtn");
+  case tls_handshake_certificate:         return(numeric_mode ? "22:11" : "Handshake:Certificate");
+  case tls_handshake_server_key_exchange: return(numeric_mode ? "22:12" : "Handshake:ServerKeyExch");
+  case tls_handshake_certificate_request: return(numeric_mode ? "22:13" : "Handshake:CertRequest");
+  case tls_handshake_server_hello_done:   return(numeric_mode ? "22:14" : "Handshake:ServerHelloDone");
+  case tls_handshake_certificate_verify:  return(numeric_mode ? "22:15" : "Handshake:CertVerify");
+  case tls_handshake_client_key_exchange: return(numeric_mode ? "22:16" : "Handshake:ClientKeyExch");
+  case tls_handshake_finished:            return(numeric_mode ? "22:20" : "Handshake:Finished");
+  case tls_application_data:              return(numeric_mode ? "21"    : "AppData");
+  case tls_heartbeat:                     return(numeric_mode ? "24"    : "Heartbeat");
+  default:                                return(numeric_mode ? "0"     : "Unknown");
   }
 }

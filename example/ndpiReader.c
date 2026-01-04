@@ -2655,8 +2655,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
       fprintf(out, "[TLS blocks: ");
 
       for(i=0; i<flow->ssh_tls.num_blocks; i++)
-	fprintf(out, "%s%s/%d", (i > 0) ? "," : "",
-		ndpi_print_encoded_tls_block_type(flow->ssh_tls.blocks[i].block_type),
+	fprintf(out, "%s%s=%d", (i > 0) ? "," : "",
+		ndpi_print_encoded_tls_block_type(flow->ssh_tls.blocks[i].block_type, true),
 		flow->ssh_tls.blocks[i].len);
 
       fprintf(out, "]");
@@ -2805,7 +2805,7 @@ static void printFlowSerialized(struct ndpi_flow_info *flow)
       char str[64];
 
       snprintf(str, sizeof(str), "%s:%d",
-	       ndpi_print_encoded_tls_block_type(flow->ssh_tls.blocks[i].block_type),
+	       ndpi_print_encoded_tls_block_type(flow->ssh_tls.blocks[i].block_type, true),
 	       flow->ssh_tls.blocks[i].len);
       ndpi_serialize_string_string(serializer, "", str);
     }
