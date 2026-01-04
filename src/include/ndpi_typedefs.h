@@ -853,7 +853,8 @@ typedef enum {
 } ndpi_tls_block_type;
 
 struct ndpi_tls_block {
-  ndpi_tls_block_type block_type;
+  u_int8_t block_type /* ndpi_tls_block_type */;
+  u_int8_t same_pkt:1, _unused:7;
   int16_t len; /* + = src->dst, - = dst->src */
 };
 
@@ -1548,7 +1549,7 @@ typedef struct {
   u_int16_t num_supported_versions, supported_version[MAX_NUM_JA];
   u_int16_t num_key_share_groups, key_share_group[MAX_NUM_JA];
   char signature_algorithms_str[MAX_JA_STRLEN], alpn[MAX_JA_STRLEN];
-  char alpn_original_last;  /* Store original last character before null terminator */  
+  char alpn_original_last;  /* Store original last character before null terminator */
 } ndpi_tls_client_info;
 
 typedef struct {
@@ -1557,7 +1558,7 @@ typedef struct {
   u_int16_t num_tls_extensions, tls_extension[MAX_NUM_JA];
   u_int16_t tls_supported_version;
   u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA];
-  char alpn[MAX_JA_STRLEN];  
+  char alpn[MAX_JA_STRLEN];
 } ndpi_tls_server_info;
 
 struct ndpi_flow_struct {
@@ -1910,7 +1911,7 @@ struct ndpi_flow_struct {
     NDPIProtocolPluginEntryPoint *plugin;
     void *plugin_data;
   } custom;
-  
+
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
   struct ndpi_metadata_monitoring *monit;
 

@@ -1329,7 +1329,8 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t something_went_wrong = 0;
   message_t *message;
-
+  bool same_packet = false;
+  
   if(packet->tcp == NULL)
     return 0; /* Error -> stop (this doesn't seem to be TCP) */
 
@@ -1402,9 +1403,12 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	/* Use positive values for c->s and negative for s->c */
 	if(packet->packet_direction != 0) blen = -blen;
 	
-	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen;
+	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
+	  flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
 	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type =
 	  ndpi_encode_tls_block_type(content_type, (len > 5) ? message->buffer[5] : 0);
+
+	same_packet = true;
 	
 #ifdef DEBUG_TLS_BLOCKS
 	printf("*** [TLS Block] [len: %u][num_tls_blocks: %u/%u]\n",
