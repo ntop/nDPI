@@ -1276,15 +1276,13 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
       }
 
       if (is_tls_proto == true) {
-	if(ndpi_struct->cfg.tls_blocks_analysis_enabled) {
+	if(ndpi_struct->cfg.tls_blocks_analysis_enabled
+	   && (flow->l4.tcp.tls.num_tls_blocks > 0)) {
 	  u_int16_t i, idx = 0;
 	  int ret;
 	  char buf[256];
 
-	  ndpi_serialize_start_of_block(serializer, "tls_blocks");
-	  ndpi_serialize_string_uint32(serializer, "num_blocks", flow->l4.tcp.tls.num_tls_blocks);
-
-	  ndpi_serialize_start_of_list(serializer, "blocks");
+	  ndpi_serialize_start_of_list(serializer, "tls_blocks");
 
 	  for(i=0; i< flow->l4.tcp.tls.num_tls_blocks; i++) {
 	    if(!flow->l4.tcp.tls.tls_blocks[i].same_pkt) {
@@ -1306,8 +1304,6 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
 	    ndpi_serialize_string_string(serializer, "", buf);
 
 	    ndpi_serialize_end_of_list(serializer);
-
-	    ndpi_serialize_end_of_block(serializer);
 	  }
 	}
 

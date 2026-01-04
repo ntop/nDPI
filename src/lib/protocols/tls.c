@@ -1250,6 +1250,8 @@ static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
       int16_t blen = len-5;
       u_int8_t content_type = message->buffer[0];
 
+      if(packet->packet_direction == 1 /* srv -> cli */) blen *= -1;
+
       flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
 	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
       flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type =
