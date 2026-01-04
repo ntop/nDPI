@@ -4954,14 +4954,14 @@ static char* ndpi_compute_tls_blocks_flow_fingerprint(struct ndpi_flow_struct *f
   for(i=0; i< flow->l4.tcp.tls.num_tls_blocks; i++) {
     if(!flow->l4.tcp.tls.tls_blocks[i].same_pkt) {
       if(idx > 0) {
-	ret = snprintf(&fp_buf[idx], fp_buf_len-1, ";");
+	ret = snprintf(&fp_buf[idx], fp_buf_len-idx-1, ";");
 	if(ret > 0) idx += ret; else break;
 	first = true;
       }
     } else
       first = false;
 
-    ret = snprintf(&fp_buf[idx], fp_buf_len-1, "%s%s=%d",
+    ret = snprintf(&fp_buf[idx], fp_buf_len-idx-1, "%s%s=%d",
 		   (!first) ? "," : "",
 		   ndpi_print_encoded_tls_block_type(flow->l4.tcp.tls.tls_blocks[i].block_type, true),
 		   flow->l4.tcp.tls.tls_blocks[i].len);
@@ -5008,7 +5008,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
     u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
     size_t s;
     u_int8_t fp_buf[128];
-    char l7_pf_tls_blocks_buf[64];
+    char l7_pf_tls_blocks_buf[256];
 
     if(flow->protos.tls_quic.ja4_client[0] != '\0')
       l7_pf = flow->protos.tls_quic.ja4_client;
