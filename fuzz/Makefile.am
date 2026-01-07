@@ -1,4 +1,4 @@
-bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp
+bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_nalloc fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_ranking fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr fuzz_alg_quick_encryption
 #Data structures
@@ -44,6 +44,11 @@ fuzz_ndpi_reader_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/
 fuzz_ndpi_reader_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_ndpi_reader_DEPENDENCIES = $(top_builddir)/src/lib/libndpi.a $(srcdir)/dictionary.dict
 
+fuzz_ndpi_reader_nalloc_SOURCES = fuzz_ndpi_reader_nalloc.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
+fuzz_ndpi_reader_nalloc_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -I $(top_srcdir)/src/lib/third_party/src/fuzz -DENABLE_NALLOC
+fuzz_ndpi_reader_nalloc_LINK = $(FUZZ_LINK_COMMAND)
+fuzz_ndpi_reader_nalloc_DEPENDENCIES = $(top_builddir)/src/lib/libndpi.a $(srcdir)/dictionary.dict
+
 fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader_alloc_fail.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
 fuzz_ndpi_reader_alloc_fail_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DCRYPT_FORCE_NO_AESNI -DENABLE_FINGERPRINT_FP
 fuzz_ndpi_reader_alloc_fail_LINK = $(FUZZ_LINK_COMMAND)
@@ -58,9 +63,9 @@ fuzz_quic_get_crypto_data_SOURCES = fuzz_quic_get_crypto_data.c fuzz_common_code
 fuzz_quic_get_crypto_data_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_quic_get_crypto_data_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_config_SOURCES = fuzz_config.cpp fuzz_common_code.c
-fuzz_config_CXXFLAGS = $(AM_CXXFLAGS) -DNDPI_LIB_COMPILATION
-fuzz_config_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_config_SOURCES = fuzz_config.cpp
+fuzz_config_CXXFLAGS = $(AM_CXXFLAGS) -I $(top_srcdir)/src/lib/third_party/src/fuzz -DNDPI_LIB_COMPILATION -DENABLE_NALLOC
+fuzz_config_CFLAGS = $(AM_CFLAGS) -I $(top_srcdir)/src/lib/third_party/src/fuzz -DNDPI_LIB_COMPILATION -DENABLE_NALLOC
 fuzz_config_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_community_id_SOURCES = fuzz_community_id.cpp fuzz_common_code.c
@@ -271,6 +276,7 @@ testpcaps.zip: $(testpcaps)
 
 # Explicit targets for PCAP-based corpora (uses pattern rule above)
 fuzz_ndpi_reader_seed_corpus.zip: testpcaps.zip
+fuzz_ndpi_reader_nalloc_seed_corpus.zip: testpcaps.zip
 fuzz_ndpi_reader_alloc_fail_seed_corpus.zip: testpcaps.zip
 fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip: testpcaps.zip
 fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip: testpcaps.zip
@@ -332,7 +338,7 @@ fuzz_filecfg_category_seed_corpus.zip: $(files_corpus_fuzz_filecfg_category)
 
 # Phony target to build all corpora (incremental build via dependencies)
 .PHONY: corpus
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip fuzz_ndpi_reader_pl7m_seed_corpus.zip fuzz_ndpi_reader_pl7m_64k_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_only_subclassification_seed_corpus.zip fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip fuzz_filecfg_malicious_ja4_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip fuzz_filecfg_category_seed_corpus.zip fuzz_filecfg_config_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_nalloc_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip fuzz_ndpi_reader_pl7m_seed_corpus.zip fuzz_ndpi_reader_pl7m_64k_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_only_subclassification_seed_corpus.zip fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip fuzz_filecfg_malicious_ja4_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip fuzz_filecfg_category_seed_corpus.zip fuzz_filecfg_config_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip
 	@echo "All corpus files are up to date"
 	@if [ -d "$(srcdir)/corpus" ] && ls $(srcdir)/corpus/fuzz_*seed_corpus.zip >/dev/null 2>&1; then \
 		echo "Copying pre-built corpus files from source directory..."; \
@@ -344,10 +350,13 @@ corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus
 # we don't need to update scripts in oss-fuzz repository
 # Incremental: only copy if source dictionary is newer
 .PHONY: dictionaries
-dictionaries: fuzz_ndpi_reader.dict fuzz_ndpi_reader_alloc_fail.dict fuzz_ndpi_reader_payload_analyzer.dict fuzz_process_packet.dict fuzz_tls_certificate.dict
+dictionaries: fuzz_ndpi_reader.dict fuzz_ndpi_reader_nalloc.dict fuzz_ndpi_reader_alloc_fail.dict fuzz_ndpi_reader_payload_analyzer.dict fuzz_process_packet.dict fuzz_tls_certificate.dict
 	@echo "All dictionaries are up to date"
 
 fuzz_ndpi_reader.dict: $(srcdir)/dictionary.dict
+	@cp $(srcdir)/dictionary.dict $@
+
+fuzz_ndpi_reader_nalloc.dict: $(srcdir)/dictionary.dict
 	@cp $(srcdir)/dictionary.dict $@
 
 fuzz_ndpi_reader_alloc_fail.dict: $(srcdir)/dictionary.dict
