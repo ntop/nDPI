@@ -7931,8 +7931,8 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 	ndpi_free(flow->risk_infos[i].info);
     }
 
-    if(flow->tcp.fingerprint_raw)
-      ndpi_free(flow->tcp.fingerprint_raw);
+    if(flow->tcp.fingerprint)
+      ndpi_free(flow->tcp.fingerprint);
 
     if((flow->l4_proto == IPPROTO_TCP) && flow->l4.tcp.tls.tls_blocks)
       ndpi_free(flow->l4.tcp.tls.tls_blocks);
