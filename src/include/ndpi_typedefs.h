@@ -852,11 +852,13 @@ typedef enum {
   tls_heartbeat,
 } ndpi_tls_block_type;
 
+PACK_ON
 struct ndpi_tls_block {
   u_int8_t block_type /* ndpi_tls_block_type */;
   u_int8_t same_pkt:1, _unused:7;
   int16_t len; /* + = src->dst, - = dst->src */
-};
+  u_int16_t msec_delta;
+} PACK_OFF;
 
 struct ndpi_flow_tcp_struct {
   /* TCP sequence number */
@@ -880,6 +882,7 @@ struct ndpi_flow_tcp_struct {
     /* NDPI_PROTOCOL_TLS */
     u_int8_t app_data_seen[2];
     u_int8_t num_tls_blocks, num_processed_tls_blocks /* used internally for dissection */;
+    u_int64_t last_tls_block_time_ms;
     struct ndpi_tls_block *tls_blocks; /* ndpi_struct->cfg.tls_num_blocks_analyzed */
   } tls;
 

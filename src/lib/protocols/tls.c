@@ -1257,13 +1257,23 @@ static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
 	u_int32_t len = (message->buffer[3] << 8) + message->buffer[4] + 5;
 	int16_t blen = len-5;
 	u_int8_t content_type = message->buffer[0];
+	u_int32_t tdelta;
+
+	if(flow->l4.tcp.tls.last_tls_block_time_ms)
+	  tdelta = ndpi_struct->packet.current_time_ms - flow->l4.tcp.tls.last_tls_block_time_ms;
+	else
+	  tdelta = 0;
 
 	if(packet->packet_direction == 1 /* srv -> cli */) blen *= -1;
 
 	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
+	   flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].msec_delta =
+	  (tdelta > 0xFFFF) ?  0xFFFF : (u_int16_t)tdelta,
 	  flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
 	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type =
 	  ndpi_encode_tls_block_type(content_type, (len > 5) ? message->buffer[5] : 0);
+
+	flow->l4.tcp.tls.last_tls_block_time_ms = ndpi_struct->packet.current_time_ms;
       }
     }
   }

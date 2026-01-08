@@ -4135,7 +4135,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
   ndpi_str->ja4_custom_protos      = NULL;  /* Initialized on demand */
   ndpi_str->ndpifp_custom_protos   = NULL;  /* Initialized on demand */
   ndpi_str->http_url_hashmap       = NULL;  /* Initialized on demand */
-  
+
   ndpi_str->trusted_issuer_dn = NULL; /* Initialized on demand */
 
   ndpi_str->custom_categories.sc_hostnames        = ndpi_domain_classify_alloc();
@@ -4757,9 +4757,9 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     if(a && a->ac_automa)
       ac_automata_finalize((AC_AUTOMATA_t *) a->ac_automa);
   }
-  
+
   if(ndpi_str->cfg.tls_max_num_blocks_to_analyze > 0)
-    ndpi_str->skip_tls_blocks_until_change_cipher = 1;  
+    ndpi_str->skip_tls_blocks_until_change_cipher = 1;
 
   if(ndpi_str->cfg.track_payload_enabled)
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
@@ -5055,7 +5055,7 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     /* Unload plugins (if any) */
     ndpi_unload_protocol_plugins(ndpi_str);
-    
+
     ndpi_bitmask_free(&ndpi_str->cfg.detection_bitmask);
     ndpi_bitmask_free(&ndpi_str->cfg.debug_bitmask);
     ndpi_bitmask_free(&ndpi_str->cfg.ip_list_bitmask);
@@ -5609,7 +5609,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 
   /* Is it a new protocol? */
   subprotocol_id = ndpi_get_proto_by_name(ndpi_str, proto);
-  
+
   if(subprotocol_id == NDPI_PROTOCOL_UNKNOWN) {
     def = NULL;
   } else {
@@ -6637,7 +6637,7 @@ void register_dissector(char *dissector_name, struct ndpi_detection_module_struc
   va_start(ap, num_protocol_ids);
   for(i = 0; i < num_protocol_ids; i++) {
     int ndpi_protocol_id = va_arg(ap, int);
-    
+
     if(!is_proto_enabled(ndpi_str, ndpi_protocol_id)) {
       NDPI_LOG_DBG(ndpi_str, "Protocol %d not enabled for dissector %s\n",
                    ndpi_protocol_id, dissector_name);
@@ -6659,7 +6659,7 @@ void register_dissector(char *dissector_name, struct ndpi_detection_module_struc
 
         ndpi_str->proto_defaults[ndpi_protocol_id].dissector_idx = idx;
       }
-      
+
       dissector_enabled = 1;
     }
   }
@@ -7934,7 +7934,7 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->tcp.fingerprint_raw)
       ndpi_free(flow->tcp.fingerprint_raw);
 
-    if(flow->l4.tcp.tls.tls_blocks)
+    if((flow->l4_proto == IPPROTO_TCP) && flow->l4.tcp.tls.tls_blocks)
       ndpi_free(flow->l4.tcp.tls.tls_blocks);
 
     if(flow->tcp.fingerprint_raw)
@@ -7986,7 +7986,7 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
       ndpi_free(flow->monit);
 
     ndpi_free_flow_data_protos(flow);
-    
+
     if(flow->tls_quic.message[0].buffer)
       ndpi_free(flow->tls_quic.message[0].buffer);
     if(flow->tls_quic.message[1].buffer)
@@ -11308,7 +11308,7 @@ static void ndpi_int_change_flow_protocol(struct ndpi_flow_struct *flow,
     memset(&flow->protos, 0, sizeof(flow->protos));
   }
 #endif
-  
+
   flow->detected_protocol_stack[0] = upper_detected_protocol;
   flow->detected_protocol_stack[1] = lower_detected_protocol;
 
@@ -12367,7 +12367,7 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
        && (flow->custom.plugin_data != NULL)
        )
       flow->custom.plugin->freeFlowFctn(flow->custom.plugin_data);
-    
+
     ndpi_free(flow);
   }
 }
@@ -13057,4 +13057,3 @@ void *ndpi_get_user_data(struct ndpi_detection_module_struct *ndpi_str)
     return ndpi_str->user_data;
   return NULL;
 }
-
