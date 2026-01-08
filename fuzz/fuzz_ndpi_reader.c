@@ -156,7 +156,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "flow_risk.all.info", "0") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "metadata.tcp_fingerprint_format", "1") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "metadata.ndpi_fingerprint_format", "1") == NDPI_CFG_OK);
-    assert(ndpi_set_config(workflow->ndpi_struct, "tls", "blocks_analysis", "1") == NDPI_CFG_OK);
+    assert(ndpi_set_config(workflow->ndpi_struct, "tls", "max_num_blocks_to_analyze", "8") == NDPI_CFG_OK);
+    assert(ndpi_set_config(workflow->ndpi_struct, "tls", "metadata.ja_ignore_ephemeral_tls_extn", "1") == NDPI_CFG_OK);
+    assert(ndpi_set_config(workflow->ndpi_struct, "tls", "metadata.ndpifp_ignore_sni_tls_extn", "1") == NDPI_CFG_OK);
 
     addr_dump_path = "/tmp/";
 #endif
