@@ -4757,11 +4757,9 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     if(a && a->ac_automa)
       ac_automata_finalize((AC_AUTOMATA_t *) a->ac_automa);
   }
-
-  if(ndpi_str->cfg.tls_app_blocks_tracking_enabled) {
-    ndpi_str->num_tls_blocks_to_follow = NDPI_MAX_NUM_TLS_APPL_BLOCKS;
-    ndpi_str->skip_tls_blocks_until_change_cipher = 1;
-  }
+  
+  if(ndpi_str->cfg.tls_max_num_blocks_to_analyze > 0)
+    ndpi_str->skip_tls_blocks_until_change_cipher = 1;  
 
   if(ndpi_str->cfg.track_payload_enabled)
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
@@ -7933,8 +7931,11 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 	ndpi_free(flow->risk_infos[i].info);
     }
 
-    if(flow->tcp.fingerprint)
-      ndpi_free(flow->tcp.fingerprint);
+    if(flow->tcp.fingerprint_raw)
+      ndpi_free(flow->tcp.fingerprint_raw);
+
+    if(flow->l4.tcp.tls.tls_blocks)
+      ndpi_free(flow->l4.tcp.tls.tls_blocks);
 
     if(flow->tcp.fingerprint_raw)
       ndpi_free(flow->tcp.fingerprint_raw);

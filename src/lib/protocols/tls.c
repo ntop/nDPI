@@ -104,7 +104,7 @@ static bool str_contains_digit(char *str) {
 /* TODO: rename */
 static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_struct,
                                      struct ndpi_flow_struct *flow) {
-  if(ndpi_struct->cfg.tls_blocks_analysis_enabled)
+  if(ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
     return(1); /* Process as much TLS blocks as the max packet number */
 
   /* Common path: found handshake on both directions */
@@ -1225,8 +1225,8 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
     certificates_offset += certificate_len;
   }
 
-  if((ndpi_struct->num_tls_blocks_to_follow != 0)
-     && (flow->l4.tcp.tls.num_processed_tls_blocks >= ndpi_struct->num_tls_blocks_to_follow)) {
+  if((ndpi_struct->cfg.tls_max_num_blocks_to_analyze != 0)
+     && (flow->l4.tcp.tls.num_processed_tls_blocks >= ndpi_struct->cfg.tls_max_num_blocks_to_analyze)) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] Enough blocks dissected\n");
 #endif
@@ -1241,21 +1241,30 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow, bool same_packet) {
-  if(flow->l4.tcp.tls.num_tls_blocks < NDPI_MAX_NUM_TLS_APPL_BLOCKS) {
-    struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-    message_t *message = &flow->tls_quic.message[packet->packet_direction];
+  if(ndpi_struct->cfg.tls_max_num_blocks_to_analyze != 0) {
+    if(flow->l4.tcp.tls.tls_blocks == NULL) {
+      u_int len = sizeof(struct ndpi_tls_block) * ndpi_struct->cfg.tls_max_num_blocks_to_analyze;
 
-    if(message->buffer != NULL) {
-      u_int32_t len = (message->buffer[3] << 8) + message->buffer[4] + 5;
-      int16_t blen = len-5;
-      u_int8_t content_type = message->buffer[0];
+      flow->l4.tcp.tls.tls_blocks = (struct ndpi_tls_block*)ndpi_malloc(len);
+    }
 
-      if(packet->packet_direction == 1 /* srv -> cli */) blen *= -1;
+    if((flow->l4.tcp.tls.tls_blocks != NULL)
+       && (flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->cfg.tls_max_num_blocks_to_analyze)) {
+      struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+      message_t *message = &flow->tls_quic.message[packet->packet_direction];
 
-      flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
-	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
-      flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type =
-	ndpi_encode_tls_block_type(content_type, (len > 5) ? message->buffer[5] : 0);
+      if(message->buffer != NULL) {
+	u_int32_t len = (message->buffer[3] << 8) + message->buffer[4] + 5;
+	int16_t blen = len-5;
+	u_int8_t content_type = message->buffer[0];
+
+	if(packet->packet_direction == 1 /* srv -> cli */) blen *= -1;
+
+	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
+	  flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
+	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type =
+	  ndpi_encode_tls_block_type(content_type, (len > 5) ? message->buffer[5] : 0);
+      }
     }
   }
 }
@@ -1309,7 +1318,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   case 0x0b: /* Certificate */
-    if(ndpi_struct->cfg.tls_blocks_analysis_enabled
+    if((ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
        && (flow->l4_proto == IPPROTO_TCP))
       handleTLSBlockStat(ndpi_struct, flow, true);
 
@@ -1335,7 +1344,7 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
     break;
 
   default:
-    if(ndpi_struct->cfg.tls_blocks_analysis_enabled
+    if((ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
        && (flow->l4_proto == IPPROTO_TCP))
       handleTLSBlockStat(ndpi_struct, flow, true);
     else
@@ -1427,7 +1436,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
     content_type = message->buffer[0];
 
-    if(ndpi_struct->cfg.tls_blocks_analysis_enabled) {
+    if(ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0) {
       if(flow->l4_proto == IPPROTO_TCP)
 	handleTLSBlockStat(ndpi_struct, flow, same_packet);
 
@@ -1463,7 +1472,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
         /* Further data is encrypted so we are not able to parse it without
            errors and without setting `something_went_wrong` variable */
 
-	if(!ndpi_struct->cfg.tls_blocks_analysis_enabled) {
+	if(ndpi_struct->cfg.tls_max_num_blocks_to_analyze == 0) {
 	  /*
 	    In case of TLS blocks analysis we want to analize all the blocks
 	    whereas in "standard" mode we can use this shortcut and break
@@ -1564,9 +1573,9 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
   if(something_went_wrong
-     || ((ndpi_struct->num_tls_blocks_to_follow > 0)
-	 && (flow->l4.tcp.tls.num_processed_tls_blocks == ndpi_struct->num_tls_blocks_to_follow))
-     || ((ndpi_struct->num_tls_blocks_to_follow == 0)
+     || ((ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
+	 && (flow->l4.tcp.tls.num_processed_tls_blocks == ndpi_struct->cfg.tls_max_num_blocks_to_analyze))
+     || ((ndpi_struct->cfg.tls_max_num_blocks_to_analyze == 0)
 	 && (!keep_extra_dissection_tcp(ndpi_struct, flow)))
      ) {
 #ifdef DEBUG_TLS_BLOCKS
@@ -1813,7 +1822,7 @@ static void tlsInitExtraPacketProcessing(struct ndpi_detection_module_struct *nd
 
   /* At most 12 packets should almost always be enough to find the server certificate if it's there.
      Exception: DTLS traffic with fragments, retransmissions and STUN packets */
-  flow->max_extra_packets_to_check = ((packet->udp != NULL) ? 20 : 12) + (ndpi_struct->num_tls_blocks_to_follow*4);
+  flow->max_extra_packets_to_check = ((packet->udp != NULL) ? 20 : 12) + (ndpi_struct->cfg.tls_max_num_blocks_to_analyze*4);
   flow->extra_packets_func = (packet->udp != NULL) ? ndpi_search_dtls : ndpi_search_tls_tcp;
 }
 
@@ -2822,7 +2831,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		if(ja.client.num_tls_extensions < MAX_NUM_JA) {
 		  if(((extension_id == 0xFE0D /* ECHO */) || skipTLSextension(ndpi_struct, extension_id))
 		     && (flow->l4_proto == IPPROTO_TCP)
-		     && ndpi_struct->cfg.tls_blocks_analysis_enabled
+		     && (ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
+		     && (flow->l4.tcp.tls.tls_blocks != NULL)
 		     && (flow->l4.tcp.tls.num_tls_blocks > 0) /* It should always be like that */) {
 		    /*
 		      Taking EncryptedClientHello (ECHO) lenght out of the block lenght
@@ -2863,7 +2873,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		    if(sni /* It should always be like that */
 		       && (flow->l4_proto == IPPROTO_TCP)
-		       && ndpi_struct->cfg.tls_blocks_analysis_enabled
+		       && (ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
+		       && (flow->l4.tcp.tls.tls_blocks != NULL)
 		       && (flow->l4.tcp.tls.num_tls_blocks > 0) /* It should always be like that */
 		       ) {
 		      /*

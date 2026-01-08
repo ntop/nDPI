@@ -2649,15 +2649,15 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     print_bin(out, "Plen Bins", &flow->payload_len_bin);
 #endif
 
-    if(flow->ssh_tls.num_blocks > 0) {
+    if((flow->tls.num_blocks > 0) && (flow->tls.blocks != NULL)) {
       int i;
 
       fprintf(out, "[TLS blocks: ");
 
-      for(i=0; i<flow->ssh_tls.num_blocks; i++)
+      for(i=0; i<flow->tls.num_blocks; i++)
 	fprintf(out, "%s%s=%d", (i > 0) ? "," : "",
-		ndpi_print_encoded_tls_block_type(flow->ssh_tls.blocks[i].block_type, true),
-		flow->ssh_tls.blocks[i].len);
+		ndpi_print_encoded_tls_block_type(flow->tls.blocks[i].block_type, true),
+		flow->tls.blocks[i].len);
 
       fprintf(out, "]");
     }

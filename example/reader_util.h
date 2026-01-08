@@ -318,14 +318,11 @@ typedef struct ndpi_flow_info {
     ndpi_cipher_weakness client_unsafe_cipher, server_unsafe_cipher;
 
     u_int32_t quic_version;
-
-    u_int8_t num_blocks;
-    struct ndpi_tls_block blocks[NDPI_MAX_NUM_TLS_APPL_BLOCKS];
   } ssh_tls;
 
   struct {
     u_int8_t num_blocks;
-    struct ndpi_tls_block blocks[NDPI_MAX_NUM_TLS_APPL_BLOCKS];
+    struct ndpi_tls_block *blocks;
   } tls;
   
   struct {

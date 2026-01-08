@@ -301,7 +301,7 @@ struct ndpi_detection_module_config_struct {
   int tls_ja_ignore_ephemeral_extensions;
   int tls_ndpifp_ignore_sni_extension;
   int tls_subclassification_enabled;
-  int tls_blocks_analysis_enabled;
+  int tls_max_num_blocks_to_analyze;
   int quic_subclassification_enabled;
 
   int smtp_opportunistic_tls_enabled;
@@ -368,7 +368,6 @@ struct ndpi_detection_module_config_struct {
 
 struct ndpi_detection_module_struct {
   u_int64_t current_ts;
-  u_int16_t num_tls_blocks_to_follow;
   u_int8_t skip_tls_blocks_until_change_cipher:1, finalized:1, _notused:6;
   u_int8_t tls_certificate_expire_in_x_days;
 

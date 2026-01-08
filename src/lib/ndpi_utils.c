@@ -1276,7 +1276,7 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
       }
 
       if (is_tls_proto == true) {
-	if(ndpi_struct->cfg.tls_blocks_analysis_enabled
+	if((ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
 	   && (flow->l4.tcp.tls.num_tls_blocks > 0)) {
 	  u_int16_t i, idx = 0;
 	  int ret;
@@ -5008,7 +5008,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
     if(flow->protos.tls_quic.ja4_client[0] != '\0')
       l7_pf = flow->protos.tls_quic.ja4_client;
 
-    if(ndpi_str->cfg.tls_blocks_analysis_enabled)
+    if(ndpi_str->cfg.tls_max_num_blocks_to_analyze > 0)
       l7_pf_tls_blocks = ndpi_compute_tls_blocks_flow_fingerprint(flow,
 								  l7_pf_tls_blocks_buf, sizeof(l7_pf_tls_blocks_buf));
 
