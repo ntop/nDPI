@@ -78,7 +78,8 @@ static void ndpi_check_apple_push(struct ndpi_detection_module_struct *ndpi_stru
     if((packet->tcp->source == apple_push_port) || (packet->tcp->dest == apple_push_port) ||
        (packet->tcp->source == notification_apn_port) || (packet->tcp->dest == notification_apn_port)) {
       NDPI_LOG_INFO(ndpi_struct, "found apple_push\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_APPLE_PUSH, NDPI_PROTOCOL_TLS, NDPI_CONFIDENCE_DPI);
+      switch_to_tls(ndpi_struct, flow, 1);
       return;
     }
   }

@@ -1886,6 +1886,9 @@ void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   ndpi_search_tls_wrapper(ndpi_struct, flow);
+
+  if(!flow->extra_packets_func)
+    tlsInitExtraPacketProcessing(ndpi_struct, flow);
 }
 
 /* **************************************** */
