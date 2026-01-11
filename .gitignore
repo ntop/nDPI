@@ -34,8 +34,7 @@
 /aclocal.m4
 /autom4te.cache/
 /build
-/build-fuzz
-/build-sanitizer
+/build-*
 /compile
 /config.guess
 /config.h
@@ -183,6 +182,10 @@
 /packages/ubuntu/debian/ndpi-dev/
 /packages/ubuntu/debian/ndpi-dev-tmp/
 /packages/ubuntu/debian/ndpi-tmp/
+/python/.eggs/
+/python/.venv/
+/python/build/
+/python/ndpi.egg-info/
 /rrdtool/Makefile
 /rrdtool/rrd_anomaly
 /rrdtool/rrd_similarity
