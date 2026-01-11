@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Display qemu specified architecture (armhf - little endian)
         if: startsWith(matrix.arch, 'armhf')
-        uses: docker://multiarch/ubuntu-core:armhf-bionic
+        uses: docker://multiarch/ubuntu-core:armhf-focal
         with:
           args: >
             bash -c
@@ -43,7 +43,7 @@ jobs:
             "
       - name: Configure, compile and test using qemu for the specified architecture (armhf - little endian)
         if: startsWith(matrix.arch, 'armhf')
-        uses: docker://multiarch/ubuntu-core:armhf-bionic
+        uses: docker://multiarch/ubuntu-core:armhf-focal
         with:
           args: >
             bash -c
@@ -58,7 +58,7 @@ jobs:
             "
       - name: Display qemu specified architecture (s390x - big endian)
         if: startsWith(matrix.arch, 's390x')
-        uses: docker://multiarch/ubuntu-core:s390x-bionic
+        uses: docker://multiarch/ubuntu-core:s390x-focal
         with:
           args: >
             bash -c
@@ -67,7 +67,7 @@ jobs:
             "
       - name: Configure and compile using qemu for the specified architecture (s390x - big endian)
         if: startsWith(matrix.arch, 's390x')
-        uses: docker://multiarch/ubuntu-core:s390x-bionic
+        uses: docker://multiarch/ubuntu-core:s390x-focal
         with:
           args: >
             bash -c
