@@ -48,7 +48,7 @@ jobs:
           args: >
             bash -c
             "apt-get -y update &&
-            apt-get -y install git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
+            DEBIAN_FRONTEND=noninteractive apt-get -y install make git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
             git config --global --add safe.directory $(realpath .) &&
             env CC=gcc ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages &&
             make -j $(nproc) all &&
@@ -72,7 +72,7 @@ jobs:
           args: >
             bash -c
             "apt-get -y update &&
-            apt-get -y install git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
+            DEBIAN_FRONTEND=noninteractive  apt-get -y install make git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
             git config --global --add safe.directory $(realpath .) &&
             env CC=gcc ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages &&
             make -j $(nproc) all &&
