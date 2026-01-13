@@ -37,22 +37,22 @@ FUZZ_LINK_COMMAND = $(AM_V_CCLD)$(LIBTOOL) $(AM_V_lt) --silent --tag=CC $(AM_LIB
 # Note: Fuzz targets with dictionaries should depend on them for proper rebuilds
 fuzz_process_packet_SOURCES = fuzz_process_packet.c fuzz_common_code.c
 fuzz_process_packet_LINK = $(FUZZ_LINK_COMMAND)
-fuzz_process_packet_DEPENDENCIES = $(srcdir)/dictionary.dict
+fuzz_process_packet_DEPENDENCIES = $(top_builddir)/src/lib/libndpi.a $(srcdir)/dictionary.dict
 
 fuzz_ndpi_reader_SOURCES = fuzz_ndpi_reader.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
 fuzz_ndpi_reader_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/
 fuzz_ndpi_reader_LINK = $(FUZZ_LINK_COMMAND)
-fuzz_ndpi_reader_DEPENDENCIES = $(srcdir)/dictionary.dict
+fuzz_ndpi_reader_DEPENDENCIES = $(top_builddir)/src/lib/libndpi.a $(srcdir)/dictionary.dict
 
 fuzz_ndpi_reader_alloc_fail_SOURCES = fuzz_ndpi_reader_alloc_fail.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
 fuzz_ndpi_reader_alloc_fail_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DCRYPT_FORCE_NO_AESNI -DENABLE_FINGERPRINT_FP
 fuzz_ndpi_reader_alloc_fail_LINK = $(FUZZ_LINK_COMMAND)
-fuzz_ndpi_reader_alloc_fail_DEPENDENCIES = $(srcdir)/dictionary.dict
+fuzz_ndpi_reader_alloc_fail_DEPENDENCIES = $(top_builddir)/src/lib/libndpi.a $(srcdir)/dictionary.dict
 
 fuzz_ndpi_reader_payload_analyzer_SOURCES = fuzz_ndpi_reader_payload_analyzer.c fuzz_common_code.c $(top_srcdir)/example/reader_util.c
 fuzz_ndpi_reader_payload_analyzer_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/example/ -DENABLE_MEM_ALLOC_FAILURES -DENABLE_PAYLOAD_ANALYZER
 fuzz_ndpi_reader_payload_analyzer_LINK = $(FUZZ_LINK_COMMAND)
-fuzz_ndpi_reader_payload_analyzer_DEPENDENCIES = $(srcdir)/dictionary.dict
+fuzz_ndpi_reader_payload_analyzer_DEPENDENCIES = $(top_builddir)/src/lib/libndpi.a $(srcdir)/dictionary.dict
 
 fuzz_quic_get_crypto_data_SOURCES = fuzz_quic_get_crypto_data.c fuzz_common_code.c
 fuzz_quic_get_crypto_data_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
@@ -165,7 +165,7 @@ fuzz_binaryfusefilter_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_tls_certificate_SOURCES = fuzz_tls_certificate.c fuzz_common_code.c
 fuzz_tls_certificate_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_tls_certificate_LINK = $(FUZZ_LINK_COMMAND)
-fuzz_tls_certificate_DEPENDENCIES = $(srcdir)/dictionary_tls_certificate.dict
+fuzz_tls_certificate_DEPENDENCIES = $(top_builddir)/src/lib/libndpi.a $(srcdir)/dictionary_tls_certificate.dict
 
 fuzz_dga_SOURCES = fuzz_dga.c fuzz_common_code.c
 fuzz_dga_LINK = $(FUZZ_LINK_COMMAND)
