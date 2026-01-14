@@ -370,7 +370,8 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     }
 
     /* check for attachment */
-    if(packet->content_disposition_line.len > 0) {
+    if(packet->content_disposition_line.len > 0 &&
+       flow->http.filename == NULL) {
       u_int8_t attachment_len = sizeof("attachment; filename");
 
       if(packet->content_disposition_line.len > attachment_len &&
