@@ -1,5 +1,6 @@
 name: ARM builds with docker
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
@@ -43,18 +44,29 @@ jobs:
             "
       - name: Configure, compile and test using qemu for the specified architecture (armhf - little endian)
         if: startsWith(matrix.arch, 'armhf')
-        uses: docker://multiarch/ubuntu-core:armhf-focal
-        with:
-          args: >
-            bash -c
-            "apt-get -y update &&
-            DEBIAN_FRONTEND=noninteractive apt-get -y install make git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
-            git config --global --add safe.directory $(realpath .) &&
-            env CC=gcc ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages &&
-            make -j $(nproc) all &&
-            make -C example ndpiSimpleIntegration &&
-            make -C rrdtool &&
-            make check VERBOSE=1
+        # Use docker run with --privileged to allow tmpfs mount.
+        # This works around QEMU bug #1805913 where readdir() returns EOVERFLOW
+        # for 32-bit ARM emulation on 64-bit hosts due to large inode numbers.
+        # Since we need to load files from two directories (lists and plugins) the simpler
+        # solution is to make an out-of-tree build in a tmpfs and run the tests directly from there
+        # See: https://bugs.launchpad.net/qemu/+bug/1805913
+        run: |
+          docker run --rm --privileged -v $(pwd):/src:ro \
+            -e NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS=$NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS \
+            -e CFLAGS="$CFLAGS" \
+            multiarch/ubuntu-core:armhf-focal bash -c "
+              apt-get -y update &&
+              DEBIAN_FRONTEND=noninteractive apt-get -y install make git wdiff colordiff autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev &&
+              mkdir -p /build &&
+              mount -t tmpfs tmpfs /build &&
+              cp -a /src/. /build/ &&
+              cd /build &&
+              git config --global --add safe.directory /build &&
+              env CC=gcc ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages &&
+              make -j \$(nproc) all &&
+              make -C example ndpiSimpleIntegration &&
+              make -C rrdtool &&
+              make check VERBOSE=1
             "
       - name: Display qemu specified architecture (s390x - big endian)
         if: startsWith(matrix.arch, 's390x')
