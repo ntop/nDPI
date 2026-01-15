@@ -1253,7 +1253,7 @@ static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
       struct ndpi_packet_struct *packet = &ndpi_struct->packet;
       message_t *message = &flow->tls_quic.message[packet->packet_direction];
 
-      if(message->buffer != NULL) {
+      if(message->buffer != NULL && message->buffer_used >= 5) {
 	u_int32_t len = (message->buffer[3] << 8) + message->buffer[4] + 5;
 	int16_t blen = len-5;
 	u_int8_t content_type = message->buffer[0];
