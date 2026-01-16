@@ -5302,6 +5302,9 @@ const char* ndpi_tls_extension2str(u_int16_t extension_id,
 /* ****************************************** */
 
 const char* ndpi_tls_elliptic_curve2str(u_int16_t curve_id, char unknown_curve[8]) {
+  if((curve_id >= 0x002B) && (curve_id <= 0x003F))
+    return "(Reserved)";
+
   switch (curve_id) {
     /* RFC 4492 / 8422 - Standard Curves */
   case 0x0001: return "sect163k1";           // deprecated
@@ -5354,9 +5357,6 @@ const char* ndpi_tls_elliptic_curve2str(u_int16_t curve_id, char unknown_curve[8
   case 0x0028: return "secp521r1kyber1024";
   case 0x0029: return "x448kyber768";
   case 0x002A: return "x448kyber1024";
-
-    /* Deprecated or Reserved Ranges */
-  case 0x002B ... 0x003F: return "(Reserved)";
 
     /* Arbitrary Prime and Characteristic-2 Curves */
   case 0xFF01: return "arbitrary_explicit_prime_curves";
