@@ -5389,6 +5389,10 @@ const char* ndpi_tls_elliptic_curve2str(u_int16_t curve_id, char unknown_curve[8
 /* ****************************************** */
 
 const char* ndpi_tls_signature_algo2str(u_int16_t algo_id, char unknown_algo[8]) {
+  if (algo_id >= 0xFE00 && algo_id <= 0xFEFF) {
+    return("(Experimental/Private Use)");
+  }
+
   switch (algo_id) {
     // Legacy RSA PKCS#1 schemes (deprecated in TLS 1.3)
   case 0x0201: return "rsa_pkcs1_sha1";          // Deprecated
@@ -5443,9 +5447,6 @@ const char* ndpi_tls_signature_algo2str(u_int16_t algo_id, char unknown_algo[8])
   case 0x0400: return "anonymous_sha256";        // Deprecated
   case 0x0500: return "anonymous_sha384";        // Deprecated
   case 0x0600: return "anonymous_sha512";        // Deprecated
-
-    // Private/Experimental Use Range
-  case 0xFE00 ... 0xFEFF: return "(Experimental/Private Use)";
 
     // GREASE values for signature algorithms (RFC 8701)
   case 0x0A0A: return "(GREASE)";
