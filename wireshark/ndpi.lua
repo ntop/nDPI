@@ -140,6 +140,7 @@ flow_risks[53] = ProtoField.bool("ndpi.flow_risk.malware_contact", "Contact with
 flow_risks[54] = ProtoField.bool("ndpi.flow_risk.binary_data_transfer", "Attempt to transfer a binary file", num_bits_flow_risks, nil, bit(54), "nDPI Flow Risk: binary data file transfer")
 flow_risks[55] = ProtoField.bool("ndpi.flow_risk.probing_attempt", "Probing attempt", num_bits_flow_risks, nil, bit(55), "nDPI Flow Risk: probing attempt")
 flow_risks[56] = ProtoField.bool("ndpi.flow_risk.obfuscated_traffic", "Obfuscated Traffic", num_bits_flow_risks, nil, bit(56), "nDPI Flow Risk: obfuscated traffic")
+flow_risks[57] = ProtoField.bool("ndpi.flow_risk.slow_dos", "Slow DoS", num_bits_flow_risks, nil, bit(56), "nDPI Flow Risk: slow DoS attempt")
 
 -- Last one: keep in sync the bitmask when adding new risks!!
 flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT64, nil, base.HEX, bit(64) - bit(57))

@@ -214,7 +214,8 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_MALWARE_HOST_CONTACTED,                NDPI_RISK_SEVERE, CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_BINARY_DATA_TRANSFER,                  NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_PROBING_ATTEMPT,                       NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
-  { NDPI_OBFUSCATED_TRAFFIC,                    NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE },
+  { NDPI_OBFUSCATED_TRAFFIC,                    NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE   },
+  { NDPI_SLOW_DOS,                              NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY   }
@@ -8490,10 +8491,18 @@ static void connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
   flow->is_ipv6 = (packet->iphv6 != NULL);
 
-  flow->last_packet_time_ms = packet->current_time_ms;
-
   if(tcph != NULL) {
     u_int8_t flags = ((u_int8_t*)tcph)[13];
+    u_int16_t syn_mask = TH_SYN | TH_ECE | TH_CWR | TH_ACK;
+    u_int8_t flags_3wh = flags & syn_mask;
+
+    if((flags_3wh & (TH_SYN|TH_ACK)) == (TH_SYN|TH_ACK))
+      flow->l4.tcp.three_way_handshake.syn_ack_time = packet->current_time_ms;
+    else if((flags_3wh & TH_SYN) == TH_SYN)
+      flow->l4.tcp.three_way_handshake.syn_time = packet->current_time_ms;
+    else if(((flags_3wh & TH_ACK) == TH_ACK)
+	    && (flow->l4.tcp.three_way_handshake.ack_time == 0))
+      flow->l4.tcp.three_way_handshake.ack_time = packet->current_time_ms;
 
     if(flags == 0)
       ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP NULL scan");
@@ -8680,6 +8689,8 @@ static void connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     else
       ndpi_str->input_info->in_pkt_dir = NDPI_IN_PKT_DIR_S_TO_C;
   }
+
+  flow->last_packet_time_ms = packet->current_time_ms;
 }
 
 /* ************************************************ */
@@ -9165,6 +9176,38 @@ static void check_tcp_flags(struct ndpi_detection_module_struct *ndpi_struct, st
 static void check_probing_attempt(struct ndpi_detection_module_struct *ndpi_str,
                                   struct ndpi_flow_struct *flow) {
   /* TODO: check UDP traffic too */
+
+  if(flow->l4_proto == IPPROTO_TCP) {
+    u_int64_t tdiff_ms;
+
+    if(flow->l4.tcp.three_way_handshake.syn_ack_time && flow->l4.tcp.three_way_handshake.syn_time) {
+      if(flow->l4.tcp.three_way_handshake.syn_ack_time > flow->l4.tcp.three_way_handshake.syn_time)
+	tdiff_ms = flow->l4.tcp.three_way_handshake.syn_ack_time - flow->l4.tcp.three_way_handshake.syn_time;
+      else /* out of order */
+	tdiff_ms = flow->l4.tcp.three_way_handshake.syn_time - flow->l4.tcp.three_way_handshake.syn_ack_time;
+
+      if(tdiff_ms > 1500 /* 1.5 sec */) {
+	char buf[64];
+
+	snprintf(buf, sizeof(buf), "Slow TCP 3WH (SYN|ACK): %u ms", (unsigned int)tdiff_ms);
+	ndpi_set_risk(ndpi_str, flow, NDPI_SLOW_DOS, buf);
+      }
+    }
+
+    if(flow->l4.tcp.three_way_handshake.ack_time && flow->l4.tcp.three_way_handshake.syn_ack_time) {
+      if(flow->l4.tcp.three_way_handshake.ack_time > flow->l4.tcp.three_way_handshake.syn_ack_time)
+	tdiff_ms = flow->l4.tcp.three_way_handshake.ack_time - flow->l4.tcp.three_way_handshake.syn_ack_time;
+      else
+	tdiff_ms = flow->l4.tcp.three_way_handshake.syn_ack_time - flow->l4.tcp.three_way_handshake.ack_time;
+
+      if(tdiff_ms > 1500 /* 1.5 sec */) {
+	char buf[64];
+
+	snprintf(buf, sizeof(buf), "Slow TCP 3WH (ACK): %u ms", (unsigned int)tdiff_ms);
+	ndpi_set_risk(ndpi_str, flow, NDPI_SLOW_DOS, buf);
+      }
+    }
+  }
 
   if((flow->l4_proto == IPPROTO_TCP)
      && (flow->l4.tcp.cli2srv_tcp_flags & TH_PUSH)
@@ -10908,6 +10951,22 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
   if(packet->packet_lines_parsed_complete != 0)
     return;
 
+  if((flow->l4.tcp.three_way_handshake.syn_time != 0) /* Check only if 3WH was observed */
+     && (flow->l4.tcp.three_way_handshake.ack_time != 0)
+     && ((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP) || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP))
+     && (flow->http.method != NDPI_HTTP_METHOD_UNKNOWN)
+     && (flow->http.response_status_code == 0 /* Response code not observed yet */)
+     ) {
+    u_int64_t tdiff_ms = packet->current_time_ms - flow->l4.tcp.three_way_handshake.ack_time;
+
+    if((tdiff_ms > 3000 /* 3 sec */) && (!ndpi_isset_risk(flow, NDPI_SLOW_DOS))) {
+      char buf[64];
+
+      snprintf(buf, sizeof(buf), "Slow HTTP Req. (Slowloris): %.1f sec", tdiff_ms/1000.);
+      ndpi_set_risk(ndpi_str, flow, NDPI_SLOW_DOS, buf);
+    }
+  }
+
   packet->packet_lines_parsed_complete = 1;
   ndpi_reset_packet_line_info(packet);
 
@@ -12401,7 +12460,8 @@ u_int ndpi_get_ndpi_detection_module_size() {
 u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow)
 {
   if(flow)
-    return flow->last_packet_time_ms / 1000;
+    return(flow->last_packet_time_ms / 1000);
+
   return 0;
 }
 
@@ -12957,6 +13017,23 @@ ndpi_risk_info* ndpi_risk2severity(ndpi_risk_enum risk) {
 
 /* ******************************************************************** */
 
+static int is_valid_port(const char *port_str) {
+  char *endptr;
+  long port;
+
+  /* We can't easily use ndpi_strtonum because we want to be sure that there are no
+     others characters after the number */
+  errno = 0;    /* To distinguish success/failure after call */
+  port = strtol(port_str, &endptr, 10);
+  if(errno == 0 && *endptr == '\0' &&
+     (port >= 0 && port <= 65535)) {
+    return 1;
+  }
+  return 0;
+}
+
+/* ******************************************************************** */
+
 char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
 			    const u_int8_t *value, size_t value_len,
 			    int normalize) {
@@ -12984,12 +13061,26 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
 
     dst[i] = '\0';
     if(normalize & NDPI_HOSTNAME_NORM_STRIP_PORT) {
-      /* Skip port in "239.255.255.250:1900" or "[ff02::c]:1900" */
+      /* Skip port in "239.255.255.250:1900", "[ff02::c]:1900" or "domain.com:1900" */
       double_column = strrchr(dst, ':');
       if(double_column) {
-        *double_column = '\0';
-        i = double_column - dst;
+        if(dst[0] == '[' &&
+           dst[double_column - dst - 1] == ']' &&
+           is_valid_port(double_column + 1)) {
+          *double_column = '\0';
+          i = double_column - dst;
+        } else {
+          /* It can still be a literal IPV6 address (without port)*/
+          struct in6_addr addr6;
+
+          if(inet_pton(AF_INET6, dst, &addr6) != 1 &&
+             is_valid_port(double_column + 1)) {
+            *double_column = '\0';
+            i = double_column - dst;
+          }
+        }
       }
+
     }
     if(normalize & NDPI_HOSTNAME_NORM_STRIP_EOLSP) {
       /* Removing spaces at the end of a line */
@@ -13037,14 +13128,10 @@ int ndpi_seen_flow_beginning(const struct ndpi_flow_struct *flow)
 
 void ndpi_set_user_data(struct ndpi_detection_module_struct *ndpi_str, void *user_data) {
   if (ndpi_str == NULL)
-    {
-      return;
-    }
+    return;
 
   if (ndpi_str->user_data != NULL)
-    {
-      NDPI_LOG_ERR(ndpi_str, "%s", "User data is already set. Overwriting.")
-	}
+    NDPI_LOG_ERR(ndpi_str, "%s", "User data is already set. Overwriting.")
 
   ndpi_str->user_data = user_data;
 }

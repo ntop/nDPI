@@ -14,6 +14,10 @@
 #include "pl7m.h"
 #endif
 
+#ifdef ENABLE_NALLOC
+#include "nallocinc.c"
+#endif
+
 struct ndpi_workflow_prefs *prefs = NULL;
 struct ndpi_workflow *workflow = NULL;
 struct ndpi_global_context *g_ctx;
@@ -153,7 +157,13 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     assert(ndpi_set_config(workflow->ndpi_struct, "tls", "dpi.heuristics.max_packets_extra_dissection", "40") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, "all", "monitoring", "1") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "dpi.address_cache_size", "8192") == NDPI_CFG_OK);
+
+    /* Roaring code doesn't handle memory allocation failures */
+#ifdef ENABLE_NALLOC
+    assert(ndpi_set_config(workflow->ndpi_struct, NULL, "hostname_dns_check", "0") == NDPI_CFG_OK);
+#else
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "hostname_dns_check", "1") == NDPI_CFG_OK);
+#endif
 
 #ifdef ENABLE_CONFIG2
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "flow_risk.all.info", "0") == NDPI_CFG_OK);
@@ -214,6 +224,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     return 0;
   }
 
+#ifdef ENABLE_NALLOC
+  nalloc_init("nalloc");
+  nalloc_start(Data, Size);
+#endif
+
   header = NULL;
   r = pcap_next_ex(pkts, &header, &pkt);
   while (r > 0) {
@@ -247,6 +262,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   ndpi_update_params(SPLT_PARAM_TYPE, "splt_param.txt");
   ndpi_update_params(BD_PARAM_TYPE, "bd_param.txt");
   ndpi_update_params(2, ""); /* invalid */
+#endif
+
+#ifdef ENABLE_NALLOC
+  nalloc_end();
 #endif
 
   return 0;

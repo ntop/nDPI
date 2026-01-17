@@ -1253,7 +1253,7 @@ static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
       struct ndpi_packet_struct *packet = &ndpi_struct->packet;
       message_t *message = &flow->tls_quic.message[packet->packet_direction];
 
-      if(message->buffer != NULL) {
+      if(message->buffer != NULL && message->buffer_used >= 5) {
 	u_int32_t len = (message->buffer[3] << 8) + message->buffer[4] + 5;
 	int16_t blen = len-5;
 	u_int8_t content_type = message->buffer[0];
@@ -2220,7 +2220,8 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len, "%02u%02u%c%c_",
-		     ja->client.num_ciphers, ja->client.num_tls_extensions,
+		     ndpi_min(99, ja->client.num_ciphers),
+		     ndpi_min(99, ja->client.num_tls_extensions),
 		     alpn_first, alpn_last);
   if((rc > 0) && (ja_str_len + rc < JA_STR_LEN)) ja_str_len += rc;
 
@@ -2247,7 +2248,11 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s_", tmp_str); if(i > 0) ja4_r_len += i;
 #endif
 
-  ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+  if(ja->client.num_ciphers > 0) {
+    ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+  } else {
+    memset(sha_hash, '\0', 6);
+  }
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x_",
@@ -2303,7 +2308,11 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
   }
 
-  ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+  if(ja->client.num_tls_extensions > 0) {
+    ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+  } else {
+    memset(sha_hash, '\0', 6);
+  }
 
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x",

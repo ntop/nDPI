@@ -319,7 +319,7 @@ void ndpi_data_print_window_values(struct ndpi_analyze_struct *s) {
 /* ********************************************************************************* */
 
 /*
-  Upload / download ration
+  Upload / download ratio
 
   -1  Download
   0   Mixed

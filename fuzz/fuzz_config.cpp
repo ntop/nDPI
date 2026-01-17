@@ -1,7 +1,10 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 #include "ndpi_classify.h"
-#include "fuzz_common_code.h"
+
+#ifdef ENABLE_NALLOC
+#include "nallocinc.c"
+#endif
 
 #include <stdint.h>
 #include <stdio.h>
@@ -44,12 +47,20 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int64_t cat_userdata = 0;
   u_int16_t unused1, unused2;
   ndpi_master_app_protocol proto1, proto2;
+#ifdef ENABLE_NALLOC
+  int nalloc_active = 0;
+#endif
 
+#ifdef ENABLE_NALLOC
+  /* Nalloc doesn't work with masan. That means that this fuzzers doesn't test
+     allocation failures with masan. Is taht a problem? */
   /* Make allocation failures more unlikely */
-  if(fuzzed_data.ConsumeBool())
-    fuzz_set_alloc_callbacks_and_seed(size);
-  else
-    fuzz_set_alloc_callbacks_and_seed(0);
+  if(fuzzed_data.ConsumeBool()) {
+    nalloc_init("nalloc");
+    nalloc_start(data, size);
+    nalloc_active = 1;
+  }
+#endif
 
   if(fuzzed_data.ConsumeBool())
     g_ctx = ndpi_global_init();
@@ -929,6 +940,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_exit_detection_module(ndpi_info_mod);
 
   ndpi_global_deinit(g_ctx);
+
+#ifdef ENABLE_NALLOC
+  if(nalloc_active)
+    nalloc_end();
+#endif
 
   return 0;
 }

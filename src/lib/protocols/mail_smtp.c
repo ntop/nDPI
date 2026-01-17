@@ -154,9 +154,10 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
 		  ndpi_hostname_sni_set(flow, &packet->line[a].ptr[4], len, NDPI_HOSTNAME_NORM_ALL);
 		  NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname [%s]\n", flow->host_server_name);
 
-		  if (ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
+		  ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
 						   flow->host_server_name,
-						   strlen(flow->host_server_name))) {
+						   strlen(flow->host_server_name));
+		  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
 		    /* We set the protocols; we need to initialize extra dissection
 		       to search for credentials */
 		    NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname matched\n");

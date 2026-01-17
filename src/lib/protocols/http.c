@@ -370,7 +370,8 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
     }
 
     /* check for attachment */
-    if(packet->content_disposition_line.len > 0) {
+    if(packet->content_disposition_line.len > 0 &&
+       flow->http.filename == NULL) {
       u_int8_t attachment_len = sizeof("attachment; filename");
 
       if(packet->content_disposition_line.len > attachment_len &&
@@ -1617,7 +1618,7 @@ static void parse_response_code(struct ndpi_detection_module_struct *ndpi_struct
   char buf[4];
   char ec[48];
 
-  if(packet->payload_packet_len >= 12) {
+  if(packet->payload_packet_len >= 12) {    
     /* Set server HTTP response code */
     strncpy(buf, (char*)&packet->payload[9], 3);
     buf[3] = '\0';

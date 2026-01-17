@@ -1,0 +1,36 @@
+DPI Packets (TCP):	10	(10.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 13 (13.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    1/0 (search/found)
+
+ntop	14	1712	1
+
+Safe                            14 1712          1            
+
+Network                         14 1712          1            
+
+	1	TCP 192.168.2.61:39970 <-> 116.203.142.127:80 [proto: 7.26/HTTP.ntop][Stack: HTTP.ntop][IP: 26/ntop][ClearText][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 10][cat: Network/14][Breed: Safe][7 pkts/717 bytes <-> 7 pkts/995 bytes][Goodput ratio: 34/53][20.90 sec][Hostname/SNI: packages.ntop.org][bytes ratio: -0.162 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/19 3971/4176 9999/10002 4856/4705][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 102/142 223/591 53/183][URL: packages.ntop.org/][StatusCode: 408][Content-Type: text/html][Server: Apache/2.4.66 (Debian)][User-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; SLCC2)][Risk: ** Error Code **** (Possible) Slow DoS **][Risk Score: 110][Risk Info: Slow HTTP Req. (Slowloris): 9.8 sec / HTTP Error Code 408][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][PLAIN TEXT (GET / HTTP/1.1)][Plen Bins: 0,50,0,0,25,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -25,6 +25,7 @@ AC_ARG_WITH(local-libgcrypt, AS_HELP_STRING([--with-local-libgcrypt], [Build wit
 AC_ARG_ENABLE(tls-sigs, AS_HELP_STRING([--enable-tls-sigs], [Enable TLS Client signature algorithm dissection. Rarely used, but requires significantly more memory.]))
 AC_ARG_ENABLE(npcap, AS_HELP_STRING([--disable-npcap], [msys2 only: Disable linkage against the wpcap/npcap import library in windows/WpdPack/Lib.]))
 AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom path; default: ${srcdir}/../PF_RING/userland/nbpf]),[NBPF_HOME=$withval],[NBPF_HOME="`cd ${srcdir}/../PF_RING/userland/nbpf 2>/dev/null && pwd || echo ${srcdir}/../PF_RING/userland/nbpf`"])
+AC_ARG_WITH(libpcap, AS_HELP_STRING([--with-libpcap=PATH], [Linux only: Custom path to libpcap installation]),[LIBPCAP_PATH=$withval],[LIBPCAP_PATH=""])
 AC_ARG_WITH(lto-and-gold-linker, AS_HELP_STRING([--with-lto-and-gold-linker], [Build with LTO and Gold linker]))
 AC_ARG_ENABLE(debug-build, AS_HELP_STRING([--enable-debug-build], [Enable debug build (`-g` flag)]),[enable_debugbuild=$enableval],[enable_debugbuild=no])
 AC_ARG_ENABLE(plugin-support, AS_HELP_STRING([--disable-plugin-support], [Disable plugin system]))
@@ -430,7 +431,39 @@ case "$host" in
              AC_CHECK_LIB([pcap], [pcap_open_live],, [AC_MSG_ERROR([Missing msys2/mingw libpcap library. Install it with `pacman -S mingw-w64-x86_64-libpcap' (msys2).])])])
       ;;
    *)
-      if test -f $PCAP_HOME/libpcap/libpcap.a; then :
+      if test -n "$LIBPCAP_PATH"; then :
+         echo "Using custom libpcap from $LIBPCAP_PATH"
+         PCAP_INC="-I $LIBPCAP_PATH/include"
+
+         dnl> Check for libpcap in custom path (prefer static library)
+         if test -f "$LIBPCAP_PATH/lib/libpcap.a"; then :
+            PCAP_LIB="$LIBPCAP_PATH/lib/libpcap.a"
+            echo "  Found static library: $LIBPCAP_PATH/lib/libpcap.a"
+         elif test -f "$LIBPCAP_PATH/lib64/libpcap.a"; then :
+            PCAP_LIB="$LIBPCAP_PATH/lib64/libpcap.a"
+            echo "  Found static library: $LIBPCAP_PATH/lib64/libpcap.a"
+         elif test -f "$LIBPCAP_PATH/lib/libpcap.so"; then :
+            PCAP_LIB="-L$LIBPCAP_PATH/lib -lpcap"
+            echo "  Found shared library: $LIBPCAP_PATH/lib/libpcap.so"
+         elif test -f "$LIBPCAP_PATH/lib/libpcap.dylib"; then :
+            PCAP_LIB="-L$LIBPCAP_PATH/lib -lpcap"
+            echo "  Found shared library: $LIBPCAP_PATH/lib/libpcap.dylib"
+         else
+            AC_MSG_ERROR([libpcap not found in specified path: $LIBPCAP_PATH. Please check that libpcap is installed in this location with lib/ and include/ subdirectories.])
+         fi
+
+         dnl> Try to get additional dependencies from pkg-config if available
+         if test -f "$LIBPCAP_PATH/lib/pkgconfig/libpcap.pc"; then :
+            export PKG_CONFIG_PATH="$LIBPCAP_PATH/lib/pkgconfig:$PKG_CONFIG_PATH"
+            PKG_CHECK_MODULES([PCAP_DEPS], [libpcap], [
+               PCAP_PRIVATE_LIBS=`$PKG_CONFIG --libs --static libpcap | sed "s|-L$LIBPCAP_PATH/lib *||" | sed 's|-lpcap *||'`
+               PCAP_LIB="$PCAP_LIB $PCAP_PRIVATE_LIBS"
+               echo "  Added dependencies from pkg-config: $PCAP_PRIVATE_LIBS"
+            ], [
+               echo "  Warning: Could not get dependencies from pkg-config, using defaults"
+            ])
+         fi
+      elif test -f $PCAP_HOME/libpcap/libpcap.a; then :
          echo "Using libpcap from $PCAP_HOME"
          PCAP_INC="-I $PCAP_HOME/libpcap"
 	 PFRING_LIB=
@@ -802,6 +835,8 @@ Compiler Flags:
   LDFLAGS:                 ${LDFLAGS}
   NDPI_LDFLAGS:            ${NDPI_LDFLAGS}
   Additional libs:         ${ADDITIONAL_LIBS}
+  PCAP_INC:                ${PCAP_INC}
+  PCAP_LIB:                ${PCAP_LIB}
 
 ========================================================================
 Configuration complete. Now run 'make' to build nDPI.

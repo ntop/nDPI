@@ -346,3 +346,9 @@ Connection with no data exchaged that looks like a probing attempt
 NDPI_OBFUSCATED_TRAFFIC
 =======================
 This risk is triggered when a connection is likely using some obfuscation technique to try to "look like" something else, hiding its true nature
+
+.. _Risk 057:
+
+NDPI_SLOW_DOS
+=======================
+This risk is triggered when a TCP connection is likely subject to slow DoS attacks

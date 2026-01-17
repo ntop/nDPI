@@ -1263,6 +1263,14 @@ extern "C" {
 			    u_char *hash_buf, u_int8_t hash_buf_len);
   u_int8_t ndpi_is_safe_ssl_cipher(u_int32_t cipher);
   const char* ndpi_cipher2str(u_int32_t cipher, char unknown_cipher[8]);
+  const char* ndpi_tls_extension2str(u_int16_t extension_id, char unknown_extn[8]);
+  const char* ndpi_tls_elliptic_curve2str(u_int16_t curve_id, char unknown_curve[8]);
+  const char* ndpi_tls_signature_algo2str(u_int16_t algo_id, char unknown_algo[8]);
+  const char* ndpi_tls_elliptic_curve_groups2str(u_int16_t group_id, char unknown_group[8]);
+  const char* ndpi_tls_elliptic_curve_point_format2str(u_int16_t format_id, char unknown_group[8]);
+  const char* ndpi_tls_key_share_group2str(u_int16_t group_id, char unknown_group[8]);
+  const char* ndpi_tls_supported_version2str(u_int16_t version_id, char unknown_version[8]);
+
   const char* ndpi_tunnel2str(ndpi_packet_tunnel tt);
   u_int16_t ndpi_guess_host_protocol_id(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow);
