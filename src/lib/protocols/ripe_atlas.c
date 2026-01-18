@@ -61,7 +61,7 @@ static void ndpi_search_ripe_atlas(struct ndpi_detection_module_struct *ndpi_str
 
 void init_ripe_atlas_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("RipeAtlas", ndpi_struct,
+  ndpi_register_dissector("RipeAtlas", ndpi_struct,
                      ndpi_search_ripe_atlas,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_RIPE_ATLAS);

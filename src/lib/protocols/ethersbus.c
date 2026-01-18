@@ -62,7 +62,7 @@ static void ndpi_search_ethersbus(struct ndpi_detection_module_struct *ndpi_stru
 
 void init_ethersbus_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("Ether-S-Bus", ndpi_struct,
+  ndpi_register_dissector("Ether-S-Bus", ndpi_struct,
                      ndpi_search_ethersbus,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_ETHERSBUS);

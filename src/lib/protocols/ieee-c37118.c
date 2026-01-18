@@ -68,7 +68,7 @@ static void ndpi_search_ieee_c37118(struct ndpi_detection_module_struct *ndpi_st
 
 void init_ieee_c37118_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("IEEE-C37118", ndpi_struct,
+  ndpi_register_dissector("IEEE-C37118", ndpi_struct,
                      ndpi_search_ieee_c37118,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_IEEE_C37118);

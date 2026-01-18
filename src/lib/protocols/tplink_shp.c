@@ -83,7 +83,7 @@ static void ndpi_search_tplink_shp(struct ndpi_detection_module_struct *ndpi_str
   
 void init_tplink_shp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("TPLINK SHP", ndpi_struct,
+  ndpi_register_dissector("TPLINK SHP", ndpi_struct,
                      ndpi_search_tplink_shp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_TPLINK_SHP);

@@ -73,7 +73,7 @@ static void ndpi_search_tristation(struct ndpi_detection_module_struct *ndpi_str
 
 void init_tristation_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("TriStation", ndpi_struct,
+  ndpi_register_dissector("TriStation", ndpi_struct,
                      ndpi_search_tristation,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_TRISTATION);

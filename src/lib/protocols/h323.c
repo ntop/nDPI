@@ -73,7 +73,7 @@ static void ndpi_search_h323(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_h323_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("H323", ndpi_struct,
+  ndpi_register_dissector("H323", ndpi_struct,
                      ndpi_search_h323,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_H323);

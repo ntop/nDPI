@@ -312,7 +312,7 @@ static void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struc
 
 void init_smpp_dissector(struct ndpi_detection_module_struct* ndpi_struct)
 {
-  register_dissector("SMPP", ndpi_struct,
+  ndpi_register_dissector("SMPP", ndpi_struct,
                      ndpi_search_smpp_tcp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_SMPP);

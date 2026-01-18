@@ -93,7 +93,7 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
 }
 
 void init_cassandra_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  register_dissector("Cassandra", ndpi_struct,
+  ndpi_register_dissector("Cassandra", ndpi_struct,
                      ndpi_search_cassandra,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_CASSANDRA);

@@ -60,7 +60,7 @@ static void ndpi_search_qq(struct ndpi_detection_module_struct *ndpi_struct, str
 
 void init_qq_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("QQ", ndpi_struct,
+  ndpi_register_dissector("QQ", ndpi_struct,
                      ndpi_search_qq,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_QQ);

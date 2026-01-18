@@ -192,7 +192,7 @@ static void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struc
 
 void init_collectd_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("collectd", ndpi_struct,
+  ndpi_register_dissector("collectd", ndpi_struct,
                      ndpi_search_collectd,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_COLLECTD);

@@ -426,7 +426,7 @@ static void smtpInitExtraPacketProcessing(struct ndpi_flow_struct *flow) {
 /* **************************************** */
 
 void init_mail_smtp_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  register_dissector("MAIL_SMTP", ndpi_struct,
+  ndpi_register_dissector("MAIL_SMTP", ndpi_struct,
                      ndpi_search_mail_smtp_tcp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                       1, NDPI_PROTOCOL_MAIL_SMTP);

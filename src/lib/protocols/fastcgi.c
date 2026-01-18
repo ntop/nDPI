@@ -237,7 +237,7 @@ static int ndpi_search_fastcgi_extra(struct ndpi_detection_module_struct * ndpi_
 
 void init_fastcgi_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("FastCGI", ndpi_struct,
+  ndpi_register_dissector("FastCGI", ndpi_struct,
                      ndpi_search_fastcgi,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_FASTCGI);

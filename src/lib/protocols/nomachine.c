@@ -71,7 +71,7 @@ static void ndpi_search_nomachine(struct ndpi_detection_module_struct *ndpi_stru
 }
 void init_nomachine_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("NoMachine", ndpi_struct,
+  ndpi_register_dissector("NoMachine", ndpi_struct,
                      ndpi_search_nomachine,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_NOMACHINE);

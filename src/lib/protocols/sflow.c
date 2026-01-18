@@ -57,7 +57,7 @@ static void ndpi_search_sflow(struct ndpi_detection_module_struct *ndpi_struct, 
 
 void init_sflow_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("sFlow", ndpi_struct,
+  ndpi_register_dissector("sFlow", ndpi_struct,
                      ndpi_search_sflow,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_SFLOW);

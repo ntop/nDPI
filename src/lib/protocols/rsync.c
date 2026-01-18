@@ -60,7 +60,7 @@ static void ndpi_search_rsync(struct ndpi_detection_module_struct *ndpi_struct, 
 
 void init_rsync_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("RSYNC", ndpi_struct,
+  ndpi_register_dissector("RSYNC", ndpi_struct,
                      ndpi_search_rsync,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_RSYNC);

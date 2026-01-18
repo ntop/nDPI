@@ -82,7 +82,7 @@ static void ndpi_search_lisp(struct ndpi_detection_module_struct *ndpi_struct, s
 
 void init_lisp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("LISP", ndpi_struct,
+  ndpi_register_dissector("LISP", ndpi_struct,
                      ndpi_search_lisp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                       1, NDPI_PROTOCOL_LISP);

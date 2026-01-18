@@ -60,7 +60,7 @@ static void ndpi_search_ultrasurf(struct ndpi_detection_module_struct *ndpi_stru
 
 void init_ultrasurf_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("UltraSurf", ndpi_struct,
+  ndpi_register_dissector("UltraSurf", ndpi_struct,
                      ndpi_search_ultrasurf,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_ULTRASURF);

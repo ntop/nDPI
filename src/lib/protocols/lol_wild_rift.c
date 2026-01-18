@@ -74,7 +74,7 @@ static void ndpi_search_lolwildrift(struct ndpi_detection_module_struct *ndpi_st
 
 void init_lolwildrift_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("LoLWildRift", ndpi_struct,
+  ndpi_register_dissector("LoLWildRift", ndpi_struct,
                      ndpi_search_lolwildrift,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                       1, NDPI_PROTOCOL_LOLWILDRIFT);

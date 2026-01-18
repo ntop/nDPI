@@ -71,7 +71,7 @@ static void ndpi_search_hl7(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_hl7_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("HL7", ndpi_struct,
+  ndpi_register_dissector("HL7", ndpi_struct,
                      ndpi_search_hl7,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_HL7);

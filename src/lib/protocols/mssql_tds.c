@@ -78,7 +78,7 @@ static void ndpi_search_mssql_tds(struct ndpi_detection_module_struct *ndpi_stru
 
 void init_mssql_tds_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("MsSQL_TDS", ndpi_struct,
+  ndpi_register_dissector("MsSQL_TDS", ndpi_struct,
                      ndpi_search_mssql_tds,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                       1, NDPI_PROTOCOL_MSSQL_TDS);
