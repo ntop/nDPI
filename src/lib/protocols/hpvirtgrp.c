@@ -59,7 +59,7 @@ static void ndpi_search_hpvirtgrp(struct ndpi_detection_module_struct *ndpi_stru
 
 void init_hpvirtgrp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("HP Virtual Machine Group Management", ndpi_struct,
+  ndpi_register_dissector("HP Virtual Machine Group Management", ndpi_struct,
                      ndpi_search_hpvirtgrp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_HPVIRTGRP);

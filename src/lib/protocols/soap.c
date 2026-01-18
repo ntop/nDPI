@@ -82,7 +82,7 @@ static void ndpi_search_soap(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_soap_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("SOAP", ndpi_struct,
+  ndpi_register_dissector("SOAP", ndpi_struct,
                      ndpi_search_soap,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_SOAP);

@@ -145,7 +145,7 @@ static void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
 }
 
 void init_snmp_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  register_dissector("SNMP", ndpi_struct,
+  ndpi_register_dissector("SNMP", ndpi_struct,
                      ndpi_search_snmp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_SNMP);

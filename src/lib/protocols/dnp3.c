@@ -57,7 +57,7 @@ static void ndpi_search_dnp3_tcp(struct ndpi_detection_module_struct *ndpi_struc
 
 void init_dnp3_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
 
-  register_dissector("DNP3", ndpi_struct,
+  ndpi_register_dissector("DNP3", ndpi_struct,
                      ndpi_search_dnp3_tcp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_DNP3);

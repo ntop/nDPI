@@ -96,7 +96,7 @@ static void ndpi_search_apple_push(struct ndpi_detection_module_struct *ndpi_str
 
 void init_apple_push_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("APPLE_PUSH", ndpi_struct,
+  ndpi_register_dissector("APPLE_PUSH", ndpi_struct,
                      ndpi_search_apple_push,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_APPLE_PUSH);

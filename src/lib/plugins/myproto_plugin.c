@@ -83,7 +83,7 @@ static void myprotoInitFctn(struct ndpi_detection_module_struct *ndpi_struct) {
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
                           1);
 
-  register_dissector(NDPI_PROTOCOL_MYPROTO_NAME, ndpi_struct,
+  ndpi_register_dissector(NDPI_PROTOCOL_MYPROTO_NAME, ndpi_struct,
                      ndpi_search_myproto,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, myproto_id);

@@ -95,7 +95,7 @@ ts3_license_weblist:
 
 void init_teamspeak_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("TeamSpeak", ndpi_struct,
+  ndpi_register_dissector("TeamSpeak", ndpi_struct,
                      ndpi_search_teamspeak,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_TEAMSPEAK);

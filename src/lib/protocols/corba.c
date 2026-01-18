@@ -61,7 +61,7 @@ static void ndpi_search_corba(struct ndpi_detection_module_struct *ndpi_struct, 
 
 void init_corba_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("Corba", ndpi_struct,
+  ndpi_register_dissector("Corba", ndpi_struct,
                      ndpi_search_corba,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_CORBA);

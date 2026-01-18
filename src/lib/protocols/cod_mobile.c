@@ -72,7 +72,7 @@ static void ndpi_search_cod_mobile(struct ndpi_detection_module_struct *ndpi_str
 
 void init_cod_mobile_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("CoD_Mobile", ndpi_struct,
+  ndpi_register_dissector("CoD_Mobile", ndpi_struct,
                      ndpi_search_cod_mobile,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_COD_MOBILE);

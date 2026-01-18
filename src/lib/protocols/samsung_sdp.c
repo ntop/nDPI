@@ -57,7 +57,7 @@ static void ndpi_search_samsung_sdp(struct ndpi_detection_module_struct *ndpi_st
 
 void init_samsung_sdp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("SamsungSDP", ndpi_struct,
+  ndpi_register_dissector("SamsungSDP", ndpi_struct,
                      ndpi_search_samsung_sdp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_SAMSUNG_SDP);

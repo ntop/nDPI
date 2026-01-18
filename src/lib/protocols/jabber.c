@@ -142,7 +142,7 @@ static void ndpi_search_jabber_tcp(struct ndpi_detection_module_struct *ndpi_str
 
 void init_jabber_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("Jabber", ndpi_struct,
+  ndpi_register_dissector("Jabber", ndpi_struct,
                       ndpi_search_jabber_tcp,
                       NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                       1, NDPI_PROTOCOL_JABBER);

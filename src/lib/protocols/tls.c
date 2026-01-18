@@ -3608,7 +3608,7 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
 /* **************************************** */
 
 void init_tls_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  register_dissector("(D)TLS", ndpi_struct,
+  ndpi_register_dissector("(D)TLS", ndpi_struct,
                      ndpi_search_tls_wrapper,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      2,

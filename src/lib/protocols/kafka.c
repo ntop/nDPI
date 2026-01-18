@@ -87,7 +87,7 @@ static void ndpi_search_kafka(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_kafka_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("Kafka", ndpi_struct,
+  ndpi_register_dissector("Kafka", ndpi_struct,
                      ndpi_search_kafka,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                       1, NDPI_PROTOCOL_APACHE_KAFKA);

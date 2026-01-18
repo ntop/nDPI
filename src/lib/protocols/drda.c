@@ -92,7 +92,7 @@ static void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_drda_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("DRDA", ndpi_struct,
+  ndpi_register_dissector("DRDA", ndpi_struct,
                      ndpi_search_drda,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_DRDA);

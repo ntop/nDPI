@@ -81,7 +81,7 @@ static void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
   
 void init_munin_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("Munin", ndpi_struct,
+  ndpi_register_dissector("Munin", ndpi_struct,
                      ndpi_search_munin,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                       1, NDPI_PROTOCOL_MUNIN);

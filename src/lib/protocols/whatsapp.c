@@ -122,7 +122,7 @@ static void ndpi_search_whatsapp(struct ndpi_detection_module_struct *ndpi_struc
 
 void init_whatsapp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("WhatsApp", ndpi_struct,
+  ndpi_register_dissector("WhatsApp", ndpi_struct,
                      ndpi_search_whatsapp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_WHATSAPP);

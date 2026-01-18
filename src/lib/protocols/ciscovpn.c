@@ -67,7 +67,7 @@ static void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struc
 
 void init_ciscovpn_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("CiscoVPN", ndpi_struct,
+  ndpi_register_dissector("CiscoVPN", ndpi_struct,
                      ndpi_search_ciscovpn,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_CISCOVPN);

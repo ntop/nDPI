@@ -96,7 +96,7 @@ static void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct,
 
 void init_dcerpc_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("DCERPC", ndpi_struct,
+  ndpi_register_dissector("DCERPC", ndpi_struct,
                      ndpi_search_dcerpc,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_DCERPC);

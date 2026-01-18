@@ -74,7 +74,7 @@ static void ndpi_search_iso9506_1_mms(struct ndpi_detection_module_struct *ndpi_
 
 void init_iso9506_1_mms_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("ISO9506-1-MMS", ndpi_struct,
+  ndpi_register_dissector("ISO9506-1-MMS", ndpi_struct,
                      ndpi_search_iso9506_1_mms,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_ISO9506_1_MMS);

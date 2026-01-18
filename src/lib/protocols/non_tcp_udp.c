@@ -164,7 +164,7 @@ static void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
 
 void init_non_tcp_udp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("Non_TCP_UDP", ndpi_struct,
+  ndpi_register_dissector("Non_TCP_UDP", ndpi_struct,
                      ndpi_search_in_non_tcp_udp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_IPV4_OR_IPV6,
                      13,

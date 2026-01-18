@@ -111,7 +111,7 @@ not_fins:
 
 void init_fins_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("FINS", ndpi_struct,
+  ndpi_register_dissector("FINS", ndpi_struct,
                      ndpi_search_fins,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_FINS);

@@ -6613,7 +6613,7 @@ int load_protocols_file_fd(struct ndpi_detection_module_struct *ndpi_str, FILE *
 
 /* ******************************************************************** */
 
-void register_dissector(char *dissector_name, struct ndpi_detection_module_struct *ndpi_str,
+void ndpi_register_dissector(char *dissector_name, struct ndpi_detection_module_struct *ndpi_str,
                         void (*func)(struct ndpi_detection_module_struct *,
                                      struct ndpi_flow_struct *flow),
                         const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,

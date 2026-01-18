@@ -103,7 +103,7 @@ static void ndpi_search_mgcp(struct ndpi_detection_module_struct *ndpi_struct, s
 
 void init_mgcp_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("MGCP", ndpi_struct,
+  ndpi_register_dissector("MGCP", ndpi_struct,
                      ndpi_search_mgcp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                       1, NDPI_PROTOCOL_MGCP);

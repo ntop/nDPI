@@ -143,7 +143,7 @@ static void ndpi_search_tinc(struct ndpi_detection_module_struct* ndpi_struct, s
 
 void init_tinc_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("TINC", ndpi_struct,
+  ndpi_register_dissector("TINC", ndpi_struct,
                      ndpi_search_tinc,
                      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION, /* TODO: IPv6? */
                      1, NDPI_PROTOCOL_TINC);

@@ -654,7 +654,7 @@ struct ndpi_detection_module_struct {
 int is_proto_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId);
 int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id);
 
-void register_dissector(char *dissector_name, struct ndpi_detection_module_struct *ndpi_str,
+void ndpi_register_dissector(char *dissector_name, struct ndpi_detection_module_struct *ndpi_str,
                         void (*func)(struct ndpi_detection_module_struct *,
                                      struct ndpi_flow_struct *flow),
                         const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,

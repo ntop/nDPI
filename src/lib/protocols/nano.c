@@ -81,7 +81,7 @@ static void ndpi_search_nano(struct ndpi_detection_module_struct *ndpi_struct, s
 
 void init_nano_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("Nano", ndpi_struct,
+  ndpi_register_dissector("Nano", ndpi_struct,
                      ndpi_search_nano,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_NANO);

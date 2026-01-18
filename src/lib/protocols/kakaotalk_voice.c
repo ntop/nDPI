@@ -67,7 +67,7 @@ static void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndp
 
 void init_kakaotalk_voice_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("KakaoTalk_Voice", ndpi_struct,
+  ndpi_register_dissector("KakaoTalk_Voice", ndpi_struct,
                      ndpi_search_kakaotalk_voice,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                       1, NDPI_PROTOCOL_KAKAOTALK_VOICE);

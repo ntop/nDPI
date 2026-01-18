@@ -66,7 +66,7 @@ static void ndpi_search_amazon_video(struct ndpi_detection_module_struct *ndpi_s
 
 
 void init_amazon_video_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
-  register_dissector("AMAZON_VIDEO", ndpi_struct,
+  ndpi_register_dissector("AMAZON_VIDEO", ndpi_struct,
                      ndpi_search_amazon_video,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
                      1, NDPI_PROTOCOL_AMAZON_VIDEO);

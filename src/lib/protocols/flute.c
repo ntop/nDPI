@@ -64,7 +64,7 @@ not_flute:
 
 void init_flute_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
-  register_dissector("FLUTE", ndpi_struct,
+  ndpi_register_dissector("FLUTE", ndpi_struct,
                      ndpi_search_flute,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
                      1, NDPI_PROTOCOL_FLUTE);
