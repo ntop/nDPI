@@ -2595,6 +2595,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_OBFUSCATED_TRAFFIC:
     return("Obfuscated Traffic");
 
+  case NDPI_SLOW_DOS:
+    return("(Possible) Slow DoS");
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2721,6 +2724,8 @@ const char* ndpi_risk2code(ndpi_risk_enum risk) {
     return STRINGIFY(NDPI_PROBING_ATTEMPT);
   case NDPI_OBFUSCATED_TRAFFIC:
     return STRINGIFY(NDPI_OBFUSCATED_TRAFFIC);
+  case NDPI_SLOW_DOS:
+    return STRINGIFY(NDPI_SLOW_DOS);
 
   default:
     return("Unknown risk");
@@ -2844,6 +2849,8 @@ ndpi_risk_enum ndpi_code2risk(const char* risk) {
     return(NDPI_PROBING_ATTEMPT);
   else if(strcmp(STRINGIFY(NDPI_OBFUSCATED_TRAFFIC), risk) == 0)
     return(NDPI_OBFUSCATED_TRAFFIC);
+  else if(strcmp(STRINGIFY(NDPI_SLOW_DOS), risk) == 0)
+    return(NDPI_SLOW_DOS);
   else
     return(NDPI_MAX_RISK);
 }
@@ -2987,6 +2994,7 @@ const char *ndpi_risk_shortnames[NDPI_MAX_RISK] = {
   "binary_data_transfer",
   "probing",
   "obfuscated",
+  "slow_DoS"
 };
 
 /* ******************************************************************** */
@@ -3481,9 +3489,26 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_fl
     u_int8_t i;
 
     for(i = 0; i < flow->num_risk_infos; i++)
-      if(flow->risk_infos[i].id == r)
-        return;
+      if(flow->risk_infos[i].id == r) {
+	if((flow->risk_infos[i].info != NULL)
+	   && (r != NDPI_SUSPICIOUS_ENTROPY /* Entropy changes when recomputed, so let's keep only one message */)
+	   /* Messages are different */
+	   && strcmp(flow->risk_infos[i].info, risk_message) && (strstr(flow->risk_infos[i].info, risk_message) == NULL)
+	   ) {
+	  char buf[256];
 
+	  /* Concatenate risks info */
+	  
+	  snprintf(buf, sizeof(buf), "%s|%s",
+		   flow->risk_infos[i].info, risk_message);
+
+	  ndpi_free(flow->risk_infos[i].info);
+	  flow->risk_infos[i].info = ndpi_strdup(buf);
+	}
+	
+        return;
+      }
+    
     /* Risk already set without any details, but now we have a specific risk_message
        that we want to save.
        This might happen with NDPI_HTTP_CRAWLER_BOT which might have been set early via

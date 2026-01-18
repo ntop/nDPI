@@ -1293,6 +1293,19 @@ static int processTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
 
   switch(packet->payload[0] /* block type */) {
   case 0x01: /* Client Hello */
+    if((flow->l4.tcp.three_way_handshake.syn_time != 0) /* Check only if 3WH was observed */
+       && (flow->l4.tcp.three_way_handshake.ack_time != 0)
+       ) {
+      u_int64_t tdiff_ms = packet->current_time_ms - flow->l4.tcp.three_way_handshake.ack_time;
+      
+      if((tdiff_ms > 3000 /* 3 sec */) && (!ndpi_isset_risk(flow, NDPI_SLOW_DOS))) {
+	char buf[64];
+	
+	snprintf(buf, sizeof(buf), "Slow TLS Request: %.1f sec", tdiff_ms/1000.);
+	ndpi_set_risk(ndpi_struct, flow, NDPI_SLOW_DOS, buf);
+      }
+    }
+
     flow->protos.tls_quic.client_hello_processed = 1;
     flow->protos.tls_quic.ch_direction = packet->packet_direction;
     processClientServerHello(ndpi_struct, flow, 0);

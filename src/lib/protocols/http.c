@@ -1618,7 +1618,7 @@ static void parse_response_code(struct ndpi_detection_module_struct *ndpi_struct
   char buf[4];
   char ec[48];
 
-  if(packet->payload_packet_len >= 12) {
+  if(packet->payload_packet_len >= 12) {    
     /* Set server HTTP response code */
     strncpy(buf, (char*)&packet->payload[9], 3);
     buf[3] = '\0';

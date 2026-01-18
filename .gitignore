@@ -21,6 +21,7 @@
 *.user
 *o.cmd
 *~
+*.dSYM
 .autotools
 .cproject
 .dirstamp

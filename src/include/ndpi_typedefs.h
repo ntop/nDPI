@@ -169,6 +169,7 @@ typedef enum {
   NDPI_BINARY_DATA_TRANSFER,   /* Attempt to transfer something in binary format */
   NDPI_PROBING_ATTEMPT,        /* Probing attempt (e.g. TCP connection with no data exchanged or unidirection traffic for bidirectional flows such as SSH) */
   NDPI_OBFUSCATED_TRAFFIC,
+  NDPI_SLOW_DOS,
   /* Before allocating a new risk here, check if there are FREE entries above */
 
   /* Leave this as last member */
@@ -860,6 +861,10 @@ struct ndpi_tls_block {
 };
 
 struct ndpi_flow_tcp_struct {
+  struct {
+    u_int64_t syn_time, syn_ack_time, ack_time;
+  } three_way_handshake;
+
   /* TCP sequence number */
   u_int32_t next_tcp_seq_nr[2];
   u_int16_t last_tcp_pkt_payload_len;
