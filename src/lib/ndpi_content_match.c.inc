@@ -309,6 +309,15 @@ static ndpi_network host_protocol_list[] = {
   { 0xBC2A5F00 /* 188.42.95.0/24 */, 24, NDPI_PROTOCOL_VIVOX },
   { 0xBC2A9300 /* 188.42.147.0/24 */, 24, NDPI_PROTOCOL_VIVOX },
 
+  /* ApplePush: https://support.apple.com/en-us/HT203609
+     TODO: are we able to autogenerate this list?
+   */
+  { 0x11f90000 /* 17.249.0.0/16 */, 16, NDPI_PROTOCOL_APPLE_PUSH },
+  { 0x11fc0000 /* 17.252.0.0/16 */, 16, NDPI_PROTOCOL_APPLE_PUSH },
+  { 0x11399000 /* 17.57.144.0/22 */, 22, NDPI_PROTOCOL_APPLE_PUSH },
+  { 0x11bc8000 /* 17.188.128.0/18 */, 18, NDPI_PROTOCOL_APPLE_PUSH },
+  { 0x11bc1400 /* 17.188.20.0/23 */, 23, NDPI_PROTOCOL_APPLE_PUSH },
+
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_protocol_list.c.inc"
 #endif
@@ -319,9 +328,15 @@ static ndpi_network host_protocol_list[] = {
 
 static ndpi_network6 host_protocol_list_6[] = {
 
- /* See the ipv4 list for a description */
+ /* See the ipv4 lists for a descriptions */
+
  { "2606:4700:100::", 48, NDPI_PROTOCOL_CLOUDFLARE_WARP },
  { "2606:4700:102::", 48, NDPI_PROTOCOL_CLOUDFLARE_WARP },
+
+ { "2620:149:a44::", 48, NDPI_PROTOCOL_APPLE_PUSH },
+ { "2403:300:a42::", 48, NDPI_PROTOCOL_APPLE_PUSH },
+ { "2403:300:a51::", 48, NDPI_PROTOCOL_APPLE_PUSH },
+ { "2a01:b740:a42::", 48, NDPI_PROTOCOL_APPLE_PUSH },
 
  /* End */
  { NULL, 0, 0 }

@@ -953,7 +953,6 @@ void init_nintendo_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_csgo_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_checkmk_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_cpha_dissector(struct ndpi_detection_module_struct *ndpi_struct);
-void init_apple_push_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_amazon_video_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_whatsapp_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_ajp_dissector(struct ndpi_detection_module_struct *ndpi_struct);

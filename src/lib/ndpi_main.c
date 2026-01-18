@@ -6973,9 +6973,6 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* DIAMETER */
   init_diameter_dissector(ndpi_str);
 
-  /* APPLE_PUSH */
-  init_apple_push_dissector(ndpi_str);
-
   /* EAQ */
   init_eaq_dissector(ndpi_str);
 
