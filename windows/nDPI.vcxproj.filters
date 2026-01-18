@@ -181,7 +181,6 @@
     <ClCompile Include="..\src\lib\protocols\amazon_video.c" />
     <ClCompile Include="..\src\lib\protocols\among_us.c" />
     <ClCompile Include="..\src\lib\protocols\amqp.c" />
-    <ClCompile Include="..\src\lib\protocols\apple_push.c" />
     <ClCompile Include="..\src\lib\protocols\avast_securedns.c" />
     <ClCompile Include="..\src\lib\protocols\capwap.c" />
     <ClCompile Include="..\src\lib\protocols\cassandra.c" />
