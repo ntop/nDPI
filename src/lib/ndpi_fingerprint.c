@@ -183,7 +183,7 @@ static char* ndpi_compute_tls_blocks_flow_fingerprint(struct ndpi_flow_struct *f
     default:
       ret = snprintf(&fp_buf[idx], fp_buf_len-idx-1, "%s%s%u",
 		     (i > 0) ? "," : "",
-		     (flow->l4.tcp.tls.tls_blocks[i].len > 0) ? "+" : "=",
+		     (flow->l4.tcp.tls.tls_blocks[i].len > 0) ? "+" : "-",
 		     flow->l4.tcp.tls.tls_blocks[i].block_type);
     }
 
