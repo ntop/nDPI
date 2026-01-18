@@ -181,8 +181,9 @@ static char* ndpi_compute_tls_blocks_flow_fingerprint(struct ndpi_flow_struct *f
       break;
 
     default:
-      ret = snprintf(&fp_buf[idx], fp_buf_len-idx-1, "%s%u",
+      ret = snprintf(&fp_buf[idx], fp_buf_len-idx-1, "%s%s%u",
 		     (i > 0) ? "," : "",
+		     (flow->l4.tcp.tls.tls_blocks[i].len > 0) ? "+" : "=",
 		     flow->l4.tcp.tls.tls_blocks[i].block_type);
     }
 
@@ -226,7 +227,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 	* no fingerprint for mid-flows
 	TODO: is that what we really want?
      */
-     (flow->tcp.fingerprint || flow->protos.tls_quic.ja4_client[0] != '\0')) {
+     (flow->tcp.fingerprint || flow->protos.tls_quic.ja4_ndpi_client[0] != '\0')) {
     char *l4_fp = "no_l4_fp";
     char *l7_pf = "no_app_fp_cli";
     char *l7_pf_tls_blocks = "";
@@ -240,8 +241,8 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
        && (flow->tcp.fingerprint != NULL))
       l4_fp = flow->tcp.fingerprint;
 
-    if(flow->protos.tls_quic.ja4_client[0] != '\0')
-      l7_pf = flow->protos.tls_quic.ja4_client;
+    if(flow->protos.tls_quic.ja4_ndpi_client[0] != '\0')
+      l7_pf = flow->protos.tls_quic.ja4_ndpi_client;
 
     if(ndpi_str->cfg.tls_max_num_blocks_to_analyze > 0)
       l7_pf_tls_blocks = ndpi_compute_tls_blocks_flow_fingerprint(flow,

@@ -2114,17 +2114,37 @@ static bool is_grease_version(u_int16_t version) {
 
 /* **************************************** */
 
+bool skipTLSextension(struct ndpi_detection_module_struct *ndpi_struct,
+		      u_int16_t extension_id)  {
+  if((extension_id == 0x0 /* SNI */) && ndpi_struct->cfg.tls_ndpifp_ignore_sni_extension)
+    return(true);
+
+  if(ndpi_struct->cfg.tls_ja_ignore_ephemeral_extensions) {
+    switch(extension_id) {
+    case 0x23: /* session ticket - RFC 9149 */
+    case 0x29: /* pre-shared key - RFC 8446 */
+    case 0x15: /* padding        - RFC 7685 */
+      return(true);
+    }
+  }
+
+  return(false);
+}
+
+/* **************************************** */
+
 static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow,
 			     u_int32_t quic_version,
 			     union ndpi_ja_info *ja) {
-  u_int8_t tmp_str[JA_STR_LEN];
-  u_int tmp_str_len, num_extn;
+  u_int8_t tmp_str[JA_STR_LEN], tmp_ndpi_str[512];
+  u_int tmp_str_len, tmp_ndpi_str_len = 0, num_extn, num_ndpi_extn;
   u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
-  u_int16_t ja_str_len, i;
+  u_int16_t ja_str_len, i, ja_offset;
   int rc;
   u_int16_t tls_handshake_version = ja->client.tls_handshake_version;
   char * const ja_str = &flow->protos.tls_quic.ja4_client[0];
+  char * const ja_ndpi_str = &flow->protos.tls_quic.ja4_ndpi_client[0];
   const u_int16_t ja_max_len = sizeof(flow->protos.tls_quic.ja4_client);
   bool is_dtls = ((flow->l4_proto == IPPROTO_UDP) && (quic_version == 0)) || flow->stun.maybe_dtls;
   int ja4_r_len = 0;
@@ -2280,7 +2300,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
   tmp_str_len = 0;
-  for(i=0, num_extn = 0; i<ja->client.num_tls_extensions; i++) {
+  for(i=0, num_extn = num_ndpi_extn = 0; i<ja->client.num_tls_extensions; i++) {
     if((ja->client.tls_extension[i] > 0) && (ja->client.tls_extension[i] != 0x10 /* ALPN extension */)) {
 #ifdef JA4R_DECIMAL
       rc = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s%u", (num_extn > 0) ? "," : "", ja->client.tls_extension[i]);
@@ -2289,17 +2309,28 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 
       rc = ndpi_snprintf((char *)&tmp_str[tmp_str_len], JA_STR_LEN-tmp_str_len, "%s%04x",
 			 (num_extn > 0) ? "," : "", ja->client.tls_extension[i]);
-      if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;
+      if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;      
       num_extn++;
+
+      if(!skipTLSextension(ndpi_struct, ja->client.tls_extension[i])) {
+	rc = ndpi_snprintf((char *)&tmp_ndpi_str[tmp_ndpi_str_len], sizeof(tmp_ndpi_str)-tmp_ndpi_str_len, "%s%04x",
+			   (num_ndpi_extn > 0) ? "," : "", ja->client.tls_extension[i]);
+	if((rc > 0) && (tmp_ndpi_str_len + rc < sizeof(tmp_ndpi_str))) tmp_ndpi_str_len += rc; else break;
+	num_ndpi_extn++;
+      }
     }
   }
-
+ 
   for(i=0; i<ja->client.num_signature_algorithms; i++) {
     rc = ndpi_snprintf((char *)&tmp_str[tmp_str_len], JA_STR_LEN-tmp_str_len, "%s%04x",
 		       (i > 0) ? "," : "_", ja->client.signature_algorithm[i]);
     if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;
-  }
 
+    rc = ndpi_snprintf((char *)&tmp_ndpi_str[tmp_ndpi_str_len], sizeof(tmp_ndpi_str)-tmp_ndpi_str_len, "%s%04x",
+		       (i > 0) ? "," : "_", ja->client.signature_algorithm[i]);
+    if((rc > 0) && (tmp_ndpi_str_len + rc < sizeof(tmp_ndpi_str))) tmp_ndpi_str_len += rc; else break;    
+  }
+  
 #ifdef DEBUG_JA
   printf("[EXTN] %s [len: %u]\n", tmp_str, tmp_str_len);
 #endif
@@ -2318,42 +2349,31 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
   }
 
-  if(ja->client.num_tls_extensions > 0) {
-    ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
-  } else {
-    memset(sha_hash, '\0', 6);
-  }
+  if(ja->client.num_tls_extensions > 0) ndpi_sha256(tmp_str, tmp_str_len, sha_hash); else memset(sha_hash, '\0', 6);  
 
+  ja_offset = ja_str_len;
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x",
 		     sha_hash[0], sha_hash[1], sha_hash[2],
 		     sha_hash[3], sha_hash[4], sha_hash[5]);
   if((rc > 0) && (ja_str_len + rc < JA_STR_LEN)) ja_str_len += rc;
-
   ja_str[36] = 0;
+  
+  /* nDPI */
+  if(ja->client.num_tls_extensions > 0) ndpi_sha256(tmp_ndpi_str, tmp_ndpi_str_len, sha_hash); else memset(sha_hash, '\0', 6);  
+  ja_str_len = ja_offset;
+  strncpy(ja_ndpi_str, ja_str, ja_str_len);
+
+  rc = ndpi_snprintf(&ja_ndpi_str[ja_str_len], ja_max_len - ja_str_len,
+		     "%02x%02x%02x%02x%02x%02x",
+		     sha_hash[0], sha_hash[1], sha_hash[2],
+		     sha_hash[3], sha_hash[4], sha_hash[5]);
+  if((rc > 0) && (ja_str_len + rc < JA_STR_LEN)) ja_str_len += rc;
+  ja_ndpi_str[36] = 0;
 
 #ifdef DEBUG_JA
   printf("[JA4] %s [len: %lu]\n", ja_str, strlen(ja_str));
 #endif
-}
-
-/* **************************************** */
-
-bool skipTLSextension(struct ndpi_detection_module_struct *ndpi_struct,
-		      u_int16_t extension_id)  {
-  if((extension_id == 0x0 /* SNI */) && ndpi_struct->cfg.tls_ndpifp_ignore_sni_extension)
-    return(true);
-
-  if(ndpi_struct->cfg.tls_ja_ignore_ephemeral_extensions) {
-    switch(extension_id) {
-    case 0x23: /* session ticket - RFC 9149 */
-    case 0x29: /* pre-shared key - RFC 8446 */
-    case 0x15: /* padding        - RFC 7685 */
-      return(true);
-    }
-  }
-
-  return(false);
 }
 
 /* **************************************** */
@@ -2877,8 +2897,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		      flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks-1].len -= extension_len + 4 /* id + len */;
 		  }
 
-		  if(!skipTLSextension(ndpi_struct, extension_id))
-		    ja.client.tls_extension[ja.client.num_tls_extensions++] = extension_id;
+		  ja.client.tls_extension[ja.client.num_tls_extensions++] = extension_id;
 		} else {
 		  invalid_ja = 1;
 #ifdef DEBUG_TLS
