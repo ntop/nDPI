@@ -1509,7 +1509,10 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       printf("[TLS] *** TLS ALERT ***\n");
 #endif
 
-      if(len >= 7) {
+      /* Basic heuristic to tell if the alert is encrypted or not */
+      if(len == 7 &&
+         (message->buffer[5] == 1 ||
+          message->buffer[5] == 2)) {
 	u_int8_t alert_level = message->buffer[5];
 
 	if(alert_level == 2 /* Warning (1), Fatal (2) */)
