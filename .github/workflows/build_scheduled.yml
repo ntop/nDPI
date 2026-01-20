@@ -123,26 +123,90 @@ jobs:
           sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libjson-c-dev libpcap-dev rrdtool librrd-dev parallel
       - name: Configure nDPI
         run: |
-          ./autogen.sh && ./configure --enable-option-checking=fatal --with-thread-sanitizer
+          ./autogen.sh && ./configure --with-thread-sanitizer
       - name: Build nDPI
         run: |
           make -j $(nproc) all
-          make -j $(nproc) -C example ndpiSimpleIntegration
+          make -j $(nproc) -C example
           make -j $(nproc) -C rrdtool
       - name: Tests
         run: |
           NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          ./tests/do-unit.sh
+          ./tests/do-dga.sh
 
-  localgcrypt:
-    name: Local gcrypt on ${{ matrix.os }}
+  nBPF:
+    name: nBPF (ubuntu-latest)
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libjson-c-dev libpcap-dev rrdtool librrd-dev parallel
+      - name: Install Ubuntu Prerequisites (nBPF)
+        run: |
+          git clone https://github.com/ntop/PF_RING.git ../PF_RING
+          cd ../PF_RING/userland/nbpf
+          ./configure
+          make
+          cd -
+      - name: Configure nDPI
+        run: |
+          ./autogen.sh && ./configure
+      - name: Build nDPI
+        run: |
+          make -j $(nproc) all
+          make -j $(nproc) -C example
+          make -j $(nproc) -C rrdtool
+      - name: Tests
+        run: |
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          ./tests/do-unit.sh
+          ./tests/do-dga.sh
+
+  no-dependencies:
+    name: no-dependencies (global_context and plugin) (ubuntu-latest)
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libjson-c-dev libpcap-dev rrdtool librrd-dev parallel
+      - name: Configure nDPI
+        run: |
+          ./autogen.sh && ./configure --disable-global-context-support --disable-plugin-support
+      - name: Build nDPI
+        run: |
+          make -j $(nproc) all
+          make -j $(nproc) -C example
+          make -j $(nproc) -C rrdtool
+      - name: Tests
+        run: |
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
+          ./tests/do-unit.sh
+          ./tests/do-dga.sh
+
+  builds:
+    name: ${{ matrix.os }} ${{matrix.gcrypt}}
     runs-on: ${{ matrix.os }}
     env:
-      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+      CFLAGS: -g -O2 -Werror -DNDPI_EXTENDED_SANITY_CHECKS
     strategy:
       fail-fast: true
       matrix:
         # macos-14,15 and 26 are on **ARM64**
         os: ["ubuntu-22.04", "ubuntu-24.04", "macos-15-intel", "macOS-14", "macOS-15", "macOS-26", "ubuntu-22.04-arm", "ubuntu-24.04-arm"]
+        gcrypt: ["", "--with-local-libgcrypt"]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -159,11 +223,11 @@ jobs:
           brew install coreutils wdiff colordiff autoconf automake libtool gettext json-c rrdtool parallel libgcrypt
       - name: Configure nDPI
         run: |
-          ./autogen.sh && ./configure --enable-option-checking=fatal --with-local-libgcrypt
+          ./autogen.sh && ./configure ${{matrix.gcrypt}}
       - name: Build nDPI
         run: |
           make -j $(nproc) all
-          make -j $(nproc) -C example ndpiSimpleIntegration
+          make -j $(nproc) -C example
           make -j $(nproc) -C rrdtool
       - name: Tests
         run: |
@@ -205,3 +269,91 @@ jobs:
           msys2 -c './tests/do-unit.sh'
           msys2 -c './tests/do-dga.sh'
 
+  test-lto-gold:
+    # Options used by oss-fuzz: we only want to check that everything compile fine; no need to run the tests
+    name: LTO and Gold Linker ${{ matrix.compiler }}
+    runs-on: ubuntu-latest
+    env:
+      CC: ${{ matrix.compiler }}
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+    strategy:
+      fail-fast: true
+      matrix:
+        compiler: ["gcc-14", "clang-18"] # "Newest" gcc/clang easily available
+        include:
+          - compiler: "gcc-14"
+            ar: "ar"
+            ranlib: "ranlib"
+          - compiler: "clang-18"
+            ar: "llvm-ar-18"
+            ranlib: "llvm-ranlib-18"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake debhelper libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev parallel
+      - name: Configure nDPI
+        run: |
+          ./autogen.sh && AR=${{ matrix.ar }} RANLIB=${{ matrix.ranlib }} ./configure --enable-option-checking=fatal --enable-debug-messages --with-sanitizer --with-lto-and-gold-linker
+      - name: Build nDPI
+        run: |
+          make -j $(nproc) all
+          make -j $(nproc) -C example
+          make -j $(nproc) -C rrdtool
+      - name: Print nDPI long help
+        run: |
+          cd ./example && ./ndpiReader -H
+
+  test-out-of-tree-builds:
+    name: Out-of-tree builds
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Install Ubuntu Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake debhelper libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev parallel
+      - name: Autogen nDPI
+        run: |
+          ./autogen.sh
+      - name: Configure and build nDPI (standard)
+        run: |
+          mkdir -p build-standard
+          cd build-standard
+          ../configure
+          make -j $(nproc) all
+          make -j $(nproc) -C example
+          make -j $(nproc) -C rrdtool
+          cd -
+      - name: Configure and build nDPI (fuzzing)
+        run: |
+          mkdir -p build-fuzzing
+          cd build-fuzzing
+          CC=clang CXX=clang++ ../configure --with-sanitizer --enable-fuzztargets
+          make -j $(nproc) all
+          make -j $(nproc) -C example
+          make -j $(nproc) -C rrdtool
+          cd -
+      - name: Print nDPI long help
+        run: |
+          cd ./build-standard/example && ./ndpiReader -H && cd -
+          cd ./build-fuzzing/example && ./ndpiReader -H && cd -
+      - name: Tests #We are only intersting into tests scripts being valid --> less tests than usual
+        run: |
+          cd build-standard
+          NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS=1 ./tests/do.sh
+          ./tests/do-unit.sh
+          ./tests/do-dga.sh
+          cd -
+          cd build-fuzzing
+          MAX_TOTAL_TIME=10 NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS=1 ./tests/do.sh
+          ./tests/do-unit.sh
+          ./tests/do-dga.sh
+          cd -
