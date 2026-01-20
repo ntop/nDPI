@@ -121,6 +121,10 @@ static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_s
     return 0;
   }
 
+  /* Non-warning alert */
+  if(flow->tls_quic.alert)
+    return 0;
+
   /* Are we interested only in the (sub)-classification? */
 
   if(/* Subclassification */
@@ -1387,6 +1391,28 @@ static void ndpi_looks_like_tls(struct ndpi_detection_module_struct *ndpi_struct
 
 /* **************************************** */
 
+static int check_tls_type_and_version(const u_int8_t *buf, u_int16_t buf_len)
+{
+  /* Valid TLS Content Types:
+     https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5 */
+  if(buf_len >= 1 &&
+     !(buf[0] >= 20 && buf[0] <= 26))
+    return 0;
+
+  /* Valid version in Record Layer
+     "Earlier versions of the TLS specification were not fully clear on what the record layer version
+     number (TLSPlaintext.version) should contain when sending ClientHello (i.e., before it is known
+     which version of the protocol will be employed). Thus, TLS servers compliant with this
+     specification MUST accept any value {03,XX} as the record layer version number for ClientHello."
+  */
+  if(buf_len >=2 && buf[1] != 0x03)
+    return 0;
+
+  return 1; /* ok */
+}
+
+/* **************************************** */
+
 int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
                         struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
@@ -1420,15 +1446,6 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 			    message) == -1)
     return 0; /* Error -> stop */
 
-  /*
-    Valid TLS Content Types:
-    https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5
-  */
-  if(!(message->buffer[0] >= 20 &&
-       message->buffer[0] <= 26)) {
-    something_went_wrong = 1;
-  }
-
   while(!something_went_wrong) {
     u_int32_t len;
     u_int16_t p_len;
@@ -1437,6 +1454,14 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
     if(message->buffer_used < 5)
       break;
+
+    if(!check_tls_type_and_version(message->buffer, message->buffer_used)) {
+#ifdef DEBUG_TLS_MEMORY
+      printf("[TLS Mem] Invalid record type/version");
+#endif
+      something_went_wrong = 1;
+      break;
+    }
 
     len = (message->buffer[3] << 8) + message->buffer[4] + 5;
 
@@ -1509,6 +1534,8 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       printf("[TLS] *** TLS ALERT ***\n");
 #endif
 
+      flow->tls_quic.alert = 1;
+
       /* Basic heuristic to tell if the alert is encrypted or not */
       if(len == 7 &&
          (message->buffer[5] == 1 ||
@@ -1517,67 +1544,58 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 	if(alert_level == 2 /* Warning (1), Fatal (2) */)
 	  ndpi_set_risk(ndpi_struct, flow, NDPI_TLS_FATAL_ALERT, "Found fatal TLS alert");
+	else
+	  flow->tls_quic.alert = 0;
       }
 
       u_int16_t const alert_len = ntohs(*(u_int16_t const *)&message->buffer[3]);
-      if (message->buffer[1] == 0x03 &&
-          message->buffer[2] <= 0x04 &&
-          alert_len == (u_int32_t)message->buffer_used - 5)
-	{
-	  ndpi_int_tls_add_connection(ndpi_struct, flow);
-	}
+      if(alert_len == (u_int32_t)message->buffer_used - 5)
+	ndpi_int_tls_add_connection(ndpi_struct, flow);
     }
-
-    if((len > 9)
-       && (content_type != 0x17 /* Application Data */)) {
+    else if(content_type == 0x16 /* Handshake */) {
       /* Split the element in blocks */
       u_int32_t processed = 5;
 
-      while((processed+4) <= len) {
-	const u_int8_t *block = (const u_int8_t *)&message->buffer[processed];
-	u_int32_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
+      if(len > 9) {
+        while((processed+4) <= len) {
+          const u_int8_t *block = (const u_int8_t *)&message->buffer[processed];
+          u_int32_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
 
-	if(/* (block_len == 0) || */ /* Note blocks can have zero lenght */
-	   (block_len > len) || ((block[1] != 0x0))) {
-	  something_went_wrong = 1;
-	  break;
-	}
+          if(/* (block_len == 0) || */ /* Note blocks can have zero lenght */
+             (block_len > len) || ((block[1] != 0x0))) {
+            something_went_wrong = 1;
+            break;
+          }
 
-	packet->payload = block;
-	packet->payload_packet_len = ndpi_min(block_len+4, message->buffer_used);
+          packet->payload = block;
+          packet->payload_packet_len = ndpi_min(block_len+4, message->buffer_used);
 
-	if((processed+packet->payload_packet_len) > len) {
-	  something_went_wrong = 1;
-	  break;
-	}
+          if((processed+packet->payload_packet_len) > len) {
+            something_went_wrong = 1;
+            break;
+          }
 
-	processTLSBlock(ndpi_struct, flow);
+          processTLSBlock(ndpi_struct, flow);
+          ndpi_looks_like_tls(ndpi_struct, flow);
+
+          processed += packet->payload_packet_len;
+        }
+      }
+    } else if(content_type == 0x17 /* Application Data */) {
+      u_int32_t block_len   = (message->buffer[3] << 8) + (message->buffer[4]);
+
+      /* Let's do a quick check to make sure this really looks like TLS */
+      if(block_len < 16384 /* Max TLS block size */)
 	ndpi_looks_like_tls(ndpi_struct, flow);
 
-	processed += packet->payload_packet_len;
-      }
-    } else if(len > 5 /* Minimum block size */) {
-      /* Process element as a whole */
-      if(content_type == 0x17 /* Application Data */) {
-	u_int32_t block_len   = (message->buffer[3] << 8) + (message->buffer[4]);
+      if(block_len == (u_int32_t)message->buffer_used - 5)
+	ndpi_int_tls_add_connection(ndpi_struct, flow);
 
-	/* Let's do a quick check to make sure this really looks like TLS */
-	if(block_len < 16384 /* Max TLS block size */)
-	  ndpi_looks_like_tls(ndpi_struct, flow);
-
-	if (message->buffer[1] == 0x03 &&
-	    message->buffer[2] <= 0x04 &&
-	    block_len == (u_int32_t)message->buffer_used - 5)
-	  {
-	    ndpi_int_tls_add_connection(ndpi_struct, flow);
-	  }
-
-	/* If we have seen Application Data blocks in both directions, it means
-	   we are after the handshake. Stop extra processing */
-	flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
-	if(flow->l4.tcp.tls.app_data_seen[!packet->packet_direction] == 1)
-	  flow->tls_quic.certificate_processed = 1;
-      }
+      /* If we have seen Application Data blocks in both directions, it means
+	 we are after the handshake. Stop extra processing */
+      flow->l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
+      if(flow->l4.tcp.tls.app_data_seen[!packet->packet_direction] == 1)
+	flow->tls_quic.certificate_processed = 1;
     }
 
     packet->payload = p;

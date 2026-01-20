@@ -1697,7 +1697,7 @@ struct ndpi_flow_struct {
 
   struct {
     message_t message[2]; /* Directions */
-    u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, pad:3;
+    u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
     struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
   } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
