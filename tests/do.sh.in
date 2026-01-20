@@ -275,9 +275,9 @@ process_single_config() {
 
     cd ${ABS_BUILDDIR}/tests/cfgs/"$(basename "$d")" || return 1
 
-    # Determine PCAPS to test
+    # Determine PCAPS to test (name with absolute path!)
     if [ $TEST_ONLY_RECENTLY_UPDATED_PCAPS -eq 1 ]; then
-        PCAPS=$(cd ${ABS_SRCDIR}/tests/"$d"/result || exit 1; find * -type f -print0  | xargs -0 ls -t | head -10 | xargs basename -s .out)
+        PCAPS=$(cd ${ABS_SRCDIR}/tests/"$d"/result || exit 1; find "$PWD" -name "*.out" | xargs -d '\n' ls -t | head -10 | sed 's/\.out$//' | sed 's/\/result\//\/pcap\//')
     else
         if [ -n "$PCAPS_ARG" ]; then
             PCAPS="$PCAPS_ARG"
