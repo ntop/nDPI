@@ -1,0 +1,41 @@
+DPI Packets (TCP):	8	(8.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        1/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    1/0 (search/found)
+Hash fp custom protos:     1/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+GoogleServices	17	3004	1
+
+Acceptable                      17 3004          1            
+
+Web                             17 3004          1            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.12.156           	 1      
+
+
+	1	TCP 192.168.12.156:43854 -> 216.58.209.42:443 [proto: 91.239/TLS.GoogleServices][Stack: TLS.GoogleServices][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 126/Google, Confidence: IP address][DPI packets: 8][cat: Web/5][Breed: Acceptable][17 pkts/3004 bytes -> 0 pkts/0 bytes][Goodput ratio: 62/0][11.30 sec][Hostname/SNI: notifications-pa.googleapis.com][(Advertised) ALPNs: h2;http/1.1][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 753/0 10866/0 2704/0][Pkt Len c2s/s2c min/avg/max/stddev: 66/0 177/0 1090/0 251/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Fingerprint: 4b1a5d699e35ee234471a21c50cdc0f9][TCP Fingerprint: 2_64_65535_685ad951a756/Android][TLSv1.2][JA4: t12d0409h2_dd22d19553a2_b39be8c56a14][Plen Bins: 0,42,14,0,0,14,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0][TLS blocks: 22:1=119,22:16=37,22:16=37,20=1,22:0=40,22:0=40,22:0=40]

@@ -1,0 +1,1 @@
+--cfg=tls,max_num_blocks_to_analyze,8 --cfg=tls,metadata.ndpifp_ignore_sni_tls_extn,1 --cfg=tls,metadata.ja_ignore_ephemeral_tls_extn,1 --cfg=metadata.ndpi_fingerprint_ignore_tcp_fp,1
