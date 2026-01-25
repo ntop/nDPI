@@ -3619,6 +3619,42 @@ static int ndpi_add_ndpifp_subprotocol(struct ndpi_detection_module_struct *ndpi
 
   return(ndpi_hash_add_entry(&ndpi_str->ndpifp_custom_protos, ndpifp, ndpifp_len, protocol_id));
 }
+static int ndpi_add_tls_cert_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
+                                          char *cert_pattern, 
+                                          u_int16_t protocol_id) {
+  ndpi_tls_cert_name_match_dynamic *new_rule;
+
+  if(!cert_pattern || cert_pattern[0] == '\0') {
+    NDPI_LOG_ERR(ndpi_str, "Empty TLS certificate pattern\n");
+    return(-1);
+  }
+
+  
+  new_rule = (ndpi_tls_cert_name_match_dynamic *)ndpi_malloc(sizeof(*new_rule));
+  if(new_rule == NULL) {
+    NDPI_LOG_ERR(ndpi_str, "Memory allocation failure for TLS cert rule\n");
+    return(-2);
+  }
+
+  /* Store the certificate pattern */
+  new_rule->cert_pattern = ndpi_strdup(cert_pattern);
+  if(new_rule->cert_pattern == NULL) {
+    ndpi_free(new_rule);
+    NDPI_LOG_ERR(ndpi_str, "Memory allocation failure for TLS cert pattern\n");
+    return(-2);
+  }
+
+  new_rule->protocol_id = protocol_id;
+
+
+  new_rule->next = ndpi_str->dynamic_tls_cert_list;
+  ndpi_str->dynamic_tls_cert_list = new_rule;
+
+  NDPI_LOG_DBG(ndpi_str, "Added TLS cert rule: [%s] -> protocol %u\n", 
+               cert_pattern, protocol_id);
+
+  return(0);
+}
 
 /* ******************************************* */
 
@@ -4135,6 +4171,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
   ndpi_str->malicious_sha1_hashmap = NULL;  /* Initialized on demand */
   ndpi_str->ja4_custom_protos      = NULL;  /* Initialized on demand */
   ndpi_str->ndpifp_custom_protos   = NULL;  /* Initialized on demand */
+  ndpi_str->dynamic_tls_cert_list  = NULL;  /* Initialized on demand */
   ndpi_str->http_url_hashmap       = NULL;  /* Initialized on demand */
 
   ndpi_str->trusted_issuer_dn = NULL; /* Initialized on demand */
@@ -5197,6 +5234,17 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->ndpifp_custom_protos)
       ndpi_hash_free(&ndpi_str->ndpifp_custom_protos);
 
+    if(ndpi_str->dynamic_tls_cert_list) {
+      ndpi_tls_cert_name_match_dynamic *rule = ndpi_str->dynamic_tls_cert_list;
+      
+      while(rule != NULL) {
+        ndpi_tls_cert_name_match_dynamic *next = rule->next;
+        if(rule->cert_pattern)
+        ndpi_free(rule->cert_pattern);
+        ndpi_free(rule);
+        rule = next;
+      }
+    }
     if(ndpi_str->http_url_hashmap)
       ndpi_hash_free(&ndpi_str->http_url_hashmap);
 
@@ -5667,7 +5715,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
   while((elem = strsep(&rule, ",")) != NULL) {
     char *attr = elem, *value = NULL;
     ndpi_port_range range;
-    int is_tcp = 0, is_udp = 0, is_ip = 0, is_ja4 = 0, is_ndpifp = 0, is_httpurl = 0;;
+    int is_tcp = 0, is_udp = 0, is_ip = 0, is_ja4 = 0, is_ndpifp = 0, is_httpurl = 0, is_tls_cert = 0;;
     u_int8_t is_ipv6_ip = 0;
 
     if(strncmp(attr, "tcp:", 4) == 0)
@@ -5730,7 +5778,17 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
       is_ndpifp = 1, value = &attr[7];
     } else if(strncmp(attr, "url:", 4) == 0) {
       is_httpurl = 1, value = &attr[4];
+    } else if(strncmp(attr, "tls_cert:", 9) == 0) {
+      is_tls_cert = 1, value = &attr[9];
+      if (value[0] == '"') {
+        value++;
+        if (value[0] != '\0') {
+          size_t len=strlen(value);
+          if(len > 0 && value[len-1] == '"')
+          value[len-1] = '\0'; /* remove trailing " */
+      }
     }
+  }
 
     if(is_tcp || is_udp) {
       u_int p_low, p_high;
@@ -5781,6 +5839,11 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 
       if(rc != 0)
 	return(rc);
+    } else if(is_tls_cert) {
+      int rc = ndpi_add_tls_cert_subprotocol(ndpi_str, value, subprotocol_id);
+      
+      if(rc != 0)
+  return(rc);
     } else {
       int rc = ndpi_add_host_url_subprotocol(ndpi_str, value, subprotocol_id, category, breed, 0);
 
@@ -5791,6 +5854,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 
   return(ret);
 }
+                
 
 /* ******************************************************************** */
 

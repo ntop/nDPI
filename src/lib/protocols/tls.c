@@ -1090,7 +1090,28 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	  ndpi_lru_add_to_cache(ndpi_struct->tls_cert_cache, key, proto_id, ndpi_get_current_time(flow));
 	}
       }
+      /* Check dynamic TLS certificate rules from protos.txt */
+  if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+    ndpi_struct->dynamic_tls_cert_list != NULL) {
+      ndpi_tls_cert_name_match_dynamic *rule = ndpi_struct->dynamic_tls_cert_list;
+      while(rule != NULL) {
+        if(strstr(rdnSeqBuf, rule->cert_pattern) != NULL) {
+          ndpi_master_app_protocol proto;
+          ndpi_set_detected_protocol(ndpi_struct, flow, rule->protocol_id,
+                                     ndpi_get_master_proto(ndpi_struct, flow),
+                                      NDPI_CONFIDENCE_DPI);
+          proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
+          proto.app_protocol = rule->protocol_id;
+          flow->category = get_proto_category(ndpi_struct, proto);
+          flow->breed = get_proto_breed(ndpi_struct, proto);
+          ndpi_check_subprotocol_risk(ndpi_struct, flow, rule->protocol_id);
+          ndpi_unset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST);
+          break; /* Match found, stop checking */
+        }
+        rule = rule->next;
+      }
     }
+  }
   }
 
   if(flow->protos.tls_quic.subjectDN && flow->protos.tls_quic.issuerDN

@@ -1568,6 +1568,12 @@ typedef struct {
   char alpn[MAX_JA_STRLEN];
 } ndpi_tls_server_info;
 
+typedef struct ndpi_tls_cert_name_match_dynamic {
+  char *cert_pattern;                              
+  u_int16_t protocol_id;                         
+  struct ndpi_tls_cert_name_match_dynamic *next;   
+} ndpi_tls_cert_name_match_dynamic;
+
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   struct ndpi_proto_stack protocol_stack;
