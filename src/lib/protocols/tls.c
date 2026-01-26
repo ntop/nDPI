@@ -1230,7 +1230,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if((ndpi_struct->cfg.tls_max_num_blocks_to_analyze != 0)
-     && (flow->l4.tcp.tls.num_processed_tls_blocks >= ndpi_struct->cfg.tls_max_num_blocks_to_analyze)) {
+     && (flow->l4.tcp.tls.num_tls_blocks >= ndpi_struct->cfg.tls_max_num_blocks_to_analyze)) {
 #ifdef DEBUG_TLS_BLOCKS
     printf("*** [TLS Block] Enough blocks dissected\n");
 #endif
@@ -1507,14 +1507,6 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     p_len = packet->payload_packet_len; /* Backup */
 
     if(content_type == 0x14 /* Change Cipher Spec */) {
-      if(ndpi_struct->skip_tls_blocks_until_change_cipher) {
-	/*
-	  Ignore Application Data up until change cipher
-	  so in this case we reset the number of observed
-	  TLS blocks
-	*/
-	flow->l4.tcp.tls.num_processed_tls_blocks = 0;
-      }
       if(len == 6 &&
          message->buffer[1] == 0x03 && /* TLS >= 1.0 */
          ((message->buffer[3] << 8) + (message->buffer[4])) == 1) {
@@ -1625,12 +1617,15 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
 #ifdef DEBUG_TLS_MEMORY
-  printf("[TLS] Eval if keep going [%p]\n", flow->extra_packets_func);
+  printf("[TLS] Eval if keep going [%p][blocks:%d/%d][wrong:%d]\n",
+         flow->extra_packets_func,
+         flow->l4.tcp.tls.num_tls_blocks, ndpi_struct->cfg.tls_max_num_blocks_to_analyze,
+         something_went_wrong);
 #endif
 
   if(something_went_wrong
      || ((ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
-	 && (flow->l4.tcp.tls.num_processed_tls_blocks == ndpi_struct->cfg.tls_max_num_blocks_to_analyze))
+	 && (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->cfg.tls_max_num_blocks_to_analyze))
      || ((ndpi_struct->cfg.tls_max_num_blocks_to_analyze == 0)
 	 && (!keep_extra_dissection_tcp(ndpi_struct, flow)))
      ) {

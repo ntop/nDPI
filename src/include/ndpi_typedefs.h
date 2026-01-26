@@ -885,7 +885,7 @@ struct ndpi_flow_tcp_struct {
   struct {
     /* NDPI_PROTOCOL_TLS */
     u_int8_t app_data_seen[2];
-    u_int8_t num_tls_blocks, num_processed_tls_blocks /* used internally for dissection */;
+    u_int8_t num_tls_blocks /* used internally for dissection */;
     u_int64_t last_tls_block_time_ms;
     struct ndpi_tls_block *tls_blocks; /* ndpi_struct->cfg.tls_num_blocks_analyzed */
   } tls;

@@ -4757,9 +4757,6 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
       ac_automata_finalize((AC_AUTOMATA_t *) a->ac_automa);
   }
 
-  if(ndpi_str->cfg.tls_max_num_blocks_to_analyze > 0)
-    ndpi_str->skip_tls_blocks_until_change_cipher = 1;
-
   if(ndpi_str->cfg.track_payload_enabled)
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
 
