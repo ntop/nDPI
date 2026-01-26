@@ -1099,6 +1099,33 @@ void init_msgpack_dissector(struct ndpi_detection_module_struct *ndpi_struct);
   #include "../../../nDPI-custom/custom_ndpi_private.h"
 #endif
 
+
+enum cfg_param_type {
+  CFG_PARAM_ENABLE_DISABLE = 0,
+  CFG_PARAM_INT,
+  CFG_PARAM_PROTOCOL_ENABLE_DISABLE,
+  CFG_PARAM_FILENAME_CONFIG, /* We call ndpi_set_config() immediately for each row in it */
+  CFG_PARAM_FLOWRISK_ENABLE_DISABLE,
+};
+
+typedef int (*cfg_calback)(struct ndpi_detection_module_struct *ndpi_str, void *_variable, const char *proto, const char *param);
+
+struct cfg_param {
+  char *proto;
+  char *param;
+  char *default_value;
+  char *min_value;
+  char *max_value;
+  enum cfg_param_type type;
+  int offset;
+  cfg_calback fn_callback;
+};
+
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+extern const struct cfg_param cfg_params[];
+#endif
+
+
 #endif
 
 #ifdef __cplusplus
