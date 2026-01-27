@@ -1,0 +1,5 @@
+# Match by Common Name
+nDPI_TestApp@tls_cert:"CN=nDPI_TestCert"
+
+# Match by Organization
+nDPI_TestOrg@tls_cert:"O=nDPI_Test_Org"
