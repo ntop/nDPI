@@ -63,9 +63,9 @@ fuzz_quic_get_crypto_data_SOURCES = fuzz_quic_get_crypto_data.c fuzz_common_code
 fuzz_quic_get_crypto_data_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_quic_get_crypto_data_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_config_SOURCES = fuzz_config.cpp
-fuzz_config_CXXFLAGS = $(AM_CXXFLAGS) -I $(top_srcdir)/src/lib/third_party/src/fuzz -DNDPI_LIB_COMPILATION -DENABLE_NALLOC
-fuzz_config_CFLAGS = $(AM_CFLAGS) -I $(top_srcdir)/src/lib/third_party/src/fuzz -DNDPI_LIB_COMPILATION -DENABLE_NALLOC
+fuzz_config_SOURCES = fuzz_config.cpp fuzz_common_code.c
+fuzz_config_CXXFLAGS = $(AM_CXXFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_config_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_config_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_community_id_SOURCES = fuzz_community_id.cpp fuzz_common_code.c
