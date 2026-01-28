@@ -1243,68 +1243,54 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
-static u_int16_t handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
-				    struct ndpi_flow_struct *flow, bool same_packet,
-				    u_int8_t handshake_type, bool first_block) {
+static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
+			       struct ndpi_flow_struct *flow, bool *same_packet,
+			       u_int8_t record_type, u_int8_t handshake_type,
+			       u_int16_t block_len) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int16_t len = packet->payload_packet_len;
-  
-  if(ndpi_struct->cfg.tls_max_num_blocks_to_analyze != 0) {
+
+  if(flow->l4_proto == IPPROTO_TCP &&
+     ndpi_struct->cfg.tls_max_num_blocks_to_analyze != 0) {
     if(flow->l4.tcp.tls.tls_blocks == NULL) {
       u_int len = sizeof(struct ndpi_tls_block) * ndpi_struct->cfg.tls_max_num_blocks_to_analyze;
 
-      flow->l4.tcp.tls.tls_blocks = (struct ndpi_tls_block*)ndpi_malloc(len);
+      flow->l4.tcp.tls.tls_blocks = (struct ndpi_tls_block *)ndpi_malloc(len);
     }
 
     if((flow->l4.tcp.tls.tls_blocks != NULL)
        && (flow->l4.tcp.tls.num_tls_blocks < ndpi_struct->cfg.tls_max_num_blocks_to_analyze)) {
-      message_t *message = &flow->tls_quic.message[packet->packet_direction];
 
-      if(message->buffer != NULL && message->buffer_used >= 5) {	
-	int16_t blen;
-	u_int32_t tdelta;
-	u_int16_t enc_block_type, block_type;
+      int32_t blen;
+      u_int32_t tdelta;
+      u_int16_t enc_block_type;
 
-	len = (message->buffer[3] << 8) + message->buffer[4];
-	
-	if(handshake_type == 0 /* to be computed */)
-	  enc_block_type = ndpi_encode_tls_block_type((block_type = message->buffer[0]), (len > 5) ? message->buffer[5] : 0);
-	else
-	  enc_block_type = ndpi_encode_tls_block_type((block_type = 0x16 /* Handshake */), handshake_type);
+      enc_block_type = ndpi_encode_tls_block_type(record_type, handshake_type);
+      blen = block_len;
 
-	if(first_block)
-	  blen = len;
-	else
-	  blen = packet->payload_packet_len - 4;
+      if(flow->l4.tcp.tls.last_tls_block_time_ms)
+        tdelta = ndpi_struct->packet.current_time_ms - flow->l4.tcp.tls.last_tls_block_time_ms;
+      else
+        tdelta = 0;
 
-	if((block_type == 0x16 /* Handshake */) && (handshake_type != 0 /* Encrypted Handshake Msg */))
-	  blen -= 4;
+      if(packet->packet_direction == 1 /* srv -> cli */) blen *= -1;
 
-	if(flow->l4.tcp.tls.last_tls_block_time_ms)
-	  tdelta = ndpi_struct->packet.current_time_ms - flow->l4.tcp.tls.last_tls_block_time_ms;
-	else
-	  tdelta = 0;
+      flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
+         flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].msec_delta =
+        (tdelta > 0xFFFF) ?  0xFFFF : (u_int16_t)tdelta,
+        flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
+      flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type = enc_block_type;
 
-	if(packet->packet_direction == 1 /* srv -> cli */) blen *= -1;
-
-	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].len = blen,
-	   flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].msec_delta =
-	  (tdelta > 0xFFFF) ?  0xFFFF : (u_int16_t)tdelta,
-	  flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
-	flow->l4.tcp.tls.tls_blocks[flow->l4.tcp.tls.num_tls_blocks++].block_type = enc_block_type;
-
-	flow->l4.tcp.tls.last_tls_block_time_ms = ndpi_struct->packet.current_time_ms;
-      }
+      flow->l4.tcp.tls.last_tls_block_time_ms = ndpi_struct->packet.current_time_ms;
     }
   }
-
-  return(len);
+  if(*same_packet == false)
+    *same_packet = true;
 }
 
 /* **************************************** */
 
 static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_struct,
-				    struct ndpi_flow_struct *flow, bool first_block) {
+				    struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int ret;
   int is_dtls = packet->udp || flow->stun.maybe_dtls;
@@ -1363,10 +1349,6 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
     break;
 
   case 0x0b: /* Certificate */
-    if((ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
-       && (flow->l4_proto == IPPROTO_TCP))
-      handleTLSBlockStat(ndpi_struct, flow, true, handshake_type, first_block);
-
     /* Important: populate the tls union fields only after
      * ndpi_int_tls_add_connection has been called */
     if(flow->protos.tls_quic.client_hello_processed ||
@@ -1387,13 +1369,6 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
       flow->tls_quic.certificate_processed = 1;
     }
     break;
-
-  default:
-    if((ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
-       && (flow->l4_proto == IPPROTO_TCP)) {
-      ndpi_struct->packet.payload_packet_len = handleTLSBlockStat(ndpi_struct, flow, true, handshake_type, first_block);
-    } else
-      return(-1);
   }
 
   return(0);
@@ -1502,12 +1477,8 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
     content_type = message->buffer[0];
 
-    if(ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0) {
-      if((flow->l4_proto == IPPROTO_TCP) && (content_type != 0x16 /* Handshake */))
-	handleTLSBlockStat(ndpi_struct, flow, same_packet, 0, true);
-
-      same_packet = true;
-    }
+    if(content_type != 0x16)
+      handleTLSBlockStat(ndpi_struct, flow, &same_packet, content_type, 0, len - 5);
 
     /* Overwriting packet payload */
     p = packet->payload;
@@ -1564,13 +1535,27 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     } else if(content_type == 0x16 /* Handshake */) {
       /* Split the element in blocks */
       u_int32_t processed = 5;
-      bool first_block = true;
 
       if(len >= 9) {
         while((processed+4) <= len) {
           const u_int8_t *block = (const u_int8_t *)&message->buffer[processed];
           u_int32_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
-	  
+
+          if((current_pkt_from_client_to_server(ndpi_struct, flow) &&
+              flow->tls_quic.change_cipher_from_client == 1) ||
+             (!current_pkt_from_client_to_server(ndpi_struct, flow) &&
+              flow->tls_quic.change_cipher_from_server == 1)) {
+#ifdef DEBUG_TLS_MEMORY
+            printf("[TLS Mem] Encrypted Handshake msg. Skip\n");
+#endif
+
+            handleTLSBlockStat(ndpi_struct, flow, &same_packet, 0x16, 0, len - 5);
+
+	    /* We don't have block len, so ignore the entire record */
+            processed += len - 5;
+            break;
+          }
+
           if(/* (block_len == 0) || */ /* Note blocks can have zero lenght */
              (block_len > len) || ((block[1] != 0x0))) {
             something_went_wrong = 1;
@@ -1585,10 +1570,12 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
             break;
           }
 
-	  processHandshakeTLSBlock(ndpi_struct, flow, first_block);
+          handleTLSBlockStat(ndpi_struct, flow, &same_packet, 0x16, block[0], block_len);
+
+	  processHandshakeTLSBlock(ndpi_struct, flow);
           ndpi_looks_like_tls(ndpi_struct, flow);
 
-          processed += packet->payload_packet_len, first_block = false;
+          processed += packet->payload_packet_len;
         }
       }
     } else if(content_type == 0x17 /* Application Data */) {
@@ -1716,7 +1703,6 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
   const u_int8_t *p;
   u_int8_t no_dtls = 0, change_cipher_found = 0;
   message_t *message = NULL;
-  bool first_block = true;
 
 #ifdef DEBUG_TLS
   printf("[TLS] %s()\n", __FUNCTION__);
@@ -1760,7 +1746,7 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
 	if((handshake_len + 12) == block_len) {
           packet->payload = &block[13];
           packet->payload_packet_len = block_len;
-          processHandshakeTLSBlock(ndpi_struct, flow, first_block);
+          processHandshakeTLSBlock(ndpi_struct, flow);
 	} else if(handshake_len + 12 > block_len) {
 	  int rc;
 
@@ -1796,7 +1782,7 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
           if(handshake_len + 12 == message->buffer_used) {
             packet->payload = message->buffer;
             packet->payload_packet_len = message->buffer_used;
-            processHandshakeTLSBlock(ndpi_struct, flow, first_block);
+            processHandshakeTLSBlock(ndpi_struct, flow);
 
             ndpi_free(message->buffer);
             memset(message, '\0', sizeof(*message));
@@ -1852,7 +1838,7 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
       break;
     }
 
-    processed += block_len + 13, first_block = false;
+    processed += block_len + 13;
   }
 
   if(processed != p_len && message == NULL /* No pending reassembler */) {
@@ -2432,11 +2418,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
   printf("TLS %s() called\n", __FUNCTION__);
 #endif
-
-  if(ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0) {
-    if(flow->l4_proto == IPPROTO_TCP)
-      handleTLSBlockStat(ndpi_struct, flow, false /* same_packet */, 0, false /* first block */);
-  }
 
   handshake_type = packet->payload[0];
   total_len = (packet->payload[1] << 16) +  (packet->payload[2] << 8) + packet->payload[3];
