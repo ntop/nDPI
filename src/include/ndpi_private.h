@@ -859,7 +859,6 @@ void init_h323_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_hots_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_http_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_iax_dissector(struct ndpi_detection_module_struct *ndpi_struct);
-void init_icecast_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_ipp_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_irc_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_jabber_dissector(struct ndpi_detection_module_struct *ndpi_struct);

@@ -959,9 +959,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_POSTGRES */
   u_int64_t postgres_stage:3;
 
-  /* NDPI_PROTOCOL_ICECAST */
-  u_int64_t icecast_stage:1;
-
   /* NDPI_PROTOCOL_MAIL_POP */
   u_int64_t mail_pop_stage:2;
 
