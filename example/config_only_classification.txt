@@ -12,6 +12,8 @@ dpi.compute_entropy,0
 bittorrent,metadata.hash,0
 #SSDP
 ssdp,metadata,0
+#NTP
+ntp,metadata,0
 #TLS (we might need ja4c for subclassification)
 tls,metadata.sha1_fingerprint,0
 tls,metadata.ja3s_fingerprint,0

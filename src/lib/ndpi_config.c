@@ -172,6 +172,7 @@ const struct cfg_param cfg_params[] = {
 
   { "ssdp",          "metadata",                                "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ssdp_metadata_enabled), NULL },
 
+  { "ntp",           "metadata",                                "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ntp_metadata_enabled), NULL },
 
   { "dns",           "subclassification",                       "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_subclassification_enabled), NULL },
   { "dns",           "process_response",                        "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_parse_response_enabled), NULL },

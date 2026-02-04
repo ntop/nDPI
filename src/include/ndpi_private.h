@@ -335,6 +335,8 @@ struct ndpi_detection_module_config_struct {
 
   int ssdp_metadata_enabled;
 
+  int ntp_metadata_enabled;
+
   int dns_subclassification_enabled;
   int dns_parse_response_enabled;
 

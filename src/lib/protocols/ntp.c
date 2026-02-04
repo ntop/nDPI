@@ -104,7 +104,8 @@ static void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct
   uint8_t version = (packet->payload[0] & 56) >> 3;
 
   if (version == 2) {
-    flow->protos.ntp[flow->l4.udp.ntp_stage].version = version;
+    if(ndpi_struct->cfg.ntp_metadata_enabled)
+      flow->protos.ntp[flow->l4.udp.ntp_stage].version = version;
     ndpi_int_ntp_add_connection(ndpi_struct, flow);
     return;
   }
@@ -122,15 +123,18 @@ static void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct
     return;
   }
 
-  flow->protos.ntp[flow->l4.udp.ntp_stage].version = version;
-  flow->protos.ntp[flow->l4.udp.ntp_stage].mode = mode;
-  flow->protos.ntp[flow->l4.udp.ntp_stage].leap_indicator = (packet->payload[0] & 192) >> 6;
-  flow->protos.ntp[flow->l4.udp.ntp_stage].stratum = stratum;
+  if(ndpi_struct->cfg.ntp_metadata_enabled) {
+    flow->protos.ntp[flow->l4.udp.ntp_stage].version = version;
+    flow->protos.ntp[flow->l4.udp.ntp_stage].mode = mode;
+    flow->protos.ntp[flow->l4.udp.ntp_stage].leap_indicator = (packet->payload[0] & 192) >> 6;
+    flow->protos.ntp[flow->l4.udp.ntp_stage].stratum = stratum;
 
-  get_ntp_info(flow, packet, flow->l4.udp.ntp_stage);
-  flow->l4.udp.ntp_stage = 1;
+    get_ntp_info(flow, packet, flow->l4.udp.ntp_stage);
+
+    flow->l4.udp.ntp_stage = 1;
+    ndpi_set_extra_dissection(flow);
+  }
   NDPI_LOG_INFO(ndpi_struct, "found NTP\n");
-  ndpi_set_extra_dissection(flow);
   ndpi_int_ntp_add_connection(ndpi_struct, flow);
   return;
 }
