@@ -7862,29 +7862,8 @@ void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
       if(flow->protos.ssdp.location)
         ndpi_free(flow->protos.ssdp.location);
 
-      if(flow->protos.ssdp.household_smart_speaker_audio)
-        ndpi_free(flow->protos.ssdp.household_smart_speaker_audio);
-
-      if(flow->protos.ssdp.rincon_household)
-        ndpi_free(flow->protos.ssdp.rincon_household);
-
-      if(flow->protos.ssdp.rincon_bootseq)
-        ndpi_free(flow->protos.ssdp.rincon_bootseq);
-
-      if(flow->protos.ssdp.rincon_wifimode)
-        ndpi_free(flow->protos.ssdp.rincon_wifimode);
-
-      if(flow->protos.ssdp.rincon_variant)
-        ndpi_free(flow->protos.ssdp.rincon_variant);
-
-      if(flow->protos.ssdp.sonos_securelocation)
-        ndpi_free(flow->protos.ssdp.sonos_securelocation);
-
       if(flow->protos.ssdp.securelocation_upnp)
         ndpi_free(flow->protos.ssdp.securelocation_upnp);
-
-      if(flow->protos.ssdp.location_smart_speaker_audio)
-        ndpi_free(flow->protos.ssdp.location_smart_speaker_audio);
 
       if(flow->protos.ssdp.nt)
         ndpi_free(flow->protos.ssdp.nt);
@@ -9958,14 +9937,7 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
     packet->usn.ptr = NULL, packet->usn.len = 0;
     packet->cache_controle.ptr = NULL, packet->cache_controle.len = 0;
     packet->location.ptr = NULL, packet->location.len = 0;
-    packet->household_smart_speaker_audio.ptr = NULL, packet->household_smart_speaker_audio.len = 0;
-    packet->rincon_household.ptr = NULL, packet->rincon_household.len = 0;
-    packet->rincon_bootseq.ptr = NULL, packet->rincon_bootseq.len = 0;
-    packet->rincon_wifimode.ptr = NULL, packet->rincon_wifimode.len = 0;
-    packet->rincon_variant.ptr = NULL, packet->rincon_variant.len = 0;
-    packet->sonos_securelocation.ptr = NULL, packet->sonos_securelocation.len = 0;
     packet->securelocation_upnp.ptr = NULL, packet->securelocation_upnp.len = 0;
-    packet->location_smart_speaker_audio.ptr = NULL, packet->location_smart_speaker_audio.len = 0;
     packet->nt.ptr = NULL, packet->nt.len = 0;
     packet->nts.ptr = NULL, packet->nts.len = 0;
     packet->man.ptr = NULL, packet->man.len = 0;
@@ -10790,14 +10762,8 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
   struct header_line headers_o[] = { { "Origin:", &packet->http_origin },
                                      { NULL, NULL} };
   struct header_line headers_h[] = { { "Host:", &packet->host_line },
-                                     { "HOUSEHOLD.SMARTSPEAKER.AUDIO:", &packet->household_smart_speaker_audio },
                                      { NULL, NULL} };
   struct header_line headers_x[] = { { "X-Forwarded-For:", &packet->forwarded_line },
-                                     { "X-RINCON-HOUSEHOLD:", &packet->rincon_household },
-                                     { "X-RINCON-BOOTSEQ:", &packet->rincon_bootseq },
-                                     { "X-RINCON-WIFIMODE:", &packet->rincon_wifimode },
-                                     { "X-RINCON-VARIANT:", &packet->rincon_variant },
-                                     { "X-SONOS-HHSECURELOCATION:", &packet->sonos_securelocation },
                                      { NULL, NULL} };
   struct header_line headers_r[] = { { "Referer:", &packet->referer_line },
                                      { NULL, NULL} };
@@ -10806,7 +10772,6 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
                                      { "ST", &packet->st },
                                      { NULL, NULL} };
   struct header_line headers_l[] = { { "LOCATION:", &packet->location },
-                                     { "LOCATION.SMARTSPEAKER.AUDIO:", &packet->location_smart_speaker_audio },
                                      { NULL, NULL}};
   struct header_line headers_m[] = { { "MAN:", &packet->man },
                                      { "MX:", &packet->mx },
