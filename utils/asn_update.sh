@@ -114,11 +114,6 @@ DEST=../src/lib/inc_generated/ndpi_asn_hotspotshield.c.inc
 create_list NDPI_PROTOCOL_HOTSPOT_SHIELD $DEST "" "AS26642"
 echo "(3) Hotspot Shield IPs are available in $DEST"
 
-echo "(1) Downloading GitHub routes..."
-DEST=../src/lib/inc_generated/ndpi_asn_github.c.inc
-create_list NDPI_PROTOCOL_GITHUB $DEST "" "AS36459"
-echo "(3) GitHub IPs are available in $DEST"
-
 echo "(1) Downloading Steam routes..." #Valve
 DEST=../src/lib/inc_generated/ndpi_asn_steam.c.inc
 create_list NDPI_PROTOCOL_STEAM $DEST "" "AS32590"

@@ -109,7 +109,6 @@
 #include "inc_generated/ndpi_asn_canonical.c.inc"
 #include "inc_generated/ndpi_asn_twitch.c.inc"
 #include "inc_generated/ndpi_asn_hotspotshield.c.inc"
-#include "inc_generated/ndpi_asn_github.c.inc"
 #include "inc_generated/ndpi_asn_steam.c.inc"
 #include "inc_generated/ndpi_asn_bloomberg.c.inc"
 #include "inc_generated/ndpi_asn_edgecast.c.inc"
@@ -142,6 +141,11 @@
 #include "inc_generated/ndpi_domains_aws_ec2_match.c.inc"
 #include "inc_generated/ndpi_domains_aws_emr_match.c.inc"
 #include "inc_generated/ndpi_domains_aws_s3_match.c.inc"
+#include "inc_generated/ndpi_github_match.c.inc"
+#include "inc_generated/ndpi_domains_github_match.c.inc"
+#include "inc_generated/ndpi_domains_github_copilot_match.c.inc"
+#include "inc_generated/ndpi_domains_github_packages_match.c.inc"
+#include "inc_generated/ndpi_domains_github_actions_match.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -1066,6 +1070,10 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   self_check_host_match(ndpi_str, aws_ec2_host_match);
   self_check_host_match(ndpi_str, aws_emr_host_match);
   self_check_host_match(ndpi_str, aws_s3_host_match);
+  self_check_host_match(ndpi_str, github_host_match);
+  self_check_host_match(ndpi_str, githubcopilot_host_match);
+  self_check_host_match(ndpi_str, githubpackages_host_match);
+  self_check_host_match(ndpi_str, githubactions_host_match);
 
   for(i = 0; host_match[i].string_to_match != NULL; i++)
     init_app_protocol(ndpi_str, &host_match[i]);
@@ -1093,6 +1101,14 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
     init_app_protocol(ndpi_str, &aws_emr_host_match[i]);
   for(i = 0; aws_s3_host_match[i].string_to_match != NULL; i++)
     init_app_protocol(ndpi_str, &aws_s3_host_match[i]);
+  for(i = 0; github_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &github_host_match[i]);
+  for(i = 0; githubcopilot_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &githubcopilot_host_match[i]);
+  for(i = 0; githubpackages_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &githubpackages_host_match[i]);
+  for(i = 0; githubactions_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &githubactions_host_match[i]);
 
   /* ************************ */
 
@@ -1139,6 +1155,14 @@ static void load_string_based_protocols(struct ndpi_detection_module_struct *ndp
     load_protocol_match(ndpi_str, &aws_emr_host_match[i]);
   for(i = 0; aws_s3_host_match[i].string_to_match != NULL; i++)
     load_protocol_match(ndpi_str, &aws_s3_host_match[i]);
+  for(i = 0; github_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &github_host_match[i]);
+  for(i = 0; githubcopilot_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &githubcopilot_host_match[i]);
+  for(i = 0; githubpackages_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &githubpackages_host_match[i]);
+  for(i = 0; githubactions_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &githubactions_host_match[i]);
 
   /* ************************ */
 
@@ -4499,10 +4523,6 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_hotspot_shield_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_hotspot_shield_protocol_list_6);
   }
-  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_GITHUB)) {
-    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_github_protocol_list);
-    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_github_protocol_list_6);
-  }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_STEAM)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_steam_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_steam_protocol_list_6);
@@ -4582,6 +4602,10 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_BADOO)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_badoo_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_badoo_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_GITHUB)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_github_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_github_protocol_list_6);
   }
 
   if(ndpi_str->cfg.flow_risk_lists_enabled) {
