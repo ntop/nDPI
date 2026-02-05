@@ -159,7 +159,7 @@ jobs:
           brew install libmaxminddb
       - name: Configure nDPI
         run: |
-          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }} --enable-tls-sigs 
+          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages ${{ matrix.msan }} ${{ matrix.pcre }} ${{ matrix.maxminddb }}
       - name: Build nDPI
         run: |
           make -j all
@@ -203,7 +203,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.msan, '--with-') # Only on a few "standard" builds
         run: |
           make distclean
-          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --host=x86_64-w64-mingw32
+          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --host=x86_64-w64-mingw32
           make -j $(nproc) all
         env:
           CC:
@@ -229,7 +229,7 @@ jobs:
           install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap parallel
       - name: Configure nDPI on Windows msys2
         run: |
-          msys2 -c './autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap'
+          msys2 -c './autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --disable-npcap'
       - name: Build nDPI on Windows msys2
         run: |
           msys2 -c 'make -j all'

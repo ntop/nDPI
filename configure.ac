@@ -22,7 +22,6 @@ AC_ARG_ENABLE(fuzztargets, AS_HELP_STRING([--enable-fuzztargets], [Enable fuzz t
 AC_ARG_ENABLE(gprof, AS_HELP_STRING([--enable-gprof], [Enable CPU/HEAP profiling with gperftools]),[enable_gprof=$enableval],[enable_gprof=no])
 AC_ARG_ENABLE(code-coverage, AS_HELP_STRING([--enable-code-coverage], [Generate Code Coverage report]))
 AC_ARG_WITH(local-libgcrypt, AS_HELP_STRING([--with-local-libgcrypt], [Build with libgcrypt (if present) instead of the enclosed gcrypt light]))
-AC_ARG_ENABLE(tls-sigs, AS_HELP_STRING([--enable-tls-sigs], [Enable TLS Client signature algorithm dissection. Rarely used, but requires significantly more memory.]))
 AC_ARG_ENABLE(npcap, AS_HELP_STRING([--disable-npcap], [msys2 only: Disable linkage against the wpcap/npcap import library in windows/WpdPack/Lib.]))
 AC_ARG_WITH(nbpf-path, AS_HELP_STRING([--with-nbpf-path], [nBPF library custom path; default: ${srcdir}/../PF_RING/userland/nbpf]),[NBPF_HOME=$withval],[NBPF_HOME="`cd ${srcdir}/../PF_RING/userland/nbpf 2>/dev/null && pwd || echo ${srcdir}/../PF_RING/userland/nbpf`"])
 AC_ARG_WITH(libpcap, AS_HELP_STRING([--with-libpcap=PATH], [Linux only: Custom path to libpcap installation]),[LIBPCAP_PATH=$withval],[LIBPCAP_PATH=""])
@@ -331,11 +330,6 @@ if ! test "${with_only_libndpi+set}" = set; then :
 fi
 AM_CONDITIONAL([BUILD_UNITTESTS], [test "x$build_unittests" = "xyes"])
 
-HANDLE_TLS_SIGS="//"
-AS_IF([test "x${enable_tls_sigs}" = "xyes"],[
-  HANDLE_TLS_SIGS=""
-])
-
 AS_IF([test "${with_lto_and_gold_linker+set}" = set], [
        NDPI_CFLAGS="${NDPI_CFLAGS} -flto -fuse-ld=gold -Wno-unused-command-line-argument"
        NDPI_LDFLAGS="${NDPI_LDFLAGS} ${NDPI_CFLAGS}"
@@ -627,7 +621,6 @@ AC_SUBST(PCRE2_ENABLED)
 AC_SUBST(NBPF_ENABLED)
 AC_SUBST(GLOBAL_CONTEXT_ENABLED)
 AC_SUBST(PLUGINS_ENABLED)
-AC_SUBST(HANDLE_TLS_SIGS)
 AC_SUBST(DISABLE_NPCAP)
 AC_SUBST(EXE_SUFFIX)
 AC_SUBST(NDPI_CFLAGS)
@@ -753,12 +746,6 @@ AS_IF([test "x${PLUGINS_ENABLED}" = "x1"],
   Plugins:                 enabled"],
   [SUMMARY="${SUMMARY}
   Plugins:                 disabled"])
-
-AS_IF([test "x${enable_tls_sigs}" = "xyes"],
-  [SUMMARY="${SUMMARY}
-  TLS signatures:          enabled"],
-  [SUMMARY="${SUMMARY}
-  TLS signatures:          disabled"])
 
 AS_IF([test "x${enable_oldcroaring}" = "xyes"],
   [SUMMARY="${SUMMARY}

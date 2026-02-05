@@ -23,7 +23,7 @@ jobs:
           sudo apt-get install libpcre3-dev libmaxminddb-dev lcov
           sudo apt-get install wdiff colordiff
       - name: Configure
-        run: ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre2 --with-maxminddb --enable-tls-sigs
+        run: ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre2 --with-maxminddb
       - name: Build
         run: make all
       - name: Test
@@ -89,7 +89,7 @@ jobs:
           pprof -h
       - name: Configure nDPI library
         run: |
-          ./autogen.sh && ./configure --enable-gprof --enable-option-checking=fatal --with-pcre2 --with-maxminddb --enable-tls-sigs
+          ./autogen.sh && ./configure --enable-gprof --enable-option-checking=fatal --with-pcre2 --with-maxminddb
       - name: Build nDPI library
         run: |
           make -j
@@ -256,7 +256,7 @@ jobs:
           install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap mingw-w64-x86_64-libgcrypt parallel
       - name: Configure nDPI on Windows msys2
         run: |
-          msys2 -c './autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-tls-sigs --disable-npcap --with-local-libgcrypt'
+          msys2 -c './autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --disable-npcap --with-local-libgcrypt'
       - name: Build nDPI on Windows msys2
         run: |
           msys2 -c 'make -j all'

@@ -194,8 +194,6 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 
 #define NDPI_MAX_NUM_TLS_APPL_BLOCKS            8
 
-//#define TLS_HANDLE_SIGNATURE_ALGORITMS 1
-
 #ifdef __APPLE__
 
 #include <libkern/OSByteOrder.h>

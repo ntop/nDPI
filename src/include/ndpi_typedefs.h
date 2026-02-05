@@ -1753,12 +1753,6 @@ struct ndpi_flow_struct {
       u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1,
 	server_hello_processed:1, fingerprint_set:1, webrtc:1;
 
-#ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
-      /* Under #ifdef to save memory for those who do not need them */
-      u_int8_t num_tls_signature_algorithms;
-      u_int16_t client_signature_algorithms[MAX_NUM_TLS_SIGNATURE_ALGORITHMS];
-#endif
-
       struct tls_heuristics browser_heuristics;
       u_int16_t ssl_version, server_names_len;
 
