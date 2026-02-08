@@ -4421,8 +4421,9 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 	value |= mapped_idx, buf_shift += NUM_BITS_NIBBLE;
 
 	if(buf_shift == NIBBLE_ELEM_OFFSET) {
-	  memcpy(&out[out_idx], &value, 3);
-	  out_idx += 3;
+	  out[out_idx++] = value & 0xFF;
+	  out[out_idx++] = (value >> 8) & 0xFF;
+	  out[out_idx++] = (value >> 16) & 0xFF;
 	  buf_shift = 0; /* Move to the next buffer */
 	  value = 0;
 	}
@@ -4430,10 +4431,10 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     if(buf_shift != 0) {
-      u_int bytes = buf_shift / NUM_BITS_NIBBLE;
+      u_int j, bytes = buf_shift / NUM_BITS_NIBBLE;
 
-      memcpy(&out[out_idx], &value, bytes);
-      out_idx += bytes;
+      for(j = 0; j < bytes; j++)
+        out[out_idx++] = (value >> (j * 8)) & 0xFF;
     }
   }
 

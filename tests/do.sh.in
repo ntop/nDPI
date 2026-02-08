@@ -78,7 +78,7 @@ PLUGINS_ENABLED=@PLUGINS_ENABLED@
 PLUGINS_CFGS="plugins"
 ABS_SRCDIR="@abs_top_srcdir@"
 ABS_BUILDDIR="@abs_top_builddir@"
-READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,../../../example/config.txt -A -p ../../..//example/protos.txt -c ../../..//example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja4_fingerprints.csv -S ../../..//example/sha1_fingerprints.csv -G ../../../lists -q -K JSON -k /dev/null -t -v 2"
+READER="${CMD_PREFIX} ../../../example/ndpiReader${EXE_SUFFIX} --cfg=filename.config,../../../example/config.txt -A -p ../../..//example/protos.txt -c ../../..//example/categories.txt -r ../../../example/risky_domains.txt -j ../../../example/ja4_fingerprints.csv -S ../../..//example/sha1_fingerprints.csv -G ../../../lists -L ../../../lists/public_suffix_list.dat -q -K JSON -k /dev/null -t -v 2"
 #Used by plugins; different variables for Linux and macOS: no harm in setting always both of them
 LD_LIBRARY_PATH=${ABS_BUILDDIR}/src/lib/
 DYLD_LIBRARY_PATH=${ABS_BUILDDIR}/src/lib/
