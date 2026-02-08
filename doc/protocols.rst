@@ -4278,7 +4278,7 @@ References: `MessagePack Protocol Specs <https://github.com/msgpack/msgpack/blob
 .. _Proto_470:
 
 `NDPI_PROTOCOL_GITHUB_COPILOT`
-=======================
+==============================
 GitHub Copilot is a code completion and programming AI-assistant developed by GitHub.
 
 References: `Official site <https://github.com/features/copilot>`_
@@ -4287,7 +4287,7 @@ References: `Official site <https://github.com/features/copilot>`_
 .. _Proto_471:
 
 `NDPI_PROTOCOL_GITHUB_PACKAGES`
-=======================
+===============================
 GitHub Packages is a platform for hosting and managing packages, including containers and other dependencies.
 
 References: `Official site <https://docs.github.com/en/packages/learn-github-packages/introduction-to-github-packages>`_
@@ -4296,7 +4296,7 @@ References: `Official site <https://docs.github.com/en/packages/learn-github-pac
 .. _Proto_472:
 
 `NDPI_PROTOCOL_GITHUB_ACTIONS`
-=======================
+==============================
 GitHub Actions is a continuous integration and continuous delivery (CI/CD) platform that allows you to automate your build, test, and deployment pipeline.
 
 References: `Official site <https://docs.github.com/en/actions/get-started/understand-github-actions>`_

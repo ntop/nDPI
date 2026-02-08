@@ -6,7 +6,8 @@ import urllib.request
 import netaddr
 
 GITHUB_META_URL = "https://api.github.com/meta"
-services = ["hooks", "web", "api", "git", "github_enterprise_importer", "packages", "pages", "importer", "actions", "actions_macos", "codespaces", "copilot"]
+#Ignore "actions" because there are lots of overlapping with Microsoft/Azure IPs. TODO: better solution?
+services = ["hooks", "web", "api", "git", "github_enterprise_importer", "packages", "pages", "importer", "actions_macos", "codespaces", "copilot"]
 
 def read_url(url):
     try:

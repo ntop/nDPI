@@ -29,11 +29,6 @@ http_response=$(curl -s -o $TMP -w "%{http_code}" "${ORIGIN}")
 check_http_response "${http_response}"
 is_file_empty "${TMP}"
 
-filtered=$(mktemp)
-
-cat $TMP | jq '.values |= map(select(.name | test("^Action") | not))' > $filtered
-mv $filtered $TMP
-
 echo "(3) Processing IP addresses..."
 tr -d '\r' < $TMP | grep / | tr -d '"' | tr -d " " | tr -d "," | grep -v : > $LIST
 is_file_empty "${LIST}"
