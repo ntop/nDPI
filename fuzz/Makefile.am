@@ -1,4 +1,4 @@
-bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_nalloc fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp
+bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_nalloc fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp fuzz_match_custom_category
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_ranking fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr fuzz_alg_quick_encryption
 #Data structures
@@ -182,6 +182,9 @@ fuzz_is_stun_udp_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_is_stun_tcp_SOURCES = fuzz_is_stun_tcp.c fuzz_common_code.c
 fuzz_is_stun_tcp_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION -DSTUN_TCP
 fuzz_is_stun_tcp_LINK = $(FUZZ_LINK_COMMAND)
+
+fuzz_match_custom_category_SOURCES = fuzz_match_custom_category.c fuzz_common_code.c
+fuzz_match_custom_category_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_gcrypt_light_SOURCES = fuzz_gcrypt_light.cpp fuzz_common_code.c
 fuzz_gcrypt_light_LINK = $(FUZZ_LINK_COMMAND)
@@ -398,6 +401,7 @@ distdir:
 		-o -name 'random_list.list' \
 		-o -path '$(srcdir)/dictionary.dict' \
 		-o -path '$(srcdir)/dictionary_tls_certificate.dict' \
+		-o -path '$(srcdir)/corpus/create_corpus_fuzz_match_custom_category.sh' \
 		-o -path '$(srcdir)/corpus/fuzz_*.zip' \
 		-o -path '$(srcdir)/corpus/fuzz_quic_get_crypto_data/*' \
 		-o -path '$(srcdir)/corpus/fuzz_filecfg_protocols/*' \
