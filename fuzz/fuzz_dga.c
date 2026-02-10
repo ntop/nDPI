@@ -4,6 +4,15 @@
 static struct ndpi_detection_module_struct *ndpi_struct = NULL;
 static struct ndpi_flow_struct *ndpi_flow = NULL;
 
+static char *path = NULL;
+
+int LLVMFuzzerInitialize(int *argc, char ***argv) {
+  (void)argc;
+
+  path = dirname(strdup(*argv[0])); /* No errors; no free! */
+  return 0;
+}
+
 static int ndpi_custom_dga_fn(const char* domain, int domain_length)
 {
   return ndpi_is_printable_buffer((const u_int8_t *)domain, domain_length);
@@ -13,7 +22,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   char *name;
 
   if (ndpi_struct == NULL) {
-    fuzz_init_detection_module(&ndpi_struct, NULL);
+    fuzz_init_detection_module(&ndpi_struct, NULL, path);
     ndpi_flow = ndpi_calloc(1, sizeof(struct ndpi_flow_struct));
   }
 

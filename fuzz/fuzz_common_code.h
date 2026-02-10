@@ -3,13 +3,16 @@
 
 #include "ndpi_api.h"
 
+#include <libgen.h>
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
 void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_mod,
-                                struct ndpi_global_context *g_ctx);
+                                struct ndpi_global_context *g_ctx,
+                                const char *path);
 
 /* To allow memory allocation failures */
 void fuzz_set_alloc_callbacks(void);

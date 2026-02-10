@@ -1,6 +1,8 @@
 
 #include "fuzz_common_code.h"
 
+#include <assert.h>
+
 
 static int mem_alloc_state = 0;
 
@@ -49,23 +51,37 @@ void fuzz_set_alloc_callbacks_and_seed(int seed)
 }
 
 void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_mod,
-                                struct ndpi_global_context *g_ctx)
+                                struct ndpi_global_context *g_ctx,
+                                const char *path)
 {
+  char name[256];
+
   if(*ndpi_info_mod == NULL) {
     *ndpi_info_mod = ndpi_init_detection_module(g_ctx);
 
-    ndpi_set_config_u64(*ndpi_info_mod, NULL, "log.level", 3);
-    ndpi_set_config(*ndpi_info_mod, "all", "log", "enable");
+    assert(ndpi_set_config_u64(*ndpi_info_mod, NULL, "log.level", 3) == 0);
+    assert(ndpi_set_config(*ndpi_info_mod, "all", "log", "enable") == 0);
 
-    ndpi_load_domain_suffixes(*ndpi_info_mod, "public_suffix_list.dat");
-    ndpi_load_categories_dir(*ndpi_info_mod, "./lists/");
-    ndpi_load_protocols_file(*ndpi_info_mod, "protos.txt");
-    ndpi_load_categories_file(*ndpi_info_mod, "categories.txt", NULL);
-    ndpi_load_risk_domain_file(*ndpi_info_mod, "risky_domains.txt");
-    ndpi_load_malicious_ja4_file(*ndpi_info_mod, "ja4_fingerprints.csv");
-    ndpi_load_malicious_sha1_file(*ndpi_info_mod, "sha1_fingerprints.csv");
-
-    ndpi_set_config(*ndpi_info_mod, NULL, "filename.config", "config.txt");
+    sprintf(name, "%s/public_suffix_list.dat", path);
+    assert(ndpi_load_domain_suffixes(*ndpi_info_mod, name) >= 0);
+    sprintf(name, "%s/lists/", path);
+    assert(ndpi_load_categories_dir(*ndpi_info_mod, name) >= 0);
+    sprintf(name, "%s/lists/protocols/", path);
+    assert(ndpi_load_protocols_dir(*ndpi_info_mod, name) >= 0);
+    sprintf(name, "%s/protos.txt", path);
+    assert(ndpi_load_protocols_file(*ndpi_info_mod, name) >= 0);
+    sprintf(name, "%s/categories.txt", path);
+    assert(ndpi_load_categories_file(*ndpi_info_mod, name, NULL) >= 0);
+    sprintf(name, "%s/risky_domains.txt", path);
+    assert(ndpi_load_risk_domain_file(*ndpi_info_mod, name) >= 0);
+    sprintf(name, "%s/ja4_fingerprints.csv", path);
+    assert(ndpi_load_malicious_ja4_file(*ndpi_info_mod, name) >= 0);
+    sprintf(name, "%s/tcp_fingerprints.csv", path);
+    assert(ndpi_load_tcp_fingerprint_file(*ndpi_info_mod, name) >= 0);
+    sprintf(name, "%s/sha1_fingerprints.csv", path);
+    assert(ndpi_load_malicious_sha1_file(*ndpi_info_mod, name) >= 0);
+    sprintf(name, "%s/config_only_classification.txt", path);
+    assert(ndpi_set_config(*ndpi_info_mod, NULL, "filename.config", name) >= 0);
 
     ndpi_finalize_initialization(*ndpi_info_mod);
   }
