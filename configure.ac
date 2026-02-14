@@ -331,7 +331,7 @@ case "$host" in
       LIBS="${LIBS} -lws2_32"
       BUILD_MINGW=1
       EXE_SUFFIX=".exe"
-      AS_IF([test "${enable_npcap+set}" != set && test "${with_only_libndpi+set}" != set],,
+      AS_IF([test "${enable_npcap+set}" = set && test "${with_only_libndpi+set}" != set],
             [PKG_CHECK_MODULES([PCAP], [libpcap], [PCAP_LIB="" PCAP_INC="${pkg_cv_PCAP_CFLAGS}"])
              AC_CHECK_LIB([pcap], [pcap_open_live],, [AC_MSG_ERROR([Missing msys2/mingw libpcap library. Install it with `pacman -S mingw-w64-x86_64-libpcap' (msys2).])])])
       ;;
