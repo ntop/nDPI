@@ -16,7 +16,7 @@ LIST6_MERGED=/tmp/azure.list6_m
 LINK_ORIGIN="https://www.microsoft.com/en-us/download/details.aspx?id=56519"
 
 echo "(1) Downloading file... ${LINK_ORIGIN}"
-http_response=$(curl -s -o ${LINK_TMP} -w "%{http_code}" "${LINK_ORIGIN}")
+http_response=$(curl -L -s -o ${LINK_TMP} -w "%{http_code}" "${LINK_ORIGIN}")
 check_http_response "${http_response}"
 is_file_empty "${LINK_TMP}"
 
@@ -25,7 +25,7 @@ rm -f ${LINK_TMP}
 is_str_empty "${ORIGIN}" "${LINK_ORIGIN} does not contain the url format!"
 
 echo "(2) Downloading file... ${ORIGIN}"
-http_response=$(curl -s -o $TMP -w "%{http_code}" "${ORIGIN}")
+http_response=$(curl -L -s -o $TMP -w "%{http_code}" "${ORIGIN}")
 check_http_response "${http_response}"
 is_file_empty "${TMP}"
 

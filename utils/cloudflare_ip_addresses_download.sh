@@ -13,13 +13,13 @@ ORIGIN="https://www.cloudflare.com/ips-v4/"
 ORIGIN6="https://www.cloudflare.com/ips-v6/"
 
 echo "(1) Downloading file... ${ORIGIN}"
-http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
+http_response=$(curl -L -s -o $LIST -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${LIST}"
 ./mergeipaddrlist.py "${LIST}" > "${LIST_MERGED}"
 is_file_empty "${LIST_MERGED}"
 
-http_response=$(curl -s -o $LIST6 -w "%{http_code}" ${ORIGIN6})
+http_response=$(curl -L -s -o $LIST6 -w "%{http_code}" ${ORIGIN6})
 check_http_response "${http_response}"
 is_file_empty "${LIST6}"
 ./mergeipaddrlist.py "${LIST6}" > "${LIST6_MERGED}"

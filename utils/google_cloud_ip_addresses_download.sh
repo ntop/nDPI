@@ -14,7 +14,7 @@ ORIGIN="https://www.gstatic.com/ipranges/cloud.json"
 
 
 echo "(1) Downloading file... ${ORIGIN}"
-http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
+http_response=$(curl -L -s -o $TMP -w "%{http_code}" ${ORIGIN})
 if [ "$http_response" != "200" ]; then
     echo "Error $http_response: you probably need to update the list url!"
     exit 1

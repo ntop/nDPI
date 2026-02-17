@@ -13,7 +13,7 @@ ORIGIN="https://techdocs.akamai.com/property-manager/pdfs/akamai_ipv4_CIDRs.txt"
 ORIGIN6="https://techdocs.akamai.com/property-manager/pdfs/akamai_ipv6_CIDRs.txt"
 
 echo "(1) Downloading file... ${ORIGIN}"
-http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
+http_response=$(curl -L -s -o $LIST -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${LIST}"
 ./mergeipaddrlist.py "${LIST}" > "${LIST_MERGED}"
@@ -41,7 +41,7 @@ cat <<EOF >> "${LIST_MERGED}"
 184.84.0.0/14
 EOF
 
-http_response=$(curl -s -o $LIST6 -w "%{http_code}" ${ORIGIN6})
+http_response=$(curl -L -s -o $LIST6 -w "%{http_code}" ${ORIGIN6})
 check_http_response "${http_response}"
 is_file_empty "${LIST6}"
 ./mergeipaddrlist.py "${LIST6}" > "${LIST6_MERGED}"

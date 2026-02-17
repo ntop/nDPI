@@ -15,7 +15,7 @@ ORIGIN=https://api.surfshark.com/v4/server/clusters/all
 #No ipv6 support: https://support.surfshark.com/hc/en-us/articles/360011550239-Does-Surfshark-support-IPv6-Do-I-have-it-on-my-network
 
 echo "(1) Downloading file..."
-http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
+http_response=$(curl -L -s -o $TMP -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${TMP}"
 

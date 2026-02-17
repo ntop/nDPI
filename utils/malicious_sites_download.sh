@@ -12,7 +12,7 @@ ORIGIN="https://hole.cert.pl/domains/v2/domains.json"
 
 
 printf '(1) Downloading file... %s\n' "${ORIGIN}"
-http_response=$(curl -s -o ${TMP} -w "%{http_code}" ${ORIGIN})
+http_response=$(curl -L -s -o ${TMP} -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${TMP}"
 

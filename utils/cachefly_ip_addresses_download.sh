@@ -11,7 +11,7 @@ ORIGIN='https://cachefly.cachefly.net/ips/cdn.txt'
 #TODO: ipv6. Is there any ipv6 list?
 
 echo "(1) Downloading file..."
-http_response=$(curl -s -o "${LIST}" -w "%{http_code}" "${ORIGIN}")
+http_response=$(curl -L -s -o "${LIST}" -w "%{http_code}" "${ORIGIN}")
 check_http_response "${http_response}"
 is_file_empty "${LIST}"
 ./mergeipaddrlist.py $LIST > $LIST_MERGED
