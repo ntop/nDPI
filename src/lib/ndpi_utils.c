@@ -3138,7 +3138,7 @@ void ndpi_hash_free(ndpi_str_hash **h) {
 
 /* ******************************************************************** */
 
-int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int64_t *value) {
+int ndpi_hash_find_entry(ndpi_str_hash *h, const char *key, u_int key_len, u_int64_t *value) {
   ndpi_str_hash_priv *h_priv;
   ndpi_str_hash_priv *item;
 
@@ -4379,7 +4379,7 @@ static void ndpi_domain_mapper_init() {
 /* ************************************************ */
 
 u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
-			 char *domain, char *out, u_int out_len) {
+			 const char *domain, char *out, u_int out_len) {
   u_int out_idx = 0, i, buf_shift = 0, domain_buf_len, compressed_len, suffix_len, domain_len;
   u_int32_t value = 0;
   u_char domain_buf[256], compressed[128];
