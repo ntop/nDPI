@@ -7006,7 +7006,7 @@ void cryptDecryptUnitTest() {
 
 /* *********************************************** */
 
-void encodeDomainsUnitTest() {
+void encodeDomainsUnitTest(bool load_suffix_list) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   const char *lists_path = "../lists/public_suffix_list.dat";
   char *lists_dir = "../lists";
@@ -7022,14 +7022,18 @@ void encodeDomainsUnitTest() {
     ndpi_protocol_category_t id;
     ndpi_protocol_breed_t breed;
 
-    assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
+    if(load_suffix_list)
+      assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
 
     ndpi_get_host_domain_suffix(ndpi_str, "lcb.it", &suffix_id);
     ndpi_get_host_domain_suffix(ndpi_str, "www.ntop.org", &suffix_id);
     ndpi_get_host_domain_suffix(ndpi_str, "www.bbc.co.uk", &suffix_id);
 
-    str = (char*)"www.ntop.org"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
-    str = (char*)"www.bbc.co.uk"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
+    if(load_suffix_list) {
+      /* The encoding is different with or without the suffix list */
+      str = (char*)"www.ntop.org"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
+      str = (char*)"www.bbc.co.uk"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
+    }
 
     assert(ndpi_load_categories_dir(ndpi_str, lists_dir));
     assert(ndpi_load_categories_file(ndpi_str, categories_path, "categories.txt"));
@@ -7041,6 +7045,16 @@ void encodeDomainsUnitTest() {
     str = (char*)"10bet.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 107);
     str = (char*)"www.ntop.org"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1); assert(id == 0);
     str = (char*)"lifyqyi.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 100);
+    str = (char*)"xhamster.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == NDPI_PROTOCOL_CATEGORY_ADULT_CONTENT);
+    str = (char*)"a.xhamster.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == NDPI_PROTOCOL_CATEGORY_ADULT_CONTENT);
+    str = (char*)"a.xhamster.com.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
+    str = (char*)"a.xhamster.com.a"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
+    str = (char*)"gateway.unityads.unity3d.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == NDPI_PROTOCOL_CATEGORY_ADVERTISEMENT);
+    str = (char*)"unityads.unity3d.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == NDPI_PROTOCOL_CATEGORY_ADVERTISEMENT);
+    str = (char*)"unity3d.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
+
+    str = (char*)"something.arpa"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
+    str = (char*)"something.local"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
   }
 
   ndpi_exit_detection_module(ndpi_str);
@@ -7387,7 +7401,9 @@ int main(int argc, char **argv) {
     domainCacheTestUnit();
     cryptDecryptUnitTest();
     kdUnitTest();
-    encodeDomainsUnitTest();
+    /* We want the same results, with and without the public suffix list */
+    encodeDomainsUnitTest(true);
+    encodeDomainsUnitTest(false);
     loadStressTest();
     domainsUnitTest();
     outlierUnitTest();
