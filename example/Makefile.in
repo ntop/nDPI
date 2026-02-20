@@ -106,6 +106,7 @@ distdir:
 	find $(srcdir) -maxdepth 1 -type f -name '*.c' \
 		-o -name '*.h' \
 		-o -name '*.py' \
+		-o -name '*.sh' \
 		-o -name '*.txt' \
 		-o -name '*.conf' \
 		-o -name '*.csv' | xargs -I'{}' cp '{}' '$(distdir)/{}'
