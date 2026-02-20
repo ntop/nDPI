@@ -856,9 +856,10 @@ typedef enum {
 PACK_ON
 struct ndpi_tls_block {
   u_int8_t block_type /* ndpi_tls_block_type */;
-  u_int8_t same_pkt:1, _unused:7;
   int16_t len; /* + = src->dst, - = dst->src */
-  u_int16_t msec_delta;
+  /* Optional, leave it at the end */
+  u_int8_t same_pkt:1, _unused:7;
+  u_int16_t msec_delta; /* Used to store protocol_id in ja4 hash */
 } PACK_OFF;
 
 struct ndpi_flow_tcp_struct {
@@ -1308,6 +1309,11 @@ typedef struct _ndpi_automa {
   void *ac_automa; /* Real type is AC_AUTOMATA_t */
   struct ndpi_automa_stats stats;
 } ndpi_automa;
+
+typedef struct ndpi_list_struct {
+  char *value;
+  struct ndpi_list_struct *next;
+} ndpi_list;
 
 typedef struct ndpi_str_hash {
   void *priv;

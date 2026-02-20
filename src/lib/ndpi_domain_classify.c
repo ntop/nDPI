@@ -93,11 +93,11 @@ bool ndpi_domain_classify_add(struct ndpi_detection_module_struct *ndpi_str,
   if(ndpi_str) {
     out_len = ndpi_encode_domain(ndpi_str, domain, out, sizeof(out));
     
-    ndpi_hash_add_entry(&s->domains, out, out_len, class_id);
+    ndpi_hash_add_entry(&s->domains, out, out_len, class_id, NULL);
   } else
-    ndpi_hash_add_entry(&s->domains, domain, strlen(domain), class_id);
+    ndpi_hash_add_entry(&s->domains, domain, strlen(domain), class_id, NULL);
 #else
-  ndpi_hash_add_entry(&s->domains, domain, strlen(domain), class_id);
+  ndpi_hash_add_entry(&s->domains, domain, strlen(domain), class_id, NULL);
 #endif
 
   return(true);

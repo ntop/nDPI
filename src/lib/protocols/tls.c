@@ -106,7 +106,7 @@ static int keep_extra_dissection_tcp(struct ndpi_detection_module_struct *ndpi_s
                                      struct ndpi_flow_struct *flow) {
   if(ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
     return(1); /* Process as much TLS blocks as the max packet number */
-
+    
   /* Common path: found handshake on both directions */
   if(
      (flow->tls_quic.certificate_processed == 1 && flow->protos.tls_quic.client_hello_processed)
@@ -1114,6 +1114,58 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 
 /* **************************************** */
 
+static void tls_match_ja4(struct ndpi_detection_module_struct *ndpi_struct,
+			  struct ndpi_flow_struct *flow) {
+  u_int64_t proto_id;
+  ndpi_list *extra_data = NULL;
+		  
+  /* This protocol has been defined in protos.txt-like files */
+  if(ndpi_hash_find_entry_extra(ndpi_struct->ja4_custom_protos,
+				flow->protos.tls_quic.ja4_client,
+				NDPI_ARRAY_LENGTH(flow->protos.tls_quic.ja4_client) - 1,
+				&proto_id, &extra_data) != 0)
+    return; /* Not found */
+
+
+  if((flow->l4_proto == IPPROTO_TCP)
+     && (flow->l4.tcp.tls.num_tls_blocks == ndpi_struct->cfg.tls_max_num_blocks_to_analyze)
+     && (ndpi_struct->cfg.tls_max_num_blocks_to_analyze <= 8 /* (&) */)
+     && (flow->l4.tcp.tls.tls_blocks != NULL)) {
+    float multiplier[8 /* (&) */] = { 2, 2, .1, .1, .1, .1, .1, .1 };
+    float best_res = 9999999.;
+    
+    while(extra_data != NULL) {
+      /* Multiple matches: let's find the best match (if any) */
+      struct ndpi_tls_block *tls_blocks = (struct ndpi_tls_block*)extra_data->value;
+
+      if(tls_blocks != NULL) {
+	float res = ndpi_tls_blocks_len_compare(flow->l4.tcp.tls.tls_blocks, tls_blocks,
+						multiplier, 8 /* (&) */);
+
+	printf("-->> %.1f / %.1f [%u]\n", res, best_res, tls_blocks->msec_delta);
+	
+	if((res < 2 /* The first two block_entries must be identical */)
+	   && (res < best_res)) {
+	  best_res = res;
+	  proto_id = tls_blocks->msec_delta; /* It stores the protocolId. See (*%*) in ndpi_main.c */
+	  
+	  if(res == 0) /* identical TLS blocks */
+	    break; /* No match better than this ! */
+	}
+      }
+      
+      extra_data = extra_data->next;
+    }
+  }
+
+  if(proto_id != NDPI_PROTOCOL_UNKNOWN)
+    ndpi_set_detected_protocol(ndpi_struct, flow, proto_id,
+			       ndpi_get_master_proto(ndpi_struct, flow),
+			       NDPI_CONFIDENCE_CUSTOM_RULE);
+}
+
+/* **************************************** */
+
 /* See https://blog.catchpoint.com/2017/05/12/dissecting-tls-using-wireshark/ */
 int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 		       struct ndpi_flow_struct *flow) {
@@ -1235,6 +1287,9 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
     printf("*** [TLS Block] Enough blocks dissected\n");
 #endif
 
+    if(ndpi_struct->ja4_custom_protos != NULL)
+      tls_match_ja4(ndpi_struct, flow);
+    
     flow->extra_packets_func = NULL; /* We're good now */
   }
 
@@ -1641,7 +1696,12 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_TLS, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
       /* TLS over port 8080 usually triggers that risk; clear it */
       ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
+
+      if(ndpi_struct->ja4_custom_protos != NULL)
+      tls_match_ja4(ndpi_struct, flow);
+     
       flow->extra_packets_func = NULL;
+
       return(0); /* That's all */
     /* Loook for TLS-in-TLS */
     } else if((ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_TLS) && /* Feature enabled */
@@ -1654,6 +1714,9 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       switch_extra_dissection_to_tls_obfuscated_heur(ndpi_struct, flow);
       return(1);
     } else {
+      if(ndpi_struct->ja4_custom_protos != NULL)
+	tls_match_ja4(ndpi_struct, flow);
+      
       flow->extra_packets_func = NULL;
       return(0); /* That's all */
     }
@@ -3507,20 +3570,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 compute_ja4c:
 	      if(ndpi_struct->cfg.tls_ja4c_fingerprint_enabled) {
 	        ndpi_compute_ja4(ndpi_struct, flow, quic_version, &ja);
-
-		if(ndpi_struct->ja4_custom_protos != NULL) {
-		  u_int64_t proto_id;
-
-		  /* This protocol has been defined in protos.txt-like files */
-		  if(ndpi_hash_find_entry(ndpi_struct->ja4_custom_protos,
-					  flow->protos.tls_quic.ja4_client,
-					  NDPI_ARRAY_LENGTH(flow->protos.tls_quic.ja4_client) - 1,
-					  &proto_id) == 0) {
-		    ndpi_set_detected_protocol(ndpi_struct, flow, proto_id,
-					       ndpi_get_master_proto(ndpi_struct, flow),
-					       NDPI_CONFIDENCE_CUSTOM_RULE);
-		  }
-		}
 
                 if(ndpi_struct->malicious_ja4_hashmap != NULL) {
                   u_int16_t rc1 = ndpi_hash_find_entry(ndpi_struct->malicious_ja4_hashmap,

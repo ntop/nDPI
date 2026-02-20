@@ -2204,7 +2204,11 @@ extern "C" {
    * @return 0 if an entry with that key was found, 1 otherwise
    *
    */
-  int ndpi_hash_find_entry(ndpi_str_hash *h, const char *key, u_int key_len, u_int64_t *value);
+  int ndpi_hash_find_entry(ndpi_str_hash *h, const char *key, u_int key_len,
+			   u_int64_t *value /* out */);
+  int ndpi_hash_find_entry_extra(ndpi_str_hash *h, const char *key, u_int key_len,
+				 u_int64_t *value /* out */,
+				 ndpi_list **extra_data /* out */);
 
   /**
    * Add an entry to the hashmap.
@@ -2217,7 +2221,8 @@ extern "C" {
    * @return 0 if the entry was added, 1 otherwise
    *
    */
-  int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int64_t value);
+  int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int64_t value,
+			  char *extra_data /* Allocated by caller */);
 
   typedef void (*ndpi_hash_walk_iter)(char *key, u_int64_t value64, void *data);
   void ndpi_hash_walk(ndpi_str_hash **h, ndpi_hash_walk_iter cb, void *data);
@@ -2227,6 +2232,12 @@ extern "C" {
                           str_hash_type hash_type,
                           struct ndpi_str_hash_stats *stats);
 
+  /* ******************************* */
+
+  void ndpi_list_init(ndpi_list *l);
+  void ndpi_list_free(ndpi_list *l);
+  bool ndpi_list_append(ndpi_list *l, void *value);
+  
   /* ******************************* */
 
   int ndpi_load_geoip(struct ndpi_detection_module_struct *ndpi_str,

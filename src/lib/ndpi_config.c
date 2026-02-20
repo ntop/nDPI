@@ -826,7 +826,7 @@ static AC_ERROR_t ac_walk_proto_id(AC_AUTOMATA_t *thiz, AC_NODE_t *n, int idx, v
     for(i=0; i<n->matched_patterns->num; i++) {
       AC_PATTERN_t *p = &n->matched_patterns->patterns[i];
 
-      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.number);
+      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.number, NULL);
     }
   }
 
@@ -847,7 +847,7 @@ static AC_ERROR_t ac_walk_category_id(AC_AUTOMATA_t *thiz, AC_NODE_t *n, int idx
     for(i=0; i<n->matched_patterns->num; i++) {
       AC_PATTERN_t *p = &n->matched_patterns->patterns[i];
 
-      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.category);
+      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.category, NULL);
     }
   }
 

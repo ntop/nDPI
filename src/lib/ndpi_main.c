@@ -3620,19 +3620,48 @@ static void ndpi_init_ptree_ipv6(struct ndpi_detection_module_struct *ndpi_str,
 
 static int ndpi_add_ja4_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
 				    char *ja4, u_int16_t protocol_id) {
-  int ja4_len = strlen(ja4);
+  const u_int ja4_str_len = 36;  /* size of JA4C */
+  u_int ja4_len = strlen(ja4);
+  struct ndpi_tls_block *blocks = NULL;
+  u_int8_t num_tls_blocks;
 
-  if(ja4_len != 36  /* size of JA4C */) {
+  if(ja4_len == ja4_str_len) {
+    /* JA4 */
+    ja4_len = ja4_str_len;
+  } else if(ja4_len > ja4_str_len) {
+    /* JA4 with blocks */
+    if(ndpi_str->cfg.tls_max_num_blocks_to_analyze > 0) {
+      blocks = ndpi_decode_tls_blocks((const u_char*)&ja4[ja4_str_len+1 /* Skip divider */],
+				      ja4_len - ja4_str_len - 1, &num_tls_blocks);
+
+      if(blocks != NULL) {
+	if(num_tls_blocks < ndpi_str->cfg.tls_max_num_blocks_to_analyze) {
+	  /* Invalid blocks lenght (too short): discarding it */
+	  ndpi_free(blocks);
+	  blocks = NULL;
+	} else {
+	  /* We jeopardize the msec_delta field to store the protocol_id (*%*) */
+	  blocks[0].msec_delta = protocol_id;
+	}
+      }
+    } else {
+      NDPI_LOG_ERR(ndpi_str, "JA4C with TLS blocks when TLS blocks are disabled [%s]\n", ja4);
+      return(-1);
+    }
+
+    ja4_len = ja4_str_len;
+  } else {
     NDPI_LOG_ERR(ndpi_str, "Not a JA4C: [%s]\n", ja4);
-    return(-1);
+    return(-2);
   }
 
   if(ndpi_str->ja4_custom_protos == NULL) {
     if(ndpi_hash_init(&ndpi_str->ja4_custom_protos) != 0)
-      return(-2);
+      return(-3);
   }
 
-  return(ndpi_hash_add_entry(&ndpi_str->ja4_custom_protos, ja4, ja4_len, protocol_id));
+  return(ndpi_hash_add_entry(&ndpi_str->ja4_custom_protos,
+			     ja4, ja4_len, protocol_id, (void*)blocks));
 }
 
 /* ******************************************* */
@@ -3651,7 +3680,7 @@ static int ndpi_add_ndpifp_subprotocol(struct ndpi_detection_module_struct *ndpi
       return(-2);
   }
 
-  return(ndpi_hash_add_entry(&ndpi_str->ndpifp_custom_protos, ndpifp, ndpifp_len, protocol_id));
+  return(ndpi_hash_add_entry(&ndpi_str->ndpifp_custom_protos, ndpifp, ndpifp_len, protocol_id, NULL));
 }
 
 /* ******************************************* */
@@ -3669,7 +3698,7 @@ static int ndpi_add_http_url_subprotocol(struct ndpi_detection_module_struct *nd
 
   id = (u_int64_t)(breed & 0xFFFF) << 32 | (category & 0xFFFF) << 16 | (protocol_id & 0xFFFF);
 
-  return(ndpi_hash_add_entry(&ndpi_str->http_url_hashmap, url, url_len, id));
+  return(ndpi_hash_add_entry(&ndpi_str->http_url_hashmap, url, url_len, id, NULL));
 }
 
 /* ******************************************* */
@@ -6447,7 +6476,7 @@ int load_malicious_ja4_file_fd(struct ndpi_detection_module_struct *ndpi_str, FI
       continue;
     }
 
-    if(ndpi_hash_add_entry(&ndpi_str->malicious_ja4_hashmap, line, len, 0) == 0)
+    if(ndpi_hash_add_entry(&ndpi_str->malicious_ja4_hashmap, line, len, 0, NULL) == 0)
       num++;
   }
 
@@ -6526,7 +6555,7 @@ int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, F
       first_comma[i] = toupper(first_comma[i]);
 
     if(ndpi_hash_add_entry(&ndpi_str->malicious_sha1_hashmap, first_comma,
-			   second_comma - first_comma, 0) == 0)
+			   second_comma - first_comma, 0, NULL) == 0)
       num++;
   }
 
@@ -9322,7 +9351,7 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow) {
 
   if(flow->already_gaveup) {
-    NDPI_LOG_ERR(ndpi_struct, "Already called!\n"); /* We shoudn't be here ...*/
+    NDPI_LOG_ERR(ndpi_struct, "%s() - Already called!\n", __FUNCTION__); /* We shoudn't be here ...*/
     return;
   }
   flow->already_gaveup = 1;

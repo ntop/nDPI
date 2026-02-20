@@ -4,7 +4,7 @@ Num dissector calls: 3 (3.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
-LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/2/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    0/1/0 (insert/search/found)
@@ -13,7 +13,7 @@ Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     0/0 (search/found)
 Automa common alpns:  2/2 (search/found)
-Patricia risk mask:   0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        0/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
@@ -29,7 +29,7 @@ Hash url custom protos:    0/0 (search/found)
 
 CustomJA4Proto	32	10766	1
 
-Acceptable                      32 10766         1            
+Safe                            32 10766         1            
 
 Web                             32 10766         1            
 
@@ -38,4 +38,4 @@ JA Host Stats:
 	1	 192.168.70.96            	 1      
 
 
-	1	TCP 192.168.70.96:61765 <-> 144.76.154.14:432 [proto: 91.2060/TLS.CustomJA4Proto][Stack: TLS.CustomJA4Proto][IP: 0/Unknown][ClearText][Confidence: Match by custom rule][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][Breed: Acceptable][15 pkts/2016 bytes <-> 17 pkts/8750 bytes][Goodput ratio: 52/87][0.67 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.625 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/38 106/195 35/59][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 134/515 738/1394 173/585][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 150][Risk Info: h2;SNI should always be present;Expected on port 443][nDPI Fingerprint: fac0c017f808f2a93d673da6e7bf3d7f][TCP Fingerprint: 2_64_65535_41a9d5af7dd3/Android][TLSv1.3][JA4: t13i1511h2_8daaf6152771_40271e0a5736][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Safari][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 24,11,11,0,5,0,0,5,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,30,0,0,0,0,0,0]
+	1	TCP 192.168.70.96:61765 <-> 144.76.154.14:432 [proto: 91.2060/TLS.CustomJA4Proto][Stack: TLS.CustomJA4Proto][IP: 0/Unknown][ClearText][Confidence: Match by custom rule][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Web/5][Breed: Safe][15 pkts/2016 bytes <-> 17 pkts/8750 bytes][Goodput ratio: 52/87][0.67 sec][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.625 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/38 106/195 35/59][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 134/515 738/1394 173/585][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** ALPN/SNI Mismatch **][Risk Score: 150][Risk Info: h2;SNI should always be present;Expected on port 443][nDPI Fingerprint: fac0c017f808f2a93d673da6e7bf3d7f][TCP Fingerprint: 2_64_65535_41a9d5af7dd3/Android][TLSv1.3][JA4: t13i1511h2_8daaf6152771_40271e0a5736][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Safari][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 24,11,11,0,5,0,0,5,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,30,0,0,0,0,0,0]

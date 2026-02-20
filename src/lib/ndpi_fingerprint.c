@@ -84,7 +84,7 @@ int ndpi_add_tcp_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
     return(-1);
   } else {
     if(ndpi_hash_add_entry(&ndpi_str->tcp_fingerprint_hashmap, fingerprint, len,
-			   (u_int64_t)os) == 0) {
+			   (u_int64_t)os, NULL) == 0) {
       return(0);
     } else
       return(-2);

@@ -23,7 +23,7 @@ Hash malicious ja4:        1/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     1/1 (search/found)
 Hash public domain suffix: 18/11 (search/found)
-Hash ja4 custom protos:    1/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     1/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
 
@@ -38,4 +38,4 @@ JA Host Stats:
 	1	 192.168.12.156           	 1      
 
 
-	1	TCP 192.168.12.156:39958 -> 172.67.21.133:443 [proto: 91/TLS][Stack: TLS][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 10][cat: Web/5][Breed: Safe][10 pkts/1549 bytes -> 0 pkts/0 bytes][Goodput ratio: 64/0][0.30 sec][Hostname/SNI: sb.adtidy.org][(Advertised) ALPNs: http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 33/0 154/0 47/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 155/0 571/0 179/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Fingerprint: 6ff9dd7d75f3c03976cdd8c1be1bbb55][TCP Fingerprint: 2_64_65535_685ad951a756/Android][TLSv1.2][JA4: t13d1713h1_5b57614c22b0_eca864cca44a][Safari][Plen Bins: 25,25,0,0,0,0,0,0,0,0,0,0,25,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0][TLS blocks: 22:1=218,20=1,22:0=40,23=385,21=26]
+	1	TCP 192.168.12.156:39958 -> 172.67.21.133:443 [proto: 91/TLS][Stack: TLS][IP: 220/Cloudflare][Encrypted][Confidence: DPI][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 10][cat: Web/5][Breed: Safe][10 pkts/1549 bytes -> 0 pkts/0 bytes][Goodput ratio: 64/0][0.30 sec][Hostname/SNI: sb.adtidy.org][(Advertised) ALPNs: http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 33/0 154/0 47/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/0 155/0 571/0 179/0][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Fingerprint: 6ff9dd7d75f3c03976cdd8c1be1bbb55][TCP Fingerprint: 2_64_65535_685ad951a756/Android][TLSv1.2][JA4: t13d1713h1_5b57614c22b0_eca864cca44a][Safari][Plen Bins: 25,25,0,0,0,0,0,0,0,0,0,0,25,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0][TLS blocks: 22:1=218,20=1,22:0=40,23=385,21=26][8400da8100018300288f018182001a]

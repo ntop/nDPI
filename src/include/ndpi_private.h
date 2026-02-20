@@ -142,11 +142,6 @@ struct ndpi_packet_struct {
     packet_direction:1, empty_line_position_set:1, http_check_content:1, pad:4;
 };
 
-typedef struct ndpi_list_struct {
-  char *value;
-  struct ndpi_list_struct *next;
-} ndpi_list;
-
 #ifdef HAVE_NBPF
 typedef struct {
   void *tree; /* cast to nbpf_filter* */

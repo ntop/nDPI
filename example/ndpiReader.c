@@ -570,9 +570,6 @@ static void configure_ndpi(struct ndpi_detection_module_struct *ndpi_struct) {
     }
   }
 
-  if(_protoFilePath != NULL)
-    ndpi_load_protocols_file(ndpi_struct, _protoFilePath);
-
   ndpi_set_config(ndpi_struct, NULL, "tcp_ack_payload_heuristic", "enable");
 
   for(i = 0; i < num_cfgs; i++) {
@@ -584,6 +581,9 @@ static void configure_ndpi(struct ndpi_detection_module_struct *ndpi_struct) {
               cfgs[i].param, cfgs[i].value, ndpi_cfg_error2string(rc), rc);
     }
   }
+
+  if(_protoFilePath != NULL)
+    ndpi_load_protocols_file(ndpi_struct, _protoFilePath);
 
   if(enable_doh_dot_detection)
     ndpi_set_config(ndpi_struct, "tls", "application_blocks_tracking", "enable");
@@ -2651,7 +2651,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if((flow->tls.num_blocks > 0) && (flow->tls.blocks != NULL)) {
       int i;
-
+      u_char *enc = ndpi_encode_tls_blocks(flow->tls.blocks, flow->tls.num_blocks);
+      
       fprintf(out, "[TLS blocks: ");
 
       for(i=0; i<flow->tls.num_blocks; i++)
@@ -2659,7 +2660,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 		ndpi_print_encoded_tls_block_type(flow->tls.blocks[i].block_type, true),
 		flow->tls.blocks[i].len);
 
-      fprintf(out, "]");
+      fprintf(out, "][%s]", enc ? (char*)enc : "");
+
+      if(enc) ndpi_free(enc);
     }
 
     if(flow->flow_payload && (flow->flow_payload_len > 0)) {
@@ -5808,8 +5811,8 @@ void automataDomainsUnitTest() {
 /* *********************************************** */
   
 void blocksUnitTest() {
-  struct ndpi_tls_block a[] = { { 4, 1, 0, 1590, 0}, { 5, 1, 0, -1212, 0}, { 1, 1, 0, -1, 0}, { 16, 1, 0, -42, 0}, { 16, 1, 0, -53, 0}  };
-  struct ndpi_tls_block b[] = { { 4, 1, 0, 1591, 0}, { 5, 1, 0, -1212, 0}, { 1, 1, 0, -1, 0}, { 16, 1, 0, -42, 0}, { 16, 1, 0, -53, 0}  };
+  struct ndpi_tls_block a[] = { { 4, 1590, 0, 1, 0}, { 5, -1212, 0, 1, 0}, { 1, -1, 0, 1, 0}, { 16, -42, 0, 1, 0}, { 16, -53, 0, 1, 0}  };
+  struct ndpi_tls_block b[] = { { 4, 1591, 0, 1, 0}, { 5, -1212, 0, 1, 0}, { 1, -1, 0, 1, 0}, { 16, -42, 0, 1, 0}, { 16, -53, 0, 1, 0}  };
   float multiplier[]        = { 100, 100, 80, 40, 20};
   float ret = ndpi_tls_blocks_len_compare(a, b, multiplier, sizeof(multiplier) / sizeof(float));
 
@@ -5999,7 +6002,7 @@ void hashUnitTest() {
     u_int8_t l = strlen(dict[i]);
     u_int64_t v;
 
-    assert(ndpi_hash_add_entry(&h, dict[i], l, i) == 0);
+    assert(ndpi_hash_add_entry(&h, dict[i], l, i, NULL) == 0);
     assert(ndpi_hash_find_entry(h, dict[i], l, &v) == 0);
     assert(v == i);
   }
