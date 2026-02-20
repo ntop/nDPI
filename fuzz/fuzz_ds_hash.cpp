@@ -31,7 +31,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     data_len = fuzzed_data.ConsumeIntegralInRange(0, 127);
     std::vector<char>data = fuzzed_data.ConsumeBytes<char>(data_len);
 
-    rc = ndpi_hash_add_entry(&h, data.data(), data.size(), i);
+    rc = ndpi_hash_add_entry(&h, data.data(), data.size(), i, NULL);
     /* Keep one random entry really added */
     if (rc == 0 && fuzzed_data.ConsumeBool()) {
       value_added = data;
