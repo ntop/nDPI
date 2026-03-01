@@ -49,43 +49,47 @@ static void ndpi_search_activision(struct ndpi_detection_module_struct *ndpi_str
     return;
   }
 
+  u_int16_t magic = ntohs(get_u_int16_t(packet->payload, 0));
+
+  /*
+   * 0x46/0x47 variant: payload direction markers are protocol-level and
+   * unrelated to nDPI's flow direction assignment, so handle them before
+   * any direction-dependent checks.
+   */
+  if (magic == 0x4600 || magic == 0x4700)
+  {
+    if (flow->packet_counter > 4)
+      ndpi_int_activision_add_connection(ndpi_struct, flow);
+
+    return;
+  }
+
+  /* original 0x0c02/0x0d02 variant: direction-dependent */
   if (flow->packet_direction_counter[packet->packet_direction] == 1)
   {
     if (packet->packet_direction == 0)
     {
-      if (ntohs(get_u_int16_t(packet->payload, 0)) != 0x0c02)
+      if (magic != 0x0c02)
       {
         NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
       }
     } else {
-      if (ntohs(get_u_int16_t(packet->payload, 0)) != 0x0d02)
+      if (magic != 0x0d02)
       {
         NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
       }
     }
 
-    if (packet->payload_packet_len < 29)
-    {
-      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-      return;
-    }
-
-    if (ntohs(get_u_int16_t(packet->payload, 17)) == 0xc0a8 &&
-        ntohl(get_u_int32_t(packet->payload, 19)) == 0x0015020c)
-    {
-      ndpi_int_activision_add_connection(ndpi_struct, flow);
-      return;
-    }
   } else if (packet->packet_direction == 0) {
-    if (packet->payload[0] != 0x29)
+    if (packet->payload[0] != 0x29 && magic != 0x0c02)
     {
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
   } else if (packet->packet_direction == 1) {
-    if (packet->payload[0] != 0x28)
+    if (packet->payload[0] != 0x28 && magic != 0x0d02)
     {
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
