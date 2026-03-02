@@ -8,13 +8,22 @@
 struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 struct ndpi_flow_struct *flow = NULL;
 
+static char *path = NULL;
+
+int LLVMFuzzerInitialize(int *argc, char ***argv) {
+  (void)argc;
+
+  path = dirname(strdup(*argv[0])); /* No errors; no free! */
+  return 0;
+}
+
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   const u_int8_t *crypto_data;
   uint64_t crypto_data_len;
   u_int32_t first_int, version = 0;
 
   if(ndpi_info_mod == NULL) {
-    fuzz_init_detection_module(&ndpi_info_mod, NULL);
+    fuzz_init_detection_module(&ndpi_info_mod, NULL, path);
 
     flow = ndpi_calloc(1, SIZEOF_FLOW_STRUCT);
   }

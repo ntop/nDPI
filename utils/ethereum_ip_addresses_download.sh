@@ -12,7 +12,7 @@ ORIGIN="https://raw.githubusercontent.com/ethereum/go-ethereum/master/params/boo
 
 
 echo "(1) Downloading file... ${ORIGIN}"
-http_response=$(curl -s -o $TMP -w "%{http_code}" ${ORIGIN})
+http_response=$(curl -L -s -o $TMP -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${TMP}"
 

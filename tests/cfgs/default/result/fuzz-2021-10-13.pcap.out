@@ -1,6 +1,6 @@
 DPI Packets (TCP):	1	(1.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
-Num dissector calls: 158 (158.00 diss/flow)
+Num dissector calls: 157 (157.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -23,7 +23,7 @@ Hash malicious ja4:        0/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     0/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
-Hash ja4 custom protos:    0/0 (search/found)
+Hash ja4 custom protos:    1/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
 
@@ -36,4 +36,4 @@ Unspecified                      1 197           1
 
 
 Undetected flows:
-	1	TCP [3400:3a30:3035:2f75:706c:6f32:643f:6c3d]:44288 -> [302e::3d00:0:8001]:0 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Unrated][1 pkts/197 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan / No server to client traffic][PLAIN TEXT (005/uplo2)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP [3400:3a30:3035:2f75:706c:6f32:643f:6c3d]:44288 -> [302e::3d00:0:8001]:0 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Unrated][1 pkts/197 bytes -> 0 pkts/0 bytes][Goodput ratio: 75/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **][Risk Score: 60][Risk Info: TCP NULL scan;No server to client traffic][PLAIN TEXT (005/uplo2)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

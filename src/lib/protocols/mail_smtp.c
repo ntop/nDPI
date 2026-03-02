@@ -107,7 +107,8 @@ static void get_credentials_auth_plain(struct ndpi_detection_module_struct *ndpi
     if(1 + user_len + 1 < out_len) {
       unsigned int pwd_len;
 
-      pwd_len = ndpi_min(out_len - (1 + user_len + 1), sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password) - 1);
+      pwd_len = ndpi_min(out_len - (1 + user_len + 1),
+			 sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password) - 1);
       memcpy(flow->l4.tcp.ftp_imap_pop_smtp.password, out + 1 + user_len + 1, pwd_len);
       flow->l4.tcp.ftp_imap_pop_smtp.password[pwd_len] = '\0';
     }

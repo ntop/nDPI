@@ -46,6 +46,10 @@ RETVAL=$(( RETVAL + $? ))
 RETVAL=$(( RETVAL + $? ))
 ./tor_exit_nodes_ip_addresses_download.sh
 RETVAL=$(( RETVAL + $? ))
+./github_ip_addresses_download.sh
+RETVAL=$(( RETVAL + $? ))
+./github_domains_download.sh
+RETVAL=$(( RETVAL + $? ))
 
 ./asn_update.sh
 RETVAL=$(( RETVAL + $? ))

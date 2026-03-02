@@ -12,7 +12,7 @@ LIST_MERGED=/tmp/digitalocean.list_m
 ORIGIN="https://www.digitalocean.com/geo/google.csv"
 
 echo "(1) Downloading file... ${ORIGIN}"
-http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
+http_response=$(curl -L -s -o $LIST -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${LIST}"
 grep -v ':' "${LIST}" | cut -f 1 -d ',' > ${LIST4}

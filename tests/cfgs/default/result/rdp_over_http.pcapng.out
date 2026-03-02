@@ -1,6 +1,6 @@
 DPI Packets (TCP):	6	(6.00 pkts/flow)
 Confidence DPI              : 1 (flows)
-Num dissector calls: 162 (162.00 diss/flow)
+Num dissector calls: 161 (161.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -23,7 +23,7 @@ Hash malicious ja4:        0/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     1/1 (search/found)
 Hash public domain suffix: 0/0 (search/found)
-Hash ja4 custom protos:    0/0 (search/found)
+Hash ja4 custom protos:    1/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
 
@@ -33,4 +33,4 @@ Acceptable                      11 727           1
 
 RemoteAccess                    11 727           1            
 
-	1	TCP 192.168.10.2:50650 <-> 192.168.2.61:3389 [proto: 88/RDP][Stack: RDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: RemoteAccess/12][Breed: Acceptable][6 pkts/343 bytes <-> 5 pkts/384 bytes][Goodput ratio: 6/30][0.03 sec][bytes ratio: -0.056 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/4 9/9 4/4][Pkt Len c2s/s2c min/avg/max/stddev: 52/52 57/77 71/120 8/28][Risk: ** Desktop/File Sharing **** Probing Attempt **][Risk Score: 60][Risk Info: Mismatching client/server protocol / Found RDP][TCP Fingerprint: 194_64_65535_78dd6871cb6d/macOS][PLAIN TEXT (HTTP/1.1 500 Server Error)][Plen Bins: 33,33,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.10.2:50650 <-> 192.168.2.61:3389 [proto: 88/RDP][Stack: RDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: RemoteAccess/12][Breed: Acceptable][6 pkts/343 bytes <-> 5 pkts/384 bytes][Goodput ratio: 6/30][0.03 sec][bytes ratio: -0.056 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 4/4 9/9 4/4][Pkt Len c2s/s2c min/avg/max/stddev: 52/52 57/77 71/120 8/28][Risk: ** Desktop/File Sharing **** Probing Attempt **][Risk Score: 60][Risk Info: Mismatching client/server protocol;Found RDP][TCP Fingerprint: 194_64_65535_78dd6871cb6d/macOS][PLAIN TEXT (HTTP/1.1 500 Server Error)][Plen Bins: 33,33,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

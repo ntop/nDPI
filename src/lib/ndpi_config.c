@@ -42,20 +42,12 @@
 #include "third_party/include/windows/dirent.h"
 #endif
 
-enum cfg_param_type {
-  CFG_PARAM_ENABLE_DISABLE = 0,
-  CFG_PARAM_INT,
-  CFG_PARAM_PROTOCOL_ENABLE_DISABLE,
-  CFG_PARAM_FILENAME_CONFIG, /* We call ndpi_set_config() immediately for each row in it */
-  CFG_PARAM_FLOWRISK_ENABLE_DISABLE,
-};
-
 typedef ndpi_cfg_error (*cfg_set)(struct ndpi_detection_module_struct *ndpi_str,
                                   void *_variable, const char *value,
                                   const char *min_value, const char *max_value,
                                   const char *proto, const char *param);
 typedef char *(*cfg_get)(struct ndpi_detection_module_struct *ndpi_str, void *_variable, const char *proto, char *buf, int buf_len);
-typedef int (*cfg_calback)(struct ndpi_detection_module_struct *ndpi_str, void *_variable, const char *proto, const char *param);
+
 
 static ndpi_cfg_error _set_param_enable_disable(struct ndpi_detection_module_struct *ndpi_str,
 						void *_variable, const char *value,
@@ -114,16 +106,10 @@ static const struct cfg_op {
 
 #define __OFF(a)	offsetof(struct ndpi_detection_module_config_struct, a)
 
-static const struct cfg_param {
-  char *proto;
-  char *param;
-  char *default_value;
-  char *min_value;
-  char *max_value;
-  enum cfg_param_type type;
-  int offset;
-  cfg_calback fn_callback;
-} cfg_params[] = {
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+static
+#endif
+const struct cfg_param cfg_params[] = {
   /* Per-protocol parameters */
 
   { "http",          "metadata.req.content_type",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(http_request_content_type_enabled), NULL },
@@ -186,6 +172,7 @@ static const struct cfg_param {
 
   { "ssdp",          "metadata",                                "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ssdp_metadata_enabled), NULL },
 
+  { "ntp",           "metadata",                                "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ntp_metadata_enabled), NULL },
 
   { "dns",           "subclassification",                       "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_subclassification_enabled), NULL },
   { "dns",           "process_response",                        "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(dns_parse_response_enabled), NULL },
@@ -839,7 +826,7 @@ static AC_ERROR_t ac_walk_proto_id(AC_AUTOMATA_t *thiz, AC_NODE_t *n, int idx, v
     for(i=0; i<n->matched_patterns->num; i++) {
       AC_PATTERN_t *p = &n->matched_patterns->patterns[i];
 
-      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.number);
+      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.number, NULL);
     }
   }
 
@@ -860,7 +847,7 @@ static AC_ERROR_t ac_walk_category_id(AC_AUTOMATA_t *thiz, AC_NODE_t *n, int idx
     for(i=0; i<n->matched_patterns->num; i++) {
       AC_PATTERN_t *p = &n->matched_patterns->patterns[i];
 
-      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.category);
+      ndpi_hash_add_entry(&h, p->astring, strlen(p->astring), p->rep.category, NULL);
     }
   }
 

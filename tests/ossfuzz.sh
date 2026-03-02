@@ -40,12 +40,22 @@ if [[ "$SANITIZER" != "memory" ]]; then
 	unset AFL_NOOPT
 fi
 
+# Workaround for introspector builds.
+# See: google/oss-fuzz#13226.
+# See: https://github.com/ossf/fuzz-introspector/pull/2278
+# See: https://github.com/google/oss-fuzz/pull/14962
+if [[ "$SANITIZER" = "introspector" ]]; then
+  curl -O https://patch-diff.githubusercontent.com/raw/ossf/fuzz-introspector/pull/2278.patch
+  patch -p1 --directory=/fuzz-introspector/ < 2278.patch
+  export FUZZ_INTROSPECTOR_PARALLEL=false
+fi
+
 # build project
 cd ndpi
 #There are two workarounds:
 # * pcap stuff + --with-only-libndpi: for introspector builds. As reported in #8939, configure is not able to detect external libraries in introspector builds
 # * ADDITIONAL_* stuff: to be able run tests/unit/unit (via chronos/check_tests.sh) even with the previous workaround
-./autogen.sh && AR=llvm-ar RANLIB=llvm-ranlib LDFLAGS="-L/usr/local/lib -lpcap" ADDITIONAL_INCS="-I/usr/local/include/json-c/" ADDITIONAL_LIBS="-L/usr/local/lib -ljson-c" ./configure --disable-shared --enable-fuzztargets --enable-tls-sigs --with-only-libndpi
+./autogen.sh && AR=llvm-ar RANLIB=llvm-ranlib LDFLAGS="-L/usr/local/lib -lpcap" ADDITIONAL_INCS="-I/usr/local/include/json-c/" ADDITIONAL_LIBS="-L/usr/local/lib -ljson-c" ./configure --disable-shared --enable-fuzztargets --with-only-libndpi
 make -j$(nproc)
 # Copy fuzzers
 ls fuzz/fuzz* | grep -v "\." | while read -r i; do cp "$i" "$OUT"/; done

@@ -109,7 +109,6 @@
 #include "inc_generated/ndpi_asn_canonical.c.inc"
 #include "inc_generated/ndpi_asn_twitch.c.inc"
 #include "inc_generated/ndpi_asn_hotspotshield.c.inc"
-#include "inc_generated/ndpi_asn_github.c.inc"
 #include "inc_generated/ndpi_asn_steam.c.inc"
 #include "inc_generated/ndpi_asn_bloomberg.c.inc"
 #include "inc_generated/ndpi_asn_edgecast.c.inc"
@@ -142,6 +141,11 @@
 #include "inc_generated/ndpi_domains_aws_ec2_match.c.inc"
 #include "inc_generated/ndpi_domains_aws_emr_match.c.inc"
 #include "inc_generated/ndpi_domains_aws_s3_match.c.inc"
+#include "inc_generated/ndpi_github_match.c.inc"
+#include "inc_generated/ndpi_domains_github_match.c.inc"
+#include "inc_generated/ndpi_domains_github_copilot_match.c.inc"
+#include "inc_generated/ndpi_domains_github_packages_match.c.inc"
+#include "inc_generated/ndpi_domains_github_actions_match.c.inc"
 
 /* Third party libraries */
 #include "third_party/include/ndpi_patricia.h"
@@ -277,15 +281,13 @@ char *ndpi_get_proto_by_id(const struct ndpi_detection_module_struct *ndpi_str, 
 
 /* *********************************************************************************** */
 
-static void dissector_bitmask_set(struct ndpi_dissector_bitmask *b, u_int16_t bit)
-{
+static void dissector_bitmask_set(struct ndpi_dissector_bitmask *b, u_int16_t bit) {
   b->fds[bit / 32] |= (1ul << (bit % 32));
 }
 
 /* *********************************************************************************** */
 
-static int dissector_bitmask_is_set(const struct ndpi_dissector_bitmask *b, u_int16_t bit)
-{
+static int dissector_bitmask_is_set(const struct ndpi_dissector_bitmask *b, u_int16_t bit) {
   return b->fds[bit / 32] & (1ul << (bit % 32));
 }
 
@@ -1068,6 +1070,10 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
   self_check_host_match(ndpi_str, aws_ec2_host_match);
   self_check_host_match(ndpi_str, aws_emr_host_match);
   self_check_host_match(ndpi_str, aws_s3_host_match);
+  self_check_host_match(ndpi_str, github_host_match);
+  self_check_host_match(ndpi_str, githubcopilot_host_match);
+  self_check_host_match(ndpi_str, githubpackages_host_match);
+  self_check_host_match(ndpi_str, githubactions_host_match);
 
   for(i = 0; host_match[i].string_to_match != NULL; i++)
     init_app_protocol(ndpi_str, &host_match[i]);
@@ -1095,6 +1101,14 @@ static void init_string_based_protocols(struct ndpi_detection_module_struct *ndp
     init_app_protocol(ndpi_str, &aws_emr_host_match[i]);
   for(i = 0; aws_s3_host_match[i].string_to_match != NULL; i++)
     init_app_protocol(ndpi_str, &aws_s3_host_match[i]);
+  for(i = 0; github_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &github_host_match[i]);
+  for(i = 0; githubcopilot_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &githubcopilot_host_match[i]);
+  for(i = 0; githubpackages_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &githubpackages_host_match[i]);
+  for(i = 0; githubactions_host_match[i].string_to_match != NULL; i++)
+    init_app_protocol(ndpi_str, &githubactions_host_match[i]);
 
   /* ************************ */
 
@@ -1141,6 +1155,14 @@ static void load_string_based_protocols(struct ndpi_detection_module_struct *ndp
     load_protocol_match(ndpi_str, &aws_emr_host_match[i]);
   for(i = 0; aws_s3_host_match[i].string_to_match != NULL; i++)
     load_protocol_match(ndpi_str, &aws_s3_host_match[i]);
+  for(i = 0; github_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &github_host_match[i]);
+  for(i = 0; githubcopilot_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &githubcopilot_host_match[i]);
+  for(i = 0; githubpackages_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &githubpackages_host_match[i]);
+  for(i = 0; githubactions_host_match[i].string_to_match != NULL; i++)
+    load_protocol_match(ndpi_str, &githubactions_host_match[i]);
 
   /* ************************ */
 
@@ -3100,38 +3122,50 @@ int ndpi_get_patricia_stats(struct ndpi_detection_module_struct *ndpi_struct,
 
   switch(ptree_type) {
   case NDPI_PTREE_RISK_MASK:
-    if(!ndpi_struct->ip_risk_mask)
+    if(!ndpi_struct->ip_risk_mask) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->ip_risk_mask->v4, stats);
     return 0;
 
   case NDPI_PTREE_RISK_MASK6:
-    if(!ndpi_struct->ip_risk_mask)
+    if(!ndpi_struct->ip_risk_mask) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->ip_risk_mask->v6, stats);
     return 0;
 
   case NDPI_PTREE_RISK:
-    if(!ndpi_struct->ip_risk)
+    if(!ndpi_struct->ip_risk) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->ip_risk->v4, stats);
     return 0;
 
   case NDPI_PTREE_RISK6:
-    if(!ndpi_struct->ip_risk)
+    if(!ndpi_struct->ip_risk) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->ip_risk->v6, stats);
     return 0;
 
   case NDPI_PTREE_PROTOCOLS:
-    if(!ndpi_struct->protocols)
+    if(!ndpi_struct->protocols) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->protocols->v4, stats);
     return 0;
 
   case NDPI_PTREE_PROTOCOLS6:
-    if(!ndpi_struct->protocols)
+    if(!ndpi_struct->protocols) {
+      memset(stats, '\0', sizeof(*stats));
       return -1;
+    }
     ndpi_patricia_get_stats(ndpi_struct->protocols->v6, stats);
     return 0;
 
@@ -3586,19 +3620,48 @@ static void ndpi_init_ptree_ipv6(struct ndpi_detection_module_struct *ndpi_str,
 
 static int ndpi_add_ja4_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
 				    char *ja4, u_int16_t protocol_id) {
-  int ja4_len = strlen(ja4);
+  const u_int ja4_str_len = 36;  /* size of JA4C */
+  u_int ja4_len = strlen(ja4);
+  struct ndpi_tls_block *blocks = NULL;
+  u_int8_t num_tls_blocks;
 
-  if(ja4_len != 36  /* size of JA4C */) {
+  if(ja4_len == ja4_str_len) {
+    /* JA4 */
+    ja4_len = ja4_str_len;
+  } else if(ja4_len > ja4_str_len) {
+    /* JA4 with blocks */
+    if(ndpi_str->cfg.tls_max_num_blocks_to_analyze > 0) {
+      blocks = ndpi_decode_tls_blocks((const u_char*)&ja4[ja4_str_len+1 /* Skip divider */],
+				      ja4_len - ja4_str_len - 1, &num_tls_blocks);
+
+      if(blocks != NULL) {
+	if(num_tls_blocks < ndpi_str->cfg.tls_max_num_blocks_to_analyze) {
+	  /* Invalid blocks lenght (too short): discarding it */
+	  ndpi_free(blocks);
+	  blocks = NULL;
+	} else {
+	  /* We jeopardize the msec_delta field to store the protocol_id (*%*) */
+	  blocks[0].msec_delta = protocol_id;
+	}
+      }
+    } else {
+      NDPI_LOG_ERR(ndpi_str, "JA4C with TLS blocks when TLS blocks are disabled [%s]\n", ja4);
+      return(-1);
+    }
+
+    ja4_len = ja4_str_len;
+  } else {
     NDPI_LOG_ERR(ndpi_str, "Not a JA4C: [%s]\n", ja4);
-    return(-1);
+    return(-2);
   }
 
   if(ndpi_str->ja4_custom_protos == NULL) {
     if(ndpi_hash_init(&ndpi_str->ja4_custom_protos) != 0)
-      return(-2);
+      return(-3);
   }
 
-  return(ndpi_hash_add_entry(&ndpi_str->ja4_custom_protos, ja4, ja4_len, protocol_id));
+  return(ndpi_hash_add_entry(&ndpi_str->ja4_custom_protos,
+			     ja4, ja4_len, protocol_id, (void*)blocks));
 }
 
 /* ******************************************* */
@@ -3617,7 +3680,7 @@ static int ndpi_add_ndpifp_subprotocol(struct ndpi_detection_module_struct *ndpi
       return(-2);
   }
 
-  return(ndpi_hash_add_entry(&ndpi_str->ndpifp_custom_protos, ndpifp, ndpifp_len, protocol_id));
+  return(ndpi_hash_add_entry(&ndpi_str->ndpifp_custom_protos, ndpifp, ndpifp_len, protocol_id, NULL));
 }
 static int ndpi_add_tls_cert_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
                                           char *cert_pattern, 
@@ -3671,7 +3734,7 @@ static int ndpi_add_http_url_subprotocol(struct ndpi_detection_module_struct *nd
 
   id = (u_int64_t)(breed & 0xFFFF) << 32 | (category & 0xFFFF) << 16 | (protocol_id & 0xFFFF);
 
-  return(ndpi_hash_add_entry(&ndpi_str->http_url_hashmap, url, url_len, id));
+  return(ndpi_hash_add_entry(&ndpi_str->http_url_hashmap, url, url_len, id, NULL));
 }
 
 /* ******************************************* */
@@ -4538,10 +4601,6 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_hotspot_shield_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_hotspot_shield_protocol_list_6);
   }
-  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_GITHUB)) {
-    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_github_protocol_list);
-    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_github_protocol_list_6);
-  }
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_STEAM)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_steam_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_steam_protocol_list_6);
@@ -4621,6 +4680,10 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
   if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_BADOO)) {
     ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_badoo_protocol_list);
     ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_badoo_protocol_list_6);
+  }
+  if(is_ip_list_enabled(ndpi_str, NDPI_PROTOCOL_GITHUB)) {
+    ndpi_init_ptree_ipv4(ndpi_str->protocols->v4, ndpi_protocol_github_protocol_list);
+    ndpi_init_ptree_ipv6(ndpi_str, ndpi_str->protocols->v6, ndpi_protocol_github_protocol_list_6);
   }
 
   if(ndpi_str->cfg.flow_risk_lists_enabled) {
@@ -4795,9 +4858,6 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
     if(a && a->ac_automa)
       ac_automata_finalize((AC_AUTOMATA_t *) a->ac_automa);
   }
-
-  if(ndpi_str->cfg.tls_max_num_blocks_to_analyze > 0)
-    ndpi_str->skip_tls_blocks_until_change_cipher = 1;
 
   if(ndpi_str->cfg.track_payload_enabled)
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
@@ -6480,7 +6540,7 @@ int load_malicious_ja4_file_fd(struct ndpi_detection_module_struct *ndpi_str, FI
       continue;
     }
 
-    if(ndpi_hash_add_entry(&ndpi_str->malicious_ja4_hashmap, line, len, 0) == 0)
+    if(ndpi_hash_add_entry(&ndpi_str->malicious_ja4_hashmap, line, len, 0, NULL) == 0)
       num++;
   }
 
@@ -6559,7 +6619,7 @@ int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, F
       first_comma[i] = toupper(first_comma[i]);
 
     if(ndpi_hash_add_entry(&ndpi_str->malicious_sha1_hashmap, first_comma,
-			   second_comma - first_comma, 0) == 0)
+			   second_comma - first_comma, 0, NULL) == 0)
       num++;
   }
 
@@ -7036,9 +7096,6 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* DIAMETER */
   init_diameter_dissector(ndpi_str);
-
-  /* APPLE_PUSH */
-  init_apple_push_dissector(ndpi_str);
 
   /* EAQ */
   init_eaq_dissector(ndpi_str);
@@ -7934,29 +7991,8 @@ void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
       if(flow->protos.ssdp.location)
         ndpi_free(flow->protos.ssdp.location);
 
-      if(flow->protos.ssdp.household_smart_speaker_audio)
-        ndpi_free(flow->protos.ssdp.household_smart_speaker_audio);
-
-      if(flow->protos.ssdp.rincon_household)
-        ndpi_free(flow->protos.ssdp.rincon_household);
-
-      if(flow->protos.ssdp.rincon_bootseq)
-        ndpi_free(flow->protos.ssdp.rincon_bootseq);
-
-      if(flow->protos.ssdp.rincon_wifimode)
-        ndpi_free(flow->protos.ssdp.rincon_wifimode);
-
-      if(flow->protos.ssdp.rincon_variant)
-        ndpi_free(flow->protos.ssdp.rincon_variant);
-
-      if(flow->protos.ssdp.sonos_securelocation)
-        ndpi_free(flow->protos.ssdp.sonos_securelocation);
-
       if(flow->protos.ssdp.securelocation_upnp)
         ndpi_free(flow->protos.ssdp.securelocation_upnp);
-
-      if(flow->protos.ssdp.location_smart_speaker_audio)
-        ndpi_free(flow->protos.ssdp.location_smart_speaker_audio);
 
       if(flow->protos.ssdp.nt)
         ndpi_free(flow->protos.ssdp.nt);
@@ -9253,7 +9289,7 @@ static void check_probing_attempt(struct ndpi_detection_module_struct *ndpi_str,
       if(tdiff_ms > 1500 /* 1.5 sec */) {
 	char buf[64];
 
-	snprintf(buf, sizeof(buf), "Slow TCP 3WH (SYN|ACK):  %.1f sec", tdiff_ms/1000.);
+	snprintf(buf, sizeof(buf), "Slow TCP 3WH (SYN_ACK): %.1f sec", tdiff_ms/1000.);
 	ndpi_set_risk(ndpi_str, flow, NDPI_SLOW_DOS, buf);
       }
     }
@@ -9267,7 +9303,7 @@ static void check_probing_attempt(struct ndpi_detection_module_struct *ndpi_str,
       if(tdiff_ms > 1500 /* 1.5 sec */) {
 	char buf[64];
 
-	snprintf(buf, sizeof(buf), "Slow TCP 3WH (ACK):  %.1f sec", tdiff_ms/1000.);
+	snprintf(buf, sizeof(buf), "Slow TCP 3WH (ACK): %.1f sec", tdiff_ms/1000.);
 	ndpi_set_risk(ndpi_str, flow, NDPI_SLOW_DOS, buf);
       }
     }
@@ -9379,7 +9415,7 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow) {
 
   if(flow->already_gaveup) {
-    NDPI_LOG_ERR(ndpi_struct, "Already called!\n"); /* We shoudn't be here ...*/
+    NDPI_LOG_ERR(ndpi_struct, "%s() - Already called!\n", __FUNCTION__); /* We shoudn't be here ...*/
     return;
   }
   flow->already_gaveup = 1;
@@ -10030,14 +10066,7 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
     packet->usn.ptr = NULL, packet->usn.len = 0;
     packet->cache_controle.ptr = NULL, packet->cache_controle.len = 0;
     packet->location.ptr = NULL, packet->location.len = 0;
-    packet->household_smart_speaker_audio.ptr = NULL, packet->household_smart_speaker_audio.len = 0;
-    packet->rincon_household.ptr = NULL, packet->rincon_household.len = 0;
-    packet->rincon_bootseq.ptr = NULL, packet->rincon_bootseq.len = 0;
-    packet->rincon_wifimode.ptr = NULL, packet->rincon_wifimode.len = 0;
-    packet->rincon_variant.ptr = NULL, packet->rincon_variant.len = 0;
-    packet->sonos_securelocation.ptr = NULL, packet->sonos_securelocation.len = 0;
     packet->securelocation_upnp.ptr = NULL, packet->securelocation_upnp.len = 0;
-    packet->location_smart_speaker_audio.ptr = NULL, packet->location_smart_speaker_audio.len = 0;
     packet->nt.ptr = NULL, packet->nt.len = 0;
     packet->nts.ptr = NULL, packet->nts.len = 0;
     packet->man.ptr = NULL, packet->man.len = 0;
@@ -10862,14 +10891,8 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
   struct header_line headers_o[] = { { "Origin:", &packet->http_origin },
                                      { NULL, NULL} };
   struct header_line headers_h[] = { { "Host:", &packet->host_line },
-                                     { "HOUSEHOLD.SMARTSPEAKER.AUDIO:", &packet->household_smart_speaker_audio },
                                      { NULL, NULL} };
   struct header_line headers_x[] = { { "X-Forwarded-For:", &packet->forwarded_line },
-                                     { "X-RINCON-HOUSEHOLD:", &packet->rincon_household },
-                                     { "X-RINCON-BOOTSEQ:", &packet->rincon_bootseq },
-                                     { "X-RINCON-WIFIMODE:", &packet->rincon_wifimode },
-                                     { "X-RINCON-VARIANT:", &packet->rincon_variant },
-                                     { "X-SONOS-HHSECURELOCATION:", &packet->sonos_securelocation },
                                      { NULL, NULL} };
   struct header_line headers_r[] = { { "Referer:", &packet->referer_line },
                                      { NULL, NULL} };
@@ -10878,7 +10901,6 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
                                      { "ST", &packet->st },
                                      { NULL, NULL} };
   struct header_line headers_l[] = { { "LOCATION:", &packet->location },
-                                     { "LOCATION.SMARTSPEAKER.AUDIO:", &packet->location_smart_speaker_audio },
                                      { NULL, NULL}};
   struct header_line headers_m[] = { { "MAN:", &packet->man },
                                      { "MX:", &packet->mx },
@@ -11455,13 +11477,6 @@ static void ndpi_int_change_protocol(struct ndpi_flow_struct *flow,
     lower_detected_protocol = NDPI_PROTOCOL_UNKNOWN;
 
   ndpi_int_change_flow_protocol(flow, upper_detected_protocol, lower_detected_protocol, confidence);
-}
-
-/* ********************************************************************************* */
-
-void change_category(struct ndpi_flow_struct *flow,
-		     ndpi_protocol_category_t protocol_category) {
-  flow->category = protocol_category;
 }
 
 /* ********************************************************************************* */
@@ -12345,16 +12360,17 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
 				      ndpi_protocol_match_result *ret_match,
 				      u_int16_t master_protocol_id,
 				      int update_flow_classification) {
-  u_int16_t rc, string_to_match_len;
+  u_int16_t rc, string_to_match_len, bkp_len;
+  int ret;
   ndpi_protocol_category_t category;
   ndpi_protocol_breed_t breed;
-  char buf[256], *string_to_match;
+  char buf[256], *string_to_match, *bkp;
 
   if(!ndpi_str) return(-1);
 
   snprintf(buf, sizeof(buf), "%.*s", _string_to_match_len, _string_to_match);
-  string_to_match = buf;
-  string_to_match_len = strlen(string_to_match);
+  string_to_match = bkp = buf;
+  string_to_match_len = bkp_len = strlen(string_to_match);
   memset(ret_match, 0, sizeof(*ret_match));
 
   /* Match host first... */
@@ -12369,8 +12385,16 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
   category = ret_match->protocol_category;
   breed = ret_match->protocol_breed;
 
-  if(ndpi_get_custom_category_match(ndpi_str, string_to_match,
-				    string_to_match_len, &category, &breed) != -1) {
+  ret = ndpi_get_custom_category_match(ndpi_str, string_to_match, string_to_match_len, &category, &breed);
+  if((ret == -1) /* Luck yet */
+     && (ndpi_str->public_domain_suffixes != NULL /* Domains loaded */)
+     && (bkp_len != string_to_match_len /* domain != _string_to_match */)
+     ) {
+    /* As very last resort we try with the original name and not with the domain */
+    ret = ndpi_get_custom_category_match(ndpi_str, bkp, bkp_len, &category, &breed);
+  }
+
+  if(ret != -1) {
     ret_match->protocol_category = category;
     ret_match->protocol_breed = breed;
     rc = master_protocol_id;

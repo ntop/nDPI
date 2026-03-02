@@ -837,7 +837,7 @@ typedef enum {
   tls_unknown = 0,
   tls_change_cipher,
   tls_alert,
-  tls_handshake_hello_request,
+  tls_handshake_encrypted_message,
   tls_handshake_client_hello,
   tls_handshake_server_hello,
   tls_handshake_new_session_ticket,
@@ -853,12 +853,14 @@ typedef enum {
   tls_heartbeat,
 } ndpi_tls_block_type;
 
+PACK_ON
 struct ndpi_tls_block {
   u_int8_t block_type /* ndpi_tls_block_type */;
-  u_int8_t same_pkt:1, _unused:7;
   int16_t len; /* + = src->dst, - = dst->src */
-  u_int16_t msec_delta;
-};
+  /* Optional, leave it at the end */
+  u_int8_t same_pkt:1, _unused:7;
+  u_int16_t msec_delta; /* Used to store protocol_id in ja4 hash */
+} PACK_OFF;
 
 struct ndpi_flow_tcp_struct {
   struct {
@@ -885,7 +887,7 @@ struct ndpi_flow_tcp_struct {
   struct {
     /* NDPI_PROTOCOL_TLS */
     u_int8_t app_data_seen[2];
-    u_int8_t num_tls_blocks, num_processed_tls_blocks /* used internally for dissection */;
+    u_int8_t num_tls_blocks /* used internally for dissection */;
     u_int64_t last_tls_block_time_ms;
     struct ndpi_tls_block *tls_blocks; /* ndpi_struct->cfg.tls_num_blocks_analyzed */
   } tls;
@@ -1054,6 +1056,9 @@ struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_TFTP */
   u_int16_t tftp_data_num;
   u_int16_t tftp_ack_num;
+
+  /* NDPI_PROTOCOL_NTP*/
+  u_int8_t ntp_stage;
 };
 
 /* ************************************************** */
@@ -1305,6 +1310,11 @@ typedef struct _ndpi_automa {
   struct ndpi_automa_stats stats;
 } ndpi_automa;
 
+typedef struct ndpi_list_struct {
+  char *value;
+  struct ndpi_list_struct *next;
+} ndpi_list;
+
 typedef struct ndpi_str_hash {
   void *priv;
   struct ndpi_str_hash_stats stats;
@@ -1380,7 +1390,7 @@ typedef enum {
 } ndpi_cipher_weakness;
 
 #define MAX_NUM_TLS_SIGNATURE_ALGORITHMS 16
-#define MAX_NUM_DNS_RSP_ADDRESSES         4
+#define MAX_NUM_DNS_RSP_ADDRESSES         8
 
 typedef struct {
   union {
@@ -1703,7 +1713,7 @@ struct ndpi_flow_struct {
 
   struct {
     message_t message[2]; /* Directions */
-    u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, pad:3;
+    u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
     struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
   } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
@@ -1722,10 +1732,14 @@ struct ndpi_flow_struct {
       char ptr_domain_name[64 /* large enough but smaller than { } tls */];
     } dns;
 
-    struct {
-      u_int8_t version;
-      u_int8_t mode;
-    } ntp;
+    struct ntp_info {
+      u_int8_t leap_indicator: 2, version: 3, mode: 3;
+      u_int8_t stratum;
+      int8_t ppol, precision;
+      float root_delay, root_dispersion;
+      char ref_id[20];
+      uint64_t ref_time, org_time, rec_time, trans_time;
+    } ntp[2];
 
     struct {
       char hostname[48], domain[48], username[48];
@@ -1750,12 +1764,6 @@ struct ndpi_flow_struct {
       u_int8_t sha1_certificate_fingerprint[20];
       u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1,
 	server_hello_processed:1, fingerprint_set:1, webrtc:1;
-
-#ifdef TLS_HANDLE_SIGNATURE_ALGORITMS
-      /* Under #ifdef to save memory for those who do not need them */
-      u_int8_t num_tls_signature_algorithms;
-      u_int16_t client_signature_algorithms[MAX_NUM_TLS_SIGNATURE_ALGORITHMS];
-#endif
 
       struct tls_heuristics browser_heuristics;
       u_int16_t ssl_version, server_names_len;

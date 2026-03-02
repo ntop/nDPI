@@ -570,9 +570,6 @@ static void configure_ndpi(struct ndpi_detection_module_struct *ndpi_struct) {
     }
   }
 
-  if(_protoFilePath != NULL)
-    ndpi_load_protocols_file(ndpi_struct, _protoFilePath);
-
   ndpi_set_config(ndpi_struct, NULL, "tcp_ack_payload_heuristic", "enable");
 
   for(i = 0; i < num_cfgs; i++) {
@@ -584,6 +581,9 @@ static void configure_ndpi(struct ndpi_detection_module_struct *ndpi_struct) {
               cfgs[i].param, cfgs[i].value, ndpi_cfg_error2string(rc), rc);
     }
   }
+
+  if(_protoFilePath != NULL)
+    ndpi_load_protocols_file(ndpi_struct, _protoFilePath);
 
   if(enable_doh_dot_detection)
     ndpi_set_config(ndpi_struct, "tls", "application_blocks_tracking", "enable");
@@ -2651,7 +2651,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
     if((flow->tls.num_blocks > 0) && (flow->tls.blocks != NULL)) {
       int i;
-
+      u_char *enc = ndpi_encode_tls_blocks(flow->tls.blocks, flow->tls.num_blocks);
+      
       fprintf(out, "[TLS blocks: ");
 
       for(i=0; i<flow->tls.num_blocks; i++)
@@ -2659,7 +2660,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 		ndpi_print_encoded_tls_block_type(flow->tls.blocks[i].block_type, true),
 		flow->tls.blocks[i].len);
 
-      fprintf(out, "]");
+      fprintf(out, "][%s]", enc ? (char*)enc : "");
+
+      if(enc) ndpi_free(enc);
     }
 
     if(flow->flow_payload && (flow->flow_payload_len > 0)) {
@@ -5334,6 +5337,18 @@ static void ndpi_process_packet(u_char *args,
   }
 }
 
+
+#define timespec_diff_macro(a, b, result)             \
+  do {                                                \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;     \
+    (result)->tv_nsec = (a)->tv_nsec - (b)->tv_nsec;  \
+    if ((result)->tv_nsec < 0) {                      \
+      --(result)->tv_sec;                             \
+      (result)->tv_nsec += 1000000000;                \
+    }                                                 \
+  } while (0)
+
+
 #ifndef USE_DPDK
 /**
  * @brief Call pcap_loop() to process packets from a live capture or savefile
@@ -5341,6 +5356,25 @@ static void ndpi_process_packet(u_char *args,
 static void runPcapLoop(u_int16_t thread_id) {
   if((!shutdown_app) && (ndpi_thread_info[thread_id].workflow->pcap_handle != NULL)) {
     int datalink_type = pcap_datalink(ndpi_thread_info[thread_id].workflow->pcap_handle);
+    int ret;
+    int perf_ctl_fd = -1;
+    int perf_ctl_ack_fd = -1;
+    char ack[5];
+    char *env;
+#ifdef PRINT_RUNTIME
+    struct timespec start, end, diff;
+#endif
+
+   /* Enable perf only for "runtime" functions, not for initialization phase.
+      See: example/perf.sh */
+    if(num_threads == 1) {
+      env = getenv("PERF_CTL_FD");
+      if(env)
+        perf_ctl_fd = atoi(env);
+      env = getenv("PERF_CTL_ACK_FD");
+      if(env)
+        perf_ctl_ack_fd =atoi(env);
+    }
 
     /* When using as extcap interface, the output/dumper pcap must have the same datalink
        type of the input traffic [to be able to use, for example, input pcaps with
@@ -5356,9 +5390,41 @@ static void runPcapLoop(u_int16_t thread_id) {
       printf("Unsupported datalink %d. Skip pcap\n", datalink_type);
       return;
     }
-    int ret = pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &ndpi_process_packet, (u_char*)&thread_id);
+
+    if(perf_ctl_fd != -1 && perf_ctl_ack_fd != -1) {
+      /* Start the performance counter and read the ack */
+      ret = write(perf_ctl_fd, "enable\n", 8);
+      assert(ret >= 0);
+      ret = read(perf_ctl_ack_fd, ack, 5);
+      assert(ret >= 0);
+      assert(strcmp(ack, "ack\n") == 0);
+    }
+
+#ifdef PRINT_RUNTIME
+    clock_gettime(CLOCK_MONOTONIC, &start);
+#endif
+
+    ret = pcap_loop(ndpi_thread_info[thread_id].workflow->pcap_handle, -1, &ndpi_process_packet, (u_char*)&thread_id);
     if (ret == -1)
       printf("Error while reading pcap file: '%s'\n", pcap_geterr(ndpi_thread_info[thread_id].workflow->pcap_handle));
+
+#ifdef PRINT_RUNTIME
+    clock_gettime(CLOCK_MONOTONIC, &end);
+#endif
+
+    if(perf_ctl_fd != -1 && perf_ctl_ack_fd != -1) {
+      /* Stop the performance counter and read the ack */
+      ret = write(perf_ctl_fd, "disable\n", 9);
+      assert(ret >= 0);
+      ret = read(perf_ctl_ack_fd, ack, 5);
+      assert(ret >= 0);
+      assert(strcmp(ack, "ack\n") == 0);
+    }
+
+#ifdef PRINT_RUNTIME
+    timespec_diff_macro(&end, &start, &diff);
+    printf("(Run-)Time: %ld.%ld\n", diff.tv_sec, diff.tv_nsec);
+#endif
   }
 }
 #endif
@@ -5806,6 +5872,16 @@ void automataDomainsUnitTest() {
 #endif
 
 /* *********************************************** */
+  
+void blocksUnitTest() {
+  struct ndpi_tls_block a[] = { { 4, 1590, 0, 1, 0}, { 5, -1212, 0, 1, 0}, { 1, -1, 0, 1, 0}, { 16, -42, 0, 1, 0}, { 16, -53, 0, 1, 0}  };
+  struct ndpi_tls_block b[] = { { 4, 1590, 0, 1, 0}, { 5, -1212, 0, 1, 0}, { 1, -1, 0, 1, 0}, { 16, -42, 0, 1, 0}, { 16, -52, 0, 1, 0}  };
+  float ret = ndpi_tls_blocks_len_compare(a, b, 5 /* num_blocks */);
+
+  assert(ret == 1.0);
+}
+
+/* *********************************************** */
 
 // #define RUN_DATA_ANALYSIS_THEN_QUIT 1
 
@@ -5988,7 +6064,7 @@ void hashUnitTest() {
     u_int8_t l = strlen(dict[i]);
     u_int64_t v;
 
-    assert(ndpi_hash_add_entry(&h, dict[i], l, i) == 0);
+    assert(ndpi_hash_add_entry(&h, dict[i], l, i, NULL) == 0);
     assert(ndpi_hash_find_entry(h, dict[i], l, &v) == 0);
     assert(v == i);
   }
@@ -6995,7 +7071,7 @@ void cryptDecryptUnitTest() {
 
 /* *********************************************** */
 
-void encodeDomainsUnitTest() {
+void encodeDomainsUnitTest(bool load_suffix_list) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
   const char *lists_path = "../lists/public_suffix_list.dat";
   char *lists_dir = "../lists";
@@ -7011,14 +7087,18 @@ void encodeDomainsUnitTest() {
     ndpi_protocol_category_t id;
     ndpi_protocol_breed_t breed;
 
-    assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
+    if(load_suffix_list)
+      assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
 
     ndpi_get_host_domain_suffix(ndpi_str, "lcb.it", &suffix_id);
     ndpi_get_host_domain_suffix(ndpi_str, "www.ntop.org", &suffix_id);
     ndpi_get_host_domain_suffix(ndpi_str, "www.bbc.co.uk", &suffix_id);
 
-    str = (char*)"www.ntop.org"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
-    str = (char*)"www.bbc.co.uk"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
+    if(load_suffix_list) {
+      /* The encoding is different with or without the suffix list */
+      str = (char*)"www.ntop.org"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
+      str = (char*)"www.bbc.co.uk"; assert(ndpi_encode_domain(ndpi_str, str, out, sizeof(out)) == 8);
+    }
 
     assert(ndpi_load_categories_dir(ndpi_str, lists_dir));
     assert(ndpi_load_categories_file(ndpi_str, categories_path, "categories.txt"));
@@ -7030,6 +7110,16 @@ void encodeDomainsUnitTest() {
     str = (char*)"10bet.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 107);
     str = (char*)"www.ntop.org"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1); assert(id == 0);
     str = (char*)"lifyqyi.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == 100);
+    str = (char*)"xhamster.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == NDPI_PROTOCOL_CATEGORY_ADULT_CONTENT);
+    str = (char*)"a.xhamster.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == NDPI_PROTOCOL_CATEGORY_ADULT_CONTENT);
+    str = (char*)"a.xhamster.com.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
+    str = (char*)"a.xhamster.com.a"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
+    str = (char*)"gateway.unityads.unity3d.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == NDPI_PROTOCOL_CATEGORY_ADVERTISEMENT);
+    str = (char*)"unityads.unity3d.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == 0); assert(id == NDPI_PROTOCOL_CATEGORY_ADVERTISEMENT);
+    str = (char*)"unity3d.com"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
+
+    str = (char*)"something.arpa"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
+    str = (char*)"something.local"; assert(ndpi_get_custom_category_match(ndpi_str, str, strlen(str), &id, &breed) == -1);
   }
 
   ndpi_exit_detection_module(ndpi_str);
@@ -7338,7 +7428,7 @@ int main(int argc, char **argv) {
   checkRankingUnitTest(true);
   exit(0);
 #endif
-
+ 
 #ifdef DEBUG_TRACE
   trace = fopen("/tmp/ndpiReader.log", "a");
 
@@ -7376,7 +7466,9 @@ int main(int argc, char **argv) {
     domainCacheTestUnit();
     cryptDecryptUnitTest();
     kdUnitTest();
-    encodeDomainsUnitTest();
+    /* We want the same results, with and without the public suffix list */
+    encodeDomainsUnitTest(true);
+    encodeDomainsUnitTest(false);
     loadStressTest();
     domainsUnitTest();
     outlierUnitTest();
@@ -7389,7 +7481,7 @@ int main(int argc, char **argv) {
     zscoreUnitTest();
     sesUnitTest();
     desUnitTest();
-
+    blocksUnitTest();
     /* Internal checks */
     // binUnitTest();
     //hwUnitTest();

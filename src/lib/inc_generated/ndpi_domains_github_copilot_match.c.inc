@@ -20,17 +20,8 @@
 /* ****************************************************** */
 
 
-static ndpi_network ndpi_protocol_github_protocol_list[] = {
- { 0x8C527000 /* 140.82.112.0/20 */, 20, NDPI_PROTOCOL_GITHUB },
- { 0x8F374000 /* 143.55.64.0/20 */, 20, NDPI_PROTOCOL_GITHUB },
- { 0xC01EFC00 /* 192.30.252.0/22 */, 22, NDPI_PROTOCOL_GITHUB },
- /* End */
- { 0x0, 0, 0 }
-};
-
-static ndpi_network6 ndpi_protocol_github_protocol_list_6[] = {
- { "2620:112:3000::", 44, NDPI_PROTOCOL_GITHUB },
- { "2a0a:a440::", 29, NDPI_PROTOCOL_GITHUB },
- /* End */
- { NULL, 0, 0 }
+static ndpi_protocol_match githubcopilot_host_match[] = {
+ { "default.exp-tas.com", "GithubCopilot", NDPI_PROTOCOL_GITHUB_COPILOT, NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+ { "githubcopilot.com", "GithubCopilot", NDPI_PROTOCOL_GITHUB_COPILOT, NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+ { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL }
 };

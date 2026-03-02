@@ -22,7 +22,7 @@ Patricia protocols IPv6: 0/0 (search/found)
 Hash malicious ja4:        0/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     1/1 (search/found)
-Hash public domain suffix: 0/0 (search/found)
+Hash public domain suffix: 7/7 (search/found)
 Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
 Hash url custom protos:    1/0 (search/found)
@@ -33,4 +33,4 @@ Acceptable                      10 993           1
 
 Download                        10 993           1            
 
-	1	TCP 192.168.2.198:51327 <-> 89.31.76.10:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Download/7][Breed: Acceptable][6 pkts/490 bytes <-> 4 pkts/503 bytes][Goodput ratio: 17/46][0.12 sec][Hostname/SNI: sevenpitaly.com][bytes ratio: -0.013 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/22 45/43 20/22][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 82/126 148/297 30/99][URL: sevenpitaly.com/.env][StatusCode: 406][Content-Type: application/octet-stream][Server: openresty][User-Agent: curl/8.4.0][Risk: ** Possible Exploit Attempt **** Error Code **** Binary File/Data Transfer (Attempt) **][Risk Score: 210][Risk Info: Found binary mime octet-stream (attempt) / HTTP Error Code 406 / URL starting with dot [/.env]][TCP Fingerprint: 2_64_65535_d29295416479/macOS][PLAIN TEXT (GET /.env HTTP/1.1)][Plen Bins: 0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.2.198:51327 <-> 89.31.76.10:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Download/7][Breed: Acceptable][6 pkts/490 bytes <-> 4 pkts/503 bytes][Goodput ratio: 17/46][0.12 sec][Hostname/SNI: sevenpitaly.com][bytes ratio: -0.013 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 24/22 45/43 20/22][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 82/126 148/297 30/99][URL: sevenpitaly.com/.env][StatusCode: 406][Content-Type: application/octet-stream][Server: openresty][User-Agent: curl/8.4.0][Risk: ** Possible Exploit Attempt **** Error Code **** Binary File/Data Transfer (Attempt) **][Risk Score: 210][Risk Info: Found binary mime octet-stream (attempt);HTTP Error Code 406;URL starting with dot [/.env]][TCP Fingerprint: 2_64_65535_d29295416479/macOS][PLAIN TEXT (GET /.env HTTP/1.1)][Plen Bins: 0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

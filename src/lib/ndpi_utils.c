@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <math.h>
 #include <sys/types.h>
+#include <time.h>
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
@@ -73,10 +74,41 @@ struct pcre2_struct {
 typedef struct {
   char *key;
   u_int64_t value64;
+  ndpi_list value_list;
   UT_hash_handle hh;
 } ndpi_str_hash_priv;
 
+typedef struct {
+  uint32_t seconds;
+  uint32_t fraction;
+} ntp_t;
+
+#define NTP_DELTA 2208988800UL
+
 /* ****************************************** */
+
+// https://tickelton.gitlab.io/articles/ntp-timestamps/
+void ntp_ts_to_string(uint64_t timestamp, char *buffer, size_t buffer_size) {
+
+  if (timestamp == 0) {
+    buffer[0] = '\0';
+    return;
+  }
+
+  ntp_t ntp;
+
+  memcpy(&ntp, &timestamp, sizeof(uint64_t));
+
+  time_t sec = ntohl(ntp.seconds) - NTP_DELTA;
+  uint32_t usec = (uint32_t)((double)ntohl(ntp.fraction) * 1.0e9 / (double)(1LL << 32));
+
+  struct tm tm;
+
+  (void)ndpi_gmtime_r(&sec, &tm);
+  size_t offset = strftime(buffer, buffer_size, "%Y-%m-%d %H:%M:%S", &tm);
+  snprintf(buffer + offset, buffer_size - offset, ".%d", usec);
+}
+
 
 /* implementation of the punycode check function */
 int ndpi_check_punycode_string(char * buffer , int len) {
@@ -1079,15 +1111,15 @@ char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
 /* ********************************** */
 
 /* NOTE: caller MUST free returned pointer */
-char* ndpi_hex_encode(unsigned char const* bytes_to_encode, size_t in_len) {
+u_char* ndpi_hex_encode(unsigned char const* bytes_to_encode, size_t in_len) {
   size_t double_len = in_len * 2;
-  char *ret = (char*)ndpi_malloc(double_len+1);
+  u_char *ret = (u_char*)ndpi_malloc(double_len+1);
 
   if(ret != NULL) {
     u_int i, ret_idx = 0;
 
     for(i=0; i<in_len; i++) {
-      sprintf(&ret[ret_idx], "%02x", bytes_to_encode[i]);
+      sprintf((char*)&ret[ret_idx], "%02x", bytes_to_encode[i]);
       ret_idx += 2;
     }
 
@@ -1626,8 +1658,30 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_NTP:
     ndpi_serialize_start_of_block(serializer, "ntp");
-    ndpi_serialize_string_uint32(serializer, "version", flow->protos.ntp.version);
-    ndpi_serialize_string_uint32(serializer, "mode", flow->protos.ntp.mode);
+    for (i = 0; i < 2; i++) {
+      ndpi_serialize_start_of_block_uint32(serializer,i);
+      ndpi_serialize_string_uint32(serializer, "leap_indicator", flow->protos.ntp[i].leap_indicator);
+      ndpi_serialize_string_uint32(serializer, "version", flow->protos.ntp[i].version);
+      ndpi_serialize_string_uint32(serializer, "mode", flow->protos.ntp[i].mode);
+      ndpi_serialize_string_uint32(serializer, "stratum", flow->protos.ntp[i].stratum);
+      ndpi_serialize_string_int32(serializer, "ppol", flow->protos.ntp[i].ppol);
+      ndpi_serialize_string_int32(serializer, "precision", flow->protos.ntp[i].precision);
+      ndpi_serialize_string_float(serializer, "root_delay", flow->protos.ntp[i].root_delay, "%f");
+      ndpi_serialize_string_float(serializer, "root_dispersion", flow->protos.ntp[i].root_dispersion, "%f");
+      ndpi_serialize_string_string(serializer, "ref_id", flow->protos.ntp[i].ref_id);
+
+
+      char timestamp[64];
+      ntp_ts_to_string(flow->protos.ntp[i].ref_time, timestamp, sizeof timestamp);
+      ndpi_serialize_string_string(serializer, "ref_time", timestamp);
+      ntp_ts_to_string(flow->protos.ntp[i].org_time, timestamp, sizeof timestamp);
+      ndpi_serialize_string_string(serializer, "org_time", timestamp);
+      ntp_ts_to_string(flow->protos.ntp[i].rec_time, timestamp, sizeof timestamp);
+      ndpi_serialize_string_string(serializer, "rec_time", timestamp);
+      ntp_ts_to_string(flow->protos.ntp[i].trans_time, timestamp, sizeof timestamp);
+      ndpi_serialize_string_string(serializer, "trans_time", timestamp);
+      ndpi_serialize_end_of_block(serializer);
+    }
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -1858,40 +1912,8 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_serialize_string_string(serializer, "USN", flow->protos.ssdp.usn);
     }
 
-    if (flow->protos.ssdp.rincon_household) {
-      ndpi_serialize_string_string(serializer, "X-RINCON-HOUSEHOLD", flow->protos.ssdp.rincon_household);
-    }
-
-    if (flow->protos.ssdp.rincon_bootseq) {
-      ndpi_serialize_string_string(serializer, "X-RINCON-BOOTSEQ", flow->protos.ssdp.rincon_bootseq);
-    }
-
-    if (flow->protos.ssdp.bootid) {
-      ndpi_serialize_string_string(serializer, "BOOTID.UPNP.ORG", flow->protos.ssdp.bootid);
-    }
-
-    if (flow->protos.ssdp.rincon_wifimode) {
-      ndpi_serialize_string_string(serializer, "X-RINCON-WIFIMODE", flow->protos.ssdp.rincon_wifimode);
-    }
-
-    if (flow->protos.ssdp.rincon_variant) {
-      ndpi_serialize_string_string(serializer, "X-RINCON-VARIANT", flow->protos.ssdp.rincon_variant);
-    }
-
-    if (flow->protos.ssdp.household_smart_speaker_audio) {
-      ndpi_serialize_string_string(serializer, "HOUSEHOLD.SMARTSPEAKER.AUDIO", flow->protos.ssdp.household_smart_speaker_audio);
-    }
-
-    if (flow->protos.ssdp.location_smart_speaker_audio) {
-      ndpi_serialize_string_string(serializer, "LOCATION.SMARTSPEAKER.AUDIO", flow->protos.ssdp.location_smart_speaker_audio);
-    }
-
     if (flow->protos.ssdp.securelocation_upnp) {
       ndpi_serialize_string_string(serializer, "SECURELOCATION.UPNP.ORG", flow->protos.ssdp.securelocation_upnp);
-    }
-
-    if (flow->protos.ssdp.sonos_securelocation) {
-      ndpi_serialize_string_string(serializer, "X-SONOS-HHSECURELOCATION", flow->protos.ssdp.sonos_securelocation);
     }
 
     if (flow->protos.ssdp.man) {
@@ -3117,7 +3139,9 @@ void ndpi_hash_free(ndpi_str_hash **h) {
 
 /* ******************************************************************** */
 
-int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int64_t *value) {
+int ndpi_hash_find_entry_extra(ndpi_str_hash *h, const char *key, u_int key_len,
+			       u_int64_t *value /* out */,
+			       ndpi_list **extra_data /* out */) {
   ndpi_str_hash_priv *h_priv;
   ndpi_str_hash_priv *item;
 
@@ -3133,6 +3157,9 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int64_t *
     if(value != NULL)
       *value = item->value64;
 
+    if(extra_data != NULL)
+      *extra_data = &item->value_list;
+
     h->stats.n_found++;
     return 0;
   } else
@@ -3141,7 +3168,15 @@ int ndpi_hash_find_entry(ndpi_str_hash *h, char *key, u_int key_len, u_int64_t *
 
 /* ******************************************************************** */
 
-int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int64_t value) {
+int ndpi_hash_find_entry(ndpi_str_hash *h, const char *key,
+			 u_int key_len, u_int64_t *value /* out */) {
+  return(ndpi_hash_find_entry_extra(h, key, key_len, value, NULL));
+}
+
+/* ******************************************************************** */
+
+int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len,
+			u_int64_t value, char *extra_data /* Allocated by caller */) {
   ndpi_str_hash_priv *h_priv;
   ndpi_str_hash_priv *item, *ret_found;
 
@@ -3153,7 +3188,15 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int64_
   HASH_FIND(hh, h_priv, key, key_len, item);
 
   if(item != NULL) {
-    item->value64 = value;
+    if(extra_data != NULL) {
+      /*
+	If there are extra blocks to handle value64
+	(the protocol) is not overwritten (***)
+      */
+      ndpi_list_append(&item->value_list, extra_data);
+    } else
+      item->value64 = value;
+
     return(1); /* Entry already present */
   }
 
@@ -3161,6 +3204,7 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int64_
   if(item == NULL)
     return(2);
 
+  ndpi_list_init(&item->value_list);
   item->key = ndpi_malloc(key_len+1);
 
   if(item->key == NULL) {
@@ -3171,12 +3215,16 @@ int ndpi_hash_add_entry(ndpi_str_hash **h, char *key, u_int8_t key_len, u_int64_
     item->key[key_len] = '\0';
   }
 
-  item->value64 = value;
+  if(extra_data != NULL) /* Same as (***) above */
+    ndpi_list_append(&item->value_list, extra_data);
+  else
+    item->value64 = value;
 
   HASH_ADD(hh, *(ndpi_str_hash_priv **)&((*h)->priv), key[0], key_len, item);
 
   HASH_FIND(hh, *(ndpi_str_hash_priv **)&((*h)->priv), key, key_len, ret_found);
-  if(ret_found == NULL) { /* The insertion failed (because of a memory allocation error) */
+  if(ret_found == NULL) {
+    /* The insertion failed (because of a memory allocation error) */
     ndpi_free(item->key);
     ndpi_free(item);
     return 4;
@@ -3450,7 +3498,8 @@ void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ******************************************************************** */
 
-void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
+		   struct ndpi_flow_struct *flow,
                    ndpi_risk_enum r, char *risk_message) {
   if(!flow) return;
 
@@ -3493,22 +3542,22 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_fl
 	if((flow->risk_infos[i].info != NULL)
 	   && (r != NDPI_SUSPICIOUS_ENTROPY /* Entropy changes when recomputed, so let's keep only one message */)
 	   /* Messages are different */
-	   && strcmp(flow->risk_infos[i].info, risk_message) && (strstr(flow->risk_infos[i].info, risk_message) == NULL)
+	   && strcmp(flow->risk_infos[i].info, risk_message)
+	   && (strstr(flow->risk_infos[i].info, risk_message) == NULL)
 	   ) {
-	  char buf[256];
+	  char buf[1024];
 
 	  /* Concatenate risks info */
-	  
-	  snprintf(buf, sizeof(buf), "%s|%s",
+	  snprintf(buf, sizeof(buf), "%s;%s",
 		   flow->risk_infos[i].info, risk_message);
 
 	  ndpi_free(flow->risk_infos[i].info);
 	  flow->risk_infos[i].info = ndpi_strdup(buf);
 	}
-	
+
         return;
       }
-    
+
     /* Risk already set without any details, but now we have a specific risk_message
        that we want to save.
        This might happen with NDPI_HTTP_CRAWLER_BOT which might have been set early via
@@ -3988,8 +4037,10 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
   ordered_risk_infos = ndpi_malloc(sizeof(flow->risk_infos));
   if(!ordered_risk_infos)
     return(NULL);
+
   memcpy(ordered_risk_infos, flow->risk_infos, sizeof(flow->risk_infos));
-  qsort(ordered_risk_infos, flow->num_risk_infos, sizeof(struct ndpi_risk_information), risk_infos_pair_cmp);
+  qsort(ordered_risk_infos, flow->num_risk_infos,
+	sizeof(struct ndpi_risk_information), risk_infos_pair_cmp);
 
   if(use_json) {
     ndpi_serializer serializer;
@@ -4024,7 +4075,7 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
 
     for(i=0; (i<flow->num_risk_infos) && (out_len > offset); i++) {
       int rc = snprintf(&out[offset], out_len-offset, "%s%s",
-			(i == 0) ? "" : " / ",
+			(i == 0) ? "" : ";",
 			ordered_risk_infos[i].info);
 
       if(rc <= 0)
@@ -4355,7 +4406,7 @@ static void ndpi_domain_mapper_init() {
 /* ************************************************ */
 
 u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
-			 char *domain, char *out, u_int out_len) {
+			 const char *domain, char *out, u_int out_len) {
   u_int out_idx = 0, i, buf_shift = 0, domain_buf_len, compressed_len, suffix_len, domain_len;
   u_int32_t value = 0;
   u_char domain_buf[256], compressed[128];
@@ -4397,8 +4448,9 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
 	value |= mapped_idx, buf_shift += NUM_BITS_NIBBLE;
 
 	if(buf_shift == NIBBLE_ELEM_OFFSET) {
-	  memcpy(&out[out_idx], &value, 3);
-	  out_idx += 3;
+	  out[out_idx++] = value & 0xFF;
+	  out[out_idx++] = (value >> 8) & 0xFF;
+	  out[out_idx++] = (value >> 16) & 0xFF;
 	  buf_shift = 0; /* Move to the next buffer */
 	  value = 0;
 	}
@@ -4406,10 +4458,10 @@ u_int ndpi_encode_domain(struct ndpi_detection_module_struct *ndpi_str,
     }
 
     if(buf_shift != 0) {
-      u_int bytes = buf_shift / NUM_BITS_NIBBLE;
+      u_int j, bytes = buf_shift / NUM_BITS_NIBBLE;
 
-      memcpy(&out[out_idx], &value, bytes);
-      out_idx += bytes;
+      for(j = 0; j < bytes; j++)
+        out[out_idx++] = (value >> (j * 8)) & 0xFF;
     }
   }
 
@@ -5139,8 +5191,8 @@ ndpi_tls_block_type ndpi_encode_tls_block_type(u_int8_t block_type, u_int8_t han
     return(tls_alert);
   case 22: /* Handshake */
     switch(handshake_type) {
-    case 0: /* Hello Request */
-      return(tls_handshake_hello_request);
+    case 0: /* Encrypted Handshake Message */
+      return(tls_handshake_encrypted_message);
     case 1: /* Client Hello */
       return(tls_handshake_client_hello);
     case 2: /* Server Hello */
@@ -5180,7 +5232,7 @@ const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block_type block_type, bo
   switch(block_type) {
   case tls_change_cipher:                 return(numeric_mode ? "20"    : "ChangeCipher");
   case tls_alert:                         return(numeric_mode ? "21"    : "Alert");
-  case tls_handshake_hello_request:       return(numeric_mode ? "22:0"  : "Handshake:HelloRequest");
+  case tls_handshake_encrypted_message:   return(numeric_mode ? "22:0"  : "Handshake:EncHandshakeMsg");
   case tls_handshake_client_hello:        return(numeric_mode ? "22:1"  : "Handshake:ClientHello");
   case tls_handshake_server_hello:        return(numeric_mode ? "22:2"  : "Handshake:ServerHello");
   case tls_handshake_new_session_ticket:  return(numeric_mode ? "22:4"  : "Handshake:NewSessTicket");
@@ -5192,10 +5244,62 @@ const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block_type block_type, bo
   case tls_handshake_certificate_verify:  return(numeric_mode ? "22:15" : "Handshake:CertVerify");
   case tls_handshake_client_key_exchange: return(numeric_mode ? "22:16" : "Handshake:ClientKeyExch");
   case tls_handshake_finished:            return(numeric_mode ? "22:20" : "Handshake:Finished");
-  case tls_application_data:              return(numeric_mode ? "21"    : "AppData");
+  case tls_application_data:              return(numeric_mode ? "23"    : "AppData");
   case tls_heartbeat:                     return(numeric_mode ? "24"    : "Heartbeat");
   default:                                return(numeric_mode ? "0"     : "Unknown");
   }
+}
+
+/* ****************************************** */
+
+/* NOTE: caller MUST free the returned pointer */
+u_char* ndpi_encode_tls_blocks(struct ndpi_tls_block *tls_blocks,
+			       u_int8_t num_tls_blocks) {
+  u_char buf[512];
+  u_int8_t i, offset=0, block_len = 3 /* block_type(1) + len(2) */;
+  u_int expected_len = num_tls_blocks * block_len;
+
+  if(sizeof(buf) < expected_len) return(0); /* Buffer too short */
+
+  for(i=0; i<num_tls_blocks; i++) {
+    buf[offset++] = (tls_blocks[i].block_type & 0x7F) + (tls_blocks[i].same_pkt << 7);
+    buf[offset++] = tls_blocks[i].len >> 8;
+    buf[offset++] = tls_blocks[i].len & 0xFF;
+  }
+
+  return(ndpi_hex_encode(buf, expected_len));
+}
+
+/* ****************************************** */
+
+/* NOTE: caller MUST free the returned pointer */
+struct ndpi_tls_block* ndpi_decode_tls_blocks(const u_char *encoded_blocks,
+					      u_int encoded_blocks_len,
+					      u_int8_t *num_tls_blocks) {
+  size_t out_len;
+  u_char *buf = ndpi_hex_decode(encoded_blocks, encoded_blocks_len, &out_len);
+  u_int8_t i, offset, block_len = 3; /* block_type(1) + len(2) */
+  struct ndpi_tls_block *tls_blocks;
+
+  if(buf == NULL)  return(NULL);
+  if(out_len == 0) { ndpi_free(buf); return(NULL); }
+
+  *num_tls_blocks = out_len / block_len;
+
+  tls_blocks = (struct ndpi_tls_block*)ndpi_calloc(*num_tls_blocks,
+						   sizeof(struct ndpi_tls_block));
+  if(tls_blocks == NULL) { ndpi_free(buf); return(NULL); }
+
+  for(i=0, offset=0; i<*num_tls_blocks; i++) {
+    tls_blocks[i].block_type = buf[offset] & 0x7F;
+    tls_blocks[i].same_pkt   = (buf[offset] & 0x80) ? 1 : 0;
+    tls_blocks[i].len = (buf[offset+1] << 8) + buf[offset+2];
+    offset += 3;
+  }
+
+  ndpi_free(buf);
+
+  return(tls_blocks);
 }
 
 /* ****************************************** */
@@ -5887,4 +5991,87 @@ const char* ndpi_tls_supported_version2str(u_int16_t version_id, char unknown_ve
 
   ndpi_snprintf(unknown_version, 8, "0X%04X", version_id);
   return(unknown_version);
+}
+
+/* ****************************************** */
+
+/*
+  Compares two TLS blocks of the same lenght and
+  returns a distance values: 0 = vectors are identical,
+  otherwise a value is returned. The higger is the value
+  the more different are the vectors.
+
+ */
+float ndpi_tls_blocks_len_compare(struct ndpi_tls_block *a,
+				  struct ndpi_tls_block *b,
+				  u_int8_t num_tls_blocks) {
+  float total = 0;
+  u_int8_t n;
+
+  for(n=0; n<num_tls_blocks; n++) {
+    if(a[n].block_type != b[n].block_type)
+      return(999999.);
+    else {
+      int diff = a[n].len - b[n].len;
+
+      if((diff != 0) && (n < 2 /* C/S Hello */))
+	return(999999.);
+      
+      total += diff * diff;
+
+#if 0
+      fprintf(stderr, "[%d] diff=%u [%d, %d], %.2f\n",
+	      n, diff, a[n].len, b[n].len, total);
+#endif
+    }
+  }
+
+  return(total);
+}
+
+/* ****************************************** */
+
+void ndpi_list_init(ndpi_list *l) {
+  l->value = NULL, l->next = NULL;
+}
+
+/* ****************************************** */
+
+void ndpi_list_free(ndpi_list *l) {
+  while(l != NULL) {
+    ndpi_list *next = l->next;
+
+    if(l->value != NULL) ndpi_free(l->value);
+    ndpi_free(l);
+    l = next;
+  }
+}
+
+/* ****************************************** */
+
+/*
+  NOTE:
+  *value must be allocated by the caller and
+  it will be freed by ndpi_list_free()
+*/
+bool ndpi_list_append(ndpi_list *l, void *value) {
+  if(l->value == NULL) {
+    /* Empty list: let's use the first entry */
+    l->value = value;
+  } else {
+    ndpi_list *new_tail = (ndpi_list*)ndpi_malloc(sizeof(ndpi_list));
+
+    if(new_tail == NULL) return(false);
+    new_tail->value = value, new_tail->next = NULL;
+
+    /* Move to the end */
+    while(l->next != NULL) l = l->next;
+
+    if(l != NULL)
+      l->next = new_tail;
+    else
+      ndpi_free(new_tail); /* Something went wrong */
+  }
+
+  return(true); /* All good */
 }

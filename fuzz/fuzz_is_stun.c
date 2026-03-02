@@ -11,13 +11,22 @@ struct ndpi_tcphdr tcph;
 struct ndpi_udphdr udph;
 #endif
 
+static char *path = NULL;
+
+int LLVMFuzzerInitialize(int *argc, char ***argv) {
+  (void)argc;
+
+  path = dirname(strdup(*argv[0])); /* No errors; no free! */
+  return 0;
+}
+
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int16_t app_proto; /* unused */
   struct ndpi_packet_struct *packet;
   ndpi_protocol_category_t category;
 
   if (ndpi_struct == NULL) {
-    fuzz_init_detection_module(&ndpi_struct, NULL);
+    fuzz_init_detection_module(&ndpi_struct, NULL, path);
   }
 
   packet = &ndpi_struct->packet;

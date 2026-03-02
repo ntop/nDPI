@@ -9,7 +9,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   u_int len;
   u_char out[2048], out2[2048];
   int pseudo_bool;
-  char *enc;
+  u_char *enc;
   u_char *dec;
   size_t out_len;
 
@@ -59,7 +59,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_hex2bin(out2, sizeof(out2), out, len);
 
   enc = ndpi_hex_encode(data, size);
-  dec = ndpi_hex_decode((u_char *)enc, size * 2, &out_len);
+  dec = ndpi_hex_decode(enc, size * 2, &out_len);
   ndpi_free(enc);
   ndpi_free(dec);
 

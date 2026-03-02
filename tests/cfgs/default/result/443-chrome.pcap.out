@@ -2,7 +2,7 @@ Guessed flow protos:	1
 
 DPI Packets (TCP):	1	(1.00 pkts/flow)
 Confidence Match by port    : 1 (flows)
-Num dissector calls: 161 (161.00 diss/flow)
+Num dissector calls: 160 (160.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -25,7 +25,7 @@ Hash malicious ja4:        0/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     0/0 (search/found)
 Hash public domain suffix: 0/0 (search/found)
-Hash ja4 custom protos:    0/0 (search/found)
+Hash ja4 custom protos:    1/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
 
@@ -35,4 +35,4 @@ Safe                             1 1506          1
 
 Web                              1 1506          1            
 
-	1	TCP 178.62.197.130:443 -> 192.168.1.13:53059 [proto: 91/TLS][Stack: TLS][IP: 442/DigitalOcean][Encrypted][Confidence: Match by port][FPC: 442/DigitalOcean, Confidence: IP address][DPI packets: 1][cat: Web/5][Breed: Safe][1 pkts/1506 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No client to server traffic / Entropy: 7.855 (Encrypted or Random?)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0]
+	1	TCP 178.62.197.130:443 -> 192.168.1.13:53059 [proto: 91/TLS][Stack: TLS][IP: 442/DigitalOcean][Encrypted][Confidence: Match by port][FPC: 442/DigitalOcean, Confidence: IP address][DPI packets: 1][cat: Web/5][Breed: Safe][1 pkts/1506 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][Risk: ** Susp Entropy **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No client to server traffic;Entropy: 7.855 (Encrypted or Random?)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0]

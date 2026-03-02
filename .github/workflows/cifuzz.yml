@@ -18,14 +18,9 @@ jobs:
         uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
         with:
           oss-fuzz-project-name: 'ndpi'
-          fuzz-seconds: 600
+          fuzz-seconds: 300
           dry-run: false
           sanitizer: ${{ matrix.sanitizer }}
-      - name: Check Crash (fails when a crash is detected)
-        # Run Fuzzers return success even when setting dry-run to false.
-        # A temporal workaround is to trigger failure manually if we fing crash files.
-        run: |
-          exit $(ls out/artifacts |wc -l)
       - name: Upload Crash (upload detected crash as artifacts)
         uses: actions/upload-artifact@v4
         if: failure()

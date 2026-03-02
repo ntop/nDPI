@@ -22,8 +22,8 @@ Patricia protocols IPv6: 0/0 (search/found)
 Hash malicious ja4:        1/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     0/0 (search/found)
-Hash public domain suffix: 0/0 (search/found)
-Hash ja4 custom protos:    1/0 (search/found)
+Hash public domain suffix: 4/4 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     1/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
 
@@ -38,4 +38,4 @@ JA Host Stats:
 	1	 192.168.12.169           	 1      
 
 
-	1	TCP 192.168.12.169:39850 -> 8.8.8.8:443 [proto: 91.196/TLS.DoH_DoT][Stack: TLS.DoH_DoT][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 91.196/TLS.DoH_DoT, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/449 bytes -> 0 pkts/0 bytes][Goodput ratio: 85/0][< 1 sec][Hostname/SNI: dns.google][Risk: ** TLS (probably) Not Carrying HTTPS **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic / No ALPN][nDPI Fingerprint: 479adc8f3f8331089b69060e0e9a7b6c][TLSv1.2][JA4: t12d990700_bf97e4b3d095_7b0ba9b4cf08][Firefox][PLAIN TEXT (dns.google)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.12.169:39850 -> 8.8.8.8:443 [proto: 91.196/TLS.DoH_DoT][Stack: TLS.DoH_DoT][IP: 126/Google][Encrypted][Confidence: DPI][FPC: 91.196/TLS.DoH_DoT, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/449 bytes -> 0 pkts/0 bytes][Goodput ratio: 85/0][< 1 sec][Hostname/SNI: dns.google][Risk: ** TLS (probably) Not Carrying HTTPS **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic;No ALPN][nDPI Fingerprint: 479adc8f3f8331089b69060e0e9a7b6c][TLSv1.2][JA4: t12d990700_bf97e4b3d095_7b0ba9b4cf08][Firefox][PLAIN TEXT (dns.google)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

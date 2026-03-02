@@ -14,7 +14,7 @@ LIST6_MERGED_U=/tmp/tor.list_m6_u
 ORIGIN="https://raw.githubusercontent.com/alireza-rezaee/tor-nodes/refs/heads/main/latest.exits.csv"
 
 echo "(1) Downloading file... ${ORIGIN}"
-http_response=$(curl -s -o $LIST -w "%{http_code}" ${ORIGIN})
+http_response=$(curl -L -s -o $LIST -w "%{http_code}" ${ORIGIN})
 check_http_response "${http_response}"
 is_file_empty "${LIST}"
 

@@ -700,10 +700,15 @@ static int dissect_l4(struct m_pkt *p)
 			}
 		} else {
 			ppp_h = &data[l4_hdr_len];
+			if (p->l4_length == l4_hdr_len) {
+				derr("Unexpected gre ppp len %d/%d\n",
+				     l4_hdr_len, p->l4_length);
+				return -1;
+			}
 
 			if (ppp_h[0] == 0xFF) { /* PPP HDLC encapsulation */
 				if(p->l4_length < l4_hdr_len + 4) {
-					derr("Unexpected gre ppp len %d/%d\n",
+					derr("Unexpected gre ppp len %d/%d (b)\n",
 					     l4_hdr_len, p->l4_length);
 					return -1;
 				}
