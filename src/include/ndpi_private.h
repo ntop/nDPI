@@ -202,7 +202,6 @@ struct ndpi_global_context {
 
 struct ndpi_detection_module_config_struct {
   int max_packets_to_process;
-  int direction_detect_enabled;
  /* In some networks, there are some anomalous TCP flows where
     the smallest ACK packets have some kind of zero padding.
     It looks like the IP and TCP headers in those frames wrongly consider the

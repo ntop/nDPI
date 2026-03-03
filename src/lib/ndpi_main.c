@@ -5312,7 +5312,7 @@ static default_ports_tree_node_t *ndpi_get_guessed_protocol_id(struct ndpi_detec
                                                                u_int8_t proto, u_int16_t sport, u_int16_t dport) {
   default_ports_tree_node_t node;
   /* Set use_sport to config value if direction detection is enabled */
-  int use_sport = ndpi_str->cfg.direction_detect_enabled ? ndpi_str->cfg.use_client_port_in_guess : 1;
+  int use_sport = ndpi_str->cfg.use_client_port_in_guess;
 
   if(sport && dport) {
     const void *ret;
@@ -8543,16 +8543,12 @@ static void connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
   packet->tcp_retransmission = 0, packet->packet_direction = 0;
 
-  if(!ndpi_str->cfg.direction_detect_enabled) {
-    packet->packet_direction = flow->packet_direction;
-  } else {
-    if(iph != NULL && ntohl(iph->saddr) < ntohl(iph->daddr))
-      packet->packet_direction = 1;
+  if(iph != NULL && ntohl(iph->saddr) < ntohl(iph->daddr))
+    packet->packet_direction = 1;
 
-    if((iphv6 != NULL)
-       && NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(&iphv6->ip6_src, &iphv6->ip6_dst) != 0)
-      packet->packet_direction = 1;
-  }
+  if((iphv6 != NULL)
+     && NDPI_COMPARE_IPV6_ADDRESS_STRUCTS(&iphv6->ip6_src, &iphv6->ip6_dst) != 0)
+    packet->packet_direction = 1;
 
   flow->is_ipv6 = (packet->iphv6 != NULL);
 
@@ -8574,8 +8570,7 @@ static void connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
     else if(flags == (TH_FIN | TH_PUSH | TH_URG))
       ndpi_set_risk(ndpi_str, flow, NDPI_TCP_ISSUES, "TCP XMAS scan");
 
-    if(ndpi_str->cfg.direction_detect_enabled &&
-       (tcph->source != tcph->dest))
+    if(tcph->source != tcph->dest)
       packet->packet_direction = (ntohs(tcph->source) < ntohs(tcph->dest)) ? 1 : 0;
 
     if(packet->packet_direction == 0 /* cli -> srv */) {
@@ -8658,8 +8653,7 @@ static void connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
 
     flow->l4.tcp.last_tcp_pkt_payload_len = packet->payload_packet_len;
   } else if(udph != NULL) {
-    if(ndpi_str->cfg.direction_detect_enabled &&
-       (udph->source != udph->dest))
+    if(udph->source != udph->dest)
       packet->packet_direction = (htons(udph->source) < htons(udph->dest)) ? 1 : 0;
   }
 
