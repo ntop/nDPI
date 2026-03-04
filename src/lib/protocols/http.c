@@ -144,8 +144,11 @@ static void ndpi_analyze_content_signature(struct ndpi_detection_module_struct *
 static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  if(packet->payload_packet_len == 0 || packet->tcp_retransmission)
+
+  if(packet->payload_packet_len == 0 || packet->tcp_retransmission) {
+    NDPI_LOG_DBG(ndpi_struct, "Skip %d/%d\n", packet->payload_packet_len, packet->tcp_retransmission);
     return 1;
+  }
 
   ndpi_search_http_tcp(ndpi_struct, flow);
 
@@ -968,8 +971,6 @@ static void ndpi_check_http_url(struct ndpi_detection_module_struct *ndpi_struct
 /* Check custom protocol */
 static void ndpi_check_http_url_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow) {
-  int custom_category = 0;
-
   if(flow->http.url) {
     if(ndpi_struct->http_url_hashmap) {
       u_int64_t id;
@@ -987,20 +988,8 @@ static void ndpi_check_http_url_subprotocol(struct ndpi_detection_module_struct 
 				   NDPI_CONFIDENCE_CUSTOM_RULE);
 	flow->category = category;
 	flow->breed = breed;
-
-	if(category != NDPI_PROTOCOL_CATEGORY_UNSPECIFIED)
-	  custom_category = 1;
-
-	return;
       }
     }
-
-    if(!custom_category) { /* Category from custom rule always wins */
-      if(ends_with(ndpi_struct, (char*)flow->http.url, "/generate_204")
-         || ends_with(ndpi_struct, (char*)flow->http.url, "/generate204")) {
-        flow->category = NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK;
-      }
-    }    
   }
 }
 
@@ -1368,6 +1357,17 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
 
   ndpi_check_http_header(ndpi_struct, flow);
+
+  /* At the very end: we want to override any previous category match
+     (exception: custom rule via url matching) */
+  if(flow->confidence != NDPI_CONFIDENCE_CUSTOM_RULE) {
+    if(flow->http.url) {
+      if(ends_with(ndpi_struct, (char *)flow->http.url, "/generate_204") ||
+         ends_with(ndpi_struct, (char *)flow->http.url, "/generate204")) {
+        flow->category = NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK;
+      }
+    }
+  }
 }
 
 /* ************************************************************* */
