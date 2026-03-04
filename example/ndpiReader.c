@@ -157,11 +157,12 @@ extern u_int16_t min_pattern_len, max_pattern_len;
 u_int8_t dump_internal_stats;
 
 static struct ndpi_bin malloc_bins;
-static int enable_malloc_bins = 0;
-static int max_malloc_bins = 14;
+static struct ndpi_bin realloc_bins;
+static int enable_alloc_bins = 0;
+static int max_alloc_bins = 14;
 static u_int8_t dump_hosts_mode = 0;
 
-int malloc_size_stats = 0;
+int alloc_size_stats = 0;
 
 int monitoring_enabled;
 
@@ -321,12 +322,12 @@ FILE *trace = NULL;
 
 /* ***************************************************** */
 
-static u_int32_t reader_slot_malloc_bins(u_int64_t v)
+static u_int32_t reader_slot_alloc_bins(u_int64_t v)
 {
   int i;
 
   /* 0-2,3-4,5-8,9-16,17-32,33-64,65-128,129-256,257-512,513-1024,1025-2048,2049-4096,4097-8192,8193- */
-  for(i=0; i < max_malloc_bins - 1; i++)
+  for(i=0; i < max_alloc_bins - 1; i++)
     if((1ULL << (i + 1)) >= v)
       return i;
   return i;
@@ -338,8 +339,8 @@ static u_int32_t reader_slot_malloc_bins(u_int64_t v)
 static void *malloc_wrapper(size_t size) {
   tot_ndpi_memory += size;
 
-  if(enable_malloc_bins && malloc_size_stats)
-    ndpi_inc_bin(&malloc_bins, reader_slot_malloc_bins(size), 1);
+  if(enable_alloc_bins && alloc_size_stats)
+    ndpi_inc_bin(&malloc_bins, reader_slot_alloc_bins(size), 1);
 
   return(malloc(size)); /* Don't change to ndpi_malloc !!!!! */
 }
@@ -358,8 +359,8 @@ static void free_wrapper(void *freeable) {
 static void *calloc_wrapper(size_t nmemb, size_t size) {
   tot_ndpi_memory += (nmemb * size);
 
-  if(enable_malloc_bins && malloc_size_stats)
-    ndpi_inc_bin(&malloc_bins, reader_slot_malloc_bins(nmemb * size), 1);
+  if(enable_alloc_bins && alloc_size_stats)
+    ndpi_inc_bin(&malloc_bins, reader_slot_alloc_bins(nmemb * size), 1);
 
   return(calloc(nmemb, size)); /* Don't change to ndpi_calloc !!!!! */
 }
@@ -369,8 +370,8 @@ static void *calloc_wrapper(size_t nmemb, size_t size) {
 static void *realloc_wrapper(void *ptr, size_t size) {
   tot_ndpi_memory += size;
 
-  if(enable_malloc_bins && malloc_size_stats)
-    ndpi_inc_bin(&malloc_bins, reader_slot_malloc_bins(size), 1);
+  if(enable_alloc_bins && alloc_size_stats)
+    ndpi_inc_bin(&realloc_bins, reader_slot_alloc_bins(size), 1);
 
   return(realloc(ptr, size)); /* Don't change to ndpi_realloc !!!!! */
 }
@@ -380,8 +381,8 @@ static void *realloc_wrapper(void *ptr, size_t size) {
 static void *aligned_malloc_wrapper(size_t alignment, size_t size) {
   tot_ndpi_memory += size;
 
-  if(enable_malloc_bins && malloc_size_stats)
-    ndpi_inc_bin(&malloc_bins, reader_slot_malloc_bins(size), 1);
+  if(enable_alloc_bins && alloc_size_stats)
+    ndpi_inc_bin(&malloc_bins, reader_slot_alloc_bins(size), 1);
 
   void* p;
 #ifdef _MSC_VER
@@ -1629,8 +1630,9 @@ static void parse_parameters(int argc, char **argv)
     break;
 
     case 'M':
-      enable_malloc_bins = 1;
-      ndpi_init_bin(&malloc_bins, ndpi_bin_family64, max_malloc_bins);
+      enable_alloc_bins = 1;
+      ndpi_init_bin(&malloc_bins, ndpi_bin_family64, max_alloc_bins);
+      ndpi_init_bin(&realloc_bins, ndpi_bin_family64, max_alloc_bins);
       break;
 
     case 169:
@@ -1905,7 +1907,7 @@ static void parseOptions(int argc, char **argv) {
         _pcap_file[thread_id] = _pcap_file[0];
     }
 
-    if(num_threads > 1 && enable_malloc_bins == 1)
+    if(num_threads > 1 && enable_alloc_bins == 1)
     {
       printf("Memory profiling ('-M') is incompatible with multi-thread enviroment");
       exit(1);
@@ -2884,10 +2886,10 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
   if((which == ndpi_preorder) || (which == ndpi_leaf)) { /* Avoid walking the same node multiple times */
     if((!flow->detection_completed) && flow->ndpi_flow) {
 
-      malloc_size_stats = 1;
+      alloc_size_stats = 1;
       flow->detected_protocol = ndpi_detection_giveup(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                                                       flow->ndpi_flow);
-      malloc_size_stats = 0;
+      alloc_size_stats = 0;
 
       if(flow->ndpi_flow->protocol_was_guessed) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
     }
@@ -4701,8 +4703,10 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
              (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_HTTP_URL].n_search,
              (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_HTTP_URL].n_found);
 
-      if(enable_malloc_bins)
-	printf("\tData-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
+      if(enable_alloc_bins) {
+	printf("\tData-path malloc histogram:  %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
+	printf("\tData-path realloc histogram: %s\n", ndpi_print_bin(&realloc_bins, 0, buf, sizeof(buf)));
+      }
     }
   }
 
@@ -4833,8 +4837,10 @@ static void printResults(u_int64_t processing_time_usec, u_int64_t setup_time_us
              (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_HTTP_URL].n_search,
              (long long unsigned int)cumulative_stats.hash_stats[NDPI_STR_HASH_HTTP_URL].n_found);
 
-      if(enable_malloc_bins)
-        fprintf(results_file, "Data-path malloc histogram: %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
+      if(enable_alloc_bins) {
+        fprintf(results_file, "Data-path malloc histogram:  %s\n", ndpi_print_bin(&malloc_bins, 0, buf, sizeof(buf)));
+        fprintf(results_file, "Data-path realloc histogram: %s\n", ndpi_print_bin(&realloc_bins, 0, buf, sizeof(buf)));
+      }
     }
 
     fprintf(results_file, "\n");
@@ -7590,7 +7596,10 @@ int main(int argc, char **argv) {
   if(results_file)  fclose(results_file);
   if(extcap_dumper) pcap_dump_close(extcap_dumper);
   if(extcap_fifo_h) pcap_close(extcap_fifo_h);
-  if(enable_malloc_bins) ndpi_free_bin(&malloc_bins);
+  if(enable_alloc_bins) {
+    ndpi_free_bin(&malloc_bins);
+    ndpi_free_bin(&realloc_bins);
+  }
   if(csv_fp)         fclose(csv_fp);
   if(fingerprint_fp) fclose(fingerprint_fp);
 
