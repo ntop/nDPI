@@ -8605,36 +8605,27 @@ static void connection_tracking(struct ndpi_detection_module_struct *ndpi_str,
       NDPI_LOG_DBG2(ndpi_str, "TCP ACK with zero padding. Ignoring\n");
       packet->tcp_retransmission = 1;
     } else if(flow->l4.tcp.next_tcp_seq_nr[0] == 0 || flow->l4.tcp.next_tcp_seq_nr[1] == 0 ||
-	      (tcph->syn && flow->packet_counter == 0)) {
-      /* initialize tcp sequence counters */
-      /* the ack flag needs to be set to get valid sequence numbers from the other
-       * direction. Usually it will catch the second packet syn+ack but it works
-       * also for asymmetric traffic where it will use the first data packet
-       *
-       * if the syn flag is set add one to the sequence number,
-       * otherwise use the payload length.
-       *
-       * If we receive multiple syn-ack (before any real data), keep the last one
-       */
-      if(tcph->ack != 0) {
-	flow->l4.tcp.next_tcp_seq_nr[packet->packet_direction] =
+	      tcph->syn) {
+      /* Initialize tcp sequence counters */
+      /* If we receive multiple syn(-ack), keep the last one */
+      flow->l4.tcp.next_tcp_seq_nr[packet->packet_direction] =
 	  ntohl(tcph->seq) + (tcph->syn ? 1 : packet->payload_packet_len);
 
-	/*
-	  Check to avoid discrepancies in case we analyze a flow that does not start with SYN...
-	  but that is already started when nDPI being to process it. See also (***) below
-	*/
-	if(flow->num_processed_pkts > 1)
-	  flow->l4.tcp.next_tcp_seq_nr[1 - packet->packet_direction] = ntohl(tcph->ack_seq);
-      }
+      /*
+	Check to avoid discrepancies in case we analyze a flow that does not start with SYN...
+	but that is already started when nDPI being to process it. See also (***) below
+       */
+      if(tcph->ack != 0)
+        flow->l4.tcp.next_tcp_seq_nr[1 - packet->packet_direction] = ntohl(tcph->ack_seq);
     } else if(packet->payload_packet_len > 0) {
       /* check tcp sequence counters */
       if(((u_int32_t)(ntohl(tcph->seq) - flow->l4.tcp.next_tcp_seq_nr[packet->packet_direction])) >
 	 ndpi_str->tcp_max_retransmission_window_size) {
-	if(flow->l4.tcp.last_tcp_pkt_payload_len > 0)
+	if(flow->l4.tcp.last_tcp_pkt_payload_len > 0) {
+          NDPI_LOG_DBG2(ndpi_str, "TCP Retransmission\n");
 	  packet->tcp_retransmission = 1;
+	}
 
-	/* CHECK IF PARTIAL RETRY IS HAPPENING */
 	if((flow->l4.tcp.next_tcp_seq_nr[packet->packet_direction] - ntohl(tcph->seq) <
 	    packet->payload_packet_len)) {
 	  if(flow->num_processed_pkts > 1) /* See also (***) above */
