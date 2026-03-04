@@ -1264,17 +1264,6 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
     certificates_offset += certificate_len;
   }
 
-  if((ndpi_struct->cfg.tls_max_num_blocks_to_analyze != 0)
-     && (flow->l4.tcp.tls.num_tls_blocks >= ndpi_struct->cfg.tls_max_num_blocks_to_analyze)) {
-#ifdef DEBUG_TLS_BLOCKS
-    printf("*** [TLS Block] Enough blocks dissected\n");
-#endif
-
-    tls_match_ja4(ndpi_struct, flow);
-
-    flow->extra_packets_func = NULL; /* We're good now */
-  }
-
   return(1);
 }
 
