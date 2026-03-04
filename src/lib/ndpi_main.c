@@ -10857,7 +10857,7 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
                                      { NULL, NULL} };
   struct header_line headers_s[] = { { "Server:", &packet->server_line },
                                      { "SECURELOCATION.UPNP.ORG:", &packet->securelocation_upnp },
-                                     { "ST", &packet->st },
+                                     { "ST:", &packet->st },
                                      { NULL, NULL} };
   struct header_line headers_l[] = { { "LOCATION:", &packet->location },
                                      { NULL, NULL}};
