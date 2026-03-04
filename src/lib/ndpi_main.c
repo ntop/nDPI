@@ -3901,7 +3901,7 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
 void ndpi_debug_printf(u_int16_t proto, struct ndpi_detection_module_struct *ndpi_str, ndpi_log_level_t log_level,
                        const char *file_name, const char *func_name, unsigned int line_number, const char *format, ...) {
   va_list args;
-#define MAX_STR_LEN 250
+#define MAX_STR_LEN 2048
   char str[MAX_STR_LEN];
   if(ndpi_str != NULL && log_level > NDPI_LOG_ERROR && proto > 0 &&
      !ndpi_bitmask_is_set(&ndpi_str->cfg.debug_bitmask, proto))
