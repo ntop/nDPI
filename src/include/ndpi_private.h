@@ -36,6 +36,8 @@ extern "C" {
 #define _NDPI_CONFIG_H_
 #endif
 
+#include "ndpi_usdt.h"
+
 /* NDPI_NODE */
 typedef struct node_t {
   char *key;

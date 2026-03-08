@@ -26,6 +26,7 @@ EXTRA_DIST = README.md README.fuzzer.md CHANGELOG.md CONTRIBUTING.md \
 		doc/configuration_parameters.rst \
 		doc/library_initialization.rst \
 		doc/monitoring.rst \
+		doc/usdt.rst \
 	python/DEV_GUIDE.md python/dev_requirements.txt python/ndpi_example.py python/ndpi/__init__.py \
 		python/ndpi/ndpi_build.py python/ndpi/ndpi.py python/README.md \
 		python/requirements.txt python/setup.py python/tests.py \

@@ -20,6 +20,7 @@ nDPI is an open source DPI (Deep Packet Inspection) toolkit for traffic analysis
    monitoring
    protocols
    flow_risks
+   usdt
 
 .. toctree::
    :caption: Other Products

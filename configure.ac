@@ -31,6 +31,15 @@ AC_ARG_ENABLE(plugin-support, AS_HELP_STRING([--disable-plugin-support], [Disabl
 AC_ARG_ENABLE(global-context-support, AS_HELP_STRING([--disable-global-context-support], [Disable support for global context. No external dependency on libpthread]))
 AC_ARG_ENABLE(memory-track-origins, AS_HELP_STRING([--disable-memory-track-origins], [Don't add -fsanitize-memory-track-origins flag when compiling with MASAN support. Useful for faster CI]))
 AC_ARG_ENABLE(old-croaring, AS_HELP_STRING([--enable-old-croaring], [Always use old croaring version, instead of try to auto-detect if v4 works. Useful with old compilers]),[enable_oldcroaring=$enableval],[enable_oldcroaring=no])
+AC_ARG_ENABLE(usdt-probes, AS_HELP_STRING([--enable-usdt-probes], [Enable USDT/DTrace static tracing probes]),[enable_usdt_probes=$enableval],[enable_usdt_probes=no])
+
+AS_IF([test "x$enable_usdt_probes" = "xyes"], [
+  AC_CHECK_HEADER([sys/sdt.h], [
+    AC_DEFINE([HAVE_USDT], [1], [Define if USDT probes are enabled])
+  ], [
+    AC_MSG_ERROR([--enable-usdt-probes requires sys/sdt.h (install systemtap-sdt-dev)])
+  ])
+])
 
 #These two variables are not supposed to be set/changed by the user:
 #he should use standard CFLAGS/LDFLAGS, instead
@@ -761,6 +770,12 @@ AS_IF([test "x${CUSTOM_NDPI}" = "x-DCUSTOM_NDPI_PROTOCOLS"],
   Custom protocols:        yes (../nDPI-custom)"],
   [SUMMARY="${SUMMARY}
   Custom protocols:        no"])
+
+AS_IF([test "x${enable_usdt_probes}" = "xyes"],
+  [SUMMARY="${SUMMARY}
+  USDT probes:             enabled"],
+  [SUMMARY="${SUMMARY}
+  USDT probes:             disabled"])
 
 SUMMARY="${SUMMARY}
 

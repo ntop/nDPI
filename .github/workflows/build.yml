@@ -241,3 +241,75 @@ jobs:
           msys2 -c './tests/do.sh'
           msys2 -c './tests/do-unit.sh'
           msys2 -c './tests/do-dga.sh'
+
+  test-usdt:
+    name: USDT probes (ubuntu-latest)
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror -g -O2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
+          sudo apt-get install systemtap-sdt-dev bpftrace
+      - name: Configure nDPI with USDT
+        run: |
+          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-usdt-probes
+      - name: Build nDPI
+        run: |
+          make -j all
+          make -C example
+      - name: Verify USDT probes are embedded (readelf)
+        run: |
+          echo "=== Probes in libndpi.so ==="
+          readelf -n src/lib/libndpi.so | grep -A4 stapsdt
+          echo "=== Probes in ndpiReader ==="
+          readelf -n example/ndpiReader | grep -A4 stapsdt
+          # Verify both probes are present
+          readelf -n example/ndpiReader | grep -q 'flow_classified'
+          readelf -n example/ndpiReader | grep -q 'hostname_set'
+          echo "All expected USDT probes found."
+      - name: List probes via bpftrace
+        run: |
+          sudo bpftrace -l "usdt:./example/ndpiReader:ndpi:*" | tee /tmp/probe_list.txt
+          grep -q 'flow_classified' /tmp/probe_list.txt
+          grep -q 'hostname_set' /tmp/probe_list.txt
+          echo "bpftrace can see all probes."
+      - name: Test flow_classified probe with ndpiReader
+        run: |
+          sudo bpftrace -e '
+          usdt:./example/ndpiReader:ndpi:flow_classified {
+            @flows = count();
+            @proto_master[arg0] = count();
+            @confidence[arg2] = count();
+            @category[arg3] = count();
+          }' -c './example/ndpiReader -q -i tests/pcap/http.pcapng' 2>&1 | tee /tmp/bpf_classified.txt
+          # Verify we actually traced some flows
+          grep -q '@flows:' /tmp/bpf_classified.txt
+          echo "flow_classified probe: OK"
+      - name: Test hostname_set probe with ndpiReader
+        run: |
+          sudo bpftrace -e '
+          usdt:./example/ndpiReader:ndpi:hostname_set {
+            @hostnames = count();
+            @top[str(arg0)] = count();
+          }' -c './example/ndpiReader -q -i tests/pcap/tls_certificate_too_long.pcap' 2>&1 | tee /tmp/bpf_hostname.txt
+          # Verify we actually traced some hostnames
+          grep -q '@hostnames:' /tmp/bpf_hostname.txt
+          echo "hostname_set probe: OK"
+      - name: Test both probes simultaneously
+        run: |
+          sudo bpftrace -e '
+          usdt:./example/ndpiReader:ndpi:hostname_set {
+            @hostnames = count();
+          }
+          usdt:./example/ndpiReader:ndpi:flow_classified {
+            @classified = count();
+          }' -c './example/ndpiReader -q -i tests/pcap/dns.pcap' 2>&1 | tee /tmp/bpf_both.txt
+          grep -q '@classified:' /tmp/bpf_both.txt
+          grep -q '@hostnames:' /tmp/bpf_both.txt
+          echo "Both probes fired successfully."
