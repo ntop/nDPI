@@ -16,8 +16,7 @@ AM_CFLAGS+=-fPIC -DPIC -DNDPI_LIB_COMPILATION -I$(top_srcdir)/src/include -I$(to
 AM_LDFLAGS=-L$(top_builddir)/src/lib @NDPI_LDFLAGS@
 LIBNDPI_DEP=$(top_builddir)/src/lib/libndpi.so
 LIBS=-lndpi @ADDITIONAL_LIBS@ @LIBS@
-HEADERS=$(top_srcdir)/src/include/ndpi_api.h \
-        $(top_srcdir)/src/include/ndpi_typedefs.h $(top_srcdir)/src/include/ndpi_protocol_ids.h
+HEADERS=$(wildcard $(top_srcdir)/src/include/*.h)
 HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 PREFIX?=@prefix@
 
