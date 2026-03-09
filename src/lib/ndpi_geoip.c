@@ -102,13 +102,32 @@ int ndpi_get_geoip_asn(struct ndpi_detection_module_struct *ndpi_str, char *ip, 
       *asn = 0;
     else
     {
-      /* Get the ASN */
-      if ((status = MMDB_get_value(&result.entry, &entry_data, "autonomous_system_number", NULL)) == MMDB_SUCCESS)
-      {
-        if (entry_data.has_data && entry_data.type == MMDB_DATA_TYPE_UINT32)
-          *asn = entry_data.uint32;
-        else
-          *asn = 0;
+      *asn = 0;
+
+      status = MMDB_get_value(&result.entry, &entry_data, "autonomous_system_number", NULL);
+      if (status == MMDB_SUCCESS && entry_data.has_data && entry_data.type == MMDB_DATA_TYPE_UINT32)
+        *asn = entry_data.uint32;
+
+      /* Flat schema fallback (e.g. IPLocate): asn stored as string */
+      if (*asn == 0) {
+        status = MMDB_get_value(&result.entry, &entry_data, "asn", NULL);
+        if (status == MMDB_SUCCESS && entry_data.has_data &&
+            entry_data.type == MMDB_DATA_TYPE_UTF8_STRING)
+        {
+          /* MMDB strings are length-counted, not NUL-terminated; copy
+             before converting. Skip an optional "AS" prefix. */
+          char asn_str[16];
+          const char *p = asn_str;
+          u_int32_t str_len = ndpi_min(entry_data.data_size, sizeof(asn_str) - 1);
+
+          memcpy(asn_str, entry_data.utf8_string, str_len);
+          asn_str[str_len] = '\0';
+
+          if ((p[0] == 'A' || p[0] == 'a') && (p[1] == 'S' || p[1] == 's'))
+            p += 2;
+
+          *asn = (u_int32_t)atol(p);
+        }
       }
     }
 
@@ -142,6 +161,11 @@ int ndpi_get_geoip_aso(struct ndpi_detection_module_struct *ndpi_str, char *ip, 
       if (aso_len > 0)
       {
         status = MMDB_get_value(&result.entry, &entry_data, "autonomous_system_organization", NULL);
+
+        /* Flat schema fallback (e.g. IPLocate): org */
+        if (status != MMDB_SUCCESS || !entry_data.has_data)
+          status = MMDB_get_value(&result.entry, &entry_data, "org", NULL);
+
         if (status != MMDB_SUCCESS || !entry_data.has_data)
           aso[0] = '\0';
         else
@@ -189,7 +213,12 @@ int ndpi_get_geoip_country_continent(struct ndpi_detection_module_struct *ndpi_s
     {
       if (country_code_len > 0)
       {
+        /* MaxMind: country -> iso_code */
         status = MMDB_get_value(&result.entry, &entry_data, "country", "iso_code", NULL);
+
+        /* Flat schema fallback (e.g. IPLocate): country_code */
+        if (status != MMDB_SUCCESS || !entry_data.has_data)
+          status = MMDB_get_value(&result.entry, &entry_data, "country_code", NULL);
 
         if ((status != MMDB_SUCCESS) || (!entry_data.has_data))
           country_code[0] = '\0';
@@ -204,7 +233,12 @@ int ndpi_get_geoip_country_continent(struct ndpi_detection_module_struct *ndpi_s
 
       if (continent_len > 0)
       {
+        /* MaxMind: continent -> names -> en */
         status = MMDB_get_value(&result.entry, &entry_data, "continent", "names", "en", NULL);
+
+        /* Flat schema fallback: continent_code */
+        if (status != MMDB_SUCCESS || !entry_data.has_data)
+          status = MMDB_get_value(&result.entry, &entry_data, "continent_code", NULL);
 
         if ((status != MMDB_SUCCESS) || (!entry_data.has_data))
           continent[0] = '\0';
