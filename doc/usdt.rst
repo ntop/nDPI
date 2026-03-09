@@ -25,13 +25,20 @@ Then configure nDPI with USDT enabled:
 .. code-block:: bash
 
    ./autogen.sh
-   ./configure --enable-usdt-probes
+   ./configure --enable-usdt-probes --enable-debug-build
    make
 
 .. note::
 
    On macOS, ``sys/sdt.h`` is provided by the system. On platforms where it is
    unavailable, the probes compile to no-ops and have zero impact.
+
+.. note::
+
+   To dereference the ``ndpi_flow_struct *`` pointer in bpftrace scripts, build nDPI
+   with debug symbols (``--enable-debug-build``). bpftrace then resolves field offsets
+   automatically from DWARF info. Without debug symbols you can still use the scalar
+   arguments directly.
 
 Available Probes
 ----------------
@@ -48,16 +55,54 @@ Available Probes
        | ``arg1``: application protocol ID (``u16``)
        | ``arg2``: confidence level (``enum``)
        | ``arg3``: category (``enum``)
+       | ``arg4``: flow pointer (``struct ndpi_flow_struct *``)
      - Fires exactly once per flow when classification is finalized.
        Covers all exit paths: successful detection, giveup, max-packets,
        nBPF match, and extra-dissector completion.
+       The scalar arguments allow fast filtering in bpftrace predicates;
+       ``arg4`` provides access to all other flow fields when needed.
    * - ``hostname_set``
      - | ``arg0``: hostname string (``char *``)
-       | ``arg1``: master protocol ID (``u16``)
-       | ``arg2``: application protocol ID (``u16``)
+       | ``arg1``: flow pointer (``struct ndpi_flow_struct *``)
      - Fires when a hostname/SNI is extracted from a flow.
        Covers all protocols that resolve hostnames: TLS (SNI), DNS,
        HTTP (Host header), QUIC, NetBIOS, DHCP, STUN, and others.
+       The hostname is provided directly as a string for convenience;
+       the flow pointer gives access to all other flow fields.
+
+bpftrace Notes
+--------------
+
+Predicates vs. action blocks
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+bpftrace predicates (``/condition/``) work well for filtering on scalar arguments
+(``arg0``–``arg3`` in ``flow_classified``):
+
+.. code-block:: bash
+
+   bpftrace -e 'usdt::ndpi:flow_classified /arg0 == 91/ { ... }'
+
+Filtering on struct fields via a pointer (e.g. ``arg4`` or ``arg1`` in
+``hostname_set``) is **not supported in predicates**. User-space pointer
+dereferences require ``bpf_probe_read_user()`` internally, which bpftrace only
+generates inside action blocks — not in the predicate expression. Attempting it
+will either fail to compile or silently misbehave.
+
+Use an ``if`` statement inside the action block instead:
+
+.. code-block:: bash
+
+   bpftrace -e 'usdt::ndpi:hostname_set {
+     $flow = (struct ndpi_flow_struct *)arg1;
+     if ($flow->detected_protocol_stack[0] == 5) {
+       @dns[str(arg0)] = count();
+     }
+   }'
+
+See the `bpftrace reference guide
+<https://github.com/bpftrace/bpftrace/blob/master/docs/reference_guide.md>`_
+for full details on predicate and action block semantics.
 
 bpftrace Examples
 -----------------
@@ -136,6 +181,17 @@ Flows classified as SocialNetwork (category 6):
      @social[arg0, arg1] = count();
    }'
 
+Flows with non-zero risk bitmap (requires ``arg4`` / debug symbols):
+
+.. code-block:: bash
+
+   bpftrace -e 'usdt::ndpi:flow_classified {
+     $flow = (struct ndpi_flow_struct *)arg4;
+     if ($flow->risk != 0) {
+       @risky[arg0] = count();
+     }
+   }'
+
 hostname_set Examples
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -144,7 +200,11 @@ Real-time hostname log:
 .. code-block:: bash
 
    bpftrace -e 'usdt::ndpi:hostname_set {
-     printf("%s (master=%d app=%d)\n", str(arg0), arg1, arg2);
+     $flow = (struct ndpi_flow_struct *)arg1;
+     printf("%s (master=%d app=%d)\n",
+            str(arg0),
+            $flow->detected_protocol_stack[0],
+            $flow->detected_protocol_stack[1]);
    }'
 
 Top hostnames by flow count:
@@ -167,16 +227,22 @@ Hostnames resolved via DNS only (DNS = 5):
 
 .. code-block:: bash
 
-   bpftrace -e 'usdt::ndpi:hostname_set /arg1 == 5/ {
-     @dns[str(arg0)] = count();
+   bpftrace -e 'usdt::ndpi:hostname_set {
+     $flow = (struct ndpi_flow_struct *)arg1;
+     if ($flow->detected_protocol_stack[0] == 5) {
+       @dns[str(arg0)] = count();
+     }
    }'
 
 TLS SNI extraction in real time (TLS = 91):
 
 .. code-block:: bash
 
-   bpftrace -e 'usdt::ndpi:hostname_set /arg1 == 91/ {
-     printf("TLS SNI: %s\n", str(arg0));
+   bpftrace -e 'usdt::ndpi:hostname_set {
+     $flow = (struct ndpi_flow_struct *)arg1;
+     if ($flow->detected_protocol_stack[0] == 91) {
+       printf("TLS SNI: %s\n", str(arg0));
+     }
    }'
 
 Hostnames with their application protocol breakdown:
@@ -184,7 +250,8 @@ Hostnames with their application protocol breakdown:
 .. code-block:: bash
 
    bpftrace -e 'usdt::ndpi:hostname_set {
-     @host_app[str(arg0), arg2] = count();
+     $flow = (struct ndpi_flow_struct *)arg1;
+     @host_app[str(arg0), $flow->detected_protocol_stack[1]] = count();
    }'
 
 Hostname resolution rate (hostnames/sec):
@@ -199,8 +266,11 @@ Detect potential DGA activity (short hostnames with many unique values):
 
 .. code-block:: bash
 
-   bpftrace -e 'usdt::ndpi:hostname_set /arg1 == 5/ {
-     @unique_dns = count();
+   bpftrace -e 'usdt::ndpi:hostname_set {
+     $flow = (struct ndpi_flow_struct *)arg1;
+     if ($flow->detected_protocol_stack[0] == 5) {
+       @unique_dns = count();
+     }
    } interval:s:10 {
      printf("Unique DNS hostnames in last 10s: %d\n", @unique_dns);
      clear(@unique_dns);

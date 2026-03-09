@@ -26,13 +26,15 @@
   #define NDPI_DTRACE1(name, a)           DTRACE_PROBE1(ndpi, name, a)
   #define NDPI_DTRACE2(name, a, b)        DTRACE_PROBE2(ndpi, name, a, b)
   #define NDPI_DTRACE3(name, a, b, c)     DTRACE_PROBE3(ndpi, name, a, b, c)
-  #define NDPI_DTRACE4(name, a, b, c, d)  DTRACE_PROBE4(ndpi, name, a, b, c, d)
+  #define NDPI_DTRACE4(name, a, b, c, d)     DTRACE_PROBE4(ndpi, name, a, b, c, d)
+  #define NDPI_DTRACE5(name, a, b, c, d, e)  DTRACE_PROBE5(ndpi, name, a, b, c, d, e)
 #else
-  #define NDPI_DTRACE0(name)              ((void)0)
-  #define NDPI_DTRACE1(name, a)           ((void)0)
-  #define NDPI_DTRACE2(name, a, b)        ((void)0)
-  #define NDPI_DTRACE3(name, a, b, c)     ((void)0)
-  #define NDPI_DTRACE4(name, a, b, c, d)  ((void)0)
+  #define NDPI_DTRACE0(name)                 ((void)0)
+  #define NDPI_DTRACE1(name, a)              ((void)0)
+  #define NDPI_DTRACE2(name, a, b)           ((void)0)
+  #define NDPI_DTRACE3(name, a, b, c)        ((void)0)
+  #define NDPI_DTRACE4(name, a, b, c, d)     ((void)0)
+  #define NDPI_DTRACE5(name, a, b, c, d, e)  ((void)0)
 #endif
 
 #endif /* __NDPI_USDT_H__ */

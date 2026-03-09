@@ -9547,11 +9547,12 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
 		    "nDPI protocol does not match the server IP address");
   }
 
-  NDPI_DTRACE4(flow_classified,
+  NDPI_DTRACE5(flow_classified,
                flow->detected_protocol_stack[0],  /* proto_master */
                flow->detected_protocol_stack[1],  /* proto_app */
                flow->confidence,
-               flow->category);
+               flow->category,
+               flow);
 
   if(flow->state == NDPI_STATE_CLASSIFIED) {
     NDPI_LOG_ERR(ndpi_struct, "Already classified!\n"); /* We shoudn't be here ...*/
@@ -13133,10 +13134,7 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
     }
   }
 
-  NDPI_DTRACE3(hostname_set,
-               dst,                                /* hostname string */
-               flow->detected_protocol_stack[0],   /* proto_master */
-               flow->detected_protocol_stack[1]);   /* proto_app */
+  NDPI_DTRACE2(hostname_set, dst, flow);
 
   return dst;
 }

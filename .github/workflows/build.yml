@@ -290,13 +290,26 @@ jobs:
           }' -c './example/ndpiReader -q -i tests/pcap/http.pcapng' 2>&1 | tee /tmp/bpf_classified.txt
           # Verify we actually traced some flows
           grep -q '@flows:' /tmp/bpf_classified.txt
-          echo "flow_classified probe: OK"
+          echo "flow_classified probe (scalar args): OK"
+      - name: Test flow_classified probe with flow pointer (arg4)
+        run: |
+          sudo bpftrace -e '
+          usdt:./example/ndpiReader:ndpi:flow_classified {
+            $flow = (struct ndpi_flow_struct *)arg4;
+            if ($flow->risk != 0) {
+              @risky[arg0] = count();
+            }
+            @flows = count();
+          }' -c './example/ndpiReader -q -i tests/pcap/http.pcapng' 2>&1 | tee /tmp/bpf_classified_ptr.txt
+          grep -q '@flows:' /tmp/bpf_classified_ptr.txt
+          echo "flow_classified probe (flow pointer): OK"
       - name: Test hostname_set probe with ndpiReader
         run: |
           sudo bpftrace -e '
           usdt:./example/ndpiReader:ndpi:hostname_set {
+            $flow = (struct ndpi_flow_struct *)arg1;
             @hostnames = count();
-            @top[str(arg0)] = count();
+            @top[str(arg0), $flow->detected_protocol_stack[0]] = count();
           }' -c './example/ndpiReader -q -i tests/pcap/tls_certificate_too_long.pcap' 2>&1 | tee /tmp/bpf_hostname.txt
           # Verify we actually traced some hostnames
           grep -q '@hostnames:' /tmp/bpf_hostname.txt
@@ -308,7 +321,7 @@ jobs:
             @hostnames = count();
           }
           usdt:./example/ndpiReader:ndpi:flow_classified {
-            @classified = count();
+            @classified[arg0] = count();
           }' -c './example/ndpiReader -q -i tests/pcap/dns.pcap' 2>&1 | tee /tmp/bpf_both.txt
           grep -q '@classified:' /tmp/bpf_both.txt
           grep -q '@hostnames:' /tmp/bpf_both.txt
