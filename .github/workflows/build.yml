@@ -255,7 +255,26 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install systemtap-sdt-dev bpftrace dwarves
+          sudo apt-get install systemtap-sdt-dev bpftrace
+          sudo apt-get install cmake libdwarf-dev libelf-dev zlib1g-dev
+      - name: Build and install patched pahole
+        run: |
+          git clone --depth=1 --branch v1.31 \
+            https://git.kernel.org/pub/scm/devel/pahole/pahole.git
+          # DW_TAG_atomic_type (C11 _Atomic) is absent from the BTF encoder in
+          # all released pahole versions. Map it to BTF_KIND_VOLATILE, exactly
+          # as the DWARF loader already does (commit 6fdb0140).
+          python3 -c "
+          content = open('pahole/btf_encoder.c').read()
+          content = content.replace(
+              '\tcase DW_TAG_volatile_type:',
+              '\tcase DW_TAG_atomic_type:\n\tcase DW_TAG_volatile_type:',
+              1)
+          open('pahole/btf_encoder.c', 'w').write(content)
+          "
+          cmake -S pahole -B pahole/build -D__LIB=lib
+          make -j$(nproc) -C pahole/build
+          sudo make -C pahole/build install
       - name: Configure nDPI with USDT
         run: |
           ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-usdt-probes
@@ -265,10 +284,6 @@ jobs:
           make -C example
       - name: Embed BTF into binaries (pahole)
         run: |
-          # pahole converts DWARF debug info into a .BTF ELF section.
-          # The GNU linker does not merge .BTF sections from object files,
-          # so -gbtf at compile time is ineffective for shared libraries;
-          # pahole -J is the correct post-build approach.
           pahole -J src/lib/libndpi.so
           pahole -J example/ndpiReader
           echo "BTF embedding done."
@@ -282,7 +297,7 @@ jobs:
           readelf -n example/ndpiReader | grep -q 'flow_classified'
           readelf -n example/ndpiReader | grep -q 'hostname_set'
           echo "All expected USDT probes found."
-          # Verify BTF section is present (embedded by pahole above)
+          # Verify BTF section is present
           readelf -S example/ndpiReader | grep -q '\.BTF'
           echo "BTF section found in ndpiReader."
           readelf -S src/lib/libndpi.so | grep -q '\.BTF'
