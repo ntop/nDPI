@@ -273,6 +273,11 @@ jobs:
           readelf -n example/ndpiReader | grep -q 'flow_classified'
           readelf -n example/ndpiReader | grep -q 'hostname_set'
           echo "All expected USDT probes found."
+          # Verify BTF section is embedded (requires GCC 10.1+ / Clang 10+)
+          readelf -S example/ndpiReader | grep -q '\.BTF'
+          echo "BTF section found in ndpiReader."
+          readelf -S src/lib/libndpi.so | grep -q '\.BTF'
+          echo "BTF section found in libndpi.so."
       - name: List probes via bpftrace
         run: |
           sudo bpftrace -l "usdt:./example/ndpiReader:ndpi:*" | tee /tmp/probe_list.txt
@@ -291,26 +296,28 @@ jobs:
           # Verify we actually traced some flows
           grep -q '@flows:' /tmp/bpf_classified.txt
           echo "flow_classified probe (scalar args): OK"
-      - name: Test flow_classified probe with flow pointer (arg4)
+      - name: Test flow_classified probe with flow pointer (arg4) via BTF
         run: |
-          sudo bpftrace -e '
-          usdt:./example/ndpiReader:ndpi:flow_classified {
-            $flow = (struct ndpi_flow_struct *)arg4;
-            if ($flow->risk != 0) {
-              @risky[arg0] = count();
-            }
+          # Use the full binary path so bpftrace reads struct types from the
+          # embedded .BTF section — no --include needed.
+          READER=$(realpath example/ndpiReader)
+          sudo bpftrace -e "
+          usdt:${READER}:ndpi:flow_classified {
+            \$flow = (struct ndpi_flow_struct *)arg4;
             @flows = count();
-          }' -c './example/ndpiReader -q -i tests/pcap/http.pcapng' 2>&1 | tee /tmp/bpf_classified_ptr.txt
+            if (\$flow->risk != 0) { @risky[arg0] = count(); }
+          }" -c './example/ndpiReader -q -i tests/pcap/http.pcapng' 2>&1 | tee /tmp/bpf_classified_ptr.txt
           grep -q '@flows:' /tmp/bpf_classified_ptr.txt
-          echo "flow_classified probe (flow pointer): OK"
+          echo "flow_classified probe (BTF struct dereference): OK"
       - name: Test hostname_set probe with ndpiReader
         run: |
-          sudo bpftrace -e '
-          usdt:./example/ndpiReader:ndpi:hostname_set {
-            $flow = (struct ndpi_flow_struct *)arg1;
+          READER=$(realpath example/ndpiReader)
+          sudo bpftrace -e "
+          usdt:${READER}:ndpi:hostname_set {
+            \$flow = (struct ndpi_flow_struct *)arg1;
             @hostnames = count();
-            @top[str(arg0), $flow->detected_protocol_stack[0]] = count();
-          }' -c './example/ndpiReader -q -i tests/pcap/tls_certificate_too_long.pcap' 2>&1 | tee /tmp/bpf_hostname.txt
+            @top[str(arg0), \$flow->detected_protocol_stack[0]] = count();
+          }" -c './example/ndpiReader -q -i tests/pcap/tls_certificate_too_long.pcap' 2>&1 | tee /tmp/bpf_hostname.txt
           # Verify we actually traced some hostnames
           grep -q '@hostnames:' /tmp/bpf_hostname.txt
           echo "hostname_set probe: OK"

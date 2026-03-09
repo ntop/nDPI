@@ -35,10 +35,12 @@ Then configure nDPI with USDT enabled:
 
 .. note::
 
-   To dereference the ``ndpi_flow_struct *`` pointer in bpftrace scripts, build nDPI
-   with debug symbols (``--enable-debug-build``). bpftrace then resolves field offsets
-   automatically from DWARF info. Without debug symbols you can still use the scalar
-   arguments directly.
+   When ``--enable-usdt-probes`` is configured, nDPI automatically tries to embed
+   a ``.BTF`` ELF section (requires GCC 10.1+ or Clang 10+). This lets bpftrace
+   resolve ``struct ndpi_flow_struct`` fields by name without any ``--include`` flags,
+   provided the binary path is used explicitly in the probe specification (see
+   `Struct field access via BTF`_ below). On older compilers the section is simply
+   absent and the scalar arguments (``arg0``–``arg3``) remain fully usable.
 
 Available Probes
 ----------------
@@ -73,6 +75,34 @@ Available Probes
 bpftrace Notes
 --------------
 
+Struct field access via BTF
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When nDPI is built with a compiler that supports ``-gbtf`` (GCC 10.1+, Clang 10+),
+the binary contains a ``.BTF`` ELF section with full type information. bpftrace can
+use this to resolve ``struct ndpi_flow_struct`` fields by name — **without any**
+``--include`` **flags** — as long as the full binary path is given in the probe
+specification:
+
+.. code-block:: bash
+
+   # Use the full path (not :: shorthand) so bpftrace reads BTF from the binary
+   bpftrace -e 'usdt:./example/ndpiReader:ndpi:flow_classified {
+     $flow = (struct ndpi_flow_struct *)arg4;
+     if ($flow->risk != 0) { @risky[arg0] = count(); }
+   }'
+
+You can verify whether the ``.BTF`` section is present:
+
+.. code-block:: bash
+
+   readelf -S example/ndpiReader | grep '\.BTF'
+
+See the `bpftrace USDT documentation
+<https://github.com/bpftrace/bpftrace/blob/master/docs/reference_guide.md#usdt>`_
+and the `BTF specification <https://docs.kernel.org/bpf/btf.html>`_ for further
+details.
+
 Predicates vs. action blocks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -93,7 +123,7 @@ Use an ``if`` statement inside the action block instead:
 
 .. code-block:: bash
 
-   bpftrace -e 'usdt::ndpi:hostname_set {
+   bpftrace -e 'usdt:/path/to/ndpiReader:ndpi:hostname_set {
      $flow = (struct ndpi_flow_struct *)arg1;
      if ($flow->detected_protocol_stack[0] == 5) {
        @dns[str(arg0)] = count();

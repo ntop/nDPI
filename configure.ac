@@ -36,6 +36,12 @@ AC_ARG_ENABLE(usdt-probes, AS_HELP_STRING([--enable-usdt-probes], [Enable USDT/D
 AS_IF([test "x$enable_usdt_probes" = "xyes"], [
   AC_CHECK_HEADER([sys/sdt.h], [
     AC_DEFINE([HAVE_USDT], [1], [Define if USDT probes are enabled])
+    dnl Embed BTF type info so bpftrace can resolve struct fields without --include.
+    dnl Requires GCC 10.1+ or Clang 10+; silently skipped on older compilers.
+    AX_CHECK_COMPILE_FLAG([-gbtf], [
+      NDPI_CFLAGS="${NDPI_CFLAGS} -gbtf"
+      AC_DEFINE([HAVE_USDT_BTF], [1], [Define if BTF type info is embedded alongside USDT probes])
+    ])
   ], [
     AC_MSG_ERROR([--enable-usdt-probes requires sys/sdt.h (install systemtap-sdt-dev)])
   ])
@@ -772,8 +778,11 @@ AS_IF([test "x${CUSTOM_NDPI}" = "x-DCUSTOM_NDPI_PROTOCOLS"],
   Custom protocols:        no"])
 
 AS_IF([test "x${enable_usdt_probes}" = "xyes"],
-  [SUMMARY="${SUMMARY}
-  USDT probes:             enabled"],
+  [AS_IF([test "x${ac_cv_compile_flag__gbtf}" = "xyes"],
+    [SUMMARY="${SUMMARY}
+  USDT probes:             enabled (with BTF)"],
+    [SUMMARY="${SUMMARY}
+  USDT probes:             enabled (no BTF: upgrade to GCC 10.1+/Clang 10+)"])],
   [SUMMARY="${SUMMARY}
   USDT probes:             disabled"])
 
