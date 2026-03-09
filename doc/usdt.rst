@@ -10,15 +10,15 @@ the application.
 Building with USDT Support
 --------------------------
 
-Install the required header (Linux):
+Install the required headers (Linux):
 
 .. code-block:: bash
 
    # Debian/Ubuntu
-   sudo apt-get install systemtap-sdt-dev
+   sudo apt-get install systemtap-sdt-dev dwarves
 
    # RHEL/CentOS/Fedora
-   sudo dnf install systemtap-sdt-devel
+   sudo dnf install systemtap-sdt-devel dwarves
 
 Then configure nDPI with USDT enabled:
 
@@ -35,12 +35,10 @@ Then configure nDPI with USDT enabled:
 
 .. note::
 
-   When ``--enable-usdt-probes`` is configured, nDPI automatically tries to embed
-   a ``.BTF`` ELF section (requires GCC 10.1+ or Clang 10+). This lets bpftrace
-   resolve ``struct ndpi_flow_struct`` fields by name without any ``--include`` flags,
-   provided the binary path is used explicitly in the probe specification (see
-   `Struct field access via BTF`_ below). On older compilers the section is simply
-   absent and the scalar arguments (``arg0``–``arg3``) remain fully usable.
+   To allow bpftrace to resolve ``struct ndpi_flow_struct`` fields by name without
+   any ``--include`` flags, embed BTF into the binaries after building using
+   ``pahole -J`` (from the ``dwarves`` package). See `Struct field access via BTF`_
+   below. Without BTF the scalar arguments (``arg0``–``arg3``) remain fully usable.
 
 Available Probes
 ----------------
@@ -78,21 +76,38 @@ bpftrace Notes
 Struct field access via BTF
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When nDPI is built with a compiler that supports ``-gbtf`` (GCC 10.1+, Clang 10+),
-the binary contains a ``.BTF`` ELF section with full type information. bpftrace can
-use this to resolve ``struct ndpi_flow_struct`` fields by name — **without any**
-``--include`` **flags** — as long as the full binary path is given in the probe
-specification:
+The GNU linker does not merge ``.BTF`` sections from object files, so compiler
+flags like ``-gbtf`` are not sufficient to embed BTF into a shared library or
+executable. The correct approach is to use ``pahole -J`` (from the ``dwarves``
+package) as a post-build step: it reads the DWARF debug info already present in
+the binary and inserts a ``.BTF`` section with full type information.
 
 .. code-block:: bash
 
-   # Use the full path (not :: shorthand) so bpftrace reads BTF from the binary
+   # Debian/Ubuntu
+   sudo apt-get install dwarves
+
+   # RHEL/CentOS/Fedora
+   sudo dnf install dwarves
+
+   ./configure --enable-usdt-probes --enable-debug-build
+   make
+   pahole -J src/lib/libndpi.so
+   pahole -J example/ndpiReader
+
+Once the ``.BTF`` section is present, bpftrace can resolve
+``struct ndpi_flow_struct`` fields by name — **without any** ``--include``
+**flags** — as long as the full binary path is used in the probe specification
+(the ``::`` shorthand does not trigger BTF lookup):
+
+.. code-block:: bash
+
    bpftrace -e 'usdt:./example/ndpiReader:ndpi:flow_classified {
      $flow = (struct ndpi_flow_struct *)arg4;
      if ($flow->risk != 0) { @risky[arg0] = count(); }
    }'
 
-You can verify whether the ``.BTF`` section is present:
+Verify the section is present with:
 
 .. code-block:: bash
 

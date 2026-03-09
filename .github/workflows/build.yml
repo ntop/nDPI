@@ -255,7 +255,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install systemtap-sdt-dev bpftrace
+          sudo apt-get install systemtap-sdt-dev bpftrace dwarves
       - name: Configure nDPI with USDT
         run: |
           ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-usdt-probes
@@ -263,6 +263,15 @@ jobs:
         run: |
           make -j all
           make -C example
+      - name: Embed BTF into binaries (pahole)
+        run: |
+          # pahole converts DWARF debug info into a .BTF ELF section.
+          # The GNU linker does not merge .BTF sections from object files,
+          # so -gbtf at compile time is ineffective for shared libraries;
+          # pahole -J is the correct post-build approach.
+          pahole -J src/lib/libndpi.so
+          pahole -J example/ndpiReader
+          echo "BTF embedding done."
       - name: Verify USDT probes are embedded (readelf)
         run: |
           echo "=== Probes in libndpi.so ==="
@@ -273,7 +282,7 @@ jobs:
           readelf -n example/ndpiReader | grep -q 'flow_classified'
           readelf -n example/ndpiReader | grep -q 'hostname_set'
           echo "All expected USDT probes found."
-          # Verify BTF section is embedded (requires GCC 10.1+ / Clang 10+)
+          # Verify BTF section is present (embedded by pahole above)
           readelf -S example/ndpiReader | grep -q '\.BTF'
           echo "BTF section found in ndpiReader."
           readelf -S src/lib/libndpi.so | grep -q '\.BTF'
