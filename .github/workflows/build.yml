@@ -255,7 +255,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install systemtap-sdt-dev bpftrace pahole libelf-dev
+          sudo apt-get install systemtap-sdt-dev bpftrace pahole libelf-dev libdwarf1 llvm
       - name: Download latest bpftrace
         run: |
           curl -L -O https://github.com/bpftrace/bpftrace/releases/download/v0.24.2/bpftrace
@@ -271,6 +271,8 @@ jobs:
           make -j all
       - name: Generate header file for bpftrace
         run: |
+          pahole --version
+          ldd $(which pahole) | grep bpf
           pahole -J example/ndpiReader
           bpftool btf dump file example/ndpiReader format c > ndpi_types.h
       - name: Verify USDT probes are embedded (readelf)
