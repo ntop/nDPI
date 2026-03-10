@@ -37,8 +37,8 @@ Then configure nDPI with USDT enabled:
 
    To allow bpftrace to resolve ``struct ndpi_flow_struct`` fields by name without
    any ``--include`` flags, embed BTF into the binaries after building using
-   ``pahole -J`` (from the ``dwarves`` package). See `Struct field access via BTF`_
-   below. Without BTF the scalar arguments (``arg0``–``arg3``) remain fully usable.
+   ``pahole -J`` (from the ``dwarves`` package). See `Struct field access`_
+   below. Without BTF the scalar arguments remain fully usable.
 
 Available Probes
 ----------------
@@ -73,14 +73,15 @@ Available Probes
 bpftrace Notes
 --------------
 
-Struct field access via BTF
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Struct field access
+^^^^^^^^^^^^^^^^^^^^
 
-The GNU linker does not merge ``.BTF`` sections from object files, so compiler
-flags like ``-gbtf`` are not sufficient to embed BTF into a shared library or
-executable. The correct approach is to use ``pahole -J`` (from the ``dwarves``
-package) as a post-build step: it reads the DWARF debug info already present in
-the binary and inserts a ``.BTF`` section with full type information.
+To be able to dereference userspace pointers (for example,
+``struct ndpi_flow_struct`` as ``arg1`` in ``hostname_set`` probe) you need to
+embed BTF information into a shared library or executable. The correct approach
+is to use ``pahole -J`` (from the ``dwarves`` package) as a post-build step:
+it reads the DWARF debug info already present in the binary and inserts a
+``.BTF`` section with full type information.
 
 .. code-block:: bash
 
@@ -102,7 +103,7 @@ Once the ``.BTF`` section is present, bpftrace can resolve
 
 .. code-block:: bash
 
-   bpftrace -e 'usdt:./example/ndpiReader:ndpi:flow_classified {
+   bpftrace -e 'usdt:/path/to/ndpiReader:ndpi:flow_classified {
      $flow = (struct ndpi_flow_struct *)arg4;
      if ($flow->risk != 0) { @risky[arg0] = count(); }
    }'
@@ -113,10 +114,83 @@ Verify the section is present with:
 
    readelf -S example/ndpiReader | grep '\.BTF'
 
-See the `bpftrace USDT documentation
-<https://github.com/bpftrace/bpftrace/blob/master/docs/reference_guide.md#usdt>`_
-and the `BTF specification <https://docs.kernel.org/bpf/btf.html>`_ for further
-details.
+
+.. _btf-pitfalls:
+
+BTF Generation — Known Issues and Workarounds
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**C11 ``_Atomic`` types break pahole BTF encoding**
+
+nDPI's bundled CRoaring library uses ``_Atomic`` qualifiers, which the
+compiler emits as ``DW_TAG_atomic_type`` entries in DWARF.  All released
+versions of ``pahole`` (including 1.31) abort BTF encoding when they
+encounter this tag, even when ``--btf_encode_force`` is passed::
+
+   Unsupported DW_TAG_atomic_type(0x47): type: 0x153c6
+   Encountered error while encoding BTF.
+
+The workaround used in nDPI's CI is to rebuild with
+``CROARING_ATOMIC_IMPL=1``, which selects a non-atomic code path and
+eliminates the offending DWARF entries:
+
+.. code-block:: bash
+
+   CFLAGS="-DCROARING_ATOMIC_IMPL=1" ./configure \
+       --enable-usdt-probes --enable-debug-build
+   make
+
+**Fallback: generate a C header with bpftool**
+
+Even with BTF info correctly embedded, pointer dereferences might fail::
+
+    stdin:1:65-93: ERROR: Cannot resolve unknown type "struct ndpi_flow_struct"
+
+In thi case, generate a C header from the BTF info and pass it to bpftrace
+with ``--include``:
+
+.. code-block:: bash
+
+   # Generate a C header with the full layout of the userspace structures
+   bpftool btf dump file /path/to/ndpiReader format c > ndpi_types.h
+
+   # Use the header in bpfttrace
+   sudo bpftrace -I .--include ndpi_types.h \
+     -e 'usdt:/path/to/ndpiReader:ndpi:flow_classified {
+       $flow = (struct ndpi_flow_struct *)arg4;
+       if ($flow->risk != 0) { @risky[arg0] = count(); }
+     }'
+
+bpftrace Map Size Limits
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+When tracing long or high-throughput captures, bpftrace maps can fill
+up and emit a kernel-level ``E2BIG`` warning::
+
+   WARNING: Map full; can't update element.
+   Additional Info - helper: map_update_elem, retcode: -7
+
+Increase map key limit via the environment variable (works with all
+recent bpftrace versions):
+
+.. code-block:: bash
+
+   sudo BPFTRACE_MAX_MAP_KEYS=100000 bpftrace --include ndpi_types.h \
+     -e 'usdt:/path/to/ndpiReader:ndpi:hostname_set {
+       @top[str(arg0)] = count();
+     }'
+
+Some bpftrace builds also accept a ``config`` block at the top of the
+script:
+
+.. code-block:: bash
+
+   sudo bpftrace --include ndpi_types.h \
+     -e 'config = { max_map_keys = 100000 }
+   usdt:/path/to/ndpiReader:ndpi:hostname_set {
+     @top[str(arg0)] = count();
+   }'
+
 
 Predicates vs. action blocks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -129,10 +203,7 @@ bpftrace predicates (``/condition/``) work well for filtering on scalar argument
    bpftrace -e 'usdt::ndpi:flow_classified /arg0 == 91/ { ... }'
 
 Filtering on struct fields via a pointer (e.g. ``arg4`` or ``arg1`` in
-``hostname_set``) is **not supported in predicates**. User-space pointer
-dereferences require ``bpf_probe_read_user()`` internally, which bpftrace only
-generates inside action blocks — not in the predicate expression. Attempting it
-will either fail to compile or silently misbehave.
+``hostname_set``) is **not supported in predicates**.
 
 Use an ``if`` statement inside the action block instead:
 
@@ -145,12 +216,21 @@ Use an ``if`` statement inside the action block instead:
      }
    }'
 
-See the `bpftrace reference guide
-<https://github.com/bpftrace/bpftrace/blob/master/docs/reference_guide.md>`_
-for full details on predicate and action block semantics.
-
 bpftrace Examples
 -----------------
+
+.. note::
+
+   Examples that dereference a userspace pointer (``arg4`` in ``flow_classified``,
+   ``arg1`` in ``hostname_set``) require either a ``.BTF`` section embedded
+   in the binary via ``pahole -J`` **or** an explicit ``--include ndpi_types.h``
+   header (generated via ``bpftool btf dump ... format c``).  See
+   `BTF Generation — Known Issues and Workarounds`_ above.
+
+   Scalar-only examples (those using only ``arg0``–``arg3`` in ``flow_classified``,
+   ``arg0`` in ``hostname_set``, without struct dereference) work without BTF or
+   headers and can use the ``::`` shorthand.
+
 
 List available probes:
 

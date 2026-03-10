@@ -255,7 +255,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install systemtap-sdt-dev bpftrace pahole llvm linux-tools-common linux-tools-azure linux-cloud-tools-azure
+          sudo apt-get install systemtap-sdt-dev bpftrace pahole llvm
       - name: Download latest bpftrace
         run: |
           curl -L -O https://github.com/bpftrace/bpftrace/releases/download/v0.24.2/bpftrace
@@ -271,7 +271,7 @@ jobs:
           make -j all
       - name: Build bpftool
         run: |
-          # Temporary workaround: some 6.14 kernel don't have bpftool (and perf) in their packages
+          # Temporary workaround: some 6.14 kernels don't have bpftool (and perf) in their packages
           # See: https://bugs.launchpad.net/ubuntu/+source/linux-hwe-6.14/+bug/2117147
           # See: https://gist.github.com/karlivory/9111f906f4eb06370b2b237c62a6b00e
           curl -L -O https://gist.githubusercontent.com/karlivory/9111f906f4eb06370b2b237c62a6b00e/raw/dbd24228dda79e05815531a1db643d0709301838/build-perf.sh
@@ -309,7 +309,7 @@ jobs:
           # Verify we actually traced some flows
           grep -q '@flows:' /tmp/bpf_classified.txt
           echo "flow_classified probe (scalar args): OK"
-      - name: Test flow_classified probe with flow pointer (arg4) via BTF
+      - name: Test flow_classified probe with flow pointer (arg4) via header
         run: |
           # Embedding .BTF section and reading it from bpftrace is still a bit buggy.
           # Use explicit header, with latest bpftrace
