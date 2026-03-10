@@ -272,7 +272,7 @@ jobs:
       - name: Build bpftool
         run: |
           curl -L -O https://gist.githubusercontent.com/karlivory/9111f906f4eb06370b2b237c62a6b00e/raw/dbd24228dda79e05815531a1db643d0709301838/build-perf.sh
-          bash build-perf.sh
+          sudo bash build-perf.sh
       - name: Generate header file for bpftrace
         run: |
           pahole -J src/lib/libndpi.so
