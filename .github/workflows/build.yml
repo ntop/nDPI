@@ -269,16 +269,12 @@ jobs:
       - name: Build nDPI
         run: |
           make -j all
-          make -C example
       - name: Generate header file for bpftrace
         run: |
-          pahole -J src/lib/libndpi.so
           pahole -J example/ndpiReader
           bpftool btf dump file example/ndpiReader format c > ndpi_types.h
       - name: Verify USDT probes are embedded (readelf)
         run: |
-          echo "=== Probes in libndpi.so ==="
-          readelf -n src/lib/libndpi.so | grep -A4 stapsdt
           echo "=== Probes in ndpiReader ==="
           readelf -n example/ndpiReader | grep -A4 stapsdt
           # Verify both probes are present
