@@ -255,15 +255,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install systemtap-sdt-dev bpftrace
-          sudo apt-get install cmake libdwarf-dev libelf-dev zlib1g-dev llvm libelf-dev
+          sudo apt-get install systemtap-sdt-dev bpftrace pahole
       - name: Download latest bpftrace
         run: |
           curl -L -O https://github.com/bpftrace/bpftrace/releases/download/v0.24.2/bpftrace
           chmod +x bpftrace
       - name: Configure nDPI with USDT
         run: |
-          # Workaround: C11 '_Atomic' type is not fully supported for BPF CO-RE purposes
+          # Workaround: C11 '_Atomic' type (from croaring code) is not fully supported for BPF CO-RE purposes
           # This is needed only if you want to dereference `struct ndpi_flow_struct *`
           # in the probe actions
           ./autogen.sh && CFLAGS="-DCROARING_ATOMIC_IMPL=1" ./configure --enable-option-checking=fatal --enable-debug-messages --enable-usdt-probes
