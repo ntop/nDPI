@@ -256,37 +256,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
           sudo apt-get install systemtap-sdt-dev bpftrace
-          sudo apt-get install cmake libdwarf-dev libelf-dev zlib1g-dev
-      - name: Build and install patched pahole
+          sudo apt-get install cmake libdwarf-dev libelf-dev zlib1g-dev llvm libelf-dev
+      - name: Download latest bpftrace
         run: |
-          git clone --depth=1 --branch v1.31 \
-            https://git.kernel.org/pub/scm/devel/pahole/pahole.git
-          # DW_TAG_atomic_type (C11 _Atomic) is absent from the BTF encoder in
-          # all released pahole versions. Map it to BTF_KIND_VOLATILE, exactly
-          # as the DWARF loader already does (commit 6fdb0140).
-          python3 -c "
-          content = open('pahole/btf_encoder.c').read()
-          content = content.replace(
-              '\tcase DW_TAG_volatile_type:',
-              '\tcase DW_TAG_atomic_type:\n\tcase DW_TAG_volatile_type:',
-              1)
-          open('pahole/btf_encoder.c', 'w').write(content)
-          "
-          cmake -S pahole -B pahole/build -D__LIB=lib
-          make -j$(nproc) -C pahole/build
-          sudo make -C pahole/build install
+          curl -L -O https://github.com/bpftrace/bpftrace/releases/download/v0.24.2/bpftrace
+          chmod +x bpftrace
       - name: Configure nDPI with USDT
         run: |
-          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-usdt-probes
+          # Workaround: C11 '_Atomic' type is not fully supported for BPF CO-RE purposes
+          # This is needed only if you want to dereference `struct ndpi_flow_struct *`
+          # in the probe actions
+          ./autogen.sh && CFLAGS="-DCROARING_ATOMIC_IMPL=1" ./configure --enable-option-checking=fatal --enable-debug-messages --enable-usdt-probes
       - name: Build nDPI
         run: |
           make -j all
           make -C example
-      - name: Embed BTF into binaries (pahole)
+      - name: Generate header file for bpftrace
         run: |
           pahole -J src/lib/libndpi.so
           pahole -J example/ndpiReader
-          echo "BTF embedding done."
+          bpftool btf dump file example/ndpiReader format c > ndpi_types.h
       - name: Verify USDT probes are embedded (readelf)
         run: |
           echo "=== Probes in libndpi.so ==="
@@ -297,11 +286,6 @@ jobs:
           readelf -n example/ndpiReader | grep -q 'flow_classified'
           readelf -n example/ndpiReader | grep -q 'hostname_set'
           echo "All expected USDT probes found."
-          # Verify BTF section is present
-          readelf -S example/ndpiReader | grep -q '\.BTF'
-          echo "BTF section found in ndpiReader."
-          readelf -S src/lib/libndpi.so | grep -q '\.BTF'
-          echo "BTF section found in libndpi.so."
       - name: List probes via bpftrace
         run: |
           sudo bpftrace -l "usdt:./example/ndpiReader:ndpi:*" | tee /tmp/probe_list.txt
@@ -322,20 +306,21 @@ jobs:
           echo "flow_classified probe (scalar args): OK"
       - name: Test flow_classified probe with flow pointer (arg4) via BTF
         run: |
-          # Use the full binary path so bpftrace reads struct types from the
-          # embedded .BTF section — no --include needed.
-          READER=$(realpath example/ndpiReader)
-          sudo bpftrace -e 'usdt:'"${READER}"':ndpi:flow_classified {
+          # Embedding .BTF section and reading it from bpftrace is still a bit buggy.
+          # Use explicit header, with latest bpftrace
+          sudo ./bpftrace -I . --include ndpi_types.h \
+          -e 'usdt:./example/ndpiReader:ndpi:flow_classified {
             $flow = (struct ndpi_flow_struct *)arg4;
             @flows = count();
             if ($flow->risk != 0) { @risky[arg0] = count(); }
           }' -c './example/ndpiReader -q -i tests/pcap/http.pcapng' 2>&1 | tee /tmp/bpf_classified_ptr.txt
           grep -q '@flows:' /tmp/bpf_classified_ptr.txt
-          echo "flow_classified probe (BTF struct dereference): OK"
+          echo "flow_classified probe (struct dereference): OK"
       - name: Test hostname_set probe with ndpiReader
         run: |
           READER=$(realpath example/ndpiReader)
-          sudo bpftrace -e 'usdt:'"${READER}"':ndpi:hostname_set {
+          sudo ./bpftrace -I . --include ndpi_types.h \
+          -e 'usdt:./example/ndpiReader:ndpi:hostname_set {
             $flow = (struct ndpi_flow_struct *)arg1;
             @hostnames = count();
             @top[str(arg0), $flow->detected_protocol_stack[0]] = count();
