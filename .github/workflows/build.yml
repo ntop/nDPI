@@ -255,7 +255,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install systemtap-sdt-dev bpftrace pahole libelf-dev libdwarf1 llvm
+          sudo apt-get install systemtap-sdt-dev bpftrace pahole
       - name: Download latest bpftrace
         run: |
           curl -L -O https://github.com/bpftrace/bpftrace/releases/download/v0.24.2/bpftrace
@@ -265,18 +265,19 @@ jobs:
           # Workaround: C11 '_Atomic' type (from croaring code) is not fully supported for BPF CO-RE purposes
           # This is needed only if you want to dereference `struct ndpi_flow_struct *`
           # in the probe actions
-          ./autogen.sh && CFLAGS="-DCROARING_ATOMIC_IMPL=1" ./configure --enable-option-checking=fatal --enable-debug-messages --enable-usdt-probes
+          ./autogen.sh && CFLAGS="-DCROARING_ATOMIC_IMPL=1" ./configure --enable-option-checking=fatal --enable-debug-build --enable-debug-messages --enable-usdt-probes
       - name: Build nDPI
         run: |
           make -j all
       - name: Generate header file for bpftrace
         run: |
-          pahole --version
-          ldd $(which pahole) | grep bpf
+          pahole -J src/lib/libndpi.so
           pahole -J example/ndpiReader
           bpftool btf dump file example/ndpiReader format c > ndpi_types.h
       - name: Verify USDT probes are embedded (readelf)
         run: |
+          echo "=== Probes in libndpi.so ==="
+          readelf -n src/lib/libndpi.so | grep -A4 stapsdt
           echo "=== Probes in ndpiReader ==="
           readelf -n example/ndpiReader | grep -A4 stapsdt
           # Verify both probes are present
