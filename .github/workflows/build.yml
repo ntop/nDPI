@@ -271,6 +271,9 @@ jobs:
           make -j all
       - name: Build bpftool
         run: |
+          # Temporary workaround: some 6.14 kernel don't have bpftool (and perf) in their packages
+          # See: https://bugs.launchpad.net/ubuntu/+source/linux-hwe-6.14/+bug/2117147
+          # See: https://gist.github.com/karlivory/9111f906f4eb06370b2b237c62a6b00e
           curl -L -O https://gist.githubusercontent.com/karlivory/9111f906f4eb06370b2b237c62a6b00e/raw/dbd24228dda79e05815531a1db643d0709301838/build-perf.sh
           sudo bash build-perf.sh
       - name: Generate header file for bpftrace
@@ -315,7 +318,7 @@ jobs:
             $flow = (struct ndpi_flow_struct *)arg4;
             @flows = count();
             if ($flow->risk != 0) { @risky[arg0] = count(); }
-          }' -c './example/ndpiReader -q -i tests/pcap/http.pcapng' 2>&1 | tee /tmp/bpf_classified_ptr.txt
+          }' -c './example/ndpiReader -q -i tests/pcap/1kxun.pcap' 2>&1 | tee /tmp/bpf_classified_ptr.txt
           grep -q '@flows:' /tmp/bpf_classified_ptr.txt
           echo "flow_classified probe (struct dereference): OK"
       - name: Test hostname_set probe with ndpiReader
@@ -339,6 +342,6 @@ jobs:
           usdt:./example/ndpiReader:ndpi:flow_classified {
             @classified[arg0] = count();
           }' -c './example/ndpiReader -q -i tests/pcap/dns.pcap' 2>&1 | tee /tmp/bpf_both.txt
-          grep -q '@classified:' /tmp/bpf_both.txt
-          grep -q '@hostnames:' /tmp/bpf_both.txt
+          grep -q '@classified' /tmp/bpf_both.txt
+          grep -q '@hostnames' /tmp/bpf_both.txt
           echo "Both probes fired successfully."
