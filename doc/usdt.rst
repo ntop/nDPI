@@ -69,6 +69,14 @@ Available Probes
        HTTP (Host header), QUIC, NetBIOS, DHCP, STUN, and others.
        The hostname is provided directly as a string for convenience;
        the flow pointer gives access to all other flow fields.
+   * - ``fragment_ipv4``
+     - | ``arg0``: pointer to IPv4 header (``struct ndpi_iphdr *``)
+     - Fires when a (IPv4) packet processed by the library is fragmented
+       at IP layer.
+   * - ``fragment_ipv6``
+     - | ``arg0``: pointer to IPv6 header (``struct ndpi_ipv6hdr *``)
+     - Fires when a (IPv6) packet processed by the library is fragmented
+       at IP layer.
 
 bpftrace Notes
 --------------

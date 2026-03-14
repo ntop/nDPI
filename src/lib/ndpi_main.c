@@ -26,6 +26,7 @@
 #include <netinet/ip.h>
 #endif
 
+
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_UNKNOWN
 
 #include "ndpi_config.h"
@@ -7715,8 +7716,14 @@ static void ndpi_enabled_callbacks_init(struct ndpi_detection_module_struct *ndp
  * 	nxt_hdr: first byte of the layer 4 packet
  * returns 0 upon success and 1 upon failure
  */
-int ndpi_handle_ipv6_extension_headers(u_int16_t l3len, const u_int8_t **l4ptr,
+int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi_str,
+                                       const struct ndpi_ipv6hdr *ip6h,
+                                       u_int16_t l3len, const u_int8_t **l4ptr,
                                        u_int16_t *l4len, u_int8_t *nxt_hdr) {
+#ifndef HAVE_USDT
+  __ndpi_unused_param(ip6h);
+#endif
+
   while(l3len > 1 && (*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
     u_int16_t ehdr_len, frag_offset;
 
@@ -7735,6 +7742,16 @@ int ndpi_handle_ipv6_extension_headers(u_int16_t l3len, const u_int8_t **l4ptr,
         return 1;
       }
       l3len -= 5;
+
+      if(ndpi_str) {
+        uint16_t offlg = ntohs(*(u_int16_t *)((*l4ptr) + 2));
+        if((offlg & 0xfff8) != 0 || (offlg & 0x0001) != 0) {
+          NDPI_LOG_DBG(ndpi_str, "IP(v6) fragment\n");
+
+          NDPI_DTRACE1(fragment_ipv6,
+                       ip6h /* IPV6 header */);
+        }
+      }
 
       *nxt_hdr = (*l4ptr)[0];
       frag_offset = ntohs(*(u_int16_t *)((*l4ptr) + 2)) >> 3;
@@ -7777,12 +7794,22 @@ int ndpi_handle_ipv6_extension_headers(u_int16_t l3len, const u_int8_t **l4ptr,
 /* ******************************************************************** */
 
 /* Used by dns.c */
-u_int8_t iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize) {
+u_int8_t iph_is_valid_and_not_fragmented(struct ndpi_detection_module_struct *ndpi_str,
+                                         const struct ndpi_iphdr *iph, const u_int16_t ipsize) {
   /*
     returned value:
     0: fragmented
     1: not fragmented
   */
+
+  if((ntohs(iph->frag_off) & 0x2000) ||
+     (ntohs(iph->frag_off) & 0x1fff)) {
+    NDPI_LOG_DBG(ndpi_str, "IP(v4) fragment\n");
+
+    NDPI_DTRACE1(fragment_ipv4,
+                 iph /* IPV4 header */);
+  }
+
   //#ifdef REQUIRE_FULL_PACKETS
 
   if(iph->protocol == IPPROTO_UDP) {
@@ -7844,7 +7871,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
   }
 
   /* 0: fragmented; 1: not fragmented */
-  if(iph != NULL && iph_is_valid_and_not_fragmented(iph, l3_len)) {
+  if(iph != NULL && iph_is_valid_and_not_fragmented(ndpi_str, iph, l3_len)) {
     u_int16_t len = ndpi_min(ntohs(iph->tot_len), l3_len);
     u_int16_t hlen = (iph->ihl * 4);
 
@@ -7863,7 +7890,7 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
     l4protocol = iph_v6->ip6_hdr.ip6_un1_nxt;
 
     // we need to handle IPv6 extension headers if present
-    if(ndpi_handle_ipv6_extension_headers(l3_len - sizeof(struct ndpi_ipv6hdr), &l4ptr, &l4len, &l4protocol) != 0) {
+    if(ndpi_handle_ipv6_extension_headers(ndpi_str, iph_v6, l3_len - sizeof(struct ndpi_ipv6hdr), &l4ptr, &l4len, &l4protocol) != 0) {
       return(1);
     }
 

@@ -662,7 +662,8 @@ void exclude_dissector(struct ndpi_detection_module_struct *ndpi_str, struct ndp
 
 char *strptime(const char *s, const char *format, struct tm *tm);
 
-u_int8_t iph_is_valid_and_not_fragmented(const struct ndpi_iphdr *iph, const u_int16_t ipsize);
+u_int8_t iph_is_valid_and_not_fragmented(struct ndpi_detection_module_struct *ndpi_str,
+                                         const struct ndpi_iphdr *iph, const u_int16_t ipsize);
 
 int current_pkt_from_client_to_server(const struct ndpi_detection_module_struct *ndpi_str, const struct ndpi_flow_struct *flow);
 int current_pkt_from_server_to_client(const struct ndpi_detection_module_struct *ndpi_str, const struct ndpi_flow_struct *flow);

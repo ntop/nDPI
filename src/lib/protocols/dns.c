@@ -926,7 +926,7 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
       /* 0: fragmented; 1: not fragmented */
       if((flags & 0x20)
-	 || (iph_is_valid_and_not_fragmented(packet->iph, packet->l3_packet_len) == 0)) {
+	 || (iph_is_valid_and_not_fragmented(ndpi_struct, packet->iph, packet->l3_packet_len) == 0)) {
 	ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_FRAGMENTED, NULL);
       }
     } else if(packet->iphv6 != NULL) {
