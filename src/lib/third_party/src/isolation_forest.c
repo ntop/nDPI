@@ -25,6 +25,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include "ndpi_main.h"
 
 /* ────────────────────────────────────────────
    Portable pseudo-random number generator
@@ -212,16 +213,16 @@ IForest *iforest_fit(const double *data,
   if (subsample_sz <= 0 || subsample_sz > n_samples)
     subsample_sz = (n_samples < 256) ? n_samples : 256;
 
-  IForest *forest = (IForest *)malloc(sizeof(IForest));
+  IForest *forest = (IForest *)ndpi_malloc(sizeof(IForest));
   if (!forest) return NULL;
 
-  forest->trees         = (IFTree *)malloc(sizeof(IFTree) * (size_t)n_trees);
+  forest->trees         = (IFTree *)ndpi_malloc(sizeof(IFTree) * (size_t)n_trees);
   forest->n_trees       = n_trees;
   forest->n_features    = n_features;
   forest->subsample_size = subsample_sz;
   forest->avg_path_length = c_factor(subsample_sz);
 
-  if (!forest->trees) { free(forest); return NULL; }
+  if (!forest->trees) { ndpi_free(forest); return NULL; }
 
   /* Max depth is ceil(log2(subsample_size)) */
   int max_depth = 1;
@@ -229,8 +230,8 @@ IForest *iforest_fit(const double *data,
   if (max_depth > IF_MAX_DEPTH) max_depth = IF_MAX_DEPTH;
 
   /* Index buffer for subsampling (reused per tree) */
-  int *indices = (int *)malloc(sizeof(int) * (size_t)n_samples);
-  if (!indices) { free(forest->trees); free(forest); return NULL; }
+  int *indices = (int *)ndpi_malloc(sizeof(int) * (size_t)n_samples);
+  if (!indices) { ndpi_free(forest->trees); ndpi_free(forest); return NULL; }
 
   RNG rng;
   rng_seed(&rng, seed);
@@ -250,7 +251,7 @@ IForest *iforest_fit(const double *data,
 	       data, n_features, &rng);
   }
 
-  free(indices);
+  ndpi_free(indices);
   return forest;
 }
 
@@ -294,6 +295,6 @@ void iforest_score_batch(const IForest *forest,
 
 void iforest_free(IForest *forest) {
   if (!forest) return;
-  free(forest->trees);
-  free(forest);
+  ndpi_free(forest->trees);
+  ndpi_free(forest);
 }
