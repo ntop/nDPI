@@ -7483,7 +7483,8 @@ void isolationforestUnitTest() {
   }
 
   /* Train both normal and anomalous traffic */
-  assert(forest = ndpi_alloc_iforest((const double*)data, N, NET_FEATURES));
+  forest = ndpi_alloc_iforest((const double*)data, N, NET_FEATURES);
+  assert(forest);
 
   for(int i = 0; i < N_NORMAL; i++) {
     double *row = data + i * NET_FEATURES;
