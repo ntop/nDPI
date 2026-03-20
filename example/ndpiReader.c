@@ -7456,11 +7456,11 @@ void isolationforestUnitTest() {
 
   /* Attack traffic: port scans, floods, exfil */
   for(i = N_NORMAL; i < N; i++) {
-    double *row = (double*)ndpi_malloc(sizeof(double)* NET_FEATURES);   
+    double *row = (double*)ndpi_malloc(sizeof(double)* NET_FEATURES);
     int kind = i % 3;
 
     data[i] = row;
-    
+
     if (kind == 0) {
       /* Port scan: many ports, small packets, rapid */
       row[NET_PKT_SIZE] = 40 + randomize() * 20;
@@ -7506,7 +7506,7 @@ void isolationforestUnitTest() {
 #if 0
       printf("[anomaly] score=%.4f [threshold: %.4f] [%s]\n",
 	     score, threshold, (score > threshold) ? "ANOMALY" : "OK");
-      
+
       assert(score > threshold);
 #endif
     }
