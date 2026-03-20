@@ -1961,8 +1961,7 @@ extern "C" {
    * @param n_features    Number of features per sample
    * @param n_trees       Number of isolation trees (100–500 typical)
    */
-  void* ndpi_alloc_iforest(const double *data, int n_samples,
-			   int n_features);
+  void* ndpi_alloc_iforest(double **data, u_int n_samples, u_int n_features);
 
   /**
    * Frees a previously allocated isolation forest
@@ -1979,7 +1978,7 @@ extern "C" {
    * @param sample       The data sample to analyze
    * @return The anomaly value (0..1 range), usually a value over 0.5 is an anomaly.
    */
-  double ndpi_iforest_score_single(void *_forest, const double *sample);
+  double ndpi_iforest_score(void *_forest, double *sample);
 
   /* ******************************* */
 

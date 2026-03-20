@@ -2422,12 +2422,9 @@ u_int16_t ndpi_ranking_add_epoch(ndpi_ranking *rank,
  * @param n_features    Number of features per sample
  * @param n_trees       Number of isolation trees (100–500 typical)
  */
-void* ndpi_alloc_iforest(const double *data, int n_samples, int n_features) {
+void* ndpi_alloc_iforest(double **data, u_int n_samples, u_int n_features) {
   /* We use some reasonable defaults to avoid making API too complex */
-  return((void*)iforest_fit(data, n_samples, n_features,
-			    200, /* n_trees */
-			    256, /* subsample_sz */
-			    0 /* seed */));
+  return((void*)build_forest(data, n_samples, n_features));
 }
 
 /**
@@ -2436,7 +2433,7 @@ void* ndpi_alloc_iforest(const double *data, int n_samples, int n_features) {
  * @param forest A forest created with ndpi_alloc_iforest() 
  */
 void ndpi_free_iforest(void *forest) {
-  iforest_free((IForest*)forest);
+  free_forest((Forest*)forest);
 }
 
 /**
@@ -2448,9 +2445,7 @@ void ndpi_free_iforest(void *forest) {
  * @param sample_score The computed score (out)
  * @return The anomaly value (0..1 range), usually a value over 0.5 is an anomaly.
  */
-double ndpi_iforest_score_single(void *_forest, const double *sample) {
-  IFResult r = iforest_score((IForest*)_forest, sample, 0.5);
-
-  return(r.score);
+double ndpi_iforest_score(void *_forest, double *sample) {
+  return(forest_compute_score((Forest*)_forest, sample));
 }
   

@@ -18,283 +18,157 @@
  *      it sits in (0, 1) regardless of dataset size.
  */
 
-#include "isolation_forest.h"
-
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include <time.h>
 #include <assert.h>
 #include "ndpi_main.h"
+#include "../include/isolation_forest.h"
 
-/* ────────────────────────────────────────────
-   Portable pseudo-random number generator
-   (xorshift64 — fast, no global state needed)
-   ──────────────────────────────────────────── */
-
-typedef struct { unsigned long long state; } RNG;
-
-static void rng_seed(RNG *r, unsigned int seed) {
-  r->state = seed ? (unsigned long long)seed : (unsigned long long)time(NULL);
-  if (r->state == 0) r->state = 12345678901234ULL;
+static double rand_range(double min, double max) {
+  return min + (double)rand() / RAND_MAX * (max - min);
 }
 
-static unsigned long long rng_next(RNG *r) {
-  r->state ^= r->state << 13;
-  r->state ^= r->state >> 7;
-  r->state ^= r->state << 17;
-  return r->state;
-}
+static Node* create_node(int depth, unsigned int num_features) {
+  Node* node = (Node*)ndpi_malloc(sizeof(Node));
 
-/* Uniform double in [0, 1) */
-static double rng_double(RNG *r) {
-  return (double)(rng_next(r) >> 11) / (double)(1ULL << 53);
-}
-
-/* Uniform int in [0, n) */
-static int rng_int(RNG *r, int n) {
-  return (int)(rng_next(r) % (unsigned long long)n);
-}
-
-/* Fisher–Yates shuffle on an int array */
-static void shuffle(int *arr, int n, RNG *r) {
-  for (int i = n - 1; i > 0; i--) {
-    int j = rng_int(r, i + 1);
-    int tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  if(node) {
+    node->normal_vector = (double*)ndpi_malloc(num_features * sizeof(double));
+    node->left = node->right = NULL;
+    node->is_leaf = 0;
+    node->depth = depth;
   }
-}
-
-/* ────────────────────────────────────────────
-   Expected path length c(n)
-   This is the average path length of an unsuccessful
-   search in a Binary Search Tree with n nodes:
-   c(n) = 2 * H(n-1) - (2*(n-1)/n)
-   where H(k) is the harmonic number ≈ ln(k) + 0.5772
-   ──────────────────────────────────────────── */
-
-static double harmonic(double n) {
-  /* Accurate for n >= 2; avoid log(0) */
-  if (n <= 1.0) return 0.0;
-  return log(n) + 0.5772156649;   /* Euler–Mascheroni constant */
-}
-
-static double c_factor(int n) {
-  if (n <= 1) return 1.0;
-  if (n == 2) return 1.0;
-  double nd = (double)n;
-  return 2.0 * harmonic(nd - 1.0) - 2.0 * (nd - 1.0) / nd;
-}
-
-/* ────────────────────────────────────────────
-   Tree building (recursive with explicit stack)
-   ──────────────────────────────────────────── */
-
-/* Allocate a new node in the tree's pool; returns index */
-static int new_node(IFTree *tree) {
-  assert(tree->node_count < IF_MAX_NODES);
-  int idx = tree->node_count++;
-  memset(&tree->nodes[idx], 0, sizeof(IFNode));
-  return idx;
-}
-
-/* Build one isolation tree.
- *
- * indices[]  subset of row indices (subsample) — we partition in-place.
- * n          length of the active subset [lo, hi)
- * depth      current tree depth
- * max_depth  stop splitting beyond this depth
- * data       full dataset (row-major)
- * n_features number of features
- * rng        random state
- */
-static int build_node(IFTree *tree,
-                      int    *indices, int lo, int hi,
-                      int     depth,  int max_depth,
-                      const double *data, int n_features,
-                      RNG *rng)
-{
-  int n = hi - lo;
-  int node = new_node(tree);
-
-  /* Stop conditions: single sample or max depth reached */
-  if (n <= 1 || depth >= max_depth) {
-    tree->nodes[node].is_leaf = 1;
-    tree->nodes[node].size    = n;
-    return node;
-  }
-
-  /* Pick a random feature */
-  int feat = rng_int(rng, n_features);
-
-  /* Find min and max of that feature in current subset */
-  double fmin = data[indices[lo] * n_features + feat];
-  double fmax = fmin;
-  for (int i = lo + 1; i < hi; i++) {
-    double v = data[indices[i] * n_features + feat];
-    if (v < fmin) fmin = v;
-    if (v > fmax) fmax = v;
-  }
-
-  /* All values identical — make a leaf (can't split) */
-  if (fmax - fmin < 1e-12) {
-    tree->nodes[node].is_leaf = 1;
-    tree->nodes[node].size    = n;
-    return node;
-  }
-
-  /* Random split threshold in (fmin, fmax) */
-  double thr = fmin + rng_double(rng) * (fmax - fmin);
-
-  /* Partition indices around the threshold (stable relative order) */
-  int mid = lo;
-  for (int i = lo; i < hi; i++) {
-    if (data[indices[i] * n_features + feat] < thr) {
-      int tmp = indices[mid]; indices[mid] = indices[i]; indices[i] = tmp;
-      mid++;
-    }
-  }
-
-  /* If the partition is degenerate (all went one side), make a leaf */
-  if (mid == lo || mid == hi) {
-    tree->nodes[node].is_leaf = 1;
-    tree->nodes[node].size    = n;
-    return node;
-  }
-
-  /* Record the split */
-  tree->nodes[node].is_leaf   = 0;
-  tree->nodes[node].feature   = feat;
-  tree->nodes[node].threshold = thr;
-
-  /* Recurse — note: new_node() may move memory if we used realloc,
-     but here we use a fixed pool so pointers are stable.            */
-  tree->nodes[node].left  = build_node(tree, indices, lo,  mid, depth+1, max_depth, data, n_features, rng);
-  tree->nodes[node].right = build_node(tree, indices, mid, hi,  depth+1, max_depth, data, n_features, rng);
-
+  
   return node;
 }
 
-/* ────────────────────────────────────────────
-   Path-length traversal
-   ──────────────────────────────────────────── */
+// Builds one tree by recursively splitting data with random hyperplanes
+static Node* build_tree(double **data, unsigned int n_samples, unsigned int num_features, int depth) {
+  Node* node = create_node(depth, num_features);
+  unsigned int i, j;
 
-static double path_length(const IFTree *tree, const double *sample) {
-  int node = 0;   /* root is always index 0 */
-  double depth = 0.0;
+  if(!node)
+    return(node);
+  
+  if (depth >= MAX_DEPTH || n_samples <= 1) {
+    node->is_leaf = 1;
+    return node;
+  }
 
-  while (1) {
-    const IFNode *n = &tree->nodes[node];
-    if (n->is_leaf) {
-      /* Add c(size) to account for would-be further splits */
-      return depth + c_factor(n->size);
+  // Generate random normal vector (the 'Extended' part)
+  for (j = 0; j < num_features; j++)
+    node->normal_vector[j] = rand_range(-1.0, 1.0);
+
+  // Project points to find min/max range for the intercept
+  double min_p = 1e15, max_p = -1e15;
+  double *projs = ndpi_malloc(n_samples * sizeof(double));
+
+  if(projs != NULL) {
+    for (i = 0; i < n_samples; i++) {
+      projs[i] = 0;
+      
+      for (j = 0; j < num_features; j++)
+	projs[i] += data[i][j] * node->normal_vector[j];
+      
+      if (projs[i] < min_p) min_p = projs[i];
+      if (projs[i] > max_p) max_p = projs[i];
     }
-    depth += 1.0;
-    if (sample[n->feature] < n->threshold)
-      node = n->left;
-    else
-      node = n->right;
+  
+    node->intercept = rand_range(min_p, max_p);
+
+    // Count and split data for child nodes
+    int l_count = 0, r_count = 0;
+    for (i = 0; i < n_samples; i++)
+      (projs[i] < node->intercept) ? l_count++ : r_count++;
+
+    double **l_data = ndpi_malloc(l_count * sizeof(double*));
+    double **r_data = ndpi_malloc(r_count * sizeof(double*));
+    int li = 0, ri = 0;
+    
+    for (i = 0; i < n_samples; i++)
+      (projs[i] < node->intercept) ? (l_data[li++] = data[i]) : (r_data[ri++] = data[i]);
+
+    node->left = build_tree(l_data, l_count, num_features, depth + 1);
+    node->right = build_tree(r_data, r_count, num_features, depth + 1);
+
+    ndpi_free(projs); ndpi_free(l_data); ndpi_free(r_data);
   }
+  
+  return node;
 }
 
-/* ────────────────────────────────────────────
-   Public API
-   ──────────────────────────────────────────── */
+static double path_length(Node* node, double *x, unsigned int num_features) {
+  if (node->is_leaf) return (double)node->depth;
+  double p = 0;
+  unsigned int j;
 
-IForest *iforest_fit(const double *data,
-                     int n_samples,
-                     int n_features,
-                     int n_trees,
-                     int subsample_sz,
-                     unsigned int seed)
-{
-  if (!data || n_samples <= 0 || n_features <= 0 || n_trees <= 0)
-    return NULL;
-
-  if (subsample_sz <= 0 || subsample_sz > n_samples)
-    subsample_sz = (n_samples < 256) ? n_samples : 256;
-
-  IForest *forest = (IForest *)ndpi_malloc(sizeof(IForest));
-  if (!forest) return NULL;
-
-  forest->trees         = (IFTree *)ndpi_malloc(sizeof(IFTree) * (size_t)n_trees);
-  forest->n_trees       = n_trees;
-  forest->n_features    = n_features;
-  forest->subsample_size = subsample_sz;
-  forest->avg_path_length = c_factor(subsample_sz);
-
-  if (!forest->trees) { ndpi_free(forest); return NULL; }
-
-  /* Max depth is ceil(log2(subsample_size)) */
-  int max_depth = 1;
-  while ((1 << max_depth) < subsample_sz) max_depth++;
-  if (max_depth > IF_MAX_DEPTH) max_depth = IF_MAX_DEPTH;
-
-  /* Index buffer for subsampling (reused per tree) */
-  int *indices = (int *)ndpi_malloc(sizeof(int) * (size_t)n_samples);
-  if (!indices) { ndpi_free(forest->trees); ndpi_free(forest); return NULL; }
-
-  RNG rng;
-  rng_seed(&rng, seed);
-
-  /* Initialise index array 0..n_samples-1 */
-  for (int i = 0; i < n_samples; i++) indices[i] = i;
-
-  for (int t = 0; t < n_trees; t++) {
-    IFTree *tree = &forest->trees[t];
-    tree->node_count = 0;
-
-    /* Draw subsample_sz rows without replacement via partial shuffle */
-    shuffle(indices, n_samples, &rng);
-
-    /* Build the tree on indices[0..subsample_sz) */
-    build_node(tree, indices, 0, subsample_sz, 0, max_depth,
-	       data, n_features, &rng);
-  }
-
-  ndpi_free(indices);
-  return forest;
+  for (j = 0; j < num_features; j++)
+    p += x[j] * node->normal_vector[j];
+  
+  return (p < node->intercept) ? path_length(node->left, x, num_features) : path_length(node->right, x, num_features);
 }
 
-IFResult iforest_score(const IForest *forest,
-                       const double  *sample,
-                       double         threshold)
-{
-  IFResult result;
-  result.avg_depth  = 0.0;
-  result.score      = 0.5;
-  result.is_anomaly = 0;
+Forest* build_forest(double **data,  unsigned int n_samples, unsigned int num_features) {
+  Forest *f = (Forest*)ndpi_malloc(sizeof(Forest));
+  unsigned int i;
 
-  if (!forest || !sample) return result;
+  if(!f) return(NULL);
 
-  double total_depth = 0.0;
-  for (int t = 0; t < forest->n_trees; t++) {
-    total_depth += path_length(&forest->trees[t], sample);
-  }
-  result.avg_depth = total_depth / (double)forest->n_trees;
+  f->num_features = num_features, f->n_samples = n_samples;
+  
+  for (i = 0; i < N_TREES; i++)
+    f->forest[i] = build_tree(data, n_samples, num_features, 0);
 
-  /* Normalised anomaly score: s(x,n) = 2^(-E[h(x)] / c(n)) */
-  result.score = pow(2.0, -result.avg_depth / forest->avg_path_length);
-
-  result.is_anomaly = (result.score > threshold) ? 1 : 0;
-  return result;
+  return(f);
 }
 
-void iforest_score_batch(const IForest *forest,
-                         const double  *data,
-                         int            n_samples,
-                         double         threshold,
-                         IFResult      *out)
-{
-  if (!forest || !data || !out) return;
-  for (int i = 0; i < n_samples; i++) {
-    out[i] = iforest_score(forest,
-			   data + (size_t)i * (size_t)forest->n_features,
-			   threshold);
-  }
+// Harmonic number approximation
+static double harmonic(int n) {
+  return log(n) + 0.5772156649;
 }
 
-void iforest_free(IForest *forest) {
-  if (!forest) return;
-  ndpi_free(forest->trees);
-  ndpi_free(forest);
+// Average path length for 'n' points (the normalizer)
+static double c_factor(int n) {
+  if (n <= 1) return 0;
+  if (n == 2) return 1;
+  return 2.0 * harmonic(n - 1) - (2.0 * (n - 1) / n);
+}
+
+/* Calculate the final 0.0 - 1.0 score */
+static double anomaly_score(double avg_path_length, int n_samples) {
+  double c = c_factor(n_samples);
+  return pow(2.0, -(avg_path_length / c));
+}
+
+double forest_compute_score(Forest *f, double *data) {
+  double avg = 0;
+  unsigned int t;
+  
+  for (t = 0; t < N_TREES; t++)
+    avg += path_length(f->forest[t], data, f->num_features);
+
+  return(anomaly_score(avg / (double)N_TREES, f->n_samples));
+}
+
+static void free_node(Node *n) {
+  if(n->left)  free_node(n->left);
+  if(n->right) free_node(n->right);
+  
+  ndpi_free(n->normal_vector);  
+}
+
+void free_forest(Forest *f) {
+  unsigned int i;
+
+  for(i=0; i<N_TREES; i++) {
+    Node *n = f->forest[i];
+
+    if(n != NULL)
+      free_node(n);
+  }
+
+  ndpi_free(f);
+  
+  /* TODO */
 }
