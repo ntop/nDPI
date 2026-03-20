@@ -593,7 +593,7 @@ static void configure_ndpi(struct ndpi_detection_module_struct *ndpi_struct) {
     ndpi_cache_address_restore(ndpi_struct, addr_dump_path, 0);
 
   if(pluginsDirPath != NULL)
-    ndpi_load_protocol_plugins(ndpi_struct, pluginsDirPath); 
+    ndpi_load_protocol_plugins(ndpi_struct, pluginsDirPath);
 }
 
 /* *********************************************** */
@@ -1957,7 +1957,7 @@ char* sprint_bin(char *buf, u_int buf_len, struct ndpi_bin *b,
   u_int i, idx = 0;
 
   if(normalize) ndpi_normalize_bin(b);
-  
+
   for(i=0; i<b->num_bins; i++) {
     int l;
 
@@ -1965,7 +1965,7 @@ char* sprint_bin(char *buf, u_int buf_len, struct ndpi_bin *b,
       l = snprintf(&buf[idx], buf_len-idx,  "%s", sep);
       if(l < 0) break; else idx += l;
     }
-    
+
     switch(b->family) {
     case ndpi_bin_family8:
       l = snprintf(&buf[idx], buf_len-idx,  "%u", b->u.bins8[i]);
@@ -2635,7 +2635,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     char unknown_cipher[8];
     if(flow->ssh_tls.server_cipher != '\0')
       fprintf(out, "[Cipher: %s]", ndpi_cipher2str(flow->ssh_tls.server_cipher, unknown_cipher));
-    
+
     if(flow->bittorent_hash != NULL) fprintf(out, "[BT Hash: %s]", flow->bittorent_hash);
     if(flow->dhcp_fingerprint != NULL) fprintf(out, "[DHCP Fingerprint: %s]", flow->dhcp_fingerprint);
     if(flow->dhcp_class_ident) fprintf(out, "[DHCP Class Ident: %s]",
@@ -2654,7 +2654,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if((flow->tls.num_blocks > 0) && (flow->tls.blocks != NULL)) {
       int i;
       u_char *enc = ndpi_encode_tls_blocks(flow->tls.blocks, flow->tls.num_blocks);
-      
+
       fprintf(out, "[TLS blocks: ");
 
       for(i=0; i<flow->tls.num_blocks; i++)
@@ -2691,7 +2691,7 @@ static void printFlowSerialized(struct ndpi_flow_info *flow)
   double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
   float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
   char buf[512];
-  
+
   ndpi_serialize_string_uint32(serializer, "flow_id", flow->flow_id);
   ndpi_serialize_string_double(serializer, "first_seen", f / 1000., "%.3f");
   ndpi_serialize_string_double(serializer, "last_seen", l / 1000., "%.3f");
@@ -2799,7 +2799,7 @@ static void printFlowSerialized(struct ndpi_flow_info *flow)
     ndpi_serialize_string_uint32(serializer, "c_to_s_init_win", flow->c_to_s_init_win);
     ndpi_serialize_string_uint32(serializer, "s_to_c_init_win", flow->s_to_c_init_win);
   }
-  
+
   /* Bins */
   ndpi_serialize_start_of_block(serializer, "plen_bins");
   ndpi_serialize_string_string(serializer, "raw",
@@ -2807,7 +2807,7 @@ static void printFlowSerialized(struct ndpi_flow_info *flow)
   ndpi_serialize_string_string(serializer, "normalized",
 			       sprint_bin(buf, sizeof(buf), &flow->payload_len_bin, ",", true));
   ndpi_serialize_end_of_block(serializer);
-  
+
   json_str = ndpi_serializer_get_buffer(serializer, &json_str_len);
   if (json_str == NULL || json_str_len == 0)
     {
@@ -5878,7 +5878,7 @@ void automataDomainsUnitTest() {
 #endif
 
 /* *********************************************** */
-  
+
 void blocksUnitTest() {
   struct ndpi_tls_block a[] = { { 4, 1590, 0, 1, 0}, { 5, -1212, 0, 1, 0}, { 1, -1, 0, 1, 0}, { 16, -42, 0, 1, 0}, { 16, -53, 0, 1, 0}  };
   struct ndpi_tls_block b[] = { { 4, 1590, 0, 1, 0}, { 5, -1212, 0, 1, 0}, { 1, -1, 0, 1, 0}, { 16, -42, 0, 1, 0}, { 16, -52, 0, 1, 0}  };
@@ -7416,6 +7416,95 @@ static void hash_walker(char *key, u_int64_t value, void *data) {
   printf("%s\t%llu\n", key, (unsigned long long)value);
 }
 
+/* *********************************************** */
+
+/* Simulated feature indices */
+#define NET_PKT_SIZE  0   /* bytes, 64–1500 normal */
+#define NET_DURATION  1   /* ms,    1–300  normal  */
+#define NET_N_PORTS   2   /* number of destination ports */
+#define NET_INTERVAL  3   /* ms between connections      */
+#define NET_PAYLOAD   4   /* entropy proxy 0–8 bits      */
+#define NET_FEATURES  5
+
+static unsigned long demo_seed = 20240101UL;
+
+static double randomize() {
+    demo_seed = demo_seed * 1664525UL + 1013904223UL;
+    return (double)(demo_seed & 0x7FFFFFFF) / (double)0x80000000;
+}
+
+void isolationforestUnitTest() {
+  void* forest;
+  const int N_NORMAL   = 5000;
+  const int N_ATTACKS  = 15;
+  const int N          = N_NORMAL + N_ATTACKS;
+  double *data         = (double *)malloc(sizeof(double) * (size_t)N * NET_FEATURES);
+  double threshold     = 0.6;
+  int i;
+
+  /* Normal web/DB traffic */
+  for(i = 0; i < N_NORMAL; i++) {
+    double *row = data + i * NET_FEATURES;
+
+    row[NET_PKT_SIZE]  = 64 + randomize() * 1436;     /* 64–1500 B    */
+    row[NET_DURATION]  = 1  + randomize() * 299;      /* 1–300 ms     */
+    row[NET_N_PORTS]   = 1  + (int)(randomize() * 3); /* 1–3 ports    */
+    row[NET_INTERVAL]  = 5  + randomize() * 295;      /* 5–300 ms     */
+    row[NET_PAYLOAD]   = 4  + randomize() * 0.8;      /* ~4–8 entropy */
+  }
+
+  /* Attack traffic: port scans, floods, exfil */
+  for(i = N_NORMAL; i < N; i++) {
+    double *row = data + i * NET_FEATURES;
+    int kind = i % 3;
+
+    if (kind == 0) {
+      /* Port scan: many ports, small packets, rapid */
+      row[NET_PKT_SIZE] = 40 + randomize() * 20;
+      row[NET_DURATION] = randomize() * 2;
+      row[NET_N_PORTS]  = 100 + randomize() * 900;
+      row[NET_INTERVAL] = randomize() * 0.5;
+      row[NET_PAYLOAD]  = 0.5 + randomize() * 0.5;
+    } else if (kind == 1) {
+      /* Data exfiltration: huge payload, low entropy (compressed/encrypted) */
+      row[NET_PKT_SIZE] = 1400 + randomize() * 100;
+      row[NET_DURATION] = 5000 + randomize() * 1000;
+      row[NET_N_PORTS]  = 1;
+      row[NET_INTERVAL] = 0.01 + randomize() * 0.1;
+      row[NET_PAYLOAD]  = 7.8 + randomize() * 0.2;
+    } else {
+      /* SYN flood: tiny packets, zero duration, massive rate */
+      row[NET_PKT_SIZE] = 40;
+      row[NET_DURATION] = 0;
+      row[NET_N_PORTS]  = 1;
+      row[NET_INTERVAL] = randomize() * 0.01;
+      row[NET_PAYLOAD]  = 1 + randomize();
+    }
+  }
+
+  /* Train both normal and anomalous traffic */
+  assert(forest = ndpi_alloc_iforest((const double*)data, N, NET_FEATURES));
+
+  for(int i = 0; i < N_NORMAL; i++) {
+    double *row = data + i * NET_FEATURES;
+    double score = ndpi_iforest_score_single(forest, row);
+
+    /* if(score > threshold) printf("[Normal] score=%.2f\n", score); */
+    assert(score <= threshold); /* No false positives */
+  }
+
+  for(i = N_NORMAL; i < N; i++) {
+    double *row = data + i * NET_FEATURES;
+    double score = ndpi_iforest_score_single(forest, row);
+
+    /* Disabled as some false positives might happen */
+    /* printf("[anomaly] score=%.2f\n", score); */
+
+    assert(score > threshold);
+  }
+
+  ndpi_free_iforest(forest);
+}
 
 /* *********************************************** */
 
@@ -7434,7 +7523,7 @@ int main(int argc, char **argv) {
   checkRankingUnitTest(true);
   exit(0);
 #endif
- 
+
 #ifdef DEBUG_TRACE
   trace = fopen("/tmp/ndpiReader.log", "a");
 
@@ -7512,6 +7601,7 @@ int main(int argc, char **argv) {
     mahalanobisUnitTest();
     bitmaskUnitTest();
     checkmemrchrUnitTest();
+    isolationforestUnitTest();
 #endif
   }
 
@@ -7588,10 +7678,10 @@ int main(int argc, char **argv) {
   }
 
   signal(SIGINT, sigproc);
-  
+
   for(i=0; i<num_loops; i++)
-    test_lib();  
-  
+    test_lib();
+
   if(results_path)  ndpi_free(results_path);
   if(results_file)  fclose(results_file);
   if(extcap_dumper) pcap_dump_close(extcap_dumper);
