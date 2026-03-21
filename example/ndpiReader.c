@@ -7547,9 +7547,9 @@ void isolationforestUnitTest() {
 // #define DEBUG
 
 void anomalyModelUnitTest() {
-  const int N_NORMAL   = 5000;
-  const int N_ATTACKS  = 1500;
-  ndpi_anomaly_model *m = ndpi_alloc_anomaly_model(NUM_FEATURES);
+  const u_int32_t N_NORMAL  = 5000;
+  const u_int32_t N_ATTACKS = 1500;
+  ndpi_anomaly_model *m     = ndpi_alloc_anomaly_model(NUM_FEATURES);
   u_int32_t i;
 #ifdef DEBUG
   u_int32_t num_anomalies = 0;

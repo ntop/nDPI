@@ -2486,6 +2486,25 @@ static void ndpi_normalize_vector_L1(double *training_data, u_int32_t num) {
 
 /* *********************** */
 
+#if 0
+/*
+  The L2 norm, also known as the Euclidean norm, is a standard mathematical way
+  to measure the length or magnitude of a vector in space. It represents the
+  shortest straight-line distance from the origin to a point in
+  𝑛-dimensional space.
+*/
+static void ndpi_normalize_vector_L2(double *training_data, u_int32_t num) {
+  u_int32_t i;
+  double l2_norm = 0;
+  
+  for(i=0; i<num; i++) l2_norm += training_data[i] * training_data[i];
+  l2_norm = sqrt(l2_norm);
+  for(i=0; i<num; i++) training_data[i] /= l2_norm;
+}
+#endif
+
+/* *********************** */
+
 bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, double *training_data) {
   u_int32_t len = sizeof(double) * m->n_features;
 
