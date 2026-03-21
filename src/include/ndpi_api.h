@@ -1984,8 +1984,8 @@ extern "C" {
 
   ndpi_anomaly_model* ndpi_alloc_anomaly_model(u_int16_t n_features);
   void ndpi_free_anomaly_model(ndpi_anomaly_model *m);
-  bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, u_int32_t *training_data);
-  bool ndpi_compute_anomaly_score(ndpi_anomaly_model *m, u_int32_t *testing_data);
+  bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, double *training_data);
+  bool ndpi_compute_anomaly_score(ndpi_anomaly_model *m, double *testing_data);
 
   /* ******************************* */
 

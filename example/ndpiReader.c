@@ -7544,6 +7544,8 @@ void isolationforestUnitTest() {
 
 /* *********************************************** */
 
+// #define DEBUG
+
 void anomalyModelUnitTest() {
   const int N_NORMAL   = 5000;
   const int N_ATTACKS  = 1500;
@@ -7552,12 +7554,12 @@ void anomalyModelUnitTest() {
 #ifdef DEBUG
   u_int32_t num_anomalies = 0;
 #endif
-  
+
   assert(m);
-  
+
   /* Normal web/DB traffic */
   for(i = 0; i < N_NORMAL; i++) {
-    u_int32_t row[NUM_FEATURES];
+    double row[NUM_FEATURES];
 
     row[NET_PKT_SIZE]  = 64 + randomize() * 1436;     /* 64–1500 B    */
     row[NET_DURATION]  = 1  + randomize() * 299;      /* 1–300 ms     */
@@ -7569,7 +7571,7 @@ void anomalyModelUnitTest() {
   }
 
   for(i = 0; i < N_ATTACKS; i++) {
-    u_int32_t row[NUM_FEATURES];
+    double row[NUM_FEATURES];
     int kind = i % 3;
 
     if (kind == 0) {
@@ -7594,12 +7596,13 @@ void anomalyModelUnitTest() {
       row[NET_INTERVAL] = randomize() * 0.01;
       row[NET_PAYLOAD]  = 1 + randomize();
     }
-    
-    // assert(ndpi_compute_anomaly_score(m, row) == true);
+
+    assert(ndpi_compute_anomaly_score(m, row) == true);
+
 #ifdef DEBUG
     if(ndpi_compute_anomaly_score(m, row)) num_anomalies++;
 #endif
-    
+
 #ifdef DEBUG
     fprintf(stdout, "."); fflush(stdout);
 #endif
@@ -7608,7 +7611,7 @@ void anomalyModelUnitTest() {
 #ifdef DEBUG
   fprintf(stdout, "\nnum_anomalies: %u/%u\n", num_anomalies, N_ATTACKS);
 #endif
-  
+
   ndpi_free_anomaly_model(m);
 }
 
@@ -7623,11 +7626,6 @@ int main(int argc, char **argv) {
   int skip_unit_tests = 0;
 #else
   int skip_unit_tests = 1;
-#endif
-
-#ifdef FORCE_RANKING_CHECK
-  checkRankingUnitTest(true);
-  exit(0);
 #endif
 
 #ifdef DEBUG_TRACE

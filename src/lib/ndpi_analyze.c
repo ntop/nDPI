@@ -2461,17 +2461,39 @@ ndpi_anomaly_model* ndpi_alloc_anomaly_model(u_int16_t n_features) {
   return(m);
 }
 
+/* *********************** */
+
 void ndpi_free_anomaly_model(ndpi_anomaly_model *m) {
   if(m->training_data) ndpi_free(m->training_data);
   ndpi_free(m);
 }
 
-bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, u_int32_t *training_data) {
-  u_int32_t len = sizeof(u_int32_t) * m->n_features;
+/* *********************** */
 
+/*
+  The L1 norm, also known as the Manhattan norm or Taxicab norm, is a
+  mathematical function that calculates the "length" of a vector by
+  summing the absolute values of its individual components.  
+*/
+
+static void ndpi_normalize_vector_L1(double *training_data, u_int32_t num) {
+  u_int32_t i;
+  double l1_norm = 0;
+  
+  for(i=0; i<num; i++) l1_norm += training_data[i];
+  for(i=0; i<num; i++) training_data[i] /= l1_norm;
+}
+
+/* *********************** */
+
+bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, double *training_data) {
+  u_int32_t len = sizeof(double) * m->n_features;
+
+  ndpi_normalize_vector_L1(training_data, m->n_features);
+  
   if(m->training_data == NULL) {
     /* Initial iteration */
-    m->training_data = (u_int32_t*)ndpi_malloc(len);
+    m->training_data = (double*)ndpi_malloc(len);
 
     if(m->training_data == NULL)
       return(false);
@@ -2481,7 +2503,7 @@ bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, u_int32_t *training_data) {
     m->n_samples = 1, m->tot_memory += len;
   } else {
     u_int32_t i, new_len = len + m->tot_memory;
-    u_int32_t *new_data = (u_int32_t*)ndpi_realloc(m->training_data, new_len);
+    double *new_data = (double*)ndpi_realloc(m->training_data, new_len);
 
     if(new_data == NULL)
       return(false); /* Allocation failure */
@@ -2494,7 +2516,6 @@ bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, u_int32_t *training_data) {
     }
 
     /* Compute distance */
-
     for(i=0; i<m->n_samples; i++) {
       u_int64_t distance = 0;
       u_int32_t idx = i * m->n_features;
@@ -2528,12 +2549,14 @@ bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, u_int32_t *training_data) {
 /* ************************************************** */
 
 bool ndpi_compute_anomaly_score(ndpi_anomaly_model *m,
-				u_int32_t *testing_data) {
+				double *testing_data) {
   u_int32_t i;
-  u_int64_t max_distance = 0;
+  double max_distance = 0;
+  
+  ndpi_normalize_vector_L1(testing_data, m->n_features);
   
   for(i=0; i<m->n_samples; i++) {
-    u_int64_t distance = 0;
+    double distance = 0;
     u_int32_t idx = i * m->n_features;
     u_int32_t k;
 

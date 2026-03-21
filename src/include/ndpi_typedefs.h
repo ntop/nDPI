@@ -2238,11 +2238,11 @@ typedef struct {
 } ndpi_ranking;
 
 typedef struct {
-  u_int32_t *training_data;
+  double *training_data;
   u_int32_t tot_memory;
   u_int32_t n_samples;  /* num_rows    */
   u_int16_t n_features; /* num columns */
-  u_int64_t max_distance;
+  double max_distance;
 } ndpi_anomaly_model;
 
 /* **************************************** */
