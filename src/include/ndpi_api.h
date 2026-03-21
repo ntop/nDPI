@@ -1982,6 +1982,13 @@ extern "C" {
 
   /* ******************************* */
 
+  ndpi_anomaly_model* ndpi_alloc_anomaly_model(u_int16_t n_features);
+  void ndpi_free_anomaly_model(ndpi_anomaly_model *m);
+  bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, u_int32_t *training_data);
+  bool ndpi_compute_anomaly_score(ndpi_anomaly_model *m, u_int32_t *testing_data);
+
+  /* ******************************* */
+
   int   ndpi_jitter_init(struct ndpi_jitter_struct *hw, u_int16_t num_periods);
   void  ndpi_jitter_free(struct ndpi_jitter_struct *hw);
   float ndpi_jitter_add_value(struct ndpi_jitter_struct *s, const float value);

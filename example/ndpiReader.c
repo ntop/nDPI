@@ -7424,7 +7424,7 @@ static void hash_walker(char *key, u_int64_t value, void *data) {
 #define NET_N_PORTS   2   /* number of destination ports */
 #define NET_INTERVAL  3   /* ms between connections      */
 #define NET_PAYLOAD   4   /* entropy proxy 0–8 bits      */
-#define NET_FEATURES  5
+#define NUM_FEATURES  5
 
 static unsigned long demo_seed = 20240101UL;
 
@@ -7448,13 +7448,13 @@ void isolationforestUnitTest() {
 
   /* Normal web/DB traffic */
   for(i = 0; i < N_NORMAL; i++) {
-    u_int32_t l = sizeof(double)* NET_FEATURES;
+    u_int32_t l = sizeof(double)* NUM_FEATURES;
     double *row = (double*)ndpi_malloc(l);
 
 #ifdef DEBUG
     tot_mem += l;
 #endif
-    
+
     data[i] = row;
     row[NET_PKT_SIZE]  = 64 + randomize() * 1436;     /* 64–1500 B    */
     row[NET_DURATION]  = 1  + randomize() * 299;      /* 1–300 ms     */
@@ -7465,14 +7465,14 @@ void isolationforestUnitTest() {
 
   /* Attack traffic: port scans, floods, exfil */
   for(i = N_NORMAL; i < N; i++) {
-    u_int32_t l = sizeof(double)* NET_FEATURES;
+    u_int32_t l = sizeof(double)* NUM_FEATURES;
     double *row = (double*)ndpi_malloc(l);
     int kind = i % 3;
 
 #ifdef DEBUG
     tot_mem += l;
 #endif
-    
+
     data[i] = row;
 
     if (kind == 0) {
@@ -7498,11 +7498,11 @@ void isolationforestUnitTest() {
       row[NET_PAYLOAD]  = 1 + randomize();
     }
   }
-  
+
   //printf("[DEBUG] dataset len %.2f MB\n", (float)tot_mem / (1024. * 1024.));
-  
+
   /* Train only with normal data */
-  forest = ndpi_alloc_iforest(data, N_NORMAL, NET_FEATURES);
+  forest = ndpi_alloc_iforest(data, N_NORMAL, NUM_FEATURES);
   assert(forest);
 
   for(int i = 0; i < N_NORMAL; i++) {
@@ -7514,8 +7514,10 @@ void isolationforestUnitTest() {
     threshold = ndpi_max(threshold, score);
   }
 
+#ifdef DEBUG
   u_int num_anomalies = 0;
-  
+#endif
+
   for(i = N_NORMAL; i < N; i++) {
     double score = ndpi_iforest_score(forest, data[i]);
 
@@ -7524,17 +7526,90 @@ void isolationforestUnitTest() {
 #if 0
       printf("[anomaly] score=%.4f [threshold: %.4f] [%s]\n",
 	     score, threshold, (score > threshold) ? "ANOMALY" : "OK");
-
-      // assert(score > threshold);
 #endif
+      assert(score > threshold);
 
+#ifdef DEBUG
       num_anomalies++;
+#endif
     }
   }
 
+#ifdef DEBUG
   printf("%u/%u anomalies [threshold: %.4f]\n", num_anomalies, N_ATTACKS, threshold);
+#endif
 
   ndpi_free_iforest(forest);
+}
+
+/* *********************************************** */
+
+void anomalyModelUnitTest() {
+  const int N_NORMAL   = 5000;
+  const int N_ATTACKS  = 1500;
+  ndpi_anomaly_model *m = ndpi_alloc_anomaly_model(NUM_FEATURES);
+  u_int32_t i;
+#ifdef DEBUG
+  u_int32_t num_anomalies = 0;
+#endif
+  
+  assert(m);
+  
+  /* Normal web/DB traffic */
+  for(i = 0; i < N_NORMAL; i++) {
+    u_int32_t row[NUM_FEATURES];
+
+    row[NET_PKT_SIZE]  = 64 + randomize() * 1436;     /* 64–1500 B    */
+    row[NET_DURATION]  = 1  + randomize() * 299;      /* 1–300 ms     */
+    row[NET_N_PORTS]   = 1  + (int)(randomize() * 3); /* 1–3 ports    */
+    row[NET_INTERVAL]  = 5  + randomize() * 295;      /* 5–300 ms     */
+    row[NET_PAYLOAD]   = 4  + randomize() * 0.8;      /* ~4–8 entropy */
+
+    assert(ndpi_train_anomaly_model(m, row) == true);
+  }
+
+  for(i = 0; i < N_ATTACKS; i++) {
+    u_int32_t row[NUM_FEATURES];
+    int kind = i % 3;
+
+    if (kind == 0) {
+      /* Port scan: many ports, small packets, rapid */
+      row[NET_PKT_SIZE] = 40 + randomize() * 20;
+      row[NET_DURATION] = randomize() * 2;
+      row[NET_N_PORTS]  = 100 + randomize() * 900;
+      row[NET_INTERVAL] = randomize() * 0.5;
+      row[NET_PAYLOAD]  = 0.5 + randomize() * 0.5;
+    } else if (kind == 1) {
+      /* Data exfiltration: huge payload, low entropy (compressed/encrypted) */
+      row[NET_PKT_SIZE] = 1400 + randomize() * 100;
+      row[NET_DURATION] = 5000 + randomize() * 1000;
+      row[NET_N_PORTS]  = 1;
+      row[NET_INTERVAL] = 0.01 + randomize() * 0.1;
+      row[NET_PAYLOAD]  = 7.8 + randomize() * 0.2;
+    } else {
+      /* SYN flood: tiny packets, zero duration, massive rate */
+      row[NET_PKT_SIZE] = 40;
+      row[NET_DURATION] = 0;
+      row[NET_N_PORTS]  = 1;
+      row[NET_INTERVAL] = randomize() * 0.01;
+      row[NET_PAYLOAD]  = 1 + randomize();
+    }
+    
+    // assert(ndpi_compute_anomaly_score(m, row) == true);
+#ifdef DEBUG
+    if(ndpi_compute_anomaly_score(m, row)) num_anomalies++;
+#endif
+    
+#ifdef DEBUG
+    fprintf(stdout, "."); fflush(stdout);
+#endif
+  }
+
+#ifdef DEBUG
+  fprintf(stdout, "\nnum_anomalies: %u/%u\n", num_anomalies, N_ATTACKS);
+#endif
+  
+  ndpi_free_anomaly_model(m);
 }
 
 /* *********************************************** */
@@ -7550,8 +7625,6 @@ int main(int argc, char **argv) {
   int skip_unit_tests = 1;
 #endif
 
-  // isolationforestUnitTest(); exit(0);
-  
 #ifdef FORCE_RANKING_CHECK
   checkRankingUnitTest(true);
   exit(0);
@@ -7635,6 +7708,7 @@ int main(int argc, char **argv) {
     bitmaskUnitTest();
     checkmemrchrUnitTest();
     isolationforestUnitTest();
+    anomalyModelUnitTest();
 #endif
   }
 

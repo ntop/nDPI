@@ -2237,6 +2237,14 @@ typedef struct {
   u_int32_t num_updates_without_ranking_changes;
 } ndpi_ranking;
 
+typedef struct {
+  u_int32_t *training_data;
+  u_int32_t tot_memory;
+  u_int32_t n_samples;  /* num_rows    */
+  u_int16_t n_features; /* num columns */
+  u_int64_t max_distance;
+} ndpi_anomaly_model;
+
 /* **************************************** */
 
 #endif /* __NDPI_TYPEDEFS_H__ */

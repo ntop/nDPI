@@ -2430,7 +2430,7 @@ void* ndpi_alloc_iforest(double **data, u_int32_t n_samples, u_int16_t n_feature
 /**
  * Frees a previously allocated isolation forest
  *
- * @param forest A forest created with ndpi_alloc_iforest() 
+ * @param forest A forest created with ndpi_alloc_iforest()
  */
 void ndpi_free_iforest(void *forest) {
   free_forest((Forest*)forest);
@@ -2448,4 +2448,108 @@ void ndpi_free_iforest(void *forest) {
 double ndpi_iforest_score(void *_forest, double *sample) {
   return(forest_compute_score((Forest*)_forest, sample));
 }
+
+/* *********************** */
+/* *********************** */
+
+ndpi_anomaly_model* ndpi_alloc_anomaly_model(u_int16_t n_features) {
+  ndpi_anomaly_model *m = ndpi_calloc(1, sizeof(ndpi_anomaly_model));
+
+  if(m)
+    m->n_features = n_features;
+
+  return(m);
+}
+
+void ndpi_free_anomaly_model(ndpi_anomaly_model *m) {
+  if(m->training_data) ndpi_free(m->training_data);
+  ndpi_free(m);
+}
+
+bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, u_int32_t *training_data) {
+  u_int32_t len = sizeof(u_int32_t) * m->n_features;
+
+  if(m->training_data == NULL) {
+    /* Initial iteration */
+    m->training_data = (u_int32_t*)ndpi_malloc(len);
+
+    if(m->training_data == NULL)
+      return(false);
+    else
+      memcpy(&m->training_data[0], training_data, len);
+
+    m->n_samples = 1, m->tot_memory += len;
+  } else {
+    u_int32_t i, new_len = len + m->tot_memory;
+    u_int32_t *new_data = (u_int32_t*)ndpi_realloc(m->training_data, new_len);
+
+    if(new_data == NULL)
+      return(false); /* Allocation failure */
+    else {
+      u_int32_t start_idx = len * m->n_samples;
+
+      m->training_data = new_data, m->tot_memory += len;
+
+      memcpy(&((u_int8_t*)m->training_data)[start_idx], training_data, len);
+    }
+
+    /* Compute distance */
+
+    for(i=0; i<m->n_samples; i++) {
+      u_int64_t distance = 0;
+      u_int32_t idx = i * m->n_features;
+      u_int32_t k;
+
+      for(k=0; k<m->n_features; k++) {
+#ifdef DEBUG
+	fprintf(stdout, "%u ", idx+k);
+#endif
+
+	distance += m->training_data[idx+k] * training_data[k]; /* dot product */
+      }
+
+      if(distance > m->max_distance) m->max_distance = distance;
+
+#ifdef DEBUG
+      fprintf(stdout, " [%llu / %llu]\n", distance, m->max_distance);
+#endif
+    }
+
+    m->n_samples++;
+
+#ifdef DEBUG
+    fprintf(stdout, "[n_samples %u] %llu\n\n", m->n_samples, m->max_distance);
+#endif
+  }
+
+  return(true);
+}
+
+/* ************************************************** */
+
+bool ndpi_compute_anomaly_score(ndpi_anomaly_model *m,
+				u_int32_t *testing_data) {
+  u_int32_t i;
+  u_int64_t max_distance = 0;
   
+  for(i=0; i<m->n_samples; i++) {
+    u_int64_t distance = 0;
+    u_int32_t idx = i * m->n_features;
+    u_int32_t k;
+
+    for(k=0; k<m->n_features; k++)
+      distance += m->training_data[idx+k] * testing_data[k]; /* dot product */
+
+    // fprintf(stderr, "distance: %llu / %llu\n", distance, m->max_distance);
+    if(distance > m->max_distance)
+      return(true /* anomaly */);
+
+    if(distance > max_distance) max_distance = distance;
+  }
+
+#ifdef DEBUG
+  fprintf(stderr, "max_distance: %llu / %llu\n", max_distance, m->max_distance);
+#endif
+  
+  return(false /* normal */);
+}
