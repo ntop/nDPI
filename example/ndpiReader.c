@@ -7602,7 +7602,7 @@ void anomalyModelUnitTest() {
       row[NET_PAYLOAD]  = 1 + randomize();
     }
 
-    //assert(ndpi_compute_anomaly_score(m, row) == true);
+    assert(ndpi_compute_anomaly_score(m, row) == true);
 
 #ifdef DEBUG
     if(ndpi_compute_anomaly_score(m, row)) num_anomalies++;
