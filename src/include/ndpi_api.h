@@ -1961,7 +1961,7 @@ extern "C" {
    * @param n_features    Number of features per sample
    * @param n_trees       Number of isolation trees (100–500 typical)
    */
-  void* ndpi_alloc_iforest(double **data, u_int n_samples, u_int n_features);
+  void* ndpi_alloc_iforest(double **data, u_int32_t n_samples, u_int16_t n_features);
 
   /**
    * Frees a previously allocated isolation forest

@@ -17,16 +17,18 @@ typedef struct Node {
   double *normal_vector; // Random slope for EIF
   double intercept;      // Random split point
   struct Node *left, *right;
-  int is_leaf, depth;
+  bool is_leaf;
+  u_int8_t depth;
 } Node;
 
 typedef struct Forest {
   Node* forest[N_TREES];
-  unsigned int num_features, n_samples;
+  u_int32_t n_samples, tot_memory;
+  u_int16_t num_features;
 } Forest;
 
 
-Forest* build_forest(double **data,  unsigned int n_samples, unsigned int num_features);
+Forest* build_forest(double **data,  u_int32_t n_samples, u_int16_t num_features);
 double forest_compute_score(Forest *f, double *data);
 void free_forest(Forest *f);
 

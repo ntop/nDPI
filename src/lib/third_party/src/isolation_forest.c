@@ -30,29 +30,33 @@ static double rand_range(double min, double max) {
   return min + (double)rand() / RAND_MAX * (max - min);
 }
 
-static Node* create_node(int depth, unsigned int num_features) {
+static Node* create_node(Forest *f, int depth, u_int16_t num_features) {
   Node* node = (Node*)ndpi_malloc(sizeof(Node));
 
   if(node) {
-    node->normal_vector = (double*)ndpi_malloc(num_features * sizeof(double));
+    u_int32_t len = num_features * sizeof(double);
+    
+    node->normal_vector = (double*)ndpi_malloc(len);
     node->left = node->right = NULL;
-    node->is_leaf = 0;
+    node->is_leaf = false;
     node->depth = depth;
+
+    f->tot_memory += len + sizeof(Node);
   }
 
   return node;
 }
 
 // Builds one tree by recursively splitting data with random hyperplanes
-static Node* build_tree(double **data, unsigned int n_samples, unsigned int num_features, int depth) {
-  Node* node = create_node(depth, num_features);
-  unsigned int i, j;
+static Node* build_tree(Forest *f, double **data, u_int32_t n_samples, u_int16_t num_features, int depth) {
+  Node* node = create_node(f, depth, num_features);
+  u_int32_t i, j;
 
   if(!node)
     return(node);
 
   if (depth >= MAX_DEPTH || n_samples <= 1) {
-    node->is_leaf = 1;
+    node->is_leaf = true;
     return node;
   }
 
@@ -62,9 +66,12 @@ static Node* build_tree(double **data, unsigned int n_samples, unsigned int num_
 
   // Project points to find min/max range for the intercept
   double min_p = 1e15, max_p = -1e15;
-  double *projs = ndpi_malloc(n_samples * sizeof(double));
+  u_int32_t len = n_samples * sizeof(double);
+  double *projs = ndpi_malloc(len);
 
   if(projs != NULL) {
+    f->tot_memory += len;
+    
     for (i = 0; i < n_samples; i++) {
       projs[i] = 0;
 
@@ -82,26 +89,38 @@ static Node* build_tree(double **data, unsigned int n_samples, unsigned int num_
     for (i = 0; i < n_samples; i++)
       (projs[i] < node->intercept) ? l_count++ : r_count++;
 
-    double **l_data = ndpi_malloc(l_count * sizeof(double*));
-    double **r_data = ndpi_malloc(r_count * sizeof(double*));
-    int li = 0, ri = 0;
+    u_int32_t l_len = l_count * sizeof(double*);
+    double **l_data = ndpi_malloc(l_len);
 
-    for (i = 0; i < n_samples; i++)
-      (projs[i] < node->intercept) ? (l_data[li++] = data[i]) : (r_data[ri++] = data[i]);
+    if(l_data) {
+      u_int32_t r_len = r_count * sizeof(double*);
+      double **r_data = ndpi_malloc(r_len);
 
-    node->left = build_tree(l_data, l_count, num_features, depth + 1);
-    node->right = build_tree(r_data, r_count, num_features, depth + 1);
+      if(r_data) {
+	int li = 0, ri = 0;
 
-    ndpi_free(projs); ndpi_free(l_data); ndpi_free(r_data);
+	for (i = 0; i < n_samples; i++)
+	  (projs[i] < node->intercept) ? (l_data[li++] = data[i]) : (r_data[ri++] = data[i]);
+
+	node->left = build_tree(f, l_data, l_count, num_features, depth + 1);
+	node->right = build_tree(f, r_data, r_count, num_features, depth + 1);
+
+	ndpi_free(r_data);
+      }
+
+      ndpi_free(l_data); 
+    }
+    
+    ndpi_free(projs);
   }
-
+  
   return node;
 }
 
-static double path_length(Node* node, double *x, unsigned int num_features) {
+static double path_length(Node* node, double *x, u_int16_t num_features) {
   if (node->is_leaf) return (double)node->depth;
   double p = 0;
-  unsigned int j;
+  u_int32_t j;
 
   for (j = 0; j < num_features; j++)
     p += x[j] * node->normal_vector[j];
@@ -109,17 +128,21 @@ static double path_length(Node* node, double *x, unsigned int num_features) {
   return (p < node->intercept) ? path_length(node->left, x, num_features) : path_length(node->right, x, num_features);
 }
 
-Forest* build_forest(double **data,  unsigned int n_samples, unsigned int num_features) {
+Forest* build_forest(double **data,  u_int32_t n_samples, u_int16_t num_features) {
   Forest *f = (Forest*)ndpi_malloc(sizeof(Forest));
-  unsigned int i;
+  u_int32_t i;
 
   if(!f) return(NULL);
 
   f->num_features = num_features, f->n_samples = n_samples;
 
   for (i = 0; i < N_TREES; i++)
-    f->forest[i] = build_tree(data, n_samples, num_features, 0);
+    f->forest[i] = build_tree(f, data, n_samples, num_features, 0);
 
+#ifdef DEBUG
+  printf("[DEBUG] tot_memory=%.1f MB\n", (float)f->tot_memory / (1024. * 1024.));
+#endif
+  
   return(f);
 }
 
@@ -143,7 +166,7 @@ static double anomaly_score(double avg_path_length, int n_samples) {
 
 double forest_compute_score(Forest *f, double *data) {
   double avg = 0;
-  unsigned int t;
+  u_int32_t t;
 
   for (t = 0; t < N_TREES; t++)
     avg += path_length(f->forest[t], data, f->num_features);
@@ -160,7 +183,7 @@ static void free_node(Node *n) {
 }
 
 void free_forest(Forest *f) {
-  unsigned int i;
+  u_int32_t i;
 
   for(i=0; i<N_TREES; i++) {
     Node *n = f->forest[i];

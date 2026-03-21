@@ -2422,7 +2422,7 @@ u_int16_t ndpi_ranking_add_epoch(ndpi_ranking *rank,
  * @param n_features    Number of features per sample
  * @param n_trees       Number of isolation trees (100–500 typical)
  */
-void* ndpi_alloc_iforest(double **data, u_int n_samples, u_int n_features) {
+void* ndpi_alloc_iforest(double **data, u_int32_t n_samples, u_int16_t n_features) {
   /* We use some reasonable defaults to avoid making API too complex */
   return((void*)build_forest(data, n_samples, n_features));
 }
