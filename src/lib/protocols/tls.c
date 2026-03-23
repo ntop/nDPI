@@ -2308,7 +2308,8 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   printf("[JA4 DEBUG] First='%c', Last='%c'\n", alpn_first, alpn_last);
 #endif
 
-  rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len, "%02u%02u%c%c_",
+  rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
+		     "%02u%02u%c%c_",
 		     ndpi_min(99, ja->client.num_ciphers),
 		     ndpi_min(99, ja->client.num_tls_extensions),
 		     alpn_first, alpn_last);
@@ -2716,10 +2717,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  int b_diff = sizeof(tls_s)-tls_s_len-1;
 
 	  if(b_diff > 0) {
-	    int rc = snprintf(&tls_s[tls_s_len], b_diff, "%02u_%s_%04x",
-			      s->num_tls_extensions,
-			      (s->alpn[0] == '\0') ? "00" : s->alpn,
-			      s->cipher[0]);
+	    int rc = ndpi_snprintf(&tls_s[tls_s_len], b_diff, "%02u_%s_%04x",
+				   s->num_tls_extensions,
+				   (s->alpn[0] == '\0') ? "00" : s->alpn,
+				   s->cipher[0]);
 	    
 	    if(rc > 0)
 	      tls_s_len += rc;
@@ -2733,8 +2734,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  int b_diff = sizeof(tls_s)-tls_s_len-1;
 
 	  if(b_diff > 0) {
-	    int rc = snprintf(&tls_s[tls_s_len], b_diff, "%04x",
-			      s->tls_extension[i]);
+	    int rc = ndpi_snprintf(&tls_s[tls_s_len], b_diff, "%04x",
+				   s->tls_extension[i]);
 	    
 	    if(rc <= 0)
 	      break;
@@ -2751,8 +2752,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  int b_diff = sizeof(tls_s)-tls_s_len-1;
 	  
 	  if(b_diff > 0) {
-	    int rc = snprintf(&tls_s[tls_s_len], b_diff, "%04x",
-			      s->elliptic_curve_point_format[i]);
+	    int rc = ndpi_snprintf(&tls_s[tls_s_len], b_diff, "%04x",
+				   s->elliptic_curve_point_format[i]);
 
 	    if(rc <= 0)
 	      break;
