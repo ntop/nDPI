@@ -2710,8 +2710,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			(s->alpn[0] == '\0') ? "00" : s->alpn,
 			s->cipher[0]);
 
-	if(sizeof(tls_s) > tls_s_len)
-	  tls_s[tls_s_len] = '_'; tls_s_len++;
+	if(sizeof(tls_s) > tls_s_len) {
+	  tls_s[tls_s_len] = '_';
+	  tls_s_len++;
+	}
 	
 	for(i=0; i<s->num_tls_extensions; i++) {
 	  int b_diff = sizeof(tls_s)-tls_s_len;
@@ -2728,8 +2730,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    break;
 	}
 
-	if(sizeof(tls_s) > tls_s_len)
-	  tls_s[tls_s_len] = '_'; tls_s_len++;
+	if(sizeof(tls_s) > tls_s_len) {
+	  tls_s[tls_s_len] = '_';
+	  tls_s_len++;
+	}
 	
 	for(i=0; i<s->num_elliptic_curve_point_format; i++) {
 	  int b_diff = sizeof(tls_s)-tls_s_len;
