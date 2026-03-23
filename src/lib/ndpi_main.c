@@ -1396,7 +1396,7 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
 			  0);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BITTORRENT,
 			  "BitTorrent", NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
-			  ndpi_build_default_ports_range(ports_a, 6881, 6889, 51413, 51413, 53646, 53646, 0, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports_range(ports_a, 6881, 6889, 51413, 51413, 53646, 53646, 6969, 6969, 0, 0) /* TCP */,
 			  ndpi_build_default_ports_range(ports_b, 6881, 6889, 51413, 51413, 6771, 6771, 0, 0, 0, 0) /* UDP */,
 			  0);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_GOOGLE,
