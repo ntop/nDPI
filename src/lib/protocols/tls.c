@@ -2403,7 +2403,8 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   tmp_str[tmp_str_len] = 0;
 
 #ifndef JA4R_DECIMAL
-  i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s", tmp_str); if(i > 0) ja4_r_len += i;
+  i = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s", tmp_str);
+  if(i > 0) ja4_r_len += i;
 #endif
 
   if(ndpi_struct->cfg.tls_ja4r_fingerprint_enabled) {
@@ -2414,7 +2415,10 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
   }
 
-  if(ja->client.num_tls_extensions > 0) ndpi_sha256(tmp_str, tmp_str_len, sha_hash); else memset(sha_hash, '\0', 6);
+  if(ja->client.num_tls_extensions > 0)
+    ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+  else
+    memset(sha_hash, '\0', 6);
 
   ja_offset = ja_str_len;
   rc = ndpi_snprintf(&ja_str[ja_str_len], ja_max_len - ja_str_len,
@@ -2425,7 +2429,11 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   ja_str[36] = 0;
 
   /* nDPI */
-  if(ja->client.num_tls_extensions > 0) ndpi_sha256(tmp_ndpi_str, tmp_ndpi_str_len, sha_hash); else memset(sha_hash, '\0', 6);
+  if(ja->client.num_tls_extensions > 0)
+    ndpi_sha256(tmp_ndpi_str, tmp_ndpi_str_len, sha_hash);
+  else
+    memset(sha_hash, '\0', 6);
+  
   ja_str_len = ja_offset;
   strncpy(ja_ndpi_str, ja_str, ja_str_len);
 
@@ -2696,7 +2704,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
         flow->protos.tls_quic.ssl_version = tls_version;
 
       if(ndpi_struct->cfg.ndpi_fingerprint_enabled) {
-        char tls_s[128], fp_buf[13];
+        char tls_s[128] = { '\0' }, fp_buf[13];
 	ndpi_tls_server_info *s = &ja.server;
 	u_int tls_s_len, i;
 	u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
@@ -2705,11 +2713,16 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	ndpi_fill_version_str(tls_s, s->tls_handshake_version);
 	tls_s_len = 3;
 
-	tls_s_len += snprintf(&tls_s[tls_s_len], sizeof(tls_s)-tls_s_len, "%02u_%s_%04x",
-			s->num_tls_extensions,
-			(s->alpn[0] == '\0') ? "00" : s->alpn,
-			s->cipher[0]);
+	if(sizeof(tls_s) > tls_s_len) {
+	  int rc = snprintf(&tls_s[tls_s_len], sizeof(tls_s)-tls_s_len, "%02u_%s_%04x",
+			    s->num_tls_extensions,
+			    (s->alpn[0] == '\0') ? "00" : s->alpn,
+			    s->cipher[0]);
 
+	  if(rc > 0)
+	    tls_s_len += rc;
+	}
+	
 	if(sizeof(tls_s) > tls_s_len) {
 	  tls_s[tls_s_len] = '_';
 	  tls_s_len++;
@@ -2749,7 +2762,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  } else
 	    break;
 	}
-		
+	
 	ndpi_sha256((const u_char *)tls_s, tls_s_len, sha_hash);
 
 	ndpi_snprintf(fp_buf, sizeof(fp_buf),
