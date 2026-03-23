@@ -241,7 +241,7 @@ u_int64_t ndpi_compare_flow_tls_blocks(struct ndpi_detection_module_struct *ndpi
 char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 					 struct ndpi_flow_struct *flow) {
   if(ndpi_str->cfg.ndpi_fingerprint_enabled &&
-     (flow->ndpi.fingerprint == NULL) &&
+     (flow->ndpi.client_fingerprint == NULL) &&
      ndpi_stack_is_tls_like(&flow->protocol_stack) &&
      /*
        We need TCP & TLS handshake. What should we do if we don't have them?
@@ -304,16 +304,16 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 		    sha_hash[12], sha_hash[13], sha_hash[14], sha_hash[15]
 		    );
 
-      flow->ndpi.fingerprint = ndpi_strdup((char*)fp_buf);
+      flow->ndpi.client_fingerprint = ndpi_strdup((char*)fp_buf);
 
-      if((flow->ndpi.fingerprint != NULL)
+      if((flow->ndpi.client_fingerprint != NULL)
 	 && (ndpi_str->ndpifp_custom_protos != NULL)) {
 	u_int64_t proto_id;
 	ndpi_list *extra_data = NULL;
 	
 	/* This protocol has been defined in protos.txt-like files */
 	if(ndpi_hash_find_entry_extra(ndpi_str->ndpifp_custom_protos,
-				      flow->ndpi.fingerprint, strlen(flow->ndpi.fingerprint),
+				      flow->ndpi.client_fingerprint, strlen(flow->ndpi.client_fingerprint),
 				      &proto_id, &extra_data) == 0) {
 
 	  proto_id = ndpi_compare_flow_tls_blocks(ndpi_str, flow, extra_data, proto_id);
@@ -331,5 +331,5 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
     }
   }
 
-  return(flow->ndpi.fingerprint);
+  return(flow->ndpi.client_fingerprint);
 }

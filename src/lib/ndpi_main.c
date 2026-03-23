@@ -8033,8 +8033,11 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->tcp.fingerprint_raw)
       ndpi_free(flow->tcp.fingerprint_raw);
 
-    if(flow->ndpi.fingerprint)
-      ndpi_free(flow->ndpi.fingerprint);
+    if(flow->ndpi.client_fingerprint)
+      ndpi_free(flow->ndpi.client_fingerprint);
+
+    if(flow->ndpi.server_fingerprint)
+      ndpi_free(flow->ndpi.server_fingerprint);
 
     if(flow->http.url)
       ndpi_free(flow->http.url);

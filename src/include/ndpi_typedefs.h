@@ -1661,7 +1661,7 @@ struct ndpi_flow_struct {
   } tcp;
 
   struct {
-    char *fingerprint;
+    char *client_fingerprint, *server_fingerprint;
   } ndpi;
 
   /*

@@ -529,9 +529,14 @@ static void ndpi_free_flow_tls_data(struct ndpi_flow_info *flow) {
     flow->ssh_tls.ja4_client_raw = NULL;
   }
 
-  if(flow->ndpi_fingerprint) {
-    ndpi_free(flow->ndpi_fingerprint);
-    flow->ndpi_fingerprint = NULL;
+  if(flow->ndpi_client_fingerprint) {
+    ndpi_free(flow->ndpi_client_fingerprint);
+    flow->ndpi_client_fingerprint = NULL;
+  }
+
+  if(flow->ndpi_server_fingerprint) {
+    ndpi_free(flow->ndpi_server_fingerprint);
+    flow->ndpi_server_fingerprint = NULL;
   }
 
   if(flow->stun.mapped_address.aps) {
@@ -1550,8 +1555,11 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_snprintf(flow->ssh_tls.ja4_client, sizeof(flow->ssh_tls.ja4_client), "%s",
 	     flow->ndpi_flow->protos.tls_quic.ja4_client);
 
-    if(flow->ndpi_flow->ndpi.fingerprint)
-      flow->ndpi_fingerprint = ndpi_strdup(flow->ndpi_flow->ndpi.fingerprint);
+    if(flow->ndpi_flow->ndpi.client_fingerprint)
+      flow->ndpi_client_fingerprint = ndpi_strdup(flow->ndpi_flow->ndpi.client_fingerprint);
+
+    if(flow->ndpi_flow->ndpi.server_fingerprint)
+      flow->ndpi_server_fingerprint = ndpi_strdup(flow->ndpi_flow->ndpi.server_fingerprint);
 
     if(flow->ndpi_flow->protos.tls_quic.ja4_client_raw)
       flow->ssh_tls.ja4_client_raw = ndpi_strdup(flow->ndpi_flow->protos.tls_quic.ja4_client_raw);

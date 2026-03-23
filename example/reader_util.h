@@ -352,7 +352,7 @@ typedef struct ndpi_flow_info {
   u_int8_t multimedia_flow_types;
   
   void *src_id, *dst_id;
-  char *tcp_fingerprint, *ndpi_fingerprint;
+  char *tcp_fingerprint, *ndpi_client_fingerprint, *ndpi_server_fingerprint;
   struct ndpi_entropy *entropy;
   struct ndpi_entropy *last_entropy;
 
