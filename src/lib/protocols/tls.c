@@ -2713,7 +2713,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	tls_s_len = 3;
 
 	if(sizeof(tls_s) > tls_s_len) {
-	  int b_diff = sizeof(tls_s)-tls_s_len;
+	  int b_diff = sizeof(tls_s)-tls_s_len-1;
 
 	  if(b_diff > 0) {
 	    int rc = snprintf(&tls_s[tls_s_len], b_diff, "%02u_%s_%04x",
@@ -2730,7 +2730,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  tls_s[tls_s_len++] = '_';
 	
 	for(i=0; i<s->num_tls_extensions; i++) {
-	  int b_diff = sizeof(tls_s)-tls_s_len;
+	  int b_diff = sizeof(tls_s)-tls_s_len-1;
 
 	  if(b_diff > 0) {
 	    int rc = snprintf(&tls_s[tls_s_len], b_diff, "%04x",
@@ -2748,7 +2748,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  tls_s[tls_s_len++] = '_';
 	
 	for(i=0; i<s->num_elliptic_curve_point_format; i++) {
-	  int b_diff = sizeof(tls_s)-tls_s_len;
+	  int b_diff = sizeof(tls_s)-tls_s_len-1;
 	  
 	  if(b_diff > 0) {
 	    int rc = snprintf(&tls_s[tls_s_len], b_diff, "%04x",
