@@ -2712,16 +2712,38 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 	tls_s[tls_s_len] = '_'; tls_s_len++;
 	
-	for(i=0; i<s->num_tls_extensions; i++)
-	  tls_s_len += snprintf(&tls_s[tls_s_len], sizeof(tls_s)-tls_s_len, "%04x",
-			  s->tls_extension[i]);
+	for(i=0; i<s->num_tls_extensions; i++) {
+	  int b_diff = sizeof(tls_s)-tls_s_len;
 
+	  if(b_diff > 0) {
+	    int rc = snprintf(&tls_s[tls_s_len], b_diff, "%04x",
+			      s->tls_extension[i]);
+	    
+	    if(rc <= 0)
+	      break;
+	    else
+	      tls_s_len += rc;
+	  } else
+	    break;
+	}
+	
 	tls_s[tls_s_len] = '_'; tls_s_len++;
 	
-	for(i=0; i<s->num_elliptic_curve_point_format; i++)
-	  tls_s_len += snprintf(&tls_s[tls_s_len], sizeof(tls_s)-tls_s_len, "%04x",
-			  s->elliptic_curve_point_format[i]);
+	for(i=0; i<s->num_elliptic_curve_point_format; i++) {
+	  int b_diff = sizeof(tls_s)-tls_s_len;
+	  
+	  if(b_diff > 0) {
+	    int rc = snprintf(&tls_s[tls_s_len], b_diff, "%04x",
+			      s->elliptic_curve_point_format[i]);
 
+	    if(rc <= 0)
+	      break;
+	    else
+	      tls_s_len += rc;
+	  } else
+	    break;
+	}
+		
 	ndpi_sha256((const u_char *)tls_s, tls_s_len, sha_hash);
 
 	ndpi_snprintf(fp_buf, sizeof(fp_buf),
