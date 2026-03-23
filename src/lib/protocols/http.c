@@ -529,7 +529,6 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
      strncmp((const char *)packet->server_line.ptr, "ntopng ", 7) == 0) {
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTOP, master_protocol, NDPI_CONFIDENCE_DPI);
     update_category_and_breed(ndpi_struct, flow);
-    ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
   }
 
   /* Matching on Content-Type.

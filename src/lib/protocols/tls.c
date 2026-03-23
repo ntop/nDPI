@@ -1665,8 +1665,6 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       /* Even if a LRU cache is involved, NDPI_CONFIDENCE_DPI_AGGRESSIVE seems more
          suited than NDPI_CONFIDENCE_DPI_CACHE */
       ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OOKLA, NDPI_PROTOCOL_TLS, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
-      /* TLS over port 8080 usually triggers that risk; clear it */
-      ndpi_unset_risk(ndpi_struct, flow, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT);
 
       tls_match_ja4(ndpi_struct, flow);
       flow->extra_packets_func = NULL;
