@@ -2701,8 +2701,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       if(flow->protos.tls_quic.ssl_version == 0)
         flow->protos.tls_quic.ssl_version = tls_version;
 
-      if(ndpi_struct->cfg.ndpi_fingerprint_enabled) {
-        char tls_s[128] = { '\0' }, fp_buf[13];
+      if(ndpi_struct->cfg.ndpi_fingerprint_enabled
+	 && (flow->ndpi.server_fingerprint == NULL)) {
+        char tls_s[128], fp_buf[13];
 	ndpi_tls_server_info *s = &ja.server;
 	u_int tls_s_len, i;
 	u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
@@ -2712,19 +2713,21 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	tls_s_len = 3;
 
 	if(sizeof(tls_s) > tls_s_len) {
-	  int rc = snprintf(&tls_s[tls_s_len], sizeof(tls_s)-tls_s_len, "%02u_%s_%04x",
-			    s->num_tls_extensions,
-			    (s->alpn[0] == '\0') ? "00" : s->alpn,
-			    s->cipher[0]);
+	  int b_diff = sizeof(tls_s)-tls_s_len;
 
-	  if(rc > 0)
-	    tls_s_len += rc;
+	  if(b_diff > 0) {
+	    int rc = snprintf(&tls_s[tls_s_len], b_diff, "%02u_%s_%04x",
+			      s->num_tls_extensions,
+			      (s->alpn[0] == '\0') ? "00" : s->alpn,
+			      s->cipher[0]);
+	    
+	    if(rc > 0)
+	      tls_s_len += rc;
+	  }
 	}
 	
-	if(sizeof(tls_s) > tls_s_len) {
-	  tls_s[tls_s_len] = '_';
-	  tls_s_len++;
-	}
+	if(sizeof(tls_s) > tls_s_len)
+	  tls_s[tls_s_len++] = '_';
 	
 	for(i=0; i<s->num_tls_extensions; i++) {
 	  int b_diff = sizeof(tls_s)-tls_s_len;
@@ -2741,10 +2744,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	    break;
 	}
 
-	if(sizeof(tls_s) > tls_s_len) {
-	  tls_s[tls_s_len] = '_';
-	  tls_s_len++;
-	}
+	if(sizeof(tls_s) > tls_s_len)
+	  tls_s[tls_s_len++] = '_';
 	
 	for(i=0; i<s->num_elliptic_curve_point_format; i++) {
 	  int b_diff = sizeof(tls_s)-tls_s_len;
