@@ -4013,10 +4013,20 @@ int ndpi_snprintf(char * str, size_t size, char const * format, ...) {
   va_list va_args;
 
   va_start(va_args, format);
-  int ret = ndpi_vsnprintf(str, size, format, va_args);
+  int rc = ndpi_vsnprintf(str, size, format, va_args);
   va_end(va_args);
 
-  return ret;
+  /*
+    ndpi_snprintf wraps standard snprintf, which returns the number of characters that would
+    have been written (not the number actually written) when the output is truncated.
+    So if rc >= size, only size - 1 characters were actually written, but tls_s_len is
+    advanced by rc. This has two consequences:
+  */
+
+  if(rc >= (int)size)
+    rc = size - 1;
+  
+  return(rc);
 }
 
 /* ******************************************* */
