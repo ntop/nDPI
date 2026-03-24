@@ -1254,6 +1254,11 @@ typedef enum {
   NDPI_PROTOCOL_CATEGORY_HISTORY,
   NDPI_PROTOCOL_CATEGORY_POLITICS,
   NDPI_PROTOCOL_CATEGORY_VEHICLES, /* 157 */
+  NDPI_PROTOCOL_CATEGORY_SEARCH_ENGINE, /* 158 - search engines */
+  NDPI_PROTOCOL_CATEGORY_CHILDREN,      /* 159 - content targeted at children */
+  NDPI_PROTOCOL_CATEGORY_VIOLENCE,      /* 160 - explicit violent content */
+  NDPI_PROTOCOL_CATEGORY_DRUGS,         /* 161 - drug-related content */
+  NDPI_PROTOCOL_CATEGORY_WEAPONS,       /* 162 - firearms, ammunition, and weaponry */
 
   /*
     IMPORTANT

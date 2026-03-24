@@ -4103,7 +4103,12 @@ static const char *categories[NDPI_PROTOCOL_NUM_CATEGORIES] = {
   "Beauty",
   "History",
   "Politics",
-  "Vehicles"
+  "Vehicles",
+  "Search Engines",
+  "Children",
+  "Violence",
+  "Drugs",
+  "Weapons"
 };
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
