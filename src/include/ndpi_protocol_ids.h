@@ -502,6 +502,7 @@ typedef enum {
   NDPI_PROTOCOL_GITHUB_COPILOT        = 470,
   NDPI_PROTOCOL_GITHUB_PACKAGES       = 471,
   NDPI_PROTOCOL_GITHUB_ACTIONS        = 472,
+  NDPI_PROTOCOL_YOUTUBE_KIDS          = 473,
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 

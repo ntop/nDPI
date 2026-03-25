@@ -4300,3 +4300,11 @@ References: `Official site <https://docs.github.com/en/packages/learn-github-pac
 GitHub Actions is a continuous integration and continuous delivery (CI/CD) platform that allows you to automate your build, test, and deployment pipeline.
 
 References: `Official site <https://docs.github.com/en/actions/get-started/understand-github-actions>`_
+
+.. _Proto_473:
+
+`NDPI_PROTOCOL_YOUTUBE_KIDS`
+============================
+YouTube Kids is a video platform by Google designed for children, offering curated, age-appropriate content with parental controls.
+References: `YouTube Kids official site <https://www.youtubekids.com/>`_
+
