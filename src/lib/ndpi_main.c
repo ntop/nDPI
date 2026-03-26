@@ -4104,7 +4104,7 @@ static const char *categories[NDPI_PROTOCOL_NUM_CATEGORIES] = {
   "History",
   "Politics",
   "Vehicles",
-  "Search Engines",
+  "Search_Engine",
   "Children",
   "Violence",
   "Drugs",
