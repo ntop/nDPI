@@ -2457,10 +2457,10 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* **************************************** */
 
-void ndpi_compute_tls_server_fingerprint(struct ndpi_flow_struct *flow,
-					 bool is_dtls,
-					 u_int32_t quic_version,
-					 ndpi_tls_server_info *s) {
+static void ndpi_compute_tls_server_fingerprint(struct ndpi_flow_struct *flow,
+                                                bool is_dtls,
+                                                u_int32_t quic_version,
+                                                ndpi_tls_server_info *s) {
   char tls_s[128], fp_buf[13];
   u_int tls_s_len, i;
   u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
@@ -2788,7 +2788,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       if(flow->protos.tls_quic.ssl_version == 0)
         flow->protos.tls_quic.ssl_version = tls_version;
 
-      if(ndpi_struct->cfg.ndpi_fingerprint_enabled
+      if(ndpi_struct->cfg.ndpi_server_fingerprint_enabled
 	 && (flow->ndpi.server_fingerprint == NULL))
 	ndpi_compute_tls_server_fingerprint(flow, is_dtls, quic_version, s);
 

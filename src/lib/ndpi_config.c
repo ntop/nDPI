@@ -218,6 +218,7 @@ const struct cfg_param cfg_params[] = {
   { NULL,            "metadata.tcp_fingerprint_raw",            "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tcp_fingerprint_raw_enabled), NULL },
   { NULL,            "metadata.tcp_fingerprint_format",         "0", "0" /* min */, "1" /* max */, CFG_PARAM_INT, __OFF(tcp_fingerprint_format), NULL },
 
+  { NULL,            "metadata.ndpi_server_fingerprint",        "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ndpi_server_fingerprint_enabled), NULL },
   { NULL,            "metadata.ndpi_fingerprint",               "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(ndpi_fingerprint_enabled), NULL },
   { NULL,            "metadata.ndpi_fingerprint_format",         "0", "0" /* client-only */, "1" /* client+server only */, CFG_PARAM_INT, __OFF(ndpi_fingerprint_format), NULL },
   { NULL,            "metadata.ndpi_fingerprint_ignore_tcp_fp", "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_ndpifp_ignore_tcp_fingerprint), NULL },

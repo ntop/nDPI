@@ -234,6 +234,7 @@ struct ndpi_detection_module_config_struct {
   int tcp_fingerprint_enabled;
   int tcp_fingerprint_raw_enabled;
   int ndpi_fingerprint_enabled;
+  int ndpi_server_fingerprint_enabled;
   ndpi_fingerprint_format ndpi_fingerprint_format;
 
   char filename_config[CFG_MAX_LEN];
