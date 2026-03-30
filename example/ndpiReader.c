@@ -6152,7 +6152,11 @@ void hwUnitTest2() {
   u_int num_learning_points = 1;
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.9, beta = 0.5, gamma = 1;
-  FILE *fd = fopen("/tmp/result.csv", "w");
+  FILE *fd = fopen(
+#ifndef WIN32
+		   "/tmp/"
+#endif
+		   "result.csv", "w");
 
   assert(ndpi_hw_init(&hw, num_learning_points, 0 /* 0=multiplicative, 1=additive */,
 		      alpha, beta, gamma, 0.05) == 0);
@@ -6227,7 +6231,11 @@ void sesUnitTest() {
   };
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.9;
-  FILE *fd = fopen("/tmp/ses_result.csv", "w");
+  FILE *fd = fopen(
+#ifndef WIN32
+		   "/tmp/"
+#endif
+		   "ses_result.csv", "w");
 
   assert(ndpi_ses_init(&ses, alpha, 0.05) == 0);
   ndpi_ses_reset(&ses);
@@ -6300,7 +6308,11 @@ void desUnitTest() {
   };
   u_int i, num = sizeof(v) / sizeof(double);
   float alpha = 0.9, beta = 0.5;
-  FILE *fd = fopen("/tmp/des_result.csv", "w");
+  FILE *fd = fopen(
+#ifndef WIN32
+		   "/tmp/"
+#endif
+		   "des_result.csv", "w");
 
   assert(ndpi_des_init(&des, alpha, beta, 0.05) == 0);
   ndpi_des_reset(&des);
@@ -7293,24 +7305,15 @@ void checkmemrchrUnitTest() {
 
 /* *********************************************** */
 
-#ifndef MAX_PATH
-#define MAX_PATH 512
-#endif
-
 void checkRankingUnitTest(bool do_trace) {
   ndpi_ranking rank;
-  char path[MAX_PATH] = {0};
+  char path[64] = {0};
   const u_int num = 3;
   ndpi_ranking_epoch_entry entries[4];
   u_int i, j;
   ndpi_ranking_change curr_ranking[4], prev_ranking[4];
   u_int32_t now = (u_int32_t)time(NULL), prev_epoch;
   u_int16_t num_changes;
-#ifdef WIN32
-  TCHAR szTempPath[MAX_PATH];
-
-  GetTempPath(MAX_PATH, szTempPath);
-#endif
 
   srand(now);
 
@@ -7318,12 +7321,12 @@ void checkRankingUnitTest(bool do_trace) {
     On GitHub Actions, ndpiReader might be called multiple times in parallel,
     so every instance must use its own file
   */
-  snprintf(path, sizeof(path),"%s%sranking.%u.test",
+  snprintf(path, sizeof(path),"%sranking.%u.test",
 #ifdef WIN32
-	   szTempPath, "\\",
+	   "",
 #else
 
-	   "/tmp", "/",
+	   "/tmp/",
 #endif
 	   (unsigned int)getpid());
 
