@@ -7293,9 +7293,13 @@ void checkmemrchrUnitTest() {
 
 /* *********************************************** */
 
+#ifndef MAX_PATH
+#define MAX_PATH 512
+#endif
+
 void checkRankingUnitTest(bool do_trace) {
   ndpi_ranking rank;
-  char path[64] = {0};
+  char path[MAX_PATH] = {0};
   const u_int num = 3;
   ndpi_ranking_epoch_entry entries[4];
   u_int i, j;
