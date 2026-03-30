@@ -7302,6 +7302,11 @@ void checkRankingUnitTest(bool do_trace) {
   ndpi_ranking_change curr_ranking[4], prev_ranking[4];
   u_int32_t now = (u_int32_t)time(NULL), prev_epoch;
   u_int16_t num_changes;
+#ifdef WIN32
+  TCHAR szTempPath[MAX_PATH];
+
+  GetTempPath(MAX_PATH, szTempPath);
+#endif
 
   srand(now);
 
@@ -7309,7 +7314,15 @@ void checkRankingUnitTest(bool do_trace) {
     On GitHub Actions, ndpiReader might be called multiple times in parallel,
     so every instance must use its own file
   */
-  snprintf(path, sizeof(path), "/tmp/ranking.%u.test", (unsigned int)getpid());
+  snprintf(path, sizeof(path),"%s%sranking.%u.test",
+#ifdef WIN32
+	   szTempPath, "\\",
+#else
+
+	   "/tmp", "/",
+#endif
+	   (unsigned int)getpid());
+
 
   ndpi_init_ranking(&rank, num+1 /* max_num_items */, 8 /* num_epochs */);
   assert(ndpi_serialize_ranking(&rank, path) == true);
