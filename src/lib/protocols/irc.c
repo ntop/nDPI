@@ -151,8 +151,8 @@ static void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	  char buf[32], msg[64], *sp;
 
 	  snprintf(buf, sizeof(buf), "%.*s", (int)(packet->payload_packet_len - (user + 5 - (char *)packet->payload)), user + 5);
-	  if((sp = strchr(buf, ' ')) != NULL)
-	    sp[0] = '\0';
+	  sp = buf;
+	  strsep(&sp, " \r\n");
 	  
 	  snprintf(msg, sizeof(msg), "Found IRC username (%s)", buf);
 	  ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
