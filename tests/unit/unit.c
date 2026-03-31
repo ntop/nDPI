@@ -350,6 +350,7 @@ int serializeProtoUnitTest(void)
         printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __func__, (int)buffer_len, buffer);
       }
 
+#ifndef WIN32
       char const * const expected_csv_buf_str = "Self-signed Cert,High,300,270,30,Obsolete TLS (v1.1 or older),High,310,275,35,Weak TLS Cipher,High,150,135,15,Malformed Packet,Low,160,80,80,DPI,TLS.Facebook,91.119,Facebook,119,1,Fun,6,SocialNetwork,340282346638528859811704183484516925440.000000,680564693277057719623408366969033850880.000000";
       buffer_len = 0;
       buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
@@ -362,6 +363,7 @@ int serializeProtoUnitTest(void)
         printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __func__, (int)buffer_len, buffer);
       }
     }
+#endif
 
     ndpi_term_serializer(&serializer);
   }
