@@ -12,7 +12,7 @@ jobs:
     env:
       CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Test in FreeBSD
       id: test
       uses: vmactions/freebsd-vm@1885b78bae4c4c4b331b4b0461d23cc14cc72387 #v1.2.9
