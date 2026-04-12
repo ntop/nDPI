@@ -4310,3 +4310,11 @@ YouTube Kids is a video platform by Google designed for children, offering curat
 
 References: `YouTube Kids official site <https://www.youtubekids.com/>`_
 
+
+.. _Proto_474:
+
+`NDPI_PROTOCOL_SBE`
+===================
+A FIX standard for binary message encoding.
+
+References: `Official Protocol Specs <https://github.com/FIXTradingCommunity/fix-simple-binary-encoding/tree/master>`_

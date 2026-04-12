@@ -311,6 +311,7 @@
     <ClCompile Include="..\src\lib\protocols\rtsp.c" />
     <ClCompile Include="..\src\lib\protocols\rx.c" />
     <ClCompile Include="..\src\lib\protocols\samsung_sdp.c" />
+    <ClCompile Include="..\src\lib\protocols\sbe.c" />
     <ClCompile Include="..\src\lib\protocols\sflow.c" />
     <ClCompile Include="..\src\lib\protocols\sip.c" />
     <ClCompile Include="..\src\lib\protocols\skinny.c" />
