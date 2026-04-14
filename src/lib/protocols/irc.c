@@ -46,55 +46,12 @@ static u_int8_t ndpi_check_for_NOTICE_or_PRIVMSG(struct ndpi_detection_module_st
   return 0;
 }
 
-static u_int8_t ndpi_check_for_Nickname(struct ndpi_detection_module_struct *ndpi_struct)
-{
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int16_t i, packetl = packet->payload_packet_len;
-
-  if (packetl < 4) {
-    return 0;
-  }
-
-  for (i = 0; i < (packetl - 4); i++) {
-    if (packet->payload[i] == 'N' || packet->payload[i] == 'n') {
-      if ((((packetl - (i + 1)) >= 4) && memcmp(&packet->payload[i + 1], "ick=", 4) == 0)
-	  || (((packetl - (i + 1)) >= 8) && (memcmp(&packet->payload[i + 1], "ickname=", 8) == 0))
-	  || (((packetl - (i + 1)) >= 8) && (memcmp(&packet->payload[i + 1], "ickName=", 8) == 0))) {
-	NDPI_LOG_DBG2(ndpi_struct, "found HTTP IRC Nickname pattern\n");
-	return 1;
-      }
-    }
-  }
-  return 0;
-}
-
-static u_int8_t ndpi_check_for_cmd(struct ndpi_detection_module_struct *ndpi_struct)
-{
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int16_t i;
-
-  if (packet->payload_packet_len < 4) {
-    return 0;
-  }
-
-  for (i = 0; i < packet->payload_packet_len - 4; i++) {
-    if (packet->payload[i] == 'c') {
-      if (memcmp(&packet->payload[i + 1], "md=", 3) == 0) {
-	NDPI_LOG_DBG2(ndpi_struct, "found HTTP IRC cmd pattern  \n");
-	return 1;
-      }
-    }
-  }
-  return 0;
-}
-
 static void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 	
   u_int16_t c = 0;
   u_int16_t i = 0;
-  u_int16_t http_content_ptr_len = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search irc\n");
   if((flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC && (flow->packet_counter > 10))
@@ -207,19 +164,6 @@ static void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	  }
 	}
       }
-    }
-  }
-
-  if ((flow->detected_protocol_stack[0] != NDPI_PROTOCOL_IRC) && (flow->l4.tcp.irc_stage == 1)) {
-    if ((((packet->payload_packet_len - http_content_ptr_len) > 10)
-	 && (memcmp(packet->payload + http_content_ptr_len, "interface=", 10) == 0)
-	 && (ndpi_check_for_Nickname(ndpi_struct) != 0))
-	|| (((packet->payload_packet_len - http_content_ptr_len) > 5)
-	    && (memcmp(packet->payload + http_content_ptr_len, "item=", 5) == 0)
-	    && (ndpi_check_for_cmd(ndpi_struct) != 0))) {
-      NDPI_LOG_INFO(ndpi_struct, "found IRC: Nickname, cmd,  one time");
-      ndpi_int_irc_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
-      return;
     }
   }
 }

@@ -1287,7 +1287,6 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
 			      NDPI_PROTOCOL_CROSSFIRE, NDPI_PROTOCOL_SOAP,
 			      NDPI_PROTOCOL_BITTORRENT,
 			      NDPI_PROTOCOL_ZATTOO,
-			      NDPI_PROTOCOL_IRC,
 			      NDPI_PROTOCOL_IPP,
 			      NDPI_PROTOCOL_MPEGDASH,
 			      NDPI_PROTOCOL_RTSP,
