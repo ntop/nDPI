@@ -36,6 +36,17 @@ extern "C" {
 #define _NDPI_CONFIG_H_
 #endif
 
+#if defined(WIN32) || defined(_MSC_VER)
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#else
+#if defined(USE_GLOBAL_CONTEXT)
+#include <pthread.h>
+#endif
+#endif
+
 #include "ndpi_usdt.h"
 
 /* NDPI_NODE */
@@ -429,6 +440,16 @@ struct ndpi_detection_module_struct {
     void *ipAddresses6, *ipAddresses6_shadow; /* Patricia IPv6*/
     u_int8_t categories_loaded;
   } custom_categories;
+
+  void *category_ndb; /* struct ndpi_category_ndb * — mmap .ndb hostname backend */
+  u_int8_t category_backend_mode;
+#if defined(WIN32) || defined(_MSC_VER)
+  SRWLOCK category_ndb_lock;
+  u_int8_t category_ndb_lock_inited;
+#elif defined(USE_GLOBAL_CONTEXT)
+  pthread_rwlock_t category_ndb_lock;
+  u_int8_t category_ndb_lock_inited;
+#endif
 
   u_int8_t ip_version_limit;
 
@@ -1132,6 +1153,18 @@ struct cfg_param {
 extern const struct cfg_param cfg_params[];
 #endif
 
+struct ndpi_category_ndb;
+int ndpi_category_ndb_lookup_hostname(struct ndpi_category_ndb *db, const char *name, u_int name_len,
+    uint32_t *category_id);
+int ndpi_category_ndb_lookup_ipv4(struct ndpi_category_ndb *db, uint32_t addr_be, uint32_t *category_id);
+int ndpi_category_ndb_lookup_ipv6(struct ndpi_category_ndb *db, const uint8_t addr[16], uint32_t *category_id);
+
+void ndpi_category_ndb_rwlock_init(struct ndpi_detection_module_struct *ndpi_str);
+void ndpi_category_ndb_rwlock_destroy(struct ndpi_detection_module_struct *ndpi_str);
+void ndpi_category_ndb_lock_rd(struct ndpi_detection_module_struct *ndpi_str);
+void ndpi_category_ndb_unlock_rd(struct ndpi_detection_module_struct *ndpi_str);
+void ndpi_category_ndb_lock_wr(struct ndpi_detection_module_struct *ndpi_str);
+void ndpi_category_ndb_unlock_wr(struct ndpi_detection_module_struct *ndpi_str);
 
 #endif
 

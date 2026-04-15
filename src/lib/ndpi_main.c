@@ -4362,6 +4362,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
     return(NULL);
   }
 
+  ndpi_category_ndb_rwlock_init(ndpi_str);
+
   return(ndpi_str);
 }
 
@@ -5099,6 +5101,25 @@ int ndpi_match_custom_category(struct ndpi_detection_module_struct *ndpi_str,
   memcpy(buf, name, name_len);
   buf[name_len] = '\0';
 
+  if(ndpi_str->category_ndb &&
+      (ndpi_str->category_backend_mode == NDPI_CATEGORY_BACKEND_NDB_ONLY ||
+       ndpi_str->category_backend_mode == NDPI_CATEGORY_BACKEND_HYBRID)) {
+    uint32_t cat_id;
+    int ndb_rc;
+
+    ndpi_category_ndb_lock_rd(ndpi_str);
+    ndb_rc = ndpi_category_ndb_lookup_hostname((struct ndpi_category_ndb *)ndpi_str->category_ndb, name, name_len,
+          &cat_id);
+    ndpi_category_ndb_unlock_rd(ndpi_str);
+    if(ndb_rc == 0) {
+      *category = (ndpi_protocol_category_t)cat_id;
+      *breed = NDPI_PROTOCOL_ACCEPTABLE;
+      return(0);
+    }
+    if(ndpi_str->category_backend_mode == NDPI_CATEGORY_BACKEND_NDB_ONLY)
+      return(-1);
+  }
+
   if(ndpi_domain_classify_hostname(ndpi_str, ndpi_str->custom_categories.sc_hostnames,
 				   &class_id, buf)) {
     *category = (ndpi_protocol_category_t)(class_id & 0xFFFF);
@@ -5140,7 +5161,24 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
     ptr[0] = '\0';
 
   if(inet_pton(AF_INET, ipbuf, &pin) == 1) {
-    /* Search IPv4 */
+    /* Search IPv4: .ndb first when enabled, then Patricia in HYBRID */
+    if(ndpi_str->category_ndb &&
+       (ndpi_str->category_backend_mode == NDPI_CATEGORY_BACKEND_NDB_ONLY ||
+        ndpi_str->category_backend_mode == NDPI_CATEGORY_BACKEND_HYBRID)) {
+      uint32_t cat_u32;
+      int ndb_rc;
+
+      ndpi_category_ndb_lock_rd(ndpi_str);
+      ndb_rc = ndpi_category_ndb_lookup_ipv4((struct ndpi_category_ndb *)ndpi_str->category_ndb, pin.s_addr,
+          &cat_u32);
+      ndpi_category_ndb_unlock_rd(ndpi_str);
+      if(ndb_rc == 0) {
+        *category = (ndpi_protocol_category_t)cat_u32;
+        return(0);
+      }
+      if(ndpi_str->category_backend_mode == NDPI_CATEGORY_BACKEND_NDB_ONLY)
+        return(-1);
+    }
 
     /* Make sure all in network byte order otherwise compares wont work */
     ndpi_fill_prefix_v4(&prefix, &pin, 32,
@@ -5154,7 +5192,25 @@ int ndpi_get_custom_category_match(struct ndpi_detection_module_struct *ndpi_str
     }
     return(-1);
   } else if(inet_pton(AF_INET6, ipbuf, &pin6) == 1) {
-    /* Search IPv6 */
+    /* Search IPv6: .ndb first when enabled, then Patricia in HYBRID */
+    if(ndpi_str->category_ndb &&
+       (ndpi_str->category_backend_mode == NDPI_CATEGORY_BACKEND_NDB_ONLY ||
+        ndpi_str->category_backend_mode == NDPI_CATEGORY_BACKEND_HYBRID)) {
+      uint32_t cat_u32;
+      int ndb_rc;
+
+      ndpi_category_ndb_lock_rd(ndpi_str);
+      ndb_rc = ndpi_category_ndb_lookup_ipv6((struct ndpi_category_ndb *)ndpi_str->category_ndb, pin6.s6_addr,
+          &cat_u32);
+      ndpi_category_ndb_unlock_rd(ndpi_str);
+      if(ndb_rc == 0) {
+        *category = (ndpi_protocol_category_t)cat_u32;
+        return(0);
+      }
+      if(ndpi_str->category_backend_mode == NDPI_CATEGORY_BACKEND_NDB_ONLY)
+        return(-1);
+    }
+
     ndpi_fill_prefix_v6(&prefix, &pin6, 128,
 			((ndpi_patricia_tree_t *) ndpi_str->custom_categories.ipAddresses6)->maxbits);
     node = ndpi_patricia_search_best(ndpi_str->custom_categories.ipAddresses6, &prefix);
@@ -5179,6 +5235,9 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
 
     /* Unload plugins (if any) */
     ndpi_unload_protocol_plugins(ndpi_str);
+
+    ndpi_unload_category_ndb(ndpi_str);
+    ndpi_category_ndb_rwlock_destroy(ndpi_str);
 
     ndpi_bitmask_free(&ndpi_str->cfg.detection_bitmask);
     ndpi_bitmask_free(&ndpi_str->cfg.debug_bitmask);
