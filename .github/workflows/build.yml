@@ -16,7 +16,7 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Set up Python 3.9
@@ -48,7 +48,7 @@ jobs:
     name: Test Utils (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -114,7 +114,7 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install Ubuntu Prerequisites
@@ -218,7 +218,7 @@ jobs:
       matrix:
         os: ["windows-latest"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install Windows msys2 prerequisites
@@ -248,7 +248,7 @@ jobs:
     env:
       CFLAGS: -Werror -g -O2
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Install Prerequisites
