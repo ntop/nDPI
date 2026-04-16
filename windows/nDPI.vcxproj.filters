@@ -285,6 +285,7 @@
     <ClCompile Include="..\src\lib\protocols\crynet.c" />
     <ClCompile Include="..\example\ndpiReader.c" />
     <ClCompile Include="..\example\reader_util.c" />
+    <ClCompile Include="..\example\utests.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\include\ndpi_includes.h" />

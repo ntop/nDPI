@@ -16,11 +16,11 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.9"
       - name: Install Ubuntu Prerequisites
@@ -48,7 +48,7 @@ jobs:
     name: Test Utils (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -114,7 +114,7 @@ jobs:
             maxminddb: "--with-maxminddb"
             msan: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install Ubuntu Prerequisites
@@ -148,7 +148,9 @@ jobs:
         if: startsWith(matrix.os, 'macOS')
         run: |
           # Avoid (re)installing pkg-config. See: https://github.com/actions/runner-images/issues/10984
-          brew install coreutils wdiff colordiff autoconf automake libtool gettext json-c rrdtool parallel
+          # Avoid (re)installing  gettext 1.0, to avoid "gettext 1.0 is already installed and up-to-date.
+          # To reinstall 1.0, run: brew reinstall gettext" warning
+          brew install coreutils wdiff colordiff autoconf automake libtool json-c rrdtool parallel
       - name: Install MacOS Prerequisites (libpcre2)
         if: startsWith(matrix.os, 'macOS') && startsWith(matrix.pcre, '--with-pcre2')
         run: |
@@ -218,7 +220,7 @@ jobs:
       matrix:
         os: ["windows-latest"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install Windows msys2 prerequisites
@@ -248,7 +250,7 @@ jobs:
     env:
       CFLAGS: -Werror -g -O2
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Prerequisites

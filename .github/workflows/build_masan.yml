@@ -24,7 +24,7 @@ jobs:
       # Idea to have significant faster tests while pushing/merging: test all pcaps only on schedule runs; otherwise tests only the pcaps updated/added recently
       NDPI_TEST_ONLY_RECENTLY_UPDATED_PCAPS: ${{ (github.event_name == 'schedule') && '0' || '1' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites

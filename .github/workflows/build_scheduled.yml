@@ -12,7 +12,7 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -42,11 +42,11 @@ jobs:
     name: Documentation (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: "3.9"
       - name: Install Ubuntu Prerequisites
@@ -75,7 +75,7 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -114,7 +114,7 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -141,7 +141,7 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -175,7 +175,7 @@ jobs:
     env:
       CFLAGS: -Werror
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -208,7 +208,7 @@ jobs:
         os: ["ubuntu-22.04", "ubuntu-24.04", "macos-15-intel", "macOS-14", "macOS-15", "macOS-26", "ubuntu-22.04-arm", "ubuntu-24.04-arm"]
         gcrypt: ["", "--with-local-libgcrypt"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Ubuntu Prerequisites
@@ -245,7 +245,7 @@ jobs:
       matrix:
         os: ["windows-latest"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install Windows msys2 prerequisites
@@ -288,7 +288,7 @@ jobs:
             ar: "llvm-ar-18"
             ranlib: "llvm-ranlib-18"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install Ubuntu Prerequisites
@@ -313,7 +313,7 @@ jobs:
     env:
       CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install Ubuntu Prerequisites

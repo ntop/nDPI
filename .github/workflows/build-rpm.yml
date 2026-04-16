@@ -12,7 +12,7 @@ jobs:
     container:
       image: almalinux:8
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install Alma Linux Prerequisites
       run: |
