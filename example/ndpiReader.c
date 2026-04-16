@@ -428,6 +428,24 @@ static void flow_free_wrapper(void *freeable) {
   free(freeable); /* Don't change to ndpi_free !!!!! */
 }
 
+/*
+ * Install nDPI memory hooks once, before any ndpi_malloc()/ndpi_free() or
+ * ndpi_init_detection_module() path (parseOptions, dump_hosts, extcap_config,
+ * help(), run_unit_tests, init_doh_bins, etc.). If this ran only inside
+ * test_lib(), pointers allocated earlier used libc while later ndpi_free()
+ * used the custom free: undefined behavior with non-trivial allocators.
+ */
+static void ndpiReader_install_memory_hooks(void) {
+  ndpi_set_memory_alloction_functions(malloc_wrapper,
+                                      free_wrapper,
+                                      calloc_wrapper,
+                                      realloc_wrapper,
+                                      aligned_malloc_wrapper,
+                                      aligned_free_wrapper,
+                                      flow_malloc_wrapper,
+                                      flow_free_wrapper);
+}
+
 /* ***************************************************** */
 
 
@@ -5574,15 +5592,6 @@ void test_lib() {
 #endif
   struct ndpi_global_context *g_ctx;
 
-  ndpi_set_memory_alloction_functions(malloc_wrapper,
-                                      free_wrapper,
-                                      calloc_wrapper,
-                                      realloc_wrapper,
-                                      aligned_malloc_wrapper,
-                                      aligned_free_wrapper,
-                                      flow_malloc_wrapper,
-                                      flow_free_wrapper);
-
 #ifndef USE_GLOBAL_CONTEXT
   /* ndpiReader works even if libnDPI has been compiled without global context support,
      but you can't configure any cache with global scope */
@@ -5770,6 +5779,8 @@ int main(int argc, char **argv) {
     printf("nDPI Library version mismatch: please make sure this code and the nDPI library are in sync\n");
     return(-1);
   }
+
+  ndpiReader_install_memory_hooks();
 
   gettimeofday(&startup_time, NULL);
   memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));

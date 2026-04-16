@@ -40,6 +40,8 @@ To run tests do additionally:
 
 or run all with: `make check`
 
+The sample CLI **ndpiReader** (under `example/`) and how it installs custom memory hooks before other nDPI calls are described in [example/README.md](example/README.md).
+
 Please note that the (minimal) pre-requisites for compilation include:
 - GNU tools (autoconf automake libtool pkg-config gettext flex bison)
 - GNU C compiler (gcc) or Clang
