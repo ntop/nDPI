@@ -29,6 +29,22 @@ static void ndpi_int_haproxy_add_connection(struct ndpi_detection_module_struct 
   ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HAPROXY, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
+static int search_proxy_protocol_v2(struct ndpi_detection_module_struct *ndpi_struct)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  static const unsigned char pp2_sig[] = { 0x0D, 0x0A, 0x0D, 0x0A, 0x00, 0x0D, 0x0A, 0x51, 0x55, 0x49, 0x54, 0x0A };
+
+  if (packet->payload_packet_len < sizeof(pp2_sig)) {
+    return 0;
+  }
+
+  if (memcmp(packet->payload, pp2_sig, sizeof(pp2_sig)) == 0) {
+    return 1;
+  }
+
+  return 0;
+}
+
 static void ndpi_search_haproxy(struct ndpi_detection_module_struct *ndpi_struct,
                                 struct ndpi_flow_struct *flow)
 {
@@ -36,6 +52,12 @@ static void ndpi_search_haproxy(struct ndpi_detection_module_struct *ndpi_struct
   const uint8_t *haproxy_end;
 
   NDPI_LOG_DBG(ndpi_struct, "search HAProxy\n");
+
+  if (search_proxy_protocol_v2(ndpi_struct) != 0) {
+    NDPI_LOG_DBG(ndpi_struct, "found HAProxy (Proxy Protocol v2)\n");
+    ndpi_int_haproxy_add_connection(ndpi_struct, flow);
+    return;
+  }
 
   if (packet->payload_packet_len < NDPI_STATICSTRING_LEN("PROXY TCP"))
   {

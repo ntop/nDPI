@@ -3185,7 +3185,7 @@ Notes:
 ========================
 HAProxy is a high availability load balancer and reverse proxy.
 
-References: `HAProxy official site: <https://www.haproxy.org>`_
+References: `HAProxy official site: <https://www.haproxy.org>`_, `Proxy Protocol v2: <https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt>`_
 
 
 .. _Proto_351:
