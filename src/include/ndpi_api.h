@@ -1133,7 +1133,13 @@ extern "C" {
   ndpi_tls_block_type ndpi_encode_tls_block_type(u_int8_t block_type, u_int8_t handshake_type);
   const char* ndpi_print_encoded_tls_block_type(ndpi_tls_block_type block_type, bool numeric_mode);
 
+  /* NOTE: caller MUST free the returned pointer */
   u_char* ndpi_encode_tls_blocks(struct ndpi_tls_block *tls_blocks, u_int8_t num_tls_blocks);
+  /*
+   * encoded_blocks is a length-delimited hex buffer and does not need to be
+   * NUL-terminated. Returns NULL on malformed hex, malformed TLS blocks, or
+   * allocation failure.
+   */
   struct ndpi_tls_block* ndpi_decode_tls_blocks(const u_char *encoded_blocks, u_int encoded_blocks_len,
 						u_int8_t *num_tls_blocks);
   u_int64_t ndpi_compare_flow_tls_blocks(struct ndpi_detection_module_struct *ndpi_str,
@@ -1299,6 +1305,11 @@ extern "C" {
   u_char* ndpi_base64_decode(const u_char *src, size_t len, size_t *out_len);
   char* ndpi_base64_encode(unsigned char const* bytes_to_encode, size_t in_len); /* NOTE: caller MUST free the returned pointer */
 
+  /*
+   * src is a length-delimited hex buffer and does not need to be
+   * NUL-terminated. Returns NULL on malformed hex or allocation failure.
+   * On failure, out_len is set to 0.
+   */
   u_char* ndpi_hex_decode(const u_char *src, size_t len, size_t *out_len);
   u_char* ndpi_hex_encode(unsigned char const* bytes_to_encode, size_t in_len); /* NOTE: caller MUST free the returned pointer */
 

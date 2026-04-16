@@ -1131,21 +1131,52 @@ u_char* ndpi_hex_encode(unsigned char const* bytes_to_encode, size_t in_len) {
 
 /* ********************************** */
 
+static int ndpi_hex2nibble(u_char c) {
+  if(c >= '0' && c <= '9')
+    return(c - '0');
+  if(c >= 'a' && c <= 'f')
+    return(10 + (c - 'a'));
+  if(c >= 'A' && c <= 'F')
+    return(10 + (c - 'A'));
+
+  return(-1);
+}
+
+/* ********************************** */
+
 u_char* ndpi_hex_decode(const u_char *src, size_t len, size_t *out_len) {
+  size_t i, decoded_len;
   u_char *ret;
 
-  *out_len = len / 2;
-  ret = (u_char*)ndpi_malloc(*out_len+1);
+  if(out_len == NULL)
+    return(NULL);
+
+  *out_len = 0;
+
+  if((src == NULL) && (len != 0))
+    return(NULL);
+
+  if((len & 0x1) != 0)
+    return(NULL);
+
+  decoded_len = len / 2;
+  ret = (u_char*)ndpi_malloc(decoded_len + 1);
 
   if(ret != NULL) {
-    u_int i, ret_idx = 0;
+    for(i = 0; i < decoded_len; i++) {
+      int hi = ndpi_hex2nibble(src[2 * i]);
+      int lo = ndpi_hex2nibble(src[(2 * i) + 1]);
 
-    for(i=0; i<*out_len; i++) {
-      sscanf((const char*)&src[ret_idx], "%02hhX", &ret[i]);
-      ret_idx += 2;
+      if((hi < 0) || (lo < 0)) {
+        ndpi_free(ret);
+        return(NULL);
+      }
+
+      ret[i] = (u_char)((hi << 4) | lo);
     }
 
-    ret[i] = '\0';
+    ret[decoded_len] = '\0';
+    *out_len = decoded_len;
   }
 
   return(ret);
@@ -5341,12 +5372,23 @@ struct ndpi_tls_block* ndpi_decode_tls_blocks(const u_char *encoded_blocks,
 					      u_int encoded_blocks_len,
 					      u_int8_t *num_tls_blocks) {
   size_t out_len;
-  u_char *buf = ndpi_hex_decode(encoded_blocks, encoded_blocks_len, &out_len);
+  u_char *buf;
   u_int8_t i, offset, block_len = 3; /* block_type(1) + len(2) */
   struct ndpi_tls_block *tls_blocks;
 
-  if(buf == NULL)  return(NULL);
-  if(out_len == 0) { ndpi_free(buf); return(NULL); }
+  if(num_tls_blocks == NULL)
+    return(NULL);
+
+  *num_tls_blocks = 0;
+
+  buf = ndpi_hex_decode(encoded_blocks, encoded_blocks_len, &out_len);
+  if(buf == NULL)
+    return(NULL);
+  if((out_len == 0) || ((out_len % block_len) != 0)
+     || ((out_len / block_len) > 0xFF)) {
+    ndpi_free(buf);
+    return(NULL);
+  }
 
   *num_tls_blocks = out_len / block_len;
 
