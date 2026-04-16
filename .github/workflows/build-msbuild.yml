@@ -16,13 +16,13 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: ["windows-latest", "windows-11-arm"]
+        os: ["windows-2025", "windows-2025-vs2026", "windows-11-arm"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Download NuGet packages
         run: msbuild windows/nDPI.sln -t:restore -p:RestorePackagesConfig=true
@@ -40,7 +40,7 @@ jobs:
         run: msbuild windows/nDPI.sln -t:rebuild -property:Configuration=Debug-ndpiReader
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-artifacts-${{ matrix.os }}
           path: windows/bin

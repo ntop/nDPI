@@ -1430,6 +1430,8 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
     u_int8_t unknown_tls_version;
     char version[16], unknown_cipher[8];
 
+    __ndpi_unused_param(is_tls_proto);
+
     ndpi_ssl_version2str(version, sizeof(version), flow->protos.tls_quic.ssl_version, &unknown_tls_version);
 
     if(flow->protos.tls_quic.notBefore)
@@ -1489,8 +1491,7 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
         ndpi_serialize_string_string(serializer, "fingerprint", buf);
       }
 
-      if (is_tls_proto == true)
-	ndpi_serialize_tls_blocks(ndpi_struct, serializer, flow);
+      ndpi_serialize_tls_blocks(ndpi_struct, serializer, flow);
 
       ndpi_serialize_end_of_block(serializer);
     }
@@ -2014,7 +2015,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
     if(flow->protos.sip.to_imsi[0] != '\0')
       ndpi_serialize_string_string(serializer, "to_imsi", flow->protos.sip.to_imsi);
-    
+
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -2028,14 +2029,14 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 #include "../../../nDPI-custom/ndpi_utils_dpi2json_dtls.c"
 #endif
     break;
-    
+
   case NDPI_PROTOCOL_IPSEC:
     {
       ndpi_serializer sub_serializer;
       u_int32_t buffer_len;
       char *buffer;
-      
-      ndpi_serialize_start_of_block(serializer, "ipsec");      
+
+      ndpi_serialize_start_of_block(serializer, "ipsec");
       ndpi_serialize_string_uint32(serializer, "num_proposals", flow->protos.ipsec.num_proposals);
 
 
@@ -2046,7 +2047,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
 	for(i=0; i<flow->protos.ipsec.num_proposals; i++) {
 	  struct ndpi_ipsec_proposal *p = &flow->protos.ipsec.proposal[i];
-	  
+
 	  ndpi_serialize_string_uint32(&sub_serializer, "protocol_id", p->proto_id);
 	  ndpi_serialize_string_uint32(&sub_serializer, "num_transforms", p->num_transforms);
 	  ndpi_serialize_string_string(&sub_serializer, "encription_algorithm", ndpi_ikev2_encr_name(p->encr_alg));
@@ -2057,7 +2058,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	  ndpi_serialize_string_uint32(&sub_serializer, "extended_sequence_numbers", p->esn);
 	  ndpi_serialize_end_of_record(&sub_serializer);
 	}
-	
+
 	buffer = ndpi_serializer_get_buffer(&sub_serializer, &buffer_len);
 	if(buffer && (buffer_len > 0))
 	  ndpi_serialize_string_raw(serializer, "proposals", buffer, buffer_len);
@@ -2210,7 +2211,7 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 
     ndpi_serialize_end_of_block(serializer);
   }
-  
+
   ndpi_serialize_string_string(serializer, "proto",
 			       ndpi_get_ip_proto_name(l4_protocol,
 						      l4_proto_name, sizeof(l4_proto_name)));
@@ -4070,7 +4071,7 @@ int ndpi_snprintf(char * str, size_t size, char const * format, ...) {
 
   if(rc >= (int)size)
     rc = size - 1;
-  
+
   return(rc);
 }
 
@@ -6080,7 +6081,7 @@ float ndpi_tls_blocks_len_compare(struct ndpi_tls_block *a,
 
       if((diff != 0) && (n < 2 /* C/S Hello */))
 	return(999999.);
-      
+
       total += diff * diff;
 
 #if 0

@@ -33,7 +33,6 @@
     <ClCompile Include="..\src\lib\protocols\http.c" />
     <ClCompile Include="..\src\lib\protocols\http2.c" />
     <ClCompile Include="..\src\lib\protocols\iax.c" />
-    <ClCompile Include="..\src\lib\protocols\icecast.c" />
     <ClCompile Include="..\src\lib\protocols\ipp.c" />
     <ClCompile Include="..\src\lib\protocols\irc.c" />
     <ClCompile Include="..\src\lib\protocols\jabber.c" />
@@ -286,6 +285,7 @@
     <ClCompile Include="..\src\lib\protocols\crynet.c" />
     <ClCompile Include="..\example\ndpiReader.c" />
     <ClCompile Include="..\example\reader_util.c" />
+    <ClCompile Include="..\example\utests.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\include\ndpi_includes.h" />

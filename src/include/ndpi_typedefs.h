@@ -906,9 +906,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_WHATSAPP */
   u_int8_t wa_matched_so_far;
 
-  /* NDPI_PROTOCOL_IRC */
-  u_int8_t irc_stage;
-
   /* NDPI_PROTOCOL_NEST_LOG_SINK */
   u_int8_t nest_log_sink_matches;
 
@@ -919,7 +916,7 @@ struct ndpi_flow_tcp_struct {
   u_int64_t seen_syn:1, seen_syn_ack:1, seen_ack:1;
 
   /* NDPI_PROTOCOL_IRC */
-  u_int64_t irc_3a_counter:3;
+  u_int64_t irc_stage:2;
 
   /* NDPI_PROTOCOL_USENET */
   u_int64_t usenet_stage:2;
@@ -959,9 +956,6 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_POSTGRES */
   u_int64_t postgres_stage:3;
 
-  /* NDPI_PROTOCOL_ICECAST */
-  u_int64_t icecast_stage:1;
-
   /* NDPI_PROTOCOL_MAIL_POP */
   u_int64_t mail_pop_stage:2;
 
@@ -973,7 +967,7 @@ struct ndpi_flow_tcp_struct {
   u_int64_t rdp_protocol_detected:1;
 
   /* Reserved for future use */
-  u_int64_t reserved:20;
+  u_int64_t reserved:21;
 };
 
 /* ************************************************** */

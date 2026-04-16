@@ -362,8 +362,8 @@ int serializeProtoUnitTest(void)
         printf("%s: ERROR: expected CSV str: \"%s\"\n", __func__, expected_csv_buf_str);
         printf("%s: ERROR: got CSV str.....: \"%.*s\"\n", __func__, (int)buffer_len, buffer);
       }
-    }
 #endif
+    }
 
     ndpi_term_serializer(&serializer);
   }
