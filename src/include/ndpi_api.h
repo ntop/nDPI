@@ -2005,7 +2005,8 @@ extern "C" {
   u_int8_t ndpi_is_protocol_detected(ndpi_protocol proto);
   void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
 				 ndpi_serializer *serializer,
-				 struct ndpi_flow_struct *flow);
+				 struct ndpi_flow_struct *flow,
+				 bool is_tls_proto);
   void ndpi_serialize_risk(ndpi_serializer *serializer, ndpi_risk risk);
   void ndpi_serialize_risk_score(ndpi_serializer *serializer, ndpi_risk_enum risk);
   void ndpi_serialize_confidence(ndpi_serializer *serializer, ndpi_confidence_t confidence);

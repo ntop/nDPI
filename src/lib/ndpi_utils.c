@@ -1240,8 +1240,10 @@ void ndpi_serialize_proto(struct ndpi_detection_module_struct *ndpi_struct,
 
 void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
 			       ndpi_serializer *serializer,
-			       struct ndpi_flow_struct *flow) {
-  if((ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
+			       struct ndpi_flow_struct *flow,
+			       bool is_tls_proto) {
+  if(is_tls_proto
+     && (ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
      && (flow->l4.tcp.tls.tls_blocks != NULL)
      && (flow->l4.tcp.tls.num_tls_blocks > 0)) {
     u_int16_t i, idx = 0;
@@ -1430,8 +1432,6 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
     u_int8_t unknown_tls_version;
     char version[16], unknown_cipher[8];
 
-    __ndpi_unused_param(is_tls_proto);
-
     ndpi_ssl_version2str(version, sizeof(version), flow->protos.tls_quic.ssl_version, &unknown_tls_version);
 
     if(flow->protos.tls_quic.notBefore)
@@ -1491,7 +1491,7 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
         ndpi_serialize_string_string(serializer, "fingerprint", buf);
       }
 
-      ndpi_serialize_tls_blocks(ndpi_struct, serializer, flow);
+      ndpi_serialize_tls_blocks(ndpi_struct, serializer, flow, is_tls_proto);
 
       ndpi_serialize_end_of_block(serializer);
     }
