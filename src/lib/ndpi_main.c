@@ -10922,84 +10922,99 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
 
 /* internal function for every detection to parse one packet and to increase the info buffer */
 void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow) {
-  u_int32_t a;
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
+  u_int32_t pos;
 
-  if((packet->payload_packet_len < 3) || (packet->payload == NULL))
+  /* Payload must be present and long enough to hold at least one header character */
+  if(packet->payload == NULL || packet->payload_packet_len < 3)
     return;
 
+  /* Skip re-parsing: this packet's lines were already extracted */
   if(packet->packet_lines_parsed_complete != 0)
     return;
 
-  if((flow->l4.tcp.three_way_handshake.syn_time != 0) /* Check only if 3WH was observed */
-     && (flow->l4.tcp.three_way_handshake.ack_time != 0)
-     && ((flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP) || (flow->detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP))
-     && (flow->http.method != NDPI_HTTP_METHOD_UNKNOWN)
-     && (flow->http.response_status_code == 0 /* Response code not observed yet */)
-     ) {
-    u_int64_t tdiff_ms = packet->current_time_ms - flow->l4.tcp.three_way_handshake.ack_time;
+  /*
+   * Slowloris / slow HTTP request detection.
+   * Trigger when: the TCP 3-way handshake was fully observed, the flow is HTTP,
+   * a request method has been seen, and no response has arrived yet.
+   */
+  if(flow->l4.tcp.three_way_handshake.syn_time != 0 /* 3WH was observed */
+     && flow->l4.tcp.three_way_handshake.ack_time != 0
+     && (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP
+         || flow->detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP)
+     && flow->http.method != NDPI_HTTP_METHOD_UNKNOWN
+     && flow->http.response_status_code == 0 /* no response seen yet */) {
+    u_int64_t elapsed_ms = packet->current_time_ms - flow->l4.tcp.three_way_handshake.ack_time;
 
-    if((tdiff_ms > 3000 /* 3 sec */) && (!ndpi_isset_risk(flow, NDPI_SLOW_DOS))) {
-      char buf[64];
+    if(elapsed_ms > 3000 /* 3 sec */ && !ndpi_isset_risk(flow, NDPI_SLOW_DOS)) {
+      char msg[64];
 
-      snprintf(buf, sizeof(buf), "Slow HTTP Req. (Slowloris): %.1f sec", tdiff_ms/1000.);
-      ndpi_set_risk(ndpi_str, flow, NDPI_SLOW_DOS, buf);
+      snprintf(msg, sizeof(msg), "Slow HTTP Req. (Slowloris): %.1f sec", elapsed_ms / 1000.);
+      ndpi_set_risk(ndpi_str, flow, NDPI_SLOW_DOS, msg);
     }
   }
 
   packet->packet_lines_parsed_complete = 1;
   ndpi_reset_packet_line_info(packet);
 
+  /* Seed the first line to begin at the payload start */
   packet->line[packet->parsed_lines].ptr = packet->payload;
   packet->line[packet->parsed_lines].len = 0;
 
-  for(a = 0; ((a+1) < packet->payload_packet_len) && (packet->parsed_lines < NDPI_MAX_PARSE_LINES_PER_PACKET); a++) {
-    if((packet->payload[a] == 0x0d) && (packet->payload[a+1] == 0x0a)) {
-      /* If end of line char sequence CR+NL "\r\n", process line */
+  /* Scan byte-by-byte for CR+LF sequences that delimit header lines */
+  for(pos = 0;
+      (pos + 1) < packet->payload_packet_len && packet->parsed_lines < NDPI_MAX_PARSE_LINES_PER_PACKET;
+      pos++) {
+    if(packet->payload[pos] != 0x0d || packet->payload[pos + 1] != 0x0a)
+      continue;
 
-      flow->http.request_header_observed = 1;
+    /* Found a CR+LF — the current line ends here */
+    flow->http.request_header_observed = 1;
 
-      if(((a + 3) < packet->payload_packet_len)
-	 && (packet->payload[a+2] == 0x0d)
-	 && (packet->payload[a+3] == 0x0a)) {
-	/* \r\n\r\n */
-	int diff; /* No unsigned ! */
-	u_int32_t a1 = a + 4;
+    /* Double CR+LF (\r\n\r\n) signals the end of HTTP headers;
+     * snapshot whatever body bytes are immediately available. */
+    if((pos + 3) < packet->payload_packet_len
+       && packet->payload[pos + 2] == 0x0d
+       && packet->payload[pos + 3] == 0x0a) {
+      u_int32_t body_offset = pos + 4;
+      int body_bytes; /* signed — subtraction may underflow if unsigned */
 
-	diff = packet->payload_packet_len - a1;
+      body_bytes = (int)packet->payload_packet_len - (int)body_offset;
 
-	if(diff > 0) {
-	  diff = ndpi_min((unsigned int)diff, sizeof(flow->initial_binary_bytes));
-	  memcpy(&flow->initial_binary_bytes, &packet->payload[a1], diff);
-	  flow->initial_binary_bytes_len = diff;
-	}
+      if(body_bytes > 0) {
+        body_bytes = ndpi_min((unsigned int)body_bytes, sizeof(flow->initial_binary_bytes));
+        memcpy(&flow->initial_binary_bytes, &packet->payload[body_offset], body_bytes);
+        flow->initial_binary_bytes_len = body_bytes;
       }
-
-      packet->line[packet->parsed_lines].len =
-	(u_int16_t)(((size_t) &packet->payload[a]) - ((size_t) packet->line[packet->parsed_lines].ptr));
-
-      parse_single_packet_line(ndpi_str);
-
-      if(packet->line[packet->parsed_lines].len == 0) {
-	packet->empty_line_position = a;
-	packet->empty_line_position_set = 1;
-      }
-
-      if(packet->parsed_lines >= (NDPI_MAX_PARSE_LINES_PER_PACKET - 1))
-	return;
-
-      packet->parsed_lines++;
-      packet->line[packet->parsed_lines].ptr = &packet->payload[a + 2];
-      packet->line[packet->parsed_lines].len = 0;
-
-      a++; /* next char in the payload */
     }
+
+    /* Record how many bytes are in this line (pointer arithmetic via size_t) */
+    packet->line[packet->parsed_lines].len =
+      (u_int16_t)((size_t)&packet->payload[pos] - (size_t)packet->line[packet->parsed_lines].ptr);
+
+    parse_single_packet_line(ndpi_str);
+
+    if(packet->line[packet->parsed_lines].len == 0) {
+      packet->empty_line_position     = pos;
+      packet->empty_line_position_set = 1;
+    }
+
+    if(packet->parsed_lines >= (NDPI_MAX_PARSE_LINES_PER_PACKET - 1))
+      return;
+
+    packet->parsed_lines++;
+    packet->line[packet->parsed_lines].ptr = &packet->payload[pos + 2];
+    packet->line[packet->parsed_lines].len = 0;
+
+    pos++; /* skip the LF byte; the loop increment will step past it */
   }
 
+  /* If at least one CR+LF-terminated line was seen, process the trailing fragment
+   * (the portion after the last CR+LF that has no terminator of its own). */
   if(packet->parsed_lines >= 1) {
     packet->line[packet->parsed_lines].len =
-      (u_int16_t)(((size_t) &packet->payload[packet->payload_packet_len]) -
-		  ((size_t) packet->line[packet->parsed_lines].ptr));
+      (u_int16_t)((size_t)&packet->payload[packet->payload_packet_len]
+                  - (size_t)packet->line[packet->parsed_lines].ptr);
 
     parse_single_packet_line(ndpi_str);
     packet->parsed_lines++;
