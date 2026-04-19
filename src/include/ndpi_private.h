@@ -933,7 +933,6 @@ void init_vxlan_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_whois_das_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_xbox_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_xdmcp_dissector(struct ndpi_detection_module_struct *ndpi_struct);
-void init_zattoo_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_zmq_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_stracraft_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_ubntac2_dissector(struct ndpi_detection_module_struct *ndpi_struct);

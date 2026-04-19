@@ -1285,7 +1285,6 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
 			      NDPI_PROTOCOL_WEBSOCKET,
 			      NDPI_PROTOCOL_CROSSFIRE, NDPI_PROTOCOL_SOAP,
 			      NDPI_PROTOCOL_BITTORRENT,
-			      NDPI_PROTOCOL_ZATTOO,
 			      NDPI_PROTOCOL_IPP,
 			      NDPI_PROTOCOL_MPEGDASH,
 			      NDPI_PROTOCOL_RTSP,
@@ -1507,8 +1506,8 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 8116, 0, 0, 0, 0) /* UDP */,
 			  0);
-  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ZATTOO,
-			  "Zattoo", NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_QOE_CATEGORY_LIVE_STREAMING,
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREE,
+			  "FreeProtocol", NDPI_PROTOCOL_CATEGORY_VIDEO, NDPI_PROTOCOL_QOE_CATEGORY_LIVE_STREAMING,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
 			  0);
@@ -6864,9 +6863,6 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* Media Gateway Control Protocol */
   init_mgcp_dissector(ndpi_str);
-
-  /* ZATTOO */
-  init_zattoo_dissector(ndpi_str);
 
   /* QQ */
   init_qq_dissector(ndpi_str);

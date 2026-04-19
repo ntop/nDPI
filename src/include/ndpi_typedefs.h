@@ -1958,9 +1958,6 @@ struct ndpi_flow_struct {
   u_int8_t bittorrent_stage;		      // can be 0 - 255
   u_int8_t bt_check_performed : 1;
 
-  /* NDPI_PROTOCOL_ZATTOO */
-  u_int8_t zattoo_stage:3;
-
   /* NDPI_PROTOCOL_OOKLA */
   u_int8_t ookla_stage : 1;
 
