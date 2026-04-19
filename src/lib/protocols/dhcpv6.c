@@ -31,36 +31,39 @@
 
 
 static void ndpi_int_dhcpv6_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-					   struct ndpi_flow_struct *flow)
-{
-
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DHCPV6, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+                                           struct ndpi_flow_struct *flow) {
+  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DHCPV6,
+                             NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
-static void ndpi_search_dhcpv6_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
-{
-	struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-	
-	NDPI_LOG_DBG(ndpi_struct, "search DHCPv6\n");
+static void ndpi_search_dhcpv6_udp(struct ndpi_detection_module_struct *ndpi_struct,
+                                   struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-	if (packet->payload_packet_len >= 4 &&
-		(packet->udp->source == htons(546) || packet->udp->source == htons(547)) &&
-		(packet->udp->dest == htons(546) || packet->udp->dest == htons(547)) &&
-		packet->payload[0] >= 1 && packet->payload[0] <= 13) {
+  NDPI_LOG_DBG(ndpi_struct, "search DHCPv6\n");
 
-		NDPI_LOG_INFO(ndpi_struct, "found DHCPv6\n");
-		ndpi_int_dhcpv6_add_connection(ndpi_struct, flow);
-		return;
-	}
+  /*
+   * DHCPv6 (RFC 3315) uses UDP port 546 (client) and 547 (server).
+   * A valid message is at least 4 bytes: 1 byte message-type + 3 bytes
+   * transaction-id.  Message types 1-13 are defined by the standard.
+   */
+  if(packet->payload_packet_len >= 4 &&
+     (packet->udp->source == htons(546) || packet->udp->source == htons(547)) &&
+     (packet->udp->dest   == htons(546) || packet->udp->dest   == htons(547)) &&
+     packet->payload[0] >= 1 && packet->payload[0] <= 13) {
 
-	NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+    NDPI_LOG_INFO(ndpi_struct, "found DHCPv6\n");
+    ndpi_int_dhcpv6_add_connection(ndpi_struct, flow);
+    return;
+  }
+
+  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 
-void init_dhcpv6_dissector(struct ndpi_detection_module_struct *ndpi_struct)
-{
+void init_dhcpv6_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_register_dissector("DHCPV6", ndpi_struct,
-                     ndpi_search_dhcpv6_udp,
-                     NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP_WITH_PAYLOAD,
-                     1, NDPI_PROTOCOL_DHCPV6);
+                          ndpi_search_dhcpv6_udp,
+                          NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP_WITH_PAYLOAD,
+                          1, NDPI_PROTOCOL_DHCPV6);
 }
