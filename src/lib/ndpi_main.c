@@ -8132,84 +8132,73 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 			    unsigned short packetlen,
 			    struct ndpi_flow_input_info *input_info) {
   struct ndpi_packet_struct *packet = &ndpi_str->packet;
-  const struct ndpi_iphdr *decaps_iph = NULL;
-  u_int16_t l3len;
-  u_int16_t l4len, l4_packet_len;
-  const u_int8_t *l4ptr;
-  u_int8_t l4protocol;
-  u_int8_t l4_result;
+  const struct ndpi_iphdr *raw_iph;
+  const u_int8_t *transport_ptr;
+  u_int16_t ip_span, transport_len;
+  u_int8_t transport_proto;
 
-  /* need at least 20 bytes for ip header */
+  /* Require at least a minimal IP header */
   if(packetlen < 20)
-    return 1;
+    return(1);
 
+  /* Record arrival time and caller-supplied metadata */
   packet->current_time_ms = current_time_ms;
+  ndpi_str->input_info    = input_info;
 
-  ndpi_str->input_info = input_info;
-
-  packet->iph = (const struct ndpi_iphdr *)packet_data;
-
-  /* reset payload_packet_len, will be set if ipv4 tcp or udp */
-  packet->payload = NULL;
+  /* Initialise per-packet L3/L4 state */
+  packet->iph               = (const struct ndpi_iphdr *)packet_data;
+  packet->iphv6             = NULL;
+  packet->tcp               = NULL;
+  packet->udp               = NULL;
+  packet->payload           = NULL;
   packet->payload_packet_len = 0;
-  packet->l3_packet_len = packetlen;
+  packet->l3_packet_len     = packetlen;
 
-  packet->tcp = NULL, packet->udp = NULL;
-  packet->iphv6 = NULL;
-
-  l3len = packet->l3_packet_len;
+  ip_span = packetlen;
 
   ndpi_reset_packet_line_info(packet);
   packet->packet_lines_parsed_complete = 0;
-  packet->http_check_content = 0;
+  packet->http_check_content           = 0;
 
-  if(packet->iph != NULL)
-    decaps_iph = packet->iph;
+  /* Validate the IP version and set up the appropriate header pointer */
+  raw_iph = packet->iph;
 
-  if(decaps_iph && (decaps_iph->version == 4 /* IPVERSION */) && (decaps_iph->ihl >= 5)) {
+  if(raw_iph != NULL && raw_iph->version == 4 /* IPVERSION */ && raw_iph->ihl >= 5) {
     NDPI_LOG_DBG2(ndpi_str, "ipv4 header\n");
-  } else if(decaps_iph && decaps_iph->version == 6 && l3len >= sizeof(struct ndpi_ipv6hdr) &&
-	    (ndpi_str->ip_version_limit & NDPI_DETECTION_ONLY_IPV4) == 0) {
+  } else if(raw_iph != NULL && raw_iph->version == 6 &&
+            ip_span >= sizeof(struct ndpi_ipv6hdr) &&
+            (ndpi_str->ip_version_limit & NDPI_DETECTION_ONLY_IPV4) == 0) {
     NDPI_LOG_DBG2(ndpi_str, "ipv6 header\n");
     packet->iphv6 = (struct ndpi_ipv6hdr *)packet->iph;
-    packet->iph = NULL;
+    packet->iph   = NULL;
   } else {
     packet->iph = NULL;
     return(1);
   }
 
-  /* needed:
-   *  - unfragmented packets
-   *  - ip header <= packet len
-   *  - ip total length >= packet len
-   */
+  /* Locate the transport-layer header; requires an unfragmented, size-valid packet */
+  transport_ptr   = NULL;
+  transport_len   = 0;
+  transport_proto = 0;
 
-  l4ptr = NULL;
-  l4len = 0;
-  l4protocol = 0;
-
-  l4_result =
-    ndpi_detection_get_l4_internal(ndpi_str, (const u_int8_t *) decaps_iph, l3len, &l4ptr, &l4len, &l4protocol, 0);
-
-  if(l4_result != 0) {
+  if(ndpi_detection_get_l4_internal(ndpi_str, (const u_int8_t *)raw_iph, ip_span,
+                                    &transport_ptr, &transport_len,
+                                    &transport_proto, 0) != 0)
     return(1);
-  }
 
-  l4_packet_len = l4len;
-  flow->l4_proto = l4protocol;
+  flow->l4_proto = transport_proto;
 
-  /* TCP / UDP detection */
-  if(l4protocol == IPPROTO_TCP) {
+  /* Demultiplex the transport protocol and populate packet fields */
+  if(transport_proto == IPPROTO_TCP) {
     u_int16_t tcp_header_len;
 
-    if(l4_packet_len < sizeof(struct ndpi_tcphdr) /* min size of tcp */)
+    if(transport_len < sizeof(struct ndpi_tcphdr) /* min size of tcp */)
       return(1);
 
-    /* tcp */
-    packet->tcp = (struct ndpi_tcphdr *) l4ptr;
+    packet->tcp    = (struct ndpi_tcphdr *)transport_ptr;
     tcp_header_len = packet->tcp->doff * 4;
 
-    if(l4_packet_len >= tcp_header_len) {
+    if(transport_len >= tcp_header_len) {
       if(ndpi_str->cfg.tcp_fingerprint_enabled &&
          flow->tcp.fingerprint == NULL) {
 	u_int8_t *t = (u_int8_t*)packet->tcp;
@@ -8424,27 +8413,27 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	}
       }
 
-      packet->payload_packet_len = l4_packet_len - tcp_header_len;
+      packet->payload_packet_len = transport_len - tcp_header_len;
       packet->payload = ((u_int8_t *) packet->tcp) + tcp_header_len;
     } else {
       /* tcp header not complete */
       return(1);
     }
-  } else if(l4protocol == IPPROTO_UDP) {
-    if(l4_packet_len < 8 /* size of udp */)
+  } else if(transport_proto == IPPROTO_UDP) {
+    if(transport_len < 8 /* size of udp */)
       return(1);
-    packet->udp = (struct ndpi_udphdr *) l4ptr;
-    packet->payload_packet_len = l4_packet_len - 8;
-    packet->payload = ((u_int8_t *) packet->udp) + 8;
-  } else if((l4protocol == IPPROTO_ICMP) || (l4protocol == IPPROTO_ICMPV6)) {
-    if((l4protocol == IPPROTO_ICMP && l4_packet_len < sizeof(struct ndpi_icmphdr)) ||
-       (l4protocol == IPPROTO_ICMPV6 && l4_packet_len < sizeof(struct ndpi_icmp6hdr)))
+    packet->udp              = (struct ndpi_udphdr *)transport_ptr;
+    packet->payload_packet_len = transport_len - 8;
+    packet->payload          = ((u_int8_t *)packet->udp) + 8;
+  } else if((transport_proto == IPPROTO_ICMP) || (transport_proto == IPPROTO_ICMPV6)) {
+    if((transport_proto == IPPROTO_ICMP   && transport_len < sizeof(struct ndpi_icmphdr)) ||
+       (transport_proto == IPPROTO_ICMPV6 && transport_len < sizeof(struct ndpi_icmp6hdr)))
       return(1);
-    packet->payload = ((u_int8_t *) l4ptr);
-    packet->payload_packet_len = l4_packet_len;
+    packet->payload            = ((u_int8_t *)transport_ptr);
+    packet->payload_packet_len = transport_len;
   } else {
-    packet->payload = ((u_int8_t *) l4ptr);
-    packet->payload_packet_len = l4_packet_len;
+    packet->payload            = ((u_int8_t *)transport_ptr);
+    packet->payload_packet_len = transport_len;
   }
 
   return(0);
