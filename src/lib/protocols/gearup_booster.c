@@ -42,7 +42,12 @@ static void ndpi_search_gearup_booster(struct ndpi_detection_module_struct *ndpi
 
   NDPI_LOG_DBG(ndpi_struct, "search GearUP Booster\n");
 
-  if (packet->tcp != NULL && packet->payload_packet_len >= 16) {
+  if (packet->tcp != NULL) {
+    if (packet->payload_packet_len < 16) {
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return;
+    }
+
     if (flow->packet_counter <= 3) {
       int32_t pdu_length = ntohl(get_u_int32_t(packet->payload, 0));
       if (pdu_length != packet->payload_packet_len - 4) {
