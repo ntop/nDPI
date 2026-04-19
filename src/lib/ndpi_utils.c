@@ -2033,40 +2033,54 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_IPSEC:
     {
-      ndpi_serializer sub_serializer;
       u_int32_t buffer_len;
-      char *buffer;
+      char *buffer, version[8];
 
       ndpi_serialize_start_of_block(serializer, "ipsec");
-      ndpi_serialize_string_uint32(serializer, "num_proposals", flow->protos.ipsec.num_proposals);
+      
+      snprintf(version, sizeof(version), "%u.%u",
+	       (flow->protos.ipsec.version & 0xF0) >> 4,
+	       (flow->protos.ipsec.version & 0x0F));
+      ndpi_serialize_string_string(serializer, "ike_version", version);
 
-
-      if(ndpi_init_serializer(&sub_serializer, ndpi_serialization_format_json) == -1)
-	;
-      else {
-	u_int8_t i;
-
-	for(i=0; i<flow->protos.ipsec.num_proposals; i++) {
+      if(flow->protos.ipsec.num_proposals > 0) {
+	ndpi_serializer sub_serializer, *ser;
+	const bool serialize_only_first_protosal = true;
+	u_int8_t i, num = (!serialize_only_first_protosal) ? flow->protos.ipsec.num_proposals : 1;
+							      
+	if(!serialize_only_first_protosal) {
+	  ndpi_serialize_string_uint32(serializer, "num_proposals", flow->protos.ipsec.num_proposals);
+	  
+	  if(ndpi_init_serializer(&sub_serializer, ndpi_serialization_format_json) == -1)
+	    ser = NULL;
+	  else
+	    ser = &sub_serializer;
+	} else
+	  ser = serializer;
+	             	
+	for(i=0; i<num; i++) {
 	  struct ndpi_ipsec_proposal *p = &flow->protos.ipsec.proposal[i];
-
-	  ndpi_serialize_string_uint32(&sub_serializer, "protocol_id", p->proto_id);
-	  ndpi_serialize_string_uint32(&sub_serializer, "num_transforms", p->num_transforms);
-	  ndpi_serialize_string_string(&sub_serializer, "encription_algorithm", ndpi_ikev2_encr_name(p->encr_alg));
-	  ndpi_serialize_string_uint32(&sub_serializer, "encription_key_bits", p->encr_key_bits);
-	  ndpi_serialize_string_string(&sub_serializer, "pseudo_random_algorithm", ndpi_ikev2_prf_name(p->prf_alg));
-	  ndpi_serialize_string_string(&sub_serializer, "integrity_algorithm", ndpi_ikev2_integ_name(p->integ_alg));
-	  ndpi_serialize_string_string(&sub_serializer, "diffie_hellman_group", ndpi_ikev2_dh_name(p->dh_group));
-	  ndpi_serialize_string_uint32(&sub_serializer, "extended_sequence_numbers", p->esn);
-	  ndpi_serialize_end_of_record(&sub_serializer);
+	  
+	  ndpi_serialize_string_uint32(ser, "protocol_id", p->proto_id);
+	  ndpi_serialize_string_uint32(ser, "num_transforms", p->num_transforms);
+	  ndpi_serialize_string_string(ser, "encryption_algorithm", ndpi_ikev2_encr_name(p->encr_alg));
+	  ndpi_serialize_string_uint32(ser, "encryption_key_bits", p->encr_key_bits);
+	  ndpi_serialize_string_string(ser, "pseudo_random_algorithm", ndpi_ikev2_prf_name(p->prf_alg));
+	  ndpi_serialize_string_string(ser, "integrity_algorithm", ndpi_ikev2_integ_name(p->integ_alg));
+	  ndpi_serialize_string_string(ser, "diffie_hellman_group", ndpi_ikev2_dh_name(p->dh_group));
+	  ndpi_serialize_string_uint32(ser, "extended_sequence_numbers", p->esn);
+	  if(!serialize_only_first_protosal) ndpi_serialize_end_of_record(ser);
 	}
 
-	buffer = ndpi_serializer_get_buffer(&sub_serializer, &buffer_len);
-	if(buffer && (buffer_len > 0))
-	  ndpi_serialize_string_raw(serializer, "proposals", buffer, buffer_len);
-
-	ndpi_term_serializer(&sub_serializer);
+	if(!serialize_only_first_protosal) {
+	  buffer = ndpi_serializer_get_buffer(ser, &buffer_len);
+	  if(buffer && (buffer_len > 0))
+	    ndpi_serialize_string_raw(serializer, "proposals", buffer, buffer_len);
+	  
+	  ndpi_term_serializer(ser);
+	}
       }
-
+      
       ndpi_serialize_end_of_block(serializer);
     }
     break;
