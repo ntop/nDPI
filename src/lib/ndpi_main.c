@@ -7722,72 +7722,81 @@ int ndpi_handle_ipv6_extension_headers(struct ndpi_detection_module_struct *ndpi
                                        const struct ndpi_ipv6hdr *ip6h,
                                        u_int16_t l3len, const u_int8_t **l4ptr,
                                        u_int16_t *l4len, u_int8_t *nxt_hdr) {
+  /*
+   * IPv6 extension header type numbers we recognise before reaching L4:
+   *   0  = Hop-by-Hop Options
+   *  43  = Routing Header
+   *  44  = Fragment Header  (fixed 8-byte size)
+   *  59  = No Next Header   (signals end of packet data)
+   *  60  = Destination Options
+   * 135  = Mobility Header
+   */
 #ifndef HAVE_USDT
   __ndpi_unused_param(ip6h);
 #endif
 
-  while(l3len > 1 && (*nxt_hdr == 0 || *nxt_hdr == 43 || *nxt_hdr == 44 || *nxt_hdr == 60 || *nxt_hdr == 135 || *nxt_hdr == 59)) {
-    u_int16_t ehdr_len, frag_offset;
+  for(;;) {
+    u_int8_t htype = *nxt_hdr;
 
-    // no next header
-    if(*nxt_hdr == 59) {
+    if(l3len <= 1)
+      break;
+
+    /* Stop when the current "next header" value is not a known extension header */
+    if(htype != 0 && htype != 43 && htype != 44 &&
+       htype != 59 && htype != 60 && htype != 135)
+      break;
+
+    /* No payload follows this point */
+    if(htype == 59)
       return(1);
-    }
 
-    // fragment extension header has fixed size of 8 bytes and the first byte is the next header type
-    if(*nxt_hdr == 44) {
-      if(*l4len < 8) {
-	return(1);
-      }
+    if(htype == 44) {
+      /* Fragment Header: always exactly 8 bytes */
+      if(*l4len < 8)
+        return(1);
 
-      if(l3len < 5) {
-        return 1;
-      }
+      if(l3len < 5)
+        return(1);
       l3len -= 5;
 
       if(ndpi_str) {
         uint16_t offlg = ntohs(*(u_int16_t *)((*l4ptr) + 2));
         if((offlg & 0xfff8) != 0 || (offlg & 0x0001) != 0) {
           NDPI_LOG_DBG(ndpi_str, "IP(v6) fragment\n");
-
-          NDPI_DTRACE1(fragment_ipv6,
-                       ip6h /* IPV6 header */);
+          NDPI_DTRACE1(fragment_ipv6, ip6h /* IPV6 header */);
         }
       }
 
       *nxt_hdr = (*l4ptr)[0];
-      frag_offset = ntohs(*(u_int16_t *)((*l4ptr) + 2)) >> 3;
-      // Handle ipv6 fragments as the ipv4 ones: keep the first fragment, drop the others
-      if(frag_offset != 0)
-	return(1);
-      *l4len -= 8;
+      /* Only the first fragment carries a reassemblable L4; discard others */
+      if((ntohs(*(u_int16_t *)((*l4ptr) + 2)) >> 3) != 0)
+        return(1);
+
+      *l4len   -= 8;
       (*l4ptr) += 8;
-      continue;
+
+    } else {
+      /*
+       * Variable-length extension header layout:
+       *   byte 0: next-header type
+       *   byte 1: header length in 8-octet units, excluding the first 8 octets
+       */
+      if(*l4len < 2)
+        return(1);
+
+      u_int16_t ext_bytes = ((u_int16_t)(*l4ptr)[1] * 8) + 8;
+
+      if(ext_bytes > l3len)
+        return(1);
+      l3len -= ext_bytes;
+
+      if(*l4len < ext_bytes)
+        return(1);
+
+      *nxt_hdr  = (*l4ptr)[0];
+      *l4len   -= ext_bytes;
+      (*l4ptr) += ext_bytes;
     }
-
-    // the other extension headers have one byte for the next header type
-    // and one byte for the extension header length in 8 byte steps minus the first 8 bytes
-    if(*l4len < 2) {
-      return(1);
-    }
-
-    ehdr_len = (*l4ptr)[1];
-    ehdr_len *= 8;
-    ehdr_len += 8;
-
-    if(ehdr_len > l3len) {
-      return 1;
-    }
-    l3len -= ehdr_len;
-
-    if(*l4len < ehdr_len) {
-      return(1);
-    }
-
-    *nxt_hdr = (*l4ptr)[0];
-
-    *l4len -= ehdr_len;
-    (*l4ptr) += ehdr_len;
   }
 
   return(0);
@@ -7842,75 +7851,84 @@ u_int8_t iph_is_valid_and_not_fragmented(struct ndpi_detection_module_struct *nd
 static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_struct *ndpi_str, const u_int8_t *l3,
                                                u_int16_t l3_len, const u_int8_t **l4_return, u_int16_t *l4_len_return,
                                                u_int8_t *l4_protocol_return, u_int32_t flags) {
-  const struct ndpi_iphdr *iph = NULL;
-  const struct ndpi_ipv6hdr *iph_v6 = NULL;
-  u_int16_t l4len = 0;
-  const u_int8_t *l4ptr = NULL;
-  u_int8_t l4protocol = 0;
+  const u_int8_t *payload_ptr  = NULL;
+  u_int16_t       payload_len  = 0;
+  u_int8_t        ip_proto     = 0;
+  u_int8_t        ip_ver;
 
+  /* Need at least a minimal IPv4 header to inspect the version field */
   if(l3 == NULL || l3_len < sizeof(struct ndpi_iphdr))
     return(1);
 
-  iph = (const struct ndpi_iphdr *) l3;
+  ip_ver = ((const struct ndpi_iphdr *)l3)->version;
 
-  if((iph->version == 4 /* IPVERSION */) && (iph->ihl >= 5)) {
+  if(ip_ver == 4 /* IPv4 */) {
+    const struct ndpi_iphdr *v4hdr = (const struct ndpi_iphdr *)l3;
+
+    /* IHL must be at least 5 (= 20 bytes) */
+    if(v4hdr->ihl < 5)
+      return(1);
+
     NDPI_LOG_DBG2(ndpi_str, "IPv4 header\n");
-  }
-  else if(iph->version == 6 && l3_len >= sizeof(struct ndpi_ipv6hdr)) {
-    NDPI_LOG_DBG2(ndpi_str, "ipv6 header\n");
-    iph_v6 = (const struct ndpi_ipv6hdr *) l3;
-    iph = NULL;
-  } else {
-    return(1);
-  }
 
-  if((flags & NDPI_DETECTION_ONLY_IPV6) && iph != NULL) {
-    NDPI_LOG_DBG2(ndpi_str, "ipv4 header found but excluded by flag\n");
-    return(1);
-  } else if((flags & NDPI_DETECTION_ONLY_IPV4) && iph_v6 != NULL) {
-    NDPI_LOG_DBG2(ndpi_str, "ipv6 header found but excluded by flag\n");
-    return(1);
-  }
-
-  /* 0: fragmented; 1: not fragmented */
-  if(iph != NULL && iph_is_valid_and_not_fragmented(ndpi_str, iph, l3_len)) {
-    u_int16_t len = ndpi_min(ntohs(iph->tot_len), l3_len);
-    u_int16_t hlen = (iph->ihl * 4);
-
-    l4ptr = (((const u_int8_t *) iph) + iph->ihl * 4);
-
-    if(len == 0)
-      len = l3_len;
-
-    l4len = (len > hlen) ? (len - hlen) : 0;
-    l4protocol = iph->protocol;
-  }
-
-  else if(iph_v6 != NULL && (l3_len - sizeof(struct ndpi_ipv6hdr)) >= ntohs(iph_v6->ip6_hdr.ip6_un1_plen)) {
-    l4ptr = (((const u_int8_t *) iph_v6) + sizeof(struct ndpi_ipv6hdr));
-    l4len = ntohs(iph_v6->ip6_hdr.ip6_un1_plen);
-    l4protocol = iph_v6->ip6_hdr.ip6_un1_nxt;
-
-    // we need to handle IPv6 extension headers if present
-    if(ndpi_handle_ipv6_extension_headers(ndpi_str, iph_v6, l3_len - sizeof(struct ndpi_ipv6hdr), &l4ptr, &l4len, &l4protocol) != 0) {
+    if(flags & NDPI_DETECTION_ONLY_IPV6) {
+      NDPI_LOG_DBG2(ndpi_str, "ipv4 header found but excluded by flag\n");
       return(1);
     }
 
+    /* Only process non-fragmented (or first-fragment) packets */
+    if(!iph_is_valid_and_not_fragmented(ndpi_str, v4hdr, l3_len))
+      return(1);
+
+    {
+      u_int16_t ip_total = ndpi_min(ntohs(v4hdr->tot_len), l3_len);
+      u_int16_t ip_hlen  = (u_int16_t)(v4hdr->ihl) * 4;
+
+      if(ip_total == 0)
+        ip_total = l3_len;
+
+      payload_ptr = (const u_int8_t *)v4hdr + ip_hlen;
+      payload_len = (ip_total > ip_hlen) ? (ip_total - ip_hlen) : 0;
+      ip_proto    = v4hdr->protocol;
+    }
+
+  } else if(ip_ver == 6 /* IPv6 */ && l3_len >= sizeof(struct ndpi_ipv6hdr)) {
+    const struct ndpi_ipv6hdr *v6hdr = (const struct ndpi_ipv6hdr *)l3;
+    u_int16_t v6_payload_len = ntohs(v6hdr->ip6_hdr.ip6_un1_plen);
+
+    NDPI_LOG_DBG2(ndpi_str, "ipv6 header\n");
+
+    if(flags & NDPI_DETECTION_ONLY_IPV4) {
+      NDPI_LOG_DBG2(ndpi_str, "ipv6 header found but excluded by flag\n");
+      return(1);
+    }
+
+    /* The captured data must cover the advertised IPv6 payload length */
+    if((l3_len - sizeof(struct ndpi_ipv6hdr)) < v6_payload_len)
+      return(1);
+
+    payload_ptr = (const u_int8_t *)v6hdr + sizeof(struct ndpi_ipv6hdr);
+    payload_len = v6_payload_len;
+    ip_proto    = v6hdr->ip6_hdr.ip6_un1_nxt;
+
+    /* Walk past any extension headers to reach the actual L4 data */
+    if(ndpi_handle_ipv6_extension_headers(ndpi_str, v6hdr,
+                                          l3_len - sizeof(struct ndpi_ipv6hdr),
+                                          &payload_ptr, &payload_len, &ip_proto) != 0)
+      return(1);
+
   } else {
     return(1);
   }
 
-  if(l4_return != NULL) {
-    *l4_return = l4ptr;
-  }
+  if(l4_return != NULL)
+    *l4_return = payload_ptr;
 
-  if(l4_len_return != NULL) {
-    *l4_len_return = l4len;
-  }
+  if(l4_len_return != NULL)
+    *l4_len_return = payload_len;
 
-  if(l4_protocol_return != NULL) {
-    *l4_protocol_return = l4protocol;
-  }
+  if(l4_protocol_return != NULL)
+    *l4_protocol_return = ip_proto;
 
   return(0);
 }
@@ -10750,116 +10768,6 @@ ndpi_protocol ndpi_detection_process_packet(struct ndpi_detection_module_struct 
 
 /* ********************************************************************************* */
 
-u_int32_t ndpi_bytestream_to_number(const u_int8_t *str, u_int16_t max_chars_to_read, u_int16_t *bytes_read) {
-  u_int32_t val;
-  val = 0;
-
-  // cancel if eof, ' ' or line end chars are reached
-  while(max_chars_to_read > 0 && *str >= '0' && *str <= '9') {
-    val *= 10;
-    val += *str - '0';
-    str++;
-    max_chars_to_read = max_chars_to_read - 1;
-    *bytes_read = *bytes_read + 1;
-  }
-
-  return(val);
-}
-
-/* ********************************************************************************* */
-
-u_int64_t ndpi_bytestream_to_number64(const u_int8_t *str, u_int16_t max_chars_to_read, u_int16_t *bytes_read) {
-  u_int64_t val;
-  val = 0;
-  // cancel if eof, ' ' or line end chars are reached
-  while(max_chars_to_read > 0 && *str >= '0' && *str <= '9') {
-    val *= 10;
-    val += *str - '0';
-    str++;
-    max_chars_to_read = max_chars_to_read - 1;
-    *bytes_read = *bytes_read + 1;
-  }
-  return(val);
-}
-
-/* ********************************************************************************* */
-
-u_int64_t ndpi_bytestream_dec_or_hex_to_number64(const u_int8_t *str, u_int16_t max_chars_to_read,
-						 u_int16_t *bytes_read) {
-  u_int64_t val;
-  val = 0;
-  if(max_chars_to_read <= 2 || str[0] != '0' || str[1] != 'x') {
-    return(ndpi_bytestream_to_number64(str, max_chars_to_read, bytes_read));
-  } else {
-    /*use base 16 system */
-    str += 2;
-    max_chars_to_read -= 2;
-    *bytes_read = *bytes_read + 2;
-    while(max_chars_to_read > 0) {
-      if(*str >= '0' && *str <= '9') {
-	val *= 16;
-	val += *str - '0';
-      } else if(*str >= 'a' && *str <= 'f') {
-	val *= 16;
-	val += *str + 10 - 'a';
-      } else if(*str >= 'A' && *str <= 'F') {
-	val *= 16;
-	val += *str + 10 - 'A';
-      } else {
-	break;
-      }
-      str++;
-      max_chars_to_read = max_chars_to_read - 1;
-      *bytes_read = *bytes_read + 1;
-    }
-  }
-  return(val);
-}
-
-/* ********************************************************************************* */
-
-u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t *str, u_int16_t max_chars_to_read, u_int16_t *bytes_read) {
-  u_int32_t val;
-  u_int16_t read = 0;
-  u_int16_t oldread;
-  u_int32_t c;
-
-  /* ip address must be X.X.X.X with each X between 0 and 255 */
-  oldread = read;
-  c = ndpi_bytestream_to_number(str, max_chars_to_read, &read);
-  if(c > 255 || oldread == read || max_chars_to_read == read || str[read] != '.')
-    return(0);
-
-  read++;
-  val = c << 24;
-  oldread = read;
-  c = ndpi_bytestream_to_number(&str[read], max_chars_to_read - read, &read);
-  if(c > 255 || oldread == read || max_chars_to_read == read || str[read] != '.')
-    return(0);
-
-  read++;
-  val = val + (c << 16);
-  oldread = read;
-  c = ndpi_bytestream_to_number(&str[read], max_chars_to_read - read, &read);
-  if(c > 255 || oldread == read || max_chars_to_read == read || str[read] != '.')
-    return(0);
-
-  read++;
-  val = val + (c << 8);
-  oldread = read;
-  c = ndpi_bytestream_to_number(&str[read], max_chars_to_read - read, &read);
-  if(c > 255 || oldread == read || max_chars_to_read == read)
-    return(0);
-
-  val = val + c;
-
-  *bytes_read = *bytes_read + read;
-
-  return(htonl(val));
-}
-
-/* ********************************************************************************* */
-
 struct header_line {
   char *name;
   struct ndpi_int_one_line_struct *line;
@@ -11477,14 +11385,6 @@ int ndpi_parse_ip_string(const char *ip_str, ndpi_ip_addr_t *parsed_ip) {
   }
 
   return(rv);
-}
-
-/* ****************************************************** */
-
-u_int16_t ntohs_ndpi_bytestream_to_number(const u_int8_t *str,
-					  u_int16_t max_chars_to_read, u_int16_t *bytes_read) {
-  u_int16_t val = ndpi_bytestream_to_number(str, max_chars_to_read, bytes_read);
-  return(ntohs(val));
 }
 
 /* ****************************************************** */

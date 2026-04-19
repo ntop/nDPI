@@ -46,20 +46,6 @@ extern "C" {
   void ndpi_twalk(const void *, void (*)(const void *, ndpi_VISIT, int, void*), void *user_data);
   void ndpi_tdestroy(void *vrootp, void (*freefct)(void *));
 
-  u_int16_t ntohs_ndpi_bytestream_to_number(const u_int8_t * str,
-					    u_int16_t max_chars_to_read,
-					    u_int16_t * bytes_read);
-
-  u_int32_t ndpi_bytestream_to_number(const u_int8_t * str, u_int16_t max_chars_to_read,
-				      u_int16_t * bytes_read);
-  u_int64_t ndpi_bytestream_to_number64(const u_int8_t * str, u_int16_t max_chars_to_read,
-					u_int16_t * bytes_read);
-  u_int64_t ndpi_bytestream_dec_or_hex_to_number64(const u_int8_t * str,
-						   u_int16_t max_chars_to_read,
-						   u_int16_t * bytes_read);
-  u_int32_t ndpi_bytestream_to_ipv4(const u_int8_t * str, u_int16_t max_chars_to_read,
-				    u_int16_t * bytes_read);
-
   extern void ndpi_set_proto_subprotocols(struct ndpi_detection_module_struct *ndpi_mod,
                                      int protoId, ...);
 
