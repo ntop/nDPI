@@ -1,6 +1,6 @@
 bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_nalloc fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp fuzz_match_custom_category
 #Alghoritms
-bin_PROGRAMS += fuzz_alg_ranking fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr fuzz_alg_quick_encryption
+bin_PROGRAMS += fuzz_alg_ranking fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr fuzz_alg_quick_encryption
 #Data structures
 bin_PROGRAMS += fuzz_ds_patricia fuzz_ds_ahocorasick fuzz_ds_libcache fuzz_ds_tree fuzz_ds_ptree fuzz_ds_hash fuzz_ds_cmsketch fuzz_ds_bitmap64_fuse fuzz_ds_domain_classify fuzz_ds_kdtree fuzz_ds_btree fuzz_ds_address_cache fuzz_ds_bitmap fuzz_ds_filter
 #Third party
@@ -91,9 +91,6 @@ fuzz_alg_jitter_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_crc32_md5_SOURCES = fuzz_alg_crc32_md5.c
 fuzz_alg_crc32_md5_LINK = $(FUZZ_LINK_COMMAND)
-
-fuzz_alg_bytestream_SOURCES = fuzz_alg_bytestream.c
-fuzz_alg_bytestream_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_shoco_SOURCES = fuzz_alg_shoco.cpp
 fuzz_alg_shoco_LINK = $(FUZZ_LINK_COMMAND)
