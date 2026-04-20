@@ -942,7 +942,7 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
 
 /* *********************************************** */
 
-static void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t s_port = 0, d_port = 0;
   int payload_offset = 0;

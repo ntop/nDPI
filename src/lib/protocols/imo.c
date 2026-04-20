@@ -60,7 +60,7 @@ static void ndpi_search_imo(struct ndpi_detection_module_struct *ndpi_struct, st
     NDPI_LOG_INFO(ndpi_struct, "found IMO\n");
     ndpi_int_imo_add_connection(ndpi_struct, flow);
   } else {
-    if(flow->num_processed_pkts > 5)
+    if(flow->num_processed_pkts > 10)
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     else
       flow->l4.udp.imo_last_one_byte_pkt = 0;

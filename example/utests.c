@@ -2296,6 +2296,148 @@ static void cryptoUnitTest(void) {
 }
 
 
+static void checkHexDecode(const u_char *encoded, size_t encoded_len,
+			   const u_char *expected, size_t expected_len) {
+  size_t out_len = 0;
+  u_char *decoded;
+
+  decoded = ndpi_hex_decode(encoded, encoded_len, &out_len);
+  assert(decoded != NULL);
+  assert(out_len == expected_len);
+  assert(memcmp(decoded, expected, expected_len) == 0);
+  assert(decoded[out_len] == '\0');
+
+  ndpi_free(decoded);
+}
+
+static void checkTlsBlocksDecode(const u_char *encoded, size_t encoded_len,
+				 const struct ndpi_tls_block *expected_blocks,
+				 u_int8_t expected_num_blocks) {
+  u_int8_t num_blocks = 0;
+  u_int8_t i;
+  struct ndpi_tls_block *decoded;
+
+  decoded = ndpi_decode_tls_blocks(encoded, encoded_len, &num_blocks);
+  assert(decoded != NULL);
+  assert(num_blocks == expected_num_blocks);
+
+  for(i = 0; i < num_blocks; i++) {
+    assert(decoded[i].block_type == expected_blocks[i].block_type);
+    assert(decoded[i].same_pkt == expected_blocks[i].same_pkt);
+    assert(decoded[i].len == expected_blocks[i].len);
+  }
+
+  ndpi_free(decoded);
+}
+
+static void rewriteHexCase(u_char *encoded, size_t encoded_len) {
+  size_t i;
+
+  for(i = 0; i < encoded_len; i++) {
+    if(encoded[i] >= 'a' && encoded[i] <= 'f') {
+      if((i & 0x1) == 0)
+	encoded[i] -= 'a' - 'A';
+    } else if(encoded[i] >= 'A' && encoded[i] <= 'F') {
+      if((i & 0x1) == 1)
+	encoded[i] += 'a' - 'A';
+    }
+  }
+}
+
+static void hexDecodeUnitTest(void) {
+  static const u_char lower_hex[] = { 'a', 'f' };
+  static const u_char upper_hex[] = { 'A', 'F' };
+  static const u_char mixed_hex[] = { '0', '1', 'a', 'B', 'c', 'D' };
+  static const u_char zero_hex[] = { '0', '0', 'f', 'F' };
+  static const u_char invalid_hex[] = { '0', 'g' };
+  static const u_char odd_hex[] = { '0' };
+  static const u_char lower_expected[] = { 0xAF };
+  static const u_char upper_expected[] = { 0xAF };
+  static const u_char mixed_expected[] = { 0x01, 0xAB, 0xCD };
+  static const u_char zero_expected[] = { 0x00, 0xFF };
+  size_t out_len = 123;
+  u_char *decoded;
+
+  checkHexDecode(lower_hex, sizeof(lower_hex), lower_expected, sizeof(lower_expected));
+  checkHexDecode(upper_hex, sizeof(upper_hex), upper_expected, sizeof(upper_expected));
+  checkHexDecode(mixed_hex, sizeof(mixed_hex), mixed_expected, sizeof(mixed_expected));
+  checkHexDecode(zero_hex, sizeof(zero_hex), zero_expected, sizeof(zero_expected));
+
+  decoded = ndpi_hex_decode(invalid_hex, sizeof(invalid_hex), &out_len);
+  assert(decoded == NULL);
+  assert(out_len == 0);
+
+  out_len = 123;
+  decoded = ndpi_hex_decode(odd_hex, sizeof(odd_hex), &out_len);
+  assert(decoded == NULL);
+  assert(out_len == 0);
+
+  out_len = 123;
+  decoded = ndpi_hex_decode((const u_char *)"", 0, &out_len);
+  assert(decoded != NULL);
+  assert(out_len == 0);
+  assert(decoded[0] == '\0');
+  ndpi_free(decoded);
+}
+
+static void tlsBlocksUnitTest(void) {
+  struct ndpi_tls_block expected_blocks[] = {
+    { .block_type = tls_handshake_client_hello, .len = 0x0000, .same_pkt = 1 },
+    { .block_type = tls_application_data, .len = 0xFFFF, .same_pkt = 0 },
+    { .block_type = tls_application_data, .len = 0x00AF, .same_pkt = 1 }
+  };
+  static const u_char truncated_tls_blocks[] = { '0', '0', '0', '1' };
+  static const u_char invalid_tls_blocks[] = { '0', 'g', '0', '0', '0', '0' };
+  static const u_char odd_tls_blocks[] = { '0', '0', '0' };
+  u_int8_t expected_num_blocks = sizeof(expected_blocks) / sizeof(expected_blocks[0]);
+  u_int8_t num_blocks = 0;
+  size_t encoded_len;
+  size_t oversized_encoded_len = (size_t)256 * 6;
+  u_char *encoded;
+  u_char *encoded_no_nul;
+  u_char *oversized_encoded;
+
+  encoded = ndpi_encode_tls_blocks(expected_blocks, expected_num_blocks);
+  assert(encoded != NULL);
+
+  encoded_len = strlen((const char *)encoded);
+  encoded_no_nul = ndpi_malloc(encoded_len);
+  assert(encoded_no_nul != NULL);
+
+  memcpy(encoded_no_nul, encoded, encoded_len);
+
+  checkTlsBlocksDecode(encoded_no_nul, encoded_len, expected_blocks, expected_num_blocks);
+  rewriteHexCase(encoded_no_nul, encoded_len);
+  checkTlsBlocksDecode(encoded_no_nul, encoded_len, expected_blocks, expected_num_blocks);
+  ndpi_free(encoded_no_nul);
+  ndpi_free(encoded);
+
+  num_blocks = expected_num_blocks;
+  assert(ndpi_decode_tls_blocks(truncated_tls_blocks, sizeof(truncated_tls_blocks), &num_blocks) == NULL);
+  assert(num_blocks == 0);
+
+  num_blocks = expected_num_blocks;
+  assert(ndpi_decode_tls_blocks(invalid_tls_blocks, sizeof(invalid_tls_blocks), &num_blocks) == NULL);
+  assert(num_blocks == 0);
+
+  num_blocks = expected_num_blocks;
+  assert(ndpi_decode_tls_blocks(odd_tls_blocks, sizeof(odd_tls_blocks), &num_blocks) == NULL);
+  assert(num_blocks == 0);
+
+  oversized_encoded = ndpi_malloc(oversized_encoded_len);
+  assert(oversized_encoded != NULL);
+  memset(oversized_encoded, '0', oversized_encoded_len);
+
+  num_blocks = expected_num_blocks;
+  assert(ndpi_decode_tls_blocks(oversized_encoded, oversized_encoded_len, &num_blocks) == NULL);
+  assert(num_blocks == 0);
+  ndpi_free(oversized_encoded);
+
+  num_blocks = expected_num_blocks;
+  assert(ndpi_decode_tls_blocks((const u_char *)"", 0, &num_blocks) == NULL);
+  assert(num_blocks == 0);
+}
+
 void run_unit_tests() {
 
   checkRankingUnitTest(false);
@@ -2352,5 +2494,7 @@ void run_unit_tests() {
   bitmap64FuseUnitTest();
   riskUtilsUnitTest();
   cryptoUnitTest();
+  hexDecodeUnitTest();
+  tlsBlocksUnitTest();
 
 }

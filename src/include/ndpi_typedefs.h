@@ -1592,6 +1592,7 @@ struct ndpi_ipsec_proposal {
 };
 
 struct ndpi_ipsec_details {
+  u_int8_t version;             /* Version: major (upper 4 bits) and minor (lower 4 bits) */
   u_int8_t exchange_type;       /* IKEv2 exchange type (34=SA_INIT, 35=IKE_AUTH, ...) */
   u_int8_t num_proposals;       /* Number of proposals captured (up to NDPI_IKEV2_MAX_PROPOSALS) */
   struct ndpi_ipsec_proposal proposal[NDPI_IKEV2_MAX_PROPOSALS];

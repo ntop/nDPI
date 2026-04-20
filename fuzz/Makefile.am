@@ -1,4 +1,4 @@
-bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_nalloc fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp fuzz_match_custom_category
+bin_PROGRAMS = fuzz_process_packet fuzz_ndpi_reader fuzz_ndpi_reader_nalloc fuzz_ndpi_reader_alloc_fail fuzz_ndpi_reader_payload_analyzer fuzz_quic_get_crypto_data fuzz_config fuzz_community_id fuzz_serialization fuzz_tls_certificate fuzz_dga fuzz_is_stun_udp fuzz_is_stun_tcp fuzz_match_custom_category fuzz_tls_client_server_hello fuzz_dns_parse fuzz_http_parse fuzz_ndpi_decode_tls_blocks
 #Alghoritms
 bin_PROGRAMS += fuzz_alg_ranking fuzz_alg_bins fuzz_alg_hll fuzz_alg_hw_rsi_outliers_da fuzz_alg_jitter fuzz_alg_ses_des fuzz_alg_crc32_md5 fuzz_alg_bytestream fuzz_alg_shoco fuzz_alg_memmem fuzz_alg_strnstr fuzz_alg_quick_encryption
 #Data structures
@@ -185,6 +185,21 @@ fuzz_is_stun_tcp_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_match_custom_category_SOURCES = fuzz_match_custom_category.c fuzz_common_code.c
 fuzz_match_custom_category_LINK = $(FUZZ_LINK_COMMAND)
+
+fuzz_tls_client_server_hello_SOURCES = fuzz_tls_client_server_hello.c fuzz_common_code.c
+fuzz_tls_client_server_hello_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_tls_client_server_hello_LINK = $(FUZZ_LINK_COMMAND)
+
+fuzz_dns_parse_SOURCES = fuzz_dns_parse.c fuzz_common_code.c
+fuzz_dns_parse_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_dns_parse_LINK = $(FUZZ_LINK_COMMAND)
+
+fuzz_http_parse_SOURCES = fuzz_http_parse.c fuzz_common_code.c
+fuzz_http_parse_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
+fuzz_http_parse_LINK = $(FUZZ_LINK_COMMAND)
+
+fuzz_ndpi_decode_tls_blocks_SOURCES = fuzz_ndpi_decode_tls_blocks.c
+fuzz_ndpi_decode_tls_blocks_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_gcrypt_light_SOURCES = fuzz_gcrypt_light.cpp fuzz_common_code.c
 fuzz_gcrypt_light_LINK = $(FUZZ_LINK_COMMAND)
