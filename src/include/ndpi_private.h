@@ -778,6 +778,14 @@ int signal_search_into_cache(struct ndpi_detection_module_struct* ndpi_struct,
 void signal_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
                         struct ndpi_flow_struct *flow);
 
+/* DNS */
+void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct,
+                     struct ndpi_flow_struct *flow);
+
+/* HTTP */
+void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+                          struct ndpi_flow_struct *flow);
+
 /* QUIC */
 int quic_len(const uint8_t *buf, uint64_t *value);
 int quic_len_buffer_still_required(uint8_t value);

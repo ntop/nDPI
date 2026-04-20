@@ -47,7 +47,10 @@ static void ndpi_search_lagofast(struct ndpi_detection_module_struct *ndpi_struc
   }
 
   // LagoFast identifier
-  if (get_u_int32_t(packet->payload, 0) != htonl(0x006e5d03)) {
+  if (get_u_int32_t(packet->payload, 0) != htonl(0x006e5d03) &&
+      get_u_int32_t(packet->payload, 0) != htonl(0x006e5d04) &&
+      get_u_int32_t(packet->payload, 0) != htonl(0x00aedb07))
+  {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
