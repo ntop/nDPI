@@ -493,15 +493,6 @@ References: `iQIYI official site: <https://www.iqiyi.com/>`_
 
 
 
-.. _Proto_55:
-
-`NDPI_PROTOCOL_ZATTOO`
-======================
-Zattoo is a TV streaming service providing live and on-demand television content over the Internet.
-
-References: `Zattoo official site <https://zattoo.com/>`_
-
-
 .. _Proto_56:
 
 `NDPI_PROTOCOL_YANDEX_MARKET`
