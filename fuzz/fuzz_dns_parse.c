@@ -2,19 +2,22 @@
  * fuzz_dns_parse
  *
  * What it tests:
- *   DNS query / answer RR walking in src/lib/protocols/dns.c. Reaches
- *   process_queries() / process_answers() and the name-compression parser.
- *   Exercises attacker-controlled uint16 counts (num_queries, num_answers,
- *   authority_rrs, additional_rrs) and name-pointer loops.
+ *   DNS query / answer RR walking in src/lib/protocols/dns.c. Calls
+ *   ndpi_search_dns() directly with a synthesised packet_struct so the
+ *   dissector is reached without depending on ndpi_detection_process_packet()
+ *   and the full flow state machine. Exercises attacker-controlled uint16
+ *   counts (num_queries, num_answers, authority_rrs, additional_rrs) and the
+ *   name-compression pointer loops.
  *
  * Expected input format:
  *   Raw DNS payload (starts with the 12-byte ndpi_dns_packet_header prefix).
- *   The harness wraps the fuzz data in a synthetic IPv4 + UDP packet with
- *   src/dst port 53 and feeds it to ndpi_detection_process_packet() so the
- *   DNS dissector is selected by the port hint.
+ *   The last byte is consumed as a selector:
+ *     bit 0 -> TCP vs UDP framing
+ *     bit 1 -> MDNS port (5353) vs DNS port (53)
  */
 
 #include "ndpi_api.h"
+#include "ndpi_private.h"
 #include "fuzz_common_code.h"
 
 #include <arpa/inet.h>
@@ -22,65 +25,74 @@
 #include <stdio.h>
 #include <string.h>
 
-#define IPV4_HDR_LEN 20
-#define UDP_HDR_LEN  8
-#define MAX_PKT      (64 * 1024)
+static struct ndpi_detection_module_struct *ndpi_struct = NULL;
+static struct ndpi_flow_struct *ndpi_flow = NULL;
+static struct ndpi_iphdr iph;
+static struct ndpi_udphdr udph;
+static struct ndpi_tcphdr tcph;
 
-static struct ndpi_detection_module_struct *ndpi_info_mod = NULL;
 static char *path = NULL;
 
 int LLVMFuzzerInitialize(int *argc, char ***argv) {
   (void)argc;
-  path = dirname(strdup(*argv[0]));
+  path = dirname(strdup(*argv[0])); /* No errors; no free! */
   return 0;
 }
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-  static uint8_t pkt[MAX_PKT];
-  struct ndpi_flow_struct flow;
-  size_t payload_len, total_len;
-  uint16_t ip_len, udp_len;
+  struct ndpi_packet_struct *packet;
+  uint8_t selector;
+  int is_tcp, is_mdns;
+  uint16_t port;
 
-  if (ndpi_info_mod == NULL)
-    fuzz_init_detection_module(&ndpi_info_mod, NULL, path);
+  if (ndpi_struct == NULL) {
+    fuzz_init_detection_module(&ndpi_struct, NULL, path);
+    ndpi_flow = ndpi_calloc(1, sizeof(struct ndpi_flow_struct));
 
-  if (size > MAX_PKT - IPV4_HDR_LEN - UDP_HDR_LEN)
-    size = MAX_PKT - IPV4_HDR_LEN - UDP_HDR_LEN;
-  payload_len = size;
-  total_len = IPV4_HDR_LEN + UDP_HDR_LEN + payload_len;
-
-  memset(pkt, 0, IPV4_HDR_LEN + UDP_HDR_LEN);
-
-  /* IPv4 header: version=4, ihl=5, proto=17 (UDP) */
-  pkt[0] = 0x45;
-  ip_len = htons((uint16_t)total_len);
-  memcpy(&pkt[2], &ip_len, 2);
-  pkt[8] = 64;   /* ttl */
-  pkt[9] = 17;   /* UDP */
-  {
-    uint32_t saddr = htonl(0x0A000001);
-    uint32_t daddr = htonl(0x0A000002);
-    memcpy(&pkt[12], &saddr, 4);
-    memcpy(&pkt[16], &daddr, 4);
+    memset(&iph, 0, sizeof(iph));
+    iph.version = 4;
+    iph.ihl = 5;
+    iph.saddr = htonl(0x0A000001);
+    iph.daddr = htonl(0x0A000002);
   }
 
-  /* UDP header: src/dst port 53 */
-  {
-    uint16_t sport = htons(53), dport = htons(53);
-    memcpy(&pkt[IPV4_HDR_LEN + 0], &sport, 2);
-    memcpy(&pkt[IPV4_HDR_LEN + 2], &dport, 2);
+  if (size < 1)
+    return 0;
+
+  fuzz_set_alloc_callbacks_and_seed(size);
+
+  selector = data[size - 1];
+  is_tcp  = selector & 0x01;
+  is_mdns = (selector & 0x02) ? 1 : 0;
+  port    = is_mdns ? 5353 : 53;
+
+  packet = &ndpi_struct->packet;
+  packet->payload = data;
+  packet->payload_packet_len = (u_int16_t)size;
+  packet->iph = &iph;
+  packet->iphv6 = NULL;
+
+  if (is_tcp) {
+    memset(&tcph, 0, sizeof(tcph));
+    tcph.source = htons(port);
+    tcph.dest = htons(port);
+    packet->tcp = &tcph;
+    packet->udp = NULL;
+    iph.protocol = 6;
+  } else {
+    memset(&udph, 0, sizeof(udph));
+    udph.source = htons(port);
+    udph.dest = htons(port);
+    packet->udp = &udph;
+    packet->tcp = NULL;
+    iph.protocol = 17;
   }
-  udp_len = htons((uint16_t)(UDP_HDR_LEN + payload_len));
-  memcpy(&pkt[IPV4_HDR_LEN + 4], &udp_len, 2);
 
-  if (payload_len > 0)
-    memcpy(&pkt[IPV4_HDR_LEN + UDP_HDR_LEN], data, payload_len);
+  memset(ndpi_flow, 0, sizeof(struct ndpi_flow_struct));
+  ndpi_flow->l4_proto = is_tcp ? IPPROTO_TCP : IPPROTO_UDP;
 
-  memset(&flow, 0, SIZEOF_FLOW_STRUCT);
-  ndpi_detection_process_packet(ndpi_info_mod, &flow, pkt,
-                                (unsigned short)total_len, 0, NULL);
-  ndpi_detection_giveup(ndpi_info_mod, &flow);
-  ndpi_free_flow_data(&flow);
+  ndpi_search_dns(ndpi_struct, ndpi_flow);
+  ndpi_free_flow_data(ndpi_flow);
 
   return 0;
 }

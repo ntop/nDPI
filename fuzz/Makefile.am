@@ -191,9 +191,11 @@ fuzz_tls_client_server_hello_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_tls_client_server_hello_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_dns_parse_SOURCES = fuzz_dns_parse.c fuzz_common_code.c
+fuzz_dns_parse_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_dns_parse_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_http_parse_SOURCES = fuzz_http_parse.c fuzz_common_code.c
+fuzz_http_parse_CFLAGS = $(AM_CFLAGS) -DNDPI_LIB_COMPILATION
 fuzz_http_parse_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_ndpi_decode_tls_blocks_SOURCES = fuzz_ndpi_decode_tls_blocks.c
