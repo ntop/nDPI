@@ -82,3 +82,32 @@ A more complex example, with global context and a shared Oookla LRU cache (all t
         
         ndpi_global_deinit(g_ctx);
 
+
+
+Another example, with a custom memory allocator
+
+.. code:: c
+        
+        struct ndpi_detection_module_struct *ndpi_struct;
+        ndpi_cfg_error rc;
+        int ret;
+
+        /* If you want to set a custom allocator for all memory allocations performed by
+           the library, you must call `ndpi_set_memory_alloction_functions() ONCE,
+           BEFORE ANY nDPI functions */
+
+        ndpi_set_memory_alloction_functions(malloc_wrapper,
+                                            free_wrapper,
+                                            calloc_wrapper,
+                                            realloc_wrapper,
+                                            aligned_malloc_wrapper,
+                                            aligned_free_wrapper,
+                                            flow_malloc_wrapper,
+                                            flow_free_wrapper);
+
+        ndpi_struct = ndpi_init_detection_module(NULL);
+        if(!ndpi_struct) {
+        	ERROR;
+        }
+        
+        /* Continue as the previous examples */

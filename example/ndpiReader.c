@@ -428,24 +428,6 @@ static void flow_free_wrapper(void *freeable) {
   free(freeable); /* Don't change to ndpi_free !!!!! */
 }
 
-/*
- * Install nDPI memory hooks once, before any ndpi_malloc()/ndpi_free() or
- * ndpi_init_detection_module() path (parseOptions, dump_hosts, extcap_config,
- * help(), run_unit_tests, init_doh_bins, etc.). If this ran only inside
- * test_lib(), pointers allocated earlier used libc while later ndpi_free()
- * used the custom free: undefined behavior with non-trivial allocators.
- */
-static void ndpiReader_install_memory_hooks(void) {
-  ndpi_set_memory_alloction_functions(malloc_wrapper,
-                                      free_wrapper,
-                                      calloc_wrapper,
-                                      realloc_wrapper,
-                                      aligned_malloc_wrapper,
-                                      aligned_free_wrapper,
-                                      flow_malloc_wrapper,
-                                      flow_free_wrapper);
-}
-
 /* ***************************************************** */
 
 
@@ -5780,7 +5762,19 @@ int main(int argc, char **argv) {
     return(-1);
   }
 
-  ndpiReader_install_memory_hooks();
+  /* Set a custom allocator for the library.
+     **IF** you want to use `ndpi_malloc()` and similar functions to allocate memory ALSO
+     from your application code, you must be sure to call `ndpi_set_memory_alloction_functions()`
+     BEFORE ANY allocations (from the library and from the application, both)
+  */
+  ndpi_set_memory_alloction_functions(malloc_wrapper,
+                                      free_wrapper,
+                                      calloc_wrapper,
+                                      realloc_wrapper,
+                                      aligned_malloc_wrapper,
+                                      aligned_free_wrapper,
+                                      flow_malloc_wrapper,
+                                      flow_free_wrapper);
 
   gettimeofday(&startup_time, NULL);
   memset(ndpi_thread_info, 0, sizeof(ndpi_thread_info));
