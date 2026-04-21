@@ -80,7 +80,7 @@ static void ikev2_parse_transforms(const u_int8_t *payload, u_int16_t xform_star
 
     /* Scan attributes inside this transform (key length, etc.) */
     u_int16_t key_bits = 0;
-    u_int16_t attr_off = off + 8;
+    u_int32_t attr_off = off + 8;
     u_int16_t attr_end = off + xform_len;
 
     while (attr_off + 4 <= attr_end) {
