@@ -7608,8 +7608,8 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
 
 static inline int ndpi_proto_cb_tcp_payload(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
   return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	  (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
-	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
+	  (NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP_OR_UDP |
 	   NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0;
 }
 
@@ -7617,8 +7617,8 @@ static inline int ndpi_proto_cb_tcp_payload(const struct ndpi_detection_module_s
 
 static inline int ndpi_proto_cb_tcp_nopayload(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
   return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	  (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
-	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
+	  (NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP_OR_UDP |
 	   NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0
     && (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
 	NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD) == 0;
@@ -7628,8 +7628,8 @@ static inline int ndpi_proto_cb_tcp_nopayload(const struct ndpi_detection_module
 
 static inline int ndpi_proto_cb_udp(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
   return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	  (NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP |
-	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP |
+	  (NDPI_SELECTION_BITMASK_PROTOCOL_L4_UDP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP_OR_UDP |
 	   NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC)) != 0;
 }
 
@@ -7637,9 +7637,9 @@ static inline int ndpi_proto_cb_udp(const struct ndpi_detection_module_struct *n
 
 static inline int ndpi_proto_cb_other(const struct ndpi_detection_module_struct *ndpi_str, uint32_t idx) {
   return (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
-	  (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP |
-	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP |
-	   NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)) == 0
+	  (NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_L4_UDP |
+	   NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP_OR_UDP)) == 0
     ||
     (ndpi_str->callback_buffer[idx].ndpi_selection_bitmask &
      NDPI_SELECTION_BITMASK_PROTOCOL_COMPLETE_TRAFFIC) != 0;
@@ -10599,11 +10599,11 @@ static void ndpi_internal_detection_process_packet(struct ndpi_detection_module_
 
   if(packet->tcp != NULL)
     ndpi_selection_packet |=
-      (NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP);
+      (NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP | NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP_OR_UDP);
 
   if(packet->udp != NULL)
     ndpi_selection_packet |=
-      (NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP);
+      (NDPI_SELECTION_BITMASK_PROTOCOL_L4_UDP | NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP_OR_UDP);
 
   if(packet->payload_packet_len != 0)
     ndpi_selection_packet |= NDPI_SELECTION_BITMASK_PROTOCOL_HAS_PAYLOAD;
@@ -12441,11 +12441,11 @@ ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *n
     u_int16_t idx = ndpi_struct->proto_defaults[ndpi_proto_id].dissector_idx;
     NDPI_SELECTION_BITMASK_PROTOCOL_SIZE bm = ndpi_struct->callback_buffer[idx].ndpi_selection_bitmask;
 
-    if(bm & NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP)
+    if(bm & NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP)
       return(ndpi_l4_proto_tcp_only);
-    else if(bm & NDPI_SELECTION_BITMASK_PROTOCOL_INT_UDP)
+    else if(bm & NDPI_SELECTION_BITMASK_PROTOCOL_L4_UDP)
       return(ndpi_l4_proto_udp_only);
-    else if(bm & NDPI_SELECTION_BITMASK_PROTOCOL_INT_TCP_OR_UDP)
+    else if(bm & NDPI_SELECTION_BITMASK_PROTOCOL_L4_TCP_OR_UDP)
       return(ndpi_l4_proto_tcp_and_udp);
   }
 
