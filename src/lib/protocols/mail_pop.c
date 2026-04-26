@@ -105,7 +105,6 @@ static int pop_check_client_command(struct ndpi_detection_module_struct *ndpi_st
 static void ndpi_search_mail_pop_tcp(struct ndpi_detection_module_struct *ndpi_struct,
                                      struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int8_t a = 0;
   u_int8_t bit_count = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search mail_pop\n");
