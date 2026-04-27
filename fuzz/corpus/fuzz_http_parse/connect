@@ -1,0 +1,7 @@
+CONNECT coturn.twin.me:443 HTTP/1.0
+User-Agent: webrtc
+Host: coturn.twin.me
+Proxy-Authorization: Basic a0dVNXpHTElpV1NMQVRSUDo1Q1BEWmtHdFRKS09rRHdPYVdKRWMzSGhjV1E5dUlXRA==
+Content-Length: 0
+Proxy-Connection: Keep-Alive
+

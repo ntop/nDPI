@@ -1,0 +1,10 @@
+POST /onvif/device_service HTTP/1.1
+Accept: application/soap+xml, text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2
+Content-Type: application/soap+xml; charset=utf-8
+Cache-Control: no-cache
+Pragma: no-cache
+User-Agent: Java/17.0.8
+Host: 10.80.153.36
+Connection: keep-alive
+Content-Length: 180
+

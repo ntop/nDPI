@@ -351,9 +351,21 @@ files_corpus_fuzz_filecfg_category := $(wildcard $(srcdir)/corpus/fuzz_filecfg_c
 fuzz_filecfg_category_seed_corpus.zip: $(files_corpus_fuzz_filecfg_category)
 	@zip -q -j $@ $(files_corpus_fuzz_filecfg_category)
 
+files_corpus_fuzz_http_parse := $(wildcard $(srcdir)/corpus/fuzz_http_parse/*)
+fuzz_http_parse_seed_corpus.zip: $(files_corpus_fuzz_http_parse)
+	@zip -q -j $@ $(files_corpus_fuzz_http_parse)
+
+files_corpus_fuzz_dns_parse := $(wildcard $(srcdir)/corpus/fuzz_dns_parse/*)
+fuzz_dns_parse_seed_corpus.zip: $(files_corpus_fuzz_dns_parse)
+	@zip -q -j $@ $(files_corpus_fuzz_dns_parse)
+
+files_corpus_fuzz_tls_client_server_hello_parse := $(wildcard $(srcdir)/corpus/fuzz_tls_client_server_hello_parse/*)
+fuzz_tls_client_server_hello_parse_seed_corpus.zip: $(files_corpus_fuzz_tls_client_server_hello_parse)
+	@zip -q -j $@ $(files_corpus_fuzz_tls_client_server_hello_parse)
+
 # Phony target to build all corpora (incremental build via dependencies)
 .PHONY: corpus
-corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_nalloc_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip fuzz_ndpi_reader_pl7m_seed_corpus.zip fuzz_ndpi_reader_pl7m_64k_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_only_subclassification_seed_corpus.zip fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip fuzz_filecfg_malicious_ja4_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip fuzz_filecfg_category_seed_corpus.zip fuzz_filecfg_config_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip
+corpus: fuzz_ndpi_reader_seed_corpus.zip fuzz_ndpi_reader_nalloc_seed_corpus.zip fuzz_ndpi_reader_alloc_fail_seed_corpus.zip fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip fuzz_quic_get_crypto_data_seed_corpus.zip fuzz_libinjection_seed_corpus.zip fuzz_tls_certificate_seed_corpus.zip fuzz_filecfg_protocols_seed_corpus.zip fuzz_is_stun_udp_seed_corpus.zip fuzz_is_stun_tcp_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_seed_corpus.zip fuzz_ndpi_reader_pl7m_seed_corpus.zip fuzz_ndpi_reader_pl7m_64k_seed_corpus.zip fuzz_ndpi_reader_pl7m_simplest_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_internal_seed_corpus.zip fuzz_ndpi_reader_pl7m_only_subclassification_seed_corpus.zip fuzz_ndpi_reader_pl7m_randomize_ports_seed_corpus.zip fuzz_filecfg_malicious_ja4_seed_corpus.zip fuzz_filecfg_malicious_sha1_seed_corpus.zip fuzz_filecfg_categories_seed_corpus.zip fuzz_filecfg_category_seed_corpus.zip fuzz_filecfg_config_seed_corpus.zip fuzz_filecfg_risk_domains_seed_corpus.zip fuzz_http_parse_seed_corpus.zip fuzz_dns_parse_seed_corpus.zip tls_client_server_hello_seed_corpus.zip
 	@echo "All corpus files are up to date"
 	@if [ -d "$(srcdir)/corpus" ] && ls $(srcdir)/corpus/fuzz_*seed_corpus.zip >/dev/null 2>&1; then \
 		echo "Copying pre-built corpus files from source directory..."; \

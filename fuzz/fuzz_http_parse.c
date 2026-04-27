@@ -57,6 +57,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   fuzz_set_alloc_callbacks_and_seed(size);
 
   packet = &ndpi_struct->packet;
+
+  /* Reset lines info */
+  memset(packet, '\0', sizeof(*packet));
+
   packet->payload = data;
   packet->payload_packet_len = (u_int16_t)size;
   packet->iph = &iph;

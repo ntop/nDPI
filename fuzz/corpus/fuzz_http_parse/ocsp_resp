@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Content-Type: application/ocsp-response
+Date: Sat, 11 Jul 2015 08:56:12 GMT
+Expires: Wed, 15 Jul 2015 08:56:12 GMT
+Server: ocsp_responder
+Content-Length: 463
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Cache-Control: public, max-age=345600
+Age: 304740
+Alternate-Protocol: 80:quic,p=0
+

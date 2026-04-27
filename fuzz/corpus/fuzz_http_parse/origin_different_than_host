@@ -1,0 +1,14 @@
+GET /?topreferer=optawidgets.365scores.com HTTP/1.1
+Host: csb.performgroup.io
+Connection: Upgrade
+Pragma: no-cache
+Cache-Control: no-cache
+User-Agent: Mozilla/5.0 (Linux; Android 9; JKM-LX1 Build/HUAWEIJKM-LX1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/106.0.5249.118 Mobile Safari/537.36
+Upgrade: websocket
+Origin: http://optawidgets.365scores.com
+Sec-WebSocket-Version: 13
+Accept-Encoding: gzip, deflate
+Accept-Language: ar-OM,ar;q=0.9,en-US;q=0.8,en;q=0.7
+Sec-WebSocket-Key: sb9H3YzYsVPR/qPgmiLeEQ==
+Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+

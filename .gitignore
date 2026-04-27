@@ -154,6 +154,9 @@
 /fuzz/fuzz_ndpi_reader_payload_analyzer_seed_corpus.zip
 /fuzz/fuzz_readerutils_workflow_seed_corpus.zip
 /fuzz/fuzz_readerutils_parseprotolist_seed_corpus.zip
+/fuzz/fuzz_http_parse_seed_corpus.zip
+/fuzz/fuzz_dns_parse_seed_corpus.zip
+/fuzz/fuzz_tls_client_server_hello_seed_corpus.zip
 /fuzz/fuzz_*.dict
 /fuzz/testpcaps.zip
 /influxdb/Makefile
