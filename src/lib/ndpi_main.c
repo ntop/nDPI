@@ -7981,6 +7981,28 @@ void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
 
       if(flow->protos.ssh.key_exchange_method)
 	ndpi_free(flow->protos.ssh.key_exchange_method);
+
+      if(flow->protos.ssh.client_hostkey_algorithms)
+	ndpi_free(flow->protos.ssh.client_hostkey_algorithms);
+      if(flow->protos.ssh.client_cipher_c2s)
+	ndpi_free(flow->protos.ssh.client_cipher_c2s);
+      if(flow->protos.ssh.client_cipher_s2c)
+	ndpi_free(flow->protos.ssh.client_cipher_s2c);
+      if(flow->protos.ssh.client_mac_c2s)
+	ndpi_free(flow->protos.ssh.client_mac_c2s);
+      if(flow->protos.ssh.client_mac_s2c)
+	ndpi_free(flow->protos.ssh.client_mac_s2c);
+
+      if(flow->protos.ssh.negotiated_hostkey_alg)
+	ndpi_free(flow->protos.ssh.negotiated_hostkey_alg);
+      if(flow->protos.ssh.negotiated_cipher_c2s)
+	ndpi_free(flow->protos.ssh.negotiated_cipher_c2s);
+      if(flow->protos.ssh.negotiated_cipher_s2c)
+	ndpi_free(flow->protos.ssh.negotiated_cipher_s2c);
+      if(flow->protos.ssh.negotiated_mac_c2s)
+	ndpi_free(flow->protos.ssh.negotiated_mac_c2s);
+      if(flow->protos.ssh.negotiated_mac_s2c)
+	ndpi_free(flow->protos.ssh.negotiated_mac_s2c);
     }
 
     if(flow_is_proto(flow, NDPI_PROTOCOL_SIP)) {

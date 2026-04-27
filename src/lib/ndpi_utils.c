@@ -1494,8 +1494,9 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
       ndpi_serialize_string_string(serializer, "ja3s", flow->protos.tls_quic.ja3_server);
       ndpi_serialize_string_string(serializer, "ja4", flow->protos.tls_quic.ja4_client);
       ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->protos.tls_quic.server_unsafe_cipher);
-      ndpi_serialize_string_string(serializer, "cipher",
-                                   ndpi_cipher2str(flow->protos.tls_quic.server_cipher, unknown_cipher));
+      if(flow->protos.tls_quic.server_cipher != TLS_NULL_WITH_NULL_NULL)
+        ndpi_serialize_string_string(serializer, "cipher",
+                                     ndpi_cipher2str(flow->protos.tls_quic.server_cipher, unknown_cipher));
 
       if(flow->protos.tls_quic.issuerDN)
         ndpi_serialize_string_string(serializer, "issuerDN", flow->protos.tls_quic.issuerDN);
@@ -1986,6 +1987,25 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_serialize_string_string(serializer,  "hassh_server", flow->protos.ssh.hassh_server);
     }
 
+    if(flow->protos.ssh.key_exchange_method)
+      ndpi_serialize_string_string(serializer, "kex_alg",
+                                   flow->protos.ssh.key_exchange_method);
+    if(flow->protos.ssh.negotiated_hostkey_alg)
+      ndpi_serialize_string_string(serializer, "hostkey_alg",
+                                   flow->protos.ssh.negotiated_hostkey_alg);
+    if(flow->protos.ssh.negotiated_cipher_c2s)
+      ndpi_serialize_string_string(serializer, "cipher_c2s",
+                                   flow->protos.ssh.negotiated_cipher_c2s);
+    if(flow->protos.ssh.negotiated_cipher_s2c)
+      ndpi_serialize_string_string(serializer, "cipher_s2c",
+                                   flow->protos.ssh.negotiated_cipher_s2c);
+    if(flow->protos.ssh.negotiated_mac_c2s)
+      ndpi_serialize_string_string(serializer, "mac_c2s",
+                                   flow->protos.ssh.negotiated_mac_c2s);
+    if(flow->protos.ssh.negotiated_mac_s2c)
+      ndpi_serialize_string_string(serializer, "mac_s2c",
+                                   flow->protos.ssh.negotiated_mac_s2c);
+
     if(ndpi_struct->cfg.ssh_hassh_data_enabled) {
       ndpi_serialize_start_of_block(serializer, "key_exchange_algorithms");
 
@@ -1995,10 +2015,6 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       if(flow->protos.ssh.server_key_exchange_algorithms)
 	ndpi_ssh_serialize_csv(serializer, flow->protos.ssh.server_key_exchange_algorithms, "server");
 
-      if(flow->protos.ssh.key_exchange_method)
-	ndpi_serialize_string_string(serializer,
-				     "key_exchange_method",
-				     flow->protos.ssh.key_exchange_method);
       ndpi_serialize_end_of_block(serializer);
     }
 

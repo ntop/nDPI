@@ -1802,6 +1802,14 @@ struct ndpi_flow_struct {
       char *client_key_exchange_algorithms,
 	*server_key_exchange_algorithms,
 	*key_exchange_method;
+      /* Intermediate client KEXINIT lists needed for negotiation */
+      char *client_hostkey_algorithms;
+      char *client_cipher_c2s, *client_cipher_s2c;
+      char *client_mac_c2s,    *client_mac_s2c;
+      /* Negotiated algorithm strings (set once server KEXINIT is processed) */
+      char *negotiated_hostkey_alg;
+      char *negotiated_cipher_c2s, *negotiated_cipher_s2c;
+      char *negotiated_mac_c2s,    *negotiated_mac_s2c;
     } ssh;
 
     struct {
@@ -2003,8 +2011,8 @@ struct ndpi_flow_struct {
 _Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 328,
                "Size of the struct member protocols increased to more than 328 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1304,
-               "Size of the flow struct increased to more than 1304 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1392,
+               "Size of the flow struct increased to more than 1392 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif
