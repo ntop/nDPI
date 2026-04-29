@@ -438,6 +438,9 @@ distdir:
 		-o -path '$(srcdir)/corpus/fuzz_is_stun_udp/*' \
 		-o -path '$(srcdir)/corpus/fuzz_is_stun_tcp/*' \
 		-o -path '$(srcdir)/corpus/fuzz_libinjection/*' \
+		-o -path '$(srcdir)/corpus/fuzz_dns_parse/*' \
+		-o -path '$(srcdir)/corpus/fuzz_http_parse/*' \
+		-o -path '$(srcdir)/corpus/fuzz_tls_client_server_hello/*' \
 		-o -path '$(srcdir)/corpus/fuzz_tls_certificate/*' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 	find . -type l -name '*.c' | xargs -I'{}' cp -r '{}' '$(distdir)/{}'
 
