@@ -255,6 +255,8 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     goto invalid_payload;
 
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
+  if(len > len_max)
+    goto invalid_payload;
   offset += 4;
 
   /* -1 for ';' */
@@ -319,11 +321,10 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
   
   /* ssh.server_host_key_algorithms [None] */
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
-
   if(len > len_max)
     goto invalid_payload;
-  offset += 4;
 
+  offset += 4;
   if(ndpi_struct->cfg.ssh_hassh_data_enabled && len > 0 &&
      offset + len <= packet->payload_packet_len) {
     char *tmp = (char*)ndpi_malloc(len + 1);
@@ -351,6 +352,8 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
 
   /* ssh.encryption_algorithms_client_to_server [C] */
   len = ntohl(*(u_int32_t*)&packet->payload[offset]);
+  if(len > len_max)
+    goto invalid_payload;
 
   offset += 4;
   if(client_hash) {
@@ -383,8 +386,6 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     }
   }
 
-  if(len > len_max)
-    goto invalid_payload;
   offset += len;
 
   if(offset >= max_payload_len)
