@@ -106,11 +106,7 @@ static char* fargv[MAX_FARGS];
 static int fargc = 0;
 static int dump_fpc_stats = 0;
 
-#ifdef NDPI_EXTENDED_SANITY_CHECKS
-int skip_unit_tests = 0;
-#else
 int skip_unit_tests = 1;
-#endif
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../nDPI-custom/ndpiReader_defs.c"
@@ -1016,7 +1012,7 @@ static void help(u_int long_help) {
          "  --dump-fpc-stats           | Print FPC statistics\n"
 	 "  --protos-dump <mode>       | Dump host-based protocolId (mode=1) and categoryId (mode=2)\n"
 	 "  --plugins-dir <dir>        | Directory from which plugins are dynamically loaded\n"
-         "  --run-tests                | Run unit tests at startup\n"
+         "  --run-tests                | Run only unit tests\n"
          ,
          human_readeable_string_len,
          min_pattern_len, max_pattern_len, max_num_packets_per_flow, max_packet_payload_dissection,
@@ -1883,6 +1879,9 @@ static void parseOptions(int argc, char **argv) {
 #endif
 
   parse_parameters(argc, argv);
+
+  if(!skip_unit_tests)
+    return;
 
   if (serialization_fp == NULL && serialization_format != ndpi_serialization_format_unknown)
   {
@@ -5795,6 +5794,7 @@ int main(int argc, char **argv) {
     if(!quiet_mode)
       printf("Run internal unit tests\n");
     run_unit_tests();
+    exit(0);
   }
 
   if(dump_hosts_mode > 0) {
