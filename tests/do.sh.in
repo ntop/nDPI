@@ -278,7 +278,7 @@ process_single_config() {
 
     # Determine PCAPS to test (name with absolute path!)
     if [ $TEST_ONLY_RECENTLY_UPDATED_PCAPS -eq 1 ]; then
-        PCAPS=$(cd ${ABS_SRCDIR}/tests/"$d"/result || exit 1; find "$PWD" -name "*.out" | xargs -d '\n' ls -t | head -10 | sed 's/\.out$//' | sed 's/\/result\//\/pcap\//')
+        PCAPS=$(cd ${ABS_SRCDIR}/tests/"$d"/result || exit 1; git ls-tree -r --name-only HEAD | while read filename; do   echo "$(git log -1 --format="%ai" -- "$filename") $(pwd)/$filename"; done | sort -r | head -n 5 | cut -d' ' -f4- | sed 's/\.out$//' | sed 's/\/result\//\/pcap\//')
     else
         if [ -n "$PCAPS_ARG" ]; then
             PCAPS="$PCAPS_ARG"
