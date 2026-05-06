@@ -182,6 +182,7 @@
     <ClCompile Include="..\src\lib\protocols\i3d.c" />
     <ClCompile Include="..\src\lib\protocols\iec60870-5-104.c" />
     <ClCompile Include="..\src\lib\protocols\imo.c" />
+    <ClCompile Include="..\src\lib\protocols\iris.c" />
     <ClCompile Include="..\src\lib\protocols\ipsec.c" />
     <ClCompile Include="..\src\lib\protocols\kismet.c" />
     <ClCompile Include="..\src\lib\protocols\line.c" />
