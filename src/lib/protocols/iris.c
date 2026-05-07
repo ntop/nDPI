@@ -126,7 +126,7 @@ static void ndpi_check_iris(struct ndpi_detection_module_struct *ndpi_struct,
     uint32_t message_length = 0U;
     uint16_t message_type_or_error_code = 0U;
 
-    memcpy(&message_length, packet->payload, sizeof(uint32_t));
+    message_length = le32toh(*(uint32_t *)packet->payload);
     memcpy(&message_type_or_error_code, packet->payload + sizeof(uint32_t) * 3, sizeof(uint16_t));
 
     switch (message_type_or_error_code)
