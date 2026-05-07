@@ -1,6 +1,8 @@
-DPI Packets (TCP):	4	(4.00 pkts/flow)
-Confidence DPI              : 1 (flows)
-Num dissector calls: 161 (161.00 diss/flow)
+Guessed flow protos:	1
+
+DPI Packets (TCP):	13	(13.00 pkts/flow)
+Confidence DPI (partial)    : 1 (flows)
+Num dissector calls: 191 (191.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/0/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -27,10 +29,10 @@ Hash ja4 custom protos:    1/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
 
-Iris	13	938	1
+SSH	13	938	1
 
 Acceptable                      13 938           1            
 
-Database                        13 938           1            
+RemoteAccess                    13 938           1            
 
-	1	TCP 192.168.2.198:50306 <-> 192.168.2.1:22 [proto: 475/Iris][Stack: Iris][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Database/11][Breed: Acceptable][7 pkts/476 bytes <-> 6 pkts/462 bytes][Goodput ratio: 0/13][0.55 sec][bytes ratio: 0.015 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 109/182 321/324 136/135][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68/77 78/105 4/14][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 1972][TCP Fingerprint: 2_64_65535_d29295416479/macOS][PLAIN TEXT (OpenSSH)][Plen Bins: 66,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.2.198:50306 <-> 192.168.2.1:22 [proto: 92/SSH][Stack: SSH][IP: 0/Unknown][Encrypted][Confidence: DPI (partial)][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 13][cat: RemoteAccess/12][Breed: Acceptable][7 pkts/476 bytes <-> 6 pkts/462 bytes][Goodput ratio: 0/13][0.55 sec][bytes ratio: 0.015 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 109/182 321/324 136/135][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 68/77 78/105 4/14][TCP Fingerprint: 2_64_65535_d29295416479/macOS][Server: SSH-2.0-OpenSSH_7.4p1 Debian-10+deb9u7][PLAIN TEXT (OpenSSH)][Plen Bins: 66,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -1,0 +1,37 @@
+DPI Packets (TCP):	8	(4.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/2/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     2/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Iris	317	63776	2
+
+Acceptable                     317 63776         2            
+
+Database                       317 63776         2            
+
+	1	TCP 127.0.0.1:51950 <-> 127.0.0.1:1972 [proto: 475/Iris][Stack: Iris][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Database/11][Breed: Acceptable][121 pkts/16530 bytes <-> 99 pkts/36469 bytes][Goodput ratio: 52/82][5.15 sec][bytes ratio: -0.376 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 46/48 300/326 88/89][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 137/368 5097/21511 454/2175][TCP Fingerprint: 2_64_65495_db1b9381215d/Unknown][PLAIN TEXT (brauna)][Plen Bins: 70,16,3,2,3,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+	2	TCP 127.0.0.1:58760 <-> 127.0.0.1:1972 [proto: 475/Iris][Stack: Iris][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Database/11][Breed: Acceptable][46 pkts/5071 bytes <-> 51 pkts/5706 bytes][Goodput ratio: 40/41][1.71 sec][bytes ratio: -0.059 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 20/41 307/929 66/152][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 110/112 264/295 46/63][TCP Fingerprint: 2_64_65495_4282f7101799/Unknown][PLAIN TEXT (nicolas)][Plen Bins: 59,17,6,7,3,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

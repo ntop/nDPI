@@ -218,21 +218,18 @@ static void ndpi_check_iris(struct ndpi_detection_module_struct *ndpi_struct,
         case READ_UNCOMMITTED:
         case READ_COMMITTED:
         case RESET_CONNECTION:
-        case OPEN_STREAM:                    
-            NDPI_LOG_INFO(ndpi_struct, "Found iris\n");
-            ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IRIS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-            return;
+        case OPEN_STREAM:
+            if (message_length == (packet->payload_packet_len - 14U)) {
+                NDPI_LOG_INFO(ndpi_struct, "Found iris\n");
+                ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IRIS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+		return;
+            }
 
         default:
             break;
     }
 
-    if (message_length == (packet->payload_packet_len - 14U)) {
-        NDPI_LOG_INFO(ndpi_struct, "Found iris\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IRIS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-    } else {
-        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);  
-    }
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 /* this detection also works asymmetrically */
