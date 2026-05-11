@@ -118,7 +118,7 @@ enum message_type { HANDSHAKE =  21320,
                     OPEN_STREAM = 21327 };
 
 
-static int check_msg_type_or_error_code(struct ndpi_packet_struct *packet) {
+static int iris_check_msg_type_or_error_code(struct ndpi_packet_struct *packet) {
     uint16_t message_type_or_error_code;
 
     message_type_or_error_code = le16toh(*(uint16_t *)(packet->payload + sizeof(uint32_t) * 3));
@@ -230,7 +230,7 @@ static void ndpi_search_iris(struct ndpi_detection_module_struct *ndpi_struct, s
       message_length = le32toh(*(uint32_t *)packet->payload);
       if(message_length == (packet->payload_packet_len - 14U)) {
         /* For requests, check also msg type (not present in the responses) */
-        if((flow->s_port == ntohs(1972) && check_msg_type_or_error_code(packet)) ||
+        if((flow->s_port == ntohs(1972) && iris_check_msg_type_or_error_code(packet)) ||
            (flow->c_port == ntohs(1972))) {
           NDPI_LOG_INFO(ndpi_struct, "Found iris\n");
           ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IRIS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
