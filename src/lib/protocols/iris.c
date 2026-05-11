@@ -118,19 +118,12 @@ enum message_type { HANDSHAKE =  21320,
                     OPEN_STREAM = 21327 };
 
 
-static void ndpi_check_iris(struct ndpi_detection_module_struct *ndpi_struct,
-			       struct ndpi_flow_struct *flow) {
+static int check_msg_type_or_error_code(struct ndpi_packet_struct *packet) {
+    uint16_t message_type_or_error_code;
 
-    struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-
-    uint16_t message_length = 0U;
-    uint16_t message_type_or_error_code = 0U;
-
-    message_length = le16toh(*(uint16_t *)packet->payload);
     message_type_or_error_code = le16toh(*(uint16_t *)(packet->payload + sizeof(uint32_t) * 3));
 
-    switch (message_type_or_error_code)
-    {
+    switch (message_type_or_error_code) {
         case HANDSHAKE:
         case CONNECT:
         case DISCONNECT:
@@ -219,37 +212,39 @@ static void ndpi_check_iris(struct ndpi_detection_module_struct *ndpi_struct,
         case READ_COMMITTED:
         case RESET_CONNECTION:
         case OPEN_STREAM:
-            if (message_length == (packet->payload_packet_len - 14U)) {
-                NDPI_LOG_INFO(ndpi_struct, "Found iris\n");
-                ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IRIS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-		return;
-            }
-
-        default:
-            break;
+	  return 1;
     }
-
-    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+    return 0;
 }
 
 /* this detection also works asymmetrically */
 static void ndpi_search_iris(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
     struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+    uint32_t message_length;
 
     NDPI_LOG_DBG(ndpi_struct, "Search Iris\n");
 
-    if(packet->payload_packet_len > 14U){
-        ndpi_check_iris(ndpi_struct, flow);
-    } else {
-        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+    if((flow->s_port == ntohs(1972) || flow->c_port == ntohs(1972)) &&
+       packet->payload_packet_len > 14U) {
+      message_length = le32toh(*(uint32_t *)packet->payload);
+      if(message_length == (packet->payload_packet_len - 14U)) {
+        /* For requests, check also msg type (not present in the responses) */
+        if((flow->s_port == ntohs(1972) && check_msg_type_or_error_code(packet)) ||
+           (flow->c_port == ntohs(1972))) {
+          NDPI_LOG_INFO(ndpi_struct, "Found iris\n");
+          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IRIS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	  return;
+	}
+      }
     }
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
 void init_iris_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {
   ndpi_register_dissector("iris", ndpi_struct,
-                     ndpi_search_iris,
-                     NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                     1, NDPI_PROTOCOL_IRIS);
+                          ndpi_search_iris,
+                          NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                          1, NDPI_PROTOCOL_IRIS);
 }
