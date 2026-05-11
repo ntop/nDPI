@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v6
     - name: Test in FreeBSD
       id: test
-      uses: vmactions/freebsd-vm@1885b78bae4c4c4b331b4b0461d23cc14cc72387 #v1.2.9
+      uses: vmactions/freebsd-vm@d1e65811565151536c0c894fff74f06351ed26e6 #v1.4.5
       with:
         envs: 'CFLAGS'
         usesh: true

@@ -32,7 +32,7 @@ jobs:
       - name: Generate Coverage Report
         run: |
           make coverage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ndpi-coverage-report
           path: coverage_report
@@ -63,7 +63,7 @@ jobs:
           make doc
           mkdir -vp doc/_build/ndpi-documentation-upload/ndpi-documentation
           mv -v doc/_build/html doc/_build/ndpi-documentation-upload/ndpi-documentation/html
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ndpi-documentation
           path: doc/_build/ndpi-documentation-upload
@@ -102,7 +102,7 @@ jobs:
             mv -v tests/cfgs/${PROFILE}/result/cpu_profile.png ndpi-performance-upload/${PROFILE}_cpu_profile.png
             mv -v tests/cfgs/${PROFILE}/result/heap_profile.png ndpi-performance-upload/${PROFILE}_heap_profile.png
           done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ndpi-performance
           path: ndpi-performance-upload
@@ -220,7 +220,10 @@ jobs:
         if: startsWith(matrix.os, 'macOS')
         run: |
           # Avoid (re)installing pkg-config. See: https://github.com/actions/runner-images/issues/10984
-          brew install coreutils wdiff colordiff autoconf automake libtool gettext json-c rrdtool parallel libgcrypt
+          # Avoid (re)installing  gettext 1.0, to avoid "gettext 1.0 is already installed and up-to-date.
+          # To reinstall 1.0, run: brew reinstall gettext" warning
+          # Avoid (re)installing libgcrypt
+          brew install coreutils wdiff colordiff autoconf automake libtool json-c rrdtool parallel
       - name: Configure nDPI
         run: |
           ./autogen.sh && ./configure ${{matrix.gcrypt}}
@@ -357,3 +360,137 @@ jobs:
           ./tests/do-unit.sh
           ./tests/do-dga.sh
           cd -
+
+  test-usdt:
+    name: USDT probes (ubuntu-latest)
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror -g -O2
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Install Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
+          sudo apt-get install systemtap-sdt-dev bpftrace pahole llvm
+      - name: Download latest bpftrace
+        run: |
+          curl -L -O https://github.com/bpftrace/bpftrace/releases/download/v0.24.2/bpftrace
+          chmod +x bpftrace
+      - name: Configure nDPI with USDT
+        run: |
+          # Workaround: C11 '_Atomic' type (from croaring code) is not fully supported for BPF CO-RE purposes
+          # This is needed only if you want to dereference `struct ndpi_flow_struct *`
+          # in the probe actions
+          ./autogen.sh && CFLAGS="-DCROARING_ATOMIC_IMPL=1" ./configure --enable-option-checking=fatal --enable-debug-build --enable-debug-messages --enable-usdt-probes
+      - name: Build nDPI
+        run: |
+          make -j all
+      - name: Build bpftool
+        run: |
+          # Temporary workaround: some 6.14 kernels don't have bpftool (and perf) in their packages
+          # See: https://bugs.launchpad.net/ubuntu/+source/linux-hwe-6.14/+bug/2117147
+          # See: https://gist.github.com/karlivory/9111f906f4eb06370b2b237c62a6b00e
+          curl -L -O https://gist.githubusercontent.com/karlivory/9111f906f4eb06370b2b237c62a6b00e/raw/dbd24228dda79e05815531a1db643d0709301838/build-perf.sh
+          sudo bash build-perf.sh
+      - name: Generate header file for bpftrace
+        run: |
+          pahole -J src/lib/libndpi.so
+          pahole -J example/ndpiReader
+          bpftool btf dump file example/ndpiReader format c > ndpi_types.h
+      - name: Verify USDT probes are embedded (readelf)
+        run: |
+          echo "=== Probes in libndpi.so ==="
+          readelf -n src/lib/libndpi.so | grep -A4 stapsdt
+          echo "=== Probes in ndpiReader ==="
+          readelf -n example/ndpiReader | grep -A4 stapsdt
+          # Verify both probes are present
+          readelf -n example/ndpiReader | grep -q 'flow_classified'
+          readelf -n example/ndpiReader | grep -q 'hostname_set'
+          readelf -n example/ndpiReader | grep -q 'fragment_ipv4'
+          readelf -n example/ndpiReader | grep -q 'fragment_ipv6'
+          echo "All expected USDT probes found."
+      - name: List probes via bpftrace
+        run: |
+          sudo bpftrace -l "usdt:./example/ndpiReader:ndpi:*" | tee /tmp/probe_list.txt
+          grep -q 'flow_classified' /tmp/probe_list.txt
+          grep -q 'hostname_set' /tmp/probe_list.txt
+          grep -q 'fragment_ipv4' /tmp/probe_list.txt
+          grep -q 'fragment_ipv6' /tmp/probe_list.txt
+          echo "bpftrace can see all probes."
+      - name: Test flow_classified probe with ndpiReader
+        run: |
+          sudo bpftrace -e '
+          usdt:./example/ndpiReader:ndpi:flow_classified {
+            @flows = count();
+            @proto_master[arg0] = count();
+            @confidence[arg2] = count();
+            @category[arg3] = count();
+          }' -c './example/ndpiReader -q -i tests/pcap/http.pcapng' 2>&1 | tee /tmp/bpf_classified.txt
+          # Verify we actually traced some flows
+          grep -q '@flows:' /tmp/bpf_classified.txt
+          echo "flow_classified probe (scalar args): OK"
+      - name: Test flow_classified probe with flow pointer (arg4) via header
+        run: |
+          # Embedding .BTF section and reading it from bpftrace is still a bit buggy.
+          # Use explicit header, with latest bpftrace
+          sudo ./bpftrace -I . --include ndpi_types.h \
+          -e 'usdt:./example/ndpiReader:ndpi:flow_classified {
+            $flow = (struct ndpi_flow_struct *)arg4;
+            @flows = count();
+            if ($flow->risk != 0) { @risky[arg0] = count(); }
+          }' -c './example/ndpiReader -q -i tests/pcap/1kxun.pcap' 2>&1 | tee /tmp/bpf_classified_ptr.txt
+          grep -q '@flows:' /tmp/bpf_classified_ptr.txt
+          echo "flow_classified probe (struct dereference): OK"
+      - name: Test hostname_set probe with ndpiReader
+        run: |
+          READER=$(realpath example/ndpiReader)
+          sudo ./bpftrace -I . --include ndpi_types.h \
+          -e 'usdt:./example/ndpiReader:ndpi:hostname_set {
+            $flow = (struct ndpi_flow_struct *)arg1;
+            @hostnames = count();
+            @top[str(arg0), $flow->detected_protocol_stack[0]] = count();
+          }' -c './example/ndpiReader -q -i tests/pcap/tls_certificate_too_long.pcap' 2>&1 | tee /tmp/bpf_hostname.txt
+          # Verify we actually traced some hostnames
+          grep -q '@hostnames:' /tmp/bpf_hostname.txt
+          echo "hostname_set probe: OK"
+      - name: Test both hostname_set and flow_classified simultaneously
+        run: |
+          sudo bpftrace -e '
+          usdt:./example/ndpiReader:ndpi:hostname_set {
+            @hostnames = count();
+          }
+          usdt:./example/ndpiReader:ndpi:flow_classified {
+            @classified[arg0] = count();
+          }' -c './example/ndpiReader -q -i tests/pcap/dns.pcap' 2>&1 | tee /tmp/bpf_both.txt
+          grep -q '@classified' /tmp/bpf_both.txt
+          grep -q '@hostnames' /tmp/bpf_both.txt
+          echo "Both probes fired successfully."
+      - name: Test fragment_ipv4 probe with ndpiReader
+        run: |
+          READER=$(realpath example/ndpiReader)
+          sudo ./bpftrace -I . --include ndpi_types.h \
+          -e 'usdt:./example/ndpiReader:ndpi:fragment_ipv4 {
+            $iph = (struct ndpi_iphdr *)arg0;
+            @frags = count();
+            @top[ntop($iph->saddr)] = count();
+          }' -c './example/ndpiReader -q -i tests/pcap/ip_fragmented_garbage.pcap' 2>&1 | tee /tmp/frag_ipv4.txt
+          # Verify we actually traced some hostnames
+          grep -q '@frags:' /tmp/frag_ipv4.txt
+          grep -q '@top' /tmp/frag_ipv4.txt
+          echo "fragment_ipv4 probe: OK"
+      - name: Test fragment_ipv6 probe with ndpiReader
+        run: |
+          READER=$(realpath example/ndpiReader)
+          sudo ./bpftrace -I . --include ndpi_types.h \
+          -e 'usdt:./example/ndpiReader:ndpi:fragment_ipv6 {
+            $ip6h = (struct ndpi_ipv6hdr *)arg0;
+            @frags = count();
+            @top[ntop($ip6h->ip6_src.u6_addr.u6_addr8)] = count();
+          }' -c './example/ndpiReader -q -i tests/pcap/dns_fragmented.pcap' 2>&1 | tee /tmp/frag_ipv6.txt
+          # Verify we actually traced some hostnames
+          grep -q '@frags:' /tmp/frag_ipv6.txt
+          grep -q '@top' /tmp/frag_ipv6.txt
+          echo "fragment_ipv6 probe: OK"

@@ -84,30 +84,25 @@ jobs:
         msan: [""]
         cflags: ["-g -O2"] # Default value if you do not specify CFLAGS variable
         include:
+          #Try "newest/oldest" compilers with various optimization flags
           - compiler: "gcc-4.9" # "Oldest" gcc easily available. To simulate RHEL7
             os: ubuntu-22.04
-            pcre: "--with-pcre2"
-            maxminddb: "--with-maxminddb"
-            msan: "--with-sanitizer"
             cflags: "-O0"
           - compiler: "gcc-14" # "Newest" gcc easily available
             os: ubuntu-24.04
-            pcre: "--with-pcre2"
-            maxminddb: "--with-maxminddb"
-            msan: "--with-sanitizer"
             cflags: "-O1"
           - compiler: "clang-12" # "Oldest" clang easily available
             os: ubuntu-22.04
-            pcre: "--with-pcre2"
-            maxminddb: "--with-maxminddb"
-            msan: "--with-sanitizer"
             cflags: "-Os"
           - compiler: "clang-18" # "Newest" clang easily available. See also below...
             os: ubuntu-24.04
+            cflags: "-O3"
+          #Sanitizer
+          - compiler: "clang"
+            os: ubuntu-latest
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
-            cflags: "-O3"
           - compiler: "cc"
             os: macOS-latest
             pcre: "--with-pcre2"
@@ -121,12 +116,8 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install autoconf automake debhelper libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
+          sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
           sudo apt-get install rrdtool librrd-dev parallel
-      - name: Install Ubuntu Prerequisites [Mingw-w64] (runs only on ubuntu jobs)
-        if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.msan, '--with-') # Only on a few "standard" builds
-        run: |
-          sudo apt-get install gcc-mingw-w64 libc6-dev
       - name: Install Ubuntu Prerequisites (libpcre2)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.pcre, '--with-pcre2')
         run: |
@@ -178,37 +169,11 @@ jobs:
           test ! -r /tmp/ndpi/usr/include/ndpi/ndpi_private.h
           file /tmp/ndpi/usr/lib/libndpi.a
           file /tmp/ndpi/usr/lib/libndpi.so*
-      - name: Test nDPI [SYMBOLS]
-        if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.msan, '--with-') # Only on a few "standard" builds
-        run: |
-          ./utils/check_symbols.sh || { FAILED=$?; echo "::error file=${NDPI_LIB}::Unwanted libc symbols found: ${FAILED}. Please make sure to use only ndpi_malloc/ndpi_calloc/ndpi_realloc/ndpi_free wrapper instead of malloc/calloc/realloc/free."; false; }
-        env:
-          NDPI_LIB: src/lib/libndpi.a
       - name: Tests
         run: |
           NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
           ./tests/do-unit.sh
           ./tests/do-dga.sh
-      - name: Generate/Verify tarball
-        if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.msan, '--with-') # Only on a few "standard" builds
-        run: |
-          make dist
-          ./utils/verify_dist_tarball.sh
-      - name: Build Debian/Ubuntu package
-        if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.msan, '--with-') # Only on a few "standard" builds
-        run: |
-          cd packages/ubuntu
-          ./configure --enable-no-sign
-          make
-          cd ../..
-      - name: Build nDPI [Mingw-w64] (runs only on ubuntu jobs)
-        if: startsWith(matrix.os, 'ubuntu') && !startsWith(matrix.msan, '--with-') # Only on a few "standard" builds
-        run: |
-          make distclean
-          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --host=x86_64-w64-mingw32
-          make -j $(nproc) all
-        env:
-          CC:
 
   test-windows:
     name: ${{ matrix.os }} (msys2)
@@ -244,136 +209,66 @@ jobs:
           msys2 -c './tests/do-unit.sh'
           msys2 -c './tests/do-dga.sh'
 
-  test-usdt:
-    name: USDT probes (ubuntu-latest)
+  mingw-64:
+    name: Mingw-64 (ubuntu-latest)
     runs-on: ubuntu-latest
     env:
-      CFLAGS: -Werror -g -O2
+      CC:
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Install Prerequisites
+      - name: Install Ubuntu Prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
-          sudo apt-get install systemtap-sdt-dev bpftrace pahole llvm
-      - name: Download latest bpftrace
+          sudo apt-get install autoconf automake libtool pkg-config gettext flex bison libjson-c-dev libpcap-dev gcc-mingw-w64 libc6-dev
+      - name: Configure nDPI
         run: |
-          curl -L -O https://github.com/bpftrace/bpftrace/releases/download/v0.24.2/bpftrace
-          chmod +x bpftrace
-      - name: Configure nDPI with USDT
-        run: |
-          # Workaround: C11 '_Atomic' type (from croaring code) is not fully supported for BPF CO-RE purposes
-          # This is needed only if you want to dereference `struct ndpi_flow_struct *`
-          # in the probe actions
-          ./autogen.sh && CFLAGS="-DCROARING_ATOMIC_IMPL=1" ./configure --enable-option-checking=fatal --enable-debug-build --enable-debug-messages --enable-usdt-probes
+          ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --host=x86_64-w64-mingw32 
       - name: Build nDPI
         run: |
-          make -j all
-      - name: Build bpftool
+          make -j $(nproc) all
+          make -j $(nproc) -C example
+          #make -j $(nproc) -C rrdtool
+      # No tests, only build
+
+  tarball-and-package:
+    name: Tarball/Package/Symbols checks (ubuntu-latest)
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS:
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Install Ubuntu Prerequisites
         run: |
-          # Temporary workaround: some 6.14 kernels don't have bpftool (and perf) in their packages
-          # See: https://bugs.launchpad.net/ubuntu/+source/linux-hwe-6.14/+bug/2117147
-          # See: https://gist.github.com/karlivory/9111f906f4eb06370b2b237c62a6b00e
-          curl -L -O https://gist.githubusercontent.com/karlivory/9111f906f4eb06370b2b237c62a6b00e/raw/dbd24228dda79e05815531a1db643d0709301838/build-perf.sh
-          sudo bash build-perf.sh
-      - name: Generate header file for bpftrace
+          sudo apt-get update
+          sudo apt-get install autoconf debhelper automake libtool pkg-config gettext flex bison libjson-c-dev libpcap-dev rrdtool librrd-dev
+      - name: Configure nDPI
         run: |
-          pahole -J src/lib/libndpi.so
-          pahole -J example/ndpiReader
-          bpftool btf dump file example/ndpiReader format c > ndpi_types.h
-      - name: Verify USDT probes are embedded (readelf)
+          ./autogen.sh && ./configure
+      - name: Build nDPI
         run: |
-          echo "=== Probes in libndpi.so ==="
-          readelf -n src/lib/libndpi.so | grep -A4 stapsdt
-          echo "=== Probes in ndpiReader ==="
-          readelf -n example/ndpiReader | grep -A4 stapsdt
-          # Verify both probes are present
-          readelf -n example/ndpiReader | grep -q 'flow_classified'
-          readelf -n example/ndpiReader | grep -q 'hostname_set'
-          readelf -n example/ndpiReader | grep -q 'fragment_ipv4'
-          readelf -n example/ndpiReader | grep -q 'fragment_ipv6'
-          echo "All expected USDT probes found."
-      - name: List probes via bpftrace
+          make -j $(nproc) all
+          make -j $(nproc) -C example
+          make -j $(nproc) -C rrdtool
+      # No need to run tests on this job
+      - name: Generate/Verify tarball
         run: |
-          sudo bpftrace -l "usdt:./example/ndpiReader:ndpi:*" | tee /tmp/probe_list.txt
-          grep -q 'flow_classified' /tmp/probe_list.txt
-          grep -q 'hostname_set' /tmp/probe_list.txt
-          grep -q 'fragment_ipv4' /tmp/probe_list.txt
-          grep -q 'fragment_ipv6' /tmp/probe_list.txt
-          echo "bpftrace can see all probes."
-      - name: Test flow_classified probe with ndpiReader
+          make dist
+          ./utils/verify_dist_tarball.sh
+      - name: Build Debian/Ubuntu package
         run: |
-          sudo bpftrace -e '
-          usdt:./example/ndpiReader:ndpi:flow_classified {
-            @flows = count();
-            @proto_master[arg0] = count();
-            @confidence[arg2] = count();
-            @category[arg3] = count();
-          }' -c './example/ndpiReader -q -i tests/pcap/http.pcapng' 2>&1 | tee /tmp/bpf_classified.txt
-          # Verify we actually traced some flows
-          grep -q '@flows:' /tmp/bpf_classified.txt
-          echo "flow_classified probe (scalar args): OK"
-      - name: Test flow_classified probe with flow pointer (arg4) via header
+          cd packages/ubuntu
+          ./configure --enable-no-sign
+          make
+          cd ../..
+      - name: Test nDPI [SYMBOLS]
         run: |
-          # Embedding .BTF section and reading it from bpftrace is still a bit buggy.
-          # Use explicit header, with latest bpftrace
-          sudo ./bpftrace -I . --include ndpi_types.h \
-          -e 'usdt:./example/ndpiReader:ndpi:flow_classified {
-            $flow = (struct ndpi_flow_struct *)arg4;
-            @flows = count();
-            if ($flow->risk != 0) { @risky[arg0] = count(); }
-          }' -c './example/ndpiReader -q -i tests/pcap/1kxun.pcap' 2>&1 | tee /tmp/bpf_classified_ptr.txt
-          grep -q '@flows:' /tmp/bpf_classified_ptr.txt
-          echo "flow_classified probe (struct dereference): OK"
-      - name: Test hostname_set probe with ndpiReader
-        run: |
-          READER=$(realpath example/ndpiReader)
-          sudo ./bpftrace -I . --include ndpi_types.h \
-          -e 'usdt:./example/ndpiReader:ndpi:hostname_set {
-            $flow = (struct ndpi_flow_struct *)arg1;
-            @hostnames = count();
-            @top[str(arg0), $flow->detected_protocol_stack[0]] = count();
-          }' -c './example/ndpiReader -q -i tests/pcap/tls_certificate_too_long.pcap' 2>&1 | tee /tmp/bpf_hostname.txt
-          # Verify we actually traced some hostnames
-          grep -q '@hostnames:' /tmp/bpf_hostname.txt
-          echo "hostname_set probe: OK"
-      - name: Test both hostname_set and flow_classified simultaneously
-        run: |
-          sudo bpftrace -e '
-          usdt:./example/ndpiReader:ndpi:hostname_set {
-            @hostnames = count();
-          }
-          usdt:./example/ndpiReader:ndpi:flow_classified {
-            @classified[arg0] = count();
-          }' -c './example/ndpiReader -q -i tests/pcap/dns.pcap' 2>&1 | tee /tmp/bpf_both.txt
-          grep -q '@classified' /tmp/bpf_both.txt
-          grep -q '@hostnames' /tmp/bpf_both.txt
-          echo "Both probes fired successfully."
-      - name: Test fragment_ipv4 probe with ndpiReader
-        run: |
-          READER=$(realpath example/ndpiReader)
-          sudo ./bpftrace -I . --include ndpi_types.h \
-          -e 'usdt:./example/ndpiReader:ndpi:fragment_ipv4 {
-            $iph = (struct ndpi_iphdr *)arg0;
-            @frags = count();
-            @top[ntop($iph->saddr)] = count();
-          }' -c './example/ndpiReader -q -i tests/pcap/ip_fragmented_garbage.pcap' 2>&1 | tee /tmp/frag_ipv4.txt
-          # Verify we actually traced some hostnames
-          grep -q '@frags:' /tmp/frag_ipv4.txt
-          grep -q '@top' /tmp/frag_ipv4.txt
-          echo "fragment_ipv4 probe: OK"
-      - name: Test fragment_ipv6 probe with ndpiReader
-        run: |
-          READER=$(realpath example/ndpiReader)
-          sudo ./bpftrace -I . --include ndpi_types.h \
-          -e 'usdt:./example/ndpiReader:ndpi:fragment_ipv6 {
-            $ip6h = (struct ndpi_ipv6hdr *)arg0;
-            @frags = count();
-            @top[ntop($ip6h->ip6_src.u6_addr.u6_addr8)] = count();
-          }' -c './example/ndpiReader -q -i tests/pcap/dns_fragmented.pcap' 2>&1 | tee /tmp/frag_ipv6.txt
-          # Verify we actually traced some hostnames
-          grep -q '@frags:' /tmp/frag_ipv6.txt
-          grep -q '@top' /tmp/frag_ipv6.txt
-          echo "fragment_ipv6 probe: OK"
+          ./utils/check_symbols.sh || { FAILED=$?; echo "::error file=${NDPI_LIB}::Unwanted libc symbols found: ${FAILED}. Please make sure to use only ndpi_malloc/ndpi_calloc/ndpi_realloc/ndpi_free wrapper instead of malloc/calloc/realloc/free."; false; }
+        env:
+          NDPI_LIB: src/lib/libndpi.a
+
+

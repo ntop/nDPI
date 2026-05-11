@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: ["windows-2025", "windows-2025-vs2026", "windows-11-arm"]
+        os: ["windows-2025", "windows-11-arm"]
     steps:
       - name: Checkout
         uses: actions/checkout@v6

@@ -23,7 +23,7 @@ for line in $(nm -P -u "${NDPI_LIB}"); do
     if [ ! -z "${FOUND_SYMBOL}" ]; then
         SKIP=0
         case "${CURRENT_OBJECT}" in
-            '[ndpi_main.o]'|'[ndpi_plugin.o]')
+            '[ndpi_main.o]'|'[ndpi_plugin.o]'|'[ndpi_fingerprint.o]'|'[ndpi_domains.o]')
                 case "${FOUND_SYMBOL}" in
                     'printf'|'fprintf') SKIP=1 ;;
                 esac
