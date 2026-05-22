@@ -4001,6 +4001,9 @@ void load_common_alpns(struct ndpi_detection_module_struct *ndpi_str) {
     /* ApplePush */
     "apns-security-v3", "apns-pack-v1",
 
+    /* LIBP2P */
+    "/yamux/1.0.0", "libp2p",
+
     NULL /* end */
   };
   u_int i;

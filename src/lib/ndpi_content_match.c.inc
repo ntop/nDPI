@@ -1554,6 +1554,9 @@ static ndpi_protocol_match host_match[] =
    { "espn.net",                                "Espn", NDPI_PROTOCOL_ESPN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "espn.playback.edge.bamgrid.com",          "Espn", NDPI_PROTOCOL_ESPN, NDPI_PROTOCOL_CATEGORY_STREAMING, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   /* libp2p applications i.e. ipfs */
+   { "bootstrap.libp2p.io",                     "libp2p", NDPI_PROTOCOL_LIBP2P, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "ipfs",                                    "libp2p", NDPI_PROTOCOL_LIBP2P, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_content_match_host_match.c.inc"

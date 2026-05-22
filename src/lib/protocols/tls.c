@@ -1958,13 +1958,25 @@ static void tls_subclassify_by_alpn(struct ndpi_detection_module_struct *ndpi_st
 				    struct ndpi_flow_struct *flow) {
   /* Right now we have only one rule so we can keep it trivial */
 
-  if(strlen(flow->protos.tls_quic.advertised_alpns) > NDPI_STATICSTRING_LEN("anydesk/") &&
+  size_t alpns_len = strlen(flow->protos.tls_quic.advertised_alpns);
+  if(alpns_len > NDPI_STATICSTRING_LEN("anydesk/") &&
      strncmp(flow->protos.tls_quic.advertised_alpns, "anydesk/", NDPI_STATICSTRING_LEN("anydesk/")) == 0) {
 #ifdef DEBUG_TLS
     printf("Matching ANYDESK via alpn\n");
 #endif
     ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ANYDESK,
 			       ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI);
+    flow->protos.tls_quic.subprotocol_detected = 1;
+  } else if ((alpns_len > NDPI_STATICSTRING_LEN("/yamux/") &&
+              strncmp(flow->protos.tls_quic.advertised_alpns, "/yamux/", NDPI_STATICSTRING_LEN("/yamux/")) == 0) ||
+             (alpns_len >= NDPI_STATICSTRING_LEN("libp2p") &&
+              strncmp(flow->protos.tls_quic.advertised_alpns, "libp2p", NDPI_STATICSTRING_LEN("libp2p")) == 0))
+  {
+#ifdef DEBUG_TLS
+    printf("Matching LIBP2P via alpn\n");
+#endif
+    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LIBP2P,
+                               ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI);
     flow->protos.tls_quic.subprotocol_detected = 1;
   }
 }

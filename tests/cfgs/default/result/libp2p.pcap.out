@@ -1,0 +1,69 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	17	(2.83 pkts/flow)
+DPI Packets (UDP):	14	(1.08 pkts/flow)
+Confidence DPI              : 18 (flows)
+Confidence Match by IP      : 1 (flows)
+Num dissector calls: 319 (16.79 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache stun:       0/12/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          11/7 (search/found)
+Automa domain:        9/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  5/5 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   37/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 123/68 (search/found)
+Hash ja4 custom protos:    6/0 (search/found)
+Hash fp custom protos:     5/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+DNS	10	2641	7
+STUN	6	1308	6
+AWS_EC2	12	3700	1
+libp2p	6	8876	5
+
+Acceptable                      34 16525         19           
+
+VPN                              4 6232          4            
+Web                              2 2644          1            
+Cloud                           12 3700          1            
+Network                         16 3949          13           
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.33.33            	 3      
+
+
+	1	TCP 192.168.33.33:4001 <-> 35.156.107.230:4001 [proto: 461/AWS_EC2][Stack: AWS_EC2][IP: 461/AWS_EC2][Encrypted][Confidence: Match by IP][FPC: 461/AWS_EC2, Confidence: IP address][DPI packets: 12][cat: Cloud/13][Breed: Acceptable][6 pkts/1917 bytes <-> 6 pkts/1783 bytes][Goodput ratio: 79/77][0.17 sec][bytes ratio: 0.036 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 31/4 141/14 55/6][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 320/297 1547/1413 549/499][TCP Fingerprint: 2_64_64240_2e3cee914fc1/Linux][PLAIN TEXT (/multistream/1.0.0)][Plen Bins: 40,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,20,0]
+	2	UDP 192.168.33.33:4001 -> 151.242.163.23:4001 [proto: 188.476/QUIC.libp2p][Stack: QUIC.libp2p][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Acceptable][2 pkts/2644 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][< 1 sec][(Advertised) ALPNs: libp2p][TLS Supported Versions: TLSv1.3][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** Unidirectional Traffic **][Risk Score: 110][Risk Info: No server to client traffic;SNI should always be present;Expected on port 443][nDPI Cli Fingerprint: 26e39c425afef00712e390d6bf4e418d][TLSv1.3][QUIC ver: V-1][JA4: q13i0312lp_55b375c5d22e_f902b76752af][Firefox][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0]
+	3	TCP 192.168.33.253:53 -> 192.168.33.33:55810 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][4 pkts/1872 bytes -> 0 pkts/0 bytes][Goodput ratio: 86/0][0.13 sec][Hostname/SNI: _dnsaddr.sg1.bootstrap.libp2p.io][0.0.0.0][DNS Id: 0xcdeb][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (dnsaddr)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 192.168.33.33:38448 -> 51.81.93.51:443 [proto: 91.476/TLS.libp2p][Stack: TLS.libp2p][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 91.476/TLS.libp2p, Confidence: DPI][DPI packets: 1][cat: VPN/2][Breed: Acceptable][1 pkts/1569 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][Hostname/SNI: ny5.bootstrap.libp2p.io][TLS Supported Versions: TLSv1.3;TLSv1.2][Risk: ** TLS (probably) Not Carrying HTTPS **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic;No ALPN][nDPI Cli Fingerprint: fa2c97f1a34f91924131452a160ec7d6][TLSv1.2][JA4: t13d131100_f57a46bbacb6_ab7e3b40a677][Firefox][PLAIN TEXT (ny5.bootstrap.libp2)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100]
+	5	TCP 192.168.33.33:46112 -> 54.38.47.166:443 [proto: 91.476/TLS.libp2p][Stack: TLS.libp2p][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 91.476/TLS.libp2p, Confidence: DPI][DPI packets: 1][cat: VPN/2][Breed: Acceptable][1 pkts/1569 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][Hostname/SNI: am6.bootstrap.libp2p.io][TLS Supported Versions: TLSv1.3;TLSv1.2][Risk: ** TLS (probably) Not Carrying HTTPS **** Unidirectional Traffic **][Risk Score: 20][Risk Info: No server to client traffic;No ALPN][nDPI Cli Fingerprint: fa2c97f1a34f91924131452a160ec7d6][TLSv1.2][JA4: t13d131100_f57a46bbacb6_ab7e3b40a677][Firefox][PLAIN TEXT (am6.bootstrap.libp2)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100]
+	6	TCP 192.168.33.33:4001 -> 54.38.92.75:4001 [proto: 91.476/TLS.libp2p][Stack: TLS.libp2p][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 91.476/TLS.libp2p, Confidence: DPI][DPI packets: 1][cat: VPN/2][Breed: Acceptable][1 pkts/1547 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][(Advertised) ALPNs: /yamux/1.0.0;libp2p][TLS Supported Versions: TLSv1.3][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** Unidirectional Traffic **][Risk Score: 110][Risk Info: No server to client traffic;SNI should always be present;Expected on port 443][nDPI Cli Fingerprint: 1941140e07e8211e3cf6be7409e75c34][TLSv1.2][JA4: t13i0311/0_55b375c5d22e_4a12575e92d6][Firefox][PLAIN TEXT (/yamux/1.0.0)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0]
+	7	TCP 192.168.33.33:4001 -> 62.169.18.218:4001 [proto: 91.476/TLS.libp2p][Stack: TLS.libp2p][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 91.476/TLS.libp2p, Confidence: DPI][DPI packets: 1][cat: VPN/2][Breed: Acceptable][1 pkts/1547 bytes -> 0 pkts/0 bytes][Goodput ratio: 96/0][< 1 sec][(Advertised) ALPNs: /yamux/1.0.0;libp2p][TLS Supported Versions: TLSv1.3][Risk: ** Known Proto on Non Std Port **** Missing SNI TLS Extn **** Unidirectional Traffic **][Risk Score: 110][Risk Info: No server to client traffic;SNI should always be present;Expected on port 443][nDPI Cli Fingerprint: 1941140e07e8211e3cf6be7409e75c34][TLSv1.2][JA4: t13i0311/0_55b375c5d22e_4a12575e92d6][Firefox][PLAIN TEXT (/yamux/1.0.0)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0]
+	8	UDP 192.168.33.33:33304 -> 217.254.215.59:53374 [proto: 78/STUN][Stack: STUN][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/218 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (webrtc)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 192.168.33.33:41832 -> 99.226.6.94:18138 [proto: 78/STUN][Stack: STUN][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/218 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (webrtc)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	UDP 192.168.33.33:43106 -> 217.254.215.59:51159 [proto: 78/STUN][Stack: STUN][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/218 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (webrtc)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	11	UDP 192.168.33.33:46305 -> 49.228.127.26:4001 [proto: 78/STUN][Stack: STUN][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/218 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (webrtc)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	12	UDP 192.168.33.33:55337 -> 217.254.215.59:9131 [proto: 78/STUN][Stack: STUN][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/218 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (webrtc)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	UDP 192.168.33.33:58336 -> 49.228.127.26:36655 [proto: 78/STUN][Stack: STUN][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 78/STUN, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/218 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (webrtc)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	14	UDP 192.168.33.253:53 -> 192.168.33.33:55514 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/190 bytes -> 0 pkts/0 bytes][Goodput ratio: 77/0][< 1 sec][Hostname/SNI: _dnsaddr.node-01.gc-us-central1-a.ipfs.prod.statusim.net][0.0.0.0][DNS Id: 0xfb98][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (dnsaddr)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	15	UDP 192.168.33.253:53 -> 192.168.33.33:44205 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/166 bytes -> 0 pkts/0 bytes][Goodput ratio: 74/0][< 1 sec][Hostname/SNI: _dnsaddr.ipfs.twdragon.net][0.0.0.0][DNS Id: 0xe005][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (dnsaddr)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	16	UDP 192.168.33.253:53 -> 192.168.33.33:59317 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/104 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][< 1 sec][Hostname/SNI: _dnsaddr.sv15.bootstrap.libp2p.io][0.0.0.0][DNS Id: 0xe4c5][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (dnsaddr)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	17	UDP 192.168.33.253:53 -> 192.168.33.33:37967 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/103 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][< 1 sec][Hostname/SNI: _dnsaddr.am6.bootstrap.libp2p.io][0.0.0.0][DNS Id: 0xeda4][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (dnsaddr)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	18	UDP 192.168.33.253:53 -> 192.168.33.33:45851 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/103 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][< 1 sec][Hostname/SNI: _dnsaddr.sg1.bootstrap.libp2p.io][0.0.0.0][DNS Id: 0xcdeb][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (dnsaddr)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	19	UDP 192.168.33.253:53 -> 192.168.33.33:53387 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/103 bytes -> 0 pkts/0 bytes][Goodput ratio: 59/0][< 1 sec][Hostname/SNI: _dnsaddr.ny5.bootstrap.libp2p.io][0.0.0.0][DNS Id: 0xfb21][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][PLAIN TEXT (dnsaddr)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

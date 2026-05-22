@@ -505,6 +505,7 @@ typedef enum {
   NDPI_PROTOCOL_YOUTUBE_KIDS          = 473,
   NDPI_PROTOCOL_SBE                   = 474,
   NDPI_PROTOCOL_IRIS                  = 475,
+  NDPI_PROTOCOL_LIBP2P                = 476,
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 
