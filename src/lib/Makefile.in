@@ -143,3 +143,5 @@ endif
 	#Avoid installing private header
 	# Installing header files to $(DESTDIR)@includedir@/ndpi
 	find $(top_srcdir)/src/include/*.h ! -name ndpi_private.h -exec cp "{}" $(DESTDIR)@includedir@/ndpi \;
+	cp $(top_builddir)/src/include/ndpi_config.h $(DESTDIR)@includedir@/ndpi/
+	cp $(top_builddir)/src/include/ndpi_define.h $(DESTDIR)@includedir@/ndpi/

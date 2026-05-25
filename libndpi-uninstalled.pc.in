@@ -1,0 +1,8 @@
+abs_top_srcdir=@abs_top_srcdir@
+abs_top_builddir=@abs_top_builddir@
+
+Name: libndpi
+Description: deep packet inspection library (uninstalled)
+Version: @VERSION@
+Libs: -L${abs_top_builddir}/src/lib -lndpi @ADDITIONAL_LIBS@
+Cflags: -I${abs_top_srcdir}/src/include -I${abs_top_builddir}/src/include
