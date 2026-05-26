@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
       - name: Run script
         run: |
-          ./utils/cross-compile-test.sh --full
+          ./utils/cross-compile-test.sh --full --tests
 
   crosscompilation-s390x:
     name: s390x on ubuntu-latest x86_64
@@ -36,4 +36,4 @@ jobs:
           fetch-depth: 0
       - name: Run script
         run: |
-          ./utils/cross-compile-test-s390x.sh --full
+          ./utils/cross-compile-test-s390x.sh --full --tests

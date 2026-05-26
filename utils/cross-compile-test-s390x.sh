@@ -13,6 +13,8 @@
 #   --full           Add s390x multiarch, install cross-compiled dev libs,
 #                    build examples and unit tests, then run ndpiReader -H
 #                    on the host via QEMU user-mode emulation.
+#   --tests          Everything in --full, plus run the full test suite
+#                    (tests/do.sh) via QEMU binfmt_misc.
 #
 # Options:
 #   --clean          Remove the build directory and exit.
@@ -23,12 +25,13 @@
 # What is tested:
 #   1. Cross-compiler selection (CC/CXX set before AC_PROG_CC).
 #   2. configure.ac cross-compilation warning (fires when PKG_CONFIG_SYSROOT_DIR
-#      is unset; suppressed in --full mode where it is explicitly set).
+#      is unset; suppressed in --full/--tests mode where it is explicitly set).
 #   3. Homebrew path guard (should be skipped on non-Darwin host).
 #   4. pfring_config conditional execution.
 #   5. date portability fix (stat-based file mtime).
 #   6. The final library/binary is s390x, not x86-64.
-#   7. (--full) ndpiReader -H executes correctly under QEMU user-mode emulation.
+#   7. (--full/--tests) ndpiReader -H executes correctly under QEMU user-mode emulation.
+#   8. (--tests) Full test suite (tests/do.sh) passes under QEMU via binfmt_misc.
 # =============================================================================
 set -euo pipefail
 
@@ -61,10 +64,11 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --library-only) MODE="library-only" ;;
         --full)         MODE="full" ;;
+        --tests)        MODE="tests" ;;
         --clean)        DO_CLEAN=true ;;
         --jobs)         shift; JOBS="$1" ;;
         --build-dir)    shift; BUILD_DIR="$1" ;;
-        --help|-h)      sed -n '2,30p' "$0"; exit 0 ;;
+        --help|-h)      sed -n '2,32p' "$0"; exit 0 ;;
         *) die "Unknown argument: $1.  Run with --help for usage." ;;
     esac
     shift
@@ -216,7 +220,7 @@ EOF
 # ---------------------------------------------------------------------------
 # Install s390x dev libraries (full mode only)
 # ---------------------------------------------------------------------------
-if [[ "$MODE" == "full" ]]; then
+if [[ "$MODE" != "library-only" ]]; then
     sep
     info "Setting up s390x multiarch and cross-compiled dev libraries"
 
@@ -330,7 +334,7 @@ else
         --with-pcre2
         --with-maxminddb
     )
-    info "Mode: full (examples + unit tests, with cross-compiled dev libs)"
+    info "Mode: ${MODE} (examples + unit tests, with cross-compiled dev libs)"
 fi
 
 # ---------------------------------------------------------------------------
@@ -425,7 +429,7 @@ fi
 
 # Full mode: also check ndpiReader and optionally run it via QEMU
 READER=""
-if [[ "$MODE" == "full" ]]; then
+if [[ "$MODE" != "library-only" ]]; then
     READER="$(find "${BUILD_DIR}/example" -name 'ndpiReader' 2>/dev/null | head -1 || true)"
     if [[ -n "${READER}" ]]; then
         check_arch "${READER}" "ndpiReader"
@@ -520,7 +524,7 @@ fi
 #                        libs (e.g. libpcap, libpcre2) under
 #                        /usr/lib/s390x-linux-gnu/
 # ---------------------------------------------------------------------------
-if [[ "$MODE" == "full" && -n "${READER}" && -f "${BUILD_DIR}/tests/do.sh" ]]; then
+if [[ "$MODE" == "tests" && -n "${READER}" && -f "${BUILD_DIR}/tests/do.sh" ]]; then
     sep
     info "Running test suite via QEMU (binfmt_misc)"
 
@@ -548,7 +552,7 @@ if [[ "$MODE" == "full" && -n "${READER}" && -f "${BUILD_DIR}/tests/do.sh" ]]; t
             export QEMU_LD_PREFIX=/
             export LD_LIBRARY_PATH="${BUILD_DIR}/src/lib:/usr/lib/${TARGET_TRIPLE}"
             cd "${BUILD_DIR}"
-            NDPI_FORCE_PARALLEL_UTESTS=1 bash tests/do.sh
+            NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 bash tests/do.sh
         ) || TESTS_RC=$?
         echo
         if [[ "${TESTS_RC}" -eq 0 ]]; then
