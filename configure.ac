@@ -110,6 +110,8 @@ AS_IF([test "x${enable_code_coverage}" = "xyes"],[
 
 AS_IF([test "${enable_npcap+set}" = set],[DISABLE_NPCAP=1],[DISABLE_NPCAP=0])
 
+AC_PATH_PROG([FILECMD], [file])
+AC_PATH_PROG([MANIFEST_TOOL], [mt], [:])
 LT_INIT
 LT_LIB_M
 

@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  crosscompilation:
+  crosscompilation-aarch64:
     name: AArch64 on ubuntu-latest x86_64
     runs-on: ubuntu-latest
     env:
@@ -24,4 +24,16 @@ jobs:
       - name: Run script
         run: |
           ./utils/cross-compile-test.sh --full
-          #No real tests, only `ndpiReader -H`
+
+  crosscompilation-s390x:
+    name: s390x on ubuntu-latest x86_64
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Run script
+        run: |
+          ./utils/cross-compile-test-s390x.sh --full

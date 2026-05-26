@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 # =============================================================================
-# cross-compile-test.sh — Test nDPI cross-compilation
+# cross-compile-test-s390x.sh — Test nDPI cross-compilation
 # Host  : Ubuntu x86-64
-# Target: AArch64 (aarch64-linux-gnu)
+# Target: IBM s390x (s390x-linux-gnu)
 #
 # Usage:
-#   ./utils/cross-compile-test.sh [OPTIONS]
+#   ./utils/cross-compile-test-s390x.sh [OPTIONS]
 #
 # Modes (mutually exclusive):
 #   --library-only   (default) Build libndpi only; no cross-compiled host libs
 #                    needed.  Fast and self-contained.
-#   --full           Add arm64 multiarch, install cross-compiled dev libs,
+#   --full           Add s390x multiarch, install cross-compiled dev libs,
 #                    build examples and unit tests, then run ndpiReader -H
 #                    on the host via QEMU user-mode emulation.
 #
@@ -27,7 +27,7 @@
 #   3. Homebrew path guard (should be skipped on non-Darwin host).
 #   4. pfring_config conditional execution.
 #   5. date portability fix (stat-based file mtime).
-#   6. The final library/binary is AArch64, not x86-64.
+#   6. The final library/binary is s390x, not x86-64.
 #   7. (--full) ndpiReader -H executes correctly under QEMU user-mode emulation.
 # =============================================================================
 set -euo pipefail
@@ -37,7 +37,7 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 SCRIPT_DIR="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 NDPI_ROOT="$(realpath "${SCRIPT_DIR}/..")"
-TARGET_TRIPLE="aarch64-linux-gnu"
+TARGET_TRIPLE="s390x-linux-gnu"
 DEFAULT_BUILD_DIR="${NDPI_ROOT}/build-cross-${TARGET_TRIPLE}"
 JOBS="$(nproc)"
 MODE="library-only"
@@ -104,9 +104,9 @@ info "Installing cross-compilation toolchain (${TARGET_TRIPLE})"
 
 COMMON_PKGS=(autoconf automake libtool make file pkgconf parallel)
 
-# crossbuild-essential-arm64 is available on Ubuntu 18.04+
-if apt-cache show crossbuild-essential-arm64 &>/dev/null 2>&1; then
-    TOOLCHAIN_PKGS=(crossbuild-essential-arm64)
+# crossbuild-essential-s390x is available on Ubuntu 18.04+
+if apt-cache show crossbuild-essential-s390x &>/dev/null 2>&1; then
+    TOOLCHAIN_PKGS=(crossbuild-essential-s390x)
 else
     TOOLCHAIN_PKGS=(
         binutils-${TARGET_TRIPLE}
@@ -125,32 +125,32 @@ command -v "${CC_CROSS}" &>/dev/null \
 ok "Cross-compiler: $(command -v "${CC_CROSS}") ($(${CC_CROSS} --version | head -1))"
 
 # ---------------------------------------------------------------------------
-# Helper: add ports.ubuntu.com as the arm64 apt source.
+# Helper: add ports.ubuntu.com as the s390x apt source.
 #
 # On a standard Ubuntu amd64 install, archive.ubuntu.com and
-# security.ubuntu.com only carry amd64/i386 packages.  arm64 packages live
+# security.ubuntu.com only carry amd64/i386 packages.  s390x packages live
 # on ports.ubuntu.com.  Without this, 'apt-get update' returns 404s for
-# every arm64 index file and ':arm64' package installs fail.
+# every s390x index file and ':s390x' package installs fail.
 #
 # We also add an Architectures: restriction to the existing main sources so
-# that apt no longer tries (and fails) to fetch arm64 indices from the
+# that apt no longer tries (and fails) to fetch s390x indices from the
 # amd64-only mirrors.
 # ---------------------------------------------------------------------------
-setup_arm64_apt_sources() {
+setup_s390x_apt_sources() {
     local codename
     codename="$(lsb_release -sc 2>/dev/null || echo "noble")"
 
     if [[ -f /etc/apt/sources.list.d/ubuntu.sources ]]; then
         # Ubuntu 24.04+ deb822 format
-        local ports_file="/etc/apt/sources.list.d/ubuntu-ports-arm64.sources"
+        local ports_file="/etc/apt/sources.list.d/ubuntu-ports-s390x.sources"
         if [[ ! -f "${ports_file}" ]]; then
-            info "Creating ${ports_file} (ports.ubuntu.com, arm64)"
+            info "Creating ${ports_file} (ports.ubuntu.com, s390x)"
             sudo tee "${ports_file}" >/dev/null <<EOF
 Types: deb
 URIs: http://ports.ubuntu.com/ubuntu-ports
 Suites: ${codename} ${codename}-updates ${codename}-security ${codename}-backports
 Components: main restricted universe multiverse
-Architectures: arm64
+Architectures: s390x
 Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 EOF
             ok "Created ${ports_file}"
@@ -160,7 +160,7 @@ EOF
 
         # Add 'Architectures: amd64 i386' to each stanza in ubuntu.sources
         # that doesn't already have an Architectures field, so apt stops
-        # requesting arm64 indices from archive.ubuntu.com.
+        # requesting s390x indices from archive.ubuntu.com.
         if ! grep -q "^Architectures:" /etc/apt/sources.list.d/ubuntu.sources; then
             info "Restricting ubuntu.sources to amd64 i386"
             local tmpfile
@@ -181,14 +181,14 @@ sys.stdout.write(content)
 
     elif [[ -f /etc/apt/sources.list ]]; then
         # Ubuntu 22.04 and earlier: plain sources.list
-        local ports_file="/etc/apt/sources.list.d/ubuntu-ports-arm64.list"
+        local ports_file="/etc/apt/sources.list.d/ubuntu-ports-s390x.list"
         if [[ ! -f "${ports_file}" ]]; then
-            info "Creating ${ports_file} (ports.ubuntu.com, arm64)"
+            info "Creating ${ports_file} (ports.ubuntu.com, s390x)"
             sudo tee "${ports_file}" >/dev/null <<EOF
-deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${codename} main restricted universe multiverse
-deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${codename}-updates main restricted universe multiverse
-deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${codename}-security main restricted universe multiverse
-deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${codename}-backports main restricted universe multiverse
+deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports ${codename} main restricted universe multiverse
+deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports ${codename}-updates main restricted universe multiverse
+deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports ${codename}-security main restricted universe multiverse
+deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports ${codename}-backports main restricted universe multiverse
 EOF
             ok "Created ${ports_file}"
         else
@@ -196,7 +196,7 @@ EOF
         fi
 
         # Add arch=amd64,i386 restriction to the main entries so apt doesn't
-        # request arm64 indices from archive.ubuntu.com.
+        # request s390x indices from archive.ubuntu.com.
         if ! grep -qE '^\s*deb\s+\[' /etc/apt/sources.list; then
             info "Adding arch restriction to /etc/apt/sources.list"
             sudo sed -i \
@@ -208,41 +208,41 @@ EOF
             ok "/etc/apt/sources.list already has arch restrictions."
         fi
     else
-        warn "Cannot locate apt sources file; skipping arm64 source setup."
-        warn "Manually add ports.ubuntu.com arm64 sources if package installation fails."
+        warn "Cannot locate apt sources file; skipping s390x source setup."
+        warn "Manually add ports.ubuntu.com s390x sources if package installation fails."
     fi
 }
 
 # ---------------------------------------------------------------------------
-# Install arm64 dev libraries (full mode only)
+# Install s390x dev libraries (full mode only)
 # ---------------------------------------------------------------------------
 if [[ "$MODE" == "full" ]]; then
     sep
-    info "Setting up arm64 multiarch and cross-compiled dev libraries"
+    info "Setting up s390x multiarch and cross-compiled dev libraries"
 
-    # Register arm64 as a foreign architecture so apt can install :arm64 packages
-    if ! dpkg --print-foreign-architectures | grep -q arm64; then
-        sudo dpkg --add-architecture arm64
-        ok "arm64 architecture registered."
+    # Register s390x as a foreign architecture so apt can install :s390x packages
+    if ! dpkg --print-foreign-architectures | grep -q s390x; then
+        sudo dpkg --add-architecture s390x
+        ok "s390x architecture registered."
     else
-        ok "arm64 multiarch already registered."
+        ok "s390x multiarch already registered."
     fi
 
-    # Configure apt to fetch arm64 packages from ports.ubuntu.com
-    setup_arm64_apt_sources
+    # Configure apt to fetch s390x packages from ports.ubuntu.com
+    setup_s390x_apt_sources
 
     info "Updating package lists..."
     sudo apt-get update -q
     ok "Package lists updated."
 
     # Dev libraries for the target sysroot.
-    # These land in /usr/lib/aarch64-linux-gnu/ and their .pc files in
-    # /usr/lib/aarch64-linux-gnu/pkgconfig/ — exactly what cross-pkg-config needs.
+    # These land in /usr/lib/s390x-linux-gnu/ and their .pc files in
+    # /usr/lib/s390x-linux-gnu/pkgconfig/ — exactly what cross-pkg-config needs.
     TARGET_LIBS=(
-        libpcap-dev:arm64
-        libjson-c-dev:arm64
-        libpcre2-dev:arm64
-        libmaxminddb-dev:arm64
+        libpcap-dev:s390x
+        libjson-c-dev:s390x
+        libpcre2-dev:s390x
+        libmaxminddb-dev:s390x
     )
     sudo apt-get install -y --no-install-recommends "${TARGET_LIBS[@]}"
     ok "Cross-compiled dev libraries installed."
@@ -386,23 +386,23 @@ check_arch() {
     file_out="$(file "${path}")"
     echo "  file: ${file_out}"
 
-    # 'file' on .so reports "ARM aarch64" or "ELF 64-bit LSB ... ARM"
+    # 'file' on .so reports "IBM S/390" for s390x ELFs
     # 'file' on .a  reports "current ar archive" — probe with readelf instead
-    if echo "${file_out}" | grep -qiE "aarch64|ARM aarch64|64-bit.*ARM"; then
+    if echo "${file_out}" | grep -qiE "IBM S/390|s390"; then
         arch_ok=true
     elif echo "${file_out}" | grep -qi "current ar archive"; then
         if command -v "${READELF}" &>/dev/null; then
             local re_out
             re_out="$("${READELF}" -h "${path}" 2>/dev/null || true)"
             echo "  readelf machine: $(echo "${re_out}" | grep 'Machine:' || echo '  (unknown)')"
-            echo "${re_out}" | grep -qiE "aarch64|AArch64" && arch_ok=true
+            echo "${re_out}" | grep -qiE "IBM S/390|s390" && arch_ok=true
         fi
     fi
 
     if $arch_ok; then
-        ok "${label} is AArch64."
+        ok "${label} is s390x."
     else
-        die "${label} is NOT AArch64!  Cross-compilation may have failed.\n  file output: ${file_out}"
+        die "${label} is NOT s390x!  Cross-compilation may have failed.\n  file output: ${file_out}"
     fi
 
     # Sanity: no x86 code should be present
@@ -443,17 +443,18 @@ fi
 # ---------------------------------------------------------------------------
 # QEMU smoke test: run ndpiReader -H on the host via user-mode emulation
 #
-# qemu-aarch64-static executes AArch64 ELFs on the x86-64 kernel using two
+# qemu-s390x-static executes s390x ELFs on the x86-64 kernel using two
 # independent mechanisms:
 #
 #   QEMU_LD_PREFIX=/
 #     Tells QEMU to prepend '/' to the ELF interpreter path embedded in the
-#     binary (/lib/ld-linux-aarch64.so.1).  With Ubuntu multiarch that file
-#     exists at /lib/aarch64-linux-gnu/ld-linux-aarch64.so.1, installed as a
-#     dependency of libc6:arm64 (pulled in by the cross-compiled dev libs).
+#     binary (/lib/ld64.so.1 for s390x).  With Ubuntu multiarch that file is
+#     installed at /lib/s390x-linux-gnu/ld64.so.1 (as part of libc6:s390x,
+#     pulled in by the cross-compiled dev libs), with a symlink from
+#     /lib/ld64.so.1 to that path.
 #
 #   LD_LIBRARY_PATH=<build lib dir>
-#     Passed through QEMU to the AArch64 dynamic linker so it can find
+#     Passed through QEMU to the s390x dynamic linker so it can find
 #     libndpi.so in the build directory (it is not installed system-wide).
 # ---------------------------------------------------------------------------
 if [[ -n "${READER}" ]]; then
@@ -461,22 +462,33 @@ if [[ -n "${READER}" ]]; then
     info "QEMU smoke test: ndpiReader -H"
 
     QEMU_BIN=""
-    if command -v qemu-aarch64-static &>/dev/null; then
-        QEMU_BIN="qemu-aarch64-static"
+    if command -v qemu-s390x-static &>/dev/null; then
+        QEMU_BIN="qemu-s390x-static"
     else
         info "qemu-user-static not installed; installing now..."
         sudo apt-get install -y --no-install-recommends qemu-user-static
-        QEMU_BIN="qemu-aarch64-static"
+        QEMU_BIN="qemu-s390x-static"
     fi
 
-    # Verify the aarch64 dynamic linker is accessible (installed via libc6:arm64
-    # which is pulled in as a dependency of the cross-compiled dev libs above).
-    AARCH64_LD="/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1"
-    if [[ ! -f "${AARCH64_LD}" ]]; then
-        warn "AArch64 dynamic linker not found at ${AARCH64_LD}."
-        warn "Install libc6:arm64 to enable QEMU execution."
+    # Verify the s390x dynamic linker is accessible.  s390x ELFs embed the
+    # interpreter as /lib/ld64.so.1; Ubuntu multiarch installs it at
+    # /lib/s390x-linux-gnu/ld64.so.1 with a compatibility symlink at
+    # /lib/ld64.so.1.  libc6:s390x is pulled in as a dependency of the
+    # cross-compiled dev libs installed above.
+    S390X_LD="/lib/ld64.so.1"
+    S390X_LD_MULTIARCH="/lib/s390x-linux-gnu/ld64.so.1"
+
+    if [[ ! -f "${S390X_LD}" && ! -L "${S390X_LD}" ]]; then
+        warn "s390x dynamic linker not found at ${S390X_LD}."
+        if [[ -f "${S390X_LD_MULTIARCH}" ]]; then
+            warn "Found at ${S390X_LD_MULTIARCH} but symlink ${S390X_LD} is missing."
+            warn "QEMU_LD_PREFIX=/ requires ${S390X_LD} to exist."
+            warn "Install libc6:s390x or create the symlink manually."
+        else
+            warn "Install libc6:s390x to enable QEMU execution."
+        fi
     else
-        ok "AArch64 dynamic linker: ${AARCH64_LD}"
+        ok "s390x dynamic linker: ${S390X_LD}"
 
         # LD_LIBRARY_PATH points QEMU at the cross-compiled shared libndpi.so
         # so ndpiReader can find it at runtime.
@@ -497,29 +509,29 @@ fi
 #
 # tests/do.sh calls ndpiReader repeatedly against pcap files.  With
 # qemu-user-static installed, the kernel's binfmt_misc subsystem intercepts
-# every execve() of an AArch64 ELF and routes it through qemu-aarch64-static
+# every execve() of an s390x ELF and routes it through qemu-s390x-static
 # transparently — no explicit wrapper is needed around each call.
 #
 # Environment variables are inherited through the whole binfmt_misc chain:
-#   QEMU_LD_PREFIX=/   — read by QEMU to locate the AArch64 dynamic linker
-#                        (/lib/ld-linux-aarch64.so.1)
-#   LD_LIBRARY_PATH    — passed to the AArch64 dynamic linker so it finds
+#   QEMU_LD_PREFIX=/   — read by QEMU to locate the s390x dynamic linker
+#                        (/lib/ld64.so.1)
+#   LD_LIBRARY_PATH    — passed to the s390x dynamic linker so it finds
 #                        libndpi.so (build dir) and cross-compiled system
 #                        libs (e.g. libpcap, libpcre2) under
-#                        /usr/lib/aarch64-linux-gnu/
+#                        /usr/lib/s390x-linux-gnu/
 # ---------------------------------------------------------------------------
 if [[ "$MODE" == "full" && -n "${READER}" && -f "${BUILD_DIR}/tests/do.sh" ]]; then
     sep
     info "Running test suite via QEMU (binfmt_misc)"
 
     # qemu-user-static registers a binfmt_misc entry on install.
-    # If absent, execve() of AArch64 ELFs fails immediately with ENOEXEC.
-    BINFMT_ENTRY="/proc/sys/fs/binfmt_misc/qemu-aarch64"
+    # If absent, execve() of s390x ELFs fails immediately with ENOEXEC.
+    BINFMT_ENTRY="/proc/sys/fs/binfmt_misc/qemu-s390x"
     if [[ ! -f "${BINFMT_ENTRY}" ]]; then
         warn "binfmt_misc entry not found at ${BINFMT_ENTRY}."
         if command -v update-binfmts &>/dev/null; then
-            info "Trying: sudo update-binfmts --enable qemu-aarch64"
-            sudo update-binfmts --enable qemu-aarch64 2>/dev/null || true
+            info "Trying: sudo update-binfmts --enable qemu-s390x"
+            sudo update-binfmts --enable qemu-s390x 2>/dev/null || true
         fi
         if [[ ! -f "${BINFMT_ENTRY}" ]]; then
             warn "Registration still absent — skipping test suite."
@@ -528,7 +540,7 @@ if [[ "$MODE" == "full" && -n "${READER}" && -f "${BUILD_DIR}/tests/do.sh" ]]; t
     fi
 
     if [[ -f "${BINFMT_ENTRY}" ]]; then
-        ok "binfmt_misc AArch64: $(head -1 "${BINFMT_ENTRY}")"
+        ok "binfmt_misc s390x: $(head -1 "${BINFMT_ENTRY}")"
         info "QEMU_LD_PREFIX=/ LD_LIBRARY_PATH=${BUILD_DIR}/src/lib:/usr/lib/${TARGET_TRIPLE}"
         echo
         TESTS_RC=0
@@ -564,6 +576,6 @@ echo "  ${TARGET_TRIPLE}-nm      '${LIB}' | head -20"
 echo
 if [[ -n "${READER}" ]]; then
 echo "To run the binary again:"
-echo "  QEMU_LD_PREFIX=/ LD_LIBRARY_PATH='${READER_LIB_DIR:-${BUILD_DIR}/src/lib}' qemu-aarch64-static '${READER}' -H"
+echo "  QEMU_LD_PREFIX=/ LD_LIBRARY_PATH='${READER_LIB_DIR:-${BUILD_DIR}/src/lib}' qemu-s390x-static '${READER}' -H"
 echo
 fi
