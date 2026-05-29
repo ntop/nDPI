@@ -330,6 +330,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_rtp_payload_type2str(fuzzed_data.ConsumeIntegral<u_int8_t>(), fuzzed_data.ConsumeIntegral<u_int32_t>());
   ndpi_rtp_payload_type2str(127, fuzzed_data.ConsumeIntegral<u_int32_t>());
 
+  ndpi_ikev2_dh_name(fuzzed_data.ConsumeIntegral<u_int8_t>());
+  ndpi_ikev2_integ_name(fuzzed_data.ConsumeIntegral<u_int8_t>());
+  ndpi_ikev2_prf_name(fuzzed_data.ConsumeIntegral<u_int8_t>());
+  ndpi_ikev2_encr_name(fuzzed_data.ConsumeIntegral<u_int8_t>());
+
+  char unknown_curve[8];
+  ndpi_tls_elliptic_curve2str(fuzzed_data.ConsumeIntegral<u_int16_t>(), unknown_curve);
+
   char buf2[16];
   ndpi_entropy2str(fuzzed_data.ConsumeFloatingPoint<float>(), fuzzed_data.ConsumeBool() ? buf2 : NULL, sizeof(buf2));
 

@@ -8,7 +8,7 @@
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   FuzzedDataProvider fuzzed_data(data, size);
   u_int16_t i, j;
-  ndpi_ranking rank;
+  ndpi_ranking rank, rank2;
   u_int16_t max_num_entries, num_epochs;
   u_int32_t now, prev_epoch;
   ndpi_ranking_epoch_entry *entries;
@@ -45,9 +45,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_print_ranking(&rank);
 
   snprintf(path, sizeof(path), "/tmp/ranking.%u.test", (unsigned int)getpid());
-  if(ndpi_serialize_ranking(&rank, path)) {
-    ndpi_term_ranking(&rank);
-    ndpi_deserialize_ranking(&rank, path);
+  if(ndpi_serialize_ranking(&rank, fuzzed_data.ConsumeBool() ? path : NULL)) {
+    if(ndpi_deserialize_ranking(&rank2, fuzzed_data.ConsumeBool() ? path : NULL))
+      ndpi_term_ranking(&rank2);
     unlink(path);
   }
 

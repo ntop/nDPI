@@ -2276,8 +2276,10 @@ bool ndpi_deserialize_ranking(ndpi_ranking *rank, const char *path) {
     if(rank->epochs) {
       n_read = fread(rank->epochs, rank->header.epochs_memory_len, 1, fd);
 
-      if(n_read != 1)
+      if(n_read != 1) {
+        ndpi_free(rank->epochs);
 	ret = false;
+      }
     } else
       ret = false;
   }
@@ -2464,8 +2466,10 @@ ndpi_anomaly_model* ndpi_alloc_anomaly_model(u_int16_t n_features) {
 /* *********************** */
 
 void ndpi_free_anomaly_model(ndpi_anomaly_model *m) {
-  if(m->training_data) ndpi_free(m->training_data);
-  ndpi_free(m);
+  if(m) {
+    if(m->training_data) ndpi_free(m->training_data);
+    ndpi_free(m);
+  }
 }
 
 /* *********************** */
@@ -2506,6 +2510,8 @@ static void ndpi_normalize_vector_L2(double *training_data, u_int32_t num) {
 /* *********************** */
 
 bool ndpi_train_anomaly_model(ndpi_anomaly_model *m, double *training_data) {
+  if(!m || !training_data)
+    return(false);
   u_int32_t len = sizeof(double) * m->n_features;
 
   ndpi_normalize_vector_L1(training_data, m->n_features);
@@ -2571,7 +2577,10 @@ bool ndpi_compute_anomaly_score(ndpi_anomaly_model *m,
 				double *testing_data) {
   u_int32_t i;
   double max_distance = 0;
-  
+
+  if(!m || !testing_data)
+    return(false);
+
   ndpi_normalize_vector_L1(testing_data, m->n_features);
   
   for(i=0; i<m->n_samples; i++) {
