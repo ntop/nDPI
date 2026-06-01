@@ -87,7 +87,7 @@ HTTP only: this risk is triggered whenever the accessed URL is suspicious. Examp
 
 NDPI_HTTP_SUSPICIOUS_HEADER
 ===========================
-HTTP only: this risk is triggered whenever the HTTP peader contains suspicious entries such as Uuid, TLS_version, Osname that are unexpected on the HTTP header.
+HTTP only: this risk is triggered whenever the HTTP header contains suspicious entries such as Uuid, TLS_version, Osname that are unexpected on the HTTP header.
 
 .. _Risk 015:
 
@@ -148,7 +148,7 @@ or when a suspicious query with a very long host name is detected.
 
 NDPI_TLS_MISSING_SNI
 ====================
-TLS needs to carry the the `SNI <https://en.wikipedia.org/wiki/Server_Name_Indication>`_ of the remote server we're accessing. Unfortunately SNI is optional in TLS so it can be omitted. In this case this risk is triggered as this is a non-standard situation that indicates a potential security problem or a protocol using TLS for other purposes (or a protocol bug).
+TLS needs to carry the `SNI <https://en.wikipedia.org/wiki/Server_Name_Indication>`_ of the remote server we're accessing. Unfortunately SNI is optional in TLS so it can be omitted. In this case this risk is triggered as this is a non-standard situation that indicates a potential security problem or a protocol using TLS for other purposes (or a protocol bug).
 
 .. _Risk 025:
 
@@ -339,22 +339,22 @@ HTTP only: this risk indicates that a binary file/data application transfer (att
 
 NDPI_PROBING_ATTEMPT
 ====================
-Connection with no data exchaged that looks like a probing attempt
+Connection with no data exchaged that looks like a probing attempt.
 
 .. _Risk 056:
 
 NDPI_OBFUSCATED_TRAFFIC
 =======================
-This risk is triggered when a connection is likely using some obfuscation technique to try to "look like" something else, hiding its true nature
+This risk is triggered when a connection is likely using some obfuscation technique to try to "look like" something else, hiding its true nature.
 
 .. _Risk 057:
 
 NDPI_SLOW_DOS
 =======================
-This risk is triggered when a TCP connection is likely subject to slow DoS attacks
+This risk is triggered when a TCP connection is likely subject to slow DoS attacks.
 
 .. _Risk 058:
 
-NDPI_NON_OQC
+NDPI_NON_PQC
 ============
 This risk is triggered when an encrypted stream (e.g. TLS, QUIC, SSH, IPSEC) is not using post-quantum cryptography algorithms.
