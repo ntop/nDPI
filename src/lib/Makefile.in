@@ -28,7 +28,7 @@ includedir = @includedir@/ndpi
 PREFIX = $(prefix)
 OS_TYPE = @OS_TYPE@
 ifneq ($(OS_TYPE),Windows_NT)
-AM_CFLAGS  = -fPIC -DPIC
+AM_CFLAGS  = -fPIC -DPIC -fPIE
 else
 AM_CFLAGS  =
 endif
