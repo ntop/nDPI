@@ -739,7 +739,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
 static void ndpi_check_user_agent(struct ndpi_detection_module_struct *ndpi_struct,
                                   struct ndpi_flow_struct *flow,
 				  char const *ua, size_t ua_len) {
-  char *double_slash;
+  const char *double_slash;
 
   if((!ua) || (ua[0] == '\0'))
     return;

@@ -151,7 +151,7 @@ static char *get_imsi(const char *str, int *imsi_len)
   if(*imsi_len != 14 && *imsi_len != 15)
     return NULL;
   for(c = s + 5; c != e; c++)
-    if(!isdigit(*c))
+    if(!isdigit((unsigned char)(*c)))
       return NULL;
   return s + 5;
 }

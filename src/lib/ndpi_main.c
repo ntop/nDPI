@@ -5814,7 +5814,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 	  value[max_len] = '\0'; /* remove trailing " */
 
 	for(i=0; i<max_len; i++)
-	  value[i] = tolower(value[i]);
+	  value[i] = tolower((unsigned char)value[i]);
       }
     } else if(strncmp(attr, "nbpf:", 5) == 0) {
 #ifdef HAVE_NBPF
@@ -6312,7 +6312,7 @@ int ndpi_load_categories_dir(struct ndpi_detection_module_struct *ndpi_str,
       cat_id = ndpi_strtonum(dp->d_name, 1, NDPI_PROTOCOL_NUM_CATEGORIES - 1, &errstrp, 10);
       if(errstrp == NULL) {
 	/* Valid file */
-	char path[512];
+	char path[1024];
 
 	underscore[0] = '_';
 	snprintf(path, sizeof(path), "%s/%s", dir_path, dp->d_name);
@@ -6376,7 +6376,7 @@ int ndpi_load_protocols_dir(struct ndpi_detection_module_struct *ndpi_str,
       proto_id = ndpi_strtonum(dp->d_name, 1, ndpi_str->num_internal_protocols - 1, &errstrp, 10);
       if(errstrp == NULL) {
 	/* Valid file */
-	char path[512];
+	char path[1024];
 
 	underscore[0] = '_';
 	snprintf(path, sizeof(path), "%s/%s", dir_path, dp->d_name);
@@ -6615,7 +6615,7 @@ int load_malicious_sha1_file_fd(struct ndpi_detection_module_struct *ndpi_str, F
     }
 
     for (i = 0; i < 40; ++i)
-      first_comma[i] = toupper(first_comma[i]);
+      first_comma[i] = toupper((unsigned char)first_comma[i]);
 
     if(ndpi_hash_add_entry(&ndpi_str->malicious_sha1_hashmap, first_comma,
 			   second_comma - first_comma, 0, NULL) == 0)
@@ -12763,7 +12763,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 	tmp[(u_int)len < max_tmp_len ? (u_int)len : max_tmp_len] = '\0';
 
       for(i=0, j=0; (i<(u_int)len) && (j<max_tmp_len); i++) {
-	tmp[j] = tolower(name[i]);
+	tmp[j] = tolower((unsigned char)name[i]);
 
 	if(tmp[j] == '.') {
 	  num_dots++;

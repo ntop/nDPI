@@ -141,13 +141,7 @@ static void telnet_set_detected(struct ndpi_detection_module_struct *ndpi_struct
  *   Byte 1:    command byte (0xF0–0xFE, not 0xFF)
  *   Byte 2:    option byte (≤ 0x28, only required for commands 0xFB–0xFE)
  */
-#if !defined(WIN32)
-static inline
-#elif defined(MINGW_GCC)
-__mingw_forceinline static
-#else
-__forceinline static
-#endif
+static
 u_int8_t search_iac(struct ndpi_detection_module_struct *ndpi_struct) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t pos;

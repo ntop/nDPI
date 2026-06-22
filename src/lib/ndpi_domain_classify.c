@@ -165,7 +165,7 @@ bool ndpi_domain_classify_hostname(struct ndpi_detection_module_struct *ndpi_mod
   item = hostname;
 
   while(true) {
-    char *next;
+    const char *next;
 
     /* This looks like a match so let's check the hash now */
 #ifdef ENCODE_DATA

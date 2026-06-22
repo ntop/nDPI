@@ -2759,10 +2759,14 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
     }
   }
 
+  pkt_timeval tv;
+  tv.tv_sec = header->ts.tv_sec;
+  tv.tv_usec = header->ts.tv_usec;
+
   /* process the packet */
   return(packet_processing(workflow, time_ms, vlan_id, tunnel_type, iph, iph6,
 			   header->caplen - ip_offset,
-			   header->caplen, header, packet, header->ts,
+			   header->caplen, header, packet, tv,
 			   flow_risk, flow));
 }
 

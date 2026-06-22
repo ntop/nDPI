@@ -3,9 +3,11 @@ on:
   push:
     branches:
       - dev
+      - '**/*-stable'
   pull_request:
     branches:
       - dev
+      - '**/*-stable'
     types: [opened, synchronize, reopened]
   release:
     types: [created]
@@ -79,7 +81,7 @@ jobs:
       fail-fast: true
       matrix:
         # Only most "important" OS; the other ones are tested only via scheduled job
-        os: ["ubuntu-22.04", "ubuntu-24.04", "macOS-15", "macOS-26"]
+        os: ["ubuntu-22.04", "ubuntu-24.04", "ubuntu-26.04", "macOS-15", "macOS-26"]
         compiler: ["cc"]
         pcre: [""]
         maxminddb: [""]
@@ -90,14 +92,14 @@ jobs:
           - compiler: "gcc-4.9" # "Oldest" gcc easily available. To simulate RHEL7
             os: ubuntu-22.04
             cflags: "-O0"
-          - compiler: "gcc-14" # "Newest" gcc easily available
-            os: ubuntu-24.04
+          - compiler: "gcc-15" # "Newest" gcc easily available
+            os: ubuntu-26.04
             cflags: "-O1"
           - compiler: "clang-12" # "Oldest" clang easily available
             os: ubuntu-22.04
             cflags: "-Os"
-          - compiler: "clang-18" # "Newest" clang easily available. See also below...
-            os: ubuntu-24.04
+          - compiler: "clang-22" # "Newest" clang easily available.
+            os: ubuntu-26.04
             cflags: "-O3"
           #Sanitizer
           - compiler: "clang"

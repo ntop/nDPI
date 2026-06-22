@@ -24,13 +24,6 @@
 #ifndef __NDPI_WIN32_H__
 #define __NDPI_WIN32_H__
 
-// fix a MinGW build issue "error: multiple storage classes in declaration specifiers" due to MinGW
-// defining extern for __forceinline types
-#if (defined(__MINGW32__) || defined(__MINGW64__)) && defined(__GNUC__)
-#define MINGW_GCC
-#define __mingw_forceinline __inline__ __attribute__((__always_inline__,__gnu_inline__))
-#endif
-
 #undef _WIN32_WINNT
 #define _WIN32_WINNT _WIN32_WINNT_WIN8
 #include <winsock2.h>

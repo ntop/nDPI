@@ -746,7 +746,7 @@ static int ndpi_find_non_eng_bigrams(char *str) {
      )
     return(1);
 
-  s[0] = tolower(str[0]), s[1] = tolower(str[1]), s[2] = '\0';
+  s[0] = tolower((unsigned char)str[0]), s[1] = tolower((unsigned char)str[1]), s[2] = '\0';
 
   return(ndpi_match_bigram(s));
 }
@@ -3827,7 +3827,7 @@ bool ndpi_is_valid_hostname(char * const hostname, size_t len) {
   if(label_len == 0)
     return(false); /* Ends with a dot */
 
-  if(!isalnum(hostname[idx-1]))
+  if(!isalnum((unsigned char)hostname[idx-1]))
     return(false); /* Label must end with letter or digit */
 
   return(has_valid_label || len > 0); /* At least one label exists */

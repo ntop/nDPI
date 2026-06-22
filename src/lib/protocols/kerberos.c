@@ -184,7 +184,7 @@ static void krb_strncpy_lower(char * const dst, size_t dst_siz,
      {
        dst[i] = '?';
      } else {
-       dst[i] = tolower(src[i]);
+       dst[i] = tolower((unsigned char)src[i]);
      }
    }
 }

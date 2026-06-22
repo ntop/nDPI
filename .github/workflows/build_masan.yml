@@ -3,9 +3,11 @@ on:
   push:
     branches:
       - dev
+      - '**/*-stable'
   pull_request:
     branches:
       - dev
+      - '**/*-stable'
     types: [opened, synchronize, reopened]
   release:
     types: [created]

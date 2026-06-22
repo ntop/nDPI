@@ -1,0 +1,93 @@
+name: BSD Builds
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+  schedule:
+    #At the end of every day
+    - cron: '0 0 * * *'
+
+jobs:
+  FreeBSD:
+    name: FreeBSD
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
+    steps:
+    - uses: actions/checkout@v6
+    - name: Test in FreeBSD
+      id: test
+      uses: vmactions/freebsd-vm@b84ab5559b5a1bb4b8ee2737d2506a16e1737636 #v1.4.8
+      with:
+        envs: 'CFLAGS'
+        usesh: true
+        copyback: false
+        release: "15.1"
+        prepare: |
+          pkg install -y gcc git gettext flex bison libtool autoconf automake devel/pkgconf gmake libpcap json-c
+        run: |
+          echo "Working Directory: $(pwd)"
+          echo "User.............: $(whoami)"
+          echo "FreeBSD Version..: $(freebsd-version)"
+          ./autogen.sh && ./configure
+          gmake -j $(nproc) all
+          gmake -j $(nproc) -C example
+          ./example/ndpiReader -H
+          #Avoid running tests to be fast: we are only interested in basic compilation
+
+  OpenBSD:
+    name: OpenBSD
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
+    steps:
+    - uses: actions/checkout@v6
+    - name: Test in OpenBSD
+      id: test
+      uses: vmactions/openbsd-vm@18edb32f4e48dae5865d7b8b3a9587bc01218a20 #v1.4.4
+      with:
+        envs: 'CFLAGS'
+        usesh: true
+        copyback: false
+        release: "7.9"
+        prepare: |
+          pkg_add gcc git gettext-tools bison libtool autoconf-2.72p0 automake-1.11.6p4 gmake libpcap json-c
+        run: |
+          export AUTOCONF_VERSION=2.72
+          export AUTOMAKE_VERSION=1.11
+          echo "Working Directory: $(pwd)"
+          echo "User.............: $(whoami)"
+          echo "OpenBSD Version..: $(openbsd-version)"
+          ./autogen.sh && ./configure
+          gmake -j $(sysctl -n hw.ncpu) all
+          gmake -j $(sysctl -n hw.ncpu) -C example
+          ./example/ndpiReader -H
+          #Avoid running tests to be fast: we are only interested in basic compilation
+
+  NetBSD:
+    name: NetBSD
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror -DNDPI_EXTENDED_SANITY_CHECKS -g -O2
+    steps:
+    - uses: actions/checkout@v6
+    - name: Test in NetBSD
+      id: test
+      uses: vmactions/netbsd-vm@99816dccf75edf233ed6cd00a159e3a5b85ea373 #v1.4.0
+      with:
+        envs: 'CFLAGS'
+        usesh: true
+        copyback: false
+        release: "10.1"
+        prepare: |
+          pkg_add -u pcre2
+          pkg_add gcc12 git pkgconf gettext flex bison libtool autoconf automake gmake libpcap json-c
+        run: |
+          echo "Working Directory: $(pwd)"
+          echo "User.............: $(whoami)"
+          echo "NetBSD Version..: $(uname -a)"
+          ./autogen.sh && ./configure
+          gmake -j $(sysctl -n hw.ncpu) all
+          gmake -j $(sysctl -n hw.ncpu) -C example
+          ./example/ndpiReader -H
+          #Avoid running tests to be fast: we are only interested in basic compilation

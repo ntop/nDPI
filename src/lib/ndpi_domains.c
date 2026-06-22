@@ -94,7 +94,7 @@ int ndpi_load_domain_suffixes(struct ndpi_detection_module_struct *ndpi_str,
 const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndpi_str,
 					const char *hostname,
 					u_int64_t *domain_id /* out */) {
-  char *dot, *prev_dot;
+  const char *dot, *prev_dot;
 
   if(!ndpi_str || !hostname || !domain_id)
     return NULL;
@@ -134,7 +134,8 @@ const char* ndpi_get_host_domain_suffix(struct ndpi_detection_module_struct *ndp
 const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
 				 const char *hostname) {
   const char *ret;
-  char *dot, *first_dc;
+  char *dot;
+  const char *first_dc;
   u_int64_t domain_id, len;
   
   if(!ndpi_str || !hostname)
@@ -149,11 +150,11 @@ const char* ndpi_get_host_domain(struct ndpi_detection_module_struct *ndpi_str,
   else
     len--;
 
-  if((isdigit(hostname[len])) || (hostname[len] == ']' /* IPv6 address [...] */ ))
+  if((isdigit((unsigned char)hostname[len])) || (hostname[len] == ']' /* IPv6 address [...] */ ))
     return(hostname);
 
   if((first_dc = strchr(hostname, ':')) != NULL) {
-    char *last_dc = strchr(hostname, ':');
+    const char *last_dc = strchr(hostname, ':');
 
     if((last_dc != NULL) && (first_dc != last_dc))
       return(hostname); /* Numeric IPv6 address */

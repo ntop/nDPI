@@ -116,7 +116,7 @@ u_int ndpi_load_protocol_plugins(struct ndpi_detection_module_struct *ndpi_struc
     return(-1);
 
   while((dp = readdir(dirp)) != NULL) {
-    char *extn, path[512];
+    char *extn, path[1024];
 
     if(dp->d_name[0] == '.') continue;
     extn = strrchr(dp->d_name, '.');

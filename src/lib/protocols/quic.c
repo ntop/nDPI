@@ -1512,7 +1512,7 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 static int may_be_gquic_rej(struct ndpi_detection_module_struct *ndpi_struct)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  void *ptr;
+  const void *ptr;
 
   /* Common case: msg from server default port */
   if(packet->udp->source != ntohs(443))

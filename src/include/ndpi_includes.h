@@ -61,10 +61,6 @@
 
 #endif	/* Win32 */
 
-#if defined __OpenBSD__
-#include "ndpi_includes_OpenBSD.h"
-#else
 typedef struct timeval pkt_timeval;
-#endif /* __OpenBSD__ */
 
 #endif /* __NDPI_INCLUDES_H__ */
