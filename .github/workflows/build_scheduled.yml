@@ -20,7 +20,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install autoconf automake libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev
           sudo apt-get install rrdtool librrd-dev
-          sudo apt-get install libpcre3-dev libmaxminddb-dev lcov
+          sudo apt-get install libpcre2-dev libmaxminddb-dev lcov
           sudo apt-get install wdiff colordiff
       - name: Configure
         run: ./autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --enable-code-coverage --with-pcre2 --with-maxminddb
@@ -92,7 +92,7 @@ jobs:
           ./autogen.sh && ./configure --enable-gprof --enable-option-checking=fatal --with-pcre2 --with-maxminddb
       - name: Build nDPI library
         run: |
-          make -j
+          make -j $(nproc)
       - name: Performance Profiling
         run: |
           NDPI_FORCE_PARALLEL_UTESTS=1 NDPI_FORCE_PARALLEL_CONFIGS=1 NDPI_SKIP_PARALLEL_BAR=1 ./tests/do.sh
@@ -387,7 +387,7 @@ jobs:
           ./autogen.sh && CFLAGS="-DCROARING_ATOMIC_IMPL=1" ./configure --enable-option-checking=fatal --enable-debug-build --enable-debug-messages --enable-usdt-probes
       - name: Build nDPI
         run: |
-          make -j all
+          make -j $(nproc) all
       - name: Build bpftool
         run: |
           # Temporary workaround: some 6.14 kernels don't have bpftool (and perf) in their packages
