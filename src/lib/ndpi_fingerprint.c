@@ -170,12 +170,30 @@ static char* ndpi_compute_tls_blocks_flow_fingerprint(struct ndpi_flow_struct *f
   fp_buf[0] = '\0'; /* Not really necessary, but just to be sure */
 
   for(i=0; i< flow->l4.tcp.tls.num_tls_blocks; i++) {
-    ret = snprintf(&fp_buf[idx], fp_buf_len-idx-1, "%s%u=%d",
+    u_int avail;
+
+    if(idx >= fp_buf_len - 1)
+      break;
+
+    avail = fp_buf_len - idx;
+
+    ret = snprintf(&fp_buf[idx], avail, "%s%u=%d",
 		   (i > 0) ? "," : "",
 		   flow->l4.tcp.tls.tls_blocks[i].block_type,
 		   flow->l4.tcp.tls.tls_blocks[i].len);
 
-    if(ret > 0) idx += ret; else break;
+    if(ret <= 0)
+      break;
+
+    if((u_int)ret >= avail) {
+      /* Truncated: snprintf() returns the would-be length, not what was
+	 written. Keep the avail-1 chars that fit and stop, or idx walks
+	 past the buffer and avail underflows on the next round. */
+      idx = fp_buf_len - 1;
+      break;
+    }
+
+    idx += ret;
   } /* for */
 
 #if 0
@@ -284,8 +302,12 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
     s = snprintf((char*)fp_buf, sizeof(fp_buf)-1, "%s-%s%s-%s",
 		 l4_fp, l7_pf, l7_pf_tls_blocks, l7_pf_server);
 
-    if(ndpi_str->cfg.tls_ndpifp_ignore_sni_extension)
-      fp_buf[strlen(l4_fp)+4] = '_';
+    if(ndpi_str->cfg.tls_ndpifp_ignore_sni_extension) {
+      size_t sni_off = strlen(l4_fp) + 4;
+
+      if(sni_off < ndpi_min(s, sizeof(fp_buf)-1))
+	fp_buf[sni_off] = '_';
+    }
 
 #if 0
     fprintf(stderr, "#### [sport=%u] %s\n", ntohs(flow->c_port), fp_buf);
