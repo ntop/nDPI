@@ -19,11 +19,11 @@ LIST6=/tmp/bot.list6
 LIST_MERGED=/tmp/bot.list_m
 LIST6_MERGED=/tmp/bot.list6_m
 #Google Common crawlers
-ORIGIN1="https://developers.google.com/static/search/apis/ipranges/googlebot.json"
+ORIGIN1="https://developers.google.com/static/crawling/ipranges/common-crawlers.json"
 #Google Special-case crawlers
-ORIGIN2="https://developers.google.com/static/search/apis/ipranges/special-crawlers.json"
+ORIGIN2="https://developers.google.com/static/crawling/ipranges/special-crawlers.json"
 #Google User-triggered fetchers
-ORIGIN3="https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json"
+ORIGIN3="https://developers.google.com/static/crawling/ipranges/user-triggered-fetchers.json"
 #Bing Bot
 ORIGIN_BING="https://www.bing.com/toolbox/bingbot.json"
 #Facebook Bot: https://developers.facebook.com/docs/sharing/webmasters/crawler/
