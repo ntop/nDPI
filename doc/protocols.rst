@@ -4327,3 +4327,12 @@ References: `InterSystems IRIS official site: <https://www.intersystems.com/prod
 libp2p is a modular network stack and open-source library that enables developers to build decentralised, peer-to-peer (P2P) applications.
 
 References: `Official site: <https://libp2p.io>`_
+
+
+.. _Proto_477:
+
+`NDPI_PROTOCOL_NETMOTION`
+=========================
+NetMotion Mobility (formerly Mobility XE) is an enterprise mobile VPN that keeps sessions persistent across network changes, widely deployed in public-sector and first-responder fleets. Clients tunnel to the Mobility server using the Internet Mobility Protocol (IMP), by default over UDP/5008.
+
+References: `Official site: <https://www.netmotionsoftware.com>`_

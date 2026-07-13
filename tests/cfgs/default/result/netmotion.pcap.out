@@ -27,10 +27,10 @@ Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
 
-WireGuard	10	1924	1
+NetMotion	16	2703	1
 
-Acceptable                      10 1924          1            
+Acceptable                      16 2703          1            
 
-VPN                             10 1924          1            
+VPN                             16 2703          1            
 
-	1	UDP 192.168.122.11:22595 <-> 198.54.131.98:5060 [proto: 206/WireGuard][Stack: WireGuard][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: VPN/2][Breed: Acceptable][6 pkts/828 bytes <-> 4 pkts/1096 bytes][Goodput ratio: 69/85][0.97 sec][bytes ratio: -0.139 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/234 193/239 470/248 177/6][Pkt Len c2s/s2c min/avg/max/stddev: 122/122 138/274 202/714 29/254][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 51820][Plen Bins: 0,0,60,20,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 203.0.113.77:5008 <-> 192.168.80.145:63991 [proto: 477/NetMotion][Stack: NetMotion][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: VPN/2][Breed: Acceptable][10 pkts/1626 bytes <-> 6 pkts/1077 bytes][Goodput ratio: 74/77][0.99 sec][bytes ratio: 0.203 (Upload)][IAT c2s/s2c min/avg/max/stddev: 25/31 104/161 207/254 63/83][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 163/180 280/664 83/219][Plen Bins: 38,12,0,18,0,0,18,6,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
