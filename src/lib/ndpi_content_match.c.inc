@@ -1404,8 +1404,28 @@ static ndpi_protocol_match host_match[] =
 
    { "nvidia.com",                       "Nvidia", NDPI_PROTOCOL_NVIDIA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL},
 
-   { "proton.me",                        "ProtonVPN", NDPI_PROTOCOL_PROTONVPN, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   { "protonvpn.com",                    "ProtonVPN", NDPI_PROTOCOL_PROTONVPN, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Proton VPN: control plane only; the VPN data plane is WireGuard/OpenVPN */
+   { "protonvpn.com",                    "ProtonVPN",      NDPI_PROTOCOL_PROTONVPN,       NDPI_PROTOCOL_CATEGORY_VPN,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "protonvpn.net",                    "ProtonVPN",      NDPI_PROTOCOL_PROTONVPN,       NDPI_PROTOCOL_CATEGORY_VPN,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "vpn-api.proton.me",                "ProtonVPN",      NDPI_PROTOCOL_PROTONVPN,       NDPI_PROTOCOL_CATEGORY_VPN,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   /* Proton umbrella: account/login, base site and any not-yet-listed suite */
+   { "proton.black",                     "Proton",         NDPI_PROTOCOL_PROTON,          NDPI_PROTOCOL_CATEGORY_WEB,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "proton.me",                        "Proton",         NDPI_PROTOCOL_PROTON,          NDPI_PROTOCOL_CATEGORY_WEB,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "mail-api.proton.me",               "ProtonMail",     NDPI_PROTOCOL_PROTON_MAIL,     NDPI_PROTOCOL_CATEGORY_MAIL,                    NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "mail.proton.me",                   "ProtonMail",     NDPI_PROTOCOL_PROTON_MAIL,     NDPI_PROTOCOL_CATEGORY_MAIL,                    NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "pm.me",                            "ProtonMail",     NDPI_PROTOCOL_PROTON_MAIL,     NDPI_PROTOCOL_CATEGORY_MAIL,                    NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "protonmail.ch",                    "ProtonMail",     NDPI_PROTOCOL_PROTON_MAIL,     NDPI_PROTOCOL_CATEGORY_MAIL,                    NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "protonmail.com",                   "ProtonMail",     NDPI_PROTOCOL_PROTON_MAIL,     NDPI_PROTOCOL_CATEGORY_MAIL,                    NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "pass-api.proton.me",               "ProtonPass",     NDPI_PROTOCOL_PROTON_PASS,     NDPI_PROTOCOL_CATEGORY_CLOUD,                   NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "pass.proton.me",                   "ProtonPass",     NDPI_PROTOCOL_PROTON_PASS,     NDPI_PROTOCOL_CATEGORY_CLOUD,                   NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "drive-api.proton.me",              "ProtonDrive",    NDPI_PROTOCOL_PROTON_DRIVE,    NDPI_PROTOCOL_CATEGORY_CLOUD,                   NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "drive.proton.me",                  "ProtonDrive",    NDPI_PROTOCOL_PROTON_DRIVE,    NDPI_PROTOCOL_CATEGORY_CLOUD,                   NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "calendar-api.proton.me",           "ProtonCalendar", NDPI_PROTOCOL_PROTON_CALENDAR, NDPI_PROTOCOL_CATEGORY_PRODUCTIVITY,            NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "calendar.proton.me",               "ProtonCalendar", NDPI_PROTOCOL_PROTON_CALENDAR, NDPI_PROTOCOL_CATEGORY_PRODUCTIVITY,            NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "docs.proton.me",                   "ProtonDocs",     NDPI_PROTOCOL_PROTON_DOCS,     NDPI_PROTOCOL_CATEGORY_COLLABORATIVE,           NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "wallet.proton.me",                 "ProtonWallet",   NDPI_PROTOCOL_PROTON_WALLET,   NDPI_PROTOCOL_CATEGORY_CRYPTO_BLOCKCHAIN,       NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "lumo.proton.me",                   "ProtonLumo",     NDPI_PROTOCOL_PROTON_LUMO,     NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "meet.proton.me",                   "ProtonMeet",     NDPI_PROTOCOL_PROTON_MEET,     NDPI_PROTOCOL_CATEGORY_CHAT,                    NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "roblox.com",                       "Roblox", NDPI_PROTOCOL_ROBLOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "rbxcdn.com",                       "Roblox", NDPI_PROTOCOL_ROBLOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
