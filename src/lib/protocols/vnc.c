@@ -1,7 +1,7 @@
 /*
  * vnc.c
  *
- * Copyright (C) 2016-22 - ntop.org
+ * Copyright (C) 2016-26 - ntop.org
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -27,39 +27,56 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
+/*
+ * RFC 6143, Section 7.1.1 - ProtocolVersion Handshake
+ *
+ * Both the server and the client start the session by sending a fixed,
+ * 12-byte banner of the form "RFB xxx.yyy\n", where xxx and yyy are
+ * three ASCII decimal digits giving the major and minor version
+ * (e.g. "RFB 003.008\n"). Either endpoint may send its banner first;
+ * a VNC/RFB session is confirmed once both banners have been observed.
+ */
+#define VNC_RFB_BANNER_LEN 12
+
+static int vnc_is_rfb_banner(const struct ndpi_packet_struct *packet)
+{
+  const u_int8_t *b = packet->payload;
+
+  if(packet->payload_packet_len != VNC_RFB_BANNER_LEN)
+    return 0;
+
+  if(memcmp(b, "RFB ", 4) != 0 || b[7] != '.' || b[11] != 0x0a)
+    return 0;
+
+  return(ndpi_isdigit(b[4]) && ndpi_isdigit(b[5]) && ndpi_isdigit(b[6]) &&
+         ndpi_isdigit(b[8]) && ndpi_isdigit(b[9]) && ndpi_isdigit(b[10]));
+}
+
 static void ndpi_search_vnc_tcp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search vnc\n");
-  /* search over TCP */
-  if(packet->tcp) {
 
+  if(vnc_is_rfb_banner(packet)) {
     if(flow->l4.tcp.vnc_stage == 0) {
-      if((packet->payload_packet_len == 12) &&
-	 (((memcmp(packet->payload, "RFB 003.", 7) == 0) && (packet->payload[11] == 0x0a))
-	  ||
-	  ((memcmp(packet->payload, "RFB 004.", 7) == 0) && (packet->payload[11] == 0x0a)))) {
-	NDPI_LOG_DBG2(ndpi_struct, "reached vnc stage one\n");
-	flow->l4.tcp.vnc_stage = 1 + packet->packet_direction;
-	return;
-      }
-    } else if(flow->l4.tcp.vnc_stage == 2 - packet->packet_direction) {
+      /* First RFB banner observed: remember which side sent it */
+      NDPI_LOG_DBG2(ndpi_struct, "reached vnc stage one\n");
+      flow->l4.tcp.vnc_stage = 1 + packet->packet_direction;
+      return;
+    }
 
-      if((packet->payload_packet_len == 12) &&
-	 (((memcmp(packet->payload, "RFB 003.", 7) == 0) && (packet->payload[11] == 0x0a))
-	  ||
-	  ((memcmp(packet->payload, "RFB 004.", 7) == 0) && (packet->payload[11] == 0x0a)))) {	   
-	NDPI_LOG_INFO(ndpi_struct, "found vnc\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VNC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-	ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found VNC"); /* Remote assistance */
-	return;
-      }
+    if(flow->l4.tcp.vnc_stage == (u_int64_t)(2 - packet->packet_direction)) {
+      /* Matching RFB banner from the other side: handshake complete */
+      NDPI_LOG_INFO(ndpi_struct, "found vnc\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VNC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found VNC"); /* Remote assistance */
+      return;
     }
   }
+
   NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
-
 
 void init_vnc_dissector(struct ndpi_detection_module_struct *ndpi_struct)
 {

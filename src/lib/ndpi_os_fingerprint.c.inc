@@ -60,7 +60,7 @@ static struct os_fingerprint tcp_fps[] = {
 
     { "194_64_65535_15db81ff8b0d",  ndpi_os_ios_ipad_os },
     { "194_64_65535_dd5737e4fedb",  ndpi_os_ios_ipad_os },
-    { "194_64_65535_d3a424420f2a",  ndpi_os_ios_ipad_os },
+    /* { "194_64_65535_d3a424420f2a",  ndpi_os_ios_ipad_os }, */ /* Used by both macOS and iOS/iPad */
     /* { "194_64_0_d29295416479",      ndpi_os_ios_ipad_os }, */ /* Used by both macOS and iOS/iPad */
 
     { "194_64_65535_d29295416479",  ndpi_os_macos       },
