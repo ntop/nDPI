@@ -38,9 +38,14 @@
 
 #define PKT_LEN_ALERT 512
 
-
 static void search_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		       struct ndpi_flow_struct *flow);
+
+static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct,
+			    struct ndpi_flow_struct *flow);
+
+static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
+			   struct ndpi_flow_struct *flow);
 
 /* *********************************************** */
 
@@ -684,6 +689,151 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* *********************************************** */
 
+static void dns_tcp_reasm_free_dir(struct ndpi_dns_tcp_reasm *reasm)
+{
+  if(reasm->buf != NULL) {
+    ndpi_free(reasm->buf);
+    reasm->buf = NULL;
+  }
+
+  reasm->cur_len = 0;
+  reasm->msg_len = 0;
+}
+
+/* *********************************************** */
+
+static void dns_tcp_reasm_enable_extra(struct ndpi_flow_struct *flow)
+{
+  if(flow->extra_packets_func == NULL &&
+     flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+    flow->max_extra_packets_to_check = 5;
+    flow->extra_packets_func = search_dns_again;
+  }
+}
+
+/* *********************************************** */
+
+static int dns_tcp_reasm_append(struct ndpi_dns_tcp_reasm *reasm,
+				const u_int8_t *data, u_int16_t len)
+{
+  u_int32_t new_len;
+
+  if(len == 0)
+    return 0;
+
+  new_len = (u_int32_t)reasm->cur_len + len;
+  if(new_len > (u_int32_t)NDPI_DNS_TCP_MAX_MSG_LEN + 2)
+    return -1;
+
+  if(reasm->buf == NULL) {
+    reasm->buf = ndpi_malloc(new_len);
+    if(reasm->buf == NULL)
+      return -1;
+
+    memcpy(reasm->buf, data, len);
+    reasm->cur_len = len;
+    return 0;
+  }
+
+  reasm->buf = ndpi_realloc(reasm->buf, new_len);
+  if(reasm->buf == NULL)
+    return -1;
+
+  memcpy(&reasm->buf[reasm->cur_len], data, len);
+  reasm->cur_len = new_len;
+
+  return 0;
+}
+
+/* *********************************************** */
+
+static void dns_tcp_reasm_consume(struct ndpi_dns_tcp_reasm *reasm, u_int32_t consumed)
+{
+  if(consumed >= reasm->cur_len) {
+    dns_tcp_reasm_free_dir(reasm);
+    return;
+  }
+
+  memmove(reasm->buf, &reasm->buf[consumed], reasm->cur_len - consumed);
+  reasm->cur_len -= consumed;
+  reasm->msg_len = 0;
+}
+
+/* *********************************************** */
+
+static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
+			   struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  struct ndpi_dns_tcp_reasm *reasm;
+  const u_int8_t *original_payload;
+  u_int16_t original_payload_len;
+  u_int16_t msg_len, total_len;
+  int processed = 0;
+
+  if(flow->dns_tcp_reasm == NULL) {
+    flow->dns_tcp_reasm = ndpi_calloc(1, sizeof(struct ndpi_dns_tcp_reasm_state));
+    if(flow->dns_tcp_reasm == NULL)
+      return -1;
+  }
+
+  reasm = &flow->dns_tcp_reasm->dir[packet->packet_direction];
+
+  if(dns_tcp_reasm_append(reasm, packet->payload, packet->payload_packet_len) < 0) {
+    dns_tcp_reasm_free_dir(reasm);
+    return -1;
+  }
+
+  original_payload = packet->payload;
+  original_payload_len = packet->payload_packet_len;
+
+  while(1) {
+    if(reasm->cur_len < 2) {
+      dns_tcp_reasm_enable_extra(flow);
+      packet->payload = original_payload;
+      packet->payload_packet_len = original_payload_len;
+      return processed > 0 ? 1 : 0;
+    }
+
+    if(reasm->msg_len == 0)
+      reasm->msg_len = ntohs(get_u_int16_t(reasm->buf, 0));
+
+    msg_len = reasm->msg_len;
+    if(msg_len > NDPI_DNS_TCP_MAX_MSG_LEN) {
+      dns_tcp_reasm_free_dir(reasm);
+      packet->payload = original_payload;
+      packet->payload_packet_len = original_payload_len;
+      return -1;
+    }
+
+    total_len = 2 + msg_len;
+
+    if(reasm->cur_len < total_len) {
+      dns_tcp_reasm_enable_extra(flow);
+      packet->payload = original_payload;
+      packet->payload_packet_len = original_payload_len;
+      return processed > 0 ? 1 : 0;
+    }
+
+    if(msg_len == 0) {
+      dns_tcp_reasm_consume(reasm, 2);
+      continue;
+    }
+
+    packet->payload = (u_int8_t *)reasm->buf;
+    packet->payload_packet_len = total_len;
+    search_dns(ndpi_struct, flow);
+    processed = 1;
+
+    packet->payload = original_payload;
+    packet->payload_packet_len = original_payload_len;
+
+    dns_tcp_reasm_consume(reasm, total_len);
+  }
+}
+
+/* *********************************************** */
+
 static int keep_extra_dissection(struct ndpi_flow_struct *flow)
 {
   /* As a general rule, we wait for a valid response
@@ -698,6 +848,15 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 
   if(packet->tcp_retransmission || packet->payload_packet_len == 0)
     return keep_extra_dissection(flow);
+
+  if(packet->tcp != NULL) {
+    if(dns_tcp_process(ndpi_struct, flow) < 0) {
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return 0;
+    }
+
+    return keep_extra_dissection(flow);
+  }
 
   /* possibly dissect the DNS reply */
   search_dns(ndpi_struct, flow);
@@ -980,11 +1139,26 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     return;
   }
 
-  /* Since:
-      UDP: every packet must contains a complete/valid DNS message;
-      TCP: we are not able to handle DNS messages spanning multiple TCP packets;
-     we must be able to detect these protocols on the first packet
-  */
+  if(packet->tcp != NULL) {
+    int rc;
+
+    if(packet->payload_packet_len == 0) {
+      dns_tcp_reasm_enable_extra(flow);
+      return;
+    }
+
+    rc = dns_tcp_process(ndpi_struct, flow);
+    if(rc < 0) {
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return;
+    }
+    if(rc == 0)
+      dns_tcp_reasm_enable_extra(flow);
+    return;
+  }
+
+  /* Since every UDP packet must contain a complete/valid DNS message,
+     we must be able to detect these protocols on the first packet */
   if(packet->payload_packet_len < sizeof(struct ndpi_dns_packet_header) + payload_offset) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
