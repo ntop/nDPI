@@ -1,0 +1,36 @@
+DPI Packets (TCP):	7	(7.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 161 (161.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    1/1/0 (insert/search/found)
+Automa host:          2/2 (search/found)
+Automa domain:        2/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 20/11 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+DNS	11	830	1
+
+Acceptable                      11 830           1            
+
+Network                         11 830           1            
+
+	1	TCP 10.61.20.100:50060 <-> 10.21.208.15:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][cat: Network/14][Breed: Acceptable][6 pkts/436 bytes <-> 5 pkts/394 bytes][Goodput ratio: 18/24][< 1 sec][Hostname/SNI: 0-prod-dynamite-prod-00-us-signaler-pa.clients6.google.com][142.250.75.42][DNS Id: 0x12d8][bytes ratio: 0.051 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 73/79 130/148 26/35][TCP Fingerprint: 2_128_65535_6bb88f5575fd/Windows][PLAIN TEXT (dynamite)][Plen Bins: 33,0,66,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
