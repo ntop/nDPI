@@ -779,6 +779,18 @@ void signal_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
                         struct ndpi_flow_struct *flow);
 
 /* DNS */
+#define NDPI_DNS_TCP_MAX_MSG_LEN 16384
+
+struct ndpi_dns_tcp_reasm {
+  u_int8_t *buf;
+  u_int16_t cur_len;
+  u_int16_t msg_len; /* 0 = length prefix not yet parsed */
+};
+
+struct ndpi_dns_tcp_reasm_state {
+  struct ndpi_dns_tcp_reasm dir[2];
+};
+
 void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct,
                      struct ndpi_flow_struct *flow);
 

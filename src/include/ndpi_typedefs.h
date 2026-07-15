@@ -1725,6 +1725,8 @@ struct ndpi_flow_struct {
     u_int16_t pktbuf_maxlen, pktbuf_currlen;
   } kerberos_buf;
 
+  struct ndpi_dns_tcp_reasm_state *dns_tcp_reasm;
+
   struct {
     u_int8_t maybe_dtls:1, rtcp_seen:1, is_turn : 1, is_client_controlling:1, pad : 4;
     ndpi_address_port mapped_address, peer_address, relayed_address, response_origin, other_address;
