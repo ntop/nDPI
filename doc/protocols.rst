@@ -4342,7 +4342,7 @@ References: `Official site: <https://www.netmotionsoftware.com>`_
 
 `NDPI_PROTOCOL_PROTON`
 ======================
-Proton account/umbrella traffic (proton.me): sign-in and any Proton AG service not matched by a more specific Proton protocol below. Proton VPN keeps its own NDPI_PROTOCOL_PROTONVPN.
+Proton account/umbrella traffic (proton.me): sign-in and any Proton AG service not matched by a more specific Proton protocol below.
 
 References: `Official site: <https://proton.me/>`_
 

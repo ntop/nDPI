@@ -1404,11 +1404,9 @@ static ndpi_protocol_match host_match[] =
 
    { "nvidia.com",                       "Nvidia", NDPI_PROTOCOL_NVIDIA, NDPI_PROTOCOL_CATEGORY_WEB, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL},
 
-   /* Proton VPN: control plane only; the VPN data plane is WireGuard/OpenVPN */
    { "protonvpn.com",                    "ProtonVPN",      NDPI_PROTOCOL_PROTONVPN,       NDPI_PROTOCOL_CATEGORY_VPN,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "protonvpn.net",                    "ProtonVPN",      NDPI_PROTOCOL_PROTONVPN,       NDPI_PROTOCOL_CATEGORY_VPN,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "vpn-api.proton.me",                "ProtonVPN",      NDPI_PROTOCOL_PROTONVPN,       NDPI_PROTOCOL_CATEGORY_VPN,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
-   /* Proton umbrella: account/login, base site and any not-yet-listed suite */
    { "proton.black",                     "Proton",         NDPI_PROTOCOL_PROTON,          NDPI_PROTOCOL_CATEGORY_WEB,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "proton.me",                        "Proton",         NDPI_PROTOCOL_PROTON,          NDPI_PROTOCOL_CATEGORY_WEB,                     NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "mail-api.proton.me",               "ProtonMail",     NDPI_PROTOCOL_PROTON_MAIL,     NDPI_PROTOCOL_CATEGORY_MAIL,                    NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
