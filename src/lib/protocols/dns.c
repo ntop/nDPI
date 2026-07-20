@@ -718,6 +718,7 @@ static int dns_tcp_reasm_append(struct ndpi_dns_tcp_reasm *reasm,
 				const u_int8_t *data, u_int16_t len)
 {
   u_int32_t new_len;
+  u_int8_t *new_buf;
 
   if(len == 0)
     return 0;
@@ -736,14 +737,11 @@ static int dns_tcp_reasm_append(struct ndpi_dns_tcp_reasm *reasm,
     return 0;
   }
 
-  {
-    u_int8_t *new_buf = (u_int8_t *)ndpi_realloc(reasm->buf, new_len);
+  new_buf = (u_int8_t *)ndpi_realloc(reasm->buf, new_len);
+  if(new_buf == NULL)
+    return -1;
 
-    if(new_buf == NULL)
-      return -1;
-
-    reasm->buf = new_buf;
-  }
+  reasm->buf = new_buf;
 
   memcpy(&reasm->buf[reasm->cur_len], data, len);
   reasm->cur_len = new_len;
