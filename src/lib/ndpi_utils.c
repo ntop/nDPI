@@ -5452,126 +5452,185 @@ struct ndpi_tls_block* ndpi_decode_tls_blocks(const u_char *encoded_blocks,
 
 const char* ndpi_tls_extension2str(u_int16_t extension_id,
 				   char unknown_extn[8]) {
-  switch(extension_id) {
-    /* RFC 6066 - TLS Extensions Definitions */
-  case 0: return "server_name";
-  case 1: return "max_fragment_length";
-  case 2: return "client_certificate_url";
-  case 3: return "trusted_ca_keys";
-  case 4: return "truncated_hmac";
-  case 5: return "status_request";
+  switch (extension_id) {
+	/* RFC 6066 - TLS Extensions Definitions */
+case 0: return "server_name";
+case 1: return "max_fragment_length";
+case 2: return "client_certificate_url";
+case 3: return "trusted_ca_keys";
+case 4: return "truncated_hmac";
+case 5: return "status_request";
 
-    /* RFC 4366 - Transport Layer Security (TLS) Extensions */
-  case 6: return "user_mapping";
-  case 7: return "client_authz";
-  case 8: return "server_authz";
+/* RFC 4681 - TLS User Mapping Extension */
+case 6: return "user_mapping";
 
-    /* RFC 4492 - Elliptic Curve Cryptography (ECC) Cipher Suites */
-  case 10: return "supported_groups";  /* Formerly "elliptic_curves" */
-  case 11: return "ec_point_formats";
+/* RFC 5878 - TLS Authorization Extensions */
+case 7: return "client_authz";                             
+case 8: return "server_authz";                             
 
-    /* RFC 4681 - TLS User Mapping Extension */
-  case 12: return "srp";
-  case 13: return "signature_algorithms";
-  case 14: return "use_srtp";
-  case 15: return "heartbeat";
+/* RFC 6091 - Using OpenPGP Keys for TLS Authentication */
+case 9: return "cert_type";                                
 
-    /* RFC 7301 - Application-Layer Protocol Negotiation (ALPN) */
-  case 16: return "application_layer_protocol_negotiation";
+/* RFC 8422 - Elliptic Curve Cryptography (ECC) Cipher Suites */
+case 10: return "supported_groups";                        
+case 11: return "ec_point_formats";                        
 
-    /* RFC 7685 - A TLS Extension for Certificate Status Request */
-  case 17: return "status_request_v2";
-  case 18: return "signed_certificate_timestamp";
-  case 19: return "client_certificate_type";
-  case 20: return "server_certificate_type";
+/* RFC 5054 - Using the Secure Remote Password (SRP) Protocol for TLS */
+case 12: return "srp";                                    
 
-    /* RFC 8879 - TLS Certificate Compression */
-  case 22: return "compress_certificate";
+/* RFC 8446 - The Transport Layer Security (TLS) Protocol Version 1.3 */
+case 13: return "signature_algorithms";                    
 
-    /* RFC 8449 - Record Size Limit Extension */
-  case 28: return "record_size_limit";
+/* RFC 5764 - DTLS Extension to Establish SRTP */
+case 14: return "use_srtp";                                
 
-    /* RFC 5746 - Transport Layer Security (TLS) Renegotiation Indication */
-  case 65281: return "renegotiation_info";
+/* RFC 6520 - TLS Heartbeat Extension */
+case 15: return "heartbeat";                               
 
-    /* TLS 1.3 Extensions (RFC 8446) */
-  case 21: return "padding";
-  case 23: return "session_ticket";
-  case 24: return "pre_shared_key";
-  case 25: return "early_data";
-  case 26: return "supported_versions";
-  case 27: return "cookie";
-  case 29: return "preshared_key";  /* Alternate spelling */
-  case 30: return "psk_key_exchange_modes";
-  case 31: return "ticket_early_data_info";
-  case 32: return "certificate_authorities";
-  case 33: return "oid_filters";
-  case 34: return "post_handshake_auth";
-  case 35: return "signature_algorithms_cert";
-  case 36: return "key_share";
-  case 37: return "transparency_info";
-  case 38: return "connection_id";
-  case 39: return "external_id_hash";
-  case 40: return "external_session_id";
-  case 41: return "quic_transport_parameters";
-  case 42: return "ticket_request";
-  case 43: return "dnssec_chain";
+/* RFC 7301 - Application-Layer Protocol Negotiation (ALPN) */
+case 16: return "application_layer_protocol_negotiation";  
 
-    /* RFC 7627 - Extended Master Secret Extension */
-  case 44: return "extended_master_secret";
+/* RFC 6961 - TLS Multiple Certificate Status Request */
+case 17: return "status_request_v2";                      
 
-    /* RFC 8446 - Other TLS 1.3 extensions */
-  case 45: return "token_binding";
-  case 46: return "cached_info";
-  case 47: return "tls_lts";
+/* RFC 6962 - Certificate Transparency */
+case 18: return "signed_certificate_timestamp";            
 
-    /* Drafts and other extensions */
-  case 48: return "compress_certificate_algorithms";
-  case 49: return "record_size_limit";
-  case 50: return "pwd_protect";
-  case 51: return "pwd_clear";
-  case 52: return "password_salt";
-  case 53: return "ticket_pinning";
-  case 54: return "tls_cert_with_extern_psk";
-  case 55: return "delegated_credential";
-  case 56: return "session_ticket_tls";
-  case 57: return "TLD";
-  case 58: return "external_id_hash";
-  case 59: return "external_session_id";
-  case 60: return "quic_transport_parameters";
-  case 61: return "ticket_request";
-  case 62: return "dnssec_chain";
-  case 63: return "sequence_number_encryption_algorithms";
+/* RFC 7250 - Using Raw Public Keys in TLS */
+case 19: return "client_certificate_type";                 
+case 20: return "server_certificate_type";                 
 
-    /* GREASE values (RFC 8701) */
-  case 0x0A0A: return "(GREASE)";
-  case 0x1A1A: return "(GREASE)";
-  case 0x2A2A: return "(GREASE)";
-  case 0x3A3A: return "(GREASE)";
-  case 0x4A4A: return "(GREASE)";
-  case 0x5A5A: return "(GREASE)";
-  case 0x6A6A: return "(GREASE)";
-  case 0x7A7A: return "(GREASE)";
-  case 0x8A8A: return "(GREASE)";
-  case 0x9A9A: return "(GREASE)";
-  case 0xAAAA: return "(GREASE)";
-  case 0xBABA: return "(GREASE)";
-  case 0xCACA: return "(GREASE)";
-  case 0xDADA: return "(GREASE)";
-  case 0xEAEA: return "(GREASE)";
-  case 0xFAFA: return "(GREASE)";
+/* RFC 7685 - A TLS Extension for Certificate Status Request */
+case 21: return "padding";                                 
 
-  case 0x44CD: return "application_settings";
+/* RFC 7366 - Encrypt-then-MAC for TLS */
+case 22: return "encrypt_then_mac";                        
 
-    /* Custom/Private extensions (experimental range) */
-  case 65037: return "next_protocol_negotiation";  /*  Google NPN */
-  case 65280: return "extended_random";  /* Used in some implementations */
-  case 65282: return "token_binding";  /* Alternate value */
+/* RFC 7627 - Extended Master Secret Extension */
+case 23: return "extended_master_secret";                  
 
-  default:
-    ndpi_snprintf(unknown_extn, 8, "0X%04X", extension_id);
-    return(unknown_extn);
-  }
+/* RFC 8472 - Token Binding for TLS */
+case 24: return "token_binding";                           
+
+/* RFC 7924 - Transport Layer Security (TLS) Cached Information Extension */
+case 25: return "cached_info";                             
+
+/* draft-gutmann-tls-lts - TLS Long-term Support Extension */
+case 26: return "tls_lts";                                 
+
+/* RFC 8879 - TLS Certificate Compression */
+case 27: return "compress_certificate";                    
+
+/* RFC 8449 - Record Size Limit Extension */
+case 28: return "record_size_limit";                       
+
+/* RFC 8492 - Secure Password Ciphersuites */
+case 29: return "pwd_protect";                             
+case 30: return "pwd_clear";                               
+case 31: return "password_salt";                           
+
+/* RFC 8672 - TLS Ticket Pinning Extension */
+case 32: return "ticket_pinning";                          
+
+/* draft-ietf-tls-8773bis - TLS Certificate with External PSK */
+case 33: return "tls_cert_with_extern_psk";                
+
+/* RFC 9345 - Delegated Credentials for TLS */
+case 34: return "delegated_credential";                   
+
+/* RFC 5077 - Session Ticket */
+case 35: return "session_ticket";                         
+
+/* ETSI TS 103 523-2 - TLMSP */
+case 36: return "TLMSP";
+case 37: return "TLMSP_proxying";
+case 38: return "TLMSP_delegate";
+
+/* RFC 8870 - TLS Encrypted Key Transport */
+case 39: return "supported_ekt_ciphers";                   
+
+/* Reserved (formerly 40) */
+case 40: return "Reserved";                               
+
+/* TLS 1.3 Core Extensions (RFC 8446) */
+case 41: return "pre_shared_key";
+case 42: return "early_data";
+case 43: return "supported_versions";
+case 44: return "cookie";
+case 45: return "psk_key_exchange_modes";
+
+/* RFC 9847 Reserved (formerly 46) */
+case 46: return "Reserved";                               
+
+/* RFC 8446 */
+case 47: return "certificate_authorities";
+case 48: return "oid_filters";
+case 49: return "post_handshake_auth";
+case 50: return "signature_algorithms_cert";
+case 51: return "key_share";
+
+/* RFC 9162 - Certificate Transparency Version 2.0 */
+case 52: return "transparency_info";                       
+
+/* RFC 9146 - Connection ID for DTLS */
+case 53: return "connection_id (deprecated)";              
+case 54: return "connection_id";                           
+
+/* RFC 8844 - DTLS 1.3 Extension for External ID */
+case 55: return "external_id_hash";
+case 56: return "external_session_id";
+
+/* RFC 9001 - QUIC Transport Parameters */
+case 57: return "quic_transport_parameters";               
+
+/* RFC 9149 - TLS Ticket Requests */
+case 58: return "ticket_request";                          
+
+/* RFC 9102 - TLS DNSSEC Chain Extension */
+case 59: return "dnssec_chain";                            
+
+/* draft-pismenny-tls-dtls-plaintext-sequence-number */
+case 60: return "sequence_number_encryption_algorithms";
+
+/* draft-ietf-tls-dtls-rrc - RRC for DTLS 1.3 */
+case 61: return "rrc";                                     
+
+/* draft-ietf-tls-tlsflags - TLS Flags Extension */
+case 62: return "tls_flags";                               
+
+/* RFC 9849 - TLS Encrypted Client Hello (ECH) Extensions */
+case 64768: return "ech_outer_extensions";                 
+case 65037: return "encrypted_client_hello";               
+
+/* Private Use Range */
+case 65280:                                                
+case 65282 ... 65535: return "PrivateUse";                 
+
+/* RFC 5746 - Renegotiation Indication Extension */
+case 65281: return "renegotiation_info";                   
+
+/* GREASE values (RFC 8701) */
+case 0x0A0A:                                               
+case 0x1A1A:                                               
+case 0x2A2A:                                               
+case 0x3A3A:                                               
+case 0x4A4A:                                               
+case 0x5A5A:                                               
+case 0x6A6A:                                               
+case 0x7A7A:                                               
+case 0x8A8A:                                               
+case 0x9A9A:                                               
+case 0xAAAA:                                               
+case 0xBABA:                                               
+case 0xCACA:                                               
+case 0xDADA:                                               
+case 0xEAEA:                                               
+case 0xFAFA: return "(GREASE)";                            
+
+default:
+	ndpi_snprintf(unknown_extn, 8, "0X%04X", extension_id);
+	return unknown_extn;
+}
 }
 
 /* ****************************************** */
