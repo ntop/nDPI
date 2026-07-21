@@ -170,7 +170,7 @@ int ndpi_get_geoip_aso(struct ndpi_detection_module_struct *ndpi_str, char *ip, 
           aso[0] = '\0';
         else
         {
-          int str_len = ndpi_min(entry_data.data_size, aso_len);
+          int str_len = ndpi_min(entry_data.data_size, (u_int32_t)aso_len - 1);
 
           memcpy(aso, entry_data.utf8_string, str_len);
           aso[str_len] = '\0';
@@ -224,7 +224,7 @@ int ndpi_get_geoip_country_continent(struct ndpi_detection_module_struct *ndpi_s
           country_code[0] = '\0';
         else
         {
-          int str_len = ndpi_min(entry_data.data_size, country_code_len);
+          int str_len = ndpi_min(entry_data.data_size, (u_int32_t)country_code_len - 1);
 
           memcpy(country_code, entry_data.utf8_string, str_len);
           country_code[str_len] = '\0';
@@ -244,7 +244,7 @@ int ndpi_get_geoip_country_continent(struct ndpi_detection_module_struct *ndpi_s
           continent[0] = '\0';
         else
         {
-          int str_len = ndpi_min(entry_data.data_size, continent_len);
+          int str_len = ndpi_min(entry_data.data_size, (u_int32_t)continent_len - 1);
 
           memcpy(continent, entry_data.utf8_string, str_len);
           continent[str_len] = '\0';
@@ -294,7 +294,7 @@ int ndpi_get_geoip_country_continent_city(struct ndpi_detection_module_struct *n
           country_code[0] = '\0';
         else
         {
-          int str_len = ndpi_min(entry_data.data_size, country_code_len);
+          int str_len = ndpi_min(entry_data.data_size, (u_int32_t)country_code_len - 1);
 
           memcpy(country_code, entry_data.utf8_string, str_len);
           country_code[str_len] = '\0';
@@ -309,7 +309,7 @@ int ndpi_get_geoip_country_continent_city(struct ndpi_detection_module_struct *n
           continent[0] = '\0';
         else
         {
-          int str_len = ndpi_min(entry_data.data_size, continent_len);
+          int str_len = ndpi_min(entry_data.data_size, (u_int32_t)continent_len - 1);
 
           memcpy(continent, entry_data.utf8_string, str_len);
           continent[str_len] = '\0';
@@ -324,7 +324,7 @@ int ndpi_get_geoip_country_continent_city(struct ndpi_detection_module_struct *n
           city[0] = '\0';
         else
         {
-          int len = ndpi_min(entry_data.data_size, city_len);
+          int len = ndpi_min(entry_data.data_size, (u_int32_t)city_len - 1);
 
           memcpy(city, entry_data.utf8_string, len);
           city[len] = 0;
