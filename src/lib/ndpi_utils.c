@@ -5627,10 +5627,12 @@ case 0xEAEA:
 case 0xFAFA: return "(GREASE)";                            
 
 default:
-	if (extension_id >= 65282 && extension_id <= 65535)
+	/* Range 65282 ... 65535. Removed check to avoid:
+	   warning: comparison is always true due to limited range of data type */
+	if (extension_id >= 65282)
    		return "PrivateUse";
 	ndpi_snprintf(unknown_extn, 8, "0X%04X", extension_id);
-		return unknown_extn;
+	return unknown_extn;
 }
 }
 
