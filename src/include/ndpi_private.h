@@ -778,8 +778,11 @@ int signal_search_into_cache(struct ndpi_detection_module_struct* ndpi_struct,
 void signal_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
                         struct ndpi_flow_struct *flow);
 
-/* DNS */
-#define NDPI_DNS_TCP_MAX_MSG_LEN 16384
+/* RFC 1035: max DNS message size in the TCP 16-bit length field (65535).
+ * RFC 7766: DNS over TCP. Dissection passes the 2-byte prefix + message in
+ * packet->payload_packet_len (u_int16_t), so the on-wire unit is rejected when
+ * 2 + message_size exceeds this same limit (largest dissectable message: 65533). */
+#define NDPI_DNS_TCP_MAX_MSG_LEN 65535
 
 struct ndpi_dns_tcp_reasm {
   u_int8_t *buf;
