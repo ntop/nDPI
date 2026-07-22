@@ -5603,8 +5603,7 @@ case 64768: return "ech_outer_extensions";
 case 65037: return "encrypted_client_hello";               
 
 /* Private Use Range */
-case 65280:                                                
-case 65282 ... 65535: return "PrivateUse";                 
+case 65280: return "PrivateUse";                 
 
 /* RFC 5746 - Renegotiation Indication Extension */
 case 65281: return "renegotiation_info";                   
@@ -5628,8 +5627,10 @@ case 0xEAEA:
 case 0xFAFA: return "(GREASE)";                            
 
 default:
+	if (extension_id >= 65282 && extension_id <= 65535)
+   		return "PrivateUse";
 	ndpi_snprintf(unknown_extn, 8, "0X%04X", extension_id);
-	return unknown_extn;
+		return unknown_extn;
 }
 }
 
