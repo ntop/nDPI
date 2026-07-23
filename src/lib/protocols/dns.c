@@ -928,27 +928,15 @@ static int keep_extra_dissection(struct ndpi_flow_struct *flow)
 
 static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  struct ndpi_dns_tcp_reasm *reasm;
 
   if(packet->tcp_retransmission || packet->payload_packet_len == 0) {
-    if(flow->dns_tcp_reasm != NULL &&
-       flow->dns_tcp_reasm->dir[packet->packet_direction].cur_len > 0)
-      return 1;
     return keep_extra_dissection(flow);
   }
 
   if(packet->tcp != NULL) {
     if(dns_tcp_process(ndpi_struct, flow) < 0) {
-      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-      return 0;
+      return 0; /* Something is seriously wrong: stop here */
     }
-
-    if(flow->dns_tcp_reasm != NULL) {
-      reasm = &flow->dns_tcp_reasm->dir[packet->packet_direction];
-      if(reasm->cur_len > 0)
-        return 1;
-    }
-
     return keep_extra_dissection(flow);
   }
 
@@ -1198,14 +1186,12 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
 void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t s_port = 0, d_port = 0;
-  int payload_offset = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
 
   if(packet->udp != NULL) {
     s_port = ntohs(packet->udp->source);
     d_port = ntohs(packet->udp->dest);
-    payload_offset = 0;
 
     /* For MDNS/LLMNR: If the packet is not a response, dest addr needs to be multicast. */
     if ((d_port == MDNS_PORT && isMDNSMulticastAddress(packet) == 0) ||
@@ -1222,7 +1208,6 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   } else if(packet->tcp != NULL) {
     s_port = ntohs(packet->tcp->source);
     d_port = ntohs(packet->tcp->dest);
-    payload_offset = 2;
   }
 
   /* We are able to detect DNS/MDNS/LLMNR only on standard ports (see #1788) */
@@ -1234,9 +1219,6 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   }
 
   if(packet->tcp != NULL) {
-    if(packet->payload_packet_len == 0)
-      return;
-
     if(dns_tcp_process(ndpi_struct, flow) < 0)
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
@@ -1244,7 +1226,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
   /* Since every UDP packet must contain a complete/valid DNS message,
      we must be able to detect these protocols on the first packet */
-  if(packet->payload_packet_len < sizeof(struct ndpi_dns_packet_header) + payload_offset) {
+  if(packet->payload_packet_len < sizeof(struct ndpi_dns_packet_header)) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
