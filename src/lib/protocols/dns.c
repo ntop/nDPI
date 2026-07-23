@@ -728,7 +728,7 @@ static void dns_tcp_reasm_enable_extra(struct ndpi_detection_module_struct *ndpi
      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_LLMNR)
     return;
 
-  flow->max_extra_packets_to_check = 5;
+  flow->max_extra_packets_to_check = ndpi_struct->cfg.dns_max_packets_extra_dissection;
   flow->extra_packets_func = search_dns_again;
 }
 
@@ -1148,7 +1148,7 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
      flow->detected_protocol_stack[1] != NDPI_PROTOCOL_LLMNR) {
     if(keep_extra_dissection(flow)) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
-      flow->max_extra_packets_to_check = 5;
+      flow->max_extra_packets_to_check = ndpi_struct->cfg.dns_max_packets_extra_dissection;
       flow->extra_packets_func = search_dns_again;
     }
   }
