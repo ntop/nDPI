@@ -38,6 +38,13 @@
 
 #define PKT_LEN_ALERT 512
 
+/* Max DNS message size is 65535.
+ * Over TCP we also have the 2-byte prefix -> max L5 length is 65537
+ * However our internal engine doesn't handle pkt/message bigger than 65535
+ * (because ip length and packet->payload_packet_len are 16 bits long) ->
+ * clamp to 65533. That shouldn't have any practical effects.... */
+#define DNS_TCP_MAX_MSG_LEN 65533
+
 
 static void search_dns(struct ndpi_detection_module_struct *ndpi_struct,
 		       struct ndpi_flow_struct *flow);
@@ -737,7 +744,7 @@ static int dns_tcp_reasm_append(struct ndpi_dns_tcp_reasm *reasm,
     return 0;
 
   new_len = (u_int32_t)reasm->cur_len + len;
-  if(new_len > (u_int32_t)NDPI_DNS_TCP_MAX_MSG_LEN)
+  if(new_len > (u_int32_t)(DNS_TCP_MAX_MSG_LEN + 2))
     return -1;
 
   if(reasm->buf == NULL) {
@@ -805,13 +812,11 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
   /* Fast path: dissect every complete length-prefixed message in this TCP payload. */
   for(offset = 0; offset + 2 <= original_payload_len; ) {
     msg_len = ntohs(get_u_int16_t(&original_payload[offset], 0));
-
-    if(msg_len > (u_int32_t)NDPI_DNS_TCP_MAX_MSG_LEN)
+    if(msg_len < sizeof(struct ndpi_dns_packet_header) ||
+       msg_len > DNS_TCP_MAX_MSG_LEN)
       return -1;
 
     total_len = 2 + msg_len;
-    if(total_len > (u_int32_t)NDPI_DNS_TCP_MAX_MSG_LEN)
-      return -1;
     if(offset + total_len > original_payload_len)
       break; /* incomplete message: handled below */
 
@@ -871,25 +876,17 @@ append_and_reasm:
 
     if(reasm->msg_len == 0) {
       msg_len = ntohs(get_u_int16_t(reasm->buf, 0));
-
-      if(msg_len > (u_int32_t)NDPI_DNS_TCP_MAX_MSG_LEN) {
+      if(msg_len < sizeof(struct ndpi_dns_packet_header) ||
+         msg_len > DNS_TCP_MAX_MSG_LEN) {
         dns_tcp_reasm_free_dir(reasm);
         packet->payload = original_payload;
         packet->payload_packet_len = original_payload_len;
-        return -1;
       }
-      reasm->msg_len = (u_int16_t)msg_len;
+      reasm->msg_len = msg_len;
     } else
       msg_len = reasm->msg_len;
 
     total_len = 2 + msg_len;
-
-    if(total_len > (u_int32_t)NDPI_DNS_TCP_MAX_MSG_LEN) {
-      dns_tcp_reasm_free_dir(reasm);
-      packet->payload = original_payload;
-      packet->payload_packet_len = original_payload_len;
-      return -1;
-    }
 
     if(reasm->cur_len < total_len) {
       dns_tcp_reasm_enable_extra(ndpi_struct, flow);
