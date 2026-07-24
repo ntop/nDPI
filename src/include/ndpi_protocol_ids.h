@@ -516,6 +516,7 @@ typedef enum {
   NDPI_PROTOCOL_PROTON_WALLET         = 484,
   NDPI_PROTOCOL_PROTON_LUMO           = 485,
   NDPI_PROTOCOL_PROTON_MEET           = 486,
+  NDPI_PROTOCOL_YGGDRASIL             = 487,
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 

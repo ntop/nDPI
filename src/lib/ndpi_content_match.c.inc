@@ -338,6 +338,8 @@ static ndpi_network6 host_protocol_list_6[] = {
  { "2403:300:a51::", 48, NDPI_PROTOCOL_APPLE_PUSH },
  { "2a01:b740:a42::", 48, NDPI_PROTOCOL_APPLE_PUSH },
 
+ { "ff02::114", 128, NDPI_PROTOCOL_YGGDRASIL },
+
  /* End */
  { NULL, 0, 0 }
 };

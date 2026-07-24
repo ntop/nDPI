@@ -1,0 +1,53 @@
+Guessed flow protos:	1
+
+DPI Packets (TCP):	5	(1.67 pkts/flow)
+DPI Packets (UDP):	2	(1.00 pkts/flow)
+Confidence DPI              : 4 (flows)
+Confidence Match by IP      : 1 (flows)
+Num dissector calls: 382 (76.40 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/3/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/2/0 (insert/search/found)
+LRU cache mining:     0/1/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          4/0 (search/found)
+Automa domain:        2/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 2/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   1/0 (search/found)
+Patricia protocols:   8/0 (search/found)
+Patricia protocols IPv6: 1/1 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 36/22 (search/found)
+Hash ja4 custom protos:    3/0 (search/found)
+Hash fp custom protos:     1/0 (search/found)
+Hash url custom protos:    1/0 (search/found)
+
+TLS	2	3430	1
+QUIC	2	2644	1
+Yggdrasil	8	1685	3
+
+Safe                             2 3430          1            
+Acceptable                      10 4329          4            
+
+VPN                              8 1685          3            
+Web                              4 6074          2            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.3.25             	 1      
+
+
+	1	TCP 192.168.3.25:38860 <-> 5.252.226.123:1338 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Safe][1 pkts/1540 bytes <-> 1 pkts/1890 bytes][Goodput ratio: 96/96][0.03 sec][Hostname/SNI: ygg1.mk16.de][TLS Supported Versions: TLSv1.3;TLSv1.2][Risk: ** Known Proto on Non Std Port **** TLS (probably) Not Carrying HTTPS **][Risk Score: 60][Risk Info: No ALPN;Expected on port 443][nDPI Cli Fingerprint: 8b621ccfc2061d2ef697057bd7572d53][nDPI Srv Fingerprint: a2da83e97c3d][TLSv1.3][JA4: t13d131000_f57a46bbacb6_e7c285222651][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,50]
+	2	UDP 5.252.226.123:1339 <-> 192.168.3.25:46520 [proto: 188/QUIC][Stack: QUIC][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 188/QUIC, Confidence: DPI][DPI packets: 1][cat: Web/5][Breed: Acceptable][1 pkts/1322 bytes <-> 1 pkts/1322 bytes][Goodput ratio: 97/97][0.00 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: No server to client traffic;Expected on port 443][QUIC ver: V-1][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0]
+	3	TCP 192.168.3.25:52268 <-> 5.252.226.123:1340 [proto: 7.487/HTTP.Yggdrasil][Stack: HTTP.Yggdrasil][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7.487/HTTP.Yggdrasil, Confidence: DPI][DPI packets: 2][cat: VPN/2][Breed: Acceptable][3 pkts/686 bytes <-> 2 pkts/455 bytes][Goodput ratio: 71/71][0.02 sec][Hostname/SNI: ygg1.mk16.de][URL: ygg1.mk16.de/?key=0000000087ee9949eeab56bd430ee8f324cad55abf3993ed9b9be63ce693e18a][StatusCode: 101][User-Agent: Go-http-client/1.1][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 80][PLAIN TEXT (0000000087ee9949eeab56bd430)][Plen Bins: 0,20,0,20,20,0,20,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 192.168.3.25:50826 <-> 5.252.226.123:1337 [proto: 487/Yggdrasil][Stack: Yggdrasil][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 487/Yggdrasil, Confidence: DPI][DPI packets: 1][cat: VPN/2][Breed: Acceptable][1 pkts/189 bytes <-> 1 pkts/189 bytes][Goodput ratio: 65/65][0.03 sec][PLAIN TEXT (Dtmeta)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP [fe80::7cce:ae80:8900:9424]:9001 -> [ff02::114]:9001 [proto: 487/Yggdrasil][Stack: Yggdrasil][IP: 487/Yggdrasil][Encrypted][Confidence: Match by IP][FPC: 487/Yggdrasil, Confidence: IP address][DPI packets: 1][cat: VPN/2][Breed: Acceptable][1 pkts/166 bytes -> 0 pkts/0 bytes][Goodput ratio: 62/0][< 1 sec][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 6.247 (Executable?)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

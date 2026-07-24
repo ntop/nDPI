@@ -4417,3 +4417,12 @@ References: `Official site: <https://lumo.proton.me/>`_
 Proton Meet is an end-to-end encrypted video conferencing service by Proton AG.
 
 References: `Official site: <https://proton.me/meet>`_
+
+
+.. _Proto_487:
+
+`NDPI_PROTOCOL_YGGDRASIL`
+=========================
+Yggdrasil is a new experimental compact routing scheme. It is designed to be a future-proof and decentralised alternative to the structured routing protocols commonly used today on the Internet, as well as an enabling technology for future large-scale mesh networks.
+
+References: `Official site: <https://yggdrasil-network.github.io/>`_
