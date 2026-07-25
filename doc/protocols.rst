@@ -492,6 +492,14 @@ iQIYI is a Chinese online video platform with original and licensed movies, dram
 References: `iQIYI official site: <https://www.iqiyi.com/>`_
 
 
+.. _Proto_55:
+
+`NDPI_PROTOCOL_MESHTASTIC`
+==========================
+An open source, off-grid, decentralized mesh network built to run on affordable, low-power devices. No cell towers. No internet. Just pure peer-to-peer connectivity.
+
+References: `TCP Client API: <https://meshtastic.org/docs/development/device/client-api/>`_
+
 
 .. _Proto_56:
 

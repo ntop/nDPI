@@ -44,6 +44,10 @@ enum protobuf_type {
   PT_I32
 };
 
+size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
+                        size_t * const protobuf_elements,
+                        size_t * const protobuf_len_elements);
+
 static void ndpi_int_protobuf_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
                                              struct ndpi_flow_struct *flow)
 {
@@ -72,7 +76,7 @@ protobuf_dissect_tag(uint64_t tag, uint64_t * const field_number)
 }
 
 static int
-protobuf_dissect_varint(struct ndpi_packet_struct const * const packet,
+protobuf_dissect_varint(unsigned char const * const buffer, size_t size,
                         size_t * const offset, uint64_t * const value)
 {
   size_t i;
@@ -80,13 +84,13 @@ protobuf_dissect_varint(struct ndpi_packet_struct const * const packet,
 
   for (i = 0; i < 9; ++i)
   {
-    if (packet->payload_packet_len < *offset + i + 1)
+    if (size < *offset + i + 1)
     {
       return -1;
     }
 
-    *value |= ((uint64_t)(packet->payload[*offset + i] & 0x7F)) << (i * 8 - i);
-    if ((packet->payload[*offset + i] & 0x80) == 0)
+    *value |= ((uint64_t)(buffer[*offset + i] & 0x7F)) << (i * 8 - i);
+    if ((buffer[*offset + i] & 0x80) == 0)
     {
       break;
     }
@@ -96,15 +100,12 @@ protobuf_dissect_varint(struct ndpi_packet_struct const * const packet,
   return 0;
 }
 
-static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struct,
-                                 struct ndpi_flow_struct *flow)
+size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
+                        size_t * const protobuf_elements,
+                        size_t * const protobuf_len_elements)
 {
-  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
-
-  NDPI_LOG_DBG(ndpi_struct, "search Protobuf\n");
-
-  size_t protobuf_elements = 0;
-  size_t protobuf_len_elements = 0;
+  *protobuf_elements = 0;
+  *protobuf_len_elements = 0;
   size_t offset = 0;
 
 #ifdef DEBUG_PROTOBUF
@@ -116,7 +117,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
 #endif
     uint64_t tag;
     // A Protobuf tag has a type and a field number stored as u32 varint.
-    if (protobuf_dissect_varint(packet, &offset, &tag) != 0)
+    if (protobuf_dissect_varint(buffer, size, &offset, &tag) != 0)
     {
       break;
     }
@@ -125,8 +126,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
     enum protobuf_type type = protobuf_dissect_tag(tag, &field_number);
     if (type == PT_INVALID || field_number == 0 || field_number > (UINT_MAX >> 3))
     {
-      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-      return;
+      return 0;
     }
 
 #ifdef DEBUG_PROTOBUF
@@ -137,10 +137,9 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
       case PT_VARINT:
       {
         uint64_t value;
-        if (protobuf_dissect_varint(packet, &offset, &value) != 0)
+        if (protobuf_dissect_varint(buffer, size, &offset, &value) != 0)
         {
-          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-          return;
+          return 0;
         }
 #ifdef DEBUG_PROTOBUF
         printf("[VARINT: %llu / %llx]", (unsigned long long int)value,
@@ -149,10 +148,9 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
         break;
       }
       case PT_I64: {
-        if (packet->payload_packet_len < offset + sizeof(uint64_t))
+        if (size < offset + sizeof(uint64_t))
         {
-          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-          return;
+          return 0;
         }
 #ifdef DEBUG_PROTOBUF
         union {
@@ -170,23 +168,21 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
       case PT_LEN:
       {
         uint64_t length;
-        if (protobuf_dissect_varint(packet, &offset, &length) != 0)
+        if (protobuf_dissect_varint(buffer, size, &offset, &length) != 0)
         {
-          if (packet->payload_packet_len >= offset)
+          if (size >= offset)
           {
             break; // We are not excluding the protocol immediately. Let's wait for more packets to arrive..
           } else {
-            NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-            return;
+            return 0;
           }
         }
         if (length == 0 || length > INT_MAX)
         {
-          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-          return;
+          return 0;
         }
         offset += length;
-        protobuf_len_elements++;
+        (*protobuf_len_elements)++;
 #ifdef DEBUG_PROTOBUF
         printf("[LEN length: %llu]", (unsigned long long int)length);
 #endif
@@ -195,13 +191,11 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
       case PT_SGROUP:
       case PT_EGROUP:
         // Start/End groups are deprecated and therefor ignored to reduce false positives.
-        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-        return;
+        return 0;
       case PT_I32: {
-        if (packet->payload_packet_len < offset + sizeof(uint32_t))
+        if (size < offset + sizeof(uint32_t))
         {
-          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-          return;
+          return 0;
         }
 #ifdef DEBUG_PROTOBUF
         union {
@@ -218,7 +212,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
       case PT_INVALID:
         break;
     }
-  } while (++protobuf_elements < PROTOBUF_MAX_ELEMENTS);
+  } while (++(*protobuf_elements) < PROTOBUF_MAX_ELEMENTS);
 
 #ifdef DEBUG_PROTOBUF
   printf(" [offset: %llu][length: %u][elems: %llu][len_elems: %llu]\n",
@@ -226,6 +220,26 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
          (unsigned long long int)protobuf_elements,
          (unsigned long long int)protobuf_len_elements);
 #endif
+  return offset;
+}
+
+static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struct,
+                                 struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
+
+  NDPI_LOG_DBG(ndpi_struct, "search Protobuf\n");
+
+  size_t protobuf_elements = 0;
+  size_t protobuf_len_elements = 0;
+  size_t bytes_parsed = protobuf_dissect(packet->payload, packet->payload_packet_len,
+                                         &protobuf_elements, &protobuf_len_elements);
+
+  if (bytes_parsed == 0) {
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+    return;
+  }
+
   if ((protobuf_elements >= PROTOBUF_REQUIRED_ELEMENTS && protobuf_len_elements > 0 &&
        /* (On UDP) this packet might be also a RTP/RTCP one. Wait for the next one */
        (flow->packet_counter > 1 || flow->l4_proto == IPPROTO_TCP || flow->rtp_stage == 0))
@@ -238,7 +252,7 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
     return;
   }
 
-  if (packet->payload_packet_len >= offset
+  if (packet->payload_packet_len >= bytes_parsed
       && protobuf_elements > 0
       && flow->packet_counter <= PROTOBUF_MAX_PACKETS)
   {

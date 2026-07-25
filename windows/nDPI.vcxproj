@@ -278,6 +278,7 @@
     <ClCompile Include="..\src\lib\protocols\mail_smtp.c" />
     <ClCompile Include="..\src\lib\protocols\nexon.c" />
     <ClCompile Include="..\src\lib\protocols\megaco.c" />
+    <ClCompile Include="..\src\lib\protocols\meshtastic.c" />
     <ClCompile Include="..\src\lib\protocols\mgcp.c" />
     <ClCompile Include="..\src\lib\protocols\monero.c" />
     <ClCompile Include="..\src\lib\protocols\mpegts.c" />

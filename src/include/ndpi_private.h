@@ -1115,6 +1115,7 @@ void init_msgpack_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_sbe_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_iris_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_yggdrasil_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_meshtastic_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
   #include "../../../nDPI-custom/custom_ndpi_private.h"

@@ -84,7 +84,7 @@ typedef enum {
   NDPI_PROTOCOL_ICECAST               = 52,
   NDPI_PROTOCOL_CPHA                  = 53,
   NDPI_PROTOCOL_IQIYI                 = 54,
-  NDPI_PROTOCOL_FREE                  = 55, /* Free protocol */
+  NDPI_PROTOCOL_MESHTASTIC            = 55,
   NDPI_PROTOCOL_YANDEX_MARKET         = 56,
   NDPI_PROTOCOL_YANDEX_DISK           = 57,
   NDPI_PROTOCOL_DISCORD               = 58,
