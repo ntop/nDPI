@@ -288,6 +288,7 @@
     <ClCompile Include="..\src\lib\protocols\mudfish.c" />
     <ClCompile Include="..\src\lib\protocols\munin.c" />
     <ClCompile Include="..\src\lib\protocols\mysql.c" />
+    <ClCompile Include="..\src\lib\protocols\nebula.c" />
     <ClCompile Include="..\src\lib\protocols\netbios.c" />
     <ClCompile Include="..\src\lib\protocols\netflow.c" />
     <ClCompile Include="..\src\lib\protocols\nfs.c" />

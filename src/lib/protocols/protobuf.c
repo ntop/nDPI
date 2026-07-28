@@ -24,7 +24,7 @@
 #include "ndpi_protocol_ids.h"
 
 #define NDPI_CURRENT_PROTO NDPI_PROTOCOL_PROTOBUF
-//#define DEBUG_PROTOBUF
+//#define DEBUG_PROTOBUF 1
 #define PROTOBUF_MIN_ELEMENTS 2
 #define PROTOBUF_MAX_ELEMENTS 32
 #define PROTOBUF_REQUIRED_ELEMENTS 8
@@ -158,7 +158,7 @@ size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
           uint64_t as_u64;
           double as_double;
         } value;
-        value.as_u64 = le64toh(*(uint64_t *)&packet->payload[offset]);
+        value.as_u64 = le64toh(*(uint64_t *)&buffer[offset]);
         printf("[I64: %lld / %llu / %lf]", (long long int)value.as_i64,
                (unsigned long long int)value.as_u64, value.as_double);
 #endif
@@ -203,7 +203,7 @@ size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
           uint32_t as_u32;
           float as_float;
         } value;
-        value.as_u32 = le32toh(*(uint32_t *)&packet->payload[offset]);
+        value.as_u32 = le32toh(*(uint32_t *)&buffer[offset]);
         printf("[I32: %d / %u / %f]", value.as_i32, value.as_u32, value.as_float);
 #endif
         offset += 4;
@@ -215,8 +215,8 @@ size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
   } while (++(*protobuf_elements) < PROTOBUF_MAX_ELEMENTS);
 
 #ifdef DEBUG_PROTOBUF
-  printf(" [offset: %llu][length: %u][elems: %llu][len_elems: %llu]\n",
-         (unsigned long long int)offset, packet->payload_packet_len,
+  printf(" [offset: %llu][length: %zu][elems: %llu][len_elems: %llu]\n",
+         (unsigned long long int)offset, size,
          (unsigned long long int)protobuf_elements,
          (unsigned long long int)protobuf_len_elements);
 #endif

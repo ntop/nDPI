@@ -4434,3 +4434,12 @@ References: `Official site: <https://proton.me/meet>`_
 Yggdrasil is a new experimental compact routing scheme. It is designed to be a future-proof and decentralised alternative to the structured routing protocols commonly used today on the Internet, as well as an enabling technology for future large-scale mesh networks.
 
 References: `Official site: <https://yggdrasil-network.github.io/>`_
+
+
+.. _Proto_488:
+
+`NDPI_PROTOCOL_NEBULA`
+======================
+Nebula is a self-hosted overlay networking tool designed to be fast, secure, and scalable. Connect any number of hosts with on-demand, encrypted tunnels that work across any IP networks and without opening firewall ports.
+
+References: `Official site: <https://nebula.defined.net/docs/>`_, `Nebula Software: <https://github.com/slackhq/nebula>`_
