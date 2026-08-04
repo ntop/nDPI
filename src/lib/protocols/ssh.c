@@ -216,6 +216,17 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
 /* ************************************************************************ */
 
 static int search_ssh_again(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+  if(packet->payload_packet_len == 0 ||
+     packet->tcp_retransmission) {
+#ifdef SSH_DEBUG
+    printf("[SSH] Ack or retransmission %d/%d. Skip\n",
+           packet->payload_packet_len, packet->tcp_retransmission);
+#endif
+    return(1); /* Keep working */
+  }
+
   ndpi_search_ssh_tcp(ndpi_struct, flow);
 
   if((flow->protos.ssh.hassh_client[0] != '\0')
@@ -599,7 +610,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   
 #ifdef SSH_DEBUG
-  printf("[SSH] %s()\n", __FUNCTION__);
+  printf("[SSH] %s() stage %d\n", __FUNCTION__, flow->l4.tcp.ssh_stage);
 #endif
 
   if(flow->l4.tcp.ssh_stage <= 1) {
@@ -642,6 +653,19 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       flow->l4.tcp.ssh_stage++;
       return;	
+    } else {
+      /* Unexpected msg. Check if this is an unidirectional flow with
+       * banner + key exchange only in one direction */
+      if(flow->l4.tcp.ssh_stage == 1 &&
+         (flow->packet_direction_counter[0] == 0 || flow->packet_direction_counter[1] == 0)) {
+#ifdef SSH_DEBUG
+        printf("[SSH] Check if this is an unidirectional flow\n");
+#endif
+        flow->l4.tcp.ssh_stage++;
+        ndpi_search_ssh_tcp(ndpi_struct, flow); /* Recursion */
+        return;
+      }
+
     }
   } else if(packet->payload_packet_len > 5) {
     u_int8_t msgcode = *(packet->payload + 5);
