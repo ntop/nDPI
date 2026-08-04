@@ -50,6 +50,7 @@ typedef enum {
 #define DIAM_HEADER_LEN 20
 
 // DIAMETER header
+PACK_ON
 struct diameter_header_t
 {
   u_int8_t  version;
@@ -59,7 +60,7 @@ struct diameter_header_t
   u_int32_t app_id;
   u_int32_t hop_id;
   u_int32_t end_id;
-};
+} PACK_OFF;
 
 
 // Check packet
