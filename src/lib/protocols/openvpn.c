@@ -458,11 +458,13 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
 
   NDPI_LOG_DBG(ndpi_struct, "Search opnvpn\n");
 
-  if(packet->payload_packet_len > 10 &&
-     ntohl(*(u_int32_t *)&packet->payload[4 + 2 * (packet->tcp != NULL)]) == 0x2112A442) {
-    NDPI_LOG_DBG2(ndpi_struct, "Avoid collision with STUN\n");
-    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-    return;
+  if(packet->payload_packet_len > 10) {
+    uint32_t ovpn_pattern = get_u_int32_t(packet, 4 + 2 * (packet->tcp != NULL));
+    if (ntohl(ovpn_pattern) == 0x2112A442) {
+      NDPI_LOG_DBG2(ndpi_struct, "Avoid collision with STUN\n");
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return;
+    }
   }
 
   NDPI_LOG_DBG2(ndpi_struct, "States (before): %d %d\n",
