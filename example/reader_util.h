@@ -285,7 +285,10 @@ typedef struct ndpi_flow_info {
     } bfcp;
   };
 
-  ndpi_serializer ndpi_flow_serializer;
+  struct {
+    uint8_t _alignment[4];
+    ndpi_serializer ndpi_flow_serializer;
+  };
 
   char host_server_name[80]; /* Hostname/SNI */
   char *server_hostname;

@@ -79,9 +79,9 @@ AS_IF([test "${with_sanitizer+set}" = set],[
   NDPI_LDFLAGS="${NDPI_LDFLAGS} -fsanitize=address -fsanitize=undefined -fsanitize=leak"
   #Sanitizers should work on any compilers that we support (or that we test on CI, at least)
   #Exception: "-fsanitize=alignment" is not supported in gcc 4.9
-  AX_CHECK_COMPILE_FLAG([-fno-sanitize=alignment], [
-    NDPI_CFLAGS="${NDPI_CFLAGS} -fno-sanitize=alignment"
-    NDPI_LDFLAGS="${NDPI_LDFLAGS} -fno-sanitize=alignment"
+  AX_CHECK_COMPILE_FLAG([-fsanitize=alignment], [
+    NDPI_CFLAGS="${NDPI_CFLAGS} -fsanitize=alignment"
+    NDPI_LDFLAGS="${NDPI_LDFLAGS} -fsanitize=alignment"
   ])
 ])
 
@@ -302,7 +302,7 @@ echo "Setting API version to ${NDPI_API_VERSION}"
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
-NDPI_CFLAGS="-W -Wall -Wextra -Wno-address-of-packed-member ${NDPI_CFLAGS}"
+NDPI_CFLAGS="-W -Wall -Wextra ${NDPI_CFLAGS}"
 
 dnl> MacOS brew.sh
 HOMEBREW_DIR=/opt/homebrew
