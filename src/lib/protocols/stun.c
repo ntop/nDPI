@@ -611,10 +611,13 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       break;
 
     case 0x8022: /* SOFTWARE */
-      /* Webex (formerly Cisco Spark) ICE agents advertise SOFTWARE "Cisco-Spark" */
-      if(off + 4 + len <= payload_length &&
-	 ndpi_strnstr((const char *)&payload[off + 4], "Cisco-Spark", len) != NULL)
-	*app_proto = NDPI_PROTOCOL_WEBEX;
+      if(off + 4 + len <= payload_length) {
+	if(ndpi_strnstr((const char *)&payload[off + 4], "Cisco-Spark", len) != NULL)
+	  *app_proto = NDPI_PROTOCOL_WEBEX; /* Webex (formerly Cisco Spark) */
+	else if(ndpi_strnstr((const char *)&payload[off + 4], "discord-sfu", len) != NULL)
+          *app_proto = NDPI_PROTOCOL_DISCORD_CALL;
+      }
+
       break;
 
     case 0x8029: /* ICE-CONTROLLED */

@@ -527,6 +527,7 @@ Discord is a VoIP, instant messaging and digital distribution platform designed 
 
 References: `Discord official site <https://discord.com/>`_, `Protocol info <https://discord.com/developers/docs/intro>`_
 
+
 .. _Proto_59:
 
 `NDPI_PROTOCOL_ADOBE_CONNECT`
@@ -4443,3 +4444,12 @@ References: `Official site: <https://yggdrasil-network.github.io/>`_
 Nebula is a self-hosted overlay networking tool designed to be fast, secure, and scalable. Connect any number of hosts with on-demand, encrypted tunnels that work across any IP networks and without opening firewall ports.
 
 References: `Official site: <https://nebula.defined.net/docs/>`_, `Nebula Software: <https://github.com/slackhq/nebula>`_
+
+
+.. _Proto_489:
+
+`NDPI_PROTOCOL_DISCORD_CALL`
+============================
+Discoed Call protocol handles both audio and video calls within the Discord app.
+
+References: `Discord official site <https://discord.com/>`_
