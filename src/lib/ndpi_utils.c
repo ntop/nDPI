@@ -1285,6 +1285,8 @@ void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_list(serializer, "tls_blocks");
 
     for(i=0; i< flow->l4.tcp.tls.num_tls_blocks; i++) {
+      u_int avail;
+
       if(!flow->l4.tcp.tls.tls_blocks[i].same_pkt) {
 	if(idx > 0) {
 	  ndpi_serialize_string_string(serializer, "", buf);
@@ -1292,19 +1294,35 @@ void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       }
 
+      if(idx >= sizeof(buf) - 1)
+	break;
+
+      avail = sizeof(buf) - idx;
+
       if(ndpi_struct->cfg.tls_blocks_show_timing)
-	ret = snprintf(&buf[idx], sizeof(buf)-idx-1, "%s%s=%d@%u",
+	ret = snprintf(&buf[idx], avail, "%s%s=%d@%u",
 		       (idx > 0) ? "," : "",
 		       ndpi_print_encoded_tls_block_type(flow->l4.tcp.tls.tls_blocks[i].block_type, true),
 		       flow->l4.tcp.tls.tls_blocks[i].len,
 		       flow->l4.tcp.tls.tls_blocks[i].msec_delta);
       else
-	ret = snprintf(&buf[idx], sizeof(buf)-idx-1, "%s%s=%d",
+	ret = snprintf(&buf[idx], avail, "%s%s=%d",
 		       (idx > 0) ? "," : "",
 		       ndpi_print_encoded_tls_block_type(flow->l4.tcp.tls.tls_blocks[i].block_type, true),
 		       flow->l4.tcp.tls.tls_blocks[i].len);
 
-      if(ret > 0) idx += ret; else break;
+      if(ret <= 0)
+	break;
+
+      if((u_int)ret >= avail) {
+	/* Truncated: snprintf() returns the would-be length, not what was
+	   written. Keep the chars that fit and stop, or idx walks past the
+	   buffer and sizeof(buf)-idx underflows on the next round. */
+	idx = sizeof(buf) - 1;
+	break;
+      }
+
+      idx += ret;
     } /* for */
 
     if(idx > 0)
