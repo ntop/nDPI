@@ -22,15 +22,16 @@
 
 static ndpi_network ndpi_protocol_dropbox_protocol_list[] = {
  { 0x2D3A4000 /* 45.58.64.0/20 */, 20, NDPI_PROTOCOL_DROPBOX },
- { 0x40700D00 /* 64.112.13.0/24 */, 24, NDPI_PROTOCOL_DROPBOX },
  { 0x6CA0A000 /* 108.160.160.0/20 */, 20, NDPI_PROTOCOL_DROPBOX },
  { 0xA27D0000 /* 162.125.0.0/16 */, 16, NDPI_PROTOCOL_DROPBOX },
  { 0xB92D0800 /* 185.45.8.0/22 */, 22, NDPI_PROTOCOL_DROPBOX },
+ { 0xB9DD3E00 /* 185.221.62.0/24 */, 24, NDPI_PROTOCOL_DROPBOX },
  /* End */
  { 0x0, 0, 0 }
 };
 
 static ndpi_network6 ndpi_protocol_dropbox_protocol_list_6[] = {
+ { "2001:678:11dc::", 48, NDPI_PROTOCOL_DROPBOX },
  { "2620:100:6000::", 40, NDPI_PROTOCOL_DROPBOX },
  /* End */
  { NULL, 0, 0 }

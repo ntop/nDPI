@@ -17,7 +17,7 @@ Patricia risk mask:   0/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
 Patricia risk:        6/0 (search/found)
 Patricia risk IPv6:   0/0 (search/found)
-Patricia protocols:   14/1 (search/found)
+Patricia protocols:   14/2 (search/found)
 Patricia protocols IPv6: 0/0 (search/found)
 Hash malicious ja4:        0/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
@@ -33,7 +33,7 @@ Acceptable                       7 469           7
 
 Network                          7 469           7            
 
-	1	UDP 9.160.203.32:41059 -> 68.90.0.255:38409 [proto: 417/RipeAtlas][Stack: RipeAtlas][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 417/RipeAtlas, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][PLAIN TEXT (11.111.11.111)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 9.160.203.32:41059 -> 68.90.0.255:38409 [proto: 417/RipeAtlas][Stack: RipeAtlas][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 417/RipeAtlas, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][PLAIN TEXT (11.111.11.111)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	2	UDP 23.57.157.60:36137 -> 152.246.227.169:4712 [proto: 417/RipeAtlas][Stack: RipeAtlas][IP: 467/Akamai][Encrypted][Confidence: DPI][FPC: 417/RipeAtlas, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (11.111.11.111)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	3	UDP 147.63.105.185:48224 -> 128.53.92.31:2164 [proto: 417/RipeAtlas][Stack: RipeAtlas][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 417/RipeAtlas, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (11.111.11.111)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	4	UDP 168.139.124.224:11476 -> 19.132.223.32:36467 [proto: 417/RipeAtlas][Stack: RipeAtlas][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 417/RipeAtlas, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/67 bytes -> 0 pkts/0 bytes][Goodput ratio: 37/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (11.111.11.111)][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -41,10 +41,12 @@ static ndpi_network ndpi_protocol_netflix_protocol_list[] = {
 
 static ndpi_network6 ndpi_protocol_netflix_protocol_list_6[] = {
  { "2607:fb10::", 32, NDPI_PROTOCOL_NETFLIX },
- { "2620:0:ef0::", 48, NDPI_PROTOCOL_NETFLIX },
  { "2620:10c:7000::", 44, NDPI_PROTOCOL_NETFLIX },
  { "2a00:86c0::", 32, NDPI_PROTOCOL_NETFLIX },
- { "2a03:5640::", 32, NDPI_PROTOCOL_NETFLIX },
+ { "2a03:5640:1000::", 36, NDPI_PROTOCOL_NETFLIX },
+ { "2a03:5640:2000::", 35, NDPI_PROTOCOL_NETFLIX },
+ { "2a03:5640:4000::", 34, NDPI_PROTOCOL_NETFLIX },
+ { "2a03:5640:8000::", 33, NDPI_PROTOCOL_NETFLIX },
  /* End */
  { NULL, 0, 0 }
 };
