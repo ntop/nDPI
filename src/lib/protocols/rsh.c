@@ -122,16 +122,20 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
 
         ndpi_int_rsh_add_connection(ndpi_struct, flow);
 
-        strncpy(flow->protos.rsh.client_username, dissected_info[0],
-                ndpi_min(NDPI_ARRAY_LENGTH(flow->protos.rsh.client_username),
-                         (unsigned long)(dissected_info[1] - dissected_info[0])));
-        strncpy(flow->protos.rsh.server_username, dissected_info[1],
-                ndpi_min(NDPI_ARRAY_LENGTH(flow->protos.rsh.server_username),
-                         (unsigned long)(dissected_info[2] - dissected_info[1])));
-        strncpy(flow->protos.rsh.command, dissected_info[2],
-                ndpi_min(NDPI_ARRAY_LENGTH(flow->protos.rsh.command),
-                         (unsigned long)packet->payload_packet_len -
-                         (unsigned long)(dissected_info[2] - dissected_info[0])));
+        size_t client_len = ndpi_min(NDPI_ARRAY_LENGTH(flow->protos.rsh.client_username) - 1,
+                                     (unsigned long)(dissected_info[1] - dissected_info[0]));
+        size_t server_len = ndpi_min(NDPI_ARRAY_LENGTH(flow->protos.rsh.server_username) - 1,
+                                     (unsigned long)(dissected_info[2] - dissected_info[1]));
+        size_t command_len = ndpi_min(NDPI_ARRAY_LENGTH(flow->protos.rsh.command) - 1,
+                                      (unsigned long)packet->payload_packet_len -
+                                      (unsigned long)(dissected_info[2] - dissected_info[0]));
+
+        strncpy(flow->protos.rsh.client_username, dissected_info[0], client_len);
+        flow->protos.rsh.client_username[client_len] = '\0';
+        strncpy(flow->protos.rsh.server_username, dissected_info[1], server_len);
+        flow->protos.rsh.server_username[server_len] = '\0';
+        strncpy(flow->protos.rsh.command, dissected_info[2], command_len);
+        flow->protos.rsh.command[command_len] = '\0';
 
 	
         if (snprintf(str, NDPI_ARRAY_LENGTH(str), "User '%s' executing '%s'",
