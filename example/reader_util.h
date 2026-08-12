@@ -452,7 +452,8 @@ int ndpi_stats_init(ndpi_stats_t *s, uint32_t num_protocols);
 void ndpi_stats_reset(ndpi_stats_t *s);
 
 /* TODO: remove wrappers parameters and use ndpi global, when their initialization will be fixed... */
-struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle, int do_init_flows_root, ndpi_serialization_format serialization_format, struct ndpi_global_context *g_ctx);
+struct ndpi_workflow * ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs, pcap_t * pcap_handle, int do_init_flows_root, ndpi_serialization_format serialization_format, struct ndpi_global_context *g_ctx,
+                                          enum ndpi_license_type license_type);
 
 
 /* workflow main free function */

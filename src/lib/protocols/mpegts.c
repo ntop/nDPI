@@ -57,6 +57,7 @@ void init_mpegts_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("MPEG_TS", ndpi_struct,
                      ndpi_search_mpegts,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                      DISSECTOR_LICENSE_LGPL,
                       1, NDPI_PROTOCOL_MPEGTS);
 }
 

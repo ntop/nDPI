@@ -66,5 +66,6 @@ void init_sonos_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("Sonos", ndpi_struct,
                      ndpi_search_sonos,
                      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD, /* Only IPv4 UDP traffic is expected. */
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_SONOS);
 }

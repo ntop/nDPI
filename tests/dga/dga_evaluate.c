@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
   }
 
   /* Initialize nDPI detection module*/
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
   assert(ndpi_str != NULL);
   ndpi_set_config(ndpi_str, NULL, "log.level", "3"); /* NDPI_LOG_DEBUG_EXTRA */
   set_ndpi_debug_function(ndpi_str, ndpi_dbg_fn);

@@ -195,5 +195,6 @@ void init_collectd_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("collectd", ndpi_struct,
                      ndpi_search_collectd,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_COLLECTD);
 }

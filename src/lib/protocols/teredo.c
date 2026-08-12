@@ -49,6 +49,7 @@ void init_teredo_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("TEREDO", ndpi_struct,
                      ndpi_search_teredo,
                      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD, /* Teredo is inherently IPV4 only */
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_TEREDO);
 }
 

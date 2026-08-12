@@ -78,5 +78,6 @@ void init_checkmk_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("CHECKMK", ndpi_struct,
                      ndpi_search_checkmk,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_CHECKMK);
 }

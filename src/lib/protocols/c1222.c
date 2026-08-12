@@ -67,5 +67,6 @@ void init_c1222_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("ANSI_C1222", ndpi_struct,
                      ndpi_search_c1222,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_C1222);
 }

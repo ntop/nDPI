@@ -4234,7 +4234,8 @@ void ndpi_global_deinit(struct ndpi_global_context *g_ctx) {
 
 /* ******************************************************************** */
 
-struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx) {
+struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx,
+                                                                  enum ndpi_license_type license_type) {
   struct ndpi_detection_module_struct *ndpi_str = ndpi_calloc(1, sizeof(struct ndpi_detection_module_struct));
   int i;
 
@@ -4245,6 +4246,8 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
        simply avoid any logs at all */
     return(NULL);
   }
+
+  ndpi_str->license_type = license_type;
 
 #ifdef WIN32
   /* Required to use getaddrinfo on Windows */
@@ -6761,11 +6764,18 @@ void ndpi_register_dissector(char *dissector_name, struct ndpi_detection_module_
                         void (*func)(struct ndpi_detection_module_struct *,
                                      struct ndpi_flow_struct *flow),
                         const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
+                        enum ndpi_dissector_license_type dissector_license_type,
                         int num_protocol_ids, ...)
 {
   va_list ap;
   int i, dissector_enabled = 0, first_protocol_id = -1;
   u_int32_t idx = ndpi_str->callback_buffer_num;
+
+  if(ndpi_str->license_type == NDPI_LICENSE_COMMERCIAL_LGPL &&
+     dissector_license_type == DISSECTOR_LICENSE_NTOP_DUAL_LICENSE) {
+    NDPI_LOG_ERR(ndpi_str, "Dissector %s not loaded: incompatible license\n", dissector_name);
+    return;
+  }
 
   if(idx >= NDPI_MAX_NUM_DISSECTORS) {
     /*
@@ -6819,6 +6829,7 @@ void ndpi_register_dissector(char *dissector_name, struct ndpi_detection_module_
     ndpi_str->callback_buffer[idx].dissector_idx = idx;
     ndpi_str->callback_buffer[idx].ndpi_selection_bitmask = ndpi_selection_bitmask;
     ndpi_str->callback_buffer[idx].first_protocol_id = first_protocol_id; /* Just for logging */
+    ndpi_str->callback_buffer[idx].dissector_license_type = dissector_license_type;
 
     ndpi_str->callback_buffer_num++;
   } else {
@@ -12092,7 +12103,7 @@ void ndpi_generate_options(u_int opt, FILE *options_out) {
   u_int i;
 
   if (!options_out) return;
-  ndpi_str = ndpi_init_detection_module(NULL);
+  ndpi_str = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
   if (!ndpi_str) return;
 
   if(ndpi_finalize_initialization(ndpi_str) != 0) {

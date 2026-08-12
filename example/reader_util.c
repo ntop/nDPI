@@ -410,11 +410,12 @@ void ndpi_stats_reset(ndpi_stats_t *s) {
 struct ndpi_workflow* ndpi_workflow_init(const struct ndpi_workflow_prefs * prefs,
 					 pcap_t * pcap_handle, int do_init_flows_root,
 					 ndpi_serialization_format serialization_format,
-					 struct ndpi_global_context *g_ctx) {
+					 struct ndpi_global_context *g_ctx,
+					 enum ndpi_license_type license_type) {
   struct ndpi_detection_module_struct * module;
   struct ndpi_workflow * workflow;
 
-  module = ndpi_init_detection_module(g_ctx);
+  module = ndpi_init_detection_module(g_ctx, license_type);
 
   if(module == NULL) {
     LOG(NDPI_LOG_ERROR, "global structure initialization failed\n");

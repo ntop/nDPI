@@ -284,10 +284,13 @@ extern "C" {
    * in parallel
    *
    * @par g_ctx = global context associated to the new detection module; NULL if no global context is needed
+   * @par license_type = license under which the calling application is used; it determines which
+   *                      dissectors (based on their own license) are loaded
    * @return  the initialized detection module
    *
    */
-  struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx);
+  struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_global_context *g_ctx,
+                                                                    enum ndpi_license_type license_type);
 
   /**
    * Completes the initialization (2nd step)

@@ -59,5 +59,6 @@ void init_melsec_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("MELSEC", ndpi_struct,
                      ndpi_search_melsec,
                      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      DISSECTOR_LICENSE_LGPL,
                       1, NDPI_PROTOCOL_MELSEC);
 }

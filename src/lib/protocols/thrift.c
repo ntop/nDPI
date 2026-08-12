@@ -260,5 +260,6 @@ void init_apache_thrift_dissector(struct ndpi_detection_module_struct *ndpi_stru
   ndpi_register_dissector("Thrift", ndpi_struct,
                      ndpi_search_thrift_tcp_udp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_APACHE_THRIFT);
 }

@@ -63,5 +63,6 @@ void init_whois_das_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("Whois-DA", ndpi_struct,
                      ndpi_search_whois_das,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_WHOIS_DAS);
 }

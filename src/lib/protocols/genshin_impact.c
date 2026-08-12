@@ -78,5 +78,6 @@ void init_genshin_impact_dissector(struct ndpi_detection_module_struct *ndpi_str
   ndpi_register_dissector("GenshinImpact", ndpi_struct,
                      ndpi_search_genshin_impact,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_GENSHIN_IMPACT);
 }

@@ -1154,7 +1154,7 @@ static void outlierUnitTest() {
 /* *********************************************** */
 
 static void loadStressTest() {
-  struct ndpi_detection_module_struct *ndpi_struct_shadow = ndpi_init_detection_module(NULL);
+  struct ndpi_detection_module_struct *ndpi_struct_shadow = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
 
   if(ndpi_struct_shadow) {
     int i;
@@ -1289,7 +1289,7 @@ static void cryptDecryptUnitTest() {
 /* *********************************************** */
 
 static void encodeDomainsUnitTest(bool load_suffix_list) {
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
   const char *lists_path = "../lists/public_suffix_list.dat";
   char *lists_dir = "../lists";
   char *categories_path = "./categories.txt";
@@ -1345,7 +1345,7 @@ static void encodeDomainsUnitTest(bool load_suffix_list) {
 /* *********************************************** */
 
 static void domainsUnitTest() {
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
   const char *lists_path = "../lists/public_suffix_list.dat";
   struct stat st;
 
@@ -1381,7 +1381,7 @@ static void domainSearchUnitTest() {
   ndpi_domain_classify *sc = ndpi_domain_classify_alloc();
   char *domain = "ntop.org";
   u_int64_t class_id;
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
   u_int8_t trace = 0;
 
   assert(ndpi_str);
@@ -1415,7 +1415,7 @@ static void domainSearchUnitTest() {
 /* *********************************************** */
 
 static void domainSearchUnitTest2() {
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
   ndpi_domain_classify *c = ndpi_domain_classify_alloc();
   u_int64_t class_id = 9;
 
@@ -1867,7 +1867,7 @@ static void dgaUnitTest() {
     NULL
   };
   int debug = 0, i;
-  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL);
+  struct ndpi_detection_module_struct *ndpi_str = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
 
   assert(ndpi_str != NULL);
 

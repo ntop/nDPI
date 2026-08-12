@@ -105,5 +105,6 @@ void init_hart_ip_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("HART-IP", ndpi_struct,
                      ndpi_search_hart_ip,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_HART_IP);
 }

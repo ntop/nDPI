@@ -212,5 +212,6 @@ void init_dhcp_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_register_dissector("DHCP", ndpi_struct,
                           ndpi_search_dhcp_udp,
                           NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD,
+                          DISSECTOR_LICENSE_LGPL,
                           1, NDPI_PROTOCOL_DHCP);
 }

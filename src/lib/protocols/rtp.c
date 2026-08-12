@@ -548,5 +548,6 @@ void init_rtp_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_register_dissector("RT(C)P", ndpi_struct,
                      ndpi_search_rtp,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      2, NDPI_PROTOCOL_RTP, NDPI_PROTOCOL_RTCP);
 }

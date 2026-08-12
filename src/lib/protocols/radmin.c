@@ -93,5 +93,6 @@ void init_radmin_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("Radmin", ndpi_struct,
                      ndpi_search_radmin,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_RADMIN);
 }

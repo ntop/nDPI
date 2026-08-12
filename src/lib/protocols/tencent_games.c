@@ -90,5 +90,6 @@ void init_tencent_games_dissector(struct ndpi_detection_module_struct *ndpi_stru
   ndpi_register_dissector("TencentGames", ndpi_struct,
                      ndpi_search_tencent_games,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_TENCENTGAMES);
 }

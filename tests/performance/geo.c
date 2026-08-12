@@ -6,7 +6,7 @@ int main()
     struct ndpi_detection_module_struct *ndpi_info_mod;
     int rc;
 
-    ndpi_info_mod = ndpi_init_detection_module(NULL);
+    ndpi_info_mod = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
     if (ndpi_info_mod == NULL)
         return 1;
 

@@ -85,6 +85,7 @@ void init_gnutella_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("Gnutella", ndpi_struct,
                      ndpi_search_gnutella,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_GNUTELLA);
 }
 

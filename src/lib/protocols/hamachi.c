@@ -169,5 +169,6 @@ void init_hamachi_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("Hamachi", ndpi_struct,
                      ndpi_search_hamachi,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      DISSECTOR_LICENSE_LGPL,
                       1, NDPI_PROTOCOL_HAMACHI);
 }

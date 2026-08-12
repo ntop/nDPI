@@ -57,7 +57,7 @@ void fuzz_init_detection_module(struct ndpi_detection_module_struct **ndpi_info_
   char name[256];
 
   if(*ndpi_info_mod == NULL) {
-    *ndpi_info_mod = ndpi_init_detection_module(g_ctx);
+    *ndpi_info_mod = ndpi_init_detection_module(g_ctx, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
 
     assert(ndpi_set_config_u64(*ndpi_info_mod, NULL, "log.level", 3) == 0);
     assert(ndpi_set_config(*ndpi_info_mod, "all", "log", "enable") == 0);

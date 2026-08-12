@@ -76,5 +76,6 @@ void init_can_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("Controller_Area_Network", ndpi_struct,
                      ndpi_search_can,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_CAN);
 }

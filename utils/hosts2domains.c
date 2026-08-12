@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     return(-1);
   }
   
-  assert(ndpi_str = ndpi_init_detection_module(NULL));
+  assert(ndpi_str = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL));
   assert(ndpi_load_domain_suffixes(ndpi_str, (char*)lists_path) == 0);
   
   while (fgets(line, sizeof(line), fd) != NULL) {

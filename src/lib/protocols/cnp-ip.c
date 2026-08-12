@@ -59,5 +59,6 @@ void init_cnp_ip_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("CNP-IP", ndpi_struct,
                      ndpi_search_cnp_ip,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_CNP_IP);
 }

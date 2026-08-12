@@ -65,6 +65,7 @@ void init_hcl_notes_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("HCL_Notes", ndpi_struct,
                      ndpi_search_hcl_notes,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_HCL_NOTES);
 }
 

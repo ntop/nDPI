@@ -66,5 +66,6 @@ void init_json_rpc_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("JSON-RPC", ndpi_struct,
                      ndpi_search_json_rpc,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                      DISSECTOR_LICENSE_LGPL,
                       1, NDPI_PROTOCOL_JSON_RPC);
 }

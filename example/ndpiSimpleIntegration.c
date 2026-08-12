@@ -183,7 +183,7 @@ static struct nDPI_workflow * init_workflow(char const * const file_or_device)
     printf("pcap_setfilter error: '%s'\n", pcap_geterr(workflow->pcap_handle));
   }  
 
-  workflow->ndpi_struct = ndpi_init_detection_module(NULL);
+  workflow->ndpi_struct = ndpi_init_detection_module(NULL, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
   if (workflow->ndpi_struct == NULL) {
     free_workflow(&workflow);
     return NULL;

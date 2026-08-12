@@ -65,5 +65,6 @@ void init_dhcpv6_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_register_dissector("DHCPV6", ndpi_struct,
                           ndpi_search_dhcpv6_udp,
                           NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP_WITH_PAYLOAD,
+                          DISSECTOR_LICENSE_LGPL,
                           1, NDPI_PROTOCOL_DHCPV6);
 }

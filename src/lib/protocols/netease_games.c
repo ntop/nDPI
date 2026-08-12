@@ -81,5 +81,6 @@ void init_netease_games_dissector(struct ndpi_detection_module_struct *ndpi_stru
   ndpi_register_dissector("NetEaseGames", ndpi_struct,
                      ndpi_search_netease,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_UDP_WITH_PAYLOAD,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_NETEASE_GAMES);
 }

@@ -61,6 +61,7 @@ void init_openflow_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("OpenFlow", ndpi_struct,
                      ndpi_search_openflow,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_OPENFLOW);
 }
 

@@ -127,6 +127,7 @@ void init_gearup_booster_dissector(struct ndpi_detection_module_struct *ndpi_str
   ndpi_register_dissector("GeaUP_Booster", ndpi_struct,
                      ndpi_search_gearup_booster,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_GEARUP_BOOSTER);
 }
 

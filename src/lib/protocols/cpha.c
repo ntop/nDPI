@@ -56,5 +56,6 @@ void init_cpha_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_register_dissector("CPHA", ndpi_struct,
                      ndpi_search_cpha,
                      NDPI_SELECTION_BITMASK_PROTOCOL_UDP_WITH_PAYLOAD, /* TODO: ipv6 support? */
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_CPHA);
 }

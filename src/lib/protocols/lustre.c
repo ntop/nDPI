@@ -82,5 +82,6 @@ void init_lustre_dissector(struct ndpi_detection_module_struct *ndpi_struct)
   ndpi_register_dissector("Lustre", ndpi_struct,
                      ndpi_search_lustre,
                      NDPI_SELECTION_BITMASK_PROTOCOL_TCP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION, /* Ipv4 only; Lustre doesn't support IPv6 */
+                     DISSECTOR_LICENSE_LGPL,
                       1, NDPI_PROTOCOL_LUSTRE);
 }

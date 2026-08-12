@@ -83,5 +83,6 @@ void init_matter_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_register_dissector("Matter", ndpi_struct,
                      ndpi_search_matter,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V6_UDP_WITH_PAYLOAD, /* MATTER is only over IPv6 */
+                     DISSECTOR_LICENSE_LGPL,
                      1, NDPI_PROTOCOL_MATTER);
 }
