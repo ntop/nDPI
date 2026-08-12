@@ -71,7 +71,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   g_ctx = ndpi_global_init();
 
-  w = ndpi_workflow_init(&prefs, pcap_handle, 1, serialization_format, g_ctx);
+  w = ndpi_workflow_init(&prefs, pcap_handle, 1, serialization_format, g_ctx, NDPI_LICENSE_NON_COMMERCIAL_LGPL);
   if(w) {
     ndpi_finalize_initialization(w->ndpi_struct);
 
