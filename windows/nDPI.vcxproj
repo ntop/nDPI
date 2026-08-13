@@ -399,6 +399,7 @@
     <ClCompile Include="..\src\lib\protocols\iqiyi.c" />
     <ClCompile Include="..\src\lib\protocols\egd.c" />
     <ClCompile Include="..\src\lib\protocols\cod_mobile.c" />
+    <ClCompile Include="..\src\lib\protocols\freefire.c" />
     <ClCompile Include="..\src\lib\protocols\zug.c" />
     <ClCompile Include="..\src\lib\protocols\jrmi.c" />
     <ClCompile Include="..\src\lib\protocols\nano.c" />

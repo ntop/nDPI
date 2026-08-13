@@ -4453,3 +4453,14 @@ References: `Official site: <https://nebula.defined.net/docs/>`_, `Nebula Softwa
 Discoed Call protocol handles both audio and video calls within the Discord app.
 
 References: `Discord official site <https://discord.com/>`_
+
+
+.. _Proto_490:
+
+`NDPI_PROTOCOL_FREEFIRE`
+========================
+Free Fire is a popular battle royale game for iOS and Android developed by Garena.
+Gameplay typically uses UDP ports in the 10011-10015 range. Supplementary cleartext
+TCP control channels are commonly seen on ports 39698 and 39800.
+
+References: `Free Fire official site: <https://ff.garena.com/>`_

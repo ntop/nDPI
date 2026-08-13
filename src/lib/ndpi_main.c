@@ -2851,6 +2851,11 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
  			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
 			  0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_FREEFIRE,
+			  "FreeFire", NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_QOE_CATEGORY_ONLINE_GAMING,
+ 			  ndpi_build_default_ports(ports_a, 39698, 39800, 0, 0, 0) /* TCP */,
+			  ndpi_build_default_ports(ports_b, 10012, 10014, 0, 0, 0) /* UDP */,
+			  0, 0 /* protocol classification cannot change if partial */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZUG,
 			  "ZUG", NDPI_PROTOCOL_CATEGORY_CRYPTO_BLOCKCHAIN, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
@@ -7533,6 +7538,9 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* Call of Duty: Mobile */
   init_cod_mobile_dissector(ndpi_str);
+
+  /* Free Fire */
+  init_freefire_dissector(ndpi_str);
 
   /* ZUG */
   init_zug_dissector(ndpi_str);

@@ -1,0 +1,37 @@
+DPI Packets (TCP):	12	(6.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 330 (165.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/2/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     2/2 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    2/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+FreeFire	106	42107	2
+
+Fun                            106 42107         2            
+
+Game                           106 42107         2            
+
+	1	TCP 192.168.50.79:55869 <-> 202.81.99.40:39698 [proto: 490/FreeFire][Stack: FreeFire][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Game/8][Breed: Fun][39 pkts/6258 bytes <-> 36 pkts/30525 bytes][Goodput ratio: 59/92][32.34 sec][bytes ratio: -0.660 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 943/729 8012/8059 2285/1997][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 160/848 1080/1334 262/578][TCP Fingerprint: 194_64_65535_d29295416479/macOS][PLAIN TEXT (leyJrZX)][Plen Bins: 25,0,2,4,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,2,9,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.50.79:55870 <-> 202.81.99.136:39800 [proto: 490/FreeFire][Stack: FreeFire][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Game/8][Breed: Fun][18 pkts/3964 bytes <-> 13 pkts/1360 bytes][Goodput ratio: 70/36][32.32 sec][bytes ratio: 0.489 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 2109/2932 8001/8060 3205/3498][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 220/105 1474/485 364/110][TCP Fingerprint: 194_64_65535_d29295416479/macOS][PLAIN TEXT (GroupID)][Plen Bins: 69,0,6,0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0]
