@@ -1113,7 +1113,9 @@ static int quic_reasm_add_fragment(struct ndpi_flow_struct *flow, const u_int8_t
     flow->l4.udp.quic_reasm_buf_bitmap = (u_int8_t *)ndpi_calloc(reasm_bitmap_capacity, sizeof(u_int8_t));
     if(!flow->l4.udp.quic_reasm_buf || !flow->l4.udp.quic_reasm_buf_bitmap) {
       ndpi_free(flow->l4.udp.quic_reasm_buf);
+      flow->l4.udp.quic_reasm_buf = NULL;
       ndpi_free(flow->l4.udp.quic_reasm_buf_bitmap);
+      flow->l4.udp.quic_reasm_buf_bitmap = NULL;
       return -1; /* Memory error */
     }
     flow->l4.udp.quic_reasm_buf_last_pos = 0;
