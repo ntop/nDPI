@@ -1063,125 +1063,134 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   return NULL;
 }
 
-static void update_reasm_buf_bitmap(u_int8_t *buffer_bitmap,
-				    const u_int32_t buffer_bitmap_size,
-				    const u_int32_t recv_pos,
-				    const u_int32_t recv_len)
-{
-  if (!recv_len || !buffer_bitmap_size || !buffer_bitmap || recv_pos + recv_len > buffer_bitmap_size * 8)
-    return;
-  const u_int32_t start_byte = recv_pos / 8;
-  const u_int32_t end_byte = (recv_pos + recv_len - 1) / 8;
-  const u_int32_t start_bit = recv_pos % 8;
-  const u_int32_t end_bit = (start_bit + recv_len - 1) % 8;
-  if (start_byte == end_byte)
-    buffer_bitmap[start_byte] |= (((1U << recv_len) - 1U) << start_bit); // fill from bit 'start_bit' until bit 'end_bit', both inclusive
-  else{
-    u_int32_t i;
+/*
+   QUIC CRYPTO frames carrying the TLS ClientHello may show up out of
+   order, be retransmitted or overlap each other. Alongside the fixed-size
+   reassembly buffer we therefore keep a bitmap with one bit per buffered
+   byte: a bit is set as soon as that byte has been written at least once,
+   no matter which fragment provided it. The ClientHello is considered
+   fully reassembled only once every bit up to its declared length is set,
+   i.e. there are no gaps left. */
 
-    for (i = start_byte + 1; i <= end_byte - 1; i++)
-      buffer_bitmap[i] = 0xff; // completely received byte
-    buffer_bitmap[start_byte] |= ~((1U << start_bit) - 1U); // fill from bit 'start_bit' until bit 7, both inclusive
-    buffer_bitmap[end_byte] |= (1U << (end_bit + 1U)) - 1U; // fill from bit 0 until bit 'end_bit', both inclusive
-  }
-}
-
-static int is_reasm_buf_complete(const u_int8_t *buffer_bitmap,
-                                 const u_int32_t buffer_len)
+static void quic_reasm_bitmap_mark_received(u_int8_t *bitmap, u_int32_t bitmap_size,
+					     u_int32_t pos, u_int32_t len)
 {
-  const u_int32_t complete_bytes = buffer_len / 8;
-  const u_int32_t remaining_bits = buffer_len % 8;
   u_int32_t i;
 
-  if (!buffer_bitmap)
+  if(!bitmap || len == 0 || (u_int64_t)pos + len > (u_int64_t)bitmap_size * 8)
+    return;
+
+  for(i = pos; i < pos + len; i++)
+    bitmap[i >> 3] |= (u_int8_t)(1u << (i & 7));
+}
+
+static int quic_reasm_bitmap_is_full(const u_int8_t *bitmap, u_int32_t num_bytes)
+{
+  u_int32_t i;
+
+  if(!bitmap)
     return 0;
 
-  for(i = 0; i < complete_bytes; i++)
-    if (buffer_bitmap[i] != 0xff)
+  for(i = 0; i < num_bytes; i++) {
+    if(!(bitmap[i >> 3] & (1u << (i & 7))))
       return 0;
+  }
 
-  if (remaining_bits && buffer_bitmap[complete_bytes] != (1U << (remaining_bits)) - 1) 
-    return 0;
-    
   return 1;
 }
 
-static int __reassemble(struct ndpi_flow_struct *flow, const u_int8_t *frag,
-                        uint64_t frag_len, uint64_t frag_offset,
-                        const u_int8_t **buf, u_int64_t *buf_len)
+static int quic_reasm_add_fragment(struct ndpi_flow_struct *flow, const u_int8_t *frag,
+				   uint64_t frag_len, uint64_t frag_offset,
+				   const u_int8_t **buf, u_int64_t *buf_len)
 {
-  const uint64_t max_quic_reasm_buffer_len = 4096; /* Let's say a couple of full-MTU packets... Must be multiple of 8*/
-  const uint64_t quic_reasm_buffer_bitmap_len = max_quic_reasm_buffer_len / 8;
-  const uint64_t last_pos = frag_offset + frag_len;
+  /* Room for a ClientHello spread across a couple of full-MTU packets. */
+  const u_int32_t reasm_capacity = 4096;
+  const u_int32_t reasm_bitmap_capacity = reasm_capacity / 8;
+  const uint64_t frag_end = frag_offset + frag_len;
 
   if(!flow->l4.udp.quic_reasm_buf) {
-    flow->l4.udp.quic_reasm_buf = (uint8_t *)ndpi_malloc(max_quic_reasm_buffer_len);
-    if(!flow->l4.udp.quic_reasm_buf_bitmap)
-      flow->l4.udp.quic_reasm_buf_bitmap = (uint8_t *)ndpi_calloc(quic_reasm_buffer_bitmap_len, sizeof(uint8_t));
-    if(!flow->l4.udp.quic_reasm_buf || !flow->l4.udp.quic_reasm_buf_bitmap)
+    flow->l4.udp.quic_reasm_buf = (u_int8_t *)ndpi_malloc(reasm_capacity);
+    flow->l4.udp.quic_reasm_buf_bitmap = (u_int8_t *)ndpi_calloc(reasm_bitmap_capacity, sizeof(u_int8_t));
+    if(!flow->l4.udp.quic_reasm_buf || !flow->l4.udp.quic_reasm_buf_bitmap) {
+      ndpi_free(flow->l4.udp.quic_reasm_buf);
+      flow->l4.udp.quic_reasm_buf = NULL;
+      ndpi_free(flow->l4.udp.quic_reasm_buf_bitmap);
+      flow->l4.udp.quic_reasm_buf_bitmap = NULL;
       return -1; /* Memory error */
+    }
     flow->l4.udp.quic_reasm_buf_last_pos = 0;
   }
-  if(last_pos > max_quic_reasm_buffer_len)
+
+  if(frag_end > reasm_capacity)
     return -3; /* Buffer too small */
 
   memcpy(&flow->l4.udp.quic_reasm_buf[frag_offset], frag, frag_len);
-  flow->l4.udp.quic_reasm_buf_last_pos = last_pos > flow->l4.udp.quic_reasm_buf_last_pos ? last_pos : flow->l4.udp.quic_reasm_buf_last_pos;
-  update_reasm_buf_bitmap(flow->l4.udp.quic_reasm_buf_bitmap, quic_reasm_buffer_bitmap_len, frag_offset, frag_len); 
+  quic_reasm_bitmap_mark_received(flow->l4.udp.quic_reasm_buf_bitmap, reasm_bitmap_capacity,
+				  (u_int32_t)frag_offset, (u_int32_t)frag_len);
+  if(frag_end > flow->l4.udp.quic_reasm_buf_last_pos)
+    flow->l4.udp.quic_reasm_buf_last_pos = (u_int32_t)frag_end;
 
   *buf = flow->l4.udp.quic_reasm_buf;
   *buf_len = flow->l4.udp.quic_reasm_buf_last_pos;
   return 0;
 }
-static int is_ch_complete(const u_int8_t *buf, uint64_t buf_len)
-{
-  uint32_t msg_len;
 
-  if(buf_len >= 4) {
-    msg_len = (buf[1] << 16) + (buf[2] << 8) + buf[3];
-    if (4 + msg_len == buf_len) {
-      return 1;
-    }
-  }
-  return 0;
-}
-static int is_ch_reassembler_pending(struct ndpi_flow_struct *flow)
+static int quic_tls_handshake_msg_is_complete(const u_int8_t *buf, uint64_t buf_len)
 {
-  return flow->l4.udp.quic_reasm_buf != NULL &&
-    !(is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, flow->l4.udp.quic_reasm_buf_last_pos)
-      && is_ch_complete(flow->l4.udp.quic_reasm_buf, flow->l4.udp.quic_reasm_buf_last_pos));
+  uint32_t declared_len;
+
+  if(buf_len < 4)
+    return 0;
+
+  /* TLS Handshake header: 1 byte msg type + 3 byte big-endian body length */
+  declared_len = (buf[1] << 16) | (buf[2] << 8) | buf[3];
+
+  return (4 + declared_len) == buf_len;
 }
-static const uint8_t *get_reassembled_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
-						  struct ndpi_flow_struct *flow,
-						  const u_int8_t *frag,
-						  uint64_t frag_offset, uint64_t frag_len,
-						  uint64_t *crypto_data_len)
+
+static int quic_ch_reassembly_pending(struct ndpi_flow_struct *flow)
+{
+  if(!flow->l4.udp.quic_reasm_buf)
+    return 0;
+
+  if(quic_reasm_bitmap_is_full(flow->l4.udp.quic_reasm_buf_bitmap, flow->l4.udp.quic_reasm_buf_last_pos) &&
+     quic_tls_handshake_msg_is_complete(flow->l4.udp.quic_reasm_buf, flow->l4.udp.quic_reasm_buf_last_pos))
+    return 0;
+
+  return 1;
+}
+
+static const uint8_t *quic_get_reassembled_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
+							struct ndpi_flow_struct *flow,
+							const u_int8_t *frag,
+							uint64_t frag_offset, uint64_t frag_len,
+							uint64_t *crypto_data_len)
 {
   const u_int8_t *crypto_data;
   int rc;
 
   NDPI_LOG_DBG2(ndpi_struct, "frag %d/%d\n", frag_offset, frag_len);
 
-  /* Fast path: no need of reassembler stuff */
-  if(frag_offset == 0 &&
-     is_ch_complete(frag, frag_len)) {
+  /* Fast path: this single fragment already is the whole ClientHello */
+  if(frag_offset == 0 && quic_tls_handshake_msg_is_complete(frag, frag_len)) {
     NDPI_LOG_DBG2(ndpi_struct, "Complete CH (fast path)\n");
     *crypto_data_len = frag_len;
     return frag;
   }
 
-  rc = __reassemble(flow, frag, frag_len, frag_offset,
-                    &crypto_data, crypto_data_len);
-  if(rc == 0) {
-    if(is_reasm_buf_complete(flow->l4.udp.quic_reasm_buf_bitmap, *crypto_data_len) &&
-       is_ch_complete(crypto_data, *crypto_data_len)) {
-      NDPI_LOG_DBG2(ndpi_struct, "Reassembler completed!\n");
-      return crypto_data;
-    }
-    NDPI_LOG_DBG2(ndpi_struct, "CH not yet completed\n");
-  } else {
+  rc = quic_reasm_add_fragment(flow, frag, frag_len, frag_offset, &crypto_data, crypto_data_len);
+  if(rc != 0) {
     NDPI_LOG_DBG(ndpi_struct, "Reassembler error: %d\n", rc);
+    return NULL;
   }
+
+  if(quic_reasm_bitmap_is_full(flow->l4.udp.quic_reasm_buf_bitmap, *crypto_data_len) &&
+     quic_tls_handshake_msg_is_complete(crypto_data, *crypto_data_len)) {
+    NDPI_LOG_DBG2(ndpi_struct, "Reassembler completed!\n");
+    return crypto_data;
+  }
+
+  NDPI_LOG_DBG2(ndpi_struct, "CH not yet completed\n");
   return NULL;
 }
 
@@ -1294,7 +1303,7 @@ const uint8_t *get_crypto_data(struct ndpi_detection_module_struct *ndpi_struct,
                        (unsigned long)frag_len, counter, clear_payload_len, version);
           return NULL;
         }
-        crypto_data = get_reassembled_crypto_data(ndpi_struct, flow,
+        crypto_data = quic_get_reassembled_crypto_data(ndpi_struct, flow,
                                                   &clear_payload[counter],
                                                   frag_offset, frag_len,
                                                   crypto_data_len);
@@ -1762,7 +1771,7 @@ static int eval_extra_processing(struct ndpi_detection_module_struct *ndpi_struc
     }
   }
 
-  if(is_ch_reassembler_pending(flow)) {
+  if(quic_ch_reassembly_pending(flow)) {
     NDPI_LOG_DBG2(ndpi_struct, "We have further work to do (reasm)\n");
     return 1;
   }
@@ -1790,9 +1799,9 @@ static int ndpi_search_quic_extra(struct ndpi_detection_module_struct *ndpi_stru
   if(packet->payload_packet_len == 0)
     return 1;
 
-  if (is_ch_reassembler_pending(flow)) {
+  if (quic_ch_reassembly_pending(flow)) {
     ndpi_search_quic(ndpi_struct, flow);
-    if(is_ch_reassembler_pending(flow))
+    if(quic_ch_reassembly_pending(flow))
       return 1;
     flow->extra_packets_func = NULL;
     return 0;
@@ -1948,7 +1957,7 @@ static void ndpi_search_quic(struct ndpi_detection_module_struct *ndpi_struct,
 
   is_initial_quic = may_be_initial_pkt(ndpi_struct, &version);
   if(!is_initial_quic) {
-    if(!is_ch_reassembler_pending(flow)) { /* Better safe than sorry */
+    if(!quic_ch_reassembly_pending(flow)) { /* Better safe than sorry */
       ret = may_be_0rtt(ndpi_struct, &version);
       if(ret == 1) {
         NDPI_LOG_DBG(ndpi_struct, "Found 0-RTT, keep looking for Initial\n");
