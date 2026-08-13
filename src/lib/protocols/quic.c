@@ -322,14 +322,6 @@ static void phton64(uint8_t *p, uint64_t v)
   p[7] = (uint8_t)(v >> 0);
 }
 
-static void *memdup(const uint8_t *orig, size_t len)
-{
-  void *dest = ndpi_malloc(len);
-  if(dest)
-    memcpy(dest, orig, len);
-  return dest;
-}
-
 
 /*
  * Generic Wireshark definitions
@@ -444,14 +436,12 @@ static gcry_error_t hkdf_extract(int hashalgo, const uint8_t *salt, size_t salt_
 
 /*
  * Computes HKDF-Expand-Label(Secret, Label, Hash(context_value), Length) with a
- * custom label prefix. If "context_hash" is NULL, then an empty context is
- * used. Otherwise it must have the same length as the hash algorithm output.
+ * custom label prefix.
  */
-static int tls13_hkdf_expand_label_context(struct ndpi_detection_module_struct *ndpi_struct,
-					   int md, const StringInfo *secret,
-					   const char *label_prefix, const char *label,
-					   const uint8_t *context_hash, uint8_t context_length,
-					   uint16_t out_len, uint8_t **out)
+static int tls13_hkdf_expand_label(struct ndpi_detection_module_struct *ndpi_struct,
+                                   int md, const StringInfo *secret,
+                                   const char *label_prefix, const char *label,
+                                   uint16_t out_len, unsigned char **out)
 {
   /* RFC 8446 Section 7.1:
    * HKDF-Expand-Label(Secret, Label, Context, Length) =
@@ -511,12 +501,9 @@ static int tls13_hkdf_expand_label_context(struct ndpi_detection_module_struct *
   memcpy(&info_data[info_len], (const uint8_t *)label, label_length);
   info_len += label_length;
 
+  uint8_t context_length = 0; /* We don't use context */
   memcpy(&info_data[info_len], &context_length, 1);
   info_len += 1;
-  if(context_length && context_hash != NULL) {
-    memcpy(&info_data[info_len], context_hash, context_length);
-    info_len += context_length;
-  }
 #endif
 
   *out = (uint8_t *)ndpi_malloc(out_len);
@@ -535,13 +522,6 @@ static int tls13_hkdf_expand_label_context(struct ndpi_detection_module_struct *
   }
 
   return 1;
-}
-static int tls13_hkdf_expand_label(struct ndpi_detection_module_struct *ndpi_struct,
-				   int md, const StringInfo *secret,
-				   const char *label_prefix, const char *label,
-				   uint16_t out_len, unsigned char **out)
-{
-  return tls13_hkdf_expand_label_context(ndpi_struct, md, secret, label_prefix, label, NULL, 0, out_len, out);
 }
 
 
@@ -565,16 +545,10 @@ static int quic_hkdf_expand_label(struct ndpi_detection_module_struct *ndpi_stru
 static void quic_hp_cipher_reset(quic_hp_cipher *hp_cipher)
 {
   gcry_cipher_close(hp_cipher->hp_cipher);
-#if 0
-  memset(hp_cipher, 0, sizeof(*hp_cipher));
-#endif
 }
 static void quic_pp_cipher_reset(quic_pp_cipher *pp_cipher)
 {
   gcry_cipher_close(pp_cipher->pp_cipher);
-#if 0
-  memset(pp_cipher, 0, sizeof(*pp_cipher));
-#endif
 }
 static void quic_ciphers_reset(quic_ciphers *ciphers)
 {
@@ -700,15 +674,16 @@ static int quic_pp_cipher_prepare(struct ndpi_detection_module_struct *ndpi_stru
   return 1;
 }
 static int quic_ciphers_prepare(struct ndpi_detection_module_struct *ndpi_struct,
-                                quic_ciphers *ciphers, int hash_algo, int cipher_algo,
-                                int cipher_mode, uint8_t *secret, u_int32_t version)
+                                quic_ciphers *ciphers, uint8_t *secret, u_int32_t version)
 {
   int ret;
 
-  ret = quic_hp_cipher_prepare(ndpi_struct, &ciphers->hp_cipher, hash_algo, cipher_algo, secret, version);
+  /* Packet numbers are protected with AES128-CTR,
+     Initial packets are protected with AEAD_AES_128_GCM. */
+  ret = quic_hp_cipher_prepare(ndpi_struct, &ciphers->hp_cipher, GCRY_MD_SHA256, GCRY_CIPHER_AES128, secret, version);
   if(ret != 1)
     return ret;
-  ret = quic_pp_cipher_prepare(ndpi_struct, &ciphers->pp_cipher, hash_algo, cipher_algo, cipher_mode, secret, version);
+  ret = quic_pp_cipher_prepare(ndpi_struct, &ciphers->pp_cipher, GCRY_MD_SHA256, GCRY_CIPHER_AES128, GCRY_CIPHER_MODE_GCM, secret, version);
   if(ret != 1)
     quic_hp_cipher_reset(&ciphers->hp_cipher);
   return ret;
@@ -716,13 +691,10 @@ static int quic_ciphers_prepare(struct ndpi_detection_module_struct *ndpi_struct
 /**
  * Given a header protection cipher, a buffer and the packet number offset,
  * return the unmasked first byte and packet number.
- * If the loss bits feature is enabled, the protected bits in the first byte
- * are fewer than usual: 3 instead of 5 (on short headers only)
  */
 static int quic_decrypt_header(const uint8_t *packet_payload,
 			       uint32_t pn_offset, quic_hp_cipher *hp_cipher,
-			       int hp_cipher_algo, uint8_t *first_byte, uint32_t *pn,
-			       int loss_bits_negotiated)
+			       uint8_t *first_byte, uint32_t *pn)
 {
   if(!hp_cipher->hp_cipher) {
     /* Need to know the cipher */
@@ -736,18 +708,11 @@ static int quic_decrypt_header(const uint8_t *packet_payload,
   memcpy(sample, packet_payload + pn_offset + 4, 16);
 
   uint8_t mask[5] = { 0 };
-  switch (hp_cipher_algo) {
-  case GCRY_CIPHER_AES128:
-  case GCRY_CIPHER_AES256:
-    /* Encrypt in-place with AES-ECB and extract the mask. */
-    if(gcry_cipher_encrypt(h, sample, sizeof(sample), NULL, 0)) {
-      return 0;
-    }
-    memcpy(mask, sample, sizeof(mask));
-    break;
-  default:
+  /* Encrypt in-place with AES-ECB and extract the mask. */
+  if(gcry_cipher_encrypt(h, sample, sizeof(sample), NULL, 0)) {
     return 0;
   }
+  memcpy(mask, sample, sizeof(mask));
 
   /* https://tools.ietf.org/html/draft-ietf-quic-tls-22#section-5.4.1 */
   uint8_t packet0 = packet_payload[0];
@@ -755,14 +720,8 @@ static int quic_decrypt_header(const uint8_t *packet_payload,
     /* Long header: 4 bits masked */
     packet0 ^= mask[0] & 0x0f;
   } else {
-    /* Short header */
-    if(loss_bits_negotiated == 0) {
-      /* Standard mask: 5 bits masked */
-      packet0 ^= mask[0] & 0x1F;
-    } else {
-      /* https://tools.ietf.org/html/draft-ferrieuxhamchaoui-quic-lossbits-03#section-5.3 */
-      packet0 ^= mask[0] & 0x07;
-    }
+    /* Short header. We ignore loss bits -> standard mask: 5 bits masked */
+    packet0 ^= mask[0] & 0x1F;
   }
   uint32_t pkn_len = (packet0 & 0x03) + 1;
   /* printf("packet0 0x%x pkn_len %d\n", packet0, pkn_len); */
@@ -809,7 +768,7 @@ static void quic_decrypt_message(struct ndpi_detection_module_struct *ndpi_struc
     return;
   }
   /* Copy header, but replace encrypted first byte and PKN by plaintext. */
-  header = (uint8_t *)memdup(packet_payload, header_length);
+  header = (uint8_t *)ndpi_memdup(packet_payload, header_length);
   if(!header)
     return;
   header[0] = first_byte;
@@ -824,7 +783,7 @@ static void quic_decrypt_message(struct ndpi_detection_module_struct *ndpi_struc
     ndpi_free(header);
     return;
   }
-  buffer = (uint8_t *)memdup(packet_payload + header_length, buffer_length);
+  buffer = (uint8_t *)ndpi_memdup(packet_payload + header_length, buffer_length);
   if(!buffer) {
     ndpi_free(header);
     return;
@@ -1002,10 +961,7 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
     return NULL;
   }
 
-  /* Packet numbers are protected with AES128-CTR,
-     Initial packets are protected with AEAD_AES_128_GCM. */
-  if(!quic_ciphers_prepare(ndpi_struct, &ciphers, GCRY_MD_SHA256,
-                           GCRY_CIPHER_AES128, GCRY_CIPHER_MODE_GCM,
+  if(!quic_ciphers_prepare(ndpi_struct, &ciphers,
                            client_secret, version)) {
     NDPI_LOG_DBG(ndpi_struct, "Error quic_cipher_prepare\n");
     return NULL;
@@ -1034,7 +990,7 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   }
 
   if(!quic_decrypt_header(&packet->payload[0], pn_offset, &ciphers.hp_cipher,
-			  GCRY_CIPHER_AES128, &first_byte, &pkn32, 0)) {
+			  &first_byte, &pkn32)) {
     quic_ciphers_reset(&ciphers);
     return NULL;
   }

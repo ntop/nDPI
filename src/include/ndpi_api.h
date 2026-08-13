@@ -189,6 +189,8 @@ extern "C" {
    */
   u_int32_t ndpi_get_tot_allocated_memory(void);
 
+  void *ndpi_memdup(const uint8_t *orig, size_t len);
+
   /**
    * Remove leading and trailing whitespace from a string in-place.
    *
