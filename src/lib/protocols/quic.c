@@ -96,8 +96,8 @@ static uint8_t get_u8_quic_ver(uint32_t version)
   /* IETF Draft versions */
   if((version >> 8) == 0xff0000)
     return (uint8_t)version;
-  /* QUIC (final?) constants for v1 are defined in draft-33, but latest
-     draft version is -34 */
+  /* QUIC v1 wire constants were fixed in draft-33 (draft numbering kept
+     going up to -34 before publication as RFC 9001) */
   if (version == 0x00000001) {
     return 34;
   }
@@ -108,7 +108,7 @@ static uint8_t get_u8_quic_ver(uint32_t version)
     return 27;
 
   /* "Versions that follow the pattern 0x?a?a?a?a are reserved for use in
-     forcing version negotiation to be exercised".
+     forcing version negotiation to be exercised" (RFC 8999, Section 6).
      We can't return a correct draft version because we don't have a real
      version here! That means that we can't decode any data and we can dissect
      only the cleartext header.
@@ -184,7 +184,7 @@ int is_version_with_var_int_transport_params(uint32_t version)
 }
 int is_version_with_ietf_long_header(uint32_t version)
 {
-  /* At least draft-ietf-quic-invariants-06, or newer*/
+  /* At least RFC 8999 (formerly draft-ietf-quic-invariants-06, or newer) */
   return is_version_quic(version) ||
     ((version & 0xFFFFFF00) == 0x51303500) /* Q05X */ ||
     ((version & 0xFFFFFF00) == 0x54303500) /* T05X */;
@@ -420,10 +420,9 @@ static gcry_error_t hkdf_extract(int hashalgo, const uint8_t *salt, size_t salt_
 /*
  * Computes HKDF-Expand-Label(Secret, Label, Hash(context_value), Length) with "tls13 " as label prefix
  */
-static int tls13_hkdf_expand_label(struct ndpi_detection_module_struct *ndpi_struct,
-                                   int md, const unsigned char *secret_data, unsigned int secret_len,
-                                   const char *label,
-                                   uint16_t out_len, unsigned char **out)
+static int quic_hkdf_expand_label(struct ndpi_detection_module_struct *ndpi_struct,
+				  uint8_t *secret, uint32_t secret_len,
+				  const char *label, uint8_t *out, uint32_t out_len)
 {
   /* RFC 8446 Section 7.1:
    * HKDF-Expand-Label(Secret, Label, Context, Length) =
@@ -472,35 +471,15 @@ static int tls13_hkdf_expand_label(struct ndpi_detection_module_struct *ndpi_str
   memcpy(&info_data[info_len], &context_length, 1);
   info_len += 1;
 
-  *out = (uint8_t *)ndpi_malloc(out_len);
-  if(!*out) {
-    ndpi_free(info_data);
-    return 0;
-  }
-  err = hkdf_expand(md, secret_data, secret_len, info_data, info_len, *out, out_len);
+  err = hkdf_expand(QUIC_HASH_ALGO, secret, secret_len, info_data, info_len, out, out_len);
   ndpi_free(info_data);
 
   if(err) {
     NDPI_LOG_DBG(ndpi_struct, "Failed hkdf_expand: %s\n", __gcry_err(err, buferr, sizeof(buferr)));
-    ndpi_free(*out);
-    *out = NULL;
     return 0;
   }
 
   return 1;
-}
-
-static int quic_hkdf_expand_label(struct ndpi_detection_module_struct *ndpi_struct,
-				  uint8_t *secret, uint32_t secret_len,
-				  const char *label, uint8_t *out, uint32_t out_len)
-{
-  uint8_t *out_mem = NULL;
-  if(tls13_hkdf_expand_label(ndpi_struct, QUIC_HASH_ALGO, secret, secret_len, label, out_len, &out_mem)) {
-    memcpy(out, out_mem, out_len);
-    ndpi_free(out_mem);
-    return 1;
-  }
-  return 0;
 }
 static void quic_hp_cipher_uninit(ndpi_quic_hp_cipher *hp_cipher)
 {
@@ -517,42 +496,13 @@ static void quic_ciphers_uninit(ndpi_quic_ciphers *ciphers)
 }
 /**
  * Expands the secret (length MUST be the same as the SHA-256 digest size)
- * and initialize cipher with the new key.
+ * and initializes both ciphers with the new key material.
  */
-static int quic_hp_cipher_init(struct ndpi_detection_module_struct *ndpi_struct,
-                               ndpi_quic_hp_cipher *hp_cipher, uint8_t *secret,
-			       uint32_t version)
-{
-  uint8_t hp_key[QUIC_CIPHER_KEY_LENGTH];
-  uint32_t hash_len = gcry_md_get_algo_dlen(QUIC_HASH_ALGO);
-  char const * const label = is_version_with_v1_labels(version) ? "quic hp" : "quicv2 hp";
-
-  if(!quic_hkdf_expand_label(ndpi_struct, secret, hash_len, label, hp_key, sizeof(hp_key))) {
-    return 0;
-  }
-
-  return gcry_cipher_setkey(hp_cipher->hp_cipher, hp_key, sizeof(hp_key)) == 0;
-}
-static int quic_pp_cipher_init(struct ndpi_detection_module_struct *ndpi_struct,
-                               ndpi_quic_pp_cipher *pp_cipher, uint8_t *secret,
-			       uint32_t version)
-{
-  uint8_t write_key[QUIC_CIPHER_KEY_LENGTH];
-  uint32_t hash_len = gcry_md_get_algo_dlen(QUIC_HASH_ALGO);
-  char const * const key_label = is_version_with_v1_labels(version) ? "quic key" : "quicv2 key";
-  char const * const iv_label = is_version_with_v1_labels(version) ? "quic iv" : "quicv2 iv";
-
-  if(!quic_hkdf_expand_label(ndpi_struct, secret, hash_len, key_label, write_key, sizeof(write_key)) ||
-     !quic_hkdf_expand_label(ndpi_struct, secret, hash_len, iv_label, pp_cipher->pp_iv, sizeof(pp_cipher->pp_iv))) {
-    return 0;
-  }
-
-  return gcry_cipher_setkey(pp_cipher->pp_cipher, write_key, sizeof(write_key)) == 0;
-}
-
 static int quic_ciphers_init(struct ndpi_detection_module_struct *ndpi_struct,
                              ndpi_quic_ciphers *ciphers, uint8_t *secret, u_int32_t version)
 {
+  uint32_t hash_len = gcry_md_get_algo_dlen(QUIC_HASH_ALGO);
+
   /* Header protection uses AES128-ECB. Initial packets are protected with AEAD_AES_128_GCM.
      The secret length MUST match the hash algorithm output.
      See: https://datatracker.ietf.org/doc/html/rfc9001#name-packet-protection
@@ -564,10 +514,16 @@ static int quic_ciphers_init(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "Failed to create HP cipher\n");
     return 0;
   }
-  if(!quic_hp_cipher_init(ndpi_struct, &ciphers->hp_cipher, secret, version)) {
-    quic_hp_cipher_uninit(&ciphers->hp_cipher);
-    NDPI_LOG_DBG(ndpi_struct, "Failed to derive key material for HP cipher\n");
-    return 0;
+  {
+    uint8_t hp_key[QUIC_CIPHER_KEY_LENGTH];
+    char const * const hp_label = is_version_with_v1_labels(version) ? "quic hp" : "quicv2 hp";
+
+    if(!quic_hkdf_expand_label(ndpi_struct, secret, hash_len, hp_label, hp_key, sizeof(hp_key)) ||
+       gcry_cipher_setkey(ciphers->hp_cipher.hp_cipher, hp_key, sizeof(hp_key)) != 0) {
+      quic_hp_cipher_uninit(&ciphers->hp_cipher);
+      NDPI_LOG_DBG(ndpi_struct, "Failed to derive key material for HP cipher\n");
+      return 0;
+    }
   }
 
   /* Packet protection */
@@ -577,11 +533,19 @@ static int quic_ciphers_init(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "Failed to create PP cipher\n");
     return 0;
   }
-  if(!quic_pp_cipher_init(ndpi_struct, &ciphers->pp_cipher, secret, version)) {
-    quic_pp_cipher_uninit(&ciphers->pp_cipher);
-    quic_hp_cipher_uninit(&ciphers->hp_cipher);
-    NDPI_LOG_DBG(ndpi_struct, "Failed to derive key material for PP cipher\n");
-    return 0;
+  {
+    uint8_t write_key[QUIC_CIPHER_KEY_LENGTH];
+    char const * const key_label = is_version_with_v1_labels(version) ? "quic key" : "quicv2 key";
+    char const * const iv_label = is_version_with_v1_labels(version) ? "quic iv" : "quicv2 iv";
+
+    if(!quic_hkdf_expand_label(ndpi_struct, secret, hash_len, key_label, write_key, sizeof(write_key)) ||
+       !quic_hkdf_expand_label(ndpi_struct, secret, hash_len, iv_label, ciphers->pp_cipher.pp_iv, sizeof(ciphers->pp_cipher.pp_iv)) ||
+       gcry_cipher_setkey(ciphers->pp_cipher.pp_cipher, write_key, sizeof(write_key)) != 0) {
+      quic_pp_cipher_uninit(&ciphers->pp_cipher);
+      quic_hp_cipher_uninit(&ciphers->hp_cipher);
+      NDPI_LOG_DBG(ndpi_struct, "Failed to derive key material for PP cipher\n");
+      return 0;
+    }
   }
 
   return 1;
@@ -599,40 +563,40 @@ static int quic_decrypt_header(const uint8_t *packet_payload,
     /* Need to know the cipher */
     return 0;
   }
-  gcry_cipher_hd_t h = hp_cipher->hp_cipher;
+  gcry_cipher_hd_t hp_cipher_handle = hp_cipher->hp_cipher;
 
   /* Sample is always 16 bytes and starts after PKN (assuming length 4).
-     https://tools.ietf.org/html/draft-ietf-quic-tls-22#section-5.4.2 */
+     RFC 9001, Section 5.4.2 */
   uint8_t sample[16];
   memcpy(sample, packet_payload + pn_offset + 4, 16);
 
   uint8_t mask[5] = { 0 };
   /* Encrypt in-place with AES-ECB and extract the mask. */
-  if(gcry_cipher_encrypt(h, sample, sizeof(sample), NULL, 0)) {
+  if(gcry_cipher_encrypt(hp_cipher_handle, sample, sizeof(sample), NULL, 0)) {
     return 0;
   }
   memcpy(mask, sample, sizeof(mask));
 
-  /* https://tools.ietf.org/html/draft-ietf-quic-tls-22#section-5.4.1 */
-  uint8_t packet0 = packet_payload[0];
-  if((packet0 & 0x80) == 0x80) {
+  /* RFC 9001, Section 5.4.1 */
+  uint8_t unmasked_byte0 = packet_payload[0];
+  if((unmasked_byte0 & 0x80) == 0x80) {
     /* Long header: 4 bits masked */
-    packet0 ^= mask[0] & 0x0f;
+    unmasked_byte0 ^= mask[0] & 0x0f;
   } else {
     /* Short header. We ignore loss bits -> standard mask: 5 bits masked */
-    packet0 ^= mask[0] & 0x1F;
+    unmasked_byte0 ^= mask[0] & 0x1F;
   }
-  uint32_t pkn_len = (packet0 & 0x03) + 1;
-  /* printf("packet0 0x%x pkn_len %d\n", packet0, pkn_len); */
+  uint32_t pkn_len = (unmasked_byte0 & 0x03) + 1;
+  /* printf("unmasked_byte0 0x%x pkn_len %d\n", unmasked_byte0, pkn_len); */
 
   uint8_t pkn_bytes[4];
   memcpy(pkn_bytes, packet_payload + pn_offset, pkn_len);
-  uint32_t pkt_pkn = 0, i;
+  uint32_t truncated_pn = 0, i;
   for(i = 0; i < pkn_len; i++) {
-    pkt_pkn |= (uint32_t)(pkn_bytes[i] ^ mask[1 + i]) << (8 * (pkn_len - 1 - i));
+    truncated_pn |= (uint32_t)(pkn_bytes[i] ^ mask[1 + i]) << (8 * (pkn_len - 1 - i));
   }
-  *first_byte = packet0;
-  *pn = pkt_pkn;
+  *first_byte = unmasked_byte0;
+  *pn = truncated_pn;
   return 1;
 }
 /**
@@ -642,7 +606,7 @@ static int quic_decrypt_header(const uint8_t *packet_payload,
  * the (encrypted) packet number length is also included.
  *
  * The actual packet number must be constructed according to
- * https://tools.ietf.org/html/draft-ietf-quic-transport-22#section-12.3
+ * RFC 9000, Section 12.3
  */
 static void quic_decrypt_message(struct ndpi_detection_module_struct *ndpi_struct,
                                  ndpi_quic_pp_cipher *pp_cipher, const uint8_t *packet_payload, uint32_t packet_payload_len,
@@ -654,7 +618,7 @@ static void quic_decrypt_message(struct ndpi_detection_module_struct *ndpi_struc
   uint8_t *header;
   uint8_t nonce[TLS13_AEAD_NONCE_LENGTH];
   uint8_t *buffer;
-  uint8_t atag[16];
+  uint8_t auth_tag[16];
   uint32_t buffer_length, i;
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
   char buferr[128];
@@ -688,7 +652,7 @@ static void quic_decrypt_message(struct ndpi_detection_module_struct *ndpi_struc
     ndpi_free(header);
     return;
   }
-  memcpy(atag, packet_payload + header_length + buffer_length, 16);
+  memcpy(auth_tag, packet_payload + header_length + buffer_length, 16);
 
   memcpy(nonce, pp_cipher->pp_iv, TLS13_AEAD_NONCE_LENGTH);
   /* Packet number is left-padded with zeroes and XORed with write_iv */
@@ -722,7 +686,7 @@ static void quic_decrypt_message(struct ndpi_detection_module_struct *ndpi_struc
     return;
   }
 
-  err = gcry_cipher_checktag(pp_cipher->pp_cipher, atag, 16);
+  err = gcry_cipher_checktag(pp_cipher->pp_cipher, auth_tag, 16);
   if(err) {
     NDPI_LOG_DBG(ndpi_struct, "Decryption (checktag) failed: %s\n", __gcry_err(err, buferr, sizeof(buferr)));
     ndpi_free(buffer);
