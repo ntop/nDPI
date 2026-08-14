@@ -170,13 +170,3 @@ char *ndpi_strdup(const char *s) {
 
   return(m);
 }
-
-/* ****************************************** */
-
-void *ndpi_memdup(const uint8_t *orig, size_t len)
-{
-  void *dest = ndpi_malloc(len);
-  if(dest)
-    memcpy(dest, orig, len);
-  return dest;
-}
