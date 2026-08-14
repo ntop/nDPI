@@ -494,6 +494,7 @@ static void quic_ciphers_uninit(ndpi_quic_ciphers *ciphers)
   quic_hp_cipher_uninit(&ciphers->hp_cipher);
   quic_pp_cipher_uninit(&ciphers->pp_cipher);
 }
+
 /**
  * Expands the secret (length MUST be the same as the SHA-256 digest size)
  * and initializes both ciphers with the new key material.
@@ -502,6 +503,11 @@ static int quic_ciphers_init(struct ndpi_detection_module_struct *ndpi_struct,
                              ndpi_quic_ciphers *ciphers, uint8_t *secret, u_int32_t version)
 {
   uint32_t hash_len = gcry_md_get_algo_dlen(QUIC_HASH_ALGO);
+  uint8_t hp_key[QUIC_CIPHER_KEY_LENGTH];
+  char const * const hp_label = is_version_with_v1_labels(version) ? "quic hp" : "quicv2 hp";
+  uint8_t write_key[QUIC_CIPHER_KEY_LENGTH];
+  char const * const key_label = is_version_with_v1_labels(version) ? "quic key" : "quicv2 key";
+  char const * const iv_label = is_version_with_v1_labels(version) ? "quic iv" : "quicv2 iv";
 
   /* Header protection uses AES128-ECB. Initial packets are protected with AEAD_AES_128_GCM.
      The secret length MUST match the hash algorithm output.
@@ -514,16 +520,11 @@ static int quic_ciphers_init(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "Failed to create HP cipher\n");
     return 0;
   }
-  {
-    uint8_t hp_key[QUIC_CIPHER_KEY_LENGTH];
-    char const * const hp_label = is_version_with_v1_labels(version) ? "quic hp" : "quicv2 hp";
-
-    if(!quic_hkdf_expand_label(ndpi_struct, secret, hash_len, hp_label, hp_key, sizeof(hp_key)) ||
-       gcry_cipher_setkey(ciphers->hp_cipher.hp_cipher, hp_key, sizeof(hp_key)) != 0) {
-      quic_hp_cipher_uninit(&ciphers->hp_cipher);
-      NDPI_LOG_DBG(ndpi_struct, "Failed to derive key material for HP cipher\n");
-      return 0;
-    }
+  if(!quic_hkdf_expand_label(ndpi_struct, secret, hash_len, hp_label, hp_key, sizeof(hp_key)) ||
+     gcry_cipher_setkey(ciphers->hp_cipher.hp_cipher, hp_key, sizeof(hp_key)) != 0) {
+    quic_hp_cipher_uninit(&ciphers->hp_cipher);
+    NDPI_LOG_DBG(ndpi_struct, "Failed to derive key material for HP cipher\n");
+    return 0;
   }
 
   /* Packet protection */
@@ -533,19 +534,13 @@ static int quic_ciphers_init(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "Failed to create PP cipher\n");
     return 0;
   }
-  {
-    uint8_t write_key[QUIC_CIPHER_KEY_LENGTH];
-    char const * const key_label = is_version_with_v1_labels(version) ? "quic key" : "quicv2 key";
-    char const * const iv_label = is_version_with_v1_labels(version) ? "quic iv" : "quicv2 iv";
-
-    if(!quic_hkdf_expand_label(ndpi_struct, secret, hash_len, key_label, write_key, sizeof(write_key)) ||
-       !quic_hkdf_expand_label(ndpi_struct, secret, hash_len, iv_label, ciphers->pp_cipher.pp_iv, sizeof(ciphers->pp_cipher.pp_iv)) ||
-       gcry_cipher_setkey(ciphers->pp_cipher.pp_cipher, write_key, sizeof(write_key)) != 0) {
-      quic_pp_cipher_uninit(&ciphers->pp_cipher);
-      quic_hp_cipher_uninit(&ciphers->hp_cipher);
-      NDPI_LOG_DBG(ndpi_struct, "Failed to derive key material for PP cipher\n");
-      return 0;
-    }
+  if(!quic_hkdf_expand_label(ndpi_struct, secret, hash_len, key_label, write_key, sizeof(write_key)) ||
+     !quic_hkdf_expand_label(ndpi_struct, secret, hash_len, iv_label, ciphers->pp_cipher.pp_iv, sizeof(ciphers->pp_cipher.pp_iv)) ||
+     gcry_cipher_setkey(ciphers->pp_cipher.pp_cipher, write_key, sizeof(write_key)) != 0) {
+    quic_pp_cipher_uninit(&ciphers->pp_cipher);
+    quic_hp_cipher_uninit(&ciphers->hp_cipher);
+    NDPI_LOG_DBG(ndpi_struct, "Failed to derive key material for PP cipher\n");
+    return 0;
   }
 
   return 1;
