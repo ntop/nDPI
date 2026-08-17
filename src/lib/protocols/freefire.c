@@ -4,7 +4,6 @@
  * Free Fire
  *
  * Copyright (C) 2026 - ntop.org
- * Copyright (C) 2026 - V.G <v.gavrilov@securitycode.ru>
  *
  * This file is part of nDPI, an open source deep packet inspection
  * library based on the OpenDPI and PACE technology by ipoque GmbH
@@ -46,9 +45,22 @@ static int is_freefire_gameplay_port(u_int16_t port)
 
 static int is_freefire_udp_payload(const struct ndpi_packet_struct *packet)
 {
-  /* Gameplay datagrams commonly start with XX YY a5/a7 ... */
-  return (packet->payload_packet_len >= 8 &&
-          (packet->payload[2] == 0xa5 || packet->payload[2] == 0xa7));
+  u_int8_t b2;
+
+  if (packet->payload_packet_len < 8)
+    return 0;
+
+  /* Gameplay datagrams start with XX YY a0/a5/a7 ... */
+  b2 = packet->payload[2];
+  return (b2 == 0xa0 || b2 == 0xa5 || b2 == 0xa7);
+}
+
+static int is_freefire_tcp_setup(const struct ndpi_packet_struct *packet)
+{
+  /* First C->S control packet: 770 bytes with zeros at offsets 2-5 */
+  return (packet->payload_packet_len == 770 &&
+          packet->payload[2] == 0 && packet->payload[3] == 0 &&
+          packet->payload[4] == 0 && packet->payload[5] == 0);
 }
 
 static int is_freefire_tcp_payload(const struct ndpi_packet_struct *packet)
@@ -81,15 +93,31 @@ static void ndpi_search_freefire(struct ndpi_detection_module_struct *ndpi_struc
   NDPI_LOG_DBG(ndpi_struct, "search Free Fire\n");
 
   if (packet->tcp != NULL) {
+    if (packet->payload_packet_len == 10 &&
+        packet->payload[0] == 0xa0 &&
+        memcmp(&packet->payload[5], "vj73p", 5) == 0) {
+      NDPI_LOG_INFO(ndpi_struct, "found Free Fire (TCP)\n");
+      ndpi_int_freefire_add_connection(ndpi_struct, flow);
+      return;
+    }
+
+    /* Fast-exclude generic TCP: first C->S is not the Free Fire setup frame */
+    if (packet->packet_direction == 0 &&
+        flow->packet_direction_counter[0] == 1) {
+      if (!is_freefire_tcp_setup(packet))
+        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return;
+    }
+
     if (is_freefire_tcp_payload(packet)) {
       NDPI_LOG_INFO(ndpi_struct, "found Free Fire (TCP)\n");
       ndpi_int_freefire_add_connection(ndpi_struct, flow);
       return;
     }
 
-    if (flow->packet_counter >= 8)
+    if (flow->packet_counter >= 4)
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-  } else if (packet->udp != NULL) {
+  } else {
     u_int16_t sport = ntohs(packet->udp->source);
     u_int16_t dport = ntohs(packet->udp->dest);
 
@@ -100,9 +128,6 @@ static void ndpi_search_freefire(struct ndpi_detection_module_struct *ndpi_struc
       return;
     }
 
-    if (flow->packet_counter >= 4)
-      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-  } else {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }

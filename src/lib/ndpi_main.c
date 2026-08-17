@@ -7539,9 +7539,6 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Call of Duty: Mobile */
   init_cod_mobile_dissector(ndpi_str);
 
-  /* Free Fire */
-  init_freefire_dissector(ndpi_str);
-
   /* ZUG */
   init_zug_dissector(ndpi_str);
 
@@ -7631,6 +7628,9 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
 
   /* Nebula */
   init_nebula_dissector(ndpi_str);
+
+  /* Free Fire */
+  init_freefire_dissector(ndpi_str);
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
 #include "../../../nDPI-custom/custom_ndpi_main_init.c"
