@@ -379,7 +379,8 @@ extern "C" {
 			      ndpi_protocol_qoe_category_t qoeCategory,
 			      ndpi_port_range *tcpDefPorts,
 			      ndpi_port_range *udpDefPorts,
-			      u_int8_t is_custom_protocol);
+			      u_int8_t is_custom_protocol,
+			      u_int8_t partialClassificationCanChange);
 
   /**
    * Set protocol ids mapping
@@ -1119,9 +1120,13 @@ extern "C" {
 					      u_int16_t user_proto_id);
   u_int16_t ndpi_map_ndpi_id_to_user_proto_id(struct ndpi_detection_module_struct *ndpi_str,
 					      u_int16_t ndpi_proto_id);
+  
+  bool ndpi_can_partial_proto_classification_change(struct ndpi_detection_module_struct *ndpi_struct,
+						    u_int16_t ndpi_proto_id);
 
   /* Tells to called on what l4 protocol given application protocol can be found */
-  ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct, u_int16_t ndpi_proto_id);
+  ndpi_l4_proto_info ndpi_get_l4_proto_info(struct ndpi_detection_module_struct *ndpi_struct,
+					    u_int16_t ndpi_proto_id);
   const char* ndpi_get_l4_proto_name(ndpi_l4_proto_info proto);
 
   u_int16_t ndpi_get_lower_proto(ndpi_master_app_protocol proto);

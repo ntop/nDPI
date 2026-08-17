@@ -1309,7 +1309,8 @@ typedef enum {
 typedef struct ndpi_proto_defaults {
   char protoName[32];
   ndpi_protocol_category_t protoCategory;
-  u_int8_t isClearTextProto:1, isAppProtocol:1, isCustomProto:1, performIPcheck:1, _notused:4;
+  u_int8_t isClearTextProto:1, isAppProtocol:1, isCustomProto:1, performIPcheck:1,
+    partialClassificationCanChange:1, _notused:3;
   u_int16_t *subprotocols;
   u_int32_t subprotocol_count;
   u_int16_t protoId, dissector_idx;
