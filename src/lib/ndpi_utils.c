@@ -53,6 +53,12 @@
 #include "third_party/include/uthash.h"
 #include "third_party/include/rce_injection.h"
 
+#ifdef USE_HOST_LIBGCRYPT
+#include <gcrypt.h>
+#else
+#include "gcrypt_light.h"
+#endif
+
 #include "ndpi_replace_printf.h"
 #include "ndpi_sha256.h"
 
@@ -6379,4 +6385,136 @@ const char *ndpi_ikev2_dh_name(u_int16_t id) {
     case 32: return "CURVE448";
     default: return "UNKNOWN";
   }
+}
+
+/* ****************************************** */
+
+gcry_error_t hkdf_expand(int hashalgo, const uint8_t *prk, uint32_t prk_len,
+                         const uint8_t *info, uint32_t info_len,
+                         uint8_t *out, uint32_t out_len)
+{
+  /* Current maximum hash output size: 48 bytes for SHA-384. */
+  uint8_t lastoutput[48];
+  gcry_md_hd_t h;
+  gcry_error_t err;
+  const unsigned int hash_len = gcry_md_get_algo_dlen(hashalgo);
+  uint32_t off;
+
+  /* Some sanity checks */
+  if(!(out_len > 0 && out_len <= 255 * hash_len) ||
+     !(hash_len > 0 && hash_len <= sizeof(lastoutput))) {
+    return GPG_ERR_INV_ARG;
+  }
+
+  err = gcry_md_open(&h, hashalgo, GCRY_MD_FLAG_HMAC);
+  if(err) {
+    return err;
+  }
+
+  for(off = 0; off < out_len; off += hash_len) {
+    gcry_md_reset(h);
+    gcry_md_setkey(h, prk, prk_len); /* Set PRK */
+    if(off > 0) {
+      gcry_md_write(h, lastoutput, hash_len); /* T(1..N) */
+    }
+    gcry_md_write(h, info, info_len);                   /* info */
+
+    uint8_t c = off / hash_len + 1;
+    gcry_md_write(h, &c, sizeof(c));                    /* constant 0x01..N */
+
+    memcpy(lastoutput, gcry_md_read(h, hashalgo), hash_len);
+    memcpy(out + off, lastoutput, ndpi_min(hash_len, out_len - off));
+  }
+
+  gcry_md_close(h);
+  return 0;
+}
+
+/* ****************************************** */
+
+/*
+ * Calculate HKDF-Extract(salt, IKM) -> PRK according to RFC 5869.
+ * Caller MUST ensure that 'prk' is large enough to store the digest from hash
+ * algorithm 'hashalgo' (e.g. 32 bytes for SHA-256).
+ */
+gcry_error_t hkdf_extract(int hashalgo, const uint8_t *salt, size_t salt_len,
+                          const uint8_t *ikm, size_t ikm_len, uint8_t *prk)
+{
+  /* PRK = HMAC-Hash(salt, IKM) where salt is key, and IKM is input. */
+
+  gcry_md_hd_t hmac_handle;
+  gcry_error_t result = gcry_md_open(&hmac_handle, hashalgo, GCRY_MD_FLAG_HMAC);
+  if(result) {
+    return result;
+  }
+  result = gcry_md_setkey(hmac_handle, salt, salt_len);
+  if(result) {
+    gcry_md_close(hmac_handle);
+    return result;
+  }
+  gcry_md_write(hmac_handle, ikm, ikm_len);
+  memcpy(prk, gcry_md_read(hmac_handle, 0), gcry_md_get_algo_dlen(hashalgo));
+  gcry_md_close(hmac_handle);
+  return GPG_ERR_NO_ERROR;
+}
+
+/* ****************************************** */
+
+/*
+ * Computes HKDF-Expand-Label(Secret, Label, Hash(context_value), Length) with "tls13 " as label prefix
+ */
+int hkdf_expand_label(int hashalgo, uint8_t *secret, uint32_t secret_len,
+                      const char *label, uint8_t *out, uint32_t out_len)
+{
+  /* RFC 8446 Section 7.1:
+   * HKDF-Expand-Label(Secret, Label, Context, Length) =
+   *      HKDF-Expand(Secret, HkdfLabel, Length)
+   * struct {
+   *     uint16 length = Length;
+   *     opaque label<7..255> = "tls13 " + Label; // "tls13 " is label prefix.
+   *     opaque context<0..255> = Context;
+   * } HkdfLabel;
+   *
+   * RFC 5869 HMAC-based Extract-and-Expand Key Derivation Function (HKDF):
+   * HKDF-Expand(PRK, info, L) -> OKM
+   */
+  gcry_error_t err;
+  const unsigned label_length = (unsigned int)strlen(label);
+  const char *label_prefix = "tls13 ";
+  const unsigned int label_prefix_length = (unsigned int)strlen(label_prefix);
+
+  /* Some sanity checks */
+  if(!(label_length > 0 && label_prefix_length + label_length <= 255)) {
+    return 0;
+  }
+
+  /* info = HkdfLabel { length, label, context } */
+  uint32_t info_len = 0;
+  uint8_t *info_data = (uint8_t *)ndpi_malloc(1024);
+  if(!info_data)
+    return 0;
+  const uint16_t length = htons(out_len);
+  memcpy(&info_data[info_len], &length, sizeof(length));
+  info_len += sizeof(length);
+
+  const uint8_t label_vector_length = label_prefix_length + label_length;
+  memcpy(&info_data[info_len], &label_vector_length, 1);
+  info_len += 1;
+  memcpy(&info_data[info_len], (const uint8_t *)label_prefix, label_prefix_length);
+  info_len += label_prefix_length;
+  memcpy(&info_data[info_len], (const uint8_t *)label, label_length);
+  info_len += label_length;
+
+  uint8_t context_length = 0; /* We don't use context */
+  memcpy(&info_data[info_len], &context_length, 1);
+  info_len += 1;
+
+  err = hkdf_expand(hashalgo, secret, secret_len, info_data, info_len, out, out_len);
+  ndpi_free(info_data);
+
+  if(err) {
+    return 0;
+  }
+
+  return 1;
 }
