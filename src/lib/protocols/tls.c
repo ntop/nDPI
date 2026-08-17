@@ -1375,8 +1375,6 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
     break;
 
   case 0x0b: /* Certificate */
-    /* Important: populate the tls union fields only after
-     * ndpi_int_tls_add_connection has been called */
     if(flow->protos.tls_quic.client_hello_processed ||
        flow->protos.tls_quic.server_hello_processed) {
       /* Only certificates from the server */
@@ -2648,7 +2646,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
       offset += 2 + 1;
 
-      if((offset + 1) < packet->payload_packet_len) /* +1 because we are goint to read 2 bytes */
+      if((offset + 1) < packet->payload_packet_len)
 	tot_extension_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
       else
 	tot_extension_len = 0;
@@ -3029,9 +3027,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
 	  if((extensions_len+offset) <= total_len) {
-	    /* Move to the first extension
-	       Type is u_int to avoid possible overflow on extension_len addition */
-	    u_int extension_offset = 0;
+	    u_int32_t extension_offset = 0;
 
 	    while(extension_offset < extensions_len &&
 		  offset+extension_offset+4 <= total_len) {
@@ -3496,7 +3492,6 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		  s_offset++;
 
-		  // careful not to overflow and loop forever with u_int8_t
 		  for(j=0; j+1<version_len && s_offset + j + 1 < packet->payload_packet_len; j += 2) {
 		    u_int16_t tls_version = ntohs(*((u_int16_t*)&packet->payload[s_offset+j]));
 		    u_int8_t unknown_tls_version;
