@@ -331,8 +331,8 @@ static void phton64(uint8_t *p, uint64_t v)
 }
 
 
-#define HASH_SHA2_256_LENGTH		32
-#define TLS13_AEAD_NONCE_LENGTH		12
+#define QUIC_HASH_SHA2_256_LENGTH	32
+#define QUIC_TLS13_AEAD_NONCE_LENGTH    12
 
 /* QUIC decryption context. */
 
@@ -351,7 +351,7 @@ typedef struct ndpi_quic_hp_cipher {
 /* Packet protection cipher. */
 typedef struct ndpi_quic_pp_cipher {
   gcry_cipher_hd_t pp_cipher;
-  uint8_t pp_iv[TLS13_AEAD_NONCE_LENGTH];
+  uint8_t pp_iv[QUIC_TLS13_AEAD_NONCE_LENGTH];
 } ndpi_quic_pp_cipher;
 typedef struct ndpi_quic_ciphers {
   ndpi_quic_hp_cipher hp_cipher;
@@ -427,12 +427,9 @@ static int decrypt_header(const uint8_t *packet_payload,
   uint32_t pkn_len;
   uint8_t pkn_bytes[4];
   uint32_t truncated_pn, i;
+  gcry_cipher_hd_t hp_cipher_handle;
 
-  if(!hp_cipher->hp_cipher) {
-    /* Need to know the cipher */
-    return 0;
-  }
-  gcry_cipher_hd_t hp_cipher_handle = hp_cipher->hp_cipher;
+  hp_cipher_handle = hp_cipher->hp_cipher;
 
   memcpy(sample, packet_payload + pn_offset + 4, 16);
 
@@ -449,8 +446,8 @@ static int decrypt_header(const uint8_t *packet_payload,
     /* Long header: 4 bits masked */
     unmasked_byte0 ^= mask[0] & 0x0f;
   } else {
-    /* Short header. We ignore loss bits -> standard mask: 5 bits masked */
-    unmasked_byte0 ^= mask[0] & 0x1F;
+    /* Short header: we decrypt only initial packets */
+    return 0;
   }
   pkn_len = (unmasked_byte0 & 0x03) + 1;
   /* printf("unmasked_byte0 0x%x pkn_len %d\n", unmasked_byte0, pkn_len); */
@@ -466,14 +463,15 @@ static int decrypt_header(const uint8_t *packet_payload,
 }
 
 static void decrypt_message(struct ndpi_detection_module_struct *ndpi_struct,
-                            ndpi_quic_pp_cipher *pp_cipher, const uint8_t *packet_payload, uint32_t packet_payload_len,
-			    uint32_t header_length, uint8_t first_byte, uint32_t pkn_len,
-			    uint64_t packet_number,
-			    uint8_t **decrypt_data, uint32_t *decrypt_data_len)
+                            ndpi_quic_pp_cipher *pp_cipher,
+                            const uint8_t *packet_payload, uint32_t packet_payload_len,
+                            uint32_t header_length, uint8_t first_byte,
+                            uint64_t packet_number, uint32_t packey_number_len,
+                            uint8_t **decrypt_data, uint32_t *decrypt_data_len)
 {
   gcry_error_t err;
   uint8_t *header;
-  uint8_t nonce[TLS13_AEAD_NONCE_LENGTH];
+  uint8_t nonce[QUIC_TLS13_AEAD_NONCE_LENGTH];
   uint8_t *buffer;
   uint8_t auth_tag[16];
   uint32_t buffer_length, i;
@@ -483,8 +481,8 @@ static void decrypt_message(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(!(pp_cipher != NULL) ||
      !(pp_cipher->pp_cipher != NULL) ||
-     !(pkn_len < header_length) ||
-     !(1 <= pkn_len && pkn_len <= 4)) {
+     !(packey_number_len < header_length) ||
+     !(1 <= packey_number_len && packey_number_len <= 4)) {
     NDPI_LOG_DBG(ndpi_struct, "Failed sanity checks\n");
     return;
   }
@@ -493,11 +491,11 @@ static void decrypt_message(struct ndpi_detection_module_struct *ndpi_struct,
   if(!header)
     return;
   header[0] = first_byte;
-  for(i = 0; i < pkn_len; i++) {
+  for(i = 0; i < packey_number_len; i++) {
     header[header_length - 1 - i] = (uint8_t)(packet_number >> (8 * i));
   }
 
-  /* Input is "header || ciphertext (buffer) || auth tag (16 bytes)" */
+  /* Input: header || ciphertext (buffer) || auth tag (always 16 bytes) */
   buffer_length = packet_payload_len - (header_length + 16);
   if(buffer_length == 0) {
     NDPI_LOG_DBG(ndpi_struct, "Decryption error, ciphertext is too short\n");
@@ -511,12 +509,12 @@ static void decrypt_message(struct ndpi_detection_module_struct *ndpi_struct,
   }
   memcpy(auth_tag, packet_payload + header_length + buffer_length, 16);
 
-  memcpy(nonce, pp_cipher->pp_iv, TLS13_AEAD_NONCE_LENGTH);
-  /* Packet number is left-padded with zeroes and XORed with write_iv */
+  /* PN: left-padded with zeroes and XORed with iv */
+  memcpy(nonce, pp_cipher->pp_iv, QUIC_TLS13_AEAD_NONCE_LENGTH);
   phton64(nonce + sizeof(nonce) - 8, pntoh64(nonce + sizeof(nonce) - 8) ^ packet_number);
 
-  gcry_cipher_reset(pp_cipher->pp_cipher);
-  err = gcry_cipher_setiv(pp_cipher->pp_cipher, nonce, TLS13_AEAD_NONCE_LENGTH);
+  /* gcry_cipher_reset(pp_cipher->pp_cipher); */
+  err = gcry_cipher_setiv(pp_cipher->pp_cipher, nonce, QUIC_TLS13_AEAD_NONCE_LENGTH);
   if(err) {
     NDPI_LOG_DBG(ndpi_struct, "Error gcry_cipher_setiv: %s\n", __gcry_err(err, buferr, sizeof(buferr)));
     ndpi_free(header);
@@ -556,8 +554,14 @@ static int get_initial_secrets(struct ndpi_detection_module_struct *ndpi_struct,
 			       uint32_t version,
 			       const uint8_t *cid, uint8_t cid_len,
 			       /* Hash for handshake packets is SHA-256 (output size 32) */
-			       uint8_t client_initial_secret[HASH_SHA2_256_LENGTH])
+			       uint8_t client_initial_secret[QUIC_HASH_SHA2_256_LENGTH])
 {
+  gcry_error_t err;
+  uint8_t secret[QUIC_HASH_SHA2_256_LENGTH];
+#ifdef NDPI_ENABLE_DEBUG_MESSAGES
+  char buferr[128];
+#endif
+
   /*
    * https://datatracker.ietf.org/doc/html/rfc9001#name-initial-secrets
    *
@@ -566,66 +570,62 @@ static int get_initial_secrets(struct ndpi_detection_module_struct *ndpi_struct,
    * client_initial_secret = HKDF-Expand-Label(initial_secret,
    *                                           "client in", "", Hash.length)
    */
-  static const uint8_t hs_salt_draft_22[20] = {
-    0x7f, 0xbc, 0xdb, 0x0e, 0x7c, 0x66, 0xbb, 0xe9, 0x19, 0x3a,
-    0x96, 0xcd, 0x21, 0x51, 0x9e, 0xbd, 0x7a, 0x02, 0x64, 0x4a
-  };
-  static const uint8_t hs_salt_draft_23[20] = {
-    0xc3, 0xee, 0xf7, 0x12, 0xc7, 0x2e, 0xbb, 0x5a, 0x11, 0xa7,
-    0xd2, 0x43, 0x2b, 0xb4, 0x63, 0x65, 0xbe, 0xf9, 0xf5, 0x02,
-  };
-  static const uint8_t hs_salt_draft_29[20] = {
-    0xaf, 0xbf, 0xec, 0x28, 0x99, 0x93, 0xd2, 0x4c, 0x9e, 0x97,
-    0x86, 0xf1, 0x9c, 0x61, 0x11, 0xe0, 0x43, 0x90, 0xa8, 0x99
-  };
-  static const uint8_t hs_salt_draft_q50[20] = {
-    0x50, 0x45, 0x74, 0xEF, 0xD0, 0x66, 0xFE, 0x2F, 0x9D, 0x94,
-    0x5C, 0xFC, 0xDB, 0xD3, 0xA7, 0xF0, 0xD3, 0xB5, 0x6B, 0x45
-  };
-  static const uint8_t hs_salt_draft_t50[20] = {
-    0x7f, 0xf5, 0x79, 0xe5, 0xac, 0xd0, 0x72, 0x91, 0x55, 0x80,
-    0x30, 0x4c, 0x43, 0xa2, 0x36, 0x7c, 0x60, 0x48, 0x83, 0x10
-  };
-  static const uint8_t hs_salt_draft_t51[20] = {
-    0x7a, 0x4e, 0xde, 0xf4, 0xe7, 0xcc, 0xee, 0x5f, 0xa4, 0x50,
-    0x6c, 0x19, 0x12, 0x4f, 0xc8, 0xcc, 0xda, 0x6e, 0x03, 0x3d
-  };
-  static const uint8_t hs_salt_v1[20] = {
-    0x38, 0x76, 0x2c, 0xf7, 0xf5, 0x59, 0x34, 0xb3, 0x4d, 0x17,
-    0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a
-  };
-  static const uint8_t hs_salt_v2[20] = {
-    0x0d, 0xed, 0xe3, 0xde, 0xf7, 0x00, 0xa6, 0xdb, 0x81, 0x93,
-    0x81, 0xbe, 0x6e, 0x26, 0x9d, 0xcb, 0xf9, 0xbd, 0x2e, 0xd9
-  };
-  gcry_error_t err;
-  uint8_t secret[HASH_SHA2_256_LENGTH];
-#ifdef NDPI_ENABLE_DEBUG_MESSAGES
-  char buferr[128];
-#endif
 
   if(version == V_Q050) {
+    static const uint8_t hs_salt_draft_q50[20] = {
+      0x50, 0x45, 0x74, 0xEF, 0xD0, 0x66, 0xFE, 0x2F, 0x9D, 0x94,
+      0x5C, 0xFC, 0xDB, 0xD3, 0xA7, 0xF0, 0xD3, 0xB5, 0x6B, 0x45
+    };
     err = hkdf_extract(QUIC_HASH_ALGO, hs_salt_draft_q50, sizeof(hs_salt_draft_q50),
                        cid, cid_len, secret);
   } else if(version == V_T050) {
+    static const uint8_t hs_salt_draft_t50[20] = {
+      0x7f, 0xf5, 0x79, 0xe5, 0xac, 0xd0, 0x72, 0x91, 0x55, 0x80,
+      0x30, 0x4c, 0x43, 0xa2, 0x36, 0x7c, 0x60, 0x48, 0x83, 0x10
+    };
     err = hkdf_extract(QUIC_HASH_ALGO, hs_salt_draft_t50, sizeof(hs_salt_draft_t50),
                        cid, cid_len, secret);
   } else if(version == V_T051) {
+    static const uint8_t hs_salt_draft_t51[20] = {
+      0x7a, 0x4e, 0xde, 0xf4, 0xe7, 0xcc, 0xee, 0x5f, 0xa4, 0x50,
+      0x6c, 0x19, 0x12, 0x4f, 0xc8, 0xcc, 0xda, 0x6e, 0x03, 0x3d
+    };
     err = hkdf_extract(QUIC_HASH_ALGO, hs_salt_draft_t51, sizeof(hs_salt_draft_t51),
                        cid, cid_len, secret);
   } else if(is_quic_ver_less_than(version, 22)) {
+    static const uint8_t hs_salt_draft_22[20] = {
+      0x7f, 0xbc, 0xdb, 0x0e, 0x7c, 0x66, 0xbb, 0xe9, 0x19, 0x3a,
+      0x96, 0xcd, 0x21, 0x51, 0x9e, 0xbd, 0x7a, 0x02, 0x64, 0x4a
+    };
     err = hkdf_extract(QUIC_HASH_ALGO, hs_salt_draft_22, sizeof(hs_salt_draft_22),
                        cid, cid_len, secret);
   } else if(is_quic_ver_less_than(version, 28)) {
+    static const uint8_t hs_salt_draft_23[20] = {
+      0xc3, 0xee, 0xf7, 0x12, 0xc7, 0x2e, 0xbb, 0x5a, 0x11, 0xa7,
+      0xd2, 0x43, 0x2b, 0xb4, 0x63, 0x65, 0xbe, 0xf9, 0xf5, 0x02,
+    };
     err = hkdf_extract(QUIC_HASH_ALGO, hs_salt_draft_23, sizeof(hs_salt_draft_23),
+
                        cid, cid_len, secret);
   } else if(is_quic_ver_less_than(version, 32)) {
+    static const uint8_t hs_salt_draft_29[20] = {
+      0xaf, 0xbf, 0xec, 0x28, 0x99, 0x93, 0xd2, 0x4c, 0x9e, 0x97,
+      0x86, 0xf1, 0x9c, 0x61, 0x11, 0xe0, 0x43, 0x90, 0xa8, 0x99
+    };
     err = hkdf_extract(QUIC_HASH_ALGO, hs_salt_draft_29, sizeof(hs_salt_draft_29),
                        cid, cid_len, secret);
   } else if (is_quic_ver_less_than(version, 34)) {
+    static const uint8_t hs_salt_v1[20] = {
+      0x38, 0x76, 0x2c, 0xf7, 0xf5, 0x59, 0x34, 0xb3, 0x4d, 0x17,
+      0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a
+    };
     err = hkdf_extract(QUIC_HASH_ALGO, hs_salt_v1, sizeof(hs_salt_v1),
                        cid, cid_len, secret);
   } else {
+    static const uint8_t hs_salt_v2[20] = {
+      0x0d, 0xed, 0xe3, 0xde, 0xf7, 0x00, 0xa6, 0xdb, 0x81, 0x93,
+      0x81, 0xbe, 0x6e, 0x26, 0x9d, 0xcb, 0xf9, 0xbd, 0x2e, 0xd9
+    };
     err = hkdf_extract(QUIC_HASH_ALGO, hs_salt_v2, sizeof(hs_salt_v2),
                        cid, cid_len, secret);
   }
@@ -635,7 +635,7 @@ static int get_initial_secrets(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if(!hkdf_expand_label(QUIC_HASH_ALGO, secret, sizeof(secret), "client in",
-			client_initial_secret, HASH_SHA2_256_LENGTH)) {
+			client_initial_secret, QUIC_HASH_SHA2_256_LENGTH)) {
     NDPI_LOG_DBG(ndpi_struct, "Error quic_hkdf_expand_label: %s\n", __gcry_err(err, buferr, sizeof(buferr)));
     return -1;
   }
@@ -652,9 +652,9 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   uint64_t token_length, payload_length, packet_number;
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   uint8_t first_byte;
-  uint32_t pkn32, pn_offset, pkn_len, offset;
+  uint32_t pkn32, pn_offset, packet_number__len, offset;
   ndpi_quic_ciphers ciphers; /* Client initial ciphers */
-  uint8_t client_secret[HASH_SHA2_256_LENGTH];
+  uint8_t client_secret[QUIC_HASH_SHA2_256_LENGTH];
   uint8_t *decrypt_data = NULL;
   uint32_t decrypt_data_len = 0;
 
@@ -700,11 +700,11 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
   }
   NDPI_LOG_DBG2(ndpi_struct, "first_byte 0x%x pkn32 0x%x\n", first_byte, pkn32);
 
-  pkn_len = (first_byte & 3) + 1;
+  packet_number__len = (first_byte & 3) + 1;
   /* TODO: is it always true in Initial Packets? */
   packet_number = pkn32;
 
-  offset = pn_offset + pkn_len;
+  offset = pn_offset + packet_number__len;
   if (!(pn_offset + payload_length >= offset + 16)) {
     NDPI_LOG_DBG(ndpi_struct, "No room for Auth Tag %d %d",
                  pn_offset + payload_length, offset);
@@ -712,7 +712,8 @@ static uint8_t *decrypt_initial_packet(struct ndpi_detection_module_struct *ndpi
     return NULL;
   }
   decrypt_message(ndpi_struct, &ciphers.pp_cipher, &packet->payload[0], pn_offset + payload_length,
-		       offset, first_byte, pkn_len, packet_number,
+		       offset, first_byte,
+		       packet_number, packet_number__len,
 		       &decrypt_data, &decrypt_data_len);
 
   ciphers_uninit(&ciphers);
