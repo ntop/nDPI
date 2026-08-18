@@ -1472,11 +1472,20 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
 
     ndpi_ssl_version2str(version, sizeof(version), flow->protos.tls_quic.ssl_version, &unknown_tls_version);
 
-    if(flow->protos.tls_quic.notBefore)
-      before = ndpi_gmtime_r((const time_t *)&flow->protos.tls_quic.notBefore, &a);
+    /* notBefore/notAfter are u_int32_t, so their address cannot be passed as a
+       time_t *: on 64-bit platforms that reads 8 bytes out of a 4-byte field.
+       Convert to a real time_t instead. */
+    if(flow->protos.tls_quic.notBefore) {
+      time_t not_before = (time_t)flow->protos.tls_quic.notBefore;
 
-    if(flow->protos.tls_quic.notAfter)
-      after = ndpi_gmtime_r((const time_t *)&flow->protos.tls_quic.notAfter, &b);
+      before = ndpi_gmtime_r(&not_before, &a);
+    }
+
+    if(flow->protos.tls_quic.notAfter) {
+      time_t not_after = (time_t)flow->protos.tls_quic.notAfter;
+
+      after = ndpi_gmtime_r(&not_after, &b);
+    }
 
     if(!unknown_tls_version) {
       ndpi_serialize_start_of_block(serializer, "tls");
