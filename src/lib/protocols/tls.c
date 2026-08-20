@@ -3786,7 +3786,7 @@ void init_tls_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_register_dissector("(D)TLS", ndpi_struct,
                      ndpi_search_tls_wrapper,
                      NDPI_SELECTION_BITMASK_PROTOCOL_V4_V6_TCP_OR_UDP_WITH_PAYLOAD_WITHOUT_RETRANSMISSION,
-                     DISSECTOR_LICENSE_LGPL,
+                     DISSECTOR_LICENSE_NTOP_DUAL_LICENSE,
                      2,
                      NDPI_PROTOCOL_TLS,
                      NDPI_PROTOCOL_DTLS);
