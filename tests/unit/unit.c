@@ -41,7 +41,6 @@
 #include <search.h>
 #include <pcap.h>
 #include <signal.h>
-#include <pthread.h>
 #include <assert.h>
 #include <math.h>
 #include <sys/stat.h>
@@ -51,6 +50,8 @@
 #include "ndpi_config.h"
 #include "ndpi_api.h"
 #include "ndpi_define.h"
+#include "ndpi_categories_bin.h"
+#include "ndpi_category_host_norm.h"
 
 #include "json.h" /* JSON-C */
 
@@ -375,6 +376,198 @@ int serializeProtoUnitTest(void)
 
 /* *********************************************** */
 
+#ifndef WIN32
+static uint64_t ut_fnv1a64(const char *s, size_t len) {
+  uint64_t h = 1469598103934665603ULL;
+  size_t i;
+
+  for(i = 0; i < len; ++i) {
+    h ^= (unsigned char)s[i];
+    h *= 1099511628211ULL;
+  }
+  return h;
+}
+
+static int category_ndb_smoke_unit(void) {
+  char path[] = "/tmp/ndpi_ut_ndbXXXXXX";
+  int fd;
+  FILE *fp;
+  ndb_header_disk_t hdr;
+  ndb_category_disk_t cat;
+  ndb_bucket_disk_t bucks[2];
+  ndb_entry_disk_t ent;
+  const char *dom = "example.com";
+  size_t dom_len = strlen(dom);
+  const char pool[] = "x\0example.com\0";
+  const size_t pool_len = sizeof(pool) - 1;
+  ndb_ipv4_entry_disk_t v4[3];
+  ndpi_protocol_category_t cat_out;
+  ndpi_protocol_breed_t breed;
+  uint64_t off;
+  uint32_t addr_8888 = htonl(0x08080808);
+  uint32_t addr_10_8 = htonl(0x0a000000);
+  uint32_t addr_10_1_16 = htonl(0x0a010000);
+
+  if(!ndpi_category_hostname_labels_valid_ascii(dom))
+    return -1;
+  if(ndpi_category_hostname_labels_valid_ascii("a..b"))
+    return -1;
+
+  fd = mkstemp(path);
+  if(fd < 0) {
+    perror("mkstemp");
+    return -1;
+  }
+  fp = fdopen(fd, "wb");
+  if(!fp) {
+    close(fd);
+    return -1;
+  }
+
+  memset(&hdr, 0, sizeof(hdr));
+  memcpy(hdr.magic, NDB_MAGIC, 4);
+  hdr.format_version = NDB_FORMAT_VERSION;
+  hdr.category_count = 1;
+  hdr.domain_entry_count = 1;
+  hdr.domain_bucket_count = 2;
+  hdr.string_pool_size = pool_len;
+  hdr.ipv4_entry_count = 3;
+  hdr.ipv6_entry_count = 0;
+
+  off = sizeof(hdr);
+  hdr.categories_off = off;
+  off += sizeof(cat);
+  hdr.domain_buckets_off = off;
+  off += sizeof(bucks);
+  hdr.domain_entries_off = off;
+  off += sizeof(ent);
+  hdr.string_pool_off = off;
+  off += pool_len;
+  hdr.ipv4_entries_off = off;
+  off += sizeof(v4);
+  hdr.ipv6_entries_off = off;
+  hdr.file_size = off;
+
+  cat.id = NDPI_PROTOCOL_CATEGORY_WEB;
+  cat.name_off = 0;
+
+  bucks[0].first = 0;
+  bucks[0].count = 1;
+  bucks[1].first = 0;
+  bucks[1].count = 0;
+
+  ent.hash = ut_fnv1a64(dom, dom_len);
+  ent.domain_off = 2;
+  ent.domain_len = (uint16_t)dom_len;
+  ent.flags = 0;
+  ent.category_id = NDPI_PROTOCOL_CATEGORY_WEB;
+
+  v4[0].network_be = addr_10_8;
+  v4[0].prefix_len = 8;
+  v4[0].flags = 0;
+  v4[0].reserved0 = 0;
+  v4[0].category_id = NDPI_PROTOCOL_CATEGORY_WEB;
+
+  v4[1].network_be = addr_10_1_16;
+  v4[1].prefix_len = 16;
+  v4[1].flags = 0;
+  v4[1].reserved0 = 0;
+  v4[1].category_id = NDPI_PROTOCOL_CATEGORY_VPN;
+
+  v4[2].network_be = addr_8888;
+  v4[2].prefix_len = 32;
+  v4[2].flags = 0;
+  v4[2].reserved0 = 0;
+  v4[2].category_id = NDPI_PROTOCOL_CATEGORY_VPN;
+
+  if(fwrite(&hdr, 1, sizeof(hdr), fp) != sizeof(hdr) ||
+      fwrite(&cat, 1, sizeof(cat), fp) != sizeof(cat) ||
+      fwrite(bucks, 1, sizeof(bucks), fp) != sizeof(bucks) ||
+      fwrite(&ent, 1, sizeof(ent), fp) != sizeof(ent) ||
+      fwrite(pool, 1, pool_len, fp) != pool_len ||
+      fwrite(v4, 1, sizeof(v4), fp) != sizeof(v4)) {
+    fclose(fp);
+    unlink(path);
+    return -1;
+  }
+  fclose(fp);
+
+  if(ndpi_load_category_ndb_file(ndpi_info_mod, path, NDPI_CATEGORY_BACKEND_NDB_ONLY) != 0) {
+    unlink(path);
+    return -1;
+  }
+
+  {
+    char hostbuf[] = "example.com";
+    if(ndpi_match_custom_category(ndpi_info_mod, hostbuf, (u_int)strlen(hostbuf), &cat_out, &breed) != 0 ||
+       cat_out != NDPI_PROTOCOL_CATEGORY_WEB) {
+      ndpi_unload_category_ndb(ndpi_info_mod);
+      unlink(path);
+      return -1;
+    }
+  }
+
+  {
+    char ipbuf[] = "8.8.8.8";
+    if(ndpi_get_custom_category_match(ndpi_info_mod, ipbuf, (u_int)strlen(ipbuf), &cat_out, &breed) != 0 ||
+       cat_out != NDPI_PROTOCOL_CATEGORY_VPN) {
+      ndpi_unload_category_ndb(ndpi_info_mod);
+      unlink(path);
+      return -1;
+    }
+  }
+
+  /* Longest-prefix: 10.0.0.0/8 (WEB) vs 10.1.0.0/16 (VPN); more specific row must win. */
+  {
+    char ipbuf[] = "10.1.2.3";
+    if(ndpi_get_custom_category_match(ndpi_info_mod, ipbuf, (u_int)strlen(ipbuf), &cat_out, &breed) != 0 ||
+       cat_out != NDPI_PROTOCOL_CATEGORY_VPN) {
+      ndpi_unload_category_ndb(ndpi_info_mod);
+      unlink(path);
+      return -1;
+    }
+  }
+  {
+    char ipbuf[] = "10.9.9.9";
+    if(ndpi_get_custom_category_match(ndpi_info_mod, ipbuf, (u_int)strlen(ipbuf), &cat_out, &breed) != 0 ||
+       cat_out != NDPI_PROTOCOL_CATEGORY_WEB) {
+      ndpi_unload_category_ndb(ndpi_info_mod);
+      unlink(path);
+      return -1;
+    }
+  }
+
+  {
+    char miss[] = "nomatch.example";
+    if(ndpi_match_custom_category(ndpi_info_mod, miss, (u_int)strlen(miss), &cat_out, &breed) != -1) {
+      ndpi_unload_category_ndb(ndpi_info_mod);
+      unlink(path);
+      return -1;
+    }
+  }
+
+  ndpi_unload_category_ndb(ndpi_info_mod);
+
+  if(ndpi_load_category_ndb_file(ndpi_info_mod, path, NDPI_CATEGORY_BACKEND_HYBRID) != 0) {
+    unlink(path);
+    return -1;
+  }
+  {
+    char miss6[] = "2001:db8::1";
+    if(ndpi_get_custom_category_match(ndpi_info_mod, miss6, (u_int)strlen(miss6), &cat_out, &breed) != -1) {
+      ndpi_unload_category_ndb(ndpi_info_mod);
+      unlink(path);
+      return -1;
+    }
+  }
+  ndpi_unload_category_ndb(ndpi_info_mod);
+  unlink(path);
+  return 0;
+}
+#endif /* !WIN32 */
+
+/* *********************************************** */
+
 int main(int argc, char **argv) {
 #ifndef WIN32
   int c;
@@ -418,6 +611,14 @@ int main(int argc, char **argv) {
   /* Tests */
   if (serializerUnitTest() != 0) return -1;
   if (serializeProtoUnitTest() != 0) return -1;
+#ifndef WIN32
+  if (category_ndb_smoke_unit() != 0) {
+    printf("category_ndb_smoke_unit: FAILED\n");
+    return -1;
+  }
+  if (verbose)
+    printf("%30s                      OK\n", "category_ndb_smoke_unit");
+#endif
 
   return 0;
 }

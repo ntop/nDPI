@@ -908,6 +908,37 @@ extern "C" {
 			       char* path);
 
   /**
+   * Category hostname backend: LEGACY (Aho-Corasick lists), NDB_ONLY (.ndb only for external lists),
+   * HYBRID (.ndb first, then AC for external lists on miss).
+   */
+  typedef enum {
+    NDPI_CATEGORY_BACKEND_LEGACY = 0,
+    NDPI_CATEGORY_BACKEND_NDB_ONLY,
+    NDPI_CATEGORY_BACKEND_HYBRID
+  } ndpi_category_backend_mode_t;
+
+  /**
+   * Load a compiled .ndb category file (mmap). mode must be NDB_ONLY or HYBRID (not LEGACY).
+   * On failure the previous module state is preserved. On success, replaces any prior .ndb cleanly.
+   *
+   * Threading: when nDPI is built without global context support (no internal pthread rwlock for this
+   * backend), the .ndb backend should be considered single-threaded unless external synchronization is
+   * provided by the caller. Concurrent reload/unload while other threads perform category lookups is unsafe;
+   * the caller must serialize those operations (e.g. one thread or an external mutex).
+   *
+   * @return 0 on success, &lt; 0 on error (e.g. -2 invalid argument).
+   */
+  int ndpi_load_category_ndb_file(struct ndpi_detection_module_struct *ndpi_str, const char *path,
+      ndpi_category_backend_mode_t mode);
+
+  /**
+   * Release .ndb state; sets backend to LEGACY.
+   * Threading: same contract as ndpi_load_category_ndb_file (single-threaded unless the caller provides
+   * external synchronization when built without global context support).
+   */
+  void ndpi_unload_category_ndb(struct ndpi_detection_module_struct *ndpi_str);
+
+  /**
    * Load files (whose name is <protocolid>_<label>.<extension>) stored
    * in a directory and binds each IP/network to the specified protocol.
    * This function is used to bind IP addresses to protocols

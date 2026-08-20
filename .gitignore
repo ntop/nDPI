@@ -55,6 +55,7 @@
 /example/ndpiReader
 /example/ndpiReader.exe
 /example/ndpiSimpleIntegration
+/example/ndpi_gen_categories_bin
 /utils/Makefile
 /utils/hosts2domains
 /utils/print_rank

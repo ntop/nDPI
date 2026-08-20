@@ -302,7 +302,11 @@ echo "Setting API version to ${NDPI_API_VERSION}"
 AC_DEFINE_UNQUOTED(NDPI_GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(NDPI_GIT_DATE, "${GIT_DATE}", [Last GIT change])
 
-NDPI_CFLAGS="-W -Wall -Wextra -Wno-address-of-packed-member ${NDPI_CFLAGS}"
+NDPI_CFLAGS="-W -Wall -Wextra ${NDPI_CFLAGS}"
+dnl> gcc < 5 does not support -Wno-address-of-packed-member (unknown -Wno-* is fatal with -Werror)
+AX_CHECK_COMPILE_FLAG([-Wno-address-of-packed-member], [
+  NDPI_CFLAGS="${NDPI_CFLAGS} -Wno-address-of-packed-member"
+], [], [-Werror])
 
 dnl> MacOS brew.sh
 HOMEBREW_DIR=/opt/homebrew
@@ -431,6 +435,8 @@ if test -d ${srcdir}/../nDPI-custom; then :
    AC_MSG_RESULT([Compiling with custom nDPI protocols])
 fi
 
+dnl> example/ndpi_gen_categories_bin is linked without $(LIBS); Winsock must still be linked.
+NDPI_GEN_EXTRA_LIBS=
 case "$host" in
    *-*-mingw32*|*-*-msys)
       PCAP_INC=""
@@ -450,6 +456,7 @@ case "$host" in
       esac
       NDPI_CFLAGS="-D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS ${NDPI_CFLAGS}"
       LIBS="${LIBS} -lws2_32"
+      NDPI_GEN_EXTRA_LIBS="-lws2_32"
       BUILD_MINGW=1
       EXE_SUFFIX=".exe"
       AS_IF([test "${enable_npcap+set}" != set && test "${with_only_libndpi+set}" != set],,
@@ -649,6 +656,7 @@ AC_SUBST(NDPI_API_VERSION)
 AC_SUBST(EXTRA_TARGETS)
 AC_SUBST(BUILD_MINGW)
 AC_SUBST(BUILD_MINGW_X64)
+AC_SUBST(NDPI_GEN_EXTRA_LIBS)
 AC_SUBST(BUILD_FUZZTARGETS)
 AC_SUBST(JSONC_CFLAGS)
 AC_SUBST(JSONC_LIBS)

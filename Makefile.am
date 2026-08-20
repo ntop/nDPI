@@ -19,7 +19,7 @@ EXTRA_DIST = README.md README.fuzzer.md CHANGELOG.md CONTRIBUTING.md \
 	autogen.sh wireshark windows utils packages dga \
 	influxdb/Makefile.in influxdb/metric_anomaly.c influxdb/README.txt \
 	rrdtool/Makefile.in rrdtool/README.txt rrdtool/rrd_anomaly.c rrdtool/rrd_similarity.c \
-	doc/requirements.txt doc/conf.py doc/flow_risks.rst doc/protocols.rst doc/guide/nDPI_QuickStartGuide.pages \
+	doc/requirements.txt doc/categories-ndb.md doc/conf.py doc/flow_risks.rst doc/protocols.rst doc/guide/nDPI_QuickStartGuide.pages \
 		doc/guide/nDPI_QuickStartGuide.pdf doc/img/logo.png doc/index.rst \
 		doc/Makefile doc/what_is_ndpi.rst \
 		doc/FAQ.rst \

@@ -63,6 +63,7 @@
 #endif
 #include <errno.h>
 #include "reader_util.h"
+#include "ndpiReader_category_ndb_reload.h"
 
 #define ntohl64(x) ( ( (uint64_t)(ntohl( (uint32_t)((x << 32) >> 32) )) << 32) | ntohl( ((uint32_t)(x >> 32)) ) )
 #define htonl64(x) ntohl64(x)
@@ -88,6 +89,13 @@ static char *_maliciousSHA1Path     = NULL; /**< Malicious SSL certificate SHA1 
 static char *_riskyDomainFilePath   = NULL; /**< Risky domain files */
 static char *_domain_suffixes       = NULL; /**< Domain suffixes file */
 static char *_categoriesDirPath     = NULL; /**< Directory containing domain files */
+static char *_categoryNdbPath       = NULL; /**< Compiled categories (.ndb) for hostname backend */
+static ndpi_category_backend_mode_t g_category_ndb_effective_mode = NDPI_CATEGORY_BACKEND_NDB_ONLY;
+static unsigned g_category_ndb_reload_interval_sec = 5;
+static volatile int g_category_ndb_monitor_stop;
+static pthread_t g_category_ndb_monitor_ptid;
+static ndpi_reader_category_ndb_snap_t g_category_ndb_snap;
+static struct ndpi_detection_module_struct *g_category_ndb_str_ptrs[MAX_NUM_READER_THREADS];
 static u_int8_t live_capture = 0;
 static u_int8_t undetected_flows_deleted = 0;
 static FILE *csv_fp                 = NULL; /**< for CSV export */
@@ -574,6 +582,17 @@ static void configure_ndpi(struct ndpi_detection_module_struct *ndpi_struct) {
     }
   }
 
+  if(_categoryNdbPath) {
+    g_category_ndb_effective_mode =
+      (_categoriesDirPath != NULL || _customCategoryFilePath != NULL) ? NDPI_CATEGORY_BACKEND_HYBRID :
+      NDPI_CATEGORY_BACKEND_NDB_ONLY;
+
+    if(ndpi_load_category_ndb_file(ndpi_struct, _categoryNdbPath, g_category_ndb_effective_mode) != 0) {
+      fprintf(stderr, "Failed to load category .ndb file: %s\n", _categoryNdbPath);
+      exit(-1);
+    }
+  }
+
   ndpi_set_config(ndpi_struct, NULL, "tcp_ack_payload_heuristic", "enable");
 
   for(i = 0; i < num_cfgs; i++) {
@@ -978,6 +997,11 @@ static void help(u_int long_help) {
          "  -j <path>                  | Load malicious JA4 fingeprints\n"
          "  -S <path>                  | Load malicious SSL certificate SHA1 fingerprints\n"
 	 "  -G <dir>                   | Bind domain names to categories loading files from <dir>\n"
+   "  --category-ndb <path>      | Load compiled hostname categories from .ndb (mmap).\n"
+   "                             | With only this flag: NDB_ONLY (external hostname lists use .ndb).\n"
+   "                             | With -G or -c also: HYBRID (ndb hit wins; miss falls back to lists).\n"
+   "                             | Built-in category_match[] behaviour is unchanged.\n"
+   "  --category-ndb-reload-interval <sec> | Hot-reload poll interval (default 5; >= 1).\n"
          "  -w <path>                  | Write test output on the specified file. This is useful for\n"
          "                             | testing purposes in order to compare results across runs\n"
 	 "  --protocols-list-dir <dir> | Directory containing protocols directory (e.g. ../lists/protocols)\n"
@@ -1070,6 +1094,8 @@ static void help(u_int long_help) {
 #define OPTLONG_VALUE_FPC_STATS                 3004
 #define OPTLONG_VALUE_DOMAINS_FILE              3005
 #define OPTLONG_VALUE_RUN_TESTS                 3006
+#define OPTLONG_VALUE_CATEGORY_NDB              3007
+#define OPTLONG_VALUE_CATEGORY_NDB_RELOAD_INT   3008
 
 static struct option longopts[] = {
   /* mandatory extcap options */
@@ -1126,6 +1152,8 @@ static struct option longopts[] = {
 
   { "x-file", required_argument, NULL, OPTLONG_VALUE_DOMAINS_FILE},
   { "run-tests", no_argument, NULL, OPTLONG_VALUE_RUN_TESTS},
+  { "category-ndb", required_argument, NULL, OPTLONG_VALUE_CATEGORY_NDB},
+  { "category-ndb-reload-interval", required_argument, NULL, OPTLONG_VALUE_CATEGORY_NDB_RELOAD_INT},
 
   {0, 0, 0, 0}
 };
@@ -1819,6 +1847,22 @@ static void parse_parameters(int argc, char **argv)
     case OPTLONG_VALUE_RUN_TESTS:
       skip_unit_tests = 0;
       break;
+
+    case OPTLONG_VALUE_CATEGORY_NDB:
+      _categoryNdbPath = optarg;
+      break;
+
+    case OPTLONG_VALUE_CATEGORY_NDB_RELOAD_INT:
+      {
+        int iv = atoi(optarg);
+
+        if(iv < 1) {
+          fprintf(stderr, "--category-ndb-reload-interval must be >= 1\n");
+          exit(1);
+        }
+        g_category_ndb_reload_interval_sec = (unsigned)iv;
+        break;
+      }
 
     case 'X':
       ip_port_to_check = optarg;
@@ -5568,6 +5612,34 @@ void * processing_thread(void *_thread_id) {
 
 /* ***************************************************** */
 
+/*
+ * Periodic .ndb hot-reload monitor: aims to converge all ndpi_struct instances to the
+ * latest valid on-disk file; does not guarantee an atomic swap across threads (Etapa 2).
+ */
+static void *category_ndb_monitor_thread(void *arg) {
+  unsigned i, n;
+
+  (void)arg;
+  n = (unsigned)num_threads;
+
+  while(!g_category_ndb_monitor_stop) {
+    for(i = 0; i < g_category_ndb_reload_interval_sec && !g_category_ndb_monitor_stop; i++)
+      sleep(1);
+
+    if(g_category_ndb_monitor_stop || !_categoryNdbPath)
+      break;
+
+    for(i = 0; i < n; i++)
+      g_category_ndb_str_ptrs[i] = ndpi_thread_info[i].workflow->ndpi_struct;
+
+    (void)ndpi_reader_category_ndb_poll_reload(_categoryNdbPath, g_category_ndb_effective_mode,
+        (struct ndpi_detection_module_struct *const *)g_category_ndb_str_ptrs, n,
+        &g_category_ndb_snap);
+  }
+
+  return NULL;
+}
+
 /**
  * @brief Begin, process, end detection process
  */
@@ -5607,43 +5679,58 @@ void test_lib() {
     setupDetection(thread_id, cap, g_ctx);
   }
 
-  gettimeofday(&begin, NULL);
+  {
+    int category_ndb_monitor_running = 0;
 
-  int status;
-  void * thd_res;
+    if(_categoryNdbPath && ndpi_reader_category_ndb_snap_init(_categoryNdbPath, &g_category_ndb_snap) == 0) {
+      g_category_ndb_monitor_stop = 0;
+      if(pthread_create(&g_category_ndb_monitor_ptid, NULL, category_ndb_monitor_thread, NULL) == 0)
+        category_ndb_monitor_running = 1;
+      else
+        fprintf(stderr, "[category-ndb] warning: could not start reload monitor thread\n");
+    }
 
-  /* Running processing threads */
-  for(thread_id = 0; thread_id < num_threads; thread_id++) {
-    status = pthread_create(&ndpi_thread_info[thread_id].pthread, NULL, processing_thread, (void *) thread_id);
-    /* check pthreade_create return value */
-    if(status != 0) {
+    gettimeofday(&begin, NULL);
+
+    {
+      int status;
+      void *thd_res;
+
+      for(thread_id = 0; thread_id < num_threads; thread_id++) {
+        status = pthread_create(&ndpi_thread_info[thread_id].pthread, NULL, processing_thread, (void *)thread_id);
+        if(status != 0) {
 #ifdef WIN64
-      fprintf(stderr, "error on create %lld thread\n", thread_id);
+          fprintf(stderr, "error on create %lld thread\n", thread_id);
 #else
-      fprintf(stderr, "error on create %ld thread\n", thread_id);
+          fprintf(stderr, "error on create %ld thread\n", thread_id);
 #endif
-      exit(-1);
-    }
-  }
-  /* Waiting for completion */
-  for(thread_id = 0; thread_id < num_threads; thread_id++) {
-    status = pthread_join(ndpi_thread_info[thread_id].pthread, &thd_res);
-    /* check pthreade_join return value */
-    if(status != 0) {
+          exit(-1);
+        }
+      }
+
+      for(thread_id = 0; thread_id < num_threads; thread_id++) {
+        status = pthread_join(ndpi_thread_info[thread_id].pthread, &thd_res);
+        if(status != 0) {
 #ifdef WIN64
-      fprintf(stderr, "error on join %lld thread\n", thread_id);
+          fprintf(stderr, "error on join %lld thread\n", thread_id);
 #else
-      fprintf(stderr, "error on join %ld thread\n", thread_id);
+          fprintf(stderr, "error on join %ld thread\n", thread_id);
 #endif
-      exit(-1);
-    }
-    if(thd_res != NULL) {
+          exit(-1);
+        }
+        if(thd_res != NULL) {
 #ifdef WIN64
-      fprintf(stderr, "error on returned value of %lld joined thread\n", thread_id);
+          fprintf(stderr, "error on returned value of %lld joined thread\n", thread_id);
 #else
-      fprintf(stderr, "error on returned value of %ld joined thread\n", thread_id);
+          fprintf(stderr, "error on returned value of %ld joined thread\n", thread_id);
 #endif
-      exit(-1);
+          exit(-1);
+        }
+      }
+
+      g_category_ndb_monitor_stop = 1;
+      if(category_ndb_monitor_running)
+        pthread_join(g_category_ndb_monitor_ptid, NULL);
     }
   }
 

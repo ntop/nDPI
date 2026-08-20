@@ -166,6 +166,8 @@
     <ClCompile Include="..\src\lib\ndpi_community_id.c" />
     <ClCompile Include="..\src\lib\ndpi_geoip.c" />
     <ClCompile Include="..\src\lib\ndpi_main.c" />
+    <ClCompile Include="..\src\lib\ndpi_category_host_norm.c" />
+    <ClCompile Include="..\src\lib\ndpi_category_ndb.c" />
     <ClCompile Include="..\src\lib\ndpi_filter.c" />
     <ClCompile Include="..\src\lib\ndpi_memory.c" />
     <ClCompile Include="..\src\lib\ndpi_serializer.c" />
@@ -285,6 +287,7 @@
     <ClCompile Include="..\example\ndpiReader.c" />
     <ClCompile Include="..\example\reader_util.c" />
     <ClCompile Include="..\example\utests.c" />
+    <ClCompile Include="..\example\ndpiReader_category_ndb_reload.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\include\ndpi_includes.h" />
@@ -342,6 +345,7 @@
     <ClInclude Include="src\ndpi_config.h" />
     <ClInclude Include="src\ndpi_define.h" />
     <ClInclude Include="..\example\reader_util.h" />
+    <ClInclude Include="..\example\ndpiReader_category_ndb_reload.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\lib\ndpi_content_match.c.inc" />

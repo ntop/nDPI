@@ -11,7 +11,7 @@ INC=-I $(top_srcdir)/src/include/ -I $(top_builddir)/src/include/ -I $(top_srcdi
 LIB=$(top_builddir)/src/lib/libndpi.a @ADDITIONAL_LIBS@ @LIBS@
 GEN_HEADERS=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 
-TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu strnstr
+TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu strnstr category_ndb_bench
 TESTS=substring_test patricia_test strnstr_test geo_test
 
 
@@ -47,6 +47,9 @@ geo_test: geo
 
 patriciasearch: $(srcdir)/patriciasearch.c Makefile $(GEN_HEADERS)
 	$(CC) $(INC) $(AM_CFLAGS) $(CFLAGS) $(srcdir)/patriciasearch.c -o patriciasearch $(LIB)
+
+category_ndb_bench: $(srcdir)/category_ndb_bench.c Makefile $(GEN_HEADERS)
+	$(CC) $(INC) $(AM_CFLAGS) $(CFLAGS) $(srcdir)/category_ndb_bench.c -o category_ndb_bench $(LIB)
 
 patricia_test: patriciasearch blacklist-ip.txt
 	./patriciasearch

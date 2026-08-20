@@ -24,5 +24,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   ndpi_match_custom_category(ndpi_struct, (char *)data, size,
                              &category, &breed);
+
+  if(size < 128) {
+    char buf[128];
+    memcpy(buf, data, size);
+    buf[size] = '\0';
+    (void)ndpi_get_custom_category_match(ndpi_struct, buf, (u_int)size, &category, &breed);
+  }
   return 0;
 }

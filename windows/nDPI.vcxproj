@@ -126,6 +126,9 @@
     <ClCompile Include="..\example\utests.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\example\ndpiReader_category_ndb_reload.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />
     <ClCompile Include="..\src\lib\ndpi_bitmap.c" />
     <ClCompile Include="..\src\lib\ndpi_classify.c" />
@@ -133,6 +136,8 @@
     <ClCompile Include="..\src\lib\ndpi_geoip.c" />
     <ClCompile Include="..\src\lib\ndpi_main.c" />
     <ClCompile Include="..\src\lib\ndpi_cache.c" />
+    <ClCompile Include="..\src\lib\ndpi_category_host_norm.c" />
+    <ClCompile Include="..\src\lib\ndpi_category_ndb.c" />
     <ClCompile Include="..\src\lib\ndpi_config.c" />
     <ClCompile Include="..\src\lib\ndpi_filter.c" />
     <ClCompile Include="..\src\lib\ndpi_memory.c" />
@@ -435,6 +440,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\example\reader_util.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\example\ndpiReader_category_ndb_reload.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\src\include\ndpi_encryption.h" />
