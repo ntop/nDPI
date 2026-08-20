@@ -56,7 +56,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   else
     g_ctx = NULL;
 
-  ndpi_info_mod = ndpi_init_detection_module(g_ctx, fuzzed_data.ConsumeEnum<enum ndpi_license_type>());
+  ndpi_info_mod = ndpi_init_detection_module(g_ctx, static_cast<enum ndpi_license_type>(fuzzed_data.ConsumeIntegralInRange(0, 2)));
 
   set_ndpi_debug_function(ndpi_info_mod, NULL);
 
