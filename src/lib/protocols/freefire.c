@@ -101,12 +101,15 @@ static void ndpi_search_freefire(struct ndpi_detection_module_struct *ndpi_struc
       return;
     }
 
-    /* Fast-exclude generic TCP: first C->S is not the Free Fire setup frame */
-    if (packet->packet_direction == 0 &&
-        flow->packet_direction_counter[0] == 1) {
-      if (!is_freefire_tcp_setup(packet))
-        NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-      return;
+    /* Fast-exclude only when we saw the full 3-way handshake.
+       Mid-flow captures fall through to string matching below. */
+    if (ndpi_seen_flow_beginning(flow)) {
+      if (packet->packet_direction == 0 &&
+          flow->packet_direction_counter[0] == 1) {
+        if (!is_freefire_tcp_setup(packet))
+          NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+        return;
+      }
     }
 
     if (is_freefire_tcp_payload(packet)) {
