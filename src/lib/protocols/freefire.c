@@ -93,14 +93,6 @@ static void ndpi_search_freefire(struct ndpi_detection_module_struct *ndpi_struc
   NDPI_LOG_DBG(ndpi_struct, "search Free Fire\n");
 
   if (packet->tcp != NULL) {
-    if (packet->payload_packet_len == 10 &&
-        packet->payload[0] == 0xa0 &&
-        memcmp(&packet->payload[5], "vj73p", 5) == 0) {
-      NDPI_LOG_INFO(ndpi_struct, "found Free Fire (TCP)\n");
-      ndpi_int_freefire_add_connection(ndpi_struct, flow);
-      return;
-    }
-
     /* Fast-exclude only when we saw the full 3-way handshake.
        Mid-flow captures fall through to string matching below. */
     if (ndpi_seen_flow_beginning(flow)) {
