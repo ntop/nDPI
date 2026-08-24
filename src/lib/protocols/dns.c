@@ -148,7 +148,7 @@ static u_int16_t checkDNSSubprotocol(struct ndpi_detection_module_struct *ndpi_s
       dport == (u_int16_t)ndpi_struct->cfg.dns_custom_port))
     return NDPI_PROTOCOL_DNS;
 
-  return rc;
+  return rc == 0 ? NDPI_PROTOCOL_DNS : rc;
 }
 
 /* *********************************************** */
@@ -660,6 +660,11 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
     *is_query = 0;
 
   if(*is_query) {
+
+    if(dns_header->num_answers == 0 && dns_header->num_queries == 0 &&
+       dns_header->additional_rrs == 0 && dns_header->authority_rrs == 0)
+      return 0;
+
     if(dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS &&
        /* dns_header->num_answers == 0 && */
        ((dns_header->flags & 0x2800) == 0x2800 /* Dynamic DNS Update */ ||
@@ -1202,12 +1207,23 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   }
 
   /* DNS on nonstandard ports is opt-in to avoid false positives. */
-  if(!(s_port == DNS_PORT || d_port == DNS_PORT ||
-       s_port == MDNS_PORT || d_port == MDNS_PORT ||
-       d_port == LLMNR_PORT ||
-       (ndpi_struct->cfg.dns_custom_port != 0 &&
-        (s_port == (u_int16_t)ndpi_struct->cfg.dns_custom_port ||
-         d_port == (u_int16_t)ndpi_struct->cfg.dns_custom_port)))) {
+  if(s_port == DNS_PORT || d_port == DNS_PORT ||
+     s_port == MDNS_PORT || d_port == MDNS_PORT ||
+     d_port == LLMNR_PORT ||
+     (ndpi_struct->cfg.dns_custom_port > 0 &&
+      (s_port == (u_int16_t)ndpi_struct->cfg.dns_custom_port ||
+       d_port == (u_int16_t)ndpi_struct->cfg.dns_custom_port))) {
+    /* Standard case, keep going */
+  } else if(ndpi_struct->cfg.dns_custom_port == 0 &&
+            flow->l4_proto == IPPROTO_UDP && /* No TCP to avoid too many false positives */
+            /* Avoid collision with other protocols requiring multiple pkts. */
+            flow->rtp_stage == 0 &&
+            flow->rtcp_stage == 0 &&
+            flow->teamviewer_stage == 0 &&
+            flow->l4.udp.eaq_pkt_id == 0 && flow->l4.udp.eaq_sequence == 0 &&
+            flow->l4.udp.hamachi_stage == 0) {
+    /* Ok, check DNS on any ports: keep going */
+  } else {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
