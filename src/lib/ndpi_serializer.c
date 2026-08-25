@@ -88,78 +88,141 @@ static int ndpi_is_number(const char *str, u_int32_t str_len) {
  * Upon successful return, these functions return the number of characters printed (excluding the null byte used to terminate the string).
  */
 int ndpi_json_string_escape(const char *src, int src_len, char *dst, int dst_max_len) {
-  u_char c = 0;
-  int i, j = 0;
+  int i = 0;
+  int j = 0;
 
+  // We need at least 3 bytes for an empty JSON string: "" and '\0'
+  if (dst_max_len < 3) {
+    if (dst_max_len > 0) dst[0] = '\0';
+    return -1; // Buffer too small
+  }
+
+  // Reserve 2 bytes at the end for the closing quote and null terminator
+  int safe_max_len = dst_max_len - 2;
+
+  // Opening quote
   dst[j++] = '"';
 
-  for(i = 0; i < src_len && j < dst_max_len; i++) {
+  for (i = 0; i < src_len; i++) {
+    u_char c = (u_char)src[i];
 
-    c = (u_char) src[i];
+    if (c <= 0x7E) {
+      // Handle characters requiring 2-byte escape sequences
+      if (c == '\\' || c == '"' || c == '/') {
+	if (j + 2 > safe_max_len) goto overflow;
+	dst[j++] = '\\';
+	dst[j++] = c;
+      } else if (c == '\b') {
+	if (j + 2 > safe_max_len) goto overflow;
+	dst[j++] = '\\';
+	dst[j++] = 'b';
+      } else if (c == '\t') {
+	if (j + 2 > safe_max_len) goto overflow;
+	dst[j++] = '\\';
+	dst[j++] = 't';
+      } else if (c == '\n') {
+	if (j + 2 > safe_max_len) goto overflow;
+	dst[j++] = '\\';
+	dst[j++] = 'n';
+      } else if (c == '\f') {
+	if (j + 2 > safe_max_len) goto overflow;
+	dst[j++] = '\\';
+	dst[j++] = 'f';
+      } else if (c == '\r') {
+	if (j + 2 > safe_max_len) goto overflow;
+	dst[j++] = '\\';
+	dst[j++] = 'r';
+      } else if (c < 0x20) {
+	// Hex escape non-printable ASCII control characters (\u00XX)
+	if (j + 6 > safe_max_len) goto overflow;
+	dst[j++] = '\\';
+	dst[j++] = 'u';
+	dst[j++] = '0';
+	dst[j++] = '0';
 
-    if (c < 0x20 /* ' ' */ || c == 0x7F) {
-      ; // Non-printable ASCII character (skip)
-    } else if (c >= 0x20 && c <= 0x7E) {
-      // Valid ASCII character (escape if required by JSON)
-      switch (c) {
-      case '\\':
-      case '"':
-      case '/':
-        dst[j++] = '\\';
-        dst[j++] = c;
-        break;
-      case '\b':
-        dst[j++] = '\\';
-        dst[j++] = 'b';
-        break;
-      case '\t':
-        dst[j++] = '\\';
-        dst[j++] = 't';
-        break;
-      case '\n':
-        dst[j++] = '\\';
-        dst[j++] = 'n';
-        break;
-      case '\f':
-        dst[j++] = '\\';
-        dst[j++] = 'f';
-        break;
-      case '\r':
-        dst[j++] = '\\';
-        dst[j++] = 'r';
-        break;
-      default:
-  	dst[j++] = c;
+	// Quick hex conversion
+	char hex[] = "0123456789abcdef";
+	dst[j++] = hex[(c >> 4) & 0x0F];
+	dst[j++] = hex[c & 0x0F];
+      } else {
+	// Printable ASCII
+	if (j + 1 > safe_max_len) goto overflow;
+	dst[j++] = c;
+      }
+    } else if (c == 0x7F) {
+      // Escape DEL character
+      if (j + 6 > safe_max_len) goto overflow;
+      dst[j++] = '\\';
+      dst[j++] = 'u';
+      dst[j++] = '0';
+      dst[j++] = '0';
+      dst[j++] = '7';
+      dst[j++] = 'f';
+    } else {
+      // Multi-byte UTF-8 Validation & Copying
+      // Note: Length check must happen BEFORE accessing lookahead buffer indices
+
+      if ((c >= 0xC2 && c <= 0xDF) && (src_len - i >= 2)) {
+	u_char c1 = (u_char)src[i+1];
+	if (c1 >= 0x80 && c1 <= 0xBF) {
+	  if (j + 2 > safe_max_len) goto overflow;
+	  dst[j++] = c;
+	  dst[j++] = (char)c1;
+	  i += 1;
+	  continue;
+	}
+      }
+      else if ((c >= 0xE0 && c <= 0xEF) && (src_len - i >= 3)) {
+	u_char c1 = (u_char)src[i+1];
+	u_char c2 = (u_char)src[i+2];
+	if ((c1 >= 0x80 && c1 <= 0xBF) && (c2 >= 0x80 && c2 <= 0xBF)) {
+	  // Exclude overlongs and surrogates for strict JSON validity
+	  if (!((c == 0xE0 && c1 < 0xA0) || (c == 0xED && c1 > 0x9F))) {
+	    if (j + 3 > safe_max_len) goto overflow;
+	    dst[j++] = c;
+	    dst[j++] = (char)c1;
+	    dst[j++] = (char)c2;
+	    i += 2;
+	    continue;
+	  }
+	}
+      }
+      else if ((c >= 0xF0 && c <= 0xF4) && (src_len - i >= 4)) {
+	u_char c1 = (u_char)src[i+1];
+	u_char c2 = (u_char)src[i+2];
+	u_char c3 = (u_char)src[i+3];
+	if ((c1 >= 0x80 && c1 <= 0xBF) && (c2 >= 0x80 && c2 <= 0xBF) && (c3 >= 0x80 && c3 <= 0xBF)) {
+	  // Exclude overlongs and out-of-range codepoints (> U+10FFFF)
+	  if (!((c == 0xF0 && c1 < 0x90) || (c == 0xF4 && c1 > 0x8F))) {
+	    if (j + 4 > safe_max_len) goto overflow;
+	    dst[j++] = c;
+	    dst[j++] = (char)c1;
+	    dst[j++] = (char)c2;
+	    dst[j++] = (char)c3;
+	    i += 3;
+	    continue;
+	  }
+	}
       }
 
-    } else if ((c >= 0xC2 && c <= 0xDF) && (src_len - i) >= 2 && 
-               ((u_char) src[i+1] >= 0x80 && (u_char) src[i+1] <= 0xBF)) {
-      // 2-byte sequence (U+0080 to U+07FF)
-      dst[j++] = c;
-      dst[j++] = src[++i];
-    } else if ((c >= 0xE0 && c <= 0xEF) && (src_len - i) >= 3 &&
-               ((u_char) src[i+1] >= 0x80 && (u_char) src[i+1] <= 0xBF) &&
-               ((u_char) src[i+2] >= 0x80 && (u_char) src[i+2] <= 0xBF)) {
-      // 3-byte sequence (U+0800 to U+FFFF)
-      dst[j++] = c;
-      dst[j++] = src[++i];
-      dst[j++] = src[++i];
-    } else if ((c >= 0xF0 && c <= 0xF4) && (src_len - i) >= 4 &&
-               ((u_char) src[i+1] >= 0x80 && (u_char) src[i+1] <= 0xBF) &&
-               ((u_char) src[i+2] >= 0x80 && (u_char) src[i+2] <= 0xBF) &&
-               ((u_char) src[i+3] >= 0x80 && (u_char) src[i+3] <= 0xBF)) {
-      // 4-byte sequence (U+10000 to U+10FFiFF)
-      dst[j++] = c;
-      dst[j++] = src[++i];
-      dst[j++] = src[++i];
-      dst[j++] = src[++i];
+      // If it falls through here, it's an invalid UTF-8 byte.
+      // Replace it with the standard Unicode Replacement Character (U+FFFD) encoded in UTF-8
+      if (j + 3 > safe_max_len) goto overflow;
+      dst[j++] = (char)0xEF;
+      dst[j++] = (char)0xBF;
+      dst[j++] = (char)0xBD;
     }
   }
 
+  // Closing quote and direct sequence termination
   dst[j++] = '"';
-  dst[j+1] = '\0';
+  dst[j] = '\0';
+  return j;
 
-  return(j);
+ overflow:
+  // Graceful failure or fallback termination on overflow
+  if (j < dst_max_len) dst[j] = '\0';
+  return -1;
 }
 
 /* ********************************** */
