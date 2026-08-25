@@ -158,6 +158,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     assert(ndpi_set_config(workflow->ndpi_struct, "tls", "dpi.heuristics.max_packets_extra_dissection", "40") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, "all", "monitoring", "1") == NDPI_CFG_OK);
     assert(ndpi_set_config(workflow->ndpi_struct, NULL, "dpi.address_cache_size", "8192") == NDPI_CFG_OK);
+    assert(ndpi_set_config(workflow->ndpi_struct, "dns", "custom_port", "0") == NDPI_CFG_OK);
 
     /* Roaring code doesn't handle memory allocation failures */
 #ifdef ENABLE_NALLOC

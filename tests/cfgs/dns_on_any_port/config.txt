@@ -1,0 +1,1 @@
+--cfg=dns,custom_port,0

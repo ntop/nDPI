@@ -1,0 +1,45 @@
+DPI Packets (UDP):	20	(2.00 pkts/flow)
+Confidence DPI              : 10 (flows)
+Num dissector calls: 1540 (154.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          40/0 (search/found)
+Automa domain:        20/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 2/0 (search/found)
+Patricia risk:        5/0 (search/found)
+Patricia risk IPv6:   5/0 (search/found)
+Patricia protocols:   10/0 (search/found)
+Patricia protocols IPv6: 10/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 150/10 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+DNS	20	2397	10
+
+Acceptable                      20 2397          10           
+
+Network                         20 2397          10           
+
+	1	UDP [2001:db8:7215:15a9::b5fc]:53792 <-> [2001:db8:e19d:ec02::b66d]:27634 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/106 bytes <-> 1 pkts/160 bytes][Goodput ratio: 41/61][0.00 sec][Hostname/SNI: 81.193.79.173.in-addr.arpa][0.0.0.0][DNS Id: 0x0cd4][DNS Ptr: zudzf.waj.corp][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 53][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP [2001:db8:5058:64c9::1b47]:43131 <-> [2001:db8:2815:51a5::8cd0]:60794 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/99 bytes <-> 1 pkts/163 bytes][Goodput ratio: 37/62][0.00 sec][Hostname/SNI: thbnhvz.kropxg.corp][0.0.0.0][DNS Id: 0x25d3][Risk: ** Known Proto on Non Std Port **** Susp DGA Domain name **** Risky Domain Name **][Risk Score: 200][Risk Info: DGA Name Query with no Error Code;thbnhvz.kropxg.corp;Expected on port 53][PLAIN TEXT (velismaa)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP [2001:db8:d422:9949::7c79]:44554 <-> [2001:db8:be3f:13cc::c471]:22153 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/102 bytes <-> 1 pkts/159 bytes][Goodput ratio: 39/61][0.00 sec][Hostname/SNI: bcyzbyl.tnmpfa.example][0.0.0.0][DNS Id: 0xfe54][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 53][PLAIN TEXT (tnmpfa)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 198.51.100.135:26501 <-> 203.0.113.233:10168 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/80 bytes <-> 1 pkts/180 bytes][Goodput ratio: 47/76][0.00 sec][Hostname/SNI: smguodv.jbpz.example][0.0.0.0][DNS Id: 0x6cc8][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 53][PLAIN TEXT (smguodv)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP [2001:db8:24fc:d09f::f667]:13922 <-> [2001:db8:1b8f:8c6::a290]:13936 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/99 bytes <-> 1 pkts/157 bytes][Goodput ratio: 37/60][0.00 sec][Hostname/SNI: goxzs.aztkn.example][0.0.0.0][DNS Id: 0x7525][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 53][PLAIN TEXT (example)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP [2001:db8:dc21:9333::bdb8]:31256 <-> [2001:db8:4fa6:1ca6::a249]:23784 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/97 bytes <-> 1 pkts/145 bytes][Goodput ratio: 36/57][0.00 sec][Hostname/SNI: glv.utiwggep.corp][0.0.0.0][DNS Id: 0xc8a3][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 53][PLAIN TEXT (utiwggep)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 192.0.2.207:36565 <-> 203.0.113.125:50318 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/81 bytes <-> 1 pkts/150 bytes][Goodput ratio: 48/72][0.00 sec][Hostname/SNI: rzsuiicw.bfkc.invalid][0.0.0.0][DNS Id: 0x623c][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 53][PLAIN TEXT (rzsuiic)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 203.0.113.179:3604 <-> 203.0.113.83:3005 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/83 bytes <-> 1 pkts/138 bytes][Goodput ratio: 49/69][0.00 sec][Hostname/SNI: gunjyrk.lhjosm.internal][0.0.0.0][DNS Id: 0xc2aa][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 53][PLAIN TEXT (gunjyrk)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 198.51.100.104:21395 <-> 203.0.113.205:44523 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/79 bytes <-> 1 pkts/126 bytes][Goodput ratio: 46/66][0.00 sec][Hostname/SNI: tdohf.vwtot.example][2001:db8:66e7:2275::a36b][DNS Id: 0x879b][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 53][PLAIN TEXT (example)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	UDP 203.0.113.150:51827 <-> 203.0.113.43:55050 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/79 bytes <-> 1 pkts/114 bytes][Goodput ratio: 46/63][0.00 sec][Hostname/SNI: uzljmw.yvld.invalid][203.0.113.103][DNS Id: 0xd9d9][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 53][PLAIN TEXT (uzljmw)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

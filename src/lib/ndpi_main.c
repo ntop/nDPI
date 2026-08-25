@@ -8566,7 +8566,7 @@ static int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ************************************************ */
 
-static u_int8_t ndpi_is_multi_or_broadcast(struct ndpi_flow_struct *flow) {
+u_int8_t ndpi_is_multi_or_broadcast(struct ndpi_flow_struct *flow) {
 
   if(!flow->is_ipv6) {
     /* IPv4 */

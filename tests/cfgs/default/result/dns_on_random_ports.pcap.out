@@ -1,0 +1,48 @@
+DPI Packets (UDP):	20	(2.00 pkts/flow)
+Confidence Unknown          : 10 (flows)
+Num dissector calls: 1671 (167.10 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/30/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/10/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/10/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        5/0 (search/found)
+Patricia risk IPv6:   5/0 (search/found)
+Patricia protocols:   10/0 (search/found)
+Patricia protocols IPv6: 10/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Unknown	20	2397	10
+
+Unrated                         20 2397          10           
+
+Unspecified                     20 2397          10           
+
+
+
+Undetected flows:
+	1	UDP [2001:db8:7215:15a9::b5fc]:53792 <-> [2001:db8:e19d:ec02::b66d]:27634 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/106 bytes <-> 1 pkts/160 bytes][Goodput ratio: 41/61][0.00 sec][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP [2001:db8:5058:64c9::1b47]:43131 <-> [2001:db8:2815:51a5::8cd0]:60794 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/99 bytes <-> 1 pkts/163 bytes][Goodput ratio: 37/62][0.00 sec][PLAIN TEXT (velismaa)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP [2001:db8:d422:9949::7c79]:44554 <-> [2001:db8:be3f:13cc::c471]:22153 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/102 bytes <-> 1 pkts/159 bytes][Goodput ratio: 39/61][0.00 sec][PLAIN TEXT (tnmpfa)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 198.51.100.135:26501 <-> 203.0.113.233:10168 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/80 bytes <-> 1 pkts/180 bytes][Goodput ratio: 47/76][0.00 sec][PLAIN TEXT (smguodv)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP [2001:db8:24fc:d09f::f667]:13922 <-> [2001:db8:1b8f:8c6::a290]:13936 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/99 bytes <-> 1 pkts/157 bytes][Goodput ratio: 37/60][0.00 sec][PLAIN TEXT (example)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP [2001:db8:dc21:9333::bdb8]:31256 <-> [2001:db8:4fa6:1ca6::a249]:23784 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/97 bytes <-> 1 pkts/145 bytes][Goodput ratio: 36/57][0.00 sec][PLAIN TEXT (utiwggep)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 192.0.2.207:36565 <-> 203.0.113.125:50318 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/81 bytes <-> 1 pkts/150 bytes][Goodput ratio: 48/72][0.00 sec][PLAIN TEXT (rzsuiic)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 203.0.113.179:3604 <-> 203.0.113.83:3005 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/83 bytes <-> 1 pkts/138 bytes][Goodput ratio: 49/69][0.00 sec][PLAIN TEXT (gunjyrk)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 198.51.100.104:21395 <-> 203.0.113.205:44523 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/79 bytes <-> 1 pkts/126 bytes][Goodput ratio: 46/66][0.00 sec][PLAIN TEXT (example)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	UDP 203.0.113.150:51827 <-> 203.0.113.43:55050 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][Breed: Unrated][1 pkts/79 bytes <-> 1 pkts/114 bytes][Goodput ratio: 46/63][0.00 sec][PLAIN TEXT (uzljmw)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
