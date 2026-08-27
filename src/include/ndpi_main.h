@@ -77,7 +77,7 @@ extern "C" {
   void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow, ndpi_risk_enum r);
   int ndpi_isset_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r);
   int ndpi_is_printable_buffer(u_int8_t const * const buf, size_t len);
-  int ndpi_normalize_printable_string(char * const str, size_t len);
+  int ndpi_normalize_printable_string(char * const str, size_t len, char *invalid_character);
   bool ndpi_is_valid_hostname(char * const str, size_t len);
 
 #define NDPI_ENTROPY_PLAINTEXT(entropy) (entropy < 4.941f)

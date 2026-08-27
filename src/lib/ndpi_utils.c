@@ -3775,12 +3775,14 @@ int ndpi_is_printable_buffer(u_int8_t const * const buf, size_t len) {
 
 /* ******************************************************************** */
 
-int ndpi_normalize_printable_string(char * const str, size_t len) {
+int ndpi_normalize_printable_string(char * const str, size_t len, char *invalid_character) {
   int retval = 1;
   size_t i;
 
   for(i = 0; i < len; ++i) {
     if(ndpi_isprint(str[i]) == 0) {
+      if(invalid_character && retval == 1) /* First invalid character */
+       *invalid_character = str[i];
       str[i] = '?';
       retval = 0;
     }

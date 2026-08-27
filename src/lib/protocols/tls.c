@@ -582,7 +582,7 @@ static int extractRDNSequence(struct ndpi_packet_struct *packet,
   buffer[len] = '\0';
 
   // check string is printable
-  is_printable = ndpi_normalize_printable_string(buffer, len);
+  is_printable = ndpi_normalize_printable_string(buffer, len, NULL);
 
   if(is_printable) {
     int rc = ndpi_snprintf(&rdnSeqBuf[*rdnSeqBuf_offset],
@@ -756,10 +756,13 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	if(rdn_len && (flow->protos.tls_quic.issuerDN == NULL) &&
 	   ndpi_struct->cfg.tls_cert_issuer_enabled) {
 	  flow->protos.tls_quic.issuerDN = ndpi_strdup(rdnSeqBuf);
-	  if(ndpi_normalize_printable_string(rdnSeqBuf, rdn_len) == 0) {
+
+	  char invalid_character = 0;
+	  if(ndpi_normalize_printable_string(rdnSeqBuf, rdn_len, &invalid_character) == 0) {
 	    if(is_flowrisk_info_enabled(ndpi_struct, NDPI_INVALID_CHARACTERS)) {
-	      char str[64];
-	      snprintf(str, sizeof(str), "Invalid issuerDN %s", flow->protos.tls_quic.issuerDN);
+	      char str[256];
+	      snprintf(str, sizeof(str), "Invalid character 0x%02X in issuerDN %s",
+		       ((unsigned char)invalid_character), flow->protos.tls_quic.issuerDN);
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
 	    } else {
 	      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, NULL);
@@ -967,8 +970,12 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 		      We cannot use ndpi_is_valid_hostname() as we can have wildcards
 		      here that will create false positives
 		    */
-		    if(ndpi_normalize_printable_string(dNSName, dNSName_len) == 0) {
-		      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, dNSName);
+		    char invalid_character = 0;
+		    if(ndpi_normalize_printable_string(dNSName, dNSName_len, &invalid_character) == 0) {
+		      char str[1024];
+		      snprintf(str, sizeof(str), "Invalid character 0x%02X in dnsName name: %s",
+			       (unsigned char)invalid_character, dNSName);
+		      ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
 
 		      /* This looks like an attack */
 		      ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Invalid dNSName name");
@@ -2745,8 +2752,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef DEBUG_TLS
 	  printf("Server TLS [ALPN: %s][len: %u]\n", alpn_str, alpn_str_len);
 #endif
-	  if(ndpi_normalize_printable_string(alpn_str, alpn_str_len) == 0)
-	    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, alpn_str);
+	  char invalid_character = 0;
+	  if(ndpi_normalize_printable_string(alpn_str, alpn_str_len, &invalid_character) == 0) {
+	    char str[1024];
+	    snprintf(str, sizeof(str), "Invalid character 0x%02X in ALPN: %.*s",
+		     (unsigned char)invalid_character, alpn_str_len, alpn_str);
+	    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
+	  }
 
 	  if(flow->protos.tls_quic.negotiated_alpn == NULL &&
 	     ndpi_struct->cfg.tls_alpn_negotiated_enabled)

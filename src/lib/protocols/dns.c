@@ -48,6 +48,7 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
 static void ndpi_check_dns_type(struct ndpi_detection_module_struct *ndpi_struct,
                                 struct ndpi_flow_struct *flow,
 				u_int16_t dns_type) {
+  char str[128];
   /* https://en.wikipedia.org/wiki/List_of_DNS_record_types */
 
   switch(dns_type) {
@@ -94,7 +95,8 @@ static void ndpi_check_dns_type(struct ndpi_detection_module_struct *ndpi_struct
   case 106:
   case 107:
   case 259:
-    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, "Obsolete DNS record type");
+    snprintf(str, sizeof(str), "Obsolete DNS record type: %d", dns_type); 
+    ndpi_set_risk(ndpi_struct, flow, NDPI_DNS_SUSPICIOUS_TRAFFIC, str);
     break;
   }
 }
@@ -247,7 +249,8 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 				   u_int *off /* payload offset */,
 				   char *_hostname, u_int max_len,
 				   u_int *_hostname_len,
-				   u_int8_t ignore_checks) {
+				   u_int8_t ignore_checks,
+                                   char *invalid_character) {
   u_int8_t hostname_is_valid = 1;
   u_int j = 0;
 
@@ -283,6 +286,11 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
 	  _hostname[j++] = tolower(c);
 	} else {
 	  /* printf("---?? '%c'\n", c); */
+
+          if(hostname_is_valid == 1 && invalid_character) {
+            /* Report the first one */
+            *invalid_character = c;
+          }
 
 	  hostname_is_valid = 0;
 
@@ -417,7 +425,7 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
               ndpi_grab_dns_name(packet, &x,
                                  flow->protos.dns.ptr_domain_name,
                                  sizeof(flow->protos.dns.ptr_domain_name), &len,
-                                 ignore_checks);
+                                 ignore_checks, NULL);
               /* ndpi_grab_dns_name doesn't update the offset if it failed.
                  We unconditionally update it at the end of the for loop */
               x = orig_x;
@@ -960,6 +968,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
   u_int len, is_mdns, off = sizeof(struct ndpi_dns_packet_header) + (packet->tcp ? 2 : 0);
   char _hostname[256];
   u_int8_t hostname_is_valid;
+  char invalid_character = 0;
 
   proto->master_protocol = checkDNSSubprotocol(ndpi_struct, ntohs(flow->c_port), ntohs(flow->s_port));
   proto->app_protocol = flow->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN ? flow->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN;
@@ -973,7 +982,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
   /* TODO: should we overwrite existing hostname?
      For the time being, keep the old/current behavior */
 
-  hostname_is_valid = ndpi_grab_dns_name(packet, &off, _hostname, sizeof(_hostname), &len, is_mdns);
+  hostname_is_valid = ndpi_grab_dns_name(packet, &off, _hostname, sizeof(_hostname), &len, is_mdns, &invalid_character);
 
 #ifdef DNS_DEBUG
   printf("[DNS] [%s]\n", _hostname);
@@ -981,8 +990,16 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len, is_mdns ? NDPI_HOSTNAME_NORM_LC : NDPI_HOSTNAME_NORM_ALL);
 
-  if (hostname_is_valid == 0)
-    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, "Invalid chars detected in domain name");
+  if (hostname_is_valid == 0) {
+    char str[128];
+
+    if (ndpi_isprint(invalid_character))
+      snprintf(str, sizeof(str), "Invalid printable char(s) [%c] detected in domain name", invalid_character);
+    else
+      snprintf(str, sizeof(str), "Invalid non printable char(s) [0x%02X] detected in domain name", (unsigned char)invalid_character);
+
+    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
+  }
 
   /* Ignore reverse DNS queries */
   if(strstr(_hostname, ".in-addr.") == NULL) {
