@@ -1,6 +1,6 @@
 # CHANGELOG
 
-#### nDPI 6.0 (Aug 2025)
+#### nDPI 6.0 (Aug 2026)
 
 ## Major Changes
 * Update nDPI Licensing Terms and Component Usage: for-profit vs not-for-profit applications. See: https://www.ntop.org/announcing-ndpi-dual-license-change/
