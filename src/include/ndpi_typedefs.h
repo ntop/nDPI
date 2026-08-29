@@ -1589,6 +1589,41 @@ typedef struct ndpi_protocol_plugin {
 
 typedef int (*ProcessExtraPacketsFunc) (struct ndpi_detection_module_struct *, struct ndpi_flow_struct *flow);
 
+/*
+  This structure below will not stay inside the protos
+  structure below as HTTP is used by many subprotocols
+  such as FaceBook, Google... so it is hard to know
+  when to use it or not. Thus we leave it outside for the
+  time being.
+
+  Allocated on demand (by the HTTP dissector and by protocols
+  riding on top of HTTP, e.g. IPP) so that flows that never see
+  HTTP traffic don't pay for this memory.
+*/
+struct ndpi_flow_http_info {
+  ndpi_http_method method;
+  u_int8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
+  u_int8_t websocket:1, request_header_observed:1, first_payload_after_header_observed:1, is_form:1, _pad:4;
+  u_int16_t response_status_code; /* 200, 404, etc. */
+  char *url, *content_type /* response */, *request_content_type /* e.g. for POST */, *user_agent, *server, *referer, *host;
+  char *detected_os; /* Via HTTP/QUIC User-Agent */
+  char *nat_ip; /* Via HTTP X-Forwarded-For */
+  char *filename; /* Via HTTP Content-Disposition */
+  char *username, *password;
+};
+
+/* Allocated on demand by the DNS dissector: see struct ndpi_flow_http_info above */
+struct ndpi_flow_dns_info {
+  u_int8_t num_queries, num_answers, reply_code, num_rsp_addr;
+  u_int8_t is_query:1, pad:7;
+  u_int16_t transaction_id, query_type, query_class, rsp_type, edns0_udp_payload_size;
+  u_int8_t is_rsp_addr_ipv6[MAX_NUM_DNS_RSP_ADDRESSES];
+  ndpi_ip_addr_t rsp_addr[MAX_NUM_DNS_RSP_ADDRESSES]; /* The first num_rsp_addr address in a DNS response packet (A and AAAA) */
+  u_int32_t rsp_addr_ttl[MAX_NUM_DNS_RSP_ADDRESSES];
+  char geolocation_iata_code[4];
+  char ptr_domain_name[64 /* large enough but smaller than { } tls */];
+};
+
 typedef struct {
   u_int16_t tls_handshake_version;
   u_int16_t num_ciphers, cipher[MAX_NUM_JA];
@@ -1721,24 +1756,8 @@ struct ndpi_flow_struct {
     char *client_fingerprint, *server_fingerprint;
   } ndpi;
 
-  /*
-    This structure below will not not stay inside the protos
-    structure below as HTTP is used by many subprotocols
-    such as FaceBook, Google... so it is hard to know
-    when to use it or not. Thus we leave it outside for the
-    time being.
-  */
-  struct {
-    ndpi_http_method method;
-    u_int8_t request_version; /* 0=1.0 and 1=1.1. Create an enum for this? */
-    u_int8_t websocket:1, request_header_observed:1, first_payload_after_header_observed:1, is_form:1, _pad:4;
-    u_int16_t response_status_code; /* 200, 404, etc. */
-    char *url, *content_type /* response */, *request_content_type /* e.g. for POST */, *user_agent, *server, *referer, *host;
-    char *detected_os; /* Via HTTP/QUIC User-Agent */
-    char *nat_ip; /* Via HTTP X-Forwarded-For */
-    char *filename; /* Via HTTP Content-Disposition */
-    char *username, *password;
-  } http;
+  /* Allocated on demand by the HTTP dissector: see struct ndpi_flow_http_info */
+  struct ndpi_flow_http_info *http;
 
   u_int8_t flow_multimedia_types;
 
@@ -1753,6 +1772,9 @@ struct ndpi_flow_struct {
   } kerberos_buf;
 
   struct ndpi_dns_tcp_reasm_state *dns_tcp_reasm;
+
+  /* Allocated on demand by the DNS dissector: see struct ndpi_flow_dns_info */
+  struct ndpi_flow_dns_info *dns;
 
   struct {
     u_int8_t maybe_dtls:1, rtcp_seen:1, is_turn : 1, is_client_controlling:1, pad : 4;
@@ -1773,18 +1795,6 @@ struct ndpi_flow_struct {
   struct rtp_info rtp[2 /* directions */];
 
   union {
-    /* the only fields useful for nDPI and ntopng */
-    struct {
-      u_int8_t num_queries, num_answers, reply_code, num_rsp_addr;
-      u_int8_t is_query:1, pad:7;
-      u_int16_t transaction_id, query_type, query_class, rsp_type, edns0_udp_payload_size;
-      u_int8_t is_rsp_addr_ipv6[MAX_NUM_DNS_RSP_ADDRESSES];
-      ndpi_ip_addr_t rsp_addr[MAX_NUM_DNS_RSP_ADDRESSES]; /* The first num_rsp_addr address in a DNS response packet (A and AAAA) */
-      u_int32_t rsp_addr_ttl[MAX_NUM_DNS_RSP_ADDRESSES];
-      char geolocation_iata_code[4];
-      char ptr_domain_name[64 /* large enough but smaller than { } tls */];
-    } dns;
-
     struct ntp_info {
       u_int8_t leap_indicator: 2, version: 3, mode: 3;
       u_int8_t stratum;
@@ -2047,11 +2057,11 @@ struct ndpi_flow_struct {
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 328,
-               "Size of the struct member protocols increased to more than 328 bytes, "
+_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 272,
+               "Size of the struct member protocols increased to more than 272 bytes, "
                "please check if this change is necessary.");
-_Static_assert(sizeof(struct ndpi_flow_struct) <= 1392,
-               "Size of the flow struct increased to more than 1392 bytes, "
+_Static_assert(sizeof(struct ndpi_flow_struct) <= 1248,
+               "Size of the flow struct increased to more than 1248 bytes, "
                "please check if this change is necessary.");
 #endif
 #endif

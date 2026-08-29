@@ -368,7 +368,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_flow_risk_info(&flow, out, sizeof(out), 1);
   ndpi_get_flow_ndpi_proto(&flow, &p2);
   ndpi_is_proto(p.proto, NDPI_PROTOCOL_TLS);
-  ndpi_http_method2str(flow.http.method);
+  ndpi_http_method2str(flow.http ? flow.http->method : NDPI_HTTP_METHOD_UNKNOWN);
   ndpi_is_subprotocol_informative(ndpi_info_mod, p.proto.app_protocol);
   ndpi_get_flow_name(bool_value ? &flow : NULL);
   ndpi_stack2str(ndpi_info_mod, &flow.protocol_stack, buf_stack, sizeof(buf_stack));

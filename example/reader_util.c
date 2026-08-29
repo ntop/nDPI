@@ -1495,41 +1495,44 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
                   flow->ndpi_flow->protos.discord.client_ip);
   }
   /* DNS */
-  else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_DNS)) {
-    if(flow->ndpi_flow->protos.dns.is_rsp_addr_ipv6[0] == 0)
+  else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_DNS) &&
+          flow->ndpi_flow->dns != NULL) {
+    struct ndpi_flow_dns_info *dns_info = flow->ndpi_flow->dns;
+
+    if(dns_info->is_rsp_addr_ipv6[0] == 0)
     {
       flow->info_type = INFO_GENERIC;
-      inet_ntop(AF_INET, &flow->ndpi_flow->protos.dns.rsp_addr[0].ipv4, flow->info, sizeof(flow->info));
+      inet_ntop(AF_INET, &dns_info->rsp_addr[0].ipv4, flow->info, sizeof(flow->info));
     } else {
       flow->info_type = INFO_GENERIC;
-      inet_ntop(AF_INET6, &flow->ndpi_flow->protos.dns.rsp_addr[0].ipv6, flow->info, sizeof(flow->info));
+      inet_ntop(AF_INET6, &dns_info->rsp_addr[0].ipv6, flow->info, sizeof(flow->info));
 
       /* For consistency across platforms replace :0: with :: */
       ndpi_patchIPv6Address(flow->info);
     }
 
-    if(flow->ndpi_flow->protos.dns.geolocation_iata_code[0] != '\0')
-      strcpy(flow->dns.geolocation_iata_code, flow->ndpi_flow->protos.dns.geolocation_iata_code);
+    if(dns_info->geolocation_iata_code[0] != '\0')
+      strcpy(flow->dns.geolocation_iata_code, dns_info->geolocation_iata_code);
 
-    if(flow->ndpi_flow->protos.dns.ptr_domain_name[0] != '\0')
-      strcpy(flow->dns.ptr_domain_name, flow->ndpi_flow->protos.dns.ptr_domain_name);
+    if(dns_info->ptr_domain_name[0] != '\0')
+      strcpy(flow->dns.ptr_domain_name, dns_info->ptr_domain_name);
 
-    flow->dns.transaction_id = flow->ndpi_flow->protos.dns.transaction_id;
+    flow->dns.transaction_id = dns_info->transaction_id;
 
 #if 0
     if(0) {
       u_int8_t i;
 
-      for(i=0; i<flow->ndpi_flow->protos.dns.num_rsp_addr; i++) {
+      for(i=0; i<dns_info->num_rsp_addr; i++) {
 	char buf[64];
 
-	if(flow->ndpi_flow->protos.dns.is_rsp_addr_ipv6[i] == 0) {
-	  inet_ntop(AF_INET, &flow->ndpi_flow->protos.dns.rsp_addr[i].ipv4, buf, sizeof(buf));
+	if(dns_info->is_rsp_addr_ipv6[i] == 0) {
+	  inet_ntop(AF_INET, &dns_info->rsp_addr[i].ipv4, buf, sizeof(buf));
 	} else {
-	  inet_ntop(AF_INET6, &flow->ndpi_flow->protos.dns.rsp_addr[i].ipv6, buf, sizeof(buf));
+	  inet_ntop(AF_INET6, &dns_info->rsp_addr[i].ipv6, buf, sizeof(buf));
 	}
 
-	printf("(%s) %s [ttl: %u]\n", flow->host_server_name, buf, flow->ndpi_flow->protos.dns.rsp_addr_ttl[i]);
+	printf("(%s) %s [ttl: %u]\n", flow->host_server_name, buf, dns_info->rsp_addr_ttl[i]);
       }
     }
 #endif
@@ -1747,19 +1750,22 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   /* HTTP metadata are "global" not in `flow->ndpi_flow->protos` union; for example, we can have
      HTTP/BitTorrent and in that case we want to export also HTTP attributes */
-  if(ndpi_stack_is_http_like(&flow->detected_protocol.protocol_stack)) { /* HTTP, HTTP_PROXY, HTTP_CONNECT */
-    if(flow->ndpi_flow->http.url != NULL) {
-      ndpi_snprintf(flow->http.url, sizeof(flow->http.url), "%s", flow->ndpi_flow->http.url);
+  if(ndpi_stack_is_http_like(&flow->detected_protocol.protocol_stack) &&
+     flow->ndpi_flow->http != NULL) { /* HTTP, HTTP_PROXY, HTTP_CONNECT */
+    struct ndpi_flow_http_info *http_info = flow->ndpi_flow->http;
+
+    if(http_info->url != NULL) {
+      ndpi_snprintf(flow->http.url, sizeof(flow->http.url), "%s", http_info->url);
     }
 
-    flow->http.response_status_code = flow->ndpi_flow->http.response_status_code;
-    ndpi_snprintf(flow->http.content_type, sizeof(flow->http.content_type), "%s", flow->ndpi_flow->http.content_type ? flow->ndpi_flow->http.content_type : "");
-    ndpi_snprintf(flow->http.server, sizeof(flow->http.server), "%s", flow->ndpi_flow->http.server ? flow->ndpi_flow->http.server : "");
-    ndpi_snprintf(flow->http.request_content_type, sizeof(flow->http.request_content_type), "%s", flow->ndpi_flow->http.request_content_type ? flow->ndpi_flow->http.request_content_type : "");
-    ndpi_snprintf(flow->http.nat_ip, sizeof(flow->http.nat_ip), "%s", flow->ndpi_flow->http.nat_ip ? flow->ndpi_flow->http.nat_ip : "");
-    ndpi_snprintf(flow->http.filename, sizeof(flow->http.filename), "%s", flow->ndpi_flow->http.filename ? flow->ndpi_flow->http.filename : "");
-    ndpi_snprintf(flow->http.username, sizeof(flow->http.username), "%s", flow->ndpi_flow->http.username ? flow->ndpi_flow->http.username : "");
-    ndpi_snprintf(flow->http.password, sizeof(flow->http.password), "%s", flow->ndpi_flow->http.password ? flow->ndpi_flow->http.password : "");
+    flow->http.response_status_code = http_info->response_status_code;
+    ndpi_snprintf(flow->http.content_type, sizeof(flow->http.content_type), "%s", http_info->content_type ? http_info->content_type : "");
+    ndpi_snprintf(flow->http.server, sizeof(flow->http.server), "%s", http_info->server ? http_info->server : "");
+    ndpi_snprintf(flow->http.request_content_type, sizeof(flow->http.request_content_type), "%s", http_info->request_content_type ? http_info->request_content_type : "");
+    ndpi_snprintf(flow->http.nat_ip, sizeof(flow->http.nat_ip), "%s", http_info->nat_ip ? http_info->nat_ip : "");
+    ndpi_snprintf(flow->http.filename, sizeof(flow->http.filename), "%s", http_info->filename ? http_info->filename : "");
+    ndpi_snprintf(flow->http.username, sizeof(flow->http.username), "%s", http_info->username ? http_info->username : "");
+    ndpi_snprintf(flow->http.password, sizeof(flow->http.password), "%s", http_info->password ? http_info->password : "");
   }
 
   if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_RTP))
@@ -1767,7 +1773,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   ndpi_snprintf(flow->http.user_agent,
                 sizeof(flow->http.user_agent),
-                "%s", (flow->ndpi_flow->http.user_agent ? flow->ndpi_flow->http.user_agent : ""));
+                "%s", (flow->ndpi_flow->http && flow->ndpi_flow->http->user_agent ? flow->ndpi_flow->http->user_agent : ""));
 
   {
     ndpi_ip_addr_t ip_addr;

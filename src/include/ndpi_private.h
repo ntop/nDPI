@@ -700,6 +700,13 @@ void change_category(struct ndpi_flow_struct *flow,
 char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len, int normalize);
 char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value, size_t value_len);
 
+/* Get (allocating it on first use, if needed) the HTTP/DNS protocol-specific
+   flow information. Used by the respective dissectors (and by protocols
+   riding on top of them, e.g. IPP over HTTP) to lazily populate flow->http
+   and flow->dns only for the flows that actually need them. */
+struct ndpi_flow_http_info *ndpi_flow_get_http_info(struct ndpi_flow_struct *flow);
+struct ndpi_flow_dns_info *ndpi_flow_get_dns_info(struct ndpi_flow_struct *flow);
+
 void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_struct,
 					  struct ndpi_flow_struct *flow);
 

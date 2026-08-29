@@ -1708,30 +1708,32 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_DNS:
     ndpi_serialize_start_of_block(serializer, "dns");
-    ndpi_serialize_string_uint32(serializer, "num_queries", flow->protos.dns.num_queries);
-    ndpi_serialize_string_uint32(serializer, "num_answers", flow->protos.dns.num_answers);
-    ndpi_serialize_string_uint32(serializer, "reply_code",  flow->protos.dns.reply_code);
-    ndpi_serialize_string_uint32(serializer, "query_type",  flow->protos.dns.query_type);
-    ndpi_serialize_string_uint32(serializer, "rsp_type",    flow->protos.dns.rsp_type);
+    if(flow->dns) {
+      ndpi_serialize_string_uint32(serializer, "num_queries", flow->dns->num_queries);
+      ndpi_serialize_string_uint32(serializer, "num_answers", flow->dns->num_answers);
+      ndpi_serialize_string_uint32(serializer, "reply_code",  flow->dns->reply_code);
+      ndpi_serialize_string_uint32(serializer, "query_type",  flow->dns->query_type);
+      ndpi_serialize_string_uint32(serializer, "rsp_type",    flow->dns->rsp_type);
 
-    ndpi_serialize_start_of_list(serializer, "rsp_addr");
+      ndpi_serialize_start_of_list(serializer, "rsp_addr");
 
-    for(i=0; i<flow->protos.dns.num_rsp_addr; i++) {
-      char buf[64];
-      u_int len;
+      for(i=0; i<flow->dns->num_rsp_addr; i++) {
+        char buf[64];
+        u_int len;
 
-      if(flow->protos.dns.is_rsp_addr_ipv6[i] == 0) {
-	inet_ntop(AF_INET, &flow->protos.dns.rsp_addr[i].ipv4, buf, sizeof(buf));
-      } else {
-	inet_ntop(AF_INET6, &flow->protos.dns.rsp_addr[i].ipv6, buf, sizeof(buf));
+        if(flow->dns->is_rsp_addr_ipv6[i] == 0) {
+	  inet_ntop(AF_INET, &flow->dns->rsp_addr[i].ipv4, buf, sizeof(buf));
+        } else {
+	  inet_ntop(AF_INET6, &flow->dns->rsp_addr[i].ipv6, buf, sizeof(buf));
+        }
+
+        len = strlen(buf);
+        snprintf(&buf[len], sizeof(buf)-len, ",ttl=%u", flow->dns->rsp_addr_ttl[i]);
+        ndpi_serialize_string_string(serializer, "addr", buf);
       }
 
-      len = strlen(buf);
-      snprintf(&buf[len], sizeof(buf)-len, ",ttl=%u", flow->protos.dns.rsp_addr_ttl[i]);
-      ndpi_serialize_string_string(serializer, "addr", buf);
+      ndpi_serialize_end_of_list(serializer);
     }
-
-    ndpi_serialize_end_of_list(serializer);
 
     ndpi_serialize_end_of_block(serializer);
     break;
@@ -1846,24 +1848,26 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_HTTP_PROXY:
     ndpi_serialize_start_of_block(serializer, "http");
 
-    if(flow->http.url != NULL) {
-      ndpi_serialize_string_string(serializer, "url", flow->http.url);
-      ndpi_serialize_string_uint32(serializer, "code", flow->http.response_status_code);
-      ndpi_serialize_string_string(serializer, "content_type", flow->http.content_type);
-      ndpi_serialize_string_string(serializer, "user_agent", flow->http.user_agent);
+    if(flow->http) {
+      if(flow->http->url != NULL) {
+        ndpi_serialize_string_string(serializer, "url", flow->http->url);
+        ndpi_serialize_string_uint32(serializer, "code", flow->http->response_status_code);
+        ndpi_serialize_string_string(serializer, "content_type", flow->http->content_type);
+        ndpi_serialize_string_string(serializer, "user_agent", flow->http->user_agent);
+      }
+
+      if (flow->http->request_content_type != NULL)
+        ndpi_serialize_string_string(serializer, "request_content_type",
+                                     flow->http->request_content_type);
+
+      if (flow->http->detected_os != NULL)
+        ndpi_serialize_string_string(serializer, "detected_os",
+                                     flow->http->detected_os);
+
+      if (flow->http->nat_ip != NULL)
+        ndpi_serialize_string_string(serializer, "nat_ip",
+                                     flow->http->nat_ip);
     }
-
-    if (flow->http.request_content_type != NULL)
-      ndpi_serialize_string_string(serializer, "request_content_type",
-                                   flow->http.request_content_type);
-
-    if (flow->http.detected_os != NULL)
-      ndpi_serialize_string_string(serializer, "detected_os",
-                                   flow->http.detected_os);
-
-    if (flow->http.nat_ip != NULL)
-      ndpi_serialize_string_string(serializer, "nat_ip",
-                                   flow->http.nat_ip);
 
     ndpi_serialize_end_of_block(serializer);
     break;
@@ -4122,10 +4126,10 @@ u_int8_t ndpi_is_encrypted_proto(struct ndpi_detection_module_struct *ndpi_str,
 u_int32_t ndpi_get_flow_error_code(struct ndpi_flow_struct *flow) {
   switch(flow->detected_protocol_stack[0] /* proto.app_protocol */) {
   case NDPI_PROTOCOL_DNS:
-    return(flow->protos.dns.reply_code);
+    return(flow->dns ? flow->dns->reply_code : 0);
 
   case NDPI_PROTOCOL_HTTP:
-    return(flow->http.response_status_code);
+    return(flow->http ? flow->http->response_status_code : 0);
 
   case NDPI_PROTOCOL_SNMP:
     return(flow->protos.snmp.error_status);

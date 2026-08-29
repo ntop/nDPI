@@ -8154,41 +8154,51 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->ndpi.server_fingerprint)
       ndpi_free(flow->ndpi.server_fingerprint);
 
-    if(flow->http.url)
-      ndpi_free(flow->http.url);
+    if(flow->http) {
+      if(flow->http->url)
+        ndpi_free(flow->http->url);
 
-    if(flow->http.content_type)
-      ndpi_free(flow->http.content_type);
+      if(flow->http->content_type)
+        ndpi_free(flow->http->content_type);
 
-    if(flow->http.request_content_type)
-      ndpi_free(flow->http.request_content_type);
+      if(flow->http->request_content_type)
+        ndpi_free(flow->http->request_content_type);
 
-    if(flow->http.referer)
-      ndpi_free(flow->http.referer);
+      if(flow->http->referer)
+        ndpi_free(flow->http->referer);
 
-    if(flow->http.host)
-      ndpi_free(flow->http.host);
+      if(flow->http->host)
+        ndpi_free(flow->http->host);
 
-    if(flow->http.user_agent)
-      ndpi_free(flow->http.user_agent);
+      if(flow->http->user_agent)
+        ndpi_free(flow->http->user_agent);
 
-    if(flow->http.nat_ip)
-      ndpi_free(flow->http.nat_ip);
+      if(flow->http->nat_ip)
+        ndpi_free(flow->http->nat_ip);
 
-    if(flow->http.detected_os)
-      ndpi_free(flow->http.detected_os);
+      if(flow->http->detected_os)
+        ndpi_free(flow->http->detected_os);
 
-    if(flow->http.server)
-      ndpi_free(flow->http.server);
+      if(flow->http->server)
+        ndpi_free(flow->http->server);
 
-    if(flow->http.filename)
-      ndpi_free(flow->http.filename);
+      if(flow->http->filename)
+        ndpi_free(flow->http->filename);
 
-    if(flow->http.username)
-      ndpi_free(flow->http.username);
+      if(flow->http->username)
+        ndpi_free(flow->http->username);
 
-    if(flow->http.password)
-      ndpi_free(flow->http.password);
+      if(flow->http->password)
+        ndpi_free(flow->http->password);
+
+      ndpi_free(flow->http);
+      flow->http = NULL;
+    }
+
+    if(flow->dns) {
+      ndpi_free(flow->dns);
+      flow->dns = NULL;
+    }
 
     if(flow->kerberos_buf.pktbuf)
       ndpi_free(flow->kerberos_buf.pktbuf);
@@ -11050,8 +11060,8 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
      && flow->l4.tcp.three_way_handshake.ack_time != 0
      && (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP
          || flow->detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP)
-     && flow->http.method != NDPI_HTTP_METHOD_UNKNOWN
-     && flow->http.response_status_code == 0 /* no response seen yet */) {
+     && flow->http != NULL && flow->http->method != NDPI_HTTP_METHOD_UNKNOWN
+     && flow->http->response_status_code == 0 /* no response seen yet */) {
     u_int64_t elapsed_ms = packet->current_time_ms - flow->l4.tcp.three_way_handshake.ack_time;
 
     if(elapsed_ms > 3000 /* 3 sec */ && !ndpi_isset_risk(flow, NDPI_SLOW_DOS)) {
@@ -11077,7 +11087,7 @@ void ndpi_parse_packet_line_info(struct ndpi_detection_module_struct *ndpi_str, 
       continue;
 
     /* Found a CR+LF — the current line ends here */
-    flow->http.request_header_observed = 1;
+    ndpi_flow_get_http_info(flow)->request_header_observed = 1;
 
     /* Double CR+LF (\r\n\r\n) signals the end of HTTP headers;
      * snapshot whatever body bytes are immediately available. */
@@ -13347,6 +13357,24 @@ static int is_valid_port(const char *port_str) {
 
 /* ******************************************************************** */
 
+struct ndpi_flow_http_info *ndpi_flow_get_http_info(struct ndpi_flow_struct *flow) {
+  if(flow->http == NULL)
+    flow->http = (struct ndpi_flow_http_info *)ndpi_calloc(1, sizeof(struct ndpi_flow_http_info));
+
+  return flow->http;
+}
+
+/* ******************************************************************** */
+
+struct ndpi_flow_dns_info *ndpi_flow_get_dns_info(struct ndpi_flow_struct *flow) {
+  if(flow->dns == NULL)
+    flow->dns = (struct ndpi_flow_dns_info *)ndpi_calloc(1, sizeof(struct ndpi_flow_dns_info));
+
+  return flow->dns;
+}
+
+/* ******************************************************************** */
+
 char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
 			    const u_int8_t *value, size_t value_len,
 			    int normalize) {
@@ -13411,7 +13439,9 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
 
 char *ndpi_user_agent_set(struct ndpi_flow_struct *flow,
 			  const u_int8_t *value, size_t value_len) {
-  if(flow->http.user_agent != NULL) {
+  struct ndpi_flow_http_info *http;
+
+  if(flow->http != NULL && flow->http->user_agent != NULL) {
     /* Already set: ignore double set */
     return NULL;
   }
@@ -13419,13 +13449,17 @@ char *ndpi_user_agent_set(struct ndpi_flow_struct *flow,
     return NULL;
   }
 
-  flow->http.user_agent = ndpi_malloc(value_len + 1);
-  if(flow->http.user_agent != NULL) {
-    memcpy(flow->http.user_agent, value, value_len);
-    flow->http.user_agent[value_len] = '\0';
+  http = ndpi_flow_get_http_info(flow);
+  if(http == NULL)
+    return NULL;
+
+  http->user_agent = ndpi_malloc(value_len + 1);
+  if(http->user_agent != NULL) {
+    memcpy(http->user_agent, value, value_len);
+    http->user_agent[value_len] = '\0';
   }
 
-  return flow->http.user_agent;
+  return http->user_agent;
 }
 
 /* ******************************************************************** */
