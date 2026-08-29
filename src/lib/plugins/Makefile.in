@@ -16,18 +16,19 @@ AM_CFLAGS+=-fPIC -DPIC -DNDPI_LIB_COMPILATION -I$(top_srcdir)/src/include -I$(to
 AM_LDFLAGS=-L$(top_builddir)/src/lib @NDPI_LDFLAGS@
 LIBNDPI_DEP=$(top_builddir)/src/lib/libndpi.so
 LIBS=-lndpi @ADDITIONAL_LIBS@ @LIBS@
-HEADERS=$(wildcard $(top_srcdir)/src/include/*.h)
-HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 PREFIX?=@prefix@
 
+DEPFLAGS = -MMD -MP -MT $@ -MF $(@:.o=.d)
 
 all: myproto_plugin.so
 
 myproto_plugin.so: myproto_plugin.o $(LIBNDPI_DEP)
 	$(CC) $(AM_CFLAGS) $(CFLAGS) -shared $(AM_LDFLAGS) $(LDFLAGS) $< $(LIBS) -o $@
 
-%.o: %.c $(HEADERS) Makefile
-	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
+%.o: %.c Makefile
+	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
+
+-include $(wildcard *.d)
 
 #TODO
 install:
@@ -38,7 +39,7 @@ check:
 	true # nothing to do here
 
 clean:
-	$(RM) *.o *~ *.so
+	$(RM) *.o *.d *~ *.so
 
 distclean:
 	$(RM) Makefile

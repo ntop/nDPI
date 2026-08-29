@@ -29,10 +29,10 @@ LIBNDPI_DEP=$(top_builddir)/src/lib/libndpi.so
 AM_LDFLAGS+=-L$(top_builddir)/src/lib
 endif
 LIBS=$(LIBNDPI) @ADDITIONAL_LIBS@ @LIBS@ -lpthread
-HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
-HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 OBJS=dga_evaluate
 PREFIX?=@prefix@
+
+DEPFLAGS = -MMD -MP -MT $@ -MF $(@:.o=.d)
 
 all: dga_evaluate$(EXE_SUFFIX)
 
@@ -42,11 +42,13 @@ COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
 dga_evaluate$(EXE_SUFFIX): $(LIBNDPI_DEP) dga_evaluate.o
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(AM_LDFLAGS) $(LDFLAGS) dga_evaluate.o $(LIBS) -o $@
 
-%.o: %.c $(HEADERS) Makefile
-	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
+%.o: %.c Makefile
+	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
+
+-include $(wildcard *.d)
 
 clean:
-	$(RM) *.o *.lo dga_evaluate$(EXE_SUFFIX)
+	$(RM) *.o *.d *.lo dga_evaluate$(EXE_SUFFIX)
 	$(RM) .*.o.cmd .*.o.d
 	$(RM) -r build .libs .deps
 

@@ -32,10 +32,9 @@ LIBNDPI_DEP=$(top_builddir)/src/lib/libndpi.so
 AM_LDFLAGS+=-L$(top_builddir)/src/lib
 endif
 LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @GPROF_LIBS@ @LIBS@
-HEADERS=reader_util.h $(SRCHOME)/include/ndpi_api.h \
-        $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
-HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 PREFIX?=@prefix@
+
+DEPFLAGS = -MMD -MP -MT $@ -MF $(@:.o=.d)
 
 ifneq ($(BUILD_MINGW),)
 
@@ -73,8 +72,10 @@ ndpiReader$(EXE_SUFFIX): $(COMMON_SOURCES:%.c=%.o) ndpiReader.o $(LIBNDPI_DEP)
 ndpiSimpleIntegration$(EXE_SUFFIX): ndpiSimpleIntegration.o
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $< $(LIBS) -o $@
 
-%.o: %.c $(HEADERS) Makefile
-	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
+%.o: %.c Makefile
+	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
+
+-include $(wildcard *.d)
 
 install: ndpiReader$(EXE_SUFFIX)
 	@MKDIR_P@ $(DESTDIR)$(PREFIX)/bin/
@@ -96,7 +97,7 @@ cppcheck:
 	 cppcheck --template='{file}:{line}:{severity}:{message}' --quiet --enable=all --force -I$(SRCHOME)/include $(srcdir)/*.c
 
 clean:
-	$(RM) *.o *.lo ndpiReader ndpiSimpleIntegration ndpiReader$(EXE_SUFFIX) ndpiSimpleIntegration$(EXE_SUFFIX) ndpiReader.dpdk
+	$(RM) *.o *.d *.lo ndpiReader ndpiSimpleIntegration ndpiReader$(EXE_SUFFIX) ndpiSimpleIntegration$(EXE_SUFFIX) ndpiReader.dpdk
 	$(RM) .*.dpdk.cmd .*.o.cmd *.dpdk.map .*.o.d
 	$(RM) _install _postbuild _postinstall _preinstall
 	$(RM) -r build .libs .deps

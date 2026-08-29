@@ -43,8 +43,6 @@ AM_LDFLAGS = @NDPI_LDFLAGS@
 LIBS       = @ADDITIONAL_LIBS@ @LIBS@ @GPROF_LIBS@
 
 OBJECTS   = $(patsubst $(srcdir)/protocols/%.c, %.o, $(wildcard $(srcdir)/protocols/*.c)) $(patsubst $(srcdir)/third_party/src/%.c, %.o, $(wildcard $(srcdir)/third_party/src/*.c)) $(patsubst $(srcdir)/third_party/src/hll/%.c, %.o, $(wildcard $(srcdir)/third_party/src/hll/*.c)) $(patsubst $(srcdir)/%.c, %.o, $(wildcard $(srcdir)/*.c))
-HEADERS   = $(wildcard $(top_srcdir)/src/include/*.h) $(wildcard $(srcdir)/*.h)
-HEADERS  += $(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 NDPI_VERSION_MAJOR   = @NDPI_MAJOR@
 NDPI_LIB_STATIC      = libndpi.a
 NDPI_LIB_SHARED_BASE = libndpi.so
@@ -94,7 +92,14 @@ ndpi_main.o: $(srcdir)/ndpi_content_match.c.inc \
 
 ndpi_fingerprint.o: $(srcdir)/ndpi_os_fingerprint.c.inc
 
+# The generated headers have no compiler-tracked dependency until the first
+# build has produced the .d files, so list them explicitly to order the very
+# first compile.
 $(OBJECTS): $(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
+
+# Automatic dependency tracking
+DEPFLAGS = -MMD -MP -MT $@ -MF $(@:.o=.d)
+-include $(wildcard *.d)
 
 $(NDPI_LIB_STATIC): $(OBJECTS)
 	   $(AR) rc $@ $(OBJECTS)
@@ -105,11 +110,11 @@ $(NDPI_LIB_SHARED): $(OBJECTS)
 	ln -fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE)
 	ln -fs $(NDPI_LIB_SHARED) $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
 
-%.o: %.c $(HEADERS) Makefile
-	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(CFLAGS_$(notdir $<)) -c $< -o $@
+%.o: %.c Makefile
+	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(CFLAGS_$(notdir $<)) $(DEPFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED) $(OBJECTS) *.o *.so *.so.* *.lo *.dll *.la
+	$(RM) $(NDPI_LIB_STATIC) $(NDPI_LIB_SHARED) $(OBJECTS) *.o *.d *.so *.so.* *.lo *.dll *.la
 	$(RM) $(NDPI_LIB_SHARED_BASE) $(NDPI_LIB_SHARED_BASE).$(NDPI_VERSION_MAJOR)
 	$(RM) -r .libs .deps
 

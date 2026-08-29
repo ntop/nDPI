@@ -30,10 +30,10 @@ LIBNDPI_DEP=$(top_builddir)/src/lib/libndpi.so
 AM_LDFLAGS+=-L$(top_builddir)/src/lib
 endif
 LIBS=$(LIBNDPI) @PCAP_LIB@ @ADDITIONAL_LIBS@ @JSONC_LIBS@ @LIBS@
-HEADERS=$(SRCHOME)/include/ndpi_api.h $(SRCHOME)/include/ndpi_typedefs.h $(SRCHOME)/include/ndpi_protocol_ids.h
-HEADERS+=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 OBJS=unit
 PREFIX?=@prefix@
+
+DEPFLAGS = -MMD -MP -MT $@ -MF $(@:.o=.d)
 
 ifneq ($(BUILD_MINGW),)
 
@@ -66,11 +66,13 @@ COMMON_SOURCES := $(filter-out $(EXECUTABLE_SOURCES),$(wildcard *.c ))
 unit$(EXE_SUFFIX): $(LIBNDPI_DEP) unit.o
 	$(CC) $(AM_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(AM_LDFLAGS) $(LDFLAGS) unit.o $(LIBS) -o $@
 
-%.o: %.c $(HEADERS) Makefile
-	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
+%.o: %.c Makefile
+	$(CC) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
+
+-include $(wildcard *.d)
 
 clean:
-	$(RM) *.o *.lo unit$(EXE_SUFFIX)
+	$(RM) *.o *.d *.lo unit$(EXE_SUFFIX)
 	$(RM) .*.o.cmd .*.o.d
 	$(RM) -r build .libs .deps
 
