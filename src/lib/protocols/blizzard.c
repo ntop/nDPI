@@ -52,11 +52,14 @@ static void search_blizzard_tcp(struct ndpi_detection_module_struct* ndpi_struct
   }
 
   /* Pattern found on Hearthstone */
-  if(packet->payload_packet_len >= 8 &&
-     le32toh(*(uint32_t *)&packet->payload[4]) == (u_int32_t)(packet->payload_packet_len - 8)) {
-    NDPI_LOG_INFO(ndpi_struct, "Found Blizzard (Hearthstone)\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-    return;
+  if(packet->payload_packet_len >= 8) {
+    uint32_t pdu_length;
+    memcpy(&pdu_length, &packet->payload[4], sizeof(pdu_length));
+    if (le32toh(pdu_length) == (u_int32_t)(packet->payload_packet_len - 8)) {
+      NDPI_LOG_INFO(ndpi_struct, "Found Blizzard (Hearthstone)\n");
+      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BLIZZARD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      return;
+    }
   }
 
   /* Pattern found on WoW */

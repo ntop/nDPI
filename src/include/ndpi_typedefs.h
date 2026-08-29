@@ -709,8 +709,8 @@ struct ndpi_binary_bitmap_entry {
 
 typedef union
 {
-  u_int32_t ipv4;
   struct ndpi_in6_addr ipv6;
+  u_int32_t ipv4;
 } ndpi_ip_addr_t;
 
 
@@ -2285,7 +2285,7 @@ typedef struct {
 typedef ndpi_ranking_epoch_entry ndpi_ranking_change;
 
 typedef struct {
-  u_int32_t epoch;
+  u_int64_t epoch;
   ndpi_ranking_epoch_entry *entries;
 } ndpi_ranking_epoch;
 

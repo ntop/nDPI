@@ -156,7 +156,12 @@ static u_int16_t checkDNSSubprotocol(struct ndpi_detection_module_struct *ndpi_s
 /* *********************************************** */
 
 static u_int16_t get16(u_int *i, const u_int8_t *payload) {
-  u_int16_t v = *(u_int16_t*)&payload[*i];
+  u_int16_t v;
+
+  if (*i % 2 == 0)
+    v = *(u_int16_t*)&payload[*i];
+  else
+    memcpy(&v, &payload[*i], sizeof(v));
 
   (*i) += 2;
 
@@ -385,7 +390,8 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
     }
 
     rsp_type = get16(&x, packet->payload);
-    rsp_ttl  = ntohl(*((u_int32_t*)&packet->payload[x+2]));
+    memcpy(&rsp_ttl, &packet->payload[x+2], sizeof(rsp_ttl));
+    rsp_ttl  = ntohl(rsp_ttl);
 
     if(rsp_ttl == 0)
       ndpi_set_risk(ndpi_struct, flow, NDPI_MINOR_ISSUES, "DNS Record with zero TTL");
@@ -402,7 +408,9 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 
     /* x points to the response "class" field */
     if((x+12) <= packet->payload_packet_len) {
-      u_int32_t ttl = ntohl(*((u_int32_t*)&packet->payload[x+2]));
+      u_int32_t ttl;
+      memcpy(&ttl, &packet->payload[x+2], sizeof(ttl));
+      ttl = ntohl(ttl);
 
       x += 6;
       data_len = get16(&x, packet->payload);
