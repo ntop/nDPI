@@ -3765,7 +3765,34 @@ static int ndpi_add_ndpifp_subprotocol(struct ndpi_detection_module_struct *ndpi
   return(ndpi_hash_add_entry(&ndpi_str->ndpifp_custom_protos,
 			     ndpifp, ndpifp_len, protocol_id, (void*)blocks));
 }
+static int ndpi_add_tls_cert_hash_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
+                                               char *cert_hash, 
+                                               u_int16_t protocol_id) {
+  ndpi_tls_cert_hash_match_dynamic *new_rule;
 
+  if(!cert_hash || cert_hash[0] == '\0') {
+    NDPI_LOG_ERR(ndpi_str, "Empty TLS cert hash\n");
+    return(-1);
+  }
+
+  new_rule = (ndpi_tls_cert_hash_match_dynamic *)ndpi_malloc(sizeof(*new_rule));
+  if(new_rule == NULL) {
+    NDPI_LOG_ERR(ndpi_str, "Memory allocation failure for TLS cert hash\n");
+    return(-2);
+  }
+
+  new_rule->cert_hash = ndpi_strdup(cert_hash);
+  if(new_rule->cert_hash == NULL) {
+    ndpi_free(new_rule);
+    NDPI_LOG_ERR(ndpi_str, "Memory allocation failure for TLS cert hash\n");
+    return(-2);
+  }
+  new_rule->protocol_id = protocol_id;
+  new_rule->next = ndpi_str->dynamic_tls_cert_hash_list;
+  ndpi_str->dynamic_tls_cert_hash_list = new_rule;
+
+  return(0);
+}
 /* ******************************************* */
 
 static int ndpi_add_http_url_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
@@ -4289,6 +4316,7 @@ struct ndpi_detection_module_struct *ndpi_init_detection_module(struct ndpi_glob
   ndpi_str->malicious_sha1_hashmap = NULL;  /* Initialized on demand */
   ndpi_str->ja4_custom_protos      = NULL;  /* Initialized on demand */
   ndpi_str->ndpifp_custom_protos   = NULL;  /* Initialized on demand */
+  ndpi_str->dynamic_tls_cert_hash_list   = NULL;  /* Initialized on demand */
   ndpi_str->http_url_hashmap       = NULL;  /* Initialized on demand */
 
   ndpi_str->trusted_issuer_dn = NULL; /* Initialized on demand */
@@ -5340,6 +5368,17 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->ndpifp_custom_protos)
       ndpi_hash_free(&ndpi_str->ndpifp_custom_protos);
 
+    if(ndpi_str->dynamic_tls_cert_hash_list) {
+      ndpi_tls_cert_hash_match_dynamic *rule = ndpi_str->dynamic_tls_cert_hash_list;
+      
+      while(rule != NULL) {
+        ndpi_tls_cert_hash_match_dynamic *next = rule->next;
+        if(rule->cert_hash)
+        ndpi_free(rule->cert_hash);
+        ndpi_free(rule);
+        rule = next;
+      }
+    }
     if(ndpi_str->http_url_hashmap)
       ndpi_hash_free(&ndpi_str->http_url_hashmap);
 
@@ -5647,6 +5686,61 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
   ndpi_protocol_category_t category = NDPI_PROTOCOL_CATEGORY_UNSPECIFIED;
   ndpi_protocol_breed_t breed = NDPI_PROTOCOL_ACCEPTABLE;
 
+    if(strncmp(rule, "tls_cert_hash:", 14) == 0) {
+    
+    char *hash_start = &rule[14];  
+    char *at_sign = strchr(hash_start, '@');
+    
+    if(at_sign != NULL) {
+      int hash_len = at_sign - hash_start;
+      char *cert_hash = (char *)ndpi_malloc(hash_len + 1);
+      if(cert_hash == NULL) {
+        NDPI_LOG_ERR(ndpi_str, "Memory allocation failure for TLS cert hash\n");
+        return(-1);
+      }
+      strncpy(cert_hash, hash_start, hash_len);
+      cert_hash[hash_len] = '\0';
+      char *proto_name = &at_sign[1];
+      u_int16_t proto_id = ndpi_get_proto_by_name(ndpi_str, proto_name);
+      
+      if(proto_id == NDPI_PROTOCOL_UNKNOWN) {
+        if(ndpi_str->num_supported_protocols >= 65535) {
+          NDPI_LOG_ERR(ndpi_str, "Too many protocols defined\n");
+          ndpi_free(cert_hash);
+          return(-2);
+        }
+        
+        proto_id = ndpi_str->num_supported_protocols;
+        ndpi_port_range ports_a[MAX_DEFAULT_PORTS], ports_b[MAX_DEFAULT_PORTS];
+        
+        ret = ndpi_set_proto_defaults(ndpi_str, 1, 1,
+                                     NDPI_PROTOCOL_ACCEPTABLE,
+                                     proto_id,
+                                     proto_name,
+                                     NDPI_PROTOCOL_CATEGORY_UNSPECIFIED,
+                                     NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                                     ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0),
+                                     ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0),
+                                     1);
+        if(ret != 0) {
+          NDPI_LOG_ERR(ndpi_str, "Error creating protocol. Skip rule\n");
+          ndpi_free(cert_hash);
+          return(-3);
+        }
+      }
+      
+      /*hash rule*/
+      ret = ndpi_add_tls_cert_hash_subprotocol(ndpi_str, cert_hash, proto_id);
+      printf("[DEBUG] Added TLS cert hash rule: hash=%s, proto_id=%u, ret=%d\n", 
+        cert_hash, proto_id, ret);
+      ndpi_free(cert_hash);
+      return(ret);
+    } else {
+      NDPI_LOG_ERR(ndpi_str, "Invalid TLS cert hash rule format: %s\n", rule);
+      return(-1);
+    }
+  }
+
   at = strrchr(rule, '@');
   if(at == NULL) {
     /* This looks like a mask rule or an invalid rule */
@@ -5810,7 +5904,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
   while((elem = strsep(&rule, ",")) != NULL) {
     char *attr = elem, *value = NULL;
     ndpi_port_range range;
-    int is_tcp = 0, is_udp = 0, is_ip = 0, is_ja4 = 0, is_ndpifp = 0, is_httpurl = 0;;
+    int is_tcp = 0, is_udp = 0, is_ip = 0, is_ja4 = 0, is_ndpifp = 0, is_httpurl = 0;
     u_int8_t is_ipv6_ip = 0;
 
     if(strncmp(attr, "tcp:", 4) == 0)
@@ -5924,7 +6018,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 
       if(rc != 0)
 	return(rc);
-    } else {
+    }else {
       int rc = ndpi_add_host_url_subprotocol(ndpi_str, value, subprotocol_id, category, breed, 0);
 
       if(rc != 0)
@@ -5934,6 +6028,7 @@ static int ndpi_handle_rule(struct ndpi_detection_module_struct *ndpi_str,
 
   return(ret);
 }
+                
 
 /* ******************************************************************** */
 

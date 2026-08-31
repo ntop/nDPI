@@ -675,6 +675,8 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
 void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_struct *flow,
 				u_int16_t p_offset, u_int16_t certificate_len) {
+          printf("[DEBUG] processCertificateElements called! cert_len=%u\n", certificate_len);
+  fflush(stdout);
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t num_found = 0;
   int32_t i;
@@ -1094,6 +1096,8 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	}
       }
     }
+      
+  
   }
 
   if(flow->protos.tls_quic.subjectDN && flow->protos.tls_quic.issuerDN
@@ -1218,6 +1222,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 	printf("\n");
       }
 #endif
+printf("[DEBUG] tls_sha1_fingerprint_enabled=%d\n", ndpi_struct->cfg.tls_sha1_fingerprint_enabled);
 
       /* For SHA-1 we take into account only the first certificate and not all of them */
       if(ndpi_struct->cfg.tls_sha1_fingerprint_enabled) {
@@ -1255,10 +1260,57 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
           if(rc1 == 0)
             ndpi_set_risk(ndpi_struct, flow, NDPI_MALICIOUS_SHA1_CERTIFICATE, sha1_str);
         }
+        printf("[DEBUG_CONDITIONS] detected_protocol_stack[1]=%u (should be 0), list_exists=%d\n",
+       flow->detected_protocol_stack[1], ndpi_struct->dynamic_tls_cert_hash_list != NULL);
+      
+        if(flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+           ndpi_struct->dynamic_tls_cert_hash_list != NULL) {
+  printf("[DEBUG] ✅ Both conditions met! Checking TLS cert hashes\n");
+          
+          ndpi_tls_cert_hash_match_dynamic *rule = ndpi_struct->dynamic_tls_cert_hash_list;
+          
+          while(rule != NULL) {
+            char rule_hash_no_colon[256];
+            int j = 0;
+            for(int i = 0; rule->cert_hash[i] != '\0' && j < (int)sizeof(rule_hash_no_colon)-1; i++) {
+              if(rule->cert_hash[i] != ':') {
+                rule_hash_no_colon[j++] = toupper((unsigned char)rule->cert_hash[i]);
+              }
+            }
+            rule_hash_no_colon[j] = '\0';
+            
+            
+            if(strcasecmp(sha1_str, rule_hash_no_colon) == 0) {
+              printf("[DEBUG] ✅ HASH MATCH! sha1_str=%s\n", sha1_str);
+              
+              /* Hash match found */
+              ndpi_master_app_protocol proto;
+              
+              ndpi_set_detected_protocol(ndpi_struct, flow, rule->protocol_id,
+                                        ndpi_get_master_proto(ndpi_struct, flow),
+                                        NDPI_CONFIDENCE_DPI);
+              proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
+              proto.app_protocol = rule->protocol_id;
+              flow->category = get_proto_category(ndpi_struct, proto);
+              flow->breed = get_proto_breed(ndpi_struct, proto);
+              ndpi_check_subprotocol_risk(ndpi_struct, flow, rule->protocol_id);
+              ndpi_unset_risk(ndpi_struct, flow, NDPI_NUMERIC_IP_HOST);
+              break;
+            }else {
+              printf("[DEBUG] ❌ No match. sha1_str=%s vs rule=%s\n", sha1_str, rule_hash_no_colon);
+            }
+            rule = rule->next;
+          }
+        }
+        else {
+          printf("[DEBUG] ❌ Conditions NOT met: stack[1]=%u (need 0), list=%d (need 1)\n",
+                 flow->detected_protocol_stack[1], 
+                 ndpi_struct->dynamic_tls_cert_hash_list != NULL);
       }
+    }
 
       processCertificateElements(ndpi_struct, flow, certificates_offset, certificate_len);
-    }
+      }
 
     certificates_offset += certificate_len;
   }

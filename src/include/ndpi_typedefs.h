@@ -1647,6 +1647,18 @@ struct ndpi_ipsec_details {
   struct ndpi_ipsec_proposal proposal[2];
 };
 
+typedef struct ndpi_tls_cert_name_match_dynamic {
+  char *cert_pattern;
+  u_int16_t protocol_id;
+  struct ndpi_tls_cert_name_match_dynamic *next;
+} ndpi_tls_cert_name_match_dynamic;
+
+typedef struct ndpi_tls_cert_hash_match_dynamic {
+  char *cert_hash;
+  u_int16_t protocol_id;
+  struct ndpi_tls_cert_hash_match_dynamic *next;
+} ndpi_tls_cert_hash_match_dynamic;
+
 struct ndpi_flow_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   struct ndpi_proto_stack protocol_stack;
