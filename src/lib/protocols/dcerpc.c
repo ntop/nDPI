@@ -29,6 +29,10 @@
 #include "ndpi_private.h"
 #include <stdbool.h>
 
+#define DCERPC_HEADER_LEN 16
+#define DCERPC_MAX_REASM_LEN 65535
+
+
 static void ndpi_int_dcerpc_add_connection(struct ndpi_detection_module_struct
 					     *ndpi_struct, struct ndpi_flow_struct *flow)
 {
@@ -78,6 +82,112 @@ static bool is_connectionless_dcerpc(struct ndpi_packet_struct *packet)
   return true;
 }
 
+static void dcerpc_tcp_reasm_free_dir(struct ndpi_dcerpc_tcp_reasm *reasm)
+{
+  if(reasm->buf != NULL)
+    ndpi_free(reasm->buf);
+  reasm->buf = NULL;
+  reasm->cur_len = 0;
+  reasm->msg_len = 0;
+  reasm->next_seq = 0;
+}
+
+static int dcerpc_tcp_reasm_append(struct ndpi_dcerpc_tcp_reasm *reasm,
+                                   const u_int8_t *data, u_int16_t len)
+{
+  u_int32_t new_len;
+  u_int8_t *new_buf;
+
+  if(len == 0)
+    return 0;
+  new_len = (u_int32_t)reasm->cur_len + len;
+  if(new_len > DCERPC_MAX_REASM_LEN)
+    return -1;
+  if(reasm->buf == NULL) {
+    reasm->buf = ndpi_malloc(new_len);
+    if(reasm->buf == NULL)
+      return -1;
+    memcpy(reasm->buf, data, len);
+  } else {
+    new_buf = (u_int8_t *)ndpi_realloc(reasm->buf, new_len);
+    if(new_buf == NULL)
+      return -1;
+    reasm->buf = new_buf;
+    memcpy(&reasm->buf[reasm->cur_len], data, len);
+  }
+  reasm->cur_len = (u_int16_t)new_len;
+  return 0;
+}
+
+static bool dcerpc_tcp_start_candidate(struct ndpi_packet_struct *packet)
+{
+  return packet->tcp != NULL && packet->payload_packet_len > 0 &&
+         packet->payload[0] == 0x05;
+}
+
+/* Keep the dissector alive for the ACK zero-padding form already recognized by
+ * nDPI's TCP tracking code. The issue capture contains this padding immediately
+ * before the first DCERPC segment. */
+static bool dcerpc_tcp_ack_padding(struct ndpi_packet_struct *packet)
+{
+  u_int16_t i;
+
+  if(packet->tcp == NULL || packet->tcp->ack == 0 || packet->tcp->psh != 0 ||
+     packet->payload_packet_len <= 1 || packet->payload_packet_len >= 8)
+    return false;
+  for(i = 0; i < packet->payload_packet_len; i++)
+    if(packet->payload[i] != 0)
+      return false;
+  return true;
+}
+
+static int dcerpc_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
+                              struct ndpi_flow_struct *flow)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  struct ndpi_dcerpc_tcp_reasm *reasm;
+  const u_int8_t *original_payload = packet->payload;
+  u_int16_t original_len = packet->payload_packet_len;
+  u_int16_t fragment_len;
+
+  if(packet->tcp_retransmission || original_len == 0)
+    return 0;
+  if(flow->core.dcerpc_tcp_reasm == NULL) {
+    flow->core.dcerpc_tcp_reasm = ndpi_calloc(1, sizeof(*flow->core.dcerpc_tcp_reasm));
+    if(flow->core.dcerpc_tcp_reasm == NULL)
+      return -1;
+  }
+  reasm = &flow->core.dcerpc_tcp_reasm->dir[packet->packet_direction];
+  if(dcerpc_tcp_reasm_append(reasm, original_payload, original_len) < 0)
+    goto invalid;
+  if(reasm->cur_len < 10)
+    return 0;
+  if(reasm->buf[0] != 0x05 || reasm->buf[2] >= 16 || (reasm->buf[3] & 0xF0))
+    goto invalid;
+  if(reasm->buf[4] & 0x10)
+    fragment_len = ((u_int16_t)reasm->buf[8] << 8) | reasm->buf[9];
+  else
+    fragment_len = ((u_int16_t)reasm->buf[9] << 8) | reasm->buf[8];
+  if(fragment_len < DCERPC_HEADER_LEN)
+    goto invalid;
+  reasm->msg_len = fragment_len;
+  if(reasm->msg_len > reasm->cur_len)
+    return 0;
+
+  packet->payload = reasm->buf;
+  packet->payload_packet_len = reasm->msg_len;
+  if(is_connection_oriented_dcerpc(packet))
+    ndpi_int_dcerpc_add_connection(ndpi_struct, flow);
+  packet->payload = original_payload;
+  packet->payload_packet_len = original_len;
+  dcerpc_tcp_reasm_free_dir(reasm);
+  return flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DCERPC ? 1 : 0;
+
+invalid:
+  dcerpc_tcp_reasm_free_dir(reasm);
+  return -1;
+}
+
 static void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
@@ -89,7 +199,15 @@ static void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if(packet->payload_packet_len>1)
+  if(packet->tcp != NULL && (flow->core.dcerpc_tcp_reasm != NULL || dcerpc_tcp_start_candidate(packet))) {
+    if(dcerpc_tcp_process(ndpi_struct, flow) >= 0)
+      return;
+  }
+
+  /* The issue capture has a short ACK zero-padding segment before DCERPC. */
+  if(dcerpc_tcp_ack_padding(packet))
+    return;
+  if(packet->payload_packet_len > 1)
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 

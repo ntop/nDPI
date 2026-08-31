@@ -1728,6 +1728,7 @@ struct ndpi_flow_core_struct {
   struct ndpi_dissector_bitmask excluded_dissectors_bitmask;
 
   struct ndpi_dns_tcp_reasm_state *dns_tcp_reasm; /* TCP DNS reassembly */
+  struct ndpi_dcerpc_tcp_reasm_state *dcerpc_tcp_reasm; /* TCP DCERPC reassembly */
   
   /* General purpose field used to save mainly hostname/SNI information.
    * In details it used for: MGCP, COLLECTD, DNS, SSDP and NETBIOS name, HTTP, MUNIN and DHCP hostname,
