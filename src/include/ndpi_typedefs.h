@@ -1812,6 +1812,20 @@ struct ndpi_flow_metadata_struct {
     u_int16_t response_status_code; /* 200, 404, etc. */
     char *url, *content_type /* response */, *request_content_type /* e.g. for POST */, *user_agent, *server, *referer, *host;
     char *detected_os; /* Via HTTP/QUIC User-Agent */
+    /*
+     * Bounded state for conservative HTTP-carried ISO-BMFF analysis. The
+     * header is retained only until a complete 8/16-byte box header is seen;
+     * payload bytes are skipped, not stored. Flags preserve evidence across
+     * TCP segments and the counters are capped by the parser budget.
+     */
+    u_int8_t mp4_header[16], mp4_header_len;
+    u_int8_t mp4_ftyp_seen:1, mp4_uuid_box_seen:1, mp4_moov_seen:1,
+      mp4_mdat_seen:1, mp4_parse_stopped:1, mp4_anomaly_checked:1, _mp4_pad:2;
+    u_int32_t mp4_box_type;
+    /* Set only from a syntactically valid, bounded HTTP Content-Length. */
+    u_int64_t mp4_expected_body_bytes;
+    /* Declared top-level sizes used for the conservative dominance ratio. */
+    u_int64_t mp4_box_remaining, mp4_body_bytes, mp4_uuid_bytes;
     char *nat_ip; /* Via HTTP X-Forwarded-For */
     char *filename; /* Via HTTP Content-Disposition */
     char *username, *password;
