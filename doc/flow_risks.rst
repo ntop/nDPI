@@ -154,7 +154,7 @@ TLS needs to carry the `SNI <https://en.wikipedia.org/wiki/Server_Name_Indicatio
 
 NDPI_HTTP_SUSPICIOUS_CONTENT
 ============================
-HTTP only: risk reported when HTTP carries content in expected format. Example the HTTP header indicates that the context is text/html but the real content is not readeable (i.e. it can transport binary data). In general this is an attempt to use a valid MIME type to carry data that does not match the type.
+HTTP only: risk reported when HTTP carries content in expected format. Example the HTTP header indicates that the context is text/html but the real content is not readeable (i.e. it can transport binary data). In general this is an attempt to use a valid MIME type to carry data that does not match the type. The HTTP dissector also uses this risk for a conservative ISO-BMFF anomaly: an HTTP response with a bounded `Content-Length`, whose first top-level box is `ftyp`, whose private `uuid` box has at least 1 MiB of declared payload and accounts for at least 90% of the declared top-level boxes, and where no top-level `moov` or `mdat` media box is observed. The parser is streaming and overflow-checked; it never decrypts or executes payloads. This is a structural anomaly indicator inspired by the `Censys fake-MP4 report <https://censys.com/blog/fake-mp4-file-carries-malicious-payload/>`_; it is not a malware verdict, and responses without a usable Content-Length are intentionally not flagged by this detector.
 
 .. _Risk 026:
 
