@@ -100,16 +100,13 @@ static void ndpi_http_mp4_feed(struct ndpi_flow_struct *flow,
     if(flow->http.mp4_box_remaining > 0) {
       u_int64_t skip = ndpi_min((u_int64_t)data_len,
                                 flow->http.mp4_box_remaining);
-      flow->http.mp4_box_remaining -= skip;
+      flow->http.mp4_box_remaining -= (u_int32_t)skip;
       if(!ndpi_mp4_add_u64(&flow->http.mp4_body_bytes, skip)) {
         flow->http.mp4_parse_stopped = 1;
         continue;
       }
-      if(flow->http.mp4_box_type == 0x75756964 /* uuid */ &&
-         !ndpi_mp4_add_u64(&flow->http.mp4_uuid_bytes, skip)) {
-        flow->http.mp4_parse_stopped = 1;
-        continue;
-      }
+      if(flow->http.mp4_box_type == 0x75756964 /* uuid */)
+        flow->http.mp4_uuid_bytes += (u_int32_t)skip;
       data += skip;
       data_len -= (u_int32_t)skip;
       continue;
@@ -151,14 +148,15 @@ static void ndpi_http_mp4_feed(struct ndpi_flow_struct *flow,
         continue;
       }
 
-      /*
-       * Reject oversized declarations before accounting them. Besides limiting
-       * work, this keeps the counters and the ratio predicate overflow-safe.
-       */
-      if(box_size > NDPI_MP4_MAX_DECLARED_BYTES) {
+      /* An extended-size box must include its complete 16-byte header. */
+      if(box_size < header_len ||
+         box_size > NDPI_MP4_MAX_DECLARED_BYTES - flow->http.mp4_declared_bytes) {
         flow->http.mp4_parse_stopped = 1;
         continue;
       }
+
+      /* Keep the cumulative declared-byte budget and ratio predicate bounded. */
+      flow->http.mp4_declared_bytes += (u_int32_t)box_size;
 
       /*
        * Require ftyp to be the first top-level box. Track media boxes as
@@ -177,7 +175,7 @@ static void ndpi_http_mp4_feed(struct ndpi_flow_struct *flow,
         flow->http.mp4_mdat_seen = 1;
 
       flow->http.mp4_box_type = box_type;
-      flow->http.mp4_box_remaining = box_size - header_len;
+      flow->http.mp4_box_remaining = (u_int32_t)(box_size - header_len);
       flow->http.mp4_header_len = 0;
     }
   }
@@ -1859,6 +1857,7 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
   flow->http.mp4_expected_body_bytes = 0;
   flow->http.mp4_body_bytes = 0;
   flow->http.mp4_uuid_bytes = 0;
+  flow->http.mp4_declared_bytes = 0;
   flow->http.mp4_content_length_parsed = 0;
   flow->http.mp4_content_length_valid_count = 0;
   flow->http.mp4_content_length_invalid = 0;

@@ -1828,7 +1828,8 @@ struct ndpi_flow_metadata_struct {
     /* Set only from a syntactically valid, bounded HTTP Content-Length. */
     u_int64_t mp4_expected_body_bytes;
     /* Declared top-level sizes used for the conservative dominance ratio. */
-    u_int64_t mp4_box_remaining, mp4_body_bytes, mp4_uuid_bytes;
+    u_int32_t mp4_box_remaining, mp4_uuid_bytes, mp4_declared_bytes;
+    u_int64_t mp4_body_bytes;
     char *nat_ip; /* Via HTTP X-Forwarded-For */
     char *filename; /* Via HTTP Content-Disposition */
     char *username, *password;
