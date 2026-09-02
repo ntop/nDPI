@@ -90,7 +90,7 @@ static int ndpi_mp4_add_u64(u_int64_t *value, u_int64_t increment) {
 static void ndpi_http_mp4_feed(struct ndpi_flow_struct *flow,
                                const u_int8_t *data, u_int32_t data_len) {
   while(data_len > 0 && !flow->http.mp4_parse_stopped) {
-    u_int32_t copy_len;
+    u_int32_t copy_len, header_needed = 8;
 
     /*
      * The current box header has already been validated. Consume only its
@@ -101,20 +101,35 @@ static void ndpi_http_mp4_feed(struct ndpi_flow_struct *flow,
       u_int64_t skip = ndpi_min((u_int64_t)data_len,
                                 flow->http.mp4_box_remaining);
       flow->http.mp4_box_remaining -= skip;
+      if(!ndpi_mp4_add_u64(&flow->http.mp4_body_bytes, skip)) {
+        flow->http.mp4_parse_stopped = 1;
+        continue;
+      }
+      if(flow->http.mp4_box_type == 0x75756964 /* uuid */ &&
+         !ndpi_mp4_add_u64(&flow->http.mp4_uuid_bytes, skip)) {
+        flow->http.mp4_parse_stopped = 1;
+        continue;
+      }
       data += skip;
       data_len -= (u_int32_t)skip;
       continue;
     }
 
     /* Preserve an incomplete 8/16-byte header until the next packet. */
-    copy_len = ndpi_min((u_int32_t)(sizeof(flow->http.mp4_header) -
-                                    flow->http.mp4_header_len), data_len);
+    if(flow->http.mp4_header_len >= 8 &&
+       ndpi_mp4_be32(flow->http.mp4_header) == 1)
+      header_needed = 16;
+    copy_len = ndpi_min(header_needed - flow->http.mp4_header_len, data_len);
     memcpy(&flow->http.mp4_header[flow->http.mp4_header_len], data, copy_len);
+    if(!ndpi_mp4_add_u64(&flow->http.mp4_body_bytes, copy_len)) {
+      flow->http.mp4_parse_stopped = 1;
+      continue;
+    }
     flow->http.mp4_header_len += copy_len;
     data += copy_len;
     data_len -= copy_len;
 
-    if(flow->http.mp4_header_len < 8)
+    if(flow->http.mp4_header_len < header_needed)
       continue;
 
     {
@@ -140,8 +155,7 @@ static void ndpi_http_mp4_feed(struct ndpi_flow_struct *flow,
        * Reject oversized declarations before accounting them. Besides limiting
        * work, this keeps the counters and the ratio predicate overflow-safe.
        */
-      if(box_size > NDPI_MP4_MAX_DECLARED_BYTES ||
-         flow->http.mp4_body_bytes > NDPI_MP4_MAX_DECLARED_BYTES - box_size) {
+      if(box_size > NDPI_MP4_MAX_DECLARED_BYTES) {
         flow->http.mp4_parse_stopped = 1;
         continue;
       }
@@ -159,13 +173,6 @@ static void ndpi_http_mp4_feed(struct ndpi_flow_struct *flow,
       if(box_type == 0x6d646174 /* mdat */)
         flow->http.mp4_mdat_seen = 1;
 
-      if(!ndpi_mp4_add_u64(&flow->http.mp4_body_bytes, box_size) ||
-         (box_type == 0x75756964 /* uuid */ &&
-          !ndpi_mp4_add_u64(&flow->http.mp4_uuid_bytes, box_size - header_len))) {
-        flow->http.mp4_parse_stopped = 1;
-        continue;
-      }
-
       flow->http.mp4_box_type = box_type;
       flow->http.mp4_box_remaining = box_size - header_len;
       flow->http.mp4_header_len = 0;
@@ -182,9 +189,10 @@ static void ndpi_http_parse_content_length(struct ndpi_flow_struct *flow,
                                            struct ndpi_packet_struct *packet) {
   u_int16_t i;
 
-  if(flow->http.mp4_expected_body_bytes != 0)
+  if(flow->http.mp4_content_length_parsed)
     return;
 
+  flow->http.mp4_content_length_parsed = 1;
   for(i = 0; i < packet->parsed_lines; i++) {
     const u_int8_t *line = packet->line[i].ptr;
     u_int16_t len = packet->line[i].len;
@@ -197,17 +205,22 @@ static void ndpi_http_parse_content_length(struct ndpi_flow_struct *flow,
     while(pos < len && (line[pos] == ' ' || line[pos] == '\t'))
       pos++;
     while(pos < len && line[pos] >= '0' && line[pos] <= '9') {
-      if(value > (NDPI_MP4_MAX_DECLARED_BYTES - (line[pos] - '0')) / 10)
-        return;
+      if(value > (NDPI_MP4_MAX_DECLARED_BYTES - (line[pos] - '0')) / 10) {
+        flow->http.mp4_content_length_invalid = 1;
+        break;
+      }
       value = value * 10 + (line[pos] - '0');
       pos++;
       digits = 1;
     }
     while(pos < len && (line[pos] == ' ' || line[pos] == '\t'))
       pos++;
-    if(digits && pos == len) {
-      flow->http.mp4_expected_body_bytes = value;
-      return;
+    if(digits && pos == len && value > 0) {
+      if(flow->http.mp4_content_length_valid_count == 0)
+        flow->http.mp4_expected_body_bytes = value;
+      flow->http.mp4_content_length_valid_count++;
+    } else if(digits || pos != len || value == 0) {
+      flow->http.mp4_content_length_invalid = 1;
     }
   }
 }
@@ -250,7 +263,9 @@ static void ndpi_http_check_suspicious_mp4(struct ndpi_detection_module_struct *
    * combines independent structural evidence and deliberately emits an
    * anomaly signal, not a malware verdict.
    */
-  if(flow->http.mp4_expected_body_bytes > 0 &&
+  if(!flow->http.mp4_content_length_invalid &&
+     flow->http.mp4_content_length_valid_count == 1 &&
+     flow->http.mp4_expected_body_bytes > 0 &&
      flow->http.mp4_body_bytes >= flow->http.mp4_expected_body_bytes &&
      flow->http.mp4_ftyp_seen && flow->http.mp4_uuid_box_seen &&
      !flow->http.mp4_moov_seen && !flow->http.mp4_mdat_seen &&
@@ -1809,6 +1824,10 @@ static void process_response(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_validate_http_content(ndpi_struct, flow);
   ndpi_http_check_suspicious_mp4(ndpi_struct, flow);
+  if(flow->http.mp4_expected_body_bytes > flow->http.mp4_body_bytes &&
+     !flow->http.mp4_content_length_invalid &&
+     flow->http.mp4_content_length_valid_count == 1)
+    flow->max_extra_packets_to_check = 32;
 }
 
 static void reset(struct ndpi_detection_module_struct *ndpi_struct,
@@ -1833,9 +1852,12 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
   flow->http.mp4_anomaly_checked = 0;
   flow->http.mp4_box_type = 0;
   flow->http.mp4_expected_body_bytes = 0;
-  flow->http.mp4_box_remaining = 0;
   flow->http.mp4_body_bytes = 0;
   flow->http.mp4_uuid_bytes = 0;
+  flow->http.mp4_content_length_parsed = 0;
+  flow->http.mp4_content_length_valid_count = 0;
+  flow->http.mp4_content_length_invalid = 0;
+  flow->http.mp4_box_remaining = 0;
   if(flow->http.url) {
     ndpi_free(flow->http.url);
     flow->http.url = NULL;
@@ -1974,7 +1996,11 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       process_response(ndpi_struct, flow);
 
-      flow->metadata.l4.tcp.http_stage = 0;
+      if(flow->metadata.http.mp4_expected_body_bytes > 0 &&
+         flow->metadata.http.mp4_body_bytes < flow->metadata.http.mp4_expected_body_bytes)
+        flow->metadata.l4.tcp.http_stage = packet->packet_direction + 3;
+      else
+        flow->metadata.l4.tcp.http_stage = 0;
     } else {
       NDPI_LOG_DBG2(ndpi_struct, "The msg from the server doesn't look like a response...\n");
       /* TODO */
@@ -1996,6 +2022,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
       ndpi_parse_packet_line_info(ndpi_struct, flow);
       check_content_type_and_change_protocol(ndpi_struct, flow);
+      if(packet->packet_direction == 1)
+        ndpi_http_check_suspicious_mp4(ndpi_struct, flow);
       return;
     }
 
@@ -2022,10 +2050,14 @@ void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if((ndpi_struct->cfg.http_parse_response_enabled &&
       flow->core.host_server_name[0] != '\0' &&
-      flow->metadata.http.response_status_code != 0) ||
+      flow->metadata.http.response_status_code != 0 &&
+      (flow->metadata.http.mp4_expected_body_bytes == 0 ||
+       flow->metadata.http.mp4_body_bytes >= flow->metadata.http.mp4_expected_body_bytes)) ||
      (!ndpi_struct->cfg.http_parse_response_enabled &&
       (flow->core.host_server_name[0] != '\0' ||
-       flow->metadata.http.response_status_code != 0)) ||
+       flow->metadata.http.response_status_code != 0) &&
+      (flow->metadata.http.mp4_expected_body_bytes == 0 ||
+       flow->metadata.http.mp4_body_bytes >= flow->metadata.http.mp4_expected_body_bytes)) ||
      /* We have found 3 consecutive requests (without the reply) or 3
         consecutive replies (without the request). If the traffic is really
         asymmetric, stop here, because we will never find the metadata from
