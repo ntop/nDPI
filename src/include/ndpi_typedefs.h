@@ -1823,7 +1823,7 @@ struct ndpi_flow_metadata_struct {
       mp4_mdat_seen:1, mp4_parse_stopped:1, mp4_anomaly_checked:1,
       mp4_content_length_parsed:1, mp4_content_length_invalid:1,
       mp4_content_length_multiple:1, mp4_content_length_valid_count:2,
-      _mp4_pad:2;
+      mp4_first_box_seen:1, _mp4_pad:1;
     u_int32_t mp4_box_type;
     /* Set only from a syntactically valid, bounded HTTP Content-Length. */
     u_int64_t mp4_expected_body_bytes;

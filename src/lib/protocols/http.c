@@ -164,8 +164,11 @@ static void ndpi_http_mp4_feed(struct ndpi_flow_struct *flow,
        * Require ftyp to be the first top-level box. Track media boxes as
        * negative evidence: a normal playable file should expose moov or mdat.
        */
-      if(flow->http.mp4_body_bytes == 0 && box_type == 0x66747970 /* ftyp */)
-        flow->http.mp4_ftyp_seen = 1;
+      if(!flow->http.mp4_first_box_seen) {
+        flow->http.mp4_first_box_seen = 1;
+        if(box_type == 0x66747970 /* ftyp */)
+          flow->http.mp4_ftyp_seen = 1;
+      }
       if(box_type == 0x75756964 /* uuid */)
         flow->http.mp4_uuid_box_seen = 1;
       if(box_type == 0x6d6f6f76 /* moov */)
@@ -239,7 +242,7 @@ static void ndpi_http_check_suspicious_mp4(struct ndpi_detection_module_struct *
     ndpi_http_parse_content_length(flow, packet);
 
   if(packet->empty_line_position_set) {
-    u_int32_t body_offset = packet->empty_line_position + 4;
+    u_int32_t body_offset = packet->empty_line_position + 2;
     if(body_offset < packet->payload_packet_len) {
       body = packet->payload + body_offset;
       body_len = packet->payload_packet_len - body_offset;
@@ -1850,6 +1853,7 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
   flow->http.mp4_mdat_seen = 0;
   flow->http.mp4_parse_stopped = 0;
   flow->http.mp4_anomaly_checked = 0;
+  flow->http.mp4_first_box_seen = 0;
   flow->http.mp4_box_type = 0;
   flow->http.mp4_expected_body_bytes = 0;
   flow->http.mp4_body_bytes = 0;
