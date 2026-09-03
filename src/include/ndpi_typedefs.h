@@ -1048,6 +1048,10 @@ struct ndpi_flow_udp_struct {
   u_int8_t eaq_pkt_id;
   u_int32_t eaq_sequence;
 
+  /* NDPI_PROTOCOL_DNS */
+  u_int16_t dns_any_port_transaction_id;
+  u_int8_t dns_any_port_candidate:1, dns_any_port_candidate_direction:1;
+
   /* NDPI_PROTOCOL_MUMBLE */
   u_int64_t mumble_ident;
 

@@ -711,6 +711,80 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* *********************************************** */
 
+static int is_valid_uncompressed_dns_questions(const u_int8_t *payload, u_int payload_len,
+					       u_int payload_offset, u_int16_t num_queries) {
+  u_int off = payload_offset + sizeof(struct ndpi_dns_packet_header);
+  u_int16_t i;
+
+  for(i = 0; i < num_queries; i++) {
+    u_int name_len = 0, labels = 0;
+
+    while(1) {
+      u_int8_t label_len;
+
+      if(off >= payload_len)
+	return 0;
+
+      label_len = payload[off++];
+      name_len++;
+
+      if(label_len == 0)
+	break;
+
+      if((label_len & 0xC0) != 0 || label_len > 63)
+	return 0;
+
+      if((off + label_len) > payload_len)
+	return 0;
+
+      labels++;
+      if(labels > 32)
+	return 0;
+
+      name_len += label_len;
+      if(name_len > 253)
+	return 0;
+
+      off += label_len;
+    }
+
+    if(labels == 0 || name_len > 253 || (off + 4) > payload_len)
+      return 0;
+
+    if(ntohs(get_u_int16_t(payload, off)) == 0 ||
+       ntohs(get_u_int16_t(payload, off + 2)) == 0)
+      return 0;
+
+    off += 4;
+  }
+
+  return 1;
+}
+
+/* *********************************************** */
+
+static int is_valid_dns_on_non_standard_udp_port(struct ndpi_detection_module_struct *ndpi_struct,
+						 struct ndpi_flow_struct *flow,
+						 struct ndpi_dns_packet_header *dns_header,
+						 u_int8_t *is_query) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+  if(packet->udp == NULL || packet->tcp != NULL)
+    return 0;
+
+  if(!is_valid_dns(ndpi_struct, flow, dns_header, 0, is_query))
+    return 0;
+
+  if(dns_header->num_queries == 0 ||
+     dns_header->num_queries > NDPI_MAX_DNS_REQUESTS)
+    return 0;
+
+  return is_valid_uncompressed_dns_questions(packet->payload, packet->payload_packet_len,
+					     0, dns_header->num_queries);
+}
+
+/* *********************************************** */
+
 static void dns_tcp_reasm_free_dir(struct ndpi_dns_tcp_reasm *reasm)
 {
   if(reasm->buf != NULL) {
@@ -1241,12 +1315,33 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   } else if(ndpi_struct->cfg.dns_custom_port == 0 &&
             !ndpi_is_multi_or_broadcast(flow) &&
             flow->l4_proto == IPPROTO_UDP && /* No TCP to avoid too many false positives */
-            /* Avoid collision with other protocols requiring multiple pkts. */
-            flow->rtp_stage == 0 &&
-            flow->rtcp_stage == 0 &&
-            flow->teamviewer_stage == 0 &&
-            flow->l4.udp.eaq_pkt_id == 0 && flow->l4.udp.eaq_sequence == 0) {
-    /* Ok, check DNS on any ports: keep going */
+            (flow->l4.udp.dns_any_port_candidate ||
+             /* Avoid collision with other protocols requiring multiple pkts. */
+             (flow->rtp_stage == 0 &&
+              flow->rtcp_stage == 0 &&
+              flow->teamviewer_stage == 0 &&
+              flow->l4.udp.eaq_pkt_id == 0 && flow->l4.udp.eaq_sequence == 0))) {
+    struct ndpi_dns_packet_header dns_header;
+    u_int8_t is_query;
+
+    if(!is_valid_dns_on_non_standard_udp_port(ndpi_struct, flow, &dns_header, &is_query)) {
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return;
+    }
+
+    if(is_query) {
+      flow->l4.udp.dns_any_port_candidate = 1;
+      flow->l4.udp.dns_any_port_candidate_direction = packet->packet_direction;
+      flow->l4.udp.dns_any_port_transaction_id = dns_header.tr_id;
+      return;
+    }
+
+    if(flow->l4.udp.dns_any_port_candidate == 0 ||
+       flow->l4.udp.dns_any_port_transaction_id != dns_header.tr_id ||
+       flow->l4.udp.dns_any_port_candidate_direction == packet->packet_direction) {
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return;
+    }
   } else {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
