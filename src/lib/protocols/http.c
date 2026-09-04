@@ -274,9 +274,26 @@ static void ndpi_http_check_suspicious_mp4(struct ndpi_detection_module_struct *
      flow->http.mp4_body_bytes > 0 &&
      flow->http.mp4_uuid_bytes >=
        flow->http.mp4_body_bytes - flow->http.mp4_body_bytes / 10) {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_CONTENT,
-                  "MP4 carrier dominated by private uuid box without media boxes");
-    flow->http.mp4_anomaly_checked = 1;
+    {
+      char risk_info[160];
+      u_int64_t uuid_ratio =
+        (flow->http.mp4_uuid_bytes * 100ULL) / flow->http.mp4_body_bytes;
+
+      /*
+       * Preserve the structural evidence in the risk message. This is
+       * derived exclusively from parsed wire bytes and helps downstream
+       * analysts distinguish a high-dominance carrier from other HTTP
+       * suspicious-content events without storing the payload.
+       */
+      snprintf(risk_info, sizeof(risk_info),
+               "MP4 carrier dominated by private uuid box without media boxes (body=%llu, uuid=%u, uuid_ratio=%llu%%)",
+               (unsigned long long)flow->http.mp4_body_bytes,
+               flow->http.mp4_uuid_bytes,
+               (unsigned long long)uuid_ratio);
+      ndpi_set_risk(ndpi_struct, flow, NDPI_HTTP_SUSPICIOUS_CONTENT,
+                    risk_info);
+      flow->http.mp4_anomaly_checked = 1;
+    }
   }
 }
 
