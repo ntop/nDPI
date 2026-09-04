@@ -360,9 +360,9 @@ static int process_queries(struct ndpi_detection_module_struct *ndpi_struct,
 /* *********************************************** */
 
 static int process_queries_strict(struct ndpi_detection_module_struct *ndpi_struct,
-                                  struct ndpi_flow_struct *flow,
                                   struct ndpi_dns_packet_header *dns_header,
-                                  u_int payload_offset) {
+                                  u_int payload_offset,
+                                  u_int16_t *first_query_type) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int x = payload_offset;
   u_int16_t num;
@@ -395,8 +395,8 @@ static int process_queries_strict(struct ndpi_detection_module_struct *ndpi_stru
     if(query_type == 0 || ntohs(get_u_int16_t(packet->payload, x)) == 0)
       return -1;
 
-    if(flow->protos.dns.query_type == 0)
-      flow->protos.dns.query_type = query_type;
+    if(num == 0)
+      *first_query_type = query_type;
 
     x += 2; /* Skip class */
   }
@@ -1102,8 +1102,9 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
   u_int8_t is_query;
   struct ndpi_dns_packet_header dns_header;
   u_int off;
+  u_int16_t strict_query_type = 0;
   ndpi_master_app_protocol proto;
-  int rc;
+  int rc, strict_questions_end = -1;
 
   if(packet->udp != NULL) {
     payload_offset = 0;
@@ -1123,25 +1124,31 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
     return;
   }
 
-  if(strict_geometry &&
-     (dns_header.num_queries == 0 || dns_header.num_queries > NDPI_MAX_DNS_REQUESTS)) {
-    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-    return;
+  off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
+
+  /* Validate arbitrary-port candidates before touching the protocol union. */
+  if(strict_geometry) {
+    if(dns_header.num_queries == 0 ||
+       dns_header.num_queries > NDPI_MAX_DNS_REQUESTS ||
+       (strict_questions_end = process_queries_strict(ndpi_struct, &dns_header, off,
+                                                      &strict_query_type)) == -1) {
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return;
+    }
   }
 
   process_hostname(ndpi_struct, flow, &dns_header, &proto);
-
-  off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
 
   if(is_query) {
     flow->protos.dns.is_query = 1;
     flow->protos.dns.transaction_id = dns_header.tr_id;
 
-    rc = strict_geometry ? process_queries_strict(ndpi_struct, flow, &dns_header, off) :
-                           process_queries(ndpi_struct, flow, &dns_header, off);
-    if(strict_geometry && rc == -1) {
-      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-      return;
+    if(strict_geometry) {
+      rc = strict_questions_end;
+      if(flow->protos.dns.query_type == 0)
+        flow->protos.dns.query_type = strict_query_type;
+    } else {
+      rc = process_queries(ndpi_struct, flow, &dns_header, off);
     }
 #ifdef DNS_DEBUG
     if(rc == -1)
@@ -1170,12 +1177,14 @@ static void search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct 
       }
     }
 
-    rc = strict_geometry ? process_queries_strict(ndpi_struct, flow, &dns_header, off) :
-                           process_queries(ndpi_struct, flow, &dns_header, off);
-    if(strict_geometry && rc == -1) {
-      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
-      return;
-    } else if(rc == -1) {
+    if(strict_geometry) {
+      rc = strict_questions_end;
+      if(flow->protos.dns.query_type == 0)
+        flow->protos.dns.query_type = strict_query_type;
+    } else {
+      rc = process_queries(ndpi_struct, flow, &dns_header, off);
+    }
+    if(rc == -1) {
 #ifdef DNS_DEBUG
       printf("[DNS] Error queries (response msg)\n");
 #endif
