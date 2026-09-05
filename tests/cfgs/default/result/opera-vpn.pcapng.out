@@ -3,7 +3,7 @@ Guessed flow protos:	1
 DPI Packets (TCP):	369	(5.95 pkts/flow)
 Confidence Match by port    : 1 (flows)
 Confidence DPI              : 61 (flows)
-Num dissector calls: 183 (2.95 diss/flow)
+Num dissector calls: 61 (0.98 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -30,14 +30,14 @@ Hash ja4 custom protos:    122/0 (search/found)
 Hash fp custom protos:     61/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
 
+TLS	3	206	1
 OperaVPN	3197	1398676	61
-Kik	3	206	1
 
+Safe                             3 206           1            
 Acceptable                    3197 1398676       61           
-Fun                              3 206           1            
 
 VPN                           3197 1398676       61           
-Chat                             3 206           1            
+Web                              3 206           1            
 
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
@@ -105,4 +105,4 @@ JA Host Stats:
 	59	TCP 192.168.1.29:51405 <-> 77.111.247.69:443 [proto: 91.339/TLS.OperaVPN][Stack: TLS.OperaVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: VPN/2][Breed: Acceptable][17 pkts/3753 bytes <-> 17 pkts/6564 bytes][Goodput ratio: 70/83][3.18 sec][Hostname/SNI: eu0.sec-tunnel.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.272 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 11/8 35/28 14/11][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 221/386 1491/1506 359/479][nDPI Cli Fingerprint: a85c773ee95b599036297606b77de34c][nDPI Srv Fingerprint: a2da83e97c3d][TCP Fingerprint: 2_64_65535_d29295416479/macOS][TLSv1.3][JA4: t13d1516h2_8daaf6152771_e5627efa2ab1][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 12,12,12,6,0,0,6,0,0,0,0,0,6,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,6,0,0,0,0,0,0,0,0,0,0,6,6,0,0]
 	60	TCP 192.168.1.29:51452 <-> 77.111.247.69:443 [proto: 91.339/TLS.OperaVPN][Stack: TLS.OperaVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: VPN/2][Breed: Acceptable][19 pkts/4568 bytes <-> 18 pkts/5685 bytes][Goodput ratio: 72/79][0.22 sec][Hostname/SNI: eu0.sec-tunnel.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.109 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/9 33/68 12/19][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 240/316 1483/1506 346/442][nDPI Cli Fingerprint: a85c773ee95b599036297606b77de34c][nDPI Srv Fingerprint: a2da83e97c3d][TCP Fingerprint: 2_64_65535_d29295416479/macOS][TLSv1.3][JA4: t13d1516h2_8daaf6152771_e5627efa2ab1][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 5,19,19,5,0,0,0,0,5,0,0,0,0,0,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,5,5,0,0]
 	61	TCP 192.168.1.29:51466 <-> 77.111.247.69:443 [proto: 91.339/TLS.OperaVPN][Stack: TLS.OperaVPN][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: VPN/2][Breed: Acceptable][7 pkts/2470 bytes <-> 4 pkts/2788 bytes][Goodput ratio: 81/90][0.06 sec][Hostname/SNI: eu0.sec-tunnel.com][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.060 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 12/10 29/28 14/13][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 353/697 1481/1506 492/640][nDPI Cli Fingerprint: a85c773ee95b599036297606b77de34c][nDPI Srv Fingerprint: a2da83e97c3d][TCP Fingerprint: 2_64_65535_d29295416479/macOS][TLSv1.3][JA4: t13d1516h2_8daaf6152771_e5627efa2ab1][JA3S: f4febc55ea12b31ae17cfb7e614afda8][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,20,20,0,0]
-	62	TCP 192.168.1.29:51457 <-> 77.111.247.69:443 [proto: 491/Kik][Stack: Kik][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Chat/9][Breed: Fun][2 pkts/132 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.03 sec][Risk: ** TCP Connection Issues **** Probing Attempt **][Risk Score: 100][Risk Info: TCP probing attempt;Connection refused (client)][TCP Fingerprint: 2_64_65535_d29295416479/macOS][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	62	TCP 192.168.1.29:51457 <-> 77.111.247.69:443 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: Web/5][Breed: Safe][2 pkts/132 bytes <-> 1 pkts/74 bytes][Goodput ratio: 0/0][0.03 sec][Risk: ** TCP Connection Issues **** Probing Attempt **][Risk Score: 100][Risk Info: TCP probing attempt;Connection refused (client)][TCP Fingerprint: 2_64_65535_d29295416479/macOS][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

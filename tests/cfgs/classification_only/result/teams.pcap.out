@@ -7,7 +7,7 @@ Confidence Unknown          : 1 (flows)
 Confidence Match by port    : 2 (flows)
 Confidence DPI (partial)    : 6 (flows)
 Confidence DPI              : 74 (flows)
-Num dissector calls: 609 (7.34 diss/flow)
+Num dissector calls: 533 (6.42 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/9/0 (insert/search/found)
 LRU cache stun:       24/0/0 (insert/search/found)
@@ -41,21 +41,19 @@ ntop	37	9514	2
 TeamsCall	93	19649	12
 STUN	31	13745	1
 ICMP	2	140	1
-TLS	20	11474	2
+TLS	23	11660	3
 Dropbox	2	1054	2
 Spotify	1	82	1
 Microsoft365	531	334618	13
 Teams	722	277403	23
-Kik	3	186	1
 
 Unrated                          4 456           1            
-Safe                           215 81981         10           
+Safe                           218 82167         11           
 Acceptable                    1275 594290        70           
-Fun                              4 268           2            
+Fun                              1 82            1            
 
 Unspecified                      4 456           1            
-Web                             20 11474         2            
-Chat                             3 186           1            
+Web                             23 11660         3            
 VoIP                            93 19649         12           
 Cloud                            2 1054          2            
 Network                        122 32073         28           
@@ -146,7 +144,7 @@ JA Host Stats:
 	77	UDP 192.168.1.6:62863 <-> 192.168.1.1:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/103 bytes <-> 1 pkts/158 bytes][Goodput ratio: 59/73][0.07 sec][Hostname/SNI: emea.ng.msg.teams-msgapi.trafficmanager.net][0.0.0.0][DNS Id: 0x74f2][PLAIN TEXT (msgapi)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	78	UDP 192.168.1.6:56634 <-> 192.168.1.1:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/89 bytes <-> 1 pkts/142 bytes][Goodput ratio: 52/70][0.03 sec][Hostname/SNI: captive.apple.com.edgekey.net][0.0.0.0][DNS Id: 0x29fd][PLAIN TEXT (captive)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	79	UDP 192.168.1.6:60813 <-> 192.168.1.1:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/93 bytes <-> 1 pkts/109 bytes][Goodput ratio: 54/61][0.01 sec][Hostname/SNI: skypedataprdcolneu04.cloudapp.net][0.0.0.0][DNS Id: 0xce9d][PLAIN TEXT (skypedataprdcolneu04)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	80	TCP 192.168.1.6:58533 -> 149.154.167.91:443 [proto: 491/Kik][Stack: Kik][IP: 185/Telegram][Encrypted][Confidence: Match by port][FPC: 185/Telegram, Confidence: IP address][DPI packets: 3][cat: Chat/9][Breed: Fun][3 pkts/186 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][4.29 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	80	TCP 192.168.1.6:58533 -> 149.154.167.91:443 [proto: 91/TLS][Stack: TLS][IP: 185/Telegram][Encrypted][Confidence: Match by port][FPC: 185/Telegram, Confidence: IP address][DPI packets: 3][cat: Web/5][Breed: Safe][3 pkts/186 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][4.29 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	81	ICMP 93.71.110.205:0 -> 192.168.1.6:0 [proto: 81/ICMP][Stack: ICMP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 81/ICMP, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][2 pkts/140 bytes -> 0 pkts/0 bytes][Goodput ratio: 40/0][0.01 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	82	UDP 192.168.1.112:57621 -> 192.168.1.255:57621 [proto: 156/Spotify][Stack: Spotify][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 156/Spotify, Confidence: DPI][DPI packets: 1][cat: Music/25][Breed: Fun][1 pkts/82 bytes -> 0 pkts/0 bytes][Goodput ratio: 48/0][< 1 sec][PLAIN TEXT (SpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 

@@ -5,7 +5,7 @@ DPI Packets (UDP):	1	(1.00 pkts/flow)
 Confidence Unknown          : 1 (flows)
 Confidence Match by port    : 9 (flows)
 Confidence DPI              : 23 (flows)
-Num dissector calls: 374 (11.33 diss/flow)
+Num dissector calls: 348 (10.55 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/30/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -35,20 +35,18 @@ Hash url custom protos:    8/0 (search/found)
 Unknown	10	786	1
 HTTP	65	64777	8
 NTP	2	180	1
-TLS	13	2142	1
+TLS	21	2574	3
 Waze	484	289335	19
 WhatsApp	15	1341	1
-Kik	8	432	2
 
 Unrated                         10 786           1            
-Safe                            13 2142          1            
+Safe                            21 2574          3            
 Acceptable                     566 355633        29           
-Fun                              8 432           2            
 
 Unspecified                     10 786           1            
-Web                            525 293049        27           
+Web                            533 293481        29           
 Download                        37 63205         1            
-Chat                            23 1773          3            
+Chat                            15 1341          1            
 System                           2 180           1            
 
 JA Host Stats: 
@@ -83,9 +81,9 @@ JA Host Stats:
 	25	TCP 10.16.37.157:46473 <-> 200.160.4.49:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Acceptable][2 pkts/120 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.01 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	26	TCP 10.16.37.157:52746 <-> 200.160.4.49:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Acceptable][2 pkts/120 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.01 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	27	TCP 10.16.37.157:52953 <-> 200.160.4.49:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Acceptable][2 pkts/120 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.01 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	28	TCP 10.8.0.1:43089 <-> 200.160.4.198:443 [proto: 491/Kik][Stack: Kik][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Chat/9][Breed: Fun][2 pkts/108 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	28	TCP 10.8.0.1:43089 <-> 200.160.4.198:443 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Safe][2 pkts/108 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	29	TCP 10.8.0.1:45169 <-> 200.160.4.198:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Acceptable][2 pkts/108 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	30	TCP 10.8.0.1:60479 <-> 200.160.4.49:443 [proto: 491/Kik][Stack: Kik][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Chat/9][Breed: Fun][2 pkts/108 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	30	TCP 10.8.0.1:60479 <-> 200.160.4.49:443 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Safe][2 pkts/108 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.00 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	31	TCP 10.8.0.1:60574 <-> 200.160.4.49:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Acceptable][2 pkts/108 bytes <-> 2 pkts/108 bytes][Goodput ratio: 0/0][0.01 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	32	UDP 10.8.0.1:46214 <-> 200.89.75.198:123 [proto: 9/NTP][Stack: NTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 9/NTP, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Acceptable][1 pkts/90 bytes <-> 1 pkts/90 bytes][Goodput ratio: 53/53][0.31 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
