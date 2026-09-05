@@ -6,7 +6,7 @@ DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by port    : 13 (flows)
 Confidence DPI              : 38 (flows)
 Confidence Match by IP      : 1 (flows)
-Num dissector calls: 1940 (37.31 diss/flow)
+Num dissector calls: 1958 (37.65 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/42/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -38,19 +38,21 @@ HTTP	1	66	1
 SSDP	11	4984	1
 WorldOfWarcraft	9	880	1
 IGMP	2	120	1
-TLS	46	3071	14
+TLS	35	2434	9
 Google	11	1420	2
 QUIC	6	475	1
 Blizzard	685	346308	24
+Kik	11	637	5
 
-Safe                            46 3071          14           
+Safe                            35 2434          9            
 Acceptable                      48 8614          12           
-Fun                            694 347188        25           
+Fun                            705 347825        30           
 Tracker_Ads                      9 1299          1            
 
-Web                             55 3733          17           
+Web                             44 3096          12           
 Download                       179 134204        1            
 Game                           515 212984        24           
+Chat                            11 637           5            
 Network                         28 2968          8            
 System                          11 4984          1            
 Advertisement                    9 1299          1            
@@ -94,16 +96,16 @@ Advertisement                    9 1299          1
 	37	TCP 192.168.1.100:3491 <-> 2.228.46.104:443 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Web/5][Breed: Safe][2 pkts/108 bytes <-> 2 pkts/167 bytes][Goodput ratio: 0/32][0.04 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	38	TCP 192.168.1.100:3492 <-> 2.228.46.104:443 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Web/5][Breed: Safe][2 pkts/108 bytes <-> 2 pkts/167 bytes][Goodput ratio: 0/32][0.03 sec][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	39	TCP 192.30.252.91:443 <-> 192.168.1.100:3213 [proto: 91/TLS][Stack: TLS][IP: 203/Github][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Safe][2 pkts/145 bytes <-> 1 pkts/89 bytes][Goodput ratio: 21/39][0.13 sec][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	40	TCP 192.168.1.100:3486 <-> 199.38.164.156:443 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Safe][2 pkts/108 bytes <-> 2 pkts/120 bytes][Goodput ratio: 0/0][0.12 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	40	TCP 192.168.1.100:3486 <-> 199.38.164.156:443 [proto: 491/Kik][Stack: Kik][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Chat/9][Breed: Fun][2 pkts/108 bytes <-> 2 pkts/120 bytes][Goodput ratio: 0/0][0.12 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	41	UDP 192.168.1.100:58844 <-> 192.168.1.254:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/86 bytes <-> 1 pkts/124 bytes][Goodput ratio: 51/66][0.05 sec][Hostname/SNI: 40.186.239.80.in-addr.arpa][0.0.0.0][DNS Id: 0x8b3c][DNS Ptr: 80-239-186-40.attens.net][PLAIN TEXT (attens)][Plen Bins: 0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	42	TCP 192.168.1.100:3484 <-> 173.194.113.224:443 [proto: 91/TLS][Stack: TLS][IP: 126/Google][Encrypted][Confidence: Match by port][FPC: 126/Google, Confidence: IP address][DPI packets: 3][cat: Web/5][Breed: Safe][2 pkts/108 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.03 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	42	TCP 192.168.1.100:3484 <-> 173.194.113.224:443 [proto: 491/Kik][Stack: Kik][IP: 126/Google][Encrypted][Confidence: Match by port][FPC: 126/Google, Confidence: IP address][DPI packets: 3][cat: Chat/9][Breed: Fun][2 pkts/108 bytes <-> 1 pkts/60 bytes][Goodput ratio: 0/0][0.03 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	43	TCP 192.168.1.100:2759 <-> 64.233.184.188:5228 [proto: 126/Google][Stack: Google][IP: 126/Google][Encrypted][Confidence: Match by IP][FPC: 126/Google, Confidence: IP address][DPI packets: 2][cat: Web/5][Breed: Acceptable][1 pkts/55 bytes <-> 1 pkts/66 bytes][Goodput ratio: 2/0][0.05 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	44	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 91/TLS][Stack: TLS][IP: 126/Google][Encrypted][Confidence: Match by port][FPC: 126/Google, Confidence: IP address][DPI packets: 2][cat: Web/5][Breed: Safe][1 pkts/55 bytes <-> 1 pkts/66 bytes][Goodput ratio: 2/0][0.04 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	44	TCP 192.168.1.100:3052 <-> 216.58.212.110:443 [proto: 491/Kik][Stack: Kik][IP: 126/Google][Encrypted][Confidence: Match by port][FPC: 126/Google, Confidence: IP address][DPI packets: 2][cat: Chat/9][Breed: Fun][1 pkts/55 bytes <-> 1 pkts/66 bytes][Goodput ratio: 2/0][0.04 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	45	IGMP 192.168.1.107:0 -> 224.0.0.22:0 [proto: 82/IGMP][Stack: IGMP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 82/IGMP, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][2 pkts/120 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][3.18 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	46	UDP 192.168.1.100:53146 <-> 5.42.180.154:1119 [proto: 213/Blizzard][Stack: Blizzard][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Game/8][Breed: Fun][1 pkts/44 bytes <-> 1 pkts/60 bytes][Goodput ratio: 4/3][0.05 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	47	UDP 192.168.1.100:53146 <-> 62.115.246.51:1119 [proto: 213/Blizzard][Stack: Blizzard][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Game/8][Breed: Fun][1 pkts/44 bytes <-> 1 pkts/60 bytes][Goodput ratio: 4/3][0.06 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	48	UDP 192.168.1.100:6113 <-> 213.248.127.166:1119 [proto: 213/Blizzard][Stack: Blizzard][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Game/8][Breed: Fun][1 pkts/43 bytes <-> 1 pkts/60 bytes][Goodput ratio: 2/11][0.05 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	49	UDP 192.168.1.100:6113 <-> 213.248.127.212:1119 [proto: 213/Blizzard][Stack: Blizzard][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Game/8][Breed: Fun][1 pkts/43 bytes <-> 1 pkts/60 bytes][Goodput ratio: 2/11][0.05 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	50	TCP 192.168.1.100:3534 -> 2.228.46.112:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 213/Blizzard, Confidence: DNS][DPI packets: 1][cat: Web/5][Breed: Acceptable][1 pkts/66 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TCP Fingerprint: 2_128_8192_6bb88f5575fd/Unknown][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	51	TCP 80.239.186.26:443 -> 192.168.1.100:3476 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Web/5][Breed: Safe][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **** Probing Attempt **][Risk Score: 110][Risk Info: TCP probing attempt;Connection refused;No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	52	TCP 80.239.186.40:443 -> 192.168.1.100:3478 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Web/5][Breed: Safe][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **** Probing Attempt **][Risk Score: 110][Risk Info: TCP probing attempt;Connection refused;No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	51	TCP 80.239.186.26:443 -> 192.168.1.100:3476 [proto: 491/Kik][Stack: Kik][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Chat/9][Breed: Fun][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **** Probing Attempt **][Risk Score: 110][Risk Info: TCP probing attempt;Connection refused;No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	52	TCP 80.239.186.40:443 -> 192.168.1.100:3478 [proto: 491/Kik][Stack: Kik][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: Chat/9][Breed: Fun][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **** TCP Connection Issues **** Probing Attempt **][Risk Score: 110][Risk Info: TCP probing attempt;Connection refused;No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

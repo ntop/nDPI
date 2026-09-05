@@ -1,0 +1,44 @@
+DPI Packets (TCP):	32	(8.00 pkts/flow)
+Confidence DPI              : 4 (flows)
+Num dissector calls: 336 (84.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/4/0 (insert/search/found)
+Automa host:          4/4 (search/found)
+Automa domain:        4/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     2/0 (search/found)
+Automa common alpns:  4/2 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/4 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       2/0 (search/found)
+Hash TCP fingerprints:     4/4 (search/found)
+Hash public domain suffix: 36/20 (search/found)
+Hash ja4 custom protos:    8/0 (search/found)
+Hash fp custom protos:     4/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Kik	165	103908	4
+
+Fun                            165 103908        4            
+
+Chat                           165 103908        4            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.50.99            	 2      
+
+
+	1	TCP 192.168.50.99:63165 <-> 3.212.236.212:443 [proto: 91.491/TLS.Kik][Stack: TLS.Kik][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 461/AWS_EC2, Confidence: IP address][DPI packets: 10][cat: Chat/9][Breed: Fun][40 pkts/48961 bytes <-> 25 pkts/6342 bytes][Goodput ratio: 95/74][1.80 sec][Hostname/SNI: platform.kik.com][(Advertised) ALPNs: http/1.1][(Negotiated) ALPN: http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: 0.771 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 20/40 294/290 69/87][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 1224/254 1506/1506 542/460][nDPI Cli Fingerprint: c3a9fe1a3c1aa4f51d7c55a5d8189698][nDPI Srv Fingerprint: c5cff1c48114][TCP Fingerprint: 194_64_65535_d29295416479/macOS][TLSv1.2][JA4: t13d2013h1_a09f3c656075_7f0f34a4126d][ServerNames: *.kik.com,kik.com][JA3S: 50a9e7b112931e541503e8a2499252b9][Issuer: C=US, O=Amazon, CN=Amazon RSA 2048 M01][Subject: CN=*.kik.com][Certificate SHA-1: F3:7E:20:E6:6F:26:01:E3:28:D2:0A:97:92:80:59:7F:9C:4F:66:06][Safari][Validity: 2025-11-06 00:00:00 - 2026-12-05 23:59:59][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,2,0,5,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,84,0,0]
+	2	TCP 192.168.50.99:51197 <-> 34.49.206.20:443 [proto: 91.491/TLS.Kik][Stack: TLS.Kik][IP: 284/GoogleCloud][Encrypted][Confidence: DPI][FPC: 284/GoogleCloud, Confidence: IP address][DPI packets: 6][cat: Chat/9][Breed: Fun][25 pkts/13240 bytes <-> 23 pkts/16063 bytes][Goodput ratio: 87/87][0.91 sec][Hostname/SNI: login.kikprod.net][(Advertised) ALPNs: grpc-exp;h2][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.096 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 9/42 51/598 18/137][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 530/698 1466/1466 619/626][Risk: ** Uncommon TLS ALPN **][Risk Score: 50][Risk Info: grpc-ex][nDPI Cli Fingerprint: a34accee8fee4323ec8b0bd1a305fb34][nDPI Srv Fingerprint: 2e8859b5ba1c][TCP Fingerprint: 194_64_65535_d29295416479/macOS][TLSv1.3][JA4: t13d1712gp_5b57614c22b0_ef7df7f74e48][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Safari][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 3,3,7,3,3,0,0,0,0,3,0,0,0,0,0,7,3,0,0,3,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,3,0,0,0,0,56,0,0,0,0]
+	3	TCP 192.168.50.99:63169 <-> 100.48.127.238:443 [proto: 91.491/TLS.Kik][Stack: TLS.Kik][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 461/AWS_EC2, Confidence: IP address][DPI packets: 10][cat: Chat/9][Breed: Fun][13 pkts/5604 bytes <-> 10 pkts/5126 bytes][Goodput ratio: 84/87][1.13 sec][Hostname/SNI: clientmetrics.kik.com][(Advertised) ALPNs: http/1.1][(Negotiated) ALPN: http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: 0.045 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 57/40 280/282 111/99][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 431/513 1506/1506 567/637][nDPI Cli Fingerprint: c3a9fe1a3c1aa4f51d7c55a5d8189698][nDPI Srv Fingerprint: c5cff1c48114][TCP Fingerprint: 194_64_65535_d29295416479/macOS][TLSv1.2][JA4: t13d2013h1_a09f3c656075_7f0f34a4126d][ServerNames: *.kik.com,kik.com][JA3S: 50a9e7b112931e541503e8a2499252b9][Issuer: C=US, O=Amazon, CN=Amazon RSA 2048 M01][Subject: CN=*.kik.com][Certificate SHA-1: F3:7E:20:E6:6F:26:01:E3:28:D2:0A:97:92:80:59:7F:9C:4F:66:06][Safari][Validity: 2025-11-06 00:00:00 - 2026-12-05 23:59:59][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 0,9,0,18,9,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,9,0,0,36,0,0]
+	4	TCP 192.168.50.99:51194 <-> 34.49.206.20:443 [proto: 91.491/TLS.Kik][Stack: TLS.Kik][IP: 284/GoogleCloud][Encrypted][Confidence: DPI][FPC: 284/GoogleCloud, Confidence: IP address][DPI packets: 6][cat: Chat/9][Breed: Fun][15 pkts/2096 bytes <-> 14 pkts/6476 bytes][Goodput ratio: 52/84][0.54 sec][Hostname/SNI: api.kikprod.net][(Advertised) ALPNs: grpc-exp;h2][TLS Supported Versions: TLSv1.3;TLSv1.2;TLSv1.1;TLSv1][bytes ratio: -0.511 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 11/37 43/213 17/63][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 140/463 583/1466 140/549][Risk: ** Uncommon TLS ALPN **][Risk Score: 50][Risk Info: grpc-ex][nDPI Cli Fingerprint: a34accee8fee4323ec8b0bd1a305fb34][nDPI Srv Fingerprint: 2e8859b5ba1c][TCP Fingerprint: 194_64_65535_d29295416479/macOS][TLSv1.3][JA4: t13d1712gp_5b57614c22b0_ef7df7f74e48][JA3S: eb1d94daa7e0344597e756a1fb6e7054][Safari][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 6,6,31,6,6,0,0,0,0,12,0,0,0,0,0,0,6,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,0,0,0,0]
