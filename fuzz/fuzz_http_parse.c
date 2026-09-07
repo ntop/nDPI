@@ -69,7 +69,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   packet->udp = NULL;
 
   memset(ndpi_flow, 0, sizeof(struct ndpi_flow_struct));
-  ndpi_flow->l4_proto = IPPROTO_TCP;
+  ndpi_flow->core.l4_proto = IPPROTO_TCP;
 
   ndpi_search_http_tcp(ndpi_struct, ndpi_flow);
   ndpi_free_flow_data(ndpi_flow);

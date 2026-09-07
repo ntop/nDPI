@@ -78,10 +78,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   }
 
   memset(ndpi_flow, 0, sizeof(struct ndpi_flow_struct));
-  ndpi_flow->detected_protocol_stack[0] = NDPI_PROTOCOL_TLS;
-  ndpi_flow->l4_proto = is_udp ? IPPROTO_UDP : IPPROTO_TCP;
+  ndpi_flow->core.detected_protocol_stack[0] = NDPI_PROTOCOL_TLS;
+  ndpi_flow->core.l4_proto = is_udp ? IPPROTO_UDP : IPPROTO_TCP;
   if (is_quic)
-    ndpi_flow->protos.tls_quic.quic_version = quic_version;
+    ndpi_flow->metadata.protos.tls_quic.quic_version = quic_version;
 
   processClientServerHello(ndpi_struct, ndpi_flow, quic_version);
   ndpi_free_flow_data(ndpi_flow);
