@@ -39,7 +39,7 @@ static void ndpi_int_nebula_add_connection(struct ndpi_detection_module_struct *
                                            struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found Nebula\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_NEBULA,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -85,7 +85,7 @@ static void ndpi_search_nebula(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if (flow->packet_counter != message_counter) {
+  if (flow->core.packet_counter != message_counter) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }

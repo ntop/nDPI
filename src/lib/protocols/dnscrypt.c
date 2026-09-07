@@ -28,7 +28,7 @@
 static void ndpi_int_dnscrypt_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
                                              struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DNSCRYPT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_DNSCRYPT, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 static void ndpi_search_dnscrypt(struct ndpi_detection_module_struct *ndpi_struct,
@@ -55,9 +55,9 @@ static void ndpi_search_dnscrypt(struct ndpi_detection_module_struct *ndpi_struc
     return;
   }
 
-  if ((flow->packet_direction_counter[packet->packet_direction] >= 1 &&
-       flow->packet_direction_counter[1 - packet->packet_direction] >= 1) ||
-      flow->packet_counter >= 8) {
+  if ((flow->core.packet_direction_counter[packet->packet_direction] >= 1 &&
+       flow->core.packet_direction_counter[1 - packet->packet_direction] >= 1) ||
+      flow->core.packet_counter >= 8) {
     /*
      * Wait for at least one packet per direction, up to a max
      * Required as we need to wait for the server response which contains the ASCII pattern below.

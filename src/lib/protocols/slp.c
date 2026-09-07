@@ -89,7 +89,7 @@ static void ndpi_int_slp_add_connection(struct ndpi_detection_module_struct *ndp
 {
   NDPI_LOG_INFO(ndpi_struct, "found Service Location Protocol\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_SERVICE_LOCATION, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }
@@ -153,7 +153,7 @@ static int slp_dissect_url_entries(struct ndpi_detection_module_struct *ndpi_str
   url_entries_count = ntohs(*(uint16_t *)&packet->payload[url_entries_offset]);
   url_entries_offset += sizeof(uint16_t);
 
-  for (i = 0; i < ndpi_min(url_entries_count, NDPI_ARRAY_LENGTH(flow->protos.slp.url)); ++i) {
+  for (i = 0; i < ndpi_min(url_entries_count, NDPI_ARRAY_LENGTH(flow->metadata.protos.slp.url)); ++i) {
     if (packet->payload_packet_len < url_entries_offset + sizeof(*url_entry)) {
       return 1;
     }
@@ -166,10 +166,10 @@ static int slp_dissect_url_entries(struct ndpi_detection_module_struct *ndpi_str
     }
     url_entries_offset += url_length;
 
-    flow->protos.slp.url_count++;
+    flow->metadata.protos.slp.url_count++;
     char const * const url = (char *)&url_entry->length + sizeof(url_entry->length);
-    strncpy(flow->protos.slp.url[i], url, ndpi_min(url_length, NDPI_ARRAY_LENGTH(flow->protos.slp.url[i]) - 1));
-    flow->protos.slp.url[i][NDPI_ARRAY_LENGTH(flow->protos.slp.url[i]) - 1] = '\0';
+    strncpy(flow->metadata.protos.slp.url[i], url, ndpi_min(url_length, NDPI_ARRAY_LENGTH(flow->metadata.protos.slp.url[i]) - 1));
+    flow->metadata.protos.slp.url[i][NDPI_ARRAY_LENGTH(flow->metadata.protos.slp.url[i]) - 1] = '\0';
 
     // handle Authentication Blocks
     uint8_t num_auths = packet->payload[url_entries_offset++];
@@ -187,7 +187,7 @@ static int slp_dissect_url_entries(struct ndpi_detection_module_struct *ndpi_str
     }
   }
 
-  return flow->protos.slp.url_count == 0;
+  return flow->metadata.protos.slp.url_count == 0;
 }
 
 static void ndpi_search_slp_v1(struct ndpi_detection_module_struct *ndpi_struct,
@@ -278,22 +278,22 @@ static void ndpi_dissect_slp_v2(struct ndpi_detection_module_struct *ndpi_struct
       // <URL String>
       url_length_or_count = ntohs(*(uint16_t *)&packet->payload[sizeof(*hdr) + url_length_offset]);
       if (packet->payload_packet_len > sizeof(*hdr) + url_offset + 2 + url_length_or_count) {
-        size_t len = ndpi_min(sizeof(flow->protos.slp.url[0]) - 1, url_length_or_count);
-        flow->protos.slp.url_count = 1;
-        strncpy(flow->protos.slp.url[0], (char *)&packet->payload[sizeof(*hdr) + url_offset + 2], len);
-        flow->protos.slp.url[0][len] = 0;
+        size_t len = ndpi_min(sizeof(flow->metadata.protos.slp.url[0]) - 1, url_length_or_count);
+        flow->metadata.protos.slp.url_count = 1;
+        strncpy(flow->metadata.protos.slp.url[0], (char *)&packet->payload[sizeof(*hdr) + url_offset + 2], len);
+        flow->metadata.protos.slp.url[0][len] = 0;
       }
     } else if (url_entry_count_offset > 0 && packet->payload_packet_len > sizeof(*hdr) + url_entry_count_offset + 2) {
       if (slp_dissect_url_entries(ndpi_struct, flow, sizeof(*hdr) + url_entry_count_offset) != 0) {
-        ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid URL entries");
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Invalid URL entries");
       }
     } else if (packet->payload_packet_len > sizeof(*hdr) + url_offset + 2) {
       url_length_or_count = ntohs(*(uint16_t *)&packet->payload[sizeof(*hdr) + url_offset]); // FID_SrvReg or FID_SrvDeReg
       if (packet->payload_packet_len > sizeof(*hdr) + url_offset + 2 + url_length_or_count) {
-        size_t len = ndpi_min(sizeof(flow->protos.slp.url[0]) - 1, url_length_or_count);
-        flow->protos.slp.url_count = 1;
-        strncpy(flow->protos.slp.url[0], (char *)&packet->payload[sizeof(*hdr) + url_offset + 2], len);
-        flow->protos.slp.url[0][len] = 0;
+        size_t len = ndpi_min(sizeof(flow->metadata.protos.slp.url[0]) - 1, url_length_or_count);
+        flow->metadata.protos.slp.url_count = 1;
+        strncpy(flow->metadata.protos.slp.url[0], (char *)&packet->payload[sizeof(*hdr) + url_offset + 2], len);
+        flow->metadata.protos.slp.url[0][len] = 0;
       }
     }
   }

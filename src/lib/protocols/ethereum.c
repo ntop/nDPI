@@ -40,7 +40,8 @@ enum ether_disc_packet_type {
 static void ndpi_ether_cache_connection(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
   if(ndpi_struct->mining_cache)
-    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, mining_make_lru_cache_key(flow), NDPI_PROTOCOL_ETHEREUM, ndpi_get_current_time(flow));
+    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, mining_make_lru_cache_key(flow),
+			  NDPI_PROTOCOL_ETHEREUM, ndpi_get_current_time(&flow->core));
 }
 
 /* ************************************************************************** */
@@ -81,7 +82,7 @@ static void ndpi_search_ethereum_udp(struct ndpi_detection_module_struct *ndpi_s
   if((packet->iph && ((ntohl(packet->iph->daddr) & 0xFF000000) != 0xFF000000 /* 255.0.0.0 */))
       ||(packet->iphv6 && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[0]) != 0xFF020000 /* ff02:: */))) {
     if(ndpi_ether_is_discv4(packet) /*|| ndpi_is_discv5(packet)*/) { 
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ETHEREUM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_ETHEREUM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       ndpi_ether_cache_connection(ndpi_struct, flow);
       return;
     }
@@ -109,7 +110,7 @@ static void ndpi_search_ethereum_tcp(struct ndpi_detection_module_struct *ndpi_s
        && (packet->payload_packet_len < 600)
        && (packet->payload[2] == 0x04)) {
       if(ndpi_is_ether_port(ntohs(packet->tcp->dest)) /* Ethereum port */) {
-	      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ETHEREUM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_ETHEREUM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	      ndpi_ether_cache_connection(ndpi_struct, flow);
 	      return;
       } 
@@ -126,7 +127,7 @@ static void ndpi_search_ethereum_tcp(struct ndpi_detection_module_struct *ndpi_s
 	{ "id": 2, "jsonrpc":"2.0","result":true}
 	{"worker": "", "jsonrpc": "2.0", "params": [], "id": 3, "method": "eth_getWork"}
       */
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ETHEREUM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_ETHEREUM, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       ndpi_ether_cache_connection(ndpi_struct, flow);
       return;
     } 

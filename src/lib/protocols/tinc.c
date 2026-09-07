@@ -61,7 +61,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
 	/* cache_free(ndpi_struct->tinc_cache); */
 
         NDPI_LOG_INFO(ndpi_struct, "found tinc udp connection\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
+        ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_CACHE);
       }
     }
     
@@ -69,14 +69,14 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
     return;
   } else if(packet->tcp != NULL) {
 
-    switch(flow->tinc_state) {
+    switch(flow->metadata.tinc_state) {
     case 0:
     case 1:
       if(payload_len > 6 && memcmp(packet_payload, "0 ", 2) == 0 && packet_payload[2] != ' ') {
 	u_int32_t i = 3;
 	while(i < payload_len && packet_payload[i++] != ' ');
 	if(i+3 == payload_len && memcmp((packet_payload+i), "17\n", 3) == 0) {
-	  flow->tinc_state++;
+	  flow->metadata.tinc_state++;
 	  return;
 	}
       }
@@ -107,11 +107,11 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
 	}
           
 	if(i < payload_len && packet_payload[i] == '\n') {
-	  if(++flow->tinc_state > 3) {
+	  if(++flow->metadata.tinc_state > 3) {
 	    struct tinc_cache_entry tinc_cache_entry = {
-	      .src_address = flow->c_address.v4,
-	      .dst_address = flow->s_address.v4,
-	      .dst_port = flow->s_port,
+	      .src_address = flow->core.c_address.v4,
+	      .dst_address = flow->core.s_address.v4,
+	      .dst_port = flow->core.s_port,
 	    };
 
 	    if(ndpi_struct->tinc_cache == NULL)
@@ -119,7 +119,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
 
 	    cache_add(ndpi_struct->tinc_cache, &tinc_cache_entry, sizeof(tinc_cache_entry));
 	    NDPI_LOG_INFO(ndpi_struct, "found tinc tcp connection\n");
-	    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TINC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	  }
 	  return;
 	}
@@ -136,7 +136,7 @@ static void ndpi_check_tinc(struct ndpi_detection_module_struct *ndpi_struct, st
 static void ndpi_search_tinc(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow) {
   NDPI_LOG_DBG(ndpi_struct, "tinc detection\n");
 
-  if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_TINC) {
+  if(flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_TINC) {
     ndpi_check_tinc(ndpi_struct, flow);
   }
 }

@@ -72,10 +72,11 @@ extern "C" {
 					 const u_int8_t ** l4ptr, u_int16_t * l4len,
 					 u_int8_t * nxt_hdr);
 
-  void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow,
+  void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
+		     struct ndpi_flow_core_struct *coreo,
                      ndpi_risk_enum r, char *risk_message);
-  void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_struct *flow, ndpi_risk_enum r);
-  int ndpi_isset_risk(struct ndpi_flow_struct *flow, ndpi_risk_enum r);
+  void ndpi_unset_risk(struct ndpi_detection_module_struct *ndpi_str, struct ndpi_flow_core_struct *core, ndpi_risk_enum r);
+  int ndpi_isset_risk(struct ndpi_flow_core_struct *core, ndpi_risk_enum r);
   int ndpi_is_printable_buffer(u_int8_t const * const buf, size_t len);
   int ndpi_normalize_printable_string(char * const str, size_t len, char *invalid_character);
   bool ndpi_is_valid_hostname(char * const str, size_t len);

@@ -34,7 +34,7 @@ static void ndpi_int_stomp_add_connection(struct ndpi_detection_module_struct *n
                                                 struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found STOMP\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_STOMP, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }
@@ -47,7 +47,7 @@ static void ndpi_search_stomp(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search STOMP\n");
   
   if (packet->payload_packet_len > 26 &&
-      current_pkt_from_client_to_server(ndpi_struct, flow) &&
+      current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
       memcmp(packet->payload, "STOMP", NDPI_STATICSTRING_LEN("STOMP")) == 0)
   {
     ndpi_int_stomp_add_connection(ndpi_struct, flow);
@@ -55,7 +55,7 @@ static void ndpi_search_stomp(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   if (packet->payload_packet_len > 100 && 
-      current_pkt_from_server_to_client(ndpi_struct, flow) &&
+      current_pkt_from_server_to_client(ndpi_struct, &flow->core) &&
       memcmp(packet->payload, "CONNECTED", NDPI_STATICSTRING_LEN("CONNECTED")) == 0)
   {
     ndpi_int_stomp_add_connection(ndpi_struct, flow);

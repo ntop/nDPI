@@ -38,7 +38,7 @@ struct afpHeader {
 
 static void ndpi_int_afp_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AFP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_AFP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 
@@ -57,7 +57,7 @@ static void ndpi_search_afp(struct ndpi_detection_module_struct *ndpi_struct, st
 	the initial connection, we need to discard these packets
 	as they are not an indication that this flow is not AFP	
       */
-      if(flow->packet_counter > 5)
+      if(flow->core.packet_counter > 5)
         NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }

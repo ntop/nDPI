@@ -48,7 +48,7 @@ static void ndpi_check_vxlan(struct ndpi_detection_module_struct *ndpi_struct, s
       (vxlanhdr->groupPolicy == 0x0) &&
       (vxlanhdr->reserved == 0x0)) {
       NDPI_LOG_INFO(ndpi_struct, "found vxlan\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VXLAN, NDPI_PROTOCOL_VXLAN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_VXLAN, NDPI_PROTOCOL_VXLAN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }

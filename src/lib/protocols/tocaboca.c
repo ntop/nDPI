@@ -29,7 +29,7 @@ static void ndpi_int_toca_boca_add_connection(struct ndpi_detection_module_struc
                                               struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found TocaBoca\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_TOCA_BOCA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -51,7 +51,7 @@ static void ndpi_search_toca_boca(struct ndpi_detection_module_struct *ndpi_stru
       return;
     }
 
-    if (flow->packet_counter == 1
+    if (flow->core.packet_counter == 1
         && payload_len >= 24
         && ntohl(get_u_int32_t(packet->payload, 0)) == 0xffff0001
         && ntohl(get_u_int32_t(packet->payload, 12)) == 0x02ff0104)

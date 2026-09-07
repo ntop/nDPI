@@ -45,7 +45,7 @@ static void ndpi_int_meshtastic_add_connection(struct ndpi_detection_module_stru
 {
   NDPI_LOG_INFO(ndpi_struct, "found Meshtastic\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_MESHTASTIC,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);

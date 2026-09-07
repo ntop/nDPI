@@ -65,10 +65,10 @@ static void ndpi_int_openvpn_add_connection(struct ndpi_detection_module_struct 
                                             ndpi_confidence_t confidence)
 {
   if(ndpi_struct->cfg.openvpn_subclassification_by_ip &&
-     ndpi_struct->proto_defaults[flow->guessed_protocol_id_by_ip].protoCategory == NDPI_PROTOCOL_CATEGORY_VPN) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, flow->guessed_protocol_id_by_ip, NDPI_PROTOCOL_OPENVPN, confidence);
+     ndpi_struct->proto_defaults[flow->core.guessed_protocol_id_by_ip].protoCategory == NDPI_PROTOCOL_CATEGORY_VPN) {
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, flow->core.guessed_protocol_id_by_ip, NDPI_PROTOCOL_OPENVPN, confidence);
   } else {
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN, confidence);
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_OPENVPN, NDPI_PROTOCOL_UNKNOWN, confidence);
   }
 }
 
@@ -168,7 +168,7 @@ static int search_standard(struct ndpi_detection_module_struct* ndpi_struct,
     NDPI_LOG_DBG2(ndpi_struct, "Invalid key id\n");
     return 1; /* Exclude */
   }
-  if(flow->packet_direction_counter[dir] == 1 &&
+  if(flow->core.packet_direction_counter[dir] == 1 &&
      !(opcode == P_CONTROL_HARD_RESET_CLIENT_V1 ||
        opcode == P_CONTROL_HARD_RESET_CLIENT_V2 ||
        opcode == P_CONTROL_HARD_RESET_SERVER_V1 ||
@@ -187,7 +187,7 @@ static int search_standard(struct ndpi_detection_module_struct* ndpi_struct,
     NDPI_LOG_DBG2(ndpi_struct, "Invalid len first pkt (QUIC collision)\n");
     return 1; /* Exclude */
   }
-  if(flow->packet_direction_counter[dir] == 1 &&
+  if(flow->core.packet_direction_counter[dir] == 1 &&
      packet->tcp &&
      ntohs(*(u_int16_t *)(packet->payload)) != ovpn_payload_len) {
     NDPI_LOG_DBG2(ndpi_struct, "Invalid tcp len on reset\n");
@@ -195,35 +195,35 @@ static int search_standard(struct ndpi_detection_module_struct* ndpi_struct,
   }
 
   NDPI_LOG_DBG2(ndpi_struct, "[packets %d/%d][opcode: %u][len: %u]\n",
-                flow->packet_direction_counter[dir],
-                flow->packet_direction_counter[!dir],
+                flow->core.packet_direction_counter[dir],
+                flow->core.packet_direction_counter[!dir],
                 opcode, ovpn_payload_len);
 
-  if(flow->packet_direction_counter[dir] > 1) {
-    if(memcmp(flow->ovpn_session_id[dir], ovpn_payload + 1, 8) != 0) {
+  if(flow->core.packet_direction_counter[dir] > 1) {
+    if(memcmp(flow->metadata.openvpn.ovpn_session_id[dir], ovpn_payload + 1, 8) != 0) {
       NDPI_LOG_DBG2(ndpi_struct, "Invalid session id on two consecutive pkts in the same dir\n");
       return 1; /* Exclude */
     }
-    if(flow->packet_direction_counter[dir] >= 2 &&
-       flow->packet_direction_counter[!dir] >= 2) {
+    if(flow->core.packet_direction_counter[dir] >= 2 &&
+       flow->core.packet_direction_counter[!dir] >= 2) {
       /* (2) */
       NDPI_LOG_INFO(ndpi_struct,"found openvpn (session ids match on both direction)\n");
       return 2; /* Found */
     }
-    if(flow->packet_direction_counter[dir] >= 4 &&
-       flow->packet_direction_counter[!dir] == 0) {
+    if(flow->core.packet_direction_counter[dir] >= 4 &&
+       flow->core.packet_direction_counter[!dir] == 0) {
       /* (3) */
       NDPI_LOG_INFO(ndpi_struct,"found openvpn (asymmetric)\n");
       return 2; /* Found */
     }
   } else {
-    memcpy(flow->ovpn_session_id[dir], ovpn_payload + 1, 8);
+    memcpy(flow->metadata.openvpn.ovpn_session_id[dir], ovpn_payload + 1, 8);
     NDPI_LOG_DBG2(ndpi_struct, "Session key [%d]: 0x%lx\n", dir,
-                  ndpi_ntohll(*(u_int64_t *)flow->ovpn_session_id[dir]));
+                  ndpi_ntohll(*(u_int64_t *)flow->metadata.openvpn.ovpn_session_id[dir]));
   }
 
   /* (1) */
-  if(flow->packet_direction_counter[!dir] > 0 &&
+  if(flow->core.packet_direction_counter[!dir] > 0 &&
      (opcode == P_CONTROL_HARD_RESET_SERVER_V1 ||
       opcode == P_CONTROL_HARD_RESET_SERVER_V2)) {
 
@@ -242,7 +242,7 @@ static int search_standard(struct ndpi_detection_module_struct* ndpi_struct,
         if((offset + 8) <= ovpn_payload_len) {
           session_remote = &ovpn_payload[offset];
 
-          if(memcmp(flow->ovpn_session_id[!dir], session_remote, 8) == 0) {
+          if(memcmp(flow->metadata.openvpn.ovpn_session_id[!dir], session_remote, 8) == 0) {
             NDPI_LOG_INFO(ndpi_struct,"found openvpn\n");
             return 2; /* Found */
           } else {
@@ -256,7 +256,7 @@ static int search_standard(struct ndpi_detection_module_struct* ndpi_struct,
     }
   }
 
-  if(failed || flow->packet_counter > 5)
+  if(failed || flow->core.packet_counter > 5)
     return 1; /* Exclude */
   return 0; /* Continue */
 }
@@ -289,78 +289,78 @@ static int search_heur_opcode_common(struct ndpi_detection_module_struct* ndpi_s
   */
 
   NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: [packets %d/%d msgs %d, dir %d][first byte 0x%x][opcode: 0x%x]\n",
-                flow->packet_direction_counter[0],
-                flow->packet_direction_counter[1],
-                flow->ovpn_heur_opcode__num_msgs,
+                flow->core.packet_direction_counter[0],
+                flow->core.packet_direction_counter[1],
+                flow->metadata.openvpn.ovpn_heur_opcode__num_msgs,
                 dir, first_byte, opcode);
 
-  flow->ovpn_heur_opcode__num_msgs++;
+  flow->metadata.openvpn.ovpn_heur_opcode__num_msgs++;
 
-  if(flow->packet_direction_counter[dir] == 1) {
-    flow->ovpn_heur_opcode__resets[dir] = opcode;
-    if(flow->packet_direction_counter[!dir] > 0 &&
-       opcode == flow->ovpn_heur_opcode__resets[!dir]) {
+  if(flow->core.packet_direction_counter[dir] == 1) {
+    flow->metadata.openvpn.ovpn_heur_opcode__resets[dir] = opcode;
+    if(flow->core.packet_direction_counter[!dir] > 0 &&
+       opcode == flow->metadata.openvpn.ovpn_heur_opcode__resets[!dir]) {
       NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: same resets\n");
       return 1; /* Exclude */
     }
     return 0; /* Continue */
   }
 
-  if(opcode == flow->ovpn_heur_opcode__resets[dir]) {
-    if(flow->ovpn_heur_opcode__codes_num > 0) {
+  if(opcode == flow->metadata.openvpn.ovpn_heur_opcode__resets[dir]) {
+    if(flow->metadata.openvpn.ovpn_heur_opcode__codes_num > 0) {
       NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: resets after other opcodes\n");
       return 1; /* Exclude */
     }
     return 0; /* Continue */
   }
-  if(flow->packet_direction_counter[!dir] > 0 &&
-     opcode == flow->ovpn_heur_opcode__resets[!dir]) {
+  if(flow->core.packet_direction_counter[!dir] > 0 &&
+     opcode == flow->metadata.openvpn.ovpn_heur_opcode__resets[!dir]) {
     NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: same resets\n");
     return 1; /* Exclude */
   }
 
-  if(flow->packet_direction_counter[!dir] == 0) {
+  if(flow->core.packet_direction_counter[!dir] == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: opcode different than reset but not reset in the other direction\n");
     return 1; /* Exclude */
   }
 
-  if(flow->ovpn_heur_opcode__codes_num == OPENVPN_HEUR_MAX_NUM_OPCODES &&
-     opcode != flow->ovpn_heur_opcode__codes[OPENVPN_HEUR_MAX_NUM_OPCODES - 1]) {
+  if(flow->metadata.openvpn.ovpn_heur_opcode__codes_num == OPENVPN_HEUR_MAX_NUM_OPCODES &&
+     opcode != flow->metadata.openvpn.ovpn_heur_opcode__codes[OPENVPN_HEUR_MAX_NUM_OPCODES - 1]) {
     NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: once data we can't have other opcode\n");
     /* TODO: this check assumes that the "data" opcode is the 4th one (after the resets).
      * But we usually have only ack + control + data... */
     return 1; /* Exclude */
   }
 
-  for(i = 0; i < flow->ovpn_heur_opcode__codes_num; i++) {
-    if(flow->ovpn_heur_opcode__codes[i] == opcode)
+  for(i = 0; i < flow->metadata.openvpn.ovpn_heur_opcode__codes_num; i++) {
+    if(flow->metadata.openvpn.ovpn_heur_opcode__codes[i] == opcode)
       found = 1;
   }
   if(found == 0) {
-    if(flow->ovpn_heur_opcode__codes_num == OPENVPN_HEUR_MAX_NUM_OPCODES) {
+    if(flow->metadata.openvpn.ovpn_heur_opcode__codes_num == OPENVPN_HEUR_MAX_NUM_OPCODES) {
       NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: too many opcodes. Early exclude\n");
       return 1; /* Exclude */
     }
-    flow->ovpn_heur_opcode__codes[flow->ovpn_heur_opcode__codes_num++] = opcode;
+    flow->metadata.openvpn.ovpn_heur_opcode__codes[flow->metadata.openvpn.ovpn_heur_opcode__codes_num++] = opcode;
   }
 
   NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: Resets 0x%x,0x%x Num %d\n",
-                flow->ovpn_heur_opcode__resets[0],
-                flow->ovpn_heur_opcode__resets[1],
-                flow->ovpn_heur_opcode__codes_num);
+                flow->metadata.openvpn.ovpn_heur_opcode__resets[0],
+                flow->metadata.openvpn.ovpn_heur_opcode__resets[1],
+                flow->metadata.openvpn.ovpn_heur_opcode__codes_num);
 
-  if(flow->ovpn_heur_opcode__num_msgs < ndpi_struct->cfg.openvpn_heuristics_num_msgs)
+  if(flow->metadata.openvpn.ovpn_heur_opcode__num_msgs < ndpi_struct->cfg.openvpn_heuristics_num_msgs)
     return 0; /* Continue */
 
   /* Done. Check what we have found...*/
 
-  if(flow->packet_direction_counter[0] == 0 ||
-     flow->packet_direction_counter[1] == 0) {
+  if(flow->core.packet_direction_counter[0] == 0 ||
+     flow->core.packet_direction_counter[1] == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: excluded because asymmetric traffic\n");
     return 1; /* Exclude */
   }
 
-  if(flow->ovpn_heur_opcode__codes_num >= 2) {
+  if(flow->metadata.openvpn.ovpn_heur_opcode__codes_num >= 2) {
     NDPI_LOG_INFO(ndpi_struct,"found openvpn (Heur-opcode)\n");
     return 2; /* Found */
   }
@@ -392,21 +392,21 @@ static int search_heur_opcode(struct ndpi_detection_module_struct* ndpi_struct,
 
     NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: TCP length %d (remaining %d)\n",
                   ovpn_payload_len,
-                  flow->ovpn_heur_opcode__missing_bytes[dir]);
+                  flow->metadata.openvpn.ovpn_heur_opcode__missing_bytes[dir]);
 
     /* We might need to "reassemble" the OpenVPN messages.
        Luckily, we are not interested in the message itself, but only in the first byte
        (after the length field), so as state we only need to know the "missing bytes"
        of the latest pdu (from the previous TCP packets) */
-    if(flow->ovpn_heur_opcode__missing_bytes[dir] > 0) {
+    if(flow->metadata.openvpn.ovpn_heur_opcode__missing_bytes[dir] > 0) {
       NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: TCP, remaining bytes to ignore %d length %d\n",
-                    flow->ovpn_heur_opcode__missing_bytes[dir], ovpn_payload_len);
-      if(flow->ovpn_heur_opcode__missing_bytes[dir] >= ovpn_payload_len) {
-        flow->ovpn_heur_opcode__missing_bytes[dir] -= ovpn_payload_len;
+                    flow->metadata.openvpn.ovpn_heur_opcode__missing_bytes[dir], ovpn_payload_len);
+      if(flow->metadata.openvpn.ovpn_heur_opcode__missing_bytes[dir] >= ovpn_payload_len) {
+        flow->metadata.openvpn.ovpn_heur_opcode__missing_bytes[dir] -= ovpn_payload_len;
         return 0; /* Continue */
       } else {
-        offset = flow->ovpn_heur_opcode__missing_bytes[dir];
-        flow->ovpn_heur_opcode__missing_bytes[dir] = 0;
+        offset = flow->metadata.openvpn.ovpn_heur_opcode__missing_bytes[dir];
+        flow->metadata.openvpn.ovpn_heur_opcode__missing_bytes[dir] = 0;
       }
     } else {
       offset = 0;
@@ -434,9 +434,9 @@ static int search_heur_opcode(struct ndpi_detection_module_struct* ndpi_struct,
       if(offset + 2 + pdu_len <= ovpn_payload_len) {
         offset += 2 + pdu_len;
       } else {
-        flow->ovpn_heur_opcode__missing_bytes[dir] = pdu_len - (ovpn_payload_len - (offset + 2));
+        flow->metadata.openvpn.ovpn_heur_opcode__missing_bytes[dir] = pdu_len - (ovpn_payload_len - (offset + 2));
         NDPI_LOG_DBG2(ndpi_struct, "Heur-opcode: TCP, missing %d bytes\n",
-                      flow->ovpn_heur_opcode__missing_bytes[dir]);
+                      flow->metadata.openvpn.ovpn_heur_opcode__missing_bytes[dir]);
         return 0; /* Continue */
       }
 #ifdef NDPI_ENABLE_DEBUG_MESSAGES
@@ -466,31 +466,31 @@ static void ndpi_search_openvpn(struct ndpi_detection_module_struct* ndpi_struct
   }
 
   NDPI_LOG_DBG2(ndpi_struct, "States (before): %d %d\n",
-                flow->ovpn_alg_standard_state,
-                flow->ovpn_alg_heur_opcode_state);
+                flow->metadata.openvpn.ovpn_alg_standard_state,
+                flow->metadata.openvpn.ovpn_alg_heur_opcode_state);
 
-  if(flow->ovpn_alg_standard_state == 0) {
-    flow->ovpn_alg_standard_state = search_standard(ndpi_struct, flow);
+  if(flow->metadata.openvpn.ovpn_alg_standard_state == 0) {
+    flow->metadata.openvpn.ovpn_alg_standard_state = search_standard(ndpi_struct, flow);
   }
   if(ndpi_struct->cfg.openvpn_heuristics & NDPI_HEURISTICS_OPENVPN_OPCODE) {
-    if(flow->ovpn_alg_heur_opcode_state == 0) {
-      flow->ovpn_alg_heur_opcode_state = search_heur_opcode(ndpi_struct, flow);
+    if(flow->metadata.openvpn.ovpn_alg_heur_opcode_state == 0) {
+      flow->metadata.openvpn.ovpn_alg_heur_opcode_state = search_heur_opcode(ndpi_struct, flow);
     }
   } else {
-    flow->ovpn_alg_heur_opcode_state = 1;
+    flow->metadata.openvpn.ovpn_alg_heur_opcode_state = 1;
   }
 
   NDPI_LOG_DBG2(ndpi_struct, "States (after): %d %d\n",
-                flow->ovpn_alg_standard_state,
-                flow->ovpn_alg_heur_opcode_state);
+                flow->metadata.openvpn.ovpn_alg_standard_state,
+                flow->metadata.openvpn.ovpn_alg_heur_opcode_state);
 
-  if(flow->ovpn_alg_standard_state == 2) {
+  if(flow->metadata.openvpn.ovpn_alg_standard_state == 2) {
     ndpi_int_openvpn_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
-  } else if (flow->ovpn_alg_heur_opcode_state == 2) {
+  } else if (flow->metadata.openvpn.ovpn_alg_heur_opcode_state == 2) {
     ndpi_int_openvpn_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
-    ndpi_set_risk(ndpi_struct, flow, NDPI_OBFUSCATED_TRAFFIC, "Obfuscated OpenVPN");
-  } else if(flow->ovpn_alg_standard_state == 1 &&
-            flow->ovpn_alg_heur_opcode_state == 1) {
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_OBFUSCATED_TRAFFIC, "Obfuscated OpenVPN");
+  } else if(flow->metadata.openvpn.ovpn_alg_standard_state == 1 &&
+            flow->metadata.openvpn.ovpn_alg_heur_opcode_state == 1) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 

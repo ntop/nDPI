@@ -33,7 +33,7 @@
 static void ndpi_int_ipp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IPP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_IPP, NDPI_PROTOCOL_HTTP, NDPI_CONFIDENCE_DPI);
 }
 
 static void ndpi_search_ipp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -44,8 +44,8 @@ static void ndpi_search_ipp(struct ndpi_detection_module_struct *ndpi_struct, st
 
   /* Treat IPP as a HTTP sub-protocol */
 
-  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP &&
-     flow->http.method == NDPI_HTTP_METHOD_POST &&
+  if(flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP &&
+     flow->metadata.http.method == NDPI_HTTP_METHOD_POST &&
      LINE_STARTS(packet->http_url_name, "/ipp/") == 1) {
     NDPI_LOG_INFO(ndpi_struct, "found ipp\n");
     ndpi_int_ipp_add_connection(ndpi_struct, flow);

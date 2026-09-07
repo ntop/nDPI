@@ -60,10 +60,10 @@ static void ndpi_int_softether_add_connection(struct ndpi_detection_module_struc
 					      struct ndpi_flow_struct * const flow) {
   NDPI_LOG_INFO(ndpi_struct, "found softether\n");
 
-  flow->max_extra_packets_to_check = 15;
-  flow->extra_packets_func = ndpi_search_softether_again;
+  flow->core.max_extra_packets_to_check = 15;
+  flow->core.extra_packets_func = ndpi_search_softether_again;
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_SOFTETHER,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -210,7 +210,7 @@ static int dissect_softether_host_fqdn(struct ndpi_flow_struct *flow,
 
     if(got_hostname == 1) {
       if(val1.type == VALUE_STR && val1.value_size > 0) {
-	hostname_len = ndpi_min(val1.value_size, sizeof(flow->protos.softether.hostname) - 1);
+	hostname_len = ndpi_min(val1.value_size, sizeof(flow->metadata.protos.softether.hostname) - 1);
 	hostname_ptr = val1.value.ptr.value_str;
       }
 	  
@@ -218,7 +218,7 @@ static int dissect_softether_host_fqdn(struct ndpi_flow_struct *flow,
     }
     if(got_fqdn == 1) {
       if(val1.type == VALUE_STR && val1.value_size > 0)  {
-	fqdn_len = ndpi_min(val1.value_size, sizeof(flow->protos.softether.fqdn) - 1);
+	fqdn_len = ndpi_min(val1.value_size, sizeof(flow->metadata.protos.softether.fqdn) - 1);
 	fqdn_ptr = val1.value.ptr.value_str;
       }
 	  
@@ -237,14 +237,14 @@ static int dissect_softether_host_fqdn(struct ndpi_flow_struct *flow,
   if(payload_len != 0 || tuple_count != 0)
     return 1;
 
-  /* Ok, write to `flow->protos.softether` */
+  /* Ok, write to `flow->metadata.protos.softether` */
   if(hostname_ptr) {
-    strncpy(flow->protos.softether.hostname, hostname_ptr, hostname_len);
-    flow->protos.softether.hostname[hostname_len] = '\0';
+    strncpy(flow->metadata.protos.softether.hostname, hostname_ptr, hostname_len);
+    flow->metadata.protos.softether.hostname[hostname_len] = '\0';
   }
   if(fqdn_ptr) {
-    strncpy(flow->protos.softether.fqdn, fqdn_ptr, fqdn_len);
-    flow->protos.softether.fqdn[fqdn_len] = '\0';
+    strncpy(flow->metadata.protos.softether.fqdn, fqdn_ptr, fqdn_len);
+    flow->metadata.protos.softether.fqdn[fqdn_len] = '\0';
   }
   return 0;
 }
@@ -269,26 +269,26 @@ static int dissect_softether_ip_port(struct ndpi_flow_struct *flow,
   if(ip_port_separator == NULL)    
     return 1;    
 
-  ip_len = ndpi_min(sizeof(flow->protos.softether.ip) - 1,
+  ip_len = ndpi_min(sizeof(flow->metadata.protos.softether.ip) - 1,
                     ip_port_separator - (char const *)packet->payload -
                     NDPI_STATICSTRING_LEN("IP="));
 
-  strncpy(flow->protos.softether.ip,
+  strncpy(flow->metadata.protos.softether.ip,
 	  (char const *)packet->payload + NDPI_STATICSTRING_LEN("IP="),
           ip_len);
-  flow->protos.softether.ip[ip_len] = '\0';
+  flow->metadata.protos.softether.ip[ip_len] = '\0';
 
   if (packet->payload_packet_len < (ip_port_separator - (char const *)packet->payload) +
                                    NDPI_STATICSTRING_LEN(",PORT="))
     return 1;
 
-  port_len = ndpi_min(sizeof(flow->protos.softether.port) - 1,
+  port_len = ndpi_min(sizeof(flow->metadata.protos.softether.port) - 1,
                       packet->payload_packet_len - (ip_port_separator - (char const *)packet->payload) -
                       NDPI_STATICSTRING_LEN(",PORT="));
-  strncpy(flow->protos.softether.port, ip_port_separator + NDPI_STATICSTRING_LEN(",PORT="),
+  strncpy(flow->metadata.protos.softether.port, ip_port_separator + NDPI_STATICSTRING_LEN(",PORT="),
           port_len);
   
-  flow->protos.softether.port[port_len] = '\0';
+  flow->metadata.protos.softether.port[port_len] = '\0';
 
   return 0;
 }
@@ -303,7 +303,7 @@ static void ndpi_search_softether(struct ndpi_detection_module_struct *ndpi_stru
 
   if(packet->payload_packet_len == 1) {
 
-    if((packet->payload[0] != 0x41) || (flow->packet_counter > 2))	
+    if((packet->payload[0] != 0x41) || (flow->core.packet_counter > 2))	
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);	
 
     return;
@@ -332,11 +332,11 @@ static int ndpi_search_softether_again(struct ndpi_detection_module_struct *ndpi
 				       struct ndpi_flow_struct *flow) {
   if((dissect_softether_ip_port(flow, &ndpi_struct->packet) == 0)
      || (dissect_softether_host_fqdn(flow, &ndpi_struct->packet) == 0)) {
-    if((flow->protos.softether.ip[0] != '\0')
-       && (flow->protos.softether.port[0] != '\0')
-       && (flow->protos.softether.hostname[0] != '\0')
-       && (flow->protos.softether.fqdn[0] != '\0')) {
-      flow->extra_packets_func = NULL;
+    if((flow->metadata.protos.softether.ip[0] != '\0')
+       && (flow->metadata.protos.softether.port[0] != '\0')
+       && (flow->metadata.protos.softether.hostname[0] != '\0')
+       && (flow->metadata.protos.softether.fqdn[0] != '\0')) {
+      flow->core.extra_packets_func = NULL;
 
       return 0;
     }

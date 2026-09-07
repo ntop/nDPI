@@ -49,7 +49,7 @@ static void ndpi_search_pfcp(struct ndpi_detection_module_struct *ndpi_struct,
         ntohs(get_u_int16_t(packet->payload, 2)) == (u_int16_t)(packet->payload_packet_len-4))
     {
       NDPI_LOG_INFO(ndpi_struct, "found PFCP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                                  NDPI_PROTOCOL_PFCP, NDPI_PROTOCOL_UNKNOWN,
                                  NDPI_CONFIDENCE_DPI);
       return;

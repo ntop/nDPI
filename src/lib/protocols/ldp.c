@@ -55,7 +55,7 @@ static void ndpi_int_ldp_add_connection(struct ndpi_detection_module_struct *ndp
                                         struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found LDP\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LDP,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_LDP,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 

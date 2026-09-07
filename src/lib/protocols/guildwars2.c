@@ -44,7 +44,7 @@ static void ndpi_search_guildwars2_tcp(struct ndpi_detection_module_struct *ndpi
         (memcmp(packet->payload, "STS/1.0 400 Success", 19) == 0))
     {
       NDPI_LOG_INFO(ndpi_struct, "found Guild Wars 2\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GUILDWARS2, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_GUILDWARS2, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }

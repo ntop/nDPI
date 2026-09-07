@@ -33,7 +33,7 @@ static void ndpi_int_netease_add_connection(struct ndpi_detection_module_struct 
                                             struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found NetEase Games\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETEASE_GAMES,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_NETEASE_GAMES,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -46,7 +46,7 @@ static void ndpi_search_netease(struct ndpi_detection_module_struct *ndpi_struct
    * NetEase (Lost Light, Badlanders, Naraka: Bladepoint) */
 
   if (packet->payload_packet_len == 12 &&
-      current_pkt_from_client_to_server(ndpi_struct, flow) &&
+      current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
       packet->payload[0] == 0x01 &&
       le16toh(get_u_int16_t(packet->payload, 2)) == 0x1D0 &&
       le32toh(get_u_int32_t(packet->payload, 8)) == 0x1010100)

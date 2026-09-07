@@ -35,7 +35,7 @@ static void ndpi_int_iso9506_1_mms_add_connection(struct ndpi_detection_module_s
                                                 struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found ISO 9506-1 MMS\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_ISO9506_1_MMS, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }
@@ -49,7 +49,7 @@ static void ndpi_search_iso9506_1_mms(struct ndpi_detection_module_struct *ndpi_
   
   if ((packet->payload_packet_len > 60) && tpkt_verify_hdr(packet))
   {
-    if (current_pkt_from_client_to_server(ndpi_struct, flow)) {
+    if (current_pkt_from_client_to_server(ndpi_struct, &flow->core)) {
       /* Check COTP and ISO 8327-1 headers */
       if ((packet->payload[4] == 2) && (packet->payload[5] == 0xF0) &&
           (packet->payload[6] == 0x80) && (packet->payload[7] - 13 <= 1) &&
@@ -67,7 +67,7 @@ static void ndpi_search_iso9506_1_mms(struct ndpi_detection_module_struct *ndpi_
     }
   }
 
-  if (flow->packet_direction_counter[packet->packet_direction] > 2) {
+  if (flow->core.packet_direction_counter[packet->packet_direction] > 2) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }

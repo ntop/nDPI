@@ -32,7 +32,7 @@
 static void ndpi_int_checkmk_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					    struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CHECKMK, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_CHECKMK, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 
@@ -51,7 +51,7 @@ static void ndpi_search_checkmk(struct ndpi_detection_module_struct *ndpi_struct
 	the initial connection, we need to discard these packets
 	as they are not an indication that this flow is not AFP
       */
-      if(flow->packet_counter > 6)
+      if(flow->core.packet_counter > 6)
         NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }

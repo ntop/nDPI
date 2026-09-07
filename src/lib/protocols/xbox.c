@@ -30,7 +30,7 @@
 static void ndpi_int_xbox_add_connection(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_XBOX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_XBOX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 
@@ -72,13 +72,13 @@ static void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, s
 	    || (packet->payload_packet_len == 40 && ntohl(get_u_int32_t(packet->payload, 0)) == 0xcf5f3202)
 	    || (packet->payload_packet_len == 38 && ntohl(get_u_int32_t(packet->payload, 0)) == 0xc1457f03)
 	    || (packet->payload_packet_len == 28 && ntohl(get_u_int32_t(packet->payload, 0)) == 0x015f2c00))) {
-      if (flow->l4.udp.xbox_stage == 1) {
+      if (flow->metadata.l4.udp.xbox_stage == 1) {
 	ndpi_int_xbox_add_connection(ndpi_struct, flow);
 	NDPI_LOG_INFO(ndpi_struct, "found xbox udp connection detected\n");
 	return;
       }
       NDPI_LOG_DBG(ndpi_struct, "maybe xbox\n");
-      flow->l4.udp.xbox_stage++;
+      flow->metadata.l4.udp.xbox_stage++;
       return;
     }
 /* Disable this code. These checks are quite weak and these ports are not mentioned at
@@ -93,7 +93,7 @@ static void ndpi_search_xbox(struct ndpi_detection_module_struct *ndpi_struct, s
 #endif
   }
 
-  if(flow->packet_counter >= 5)
+  if(flow->core.packet_counter >= 5)
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 

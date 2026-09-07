@@ -32,10 +32,10 @@ static void ndpi_int_msgpack_add_connection(struct ndpi_detection_module_struct 
                                             struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found MessagePack\n");
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
+  if (flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     ndpi_set_detected_protocol_keeping_master(ndpi_struct, flow, NDPI_PROTOCOL_MSGPACK, NDPI_CONFIDENCE_DPI);
   } else {
-    ndpi_set_detected_protocol(ndpi_struct, flow,
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                                NDPI_PROTOCOL_MSGPACK,
                                NDPI_PROTOCOL_UNKNOWN,
                                NDPI_CONFIDENCE_DPI);
@@ -272,18 +272,18 @@ void ndpi_search_msgpack(struct ndpi_detection_module_struct *ndpi_struct,
   if (byte_type_objects * 2 >= msgpack_objects ||
       rem_siz * 4 >= packet->payload_packet_len)
   {
-    if (rem_siz > 0 || flow->packet_counter >= MSGPACK_MAX_PACKETS)
+    if (rem_siz > 0 || flow->core.packet_counter >= MSGPACK_MAX_PACKETS)
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
-  if ((rem_siz == 0 && flow->packet_counter > 1) || tlv_objects > 0
+  if ((rem_siz == 0 && flow->core.packet_counter > 1) || tlv_objects > 0
       || (byte_type_objects * 4 < msgpack_objects && packet->tcp != NULL))
   {
     ndpi_int_msgpack_add_connection(ndpi_struct, flow);
   }
 
-  if (flow->packet_counter < MSGPACK_MAX_PACKETS)
+  if (flow->core.packet_counter < MSGPACK_MAX_PACKETS)
     return;
 
   NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);

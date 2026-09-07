@@ -42,7 +42,7 @@ static void ndpi_int_bacnet_add_connection(struct ndpi_detection_module_struct *
 {
   NDPI_LOG_INFO(ndpi_struct, "found BACnet\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_BACNET,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);

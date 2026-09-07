@@ -85,7 +85,7 @@ static void ndpi_int_thrift_add_connection(struct ndpi_detection_module_struct *
       break;
   }
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_APACHE_THRIFT, master_protocol,
                              NDPI_CONFIDENCE_DPI);
 }
@@ -115,10 +115,10 @@ static void thrift_set_method(struct ndpi_detection_module_struct *ndpi_struct,
                               char const * const method, size_t method_length)
 {
   if (thrift_validate_method(method, method_length) == 0) {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, "Invalid method name");
-    flow->protos.thrift.method[0] = '\0';
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, "Invalid method name");
+    flow->metadata.protos.thrift.method[0] = '\0';
   } else {
-    strncpy(flow->protos.thrift.method, method, ndpi_min(sizeof(flow->protos.thrift.method), method_length));
+    strncpy(flow->metadata.protos.thrift.method, method, ndpi_min(sizeof(flow->metadata.protos.thrift.method), method_length));
   }
 }
 
@@ -127,12 +127,12 @@ static void thrift_set_type(struct ndpi_detection_module_struct *ndpi_struct,
                             uint8_t message_type)
 {
   if (message_type == TMT_INVALID_TMESSAGE_TYPE) {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid message type");
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Invalid message type");
   }
-  flow->protos.thrift.message_type = message_type;
+  flow->metadata.protos.thrift.message_type = message_type;
 
   if (message_type == TMT_EXCEPTION) {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_ERROR_CODE_DETECTED, "Apache Thrift Exception");
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_ERROR_CODE_DETECTED, "Apache Thrift Exception");
   }
 }
 
@@ -208,8 +208,8 @@ static void ndpi_search_thrift_tcp_udp(struct ndpi_detection_module_struct *ndpi
 
   NDPI_LOG_DBG(ndpi_struct, "search Apache Thrift\n");
 
-  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
-      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP)
+  if (flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
+      flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP)
   {
     /* Check Thrift over HTTP */
     if (packet->content_line.ptr != NULL)

@@ -41,48 +41,48 @@ static int ndpi_search_ntp_again(struct ndpi_detection_module_struct *ndpi_struc
 
 static void ndpi_set_extra_dissection(struct ndpi_flow_struct *flow)
 {
-    flow->max_extra_packets_to_check = 1;
-    flow->extra_packets_func = ndpi_search_ntp_again;
+    flow->core.max_extra_packets_to_check = 1;
+    flow->core.extra_packets_func = ndpi_search_ntp_again;
 }
 
 static void ndpi_int_ntp_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NTP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_NTP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 static void get_ntp_info(struct ndpi_flow_struct *flow, struct ndpi_packet_struct *packet, uint8_t stage)
 {
   u_int32_t tmp = 0;
-  flow->protos.ntp[stage].ppol = (int8_t)packet->payload[2];
-  flow->protos.ntp[stage].precision = (int8_t)packet->payload[3];
+  flow->metadata.protos.ntp[stage].ppol = (int8_t)packet->payload[2];
+  flow->metadata.protos.ntp[stage].precision = (int8_t)packet->payload[3];
 
   // https://github.com/wireshark/wireshark/blob/c383ce5173cb15463259ca862cd5b469c2a3aab8/epan/dissectors/packet-ntp.c#L1574
   tmp = ntohl(get_u_int32_t(packet->payload, 4));
-  flow->protos.ntp[stage].root_delay = (tmp >> 16) + (tmp & 0xffff) / 65536.0;
+  flow->metadata.protos.ntp[stage].root_delay = (tmp >> 16) + (tmp & 0xffff) / 65536.0;
   tmp = ntohl(get_u_int32_t(packet->payload, 8));
-  flow->protos.ntp[stage].root_dispersion = (tmp >> 16) + (tmp & 0xffff) / 65536.0;
+  flow->metadata.protos.ntp[stage].root_dispersion = (tmp >> 16) + (tmp & 0xffff) / 65536.0;
 
-  if (flow->protos.ntp[stage].stratum == 0 || flow->protos.ntp[stage].stratum == 1) {
-      ndpi_snprintf(flow->protos.ntp[stage].ref_id, sizeof(flow->protos.ntp[stage].ref_id), "%c%c%c%c", packet->payload[12],
+  if (flow->metadata.protos.ntp[stage].stratum == 0 || flow->metadata.protos.ntp[stage].stratum == 1) {
+      ndpi_snprintf(flow->metadata.protos.ntp[stage].ref_id, sizeof(flow->metadata.protos.ntp[stage].ref_id), "%c%c%c%c", packet->payload[12],
                                                               packet->payload[13],
                                                               packet->payload[14],
                                                               packet->payload[15]);
   } else {
     if(packet->iph) {
       tmp = get_u_int32_t(packet->payload, 12);
-      inet_ntop(AF_INET, &tmp, flow->protos.ntp[stage].ref_id, sizeof(flow->protos.ntp[stage].ref_id));
+      inet_ntop(AF_INET, &tmp, flow->metadata.protos.ntp[stage].ref_id, sizeof(flow->metadata.protos.ntp[stage].ref_id));
     } else {
-      ndpi_snprintf(flow->protos.ntp[stage].ref_id, sizeof(flow->protos.ntp[stage].ref_id), "%c:%c:%c:%c", packet->payload[12],
+      ndpi_snprintf(flow->metadata.protos.ntp[stage].ref_id, sizeof(flow->metadata.protos.ntp[stage].ref_id), "%c:%c:%c:%c", packet->payload[12],
                                                               packet->payload[13],
                                                               packet->payload[14],
                                                               packet->payload[15]);
       }
     }
-  flow->protos.ntp[stage].ref_time = get_u_int64_t(packet->payload, 16);
-  flow->protos.ntp[stage].org_time = get_u_int64_t(packet->payload, 24);
-  flow->protos.ntp[stage].rec_time = get_u_int64_t(packet->payload, 32);
-  flow->protos.ntp[stage].trans_time = get_u_int64_t(packet->payload, 40);
+  flow->metadata.protos.ntp[stage].ref_time = get_u_int64_t(packet->payload, 16);
+  flow->metadata.protos.ntp[stage].org_time = get_u_int64_t(packet->payload, 24);
+  flow->metadata.protos.ntp[stage].rec_time = get_u_int64_t(packet->payload, 32);
+  flow->metadata.protos.ntp[stage].trans_time = get_u_int64_t(packet->payload, 40);
 }
 
 static void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -105,7 +105,7 @@ static void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct
 
   if (version == 2) {
     if(ndpi_struct->cfg.ntp_metadata_enabled)
-      flow->protos.ntp[flow->l4.udp.ntp_stage].version = version;
+      flow->metadata.protos.ntp[flow->metadata.l4.udp.ntp_stage].version = version;
     ndpi_int_ntp_add_connection(ndpi_struct, flow);
     return;
   }
@@ -124,14 +124,14 @@ static void ndpi_search_ntp_udp(struct ndpi_detection_module_struct *ndpi_struct
   }
 
   if(ndpi_struct->cfg.ntp_metadata_enabled) {
-    flow->protos.ntp[flow->l4.udp.ntp_stage].version = version;
-    flow->protos.ntp[flow->l4.udp.ntp_stage].mode = mode;
-    flow->protos.ntp[flow->l4.udp.ntp_stage].leap_indicator = (packet->payload[0] & 192) >> 6;
-    flow->protos.ntp[flow->l4.udp.ntp_stage].stratum = stratum;
+    flow->metadata.protos.ntp[flow->metadata.l4.udp.ntp_stage].version = version;
+    flow->metadata.protos.ntp[flow->metadata.l4.udp.ntp_stage].mode = mode;
+    flow->metadata.protos.ntp[flow->metadata.l4.udp.ntp_stage].leap_indicator = (packet->payload[0] & 192) >> 6;
+    flow->metadata.protos.ntp[flow->metadata.l4.udp.ntp_stage].stratum = stratum;
 
-    get_ntp_info(flow, packet, flow->l4.udp.ntp_stage);
+    get_ntp_info(flow, packet, flow->metadata.l4.udp.ntp_stage);
 
-    flow->l4.udp.ntp_stage = 1;
+    flow->metadata.l4.udp.ntp_stage = 1;
     ndpi_set_extra_dissection(flow);
   }
   NDPI_LOG_INFO(ndpi_struct, "found NTP\n");

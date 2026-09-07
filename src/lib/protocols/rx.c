@@ -84,7 +84,7 @@ static void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   u_int32_t payload_len = packet->payload_packet_len;
 
   NDPI_LOG_DBG2(ndpi_struct, "RX: pck: %d, dir[0]: %d, dir[1]: %d\n",
-           flow->packet_counter, flow->packet_direction_counter[0], flow->packet_direction_counter[1]);
+           flow->core.packet_counter, flow->core.packet_direction_counter[0], flow->core.packet_direction_counter[1]);
 
   /* Check that packet is long enough */
   if (payload_len < sizeof(struct ndpi_rx_header)) {
@@ -183,13 +183,13 @@ static void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
   /* If we have already seen one packet in the other direction, then
      the two must have matching connection numbers. Otherwise store
      them. */
-  if(flow->packet_direction_counter[!packet->packet_direction] != 0)
+  if(flow->core.packet_direction_counter[!packet->packet_direction] != 0)
   {
-    if (flow->l4.udp.rx_conn_epoch == header->conn_epoch &&
-	flow->l4.udp.rx_conn_id == header->conn_id)
+    if (flow->metadata.l4.udp.rx_conn_epoch == header->conn_epoch &&
+	flow->metadata.l4.udp.rx_conn_id == header->conn_id)
     {
       NDPI_LOG_INFO(ndpi_struct, "found RX\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_RX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     }
     /* https://www.central.org/frameless/numbers/rxservice.html. */
     else
@@ -198,8 +198,8 @@ static void ndpi_check_rx(struct ndpi_detection_module_struct *ndpi_struct,
       return;
     }
   } else {
-    flow->l4.udp.rx_conn_epoch = header->conn_epoch;
-    flow->l4.udp.rx_conn_id = header->conn_id;
+    flow->metadata.l4.udp.rx_conn_epoch = header->conn_epoch;
+    flow->metadata.l4.udp.rx_conn_id = header->conn_id;
   }
 }
 
@@ -207,7 +207,7 @@ static void ndpi_search_rx(struct ndpi_detection_module_struct *ndpi_struct,
                            struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_DBG(ndpi_struct, "search RX\n");
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_RX) {
+  if (flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_RX) {
     ndpi_check_rx(ndpi_struct, flow);
   }
 }

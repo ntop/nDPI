@@ -52,7 +52,7 @@ static void ndpi_int_whatsapp_add_connection(struct ndpi_detection_module_struct
                                              struct ndpi_flow_struct * flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found WhatsApp\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHATSAPP,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_WHATSAPP,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -62,19 +62,19 @@ static int ndpi_int_match_whatsapp_sequence(struct ndpi_detection_module_struct 
 {
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
 
-  if (flow->l4.tcp.wa_matched_so_far < GET_SEQ_SIZE(seq_id))
+  if (flow->metadata.l4.tcp.wa_matched_so_far < GET_SEQ_SIZE(seq_id))
   {
-    size_t match_len = GET_SEQ_SIZE(seq_id) - flow->l4.tcp.wa_matched_so_far;
+    size_t match_len = GET_SEQ_SIZE(seq_id) - flow->metadata.l4.tcp.wa_matched_so_far;
     if (packet->payload_packet_len < match_len)
     {
       match_len = packet->payload_packet_len;
     }
 
-    if (memcmp(packet->payload, &GET_SEQ(seq_id)[flow->l4.tcp.wa_matched_so_far],
+    if (memcmp(packet->payload, &GET_SEQ(seq_id)[flow->metadata.l4.tcp.wa_matched_so_far],
                match_len) == 0)
     {
-      flow->l4.tcp.wa_matched_so_far += match_len;
-      if (flow->l4.tcp.wa_matched_so_far == GET_SEQ_SIZE(seq_id))
+      flow->metadata.l4.tcp.wa_matched_so_far += match_len;
+      if (flow->metadata.l4.tcp.wa_matched_so_far == GET_SEQ_SIZE(seq_id))
       {
         ndpi_int_whatsapp_add_connection(ndpi_struct, flow);
       }
@@ -91,7 +91,7 @@ static void ndpi_search_whatsapp(struct ndpi_detection_module_struct *ndpi_struc
 
   NDPI_LOG_DBG(ndpi_struct, "search WhatsApp\n");
 
-  if (flow->packet_counter > 3)
+  if (flow->core.packet_counter > 3)
   {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
@@ -101,7 +101,7 @@ static void ndpi_search_whatsapp(struct ndpi_detection_module_struct *ndpi_struc
    * This is a very old sequence (2015?) but we still have it in our unit tests.
    * Try to detect it, without too much effort...
    */
-  if (flow->l4.tcp.wa_matched_so_far == 0 &&
+  if (flow->metadata.l4.tcp.wa_matched_so_far == 0 &&
       packet->payload_packet_len > GET_SEQ_SIZE(WA_SEQ_VERY_OLD) &&
       memcmp(packet->payload, GET_SEQ(WA_SEQ_VERY_OLD), GET_SEQ_SIZE(WA_SEQ_VERY_OLD)) == 0)
   {

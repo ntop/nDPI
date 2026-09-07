@@ -42,14 +42,14 @@ static void ndpi_int_nano_add_connection(struct ndpi_detection_module_struct *nd
 {
   NDPI_LOG_INFO(ndpi_struct, "found Nano Network Protocol\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_NANO, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 
   if(ndpi_struct->mining_cache)
   {
     ndpi_lru_add_to_cache(ndpi_struct->mining_cache, mining_make_lru_cache_key(flow),
-                          NDPI_PROTOCOL_NANO, ndpi_get_current_time(flow));
+                          NDPI_PROTOCOL_NANO, ndpi_get_current_time(&flow->core));
   }
 }
 

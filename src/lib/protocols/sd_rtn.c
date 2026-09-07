@@ -29,7 +29,7 @@ static void ndpi_int_sd_rtn_add_connection(struct ndpi_detection_module_struct *
                                            struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found Software Defined Real-time Network (SD-RTN)\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_SD_RTN,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -51,7 +51,7 @@ static int ndpi_int_sd_rtn_dissect_sni(struct ndpi_flow_struct * const flow,
     return -1;
   }
 
-  ndpi_hostname_sni_set(flow, &payload[19], sni_len, NDPI_HOSTNAME_NORM_ALL);
+  ndpi_hostname_sni_set(&flow->core, &payload[19], sni_len, NDPI_HOSTNAME_NORM_ALL);
 
   return 0;
 }

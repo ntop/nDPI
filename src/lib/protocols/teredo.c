@@ -37,7 +37,7 @@ static void ndpi_search_teredo(struct ndpi_detection_module_struct *ndpi_struct,
      && ((ntohs(packet->udp->source) == 3544) || (ntohs(packet->udp->dest) == 3544))
      && (packet->payload_packet_len >= 40 /* IPv6 header */)) {
     NDPI_LOG_INFO(ndpi_struct,"found teredo\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TEREDO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TEREDO, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   }  else {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }

@@ -31,7 +31,7 @@
 static void ndpi_int_smpp_add_connection(struct ndpi_detection_module_struct* ndpi_struct, 
                                          struct ndpi_flow_struct* flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SMPP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_SMPP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 static  u_int8_t ndpi_check_overflow(u_int32_t current_length, u_int32_t total_lenth)
@@ -45,7 +45,7 @@ static void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struc
   struct ndpi_packet_struct* packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "search SMPP\n");
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_SMPP){
+  if (flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_SMPP){
     // min SMPP packet length = 16 bytes
     if (packet->payload_packet_len < 16) {
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
@@ -59,7 +59,7 @@ static void ndpi_search_smpp_tcp(struct ndpi_detection_module_struct* ndpi_struc
 	     pdu_l, packet->payload_packet_len);
 
     // if PDU size was invalid, try the following TCP segments, 3 attempts max
-    if(flow->packet_counter > 3) {
+    if(flow->core.packet_counter > 3) {
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }

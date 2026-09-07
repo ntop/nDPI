@@ -45,7 +45,7 @@ static void ndpi_int_raft_add_connection(struct ndpi_detection_module_struct *nd
                                          struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found raft\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_RAFT,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -88,7 +88,7 @@ static void ndpi_search_raft(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if (flow->packet_counter < 3)
+  if (flow->core.packet_counter < 3)
   {
     return;
   }

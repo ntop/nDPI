@@ -77,7 +77,7 @@ static void ndpi_search_drda(struct ndpi_detection_module_struct *ndpi_struct,
 	if(count != payload_len) goto no_drda;
       }
       NDPI_LOG_INFO(ndpi_struct, "found DRDA\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DRDA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_DRDA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }

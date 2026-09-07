@@ -1047,7 +1047,7 @@ static void help(u_int long_help) {
 	   "Size of nDPI Flow structure:      %u\n"
            "Size of nDPI Flow protocol union: %zu\n",
            ndpi_detection_get_sizeof_ndpi_flow_struct(),
-           sizeof(((struct ndpi_flow_struct *)0)->protos));
+           sizeof(((struct ndpi_flow_struct *)0)->metadata.protos));
 
     printf("\n\nnDPI supported protocols:\n");
     printf("%3s %8s %-26s %-10s %-8s %-21s %-18s %-31s %-31s %6s\n",
@@ -2949,7 +2949,7 @@ static void node_proto_guess_walker(const void *node, ndpi_VISIT which, int dept
                                                       flow->ndpi_flow);
       alloc_size_stats = 0;
 
-      if(flow->ndpi_flow->protocol_was_guessed) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
+      if(flow->ndpi_flow->core.protocol_was_guessed) ndpi_thread_info[thread_id].workflow->stats.guessed_flow_protocols++;
     }
 
     process_ndpi_collected_info(ndpi_thread_info[thread_id].workflow, flow);

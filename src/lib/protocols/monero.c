@@ -33,7 +33,7 @@ static void ndpi_int_monero_add_connection(struct ndpi_detection_module_struct *
 {
   NDPI_LOG_INFO(ndpi_struct, "found Monero Protocol\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_MONERO, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 
@@ -42,7 +42,7 @@ static void ndpi_int_monero_add_connection(struct ndpi_detection_module_struct *
     ndpi_lru_add_to_cache(ndpi_struct->mining_cache,
                           mining_make_lru_cache_key(flow),
                           NDPI_PROTOCOL_MONERO,
-                          ndpi_get_current_time(flow));
+                          ndpi_get_current_time(&flow->core));
   }
 }
 

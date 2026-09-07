@@ -75,15 +75,15 @@ static void ndpi_int_fastcgi_add_connection(struct ndpi_detection_module_struct 
                                             ndpi_protocol_match_result * const match)
 {
   NDPI_LOG_INFO(ndpi_struct, "found fastcgi\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_FASTCGI,
                              (match != NULL ? match->protocol_id : NDPI_PROTOCOL_UNKNOWN),
                              NDPI_CONFIDENCE_DPI);
 
-  if (flow->extra_packets_func == NULL)
+  if (flow->core.extra_packets_func == NULL)
   {
-    flow->max_extra_packets_to_check = 5;
-    flow->extra_packets_func = ndpi_search_fastcgi_extra;
+    flow->core.max_extra_packets_to_check = 5;
+    flow->core.extra_packets_func = ndpi_search_fastcgi_extra;
   }
 }
 
@@ -136,13 +136,14 @@ static int fcgi_parse_params(struct ndpi_flow_struct * const flow,
     return 1;
   }
 
-  flow->protos.fast_cgi.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
+  flow->metadata.protos.fast_cgi.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
                                                       (u_int16_t)packet->http_method.len);
-  ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
-  strncpy(flow->protos.fast_cgi.user_agent, (char *)packet->user_agent_line.ptr,
-          ndpi_min(sizeof(flow->protos.fast_cgi.user_agent) - 1, packet->user_agent_line.len));
-  strncpy(flow->protos.fast_cgi.url, (char *)packet->http_url_name.ptr,
-          ndpi_min(sizeof(flow->protos.fast_cgi.url) - 1, packet->http_url_name.len));
+  ndpi_hostname_sni_set(&flow->core, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
+  
+  strncpy(flow->metadata.protos.fast_cgi.user_agent, (char *)packet->user_agent_line.ptr,
+          ndpi_min(sizeof(flow->metadata.protos.fast_cgi.user_agent) - 1, packet->user_agent_line.len));
+  strncpy(flow->metadata.protos.fast_cgi.url, (char *)packet->http_url_name.ptr,
+          ndpi_min(sizeof(flow->metadata.protos.fast_cgi.url) - 1, packet->http_url_name.len));
 
   return 0;
 }
@@ -190,38 +191,38 @@ static void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct
   {
     if (content_len == 0)
     {
-      flow->max_extra_packets_to_check = 0;
-      flow->extra_packets_func = NULL;
+      flow->core.max_extra_packets_to_check = 0;
+      flow->core.extra_packets_func = NULL;
       return;
     }
 
     if (fcgi_parse_params(flow, packet) != 0)
     {
-      ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid FastCGI PARAMS header");
+      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Invalid FastCGI PARAMS header");
       ndpi_int_fastcgi_add_connection(ndpi_struct, flow, NULL);
     } else {
-      ndpi_match_host_subprotocol(ndpi_struct, flow,
-                                  flow->host_server_name,
-                                  strlen(flow->host_server_name),
+      ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
+                                  flow->core.host_server_name,
+                                  strlen(flow->core.host_server_name),
                                   &ret_match, NDPI_PROTOCOL_FASTCGI, 1);
-      ndpi_check_dga_name(ndpi_struct, flow,
-                          flow->host_server_name, 1, 0, 0);
+      ndpi_check_dga_name(ndpi_struct, &flow->core,
+                          flow->core.host_server_name, 1, 0, 0);
       if(ndpi_is_valid_hostname((char *)packet->host_line.ptr,
                                 packet->host_line.len) == 0) {
         char str[128];
 
-        snprintf(str, sizeof(str), "Invalid host %s", flow->host_server_name);
-        ndpi_set_risk(ndpi_struct, flow, NDPI_INVALID_CHARACTERS, str);
+        snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
 
         /* This looks like an attack */
-        ndpi_set_risk(ndpi_struct, flow, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
       }
       ndpi_int_fastcgi_add_connection(ndpi_struct, flow, &ret_match);
     }
     return;
   }
 
-  if (flow->packet_counter > 2)
+  if (flow->core.packet_counter > 2)
   {
     ndpi_int_fastcgi_add_connection(ndpi_struct, flow, NULL);
   }
@@ -232,7 +233,7 @@ static int ndpi_search_fastcgi_extra(struct ndpi_detection_module_struct * ndpi_
 {
   ndpi_search_fastcgi(ndpi_struct, flow);
 
-  return flow->extra_packets_func != NULL;
+  return flow->core.extra_packets_func != NULL;
 }
 
 void init_fastcgi_dissector(struct ndpi_detection_module_struct *ndpi_struct)

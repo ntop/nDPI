@@ -29,7 +29,7 @@ static void ndpi_int_threema_add_connection(struct ndpi_detection_module_struct 
                                             struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found Threema\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_PROTOCOL_THREEMA,
                              NDPI_CONFIDENCE_DPI);
@@ -47,7 +47,7 @@ static void ndpi_search_threema(struct ndpi_detection_module_struct *ndpi_struct
     return;
   }
 
-  switch (flow->packet_counter)
+  switch (flow->core.packet_counter)
   {
     case 1:
       if (packet->payload_packet_len != 48)

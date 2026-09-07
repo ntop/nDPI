@@ -29,7 +29,7 @@
 static void ndpi_int_avast_securedns_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
                                                     struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_AVAST_SECUREDNS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_AVAST_SECUREDNS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 static void ndpi_search_avast_securedns(struct ndpi_detection_module_struct *ndpi_struct,
@@ -39,7 +39,7 @@ static void ndpi_search_avast_securedns(struct ndpi_detection_module_struct *ndp
 
   if (packet->payload_packet_len < 34 ||
       ntohl(get_u_int32_t(packet->payload, 11)) != 0x00013209 ||
-      flow->packet_counter > 1)
+      flow->core.packet_counter > 1)
   {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;

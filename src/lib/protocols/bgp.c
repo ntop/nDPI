@@ -46,7 +46,7 @@ static void ndpi_search_bgp(struct ndpi_detection_module_struct *ndpi_struct, st
        && (ntohs(get_u_int16_t(packet->payload, 16)) <= packet->payload_packet_len)) {
       
       NDPI_LOG_INFO(ndpi_struct, "found BGP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BGP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_BGP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     } 
   }

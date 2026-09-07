@@ -33,7 +33,7 @@
 static void ndpi_int_usenet_add_connection(struct ndpi_detection_module_struct
 					   *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_USENET, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_USENET, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 
@@ -45,19 +45,19 @@ static void ndpi_search_usenet_tcp(struct ndpi_detection_module_struct *ndpi_str
 	
 	NDPI_LOG_DBG(ndpi_struct, "search usenet\n");
 
-	NDPI_LOG_DBG2(ndpi_struct, "STAGE IS %u\n", flow->l4.tcp.usenet_stage);
+	NDPI_LOG_DBG2(ndpi_struct, "STAGE IS %u\n", flow->metadata.l4.tcp.usenet_stage);
 
 	// check for the first server replay
 	/*
 	   200    Service available, posting allowed
 	   201    Service available, posting prohibited
 	 */
-	if (flow->l4.tcp.usenet_stage == 0 && packet->payload_packet_len > 10
+	if (flow->metadata.l4.tcp.usenet_stage == 0 && packet->payload_packet_len > 10
 		&& ((memcmp(packet->payload, "200 ", 4) == 0)
 			|| (memcmp(packet->payload, "201 ", 4) == 0))) {
 
 		NDPI_LOG_DBG2(ndpi_struct, "found 200 or 201\n");
-		flow->l4.tcp.usenet_stage = 1 + packet->packet_direction;
+		flow->metadata.l4.tcp.usenet_stage = 1 + packet->packet_direction;
 
 		NDPI_LOG_DBG2(ndpi_struct, "maybe hit\n");
 		return;
@@ -70,10 +70,10 @@ static void ndpi_search_usenet_tcp(struct ndpi_detection_module_struct *ndpi_str
 	   [S] 281 Authentication accepted
 	 */
 	// check for client username
-	if (flow->l4.tcp.usenet_stage == 2 - packet->packet_direction) {
+	if (flow->metadata.l4.tcp.usenet_stage == 2 - packet->packet_direction) {
 		if (packet->payload_packet_len > 20 && (memcmp(packet->payload, "AUTHINFO USER ", 14) == 0)) {
 			NDPI_LOG_DBG2(ndpi_struct, "username found\n");
-			flow->l4.tcp.usenet_stage = 3 + packet->packet_direction;
+			flow->metadata.l4.tcp.usenet_stage = 3 + packet->packet_direction;
 
 			NDPI_LOG_INFO(ndpi_struct, "found usenet\n");
 			ndpi_int_usenet_add_connection(ndpi_struct, flow);

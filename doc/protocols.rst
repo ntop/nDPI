@@ -4464,3 +4464,14 @@ Gameplay typically uses UDP ports in the 10011-10015 range. Supplementary cleart
 TCP control channels are commonly seen on ports 39698 and 39800.
 
 References: `Free Fire official site: <https://ff.garena.com/>`_
+
+
+.. _Proto_491:
+
+`NDPI_PROTOCOL_KIK`
+===================
+Kik Messenger is an instant messaging application for mobile devices.
+Traffic is detected via TLS Server Name Indication on kik.com and kikprod.net
+hostnames (e.g. login.kikprod.net, platform.kik.com).
+
+References: `Kik official site: <https://www.kik.com/>`_

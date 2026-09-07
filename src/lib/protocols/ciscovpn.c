@@ -31,7 +31,7 @@
 
 static void ndpi_int_ciscovpn_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CISCOVPN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_CISCOVPN, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 /* ****************************************************************** */
@@ -58,7 +58,7 @@ static void ndpi_search_ciscovpn(struct ndpi_detection_module_struct *ndpi_struc
       return;
     }
     
-    if(flow->num_processed_pkts > 5)
+    if(flow->core.num_processed_pkts > 5)
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);    
   } else
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);  

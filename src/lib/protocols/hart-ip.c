@@ -61,7 +61,7 @@ static void ndpi_int_hart_ip_add_connection(struct ndpi_detection_module_struct 
 {
   NDPI_LOG_INFO(ndpi_struct, "found HART-IP\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_HART_IP, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }

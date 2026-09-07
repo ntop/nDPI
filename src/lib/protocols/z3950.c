@@ -29,7 +29,7 @@
 
 static void ndpi_int_z3950_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
                                           struct ndpi_flow_struct *flow) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_Z3950, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_Z3950, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 /* ***************************************************************** */
@@ -47,7 +47,7 @@ static int z3950_parse_sequences(struct ndpi_flow_struct *flow, struct ndpi_pack
 
   /* Simple check to avoid false positives: the first pkt after the 3WHS
      should be a initRequest or a initResponse */
-  if(ndpi_seen_flow_beginning(flow) && flow->packet_counter == 1 &&
+  if(ndpi_seen_flow_beginning(flow) && flow->core.packet_counter == 1 &&
      pdu_type != 20 && pdu_type != 21)
     return(-1);
 
@@ -96,7 +96,7 @@ static void ndpi_search_z3950(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search z39.50\n");
 
   if(packet->tcp != NULL && packet->payload_packet_len >= 6 &&
-     flow->packet_counter >= 1 && flow->packet_counter <= 8) {
+     flow->core.packet_counter >= 1 && flow->core.packet_counter <= 8) {
     int ret = z3950_parse_sequences(flow, packet, minimum_expected_sequences);
 
     if(ret < 0) {
@@ -109,13 +109,13 @@ static void ndpi_search_z3950(struct ndpi_detection_module_struct *ndpi_struct,
       return;
     }
 
-    if(flow->l4.tcp.z3950_stage == 3) {
-      if(flow->packet_direction_counter[0] && flow->packet_direction_counter[1])
+    if(flow->metadata.l4.tcp.z3950_stage == 3) {
+      if(flow->core.packet_direction_counter[0] && flow->core.packet_direction_counter[1])
 	ndpi_int_z3950_add_connection(ndpi_struct, flow);
       else
 	NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);  /* Skip if unidirectional traffic */
     } else
-      flow->l4.tcp.z3950_stage++;
+      flow->metadata.l4.tcp.z3950_stage++;
 
     return;
   }

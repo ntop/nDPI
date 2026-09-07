@@ -29,7 +29,7 @@ static void ndpi_int_cloudflare_warp_add_connection(struct ndpi_detection_module
                                                     struct ndpi_flow_struct * flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found CloudflareWarp\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CLOUDFLARE_WARP,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_CLOUDFLARE_WARP,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -58,22 +58,22 @@ static void ndpi_search_cloudflare_warp(struct ndpi_detection_module_struct *ndp
      Overall, it should be enough to identify it via ip and port matching
   */
 
-  if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_CLOUDFLARE_WARP) {
+  if(flow->core.guessed_protocol_id_by_ip == NDPI_PROTOCOL_CLOUDFLARE_WARP) {
     /* Wireguard */
-    if(flow->s_port == ntohs(2408) || flow->c_port == ntohs(2408) ||
-       flow->s_port == ntohs(500) || flow->c_port == ntohs(500) ||
-       flow->s_port == ntohs(1701) || flow->c_port == ntohs(1701) ||
-       flow->s_port == ntohs(4500) || flow->c_port == ntohs(4500)) {
+    if(flow->core.s_port == ntohs(2408) || flow->core.c_port == ntohs(2408) ||
+       flow->core.s_port == ntohs(500) || flow->core.c_port == ntohs(500) ||
+       flow->core.s_port == ntohs(1701) || flow->core.c_port == ntohs(1701) ||
+       flow->core.s_port == ntohs(4500) || flow->core.c_port == ntohs(4500)) {
       ndpi_int_cloudflare_warp_add_connection(ndpi_struct, flow);
       return;
     }
     /* MASQUE */
     /* TODO: we should check if the QUIC dissector already owns this flow, i.e
        if this code path is ever triggered... */
-    if(flow->s_port == ntohs(443) || flow->c_port == ntohs(443) ||
-       flow->s_port == ntohs(4443) || flow->c_port == ntohs(4443) ||
-       flow->s_port == ntohs(8443) || flow->c_port == ntohs(8443) ||
-       flow->s_port == ntohs(8095) || flow->c_port == ntohs(8095)) {
+    if(flow->core.s_port == ntohs(443) || flow->core.c_port == ntohs(443) ||
+       flow->core.s_port == ntohs(4443) || flow->core.c_port == ntohs(4443) ||
+       flow->core.s_port == ntohs(8443) || flow->core.c_port == ntohs(8443) ||
+       flow->core.s_port == ntohs(8095) || flow->core.c_port == ntohs(8095)) {
       ndpi_int_cloudflare_warp_add_connection(ndpi_struct, flow);
       return;
     }

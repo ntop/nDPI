@@ -35,7 +35,7 @@ static void ndpi_int_lolwildrift_add_connection(struct ndpi_detection_module_str
                                                 struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found League of Legends: Wild Rift\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_LOLWILDRIFT,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_LOLWILDRIFT,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -57,11 +57,11 @@ static void ndpi_search_lolwildrift(struct ndpi_detection_module_struct *ndpi_st
   if (packet->payload_packet_len == 69 &&
       ntohl(get_u_int32_t(packet->payload, 0)) == 0x4000000)
   {
-    flow->l4.udp.lolwildrift_stage = 1;
+    flow->metadata.l4.udp.lolwildrift_stage = 1;
     return;
   }
 
-  if (flow->l4.udp.lolwildrift_stage == 1 &&
+  if (flow->metadata.l4.udp.lolwildrift_stage == 1 &&
       packet->payload_packet_len == 359 &&
       ntohl(get_u_int32_t(packet->payload, 0)) == 0x10000000)
   {

@@ -33,7 +33,7 @@
 
 static void ndpi_int_rtmp_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTMP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_RTMP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 static void ndpi_check_rtmp(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
@@ -52,28 +52,28 @@ static void ndpi_check_rtmp(struct ndpi_detection_module_struct *ndpi_struct, st
 
   /* TODO: should we check somehow for mid-flows? */
 
-  if(flow->l4.tcp.rtmp_stage == 0) {
+  if(flow->metadata.l4.tcp.rtmp_stage == 0) {
     NDPI_LOG_DBG2(ndpi_struct, "RTMP stage 0: \n");
      
     if(packet->payload[0] == 0x03) {
-      flow->l4.tcp.rtmp_stage = packet->packet_direction + 1;
-      flow->l4.tcp.rtmp_client_buffer_len = packet->payload_packet_len;
+      flow->metadata.l4.tcp.rtmp_stage = packet->packet_direction + 1;
+      flow->metadata.l4.tcp.rtmp_client_buffer_len = packet->payload_packet_len;
       return;
     }
   } else {
     NDPI_LOG_DBG2(ndpi_struct, "RTMP stage %u (client already sent %d bytes)\n",
-                  flow->l4.tcp.rtmp_stage, flow->l4.tcp.rtmp_client_buffer_len);
+                  flow->metadata.l4.tcp.rtmp_stage, flow->metadata.l4.tcp.rtmp_client_buffer_len);
 
     /* At first check, if this is for sure a response packet (in another direction. If not, do nothing now and return. */
-    if(flow->l4.tcp.rtmp_stage - packet->packet_direction == 1) {
+    if(flow->metadata.l4.tcp.rtmp_stage - packet->packet_direction == 1) {
       /* From the same direction */
-      flow->l4.tcp.rtmp_client_buffer_len += packet->payload_packet_len;
-      if(flow->l4.tcp.rtmp_client_buffer_len <= 1537)
+      flow->metadata.l4.tcp.rtmp_client_buffer_len += packet->payload_packet_len;
+      if(flow->metadata.l4.tcp.rtmp_client_buffer_len <= 1537)
         return;
     }
 
     /* This is a packet in another direction */
-    if(packet->payload[0] == 0x03 && flow->l4.tcp.rtmp_client_buffer_len == 1537) {
+    if(packet->payload[0] == 0x03 && flow->metadata.l4.tcp.rtmp_client_buffer_len == 1537) {
       NDPI_LOG_INFO(ndpi_struct, "found RTMP\n");
       ndpi_int_rtmp_add_connection(ndpi_struct, flow);
       return;

@@ -59,9 +59,9 @@ static void ndpi_search_soap(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  if (flow->packet_counter > 3)
+  if (flow->core.packet_counter > 3)
   {
-    if (flow->l4.tcp.soap_stage == 1)
+    if (flow->metadata.l4.tcp.soap_stage == 1)
     {
       ndpi_int_soap_add_connection(ndpi_struct, flow);
     }
@@ -70,12 +70,12 @@ static void ndpi_search_soap(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  if (flow->l4.tcp.soap_stage == 0 &&
+  if (flow->metadata.l4.tcp.soap_stage == 0 &&
       packet->payload_packet_len >= 19)
   {
     if (strncmp((char*)packet->payload, "<?xml version=\"1.0\"", 19) == 0)
     {
-      flow->l4.tcp.soap_stage = 1;
+      flow->metadata.l4.tcp.soap_stage = 1;
     }
   }
 }

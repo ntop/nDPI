@@ -33,7 +33,7 @@
 static void ndpi_int_irc_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow, ndpi_confidence_t confidence)
 {
   NDPI_LOG_INFO(ndpi_struct, "Found IRC\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IRC, NDPI_PROTOCOL_UNKNOWN, confidence);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_IRC, NDPI_PROTOCOL_UNKNOWN, confidence);
 }
 
 static u_int8_t ndpi_check_for_NOTICE_or_PRIVMSG(struct ndpi_detection_module_struct *ndpi_struct)
@@ -82,13 +82,13 @@ static void ndpi_search_irc_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	strsep(&sp, " \r\n");
 	  
         snprintf(msg, sizeof(msg), "Found IRC username (%s)", buf);
-        ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
       }
 
-      NDPI_LOG_DBG2(ndpi_struct, "IRC stage: %d\n", flow->l4.tcp.irc_stage);
-      flow->l4.tcp.irc_stage++;
+      NDPI_LOG_DBG2(ndpi_struct, "IRC stage: %d\n", flow->metadata.l4.tcp.irc_stage);
+      flow->metadata.l4.tcp.irc_stage++;
       /* 3 consecutive valid packets */
-      if(flow->l4.tcp.irc_stage == 3)
+      if(flow->metadata.l4.tcp.irc_stage == 3)
         ndpi_int_irc_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_DPI);
       return;
     }

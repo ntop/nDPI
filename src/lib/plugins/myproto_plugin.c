@@ -47,7 +47,7 @@ static void ndpi_search_myproto(struct ndpi_detection_module_struct *ndpi_struct
 
   if(packet->payload_packet_len == NDPI_STATICSTRING_LEN("MyProto") &&
      memcmp(packet->payload, "MyProto", NDPI_STATICSTRING_LEN("MyProto")) == 0) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, myproto_id,
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, myproto_id,
 			       NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     NDPI_LOG_INFO(ndpi_struct, "Protocol %s found\n", NDPI_PROTOCOL_MYPROTO_NAME);
   } else {

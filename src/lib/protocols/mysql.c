@@ -52,7 +52,7 @@ static void ndpi_search_mysql_tcp(struct ndpi_detection_module_struct *ndpi_stru
           (memcmp(&packet->payload[packet->payload_packet_len-5], "_pam", 4) == 0))
       {
         NDPI_LOG_INFO(ndpi_struct, "found MySQL\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MYSQL, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+        ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_MYSQL, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
         return;
       }
     }

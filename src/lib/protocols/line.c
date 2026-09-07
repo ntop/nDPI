@@ -30,7 +30,7 @@ static void ndpi_int_line_add_connection(struct ndpi_detection_module_struct * c
                                          struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found LineCall\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_PROTOCOL_LINE_CALL, NDPI_CONFIDENCE_DPI);
 }
 
@@ -42,7 +42,7 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "searching LineCall\n");
 
-  if(packet->iph && (flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_LINE)) {
+  if(packet->iph && (flow->core.guessed_protocol_id_by_ip == NDPI_PROTOCOL_LINE)) {
     /*
       The heuristic below (coming from reverse engineering packet traces)
       will apply only to IPv4 and Line IP addresses. This is to avoid puttin
@@ -75,9 +75,9 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
      it seems that the 4th bytes of these packets is some kind of packet
      number. Look for 4 packets per direction with consecutive numbers. */
   if(packet->payload_packet_len > 10) {
-    if(flow->l4.udp.line_pkts[packet->packet_direction] == 0) {
-      flow->l4.udp.line_base_cnt[packet->packet_direction] = packet->payload[3];
-      flow->l4.udp.line_pkts[packet->packet_direction] += 1;
+    if(flow->metadata.l4.udp.line_pkts[packet->packet_direction] == 0) {
+      flow->metadata.l4.udp.line_base_cnt[packet->packet_direction] = packet->payload[3];
+      flow->metadata.l4.udp.line_pkts[packet->packet_direction] += 1;
       return;
     } else {
       /* It might be a RTP/RTCP packet. Ignore it and keep looking for the
@@ -85,17 +85,17 @@ static void ndpi_search_line(struct ndpi_detection_module_struct *ndpi_struct,
       /* Basic RTP detection */
       rc = is_rtp_or_rtcp(ndpi_struct, packet->payload, packet->payload_packet_len, NULL);
       if(rc == IS_RTCP || rc == IS_RTP) {
-        if(flow->packet_counter < 10) {
+        if(flow->core.packet_counter < 10) {
           NDPI_LOG_DBG(ndpi_struct, "Probably RTP; keep looking for LINE\n");
           return;
 	}
       } else {
-        if((u_int8_t)(flow->l4.udp.line_base_cnt[packet->packet_direction] +
-                      flow->l4.udp.line_pkts[packet->packet_direction]) == packet->payload[3]) {
-          flow->l4.udp.line_pkts[packet->packet_direction] += 1;
-          if(flow->l4.udp.line_pkts[0] >= 4 && flow->l4.udp.line_pkts[1] >= 4) {
+        if((u_int8_t)(flow->metadata.l4.udp.line_base_cnt[packet->packet_direction] +
+                      flow->metadata.l4.udp.line_pkts[packet->packet_direction]) == packet->payload[3]) {
+          flow->metadata.l4.udp.line_pkts[packet->packet_direction] += 1;
+          if(flow->metadata.l4.udp.line_pkts[0] >= 4 && flow->metadata.l4.udp.line_pkts[1] >= 4) {
             /* To avoid false positives: usually "base pkt numbers" per-direction are different */
-            if(flow->l4.udp.line_base_cnt[0] != flow->l4.udp.line_base_cnt[1])
+            if(flow->metadata.l4.udp.line_base_cnt[0] != flow->metadata.l4.udp.line_base_cnt[1])
               ndpi_int_line_add_connection(ndpi_struct, flow);
             else
               NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);

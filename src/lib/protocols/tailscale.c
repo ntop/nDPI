@@ -38,10 +38,10 @@ static void ndpi_search_tailscale(struct ndpi_detection_module_struct *ndpi_stru
   NDPI_LOG_DBG(ndpi_struct, "search Tailscale\n");
 
   if(packet->payload_packet_len > sizeof(magic) &&
-     (ntohs(flow->c_port) == port || ntohs(flow->s_port) == port) &&
+     (ntohs(flow->core.c_port) == port || ntohs(flow->core.s_port) == port) &&
      memcmp(packet->payload, magic, sizeof(magic)) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found Tailscale\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TAILSCALE, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TAILSCALE, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     return;
   }
 

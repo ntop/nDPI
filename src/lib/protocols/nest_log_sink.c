@@ -55,11 +55,11 @@ static void ndpi_search_nest_log_sink(struct ndpi_detection_module_struct *ndpi_
     if (packet->payload[1] <= 0x02 &&
             (packet->payload[2] == 0x00 || packet->payload[2] == 0x10) &&
             packet->payload[3] == 0x13)
-        flow->l4.tcp.nest_log_sink_matches++;
+        flow->metadata.l4.tcp.nest_log_sink_matches++;
 
-    if (flow->l4.tcp.nest_log_sink_matches == NEST_LOG_SINK_MIN_MATCH) {
+    if (flow->metadata.l4.tcp.nest_log_sink_matches == NEST_LOG_SINK_MIN_MATCH) {
         NDPI_LOG_INFO(ndpi_struct, "found nest_log_sink\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NEST_LOG_SINK, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+        ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_NEST_LOG_SINK, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     }
 }
 

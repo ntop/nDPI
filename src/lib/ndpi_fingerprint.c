@@ -164,12 +164,12 @@ static char* ndpi_compute_tls_blocks_flow_fingerprint(struct ndpi_flow_struct *f
   int ret;
   u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
 
-  if((flow->l4_proto != IPPROTO_TCP) || (flow->l4.tcp.tls.num_tls_blocks == 0))
+  if((flow->core.l4_proto != IPPROTO_TCP) || (flow->metadata.l4.tcp.tls.num_tls_blocks == 0))
     return("");
 
   fp_buf[0] = '\0'; /* Not really necessary, but just to be sure */
 
-  for(i=0; i< flow->l4.tcp.tls.num_tls_blocks; i++) {
+  for(i=0; i< flow->metadata.l4.tcp.tls.num_tls_blocks; i++) {
     u_int avail;
 
     if(idx >= fp_buf_len - 1)
@@ -179,8 +179,8 @@ static char* ndpi_compute_tls_blocks_flow_fingerprint(struct ndpi_flow_struct *f
 
     ret = snprintf(&fp_buf[idx], avail, "%s%u=%d",
 		   (i > 0) ? "," : "",
-		   flow->l4.tcp.tls.tls_blocks[i].block_type,
-		   flow->l4.tcp.tls.tls_blocks[i].len);
+		   flow->metadata.l4.tcp.tls.tls_blocks[i].block_type,
+		   flow->metadata.l4.tcp.tls.tls_blocks[i].len);
 
     if(ret <= 0)
       break;
@@ -197,7 +197,7 @@ static char* ndpi_compute_tls_blocks_flow_fingerprint(struct ndpi_flow_struct *f
   } /* for */
 
 #if 0
-  fprintf(stderr, "#### [sport=%u] %s\n", ntohs(flow->c_port), fp_buf);
+  fprintf(stderr, "#### [sport=%u] %s\n", ntohs(flow->core.c_port), fp_buf);
 #endif
 
   ndpi_sha256((u_char*)fp_buf, idx, sha_hash);
@@ -224,10 +224,10 @@ u_int64_t ndpi_compare_flow_tls_blocks(struct ndpi_detection_module_struct *ndpi
 				       struct ndpi_flow_struct *flow,
 				       ndpi_list *extra_data,
 				       u_int64_t proto_id) {
-  if((flow->l4_proto == IPPROTO_TCP)
-     && (flow->l4.tcp.tls.num_tls_blocks == ndpi_str->cfg.tls_max_num_blocks_to_analyze)
+  if((flow->core.l4_proto == IPPROTO_TCP)
+     && (flow->metadata.l4.tcp.tls.num_tls_blocks == ndpi_str->cfg.tls_max_num_blocks_to_analyze)
      && (ndpi_str->cfg.tls_max_num_blocks_to_analyze <= 8 /* (&) */)
-     && (flow->l4.tcp.tls.tls_blocks != NULL)) {
+     && (flow->metadata.l4.tcp.tls.tls_blocks != NULL)) {
     float best_res = 9999999.;
 
     while(extra_data != NULL) {
@@ -235,7 +235,7 @@ u_int64_t ndpi_compare_flow_tls_blocks(struct ndpi_detection_module_struct *ndpi
       struct ndpi_tls_block *tls_blocks = (struct ndpi_tls_block*)extra_data->value;
 
       if(tls_blocks != NULL) {
-	float res = ndpi_tls_blocks_len_compare(flow->l4.tcp.tls.tls_blocks, tls_blocks, 8 /* (&) */);
+	float res = ndpi_tls_blocks_len_compare(flow->metadata.l4.tcp.tls.tls_blocks, tls_blocks, 8 /* (&) */);
 
 
 	if((res < 4) && (res < best_res)) {
@@ -259,8 +259,8 @@ u_int64_t ndpi_compare_flow_tls_blocks(struct ndpi_detection_module_struct *ndpi
 char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 					 struct ndpi_flow_struct *flow) {
   if(ndpi_str->cfg.ndpi_fingerprint_enabled &&
-     (flow->ndpi.client_fingerprint == NULL) &&
-     ndpi_stack_is_tls_like(&flow->protocol_stack) &&
+     (flow->metadata.ndpi.client_fingerprint == NULL) &&
+     ndpi_stack_is_tls_like(&flow->core.protocol_stack) &&
      /*
        We need TCP & TLS handshake. What should we do if we don't have them?
        For the time being, keep calculating the fingerprint if we have at least
@@ -269,7 +269,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 	* no fingerprint for mid-flows
 	TODO: is that what we really want?
      */
-     (flow->tcp.fingerprint || flow->protos.tls_quic.ja4_ndpi_client[0] != '\0')) {
+     (flow->metadata.l4.tcp.fingerprint || flow->metadata.protos.tls_quic.ja4_ndpi_client[0] != '\0')) {
     char *l4_fp = "no_l4_fp";
     char *l7_pf = "no_app_fp_cli";
     char *l7_pf_tls_blocks = "";
@@ -280,22 +280,22 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
     char l7_pf_tls_blocks_buf[256];
 
     if((!ndpi_str->cfg.tls_ndpifp_ignore_tcp_fingerprint)
-       && (flow->tcp.fingerprint != NULL))
-      l4_fp = flow->tcp.fingerprint;
+       && (flow->metadata.l4.tcp.fingerprint != NULL))
+      l4_fp = flow->metadata.l4.tcp.fingerprint;
 
-    if(flow->protos.tls_quic.ja4_ndpi_client[0] != '\0')
-      l7_pf = flow->protos.tls_quic.ja4_ndpi_client;
+    if(flow->metadata.protos.tls_quic.ja4_ndpi_client[0] != '\0')
+      l7_pf = flow->metadata.protos.tls_quic.ja4_ndpi_client;
 
     if(ndpi_str->cfg.tls_max_num_blocks_to_analyze > 0)
       l7_pf_tls_blocks = ndpi_compute_tls_blocks_flow_fingerprint(flow,
 								  l7_pf_tls_blocks_buf, sizeof(l7_pf_tls_blocks_buf));
 
     if(ndpi_str->cfg.ndpi_fingerprint_format == NDPI_CLIENT_SERVER_NDPI_FINGERPRINT) {
-      if(flow->protos.tls_quic.sha1_certificate_fingerprint[0] != '\0')
-	l7_pf_server = (char*)flow->protos.tls_quic.sha1_certificate_fingerprint;
+      if(flow->metadata.protos.tls_quic.sha1_certificate_fingerprint[0] != '\0')
+	l7_pf_server = (char*)flow->metadata.protos.tls_quic.sha1_certificate_fingerprint;
       else {
-	if(flow->protos.tls_quic.ja3_server[0] != '\0')
-	  l7_pf_server = flow->protos.tls_quic.ja3_server;
+	if(flow->metadata.protos.tls_quic.ja3_server[0] != '\0')
+	  l7_pf_server = flow->metadata.protos.tls_quic.ja3_server;
       }
     }
 
@@ -310,7 +310,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
     }
 
 #if 0
-    fprintf(stderr, "#### [sport=%u] %s\n", ntohs(flow->c_port), fp_buf);
+    fprintf(stderr, "#### [sport=%u] %s\n", ntohs(flow->core.c_port), fp_buf);
 #endif
 
     if(s > 0) {
@@ -326,32 +326,32 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 		    sha_hash[12], sha_hash[13], sha_hash[14], sha_hash[15]
 		    );
 
-      flow->ndpi.client_fingerprint = ndpi_strdup((char*)fp_buf);
+      flow->metadata.ndpi.client_fingerprint = ndpi_strdup((char*)fp_buf);
 
-      if((flow->ndpi.client_fingerprint != NULL)
+      if((flow->metadata.ndpi.client_fingerprint != NULL)
 	 && (ndpi_str->ndpifp_custom_protos != NULL)) {
 	u_int64_t proto_id;
 	ndpi_list *extra_data = NULL;
 	
 	/* This protocol has been defined in protos.txt-like files */
 	if(ndpi_hash_find_entry_extra(ndpi_str->ndpifp_custom_protos,
-				      flow->ndpi.client_fingerprint, strlen(flow->ndpi.client_fingerprint),
+				      flow->metadata.ndpi.client_fingerprint, strlen(flow->metadata.ndpi.client_fingerprint),
 				      &proto_id, &extra_data) == 0) {
 
 	  proto_id = ndpi_compare_flow_tls_blocks(ndpi_str, flow, extra_data, proto_id);
 	  
 	  if(proto_id != NDPI_PROTOCOL_UNKNOWN) {
-	    ndpi_set_detected_protocol(ndpi_str, flow, proto_id,
+	    ndpi_set_detected_protocol(ndpi_str, &flow->core, proto_id,
 				       ndpi_get_master_proto(ndpi_str, flow),
 				       NDPI_CONFIDENCE_CUSTOM_RULE);
 	    
-	    flow->category = ndpi_str->proto_defaults[proto_id].protoCategory,
-	      flow->breed = ndpi_str->proto_defaults[proto_id].protoBreed;
+	    flow->core.category = ndpi_str->proto_defaults[proto_id].protoCategory,
+	      flow->core.breed = ndpi_str->proto_defaults[proto_id].protoBreed;
 	  }
 	}
       }
     }
   }
 
-  return(flow->ndpi.client_fingerprint);
+  return(flow->metadata.ndpi.client_fingerprint);
 }

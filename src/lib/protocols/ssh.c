@@ -112,7 +112,7 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
   }
   
   if(obsolete_ssh_version)
-    ndpi_set_risk(ndpi_struct, flow,
+    ndpi_set_risk(ndpi_struct, &flow->core,
                   (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER),
                   NULL);
 }
@@ -205,7 +205,7 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
     char str[64];
 
     snprintf(str, sizeof(str), "Found cipher %s", obsolete_ciphers[found_obsolete_cipher]);
-    ndpi_set_risk(ndpi_struct, flow,
+    ndpi_set_risk(ndpi_struct, &flow->core,
 		  (is_client_signature ? NDPI_SSH_OBSOLETE_CLIENT_VERSION_OR_CIPHER : NDPI_SSH_OBSOLETE_SERVER_VERSION_OR_CIPHER),
 		  str);
   }
@@ -229,10 +229,10 @@ static int search_ssh_again(struct ndpi_detection_module_struct *ndpi_struct, st
 
   ndpi_search_ssh_tcp(ndpi_struct, flow);
 
-  if((flow->protos.ssh.hassh_client[0] != '\0')
-     && (flow->protos.ssh.hassh_server[0] != '\0')) {
+  if((flow->metadata.protos.ssh.hassh_client[0] != '\0')
+     && (flow->metadata.protos.ssh.hassh_server[0] != '\0')) {
     /* stop extra processing */
-    flow->extra_packets_func = NULL; /* We're good now */
+    flow->core.extra_packets_func = NULL; /* We're good now */
     return(0);
   }
 
@@ -244,15 +244,15 @@ static int search_ssh_again(struct ndpi_detection_module_struct *ndpi_struct, st
 
 static void ndpi_int_ssh_add_connection(struct ndpi_detection_module_struct
 					*ndpi_struct, struct ndpi_flow_struct *flow) {
-  if(flow->extra_packets_func != NULL)
+  if(flow->core.extra_packets_func != NULL)
     return;
 
   NDPI_LOG_INFO(ndpi_struct, "Found SSH\n");
 
-  flow->max_extra_packets_to_check = 12;
-  flow->extra_packets_func = search_ssh_again;
+  flow->core.max_extra_packets_to_check = 12;
+  flow->core.extra_packets_func = search_ssh_again;
   
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSH, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_SSH, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 /* ************************************************************************ */
@@ -283,18 +283,18 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     buf[buf_out_len] = '\0';
     
     if(client_hash) {
-      if(flow->protos.ssh.client_key_exchange_algorithms == NULL)
-        flow->protos.ssh.client_key_exchange_algorithms = ndpi_strdup(buf);
+      if(flow->metadata.protos.ssh.client_key_exchange_algorithms == NULL)
+        flow->metadata.protos.ssh.client_key_exchange_algorithms = ndpi_strdup(buf);
     } else {
-      if(flow->protos.ssh.server_key_exchange_algorithms == NULL)
-        flow->protos.ssh.server_key_exchange_algorithms = ndpi_strdup(buf);
+      if(flow->metadata.protos.ssh.server_key_exchange_algorithms == NULL)
+        flow->metadata.protos.ssh.server_key_exchange_algorithms = ndpi_strdup(buf);
     }
 
-    if(flow->protos.ssh.client_key_exchange_algorithms
-       && flow->protos.ssh.server_key_exchange_algorithms) {
+    if(flow->metadata.protos.ssh.client_key_exchange_algorithms
+       && flow->metadata.protos.ssh.server_key_exchange_algorithms) {
       /* Compute the negotiated key exchange algorithm */
       u_int offset = 0;
-      char *csv_string = flow->protos.ssh.client_key_exchange_algorithms;
+      char *csv_string = flow->metadata.protos.ssh.client_key_exchange_algorithms;
       char buf[64];
       
       while(csv_string[offset] != '\0') {
@@ -308,8 +308,8 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
 	strncpy(buf, &csv_string[offset], len);
 	buf[len] = '\0';
 	
-	if(strstr(flow->protos.ssh.server_key_exchange_algorithms, buf) != NULL) {
-	  flow->protos.ssh.key_exchange_method = ndpi_strdup(buf);
+	if(strstr(flow->metadata.protos.ssh.server_key_exchange_algorithms, buf) != NULL) {
+	  flow->metadata.protos.ssh.key_exchange_method = ndpi_strdup(buf);
 	  break; /* Found what we looked for */
 	}
 	
@@ -345,15 +345,15 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
       strncpy(tmp, (const char*)&packet->payload[offset], len);
       tmp[len] = '\0';
       if(client_hash) {
-        if(!flow->protos.ssh.client_hostkey_algorithms)
-          flow->protos.ssh.client_hostkey_algorithms = tmp;
+        if(!flow->metadata.protos.ssh.client_hostkey_algorithms)
+          flow->metadata.protos.ssh.client_hostkey_algorithms = tmp;
         else
           ndpi_free(tmp);
       } else {
         /* Negotiate hostkey_alg using client's stored list */
-        if(flow->protos.ssh.client_hostkey_algorithms && !flow->protos.ssh.negotiated_hostkey_alg)
-          flow->protos.ssh.negotiated_hostkey_alg =
-            ssh_negotiate_algorithm(flow->protos.ssh.client_hostkey_algorithms, tmp);
+        if(flow->metadata.protos.ssh.client_hostkey_algorithms && !flow->metadata.protos.ssh.negotiated_hostkey_alg)
+          flow->metadata.protos.ssh.negotiated_hostkey_alg =
+            ssh_negotiate_algorithm(flow->metadata.protos.ssh.client_hostkey_algorithms, tmp);
         ndpi_free(tmp);
       }
     }
@@ -378,12 +378,12 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     buf_out_len += len;
     buf[buf_out_len++] = ';';
 
-    if(ndpi_struct->cfg.ssh_hassh_data_enabled && !flow->protos.ssh.client_cipher_c2s) {
+    if(ndpi_struct->cfg.ssh_hassh_data_enabled && !flow->metadata.protos.ssh.client_cipher_c2s) {
       char *tmp = (char*)ndpi_malloc(len + 1);
       if(tmp) {
         strncpy(tmp, (const char*)&packet->payload[offset], len);
         tmp[len] = '\0';
-        flow->protos.ssh.client_cipher_c2s = tmp;
+        flow->metadata.protos.ssh.client_cipher_c2s = tmp;
       }
     }
   } else if(ndpi_struct->cfg.ssh_hassh_data_enabled && len > 0 &&
@@ -392,9 +392,9 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     if(tmp) {
       strncpy(tmp, (const char*)&packet->payload[offset], len);
       tmp[len] = '\0';
-      if(flow->protos.ssh.client_cipher_c2s && !flow->protos.ssh.negotiated_cipher_c2s)
-        flow->protos.ssh.negotiated_cipher_c2s =
-          ssh_negotiate_algorithm(flow->protos.ssh.client_cipher_c2s, tmp);
+      if(flow->metadata.protos.ssh.client_cipher_c2s && !flow->metadata.protos.ssh.negotiated_cipher_c2s)
+        flow->metadata.protos.ssh.negotiated_cipher_c2s =
+          ssh_negotiate_algorithm(flow->metadata.protos.ssh.client_cipher_c2s, tmp);
       ndpi_free(tmp);
     }
   }
@@ -420,24 +420,24 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     buf[buf_out_len++] = ';';
 
     if(ndpi_struct->cfg.ssh_hassh_data_enabled && len > 0 &&
-       flow->protos.ssh.client_cipher_s2c && !flow->protos.ssh.negotiated_cipher_s2c) {
+       flow->metadata.protos.ssh.client_cipher_s2c && !flow->metadata.protos.ssh.negotiated_cipher_s2c) {
       char *tmp = (char*)ndpi_malloc(len + 1);
       if(tmp) {
         strncpy(tmp, (const char*)&packet->payload[offset], len);
         tmp[len] = '\0';
-        flow->protos.ssh.negotiated_cipher_s2c =
-          ssh_negotiate_algorithm(flow->protos.ssh.client_cipher_s2c, tmp);
+        flow->metadata.protos.ssh.negotiated_cipher_s2c =
+          ssh_negotiate_algorithm(flow->metadata.protos.ssh.client_cipher_s2c, tmp);
         ndpi_free(tmp);
       }
     }
   } else if(ndpi_struct->cfg.ssh_hassh_data_enabled && len > 0 &&
             offset + len <= packet->payload_packet_len) {
-    if(!flow->protos.ssh.client_cipher_s2c) {
+    if(!flow->metadata.protos.ssh.client_cipher_s2c) {
       char *tmp = (char*)ndpi_malloc(len + 1);
       if(tmp) {
         strncpy(tmp, (const char*)&packet->payload[offset], len);
         tmp[len] = '\0';
-        flow->protos.ssh.client_cipher_s2c = tmp;
+        flow->metadata.protos.ssh.client_cipher_s2c = tmp;
       }
     }
   }
@@ -461,12 +461,12 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     buf_out_len += len;
     buf[buf_out_len++] = ';';
 
-    if(ndpi_struct->cfg.ssh_hassh_data_enabled && !flow->protos.ssh.client_mac_c2s) {
+    if(ndpi_struct->cfg.ssh_hassh_data_enabled && !flow->metadata.protos.ssh.client_mac_c2s) {
       char *tmp = (char*)ndpi_malloc(len + 1);
       if(tmp) {
         strncpy(tmp, (const char*)&packet->payload[offset], len);
         tmp[len] = '\0';
-        flow->protos.ssh.client_mac_c2s = tmp;
+        flow->metadata.protos.ssh.client_mac_c2s = tmp;
       }
     }
   } else if(ndpi_struct->cfg.ssh_hassh_data_enabled && len > 0 &&
@@ -475,12 +475,12 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     if(tmp) {
       strncpy(tmp, (const char*)&packet->payload[offset], len);
       tmp[len] = '\0';
-      if(!flow->protos.ssh.negotiated_mac_c2s) {
-        if(flow->protos.ssh.client_mac_c2s)
-          flow->protos.ssh.negotiated_mac_c2s =
-            ssh_negotiate_algorithm(flow->protos.ssh.client_mac_c2s, tmp);
+      if(!flow->metadata.protos.ssh.negotiated_mac_c2s) {
+        if(flow->metadata.protos.ssh.client_mac_c2s)
+          flow->metadata.protos.ssh.negotiated_mac_c2s =
+            ssh_negotiate_algorithm(flow->metadata.protos.ssh.client_mac_c2s, tmp);
         else
-          flow->protos.ssh.negotiated_mac_c2s =
+          flow->metadata.protos.ssh.negotiated_mac_c2s =
             ssh_negotiate_algorithm(tmp, tmp);
       }
       ndpi_free(tmp);
@@ -507,29 +507,29 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     buf[buf_out_len++] = ';';
 
     if(ndpi_struct->cfg.ssh_hassh_data_enabled && len > 0 &&
-       !flow->protos.ssh.negotiated_mac_s2c) {
+       !flow->metadata.protos.ssh.negotiated_mac_s2c) {
       char *tmp = (char*)ndpi_malloc(len + 1);
       if(tmp) {
         strncpy(tmp, (const char*)&packet->payload[offset], len);
         tmp[len] = '\0';
-        if(flow->protos.ssh.client_mac_s2c)
-          flow->protos.ssh.negotiated_mac_s2c =
-            ssh_negotiate_algorithm(flow->protos.ssh.client_mac_s2c, tmp);
+        if(flow->metadata.protos.ssh.client_mac_s2c)
+          flow->metadata.protos.ssh.negotiated_mac_s2c =
+            ssh_negotiate_algorithm(flow->metadata.protos.ssh.client_mac_s2c, tmp);
         else
           /* client list missed due to TCP segmentation; take server's first preference */
-          flow->protos.ssh.negotiated_mac_s2c =
+          flow->metadata.protos.ssh.negotiated_mac_s2c =
             ssh_negotiate_algorithm(tmp, tmp);
         ndpi_free(tmp);
       }
     }
   } else if(ndpi_struct->cfg.ssh_hassh_data_enabled && len > 0 &&
             offset + len <= packet->payload_packet_len) {
-    if(!flow->protos.ssh.client_mac_s2c) {
+    if(!flow->metadata.protos.ssh.client_mac_s2c) {
       char *tmp = (char*)ndpi_malloc(len + 1);
       if(tmp) {
         strncpy(tmp, (const char*)&packet->payload[offset], len);
         tmp[len] = '\0';
-        flow->protos.ssh.client_mac_s2c = tmp;
+        flow->metadata.protos.ssh.client_mac_s2c = tmp;
       }
     }
   }
@@ -610,58 +610,58 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   
 #ifdef SSH_DEBUG
-  printf("[SSH] %s() stage %d\n", __FUNCTION__, flow->l4.tcp.ssh_stage);
+  printf("[SSH] %s() stage %d\n", __FUNCTION__, flow->metadata.l4.tcp.ssh_stage);
 #endif
 
-  if(flow->l4.tcp.ssh_stage <= 1) {
+  if(flow->metadata.l4.tcp.ssh_stage <= 1) {
     if(packet->payload_packet_len > 7 && memcmp(packet->payload, "SSH-", 4) == 0) {
-      if(current_pkt_from_client_to_server(ndpi_struct, flow)) {
-	int len = ndpi_min(sizeof(flow->protos.ssh.client_signature)-1, packet->payload_packet_len);
+      if(current_pkt_from_client_to_server(ndpi_struct, &flow->core)) {
+	int len = ndpi_min(sizeof(flow->metadata.protos.ssh.client_signature)-1, packet->payload_packet_len);
       
-	strncpy(flow->protos.ssh.client_signature, (const char *)packet->payload, len);
-	flow->protos.ssh.client_signature[len] = '\0';
-	ndpi_ssh_zap_cr(flow->protos.ssh.client_signature, len);
+	strncpy(flow->metadata.protos.ssh.client_signature, (const char *)packet->payload, len);
+	flow->metadata.protos.ssh.client_signature[len] = '\0';
+	ndpi_ssh_zap_cr(flow->metadata.protos.ssh.client_signature, len);
 
-	ssh_analyze_signature_version(ndpi_struct, flow, flow->protos.ssh.client_signature, 1);
+	ssh_analyze_signature_version(ndpi_struct, flow, flow->metadata.protos.ssh.client_signature, 1);
       
 #ifdef SSH_DEBUG
-	printf("[SSH] [client_signature: %s]\n", flow->protos.ssh.client_signature);
+	printf("[SSH] [client_signature: %s]\n", flow->metadata.protos.ssh.client_signature);
 #endif      
       
 	ndpi_int_ssh_add_connection(ndpi_struct, flow);
       } else {
-	int len = ndpi_min(sizeof(flow->protos.ssh.server_signature)-1, packet->payload_packet_len);
+	int len = ndpi_min(sizeof(flow->metadata.protos.ssh.server_signature)-1, packet->payload_packet_len);
       
-	strncpy(flow->protos.ssh.server_signature, (const char *)packet->payload, len);
-	flow->protos.ssh.server_signature[len] = '\0';
-	ndpi_ssh_zap_cr(flow->protos.ssh.server_signature, len);
+	strncpy(flow->metadata.protos.ssh.server_signature, (const char *)packet->payload, len);
+	flow->metadata.protos.ssh.server_signature[len] = '\0';
+	ndpi_ssh_zap_cr(flow->metadata.protos.ssh.server_signature, len);
 
-	ssh_analyze_signature_version(ndpi_struct, flow, flow->protos.ssh.server_signature, 0);
+	ssh_analyze_signature_version(ndpi_struct, flow, flow->metadata.protos.ssh.server_signature, 0);
       
 #ifdef SSH_DEBUG
-	printf("[SSH] [server_signature: %s]\n", flow->protos.ssh.server_signature);
+	printf("[SSH] [server_signature: %s]\n", flow->metadata.protos.ssh.server_signature);
 #endif
       
 	NDPI_LOG_DBG2(ndpi_struct, "ssh stage 1 passed\n");
       
 #ifdef SSH_DEBUG
-	printf("[SSH] [completed stage: %u]\n", flow->l4.tcp.ssh_stage);
+	printf("[SSH] [completed stage: %u]\n", flow->metadata.l4.tcp.ssh_stage);
 #endif
 
 	ndpi_int_ssh_add_connection(ndpi_struct, flow);
       }
 
-      flow->l4.tcp.ssh_stage++;
+      flow->metadata.l4.tcp.ssh_stage++;
       return;	
     } else {
       /* Unexpected msg. Check if this is an unidirectional flow with
        * banner + key exchange only in one direction */
-      if(flow->l4.tcp.ssh_stage == 1 &&
-         (flow->packet_direction_counter[0] == 0 || flow->packet_direction_counter[1] == 0)) {
+      if(flow->metadata.l4.tcp.ssh_stage == 1 &&
+         (flow->core.packet_direction_counter[0] == 0 || flow->core.packet_direction_counter[1] == 0)) {
 #ifdef SSH_DEBUG
         printf("[SSH] Check if this is an unidirectional flow\n");
 #endif
-        flow->l4.tcp.ssh_stage++;
+        flow->metadata.l4.tcp.ssh_stage++;
         ndpi_search_ssh_tcp(ndpi_struct, flow); /* Recursion */
         return;
       }
@@ -677,7 +677,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	u_int i, len;
 
 #ifdef SSH_DEBUG
-	printf("[SSH] [stage: %u][msg: %u][direction: %u][key exchange init]\n", flow->l4.tcp.ssh_stage, msgcode, packet->packet_direction);
+	printf("[SSH] [stage: %u][msg: %u][direction: %u][key exchange init]\n", flow->metadata.l4.tcp.ssh_stage, msgcode, packet->packet_direction);
 #endif
 
 	if(hassh_buf) {
@@ -699,11 +699,11 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 	      }
 #endif
 	      for(i=0; i<16; i++)
-		snprintf(&flow->protos.ssh.hassh_client[i*2],
-			 sizeof(flow->protos.ssh.hassh_client) - (i*2),
+		snprintf(&flow->metadata.protos.ssh.hassh_client[i*2],
+			 sizeof(flow->metadata.protos.ssh.hassh_client) - (i*2),
 			 "%02X", fingerprint_client[i] & 0xFF);
 	  
-	      flow->protos.ssh.hassh_client[32] = '\0';
+	      flow->metadata.protos.ssh.hassh_client[32] = '\0';
 	    }
 	  } else {
 	    u_char fingerprint_server[16];
@@ -724,10 +724,10 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
 #endif
 
 	      for(i=0; i<16; i++)
-		snprintf(&flow->protos.ssh.hassh_server[i*2],
-			 sizeof(flow->protos.ssh.hassh_server) - (i*2),
+		snprintf(&flow->metadata.protos.ssh.hassh_server[i*2],
+			 sizeof(flow->metadata.protos.ssh.hassh_server) - (i*2),
 			 "%02X", fingerprint_server[i] & 0xFF);
-	      flow->protos.ssh.hassh_server[32] = '\0';
+	      flow->metadata.protos.ssh.hassh_server[32] = '\0';
 	    }
 	  }
 
@@ -738,11 +738,11 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
       ndpi_int_ssh_add_connection(ndpi_struct, flow);
     }
 
-    if((flow->protos.ssh.hassh_client[0] != '\0') && (flow->protos.ssh.hassh_server[0] != '\0')) {
+    if((flow->metadata.protos.ssh.hassh_client[0] != '\0') && (flow->metadata.protos.ssh.hassh_server[0] != '\0')) {
 #ifdef SSH_DEBUG
       printf("[SSH] Dissection completed\n");
 #endif
-      flow->extra_packets_func = NULL; /* We're good now */
+      flow->core.extra_packets_func = NULL; /* We're good now */
     }
 
     return;
@@ -752,7 +752,7 @@ static void ndpi_search_ssh_tcp(struct ndpi_detection_module_struct *ndpi_struct
   printf("[SSH] Excluding SSH");
 #endif
 
-  NDPI_LOG_DBG(ndpi_struct, "excluding ssh at stage %d\n", flow->l4.tcp.ssh_stage);
+  NDPI_LOG_DBG(ndpi_struct, "excluding ssh at stage %d\n", flow->metadata.l4.tcp.ssh_stage);
   NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 

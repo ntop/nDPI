@@ -274,31 +274,31 @@ static int get_rtp_info(struct ndpi_detection_module_struct *ndpi_struct,
                         struct ndpi_flow_struct *flow,
                         const u_int8_t *payload,
                         u_int16_t payload_len) {
-  u_int8_t packet_direction = current_pkt_from_client_to_server(ndpi_struct, flow) ? 0 : 1;
+  u_int8_t packet_direction = current_pkt_from_client_to_server(ndpi_struct, &flow->core) ? 0 : 1;
 
-  if(flow->rtp[packet_direction].payload_detected == false) {
-    flow->rtp[packet_direction].payload_type = payload[1] & 0x7F;
-    flow->rtp[packet_direction].payload_detected = true;
+  if(flow->metadata.rtp.rtp[packet_direction].payload_detected == false) {
+    flow->metadata.rtp.rtp[packet_direction].payload_type = payload[1] & 0x7F;
+    flow->metadata.rtp.rtp[packet_direction].payload_detected = true;
 
-    /* printf("********* [direction: %d] payload_type=%u\n", packet_direction, flow->protos.rtp[packet_direction].payload_type);  */
+    /* printf("********* [direction: %d] payload_type=%u\n", packet_direction, flow->metadata.protos.rtp[packet_direction].payload_type);  */
 
-    if(((flow->rtp[packet_direction].payload_type == 126 /* Enhanced Voice Services (EVS) */)
-        || (flow->rtp[packet_direction].payload_type == 127 /* Enhanced Voice Services (EVS) */))
+    if(((flow->metadata.rtp.rtp[packet_direction].payload_type == 126 /* Enhanced Voice Services (EVS) */)
+        || (flow->metadata.rtp.rtp[packet_direction].payload_type == 127 /* Enhanced Voice Services (EVS) */))
        && (payload_len > 12 /* RTP header */)) {
       const u_int8_t *evs = &payload[12];
       u_int packet_len = payload_len - 12;
       u_int num_bits = packet_len * 8;
 
-      flow->flow_multimedia_types = ndpi_multimedia_audio_flow;
+      flow->metadata.flow_multimedia_types = ndpi_multimedia_audio_flow;
       /* printf("********* %02X [bits %u]\n", evs[0], num_bits); */
 
       if(num_bits == 56) {
         /* A.2.1.3 Special case for 56 bit payload size (EVS Primary or EVS AMR-WB IO SID) */
 
         if((evs[0] & 0x80) == 0)
-          flow->rtp[packet_direction].evs_subtype = evs[0] & 0xF;
+          flow->metadata.rtp.rtp[packet_direction].evs_subtype = evs[0] & 0xF;
         else
-          flow->rtp[packet_direction].evs_subtype = evs[1] & 0xF;
+          flow->metadata.rtp.rtp[packet_direction].evs_subtype = evs[1] & 0xF;
       } else {
 
         /* See ndpi_rtp_payload_type2str() */
@@ -324,7 +324,7 @@ static int get_rtp_info(struct ndpi_detection_module_struct *ndpi_struct,
         case  1280:
         case  1920:
         case  2560:
-          flow->rtp[packet_direction].evs_subtype = num_bits;
+          flow->metadata.rtp.rtp[packet_direction].evs_subtype = num_bits;
           break;
 
         default:
@@ -332,7 +332,7 @@ static int get_rtp_info(struct ndpi_detection_module_struct *ndpi_struct,
             /* EVS Codec Mode Request (EVS-CMR) */
             u_int8_t d_bits = evs[0] & 0X0F;
 
-            flow->rtp[packet_direction].evs_subtype = d_bits + 30 /* dummy offset */;
+            flow->metadata.rtp.rtp[packet_direction].evs_subtype = d_bits + 30 /* dummy offset */;
           }
           break;
         }
@@ -345,7 +345,7 @@ static int get_rtp_info(struct ndpi_detection_module_struct *ndpi_struct,
 /* ************************************************************ */
 
 static int keep_extra_dissection(struct ndpi_flow_struct *flow) {
-  return ((flow->rtp[0].payload_detected && flow->rtp[1].payload_detected) ? false :true);
+  return ((flow->metadata.rtp.rtp[0].payload_detected && flow->metadata.rtp.rtp[1].payload_detected) ? false :true);
 }
 
 /* ************************************************************ */
@@ -365,23 +365,23 @@ static void ndpi_int_rtp_add_connection(struct ndpi_detection_module_struct *ndp
                                         struct ndpi_flow_struct *flow,
                                         u_int16_t proto)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_UNKNOWN, proto,
                              NDPI_CONFIDENCE_DPI);
   if(ndpi_struct->cfg.rtp_search_for_stun) {
     /* It makes sense to look for STUN only if we didn't capture the entire flow,
        from the beginning */
-    if(!(flow->l4_proto == IPPROTO_TCP && ndpi_seen_flow_beginning(flow))) {
+    if(!(flow->core.l4_proto == IPPROTO_TCP && ndpi_seen_flow_beginning(flow))) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling (STUN) extra dissection\n");
       switch_extra_dissection_to_stun(ndpi_struct, flow, 1);
     }
   } else if(proto == NDPI_PROTOCOL_RTP) {
-    if(!flow->extra_packets_func &&
+    if(!flow->core.extra_packets_func &&
        keep_extra_dissection(flow) &&
        ndpi_struct->cfg.rtp_max_packets_extra_dissection > 0) {
       NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
-      flow->max_extra_packets_to_check = ndpi_struct->cfg.rtp_max_packets_extra_dissection;
-      flow->extra_packets_func = rtp_search_again;
+      flow->core.max_extra_packets_to_check = ndpi_struct->cfg.rtp_max_packets_extra_dissection;
+      flow->core.extra_packets_func = rtp_search_again;
     }
   }
 }
@@ -407,16 +407,17 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
     payload += 2; /* Skip the length field */
     payload_len -= 2;
   }
-  NDPI_LOG_DBG(ndpi_struct, "search RTP (stage %d/%d)\n", flow->rtp_stage, flow->rtcp_stage);
+  NDPI_LOG_DBG(ndpi_struct, "search RTP (stage %d/%d)\n",
+	       flow->metadata.rtp.rtp_stage, flow->metadata.rtcp_stage);
 
   /* * Let some "unknown" packets at the beginning:
    * search for 3/4 consecutive RTP/RTCP packets.
    * Wait a little longer (4 vs 3 pkts) for RTCP to try to tell if there are only
    * RTCP packets in the flow or if RTP/RTCP are multiplexed together */
 
-  if(flow->packet_counter > 3 &&
-     flow->rtp_stage == 0 &&
-     flow->rtcp_stage == 0) {
+  if(flow->core.packet_counter > 3 &&
+     flow->metadata.rtp.rtp_stage == 0 &&
+     flow->metadata.rtcp_stage == 0) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
@@ -424,47 +425,47 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
   is_rtp = is_rtp_or_rtcp(ndpi_struct, payload, payload_len, &seq);
 
   if(is_rtp == IS_RTP) {
-    if(flow->rtp_stage == 2) {
-      if(flow->l4_proto == IPPROTO_UDP &&
-         flow->l4.udp.line_pkts[0] >= 2 && flow->l4.udp.line_pkts[1] >= 2) {
+    if(flow->metadata.rtp.rtp_stage == 2) {
+      if(flow->core.l4_proto == IPPROTO_UDP &&
+         flow->metadata.l4.udp.line_pkts[0] >= 2 && flow->metadata.l4.udp.line_pkts[1] >= 2) {
         /* It seems that it is a LINE stuff; let its dissector to evaluate */
-      } else if(flow->l4_proto == IPPROTO_UDP && flow->l4.udp.epicgames_stage > 0) {
+      } else if(flow->core.l4_proto == IPPROTO_UDP && flow->metadata.l4.udp.epicgames_stage > 0) {
         /* It seems that it is a EpicGames stuff; let its dissector to evaluate */
-      } else if(flow->rtp_seq_set[packet->packet_direction] &&
-                flow->rtp_seq[packet->packet_direction] == seq) {
+      } else if(flow->metadata.rtp.rtp_seq_set[packet->packet_direction] &&
+                flow->metadata.rtp.rtp_seq[packet->packet_direction] == seq) {
         /* Simple heuristic to avoid false positives. Tradeoff between:
 	    - consecutive RTP packets should have different sequence number
 	    - we should handle duplicated traffic */
         NDPI_LOG_DBG(ndpi_struct, "Same seq on consecutive pkts\n");
-        flow->rtp_stage = 0;
-        flow->rtcp_stage = 0;
+        flow->metadata.rtp.rtp_stage = 0;
+        flow->metadata.rtcp_stage = 0;
         NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       } else {
         get_rtp_info(ndpi_struct, flow, payload, payload_len);
-        rtp_get_stream_type(flow->rtp[packet->packet_direction].payload_type,
-			    &flow->flow_multimedia_types, NDPI_PROTOCOL_UNKNOWN);
+        rtp_get_stream_type(flow->metadata.rtp.rtp[packet->packet_direction].payload_type,
+			    &flow->metadata.flow_multimedia_types, NDPI_PROTOCOL_UNKNOWN);
 
         NDPI_LOG_INFO(ndpi_struct, "Found RTP\n");
         ndpi_int_rtp_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTP);
       }
       return;
     }
-    if(flow->rtp_stage == 0) {
-      flow->rtp_seq[packet->packet_direction] = seq;
-      flow->rtp_seq_set[packet->packet_direction] = 1;
+    if(flow->metadata.rtp.rtp_stage == 0) {
+      flow->metadata.rtp.rtp_seq[packet->packet_direction] = seq;
+      flow->metadata.rtp.rtp_seq_set[packet->packet_direction] = 1;
     }
-    flow->rtp_stage += 1;
-  } else if(is_rtp == IS_RTCP && flow->rtp_stage > 0) {
+    flow->metadata.rtp.rtp_stage += 1;
+  } else if(is_rtp == IS_RTCP && flow->metadata.rtp.rtp_stage > 0) {
     /* RTCP after (some) RTP. Keep looking for RTP */
-  } else if(is_rtp == IS_RTCP && flow->rtp_stage == 0) {
-    if(flow->rtcp_stage == 3) {
+  } else if(is_rtp == IS_RTCP && flow->metadata.rtp.rtp_stage == 0) {
+    if(flow->metadata.rtcp_stage == 3) {
       NDPI_LOG_INFO(ndpi_struct, "Found RTCP\n");
       ndpi_int_rtp_add_connection(ndpi_struct, flow, NDPI_PROTOCOL_RTCP);
       return;
     }
-    flow->rtcp_stage += 1;
+    flow->metadata.rtcp_stage += 1;
   } else {
-    if(flow->rtp_stage || flow->rtcp_stage) {
+    if(flow->metadata.rtp.rtp_stage || flow->metadata.rtcp_stage) {
       u_int32_t unused;
       u_int16_t app_proto = NDPI_PROTOCOL_UNKNOWN;
       ndpi_protocol_category_t category;
@@ -472,8 +473,8 @@ static void ndpi_rtp_search(struct ndpi_detection_module_struct *ndpi_struct,
       /* TODO: we should switch to the demultiplexing-code in stun dissector */
       if(is_stun(ndpi_struct, flow, &app_proto, &category) != 0 &&
          !is_dtls(packet->payload, packet->payload_packet_len, &unused)) {
-        flow->rtp_stage = 0;
-        flow->rtcp_stage = 0;
+        flow->metadata.rtp.rtp_stage = 0;
+        flow->metadata.rtcp_stage = 0;
         NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
     }

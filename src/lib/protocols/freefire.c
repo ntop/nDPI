@@ -34,7 +34,7 @@ static void ndpi_int_freefire_add_connection(struct ndpi_detection_module_struct
                                              struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found Free Fire\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_FREEFIRE,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_FREEFIRE,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -97,7 +97,7 @@ static void ndpi_search_freefire(struct ndpi_detection_module_struct *ndpi_struc
        Mid-flow captures fall through to string matching below. */
     if (ndpi_seen_flow_beginning(flow)) {
       if (packet->packet_direction == 0 &&
-          flow->packet_direction_counter[0] == 1) {
+          flow->core.packet_direction_counter[0] == 1) {
         if (!is_freefire_tcp_setup(packet))
           NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
         return;
@@ -110,7 +110,7 @@ static void ndpi_search_freefire(struct ndpi_detection_module_struct *ndpi_struc
       return;
     }
 
-    if (flow->packet_counter >= 4)
+    if (flow->core.packet_counter >= 4)
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   } else {
     u_int16_t sport = ntohs(packet->udp->source);

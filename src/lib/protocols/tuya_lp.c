@@ -31,7 +31,7 @@ static void ndpi_int_tuya_lp_add_connection(struct ndpi_detection_module_struct 
 {
   NDPI_LOG_INFO(ndpi_struct, "found TUYA LP\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_TUYA_LP,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);

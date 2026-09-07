@@ -53,8 +53,8 @@ struct mongo_message_header
 static void set_mongodb_detected(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
 
-  if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MONGODB, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  if(flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_MONGODB, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   }
 }
 
@@ -124,7 +124,7 @@ static void ndpi_search_mongodb(struct ndpi_detection_module_struct *ndpi_struct
 				struct ndpi_flow_struct *flow)
 {
   // Break after 6 packets.
-  if(flow->packet_counter > 6) {
+  if(flow->core.packet_counter > 6) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }

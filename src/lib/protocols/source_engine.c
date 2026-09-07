@@ -33,7 +33,7 @@ static void ndpi_int_source_engine_add_connection(struct ndpi_detection_module_s
 {
   NDPI_LOG_INFO(ndpi_struct, "found Source Engine\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_SOURCE_ENGINE,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -51,7 +51,7 @@ static void ndpi_search_source_engine(struct ndpi_detection_module_struct *ndpi_
   /* https://developer.valvesoftware.com/wiki/Server_queries */
 
   /* A2S request */
-  if (current_pkt_from_client_to_server(ndpi_struct, flow) &&
+  if (current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
       (packet->payload_packet_len > 8 && packet->payload_packet_len < 30) &&
       get_u_int32_t(packet->payload, 0) == 0xFFFFFFFF)
   {
@@ -65,7 +65,7 @@ static void ndpi_search_source_engine(struct ndpi_detection_module_struct *ndpi_
   }
 
   /* A2S response */
-  if (current_pkt_from_server_to_client(ndpi_struct, flow))
+  if (current_pkt_from_server_to_client(ndpi_struct, &flow->core))
   {
     /* Challenge response */
     if (packet->payload_packet_len == 9 && 

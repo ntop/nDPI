@@ -44,11 +44,11 @@ static void ndpi_search_whois_das(struct ndpi_detection_module_struct *ndpi_stru
         */
        ndpi_is_valid_hostname((char * const)&packet->payload[0], packet->payload_packet_len - 2)) {
 
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WHOIS_DAS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_WHOIS_DAS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
       if((dport == 43) || (dport == 4343)) { /* Request */
-        ndpi_hostname_sni_set(flow, &packet->payload[0], packet->payload_packet_len - 2, NDPI_HOSTNAME_NORM_ALL); /* Skip \r\n */
-        NDPI_LOG_INFO(ndpi_struct, "[WHOIS/DAS] %s\n", flow->host_server_name);
+        ndpi_hostname_sni_set(&flow->core, &packet->payload[0], packet->payload_packet_len - 2, NDPI_HOSTNAME_NORM_ALL); /* Skip \r\n */
+        NDPI_LOG_INFO(ndpi_struct, "[WHOIS/DAS] %s\n", flow->core.host_server_name);
       }
       return;
     }

@@ -33,7 +33,7 @@
 static void ndpi_int_teamview_add_connection(struct ndpi_detection_module_struct
                                              *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TEAMVIEWER, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TEAMVIEWER, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   NDPI_LOG_INFO(ndpi_struct, "found teamwiewer\n");
 }
 
@@ -47,11 +47,11 @@ static void ndpi_search_teamview(struct ndpi_detection_module_struct *ndpi_struc
   if (packet->udp != NULL) {
     if (packet->payload_packet_len > 13) {
       if (packet->payload[0] == 0x00 && packet->payload[11] == 0x17 && packet->payload[12] == 0x24) { /* byte 0 is a counter/seq number, and at the start is 0 */
-	flow->teamviewer_stage++;
-	if (flow->teamviewer_stage == 4 ||
+	flow->metadata.teamviewer_stage++;
+	if (flow->metadata.teamviewer_stage == 4 ||
 	    packet->udp->dest == ntohs(5938) || packet->udp->source == ntohs(5938)) {
 	  ndpi_int_teamview_add_connection(ndpi_struct, flow);
-	  ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found TeamViewer"); /* Remote assistance (UDP only) */
+	  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found TeamViewer"); /* Remote assistance (UDP only) */
 	}
 	return;
       }
@@ -60,17 +60,17 @@ static void ndpi_search_teamview(struct ndpi_detection_module_struct *ndpi_struc
   else if(packet->tcp != NULL) {
     if (packet->payload_packet_len > 2) {
       if (packet->payload[0] == 0x17 && packet->payload[1] == 0x24) {
-	flow->teamviewer_stage++;
-	if (flow->teamviewer_stage == 4 ||
+	flow->metadata.teamviewer_stage++;
+	if (flow->metadata.teamviewer_stage == 4 ||
 	    packet->tcp->dest == ntohs(5938) || packet->tcp->source == ntohs(5938)) {
 	  ndpi_int_teamview_add_connection(ndpi_struct, flow);
 	}
 	return;
       }
-      else if (flow->teamviewer_stage) {
+      else if (flow->metadata.teamviewer_stage) {
 	if (packet->payload[0] == 0x11 && packet->payload[1] == 0x30) {
-	  flow->teamviewer_stage++;
-	  if (flow->teamviewer_stage == 4) {
+	  flow->metadata.teamviewer_stage++;
+	  if (flow->metadata.teamviewer_stage == 4) {
 	    ndpi_int_teamview_add_connection(ndpi_struct, flow);
 	  }
 	}

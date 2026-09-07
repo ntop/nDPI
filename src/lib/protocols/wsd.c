@@ -46,7 +46,7 @@ static void ndpi_search_wsd(struct ndpi_detection_module_struct *ndpi_struct,
      && (strncmp((char*)packet->payload, "<?xml", 5) == 0)
      ) {
     NDPI_LOG_INFO(ndpi_struct,"found wsd\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_WSD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_WSD, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   } else {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }

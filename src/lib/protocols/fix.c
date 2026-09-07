@@ -43,7 +43,7 @@ static void ndpi_search_fix(struct ndpi_detection_module_struct *ndpi_struct, st
 	 packet->payload[4] == 0x58) {
 	
 	NDPI_LOG_INFO(ndpi_struct, "found FIX\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_FIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_FIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
       // 0. 9=
@@ -53,7 +53,7 @@ static void ndpi_search_fix(struct ndpi_detection_module_struct *ndpi_struct, st
 	 packet->payload[5] == 0x3d) {
 
 	NDPI_LOG_INFO(ndpi_struct, "found FIX\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_FIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_FIX, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }

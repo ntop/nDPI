@@ -31,7 +31,7 @@
 
 static void ndpi_dofus_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DOFUS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_DOFUS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   NDPI_LOG_INFO(ndpi_struct, "found dofus\n");
 }
 
@@ -42,7 +42,7 @@ static void ndpi_search_dofus(struct ndpi_detection_module_struct *ndpi_struct, 
   NDPI_LOG_DBG(ndpi_struct, "search dofus\n");
 
   /* Dofus 3 */
-  if(ntohs(flow->c_port) == 5555 || ntohs(flow->s_port) == 5555) {
+  if(ntohs(flow->core.c_port) == 5555 || ntohs(flow->core.s_port) == 5555) {
     if(packet->payload_packet_len > 3 &&
        packet->payload[0] + 1 == packet->payload_packet_len &&
        packet->payload[1] == 0x0a &&

@@ -29,7 +29,7 @@ static void ndpi_int_merakicloud_add_connection(struct ndpi_detection_module_str
                                                 struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found MerakiCloud\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MERAKI_CLOUD,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_MERAKI_CLOUD,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -40,7 +40,7 @@ static void ndpi_search_merakicloud(struct ndpi_detection_module_struct *ndpi_st
 
   NDPI_LOG_DBG(ndpi_struct, "search MerakiCloud\n");
 
-  if((flow->c_port == ntohs(7351) || flow->s_port == ntohs(7351)) &&
+  if((flow->core.c_port == ntohs(7351) || flow->core.s_port == ntohs(7351)) &&
      packet->payload_packet_len > 4 &&
      get_u_int32_t(packet->payload, 0) == ntohl(0xfef72891)) {
     ndpi_int_merakicloud_add_connection(ndpi_struct, flow);

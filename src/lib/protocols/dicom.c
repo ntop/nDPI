@@ -47,7 +47,7 @@ static void ndpi_search_dicom(struct ndpi_detection_module_struct *ndpi_struct,
        && (packet->payload[6] == 0x0) && (packet->payload[7] == 0x1) /* Protocol Version */
        && (packet->payload[8] == 0x0) && (packet->payload[9] == 0x0) /* Pad */       
        ) {
-      ndpi_set_detected_protocol(ndpi_struct, flow,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core,
 				 NDPI_PROTOCOL_DICOM,
 				 NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     } else

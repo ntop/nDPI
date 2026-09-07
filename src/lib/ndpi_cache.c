@@ -485,7 +485,8 @@ bool ndpi_cache_address(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_struct->address_cache = ndpi_init_address_cache(ndpi_struct->cfg.address_cache_size);
 
   if(ndpi_struct->address_cache)
-    return(ndpi_address_cache_insert(ndpi_struct->address_cache, ip_addr, hostname, epoch_now, ttl));
+    return(ndpi_address_cache_insert(ndpi_struct->address_cache, ip_addr,
+				     hostname, epoch_now, ttl));
   else
     return(false);
 }

@@ -57,39 +57,39 @@ static void ndpi_search_mikrotik(struct ndpi_detection_module_struct *ndpi_struc
 	  switch(m_type) {
 	  case 1 /* MAC Address */:
 	    if(m_len == 6)
-	      memcpy(flow->protos.mikrotik.mac_addr, &payload[offset+4], m_len);
+	      memcpy(flow->metadata.protos.mikrotik.mac_addr, &payload[offset+4], m_len);
 	    break;
 	  case 5 /* Identity */:
-	    snprintf(flow->protos.mikrotik.identity, sizeof(flow->protos.mikrotik.identity), 
+	    snprintf(flow->metadata.protos.mikrotik.identity, sizeof(flow->metadata.protos.mikrotik.identity), 
 		     "%.*s", m_len, &payload[offset+4]);
 	    break;
 	  case 7 /* Version */:
-	    snprintf(flow->protos.mikrotik.version, sizeof(flow->protos.mikrotik.version), 
+	    snprintf(flow->metadata.protos.mikrotik.version, sizeof(flow->metadata.protos.mikrotik.version), 
 		     "%.*s", m_len, &payload[offset+4]);
 	    break;
 	  case 10: /* Uptime */
 	    if(m_len == 4)
-	      flow->protos.mikrotik.uptime = ntohl(*((u_int32_t*)&payload[offset+4]));
+	      flow->metadata.protos.mikrotik.uptime = ntohl(*((u_int32_t*)&payload[offset+4]));
 	    break;
 	  case 11: /* Software-ID */
-	    snprintf(flow->protos.mikrotik.sw_id, sizeof(flow->protos.mikrotik.sw_id), 
+	    snprintf(flow->metadata.protos.mikrotik.sw_id, sizeof(flow->metadata.protos.mikrotik.sw_id), 
 		     "%.*s", m_len, &payload[offset+4]);
 	    break;
 	  case 12: /* Board */
-	    snprintf(flow->protos.mikrotik.board, sizeof(flow->protos.mikrotik.board), 
+	    snprintf(flow->metadata.protos.mikrotik.board, sizeof(flow->metadata.protos.mikrotik.board), 
 		     "%.*s", m_len, &payload[offset+4]);
 	    break;
 	  case 15: /* IPv6 */
 	    if(m_len == 16)
-	      memcpy(&flow->protos.mikrotik.ipv6_addr, &payload[offset+4], m_len);
+	      memcpy(&flow->metadata.protos.mikrotik.ipv6_addr, &payload[offset+4], m_len);
 	    break;
 	  case 16: /* Interface Name */
-	    snprintf(flow->protos.mikrotik.iface_name, sizeof(flow->protos.mikrotik.iface_name), 
+	    snprintf(flow->metadata.protos.mikrotik.iface_name, sizeof(flow->metadata.protos.mikrotik.iface_name), 
 		     "%.*s", m_len, &payload[offset+4]);
 	    break;
 	  case 14: /* IPv4 */
 	    if(m_len == 4)
-	      flow->protos.mikrotik.ipv4_addr = ntohl(*((u_int32_t*)&payload[offset+4]));
+	      flow->metadata.protos.mikrotik.ipv4_addr = ntohl(*((u_int32_t*)&payload[offset+4]));
 	    break;
 	  }
       
@@ -98,7 +98,7 @@ static void ndpi_search_mikrotik(struct ndpi_detection_module_struct *ndpi_struc
 	  break;
       } /* while */
     
-      ndpi_set_detected_protocol(ndpi_struct, flow,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core,
 				 NDPI_PROTOCOL_MIKROTIK,
 				 NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     }

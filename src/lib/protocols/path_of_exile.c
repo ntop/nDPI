@@ -43,7 +43,7 @@ static void ndpi_search_pathofexile(struct ndpi_detection_module_struct *ndpi_st
         ntohl(get_u_int32_t(packet->payload, 14)) == 0x40)
     {
       NDPI_LOG_INFO(ndpi_struct, "found Path of Exile 2\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PATHOFEXILE, NDPI_PROTOCOL_UNKNOWN,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_PATHOFEXILE, NDPI_PROTOCOL_UNKNOWN,
                                  NDPI_CONFIDENCE_DPI);
       return;
     }
@@ -61,7 +61,7 @@ static void ndpi_search_pathofexile(struct ndpi_detection_module_struct *ndpi_st
         ntohl(get_u_int32_t(packet->payload, packet->payload_packet_len-4)) == 0x40000001)
     {
       NDPI_LOG_INFO(ndpi_struct, "found Path of Exile\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_PATHOFEXILE, NDPI_PROTOCOL_UNKNOWN,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_PATHOFEXILE, NDPI_PROTOCOL_UNKNOWN,
                                  NDPI_CONFIDENCE_DPI);
     }
   }

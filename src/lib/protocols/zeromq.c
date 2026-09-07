@@ -34,7 +34,7 @@ static void ndpi_search_zmq(struct ndpi_detection_module_struct *ndpi_struct, st
 
   if (packet->payload_packet_len > 9) {
     if (memcmp(packet->payload, zmtp_signature, sizeof(zmtp_signature)) == 0) {
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ZMQ,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_ZMQ,
                                  NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       NDPI_LOG_INFO(ndpi_struct, "found ZMQ\n");
       return;

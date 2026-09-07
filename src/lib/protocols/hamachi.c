@@ -35,7 +35,7 @@ static void ndpi_int_hamachi_add_connection(struct ndpi_detection_module_struct 
                                             struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found Hamachi\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HAMACHI,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_HAMACHI,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -65,7 +65,7 @@ static void search_hamachi_udp(struct ndpi_detection_module_struct* ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search Hamachi over UDP\n");
 
   /* Skip initial 76-byte handshake (relay mode only) */
-  if (flow->packet_counter <= 2 && packet->payload_packet_len == 76)
+  if (flow->core.packet_counter <= 2 && packet->payload_packet_len == 76)
   {
     if (get_u_int64_t(packet->payload, 0) != 0 ||
         get_u_int64_t(packet->payload, 68) != 0)
@@ -107,20 +107,20 @@ static void search_hamachi_udp(struct ndpi_detection_module_struct* ndpi_struct,
    * We need to verify consistency within each direction and collect samples from both.
    */
 
-  if (flow->l4.udp.hamachi_stage == 0) {
+  if (flow->metadata.l4.udp.hamachi_stage == 0) {
     /* Store signature values from first packet and set stage based on direction */
-    flow->l4.udp.hamachi_long[dir] = hamachi_l;
-    flow->l4.udp.hamachi_short[dir] = hamachi_s;
-    flow->l4.udp.hamachi_stage = dir ? 2 : 1; /* Stage 1 for dir=0, stage 2 for dir=1 */
+    flow->metadata.l4.udp.hamachi_long[dir] = hamachi_l;
+    flow->metadata.l4.udp.hamachi_short[dir] = hamachi_s;
+    flow->metadata.l4.udp.hamachi_stage = dir ? 2 : 1; /* Stage 1 for dir=0, stage 2 for dir=1 */
     return;
   }
 
-  if (flow->l4.udp.hamachi_stage == 1 || flow->l4.udp.hamachi_stage == 2) {
-    u_int8_t stored_dir = flow->l4.udp.hamachi_stage - 1;
+  if (flow->metadata.l4.udp.hamachi_stage == 1 || flow->metadata.l4.udp.hamachi_stage == 2) {
+    u_int8_t stored_dir = flow->metadata.l4.udp.hamachi_stage - 1;
     /* Current packet is same direction - verify */
     if (dir == stored_dir) {
-      if (hamachi_l != flow->l4.udp.hamachi_long[dir] ||
-          hamachi_s != flow->l4.udp.hamachi_short[dir])
+      if (hamachi_l != flow->metadata.l4.udp.hamachi_long[dir] ||
+          hamachi_s != flow->metadata.l4.udp.hamachi_short[dir])
       {
         goto exclude_hamachi;
       }
@@ -128,22 +128,22 @@ static void search_hamachi_udp(struct ndpi_detection_module_struct* ndpi_struct,
     }
 
     /* Opposite direction - verify signatures differ */
-    if (hamachi_l == flow->l4.udp.hamachi_long[stored_dir] ||
-       hamachi_s == flow->l4.udp.hamachi_short[stored_dir])
+    if (hamachi_l == flow->metadata.l4.udp.hamachi_long[stored_dir] ||
+       hamachi_s == flow->metadata.l4.udp.hamachi_short[stored_dir])
     {
       goto exclude_hamachi;
     }
 
-    flow->l4.udp.hamachi_long[dir] = hamachi_l;
-    flow->l4.udp.hamachi_short[dir] = hamachi_s;
-    flow->l4.udp.hamachi_stage = 3;
+    flow->metadata.l4.udp.hamachi_long[dir] = hamachi_l;
+    flow->metadata.l4.udp.hamachi_short[dir] = hamachi_s;
+    flow->metadata.l4.udp.hamachi_stage = 3;
     return;
   }
 
-  if (flow->l4.udp.hamachi_stage == 3) {
+  if (flow->metadata.l4.udp.hamachi_stage == 3) {
     /* Final consistency check */
-    if (hamachi_l != flow->l4.udp.hamachi_long[dir] ||
-        hamachi_s != flow->l4.udp.hamachi_short[dir])
+    if (hamachi_l != flow->metadata.l4.udp.hamachi_long[dir] ||
+        hamachi_s != flow->metadata.l4.udp.hamachi_short[dir])
     {
       goto exclude_hamachi;
     }
@@ -158,7 +158,7 @@ exclude_hamachi:
 
 static void ndpi_search_hamachi(struct ndpi_detection_module_struct* ndpi_struct, struct ndpi_flow_struct* flow)
 {
-  if(flow->l4_proto == IPPROTO_TCP)
+  if(flow->core.l4_proto == IPPROTO_TCP)
     search_hamachi_tcp(ndpi_struct, flow);
   else
     search_hamachi_udp(ndpi_struct, flow);

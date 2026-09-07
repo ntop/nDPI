@@ -48,7 +48,7 @@ static void ndpi_search_bfcp(struct ndpi_detection_module_struct *ndpi_struct,
   /* RFC4582: 1
      RFC8855: 1 on TCP, 2 on UDP */
   if (!(version == 1 ||
-        (version == 2 && flow->l4_proto == IPPROTO_UDP))) {
+        (version == 2 && flow->core.l4_proto == IPPROTO_UDP))) {
     goto not_bfcp;
   }
   if (reserved != 0) {
@@ -66,11 +66,11 @@ static void ndpi_search_bfcp(struct ndpi_detection_module_struct *ndpi_struct,
   }
 
   NDPI_LOG_INFO(ndpi_struct, "found BFCP\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_BFCP,
-                                               NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_BFCP,
+			     NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
-  flow->protos.bfcp.conference_id = ntohl(get_u_int32_t(packet->payload, 4));
-  flow->protos.bfcp.user_id = ntohs(get_u_int16_t(packet->payload, 10));
+  flow->metadata.protos.bfcp.conference_id = ntohl(get_u_int32_t(packet->payload, 4));
+  flow->metadata.protos.bfcp.user_id = ntohs(get_u_int16_t(packet->payload, 10));
   return;
 
 not_bfcp:

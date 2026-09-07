@@ -40,8 +40,8 @@ extern int ndpi_tls_obfuscated_heur_search_again(struct ndpi_detection_module_st
 static void ndpi_int_rdp_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 					struct ndpi_flow_struct *flow) {
   NDPI_LOG_INFO(ndpi_struct, "found RDP\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RDP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-  ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found RDP"); /* Remote assistance */
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_RDP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found RDP"); /* Remote assistance */
 }
 
 /* **************************************** */
@@ -77,7 +77,7 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
        /* COTP */
        packet->payload[4] == packet->payload_packet_len - 5) {
 
-      if(current_pkt_from_client_to_server(ndpi_struct, flow)) {
+      if(current_pkt_from_client_to_server(ndpi_struct, &flow->core)) {
         if(packet->payload[5] == 0xE0 && /* COTP CR */
 	   ((packet->payload[11] == 0x01 && /* RDP Negotiation Request */
              packet->payload[13] == 0x08 /* RDP Length */) ||
@@ -89,16 +89,16 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 	    /* Check if TLS support has been requested in RDP */
 	    if((rdp_requested_proto & 0x1) == 0x1) {
 	      /* RDP Response + Client Hello + Server hello */
-	      flow->max_extra_packets_to_check = 5;
-	      flow->tls_quic.from_rdp = 1;
-	      flow->extra_packets_func = ndpi_search_tls_over_rdp;
+	      flow->core.max_extra_packets_to_check = 5;
+	      flow->metadata.tls_quic.from_rdp = 1;
+	      flow->core.extra_packets_func = ndpi_search_tls_over_rdp;
 	    }
 	  }
 
-	  if((flow->num_processed_pkts > 4) || flow->tls_quic.from_rdp)
+	  if((flow->core.num_processed_pkts > 4) || flow->metadata.tls_quic.from_rdp)
 	    ndpi_int_rdp_add_connection(ndpi_struct, flow);
 	  else
-	    flow->l4.tcp.rdp_protocol_detected = 1 /* this looks like RDP */;
+	    flow->metadata.l4.tcp.rdp_protocol_detected = 1 /* this looks like RDP */;
           return;
 	}
       } else {
@@ -113,9 +113,9 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
       }
     }
 
-    if( flow->l4.tcp.rdp_protocol_detected) {
+    if( flow->metadata.l4.tcp.rdp_protocol_detected) {
       /* Do not promote an RDP-like request when the server clearly speaks HTTP. */
-      if(!current_pkt_from_client_to_server(ndpi_struct, flow) &&
+      if(!current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
          ntohs(packet->tcp->source) != RDP_PORT &&
          ntohs(packet->tcp->dest) != RDP_PORT &&
          packet->payload_packet_len >= 5 &&
@@ -128,7 +128,7 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_int_rdp_add_connection(ndpi_struct, flow);
 
       if(!verified)
-	ndpi_set_risk(ndpi_struct, flow, NDPI_PROBING_ATTEMPT, "Mismatching client/server protocol");
+	ndpi_set_risk(ndpi_struct, &flow->core, NDPI_PROBING_ATTEMPT, "Mismatching client/server protocol");
       
       return;
     }
@@ -145,8 +145,8 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
     if((packet->payload_packet_len >= 10) && ((s_port == RDP_PORT) || (d_port == RDP_PORT))) {
       if(s_port == RDP_PORT) {
 	/* Server -> Client */
-	if(flow->l4.udp.rdp_from_srv_pkts == 0) {
-	  if(memcmp(packet->payload, flow->l4.udp.rdp_from_srv, 3) == 0 &&
+	if(flow->metadata.l4.udp.rdp_from_srv_pkts == 0) {
+	  if(memcmp(packet->payload, flow->metadata.l4.udp.rdp_from_srv, 3) == 0 &&
 	     packet->payload_packet_len >= 16 &&
 	     (ntohs(get_u_int16_t(packet->payload, 6)) & 0x0003) && /* Flags: syn-ack */
 	     ntohs(get_u_int16_t(packet->payload, 12)) <= 1600 && /* Sensible values for upstream MTU */
@@ -157,15 +157,15 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 	    return;
 	  } else {
 	    /* Mid-flow session? */
-	    memcpy(flow->l4.udp.rdp_from_srv, packet->payload, 3), flow->l4.udp.rdp_from_srv_pkts = 1;
+	    memcpy(flow->metadata.l4.udp.rdp_from_srv, packet->payload, 3), flow->metadata.l4.udp.rdp_from_srv_pkts = 1;
 	  }
 	} else {
-	  if(memcmp(flow->l4.udp.rdp_from_srv, packet->payload, 3) != 0)
+	  if(memcmp(flow->metadata.l4.udp.rdp_from_srv, packet->payload, 3) != 0)
 	    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 	  else {
-	    flow->l4.udp.rdp_from_srv_pkts = 2 /* stage 2 */;
+	    flow->metadata.l4.udp.rdp_from_srv_pkts = 2 /* stage 2 */;
 
-	    if(flow->l4.udp.rdp_to_srv_pkts == 2) {
+	    if(flow->metadata.l4.udp.rdp_to_srv_pkts == 2) {
 	      ndpi_int_rdp_add_connection(ndpi_struct, flow);
 	      return;
 	    }
@@ -173,25 +173,25 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       } else {
 	/* Client -> Server */
-	if(flow->l4.udp.rdp_to_srv_pkts == 0) {
+	if(flow->metadata.l4.udp.rdp_to_srv_pkts == 0) {
 	  if(get_u_int32_t(packet->payload, 0) == 0xFFFFFFFF &&
 	     packet->payload_packet_len >= 16 &&
 	     (ntohs(get_u_int16_t(packet->payload, 6)) & 0x0001) && /* Flags: syn */
 	     ntohs(get_u_int16_t(packet->payload, 12)) <= 1600 && /* Sensible values for upstream MTU */
 	     ntohs(get_u_int16_t(packet->payload, 14)) <= 1600) { /* Sensible values for downstream MTU */
 	    /* Initial "syn" */
-	    memcpy(flow->l4.udp.rdp_from_srv, packet->payload + 8, 3);
+	    memcpy(flow->metadata.l4.udp.rdp_from_srv, packet->payload + 8, 3);
 	  } else {
 	    /* Mid-flow session? */
-	    memcpy(flow->l4.udp.rdp_to_srv, packet->payload, 3), flow->l4.udp.rdp_to_srv_pkts = 1;
+	    memcpy(flow->metadata.l4.udp.rdp_to_srv, packet->payload, 3), flow->metadata.l4.udp.rdp_to_srv_pkts = 1;
 	  }
 	} else {
-	  if(memcmp(flow->l4.udp.rdp_to_srv, packet->payload, 3) != 0)
+	  if(memcmp(flow->metadata.l4.udp.rdp_to_srv, packet->payload, 3) != 0)
 	    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 	  else {
-	    flow->l4.udp.rdp_to_srv_pkts = 2 /* stage 2 */;
+	    flow->metadata.l4.udp.rdp_to_srv_pkts = 2 /* stage 2 */;
 	    
-	    if(flow->l4.udp.rdp_from_srv_pkts == 2) {
+	    if(flow->metadata.l4.udp.rdp_from_srv_pkts == 2) {
 	      ndpi_int_rdp_add_connection(ndpi_struct, flow);
               return;
 	    }

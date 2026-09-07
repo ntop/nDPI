@@ -54,38 +54,38 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
   if(!packet->payload || packet->payload_packet_len == 0 || packet->payload[0] == 0xFF)
     return 1;
 
-  if(flow->protos.telnet.username_detected) {
+  if(flow->metadata.protos.telnet.username_detected) {
     /* Phase 3-4: collecting password */
-    if(!flow->protos.telnet.password_found) {
+    if(!flow->metadata.protos.telnet.password_found) {
       if(packet->payload_packet_len > 9 &&
          strncasecmp((char *)packet->payload, "password:", 9) == 0)
-        flow->protos.telnet.password_found = 1;
+        flow->metadata.protos.telnet.password_found = 1;
       return 1;
     }
 
     if(packet->payload[0] == '\r' || packet->payload[0] == '\n') {
-      if(!flow->protos.telnet.password_found)
+      if(!flow->metadata.protos.telnet.password_found)
         return 1;
-      flow->protos.telnet.password_detected = 1;
-      ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
-      flow->protos.telnet.password[flow->protos.telnet.character_id] = '\0';
+      flow->metadata.protos.telnet.password_detected = 1;
+      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
+      flow->metadata.protos.telnet.password[flow->metadata.protos.telnet.character_id] = '\0';
       return 0;
     }
 
     if(packet->packet_direction == 0) {
       for(i = 0; i < packet->payload_packet_len; i++) {
-        if(flow->protos.telnet.character_id < (int)(sizeof(flow->protos.telnet.password) - 1))
-          flow->protos.telnet.password[flow->protos.telnet.character_id++] = packet->payload[i];
+        if(flow->metadata.protos.telnet.character_id < (int)(sizeof(flow->metadata.protos.telnet.password) - 1))
+          flow->metadata.protos.telnet.password[flow->metadata.protos.telnet.character_id++] = packet->payload[i];
       }
     }
     return 1;
   }
 
   /* Phase 1: waiting for the "login:" prompt */
-  if(!flow->protos.telnet.username_found) {
+  if(!flow->metadata.protos.telnet.username_found) {
     if(packet->payload_packet_len > 6 &&
        strncasecmp((char *)packet->payload, "login:", 6) == 0)
-      flow->protos.telnet.username_found = 1;
+      flow->metadata.protos.telnet.username_found = 1;
     return 1;
   }
 
@@ -93,24 +93,24 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->payload[0] == '\r' || packet->payload[0] == '\n') {
     char buf[64];
 
-    flow->protos.telnet.username_detected = 1;
-    flow->protos.telnet.username[flow->protos.telnet.character_id] = '\0';
-    flow->protos.telnet.character_id = 0;
+    flow->metadata.protos.telnet.username_detected = 1;
+    flow->metadata.protos.telnet.username[flow->metadata.protos.telnet.character_id] = '\0';
+    flow->metadata.protos.telnet.character_id = 0;
 
     snprintf(buf, sizeof(buf), "Found Telnet username (%s)",
-             flow->protos.telnet.username);
-    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
+             flow->metadata.protos.telnet.username);
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
     return 1;
   }
 
   if(packet->packet_direction == 0) {
     for(i = 0; i < packet->payload_packet_len; i++) {
-      if(flow->protos.telnet.character_id < (int)(sizeof(flow->protos.telnet.username) - 1)) {
+      if(flow->metadata.protos.telnet.character_id < (int)(sizeof(flow->metadata.protos.telnet.username) - 1)) {
         /* Skip trailing CR/LF; replace non-printable chars with '?' */
         if(i >= packet->payload_packet_len - 2 &&
            (packet->payload[i] == '\r' || packet->payload[i] == '\n'))
           continue;
-        flow->protos.telnet.username[flow->protos.telnet.character_id++] =
+        flow->metadata.protos.telnet.username[flow->metadata.protos.telnet.character_id++] =
           ndpi_isprint(packet->payload[i]) ? packet->payload[i] : '?';
       }
     }
@@ -123,9 +123,9 @@ static int search_telnet_again(struct ndpi_detection_module_struct *ndpi_struct,
 
 static void telnet_set_detected(struct ndpi_detection_module_struct *ndpi_struct,
                                 struct ndpi_flow_struct *flow) {
-  flow->max_extra_packets_to_check = 64;
-  flow->extra_packets_func = search_telnet_again;
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  flow->core.max_extra_packets_to_check = 64;
+  flow->core.extra_packets_func = search_telnet_again;
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_TELNET, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }

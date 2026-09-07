@@ -54,7 +54,7 @@ static void smtp_set_detected(struct ndpi_detection_module_struct *ndpi_struct,
 #ifdef SMTP_DEBUG
   printf("**** %s()\n", __FUNCTION__);
 #endif
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_MAIL_SMTP, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }
@@ -93,19 +93,19 @@ static void smtp_extract_auth_plain_credentials(struct ndpi_detection_module_str
   if(user_len > 0) {
     char msg[64];
 
-    user_len = ndpi_min(user_len, sizeof(flow->l4.tcp.ftp_imap_pop_smtp.username) - 1);
-    memcpy(flow->l4.tcp.ftp_imap_pop_smtp.username, decoded + 1, user_len);
-    flow->l4.tcp.ftp_imap_pop_smtp.username[user_len] = '\0';
+    user_len = ndpi_min(user_len, sizeof(flow->metadata.l4.tcp.ftp_imap_pop_smtp.username) - 1);
+    memcpy(flow->metadata.l4.tcp.ftp_imap_pop_smtp.username, decoded + 1, user_len);
+    flow->metadata.l4.tcp.ftp_imap_pop_smtp.username[user_len] = '\0';
 
     snprintf(msg, sizeof(msg), "Found username (%s)",
-             flow->l4.tcp.ftp_imap_pop_smtp.username);
-    ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
+             flow->metadata.l4.tcp.ftp_imap_pop_smtp.username);
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
 
     if(1 + user_len + 1 < decoded_len) {
       unsigned int pwd_len = ndpi_min(decoded_len - (1 + user_len + 1),
-                                      sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password) - 1);
-      memcpy(flow->l4.tcp.ftp_imap_pop_smtp.password, decoded + 1 + user_len + 1, pwd_len);
-      flow->l4.tcp.ftp_imap_pop_smtp.password[pwd_len] = '\0';
+                                      sizeof(flow->metadata.l4.tcp.ftp_imap_pop_smtp.password) - 1);
+      memcpy(flow->metadata.l4.tcp.ftp_imap_pop_smtp.password, decoded + 1 + user_len + 1, pwd_len);
+      flow->metadata.l4.tcp.ftp_imap_pop_smtp.password[pwd_len] = '\0';
     }
   }
 
@@ -140,34 +140,35 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
     /* --- Server response codes (3 chars minimum) --- */
     if(len >= 3) {
       if(memcmp(ptr, "220", 3) == 0) {
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_220;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_220;
 
         /* Extract server hostname from the banner "220 hostname ..." */
-        if(flow->host_server_name[0] == '\0' && len > 4 && ptr[4] != '(') {
+        if(flow->core.host_server_name[0] == '\0' && len > 4 && ptr[4] != '(') {
           int i;
           for(i = 5; i < len - 1 && ptr[i] != ' '; i++)
             ;
           if(ptr[i + 1] != '\r' && ptr[i + 1] != '\n') {
             unsigned int hlen = i - 4;
-            ndpi_hostname_sni_set(flow, &ptr[4], hlen, NDPI_HOSTNAME_NORM_ALL);
-            NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname [%s]\n", flow->host_server_name);
+	    
+            ndpi_hostname_sni_set(&flow->core, &ptr[4], hlen, NDPI_HOSTNAME_NORM_ALL);
+            NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname [%s]\n", flow->core.host_server_name);
             ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
-                                         flow->host_server_name,
-                                         strlen(flow->host_server_name));
-            if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
+                                         flow->core.host_server_name,
+                                         strlen(flow->core.host_server_name));
+            if(flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
               NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname matched\n");
               smtpInitExtraPacketProcessing(flow);
             }
           }
         }
       } else if(memcmp(ptr, "250", 3) == 0) {
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_250;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_250;
       } else if(memcmp(ptr, "235", 3) == 0) {
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_235;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_235;
       } else if(memcmp(ptr, "334", 3) == 0) {
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_334;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_334;
       } else if(memcmp(ptr, "354", 3) == 0) {
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_354;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_354;
       }
     }
 
@@ -175,36 +176,36 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
     if(len >= 5) {
       if(ndpi_memcasecmp(ptr, "HELO ", 5) == 0 ||
          ndpi_memcasecmp(ptr, "EHLO ", 5) == 0) {
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_HELO_EHLO;
-        flow->l4.tcp.ftp_imap_pop_smtp.auth_found = 0;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_HELO_EHLO;
+        flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_found = 0;
       } else if(ndpi_memcasecmp(ptr, "MAIL ", 5) == 0) {
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_MAIL;
-        flow->l4.tcp.ftp_imap_pop_smtp.auth_found = 0;
-        flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_MAIL;
+        flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_found = 0;
+        flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
       } else if(ndpi_memcasecmp(ptr, "RCPT ", 5) == 0) {
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_RCPT;
-        flow->l4.tcp.ftp_imap_pop_smtp.auth_found = 0;
-        flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_RCPT;
+        flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_found = 0;
+        flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
       } else if(ndpi_memcasecmp(ptr, "AUTH ", 5) == 0) {
 #ifdef SMTP_DEBUG
         printf("%s() AUTH [%.*s]\n", __FUNCTION__, len, ptr);
 #endif
-        flow->l4.tcp.ftp_imap_pop_smtp.auth_found = 1;
+        flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_found = 1;
         if(len >= 6) {
           if(ptr[5] == 'L' || ptr[5] == 'l') {
-            flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH_LOGIN;
+            flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH_LOGIN;
           } else if(ptr[5] == 'P' || ptr[5] == 'p') {
-            flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH_PLAIN;
+            flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_AUTH_PLAIN;
             smtp_extract_auth_plain_credentials(ndpi_struct, flow, ptr, len);
-            flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
+            flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
           }
         }
       } else {
         /* Deferred AUTH LOGIN credential lines arrive without a command prefix */
         if(ptr[3] != ' ' &&
-           flow->l4.tcp.ftp_imap_pop_smtp.auth_found &&
-           (flow->l4.tcp.smtp_command_bitmask & SMTP_BIT_AUTH_LOGIN)) {
-          if(flow->l4.tcp.ftp_imap_pop_smtp.username[0] == '\0') {
+           flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_found &&
+           (flow->metadata.l4.tcp.smtp_command_bitmask & SMTP_BIT_AUTH_LOGIN)) {
+          if(flow->metadata.l4.tcp.ftp_imap_pop_smtp.username[0] == '\0') {
             u_int8_t buf[48];
             u_char *decoded;
             size_t decoded_len;
@@ -213,21 +214,21 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
             ndpi_user_pwd_payload_copy(buf, sizeof(buf), 0, ptr, len);
 #ifdef SMTP_DEBUG
             printf("%s() => [auth: %u] (username) [%s]\n", __FUNCTION__,
-                   flow->l4.tcp.ftp_imap_pop_smtp.auth_found, buf);
+                   flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_found, buf);
 #endif
             decoded = ndpi_base64_decode((const u_char *)buf,
                                          (size_t)strlen((const char *)buf), &decoded_len);
             if(decoded) {
               size_t ulen = ndpi_min(decoded_len,
-                                     sizeof(flow->l4.tcp.ftp_imap_pop_smtp.username) - 1);
-              memcpy(flow->l4.tcp.ftp_imap_pop_smtp.username, decoded, ulen);
-              flow->l4.tcp.ftp_imap_pop_smtp.username[ulen] = '\0';
+                                     sizeof(flow->metadata.l4.tcp.ftp_imap_pop_smtp.username) - 1);
+              memcpy(flow->metadata.l4.tcp.ftp_imap_pop_smtp.username, decoded, ulen);
+              flow->metadata.l4.tcp.ftp_imap_pop_smtp.username[ulen] = '\0';
               ndpi_free(decoded);
             }
             snprintf(msg, sizeof(msg), "Found SMTP username (%s)",
-                     flow->l4.tcp.ftp_imap_pop_smtp.username);
-            ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
-          } else if(flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') {
+                     flow->metadata.l4.tcp.ftp_imap_pop_smtp.username);
+            ndpi_set_risk(ndpi_struct, &flow->core, NDPI_CLEAR_TEXT_CREDENTIALS, msg);
+          } else if(flow->metadata.l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') {
             u_int8_t buf[48];
             u_char *decoded;
             size_t decoded_len;
@@ -235,21 +236,21 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
             ndpi_user_pwd_payload_copy(buf, sizeof(buf), 0, ptr, len);
 #ifdef SMTP_DEBUG
             printf("%s() => [auth: %u] (password) [%s]\n", __FUNCTION__,
-                   flow->l4.tcp.ftp_imap_pop_smtp.auth_found, buf);
+                   flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_found, buf);
 #endif
             decoded = ndpi_base64_decode((const u_char *)buf,
                                          (size_t)strlen((const char *)buf), &decoded_len);
             if(decoded) {
               size_t plen = ndpi_min(decoded_len,
-                                     sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password) - 1);
-              memcpy(flow->l4.tcp.ftp_imap_pop_smtp.password, decoded, plen);
-              flow->l4.tcp.ftp_imap_pop_smtp.password[plen] = '\0';
+                                     sizeof(flow->metadata.l4.tcp.ftp_imap_pop_smtp.password) - 1);
+              memcpy(flow->metadata.l4.tcp.ftp_imap_pop_smtp.password, decoded, plen);
+              flow->metadata.l4.tcp.ftp_imap_pop_smtp.password[plen] = '\0';
               ndpi_free(decoded);
             }
-            ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
-            flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
+            ndpi_set_risk(ndpi_struct, &flow->core, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
+            flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
           } else {
-            flow->host_server_name[0] = '\0';
+            flow->core.host_server_name[0] = '\0';
             NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
           }
@@ -259,30 +260,30 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
 
     /* --- STARTTLS / X-AnonymousTLS --- */
     if(len >= 8 && ndpi_memcasecmp(ptr, "STARTTLS", 8) == 0) {
-      flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
-      flow->l4.tcp.ftp_imap_pop_smtp.auth_tls = 1;
-      flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 0;
+      flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
+      flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_tls = 1;
+      flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_done = 0;
     }
     if(len >= 14 && ndpi_memcasecmp(ptr, "X-AnonymousTLS", 14) == 0) {
-      flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
-      flow->l4.tcp.ftp_imap_pop_smtp.auth_tls = 1;
-      flow->l4.tcp.ftp_imap_pop_smtp.auth_done = 0;
+      flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_STARTTLS;
+      flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_tls = 1;
+      flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_done = 0;
     }
 
     /* --- Short 4-letter commands --- */
     if(len >= 4) {
       if(ndpi_memcasecmp(ptr, "DATA", 4) == 0)
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_DATA;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_DATA;
       else if(ndpi_memcasecmp(ptr, "NOOP", 4) == 0)
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_NOOP;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_NOOP;
       else if(ndpi_memcasecmp(ptr, "RSET", 4) == 0)
-        flow->l4.tcp.smtp_command_bitmask |= SMTP_BIT_RSET;
+        flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_RSET;
     }
   }
 
   /* Count distinct tokens observed so far */
-  if(flow->l4.tcp.smtp_command_bitmask != 0) {
-    u_int16_t mask = flow->l4.tcp.smtp_command_bitmask;
+  if(flow->metadata.l4.tcp.smtp_command_bitmask != 0) {
+    u_int16_t mask = flow->metadata.l4.tcp.smtp_command_bitmask;
     while(mask) {
       bit_count += mask & 1;
       mask >>= 1;
@@ -295,22 +296,22 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
     NDPI_LOG_INFO(ndpi_struct, "mail smtp identified\n");
 #ifdef SMTP_DEBUG
     printf("%s() [bit_count: %u][%s]\n", __FUNCTION__,
-           bit_count, flow->l4.tcp.ftp_imap_pop_smtp.password);
+           bit_count, flow->metadata.l4.tcp.ftp_imap_pop_smtp.password);
 #endif
-    if(flow->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN &&
-       flow->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
+    if(flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN &&
+       flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
       smtp_set_detected(ndpi_struct, flow);
       smtpInitExtraPacketProcessing(flow);
     }
     return;
   }
 
-  if(bit_count >= 1 && flow->packet_counter < 12)
+  if(bit_count >= 1 && flow->core.packet_counter < 12)
     return;
 
  smtp_maybe_early:
   /* Tolerate the first few packets even without a proper CRLF terminator */
-  if(flow->packet_counter <= 4 &&
+  if(flow->core.packet_counter <= 4 &&
      packet->payload_packet_len >= 4 &&
      (ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a ||
       memcmp(packet->payload, "220", 3) == 0 ||
@@ -320,7 +321,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
   }
 
  smtp_exclude:
-  if((!flow->extra_packets_func) || (flow->packet_counter > 12))
+  if((!flow->core.extra_packets_func) || (flow->core.packet_counter > 12))
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 
@@ -331,7 +332,7 @@ int ndpi_extra_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_st
   struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
   int rc;
 
-  if(flow->l4.tcp.smtp_command_bitmask & SMTP_BIT_STARTTLS) {
+  if(flow->metadata.l4.tcp.smtp_command_bitmask & SMTP_BIT_STARTTLS) {
     /*
      * RFC 3207: after STARTTLS the server replies with:
      *   220  Ready to start TLS
@@ -341,28 +342,28 @@ int ndpi_extra_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_st
     if(ndpi_struct->cfg.smtp_opportunistic_tls_enabled &&
        packet->payload_packet_len > 3 && memcmp(packet->payload, "220", 3) == 0) {
       rc = 1;
-      if(flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN &&
-         flow->detected_protocol_stack[0] != NDPI_PROTOCOL_MAIL_SMTP) {
-        ndpi_set_detected_protocol(ndpi_struct, flow,
-                                   flow->detected_protocol_stack[0],
+      if(flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN &&
+         flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_MAIL_SMTP) {
+        ndpi_set_detected_protocol(ndpi_struct, &flow->core,
+                                   flow->core.detected_protocol_stack[0],
                                    NDPI_PROTOCOL_MAIL_SMTPS, NDPI_CONFIDENCE_DPI);
-        flow->protos.tls_quic.subprotocol_detected = 1;
+        flow->metadata.protos.tls_quic.subprotocol_detected = 1;
       } else {
-        ndpi_set_detected_protocol(ndpi_struct, flow,
+        ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                                    NDPI_PROTOCOL_MAIL_SMTPS, NDPI_PROTOCOL_UNKNOWN,
                                    NDPI_CONFIDENCE_DPI);
       }
       NDPI_LOG_DBG(ndpi_struct, "Switching to [%d/%d]\n",
-                   flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+                   flow->core.detected_protocol_stack[0], flow->core.detected_protocol_stack[1]);
       switch_extra_dissection_to_tls(ndpi_struct, flow);
     } else {
       rc = 0;
     }
   } else {
     ndpi_search_mail_smtp_tcp(ndpi_struct, flow);
-    rc = ((flow->l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') &&
-          (flow->l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 ||
-           flow->l4.tcp.ftp_imap_pop_smtp.auth_done == 0)) ? 1 : 0;
+    rc = ((flow->metadata.l4.tcp.ftp_imap_pop_smtp.password[0] == '\0') &&
+          (flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 ||
+           flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_done == 0)) ? 1 : 0;
   }
 
 #ifdef SMTP_DEBUG
@@ -379,8 +380,8 @@ static void smtpInitExtraPacketProcessing(struct ndpi_flow_struct *flow) {
   static u_int num = 0;
   printf("**** %s(%u)\n", __FUNCTION__, ++num);
 #endif
-  flow->max_extra_packets_to_check = 12;
-  flow->extra_packets_func = ndpi_extra_search_mail_smtp_tcp;
+  flow->core.max_extra_packets_to_check = 12;
+  flow->core.extra_packets_func = ndpi_extra_search_mail_smtp_tcp;
 }
 
 /* **************************************** */

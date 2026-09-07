@@ -96,7 +96,7 @@ static void ndpi_int_memcached_add_connection(struct ndpi_detection_module_struc
 					      *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found memcached\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
 			     NDPI_PROTOCOL_MEMCACHED, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -116,7 +116,7 @@ static void ndpi_search_memcached(struct ndpi_detection_module_struct *ndpi_stru
       return;
     }
 
-    matches = &flow->l4.tcp.memcached_matches;
+    matches = &flow->metadata.l4.tcp.memcached_matches;
   }
   else {
     if (packet->payload_packet_len < MEMCACHED_MIN_UDP_LEN) {
@@ -132,7 +132,7 @@ static void ndpi_search_memcached(struct ndpi_detection_module_struct *ndpi_stru
 
     offset += MEMCACHED_UDP_HDR_LEN;
     length -= MEMCACHED_UDP_HDR_LEN;
-    matches = &flow->l4.udp.memcached_matches;
+    matches = &flow->metadata.l4.udp.memcached_matches;
   }
 
   /* grep MCD memcached.c |\
@@ -169,7 +169,7 @@ static void ndpi_search_memcached(struct ndpi_detection_module_struct *ndpi_stru
 
   if (*matches >= MEMCACHED_MIN_MATCH)
     ndpi_int_memcached_add_connection(ndpi_struct, flow);
-  else if(flow->packet_counter > 5)
+  else if(flow->core.packet_counter > 5)
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);    
 }
 

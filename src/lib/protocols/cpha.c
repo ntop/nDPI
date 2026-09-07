@@ -46,7 +46,7 @@ static void ndpi_search_cpha(struct ndpi_detection_module_struct *ndpi_struct, s
      && (packet->udp->dest   == cpha_port)
      && packet->iph->saddr   == 0 /* 0.0.0.0 */
      ) {
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CPHA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_CPHA, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   } else
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);      
 }

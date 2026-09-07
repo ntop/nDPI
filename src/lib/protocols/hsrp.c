@@ -49,7 +49,7 @@ static void ndpi_search_hsrp(struct ndpi_detection_module_struct *ndpi_struct,
        && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[2]) == 0x00000000)
        && (ntohl(packet->iphv6->ip6_dst.u6_addr.u6_addr32[3]) == 0x00000066)) { /* multicast: ff02::66 */;
       NDPI_LOG_INFO(ndpi_struct, "found HSRP\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HSRP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_HSRP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   } else if(packet->iph) {
@@ -71,7 +71,7 @@ static void ndpi_search_hsrp(struct ndpi_detection_module_struct *ndpi_struct,
 
       if(found) {
 	NDPI_LOG_INFO(ndpi_struct, "found HSRP\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HSRP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_HSRP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
     }

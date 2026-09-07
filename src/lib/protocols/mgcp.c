@@ -32,7 +32,7 @@ static void ndpi_int_mgcp_add_connection(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found MGCP\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MGCP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_MGCP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 
@@ -88,10 +88,10 @@ static void ndpi_search_mgcp(struct ndpi_detection_module_struct *ndpi_struct, s
       endpoint_hostname = ndpi_strnstr(endpoint, "@", packet->payload_packet_len - ((u_int8_t const *)endpoint - packet->payload));
       if (endpoint_hostname == NULL || endpoint_hostname >= mgcp)
       {
-        ndpi_hostname_sni_set(flow, (u_int8_t const *)endpoint, (mgcp - endpoint) - 1, NDPI_HOSTNAME_NORM_ALL);
+        ndpi_hostname_sni_set(&flow->core, (u_int8_t const *)endpoint, (mgcp - endpoint) - 1, NDPI_HOSTNAME_NORM_ALL);
       } else {
         endpoint_hostname++;
-        ndpi_hostname_sni_set(flow, (u_int8_t const *)endpoint_hostname, (mgcp - endpoint_hostname) - 1, NDPI_HOSTNAME_NORM_ALL);
+        ndpi_hostname_sni_set(&flow->core, (u_int8_t const *)endpoint_hostname, (mgcp - endpoint_hostname) - 1, NDPI_HOSTNAME_NORM_ALL);
       }
       return;
     }

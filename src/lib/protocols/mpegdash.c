@@ -44,10 +44,10 @@ static void ndpi_search_mpegdash_http(struct ndpi_detection_module_struct *ndpi_
 
   NDPI_LOG_DBG(ndpi_struct, "search MpegDash\n");
 
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP &&
-      flow->detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP)
+  if (flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP &&
+      flow->core.detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP)
   {
-    if (flow->packet_counter > 2)
+    if (flow->core.packet_counter > 2)
     {
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     }

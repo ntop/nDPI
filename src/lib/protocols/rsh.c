@@ -33,7 +33,7 @@
 static void ndpi_int_rsh_add_connection(struct ndpi_detection_module_struct * ndpi_struct,
                                         struct ndpi_flow_struct * flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RSH,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_RSH,
                              NDPI_CONFIDENCE_DPI);
 }
 
@@ -48,18 +48,18 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
   {
     if (packet->payload[packet->payload_packet_len - 1] == '\n')
     {
-      if (flow->packet_counter > 5)
+      if (flow->core.packet_counter > 5)
       {
         ndpi_int_rsh_add_connection(ndpi_struct, flow);
-        flow->protos.rsh.client_username[0] = '\0';
-        flow->protos.rsh.server_username[0] = '\0';
-        flow->protos.rsh.command[0] = '\0';
+        flow->metadata.protos.rsh.client_username[0] = '\0';
+        flow->metadata.protos.rsh.server_username[0] = '\0';
+        flow->metadata.protos.rsh.command[0] = '\0';
       }
       return;
     }
   }
 
-  switch (flow->packet_counter)
+  switch (flow->core.packet_counter)
   {
     case 1:
       if (packet->payload_packet_len >= 2 &&
@@ -122,24 +122,24 @@ static void ndpi_search_rsh(struct ndpi_detection_module_struct * ndpi_struct,
 
         ndpi_int_rsh_add_connection(ndpi_struct, flow);
 
-        strncpy(flow->protos.rsh.client_username, dissected_info[0],
-                ndpi_min(NDPI_ARRAY_LENGTH(flow->protos.rsh.client_username),
+        strncpy(flow->metadata.protos.rsh.client_username, dissected_info[0],
+                ndpi_min(NDPI_ARRAY_LENGTH(flow->metadata.protos.rsh.client_username),
                          (unsigned long)(dissected_info[1] - dissected_info[0])));
-        strncpy(flow->protos.rsh.server_username, dissected_info[1],
-                ndpi_min(NDPI_ARRAY_LENGTH(flow->protos.rsh.server_username),
+        strncpy(flow->metadata.protos.rsh.server_username, dissected_info[1],
+                ndpi_min(NDPI_ARRAY_LENGTH(flow->metadata.protos.rsh.server_username),
                          (unsigned long)(dissected_info[2] - dissected_info[1])));
-        strncpy(flow->protos.rsh.command, dissected_info[2],
-                ndpi_min(NDPI_ARRAY_LENGTH(flow->protos.rsh.command),
+        strncpy(flow->metadata.protos.rsh.command, dissected_info[2],
+                ndpi_min(NDPI_ARRAY_LENGTH(flow->metadata.protos.rsh.command),
                          (unsigned long)packet->payload_packet_len -
                          (unsigned long)(dissected_info[2] - dissected_info[0])));
 
 	
         if (snprintf(str, NDPI_ARRAY_LENGTH(str), "User '%s' executing '%s'",
-                     flow->protos.rsh.server_username,
-                     flow->protos.rsh.command) < 0)
+                     flow->metadata.protos.rsh.server_username,
+                     flow->metadata.protos.rsh.command) < 0)
           str[0] = '\0';
         
-        ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, str);
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_CLEAR_TEXT_CREDENTIALS, str);
       }
       return;
 

@@ -32,7 +32,7 @@
   {									\
     if (is_proto_enabled(ndpi_struct, nprot))                           \
       {									\
-	ndpi_set_detected_protocol(ndpi_struct, flow,			\
+	ndpi_set_detected_protocol(ndpi_struct, &flow->core,			\
 				   nprot, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);		\
       }									\
   }
@@ -43,7 +43,7 @@ static void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  switch (flow->l4_proto) {
+  switch (flow->core.l4_proto) {
   case NDPI_IPSEC_PROTOCOL_ESP:
     set_protocol_and_bmask(NDPI_PROTOCOL_IP_ESP);
     break;
@@ -64,7 +64,7 @@ static void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
 
       snprintf(buf, sizeof(buf), "Packet too short (%d vs %u)",
                packet->payload_packet_len, (unsigned int)sizeof(struct ndpi_icmphdr));
-      ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, buf);
+      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, buf);
     } else {
       u_int8_t icmp_type = (u_int8_t)packet->payload[0];
       u_int8_t icmp_code = (u_int8_t)packet->payload[1];
@@ -77,12 +77,12 @@ static void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
         snprintf(buf, sizeof(buf), "Invalid type (%u)/code(%u)",
                  icmp_type, icmp_code);
 
-        ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, buf);
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, buf);
       }
 
       if(packet->payload_packet_len > sizeof(struct ndpi_icmphdr)) {
-        if(ndpi_struct->cfg.compute_entropy && (flow->skip_entropy_check == 0)) {
-          flow->entropy = ndpi_entropy(packet->payload + sizeof(struct ndpi_icmphdr),
+        if(ndpi_struct->cfg.compute_entropy && (flow->core.skip_entropy_check == 0)) {
+          flow->metadata.entropy = ndpi_entropy(packet->payload + sizeof(struct ndpi_icmphdr),
                                        packet->payload_packet_len - sizeof(struct ndpi_icmphdr));
           ndpi_entropy2risk(ndpi_struct, flow);
         }
@@ -90,7 +90,7 @@ static void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
         u_int16_t chksm = icmp4_checksum(packet->payload, packet->payload_packet_len);
 
         if(chksm) {
-          ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid ICMP checksum");
+          ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Invalid ICMP checksum");
         }
       }
     }
@@ -130,7 +130,7 @@ static void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
       snprintf(buf, sizeof(buf), "Packet too short (%d vs %u)",
                packet->payload_packet_len, (unsigned int)sizeof(struct ndpi_icmp6hdr));
 
-      ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, buf);
+      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, buf);
     } else {
       u_int8_t icmp6_type = (u_int8_t)packet->payload[0];
       u_int8_t icmp6_code = (u_int8_t)packet->payload[1];
@@ -143,7 +143,7 @@ static void ndpi_search_in_non_tcp_udp(struct ndpi_detection_module_struct
         snprintf(buf, sizeof(buf), "Invalid type (%u)/code(%u)",
                  icmp6_type, icmp6_code);
 
-        ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, buf);
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, buf);
       }
     }
 

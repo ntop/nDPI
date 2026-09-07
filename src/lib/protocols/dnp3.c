@@ -45,7 +45,7 @@ static void ndpi_search_dnp3_tcp(struct ndpi_detection_module_struct *ndpi_struc
 	&& (packet->payload[0] == 0x05)
 	&& (packet->payload[1] == 0x64)) {
       NDPI_LOG_INFO(ndpi_struct, "found DNP3\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DNP3, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_DNP3, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }

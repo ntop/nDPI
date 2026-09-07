@@ -30,7 +30,7 @@ static void ndpi_int_activision_add_connection(struct ndpi_detection_module_stru
                                                struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found activision\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_ACTIVISION,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -58,14 +58,14 @@ static void ndpi_search_activision(struct ndpi_detection_module_struct *ndpi_str
    */
   if (magic == 0x4600 || magic == 0x4700)
   {
-    if (flow->packet_counter > 4)
+    if (flow->core.packet_counter > 4)
       ndpi_int_activision_add_connection(ndpi_struct, flow);
 
     return;
   }
 
   /* original 0x0c02/0x0d02 variant: direction-dependent */
-  if (flow->packet_direction_counter[packet->packet_direction] == 1)
+  if (flow->core.packet_direction_counter[packet->packet_direction] == 1)
   {
     if (packet->packet_direction == 0)
     {
@@ -96,7 +96,7 @@ static void ndpi_search_activision(struct ndpi_detection_module_struct *ndpi_str
     }
   }
 
-  if (flow->packet_counter > 4)
+  if (flow->core.packet_counter > 4)
   {
     ndpi_int_activision_add_connection(ndpi_struct, flow);
   }

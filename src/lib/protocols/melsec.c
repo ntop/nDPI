@@ -45,11 +45,11 @@ static void ndpi_search_melsec(struct ndpi_detection_module_struct *ndpi_struct,
         ntohl(get_u_int32_t(packet->payload, 3)) == 0x00001111)
     {
       NDPI_LOG_INFO(ndpi_struct, "found MELSEC\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MELSEC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_MELSEC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
     }
   }
 
-  if (flow->packet_counter > 2) {
+  if (flow->core.packet_counter > 2) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
 }

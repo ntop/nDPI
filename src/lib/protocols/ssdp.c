@@ -54,102 +54,103 @@ static void ssdp_parse_lines(struct ndpi_detection_module_struct
 
   /* Save host which provides a service if available */
   if (packet->host_line.ptr != NULL && packet->host_line.len > 0) {
-    ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL | NDPI_HOSTNAME_NORM_STRIP_PORT);
+    ndpi_hostname_sni_set(&flow->core, packet->host_line.ptr, packet->host_line.len,
+			  NDPI_HOSTNAME_NORM_ALL | NDPI_HOSTNAME_NORM_STRIP_PORT);
   }
 
   if (packet->bootid.ptr != NULL && packet->bootid.len > 0) {
-    flow->protos.ssdp.bootid = ndpi_malloc(packet->bootid.len + 1);
-    if (flow->protos.ssdp.bootid) {
-      memcpy(flow->protos.ssdp.bootid, packet->bootid.ptr, packet->bootid.len);
-      flow->protos.ssdp.bootid[packet->bootid.len] = '\0';
+    flow->metadata.protos.ssdp.bootid = ndpi_malloc(packet->bootid.len + 1);
+    if (flow->metadata.protos.ssdp.bootid) {
+      memcpy(flow->metadata.protos.ssdp.bootid, packet->bootid.ptr, packet->bootid.len);
+      flow->metadata.protos.ssdp.bootid[packet->bootid.len] = '\0';
     }
   }
 
   if (packet->usn.ptr != NULL && packet->usn.len > 0) {
-    flow->protos.ssdp.usn = ndpi_malloc(packet->usn.len + 1);
-    if (flow->protos.ssdp.usn) {
-      memcpy(flow->protos.ssdp.usn, packet->usn.ptr, packet->usn.len);
-      flow->protos.ssdp.usn[packet->usn.len] = '\0';
+    flow->metadata.protos.ssdp.usn = ndpi_malloc(packet->usn.len + 1);
+    if (flow->metadata.protos.ssdp.usn) {
+      memcpy(flow->metadata.protos.ssdp.usn, packet->usn.ptr, packet->usn.len);
+      flow->metadata.protos.ssdp.usn[packet->usn.len] = '\0';
     }
   }
 
   if (packet->cache_controle.ptr != NULL && packet->cache_controle.len > 0) {
-    flow->protos.ssdp.cache_controle = ndpi_malloc(packet->cache_controle.len + 1);
-    if (flow->protos.ssdp.cache_controle) {
-      memcpy(flow->protos.ssdp.cache_controle, packet->cache_controle.ptr, packet->cache_controle.len);
-      flow->protos.ssdp.cache_controle[packet->cache_controle.len] = '\0';
+    flow->metadata.protos.ssdp.cache_controle = ndpi_malloc(packet->cache_controle.len + 1);
+    if (flow->metadata.protos.ssdp.cache_controle) {
+      memcpy(flow->metadata.protos.ssdp.cache_controle, packet->cache_controle.ptr, packet->cache_controle.len);
+      flow->metadata.protos.ssdp.cache_controle[packet->cache_controle.len] = '\0';
     }
   }
 
   if (packet->location.ptr != NULL && packet->location.len > 0) {
-    flow->protos.ssdp.location = ndpi_malloc(packet->location.len + 1);
-    if (flow->protos.ssdp.location) {
-      memcpy(flow->protos.ssdp.location, packet->location.ptr, packet->location.len);
-      flow->protos.ssdp.location[packet->location.len] = '\0';
+    flow->metadata.protos.ssdp.location = ndpi_malloc(packet->location.len + 1);
+    if (flow->metadata.protos.ssdp.location) {
+      memcpy(flow->metadata.protos.ssdp.location, packet->location.ptr, packet->location.len);
+      flow->metadata.protos.ssdp.location[packet->location.len] = '\0';
     }
   }
 
   if (packet->securelocation_upnp.ptr != NULL && packet->securelocation_upnp.len > 0) {
-    flow->protos.ssdp.securelocation_upnp = ndpi_malloc(packet->securelocation_upnp.len + 1);
-    if (flow->protos.ssdp.securelocation_upnp) {
-      memcpy(flow->protos.ssdp.securelocation_upnp, packet->securelocation_upnp.ptr, packet->securelocation_upnp.len);
-      flow->protos.ssdp.securelocation_upnp[packet->securelocation_upnp.len] = '\0';
+    flow->metadata.protos.ssdp.securelocation_upnp = ndpi_malloc(packet->securelocation_upnp.len + 1);
+    if (flow->metadata.protos.ssdp.securelocation_upnp) {
+      memcpy(flow->metadata.protos.ssdp.securelocation_upnp, packet->securelocation_upnp.ptr, packet->securelocation_upnp.len);
+      flow->metadata.protos.ssdp.securelocation_upnp[packet->securelocation_upnp.len] = '\0';
     }
   }
 
   if (packet->nt.ptr != NULL && packet->nt.len > 0) {
-    flow->protos.ssdp.nt = ndpi_malloc(packet->nt.len + 1);
-    if (flow->protos.ssdp.nt) {
-      memcpy(flow->protos.ssdp.nt, packet->nt.ptr, packet->nt.len);
-      flow->protos.ssdp.nt[packet->nt.len] = '\0';
+    flow->metadata.protos.ssdp.nt = ndpi_malloc(packet->nt.len + 1);
+    if (flow->metadata.protos.ssdp.nt) {
+      memcpy(flow->metadata.protos.ssdp.nt, packet->nt.ptr, packet->nt.len);
+      flow->metadata.protos.ssdp.nt[packet->nt.len] = '\0';
     }
   }
 
   if (packet->nts.ptr != NULL && packet->nts.len > 0) {
-    flow->protos.ssdp.nts = ndpi_malloc(packet->nts.len + 1);
-    if (flow->protos.ssdp.nts) {
-      memcpy(flow->protos.ssdp.nts, packet->nts.ptr, packet->nts.len);
-      flow->protos.ssdp.nts[packet->nts.len] = '\0';
+    flow->metadata.protos.ssdp.nts = ndpi_malloc(packet->nts.len + 1);
+    if (flow->metadata.protos.ssdp.nts) {
+      memcpy(flow->metadata.protos.ssdp.nts, packet->nts.ptr, packet->nts.len);
+      flow->metadata.protos.ssdp.nts[packet->nts.len] = '\0';
     }
   }
 
   if (packet->server_line.ptr != NULL && packet->server_line.len > 0) {
-    flow->protos.ssdp.server = ndpi_malloc(packet->server_line.len + 1);
-    if (flow->protos.ssdp.server) {
-      memcpy(flow->protos.ssdp.server, packet->server_line.ptr, packet->server_line.len);
-      flow->protos.ssdp.server[packet->server_line.len] = '\0';
+    flow->metadata.protos.ssdp.server = ndpi_malloc(packet->server_line.len + 1);
+    if (flow->metadata.protos.ssdp.server) {
+      memcpy(flow->metadata.protos.ssdp.server, packet->server_line.ptr, packet->server_line.len);
+      flow->metadata.protos.ssdp.server[packet->server_line.len] = '\0';
     }
   }
 
   if (packet->man.ptr != NULL && packet->man.len > 0) {
-    flow->protos.ssdp.man = ndpi_malloc(packet->man.len + 1);
-    if (flow->protos.ssdp.man) {
-      memcpy(flow->protos.ssdp.man, packet->man.ptr, packet->man.len);
-      flow->protos.ssdp.man[packet->man.len] = '\0';
+    flow->metadata.protos.ssdp.man = ndpi_malloc(packet->man.len + 1);
+    if (flow->metadata.protos.ssdp.man) {
+      memcpy(flow->metadata.protos.ssdp.man, packet->man.ptr, packet->man.len);
+      flow->metadata.protos.ssdp.man[packet->man.len] = '\0';
     }
   }
 
   if (packet->mx.ptr != NULL && packet->mx.len > 0) {
-    flow->protos.ssdp.mx = ndpi_malloc(packet->mx.len + 1);
-    if (flow->protos.ssdp.mx) {
-      memcpy(flow->protos.ssdp.mx, packet->mx.ptr, packet->mx.len);
-      flow->protos.ssdp.mx[packet->mx.len] = '\0';
+    flow->metadata.protos.ssdp.mx = ndpi_malloc(packet->mx.len + 1);
+    if (flow->metadata.protos.ssdp.mx) {
+      memcpy(flow->metadata.protos.ssdp.mx, packet->mx.ptr, packet->mx.len);
+      flow->metadata.protos.ssdp.mx[packet->mx.len] = '\0';
     }
   }
 
   if (packet->st.ptr != NULL && packet->st.len > 0) {
-    flow->protos.ssdp.st = ndpi_malloc(packet->st.len + 1);
-    if (flow->protos.ssdp.st) {
-      memcpy(flow->protos.ssdp.st, packet->st.ptr, packet->st.len);
-      flow->protos.ssdp.st[packet->st.len] = '\0';
+    flow->metadata.protos.ssdp.st = ndpi_malloc(packet->st.len + 1);
+    if (flow->metadata.protos.ssdp.st) {
+      memcpy(flow->metadata.protos.ssdp.st, packet->st.ptr, packet->st.len);
+      flow->metadata.protos.ssdp.st[packet->st.len] = '\0';
     }
   }
 
   if (packet->user_agent_line.ptr != NULL && packet->user_agent_line.len > 0) {
-    flow->protos.ssdp.user_agent = ndpi_malloc(packet->user_agent_line.len + 1);
-    if (flow->protos.ssdp.user_agent) {
-      memcpy(flow->protos.ssdp.user_agent, packet->user_agent_line.ptr, packet->user_agent_line.len);
-      flow->protos.ssdp.user_agent[packet->user_agent_line.len] = '\0';
+    flow->metadata.protos.ssdp.user_agent = ndpi_malloc(packet->user_agent_line.len + 1);
+    if (flow->metadata.protos.ssdp.user_agent) {
+      memcpy(flow->metadata.protos.ssdp.user_agent, packet->user_agent_line.ptr, packet->user_agent_line.len);
+      flow->metadata.protos.ssdp.user_agent[packet->user_agent_line.len] = '\0';
     }
   }
 }
@@ -159,7 +160,7 @@ static void ndpi_int_ssdp_add_connection(struct ndpi_detection_module_struct
 {
   if(ndpi_struct->cfg.ssdp_metadata_enabled)
     ssdp_parse_lines(ndpi_struct, flow);
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_SSDP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_SSDP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 /* this detection also works asymmetrically */
@@ -176,11 +177,11 @@ static void ndpi_search_ssdp(struct ndpi_detection_module_struct *ndpi_struct, s
       for (i=0; i < sizeof(SSDP_METHODS)/sizeof(SSDP_METHODS[0]); i++) {
         if(memcmp(packet->payload, SSDP_METHODS[i].detection_line, strlen(SSDP_METHODS[i].detection_line)) == 0) {
           if(ndpi_struct->cfg.ssdp_metadata_enabled) {
-            flow->protos.ssdp.method = ndpi_malloc(strlen(SSDP_METHODS[i].detection_line) + 1);
+            flow->metadata.protos.ssdp.method = ndpi_malloc(strlen(SSDP_METHODS[i].detection_line) + 1);
 
-            if (flow->protos.ssdp.method) {
-              memcpy(flow->protos.ssdp.method, SSDP_METHODS[i].method, strlen(SSDP_METHODS[i].method));
-              flow->protos.ssdp.method[strlen(SSDP_METHODS[i].method)] = '\0';
+            if (flow->metadata.protos.ssdp.method) {
+              memcpy(flow->metadata.protos.ssdp.method, SSDP_METHODS[i].method, strlen(SSDP_METHODS[i].method));
+              flow->metadata.protos.ssdp.method[strlen(SSDP_METHODS[i].method)] = '\0';
             }
           }
 

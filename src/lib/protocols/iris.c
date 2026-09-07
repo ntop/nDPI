@@ -225,15 +225,15 @@ static void ndpi_search_iris(struct ndpi_detection_module_struct *ndpi_struct, s
 
     NDPI_LOG_DBG(ndpi_struct, "Search Iris\n");
 
-    if((flow->s_port == ntohs(1972) || flow->c_port == ntohs(1972)) &&
+    if((flow->core.s_port == ntohs(1972) || flow->core.c_port == ntohs(1972)) &&
        packet->payload_packet_len > 14U) {
       message_length = le32toh(*(uint32_t *)packet->payload);
       if(message_length == (packet->payload_packet_len - 14U)) {
         /* For requests, check also msg type (not present in the responses) */
-        if((flow->s_port == ntohs(1972) && iris_check_msg_type_or_error_code(packet)) ||
-           (flow->c_port == ntohs(1972))) {
+        if((flow->core.s_port == ntohs(1972) && iris_check_msg_type_or_error_code(packet)) ||
+           (flow->core.c_port == ntohs(1972))) {
           NDPI_LOG_INFO(ndpi_struct, "Found iris\n");
-          ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IRIS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+          ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_IRIS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	  return;
 	}
       }

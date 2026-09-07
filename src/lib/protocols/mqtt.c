@@ -56,7 +56,8 @@ enum MQTT_PACKET_TYPES {
 static void ndpi_int_mqtt_add_connection (struct ndpi_detection_module_struct *ndpi_struct,
 		struct ndpi_flow_struct *flow)
 {
-	ndpi_set_detected_protocol(ndpi_struct,flow,NDPI_PROTOCOL_MQTT,NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	ndpi_set_detected_protocol(ndpi_struct, &flow->core,
+				   NDPI_PROTOCOL_MQTT,NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	NDPI_LOG_INFO(ndpi_struct, "found Mqtt\n");
 }
 
@@ -91,7 +92,7 @@ static void ndpi_search_mqtt(struct ndpi_detection_module_struct *ndpi_struct,
 
 	NDPI_LOG_DBG(ndpi_struct, "search Mqtt\n");
 	struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-	if (flow->packet_counter > 10) {
+	if (flow->core.packet_counter > 10) {
 		NDPI_LOG_DBG(ndpi_struct, "Excluding Mqtt .. mandatory header not found!\n");
 		NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 		return;

@@ -30,7 +30,7 @@ static void ndpi_int_discord_add_connection(struct ndpi_detection_module_struct 
                                              struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found discord\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_DISCORD,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -52,26 +52,26 @@ static void ndpi_search_discord(struct ndpi_detection_module_struct *ndpi_struct
 
   if (packet->payload_packet_len == 74)
   {
-    if (flow->packet_counter == 1 &&
+    if (flow->core.packet_counter == 1 &&
         ntohl(get_u_int32_t(packet->payload, 0)) == 0x00010046)
     {
       /* Wait for the next packet, hopefully beeing able to dissect the client IP. */
       return;
     }
 
-    if (flow->packet_counter == 2 &&
+    if (flow->core.packet_counter == 2 &&
         ntohl(get_u_int32_t(packet->payload, 0)) == 0x00020046)
     {
       /* Dissect client IP. */
-      size_t len = sizeof(flow->protos.discord.client_ip) - 1;
-      strncpy(flow->protos.discord.client_ip, (char const *)&packet->payload[8], len);
-      flow->protos.discord.client_ip[len] = '\0';
+      size_t len = sizeof(flow->metadata.protos.discord.client_ip) - 1;
+      strncpy(flow->metadata.protos.discord.client_ip, (char const *)&packet->payload[8], len);
+      flow->metadata.protos.discord.client_ip[len] = '\0';
       ndpi_int_discord_add_connection(ndpi_struct, flow);
       return;
     }
   }
 
-  if (flow->packet_counter >= 5)
+  if (flow->core.packet_counter >= 5)
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
 

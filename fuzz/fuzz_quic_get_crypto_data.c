@@ -42,9 +42,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     version = 0x709A50C4; /* v2 */
 
   memset(flow, '\0', sizeof(*flow));
-  flow->detected_protocol_stack[0] = NDPI_PROTOCOL_QUIC;
-  flow->l4_proto = IPPROTO_UDP;
-  flow->protos.tls_quic.quic_version = version;
+  flow->core.detected_protocol_stack[0] = NDPI_PROTOCOL_QUIC;
+  flow->core.l4_proto = IPPROTO_UDP;
+  flow->metadata.protos.tls_quic.quic_version = version;
 
   crypto_data = get_crypto_data(ndpi_info_mod, flow, (u_int8_t *)Data + 4, Size - 4, &crypto_data_len);
 

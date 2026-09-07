@@ -63,9 +63,9 @@ static void xiaomi_dissect_metadata(struct ndpi_detection_module_struct *ndpi_st
         /* If "domain:port", strip the port */
         ptr = ndpi_strnstr((const char *)&payload[offset], ":", len);
         if(ptr == NULL)
-          ndpi_hostname_sni_set(flow, &payload[offset], len, NDPI_HOSTNAME_NORM_ALL);
+          ndpi_hostname_sni_set(&flow->core, &payload[offset], len, NDPI_HOSTNAME_NORM_ALL);
         else
-          ndpi_hostname_sni_set(flow, &payload[offset], (const u_int8_t *)ptr - &payload[offset], NDPI_HOSTNAME_NORM_ALL);
+          ndpi_hostname_sni_set(&flow->core, &payload[offset], (const u_int8_t *)ptr - &payload[offset], NDPI_HOSTNAME_NORM_ALL);
         break;
 
       case 0x32: /* Radio access technology (+ APN) */
@@ -93,7 +93,7 @@ static void ndpi_search_xiaomi(struct ndpi_detection_module_struct *ndpi_struct,
        ntohl(get_u_int32_t(packet->payload, 0)) == 0xC2FE0005 &&
        ntohl(get_u_int32_t(packet->payload, 8)) == 0x00020016) {
       NDPI_LOG_INFO(ndpi_struct, "found Xiaomi\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_XIAOMI, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_XIAOMI, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 
       /* Better way to detect "client" packets? */
       if(ntohs(packet->tcp->dest) == 5222) {

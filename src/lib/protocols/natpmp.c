@@ -44,21 +44,21 @@ static void ndpi_int_natpmp_add_connection(struct ndpi_detection_module_struct *
                                            struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found nat-pmp\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_NATPMP,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
-  if (flow->extra_packets_func == NULL)
+  if (flow->core.extra_packets_func == NULL)
   {
-    flow->max_extra_packets_to_check = 5;
-    flow->extra_packets_func = ndpi_search_natpmp_extra;
+    flow->core.max_extra_packets_to_check = 5;
+    flow->core.extra_packets_func = ndpi_search_natpmp_extra;
   }
 }
 
 static void natpmp_disable_extra_dissection(struct ndpi_flow_struct * const flow)
 {
-  flow->max_extra_packets_to_check = 0;
-  flow->extra_packets_func = NULL;
+  flow->core.max_extra_packets_to_check = 0;
+  flow->core.extra_packets_func = NULL;
 }
 
 static int natpmp_is_common_header(struct ndpi_packet_struct const * const packet)
@@ -122,7 +122,7 @@ static int ndpi_search_natpmp_extra(struct ndpi_detection_module_struct *ndpi_st
 
   if (natpmp_is_valid(packet, &natpmp_type) == 0)
   {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Invalid NATPMP Header");
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Invalid NATPMP Header");
     return 0;
   }
 
@@ -132,29 +132,29 @@ static int ndpi_search_natpmp_extra(struct ndpi_detection_module_struct *ndpi_st
       return 1; // Nothing to do here.
     case NATPMP_REQUEST_UDP_MAPPING:
     case NATPMP_REQUEST_TCP_MAPPING:
-      flow->protos.natpmp.internal_port = ntohs(get_u_int16_t(packet->payload, 4));
-      flow->protos.natpmp.external_port = ntohs(get_u_int16_t(packet->payload, 6));
-      if (flow->protos.natpmp.internal_port == 0)
+      flow->metadata.protos.natpmp.internal_port = ntohs(get_u_int16_t(packet->payload, 4));
+      flow->metadata.protos.natpmp.external_port = ntohs(get_u_int16_t(packet->payload, 6));
+      if (flow->metadata.protos.natpmp.internal_port == 0)
       {
-        ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Request Port Mapping: Internal port must not 0");
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Request Port Mapping: Internal port must not 0");
       }
       break;
     case NATPMP_RESPONSE_ADDRESS:
-      flow->protos.natpmp.result_code = ntohs(get_u_int16_t(packet->payload, 2));
-      flow->protos.natpmp.external_address.ipv4 = get_u_int32_t(packet->payload, 8);
-      if (flow->protos.natpmp.result_code != 0 && flow->protos.natpmp.external_address.ipv4 != 0)
+      flow->metadata.protos.natpmp.result_code = ntohs(get_u_int16_t(packet->payload, 2));
+      flow->metadata.protos.natpmp.external_address.ipv4 = get_u_int32_t(packet->payload, 8);
+      if (flow->metadata.protos.natpmp.result_code != 0 && flow->metadata.protos.natpmp.external_address.ipv4 != 0)
       {
-        ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Address Response: Result code indicates an error, but External IPv4 Address is set");
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Address Response: Result code indicates an error, but External IPv4 Address is set");
       }
       break;
     case NATPMP_RESPONSE_UDP_MAPPING:
     case NATPMP_RESPONSE_TCP_MAPPING:
     {
-      flow->protos.natpmp.internal_port = ntohs(get_u_int16_t(packet->payload, 8));
-      flow->protos.natpmp.external_port = ntohs(get_u_int16_t(packet->payload, 10));
-      if (flow->protos.natpmp.internal_port == 0 || flow->protos.natpmp.external_port == 0)
+      flow->metadata.protos.natpmp.internal_port = ntohs(get_u_int16_t(packet->payload, 8));
+      flow->metadata.protos.natpmp.external_port = ntohs(get_u_int16_t(packet->payload, 10));
+      if (flow->metadata.protos.natpmp.internal_port == 0 || flow->metadata.protos.natpmp.external_port == 0)
       {
-        ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Port Mapping Response: Internal/External port must not 0");
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Port Mapping Response: Internal/External port must not 0");
       }
       break;
     }
@@ -177,7 +177,7 @@ static void ndpi_search_natpmp(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if ((flow->packet_counter > 2 && natpmp_type != NATPMP_REQUEST_ADDRESS) ||
+  if ((flow->core.packet_counter > 2 && natpmp_type != NATPMP_REQUEST_ADDRESS) ||
       ntohs(packet->udp->source) == NATPMP_PORT || ntohs(packet->udp->dest) == NATPMP_PORT)
   {
     ndpi_int_natpmp_add_connection(ndpi_struct, flow);

@@ -33,7 +33,7 @@
 static void ndpi_int_telegram_add_connection(struct ndpi_detection_module_struct
                                              *ndpi_struct, struct ndpi_flow_struct *flow,
 					     ndpi_confidence_t confidence) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_UNKNOWN, confidence);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TELEGRAM, NDPI_PROTOCOL_UNKNOWN, confidence);
   NDPI_LOG_INFO(ndpi_struct, "found telegram\n");
 }
 
@@ -58,7 +58,7 @@ static void ndpi_search_telegram(struct ndpi_detection_module_struct *ndpi_struc
        TLS (i.e. Telegram Web) is correctly classified as TLS/Telegram because TLS dissector
        already kicked in.
        Let's check every port for the time being */
-    if(flow->guessed_protocol_id_by_ip == NDPI_PROTOCOL_TELEGRAM) {
+    if(flow->core.guessed_protocol_id_by_ip == NDPI_PROTOCOL_TELEGRAM) {
       ndpi_int_telegram_add_connection(ndpi_struct, flow, NDPI_CONFIDENCE_MATCH_BY_IP);
       return;
     }

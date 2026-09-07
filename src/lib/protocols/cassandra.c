@@ -46,7 +46,7 @@ static void ndpi_int_cassandra_add_connection(struct ndpi_detection_module_struc
 {
   NDPI_LOG_INFO(ndpi_struct, "found Cassandra CQL\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_CASSANDRA, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }
@@ -67,7 +67,7 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
   }
 
   if ((packet->payload_packet_len < 9) ||
-      (flow->packet_counter >= 8) ||
+      (flow->core.packet_counter >= 8) ||
       (!ndpi_validate_cassandra_response(packet->payload[0]) ||
        !ndpi_validate_cassandra_request(packet->payload[0])))
   {
@@ -75,7 +75,7 @@ static void ndpi_search_cassandra(struct ndpi_detection_module_struct *ndpi_stru
     return;
   }
   
-  if (flow->packet_direction_counter[packet->packet_direction] > 2) {
+  if (flow->core.packet_direction_counter[packet->packet_direction] > 2) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }

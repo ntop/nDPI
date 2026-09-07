@@ -63,7 +63,7 @@ static void ndpi_search_iec60870_tcp(struct ndpi_detection_module_struct *ndpi_s
     if(found) {
       NDPI_LOG_INFO(ndpi_struct, "Found IEC60870-104\n");
       
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_IEC60870, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_IEC60870, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
   }

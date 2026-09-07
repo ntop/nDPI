@@ -61,7 +61,7 @@ static void ndpi_search_resp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (memcmp(&packet->payload[offset], "\r\n", 2) == 0) {
     NDPI_LOG_INFO(ndpi_struct, "found RESP\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RESP,
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_RESP,
                                NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
   }
 

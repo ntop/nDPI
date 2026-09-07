@@ -38,8 +38,8 @@ static void ndpi_search_hl7(struct ndpi_detection_module_struct *ndpi_struct,
 
   NDPI_LOG_DBG(ndpi_struct, "search HL7\n");
 
-  if (flow->detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
-      flow->detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP)
+  if (flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_HTTP ||
+      flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_HTTP)
   {
     if (packet->content_line.ptr != NULL) {
       if ((LINE_ENDS(packet->content_line, "x-application/hl7-v2+er7") != 0) ||
@@ -50,7 +50,7 @@ static void ndpi_search_hl7(struct ndpi_detection_module_struct *ndpi_struct,
           (LINE_ENDS(packet->content_line, "x-application/xml+cda") != 0))
       {
         NDPI_LOG_INFO(ndpi_struct, "found HL7 over HTTP\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HL7, NDPI_PROTOCOL_HTTP, 
+        ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_HL7, NDPI_PROTOCOL_HTTP, 
                                    NDPI_CONFIDENCE_DPI);
       }
     }
@@ -61,7 +61,7 @@ static void ndpi_search_hl7(struct ndpi_detection_module_struct *ndpi_struct,
       memcmp(&packet->payload[1], "MSH|^~\\&|", NDPI_STATICSTRING_LEN("MSH|^~\\&|")) == 0)
   {
     NDPI_LOG_INFO(ndpi_struct, "found HL7\n");
-    ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_HL7, NDPI_PROTOCOL_UNKNOWN, 
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_HL7, NDPI_PROTOCOL_UNKNOWN, 
                                NDPI_CONFIDENCE_DPI);
     return;
   }

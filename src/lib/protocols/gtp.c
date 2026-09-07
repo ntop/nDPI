@@ -83,7 +83,7 @@ static void ndpi_check_gtp(struct ndpi_detection_module_struct *ndpi_struct, str
          (payload_len >= HEADER_LEN_GTP_U) &&
          (message_len <= (payload_len - HEADER_LEN_GTP_U))) {
         NDPI_LOG_INFO(ndpi_struct, "found gtp-u\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GTP_U, NDPI_PROTOCOL_GTP, NDPI_CONFIDENCE_DPI);
+        ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_GTP_U, NDPI_PROTOCOL_GTP, NDPI_CONFIDENCE_DPI);
         return;
       }
     }
@@ -97,7 +97,7 @@ static void ndpi_check_gtp(struct ndpi_detection_module_struct *ndpi_struct, str
           /* payload_len is always valid, because HEADER_LEN_GTP_C_V2 == sizeof(struct gtp_header_generic) */
           (message_len == (payload_len - HEADER_LEN_GTP_C_V2)))) {
         NDPI_LOG_INFO(ndpi_struct, "found gtp-c\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GTP_C, NDPI_PROTOCOL_GTP, NDPI_CONFIDENCE_DPI);
+        ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_GTP_C, NDPI_PROTOCOL_GTP, NDPI_CONFIDENCE_DPI);
         return;
       }
     }
@@ -109,7 +109,7 @@ static void ndpi_check_gtp(struct ndpi_detection_module_struct *ndpi_struct, str
          ((gtp->message_type > 0 && gtp->message_type <= 7) || /* Check based on TS 32.295 6.2.1 */
           gtp->message_type == 240 || gtp->message_type == 241)) {
         NDPI_LOG_INFO(ndpi_struct, "found gtp-prime\n");
-        ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GTP_PRIME, NDPI_PROTOCOL_GTP, NDPI_CONFIDENCE_DPI);
+        ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_GTP_PRIME, NDPI_PROTOCOL_GTP, NDPI_CONFIDENCE_DPI);
         return;
       }
     }

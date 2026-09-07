@@ -30,11 +30,11 @@ static void ndpi_int_yggdrasil_add_connection(struct ndpi_detection_module_struc
                                               struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found Yggdrasil\n");
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
+  if (flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
     ndpi_set_detected_protocol_keeping_master(ndpi_struct, flow, NDPI_PROTOCOL_YGGDRASIL,
                                               NDPI_CONFIDENCE_DPI);
   } else {
-    ndpi_set_detected_protocol(ndpi_struct, flow,
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                                NDPI_PROTOCOL_YGGDRASIL,
                                NDPI_PROTOCOL_UNKNOWN,
                                NDPI_CONFIDENCE_DPI);
@@ -48,8 +48,8 @@ static int ndpi_search_yggdrasil_http(struct ndpi_detection_module_struct *ndpi_
 
   NDPI_LOG_DBG(ndpi_struct, "search Yggdrasil\n");
 
-  if (flow->detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP &&
-      flow->detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP)
+  if (flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_HTTP &&
+      flow->core.detected_protocol_stack[1] != NDPI_PROTOCOL_HTTP)
   {
     return -1;
   }

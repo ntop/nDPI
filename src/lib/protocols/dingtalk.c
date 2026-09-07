@@ -42,7 +42,7 @@ static void ndpi_search_dingtalk(struct ndpi_detection_module_struct *ndpi_struc
         ntohl(get_u_int32_t(packet->payload, 10)) == 0x2646B03 && ntohs(get_u_int16_t(packet->payload, 14)) == 0x20)
     {
       NDPI_LOG_INFO(ndpi_struct, "found DingTalk\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_DINGTALK,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_DINGTALK,
                                  NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }

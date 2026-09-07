@@ -33,7 +33,7 @@
 static void ndpi_int_qq_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
 				       struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_QQ, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 
@@ -52,7 +52,7 @@ static void ndpi_search_qq(struct ndpi_detection_module_struct *ndpi_struct, str
         NDPI_LOG_INFO(ndpi_struct, "found QQ\n");
         ndpi_int_qq_add_connection(ndpi_struct, flow);
       } else {
-        if(flow->num_processed_pkts > 4)
+        if(flow->core.num_processed_pkts > 4)
           NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       }
 }

@@ -35,7 +35,7 @@ static void ndpi_int_c1222_add_connection(struct ndpi_detection_module_struct *n
                                           struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found ANSI C12.22\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_C1222, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }

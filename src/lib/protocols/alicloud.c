@@ -31,7 +31,7 @@ static void ndpi_int_alicloud_add_connection(struct ndpi_detection_module_struct
 {
   NDPI_LOG_INFO(ndpi_struct, "found alicloud\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_ALICLOUD, NDPI_PROTOCOL_UNKNOWN,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_ALICLOUD, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
 }
 
@@ -62,7 +62,7 @@ static void ndpi_search_alicloud(struct ndpi_detection_module_struct *ndpi_struc
     }
   }
 
-  if (flow->packet_counter > 3)
+  if (flow->core.packet_counter > 3)
   {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }

@@ -523,7 +523,7 @@ extern "C" {
    * Check if the host passed match with a protocol
    *
    * @par    ndpi_struct         = the detection module
-   * @par    flow                = the flow where match the host
+   * @par    core                = the flow core where match the host
    * @par    string_to_match     = the string to match
    * @par    string_to_match_len = the length of the string
    * @par    ret_match           = completed returned match information
@@ -533,7 +533,7 @@ extern "C" {
    *
    */
   u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-					struct ndpi_flow_struct *flow,
+					struct ndpi_flow_core_struct *core,
 					char *string_to_match,
 					u_int string_to_match_len,
 					ndpi_protocol_match_result *ret_match,
@@ -1162,7 +1162,7 @@ extern "C" {
   u_int ndpi_get_ndpi_detection_module_size(void);
 
   /* Simple helper to get current time, in sec */
-  u_int32_t ndpi_get_current_time(struct ndpi_flow_struct *flow);
+  u_int32_t ndpi_get_current_time(struct ndpi_flow_core_struct *core);
 
   /* LRU cache */
   struct ndpi_lru_cache* ndpi_lru_cache_init(u_int32_t num_entries, u_int32_t ttl, int shared);
@@ -1197,10 +1197,10 @@ extern "C" {
    * based on the exception rules configured via ndpi_load_risk_domain_exceptions().
    *
    * @param ndpi_str The detection module
-   * @param flow The flow to process for risk exceptions
+   * @param core The flow core to process for risk exceptions
    */
   void ndpi_handle_risk_exceptions(struct ndpi_detection_module_struct *ndpi_str,
-				   struct ndpi_flow_struct *flow);
+				   struct ndpi_flow_core_struct *core);
 
   /**
    * Set custom memory allocation functions for nDPI's general memory allocator.
@@ -1396,7 +1396,7 @@ extern "C" {
 
   /* DGA */
   int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
-			  struct ndpi_flow_struct *flow,
+			  struct ndpi_flow_core_struct *core,
 			  char *name, u_int8_t is_hostname, u_int8_t check_subproto,
 			  u_int8_t flow_fully_classified);
   /* URL-path DGA */
@@ -2332,7 +2332,7 @@ extern "C" {
 
   /* ******************************* */
 
-  char* ndpi_get_flow_name(struct ndpi_flow_struct *flow);
+  char* ndpi_get_flow_name(struct ndpi_flow_core_struct *core);
 
   /* ******************************* */
 

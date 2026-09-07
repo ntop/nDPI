@@ -56,7 +56,7 @@ static void ndpi_int_netmotion_add_connection(struct ndpi_detection_module_struc
                                               struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found NetMotion\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_NETMOTION,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_NETMOTION,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -86,37 +86,37 @@ static void ndpi_search_netmotion(struct ndpi_detection_module_struct *ndpi_stru
   token = ntohl(get_u_int32_t(packet->payload, 12));
   dir = packet->packet_direction;
 
-  if(flow->l4.udp.netmotion_stage == 0) {
-    flow->l4.udp.netmotion_cid[dir] = cid;
-    flow->l4.udp.netmotion_token[dir] = token;
-    flow->l4.udp.netmotion_stage = dir ? 2 : 1;
+  if(flow->metadata.l4.udp.netmotion_stage == 0) {
+    flow->metadata.l4.udp.netmotion_cid[dir] = cid;
+    flow->metadata.l4.udp.netmotion_token[dir] = token;
+    flow->metadata.l4.udp.netmotion_stage = dir ? 2 : 1;
     return;
   }
 
-  if(flow->l4.udp.netmotion_stage == 1 || flow->l4.udp.netmotion_stage == 2) {
-    u_int8_t stored_dir = flow->l4.udp.netmotion_stage - 1;
+  if(flow->metadata.l4.udp.netmotion_stage == 1 || flow->metadata.l4.udp.netmotion_stage == 2) {
+    u_int8_t stored_dir = flow->metadata.l4.udp.netmotion_stage - 1;
 
     if(dir == stored_dir) {
-      if(cid != flow->l4.udp.netmotion_cid[dir] ||
-         token != flow->l4.udp.netmotion_token[dir])
+      if(cid != flow->metadata.l4.udp.netmotion_cid[dir] ||
+         token != flow->metadata.l4.udp.netmotion_token[dir])
         goto exclude_netmotion;
       return; /* still waiting for the opposite direction */
     }
 
     /* Opposite direction: the connection id and token must differ. */
-    if(cid == flow->l4.udp.netmotion_cid[stored_dir] ||
-       token == flow->l4.udp.netmotion_token[stored_dir])
+    if(cid == flow->metadata.l4.udp.netmotion_cid[stored_dir] ||
+       token == flow->metadata.l4.udp.netmotion_token[stored_dir])
       goto exclude_netmotion;
 
-    flow->l4.udp.netmotion_cid[dir] = cid;
-    flow->l4.udp.netmotion_token[dir] = token;
-    flow->l4.udp.netmotion_stage = 3;
+    flow->metadata.l4.udp.netmotion_cid[dir] = cid;
+    flow->metadata.l4.udp.netmotion_token[dir] = token;
+    flow->metadata.l4.udp.netmotion_stage = 3;
     return;
   }
 
-  if(flow->l4.udp.netmotion_stage == 3) {
-    if(cid != flow->l4.udp.netmotion_cid[dir] ||
-       token != flow->l4.udp.netmotion_token[dir])
+  if(flow->metadata.l4.udp.netmotion_stage == 3) {
+    if(cid != flow->metadata.l4.udp.netmotion_cid[dir] ||
+       token != flow->metadata.l4.udp.netmotion_token[dir])
       goto exclude_netmotion;
 
     ndpi_int_netmotion_add_connection(ndpi_struct, flow);

@@ -28,15 +28,15 @@
 /* mail_imap_stage is a 3-bit field; cap it at 7 to prevent overflow */
 #define SAFE_INC_IMAP_STAGE(flow) \
   do { \
-    if((flow)->l4.tcp.mail_imap_stage < 7) \
-      (flow)->l4.tcp.mail_imap_stage += 1; \
+    if((flow)->metadata.l4.tcp.mail_imap_stage < 7) \
+      (flow)->metadata.l4.tcp.mail_imap_stage += 1; \
   } while(0)
 
 /* #define IMAP_DEBUG 1 */
 
 static void imap_set_detected(struct ndpi_detection_module_struct *ndpi_struct,
                                struct ndpi_flow_struct *flow, u_int16_t protocol) {
-  ndpi_set_detected_protocol(ndpi_struct, flow, protocol,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, protocol,
                              NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
@@ -68,7 +68,7 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
     goto imap_check_stage;
   }
 
-  if(flow->l4.tcp.mail_imap_stage < 5) {
+  if(flow->metadata.l4.tcp.mail_imap_stage < 5) {
     /* Locate the tag: a sequence of alphanumeric / '*' / '.' chars ending at a space */
     while(i < 20 && i < packet->payload_packet_len) {
       if(i > 0 && packet->payload[i] == ' ') {
@@ -112,12 +112,12 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
   if((command_start + 3) < packet->payload_packet_len) {
     if(ndpi_memcasecmp(packet->payload + command_start, "OK ", 3) == 0) {
       SAFE_INC_IMAP_STAGE(flow);
-      if(flow->l4.tcp.mail_imap_starttls == 1) {
+      if(flow->metadata.l4.tcp.mail_imap_starttls == 1) {
         NDPI_LOG_DBG2(ndpi_struct, "starttls detected\n");
         imap_set_detected(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_IMAPS);
         if(ndpi_struct->cfg.imap_opportunistic_tls_enabled) {
           NDPI_LOG_DBG(ndpi_struct, "Switching to [%d/%d]\n",
-                       flow->detected_protocol_stack[0], flow->detected_protocol_stack[1]);
+                       flow->core.detected_protocol_stack[0], flow->core.detected_protocol_stack[1]);
           switch_extra_dissection_to_tls(ndpi_struct, flow);
           return;
         }
@@ -128,8 +128,8 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
       saw_command = 1;
     } else if(ndpi_memcasecmp(packet->payload + command_start, "NO ", 3) == 0) {
       SAFE_INC_IMAP_STAGE(flow);
-      if(flow->l4.tcp.mail_imap_starttls == 1)
-        flow->l4.tcp.mail_imap_starttls = 0;
+      if(flow->metadata.l4.tcp.mail_imap_starttls == 1)
+        flow->metadata.l4.tcp.mail_imap_starttls = 0;
       saw_command = 1;
     }
   }
@@ -144,7 +144,7 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
   if((command_start + 8) < packet->payload_packet_len) {
     if(ndpi_memcasecmp(packet->payload + command_start, "STARTTLS", 8) == 0) {
       SAFE_INC_IMAP_STAGE(flow);
-      flow->l4.tcp.mail_imap_starttls = 1;
+      flow->metadata.l4.tcp.mail_imap_starttls = 1;
       saw_command = 1;
     }
   }
@@ -161,16 +161,16 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
       if(user) {
         char *pwd, buf[64];
 
-        ndpi_snprintf(flow->l4.tcp.ftp_imap_pop_smtp.username,
-                      sizeof(flow->l4.tcp.ftp_imap_pop_smtp.username), "%s", user);
+        ndpi_snprintf(flow->metadata.l4.tcp.ftp_imap_pop_smtp.username,
+                      sizeof(flow->metadata.l4.tcp.ftp_imap_pop_smtp.username), "%s", user);
         snprintf(buf, sizeof(buf), "Found IMAP username (%s)",
-                 flow->l4.tcp.ftp_imap_pop_smtp.username);
-        ndpi_set_risk(ndpi_struct, flow, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
+                 flow->metadata.l4.tcp.ftp_imap_pop_smtp.username);
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_CLEAR_TEXT_CREDENTIALS, buf);
 
         pwd = strtok_r(NULL, " \"\r\n", &saveptr);
         if(pwd)
-          ndpi_snprintf(flow->l4.tcp.ftp_imap_pop_smtp.password,
-                        sizeof(flow->l4.tcp.ftp_imap_pop_smtp.password), "%s", pwd);
+          ndpi_snprintf(flow->metadata.l4.tcp.ftp_imap_pop_smtp.password,
+                        sizeof(flow->metadata.l4.tcp.ftp_imap_pop_smtp.password), "%s", pwd);
       }
       SAFE_INC_IMAP_STAGE(flow);
       saw_command = 1;
@@ -224,11 +224,11 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
 
  imap_check_stage:
   if(saw_command) {
-    if(flow->l4.tcp.mail_imap_stage == 3 ||
-       flow->l4.tcp.mail_imap_stage == 5 ||
-       flow->l4.tcp.mail_imap_stage == 7) {
-      if(flow->l4.tcp.ftp_imap_pop_smtp.username[0] != '\0' ||
-         flow->l4.tcp.mail_imap_stage >= 7) {
+    if(flow->metadata.l4.tcp.mail_imap_stage == 3 ||
+       flow->metadata.l4.tcp.mail_imap_stage == 5 ||
+       flow->metadata.l4.tcp.mail_imap_stage == 7) {
+      if(flow->metadata.l4.tcp.ftp_imap_pop_smtp.username[0] != '\0' ||
+         flow->metadata.l4.tcp.mail_imap_stage >= 7) {
         NDPI_LOG_INFO(ndpi_struct, "found MAIL_IMAP\n");
         imap_set_detected(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_IMAP);
       }
@@ -241,7 +241,7 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
      packet->payload[packet->payload_packet_len - 1] == ' ') {
     NDPI_LOG_DBG2(ndpi_struct,
                   "maybe a split imap command -> need next packet and imap_stage is set to 4.\n");
-    flow->l4.tcp.mail_imap_stage = 4;
+    flow->metadata.l4.tcp.mail_imap_stage = 4;
     return;
   }
 
@@ -249,8 +249,8 @@ static void ndpi_search_mail_imap_tcp(struct ndpi_detection_module_struct *ndpi_
   /* Allow a few unrecognised packets if we have already seen at least one IMAP token */
   if(packet->payload_packet_len >= 2 &&
      ntohs(get_u_int16_t(packet->payload, packet->payload_packet_len - 2)) == 0x0d0a &&
-     flow->packet_counter < 8 &&
-     flow->l4.tcp.mail_imap_stage >= 1) {
+     flow->core.packet_counter < 8 &&
+     flow->metadata.l4.tcp.mail_imap_stage >= 1) {
     NDPI_LOG_DBG2(ndpi_struct,
                   "no imap command or response but packet count < 6 and imap stage >= 1 -> skip\n");
     return;

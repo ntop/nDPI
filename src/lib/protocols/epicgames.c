@@ -30,7 +30,7 @@ static void ndpi_int_epicgames_add_connection(struct ndpi_detection_module_struc
                                               struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found EpicGames\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_PROTOCOL_EPICGAMES,
                              NDPI_CONFIDENCE_DPI);
@@ -42,24 +42,24 @@ static void ndpi_search_epicgames(struct ndpi_detection_module_struct *ndpi_stru
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
   NDPI_LOG_DBG(ndpi_struct, "searching EpicGames (stage %d dir %d)\n",
-               flow->l4.udp.epicgames_stage, packet->packet_direction);
+               flow->metadata.l4.udp.epicgames_stage, packet->packet_direction);
 
-  if(flow->packet_counter == 1) {
+  if(flow->core.packet_counter == 1) {
     if(packet->payload_packet_len >= 34 &&
        ((ntohl(get_u_int32_t(packet->payload, 0)) & 0x08) == 0) &&
        get_u_int64_t(packet->payload, 10) == 0 &&
        get_u_int64_t(packet->payload, 18) == 0 &&
        get_u_int64_t(packet->payload, 26) == 0) {
-      flow->l4.udp.epicgames_stage = 1 + packet->packet_direction;
-      flow->l4.udp.epicgames_word = ntohl(get_u_int32_t(packet->payload, 0));
+      flow->metadata.l4.udp.epicgames_stage = 1 + packet->packet_direction;
+      flow->metadata.l4.udp.epicgames_word = ntohl(get_u_int32_t(packet->payload, 0));
       return;
     } else {
       NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
       return;
     }
-  } else if(flow->l4.udp.epicgames_stage == 2 - packet->packet_direction) {
+  } else if(flow->metadata.l4.udp.epicgames_stage == 2 - packet->packet_direction) {
     if(packet->payload_packet_len > 4 &&
-       (flow->l4.udp.epicgames_word | 0x08) == ntohl(get_u_int32_t(packet->payload, 0))) {
+       (flow->metadata.l4.udp.epicgames_word | 0x08) == ntohl(get_u_int32_t(packet->payload, 0))) {
       ndpi_int_epicgames_add_connection(ndpi_struct, flow);
       return;
     } else {
@@ -68,7 +68,7 @@ static void ndpi_search_epicgames(struct ndpi_detection_module_struct *ndpi_stru
     }
   }
 
-  if(flow->packet_counter >= 4) {
+  if(flow->core.packet_counter >= 4) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }

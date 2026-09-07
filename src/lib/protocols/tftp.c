@@ -32,7 +32,7 @@
 static void ndpi_int_tftp_add_connection(struct ndpi_detection_module_struct
 					 *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_TFTP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TFTP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 static size_t tftp_dissect_szstr(struct ndpi_packet_struct const * const packet,
@@ -187,9 +187,9 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
           }
 
           /* Dissect RRQ/WWQ filename. */
-          filename_len = ndpi_min(filename_len, sizeof(flow->protos.tftp.filename) - 1);
-          memcpy(flow->protos.tftp.filename, filename_start, filename_len);
-          flow->protos.tftp.filename[filename_len] = '\0';
+          filename_len = ndpi_min(filename_len, sizeof(flow->metadata.protos.tftp.filename) - 1);
+          memcpy(flow->metadata.protos.tftp.filename, filename_start, filename_len);
+          flow->metadata.protos.tftp.filename[filename_len] = '\0';
 
           /* We have seen enough and do not need any more TFTP packets. */
           NDPI_LOG_INFO(ndpi_struct, "found tftp (RRQ/WWQ)\n");
@@ -207,8 +207,8 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
         /* First 2 bytes were opcode so next 16 bits are the block number.
          * This should increment every packet but give some leeway for midstream and packet loss. */
         block_num = ntohs(get_u_int16_t(packet->payload, 2));
-        prev_num = flow->l4.udp.tftp_data_num;
-        flow->l4.udp.tftp_data_num = block_num;
+        prev_num = flow->metadata.l4.udp.tftp_data_num;
+        flow->metadata.l4.udp.tftp_data_num = block_num;
         if (!(block_num == prev_num + 1 || (prev_num != 0 && block_num == prev_num)))
         {
           return;
@@ -226,8 +226,8 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
         /* First 2 bytes were opcode so next 16 bits are the block number.
          * This should increment every packet but give some leeway for midstream and packet loss. */
         block_num = ntohs(get_u_int16_t(packet->payload, 2));
-        prev_num = flow->l4.udp.tftp_ack_num;
-        flow->l4.udp.tftp_ack_num = block_num;
+        prev_num = flow->metadata.l4.udp.tftp_ack_num;
+        flow->metadata.l4.udp.tftp_ack_num = block_num;
         if (!(block_num == prev_num + 1 || (block_num == prev_num)))
         {
           return;
@@ -269,10 +269,10 @@ static void ndpi_search_tftp(struct ndpi_detection_module_struct *ndpi_struct,
         return;
   }
 
-  if (flow->l4.udp.tftp_stage < 3)
+  if (flow->metadata.l4.udp.tftp_stage < 3)
   {
     NDPI_LOG_DBG2(ndpi_struct, "maybe tftp. need next packet\n");
-    flow->l4.udp.tftp_stage++;
+    flow->metadata.l4.udp.tftp_stage++;
     return;
   }
 

@@ -55,7 +55,7 @@ static void ndpi_search_kakaotalk_voice(struct ndpi_detection_module_struct *ndp
       if(((ntohl(packet->iph->saddr) & 0xFFFF0000 /* 255.255.0.0 */) == 0x01C90000 /* 1.201.0.0/16 */)
 	 || ((ntohl(packet->iph->daddr) & 0xFFFF0000 /* 255.255.0.0 */) == 0x01C90000 /* 1.201.0.0/16 */)) {
 	NDPI_LOG_INFO(ndpi_struct, "found kakaotalk_voice\n");
-	ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_KAKAOTALK_VOICE, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+	ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_KAKAOTALK_VOICE, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 	return;
       }
     } 

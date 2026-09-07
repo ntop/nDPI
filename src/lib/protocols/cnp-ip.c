@@ -35,7 +35,7 @@ static void ndpi_int_cnp_ip_add_connection(struct ndpi_detection_module_struct *
                                            struct ndpi_flow_struct *flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found CNP-IP\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_CNP_IP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_CNP_IP, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 static void ndpi_search_cnp_ip(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)

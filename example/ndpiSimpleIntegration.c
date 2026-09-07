@@ -867,14 +867,14 @@ static void ndpi_process_packet(uint8_t * const args,
    * This example tries to use maximum supported packets for detection:
    * for uint8: 0xFF
    */
-  if (flow_to_process->ndpi_flow->num_processed_pkts == 0xFF) {
+  if (flow_to_process->ndpi_flow->core.num_processed_pkts == 0xFF) {
     return;
-  } else if (flow_to_process->ndpi_flow->num_processed_pkts == 0xFE) {
+  } else if (flow_to_process->ndpi_flow->core.num_processed_pkts == 0xFE) {
     /* last chance to guess something, better then nothing */
     flow_to_process->guessed_protocol =
       ndpi_detection_giveup(workflow->ndpi_struct,
 			    flow_to_process->ndpi_flow);
-    if (flow_to_process->ndpi_flow->protocol_was_guessed != 0) {
+    if (flow_to_process->ndpi_flow->core.protocol_was_guessed != 0) {
       printf("[%8llu, %d, %4d][GUESSED] protocol: %s | app protocol: %s | category: %s\n",
 	     workflow->packets_captured,
 	     reader_thread->array_index,
@@ -912,8 +912,8 @@ static void ndpi_process_packet(uint8_t * const args,
       }
     }
 
-  if (flow_to_process->ndpi_flow->num_extra_packets_checked <=
-      flow_to_process->ndpi_flow->max_extra_packets_to_check)
+  if (flow_to_process->ndpi_flow->core.num_extra_packets_checked <=
+      flow_to_process->ndpi_flow->core.max_extra_packets_to_check)
     {
       /*
        * Your business logic starts here.
@@ -945,7 +945,7 @@ static void ndpi_process_packet(uint8_t * const args,
 	  flow_to_process->detected_l7_protocol.proto.app_protocol == NDPI_PROTOCOL_TLS)
         {
 	  if (flow_to_process->tls_client_hello_seen == 0 &&
-	      flow_to_process->ndpi_flow->protos.tls_quic.client_hello_processed != 0)
+	      flow_to_process->ndpi_flow->metadata.protos.tls_quic.client_hello_processed != 0)
             {
 	      uint8_t unknown_tls_version = 0;
 	      char buf_ver[16];
@@ -954,15 +954,15 @@ static void ndpi_process_packet(uint8_t * const args,
 		     reader_thread->array_index,
 		     flow_to_process->flow_id,
 		     ndpi_ssl_version2str(buf_ver, sizeof(buf_ver),
-					  flow_to_process->ndpi_flow->protos.tls_quic.ssl_version,
+					  flow_to_process->ndpi_flow->metadata.protos.tls_quic.ssl_version,
 					  &unknown_tls_version),
-		     flow_to_process->ndpi_flow->host_server_name,
-		     (flow_to_process->ndpi_flow->protos.tls_quic.advertised_alpns != NULL ?
-		      flow_to_process->ndpi_flow->protos.tls_quic.advertised_alpns : "-"));
+		     flow_to_process->ndpi_flow->core.host_server_name,
+		     (flow_to_process->ndpi_flow->metadata.protos.tls_quic.advertised_alpns != NULL ?
+		      flow_to_process->ndpi_flow->metadata.protos.tls_quic.advertised_alpns : "-"));
 	      flow_to_process->tls_client_hello_seen = 1;
             }
 	  if (flow_to_process->tls_server_hello_seen == 0 &&
-	      flow_to_process->ndpi_flow->tls_quic.certificate_processed != 0)
+	      flow_to_process->ndpi_flow->metadata.tls_quic.certificate_processed != 0)
             {
 	      uint8_t unknown_tls_version = 0;
 	      char buf_ver[16];
@@ -972,16 +972,16 @@ static void ndpi_process_packet(uint8_t * const args,
 		     reader_thread->array_index,
 		     flow_to_process->flow_id,
 		     ndpi_ssl_version2str(buf_ver, sizeof(buf_ver),
-					  flow_to_process->ndpi_flow->protos.tls_quic.ssl_version,
+					  flow_to_process->ndpi_flow->metadata.protos.tls_quic.ssl_version,
 					  &unknown_tls_version),
-		     (flow_to_process->ndpi_flow->protos.tls_quic.server_names_len == 0 ?
-		      1 : flow_to_process->ndpi_flow->protos.tls_quic.server_names_len),
-		     (flow_to_process->ndpi_flow->protos.tls_quic.server_names == NULL ?
-		      "-" : flow_to_process->ndpi_flow->protos.tls_quic.server_names),
-		     (flow_to_process->ndpi_flow->protos.tls_quic.issuerDN != NULL ?
-		      flow_to_process->ndpi_flow->protos.tls_quic.issuerDN : "-"),
-		     (flow_to_process->ndpi_flow->protos.tls_quic.subjectDN != NULL ?
-		      flow_to_process->ndpi_flow->protos.tls_quic.subjectDN : "-"));
+		     (flow_to_process->ndpi_flow->metadata.protos.tls_quic.server_names_len == 0 ?
+		      1 : flow_to_process->ndpi_flow->metadata.protos.tls_quic.server_names_len),
+		     (flow_to_process->ndpi_flow->metadata.protos.tls_quic.server_names == NULL ?
+		      "-" : flow_to_process->ndpi_flow->metadata.protos.tls_quic.server_names),
+		     (flow_to_process->ndpi_flow->metadata.protos.tls_quic.issuerDN != NULL ?
+		      flow_to_process->ndpi_flow->metadata.protos.tls_quic.issuerDN : "-"),
+		     (flow_to_process->ndpi_flow->metadata.protos.tls_quic.subjectDN != NULL ?
+		      flow_to_process->ndpi_flow->metadata.protos.tls_quic.subjectDN : "-"));
 	      flow_to_process->tls_server_hello_seen = 1;
             }
         }

@@ -51,7 +51,7 @@ static void ndpi_search_rtps(struct ndpi_detection_module_struct *ndpi_struct,
          (packet->payload[5] <= RTPS_LAST_MINOR_VER)))
     {
       NDPI_LOG_INFO(ndpi_struct, "found RTPS\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_RTPS,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_RTPS,
                                  NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }

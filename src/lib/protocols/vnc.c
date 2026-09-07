@@ -59,18 +59,18 @@ static void ndpi_search_vnc_tcp(struct ndpi_detection_module_struct *ndpi_struct
   NDPI_LOG_DBG(ndpi_struct, "search vnc\n");
 
   if(vnc_is_rfb_banner(packet)) {
-    if(flow->l4.tcp.vnc_stage == 0) {
+    if(flow->metadata.l4.tcp.vnc_stage == 0) {
       /* First RFB banner observed: remember which side sent it */
       NDPI_LOG_DBG2(ndpi_struct, "reached vnc stage one\n");
-      flow->l4.tcp.vnc_stage = 1 + packet->packet_direction;
+      flow->metadata.l4.tcp.vnc_stage = 1 + packet->packet_direction;
       return;
     }
 
-    if(flow->l4.tcp.vnc_stage == (u_int64_t)(2 - packet->packet_direction)) {
+    if(flow->metadata.l4.tcp.vnc_stage == (u_int64_t)(2 - packet->packet_direction)) {
       /* Matching RFB banner from the other side: handshake complete */
       NDPI_LOG_INFO(ndpi_struct, "found vnc\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_VNC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
-      ndpi_set_risk(ndpi_struct, flow, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found VNC"); /* Remote assistance */
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_VNC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found VNC"); /* Remote assistance */
       return;
     }
   }

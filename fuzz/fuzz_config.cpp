@@ -368,40 +368,40 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   ndpi_get_flow_risk_info(&flow, out, sizeof(out), 1);
   ndpi_get_flow_ndpi_proto(&flow, &p2);
   ndpi_is_proto(p.proto, NDPI_PROTOCOL_TLS);
-  ndpi_http_method2str(flow.http.method);
+  ndpi_http_method2str(flow.metadata.http.method);
   ndpi_is_subprotocol_informative(ndpi_info_mod, p.proto.app_protocol);
-  ndpi_get_flow_name(bool_value ? &flow : NULL);
-  ndpi_stack2str(ndpi_info_mod, &flow.protocol_stack, buf_stack, sizeof(buf_stack));
+  ndpi_get_flow_name(bool_value ? &flow.core : NULL);
+  ndpi_stack2str(ndpi_info_mod, &flow.core.protocol_stack, buf_stack, sizeof(buf_stack));
   /* ndpi_guess_undetected_protocol() is a "strange" function. Try fuzzing it, here */
   if(!ndpi_is_protocol_detected(p)) {
     ndpi_guess_undetected_protocol(ndpi_info_mod, bool_value ? &flow : NULL,
-                                   flow.l4_proto);
-    if(!flow.is_ipv6) {
+                                   flow.core.l4_proto);
+    if(!flow.core.is_ipv6) {
       /* Another "strange" function (ipv4 only): fuzz it here, for lack of a better alternative */
-      ndpi_find_ipv4_category_userdata(ndpi_info_mod, flow.c_address.v4);
+      ndpi_find_ipv4_category_userdata(ndpi_info_mod, flow.core.c_address.v4);
 
-      ndpi_search_tcp_or_udp_raw(ndpi_info_mod, NULL, ntohl(flow.c_address.v4), ntohl(flow.s_address.v4));
+      ndpi_search_tcp_or_udp_raw(ndpi_info_mod, NULL, ntohl(flow.core.c_address.v4), ntohl(flow.core.s_address.v4));
 
       ndpi_guess_undetected_protocol_v4(ndpi_info_mod, bool_value ? &flow : NULL,
-                                        flow.l4_proto,
-                                        flow.c_address.v4, flow.c_port,
-                                        flow.s_address.v4, flow.s_port);
+                                        flow.core.l4_proto,
+                                        flow.core.c_address.v4, flow.core.c_port,
+                                        flow.core.s_address.v4, flow.core.s_port);
     } else {
-      ndpi_find_ipv6_category_userdata(ndpi_info_mod, bool_value ? NULL : (struct in6_addr *)flow.c_address.v6);
+      ndpi_find_ipv6_category_userdata(ndpi_info_mod, bool_value ? NULL : (struct in6_addr *)&flow.core.c_address.v6);
     }
     /* Another "strange" function: fuzz it here, for lack of a better alternative */
     ndpi_search_tcp_or_udp(ndpi_info_mod, &flow);
   }
-  if(!flow.is_ipv6) {
+  if(!flow.core.is_ipv6) {
     if(bool_value)
-      ndpi_network_risk_ptree_match(ndpi_info_mod, (struct in_addr *)&flow.c_address.v4);
+      ndpi_network_risk_ptree_match(ndpi_info_mod, (struct in_addr *)&flow.core.c_address.v4);
 
-    ndpi_risk_params params[] = { { NDPI_PARAM_HOSTNAME, flow.host_server_name},
+    ndpi_risk_params params[] = { { NDPI_PARAM_HOSTNAME, flow.core.host_server_name},
                                   { NDPI_PARAM_ISSUER_DN, (void *)("CN=813845657003339838, O=Code42, OU=TEST, ST=MN, C=US") /* from example/protos.txt */},
-                                  { NDPI_PARAM_HOST_IPV4, &flow.c_address.v4} };
+                                  { NDPI_PARAM_HOST_IPV4, &flow.core.c_address.v4} };
     ndpi_check_flow_risk_exceptions(ndpi_info_mod, 3, params);
 
-    ndpi_risk_params params2[] = { { NDPI_MAX_RISK_PARAM_ID, &flow.c_address.v4} }; /* Invalid */
+    ndpi_risk_params params2[] = { { NDPI_MAX_RISK_PARAM_ID, &flow.core.c_address.v4} }; /* Invalid */
     ndpi_check_flow_risk_exceptions(ndpi_info_mod, 1, params2);
   }
   /* TODO: stub for geo stuff */

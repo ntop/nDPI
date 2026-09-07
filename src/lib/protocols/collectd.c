@@ -62,7 +62,7 @@ static void ndpi_int_collectd_add_connection(struct ndpi_detection_module_struct
                                              struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found collectd\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_COLLECTD,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -105,7 +105,7 @@ static void ndpi_int_collectd_dissect_hostname(struct ndpi_flow_struct * const f
                                                struct ndpi_packet_struct const * const packet,
                                                u_int16_t block_length)
 {
-  ndpi_hostname_sni_set(flow, &packet->payload[4], block_length, NDPI_HOSTNAME_NORM_ALL);
+  ndpi_hostname_sni_set(&flow->core, &packet->payload[4], block_length, NDPI_HOSTNAME_NORM_ALL);
 }
 
 static int ndpi_int_collectd_dissect_username(struct ndpi_flow_struct * const flow,
@@ -120,9 +120,9 @@ static int ndpi_int_collectd_dissect_username(struct ndpi_flow_struct * const fl
     return 1;
   }
 
-  size_t sz_len = ndpi_min(sizeof(flow->protos.collectd.client_username) - 1, username_length);
-  memcpy(flow->protos.collectd.client_username, &packet->payload[6], sz_len);
-  flow->protos.collectd.client_username[sz_len] = '\0';
+  size_t sz_len = ndpi_min(sizeof(flow->metadata.protos.collectd.client_username) - 1, username_length);
+  memcpy(flow->metadata.protos.collectd.client_username, &packet->payload[6], sz_len);
+  flow->metadata.protos.collectd.client_username[sz_len] = '\0';
 
   return 0;
 }

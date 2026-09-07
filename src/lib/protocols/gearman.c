@@ -41,7 +41,7 @@ static void ndpi_search_gearman(struct ndpi_detection_module_struct *ndpi_struct
         (memcmp(&packet->payload[1], "RES", 3) == 0))
     {
       NDPI_LOG_INFO(ndpi_struct, "found Gearman\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_GEARMAN,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_GEARMAN,
                                  NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }

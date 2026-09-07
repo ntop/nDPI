@@ -28,7 +28,7 @@
 
 static void ndpi_int_ubntac2_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
-  ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_UBNTAC2, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_UBNTAC2, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 
 
@@ -58,9 +58,9 @@ static void ndpi_search_ubntac2(struct ndpi_detection_module_struct *ndpi_struct
       NDPI_LOG_DBG2(ndpi_struct, "0x%x Len %d\n", tlv_type, tlv_length);
 
       if(tlv_type == 0x03 && off + 3 + tlv_length < packet->payload_packet_len) {
-	version_len = ndpi_min(sizeof(flow->protos.ubntac2.version) - 1, tlv_length);
-	memcpy(flow->protos.ubntac2.version, (const char *)&packet->payload[off + 3], version_len);
-	flow->protos.ubntac2.version[version_len] = '\0';
+	version_len = ndpi_min(sizeof(flow->metadata.protos.ubntac2.version) - 1, tlv_length);
+	memcpy(flow->metadata.protos.ubntac2.version, (const char *)&packet->payload[off + 3], version_len);
+	flow->metadata.protos.ubntac2.version[version_len] = '\0';
       }
 
       off += 3 + tlv_length;

@@ -76,8 +76,8 @@ enum ndpi_license_type {
     do not have a license from ntop for dual-licensed components: all
     components LGPL and dual-license are enabled
   */
-  NDPI_LICENSE_NOT_FOR_PROFIT_LGPL = 0,  
-  
+  NDPI_LICENSE_NOT_FOR_PROFIT_LGPL = 0,
+
   /*
     Use this value if you use nDPI in a for profit project and you
     do not have a license from ntop for dual-licensed components
@@ -888,6 +888,17 @@ struct ndpi_tls_block {
   u_int16_t msec_delta; /* Used to store protocol_id in ja4 hash */
 };
 
+typedef enum {
+  ndpi_os_unknown     = 0,
+  ndpi_os_windows     = 1,
+  ndpi_os_macos       = 2,
+  ndpi_os_ios_ipad_os = 3,
+  ndpi_os_android     = 4,
+  ndpi_os_linux       = 5,
+  ndpi_os_freebsd     = 6,
+  ndpi_os_MAX_OS      = 7 /* Keep it as last */
+} ndpi_os;
+
 struct ndpi_flow_tcp_struct {
   struct {
     u_int64_t syn_time, syn_ack_time, ack_time;
@@ -900,6 +911,8 @@ struct ndpi_flow_tcp_struct {
   /* Part of the TCP header */
   u_int8_t cli2srv_tcp_flags, srv2cli_tcp_flags;
 
+  /* **** Protocols **** */
+  
   /* NDPI_PROTOCOL_MAIL_SMTP */
   /* NDPI_PROTOCOL_MAIL_POP */
   /* NDPI_PROTOCOL_MAIL_IMAP */
@@ -940,97 +953,97 @@ struct ndpi_flow_tcp_struct {
   u_int8_t memcached_matches;
 
   /* Part of the TCP header */
-  u_int64_t seen_syn:1, seen_syn_ack:1, seen_ack:1;
+  u_int8_t seen_syn:1, seen_syn_ack:1, seen_ack:1;
 
   /* NDPI_PROTOCOL_IRC */
-  u_int64_t irc_stage:2;
+  u_int8_t irc_stage:2;
 
   /* NDPI_PROTOCOL_USENET */
-  u_int64_t usenet_stage:2;
+  u_int8_t usenet_stage:2;
 
   /* NDPI_PROTOCOL_HTTP */
-  u_int64_t http_stage:3;
-  u_int64_t http_asymmetric_stage:2;
+  u_int8_t http_stage:3, http_asymmetric_stage:2;
 
   /* NDPI_PROTOCOL_GNUTELLA */
-  u_int64_t gnutella_stage:2;
+  u_int8_t gnutella_stage:2;
 
   /* NDPI_PROTOCOL_SSH */
-  u_int64_t ssh_stage:3;
+  u_int8_t ssh_stage:3;
 
   /* NDPI_PROTOCOL_VNC */
-  u_int64_t vnc_stage:2;
+  u_int8_t vnc_stage:2;
 
   /* NDPI_PROTOCOL_RADMIN */
-  u_int64_t radmin_stage:1;
+  u_int8_t radmin_stage:1;
 
   /* NDPI_PROTOCOL_FTP_CONTROL */
-  u_int64_t ftp_control_stage:2;
+  u_int8_t ftp_control_stage:2;
 
   /* NDPI_PROTOCOL_SOAP */
-  u_int64_t soap_stage:1;
+  u_int8_t soap_stage:1;
 
   /* NDPI_PROTOCOL_SOCKS */
-  u_int64_t socks5_stage:2;
-  u_int64_t socks4_stage:2;
+  u_int8_t socks5_stage:2, socks4_stage:2;
 
   /* NDPI_PROTOCOL_Z3950 */
-  u_int64_t z3950_stage:2;
+  u_int8_t z3950_stage:2;
 
   /* NDPI_PROTOCOL_RTMP */
-  u_int64_t rtmp_stage:2;
+  u_int8_t rtmp_stage:2;
 
   /* NDPI_PROTOCOL_POSTGRES */
-  u_int64_t postgres_stage:3;
+  u_int8_t postgres_stage:3;
 
   /* NDPI_PROTOCOL_MAIL_POP */
-  u_int64_t mail_pop_stage:2;
+  u_int8_t mail_pop_stage:2;
 
   /* NDPI_PROTOCOL_MAIL_IMAP */
-  u_int64_t mail_imap_stage:3;
-  u_int64_t mail_imap_starttls:1;
+  u_int8_t mail_imap_stage:3, mail_imap_starttls:1;
 
   /* NDPI_PROTOCOL_RDP */
-  u_int64_t rdp_protocol_detected:1;
+  u_int8_t rdp_protocol_detected:1;
 
   /* Reserved for future use */
   u_int64_t reserved:21;
+
+  char *fingerprint, *fingerprint_raw;
+  ndpi_os os_hint;
 };
 
 /* ************************************************** */
 
 struct ndpi_flow_udp_struct {
   /* NDPI_PROTOCOL_TFTP */
-  u_int32_t tftp_stage:2;
+  u_int16_t tftp_stage:2,
 
   /* NDPI_PROTOCOL_XBOX */
-  u_int32_t xbox_stage:1;
+    xbox_stage:1,
 
   /* NDPI_PROTOCOL_QUIC */
-  u_int32_t quic_server_cid_stage:2;
-  u_int32_t quic_0rtt_found:1;
-  u_int32_t quic_vn_pair:1;
+    quic_server_cid_stage:2,
+    quic_0rtt_found:1,
+    quic_vn_pair:1,
 
   /* NDPI_PROTOCOL_LOLWILDRIFT */
-  u_int32_t lolwildrift_stage:1;
+    lolwildrift_stage:1,
 
   /* NDPI_PROTOCOL_ZOOM */
-  u_int32_t zoom_p2p:1;
+   zoom_p2p:1,
 
   /* NDPI_PROTOCOL_RAKNET */
-  u_int32_t raknet_custom:1;
+    raknet_custom:1,
 
   /* NDPI_PROTOCOL_MUMBLE */
-  u_int32_t mumble_stage:1;
+   mumble_stage:1,
 
   /* NDPI_PROTOCOL_HAMACHI */
-  u_int32_t hamachi_stage:2;
+   hamachi_stage:2,
 
   /* NDPI_PROTOCOL_NETMOTION */
-  u_int32_t netmotion_stage:2;
+   netmotion_stage:2,
 
   /* NDPI_PROTOCOL_EPICGAMES */
-  u_int32_t epicgames_stage:1;
+   epicgames_stage:1;
   u_int32_t epicgames_word;
 
   /* NDPI_PROTOCOL_RX */
@@ -1460,17 +1473,6 @@ struct ndpi_metadata_monitoring {
   } protos;
 };
 
-typedef enum {
-  ndpi_os_unknown     = 0,
-  ndpi_os_windows     = 1,
-  ndpi_os_macos       = 2,
-  ndpi_os_ios_ipad_os = 3,
-  ndpi_os_android     = 4,
-  ndpi_os_linux       = 5,
-  ndpi_os_freebsd     = 6,
-  ndpi_os_MAX_OS      = 7 /* Keep it as last */
-} ndpi_os;
-
 struct os_fingerprint {
   const char *fingerprint;
   ndpi_os os;
@@ -1629,6 +1631,8 @@ typedef struct {
 #define NDPI_IKEV2_REQUEST_PROPOSAL  0
 #define NDPI_IKEV2_RESPONSE_PROPOSAL 1
 
+#define OPENVPN_HEUR_MAX_NUM_OPCODES 4
+
 /* Per-proposal crypto algorithm selection from an IKEv2 SA payload (RFC 7296 §3.3) */
 struct ndpi_ipsec_proposal {
   u_int8_t  proto_id;        /* 1=IKE, 2=AH, 3=ESP */
@@ -1641,13 +1645,30 @@ struct ndpi_ipsec_proposal {
   u_int8_t  esn;             /* ESN: 0 = no ESN, 1 = ESN */
 };
 
+/* ************************ */
+
 struct ndpi_ipsec_details {
   u_int8_t version;             /* Version: major (upper 4 bits) and minor (lower 4 bits) */
   u_int8_t exchange_type;       /* IKEv2 exchange type (34=SA_INIT, 35=IKE_AUTH, ...) */
   struct ndpi_ipsec_proposal proposal[2];
 };
 
-struct ndpi_flow_struct {
+/* ************************ */
+
+struct ndpi_flow_struct_dns_metadata {
+  u_int8_t num_queries, num_answers, reply_code, num_rsp_addr;
+  u_int8_t is_query:1, pad:7;
+  u_int16_t transaction_id, query_type, query_class, rsp_type, edns0_udp_payload_size;
+  u_int8_t is_rsp_addr_ipv6[MAX_NUM_DNS_RSP_ADDRESSES];
+  ndpi_ip_addr_t rsp_addr[MAX_NUM_DNS_RSP_ADDRESSES]; /* The first num_rsp_addr address in a DNS response packet (A and AAAA) */
+  u_int32_t rsp_addr_ttl[MAX_NUM_DNS_RSP_ADDRESSES];
+  char geolocation_iata_code[4];
+  char ptr_domain_name[64 /* large enough but smaller than { } tls */];
+};
+
+/* ************************ */
+
+struct ndpi_flow_core_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   struct ndpi_proto_stack protocol_stack;
   ndpi_classification_state state;
@@ -1667,13 +1688,14 @@ struct ndpi_flow_struct {
   /* First Packet Classification info */
   struct ndpi_fpc_info fpc;
 
-  /* Flow addresses (useful for LRU lookups in ndpi_detection_giveup())
-     and ports. All in *network* byte order.
-     Client and server.
-   */
+  /*
+    Flow addresses (useful for LRU lookups in ndpi_detection_giveup())
+    and ports. All in *network* byte order.
+    Client and server.
+  */
   union {
     u_int32_t v4;
-    u_int8_t v6[16];
+    struct ndpi_in6_addr v6;
   } c_address, s_address;	/* For some unknown reasons, x86_64-w64-mingw32-gcc doesn't like the name "s_addr" */
   u_int16_t c_port, s_port;
 
@@ -1697,6 +1719,69 @@ struct ndpi_flow_struct {
   u_int16_t all_packets_counter;
   u_int16_t packet_direction_complete_counter[2];
 
+  u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
+  u_int8_t ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, tree_risk_checked:1, _notused:5;
+  ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
+  ndpi_risk risk, risk_shadow; /* Issues found with this flow [bitmask of ndpi_risk] */
+  struct ndpi_risk_information risk_infos[MAX_NUM_RISK_INFOS]; /* String that contains information about the risks found */
+  u_int8_t num_risk_infos;
+  struct ndpi_dissector_bitmask excluded_dissectors_bitmask;
+
+  struct ndpi_dns_tcp_reasm_state *dns_tcp_reasm; /* TCP DNS reassembly */
+  
+  /* General purpose field used to save mainly hostname/SNI information.
+   * In details it used for: MGCP, COLLECTD, DNS, SSDP and NETBIOS name, HTTP, MUNIN and DHCP hostname,
+   * WHOIS request, TLS/QUIC server name, XIAOMI domain and STUN realm.
+   *
+   * Please, think *very* hard before increasing its size!
+   */
+  char host_server_name[80];
+
+  /* Flow payload */
+  u_int16_t flow_payload_len;
+  char *flow_payload;
+};
+
+/* ************************ */
+
+struct ndpi_flow_tls_quic_core_struct {
+  message_t message[2]; /* Directions */
+  u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
+  struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
+  char *opaque; /* Plugin custom storage. If not NULL will be deleted automatically by ndpi_free_flow() */
+};
+
+/* ************************ */
+
+struct ndpi_flow_tls_quic_metadata_struct {
+  char *server_names, *advertised_alpns, *negotiated_alpn, *tls_supported_versions, *issuerDN, *subjectDN;
+  u_int32_t notBefore, notAfter;
+  char ja3_server[33], ja4_client[37], ja4_ndpi_client[37], *ja4_client_raw;
+  u_int16_t server_cipher;
+  u_int8_t sha1_certificate_fingerprint[20];
+  u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1,
+    server_hello_processed:1, fingerprint_set:1, webrtc:1;
+
+  struct tls_heuristics browser_heuristics;
+  u_int16_t ssl_version, server_names_len;
+
+  struct {
+    u_int16_t version;
+  } encrypted_ch;
+
+  ndpi_cipher_weakness server_unsafe_cipher;
+
+  u_int32_t quic_version;
+  u_int32_t quic_idle_timeout_sec;
+
+  /* Optionally allocated based on nDPI configuration */
+  ndpi_tls_client_info *ja_client;
+  ndpi_tls_server_info *ja_server;
+};
+
+/* ************************ */
+
+struct ndpi_flow_metadata_struct {
   /*
     the tcp / udp / other l4 value union
     used to reduce the number of bytes for tcp or udp protocol states
@@ -1709,31 +1794,10 @@ struct ndpi_flow_struct {
   /* Some protocols calculate the entropy. */
   float entropy;
 
-  /* General purpose field used to save mainly hostname/SNI information.
-   * In details it used for: MGCP, COLLECTD, DNS, SSDP and NETBIOS name, HTTP, MUNIN and DHCP hostname,
-   * WHOIS request, TLS/QUIC server name, XIAOMI domain and STUN realm.
-   *
-   * Please, think *very* hard before increasing its size!
-   */
-  char host_server_name[80];
-
-  u_int8_t initial_binary_bytes[8], initial_binary_bytes_len;
-  u_int8_t ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, tree_risk_checked:1, _notused:5;
-  ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
-  ndpi_risk risk, risk_shadow; /* Issues found with this flow [bitmask of ndpi_risk] */
-  struct ndpi_risk_information risk_infos[MAX_NUM_RISK_INFOS]; /* String that contains information about the risks found */
-  u_int8_t num_risk_infos;
-
-  struct {
-    char *fingerprint;
-    char *fingerprint_raw;
-    ndpi_os os_hint;
-  } tcp;
-
   struct {
     char *client_fingerprint, *server_fingerprint;
   } ndpi;
-
+  
   /*
     This structure below will not not stay inside the protos
     structure below as HTTP is used by many subprotocols
@@ -1765,8 +1829,6 @@ struct ndpi_flow_struct {
     u_int16_t pktbuf_maxlen, pktbuf_currlen;
   } kerberos_buf;
 
-  struct ndpi_dns_tcp_reasm_state *dns_tcp_reasm;
-
   struct {
     u_int8_t maybe_dtls:1, rtcp_seen:1, is_turn : 1, is_client_controlling:1, pad : 4;
     ndpi_address_port mapped_address, peer_address, relayed_address, response_origin, other_address;
@@ -1776,28 +1838,22 @@ struct ndpi_flow_struct {
     u_int32_t t_start, t_end;
   } stun;
 
-  struct {
-    message_t message[2]; /* Directions */
-    u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
-    struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
-    char *opaque; /* Plugin custom storage. If not NULL will be deleted automatically by ndpi_free_flow() */
-  } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
+  struct ndpi_flow_tls_quic_core_struct tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
-  struct rtp_info rtp[2 /* directions */];
+  struct {
+    struct rtp_info rtp[2 /* directions */];
+    /* NDPI_PROTOCOL_RTP */
+    u_int8_t rtp_stage:2;
+    u_int8_t rtp_seq_set[2];
+    u_int16_t rtp_seq[2];
+  } rtp;
 
   union {
     /* the only fields useful for nDPI and ntopng */
-    struct {
-      u_int8_t num_queries, num_answers, reply_code, num_rsp_addr;
-      u_int8_t is_query:1, pad:7;
-      u_int16_t transaction_id, query_type, query_class, rsp_type, edns0_udp_payload_size;
-      u_int8_t is_rsp_addr_ipv6[MAX_NUM_DNS_RSP_ADDRESSES];
-      ndpi_ip_addr_t rsp_addr[MAX_NUM_DNS_RSP_ADDRESSES]; /* The first num_rsp_addr address in a DNS response packet (A and AAAA) */
-      u_int32_t rsp_addr_ttl[MAX_NUM_DNS_RSP_ADDRESSES];
-      char geolocation_iata_code[4];
-      char ptr_domain_name[64 /* large enough but smaller than { } tls */];
-    } dns;
+    struct ndpi_flow_struct_dns_metadata dns;
 
+    struct ndpi_flow_tls_quic_metadata_struct tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
+    
     struct ntp_info {
       u_int8_t leap_indicator: 2, version: 3, mode: 3;
       u_int8_t stratum;
@@ -1821,32 +1877,6 @@ struct ndpi_flow_struct {
     struct {
       char currency[16];
     } mining;
-
-    struct {
-      char *server_names, *advertised_alpns, *negotiated_alpn, *tls_supported_versions, *issuerDN, *subjectDN;
-      u_int32_t notBefore, notAfter;
-      char ja3_server[33], ja4_client[37], ja4_ndpi_client[37], *ja4_client_raw;
-      u_int16_t server_cipher;
-      u_int8_t sha1_certificate_fingerprint[20];
-      u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1,
-	server_hello_processed:1, fingerprint_set:1, webrtc:1;
-
-      struct tls_heuristics browser_heuristics;
-      u_int16_t ssl_version, server_names_len;
-
-      struct {
-        u_int16_t version;
-      } encrypted_ch;
-
-      ndpi_cipher_weakness server_unsafe_cipher;
-
-      u_int32_t quic_version;
-      u_int32_t quic_idle_timeout_sec;
-
-      /* Optionally allocated based on nDPI configuration */
-      ndpi_tls_client_info *ja_client;
-      ndpi_tls_server_info *ja_server;
-    } tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
     struct {
       char client_signature[48], server_signature[48];
@@ -2001,9 +2031,19 @@ struct ndpi_flow_struct {
       u_int8_t num_other_funcs;     /* Other function codes */
     } s7comm;
 
-    struct ndpi_ipsec_details ipsec;
+    struct ndpi_ipsec_details ipsec;    
   } protos;
 
+  struct {
+    /* NDPI_PROTOCOL_OPENVPN */
+    u_int8_t ovpn_session_id[2][8];
+    u_int8_t ovpn_alg_standard_state:2, ovpn_alg_heur_opcode_state:2, ovpn_heur_opcode__codes_num:4;
+    u_int8_t ovpn_heur_opcode__num_msgs;
+    u_int8_t ovpn_heur_opcode__codes[OPENVPN_HEUR_MAX_NUM_OPCODES];
+    u_int8_t ovpn_heur_opcode__resets[2];
+    u_int16_t ovpn_heur_opcode__missing_bytes[2];
+  } openvpn;
+  
   struct {
     NDPIProtocolPluginEntryPoint *plugin;
     void *plugin_data;
@@ -2012,10 +2052,8 @@ struct ndpi_flow_struct {
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
   struct ndpi_metadata_monitoring *monit;
 
-  struct ndpi_dissector_bitmask excluded_dissectors_bitmask;
-
   /* NDPI_PROTOCOL_BITTORRENT */
-  u_int8_t bittorrent_stage;		      // can be 0 - 255
+  u_int8_t bittorrent_stage; // can be 0 - 255
   u_int8_t bt_check_performed : 1;
 
   /* NDPI_PROTOCOL_OOKLA */
@@ -2024,43 +2062,21 @@ struct ndpi_flow_struct {
   /* NDPI_PROTOCOL_TEAMVIEWER */
   u_int8_t teamviewer_stage : 3;
 
-  /* NDPI_PROTOCOL_OPENVPN */
-  u_int8_t ovpn_session_id[2][8];
-  u_int8_t ovpn_alg_standard_state : 2;
-  u_int8_t ovpn_alg_heur_opcode_state : 2;
-  u_int8_t ovpn_heur_opcode__codes_num : 4;
-  u_int8_t ovpn_heur_opcode__num_msgs;
-#define OPENVPN_HEUR_MAX_NUM_OPCODES 4
-  u_int8_t ovpn_heur_opcode__codes[OPENVPN_HEUR_MAX_NUM_OPCODES];
-  u_int8_t ovpn_heur_opcode__resets[2];
-  u_int16_t ovpn_heur_opcode__missing_bytes[2];
-
   /* NDPI_PROTOCOL_TINC */
   u_int8_t tinc_state;
 
    /* NDPI_PROTOCOL_RTCP */
    u_int8_t rtcp_stage:2;
+};
 
-   /* NDPI_PROTOCOL_RTP */
-   u_int8_t rtp_stage:2;
-   u_int8_t rtp_seq_set[2];
-   u_int16_t rtp_seq[2];
-
-  /* Flow payload */
-  u_int16_t flow_payload_len;
-  char *flow_payload;
-
-  /*
-     Leave this field below at the end
-     The field below can be used by third
-     party dissectors for storing private data
-   */
-  u_int8_t priv_data[16];
+struct ndpi_flow_struct {
+  struct ndpi_flow_core_struct core;
+  struct ndpi_flow_metadata_struct metadata;
 };
 
 #if !defined(NDPI_CFFI_PREPROCESSING) && defined(__linux__)
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->protos) <= 328,
+_Static_assert(sizeof(((struct ndpi_flow_struct *)0)->metadata.protos) <= 328,
                "Size of the struct member protocols increased to more than 328 bytes, "
                "please check if this change is necessary.");
 _Static_assert(sizeof(struct ndpi_flow_struct) <= 1392,

@@ -30,7 +30,7 @@ static void ndpi_int_tivoconnect_add_connection(struct ndpi_detection_module_str
                                                 struct ndpi_flow_struct * const flow)
 {
   NDPI_LOG_INFO(ndpi_struct, "found tivoconnect\n");
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_TIVOCONNECT,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -55,7 +55,7 @@ static void dissect_tivoconnect_data(struct ndpi_detection_module_struct *ndpi_s
 
     if (value == NULL)
     {
-      ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Missing value type in TiViConnect beacon");
+      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Missing value type in TiViConnect beacon");
       continue;
     }
     value++;
@@ -69,46 +69,46 @@ static void dissect_tivoconnect_data(struct ndpi_detection_module_struct *ndpi_s
       if (value_len >= NDPI_STATICSTRING_LEN("uuid:") &&
           strncasecmp(value, "uuid:", NDPI_STATICSTRING_LEN("uuid:")) == 0)
       {
-        size_t const len = ndpi_min(sizeof(flow->protos.tivoconnect.identity_uuid) - 1,
+        size_t const len = ndpi_min(sizeof(flow->metadata.protos.tivoconnect.identity_uuid) - 1,
                                     value_len - NDPI_STATICSTRING_LEN("uuid:"));
-        strncpy(flow->protos.tivoconnect.identity_uuid,
+        strncpy(flow->metadata.protos.tivoconnect.identity_uuid,
                 value + NDPI_STATICSTRING_LEN("uuid:"), len);
-        flow->protos.tivoconnect.identity_uuid[len] = '\0';
+        flow->metadata.protos.tivoconnect.identity_uuid[len] = '\0';
       }
       continue;
     }
     if (key_len == NDPI_STATICSTRING_LEN("machine") &&
         strncasecmp(key, "machine", key_len) == 0)
     {
-      size_t const len = ndpi_min(sizeof(flow->protos.tivoconnect.machine) - 1,
+      size_t const len = ndpi_min(sizeof(flow->metadata.protos.tivoconnect.machine) - 1,
                                          value_len);
-      strncpy(flow->protos.tivoconnect.machine, value, len);
-      flow->protos.tivoconnect.machine[len] = '\0';
+      strncpy(flow->metadata.protos.tivoconnect.machine, value, len);
+      flow->metadata.protos.tivoconnect.machine[len] = '\0';
       continue;
     }
     if (key_len == NDPI_STATICSTRING_LEN("platform") &&
         strncasecmp(key, "platform", key_len) == 0)
     {
-      size_t const len = ndpi_min(sizeof(flow->protos.tivoconnect.platform) - 1,
+      size_t const len = ndpi_min(sizeof(flow->metadata.protos.tivoconnect.platform) - 1,
                                          value_len);
-      strncpy(flow->protos.tivoconnect.platform, value, len);
-      flow->protos.tivoconnect.platform[len] = '\0';
+      strncpy(flow->metadata.protos.tivoconnect.platform, value, len);
+      flow->metadata.protos.tivoconnect.platform[len] = '\0';
       continue;
     }
     if (key_len == NDPI_STATICSTRING_LEN("services") &&
         strncasecmp(key, "services", key_len) == 0)
     {
-      size_t const len = ndpi_min(sizeof(flow->protos.tivoconnect.services) - 1,
+      size_t const len = ndpi_min(sizeof(flow->metadata.protos.tivoconnect.services) - 1,
                                          value_len);
-      strncpy(flow->protos.tivoconnect.services, value, len);
-      flow->protos.tivoconnect.services[len] = '\0';
+      strncpy(flow->metadata.protos.tivoconnect.services, value, len);
+      flow->metadata.protos.tivoconnect.services[len] = '\0';
       continue;
     }
   }
 
   if ((size_t)(key - payload) != payload_len)
   {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET,
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET,
                   "TiViConnect beacon malformed packet");
   }
 }

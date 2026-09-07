@@ -31,7 +31,7 @@ static void ndpi_int_munin_add_connection(struct ndpi_detection_module_struct * 
 {
   NDPI_LOG_INFO(ndpi_struct, "found munin\n");
 
-  ndpi_set_detected_protocol(ndpi_struct, flow,
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_MUNIN,
                              NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -64,16 +64,17 @@ static void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
 
   if (packet->payload[packet->payload_packet_len - 1] != '\n')
   {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Missing Munin Hostname");
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Missing Munin Hostname");
     return;
   }
 
   size_t host_len = packet->payload_packet_len - NDPI_STATICSTRING_LEN(munin_prefix) - 1;
   if (host_len > 0)
   {
-    ndpi_hostname_sni_set(flow, packet->payload + NDPI_STATICSTRING_LEN(munin_prefix), host_len, NDPI_HOSTNAME_NORM_ALL);
+    ndpi_hostname_sni_set(&flow->core, packet->payload + NDPI_STATICSTRING_LEN(munin_prefix),
+			  host_len, NDPI_HOSTNAME_NORM_ALL);
   } else {
-    ndpi_set_risk(ndpi_struct, flow, NDPI_MALFORMED_PACKET, "Missing Munin Hostname");
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Missing Munin Hostname");
   }
 }
 

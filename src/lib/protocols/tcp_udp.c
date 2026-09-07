@@ -31,7 +31,7 @@ u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struc
   struct in_addr host;
 
   if(flow)
-    return(flow->guessed_protocol_id_by_ip);
+    return(flow->core.guessed_protocol_id_by_ip);
   else {
     host.s_addr = htonl(saddr);
     if((rc = ndpi_network_ptree_match(ndpi_struct, &host)) != NDPI_PROTOCOL_UNKNOWN)
@@ -47,7 +47,7 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
   u_int proto;
   struct ndpi_packet_struct *packet;
 
-  if(!ndpi_struct || !flow || flow->host_server_name[0] != '\0')
+  if(!ndpi_struct || !flow || flow->core.host_server_name[0] != '\0')
     return;
 
   packet = &ndpi_struct->packet;
@@ -59,6 +59,6 @@ void ndpi_search_tcp_or_udp(struct ndpi_detection_module_struct *ndpi_struct, st
 				       ntohl(packet->iph->daddr));
 
     if(proto != NDPI_PROTOCOL_UNKNOWN)
-      ndpi_set_detected_protocol(ndpi_struct, flow, proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_MATCH_BY_PORT);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_MATCH_BY_PORT);
   }
 }

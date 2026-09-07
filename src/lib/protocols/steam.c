@@ -42,7 +42,7 @@ static void ndpi_search_steam(struct ndpi_detection_module_struct *ndpi_struct,
     if (le64toh(get_u_int64_t(packet->payload, 0)) == 0xA05F4C21FFFFFFFF)
     {
       NDPI_LOG_INFO(ndpi_struct, "found Steam In-Home Streaming Discovery\n");
-      ndpi_set_detected_protocol(ndpi_struct, flow, NDPI_PROTOCOL_STEAM,
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_STEAM,
                                  NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
       return;
     }
