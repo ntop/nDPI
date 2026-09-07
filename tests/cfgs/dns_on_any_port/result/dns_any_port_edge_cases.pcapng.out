@@ -1,0 +1,48 @@
+DPI Packets (UDP):	6	(1.00 pkts/flow)
+Confidence Unknown          : 2 (flows)
+Confidence DPI              : 4 (flows)
+Num dissector calls: 942 (157.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/6/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/2/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/2/0 (insert/search/found)
+Automa host:          6/0 (search/found)
+Automa domain:        3/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        6/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   12/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 15/5 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Unknown	2	184	2
+DNS	4	566	4
+
+Unrated                          2 184           2            
+Acceptable                       4 566           4            
+
+Unspecified                      2 184           2            
+Network                          4 566           4            
+
+	1	UDP 192.0.2.3:41003 -> 198.51.100.3:42003 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/313 bytes -> 0 pkts/0 bytes][Goodput ratio: 86/0][< 1 sec][Hostname/SNI: ccccccccccccccccc.ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd][0.0.0.0][DNS Id: 0x1003][Risk: ** Known Proto on Non Std Port **** Susp DGA Domain name **** Susp DNS Traffic **** Unidirectional Traffic **][Risk Score: 210][Risk Info: No server to client traffic;Long DNS host name;ccccccccccccccccc.ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd;Expected on port 53][PLAIN TEXT (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)][Plen Bins: 0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.0.2.6:41006 -> 198.51.100.6:42006 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/116 bytes -> 0 pkts/0 bytes][Goodput ratio: 63/0][< 1 sec][Hostname/SNI: payload.bin][0.0.0.0][DNS Id: 0x1006][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic;Expected on port 53][PLAIN TEXT (payload)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.0.2.2:41002 -> 198.51.100.2:42002 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/77 bytes -> 0 pkts/0 bytes][Goodput ratio: 45/0][< 1 sec][Hostname/SNI: example.com][0.0.0.0][DNS Id: 0x1002][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic;Expected on port 53][PLAIN TEXT (example)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.0.2.1:41001 -> 198.51.100.1:42001 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 28/0][< 1 sec][0.0.0.0][DNS Id: 0x1001][Risk: ** Known Proto on Non Std Port **** Unidirectional Traffic **][Risk Score: 60][Risk Info: No server to client traffic;Expected on port 53][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	UDP 192.0.2.5:41005 -> 198.51.100.5:42005 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Unrated][1 pkts/124 bytes -> 0 pkts/0 bytes][Goodput ratio: 66/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (@eeeeeeeeeeeeeeeeeeeeeeeeeeeeee)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.0.2.4:41004 -> 198.51.100.4:42004 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Unrated][1 pkts/60 bytes -> 0 pkts/0 bytes][Goodput ratio: 25/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
