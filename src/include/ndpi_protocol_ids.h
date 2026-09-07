@@ -520,6 +520,7 @@ typedef enum {
   NDPI_PROTOCOL_NEBULA                = 488,
   NDPI_PROTOCOL_DISCORD_CALL          = 489,
   NDPI_PROTOCOL_FREEFIRE              = 490,
+  NDPI_PROTOCOL_KIK                   = 491,
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 
