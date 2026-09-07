@@ -181,7 +181,7 @@ static int dcerpc_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload = original_payload;
   packet->payload_packet_len = original_len;
   dcerpc_tcp_reasm_free_dir(reasm);
-  return flow->detected_protocol_stack[0] == NDPI_PROTOCOL_DCERPC ? 1 : 0;
+  return flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_DCERPC ? 1 : 0;
 
 invalid:
   dcerpc_tcp_reasm_free_dir(reasm);
