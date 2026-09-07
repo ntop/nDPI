@@ -11,7 +11,7 @@ INC=-I $(top_srcdir)/src/include/ -I $(top_builddir)/src/include/ -I $(top_srcdi
 LIB=$(top_builddir)/src/lib/libndpi.a @ADDITIONAL_LIBS@ @LIBS@
 GEN_HEADERS=$(top_builddir)/src/include/ndpi_config.h $(top_builddir)/src/include/ndpi_define.h
 
-TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu strnstr
+TOOLS=substringsearch patriciasearch gcrypt-int gcrypt-gnu strnstr random_forest
 TESTS=substring_test patricia_test strnstr_test geo_test
 
 
@@ -30,6 +30,9 @@ substringsearch: $(srcdir)/substringsearch.c Makefile $(GEN_HEADERS)
 
 strnstr: $(srcdir)/strnstr.cpp Makefile $(GEN_HEADERS)
 	$(CXX) $(INC) $(AM_CFLAGS) $(CFLAGS) $(srcdir)/strnstr.cpp -o strnstr
+
+random_forest: $(srcdir)/random_forest.c Makefile $(GEN_HEADERS)
+	$(CC) $(INC) $(AM_CFLAGS) $(CFLAGS) $(srcdir)/random_forest.c -o random_forest $(LIB)
 
 geo: $(srcdir)/geo.c Makefile $(GEN_HEADERS)
 	$(CC) $(INC) $(AM_CFLAGS) $(CFLAGS) $(srcdir)/geo.c -o geo $(LIB)
@@ -70,4 +73,3 @@ distclean: clean
 
 check:
 	true # nothing to do here, tests run via make all
-

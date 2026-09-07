@@ -51,6 +51,7 @@
 #include "ndpi_config.h"
 #include "ndpi_api.h"
 #include "ndpi_define.h"
+#include "ndpi_random_forest.h"
 
 #include "json.h" /* JSON-C */
 
@@ -60,6 +61,42 @@ static int verbose = 0;
 /* *********************************************** */
 
 #define FLT_MAX 3.402823466e+38F
+
+int randomForestUnitTest(void)
+{
+  static const struct ndpi_random_forest_node nodes[] = {
+    { 0, 0.5f, 1, 2, 0 },
+    { NDPI_RF_LEAF_NODE, 0.0f, -1, -1, 0 },
+    { 1, 1.5f, 3, 4, 0 },
+    { NDPI_RF_LEAF_NODE, 0.0f, -1, -1, 1 },
+    { NDPI_RF_LEAF_NODE, 0.0f, -1, -1, 0 },
+    { NDPI_RF_LEAF_NODE, 0.0f, -1, -1, 1 },
+  };
+  static const int32_t roots[] = { 0, 2, 5 };
+  static const struct ndpi_random_forest_model model = {
+    nodes, sizeof(nodes) / sizeof(nodes[0]), roots, 3, 2
+  };
+  float scores[2];
+  const float left[] = { 0.25f, 0.0f };
+  const float right[] = { 0.75f, 2.0f };
+  const float invalid[] = { NAN, 0.0f };
+  const int32_t invalid_roots[] = { 99, 2, 5 };
+  struct ndpi_random_forest_model invalid_model = model;
+
+  assert(ndpi_random_forest_predict(&model, left, 2, scores, 2) == 0);
+  assert(scores[0] > 0.33f && scores[0] < 0.34f);
+  assert(scores[1] > 0.66f && scores[1] < 0.67f);
+  assert(ndpi_random_forest_predict(&model, right, 2, scores, 2) == 0);
+  assert(scores[0] > 0.66f && scores[0] < 0.67f);
+  assert(scores[1] > 0.33f && scores[1] < 0.34f);
+  assert(ndpi_random_forest_predict(&model, left, 2, NULL, 0) == 0);
+  assert(ndpi_random_forest_predict(&model, invalid, 2, scores, 2) == -1);
+  assert(ndpi_random_forest_predict(&model, left, 1, scores, 2) == -1);
+  invalid_model.roots = invalid_roots;
+  assert(ndpi_random_forest_predict(&invalid_model, left, 2, scores, 2) == -1);
+  printf("%30s                      OK\n", __func__);
+  return 0;
+}
 
 int serializerUnitTest() {
   ndpi_serializer serializer, serializer_cloned, deserializer;
@@ -416,6 +453,7 @@ int main(int argc, char **argv) {
 #endif
     
   /* Tests */
+  if (randomForestUnitTest() != 0) return -1;
   if (serializerUnitTest() != 0) return -1;
   if (serializeProtoUnitTest() != 0) return -1;
 
