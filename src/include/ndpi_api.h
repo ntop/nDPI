@@ -305,6 +305,23 @@ extern "C" {
   int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str);
 
   /**
+   * Frees the dynamic memory allocated members in the specified flow core struct
+   *
+   * @par core  = the core struct which dynamic allocated members should be deallocated
+   *
+   */
+  void ndpi_free_flow_core_data(struct ndpi_flow_core_struct *core);
+
+  /**
+   * Frees the dynamic memory allocated members in the specified flow core struct
+   * and the core struct itself.
+   *
+   * @par core  = the core struct and its dynamic allocated members that should be deallocated
+   *
+   */
+  void ndpi_free_flow_core(struct ndpi_flow_core_struct *core);
+
+  /**
    * Frees the dynamic memory allocated members in the specified flow
    *
    * @par flow  = the flow struct which dynamic allocated members should be deallocated

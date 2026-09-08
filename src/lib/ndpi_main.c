@@ -8130,14 +8130,46 @@ void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
 
 /* ****************************************************** */
 
-void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
-  if(flow) {
-    if(flow->core.num_risk_infos) {
+void ndpi_free_flow_core_data(struct ndpi_flow_core_struct *core) {
+  if(core) {
+    if(core->num_risk_infos) {
       u_int i;
 
-      for(i=0; i<flow->core.num_risk_infos; i++)
-	ndpi_free(flow->core.risk_infos[i].info);
+      for(i=0; i<core->num_risk_infos; i++)
+	ndpi_free(core->risk_infos[i].info);
     }
+
+    if(core->dns_tcp_reasm) {
+      u_int i;
+
+      for(i = 0; i < 2; i++) {
+	      if(core->dns_tcp_reasm->dir[i].buf)
+	        ndpi_free(core->dns_tcp_reasm->dir[i].buf);
+      }
+
+      ndpi_free(core->dns_tcp_reasm);
+      core->dns_tcp_reasm = NULL;
+    }
+
+    if(core->flow_payload != NULL)
+      ndpi_free(core->flow_payload);
+  }
+}
+
+/* ****************************************************** */
+
+void ndpi_free_flow_core(struct ndpi_flow_core_struct *core) {
+  if(core) {
+    ndpi_free_flow_core_data(core);
+    ndpi_free(core);
+  }
+}
+
+/* ****************************************************** */
+
+void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
+  if(flow) {
+    ndpi_free_flow_core_data(&flow->core);
 
     if(flow->metadata.l4.tcp.fingerprint)
       ndpi_free(flow->metadata.l4.tcp.fingerprint);
@@ -8193,18 +8225,6 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
     if(flow->metadata.kerberos_buf.pktbuf)
       ndpi_free(flow->metadata.kerberos_buf.pktbuf);
 
-    if(flow->core.dns_tcp_reasm) {
-      u_int i;
-
-      for(i = 0; i < 2; i++) {
-	      if(flow->core.dns_tcp_reasm->dir[i].buf)
-	        ndpi_free(flow->core.dns_tcp_reasm->dir[i].buf);
-      }
-
-      ndpi_free(flow->core.dns_tcp_reasm);
-      flow->core.dns_tcp_reasm = NULL;
-    }
-
     if(flow->metadata.monit)
       ndpi_free(flow->metadata.monit);
 
@@ -8221,9 +8241,6 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
       if(flow->metadata.l4.udp.quic_reasm_buf_bitmap)
         ndpi_free(flow->metadata.l4.udp.quic_reasm_buf_bitmap);
     }
-
-    if(flow->core.flow_payload != NULL)
-      ndpi_free(flow->core.flow_payload);
 
     if(flow->metadata.tls_quic.obfuscated_heur_state)
       ndpi_free(flow->metadata.tls_quic.obfuscated_heur_state);
