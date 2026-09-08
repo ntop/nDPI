@@ -125,22 +125,6 @@ static bool dcerpc_tcp_start_candidate(struct ndpi_packet_struct *packet)
          packet->payload[0] == 0x05;
 }
 
-/* Keep the dissector alive for the ACK zero-padding form already recognized by
- * nDPI's TCP tracking code. The issue capture contains this padding immediately
- * before the first DCERPC segment. */
-static bool dcerpc_tcp_ack_padding(struct ndpi_packet_struct *packet)
-{
-  u_int16_t i;
-
-  if(packet->tcp == NULL || packet->tcp->ack == 0 || packet->tcp->psh != 0 ||
-     packet->payload_packet_len <= 1 || packet->payload_packet_len >= 8)
-    return false;
-  for(i = 0; i < packet->payload_packet_len; i++)
-    if(packet->payload[i] != 0)
-      return false;
-  return true;
-}
-
 static int dcerpc_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
                               struct ndpi_flow_struct *flow)
 {
@@ -148,18 +132,20 @@ static int dcerpc_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
   struct ndpi_dcerpc_tcp_reasm *reasm;
   const u_int8_t *original_payload = packet->payload;
   u_int16_t original_len = packet->payload_packet_len;
+  u_int32_t seq = ntohl(packet->tcp->seq);
   u_int16_t fragment_len;
 
-  if(packet->tcp_retransmission || original_len == 0)
-    return 0;
   if(flow->core.dcerpc_tcp_reasm == NULL) {
     flow->core.dcerpc_tcp_reasm = ndpi_calloc(1, sizeof(*flow->core.dcerpc_tcp_reasm));
     if(flow->core.dcerpc_tcp_reasm == NULL)
       return -1;
   }
   reasm = &flow->core.dcerpc_tcp_reasm->dir[packet->packet_direction];
+  if(reasm->cur_len > 0 && seq != reasm->next_seq)
+    return 0;
   if(dcerpc_tcp_reasm_append(reasm, original_payload, original_len) < 0)
     goto invalid;
+  reasm->next_seq = seq + original_len;
   if(reasm->cur_len < 10)
     return 0;
   if(reasm->buf[0] != 0x05 || reasm->buf[2] >= 16 || (reasm->buf[3] & 0xF0))
@@ -199,14 +185,12 @@ static void ndpi_search_dcerpc(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if(packet->tcp != NULL && (flow->core.dcerpc_tcp_reasm != NULL || dcerpc_tcp_start_candidate(packet))) {
+  if(packet->tcp != NULL && (flow->core.dcerpc_tcp_reasm != NULL ||
+                             dcerpc_tcp_start_candidate(packet))) {
     if(dcerpc_tcp_process(ndpi_struct, flow) >= 0)
       return;
   }
 
-  /* The issue capture has a short ACK zero-padding segment before DCERPC. */
-  if(dcerpc_tcp_ack_padding(packet))
-    return;
   if(packet->payload_packet_len > 1)
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
 }
