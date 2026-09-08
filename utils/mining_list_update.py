@@ -7,7 +7,7 @@ import time
 import sys
 
 # Configuration
-URL = "https://raw.githubusercontent.com/BinaryDefense/mining-pools/91834a819c82d215ee7702ac6562fb169fe22687/xmr-pools.txt"
+URL = "https://minerstat.com/mining-pool-whitelist.txt"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DOMAIN_LIST_PATH = os.path.join(SCRIPT_DIR, "../lists/42_mining_domain.list")
