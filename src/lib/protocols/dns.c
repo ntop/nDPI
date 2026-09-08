@@ -36,7 +36,8 @@
 
 static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_core_struct *core,
-			       struct ndpi_flow_struct_dns_metadata *dns);
+			       struct ndpi_flow_struct_dns_metadata *dns,
+			       u_int8_t strict_geometry);
 
 static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow);
@@ -167,19 +168,65 @@ static u_int16_t get16(u_int *i, const u_int8_t *payload) {
 
 /* *********************************************** */
 
-static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen) {
-  if(i >= payloadLen)
-    return(0);
-  else if(payload[i] == 0x00)
-    return(1);
-  else if((payload[i] & 0xC0)== 0xC0)
-    return(2);
-  else {
-    u_int8_t len = payload[i];
-    u_int8_t off = len + 1;
+static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen,
+                           u_int message_offset, u_int8_t validate_encoding) {
+  u_int x = i, encoded_len = 0, name_len = 0;
+  u_int8_t jumped = 0;
 
-    return(off + getNameLength(i+off, payload, payloadLen));
+  /* Strict validation gates arbitrary-port detection. Compatibility mode keeps
+     established parsing and risk behavior for traffic on trusted DNS ports. */
+
+  while(x < payloadLen) {
+    u_int8_t len = payload[x];
+
+    if(len == 0) {
+      if(name_len + 1 > 255)
+        return 0;
+
+      if(!jumped)
+        encoded_len++;
+
+      return encoded_len;
+    }
+
+    if((len & 0xC0) == 0xC0) {
+      u_int pointer;
+
+      if(!validate_encoding)
+        return encoded_len + 2;
+
+      if(x + 1 >= payloadLen)
+        return 0;
+
+      pointer = message_offset + (((u_int)(len & 0x3F) << 8) | payload[x + 1]);
+      /* RFC 1035 compression pointers refer to a prior occurrence. */
+      if(pointer >= x)
+        return 0;
+
+      if(!jumped) {
+        encoded_len += 2;
+        jumped = 1;
+      }
+
+      x = pointer;
+      continue;
+    }
+
+    if(validate_encoding) {
+      if((len & 0xC0) != 0 || len > 63 ||
+         x + 1 + len > payloadLen || name_len + 1 + len > 254)
+        return 0;
+
+      name_len += 1 + len;
+    }
+
+    if(!jumped)
+      encoded_len += 1 + len;
+
+    x += 1 + len;
   }
+
+  return validate_encoding ? 0 : encoded_len;
 }
 /*
   See
@@ -319,7 +366,9 @@ static int process_queries(struct ndpi_detection_module_struct *ndpi_struct,
 			   struct ndpi_flow_core_struct *core,
 			   struct ndpi_flow_struct_dns_metadata *dns,
                            struct ndpi_dns_packet_header *dns_header,
-                           u_int payload_offset) {
+                           u_int payload_offset,
+                           u_int16_t *first_query_type,
+                           u_int8_t *valid_query_fields) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int x = payload_offset;
   u_int16_t rsp_type;
@@ -328,27 +377,41 @@ static int process_queries(struct ndpi_detection_module_struct *ndpi_struct,
   for(num = 0; num < dns_header->num_queries; num++) {
     u_int16_t data_len;
 
+    if(x >= packet->payload_packet_len)
+      return -1;
+
     if((data_len = getNameLength(x, packet->payload,
-                                 packet->payload_packet_len)) == 0) {
+                                 packet->payload_packet_len,
+                                 packet->tcp ? 2 : 0,
+                                 valid_query_fields != NULL)) == 0) {
+      if(core != NULL)
+        ndpi_set_risk(ndpi_struct, core, NDPI_MALFORMED_PACKET, "Invalid DNS Query Lenght");
       return -1;
     } else
       x += data_len;
 
-    if(data_len > 253)
+    if(data_len > 255 && core != NULL)
       ndpi_set_risk(ndpi_struct, core, NDPI_MALFORMED_PACKET, "Invalid DNS Query Lenght");
 
     if((x+4) > packet->payload_packet_len) {
-      ndpi_set_risk(ndpi_struct, core, NDPI_MALFORMED_PACKET, "Invalid DNS Query Lenght");
+      if(core != NULL)
+        ndpi_set_risk(ndpi_struct, core, NDPI_MALFORMED_PACKET, "Invalid DNS Query Lenght");
       return -1;
     }
 
     rsp_type = get16(&x, packet->payload);
 
+    if(valid_query_fields != NULL &&
+       (rsp_type == 0 || ntohs(get_u_int16_t(packet->payload, x)) == 0))
+      *valid_query_fields = 0;
+
+    if(num == 0 && first_query_type != NULL)
+      *first_query_type = rsp_type;
+
 #ifdef DNS_DEBUG
     printf("[DNS] [response (query)] response_type=%d\n", rsp_type);
 #endif
-    
-    if(dns->query_type == 0) {
+    if(dns != NULL && dns->query_type == 0) {
       /* In case we missed the query packet... */
       dns->query_type = rsp_type;
     }
@@ -382,7 +445,8 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
     u_int16_t data_len;
 
     if((data_len = getNameLength(x, packet->payload,
-                                 packet->payload_packet_len)) == 0) {
+                                 packet->payload_packet_len,
+                                 packet->tcp ? 2 : 0, 0)) == 0) {
       return -1;
     } else
       x += data_len;
@@ -540,7 +604,8 @@ static int process_additionals(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       if((data_len = getNameLength(x, packet->payload,
-                                   packet->payload_packet_len)) == 0) {
+                                   packet->payload_packet_len,
+                                   packet->tcp ? 2 : 0, 0)) == 0) {
         return -1;
       } else
         x += data_len;
@@ -587,7 +652,8 @@ static int process_additionals(struct ndpi_detection_module_struct *ndpi_struct,
         return -1;
       }
 
-      if((data_len = getNameLength(x, packet->payload, packet->payload_packet_len)) == 0) {
+      if((data_len = getNameLength(x, packet->payload, packet->payload_packet_len,
+                                   packet->tcp ? 2 : 0, 0)) == 0) {
         return -1;
       } else
         x += data_len;
@@ -642,7 +708,8 @@ static int process_additionals(struct ndpi_detection_module_struct *ndpi_struct,
         x += 6;
       }
 
-      if((data_len = getNameLength(x, packet->payload, packet->payload_packet_len)) == 0) {
+      if((data_len = getNameLength(x, packet->payload, packet->payload_packet_len,
+                                   packet->tcp ? 2 : 0, 0)) == 0) {
         return -1;
       } else
         x += data_len;
@@ -853,7 +920,7 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
 
     packet->payload = (u_int8_t *)&original_payload[offset];
     packet->payload_packet_len = (u_int16_t)total_len;
-    search_dns_tcp_udp(ndpi_struct, core, dns);
+    search_dns_tcp_udp(ndpi_struct, core, dns, 0);
     processed = 1;
 
     packet->payload = original_payload;
@@ -928,7 +995,7 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
 
     packet->payload = (u_int8_t *)reasm->buf;
     packet->payload_packet_len = (u_int16_t)total_len;
-    search_dns_tcp_udp(ndpi_struct, core, dns);
+    search_dns_tcp_udp(ndpi_struct, core, dns, 0);
     processed = 1;
 
     packet->payload = original_payload;
@@ -964,7 +1031,7 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
   }
 
   /* possibly dissect the DNS reply */
-  search_dns_tcp_udp(ndpi_struct, &flow->core, &flow->metadata.protos.dns);
+  search_dns_tcp_udp(ndpi_struct, &flow->core, &flow->metadata.protos.dns, 0);
 
   return keep_extra_dissection( &flow->metadata.protos.dns);
 }
@@ -1064,14 +1131,17 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
 
 static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_core_struct *core,
-			       struct ndpi_flow_struct_dns_metadata *dns) {
+			       struct ndpi_flow_struct_dns_metadata *dns,
+			       u_int8_t strict_geometry) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int payload_offset = 0;
   u_int8_t is_query;
   struct ndpi_dns_packet_header dns_header;
   u_int off;
+  u_int16_t strict_query_type = 0;
+  u_int8_t valid_query_fields = 1;
   ndpi_master_app_protocol proto;
-  int rc;
+  int rc, strict_questions_end = -1;
 
   if(packet->udp != NULL) {
     payload_offset = 0;
@@ -1092,15 +1162,34 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  process_hostname(ndpi_struct, core, &dns_header, &proto);
-
   off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
+
+  /* Validate arbitrary-port candidates before touching the protocol union. */
+  if(strict_geometry) {
+    if(dns_header.num_queries == 0 ||
+       dns_header.num_queries > NDPI_MAX_DNS_REQUESTS ||
+       (strict_questions_end = process_queries(ndpi_struct, NULL, NULL, &dns_header, off,
+                                               &strict_query_type,
+                                               &valid_query_fields)) == -1 ||
+       !valid_query_fields) {
+      NDPI_EXCLUDE_CORE_DISSECTOR(ndpi_struct, core);
+      return;
+    }
+  }
+
+  process_hostname(ndpi_struct, core, &dns_header, &proto);
 
   if(is_query) {
     dns->is_query = 1;
     dns->transaction_id = dns_header.tr_id;
 
-    rc = process_queries(ndpi_struct, core, dns, &dns_header, off);
+    if(strict_geometry) {
+      rc = strict_questions_end;
+      if(dns->query_type == 0)
+        dns->query_type = strict_query_type;
+    } else {
+      rc = process_queries(ndpi_struct, core, dns, &dns_header, off, NULL, NULL);
+    }
 #ifdef DNS_DEBUG
     if(rc == -1)
       printf("[DNS] Error queries (query msg)\n");
@@ -1128,7 +1217,13 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
       }
     }
 
-    rc = process_queries(ndpi_struct, core, dns, &dns_header, off);
+    if(strict_geometry) {
+      rc = strict_questions_end;
+      if(dns->query_type == 0)
+        dns->query_type = strict_query_type;
+    } else {
+      rc = process_queries(ndpi_struct, core, dns, &dns_header, off, NULL, NULL);
+    }
     if(rc == -1) {
 #ifdef DNS_DEBUG
       printf("[DNS] Error queries (response msg)\n");
@@ -1229,6 +1324,7 @@ bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_
 				      struct ndpi_flow_struct_dns_metadata *dns) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t s_port = 0, d_port = 0;
+  u_int8_t strict_geometry = 0;
 
   NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
 
@@ -1271,7 +1367,7 @@ bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_
 		    && (metadata->l4.udp.eaq_pkt_id == 0)
 		    && (metadata->l4.udp.eaq_sequence == 0))
 		)) {
-    /* Ok, check DNS on any ports: keep going */
+    strict_geometry = 1;
   } else {
     NDPI_EXCLUDE_CORE_DISSECTOR(ndpi_struct, core);
     return(false);
@@ -1290,7 +1386,7 @@ bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_
       return(false);
     }
 
-    search_dns_tcp_udp(ndpi_struct, core, dns);
+    search_dns_tcp_udp(ndpi_struct, core, dns, strict_geometry);
   }
 
   return(true);
