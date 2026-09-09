@@ -1434,6 +1434,10 @@ static ndpi_protocol_match host_match[] =
    { "wallet.proton.me",                 "ProtonWallet",   NDPI_PROTOCOL_PROTON_WALLET,   NDPI_PROTOCOL_CATEGORY_CRYPTO_BLOCKCHAIN,       NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "lumo.proton.me",                   "ProtonLumo",     NDPI_PROTOCOL_PROTON_LUMO,     NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "meet.proton.me",                   "ProtonMeet",     NDPI_PROTOCOL_PROTON_MEET,     NDPI_PROTOCOL_CATEGORY_CHAT,                    NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "duckduckgo.com",                   "DuckDuckGo",     NDPI_PROTOCOL_DUCKDUCKGO,      NDPI_PROTOCOL_CATEGORY_SEARCH_ENGINE,           NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "duck.com",                         "DuckDuckGo",     NDPI_PROTOCOL_DUCKDUCKGO,      NDPI_PROTOCOL_CATEGORY_SEARCH_ENGINE,           NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "peacocktv.com",                    "Peacock",        NDPI_PROTOCOL_PEACOCK,         NDPI_PROTOCOL_CATEGORY_STREAMING,               NDPI_PROTOCOL_FUN,        NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "peacocktvstore.com",               "Peacock",        NDPI_PROTOCOL_PEACOCK,         NDPI_PROTOCOL_CATEGORY_STREAMING,               NDPI_PROTOCOL_FUN,        NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "roblox.com",                       "Roblox", NDPI_PROTOCOL_ROBLOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "rbxcdn.com",                       "Roblox", NDPI_PROTOCOL_ROBLOX, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },

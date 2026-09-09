@@ -4486,3 +4486,24 @@ Name Indication on character.ai and characterai.io hostnames (e.g.
 user.api.character.ai, neo.character.ai, characterai.io).
 
 References: `CharacterAI official site: <https://character.ai>`_
+
+
+.. _Proto_493:
+
+`NDPI_PROTOCOL_DUCKDUCKGO`
+==========================
+DuckDuckGo is a privacy-oriented search engine. Traffic is detected via TLS/QUIC
+Server Name Indication on duckduckgo.com and duck.com hostnames.
+
+References: `DuckDuckGo official site: <https://duckduckgo.com/>`_
+
+
+.. _Proto_494:
+
+`NDPI_PROTOCOL_PEACOCK`
+=======================
+Peacock is NBCUniversal's video streaming service. Traffic is detected via
+TLS/QUIC Server Name Indication on peacocktv.com and peacocktvstore.com
+hostnames.
+
+References: `Peacock official site: <https://www.peacocktv.com/>`_

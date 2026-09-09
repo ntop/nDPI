@@ -522,6 +522,8 @@ typedef enum {
   NDPI_PROTOCOL_FREEFIRE              = 490,
   NDPI_PROTOCOL_KIK                   = 491,
   NDPI_PROTOCOL_CHARACTER_AI          = 492,
+  NDPI_PROTOCOL_DUCKDUCKGO            = 493,
+  NDPI_PROTOCOL_PEACOCK               = 494,
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 
