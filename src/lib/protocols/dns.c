@@ -35,14 +35,14 @@
 
 
 static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
-			       struct ndpi_flow_core_struct *core,
+                               struct ndpi_flow_struct *flow,
 			       struct ndpi_flow_struct_dns_metadata *dns);
 
 static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct,
 			    struct ndpi_flow_struct *flow);
 
 static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
-			   struct ndpi_flow_core_struct *core,
+                           struct ndpi_flow_struct *flow,
 			   struct ndpi_flow_struct_dns_metadata *dns);
 
 /* *********************************************** */
@@ -816,7 +816,7 @@ static void dns_tcp_reasm_consume(struct ndpi_dns_tcp_reasm *reasm, u_int32_t co
  * Avoid per-packet reassembly allocations when the full message(s) fit in the segment.
  */
 static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
-			   struct ndpi_flow_core_struct *core,
+                           struct ndpi_flow_struct *flow,
 			   struct ndpi_flow_struct_dns_metadata *dns) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   struct ndpi_dns_tcp_reasm *reasm = NULL;
@@ -824,6 +824,7 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
   u_int16_t original_payload_len;
   u_int32_t msg_len, total_len, offset;
   int processed = 0;
+  struct ndpi_flow_core_struct *core = &flow->core;
 
   original_payload = packet->payload;
   original_payload_len = packet->payload_packet_len;
@@ -853,7 +854,7 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
 
     packet->payload = (u_int8_t *)&original_payload[offset];
     packet->payload_packet_len = (u_int16_t)total_len;
-    search_dns_tcp_udp(ndpi_struct, core, dns);
+    search_dns_tcp_udp(ndpi_struct, flow, dns);
     processed = 1;
 
     packet->payload = original_payload;
@@ -928,7 +929,7 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
 
     packet->payload = (u_int8_t *)reasm->buf;
     packet->payload_packet_len = (u_int16_t)total_len;
-    search_dns_tcp_udp(ndpi_struct, core, dns);
+    search_dns_tcp_udp(ndpi_struct, flow, dns);
     processed = 1;
 
     packet->payload = original_payload;
@@ -957,14 +958,14 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
   }
 
   if(packet->tcp != NULL) {
-    if(dns_tcp_process(ndpi_struct, &flow->core, &flow->metadata.protos.dns) < 0) {
+    if(dns_tcp_process(ndpi_struct, flow, &flow->metadata.protos.dns) < 0) {
       return 0; /* Something is seriously wrong: stop here */
     }
     return keep_extra_dissection(&flow->metadata.protos.dns);
   }
 
   /* possibly dissect the DNS reply */
-  search_dns_tcp_udp(ndpi_struct, &flow->core, &flow->metadata.protos.dns);
+  search_dns_tcp_udp(ndpi_struct, flow, &flow->metadata.protos.dns);
 
   return keep_extra_dissection( &flow->metadata.protos.dns);
 }
@@ -972,7 +973,7 @@ static int search_dns_again(struct ndpi_detection_module_struct *ndpi_struct, st
 /* *********************************************** */
 
 static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
-                            struct ndpi_flow_core_struct *core,
+                            struct ndpi_flow_struct *flow,
                             struct ndpi_dns_packet_header *dns_header,
                             ndpi_master_app_protocol *proto) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
@@ -981,6 +982,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
   char _hostname[256];
   u_int8_t hostname_is_valid;
   char invalid_character = 0;
+  struct ndpi_flow_core_struct *core = &flow->core;
 
   proto->master_protocol = checkDNSSubprotocol(ndpi_struct, ntohs(core->c_port), ntohs(core->s_port));
   proto->app_protocol = core->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN ? core->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN;
@@ -1001,7 +1003,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
   /* Sets flow->.host_server_name */
-  ndpi_hostname_sni_set(core, (const u_int8_t *)_hostname, len, is_mdns ? NDPI_HOSTNAME_NORM_LC : NDPI_HOSTNAME_NORM_ALL);
+  ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len, is_mdns ? NDPI_HOSTNAME_NORM_LC : NDPI_HOSTNAME_NORM_ALL);
 
   if (hostname_is_valid == 0) {
     char str[128];
@@ -1063,7 +1065,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
 /* *********************************************** */
 
 static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
-			       struct ndpi_flow_core_struct *core,
+                               struct ndpi_flow_struct *flow,
 			       struct ndpi_flow_struct_dns_metadata *dns) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int payload_offset = 0;
@@ -1072,6 +1074,7 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
   u_int off;
   ndpi_master_app_protocol proto;
   int rc;
+  struct ndpi_flow_core_struct *core = &flow->core;
 
   if(packet->udp != NULL) {
     payload_offset = 0;
@@ -1092,7 +1095,7 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  process_hostname(ndpi_struct, core, &dns_header, &proto);
+  process_hostname(ndpi_struct, flow, &dns_header, &proto);
 
   off = sizeof(struct ndpi_dns_packet_header) + payload_offset;
 
@@ -1224,11 +1227,12 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 /* *********************************************** */
 
 bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_struct,
-				      struct ndpi_flow_core_struct *core,
+				      struct ndpi_flow_struct *flow,
 				      struct ndpi_flow_metadata_struct *metadata,
 				      struct ndpi_flow_struct_dns_metadata *dns) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t s_port = 0, d_port = 0;
+  struct ndpi_flow_core_struct *core = &flow->core;
 
   NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
 
@@ -1278,7 +1282,7 @@ bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_
   }
 
   if(packet->tcp != NULL) {
-    if(dns_tcp_process(ndpi_struct, core, dns) < 0)
+    if(dns_tcp_process(ndpi_struct, flow, dns) < 0)
       NDPI_EXCLUDE_CORE_DISSECTOR(ndpi_struct, core);
   } else {
     /*
@@ -1290,7 +1294,7 @@ bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_
       return(false);
     }
 
-    search_dns_tcp_udp(ndpi_struct, core, dns);
+    search_dns_tcp_udp(ndpi_struct, flow, dns);
   }
 
   return(true);
@@ -1300,7 +1304,7 @@ bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_
 
 void ndpi_search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow) {
-  (void)ndpi_search_dns_tcp_udp_internal(ndpi_struct, &flow->core,
+  (void)ndpi_search_dns_tcp_udp_internal(ndpi_struct, flow,
 					 &flow->metadata, &flow->metadata.protos.dns);
 }
 

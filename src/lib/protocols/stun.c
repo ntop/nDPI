@@ -561,7 +561,7 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 	int i;
 	bool valid = true;
 
-        ndpi_hostname_sni_set(&flow->core, payload + off + 4, ndpi_min(len,
+        ndpi_hostname_sni_set(flow, payload + off + 4, ndpi_min(len,
 								       payload_length - off - 4), NDPI_HOSTNAME_NORM_ALL);
         NDPI_LOG_DBG(ndpi_struct, "Realm [%s]\n", flow->core.host_server_name);       
 	

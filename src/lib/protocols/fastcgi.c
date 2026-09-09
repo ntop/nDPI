@@ -138,7 +138,7 @@ static int fcgi_parse_params(struct ndpi_flow_struct * const flow,
 
   flow->metadata.protos.fast_cgi.method = ndpi_http_str2method((const char*)packet->http_method.ptr,
                                                       (u_int16_t)packet->http_method.len);
-  ndpi_hostname_sni_set(&flow->core, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
+  ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len, NDPI_HOSTNAME_NORM_ALL);
   
   strncpy(flow->metadata.protos.fast_cgi.user_agent, (char *)packet->user_agent_line.ptr,
           ndpi_min(sizeof(flow->metadata.protos.fast_cgi.user_agent) - 1, packet->user_agent_line.len));

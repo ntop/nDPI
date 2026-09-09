@@ -699,7 +699,7 @@ void change_category(struct ndpi_flow_struct *flow,
 		     ndpi_protocol_category_t protocol_category);
 
 
-  char *ndpi_hostname_sni_set(struct ndpi_flow_core_struct *core,
+  char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
 			      const u_int8_t *value, size_t value_len, int normalize);
 char *ndpi_user_agent_set(struct ndpi_flow_struct *flow, const u_int8_t *value,
 			  size_t value_len);
