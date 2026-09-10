@@ -1,0 +1,36 @@
+DPI Packets (TCP):	20	(20.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 16 (16.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          2/0 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 7/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    1/0 (search/found)
+
+MpegDash	20	1049789	1
+
+Fun                             20 1049789       1            
+
+Media                           20 1049789       1            
+
+	1	TCP 10.0.0.1:40000 <-> 10.0.0.2:80 [proto: 7.291/HTTP.MpegDash][Stack: HTTP.MpegDash][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7.291/HTTP.MpegDash, Confidence: DPI][DPI packets: 20][cat: Media/1][Breed: Fun][1 pkts/102 bytes <-> 19 pkts/1049687 bytes][Goodput ratio: 47/100][19.00 sec][Hostname/SNI: example.test][bytes ratio: -1.000 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/1000 0/1000 0/1000 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 102/139 102/55247 102/60054 0/14758][URL: example.test/sample.mp4][StatusCode: 200][Content-Type: video/mp4][Risk: ** HTTP Susp User-Agent **** HTTP Susp Content **][Risk Score: 200][Risk Info: MP4 carrier dominated by private uuid box without media boxes (body=1048592, uuid=1048576, uuid_ratio=99%);Empty or missing User-Agent][PLAIN TEXT (GET /sample.mp4 HTTP/1.1)][Plen Bins: 0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90]
