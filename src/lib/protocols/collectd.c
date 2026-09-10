@@ -105,7 +105,7 @@ static void ndpi_int_collectd_dissect_hostname(struct ndpi_flow_struct * const f
                                                struct ndpi_packet_struct const * const packet,
                                                u_int16_t block_length)
 {
-  ndpi_hostname_sni_set(&flow->core, &packet->payload[4], block_length, NDPI_HOSTNAME_NORM_ALL);
+  ndpi_hostname_sni_set(flow, &packet->payload[4], block_length, NDPI_HOSTNAME_NORM_ALL);
 }
 
 static int ndpi_int_collectd_dissect_username(struct ndpi_flow_struct * const flow,

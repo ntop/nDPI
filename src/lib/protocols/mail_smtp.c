@@ -150,7 +150,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
           if(ptr[i + 1] != '\r' && ptr[i + 1] != '\n') {
             unsigned int hlen = i - 4;
 	    
-            ndpi_hostname_sni_set(&flow->core, &ptr[4], hlen, NDPI_HOSTNAME_NORM_ALL);
+            ndpi_hostname_sni_set(flow, &ptr[4], hlen, NDPI_HOSTNAME_NORM_ALL);
             NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname [%s]\n", flow->core.host_server_name);
             ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
                                          flow->core.host_server_name,

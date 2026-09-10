@@ -13375,14 +13375,14 @@ static int is_valid_port(const char *port_str) {
 
 /* ******************************************************************** */
 
-char *ndpi_hostname_sni_set(struct ndpi_flow_core_struct *core,
+char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
 			    const u_int8_t *value, size_t value_len,
 			    int normalize) {
   char *dst, *double_column;
   size_t len, i;
 
-  len = ndpi_min(value_len, sizeof(core->host_server_name) - 1);
-  dst = core->host_server_name;
+  len = ndpi_min(value_len, sizeof(flow->core.host_server_name) - 1);
+  dst = flow->core.host_server_name;
 
   if(!normalize) {
     memcpy(dst,&value[value_len - len],len);

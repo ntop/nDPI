@@ -199,7 +199,7 @@ static void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struc
 #ifdef DHCP_DEBUG
           NDPI_LOG_DBG2(ndpi_struct, "[DHCP] '%.*s'\n", name, opt_len);
 #endif
-          ndpi_hostname_sni_set(&flow->core, name, opt_len, NDPI_HOSTNAME_NORM_ALL);
+          ndpi_hostname_sni_set(flow, name, opt_len, NDPI_HOSTNAME_NORM_ALL);
         }
 
         cursor += opt_len + 2;
