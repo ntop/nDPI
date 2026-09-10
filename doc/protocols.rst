@@ -4475,3 +4475,14 @@ Traffic is detected via TLS Server Name Indication on kik.com and kikprod.net
 hostnames (e.g. login.kikprod.net, platform.kik.com).
 
 References: `Kik official site: <https://www.kik.com/>`_
+
+
+.. _Proto_492:
+
+`NDPI_PROTOCOL_CHARACTER_AI`
+============================
+CharacterAI is an AI chatbot platform. Traffic is detected via TLS/QUIC Server
+Name Indication on character.ai and characterai.io hostnames (e.g.
+user.api.character.ai, neo.character.ai, characterai.io).
+
+References: `CharacterAI official site: <https://character.ai>`_
