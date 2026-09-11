@@ -8139,6 +8139,18 @@ void ndpi_free_flow_core_data(struct ndpi_flow_core_struct *core) {
 	ndpi_free(core->risk_infos[i].info);
     }
 
+    if(core->dcerpc_tcp_reasm) {
+      u_int i;
+
+      for(i = 0; i < 2; i++) {
+        if(core->dcerpc_tcp_reasm->dir[i].buf)
+          ndpi_free(core->dcerpc_tcp_reasm->dir[i].buf);
+      }
+
+      ndpi_free(core->dcerpc_tcp_reasm);
+      core->dcerpc_tcp_reasm = NULL;
+    }
+
     if(core->dns_tcp_reasm) {
       u_int i;
 
