@@ -3345,7 +3345,7 @@ u_int16_t ndpi_network_ptree6_match(struct ndpi_detection_module_struct *ndpi_st
 
   /* Make sure all in network byte order otherwise compares wont work */
   ndpi_fill_prefix_v6(&prefix, pin, 128,
-		      ((ndpi_patricia_tree_t *) ndpi_str->protocols->v4)->maxbits);
+		      ((ndpi_patricia_tree_t *) ndpi_str->protocols->v6)->maxbits);
   node = ndpi_patricia_search_best(ndpi_str->protocols->v6, &prefix);
 
   return(node ? node->value.u.uv16[0].user_value : NDPI_PROTOCOL_UNKNOWN);
