@@ -1668,6 +1668,15 @@ struct ndpi_flow_struct_dns_metadata {
 
 /* ************************ */
 
+struct ndpi_flow_tls_quic_core_struct {
+  message_t message[2]; /* Directions */
+  u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
+  struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
+  char *opaque; /* Plugin custom storage. If not NULL will be deleted automatically by ndpi_free_flow() */
+};
+
+/* ************************ */
+
 struct ndpi_flow_core_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   struct ndpi_proto_stack protocol_stack;
@@ -1737,18 +1746,11 @@ struct ndpi_flow_core_struct {
    */
   char host_server_name[80];
 
+  struct ndpi_flow_tls_quic_core_struct tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
+  
   /* Flow payload */
   u_int16_t flow_payload_len;
   char *flow_payload;
-};
-
-/* ************************ */
-
-struct ndpi_flow_tls_quic_core_struct {
-  message_t message[2]; /* Directions */
-  u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
-  struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
-  char *opaque; /* Plugin custom storage. If not NULL will be deleted automatically by ndpi_free_flow() */
 };
 
 /* ************************ */
@@ -1837,8 +1839,6 @@ struct ndpi_flow_metadata_struct {
     u_int16_t rtp_counters[2];
     u_int32_t t_start, t_end;
   } stun;
-
-  struct ndpi_flow_tls_quic_core_struct tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
   struct {
     struct rtp_info rtp[2 /* directions */];

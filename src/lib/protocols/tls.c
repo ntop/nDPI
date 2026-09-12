@@ -105,7 +105,7 @@ static int tls_keep_extra_dissection_tcp(struct ndpi_detection_module_struct *nd
 
   /* Common path: found handshake on both directions */
   if(
-     (flow->metadata.tls_quic.certificate_processed == 1 && flow->metadata.protos.tls_quic.client_hello_processed)
+     (flow->core.tls_quic.certificate_processed == 1 && flow->metadata.protos.tls_quic.client_hello_processed)
 
      /* Application Data on both directions: handshake already ended (did we miss it?) */
      || (flow->metadata.l4.tcp.tls.app_data_seen[0] == 1 && flow->metadata.l4.tcp.tls.app_data_seen[1] == 1)
@@ -118,7 +118,7 @@ static int tls_keep_extra_dissection_tcp(struct ndpi_detection_module_struct *nd
   }
 
   /* Non-warning alert */
-  if(flow->metadata.tls_quic.alert)
+  if(flow->core.tls_quic.alert)
     return 0;
 
   /* Are we interested only in the (sub)-classification? */
@@ -245,7 +245,7 @@ static int check_set(struct ndpi_detection_module_struct* ndpi_struct,
 static int tls_obfuscated_heur_search(struct ndpi_detection_module_struct* ndpi_struct,
                                       struct ndpi_flow_struct* flow) {
   struct ndpi_packet_struct* packet = &ndpi_struct->packet;
-  struct tls_obfuscated_heuristic_state *state = flow->metadata.tls_quic.obfuscated_heur_state;
+  struct tls_obfuscated_heuristic_state *state = flow->core.tls_quic.obfuscated_heur_state;
   struct tls_obfuscated_heuristic_set *set;
   int i, j;
   int is_tls_in_tls_heur = 0;
@@ -300,18 +300,18 @@ static int tls_obfuscated_heur_search(struct ndpi_detection_module_struct* ndpi_
        heuristic, we need to ignore all packets before a Change-Cipher is sent in the
        same direction */
     if(current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
-       flow->metadata.tls_quic.change_cipher_from_client == 0) {
+       flow->core.tls_quic.change_cipher_from_client == 0) {
       if(packet->payload[0] == 0x14) {
         NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: Change-Cipher from client\n");
-        flow->metadata.tls_quic.change_cipher_from_client = 1;
+        flow->core.tls_quic.change_cipher_from_client = 1;
       }
       NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: skip\n");
       return 0; /* Continue */
     }
     if(current_pkt_from_server_to_client(ndpi_struct, &flow->core) &&
-       flow->metadata.tls_quic.change_cipher_from_server == 0) {
+       flow->core.tls_quic.change_cipher_from_server == 0) {
       if(packet->payload[0] == 0x14) {
-        flow->metadata.tls_quic.change_cipher_from_server = 1;
+        flow->core.tls_quic.change_cipher_from_server = 1;
         NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: Change-Cipher from server\n");
       }
       NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: skip\n");
@@ -451,10 +451,10 @@ void switch_extra_dissection_to_tls_obfuscated_heur(struct ndpi_detection_module
 {
   NDPI_LOG_DBG(ndpi_struct, "Switching to TLS Obfuscated heuristic\n");
 
-  if(flow->metadata.tls_quic.obfuscated_heur_state == NULL)
-    flow->metadata.tls_quic.obfuscated_heur_state = ndpi_calloc(1, sizeof(struct tls_obfuscated_heuristic_state));
+  if(flow->core.tls_quic.obfuscated_heur_state == NULL)
+    flow->core.tls_quic.obfuscated_heur_state = ndpi_calloc(1, sizeof(struct tls_obfuscated_heuristic_state));
   else /* If state has been already allocated (because of NDPI_HEURISTICS_TLS_OBFUSCATED_PLAIN) reset it */
-    memset(flow->metadata.tls_quic.obfuscated_heur_state, '\0', sizeof(struct tls_obfuscated_heuristic_state));
+    memset(flow->core.tls_quic.obfuscated_heur_state, '\0', sizeof(struct tls_obfuscated_heuristic_state));
 
   /* "* 2" to take into account ACKs. The "real" check is performend against
      "tls_heuristics_max_packets" in tls_obfuscated_heur_search, as expected */
@@ -1024,7 +1024,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 
 		    if(ndpi_struct->cfg.tls_subclassification_enabled &&
 		       !flow->metadata.protos.tls_quic.subprotocol_detected &&
-		       !flow->metadata.tls_quic.from_rdp) { /* No (other) sub-classification; we will have TLS.RDP anyway */
+		       !flow->core.tls_quic.from_rdp) { /* No (other) sub-classification; we will have TLS.RDP anyway */
 		      if(ndpi_match_hostname_protocol(ndpi_struct, flow, ndpi_get_master_proto(ndpi_struct, flow), dNSName, dNSName_len)) {
 			flow->metadata.protos.tls_quic.subprotocol_detected = 1;
 		        ndpi_unset_risk(ndpi_struct, &flow->core, NDPI_NUMERIC_IP_HOST);
@@ -1365,10 +1365,10 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
 #endif
 
     if(!is_dtls && flow->metadata.protos.tls_quic.ssl_version >= 0x0304 /* TLS 1.3 */)
-      flow->metadata.tls_quic.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
+      flow->core.tls_quic.certificate_processed = 1; /* No Certificate with TLS 1.3+ */
 
     if(is_dtls && flow->metadata.protos.tls_quic.ssl_version == 0xFEFC /* DTLS 1.3 */)
-      flow->metadata.tls_quic.certificate_processed = 1; /* No Certificate with DTLS 1.3+ */
+      flow->core.tls_quic.certificate_processed = 1; /* No Certificate with DTLS 1.3+ */
 
     checkTLSSubprotocol(ndpi_struct, flow, packet->payload[0] == 0x01);
     break;
@@ -1389,7 +1389,7 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
         printf("[TLS] Certificate from client. Ignoring it\n");
 #endif
       }
-      flow->metadata.tls_quic.certificate_processed = 1;
+      flow->core.tls_quic.certificate_processed = 1;
     }
     break;
   }
@@ -1429,8 +1429,9 @@ static int check_tls_type_and_version(const u_int8_t *buf, u_int16_t buf_len)
 
 /* **************************************** */
 
-int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
-                        struct ndpi_flow_struct *flow) {
+int ndpi_search_tls_tcp_internal(struct ndpi_detection_module_struct *ndpi_struct,
+				 struct ndpi_flow_struct *flow,
+				 struct ndpi_flow_tls_quic_metadata_struct *tls) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int8_t something_went_wrong = 0;
   message_t *message;
@@ -1456,7 +1457,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	 packet->payload_packet_len, packet->packet_direction);
 #endif
 
-  message = &flow->metadata.tls_quic.message[packet->packet_direction];
+  message = &flow->core.tls_quic.message[packet->packet_direction];
   if(ndpi_search_tls_memory(packet->payload,
 			    packet->payload_packet_len, ntohl(packet->tcp->seq),
 			    message) == -1)
@@ -1519,9 +1520,9 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
         printf("[TLS] Change Cipher Spec\n");
 #endif
         if(current_pkt_from_client_to_server(ndpi_struct, &flow->core))
-          flow->metadata.tls_quic.change_cipher_from_client = 1;
+          flow->core.tls_quic.change_cipher_from_client = 1;
         else
-          flow->metadata.tls_quic.change_cipher_from_server = 1;
+          flow->core.tls_quic.change_cipher_from_server = 1;
 
         ndpi_int_tls_add_connection(ndpi_struct, flow);
         flow->metadata.l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
@@ -1542,7 +1543,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
       printf("[TLS] *** TLS ALERT ***\n");
 #endif
 
-      flow->metadata.tls_quic.alert = 1;
+      flow->core.tls_quic.alert = 1;
 
       /* Basic heuristic to tell if the alert is encrypted or not */
       if(len == 7 &&
@@ -1553,7 +1554,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	if(alert_level == 2 /* Warning (1), Fatal (2) */)
 	  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_FATAL_ALERT, "Found fatal TLS alert");
 	else
-	  flow->metadata.tls_quic.alert = 0;
+	 flow->core.tls_quic.alert = 0;
       }
 
       u_int16_t const alert_len = ntohs(*(u_int16_t const *)&message->buffer[3]);
@@ -1569,9 +1570,9 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
           u_int32_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
 
           if((current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
-              flow->metadata.tls_quic.change_cipher_from_client == 1) ||
+              flow->core.tls_quic.change_cipher_from_client == 1) ||
              (!current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
-              flow->metadata.tls_quic.change_cipher_from_server == 1)) {
+              flow->core.tls_quic.change_cipher_from_server == 1)) {
 #ifdef DEBUG_TLS_MEMORY
             printf("[TLS Mem] Encrypted Handshake msg. Skip\n");
 #endif
@@ -1610,7 +1611,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 #ifdef DEBUG_TLS
       printf("[TLS] Processing Application Data [certificate_processed: %u][block_len: %u]\n",
-	     flow->metadata.tls_quic.certificate_processed, block_len);
+	     tls->certificate_processed, block_len);
 #endif
 
 #ifdef CUSTOM_NDPI_PROTOCOLS
@@ -1628,7 +1629,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 	 we are after the handshake. Stop extra processing */
       flow->metadata.l4.tcp.tls.app_data_seen[packet->packet_direction] = 1;
       if(flow->metadata.l4.tcp.tls.app_data_seen[!packet->packet_direction] == 1)
-	flow->metadata.tls_quic.certificate_processed = 1;
+	flow->core.tls_quic.certificate_processed = 1;
     }
 
     packet->payload = p;
@@ -1665,7 +1666,7 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     /* An ookla flow? */
     if((ndpi_struct->cfg.ookla_aggressiveness & NDPI_AGGRESSIVENESS_OOKLA_TLS) && /* Feature enabled */
        (!something_went_wrong &&
-        flow->metadata.tls_quic.certificate_processed == 1 &&
+        flow->core.tls_quic.certificate_processed == 1 &&
         flow->metadata.protos.tls_quic.client_hello_processed == 1 &&
         flow->metadata.protos.tls_quic.server_hello_processed == 1) && /* TLS handshake found without errors */
        flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_TLS && /* No IMAPS/FTPS/... */
@@ -1684,10 +1685,10 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     /* Loook for TLS-in-TLS */
     } else if((ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_TLS) && /* Feature enabled */
               (!something_went_wrong &&
-               flow->metadata.tls_quic.certificate_processed == 1 &&
+               flow->core.tls_quic.certificate_processed == 1 &&
                flow->metadata.protos.tls_quic.client_hello_processed == 1 &&
                flow->metadata.protos.tls_quic.server_hello_processed == 1) && /* TLS handshake found without errors */
-               flow->metadata.tls_quic.from_opportunistic_tls == 0 && /* No from plaintext Mails or FTP */
+               flow->core.tls_quic.from_opportunistic_tls == 0 && /* No from plaintext Mails or FTP */
               !is_flow_addr_informative(flow) /* The proxy server is likely hosted on some cloud providers */ ) {
       switch_extra_dissection_to_tls_obfuscated_heur(ndpi_struct, flow);
       return(1);
@@ -1699,6 +1700,13 @@ int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
     }
   } else
     return(1);
+}
+
+/* **************************************** */
+
+int ndpi_search_tls_tcp(struct ndpi_detection_module_struct *ndpi_struct,
+                        struct ndpi_flow_struct *flow) {
+  return(ndpi_search_tls_tcp_internal(ndpi_struct, flow, &flow->metadata.protos.tls_quic));
 }
 
 /* **************************************** */
@@ -1735,8 +1743,9 @@ int is_dtls(const u_int8_t *buf, u_int32_t buf_len, u_int32_t *block_len) {
 /* **************************************** */
 
 /* NOTE: this function supports both TCP and UDP */
-static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
-			       struct ndpi_flow_struct *flow) {
+static int ndpi_search_dtls_internal(struct ndpi_detection_module_struct *ndpi_struct,
+				     struct ndpi_flow_struct *flow,
+				     struct ndpi_flow_tls_quic_metadata_struct *tls) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t handshake_len, handshake_frag_off, handshake_frag_len;
   u_int16_t p_len, processed;
@@ -1776,8 +1785,7 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
         handshake_len = (block[14] << 16) + (block[15] << 8) + block[16];
         handshake_frag_off = (block[19] << 16) + (block[20] << 8) + block[21];
         handshake_frag_len = (block[22] << 16) + (block[23] << 8) + block[24];
-        message = &flow->metadata.tls_quic.message[packet->packet_direction];
-
+        message = &flow->core.tls_quic.message[packet->packet_direction];
 
 #ifdef DEBUG_TLS
         printf("[TLS] DTLS frag off %d len %d\n", handshake_frag_off, handshake_frag_len);
@@ -1847,7 +1855,7 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
       change_cipher_found = 1;
       processed += block_len + 13;
-      flow->metadata.tls_quic.certificate_processed = 1; /* Fake, to avoid extra dissection */
+      flow->core.tls_quic.certificate_processed = 1; /* Fake, to avoid extra dissection */
       break;
     } else if(block[0] == 0x15 /* Alert */) {
 #ifdef DEBUG_TLS
@@ -1874,7 +1882,7 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
       flow->core.category = get_proto_category(ndpi_struct, proto);
       flow->core.breed = get_proto_breed(ndpi_struct, proto);
 
-      flow->metadata.tls_quic.certificate_processed = 1; /* Fake, to avoid extra dissection */
+      flow->core.tls_quic.certificate_processed = 1; /* Fake, to avoid extra dissection */
       break;
     }
 
@@ -1892,11 +1900,18 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload = p;
   packet->payload_packet_len = p_len; /* Restore */
 
-  if(no_dtls || change_cipher_found || flow->metadata.tls_quic.certificate_processed) {
+  if(no_dtls || change_cipher_found || flow->core.tls_quic.certificate_processed) {
     return(0); /* That's all */
   } else {
     return(1); /* Keep working */
   }
+}
+
+/* **************************************** */
+
+static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
+			    struct ndpi_flow_struct *flow) {
+  return(ndpi_search_dtls_internal(ndpi_struct, flow, &flow->metadata.protos.tls_quic));
 }
 
 /* **************************************** */
@@ -1921,14 +1936,14 @@ void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_st
 #endif
 
   /* Reset reassemblers */
-  if(flow->metadata.tls_quic.message[0].buffer)
-    ndpi_free(flow->metadata.tls_quic.message[0].buffer);
-  memset(&flow->metadata.tls_quic.message[0], '\0', sizeof(flow->metadata.tls_quic.message[0]));
-  if(flow->metadata.tls_quic.message[1].buffer)
-    ndpi_free(flow->metadata.tls_quic.message[1].buffer);
-  memset(&flow->metadata.tls_quic.message[1], '\0', sizeof(flow->metadata.tls_quic.message[1]));
+  if(flow->core.tls_quic.message[0].buffer)
+    ndpi_free(flow->core.tls_quic.message[0].buffer);
+  memset(&flow->core.tls_quic.message[0], '\0', sizeof(flow->core.tls_quic.message[0]));
+  if(flow->core.tls_quic.message[1].buffer)
+    ndpi_free(flow->core.tls_quic.message[1].buffer);
+  memset(&flow->core.tls_quic.message[1], '\0', sizeof(flow->core.tls_quic.message[1]));
 
-  flow->metadata.tls_quic.from_opportunistic_tls = 1;
+  flow->core.tls_quic.from_opportunistic_tls = 1;
 
   tlsInitExtraPacketProcessing(ndpi_struct, flow);
 }
@@ -1944,19 +1959,19 @@ void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(first_time) {
     /* Reset reassemblers */
-    if(flow->metadata.tls_quic.message[0].buffer)
-      ndpi_free(flow->metadata.tls_quic.message[0].buffer);
-    memset(&flow->metadata.tls_quic.message[0], '\0', sizeof(flow->metadata.tls_quic.message[0]));
-    if(flow->metadata.tls_quic.message[1].buffer)
-      ndpi_free(flow->metadata.tls_quic.message[1].buffer);
-    memset(&flow->metadata.tls_quic.message[1], '\0', sizeof(flow->metadata.tls_quic.message[1]));
+    if(flow->core.tls_quic.message[0].buffer)
+      ndpi_free(flow->core.tls_quic.message[0].buffer);
+    memset(&flow->core.tls_quic.message[0], '\0', sizeof(flow->core.tls_quic.message[0]));
+    if(flow->core.tls_quic.message[1].buffer)
+      ndpi_free(flow->core.tls_quic.message[1].buffer);
+    memset(&flow->core.tls_quic.message[1], '\0', sizeof(flow->core.tls_quic.message[1]));
 
     /* We will not check obfuscated heuristic (anymore) because we have been
        called from the STUN code, but we need to clear the previous state
        (if any) to trigger "standard" TLS/DTLS code */
-    if(flow->metadata.tls_quic.obfuscated_heur_state) {
-      ndpi_free(flow->metadata.tls_quic.obfuscated_heur_state);
-      flow->metadata.tls_quic.obfuscated_heur_state = NULL;
+    if(flow->core.tls_quic.obfuscated_heur_state) {
+      ndpi_free(flow->core.tls_quic.obfuscated_heur_state);
+      flow->core.tls_quic.obfuscated_heur_state = NULL;
     }
   }
 
@@ -3182,13 +3197,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    if(!is_quic) {
 		      if(ndpi_struct->cfg.tls_subclassification_enabled &&
 		         flow->metadata.protos.tls_quic.subprotocol_detected == 0 &&
-		         !flow->metadata.tls_quic.from_rdp && /* No (other) sub-classification; we will have TLS.RDP anyway */
+		         !flow->core.tls_quic.from_rdp && /* No (other) sub-classification; we will have TLS.RDP anyway */
 		         ndpi_match_hostname_protocol(ndpi_struct, flow, ndpi_get_master_proto(ndpi_struct, flow), sni, sni_len))
 		        flow->metadata.protos.tls_quic.subprotocol_detected = 1;
 		    } else {
 		      if(ndpi_struct->cfg.quic_subclassification_enabled &&
 		         flow->metadata.protos.tls_quic.subprotocol_detected == 0 &&
-		         !flow->metadata.tls_quic.from_rdp && /* No (other) sub-classification; we will have TLS.RDP anyway */
+		         !flow->core.tls_quic.from_rdp && /* No (other) sub-classification; we will have TLS.RDP anyway */
 		         ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_QUIC, sni, sni_len))
 		        flow->metadata.protos.tls_quic.subprotocol_detected = 1;
 		    }
@@ -3787,8 +3802,10 @@ compute_ja4c:
 
 /* **************************************** */
 
-static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
-				    struct ndpi_flow_struct *flow) {
+static void ndpi_search_tls_wrapper_internal(struct ndpi_detection_module_struct *ndpi_struct,
+					     struct ndpi_flow_struct *flow,
+					     struct ndpi_flow_metadata_struct *metadata,
+					     struct ndpi_flow_tls_quic_metadata_struct *tls) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int rc = 0;
 
@@ -3807,11 +3824,11 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
      called from STUN or from Mails/FTP/...), but plain obfuscated heuristic
      is always checked in "standard" data-path! */
 
-  if(flow->metadata.tls_quic.obfuscated_heur_state == NULL) {
+  if(flow->core.tls_quic.obfuscated_heur_state == NULL) {
     if(packet->udp != NULL || flow->metadata.stun.maybe_dtls)
-      rc = ndpi_search_dtls(ndpi_struct, flow);
+      rc = ndpi_search_dtls_internal(ndpi_struct, flow, tls);
     else
-      rc = ndpi_search_tls_tcp(ndpi_struct, flow);
+      rc = ndpi_search_tls_tcp_internal(ndpi_struct, flow, tls);
 
      /* We should check for this TLS heuristic if:
       * the feature is enabled
@@ -3822,19 +3839,26 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
     if(rc == 0 &&
        (ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_PLAIN) &&
        flow->metadata.stun.maybe_dtls == 0 &&
-       flow->metadata.tls_quic.from_opportunistic_tls == 0 &&
+       flow->core.tls_quic.from_opportunistic_tls == 0 &&
        ((flow->core.l4_proto == IPPROTO_TCP && ndpi_seen_flow_beginning(flow)) ||
         flow->core.l4_proto == IPPROTO_UDP) &&
        !is_flow_addr_informative(flow) /* The proxy server is likely hosted on some cloud providers */ ) {
-      flow->metadata.tls_quic.obfuscated_heur_state = ndpi_calloc(1, sizeof(struct tls_obfuscated_heuristic_state));
+      flow->core.tls_quic.obfuscated_heur_state = ndpi_calloc(1, sizeof(struct tls_obfuscated_heuristic_state));
     }
   }
 
-  if(flow->metadata.tls_quic.obfuscated_heur_state) {
+  if(flow->core.tls_quic.obfuscated_heur_state) {
     tls_obfuscated_heur_search_again(ndpi_struct, flow);
   } else if(rc == 0) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
   }
+}
+
+/* **************************************** */
+
+static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_struct,
+				    struct ndpi_flow_struct *flow) {
+  ndpi_search_tls_wrapper_internal(ndpi_struct, flow, &flow->metadata, &flow->metadata.protos.tls_quic);
 }
 
 /* **************************************** */

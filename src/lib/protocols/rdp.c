@@ -90,12 +90,12 @@ static void ndpi_search_rdp(struct ndpi_detection_module_struct *ndpi_struct,
 	    if((rdp_requested_proto & 0x1) == 0x1) {
 	      /* RDP Response + Client Hello + Server hello */
 	      flow->core.max_extra_packets_to_check = 5;
-	      flow->metadata.tls_quic.from_rdp = 1;
+	      flow->core.tls_quic.from_rdp = 1;
 	      flow->core.extra_packets_func = ndpi_search_tls_over_rdp;
 	    }
 	  }
 
-	  if((flow->core.num_processed_pkts > 4) || flow->metadata.tls_quic.from_rdp)
+	  if((flow->core.num_processed_pkts > 4) || flow->core.tls_quic.from_rdp)
 	    ndpi_int_rdp_add_connection(ndpi_struct, flow);
 	  else
 	    flow->metadata.l4.tcp.rdp_protocol_detected = 1 /* this looks like RDP */;

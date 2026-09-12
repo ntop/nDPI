@@ -887,7 +887,7 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
          positives. In that case, the TLS dissector doesn't set the master protocol, so we
          need to rollback to the current state */
 
-      if(flow->metadata.tls_quic.certificate_processed == 1) {
+      if(flow->core.tls_quic.certificate_processed == 1) {
         NDPI_LOG_DBG(ndpi_struct, "Interesting DTLS stuff already processed. Ignoring\n");
       } else if(flow->core.state != NDPI_STATE_MONITORING) {
         NDPI_LOG_DBG(ndpi_struct, "Switch to DTLS (%d/%d)\n",
