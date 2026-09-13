@@ -1647,6 +1647,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_snprintf(flow->ssh_tls.ja4_client, sizeof(flow->ssh_tls.ja4_client), "%s",
 	     flow->ndpi_flow->metadata.protos.tls_quic.ja4_client);
 
+    ndpi_snprintf(flow->ssh_tls.ja5_client, sizeof(flow->ssh_tls.ja5_client), "%s",
+	     flow->ndpi_flow->metadata.protos.tls_quic.ja5_client);
+
     if(flow->ndpi_flow->metadata.ndpi.client_fingerprint)
       flow->ndpi_client_fingerprint = ndpi_strdup(flow->ndpi_flow->metadata.ndpi.client_fingerprint);
 

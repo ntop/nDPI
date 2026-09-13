@@ -2485,6 +2485,27 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   if((rc > 0) && (ja_str_len + rc < JA_STR_LEN)) ja_str_len += rc;
   ja_ndpi_str[36] = 0;
 
+  /*
+    JA5 is identical to JA4 but it skips the TLS extensions for which
+    skipTLSextension() returns true when building the extensions list
+    used to compute the extensions hash (same filtering used above for
+    ja4_ndpi_client, i.e. tmp_ndpi_str/num_ndpi_extn/sha_hash)
+  */
+  {
+    char * const ja5_str = &flow->metadata.protos.tls_quic.ja5_client[0];
+    char cnt_str[3];
+
+    memcpy(ja5_str, ja_str, ja_offset);
+    ndpi_snprintf(cnt_str, sizeof(cnt_str), "%02u", ndpi_min(99, num_ndpi_extn));
+    memcpy(&ja5_str[6], cnt_str, 2);
+
+    rc = ndpi_snprintf(&ja5_str[ja_offset], ja_max_len - ja_offset,
+			"%02x%02x%02x%02x%02x%02x",
+			sha_hash[0], sha_hash[1], sha_hash[2],
+			sha_hash[3], sha_hash[4], sha_hash[5]);
+    ja5_str[36] = 0;
+  }
+
 #ifdef DEBUG_JA
   printf("[JA4] %s [len: %lu]\n", ja_str, strlen(ja_str));
 #endif
