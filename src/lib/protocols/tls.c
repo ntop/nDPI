@@ -1438,6 +1438,8 @@ int ndpi_search_tls_tcp_internal(struct ndpi_detection_module_struct *ndpi_struc
   message_t *message;
   bool same_packet = false;
 
+  __ndpi_unused_param(tls);
+
   if(packet->tcp == NULL)
     return 0; /* Error -> stop (this doesn't seem to be TCP) */
 
@@ -1753,6 +1755,8 @@ static int ndpi_search_dtls_internal(struct ndpi_detection_module_struct *ndpi_s
   const u_int8_t *p;
   u_int8_t no_dtls = 0, change_cipher_found = 0;
   message_t *message = NULL;
+
+  __ndpi_unused_param(tls);
 
 #ifdef DEBUG_TLS
   printf("[TLS] %s()\n", __FUNCTION__);
@@ -3833,9 +3837,7 @@ static void ndpi_search_tls_wrapper_internal(struct ndpi_detection_module_struct
 
 #ifdef DEBUG_TLS
   printf("==>> %s() [len: %u][version: %u]\n",
-	 __FUNCTION__,
-	 packet->payload_packet_len,
-	 flow->metadata.protos.tls_quic.ssl_version);
+	 __FUNCTION__, packet->payload_packet_len, tls->ssl_version);
 #endif
 
   /* It is not easy to handle "standard" TLS/DTLS detection and (plain) obfuscated
@@ -3847,7 +3849,7 @@ static void ndpi_search_tls_wrapper_internal(struct ndpi_detection_module_struct
      is always checked in "standard" data-path! */
 
   if(flow->core.tls_quic.obfuscated_heur_state == NULL) {
-    if(packet->udp != NULL || flow->metadata.stun.maybe_dtls)
+    if(packet->udp != NULL || metadata->stun.maybe_dtls)
       rc = ndpi_search_dtls_internal(ndpi_struct, flow, tls);
     else
       rc = ndpi_search_tls_tcp_internal(ndpi_struct, flow, tls);
@@ -3860,7 +3862,7 @@ static void ndpi_search_tls_wrapper_internal(struct ndpi_detection_module_struct
       */
     if(rc == 0 &&
        (ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_PLAIN) &&
-       flow->metadata.stun.maybe_dtls == 0 &&
+       metadata->stun.maybe_dtls == 0 &&
        flow->core.tls_quic.from_opportunistic_tls == 0 &&
        ((flow->core.l4_proto == IPPROTO_TCP && ndpi_seen_flow_beginning(flow)) ||
         flow->core.l4_proto == IPPROTO_UDP) &&
