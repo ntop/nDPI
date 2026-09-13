@@ -8244,6 +8244,9 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 
     if(flow->core.tls_quic.obfuscated_heur_state)
       ndpi_free(flow->core.tls_quic.obfuscated_heur_state);
+
+    if(flow->core.host_server_name)
+      ndpi_free(flow->core.host_server_name);
   }
 }
 
@@ -9449,7 +9452,7 @@ static void check_probing_attempt(struct ndpi_detection_module_struct *ndpi_str,
 	case NDPI_PROTOCOL_MAIL_POPS:
 	case NDPI_PROTOCOL_MAIL_IMAPS:
 	case NDPI_PROTOCOL_DTLS:
-	  if(flow->core.host_server_name[0] == '\0')
+	  if(flow->core.host_server_name == NULL)
 	    ndpi_set_risk(ndpi_str, &flow->core, NDPI_PROBING_ATTEMPT, "TLS Probing");
 	  break;
 	}
@@ -10162,7 +10165,7 @@ void fill_protocol_category_and_breed(struct ndpi_detection_module_struct *ndpi_
       return;
     }
 
-    if(flow->core.host_server_name[0] != '\0') {
+    if(flow->core.host_server_name != NULL) {
       ndpi_protocol_category_t category;
       ndpi_protocol_breed_t breed;
       int rc = ndpi_match_custom_category(ndpi_str, flow->core.host_server_name,
@@ -13379,17 +13382,18 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
 			    const u_int8_t *value, size_t value_len,
 			    int normalize) {
   char *dst, *double_column;
-  size_t len, i;
+  size_t i;
 
-  len = ndpi_min(value_len, sizeof(flow->core.host_server_name) - 1);
-  dst = flow->core.host_server_name;
-
-  if(!normalize) {
-    memcpy(dst,&value[value_len - len],len);
-    dst[len] = '\0';
-  } else {
-    for(i = 0; i < len; i++) {
-      char c = value[value_len - len + i];
+  if(value == NULL) return(NULL);  
+  if(flow->core.host_server_name != NULL) ndpi_free(flow->core.host_server_name);
+  
+  flow->core.host_server_name = dst = (char*)ndpi_strndup((const char*)value, value_len);
+  if(flow->core.host_server_name == NULL) return(NULL);
+  
+  if(normalize) {
+    for(i = 0; i < value_len; i++) {
+      char c = value[i];
+      
       if(!c) break;
       if(normalize & NDPI_HOSTNAME_NORM_LC) c = tolower(c);
       if(normalize & NDPI_HOSTNAME_NORM_REPLACE_IC) {

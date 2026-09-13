@@ -143,7 +143,7 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
         flow->metadata.l4.tcp.smtp_command_bitmask |= SMTP_BIT_220;
 
         /* Extract server hostname from the banner "220 hostname ..." */
-        if(flow->core.host_server_name[0] == '\0' && len > 4 && ptr[4] != '(') {
+        if((flow->core.host_server_name == NULL) && len > 4 && ptr[4] != '(') {
           int i;
           for(i = 5; i < len - 1 && ptr[i] != ' '; i++)
             ;
@@ -151,10 +151,13 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
             unsigned int hlen = i - 4;
 	    
             ndpi_hostname_sni_set(flow, &ptr[4], hlen, NDPI_HOSTNAME_NORM_ALL);
-            NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname [%s]\n", flow->core.host_server_name);
-            ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
-                                         flow->core.host_server_name,
-                                         strlen(flow->core.host_server_name));
+	    if(flow->core.host_server_name) {
+	      NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname [%s]\n", flow->core.host_server_name);
+	      ndpi_match_hostname_protocol(ndpi_struct, flow, NDPI_PROTOCOL_MAIL_SMTP,
+					   flow->core.host_server_name,
+					   strlen(flow->core.host_server_name));
+	    }
+	    
             if(flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
               NDPI_LOG_DBG(ndpi_struct, "SMTP: hostname matched\n");
               smtpInitExtraPacketProcessing(flow);
@@ -250,7 +253,8 @@ static void ndpi_search_mail_smtp_tcp(struct ndpi_detection_module_struct *ndpi_
             ndpi_set_risk(ndpi_struct, &flow->core, NDPI_CLEAR_TEXT_CREDENTIALS, "Found password");
             flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_done = 1;
           } else {
-            flow->core.host_server_name[0] = '\0';
+	    if(flow->core.host_server_name) ndpi_free(flow->core.host_server_name);
+            flow->core.host_server_name = NULL;
             NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
             return;
           }

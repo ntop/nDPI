@@ -1113,39 +1113,41 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 	   crypto_data_len, tag_offset_start, prev_offset, offset, len);
 #endif
     if(memcmp(tag, "SNI\0", 4) == 0) {
-
       ndpi_hostname_sni_set(flow, &crypto_data[tag_offset_start + prev_offset], len, NDPI_HOSTNAME_NORM_ALL);
 
-      NDPI_LOG_DBG2(ndpi_struct, "SNI: [%s]\n",
-                    flow->core.host_server_name);
+      if(flow->core.host_server_name) {
+	NDPI_LOG_DBG2(ndpi_struct, "SNI: [%s]\n",
+		      flow->core.host_server_name);
 
-      ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
-                                  flow->core.host_server_name,
-                                  strlen(flow->core.host_server_name),
-                                  &ret_match, NDPI_PROTOCOL_QUIC, 1);
-      flow->metadata.protos.tls_quic.client_hello_processed = 1; /* Allow matching of custom categories */
+	ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
+				    flow->core.host_server_name,
+				    strlen(flow->core.host_server_name),
+				    &ret_match, NDPI_PROTOCOL_QUIC, 1);
+	flow->metadata.protos.tls_quic.client_hello_processed = 1; /* Allow matching of custom categories */
 
-      ndpi_check_dga_name(ndpi_struct, &flow->core,
-                          flow->core.host_server_name, 1, 0, 0);
+	ndpi_check_dga_name(ndpi_struct, &flow->core,
+			    flow->core.host_server_name, 1, 0, 0);
 
-      if(ndpi_is_valid_hostname((char *)&crypto_data[tag_offset_start + prev_offset],
-				len) == 0) {
-        if(is_flowrisk_info_enabled(ndpi_struct, NDPI_INVALID_CHARACTERS)) {
-          char str[128];
+	if(ndpi_is_valid_hostname((char *)&crypto_data[tag_offset_start + prev_offset],
+				  len) == 0) {
+	  if(is_flowrisk_info_enabled(ndpi_struct, NDPI_INVALID_CHARACTERS)) {
+	    char str[128];
 
-	  snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
-	  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
-        } else {
-          ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, NULL);
-        }
+	    snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
+	    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
+	  } else {
+	    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, NULL);
+	  }
 	
-	/* This looks like an attack */
-	ndpi_set_risk(ndpi_struct, &flow->core, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
-      }
+	  /* This looks like an attack */
+	  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
+	}
       
-      sni_found = 1;
-      if(icsl_found)
-        return;
+	sni_found = 1;
+
+	if(icsl_found)
+	  return;
+      }
     }
 
     if(memcmp(tag, "ICSL", 4) == 0 && len >= 4) {
@@ -1165,9 +1167,10 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
     NDPI_LOG_DBG(ndpi_struct, "Something went wrong in tags iteration\n");
 
   /* Add check for missing SNI */
-  if(flow->core.host_server_name[0] == '\0') {
+  if(flow->core.host_server_name == NULL) {
     /* This is a bit suspicious */
-    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_MISSING_SNI, "SNI should be present all time: attack ?");
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_MISSING_SNI,
+		  "SNI should be present all time: attack ?");
   }
 }
 
@@ -1409,12 +1412,13 @@ static int eval_extra_processing(struct ndpi_detection_module_struct *ndpi_struc
      These two cases are mutually exclusive
   */
 
-  if(version == V_Q046 && flow->core.host_server_name[0] == '\0') {
+  if(version == V_Q046 && flow->core.host_server_name == NULL) {
     NDPI_LOG_DBG2(ndpi_struct, "We have further work to do (old snapchat call?)\n");
     return 1;
   }
 
   if(version == V_1 &&
+     flow->core.host_server_name &&
      flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_SNAPCHAT) {
     size_t sni_len = strlen(flow->core.host_server_name);
     if(sni_len > 11 &&

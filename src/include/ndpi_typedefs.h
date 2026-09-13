@@ -1744,9 +1744,13 @@ struct ndpi_flow_core_struct {
    *
    * Please, think *very* hard before increasing its size!
    */
-  char host_server_name[80];
+  char *host_server_name;
 
-  struct ndpi_flow_tls_quic_core_struct tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
+  /*
+    The field below has to be into the flow core as it's used by TCP-based protocols that can be potentially
+    TLS-based hence that will mess around with it
+  */
+  struct ndpi_flow_tls_quic_core_struct tls_quic;
   
   /* Flow payload */
   u_int16_t flow_payload_len;

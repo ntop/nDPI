@@ -557,23 +557,26 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
       break;
 
     case 0x0014: /* Realm */
-      if(flow->core.host_server_name[0] == '\0') {
+      if(flow->core.host_server_name == NULL) {
 	int i;
 	bool valid = true;
 
-        ndpi_hostname_sni_set(flow, payload + off + 4, ndpi_min(len,
-								       payload_length - off - 4), NDPI_HOSTNAME_NORM_ALL);
-        NDPI_LOG_DBG(ndpi_struct, "Realm [%s]\n", flow->core.host_server_name);       
-	
-	/* Some Realm contain junk, so let's validate it */
-	for(i=0; flow->core.host_server_name[i] != '\0'; i++) {
-	  if(flow->core.host_server_name[i] == '?') {
-	    valid = false;
-	    break;
+        ndpi_hostname_sni_set(flow, payload + off + 4,
+			      ndpi_min(len, payload_length - off - 4), NDPI_HOSTNAME_NORM_ALL);
+
+	if(flow->core.host_server_name) {
+	  NDPI_LOG_DBG(ndpi_struct, "Realm [%s]\n", flow->core.host_server_name);       
+	  
+	  /* Some Realm contain junk, so let's validate it */
+	  for(i=0; flow->core.host_server_name[i] != '\0'; i++) {
+	    if(flow->core.host_server_name[i] == '?') {
+	      valid = false;
+	      break;
+	    }
 	  }
 	}
 
-	if(valid) {
+	if(valid && flow->core.host_server_name) {
 	  if(strstr(flow->core.host_server_name, "google.com") != NULL) {
 	    *app_proto = NDPI_PROTOCOL_GOOGLE_CALL;
 	  } else if(strstr(flow->core.host_server_name, "whispersystems.org") != NULL ||
@@ -593,8 +596,10 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 	      *app_proto = NDPI_PROTOCOL_SIGNAL_VOIP;
 	    }
 	  }
-	} else
-	  flow->core.host_server_name[0] = '\0';
+	} else {
+	  if(flow->core.host_server_name) ndpi_free(flow->core.host_server_name);
+	  flow->core.host_server_name = NULL;
+	}
       }
       break;
 

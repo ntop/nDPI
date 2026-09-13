@@ -896,7 +896,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
       u_int8_t matched_name = 0;
 
       /* If the client hello was not observed or the requested name was missing, there is no need to trigger an alert */
-      if(flow->core.host_server_name[0] == '\0')
+      if(flow->core.host_server_name == NULL)
 	matched_name = 1;
 
 #ifdef DEBUG_TLS
@@ -962,7 +962,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 
 #if DEBUG_TLS
 		    printf("[TLS] dNSName %s [%s][len: %u][leftover: %d]\n", dNSName,
-			   flow->core.host_server_name, len,
+			   flow->core.host_server_name ? flow->core.host_server_name : "", len,
 			   packet->payload_packet_len-i-len);
 #endif
 
@@ -981,10 +981,10 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 		      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_POSSIBLE_EXPLOIT, "Invalid dNSName name");
 		    }
 
-		    if(matched_name == 0) {
+		    if((matched_name == 0) && flow->core.host_server_name) {
 #if DEBUG_TLS
 		      printf("[TLS] Trying to match '%s' with '%s'\n",
-			     flow->core.host_server_name, dNSName);
+			     flow->core.host_server_name ? flow->core.host_server_name : "", dNSName);
 #endif
 
 		      if(dNSName[0] == '*') {
@@ -1051,7 +1051,8 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	      if(is_flowrisk_info_enabled(ndpi_struct, NDPI_TLS_CERTIFICATE_MISMATCH)) {
 	        char str[128];
 
-	        snprintf(str, sizeof(str), "%s vs %s", flow->core.host_server_name, flow->metadata.protos.tls_quic.server_names);
+	        snprintf(str, sizeof(str), "%s vs %s", flow->core.host_server_name ? flow->core.host_server_name : "",
+			 flow->metadata.protos.tls_quic.server_names);
 	        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_CERTIFICATE_MISMATCH, str); /* Certificate mismatch */
 	      } else {
 	        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_CERTIFICATE_MISMATCH, NULL); /* Certificate mismatch */
@@ -2326,7 +2327,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_fill_version_str(ja_str, tls_handshake_version);
 
   /* Check if SNI extension exists at all */
-  if(flow->core.host_server_name[0] == '\0') {
+  if(flow->core.host_server_name == NULL) {
     ja_str[3] = 'i';  /* No SNI extension */
   } else if(ndpi_isset_risk(&flow->core, NDPI_NUMERIC_IP_HOST)) {
     ja_str[3] = 'i';  /* SNI contains IP address */
@@ -3753,7 +3754,7 @@ compute_ja4c:
 	    }
 
 	    /* Add check for missing SNI */
-	    if(flow->core.host_server_name[0] == '\0'
+	    if(flow->core.host_server_name == NULL
 	       && (flow->metadata.protos.tls_quic.ssl_version >= 0x0302) /* TLSv1.1 */
 	       && !flow->metadata.protos.tls_quic.webrtc
 	       ) {
