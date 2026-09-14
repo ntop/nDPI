@@ -1668,6 +1668,15 @@ struct ndpi_flow_struct_dns_metadata {
 
 /* ************************ */
 
+struct ndpi_flow_tls_quic_core_struct {
+  message_t message[2]; /* Directions */
+  u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
+  struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
+  char *opaque; /* Plugin custom storage. If not NULL will be deleted automatically by ndpi_free_flow() */
+};
+
+/* ************************ */
+
 struct ndpi_flow_core_struct {
   u_int16_t detected_protocol_stack[NDPI_PROTOCOL_SIZE];
   struct ndpi_proto_stack protocol_stack;
@@ -1735,8 +1744,14 @@ struct ndpi_flow_core_struct {
    *
    * Please, think *very* hard before increasing its size!
    */
-  char host_server_name[80];
+  char *host_server_name;
 
+  /*
+    The field below has to be into the flow core as it's used by TCP-based protocols that can be potentially
+    TLS-based hence that will mess around with it
+  */
+  struct ndpi_flow_tls_quic_core_struct tls_quic;
+  
   /* Flow payload */
   u_int16_t flow_payload_len;
   char *flow_payload;
@@ -1744,19 +1759,10 @@ struct ndpi_flow_core_struct {
 
 /* ************************ */
 
-struct ndpi_flow_tls_quic_core_struct {
-  message_t message[2]; /* Directions */
-  u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
-  struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
-  char *opaque; /* Plugin custom storage. If not NULL will be deleted automatically by ndpi_free_flow() */
-};
-
-/* ************************ */
-
 struct ndpi_flow_tls_quic_metadata_struct {
   char *server_names, *advertised_alpns, *negotiated_alpn, *tls_supported_versions, *issuerDN, *subjectDN;
   u_int32_t notBefore, notAfter;
-  char ja3_server[33], ja4_client[37], ja4_ndpi_client[37], *ja4_client_raw;
+  char ja3_server[33], ja4_client[37], ja4_ndpi_client[37], ja5_client[37], *ja4_client_raw;
   u_int16_t server_cipher;
   u_int8_t sha1_certificate_fingerprint[20];
   u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1,
@@ -1837,8 +1843,6 @@ struct ndpi_flow_metadata_struct {
     u_int16_t rtp_counters[2];
     u_int32_t t_start, t_end;
   } stun;
-
-  struct ndpi_flow_tls_quic_core_struct tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
 
   struct {
     struct rtp_info rtp[2 /* directions */];

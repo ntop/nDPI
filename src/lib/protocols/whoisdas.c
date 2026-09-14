@@ -48,7 +48,7 @@ static void ndpi_search_whois_das(struct ndpi_detection_module_struct *ndpi_stru
 
       if((dport == 43) || (dport == 4343)) { /* Request */
         ndpi_hostname_sni_set(flow, &packet->payload[0], packet->payload_packet_len - 2, NDPI_HOSTNAME_NORM_ALL); /* Skip \r\n */
-        NDPI_LOG_INFO(ndpi_struct, "[WHOIS/DAS] %s\n", flow->core.host_server_name);
+        if(flow->core.host_server_name) NDPI_LOG_INFO(ndpi_struct, "[WHOIS/DAS] %s\n", flow->core.host_server_name);
       }
       return;
     }

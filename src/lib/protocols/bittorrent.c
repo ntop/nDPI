@@ -185,8 +185,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
 					      struct ndpi_flow_struct *flow,
 					      int bt_offset, int check_hash,
 					      ndpi_confidence_t confidence) {
-  if(ndpi_struct->cfg.bittorrent_hash_enabled &&
-     check_hash)
+  if(ndpi_struct->cfg.bittorrent_hash_enabled && check_hash)
     ndpi_search_bittorrent_hash(ndpi_struct, flow, bt_offset);
 
   ndpi_set_detected_protocol_keeping_master(ndpi_struct, flow, NDPI_PROTOCOL_BITTORRENT,

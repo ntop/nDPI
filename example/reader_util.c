@@ -1397,7 +1397,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   flow->num_dissector_calls = flow->ndpi_flow->core.num_dissector_calls;
 
   ndpi_snprintf(flow->host_server_name, sizeof(flow->host_server_name), "%s",
-		flow->ndpi_flow->core.host_server_name);
+		flow->ndpi_flow->core.host_server_name ? flow->ndpi_flow->core.host_server_name : "");
 
   if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_MINING)) {
     ndpi_snprintf(flow->mining.currency, sizeof(flow->mining.currency), "%s",
@@ -1537,7 +1537,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   /* MDNS */
   else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_MDNS)) {
     flow->info_type = INFO_GENERIC;
-    ndpi_snprintf(flow->info, sizeof(flow->info), "%s", flow->ndpi_flow->core.host_server_name);
+    ndpi_snprintf(flow->info, sizeof(flow->info), "%s",
+		  flow->ndpi_flow->core.host_server_name ? flow->ndpi_flow->core.host_server_name : "");
   }
   /* UBNTAC2 */
   else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_UBNTAC2)) {
@@ -1645,6 +1646,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->ssh_tls.notAfter = flow->ndpi_flow->metadata.protos.tls_quic.notAfter;
     ndpi_snprintf(flow->ssh_tls.ja4_client, sizeof(flow->ssh_tls.ja4_client), "%s",
 	     flow->ndpi_flow->metadata.protos.tls_quic.ja4_client);
+
+    ndpi_snprintf(flow->ssh_tls.ja5_client, sizeof(flow->ssh_tls.ja5_client), "%s",
+	     flow->ndpi_flow->metadata.protos.tls_quic.ja5_client);
 
     if(flow->ndpi_flow->metadata.ndpi.client_fingerprint)
       flow->ndpi_client_fingerprint = ndpi_strdup(flow->ndpi_flow->metadata.ndpi.client_fingerprint);

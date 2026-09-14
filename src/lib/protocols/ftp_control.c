@@ -83,7 +83,11 @@ static void ftp_control_set_detected(struct ndpi_detection_module_struct *ndpi_s
                                      struct ndpi_flow_struct *flow) {
   NDPI_LOG_INFO(ndpi_struct, "found FTP_CONTROL\n");
 
-  flow->core.host_server_name[0] = '\0';
+  if(flow->core.host_server_name) {
+    ndpi_free(flow->core.host_server_name);
+    flow->core.host_server_name = NULL;;
+  }
+  
   ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                              NDPI_PROTOCOL_FTP_CONTROL, NDPI_PROTOCOL_UNKNOWN,
                              NDPI_CONFIDENCE_DPI);
@@ -217,7 +221,12 @@ static void ndpi_check_ftp_control(struct ndpi_detection_module_struct *ndpi_str
     /* Upgrade to FTPS if AUTH TLS handshake completed */
     if(flow->metadata.l4.tcp.ftp_imap_pop_smtp.auth_tls == 1 &&
        ndpi_struct->cfg.ftp_opportunistic_tls_enabled == 1) {
-      flow->core.host_server_name[0] = '\0';
+
+      if(flow->core.host_server_name) {
+	ndpi_free(flow->core.host_server_name);
+	flow->core.host_server_name = NULL;
+      }
+      
       ndpi_set_detected_protocol(ndpi_struct, &flow->core,
                                  NDPI_PROTOCOL_FTPS, NDPI_PROTOCOL_UNKNOWN,
                                  NDPI_CONFIDENCE_DPI);

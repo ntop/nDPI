@@ -82,6 +82,8 @@ static void ndpi_set_binary_data_transfer(struct ndpi_detection_module_struct *n
 static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_struct *ndpi_struct,
 						 struct ndpi_flow_struct *flow,
 						 char *msg) {
+  if(flow->core.host_server_name == NULL) return;
+  
   /*
     Check known exceptions
     https://learn.microsoft.com/en-us/windows/privacy/windows-endpoints-1909-non-enterprise-editions
@@ -95,7 +97,9 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
   else {
     char buf[256];
 
-    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_BINARY_APPLICATION_TRANSFER, forge_attempt_msg(flow, msg, buf, sizeof(buf)));
+    ndpi_set_risk(ndpi_struct, &flow->core,
+		  NDPI_BINARY_APPLICATION_TRANSFER,
+		  forge_attempt_msg(flow, msg, buf, sizeof(buf)));
   }
  }
 
@@ -159,7 +163,7 @@ static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_
 
     /* Loook for TLS over websocket */
     if((ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_HTTP) && /* Feature enabled */
-       (flow->core.host_server_name[0] != '\0' &&
+       ((flow->core.host_server_name != NULL) &&
         flow->metadata.http.response_status_code != 0) && /* Bidirectional HTTP traffic */
        flow->metadata.http.websocket) {
 
@@ -582,7 +586,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
   }
 
   if(flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
-     hostname_just_set && flow->core.host_server_name[0] != '\0') {
+     hostname_just_set && (flow->core.host_server_name != NULL)) {
     ndpi_match_hostname_protocol(ndpi_struct, flow,
 				 master_protocol,
 				 flow->core.host_server_name,
@@ -612,7 +616,8 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
       NDPI_LOG_DBG2(ndpi_struct, "Origin: [%.*s] -> [%.*s]\n", packet->http_origin.len, packet->http_origin.ptr,
 		    (int)origin_hostname_len, origin_hostname);
       /* We already checked hostname...*/
-      if(strncmp(origin_hostname, flow->core.host_server_name, origin_hostname_len) != 0) {
+      if(flow->core.host_server_name
+	 && (strncmp(origin_hostname, flow->core.host_server_name, origin_hostname_len) != 0)) {
         ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
 				    origin_hostname,
 				    origin_hostname_len,
@@ -1280,7 +1285,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
 
   /* check for host line (only if we don't already have an hostname) */
-  if(packet->host_line.ptr != NULL && flow->core.host_server_name[0] == '\0') {
+  if(packet->host_line.ptr != NULL && (flow->core.host_server_name == NULL)) {
 
     NDPI_LOG_DBG2(ndpi_struct, "HOST line found %.*s\n",
 		  packet->host_line.len, packet->host_line.ptr);
@@ -1289,7 +1294,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len,
 			  NDPI_HOSTNAME_NORM_ALL | NDPI_HOSTNAME_NORM_STRIP_PORT);
 
-    if(strlen(flow->core.host_server_name) > 0) {
+    if(flow->core.host_server_name != NULL) {
       char *double_col;
       int a, b, c, d;
       u_int16_t host_line_length;
@@ -1327,8 +1332,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	char str[128];
 
         if(is_flowrisk_info_enabled(ndpi_struct, NDPI_INVALID_CHARACTERS)) {
-	  snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
-	  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
+	  if(flow->core.host_server_name != NULL) {
+	    snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
+	    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
+	  }
         } else {
           ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, NULL);
         }
@@ -1340,6 +1347,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       }
 
       if(ndpi_struct->packet.iph
+	 && flow->core.host_server_name
          && (sscanf(flow->core.host_server_name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)) {
         /* IPv4 */
 
@@ -1348,7 +1356,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
             char buf[64], msg[128];
 
 	    snprintf(msg, sizeof(msg), "Expected %s, found %s",
-		     ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)), flow->core.host_server_name);
+		     ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)),
+		     flow->core.host_server_name);
 	    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
           } else {
             ndpi_set_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
@@ -1361,7 +1370,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
   ndpi_http_parse_subprotocol(ndpi_struct, flow, hostname_just_set);
 
-  if(hostname_just_set && strlen(flow->core.host_server_name) > 0) {
+  if(hostname_just_set && flow->core.host_server_name) {
     ndpi_check_dga_name(ndpi_struct, &flow->core, flow->core.host_server_name, 1, 0, 0);
   }
 
@@ -1780,10 +1789,10 @@ void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_check_http_tcp(ndpi_struct, flow);
 
   if((ndpi_struct->cfg.http_parse_response_enabled &&
-      flow->core.host_server_name[0] != '\0' &&
+      flow->core.host_server_name &&
       flow->metadata.http.response_status_code != 0) ||
      (!ndpi_struct->cfg.http_parse_response_enabled &&
-      (flow->core.host_server_name[0] != '\0' ||
+      (flow->core.host_server_name ||
        flow->metadata.http.response_status_code != 0)) ||
      /* We have found 3 consecutive requests (without the reply) or 3
         consecutive replies (without the request). If the traffic is really

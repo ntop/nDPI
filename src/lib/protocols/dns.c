@@ -1043,7 +1043,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  if(strlen(core->host_server_name) > 0) {
+  if(core->host_server_name && strlen(core->host_server_name) > 0) {
     ndpi_protocol_match_result ret_match;
 
     if(core->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
@@ -1056,7 +1056,8 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
                                                         ndpi_struct->cfg.dns_subclassification_enabled ? 1 : 0);
     }
 
-    ndpi_check_dga_name(ndpi_struct, core, core->host_server_name, 1, 0, proto->app_protocol != NDPI_PROTOCOL_UNKNOWN);
+    if(core->host_server_name)
+      ndpi_check_dga_name(ndpi_struct, core, core->host_server_name, 1, 0, proto->app_protocol != NDPI_PROTOCOL_UNKNOWN);
   }
 
   return 0;

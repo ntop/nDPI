@@ -201,23 +201,27 @@ static void ndpi_search_fastcgi(struct ndpi_detection_module_struct *ndpi_struct
       ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Invalid FastCGI PARAMS header");
       ndpi_int_fastcgi_add_connection(ndpi_struct, flow, NULL);
     } else {
-      ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
-                                  flow->core.host_server_name,
-                                  strlen(flow->core.host_server_name),
-                                  &ret_match, NDPI_PROTOCOL_FASTCGI, 1);
-      ndpi_check_dga_name(ndpi_struct, &flow->core,
-                          flow->core.host_server_name, 1, 0, 0);
-      if(ndpi_is_valid_hostname((char *)packet->host_line.ptr,
-                                packet->host_line.len) == 0) {
-        char str[128];
+      if(flow->core.host_server_name != NULL) {
+        ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
+                                    flow->core.host_server_name,
+                                    strlen(flow->core.host_server_name),
+                                    &ret_match, NDPI_PROTOCOL_FASTCGI, 1);
+        ndpi_check_dga_name(ndpi_struct, &flow->core,
+                            flow->core.host_server_name, 1, 0, 0);
+        if(ndpi_is_valid_hostname((char *)packet->host_line.ptr,
+                                  packet->host_line.len) == 0) {
+          char str[128];
+	
+          snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
+          ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
 
-        snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
-        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
-
-        /* This looks like an attack */
-        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
+          /* This looks like an attack */
+          ndpi_set_risk(ndpi_struct, &flow->core, NDPI_POSSIBLE_EXPLOIT, "Suspicious hostname: attack ?");
+        }
+        ndpi_int_fastcgi_add_connection(ndpi_struct, flow, &ret_match);
+      } else {
+        ndpi_int_fastcgi_add_connection(ndpi_struct, flow, NULL);
       }
-      ndpi_int_fastcgi_add_connection(ndpi_struct, flow, &ret_match);
     }
     return;
   }
