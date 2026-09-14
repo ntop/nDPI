@@ -44,7 +44,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   packet->tcp = &tcph;
 
   memset(ndpi_flow, 0, sizeof(struct ndpi_flow_struct));
-  strcpy(ndpi_flow->core.host_server_name, "doh.opendns.com");
+  ndpi_hostname_sni_set(ndpi_flow, (const u_int8_t *)"doh.opendns.com",
+                        strlen("doh.opendns.com"), NDPI_HOSTNAME_NORM_ALL);
   ndpi_flow->core.detected_protocol_stack[0] = NDPI_PROTOCOL_TLS;
 
   processCertificateElements(ndpi_struct, ndpi_flow, 0, size);

@@ -440,7 +440,7 @@ jobs:
           -e 'usdt:./example/ndpiReader:ndpi:flow_classified {
             $flow = (struct ndpi_flow_struct *)arg4;
             @flows = count();
-            if ($flow->risk != 0) { @risky[arg0] = count(); }
+            if ($flow->core.risk != 0) { @risky[arg0] = count(); }
           }' -c './example/ndpiReader -q -i tests/pcap/1kxun.pcap' 2>&1 | tee /tmp/bpf_classified_ptr.txt
           grep -q '@flows:' /tmp/bpf_classified_ptr.txt
           echo "flow_classified probe (struct dereference): OK"
@@ -451,7 +451,7 @@ jobs:
           -e 'usdt:./example/ndpiReader:ndpi:hostname_set {
             $flow = (struct ndpi_flow_struct *)arg1;
             @hostnames = count();
-            @top[str(arg0), $flow->detected_protocol_stack[0]] = count();
+            @top[str(arg0), $flow->core.detected_protocol_stack[0]] = count();
           }' -c './example/ndpiReader -q -i tests/pcap/tls_certificate_too_long.pcap' 2>&1 | tee /tmp/bpf_hostname.txt
           # Verify we actually traced some hostnames
           grep -q '@hostnames:' /tmp/bpf_hostname.txt

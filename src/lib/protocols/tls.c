@@ -2331,7 +2331,8 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_fill_version_str(ja_str, tls_handshake_version);
 
   /* Check if SNI extension exists at all */
-  if(flow->core.host_server_name == NULL) {
+  if(flow->core.host_server_name == NULL ||
+     flow->core.host_server_name[0] == '\0') {
     ja_str[3] = 'i';  /* No SNI extension */
   } else if(ndpi_isset_risk(&flow->core, NDPI_NUMERIC_IP_HOST)) {
     ja_str[3] = 'i';  /* SNI contains IP address */
@@ -3190,9 +3191,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		if((offset+extension_offset+4) < packet->payload_packet_len) {
 		  len = (packet->payload[offset+extension_offset+3] << 8) + packet->payload[offset+extension_offset+4];
+		  char *sni;
 
-		  if((offset+extension_offset+5+len) <= packet->payload_packet_len) {
-		    char *sni = ndpi_hostname_sni_set(flow, &packet->payload[offset+extension_offset+5], len, NDPI_HOSTNAME_NORM_ALL);
+		  if((offset+extension_offset+5+len) <= packet->payload_packet_len &&
+		     (sni = ndpi_hostname_sni_set(flow, &packet->payload[offset+extension_offset+5], len, NDPI_HOSTNAME_NORM_ALL)) != NULL) {
 		    int sni_len = strlen(sni);
 #ifdef DEBUG_TLS
 		    printf("[TLS] SNI: [%s]\n", sni);
