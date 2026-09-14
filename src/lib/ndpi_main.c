@@ -13384,7 +13384,7 @@ char *ndpi_hostname_sni_set(struct ndpi_flow_struct *flow,
   char *dst, *double_column;
   size_t i;
 
-  if(value == NULL) return(NULL);  
+  if(value == NULL || value_len == 0) return(NULL);
   if(flow->core.host_server_name != NULL) ndpi_free(flow->core.host_server_name);
   
   flow->core.host_server_name = dst = (char*)ndpi_strndup((const char*)value, value_len);
