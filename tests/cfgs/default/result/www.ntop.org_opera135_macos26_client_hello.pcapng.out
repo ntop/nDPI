@@ -1,0 +1,46 @@
+DPI Packets (TCP):	12	(2.00 pkts/flow)
+Confidence DPI              : 6 (flows)
+Num dissector calls: 990 (165.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/6/0 (insert/search/found)
+Automa host:          6/6 (search/found)
+Automa domain:        6/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     6/0 (search/found)
+Automa common alpns:  12/12 (search/found)
+Patricia risk mask:   12/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   6/6 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 54/30 (search/found)
+Hash ja4 custom protos:    6/0 (search/found)
+Hash fp custom protos:     6/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+ntop	12	11542	6
+
+Safe                            12 11542         6            
+
+Network                         12 11542         6            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.1.29             	 2      
+
+
+	1	TCP 192.168.1.29:49630 -> 116.203.142.127:443 [proto: 91.26/TLS.ntop][Stack: TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 2][cat: Network/14][Breed: Safe][2 pkts/1971 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][< 1 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Cli Fingerprint: a7c2e7f8a462995deaf934d8a898d7b1][TLSv1.2][JA4: t13d1517h2_8daaf6152771_a87ad97598a9][JA5: t13d1513h2_8daaf6152771_beb91dc2a349][ECH: version 0xfe0d][Chrome][PLAIN TEXT (www.ntop.org)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
+	2	TCP 192.168.1.29:49631 -> 116.203.142.127:443 [proto: 91.26/TLS.ntop][Stack: TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 2][cat: Network/14][Breed: Safe][2 pkts/1956 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][< 1 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Cli Fingerprint: a7c2e7f8a462995deaf934d8a898d7b1][TLSv1.2][JA4: t13d1516h2_8daaf6152771_806a8c22fdea][JA5: t13d1513h2_8daaf6152771_beb91dc2a349][ECH: version 0xfe0d][Chrome][PLAIN TEXT (www.ntop.org)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
+	3	TCP 192.168.1.29:49632 -> 116.203.142.127:443 [proto: 91.26/TLS.ntop][Stack: TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 2][cat: Network/14][Breed: Safe][2 pkts/1939 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][< 1 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Cli Fingerprint: a7c2e7f8a462995deaf934d8a898d7b1][TLSv1.2][JA4: t13d1517h2_8daaf6152771_a87ad97598a9][JA5: t13d1513h2_8daaf6152771_beb91dc2a349][ECH: version 0xfe0d][Chrome][PLAIN TEXT (http/1.1)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
+	4	TCP 192.168.1.29:49628 -> 116.203.142.127:443 [proto: 91.26/TLS.ntop][Stack: TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 2][cat: Network/14][Breed: Safe][2 pkts/1924 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][< 1 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Cli Fingerprint: a7c2e7f8a462995deaf934d8a898d7b1][TLSv1.2][JA4: t13d1516h2_8daaf6152771_806a8c22fdea][JA5: t13d1513h2_8daaf6152771_beb91dc2a349][ECH: version 0xfe0d][Chrome][PLAIN TEXT (http/1.1)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
+	5	TCP 192.168.1.29:49633 -> 116.203.142.127:443 [proto: 91.26/TLS.ntop][Stack: TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 2][cat: Network/14][Breed: Safe][2 pkts/1892 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][< 1 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Cli Fingerprint: a7c2e7f8a462995deaf934d8a898d7b1][TLSv1.2][JA4: t13d1516h2_8daaf6152771_806a8c22fdea][JA5: t13d1513h2_8daaf6152771_beb91dc2a349][ECH: version 0xfe0d][Chrome][PLAIN TEXT (www.ntop.org)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
+	6	TCP 192.168.1.29:49627 -> 116.203.142.127:443 [proto: 91.26/TLS.ntop][Stack: TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 2][cat: Network/14][Breed: Safe][2 pkts/1860 bytes -> 0 pkts/0 bytes][Goodput ratio: 93/0][< 1 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Cli Fingerprint: a7c2e7f8a462995deaf934d8a898d7b1][TLSv1.2][JA4: t13d1516h2_8daaf6152771_806a8c22fdea][JA5: t13d1513h2_8daaf6152771_beb91dc2a349][ECH: version 0xfe0d][Chrome][PLAIN TEXT (http/1.1)][Plen Bins: 0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]

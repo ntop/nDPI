@@ -2208,12 +2208,9 @@ static bool is_grease_version(u_int16_t version) {
 
 /* **************************************** */
 
-bool skipTLSextension(struct ndpi_detection_module_struct *ndpi_struct,
-		      u_int16_t extension_id)  {
-  if((extension_id == 0x0 /* SNI */) && ndpi_struct->cfg.tls_ndpifp_ignore_sni_extension)
-    return(true);
-
-  if(ndpi_struct->cfg.tls_ja_ignore_ephemeral_extensions) {
+static bool ndpi_skip_tls_ephemeral_extension(struct ndpi_detection_module_struct *ndpi_struct,
+					      u_int16_t extension_id, bool force_skip)  {
+  if(force_skip || ndpi_struct->cfg.tls_ja_ignore_ephemeral_extensions) {
     switch(extension_id) {
     case 0x0a: /* Supported groups          */
     case 0x15: /* padding        - RFC 7685 */
@@ -2290,7 +2287,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 			     u_int32_t quic_version,
 			     union ndpi_ja_info *ja) {
   u_int8_t tmp_str[JA_STR_LEN], tmp_ndpi_str[512];
-  u_int tmp_str_len, tmp_ndpi_str_len = 0, num_extn, num_ndpi_extn;
+  u_int tmp_str_len, tmp_ndpi_str_len = 0, num_extn, num_ephemeral_extn;
   u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
   u_int16_t ja_str_len, i, ja_offset;
   int rc;
@@ -2404,7 +2401,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
   tmp_str_len = 0;
-  for(i=0, num_extn = num_ndpi_extn = 0; i<ja->client.num_tls_extensions; i++) {
+  for(i=0, num_extn = num_ephemeral_extn = 0; i<ja->client.num_tls_extensions; i++) {
     if((ja->client.tls_extension[i] > 0) && (ja->client.tls_extension[i] != 0x10 /* ALPN extension */)) {
 #ifdef JA4R_DECIMAL
       rc = snprintf(&ja4_r[ja4_r_len], sizeof(ja4_r)-ja4_r_len, "%s%u", (num_extn > 0) ? "," : "", ja->client.tls_extension[i]);
@@ -2416,12 +2413,12 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
       if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;
       num_extn++;
 
-      if(!skipTLSextension(ndpi_struct, ja->client.tls_extension[i])) {
+      if(!ndpi_skip_tls_ephemeral_extension(ndpi_struct, ja->client.tls_extension[i], true)) {
 	rc = ndpi_snprintf((char *)&tmp_ndpi_str[tmp_ndpi_str_len], sizeof(tmp_ndpi_str)-tmp_ndpi_str_len, "%s%04x",
-			   (num_ndpi_extn > 0) ? "," : "", ja->client.tls_extension[i]);
+			   (num_ephemeral_extn > 0) ? "," : "", ja->client.tls_extension[i]);
 	if((rc > 0) && (tmp_ndpi_str_len + rc < sizeof(tmp_ndpi_str))) tmp_ndpi_str_len += rc; else break;
-	num_ndpi_extn++;
-      }
+      } else
+	num_ephemeral_extn++;
     }
   }
 
@@ -2481,7 +2478,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   strncpy(ja_ndpi_str, ja_str, ja_str_len);
 
   /* Overwrite the extensions number */
-  ndpi_snprintf(&ja_ndpi_str[6], 2, "%02u", num_ndpi_extn);
+  ndpi_snprintf(&ja_ndpi_str[6], 2, "%02u", ja->client.num_tls_extensions-num_ephemeral_extn);
 
   rc = ndpi_snprintf(&ja_ndpi_str[ja_str_len], ja_max_len - ja_str_len,
 		     "%02x%02x%02x%02x%02x%02x",
@@ -2492,18 +2489,19 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 
   /*
     JA5 is identical to JA4 but it skips the TLS extensions for which
-    skipTLSextension() returns true when building the extensions list
+    ndpi_skip_tls_ephemeral_extension() returns true when building the extensions list
     used to compute the extensions hash (same filtering used above for
-    ja4_ndpi_client, i.e. tmp_ndpi_str/num_ndpi_extn/sha_hash)
+    ja4_ndpi_client, i.e. tmp_ndpi_str/num_ephemeral_extn/sha_hash)
   */
   {
     char * const ja5_str = &flow->metadata.protos.tls_quic.ja5_client[0];
     char cnt_str[3];
 
     memcpy(ja5_str, ja_str, ja_offset);
-    ndpi_snprintf(cnt_str, sizeof(cnt_str), "%02u", ndpi_min(99, num_ndpi_extn));
+    ndpi_snprintf(cnt_str, sizeof(cnt_str), "%02u",
+		  ndpi_min(99, ja->client.num_tls_extensions-num_ephemeral_extn));
     memcpy(&ja5_str[6], cnt_str, 2);
-
+    
     rc = ndpi_snprintf(&ja5_str[ja_offset], ja_max_len - ja_offset,
 			"%02x%02x%02x%02x%02x%02x",
 			sha_hash[0], sha_hash[1], sha_hash[2],
@@ -3157,7 +3155,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		/* Skip GREASE */
 
 		if(ja.client.num_tls_extensions < MAX_NUM_JA) {
-		  if(((extension_id == 0xFE0D /* ECHO */) || skipTLSextension(ndpi_struct, extension_id))
+		  if(((extension_id == 0xFE0D /* ECHO */)
+		      || ((extension_id == 0x0 /* SNI */) && ndpi_struct->cfg.tls_ndpifp_ignore_sni_extension)
+		      || ndpi_skip_tls_ephemeral_extension(ndpi_struct, extension_id, false))
 		     && (flow->core.l4_proto == IPPROTO_TCP)
 		     && (ndpi_struct->cfg.tls_max_num_blocks_to_analyze > 0)
 		     && (flow->metadata.l4.tcp.tls.tls_blocks != NULL)
