@@ -1818,6 +1818,7 @@ struct ndpi_flow_metadata_struct {
     u_int16_t response_status_code; /* 200, 404, etc. */
     char *url, *content_type /* response */, *request_content_type /* e.g. for POST */, *user_agent, *server, *referer, *host;
     char *detected_os; /* Via HTTP/QUIC User-Agent */
+    struct ndpi_http_mp4_state *mp4;
     char *nat_ip; /* Via HTTP X-Forwarded-For */
     char *filename; /* Via HTTP Content-Disposition */
     char *username, *password;
@@ -2071,6 +2072,19 @@ struct ndpi_flow_metadata_struct {
 
    /* NDPI_PROTOCOL_RTCP */
    u_int8_t rtcp_stage:2;
+};
+
+struct ndpi_http_mp4_state {
+  u_int8_t header[16], header_len;
+  u_int8_t ftyp_seen:1, uuid_box_seen:1, moov_seen:1,
+    mdat_seen:1, parse_stopped:1, anomaly_checked:1,
+    content_length_parsed:1, content_length_invalid:1,
+    content_length_multiple:1, content_length_valid_count:2,
+    first_box_seen:1, _pad:1;
+  u_int32_t box_type;
+  u_int64_t expected_body_bytes;
+  u_int32_t box_remaining, uuid_bytes, declared_bytes;
+  u_int64_t body_bytes;
 };
 
 struct ndpi_flow_struct {

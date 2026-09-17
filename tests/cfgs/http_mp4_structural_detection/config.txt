@@ -1,0 +1,1 @@
+--cfg=http.mp4_structural_detection,enable
