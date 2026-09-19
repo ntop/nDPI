@@ -2294,7 +2294,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   u_int16_t tls_handshake_version = ja->client.tls_handshake_version;
   char * const ja_str = &flow->metadata.protos.tls_quic.ja4_client[0];
   char * const ja_ndpi_str = &flow->metadata.protos.tls_quic.ja4_ndpi_client[0];
-  const u_int16_t ja_max_len = sizeof(flow->metadata.protos.tls_quic.ja4_client);
+  u_int16_t ja_max_len = sizeof(flow->metadata.protos.tls_quic.ja4_client);
   bool is_dtls = ((flow->core.l4_proto == IPPROTO_UDP) && (quic_version == 0)) || flow->metadata.stun.maybe_dtls;
   int ja4_r_len = 0;
   char ja4_r[1024];
@@ -2488,10 +2488,12 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   ja_ndpi_str[36] = 0;
 
   /*
-    JA5 is identical to JA4 but it skips the TLS extensions for which
-    ndpi_skip_tls_ephemeral_extension() returns true when building the extensions list
-    used to compute the extensions hash (same filtering used above for
-    ja4_ndpi_client, i.e. tmp_ndpi_str/num_ephemeral_extn/sha_hash)
+    JA5 is identical to JA4 with the following differences
+    - it skips the TLS extensions for which ndpi_skip_tls_ephemeral_extension()
+      returns true when building the extensions list used to compute
+      the extensions hash (same filtering used above for
+      ja4_ndpi_client, i.e. tmp_ndpi_str/num_ephemeral_extn/sha_hash)
+    - it adds a new trailer block with the hash of TLS supported groups
   */
   {
     char * const ja5_str = &flow->metadata.protos.tls_quic.ja5_client[0];
@@ -2501,12 +2503,37 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_snprintf(cnt_str, sizeof(cnt_str), "%02u",
 		  ndpi_min(99, ja->client.num_tls_extensions-num_ephemeral_extn));
     memcpy(&ja5_str[6], cnt_str, 2);
-    
+
     rc = ndpi_snprintf(&ja5_str[ja_offset], ja_max_len - ja_offset,
 			"%02x%02x%02x%02x%02x%02x",
 			sha_hash[0], sha_hash[1], sha_hash[2],
 			sha_hash[3], sha_hash[4], sha_hash[5]);
     ja5_str[36] = 0;
+
+    /* Now add supported groups */
+    if(ja->client.num_supported_groups > 0) {
+      ja_max_len = sizeof(flow->metadata.protos.tls_quic.ja5_client);
+
+      tmp_str_len = 0;
+      for(i=0; i<ja->client.num_supported_groups; i++) {
+	rc = ndpi_snprintf((char *)&tmp_str[tmp_str_len], JA_STR_LEN-tmp_str_len, "%s%04x",
+			   (i > 0) ? "," : "", ja->client.supported_group[i]);
+	if((rc > 0) && (tmp_str_len + rc < JA_STR_LEN)) tmp_str_len += rc; else break;
+      }
+
+      tmp_str[tmp_str_len] = '\0';
+      printf("-> %s\n", tmp_str);
+      
+      ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
+    } else
+      memset(sha_hash, '\0', 6);
+
+    ja_offset = 36;
+    rc = ndpi_snprintf(&ja5_str[ja_offset], ja_max_len - ja_offset,
+		       "_%02x%02x%02x%02x%02x%02x",
+		       sha_hash[0], sha_hash[1], sha_hash[2],
+		       sha_hash[3], sha_hash[4], sha_hash[5]);
+    ja5_str[36+13] = 0;
   }
 
 #ifdef DEBUG_JA
