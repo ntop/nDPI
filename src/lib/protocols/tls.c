@@ -2522,7 +2522,6 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       tmp_str[tmp_str_len] = '\0';
-      printf("-> %s\n", tmp_str);
       
       ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
     } else
