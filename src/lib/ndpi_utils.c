@@ -1351,14 +1351,14 @@ void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_serialize_end_of_list(serializer);
     }
 
-    if(c->num_elliptic_curve_groups > 0) {
+    if(c->num_supported_groups > 0) {
       char unknown_group[8];
 
-      ndpi_serialize_start_of_list(serializer, "elliptic_curve_groups");
+      ndpi_serialize_start_of_list(serializer, "supported_groups");
 
-      for(i=0; i<c->num_elliptic_curve_groups; i++)
+      for(i=0; i<c->num_supported_groups; i++)
 	ndpi_serialize_string_string(serializer, "",
-				     ndpi_tls_elliptic_curve_groups2str(c->elliptic_curve_group[i], unknown_group));
+				     ndpi_tls_supported_groups2str(c->supported_group[i], unknown_group));
 
       ndpi_serialize_end_of_list(serializer);
     }
@@ -1537,7 +1537,9 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
         ndpi_serialize_string_string(serializer, "notafter", notAfter);
       }
 
-      ndpi_serialize_string_string(serializer, "ja3s", flow->metadata.protos.tls_quic.ja3_server);
+      if(flow->metadata.protos.tls_quic.ja3_server[0] !='\0')
+	ndpi_serialize_string_string(serializer, "ja3s", flow->metadata.protos.tls_quic.ja3_server);
+      
       ndpi_serialize_string_string(serializer, "ja4", flow->metadata.protos.tls_quic.ja4_client);
       ndpi_serialize_string_string(serializer, "ja5", flow->metadata.protos.tls_quic.ja5_client);
       ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->metadata.protos.tls_quic.server_unsafe_cipher);
@@ -5938,7 +5940,7 @@ static const tls_named_group_info named_groups[] = {
 
 /* ****************************************** */
 
-const char* ndpi_tls_elliptic_curve_groups2str(u_int16_t group_id, char unknown_group[8]) {
+const char* ndpi_tls_supported_groups2str(u_int16_t group_id, char unknown_group[8]) {
   u_int16_t i;
 
   if(((group_id) & 0x0F0F) == 0x0A0A)

@@ -3298,7 +3298,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		u_int16_t s_offset = offset+extension_offset + 2;
 
 #ifdef DEBUG_TLS
-		printf("Client TLS [EllipticCurveGroups: len=%u]\n", extension_len);
+		printf("Client TLS [Groups: len=%u]\n", extension_len);
 #endif
 
 		if((s_offset+extension_len-2) <= total_len) {
@@ -3306,18 +3306,18 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
 
 #ifdef DEBUG_TLS
-		    printf("Client TLS [EllipticCurve: %u/0x%04X]\n", s_group, s_group);
+		    printf("Client TLS [Group: %u/0x%04X]\n", s_group, s_group);
 #endif
 
 		    if((s_group == 0) || (packet->payload[s_offset+i] != packet->payload[s_offset+i+1])
 		       || ((packet->payload[s_offset+i] & 0xF) != 0xA)) {
 		      /* Skip GREASE */
-		      if(ja.client.num_elliptic_curve_groups < MAX_NUM_JA)
-			ja.client.elliptic_curve_group[ja.client.num_elliptic_curve_groups++] = s_group;
+		      if(ja.client.num_supported_groups < MAX_NUM_JA)
+			ja.client.supported_group[ja.client.num_supported_groups++] = s_group;
 		      else {
 			invalid_ja = 1;
 #ifdef DEBUG_TLS
-			printf("Client TLS Invalid num elliptic group %u\n", ja.client.num_elliptic_curve_groups);
+			printf("Client TLS Invalid num group %u\n", ja.client.num_supported_groups);
 #endif
 		      }
 		    }

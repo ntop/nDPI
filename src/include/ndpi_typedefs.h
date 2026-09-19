@@ -1608,7 +1608,7 @@ typedef struct {
   u_int16_t tls_handshake_version;
   u_int16_t num_ciphers, cipher[MAX_NUM_JA];
   u_int16_t num_tls_extensions, tls_extension[MAX_NUM_JA];
-  u_int16_t num_elliptic_curve_groups, elliptic_curve_group[MAX_NUM_JA];
+  u_int16_t num_supported_groups, supported_group[MAX_NUM_JA];
   u_int16_t num_elliptic_curve_point_format, elliptic_curve_point_format[MAX_NUM_JA];
   u_int16_t num_signature_algorithms, signature_algorithm[MAX_NUM_JA];
   u_int16_t num_supported_versions, supported_version[MAX_NUM_JA];
