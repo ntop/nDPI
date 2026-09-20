@@ -2212,12 +2212,12 @@ static bool ndpi_skip_tls_ephemeral_extension(struct ndpi_detection_module_struc
 					      u_int16_t extension_id, bool force_skip)  {
   if(force_skip || ndpi_struct->cfg.tls_ja_ignore_ephemeral_extensions) {
     switch(extension_id) {
-    case 0x0a: /* Supported groups          */
-    case 0x15: /* padding        - RFC 7685 */
-    case 0x23: /* session ticket - RFC 9149 */
-    case 0x29: /* pre-shared key - RFC 8446 */
-    case 0x2a: /* early data     - RFC 8446 */
-    case 0x2b: /* Supported TLS versions    */
+    case 0x15: /* padding                - RFC 7685 */
+    case 0x23: /* session ticket         - RFC 9149 */
+    case 0x29: /* pre-shared key         - RFC 8446 */
+    case 0x2a: /* early data             - RFC 8446 */
+    case 0x2c: /* cookie                 - RFC 8446 */
+    case 0x2d: /* psk_key_exchange_modes - RFC 9972 */
       return(true);
     }
   }
@@ -2415,7 +2415,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
 
       if(!ndpi_skip_tls_ephemeral_extension(ndpi_struct, ja->client.tls_extension[i], true)) {
 	rc = ndpi_snprintf((char *)&tmp_ndpi_str[tmp_ndpi_str_len], sizeof(tmp_ndpi_str)-tmp_ndpi_str_len, "%s%04x",
-			   (num_ephemeral_extn > 0) ? "," : "", ja->client.tls_extension[i]);
+			   (i-num_ephemeral_extn-1 > 0) ? "," : "", ja->client.tls_extension[i]);
 	if((rc > 0) && (tmp_ndpi_str_len + rc < sizeof(tmp_ndpi_str))) tmp_ndpi_str_len += rc; else break;
       } else
 	num_ephemeral_extn++;
@@ -2514,6 +2514,8 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
     if(ja->client.num_supported_groups > 0) {
       ja_max_len = sizeof(flow->metadata.protos.tls_quic.ja5_client);
 
+      qsort(&ja->client.supported_group, ja->client.num_supported_groups, sizeof(u_int16_t), u_int16_t_cmpfunc);
+
       tmp_str_len = 0;
       for(i=0; i<ja->client.num_supported_groups; i++) {
 	rc = ndpi_snprintf((char *)&tmp_str[tmp_str_len], JA_STR_LEN-tmp_str_len, "%s%04x",
@@ -2522,7 +2524,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
       }
 
       tmp_str[tmp_str_len] = '\0';
-      
+
       ndpi_sha256(tmp_str, tmp_str_len, sha_hash);
     } else
       memset(sha_hash, '\0', 6);
