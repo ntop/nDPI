@@ -98,7 +98,7 @@ JA4_c hashes extension *type identifiers* only; it never inspects the payload of
 A JA5 fingerprint encodes values observed in the *first* relevant handshake message for one of two observation profiles, consistent with JA4:
 
 - **Client-Initiated (ClientHello):** JA5(C) — the profile normatively specified in this document.
-- **Server-Initiated (ServerHello):** JA5S(C) — reserved for a companion specification; out of scope here.
+- **Server-Initiated (ServerHello):** JA5S — reserved for a companion specification; out of scope here.
 
 Producers **MUST** process only the first ClientHello observed on a given 5-tuple (ignoring TCP retransmissions) and, where TLS 1.3 HelloRetryRequest occurs, **MUST** fingerprint the *original* ClientHello, not the retried one, unless explicitly operating in a retry-aware mode declared out of band.
 
@@ -180,10 +180,11 @@ n_sanitized   = |L'|
 ### 6.4 Step 3 — JA5_a Construction
 
 ```
-proto    = "t" if over TCP, "q" if over QUIC, "d" if over UDP/DTLS
+proto    = "t" if over TLS over TCP, "q" if over QUIC, "d" if over DTLS
 version  = highest value in supported_versions (GREASE-filtered),
            else legacy_version; mapped 0x0304 -> "13", 0x0303 -> "12",
-           0x0302 -> "11", 0x0301 -> "10", SSLv3 -> "s3"; unknown -> "00"
+           0x0302 -> "11", 0x0301 -> "10", SSLv3 -> "s3"; 0XFEFF -> "d1",
+           0XFEFD -> "d2", 0XFEFC -> "d3", unknown -> "00"
 sni      = "d" if extension type 0 present, else "i"
 cnt_c    = min(count(cipher_suites, GREASE-filtered), 99), zero-padded to 2
 cnt_e    = min(n_sanitized, 99), zero-padded to 2          <-- differs from JA4
