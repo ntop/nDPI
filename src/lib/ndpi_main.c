@@ -8153,6 +8153,11 @@ void ndpi_free_flow_core_data(struct ndpi_flow_core_struct *core) {
 
     if(core->flow_payload != NULL)
       ndpi_free(core->flow_payload);
+
+    if(core->host_server_name != NULL) {
+      ndpi_free(core->host_server_name);
+      core->host_server_name = NULL;
+    }
   }
 }
 
