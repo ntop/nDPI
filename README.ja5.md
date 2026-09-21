@@ -180,7 +180,7 @@ n_sanitized   = |L'|
 ### 6.4 Step 3 — JA5_a Construction
 
 ```
-proto    = "t" if over TLS over TCP, "q" if over QUIC, "d" if over DTLS
+proto    = "t" if TLS over TCP, "q" if QUIC, "d" if DTLS
 version  = highest value in supported_versions (GREASE-filtered),
            else legacy_version; mapped 0x0304 -> "13", 0x0303 -> "12",
            0x0302 -> "11", 0x0301 -> "10", SSLv3 -> "s3"; 0XFEFF -> "d1",
