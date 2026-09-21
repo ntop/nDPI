@@ -15,7 +15,7 @@ endif
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libndpi.pc
 
-EXTRA_DIST = README.md README.fuzzer.md README.license.md CHANGELOG.md CONTRIBUTING.md \
+EXTRA_DIST = README.md README.cve.md README.ja5.md README.fuzzer.md README.license.md CHANGELOG.md CONTRIBUTING.md \
 	autogen.sh wireshark windows utils packages dga \
 	influxdb/Makefile.in influxdb/metric_anomaly.c influxdb/README.txt \
 	rrdtool/Makefile.in rrdtool/README.txt rrdtool/rrd_anomaly.c rrdtool/rrd_similarity.c \
