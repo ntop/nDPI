@@ -1,6 +1,6 @@
 ### nDPI CVEs
 
-This page keeps track of nDPI CVEs. Please contact security@ntop.org for more information or to report secuirty issues.
+This page keeps track of nDPI CVEs. Please report security issues at https://github.com/ntop/nDPI/security/advisories and also please contact security@ntop.org to inform about your filing.
 
 - CVE-2026-86098 (Sep 04, 2026), ntop/nDPI: ntop nDPI before 6.0 Heap Buffer Overflow via ndpi_json_string_escape, Affected: nDPI < 6.0
 - CVE-2025-25066 (Feb 03, 2025), nDPI through 4.12 has a potential stack-based buffer overflow in ndpi_address_cache_restore in lib/ndpi_cache.c., Affected: nDPI < 4.12
