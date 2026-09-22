@@ -8158,6 +8158,20 @@ void ndpi_free_flow_core_data(struct ndpi_flow_core_struct *core) {
       ndpi_free(core->host_server_name);
       core->host_server_name = NULL;
     }
+
+    if(core->tls_quic.obfuscated_heur_state) {
+      ndpi_free(core->tls_quic.obfuscated_heur_state);
+      core->tls_quic.obfuscated_heur_state = NULL;
+    }
+
+    if(core->tls_quic.message[0].buffer) {
+      ndpi_free(core->tls_quic.message[0].buffer);
+      core->tls_quic.message[0].buffer = NULL;
+    }
+    if(core->tls_quic.message[1].buffer) {
+      ndpi_free(core->tls_quic.message[1].buffer);
+      core->tls_quic.message[1].buffer = NULL;
+    }
   }
 }
 
@@ -8235,11 +8249,6 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 
     ndpi_free_flow_data_protos(flow);
 
-    if(flow->core.tls_quic.message[0].buffer)
-      ndpi_free(flow->core.tls_quic.message[0].buffer);
-    if(flow->core.tls_quic.message[1].buffer)
-      ndpi_free(flow->core.tls_quic.message[1].buffer);
-
     if(flow->core.l4_proto == IPPROTO_UDP) {
       if(flow->metadata.l4.udp.quic_reasm_buf)
         ndpi_free(flow->metadata.l4.udp.quic_reasm_buf);
@@ -8247,11 +8256,6 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
         ndpi_free(flow->metadata.l4.udp.quic_reasm_buf_bitmap);
     }
 
-    if(flow->core.tls_quic.obfuscated_heur_state)
-      ndpi_free(flow->core.tls_quic.obfuscated_heur_state);
-
-    if(flow->core.host_server_name)
-      ndpi_free(flow->core.host_server_name);
   }
 }
 
