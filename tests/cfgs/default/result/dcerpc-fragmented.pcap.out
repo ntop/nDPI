@@ -1,0 +1,36 @@
+DPI Packets (TCP):	8	(8.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 210 (210.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    1/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+DCERPC	19	5705	1
+
+Acceptable                      19 5705          1            
+
+RPC                             19 5705          1            
+
+	1	TCP 172.16.19.104:4127 <-> 172.16.100.10:49158 [proto: 370/DCERPC][Stack: DCERPC][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 8][cat: RPC/16][Breed: Acceptable][11 pkts/4159 bytes <-> 8 pkts/1546 bytes][Goodput ratio: 85/71][0.46 sec][bytes ratio: 0.458 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/32 46/39 185/62 52/11][Pkt Len c2s/s2c min/avg/max/stddev: 60/54 378/193 1314/355 447/103][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 135][TCP Fingerprint: 2_128_65535_82992e3bddf8/Unknown][PLAIN TEXT (DC01.is.ad)][Plen Bins: 0,0,7,14,0,42,7,7,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0]

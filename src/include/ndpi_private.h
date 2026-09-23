@@ -794,8 +794,17 @@ int signal_search_into_cache(struct ndpi_detection_module_struct* ndpi_struct,
 void signal_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
                         struct ndpi_flow_struct *flow);
 
+/* DCERPC */
+struct ndpi_dcerpc_tcp_reasm {
+  u_int8_t *buf;
+  u_int16_t cur_len;
+  u_int16_t msg_len;
+  u_int32_t next_seq;
+};
+struct ndpi_dcerpc_tcp_reasm_state {
+  struct ndpi_dcerpc_tcp_reasm dir[2];
+};
 /* DNS */
-
 struct ndpi_dns_tcp_reasm {
   u_int8_t *buf;
   u_int16_t cur_len;
