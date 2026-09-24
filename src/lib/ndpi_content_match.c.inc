@@ -1402,6 +1402,8 @@ static ndpi_protocol_match host_match[] =
    { "ea.com",                           "ElectronicArts", NDPI_PROTOCOL_ELECTRONICARTS, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
    { "origin-a.akamaihd.net",            "ElectronicArts", NDPI_PROTOCOL_ELECTRONICARTS, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
 
+   { "supercell.com",                    "Supercell", NDPI_PROTOCOL_SUPERCELL, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
+
    { "nvidiagrid.net",                   "GeForceNow", NDPI_PROTOCOL_GEFORCENOW, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
    { "gfe.nvidia.com",                   "GeForceNow", NDPI_PROTOCOL_GEFORCENOW, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
    { "geforcenow.com",                   "GeForceNow", NDPI_PROTOCOL_GEFORCENOW, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
@@ -1773,7 +1775,6 @@ static ndpi_category_match category_match[] = {
    /* Same games. We don't have yet (or we don't want...) specific ID for this stuff */
    { "callofduty.com",                   NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
    { "king.com",                         NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
-   { "supercell.com",                    NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
 
    /* ADS & Tracking & Analytics */
    /* Chartbeat is a technology company that provides data and analytics to global publishers */

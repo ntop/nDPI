@@ -4507,3 +4507,14 @@ TLS/QUIC Server Name Indication on peacocktv.com and peacocktvstore.com
 hostnames.
 
 References: `Peacock official site: <https://www.peacocktv.com/>`_
+
+
+.. _Proto_495:
+
+`NDPI_PROTOCOL_SUPERCELL`
+=========================
+Supercell is a mobile game company (Brawl Stars, Clash of Clans, and others).
+Traffic is detected via TLS Server Name Indication on supercell.com hostnames
+(e.g. id.supercell.com, cdn.supercell.com, assets.social.supercell.com).
+
+References: `Supercell official site: <https://supercell.com/>`_
