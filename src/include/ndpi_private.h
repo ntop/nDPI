@@ -662,21 +662,21 @@ int is_proto_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId)
 int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id);
 
 void ndpi_register_dissector(char *dissector_name, struct ndpi_detection_module_struct *ndpi_str,
-                        void (*func)(struct ndpi_detection_module_struct *,
-                                     struct ndpi_flow_struct *flow),
-                        const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
-                        enum ndpi_dissector_license_type dissector_license_type,
-                        int num_protocol_ids, ...);
+			     void (*func)(struct ndpi_detection_module_struct *,
+					  struct ndpi_flow_struct *flow),
+			     const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
+			     enum ndpi_dissector_license_type dissector_license_type,
+			     int num_protocol_ids, ...);
 void exclude_dissector(struct ndpi_detection_module_struct *ndpi_str,
 		       struct ndpi_flow_core_struct *core,
-                       u_int16_t dissector_idx, const char *_file,
+		       u_int16_t dissector_idx, const char *_file,
 		       const char *_func, int _line) ;
 
 char *strptime(const char *s, const char *format, struct tm *tm);
-
+  
 u_int8_t iph_is_valid_and_not_fragmented(struct ndpi_detection_module_struct *ndpi_str,
-                                         const struct ndpi_iphdr *iph, const u_int16_t ipsize);
-
+					   const struct ndpi_iphdr *iph, const u_int16_t ipsize);
+  
 int current_pkt_from_client_to_server(const struct ndpi_detection_module_struct *ndpi_str, const struct ndpi_flow_core_struct *core);
 int current_pkt_from_server_to_client(const struct ndpi_detection_module_struct *ndpi_str, const struct ndpi_flow_core_struct *core);
 
