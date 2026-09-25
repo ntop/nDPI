@@ -37,6 +37,311 @@ extern void ndpi_search_msgpack(struct ndpi_detection_module_struct *ndpi_struct
                                 struct ndpi_flow_struct *flow);
 
 static const char* binary_exec_file_mimes_e[] = { "exe", NULL };
+
+/*
+ * Censys ARC observed fake MP4 carriers dominated by a private ISO-BMFF
+ * `uuid` box and explicitly recommends structural carrier validation:
+ * https://censys.com/blog/fake-mp4-file-carries-malicious-payload/
+ *
+ * This detector intentionally does not use filenames, domains, User-Agent,
+ * NetSupport strings, or campaign-specific UUID selectors. It only reports
+ * suspicious HTTP content when the wire bytes show an MP4 `ftyp` box and an
+ * oversized private box whose declared payload dominates the observed boxes.
+ * Payloads are never decrypted or executed.
+ */
+/*
+ * These limits are format-independent parser safeguards, not campaign IOCs.
+ * A UUID payload must be large enough to be meaningful as a carrier, while the
+ * total declaration budget prevents attacker-controlled box sizes from making
+ * the per-flow parser consume unbounded state or wrap its counters.
+ */
+#define NDPI_MP4_UUID_MIN_PAYLOAD (1024ULL * 1024ULL)
+#define NDPI_MP4_MAX_DECLARED_BYTES (64ULL * 1024ULL * 1024ULL)
+
+/* ISO-BMFF stores box lengths in network byte order. */
+static u_int32_t ndpi_mp4_be32(const u_int8_t *p) {
+  return ((u_int32_t)p[0] << 24) | ((u_int32_t)p[1] << 16) |
+         ((u_int32_t)p[2] << 8) | p[3];
+}
+
+static u_int64_t ndpi_mp4_be64(const u_int8_t *p) {
+  return ((u_int64_t)ndpi_mp4_be32(p) << 32) | ndpi_mp4_be32(p + 4);
+}
+
+/*
+ * Add attacker-controlled declared sizes only after checking for wraparound.
+ * Returning failure lets the caller stop parsing without changing state into
+ * an unsafe value.
+ */
+static int ndpi_mp4_add_u64(u_int64_t *value, u_int64_t increment) {
+  if(increment > UINT64_MAX - *value)
+    return 0;
+  *value += increment;
+  return 1;
+}
+
+/*
+ * Feed only response-body bytes into a bounded ISO-BMFF box walker. The
+ * parser keeps at most one incomplete box header in the flow and skips box
+ * payloads by declared length; it never buffers the embedded payload. This
+ * makes the logic usable with TCP segmentation without copying megabytes into
+ * nDPI flow state.
+ */
+static bool ndpi_http_mp4_enabled(struct ndpi_detection_module_struct *ndpi_struct)
+{
+  return ndpi_struct->cfg.http_mp4_structural_detection != 0;
+}
+
+static bool ndpi_http_contains_case_insensitive(const char *haystack, const char *needle)
+{
+  size_t haystack_len, needle_len, i;
+
+  if(haystack == NULL || needle == NULL)
+    return false;
+
+  haystack_len = strlen(haystack);
+  needle_len = strlen(needle);
+  if(needle_len == 0 || needle_len > haystack_len)
+    return false;
+
+  for(i = 0; i <= haystack_len - needle_len; i++) {
+    if(strncasecmp(haystack + i, needle, needle_len) == 0)
+      return true;
+  }
+  return false;
+}
+
+static bool ndpi_http_mp4_candidate(struct ndpi_flow_struct *flow)
+{
+  return (flow->metadata.http.content_type != NULL &&
+          ndpi_http_contains_case_insensitive(flow->metadata.http.content_type, "video/mp4")) ||
+         (flow->metadata.http.url != NULL &&
+          ndpi_http_contains_case_insensitive(flow->metadata.http.url, ".mp4"));
+}
+
+static bool ndpi_http_mp4_ensure_state(struct ndpi_detection_module_struct *ndpi_struct,
+                                       struct ndpi_flow_struct *flow)
+{
+  if(!ndpi_http_mp4_enabled(ndpi_struct) || !ndpi_http_mp4_candidate(flow))
+    return false;
+  if(flow->metadata.http.mp4 != NULL)
+    return true;
+  flow->metadata.http.mp4 = ndpi_calloc(1, sizeof(*flow->metadata.http.mp4));
+  return flow->metadata.http.mp4 != NULL;
+}
+
+static void ndpi_http_mp4_feed(struct ndpi_flow_struct *flow,
+                               const u_int8_t *data, u_int32_t data_len) {
+  while(data_len > 0 && !flow->metadata.http.mp4->parse_stopped) {
+    u_int32_t copy_len, header_needed = 8;
+
+    /*
+     * The current box header has already been validated. Consume only its
+     * declared payload, including across packet boundaries, before looking for
+     * the next top-level box header.
+     */
+    if(flow->metadata.http.mp4->box_remaining > 0) {
+      u_int64_t skip = ndpi_min((u_int64_t)data_len,
+                                flow->metadata.http.mp4->box_remaining);
+      flow->metadata.http.mp4->box_remaining -= (u_int32_t)skip;
+      if(!ndpi_mp4_add_u64(&flow->metadata.http.mp4->body_bytes, skip)) {
+        flow->metadata.http.mp4->parse_stopped = 1;
+        continue;
+      }
+      if(flow->metadata.http.mp4->box_type == 0x75756964 /* uuid */)
+        flow->metadata.http.mp4->uuid_bytes += (u_int32_t)skip;
+      data += skip;
+      data_len -= (u_int32_t)skip;
+      continue;
+    }
+
+    /* Preserve an incomplete 8/16-byte header until the next packet. */
+    if(flow->metadata.http.mp4->header_len >= 8 &&
+       ndpi_mp4_be32(flow->metadata.http.mp4->header) == 1)
+      header_needed = 16;
+    copy_len = ndpi_min(header_needed - flow->metadata.http.mp4->header_len, data_len);
+    memcpy(&flow->metadata.http.mp4->header[flow->metadata.http.mp4->header_len], data, copy_len);
+    if(!ndpi_mp4_add_u64(&flow->metadata.http.mp4->body_bytes, copy_len)) {
+      flow->metadata.http.mp4->parse_stopped = 1;
+      continue;
+    }
+    flow->metadata.http.mp4->header_len += copy_len;
+    data += copy_len;
+    data_len -= copy_len;
+
+    if(flow->metadata.http.mp4->header_len < header_needed)
+      continue;
+
+    {
+      u_int64_t box_size = ndpi_mp4_be32(flow->metadata.http.mp4->header);
+      u_int32_t header_len = 8;
+      u_int32_t box_type = ndpi_mp4_be32(&flow->metadata.http.mp4->header[4]);
+
+      /*
+       * Size 1 is the ISO-BMFF extended-size form. Size 0 is open-ended and
+       * cannot provide reliable dominance evidence for a bounded response.
+       */
+      if(box_size == 1) {
+        if(flow->metadata.http.mp4->header_len < 16)
+          continue;
+        box_size = ndpi_mp4_be64(&flow->metadata.http.mp4->header[8]);
+        header_len = 16;
+      } else if(box_size == 0 || box_size < header_len) {
+        flow->metadata.http.mp4->parse_stopped = 1;
+        continue;
+      }
+
+      /* An extended-size box must include its complete 16-byte header. */
+      if(box_size < header_len ||
+         box_size > NDPI_MP4_MAX_DECLARED_BYTES - flow->metadata.http.mp4->declared_bytes) {
+        flow->metadata.http.mp4->parse_stopped = 1;
+        continue;
+      }
+
+      /* Keep the cumulative declared-byte budget and ratio predicate bounded. */
+      flow->metadata.http.mp4->declared_bytes += (u_int32_t)box_size;
+
+      /*
+       * Require ftyp to be the first top-level box. Track media boxes as
+       * negative evidence: a normal playable file should expose moov or mdat.
+       */
+      if(!flow->metadata.http.mp4->first_box_seen) {
+        flow->metadata.http.mp4->first_box_seen = 1;
+        if(box_type == 0x66747970 /* ftyp */)
+          flow->metadata.http.mp4->ftyp_seen = 1;
+      }
+      if(box_type == 0x75756964 /* uuid */)
+        flow->metadata.http.mp4->uuid_box_seen = 1;
+      if(box_type == 0x6d6f6f76 /* moov */)
+        flow->metadata.http.mp4->moov_seen = 1;
+      if(box_type == 0x6d646174 /* mdat */)
+        flow->metadata.http.mp4->mdat_seen = 1;
+
+      flow->metadata.http.mp4->box_type = box_type;
+      flow->metadata.http.mp4->box_remaining = (u_int32_t)(box_size - header_len);
+      flow->metadata.http.mp4->header_len = 0;
+    }
+  }
+}
+
+/*
+ * A file-level ratio is meaningful only when the HTTP response declares a
+ * bounded body. Parse Content-Length conservatively; malformed, duplicated,
+ * or oversized values are ignored rather than guessed.
+ */
+static void ndpi_http_parse_content_length(struct ndpi_flow_struct *flow,
+                                           struct ndpi_packet_struct *packet) {
+  u_int16_t i;
+
+  if(flow->metadata.http.mp4->content_length_parsed)
+    return;
+
+  flow->metadata.http.mp4->content_length_parsed = 1;
+  for(i = 0; i < packet->parsed_lines; i++) {
+    const u_int8_t *line = packet->line[i].ptr;
+    u_int16_t len = packet->line[i].len;
+    u_int16_t pos = sizeof("Content-Length:") - 1;
+    u_int64_t value = 0;
+    u_int8_t digits = 0;
+
+    if(len < pos || strncasecmp((const char *)line, "Content-Length:", pos) != 0)
+      continue;
+    while(pos < len && (line[pos] == ' ' || line[pos] == '\t'))
+      pos++;
+    while(pos < len && line[pos] >= '0' && line[pos] <= '9') {
+      if(value > (NDPI_MP4_MAX_DECLARED_BYTES - (line[pos] - '0')) / 10) {
+        flow->metadata.http.mp4->content_length_invalid = 1;
+        break;
+      }
+      value = value * 10 + (line[pos] - '0');
+      pos++;
+      digits = 1;
+    }
+    while(pos < len && (line[pos] == ' ' || line[pos] == '\t'))
+      pos++;
+    if(digits && pos == len && value > 0) {
+      if(flow->metadata.http.mp4->content_length_valid_count == 0)
+        flow->metadata.http.mp4->expected_body_bytes = value;
+      flow->metadata.http.mp4->content_length_valid_count++;
+    } else if(digits || pos != len || value == 0) {
+      flow->metadata.http.mp4->content_length_invalid = 1;
+    }
+  }
+}
+
+static void ndpi_http_check_suspicious_mp4(struct ndpi_detection_module_struct *ndpi_struct,
+                                            struct ndpi_flow_struct *flow) {
+  if(!ndpi_http_mp4_ensure_state(ndpi_struct, flow))
+    return;
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  const u_int8_t *body = NULL;
+  u_int32_t body_len = 0;
+
+  if(flow->metadata.http.mp4->anomaly_checked || flow->metadata.http.mp4->parse_stopped)
+    return;
+
+  /* Parse the response header once; body-only packets do not contain lines. */
+  if(packet->empty_line_position_set)
+    ndpi_http_parse_content_length(flow, packet);
+
+  if(packet->empty_line_position_set) {
+    u_int32_t body_offset = packet->empty_line_position + 2;
+    if(body_offset < packet->payload_packet_len) {
+      body = packet->payload + body_offset;
+      body_len = packet->payload_packet_len - body_offset;
+    }
+  } else if(flow->metadata.http.response_status_code != 0 &&
+            packet->packet_direction == 1) {
+    /*
+     * Once the response status is known, later server-to-client packets are
+     * body continuation. This is what allows the parser to survive TCP
+     * segmentation without treating request bytes as media bytes.
+     */
+    body = packet->payload;
+    body_len = packet->payload_packet_len;
+  }
+
+  if(body != NULL && body_len > 0)
+    ndpi_http_mp4_feed(flow, body, body_len);
+
+  /*
+   * Evaluate only after the bounded response is accounted for. The predicate
+   * combines independent structural evidence and deliberately emits an
+   * anomaly signal, not a malware verdict.
+   */
+  if(!flow->metadata.http.mp4->content_length_invalid &&
+     flow->metadata.http.mp4->content_length_valid_count == 1 &&
+     flow->metadata.http.mp4->expected_body_bytes > 0 &&
+     flow->metadata.http.mp4->body_bytes >= flow->metadata.http.mp4->expected_body_bytes &&
+     flow->metadata.http.mp4->ftyp_seen && flow->metadata.http.mp4->uuid_box_seen &&
+     !flow->metadata.http.mp4->moov_seen && !flow->metadata.http.mp4->mdat_seen &&
+     flow->metadata.http.mp4->uuid_bytes >= NDPI_MP4_UUID_MIN_PAYLOAD &&
+     flow->metadata.http.mp4->body_bytes > 0 &&
+     flow->metadata.http.mp4->uuid_bytes >=
+       flow->metadata.http.mp4->body_bytes - flow->metadata.http.mp4->body_bytes / 10) {
+    {
+      char risk_info[160];
+      u_int64_t uuid_ratio =
+        (flow->metadata.http.mp4->uuid_bytes * 100ULL) / flow->metadata.http.mp4->body_bytes;
+
+      /*
+       * Preserve the structural evidence in the risk message. This is
+       * derived exclusively from parsed wire bytes and helps downstream
+       * analysts distinguish a high-dominance carrier from other HTTP
+       * suspicious-content events without storing the payload.
+       */
+      snprintf(risk_info, sizeof(risk_info),
+               "MP4 carrier dominated by private uuid box without media boxes (body=%llu, uuid=%u, uuid_ratio=%llu%%)",
+               (unsigned long long)flow->metadata.http.mp4->body_bytes,
+               flow->metadata.http.mp4->uuid_bytes,
+               (unsigned long long)uuid_ratio);
+      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_CONTENT,
+                    risk_info);
+      flow->metadata.http.mp4->anomaly_checked = 1;
+    }
+  }
+}
+
 static const char* binary_exec_file_mimes_j[] = { "java-vm", NULL };
 static const char* binary_exec_file_mimes_v[] = { "vnd.ms-cab-compressed", "vnd.microsoft.portable-executable", NULL };
 static const char* binary_exec_file_mimes_x[] = { "x-msdownload", "x-dosexec", NULL };
@@ -82,8 +387,6 @@ static void ndpi_set_binary_data_transfer(struct ndpi_detection_module_struct *n
 static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_struct *ndpi_struct,
 						 struct ndpi_flow_struct *flow,
 						 char *msg) {
-  if(flow->core.host_server_name == NULL) return;
-  
   /*
     Check known exceptions
     https://learn.microsoft.com/en-us/windows/privacy/windows-endpoints-1909-non-enterprise-editions
@@ -97,9 +400,7 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
   else {
     char buf[256];
 
-    ndpi_set_risk(ndpi_struct, &flow->core,
-		  NDPI_BINARY_APPLICATION_TRANSFER,
-		  forge_attempt_msg(flow, msg, buf, sizeof(buf)));
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_BINARY_APPLICATION_TRANSFER, forge_attempt_msg(flow, msg, buf, sizeof(buf)));
   }
  }
 
@@ -163,7 +464,8 @@ static int ndpi_search_http_tcp_again(struct ndpi_detection_module_struct *ndpi_
 
     /* Loook for TLS over websocket */
     if((ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_HTTP) && /* Feature enabled */
-       ((flow->core.host_server_name != NULL) &&
+       (flow->core.host_server_name != NULL &&
+        flow->core.host_server_name[0] != '\0' &&
         flow->metadata.http.response_status_code != 0) && /* Bidirectional HTTP traffic */
        flow->metadata.http.websocket) {
 
@@ -586,7 +888,8 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
   }
 
   if(flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
-     hostname_just_set && (flow->core.host_server_name != NULL)) {
+     hostname_just_set && flow->core.host_server_name != NULL &&
+     flow->core.host_server_name[0] != '\0') {
     ndpi_match_hostname_protocol(ndpi_struct, flow,
 				 master_protocol,
 				 flow->core.host_server_name,
@@ -616,8 +919,7 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
       NDPI_LOG_DBG2(ndpi_struct, "Origin: [%.*s] -> [%.*s]\n", packet->http_origin.len, packet->http_origin.ptr,
 		    (int)origin_hostname_len, origin_hostname);
       /* We already checked hostname...*/
-      if(flow->core.host_server_name
-	 && (strncmp(origin_hostname, flow->core.host_server_name, origin_hostname_len) != 0)) {
+      if(strncmp(origin_hostname, flow->core.host_server_name, origin_hostname_len) != 0) {
         ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
 				    origin_hostname,
 				    origin_hostname_len,
@@ -1285,7 +1587,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
   }
 
   /* check for host line (only if we don't already have an hostname) */
-  if(packet->host_line.ptr != NULL && (flow->core.host_server_name == NULL)) {
+  if(packet->host_line.ptr != NULL &&
+     (flow->core.host_server_name == NULL || flow->core.host_server_name[0] == '\0')) {
 
     NDPI_LOG_DBG2(ndpi_struct, "HOST line found %.*s\n",
 		  packet->host_line.len, packet->host_line.ptr);
@@ -1294,7 +1597,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
     ndpi_hostname_sni_set(flow, packet->host_line.ptr, packet->host_line.len,
 			  NDPI_HOSTNAME_NORM_ALL | NDPI_HOSTNAME_NORM_STRIP_PORT);
 
-    if(flow->core.host_server_name != NULL) {
+    if(flow->core.host_server_name != NULL && strlen(flow->core.host_server_name) > 0) {
       char *double_col;
       int a, b, c, d;
       u_int16_t host_line_length;
@@ -1332,10 +1635,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	char str[128];
 
         if(is_flowrisk_info_enabled(ndpi_struct, NDPI_INVALID_CHARACTERS)) {
-	  if(flow->core.host_server_name != NULL) {
-	    snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
-	    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
-	  }
+	  snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
+	  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
         } else {
           ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, NULL);
         }
@@ -1347,7 +1648,6 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       }
 
       if(ndpi_struct->packet.iph
-	 && flow->core.host_server_name
          && (sscanf(flow->core.host_server_name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)) {
         /* IPv4 */
 
@@ -1356,8 +1656,7 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
             char buf[64], msg[128];
 
 	    snprintf(msg, sizeof(msg), "Expected %s, found %s",
-		     ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)),
-		     flow->core.host_server_name);
+		     ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)), flow->core.host_server_name);
 	    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
           } else {
             ndpi_set_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
@@ -1370,7 +1669,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 
   ndpi_http_parse_subprotocol(ndpi_struct, flow, hostname_just_set);
 
-  if(hostname_just_set && flow->core.host_server_name) {
+  if(hostname_just_set && flow->core.host_server_name != NULL &&
+     strlen(flow->core.host_server_name) > 0) {
     ndpi_check_dga_name(ndpi_struct, &flow->core, flow->core.host_server_name, 1, 0, 0);
   }
 
@@ -1590,6 +1890,13 @@ static void process_response(struct ndpi_detection_module_struct *ndpi_struct,
   check_content_type_and_change_protocol(ndpi_struct, flow);
 
   ndpi_validate_http_content(ndpi_struct, flow);
+  ndpi_http_check_suspicious_mp4(ndpi_struct, flow);
+  if(flow->metadata.http.mp4 != NULL &&
+     (flow->metadata.http.mp4->ftyp_seen || flow->metadata.http.mp4->uuid_box_seen) &&
+     flow->metadata.http.mp4->expected_body_bytes > flow->metadata.http.mp4->body_bytes &&
+     !flow->metadata.http.mp4->content_length_invalid &&
+     flow->metadata.http.mp4->content_length_valid_count == 1)
+    flow->core.max_extra_packets_to_check = 32;
 }
 
 static void reset(struct ndpi_detection_module_struct *ndpi_struct,
@@ -1604,6 +1911,10 @@ static void reset(struct ndpi_detection_module_struct *ndpi_struct,
   flow->metadata.http.method = 0;
   flow->metadata.http.request_version = 0;
   flow->metadata.http.response_status_code = 0;
+  if(flow->metadata.http.mp4 != NULL) {
+    ndpi_free(flow->metadata.http.mp4);
+    flow->metadata.http.mp4 = NULL;
+  }
   if(flow->metadata.http.url) {
     ndpi_free(flow->metadata.http.url);
     flow->metadata.http.url = NULL;
@@ -1742,7 +2053,13 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
 
       process_response(ndpi_struct, flow);
 
-      flow->metadata.l4.tcp.http_stage = 0;
+      if(flow->metadata.http.mp4 != NULL &&
+         (flow->metadata.http.mp4->ftyp_seen || flow->metadata.http.mp4->uuid_box_seen) &&
+         flow->metadata.http.mp4->expected_body_bytes > 0 &&
+         flow->metadata.http.mp4->body_bytes < flow->metadata.http.mp4->expected_body_bytes)
+        flow->metadata.l4.tcp.http_stage = packet->packet_direction + 3;
+      else
+        flow->metadata.l4.tcp.http_stage = 0;
     } else {
       NDPI_LOG_DBG2(ndpi_struct, "The msg from the server doesn't look like a response...\n");
       /* TODO */
@@ -1764,6 +2081,8 @@ static void ndpi_check_http_tcp(struct ndpi_detection_module_struct *ndpi_struct
       }
       ndpi_parse_packet_line_info(ndpi_struct, flow);
       check_content_type_and_change_protocol(ndpi_struct, flow);
+      if(packet->packet_direction == 1)
+        ndpi_http_check_suspicious_mp4(ndpi_struct, flow);
       return;
     }
 
@@ -1789,11 +2108,21 @@ void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_check_http_tcp(ndpi_struct, flow);
 
   if((ndpi_struct->cfg.http_parse_response_enabled &&
-      flow->core.host_server_name &&
-      flow->metadata.http.response_status_code != 0) ||
+      flow->core.host_server_name != NULL &&
+      flow->core.host_server_name[0] != '\0' &&
+      flow->metadata.http.response_status_code != 0 &&
+      (flow->metadata.http.mp4 == NULL ||
+       !(flow->metadata.http.mp4->ftyp_seen || flow->metadata.http.mp4->uuid_box_seen) ||
+       flow->metadata.http.mp4->expected_body_bytes == 0 ||
+       flow->metadata.http.mp4->body_bytes >= flow->metadata.http.mp4->expected_body_bytes)) ||
      (!ndpi_struct->cfg.http_parse_response_enabled &&
-      (flow->core.host_server_name ||
-       flow->metadata.http.response_status_code != 0)) ||
+      ((flow->core.host_server_name != NULL &&
+        flow->core.host_server_name[0] != '\0') ||
+       flow->metadata.http.response_status_code != 0) &&
+      (flow->metadata.http.mp4 == NULL ||
+       !(flow->metadata.http.mp4->ftyp_seen || flow->metadata.http.mp4->uuid_box_seen) ||
+       flow->metadata.http.mp4->expected_body_bytes == 0 ||
+       flow->metadata.http.mp4->body_bytes >= flow->metadata.http.mp4->expected_body_bytes)) ||
      /* We have found 3 consecutive requests (without the reply) or 3
         consecutive replies (without the request). If the traffic is really
         asymmetric, stop here, because we will never find the metadata from

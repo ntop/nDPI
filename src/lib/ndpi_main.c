@@ -8010,6 +8010,11 @@ static u_int8_t ndpi_detection_get_l4_internal(struct ndpi_detection_module_stru
 
 void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
   if(flow) {
+    if(flow->metadata.http.mp4) {
+      ndpi_free(flow->metadata.http.mp4);
+      flow->metadata.http.mp4 = NULL;
+    }
+
     if(flow_is_proto(flow, NDPI_PROTOCOL_QUIC) ||
        flow_is_proto(flow, NDPI_PROTOCOL_TLS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_DTLS) ||
