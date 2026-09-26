@@ -42,12 +42,14 @@ static void ndpi_search_hpvirtgrp(struct ndpi_detection_module_struct *ndpi_stru
 
   if (packet->tcp != NULL)
   {
-    if (flow->core.packet_counter == 1 && packet->payload_packet_len >= 4 &&
-        packet->payload_packet_len == ntohs(*(u_int16_t*)&packet->payload[1]) &&
-        packet->payload[0] == 0x16 && packet->payload[3] == 0x00)
-    {
-      ndpi_int_hpvirtgrp_add_connection(ndpi_struct, flow);
-      return;
+    if (flow->core.packet_counter == 1 && packet->payload_packet_len >= 4) {
+      uint16_t hpvirt_len = get_u_int16_t(packet, 1);
+      if (packet->payload_packet_len == ntohs(hpvirt_len) &&
+          packet->payload[0] == 0x16 && packet->payload[3] == 0x00)
+      {
+        ndpi_int_hpvirtgrp_add_connection(ndpi_struct, flow);
+        return;
+      }
     }
   }
 

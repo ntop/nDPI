@@ -2676,7 +2676,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     printf("TLS [len: %u][handshake_type: %02X]\n", packet->payload_packet_len, handshake_type);
 #endif
 
-    tls_version = ntohs(*((u_int16_t*)&packet->payload[version_offset]));
+    tls_version = get_u_int16_t(packet, version_offset);
+    tls_version = ntohs(tls_version);
 
     if(handshake_type == 0x02 /* Server Hello */) {
       int rc;
@@ -2703,7 +2704,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       if((offset+3) > packet->payload_packet_len)
 	return(0); /* Not found */
 
-      ja.server.num_ciphers = 1, ja.server.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
+
+      ja.server.num_ciphers = 1;
+      ja.server.cipher[0] = get_u_int16_t(packet, offset);
+      ja.server.cipher[0] = ntohs(ja.server.cipher[0]);
 
       if(ndpi_struct->cfg.tls_cipher_enabled) {
         if((flow->metadata.protos.tls_quic.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja.server.cipher[0])) != NDPI_CIPHER_SAFE) {
@@ -2727,10 +2731,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
       offset += 2 + 1;
 
-      if((offset + 1) < packet->payload_packet_len)
-	tot_extension_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
-      else
-	tot_extension_len = 0;
+      if((offset + 1) < packet->payload_packet_len) {
+        tot_extension_len = get_u_int16_t(packet, offset);
+        tot_extension_len = ntohs(tot_extension_len);
+      } else tot_extension_len = 0;
 
 #ifdef DEBUG_TLS
       printf("TLS [server][tot_extension_len: %u]\n", tot_extension_len);
@@ -3158,10 +3162,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  offset+extension_offset+4 <= total_len) {
 	      u_int16_t extension_id, extension_len, extn_off = offset+extension_offset;
 
-	      extension_id = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
+	      extension_id = get_u_int16_t(packet, offset + extension_offset);
+	      extension_id = ntohs(extension_id);
 	      extension_offset += 2;
 
-	      extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
+	      extension_len = get_u_int16_t(packet, offset + extension_offset);
+	      extension_len = ntohs(extension_len);
 	      extension_offset += 2;
 
 #ifdef DEBUG_TLS
