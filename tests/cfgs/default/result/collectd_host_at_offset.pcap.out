@@ -1,8 +1,37 @@
 DPI Packets (UDP):	2	(1.00 pkts/flow)
 Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
 
 collectd	11	1092	2
 
 Acceptable                      11 1092          2            
 
 System                          11 1092          2            
+
+	1	UDP 10.0.0.1:25826 -> 10.0.0.2:25826 [proto: 298/collectd][Stack: collectd][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 298/collectd, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Acceptable][7 pkts/728 bytes -> 0 pkts/0 bytes][Goodput ratio: 60/0][6.00 sec][Hostname/SNI: server-42][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1000/0 1000/0 1000/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 104/0 104/0 104/0 0/0][PLAIN TEXT (server)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.0.0.2:25826 -> 10.0.0.2:25826 [proto: 298/collectd][Stack: collectd][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 298/collectd, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Acceptable][4 pkts/364 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][3.00 sec][Hostname/SNI: collector-1][PLAIN TEXT (collector)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
