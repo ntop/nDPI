@@ -103,9 +103,10 @@ static int ndpi_int_collectd_check_type(u_int16_t block_type)
 
 static void ndpi_int_collectd_dissect_hostname(struct ndpi_flow_struct * const flow,
                                                struct ndpi_packet_struct const * const packet,
+                                               u_int16_t hostname_offset,
                                                u_int16_t block_length)
 {
-  ndpi_hostname_sni_set(flow, &packet->payload[4], block_length, NDPI_HOSTNAME_NORM_ALL);
+  ndpi_hostname_sni_set(flow, &packet->payload[hostname_offset], block_length, NDPI_HOSTNAME_NORM_ALL);
 }
 
 static int ndpi_int_collectd_dissect_username(struct ndpi_flow_struct * const flow,
@@ -133,7 +134,7 @@ static void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struc
   struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
   u_int16_t num_blocks;
   u_int16_t block_offset = 0, block_type, block_length;
-  u_int16_t hostname_length = 0;
+  u_int16_t hostname_length = 0, hostname_offset = 4;
 
   NDPI_LOG_DBG(ndpi_struct, "search collectd\n");
 
@@ -158,7 +159,10 @@ static void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struc
          * the collectd protocol.
          */
         if(block_length > 4)
+        {
           hostname_length = block_length - 4; /* Ignore type and length fields */
+          hostname_offset = block_offset + 4;
+        }
       } else if (block_type == COLELCTD_TYPE_ENCR_AES256) {
         /*
          * The encrypted data block is a special case.
@@ -185,7 +189,7 @@ static void ndpi_search_collectd(struct ndpi_detection_module_struct *ndpi_struc
   }
 
   if (hostname_length > 0)
-    ndpi_int_collectd_dissect_hostname(flow, packet, hostname_length);
+    ndpi_int_collectd_dissect_hostname(flow, packet, hostname_offset, hostname_length);
 
   ndpi_int_collectd_add_connection(ndpi_struct, flow);
 }
