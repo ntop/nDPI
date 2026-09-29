@@ -919,7 +919,8 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
       NDPI_LOG_DBG2(ndpi_struct, "Origin: [%.*s] -> [%.*s]\n", packet->http_origin.len, packet->http_origin.ptr,
 		    (int)origin_hostname_len, origin_hostname);
       /* We already checked hostname...*/
-      if(strncmp(origin_hostname, flow->core.host_server_name, origin_hostname_len) != 0) {
+      if(flow->core.host_server_name
+	 && (strncmp(origin_hostname, flow->core.host_server_name, origin_hostname_len) != 0)) {
         ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
 				    origin_hostname,
 				    origin_hostname_len,
@@ -1635,8 +1636,10 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
 	char str[128];
 
         if(is_flowrisk_info_enabled(ndpi_struct, NDPI_INVALID_CHARACTERS)) {
-	  snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
-	  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
+          if(flow->core.host_server_name != NULL) {
+            snprintf(str, sizeof(str), "Invalid host %s", flow->core.host_server_name);
+            ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, str);
+          }
         } else {
           ndpi_set_risk(ndpi_struct, &flow->core, NDPI_INVALID_CHARACTERS, NULL);
         }
@@ -1648,7 +1651,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       }
 
       if(ndpi_struct->packet.iph
-         && (sscanf(flow->core.host_server_name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)) {
+	 && flow->core.host_server_name
+	 && (sscanf(flow->core.host_server_name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)) {
         /* IPv4 */
 
         if(ndpi_struct->packet.iph->daddr != inet_addr(flow->core.host_server_name)) {
