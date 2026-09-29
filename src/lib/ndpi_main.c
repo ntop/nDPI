@@ -8416,6 +8416,50 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 
 /* ************************************************ */
 
+/*
+  NDPI_NATIVE_TCP_FINGERPRINT: number of option value octets to be
+  added to the fingerprint for the option starting at opt[0]
+  (see README.tcp_fingerprint.md).
+
+  Return code:
+  -1   Ephemeral option: skip it (kind included)
+  0    Add the option kind only
+  >0   Add (up to) the specified number of value octets
+*/
+static int ndpi_tcp_fp_option_value_len(const u_int8_t *opt, u_int16_t avail) {
+  switch(opt[0]) {
+  case 2:  /* MSS: path dependent (MSS clamping, IPv4 vs IPv6) */
+  case 8:  /* Timestamps: per-connection clock */
+  case 19: /* TCP MD5 signature: per-segment digest */
+  case 29: /* TCP-AO: per-segment MAC */
+    return(0);
+
+  case 30: /* MPTCP: keep subtype/version (+ MP_CAPABLE flags), skip keys/tokens/nonces */
+    if(avail > 2)
+      return(((opt[2] >> 4) == 0 /* MP_CAPABLE */) ? 2 : 1);
+    else
+      return(0);
+
+  case 34: /* TCP Fast Open cookie: per-server, presence depends on cookie cache */
+    return(-1);
+
+  case 253:
+  case 254: /* RFC 6994 experimental options: keep the ExID only */
+    if(avail > 3) {
+      if((opt[2] == 0xF9) && (opt[3] == 0x89)) /* Experimental TCP Fast Open */
+	return(-1);
+      else
+	return(2);
+    } else
+      return(0);
+
+  default:
+    return(255);
+  }
+}
+
+/* ************************************************ */
+
 int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		     struct ndpi_flow_core_struct *core,
 		     struct ndpi_flow_metadata_struct *metadata,
@@ -8496,11 +8540,14 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
          && metadata->l4.tcp.fingerprint == NULL) {
 	u_int8_t *t = (u_int8_t*)packet->tcp;
 	u_int16_t flags = ntohs(*((u_int16_t*)&t[12])) & 0xFFF;
-	u_int16_t syn_mask = TH_SYN | TH_ECE | TH_CWR;
+	ndpi_tcp_fingerprint_format fp_format = ndpi_str->cfg.tcp_fingerprint_format;
 
-	if((flags & syn_mask) && ((flags & TH_ACK) == 0)) {
+	if((flags & TH_SYN) && ((flags & TH_ACK) == 0)) {
 	  char fingerprint[128], options_fp[128];
-	  u_int8_t i, fp_idx = 0, options_fp_len = 0;
+	  u_int16_t i; /* u_int16_t: i += len must not wrap (options_len <= 40, len <= 255) */
+	  u_int8_t fp_idx = 0, options_fp_len = 0;
+	  int nop_start = -1; /* Offset in options_fp of the current NOP run */
+	  u_int8_t skip_nops = 0; /* Skip the NOP padding of an ephemeral option */
 
 	  if(tcp_header_len >= sizeof(struct ndpi_tcphdr)) {
 	    u_int8_t *options = (u_int8_t*)(&t[sizeof(struct ndpi_tcphdr)]);
@@ -8522,7 +8569,7 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	    else if(ip_ttl <= 192) ip_ttl = 192;
 	    else ip_ttl = 255;
 
-	    switch(ndpi_str->cfg.tcp_fingerprint_format) {
+	    switch(fp_format) {
 	    case NDPI_NATIVE_TCP_FINGERPRINT:
 	      fp_idx = snprintf(fingerprint, sizeof(fingerprint), "%u_%u_%u_", flags, ip_ttl, tcp_win);
 	      break;
@@ -8555,19 +8602,46 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 #endif
 	      for(i=0; i<options_len; /* don't increase here */) {
 		u_int8_t kind = options[i];
+		int value_len = 0; /* Native format only: see ndpi_tcp_fp_option_value_len() */
 
 #ifdef DEBUG_TCP_OPTIONS
 		printf("Option kind: %u\n", kind);
 #endif
 
-		if(ndpi_str->cfg.tcp_fingerprint_format == NDPI_NATIVE_TCP_FINGERPRINT) {
-		  rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", kind);
+		if(fp_format == NDPI_NATIVE_TCP_FINGERPRINT) {
+		  if(kind == 1 /* NOP */) {
+		    if(skip_nops) {
+		      i++; /* Padding that follows an ephemeral option */
+		      continue;
+		    }
 
-		  if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp)))
-		    break;
+		    if(nop_start < 0)
+		      nop_start = options_fp_len;
+		  } else {
+		    if(kind > 1 /* Not EOL */)
+		      value_len = ndpi_tcp_fp_option_value_len(&options[i], options_len - i);
 
-		  options_fp_len += rc;
-		} else if(ndpi_str->cfg.tcp_fingerprint_format == NDPI_MUONFP_TCP_FINGERPRINT) {
+		    if(value_len < 0) {
+		      /* Ephemeral option: drop also the NOP padding that precedes it */
+		      if(nop_start >= 0)
+			options_fp_len = nop_start, options_fp[options_fp_len] = '\0';
+
+		      skip_nops = 1;
+		    } else
+		      skip_nops = 0;
+
+		    nop_start = -1;
+		  }
+
+		  if(value_len >= 0) {
+		    rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", kind);
+
+		    if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp)))
+		      break;
+
+		    options_fp_len += rc;
+		  }
+		} else if(fp_format == NDPI_MUONFP_TCP_FINGERPRINT) {
 		  if(fp_idx >= sizeof(fingerprint))
 		    break;
 
@@ -8580,6 +8654,9 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		}
 
 		if(kind == 0) /* EOL */ {
+		  if(fp_format == NDPI_NATIVE_TCP_FINGERPRINT)
+		    break; /* What follows is padding (RFC 9293) */
+
 		  i++;
 		  continue;
 		} else if(kind == 1) /* NOP */
@@ -8592,18 +8669,8 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 #endif
 
 		  if(len == 0)
-		    continue;
-		  else if(kind == 8) {
-		    switch(ndpi_str->cfg.tcp_fingerprint_format) {
-		    case NDPI_NATIVE_TCP_FINGERPRINT:
-		      /* Timestamp: ignore it */
-		      break;
-
-		    case NDPI_MUONFP_TCP_FINGERPRINT:
-		      /* Nothing to do */
-		      break;
-		    }
-		  } else if(len > 2) {
+		    break; /* Malformed option */
+		  else if(len > 2) {
 		    int j = i+2;
 		    u_int8_t opt_len = len - 2;
 
@@ -8626,13 +8693,15 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 			tcp_wscale = val;
 		    }
 
-		    if(ndpi_str->cfg.tcp_fingerprint_format == NDPI_NATIVE_TCP_FINGERPRINT) {
-		      while((opt_len > 0) && (j < options_len)) {
+		    if(fp_format == NDPI_NATIVE_TCP_FINGERPRINT) {
+		      u_int8_t fp_value_len = (value_len <= 0) ? 0 : ((value_len < opt_len) ? value_len : opt_len);
+
+		      while((fp_value_len > 0) && (j < options_len)) {
 			rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", options[j]);
 			if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp))) break;
 
 			options_fp_len += rc;
-			j++, opt_len--;
+			j++, fp_value_len--;
 		      }
 		    }
 		  }
@@ -8663,7 +8732,7 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	    printf("Raw Options Fingerprint: %s\n", options_fp);
 #endif
 
-	    switch(ndpi_str->cfg.tcp_fingerprint_format) {
+	    switch(fp_format) {
 	    case NDPI_NATIVE_TCP_FINGERPRINT:
 	      ndpi_sha256((const u_char*)options_fp, options_fp_len, sha_hash);
 

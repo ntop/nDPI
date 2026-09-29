@@ -1,77 +1,64 @@
+/*
+  TCP fingerprints (NDPI_NATIVE_TCP_FINGERPRINT) -> OS hint
+
+  The comment reports the raw options string (metadata.tcp_fingerprint_raw)
+  of each fingerprint: please keep it also for new entries, so that the
+  database can be recomputed if the fingerprint format changes.
+
+  Note: 96500ba614e1 is used by both macOS and iOS/iPadOS
+*/
 static struct os_fingerprint tcp_fps[] = {
-    { "2_64_65535_8bf9e292397e",    ndpi_os_freebsd     },
+    { "2_64_65535_defa183edeca",     ndpi_os_freebsd      }, /* 020103060408 */
 
-    { "2_64_64800_83b2f9a5576c",    ndpi_os_linux       },
-    { "2_64_64240_2e3cee914fc1",    ndpi_os_linux       },
-    { "2_64_29200_2e3cee914fc1",    ndpi_os_linux       },
-    { "2_64_29200_d853e95bd80f",    ndpi_os_linux       }, /* Sonos */
-    { "2_64_14600_8c07a80cc645",    ndpi_os_linux       }, /* QNAP */
-    { "2_64_64240_2e3cee914fc1",    ndpi_os_linux       }, /* rPI */
-    { "2_64_32120_2e3cee914fc1",    ndpi_os_linux       }, /* rPI */
-    { "2_64_29200_90541420d839",    ndpi_os_linux       }, /* Suse Linux */
-    { "2_64_64240_41a9d5af7dd3",    ndpi_os_linux       },
+    { "2_64_64800_5ec4846073b9",     ndpi_os_linux        }, /* 020408010307 */
+    { "2_64_64240_5ec4846073b9",     ndpi_os_linux        }, /* 020408010307 */
+    { "2_64_29200_5ec4846073b9",     ndpi_os_linux        }, /* 020408010307 */
+    { "2_64_29200_96f084d7f50c",     ndpi_os_linux        }, /* 020408010305 */
+    { "2_64_14600_b88686e220ac",     ndpi_os_linux        }, /* 020408010306 */
+    { "2_64_32120_5ec4846073b9",     ndpi_os_linux        }, /* 020408010307 */
+    { "2_64_64240_9ade5ea639dd",     ndpi_os_linux        }, /* 020408010308 */
 
-    { "2_64_65535_d876f498b09e",    ndpi_os_android     },
-    { "2_64_65535_685ad951a756",    ndpi_os_android     },
-    { "2_64_65535_41a9d5af7dd3",    ndpi_os_android     },
-    { "2_64_65535_148107a0d970",    ndpi_os_android     },
-    { "2_64_65535_f518bfb025b0",    ndpi_os_android     },
-    { "2_64_65535_2e3cee914fc1",    ndpi_os_android     },
+    { "2_64_65535_8b4e598a2ef6",     ndpi_os_android      }, /* 02040801030a */
+    { "2_64_65535_25d42dd21321",     ndpi_os_android      }, /* 020408010309 */
+    { "2_64_65535_9ade5ea639dd",     ndpi_os_android      }, /* 020408010308 */
+    { "2_64_65535_5ec4846073b9",     ndpi_os_android      }, /* 020408010307 */
 
-    { "2_128_64240_6bb88f5575fd",   ndpi_os_windows     },
-    { "2_128_8192_4697958db063",    ndpi_os_windows     }, /* Windows 7 */
-    { "194_128_64240_0c6c715fcb8e", ndpi_os_windows     },
-    { "194_128_64240_29659b8d8574", ndpi_os_windows     },
-    { "194_128_32768_e75eea53a4fd", ndpi_os_windows     },
-    { "194_128_32768_84fee6d35dde", ndpi_os_windows     },
-    { "194_128_64240_6bb88f5575fd", ndpi_os_windows     },
-    { "2_128_32768_5a9ef1c58d0b",   ndpi_os_windows     },
-    { "194_128_32768_5a9ef1c58d0b", ndpi_os_windows     },
-    { "2_128_65535_6bb88f5575fd",   ndpi_os_windows     },
+    { "2_128_64240_e035a9f8f3a0",    ndpi_os_windows      }, /* 02010308010104 */
+    { "2_128_8192_4973d993fb4a",     ndpi_os_windows      }, /* 02010302010104 */
+    { "194_128_64240_e035a9f8f3a0",  ndpi_os_windows      }, /* 02010308010104 */
+    { "194_128_32768_6b34051d2fbf",  ndpi_os_windows      }, /* 02010300010104 */
+    { "2_128_32768_6b34051d2fbf",    ndpi_os_windows      }, /* 02010300010104 */
+    { "2_128_65535_e035a9f8f3a0",    ndpi_os_windows      }, /* 02010308010104 */
+    { "194_128_32_6b34051d2fbf",     ndpi_os_windows      }, /* 02010300010104 */
+    { "194_128_64954_e035a9f8f3a0",  ndpi_os_windows      }, /* 02010308010104 */
+    { "194_128_65160_55a079b2ce62",  ndpi_os_windows      }, /* 020103080408 */
+    { "194_128_65340_e035a9f8f3a0",  ndpi_os_windows      }, /* 02010308010104 */
+    { "194_128_65535_a717f7945d0a",  ndpi_os_windows      }, /* 02010303010104 */
+    { "194_128_65535_e035a9f8f3a0",  ndpi_os_windows      }, /* 02010308010104 */
+    { "194_128_65535_da2db3bc812e",  ndpi_os_windows      }, /* 02010305010104 */
+    { "194_128_8192_6b34051d2fbf",   ndpi_os_windows      }, /* 02010300010104 */
+    { "2_128_62636_55a079b2ce62",    ndpi_os_windows      }, /* 020103080408 */
+    { "2_128_62720_e035a9f8f3a0",    ndpi_os_windows      }, /* 02010308010104 */
+    { "2_128_64390_55a079b2ce62",    ndpi_os_windows      }, /* 020103080408 */
+    { "2_128_64512_55a079b2ce62",    ndpi_os_windows      }, /* 020103080408 */
+    { "2_128_64668_e035a9f8f3a0",    ndpi_os_windows      }, /* 02010308010104 */
+    { "2_128_64872_e035a9f8f3a0",    ndpi_os_windows      }, /* 02010308010104 */
+    { "2_128_65010_e035a9f8f3a0",    ndpi_os_windows      }, /* 02010308010104 */
+    { "2_128_65088_e035a9f8f3a0",    ndpi_os_windows      }, /* 02010308010104 */
+    { "2_128_65160_55a079b2ce62",    ndpi_os_windows      }, /* 020103080408 */
+    { "2_128_65312_55a079b2ce62",    ndpi_os_windows      }, /* 020103080408 */
+    { "2_128_65424_e035a9f8f3a0",    ndpi_os_windows      }, /* 02010308010104 */
+    { "2_128_65520_55a079b2ce62",    ndpi_os_windows      }, /* 020103080408 */
+    { "2_128_65535_3623b899804f",    ndpi_os_windows      }, /* 02010307010104 */
+    { "2_128_65535_55a079b2ce62",    ndpi_os_windows      }, /* 020103080408 */
+    { "2_128_65535_e2026928e080",    ndpi_os_windows      }, /* 02010301010104 */
 
-    { "194_128_32_5a9ef1c58d0b",    ndpi_os_windows     },
-    { "194_128_64954_5df61ba47d16", ndpi_os_windows     },
-    { "194_128_65160_720287bf387b", ndpi_os_windows     },
-    { "194_128_65160_f7c19d625909", ndpi_os_windows     },
-    { "194_128_65340_5df61ba47d16", ndpi_os_windows     },
-    { "194_128_65535_35ea98532c26", ndpi_os_windows     },
-    { "194_128_65535_6bb88f5575fd", ndpi_os_windows     },
-    { "194_128_65535_9f39700b863a", ndpi_os_windows     },
-    { "194_128_8192_5a9ef1c58d0b",  ndpi_os_windows     },
-    { "2_128_62636_f7c19d625909",   ndpi_os_windows     },
-    { "2_128_62720_6bb88f5575fd",   ndpi_os_windows     },
-    { "2_128_64390_186255600578",   ndpi_os_windows     },
-    { "2_128_64512_d978a30274f9",   ndpi_os_windows     },
-    { "2_128_64668_ba856ac24bae",   ndpi_os_windows     },
-    { "2_128_64872_7ec39e7a0c60",   ndpi_os_windows     },
-    { "2_128_65010_d7f34a3d4a0e",   ndpi_os_windows     },
-    { "2_128_65088_e6db4d959510",   ndpi_os_windows     },
-    { "2_128_65160_f7c19d625909",   ndpi_os_windows     },
-    { "2_128_65312_6e130c7ac874",   ndpi_os_windows     },
-    { "2_128_65424_d408bed9ba71",   ndpi_os_windows     },
-    { "2_128_65520_91f9ecb5d85c",   ndpi_os_windows     },
-    { "2_128_65535_46c195dc1606",   ndpi_os_windows     },
-    { "2_128_65535_8739305ee1fa",   ndpi_os_windows     },
-    { "2_128_65535_91f9ecb5d85c",   ndpi_os_windows     },
-    { "2_128_65535_d408bed9ba71",   ndpi_os_windows     },
-    { "2_128_65535_d7f34a3d4a0e",   ndpi_os_windows     },
-    { "2_128_65535_e83222749ab9",   ndpi_os_windows     },
-    { "2_128_65535_f7c19d625909",   ndpi_os_windows     },
+    { "194_64_65535_fa6f8edaadeb",   ndpi_os_ios_ipad_os  }, /* 020103050101080400 */
 
-    { "194_64_65535_15db81ff8b0d",  ndpi_os_ios_ipad_os },
-    { "194_64_65535_dd5737e4fedb",  ndpi_os_ios_ipad_os },
-    /* { "194_64_65535_d3a424420f2a",  ndpi_os_ios_ipad_os }, */ /* Used by both macOS and iOS/iPad */
-    /* { "194_64_0_d29295416479",      ndpi_os_ios_ipad_os }, */ /* Used by both macOS and iOS/iPad */
-
-    { "194_64_65535_d29295416479",  ndpi_os_macos       },
-    { "194_64_65535_78dd6871cb6d",  ndpi_os_macos       },
-    { "2_64_65535_d29295416479",    ndpi_os_macos       },
-    { "2_64_0_d29295416479",        ndpi_os_macos       },
-    { "2_64_65535_d29295416479",    ndpi_os_macos       },
-    { "2_64_65535_dd5737e4fedb",    ndpi_os_macos       },
-    { "2_64_65535_99a660d3e328",    ndpi_os_macos       },
-    { "2_64_65535_78dd6871cb6d",    ndpi_os_macos       },
-    { "2_64_65535_09b18f059744",    ndpi_os_macos       },
+    { "194_64_65535_96500ba614e1",   ndpi_os_macos        }, /* 020103060101080400 */
+    { "2_64_65535_96500ba614e1",     ndpi_os_macos        }, /* 020103060101080400 */
+    { "2_64_0_96500ba614e1",         ndpi_os_macos        }, /* 020103060101080400 */
+    { "2_64_65535_4fcd627e5690",     ndpi_os_macos        }, /* 020103040101080400 */
 
     { NULL,                         ndpi_os_unknown     },
   };

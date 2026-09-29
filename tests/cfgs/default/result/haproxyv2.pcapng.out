@@ -33,4 +33,4 @@ Safe                             5 380           1
 
 Web                              5 380           1            
 
-	1	TCP 127.0.0.1:60380 <-> 127.0.0.1:8110 [proto: 350/HAProxy][Stack: HAProxy][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Safe][3 pkts/240 bytes <-> 2 pkts/140 bytes][Goodput ratio: 14/0][< 1 sec][TCP Fingerprint: 2_64_65495_db1b9381215d/Unknown][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 127.0.0.1:60380 <-> 127.0.0.1:8110 [proto: 350/HAProxy][Stack: HAProxy][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Web/5][Breed: Safe][3 pkts/240 bytes <-> 2 pkts/140 bytes][Goodput ratio: 14/0][< 1 sec][TCP Fingerprint: 2_64_65495_5ec4846073b9/Unknown][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

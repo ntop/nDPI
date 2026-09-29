@@ -41,6 +41,9 @@ void ndpi_load_tcp_fingerprints(struct ndpi_detection_module_struct *ndpi_str) {
      ndpi_hash_init(&ndpi_str->tcp_fingerprint_hashmap) == 0) {
     u_int i;
 
+    if(ndpi_str->cfg.tcp_fingerprint_format != NDPI_NATIVE_TCP_FINGERPRINT)
+      return; /* Built-in fingerprints are in native format */
+
     for(i=0; tcp_fps[i].fingerprint != NULL; i++)
       ndpi_add_tcp_fingerprint(ndpi_str, (char*)tcp_fps[i].fingerprint, tcp_fps[i].os);
   }
@@ -97,7 +100,7 @@ int ndpi_add_tcp_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
  * Format:
  *
  * <TCP fingerprint>,<numeric OS>
- * Example: 2_64_14600_8c07a80cc645,3
+ * Example: 2_64_14600_b88686e220ac,5
  *
  */
 int ndpi_load_tcp_fingerprint_file(struct ndpi_detection_module_struct *ndpi_str, const char *path) {

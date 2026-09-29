@@ -196,7 +196,7 @@ struct ndpi_global_context {
     in ndpi_main.c
    */
   typedef enum  {
-    NDPI_NATIVE_TCP_FINGERPRINT = 0,
+    NDPI_NATIVE_TCP_FINGERPRINT = 0, /* README.tcp_fingerprint.md */
     NDPI_MUONFP_TCP_FINGERPRINT /* https://github.com/sundruid/muonfp */
   } ndpi_tcp_fingerprint_format;
 
