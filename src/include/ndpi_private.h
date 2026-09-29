@@ -196,7 +196,7 @@ struct ndpi_global_context {
     in ndpi_main.c
    */
   typedef enum  {
-    NDPI_NATIVE_TCP_FINGERPRINT = 0,
+    NDPI_NATIVE_TCP_FINGERPRINT = 0, /* README.tcp_fingerprint.md */
     NDPI_MUONFP_TCP_FINGERPRINT /* https://github.com/sundruid/muonfp */
   } ndpi_tcp_fingerprint_format;
 
@@ -663,21 +663,21 @@ int is_proto_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId)
 int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id);
 
 void ndpi_register_dissector(char *dissector_name, struct ndpi_detection_module_struct *ndpi_str,
-                        void (*func)(struct ndpi_detection_module_struct *,
-                                     struct ndpi_flow_struct *flow),
-                        const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
-                        enum ndpi_dissector_license_type dissector_license_type,
-                        int num_protocol_ids, ...);
+			     void (*func)(struct ndpi_detection_module_struct *,
+					  struct ndpi_flow_struct *flow),
+			     const NDPI_SELECTION_BITMASK_PROTOCOL_SIZE ndpi_selection_bitmask,
+			     enum ndpi_dissector_license_type dissector_license_type,
+			     int num_protocol_ids, ...);
 void exclude_dissector(struct ndpi_detection_module_struct *ndpi_str,
 		       struct ndpi_flow_core_struct *core,
-                       u_int16_t dissector_idx, const char *_file,
+		       u_int16_t dissector_idx, const char *_file,
 		       const char *_func, int _line) ;
 
 char *strptime(const char *s, const char *format, struct tm *tm);
-
+  
 u_int8_t iph_is_valid_and_not_fragmented(struct ndpi_detection_module_struct *ndpi_str,
-                                         const struct ndpi_iphdr *iph, const u_int16_t ipsize);
-
+					   const struct ndpi_iphdr *iph, const u_int16_t ipsize);
+  
 int current_pkt_from_client_to_server(const struct ndpi_detection_module_struct *ndpi_str, const struct ndpi_flow_core_struct *core);
 int current_pkt_from_server_to_client(const struct ndpi_detection_module_struct *ndpi_str, const struct ndpi_flow_core_struct *core);
 
@@ -795,8 +795,17 @@ int signal_search_into_cache(struct ndpi_detection_module_struct* ndpi_struct,
 void signal_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
                         struct ndpi_flow_struct *flow);
 
+/* DCERPC */
+struct ndpi_dcerpc_tcp_reasm {
+  u_int8_t *buf;
+  u_int16_t cur_len;
+  u_int16_t msg_len;
+  u_int32_t next_seq;
+};
+struct ndpi_dcerpc_tcp_reasm_state {
+  struct ndpi_dcerpc_tcp_reasm dir[2];
+};
 /* DNS */
-
 struct ndpi_dns_tcp_reasm {
   u_int8_t *buf;
   u_int16_t cur_len;

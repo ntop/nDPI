@@ -140,8 +140,8 @@ flow_risks[53] = ProtoField.bool("ndpi.flow_risk.malware_contact", "Contact with
 flow_risks[54] = ProtoField.bool("ndpi.flow_risk.binary_data_transfer", "Attempt to transfer a binary file", num_bits_flow_risks, nil, bit(54), "nDPI Flow Risk: binary data file transfer")
 flow_risks[55] = ProtoField.bool("ndpi.flow_risk.probing_attempt", "Probing attempt", num_bits_flow_risks, nil, bit(55), "nDPI Flow Risk: probing attempt")
 flow_risks[56] = ProtoField.bool("ndpi.flow_risk.obfuscated_traffic", "Obfuscated Traffic", num_bits_flow_risks, nil, bit(56), "nDPI Flow Risk: obfuscated traffic")
-flow_risks[57] = ProtoField.bool("ndpi.flow_risk.slow_dos", "Slow DoS", num_bits_flow_risks, nil, bit(56), "nDPI Flow Risk: slow DoS attempt")
-flow_risks[57] = ProtoField.bool("ndpi.flow_risk.non_pqc", "Non PQC", num_bits_flow_risks, nil, bit(56), "nDPI Flow Risk: non PQC traffic)
+flow_risks[57] = ProtoField.bool("ndpi.flow_risk.slow_dos", "Slow DoS", num_bits_flow_risks, nil, bit(57), "nDPI Flow Risk: slow DoS attempt")
+flow_risks[58] = ProtoField.bool("ndpi.flow_risk.non_pqc", "Non PQC", num_bits_flow_risks, nil, bit(58), "nDPI Flow Risk: non PQC traffic")
 
 -- Last one: keep in sync the bitmask when adding new risks!!
 flow_risks[64] = ProtoField.new("Unused", "ndpi.flow_risk.unused", ftypes.UINT64, nil, base.HEX, bit(64) - bit(57))
@@ -303,39 +303,59 @@ local ndpi_proto_meet     = "GoogleMeet" -- NDPI_PROTOCOL_GOOGLE_MEET
 
 -- ##############################################
 
+-- Keep in sync with src/lib/ndpi_os_fingerprint.c.inc
 local tcp_fingeprint_db = {
-   ['2_64_65535_8bf9e292397e']   = "FreeBSD",
+   ['2_64_65535_defa183edeca']       = "FreeBSD",
 
-   ['2_64_64800_83b2f9a5576c']   = "Linux",
-   ['2_64_64240_2e3cee914fc1']   = "Linux",
-   ['2_64_29200_2e3cee914fc1']   = "Linux",
-   ['2_64_29200_d853e95bd80f']   = "Linux",
-   ['2_64_14600_8c07a80cc645']   = "Linux",
-   ['2_64_64240_2e3cee914fc1']   = "Linux",
-   ['2_64_29200_90541420d839']   = "Linux",
-   
-   ['2_64_65535_d876f498b09e']   = "Android",
-   ['2_64_65535_685ad951a756']   = "Android",
-   ['2_64_65535_41a9d5af7dd3']   = "Android",
-   ['2_64_65535_148107a0d970']   = "Android",
-   ['2_64_65535_f518bfb025b0']   = "Android",
+   ['2_64_64800_5ec4846073b9']       = "Linux",
+   ['2_64_64240_5ec4846073b9']       = "Linux",
+   ['2_64_29200_5ec4846073b9']       = "Linux",
+   ['2_64_29200_96f084d7f50c']       = "Linux",
+   ['2_64_14600_b88686e220ac']       = "Linux",
+   ['2_64_32120_5ec4846073b9']       = "Linux",
+   ['2_64_64240_9ade5ea639dd']       = "Linux",
 
-   ['2_128_64240_6bb88f5575fd']    = "Windows",
-   ['194_128_64240_0c6c715fcb8e']  = "Windows",
-   ['194_128_64240_29659b8d8574']  = "Windows",
-   ['194_128_32768_e75eea53a4fd']  = "Windows",
-   ['194_128_32768_84fee6d35dde']  = "Windows",
-   
-   ['194_64_65535_15db81ff8b0d'] = "iOS",
-   ['2_64_65535_41a9d5af7dd3']   = "iOS",
-   ['194_64_65535_dd5737e4fedb'] = "iOS",
-   ['194_64_65535_d3a424420f2a'] = "iPad OS",
-   ['194_64_0_d29295416479'    ] = "iPad OS",
+   ['2_64_65535_8b4e598a2ef6']       = "Android",
+   ['2_64_65535_25d42dd21321']       = "Android",
+   ['2_64_65535_9ade5ea639dd']       = "Android",
+   ['2_64_65535_5ec4846073b9']       = "Android",
 
-   ['194_64_65535_d29295416479'] = "macOS/iPad OS",
-   ['2_64_65535_d29295416479']   = "macOS/iPad OS",
-   ['194_64_65535_78dd6871cb6d'] = "macOS",
-   ['2_64_65535_dd5737e4fedb']   = "macOS",
+   ['2_128_64240_e035a9f8f3a0']      = "Windows",
+   ['2_128_8192_4973d993fb4a']       = "Windows",
+   ['194_128_64240_e035a9f8f3a0']    = "Windows",
+   ['194_128_32768_6b34051d2fbf']    = "Windows",
+   ['2_128_32768_6b34051d2fbf']      = "Windows",
+   ['2_128_65535_e035a9f8f3a0']      = "Windows",
+   ['194_128_32_6b34051d2fbf']       = "Windows",
+   ['194_128_64954_e035a9f8f3a0']    = "Windows",
+   ['194_128_65160_55a079b2ce62']    = "Windows",
+   ['194_128_65340_e035a9f8f3a0']    = "Windows",
+   ['194_128_65535_a717f7945d0a']    = "Windows",
+   ['194_128_65535_e035a9f8f3a0']    = "Windows",
+   ['194_128_65535_da2db3bc812e']    = "Windows",
+   ['194_128_8192_6b34051d2fbf']     = "Windows",
+   ['2_128_62636_55a079b2ce62']      = "Windows",
+   ['2_128_62720_e035a9f8f3a0']      = "Windows",
+   ['2_128_64390_55a079b2ce62']      = "Windows",
+   ['2_128_64512_55a079b2ce62']      = "Windows",
+   ['2_128_64668_e035a9f8f3a0']      = "Windows",
+   ['2_128_64872_e035a9f8f3a0']      = "Windows",
+   ['2_128_65010_e035a9f8f3a0']      = "Windows",
+   ['2_128_65088_e035a9f8f3a0']      = "Windows",
+   ['2_128_65160_55a079b2ce62']      = "Windows",
+   ['2_128_65312_55a079b2ce62']      = "Windows",
+   ['2_128_65424_e035a9f8f3a0']      = "Windows",
+   ['2_128_65520_55a079b2ce62']      = "Windows",
+   ['2_128_65535_3623b899804f']      = "Windows",
+   ['2_128_65535_55a079b2ce62']      = "Windows",
+   ['2_128_65535_e2026928e080']      = "Windows",
+
+   ['194_64_65535_fa6f8edaadeb']     = "iOS",
+
+   ['194_64_65535_96500ba614e1']     = "macOS/iOS",
+   ['2_64_65535_96500ba614e1']       = "macOS/iOS",
+   ['2_64_0_96500ba614e1']           = "macOS/iOS",
+   ['2_64_65535_4fcd627e5690']       = "macOS",
 }
 
 -- ##############################################
@@ -1336,6 +1356,110 @@ end
 
 -- ###############################################
 
+-- ###############################################
+
+-- nDPI native TCP fingerprint (see README.tcp_fingerprint.md): number of
+-- value octets of the option starting at opts[i] to be added to the
+-- fingerprint, or -1 to skip the (ephemeral) option
+function tcp_option_value_len(opts, i, n)
+   local kind = opts[i]
+
+   if((kind == 2) or (kind == 8) or (kind == 19) or (kind == 29)) then
+      -- MSS, Timestamps, TCP-MD5, TCP-AO: kind only
+      return 0
+   elseif(kind == 30) then
+      -- MPTCP: subtype/version (+ flags for MP_CAPABLE)
+      if(i + 2 <= n) then
+	 if(math.floor(opts[i + 2] / 16) == 0) then return 2 else return 1 end
+      end
+
+      return 0
+   elseif(kind == 34) then
+      -- TCP Fast Open
+      return -1
+   elseif((kind == 253) or (kind == 254)) then
+      -- RFC 6994 experimental: ExID only; experimental TCP Fast Open is skipped
+      if(i + 3 <= n) then
+	 if((opts[i + 2] == 0xF9) and (opts[i + 3] == 0x89)) then return -1 else return 2 end
+      end
+
+      return 0
+   end
+
+   return 255
+end
+
+-- Returns the raw options string (hex) hashed by the nDPI native TCP fingerprint
+function tcp_options_fingerprint(hex_options)
+   local fingerprint = ""
+   local opts = {}
+   local n, i
+   local nop_start = nil  -- start of the current NOP run in fingerprint
+   local skip_nops = false -- skip the NOP padding of an ephemeral option
+
+   for j = 1, hex_options:len() - 1, 2 do
+      opts[#opts + 1] = tonumber(hex_options:sub(j, j + 1), 16)
+   end
+
+   n = #opts
+   i = 1
+
+   while(i <= n) do
+      local kind = opts[i]
+      local value_len = 0
+
+      if(kind == 1) then
+	 -- NOP
+	 if(not skip_nops) then
+	    if(nop_start == nil) then nop_start = fingerprint:len() end
+	    fingerprint = fingerprint .. "01"
+	 end
+
+	 i = i + 1
+      else
+	 if(kind > 1) then value_len = tcp_option_value_len(opts, i, n) end
+
+	 if(value_len < 0) then
+	    -- Ephemeral option: drop also the NOP padding that precedes it
+	    if(nop_start ~= nil) then fingerprint = fingerprint:sub(1, nop_start) end
+	    skip_nops = true
+	 else
+	    skip_nops = false
+	 end
+
+	 nop_start = nil
+
+	 if(kind == 0) then
+	    -- EOL: what follows is padding
+	    fingerprint = fingerprint .. "00"
+	    break
+	 end
+
+	 if(value_len >= 0) then fingerprint = fingerprint .. string.format("%02x", kind) end
+
+	 if(i + 1 > n) then break end -- Truncated option
+
+	 local len = opts[i + 1]
+
+	 if(len == 0) then break end -- Malformed option
+
+	 if((len > 2) and (value_len > 0)) then
+	    local last = math.min(i + len - 1, n, i + 1 + value_len)
+
+	    for j = i + 2, last do
+	       fingerprint = fingerprint .. string.format("%02x", opts[j])
+	    end
+	 end
+
+	 i = i + len
+      end
+   end
+
+   return fingerprint
+end
+
+-- ###############################################
+
 function tcp_fingerprint(tvb, pinfo, tree, ip_version)
    local tcp_flags = getval(f_tcp_flags())
 
@@ -1348,57 +1472,14 @@ function tcp_fingerprint(tvb, pinfo, tree, ip_version)
 	 local tcp_win = getval(f_tcp_win())
 	 local fingerprint = ""	 
 	 local d_tcp_options = tcp_options.display
-	 local d_tcp_options_len = d_tcp_options:len()
 	 local tcp_opt_debug = false
 
 	 if(tcp_win == "nil") then tcp_win = 0 end
-	 
-	 i = 1
-	 while(i < d_tcp_options_len) do
-	    if(tcp_opt_debug) then tprint("[offset "..i .. "/".. d_tcp_options:len().."]") end
-	    
-	    local kind = d_tcp_options:sub(i,i+1)
 
-	    if(tcp_opt_debug) then tprint("[Kind: " .. kind .."] *** ") end
-	    
-	    i = i + 2 -- Skip kind
+	 fingerprint = tcp_options_fingerprint(d_tcp_options)
 
-	    fingerprint = fingerprint .. kind
-	    
-	    if(kind == "00") then
-	       -- EOL
-	       if(tcp_opt_debug) then tprint("[" .. kind .."][EOL]") end
-	    elseif(kind == "01") then
-	       -- NOP
-	       if(tcp_opt_debug) then tprint("[" .. kind .."][NOP]") end
-	    else
-	       local len = d_tcp_options:sub(i, i+1)
+	 if(tcp_opt_debug) then tprint("[Raw options fingerprint: " .. fingerprint .."]") end
 
-	       if(tcp_opt_debug) then tprint("[Len: " .. len .."] *** ") end
-
-	       len = tonumber(len, 16)
-	       i = i + 2 -- Skip len
-
-	       if((len ~= nil) and (len > 0)) then
-		  local value_len = 2 * (len-2)
-		  local value	   
-		  
-		  if(tcp_opt_debug) then tprint("[ValueLen: " .. value_len .."] *** ") end
-
-		  -- Skip timestamps
-		  if((kind ~= "08") and (value_len > 0)) then		     		  
-		     value = d_tcp_options:sub(i, i+value_len)
-		     value = value:sub(1, value_len) -- make sure the lenght is correct
-		     if(tcp_opt_debug) then tprint("[" .. kind .."][len: ".. len .."][value: ".. value.."]") end
-
-		     fingerprint = fingerprint .. value
-		  end
-		  
-		  i = i + value_len
-	       end
-	    end
-	 end -- while
-	 
 	 local ip_ttl
 	 local src_ip
 	 

@@ -8022,113 +8022,187 @@ void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_POPS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_MAIL_IMAPS) ||
        flow_is_proto(flow, NDPI_PROTOCOL_FTPS)) {
-      if(flow->metadata.protos.tls_quic.server_names)
+      if(flow->metadata.protos.tls_quic.server_names) {
 	ndpi_free(flow->metadata.protos.tls_quic.server_names);
+	flow->metadata.protos.tls_quic.server_names = NULL;
+      }
 
-      if(flow->metadata.protos.tls_quic.advertised_alpns)
+      if(flow->metadata.protos.tls_quic.advertised_alpns) {
 	ndpi_free(flow->metadata.protos.tls_quic.advertised_alpns);
+	flow->metadata.protos.tls_quic.advertised_alpns = NULL;
+      }
 
-      if(flow->metadata.protos.tls_quic.negotiated_alpn)
+      if(flow->metadata.protos.tls_quic.negotiated_alpn) {
 	ndpi_free(flow->metadata.protos.tls_quic.negotiated_alpn);
+	flow->metadata.protos.tls_quic.negotiated_alpn = NULL;
+      }
 
-      if(flow->metadata.protos.tls_quic.tls_supported_versions)
+      if(flow->metadata.protos.tls_quic.tls_supported_versions) {
 	ndpi_free(flow->metadata.protos.tls_quic.tls_supported_versions);
+	flow->metadata.protos.tls_quic.tls_supported_versions = NULL;
+      }
 
-      if(flow->metadata.protos.tls_quic.issuerDN)
+      if(flow->metadata.protos.tls_quic.issuerDN) {
 	ndpi_free(flow->metadata.protos.tls_quic.issuerDN);
+	flow->metadata.protos.tls_quic.issuerDN = NULL;
+      }
 
-      if(flow->metadata.protos.tls_quic.subjectDN)
+      if(flow->metadata.protos.tls_quic.subjectDN) {
 	ndpi_free(flow->metadata.protos.tls_quic.subjectDN);
+	flow->metadata.protos.tls_quic.subjectDN = NULL;
+      }
 
-      if(flow->metadata.protos.tls_quic.ja4_client_raw)
+      if(flow->metadata.protos.tls_quic.ja4_client_raw) {
 	ndpi_free(flow->metadata.protos.tls_quic.ja4_client_raw);
+	flow->metadata.protos.tls_quic.ja4_client_raw = NULL;
+      }
 
-      if(flow->metadata.protos.tls_quic.ja_client)
+      if(flow->metadata.protos.tls_quic.ja_client) {
 	ndpi_free(flow->metadata.protos.tls_quic.ja_client);
+	flow->metadata.protos.tls_quic.ja_client = NULL;
+      }
 
-      if(flow->metadata.protos.tls_quic.ja_server)
+      if(flow->metadata.protos.tls_quic.ja_server) {
 	ndpi_free(flow->metadata.protos.tls_quic.ja_server);
+	flow->metadata.protos.tls_quic.ja_server = NULL;
+      }
     }
 
     if(flow_is_proto(flow, NDPI_PROTOCOL_SSH)) {
-      if(flow->metadata.protos.ssh.client_key_exchange_algorithms)
+      if(flow->metadata.protos.ssh.client_key_exchange_algorithms) {
 	ndpi_free(flow->metadata.protos.ssh.client_key_exchange_algorithms);
+	flow->metadata.protos.ssh.client_key_exchange_algorithms = NULL;
+      }
 
-      if(flow->metadata.protos.ssh.server_key_exchange_algorithms)
+      if(flow->metadata.protos.ssh.server_key_exchange_algorithms) {
 	ndpi_free(flow->metadata.protos.ssh.server_key_exchange_algorithms);
+	flow->metadata.protos.ssh.server_key_exchange_algorithms = NULL;
+      }
 
-      if(flow->metadata.protos.ssh.key_exchange_method)
+      if(flow->metadata.protos.ssh.key_exchange_method) {
 	ndpi_free(flow->metadata.protos.ssh.key_exchange_method);
+	flow->metadata.protos.ssh.key_exchange_method = NULL;
+      }
 
-      if(flow->metadata.protos.ssh.client_hostkey_algorithms)
+      if(flow->metadata.protos.ssh.client_hostkey_algorithms) {
 	ndpi_free(flow->metadata.protos.ssh.client_hostkey_algorithms);
-      if(flow->metadata.protos.ssh.client_cipher_c2s)
+	flow->metadata.protos.ssh.client_hostkey_algorithms = NULL;
+      }
+      if(flow->metadata.protos.ssh.client_cipher_c2s) {
 	ndpi_free(flow->metadata.protos.ssh.client_cipher_c2s);
-      if(flow->metadata.protos.ssh.client_cipher_s2c)
+	flow->metadata.protos.ssh.client_cipher_c2s = NULL;
+      }
+      if(flow->metadata.protos.ssh.client_cipher_s2c) {
 	ndpi_free(flow->metadata.protos.ssh.client_cipher_s2c);
-      if(flow->metadata.protos.ssh.client_mac_c2s)
+	flow->metadata.protos.ssh.client_cipher_s2c = NULL;
+      }
+      if(flow->metadata.protos.ssh.client_mac_c2s) {
 	ndpi_free(flow->metadata.protos.ssh.client_mac_c2s);
-      if(flow->metadata.protos.ssh.client_mac_s2c)
+	flow->metadata.protos.ssh.client_mac_c2s = NULL;
+      }
+      if(flow->metadata.protos.ssh.client_mac_s2c) {
 	ndpi_free(flow->metadata.protos.ssh.client_mac_s2c);
+	flow->metadata.protos.ssh.client_mac_s2c = NULL;
+      }
 
-      if(flow->metadata.protos.ssh.negotiated_hostkey_alg)
+      if(flow->metadata.protos.ssh.negotiated_hostkey_alg) {
 	ndpi_free(flow->metadata.protos.ssh.negotiated_hostkey_alg);
-      if(flow->metadata.protos.ssh.negotiated_cipher_c2s)
+	flow->metadata.protos.ssh.negotiated_hostkey_alg = NULL;
+      }
+      if(flow->metadata.protos.ssh.negotiated_cipher_c2s) {
 	ndpi_free(flow->metadata.protos.ssh.negotiated_cipher_c2s);
-      if(flow->metadata.protos.ssh.negotiated_cipher_s2c)
+	flow->metadata.protos.ssh.negotiated_cipher_c2s = NULL;
+      }
+      if(flow->metadata.protos.ssh.negotiated_cipher_s2c) {
 	ndpi_free(flow->metadata.protos.ssh.negotiated_cipher_s2c);
-      if(flow->metadata.protos.ssh.negotiated_mac_c2s)
+	flow->metadata.protos.ssh.negotiated_cipher_s2c = NULL;
+      }
+      if(flow->metadata.protos.ssh.negotiated_mac_c2s) {
 	ndpi_free(flow->metadata.protos.ssh.negotiated_mac_c2s);
-      if(flow->metadata.protos.ssh.negotiated_mac_s2c)
+	flow->metadata.protos.ssh.negotiated_mac_c2s = NULL;
+      }
+      if(flow->metadata.protos.ssh.negotiated_mac_s2c) {
 	ndpi_free(flow->metadata.protos.ssh.negotiated_mac_s2c);
+	flow->metadata.protos.ssh.negotiated_mac_s2c = NULL;
+      }
     }
 
     if(flow_is_proto(flow, NDPI_PROTOCOL_SIP)) {
-      if(flow->metadata.protos.sip.from)
+      if(flow->metadata.protos.sip.from) {
         ndpi_free(flow->metadata.protos.sip.from);
-      if(flow->metadata.protos.sip.to)
+        flow->metadata.protos.sip.from = NULL;
+      }
+      if(flow->metadata.protos.sip.to) {
         ndpi_free(flow->metadata.protos.sip.to);
+        flow->metadata.protos.sip.to = NULL;
+      }
     }
 
     if (flow_is_proto(flow, NDPI_PROTOCOL_SSDP)) {
-      if(flow->metadata.protos.ssdp.bootid)
-      ndpi_free(flow->metadata.protos.ssdp.bootid);
+      if(flow->metadata.protos.ssdp.bootid) {
+        ndpi_free(flow->metadata.protos.ssdp.bootid);
+        flow->metadata.protos.ssdp.bootid = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.usn)
+      if(flow->metadata.protos.ssdp.usn) {
         ndpi_free(flow->metadata.protos.ssdp.usn);
+        flow->metadata.protos.ssdp.usn = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.cache_controle)
+      if(flow->metadata.protos.ssdp.cache_controle) {
         ndpi_free(flow->metadata.protos.ssdp.cache_controle);
+        flow->metadata.protos.ssdp.cache_controle = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.location)
+      if(flow->metadata.protos.ssdp.location) {
         ndpi_free(flow->metadata.protos.ssdp.location);
+        flow->metadata.protos.ssdp.location = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.securelocation_upnp)
+      if(flow->metadata.protos.ssdp.securelocation_upnp) {
         ndpi_free(flow->metadata.protos.ssdp.securelocation_upnp);
+        flow->metadata.protos.ssdp.securelocation_upnp = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.nt)
+      if(flow->metadata.protos.ssdp.nt) {
         ndpi_free(flow->metadata.protos.ssdp.nt);
+        flow->metadata.protos.ssdp.nt = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.nts)
+      if(flow->metadata.protos.ssdp.nts) {
         ndpi_free(flow->metadata.protos.ssdp.nts);
+        flow->metadata.protos.ssdp.nts = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.server)
+      if(flow->metadata.protos.ssdp.server) {
         ndpi_free(flow->metadata.protos.ssdp.server);
+        flow->metadata.protos.ssdp.server = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.method)
+      if(flow->metadata.protos.ssdp.method) {
         ndpi_free(flow->metadata.protos.ssdp.method);
+        flow->metadata.protos.ssdp.method = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.man)
+      if(flow->metadata.protos.ssdp.man) {
         ndpi_free(flow->metadata.protos.ssdp.man);
+        flow->metadata.protos.ssdp.man = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.mx)
+      if(flow->metadata.protos.ssdp.mx) {
         ndpi_free(flow->metadata.protos.ssdp.mx);
+        flow->metadata.protos.ssdp.mx = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.st)
+      if(flow->metadata.protos.ssdp.st) {
         ndpi_free(flow->metadata.protos.ssdp.st);
+        flow->metadata.protos.ssdp.st = NULL;
+      }
 
-      if(flow->metadata.protos.ssdp.user_agent)
+      if(flow->metadata.protos.ssdp.user_agent) {
         ndpi_free(flow->metadata.protos.ssdp.user_agent);
+        flow->metadata.protos.ssdp.user_agent = NULL;
+      }
     }
   }
 }
@@ -8140,8 +8214,24 @@ void ndpi_free_flow_core_data(struct ndpi_flow_core_struct *core) {
     if(core->num_risk_infos) {
       u_int i;
 
-      for(i=0; i<core->num_risk_infos; i++)
+      for(i=0; i<core->num_risk_infos; i++) {
 	ndpi_free(core->risk_infos[i].info);
+	core->risk_infos[i].info = NULL;
+      }
+
+      core->num_risk_infos = 0;
+    }
+
+    if(core->dcerpc_tcp_reasm) {
+      u_int i;
+
+      for(i = 0; i < 2; i++) {
+        if(core->dcerpc_tcp_reasm->dir[i].buf)
+          ndpi_free(core->dcerpc_tcp_reasm->dir[i].buf);
+      }
+
+      ndpi_free(core->dcerpc_tcp_reasm);
+      core->dcerpc_tcp_reasm = NULL;
     }
 
     if(core->dns_tcp_reasm) {
@@ -8156,8 +8246,38 @@ void ndpi_free_flow_core_data(struct ndpi_flow_core_struct *core) {
       core->dns_tcp_reasm = NULL;
     }
 
-    if(core->flow_payload != NULL)
+    if(core->flow_payload != NULL) {
       ndpi_free(core->flow_payload);
+      core->flow_payload = NULL;
+    }
+
+    if(core->host_server_name != NULL) {
+      ndpi_free(core->host_server_name);
+      core->host_server_name = NULL;
+    }
+
+    if(core->tls_quic.message[0].buffer) {
+      ndpi_free(core->tls_quic.message[0].buffer);
+      core->tls_quic.message[0].buffer = NULL;
+    }
+
+    if(core->tls_quic.message[1].buffer) {
+      ndpi_free(core->tls_quic.message[1].buffer);
+      core->tls_quic.message[1].buffer = NULL;
+    }
+
+    if(core->tls_quic.obfuscated_heur_state) {
+      ndpi_free(core->tls_quic.obfuscated_heur_state);
+      core->tls_quic.obfuscated_heur_state = NULL;
+    }
+
+    /* Plugin custom storage: freed here so it is released on every flow
+       teardown path (ndpi_free_flow_data()/ndpi_flow_free() included),
+       not just ndpi_free_flow() */
+    if(core->tls_quic.opaque) {
+      ndpi_free(core->tls_quic.opaque);
+      core->tls_quic.opaque = NULL;
+    }
   }
 }
 
@@ -8176,82 +8296,170 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
   if(flow) {
     ndpi_free_flow_core_data(&flow->core);
 
-    if(flow->metadata.l4.tcp.fingerprint)
-      ndpi_free(flow->metadata.l4.tcp.fingerprint);
+    if(flow->core.l4_proto == IPPROTO_TCP) {
+      if(flow->metadata.l4.tcp.fingerprint) {
+        ndpi_free(flow->metadata.l4.tcp.fingerprint);
+        flow->metadata.l4.tcp.fingerprint = NULL;
+      }
 
-    if((flow->core.l4_proto == IPPROTO_TCP) && flow->metadata.l4.tcp.tls.tls_blocks)
-      ndpi_free(flow->metadata.l4.tcp.tls.tls_blocks);
+      if(flow->metadata.l4.tcp.tls.tls_blocks) {
+        ndpi_free(flow->metadata.l4.tcp.tls.tls_blocks);
+        flow->metadata.l4.tcp.tls.tls_blocks = NULL;
+      }
 
-    if(flow->metadata.l4.tcp.fingerprint_raw)
-      ndpi_free(flow->metadata.l4.tcp.fingerprint_raw);
+      if(flow->metadata.l4.tcp.fingerprint_raw) {
+        ndpi_free(flow->metadata.l4.tcp.fingerprint_raw);
+        flow->metadata.l4.tcp.fingerprint_raw = NULL;
+      }
+    }
 
-    if(flow->metadata.ndpi.client_fingerprint)
+    if(flow->metadata.ndpi.client_fingerprint) {
       ndpi_free(flow->metadata.ndpi.client_fingerprint);
+      flow->metadata.ndpi.client_fingerprint = NULL;
+    }
 
-    if(flow->metadata.ndpi.server_fingerprint)
+    if(flow->metadata.ndpi.server_fingerprint) {
       ndpi_free(flow->metadata.ndpi.server_fingerprint);
+      flow->metadata.ndpi.server_fingerprint = NULL;
+    }
 
-    if(flow->metadata.http.url)
+    if(flow->metadata.http.url) {
       ndpi_free(flow->metadata.http.url);
+      flow->metadata.http.url = NULL;
+    }
 
-    if(flow->metadata.http.content_type)
+    if(flow->metadata.http.content_type) {
       ndpi_free(flow->metadata.http.content_type);
+      flow->metadata.http.content_type = NULL;
+    }
 
-    if(flow->metadata.http.request_content_type)
+    if(flow->metadata.http.request_content_type) {
       ndpi_free(flow->metadata.http.request_content_type);
+      flow->metadata.http.request_content_type = NULL;
+    }
 
-    if(flow->metadata.http.referer)
+    if(flow->metadata.http.referer) {
       ndpi_free(flow->metadata.http.referer);
+      flow->metadata.http.referer = NULL;
+    }
 
-    if(flow->metadata.http.host)
+    if(flow->metadata.http.host) {
       ndpi_free(flow->metadata.http.host);
+      flow->metadata.http.host = NULL;
+    }
 
-    if(flow->metadata.http.user_agent)
+    if(flow->metadata.http.user_agent) {
       ndpi_free(flow->metadata.http.user_agent);
+      flow->metadata.http.user_agent = NULL;
+    }
 
-    if(flow->metadata.http.nat_ip)
+    if(flow->metadata.http.nat_ip) {
       ndpi_free(flow->metadata.http.nat_ip);
+      flow->metadata.http.nat_ip = NULL;
+    }
 
-    if(flow->metadata.http.detected_os)
+    if(flow->metadata.http.detected_os) {
       ndpi_free(flow->metadata.http.detected_os);
+      flow->metadata.http.detected_os = NULL;
+    }
 
-    if(flow->metadata.http.server)
+    if(flow->metadata.http.server) {
       ndpi_free(flow->metadata.http.server);
+      flow->metadata.http.server = NULL;
+    }
 
-    if(flow->metadata.http.filename)
+    if(flow->metadata.http.filename) {
       ndpi_free(flow->metadata.http.filename);
+      flow->metadata.http.filename = NULL;
+    }
 
-    if(flow->metadata.http.username)
+    if(flow->metadata.http.username) {
       ndpi_free(flow->metadata.http.username);
+      flow->metadata.http.username = NULL;
+    }
 
-    if(flow->metadata.http.password)
+    if(flow->metadata.http.password) {
       ndpi_free(flow->metadata.http.password);
+      flow->metadata.http.password = NULL;
+    }
 
-    if(flow->metadata.kerberos_buf.pktbuf)
+    if(flow->metadata.kerberos_buf.pktbuf) {
       ndpi_free(flow->metadata.kerberos_buf.pktbuf);
+      flow->metadata.kerberos_buf.pktbuf = NULL;
+    }
 
-    if(flow->metadata.monit)
+    if(flow->metadata.monit) {
       ndpi_free(flow->metadata.monit);
+      flow->metadata.monit = NULL;
+    }
+
+    if(flow->core.l4_proto == IPPROTO_UDP) {
+      if(flow->metadata.l4.udp.quic_reasm_buf) {
+        ndpi_free(flow->metadata.l4.udp.quic_reasm_buf);
+        flow->metadata.l4.udp.quic_reasm_buf = NULL;
+      }
+
+      if(flow->metadata.l4.udp.quic_reasm_buf_bitmap) {
+        ndpi_free(flow->metadata.l4.udp.quic_reasm_buf_bitmap);
+        flow->metadata.l4.udp.quic_reasm_buf_bitmap = NULL;
+      }
+    }
 
     ndpi_free_flow_data_protos(flow);
 
-    if(flow->core.tls_quic.message[0].buffer)
-      ndpi_free(flow->core.tls_quic.message[0].buffer);
-    if(flow->core.tls_quic.message[1].buffer)
-      ndpi_free(flow->core.tls_quic.message[1].buffer);
-
-    if(flow->core.l4_proto == IPPROTO_UDP) {
-      if(flow->metadata.l4.udp.quic_reasm_buf)
-        ndpi_free(flow->metadata.l4.udp.quic_reasm_buf);
-      if(flow->metadata.l4.udp.quic_reasm_buf_bitmap)
-        ndpi_free(flow->metadata.l4.udp.quic_reasm_buf_bitmap);
+    /* Plugin custom data: freed here so it is released on every flow
+       teardown path (ndpi_flow_free() included), not just ndpi_free_flow() */
+    if((flow->metadata.custom.plugin != NULL)
+       && (flow->metadata.custom.plugin->freeFlowFctn != NULL)
+       && (flow->metadata.custom.plugin_data != NULL)
+       ) {
+      flow->metadata.custom.plugin->freeFlowFctn(flow->metadata.custom.plugin_data);
+      flow->metadata.custom.plugin_data = NULL;
     }
+  }
+}
 
-    if(flow->core.tls_quic.obfuscated_heur_state)
-      ndpi_free(flow->core.tls_quic.obfuscated_heur_state);
+/* ************************************************ */
 
-    if(flow->core.host_server_name)
-      ndpi_free(flow->core.host_server_name);
+/*
+  NDPI_NATIVE_TCP_FINGERPRINT: number of option value octets to be
+  added to the fingerprint for the option starting at opt[0]
+  (see README.tcp_fingerprint.md).
+
+  Return code:
+  -1   Ephemeral option: skip it (kind included)
+  0    Add the option kind only
+  >0   Add (up to) the specified number of value octets
+*/
+static int ndpi_tcp_fp_option_value_len(const u_int8_t *opt, u_int16_t avail) {
+  switch(opt[0]) {
+  case 2:  /* MSS: path dependent (MSS clamping, IPv4 vs IPv6) */
+  case 8:  /* Timestamps: per-connection clock */
+  case 19: /* TCP MD5 signature: per-segment digest */
+  case 29: /* TCP-AO: per-segment MAC */
+    return(0);
+
+  case 30: /* MPTCP: keep subtype/version (+ MP_CAPABLE flags), skip keys/tokens/nonces */
+    if(avail > 2)
+      return(((opt[2] >> 4) == 0 /* MP_CAPABLE */) ? 2 : 1);
+    else
+      return(0);
+
+  case 34: /* TCP Fast Open cookie: per-server, presence depends on cookie cache */
+    return(-1);
+
+  case 253:
+  case 254: /* RFC 6994 experimental options: keep the ExID only */
+    if(avail > 3) {
+      if((opt[2] == 0xF9) && (opt[3] == 0x89)) /* Experimental TCP Fast Open */
+	return(-1);
+      else
+	return(2);
+    } else
+      return(0);
+
+  default:
+    return(255);
   }
 }
 
@@ -8337,11 +8545,14 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
          && metadata->l4.tcp.fingerprint == NULL) {
 	u_int8_t *t = (u_int8_t*)packet->tcp;
 	u_int16_t flags = ntohs(*((u_int16_t*)&t[12])) & 0xFFF;
-	u_int16_t syn_mask = TH_SYN | TH_ECE | TH_CWR;
+	ndpi_tcp_fingerprint_format fp_format = ndpi_str->cfg.tcp_fingerprint_format;
 
-	if((flags & syn_mask) && ((flags & TH_ACK) == 0)) {
+	if((flags & TH_SYN) && ((flags & TH_ACK) == 0)) {
 	  char fingerprint[128], options_fp[128];
-	  u_int8_t i, fp_idx = 0, options_fp_len = 0;
+	  u_int16_t i; /* u_int16_t: i += len must not wrap (options_len <= 40, len <= 255) */
+	  u_int8_t fp_idx = 0, options_fp_len = 0;
+	  int nop_start = -1; /* Offset in options_fp of the current NOP run */
+	  u_int8_t skip_nops = 0; /* Skip the NOP padding of an ephemeral option */
 
 	  if(tcp_header_len >= sizeof(struct ndpi_tcphdr)) {
 	    u_int8_t *options = (u_int8_t*)(&t[sizeof(struct ndpi_tcphdr)]);
@@ -8363,7 +8574,7 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	    else if(ip_ttl <= 192) ip_ttl = 192;
 	    else ip_ttl = 255;
 
-	    switch(ndpi_str->cfg.tcp_fingerprint_format) {
+	    switch(fp_format) {
 	    case NDPI_NATIVE_TCP_FINGERPRINT:
 	      fp_idx = snprintf(fingerprint, sizeof(fingerprint), "%u_%u_%u_", flags, ip_ttl, tcp_win);
 	      break;
@@ -8396,19 +8607,46 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 #endif
 	      for(i=0; i<options_len; /* don't increase here */) {
 		u_int8_t kind = options[i];
+		int value_len = 0; /* Native format only: see ndpi_tcp_fp_option_value_len() */
 
 #ifdef DEBUG_TCP_OPTIONS
 		printf("Option kind: %u\n", kind);
 #endif
 
-		if(ndpi_str->cfg.tcp_fingerprint_format == NDPI_NATIVE_TCP_FINGERPRINT) {
-		  rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", kind);
+		if(fp_format == NDPI_NATIVE_TCP_FINGERPRINT) {
+		  if(kind == 1 /* NOP */) {
+		    if(skip_nops) {
+		      i++; /* Padding that follows an ephemeral option */
+		      continue;
+		    }
 
-		  if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp)))
-		    break;
+		    if(nop_start < 0)
+		      nop_start = options_fp_len;
+		  } else {
+		    if(kind > 1 /* Not EOL */)
+		      value_len = ndpi_tcp_fp_option_value_len(&options[i], options_len - i);
 
-		  options_fp_len += rc;
-		} else if(ndpi_str->cfg.tcp_fingerprint_format == NDPI_MUONFP_TCP_FINGERPRINT) {
+		    if(value_len < 0) {
+		      /* Ephemeral option: drop also the NOP padding that precedes it */
+		      if(nop_start >= 0)
+			options_fp_len = nop_start, options_fp[options_fp_len] = '\0';
+
+		      skip_nops = 1;
+		    } else
+		      skip_nops = 0;
+
+		    nop_start = -1;
+		  }
+
+		  if(value_len >= 0) {
+		    rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", kind);
+
+		    if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp)))
+		      break;
+
+		    options_fp_len += rc;
+		  }
+		} else if(fp_format == NDPI_MUONFP_TCP_FINGERPRINT) {
 		  if(fp_idx >= sizeof(fingerprint))
 		    break;
 
@@ -8421,6 +8659,9 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		}
 
 		if(kind == 0) /* EOL */ {
+		  if(fp_format == NDPI_NATIVE_TCP_FINGERPRINT)
+		    break; /* What follows is padding (RFC 9293) */
+
 		  i++;
 		  continue;
 		} else if(kind == 1) /* NOP */
@@ -8433,18 +8674,8 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 #endif
 
 		  if(len == 0)
-		    continue;
-		  else if(kind == 8) {
-		    switch(ndpi_str->cfg.tcp_fingerprint_format) {
-		    case NDPI_NATIVE_TCP_FINGERPRINT:
-		      /* Timestamp: ignore it */
-		      break;
-
-		    case NDPI_MUONFP_TCP_FINGERPRINT:
-		      /* Nothing to do */
-		      break;
-		    }
-		  } else if(len > 2) {
+		    break; /* Malformed option */
+		  else if(len > 2) {
 		    int j = i+2;
 		    u_int8_t opt_len = len - 2;
 
@@ -8467,13 +8698,15 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 			tcp_wscale = val;
 		    }
 
-		    if(ndpi_str->cfg.tcp_fingerprint_format == NDPI_NATIVE_TCP_FINGERPRINT) {
-		      while((opt_len > 0) && (j < options_len)) {
+		    if(fp_format == NDPI_NATIVE_TCP_FINGERPRINT) {
+		      u_int8_t fp_value_len = (value_len <= 0) ? 0 : ((value_len < opt_len) ? value_len : opt_len);
+
+		      while((fp_value_len > 0) && (j < options_len)) {
 			rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", options[j]);
 			if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp))) break;
 
 			options_fp_len += rc;
-			j++, opt_len--;
+			j++, fp_value_len--;
 		      }
 		    }
 		  }
@@ -8504,7 +8737,7 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	    printf("Raw Options Fingerprint: %s\n", options_fp);
 #endif
 
-	    switch(ndpi_str->cfg.tcp_fingerprint_format) {
+	    switch(fp_format) {
 	    case NDPI_NATIVE_TCP_FINGERPRINT:
 	      ndpi_sha256((const u_char*)options_fp, options_fp_len, sha_hash);
 
@@ -12513,17 +12746,10 @@ int ndpi_match_trigram(const char *str) {
 
 void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
+    /* Plugin custom data and tls_quic.opaque are released by
+       ndpi_free_flow_data()/ndpi_free_flow_core_data() */
     ndpi_free_flow_data(flow);
 
-    if((flow->metadata.custom.plugin != NULL)
-       && (flow->metadata.custom.plugin->freeFlowFctn != NULL)
-       && (flow->metadata.custom.plugin_data != NULL)
-       )
-      flow->metadata.custom.plugin->freeFlowFctn(flow->metadata.custom.plugin_data);
-
-    /* Custom storage */
-    if(flow->core.tls_quic.opaque) ndpi_free(flow->core.tls_quic.opaque);
-    
     ndpi_free(flow);
   }
 }

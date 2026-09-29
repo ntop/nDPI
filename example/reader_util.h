@@ -314,7 +314,7 @@ typedef struct ndpi_flow_info {
       client_hassh[33], server_hassh[33], *server_names,
       *advertised_alpns, *negotiated_alpn, *tls_supported_versions,
       *tls_issuerDN, *tls_subjectDN,
-      ja3_server[33], ja4_client[37], ja5_client[37], *ja4_client_raw,
+      ja3_server[33], ja4_client[37], ja5_client[50], *ja4_client_raw,
       sha1_cert_fingerprint[20], ssh_key_exchange_method[24];
     u_int8_t sha1_cert_fingerprint_set;
     struct tls_heuristics browser_heuristics;
