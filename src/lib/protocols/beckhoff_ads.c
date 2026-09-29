@@ -77,6 +77,9 @@ static void ndpi_search_beckhoff_ads(struct ndpi_detection_module_struct *ndpi_s
 
   if (packet->payload_packet_len >= 38) {
     struct ams_tcp_hdr const * const ams_tcp = (struct ams_tcp_hdr *)packet->payload;
+    if (packet->payload_packet_len < sizeof(struct ams_tcp_hdr)) {
+      goto not_beckhoff_ads;
+    }
     u_int16_t ams_message_length = packet->payload_packet_len - sizeof(struct ams_tcp_hdr);
 
     if ((ams_tcp->reserved != 0) ||
@@ -85,6 +88,9 @@ static void ndpi_search_beckhoff_ads(struct ndpi_detection_module_struct *ndpi_s
       goto not_beckhoff_ads;
     }
 
+    if (ams_message_length < sizeof(struct ams_hdr)) {
+      goto not_beckhoff_ads;
+    }
     struct ams_hdr const * const ams = (struct ams_hdr *)&packet->payload[6];
     u_int16_t ams_data_len = ams_message_length - sizeof(struct ams_hdr);
 
