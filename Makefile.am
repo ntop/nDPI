@@ -17,6 +17,7 @@ pkgconfig_DATA = libndpi.pc
 
 EXTRA_DIST = README.md README.cve.md README.ja5.md README.fuzzer.md README.license.md CHANGELOG.md CONTRIBUTING.md \
 	autogen.sh wireshark windows utils packages dga \
+		fingerprint/README.ja5.md fingerprint/README.ndpi_tcp_fingerprint.md \
 	influxdb/Makefile.in influxdb/metric_anomaly.c influxdb/README.txt \
 	rrdtool/Makefile.in rrdtool/README.txt rrdtool/rrd_anomaly.c rrdtool/rrd_similarity.c \
 	doc/requirements.txt doc/conf.py doc/flow_risks.rst doc/protocols.rst doc/guide/nDPI_QuickStartGuide.pages \
