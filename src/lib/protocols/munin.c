@@ -68,6 +68,10 @@ static void ndpi_search_munin(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
+  if (packet->payload_packet_len <= NDPI_STATICSTRING_LEN(munin_prefix)) {
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALFORMED_PACKET, "Packet too short for Munin");
+    return;
+  }
   size_t host_len = packet->payload_packet_len - NDPI_STATICSTRING_LEN(munin_prefix) - 1;
   if (host_len > 0)
   {

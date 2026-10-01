@@ -48,7 +48,7 @@ static void ndpi_search_c1222(struct ndpi_detection_module_struct *ndpi_struct,
   NDPI_LOG_DBG(ndpi_struct, "search ANSI C12.22\n");
 
   if ((packet->payload_packet_len < 50) || (packet->payload[0] != 0x60) ||
-      ((u_int8_t)(packet->payload_packet_len-2) != packet->payload[1]))
+      (packet->payload_packet_len != (u_int16_t)packet->payload[1] + 2))
   {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;

@@ -261,7 +261,10 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
                                     struct ndpi_flow_struct *flow,
 				    struct ndpi_packet_struct *packet,
 				    char *buf, u_int8_t client_hash) {
-  u_int32_t offset = 22, len, buf_out_len = 0, max_payload_len = packet->payload_packet_len-sizeof(u_int32_t);
+  u_int32_t offset = 22, len, buf_out_len = 0;
+  if (packet->payload_packet_len < 4)
+    goto invalid_payload;
+  u_int32_t max_payload_len = packet->payload_packet_len - sizeof(u_int32_t);
   const u_int32_t len_max = 65565;
     
   if(offset >= max_payload_len)
