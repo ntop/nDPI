@@ -2901,9 +2901,12 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		     group_id, key_extn_len);
 #endif
 
-	      if(group_id != 0x2A2A /* Skip GREASE */) {
+	      if(group_id != 0x2A2A /* Skip GREASE */ &&
+		 (u_int32_t)extn_offset + 4 + key_extn_len <= extn_end) {
 		if(ja.server.num_key_share_groups < MAX_NUM_JA)
 		  ja.server.key_share_group[ja.server.num_key_share_groups++] = group_id;
+		flow->core.tls_quic.tls_key_exchange_group = group_id;
+		flow->core.tls_quic.tls_key_exchange_group_seen = 1;
 	      }
 
 	      extn_offset += key_extn_len + 4;
@@ -2922,6 +2925,18 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
          (i.e. (D)TLS <= 1.2), use the version field present in the record layer */
       if(flow->metadata.protos.tls_quic.ssl_version == 0)
         flow->metadata.protos.tls_quic.ssl_version = tls_version;
+
+      /* The ServerHello key_share is the negotiated group. A ClientHello
+       * advertisement or a two-byte HRR key_share is not sufficient. */
+      if(!is_dtls && flow->metadata.protos.tls_quic.ssl_version >= 0x0304 &&
+	 flow->core.tls_quic.tls_key_exchange_group_seen &&
+	 !ndpi_tls_key_share_group_is_pq(flow->core.tls_quic.tls_key_exchange_group)) {
+	char risk_info[64];
+	snprintf(risk_info, sizeof(risk_info),
+	         "TLS 1.3 negotiated non-PQ group 0x%04X",
+	         flow->core.tls_quic.tls_key_exchange_group);
+	ndpi_set_risk(ndpi_struct, &flow->core, NDPI_NON_PQC, risk_info);
+      }
 
       if(ndpi_struct->cfg.ndpi_server_fingerprint_enabled
 	 && (flow->metadata.ndpi.server_fingerprint == NULL))

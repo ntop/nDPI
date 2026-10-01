@@ -6014,8 +6014,10 @@ static const key_share_group_info key_share_groups[] = {
 
   // ========== ML-KEM (FIPS 203, formerly Kyber) Hybrid Groups ==========
   // IANA: https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-18
-  {0x11EC, "X25519MLKEM768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x11ED, "P256MLKEM768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
+  // RFC 10024: Post-Quantum Traditional (PQ/T) Hybrid Key Agreement
+  {0x11EB, "SecP256r1MLKEM768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0},
+  {0x11EC, "X25519MLKEM768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0},
+  {0x11ED, "SecP384r1MLKEM1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "RFC 10024", 0},
   {0x11EE, "X25519MLKEM1024", "PQ_HYBRID", 32+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
   {0x11EF, "P256MLKEM1024", "PQ_HYBRID", 65+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
   {0x11F0, "X448MLKEM768", "PQ_HYBRID", 56+1184, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10},
@@ -6143,6 +6145,19 @@ const char* ndpi_tls_key_share_group2str(u_int16_t group_id, char unknown_group[
 
   ndpi_snprintf(unknown_group, 8, "0X%04X", group_id);
   return(unknown_group);
+}
+
+/* ****************************************** */
+
+int ndpi_tls_key_share_group_is_pq(u_int16_t group_id) {
+  u_int16_t i;
+
+  for(i = 0; key_share_groups[i].name != NULL; i++) {
+    if(key_share_groups[i].id == group_id)
+      return(strcmp(key_share_groups[i].rfc, "RFC 10024") == 0);
+  }
+
+  return(0);
 }
 
 /* ****************************************** */

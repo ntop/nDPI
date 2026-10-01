@@ -1670,7 +1670,9 @@ struct ndpi_flow_struct_dns_metadata {
 
 struct ndpi_flow_tls_quic_core_struct {
   message_t message[2]; /* Directions */
-  u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
+  u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1,
+    tls_key_exchange_group_seen:1, pad:1;
+  u_int16_t tls_key_exchange_group;
   struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
   char *opaque; /* Plugin custom storage. If not NULL will be deleted automatically by ndpi_free_flow() */
 };
