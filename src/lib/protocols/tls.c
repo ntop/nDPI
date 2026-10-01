@@ -2888,8 +2888,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		   (packet->payload[extn_offset] & 0xFF),
 		   (packet->payload[extn_offset+1] & 0xFF));
 #endif
-
-	    while(extn_offset + 4 < extn_end) {
+	    /* RFC 8446 Section 4.2.8: a ServerHello carries one complete
+	     * KeyShareEntry, while a HelloRetryRequest carries only a two-byte
+	     * selected_group. Do not treat the HRR form as negotiated. */
+	    if(extension_len >= 5) {
 	      u_int16_t group_id     = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
 	      u_int16_t key_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset + 2])));
 
@@ -2901,15 +2903,13 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		     group_id, key_extn_len);
 #endif
 
-	      if(group_id != 0x2A2A /* Skip GREASE */ &&
-		 (u_int32_t)extn_offset + 4 + key_extn_len <= extn_end) {
+	      if(group_id != 0x2A2A /* Skip GREASE */ && key_extn_len > 0 &&
+		 (u_int32_t)extn_offset + 4 + key_extn_len == extn_end) {
 		if(ja.server.num_key_share_groups < MAX_NUM_JA)
 		  ja.server.key_share_group[ja.server.num_key_share_groups++] = group_id;
 		flow->core.tls_quic.tls_key_exchange_group = group_id;
 		flow->core.tls_quic.tls_key_exchange_group_seen = 1;
 	      }
-
-	      extn_offset += key_extn_len + 4;
 	    }
 	  }
 
