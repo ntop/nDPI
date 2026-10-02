@@ -45,12 +45,13 @@ static void ndpi_search_dhcpv6_udp(struct ndpi_detection_module_struct *ndpi_str
   /*
    * DHCPv6 (RFC 3315) uses UDP port 546 (client) and 547 (server).
    * A valid message is at least 4 bytes: 1 byte message-type + 3 bytes
-   * transaction-id.  Message types 1-13 are defined by the standard.
+   * transaction-id.  Message types 1-37 are defined by:
+   * https://www.iana.org/assignments/dhcpv6-parameters
    */
   if(packet->payload_packet_len >= 4 &&
      (packet->udp->source == htons(546) || packet->udp->source == htons(547)) &&
      (packet->udp->dest   == htons(546) || packet->udp->dest   == htons(547)) &&
-     packet->payload[0] >= 1 && packet->payload[0] <= 13) {
+     packet->payload[0] >= 1 && packet->payload[0] <= 37) {
 
     NDPI_LOG_INFO(ndpi_struct, "found DHCPv6\n");
     ndpi_int_dhcpv6_add_connection(ndpi_struct, flow);
