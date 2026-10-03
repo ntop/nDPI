@@ -638,6 +638,15 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
   }
 
   if(flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
+     ((flow->metadata.http.url && strstr(flow->metadata.http.url, "/wsman")) ||
+      (flow->metadata.http.user_agent &&
+       (strstr(flow->metadata.http.user_agent, "Microsoft WinRM Client") ||
+        strstr(flow->metadata.http.user_agent, "Python PSRP Client"))))) {
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_POWERSHELL, master_protocol, NDPI_CONFIDENCE_DPI);
+    update_category_and_breed(ndpi_struct, flow);
+  }
+
+  if(flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
      flow->metadata.http.url != NULL &&
      strstr(flow->metadata.http.url, "micloud.xiaomi.net") != NULL) {
     ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_XIAOMI, master_protocol, NDPI_CONFIDENCE_DPI);

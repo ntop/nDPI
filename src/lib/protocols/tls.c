@@ -1685,6 +1685,23 @@ int ndpi_search_tls_tcp_internal(struct ndpi_detection_module_struct *ndpi_struc
       flow->core.extra_packets_func = NULL;
 
       return(0); /* That's all */
+    /* PowerShell? */
+    } else if(ndpi_struct->cfg.powershell_aggressiveness && /* Feature enabled */
+              (!something_went_wrong &&
+               flow->core.tls_quic.certificate_processed == 1 &&
+               flow->metadata.protos.tls_quic.client_hello_processed == 1 &&
+               flow->metadata.protos.tls_quic.server_hello_processed == 1) && /* TLS handshake found without errors */
+              flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_TLS && /* No IMAPS/FTPS/... */
+              flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN && /* No sub-classification */
+              ntohs(flow->core.s_port) == 5986 &&
+              flow->metadata.protos.tls_quic.advertised_alpns == NULL /* No ALPN on CH */ &&
+              !is_flow_addr_informative(flow) /* The server is likely on local networks */ ) {
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_POWERSHELL, NDPI_PROTOCOL_TLS, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
+
+      tls_match_ja4(ndpi_struct, flow);
+      flow->core.extra_packets_func = NULL;
+
+      return(0); /* That's all */
     /* Loook for TLS-in-TLS */
     } else if((ndpi_struct->cfg.tls_heuristics & NDPI_HEURISTICS_TLS_OBFUSCATED_TLS) && /* Feature enabled */
               (!something_went_wrong &&
