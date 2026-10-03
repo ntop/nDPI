@@ -1259,7 +1259,7 @@ bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_
   /* DNS on nonstandard ports is opt-in to avoid false positives. */
   if(s_port == DNS_PORT   || d_port == DNS_PORT  ||
      s_port == MDNS_PORT  || d_port == MDNS_PORT ||
-     d_port == LLMNR_PORT ||
+     s_port == LLMNR_PORT || d_port == LLMNR_PORT ||
      (ndpi_struct->cfg.dns_custom_port > 0 &&
       (s_port == (u_int16_t)ndpi_struct->cfg.dns_custom_port ||
        d_port == (u_int16_t)ndpi_struct->cfg.dns_custom_port))) {
