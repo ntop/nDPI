@@ -1361,7 +1361,7 @@ int ndpi_serialize_uint32_binary(ndpi_serializer *_serializer,
   int rc;
 
   if(serializer->fmt == ndpi_serialization_format_json)
-    needed += 24 + slen*2 /* account escape (x2) */;
+    needed += 24 + slen*6 /* worst-case \u00XX escape */;
 
   if(buff_diff < needed) {
     if(ndpi_extend_serializer_buffer(&serializer->buffer, needed - buff_diff) < 0)
@@ -2089,7 +2089,8 @@ static int ndpi_serialize_binary_raw(ndpi_serializer *_serializer,
     vlen;
 
   if(serializer->fmt == ndpi_serialization_format_json)
-    needed += 16 + klen + vlen;
+    /* Worst-case JSON escaping emits 6 bytes (\u00XX) per input byte. */
+    needed += 16 + klen * 6 + vlen * 6;
 
   if(buff_diff < needed) {
     if(ndpi_extend_serializer_buffer(&serializer->buffer, needed - buff_diff) < 0)
