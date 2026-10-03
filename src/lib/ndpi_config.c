@@ -185,6 +185,8 @@ const struct cfg_param cfg_params[] = {
 
   { "ookla",         "dpi.aggressiveness",                      "0x01", "0", "1", CFG_PARAM_INT, __OFF(ookla_aggressiveness), NULL },
 
+  { "powershell",    "dpi.aggressiveness",                      "0x01", "0", "1", CFG_PARAM_INT, __OFF(powershell_aggressiveness), NULL },
+
   { "zoom",          "max_packets_extra_dissection",            "4", "0", "255", CFG_PARAM_INT, __OFF(zoom_max_packets_extra_dissection), NULL },
 
   { "rtp",           "search_for_stun",                         "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(rtp_search_for_stun), NULL },
