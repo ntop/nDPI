@@ -1,0 +1,40 @@
+DPI Packets (UDP):	10	(2.00 pkts/flow)
+Confidence DPI              : 5 (flows)
+Num dissector calls: 5 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          20/0 (search/found)
+Automa domain:        10/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     5/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   10/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   10/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 85/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+DNS	10	3180	5
+
+Acceptable                      10 3180          5            
+
+Network                         10 3180          5            
+
+	1	UDP 192.168.2.178:36110 <-> 192.168.2.178:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/324 bytes <-> 1 pkts/340 bytes][Goodput ratio: 87/87][0.00 sec][Hostname/SNI: q4g9vt5jzao09-.nm1rdqxp0i9aainenvji19peszmqjvxm0cr9dh4djls8fgf__bsgp05nc-.a.sql][0.0.0.0][DNS Id: 0x2697][Risk: ** Susp DNS Traffic **** Susp Entropy **** Non-Printable/Invalid Chars Detected **** Minor Issues **][Risk Score: 170][Risk Info: DNS Record with zero TTL;Invalid chars detected in domain name;Entropy: 6.004 (Executable?);Long DNS host name][PLAIN TEXT (ggnrAldSaQvYgreArbQ)][Plen Bins: 0,0,0,0,0,0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 192.168.2.178:37780 <-> 192.168.2.178:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/324 bytes <-> 1 pkts/340 bytes][Goodput ratio: 87/87][0.00 sec][Hostname/SNI: 0_mlggibxgwsg-.y7ubu6xz_7mudk9ejlkur8pktrhjbw4k5ufioxkzompceyiz9hpe5ijqe-.a.sql][0.0.0.0][DNS Id: 0x6c43][Risk: ** Susp DNS Traffic **** Susp Entropy **** Non-Printable/Invalid Chars Detected **** Minor Issues **][Risk Score: 170][Risk Info: DNS Record with zero TTL;Invalid chars detected in domain name;Entropy: 5.926 (Executable?);Long DNS host name][PLAIN TEXT (xwWMAA2)][Plen Bins: 0,0,0,0,0,0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 192.168.2.178:58205 <-> 192.168.2.178:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/324 bytes <-> 1 pkts/340 bytes][Goodput ratio: 87/87][< 1 sec][Hostname/SNI: d3yw_368gnk8n-.nvn8xsbus5es559ritxf47qm_bnpjojpfmin_l0lh_sxcj1_3r2sijdz0-.a.sql][0.0.0.0][DNS Id: 0xabe9][Risk: ** Susp DNS Traffic **** Susp Entropy **** Non-Printable/Invalid Chars Detected **** Minor Issues **][Risk Score: 170][Risk Info: DNS Record with zero TTL;Invalid chars detected in domain name;Entropy: 6.082 (Executable?);Long DNS host name][PLAIN TEXT (PUBFxQ)][Plen Bins: 0,0,0,0,0,0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 192.168.2.178:60876 <-> 192.168.2.178:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/324 bytes <-> 1 pkts/340 bytes][Goodput ratio: 87/87][< 1 sec][Hostname/SNI: 2_alox_trmv4w-.u_1hipcbmurbufbxzitzvos22ueo589bn4xtaoihmi53fkzlfapiezjqm-.a.sql][0.0.0.0][DNS Id: 0xe7f4][Risk: ** Susp DNS Traffic **** Susp Entropy **** Non-Printable/Invalid Chars Detected **** Minor Issues **][Risk Score: 170][Risk Info: DNS Record with zero TTL;Invalid chars detected in domain name;Entropy: 6.079 (Executable?);Long DNS host name][PLAIN TEXT (fShsevC)][Plen Bins: 0,0,0,0,0,0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 192.168.2.178:35439 <-> 192.168.2.178:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/254 bytes <-> 1 pkts/270 bytes][Goodput ratio: 83/84][< 1 sec][Hostname/SNI: ydwga307ewtkdwtpni1m_o4h-.gbh9ppm_vj9ekjcyk3hz_aj8ukdmi3e_cfzvjqwcigaaa_-.a.sql][0.0.0.0][DNS Id: 0xc455][Risk: ** Susp DNS Traffic **** Susp Entropy **** Non-Printable/Invalid Chars Detected **** Minor Issues **][Risk Score: 170][Risk Info: DNS Record with zero TTL;Invalid chars detected in domain name;Entropy: 5.940 (Executable?);Long DNS host name][PLAIN TEXT (50zDMAYaJ)][Plen Bins: 0,0,0,0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
