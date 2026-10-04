@@ -1732,7 +1732,8 @@ struct ndpi_flow_core_struct {
   u_int8_t ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, tree_risk_checked:1, _notused:5;
   ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
   ndpi_risk risk, risk_shadow; /* Issues found with this flow [bitmask of ndpi_risk] */
-  struct ndpi_risk_information risk_infos[MAX_NUM_RISK_INFOS]; /* String that contains information about the risks found */
+  /* Allocated only when a flow-risk information string is recorded. */
+  struct ndpi_risk_information *risk_infos;
   u_int8_t num_risk_infos;
   struct ndpi_dissector_bitmask excluded_dissectors_bitmask;
 
@@ -1798,7 +1799,11 @@ struct ndpi_flow_metadata_struct {
     struct ndpi_flow_udp_struct udp;
   } l4;
 
-  /* Keep the frequently used aligned members together to avoid padding. */
+  /*
+   * Keep common scalar metadata before protocol-specific blocks. This
+   * ordering reduces alignment and tail padding on the supported ABIs; the
+   * layout is measured by tests/performance/flow_layout.c.
+   */
   u_int8_t flow_multimedia_types;
   /* Some protocols calculate the entropy. */
   float entropy;

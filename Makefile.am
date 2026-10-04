@@ -44,7 +44,6 @@ EXTRA_DIST = README.md README.cve.md README.ja5.md README.fuzzer.md README.licen
 		lists/protocols/README.md \
 	sonar-project.properties .github .ci-ignore \
 	src/lib/plugins/README.md \
-	fingerprint/README.ja5.md fingerprint/README.ndpi_tcp_fingerprint.md \
 	example/README.md
 
 doc:
