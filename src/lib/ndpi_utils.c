@@ -6125,7 +6125,7 @@ static const key_share_group_info key_share_groups[] = {
   {0x001C, "brainpoolP512r1", "ECDHE", 133, 64, 0, 0, "256-bit", "RFC 7027", 0, 0},
 
   // Terminator
-  {0x0000, NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0}
+  {0x0000, NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0}
 };
 
 /* ****************************************** */
