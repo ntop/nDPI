@@ -2191,6 +2191,8 @@ static void riskUtilsUnitTest(void) {
     assert(s != NULL && strlen(s) > 0);
   }
 
+  assert(ndpi_code2risk(ndpi_risk2code(NDPI_NON_PQC_FLOW)) == NDPI_NON_PQC_FLOW);
+
   /* ndpi_risk2score: verify specific risk has non-zero total score */
   risk_bits = 0;
   NDPI_SET_BIT(risk_bits, NDPI_TLS_SELFSIGNED_CERTIFICATE);

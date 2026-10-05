@@ -196,6 +196,7 @@ typedef enum {
   NDPI_SLOW_DOS,
   NDPI_NON_PQC,                /* Set in case an encryped traffic stream does not comply with post-quantum encryotion */
   NDPI_AI_INFERENCE_TRAFFIC,
+  NDPI_NON_PQC_FLOW,            /* TLS/QUIC flow negotiated a non-post-quantum key-exchange group */
 
   /* Before allocating a new risk here, check if there are FREE entries above */
 
@@ -1670,9 +1671,7 @@ struct ndpi_flow_struct_dns_metadata {
 
 struct ndpi_flow_tls_quic_core_struct {
   message_t message[2]; /* Directions */
-  u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1,
-    tls_key_exchange_group_seen:1, pad:1;
-  u_int16_t tls_key_exchange_group;
+  u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
   struct tls_obfuscated_heuristic_state *obfuscated_heur_state;
   char *opaque; /* Plugin custom storage. If not NULL will be deleted automatically by ndpi_free_flow() */
 };

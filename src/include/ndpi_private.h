@@ -662,6 +662,7 @@ struct ndpi_detection_module_struct {
 
 int is_proto_enabled(struct ndpi_detection_module_struct *ndpi_str, int protoId);
 int is_flowrisk_enabled(struct ndpi_detection_module_struct *ndpi_str, ndpi_risk_enum flowrisk_id);
+int ndpi_tls_key_share_group_is_pq(u_int16_t group_id);
 
 void ndpi_register_dissector(char *dissector_name, struct ndpi_detection_module_struct *ndpi_str,
 			     void (*func)(struct ndpi_detection_module_struct *,

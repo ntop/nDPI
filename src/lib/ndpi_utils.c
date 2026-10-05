@@ -2778,6 +2778,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_AI_INFERENCE_TRAFFIC:
     return("Possible AI Inference Traffic");
 
+  case NDPI_NON_PQC_FLOW:
+    return("Non PQC Compliant Flow");
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2910,6 +2913,8 @@ const char* ndpi_risk2code(ndpi_risk_enum risk) {
     return STRINGIFY(NDPI_NON_PQC);
   case NDPI_AI_INFERENCE_TRAFFIC:
     return STRINGIFY(NDPI_AI_INFERENCE_TRAFFIC);
+  case NDPI_NON_PQC_FLOW:
+    return STRINGIFY(NDPI_NON_PQC_FLOW);
 
   default:
     return("Unknown risk");
@@ -3039,6 +3044,8 @@ ndpi_risk_enum ndpi_code2risk(const char* risk) {
     return(NDPI_NON_PQC);
   else if(strcmp(STRINGIFY(NDPI_AI_INFERENCE_TRAFFIC), risk) == 0)
     return(NDPI_AI_INFERENCE_TRAFFIC);
+  else if(strcmp(STRINGIFY(NDPI_NON_PQC_FLOW), risk) == 0)
+    return(NDPI_NON_PQC_FLOW);
   else
     return(NDPI_MAX_RISK);
 }
@@ -5981,6 +5988,7 @@ typedef struct {
   const char* security_level;
   const char* rfc;
   int draft_version;
+  u_int8_t is_pqc;
 } key_share_group_info;
 
 // TLS 1.3 KeyShare groups - Complete and up-to-date
@@ -6015,9 +6023,9 @@ static const key_share_group_info key_share_groups[] = {
   // ========== ML-KEM (FIPS 203, formerly Kyber) Hybrid Groups ==========
   // IANA: https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-18
   // RFC 10024: Post-Quantum Traditional (PQ/T) Hybrid Key Agreement
-  {0x11EB, "SecP256r1MLKEM768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0},
-  {0x11EC, "X25519MLKEM768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0},
-  {0x11ED, "SecP384r1MLKEM1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "RFC 10024", 0},
+  {0x11EB, "SecP256r1MLKEM768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0, 1},
+  {0x11EC, "X25519MLKEM768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0, 1},
+  {0x11ED, "SecP384r1MLKEM1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "RFC 10024", 0, 1},
   {0x11EE, "X25519MLKEM1024", "PQ_HYBRID", 32+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
   {0x11EF, "P256MLKEM1024", "PQ_HYBRID", 65+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
   {0x11F0, "X448MLKEM768", "PQ_HYBRID", 56+1184, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10},
@@ -6154,7 +6162,7 @@ int ndpi_tls_key_share_group_is_pq(u_int16_t group_id) {
 
   for(i = 0; key_share_groups[i].name != NULL; i++) {
     if(key_share_groups[i].id == group_id)
-      return(strcmp(key_share_groups[i].rfc, "RFC 10024") == 0);
+      return(key_share_groups[i].is_pqc);
   }
 
   return(0);
