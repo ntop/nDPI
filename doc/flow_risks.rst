@@ -369,4 +369,4 @@ This risk is triggered when TLS/HTTP traffic is likely to be used to access a se
 
 NDPI_NON_PQC_FLOW
 =================
-For TLS/QUIC, this risk is triggered when a TLS 1.3 ServerHello visibly negotiates a non-post-quantum key-exchange group. It is not set from a ClientHello advertisement, and a HelloRetryRequest alone is not sufficient evidence. The standardized ML-KEM hybrid groups from `RFC 10024 <https://www.rfc-editor.org/rfc/rfc10024>`_ are treated as post-quantum. Flows where the handshake is incomplete, resumed with PSK-only, or otherwise does not expose a negotiated key-share are left unclassified.
+For TLS, this risk is triggered only when an observed ClientHello is followed by a TLS 1.3 ServerHello that visibly negotiates a non-post-quantum key-exchange group. It is not set from a ClientHello advertisement, a server-only trace, or a HelloRetryRequest alone. The standardized ML-KEM hybrid groups from `RFC 10024 <https://www.rfc-editor.org/rfc/rfc10024>`_ are treated as post-quantum. Flows where the handshake is incomplete, resumed with PSK-only, or otherwise does not expose a negotiated key-share are left unclassified.

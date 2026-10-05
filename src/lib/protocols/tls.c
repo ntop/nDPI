@@ -2943,7 +2943,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
       /* The ServerHello key_share is the negotiated group. A ClientHello
        * advertisement or a two-byte HRR key_share is not sufficient. */
-      if(!is_dtls && flow->metadata.protos.tls_quic.ssl_version >= 0x0304 &&
+      if(!is_dtls && flow->metadata.protos.tls_quic.client_hello_processed &&
+	 flow->metadata.protos.tls_quic.ssl_version >= 0x0304 &&
 		 ja.server.num_key_share_groups > 0 &&
 		 !ndpi_tls_key_share_group_is_pq(ja.server.key_share_group[0])) {
 	char risk_info[64];
