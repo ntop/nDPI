@@ -3191,7 +3191,8 @@ const char *ndpi_risk_shortnames[NDPI_MAX_RISK] = {
   "obfuscated",
   "slow_DoS",
   "non_PQC",
-  "AI_Inference"
+  "AI_Inference",
+  "non_PQC_flow"
 };
 
 /* ******************************************************************** */
