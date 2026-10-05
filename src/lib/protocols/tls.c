@@ -2950,9 +2950,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       /* NDPI_NON_PQC_FLOW is intentionally limited to TLS over TCP and QUIC.
        * DTLS 1.3 needs separate datagram reassembly and is not classified here. */
       if(!is_dtls && flow->metadata.protos.tls_quic.client_hello_processed &&
-	 flow->metadata.protos.tls_quic.ssl_version >= 0x0304 &&
+	 flow->metadata.protos.tls_quic.ssl_version == 0x0304 &&
 		 ja.server.num_key_share_groups > 0 &&
-		 !ndpi_tls_key_share_group_is_pq(ja.server.key_share_group[0])) {
+		 ndpi_tls_key_share_group_is_pq(ja.server.key_share_group[0]) == 0) {
 	char risk_info[64];
 	snprintf(risk_info, sizeof(risk_info),
 	         "TLS 1.3 negotiated non-PQ group 0x%04X",

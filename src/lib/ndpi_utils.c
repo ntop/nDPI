@@ -6066,7 +6066,7 @@ int ndpi_tls_key_share_group_is_pq(u_int16_t group_id) {
       return(key_share_groups[i].is_pqc);
   }
 
-  return(0);
+  return(-1); /* Unknown: leave the negotiated group unclassified. */
 }
 
 /* ****************************************** */
