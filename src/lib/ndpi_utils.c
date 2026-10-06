@@ -5739,16 +5739,15 @@ const char* ndpi_tls_elliptic_curve2str(u_int16_t curve_id, char unknown_curve[8
   case 0x0020: return "brainpoolP384r1tls13"; // Reserved, not used
   case 0x0021: return "brainpoolP512r1tls13"; // Reserved, not used
 
-    /* RFC 9189 - Post-Quantum Hybrid Key Exchange */
-  case 0x0022: return "x25519kyber768";
-  case 0x0023: return "secp256r1kyber768";
-  case 0x0024: return "x25519kyber1024";
-  case 0x0025: return "secp256r1kyber1024";
-  case 0x0026: return "secp384r1kyber768";
-  case 0x0027: return "secp384r1kyber1024";
-  case 0x0028: return "secp521r1kyber1024";
-  case 0x0029: return "x448kyber768";
-  case 0x002A: return "x448kyber1024";
+    /* RFC 9189 - Generic Chinese SM2/SM9 curves */
+  case 0x0022: return "GC256A";
+  case 0x0023: return "GC256B";
+  case 0x0024: return "GC256C";
+  case 0x0025: return "GC256D";
+  case 0x0026: return "GC512A";
+  case 0x0027: return "GC512B";
+  case 0x0028: return "GC512C";
+  case 0x0029: return "curveSM2";
 
     /* Arbitrary Prime and Characteristic-2 Curves */
   case 0xFF01: return "arbitrary_explicit_prime_curves";
@@ -5920,16 +5919,15 @@ static const tls_named_group_info named_groups[] = {
   {0x0020, "brainpoolP384r1tls13", "EC", 384, 1, 0},
   {0x0021, "brainpoolP512r1tls13", "EC", 512, 1, 0},
 
-  // Hybrid post-quantum key exchange (RFC 9189)
-  {0x0022, "x25519kyber768", "PQ", 255, 0, 1},
-  {0x0023, "secp256r1kyber768", "PQ", 256, 0, 1},
-  {0x0024, "x25519kyber1024", "PQ", 255, 0, 1},
-  {0x0025, "secp256r1kyber1024", "PQ", 256, 0, 1},
-  {0x0026, "secp384r1kyber768", "PQ", 384, 0, 1},
-  {0x0027, "secp384r1kyber1024", "PQ", 384, 0, 1},
-  {0x0028, "secp521r1kyber1024", "PQ", 521, 0, 1},
-  {0x0029, "x448kyber768", "PQ", 448, 0, 1},
-  {0x002A, "x448kyber1024", "PQ", 448, 0, 1},
+  // RFC 9189 generic Chinese curves; 0x002A is unassigned.
+  {0x0022, "GC256A", "EC", 256, 0, 1},
+  {0x0023, "GC256B", "EC", 256, 0, 1},
+  {0x0024, "GC256C", "EC", 256, 0, 1},
+  {0x0025, "GC256D", "EC", 256, 0, 1},
+  {0x0026, "GC512A", "EC", 512, 0, 1},
+  {0x0027, "GC512B", "EC", 512, 0, 1},
+  {0x0028, "GC512C", "EC", 512, 0, 1},
+  {0x0029, "curveSM2", "EC", 256, 0, 1},
 
   // ========== Finite Field Groups (FFDHE) ==========
   {0x0100, "ffdhe2048", "DH", 2048, 0, 1},
@@ -5948,10 +5946,15 @@ static const tls_named_group_info named_groups[] = {
 
 /* ****************************************** */
 
+bool ndpi_is_grease_value(u_int16_t value) {
+  return ((value & 0x0F0F) == 0x0A0A) &&
+         (((value >> 12) & 0x0F) == ((value >> 4) & 0x0F));
+}
+
 const char* ndpi_tls_supported_groups2str(u_int16_t group_id, char unknown_group[8]) {
   u_int16_t i;
 
-  if(((group_id) & 0x0F0F) == 0x0A0A)
+  if(ndpi_is_grease_value(group_id))
     return("(GREASE)");
 
   // Check for reserved ranges
@@ -5992,7 +5995,7 @@ typedef struct {
   u_int8_t is_pqc;
 } key_share_group_info;
 
-// TLS 1.3 KeyShare groups - Complete and up-to-date
+// TLS 1.3 key-share groups with current, registry-backed assignments
 static const key_share_group_info key_share_groups[] = {
   // ========== Traditional Elliptic Curve Groups (ECDHE) ==========
   {0x0017, "secp256r1", "ECDHE", 65, 32, 1, 1, "128-bit", "RFC 8446", 0, 0},
@@ -6010,115 +6013,12 @@ static const key_share_group_info key_share_groups[] = {
   {0x0103, "ffdhe6144", "FFDHE", 768, 768, 1, 0, "176-bit", "RFC 7919", 0, 0},
   {0x0104, "ffdhe8192", "FFDHE", 1024, 1024, 1, 0, "192-bit", "RFC 7919", 0, 0},
 
-  // ========== Kyber-based Hybrid Groups (RFC 9189) ==========
-  {0x0022, "x25519kyber768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "RFC 9189", 0, 0},
-  {0x0023, "secp256r1kyber768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "RFC 9189", 0, 0},
-  {0x0024, "x25519kyber1024", "PQ_HYBRID", 32+1568, 32+32, 1, 1, "128-bit + L5", "RFC 9189", 0, 0},
-  {0x0025, "secp256r1kyber1024", "PQ_HYBRID", 65+1568, 32+32, 1, 1, "128-bit + L5", "RFC 9189", 0, 0},
-  {0x0026, "secp384r1kyber768", "PQ_HYBRID", 97+1184, 48+32, 1, 1, "192-bit + L3", "RFC 9189", 0, 0},
-  {0x0027, "secp384r1kyber1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "RFC 9189", 0, 0},
-  {0x0028, "secp521r1kyber1024", "PQ_HYBRID", 133+1568, 66+32, 1, 1, "256-bit + L5", "RFC 9189", 0, 0},
-  {0x0029, "x448kyber768", "PQ_HYBRID", 56+1184, 56+32, 1, 1, "224-bit + L3", "RFC 9189", 0, 0},
-  {0x002A, "x448kyber1024", "PQ_HYBRID", 56+1568, 56+32, 1, 1, "224-bit + L5", "RFC 9189", 0, 0},
 
-  // ========== ML-KEM (FIPS 203, formerly Kyber) Hybrid Groups ==========
-  // IANA: https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-18
-  // RFC 10024: Post-Quantum Traditional (PQ/T) Hybrid Key Agreement
+  // Current PQ hybrid groups registered by RFC 10024.
+  // Unknown, draft, and unassigned code points are intentionally not named.
   {0x11EB, "SecP256r1MLKEM768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0, 1},
   {0x11EC, "X25519MLKEM768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0, 1},
   {0x11ED, "SecP384r1MLKEM1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "RFC 10024", 0, 1},
-  {0x11EE, "X25519MLKEM1024", "PQ_HYBRID", 32+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11EF, "P256MLKEM1024", "PQ_HYBRID", 65+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11F0, "X448MLKEM768", "PQ_HYBRID", 56+1184, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11F1, "P384MLKEM768", "PQ_HYBRID", 97+1184, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11F2, "X448MLKEM1024", "PQ_HYBRID", 56+1568, 56+32, 1, 1, "224-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11F3, "P384MLKEM1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11F4, "P521MLKEM1024", "PQ_HYBRID", 133+1568, 66+32, 1, 1, "256-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-
-  // ========== ML-KEM Only (non-hybrid) ==========
-  {0x11F5, "MLKEM512", "PQ_ONLY", 800, 32, 1, 1, "L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11F6, "MLKEM768", "PQ_ONLY", 1184, 32, 1, 1, "L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11F7, "MLKEM1024", "PQ_ONLY", 1568, 32, 1, 1, "L5", "draft-ietf-tls-hybrid-design", 10, 0},
-
-  // ========== NTRU Hybrid Groups ==========
-  {0x11F8, "X25519NTRUHPS2048509", "PQ_HYBRID", 32+699, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11F9, "P256NTRUHPS2048509", "PQ_HYBRID", 65+699, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11FA, "X25519NTRUHPS2048677", "PQ_HYBRID", 32+930, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11FB, "P256NTRUHPS2048677", "PQ_HYBRID", 65+930, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11FC, "X448NTRUHPS2048677", "PQ_HYBRID", 56+930, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11FD, "P384NTRUHPS2048677", "PQ_HYBRID", 97+930, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-
-  // ========== NTRU Prime Hybrid Groups ==========
-  {0x11FE, "X25519NTRULPR653", "PQ_HYBRID", 32+897, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x11FF, "P256NTRULPR653", "PQ_HYBRID", 65+897, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1200, "X25519NTRULPR761", "PQ_HYBRID", 32+1039, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1201, "P256NTRULPR761", "PQ_HYBRID", 65+1039, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1202, "X448NTRULPR761", "PQ_HYBRID", 56+1039, 56+32, 1, 1, "224-bit", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1203, "P384NTRULPR761", "PQ_HYBRID", 97+1039, 48+32, 1, 1, "192-bit", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1204, "P521NTRULPR761", "PQ_HYBRID", 133+1039, 66+32, 1, 1, "256-bit", "draft-ietf-tls-hybrid-design", 10, 0},
-
-  // ========== Saber (LightSaber) Hybrid Groups ==========
-  {0x1205, "X25519LightSaber", "PQ_HYBRID", 32+672, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1206, "P256LightSaber", "PQ_HYBRID", 65+672, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1207, "X25519Saber", "PQ_HYBRID", 32+992, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1208, "P256Saber", "PQ_HYBRID", 65+992, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1209, "X448Saber", "PQ_HYBRID", 56+992, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x120A, "P384Saber", "PQ_HYBRID", 97+992, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-
-  // ========== FrodoKEM Hybrid Groups ==========
-  {0x120B, "X25519Frodo640SHAKE", "PQ_HYBRID", 32+9616, 32+16, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x120C, "P256Frodo640SHAKE", "PQ_HYBRID", 65+9616, 32+16, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x120D, "X25519Frodo976SHAKE", "PQ_HYBRID", 32+15632, 32+24, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x120E, "P256Frodo976SHAKE", "PQ_HYBRID", 65+15632, 32+24, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x120F, "X448Frodo976SHAKE", "PQ_HYBRID", 56+15632, 56+24, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1210, "P384Frodo976SHAKE", "PQ_HYBRID", 97+15632, 48+24, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1211, "X25519Frodo1344SHAKE", "PQ_HYBRID", 32+21520, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1212, "P256Frodo1344SHAKE", "PQ_HYBRID", 65+21520, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1213, "P384Frodo1344SHAKE", "PQ_HYBRID", 97+21520, 48+32, 1, 1, "192-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1214, "P521Frodo1344SHAKE", "PQ_HYBRID", 133+21520, 66+32, 1, 1, "256-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-
-  // ========== BIKE Hybrid Groups ==========
-  {0x1215, "X25519BIKE1L1", "PQ_HYBRID", 32+1541, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1216, "P256BIKE1L1", "PQ_HYBRID", 65+1541, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1217, "X25519BIKE1L3", "PQ_HYBRID", 32+3083, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1218, "P256BIKE1L3", "PQ_HYBRID", 65+3083, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1219, "X448BIKE1L3", "PQ_HYBRID", 56+3083, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x121A, "P384BIKE1L3", "PQ_HYBRID", 97+3083, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-
-  // ========== HQC Hybrid Groups ==========
-  {0x121B, "X25519HQCL1", "PQ_HYBRID", 32+2249, 32+64, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x121C, "P256HQCL1", "PQ_HYBRID", 65+2249, 32+64, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x121D, "X25519HQCL3", "PQ_HYBRID", 32+4522, 32+64, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x121E, "P256HQCL3", "PQ_HYBRID", 65+4522, 32+64, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x121F, "X448HQCL3", "PQ_HYBRID", 56+4522, 56+64, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1220, "P384HQCL3", "PQ_HYBRID", 97+4522, 48+64, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-
-  // ========== SIKE Hybrid Groups (NOTE: Broken in 2022, included for completeness) ==========
-  {0x1221, "X25519SIKEp434", "PQ_HYBRID_BROKEN", 32+330, 32+16, 0, 0, "128-bit + L1", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x1222, "P256SIKEp434", "PQ_HYBRID_BROKEN", 65+330, 32+16, 0, 0, "128-bit + L1", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x1223, "X25519SIKEp503", "PQ_HYBRID_BROKEN", 32+378, 32+24, 0, 0, "128-bit + L2", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x1224, "P256SIKEp503", "PQ_HYBRID_BROKEN", 65+378, 32+24, 0, 0, "128-bit + L2", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x1225, "X25519SIKEp610", "PQ_HYBRID_BROKEN", 32+462, 32+24, 0, 0, "128-bit + L3", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x1226, "P256SIKEp610", "PQ_HYBRID_BROKEN", 65+462, 32+24, 0, 0, "128-bit + L3", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x1227, "X448SIKEp610", "PQ_HYBRID_BROKEN", 56+462, 56+24, 0, 0, "224-bit + L3", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x1228, "P384SIKEp610", "PQ_HYBRID_BROKEN", 97+462, 48+24, 0, 0, "192-bit + L3", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x1229, "X25519SIKEp751", "PQ_HYBRID_BROKEN", 32+564, 32+32, 0, 0, "128-bit + L5", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x122A, "P256SIKEp751", "PQ_HYBRID_BROKEN", 65+564, 32+32, 0, 0, "128-bit + L5", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x122B, "P384SIKEp751", "PQ_HYBRID_BROKEN", 97+564, 48+32, 0, 0, "192-bit + L5", "draft-ietf-tls-hybrid-design", 0, 0},
-  {0x122C, "P521SIKEp751", "PQ_HYBRID_BROKEN", 133+564, 66+32, 0, 0, "256-bit + L5", "draft-ietf-tls-hybrid-design", 0, 0},
-
-  // ========== Classic McEliece Hybrid Groups ==========
-  {0x122D, "X25519ClassicMcEliece348864", "PQ_HYBRID", 32+261120, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x122E, "P256ClassicMcEliece348864", "PQ_HYBRID", 65+261120, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x122F, "X25519ClassicMcEliece460896", "PQ_HYBRID", 32+524160, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1230, "P256ClassicMcEliece460896", "PQ_HYBRID", 65+524160, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1231, "X448ClassicMcEliece460896", "PQ_HYBRID", 56+524160, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1232, "P384ClassicMcEliece460896", "PQ_HYBRID", 97+524160, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1233, "X25519ClassicMcEliece6688128", "PQ_HYBRID", 32+1044992, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1234, "P256ClassicMcEliece6688128", "PQ_HYBRID", 65+1044992, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1235, "P384ClassicMcEliece6688128", "PQ_HYBRID", 97+1044992, 48+32, 1, 1, "192-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-  {0x1236, "P521ClassicMcEliece6688128", "PQ_HYBRID", 133+1044992, 66+32, 1, 1, "256-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
-
   // ========== Other/Experimental Groups ==========
   // Brainpool curves (not typically used in TLS 1.3)
   {0x001A, "brainpoolP256r1", "ECDHE", 65, 32, 0, 0, "128-bit", "RFC 7027", 0, 0},
@@ -6134,7 +6034,7 @@ static const key_share_group_info key_share_groups[] = {
 const char* ndpi_tls_key_share_group2str(u_int16_t group_id, char unknown_group[8]) {
   u_int16_t i;
 
-  if(((group_id) & 0x0F0F) == 0x0A0A)
+  if(ndpi_is_grease_value(group_id))
     return("(GREASE)");
 
   if ((group_id >= 0x002B && group_id <= 0x003F) ||  // Reserved ECDHE
