@@ -111,8 +111,10 @@ static int tls_keep_extra_dissection_tcp(struct ndpi_detection_module_struct *nd
      || (flow->metadata.l4.tcp.tls.app_data_seen[0] == 1 && flow->metadata.l4.tcp.tls.app_data_seen[1] == 1)
 
      /* Handshake on one direction and Application Data on the other */
-     || ((flow->metadata.protos.tls_quic.client_hello_processed && flow->metadata.l4.tcp.tls.app_data_seen[!flow->metadata.protos.tls_quic.ch_direction] == 1) ||
-	 (flow->metadata.protos.tls_quic.server_hello_processed && flow->metadata.l4.tcp.tls.app_data_seen[flow->metadata.protos.tls_quic.ch_direction] == 1))
+     || ((flow->metadata.protos.tls_quic.client_hello_processed
+	  && flow->metadata.l4.tcp.tls.app_data_seen[!flow->metadata.protos.tls_quic.ch_direction] == 1) ||
+	 (flow->metadata.protos.tls_quic.server_hello_processed
+	  && flow->metadata.l4.tcp.tls.app_data_seen[flow->metadata.protos.tls_quic.ch_direction] == 1))
      ) {
     return 0;
   }
@@ -1183,7 +1185,9 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* Now let's process each individual certificates */
   while(certificates_offset < certificates_length) {
-    u_int32_t certificate_len = (packet->payload[certificates_offset] << 16) + (packet->payload[certificates_offset+1] << 8) + packet->payload[certificates_offset+2];
+    u_int32_t certificate_len = (packet->payload[certificates_offset] << 16)
+      + (packet->payload[certificates_offset+1] << 8)
+      + packet->payload[certificates_offset+2];
 
     /* Invalid lenght */
     if((certificate_len == 0)
@@ -1208,7 +1212,6 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
     if(num_certificates_found++ == 0) /* Dissect only the first certificate that is the one we care */ {
-
 #ifdef DEBUG_CERTIFICATE_HASH
       {
 	u_int32_t i;
@@ -1238,6 +1241,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
         char sha1_str[20 /* sha1_siz */ * 2 + 1];
         static const char hexalnum[] = "0123456789ABCDEF";
         size_t i;
+
         for (i = 0; i < sha1_siz; ++i) {
           u_int8_t lower = (sha1[i] & 0x0F);
           u_int8_t upper = (sha1[i] & 0xF0) >> 4;
@@ -1251,7 +1255,8 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
         if(ndpi_struct->malicious_sha1_hashmap != NULL) {
-          u_int16_t rc1 = ndpi_hash_find_entry(ndpi_struct->malicious_sha1_hashmap, sha1_str, sha1_siz * 2, NULL);
+          u_int16_t rc1 = ndpi_hash_find_entry(ndpi_struct->malicious_sha1_hashmap,
+					       sha1_str, sha1_siz * 2, NULL);
 
           if(rc1 == 0)
             ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALICIOUS_SHA1_CERTIFICATE, sha1_str);
@@ -1390,7 +1395,28 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
         printf("[TLS] Certificate from client. Ignoring it\n");
 #endif
       }
+      
       flow->core.tls_quic.certificate_processed = 1;
+    }
+    break;
+
+  case 0x0c: /* Server Key Exchange */
+    {
+      u_int32_t total_len = (packet->payload[1] << 16) +  (packet->payload[2] << 8) + packet->payload[3];
+
+      if(total_len <= packet->payload_packet_len) {
+	u_int8_t pubkey_len = packet->payload[7];
+	u_int16_t offset = 7 + pubkey_len;
+
+	if(offset < packet->payload_packet_len) {
+	  offset++;
+	  
+	  if((offset + 2) < packet->payload_packet_len) {
+	    flow->metadata.protos.tls_quic.signature_algorithms =
+	      (packet->payload[offset] << 8) + packet->payload[offset+1];
+	  }
+	}
+      }
     }
     break;
   }
@@ -2838,6 +2864,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  printf("Server TLS [ALPN: %s][len: %u]\n", alpn_str, alpn_str_len);
 #endif
 	  char invalid_character = 0;
+
 	  if(ndpi_normalize_printable_string(alpn_str, alpn_str_len, &invalid_character) == 0) {
 	    char str[1024];
 	    snprintf(str, sizeof(str), "Invalid character 0x%02X in ALPN: %.*s",

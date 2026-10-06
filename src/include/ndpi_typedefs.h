@@ -1776,6 +1776,7 @@ struct ndpi_flow_tls_quic_metadata_struct {
     u_int16_t version;
   } encrypted_ch;
 
+  u_int16_t signature_algorithms; /* TLS 1.2 and earlier */
   ndpi_cipher_weakness server_unsafe_cipher;
 
   u_int32_t quic_version;
