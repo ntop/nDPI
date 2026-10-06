@@ -1311,8 +1311,6 @@ extern "C" {
   const char* ndpi_tls_supported_groups2str(u_int16_t group_id, char unknown_group[8]);
   const char* ndpi_tls_elliptic_curve_point_format2str(u_int16_t format_id, char unknown_group[8]);
   const char* ndpi_tls_key_share_group2str(u_int16_t group_id, char unknown_group[8]);
-  /* Returns 1 for PQ, 0 for known non-PQ, and -1 for unknown groups. */
-  int ndpi_tls_key_share_group_is_pq(u_int16_t group_id);
   const char* ndpi_tls_supported_version2str(u_int16_t version_id, char unknown_version[8]);
 
   const char* ndpi_tunnel2str(ndpi_packet_tunnel tt);

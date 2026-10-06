@@ -1055,8 +1055,8 @@ void process_tls(struct ndpi_detection_module_struct *ndpi_struct,
   packet->payload = crypto_data;
   packet->payload_packet_len = crypto_data_len;
 
-  if(processClientServerHello(ndpi_struct, flow, flow->metadata.protos.tls_quic.quic_version))
-    flow->metadata.protos.tls_quic.client_hello_processed = 1; /* Allow matching of custom categories */
+  processClientServerHello(ndpi_struct, flow, flow->metadata.protos.tls_quic.quic_version);
+  flow->metadata.protos.tls_quic.client_hello_processed = 1; /* Allow matching of custom categories */
 
   /* Restore */
   packet->payload = p;
