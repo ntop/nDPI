@@ -2531,7 +2531,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   ja_ndpi_str[36] = 0;
 
   /*
-    JA5 is identical to JA4 with the following differences
+    nDPI TLS Fingerprint is identical to JA4 with the following differences
     - it skips the TLS extensions for which ndpi_skip_tls_ephemeral_extension()
       returns true when building the extensions list used to compute
       the extensions hash (same filtering used above for
@@ -2539,23 +2539,23 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
     - it adds a new trailer block with the hash of TLS supported groups
   */
   {
-    char * const ja5_str = &flow->metadata.protos.tls_quic.ja5_client[0];
+    char * const tlsfp_str = &flow->metadata.protos.tls_quic.tlsfp_client[0];
     char cnt_str[3];
 
-    memcpy(ja5_str, ja_str, ja_offset);
+    memcpy(tlsfp_str, ja_str, ja_offset);
     ndpi_snprintf(cnt_str, sizeof(cnt_str), "%02u",
 		  ndpi_min(99, ja->client.num_tls_extensions-num_ephemeral_extn));
-    memcpy(&ja5_str[6], cnt_str, 2);
+    memcpy(&tlsfp_str[6], cnt_str, 2);
 
-    rc = ndpi_snprintf(&ja5_str[ja_offset], ja_max_len - ja_offset,
+    rc = ndpi_snprintf(&tlsfp_str[ja_offset], ja_max_len - ja_offset,
 			"%02x%02x%02x%02x%02x%02x",
 			sha_hash[0], sha_hash[1], sha_hash[2],
 			sha_hash[3], sha_hash[4], sha_hash[5]);
-    ja5_str[36] = 0;
+    tlsfp_str[36] = 0;
 
     /* Now add supported groups */
     if(ja->client.num_supported_groups > 0) {
-      ja_max_len = sizeof(flow->metadata.protos.tls_quic.ja5_client);
+      ja_max_len = sizeof(flow->metadata.protos.tls_quic.tlsfp_client);
 
       qsort(&ja->client.supported_group, ja->client.num_supported_groups, sizeof(u_int16_t), u_int16_t_cmpfunc);
 
@@ -2573,11 +2573,11 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
       memset(sha_hash, '\0', 6);
 
     ja_offset = 36;
-    rc = ndpi_snprintf(&ja5_str[ja_offset], ja_max_len - ja_offset,
+    rc = ndpi_snprintf(&tlsfp_str[ja_offset], ja_max_len - ja_offset,
 		       "_%02x%02x%02x%02x%02x%02x",
 		       sha_hash[0], sha_hash[1], sha_hash[2],
 		       sha_hash[3], sha_hash[4], sha_hash[5]);
-    ja5_str[36+13] = 0;
+    tlsfp_str[36+13] = 0;
   }
 
 #ifdef DEBUG_JA
