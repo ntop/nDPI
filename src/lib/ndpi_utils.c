@@ -5948,10 +5948,15 @@ static const tls_named_group_info named_groups[] = {
 
 /* ****************************************** */
 
+bool ndpi_is_grease_value(u_int16_t value) {
+  return ((value & 0x0F0F) == 0x0A0A) &&
+         (((value >> 12) & 0x0F) == ((value >> 4) & 0x0F));
+}
+
 const char* ndpi_tls_supported_groups2str(u_int16_t group_id, char unknown_group[8]) {
   u_int16_t i;
 
-  if(((group_id) & 0x0F0F) == 0x0A0A)
+  if(ndpi_is_grease_value(group_id))
     return("(GREASE)");
 
   // Check for reserved ranges
