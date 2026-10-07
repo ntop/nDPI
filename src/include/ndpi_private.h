@@ -345,6 +345,7 @@ struct ndpi_detection_module_config_struct {
   int dns_parse_response_enabled;
   int dns_max_packets_extra_dissection;
   int dns_custom_port;
+  int dns_cnames_enabled;
 
   int http_parse_response_enabled;
   int http_subclassification_enabled;
