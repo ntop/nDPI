@@ -111,8 +111,10 @@ static int tls_keep_extra_dissection_tcp(struct ndpi_detection_module_struct *nd
      || (flow->metadata.l4.tcp.tls.app_data_seen[0] == 1 && flow->metadata.l4.tcp.tls.app_data_seen[1] == 1)
 
      /* Handshake on one direction and Application Data on the other */
-     || ((flow->metadata.protos.tls_quic.client_hello_processed && flow->metadata.l4.tcp.tls.app_data_seen[!flow->metadata.protos.tls_quic.ch_direction] == 1) ||
-	 (flow->metadata.protos.tls_quic.server_hello_processed && flow->metadata.l4.tcp.tls.app_data_seen[flow->metadata.protos.tls_quic.ch_direction] == 1))
+     || ((flow->metadata.protos.tls_quic.client_hello_processed
+	  && flow->metadata.l4.tcp.tls.app_data_seen[!flow->metadata.protos.tls_quic.ch_direction] == 1) ||
+	 (flow->metadata.protos.tls_quic.server_hello_processed
+	  && flow->metadata.l4.tcp.tls.app_data_seen[flow->metadata.protos.tls_quic.ch_direction] == 1))
      ) {
     return 0;
   }
@@ -1183,7 +1185,9 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 
   /* Now let's process each individual certificates */
   while(certificates_offset < certificates_length) {
-    u_int32_t certificate_len = (packet->payload[certificates_offset] << 16) + (packet->payload[certificates_offset+1] << 8) + packet->payload[certificates_offset+2];
+    u_int32_t certificate_len = (packet->payload[certificates_offset] << 16)
+      + (packet->payload[certificates_offset+1] << 8)
+      + packet->payload[certificates_offset+2];
 
     /* Invalid lenght */
     if((certificate_len == 0)
@@ -1208,7 +1212,6 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
     if(num_certificates_found++ == 0) /* Dissect only the first certificate that is the one we care */ {
-
 #ifdef DEBUG_CERTIFICATE_HASH
       {
 	u_int32_t i;
@@ -1238,6 +1241,7 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
         char sha1_str[20 /* sha1_siz */ * 2 + 1];
         static const char hexalnum[] = "0123456789ABCDEF";
         size_t i;
+
         for (i = 0; i < sha1_siz; ++i) {
           u_int8_t lower = (sha1[i] & 0x0F);
           u_int8_t upper = (sha1[i] & 0xF0) >> 4;
@@ -1251,7 +1255,8 @@ int processCertificate(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 
         if(ndpi_struct->malicious_sha1_hashmap != NULL) {
-          u_int16_t rc1 = ndpi_hash_find_entry(ndpi_struct->malicious_sha1_hashmap, sha1_str, sha1_siz * 2, NULL);
+          u_int16_t rc1 = ndpi_hash_find_entry(ndpi_struct->malicious_sha1_hashmap,
+					       sha1_str, sha1_siz * 2, NULL);
 
           if(rc1 == 0)
             ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MALICIOUS_SHA1_CERTIFICATE, sha1_str);
@@ -1390,7 +1395,28 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
         printf("[TLS] Certificate from client. Ignoring it\n");
 #endif
       }
+
       flow->core.tls_quic.certificate_processed = 1;
+    }
+    break;
+
+  case 0x0c: /* Server Key Exchange */
+    {
+      u_int32_t total_len = (packet->payload[1] << 16) +  (packet->payload[2] << 8) + packet->payload[3];
+
+      if(total_len <= packet->payload_packet_len) {
+	u_int8_t pubkey_len = packet->payload[7];
+	u_int16_t offset = 7 + pubkey_len;
+
+	if(offset < packet->payload_packet_len) {
+	  offset++;
+
+	  if((offset + 2) < packet->payload_packet_len) {
+	    flow->metadata.protos.tls_quic.signature_algorithms =
+	      (packet->payload[offset] << 8) + packet->payload[offset+1];
+	  }
+	}
+      }
     }
     break;
   }
@@ -2508,7 +2534,7 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
   ja_ndpi_str[36] = 0;
 
   /*
-    JA5 is identical to JA4 with the following differences
+    nDPI TLS Fingerprint is identical to JA4 with the following differences
     - it skips the TLS extensions for which ndpi_skip_tls_ephemeral_extension()
       returns true when building the extensions list used to compute
       the extensions hash (same filtering used above for
@@ -2516,23 +2542,23 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
     - it adds a new trailer block with the hash of TLS supported groups
   */
   {
-    char * const ja5_str = &flow->metadata.protos.tls_quic.ja5_client[0];
+    char * const tlsfp_str = &flow->metadata.protos.tls_quic.tlsfp_client[0];
     char cnt_str[3];
 
-    memcpy(ja5_str, ja_str, ja_offset);
+    memcpy(tlsfp_str, ja_str, ja_offset);
     ndpi_snprintf(cnt_str, sizeof(cnt_str), "%02u",
 		  ndpi_min(99, ja->client.num_tls_extensions-num_ephemeral_extn));
-    memcpy(&ja5_str[6], cnt_str, 2);
+    memcpy(&tlsfp_str[6], cnt_str, 2);
 
-    rc = ndpi_snprintf(&ja5_str[ja_offset], ja_max_len - ja_offset,
+    rc = ndpi_snprintf(&tlsfp_str[ja_offset], ja_max_len - ja_offset,
 			"%02x%02x%02x%02x%02x%02x",
 			sha_hash[0], sha_hash[1], sha_hash[2],
 			sha_hash[3], sha_hash[4], sha_hash[5]);
-    ja5_str[36] = 0;
+    tlsfp_str[36] = 0;
 
     /* Now add supported groups */
     if(ja->client.num_supported_groups > 0) {
-      ja_max_len = sizeof(flow->metadata.protos.tls_quic.ja5_client);
+      ja_max_len = sizeof(flow->metadata.protos.tls_quic.tlsfp_client);
 
       qsort(&ja->client.supported_group, ja->client.num_supported_groups, sizeof(u_int16_t), u_int16_t_cmpfunc);
 
@@ -2550,11 +2576,11 @@ static void ndpi_compute_ja4(struct ndpi_detection_module_struct *ndpi_struct,
       memset(sha_hash, '\0', 6);
 
     ja_offset = 36;
-    rc = ndpi_snprintf(&ja5_str[ja_offset], ja_max_len - ja_offset,
+    rc = ndpi_snprintf(&tlsfp_str[ja_offset], ja_max_len - ja_offset,
 		       "_%02x%02x%02x%02x%02x%02x",
 		       sha_hash[0], sha_hash[1], sha_hash[2],
 		       sha_hash[3], sha_hash[4], sha_hash[5]);
-    ja5_str[36+13] = 0;
+    tlsfp_str[36+13] = 0;
   }
 
 #ifdef DEBUG_JA
@@ -2841,6 +2867,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	  printf("Server TLS [ALPN: %s][len: %u]\n", alpn_str, alpn_str_len);
 #endif
 	  char invalid_character = 0;
+
 	  if(ndpi_normalize_printable_string(alpn_str, alpn_str_len, &invalid_character) == 0) {
 	    char str[1024];
 	    snprintf(str, sizeof(str), "Invalid character 0x%02X in ALPN: %.*s",

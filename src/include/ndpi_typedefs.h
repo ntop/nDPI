@@ -1764,7 +1764,8 @@ struct ndpi_flow_core_struct {
 struct ndpi_flow_tls_quic_metadata_struct {
   char *server_names, *advertised_alpns, *negotiated_alpn, *tls_supported_versions, *issuerDN, *subjectDN;
   u_int32_t notBefore, notAfter;
-  char ja3_server[33], ja4_client[37], ja4_ndpi_client[37], ja5_client[50], *ja4_client_raw;
+  char ja3_server[33], ja4_client[37], ja4_ndpi_client[37], *ja4_client_raw;
+  char tlsfp_client[50]; /* nDPI TLS client fingerprint */
   u_int16_t server_cipher;
   u_int8_t sha1_certificate_fingerprint[20];
   u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1,
@@ -1777,6 +1778,7 @@ struct ndpi_flow_tls_quic_metadata_struct {
     u_int16_t version;
   } encrypted_ch;
 
+  u_int16_t signature_algorithms; /* TLS 1.2 and earlier */
   ndpi_cipher_weakness server_unsafe_cipher;
 
   u_int32_t quic_version;
