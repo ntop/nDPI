@@ -513,7 +513,7 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 
   ignore_checks = (proto->master_protocol == NDPI_PROTOCOL_MDNS);
 
-  if (dns->cnames == NULL)
+  if (dns->cnames == NULL && ndpi_struct->cfg.dns_cnames_enabled)
       dns->cnames = ndpi_calloc(1, sizeof(struct ndpi_dns_cname_info));
 
   for(num = 0; num < dns_header->num_answers; num++) {
@@ -557,7 +557,7 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
         printf("[DNS] [rsp_type: %u][data_len: %u]\n", rsp_type, data_len);
 #endif
 
-        if(rsp_type == 0x05 /* CNAME */ && dns->cnames) {
+        if(rsp_type == 0x05 && dns->cnames && ndpi_struct->cfg.dns_cnames_enabled) {
             /* Capture CNAME records */
             if (dns->cnames->num_cnames < MAX_NUM_DNS_CNAMES) {
                 u_int len, orig_x;
