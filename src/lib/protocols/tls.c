@@ -2935,7 +2935,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 	    if(extension_len >= 5) { /* ServerHello KeyShareEntry; not HRR selected_group */
 	      u_int16_t group_id     = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
-	      u_int16_t key_extn_len = ntohs(*((u_int16_t*)&packet->payload[extn_offset + 2]));
+	      u_int16_t key_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset + 2])));
 #ifdef DEBUG_TLS
 	      printf("\t[%02X %02X][extn_offset: %u][group_id: %u][key_extn_len: %u]\n",
 		     (packet->payload[extn_offset] & 0xFF),
@@ -3802,7 +3802,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
                   while(extn_offset + 4 < extn_end) {
                     u_int16_t group_id     = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
-                    u_int16_t key_extn_len = ntohs(*((u_int16_t*)&packet->payload[extn_offset + 2]));
+                    u_int16_t key_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset + 2])));
 
   #ifdef DEBUG_TLS
                     printf("\t[%02X %02X][extn_offset: %u][group_id: %u][key_extn_len: %u]\n",
