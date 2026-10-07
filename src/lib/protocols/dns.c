@@ -322,7 +322,6 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
   u_int offset = *off;
   u_int loop_count = 0;
   const u_int max_loops = 256; /* Prevent infinite loops */
-  u_int8_t first_label = 1; /* Track if we're at the first label */
 
   max_len--;
 
@@ -356,9 +355,7 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
           /* Resolve the pointer */
           u_int saved_offset = offset;
           u_int ptr_off = ptr_offset;
-          u_int8_t ptr_valid = 1;
           u_int ptr_loop = 0;
-          u_int8_t ptr_first_label = 1;
 
           while ((j < max_len)
               && (ptr_off < packet->payload_packet_len)
@@ -372,7 +369,6 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
                   u_int nested_offset;
 
                   if (ptr_off + 1 >= packet->payload_packet_len) {
-                      ptr_valid = 0;
                       break;
                   }
 
@@ -380,7 +376,6 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
                   nested_offset = nested_pointer;
 
                   if (nested_offset >= packet->payload_packet_len) {
-                      ptr_valid = 0;
                       break;
                   }
 
@@ -390,7 +385,6 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
                   }
 
                   ptr_off = nested_offset;
-                  ptr_first_label = 0;
                   continue;
               }
 
@@ -398,7 +392,6 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
               u_int8_t label_len = ptr_cl;
 
               if (ptr_off + 1 + label_len >= packet->payload_packet_len) {
-                  ptr_valid = 0;
                   break;
               }
 
@@ -437,8 +430,6 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
                   }
                   label_len--;
               }
-
-              ptr_first_label = 0;
           }
 
           /* After resolving the pointer, advance the main offset past the pointer */
@@ -495,7 +486,6 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
               }
               label_len--;
           }
-          first_label = 0;
       }
   }
 
