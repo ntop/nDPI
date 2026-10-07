@@ -255,60 +255,195 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
                                    char *invalid_character) {
   u_int8_t hostname_is_valid = 1;
   u_int j = 0;
+  u_int offset = *off;
+  u_int loop_count = 0;
+  const u_int max_loops = 256; /* Prevent infinite loops */
+  u_int8_t first_label = 1; /* Track if we're at the first label */
 
   max_len--;
 
-  while((j < max_len)
-	&& ((*off) < packet->payload_packet_len)
-	&& (packet->payload[(*off)] != '\0')) {
-    u_int8_t c, cl = packet->payload[*off];
+  while ((j < max_len)
+      && (offset < packet->payload_packet_len)
+      && (packet->payload[offset] != '\0')
+      && (loop_count++ < max_loops)) {
+      u_int8_t c, cl = packet->payload[offset];
 
-    if(((cl & 0xc0) != 0) || // we not support compressed names in query
-       (((*off)+1) + cl  >= packet->payload_packet_len)) {
-      /* Don't update the offset */
-      j = 0;
-      break;
-    }
+      if ((cl & 0xc0) == 0xc0) {
+          /* Compressed name - pointer to another location */
+          u_int16_t pointer;
+          u_int ptr_offset;
 
-    (*off)++;
-
-    if(j && (j < max_len)) _hostname[j++] = '.';
-
-    while((j < max_len) && (cl != 0)) {
-      c = packet->payload[(*off)++];
-
-      if(ignore_checks)
-	_hostname[j++] = tolower(c);
-      else {
-	u_int32_t shift;
-
-	shift = ((u_int32_t) 1) << (c & 0x1f);
-
-	if((dns_validchar[c >> 5] & shift)) {
-	  _hostname[j++] = tolower(c);
-	} else {
-	  /* printf("---?? '%c'\n", c); */
-
-          if(hostname_is_valid == 1 && invalid_character) {
-            /* Report the first one */
-            *invalid_character = c;
+          if (offset + 1 >= packet->payload_packet_len) {
+              /* Invalid pointer */
+              j = 0;
+              break;
           }
 
-	  hostname_is_valid = 0;
+          /* Get the pointer offset (14 bits) */
+          pointer = ((cl & 0x3f) << 8) | packet->payload[offset + 1];
+          ptr_offset = pointer;
 
-	  if (ndpi_isprint(c) == 0) {
-	    _hostname[j++] = '?';
-	  } else {
-	    _hostname[j++] = '_';
-	  }
-	}
+          if (ptr_offset >= packet->payload_packet_len) {
+              /* Invalid pointer - points beyond packet */
+              j = 0;
+              break;
+          }
+
+          /* Resolve the pointer */
+          u_int saved_offset = offset;
+          u_int ptr_off = ptr_offset;
+          u_int8_t ptr_valid = 1;
+          u_int ptr_loop = 0;
+          u_int8_t ptr_first_label = 1;
+
+          while ((j < max_len)
+              && (ptr_off < packet->payload_packet_len)
+              && (packet->payload[ptr_off] != '\0')
+              && (ptr_loop++ < max_loops)) {
+              u_int8_t ptr_cl = packet->payload[ptr_off];
+
+              if ((ptr_cl & 0xc0) == 0xc0) {
+                  /* Nested compression - resolve further */
+                  u_int16_t nested_pointer;
+                  u_int nested_offset;
+
+                  if (ptr_off + 1 >= packet->payload_packet_len) {
+                      ptr_valid = 0;
+                      break;
+                  }
+
+                  nested_pointer = ((ptr_cl & 0x3f) << 8) | packet->payload[ptr_off + 1];
+                  nested_offset = nested_pointer;
+
+                  if (nested_offset >= packet->payload_packet_len) {
+                      ptr_valid = 0;
+                      break;
+                  }
+
+                  /* Add dot before nested pointer only if we already have content */
+                  if (j > 0 && j < max_len) {
+                      _hostname[j++] = '.';
+                  }
+
+                  ptr_off = nested_offset;
+                  ptr_first_label = 0;
+                  continue;
+              }
+
+              /* Regular label */
+              u_int8_t label_len = ptr_cl;
+
+              if (ptr_off + 1 + label_len >= packet->payload_packet_len) {
+                  ptr_valid = 0;
+                  break;
+              }
+
+              ptr_off++;
+
+              /* Add dot before this label if we already have content */
+              if (j && (j < max_len)) _hostname[j++] = '.';
+
+
+              while ((j < max_len) && (label_len > 0)) {
+                  c = packet->payload[ptr_off++];
+
+                  if (ignore_checks)
+                      _hostname[j++] = tolower(c);
+                  else {
+                      u_int32_t shift;
+
+                      shift = ((u_int32_t)1) << (c & 0x1f);
+
+                      if ((dns_validchar[c >> 5] & shift)) {
+                          _hostname[j++] = tolower(c);
+                      }
+                      else {
+                          if (hostname_is_valid == 1 && invalid_character) {
+                              /* Report the first one */
+                              *invalid_character = c;
+                          }
+                          hostname_is_valid = 0;
+                          if (ndpi_isprint(c) == 0) {
+                              _hostname[j++] = '?';
+                          }
+                          else {
+                              _hostname[j++] = '_';
+                          }
+                      }
+                  }
+                  label_len--;
+              }
+
+              ptr_first_label = 0;
+          }
+
+          /* After resolving the pointer, advance the main offset past the pointer */
+          offset = saved_offset + 2;
+
+          /* We've reached the end of this label chain */
+          break;
+
       }
+      else {
+          /* Regular (non-compressed) label */
+          u_int8_t label_len = cl;
 
-      cl--;
-    }
+          if ((offset + 1 + label_len >= packet->payload_packet_len)) {
+              /* Invalid label length */
+              j = 0;
+              break;
+          }
+
+          offset++;
+
+          /* Add dot before this label if we already have content */
+          if (j > 0 && j < max_len) {
+              _hostname[j++] = '.';
+          }
+
+          while ((j < max_len) && (label_len > 0)) {
+              c = packet->payload[offset++];
+
+              if (ignore_checks) {
+                  _hostname[j++] = tolower(c);
+              }
+              else {
+                  u_int32_t shift;
+                  shift = ((u_int32_t)1) << (c & 0x1f);
+
+                  if ((dns_validchar[c >> 5] & shift)) {
+                      _hostname[j++] = tolower(c);
+                  }
+                  else {
+                      if (hostname_is_valid == 1 && invalid_character) {
+                          /* Report the first one */
+                          *invalid_character = c;
+                      }
+                      hostname_is_valid = 0;
+
+                      if (ndpi_isprint(c) == 0) {
+                          _hostname[j++] = '?';
+                      }
+                      else {
+                          _hostname[j++] = '_';
+                      }
+                  }
+              }
+              label_len--;
+          }
+          first_label = 0;
+      }
   }
 
-  _hostname[j] = '\0', *_hostname_len = j;
+  /* Update the offset only if we successfully parsed at least one label */
+  if (j > 0) {
+      *off = offset;
+  }
+  else {
+      /* If parsing failed, don't update the offset */
+  }
+
+  _hostname[j] = '\0', * _hostname_len = j;
 
   return(hostname_is_valid);
 }
@@ -378,6 +513,9 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 
   ignore_checks = (proto->master_protocol == NDPI_PROTOCOL_MDNS);
 
+  if (dns->cnames == NULL)
+      dns->cnames = ndpi_calloc(1, sizeof(struct ndpi_dns_cname_info));
+
   for(num = 0; num < dns_header->num_answers; num++) {
     u_int16_t data_len;
 
@@ -419,8 +557,33 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
         printf("[DNS] [rsp_type: %u][data_len: %u]\n", rsp_type, data_len);
 #endif
 
-        if(rsp_type == 0x05 /* CNAME */) {
-          ;
+        if(rsp_type == 0x05 /* CNAME */ && dns->cnames) {
+            /* Capture CNAME records */
+            if (dns->cnames->num_cnames < MAX_NUM_DNS_CNAMES) {
+                u_int len, orig_x;
+
+                orig_x = x;
+                ndpi_grab_dns_name(packet, &x,
+                    dns->cnames->cname_domain_names[dns->cnames->num_cnames],
+                    MAX_CNAME_LEN - 1, &len,
+                    ignore_checks, NULL);
+                /* ndpi_grab_dns_name doesn't update the offset if it failed.
+                   We unconditionally update it at the end of the for loop */
+                x = orig_x;
+
+                if (len > 0) {
+                    dns->cnames->cname_ttls[dns->cnames->num_cnames] = ttl;
+                    dns->cnames->num_cnames++;
+                }
+            }
+
+            /* Also add CNAME to FPC DNS cache if applicable */
+            if (ndpi_struct->cfg.fpc_enabled &&
+                proto->app_protocol != NDPI_PROTOCOL_UNKNOWN &&
+                proto->app_protocol != proto->master_protocol &&
+                ndpi_struct->fpc_dns_cache) {
+                /* We could cache CNAMEs too, though they're less useful for IP-based lookups */
+            }
         } else if(rsp_type == 0x0C /* PTR */) {
           u_int16_t ptr_len = (packet->payload[x-2] << 8) + packet->payload[x-1];
 

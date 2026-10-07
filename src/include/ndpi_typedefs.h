@@ -1655,6 +1655,17 @@ struct ndpi_ipsec_details {
 
 /* ************************ */
 
+#define MAX_NUM_DNS_CNAMES 8
+#define MAX_CNAME_LEN 256
+
+struct ndpi_dns_cname_info {
+    u_int16_t num_cnames;
+    u_int16_t cname_ttls[MAX_NUM_DNS_CNAMES];
+    char cname_domain_names[MAX_NUM_DNS_CNAMES][MAX_CNAME_LEN];
+};
+
+/* ************************ */
+
 struct ndpi_flow_struct_dns_metadata {
   u_int8_t num_queries, num_answers, reply_code, num_rsp_addr;
   u_int8_t is_query:1, pad:7;
@@ -1664,6 +1675,7 @@ struct ndpi_flow_struct_dns_metadata {
   u_int32_t rsp_addr_ttl[MAX_NUM_DNS_RSP_ADDRESSES];
   char geolocation_iata_code[4];
   char ptr_domain_name[64 /* large enough but smaller than { } tls */];
+  struct ndpi_dns_cname_info* cnames;
 };
 
 /* ************************ */
