@@ -1,4 +1,4 @@
-# nDPI Native TCP Fingerprint Format
+# nDPI TCP Fingerprint Format
 
 **A Passive, Single-Packet TCP/IP Stack Fingerprint Derived from the Connection-Opening Segment**
 
@@ -9,7 +9,7 @@
 
 ## Status of This Memo
 
-This document specifies the **nDPI Native TCP Fingerprint** (hereafter *NTF*), the default TCP fingerprint computed by the `nDPI` deep packet inspection library (`metadata.tcp_fingerprint_format = 0`, symbol `NDPI_NATIVE_TCP_FINGERPRINT`). It describes the format as implemented in `src/lib/ndpi_main.c`, so that third-party producers can generate byte-identical fingerprints and consumers can interpret them. Where the implementation behaves in a non-obvious way on malformed input, that behaviour is documented as normative, because interoperability depends on it.
+This document specifies the **nDPI TCP Fingerprint** (hereafter *TCPFP*), the default TCP fingerprint computed by the `nDPI` deep packet inspection library (`metadata.tcp_fingerprint_format = 0`, symbol `NDPI_NATIVE_TCP_FINGERPRINT`). It describes the format as implemented in `src/lib/ndpi_main.c`, so that third-party producers can generate byte-identical fingerprints and consumers can interpret them. Where the implementation behaves in a non-obvious way on malformed input, that behaviour is documented as normative, because interoperability depends on it.
 
 This revision of the format removes ephemeral options and path-dependent values from the hash. Fingerprints produced by earlier nDPI versions are **not** compatible with it (§15).
 
@@ -46,7 +46,7 @@ Copyright © 2026, ntop. This draft is released under the Creative Commons Attri
 
 ## Abstract
 
-Different TCP/IP stacks emit visibly different connection-opening segments: they set different flag combinations (ECN negotiation), start from different initial TTLs, advertise different receive windows, and, above all, lay out TCP options in a stack-specific order. **NTF** condenses these properties into a short, fixed-structure ASCII string computed from a *single* packet, the first SYN of a flow, with no need for handshake completion, payload, or bidirectional visibility.
+Different TCP/IP stacks emit visibly different connection-opening segments: they set different flag combinations (ECN negotiation), start from different initial TTLs, advertise different receive windows, and, above all, lay out TCP options in a stack-specific order. **TCPFP** condenses these properties into a short, fixed-structure ASCII string computed from a *single* packet, the first SYN of a flow, with no need for handshake completion, payload, or bidirectional visibility.
 
 The fingerprint is the underscore-separated concatenation of four fields:
 
@@ -110,7 +110,7 @@ This specification covers:
 - behaviour on malformed option encodings;
 - how nDPI maps a fingerprint to an operating-system hint and which flow risks are raised during computation.
 
-It does **not** cover the MuonFP format (`metadata.tcp_fingerprint_format = 1`) or FoxIO's JA4T, except for the comparison in §12, nor the nDPI TLS/JA4-derived fingerprints that embed NTF as a component.
+It does **not** cover the MuonFP format (`metadata.tcp_fingerprint_format = 1`) or FoxIO's JA4T, except for the comparison in §12, nor the nDPI TLS/JA4-derived fingerprints that embed TCPFP as a component.
 
 ## 3. Design Rationale
 
@@ -137,7 +137,7 @@ Given a qualifying segment, the producer extracts:
 ### 5.1 Grammar (ABNF, RFC 5234)
 
 ```
-ntf          = flags "_" ttl-bucket "_" window "_" options-hash
+tcpfp        = flags "_" ttl-bucket "_" window "_" options-hash
 flags        = 1*4DIGIT          ; Dec(F), 0..4095
 ttl-bucket   = "32" / "64" / "128" / "192" / "255"
 window       = 1*5DIGIT          ; Dec(W), 0..65535
@@ -164,12 +164,12 @@ LHEXDIG      = DIGIT / %x61-66   ; 0-9 a-f
 
 ### 6.1 Preconditions
 
-A producer **MUST** compute NTF only when all of the following hold:
+A producer **MUST** compute TCPFP only when all of the following hold:
 
 1. The IP packet is not fragmented and the L4 header is fully present (`transport_len >= 20`).
 2. The TCP header is fully captured: `transport_len >= doff*4`.
 3. `doff*4 >= 20`. Otherwise the segment is not fingerprinted.
-4. No fingerprint has already been recorded for the flow. NTF is computed **at most once per flow**, from the first qualifying segment in either direction. Retransmitted SYNs therefore do not overwrite the value.
+4. No fingerprint has already been recorded for the flow. TCPFP is computed **at most once per flow**, from the first qualifying segment in either direction. Retransmitted SYNs therefore do not overwrite the value.
 
 ### 6.2 Segment Selection
 
@@ -177,7 +177,7 @@ A producer **MUST** compute NTF only when all of the following hold:
 qualify = (F & SYN (0x002)) != 0  &&  (F & ACK (0x010)) == 0
 ```
 
-`SYN-ACK` segments are excluded, so on a normally observed flow NTF describes the **initiator's** stack. The `ECE`/`CWR` bits of a qualifying SYN are still part of `F`, so ECN negotiation remains part of the fingerprint.
+`SYN-ACK` segments are excluded, so on a normally observed flow TCPFP describes the **initiator's** stack. The `ECE`/`CWR` bits of a qualifying SYN are still part of `F`, so ECN negotiation remains part of the fingerprint.
 
 ### 6.3 TTL Bucketing
 
@@ -249,7 +249,7 @@ When `R` is empty, `oh = e3b0c44298fc` (the prefix of SHA-256 of the empty strin
 ### 6.6 Assembly
 
 ```
-NTF = Dec(F) || "_" || Dec(T') || "_" || Dec(W) || "_" || oh
+TCPFP = Dec(F) || "_" || Dec(T') || "_" || Dec(W) || "_" || oh
 ```
 
 ### 6.7 Worked Example (Linux)
@@ -275,7 +275,7 @@ SYN, IPv4 TTL 64, window 64240, options (20 octets):
 ```
 R   = "020408010307"
 H   = SHA-256("020408010307") = 5ec4846073b9…
-NTF = 2_64_64240_5ec4846073b9
+TCPFP = 2_64_64240_5ec4846073b9
 ```
 
 This value matches the `ndpi_os_linux` entries in `src/lib/ndpi_os_fingerprint.c.inc`. The same stack over IPv6 (MSS 1440, window 64800) produces `2_64_64800_5ec4846073b9`: the window differs, but the options hash is identical.
@@ -336,8 +336,8 @@ An empty option region gives `R = ""`, `oh = e3b0c44298fc`, and raises the flow 
 
 ## 9. Matching Semantics and OS Inference
 
-- NTF values are compared by **exact, case-sensitive string equality**. The format has no partial or per-field matching semantics. Consumers that want to match on a subset of fields (e.g. ignore the window) **MUST** split on `_` and compare fields individually.
-- After computing NTF, nDPI looks it up in a hash table (`ndpi_get_os_from_tcp_fingerprint()`) and stores the result in `flow->metadata.l4.tcp.os_hint` as an `ndpi_os` value:
+- TCPFP values are compared by **exact, case-sensitive string equality**. The format has no partial or per-field matching semantics. Consumers that want to match on a subset of fields (e.g. ignore the window) **MUST** split on `_` and compare fields individually.
+- After computing TCPFP, nDPI looks it up in a hash table (`ndpi_get_os_from_tcp_fingerprint()`) and stores the result in `flow->metadata.l4.tcp.os_hint` as an `ndpi_os` value:
 
   | `ndpi_os` | Value |
   |---|---|
@@ -353,7 +353,7 @@ An empty option region gives `R = ""`, `oh = e3b0c44298fc`, and raises the flow 
 
   ```
   # comment
-  <NTF>,<numeric ndpi_os>
+  <TCPFP>,<numeric ndpi_os>
   2_64_14600_b88686e220ac,5
   ```
 
@@ -362,7 +362,7 @@ An empty option region gives `R = ""`, `oh = e3b0c44298fc`, and raises the flow 
 
 ## 10. Side Effects: Flow Risks
 
-While computing NTF, nDPI raises `NDPI_MALICIOUS_FINGERPRINT` in two cases:
+While computing TCPFP, nDPI raises `NDPI_MALICIOUS_FINGERPRINT` in two cases:
 
 | Condition | Risk message | Rationale |
 |---|---|---|
@@ -376,15 +376,15 @@ These risks are independent of the fingerprint string and do not alter it.
 | Parameter | Default | Effect |
 |---|---|---|
 | `metadata.tcp_fingerprint` | `enable` | Master switch. When disabled, no TCP fingerprint is computed. |
-| `metadata.tcp_fingerprint_format` | `0` | `0` = NTF (this document), `1` = MuonFP. |
+| `metadata.tcp_fingerprint_format` | `0` | `0` = TCPFP (this document), `1` = MuonFP. |
 | `metadata.tcp_fingerprint_raw` | `disable` | Also export `R` (the pre-hash raw options string) when `|R| > 0`. |
-| `metadata.ndpi_fingerprint_ignore_tcp_fp` | `disable` | When disabled, NTF is used as the L4 component of the composite nDPI client fingerprint. |
+| `metadata.ndpi_fingerprint_ignore_tcp_fp` | `disable` | When disabled, TCPFP is used as the L4 component of the composite nDPI client fingerprint. |
 
 Exported fields:
 
 - C API: `flow->metadata.l4.tcp.fingerprint`, `flow->metadata.l4.tcp.fingerprint_raw`, `flow->metadata.l4.tcp.os_hint`.
 - JSON/TLV serializer: `"tcp_fingerprint"` and `"tcp_fingerprint_raw"`.
-- `ndpiReader`: `[TCP Fingerprint: <NTF>/<OS>]`, e.g. `[TCP Fingerprint: 2_64_64240_5ec4846073b9/Linux]`.
+- `ndpiReader`: `[TCP Fingerprint: <TCPFP>/<OS>]`, e.g. `[TCP Fingerprint: 2_64_64240_5ec4846073b9/Linux]`.
 - Wireshark (`wireshark/ndpi.lua`): field `ntop.tcp_fingerprint`.
 
 Exporting `R` is **RECOMMENDED** when building or auditing fingerprint databases, because it makes hash collisions directly visible and allows the database to be recomputed if the format changes.
@@ -393,7 +393,7 @@ Exporting `R` is **RECOMMENDED** when building or auditing fingerprint databases
 
 ### 12.1 JA4T
 
-JA4T is FoxIO's TCP client fingerprint, part of the JA4+ suite [R14]. Like NTF, it is computed passively from the client SYN. It is a human-readable string of four `_`-separated fields:
+JA4T is FoxIO's TCP client fingerprint, part of the JA4+ suite [R14]. Like TCPFP, it is computed passively from the client SYN. It is a human-readable string of four `_`-separated fields:
 
 ```
 JA4T = <window>_<option kinds, "-" separated, in wire order>_<MSS>_<window scale>
@@ -405,7 +405,7 @@ The JA4+ suite also defines two related fingerprints:
 
 Applying the JA4T rules to the vectors of Appendix A gives:
 
-| Vector | JA4T | NTF |
+| Vector | JA4T | TCPFP |
 |---|---|---|
 | 1 Linux, IPv4 | `64240_2-4-8-1-3_1460_7` | `2_64_64240_5ec4846073b9` |
 | 2 Linux, IPv6 | `64800_2-4-8-1-3_1440_7` | `2_64_64800_5ec4846073b9` |
@@ -416,7 +416,7 @@ Applying the JA4T rules to the vectors of Appendix A gives:
 
 The two fingerprints start from the same observation: window, option layout and a few option values identify a TCP/IP stack. They make different trade-offs:
 
-| Aspect | JA4T | NTF |
+| Aspect | JA4T | TCPFP |
 |---|---|---|
 | Packet | Client SYN (JA4TS: server SYN-ACK) | Client SYN only |
 | Representation | Clear text, variable length | `flags_ttl_win` in clear + 48-bit hash of the options, fixed layout |
@@ -428,25 +428,25 @@ The two fingerprints start from the same observation: window, option layout and 
 | Window-scale shift | Included | Included (inside the hash) |
 | Other option values (MPTCP version and flags, RFC 6994 ExID, unknown options) | Not included | Included (inside the hash) |
 | Partial matching | Natural: fields and option lists can be compared or wildcarded directly | Only on `flags`, `ttl` and `window`; option-level matching needs the raw string `R` (§11) |
-| Active variant | JA4TScan (retransmission timing) | None; NTF is passive only |
+| Active variant | JA4TScan (retransmission timing) | None; TCPFP is passive only |
 
-**The main design difference is MSS.** JA4T keeps the MSS on purpose. An MSS below what the link MTU would allow (e.g. 1460 minus tunnel overhead) reveals VPNs, tunnels and proxies on the path, and FoxIO presents this as a JA4T use case. NTF deliberately removes the MSS so that one stack yields one fingerprint regardless of path: vectors 1 and 2 share the NTF options hash, while their JA4T strings differ. As a result, NTF is the better key for stack/OS identification and database lookups, and JA4T is the better signal for path analysis. The two are complementary, not competing.
+**The main design difference is MSS.** JA4T keeps the MSS on purpose. An MSS below what the link MTU would allow (e.g. 1460 minus tunnel overhead) reveals VPNs, tunnels and proxies on the path, and FoxIO presents this as a JA4T use case. TCPFP deliberately removes the MSS so that one stack yields one fingerprint regardless of path: vectors 1 and 2 share the TCPFP options hash, while their JA4T strings differ. As a result, TCPFP is the better key for stack/OS identification and database lookups, and JA4T is the better signal for path analysis. The two are complementary, not competing.
 
-**NTF sees more of the stack in two respects:**
-- **Flags and TTL.** Vectors 6 and 7 have the same JA4T, but NTF separates them (`2` vs `194`). ECN negotiation and the initial TTL (64 vs 128 vs 255) are strong OS discriminators that JA4T leaves out.
-- **Option values beyond MSS and WS.** NTF hashes the MPTCP version and flags, the RFC 6994 ExIDs and the values of unknown options. JA4T records these options only by their kind.
+**TCPFP sees more of the stack in two respects:**
+- **Flags and TTL.** Vectors 6 and 7 have the same JA4T, but TCPFP separates them (`2` vs `194`). ECN negotiation and the initial TTL (64 vs 128 vs 255) are strong OS discriminators that JA4T leaves out.
+- **Option values beyond MSS and WS.** TCPFP hashes the MPTCP version and flags, the RFC 6994 ExIDs and the values of unknown options. JA4T records these options only by their kind.
 
-**JA4T sees more in one respect:** the presence of TFO. Vector 3 shows TFO in JA4T but not in NTF. That makes the JA4T of a client depend on whether it has a TFO cookie for the server, or uses TFO at all. It is the same session-state drift TLSFP removes for TLS, and NTF removes it for TCP (§13). JA4T also lists every trailing EOL (`…-0-0`), which follows from the option layout and adds no information.
+**JA4T sees more in one respect:** the presence of TFO. Vector 3 shows TFO in JA4T but not in TCPFP. That makes the JA4T of a client depend on whether it has a TFO cookie for the server, or uses TFO at all. It is the same session-state drift TLSFP removes for TLS, and TCPFP removes it for TCP (§13). JA4T also lists every trailing EOL (`…-0-0`), which follows from the option layout and adds no information.
 
-**Readability vs compactness.** JA4T can be read and matched by eye; NTF cannot without `R`. On the other hand, NTF has a fixed, bounded layout that suits hash-table lookups (`ndpi_get_os_from_tcp_fingerprint()`) and flow export.
+**Readability vs compactness.** JA4T can be read and matched by eye; TCPFP cannot without `R`. On the other hand, TCPFP has a fixed, bounded layout that suits hash-table lookups (`ndpi_get_os_from_tcp_fingerprint()`) and flow export.
 
-**Licensing.** At the time of writing, FoxIO publishes JA4 (TLS client) under the BSD 3-Clause license and the other JA4+ methods, including JA4T, under the FoxIO License 1.1, which restricts some commercial uses. Check FoxIO's current terms before embedding JA4T. NTF is specified under CC BY 4.0 (this document) and implemented in nDPI under the LGPLv3.
+**Licensing.** At the time of writing, FoxIO publishes JA4 (TLS client) under the BSD 3-Clause license and the other JA4+ methods, including JA4T, under the FoxIO License 1.1, which restricts some commercial uses. Check FoxIO's current terms before embedding JA4T. TCPFP is specified under CC BY 4.0 (this document) and implemented in nDPI under the LGPLv3.
 
 ### 12.2 MuonFP
 
-MuonFP (`metadata.tcp_fingerprint_format = 1`) carries essentially the same information as JA4T: window, option kinds, MSS and window scale, in clear text with `:` as the separator (e.g. `64240:2-4-8-1-3:1460:7`). nDPI users who need a JA4T-style fingerprint can therefore use format 1, which differs from JA4T mainly in field separators and in how an absent MSS or window scale is encoded. It is computed by the same parser pass as NTF:
+MuonFP (`metadata.tcp_fingerprint_format = 1`) carries essentially the same information as JA4T: window, option kinds, MSS and window scale, in clear text with `:` as the separator (e.g. `64240:2-4-8-1-3:1460:7`). nDPI users who need a JA4T-style fingerprint can therefore use format 1, which differs from JA4T mainly in field separators and in how an absent MSS or window scale is encoded. It is computed by the same parser pass as TCPFP:
 
-| Aspect | NTF (format 0) | MuonFP (format 1) |
+| Aspect | TCPFP (format 0) | MuonFP (format 1) |
 |---|---|---|
 | Layout | `flags_ttl_win_hash12` | `win:kinds:mss:wscale` |
 | Flags / TTL | Included | Not included |
@@ -476,11 +476,11 @@ Because the window is usually still stack-specific, consumers that need to match
 
 ## 14. Security and Privacy Considerations
 
-- **Spoofability.** Every NTF input is sender-controlled, so a crafted SYN can impersonate any fingerprint. NTF **MUST NOT** be used as an authentication signal.
+- **Spoofability.** Every TCPFP input is sender-controlled, so a crafted SYN can impersonate any fingerprint. TCPFP **MUST NOT** be used as an authentication signal.
 - **Truncated hash.** The 48-bit hash truncation is sized for classification, not collision resistance. An attacker can find a second preimage of a chosen `R` with approximately `2^48` work. Because `R` is itself constrained to at most 40 option octets, collisions are in any case not a concern for benign traffic.
-- **Evasion.** MSS, TFO and MAC perturbation do not change NTF, but unknown option values are still hashed, so a tool can change its NTF by adding or altering one. A tool can also pad a SYN with TFO options, which are removed, without changing its fingerprint. Detection logic **SHOULD** combine NTF with the structural risks of §10 and, where available, with the raw string `R`.
+- **Evasion.** MSS, TFO and MAC perturbation do not change TCPFP, but unknown option values are still hashed, so a tool can change its TCPFP by adding or altering one. A tool can also pad a SYN with TFO options, which are removed, without changing its fingerprint. Detection logic **SHOULD** combine TCPFP with the structural risks of §10 and, where available, with the raw string `R`.
 - **Parser safety.** The parser reads only within the option region and writes only within the fixed output buffer. With a 16-bit cursor (§8.5), crafted `L == 0` or oversized `L` values cannot cause out-of-bounds access or non-termination.
-- **Privacy.** NTF identifies a TCP/IP **stack configuration**, not an individual. The values that could link connections from the same host are excluded from both the hash and `R`: Timestamps (uptime/clock-skew estimation), TFO cookies (per client-server pair) and MPTCP keys.
+- **Privacy.** TCPFP identifies a TCP/IP **stack configuration**, not an individual. The values that could link connections from the same host are excluded from both the hash and `R`: Timestamps (uptime/clock-skew estimation), TFO cookies (per client-server pair) and MPTCP keys.
 
 ## 15. Changes from the Previous Native Format
 
@@ -519,7 +519,7 @@ On the nDPI regression corpus (4,524 fingerprinted flows):
 
 A conformant **producer**:
 
-1. **MUST** select packets exactly as in §6.1 and §6.2, and compute at most one NTF per flow.
+1. **MUST** select packets exactly as in §6.1 and §6.2, and compute at most one TCPFP per flow.
 2. **MUST** bucket TTL/Hop Limit as in §6.3.
 3. **MUST** build `R` exactly as in §6.4 and §7, including the NOP-adjacency rule, the EOL termination and the malformed-input behaviour of §8.
 4. **MUST** hash the ASCII text of `R` with SHA-256 and emit the first six digest octets as 12 lowercase hex characters.
@@ -529,8 +529,8 @@ A conformant **producer**:
 A conformant **consumer**:
 
 1. **MUST** compare fingerprints by exact string equality unless it explicitly implements per-field matching.
-2. **MUST NOT** treat an OS hint derived from NTF as authoritative.
-3. **MUST NOT** match NTF values against fingerprints produced by the previous native format (§15) or by MuonFP.
+2. **MUST NOT** treat an OS hint derived from TCPFP as authoritative.
+3. **MUST NOT** match TCPFP values against fingerprints produced by the previous native format (§15) or by MuonFP.
 
 ---
 
@@ -540,7 +540,7 @@ All vectors were computed with the reference implementation in Appendix B and cr
 
 ### A.1 Well-formed SYNs
 
-| # | Stack / case | `F` | TTL → `T'` | `W` | Options | `R` | NTF |
+| # | Stack / case | `F` | TTL → `T'` | `W` | Options | `R` | TCPFP |
 |---|---|---|---|---|---|---|---|
 | 1 | Linux, IPv4 | 2 | 64 → 64 | 64240 | `020405b4 0402 080a… 01 030307` | `020408010307` | `2_64_64240_5ec4846073b9` |
 | 2 | Linux, IPv6 (MSS 1440) | 2 | 64 → 64 | 64800 | `020405a0 0402 080a… 01 030307` | `020408010307` | `2_64_64800_5ec4846073b9` |
@@ -560,7 +560,7 @@ Observations:
 
 ### A.2 Malformed SYNs (IPv4, TTL 64, window 64240, `F = 2`)
 
-| # | Options | `R` | NTF |
+| # | Options | `R` | TCPFP |
 |---|---|---|---|
 | 11 | `22 03 01 22 fd 00…00` (40 octets; `i + L` > 255) | `""` | `2_64_64240_e3b0c44298fc` |
 | 12 | `020405b4 03 00 00 00` (`L == 0`) | `0203` | `2_64_64240_c2576dd8541a` |
@@ -629,7 +629,7 @@ def _raw_options(opts):
 
 def ndpi_native_tcp_fp(tcp_hdr: bytes, ttl: int):
     """tcp_hdr: full TCP header incl. options; ttl: IPv4 TTL or IPv6 Hop Limit.
-       Returns (ntf, raw) or None if the segment does not qualify."""
+       Returns (TCPFP, raw) or None if the segment does not qualify."""
     flags = int.from_bytes(tcp_hdr[12:14], "big") & 0x0FFF
     if not (flags & 0x002) or (flags & 0x010):        # SYN set, ACK clear
         return None
