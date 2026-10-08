@@ -222,6 +222,7 @@ struct ndpi_detection_module_config_struct {
     correct detection/classification.
     See #1946 for other details */
   int tcp_ack_paylod_heuristic;
+  int http_mp4_structural_detection;
   /* Heuristic to detect fully encrypted sessions, i.e. flows where every bytes of
      the payload is encrypted in an attempt to “look like nothing”.
      This heuristic only analyzes the first packet of the flow.
