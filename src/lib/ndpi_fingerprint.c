@@ -312,7 +312,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 	fp_buf[sni_off] = '_';
     }
 
-#if 1
+#if 0
     fprintf(stderr, "#### [sport=%u] %s\n", ntohs(flow->core.c_port), fp_buf);
 #endif
 
