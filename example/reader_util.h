@@ -357,6 +357,9 @@ typedef struct ndpi_flow_info {
     char geolocation_iata_code[4];
     char ptr_domain_name[64];
     u_int16_t transaction_id;
+    u_int16_t num_cnames;
+    u_int16_t cname_ttls[MAX_NUM_DNS_CNAMES];
+    char cname_domain_names[MAX_NUM_DNS_CNAMES][MAX_CNAME_LEN];
   } dns;
 
   struct ndpi_ipsec_details ipsec;
