@@ -892,12 +892,11 @@ struct ndpi_tls_block {
 typedef enum {
   ndpi_os_unknown     = 0,
   ndpi_os_windows     = 1,
-  ndpi_os_macos       = 2,
-  ndpi_os_ios_ipad_os = 3,
-  ndpi_os_android     = 4,
-  ndpi_os_linux       = 5,
-  ndpi_os_freebsd     = 6,
-  ndpi_os_MAX_OS      = 7 /* Keep it as last */
+  ndpi_os_apple       = 2, /* macOS / iPadOS / iOS */
+  ndpi_os_android     = 3,
+  ndpi_os_linux       = 4,
+  ndpi_os_freebsd     = 5,
+  ndpi_os_MAX_OS      = 6 /* Keep it as last */
 } ndpi_os;
 
 struct ndpi_flow_tcp_struct {

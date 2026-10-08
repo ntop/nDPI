@@ -1,0 +1,41 @@
+DPI Packets (TCP):	8	(8.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 165 (165.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  2/2 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 9/5 (search/found)
+Hash ja4 custom protos:    2/0 (search/found)
+Hash fp custom protos:     1/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+ntop	35	17584	1
+
+Safe                            35 17584         1            
+
+Network                         35 17584         1            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.1.29             	 1      
+
+
+	1	TCP 192.168.1.29:50012 <-> 116.203.142.127:443 [proto: 91.26/TLS.ntop][Stack: TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 8][cat: Network/14][Breed: Safe][20 pkts/9092 bytes <-> 15 pkts/8492 bytes][Goodput ratio: 85/88][1.53 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: h2;http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: 0.034 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 93/133 1366/1397 329/400][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 455/566 1506/1506 558/549][Risk: ** TLS Susp Extn **][Risk Score: 100][Risk Info: Extn id 51764][nDPI Cli Fingerprint: abf7e62258c2dc53e2d8fabd60cc0e3a][nDPI Srv Fingerprint: a2da83e97c3d][TCP Fingerprint: 194_64_65535_96500ba614e1/macOS/iOS/iPad][TLSv1.3][JA4: t13d1517h2_8daaf6152771_e1144aa4d245][TLS-C: t13d1515h2_8daaf6152771_28ee01d69da8_646c356617d7][JA3S: f4febc55ea12b31ae17cfb7e614afda8][ECH: version 0xfe0d][Chrome][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 0,0,16,0,0,0,0,0,0,0,0,0,0,5,5,5,0,5,0,0,0,0,0,5,0,16,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,34,0,0]

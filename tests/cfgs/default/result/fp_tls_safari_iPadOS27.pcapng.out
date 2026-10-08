@@ -1,0 +1,41 @@
+DPI Packets (TCP):	8	(8.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 165 (165.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          1/1 (search/found)
+Automa domain:        1/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  1/1 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   1/1 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 9/5 (search/found)
+Hash ja4 custom protos:    2/0 (search/found)
+Hash fp custom protos:     1/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+ntop	283	265407	1
+
+Safe                           283 265407        1            
+
+Network                        283 265407        1            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 192.168.2.7              	 1      
+
+
+	1	TCP 192.168.2.7:59303 <-> 116.203.142.127:443 [proto: 91.26/TLS.ntop][Stack: TLS.ntop][IP: 26/ntop][Encrypted][Confidence: DPI][FPC: 26/ntop, Confidence: IP address][DPI packets: 8][cat: Network/14][Breed: Safe][108 pkts/12542 bytes <-> 175 pkts/252865 bytes][Goodput ratio: 43/95][0.79 sec][Hostname/SNI: www.ntop.org][(Advertised) ALPNs: http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.905 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 6/3 105/131 19/16][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 116/1445 1506/1506 190/255][nDPI Cli Fingerprint: f6c6b36c01f4466aa5728a4f92e54dec][nDPI Srv Fingerprint: 81dba73ae426][TCP Fingerprint: 194_64_65535_96500ba614e1/macOS/iOS/iPad][TLSv1.3][JA4: t13d2013h1_a09f3c656075_7f0f34a4126d][TLS-C: t13d2012h1_a09f3c656075_e74e2a067d44_e8413690628f][JA3S: 15af977ce25de452b96affa2addb1036][Safari][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,0,0]

@@ -4904,8 +4904,7 @@ void ndpi_fill_randombytes(unsigned char *buf, unsigned int buf_len) {
 const char* ndpi_print_os_hint(ndpi_os os_hint) {
   switch(os_hint) {
   case ndpi_os_windows:          return("Windows");
-  case ndpi_os_macos:            return("macOS");
-  case ndpi_os_ios_ipad_os:      return("iOS/iPad");
+  case ndpi_os_apple:            return("macOS/iOS/iPad");
   case ndpi_os_android:          return("Android");
   case ndpi_os_linux:            return("Linux");
   case ndpi_os_freebsd:          return("FreeBSD");
