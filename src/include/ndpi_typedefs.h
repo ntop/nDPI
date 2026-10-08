@@ -196,6 +196,7 @@ typedef enum {
   NDPI_SLOW_DOS,
   NDPI_NON_PQC,                /* Set in case an encryped traffic stream does not comply with post-quantum encryotion */
   NDPI_AI_INFERENCE_TRAFFIC,
+  NDPI_NON_PQC_FLOW,            /* TLS flow negotiated a non-post-quantum key-exchange group */
 
   /* Before allocating a new risk here, check if there are FREE entries above */
 
