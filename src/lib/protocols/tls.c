@@ -1395,7 +1395,7 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
         printf("[TLS] Certificate from client. Ignoring it\n");
 #endif
       }
-      
+
       flow->core.tls_quic.certificate_processed = 1;
     }
     break;
@@ -1410,7 +1410,7 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
 
 	if(offset < packet->payload_packet_len) {
 	  offset++;
-	  
+
 	  if((offset + 2) < packet->payload_packet_len) {
 	    flow->metadata.protos.tls_quic.signature_algorithms =
 	      (packet->payload[offset] << 8) + packet->payload[offset+1];
@@ -2933,10 +2933,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		   (packet->payload[extn_offset+1] & 0xFF));
 #endif
 
-	    while(extn_offset + 4 < extn_end) {
+	    if(extension_len >= 5) { /* ServerHello KeyShareEntry; not HRR selected_group */
 	      u_int16_t group_id     = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
 	      u_int16_t key_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset + 2])));
-
 #ifdef DEBUG_TLS
 	      printf("\t[%02X %02X][extn_offset: %u][group_id: %u][key_extn_len: %u]\n",
 		     (packet->payload[extn_offset] & 0xFF),
@@ -2944,13 +2943,11 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		     extn_offset,
 		     group_id, key_extn_len);
 #endif
-
-	      if(group_id != 0x2A2A /* Skip GREASE */) {
+	      if(!ndpi_is_grease_value(group_id) /* Skip GREASE */ && key_extn_len > 0 &&
+		 (u_int32_t)extn_offset + 4 + key_extn_len == extn_end) {
 		if(ja.server.num_key_share_groups < MAX_NUM_JA)
 		  ja.server.key_share_group[ja.server.num_key_share_groups++] = group_id;
 	      }
-
-	      extn_offset += key_extn_len + 4;
 	    }
 	  }
 
@@ -2966,6 +2963,17 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
          (i.e. (D)TLS <= 1.2), use the version field present in the record layer */
       if(flow->metadata.protos.tls_quic.ssl_version == 0)
         flow->metadata.protos.tls_quic.ssl_version = tls_version;
+
+      if(!is_dtls && flow->metadata.protos.tls_quic.client_hello_processed &&
+         flow->metadata.protos.tls_quic.ssl_version == 0x0304 &&
+         ja.server.num_key_share_groups > 0 &&
+         ndpi_tls_key_share_group_is_pq(ja.server.key_share_group[0]) == 0) {
+        char risk_info[64];
+        snprintf(risk_info, sizeof(risk_info),
+                 "TLS 1.3 negotiated non-PQ group 0x%04X",
+                 ja.server.key_share_group[0]);
+        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_NON_PQC_FLOW, risk_info);
+      }
 
       if(ndpi_struct->cfg.ndpi_server_fingerprint_enabled
 	 && (flow->metadata.ndpi.server_fingerprint == NULL))
