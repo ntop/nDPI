@@ -63,7 +63,7 @@ where `<options_hash>` is a truncated SHA-256 over a hex serialization of the TC
 - TCP Fast Open, completely, including its NOP padding (per destination);
 - everything after the first End-of-Option-List (padding).
 
-This follows the same approach JA5 applies to ephemeral TLS extensions. The reference implementation is in `nDPI` (`src/lib/ndpi_main.c`, functions `ndpi_init_packet()` and `ndpi_tcp_fp_option_value_len()`). The fingerprint-to-OS database is in `src/lib/ndpi_os_fingerprint.c.inc`, and a Lua port is in `wireshark/ndpi.lua`.
+This follows the same approach TLSPF applies to ephemeral TLS extensions. The reference implementation is in `nDPI` (`src/lib/ndpi_main.c`, functions `ndpi_init_packet()` and `ndpi_tcp_fp_option_value_len()`). The fingerprint-to-OS database is in `src/lib/ndpi_os_fingerprint.c.inc`, and a Lua port is in `wireshark/ndpi.lua`.
 
 ## Normative and Informative References
 
@@ -436,7 +436,7 @@ The two fingerprints start from the same observation: window, option layout and 
 - **Flags and TTL.** Vectors 6 and 7 have the same JA4T, but NTF separates them (`2` vs `194`). ECN negotiation and the initial TTL (64 vs 128 vs 255) are strong OS discriminators that JA4T leaves out.
 - **Option values beyond MSS and WS.** NTF hashes the MPTCP version and flags, the RFC 6994 ExIDs and the values of unknown options. JA4T records these options only by their kind.
 
-**JA4T sees more in one respect:** the presence of TFO. Vector 3 shows TFO in JA4T but not in NTF. That makes the JA4T of a client depend on whether it has a TFO cookie for the server, or uses TFO at all. It is the same session-state drift JA5 removes for TLS, and NTF removes it for TCP (§13). JA4T also lists every trailing EOL (`…-0-0`), which follows from the option layout and adds no information.
+**JA4T sees more in one respect:** the presence of TFO. Vector 3 shows TFO in JA4T but not in NTF. That makes the JA4T of a client depend on whether it has a TFO cookie for the server, or uses TFO at all. It is the same session-state drift TLSFP removes for TLS, and NTF removes it for TCP (§13). JA4T also lists every trailing EOL (`…-0-0`), which follows from the option layout and adds no information.
 
 **Readability vs compactness.** JA4T can be read and matched by eye; NTF cannot without `R`. On the other hand, NTF has a fixed, bounded layout that suits hash-table lookups (`ndpi_get_os_from_tcp_fingerprint()`) and flow export.
 
