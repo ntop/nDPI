@@ -8206,7 +8206,9 @@ void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
       }
     }
 
-    if (flow_is_proto(flow, NDPI_PROTOCOL_DNS)) {
+    if (flow_is_proto(flow, NDPI_PROTOCOL_DNS) ||
+        flow_is_proto(flow, NDPI_PROTOCOL_LLMNR) ||
+        flow_is_proto(flow, NDPI_PROTOCOL_MDNS)) {
       if (flow->metadata.protos.dns.cnames) {
           ndpi_free(flow->metadata.protos.dns.cnames);
           flow->metadata.protos.dns.cnames = NULL;
