@@ -1,4 +1,4 @@
-# JA5 TLS Client Fingerprint Format
+# nDPI TLS Client Fingerprint (TLSFP) Format
 
 **An Extension of JA4 with Ephemeral-Extension Sanitization and Supported-Groups Binding**
 
@@ -9,7 +9,7 @@
 
 ## Status of This Memo
 
-This document defines the **JA5 TLS Client Fingerprint (JA5) Format**, an extension of the JA4 fingerprint proposed for adoption within the `nDPI` deep packet inspection library and downstream consumers. It is published as a draft for internal and community review. Implementers are encouraged to validate the algorithm against production TLS traffic and to report collision, stability, and performance data.
+This document defines the **nDPI TLS Client Fingerprint (TLSFP) Format**, an extension of the JA4 fingerprint proposed for adoption within the `nDPI` deep packet inspection library and downstream consumers. It is published as a draft for internal and community review. Implementers are encouraged to validate the algorithm against production TLS traffic and to report collision, stability, and performance data.
 
 ## Copyright and License
 
@@ -48,7 +48,7 @@ The **JA4** fingerprint (FoxIO, 2023) improved on **JA3** by sorting cipher suit
 1. **Ephemeral extensions** — extensions whose presence, absence, or ordering varies run-to-run for an otherwise identical client build, due to session state, TLS session resumption, or library-internal padding heuristics — introduce fingerprint drift that is indistinguishable from genuine client diversity.
 2. JA4 intentionally discards the **values** carried inside the `supported_groups` (elliptic curve) extension, retaining only extension *identity*, which causes distinct TLS stacks negotiating different curve sets to collide onto the same JA4_c hash.
 
-**JA5** addresses both issues by (a) excluding a curated set of ephemeral extension types from both the extension count and the extension hash input, and (b) appending a fourth, independently computed hash segment derived from the ordered `supported_groups` values. This document specifies the canonical string format, the byte-level calculation procedure, normalization rules, matching semantics, and conformance requirements for JA5 producers and consumers. A reference implementation is maintained in `nDPI` (`src/lib/protocols/tls.c`).
+**TLSFP** addresses both issues by (a) excluding a curated set of ephemeral extension types from both the extension count and the extension hash input, and (b) appending a fourth, independently computed hash segment derived from the ordered `supported_groups` values. This document specifies the canonical string format, the byte-level calculation procedure, normalization rules, matching semantics, and conformance requirements for TLSFP producers and consumers. A reference implementation is maintained in `nDPI` (`src/lib/protocols/tls.c`).
 
 ## Normative and Informative References
 
@@ -69,13 +69,13 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 | Term | Definition |
 |---|---|
 | **ClientHello** | The first TLS handshake message sent by a client, as defined in RFC 8446 §4.1.2. |
-| **GREASE** | Placeholder cipher/extension/group values following the bit pattern `0x?A?A` (RFC 8701), inserted by conforming clients to prevent protocol ossification. GREASE values **MUST** be excluded from all JA5 computations. |
-| **Ephemeral extension** | An extension type whose presence, absence, or byte content on the wire is determined by *session state* (e.g. resumption, retry) rather than by the client's static TLS stack configuration, and which therefore **MUST** be excluded from the JA5_a count and JA5_c hash input. The canonical registry is given in Appendix B. |
+| **GREASE** | Placeholder cipher/extension/group values following the bit pattern `0x?A?A` (RFC 8701), inserted by conforming clients to prevent protocol ossification. GREASE values **MUST** be excluded from all TLSFP computations. |
+| **Ephemeral extension** | An extension type whose presence, absence, or byte content on the wire is determined by *session state* (e.g. resumption, retry) rather than by the client's static TLS stack configuration, and which therefore **MUST** be excluded from the TLSFP_a count and TLSFP_c hash input. The canonical registry is given in Appendix B. |
 | **Fingerprint** | A signature derived from ClientHello header features. It does *not* uniquely identify a person or device; it characterizes TLS stack and library behavior. |
 
 ## 2. Scope
 
-This document specifies: the JA5 string format and its Augmented Backus–Naur Form (ABNF) grammar; the byte-level algorithm used to derive each field from a captured ClientHello; normalization and canonicalization rules; matching semantics for exact and wildcard consumers; error handling; and conformance requirements for **producers** (DPI sensors, e.g. `nDPI`) and **consumers** (firewalls, SIEM, `ntopng` flow classification, SOAR).
+This document specifies: the TLSFP string format and its Augmented Backus–Naur Form (ABNF) grammar; the byte-level algorithm used to derive each field from a captured ClientHello; normalization and canonicalization rules; matching semantics for exact and wildcard consumers; error handling; and conformance requirements for **producers** (DPI sensors, e.g. `nDPI`) and **consumers** (firewalls, SIEM, `ntopng` flow classification, SOAR).
 
 ## 3. Limitations of JA4 Motivating This Extension
 
@@ -95,27 +95,27 @@ JA4_c hashes extension *type identifiers* only; it never inspects the payload of
 
 ## 4. Data Model
 
-A JA5 fingerprint encodes values observed in the *first* relevant handshake message for one of two observation profiles, consistent with JA4:
+A TLSFP fingerprint encodes values observed in the *first* relevant handshake message for one of two observation profiles, consistent with JA4:
 
-- **Client-Initiated (ClientHello):** JA5(C) — the profile normatively specified in this document.
-- **Server-Initiated (ServerHello):** JA5S — reserved for a companion specification; out of scope here.
+- **Client-Initiated (ClientHello):** TLSFP(C) — the profile normatively specified in this document.
+- **Server-Initiated (ServerHello):** TLSFPS — reserved for a companion specification; out of scope here.
 
 Producers **MUST** process only the first ClientHello observed on a given 5-tuple (ignoring TCP retransmissions) and, where TLS 1.3 HelloRetryRequest occurs, **MUST** fingerprint the *original* ClientHello, not the retried one, unless explicitly operating in a retry-aware mode declared out of band.
 
 ## 5. String Format
 
-The canonical JA5 string consists of **four underscore-separated fields**, extending JA4's three:
+The canonical TLSFP string consists of **four underscore-separated fields**, extending JA4's three:
 
 ```
-JA5_a _ JA5_b _ JA5_c _ JA5_d
+TLSFP_a _ TLSFP_b _ TLSFP_c _ TLSFP_d
 ```
 
 | Field | Length | Content |
 |---|---|---|
-| `JA5_a` | 10 chars | Structured metadata: protocol, TLS version, SNI presence, cipher count, *sanitized* extension count, first ALPN. Unchanged in length from JA4_a; semantically identical except the extension-count digits exclude ephemeral extensions (§6.2). |
-| `JA5_b` | 12 hex | Truncated SHA-256 of the sorted cipher-suite list. **Identical to JA4_b** — JA5 does not alter cipher-suite handling. |
-| `JA5_c` | 12 hex | Truncated SHA-256 of the sorted extension-type list *with ephemeral extensions removed*, concatenated with the signature-algorithms list in advertised order. |
-| `JA5_d` | 12 hex | **New in JA5.** Truncated SHA-256 of the sorted `supported_groups` value list (GREASE-filtered). |
+| `TLSFP_a` | 10 chars | Structured metadata: protocol, TLS version, SNI presence, cipher count, *sanitized* extension count, first ALPN. Unchanged in length from JA4_a; semantically identical except the extension-count digits exclude ephemeral extensions (§6.2). |
+| `TLSFP_b` | 12 hex | Truncated SHA-256 of the sorted cipher-suite list. **Identical to JA4_b** — TLSFP does not alter cipher-suite handling. |
+| `TLSFP_c` | 12 hex | Truncated SHA-256 of the sorted extension-type list *with ephemeral extensions removed*, concatenated with the signature-algorithms list in advertised order. |
+| `TLSFP_d` | 12 hex | **New in TLSFP.** Truncated SHA-256 of the sorted `supported_groups` value list (GREASE-filtered). |
 
 Total canonical length is 10 + 1 + 12 + 1 + 12 + 1 + 12 = **49 characters** (versus 36 for JA4), reflecting the appended fourth field.
 
@@ -124,28 +124,28 @@ Total canonical length is 10 + 1 + 12 + 1 + 12 + 1 + 12 = **49 characters** (ver
 Using the core rules of RFC 5234:
 
 ```abnf
-ja5      = ja5-a "_" ja5-b "_" ja5-c "_" ja5-d
-ja5-a    = proto version sni cnt-c cnt-e alpn
+tlsfp      = tlsfp-a "_" tlsfp-b "_" tlsfp-c "_" tlsfp-d
+tlsfp-a    = proto version sni cnt-c cnt-e alpn
 proto    = "t" / "q" / "d"          ; TCP, QUIC, DTLS
 version  = 2(DIGIT / ALPHA)         ; e.g. "13", "s3", "d1"
 sni      = "d" / "i"                ; domain present / absent
 cnt-c    = 2DIGIT                   ; cipher count, capped at 99
 cnt-e    = 2DIGIT                   ; sanitized extension count, capped at 99
 alpn     = 2(ALPHA / DIGIT) / "00"
-ja5-b    = 12HEXDIG / wildcard
-ja5-c    = 12HEXDIG / wildcard
-ja5-d    = 12HEXDIG / empty / wildcard
+tlsfp-b    = 12HEXDIG / wildcard
+tlsfp-c    = 12HEXDIG / wildcard
+tlsfp-d    = 12HEXDIG / empty / wildcard
 empty    = ""
 wildcard = "%"
 ```
 
-The percent sign (`%`) is the field-level wildcard operator and matches any value for that field. `ja5-d` **MAY** be empty when `supported_groups` is absent from the ClientHello (permitted, though rare, for TLS ≤1.2 RSA key-exchange-only clients).
+The percent sign (`%`) is the field-level wildcard operator and matches any value for that field. `tlsfp-d` **MAY** be empty when `supported_groups` is absent from the ClientHello (permitted, though rare, for TLS ≤1.2 RSA key-exchange-only clients).
 
 ### 5.2 Examples
 
 ```
 t13d1514h2_acb858a92679_7dc829385eb9_0a47a2b05960
-t13d1516h2_acb858a92679_562e8b7393e5_000000000000   (JA5_d empty: no supported_groups)
+t13d1516h2_acb858a92679_562e8b7393e5_000000000000   (TLSFP_d empty: no supported_groups)
 ```
 
 ## 6. Low-Level Calculation Mechanism
@@ -166,7 +166,7 @@ For any 16-bit value `v` (cipher suite, extension type, or supported group), `v`
 
 equivalently, in bitwise form, `v` **MUST** be treated as GREASE iff `(v & 0x0F0F) == 0x0A0A`. All GREASE-valued ciphers, extension types, and supported-group codes **MUST** be removed from every list before any subsequent step.
 
-### 6.3 Step 2 — Ephemeral Extension Exclusion (New in JA5)
+### 6.3 Step 2 — Ephemeral Extension Exclusion (New in TLSFP)
 
 Let `E_eph` be the ephemeral extension registry defined in Appendix B (extension type codes). For the GREASE-filtered extension list `L`:
 
@@ -175,9 +175,9 @@ L'            = L \ E_eph
 n_sanitized   = |L'|
 ```
 
-`L'` (still in on-wire order at this stage) is retained for Step 5. `n_sanitized` feeds JA5_a in place of JA4's raw extension count. Producers **MUST** apply Step 2 *after* GREASE filtering and *before* sorting, so that ephemeral-extension exclusion and GREASE exclusion do not double-count.
+`L'` (still in on-wire order at this stage) is retained for Step 5. `n_sanitized` feeds TLSFP_a in place of JA4's raw extension count. Producers **MUST** apply Step 2 *after* GREASE filtering and *before* sorting, so that ephemeral-extension exclusion and GREASE exclusion do not double-count.
 
-### 6.4 Step 3 — JA5_a Construction
+### 6.4 Step 3 — TLSFP_a Construction
 
 ```
 proto    = "t" if TLS over TCP, "q" if QUIC, "d" if DTLS
@@ -191,21 +191,21 @@ cnt_e    = min(n_sanitized, 99), zero-padded to 2          <-- differs from JA4
 alpn     = first + last byte of the first protocol string in extension 16,
            lower-cased; "00" if extension 16 absent or protocol string empty
 
-JA5_a = proto || version || sni || cnt_c || cnt_e || alpn
+TLSFP_a = proto || version || sni || cnt_c || cnt_e || alpn
 ```
 
-### 6.5 Step 4 — JA5_b (Cipher Suite Hash, Unchanged from JA4_b)
+### 6.5 Step 4 — TLSFP_b (Cipher Suite Hash, Unchanged from JA4_b)
 
 ```
 ciphers_sorted = sort_numeric_ascending(GREASE_filter(cipher_suites))
 input_b        = join(hex(c, width=4) for c in ciphers_sorted, sep=",")
 digest_b       = SHA256(input_b)                 ; 32-byte digest
-JA5_b          = hex(digest_b)[0:12]             ; first 48 bits, 12 hex nibbles
+TLSFP_b          = hex(digest_b)[0:12]             ; first 48 bits, 12 hex nibbles
 ```
 
 Reusing JA4_b unmodified preserves backward compatibility for consumers that only key on cipher-suite identity, and confirms empirically that cipher-suite ordering carries no ephemeral noise comparable to the extension list.
 
-### 6.6 Step 5 — JA5_c (Sanitized Extension + Signature-Algorithm Hash)
+### 6.6 Step 5 — TLSFP_c (Sanitized Extension + Signature-Algorithm Hash)
 
 ```
 ext_for_hash   = L' minus {SNI(0), ALPN(16)}     ; already GREASE- and
@@ -217,10 +217,10 @@ sigalg_part    = join(hex(s, width=4) for s in signature_algorithms, sep=",")
                  ; signature-algorithm order is itself a stack signature
 input_c        = ext_part || "_" || sigalg_part
 digest_c       = SHA256(input_c)
-JA5_c          = hex(digest_c)[0:12]
+TLSFP_c          = hex(digest_c)[0:12]
 ```
 
-### 6.7 Step 6 — JA5_d (Supported-Groups Hash, New in JA5)
+### 6.7 Step 6 — TLSFP_d (Supported-Groups Hash, New in TLSFP)
 
 ```
 groups_raw     = payload of extension 10 (supported_groups), parsed as
@@ -229,15 +229,15 @@ groups_filt    = GREASE_filter(groups_raw)
 groups_sorted  = sort_numeric_ascending(groups_filt)
 input_d        = join(hex(g, width=4) for g in groups_sorted, sep=",")
 digest_d       = SHA256(input_d)
-JA5_d          = hex(digest_d)[0:12] if groups_sorted is non-empty else ""
+TLSFP_d          = hex(digest_d)[0:12] if groups_sorted is non-empty else ""
 ```
 
-Groups are sorted (rather than kept in advertised order) so that JA5_d is invariant to curve-list randomization, mirroring JA4's rationale for sorting cipher suites and extensions; the residual signal — *which* groups are offered, not their order — is what distinguishes divergent TLS stacks.
+Groups are sorted (rather than kept in advertised order) so that TLSFP_d is invariant to curve-list randomization, mirroring JA4's rationale for sorting cipher suites and extensions; the residual signal — *which* groups are offered, not their order — is what distinguishes divergent TLS stacks.
 
 ### 6.8 Step 7 — Assembly
 
 ```
-JA5 = JA5_a + "_" + JA5_b + "_" + JA5_c + "_" + JA5_d
+TLSFP = TLSFP_a + "_" + TLSFP_b + "_" + TLSFP_c + "_" + TLSFP_d
 ```
 
 ### 6.9 Computational Complexity
@@ -246,49 +246,49 @@ Steps 1–2 are O(n) in the number of extensions/ciphers per ClientHello (typica
 
 ## 7. Normalization Rules
 
-Producers **MUST** apply the following before emitting a JA5 string:
+Producers **MUST** apply the following before emitting a TLSFP string:
 
 1. Observe only the first ClientHello relevant to the flow; ignore TCP retransmissions and, per §4, HelloRetryRequest-triggered second ClientHellos unless operating in a retry-aware mode.
 2. Apply GREASE filtering (§6.2) before any counting, sorting, or hashing.
-3. Apply ephemeral-extension exclusion (§6.3) before computing `n_sanitized` and before building the JA5_c input.
+3. Apply ephemeral-extension exclusion (§6.3) before computing `n_sanitized` and before building the TLSFP_c input.
 4. Sort numeric lists in strictly ascending order by the 16-bit code point; **MUST NOT** deduplicate repeated values (malformed or unusual ClientHellos **MAY** legitimately repeat a code point, and altering that is itself a loss of signal).
 5. Zero-pad `cnt_c` and `cnt_e` to exactly two digits; cap displayed counts at 99 without capping the underlying hash inputs.
-6. If `supported_groups` is absent, emit an empty `JA5_d` field (not a hash of the empty string) so that "absent" remains distinguishable from "present but data-poor."
+6. If `supported_groups` is absent, emit an empty `TLSFP_d` field (not a hash of the empty string) so that "absent" remains distinguishable from "present but data-poor."
 7. Hexadecimal output **MUST** be lower-case, matching JA4 convention.
 
 ## 8. Matching Semantics
 
-Consumers **MUST** support exact matching and **SHOULD** support the field-level wildcard (`%`). Because each field is independently derived, JA5 preserves JA4's *locality-preserving* property: partial matching on a prefix (e.g. `JA5_a` alone, or `JA5_a_JA5_b`) is meaningful and **MAY** be used for coarse-grained clustering before committing to full four-field comparison. Consumers implementing curve-profile-only detection rules (e.g. "flag any client offering only legacy NIST curves") **MAY** match on `JA5_d` in isolation using the `%_%_%_<hash>` form.
+Consumers **MUST** support exact matching and **SHOULD** support the field-level wildcard (`%`). Because each field is independently derived, TLSFP preserves JA4's *locality-preserving* property: partial matching on a prefix (e.g. `TLSFP_a` alone, or `TLSFP_a_TLSFP_b`) is meaningful and **MAY** be used for coarse-grained clustering before committing to full four-field comparison. Consumers implementing curve-profile-only detection rules (e.g. "flag any client offering only legacy NIST curves") **MAY** match on `TLSFP_d` in isolation using the `%_%_%_<hash>` form.
 
 ## 9. Error Handling
 
-If a producer cannot parse a required field (malformed ClientHello, truncated capture), it **MUST** emit an empty field at that position and **SHOULD** log a parse diagnostic. Consumers receiving a JA5 string with an incorrect number of fields (not exactly four) **MUST** treat it as non-matching and **SHOULD** log a parse error with the offending string for triage.
+If a producer cannot parse a required field (malformed ClientHello, truncated capture), it **MUST** emit an empty field at that position and **SHOULD** log a parse diagnostic. Consumers receiving a TLSFP string with an incorrect number of fields (not exactly four) **MUST** treat it as non-matching and **SHOULD** log a parse error with the offending string for triage.
 
 ## 10. Versioning and Compatibility
 
-This document defines JA5 v1. JA5_b is intentionally byte-identical to JA4_b, so a consumer **MAY** downgrade a JA5 string to a JA4-compatible 3-field value by dropping `JA5_d` and recomputing `JA5_c` against an *unsanitized* extension list if strict JA4 interoperability is required; this is MAY, not MUST, since recomputation requires access to the original packet, not just the JA5 string. Future revisions introducing additional fields **MUST** append them after `JA5_d`, separated by `_`; consumers that do not recognize a trailing field **MUST** ignore it rather than reject the record.
+This document defines TLSFP v1. TLSFP_b is intentionally byte-identical to JA4_b, so a consumer **MAY** downgrade a TLSFP string to a JA4-compatible 3-field value by dropping `TLSFP_d` and recomputing `TLSFP_c` against an *unsanitized* extension list if strict JA4 interoperability is required; this is MAY, not MUST, since recomputation requires access to the original packet, not just the TLSFP string. Future revisions introducing additional fields **MUST** append them after `TLSFP_d`, separated by `_`; consumers that do not recognize a trailing field **MUST** ignore it rather than reject the record.
 
 ## 11. Interoperability Considerations
 
-Reverse proxies, CDNs, and TLS-terminating load balancers present their own TLS stack's fingerprint rather than the origin client's; JA5 policy **SHOULD** be enforced at the true network edge, before termination, exactly as for JA4. For TLS 1.3 0-RTT deployments, `early_data` and `pre_shared_key` are already excluded via the ephemeral registry, so JA5 is expected to be materially *more* stable than JA4 across resumption-heavy client populations (e.g. mobile applications maintaining long-lived TLS session tickets). QUIC (`proto = "q"`) ClientHellos carry the same extension set inside the TLS 1.3 CRYPTO frame and **MUST** be processed identically once reassembled.
+Reverse proxies, CDNs, and TLS-terminating load balancers present their own TLS stack's fingerprint rather than the origin client's; TLSFP policy **SHOULD** be enforced at the true network edge, before termination, exactly as for JA4. For TLS 1.3 0-RTT deployments, `early_data` and `pre_shared_key` are already excluded via the ephemeral registry, so TLSFP is expected to be materially *more* stable than JA4 across resumption-heavy client populations (e.g. mobile applications maintaining long-lived TLS session tickets). QUIC (`proto = "q"`) ClientHellos carry the same extension set inside the TLS 1.3 CRYPTO frame and **MUST** be processed identically once reassembled.
 
 ## 12. Deployment Guidance (Non-Normative)
 
-- Run JA5 alongside JA4 in shadow/monitor-only mode initially; compare cardinality (distinct fingerprint count) for a known client population to validate that ephemeral-extension sanitization reduces JA4-observed churn without collapsing genuinely distinct clients together.
-- Prioritize `JA5_d`-based rules for detecting automated tooling that clones a browser's JA4_a/JA4_b/JA4_c but leaves the underlying TLS library's default curve preference list unchanged (a common artifact of Go, Python, and Rust TLS clients configured to mimic Chrome cipher order).
-- Combine JA5 with IP reputation and behavioral rate limiting; a fingerprint match, JA5 or otherwise, is one signal among several.
+- Run TLSFP alongside JA4 in shadow/monitor-only mode initially; compare cardinality (distinct fingerprint count) for a known client population to validate that ephemeral-extension sanitization reduces JA4-observed churn without collapsing genuinely distinct clients together.
+- Prioritize `TLSFP_d`-based rules for detecting automated tooling that clones a browser's JA4_a/JA4_b/JA4_c but leaves the underlying TLS library's default curve preference list unchanged (a common artifact of Go, Python, and Rust TLS clients configured to mimic Chrome cipher order).
+- Combine TLSFP with IP reputation and behavioral rate limiting; a fingerprint match, TLSFP or otherwise, is one signal among several.
 
 ## 13. Security Considerations
 
-An adversary controlling the TLS client implementation can, in principle, replicate any target JA5 value by matching cipher order, sanitized extension set, signature-algorithm order, and `supported_groups` content exactly. JA5 raises the cost of impersonation relative to JA4 by adding one more independently-constrained dimension (curve selection) that must be matched, but it **MUST NOT** be treated as an authentication mechanism. Because ephemeral-extension exclusion is a curated, versioned registry (Appendix B), producers and consumers **MUST** agree on the registry version in use; mismatched registries between a sensor and a downstream consumer will produce silently inconsistent `JA5_a`/`JA5_c` values for the same traffic. Registry version **SHOULD** be carried alongside the fingerprint in telemetry (e.g. as metadata, not embedded in the string itself, to preserve the fixed-width format).
+An adversary controlling the TLS client implementation can, in principle, replicate any target TLSFP value by matching cipher order, sanitized extension set, signature-algorithm order, and `supported_groups` content exactly. TLSFP raises the cost of impersonation relative to JA4 by adding one more independently-constrained dimension (curve selection) that must be matched, but it **MUST NOT** be treated as an authentication mechanism. Because ephemeral-extension exclusion is a curated, versioned registry (Appendix B), producers and consumers **MUST** agree on the registry version in use; mismatched registries between a sensor and a downstream consumer will produce silently inconsistent `TLSFP_a`/`TLSFP_c` values for the same traffic. Registry version **SHOULD** be carried alongside the fingerprint in telemetry (e.g. as metadata, not embedded in the string itself, to preserve the fixed-width format).
 
 ## 14. Privacy Considerations
 
-As with JA4, JA5 values describe TLS stack and library behavior, not user identity, and **SHOULD** be treated as low-sensitivity telemetry. The addition of `supported_groups` data (`JA5_d`) does not increase per-user identifiability beyond what JA4_c already exposes via extension-set hashing, since curve preference lists are a library/build-level property shared across all users of a given client version, not a per-installation secret.
+As with JA4, TLSFP values describe TLS stack and library behavior, not user identity, and **SHOULD** be treated as low-sensitivity telemetry. The addition of `supported_groups` data (`TLSFP_d`) does not increase per-user identifiability beyond what JA4_c already exposes via extension-set hashing, since curve preference lists are a library/build-level property shared across all users of a given client version, not a per-installation secret.
 
 ## 15. Conformance Requirements
 
-**Producers MUST** implement GREASE filtering (§6.2), ephemeral-extension exclusion against a declared registry version (§6.3, Appendix B), and all four field-construction procedures of §6.4–6.7, and **MUST** emit the four-field, underscore-separated canonical string. **Consumers MUST** implement exact matching and **SHOULD** implement field-level wildcard matching (§8). Telemetry pipelines **SHOULD** export the matched rule identifier, the observed JA5 string, and the ephemeral-extension registry version used at capture time.
+**Producers MUST** implement GREASE filtering (§6.2), ephemeral-extension exclusion against a declared registry version (§6.3, Appendix B), and all four field-construction procedures of §6.4–6.7, and **MUST** emit the four-field, underscore-separated canonical string. **Consumers MUST** implement exact matching and **SHOULD** implement field-level wildcard matching (§8). Telemetry pipelines **SHOULD** export the matched rule identifier, the observed TLSFP string, and the ephemeral-extension registry version used at capture time.
 
 ---
 
@@ -315,37 +315,37 @@ Signature algorithms (advertised order):
 Supported groups (sorted, GREASE-filtered):
   0017,0018,0019,001d,001e
 
-JA5_a = t13d1514h2
-JA5_b = acb858a92679   (SHA256(ciphers)[0:12])
-JA5_c = 7dc829385eb9   (SHA256(ext_sorted + "_" + sigalgs)[0:12])
-JA5_d = 0a47a2b05960   (SHA256(groups_sorted)[0:12])
+TLSFP_a = t13d1514h2
+TLSFP_b = acb858a92679   (SHA256(ciphers)[0:12])
+TLSFP_c = 7dc829385eb9   (SHA256(ext_sorted + "_" + sigalgs)[0:12])
+TLSFP_d = 0a47a2b05960   (SHA256(groups_sorted)[0:12])
 
-JA5   = t13d1514h2_acb858a92679_7dc829385eb9_0a47a2b05960   (49 chars)
+TLSFP   = t13d1514h2_acb858a92679_7dc829385eb9_0a47a2b05960   (49 chars)
 ```
 
 **Vector 2 — Same client, JA4 baseline for comparison (no ephemeral sanitization, no curve hash).**
 
 ```
 JA4_a = t13d1516h2        (raw ext count 16, includes padding + PSK)
-JA4_b = acb858a92679      (identical to JA5_b, as specified)
-JA4_c = 562e8b7393e5      (differs from JA5_c: unsanitized extension list)
+JA4_b = acb858a92679      (identical to TLSFP_b, as specified)
+JA4_c = 562e8b7393e5      (differs from TLSFP_c: unsanitized extension list)
 
 JA4   = t13d1516h2_acb858a92679_562e8b7393e5                (36 chars)
 ```
 
-Note that `JA4_b` and `JA5_b` are identical by construction (§6.5), while `cnt_e`, `JA5_c`, and the appended `JA5_d` diverge from their JA4 counterparts, isolating exactly the two deficiencies this specification addresses.
+Note that `JA4_b` and `TLSFP_b` are identical by construction (§6.5), while `cnt_e`, `TLSFP_c`, and the appended `TLSFP_d` diverge from their JA4 counterparts, isolating exactly the two deficiencies this specification addresses.
 
 **Vector 3 — Supported groups absent (legacy RSA key exchange only).**
 
 ```
-JA5 = t12i0806h2_3fa1c9e0221b_9b0e4d7a1c58_
+TLSFP = t12i0806h2_3fa1c9e0221b_9b0e4d7a1c58_
 ```
 
-Trailing empty `JA5_d` field; note the trailing underscore with no following characters, per §5.1 and §6.8.
+Trailing empty `TLSFP_d` field; note the trailing underscore with no following characters, per §5.1 and §6.8.
 
 ## Appendix B — Ephemeral Extension Registry (Informative)
 
-Extension type codes excluded from `cnt_e` and from the `JA5_c` hash input by Step 2 (§6.3). This registry is versioned independently of this document's revision number; the version below is **Registry v1**.
+Extension type codes excluded from `cnt_e` and from the `TLSFP_c` hash input by Step 2 (§6.3). This registry is versioned independently of this document's revision number; the version below is **Registry v1**.
 
 | Extension | Type | Rationale for exclusion |
 |---|---|---|
@@ -356,7 +356,7 @@ Extension type codes excluded from `cnt_e` and from the `JA5_c` hash input by St
 | `cookie` | 44 (0x002c) | Populated only in the second ClientHello of a HelloRetryRequest exchange. |
 | `psk_key_exchange_modes` | 45 (0x002d) | Co-occurs with `pre_shared_key`; same rationale. |
 
-Implementations **MUST** record and export the registry version alongside JA5 output (§13).
+Implementations **MUST** record and export the registry version alongside TLSFP output (§13).
 
 ## Appendix C — Extension and Group ID Reference (Informative)
 
