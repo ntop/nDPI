@@ -8,10 +8,10 @@ LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/0/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    0/0/0 (insert/search/found)
-Automa host:          4/0 (search/found)
-Automa domain:        2/0 (search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
 Automa tls cert:      0/0 (search/found)
-Automa risk mask:     1/0 (search/found)
+Automa risk mask:     0/0 (search/found)
 Automa common alpns:  0/0 (search/found)
 Patricia risk mask:   2/0 (search/found)
 Patricia risk mask IPv6: 0/0 (search/found)
@@ -22,7 +22,7 @@ Patricia protocols IPv6: 0/0 (search/found)
 Hash malicious ja4:        0/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     0/0 (search/found)
-Hash public domain suffix: 17/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
 Hash ja4 custom protos:    0/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
 Hash url custom protos:    0/0 (search/found)
@@ -33,4 +33,4 @@ Acceptable                       2 342           1
 
 Network                          2 342           1            
 
-	1	UDP 192.168.2.225:45290 <-> 192.168.2.134:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/163 bytes <-> 1 pkts/179 bytes][Goodput ratio: 74/76][0.00 sec][Hostname/SNI: h4sicn03_2qaa3rlc3qudhh0aavjycxwakjehelu5klueow0zjxulgage-.4s2fgaaaa__-.test.tx][0.0.0.0][DNS Id: 0xffd5][Risk: ** Susp DNS Traffic **** Susp Entropy **** Non-Printable/Invalid Chars Detected **** Minor Issues **][Risk Score: 170][Risk Info: DNS Record with zero TTL;Invalid printable char(s) [*] detected in domain name;Entropy: 5.224 (Executable?);Long DNS host name][PLAIN TEXT (sICN03)][Plen Bins: 0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	UDP 192.168.2.225:45290 <-> 192.168.2.134:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/163 bytes <-> 1 pkts/179 bytes][Goodput ratio: 74/76][0.00 sec][0.0.0.0][DNS Id: 0xffd5][Risk: ** Susp DNS Traffic **** Susp Entropy **** Non-Printable/Invalid Chars Detected **** Minor Issues **][Risk Score: 170][Risk Info: DNS Record with zero TTL;Invalid printable char(s) [*] detected in domain name;Entropy: 5.224 (Executable?);Long DNS host name][PLAIN TEXT (sICN03)][Plen Bins: 0,0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
