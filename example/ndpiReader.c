@@ -93,6 +93,7 @@ static u_int8_t undetected_flows_deleted = 0;
 static FILE *csv_fp                 = NULL; /**< for CSV export */
 static FILE *serialization_fp       = NULL; /**< for TLV,CSV,JSON export */
 static ndpi_serialization_format serialization_format = ndpi_serialization_format_unknown;
+static pthread_mutex_t serialization_mutex = PTHREAD_MUTEX_INITIALIZER;
 static char* domain_to_check = NULL;
 static char* domains_file_to_check = NULL;
 static char* ip_port_to_check = NULL;
@@ -2879,7 +2880,9 @@ static void printFlowSerialized(struct ndpi_flow_info *flow)
       exit(-1);
     }
 
+  pthread_mutex_lock(&serialization_mutex);
   fprintf(serialization_fp, "%.*s\n", (int)json_str_len, json_str);
+  pthread_mutex_unlock(&serialization_mutex);
 }
 
 /* ********************************** */
@@ -3395,6 +3398,11 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
       node_proto_guess_walker(node, which, depth, user_data);
       if(verbose == 3)
         port_stats_walker(node, which, depth, user_data);
+
+      /* Export the flow before removing it from the active tree. */
+      if(serialization_fp != NULL &&
+         serialization_format != ndpi_serialization_format_unknown)
+        printFlowSerialized(flow);
 
       if((flow->detected_protocol.proto.app_protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
