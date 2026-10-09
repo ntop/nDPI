@@ -8220,10 +8220,15 @@ void ndpi_free_flow_core_data(struct ndpi_flow_core_struct *core) {
 	core->risk_infos[i].info = NULL;
       }
 
-      core->num_risk_infos = 0;
-    }
+	      core->num_risk_infos = 0;
+	    }
 
-    if(core->dcerpc_tcp_reasm) {
+	    if(core->risk_infos) {
+	      ndpi_free(core->risk_infos);
+	      core->risk_infos = NULL;
+	    }
+
+	    if(core->dcerpc_tcp_reasm) {
       u_int i;
 
       for(i = 0; i < 2; i++) {

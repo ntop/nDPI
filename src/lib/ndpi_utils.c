@@ -3700,6 +3700,12 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
       if(is_flowrisk_info_enabled(ndpi_str, r) &&
          risk_message != NULL) {
 	if(core->num_risk_infos < MAX_NUM_RISK_INFOS) {
+	  if(core->risk_infos == NULL)
+	    core->risk_infos = ndpi_calloc(MAX_NUM_RISK_INFOS, sizeof(*core->risk_infos));
+
+	  if(core->risk_infos == NULL)
+	    return;
+
 	  char *s = ndpi_strdup(risk_message);
 
 	  if(s != NULL) {
@@ -3739,6 +3745,12 @@ void ndpi_set_risk(struct ndpi_detection_module_struct *ndpi_str,
        This might happen with NDPI_HTTP_CRAWLER_BOT which might have been set early via
        IP matching (no details) and now via UA matching (with message). */
     if(core->num_risk_infos < MAX_NUM_RISK_INFOS) {
+      if(core->risk_infos == NULL)
+	core->risk_infos = ndpi_calloc(MAX_NUM_RISK_INFOS, sizeof(*core->risk_infos));
+
+      if(core->risk_infos == NULL)
+	return;
+
       char *s = ndpi_strdup(risk_message);
 
       if(s != NULL) {
@@ -4225,11 +4237,12 @@ char* ndpi_get_flow_risk_info(struct ndpi_flow_struct *flow,
     return(NULL);
 
   /* Ordered list of flow risk infos */
-  ordered_risk_infos = ndpi_malloc(sizeof(flow->core.risk_infos));
-  if(!ordered_risk_infos)
-    return(NULL);
+	ordered_risk_infos = ndpi_malloc(flow->core.num_risk_infos * sizeof(*ordered_risk_infos));
+	if(!ordered_risk_infos)
+	  return(NULL);
 
-  memcpy(ordered_risk_infos, flow->core.risk_infos, sizeof(flow->core.risk_infos));
+	memcpy(ordered_risk_infos, flow->core.risk_infos,
+	       flow->core.num_risk_infos * sizeof(*ordered_risk_infos));
   qsort(ordered_risk_infos, flow->core.num_risk_infos,
 	sizeof(struct ndpi_risk_information), risk_infos_pair_cmp);
 

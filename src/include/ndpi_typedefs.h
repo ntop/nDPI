@@ -1732,7 +1732,8 @@ struct ndpi_flow_core_struct {
   u_int8_t ip_risk_mask_evaluated:1, host_risk_mask_evaluated:1, tree_risk_checked:1, _notused:5;
   ndpi_risk risk_mask; /* Stores the flow risk mask for flow peers */
   ndpi_risk risk, risk_shadow; /* Issues found with this flow [bitmask of ndpi_risk] */
-  struct ndpi_risk_information risk_infos[MAX_NUM_RISK_INFOS]; /* String that contains information about the risks found */
+  /* Allocated only when a flow-risk information string is recorded. */
+  struct ndpi_risk_information *risk_infos;
   u_int8_t num_risk_infos;
   struct ndpi_dissector_bitmask excluded_dissectors_bitmask;
 
@@ -1800,13 +1801,17 @@ struct ndpi_flow_metadata_struct {
     struct ndpi_flow_udp_struct udp;
   } l4;
 
+  /*
+   * Keep common scalar metadata before protocol-specific blocks. This
+   * ordering reduces alignment and tail padding on the supported ABIs; the
+   * layout is measured by tests/performance/flow_layout.c.
+   */
+  u_int8_t flow_multimedia_types;
   /* Some protocols calculate the entropy. */
   float entropy;
-
   struct {
     char *client_fingerprint, *server_fingerprint;
   } ndpi;
-  
   /*
     This structure below will not not stay inside the protos
     structure below as HTTP is used by many subprotocols
@@ -1825,9 +1830,6 @@ struct ndpi_flow_metadata_struct {
     char *filename; /* Via HTTP Content-Disposition */
     char *username, *password;
   } http;
-
-  u_int8_t flow_multimedia_types;
-
   /*
      Put outside of the union to avoid issues in case the protocol
      is remapped to something other than Kerberos due to a faulty
@@ -1837,23 +1839,6 @@ struct ndpi_flow_metadata_struct {
     char *pktbuf;
     u_int16_t pktbuf_maxlen, pktbuf_currlen;
   } kerberos_buf;
-
-  struct {
-    u_int8_t maybe_dtls:1, rtcp_seen:1, is_turn : 1, is_client_controlling:1, pad : 4;
-    ndpi_address_port mapped_address, peer_address, relayed_address, response_origin, other_address;
-    u_int8_t num_xor_relayed_addresses, num_xor_mapped_addresses;
-    u_int8_t num_non_stun_pkt, non_stun_pkt_len[2];
-    u_int16_t rtp_counters[2];
-    u_int32_t t_start, t_end;
-  } stun;
-
-  struct {
-    struct rtp_info rtp[2 /* directions */];
-    /* NDPI_PROTOCOL_RTP */
-    u_int8_t rtp_stage:2;
-    u_int8_t rtp_seq_set[2];
-    u_int16_t rtp_seq[2];
-  } rtp;
 
   union {
     /* the only fields useful for nDPI and ntopng */
@@ -2040,7 +2025,6 @@ struct ndpi_flow_metadata_struct {
 
     struct ndpi_ipsec_details ipsec;    
   } protos;
-
   struct {
     /* NDPI_PROTOCOL_OPENVPN */
     u_int8_t ovpn_session_id[2][8];
@@ -2050,14 +2034,28 @@ struct ndpi_flow_metadata_struct {
     u_int8_t ovpn_heur_opcode__resets[2];
     u_int16_t ovpn_heur_opcode__missing_bytes[2];
   } openvpn;
-  
   struct {
     NDPIProtocolPluginEntryPoint *plugin;
     void *plugin_data;
   } custom;
-
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
   struct ndpi_metadata_monitoring *monit;
+  struct {
+    u_int8_t maybe_dtls:1, rtcp_seen:1, is_turn : 1, is_client_controlling:1, pad : 4;
+    ndpi_address_port mapped_address, peer_address, relayed_address, response_origin, other_address;
+    u_int8_t num_xor_relayed_addresses, num_xor_mapped_addresses;
+    u_int8_t num_non_stun_pkt, non_stun_pkt_len[2];
+    u_int16_t rtp_counters[2];
+    u_int32_t t_start, t_end;
+  } stun;
+
+  struct {
+    struct rtp_info rtp[2 /* directions */];
+    /* NDPI_PROTOCOL_RTP */
+    u_int8_t rtp_stage:2;
+    u_int8_t rtp_seq_set[2];
+    u_int16_t rtp_seq[2];
+  } rtp;
 
   /* NDPI_PROTOCOL_BITTORRENT */
   u_int8_t bittorrent_stage; // can be 0 - 255
