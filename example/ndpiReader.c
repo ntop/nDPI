@@ -2549,6 +2549,12 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->dns.geolocation_iata_code[0] != '\0') fprintf(out, "[GeoLocation: %s]", flow->dns.geolocation_iata_code);
     if(flow->dns.transaction_id != 0) fprintf(out, "[DNS Id: 0x%.4x]", flow->dns.transaction_id);
     if(flow->dns.ptr_domain_name[0] != '\0') fprintf(out, "[DNS Ptr: %s]", flow->dns.ptr_domain_name);
+    if(flow->dns.num_cnames > 0) {
+      fprintf(out, "[DNS CNAMEs Num: %u]", (unsigned int)flow->dns.num_cnames);
+      for (int i = 0; i < flow->dns.num_cnames && i < MAX_NUM_DNS_CNAMES; ++i) {
+        fprintf(out, "[DNS CNAME: %s TTL: %u]", flow->dns.cname_domain_names[i], (unsigned int)flow->dns.cname_ttls[i]);
+      }
+    }
 
     if((flow->src2dst_packets+flow->dst2src_packets) > 5) {
       if(flow->iat_c_to_s && flow->iat_s_to_c) {
