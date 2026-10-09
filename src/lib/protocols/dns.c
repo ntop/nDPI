@@ -1082,9 +1082,6 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
   printf("[DNS] [%s]\n", _hostname);
 #endif
 
-  /* Sets flow->.host_server_name */
-  ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len, is_mdns ? NDPI_HOSTNAME_NORM_LC : NDPI_HOSTNAME_NORM_ALL);
-
   if (hostname_is_valid == 0) {
     char str[128];
 
@@ -1094,6 +1091,9 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
       snprintf(str, sizeof(str), "Invalid non printable char(s) [0x%02X] detected in domain name", (unsigned char)invalid_character);
 
     ndpi_set_risk(ndpi_struct, core, NDPI_INVALID_CHARACTERS, str);
+  } else {
+    /* Sets flow->.host_server_name */
+  ndpi_hostname_sni_set(flow, (const u_int8_t *)_hostname, len, is_mdns ? NDPI_HOSTNAME_NORM_LC : NDPI_HOSTNAME_NORM_ALL);
   }
 
   /* Ignore reverse DNS queries */
