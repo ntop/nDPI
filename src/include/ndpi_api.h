@@ -1982,6 +1982,7 @@ extern "C" {
   u_int32_t ndpi_rev_hash_string(const char *str);
   u_int32_t ndpi_hash_string_len(const char *str, u_int len);
   u_int32_t ndpi_murmur_hash(const char *str, u_int str_len);
+  u_int32_t ndpi_murmur_hash_seed(const char *str, u_int str_len, u_int seed);
 
   /* ******************************* */
 
