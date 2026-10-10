@@ -398,10 +398,14 @@ int is_stun(struct ndpi_detection_module_struct *ndpi_struct,
 
   msg_type = ntohs(*((u_int16_t *)&payload[0]));
   msg_len = ntohs(*((u_int16_t *)&payload[2]));
-  magic_cookie = ntohl(*((u_int32_t *)&payload[4]));
-  transaction_id[0] = ntohl(*((u_int32_t *)&payload[8]));
-  transaction_id[1] = ntohl(*((u_int32_t *)&payload[12]));
-  transaction_id[2] = ntohl(*((u_int32_t *)&payload[16]));
+  memcpy(&magic_cookie, &payload[4], sizeof(magic_cookie));
+  magic_cookie = ntohl(magic_cookie);
+  memcpy(&transaction_id[0], &payload[8], sizeof(transaction_id[0]));
+  transaction_id[0] = ntohl(transaction_id[0]);
+  memcpy(&transaction_id[1], &payload[12], sizeof(transaction_id[1]));
+  transaction_id[1] = ntohl(transaction_id[1]);
+  memcpy(&transaction_id[2], &payload[16], sizeof(transaction_id[2]));
+  transaction_id[2] = ntohl(transaction_id[2]);
 
   /* No magic_cookie on classic-stun */
   /* Let's hope that we don't have anymore classic-stun over TCP */
