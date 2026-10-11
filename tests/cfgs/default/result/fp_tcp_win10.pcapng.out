@@ -36,4 +36,4 @@ Unspecified                      1 66            1
 
 
 Undetected flows:
-	1	TCP 192.168.1.187:64132 -> 192.168.1.29:3000 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Unrated][1 pkts/66 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TCP Fingerprint: 2_128_64240_e035a9f8f3a0/Windows][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	1	TCP 192.168.1.187:64132 -> 192.168.1.29:3000 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][Breed: Unrated][1 pkts/66 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][TCP Fingerprint: 2_128_64240_47466ece/Windows][MSS: 1460][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

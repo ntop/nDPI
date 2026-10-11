@@ -1747,6 +1747,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     snprintf(buf, sizeof(buf), "%s/%s", flow->ndpi_flow->metadata.l4.tcp.fingerprint,
 	     ndpi_print_os_hint(flow->ndpi_flow->metadata.l4.tcp.os_hint));
     flow->tcp_fingerprint = ndpi_strdup(buf);
+    flow->tcp_mss = flow->ndpi_flow->metadata.l4.tcp.mss;
+    flow->tcp_fastopen = flow->ndpi_flow->metadata.l4.tcp.fastopen;
   }
 
   /* HTTP metadata are "global" not in `flow->ndpi_flow->metadata.protos` union; for example, we can have

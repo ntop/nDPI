@@ -365,6 +365,8 @@ typedef struct ndpi_flow_info {
 
   void *src_id, *dst_id;
   char *tcp_fingerprint, *ndpi_client_fingerprint, *ndpi_server_fingerprint;
+  u_int16_t tcp_mss;     /* Exported next to tcp_fingerprint */
+  u_int8_t tcp_fastopen; /* 0 = none, 1 = cookie request, 2 = cookie */
   struct ndpi_entropy *entropy;
   struct ndpi_entropy *last_entropy;
 

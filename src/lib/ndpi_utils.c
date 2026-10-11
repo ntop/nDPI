@@ -2297,6 +2297,11 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->metadata.l4.tcp.fingerprint_raw)
     ndpi_serialize_string_string(serializer, "tcp_fingerprint_raw", flow->metadata.l4.tcp.fingerprint_raw);
 
+  if(flow->metadata.l4.tcp.fingerprint) {
+    ndpi_serialize_string_uint32(serializer, "tcp_mss", flow->metadata.l4.tcp.mss);
+    ndpi_serialize_string_uint32(serializer, "tcp_fastopen", flow->metadata.l4.tcp.fastopen);
+  }
+
   if(flow->metadata.ndpi.client_fingerprint || flow->metadata.ndpi.server_fingerprint) {
     ndpi_serialize_start_of_block(serializer, "ndpi_fingerprint");
 

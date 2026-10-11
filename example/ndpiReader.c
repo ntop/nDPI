@@ -2634,8 +2634,12 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ndpi_server_fingerprint)
       fprintf(out, "[nDPI Srv Fingerprint: %s]", flow->ndpi_server_fingerprint);
 
-    if(flow->tcp_fingerprint)
-      fprintf(out, "[TCP Fingerprint: %s]", flow->tcp_fingerprint);
+    if(flow->tcp_fingerprint) {
+      fprintf(out, "[TCP Fingerprint: %s][MSS: %u]", flow->tcp_fingerprint, flow->tcp_mss);
+
+      if(flow->tcp_fastopen)
+	fprintf(out, "[TFO: %s]", (flow->tcp_fastopen == 1) ? "cookie request" : "cookie");
+    }
 
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(buf_ver, sizeof(buf_ver),
 										 flow->ssh_tls.ssl_version, &known_tls));

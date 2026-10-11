@@ -1008,6 +1008,8 @@ struct ndpi_flow_tcp_struct {
 
   char *fingerprint, *fingerprint_raw;
   ndpi_os os_hint;
+  u_int16_t mss;     /* MSS of the fingerprinted SYN (0 = no MSS option) */
+  u_int8_t fastopen; /* TCP Fast Open: 0 = none, 1 = cookie request, 2 = cookie */
 };
 
 /* ************************************************** */
