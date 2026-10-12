@@ -1580,6 +1580,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     ndpi_snprintf(flow->kerberos.username,
                   sizeof(flow->kerberos.username),
                   "%s", flow->ndpi_flow->metadata.protos.kerberos.username);
+    flow->kerberos.req_msg_type = flow->ndpi_flow->metadata.protos.kerberos.req_msg_type;
+    flow->kerberos.rep_msg_type = flow->ndpi_flow->metadata.protos.kerberos.rep_msg_type;
+    flow->kerberos.error_code = flow->ndpi_flow->metadata.protos.kerberos.error_code;
   /* COLLECTD */
   } else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_COLLECTD)) {
     flow->info_type = INFO_GENERIC;

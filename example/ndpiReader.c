@@ -2068,6 +2068,19 @@ static void print_ndpi_address_port_list_file(FILE *out, const char *label, ndpi
 
 /* ********************************** */
 
+static const char* kerberos_msg_type2str(u_int8_t msg_type) {
+  switch(msg_type) {
+  case 10: return("AS-REQ");
+  case 11: return("AS-REP");
+  case 12: return("TGS-REQ");
+  case 13: return("TGS-REP");
+  case 30: return("KRB-ERROR");
+  default: return("Unknown");
+  }
+}
+
+/* ********************************** */
+
 /**
  * @brief Print the flow
  */
@@ -2409,6 +2422,13 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 		flow->kerberos.hostname,
 		flow->kerberos.username);
       }
+      if (flow->kerberos.req_msg_type != 0)
+	fprintf(out, "[Request: %s]", kerberos_msg_type2str(flow->kerberos.req_msg_type));
+      if (flow->kerberos.rep_msg_type == 30 /* KRB-ERROR */)
+	fprintf(out, "[Response: %s (Error %d)]", kerberos_msg_type2str(flow->kerberos.rep_msg_type),
+		flow->kerberos.error_code);
+      else if (flow->kerberos.rep_msg_type != 0)
+	fprintf(out, "[Response: %s (OK)]", kerberos_msg_type2str(flow->kerberos.rep_msg_type));
       break;
 
     case INFO_SOFTETHER:

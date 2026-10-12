@@ -1874,6 +1874,8 @@ struct ndpi_flow_metadata_struct {
 
     struct {
       char hostname[48], domain[48], username[48];
+      u_int8_t req_msg_type, rep_msg_type;
+      int32_t error_code; /* Valid only if rep_msg_type is KRB-ERROR (30) */
     } kerberos;
 
     struct {

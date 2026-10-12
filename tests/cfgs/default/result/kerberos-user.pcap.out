@@ -1,0 +1,36 @@
+DPI Packets (TCP):	8	(8.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 165 (165.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    1/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Kerberos	12	4317	1
+
+Acceptable                      12 4317          1            
+
+Network                         12 4317          1            
+
+	1	TCP 172.16.1.137:49733 <-> 172.16.1.16:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 8][cat: Network/14][Breed: Acceptable][6 pkts/2172 bytes <-> 6 pkts/2145 bytes][Goodput ratio: 84/84][0.00 sec][pcapworkshop.net\sherita.kolb][Request: TGS-REQ][Response: TGS-REP (OK)][bytes ratio: 0.006 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 0/0 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 362/358 1514/1514 533/532][TCP Fingerprint: 2_128_64240_47466ece/Windows][MSS: 1460][PLAIN TEXT (PCAPWORKSHOP.NET)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]

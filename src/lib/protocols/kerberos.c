@@ -33,142 +33,33 @@
 
 #define KERBEROS_PORT 88
 
+#define KRB_MAX_MSG_LEN 12000
+
+/* Reference: https://datatracker.ietf.org/doc/html/rfc4120#section-5.10 */
+#define KRB_MSG_TYPE_AS_REQ  10
+#define KRB_MSG_TYPE_AS_REP  11
+#define KRB_MSG_TYPE_TGS_REQ 12
+#define KRB_MSG_TYPE_TGS_REP 13
+#define KRB_MSG_TYPE_AP_REQ  14
+#define KRB_MSG_TYPE_ERROR   30
+
 static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow);
 
 
-/* Reference: https://en.wikipedia.org/wiki/X.690#Length_octets */
-static int krb_decode_asn1_length(struct ndpi_detection_module_struct *ndpi_struct,
-                                  size_t * const kasn1_offset)
+/* KerberosString (i.e. GeneralString) */
+static int krb_decode_asn1_string(const u_int8_t *buf, u_int32_t buf_len,
+                                  struct asn1_ber_tlv * const tlv)
 {
-  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
-  int64_t length;
-  u_int16_t value_len;
-
-  length = asn1_ber_decode_length(&packet->payload[*kasn1_offset],
-				  packet->payload_packet_len - *kasn1_offset,
-				  &value_len);
-
-  if (length == -1 ||
-      packet->payload_packet_len < *kasn1_offset + value_len + length)
+  if (asn1_ber_decode_single_tlv(buf, buf_len, tlv) != 0 ||
+      (tlv->tag != 0x1B /* GeneralString */ &&
+       tlv->tag != 0x0C /* UTF8String */ &&
+       tlv->tag != 0x16 /* IA5String */))
   {
     return -1;
   }
 
-  *kasn1_offset += value_len;
-
-  return (int)length;
-}
-
-/* Reference: https://en.wikipedia.org/wiki/X.690#Identifier_octets */
-static int krb_decode_asn1_sequence_type(struct ndpi_detection_module_struct *ndpi_struct,
-                                         size_t * const kasn1_offset)
-{
-  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
-
-  if (packet->payload_packet_len <= *kasn1_offset + 1 /* length octet */ ||
-      packet->payload[*kasn1_offset] != 0x30 /* Universal Constructed Tag Type: Sequence */)
-  {
-    return -1;
-  }
-
-  (*kasn1_offset)++;
-
-  return krb_decode_asn1_length(ndpi_struct, kasn1_offset);
-}
-
-/* Reference: https://en.wikipedia.org/wiki/X.690#Identifier_octets */
-static int krb_decode_asn1_string_type(struct ndpi_detection_module_struct *ndpi_struct,
-                                       size_t * const kasn1_offset,
-                                       char const ** const out)
-{
-  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
-  int length;
-
-  if (packet->payload_packet_len <= *kasn1_offset + 1 /* length octet */ ||
-      (packet->payload[*kasn1_offset] != 0xA3 /* Context-specific Constructed Tag Type: Bit String */ &&
-       packet->payload[*kasn1_offset] != 0xA4 /* Context-specific Constructed Tag Type: Octect String */ &&
-       packet->payload[*kasn1_offset] != 0x30 /* Sequence Of */))
-  {
-    return -1;
-  }
-
-  (*kasn1_offset)++;
-
-  length = krb_decode_asn1_length(ndpi_struct, kasn1_offset);
-  if (length <= 0)
-  {
-    return -1;
-  }
-
-  if (out != NULL)
-  {
-    *out = (char *)&packet->payload[*kasn1_offset];
-  }
-
-  return length;
-}
-
-/* Reference: https://en.wikipedia.org/wiki/X.690#Identifier_octets */
-static int krb_decode_asn1_int_type(struct ndpi_detection_module_struct *ndpi_struct,
-                                    size_t * const kasn1_offset,
-                                    int * const out)
-{
-  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
-  int length;
-
-  if (packet->payload_packet_len <= *kasn1_offset + 1 /* length octet */ ||
-      packet->payload[*kasn1_offset] != 0x02)
-  {
-    return -1;
-  }
-
-  (*kasn1_offset)++;
-
-  length = krb_decode_asn1_length(ndpi_struct, kasn1_offset);
-  if (length <= 0 || length > 4)
-  {
-    return -1;
-  }
-
-  if (out != NULL)
-  {
-    int i = 0;
-    *out = 0;
-    for (; i < length; ++i)
-    {
-      *out |= (unsigned int)packet->payload[*kasn1_offset + i] << (length - i - 1) * 8;
-    }
-    *kasn1_offset += i;
-  }
-
-  return length;
-}
-
-/* Tags in which we are not interested. */
-static int krb_decode_asn1_blocks_skip(struct ndpi_detection_module_struct *ndpi_struct,
-                                       size_t * const kasn1_offset)
-{
-  struct ndpi_packet_struct * const packet = &ndpi_struct->packet;
-  int length;
-
-  if (packet->payload_packet_len <= *kasn1_offset + 1 /* length octet */ ||
-      (packet->payload[*kasn1_offset] != 0xA0 /* Constructed Context-specific NULL */ &&
-       packet->payload[*kasn1_offset] != 0xA1 /* Constructed Context-specific BOOLEAN */ &&
-       packet->payload[*kasn1_offset] != 0xA2 /* Constructed Context-specific INTEGER */))
-  {
-    return -1;
-  }
-
-  (*kasn1_offset)++;
-
-  length = krb_decode_asn1_length(ndpi_struct, kasn1_offset);
-  if (length < 0)
-  {
-    return -1;
-  }
-
-  return length;
+  return 0;
 }
 
 static void krb_strncpy_lower(char * const dst, size_t dst_siz,
@@ -189,112 +80,304 @@ static void krb_strncpy_lower(char * const dst, size_t dst_siz,
    }
 }
 
-/* Reference: https://datatracker.ietf.org/doc/html/rfc4120 */
-static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
-                     struct ndpi_flow_struct * const flow,
-                     size_t payload_offset)
+/* Realm ::= KerberosString */
+static void krb_parse_realm(struct ndpi_flow_struct * const flow,
+                            const u_int8_t *buf, u_int32_t buf_len)
 {
-  size_t kasn1_offset = payload_offset;
-  int length, krb_version, msg_type;
-  char const * text;
+  struct asn1_ber_tlv realm;
 
-  length = krb_decode_asn1_sequence_type(ndpi_struct, &kasn1_offset);
-  if (length < 0)
+  if (krb_decode_asn1_string(buf, buf_len, &realm) != 0 || realm.length == 0)
   {
-    return -1;
+    return;
   }
 
-  length = krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
-  if (length < 0)
-  {
-    return -1;
-  }
-
-  length = krb_decode_asn1_int_type(ndpi_struct, &kasn1_offset, &krb_version); /* pvno */
-  if (length != 1 || krb_version != 5)
-  {
-    return -1;
-  }
-
-  length = krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
-  if (length < 0)
-  {
-    return -1;
-  }
-
-  length = krb_decode_asn1_int_type(ndpi_struct, &kasn1_offset, &msg_type); /* msg-type */
-  if (length != 1 || msg_type != 0x0d /* TGS-REP */)
-  {
-    return -1;
-  }
-
-  krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
-
-  length = krb_decode_asn1_sequence_type(ndpi_struct, &kasn1_offset); /* Optional PADATA */
-  if (length > 0)
-  {
-    kasn1_offset += length;
-  }
-
-  length = krb_decode_asn1_string_type(ndpi_struct, &kasn1_offset, &text);
-  if (length < 3)
-  {
-    return -1;
-  }
-
-  kasn1_offset += length;
-  text += 2;
-  length -= 2;
   if (flow->metadata.protos.kerberos.domain[0] == '\0')
   {
     krb_strncpy_lower(flow->metadata.protos.kerberos.domain, sizeof(flow->metadata.protos.kerberos.domain),
-                      text, length);
+                      (char const *)realm.value, realm.length);
   }
+}
 
-  length = krb_decode_asn1_string_type(ndpi_struct, &kasn1_offset, NULL);
-  if (length < 0)
+/*
+  PrincipalName ::= SEQUENCE {
+    name-type   [0] Int32,
+    name-string [1] SEQUENCE OF KerberosString
+  }
+*/
+static void krb_parse_cname(struct ndpi_flow_struct * const flow,
+                            const u_int8_t *buf, u_int32_t buf_len)
+{
+  struct asn1_ber_tlv seq, field, names, name[2];
+  u_int8_t num_names = 0, idx = 0;
+  int used;
+
+  if (asn1_ber_decode_single_tlv(buf, buf_len, &seq) != 0 || seq.tag != 0x30)
   {
-    return -1;
+    return;
   }
 
-  length = krb_decode_asn1_sequence_type(ndpi_struct, &kasn1_offset);
-  if (length < 0)
+  /* Looking for name-string */
+  field.tag = 0;
+  while (seq.length > 0)
   {
-    return -1;
+    used = asn1_ber_decode_tlv(seq.value, seq.length, &field);
+    if (used < 0)
+    {
+      return;
+    }
+    if (field.tag == 0xA1)
+    {
+      break;
+    }
+    seq.value += used;
+    seq.length -= used;
   }
 
-  length = krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
-  if (length < 0)
+  if (field.tag != 0xA1 ||
+      asn1_ber_decode_single_tlv(field.value, field.length, &names) != 0 || names.tag != 0x30)
   {
-    return -1;
+    return;
   }
-  kasn1_offset += length;
 
-  length = krb_decode_asn1_blocks_skip(ndpi_struct, &kasn1_offset);
-  if (length < 0)
+  while (names.length > 0 && num_names < 2)
   {
-    return -1;
+    struct asn1_ber_tlv tlv;
+
+    used = asn1_ber_decode_tlv(names.value, names.length, &tlv);
+    if (used < 0 || krb_decode_asn1_string(names.value, used, &name[num_names]) != 0)
+    {
+      return;
+    }
+    num_names++;
+    names.value += used;
+    names.length -= used;
   }
 
-  length = krb_decode_asn1_string_type(ndpi_struct, &kasn1_offset, &text);
-  if (length < 3)
+  /* Service-like principals: the second component is the interesting one */
+  if (num_names == 2 && name[0].length == 4 &&
+      (strncasecmp((char const *)name[0].value, "host", 4) == 0 ||
+       strncasecmp((char const *)name[0].value, "ldap", 4) == 0))
   {
-    return -1;
+    idx = 1;
   }
 
-  kasn1_offset += length;
-  text += 2;
-  length -= 2;
-  if (flow->metadata.protos.kerberos.hostname[0] == '\0' && text[length - 1] != '$')
+  if (num_names <= idx || name[idx].length == 0 ||
+      flow->metadata.protos.kerberos.hostname[0] != '\0' ||
+      flow->metadata.protos.kerberos.username[0] != '\0')
+  {
+    return;
+  }
+
+  /* If cname ends with a $ then it's a machine account, otherwise it's a username */
+  if (name[idx].value[name[idx].length - 1] == '$')
   {
     krb_strncpy_lower(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
-                      text, length);
-  } else if (flow->metadata.protos.kerberos.username[0] == '\0') {
+                      (char const *)name[idx].value, name[idx].length - 1);
+  } else {
     krb_strncpy_lower(flow->metadata.protos.kerberos.username, sizeof(flow->metadata.protos.kerberos.username),
-                      text, length - 1);
+                      (char const *)name[idx].value, name[idx].length);
+  }
+}
+
+/*
+  KDC-REQ-BODY ::= SEQUENCE {
+    kdc-options [0] KDCOptions,
+    cname       [1] PrincipalName OPTIONAL,
+    realm       [2] Realm,
+    ...
+  }
+*/
+static void krb_parse_req_body(struct ndpi_flow_struct * const flow,
+                               const u_int8_t *buf, u_int32_t buf_len)
+{
+  struct asn1_ber_tlv seq, field;
+  int used;
+
+  if (asn1_ber_decode_single_tlv(buf, buf_len, &seq) != 0 || seq.tag != 0x30)
+  {
+    return;
   }
 
-  return 0;
+  while (seq.length > 0)
+  {
+    used = asn1_ber_decode_tlv(seq.value, seq.length, &field);
+    if (used < 0 || field.tag > 0xA2)
+    {
+      return;
+    }
+
+    if (field.tag == 0xA1)
+    {
+      krb_parse_cname(flow, field.value, field.length);
+    } else if (field.tag == 0xA2) {
+      krb_parse_realm(flow, field.value, field.length);
+    }
+
+    seq.value += used;
+    seq.length -= used;
+  }
+}
+
+static int krb_is_valid_msg_type(u_int8_t msg_type)
+{
+  return msg_type == KRB_MSG_TYPE_AS_REQ || msg_type == KRB_MSG_TYPE_AS_REP ||
+         msg_type == KRB_MSG_TYPE_TGS_REQ || msg_type == KRB_MSG_TYPE_TGS_REP ||
+         msg_type == KRB_MSG_TYPE_AP_REQ || msg_type == KRB_MSG_TYPE_ERROR;
+}
+
+static int krb_is_request(u_int8_t msg_type)
+{
+  return msg_type == KRB_MSG_TYPE_AS_REQ || msg_type == KRB_MSG_TYPE_TGS_REQ;
+}
+
+/* Check if the buffer is the beginning of a (possibly truncated) message long msg_len bytes */
+static int krb_is_msg_start(const u_int8_t *buf, u_int32_t buf_len, u_int32_t msg_len)
+{
+  u_int8_t tag;
+  u_int32_t length;
+  int hdr_len = asn1_ber_decode_header(buf, buf_len, &tag, &length);
+
+  return hdr_len > 0 &&
+         (tag & 0xE0) == 0x60 /* Application Constructed */ &&
+         krb_is_valid_msg_type(tag & 0x1F) &&
+         (u_int32_t)hdr_len + length == msg_len;
+}
+
+/*
+  Reference: https://datatracker.ietf.org/doc/html/rfc4120#section-5
+
+  KDC-REQ   ::= SEQUENCE { pvno [1], msg-type [2], padata [3] OPTIONAL, req-body [4] }
+  KDC-REP   ::= SEQUENCE { pvno [0], msg-type [1], padata [2] OPTIONAL, crealm [3], cname [4],
+                           ticket [5], enc-part [6] }
+  KRB-ERROR ::= SEQUENCE { pvno [0], msg-type [1], ctime [2] OPTIONAL, cusec [3] OPTIONAL,
+                           stime [4], susec [5], error-code [6], crealm [7] OPTIONAL,
+                           cname [8] OPTIONAL, realm [9], sname [10], ... }
+
+  Returns the message type or -1
+*/
+static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
+                     struct ndpi_flow_struct * const flow,
+                     const u_int8_t *buf, u_int32_t buf_len)
+{
+  struct asn1_ber_tlv app, seq, field;
+  u_int8_t msg_type, pvno_idx, idx, pvno_found = 0, msg_type_found = 0;
+  int32_t value;
+  int used;
+
+  if (asn1_ber_decode_single_tlv(buf, buf_len, &app) != 0 ||
+      (app.tag & 0xE0) != 0x60 /* Application Constructed */ ||
+      asn1_ber_decode_single_tlv(app.value, app.length, &seq) != 0 ||
+      seq.tag != 0x30)
+  {
+    return -1;
+  }
+
+  msg_type = app.tag & 0x1F;
+  if (!krb_is_valid_msg_type(msg_type))
+  {
+    return -1;
+  }
+  pvno_idx = krb_is_request(msg_type) ? 1 : 0;
+
+  while (seq.length > 0)
+  {
+    used = asn1_ber_decode_tlv(seq.value, seq.length, &field);
+    if (used < 0 || (field.tag & 0xE0) != 0xA0 /* Context-specific Constructed */)
+    {
+      break;
+    }
+    seq.value += used;
+    seq.length -= used;
+    idx = field.tag & 0x1F;
+
+    if (idx == pvno_idx)
+    {
+      if (asn1_ber_decode_int(field.value, field.length, &value) != 0 || value != 5)
+      {
+        return -1;
+      }
+      pvno_found = 1;
+      continue;
+    }
+    if (idx == pvno_idx + 1)
+    {
+      if (asn1_ber_decode_int(field.value, field.length, &value) != 0 || value != msg_type)
+      {
+        return -1;
+      }
+      msg_type_found = 1;
+      continue;
+    }
+    if (!pvno_found || !msg_type_found)
+    {
+      return -1;
+    }
+
+    switch (msg_type)
+    {
+      case KRB_MSG_TYPE_AS_REQ:
+      case KRB_MSG_TYPE_TGS_REQ:
+        if (idx == 4)
+        {
+          krb_parse_req_body(flow, field.value, field.length);
+        }
+        break;
+
+      case KRB_MSG_TYPE_AS_REP:
+      case KRB_MSG_TYPE_TGS_REP:
+        if (idx == 3)
+        {
+          krb_parse_realm(flow, field.value, field.length);
+        } else if (idx == 4) {
+          krb_parse_cname(flow, field.value, field.length);
+        }
+        break;
+
+      case KRB_MSG_TYPE_ERROR:
+        if (idx == 6)
+        {
+          if (asn1_ber_decode_int(field.value, field.length, &value) == 0 &&
+              flow->metadata.protos.kerberos.rep_msg_type == 0)
+          {
+            flow->metadata.protos.kerberos.error_code = value;
+          }
+        } else if (idx == 7 || idx == 9) {
+          krb_parse_realm(flow, field.value, field.length);
+        } else if (idx == 8) {
+          krb_parse_cname(flow, field.value, field.length);
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  if (!pvno_found || !msg_type_found)
+  {
+    return -1;
+  }
+
+  /* Only the first request and the first reply are exported */
+  if (krb_is_request(msg_type))
+  {
+    if (flow->metadata.protos.kerberos.req_msg_type == 0)
+    {
+      flow->metadata.protos.kerberos.req_msg_type = msg_type;
+    }
+  } else if (msg_type != KRB_MSG_TYPE_AP_REQ) {
+    if (flow->metadata.protos.kerberos.rep_msg_type == 0)
+    {
+      flow->metadata.protos.kerberos.rep_msg_type = msg_type;
+    }
+  }
+
+  NDPI_LOG_DBG(ndpi_struct,
+               "[msg-type: %u][Kerberos Hostname,Domain,Username][%s,%s,%s]\n",
+               msg_type, flow->metadata.protos.kerberos.hostname, flow->metadata.protos.kerberos.domain,
+               flow->metadata.protos.kerberos.username);
+
+  return msg_type;
 }
 
 static void ndpi_int_kerberos_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
@@ -303,382 +386,144 @@ static void ndpi_int_kerberos_add_connection(struct ndpi_detection_module_struct
   NDPI_LOG_INFO(ndpi_struct, "found KERBEROS\n");
 }
 
+static void krb_free_buf(struct ndpi_flow_struct *flow) {
+  if(flow->metadata.kerberos_buf.pktbuf != NULL) {
+    ndpi_free(flow->metadata.kerberos_buf.pktbuf);
+    flow->metadata.kerberos_buf.pktbuf = NULL;
+  }
+}
+
 /* ************************************************* */
+
+/* Returns the type of the message found, 0 if we need more data or -1 if it is not Kerberos */
+static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
+			      struct ndpi_flow_struct *flow) {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  const u_int8_t *payload = packet->payload;
+  u_int32_t payload_len = packet->payload_packet_len, kerberos_len;
+  int msg_type;
+
+#ifdef KERBEROS_DEBUG
+  printf("\n[Kerberos] Process packet [len: %u]\n", packet->payload_packet_len);
+#endif
+
+  if(flow->metadata.kerberos_buf.pktbuf != NULL) {
+    u_int missing = flow->metadata.kerberos_buf.pktbuf_maxlen - flow->metadata.kerberos_buf.pktbuf_currlen;
+
+    if(payload_len <= missing) {
+      memcpy(&flow->metadata.kerberos_buf.pktbuf[flow->metadata.kerberos_buf.pktbuf_currlen], payload, payload_len);
+      flow->metadata.kerberos_buf.pktbuf_currlen += payload_len;
+
+      if(flow->metadata.kerberos_buf.pktbuf_currlen < flow->metadata.kerberos_buf.pktbuf_maxlen) {
+#ifdef KERBEROS_DEBUG
+	printf("[Kerberos] Missing %u bytes: skipping\n",
+	       flow->metadata.kerberos_buf.pktbuf_maxlen - flow->metadata.kerberos_buf.pktbuf_currlen);
+#endif
+	return 0;
+      }
+
+#ifdef KERBEROS_DEBUG
+      printf("[Kerberos] Packet is now full: processing\n");
+#endif
+      payload = (const u_int8_t *)flow->metadata.kerberos_buf.pktbuf;
+      payload_len = flow->metadata.kerberos_buf.pktbuf_currlen;
+    } else {
+      /* Unexpected segment: forget the partial message and start again from this packet */
+      krb_free_buf(flow);
+    }
+  }
+
+  if(packet->tcp) {
+    /* Record Marking: https://datatracker.ietf.org/doc/html/rfc4120#section-7.2.2 */
+    if(payload_len < 4)
+      return -1;
+
+    kerberos_len = ntohl(get_u_int32_t(payload, 0));
+    payload += 4, payload_len -= 4;
+
+#ifdef KERBEROS_DEBUG
+    printf("[Kerberos] [Kerberos len: %u][available: %u]\n", kerberos_len, payload_len);
+#endif
+
+    if(kerberos_len >= KRB_MAX_MSG_LEN || kerberos_len < payload_len)
+      return -1;
+
+    if(kerberos_len > payload_len) {
+      /*
+	Kerberos packets might be too long for a TCP packet
+	so it could be split across multiple packets. Instead of
+	rebuilding the stream we use a heuristic approach
+      */
+      if(!krb_is_msg_start(payload, payload_len, kerberos_len))
+	return -1;
+
+      flow->metadata.kerberos_buf.pktbuf = (char*)ndpi_malloc(kerberos_len+4);
+      if(flow->metadata.kerberos_buf.pktbuf == NULL)
+	return -1;
+
+      flow->metadata.kerberos_buf.pktbuf_maxlen = kerberos_len+4;
+      memcpy(flow->metadata.kerberos_buf.pktbuf, payload-4, payload_len+4);
+      flow->metadata.kerberos_buf.pktbuf_currlen = payload_len+4;
+#ifdef KERBEROS_DEBUG
+      printf("[Kerberos] Allocated %u bytes\n", flow->metadata.kerberos_buf.pktbuf_maxlen);
+#endif
+      return 0;
+    }
+  }
+
+  msg_type = krb_parse(ndpi_struct, flow, payload, payload_len);
+
+#ifdef KERBEROS_DEBUG
+  printf("[Kerberos] [msg-type: %d]\n", msg_type);
+#endif
+
+  krb_free_buf(flow);
+
+  return msg_type;
+}
+
+static void krb_message_found(struct ndpi_flow_struct *flow, int msg_type) {
+  if(krb_is_request(msg_type)) {
+    /* Looking for the reply */
+    flow->core.max_extra_packets_to_check = 5; /* Reply may be split into multiple segments */
+    flow->core.extra_packets_func = ndpi_search_kerberos_extra;
+  } else {
+    /* Nothing else to do; stop dissecting this flow */
+    flow->core.extra_packets_func = NULL;
+  }
+}
 
 static void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t sport = packet->tcp ? ntohs(packet->tcp->source) : ntohs(packet->udp->source);
   u_int16_t dport = packet->tcp ? ntohs(packet->tcp->dest) : ntohs(packet->udp->dest);
-  const u_int8_t *original_packet_payload = NULL;
-  u_int16_t original_payload_packet_len = 0;
+  int msg_type;
 
   if((sport != KERBEROS_PORT) && (dport != KERBEROS_PORT)) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
-  
+
   NDPI_LOG_DBG(ndpi_struct, "search KERBEROS\n");
 
-#ifdef KERBEROS_DEBUG
-  printf("\n[Kerberos] Process packet [len: %u]\n", packet->payload_packet_len);
-#endif
-    
-  if(flow->metadata.kerberos_buf.pktbuf != NULL) {
-    u_int missing = flow->metadata.kerberos_buf.pktbuf_maxlen - flow->metadata.kerberos_buf.pktbuf_currlen;
-
-    if(packet->payload_packet_len <= missing) {
-      memcpy(&flow->metadata.kerberos_buf.pktbuf[flow->metadata.kerberos_buf.pktbuf_currlen], packet->payload, packet->payload_packet_len);
-      flow->metadata.kerberos_buf.pktbuf_currlen += packet->payload_packet_len;
-
-      if(flow->metadata.kerberos_buf.pktbuf_currlen == flow->metadata.kerberos_buf.pktbuf_maxlen) {
-	original_packet_payload = packet->payload;
-	original_payload_packet_len = packet->payload_packet_len;
-	packet->payload = (u_int8_t *)flow->metadata.kerberos_buf.pktbuf;
-	packet->payload_packet_len = flow->metadata.kerberos_buf.pktbuf_currlen;
-#ifdef KERBEROS_DEBUG
-	printf("[Kerberos] Packet is now full: processing\n");
-#endif
-      } else {
-#ifdef KERBEROS_DEBUG
-	printf("[Kerberos] Missing %u bytes: skipping\n",
-	       flow->metadata.kerberos_buf.pktbuf_maxlen - flow->metadata.kerberos_buf.pktbuf_currlen);
-#endif
-
-	return;
-      }
-    }
+  msg_type = krb_process_packet(ndpi_struct, flow);
+  if(msg_type < 0) {
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+    return;
   }
+  if(msg_type == 0)
+    return;
 
-  /* I have observed 0a,0c,0d,0e at packet->payload[19/21], maybe there are other possibilities */
-  if(packet->payload_packet_len >= 4) {
-    u_int32_t kerberos_len, expected_len;
-    u_int16_t base_offset = 0;
-
-    if(packet->tcp) {
-      kerberos_len = ntohl(get_u_int32_t(packet->payload, 0)),
-	expected_len = packet->payload_packet_len - 4;
-      base_offset = 4;
-    } else
-      base_offset = 0, kerberos_len = expected_len = packet->payload_packet_len;
-
-#ifdef KERBEROS_DEBUG
-    printf("[Kerberos] [Kerberos len: %u][expected_len: %u]\n", kerberos_len, expected_len);
-#endif
-
-    if(kerberos_len < 12000) {
-      /*
-	Kerberos packets might be too long for a TCP packet
-	so it could be split across two packets. Instead of
-	rebuilding the stream we use a heuristic approach
-      */
-      if(kerberos_len > expected_len) {
-	if(packet->tcp) {
-	  if(flow->metadata.kerberos_buf.pktbuf == NULL) {
-	    flow->metadata.kerberos_buf.pktbuf = (char*)ndpi_malloc(kerberos_len+4);
-
-	    if(flow->metadata.kerberos_buf.pktbuf != NULL) {
-	      flow->metadata.kerberos_buf.pktbuf_maxlen = kerberos_len+4;	      
-#ifdef KERBEROS_DEBUG
-	      printf("[Kerberos] Allocated %u bytes\n", flow->metadata.kerberos_buf.pktbuf_maxlen);
-#endif	      
-	    }
-	  }
-	  
-	  if(flow->metadata.kerberos_buf.pktbuf != NULL) {
-	    if(packet->payload_packet_len <= flow->metadata.kerberos_buf.pktbuf_maxlen) {
-	      memcpy(flow->metadata.kerberos_buf.pktbuf, packet->payload, packet->payload_packet_len);
-	      flow->metadata.kerberos_buf.pktbuf_currlen = packet->payload_packet_len;
-	    }
-	  }
-	}
-	
-	return;
-      } else if(kerberos_len == expected_len) {
-	if(packet->payload_packet_len > 64) {
-	  u_int16_t koffset, i;
-
-	  for(i=8; i<16; i++)
-	    if((packet->payload[base_offset+i] == 0x03)
-	       && (packet->payload[base_offset+i+1] == 0x02)
-	       && (packet->payload[base_offset+i+2] == 0x01)
-	       && (packet->payload[base_offset+i+3] != 0x05)
-	       )
-	      break;
-
-	  koffset = base_offset + i + 3;
-
-#ifdef KERBEROS_DEBUG
-	  printf("[Kerberos] [msg-type: 0x%02X/%u][koffset: %u]\n",
-		 packet->payload[koffset], packet->payload[koffset], koffset);
-#endif
-
-	  if(((packet->payload[koffset] == 0x0A)
-	      || (packet->payload[koffset] == 0x0C)
-	      || (packet->payload[koffset] == 0x1E)
-	      || (packet->payload[koffset] == 0x0D)
-	      || (packet->payload[koffset] == 0x0E))) {
-	    u_int32_t koffsetp, body_offset = 0, pad_len;
-	    u_int8_t msg_type = packet->payload[koffset];
-
-#ifdef KERBEROS_DEBUG
-	    printf("[Kerberos] Packet found 0x%02X/%u\n", msg_type, msg_type);
-#endif
-
-	    ndpi_int_kerberos_add_connection(ndpi_struct, flow);
-
-	    if(msg_type != 0x0d) /* TGS-REP */ {
-	      /* Process only on requests */
-	      if(packet->payload[koffset+1] == 0xA3) {
-		if(packet->payload[koffset+3] == 0x30)
-		  pad_len = packet->payload[koffset+4];
-		else {
-		  /* Long pad */
-		  pad_len = packet->payload[koffset+2];
-		  for(i=3; i<10; i++) if(packet->payload[koffset+i] == pad_len) break;
-
-		  pad_len = (packet->payload[koffset+i+1] << 8) + packet->payload[koffset+i+2];
-		  koffset += i-2;
-		}
-	      } else
-		pad_len = 0;
-
-#ifdef KERBEROS_DEBUG
-	      printf("pad_len=0x%02X/%u\n", pad_len, pad_len);
-#endif
-
-	      if(pad_len > 0) {
-		koffsetp = koffset + 2;
-		for(i=0; i<4; i++) if(packet->payload[koffsetp] != 0x30) koffsetp++; /* ASN.1 */
-#ifdef KERBEROS_DEBUG
-		printf("koffsetp=%u [%02X %02X] [byte 0 must be 0x30]\n", koffsetp, packet->payload[koffsetp], packet->payload[koffsetp+1]);
-#endif
-	      } else
-		koffsetp = koffset;
-
-	      body_offset = koffsetp + 1 + pad_len;
-
-	      for(i=0; i<10; i++) if(body_offset<packet->payload_packet_len && packet->payload[body_offset] != 0x05) body_offset++; /* ASN.1 */
-#ifdef KERBEROS_DEBUG
-	      printf("body_offset=%u [%02X %02X] [byte 0 must be 0x05]\n", body_offset, packet->payload[body_offset], packet->payload[body_offset+1]);
-#endif
-	    }
-	    
-	    if(msg_type == 0x0A) /* AS-REQ */ {
-#ifdef KERBEROS_DEBUG
-	      printf("[Kerberos] Processing AS-REQ\n");
-#endif
-
-
-	      if(body_offset < packet->payload_packet_len) {
-		u_int16_t name_offset = body_offset + 13;
-		
-		for(i=0; (i<20) && (name_offset < packet->payload_packet_len); i++) {
-		  if(packet->payload[name_offset] != 0x1b)
-		    name_offset++; /* ASN.1 */
-		}
-		
-#ifdef KERBEROS_DEBUG
-		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
-#endif
-
-		if(name_offset < packet->payload_packet_len - 1) {
-		  u_int cname_len = 0;
-
-		  name_offset += 1;
-		  if(name_offset < packet->payload_packet_len - 1 &&
-		     ndpi_isprint(packet->payload[name_offset+1]) == 0) /* Isn't printable ? */
-		  {
-		    name_offset++;
-		  }
-
-		  if(name_offset < packet->payload_packet_len - 3 &&
-		     packet->payload[name_offset+1] == 0x1b)
-		  {
-		    name_offset += 2;
-		  }
-		  
-		  cname_len = packet->payload[name_offset];
-
-		  if((cname_len+name_offset) < packet->payload_packet_len) {
-		    u_int realm_len, realm_offset;
-		    char cname_str[48];
-		    u_int8_t num_cname = 0;
-
-			cname_str[0] = '\0'; // required, because cname_len
-
-		    while(++num_cname <= 2) {
-		      if (name_offset + cname_len + 1 >= packet->payload_packet_len)
-		        cname_len = 0;
-		      krb_strncpy_lower(cname_str, sizeof(cname_str), (char*)&packet->payload[name_offset+1], cname_len);
-
-#ifdef KERBEROS_DEBUG
-		      printf("[AS-REQ][s/dport: %u/%u][Kerberos Cname][len: %u][%s]\n", sport, dport, cname_len, cname_str);
-#endif
-
-		      if(((strcmp(cname_str, "host") == 0) || (strcmp(cname_str, "ldap") == 0)) && (packet->payload[name_offset+1+cname_len] == 0x1b) && num_cname == 1) {
-		        name_offset += cname_len + 2;
-		        if (name_offset < packet->payload_packet_len)
-		          cname_len = packet->payload[name_offset];
-		      } else{
-		        break;
-		      }
-		    }
-
-		    realm_offset = cname_len + name_offset + 3;
-
-		    /* if cname does not end with a $ then it's a username */
-		    if(cname_len > 0 && name_offset + cname_len + 1 < packet->payload_packet_len
-		       && (cname_len < sizeof(cname_str))
-		       && (cname_str[cname_len-1] == '$')) {
-		      cname_str[cname_len-1] = '\0';
-		      ndpi_snprintf(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname), "%s", cname_str);
-		    } else
-		      ndpi_snprintf(flow->metadata.protos.kerberos.username, sizeof(flow->metadata.protos.kerberos.username), "%s", cname_str);
-
-		    for(i=0; (i < 14) && (realm_offset <  packet->payload_packet_len); i++) {
-		      if(packet->payload[realm_offset] != 0x1b)
-			realm_offset++; /* ASN.1 */
-		    }
-		    
-#ifdef KERBEROS_DEBUG
-		    printf("realm_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", realm_offset,
-			   packet->payload[realm_offset], packet->payload[realm_offset+1]);
-#endif
-		    
-		    realm_offset += 1;
-		    //if(num_cname == 2) realm_offset++;
-		    if(realm_offset  < packet->payload_packet_len) {
-		      realm_len = packet->payload[realm_offset];
-
-		      if((realm_offset+realm_len) < packet->payload_packet_len) {
-			char realm_str[48];
-
-			realm_offset += 1;
-			krb_strncpy_lower(realm_str, sizeof(realm_str), (char*)&packet->payload[realm_offset], realm_len);
-
-#ifdef KERBEROS_DEBUG
-			printf("[AS-REQ][Kerberos Realm][len: %u][%s]\n", realm_len, realm_str);
-#endif
-		        ndpi_snprintf(flow->metadata.protos.kerberos.domain, sizeof(flow->metadata.protos.kerberos.domain), "%s", realm_str);
-		      }
-		    }
-		  }
-		}
-	      } 
-#ifdef KERBEROS_DEBUG
-	      printf("[Kerberos] Setting extra func from AS-REQ\n");
-#endif
-	      flow->core.max_extra_packets_to_check = 5; /* Reply may be split into multiple segments */
-	      flow->core.extra_packets_func = ndpi_search_kerberos_extra;
-	    } else if(msg_type == 0x0e) /* AS-REQ */ {
-#ifdef KERBEROS_DEBUG
-	      printf("[Kerberos] Processing AS-REQ\n");
-#endif
-	      /* Nothing specific to do; stop dissecting this flow */
-	      flow->core.extra_packets_func = NULL;
-
-	    } else if(msg_type == 0x0c) /* TGS-REQ */ {
-#ifdef KERBEROS_DEBUG
-	      printf("[Kerberos] Processing TGS-REQ\n");
-#endif
-
-	      if(body_offset < packet->payload_packet_len) {
-		u_int16_t name_offset, padding_offset = body_offset + 4;
-
-		name_offset = padding_offset;
-		for(i=0; i<14 && name_offset < packet->payload_packet_len; i++) if(packet->payload[name_offset] != 0x1b) name_offset++; /* ASN.1 */
-
-#ifdef KERBEROS_DEBUG
-		printf("name_offset=%u [%02X %02X] [byte 0 must be 0x1b]\n", name_offset, packet->payload[name_offset], packet->payload[name_offset+1]);
-#endif
-
-		if(name_offset < (packet->payload_packet_len - 1)) {
-		  u_int realm_len;
-
-		  name_offset++;
-		  realm_len = packet->payload[name_offset];
-
-		  if((realm_len+name_offset) < packet->payload_packet_len) {
-		    char realm_str[48];
-
-		    name_offset += 1;
-		    krb_strncpy_lower(realm_str, sizeof(realm_str), (char*)&packet->payload[name_offset], realm_len);
-
-#ifdef KERBEROS_DEBUG
-		    printf("[TGS-REQ][s/dport: %u/%u][Kerberos Realm][len: %u][%s]\n", sport, dport, realm_len, realm_str);
-#endif
-		    ndpi_snprintf(flow->metadata.protos.kerberos.domain, sizeof(flow->metadata.protos.kerberos.domain), "%s", realm_str);
-
-		    /* If necessary we can decode sname */
-		    if(flow->metadata.kerberos_buf.pktbuf) {
-			    ndpi_free(flow->metadata.kerberos_buf.pktbuf);
-			    packet->payload = original_packet_payload;
-			    packet->payload_packet_len = original_payload_packet_len;
-		    }
-		    flow->metadata.kerberos_buf.pktbuf = NULL;
-		  }
-		}
-	      }
-#ifdef KERBEROS_DEBUG
-	      printf("[Kerberos] Setting extra func from TGS-REQ\n");
-#endif
-	      if(!packet->udp) {
-	        flow->core.max_extra_packets_to_check = 5; /* Reply may be split into multiple segments */
-	        flow->core.extra_packets_func = ndpi_search_kerberos_extra;
-	      }
-
-	      if(flow->metadata.kerberos_buf.pktbuf != NULL) {
-		ndpi_free(flow->metadata.kerberos_buf.pktbuf);
-		packet->payload = original_packet_payload;
-		packet->payload_packet_len = original_payload_packet_len;
-		flow->metadata.kerberos_buf.pktbuf = NULL;
-	      }
-
-	      return;
-	    } else if(msg_type == 0x0d) /* TGS-REP */ {
-	      NDPI_LOG_DBG(ndpi_struct, "[Kerberos] Processing TGS-REP\n");
-
-	      if (krb_parse(ndpi_struct, flow, 8) != 0)
-	      {
-	        NDPI_LOG_DBG(ndpi_struct, "[TGS-REP] Invalid packet received\n");
-	        return;
-	      }
-	      NDPI_LOG_DBG(ndpi_struct,
-	                   "[TGS-REP][s/dport: %u/%u][Kerberos Hostname,Domain,Username][%s,%s,%s]\n",
-	                   sport, dport, flow->metadata.protos.kerberos.hostname, flow->metadata.protos.kerberos.domain,
-	                   flow->metadata.protos.kerberos.username);
-	      flow->core.extra_packets_func = NULL;
-	    } else if(msg_type == 0x1e) /* Error */ {
-#ifdef KERBEROS_DEBUG
-	      printf("[Kerberos] Processing KRB-Error\n");
-#endif
-	      /* Nothing specific to do; stop dissecting this flow */
-	      flow->core.extra_packets_func = NULL;
-	    }
-
-	    return;
-	  }
-	}
-      }
-    } else {
-#ifdef KERBEROS_DEBUG
-      printf("[Kerberos][s/dport: %u/%u] Skipping packet: too long [kerberos_len: %u]\n",
-	     sport, dport, kerberos_len);
-#endif
-
-      if(flow->metadata.protos.kerberos.domain[0] != '\0')
-	return;
-    }
-  }
-
-  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+  ndpi_int_kerberos_add_connection(ndpi_struct, flow);
+  krb_message_found(flow, msg_type);
 }
 
 static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  int msg_type;
 
 #ifdef KERBEROS_DEBUG
   printf("[Kerberos] Extra function\n");
@@ -691,7 +536,9 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
     return 1;
 
   /* Possibly dissect the reply */
-  ndpi_search_kerberos(ndpi_struct, flow);
+  msg_type = krb_process_packet(ndpi_struct, flow);
+  if(msg_type > 0)
+    krb_message_found(flow, msg_type);
 
   /* Possibly more processing */
   return flow->core.extra_packets_func != NULL;
