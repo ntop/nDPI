@@ -1784,6 +1784,16 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_string_string(serializer, "hostname", flow->metadata.protos.kerberos.hostname);
     ndpi_serialize_string_string(serializer, "domain", flow->metadata.protos.kerberos.domain);
     ndpi_serialize_string_string(serializer, "username", flow->metadata.protos.kerberos.username);
+    if(flow->metadata.protos.kerberos.req_msg_type != 0)
+      ndpi_serialize_string_uint32(serializer, "request_type", flow->metadata.protos.kerberos.req_msg_type);
+    if(flow->metadata.protos.kerberos.rep_msg_type != 0) {
+      ndpi_serialize_string_uint32(serializer, "response_type", flow->metadata.protos.kerberos.rep_msg_type);
+      ndpi_serialize_string_boolean(serializer, "response_ok",
+				    flow->metadata.protos.kerberos.rep_msg_type == 11 /* AS-REP */ ||
+				    flow->metadata.protos.kerberos.rep_msg_type == 13 /* TGS-REP */);
+      if(flow->metadata.protos.kerberos.rep_msg_type == 30 /* KRB-ERROR */)
+	ndpi_serialize_string_int32(serializer, "error_code", flow->metadata.protos.kerberos.error_code);
+    }
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -4366,6 +4376,74 @@ int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_
 
   (*value_len) += 1;
   return value;
+}
+
+/* ******************************************* */
+
+/*
+  Decode identifier and length octets (only low-tag-number form).
+  Returns the number of header bytes or -1; the value might be longer than the buffer.
+  Reference: https://en.wikipedia.org/wiki/X.690#Identifier_octets
+*/
+int asn1_ber_decode_header(const u_int8_t *buf, u_int32_t buf_len,
+			   u_int8_t *tag, u_int32_t *length) {
+  int64_t len;
+  u_int16_t value_len;
+
+  if(buf_len < 2 || (buf[0] & 0x1F) == 0x1F)
+    return -1;
+
+  len = asn1_ber_decode_length(&buf[1], buf_len - 1, &value_len);
+  if(len < 0)
+    return -1;
+
+  *tag = buf[0];
+  *length = (u_int32_t)len;
+
+  return 1 + value_len;
+}
+
+/* ******************************************* */
+
+/* Returns the number of bytes used by the whole TLV or -1 */
+int asn1_ber_decode_tlv(const u_int8_t *buf, u_int32_t buf_len,
+			struct asn1_ber_tlv * const tlv) {
+  int hdr_len = asn1_ber_decode_header(buf, buf_len, &tlv->tag, &tlv->length);
+
+  if(hdr_len < 0 || tlv->length > buf_len - hdr_len)
+    return -1;
+
+  tlv->value = &buf[hdr_len];
+
+  return hdr_len + (int)tlv->length;
+}
+
+/* ******************************************* */
+
+/* Decode a TLV which must fill the entire buffer */
+int asn1_ber_decode_single_tlv(const u_int8_t *buf, u_int32_t buf_len,
+			       struct asn1_ber_tlv * const tlv) {
+  return asn1_ber_decode_tlv(buf, buf_len, tlv) == (int)buf_len ? 0 : -1;
+}
+
+/* ******************************************* */
+
+/* Decode a buffer holding exactly one INTEGER (up to 4 bytes) */
+int asn1_ber_decode_int(const u_int8_t *buf, u_int32_t buf_len, int32_t * const out) {
+  struct asn1_ber_tlv tlv;
+  u_int32_t i, value;
+
+  if(asn1_ber_decode_single_tlv(buf, buf_len, &tlv) != 0 ||
+     tlv.tag != 0x02 /* INTEGER */ ||
+     tlv.length == 0 || tlv.length > 4)
+    return -1;
+
+  value = (tlv.value[0] & 0x80) ? 0xFFFFFFFF : 0; /* Sign extension */
+  for(i = 0; i < tlv.length; ++i)
+    value = (value << 8) | tlv.value[i];
+  *out = (int32_t)value;
+
+  return 0;
 }
 
 /* ******************************************* */
