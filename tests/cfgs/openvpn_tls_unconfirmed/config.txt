@@ -1,0 +1,1 @@
+--cfg=openvpn,dpi.heuristics,0x01 --cfg=openvpn,dpi.heuristics.num_messages,40 --cfg=tls,dpi.heuristics,0x07
