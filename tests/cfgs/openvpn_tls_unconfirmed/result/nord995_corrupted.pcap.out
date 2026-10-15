@@ -1,6 +1,6 @@
-DPI Packets (TCP):	15	(15.00 pkts/flow)
+DPI Packets (TCP):	19	(19.00 pkts/flow)
 Confidence DPI (aggressive) : 1 (flows)
-Num dissector calls: 250 (250.00 diss/flow)
+Num dissector calls: 255 (255.00 diss/flow)
 LRU cache ookla:      0/0/0 (insert/search/found)
 LRU cache bittorrent: 0/3/0 (insert/search/found)
 LRU cache stun:       0/0/0 (insert/search/found)
@@ -33,4 +33,4 @@ Safe                            53 15226         1
 
 Web                             53 15226         1            
 
-	1	TCP 192.168.1.204:49766 <-> 212.129.45.224:995 [proto: 91/TLS][Stack: TLS][IP: 426/NordVPN][Encrypted][Confidence: DPI (aggressive)][FPC: 426/NordVPN, Confidence: IP address][DPI packets: 15][cat: Web/5][Breed: Safe][26 pkts/7219 bytes <-> 27 pkts/8007 bytes][Goodput ratio: 80/81][3.96 sec][bytes ratio: -0.052 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 180/158 1717/1722 369/370][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 278/297 1471/1514 322/465][Risk: ** Known Proto on Non Std Port **** Susp Entropy **** Obfuscated Traffic **][Risk Score: 160][Risk Info: Obfuscated TLS traffic;Entropy: 6.289 (Executable?);Expected on port 443][nDPI Cli Fingerprint: 8d24451529f8804599a40c91c8c4ca63][TCP Fingerprint: 2_128_65535_3248cd84/Unknown][MSS: 1460][Plen Bins: 32,0,4,28,6,0,6,0,2,0,2,4,0,0,0,0,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,6,0,0]
+	1	TCP 192.168.1.204:49766 <-> 212.129.45.224:995 [proto: 91/TLS][Stack: TLS][IP: 426/NordVPN][Encrypted][Confidence: DPI (aggressive)][FPC: 426/NordVPN, Confidence: IP address][DPI packets: 19][cat: Web/5][Breed: Safe][26 pkts/7219 bytes <-> 27 pkts/8007 bytes][Goodput ratio: 80/81][3.96 sec][bytes ratio: -0.052 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 180/158 1717/1722 369/370][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 278/297 1471/1514 322/465][Risk: ** Known Proto on Non Std Port **** Susp Entropy **** Obfuscated Traffic **][Risk Score: 160][Risk Info: Obfuscated TLS traffic;Entropy: 6.289 (Executable?);Expected on port 443][nDPI Cli Fingerprint: 8d24451529f8804599a40c91c8c4ca63][TCP Fingerprint: 2_128_65535_3248cd84/Unknown][MSS: 1460][Plen Bins: 32,0,4,28,6,0,6,0,2,0,2,4,0,0,0,0,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,6,0,0]

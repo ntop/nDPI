@@ -401,6 +401,18 @@ static int tls_obfuscated_heur_search(struct ndpi_detection_module_struct* ndpi_
 
 /* **************************************** */
 
+/* The (plain) obfuscated-TLS heuristic and the OpenVPN opcode heuristic can both
+   trigger on the very same packet: the control channel of an (obfuscated) OpenVPN
+   session carries a real TLS handshake. If the OpenVPN heuristic is enabled and it
+   is still accumulating consistent evidence on this flow, let it take the decision:
+   OpenVPN is the more specific classification. */
+static int tls_obfuscated_heur_openvpn_pending(struct ndpi_detection_module_struct* ndpi_struct,
+                                               struct ndpi_flow_struct* flow) {
+  return (ndpi_struct->cfg.openvpn_heuristics & NDPI_HEURISTICS_OPENVPN_OPCODE) &&
+         flow->metadata.openvpn.ovpn_alg_heur_opcode_state == 0 &&
+         flow->metadata.openvpn.ovpn_heur_opcode__num_msgs > 0;
+}
+
 static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct* ndpi_struct,
 					    struct ndpi_flow_struct* flow) {
   int rc;
@@ -421,6 +433,15 @@ static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct*
         * try to identify the servers: we wait for multiple sessions to the same server,
           before to start marking the flows to that address
         * consider the number of burst after TLS handshake (see Fig 8 paper) */
+
+    if(flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN &&
+       tls_obfuscated_heur_openvpn_pending(ndpi_struct, flow)) {
+      NDPI_LOG_DBG(ndpi_struct, "TLS-Obf-Heur: deferring to OpenVPN heuristic\n");
+      /* Remember the decision: if OpenVPN doesn't confirm, it is applied at giveup */
+      flow->core.tls_quic.obfuscated_heur_deferred = 1;
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return 0; /* Stop. Don't touch classification/category: OpenVPN decides */
+    }
 
     if(flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
       ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
@@ -444,6 +465,34 @@ static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct*
   NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow); /* Not necessary in extra-dissection data path,
                                                 but we need it with the plain heuristic */
   return 0; /* Stop */
+}
+
+/* **************************************** */
+
+/* Called at giveup. If the TLS obfuscated-plain heuristic deferred its decision to the
+   OpenVPN heuristic (see tls_obfuscated_heur_openvpn_pending()) and the flow is still
+   unclassified, i.e. OpenVPN did not confirm, apply the original TLS decision.
+   Returns 1 if the decision has been applied */
+int tls_obfuscated_heur_deferred_giveup(struct ndpi_detection_module_struct* ndpi_struct,
+                                        struct ndpi_flow_struct* flow) {
+  ndpi_master_app_protocol proto;
+
+  if(!flow->core.tls_quic.obfuscated_heur_deferred)
+    return 0;
+  flow->core.tls_quic.obfuscated_heur_deferred = 0;
+
+  if(flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN)
+    return 0;
+
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
+  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_OBFUSCATED_TRAFFIC, "Obfuscated TLS traffic");
+
+  proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
+  proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
+  flow->core.category = get_proto_category(ndpi_struct, proto);
+  flow->core.breed = get_proto_breed(ndpi_struct, proto);
+
+  return 1;
 }
 
 /* **************************************** */
