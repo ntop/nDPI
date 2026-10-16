@@ -10022,6 +10022,14 @@ static void ndpi_internal_detection_giveup(struct ndpi_detection_module_struct *
     return;
   }
 
+  /* The TLS obfuscated heuristic deferred to the OpenVPN one, which didn't confirm:
+     apply its decision first, as it would have been taken before any of the guesses below.
+     This is a DPI classification, not a guess: complete it as an already classified flow */
+  if(tls_obfuscated_heur_deferred_giveup(ndpi_str, flow)) {
+    internal_giveup(ndpi_str, flow);
+    return;
+  }
+
   /* Partial classification */
   if(flow->core.fast_callback_protocol_id != NDPI_PROTOCOL_UNKNOWN) {
     ndpi_set_detected_protocol(ndpi_str, &flow->core, flow->core.fast_callback_protocol_id, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL);
