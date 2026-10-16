@@ -1447,13 +1447,16 @@ extern "C" {
   void ndpi_term_serializer(ndpi_serializer *serializer);
 
   /**
-   * Reset the serializer (cleanup the internal buffer to start a new serialization)
+   * Reset the serializer (cleanup the internal buffer to start a new serialization).
+   * Any snapshot taken before the reset is discarded, while the
+   * ndpi_serializer_skip_header() hint is preserved.
    * @param serializer The serializer handle
    */
   void ndpi_reset_serializer(ndpi_serializer *serializer);
 
   /**
-   * Hint to not create the header (used to avoid creating the header when not used)
+   * Hint to not create the header (used to avoid creating the header when not used).
+   * The hint is preserved across ndpi_reset_serializer().
    * @param serializer The serializer handle
    */
   void ndpi_serializer_skip_header(ndpi_serializer *serializer);

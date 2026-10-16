@@ -1560,6 +1560,7 @@ typedef struct {
   u_int8_t has_snapshot;
   u_int8_t multiline_json_array;
   u_int8_t inner_json;
+  u_int8_t skip_header;
   ndpi_private_serializer_status snapshot;
 } ndpi_private_serializer;
 
