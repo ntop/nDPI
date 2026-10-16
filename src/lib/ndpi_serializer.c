@@ -2551,6 +2551,12 @@ int ndpi_init_deserializer_buf(ndpi_deserializer *_deserializer,
 			       u_int32_t serialized_buffer_len) {
   ndpi_private_deserializer *deserializer = (ndpi_private_deserializer*)_deserializer;
 
+  /* Zero the (caller-provided, possibly uninitialized) deserializer first: it
+     shares its layout with the serializer, and ndpi_reset_serializer() reads
+     serializer-only fields (multiline_json_array, inner_json) on its non-TLV
+     paths, which a deserializer never sets otherwise. */
+  memset(deserializer, 0, sizeof(*deserializer));
+
   if(serialized_buffer == NULL)
     return(-3);
 
