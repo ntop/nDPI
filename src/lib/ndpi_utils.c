@@ -3806,16 +3806,15 @@ int ndpi_isset_risk(struct ndpi_flow_core_struct *core, ndpi_risk_enum r) {
 /* ******************************************************************** */
 
 int ndpi_is_printable_buffer(u_int8_t const * const buf, size_t len) {
-  int retval = 1;
   size_t i;
 
-  for(i = 0; i < len; ++i) {
-    if(ndpi_isprint(buf[i]) == 0) {
-      retval = 0;
-    }
-  }
+  /* Exit on the first non-printable byte: correctness, performance, and
+     defense-in-depth (a bogus huge len can no longer walk off the buffer). */
+  for(i = 0; i < len; ++i)
+    if(ndpi_isprint(buf[i]) == 0)
+      return 0;
 
-  return retval;
+  return 1;
 }
 
 /* ******************************************************************** */
