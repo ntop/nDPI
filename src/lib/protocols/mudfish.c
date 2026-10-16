@@ -77,12 +77,14 @@ static void ndpi_search_mudfish(struct ndpi_detection_module_struct *ndpi_struct
   }
 
   // Check discovery response
-  if (packet->payload_packet_len > 8 &&
-      get_u_int32_t(packet->payload, 0) == htonl(0x554e2041) &&
-      get_u_int32_t(packet->payload, 0) == htonl(0x465f494e))
-  {
-    ndpi_int_mudfish_add_connection(ndpi_struct, flow);
-    return;
+  if (packet->payload_packet_len > 8) {
+    u_int32_t sig;
+    memcpy(&sig, &packet->payload[0], sizeof(sig));
+    if (sig == htonl(0x554e2041) && sig == htonl(0x465f494e))
+    {
+      ndpi_int_mudfish_add_connection(ndpi_struct, flow);
+      return;
+    }
   }
 
   NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);

@@ -30,11 +30,12 @@
 #include "ndpi_api.h"
 #include "ndpi_private.h"
 
+PACK_ON
 struct afpHeader {
   u_int8_t flags, command;
   u_int16_t requestId;
   u_int32_t dataOffset, length, reserved;
-};
+} PACK_OFF;
 
 static void ndpi_int_afp_add_connection(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
