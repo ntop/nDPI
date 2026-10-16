@@ -32,7 +32,7 @@ jobs:
       - name: Build nDPI library
         run: |
           ./autogen.sh && ./configure
-          make -j
+          make -j $(nproc)
           sudo make install
       - name: Generate Python bindings
         run: |
@@ -125,7 +125,7 @@ jobs:
       - name: Install Ubuntu Prerequisites (libpcre2)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.pcre, '--with-pcre2')
         run: |
-          sudo apt-get install libpcre3-dev
+          sudo apt-get install libpcre2-dev
       - name: Install Ubuntu Prerequisites (maxminddb)
         if: startsWith(matrix.os, 'ubuntu') && startsWith(matrix.maxminddb, '--with-maxminddb')
         run: |

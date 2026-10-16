@@ -92,7 +92,7 @@ fuzz_alg_hw_rsi_outliers_da_LINK = $(FUZZ_LINK_COMMAND)
 fuzz_alg_isolationforest_SOURCES = fuzz_alg_isolationforest.cpp
 fuzz_alg_isolationforest_LINK = $(FUZZ_LINK_COMMAND)
 
-fuzz_alg_anomalymodel_SOURCES = fuzz_alg_anomalymodel.cpp cpp fuzz_common_code.c
+fuzz_alg_anomalymodel_SOURCES = fuzz_alg_anomalymodel.cpp fuzz_common_code.c
 fuzz_alg_anomalymodel_LINK = $(FUZZ_LINK_COMMAND)
 
 fuzz_alg_jitter_SOURCES = fuzz_alg_jitter.cpp fuzz_common_code.c
