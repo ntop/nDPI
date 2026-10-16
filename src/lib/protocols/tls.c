@@ -1402,20 +1402,20 @@ static int processHandshakeTLSBlock(struct ndpi_detection_module_struct *ndpi_st
 
   case 0x0c: /* Server Key Exchange */
     {
-      u_int32_t total_len = (packet->payload[1] << 16) +  (packet->payload[2] << 8) + packet->payload[3];
+      /*
+	ECDHE params: curve_type (1), named_curve (2), public key length (1),
+	public key, then (TLS 1.2) the signature algorithm (2)
+      */
+      u_int32_t hdr_len = is_dtls ? 12 : 4;
+      u_int32_t offset = hdr_len + 3;
 
-      if(total_len <= packet->payload_packet_len) {
-	u_int8_t pubkey_len = packet->payload[7];
-	u_int16_t offset = 7 + pubkey_len;
+      if(offset < packet->payload_packet_len &&
+	 packet->payload[hdr_len] == 0x03 /* named_curve */) {
+	offset += 1 + packet->payload[offset];
 
-	if(offset < packet->payload_packet_len) {
-	  offset++;
-
-	  if((offset + 2) < packet->payload_packet_len) {
-	    flow->metadata.protos.tls_quic.signature_algorithms =
-	      (packet->payload[offset] << 8) + packet->payload[offset+1];
-	  }
-	}
+	if(offset + 2 <= packet->payload_packet_len)
+	  flow->metadata.protos.tls_quic.signature_algorithms =
+	    (packet->payload[offset] << 8) + packet->payload[offset+1];
       }
     }
     break;
