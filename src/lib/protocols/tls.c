@@ -1739,7 +1739,8 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
 			       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t handshake_len, handshake_frag_off, handshake_frag_len;
-  u_int16_t p_len, processed;
+  u_int16_t p_len;
+  u_int32_t processed;
   const u_int8_t *p;
   u_int8_t no_dtls = 0, change_cipher_found = 0;
   message_t *message = NULL;
@@ -1757,7 +1758,7 @@ static int ndpi_search_dtls(struct ndpi_detection_module_struct *ndpi_struct,
     u_int32_t block_len;
     const u_int8_t *block = (const u_int8_t *)&p[processed];
 
-    if(!is_dtls(block, p_len, &block_len)) {
+    if(!is_dtls(block, p_len - processed, &block_len)) {
       no_dtls = 1;
       break;
     }
