@@ -245,6 +245,10 @@ void ndpi_reset_serializer(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
   serializer->status.flags = 0;
+  serializer->has_snapshot = 0; /* A snapshot taken before the reset is no longer valid */
+
+  if(serializer->skip_header)
+    serializer->status.flags |= NDPI_SERIALIZER_STATUS_HDR_DONE;
 
   if(serializer->fmt == ndpi_serialization_format_json) {
     u_int32_t buff_diff;
@@ -264,6 +268,15 @@ void ndpi_reset_serializer(ndpi_serializer *_serializer) {
     serializer->status.header.size_used = 0;
     serializer->status.buffer.size_used = 0;
   } else { /* ndpi_serialization_format_tlv */
+    /* Restore the header, as it may have been overwritten after
+       ndpi_serializer_set_buffer_len(). Check first, so that a deserializer
+       (which shares this code) never writes to its caller-provided buffer */
+    if(serializer->buffer.data[0] != 1 /* version */ ||
+       serializer->buffer.data[1] != (u_int8_t) serializer->fmt) {
+      serializer->buffer.data[0] = 1;
+      serializer->buffer.data[1] = (u_int8_t) serializer->fmt;
+    }
+
     serializer->status.buffer.size_used = 2 * sizeof(u_int8_t);
   }
 }
@@ -273,6 +286,7 @@ void ndpi_reset_serializer(ndpi_serializer *_serializer) {
 void ndpi_serializer_skip_header(ndpi_serializer *_serializer) {
   ndpi_private_serializer *serializer = (ndpi_private_serializer*)_serializer;
 
+  serializer->skip_header = 1; /* Preserved across ndpi_reset_serializer() */
   serializer->status.flags |= NDPI_SERIALIZER_STATUS_HDR_DONE;
 }
 
@@ -320,8 +334,7 @@ int ndpi_init_serializer_ll(ndpi_serializer *_serializer,
     }
 
   } else /* ndpi_serialization_format_tlv */ {
-    serializer->buffer.data[0]   = 1; /* version */
-    serializer->buffer.data[1]   = (u_int8_t) fmt;
+    /* The header (version and format) is written by ndpi_reset_serializer() */
   }
 
   serializer->csv_separator[0] = ',';
