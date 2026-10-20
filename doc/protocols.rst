@@ -4519,3 +4519,12 @@ PowerShell is a task-based command-line shell and scripting language developed
 by Microsoft for task automation and configuration management.
 
 References: `Official site: <https://learn.microsoft.com/en-us/powershell>`_
+
+
+.. _Proto_497:
+
+`NDPI_PROTOCOL_JANITORAI`
+============================
+JanitorAI is an AI roleplay platform, often featuring adult content.
+
+References: `JanitorAI official site: <https://janitorai.com>`_

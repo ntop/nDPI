@@ -526,6 +526,7 @@ typedef enum {
   NDPI_PROTOCOL_PEACOCK               = 494,
   NDPI_PROTOCOL_SUPERCELL             = 495,
   NDPI_PROTOCOL_POWERSHELL            = 496,
+  NDPI_PROTOCOL_JANITORAI             = 497,
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 
