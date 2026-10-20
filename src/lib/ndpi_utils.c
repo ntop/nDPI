@@ -1742,6 +1742,8 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_NTP:
     ndpi_serialize_start_of_block(serializer, "ntp");
     for (i = 0; i < 2; i++) {
+      char timestamp[64];
+      
       ndpi_serialize_start_of_block_uint32(serializer,i);
       ndpi_serialize_string_uint32(serializer, "leap_indicator", flow->metadata.protos.ntp[i].leap_indicator);
       ndpi_serialize_string_uint32(serializer, "version", flow->metadata.protos.ntp[i].version);
@@ -1753,8 +1755,6 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_serialize_string_float(serializer, "root_dispersion", flow->metadata.protos.ntp[i].root_dispersion, "%f");
       ndpi_serialize_string_string(serializer, "ref_id", flow->metadata.protos.ntp[i].ref_id);
 
-
-      char timestamp[64];
       ntp_ts_to_string(flow->metadata.protos.ntp[i].ref_time, timestamp, sizeof timestamp);
       ndpi_serialize_string_string(serializer, "ref_time", timestamp);
       ntp_ts_to_string(flow->metadata.protos.ntp[i].org_time, timestamp, sizeof timestamp);
@@ -2145,18 +2145,19 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       if(flow->metadata.protos.ipsec.proposal[NDPI_IKEV2_REQUEST_PROPOSAL].proto_id
 	 || flow->metadata.protos.ipsec.proposal[NDPI_IKEV2_RESPONSE_PROPOSAL].proto_id) {
 	u_int8_t i;
-	ndpi_serializer sub_serializer;
-
-	if(ndpi_init_serializer(&sub_serializer, ndpi_serialization_format_json) == -1)
+	ndpi_serializer sub_serializer, sub_sub_serializer;
+	
+	if(ndpi_init_serializer(&sub_serializer, ndpi_serialization_format_json) == -1)	
 	  ;
 	else {
-	  ndpi_serializer *ser;
+	  ndpi_serializer *ser, *sser;
 
 	  ser = &sub_serializer;
 
 	  for(i=0; i<2; i++) {
 	    struct ndpi_ipsec_proposal *p = &flow->metadata.protos.ipsec.proposal[i];
-
+	    int j;
+	    
 	    ndpi_serialize_string_string(ser, "type", (i == NDPI_IKEV2_REQUEST_PROPOSAL) ? "request" : "response");
 	    ndpi_serialize_string_uint32(ser, "protocol_id", p->proto_id);
 	    ndpi_serialize_string_uint32(ser, "num_transforms", p->num_transforms);
@@ -2166,8 +2167,27 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	    ndpi_serialize_string_string(ser, "integrity_algorithm", ndpi_ikev2_integ_name(p->integ_alg));
 	    ndpi_serialize_string_string(ser, "diffie_hellman_group", ndpi_ikev2_dh_name(p->dh_group));
 	    ndpi_serialize_string_uint32(ser, "extended_sequence_numbers", p->esn);
+
+	    /* *************** */
+
+	    sser = &sub_sub_serializer;
+
+	    if(ndpi_init_serializer(&sub_sub_serializer, ndpi_serialization_format_json) != -1) {
+	      for(j=0; (j<p->num_transforms) && (j<MAX_NUM_TRANSFORMS); j++) {
+		ndpi_serialize_string_uint32(sser, "transform_type", p->transforms[j].transform_type);
+		ndpi_serialize_string_uint32(sser, "transform_id",   p->transforms[j].transform_id);
+		ndpi_serialize_end_of_record(sser);
+	      }
+	      
+	      ndpi_serialize_end_of_record(sser);
+	      
+	      buffer = ndpi_serializer_get_buffer(sser, &buffer_len);
+	      if(buffer && (buffer_len > 0))
+		ndpi_serialize_string_raw(ser, "additional_key_exchanges", buffer, buffer_len);
+	    } /* if */
+	    
 	    ndpi_serialize_end_of_record(ser);
-	  }
+	  } /* for */
 
 	  buffer = ndpi_serializer_get_buffer(ser, &buffer_len);
 	  if(buffer && (buffer_len > 0))

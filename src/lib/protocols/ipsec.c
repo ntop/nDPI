@@ -78,6 +78,10 @@ static void ikev2_parse_transforms(const u_int8_t *payload, u_int16_t xform_star
 
     if (xform_len < 8 || off + xform_len > prop_end) break;
 
+    if(t < MAX_NUM_TRANSFORMS)
+      prop->transforms[t].transform_type = xform_type,
+	prop->transforms[t].transform_id = xform_id;
+    
     /* Scan attributes inside this transform (key length, etc.) */
     u_int16_t key_bits = 0;
     u_int32_t attr_off = off + 8;
@@ -90,11 +94,13 @@ static void ikev2_parse_transforms(const u_int8_t *payload, u_int16_t xform_star
 
       if (tv_format) {
         u_int16_t attr_val = ntohs(get_u_int16_t(payload, attr_off + 2));
+	
         if (attr_type == IKEV2_ATTR_KEY_LENGTH)
           key_bits = attr_val;
         attr_off += 4;
       } else {
         u_int16_t attr_len = ntohs(get_u_int16_t(payload, attr_off + 2));
+	
         attr_off += 4 + attr_len;
       }
     }

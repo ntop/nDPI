@@ -1635,10 +1635,18 @@ typedef struct {
 
 #define OPENVPN_HEUR_MAX_NUM_OPCODES 4
 
+struct ndpi_ipsec_tranform {
+  u_int8_t  transform_type;
+  u_int16_t transform_id;
+};
+
+#define MAX_NUM_TRANSFORMS 16
+
 /* Per-proposal crypto algorithm selection from an IKEv2 SA payload (RFC 7296 §3.3) */
 struct ndpi_ipsec_proposal {
   u_int8_t  proto_id;        /* 1=IKE, 2=AH, 3=ESP */
   u_int8_t  num_transforms;
+  struct ndpi_ipsec_tranform transforms[MAX_NUM_TRANSFORMS];
   u_int16_t encr_alg;        /* Encryption algorithm transform ID */
   u_int16_t encr_key_bits;   /* Key length attribute in bits (0 if not present) */
   u_int16_t prf_alg;         /* Pseudo-random function transform ID */
@@ -1652,7 +1660,7 @@ struct ndpi_ipsec_proposal {
 struct ndpi_ipsec_details {
   u_int8_t version;             /* Version: major (upper 4 bits) and minor (lower 4 bits) */
   u_int8_t exchange_type;       /* IKEv2 exchange type (34=SA_INIT, 35=IKE_AUTH, ...) */
-  struct ndpi_ipsec_proposal proposal[2];
+  struct ndpi_ipsec_proposal proposal[2]; /* [0]=IKEV2_REQUEST_PROPOSAL, [1]=IKEV2_RESPONSE_PROPOSAL */
 };
 
 /* ************************ */
