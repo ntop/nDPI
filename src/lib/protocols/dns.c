@@ -494,13 +494,9 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
               }
           }
 
-          /* Also add CNAME to FPC DNS cache if applicable */
-          if (ndpi_struct->cfg.fpc_enabled &&
-              proto->app_protocol != NDPI_PROTOCOL_UNKNOWN &&
-              proto->app_protocol != proto->master_protocol &&
-              ndpi_struct->fpc_dns_cache) {
-              /* We could cache CNAMEs too, though they're less useful for IP-based lookups */
-          }
+          /* Also add CNAME to FPC DNS cache if applicable
+          We could cache CNAMEs too, though they're less useful for IP-based lookups */
+          
         } else if(rsp_type == 0x0C /* PTR */) {
           u_int16_t ptr_len = (packet->payload[x-2] << 8) + packet->payload[x-1];
 
