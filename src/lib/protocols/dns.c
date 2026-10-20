@@ -284,6 +284,7 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
     if ((cl & 0xc0) == 0xc0) {
       /* RFC 1035 §4.1.4: 14-bit compression pointer */
       u_int16_t pointer;
+      u_int target;
 
       if (offset + 1 >= packet->payload_packet_len) {
         hostname_is_valid = 0;
@@ -291,6 +292,7 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
       }
 
       pointer = ((cl & 0x3f) << 8) | packet->payload[offset + 1];
+      target  = pointer + (packet->tcp ? 2 : 0);
 
       /* Remember where to resume once the pointer chain is exhausted */
       if (!ptr_used) {
@@ -302,13 +304,13 @@ static u_int8_t ndpi_grab_dns_name(struct ndpi_packet_struct *packet,
          and we must not loop. */
       if (pointer >= offset ||
           pointer < min_ptr ||
-          pointer >= packet->payload_packet_len ||
+          target >= packet->payload_packet_len ||
           ++ptr_jumps > max_ptr_jumps) {
         hostname_is_valid = 0;
         break;
       }
 
-      offset = pointer;
+      offset = target;
       continue;
     }
 
@@ -930,10 +932,8 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
       continue;
     }
 
-    /* Hand the DNS message (without the 2-byte length prefix) to the dissector,
-       so compression pointers are relative to packet->payload[0] as on UDP */
-    packet->payload = (u_int8_t *)&original_payload[offset + 2];
-    packet->payload_packet_len = (u_int16_t)msg_len;
+    packet->payload = (u_int8_t *)&original_payload[offset];
+    packet->payload_packet_len = (u_int16_t)total_len;
     search_dns_tcp_udp(ndpi_struct, flow, dns);
     processed = 1;
 
@@ -1007,8 +1007,8 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
       continue;
     }
 
-    packet->payload = (u_int8_t *)reasm->buf + 2;
-    packet->payload_packet_len = (u_int16_t)msg_len;
+    packet->payload = (u_int8_t *)reasm->buf;
+    packet->payload_packet_len = (u_int16_t)total_len;
     search_dns_tcp_udp(ndpi_struct, flow, dns);
     processed = 1;
 
@@ -1058,7 +1058,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
                             ndpi_master_app_protocol *proto) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   char *dot;
-  u_int len, is_mdns, off = sizeof(struct ndpi_dns_packet_header); // + (packet->tcp ? 2 : 0);
+  u_int len, is_mdns, off = sizeof(struct ndpi_dns_packet_header) + (packet->tcp ? 2 : 0);
   char _hostname[256];
   u_int8_t hostname_is_valid;
   char invalid_character = 0;
@@ -1157,11 +1157,11 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
   int rc;
   struct ndpi_flow_core_struct *core = &flow->core;
 
-  // if(packet->udp != NULL) {
-  //   payload_offset = 0;
-  // } else if(packet->tcp != NULL) {
-  //   payload_offset = 2;
-  // }
+  if(packet->udp != NULL) {
+    payload_offset = 0;
+  } else if(packet->tcp != NULL) {
+    payload_offset = 2;
+  }
 
   if(!is_valid_dns(ndpi_struct, core, &dns_header, payload_offset, &is_query)) {
 #ifdef DNS_DEBUG
