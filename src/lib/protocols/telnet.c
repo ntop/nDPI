@@ -27,6 +27,9 @@
 
 /* #define TELNET_DEBUG 1 */
 
+#define TELNET_EVIDENCE_THRESHOLD 2
+#define TELNET_IAC_SCAN_WINDOW    16
+
 /* ************************************************************************ */
 
 /*
@@ -132,57 +135,97 @@ static void telnet_set_detected(struct ndpi_detection_module_struct *ndpi_struct
 
 /* ************************************************************************ */
 
+static inline u_int8_t is_iac_negotiation(u_int8_t cmd) {
+  return (cmd >= 0xFB && cmd <= 0xFE) ? 1 : 0;
+}
+
+static inline u_int8_t is_iac_two_byte(u_int8_t cmd) {
+  return (cmd >= 0xF0 && cmd <= 0xFA) ? 1 : 0;
+}
+
 /*
- * Returns 1 if the packet starts with a valid Telnet IAC (0xFF) command
- * sequence and any subsequent bytes also form valid IAC triplets.
+ * Scans the packet payload and counts valid IAC commands.
  *
- * IAC command format:
- *   Byte 0:    0xFF  (IAC)
- *   Byte 1:    command byte (0xF0–0xFE, not 0xFF)
- *   Byte 2:    option byte (≤ 0x28, only required for commands 0xFB–0xFE)
+ * Returns:
+ *   0   - payload doesn't start with a valid IAC command, or an
+ *         unknown/invalid command byte was found after some IAC
+ *         (i.e. not Telnet);
+ *   N>0 - number of valid commands found (including the first one).
+ *
+ * IAC command layout:
+ *   IAC IAC               - escaped 0xFF, a literal data byte
+ *   IAC <0xF0-0xFA>        - two-byte command
+ *   IAC <0xFB-0xFE> <opt>  - three-byte command (negotiation)
  */
-static
-u_int8_t search_iac(struct ndpi_detection_module_struct *ndpi_struct) {
-  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-  u_int16_t pos;
+static u_int8_t count_iac(struct ndpi_packet_struct const * const packet) {
+  u_int16_t max_pos, pos;
+  u_int8_t count = 0;
 
 #ifdef TELNET_DEBUG
   printf("==> %s()\n", __FUNCTION__);
 #endif
 
-  if(packet->payload_packet_len < 3)
-    return 0;
-
-  /* First triplet must start with IAC (0xFF), followed by a command
-     byte strictly between 0xF9 and 0xFF, and an option byte < 0x28. */
-  if(!(packet->payload[0] == 0xFF &&
-       packet->payload[1] > 0xF9 &&
-       packet->payload[1] != 0xFF &&
-       packet->payload[2] < 0x28))
-    return 0;
-
-  /* Walk subsequent triplets; each must also be a valid IAC command. */
-  for(pos = 3; pos < packet->payload_packet_len - 2; pos += 3) {
-    u_int8_t b0 = packet->payload[pos];
-    u_int8_t b1 = packet->payload[pos + 1];
-    u_int8_t b2 = packet->payload[pos + 2];
-
-    /* Non-IAC byte is acceptable between commands */
-    if(b0 != 0xFF)
-      continue;
-
-    /* Two-byte IAC commands (GA, EL, EC, AO, AYT, BRK, NOP, SE): 0xF0–0xFA */
-    if(b1 >= 0xF0 && b1 <= 0xFA)
-      continue;
-
-    /* Three-byte IAC commands (WILL/WONT/DO/DONT): 0xFB–0xFE with option ≤ 0x28 */
-    if(b1 >= 0xFB && b1 != 0xFF && b2 <= 0x28)
-      continue;
-
+  if(packet->payload_packet_len < 3) {
     return 0;
   }
 
-  return 1;
+  if(packet->payload[0] != 0xFF) {
+    return 0;
+  }
+
+  if(packet->payload[1] != 0xFA && !is_iac_negotiation(packet->payload[1])) {
+    return 0;
+  }
+
+  max_pos = packet->payload_packet_len;
+  if(max_pos > TELNET_IAC_SCAN_WINDOW) {
+    max_pos = TELNET_IAC_SCAN_WINDOW;
+  }
+
+  for(pos = 0; pos < max_pos; pos++) {
+    u_int8_t cmd;
+
+    if(packet->payload[pos] != 0xFF) {
+      continue;
+    }
+
+    if(pos + 1 >= packet->payload_packet_len) {
+      break; /* Truncated at the end of the payload, not an error */
+    }
+
+    cmd = packet->payload[pos + 1];
+
+    if(cmd == 0xFF) {
+      pos += 1;
+      continue;
+    }
+
+    if(is_iac_two_byte(cmd)) {
+      pos += 1;
+      count++;
+      continue;
+    }
+
+    if(is_iac_negotiation(cmd)) {
+      if(pos + 2 >= packet->payload_packet_len) {
+        break; /* Option byte truncated, tolerate it */
+      }
+
+      if(packet->payload[pos + 2] >= 0x28) {
+        return 0;
+      }
+
+      pos += 2;
+      count++;
+
+      continue;
+    }
+
+    /* Unknown command after IAC -> not Telnet */
+    return 0;
+  }
+
+  return count;
 }
 
 /* ************************************************************************ */
@@ -191,13 +234,38 @@ static void ndpi_search_telnet_tcp(struct ndpi_detection_module_struct *ndpi_str
                                    struct ndpi_flow_struct *flow) {
   NDPI_LOG_DBG(ndpi_struct, "search telnet\n");
 
-  if(search_iac(ndpi_struct)) {
-    NDPI_LOG_INFO(ndpi_struct, "found telnet\n");
-    telnet_set_detected(ndpi_struct, flow);
-    return;
+  struct ndpi_packet_struct const * const packet = &ndpi_struct->packet;
+
+  u_int16_t port23 = htons(23);
+
+  u_int8_t n = count_iac(packet);
+
+  if (n > 0) {
+    /*
+     * Fast-path detection: strong signal (multiple commands in one packet)
+     * or well-known port -> detect immediately, no need to accumulate evidence.
+     */
+     if ((packet->tcp->source == port23 || packet->tcp->dest == port23) || n >= 2) {
+        NDPI_LOG_INFO(ndpi_struct, "found Telnet (fast-path)\n");
+        telnet_set_detected(ndpi_struct, flow);
+        return;
+     }
+
+     /* Weak signal on a non-standard port -> accumulate evidence */
+     if (flow->metadata.protos.telnet.evidence < TELNET_EVIDENCE_THRESHOLD) {
+      flow->metadata.protos.telnet.evidence++;
+     }
+
+     if(flow->metadata.protos.telnet.evidence >= TELNET_EVIDENCE_THRESHOLD) {
+      NDPI_LOG_INFO(ndpi_struct, "found Telnet (evidence threshold)\n");
+      telnet_set_detected(ndpi_struct, flow);
+      return;
+     }
   }
 
-  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+  if(flow->core.packet_counter > 6) {
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+  }
 }
 
 /* ************************************************************************ */
