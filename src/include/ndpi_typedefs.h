@@ -1663,7 +1663,7 @@ struct ndpi_ipsec_details {
 struct ndpi_dns_cname_info {
     u_int16_t num_cnames;
     u_int16_t cname_ttls[MAX_NUM_DNS_CNAMES];
-    char cname_domain_names[MAX_NUM_DNS_CNAMES][MAX_CNAME_LEN];
+    char *cname_domain_names[MAX_NUM_DNS_CNAMES];
 };
 
 /* ************************ */

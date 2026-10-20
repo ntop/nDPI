@@ -428,8 +428,16 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
   ignore_checks = (proto->master_protocol == NDPI_PROTOCOL_MDNS);
 
   /* Start a fresh CNAME list for this response */
-  if (dns->cnames != NULL)
+  if (dns->cnames != NULL) {
+    for(int i = 0; i < MAX_NUM_DNS_CNAMES; i++) {
+      if (dns->cnames->cname_domain_names[i] != NULL) {
+        ndpi_free(dns->cnames->cname_domain_names[i]);
+        dns->cnames->cname_domain_names[i] = NULL;
+      }
+    }
+    
     dns->cnames->num_cnames = 0;
+  }
 
   for(num = 0; num < dns_header->num_answers; num++) {
     u_int16_t data_len;
@@ -481,14 +489,16 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
             }            
           if (dns->cnames->num_cnames < MAX_NUM_DNS_CNAMES) {
               u_int len, orig_x;
+              char cname[MAX_CNAME_LEN] = {0};
 
               orig_x = x;
               u_int8_t name_ok = ndpi_grab_dns_name(packet, &x,
-                    dns->cnames->cname_domain_names[dns->cnames->num_cnames],
+                    cname,
                     MAX_CNAME_LEN, &len, ignore_checks, NULL);
               x = orig_x;
 
               if (name_ok && len > 0 && len < MAX_CNAME_LEN - 1) {
+                  dns->cnames->cname_domain_names[dns->cnames->num_cnames] = (char*)ndpi_strndup((const char*)cname, MAX_CNAME_LEN - 1);
                   dns->cnames->cname_ttls[dns->cnames->num_cnames] = ttl;
                   dns->cnames->num_cnames++;
               }
