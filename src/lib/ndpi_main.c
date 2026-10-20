@@ -10918,6 +10918,10 @@ static void ndpi_internal_detection_process_packet(struct ndpi_detection_module_
      flow->core.num_processed_pkts >= ndpi_str->cfg.max_packets_to_process &&
      flow->core.state != NDPI_STATE_MONITORING) {
 
+    /* The per-flow DPI limit is authoritative. Clear any pending extra
+       dissector so readers can observe that this flow is complete. */
+    flow->core.extra_packets_func = NULL;
+
     /* Reason: too many packets */
     /* We are stopping and we might not have a proper classification:
        this is the reason we call ndpi_internal_detection_giveup() instead of internal_giveup() */
