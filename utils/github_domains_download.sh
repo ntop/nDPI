@@ -21,6 +21,9 @@ echo "(1) Processing domains..."
 ./github_domain.py "packages" > $LIST_GITHUB_PACKAGES
 ./github_domain.py "actions" > $LIST_GITHUB_ACTIONS
 
+# Remove "domain" if "*.domain" exists.
+for i in $(grep -h *. /tmp/github*.list); do sed -i "/^${i#*.}$/d" /tmp/github*.list; done
+
 ./domains2list.py $LIST_GITHUB "Github" NDPI_PROTOCOL_GITHUB NDPI_PROTOCOL_CATEGORY_COLLABORATIVE NDPI_PROTOCOL_ACCEPTABLE > $DEST_GITHUB
 ./domains2list.py $LIST_GITHUB_COPILOT "GithubCopilot" NDPI_PROTOCOL_GITHUB_COPILOT NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE NDPI_PROTOCOL_ACCEPTABLE > $DEST_GITHUB_COPILOT
 ./domains2list.py $LIST_GITHUB_PACKAGES "GithubPackages" NDPI_PROTOCOL_GITHUB_PACKAGES NDPI_PROTOCOL_CATEGORY_HOSTING NDPI_PROTOCOL_ACCEPTABLE > $DEST_GITHUB_PACKAGES
