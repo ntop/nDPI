@@ -2280,7 +2280,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
              ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                             s, buf2, sizeof(buf2)),
              ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                flow->detected_protocol, buf1, sizeof(buf1)));
+                                flow->detected_protocol.proto, buf1, sizeof(buf1)));
     } else if(flow->detected_protocol.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) {
       if(s->protos[0] != flow->detected_protocol.proto.master_protocol ||
          s->protos[1] != flow->detected_protocol.proto.app_protocol) {
@@ -2288,7 +2288,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
                ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                               s, buf2, sizeof(buf2)),
                ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                  flow->detected_protocol, buf1, sizeof(buf1)));
+                                  flow->detected_protocol.proto, buf1, sizeof(buf1)));
       }
     } else {
       if(s->protos[0] != flow->detected_protocol.proto.app_protocol) {
@@ -2296,7 +2296,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
                ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                               s, buf2, sizeof(buf2)),
                ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                  flow->detected_protocol, buf1, sizeof(buf1)));
+                                  flow->detected_protocol.proto, buf1, sizeof(buf1)));
       }
     }
 #endif
