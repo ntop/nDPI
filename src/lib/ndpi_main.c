@@ -7757,6 +7757,17 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Free Fire */
   init_freefire_dissector(ndpi_str);
 
+  /* Self-hosted LLM runtimes (payload based, HTTP sub-protocols) */
+  init_ollama_dissector(ndpi_str);
+  init_vllm_dissector(ndpi_str);
+  init_llamacpp_dissector(ndpi_str);
+  init_sglang_dissector(ndpi_str);
+  init_radiance_dissector(ndpi_str);
+  init_mlxvlm_dissector(ndpi_str);
+  init_omlx_dissector(ndpi_str);
+  init_vmlx_dissector(ndpi_str);
+  init_strata_dissector(ndpi_str);
+
 
 
   /* Keep DNS as last entry! */
