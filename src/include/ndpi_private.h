@@ -97,6 +97,31 @@ struct ndpi_int_one_line_struct {
   u_int16_t len;
 };
 
+/*
+  Exact match of a (URL) line, tolerating an optional trailing slash and a
+  query string: "/metrics", "/metrics/" and "/metrics?x=1" all match
+  "/metrics". Unlike LINE_STARTS it does not match prefixes, which is what
+  short/generic REST paths need: a prefix match on "/generate" would also
+  match the connectivity check probe "/generate204".
+*/
+static inline int ndpi_line_equals(const struct ndpi_int_one_line_struct *line,
+                                   const char *string_to_compare) {
+  size_t len = strlen(string_to_compare);
+
+  if(line->ptr == NULL || line->len < len)
+    return(0);
+  if(strncasecmp((const char *)line->ptr, string_to_compare, len) != 0)
+    return(0);
+  if(line->len == len)
+    return(1);
+  if(line->ptr[len] == '/')
+    len++;
+  return((len == line->len) || (line->ptr[len] == '?'));
+}
+
+#define LINE_EQUALS(ndpi_int_one_line_struct, string_to_compare) \
+  ndpi_line_equals(&(ndpi_int_one_line_struct), (string_to_compare))
+
 struct ndpi_packet_struct {
   const struct ndpi_iphdr *iph;
   const struct ndpi_ipv6hdr *iphv6;
@@ -1162,6 +1187,29 @@ void init_iris_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_yggdrasil_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_meshtastic_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_nebula_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_ollama_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_vllm_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_llamacpp_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_sglang_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_radiance_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_mlxvlm_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_omlx_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_vmlx_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_strata_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+int  ndpi_is_sglang_native_generate(struct ndpi_packet_struct *packet);
+
+/* The shared LLM API layer (llm_api.c): what a request says about itself.
+   Cleartext HTTP/1.1 only - on TLS the request body is not visible. */
+#define NDPI_LLM_API_INFO_LEN 160
+
+int ndpi_llm_url_has(struct ndpi_packet_struct *packet, const char *needle);
+int ndpi_llm_api_is_deepseek(struct ndpi_packet_struct *packet);
+const char *ndpi_llm_api_engine_route(struct ndpi_flow_struct *flow,
+                                      struct ndpi_packet_struct *packet);
+const char *ndpi_llm_api_family(struct ndpi_flow_struct *flow,
+                                struct ndpi_packet_struct *packet);
+void ndpi_llm_api_info(char *out, size_t out_len,
+                       const char *label, const char *family, int deepseek);
 
 enum cfg_param_type {
   CFG_PARAM_ENABLE_DISABLE = 0,
