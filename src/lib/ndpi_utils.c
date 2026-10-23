@@ -2184,6 +2184,8 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	      buffer = ndpi_serializer_get_buffer(sser, &buffer_len);
 	      if(buffer && (buffer_len > 0))
 		ndpi_serialize_string_raw(ser, "additional_key_exchanges", buffer, buffer_len);
+
+	      ndpi_term_serializer(sser);
 	    } /* if */
 	    
 	    ndpi_serialize_end_of_record(ser);

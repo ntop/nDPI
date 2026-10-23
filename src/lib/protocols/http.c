@@ -302,6 +302,32 @@ static void update_category_and_breed(struct ndpi_detection_module_struct *ndpi_
 
 /* *********************************************** */
 
+static int is_powershell_user_agent(struct ndpi_flow_struct *flow) {
+  return flow->metadata.http.user_agent &&
+    (strstr(flow->metadata.http.user_agent, "Microsoft WinRM Client") ||
+     strstr(flow->metadata.http.user_agent, "Python PSRP Client"));
+}
+
+/* *********************************************** */
+
+/* WS-Management is not used only by PowerShell: skip the
+   clients/services known to be something else */
+static int is_generic_wsman(struct ndpi_flow_struct *flow) {
+  /* Generic WS-Management client */
+  if(flow->metadata.http.user_agent &&
+     strstr(flow->metadata.http.user_agent, "Openwsman"))
+    return 1;
+
+  /* Intel AMT */
+  if(strstr(flow->metadata.http.url, ":16992/") ||
+     strstr(flow->metadata.http.url, ":16993/"))
+    return 1;
+
+  return 0;
+}
+
+/* *********************************************** */
+
 /* https://www.freeformatter.com/mime-types-list.html */
 static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_module_struct *ndpi_struct,
 							struct ndpi_flow_struct *flow) {
@@ -638,10 +664,9 @@ static void ndpi_http_parse_subprotocol(struct ndpi_detection_module_struct *ndp
   }
 
   if(flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN &&
-     ((flow->metadata.http.url && strstr(flow->metadata.http.url, "/wsman")) ||
-      (flow->metadata.http.user_agent &&
-       (strstr(flow->metadata.http.user_agent, "Microsoft WinRM Client") ||
-        strstr(flow->metadata.http.user_agent, "Python PSRP Client"))))) {
+     (is_powershell_user_agent(flow) ||
+      (flow->metadata.http.url && strstr(flow->metadata.http.url, "/wsman") &&
+       !is_generic_wsman(flow)))) {
     ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_POWERSHELL, master_protocol, NDPI_CONFIDENCE_DPI);
     update_category_and_breed(ndpi_struct, flow);
   }

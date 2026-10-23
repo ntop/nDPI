@@ -33,9 +33,72 @@
 #define DCERPC_MAX_REASM_LEN 65535
 
 
+#define DCERPC_PKT_BIND 11
+
+/* Interface UUIDs used for remote administration, in canonical (big endian) byte order */
+static const u_int8_t dcerpc_remote_admin_uuids[][16] = {
+  /* MS-SCMR (svcctl): 367abb81-9844-35f1-ad32-98f038001003 */
+  { 0x36, 0x7a, 0xbb, 0x81, 0x98, 0x44, 0x35, 0xf1, 0xad, 0x32, 0x98, 0xf0, 0x38, 0x00, 0x10, 0x03 },
+  /* MS-RRP (winreg): 338cd001-2244-31f1-aaaa-900038001003 */
+  { 0x33, 0x8c, 0xd0, 0x01, 0x22, 0x44, 0x31, 0xf1, 0xaa, 0xaa, 0x90, 0x00, 0x38, 0x00, 0x10, 0x03 },
+};
+
+/* Does this (connection oriented) BIND request ask for a remote administration interface? */
+static bool is_remote_admin_bind(struct ndpi_packet_struct *packet)
+{
+  const u_int8_t *payload = packet->payload;
+  u_int16_t payload_len = packet->payload_packet_len;
+  u_int8_t num_ctx, i, j, uuid[16];
+  u_int32_t offset;
+
+  if(payload_len < 28 || payload[0] != 0x05 || payload[2] != DCERPC_PKT_BIND)
+    return false;
+
+  num_ctx = payload[24];
+  offset = 28;
+  for(i = 0; i < num_ctx; i++) {
+    /* Context id (2), num transfer syntaxes (1), reserved (1), abstract syntax (16 + 4), transfer syntaxes (20 each) */
+    if(offset + 24 > payload_len)
+      break;
+
+    memcpy(uuid, &payload[offset + 4], sizeof(uuid));
+    if(payload[4] & 0x10) { /* Little endian: swap the first three UUID fields */
+      u_int8_t t;
+
+      t = uuid[0]; uuid[0] = uuid[3]; uuid[3] = t;
+      t = uuid[1]; uuid[1] = uuid[2]; uuid[2] = t;
+      t = uuid[4]; uuid[4] = uuid[5]; uuid[5] = t;
+      t = uuid[6]; uuid[6] = uuid[7]; uuid[7] = t;
+    }
+
+    for(j = 0; j < sizeof(dcerpc_remote_admin_uuids) / sizeof(dcerpc_remote_admin_uuids[0]); j++) {
+      if(memcmp(uuid, dcerpc_remote_admin_uuids[j], sizeof(uuid)) == 0)
+        return true;
+    }
+
+    offset += 24 + 20 * payload[offset + 2];
+  }
+
+  return false;
+}
+
 static void ndpi_int_dcerpc_add_connection(struct ndpi_detection_module_struct
 					     *ndpi_struct, struct ndpi_flow_struct *flow)
 {
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+  if(packet->tcp != NULL && is_remote_admin_bind(packet)) {
+    /*
+      Remote administration via svcctl/winreg interfaces. Note that this
+      traffic is generated not only by PowerShell but also by sc.exe, reg.exe,
+      PsExec, Impacket and by many management/monitoring tools: we report it
+      as PowerShell anyway
+    */
+    NDPI_LOG_INFO(ndpi_struct, "found PowerShell over DCERPC\n");
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_POWERSHELL, NDPI_PROTOCOL_DCERPC, NDPI_CONFIDENCE_DPI);
+    return;
+  }
+
   ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_DCERPC, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI);
 }
 

@@ -1,0 +1,36 @@
+DPI Packets (TCP):	27	(27.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 165 (165.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    1/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+SMBv23	36	9316	1
+
+Acceptable                      36 9316          1            
+
+FileSharing                     36 9316          1            
+
+	1	TCP 172.16.66.1:49815 <-> 172.16.66.36:445 [proto: 10.41/NetBIOS.SMBv23][Stack: NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 27][cat: FileSharing/29][Breed: Acceptable][18 pkts/4318 bytes <-> 18 pkts/4998 bytes][Goodput ratio: 77/81][0.02 sec][bytes ratio: -0.073 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 6/6 2/2][Pkt Len c2s/s2c min/avg/max/stddev: 146/138 240/278 717/1078 130/212][PLAIN TEXT (PC NETWORK PROGRAM 1.0)][Plen Bins: 0,0,13,26,20,5,8,2,13,2,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
