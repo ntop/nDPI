@@ -1919,8 +1919,8 @@ struct ndpi_flow_metadata_struct {
 
     struct {
       u_int8_t username_detected:1, username_found:1,
-	password_detected:1, password_found:1,
-	_pad:4;
+	password_detected:1, password_found:1, evidence:2,
+	_pad:2;
       u_int8_t character_id;
       char username[32], password[32];
     } telnet;
