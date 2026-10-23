@@ -12763,20 +12763,6 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 
 /* ****************************************************** */
 
-void ndpi_check_subprotocol_risk(struct ndpi_detection_module_struct *ndpi_str,
-				 struct ndpi_flow_struct *flow, u_int16_t subprotocol_id) {
-
-  if(!ndpi_str) return;
-
-  switch(subprotocol_id) {
-  case NDPI_PROTOCOL_ANYDESK:
-    ndpi_set_risk(ndpi_str, &flow->core, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found AnyDesk"); /* Remote assistance */
-    break;
-  }
-}
-
-/* ****************************************************** */
-
 /*
   The hosted AI providers (498-507 and 517-527, see ndpi_protocol_ids.h). The
   self-hosted engines (508-516) are deliberately not included: they are named,
@@ -12786,6 +12772,42 @@ static int ndpi_is_ai_provider_protocol(u_int16_t proto) {
   return((proto >= NDPI_PROTOCOL_OPENAI   && proto <= NDPI_PROTOCOL_PERPLEXITY) ||
          (proto >= NDPI_PROTOCOL_ZAI      && proto <= NDPI_PROTOCOL_AI01));
 }
+
+void ndpi_check_subprotocol_risk(struct ndpi_detection_module_struct *ndpi_str,
+				 struct ndpi_flow_struct *flow, u_int16_t subprotocol_id) {
+
+  if(!ndpi_str) return;
+
+  /*
+    A hosted AI provider named on an encrypted flow. The payload is encrypted, so
+    the only other thing nDPI knows about the far end is the TCP stack that opened
+    the connection, and that is worth reporting: an AI API called from a Linux
+    server and the same call from a laptop are different facts to a policy, and
+    under ECH the name is gone, so the stack is what remains. It is appended to
+    the risk raised by the name match, and it says what it is - the client TCP
+    stack, not the application: nDPI does not know which process made the call,
+    and behind a proxy this is the proxy's stack.
+  */
+  if(ndpi_is_ai_provider_protocol(subprotocol_id) &&
+     (flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_TLS ||
+      flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_QUIC) &&
+     flow->metadata.l4.tcp.fingerprint != NULL &&
+     flow->metadata.l4.tcp.os_hint != ndpi_os_unknown) {
+    char info[64];
+
+    snprintf(info, sizeof(info), "client TCP stack: %s",
+             ndpi_print_os_hint(flow->metadata.l4.tcp.os_hint));
+    ndpi_set_risk(ndpi_str, &flow->core, NDPI_AI_INFERENCE_TRAFFIC, info);
+  }
+
+  switch(subprotocol_id) {
+  case NDPI_PROTOCOL_ANYDESK:
+    ndpi_set_risk(ndpi_str, &flow->core, NDPI_DESKTOP_OR_FILE_SHARING_SESSION, "Found AnyDesk"); /* Remote assistance */
+    break;
+  }
+}
+
+/* ****************************************************** */
 
 u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
 				      struct ndpi_flow_core_struct *core,
@@ -12923,6 +12945,10 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
 					 &ret_match, master_protocol, 1);
 
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
+    /* The name matched, so this is the point where a subprotocol identified by
+       name (SNI, certificate name, Host) gets the risks that go with it - the
+       certificate paths in tls.c already do this, the name path did not. */
+    ndpi_check_subprotocol_risk(ndpi_struct, flow, subproto);
     return(1);
   } else
     return(0);

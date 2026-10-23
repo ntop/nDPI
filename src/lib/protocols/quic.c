@@ -1119,10 +1119,13 @@ void process_chlo(struct ndpi_detection_module_struct *ndpi_struct,
 	NDPI_LOG_DBG2(ndpi_struct, "SNI: [%s]\n",
 		      flow->core.host_server_name);
 
-	ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
+	u_int16_t sni_proto = ndpi_match_host_subprotocol(ndpi_struct, &flow->core,
 				    flow->core.host_server_name,
 				    strlen(flow->core.host_server_name),
 				    &ret_match, NDPI_PROTOCOL_QUIC, 1);
+
+	if(sni_proto != NDPI_PROTOCOL_UNKNOWN)
+	  ndpi_check_subprotocol_risk(ndpi_struct, flow, sni_proto);
 	flow->metadata.protos.tls_quic.client_hello_processed = 1; /* Allow matching of custom categories */
 
 	ndpi_check_dga_name(ndpi_struct, &flow->core,
