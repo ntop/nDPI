@@ -1,0 +1,49 @@
+DPI Packets (TCP):	27	(4.50 pkts/flow)
+Confidence Unknown          : 3 (flows)
+Confidence DPI              : 3 (flows)
+Num dissector calls: 63 (10.50 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/9/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/3/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          6/0 (search/found)
+Automa domain:        3/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   3/3 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 49/30 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    3/0 (search/found)
+
+Unknown	21	1134	3
+ntop	6	970	3
+
+Unrated                         21 1134          3            
+Safe                             6 970           3            
+
+Unspecified                     21 1134          3            
+Network                          4 648           2            
+ConnCheck                        2 322           1            
+
+	1	TCP 192.168.1.43:56331 <-> 92.123.101.122:80 [proto: 7.26/HTTP.ntop][Stack: HTTP.ntop][IP: 467/Akamai][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Safe][1 pkts/165 bytes <-> 1 pkts/162 bytes][Goodput ratio: 55/54][0.01 sec][Hostname/SNI: conn-service-eu-04.allawnos.com][URL: conn-service-eu-04.allawnos.com/generate?client=1][StatusCode: 200][Content-Type: application/json][Server: ntopng 6.1.240606 (x86_64)][User-Agent: curl/8.][PLAIN TEXT (GET /generate)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.1.42:56330 <-> 92.123.101.121:80 [proto: 7.26/HTTP.ntop][Stack: HTTP.ntop][IP: 467/Akamai][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 2][cat: ConnCheck/30][Breed: Safe][1 pkts/159 bytes <-> 1 pkts/163 bytes][Goodput ratio: 53/54][0.01 sec][Hostname/SNI: conn-service-eu-04.allawnos.com][URL: conn-service-eu-04.allawnos.com/generate204][StatusCode: 200][Content-Type: application/json][Server: ntopng 6.1.240606 (x86_64)][User-Agent: curl/8.][PLAIN TEXT (GET /generate)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 192.168.1.44:56332 <-> 92.123.101.123:80 [proto: 7.26/HTTP.ntop][Stack: HTTP.ntop][IP: 467/Akamai][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Safe][1 pkts/158 bytes <-> 1 pkts/163 bytes][Goodput ratio: 53/54][0.01 sec][Hostname/SNI: conn-service-eu-04.allawnos.com][URL: conn-service-eu-04.allawnos.com/metrics204][StatusCode: 200][Content-Type: application/json][Server: ntopng 6.1.240606 (x86_64)][User-Agent: curl/8.][PLAIN TEXT (GET /metrics204 HTTP/1.1)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+Undetected flows:
+	1	TCP 192.168.1.42:0 <-> 92.123.101.121:0 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][Breed: Unrated][4 pkts/216 bytes <-> 3 pkts/162 bytes][Goodput ratio: 0/0][0.10 sec][bytes ratio: 0.143 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 26/26 35/39 52/52 12/13][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 54/54 54/54 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 192.168.1.43:0 <-> 92.123.101.122:0 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][Breed: Unrated][4 pkts/216 bytes <-> 3 pkts/162 bytes][Goodput ratio: 0/0][0.10 sec][bytes ratio: 0.143 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 26/26 35/39 52/52 12/13][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 54/54 54/54 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 192.168.1.44:0 <-> 92.123.101.123:0 [proto: 0/Unknown][Stack: Unknown][IP: 0/Unknown][ClearText][Confidence: Unknown][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 7][Breed: Unrated][4 pkts/216 bytes <-> 3 pkts/162 bytes][Goodput ratio: 0/0][0.10 sec][bytes ratio: 0.143 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 26/26 35/39 52/52 12/13][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 54/54 54/54 0/0][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

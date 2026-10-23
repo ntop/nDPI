@@ -1,0 +1,84 @@
+Guessed flow protos:	2
+
+DPI Packets (TCP):	53	(5.89 pkts/flow)
+DPI Packets (UDP):	19	(1.46 pkts/flow)
+DPI Packets (other):	3	(1.00 pkts/flow)
+Confidence Match by port    : 2 (flows)
+Confidence DPI              : 23 (flows)
+Num dissector calls: 661 (26.44 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/6/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/2/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    2/9/4 (insert/search/found)
+Automa host:          16/16 (search/found)
+Automa domain:        16/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        18/0 (search/found)
+Patricia risk IPv6:   7/0 (search/found)
+Patricia protocols:   32/7 (search/found)
+Patricia protocols IPv6: 14/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     4/4 (search/found)
+Hash public domain suffix: 196/106 (search/found)
+Hash ja4 custom protos:    13/0 (search/found)
+Hash fp custom protos:     4/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+DNS	12	1696	6
+SMBv1	2	482	1
+TLS	9	750	3
+SSH	886	140040	2
+ICMPV6	8	696	3
+DHCPV6	4	640	4
+Dropbox	4	702	2
+Microsoft365	115	73377	4
+
+Safe                             9 750           3            
+Acceptable                    1029 217151        21           
+Dangerous                        2 482           1            
+
+Web                              9 750           3            
+RemoteAccess                   886 140040        2            
+Cloud                            4 702           2            
+Network                         24 3032          13           
+Collaborative                  115 73377         4            
+System                           2 482           1            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 212.54.224.108           	 1      
+
+
+	1	TCP 131.114.30.18:13889 <-> 212.54.224.108:22 [proto: 92/SSH][Stack: SSH][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 13][cat: RemoteAccess/12][Breed: Acceptable][353 pkts/61802 bytes <-> 247 pkts/51986 bytes][Goodput ratio: 62/68][14.55 sec][bytes ratio: 0.086 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 39/51 786/814 89/106][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 175/210 1514/1514 185/177][Plen Bins: 0,0,10,72,10,1,1,1,1,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 212.54.224.108:41390 <-> 20.42.65.85:443 [proto: 91.219/TLS.Microsoft365][Stack: TLS.Microsoft365][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 276/Azure, Confidence: DNS][DPI packets: 5][cat: Collaborative/15][Breed: Acceptable][24 pkts/23346 bytes <-> 16 pkts/6262 bytes][Goodput ratio: 93/83][0.58 sec][Hostname/SNI: mobile.events.data.microsoft.com][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: 0.577 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 19/35 95/97 35/45][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 973/391 1494/1514 641/552][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][nDPI Cli Fingerprint: f782a5fc989c6aa81bb1bad88e70a5b3][nDPI Srv Fingerprint: 81dba73ae426][TCP Fingerprint: 2_64_64240_789c1d1f/Linux][MSS: 1460][TLSv1.3][JA4: t13d591100_a33745022dd6_dbd39dd1d406][TLS-C: t13d590800_a33745022dd6_8a090e440eea_8180606ab83d][JA3S: 15af977ce25de452b96affa2addb1036][Firefox][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 4,0,0,8,0,4,0,0,0,0,0,0,0,0,4,4,0,4,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,12,0,0]
+	3	TCP 212.54.224.108:22 <-> 131.114.30.18:11649 [proto: 92/SSH][Stack: SSH][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 14][cat: RemoteAccess/12][Breed: Acceptable][107 pkts/11114 bytes <-> 179 pkts/15138 bytes][Goodput ratio: 36/22][14.92 sec][bytes ratio: -0.153 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 143/76 1000/1053 325/243][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 104/85 210/102 19/18][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 5.003 (Executable?)][Plen Bins: 0,97,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	TCP 212.54.224.108:50192 <-> 20.42.65.85:443 [proto: 91.219/TLS.Microsoft365][Stack: TLS.Microsoft365][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 276/Azure, Confidence: DNS][DPI packets: 5][cat: Collaborative/15][Breed: Acceptable][20 pkts/18023 bytes <-> 13 pkts/6064 bytes][Goodput ratio: 93/86][0.58 sec][Hostname/SNI: mobile.events.data.microsoft.com][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: 0.496 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 21/25 100/101 38/43][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 901/466 1494/1514 664/587][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][nDPI Cli Fingerprint: f782a5fc989c6aa81bb1bad88e70a5b3][nDPI Srv Fingerprint: 81dba73ae426][TCP Fingerprint: 2_64_64240_789c1d1f/Linux][MSS: 1460][TLSv1.3][JA4: t13d591100_a33745022dd6_dbd39dd1d406][TLS-C: t13d590800_a33745022dd6_8a090e440eea_8180606ab83d][JA3S: 15af977ce25de452b96affa2addb1036][Firefox][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 4,0,0,9,0,4,0,0,0,0,0,0,0,0,4,4,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,50,14,0,0]
+	5	TCP 212.54.224.108:41398 <-> 20.42.65.85:443 [proto: 91.219/TLS.Microsoft365][Stack: TLS.Microsoft365][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 276/Azure, Confidence: DNS][DPI packets: 5][cat: Collaborative/15][Breed: Acceptable][11 pkts/3979 bytes <-> 10 pkts/5866 bytes][Goodput ratio: 82/89][0.48 sec][Hostname/SNI: mobile.events.data.microsoft.com][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.192 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 32/48 95/96 45/48][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 362/587 1494/1514 446/621][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][nDPI Cli Fingerprint: f782a5fc989c6aa81bb1bad88e70a5b3][nDPI Srv Fingerprint: 81dba73ae426][TCP Fingerprint: 2_64_64240_789c1d1f/Linux][MSS: 1460][TLSv1.3][JA4: t13d591100_a33745022dd6_dbd39dd1d406][TLS-C: t13d590800_a33745022dd6_8a090e440eea_8180606ab83d][JA3S: 15af977ce25de452b96affa2addb1036][Firefox][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 8,0,0,16,0,8,0,0,0,0,0,0,0,0,8,8,0,8,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,25,0,0]
+	6	TCP 212.54.224.108:50180 <-> 20.42.65.85:443 [proto: 91.219/TLS.Microsoft365][Stack: TLS.Microsoft365][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 276/Azure, Confidence: DNS][DPI packets: 5][cat: Collaborative/15][Breed: Acceptable][11 pkts/3971 bytes <-> 10 pkts/5866 bytes][Goodput ratio: 81/89][1.02 sec][Hostname/SNI: mobile.events.data.microsoft.com][TLS Supported Versions: TLSv1.3;TLSv1.2][bytes ratio: -0.193 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 89/62 404/124 128/53][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 361/587 1494/1514 445/621][Risk: ** TLS (probably) Not Carrying HTTPS **][Risk Score: 10][Risk Info: No ALPN][nDPI Cli Fingerprint: f782a5fc989c6aa81bb1bad88e70a5b3][nDPI Srv Fingerprint: 81dba73ae426][TCP Fingerprint: 2_64_64240_789c1d1f/Linux][MSS: 1460][TLSv1.3][JA4: t13d591100_a33745022dd6_dbd39dd1d406][TLS-C: t13d590800_a33745022dd6_8a090e440eea_8180606ab83d][JA3S: 15af977ce25de452b96affa2addb1036][Firefox][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 8,0,0,16,0,8,0,0,0,0,0,0,0,0,8,8,0,8,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,25,0,0]
+	7	ICMPV6 [fe80::2015:dff:fef4:9550]:0 -> [ff02::1:ff76:c48e]:0 [proto: 102/ICMPV6][Stack: ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 102/ICMPV6, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][6 pkts/516 bytes -> 0 pkts/0 bytes][Goodput ratio: 28/0][9.35 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 1023/0 1870/0 5248/0 1689/0][Pkt Len c2s/s2c min/avg/max/stddev: 86/0 86/0 86/0 0/0][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 212.54.224.176:138 -> 212.54.227.255:138 [proto: 10.16/NetBIOS.SMBv1][Stack: NetBIOS.SMBv1][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 10.16/NetBIOS.SMBv1, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Dangerous][2 pkts/482 bytes -> 0 pkts/0 bytes][Goodput ratio: 82/0][2.00 sec][PLAIN TEXT ( CACACACACACACACACACACACACACACA)][Plen Bins: 0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 212.54.224.106:17500 -> 212.54.227.255:17500 [proto: 121/Dropbox][Stack: Dropbox][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 121/Dropbox, Confidence: DPI][DPI packets: 1][cat: Cloud/13][Breed: Acceptable][2 pkts/351 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][10.06 sec][PLAIN TEXT (version)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	UDP 212.54.224.106:17500 -> 255.255.255.255:17500 [proto: 121/Dropbox][Stack: Dropbox][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 121/Dropbox, Confidence: DPI][DPI packets: 1][cat: Cloud/13][Breed: Acceptable][2 pkts/351 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][10.06 sec][PLAIN TEXT (version)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	11	UDP 212.54.224.108:42484 <-> 194.242.61.65:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/113 bytes <-> 1 pkts/190 bytes][Goodput ratio: 62/77][< 1 sec][Hostname/SNI: onedscolprdeus05.eastus.cloudapp.azure.com][0.0.0.0][DNS Id: 0x7771][PLAIN TEXT (onedscolprdeus05)][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	12	UDP 212.54.224.108:43980 <-> 194.242.61.65:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/113 bytes <-> 1 pkts/190 bytes][Goodput ratio: 62/77][0.00 sec][Hostname/SNI: onedscolprdeus05.eastus.cloudapp.azure.com][0.0.0.0][DNS Id: 0x8d48][PLAIN TEXT (onedscolprdeus05)][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	UDP 212.54.224.108:48178 <-> 194.242.61.65:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/113 bytes <-> 1 pkts/190 bytes][Goodput ratio: 62/77][0.00 sec][Hostname/SNI: onedscolprdeus05.eastus.cloudapp.azure.com][0.0.0.0][DNS Id: 0x9273][PLAIN TEXT (onedscolprdeus05)][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	14	UDP 212.54.224.108:48795 <-> 194.242.61.65:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/113 bytes <-> 1 pkts/190 bytes][Goodput ratio: 62/77][< 1 sec][Hostname/SNI: onedscolprdeus05.eastus.cloudapp.azure.com][0.0.0.0][DNS Id: 0xec36][PLAIN TEXT (onedscolprdeus05)][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	15	TCP 35.165.16.225:54214 <-> 212.54.224.108:3003 [proto: 91/TLS][Stack: TLS][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Safe][2 pkts/158 bytes <-> 1 pkts/92 bytes][Goodput ratio: 16/28][0.18 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 443][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	16	TCP 44.237.16.228:34320 <-> 212.54.224.108:3003 [proto: 91/TLS][Stack: TLS][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Safe][2 pkts/158 bytes <-> 1 pkts/92 bytes][Goodput ratio: 16/28][0.19 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 443][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	17	TCP 52.24.13.22:37438 <-> 212.54.224.108:3003 [proto: 91/TLS][Stack: TLS][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Safe][2 pkts/158 bytes <-> 1 pkts/92 bytes][Goodput ratio: 16/28][0.18 sec][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 443][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	18	UDP 212.54.224.108:48896 <-> 194.242.61.65:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/113 bytes <-> 1 pkts/129 bytes][Goodput ratio: 62/67][0.02 sec][Hostname/SNI: onedscolprdeus05.eastus.cloudapp.azure.com][20.42.65.85][DNS Id: 0xe30a][PLAIN TEXT (onedscolprdeus05)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	19	UDP 212.54.224.108:50765 <-> 194.242.61.65:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/113 bytes <-> 1 pkts/129 bytes][Goodput ratio: 62/67][0.02 sec][Hostname/SNI: onedscolprdeus05.eastus.cloudapp.azure.com][20.42.65.85][DNS Id: 0x0ebc][PLAIN TEXT (onedscolprdeus05)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	20	UDP [fe80::d8ca:37ff:febd:af4d]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][Stack: DHCPV6][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 103/DHCPV6, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/172 bytes -> 0 pkts/0 bytes][Goodput ratio: 64/0][< 1 sec][PLAIN TEXT (whistleblowingrecikla)][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	21	UDP [fe80::4062:3fff:fe6b:73a]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][Stack: DHCPV6][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 103/DHCPV6, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/161 bytes -> 0 pkts/0 bytes][Goodput ratio: 61/0][< 1 sec][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	22	UDP [fe80::80f1:c2ff:feb0:d6b8]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][Stack: DHCPV6][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 103/DHCPV6, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/160 bytes -> 0 pkts/0 bytes][Goodput ratio: 61/0][< 1 sec][Plen Bins: 0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	23	UDP [fe80::2015:dff:fef4:9550]:546 -> [ff02::1:2]:547 [proto: 103/DHCPV6][Stack: DHCPV6][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 103/DHCPV6, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/147 bytes -> 0 pkts/0 bytes][Goodput ratio: 57/0][< 1 sec][PLAIN TEXT (zabbix3)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	24	ICMPV6 [fe80::250:56ff:fe90:c087]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][Stack: ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 102/ICMPV6, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	25	ICMPV6 [fe80::250:56ff:fe90:8ba5]:0 -> [ff02::16]:0 [proto: 102/ICMPV6][Stack: ICMPV6][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 102/ICMPV6, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/90 bytes -> 0 pkts/0 bytes][Goodput ratio: 22/0][< 1 sec][Plen Bins: 100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
