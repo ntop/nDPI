@@ -459,6 +459,7 @@ distdir:
 		-o -path '$(srcdir)/corpus/fuzz_is_stun_tcp/*' \
 		-o -path '$(srcdir)/corpus/fuzz_libinjection/*' \
 		-o -path '$(srcdir)/corpus/fuzz_dns_parse/*' \
+		-o -path '$(srcdir)/corpus/fuzz_deserialization/*' \
 		-o -path '$(srcdir)/corpus/fuzz_http_parse/*' \
 		-o -path '$(srcdir)/corpus/fuzz_tls_client_server_hello/*' \
 		-o -path '$(srcdir)/corpus/fuzz_dga_url/*' \
