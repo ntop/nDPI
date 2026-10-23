@@ -7,12 +7,12 @@ import time
 import sys
 
 # Configuration
-URL = "https://minerstat.com/mining-pool-whitelist.txt"
+URL = "https://raw.githubusercontent.com/BinaryDefense/mining-pools/91834a819c82d215ee7702ac6562fb169fe22687/xmr-pools.txt"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DOMAIN_LIST_PATH = os.path.join(SCRIPT_DIR, "../lists/42_mining_domain.list")
 IP_LIST_PATH = os.path.join(SCRIPT_DIR, "../lists/protocols/42_mining_ip.list")
-TEMP_FILE = os.path.join(SCRIPT_DIR, "minerstat_temp.txt")
+TEMP_FILE = os.path.join(SCRIPT_DIR, "mining_pools_temp.txt")
 
 def download_file():
 
@@ -55,18 +55,19 @@ def process_file():
                 continue
                 
             parts = line.split(maxsplit=1)
-            if len(parts) < 2:
+            if len(parts) == 1:
+                domain = parts[0]
+            else:
+                # Keep compatibility with the historical "IP domain" format.
+                ip, domain = parts
+                if ip_pattern.match(ip):
+                    ips.add(f"{ip}/32")
+                    ip_count += 1
+
+            if not re.match(r'^(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$', domain):
                 skip_count += 1
                 continue
-                
-            ip, domain = parts[0], parts[1]
-            
-            # IP deduplication
-            if ip_pattern.match(ip):
-                ips.add(f"{ip}/32")
-                ip_count += 1
-            
-            domains.append(domain)
+            domains.append(domain.lower())
             domain_count += 1
     
     proc_time = time.time() - start_time
@@ -87,12 +88,14 @@ def save_lists(domains, ips):
         f.write("\n".join(domains))
     domain_time = time.time() - start_time
     
-    # Write to IP_LIST
-    start_time = time.time()
-    with open(IP_LIST_PATH, "w") as f:
-        f.write(f"# Generated at {datetime.now().isoformat()}\n")
-        f.write("\n".join(ips))
-    ip_time = time.time() - start_time
+    # Preserve existing IP coverage when the replacement source is domain-only.
+    ip_time = 0
+    if ips:
+        start_time = time.time()
+        with open(IP_LIST_PATH, "w") as f:
+            f.write(f"# Generated at {datetime.now().isoformat()}\n")
+            f.write("\n".join(sorted(ips)))
+        ip_time = time.time() - start_time
     print(f"(3) Domain list path: {os.path.abspath(DOMAIN_LIST_PATH)}")
     print(f"IP list path: {os.path.abspath(IP_LIST_PATH)}")
     print(f"Saved {len(domains)} domains in {domain_time:.4f}s")
