@@ -10793,6 +10793,7 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
                            struct ndpi_flow_struct *flow)
 {
   u_int16_t fpc_dns_cached_proto;
+  int dpi_verdict = 0;
 
   if(!ndpi_str->cfg.fpc_enabled)
     return;
@@ -10808,9 +10809,24 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
 
   /* DPI */
   if(flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
-    fpc_update(ndpi_str, flow, flow->core.detected_protocol_stack[1],
-               flow->core.detected_protocol_stack[0], NDPI_FPC_CONFIDENCE_DPI);
-    return;
+    /*
+      A bare secure transport is not an answer about the peer: with TLS/QUIC and
+      no sub-protocol, the SNI is all nDPI has, and ECH removes even that. For
+      those flows only, keep going: the DNS answer the client itself resolved,
+      and failing that the by-IP intel, name the flow from evidence an encrypted
+      transport cannot hide. If neither knows, the transport verdict stands.
+    */
+    int transport_only = ((flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_TLS ||
+                           flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_QUIC) &&
+                          (flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN));
+
+    if(!transport_only) {
+      fpc_update(ndpi_str, flow, flow->core.detected_protocol_stack[1],
+                 flow->core.detected_protocol_stack[0], NDPI_FPC_CONFIDENCE_DPI);
+      return;
+    }
+
+    dpi_verdict = 1;
   }
 
   /* Check via fpc DNS cache */
@@ -10823,12 +10839,21 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
     return;
   }
 
-  /* Check via IP */
-  if(flow->core.guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
+  /* Check via IP. Only for flows DPI could not name at all: for a bare TLS/QUIC
+     flow the by-IP guess (a cloud/CDN protocol) is reported as proto_by_ip,
+     which is where it belongs, and FPC keeps saying TLS rather than trading a
+     truth for a CDN label. */
+  if(!dpi_verdict &&
+     flow->core.guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
     fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
                flow->core.guessed_protocol_id_by_ip, NDPI_FPC_CONFIDENCE_IP);
     return;
   }
+
+  /* Nothing better than the DPI verdict is known: it stands (TLS/QUIC only). */
+  if(dpi_verdict)
+    fpc_update(ndpi_str, flow, flow->core.detected_protocol_stack[1],
+               flow->core.detected_protocol_stack[0], NDPI_FPC_CONFIDENCE_DPI);
 }
 
 /* ********************************************************************************* */
@@ -12752,6 +12777,16 @@ void ndpi_check_subprotocol_risk(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ****************************************************** */
 
+/*
+  The hosted AI providers (498-507 and 517-527, see ndpi_protocol_ids.h). The
+  self-hosted engines (508-516) are deliberately not included: they are named,
+  and reported, by their own dissectors from the request payload.
+*/
+static int ndpi_is_ai_provider_protocol(u_int16_t proto) {
+  return((proto >= NDPI_PROTOCOL_OPENAI   && proto <= NDPI_PROTOCOL_PERPLEXITY) ||
+         (proto >= NDPI_PROTOCOL_ZAI      && proto <= NDPI_PROTOCOL_AI01));
+}
+
 u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_str,
 				      struct ndpi_flow_core_struct *core,
 				      char *_string_to_match, u_int _string_to_match_len,
@@ -12831,6 +12866,24 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
         ndpi_set_risk(ndpi_str, core, NDPI_RISKY_DOMAIN, NULL);
       }
     }
+  }
+
+  /*
+    A hosted AI provider named by an encrypted flow: on TLS/QUIC the name is the
+    only evidence nDPI gets, the payload is encrypted, and ECH can take the name
+    away as well. The risk is reported, with a string that says exactly what it
+    is - an AI provider peer, from the name - and not that inference was proven.
+    The proven cases (an OpenAI/Anthropic compatible call, an engine endpoint on
+    cleartext HTTP) are reported by vllm.c/llm_api.c with a far more specific
+    string and are untouched here, since there the master protocol is HTTP.
+  */
+  if(rc != NDPI_PROTOCOL_UNKNOWN &&
+     (master_protocol_id == NDPI_PROTOCOL_TLS || master_protocol_id == NDPI_PROTOCOL_QUIC) &&
+     ndpi_is_ai_provider_protocol(ret_match->protocol_id)) {
+    if(is_flowrisk_info_enabled(ndpi_str, NDPI_AI_INFERENCE_TRAFFIC))
+      ndpi_set_risk(ndpi_str, core, NDPI_AI_INFERENCE_TRAFFIC, "AI provider peer (SNI/Host name)");
+    else
+      ndpi_set_risk(ndpi_str, core, NDPI_AI_INFERENCE_TRAFFIC, NULL);
   }
 
   /* Add punycode check */
