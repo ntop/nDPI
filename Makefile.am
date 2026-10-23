@@ -15,9 +15,9 @@ endif
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libndpi.pc
 
-EXTRA_DIST = README.md README.cve.md README.ja5.md README.fuzzer.md README.license.md CHANGELOG.md CONTRIBUTING.md \
+EXTRA_DIST = README.md README.cve.md README.fuzzer.md README.license.md CHANGELOG.md CONTRIBUTING.md \
 	autogen.sh wireshark windows utils packages dga \
-		fingerprint/README.ja5.md fingerprint/README.ndpi_tcp_fingerprint.md \
+	fingerprint/nDPI_TCP_fingerprint.md fingerprint/ndpi_tcp_fp.py fingerprint/nDPI_TLS_Fingerprint.md fingerprint/README.md \
 	influxdb/Makefile.in influxdb/metric_anomaly.c influxdb/README.txt \
 	rrdtool/Makefile.in rrdtool/README.txt rrdtool/rrd_anomaly.c rrdtool/rrd_similarity.c \
 	doc/requirements.txt doc/conf.py doc/flow_risks.rst doc/protocols.rst doc/guide/nDPI_QuickStartGuide.pages \
@@ -45,7 +45,7 @@ EXTRA_DIST = README.md README.cve.md README.ja5.md README.fuzzer.md README.licen
 		lists/protocols/README.md \
 	sonar-project.properties .github .ci-ignore \
 	src/lib/plugins/README.md \
-	fingerprint/README.ja5.md fingerprint/README.ndpi_tcp_fingerprint.md \
+	fingerprint/nDPI_TCP_fingerprint.md fingerprint/ndpi_tcp_fp.py fingerprint/nDPI_TLS_Fingerprint.md fingerprint/README.md \
 	example/README.md
 
 doc:
