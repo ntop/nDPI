@@ -801,6 +801,8 @@ void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_st
 				    struct ndpi_flow_struct *flow);
 void switch_extra_dissection_to_tls_obfuscated_heur(struct ndpi_detection_module_struct* ndpi_struct,
                                                     struct ndpi_flow_struct* flow);
+int tls_obfuscated_heur_deferred_giveup(struct ndpi_detection_module_struct* ndpi_struct,
+                                        struct ndpi_flow_struct* flow);
 
 /* OOKLA */
 int ookla_search_into_cache(struct ndpi_detection_module_struct* ndpi_struct,
