@@ -527,6 +527,36 @@ typedef enum {
   NDPI_PROTOCOL_SUPERCELL             = 495,
   NDPI_PROTOCOL_POWERSHELL            = 496,
   NDPI_PROTOCOL_JANITORAI             = 497,
+  NDPI_PROTOCOL_OPENAI                = 498, /* OpenAI: ChatGPT, REST API, Sora */
+  NDPI_PROTOCOL_ANTHROPIC             = 499, /* Anthropic: Claude */
+  NDPI_PROTOCOL_GOOGLE_GEMINI         = 500, /* Google: Gemini, NotebookLM, AI Studio */
+  NDPI_PROTOCOL_DEEPSEEK              = 501,
+  NDPI_PROTOCOL_MISTRAL               = 502, /* Mistral AI (La Plateforme, Le Chat) */
+  NDPI_PROTOCOL_XAI                   = 503, /* xAI: Grok */
+  NDPI_PROTOCOL_COHERE                = 504,
+  NDPI_PROTOCOL_GROQ                  = 505, /* Groq Cloud (OpenAI-compatible API) */
+  NDPI_PROTOCOL_HUGGINGFACE           = 506, /* Hugging Face Hub / Inference Endpoints */
+  NDPI_PROTOCOL_PERPLEXITY            = 507,
+  NDPI_PROTOCOL_OLLAMA                = 508, /* Self-hosted LLM runtime (Ollama) */
+  NDPI_PROTOCOL_VLLM                  = 509, /* Self-hosted LLM serving engine (vLLM) */
+  NDPI_PROTOCOL_LLAMA_CPP             = 510, /* llama.cpp server (incl. LM Studio backends) */
+  NDPI_PROTOCOL_SGLANG                = 511, /* Self-hosted LLM serving engine (SGLang) */
+  NDPI_PROTOCOL_RADIANCE              = 512, /* Radiance inference server (AMD GPUs) */
+  NDPI_PROTOCOL_MLX_VLM               = 513, /* MLX-VLM serving engine (Apple Silicon) */
+  NDPI_PROTOCOL_OMLX                  = 514, /* oMLX serving engine (Apple Silicon) */
+  NDPI_PROTOCOL_VMLX                  = 515, /* vMLX serving engine (Apple Silicon) */
+  NDPI_PROTOCOL_STRATA                = 516, /* Strata inference engine */
+  NDPI_PROTOCOL_ZAI               = 517, /* Z.ai (hosted AI provider) */
+  NDPI_PROTOCOL_ALIBABA_QWEN      = 518, /* AlibabaQwen (hosted AI provider) */
+  NDPI_PROTOCOL_MINIMAX           = 519, /* MiniMax (hosted AI provider) */
+  NDPI_PROTOCOL_MOONSHOT          = 520, /* Moonshot (hosted AI provider) */
+  NDPI_PROTOCOL_VOLCENGINE_ARK    = 521, /* VolcengineArk (hosted AI provider) */
+  NDPI_PROTOCOL_SILICONFLOW       = 522, /* SiliconFlow (hosted AI provider) */
+  NDPI_PROTOCOL_BAIDU_QIANFAN     = 523, /* BaiduQianfan (hosted AI provider) */
+  NDPI_PROTOCOL_TENCENT_HUNYUAN   = 524, /* TencentHunyuan (hosted AI provider) */
+  NDPI_PROTOCOL_IFLYTEK_SPARK     = 525, /* iFlytekSpark (hosted AI provider) */
+  NDPI_PROTOCOL_STEPFUN           = 526, /* StepFun (hosted AI provider) */
+  NDPI_PROTOCOL_AI01              = 527, /* 01AI (hosted AI provider) */
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 

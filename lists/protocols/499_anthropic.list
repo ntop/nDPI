@@ -1,0 +1,13 @@
+# Anthropic (Claude API). Published IP addresses, ingress (the addresses a
+# client talks TO):
+#   https://platform.claude.com/docs/en/api/ip-addresses
+# Verified 2026-10-23: dig api.anthropic.com -> 160.79.104.10 (inside /23).
+#
+# Anthropic's *outbound* range (160.79.104.0/21) is deliberately NOT listed:
+# those are the addresses Anthropic connects FROM (MCP tool calls, webhooks),
+# not the ones its API is served from, and a /21 would swallow the ingress /23.
+#
+# Load with: --protocols-list-dir <dir containing this file>
+# See lists/protocols/README.md for what a by-IP entry does (and does not) say.
+160.79.104.0/23
+2607:6bc0::/48
