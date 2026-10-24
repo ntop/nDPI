@@ -42,10 +42,10 @@ SoftwareUpdate                  19 2638          1
 
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
-	1	 194.226.199.103          	 1      
-	2	 194.226.199.61           	 2      
-	3	 194.226.199.9            	 1      
-	4	 194.226.199.21           	 1      
+	1	 194.226.199.61           	 2      
+	2	 194.226.199.103          	 1      
+	3	 194.226.199.21           	 1      
+	4	 194.226.199.9            	 1      
 
 
 	1	TCP 194.226.199.61:27453 <-> 35.241.9.150:443 [proto: 91.125/TLS.Mozilla][Stack: TLS.Mozilla][IP: 284/GoogleCloud][Encrypted][Confidence: DPI][FPC: 284/GoogleCloud, Confidence: IP address][DPI packets: 8][cat: Web/5][Breed: Acceptable][36 pkts/3477 bytes <-> 42 pkts/37330 bytes][Goodput ratio: 43/94][171.42 sec][Hostname/SNI: firefox.settings.services.mozilla.com][(Advertised) ALPNs: h2;http/1.1][(Negotiated) ALPN: h2][bytes ratio: -0.830 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 4196/3653 58250/58245 14929/14067][Pkt Len c2s/s2c min/avg/max/stddev: 56/60 97/889 375/2878 73/1070][nDPI Cli Fingerprint: 2176691291fdeea25a3371e6eb8db95c][nDPI Srv Fingerprint: 4fea6744166c][TCP Fingerprint: 2_128_8192_47466ece/Unknown][MSS: 1460][TLSv1.2][JA4: t12d1410h2_c866b44c5a26_b5b8faed2b99][TLS-C: t12d1409h2_c866b44c5a26_cf2a198afd9e_251cc6d9bd74][ServerNames: firefox.settings.services.mozilla.com,main-2-cdn.prod.kinto.prod.cloudops.mozgcp.net][JA3S: 9d9ce860f1b1cbef07b019450cb368d8][Issuer: C=US, O=Let's Encrypt, CN=R3][Subject: CN=main-2-cdn.prod.kinto.prod.cloudops.mozgcp.net][Certificate SHA-1: 30:0D:22:77:6E:DA:4E:99:3E:AF:8A:D0:5C:7D:97:51:8B:E6:22:11][Firefox][Validity: 2023-04-04 08:33:24 - 2023-07-03 08:33:23][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][Plen Bins: 49,16,2,0,3,3,1,0,1,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,11]
