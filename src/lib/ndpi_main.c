@@ -8206,6 +8206,21 @@ void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
         flow->metadata.protos.ssdp.user_agent = NULL;
       }
     }
+
+    if (flow_is_proto(flow, NDPI_PROTOCOL_DNS) ||
+        flow_is_proto(flow, NDPI_PROTOCOL_LLMNR) ||
+        flow_is_proto(flow, NDPI_PROTOCOL_MDNS)) {
+      if (flow->metadata.protos.dns.cnames) {
+        for(int i = 0; i < MAX_NUM_DNS_CNAMES; i++) {
+          if (flow->metadata.protos.dns.cnames->cname_domain_names[i] != NULL) {
+            ndpi_free(flow->metadata.protos.dns.cnames->cname_domain_names[i]);
+            flow->metadata.protos.dns.cnames->cname_domain_names[i] = NULL;
+          }
+        }
+        ndpi_free(flow->metadata.protos.dns.cnames);
+        flow->metadata.protos.dns.cnames = NULL;
+      }
+    }
   }
 }
 
