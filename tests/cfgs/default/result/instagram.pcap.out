@@ -54,8 +54,8 @@ Network                         12 1585          5
 
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
-	1	 192.168.0.103            	 1      
-	2	 192.168.2.17             	 2      
+	1	 192.168.2.17             	 2      
+	2	 192.168.0.103            	 1      
 
 
 	1	TCP 192.168.2.17:49357 <-> 31.13.86.52:443 [proto: 91.211/TLS.Instagram][Stack: TLS.Instagram][IP: 119/Facebook][Encrypted][Confidence: DPI][FPC: 119/Facebook, Confidence: IP address][DPI packets: 8][cat: SocialNetwork/6][Breed: Fun][63 pkts/6340 bytes <-> 81 pkts/100966 bytes][Goodput ratio: 26/95][13.54 sec][Hostname/SNI: scontent-mxp1-1.cdninstagram.com][(Advertised) ALPNs: http/1.1][TLS Supported Versions: TLSv1.3;TLSv1.3 (Fizz)][bytes ratio: -0.882 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 263/164 10413/10469 1493/1278][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 101/1246 663/1454 128/466][nDPI Cli Fingerprint: dc5f872bd1e88ec6a614ca05ff6a2909][nDPI Srv Fingerprint: fa663f1784fb][TCP Fingerprint: 2_64_65535_e76f0f14/macOS/iOS/iPad][MSS: 1460][TLSv1.3 (Fizz)][JA4: t00d0309h1_55b375c5d22e_2d3f7b9fe3d5][TLS-C: t00d0306h1_55b375c5d22e_e12c865f31a5_e994319f0111][JA3S: fcb2d4d0991292272fcb1e464eedfd43][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 1,1,1,1,0,1,1,0,0,0,0,0,0,1,0,0,2,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,85,0,0,0,0]

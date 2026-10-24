@@ -36,8 +36,8 @@ VoIP                           362 74597         7
 
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
-	1	 2001:b07:a3d:c112:48a1:1094:1227:281e 	 1      
-	2	 192.168.12.156           	 1      
+	1	 192.168.12.156           	 1      
+	2	 2001:b07:a3d:c112:48a1:1094:1227:281e 	 1      
 
 
 	1	UDP [2001:b07:a3d:c112:48a1:1094:1227:281e]:45572 <-> [2001:4860:4864:6::81]:19305 [proto: 30.404/DTLS.GoogleCall][Stack: STUN.DTLS.GoogleCall][IP: 126/Google][Stream Content: Audio][Encrypted][Confidence: DPI][FPC: 78.404/STUN.GoogleCall, Confidence: DPI][DPI packets: 148][DPI packets before monitoring: 43][cat: VoIP/10][Breed: Acceptable][30 pkts/4693 bytes <-> 118 pkts/36197 bytes][Goodput ratio: 60/80][0.71 sec][bytes ratio: -0.770 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 22/2 152/74 32/9][Pkt Len c2s/s2c min/avg/max/stddev: 106/99 156/307 608/1265 88/113][Mapped IP/Port: [2001:b07:a3d:c112:48a1:1094:1227:281e]:45572][RTP packets: 11/104][nDPI Cli Fingerprint: 499a2f6996c635f36c22ab7140d0b570][nDPI Srv Fingerprint: d4af27336ed5][DTLSv1.2][JA4: dd2i110700_c45550529adf_d9dd6182da81][TLS-C: dd2i110600_c45550529adf_d8bf07284a81_30e06788707b][JA3S: 1f5d6a6d0bc5d514dd84d13e6283d309][Issuer: CN=hangouts][Subject: CN=hangouts][Certificate SHA-1: 07:CC:FC:28:04:F2:29:8F:E9:C4:BF:AC:F6:D2:BD:F2:BA:36:AD:31][Validity: 2023-10-11 02:02:47 - 2024-10-11 02:02:47][Cipher: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256][PLAIN TEXT (igoKAAiKAiADEA)][Plen Bins: 0,6,16,5,2,0,0,0,68,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
