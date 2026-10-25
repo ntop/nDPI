@@ -36,8 +36,8 @@ Web                             24 8508          3
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 10.191.227.13            	 1      
-	2	 192.168.13.203           	 1      
-	3	 127.0.0.1                	 1      
+	2	 127.0.0.1                	 1      
+	3	 192.168.13.203           	 1      
 
 
 	1	UDP 127.0.0.1:40983 <-> 127.0.0.1:11111 [proto: 30/DTLS][Stack: DTLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 30/DTLS, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Safe][7 pkts/3187 bytes <-> 11 pkts/3980 bytes][Goodput ratio: 91/88][0.02 sec][TLS Supported Versions: DTLSv1.3][bytes ratio: -0.111 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 5/5 2/2][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 455/362 1398/1425 441/474][Risk: ** TLS (probably) Not Carrying HTTPS **** Missing SNI TLS Extn **][Risk Score: 60][Risk Info: SNI should always be present;No ALPN][nDPI Cli Fingerprint: b8d5aa005ca39f79063add8e69a0dbdc][nDPI Srv Fingerprint: 258fee333f5e][DTLSv1.3][JA4: dd2i270600_991e33d7eb74_10f9deb96590][TLS-C: dd2i270500_991e33d7eb74_6f81dfc01e9b_e2abea50d215][JA3S: ecfd4f82776364c3015565f97e8c3897][Firefox][Cipher: TLS_AES_128_GCM_SHA256][Plen Bins: 11,16,22,0,11,0,0,0,0,11,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,0,0,0,0]

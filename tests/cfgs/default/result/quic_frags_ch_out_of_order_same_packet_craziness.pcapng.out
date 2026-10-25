@@ -52,12 +52,12 @@ Advertisement                   18 25056         17
 JA Host Stats: 
 		 IP Address                  	 # JA4C     
 	1	 168.144.64.5             	 2      
-	2	 52.187.20.175            	 1      
-	3	 159.117.176.124          	 1      
-	4	 192.168.254.11           	 1      
-	5	 10.117.78.100            	 1      
-	6	 147.196.90.42            	 1      
-	7	 133.205.75.230           	 1      
+	2	 10.117.78.100            	 1      
+	3	 133.205.75.230           	 1      
+	4	 147.196.90.42            	 1      
+	5	 159.117.176.124          	 1      
+	6	 192.168.254.11           	 1      
+	7	 52.187.20.175            	 1      
 
 
 	1	UDP 52.187.20.175:49880 -> 208.229.157.81:443 [proto: 188.239/QUIC.GoogleServices][Stack: QUIC.GoogleServices][IP: 276/Azure][Encrypted][Confidence: DPI][FPC: 188.239/QUIC.GoogleServices, Confidence: DPI][DPI packets: 1][cat: Web/5][Breed: Acceptable][4 pkts/5568 bytes -> 0 pkts/0 bytes][Goodput ratio: 97/0][2.12 sec][Hostname/SNI: update.googleapis.com][(Advertised) ALPNs: h3-29][TLS Supported Versions: TLSv1.3][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][nDPI Cli Fingerprint: 74b25186621c904c4ef1c296b44002a8][TLSv1.3][QUIC ver: Draft-29][JA4: q13d0310h9_55b375c5d22e_b064f0e3421d][TLS-C: q13d0309h9_55b375c5d22e_45c3433cdd1e_30e06788707b][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]

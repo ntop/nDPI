@@ -3804,6 +3804,27 @@ static int hash_stats_sort_to_print(void *_a, void *_b) {
   return (b->occurency - a->occurency);
 }
 
+/* Sort the "JA Host Stats" table. It used to be printed by walking the hash table
+   directly, i.e. in the order in which hosts happened to be added, which is not
+   stable across architectures: hosts with the same number of fingerprints swapped
+   places on big-endian hosts, so the dump (and its test expectation) was
+   byte-order dependent. Sort by number of client (JA4C) fingerprints, decreasing,
+   then by IP address, so the output is the same everywhere. */
+static int jaHostStatsSort_cmp(void *_a, void *_b) {
+  ndpi_host_ja_fingerprints *a = (ndpi_host_ja_fingerprints*)_a;
+  ndpi_host_ja_fingerprints *b = (ndpi_host_ja_fingerprints*)_b;
+  int rc, a_num, b_num;
+
+  a_num = (int)HASH_COUNT(a->host_client_info_hasht);
+  b_num = (int)HASH_COUNT(b->host_client_info_hasht);
+
+  if((rc = (b_num - a_num)) != 0) return(rc);
+
+  if(a->ip_string == NULL) return(b->ip_string == NULL ? 0 : 1);
+  if(b->ip_string == NULL) return(-1);
+  return(strcmp(a->ip_string, b->ip_string));
+}
+
 /* *********************************************** */
 
 static void printFlowsStats() {
@@ -3990,6 +4011,8 @@ static void printFlowsStats() {
         ndpi_ja_fingerprints_host *tmp3 = NULL;
         ndpi_ip_dns *innerHashEl = NULL;
         ndpi_ip_dns *tmp4 = NULL;
+
+        HASH_SORT(jaByHostsHashT, jaHostStatsSort_cmp);
 
         if(verbose == 2) {
           /* for each host the number of flow with a ja4c fingerprint is printed */
