@@ -2163,7 +2163,9 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
       /* Ciphers */
       102, 129, 52243, 52244, 57363, 65279, 65413,
       /* ALPS */
-      17513, 17613
+      17513, 17613,
+      /* draft-ietf-tls-trust-anchor-ids */
+      51764
   };
   size_t const allowed_non_iana_extensions_size = sizeof(allowed_non_iana_extensions) /
     sizeof(allowed_non_iana_extensions[0]);
