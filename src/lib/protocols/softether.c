@@ -200,7 +200,8 @@ static int dissect_softether_host_fqdn(struct ndpi_flow_struct *flow,
   payload += value_siz;
   payload_len -= value_siz;
 
-  if(strncmp(val1.value.ptr.value_str, "host_name", value_siz) == 0)
+  if(val1.value_size > 0 &&
+     strncmp(val1.value.ptr.value_str, "host_name", value_siz) == 0)
     got_hostname = 1;
 
   for (; tuple_count > 0; --tuple_count) {
