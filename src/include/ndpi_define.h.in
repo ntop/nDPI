@@ -413,4 +413,6 @@ static inline uint64_t ndpi_get_u_int64_t(const void *X, int O)
 #define MAX_NUM_JA         128
 #define MAX_JA_STRLEN      256
 
+#define FILE_EXTENSION_LEN    4
+
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */
