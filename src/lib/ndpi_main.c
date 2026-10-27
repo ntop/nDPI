@@ -11583,6 +11583,15 @@ static void proto_stack_update(struct ndpi_proto_stack *s, u_int16_t lower_proto
      (s->protos[s->protos_num - 1] == upper_proto)) {
     s->protos_num--;
   }
+  /* NETBIOS/SMBV23 + SMBV23/POWERSHELL -> SMBV23/POWERSHELL */
+  if(s->protos_num == 2 &&
+     s->protos[0] == NDPI_PROTOCOL_NETBIOS &&
+     s->protos[1] == NDPI_PROTOCOL_SMBV23 &&
+     lower_proto == NDPI_PROTOCOL_SMBV23) {
+    s->protos[0] = NDPI_PROTOCOL_SMBV23;
+    s->protos[1] = NDPI_PROTOCOL_UNKNOWN;
+    s->protos_num = 1;
+  }
   /* RDP + TLS/RDP -> RDP/TLS */
   if(s->protos_num == 1 &&
      s->protos[s->protos_num - 1] == upper_proto &&

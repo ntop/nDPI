@@ -173,8 +173,8 @@ static int smb_search_again(struct ndpi_detection_module_struct *ndpi_struct,
       but also by sc.exe, reg.exe, PsExec, Impacket and by many
       management/monitoring tools: we report it as PowerShell anyway
     */
-    NDPI_LOG_INFO(ndpi_struct, "found PowerShell over SMBv23/NetBios\n");
-    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_POWERSHELL, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
+    NDPI_LOG_INFO(ndpi_struct, "found PowerShell over SMBv23\n");
+    ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_POWERSHELL, NDPI_PROTOCOL_SMBV23, NDPI_CONFIDENCE_DPI);
   }
 
   /* Remote administration or encrypted/compressed traffic (we can't tell what it is): use the default category */
