@@ -1419,6 +1419,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     if(flow->ndpi_flow->metadata.protos.bittorrent.hash[0] != '\0') {
       u_int avail = sizeof(flow->ndpi_flow->metadata.protos.bittorrent.hash) * 2 + 1;
+
       flow->bittorent_hash = ndpi_malloc(avail);
 
       if(flow->bittorent_hash) {
@@ -1493,6 +1494,14 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->info_type = INFO_GENERIC;
     ndpi_snprintf(flow->info, sizeof(flow->info), "Client IP: %s",
                   flow->ndpi_flow->metadata.protos.discord.client_ip);
+  }  
+  /* SMB */
+ else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_SMBV23) &&
+	 !ndpi_stack_is_tls_like(&flow->detected_protocol.protocol_stack) &&
+	 flow->ndpi_flow->metadata.protos.smb.filename != NULL) {
+   flow->info_type = INFO_GENERIC;
+   ndpi_snprintf(flow->info, sizeof(flow->info), "Filename: %s",
+		 flow->ndpi_flow->metadata.protos.smb.filename);
   }
   /* DNS */
   else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_DNS)) {

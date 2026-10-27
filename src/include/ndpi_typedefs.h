@@ -912,7 +912,7 @@ struct ndpi_flow_tcp_struct {
   u_int8_t cli2srv_tcp_flags, srv2cli_tcp_flags;
 
   /* **** Protocols **** */
-  
+
   /* NDPI_PROTOCOL_MAIL_SMTP */
   /* NDPI_PROTOCOL_MAIL_POP */
   /* NDPI_PROTOCOL_MAIL_IMAP */
@@ -1679,6 +1679,12 @@ struct ndpi_flow_struct_dns_metadata {
 
 /* ************************ */
 
+struct ndpi_smb_metadata {
+  char *filename;
+};
+
+/* ************************ */
+
 struct ndpi_flow_tls_quic_core_struct {
   message_t message[2]; /* Directions */
   u_int8_t certificate_processed:1, change_cipher_from_client:1, change_cipher_from_server:1, from_opportunistic_tls:1, from_rdp:1, alert:1, pad:2;
@@ -1749,7 +1755,7 @@ struct ndpi_flow_core_struct {
 
   struct ndpi_dns_tcp_reasm_state *dns_tcp_reasm; /* TCP DNS reassembly */
   struct ndpi_dcerpc_tcp_reasm_state *dcerpc_tcp_reasm; /* TCP DCERPC reassembly */
-  
+
   /* General purpose field used to save mainly hostname/SNI information.
    * In details it used for: MGCP, COLLECTD, DNS, SSDP and NETBIOS name, HTTP, MUNIN and DHCP hostname,
    * WHOIS request, TLS/QUIC server name, XIAOMI domain and STUN realm.
@@ -1763,7 +1769,7 @@ struct ndpi_flow_core_struct {
     TLS-based hence that will mess around with it
   */
   struct ndpi_flow_tls_quic_core_struct tls_quic;
-  
+
   /* Flow payload */
   u_int16_t flow_payload_len;
   char *flow_payload;
@@ -1817,7 +1823,7 @@ struct ndpi_flow_metadata_struct {
   struct {
     char *client_fingerprint, *server_fingerprint;
   } ndpi;
-  
+
   /*
     This structure below will not not stay inside the protos
     structure below as HTTP is used by many subprotocols
@@ -1871,7 +1877,7 @@ struct ndpi_flow_metadata_struct {
     struct ndpi_flow_struct_dns_metadata dns;
 
     struct ndpi_flow_tls_quic_metadata_struct tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
-    
+
     struct ntp_info {
       u_int8_t leap_indicator: 2, version: 3, mode: 3;
       u_int8_t stratum;
@@ -2051,7 +2057,9 @@ struct ndpi_flow_metadata_struct {
       u_int8_t num_other_funcs;     /* Other function codes */
     } s7comm;
 
-    struct ndpi_ipsec_details ipsec;    
+    struct ndpi_ipsec_details ipsec;
+
+    struct ndpi_smb_metadata smb;
   } protos;
 
   struct {
@@ -2063,7 +2071,7 @@ struct ndpi_flow_metadata_struct {
     u_int8_t ovpn_heur_opcode__resets[2];
     u_int16_t ovpn_heur_opcode__missing_bytes[2];
   } openvpn;
-  
+
   struct {
     NDPIProtocolPluginEntryPoint *plugin;
     void *plugin_data;

@@ -45,13 +45,7 @@ static const char* download_file_mimes_b[] = { "bz", "bz2", NULL };
 static const char* download_file_mimes_o[] = { "octet-stream", NULL };
 static const char* download_file_mimes_x[] = { "x-tar", "x-zip", "x-bzip", NULL };
 
-#define ATTACHMENT_LEN    3
-static const char* binary_exec_file_ext[] = {
-					"exe",
-					"msi",
-					"cab",
-					NULL
-};
+const char* binary_exec_file_ext[] = { ".exe", ".msi",".cab", NULL };
 
 void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 			  struct ndpi_flow_struct *flow);
@@ -88,10 +82,10 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
     Check known exceptions
     https://learn.microsoft.com/en-us/windows/privacy/windows-endpoints-1909-non-enterprise-editions
   */
-  if(ends_with(ndpi_struct, (char*)flow->core.host_server_name, ".windowsupdate.com")
-     || ends_with(ndpi_struct, (char*)flow->core.host_server_name, ".microsoft.com")
-     || ends_with(ndpi_struct, (char*)flow->core.host_server_name, ".office365.com")
-     || ends_with(ndpi_struct, (char*)flow->core.host_server_name, ".windows.com")
+  if(ndpi_ends_with(ndpi_struct, (char*)flow->core.host_server_name, ".windowsupdate.com")
+     || ndpi_ends_with(ndpi_struct, (char*)flow->core.host_server_name, ".microsoft.com")
+     || ndpi_ends_with(ndpi_struct, (char*)flow->core.host_server_name, ".office365.com")
+     || ndpi_ends_with(ndpi_struct, (char*)flow->core.host_server_name, ".windows.com")
      )
     ;
   else {
@@ -442,16 +436,16 @@ static ndpi_protocol_category_t ndpi_http_check_content(struct ndpi_detection_mo
 	  }
 	}
 
-	if(filename_len > ATTACHMENT_LEN) {
-	  attachment_len += filename_len-ATTACHMENT_LEN-1;
+	if(filename_len > FILE_EXTENSION_LEN) {
+	  attachment_len += filename_len-FILE_EXTENSION_LEN-1;
 
-	  if((attachment_len+ATTACHMENT_LEN) <= packet->content_disposition_line.len) {
+	  if((attachment_len+FILE_EXTENSION_LEN) <= packet->content_disposition_line.len) {
 	    char str[64];
 
 	    for(i = 0; binary_exec_file_ext[i] != NULL; i++) {
 	      /* Use memcmp in case content-disposition contains binary data */
 	      if(memcmp(&packet->content_disposition_line.ptr[attachment_len],
-			binary_exec_file_ext[i], ATTACHMENT_LEN) == 0) {
+			binary_exec_file_ext[i], FILE_EXTENSION_LEN) == 0) {
 
 		snprintf(str, sizeof(str), "Found file extn %s", binary_exec_file_ext[i]);
 		flow->core.category = NDPI_PROTOCOL_CATEGORY_DOWNLOAD_FT;
@@ -1412,8 +1406,8 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
      (exception: custom rule via url matching) */
   if(flow->core.confidence != NDPI_CONFIDENCE_CUSTOM_RULE) {
     if(flow->metadata.http.url) {
-      if(ends_with(ndpi_struct, (char *)flow->metadata.http.url, "/generate_204") ||
-         ends_with(ndpi_struct, (char *)flow->metadata.http.url, "/generate204")) {
+      if(ndpi_ends_with(ndpi_struct, (char *)flow->metadata.http.url, "/generate_204") ||
+         ndpi_ends_with(ndpi_struct, (char *)flow->metadata.http.url, "/generate204")) {
         flow->core.category = NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK;
       }
     }

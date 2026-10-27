@@ -32,29 +32,17 @@
 static int smb_search_again(struct ndpi_detection_module_struct *ndpi_struct,
                             struct ndpi_flow_struct *flow);
 
-/* ************************************************************ */
-
-static void ndpi_int_smbv23_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
-                                           struct ndpi_flow_struct *flow)
-{
-  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_SMBV23, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
-
-  if(ndpi_struct->cfg.smb_max_packets_extra_dissection > 0) {
-    NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
-    /* Until we see some remote administration pipes, this is file sharing */
-    flow->core.category = NDPI_PROTOCOL_CATEGORY_FILE_SHARING;
-    flow->core.max_extra_packets_to_check = ndpi_struct->cfg.smb_max_packets_extra_dissection;
-    flow->core.extra_packets_func = smb_search_again;
-  }
-}
-
+extern const char* binary_exec_file_ext[]; /* http.c */
+					     
 /* ************************************************************ */
 
 /* Is the (UTF-16LE) name of the file/pipe opened via SMB2 CREATE one of the
    names used for remote administration? */
-static int is_remote_admin_name(const u_int8_t *name, u_int16_t name_len)
+static int is_remote_admin_name(struct ndpi_detection_module_struct *ndpi_struct,
+				struct ndpi_flow_struct *flow,
+				const u_int8_t *name, u_int16_t name_len)
 {
-  char buf[16];
+  char buf[256];
   u_int16_t i, len = 0;
 
   for(i = 0; i + 1 < name_len && len < sizeof(buf) - 1; i += 2) {
@@ -64,6 +52,24 @@ static int is_remote_admin_name(const u_int8_t *name, u_int16_t name_len)
   }
   buf[len] = '\0';
 
+  if(len > 0) {
+    if(flow->metadata.protos.smb.filename == NULL)
+      flow->metadata.protos.smb.filename = ndpi_strdup(buf);
+
+    for(i = 0; binary_exec_file_ext[i] != NULL; i++) {
+      if(ndpi_ends_with(ndpi_struct, buf, (char*)binary_exec_file_ext[i])) {
+	char str[64];
+
+	snprintf(str, sizeof(str), "Found file extn %s", binary_exec_file_ext[i]);
+
+	ndpi_set_risk(ndpi_struct, &flow->core,
+		      NDPI_BINARY_APPLICATION_TRANSFER, str);
+	
+	NDPI_LOG_INFO(ndpi_struct, "found executable SMB transfer");
+      }
+    }
+  }
+  
   return strcmp(buf, "svcctl") == 0 ||                     /* MS-SCMR: service control manager */
          strcmp(buf, "winreg") == 0 ||                     /* MS-RRP: remote registry */
          strcmp(buf, "atsvc") == 0 ||                      /* MS-TSCH: task scheduler */
@@ -74,8 +80,8 @@ static int is_remote_admin_name(const u_int8_t *name, u_int16_t name_len)
 
 /* Look for SMB2 CREATE requests opening remote administration pipes/files.
    Return: 1 if found, -1 if we can't look into the flow anymore, 0 otherwise */
-static int smb2_check_create(struct ndpi_detection_module_struct *ndpi_struct)
-{
+static int smb2_check_create(struct ndpi_detection_module_struct *ndpi_struct,
+			     struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len;
@@ -84,6 +90,7 @@ static int smb2_check_create(struct ndpi_detection_module_struct *ndpi_struct)
   /* NetBIOS Session Service header */
   if(payload_len < 4 + 4 || payload[0] != 0x00)
     return 0;
+  
   msg_len = (payload[1] << 16) + (payload[2] << 8) + payload[3];
   payload += 4;
   payload_len = ndpi_min(payload_len - 4, msg_len);
@@ -112,7 +119,7 @@ static int smb2_check_create(struct ndpi_detection_module_struct *ndpi_struct)
 
       if(name_len > 0 && name_offset >= SMB2_HDR_LEN + 48 &&
          offset + name_offset + name_len <= msg_end &&
-         is_remote_admin_name(&hdr[name_offset], name_len))
+         is_remote_admin_name(ndpi_struct, flow, &hdr[name_offset], name_len))
         return 1;
     }
 
@@ -122,6 +129,24 @@ static int smb2_check_create(struct ndpi_detection_module_struct *ndpi_struct)
   }
 
   return 0;
+}
+
+/* ************************************************************ */
+
+static void ndpi_int_smbv23_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
+                                           struct ndpi_flow_struct *flow)
+{
+  ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_SMBV23, NDPI_PROTOCOL_NETBIOS, NDPI_CONFIDENCE_DPI);
+
+  if(ndpi_struct->cfg.smb_max_packets_extra_dissection > 0) {
+    NDPI_LOG_DBG(ndpi_struct, "Enabling extra dissection\n");
+    /* Until we see some remote administration pipes, this is file sharing */
+    flow->core.category = NDPI_PROTOCOL_CATEGORY_FILE_SHARING;
+    flow->core.max_extra_packets_to_check = ndpi_struct->cfg.smb_max_packets_extra_dissection;
+    flow->core.extra_packets_func = smb_search_again;
+  }
+
+  smb2_check_create(ndpi_struct, flow);
 }
 
 /* ************************************************************ */
@@ -136,7 +161,7 @@ static int smb_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   if(packet->tcp == NULL || packet->payload_packet_len == 0)
     return 1;
 
-  rc = smb2_check_create(ndpi_struct);
+  rc = smb2_check_create(ndpi_struct, flow);
   if(rc == 0)
     return 1; /* Keep looking */
 
@@ -156,6 +181,7 @@ static int smb_search_again(struct ndpi_detection_module_struct *ndpi_struct,
   proto.master_protocol = flow->core.detected_protocol_stack[1];
   proto.app_protocol = flow->core.detected_protocol_stack[0];
   flow->core.category = get_proto_category(ndpi_struct, proto);
+
   return 0;
 }
 

@@ -1029,12 +1029,12 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
           and this might be an issue or indicate an exfiltration
         */
 
-        if(ends_with(ndpi_struct, _hostname, "multi.surbl.org")
-           || ends_with(ndpi_struct, _hostname, "spamhaus.org")
-           || ends_with(ndpi_struct, _hostname, "rackcdn.com")
-           || ends_with(ndpi_struct, _hostname, "akamaiedge.net")
-           || ends_with(ndpi_struct, _hostname, "mx-verification.google.com")
-           || ends_with(ndpi_struct, _hostname, "amazonaws.com")
+        if(ndpi_ends_with(ndpi_struct, _hostname, "multi.surbl.org")
+           || ndpi_ends_with(ndpi_struct, _hostname, "spamhaus.org")
+           || ndpi_ends_with(ndpi_struct, _hostname, "rackcdn.com")
+           || ndpi_ends_with(ndpi_struct, _hostname, "akamaiedge.net")
+           || ndpi_ends_with(ndpi_struct, _hostname, "mx-verification.google.com")
+           || ndpi_ends_with(ndpi_struct, _hostname, "amazonaws.com")
            )
           ; /* Check common domain exceptions [TODO: if the list grows too much use a different datastructure] */
         else

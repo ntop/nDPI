@@ -737,8 +737,8 @@ int asn1_ber_decode_int(const u_int8_t *buf, u_int32_t buf_len, int32_t * const 
 u_int8_t ndpi_ips_match(u_int32_t src, u_int32_t dst,
 		   u_int32_t net, u_int32_t num_bits);
 
-u_int8_t ends_with(struct ndpi_detection_module_struct *ndpi_struct,
-                   char *str, char *ends);
+u_int8_t ndpi_ends_with(struct ndpi_detection_module_struct *ndpi_struct,
+			char *str, char *ends);
 
 u_int ndpi_search_tcp_or_udp_raw(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
