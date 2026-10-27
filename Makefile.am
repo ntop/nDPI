@@ -40,6 +40,8 @@ EXTRA_DIST = README.md README.cve.md README.fuzzer.md README.license.md CHANGELO
 		lists/125_scanners.list \
 		lists/protocols/266_salesforce.list \
 		lists/protocols/42_mining_ip.list \
+		lists/protocols/499_anthropic.list \
+		doc/tcp_fingerprint.rst \
 		lists/public_suffix_list.dat \
 		lists/README.md \
 		lists/protocols/README.md \

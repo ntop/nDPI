@@ -1,0 +1,74 @@
+Guessed flow protos:	8
+
+DPI Packets (TCP):	54	(4.15 pkts/flow)
+DPI Packets (UDP):	34	(3.78 pkts/flow)
+Confidence Match by port    : 8 (flows)
+Confidence DPI              : 14 (flows)
+Num dissector calls: 953 (43.32 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/33/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/2/0 (insert/search/found)
+LRU cache mining:     0/8/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/17/0 (insert/search/found)
+Automa host:          15/2 (search/found)
+Automa domain:        8/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     1/0 (search/found)
+Automa common alpns:  3/3 (search/found)
+Patricia risk mask:   8/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   28/16 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 72/45 (search/found)
+Hash ja4 custom protos:    9/0 (search/found)
+Hash fp custom protos:     3/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+DNS	28	3505	2
+NetBIOS	3	276	1
+TLS	213	65492	13
+Apple	106	64308	2
+QUIC	1201	841040	4
+
+Safe                           319 129800        15           
+Acceptable                    1232 844821        7            
+
+Web                           1414 906532        17           
+Network                         28 3505          2            
+System                           3 276           1            
+ConnCheck                      106 64308         2            
+
+JA Host Stats: 
+		 IP Address                  	 # JA4C     
+	1	 172.20.10.6              	 2      
+
+
+	1	UDP 172.20.10.6:49572 <-> 160.79.104.10:443 [proto: 188/QUIC][Stack: QUIC][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 12][cat: Web/5][Breed: Acceptable][241 pkts/114461 bytes <-> 822 pkts/637764 bytes][Goodput ratio: 91/95][31.86 sec][bytes ratio: -0.696 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 122/25 4526/4608 527/225][Pkt Len c2s/s2c min/avg/max/stddev: 86/64 475/776 1292/1242 506/511][PLAIN TEXT (@euOFI)][Plen Bins: 5,13,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,5,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,66,0,2,0,0,0,0,0,0,0,0]
+	2	UDP 172.20.10.6:62751 <-> 34.36.57.103:443 [proto: 188/QUIC][Stack: QUIC][IP: 284/GoogleCloud][Encrypted][Confidence: DPI][FPC: 284/GoogleCloud, Confidence: IP address][DPI packets: 3][cat: Web/5][Breed: Acceptable][72 pkts/75098 bytes <-> 38 pkts/3064 bytes][Goodput ratio: 96/48][20.16 sec][bytes ratio: 0.922 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 311/335 9410/9432 1616/1661][Pkt Len c2s/s2c min/avg/max/stddev: 75/66 1043/81 1292/179 479/34][PLAIN TEXT (tAnfYX)][Plen Bins: 31,12,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,3,48,0,0,0,0,0,0,0,0]
+	3	UDP 172.20.10.6:64563 <-> 17.253.14.173:443 [proto: 188.140/QUIC.Apple][Stack: QUIC.Apple][IP: 140/Apple][Encrypted][Confidence: DPI][FPC: 188.140/QUIC.Apple, Confidence: DPI][DPI packets: 1][cat: ConnCheck/30][Breed: Safe][15 pkts/6022 bytes <-> 39 pkts/29029 bytes][Goodput ratio: 90/94][0.62 sec][Hostname/SNI: tether.edge.apple][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: -0.656 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 33/9 102/104 41/27][Pkt Len c2s/s2c min/avg/max/stddev: 88/72 401/744 1392/1392 488/566][nDPI Cli Fingerprint: d38b7de01c5dfe26a1c80a4f5ac08de8][TLSv1.3][QUIC ver: V-1][JA4: q13d0111h3_ee47968ec53b_e36affaf772c][TLS-C: q13d0108h3_ee47968ec53b_37e219797ba5_6d9185085db1][PLAIN TEXT (EcmBUQ)][Plen Bins: 10,27,1,7,0,0,1,1,0,1,0,3,0,0,1,1,0,0,0,0,3,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,12,0,0,1,1,22,0,0,0,0,0]
+	4	UDP 172.20.10.6:54988 <-> 17.253.14.173:443 [proto: 188.140/QUIC.Apple][Stack: QUIC.Apple][IP: 140/Apple][Encrypted][Confidence: DPI][FPC: 188.140/QUIC.Apple, Confidence: DPI][DPI packets: 1][cat: ConnCheck/30][Breed: Safe][17 pkts/5852 bytes <-> 35 pkts/23405 bytes][Goodput ratio: 88/94][0.53 sec][Hostname/SNI: tether.edge.apple][(Advertised) ALPNs: h3][TLS Supported Versions: TLSv1.3][bytes ratio: -0.600 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 23/9 116/99 40/25][Pkt Len c2s/s2c min/avg/max/stddev: 88/73 344/669 1392/1392 439/558][nDPI Cli Fingerprint: d38b7de01c5dfe26a1c80a4f5ac08de8][TLSv1.3][QUIC ver: V-1][JA4: q13d0111h3_ee47968ec53b_e36affaf772c][TLS-C: q13d0108h3_ee47968ec53b_37e219797ba5_6d9185085db1][PLAIN TEXT (hDKKDK)][Plen Bins: 8,32,3,5,1,0,1,1,0,1,3,3,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,3,0,0,12,0,0,1,0,17,0,0,0,0,0]
+	5	TCP 172.20.10.6:49935 <-> 107.21.41.111:443 [proto: 91/TLS][Stack: TLS][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 7][cat: Web/5][Breed: Safe][16 pkts/5190 bytes <-> 20 pkts/10235 bytes][Goodput ratio: 80/87][1.23 sec][bytes ratio: -0.327 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 13/43 147/258 40/87][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 324/512 1414/1414 492/570][Plen Bins: 18,13,13,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0,4,0,0,0,0,0,4,28,0,0,0,0,0]
+	6	TCP 172.20.10.6:49940 <-> 54.185.28.157:443 [proto: 91/TLS][Stack: TLS][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 6][cat: Web/5][Breed: Safe][22 pkts/8540 bytes <-> 14 pkts/4597 bytes][Goodput ratio: 75/80][4.54 sec][bytes ratio: 0.300 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/230 219/23 3016/230 690/69][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 388/328 1414/928 490/368][Plen Bins: 0,38,16,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,8,8,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,8,0,0,0,0,0]
+	7	TCP 172.20.10.6:49933 <-> 160.79.104.10:443 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 9][cat: Web/5][Breed: Safe][22 pkts/8431 bytes <-> 33 pkts/4439 bytes][Goodput ratio: 82/51][10.52 sec][bytes ratio: 0.310 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 569/339 7809/7907 1884/1488][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 383/135 1361/366 473/107][Plen Bins: 18,42,3,0,0,0,0,0,6,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,6,3,0,0,0,0,0,3,0,0,0,0,0,0,0]
+	8	TCP 172.20.10.6:49937 <-> 54.187.159.182:443 [proto: 91/TLS][Stack: TLS][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 91/TLS, Confidence: DPI][DPI packets: 6][cat: Web/5][Breed: Safe][22 pkts/6736 bytes <-> 14 pkts/6021 bytes][Goodput ratio: 78/85][1.16 sec][bytes ratio: 0.056 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 57/60 348/335 107/105][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 306/430 994/947 348/393][Plen Bins: 0,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,16,0,0,0,16,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	TCP 172.20.10.6:49942 <-> 34.237.73.95:443 [proto: 91/TLS][Stack: TLS][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 461/AWS_EC2, Confidence: IP address][DPI packets: 8][cat: Web/5][Breed: Safe][15 pkts/4150 bytes <-> 14 pkts/5786 bytes][Goodput ratio: 76/84][15.81 sec][Hostname/SNI: nexus-websocket-a.intercom.io][(Advertised) ALPNs: http/1.1][TLS Supported Versions: GREASE;TLSv1.3;TLSv1.2][bytes ratio: -0.165 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 1284/1406 15000/15053 4136/4316][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 277/413 1414/1414 366/531][Risk: ** Non PQC Compliant Flow **][Risk Score: 50][Risk Info: TLS 1.3 negotiated non-PQ group 0x001D][nDPI Cli Fingerprint: be29726ef4ec06635b3a68755ef5b81f][nDPI Srv Fingerprint: 81dba73ae426][TCP Fingerprint: 194_64_65535_e76f0f14/macOS/iOS/iPad][MSS: 1460][TLSv1.3][JA4: t13d1516h1_8daaf6152771_0d365e64def3][TLS-C: t13d1513h1_8daaf6152771_5845bf12868f_646c356617d7][JA3S: 15af977ce25de452b96affa2addb1036][ECH: version 0xfe0d][Chrome][Cipher: TLS_AES_256_GCM_SHA384][Plen Bins: 11,5,28,5,0,0,0,5,5,5,0,0,0,0,0,5,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,0,0,0,0,0]
+	10	UDP 172.20.10.6:60542 <-> 17.253.14.173:443 [proto: 188/QUIC][Stack: QUIC][IP: 140/Apple][Encrypted][Confidence: DPI][FPC: 140/Apple, Confidence: IP address][DPI packets: 6][cat: Web/5][Breed: Acceptable][4 pkts/873 bytes <-> 6 pkts/5681 bytes][Goodput ratio: 81/96][15.39 sec][bytes ratio: -0.734 (Download)][IAT c2s/s2c min/avg/max/stddev: 406/0 5129/3054 14540/14712 6654/5831][Pkt Len c2s/s2c min/avg/max/stddev: 88/73 218/947 349/1392 130/618][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 7.851 (Encrypted or Random?)][PLAIN TEXT (XeHE233)][Plen Bins: 20,20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,20,0,0,0,0,0]
+	11	UDP 172.20.10.6:53803 <-> 34.102.213.72:443 [proto: 188/QUIC][Stack: QUIC][IP: 284/GoogleCloud][Encrypted][Confidence: DPI][FPC: 284/GoogleCloud, Confidence: IP address][DPI packets: 5][cat: Web/5][Breed: Acceptable][9 pkts/3237 bytes <-> 9 pkts/862 bytes][Goodput ratio: 88/56][10.43 sec][bytes ratio: 0.579 (Upload)][IAT c2s/s2c min/avg/max/stddev: 98/101 1463/1463 8243/8291 2804/2825][Pkt Len c2s/s2c min/avg/max/stddev: 74/66 360/96 946/151 401/39][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 6.479 (Executable?)][Plen Bins: 33,33,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	12	UDP 172.20.10.6:58695 <-> 172.20.10.1:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 3][cat: Network/14][Breed: Acceptable][11 pkts/1063 bytes <-> 11 pkts/1706 bytes][Goodput ratio: 56/73][5.12 sec][Hostname/SNI: 6.10.20.172.in-addr.arpa][0.0.0.0][DNS Id: 0x8785][bytes ratio: -0.232 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 444/396 1001/1028 497/487][Pkt Len c2s/s2c min/avg/max/stddev: 95/147 97/155 99/167 1/6][Risk: ** Error Code **][Risk Score: 10][Risk Info: DNS Error Code NXDOMAIN][PLAIN TEXT (localhost)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	UDP 172.20.10.6:64482 <-> 172.20.10.1:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][3 pkts/292 bytes <-> 3 pkts/444 bytes][Goodput ratio: 57/71][1.09 sec][Hostname/SNI: 182.159.187.54.in-addr.arpa][0.0.0.0][DNS Id: 0x716a][DNS Ptr: ip-54-187-159-182.stripe.com][bytes ratio: -0.207 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 500/498 1001/995 500/498][Pkt Len c2s/s2c min/avg/max/stddev: 97/140 97/148 98/160 0/9][PLAIN TEXT (stripe)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	14	TCP 172.20.10.6:49939 <-> 54.187.159.182:443 [proto: 91/TLS][Stack: TLS][IP: 461/AWS_EC2][Encrypted][Confidence: DPI][FPC: 461/AWS_EC2, Confidence: IP address][DPI packets: 4][cat: Web/5][Breed: Safe][3 pkts/186 bytes <-> 4 pkts/341 bytes][Goodput ratio: 0/23][14.78 sec][bytes ratio: -0.294 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 7392/7256 14785/14513 7392/7256][Pkt Len c2s/s2c min/avg/max/stddev: 54/66 62/85 66/112 6/20][Plen Bins: 50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	15	UDP 172.20.10.6:137 -> 172.20.10.15:137 [proto: 10/NetBIOS][Stack: NetBIOS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 10/NetBIOS, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Acceptable][3 pkts/276 bytes -> 0 pkts/0 bytes][Goodput ratio: 54/0][3.00 sec][Hostname/SNI: workgroup][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT ( FHEPFCELEHFCEPFFFACACACACACACA)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	16	TCP 172.20.10.6:49927 <-> 172.64.152.29:443 [proto: 91/TLS][Stack: TLS][IP: 220/Cloudflare][Encrypted][Confidence: Match by port][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 2][cat: Web/5][Breed: Safe][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.06 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	17	TCP 172.20.10.6:49928 <-> 172.64.152.29:443 [proto: 91/TLS][Stack: TLS][IP: 220/Cloudflare][Encrypted][Confidence: Match by port][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 2][cat: Web/5][Breed: Safe][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.09 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	18	TCP 172.20.10.6:49929 <-> 172.64.152.241:443 [proto: 91/TLS][Stack: TLS][IP: 220/Cloudflare][Encrypted][Confidence: Match by port][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 2][cat: Web/5][Breed: Safe][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.12 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	19	TCP 172.20.10.6:49930 <-> 172.64.149.196:443 [proto: 91/TLS][Stack: TLS][IP: 220/Cloudflare][Encrypted][Confidence: Match by port][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 2][cat: Web/5][Breed: Safe][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.12 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	20	TCP 172.20.10.6:49931 <-> 151.101.240.176:443 [proto: 91/TLS][Stack: TLS][IP: 0/Unknown][Encrypted][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 2][cat: Web/5][Breed: Safe][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.12 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	21	TCP 172.20.10.6:49932 <-> 172.64.152.29:443 [proto: 91/TLS][Stack: TLS][IP: 220/Cloudflare][Encrypted][Confidence: Match by port][FPC: 220/Cloudflare, Confidence: IP address][DPI packets: 2][cat: Web/5][Breed: Safe][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.05 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	22	TCP 172.20.10.6:49934 <-> 34.36.57.103:443 [proto: 91/TLS][Stack: TLS][IP: 284/GoogleCloud][Encrypted][Confidence: Match by port][FPC: 284/GoogleCloud, Confidence: IP address][DPI packets: 2][cat: Web/5][Breed: Safe][1 pkts/54 bytes <-> 1 pkts/66 bytes][Goodput ratio: 0/0][0.05 sec][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

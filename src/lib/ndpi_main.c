@@ -1300,6 +1300,15 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
 			      NDPI_PROTOCOL_APACHE_THRIFT,
 			      NDPI_PROTOCOL_JSON_RPC,
 			      NDPI_PROTOCOL_HL7,
+			      NDPI_PROTOCOL_OLLAMA,
+			      NDPI_PROTOCOL_VLLM,
+			      NDPI_PROTOCOL_LLAMA_CPP,
+			      NDPI_PROTOCOL_SGLANG,
+			      NDPI_PROTOCOL_RADIANCE,
+			      NDPI_PROTOCOL_MLX_VLM,
+			      NDPI_PROTOCOL_OMLX,
+			      NDPI_PROTOCOL_VMLX,
+			      NDPI_PROTOCOL_STRATA,
 			      NDPI_PROTOCOL_MATCHED_BY_CONTENT,
 			      NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS); /* NDPI_PROTOCOL_HTTP can have (content-matched) subprotocols */
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MDNS,
@@ -3051,6 +3060,120 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
                           0, 0 /* protocol classification cannot change if partial */);
   ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_POWERSHELL,
                           "PowerShell", NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  /*
+    Self-hosted LLM runtimes: no TCP/UDP port is registered on purpose. These
+    servers are routinely reverse-proxied, run on arbitrary ports or are
+    tunnelled, and the well known ports (11434/8000/8080) belong to a huge
+    number of unrelated HTTP services: port based matching would produce a
+    massive amount of false positives. Classification is payload based, see
+    src/lib/protocols/ollama.c.
+  */
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_OLLAMA,
+                          "Ollama", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VLLM,
+                          "vLLM", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_LLAMA_CPP,
+                          "LlamaCpp", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  /*
+    SGLang, same policy as the other self-hosted LLM engines: no ports at all.
+    SGLang listens on an arbitrary --port (30000 by default) and the proxies /
+    embedders around it expose it on whichever port fits, so any port we picked
+    would only generate false positives (see the note in ollama.c).
+  */
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SGLANG,
+                          "SGLang", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_RADIANCE,
+                          "Radiance", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MLX_VLM,
+                          "MLX-VLM", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_OMLX,
+                          "oMLX", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VMLX,
+                          "vMLX", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_STRATA,
+                          "Strata", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ZAI,
+                          "Z.ai", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_ALIBABA_QWEN,
+                          "AlibabaQwen", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MINIMAX,
+                          "MiniMax", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_MOONSHOT,
+                          "Moonshot", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_VOLCENGINE_ARK,
+                          "VolcengineArk", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_SILICONFLOW,
+                          "SiliconFlow", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_BAIDU_QIANFAN,
+                          "BaiduQianfan", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_TENCENT_HUNYUAN,
+                          "TencentHunyuan", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_IFLYTEK_SPARK,
+                          "iFlytekSpark", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_STEPFUN,
+                          "StepFun", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AI01,
+                          "01AI", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
                           0, 0 /* protocol classification cannot change if partial */);
@@ -7634,6 +7757,17 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Free Fire */
   init_freefire_dissector(ndpi_str);
 
+  /* Self-hosted LLM runtimes (payload based, HTTP sub-protocols) */
+  init_ollama_dissector(ndpi_str);
+  init_vllm_dissector(ndpi_str);
+  init_llamacpp_dissector(ndpi_str);
+  init_sglang_dissector(ndpi_str);
+  init_radiance_dissector(ndpi_str);
+  init_mlxvlm_dissector(ndpi_str);
+  init_omlx_dissector(ndpi_str);
+  init_vmlx_dissector(ndpi_str);
+  init_strata_dissector(ndpi_str);
+
 
 
   /* Keep DNS as last entry! */
@@ -10659,6 +10793,7 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
                            struct ndpi_flow_struct *flow)
 {
   u_int16_t fpc_dns_cached_proto;
+  int dpi_verdict = 0;
 
   if(!ndpi_str->cfg.fpc_enabled)
     return;
@@ -10674,9 +10809,24 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
 
   /* DPI */
   if(flow->core.detected_protocol_stack[0] != NDPI_PROTOCOL_UNKNOWN) {
-    fpc_update(ndpi_str, flow, flow->core.detected_protocol_stack[1],
-               flow->core.detected_protocol_stack[0], NDPI_FPC_CONFIDENCE_DPI);
-    return;
+    /*
+      A bare secure transport is not an answer about the peer: with TLS/QUIC and
+      no sub-protocol, the SNI is all nDPI has, and ECH removes even that. For
+      those flows only, keep going: the DNS answer the client itself resolved,
+      and failing that the by-IP intel, name the flow from evidence an encrypted
+      transport cannot hide. If neither knows, the transport verdict stands.
+    */
+    int transport_only = ((flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_TLS ||
+                           flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_QUIC) &&
+                          (flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN));
+
+    if(!transport_only) {
+      fpc_update(ndpi_str, flow, flow->core.detected_protocol_stack[1],
+                 flow->core.detected_protocol_stack[0], NDPI_FPC_CONFIDENCE_DPI);
+      return;
+    }
+
+    dpi_verdict = 1;
   }
 
   /* Check via fpc DNS cache */
@@ -10689,12 +10839,21 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
     return;
   }
 
-  /* Check via IP */
-  if(flow->core.guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
+  /* Check via IP. Only for flows DPI could not name at all: for a bare TLS/QUIC
+     flow the by-IP guess (a cloud/CDN protocol) is reported as proto_by_ip,
+     which is where it belongs, and FPC keeps saying TLS rather than trading a
+     truth for a CDN label. */
+  if(!dpi_verdict &&
+     flow->core.guessed_protocol_id_by_ip != NDPI_PROTOCOL_UNKNOWN) {
     fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
                flow->core.guessed_protocol_id_by_ip, NDPI_FPC_CONFIDENCE_IP);
     return;
   }
+
+  /* Nothing better than the DPI verdict is known: it stands (TLS/QUIC only). */
+  if(dpi_verdict)
+    fpc_update(ndpi_str, flow, flow->core.detected_protocol_stack[1],
+               flow->core.detected_protocol_stack[0], NDPI_FPC_CONFIDENCE_DPI);
 }
 
 /* ********************************************************************************* */
@@ -12604,10 +12763,42 @@ static u_int16_t ndpi_automa_match_string_subprotocol(struct ndpi_detection_modu
 
 /* ****************************************************** */
 
+/*
+  The hosted AI providers (498-507 and 517-527, see ndpi_protocol_ids.h). The
+  self-hosted engines (508-516) are deliberately not included: they are named,
+  and reported, by their own dissectors from the request payload.
+*/
+static int ndpi_is_ai_provider_protocol(u_int16_t proto) {
+  return((proto >= NDPI_PROTOCOL_OPENAI   && proto <= NDPI_PROTOCOL_PERPLEXITY) ||
+         (proto >= NDPI_PROTOCOL_ZAI      && proto <= NDPI_PROTOCOL_AI01));
+}
+
 void ndpi_check_subprotocol_risk(struct ndpi_detection_module_struct *ndpi_str,
 				 struct ndpi_flow_struct *flow, u_int16_t subprotocol_id) {
 
   if(!ndpi_str) return;
+
+  /*
+    A hosted AI provider named on an encrypted flow. The payload is encrypted, so
+    the only other thing nDPI knows about the far end is the TCP stack that opened
+    the connection, and that is worth reporting: an AI API called from a Linux
+    server and the same call from a laptop are different facts to a policy, and
+    under ECH the name is gone, so the stack is what remains. It is appended to
+    the risk raised by the name match, and it says what it is - the client TCP
+    stack, not the application: nDPI does not know which process made the call,
+    and behind a proxy this is the proxy's stack.
+  */
+  if(ndpi_is_ai_provider_protocol(subprotocol_id) &&
+     (flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_TLS ||
+      flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_QUIC) &&
+     flow->metadata.l4.tcp.fingerprint != NULL &&
+     flow->metadata.l4.tcp.os_hint != ndpi_os_unknown) {
+    char info[64];
+
+    snprintf(info, sizeof(info), "client TCP stack: %s",
+             ndpi_print_os_hint(flow->metadata.l4.tcp.os_hint));
+    ndpi_set_risk(ndpi_str, &flow->core, NDPI_AI_INFERENCE_TRAFFIC, info);
+  }
 
   switch(subprotocol_id) {
   case NDPI_PROTOCOL_ANYDESK:
@@ -12699,6 +12890,24 @@ u_int16_t ndpi_match_host_subprotocol(struct ndpi_detection_module_struct *ndpi_
     }
   }
 
+  /*
+    A hosted AI provider named by an encrypted flow: on TLS/QUIC the name is the
+    only evidence nDPI gets, the payload is encrypted, and ECH can take the name
+    away as well. The risk is reported, with a string that says exactly what it
+    is - an AI provider peer, from the name - and not that inference was proven.
+    The proven cases (an OpenAI/Anthropic compatible call, an engine endpoint on
+    cleartext HTTP) are reported by vllm.c/llm_api.c with a far more specific
+    string and are untouched here, since there the master protocol is HTTP.
+  */
+  if(rc != NDPI_PROTOCOL_UNKNOWN &&
+     (master_protocol_id == NDPI_PROTOCOL_TLS || master_protocol_id == NDPI_PROTOCOL_QUIC) &&
+     ndpi_is_ai_provider_protocol(ret_match->protocol_id)) {
+    if(is_flowrisk_info_enabled(ndpi_str, NDPI_AI_INFERENCE_TRAFFIC))
+      ndpi_set_risk(ndpi_str, core, NDPI_AI_INFERENCE_TRAFFIC, "AI provider peer (SNI/Host name)");
+    else
+      ndpi_set_risk(ndpi_str, core, NDPI_AI_INFERENCE_TRAFFIC, NULL);
+  }
+
   /* Add punycode check */
   if(ndpi_check_punycode_string(string_to_match, string_to_match_len)) {
     if(is_flowrisk_info_enabled(ndpi_str, NDPI_PUNYCODE_IDN)) {
@@ -12736,6 +12945,10 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
 					 &ret_match, master_protocol, 1);
 
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
+    /* The name matched, so this is the point where a subprotocol identified by
+       name (SNI, certificate name, Host) gets the risks that go with it - the
+       certificate paths in tls.c already do this, the name path did not. */
+    ndpi_check_subprotocol_risk(ndpi_struct, flow, subproto);
     return(1);
   } else
     return(0);

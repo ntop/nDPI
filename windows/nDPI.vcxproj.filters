@@ -282,6 +282,16 @@
     <ClCompile Include="..\src\lib\protocols\syncthing.c" />
     <ClCompile Include="..\src\lib\protocols\natpmp.c" />
     <ClCompile Include="..\src\lib\protocols\crynet.c" />
+    <ClCompile Include="..\src\lib\protocols\llm_api.c" />
+    <ClCompile Include="..\src\lib\protocols\ollama.c" />
+    <ClCompile Include="..\src\lib\protocols\vllm.c" />
+    <ClCompile Include="..\src\lib\protocols\llamacpp.c" />
+    <ClCompile Include="..\src\lib\protocols\sglang.c" />
+    <ClCompile Include="..\src\lib\protocols\radiance.c" />
+    <ClCompile Include="..\src\lib\protocols\mlxvlm.c" />
+    <ClCompile Include="..\src\lib\protocols\omlx.c" />
+    <ClCompile Include="..\src\lib\protocols\vmlx.c" />
+    <ClCompile Include="..\src\lib\protocols\strata.c" />
     <ClCompile Include="..\example\ndpiReader.c" />
     <ClCompile Include="..\example\reader_util.c" />
     <ClCompile Include="..\example\utests.c" />

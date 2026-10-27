@@ -4530,3 +4530,303 @@ References: `Official site: <https://learn.microsoft.com/en-us/powershell>`_
 JanitorAI is an AI roleplay platform, often featuring adult content.
 
 References: `JanitorAI official site: <https://janitorai.com>`_
+
+.. _Proto_498:
+
+`NDPI_PROTOCOL_OPENAI`
+======================
+OpenAI is the developer platform behind ChatGPT and the OpenAI APIs.
+
+References: `OpenAI platform: <https://openai.com>`_
+
+Notes: Matches the ChatGPT web app and the API endpoints (openai.com, chatgpt.com, oaistatic.com, oaiusercontent.com). Traffic is HTTPS, therefore detection is based on the TLS SNI.
+
+.. _Proto_499:
+
+`NDPI_PROTOCOL_ANTHROPIC`
+=========================
+Anthropic is the developer of the Claude family of models.
+
+References: `Anthropic official site: <https://www.anthropic.com>`_
+
+Notes: Matches the Claude web app and API endpoints (anthropic.com, claude.ai, claudeusercontent.com). Detection is based on the TLS SNI.
+
+.. _Proto_500:
+
+`NDPI_PROTOCOL_GOOGLE_GEMINI`
+=============================
+Google Gemini is Google's family of multimodal models, exposed via the Gemini web app, AI Studio, NotebookLM and the Generative Language API.
+
+References: `Google AI for Developers: <https://ai.google.dev>`_
+
+Notes: Only the Google AI/Gemini endpoints are matched, not the general googleapis.com infrastructure. Detection is based on the TLS SNI.
+
+.. _Proto_501:
+
+`NDPI_PROTOCOL_DEEPSEEK`
+========================
+DeepSeek is an AI model provider offering a chat assistant and OpenAI compatible APIs.
+
+References: `DeepSeek official site: <https://www.deepseek.com>`_
+
+Notes: Includes the telemetry/CDN endpoints observed in real browser captures (gator.volces.com, apmplus.volces.com), which are the only cleartext-visible hostnames of some DeepSeek sessions. Detection is based on the TLS SNI. The DeepSeek dialect of the request is reported by the AI inference risk even on a self-hosted engine: DeepSeek-only request fields (a ``latest_reminder`` message role, assistant ``prefix``, ``output_config``, ``tool_search``, ``response_format`` of type ``regex``, ``reasoning_effort`` ``xhigh``/``ultra`` and the fullwidth-bar special tokens) are matched in the cleartext body, as is a ``deepseek`` model id. Note that servers built on deepseek-recipe (the DeepSeek API conversion library) read no request header at all, so ``/v1/messages`` reaches them without ``anthropic-version`` and is recognised from the payload shape.
+
+.. _Proto_502:
+
+`NDPI_PROTOCOL_MISTRAL`
+=======================
+Mistral AI is a European AI model provider offering Le Chat and OpenAI compatible APIs.
+
+References: `Mistral AI official site: <https://mistral.ai>`_
+
+Notes: Detection is based on the TLS SNI.
+
+.. _Proto_503:
+
+`NDPI_PROTOCOL_XAI`
+===================
+xAI is the developer of the Grok models, exposed via grok.com, grokipedia.com and the xAI API.
+
+References: `xAI official site: <https://x.ai>`_
+
+Notes: The x.ai domain is matched through the (label aware) category matcher only: as a host suffix it would also match unrelated domains, so no protocol is attributed to it.
+
+.. _Proto_504:
+
+`NDPI_PROTOCOL_COHERE`
+======================
+Cohere is an AI provider focused on enterprise text models, embeddings and rerankers.
+
+References: `Cohere official site: <https://cohere.com>`_
+
+Notes: Detection is based on the TLS SNI.
+
+.. _Proto_505:
+
+`NDPI_PROTOCOL_GROQ`
+====================
+Groq is an inference provider serving open models with very low latency via an OpenAI compatible API.
+
+References: `Groq official site: <https://groq.com>`_
+
+Notes: Detection is based on the TLS SNI.
+
+.. _Proto_506:
+
+`NDPI_PROTOCOL_HUGGINGFACE`
+===========================
+Hugging Face is an AI community and model hub hosting models, datasets and Spaces.
+
+References: `Hugging Face official site: <https://huggingface.co>`_
+
+Notes: Includes the hf.co short domain. Detection is based on the TLS SNI.
+
+.. _Proto_507:
+
+`NDPI_PROTOCOL_PERPLEXITY`
+==========================
+Perplexity is an AI powered answer engine with a web app and an API.
+
+References: `Perplexity official site: <https://www.perplexity.ai>`_
+
+Notes: Detection is based on the TLS SNI.
+
+.. _Proto_508:
+
+`NDPI_PROTOCOL_OLLAMA`
+======================
+Ollama is a self-hosted LLM runtime exposing a native HTTP API and an OpenAI compatible one.
+
+References: `Ollama official site: <https://ollama.com>`_
+
+Notes: Detected by payload (native /api/... endpoints), never by port: Ollama is routinely reverse-proxied or tunnelled, e.g. over TLS on an arbitrary port. Like any HTTP subprotocol it is reported as HTTP.<name>.
+
+.. _Proto_509:
+
+`NDPI_PROTOCOL_VLLM`
+====================
+vLLM is a high throughput, open source LLM serving engine exposing an OpenAI compatible API.
+
+References: `vLLM official site: <https://docs.vllm.ai>`_
+
+Notes: Attributed only on the vLLM specific control endpoints (/load, /scale, /version, /model_info, ...). Endpoints shared with every OpenAI compatible engine (llama.cpp, Ollama, TGI, ...) just raise the AI inference risk, without guessing a vendor. Detected by payload, never by port.
+
+.. _Proto_510:
+
+`NDPI_PROTOCOL_LLAMA_CPP`
+=========================
+llama.cpp is the C/C++ inference engine behind many local LLM applications; its HTTP server exposes a native API next to an OpenAI compatible one. LM Studio, KoboldCpp and GPT4All embed it.
+
+References: `llama.cpp repository: <https://github.com/ggml-org/llama.cpp>`_
+
+Notes: Attributed on the native endpoints (/completion, /props, /slots, ...) and on the LM Studio /api/v0/ API. The shared OpenAI compatible endpoints only raise the AI inference risk. Detected by payload, never by port.
+
+.. _Proto_511:
+
+`NDPI_PROTOCOL_SGLANG`
+======================
+SGLang (SRT) is an open LLM serving engine; like the other self-hosted runtimes it exposes an OpenAI compatible API next to a native one, and it is usually fronted by a router/proxy on an arbitrary port.
+
+References: `SGLang repository: <https://github.com/sgl-project/sglang>`_
+
+Notes: Attributed on the routes no other serving engine exposes (/get_server_info, /get_model_info, /get_load, /flush_cache, /update_weights_from_disk, ...). Its native ``/generate`` route is shared with TGI, so it names SGLang only when the body carries SGLang's own ``sampling_params`` field; without that proof the flow only raises the AI inference risk, naming both engines. The OpenAI compatible API never names a vendor. Detected by payload, never by port.
+
+.. _Proto_512:
+
+`NDPI_PROTOCOL_RADIANCE`
+========================
+Radiance is an open inference server for AMD GPUs (C++/HIP). It implements, on a single port, OpenAI's chat/completions/responses/images/audio/video APIs, Anthropic's Messages API, llama-server's native API and vLLM's control API, so it is the reference case for engines that expose several APIs at once.
+
+References: `Radiance repository: <https://codeberg.org/StillDeadcode/radiance>`_
+
+Notes: Attributed only on the routes the project defines itself (``/v1/systemone``, ``/v1/loras``, ``/v1/load_lora_adapter``, ``/v1/health``, ``/get_tokenizer_info``, and the ``/input_tokens`` token counters). Its borrowed routes keep naming the API they speak, which is all a single request can prove: a ``/completion`` flow is llama.cpp's API, a ``/load`` flow is vLLM's, and both are Radiance serving it. Detected by payload, never by port.
+
+.. _Proto_513:
+
+`NDPI_PROTOCOL_MLX_VLM`
+=======================
+MLX-VLM is an open serving engine for vision-language, audio, embedding, reranking and decision models on Apple Silicon. Like the rest of the MLX serving family it leads with an OpenAI compatible API and Anthropic's Messages API.
+
+References: `MLX-VLM repository: <https://github.com/Blaizzy/mlx-vlm>`_
+
+Notes: Attributed only on the routes the project defines itself (``/v1/images/defaults``, ``/v1/moe-offload/stats``, ``/v1/settings``, ``/v1/metrics``, ``/v1/cache/reset``). Routes a sibling engine serves under the same name never name it: ``/v1/decisions`` is also oMLX's, ``/unload`` is also Strata's, ``/v1/cache/stats`` is also vMLX's and ``/v1/audio/voices`` is also oMLX's; those raise the AI inference risk naming the engines that share them. Detected by payload, never by port.
+
+.. _Proto_514:
+
+`NDPI_PROTOCOL_OMLX`
+====================
+oMLX is an OpenAI compatible inference server for Apple Silicon with continuous batching and SSD caching.
+
+References: `oMLX repository: <https://github.com/jundot/omlx>`_
+
+Notes: Attributed on its own surface (``/v1/audio/process``, ``/v1/web/search``, ``/v1/web/fetch``, ``/v1/models/status`` and the ``/api/`` admin plane: ``/api/activity``, ``/api/bench/``, ``/api/oq/``, ``/api/profile-templates/``, ``/api/sub-keys``, ``/api/hf/task/``, ``/api/ms/task/``, ``/api/upload/task/``). Its data plane is entirely borrowed - ``/v1/chat/completions``, ``/v1/messages``, ``/v1/rerank``, ``/v1/systemone`` (shared with Radiance), ``/v1/decisions`` (shared with MLX-VLM) and vLLM's ``/tokenize``/``/detokenize`` - so those flows name the API, not oMLX. Detected by payload, never by port.
+
+.. _Proto_515:
+
+`NDPI_PROTOCOL_VMLX`
+====================
+vMLX is an inference engine for Apple Silicon that serves JANGQ (GGUF for MLX) model files, with an SSD cache and multi-node clustering.
+
+References: `vMLX repository: <https://github.com/jjang-ai/vmlx>`_
+
+Notes: Attributed on its own routes (``/health.mtp``, ``/v1/capabilities``, ``/v1/cluster/``, ``/v1/cache/entries``, ``/v1/cache/warm``, ``/admin/deep-sleep``, ``/admin/soft-sleep``, ``/admin/wake``). It ships adapters for Ollama's native API (``/api/tags``, ``/api/ps``, ``/api/show``, ...), Anthropic's Messages API and the OpenAI API, so a flow on one of those is named by that API - ``/api/tags`` is Ollama's route whether Ollama, vMLX or a proxy serves it. ``/v1/mcp/`` and ``/v1/cache/stats`` are shared with oMLX and MLX-VLM and name the family only. Detected by payload, never by port.
+
+.. _Proto_516:
+
+`NDPI_PROTOCOL_STRATA`
+======================
+Strata is an open inference engine for consumer hardware (Windows and Linux), with a C++ core and a Python control plane. It serves OpenAI, Anthropic Messages and llama-server APIs on one port.
+
+References: `Strata repository: <https://github.com/Niko1221/Strata>`_
+
+Notes: Attributed on the routes it defines (``/v1/status``, ``/v1/telemetry``, ``/metrics/prometheus``, ``/v1/vram``, ``/v1/load``, ``/v1/unload``, ``/v1/images/files/``, ``/api-monitor`` and its ``/v1/v1/messages`` base URL alias). Its ``/props`` and ``/slots`` flows are named LlamaCpp, which is the API they speak; ``/status``, ``/settings``, ``/config``, ``/models``, ``/mcp`` and ``/api/health`` are generic names and are not used. Bare ``POST /unload`` is shared with MLX-VLM. Detected by payload, never by port: its default 8095 collides with nothing, while its own docs run it on 8080, the default of vLLM, mlx_lm.server, vMLX and ninfer.
+
+.. _Proto_517:
+
+`NDPI_PROTOCOL_ZAI`
+===================
+Z.ai (Zhipu AI) is the platform behind the GLM models; the international API is https://api.z.ai/api/paas/v4 and the mainland one is open.bigmodel.cn.
+
+References: `<https://docs.z.ai/api-reference/introduction>`_
+
+Notes: OpenAI compatible chat/completions. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_518:
+
+`NDPI_PROTOCOL_ALIBABA_QWEN`
+============================
+Alibaba Cloud Model Studio (DashScope) serves the Qwen models through an OpenAI compatible API, https://dashscope.aliyuncs.com/compatible-mode/v1 (regional variants included).
+
+References: `<https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope>`_
+
+Notes: OpenAI compatible chat/completions, plus the qwen.ai and Tongyi chat clients. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_519:
+
+`NDPI_PROTOCOL_MINIMAX`
+=======================
+MiniMax serves the MiniMax and Hailuo models; international accounts use api.minimax.io, mainland accounts api.minimaxi.com.
+
+References: `<https://www.minimaxi.com>`_
+
+Notes: OpenAI compatible chat API. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_520:
+
+`NDPI_PROTOCOL_MOONSHOT`
+========================
+Moonshot AI serves the Kimi models (api.moonshot.cn / api.moonshot.ai) and the kimi.com chat client.
+
+References: `<https://platform.moonshot.cn/docs>`_
+
+Notes: OpenAI compatible chat API. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_521:
+
+`NDPI_PROTOCOL_VOLCENGINE_ARK`
+==============================
+Volcengine Ark (ByteDance) serves the Doubao and DeepSeek models through https://ark.cn-beijing.volces.com/api/v3, with one host per region.
+
+References: `<https://ark.volcengine.com/region:cn-beijing/docs/chat-api>`_
+
+Notes: OpenAI compatible chat/completions. The regional hosts are listed explicitly and the bare volces.com domain is not: ByteDance telemetry (gator.volces.com, apmplus.volces.com) lives under it and is attributed to DeepSeek, whose traffic it carries. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_522:
+
+`NDPI_PROTOCOL_SILICONFLOW`
+===========================
+SiliconFlow is an open-model inference cloud (api.siliconflow.cn) serving open weight models over an OpenAI compatible API.
+
+References: `<https://docs.siliconflow.cn>`_
+
+Notes: OpenAI compatible chat/embeddings/rerank. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_523:
+
+`NDPI_PROTOCOL_BAIDU_QIANFAN`
+=============================
+Baidu Qianfan (qianfan.baidubce.com) serves the ERNIE models.
+
+References: `<https://cloud.baidu.com/doc/qianfan>`_
+
+Notes: OpenAI compatible chat/completions under /v2. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_524:
+
+`NDPI_PROTOCOL_TENCENT_HUNYUAN`
+===============================
+Tencent Hunyuan serves the Hunyuan models through the Tencent Cloud API and the yuanqi.tencent.com client.
+
+References: `<https://cloud.tencent.com/document/product/1729>`_
+
+Notes: OpenAI compatible chat/completions. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_525:
+
+`NDPI_PROTOCOL_IFLYTEK_SPARK`
+=============================
+iFlytek Spark (Xinghuo) is served from api.xfyun.cn and spark-api.xf-yun.com.
+
+References: `<https://www.xfyun.cn/doc/spark>`_
+
+Notes: OpenAI compatible WebSocket/HTTP chat API. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_526:
+
+`NDPI_PROTOCOL_STEPFUN`
+=======================
+StepFun serves the Step models through api.stepfun.com.
+
+References: `<https://platform.stepfun.com/docs>`_
+
+Notes: OpenAI compatible chat/completions. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.
+
+.. _Proto_527:
+
+`NDPI_PROTOCOL_AI01`
+====================
+01.AI serves the Yi models through api.lingyiwanwu.com.
+
+References: `<https://platform.lingyiwanwu.com/docs>`_
+
+Notes: OpenAI compatible chat/completions. Attributed from the TLS SNI and, on cleartext flows, from the HTTP Host header: the payload is encrypted, so nothing in the request distinguishes this provider from any other server speaking the same API family. Detected by name, never by port.

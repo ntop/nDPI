@@ -363,7 +363,29 @@ This risk is triggered when an encrypted stream (e.g. TLS, QUIC, SSH, IPSEC) is 
 
 NDPI_AI_INFERENCE_TRAFFIC
 =========================
-This risk is triggered when TLS/HTTP traffic is likely to be used to access a self-hosted LLM based on applications with ac vLLM or llama.cpp
+This risk is triggered when the flow is observed running LLM inference, i.e. sending a prompt and receiving generated output. It is set on cleartext HTTP flows, where the API is visible:
+
+* a self-hosted LLM runtime, i.e. Ollama, vLLM, SGLang, llama.cpp, Radiance, MLX-VLM, oMLX, vMLX or Strata (including the applications embedding it, like LM Studio);
+* the endpoints of an engine that is not identified as a protocol (TGI, Triton/KServe, LiteLLM, LocalAI, ...), named in the risk info string; a route that two engines share (``/generate``, ``/classify``) names both of them, since picking one from the request alone would be a guess;
+* any OpenAI compatible inference API, identified by the endpoint (``/v1/chat/completions``, ``/chat/completions``, ``/v1/embeddings``, ...) and its media APIs (``/v1/images/generations``, ``/v1/images/edits``, ``/v1/audio/speech``, ``/v1/audio/transcriptions``) or, when the gateway URL is opaque, by the payload shape (``{"model":..., "messages":[{"role":..., "content":...}]}``); this is what surfaces inference driven through an LLM gateway/proxy and by benchmark/load generation tools;
+* any Anthropic compatible Messages API call, identified by the mandatory ``anthropic-version`` request header (which works on any URL, i.e. exactly how a gateway passthrough looks) or, without it, by the payload shape (``{"model":..., "max_tokens":..., "system":"...", "messages":[...]}`` — Anthropic requires ``max_tokens`` and takes the system prompt at top level, OpenAI does not). The ``/v1/messages`` route is never matched on its own: ``/messages`` is an extremely common web-API name;
+* the endpoints shared by every engine that only expose read-only information (``/v1/models``, ``/metrics``, ``/tokenize``).
+
+Vendor specific endpoints identify the engine (see the Ollama, vLLM, SGLang, Radiance and LlamaCpp protocols); the shared ones do not name a vendor, since it cannot be proven from the request alone. An engine that ships a compatibility surface for several APIs at once (Radiance implements OpenAI, Anthropic, llama-server and vLLM routes on one port) is only named by the routes it defines itself: a ``/completion`` flow is llama.cpp API whether llama.cpp or Radiance serves it, and that is all a single request proves.
+
+Engines that define no route of their own raise this risk and are never named, because naming them from a borrowed route would be a guess: ``mlx_lm.server`` serves only ``/v1/completions``, ``/v1/chat/completions``, ``/v1/models``, ``/chat/completions`` and ``/health``; ninfer serves OpenAI, OpenAI Responses, Anthropic and vLLM names and nothing else; DeepInfer exposes no HTTP inference API at all (its only endpoint is the profiling sidecar ``/profile``, and the DeepSeek API surface is the separate deepseek-recipe project). A route that several engines do share names all of them: ``/v1/systemone`` (Radiance, oMLX), ``/v1/decisions`` (MLX-VLM, oMLX), ``/v1/cache/stats`` (MLX-VLM, vMLX), ``/v1/audio/voices`` (oMLX, vMLX), ``POST /unload`` (MLX-VLM, Strata) and ``/v1/mcp/`` (oMLX, vMLX).
+
+The request body can also name the **dialect** of an OpenAI or Anthropic compatible call. A DeepSeek request carries fields that exist in no other API family - a ``latest_reminder`` message role, assistant level ``prefix``, ``output_config``, ``tool_search``, a ``response_format`` of type ``regex``, ``reasoning_effort`` set to ``xhigh`` or ``ultra``, the fullwidth-bar special tokens (``<｜begin｜of｜sentence｜>``) - and a ``deepseek`` model id is reported as well, which is how DeepSeek served by vLLM, SGLang, MLX or Strata on a private hostname is recognised. Reported the same way whichever engine served the request: SGLang, llama.cpp, Ollama, Radiance, MLX-VLM, oMLX, vMLX and Strata share one API layer, so a DeepSeek request reaching ``/generate`` reports the dialect next to the engine name, exactly as one reaching a plain ``/v1/chat/completions``. The protocol id of the provider is **not** set for those flows: the id names the peer, and the peer here is a machine of yours, not the DeepSeek service.
+
+Access to a **hosted** AI provider (ChatGPT, Claude, Gemini, DeepSeek, ...) is reported by the protocol (OpenAI, Anthropic, ...) and by the ``ARTIFICIAL_INTELLIGENCE`` category, both derived from the TLS SNI, and it raises this risk with the info string ``AI provider peer (SNI/Host name)``. Read that string for what it claims: on an encrypted flow the name is all nDPI sees, so it says *an AI provider is being talked to*, not that an inference call was made - the payload proven cases carry the specific strings listed above. Under ECH the SNI belongs to the CDN, so neither the protocol, the category nor this risk can name the provider; what is left is the DNS answer the client itself resolved (FPC, ``Confidence: DNS``) and per-protocol IP lists (``lists/protocols/``). When the connection began inside the capture, the same risk also reports the
+client's TCP stack: ``AI provider peer (SNI/Host name);client TCP stack: macOS/iOS/iPad``
+(the JSON flow record carries the same value as ``tcp_os``). That is the stack, not the
+application: nDPI does not know which process made the call, behind a proxy the stack is
+the proxy's, and a flow whose handshake was not captured has no fingerprint to report.
+The TCP fingerprint is computed from the first SYN only, so a server is never
+fingerprinted.
+
+The risk is informational (low severity): it surfaces AI usage, it does not flag malicious traffic.
 
 .. _Risk 060:
 
