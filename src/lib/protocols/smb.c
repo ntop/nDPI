@@ -66,6 +66,7 @@ static int is_remote_admin_name(const u_int8_t *name, u_int16_t name_len)
 
   return strcmp(buf, "svcctl") == 0 ||                     /* MS-SCMR: service control manager */
          strcmp(buf, "winreg") == 0 ||                     /* MS-RRP: remote registry */
+         strcmp(buf, "atsvc") == 0 ||                      /* MS-TSCH: task scheduler */
          strncmp(buf, "psexesvc", 8) == 0;                 /* PsExec binary and pipes */
 }
 
@@ -141,7 +142,7 @@ static int smb_search_again(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(rc == 1) {
     /*
-      Remote administration via svcctl/winreg named pipes (or PsExec).
+      Remote administration via svcctl/winreg/atsvc named pipes (or PsExec).
       Note that this traffic is generated not only by PowerShell
       (i.e. Get-Service/Set-Service -ComputerName, remote registry access)
       but also by sc.exe, reg.exe, PsExec, Impacket and by many

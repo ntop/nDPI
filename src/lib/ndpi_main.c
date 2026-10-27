@@ -7634,6 +7634,9 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Free Fire */
   init_freefire_dissector(ndpi_str);
 
+  /* PowerShell */
+  init_powershell_dissector(ndpi_str);
+
 
 
   /* Keep DNS as last entry! */

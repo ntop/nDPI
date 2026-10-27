@@ -4517,8 +4517,9 @@ References: `Supercell official site: <https://supercell.com/>`_
 ==========================
 PowerShell is a task-based command-line shell and scripting language developed
 by Microsoft for task automation and configuration management.
-nDPI detects PowerShell remoting over WinRM (HTTP/HTTPS) and remote administration via the svcctl/winreg
-interfaces (over SMB named pipes or DCE/RPC); note that the latter is also used by other tools (sc.exe, reg.exe, PsExec, ...).
+nDPI detects PowerShell remoting over WinRM (HTTP/HTTPS), remote administration via the svcctl/winreg/task scheduler
+interfaces (over SMB named pipes or DCE/RPC) and Active Directory Web Services (used by the ActiveDirectory module);
+note that the latter two are also used by other tools (sc.exe, reg.exe, schtasks.exe, PsExec, AD Administrative Center, ...).
 
 References: `Official site: <https://learn.microsoft.com/en-us/powershell>`_
 

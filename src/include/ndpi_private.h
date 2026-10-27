@@ -1130,6 +1130,7 @@ void init_iqiyi_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_egd_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_cod_mobile_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_freefire_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_powershell_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_zug_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_jrmi_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_ripe_atlas_dissector(struct ndpi_detection_module_struct *ndpi_struct);

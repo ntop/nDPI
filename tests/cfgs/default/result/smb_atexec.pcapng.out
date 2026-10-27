@@ -1,0 +1,36 @@
+DPI Packets (TCP):	20	(20.00 pkts/flow)
+Confidence DPI              : 1 (flows)
+Num dissector calls: 1 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/1/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   2/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/1 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+PowerShell	138	17474	1
+
+Acceptable                     138 17474         1            
+
+Network                        138 17474         1            
+
+	1	TCP 127.0.0.1:64040 <-> 127.0.0.1:445 [proto: 10.496/NetBIOS.PowerShell][Stack: NetBIOS.SMBv23.PowerShell][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 20][cat: Network/14][Breed: Acceptable][69 pkts/10535 bytes <-> 69 pkts/6939 bytes][Goodput ratio: 71/56][3.09 sec][bytes ratio: 0.206 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 55/56 3004/3004 401/405][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 153/101 3168/342 376/68][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 139][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (tGSJCcuXfsrxXi)][Plen Bins: 0,0,43,21,16,6,4,3,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
