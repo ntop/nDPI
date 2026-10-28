@@ -55,10 +55,38 @@ static int ndpi_search_snmp_again(struct ndpi_detection_module_struct *ndpi_stru
 
 /* *************************************************************** */
 
+/* Decode the INTEGER at the beginning of the buffer. Returns the number of bytes used or -1 */
+static int snmp_decode_int(const u_int8_t *buf, u_int32_t buf_len, int32_t *value) {
+  struct ndpi_asn1_ber_tlv tlv;
+  int used = ndpi_asn1_ber_decode_tlv(buf, buf_len, &tlv);
+
+  if(used < 0 || ndpi_asn1_ber_decode_int(buf, used, value) != 0)
+    return -1;
+
+  return used;
+}
+
+/* *************************************************************** */
+
+/*
+  Reference: https://datatracker.ietf.org/doc/html/rfc1157#section-4
+             https://datatracker.ietf.org/doc/html/rfc3416#section-3
+
+  Message ::= SEQUENCE { version INTEGER, community OCTET STRING, data PDU }
+  PDU     ::= [n] SEQUENCE { request-id INTEGER, error-status INTEGER, error-index INTEGER,
+                             variable-bindings }
+
+  For SNMPv3 we only look at the version: the rest of the message has a different layout
+*/
 static void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
 			     struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t snmp_port = htons(161), trap_port = htons(162);
+  struct ndpi_asn1_ber_tlv msg, community, pdu, request_id;
+  const u_int8_t *buf;
+  u_int32_t buf_len;
+  int32_t version, error_status;
+  int used;
 
   if((packet->udp->source != snmp_port) &&
      (packet->udp->dest != snmp_port) &&
@@ -68,80 +96,64 @@ static void ndpi_search_snmp(struct ndpi_detection_module_struct *ndpi_struct,
     return;
   }
 
-  if(packet->payload_packet_len > 16 && packet->payload[0] == 0x30) {
-    u_int16_t len_length = 0, offset;
-    int64_t len;
-
-    len = ndpi_asn1_ber_decode_length(&packet->payload[1], packet->payload_packet_len - 1, &len_length);
-
-    if(len > 2 &&
-       1 + len_length + len == packet->payload_packet_len &&
-       (packet->payload[1 + len_length + 2] == 0 /* SNMPv1 */ ||
-        packet->payload[1 + len_length + 2] == 1 /* SNMPv2c */ ||
-        packet->payload[1 + len_length + 2] == 3 /* SNMPv3 */)) {
-
-      if(flow->core.extra_packets_func == NULL) {
-        ndpi_int_snmp_add_connection(ndpi_struct, flow);
-        flow->metadata.protos.snmp.version = packet->payload[1 + len_length + 2];
-      }
-
-      offset = 1 + len_length + 2;
-      if((packet->payload[offset] == 0 /* SNMPv1 */ ||
-          packet->payload[offset] == 1 /* SNMPv2c */) &&
-	 (offset + 2 < packet->payload_packet_len)) {
-
-        if(flow->core.extra_packets_func == NULL) {
-          flow->core.max_extra_packets_to_check = 8;
-          flow->core.extra_packets_func = ndpi_search_snmp_again;
-        }
-
-        u_int8_t community_len = packet->payload[offset + 2];
-        u_int8_t snmp_primitive_offset = offset + 2 + 1 + community_len;
-
-        if(snmp_primitive_offset < packet->payload_packet_len) {
-          u_int8_t snmp_primitive = packet->payload[snmp_primitive_offset] & 0xF;
-
-          flow->metadata.protos.snmp.primitive = snmp_primitive;
-
-          if(snmp_primitive == 2 /* Get Response */ &&
-             snmp_primitive_offset + 1 < packet->payload_packet_len) {
-            offset = snmp_primitive_offset + 1;
-            ndpi_asn1_ber_decode_length(&packet->payload[offset], packet->payload_packet_len - offset, &len_length);
-            offset += len_length + 1;
-            if(offset < packet->payload_packet_len) {
-              len = ndpi_asn1_ber_decode_length(&packet->payload[offset], packet->payload_packet_len - offset, &len_length);
-
-              u_int8_t error_status_offset = offset + len_length + len + 2;
-
-              if(error_status_offset < packet->payload_packet_len) {
-                u_int8_t error_status = packet->payload[error_status_offset];
-
-#ifdef SNMP_DEBUG
-                printf("-> %u [offset: %u][primitive: %u]\n",
-                       error_status, error_status_offset, snmp_primitive);
-#endif
-
-                flow->core.extra_packets_func = NULL; /* We're good now */
-
-		flow->metadata.protos.snmp.error_status = error_status;
-
-                if(error_status != 0) {
-                  char str[64];
-
-                  snprintf(str, sizeof(str), "SNMP Error %d", error_status);
-                  ndpi_set_risk(ndpi_struct, &flow->core, NDPI_ERROR_CODE_DETECTED, str);
-	        }
-              }
-            }
-          }
-        }
-      }
-
-      return;
-    }
+  if(packet->payload_packet_len <= 16 ||
+     ndpi_asn1_ber_decode_single_tlv(packet->payload, packet->payload_packet_len, &msg) != 0 ||
+     msg.tag != 0x30 /* SEQUENCE */ ||
+     (used = snmp_decode_int(msg.value, msg.length, &version)) < 0 ||
+     (version != 0 /* SNMPv1 */ && version != 1 /* SNMPv2c */ && version != 3 /* SNMPv3 */)) {
+    NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+    return;
   }
 
-  NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+  if(flow->core.extra_packets_func == NULL) {
+    ndpi_int_snmp_add_connection(ndpi_struct, flow);
+    flow->metadata.protos.snmp.version = version;
+  }
+
+  if(version == 3)
+    return;
+
+  if(flow->core.extra_packets_func == NULL) {
+    flow->core.max_extra_packets_to_check = 8;
+    flow->core.extra_packets_func = ndpi_search_snmp_again;
+  }
+
+  buf = msg.value + used;
+  buf_len = msg.length - used;
+
+  used = ndpi_asn1_ber_decode_tlv(buf, buf_len, &community);
+  if(used < 0 || community.tag != 0x04 /* OCTET STRING */)
+    return;
+  buf += used;
+  buf_len -= used;
+
+  if(ndpi_asn1_ber_decode_tlv(buf, buf_len, &pdu) < 0)
+    return;
+
+  flow->metadata.protos.snmp.primitive = pdu.tag & 0x1F; /* GET, SET... */
+
+  if(flow->metadata.protos.snmp.primitive != 2 /* Get Response */)
+    return;
+
+  used = ndpi_asn1_ber_decode_tlv(pdu.value, pdu.length, &request_id);
+  if(used < 0 || request_id.tag != 0x02 /* INTEGER */ ||
+     snmp_decode_int(pdu.value + used, pdu.length - used, &error_status) < 0)
+    return;
+
+#ifdef SNMP_DEBUG
+  printf("-> %d [primitive: %u]\n", error_status, flow->metadata.protos.snmp.primitive);
+#endif
+
+  flow->core.extra_packets_func = NULL; /* We're good now */
+
+  flow->metadata.protos.snmp.error_status = (u_int8_t)error_status;
+
+  if(error_status != 0) {
+    char str[64];
+
+    snprintf(str, sizeof(str), "SNMP Error %d", error_status);
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_ERROR_CODE_DETECTED, str);
+  }
 }
 
 void init_snmp_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
