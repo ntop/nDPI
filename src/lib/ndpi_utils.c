@@ -4365,8 +4365,9 @@ u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *nd
 
 /* ******************************************* */
 
-int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len) {
+int64_t ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len) {
   unsigned int value, i;
+  u_int16_t num_octets;
 
   if(payload_len <= 0)
     return -1;
@@ -4376,7 +4377,7 @@ int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_
     return -1;
 
   /* Definite, short */
-  if(payload[0] <= 0x80) {
+  if(payload[0] < 0x80) {
     *value_len = 1;
     return payload[0];
   }
@@ -4384,18 +4385,18 @@ int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_
   if((payload[0] & 0x7F) == 0)
     return -1;
 
-  *value_len = payload[0] & 0x7F;
+  num_octets = payload[0] & 0x7F;
   /* We support only 4 additional length octets */
-  if(*value_len > 4 ||
-     payload_len <= *value_len + 1)
+  if(num_octets > 4 ||
+     payload_len < num_octets + 1)
     return -1;
 
   value = 0;
-  for (i = 1; i <= *value_len; i++) {
-    value |= (unsigned int)payload[i] << ((*value_len) - i) * 8;
+  for (i = 1; i <= num_octets; i++) {
+    value |= (unsigned int)payload[i] << (num_octets - i) * 8;
   }
 
-  (*value_len) += 1;
+  *value_len = num_octets + 1;
   return value;
 }
 
@@ -4406,15 +4407,15 @@ int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_
   Returns the number of header bytes or -1; the value might be longer than the buffer.
   Reference: https://en.wikipedia.org/wiki/X.690#Identifier_octets
 */
-int asn1_ber_decode_header(const u_int8_t *buf, u_int32_t buf_len,
-			   u_int8_t *tag, u_int32_t *length) {
+int ndpi_asn1_ber_decode_header(const u_int8_t *buf, u_int32_t buf_len,
+				u_int8_t *tag, u_int32_t *length) {
   int64_t len;
   u_int16_t value_len;
 
   if(buf_len < 2 || (buf[0] & 0x1F) == 0x1F)
     return -1;
 
-  len = asn1_ber_decode_length(&buf[1], buf_len - 1, &value_len);
+  len = ndpi_asn1_ber_decode_length(&buf[1], buf_len - 1, &value_len);
   if(len < 0)
     return -1;
 
@@ -4427,10 +4428,15 @@ int asn1_ber_decode_header(const u_int8_t *buf, u_int32_t buf_len,
 /* ******************************************* */
 
 /* Returns the number of bytes used by the whole TLV or -1 */
-int asn1_ber_decode_tlv(const u_int8_t *buf, u_int32_t buf_len,
-			struct asn1_ber_tlv * const tlv) {
-  int hdr_len = asn1_ber_decode_header(buf, buf_len, &tlv->tag, &tlv->length);
+int ndpi_asn1_ber_decode_tlv(const u_int8_t *buf, u_int32_t buf_len,
+			     struct ndpi_asn1_ber_tlv * const tlv) {
+  int hdr_len;
 
+  /* The return value must fit in an int */
+  if(buf_len > INT_MAX)
+    return -1;
+
+  hdr_len = ndpi_asn1_ber_decode_header(buf, buf_len, &tlv->tag, &tlv->length);
   if(hdr_len < 0 || tlv->length > buf_len - hdr_len)
     return -1;
 
@@ -4442,19 +4448,19 @@ int asn1_ber_decode_tlv(const u_int8_t *buf, u_int32_t buf_len,
 /* ******************************************* */
 
 /* Decode a TLV which must fill the entire buffer */
-int asn1_ber_decode_single_tlv(const u_int8_t *buf, u_int32_t buf_len,
-			       struct asn1_ber_tlv * const tlv) {
-  return asn1_ber_decode_tlv(buf, buf_len, tlv) == (int)buf_len ? 0 : -1;
+int ndpi_asn1_ber_decode_single_tlv(const u_int8_t *buf, u_int32_t buf_len,
+				    struct ndpi_asn1_ber_tlv * const tlv) {
+  return ndpi_asn1_ber_decode_tlv(buf, buf_len, tlv) == (int)buf_len ? 0 : -1;
 }
 
 /* ******************************************* */
 
 /* Decode a buffer holding exactly one INTEGER (up to 4 bytes) */
-int asn1_ber_decode_int(const u_int8_t *buf, u_int32_t buf_len, int32_t * const out) {
-  struct asn1_ber_tlv tlv;
+int ndpi_asn1_ber_decode_int(const u_int8_t *buf, u_int32_t buf_len, int32_t * const out) {
+  struct ndpi_asn1_ber_tlv tlv;
   u_int32_t i, value;
 
-  if(asn1_ber_decode_single_tlv(buf, buf_len, &tlv) != 0 ||
+  if(ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &tlv) != 0 ||
      tlv.tag != 0x02 /* INTEGER */ ||
      tlv.length == 0 || tlv.length > 4)
     return -1;

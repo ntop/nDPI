@@ -2785,6 +2785,36 @@ extern "C" {
 				    struct ndpi_tls_block *b,
 				    u_int8_t num_tls_blocks);
 
+  /* ******************************
+
+     ASN.1 BER decoding
+
+     Only the low-tag-number form (tag number < 31) and definite lengths
+     (up to 4 length octets) are supported.
+
+     ****************************** */
+
+  /*
+    Decode the length octets.
+    Returns the length value or -1; *value_len is set to the number of length octets
+  */
+  int64_t ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len,
+				      u_int16_t *value_len);
+  /*
+    Decode identifier and length octets.
+    Returns the number of header bytes or -1; the value might be longer than the buffer
+  */
+  int ndpi_asn1_ber_decode_header(const u_int8_t *buf, u_int32_t buf_len,
+				  u_int8_t *tag, u_int32_t *length);
+  /* Decode a whole TLV. Returns the number of bytes used by it or -1 */
+  int ndpi_asn1_ber_decode_tlv(const u_int8_t *buf, u_int32_t buf_len,
+			       struct ndpi_asn1_ber_tlv * const tlv);
+  /* Decode a TLV which must fill the entire buffer. Returns 0 or -1 */
+  int ndpi_asn1_ber_decode_single_tlv(const u_int8_t *buf, u_int32_t buf_len,
+				      struct ndpi_asn1_ber_tlv * const tlv);
+  /* Decode a buffer holding exactly one INTEGER (up to 4 bytes). Returns 0 or -1 */
+  int ndpi_asn1_ber_decode_int(const u_int8_t *buf, u_int32_t buf_len, int32_t * const out);
+
 #ifdef __cplusplus
 }
 #endif

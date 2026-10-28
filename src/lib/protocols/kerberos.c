@@ -49,9 +49,9 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
 
 /* KerberosString (i.e. GeneralString) */
 static int krb_decode_asn1_string(const u_int8_t *buf, u_int32_t buf_len,
-                                  struct asn1_ber_tlv * const tlv)
+                                  struct ndpi_asn1_ber_tlv * const tlv)
 {
-  if (asn1_ber_decode_single_tlv(buf, buf_len, tlv) != 0 ||
+  if (ndpi_asn1_ber_decode_single_tlv(buf, buf_len, tlv) != 0 ||
       (tlv->tag != 0x1B /* GeneralString */ &&
        tlv->tag != 0x0C /* UTF8String */ &&
        tlv->tag != 0x16 /* IA5String */))
@@ -84,7 +84,7 @@ static void krb_strncpy_lower(char * const dst, size_t dst_siz,
 static void krb_parse_realm(struct ndpi_flow_struct * const flow,
                             const u_int8_t *buf, u_int32_t buf_len)
 {
-  struct asn1_ber_tlv realm;
+  struct ndpi_asn1_ber_tlv realm;
 
   if (krb_decode_asn1_string(buf, buf_len, &realm) != 0 || realm.length == 0)
   {
@@ -107,11 +107,11 @@ static void krb_parse_realm(struct ndpi_flow_struct * const flow,
 static void krb_parse_cname(struct ndpi_flow_struct * const flow,
                             const u_int8_t *buf, u_int32_t buf_len)
 {
-  struct asn1_ber_tlv seq, field, names, name[2];
+  struct ndpi_asn1_ber_tlv seq, field, names, name[2];
   u_int8_t num_names = 0, idx = 0;
   int used;
 
-  if (asn1_ber_decode_single_tlv(buf, buf_len, &seq) != 0 || seq.tag != 0x30)
+  if (ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &seq) != 0 || seq.tag != 0x30)
   {
     return;
   }
@@ -120,7 +120,7 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
   field.tag = 0;
   while (seq.length > 0)
   {
-    used = asn1_ber_decode_tlv(seq.value, seq.length, &field);
+    used = ndpi_asn1_ber_decode_tlv(seq.value, seq.length, &field);
     if (used < 0)
     {
       return;
@@ -134,16 +134,16 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
   }
 
   if (field.tag != 0xA1 ||
-      asn1_ber_decode_single_tlv(field.value, field.length, &names) != 0 || names.tag != 0x30)
+      ndpi_asn1_ber_decode_single_tlv(field.value, field.length, &names) != 0 || names.tag != 0x30)
   {
     return;
   }
 
   while (names.length > 0 && num_names < 2)
   {
-    struct asn1_ber_tlv tlv;
+    struct ndpi_asn1_ber_tlv tlv;
 
-    used = asn1_ber_decode_tlv(names.value, names.length, &tlv);
+    used = ndpi_asn1_ber_decode_tlv(names.value, names.length, &tlv);
     if (used < 0 || krb_decode_asn1_string(names.value, used, &name[num_names]) != 0)
     {
       return;
@@ -190,17 +190,17 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
 static void krb_parse_req_body(struct ndpi_flow_struct * const flow,
                                const u_int8_t *buf, u_int32_t buf_len)
 {
-  struct asn1_ber_tlv seq, field;
+  struct ndpi_asn1_ber_tlv seq, field;
   int used;
 
-  if (asn1_ber_decode_single_tlv(buf, buf_len, &seq) != 0 || seq.tag != 0x30)
+  if (ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &seq) != 0 || seq.tag != 0x30)
   {
     return;
   }
 
   while (seq.length > 0)
   {
-    used = asn1_ber_decode_tlv(seq.value, seq.length, &field);
+    used = ndpi_asn1_ber_decode_tlv(seq.value, seq.length, &field);
     if (used < 0 || field.tag > 0xA2)
     {
       return;
@@ -235,7 +235,7 @@ static int krb_is_msg_start(const u_int8_t *buf, u_int32_t buf_len, u_int32_t ms
 {
   u_int8_t tag;
   u_int32_t length;
-  int hdr_len = asn1_ber_decode_header(buf, buf_len, &tag, &length);
+  int hdr_len = ndpi_asn1_ber_decode_header(buf, buf_len, &tag, &length);
 
   return hdr_len > 0 &&
          (tag & 0xE0) == 0x60 /* Application Constructed */ &&
@@ -259,14 +259,14 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
                      struct ndpi_flow_struct * const flow,
                      const u_int8_t *buf, u_int32_t buf_len)
 {
-  struct asn1_ber_tlv app, seq, field;
+  struct ndpi_asn1_ber_tlv app, seq, field;
   u_int8_t msg_type, pvno_idx, idx, pvno_found = 0, msg_type_found = 0;
   int32_t value;
   int used;
 
-  if (asn1_ber_decode_single_tlv(buf, buf_len, &app) != 0 ||
+  if (ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &app) != 0 ||
       (app.tag & 0xE0) != 0x60 /* Application Constructed */ ||
-      asn1_ber_decode_single_tlv(app.value, app.length, &seq) != 0 ||
+      ndpi_asn1_ber_decode_single_tlv(app.value, app.length, &seq) != 0 ||
       seq.tag != 0x30)
   {
     return -1;
@@ -281,7 +281,7 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
 
   while (seq.length > 0)
   {
-    used = asn1_ber_decode_tlv(seq.value, seq.length, &field);
+    used = ndpi_asn1_ber_decode_tlv(seq.value, seq.length, &field);
     if (used < 0 || (field.tag & 0xE0) != 0xA0 /* Context-specific Constructed */)
     {
       break;
@@ -292,7 +292,7 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
 
     if (idx == pvno_idx)
     {
-      if (asn1_ber_decode_int(field.value, field.length, &value) != 0 || value != 5)
+      if (ndpi_asn1_ber_decode_int(field.value, field.length, &value) != 0 || value != 5)
       {
         return -1;
       }
@@ -301,7 +301,7 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
     }
     if (idx == pvno_idx + 1)
     {
-      if (asn1_ber_decode_int(field.value, field.length, &value) != 0 || value != msg_type)
+      if (ndpi_asn1_ber_decode_int(field.value, field.length, &value) != 0 || value != msg_type)
       {
         return -1;
       }
@@ -336,7 +336,7 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
       case KRB_MSG_TYPE_ERROR:
         if (idx == 6)
         {
-          if (asn1_ber_decode_int(field.value, field.length, &value) == 0 &&
+          if (ndpi_asn1_ber_decode_int(field.value, field.length, &value) == 0 &&
               flow->metadata.protos.kerberos.rep_msg_type == 0)
           {
             flow->metadata.protos.kerberos.error_code = value;

@@ -2370,6 +2370,15 @@ typedef struct {
 
 /* **************************************** */
 
+/* ASN.1 BER Type-Length-Value; "value" points into the decoded buffer */
+struct ndpi_asn1_ber_tlv {
+  u_int8_t tag;             /* Raw identifier octet (class, constructed bit, tag number) */
+  const u_int8_t *value;
+  u_int32_t length;
+};
+
+/* **************************************** */
+
 #ifndef DLT_PPI
 #define DLT_PPI 192
 #endif
