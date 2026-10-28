@@ -1147,6 +1147,7 @@ void init_iris_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_yggdrasil_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_meshtastic_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_nebula_dissector(struct ndpi_detection_module_struct *ndpi_struct);
+void init_l2tp_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 
 enum cfg_param_type {
   CFG_PARAM_ENABLE_DISABLE = 0,
