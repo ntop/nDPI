@@ -404,6 +404,7 @@ static int tls_obfuscated_heur_search(struct ndpi_detection_module_struct* ndpi_
 static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct* ndpi_struct,
 					    struct ndpi_flow_struct* flow) {
   int rc;
+  u_int16_t app_proto;
 
   NDPI_LOG_DBG2(ndpi_struct, "TLS-Obf-Heur: extra dissection\n");
 
@@ -422,8 +423,15 @@ static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct*
           before to start marking the flows to that address
         * consider the number of burst after TLS handshake (see Fig 8 paper) */
 
+    if(ndpi_struct->cfg.tls_subclassification_by_ip &&
+       ndpi_struct->proto_defaults[flow->core.guessed_protocol_id_by_ip].protoCategory == NDPI_PROTOCOL_CATEGORY_VPN) {
+      app_proto = flow->core.guessed_protocol_id_by_ip;
+    } else {
+      app_proto = NDPI_PROTOCOL_UNKNOWN;
+    }
+
     if(flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN) {
-      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_TLS, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, app_proto, NDPI_PROTOCOL_TLS, NDPI_CONFIDENCE_DPI_AGGRESSIVE);
       ndpi_set_risk(ndpi_struct, &flow->core, NDPI_OBFUSCATED_TRAFFIC, "Obfuscated TLS traffic");
     } else {
       flow->core.confidence = NDPI_CONFIDENCE_DPI_AGGRESSIVE; /* Update the value */
@@ -436,7 +444,7 @@ static int tls_obfuscated_heur_search_again(struct ndpi_detection_module_struct*
 
     ndpi_master_app_protocol proto;
     proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
-    proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
+    proto.app_protocol = app_proto;
     flow->core.category = get_proto_category(ndpi_struct, proto);
     flow->core.breed = get_proto_breed(ndpi_struct, proto);
   }

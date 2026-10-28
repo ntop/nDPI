@@ -308,6 +308,7 @@ struct ndpi_detection_module_config_struct {
   int tls_subclassification_enabled;
   int tls_max_num_blocks_to_analyze;
   int tls_blocks_show_timing;
+  int tls_subclassification_by_ip;
   int quic_subclassification_enabled;
 
   int smtp_opportunistic_tls_enabled;
