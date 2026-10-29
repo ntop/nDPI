@@ -4531,3 +4531,12 @@ References: `Official site: <https://learn.microsoft.com/en-us/powershell>`_
 JanitorAI is an AI roleplay platform, often featuring adult content.
 
 References: `JanitorAI official site: <https://janitorai.com>`_
+
+
+.. _Proto_498:
+
+`NDPI_PROTOCOL_L2TP`
+====================
+Layer 2 Tunneling Protocol (L2TP) is a tunneling protocol used to support virtual private networks (VPNs) or as part of the delivery of services by ISPs.
+
+References: `Wikipedia: <https://en.wikipedia.org/wiki/Layer_2_Tunneling_Protocol>`_

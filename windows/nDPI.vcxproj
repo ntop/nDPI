@@ -185,6 +185,7 @@
     <ClCompile Include="..\src\lib\protocols\iris.c" />
     <ClCompile Include="..\src\lib\protocols\ipsec.c" />
     <ClCompile Include="..\src\lib\protocols\kismet.c" />
+    <ClCompile Include="..\src\lib\protocols\l2tp.c" />
     <ClCompile Include="..\src\lib\protocols\line.c" />
     <ClCompile Include="..\src\lib\protocols\lisp.c" />
     <ClCompile Include="..\src\lib\protocols\memcached.c" />
