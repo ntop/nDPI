@@ -39,8 +39,10 @@ static void ndpi_int_ldap_add_connection(struct ndpi_detection_module_struct *nd
 static void ndpi_search_ldap(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  struct ndpi_asn1_ber_tlv msg_id;
   int64_t length;
-  u_int16_t length_len = 0, msg_id_len;
+  u_int16_t length_len = 0;
+  int used;
   u_int8_t op;
 	
   NDPI_LOG_DBG(ndpi_struct, "search ldap\n");
@@ -50,11 +52,13 @@ static void ndpi_search_ldap(struct ndpi_detection_module_struct *ndpi_struct, s
     length = ndpi_asn1_ber_decode_length(&packet->payload[1], packet->payload_packet_len - 1, &length_len);
     NDPI_LOG_DBG(ndpi_struct, "length %d (%d bytes)\n", length, length_len);
     if(length > 0 &&
-       packet->payload_packet_len > 1 + length_len + 1 &&
-       packet->payload[1 + length_len] == 0x02 /* Integer */) {
-      msg_id_len = packet->payload[1 + length_len + 1];
-      if(packet->payload_packet_len > 1 + length_len + 1 + msg_id_len + 1) {
-        op = packet->payload[1 + length_len + 1 + msg_id_len + 1];
+       packet->payload_packet_len > 1 + length_len) {
+      used = ndpi_asn1_ber_decode_tlv(&packet->payload[1 + length_len],
+                                      packet->payload_packet_len - (1 + length_len), &msg_id);
+      if(used > 0 &&
+         msg_id.tag == 0x02 /* Integer */ &&
+         packet->payload_packet_len > 1 + length_len + used) {
+        op = packet->payload[1 + length_len + used];
         NDPI_LOG_DBG(ndpi_struct, "Op 0x%x\n", op);
         if((op & 0x60) == 0x60 && /* Application */
            (op & 0x1F) <= 25) {
