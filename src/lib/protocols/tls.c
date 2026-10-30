@@ -2730,7 +2730,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
     printf("TLS [len: %u][handshake_type: %02X]\n", packet->payload_packet_len, handshake_type);
 #endif
 
-    tls_version = ntohs(*((u_int16_t*)&packet->payload[version_offset]));
+    tls_version = ntohs(get_u_int16_t(packet->payload, version_offset));
 
     if(handshake_type == 0x02 /* Server Hello */) {
       int rc;
@@ -2757,7 +2757,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       if((offset+3) > packet->payload_packet_len)
 	return(0); /* Not found */
 
-      ja.server.num_ciphers = 1, ja.server.cipher[0] = ntohs(*((u_int16_t*)&packet->payload[offset]));
+      ja.server.num_ciphers = 1, ja.server.cipher[0] = ntohs(get_u_int16_t(packet->payload, offset));
 
       if(ndpi_struct->cfg.tls_cipher_enabled) {
         if((flow->metadata.protos.tls_quic.server_unsafe_cipher = ndpi_is_safe_ssl_cipher(ja.server.cipher[0])) != NDPI_CIPHER_SAFE) {
@@ -2782,9 +2782,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
       offset += 2 + 1;
 
       if((offset + 1) < packet->payload_packet_len)
-	tot_extension_len = ntohs(*((u_int16_t*)&packet->payload[offset]));
+        tot_extension_len = ntohs(get_u_int16_t(packet->payload, offset));
       else
-	tot_extension_len = 0;
+        tot_extension_len = 0;
 
 #ifdef DEBUG_TLS
       printf("TLS [server][tot_extension_len: %u]\n", tot_extension_len);
@@ -2797,8 +2797,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 	if((offset+4) > packet->payload_packet_len) break;
 
-	extension_id  = ntohs(*((u_int16_t*)&packet->payload[offset]));
-	extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+2]));
+	extension_id  = ntohs(get_u_int16_t(packet->payload, offset));
+	extension_len = ntohs(get_u_int16_t(packet->payload, offset + 2));
 	if(offset+4+extension_len > packet->payload_packet_len) {
 	  break;
 	}
@@ -2814,7 +2814,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 	if(extension_id == 43 /* supported versions */) {
 	  if(extension_len >= 2) {
-	    u_int16_t tls_version = ntohs(*((u_int16_t*)&packet->payload[offset+4]));
+	    u_int16_t tls_version = ntohs(get_u_int16_t(packet->payload, offset + 4));
 
 #ifdef DEBUG_TLS
 	    printf("TLS [server] [TLS version: 0x%04X]\n", tls_version);
@@ -2825,7 +2825,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	} else if(extension_id == 16 /* application_layer_protocol_negotiation (ALPN) */ &&
 	          offset + 6 < packet->payload_packet_len) {
 	  u_int16_t s_offset = offset+4;
-	  u_int16_t tot_alpn_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
+	  u_int16_t tot_alpn_len = ntohs(get_u_int16_t(packet->payload, s_offset));
 	  char alpn_str[256];
 	  u_int16_t alpn_str_len = 0, i;
 
@@ -3221,10 +3221,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  offset+extension_offset+4 <= total_len) {
 	      u_int16_t extension_id, extension_len, extn_off = offset+extension_offset;
 
-	      extension_id = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
+	      extension_id = ntohs(get_u_int16_t(packet->payload, offset + extension_offset));
 	      extension_offset += 2;
 
-	      extension_len = ntohs(*((u_int16_t*)&packet->payload[offset+extension_offset]));
+	      extension_len = ntohs(get_u_int16_t(packet->payload, offset + extension_offset));
 	      extension_offset += 2;
 
 #ifdef DEBUG_TLS
@@ -3394,7 +3394,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		if((s_offset+extension_len-2) <= total_len) {
 		  for(i=0; i<(u_int32_t)extension_len-2 && s_offset + i + 1 < total_len; i += 2) {
-		    u_int16_t s_group = ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
+		    u_int16_t s_group = ntohs(get_u_int16_t(packet->payload, s_offset + i));
 
 #ifdef DEBUG_TLS
 		    printf("Client TLS [Group: %u/0x%04X]\n", s_group, s_group);
@@ -3427,7 +3427,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
 		if((s_offset+extension_len-1) <= total_len) {
 		  for(i=0; i<(u_int32_t)extension_len-1 && s_offset+i < total_len; i++) {
-		    u_int8_t s_group = packet->payload[s_offset+i];
+		    u_int8_t s_group = get_u_int8_t(packet->payload, s_offset + i);
 
 #ifdef DEBUG_TLS
 		    printf("Client TLS [EllipticCurveFormat: %u]\n", s_group);
@@ -3451,7 +3451,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	      } else if(extension_id == 13 /* signature algorithms */ &&
 	                offset+extension_offset+1 < total_len) {
 		int s_offset = offset+extension_offset, safari_signature_algorithms = 0, id;
-		u_int16_t tot_signature_algorithms_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
+		u_int16_t tot_signature_algorithms_len = ntohs(get_u_int16_t(packet->payload, s_offset));
 
 #ifdef DEBUG_TLS
 		printf("Client TLS [SIGNATURE_ALGORITHMS: block_len=%u/len=%u]\n", extension_len, tot_signature_algorithms_len);
@@ -3461,7 +3461,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		tot_signature_algorithms_len = ndpi_min((sizeof(ja.client.signature_algorithms_str) / 2) - 1, tot_signature_algorithms_len);
 
 		for(i=0, id=0; i<tot_signature_algorithms_len && s_offset+i+1<total_len; i += 2)
-		  ja.client.signature_algorithm[id++] = ntohs(*(u_int16_t*)&packet->payload[s_offset+i]);
+		  ja.client.signature_algorithm[id++] = ntohs(get_u_int16_t(packet->payload, s_offset + i));
 
 		ja.client.num_signature_algorithms = id;
 
@@ -3476,7 +3476,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	          int chrome_signature_algorithms = 0, duplicate_found = 0, last_signature = 0;
 
                   for(i=0; i<tot_signature_algorithms_len && s_offset + (int)i + 2 < packet->payload_packet_len; i+=2) {
-                    u_int16_t signature_algo = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+i]));
+                    u_int16_t signature_algo = (u_int16_t)ntohs(get_u_int16_t(packet->payload, s_offset + i));
 
                     if(last_signature == signature_algo) {
                       /* Consecutive duplication */
@@ -3488,7 +3488,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
                       for(j=0; j<tot_signature_algorithms_len; j+=2) {
                         if(j != i && s_offset + (int)j + 2 < packet->payload_packet_len) {
-                          u_int16_t j_signature_algo = (u_int16_t)ntohs(*((u_int16_t*)&packet->payload[s_offset+j]));
+                          u_int16_t j_signature_algo = (u_int16_t)ntohs(get_u_int16_t(packet->payload, s_offset + j));
 
                           if((signature_algo == j_signature_algo)
                              && (i < j) /* Don't skip both of them */) {
@@ -3585,7 +3585,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 	      } else if(extension_id == 16 /* application_layer_protocol_negotiation */ &&
 	                offset+extension_offset+1 < total_len) {
 		u_int16_t s_offset = offset+extension_offset;
-		u_int16_t tot_alpn_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
+		u_int16_t tot_alpn_len = ntohs(get_u_int16_t(packet->payload, s_offset));
 		char alpn_str[256];
 		u_int16_t alpn_str_len = 0, i;
 
@@ -3596,7 +3596,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		tot_alpn_len += s_offset;
 
 		while(s_offset < tot_alpn_len && s_offset < total_len) {
-		  u_int8_t alpn_i, alpn_len = packet->payload[s_offset++];
+		  u_int8_t alpn_i, alpn_len = get_u_int8_t(packet->payload, s_offset++);
 
 		  if((s_offset + alpn_len) <= tot_alpn_len &&
 		     (s_offset + alpn_len) <= total_len) {
@@ -3684,7 +3684,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  s_offset++;
 
 		  for(j=0; j+1<version_len && s_offset + j + 1 < packet->payload_packet_len; j += 2) {
-		    u_int16_t tls_version = ntohs(*((u_int16_t*)&packet->payload[s_offset+j]));
+		    u_int16_t tls_version = ntohs(get_u_int16_t(packet->payload, s_offset + j));
 		    u_int8_t unknown_tls_version;
 
 #ifdef DEBUG_TLS
@@ -3732,7 +3732,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		  if(s_offset+1 >= total_len) {
 		    final_offset = 0; /* Force skipping extension */
 		  } else {
-		    u_int16_t seq_len = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
+		    u_int16_t seq_len = ntohs(get_u_int16_t(packet->payload, s_offset));
 		    s_offset += 2;
 	            final_offset = ndpi_min(total_len, s_offset + seq_len);
 		  }
@@ -3746,8 +3746,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
                   if(!using_var_int) {
 		    if(s_offset+3 >= final_offset)
 		      break;
-		    param_type = ntohs(*((u_int16_t*)&packet->payload[s_offset]));
-		    param_len = ntohs(*((u_int16_t*)&packet->payload[s_offset + 2]));
+		    param_type = ntohs(get_u_int16_t(packet->payload, s_offset));
+		    param_len = ntohs(get_u_int16_t(packet->payload, s_offset + 2));
 		    s_offset += 4;
 		  } else {
 		    if(s_offset >= final_offset ||
@@ -3801,7 +3801,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 
 		if(extn_offset + extension_len <= total_len) {
 #ifdef DEBUG_TLS
-                  u_int16_t key_share_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
+                  u_int16_t key_share_extn_len = ntohs(get_u_int16_t(packet->payload, extn_offset));
 
                   printf("[key_share] [len=%u][key_share_extn_len: %u][%02X %02X]\n",
                          extension_len, key_share_extn_len,
@@ -3812,8 +3812,8 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
                   extn_offset += 2;
 
                   while(extn_offset + 4 < extn_end) {
-                    u_int16_t group_id     = ntohs(*((u_int16_t*)&(packet->payload[extn_offset])));
-                    u_int16_t key_extn_len = ntohs(*((u_int16_t*)&(packet->payload[extn_offset + 2])));
+                    u_int16_t group_id     = ntohs(get_u_int16_t(packet->payload, extn_offset));
+                    u_int16_t key_extn_len = ntohs(get_u_int16_t(packet->payload, extn_offset + 2));
 
   #ifdef DEBUG_TLS
                     printf("\t[%02X %02X][extn_offset: %u][group_id: %u][key_extn_len: %u]\n",

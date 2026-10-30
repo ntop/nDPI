@@ -1262,7 +1262,7 @@ static int may_be_0rtt(struct ndpi_detection_module_struct *ndpi_struct,
   pub_bit3 = ((first_byte & 0x20) != 0);
   pub_bit4 = ((first_byte & 0x10) != 0);
 
-  *version = ntohl(*((u_int32_t *)&packet->payload[1]));
+  *version = ntohl(get_u_int32_t(packet->payload, 1));
 
   /* IETF versions, Long header, fixed bit (ignore QUIC-bit-greased case), 0RTT */
 

@@ -392,7 +392,7 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
     }
 
     rsp_type = get16(&x, packet->payload);
-    rsp_ttl  = ntohl(*((u_int32_t*)&packet->payload[x+2]));
+    rsp_ttl  = ntohl(get_u_int32_t(packet->payload, x + 2));
 
     if(rsp_ttl == 0)
       ndpi_set_risk(ndpi_struct, core, NDPI_MINOR_ISSUES, "DNS Record with zero TTL");
@@ -409,7 +409,7 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
 
     /* x points to the response "class" field */
     if((x+12) <= packet->payload_packet_len) {
-      u_int32_t ttl = ntohl(*((u_int32_t*)&packet->payload[x+2]));
+      u_int32_t ttl = ntohl(get_u_int32_t(packet->payload, x + 2));
 
       x += 6;
       data_len = get16(&x, packet->payload);
