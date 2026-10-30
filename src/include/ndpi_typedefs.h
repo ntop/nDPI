@@ -1856,7 +1856,7 @@ struct ndpi_flow_metadata_struct {
   } kerberos_buf;
 
   struct {
-    u_int8_t maybe_dtls:1, rtcp_seen:1, is_turn : 1, is_client_controlling:1, pad : 4;
+    u_int8_t maybe_dtls:1, rtcp_seen:1, is_turn : 1, is_client_controlling:1, recursion_depth : 3, pad : 1;
     ndpi_address_port mapped_address, peer_address, relayed_address, response_origin, other_address;
     u_int8_t num_xor_relayed_addresses, num_xor_mapped_addresses;
     u_int8_t num_non_stun_pkt, non_stun_pkt_len[2];
