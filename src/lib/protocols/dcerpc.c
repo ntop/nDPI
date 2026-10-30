@@ -211,10 +211,10 @@ static bool dcerpc_tcp_get_fragment_len(const u_int8_t *payload, u_int16_t paylo
   if(payload_len < 10 || !dcerpc_tcp_header_prefix_valid(payload, payload_len))
     return false;
 
-  if(payload[4] & 0x10)
-    *fragment_len = ((u_int16_t)payload[8] << 8) | payload[9];
-  else
+  if(payload[4] & 0x10) /* Little endian */
     *fragment_len = ((u_int16_t)payload[9] << 8) | payload[8];
+  else
+    *fragment_len = ((u_int16_t)payload[8] << 8) | payload[9];
 
   return *fragment_len >= DCERPC_HEADER_LEN;
 }
