@@ -222,7 +222,8 @@ typedef struct ndpi_flow_info {
   u_int32_t src2dst_packets, dst2src_packets;
   u_int32_t has_human_readeable_strings;
   char human_readeable_string_buffer[32];
-  char *risk_str;
+  struct ndpi_risk_information risk_infos[MAX_NUM_RISK_INFOS];
+  u_int8_t num_risk_infos;
 
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
@@ -499,6 +500,7 @@ int ndpi_is_datalink_supported(int datalink_type);
 /* compare two nodes in workflow */
 int ndpi_workflow_node_cmp(const void *a, const void *b);
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow);
+char *reader_flow_risk_info(const struct ndpi_flow_info *flow, char *out, u_int out_len);
 void ndpi_flow_info_free_data(struct ndpi_flow_info *flow);
 void ndpi_flow_info_freer(void *node);
 const char* print_cipher_id(u_int32_t cipher);

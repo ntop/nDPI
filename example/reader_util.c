@@ -336,6 +336,82 @@ void ndpi_free_flow_info_half(struct ndpi_flow_info *flow) {
 
 /* ***************************************************** */
 
+static void free_risk_infos(struct ndpi_flow_info *flow) {
+  u_int8_t i;
+
+  for(i = 0; i < flow->num_risk_infos; i++)
+    if(flow->risk_infos[i].info) ndpi_free(flow->risk_infos[i].info);
+
+  flow->num_risk_infos = 0;
+}
+
+/* ***************************************************** */
+
+/* Same order as ndpi_get_flow_risk_info() */
+static int risk_infos_cmp(const void *_a, const void *_b) {
+  const struct ndpi_risk_information *a = (const struct ndpi_risk_information *)_a;
+  const struct ndpi_risk_information *b = (const struct ndpi_risk_information *)_b;
+
+  return(b->id - a->id);
+}
+
+/* ***************************************************** */
+
+/* The infos of the risks, as ndpi_get_flow_risk_info() (text): NULL if
+ * none */
+char *reader_flow_risk_info(const struct ndpi_flow_info *flow, char *out, u_int out_len) {
+  struct ndpi_risk_information ordered[MAX_NUM_RISK_INFOS];
+  u_int8_t i, num = 0;
+  u_int offset = 0;
+
+  if((out == NULL) || (out_len == 0))
+    return(NULL);
+
+  for(i = 0; i < flow->num_risk_infos; i++)
+    if(flow->risk_infos[i].info) ordered[num++] = flow->risk_infos[i];
+
+  qsort(ordered, num, sizeof(ordered[0]), risk_infos_cmp);
+
+  out[0] = '\0', out_len--;
+
+  for(i = 0; (i < num) && (out_len > offset); i++) {
+    int rc = snprintf(&out[offset], out_len - offset, "%s%s", (i == 0) ? "" : ";", ordered[i].info);
+
+    if(rc <= 0) break;
+    offset += rc;
+  }
+
+  if(offset > out_len) offset = out_len;
+  out[offset] = '\0';
+
+  return((out[0] == '\0') ? NULL : out);
+}
+
+/* ***************************************************** */
+
+/* A risk cleared by the reader once the nDPI flow is freed (e.g. the
+ * unidirectional traffic, when a packet comes back after the detection),
+ * together with its info */
+static void reader_flow_unset_risk(struct ndpi_flow_info *flow, ndpi_risk_enum r) {
+  u_int8_t i, j;
+
+  if((flow->risk & (1ULL << r)) == 0)
+    return;
+
+  flow->risk &= ~(1ULL << r);
+
+  for(i = 0, j = 0; i < flow->num_risk_infos; i++) {
+    if(flow->risk_infos[i].id == r) {
+      if(flow->risk_infos[i].info) ndpi_free(flow->risk_infos[i].info);
+    } else
+      flow->risk_infos[j++] = flow->risk_infos[i];
+  }
+
+  flow->num_risk_infos = j;
+}
+
+/* ***************************************************** */
+
 void ndpi_stats_free(ndpi_stats_t *s) {
   if (s->protocol_counter)           ndpi_free(s->protocol_counter);
   if (s->protocol_counter_bytes)     ndpi_free(s->protocol_counter_bytes);
@@ -597,7 +673,7 @@ void ndpi_flow_info_free_data(struct ndpi_flow_info *flow) {
   if(flow->src_name)        ndpi_free(flow->src_name);
   if(flow->dst_name)        ndpi_free(flow->dst_name);
   if(flow->tcp_fingerprint) ndpi_free(flow->tcp_fingerprint);
-  if(flow->risk_str)        ndpi_free(flow->risk_str);
+  free_risk_infos(flow);
   if(flow->flow_payload)    ndpi_free(flow->flow_payload);
 }
 
@@ -1381,16 +1457,18 @@ static void serialize_monitoring_metadata(struct ndpi_flow_info *flow)
 
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow) {
   u_int i;
-  char out[512], *s;
 
   if(!flow->ndpi_flow) return;
 
   flow->info_type = INFO_INVALID;
 
-  s = ndpi_get_flow_risk_info(flow->ndpi_flow, out, sizeof(out), 0 /* text */);
-
-  if(s != NULL)
-    flow->risk_str = ndpi_strdup(s);
+  free_risk_infos(flow);
+  for(i = 0; (i < flow->ndpi_flow->core.num_risk_infos) && (i < MAX_NUM_RISK_INFOS); i++) {
+    flow->risk_infos[flow->num_risk_infos].id = flow->ndpi_flow->core.risk_infos[i].id;
+    flow->risk_infos[flow->num_risk_infos].info =
+      flow->ndpi_flow->core.risk_infos[i].info ? ndpi_strdup(flow->ndpi_flow->core.risk_infos[i].info) : NULL;
+    flow->num_risk_infos++;
+  }
 
   flow->confidence = flow->ndpi_flow->core.confidence;
 
@@ -2016,7 +2094,7 @@ static struct ndpi_proto packet_processing(struct ndpi_workflow * workflow,
       ndpi_data_add_value(flow->pktlen_s_to_c, rawsize);
       flow->dst2src_packets++, flow->dst2src_bytes += rawsize,
         flow->dst2src_goodput_bytes += ndpi_unique_tcp_payload(flow, tcph, payload_len, 1);
-      flow->risk &= ~(1ULL << NDPI_UNIDIRECTIONAL_TRAFFIC); /* Clear bit */
+      reader_flow_unset_risk(flow, NDPI_UNIDIRECTIONAL_TRAFFIC);
       flow->dst2src_last_pkt_time = when;
 
 #ifdef DIRECTION_BINS
