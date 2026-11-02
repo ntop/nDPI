@@ -2642,6 +2642,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->risk) {
       u_int i;
       u_int16_t cli_score, srv_score;
+      char risk_info[512];
+
       fprintf(out, "[Risk: ");
 
       for(i=0; i<NDPI_MAX_RISK; i++)
@@ -2652,8 +2654,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
       fprintf(out, "[Risk Score: %u]", ndpi_risk2score(flow->risk, &cli_score, &srv_score));
 
-      if(flow->risk_str)
-	fprintf(out, "[Risk Info: %s]", flow->risk_str);
+      if(reader_flow_risk_info(flow, risk_info, sizeof(risk_info)))
+        fprintf(out, "[Risk Info: %s]", risk_info);
     }
 
     if(flow->ndpi_client_fingerprint)
@@ -5383,10 +5385,8 @@ static void ndpi_process_packet(u_char *args,
     trailer->flow_risk = htonl64(flow_risk);
     trailer->flow_score = htons(ndpi_risk2score(flow_risk, &cli_score, &srv_score));
     trailer->flow_risk_info_len = ntohs(WIRESHARK_FLOW_RISK_INFO_SIZE);
-    if(flow && flow->risk_str) {
-      strncpy(trailer->flow_risk_info, flow->risk_str, sizeof(trailer->flow_risk_info) - 1);
-      trailer->flow_risk_info[sizeof(trailer->flow_risk_info) - 1] = '\0';
-    }
+    if(flow)
+      reader_flow_risk_info(flow, trailer->flow_risk_info, sizeof(trailer->flow_risk_info));
     trailer->proto.master_protocol = htons(p.proto.master_protocol), trailer->proto.app_protocol = htons(p.proto.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p.proto, trailer->name, sizeof(trailer->name));
 
