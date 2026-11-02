@@ -46,12 +46,12 @@ static void ndpi_int_l2tp_dissect_attrs(struct ndpi_flow_struct * const flow,
   uint8_t attrs_found = 0;
   for (u_int32_t i = 0; i < payload_len && attrs_found < MAX_ATTR_DISSECT;)
   {
-    if (i + MIN_ATTR_SIZE >= payload_len) {
+    if (i + MIN_ATTR_SIZE > payload_len) {
       break;
     }
 
     const u_int16_t attr_length = (ntohs(get_u_int16_t(payload, i)) & 0x3FF);
-    if (attr_length < MIN_ATTR_SIZE || i + attr_length >= payload_len) {
+    if (attr_length < MIN_ATTR_SIZE || i + attr_length > payload_len) {
       break;
     }
 
@@ -102,6 +102,10 @@ static void ndpi_search_l2tp(struct ndpi_detection_module_struct *ndpi_struct,
     // Type: Control Message
     // Length, Sequence, Offset and Priority bit unset
     uint8_t const offset = 2 /* flags/version */ + 2 /* length */ + 8 /* TID, SID, Ns, Nr */;
+    if (packet->payload_packet_len < offset) {
+      NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
+      return;
+    }
     uint8_t const * const remaining_payload = packet->payload + offset;
     u_int32_t const remaining_size = packet->payload_packet_len - offset;
     ndpi_int_l2tp_dissect_attrs(flow, remaining_payload, remaining_size);
