@@ -5934,6 +5934,11 @@ const char* ndpi_tls_signature_algo2str(u_int16_t algo_id, char unknown_algo[8])
 
     // ECDSA_branchy (historical, not in standards)
   case 0x080F: return "ecdsa_branchy";
+  
+    // ML-DSA schemes FIPS 204
+  case 0x0904: return " ml_dsa_44";
+  case 0x0905: return " ml_dsa_65";
+  case 0x0906: return " ml_dsa_87";
 
     // GOST R 34.10 schemes (RFC 9189)
   case 0xEE01: return "gostr34102012_256";
