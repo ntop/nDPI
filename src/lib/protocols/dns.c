@@ -168,6 +168,16 @@ static u_int16_t get16(u_int *i, const u_int8_t *payload) {
 
 /* *********************************************** */
 
+static int is_valid_qclass(u_int16_t qclass) {
+  return qclass == 1   /* IN */   ||
+         qclass == 3   /* CH */   ||
+         qclass == 4   /* HS */   ||
+         qclass == 254 /* NONE */ ||
+         qclass == 255 /* ANY */;
+}
+
+/* *********************************************** */
+
 static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen,
                            u_int message_offset, u_int8_t validate_encoding) {
   u_int x = i, encoded_len = 0, name_len = 0;
@@ -199,7 +209,8 @@ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen,
 
       pointer = message_offset + (((u_int)(len & 0x3F) << 8) | payload[x + 1]);
       /* RFC 1035 compression pointers refer to a prior occurrence. */
-      if(pointer >= x)
+      if(pointer < message_offset + sizeof(struct ndpi_dns_packet_header) ||
+         pointer >= x)
         return 0;
 
       if(!jumped) {
@@ -212,7 +223,7 @@ static u_int getNameLength(u_int i, const u_int8_t *payload, u_int payloadLen,
     }
 
     if(validate_encoding) {
-      if((len & 0xC0) != 0 || len > 63 ||
+      if((len & 0xC0) != 0 ||
          x + 1 + len > payloadLen || name_len + 1 + len > 254)
         return 0;
 
@@ -383,8 +394,6 @@ static int process_queries(struct ndpi_detection_module_struct *ndpi_struct,
                                  packet->payload_packet_len,
                                  packet->tcp ? 2 : 0,
                                  valid_query_fields != NULL)) == 0) {
-      if(core != NULL)
-        ndpi_set_risk(ndpi_struct, core, NDPI_MALFORMED_PACKET, "Invalid DNS Query Lenght");
       return -1;
     } else
       x += data_len;
@@ -401,7 +410,7 @@ static int process_queries(struct ndpi_detection_module_struct *ndpi_struct,
     rsp_type = get16(&x, packet->payload);
 
     if(valid_query_fields != NULL &&
-       (rsp_type == 0 || ntohs(get_u_int16_t(packet->payload, x)) == 0))
+       (rsp_type == 0 || !is_valid_qclass(ntohs(get_u_int16_t(packet->payload, x)))))
       *valid_query_fields = 0;
 
     if(num == 0 && first_query_type != NULL)
