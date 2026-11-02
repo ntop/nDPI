@@ -1,1 +1,0 @@
-fingerprint/README.ja5.md

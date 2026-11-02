@@ -148,7 +148,10 @@ static void ndpi_dissect_strict_hdr(struct ndpi_detection_module_struct *ndpi_st
     return;
   }
 
-  if (packet->payload_packet_len < sizeof(*strict_hdr) + method_length) {
+  /* Reject method_length before adding it: on 32-bit size_t the sum
+     sizeof(*strict_hdr) + method_length can wrap and bypass this check. */
+  if (method_length > packet->payload_packet_len ||
+      packet->payload_packet_len - sizeof(*strict_hdr) < method_length) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }

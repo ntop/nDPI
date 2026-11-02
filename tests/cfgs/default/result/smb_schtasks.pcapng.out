@@ -1,0 +1,55 @@
+DPI Packets (TCP):	194	(13.86 pkts/flow)
+Confidence DPI              : 14 (flows)
+Num dissector calls: 1472 (105.14 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/14/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   28/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     14/14 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    11/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+SMBv23	520	74635	8
+DCERPC	36	3480	3
+PowerShell	78	18240	3
+
+Safe                            78 18240         3            
+Acceptable                     556 78115         11           
+
+Network                         78 18240         3            
+RPC                             36 3480          3            
+System                         410 62115         3            
+FileSharing                    110 12520         5            
+
+	1	TCP 127.0.0.1:64037 <-> 127.0.0.1:445 [proto: 10.41/NetBIOS.SMBv23][Stack: NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 20][cat: System/18][Breed: Acceptable][69 pkts/12186 bytes <-> 69 pkts/8663 bytes][Goodput ratio: 75/65][3.10 sec][bytes ratio: 0.169 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 56/57 3003/3003 401/405][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 177/126 3220/394 384/90][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NT LM 0.12)][Plen Bins: 0,0,2,17,27,24,13,7,2,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+	2	TCP 127.0.0.1:64033 <-> 127.0.0.1:445 [proto: 10.41/NetBIOS.SMBv23][Stack: NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 20][cat: System/18][Breed: Acceptable][68 pkts/12142 bytes <-> 68 pkts/8491 bytes][Goodput ratio: 75/65][14.27 sec][bytes ratio: 0.177 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 264/58 11173/3003 1552/408][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 179/125 3220/394 386/91][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NT LM 0.12)][Plen Bins: 0,0,3,16,26,25,13,7,3,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+	3	TCP 127.0.0.1:64036 <-> 127.0.0.1:445 [proto: 10.41/NetBIOS.SMBv23][Stack: NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 20][cat: System/18][Breed: Acceptable][68 pkts/12142 bytes <-> 68 pkts/8491 bytes][Goodput ratio: 75/65][3.10 sec][bytes ratio: 0.177 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 57/58 3004/3004 405/409][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 179/125 3220/394 386/91][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NT LM 0.12)][Plen Bins: 0,0,3,16,26,25,13,7,3,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+	4	TCP 127.0.0.1:62285 <-> 127.0.0.1:49667 [proto: 370.496/DCERPC.PowerShell][Stack: DCERPC.PowerShell][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Safe][16 pkts/1982 bytes <-> 14 pkts/5938 bytes][Goodput ratio: 64/89][0.02 sec][bytes ratio: -0.499 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/1 12/12 3/3][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 124/424 316/3548 94/907][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 135][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NTLMSSP)][Plen Bins: 0,0,7,35,0,0,14,7,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7]
+	5	TCP 127.0.0.1:62334 <-> 127.0.0.1:49667 [proto: 370.496/DCERPC.PowerShell][Stack: DCERPC.PowerShell][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Safe][12 pkts/4142 bytes <-> 10 pkts/1154 bytes][Goodput ratio: 87/61][0.03 sec][bytes ratio: 0.564 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/3 1/21 0/7][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 345/115 3100/300 833/100][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 135][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NTLMSSP)][Plen Bins: 0,0,11,33,11,0,11,11,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11]
+	6	TCP 127.0.0.1:62339 <-> 127.0.0.1:49667 [proto: 370.496/DCERPC.PowerShell][Stack: DCERPC.PowerShell][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Safe][14 pkts/1398 bytes <-> 12 pkts/3626 bytes][Goodput ratio: 55/85][0.01 sec][bytes ratio: -0.443 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 100/302 266/2492 69/667][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 135][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NTLMSSP)][Plen Bins: 0,0,18,36,9,0,9,9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9]
+	7	TCP 127.0.0.1:63982 <-> 127.0.0.1:445 [proto: 10.41/NetBIOS.SMBv23][Stack: NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 22][cat: FileSharing/29][Breed: Acceptable][11 pkts/1273 bytes <-> 11 pkts/1231 bytes][Goodput ratio: 61/60][2.67 sec][bytes ratio: 0.017 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 1/0 296/378 2104/2104 660/728][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 116/112 414/289 114/97][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NT LM 0.12)][Plen Bins: 0,0,25,0,12,25,0,25,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	TCP 127.0.0.1:63983 <-> 127.0.0.1:445 [proto: 10.41/NetBIOS.SMBv23][Stack: NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 22][cat: FileSharing/29][Breed: Acceptable][11 pkts/1273 bytes <-> 11 pkts/1231 bytes][Goodput ratio: 61/60][2.14 sec][bytes ratio: 0.017 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 236/302 2109/2109 662/738][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 116/112 414/289 114/97][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NT LM 0.12)][Plen Bins: 0,0,25,0,12,25,0,25,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	TCP 127.0.0.1:63986 <-> 127.0.0.1:445 [proto: 10.41/NetBIOS.SMBv23][Stack: NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 22][cat: FileSharing/29][Breed: Acceptable][11 pkts/1273 bytes <-> 11 pkts/1231 bytes][Goodput ratio: 61/60][2.75 sec][bytes ratio: 0.017 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 305/390 2110/2110 666/733][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 116/112 414/289 114/97][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NT LM 0.12)][Plen Bins: 0,0,25,0,12,25,0,25,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	TCP 127.0.0.1:64024 <-> 127.0.0.1:445 [proto: 10.41/NetBIOS.SMBv23][Stack: NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 22][cat: FileSharing/29][Breed: Acceptable][11 pkts/1273 bytes <-> 11 pkts/1231 bytes][Goodput ratio: 61/60][2.14 sec][bytes ratio: 0.017 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 237/302 2109/2109 662/738][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 116/112 414/289 114/97][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NT LM 0.12)][Plen Bins: 0,0,25,0,12,25,0,25,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	11	TCP 127.0.0.1:64027 <-> 127.0.0.1:445 [proto: 10.41/NetBIOS.SMBv23][Stack: NetBIOS.SMBv23][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 22][cat: FileSharing/29][Breed: Acceptable][11 pkts/1273 bytes <-> 11 pkts/1231 bytes][Goodput ratio: 61/60][2.14 sec][bytes ratio: 0.017 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 237/303 2113/2113 663/739][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 116/112 414/289 114/97][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][PLAIN TEXT (NT LM 0.12)][Plen Bins: 0,0,25,0,12,25,0,25,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	12	TCP 127.0.0.1:62284 <-> 127.0.0.1:135 [proto: 370/DCERPC][Stack: DCERPC][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: RPC/16][Breed: Acceptable][7 pkts/648 bytes <-> 5 pkts/512 bytes][Goodput ratio: 51/55][2.63 sec][bytes ratio: 0.117 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 2628/0 526/0 2628/0 1051/0][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 93/102 212/216 73/70][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][Plen Bins: 0,0,0,25,0,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	TCP 127.0.0.1:62333 <-> 127.0.0.1:135 [proto: 370/DCERPC][Stack: DCERPC][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: RPC/16][Breed: Acceptable][7 pkts/648 bytes <-> 5 pkts/512 bytes][Goodput ratio: 51/55][0.03 sec][bytes ratio: 0.117 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 27/0 5/0 27/0 11/0][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 93/102 212/216 73/70][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][Plen Bins: 0,0,0,25,0,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	14	TCP 127.0.0.1:62338 <-> 127.0.0.1:135 [proto: 370/DCERPC][Stack: DCERPC][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: RPC/16][Breed: Acceptable][7 pkts/648 bytes <-> 5 pkts/512 bytes][Goodput ratio: 51/55][0.01 sec][bytes ratio: 0.117 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 7/0 1/0 7/0 3/0][Pkt Len c2s/s2c min/avg/max/stddev: 44/44 93/102 212/216 73/70][TCP Fingerprint: 2_128_65535_47466ece/Windows][MSS: 65495][Plen Bins: 0,0,0,25,0,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

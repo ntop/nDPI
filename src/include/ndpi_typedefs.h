@@ -196,6 +196,7 @@ typedef enum {
   NDPI_SLOW_DOS,
   NDPI_NON_PQC,                /* Set in case an encryped traffic stream does not comply with post-quantum encryotion */
   NDPI_AI_INFERENCE_TRAFFIC,
+  NDPI_NON_PQC_FLOW,            /* TLS flow negotiated a non-post-quantum key-exchange group */
 
   /* Before allocating a new risk here, check if there are FREE entries above */
 
@@ -891,12 +892,11 @@ struct ndpi_tls_block {
 typedef enum {
   ndpi_os_unknown     = 0,
   ndpi_os_windows     = 1,
-  ndpi_os_macos       = 2,
-  ndpi_os_ios_ipad_os = 3,
-  ndpi_os_android     = 4,
-  ndpi_os_linux       = 5,
-  ndpi_os_freebsd     = 6,
-  ndpi_os_MAX_OS      = 7 /* Keep it as last */
+  ndpi_os_apple       = 2, /* macOS / iPadOS / iOS */
+  ndpi_os_android     = 3,
+  ndpi_os_linux       = 4,
+  ndpi_os_freebsd     = 5,
+  ndpi_os_MAX_OS      = 6 /* Keep it as last */
 } ndpi_os;
 
 struct ndpi_flow_tcp_struct {
@@ -912,7 +912,7 @@ struct ndpi_flow_tcp_struct {
   u_int8_t cli2srv_tcp_flags, srv2cli_tcp_flags;
 
   /* **** Protocols **** */
-  
+
   /* NDPI_PROTOCOL_MAIL_SMTP */
   /* NDPI_PROTOCOL_MAIL_POP */
   /* NDPI_PROTOCOL_MAIL_IMAP */
@@ -1008,6 +1008,8 @@ struct ndpi_flow_tcp_struct {
 
   char *fingerprint, *fingerprint_raw;
   ndpi_os os_hint;
+  u_int16_t mss;     /* MSS of the fingerprinted SYN (0 = no MSS option) */
+  u_int8_t fastopen; /* TCP Fast Open: 0 = none, 1 = cookie request, 2 = cookie */
 };
 
 /* ************************************************** */
@@ -1558,6 +1560,7 @@ typedef struct {
   u_int8_t has_snapshot;
   u_int8_t multiline_json_array;
   u_int8_t inner_json;
+  u_int8_t skip_header;
   ndpi_private_serializer_status snapshot;
 } ndpi_private_serializer;
 
@@ -1633,10 +1636,18 @@ typedef struct {
 
 #define OPENVPN_HEUR_MAX_NUM_OPCODES 4
 
+struct ndpi_ipsec_tranform {
+  u_int8_t  transform_type;
+  u_int16_t transform_id;
+};
+
+#define MAX_NUM_TRANSFORMS 16
+
 /* Per-proposal crypto algorithm selection from an IKEv2 SA payload (RFC 7296 §3.3) */
 struct ndpi_ipsec_proposal {
   u_int8_t  proto_id;        /* 1=IKE, 2=AH, 3=ESP */
   u_int8_t  num_transforms;
+  struct ndpi_ipsec_tranform transforms[MAX_NUM_TRANSFORMS];
   u_int16_t encr_alg;        /* Encryption algorithm transform ID */
   u_int16_t encr_key_bits;   /* Key length attribute in bits (0 if not present) */
   u_int16_t prf_alg;         /* Pseudo-random function transform ID */
@@ -1650,7 +1661,7 @@ struct ndpi_ipsec_proposal {
 struct ndpi_ipsec_details {
   u_int8_t version;             /* Version: major (upper 4 bits) and minor (lower 4 bits) */
   u_int8_t exchange_type;       /* IKEv2 exchange type (34=SA_INIT, 35=IKE_AUTH, ...) */
-  struct ndpi_ipsec_proposal proposal[2];
+  struct ndpi_ipsec_proposal proposal[2]; /* [0]=IKEV2_REQUEST_PROPOSAL, [1]=IKEV2_RESPONSE_PROPOSAL */
 };
 
 /* ************************ */
@@ -1664,6 +1675,12 @@ struct ndpi_flow_struct_dns_metadata {
   u_int32_t rsp_addr_ttl[MAX_NUM_DNS_RSP_ADDRESSES];
   char geolocation_iata_code[4];
   char ptr_domain_name[64 /* large enough but smaller than { } tls */];
+};
+
+/* ************************ */
+
+struct ndpi_smb_metadata {
+  char *filename;
 };
 
 /* ************************ */
@@ -1739,7 +1756,7 @@ struct ndpi_flow_core_struct {
 
   struct ndpi_dns_tcp_reasm_state *dns_tcp_reasm; /* TCP DNS reassembly */
   struct ndpi_dcerpc_tcp_reasm_state *dcerpc_tcp_reasm; /* TCP DCERPC reassembly */
-  
+
   /* General purpose field used to save mainly hostname/SNI information.
    * In details it used for: MGCP, COLLECTD, DNS, SSDP and NETBIOS name, HTTP, MUNIN and DHCP hostname,
    * WHOIS request, TLS/QUIC server name, XIAOMI domain and STUN realm.
@@ -1753,7 +1770,7 @@ struct ndpi_flow_core_struct {
     TLS-based hence that will mess around with it
   */
   struct ndpi_flow_tls_quic_core_struct tls_quic;
-  
+
   /* Flow payload */
   u_int16_t flow_payload_len;
   char *flow_payload;
@@ -1764,7 +1781,8 @@ struct ndpi_flow_core_struct {
 struct ndpi_flow_tls_quic_metadata_struct {
   char *server_names, *advertised_alpns, *negotiated_alpn, *tls_supported_versions, *issuerDN, *subjectDN;
   u_int32_t notBefore, notAfter;
-  char ja3_server[33], ja4_client[37], ja4_ndpi_client[37], ja5_client[50], *ja4_client_raw;
+  char ja3_server[33], ja4_client[37], ja4_ndpi_client[37], *ja4_client_raw;
+  char tlsfp_client[50]; /* nDPI TLS client fingerprint */
   u_int16_t server_cipher;
   u_int8_t sha1_certificate_fingerprint[20];
   u_int8_t client_hello_processed:1, ch_direction:1, subprotocol_detected:1,
@@ -1777,6 +1795,7 @@ struct ndpi_flow_tls_quic_metadata_struct {
     u_int16_t version;
   } encrypted_ch;
 
+  u_int16_t signature_algorithms; /* TLS 1.2 and earlier */
   ndpi_cipher_weakness server_unsafe_cipher;
 
   u_int32_t quic_version;
@@ -1837,13 +1856,12 @@ struct ndpi_flow_metadata_struct {
     char *pktbuf;
     u_int16_t pktbuf_maxlen, pktbuf_currlen;
   } kerberos_buf;
-
   union {
     /* the only fields useful for nDPI and ntopng */
     struct ndpi_flow_struct_dns_metadata dns;
 
     struct ndpi_flow_tls_quic_metadata_struct tls_quic; /* Used also by DTLS and POPS/IMAPS/SMTPS/FTPS */
-    
+
     struct ntp_info {
       u_int8_t leap_indicator: 2, version: 3, mode: 3;
       u_int8_t stratum;
@@ -1855,6 +1873,8 @@ struct ndpi_flow_metadata_struct {
 
     struct {
       char hostname[48], domain[48], username[48];
+      u_int8_t req_msg_type, rep_msg_type;
+      int32_t error_code; /* Valid only if rep_msg_type is KRB-ERROR (30) */
     } kerberos;
 
     struct {
@@ -2021,7 +2041,9 @@ struct ndpi_flow_metadata_struct {
       u_int8_t num_other_funcs;     /* Other function codes */
     } s7comm;
 
-    struct ndpi_ipsec_details ipsec;    
+    struct ndpi_ipsec_details ipsec;
+
+    struct ndpi_smb_metadata smb;
   } protos;
   struct {
     /* NDPI_PROTOCOL_OPENVPN */
@@ -2039,7 +2061,7 @@ struct ndpi_flow_metadata_struct {
   /* **Packet** metadata for flows where monitoring is enabled. It is reset after each packet! */
   struct ndpi_metadata_monitoring *monit;
   struct {
-    u_int8_t maybe_dtls:1, rtcp_seen:1, is_turn : 1, is_client_controlling:1, pad : 4;
+    u_int8_t maybe_dtls:1, rtcp_seen:1, is_turn : 1, is_client_controlling:1, recursion_depth : 3, pad : 1;
     ndpi_address_port mapped_address, peer_address, relayed_address, response_origin, other_address;
     u_int8_t num_xor_relayed_addresses, num_xor_mapped_addresses;
     u_int8_t num_non_stun_pkt, non_stun_pkt_len[2];
@@ -2342,6 +2364,15 @@ typedef struct {
   u_int16_t n_features; /* num columns */
   double max_distance;
 } ndpi_anomaly_model;
+
+/* **************************************** */
+
+/* ASN.1 BER Type-Length-Value; "value" points into the decoded buffer */
+struct ndpi_asn1_ber_tlv {
+  u_int8_t tag;             /* Raw identifier octet (class, constructed bit, tag number) */
+  const u_int8_t *value;
+  u_int32_t length;
+};
 
 /* **************************************** */
 

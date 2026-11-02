@@ -59,6 +59,14 @@ static void ndpi_int_stun_add_connection(struct ndpi_detection_module_struct *nd
 					 ndpi_protocol_category_t category);
 static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
                              struct ndpi_flow_struct *flow);
+static int stun_search_again_internal(struct ndpi_detection_module_struct *ndpi_struct,
+                                      struct ndpi_flow_struct *flow);
+
+/* Max nesting depth for STUN/TURN encapsulation recursion
+   (TURN ChannelData, MS-TURN, DATA attribute, Telegram encapsulation).
+   Real traffic nests at most 2-3 levels. Must fit in the 3-bit
+   flow->metadata.stun.recursion_depth. */
+#define NDPI_MAX_STUN_RECURSION_DEPTH 4
 
 
 /* Valid classifications:
@@ -820,8 +828,8 @@ static u_int32_t __get_master(struct ndpi_flow_struct *flow) {
 
 /* ***************************************************** */
 
-static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
-                             struct ndpi_flow_struct *flow)
+static int stun_search_again_internal(struct ndpi_detection_module_struct *ndpi_struct,
+                                      struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   int rtp_rtcp;
@@ -1075,6 +1083,28 @@ static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
   return keep_extra_dissection(ndpi_struct, flow);
+}
+
+/* ************************************************************ */
+
+/* Depth-capped entry point: every recursive descent (TURN ChannelData,
+   MS-TURN, DATA attribute, Telegram encapsulation) re-enters through this
+   wrapper, so a single counter bounds the whole recursion. */
+static int stun_search_again(struct ndpi_detection_module_struct *ndpi_struct,
+                             struct ndpi_flow_struct *flow)
+{
+  int ret;
+
+  if(flow->metadata.stun.recursion_depth >= NDPI_MAX_STUN_RECURSION_DEPTH) {
+    NDPI_LOG_DBG(ndpi_struct, "Max STUN recursion depth reached\n");
+    return keep_extra_dissection(ndpi_struct, flow);
+  }
+
+  flow->metadata.stun.recursion_depth++;
+  ret = stun_search_again_internal(ndpi_struct, flow);
+  flow->metadata.stun.recursion_depth--;
+
+  return ret;
 }
 
 /* ************************************************************ */

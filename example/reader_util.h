@@ -222,7 +222,8 @@ typedef struct ndpi_flow_info {
   u_int32_t src2dst_packets, dst2src_packets;
   u_int32_t has_human_readeable_strings;
   char human_readeable_string_buffer[32];
-  char *risk_str;
+  struct ndpi_risk_information risk_infos[MAX_NUM_RISK_INFOS];
+  u_int8_t num_risk_infos;
 
   // result only, not used for flow identification
   ndpi_protocol detected_protocol;
@@ -252,6 +253,8 @@ typedef struct ndpi_flow_info {
       char domain[85];
       char hostname[85];
       char username[86];
+      u_int8_t req_msg_type, rep_msg_type;
+      int32_t error_code;
     } kerberos;
 
     struct {
@@ -314,7 +317,7 @@ typedef struct ndpi_flow_info {
       client_hassh[33], server_hassh[33], *server_names,
       *advertised_alpns, *negotiated_alpn, *tls_supported_versions,
       *tls_issuerDN, *tls_subjectDN,
-      ja3_server[33], ja4_client[37], ja5_client[50], *ja4_client_raw,
+      ja3_server[33], ja4_client[37], tlsfp_client[50], *ja4_client_raw,
       sha1_cert_fingerprint[20], ssh_key_exchange_method[24];
     u_int8_t sha1_cert_fingerprint_set;
     struct tls_heuristics browser_heuristics;
@@ -365,6 +368,8 @@ typedef struct ndpi_flow_info {
 
   void *src_id, *dst_id;
   char *tcp_fingerprint, *ndpi_client_fingerprint, *ndpi_server_fingerprint;
+  u_int16_t tcp_mss;     /* Exported next to tcp_fingerprint */
+  u_int8_t tcp_fastopen; /* 0 = none, 1 = cookie request, 2 = cookie */
   struct ndpi_entropy *entropy;
   struct ndpi_entropy *last_entropy;
 
@@ -495,6 +500,7 @@ int ndpi_is_datalink_supported(int datalink_type);
 /* compare two nodes in workflow */
 int ndpi_workflow_node_cmp(const void *a, const void *b);
 void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_flow_info *flow);
+char *reader_flow_risk_info(const struct ndpi_flow_info *flow, char *out, u_int out_len);
 void ndpi_flow_info_free_data(struct ndpi_flow_info *flow);
 void ndpi_flow_info_freer(void *node);
 const char* print_cipher_id(u_int32_t cipher);

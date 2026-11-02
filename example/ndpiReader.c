@@ -93,6 +93,7 @@ static u_int8_t undetected_flows_deleted = 0;
 static FILE *csv_fp                 = NULL; /**< for CSV export */
 static FILE *serialization_fp       = NULL; /**< for TLV,CSV,JSON export */
 static ndpi_serialization_format serialization_format = ndpi_serialization_format_unknown;
+static bool export_expired_flows = true;
 static char* domain_to_check = NULL;
 static char* domains_file_to_check = NULL;
 static char* ip_port_to_check = NULL;
@@ -1002,6 +1003,7 @@ static void help(u_int long_help) {
          "  -A                         | Dump internal statistics (LRU caches / Patricia trees / Ahocarasick automas / ...\n"
          "  -M                         | Memory allocation stats on data-path (only by the library).\n"
 	 "                             | It works only on single-thread configuration\n"
+         "  --disable-expired-flow-export | Disable expired-flow output (allows multiple threads)\n"
          "  --openvpn_heuristics       | Enable OpenVPN heuristics.\n"
          "                             | It is a shortcut to --cfg=openvpn,dpi.heuristics,0x01\n"
          "  --tls_heuristics           | Enable TLS heuristics.\n"
@@ -1074,6 +1076,7 @@ static void help(u_int long_help) {
 #define OPTLONG_VALUE_DOMAINS_FILE              3005
 #define OPTLONG_VALUE_RUN_TESTS                 3006
 #define OPTLONG_VALUE_FORCE_LICENSE_TYPE         3007
+#define OPTLONG_VALUE_DISABLE_EXPIRED_FLOW_EXPORT (OPTLONG_VALUE_FORCE_LICENSE_TYPE + 1)
 
 static struct option longopts[] = {
   /* mandatory extcap options */
@@ -1131,6 +1134,7 @@ static struct option longopts[] = {
   { "x-file", required_argument, NULL, OPTLONG_VALUE_DOMAINS_FILE},
   { "run-tests", no_argument, NULL, OPTLONG_VALUE_RUN_TESTS},
   { "force-license-type", required_argument, NULL, OPTLONG_VALUE_FORCE_LICENSE_TYPE},
+  { "disable-expired-flow-export", no_argument, NULL, OPTLONG_VALUE_DISABLE_EXPIRED_FLOW_EXPORT},
 
   {0, 0, 0, 0}
 };
@@ -1655,6 +1659,10 @@ static void parse_parameters(int argc, char **argv)
       }
       break;
 
+    case OPTLONG_VALUE_DISABLE_EXPIRED_FLOW_EXPORT:
+      export_expired_flows = false;
+      break;
+
     case 'k':
       errno = 0;
       if((serialization_fp = fopen(optarg, "w")) == NULL)
@@ -2068,6 +2076,19 @@ static void print_ndpi_address_port_list_file(FILE *out, const char *label, ndpi
 
 /* ********************************** */
 
+static const char* kerberos_msg_type2str(u_int8_t msg_type) {
+  switch(msg_type) {
+  case 10: return("AS-REQ");
+  case 11: return("AS-REP");
+  case 12: return("TGS-REQ");
+  case 13: return("TGS-REP");
+  case 30: return("KRB-ERROR");
+  default: return("Unknown");
+  }
+}
+
+/* ********************************** */
+
 /**
  * @brief Print the flow
  */
@@ -2259,7 +2280,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
              ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                             s, buf2, sizeof(buf2)),
              ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                flow->detected_protocol, buf1, sizeof(buf1)));
+                                flow->detected_protocol.proto, buf1, sizeof(buf1)));
     } else if(flow->detected_protocol.proto.master_protocol != NDPI_PROTOCOL_UNKNOWN) {
       if(s->protos[0] != flow->detected_protocol.proto.master_protocol ||
          s->protos[1] != flow->detected_protocol.proto.app_protocol) {
@@ -2267,7 +2288,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
                ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                               s, buf2, sizeof(buf2)),
                ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                  flow->detected_protocol, buf1, sizeof(buf1)));
+                                  flow->detected_protocol.proto, buf1, sizeof(buf1)));
       }
     } else {
       if(s->protos[0] != flow->detected_protocol.proto.app_protocol) {
@@ -2275,7 +2296,7 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
                ndpi_stack2str(ndpi_thread_info[thread_id].workflow->ndpi_struct,
                               s, buf2, sizeof(buf2)),
                ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
-                                  flow->detected_protocol, buf1, sizeof(buf1)));
+                                  flow->detected_protocol.proto, buf1, sizeof(buf1)));
       }
     }
 #endif
@@ -2409,6 +2430,13 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 		flow->kerberos.hostname,
 		flow->kerberos.username);
       }
+      if (flow->kerberos.req_msg_type != 0)
+	fprintf(out, "[Request: %s]", kerberos_msg_type2str(flow->kerberos.req_msg_type));
+      if (flow->kerberos.rep_msg_type == 30 /* KRB-ERROR */)
+	fprintf(out, "[Response: %s (Error %d)]", kerberos_msg_type2str(flow->kerberos.rep_msg_type),
+		flow->kerberos.error_code);
+      else if (flow->kerberos.rep_msg_type != 0)
+	fprintf(out, "[Response: %s (OK)]", kerberos_msg_type2str(flow->kerberos.rep_msg_type));
       break;
 
     case INFO_SOFTETHER:
@@ -2614,6 +2642,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->risk) {
       u_int i;
       u_int16_t cli_score, srv_score;
+      char risk_info[512];
+
       fprintf(out, "[Risk: ");
 
       for(i=0; i<NDPI_MAX_RISK; i++)
@@ -2624,8 +2654,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
       fprintf(out, "[Risk Score: %u]", ndpi_risk2score(flow->risk, &cli_score, &srv_score));
 
-      if(flow->risk_str)
-	fprintf(out, "[Risk Info: %s]", flow->risk_str);
+      if(reader_flow_risk_info(flow, risk_info, sizeof(risk_info)))
+        fprintf(out, "[Risk Info: %s]", risk_info);
     }
 
     if(flow->ndpi_client_fingerprint)
@@ -2634,8 +2664,12 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ndpi_server_fingerprint)
       fprintf(out, "[nDPI Srv Fingerprint: %s]", flow->ndpi_server_fingerprint);
 
-    if(flow->tcp_fingerprint)
-      fprintf(out, "[TCP Fingerprint: %s]", flow->tcp_fingerprint);
+    if(flow->tcp_fingerprint) {
+      fprintf(out, "[TCP Fingerprint: %s][MSS: %u]", flow->tcp_fingerprint, flow->tcp_mss);
+
+      if(flow->tcp_fastopen)
+	fprintf(out, "[TFO: %s]", (flow->tcp_fastopen == 1) ? "cookie request" : "cookie");
+    }
 
     if(flow->ssh_tls.ssl_version != 0) fprintf(out, "[%s]", ndpi_ssl_version2str(buf_ver, sizeof(buf_ver),
 										 flow->ssh_tls.ssl_version, &known_tls));
@@ -2648,10 +2682,9 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
     if(flow->ssh_tls.ja4_client[0] != '\0') fprintf(out, "[JA4: %s%s]", flow->ssh_tls.ja4_client,
 						    print_cipher(flow->ssh_tls.client_unsafe_cipher));
 
-    if(flow->ssh_tls.ja5_client[0] != '\0') fprintf(out, "[JA5: %s%s]", flow->ssh_tls.ja5_client,
-						    print_cipher(flow->ssh_tls.client_unsafe_cipher));
-
     if(flow->ssh_tls.ja4_client_raw != NULL) fprintf(out, "[JA4_r: %s]", flow->ssh_tls.ja4_client_raw);
+
+    if(flow->ssh_tls.tlsfp_client[0] != '\0') fprintf(out, "[TLS-C: %s]", flow->ssh_tls.tlsfp_client);
 
     if(flow->ssh_tls.server_info[0] != '\0') fprintf(out, "[Server: %s]", flow->ssh_tls.server_info);
 
@@ -2749,8 +2782,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
 static void printFlowSerialized(struct ndpi_flow_info *flow)
 {
-  char *json_str = NULL;
-  u_int32_t json_str_len = 0;
+  char *serialized_data = NULL;
+  u_int32_t serialized_data_len = 0;
   ndpi_serializer * const serializer = &flow->ndpi_flow_serializer;
   //float data_ratio = ndpi_data_ratio(flow->src2dst_bytes, flow->dst2src_bytes);
   double f = (double)flow->first_seen_ms, l = (double)flow->last_seen_ms;
@@ -2873,14 +2906,25 @@ static void printFlowSerialized(struct ndpi_flow_info *flow)
 			       sprint_bin(buf, sizeof(buf), &flow->payload_len_bin, ",", true));
   ndpi_serialize_end_of_block(serializer);
 
-  json_str = ndpi_serializer_get_buffer(serializer, &json_str_len);
-  if (json_str == NULL || json_str_len == 0)
+  if(serialization_format == ndpi_serialization_format_tlv &&
+     ndpi_serialize_end_of_record(serializer) != 0) {
+    fprintf(stderr, "ERROR: unable to terminate TLV flow record\n");
+    exit(EXIT_FAILURE);
+  }
+
+  serialized_data = ndpi_serializer_get_buffer(serializer, &serialized_data_len);
+  if (serialized_data == NULL || serialized_data_len == 0)
     {
       printf("ERROR: nDPI serialization failed\n");
-      exit(-1);
+      exit(EXIT_FAILURE);
     }
 
-  fprintf(serialization_fp, "%.*s\n", (int)json_str_len, json_str);
+  if(fwrite(serialized_data, 1, serialized_data_len, serialization_fp) != serialized_data_len ||
+     (serialization_format != ndpi_serialization_format_tlv &&
+      fputc('\n', serialization_fp) == EOF)) {
+    fprintf(stderr, "ERROR: unable to write serialized flow\n");
+    exit(EXIT_FAILURE);
+  }
 }
 
 /* ********************************** */
@@ -3397,6 +3441,14 @@ static void node_idle_scan_walker(const void *node, ndpi_VISIT which, int depth,
       if(verbose == 3)
         port_stats_walker(node, which, depth, user_data);
 
+      /* Export through the configured per-flow outputs before freeing the flow. */
+      if(export_expired_flows) {
+        printFlow(flow->flow_id + 1, flow, thread_id);
+        if(serialization_fp != NULL &&
+           serialization_format != ndpi_serialization_format_unknown)
+          printFlowSerialized(flow);
+      }
+
       if((flow->detected_protocol.proto.app_protocol == NDPI_PROTOCOL_UNKNOWN) && !undetected_flows_deleted)
         undetected_flows_deleted = 1;
 
@@ -3754,6 +3806,27 @@ static int hash_stats_sort_to_print(void *_a, void *_b) {
   return (b->occurency - a->occurency);
 }
 
+/* Sort the "JA Host Stats" table. It used to be printed by walking the hash table
+   directly, i.e. in the order in which hosts happened to be added, which is not
+   stable across architectures: hosts with the same number of fingerprints swapped
+   places on big-endian hosts, so the dump (and its test expectation) was
+   byte-order dependent. Sort by number of client (JA4C) fingerprints, decreasing,
+   then by IP address, so the output is the same everywhere. */
+static int jaHostStatsSort_cmp(void *_a, void *_b) {
+  ndpi_host_ja_fingerprints *a = (ndpi_host_ja_fingerprints*)_a;
+  ndpi_host_ja_fingerprints *b = (ndpi_host_ja_fingerprints*)_b;
+  int rc, a_num, b_num;
+
+  a_num = (int)HASH_COUNT(a->host_client_info_hasht);
+  b_num = (int)HASH_COUNT(b->host_client_info_hasht);
+
+  if((rc = (b_num - a_num)) != 0) return(rc);
+
+  if(a->ip_string == NULL) return(b->ip_string == NULL ? 0 : 1);
+  if(b->ip_string == NULL) return(-1);
+  return(strcmp(a->ip_string, b->ip_string));
+}
+
 /* *********************************************** */
 
 static void printFlowsStats() {
@@ -3940,6 +4013,8 @@ static void printFlowsStats() {
         ndpi_ja_fingerprints_host *tmp3 = NULL;
         ndpi_ip_dns *innerHashEl = NULL;
         ndpi_ip_dns *tmp4 = NULL;
+
+        HASH_SORT(jaByHostsHashT, jaHostStatsSort_cmp);
 
         if(verbose == 2) {
           /* for each host the number of flow with a ja4c fingerprint is printed */
@@ -5310,10 +5385,8 @@ static void ndpi_process_packet(u_char *args,
     trailer->flow_risk = htonl64(flow_risk);
     trailer->flow_score = htons(ndpi_risk2score(flow_risk, &cli_score, &srv_score));
     trailer->flow_risk_info_len = ntohs(WIRESHARK_FLOW_RISK_INFO_SIZE);
-    if(flow && flow->risk_str) {
-      strncpy(trailer->flow_risk_info, flow->risk_str, sizeof(trailer->flow_risk_info) - 1);
-      trailer->flow_risk_info[sizeof(trailer->flow_risk_info) - 1] = '\0';
-    }
+    if(flow)
+      reader_flow_risk_info(flow, trailer->flow_risk_info, sizeof(trailer->flow_risk_info));
     trailer->proto.master_protocol = htons(p.proto.master_protocol), trailer->proto.app_protocol = htons(p.proto.app_protocol);
     ndpi_protocol2name(ndpi_thread_info[thread_id].workflow->ndpi_struct, p.proto, trailer->name, sizeof(trailer->name));
 
@@ -5622,6 +5695,10 @@ void test_lib() {
 #endif
 
     cap = openPcapFileOrDevice(thread_id, (const u_char*)_pcap_file[thread_id]);
+    if(export_expired_flows && num_threads > 1) {
+      fprintf(stderr, "Error: expired-flow export requires a single thread; use --disable-expired-flow-export to use multiple threads.\n");
+      exit(EXIT_FAILURE);
+    }
     setupDetection(thread_id, cap, g_ctx);
   }
 

@@ -142,6 +142,7 @@ const struct cfg_param cfg_params[] = {
   { "tls",           "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_subclassification_enabled), NULL },
   { "tls",           "max_num_blocks_to_analyze",               "0", "0", "256", CFG_PARAM_INT, __OFF(tls_max_num_blocks_to_analyze), NULL },  /* 0 = tls blocks are not analyzed */
   { "tls",           "tls_blocks_show_timing",                  "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_blocks_show_timing), NULL },
+  { "tls",           "subclassification_by_ip",                 "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(tls_subclassification_by_ip), NULL },
   { "quic",          "subclassification",                       "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(quic_subclassification_enabled), NULL },
 
   { "smtp",          "tls_dissection",                          "enable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(smtp_opportunistic_tls_enabled), NULL },
@@ -185,7 +186,11 @@ const struct cfg_param cfg_params[] = {
 
   { "ookla",         "dpi.aggressiveness",                      "0x01", "0", "1", CFG_PARAM_INT, __OFF(ookla_aggressiveness), NULL },
 
+  { "powershell",    "dpi.aggressiveness",                      "0x01", "0", "1", CFG_PARAM_INT, __OFF(powershell_aggressiveness), NULL },
+
   { "zoom",          "max_packets_extra_dissection",            "4", "0", "255", CFG_PARAM_INT, __OFF(zoom_max_packets_extra_dissection), NULL },
+
+  { "smb",           "max_packets_extra_dissection",            "25", "0", "255", CFG_PARAM_INT, __OFF(smb_max_packets_extra_dissection), NULL },
 
   { "rtp",           "search_for_stun",                         "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(rtp_search_for_stun), NULL },
   { "rtp",           "max_packets_extra_dissection",            "32", "0", "255", CFG_PARAM_INT, __OFF(rtp_max_packets_extra_dissection), NULL },

@@ -1,20 +1,11 @@
 /*
  * dhcp.c
  *
- * Copyright (C) 2016-22 - ntop.org
+ * Copyright (C) 2016-26 - ntop.org
  *
- * nDPI is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * nDPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with nDPI.  If not, see <http://www.gnu.org/licenses/>.
+ * This dissector is dual Licensed under LGPLv3 and
+ * commercial nDPI license. Please read README.license.md
+ * for details.
  *
  */
 
@@ -160,11 +151,13 @@ static void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struc
 	  break;
 
         int rc;
-        rc = ndpi_snprintf((char *)&flow->metadata.protos.dhcp.options[opt_offset],
-                           sizeof(flow->metadata.protos.dhcp.options) - opt_offset,
+        u_int rem = sizeof(flow->metadata.protos.dhcp.options) - opt_offset;
+
+        rc = ndpi_snprintf((char *)&flow->metadata.protos.dhcp.options[opt_offset], rem,
                            "%s%u", (cursor > 0) ? "," : "", opt_id);
 
-        if(rc > 0) opt_offset += rc;
+        if(rc > 0)
+          opt_offset += ndpi_min((u_int)rc, rem); /* Truncated output: buffer is full */
 
 #ifdef DHCP_DEBUG
         NDPI_LOG_DBG2(ndpi_struct, "[DHCP] Id=%d [len=%d]\n", opt_id, opt_len);
@@ -174,12 +167,12 @@ static void ndpi_search_dhcp_udp(struct ndpi_detection_module_struct *ndpi_struc
           u_int idx, fing_offset = 0;
 
           for(idx = 0; idx < opt_len && fing_offset < sizeof(flow->metadata.protos.dhcp.fingerprint) - 2; idx++) {
-            rc = ndpi_snprintf((char *)&flow->metadata.protos.dhcp.fingerprint[fing_offset],
-                               sizeof(flow->metadata.protos.dhcp.fingerprint) - fing_offset,
+            rem = sizeof(flow->metadata.protos.dhcp.fingerprint) - fing_offset;
+            rc = ndpi_snprintf((char *)&flow->metadata.protos.dhcp.fingerprint[fing_offset], rem,
                                "%s%u", (idx > 0) ? "," : "",
                                (unsigned int)dhcp->options[cursor + 2 + idx] & 0xFF);
 
-            if(rc < 0)
+            if(rc < 0 || (u_int)rc >= rem) /* Error or truncated output */
 	      break;
 	    else
 	      fing_offset += rc;

@@ -1541,7 +1541,7 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
 	ndpi_serialize_string_string(serializer, "ja3s", flow->metadata.protos.tls_quic.ja3_server);
       
       ndpi_serialize_string_string(serializer, "ja4", flow->metadata.protos.tls_quic.ja4_client);
-      ndpi_serialize_string_string(serializer, "ja5", flow->metadata.protos.tls_quic.ja5_client);
+      ndpi_serialize_string_string(serializer, "tlsfp", flow->metadata.protos.tls_quic.tlsfp_client);
       ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->metadata.protos.tls_quic.server_unsafe_cipher);
       if(flow->metadata.protos.tls_quic.server_cipher != TLS_NULL_WITH_NULL_NULL)
         ndpi_serialize_string_string(serializer, "cipher",
@@ -1742,6 +1742,8 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
   case NDPI_PROTOCOL_NTP:
     ndpi_serialize_start_of_block(serializer, "ntp");
     for (i = 0; i < 2; i++) {
+      char timestamp[64];
+      
       ndpi_serialize_start_of_block_uint32(serializer,i);
       ndpi_serialize_string_uint32(serializer, "leap_indicator", flow->metadata.protos.ntp[i].leap_indicator);
       ndpi_serialize_string_uint32(serializer, "version", flow->metadata.protos.ntp[i].version);
@@ -1753,8 +1755,6 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       ndpi_serialize_string_float(serializer, "root_dispersion", flow->metadata.protos.ntp[i].root_dispersion, "%f");
       ndpi_serialize_string_string(serializer, "ref_id", flow->metadata.protos.ntp[i].ref_id);
 
-
-      char timestamp[64];
       ntp_ts_to_string(flow->metadata.protos.ntp[i].ref_time, timestamp, sizeof timestamp);
       ndpi_serialize_string_string(serializer, "ref_time", timestamp);
       ntp_ts_to_string(flow->metadata.protos.ntp[i].org_time, timestamp, sizeof timestamp);
@@ -1784,6 +1784,16 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_string_string(serializer, "hostname", flow->metadata.protos.kerberos.hostname);
     ndpi_serialize_string_string(serializer, "domain", flow->metadata.protos.kerberos.domain);
     ndpi_serialize_string_string(serializer, "username", flow->metadata.protos.kerberos.username);
+    if(flow->metadata.protos.kerberos.req_msg_type != 0)
+      ndpi_serialize_string_uint32(serializer, "request_type", flow->metadata.protos.kerberos.req_msg_type);
+    if(flow->metadata.protos.kerberos.rep_msg_type != 0) {
+      ndpi_serialize_string_uint32(serializer, "response_type", flow->metadata.protos.kerberos.rep_msg_type);
+      ndpi_serialize_string_boolean(serializer, "response_ok",
+				    flow->metadata.protos.kerberos.rep_msg_type == 11 /* AS-REP */ ||
+				    flow->metadata.protos.kerberos.rep_msg_type == 13 /* TGS-REP */);
+      if(flow->metadata.protos.kerberos.rep_msg_type == 30 /* KRB-ERROR */)
+	ndpi_serialize_string_int32(serializer, "error_code", flow->metadata.protos.kerberos.error_code);
+    }
     ndpi_serialize_end_of_block(serializer);
     break;
 
@@ -2135,18 +2145,19 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
       if(flow->metadata.protos.ipsec.proposal[NDPI_IKEV2_REQUEST_PROPOSAL].proto_id
 	 || flow->metadata.protos.ipsec.proposal[NDPI_IKEV2_RESPONSE_PROPOSAL].proto_id) {
 	u_int8_t i;
-	ndpi_serializer sub_serializer;
-
-	if(ndpi_init_serializer(&sub_serializer, ndpi_serialization_format_json) == -1)
+	ndpi_serializer sub_serializer, sub_sub_serializer;
+	
+	if(ndpi_init_serializer(&sub_serializer, ndpi_serialization_format_json) == -1)	
 	  ;
 	else {
-	  ndpi_serializer *ser;
+	  ndpi_serializer *ser, *sser;
 
 	  ser = &sub_serializer;
 
 	  for(i=0; i<2; i++) {
 	    struct ndpi_ipsec_proposal *p = &flow->metadata.protos.ipsec.proposal[i];
-
+	    int j;
+	    
 	    ndpi_serialize_string_string(ser, "type", (i == NDPI_IKEV2_REQUEST_PROPOSAL) ? "request" : "response");
 	    ndpi_serialize_string_uint32(ser, "protocol_id", p->proto_id);
 	    ndpi_serialize_string_uint32(ser, "num_transforms", p->num_transforms);
@@ -2156,8 +2167,29 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	    ndpi_serialize_string_string(ser, "integrity_algorithm", ndpi_ikev2_integ_name(p->integ_alg));
 	    ndpi_serialize_string_string(ser, "diffie_hellman_group", ndpi_ikev2_dh_name(p->dh_group));
 	    ndpi_serialize_string_uint32(ser, "extended_sequence_numbers", p->esn);
+
+	    /* *************** */
+
+	    sser = &sub_sub_serializer;
+
+	    if(ndpi_init_serializer(&sub_sub_serializer, ndpi_serialization_format_json) != -1) {
+	      for(j=0; (j<p->num_transforms) && (j<MAX_NUM_TRANSFORMS); j++) {
+		ndpi_serialize_string_uint32(sser, "transform_type", p->transforms[j].transform_type);
+		ndpi_serialize_string_uint32(sser, "transform_id",   p->transforms[j].transform_id);
+		ndpi_serialize_end_of_record(sser);
+	      }
+	      
+	      ndpi_serialize_end_of_record(sser);
+	      
+	      buffer = ndpi_serializer_get_buffer(sser, &buffer_len);
+	      if(buffer && (buffer_len > 0))
+		ndpi_serialize_string_raw(ser, "additional_key_exchanges", buffer, buffer_len);
+
+	      ndpi_term_serializer(sser);
+	    } /* if */
+	    
 	    ndpi_serialize_end_of_record(ser);
-	  }
+	  } /* for */
 
 	  buffer = ndpi_serializer_get_buffer(ser, &buffer_len);
 	  if(buffer && (buffer_len > 0))
@@ -2296,6 +2328,11 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(flow->metadata.l4.tcp.fingerprint_raw)
     ndpi_serialize_string_string(serializer, "tcp_fingerprint_raw", flow->metadata.l4.tcp.fingerprint_raw);
+
+  if(flow->metadata.l4.tcp.fingerprint) {
+    ndpi_serialize_string_uint32(serializer, "tcp_mss", flow->metadata.l4.tcp.mss);
+    ndpi_serialize_string_uint32(serializer, "tcp_fastopen", flow->metadata.l4.tcp.fastopen);
+  }
 
   if(flow->metadata.ndpi.client_fingerprint || flow->metadata.ndpi.server_fingerprint) {
     ndpi_serialize_start_of_block(serializer, "ndpi_fingerprint");
@@ -2778,6 +2815,9 @@ const char* ndpi_risk2str(ndpi_risk_enum risk) {
   case NDPI_AI_INFERENCE_TRAFFIC:
     return("Possible AI Inference Traffic");
 
+  case NDPI_NON_PQC_FLOW:
+    return("Non PQC Compliant Flow");
+
   default:
     ndpi_snprintf(buf, sizeof(buf), "%d", (int)risk);
     return(buf);
@@ -2910,6 +2950,8 @@ const char* ndpi_risk2code(ndpi_risk_enum risk) {
     return STRINGIFY(NDPI_NON_PQC);
   case NDPI_AI_INFERENCE_TRAFFIC:
     return STRINGIFY(NDPI_AI_INFERENCE_TRAFFIC);
+  case NDPI_NON_PQC_FLOW:
+    return STRINGIFY(NDPI_NON_PQC_FLOW);
 
   default:
     return("Unknown risk");
@@ -3039,6 +3081,8 @@ ndpi_risk_enum ndpi_code2risk(const char* risk) {
     return(NDPI_NON_PQC);
   else if(strcmp(STRINGIFY(NDPI_AI_INFERENCE_TRAFFIC), risk) == 0)
     return(NDPI_AI_INFERENCE_TRAFFIC);
+  else if(strcmp(STRINGIFY(NDPI_NON_PQC_FLOW), risk) == 0)
+    return(NDPI_NON_PQC_FLOW);
   else
     return(NDPI_MAX_RISK);
 }
@@ -3184,7 +3228,8 @@ const char *ndpi_risk_shortnames[NDPI_MAX_RISK] = {
   "obfuscated",
   "slow_DoS",
   "non_PQC",
-  "AI_Inference"
+  "AI_Inference",
+  "non_PQC_flow"
 };
 
 /* ******************************************************************** */
@@ -3795,16 +3840,15 @@ int ndpi_isset_risk(struct ndpi_flow_core_struct *core, ndpi_risk_enum r) {
 /* ******************************************************************** */
 
 int ndpi_is_printable_buffer(u_int8_t const * const buf, size_t len) {
-  int retval = 1;
   size_t i;
 
-  for(i = 0; i < len; ++i) {
-    if(ndpi_isprint(buf[i]) == 0) {
-      retval = 0;
-    }
-  }
+  /* Exit on the first non-printable byte: correctness, performance, and
+     defense-in-depth (a bogus huge len can no longer walk off the buffer). */
+  for(i = 0; i < len; ++i)
+    if(ndpi_isprint(buf[i]) == 0)
+      return 0;
 
-  return retval;
+  return 1;
 }
 
 /* ******************************************************************** */
@@ -4334,8 +4378,9 @@ u_int8_t ndpi_check_flow_risk_exceptions(struct ndpi_detection_module_struct *nd
 
 /* ******************************************* */
 
-int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len) {
+int64_t ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_int16_t *value_len) {
   unsigned int value, i;
+  u_int16_t num_octets;
 
   if(payload_len <= 0)
     return -1;
@@ -4345,7 +4390,7 @@ int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_
     return -1;
 
   /* Definite, short */
-  if(payload[0] <= 0x80) {
+  if(payload[0] < 0x80) {
     *value_len = 1;
     return payload[0];
   }
@@ -4353,19 +4398,92 @@ int64_t asn1_ber_decode_length(const unsigned char *payload, int payload_len, u_
   if((payload[0] & 0x7F) == 0)
     return -1;
 
-  *value_len = payload[0] & 0x7F;
+  num_octets = payload[0] & 0x7F;
   /* We support only 4 additional length octets */
-  if(*value_len > 4 ||
-     payload_len <= *value_len + 1)
+  if(num_octets > 4 ||
+     payload_len < num_octets + 1)
     return -1;
 
   value = 0;
-  for (i = 1; i <= *value_len; i++) {
-    value |= (unsigned int)payload[i] << ((*value_len) - i) * 8;
+  for (i = 1; i <= num_octets; i++) {
+    value |= (unsigned int)payload[i] << (num_octets - i) * 8;
   }
 
-  (*value_len) += 1;
+  *value_len = num_octets + 1;
   return value;
+}
+
+/* ******************************************* */
+
+/*
+  Decode identifier and length octets (only low-tag-number form).
+  Returns the number of header bytes or -1; the value might be longer than the buffer.
+  Reference: https://en.wikipedia.org/wiki/X.690#Identifier_octets
+*/
+int ndpi_asn1_ber_decode_header(const u_int8_t *buf, u_int32_t buf_len,
+				u_int8_t *tag, u_int32_t *length) {
+  int64_t len;
+  u_int16_t value_len;
+
+  if(buf_len < 2 || (buf[0] & 0x1F) == 0x1F)
+    return -1;
+
+  len = ndpi_asn1_ber_decode_length(&buf[1], buf_len - 1, &value_len);
+  if(len < 0)
+    return -1;
+
+  *tag = buf[0];
+  *length = (u_int32_t)len;
+
+  return 1 + value_len;
+}
+
+/* ******************************************* */
+
+/* Returns the number of bytes used by the whole TLV or -1 */
+int ndpi_asn1_ber_decode_tlv(const u_int8_t *buf, u_int32_t buf_len,
+			     struct ndpi_asn1_ber_tlv * const tlv) {
+  int hdr_len;
+
+  /* The return value must fit in an int */
+  if(buf_len > INT_MAX)
+    return -1;
+
+  hdr_len = ndpi_asn1_ber_decode_header(buf, buf_len, &tlv->tag, &tlv->length);
+  if(hdr_len < 0 || tlv->length > buf_len - hdr_len)
+    return -1;
+
+  tlv->value = &buf[hdr_len];
+
+  return hdr_len + (int)tlv->length;
+}
+
+/* ******************************************* */
+
+/* Decode a TLV which must fill the entire buffer */
+int ndpi_asn1_ber_decode_single_tlv(const u_int8_t *buf, u_int32_t buf_len,
+				    struct ndpi_asn1_ber_tlv * const tlv) {
+  return ndpi_asn1_ber_decode_tlv(buf, buf_len, tlv) == (int)buf_len ? 0 : -1;
+}
+
+/* ******************************************* */
+
+/* Decode a buffer holding exactly one INTEGER (up to 4 bytes) */
+int ndpi_asn1_ber_decode_int(const u_int8_t *buf, u_int32_t buf_len, int32_t * const out) {
+  struct ndpi_asn1_ber_tlv tlv;
+  u_int32_t i, value;
+
+  if(ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &tlv) != 0 ||
+     tlv.tag != 0x02 /* INTEGER */ ||
+     tlv.length == 0 || tlv.length > 4)
+    return -1;
+
+  value = (tlv.value[0] & 0x80) ? 0xFFFFFFFF : 0; /* Sign extension */
+  for(i = 0; i < tlv.length; ++i)
+    value = (value << 8) | tlv.value[i];
+  *out = (int32_t)value;
+
+  return 0;
 }
 
 /* ******************************************* */
@@ -4909,8 +5027,7 @@ void ndpi_fill_randombytes(unsigned char *buf, unsigned int buf_len) {
 const char* ndpi_print_os_hint(ndpi_os os_hint) {
   switch(os_hint) {
   case ndpi_os_windows:          return("Windows");
-  case ndpi_os_macos:            return("macOS");
-  case ndpi_os_ios_ipad_os:      return("iOS/iPad");
+  case ndpi_os_apple:            return("macOS/iOS/iPad");
   case ndpi_os_android:          return("Android");
   case ndpi_os_linux:            return("Linux");
   case ndpi_os_freebsd:          return("FreeBSD");
@@ -5953,10 +6070,15 @@ static const tls_named_group_info named_groups[] = {
 
 /* ****************************************** */
 
+bool ndpi_is_grease_value(u_int16_t value) {
+  return ((value & 0x0F0F) == 0x0A0A) &&
+         (((value >> 12) & 0x0F) == ((value >> 4) & 0x0F));
+}
+
 const char* ndpi_tls_supported_groups2str(u_int16_t group_id, char unknown_group[8]) {
   u_int16_t i;
 
-  if(((group_id) & 0x0F0F) == 0x0A0A)
+  if(ndpi_is_grease_value(group_id))
     return("(GREASE)");
 
   // Check for reserved ranges
@@ -5994,141 +6116,143 @@ typedef struct {
   const char* security_level;
   const char* rfc;
   int draft_version;
+  u_int8_t is_pqc;
 } key_share_group_info;
 
 // TLS 1.3 KeyShare groups - Complete and up-to-date
 static const key_share_group_info key_share_groups[] = {
   // ========== Traditional Elliptic Curve Groups (ECDHE) ==========
-  {0x0017, "secp256r1", "ECDHE", 65, 32, 1, 1, "128-bit", "RFC 8446", 0},
-  {0x0018, "secp384r1", "ECDHE", 97, 48, 1, 1, "192-bit", "RFC 8446", 0},
-  {0x0019, "secp521r1", "ECDHE", 133, 66, 1, 1, "256-bit", "RFC 8446", 0},
+  {0x0017, "secp256r1", "ECDHE", 65, 32, 1, 1, "128-bit", "RFC 8446", 0, 0},
+  {0x0018, "secp384r1", "ECDHE", 97, 48, 1, 1, "192-bit", "RFC 8446", 0, 0},
+  {0x0019, "secp521r1", "ECDHE", 133, 66, 1, 1, "256-bit", "RFC 8446", 0, 0},
 
   // Montgomery curves (RFC 7748, RFC 8446)
-  {0x001D, "x25519", "ECDHE", 32, 32, 1, 1, "128-bit", "RFC 8446", 0},
-  {0x001E, "x448", "ECDHE", 56, 56, 1, 1, "224-bit", "RFC 8446", 0},
+  {0x001D, "x25519", "ECDHE", 32, 32, 1, 1, "128-bit", "RFC 8446", 0, 0},
+  {0x001E, "x448", "ECDHE", 56, 56, 1, 1, "224-bit", "RFC 8446", 0, 0},
 
   // ========== Finite Field Groups (FFDHE) ==========
-  {0x0100, "ffdhe2048", "FFDHE", 256, 256, 1, 0, "112-bit", "RFC 7919", 0},
-  {0x0101, "ffdhe3072", "FFDHE", 384, 384, 1, 0, "128-bit", "RFC 7919", 0},
-  {0x0102, "ffdhe4096", "FFDHE", 512, 512, 1, 0, "152-bit", "RFC 7919", 0},
-  {0x0103, "ffdhe6144", "FFDHE", 768, 768, 1, 0, "176-bit", "RFC 7919", 0},
-  {0x0104, "ffdhe8192", "FFDHE", 1024, 1024, 1, 0, "192-bit", "RFC 7919", 0},
+  {0x0100, "ffdhe2048", "FFDHE", 256, 256, 1, 0, "112-bit", "RFC 7919", 0, 0},
+  {0x0101, "ffdhe3072", "FFDHE", 384, 384, 1, 0, "128-bit", "RFC 7919", 0, 0},
+  {0x0102, "ffdhe4096", "FFDHE", 512, 512, 1, 0, "152-bit", "RFC 7919", 0, 0},
+  {0x0103, "ffdhe6144", "FFDHE", 768, 768, 1, 0, "176-bit", "RFC 7919", 0, 0},
+  {0x0104, "ffdhe8192", "FFDHE", 1024, 1024, 1, 0, "192-bit", "RFC 7919", 0, 0},
 
   // ========== Kyber-based Hybrid Groups (RFC 9189) ==========
-  {0x0022, "x25519kyber768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "RFC 9189", 0},
-  {0x0023, "secp256r1kyber768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "RFC 9189", 0},
-  {0x0024, "x25519kyber1024", "PQ_HYBRID", 32+1568, 32+32, 1, 1, "128-bit + L5", "RFC 9189", 0},
-  {0x0025, "secp256r1kyber1024", "PQ_HYBRID", 65+1568, 32+32, 1, 1, "128-bit + L5", "RFC 9189", 0},
-  {0x0026, "secp384r1kyber768", "PQ_HYBRID", 97+1184, 48+32, 1, 1, "192-bit + L3", "RFC 9189", 0},
-  {0x0027, "secp384r1kyber1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "RFC 9189", 0},
-  {0x0028, "secp521r1kyber1024", "PQ_HYBRID", 133+1568, 66+32, 1, 1, "256-bit + L5", "RFC 9189", 0},
-  {0x0029, "x448kyber768", "PQ_HYBRID", 56+1184, 56+32, 1, 1, "224-bit + L3", "RFC 9189", 0},
-  {0x002A, "x448kyber1024", "PQ_HYBRID", 56+1568, 56+32, 1, 1, "224-bit + L5", "RFC 9189", 0},
+  {0x0022, "x25519kyber768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "RFC 9189", 0, 0},
+  {0x0023, "secp256r1kyber768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "RFC 9189", 0, 0},
+  {0x0024, "x25519kyber1024", "PQ_HYBRID", 32+1568, 32+32, 1, 1, "128-bit + L5", "RFC 9189", 0, 0},
+  {0x0025, "secp256r1kyber1024", "PQ_HYBRID", 65+1568, 32+32, 1, 1, "128-bit + L5", "RFC 9189", 0, 0},
+  {0x0026, "secp384r1kyber768", "PQ_HYBRID", 97+1184, 48+32, 1, 1, "192-bit + L3", "RFC 9189", 0, 0},
+  {0x0027, "secp384r1kyber1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "RFC 9189", 0, 0},
+  {0x0028, "secp521r1kyber1024", "PQ_HYBRID", 133+1568, 66+32, 1, 1, "256-bit + L5", "RFC 9189", 0, 0},
+  {0x0029, "x448kyber768", "PQ_HYBRID", 56+1184, 56+32, 1, 1, "224-bit + L3", "RFC 9189", 0, 0},
+  {0x002A, "x448kyber1024", "PQ_HYBRID", 56+1568, 56+32, 1, 1, "224-bit + L5", "RFC 9189", 0, 0},
 
   // ========== ML-KEM (FIPS 203, formerly Kyber) Hybrid Groups ==========
   // IANA: https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-18
-  {0x11EC, "X25519MLKEM768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x11ED, "P256MLKEM768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x11EE, "X25519MLKEM1024", "PQ_HYBRID", 32+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x11EF, "P256MLKEM1024", "PQ_HYBRID", 65+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x11F0, "X448MLKEM768", "PQ_HYBRID", 56+1184, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x11F1, "P384MLKEM768", "PQ_HYBRID", 97+1184, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x11F2, "X448MLKEM1024", "PQ_HYBRID", 56+1568, 56+32, 1, 1, "224-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x11F3, "P384MLKEM1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x11F4, "P521MLKEM1024", "PQ_HYBRID", 133+1568, 66+32, 1, 1, "256-bit + L5", "draft-ietf-tls-hybrid-design", 10},
+  {0x11EB, "SecP256r1MLKEM768", "PQ_HYBRID", 65+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0, 1},
+  {0x11EC, "X25519MLKEM768", "PQ_HYBRID", 32+1184, 32+32, 1, 1, "128-bit + L3", "RFC 10024", 0, 1},
+  {0x11ED, "SecP384r1MLKEM1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "RFC 10024", 0, 1},
+  {0x11EE, "X25519MLKEM1024", "PQ_HYBRID", 32+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11EF, "P256MLKEM1024", "PQ_HYBRID", 65+1568, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11F0, "X448MLKEM768", "PQ_HYBRID", 56+1184, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11F1, "P384MLKEM768", "PQ_HYBRID", 97+1184, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11F2, "X448MLKEM1024", "PQ_HYBRID", 56+1568, 56+32, 1, 1, "224-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11F3, "P384MLKEM1024", "PQ_HYBRID", 97+1568, 48+32, 1, 1, "192-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11F4, "P521MLKEM1024", "PQ_HYBRID", 133+1568, 66+32, 1, 1, "256-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
 
   // ========== ML-KEM Only (non-hybrid) ==========
-  {0x11F5, "MLKEM512", "PQ_ONLY", 800, 32, 1, 1, "L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x11F6, "MLKEM768", "PQ_ONLY", 1184, 32, 1, 1, "L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x11F7, "MLKEM1024", "PQ_ONLY", 1568, 32, 1, 1, "L5", "draft-ietf-tls-hybrid-design", 10},
+  {0x11F5, "MLKEM512", "PQ_ONLY", 800, 32, 1, 1, "L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11F6, "MLKEM768", "PQ_ONLY", 1184, 32, 1, 1, "L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11F7, "MLKEM1024", "PQ_ONLY", 1568, 32, 1, 1, "L5", "draft-ietf-tls-hybrid-design", 10, 0},
 
   // ========== NTRU Hybrid Groups ==========
-  {0x11F8, "X25519NTRUHPS2048509", "PQ_HYBRID", 32+699, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x11F9, "P256NTRUHPS2048509", "PQ_HYBRID", 65+699, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x11FA, "X25519NTRUHPS2048677", "PQ_HYBRID", 32+930, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x11FB, "P256NTRUHPS2048677", "PQ_HYBRID", 65+930, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x11FC, "X448NTRUHPS2048677", "PQ_HYBRID", 56+930, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x11FD, "P384NTRUHPS2048677", "PQ_HYBRID", 97+930, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10},
+  {0x11F8, "X25519NTRUHPS2048509", "PQ_HYBRID", 32+699, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11F9, "P256NTRUHPS2048509", "PQ_HYBRID", 65+699, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11FA, "X25519NTRUHPS2048677", "PQ_HYBRID", 32+930, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11FB, "P256NTRUHPS2048677", "PQ_HYBRID", 65+930, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11FC, "X448NTRUHPS2048677", "PQ_HYBRID", 56+930, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11FD, "P384NTRUHPS2048677", "PQ_HYBRID", 97+930, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
 
   // ========== NTRU Prime Hybrid Groups ==========
-  {0x11FE, "X25519NTRULPR653", "PQ_HYBRID", 32+897, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10},
-  {0x11FF, "P256NTRULPR653", "PQ_HYBRID", 65+897, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10},
-  {0x1200, "X25519NTRULPR761", "PQ_HYBRID", 32+1039, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10},
-  {0x1201, "P256NTRULPR761", "PQ_HYBRID", 65+1039, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10},
-  {0x1202, "X448NTRULPR761", "PQ_HYBRID", 56+1039, 56+32, 1, 1, "224-bit", "draft-ietf-tls-hybrid-design", 10},
-  {0x1203, "P384NTRULPR761", "PQ_HYBRID", 97+1039, 48+32, 1, 1, "192-bit", "draft-ietf-tls-hybrid-design", 10},
-  {0x1204, "P521NTRULPR761", "PQ_HYBRID", 133+1039, 66+32, 1, 1, "256-bit", "draft-ietf-tls-hybrid-design", 10},
+  {0x11FE, "X25519NTRULPR653", "PQ_HYBRID", 32+897, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x11FF, "P256NTRULPR653", "PQ_HYBRID", 65+897, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1200, "X25519NTRULPR761", "PQ_HYBRID", 32+1039, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1201, "P256NTRULPR761", "PQ_HYBRID", 65+1039, 32+32, 1, 1, "128-bit", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1202, "X448NTRULPR761", "PQ_HYBRID", 56+1039, 56+32, 1, 1, "224-bit", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1203, "P384NTRULPR761", "PQ_HYBRID", 97+1039, 48+32, 1, 1, "192-bit", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1204, "P521NTRULPR761", "PQ_HYBRID", 133+1039, 66+32, 1, 1, "256-bit", "draft-ietf-tls-hybrid-design", 10, 0},
 
   // ========== Saber (LightSaber) Hybrid Groups ==========
-  {0x1205, "X25519LightSaber", "PQ_HYBRID", 32+672, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x1206, "P256LightSaber", "PQ_HYBRID", 65+672, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x1207, "X25519Saber", "PQ_HYBRID", 32+992, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1208, "P256Saber", "PQ_HYBRID", 65+992, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1209, "X448Saber", "PQ_HYBRID", 56+992, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x120A, "P384Saber", "PQ_HYBRID", 97+992, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10},
+  {0x1205, "X25519LightSaber", "PQ_HYBRID", 32+672, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1206, "P256LightSaber", "PQ_HYBRID", 65+672, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1207, "X25519Saber", "PQ_HYBRID", 32+992, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1208, "P256Saber", "PQ_HYBRID", 65+992, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1209, "X448Saber", "PQ_HYBRID", 56+992, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x120A, "P384Saber", "PQ_HYBRID", 97+992, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
 
   // ========== FrodoKEM Hybrid Groups ==========
-  {0x120B, "X25519Frodo640SHAKE", "PQ_HYBRID", 32+9616, 32+16, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x120C, "P256Frodo640SHAKE", "PQ_HYBRID", 65+9616, 32+16, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x120D, "X25519Frodo976SHAKE", "PQ_HYBRID", 32+15632, 32+24, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x120E, "P256Frodo976SHAKE", "PQ_HYBRID", 65+15632, 32+24, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x120F, "X448Frodo976SHAKE", "PQ_HYBRID", 56+15632, 56+24, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1210, "P384Frodo976SHAKE", "PQ_HYBRID", 97+15632, 48+24, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1211, "X25519Frodo1344SHAKE", "PQ_HYBRID", 32+21520, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x1212, "P256Frodo1344SHAKE", "PQ_HYBRID", 65+21520, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x1213, "P384Frodo1344SHAKE", "PQ_HYBRID", 97+21520, 48+32, 1, 1, "192-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x1214, "P521Frodo1344SHAKE", "PQ_HYBRID", 133+21520, 66+32, 1, 1, "256-bit + L5", "draft-ietf-tls-hybrid-design", 10},
+  {0x120B, "X25519Frodo640SHAKE", "PQ_HYBRID", 32+9616, 32+16, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x120C, "P256Frodo640SHAKE", "PQ_HYBRID", 65+9616, 32+16, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x120D, "X25519Frodo976SHAKE", "PQ_HYBRID", 32+15632, 32+24, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x120E, "P256Frodo976SHAKE", "PQ_HYBRID", 65+15632, 32+24, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x120F, "X448Frodo976SHAKE", "PQ_HYBRID", 56+15632, 56+24, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1210, "P384Frodo976SHAKE", "PQ_HYBRID", 97+15632, 48+24, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1211, "X25519Frodo1344SHAKE", "PQ_HYBRID", 32+21520, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1212, "P256Frodo1344SHAKE", "PQ_HYBRID", 65+21520, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1213, "P384Frodo1344SHAKE", "PQ_HYBRID", 97+21520, 48+32, 1, 1, "192-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1214, "P521Frodo1344SHAKE", "PQ_HYBRID", 133+21520, 66+32, 1, 1, "256-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
 
   // ========== BIKE Hybrid Groups ==========
-  {0x1215, "X25519BIKE1L1", "PQ_HYBRID", 32+1541, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x1216, "P256BIKE1L1", "PQ_HYBRID", 65+1541, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x1217, "X25519BIKE1L3", "PQ_HYBRID", 32+3083, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1218, "P256BIKE1L3", "PQ_HYBRID", 65+3083, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1219, "X448BIKE1L3", "PQ_HYBRID", 56+3083, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x121A, "P384BIKE1L3", "PQ_HYBRID", 97+3083, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10},
+  {0x1215, "X25519BIKE1L1", "PQ_HYBRID", 32+1541, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1216, "P256BIKE1L1", "PQ_HYBRID", 65+1541, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1217, "X25519BIKE1L3", "PQ_HYBRID", 32+3083, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1218, "P256BIKE1L3", "PQ_HYBRID", 65+3083, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1219, "X448BIKE1L3", "PQ_HYBRID", 56+3083, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x121A, "P384BIKE1L3", "PQ_HYBRID", 97+3083, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
 
   // ========== HQC Hybrid Groups ==========
-  {0x121B, "X25519HQCL1", "PQ_HYBRID", 32+2249, 32+64, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x121C, "P256HQCL1", "PQ_HYBRID", 65+2249, 32+64, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x121D, "X25519HQCL3", "PQ_HYBRID", 32+4522, 32+64, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x121E, "P256HQCL3", "PQ_HYBRID", 65+4522, 32+64, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x121F, "X448HQCL3", "PQ_HYBRID", 56+4522, 56+64, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1220, "P384HQCL3", "PQ_HYBRID", 97+4522, 48+64, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10},
+  {0x121B, "X25519HQCL1", "PQ_HYBRID", 32+2249, 32+64, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x121C, "P256HQCL1", "PQ_HYBRID", 65+2249, 32+64, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x121D, "X25519HQCL3", "PQ_HYBRID", 32+4522, 32+64, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x121E, "P256HQCL3", "PQ_HYBRID", 65+4522, 32+64, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x121F, "X448HQCL3", "PQ_HYBRID", 56+4522, 56+64, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1220, "P384HQCL3", "PQ_HYBRID", 97+4522, 48+64, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
 
   // ========== SIKE Hybrid Groups (NOTE: Broken in 2022, included for completeness) ==========
-  {0x1221, "X25519SIKEp434", "PQ_HYBRID_BROKEN", 32+330, 32+16, 0, 0, "128-bit + L1", "draft-ietf-tls-hybrid-design", 0},
-  {0x1222, "P256SIKEp434", "PQ_HYBRID_BROKEN", 65+330, 32+16, 0, 0, "128-bit + L1", "draft-ietf-tls-hybrid-design", 0},
-  {0x1223, "X25519SIKEp503", "PQ_HYBRID_BROKEN", 32+378, 32+24, 0, 0, "128-bit + L2", "draft-ietf-tls-hybrid-design", 0},
-  {0x1224, "P256SIKEp503", "PQ_HYBRID_BROKEN", 65+378, 32+24, 0, 0, "128-bit + L2", "draft-ietf-tls-hybrid-design", 0},
-  {0x1225, "X25519SIKEp610", "PQ_HYBRID_BROKEN", 32+462, 32+24, 0, 0, "128-bit + L3", "draft-ietf-tls-hybrid-design", 0},
-  {0x1226, "P256SIKEp610", "PQ_HYBRID_BROKEN", 65+462, 32+24, 0, 0, "128-bit + L3", "draft-ietf-tls-hybrid-design", 0},
-  {0x1227, "X448SIKEp610", "PQ_HYBRID_BROKEN", 56+462, 56+24, 0, 0, "224-bit + L3", "draft-ietf-tls-hybrid-design", 0},
-  {0x1228, "P384SIKEp610", "PQ_HYBRID_BROKEN", 97+462, 48+24, 0, 0, "192-bit + L3", "draft-ietf-tls-hybrid-design", 0},
-  {0x1229, "X25519SIKEp751", "PQ_HYBRID_BROKEN", 32+564, 32+32, 0, 0, "128-bit + L5", "draft-ietf-tls-hybrid-design", 0},
-  {0x122A, "P256SIKEp751", "PQ_HYBRID_BROKEN", 65+564, 32+32, 0, 0, "128-bit + L5", "draft-ietf-tls-hybrid-design", 0},
-  {0x122B, "P384SIKEp751", "PQ_HYBRID_BROKEN", 97+564, 48+32, 0, 0, "192-bit + L5", "draft-ietf-tls-hybrid-design", 0},
-  {0x122C, "P521SIKEp751", "PQ_HYBRID_BROKEN", 133+564, 66+32, 0, 0, "256-bit + L5", "draft-ietf-tls-hybrid-design", 0},
+  {0x1221, "X25519SIKEp434", "PQ_HYBRID_BROKEN", 32+330, 32+16, 0, 0, "128-bit + L1", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x1222, "P256SIKEp434", "PQ_HYBRID_BROKEN", 65+330, 32+16, 0, 0, "128-bit + L1", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x1223, "X25519SIKEp503", "PQ_HYBRID_BROKEN", 32+378, 32+24, 0, 0, "128-bit + L2", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x1224, "P256SIKEp503", "PQ_HYBRID_BROKEN", 65+378, 32+24, 0, 0, "128-bit + L2", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x1225, "X25519SIKEp610", "PQ_HYBRID_BROKEN", 32+462, 32+24, 0, 0, "128-bit + L3", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x1226, "P256SIKEp610", "PQ_HYBRID_BROKEN", 65+462, 32+24, 0, 0, "128-bit + L3", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x1227, "X448SIKEp610", "PQ_HYBRID_BROKEN", 56+462, 56+24, 0, 0, "224-bit + L3", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x1228, "P384SIKEp610", "PQ_HYBRID_BROKEN", 97+462, 48+24, 0, 0, "192-bit + L3", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x1229, "X25519SIKEp751", "PQ_HYBRID_BROKEN", 32+564, 32+32, 0, 0, "128-bit + L5", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x122A, "P256SIKEp751", "PQ_HYBRID_BROKEN", 65+564, 32+32, 0, 0, "128-bit + L5", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x122B, "P384SIKEp751", "PQ_HYBRID_BROKEN", 97+564, 48+32, 0, 0, "192-bit + L5", "draft-ietf-tls-hybrid-design", 0, 0},
+  {0x122C, "P521SIKEp751", "PQ_HYBRID_BROKEN", 133+564, 66+32, 0, 0, "256-bit + L5", "draft-ietf-tls-hybrid-design", 0, 0},
 
   // ========== Classic McEliece Hybrid Groups ==========
-  {0x122D, "X25519ClassicMcEliece348864", "PQ_HYBRID", 32+261120, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x122E, "P256ClassicMcEliece348864", "PQ_HYBRID", 65+261120, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10},
-  {0x122F, "X25519ClassicMcEliece460896", "PQ_HYBRID", 32+524160, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1230, "P256ClassicMcEliece460896", "PQ_HYBRID", 65+524160, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1231, "X448ClassicMcEliece460896", "PQ_HYBRID", 56+524160, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1232, "P384ClassicMcEliece460896", "PQ_HYBRID", 97+524160, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10},
-  {0x1233, "X25519ClassicMcEliece6688128", "PQ_HYBRID", 32+1044992, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x1234, "P256ClassicMcEliece6688128", "PQ_HYBRID", 65+1044992, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x1235, "P384ClassicMcEliece6688128", "PQ_HYBRID", 97+1044992, 48+32, 1, 1, "192-bit + L5", "draft-ietf-tls-hybrid-design", 10},
-  {0x1236, "P521ClassicMcEliece6688128", "PQ_HYBRID", 133+1044992, 66+32, 1, 1, "256-bit + L5", "draft-ietf-tls-hybrid-design", 10},
+  {0x122D, "X25519ClassicMcEliece348864", "PQ_HYBRID", 32+261120, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x122E, "P256ClassicMcEliece348864", "PQ_HYBRID", 65+261120, 32+32, 1, 1, "128-bit + L1", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x122F, "X25519ClassicMcEliece460896", "PQ_HYBRID", 32+524160, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1230, "P256ClassicMcEliece460896", "PQ_HYBRID", 65+524160, 32+32, 1, 1, "128-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1231, "X448ClassicMcEliece460896", "PQ_HYBRID", 56+524160, 56+32, 1, 1, "224-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1232, "P384ClassicMcEliece460896", "PQ_HYBRID", 97+524160, 48+32, 1, 1, "192-bit + L3", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1233, "X25519ClassicMcEliece6688128", "PQ_HYBRID", 32+1044992, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1234, "P256ClassicMcEliece6688128", "PQ_HYBRID", 65+1044992, 32+32, 1, 1, "128-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1235, "P384ClassicMcEliece6688128", "PQ_HYBRID", 97+1044992, 48+32, 1, 1, "192-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
+  {0x1236, "P521ClassicMcEliece6688128", "PQ_HYBRID", 133+1044992, 66+32, 1, 1, "256-bit + L5", "draft-ietf-tls-hybrid-design", 10, 0},
 
   // ========== Other/Experimental Groups ==========
   // Brainpool curves (not typically used in TLS 1.3)
-  {0x001A, "brainpoolP256r1", "ECDHE", 65, 32, 0, 0, "128-bit", "RFC 7027", 0},
-  {0x001B, "brainpoolP384r1", "ECDHE", 97, 48, 0, 0, "192-bit", "RFC 7027", 0},
-  {0x001C, "brainpoolP512r1", "ECDHE", 133, 64, 0, 0, "256-bit", "RFC 7027", 0},
+  {0x001A, "brainpoolP256r1", "ECDHE", 65, 32, 0, 0, "128-bit", "RFC 7027", 0, 0},
+  {0x001B, "brainpoolP384r1", "ECDHE", 97, 48, 0, 0, "192-bit", "RFC 7027", 0, 0},
+  {0x001C, "brainpoolP512r1", "ECDHE", 133, 64, 0, 0, "256-bit", "RFC 7027", 0, 0},
 
   // Terminator
-  {0x0000, NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0}
+  {0x0000, NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0}
 };
 
 /* ****************************************** */
@@ -6156,6 +6280,18 @@ const char* ndpi_tls_key_share_group2str(u_int16_t group_id, char unknown_group[
 
   ndpi_snprintf(unknown_group, 8, "0X%04X", group_id);
   return(unknown_group);
+}
+
+/* ****************************************** */
+int ndpi_tls_key_share_group_is_pq(u_int16_t group_id) {
+  u_int16_t i;
+
+  for(i = 0; key_share_groups[i].name != NULL; i++) {
+    if(key_share_groups[i].id == group_id)
+      return(key_share_groups[i].is_pqc);
+  }
+
+  return(-1); /* Unknown group: leave the negotiated result unclassified. */
 }
 
 /* ****************************************** */

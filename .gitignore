@@ -77,6 +77,7 @@
 /fuzz/fuzz_alg_shoco
 /fuzz/fuzz_alg_memmem
 /fuzz/fuzz_alg_strnstr
+/fuzz/fuzz_alg_asn1_ber
 /fuzz/fuzz_alg_quick_encryption
 /fuzz/fuzz_config
 /fuzz/fuzz_community_id
@@ -122,6 +123,14 @@
 /fuzz/fuzz_filecfg_risk_domains
 /fuzz/fuzz_filecfg_config
 /fuzz/fuzz_readerutils_workflow
+/fuzz/fuzz_deserialization
+/fuzz/fuzz_alg_ranking
+/fuzz/fuzz_dns_parse
+/fuzz/fuzz_http_parse
+/fuzz/fuzz_match_custom_category
+/fuzz/fuzz_ndpi_decode_tls_blocks
+/fuzz/fuzz_ndpi_reader_nalloc
+/fuzz/fuzz_tls_client_server_hello
 /fuzz/fuzz_ndpi_reader_alloc_fail_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_seed_corpus.zip
 /fuzz/fuzz_ndpi_reader_pl7m_seed_corpus.zip
@@ -162,6 +171,9 @@
 /fuzz/fuzz_http_parse_seed_corpus.zip
 /fuzz/fuzz_dns_parse_seed_corpus.zip
 /fuzz/fuzz_tls_client_server_hello_seed_corpus.zip
+/fuzz/fuzz_deserialization_seed_corpus.zip
+/fuzz/fuzz_ndpi_reader_nalloc_seed_corpus.zip
+/fuzz/fuzz_alg_asn1_ber_seed_corpus.zip
 /fuzz/fuzz_*.dict
 /fuzz/testpcaps.zip
 /influxdb/Makefile

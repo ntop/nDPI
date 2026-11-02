@@ -48,6 +48,11 @@ Please note that the (minimal) pre-requisites for compilation include:
 On Debian/Ubuntu systems do:
 - sudo apt-get install build-essential git gettext flex bison libtool autoconf automake pkg-config libpcap-dev libjson-c-dev libnuma-dev libpcre2-dev libmaxminddb-dev librrd-dev
 
+On RockyLinux (and other RHEL-based) systems do:
+- sudo dnf install epel-release dnf-plugins-core
+- sudo dnf config-manager --set-enabled crb
+- sudo dnf install gcc make git gettext flex bison libtool autoconf automake pkgconf-pkg-config libpcap-devel json-c-devel numactl-devel pcre2-devel libmaxminddb-devel rrdtool-devel
+
 On Arch Linux:
 - sudo pacman -S gcc git gettext flex bison libtool autoconf automake pkg-config libpcap json-c numactl pcre2 libmaxminddb rrdtool
 

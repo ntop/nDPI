@@ -262,6 +262,82 @@ int serializerUnitTest() {
 
 /* *********************************************** */
 
+/* ndpi_reset_serializer() must bring the serializer back to its initial state */
+int serializerResetUnitTest(void)
+{
+  ndpi_serializer serializer, fresh;
+  u_int32_t buffer_len, fresh_len;
+  char *buffer, *fresh_buffer;
+
+  /* TLV: the header is restored even if overwritten after set_buffer_len() */
+  assert(ndpi_init_serializer(&fresh, ndpi_serialization_format_tlv) != -1);
+  assert(ndpi_serialize_string_uint32(&fresh, "a", 101) != -1);
+  assert(ndpi_serialize_end_of_record(&fresh) != -1);
+  fresh_buffer = ndpi_serializer_get_buffer(&fresh, &fresh_len);
+
+  assert(ndpi_init_serializer(&serializer, ndpi_serialization_format_tlv) != -1);
+  assert(ndpi_serializer_set_buffer_len(&serializer, 0) == 0);
+  assert(ndpi_serialize_uint32_uint32(&serializer, 3, 33) != -1);
+  ndpi_reset_serializer(&serializer);
+  assert(ndpi_serialize_string_uint32(&serializer, "a", 101) != -1);
+  assert(ndpi_serialize_end_of_record(&serializer) != -1);
+  buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+  if(buffer_len != fresh_len || memcmp(buffer, fresh_buffer, fresh_len) != 0) {
+    printf("%s: ERROR: TLV output after reset differs from a fresh serializer\n", __func__);
+    return -1;
+  }
+  ndpi_term_serializer(&serializer);
+  ndpi_term_serializer(&fresh);
+
+  /* A snapshot taken before the reset can not be restored after it */
+  assert(ndpi_init_serializer(&serializer, ndpi_serialization_format_tlv) != -1);
+  assert(ndpi_serialize_uint32_uint32(&serializer, 1, 11) != -1);
+  ndpi_serializer_create_snapshot(&serializer);
+  assert(ndpi_serialize_uint32_uint32(&serializer, 2, 22) != -1);
+  ndpi_reset_serializer(&serializer);
+  ndpi_serializer_rollback_snapshot(&serializer);
+  buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+  if(buffer_len != 2) {
+    printf("%s: ERROR: rollback after reset restored a pre-reset snapshot\n", __func__);
+    return -1;
+  }
+  ndpi_term_serializer(&serializer);
+
+  /* CSV: the skip_header hint is preserved across reset */
+  assert(ndpi_init_serializer(&serializer, ndpi_serialization_format_csv) != -1);
+  ndpi_serializer_skip_header(&serializer);
+  ndpi_reset_serializer(&serializer);
+  assert(ndpi_serialize_string_uint32(&serializer, "a", 101) != -1);
+  assert(ndpi_serialize_end_of_record(&serializer) != -1);
+  buffer_len = 0;
+  ndpi_serializer_get_header(&serializer, &buffer_len);
+  if(buffer_len != 0) {
+    printf("%s: ERROR: CSV header built after reset despite skip_header\n", __func__);
+    return -1;
+  }
+  ndpi_term_serializer(&serializer);
+
+  /* CSV: without the hint, the header is built again after reset */
+  assert(ndpi_init_serializer(&serializer, ndpi_serialization_format_csv) != -1);
+  assert(ndpi_serialize_string_uint32(&serializer, "a", 101) != -1);
+  assert(ndpi_serialize_end_of_record(&serializer) != -1);
+  ndpi_reset_serializer(&serializer);
+  assert(ndpi_serialize_string_uint32(&serializer, "b", 102) != -1);
+  assert(ndpi_serialize_end_of_record(&serializer) != -1);
+  buffer_len = 0;
+  buffer = ndpi_serializer_get_header(&serializer, &buffer_len);
+  if(buffer_len != 1 || buffer[0] != 'b') {
+    printf("%s: ERROR: CSV header not rebuilt after reset\n", __func__);
+    return -1;
+  }
+  ndpi_term_serializer(&serializer);
+
+  printf("%30s                      OK\n", __func__);
+  return 0;
+}
+
+/* *********************************************** */
+
 int serializeProtoUnitTest(void)
 {
   ndpi_serializer serializer;
@@ -417,6 +493,7 @@ int main(int argc, char **argv) {
     
   /* Tests */
   if (serializerUnitTest() != 0) return -1;
+  if (serializerResetUnitTest() != 0) return -1;
   if (serializeProtoUnitTest() != 0) return -1;
 
   return 0;

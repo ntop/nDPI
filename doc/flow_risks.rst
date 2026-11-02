@@ -364,3 +364,9 @@ This risk is triggered when an encrypted stream (e.g. TLS, QUIC, SSH, IPSEC) is 
 NDPI_AI_INFERENCE_TRAFFIC
 =========================
 This risk is triggered when TLS/HTTP traffic is likely to be used to access a self-hosted LLM based on applications with ac vLLM or llama.cpp
+
+.. _Risk 060:
+
+NDPI_NON_PQC_FLOW
+=================
+For TLS, this risk is triggered only when an observed ClientHello is followed by a TLS 1.3 ServerHello that visibly negotiates a non-post-quantum key-exchange group. It is not set from a ClientHello advertisement, a server-only trace, or a HelloRetryRequest alone. The standardized ML-KEM hybrid groups from `RFC 10024 <https://www.rfc-editor.org/rfc/rfc10024>`_ are treated as post-quantum. Flows where the handshake is incomplete, resumed with PSK-only, or otherwise does not expose a negotiated key-share are left unclassified.

@@ -1358,6 +1358,7 @@ static ndpi_protocol_match host_match[] =
    { "vk-cdn.net",                       "VK", NDPI_PROTOCOL_VK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "vk-portal.net",                    "VK", NDPI_PROTOCOL_VK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "vk.com",                           "VK", NDPI_PROTOCOL_VK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "vk.ru",                            "VK", NDPI_PROTOCOL_VK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "vkuser.net",                       "VK", NDPI_PROTOCOL_VK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "vkuseraudio.net",                  "VK", NDPI_PROTOCOL_VK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "vkuservideo.net",                  "VK", NDPI_PROTOCOL_VK, NDPI_PROTOCOL_CATEGORY_SOCIAL_NETWORK, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
@@ -1401,6 +1402,8 @@ static ndpi_protocol_match host_match[] =
 
    { "ea.com",                           "ElectronicArts", NDPI_PROTOCOL_ELECTRONICARTS, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
    { "origin-a.akamaihd.net",            "ElectronicArts", NDPI_PROTOCOL_ELECTRONICARTS, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
+
+   { "supercell.com",                    "Supercell", NDPI_PROTOCOL_SUPERCELL, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
 
    { "nvidiagrid.net",                   "GeForceNow", NDPI_PROTOCOL_GEFORCENOW, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
    { "gfe.nvidia.com",                   "GeForceNow", NDPI_PROTOCOL_GEFORCENOW, NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL},
@@ -1593,6 +1596,8 @@ static ndpi_protocol_match host_match[] =
    { "bootstrap.libp2p.io",                     "libp2p", NDPI_PROTOCOL_LIBP2P, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "ipfs",                                    "libp2p", NDPI_PROTOCOL_LIBP2P, NDPI_PROTOCOL_CATEGORY_VPN, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
+   { "janitorai.com",                           "JanitorAI", NDPI_PROTOCOL_JANITORAI, NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_DEFAULT_LEVEL },
+
    { NULL, NULL, NDPI_PROTOCOL_UNKNOWN, NDPI_PROTOCOL_CATEGORY_UNSPECIFIED, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL }
   };
 
@@ -1773,7 +1778,6 @@ static ndpi_category_match category_match[] = {
    /* Same games. We don't have yet (or we don't want...) specific ID for this stuff */
    { "callofduty.com",                   NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
    { "king.com",                         NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
-   { "supercell.com",                    NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_FUN },
 
    /* ADS & Tracking & Analytics */
    /* Chartbeat is a technology company that provides data and analytics to global publishers */

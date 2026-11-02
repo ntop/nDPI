@@ -164,6 +164,8 @@ ntop_fds.client_nw_rtt    = ProtoField.new("TCP client network RTT (msec)",  "nt
 ntop_fds.server_nw_rtt    = ProtoField.new("TCP server network RTT (msec)",  "ntop.latency.server_rtt", ftypes.FLOAT,  nil, base.NONE)
 ntop_fds.appl_latency_rtt = ProtoField.new("Application Latency RTT (msec)", "ntop.latency.appl_rtt",   ftypes.FLOAT,  nil, base.NONE)
 ntop_fds.tcp_fingerprint  = ProtoField.new("TCP Fingerprint",                "ntop.tcp_fingerprint",    ftypes.STRING, nil, base.NONE)
+ntop_fds.tcp_mss          = ProtoField.new("TCP MSS",                        "ntop.tcp_mss",            ftypes.UINT16, nil, base.DEC)
+ntop_fds.tcp_fastopen     = ProtoField.new("TCP Fast Open",                  "ntop.tcp_fastopen",       ftypes.UINT8,  {[0] = "None", [1] = "Cookie request", [2] = "Cookie"}, base.DEC)
 ntop_fds.dhcp_fingerprint = ProtoField.new("DHCP Fingerprint",               "ntop.dhcp_fingerprint",   ftypes.STRING, nil, base.NONE)
 
 local f_eth_source        = Field.new("eth.src")
@@ -305,57 +307,18 @@ local ndpi_proto_meet     = "GoogleMeet" -- NDPI_PROTOCOL_GOOGLE_MEET
 
 -- Keep in sync with src/lib/ndpi_os_fingerprint.c.inc
 local tcp_fingeprint_db = {
-   ['2_64_65535_defa183edeca']       = "FreeBSD",
+   ['2_64_65535_2b9b4c52']           = "FreeBSD",          -- 2,1,3:6,4,8
 
-   ['2_64_64800_5ec4846073b9']       = "Linux",
-   ['2_64_64240_5ec4846073b9']       = "Linux",
-   ['2_64_29200_5ec4846073b9']       = "Linux",
-   ['2_64_29200_96f084d7f50c']       = "Linux",
-   ['2_64_14600_b88686e220ac']       = "Linux",
-   ['2_64_32120_5ec4846073b9']       = "Linux",
-   ['2_64_64240_9ade5ea639dd']       = "Linux",
+   ['2_64_64240_789c1d1f']           = "Linux",            -- 2,4,8,1,3:7
 
-   ['2_64_65535_8b4e598a2ef6']       = "Android",
-   ['2_64_65535_25d42dd21321']       = "Android",
-   ['2_64_65535_9ade5ea639dd']       = "Android",
-   ['2_64_65535_5ec4846073b9']       = "Android",
+   ['2_64_65535_58b6a464']           = "Android",          -- 2,4,8,1,3:10
 
-   ['2_128_64240_e035a9f8f3a0']      = "Windows",
-   ['2_128_8192_4973d993fb4a']       = "Windows",
-   ['194_128_64240_e035a9f8f3a0']    = "Windows",
-   ['194_128_32768_6b34051d2fbf']    = "Windows",
-   ['2_128_32768_6b34051d2fbf']      = "Windows",
-   ['2_128_65535_e035a9f8f3a0']      = "Windows",
-   ['194_128_32_6b34051d2fbf']       = "Windows",
-   ['194_128_64954_e035a9f8f3a0']    = "Windows",
-   ['194_128_65160_55a079b2ce62']    = "Windows",
-   ['194_128_65340_e035a9f8f3a0']    = "Windows",
-   ['194_128_65535_a717f7945d0a']    = "Windows",
-   ['194_128_65535_e035a9f8f3a0']    = "Windows",
-   ['194_128_65535_da2db3bc812e']    = "Windows",
-   ['194_128_8192_6b34051d2fbf']     = "Windows",
-   ['2_128_62636_55a079b2ce62']      = "Windows",
-   ['2_128_62720_e035a9f8f3a0']      = "Windows",
-   ['2_128_64390_55a079b2ce62']      = "Windows",
-   ['2_128_64512_55a079b2ce62']      = "Windows",
-   ['2_128_64668_e035a9f8f3a0']      = "Windows",
-   ['2_128_64872_e035a9f8f3a0']      = "Windows",
-   ['2_128_65010_e035a9f8f3a0']      = "Windows",
-   ['2_128_65088_e035a9f8f3a0']      = "Windows",
-   ['2_128_65160_55a079b2ce62']      = "Windows",
-   ['2_128_65312_55a079b2ce62']      = "Windows",
-   ['2_128_65424_e035a9f8f3a0']      = "Windows",
-   ['2_128_65520_55a079b2ce62']      = "Windows",
-   ['2_128_65535_3623b899804f']      = "Windows",
-   ['2_128_65535_55a079b2ce62']      = "Windows",
-   ['2_128_65535_e2026928e080']      = "Windows",
+   ['194_64_65535_e76f0f14']         = "macOS/iOS/iPad",   -- 2,1,3:6,1,1,8,4,0
+   ['2_64_65535_e76f0f14']           = "macOS/iOS/iPad",   -- 2,1,3:6,1,1,8,4,0
+   ['194_64_65535_2b6d3038']         = "macOS/iOS/iPad",   -- 2,1,3:5,1,1,8,4,0
 
-   ['194_64_65535_fa6f8edaadeb']     = "iOS",
-
-   ['194_64_65535_96500ba614e1']     = "macOS/iOS",
-   ['2_64_65535_96500ba614e1']       = "macOS/iOS",
-   ['2_64_0_96500ba614e1']           = "macOS/iOS",
-   ['2_64_65535_4fcd627e5690']       = "macOS",
+   ['2_128_64240_47466ece']          = "Windows",          -- 2,1,3:8,1,1,4
+   ['2_128_65535_47466ece']          = "Windows",          -- 2,1,3:8,1,1,4
 }
 
 -- ##############################################
@@ -616,6 +579,56 @@ local function digestblock(msg, i, H)
    H[6] = band(H[6] + f)
    H[7] = band(H[7] + g)
    H[8] = band(H[8] + h)
+end
+
+-- 32-bit multiplication modulo 2^32 that is exact also with
+-- floating-point Lua numbers (each partial product is < 2^48)
+local function mul32(a, b)
+   local b_lo = b % 65536
+   local b_hi = (b - b_lo) / 65536
+
+   return (a * b_lo + ((a * b_hi) % 65536) * 65536) % 4294967296
+end
+
+local function rotl32(x, r)
+   return (lshift(x, r) + rshift(x, 32 - r)) % 4294967296
+end
+
+-- MurmurHash3_x86_32 (seed 0 by default): 4-octet blocks are read little-endian
+function murmur3_32(msg, seed)
+   local c1, c2 = 0xcc9e2d51, 0x1b873593
+   local len    = #msg
+   local h      = seed or 0
+   local nblocks = math.floor(len / 4)
+   local k
+
+   for b = 0, nblocks - 1 do
+      local o = b * 4
+
+      k = string.byte(msg, o + 1) + string.byte(msg, o + 2) * 0x100
+	 + string.byte(msg, o + 3) * 0x10000 + string.byte(msg, o + 4) * 0x1000000
+      k = mul32(rotl32(mul32(k, c1), 15), c2)
+      h = bxor(h, k)
+      h = (mul32(rotl32(h, 13), 5) + 0xe6546b64) % 4294967296
+   end
+
+   local tail = len % 4
+
+   if(tail > 0) then
+      local o = nblocks * 4
+
+      k = 0
+      for j = tail, 1, -1 do k = k * 256 + string.byte(msg, o + j) end
+      k = mul32(rotl32(mul32(k, c1), 15), c2)
+      h = bxor(h, k)
+   end
+
+   h = bxor(h, len)
+   h = mul32(bxor(h, rshift(h, 16)), 0x85ebca6b)
+   h = mul32(bxor(h, rshift(h, 13)), 0xc2b2ae35)
+   h = bxor(h, rshift(h, 16))
+
+   return math.floor(h)
 end
 
 -- Made this global
@@ -1358,7 +1371,7 @@ end
 
 -- ###############################################
 
--- nDPI native TCP fingerprint (see README.tcp_fingerprint.md): number of
+-- nDPI native TCP fingerprint (see fingerprint/nDPI_TCP_fingerprint.md): number of
 -- value octets of the option starting at opts[i] to be added to the
 -- fingerprint, or -1 to skip the (ephemeral) option
 function tcp_option_value_len(opts, i, n)
@@ -1389,13 +1402,16 @@ function tcp_option_value_len(opts, i, n)
    return 255
 end
 
--- Returns the raw options string (hex) hashed by the nDPI native TCP fingerprint
+-- Returns the raw options string hashed by the nDPI native TCP fingerprint
+-- (comma-separated decimal tokens, e.g. "2,4,8,1,3:7"), the MSS (0 if
+-- absent) and the TCP Fast Open state (0 none, 1 cookie request, 2 cookie)
 function tcp_options_fingerprint(hex_options)
-   local fingerprint = ""
+   local tokens = {}
    local opts = {}
    local n, i
-   local nop_start = nil  -- start of the current NOP run in fingerprint
+   local nop_start = nil   -- number of tokens before the current NOP run
    local skip_nops = false -- skip the NOP padding of an ephemeral option
+   local mss, fastopen = 0, 0
 
    for j = 1, hex_options:len() - 1, 2 do
       opts[#opts + 1] = tonumber(hex_options:sub(j, j + 1), 16)
@@ -1411,8 +1427,8 @@ function tcp_options_fingerprint(hex_options)
       if(kind == 1) then
 	 -- NOP
 	 if(not skip_nops) then
-	    if(nop_start == nil) then nop_start = fingerprint:len() end
-	    fingerprint = fingerprint .. "01"
+	    if(nop_start == nil) then nop_start = #tokens end
+	    tokens[#tokens + 1] = "1"
 	 end
 
 	 i = i + 1
@@ -1421,7 +1437,10 @@ function tcp_options_fingerprint(hex_options)
 
 	 if(value_len < 0) then
 	    -- Ephemeral option: drop also the NOP padding that precedes it
-	    if(nop_start ~= nil) then fingerprint = fingerprint:sub(1, nop_start) end
+	    if(nop_start ~= nil) then
+	       for j = #tokens, nop_start + 1, -1 do tokens[j] = nil end
+	    end
+
 	    skip_nops = true
 	 else
 	    skip_nops = false
@@ -1431,11 +1450,11 @@ function tcp_options_fingerprint(hex_options)
 
 	 if(kind == 0) then
 	    -- EOL: what follows is padding
-	    fingerprint = fingerprint .. "00"
+	    tokens[#tokens + 1] = "0"
 	    break
 	 end
 
-	 if(value_len >= 0) then fingerprint = fingerprint .. string.format("%02x", kind) end
+	 if(value_len >= 0) then tokens[#tokens + 1] = tostring(kind) end
 
 	 if(i + 1 > n) then break end -- Truncated option
 
@@ -1443,11 +1462,25 @@ function tcp_options_fingerprint(hex_options)
 
 	 if(len == 0) then break end -- Malformed option
 
+	 if((kind == 2) and (len == 4) and (i + 3 <= n)) then
+	    mss = opts[i + 2] * 256 + opts[i + 3]
+	 end
+
+	 if(value_len < 0) then
+	    -- TCP Fast Open (kind 34, or experimental with ExID 0xF989)
+	    local base = 4
+	    local state = 1
+
+	    if(kind == 34) then base = 2 end
+	    if(len > base) then state = 2 end
+	    if(state > fastopen) then fastopen = state end
+	 end
+
 	 if((len > 2) and (value_len > 0)) then
 	    local last = math.min(i + len - 1, n, i + 1 + value_len)
 
 	    for j = i + 2, last do
-	       fingerprint = fingerprint .. string.format("%02x", opts[j])
+	       tokens[#tokens] = tokens[#tokens] .. ":" .. opts[j]
 	    end
 	 end
 
@@ -1455,34 +1488,39 @@ function tcp_options_fingerprint(hex_options)
       end
    end
 
-   return fingerprint
+   return table.concat(tokens, ","), mss, fastopen
 end
 
 -- ###############################################
 
 function tcp_fingerprint(tvb, pinfo, tree, ip_version)
    local tcp_flags = getval(f_tcp_flags())
+   local num_tcp_flags = tonumber(string.sub(tcp_flags, 3), 16)
 
-   if((tcp_flags == "0x0002")-- SYN
-      or (tcp_flags == "0x00c2") -- SYN / ECE / CWR
+   if((num_tcp_flags ~= nil)
+      and ((num_tcp_flags % 4) >= 2)                  -- SYN set
+      and ((math.floor(num_tcp_flags / 16) % 2) == 0) -- ACK clear
    ) then
       local tcp_options = f_tcp_options()
-      
-      if(tcp_options ~= nil) then
+      local d_tcp_options = ""
+
+      -- A SYN without options is fingerprinted too (empty raw options string)
+      if(tcp_options ~= nil) then d_tcp_options = tcp_options.display end
+
+      do
 	 local tcp_win = getval(f_tcp_win())
-	 local fingerprint = ""	 
-	 local d_tcp_options = tcp_options.display
+	 local fingerprint, mss, fastopen
 	 local tcp_opt_debug = false
 
 	 if(tcp_win == "nil") then tcp_win = 0 end
 
-	 fingerprint = tcp_options_fingerprint(d_tcp_options)
+	 fingerprint, mss, fastopen = tcp_options_fingerprint(d_tcp_options)
 
 	 if(tcp_opt_debug) then tprint("[Raw options fingerprint: " .. fingerprint .."]") end
 
 	 local ip_ttl
 	 local src_ip
-	 
+
 	 if(ip_version == 6) then
 	    ip_ttl = getval(f_ipv6_hlim())
 	    src_ip = f_src_ipv6()
@@ -1490,7 +1528,7 @@ function tcp_fingerprint(tvb, pinfo, tree, ip_version)
 	    ip_ttl = getval(f_ip_ttl())
 	    src_ip = f_src_ip()
 	 end
-	 
+
 	 src_ip  = getval(src_ip)
 
 	 -- Normalize TTL
@@ -1501,29 +1539,22 @@ function tcp_fingerprint(tvb, pinfo, tree, ip_version)
 	 elseif(ip_ttl <= 192) then ip_ttl = 192
 	 else ip_ttl = 255     end
 
-	 fingerprint = string.lower(fingerprint)
-
-	 local f_print
-	 local num_tcp_flags = tostring(tonumber(string.sub(tcp_flags, 3), 16))
-
-	 if(true) then
-	    -- Use SHA256
-	    f_print = string.lower(num_tcp_flags.."_"..ip_ttl .."_".. tcp_win .."_".. string.sub(sha256(fingerprint), 1, 12))
-	 else
-	    f_print = string.upper(num_tcp_flags.."_"..ip_ttl .."_".. tcp_win .."_".. fingerprint)
-	 end
+	 local f_print = (num_tcp_flags % 4096) .."_"..ip_ttl .."_".. tcp_win .."_"
+	    .. string.format("%08x", murmur3_32(fingerprint, 0))
 
 	 if(tcp_opt_debug) then tprint("Fingerprint: " .. f_print) end
-	 
+
 	 local tcp_f_entry = tree:add(ntop_proto, tvb())
 	 tcp_f_entry:add(ntop_fds.tcp_fingerprint, f_print)
-	 
-	 tcp_host_fingerprints[src_ip] = f_print	 
+	 tcp_f_entry:add(ntop_fds.tcp_mss, mss)
+	 tcp_f_entry:add(ntop_fds.tcp_fastopen, fastopen)
+
+	 tcp_host_fingerprints[src_ip] = f_print
 
 	 if(tcp_fingerprint_hosts[f_print] == nil) then
 	    tcp_fingerprint_hosts[f_print] = {}
 	 end
-	 
+
 	 tcp_fingerprint_hosts[f_print][src_ip] = 1
       end
    end

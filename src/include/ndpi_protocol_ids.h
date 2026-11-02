@@ -524,6 +524,10 @@ typedef enum {
   NDPI_PROTOCOL_CHARACTER_AI          = 492,
   NDPI_PROTOCOL_DUCKDUCKGO            = 493,
   NDPI_PROTOCOL_PEACOCK               = 494,
+  NDPI_PROTOCOL_SUPERCELL             = 495,
+  NDPI_PROTOCOL_POWERSHELL            = 496,
+  NDPI_PROTOCOL_JANITORAI             = 497,
+  NDPI_PROTOCOL_L2TP                  = 498,
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 

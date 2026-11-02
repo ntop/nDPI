@@ -16,13 +16,15 @@ u_int32_t MurmurHash(const void *key, u_int32_t len, u_int32_t seed) {
 
   const u_int32_t c1 = 0xcc9e2d51;
   const u_int32_t c2 = 0x1b873593;
-  const u_int32_t *blocks = NULL;
+  const u_int8_t *blocks = NULL;
   if(data && len) /* To avoid UBSAN warning: runtime error: applying zero offset to null pointer */
-    blocks = (const u_int32_t *)(data + nblocks * 4);
+    blocks = data + nblocks * 4;
 
   for(i = -nblocks; i; i++)
     {
-      u_int32_t k1 = blocks[i];
+      /* Little-endian read (canonical MurmurHash3): host-independent and alignment-safe */
+      const u_int8_t *b = blocks + i * 4;
+      u_int32_t k1 = (u_int32_t)b[0] | ((u_int32_t)b[1] << 8) | ((u_int32_t)b[2] << 16) | ((u_int32_t)b[3] << 24);
 
       k1 *= c1;
       k1 = ROTL32(k1, 15);

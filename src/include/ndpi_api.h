@@ -1447,13 +1447,16 @@ extern "C" {
   void ndpi_term_serializer(ndpi_serializer *serializer);
 
   /**
-   * Reset the serializer (cleanup the internal buffer to start a new serialization)
+   * Reset the serializer (cleanup the internal buffer to start a new serialization).
+   * Any snapshot taken before the reset is discarded, while the
+   * ndpi_serializer_skip_header() hint is preserved.
    * @param serializer The serializer handle
    */
   void ndpi_reset_serializer(ndpi_serializer *serializer);
 
   /**
-   * Hint to not create the header (used to avoid creating the header when not used)
+   * Hint to not create the header (used to avoid creating the header when not used).
+   * The hint is preserved across ndpi_reset_serializer().
    * @param serializer The serializer handle
    */
   void ndpi_serializer_skip_header(ndpi_serializer *serializer);
@@ -1982,6 +1985,7 @@ extern "C" {
   u_int32_t ndpi_rev_hash_string(const char *str);
   u_int32_t ndpi_hash_string_len(const char *str, u_int len);
   u_int32_t ndpi_murmur_hash(const char *str, u_int str_len);
+  u_int32_t ndpi_murmur_hash_seed(const char *str, u_int str_len, u_int seed);
 
   /* ******************************* */
 
@@ -2780,6 +2784,36 @@ extern "C" {
   float ndpi_tls_blocks_len_compare(struct ndpi_tls_block *a,
 				    struct ndpi_tls_block *b,
 				    u_int8_t num_tls_blocks);
+
+  /* ******************************
+
+     ASN.1 BER decoding
+
+     Only the low-tag-number form (tag number < 31) and definite lengths
+     (up to 4 length octets) are supported.
+
+     ****************************** */
+
+  /*
+    Decode the length octets.
+    Returns the length value or -1; *value_len is set to the number of length octets
+  */
+  int64_t ndpi_asn1_ber_decode_length(const unsigned char *payload, int payload_len,
+				      u_int16_t *value_len);
+  /*
+    Decode identifier and length octets.
+    Returns the number of header bytes or -1; the value might be longer than the buffer
+  */
+  int ndpi_asn1_ber_decode_header(const u_int8_t *buf, u_int32_t buf_len,
+				  u_int8_t *tag, u_int32_t *length);
+  /* Decode a whole TLV. Returns the number of bytes used by it or -1 */
+  int ndpi_asn1_ber_decode_tlv(const u_int8_t *buf, u_int32_t buf_len,
+			       struct ndpi_asn1_ber_tlv * const tlv);
+  /* Decode a TLV which must fill the entire buffer. Returns 0 or -1 */
+  int ndpi_asn1_ber_decode_single_tlv(const u_int8_t *buf, u_int32_t buf_len,
+				      struct ndpi_asn1_ber_tlv * const tlv);
+  /* Decode a buffer holding exactly one INTEGER (up to 4 bytes). Returns 0 or -1 */
+  int ndpi_asn1_ber_decode_int(const u_int8_t *buf, u_int32_t buf_len, int32_t * const out);
 
 #ifdef __cplusplus
 }

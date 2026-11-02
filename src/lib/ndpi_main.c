@@ -151,6 +151,7 @@
 #include "third_party/include/ndpi_patricia.h"
 #include "third_party/include/ndpi_md5.h"
 #include "third_party/include/ndpi_sha256.h"
+#include "third_party/include/MurmurHash3.h"
 
 #ifdef HAVE_NBPF
 #include "nbpf.h"
@@ -222,6 +223,7 @@ static ndpi_risk_info ndpi_known_risks[] = {
   { NDPI_SLOW_DOS,                              NDPI_RISK_HIGH,   CLIENT_HIGH_RISK_PERCENTAGE, NDPI_CLIENT_ACCOUNTABLE },
   { NDPI_NON_PQC,                               NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE   },
   { NDPI_AI_INFERENCE_TRAFFIC,                  NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE   },
+  { NDPI_NON_PQC_FLOW,                           NDPI_RISK_MEDIUM, CLIENT_FAIR_RISK_PERCENTAGE, NDPI_BOTH_ACCOUNTABLE   },
 
   /* Leave this as last member */
   { NDPI_MAX_RISK,                              NDPI_RISK_LOW,    CLIENT_FAIR_RISK_PERCENTAGE, NDPI_NO_ACCOUNTABILITY   }
@@ -1742,7 +1744,7 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DHCPV6,
 			  "DHCPV6", NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+			  ndpi_build_default_ports(ports_b, 546, 547, 0, 0, 0) /* UDP */,
 			  0, 0 /* protocol classification cannot change if partial */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_FUN, NDPI_PROTOCOL_ARMAGETRON,
 			  "Armagetron", NDPI_PROTOCOL_CATEGORY_GAME, NDPI_PROTOCOL_QOE_CATEGORY_ONLINE_GAMING,
@@ -3047,6 +3049,16 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
                           ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
                           0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_POWERSHELL,
+                          "PowerShell", NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+  ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_L2TP,
+                          "L2TP", NDPI_PROTOCOL_CATEGORY_NETWORK, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
 
   /* calling function for host and content matched protocols */
   init_string_based_protocols(ndpi_str);
@@ -3853,6 +3865,10 @@ static int ndpi_add_host_ip_subprotocol(struct ndpi_detection_module_struct *ndp
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags = AI_CANONNAME;
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+  /* While fuzzing, never trigger real DNS queries: they are slow and non-deterministic */
+  hints.ai_flags |= AI_NUMERICHOST;
+#endif
 
   if(!is_ipv6 && ndpi_str->protocols) {
     /* Check if the IP address is symbolic or numeric */
@@ -7627,6 +7643,11 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Free Fire */
   init_freefire_dissector(ndpi_str);
 
+  /* PowerShell */
+  init_powershell_dissector(ndpi_str);
+
+  /* Layer 2 Tunneling Protocol */
+  init_l2tp_dissector(ndpi_str);
 
 
   /* Keep DNS as last entry! */
@@ -8127,10 +8148,18 @@ void ndpi_free_flow_data_protos(struct ndpi_flow_struct* flow) {
         ndpi_free(flow->metadata.protos.sip.from);
         flow->metadata.protos.sip.from = NULL;
       }
+      
       if(flow->metadata.protos.sip.to) {
         ndpi_free(flow->metadata.protos.sip.to);
         flow->metadata.protos.sip.to = NULL;
       }
+    }
+
+    if(flow_is_proto(flow, NDPI_PROTOCOL_SMBV23)) {
+      if(flow->metadata.protos.smb.filename != NULL) {
+	ndpi_free(flow->metadata.protos.smb.filename);
+	flow->metadata.protos.smb.filename = NULL;
+      }	
     }
 
     if (flow_is_proto(flow, NDPI_PROTOCOL_SSDP)) {
@@ -8424,7 +8453,7 @@ void ndpi_free_flow_data(struct ndpi_flow_struct* flow) {
 /*
   NDPI_NATIVE_TCP_FINGERPRINT: number of option value octets to be
   added to the fingerprint for the option starting at opt[0]
-  (see README.tcp_fingerprint.md).
+  (see fingerprint/nDPI_TCP_fingerprint.md).
 
   Return code:
   -1   Ephemeral option: skip it (kind included)
@@ -8548,18 +8577,24 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	ndpi_tcp_fingerprint_format fp_format = ndpi_str->cfg.tcp_fingerprint_format;
 
 	if((flags & TH_SYN) && ((flags & TH_ACK) == 0)) {
-	  char fingerprint[128], options_fp[128];
+	  /*
+	    options_fp: comma-separated decimal option tokens (e.g. "2,4,8,1,3:7").
+	    With 40 option octets it is at most 155 characters long.
+	  */
+	  char fingerprint[128], options_fp[192];
 	  u_int16_t i; /* u_int16_t: i += len must not wrap (options_len <= 40, len <= 255) */
 	  u_int8_t fp_idx = 0, options_fp_len = 0;
 	  int nop_start = -1; /* Offset in options_fp of the current NOP run */
 	  u_int8_t skip_nops = 0; /* Skip the NOP padding of an ephemeral option */
+	  u_int8_t eol_seen = 0; /* MuonFP keeps parsing after EOL */
+	  u_int16_t fp_mss = 0; /* Exported MSS (well-formed option only) */
+	  u_int8_t fp_fastopen = 0; /* Exported TFO state: 0 none, 1 cookie request, 2 cookie */
 
 	  if(tcp_header_len >= sizeof(struct ndpi_tcphdr)) {
 	    u_int8_t *options = (u_int8_t*)(&t[sizeof(struct ndpi_tcphdr)]);
 	    u_int8_t options_len = tcp_header_len - sizeof(struct ndpi_tcphdr);
 	    u_int16_t tcp_win = ntohs(packet->tcp->window);
 	    u_int8_t ip_ttl;
-	    u_int8_t sha_hash[NDPI_SHA256_BLOCK_SIZE];
 	    u_int32_t tcp_mss = 0, tcp_wscale = 0;
 	    int rc;
 
@@ -8639,9 +8674,10 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		  }
 
 		  if(value_len >= 0) {
-		    rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", kind);
+		    rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len,
+				  "%s%u", (options_fp_len > 0) ? "," : "", kind);
 
-		    if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp)))
+		    if((rc < 0) || (rc >= (int)(sizeof(options_fp)-options_fp_len)))
 		      break;
 
 		    options_fp_len += rc;
@@ -8662,6 +8698,7 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		  if(fp_format == NDPI_NATIVE_TCP_FINGERPRINT)
 		    break; /* What follows is padding (RFC 9293) */
 
+		  eol_seen = 1;
 		  i++;
 		  continue;
 		} else if(kind == 1) /* NOP */
@@ -8675,12 +8712,27 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
 		  if(len == 0)
 		    break; /* Malformed option */
-		  else if(len > 2) {
+
+		  if(!eol_seen) {
+		    /* Values exported next to the fingerprint (not part of it) */
+		    if((kind == 2 /* MSS */) && (len == 4) && ((i + 4) <= options_len))
+		      fp_mss = (options[i+2] << 8) + options[i+3];
+		    else if((kind == 34 /* TCP Fast Open */)
+			    || (((kind == 253) || (kind == 254)) && ((i + 3) < options_len)
+				&& (options[i+2] == 0xF9) && (options[i+3] == 0x89) /* Experimental TFO */)) {
+		      u_int8_t state = (len > ((kind == 34) ? 2 : 4)) ? 2 /* Cookie */ : 1 /* Cookie request */;
+
+		      if(state > fp_fastopen)
+			fp_fastopen = state;
+		    }
+		  }
+
+		  if(len > 2) {
 		    int j = i+2;
 		    u_int8_t opt_len = len - 2;
 
 		    if(((kind == 2 /* Maximum segment size */) || (kind == 3 /* TCP window scale */)) &&
-		       j + opt_len - 1 < options_len){
+		       j + opt_len - 1 < options_len) {
 		      u_int32_t val = 0;
 
 		      if(opt_len == 1)
@@ -8702,8 +8754,8 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 		      u_int8_t fp_value_len = (value_len <= 0) ? 0 : ((value_len < opt_len) ? value_len : opt_len);
 
 		      while((fp_value_len > 0) && (j < options_len)) {
-			rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, "%02x", options[j]);
-			if((rc < 0) || ((int)(options_fp_len + rc) == sizeof(options_fp))) break;
+			rc = snprintf(&options_fp[options_fp_len], sizeof(options_fp)-options_fp_len, ":%u", options[j]);
+			if((rc < 0) || (rc >= (int)(sizeof(options_fp)-options_fp_len))) break;
 
 			options_fp_len += rc;
 			j++, fp_value_len--;
@@ -8739,11 +8791,8 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 
 	    switch(fp_format) {
 	    case NDPI_NATIVE_TCP_FINGERPRINT:
-	      ndpi_sha256((const u_char*)options_fp, options_fp_len, sha_hash);
-
-	      snprintf(&fingerprint[fp_idx], sizeof(fingerprint)-fp_idx, "%02x%02x%02x%02x%02x%02x",
-		       sha_hash[0], sha_hash[1], sha_hash[2],
-		       sha_hash[3], sha_hash[4], sha_hash[5]);
+	      snprintf(&fingerprint[fp_idx], sizeof(fingerprint)-fp_idx, "%08x",
+		       MurmurHash(options_fp, options_fp_len, 0 /* seed */));
 	      break;
 
 	    case NDPI_MUONFP_TCP_FINGERPRINT:
@@ -8776,6 +8825,8 @@ int ndpi_init_packet(struct ndpi_detection_module_struct *ndpi_str,
 	      metadata->l4.tcp.fingerprint_raw = ndpi_strdup(options_fp);
 
 	    metadata->l4.tcp.os_hint = ndpi_get_os_from_tcp_fingerprint(ndpi_str, metadata->l4.tcp.fingerprint);
+	    metadata->l4.tcp.mss = fp_mss;
+	    metadata->l4.tcp.fastopen = fp_fastopen;
 	  }
 	}
       }
@@ -10894,6 +10945,10 @@ static void ndpi_internal_detection_process_packet(struct ndpi_detection_module_
      flow->core.num_processed_pkts >= ndpi_str->cfg.max_packets_to_process &&
      flow->core.state != NDPI_STATE_MONITORING) {
 
+    /* The per-flow DPI limit is authoritative. Clear any pending extra
+       dissector so readers can observe that this flow is complete. */
+    flow->core.extra_packets_func = NULL;
+
     /* Reason: too many packets */
     /* We are stopping and we might not have a proper classification:
        this is the reason we call ndpi_internal_detection_giveup() instead of internal_giveup() */
@@ -11543,6 +11598,15 @@ static void proto_stack_update(struct ndpi_proto_stack *s, u_int16_t lower_proto
   if(s->protos_num >= 2 &&
      (s->protos[s->protos_num - 1] == upper_proto)) {
     s->protos_num--;
+  }
+  /* NETBIOS/SMBV23 + SMBV23/POWERSHELL -> SMBV23/POWERSHELL */
+  if(s->protos_num == 2 &&
+     s->protos[0] == NDPI_PROTOCOL_NETBIOS &&
+     s->protos[1] == NDPI_PROTOCOL_SMBV23 &&
+     lower_proto == NDPI_PROTOCOL_SMBV23) {
+    s->protos[0] = NDPI_PROTOCOL_SMBV23;
+    s->protos[1] = NDPI_PROTOCOL_UNKNOWN;
+    s->protos_num = 1;
   }
   /* RDP + TLS/RDP -> RDP/TLS */
   if(s->protos_num == 1 &&
@@ -12981,7 +13045,7 @@ static int enough(int a, int b) {
 
 /* ******************************************************************** */
 
-u_int8_t ends_with(struct ndpi_detection_module_struct *ndpi_struct,
+u_int8_t ndpi_ends_with(struct ndpi_detection_module_struct *ndpi_struct,
                    char *str, char *ends) {
   u_int str_len = str ? strlen(str) : 0;
   u_int8_t ends_len = strlen(ends);
@@ -13052,12 +13116,12 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
     if((!name)
        || (strchr(name, '_') != NULL)
        || (strchr(name, '-') != NULL)
-       || (ends_with(ndpi_str, name, "in-addr.arpa"))
-       || (ends_with(ndpi_str, name, "ip6.arpa"))
+       || (ndpi_ends_with(ndpi_str, name, "in-addr.arpa"))
+       || (ndpi_ends_with(ndpi_str, name, "ip6.arpa"))
        /* Ignore TLD .local .lan and .home */
-       || (ends_with(ndpi_str, name, ".local"))
-       || (ends_with(ndpi_str, name, ".lan"))
-       || (ends_with(ndpi_str, name, ".home"))
+       || (ndpi_ends_with(ndpi_str, name, ".local"))
+       || (ndpi_ends_with(ndpi_str, name, ".lan"))
+       || (ndpi_ends_with(ndpi_str, name, ".home"))
        )
       return(0);
 
@@ -13212,7 +13276,7 @@ int ndpi_check_dga_name(struct ndpi_detection_module_struct *ndpi_str,
 
 	if((word_len = strlen(word)) < 5) continue;
 
-	if((word_len < 10) && (ends_with(ndpi_str, word, "cdn") /* Content Delivery Network ? */))
+	if((word_len < 10) && (ndpi_ends_with(ndpi_str, word, "cdn") /* Content Delivery Network ? */))
 	  continue; /* Ignore names (not too long) that end with cdn [ ssl.p.jwpcdn.com or www.awxcdn.com ] */
 
 	NDPI_LOG_DBG2(ndpi_str, "[DGA] word(%s) [%s][len: %u]\n", word, name, (unsigned int)strlen(word));

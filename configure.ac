@@ -3,7 +3,7 @@ AC_INIT([libndpi],[6.1.0])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([foreign subdir-objects parallel-tests])
+AM_INIT_AUTOMAKE([foreign subdir-objects parallel-tests tar-ustar])
 
 AC_PREFIX_DEFAULT(/usr)
 

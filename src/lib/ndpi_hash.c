@@ -27,8 +27,14 @@
 /* ******************************************************************** */
 
 /* Based on djb2 hash - http://www.cse.yorku.ca/~oz/hash.html */
+u_int32_t ndpi_murmur_hash_seed(const char *str, u_int str_len, u_int seed) {
+  return(MurmurHash((void*)str, str_len, seed));
+}
+/* ******************************************************************** */
+
+/* Based on djb2 hash - http://www.cse.yorku.ca/~oz/hash.html */
 u_int32_t ndpi_murmur_hash(const char *str, u_int str_len) {
-  return(MurmurHash((void*)str, str_len, 0x87654321));
+  return(ndpi_murmur_hash_seed((void*)str, str_len, 0x87654321));
 }
 
 /* ******************************************************************** */

@@ -185,6 +185,7 @@
     <ClCompile Include="..\src\lib\protocols\iris.c" />
     <ClCompile Include="..\src\lib\protocols\ipsec.c" />
     <ClCompile Include="..\src\lib\protocols\kismet.c" />
+    <ClCompile Include="..\src\lib\protocols\l2tp.c" />
     <ClCompile Include="..\src\lib\protocols\line.c" />
     <ClCompile Include="..\src\lib\protocols\lisp.c" />
     <ClCompile Include="..\src\lib\protocols\memcached.c" />
@@ -299,6 +300,7 @@
     <ClCompile Include="..\src\lib\protocols\openvpn.c" />
     <ClCompile Include="..\src\lib\protocols\oracle.c" />
     <ClCompile Include="..\src\lib\protocols\postgres.c" />
+    <ClCompile Include="..\src\lib\protocols\powershell.c" />
     <ClCompile Include="..\src\lib\protocols\pptp.c" />
     <ClCompile Include="..\src\lib\protocols\protobuf.c" />
     <ClCompile Include="..\src\lib\protocols\qq.c" />

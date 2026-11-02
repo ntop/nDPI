@@ -49,7 +49,9 @@
 #ifdef _MSC_BUILD
 #define strncasecmp _strnicmp
 #define strcasecmp _stricmp
+#ifndef strdup
 #define strdup _strdup
+#endif
 #define access _access
 #endif
 

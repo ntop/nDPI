@@ -4471,8 +4471,6 @@ References: `Free Fire official site: <https://ff.garena.com/>`_
 `NDPI_PROTOCOL_KIK`
 ===================
 Kik Messenger is an instant messaging application for mobile devices.
-Traffic is detected via TLS Server Name Indication on kik.com and kikprod.net
-hostnames (e.g. login.kikprod.net, platform.kik.com).
 
 References: `Kik official site: <https://www.kik.com/>`_
 
@@ -4481,9 +4479,7 @@ References: `Kik official site: <https://www.kik.com/>`_
 
 `NDPI_PROTOCOL_CHARACTER_AI`
 ============================
-CharacterAI is an AI chatbot platform. Traffic is detected via TLS/QUIC Server
-Name Indication on character.ai and characterai.io hostnames (e.g.
-user.api.character.ai, neo.character.ai, characterai.io).
+CharacterAI is an AI chatbot platform.
 
 References: `CharacterAI official site: <https://character.ai>`_
 
@@ -4492,8 +4488,7 @@ References: `CharacterAI official site: <https://character.ai>`_
 
 `NDPI_PROTOCOL_DUCKDUCKGO`
 ==========================
-DuckDuckGo is a privacy-oriented search engine. Traffic is detected via TLS/QUIC
-Server Name Indication on duckduckgo.com and duck.com hostnames.
+DuckDuckGo is a privacy-oriented search engine.
 
 References: `DuckDuckGo official site: <https://duckduckgo.com/>`_
 
@@ -4502,8 +4497,46 @@ References: `DuckDuckGo official site: <https://duckduckgo.com/>`_
 
 `NDPI_PROTOCOL_PEACOCK`
 =======================
-Peacock is NBCUniversal's video streaming service. Traffic is detected via
-TLS/QUIC Server Name Indication on peacocktv.com and peacocktvstore.com
-hostnames.
+Peacock is NBCUniversal's video streaming service.
 
 References: `Peacock official site: <https://www.peacocktv.com/>`_
+
+
+.. _Proto_495:
+
+`NDPI_PROTOCOL_SUPERCELL`
+=========================
+Supercell is a mobile game company (Brawl Stars, Clash of Clans, and others).
+
+References: `Supercell official site: <https://supercell.com/>`_
+
+
+.. _Proto_496:
+
+`NDPI_PROTOCOL_POWERSHELL`
+==========================
+PowerShell is a task-based command-line shell and scripting language developed
+by Microsoft for task automation and configuration management.
+nDPI detects PowerShell remoting over WinRM (HTTP/HTTPS), remote administration via the svcctl/winreg/task scheduler
+interfaces (over SMB named pipes or DCE/RPC) and Active Directory Web Services (used by the ActiveDirectory module);
+note that the latter two are also used by other tools (sc.exe, reg.exe, schtasks.exe, PsExec, AD Administrative Center, ...).
+
+References: `Official site: <https://learn.microsoft.com/en-us/powershell>`_
+
+
+.. _Proto_497:
+
+`NDPI_PROTOCOL_JANITORAI`
+============================
+JanitorAI is an AI roleplay platform, often featuring adult content.
+
+References: `JanitorAI official site: <https://janitorai.com>`_
+
+
+.. _Proto_498:
+
+`NDPI_PROTOCOL_L2TP`
+====================
+Layer 2 Tunneling Protocol (L2TP) is a tunneling protocol used to support virtual private networks (VPNs) or as part of the delivery of services by ISPs.
+
+References: `Wikipedia: <https://en.wikipedia.org/wiki/Layer_2_Tunneling_Protocol>`_
