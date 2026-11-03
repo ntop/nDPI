@@ -2,10 +2,11 @@
  * ndpi_ai.c -- AI endpoint identification (segregated module, see ndpi_ai.h).
  *
  * This file is self-contained: the domain->endpoint data, the name lookup, the
- * SNI/Host check, and the automaton lifecycle all live here. The rest of the
- * detection core only calls the public API declared in ndpi_ai.h from thin hook
- * points, so this module is independent of the core. The state (the automaton)
- * lives in the detection module struct; this file manages it.
+ * SNI/Host check, the ECH DNS-fallback cache, and the automaton/cache lifecycle
+ * all live here. The rest of the detection core only calls the public API
+ * declared in ndpi_ai.h from thin hook points, so this module is independent
+ * of the core. The state (automaton + LRU cache) lives in the detection module
+ * struct; this file manages it.
  *
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
@@ -201,7 +202,54 @@ u_int16_t ndpi_get_ai_endpoint_by_name(struct ndpi_detection_module_struct *ndpi
   return ndpi_ai_check_hostname(ndpi_str, (char *)name, name_len);
 }
 
+/* --------------------------------------------------------------- *
+ *  ECH fallback: the SNI is the CDN's name, so resolve the endpoint
+ *  from the DNS answer the client itself resolved, cached by peer IP.
+ * --------------------------------------------------------------- */
+u_int16_t ndpi_ai_by_ip(struct ndpi_detection_module_struct *ndpi_str,
+                        struct ndpi_flow_struct *flow) {
+  u_int16_t endpoint = NDPI_AI_ENDPOINT_NONE;
+  u_int64_t key;
 
+  if(!ndpi_str || !ndpi_str->ai_endpoint_dns_cache || !flow)
+    return NDPI_AI_ENDPOINT_NONE;
+
+  /* Key by the peer (server) IP: the DNS cache is populated with the IP the
+   * client resolved, which is the server the flow connects to. */
+  if(flow->core.is_ipv6)
+    key = ndpi_quick_hash64((const char *)flow->core.s_address.v6.u6_addr.u6_addr8, 16);
+  else
+    key = (u_int64_t)(flow->core.s_address.v4);
+
+  if(ndpi_lru_find_cache(ndpi_str->ai_endpoint_dns_cache,
+                         key,
+                         &endpoint, 0 /* keep it: other flows to this IP reuse it */,
+                         ndpi_get_current_time(&flow->core))
+     && endpoint != NDPI_AI_ENDPOINT_NONE && endpoint <= NDPI_AI_ENDPOINT_MAX)
+    return (u_int16_t)endpoint;
+
+  return NDPI_AI_ENDPOINT_NONE;
+}
+
+/* ECH fallback: remember the endpoint the client resolved, keyed by the resolved
+ * IP. process_hostname ran first, so flow->core.host_server_name is the queried
+ * name. A later TLS/QUIC flow to this IP may carry only the CDN's SNI (ECH). The
+ * DNS dissector computes the key (it has the answer packet) and passes it in. */
+void ndpi_ai_dns_answer(struct ndpi_detection_module_struct *ndpi_str,
+                        struct ndpi_flow_core_struct *core, u_int64_t key) {
+  u_int16_t ai_ep;
+
+  if(!ndpi_str || !ndpi_str->ai_endpoint_dns_cache || !core)
+    return;
+  if(!core->host_server_name || strlen(core->host_server_name) == 0)
+    return;
+
+  ai_ep = ndpi_get_ai_endpoint_by_name(ndpi_str, core->host_server_name,
+                                       strlen(core->host_server_name));
+  if(ndpi_ai_endpoint_is_valid(ai_ep))
+    ndpi_lru_add_to_cache(ndpi_str->ai_endpoint_dns_cache, key, ai_ep,
+                          ndpi_get_current_time(core));
+}
 
 /* --------------------------------------------------------------- *
  *  lifecycle: build the automaton + LRU cache
@@ -224,10 +272,19 @@ void ndpi_ai_init(struct ndpi_detection_module_struct *ndpi_str) {
     ac_automata_finalize((AC_AUTOMATA_t *) ndpi_str->ai_endpoint_automa.ac_automa);
   }
 
+  /* AI endpoint DNS cache (ECH fallback): same size/TTL as the FPC DNS cache,
+   * always per-instance. Maps peer IP -> ndpi_ai_endpoint for flows whose SNI
+   * is the CDN name (see ndpi_ai.h). */
+  if(ndpi_str->cfg.fpc_dns_cache_num_entries > 0)
+    ndpi_str->ai_endpoint_dns_cache = ndpi_lru_cache_init(ndpi_str->cfg.fpc_dns_cache_num_entries,
+                                                          ndpi_str->cfg.fpc_dns_cache_ttl, 0);
 }
 
-/* lifecycle: release the SNI/Host automaton */
+/* lifecycle: release the automaton + LRU cache */
 void ndpi_ai_cleanup(struct ndpi_detection_module_struct *ndpi_str) {
+  if(ndpi_str->ai_endpoint_dns_cache)
+    ndpi_lru_free_cache(ndpi_str->ai_endpoint_dns_cache);
+
   if(ndpi_str->ai_endpoint_automa.ac_automa != NULL)
     ac_automata_release((AC_AUTOMATA_t *) ndpi_str->ai_endpoint_automa.ac_automa,
                         0 /* pattern strings are literals; do not free them */);

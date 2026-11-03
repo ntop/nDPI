@@ -809,6 +809,7 @@ typedef enum {
   NDPI_LRUCACHE_MINING,
   NDPI_LRUCACHE_MSTEAMS,
   NDPI_LRUCACHE_FPC_DNS, /* FPC DNS cache */
+  NDPI_LRUCACHE_AI_ENDPOINT, /* AI endpoint DNS cache (IP -> ai_endpoint) */
   NDPI_LRUCACHE_SIGNAL,
   NDPI_LRUCACHE_MAX	/* Last one! */
 } lru_cache_type;

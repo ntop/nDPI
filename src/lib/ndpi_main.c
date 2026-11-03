@@ -12792,9 +12792,15 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
     the host sub-protocol match above: a flow to a known AI provider is classified
     as NDPI_PROTOCOL_AI (category ARTIFICIAL_INTELLIGENCE) with flow->ai_endpoint
     set to the specific provider/engine. The SNI/Host check is in ndpi_ai.c.
+
+    Primary evidence is the peer name (SNI/Host). Under ECH the SNI is the CDN's
+    name, not the provider's, so fall back to the DNS answer the client itself
+    resolved (cached by peer IP, see ndpi_ai_by_ip in ndpi_ai.h).
   */
   {
     u_int16_t ai_ep = ndpi_ai_check_hostname(ndpi_struct, what, what_len);
+    if(!ndpi_ai_endpoint_is_valid(ai_ep))
+      ai_ep = ndpi_ai_by_ip(ndpi_struct, flow);
     if(ndpi_ai_endpoint_is_valid(ai_ep)) {
       ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_AI,
                                  master_protocol, NDPI_CONFIDENCE_DPI);

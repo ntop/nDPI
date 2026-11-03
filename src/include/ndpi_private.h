@@ -480,6 +480,10 @@ struct ndpi_detection_module_struct {
   /* FPC DNS cache */
   struct ndpi_lru_cache *fpc_dns_cache;
 
+  /* AI endpoint DNS cache: IP -> ndpi_ai_endpoint, for ECH-protected flows
+   * whose SNI is the CDN name (see ndpi_ai.h). Reuses the fpc_dns_cache config. */
+  struct ndpi_lru_cache *ai_endpoint_dns_cache;
+
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
   u_int16_t *ndpi_to_user_proto_id; /* custom protocolId mapping */

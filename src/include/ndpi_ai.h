@@ -1,17 +1,5 @@
 /*
- * ndpi_ai.h -- AI endpoint identification (segregated namespace) for nDPI.
- *
- * This header defines the AI *endpoint* identity: which AI system a flow is
- * talking to. It is deliberately kept OUT of ndpi_protocol_ids.h so that the
- * core protocol schema grows by exactly one marker (NDPI_PROTOCOL_AI) instead
- * of one number per provider/engine.
- *
- * A flow that is AI traffic is classified as NDPI_PROTOCOL_AI (category
- * ARTIFICIAL_INTELLIGENCE) and carries a single attribute, flow->ai_endpoint,
- * whose value is one of the ndpi_ai_endpoint identifiers below. The value
- * itself names the endpoint; the provider/engine split is a grouping of the
- * values (see the *_MIN / *_MAX bounds) so a consumer can derive
- * hosted-vs-self-hosted without a second field.
+ * AI endpoint identification (segregated namespace) for nDPI.
  *
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
@@ -27,6 +15,18 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * This header defines the AI *endpoint* identity: which AI system a flow is
+ * talking to. It is deliberately kept OUT of ndpi_protocol_ids.h so that the
+ * core protocol schema grows by exactly one marker (NDPI_PROTOCOL_AI) instead
+ * of one number per provider/engine.
+ *
+ * A flow that is AI traffic is classified as NDPI_PROTOCOL_AI (category
+ * ARTIFICIAL_INTELLIGENCE) and carries a single attribute, flow->ai_endpoint,
+ * whose value is one of the ndpi_ai_endpoint identifiers below. The value
+ * itself names the endpoint; the provider/engine split is a grouping of the
+ * values (see the *_MIN / *_MAX bounds) so a consumer can derive
+ * hosted-vs-self-hosted without a second field.
  */
 
 #ifndef __NDPI_AI_H__
@@ -124,11 +124,19 @@ u_int16_t ndpi_get_ai_endpoint_by_name(struct ndpi_detection_module_struct *ndpi
 /* Run the SNI/Host automaton against `what`; returns the matched endpoint or NONE. */
 u_int16_t ndpi_ai_check_hostname(struct ndpi_detection_module_struct *ndpi_struct, char *what, u_int what_len);
 
-/* Module lifecycle: build the SNI/Host automaton. Called once from the core init,
- * after the other automata are finalized. */
+/* ECH fallback: resolve the endpoint from the DNS answer cached by peer IP. */
+u_int16_t ndpi_ai_by_ip(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow);
+
+/* ECH fallback: remember the endpoint the client resolved, keyed by `key` (the
+ * resolved IP). `core` must already carry host_server_name (process_hostname ran
+ * first in the DNS dissector). No-op if the cache is disabled or the name is empty. */
+void ndpi_ai_dns_answer(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_core_struct *core, u_int64_t key);
+
+/* Module lifecycle: build the SNI/Host automaton + the ECH DNS-fallback cache.
+ * Called once from the core init, after the other automata are finalized. */
 void ndpi_ai_init(struct ndpi_detection_module_struct *ndpi_struct);
 
-/* Module lifecycle: release the SNI/Host automaton. */
+/* Module lifecycle: release the SNI/Host automaton + the ECH DNS-fallback cache. */
 void ndpi_ai_cleanup(struct ndpi_detection_module_struct *ndpi_struct);
 
 #ifdef __cplusplus

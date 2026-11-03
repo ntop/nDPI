@@ -15,6 +15,7 @@
 
 #include "ndpi_api.h"
 #include "ndpi_private.h"
+#include "ndpi_ai.h"
 
 #define FLAGS_MASK 0x8000
 
@@ -557,6 +558,14 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
             NDPI_LOG_DBG(ndpi_struct, "Adding entry to fpc_dns: %s proto %d\n",
                          data_len == 4 ? "ipv4" : "ipv6", proto->app_protocol);
           }
+
+           /* AI endpoint DNS cache (ECH fallback, see ndpi_ai.h): remember the AI
+              endpoint the client resolved, keyed by this resolved IP. process_hostname
+              ran first, so core->host_server_name is the queried name. A later TLS/QUIC
+              flow to this IP may carry only the CDN's SNI (ECH). The module (ndpi_ai.c)
+              does the name->endpoint lookup and the cache insert. */
+           ndpi_ai_dns_answer(ndpi_struct, core,
+                              fpc_dns_cache_key_from_packet(packet->payload + x, data_len));
         }
 
         x += data_len;
