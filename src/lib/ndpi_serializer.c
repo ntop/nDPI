@@ -2355,8 +2355,14 @@ int ndpi_serialize_string_string_len(ndpi_serializer *_serializer,
 int ndpi_serialize_string_string(ndpi_serializer *_serializer,
 				 const char *key, const char *_value) {
   const char *value = _value ? _value : "";
+  size_t value_len = strlen(value);
 
-  return(ndpi_serialize_string_string_len(_serializer, key, value, strlen(value)));
+  /* The value length is u_int16_t in ndpi_serialize_string_string_len():
+     fail instead of silently truncating longer values */
+  if(value_len > 0xFFFF)
+    return(-1);
+
+  return(ndpi_serialize_string_string_len(_serializer, key, value, value_len));
 }
 
 /* ********************************** */

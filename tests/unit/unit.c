@@ -262,6 +262,81 @@ int serializerUnitTest() {
 
 /* *********************************************** */
 
+/* The CSV fast path of ndpi_serialize_string_string_len() used to size the
+   buffer growth request in u_int16_t: a value of exactly 65535 bytes wrapped
+   "value_len + 1" to 0, skipping the growth, and the following needed-- re-wrapped
+   it to 65535, resulting in an out-of-bounds heap write (and in a size_used
+   larger than buffer.size, corrupting every later write on the serializer). */
+int serializerCsvMaxLengthUnitTest(void)
+{
+  ndpi_serializer serializer;
+  char *value, *buffer;
+  u_int32_t buffer_len, i;
+
+  /* Default buffer is NDPI_SERIALIZER_DEFAULT_BUFFER_SIZE bytes: the values
+     below force the growth path */
+  assert(ndpi_init_serializer(&serializer, ndpi_serialization_format_csv) != -1);
+
+  value = (char*)malloc(0xFFFF + 2);
+  if(value == NULL)
+    return -1;
+
+  /* Longest value the u_int16_t API can represent: must grow the buffer and
+     copy the whole value in bounds */
+  memset(value, 'a', 0xFFFF), value[0xFFFF] = '\0';
+  if(ndpi_serialize_string_string(&serializer, "server_names", value) == -1) {
+    printf("%s: ERROR cannot serialize a 0xFFFF long value\n", __func__);
+    free(value);
+    return -1;
+  }
+
+  /* One byte longer than the API can represent: must fail instead of being
+     silently truncated to (len % 65536) */
+  value[0xFFFF] = 'a', value[0xFFFF + 1] = '\0';
+  if(ndpi_serialize_string_string(&serializer, "too_long", value) != -1) {
+    printf("%s: ERROR a 0x10000 long value must be rejected\n", __func__);
+    free(value);
+    return -1;
+  }
+  value[0xFFFF] = '\0';
+
+  /* The serializer must still be usable after the max length value */
+  if(ndpi_serialize_string_string(&serializer, "after", "ok") == -1) {
+    printf("%s: ERROR serializer unusable after the max length value\n", __func__);
+    free(value);
+    return -1;
+  }
+
+  buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+  if(buffer_len != 0xFFFF + 1 /* separator */ + 2 /* "ok" */) {
+    printf("%s: ERROR bad buffer len %u\n", __func__, buffer_len);
+    free(value);
+    return -1;
+  }
+
+  for(i=0; i<0xFFFF; i++) {
+    if(buffer[i] != 'a') {
+      printf("%s: ERROR bad content at offset %u\n", __func__, i);
+      free(value);
+      return -1;
+    }
+  }
+
+  if((buffer[0xFFFF] != ',') || (buffer[0xFFFF + 1] != 'o') || (buffer[0xFFFF + 2] != 'k')) {
+    printf("%s: ERROR bad fields trailer\n", __func__);
+    free(value);
+    return -1;
+  }
+
+  free(value);
+  ndpi_term_serializer(&serializer);
+
+  printf("%30s                      OK\n", __func__);
+  return 0;
+}
+
+/* *********************************************** */
+
 /* ndpi_reset_serializer() must bring the serializer back to its initial state */
 int serializerResetUnitTest(void)
 {
@@ -493,6 +568,7 @@ int main(int argc, char **argv) {
     
   /* Tests */
   if (serializerUnitTest() != 0) return -1;
+  if (serializerCsvMaxLengthUnitTest() != 0) return -1;
   if (serializerResetUnitTest() != 0) return -1;
   if (serializeProtoUnitTest() != 0) return -1;
 
