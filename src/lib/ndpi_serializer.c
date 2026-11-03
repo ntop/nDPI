@@ -2675,7 +2675,8 @@ ndpi_serialization_type ndpi_deserialize_get_item_type(ndpi_deserializer *_deser
 
 static inline int ndpi_deserialize_get_single_string_size(ndpi_private_deserializer *deserializer, u_int32_t offset) {
   u_int32_t buff_diff;
-  u_int16_t expected, str_len;
+  u_int32_t expected;
+  u_int16_t str_len;
 
   if(offset > deserializer->buffer.size) return(-2);
   buff_diff = deserializer->buffer.size - offset;
