@@ -88,6 +88,52 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       ndpi_serialize_end_of_record(&serializer);
   }
 
+  /* Binary keys of exactly klen bytes (no NUL terminator, so ASan catches any
+     strlen() on them), possibly with control/invalid UTF-8 bytes that expand
+     up to 6x when escaped as JSON */
+  if (fuzzed_data.ConsumeBool()) {
+    std::vector<char> k = fuzzed_data.ConsumeBytes<char>(fuzzed_data.ConsumeIntegralInRange(1, 64));
+
+    if (k.size() > 0) {
+      u_int16_t klen = k.size();
+      char *key = (char *)malloc(klen);
+
+      if (key) {
+        memcpy(key, k.data(), klen);
+        ndpi_serialize_binary_int32(&serializer, key, klen, fuzzed_data.ConsumeIntegral<int32_t>());
+        ndpi_serialize_binary_int64(&serializer, key, klen, fuzzed_data.ConsumeIntegralInRange<int64_t>(INT32_MIN, (int64_t)UINT32_MAX));
+        ndpi_serialize_binary_uint32(&serializer, key, klen, fuzzed_data.ConsumeIntegral<u_int32_t>());
+        ndpi_serialize_binary_uint64(&serializer, key, klen, fuzzed_data.ConsumeIntegralInRange<u_int64_t>(0, UINT32_MAX));
+        ndpi_serialize_binary_float(&serializer, key, klen, fuzzed_data.ConsumeFloatingPoint<float>(), "%f");
+        ndpi_serialize_binary_boolean(&serializer, key, klen, fuzzed_data.ConsumeBool());
+        d = fuzzed_data.ConsumeBytes<char>(16);
+        ndpi_serialize_binary_binary(&serializer, key, klen, d.data(), d.size());
+        if (fmt != ndpi_serialization_format_csv) {
+          ndpi_serialize_start_of_block_binary(&serializer, key, klen);
+          ndpi_serialize_end_of_block(&serializer);
+        }
+        free(key);
+      }
+    }
+  }
+
+  /* Lengths at/above the 16-bit boundary (65535 used to wrap the CSV size check;
+     raw records >= 64KB used to be truncated to 16 bits) */
+  if (fuzzed_data.ConsumeBool()) {
+    u_int32_t big_len = fuzzed_data.ConsumeBool() ? 65535 : fuzzed_data.ConsumeIntegralInRange(65530, 70000);
+    char *big = (char *)malloc(big_len + 1);
+
+    if (big) {
+      memset(big, 'A', big_len);
+      big[big_len] = '\0';
+      if (big_len <= 65535)
+        ndpi_serialize_string_string_len(&serializer, "big", big, big_len);
+      if (fmt == ndpi_serialization_format_json || fmt == ndpi_serialization_format_tlv)
+        ndpi_serialize_raw_record(&serializer, (u_char *)big, big_len);
+      free(big);
+    }
+  }
+
   ndpi_serializer_create_snapshot(&serializer);
 
   if (fuzzed_data.ConsumeBool())
