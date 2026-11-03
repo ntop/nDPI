@@ -37,9 +37,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     return 0;
   memcpy(buf, data, size);
 
-  /* Force a valid version byte so the version gate doesn't reject most inputs;
-   * everything after it (format + TLV records) stays attacker-controlled. */
+  /* Force a valid version byte (and, most of the time, the TLV format byte) so
+   * the header gates don't reject most inputs; everything after them (the TLV
+   * records) stays attacker-controlled. */
   buf[0] = 1;
+  if(buf[size - 1] & 0x1)
+    buf[1] = ndpi_serialization_format_tlv;
 
   ndpi_deserializer deserializer;
   ndpi_serializer serializer;
@@ -56,6 +59,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   /* 2) Clone the whole stream into a JSON serializer (ndpi_deserialize_clone_all) */
   if(ndpi_init_deserializer_buf(&deserializer, buf, size) == 0) {
     if(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) == 0) {
+      ndpi_deserialize_clone_all(&deserializer, &serializer);
+      ndpi_term_serializer(&serializer);
+    }
+  }
+
+  /* 2b) Clone the whole stream into a TLV serializer: string keys read from
+   *     the input are not NUL-terminated and must never be strlen()'d */
+  if(ndpi_init_deserializer_buf(&deserializer, buf, size) == 0) {
+    if(ndpi_init_serializer(&serializer, ndpi_serialization_format_tlv) == 0) {
       ndpi_deserialize_clone_all(&deserializer, &serializer);
       ndpi_term_serializer(&serializer);
     }
@@ -112,7 +124,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       }
 
       rc = ndpi_deserialize_next(&deserializer);
-      if(rc <= 0)
+      if(rc != 0) /* 0 = advanced; "rc <= 0" stopped after the first item */
         break;
     }
   }
