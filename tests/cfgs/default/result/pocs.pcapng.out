@@ -1,0 +1,42 @@
+Guessed flow protos:	3
+
+DPI Packets (TCP):	5	(1.67 pkts/flow)
+Confidence Match by port    : 3 (flows)
+Num dissector calls: 330 (110.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/9/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/3/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/3/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   2/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   6/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     1/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    2/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+SMBv23	1	99	1
+SIP	4	283	2
+
+Acceptable                       5 382           3            
+
+VoIP                             4 283           2            
+System                           1 99            1            
+
+	1	TCP 10.0.0.1:88 -> 10.0.0.2:5060 [proto: 100/SIP][Stack: SIP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 3][cat: VoIP/10][Breed: Acceptable][3 pkts/229 bytes -> 0 pkts/0 bytes][Goodput ratio: 29/0][3.00 sec][Risk: ** Malicious Fingerprint **** Susp Entropy **** Unidirectional Traffic **][Risk Score: 120][Risk Info: No server to client traffic;Entropy: 5.010 (Executable?);Massive scanner detected][TCP Fingerprint: 2_64_8192_00000000/Unknown][MSS: 0][PLAIN TEXT (victimp)][Plen Bins: 0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 10.0.0.1:88 -> 10.0.0.2:445 [proto: 41/SMBv23][Stack: SMBv23][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: System/18][Breed: Acceptable][1 pkts/99 bytes -> 0 pkts/0 bytes][Goodput ratio: 45/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (victimp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	TCP 10.0.0.1:5060 -> 10.0.0.2:88 [proto: 100/SIP][Stack: SIP][IP: 0/Unknown][ClearText][Confidence: Match by port][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 1][cat: VoIP/10][Breed: Acceptable][1 pkts/54 bytes -> 0 pkts/0 bytes][Goodput ratio: 0/0][< 1 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No client to server traffic][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

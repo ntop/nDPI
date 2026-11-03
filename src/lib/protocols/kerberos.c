@@ -161,7 +161,7 @@ static u_int8_t krb_copy_name(char * const dst, size_t dst_siz,
 */
 
 /* Realm ::= KerberosString */
-static void krb_parse_realm(struct ndpi_flow_struct * const flow,
+static void krb_parse_realm(struct ndpi_kerberos_metadata * const krb,
                             const u_int8_t *buf, u_int32_t buf_len,
                             u_int8_t overwrite)
 {
@@ -172,10 +172,10 @@ static void krb_parse_realm(struct ndpi_flow_struct * const flow,
     return;
   }
 
-  if (overwrite || flow->metadata.protos.kerberos.domain[0] == '\0')
+  if (overwrite || krb->domain[0] == '\0')
   {
-    flow->metadata.protos.kerberos.domain_truncated =
-      krb_copy_name(flow->metadata.protos.kerberos.domain, sizeof(flow->metadata.protos.kerberos.domain),
+    krb->domain_truncated =
+      krb_copy_name(krb->domain, sizeof(krb->domain),
                     realm.value, realm.length);
   }
 }
@@ -210,7 +210,7 @@ static u_int32_t krb_machine_name_len(const u_int8_t *name, u_int32_t name_len)
     name-string [1] SEQUENCE OF KerberosString
   }
 */
-static void krb_parse_cname(struct ndpi_flow_struct * const flow,
+static void krb_parse_cname(struct ndpi_kerberos_metadata * const krb,
                             const u_int8_t *buf, u_int32_t buf_len,
                             u_int8_t overwrite)
 {
@@ -265,20 +265,20 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
 
   if (num_names == 0 || name[0].length == 0 ||
       (!overwrite &&
-       (flow->metadata.protos.kerberos.hostname[0] != '\0' ||
-        flow->metadata.protos.kerberos.username[0] != '\0' ||
-        flow->metadata.protos.kerberos.name_type_found)))
+       (krb->hostname[0] != '\0' ||
+        krb->username[0] != '\0' ||
+        krb->name_type_found)))
   {
     return;
   }
 
   /* Only one of them is set: the name of the reply replaces both */
-  flow->metadata.protos.kerberos.hostname[0] = '\0';
-  flow->metadata.protos.kerberos.username[0] = '\0';
-  flow->metadata.protos.kerberos.hostname_truncated = 0;
-  flow->metadata.protos.kerberos.username_truncated = 0;
-  flow->metadata.protos.kerberos.name_type = name_type;
-  flow->metadata.protos.kerberos.name_type_found = name_type_found;
+  krb->hostname[0] = '\0';
+  krb->username[0] = '\0';
+  krb->hostname_truncated = 0;
+  krb->username_truncated = 0;
+  krb->name_type = name_type;
+  krb->name_type_found = name_type_found;
 
   if (num_names == 2)
   {
@@ -293,8 +293,8 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
 
       if (len > 0)
       {
-        flow->metadata.protos.kerberos.hostname_truncated =
-          krb_copy_name(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
+        krb->hostname_truncated =
+          krb_copy_name(krb->hostname, sizeof(krb->hostname),
                         name[1].value, len);
       }
     }
@@ -304,12 +304,12 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
   /* If cname ends with a $ then it's a machine account, otherwise it's a username */
   if (name[0].value[name[0].length - 1] == '$')
   {
-    flow->metadata.protos.kerberos.hostname_truncated =
-      krb_copy_name(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
+    krb->hostname_truncated =
+      krb_copy_name(krb->hostname, sizeof(krb->hostname),
                     name[0].value, name[0].length - 1);
   } else {
-    flow->metadata.protos.kerberos.username_truncated =
-      krb_copy_name(flow->metadata.protos.kerberos.username, sizeof(flow->metadata.protos.kerberos.username),
+    krb->username_truncated =
+      krb_copy_name(krb->username, sizeof(krb->username),
                     name[0].value, name[0].length);
   }
 }
@@ -322,7 +322,7 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
     padata-value [2] OCTET STRING
   }
 */
-static void krb_parse_tgs_req_padata(struct ndpi_flow_struct * const flow,
+static void krb_parse_tgs_req_padata(struct ndpi_kerberos_metadata * const krb,
                                      const u_int8_t *buf, u_int32_t buf_len)
 {
   struct ndpi_asn1_ber_tlv seq, padata, field;
@@ -363,9 +363,9 @@ static void krb_parse_tgs_req_padata(struct ndpi_flow_struct * const flow,
       {
         if (ndpi_asn1_ber_decode_int(field.value, field.length, &padata_type) == 0 &&
             (padata_type == KRB_PADATA_FOR_USER || padata_type == KRB_PADATA_S4U_X509_USER) &&
-            flow->metadata.protos.kerberos.s4u == NDPI_KERBEROS_S4U_NONE)
+            krb->s4u == NDPI_KERBEROS_S4U_NONE)
         {
-          flow->metadata.protos.kerberos.s4u = NDPI_KERBEROS_S4U2SELF;
+          krb->s4u = NDPI_KERBEROS_S4U2SELF;
         }
         break;
       }
@@ -393,7 +393,7 @@ static int krb_kdc_option_is_set(const u_int8_t *buf, u_int32_t buf_len, u_int8_
     ...
   }
 */
-static void krb_parse_req_body(struct ndpi_flow_struct * const flow,
+static void krb_parse_req_body(struct ndpi_kerberos_metadata * const krb,
                                const u_int8_t *buf, u_int32_t buf_len,
                                u_int8_t msg_type)
 {
@@ -421,12 +421,12 @@ static void krb_parse_req_body(struct ndpi_flow_struct * const flow,
       if (msg_type == KRB_MSG_TYPE_TGS_REQ &&
           krb_kdc_option_is_set(field.value, field.length, KRB_KDC_OPT_CNAME_IN_ADDL_TKT))
       {
-        flow->metadata.protos.kerberos.s4u = NDPI_KERBEROS_S4U2PROXY;
+        krb->s4u = NDPI_KERBEROS_S4U2PROXY;
       }
     } else if (field.tag == 0xA1) {
-      krb_parse_cname(flow, field.value, field.length, 0);
+      krb_parse_cname(krb, field.value, field.length, 0);
     } else if (field.tag == 0xA2) {
-      krb_parse_realm(flow, field.value, field.length, 0);
+      krb_parse_realm(krb, field.value, field.length, 0);
     }
 
     seq.value += used;
@@ -477,7 +477,7 @@ static int krb_is_msg_start(const u_int8_t *buf, u_int32_t buf_len, u_int32_t ms
   KRB_PARSE_PREFIX) or -1
 */
 static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
-                     struct ndpi_flow_struct * const flow,
+                     struct ndpi_kerberos_metadata * const krb,
                      const u_int8_t *buf, u_int32_t buf_len,
                      u_int8_t mode)
 {
@@ -577,29 +577,29 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
       case KRB_MSG_TYPE_AS_REQ:
       case KRB_MSG_TYPE_TGS_REQ:
         /* Only the first request is exported (see below) */
-        if (flow->metadata.protos.kerberos.req_msg_type != 0)
+        if (krb->req_msg_type != 0)
         {
           break;
         }
 
         if (idx == 3 && msg_type == KRB_MSG_TYPE_TGS_REQ)
         {
-          krb_parse_tgs_req_padata(flow, field.value, field.length);
+          krb_parse_tgs_req_padata(krb, field.value, field.length);
         } else if (idx == 4) {
-          krb_parse_req_body(flow, field.value, field.length, msg_type);
+          krb_parse_req_body(krb, field.value, field.length, msg_type);
         }
         break;
 
       case KRB_MSG_TYPE_AS_REP:
       case KRB_MSG_TYPE_TGS_REP:
         /* Only the first reply is exported (see below) */
-        overwrite = (flow->metadata.protos.kerberos.rep_msg_type == 0);
+        overwrite = (krb->rep_msg_type == 0);
 
         if (idx == 3)
         {
-          krb_parse_realm(flow, field.value, field.length, overwrite);
+          krb_parse_realm(krb, field.value, field.length, overwrite);
         } else if (idx == 4) {
-          krb_parse_cname(flow, field.value, field.length, overwrite);
+          krb_parse_cname(krb, field.value, field.length, overwrite);
         }
         break;
 
@@ -607,14 +607,14 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
         if (idx == 6)
         {
           if (ndpi_asn1_ber_decode_int(field.value, field.length, &value) == 0 &&
-              flow->metadata.protos.kerberos.rep_msg_type == 0)
+              krb->rep_msg_type == 0)
           {
-            flow->metadata.protos.kerberos.error_code = value;
+            krb->error_code = value;
           }
         } else if (idx == 7 || idx == 9) {
-          krb_parse_realm(flow, field.value, field.length, 0);
+          krb_parse_realm(krb, field.value, field.length, 0);
         } else if (idx == 8) {
-          krb_parse_cname(flow, field.value, field.length, 0);
+          krb_parse_cname(krb, field.value, field.length, 0);
         }
         break;
 
@@ -644,21 +644,21 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
   /* Only the first request and the first reply are exported */
   if (krb_is_request(msg_type))
   {
-    if (flow->metadata.protos.kerberos.req_msg_type == 0)
+    if (krb->req_msg_type == 0)
     {
-      flow->metadata.protos.kerberos.req_msg_type = msg_type;
+      krb->req_msg_type = msg_type;
     }
   } else if (msg_type != KRB_MSG_TYPE_AP_REQ) {
-    if (flow->metadata.protos.kerberos.rep_msg_type == 0)
+    if (krb->rep_msg_type == 0)
     {
-      flow->metadata.protos.kerberos.rep_msg_type = msg_type;
+      krb->rep_msg_type = msg_type;
     }
   }
 
   NDPI_LOG_DBG(ndpi_struct,
                "[msg-type: %u][Kerberos Hostname,Domain,Username][%s,%s,%s]\n",
-               msg_type, flow->metadata.protos.kerberos.hostname, flow->metadata.protos.kerberos.domain,
-               flow->metadata.protos.kerberos.username);
+               msg_type, krb->hostname, krb->domain,
+               krb->username);
 
   return msg_type;
 }
@@ -684,7 +684,9 @@ static void krb_free_buf(struct ndpi_flow_struct *flow) {
   split in several segments is a reply, whose beginning only is needed
 */
 static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
-			      struct ndpi_flow_struct *flow, u_int8_t reply_expected) {
+			      struct ndpi_flow_struct *flow,
+			      struct ndpi_kerberos_metadata *krb,
+			      u_int8_t reply_expected) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len, kerberos_len;
@@ -706,7 +708,7 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
       flow->metadata.kerberos_buf.pktbuf_currlen += len;
       final = (flow->metadata.kerberos_buf.pktbuf_currlen == flow->metadata.kerberos_buf.pktbuf_maxlen);
 
-      msg_type = krb_parse(ndpi_struct, flow,
+      msg_type = krb_parse(ndpi_struct, krb,
                            (const u_int8_t *)&flow->metadata.kerberos_buf.pktbuf[4],
                            flow->metadata.kerberos_buf.pktbuf_currlen - 4,
                            final ? KRB_PARSE_PREFIX_FINAL : KRB_PARSE_PREFIX);
@@ -760,7 +762,7 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
 	return -1;
 
       /* Usually the first segment is enough */
-      msg_type = krb_parse(ndpi_struct, flow, payload, payload_len, KRB_PARSE_PREFIX);
+      msg_type = krb_parse(ndpi_struct, krb, payload, payload_len, KRB_PARSE_PREFIX);
       if(msg_type != 0)
 	return msg_type;
 
@@ -802,7 +804,7 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  msg_type = krb_parse(ndpi_struct, flow, payload, payload_len, KRB_PARSE_FULL);
+  msg_type = krb_parse(ndpi_struct, krb, payload, payload_len, KRB_PARSE_FULL);
 
 #ifdef KERBEROS_DEBUG
   printf("[Kerberos] [msg-type: %d]\n", msg_type);
@@ -830,6 +832,16 @@ static void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struc
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int16_t sport = packet->tcp ? ntohs(packet->tcp->source) : ntohs(packet->udp->source);
   u_int16_t dport = packet->tcp ? ntohs(packet->tcp->dest) : ntohs(packet->udp->dest);
+  /*
+    Metadata is parsed into a local copy, seeded with what previous messages of
+    this flow already committed, and written back to the shared union only once
+    the flow has actually been classified as Kerberos. A partially parsed (and
+    then rejected) message must not leave any data behind: if the flow later
+    ends up tagged with another protocol (e.g. the by-port guess at detection
+    give-up), stale bytes in the metadata.protos union would be interpreted
+    with the wrong union member (type confusion).
+  */
+  struct ndpi_kerberos_metadata krb = flow->metadata.protos.kerberos;
   int msg_type;
 
   if((sport != KERBEROS_PORT) && (dport != KERBEROS_PORT)) {
@@ -839,7 +851,7 @@ static void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struc
 
   NDPI_LOG_DBG(ndpi_struct, "search KERBEROS\n");
 
-  msg_type = krb_process_packet(ndpi_struct, flow, 0);
+  msg_type = krb_process_packet(ndpi_struct, flow, &krb, 0);
   if(msg_type < 0) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
@@ -848,6 +860,8 @@ static void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struc
     return;
 
   ndpi_int_kerberos_add_connection(ndpi_struct, flow);
+  /* Classified as Kerberos: now it is safe to commit the metadata */
+  flow->metadata.protos.kerberos = krb;
   krb_message_found(ndpi_struct, flow, msg_type);
 }
 
@@ -855,6 +869,9 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
 				      struct ndpi_flow_struct *flow)
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+  /* The flow is already classified as Kerberos here; still parse into a local
+     copy and commit it only on a successfully decoded message */
+  struct ndpi_kerberos_metadata krb = flow->metadata.protos.kerberos;
   int msg_type;
 
 #ifdef KERBEROS_DEBUG
@@ -868,9 +885,11 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
     return 1;
 
   /* Possibly dissect the reply */
-  msg_type = krb_process_packet(ndpi_struct, flow, 1);
-  if(msg_type > 0)
+  msg_type = krb_process_packet(ndpi_struct, flow, &krb, 1);
+  if(msg_type > 0) {
+    flow->metadata.protos.kerberos = krb;
     krb_message_found(ndpi_struct, flow, msg_type);
+  }
 
   /* Possibly more processing */
   return flow->core.extra_packets_func != NULL;
