@@ -1,0 +1,37 @@
+DPI Packets (UDP):	4	(2.00 pkts/flow)
+Confidence DPI              : 2 (flows)
+Num dissector calls: 2 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   4/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Kerberos	4	2154	2
+
+Acceptable                       4 2154          2            
+
+Network                          4 2154          2            
+
+	1	UDP 10.1.12.2:1060 <-> 10.5.3.1:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/328 bytes <-> 1 pkts/1298 bytes][Goodput ratio: 87/97][< 1 sec][denydc.com\des][Name type: 1][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (DENYDC)][Plen Bins: 0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
+	2	UDP 10.1.12.2:1059 <-> 10.5.3.1:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/333 bytes <-> 1 pkts/195 bytes][Goodput ratio: 87/78][< 1 sec][denydc\des][Name type: 1][Request: AS-REQ][Response: KRB-ERROR (Error 14)][PLAIN TEXT (DENYDC)][Plen Bins: 0,0,0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

@@ -253,8 +253,8 @@ typedef struct ndpi_flow_info {
       char domain[85];
       char hostname[85];
       char username[86];
-      u_int8_t req_msg_type, rep_msg_type;
-      int32_t error_code;
+      u_int8_t req_msg_type, rep_msg_type, name_type_found;
+      int32_t error_code, name_type;
     } kerberos;
 
     struct {
