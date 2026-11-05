@@ -117,7 +117,8 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
                             u_int8_t overwrite)
 {
   struct ndpi_asn1_ber_tlv seq, field, names, name[2];
-  u_int8_t num_names = 0, idx = 0;
+  u_int8_t num_names = 0, name_type_found = 0;
+  int32_t name_type = 0;
   int used;
 
   if (ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &seq) != 0 || seq.tag != 0x30)
@@ -125,7 +126,7 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
     return;
   }
 
-  /* Looking for name-string */
+  /* Looking for name-type and name-string */
   field.tag = 0;
   while (seq.length > 0)
   {
@@ -134,8 +135,10 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
     {
       return;
     }
-    if (field.tag == 0xA1)
+    if (field.tag == 0xA0)
     {
+      name_type_found = (ndpi_asn1_ber_decode_int(field.value, field.length, &name_type) == 0);
+    } else if (field.tag == 0xA1) {
       break;
     }
     seq.value += used;
@@ -162,18 +165,11 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
     names.length -= used;
   }
 
-  /* Service-like principals: the second component is the interesting one */
-  if (num_names == 2 && name[0].length == 4 &&
-      (strncasecmp((char const *)name[0].value, "host", 4) == 0 ||
-       strncasecmp((char const *)name[0].value, "ldap", 4) == 0))
-  {
-    idx = 1;
-  }
-
-  if (num_names <= idx || name[idx].length == 0 ||
+  if (num_names == 0 || name[0].length == 0 ||
       (!overwrite &&
        (flow->metadata.protos.kerberos.hostname[0] != '\0' ||
-        flow->metadata.protos.kerberos.username[0] != '\0')))
+        flow->metadata.protos.kerberos.username[0] != '\0' ||
+        flow->metadata.protos.kerberos.name_type_found)))
   {
     return;
   }
@@ -181,15 +177,33 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
   /* Only one of them is set: the name of the reply replaces both */
   flow->metadata.protos.kerberos.hostname[0] = '\0';
   flow->metadata.protos.kerberos.username[0] = '\0';
+  flow->metadata.protos.kerberos.name_type = name_type;
+  flow->metadata.protos.kerberos.name_type_found = name_type_found;
+
+  if (num_names == 2)
+  {
+    /* Service principals (e.g. "nfs/server.corp.local"): the first component
+       is the service, not a user. Only for "host" and "ldap" the second
+       component is the name of the machine */
+    if (name[0].length == 4 &&
+        (strncasecmp((char const *)name[0].value, "host", 4) == 0 ||
+         strncasecmp((char const *)name[0].value, "ldap", 4) == 0) &&
+        name[1].length > 0)
+    {
+      krb_strncpy_lower(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
+                        (char const *)name[1].value, name[1].length);
+    }
+    return;
+  }
 
   /* If cname ends with a $ then it's a machine account, otherwise it's a username */
-  if (name[idx].value[name[idx].length - 1] == '$')
+  if (name[0].value[name[0].length - 1] == '$')
   {
     krb_strncpy_lower(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
-                      (char const *)name[idx].value, name[idx].length - 1);
+                      (char const *)name[0].value, name[0].length - 1);
   } else {
     krb_strncpy_lower(flow->metadata.protos.kerberos.username, sizeof(flow->metadata.protos.kerberos.username),
-                      (char const *)name[idx].value, name[idx].length);
+                      (char const *)name[0].value, name[0].length);
   }
 }
 

@@ -2430,6 +2430,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 		flow->kerberos.hostname,
 		flow->kerberos.username);
       }
+      if (flow->kerberos.name_type_found)
+	fprintf(out, "[Name type: %d]", flow->kerberos.name_type);
       if (flow->kerberos.req_msg_type != 0)
 	fprintf(out, "[Request: %s]", kerberos_msg_type2str(flow->kerberos.req_msg_type));
       if (flow->kerberos.rep_msg_type == 30 /* KRB-ERROR */)
