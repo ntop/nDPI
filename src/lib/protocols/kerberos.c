@@ -895,6 +895,245 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
   return flow->core.extra_packets_func != NULL;
 }
 
+/* ********************************** */
+
+const char *ndpi_kerberos_msg_type2str(u_int8_t msg_type) {
+  switch(msg_type) {
+  case 10: return("AS-REQ");
+  case 11: return("AS-REP");
+  case 12: return("TGS-REQ");
+  case 13: return("TGS-REP");
+  case 30: return("KRB-ERROR");
+  default: return("Unknown");
+  }
+}
+
+/* ********************************** */
+
+/* Name type of a PrincipalName (RFC 4120 section 6.2, RFC 6111, MS-KILE) */
+const char *ndpi_kerberos_name_type2str(int32_t name_type) {
+  switch(name_type) {
+  case 0:    return("NT-UNKNOWN");
+  case 1:    return("NT-PRINCIPAL");
+  case 2:    return("NT-SRV-INST");
+  case 3:    return("NT-SRV-HST");
+  case 4:    return("NT-SRV-XHST");
+  case 5:    return("NT-UID");
+  case 6:    return("NT-X500-PRINCIPAL");
+  case 7:    return("NT-SMTP-NAME");
+  case 10:   return("NT-ENTERPRISE");
+  case 11:   return("NT-WELLKNOWN");
+  case -128: return("NT-MS-PRINCIPAL");
+  case -129: return("NT-MS-PRINCIPAL-AND-ID");
+  case -130: return("NT-ENT-PRINCIPAL-AND-ID");
+  default:   return("Unknown");
+  }
+}
+
+/* ********************************** */
+
+/* Error code of a KRB-ERROR (RFC 4120 section 7.5.9, RFC 4556, RFC 6113) */
+const char *ndpi_kerberos_error2str(int32_t error_code) {
+  switch(error_code) {
+  case 0:  return("KDC_ERR_NONE");
+  case 1:  return("KDC_ERR_NAME_EXP");
+  case 2:  return("KDC_ERR_SERVICE_EXP");
+  case 3:  return("KDC_ERR_BAD_PVNO");
+  case 4:  return("KDC_ERR_C_OLD_MAST_KVNO");
+  case 5:  return("KDC_ERR_S_OLD_MAST_KVNO");
+  case 6:  return("KDC_ERR_C_PRINCIPAL_UNKNOWN");
+  case 7:  return("KDC_ERR_S_PRINCIPAL_UNKNOWN");
+  case 8:  return("KDC_ERR_PRINCIPAL_NOT_UNIQUE");
+  case 9:  return("KDC_ERR_NULL_KEY");
+  case 10: return("KDC_ERR_CANNOT_POSTDATE");
+  case 11: return("KDC_ERR_NEVER_VALID");
+  case 12: return("KDC_ERR_POLICY");
+  case 13: return("KDC_ERR_BADOPTION");
+  case 14: return("KDC_ERR_ETYPE_NOSUPP");
+  case 15: return("KDC_ERR_SUMTYPE_NOSUPP");
+  case 16: return("KDC_ERR_PADATA_TYPE_NOSUPP");
+  case 17: return("KDC_ERR_TRTYPE_NOSUPP");
+  case 18: return("KDC_ERR_CLIENT_REVOKED");
+  case 19: return("KDC_ERR_SERVICE_REVOKED");
+  case 20: return("KDC_ERR_TGT_REVOKED");
+  case 21: return("KDC_ERR_CLIENT_NOTYET");
+  case 22: return("KDC_ERR_SERVICE_NOTYET");
+  case 23: return("KDC_ERR_KEY_EXPIRED");
+  case 24: return("KDC_ERR_PREAUTH_FAILED");
+  case 25: return("KDC_ERR_PREAUTH_REQUIRED");
+  case 26: return("KDC_ERR_SERVER_NOMATCH");
+  case 27: return("KDC_ERR_MUST_USE_USER2USER");
+  case 28: return("KDC_ERR_PATH_NOT_ACCEPTED");
+  case 29: return("KDC_ERR_SVC_UNAVAILABLE");
+  case 31: return("KRB_AP_ERR_BAD_INTEGRITY");
+  case 32: return("KRB_AP_ERR_TKT_EXPIRED");
+  case 33: return("KRB_AP_ERR_TKT_NYV");
+  case 34: return("KRB_AP_ERR_REPEAT");
+  case 35: return("KRB_AP_ERR_NOT_US");
+  case 36: return("KRB_AP_ERR_BADMATCH");
+  case 37: return("KRB_AP_ERR_SKEW");
+  case 38: return("KRB_AP_ERR_BADADDR");
+  case 39: return("KRB_AP_ERR_BADVERSION");
+  case 40: return("KRB_AP_ERR_MSG_TYPE");
+  case 41: return("KRB_AP_ERR_MODIFIED");
+  case 42: return("KRB_AP_ERR_BADORDER");
+  case 43: return("KRB_AP_ERR_ILL_CR_TKT");
+  case 44: return("KRB_AP_ERR_BADKEYVER");
+  case 45: return("KRB_AP_ERR_NOKEY");
+  case 46: return("KRB_AP_ERR_MUT_FAIL");
+  case 47: return("KRB_AP_ERR_BADDIRECTION");
+  case 48: return("KRB_AP_ERR_METHOD");
+  case 49: return("KRB_AP_ERR_BADSEQ");
+  case 50: return("KRB_AP_ERR_INAPP_CKSUM");
+  case 51: return("KRB_AP_PATH_NOT_ACCEPTED");
+  case 52: return("KRB_ERR_RESPONSE_TOO_BIG");
+  case 60: return("KRB_ERR_GENERIC");
+  case 61: return("KRB_ERR_FIELD_TOOLONG");
+  case 62: return("KDC_ERR_CLIENT_NOT_TRUSTED");
+  case 63: return("KDC_ERR_KDC_NOT_TRUSTED");
+  case 64: return("KDC_ERR_INVALID_SIG");
+  case 65: return("KDC_ERR_KEY_TOO_WEAK");
+  case 66: return("KDC_ERR_CERTIFICATE_MISMATCH");
+  case 67: return("KRB_AP_ERR_NO_TGT");
+  case 68: return("KDC_ERR_WRONG_REALM");
+  case 69: return("KRB_AP_ERR_USER_TO_USER_REQUIRED");
+  case 70: return("KDC_ERR_CANT_VERIFY_CERTIFICATE");
+  case 71: return("KDC_ERR_INVALID_CERTIFICATE");
+  case 72: return("KDC_ERR_REVOKED_CERTIFICATE");
+  case 73: return("KDC_ERR_REVOCATION_STATUS_UNKNOWN");
+  case 74: return("KDC_ERR_REVOCATION_STATUS_UNAVAILABLE");
+  case 75: return("KDC_ERR_CLIENT_NAME_MISMATCH");
+  case 76: return("KDC_ERR_KDC_NAME_MISMATCH");
+  case 77: return("KDC_ERR_INCONSISTENT_KEY_PURPOSE");
+  case 78: return("KDC_ERR_DIGEST_IN_CERT_NOT_ACCEPTED");
+  case 79: return("KDC_ERR_PA_CHECKSUM_MUST_BE_INCLUDED");
+  case 80: return("KDC_ERR_DIGEST_IN_SIGNED_DATA_NOT_ACCEPTED");
+  case 81: return("KDC_ERR_PUBLIC_KEY_ENCRYPTION_NOT_SUPPORTED");
+  case 90: return("KDC_ERR_PREAUTH_EXPIRED");
+  case 91: return("KDC_ERR_MORE_PREAUTH_DATA_REQUIRED");
+  case 92: return("KDC_ERR_PREAUTH_BAD_AUTHENTICATION_SET");
+  case 93: return("KDC_ERR_UNKNOWN_CRITICAL_FAST_OPTIONS");
+  default: return("Unknown");
+  }
+}
+
+/* ********************************** */
+
+/* NULL if the request is not an S4U one */
+const char *ndpi_kerberos_s4u2str(u_int8_t s4u) {
+  switch(s4u) {
+  case NDPI_KERBEROS_S4U_NONE:   return(NULL);
+  case NDPI_KERBEROS_S4U2SELF:   return("S4U2Self");
+  case NDPI_KERBEROS_S4U2PROXY:  return("S4U2Proxy");
+  default:                       return("Unknown");
+  }
+}
+
+/* ********************************** */
+
+/* The KDC issued the requested ticket (AS-REP or TGS-REP) */
+int ndpi_kerberos_reply_ok(const struct ndpi_kerberos_metadata *krb) {
+  return(krb != NULL &&
+         (krb->rep_msg_type == 11 /* AS-REP */ || krb->rep_msg_type == 13 /* TGS-REP */));
+}
+
+/* ********************************** */
+
+/* Name of the error of a KRB-ERROR reply; NULL if the reply is not an error */
+const char *ndpi_kerberos_reply_error(const struct ndpi_kerberos_metadata *krb) {
+  if(krb == NULL || krb->rep_msg_type != 30 /* KRB-ERROR */)
+    return(NULL);
+
+  return(ndpi_kerberos_error2str(krb->error_code));
+}
+
+/* ********************************** */
+
+/*
+  Client principal as "user@realm", or "host$@realm" for a machine (the form of
+  its account name). The realm is omitted if unknown.
+  An enterprise name (e.g. "user@upn.suffix") is used as it is if it ends with
+  the realm, otherwise its '@' are escaped (RFC 1964 string form):
+  "user\@upn.suffix@realm".
+  Return the length of the name (0 if there is no name)
+*/
+int ndpi_kerberos_client_name(const struct ndpi_kerberos_metadata *krb,
+                              char *buf, u_int buf_len) {
+  const char *name, *suffix = "", *at;
+  u_int len = 0, i;
+  int has_realm;
+
+  if(buf == NULL || buf_len == 0)
+    return(0);
+  buf[0] = '\0';
+
+  if(krb == NULL)
+    return(0);
+
+  if(krb->username[0] != '\0')
+    name = krb->username;
+  else if(krb->hostname[0] != '\0')
+    name = krb->hostname, suffix = "$";
+  else
+    return(0);
+
+  has_realm = (krb->domain[0] != '\0');
+  at = strrchr(name, '@');
+  if(at != NULL && has_realm && strcasecmp(at + 1, krb->domain) == 0)
+    has_realm = 0; /* Enterprise name ending with the realm */
+
+  for(i = 0; name[i] != '\0' && len + 1 < buf_len; i++) {
+    if(name[i] == '@' && has_realm) {
+      if(len + 2 >= buf_len)
+        break;
+      buf[len++] = '\\';
+    }
+    buf[len++] = name[i];
+  }
+  buf[len] = '\0';
+
+  if(has_realm)
+    ndpi_snprintf(&buf[len], buf_len - len, "%s@%s", suffix, krb->domain);
+  else
+    ndpi_snprintf(&buf[len], buf_len - len, "%s", suffix);
+
+  return((int)strlen(buf));
+}
+
+/* ********************************** */
+
+/* Serialize the metadata (the caller opens/closes the enclosing block, if any) */
+int ndpi_kerberos2json(ndpi_serializer *serializer, const struct ndpi_kerberos_metadata *krb) {
+  const char *s4u;
+
+  if(serializer == NULL || krb == NULL)
+    return(-1);
+
+  ndpi_serialize_string_string(serializer, "hostname", krb->hostname);
+  ndpi_serialize_string_string(serializer, "domain", krb->domain);
+  ndpi_serialize_string_string(serializer, "username", krb->username);
+  if(krb->hostname_truncated)
+    ndpi_serialize_string_boolean(serializer, "hostname_truncated", 1);
+  if(krb->domain_truncated)
+    ndpi_serialize_string_boolean(serializer, "domain_truncated", 1);
+  if(krb->username_truncated)
+    ndpi_serialize_string_boolean(serializer, "username_truncated", 1);
+  if(krb->name_type_found)
+    ndpi_serialize_string_int32(serializer, "name_type", krb->name_type);
+  if((s4u = ndpi_kerberos_s4u2str(krb->s4u)) != NULL)
+    ndpi_serialize_string_string(serializer, "s4u", s4u);
+  if(krb->req_msg_type != 0)
+    ndpi_serialize_string_uint32(serializer, "request_type", krb->req_msg_type);
+  if(krb->rep_msg_type != 0) {
+    ndpi_serialize_string_uint32(serializer, "response_type", krb->rep_msg_type);
+    ndpi_serialize_string_boolean(serializer, "response_ok", ndpi_kerberos_reply_ok(krb));
+    if(krb->rep_msg_type == 30 /* KRB-ERROR */)
+      ndpi_serialize_string_int32(serializer, "error_code", krb->error_code);
+  }
+
+  return(0);
+}
+
 void init_kerberos_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
   ndpi_register_dissector("Kerberos", ndpi_struct,
                      ndpi_search_kerberos,

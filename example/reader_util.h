@@ -249,14 +249,7 @@ typedef struct ndpi_flow_info {
       char password[128];
     } ftp_imap_pop_smtp;
 
-    struct {
-      char domain[64];
-      char hostname[64];
-      char username[96];
-      u_int8_t req_msg_type, rep_msg_type, name_type_found, s4u;
-      u_int8_t hostname_truncated, domain_truncated, username_truncated;
-      int32_t error_code, name_type;
-    } kerberos;
+    struct ndpi_kerberos_metadata kerberos;
 
     struct {
       char ip[16];

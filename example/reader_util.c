@@ -1658,24 +1658,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
   /* KERBEROS */
   else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_KERBEROS)) {
     flow->info_type = INFO_KERBEROS;
-    ndpi_snprintf(flow->kerberos.domain,
-                  sizeof(flow->kerberos.domain),
-                  "%s", flow->ndpi_flow->metadata.protos.kerberos.domain);
-    ndpi_snprintf(flow->kerberos.hostname,
-                  sizeof(flow->kerberos.hostname),
-                  "%s", flow->ndpi_flow->metadata.protos.kerberos.hostname);
-    ndpi_snprintf(flow->kerberos.username,
-                  sizeof(flow->kerberos.username),
-                  "%s", flow->ndpi_flow->metadata.protos.kerberos.username);
-    flow->kerberos.req_msg_type = flow->ndpi_flow->metadata.protos.kerberos.req_msg_type;
-    flow->kerberos.rep_msg_type = flow->ndpi_flow->metadata.protos.kerberos.rep_msg_type;
-    flow->kerberos.error_code = flow->ndpi_flow->metadata.protos.kerberos.error_code;
-    flow->kerberos.name_type_found = flow->ndpi_flow->metadata.protos.kerberos.name_type_found;
-    flow->kerberos.name_type = flow->ndpi_flow->metadata.protos.kerberos.name_type;
-    flow->kerberos.s4u = flow->ndpi_flow->metadata.protos.kerberos.s4u;
-    flow->kerberos.hostname_truncated = flow->ndpi_flow->metadata.protos.kerberos.hostname_truncated;
-    flow->kerberos.domain_truncated = flow->ndpi_flow->metadata.protos.kerberos.domain_truncated;
-    flow->kerberos.username_truncated = flow->ndpi_flow->metadata.protos.kerberos.username_truncated;
+    flow->kerberos = flow->ndpi_flow->metadata.protos.kerberos;
   /* COLLECTD */
   } else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_COLLECTD)) {
     flow->info_type = INFO_GENERIC;
