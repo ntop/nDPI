@@ -1781,30 +1781,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_PROTOCOL_KERBEROS:
     ndpi_serialize_start_of_block(serializer, "kerberos");
-    ndpi_serialize_string_string(serializer, "hostname", flow->metadata.protos.kerberos.hostname);
-    ndpi_serialize_string_string(serializer, "domain", flow->metadata.protos.kerberos.domain);
-    ndpi_serialize_string_string(serializer, "username", flow->metadata.protos.kerberos.username);
-    if(flow->metadata.protos.kerberos.hostname_truncated)
-      ndpi_serialize_string_boolean(serializer, "hostname_truncated", 1);
-    if(flow->metadata.protos.kerberos.domain_truncated)
-      ndpi_serialize_string_boolean(serializer, "domain_truncated", 1);
-    if(flow->metadata.protos.kerberos.username_truncated)
-      ndpi_serialize_string_boolean(serializer, "username_truncated", 1);
-    if(flow->metadata.protos.kerberos.name_type_found)
-      ndpi_serialize_string_int32(serializer, "name_type", flow->metadata.protos.kerberos.name_type);
-    if(flow->metadata.protos.kerberos.s4u != NDPI_KERBEROS_S4U_NONE)
-      ndpi_serialize_string_string(serializer, "s4u",
-				   flow->metadata.protos.kerberos.s4u == NDPI_KERBEROS_S4U2SELF ? "S4U2Self" : "S4U2Proxy");
-    if(flow->metadata.protos.kerberos.req_msg_type != 0)
-      ndpi_serialize_string_uint32(serializer, "request_type", flow->metadata.protos.kerberos.req_msg_type);
-    if(flow->metadata.protos.kerberos.rep_msg_type != 0) {
-      ndpi_serialize_string_uint32(serializer, "response_type", flow->metadata.protos.kerberos.rep_msg_type);
-      ndpi_serialize_string_boolean(serializer, "response_ok",
-				    flow->metadata.protos.kerberos.rep_msg_type == 11 /* AS-REP */ ||
-				    flow->metadata.protos.kerberos.rep_msg_type == 13 /* TGS-REP */);
-      if(flow->metadata.protos.kerberos.rep_msg_type == 30 /* KRB-ERROR */)
-	ndpi_serialize_string_int32(serializer, "error_code", flow->metadata.protos.kerberos.error_code);
-    }
+    ndpi_kerberos2json(serializer, &flow->metadata.protos.kerberos);
     ndpi_serialize_end_of_block(serializer);
     break;
 

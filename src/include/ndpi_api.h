@@ -1325,6 +1325,19 @@ extern "C" {
   char* ndpi_ssl_version2str(char *buf, int buf_len,
                              u_int16_t version, u_int8_t *unknown_tls_version);
   char *ndpi_multimedia_flowtype2str(char *buf, int buf_len, u_int8_t m_types);
+
+  /* Kerberos */
+  const char *ndpi_kerberos_msg_type2str(u_int8_t msg_type);
+  const char *ndpi_kerberos_name_type2str(int32_t name_type);
+  const char *ndpi_kerberos_error2str(int32_t error_code);
+  const char *ndpi_kerberos_s4u2str(u_int8_t s4u);
+  int ndpi_kerberos_reply_ok(const struct ndpi_kerberos_metadata *krb);
+  const char *ndpi_kerberos_reply_error(const struct ndpi_kerberos_metadata *krb);
+  int ndpi_kerberos_client_name(const struct ndpi_kerberos_metadata *krb,
+                                char *buf, u_int buf_len);
+  /* Serialize the metadata (without opening/closing a block) */
+  int ndpi_kerberos2json(ndpi_serializer *serializer,
+                         const struct ndpi_kerberos_metadata *krb);
   char *ndpi_quic_version2str(char *buf, int buf_len, u_int32_t version);
   int ndpi_netbios_name_interpret(u_char *in, u_int in_len, u_char *out, u_int out_len);
   void ndpi_patchIPv6Address(char *str);
