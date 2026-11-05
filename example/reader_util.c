@@ -1673,6 +1673,9 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
     flow->kerberos.name_type_found = flow->ndpi_flow->metadata.protos.kerberos.name_type_found;
     flow->kerberos.name_type = flow->ndpi_flow->metadata.protos.kerberos.name_type;
     flow->kerberos.s4u = flow->ndpi_flow->metadata.protos.kerberos.s4u;
+    flow->kerberos.hostname_truncated = flow->ndpi_flow->metadata.protos.kerberos.hostname_truncated;
+    flow->kerberos.domain_truncated = flow->ndpi_flow->metadata.protos.kerberos.domain_truncated;
+    flow->kerberos.username_truncated = flow->ndpi_flow->metadata.protos.kerberos.username_truncated;
   /* COLLECTD */
   } else if(ndpi_stack_contains(&flow->detected_protocol.protocol_stack, NDPI_PROTOCOL_COLLECTD)) {
     flow->info_type = INFO_GENERIC;

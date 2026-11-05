@@ -1,0 +1,48 @@
+DPI Packets (UDP):	26	(2.00 pkts/flow)
+Confidence DPI              : 13 (flows)
+Num dissector calls: 13 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   26/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Kerberos	26	7111	13
+
+Acceptable                      26 7111          13           
+
+Network                         26 7111          13           
+
+	1	UDP 10.0.0.42:51010 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/286 bytes <-> 1 pkts/441 bytes][Goodput ratio: 85/90][0.01 sec][subsidiary.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.loc\erin][Truncated: domain][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (ASUBSIDIARY.X)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.0.0.42:51008 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/268 bytes <-> 1 pkts/368 bytes][Goodput ratio: 84/88][0.01 sec][corp.local\vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv][Truncated: username][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 10.0.0.42:51009 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/268 bytes <-> 1 pkts/368 bytes][Goodput ratio: 84/88][0.01 sec][corp.local\wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww][Truncated: username][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 10.0.0.42:51007 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/267 bytes <-> 1 pkts/367 bytes][Goodput ratio: 84/88][0.01 sec][corp.local\uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 10.0.0.42:51012 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/249 bytes <-> 1 pkts/349 bytes][Goodput ratio: 83/88][0.01 sec][corp.local\ws-hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh.][Truncated: hostname][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh)][Plen Bins: 0,0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 10.0.0.42:51011 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/242 bytes <-> 1 pkts/342 bytes][Goodput ratio: 82/87][0.01 sec][corp.local\mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm][Truncated: hostname][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (FMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM)][Plen Bins: 0,0,0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 10.0.0.42:51013 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/282 bytes <-> 1 pkts/273 bytes][Goodput ratio: 85/84][0.01 sec][corp.local\zed][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ)][Plen Bins: 0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	8	UDP 10.0.0.42:51001 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/183 bytes <-> 1 pkts/283 bytes][Goodput ratio: 77/85][0.01 sec][corp.local\josé.müller][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	UDP 10.0.0.42:51006 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/180 bytes <-> 1 pkts/280 bytes][Goodput ratio: 76/85][0.01 sec][corp.local\a??b???c??][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	10	UDP 10.0.0.42:51003 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/179 bytes <-> 1 pkts/279 bytes][Goodput ratio: 76/85][0.01 sec][corp.local\smile🙂][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	11	UDP 10.0.0.42:51005 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/178 bytes <-> 1 pkts/278 bytes][Goodput ratio: 76/85][0.01 sec][corp.local\bad?name][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	12	UDP 10.0.0.42:51002 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/177 bytes <-> 1 pkts/277 bytes][Goodput ratio: 76/85][0.01 sec][corp.local\ÖzgÜr][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	13	UDP 10.0.0.42:51004 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/173 bytes <-> 1 pkts/274 bytes][Goodput ratio: 75/84][0.01 sec][corp.local\jos?][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][Response: AS-REP (OK)][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

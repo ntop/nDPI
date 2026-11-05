@@ -1899,9 +1899,11 @@ struct ndpi_flow_metadata_struct {
     } ntp[2];
 
     struct {
-      char hostname[48], domain[48], username[48];
+      /* Lowercase (ASCII only), UTF-8 */
+      char hostname[64], domain[64], username[96];
       u_int8_t req_msg_type, rep_msg_type;
-      u_int8_t name_type_found; /* name_type is valid */
+      u_int8_t name_type_found:1, /* name_type is valid */
+        hostname_truncated:1, domain_truncated:1, username_truncated:1, _pad:4;
       u_int8_t s4u; /* ndpi_kerberos_s4u, of the request */
       int32_t error_code; /* Valid only if rep_msg_type is KRB-ERROR (30) */
       int32_t name_type; /* Of the client name (e.g. 1 principal, 2 service, 10 enterprise) */
