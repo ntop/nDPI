@@ -2089,6 +2089,28 @@ static const char* kerberos_msg_type2str(u_int8_t msg_type) {
 
 /* ********************************** */
 
+/* Name type of a PrincipalName (RFC 4120 section 6.2, RFC 6111, MS-KILE) */
+static const char* kerberos_name_type2str(int32_t name_type) {
+  switch(name_type) {
+  case 0:    return("NT-UNKNOWN");
+  case 1:    return("NT-PRINCIPAL");
+  case 2:    return("NT-SRV-INST");
+  case 3:    return("NT-SRV-HST");
+  case 4:    return("NT-SRV-XHST");
+  case 5:    return("NT-UID");
+  case 6:    return("NT-X500-PRINCIPAL");
+  case 7:    return("NT-SMTP-NAME");
+  case 10:   return("NT-ENTERPRISE");
+  case 11:   return("NT-WELLKNOWN");
+  case -128: return("NT-MS-PRINCIPAL");
+  case -129: return("NT-MS-PRINCIPAL-AND-ID");
+  case -130: return("NT-ENT-PRINCIPAL-AND-ID");
+  default:   return("Unknown");
+  }
+}
+
+/* ********************************** */
+
 /**
  * @brief Print the flow
  */
@@ -2431,7 +2453,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 		flow->kerberos.username);
       }
       if (flow->kerberos.name_type_found)
-	fprintf(out, "[Name type: %d]", flow->kerberos.name_type);
+	fprintf(out, "[Name type: %d (%s)]", flow->kerberos.name_type,
+		kerberos_name_type2str(flow->kerberos.name_type));
       if (flow->kerberos.req_msg_type != 0)
 	fprintf(out, "[Request: %s]", kerberos_msg_type2str(flow->kerberos.req_msg_type));
       if (flow->kerberos.rep_msg_type == 30 /* KRB-ERROR */)
