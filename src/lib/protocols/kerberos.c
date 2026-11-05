@@ -181,6 +181,30 @@ static void krb_parse_realm(struct ndpi_flow_struct * const flow,
 }
 
 /*
+  Length of the short name of a machine (e.g. "ws1" of "ws1.corp.local"), the
+  same form as its account name ("WS1$"): the first label of the name, unless
+  it is an IPv4 address
+*/
+static u_int32_t krb_machine_name_len(const u_int8_t *name, u_int32_t name_len)
+{
+  u_int32_t i, dot = name_len;
+  u_int8_t ipv4 = 1;
+
+  for (i = 0; i < name_len; i++)
+  {
+    if (name[i] == '.')
+    {
+      if (dot == name_len)
+        dot = i;
+    } else if (!ndpi_isdigit(name[i])) {
+      ipv4 = 0;
+    }
+  }
+
+  return (ipv4 && dot < name_len) ? name_len : dot;
+}
+
+/*
   PrincipalName ::= SEQUENCE {
     name-type   [0] Int32,
     name-string [1] SEQUENCE OF KerberosString
@@ -263,12 +287,16 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
        component is the name of the machine */
     if (name[0].length == 4 &&
         (strncasecmp((char const *)name[0].value, "host", 4) == 0 ||
-         strncasecmp((char const *)name[0].value, "ldap", 4) == 0) &&
-        name[1].length > 0)
+         strncasecmp((char const *)name[0].value, "ldap", 4) == 0))
     {
-      flow->metadata.protos.kerberos.hostname_truncated =
-        krb_copy_name(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
-                      name[1].value, name[1].length);
+      u_int32_t len = krb_machine_name_len(name[1].value, name[1].length);
+
+      if (len > 0)
+      {
+        flow->metadata.protos.kerberos.hostname_truncated =
+          krb_copy_name(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
+                        name[1].value, len);
+      }
     }
     return;
   }
