@@ -192,6 +192,8 @@ const struct cfg_param cfg_params[] = {
 
   { "smb",           "max_packets_extra_dissection",            "25", "0", "255", CFG_PARAM_INT, __OFF(smb_max_packets_extra_dissection), NULL },
 
+  { "kerberos",      "max_packets_extra_dissection",            "16", "0", "255", CFG_PARAM_INT, __OFF(kerberos_max_packets_extra_dissection), NULL },
+
   { "rtp",           "search_for_stun",                         "disable", NULL, NULL, CFG_PARAM_ENABLE_DISABLE, __OFF(rtp_search_for_stun), NULL },
   { "rtp",           "max_packets_extra_dissection",            "32", "0", "255", CFG_PARAM_INT, __OFF(rtp_max_packets_extra_dissection), NULL },
 

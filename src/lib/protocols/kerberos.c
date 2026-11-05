@@ -46,9 +46,9 @@
 */
 #define KRB_MAX_BUF_LEN       12000
 #define KRB_MAX_REPLY_LEN     (1 << 20) /* Sanity check of the record marker */
-/* Packets to wait for the reply, including the ACKs of the client: enough for
+/* The packets to wait for the reply are configurable
+   (kerberos,max_packets_extra_dissection): the default (16) is enough for
    KRB_MAX_BUF_LEN bytes with delayed ACKs (MSS 1460: 9 segments + 5 ACKs) */
-#define KRB_MAX_EXTRA_PACKETS 16
 
 /* krb_parse() modes */
 #define KRB_PARSE_FULL         0 /* The whole message */
@@ -785,10 +785,11 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
   return msg_type;
 }
 
-static void krb_message_found(struct ndpi_flow_struct *flow, int msg_type) {
-  if(krb_is_request(msg_type)) {
-    /* Looking for the reply */
-    flow->core.max_extra_packets_to_check = KRB_MAX_EXTRA_PACKETS; /* Reply may be split into multiple segments */
+static void krb_message_found(struct ndpi_detection_module_struct *ndpi_struct,
+                              struct ndpi_flow_struct *flow, int msg_type) {
+  if(krb_is_request(msg_type) && ndpi_struct->cfg.kerberos_max_packets_extra_dissection > 0) {
+    /* Looking for the reply (it may be split into multiple segments) */
+    flow->core.max_extra_packets_to_check = ndpi_struct->cfg.kerberos_max_packets_extra_dissection;
     flow->core.extra_packets_func = ndpi_search_kerberos_extra;
   } else {
     /* Nothing else to do; stop dissecting this flow */
@@ -819,7 +820,7 @@ static void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struc
     return;
 
   ndpi_int_kerberos_add_connection(ndpi_struct, flow);
-  krb_message_found(flow, msg_type);
+  krb_message_found(ndpi_struct, flow, msg_type);
 }
 
 static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_struct,
@@ -841,7 +842,7 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
   /* Possibly dissect the reply */
   msg_type = krb_process_packet(ndpi_struct, flow, 1);
   if(msg_type > 0)
-    krb_message_found(flow, msg_type);
+    krb_message_found(ndpi_struct, flow, msg_type);
 
   /* Possibly more processing */
   return flow->core.extra_packets_func != NULL;
