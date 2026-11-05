@@ -80,9 +80,17 @@ static void krb_strncpy_lower(char * const dst, size_t dst_siz,
    }
 }
 
+/*
+  Names and realm are taken from the first message that carries them, except
+  for a successful reply (AS-REP/TGS-REP): its crealm and cname, set by the
+  KDC, replace the ones of the request, set by the client (e.g. the request
+  realm can be the short name of the domain, "CORP" instead of "CORP.LOCAL")
+*/
+
 /* Realm ::= KerberosString */
 static void krb_parse_realm(struct ndpi_flow_struct * const flow,
-                            const u_int8_t *buf, u_int32_t buf_len)
+                            const u_int8_t *buf, u_int32_t buf_len,
+                            u_int8_t overwrite)
 {
   struct ndpi_asn1_ber_tlv realm;
 
@@ -91,7 +99,7 @@ static void krb_parse_realm(struct ndpi_flow_struct * const flow,
     return;
   }
 
-  if (flow->metadata.protos.kerberos.domain[0] == '\0')
+  if (overwrite || flow->metadata.protos.kerberos.domain[0] == '\0')
   {
     krb_strncpy_lower(flow->metadata.protos.kerberos.domain, sizeof(flow->metadata.protos.kerberos.domain),
                       (char const *)realm.value, realm.length);
@@ -105,7 +113,8 @@ static void krb_parse_realm(struct ndpi_flow_struct * const flow,
   }
 */
 static void krb_parse_cname(struct ndpi_flow_struct * const flow,
-                            const u_int8_t *buf, u_int32_t buf_len)
+                            const u_int8_t *buf, u_int32_t buf_len,
+                            u_int8_t overwrite)
 {
   struct ndpi_asn1_ber_tlv seq, field, names, name[2];
   u_int8_t num_names = 0, idx = 0;
@@ -162,11 +171,16 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
   }
 
   if (num_names <= idx || name[idx].length == 0 ||
-      flow->metadata.protos.kerberos.hostname[0] != '\0' ||
-      flow->metadata.protos.kerberos.username[0] != '\0')
+      (!overwrite &&
+       (flow->metadata.protos.kerberos.hostname[0] != '\0' ||
+        flow->metadata.protos.kerberos.username[0] != '\0')))
   {
     return;
   }
+
+  /* Only one of them is set: the name of the reply replaces both */
+  flow->metadata.protos.kerberos.hostname[0] = '\0';
+  flow->metadata.protos.kerberos.username[0] = '\0';
 
   /* If cname ends with a $ then it's a machine account, otherwise it's a username */
   if (name[idx].value[name[idx].length - 1] == '$')
@@ -208,9 +222,9 @@ static void krb_parse_req_body(struct ndpi_flow_struct * const flow,
 
     if (field.tag == 0xA1)
     {
-      krb_parse_cname(flow, field.value, field.length);
+      krb_parse_cname(flow, field.value, field.length, 0);
     } else if (field.tag == 0xA2) {
-      krb_parse_realm(flow, field.value, field.length);
+      krb_parse_realm(flow, field.value, field.length, 0);
     }
 
     seq.value += used;
@@ -260,7 +274,7 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
                      const u_int8_t *buf, u_int32_t buf_len)
 {
   struct ndpi_asn1_ber_tlv app, seq, field;
-  u_int8_t msg_type, pvno_idx, idx, pvno_found = 0, msg_type_found = 0;
+  u_int8_t msg_type, pvno_idx, idx, pvno_found = 0, msg_type_found = 0, overwrite;
   int32_t value;
   int used;
 
@@ -325,11 +339,14 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
 
       case KRB_MSG_TYPE_AS_REP:
       case KRB_MSG_TYPE_TGS_REP:
+        /* Only the first reply is exported (see below) */
+        overwrite = (flow->metadata.protos.kerberos.rep_msg_type == 0);
+
         if (idx == 3)
         {
-          krb_parse_realm(flow, field.value, field.length);
+          krb_parse_realm(flow, field.value, field.length, overwrite);
         } else if (idx == 4) {
-          krb_parse_cname(flow, field.value, field.length);
+          krb_parse_cname(flow, field.value, field.length, overwrite);
         }
         break;
 
@@ -342,9 +359,9 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
             flow->metadata.protos.kerberos.error_code = value;
           }
         } else if (idx == 7 || idx == 9) {
-          krb_parse_realm(flow, field.value, field.length);
+          krb_parse_realm(flow, field.value, field.length, 0);
         } else if (idx == 8) {
-          krb_parse_cname(flow, field.value, field.length);
+          krb_parse_cname(flow, field.value, field.length, 0);
         }
         break;
 
