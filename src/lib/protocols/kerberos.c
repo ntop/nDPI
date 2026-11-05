@@ -43,6 +43,11 @@
 #define KRB_MSG_TYPE_AP_REQ  14
 #define KRB_MSG_TYPE_ERROR   30
 
+/* Reference: https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-sfu */
+#define KRB_PADATA_FOR_USER           129 /* S4U2Self */
+#define KRB_PADATA_S4U_X509_USER      130 /* S4U2Self with a certificate */
+#define KRB_KDC_OPT_CNAME_IN_ADDL_TKT 14  /* S4U2Proxy */
+
 static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_struct,
 				      struct ndpi_flow_struct *flow);
 
@@ -208,6 +213,77 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
 }
 
 /*
+  METHOD-DATA ::= SEQUENCE OF PA-DATA
+
+  PA-DATA ::= SEQUENCE {
+    padata-type  [1] Int32,
+    padata-value [2] OCTET STRING
+  }
+*/
+static void krb_parse_tgs_req_padata(struct ndpi_flow_struct * const flow,
+                                     const u_int8_t *buf, u_int32_t buf_len)
+{
+  struct ndpi_asn1_ber_tlv seq, padata, field;
+  int32_t padata_type;
+  int used;
+
+  if (ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &seq) != 0 || seq.tag != 0x30)
+  {
+    return;
+  }
+
+  while (seq.length > 0)
+  {
+    used = ndpi_asn1_ber_decode_tlv(seq.value, seq.length, &padata);
+    if (used < 0)
+    {
+      return;
+    }
+    seq.value += used;
+    seq.length -= used;
+
+    if (padata.tag != 0x30)
+    {
+      continue;
+    }
+
+    while (padata.length > 0)
+    {
+      used = ndpi_asn1_ber_decode_tlv(padata.value, padata.length, &field);
+      if (used < 0)
+      {
+        return;
+      }
+      padata.value += used;
+      padata.length -= used;
+
+      if (field.tag == 0xA1)
+      {
+        if (ndpi_asn1_ber_decode_int(field.value, field.length, &padata_type) == 0 &&
+            (padata_type == KRB_PADATA_FOR_USER || padata_type == KRB_PADATA_S4U_X509_USER) &&
+            flow->metadata.protos.kerberos.s4u == NDPI_KERBEROS_S4U_NONE)
+        {
+          flow->metadata.protos.kerberos.s4u = NDPI_KERBEROS_S4U2SELF;
+        }
+        break;
+      }
+    }
+  }
+}
+
+/* KDCOptions ::= KerberosFlags (BIT STRING) */
+static int krb_kdc_option_is_set(const u_int8_t *buf, u_int32_t buf_len, u_int8_t bit)
+{
+  struct ndpi_asn1_ber_tlv flags;
+
+  /* The first byte is the number of unused bits */
+  return ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &flags) == 0 &&
+         flags.tag == 0x03 /* BIT STRING */ &&
+         flags.length > 1u + bit / 8 &&
+         (flags.value[1 + bit / 8] & (0x80 >> (bit % 8))) != 0;
+}
+
+/*
   KDC-REQ-BODY ::= SEQUENCE {
     kdc-options [0] KDCOptions,
     cname       [1] PrincipalName OPTIONAL,
@@ -216,7 +292,8 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
   }
 */
 static void krb_parse_req_body(struct ndpi_flow_struct * const flow,
-                               const u_int8_t *buf, u_int32_t buf_len)
+                               const u_int8_t *buf, u_int32_t buf_len,
+                               u_int8_t msg_type)
 {
   struct ndpi_asn1_ber_tlv seq, field;
   int used;
@@ -234,8 +311,17 @@ static void krb_parse_req_body(struct ndpi_flow_struct * const flow,
       return;
     }
 
-    if (field.tag == 0xA1)
+    if (field.tag == 0xA0)
     {
+      /* Constrained delegation: the client name of the reply is the one of
+         the additional ticket (i.e. the user), not the requester one.
+         NOTE: additional-tickets without this option are user-to-user */
+      if (msg_type == KRB_MSG_TYPE_TGS_REQ &&
+          krb_kdc_option_is_set(field.value, field.length, KRB_KDC_OPT_CNAME_IN_ADDL_TKT))
+      {
+        flow->metadata.protos.kerberos.s4u = NDPI_KERBEROS_S4U2PROXY;
+      }
+    } else if (field.tag == 0xA1) {
       krb_parse_cname(flow, field.value, field.length, 0);
     } else if (field.tag == 0xA2) {
       krb_parse_realm(flow, field.value, field.length, 0);
@@ -345,9 +431,17 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
     {
       case KRB_MSG_TYPE_AS_REQ:
       case KRB_MSG_TYPE_TGS_REQ:
-        if (idx == 4)
+        /* Only the first request is exported (see below) */
+        if (flow->metadata.protos.kerberos.req_msg_type != 0)
         {
-          krb_parse_req_body(flow, field.value, field.length);
+          break;
+        }
+
+        if (idx == 3 && msg_type == KRB_MSG_TYPE_TGS_REQ)
+        {
+          krb_parse_tgs_req_padata(flow, field.value, field.length);
+        } else if (idx == 4) {
+          krb_parse_req_body(flow, field.value, field.length, msg_type);
         }
         break;
 
