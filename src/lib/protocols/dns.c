@@ -823,7 +823,8 @@ static void dns_tcp_reasm_enable_extra(struct ndpi_detection_module_struct *ndpi
      core->detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
     return;
 
-  if(!ndpi_struct->cfg.dns_parse_response_enabled)
+  if(!ndpi_struct->cfg.dns_parse_response_enabled ||
+     ndpi_struct->cfg.dns_max_packets_extra_dissection == 0)
     return;
 
   if(core->detected_protocol_stack[0] == NDPI_PROTOCOL_LLMNR ||
@@ -1293,6 +1294,7 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(!core->extra_packets_func &&
      ndpi_struct->cfg.dns_parse_response_enabled &&
+     ndpi_struct->cfg.dns_max_packets_extra_dissection > 0 &&
      /* We have never triggered extra-dissection for LLMNR. Keep the old behavior */
      core->detected_protocol_stack[0] != NDPI_PROTOCOL_LLMNR &&
      core->detected_protocol_stack[1] != NDPI_PROTOCOL_LLMNR) {
