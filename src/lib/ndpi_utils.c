@@ -1786,6 +1786,9 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_string_string(serializer, "username", flow->metadata.protos.kerberos.username);
     if(flow->metadata.protos.kerberos.name_type_found)
       ndpi_serialize_string_int32(serializer, "name_type", flow->metadata.protos.kerberos.name_type);
+    if(flow->metadata.protos.kerberos.s4u != NDPI_KERBEROS_S4U_NONE)
+      ndpi_serialize_string_string(serializer, "s4u",
+				   flow->metadata.protos.kerberos.s4u == NDPI_KERBEROS_S4U2SELF ? "S4U2Self" : "S4U2Proxy");
     if(flow->metadata.protos.kerberos.req_msg_type != 0)
       ndpi_serialize_string_uint32(serializer, "request_type", flow->metadata.protos.kerberos.req_msg_type);
     if(flow->metadata.protos.kerberos.rep_msg_type != 0) {

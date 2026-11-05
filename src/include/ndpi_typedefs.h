@@ -751,6 +751,17 @@ typedef enum {
 	      NDPI_HTTP_METHOD_PROPPATCH,
 } ndpi_http_method;
 
+/*
+  Kerberos S4U (MS-SFU): a service requests a ticket on behalf of a user. The
+  client name of the reply is the user, but the client of the flow is the
+  service
+*/
+typedef enum {
+  NDPI_KERBEROS_S4U_NONE = 0,
+  NDPI_KERBEROS_S4U2SELF,  /* TGS-REQ with PA-FOR-USER or PA-S4U-X509-USER */
+  NDPI_KERBEROS_S4U2PROXY, /* TGS-REQ with the cname-in-addl-tkt option (constrained delegation) */
+} ndpi_kerberos_s4u;
+
 typedef enum {
   NDPI_PTREE_RISK_MASK = 0,
   NDPI_PTREE_RISK_MASK6,
@@ -1891,6 +1902,7 @@ struct ndpi_flow_metadata_struct {
       char hostname[48], domain[48], username[48];
       u_int8_t req_msg_type, rep_msg_type;
       u_int8_t name_type_found; /* name_type is valid */
+      u_int8_t s4u; /* ndpi_kerberos_s4u, of the request */
       int32_t error_code; /* Valid only if rep_msg_type is KRB-ERROR (30) */
       int32_t name_type; /* Of the client name (e.g. 1 principal, 2 service, 10 enterprise) */
     } kerberos;
