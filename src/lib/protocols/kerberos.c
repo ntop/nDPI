@@ -67,22 +67,70 @@ static int krb_decode_asn1_string(const u_int8_t *buf, u_int32_t buf_len,
   return 0;
 }
 
-static void krb_strncpy_lower(char * const dst, size_t dst_siz,
-                              char const * const src, size_t src_siz)
+/* Length of the valid UTF-8 multi-byte sequence starting at buf, or 0 */
+static size_t krb_utf8_seq_len(const u_int8_t *buf, size_t len)
 {
-  int i, dst_len = (int)ndpi_min(src_siz, dst_siz - 1);
+  size_t n, i;
+  u_int8_t min = 0x80, max = 0xBF; /* Range of the second byte */
 
-   dst[dst_len] = '\0';
+  if (buf[0] >= 0xC2 && buf[0] <= 0xDF) {
+    n = 2;
+  } else if (buf[0] >= 0xE0 && buf[0] <= 0xEF) {
+    n = 3;
+    if (buf[0] == 0xE0) min = 0xA0; /* Overlong */
+    if (buf[0] == 0xED) max = 0x9F; /* Surrogates */
+  } else if (buf[0] >= 0xF0 && buf[0] <= 0xF4) {
+    n = 4;
+    if (buf[0] == 0xF0) min = 0x90; /* Overlong */
+    if (buf[0] == 0xF4) max = 0x8F; /* > U+10FFFF */
+  } else {
+    return 0;
+  }
 
-   for(i = 0; i < dst_len; ++i)
-   {
-     if (ndpi_isprint(src[i]) == 0)
-     {
-       dst[i] = '?';
-     } else {
-       dst[i] = tolower((unsigned char)src[i]);
-     }
-   }
+  if (len < n || buf[1] < min || buf[1] > max)
+    return 0;
+
+  for (i = 2; i < n; i++)
+  {
+    if (buf[i] < 0x80 || buf[i] > 0xBF)
+      return 0;
+  }
+
+  return n;
+}
+
+/*
+  Copy a name: ASCII is lowercased, valid UTF-8 is kept as is, control
+  characters and invalid bytes are replaced by '?'. A multi-byte character
+  is never split. Returns 1 if the name has been truncated, 0 otherwise
+*/
+static u_int8_t krb_copy_name(char * const dst, size_t dst_siz,
+                              const u_int8_t *src, size_t src_len)
+{
+  size_t i = 0, j = 0, n;
+
+  while (i < src_len)
+  {
+    n = (src[i] < 0x80) ? 0 : krb_utf8_seq_len(&src[i], src_len - i);
+
+    if (j + ndpi_max(n, 1) > dst_siz - 1)
+    {
+      dst[j] = '\0';
+      return 1;
+    }
+
+    if (n > 0)
+    {
+      memcpy(&dst[j], &src[i], n);
+      i += n, j += n;
+    } else {
+      dst[j++] = (src[i] < 0x80 && ndpi_isprint(src[i])) ? tolower(src[i]) : '?';
+      i++;
+    }
+  }
+
+  dst[j] = '\0';
+  return 0;
 }
 
 /*
@@ -106,8 +154,9 @@ static void krb_parse_realm(struct ndpi_flow_struct * const flow,
 
   if (overwrite || flow->metadata.protos.kerberos.domain[0] == '\0')
   {
-    krb_strncpy_lower(flow->metadata.protos.kerberos.domain, sizeof(flow->metadata.protos.kerberos.domain),
-                      (char const *)realm.value, realm.length);
+    flow->metadata.protos.kerberos.domain_truncated =
+      krb_copy_name(flow->metadata.protos.kerberos.domain, sizeof(flow->metadata.protos.kerberos.domain),
+                    realm.value, realm.length);
   }
 }
 
@@ -182,6 +231,8 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
   /* Only one of them is set: the name of the reply replaces both */
   flow->metadata.protos.kerberos.hostname[0] = '\0';
   flow->metadata.protos.kerberos.username[0] = '\0';
+  flow->metadata.protos.kerberos.hostname_truncated = 0;
+  flow->metadata.protos.kerberos.username_truncated = 0;
   flow->metadata.protos.kerberos.name_type = name_type;
   flow->metadata.protos.kerberos.name_type_found = name_type_found;
 
@@ -195,8 +246,9 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
          strncasecmp((char const *)name[0].value, "ldap", 4) == 0) &&
         name[1].length > 0)
     {
-      krb_strncpy_lower(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
-                        (char const *)name[1].value, name[1].length);
+      flow->metadata.protos.kerberos.hostname_truncated =
+        krb_copy_name(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
+                      name[1].value, name[1].length);
     }
     return;
   }
@@ -204,11 +256,13 @@ static void krb_parse_cname(struct ndpi_flow_struct * const flow,
   /* If cname ends with a $ then it's a machine account, otherwise it's a username */
   if (name[0].value[name[0].length - 1] == '$')
   {
-    krb_strncpy_lower(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
-                      (char const *)name[0].value, name[0].length - 1);
+    flow->metadata.protos.kerberos.hostname_truncated =
+      krb_copy_name(flow->metadata.protos.kerberos.hostname, sizeof(flow->metadata.protos.kerberos.hostname),
+                    name[0].value, name[0].length - 1);
   } else {
-    krb_strncpy_lower(flow->metadata.protos.kerberos.username, sizeof(flow->metadata.protos.kerberos.username),
-                      (char const *)name[0].value, name[0].length);
+    flow->metadata.protos.kerberos.username_truncated =
+      krb_copy_name(flow->metadata.protos.kerberos.username, sizeof(flow->metadata.protos.kerberos.username),
+                    name[0].value, name[0].length);
   }
 }
 

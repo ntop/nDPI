@@ -2452,6 +2452,12 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 		flow->kerberos.hostname,
 		flow->kerberos.username);
       }
+      if (flow->kerberos.hostname_truncated || flow->kerberos.domain_truncated ||
+	  flow->kerberos.username_truncated)
+	fprintf(out, "[Truncated:%s%s%s]",
+		flow->kerberos.domain_truncated ? " domain" : "",
+		flow->kerberos.hostname_truncated ? " hostname" : "",
+		flow->kerberos.username_truncated ? " username" : "");
       if (flow->kerberos.name_type_found)
 	fprintf(out, "[Name type: %d (%s)]", flow->kerberos.name_type,
 		kerberos_name_type2str(flow->kerberos.name_type));

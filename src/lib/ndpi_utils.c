@@ -1784,6 +1784,12 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_string_string(serializer, "hostname", flow->metadata.protos.kerberos.hostname);
     ndpi_serialize_string_string(serializer, "domain", flow->metadata.protos.kerberos.domain);
     ndpi_serialize_string_string(serializer, "username", flow->metadata.protos.kerberos.username);
+    if(flow->metadata.protos.kerberos.hostname_truncated)
+      ndpi_serialize_string_boolean(serializer, "hostname_truncated", 1);
+    if(flow->metadata.protos.kerberos.domain_truncated)
+      ndpi_serialize_string_boolean(serializer, "domain_truncated", 1);
+    if(flow->metadata.protos.kerberos.username_truncated)
+      ndpi_serialize_string_boolean(serializer, "username_truncated", 1);
     if(flow->metadata.protos.kerberos.name_type_found)
       ndpi_serialize_string_int32(serializer, "name_type", flow->metadata.protos.kerberos.name_type);
     if(flow->metadata.protos.kerberos.s4u != NDPI_KERBEROS_S4U_NONE)
