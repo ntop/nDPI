@@ -33,4 +33,4 @@ Acceptable                       2 2816          1
 
 Network                          2 2816          1            
 
-	1	UDP 172.31.1.104:3118 <-> 172.31.1.101:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/1406 bytes <-> 1 pkts/1410 bytes][Goodput ratio: 97/97][0.02 sec][sub1.w2k3.vmnet1.vm.base\administrator][Name type: 1][Request: TGS-REQ][Response: TGS-REP (OK)][PLAIN TEXT (MNET1.V)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
+	1	UDP 172.31.1.104:3118 <-> 172.31.1.101:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 2][cat: Network/14][Breed: Acceptable][1 pkts/1406 bytes <-> 1 pkts/1410 bytes][Goodput ratio: 97/97][0.02 sec][sub1.w2k3.vmnet1.vm.base\administrator][Name type: 1 (NT-PRINCIPAL)][Request: TGS-REQ][Response: TGS-REP (OK)][PLAIN TEXT (MNET1.V)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0]
