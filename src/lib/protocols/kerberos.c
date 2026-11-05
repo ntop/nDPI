@@ -35,6 +35,24 @@
 
 #define KRB_MAX_MSG_LEN 12000
 
+/*
+  Replies: only the beginning of the message, up to the client name, is
+  needed. It is before the ticket (that can be very large, e.g. with the PAC
+  of a user in many groups) and usually in the first TCP segment, but it can
+  be in the next ones (e.g. a large padata, as with PKINIT, small segments or
+  the record marker in its own segment)
+*/
+#define KRB_MAX_PREFIX_LEN    8192
+#define KRB_MAX_REPLY_LEN     (1 << 20) /* Sanity check of the record marker */
+/* Packets to wait for the reply, including the ACKs of the client: enough for
+   a prefix of KRB_MAX_PREFIX_LEN bytes with delayed ACKs (MSS 1460) */
+#define KRB_MAX_EXTRA_PACKETS 16
+
+/* krb_parse() modes */
+#define KRB_PARSE_FULL         0 /* The whole message */
+#define KRB_PARSE_PREFIX       1 /* The beginning of the message: may need more data */
+#define KRB_PARSE_PREFIX_FINAL 2 /* The beginning of the message: no more data */
+
 /* Reference: https://datatracker.ietf.org/doc/html/rfc4120#section-5.10 */
 #define KRB_MSG_TYPE_AS_REQ  10
 #define KRB_MSG_TYPE_AS_REP  11
@@ -421,23 +439,65 @@ static int krb_is_msg_start(const u_int8_t *buf, u_int32_t buf_len, u_int32_t ms
                            stime [4], susec [5], error-code [6], crealm [7] OPTIONAL,
                            cname [8] OPTIONAL, realm [9], sname [10], ... }
 
-  Returns the message type or -1
+  With mode KRB_PARSE_PREFIX/KRB_PARSE_PREFIX_FINAL, buf holds only the
+  beginning of the message: the fields are parsed up to the first incomplete
+  one.
+
+  Returns the message type, 0 if more data is needed (only with
+  KRB_PARSE_PREFIX) or -1
 */
 static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
                      struct ndpi_flow_struct * const flow,
-                     const u_int8_t *buf, u_int32_t buf_len)
+                     const u_int8_t *buf, u_int32_t buf_len,
+                     u_int8_t mode)
 {
   struct ndpi_asn1_ber_tlv app, seq, field;
   u_int8_t msg_type, pvno_idx, idx, pvno_found = 0, msg_type_found = 0, overwrite;
+  u_int8_t incomplete = 0, last_idx = 0;
   int32_t value;
   int used;
 
-  if (ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &app) != 0 ||
-      (app.tag & 0xE0) != 0x60 /* Application Constructed */ ||
-      ndpi_asn1_ber_decode_single_tlv(app.value, app.length, &seq) != 0 ||
-      seq.tag != 0x30)
+  if (mode == KRB_PARSE_FULL)
   {
-    return -1;
+    if (ndpi_asn1_ber_decode_single_tlv(buf, buf_len, &app) != 0 ||
+        (app.tag & 0xE0) != 0x60 /* Application Constructed */ ||
+        ndpi_asn1_ber_decode_single_tlv(app.value, app.length, &seq) != 0 ||
+        seq.tag != 0x30)
+    {
+      return -1;
+    }
+  } else {
+    int app_hdr, seq_hdr;
+    u_int32_t avail;
+
+    app_hdr = ndpi_asn1_ber_decode_header(buf, buf_len, &app.tag, &app.length);
+    if (app_hdr < 0)
+    {
+      /* The header is at most 6 bytes (see ndpi_asn1_ber_decode_header) */
+      return (mode == KRB_PARSE_PREFIX && buf_len < 6) ? 0 : -1;
+    }
+    if ((app.tag & 0xE0) != 0x60 /* Application Constructed */)
+    {
+      return -1;
+    }
+    avail = ndpi_min(app.length, buf_len - app_hdr);
+
+    seq_hdr = ndpi_asn1_ber_decode_header(&buf[app_hdr], avail, &seq.tag, &seq.length);
+    if (seq_hdr < 0)
+    {
+      return (mode == KRB_PARSE_PREFIX && avail < 6) ? 0 : -1;
+    }
+    if (seq.tag != 0x30 || (u_int32_t)seq_hdr + seq.length > app.length)
+    {
+      return -1;
+    }
+    seq.value = &buf[app_hdr + seq_hdr];
+    if (seq.length > avail - seq_hdr)
+    {
+      /* Only the beginning of the fields is available */
+      seq.length = avail - seq_hdr;
+      incomplete = 1;
+    }
   }
 
   msg_type = app.tag & 0x1F;
@@ -457,6 +517,7 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
     seq.value += used;
     seq.length -= used;
     idx = field.tag & 0x1F;
+    last_idx = idx;
 
     if (idx == pvno_idx)
     {
@@ -532,6 +593,19 @@ static int krb_parse(struct ndpi_detection_module_struct * const ndpi_struct,
     }
   }
 
+  if (incomplete && mode == KRB_PARSE_PREFIX)
+  {
+    /* The names are in the fields up to cname [4] (KDC-REP) or sname [10]
+       (KRB-ERROR) */
+    if (!pvno_found || !msg_type_found ||
+        ((msg_type == KRB_MSG_TYPE_AS_REP || msg_type == KRB_MSG_TYPE_TGS_REP) && last_idx < 4) ||
+        (msg_type == KRB_MSG_TYPE_ERROR && last_idx < 10) ||
+        krb_is_request(msg_type) || msg_type == KRB_MSG_TYPE_AP_REQ)
+    {
+      return 0;
+    }
+  }
+
   if (!pvno_found || !msg_type_found)
   {
     return -1;
@@ -574,9 +648,13 @@ static void krb_free_buf(struct ndpi_flow_struct *flow) {
 
 /* ************************************************* */
 
-/* Returns the type of the message found, 0 if we need more data or -1 if it is not Kerberos */
+/*
+  Returns the type of the message found, 0 if we need more data or -1 if it is not Kerberos.
+  reply_expected: the flow has already been detected (by a request): a message
+  split in several segments is a reply, whose beginning only is needed
+*/
 static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
-			      struct ndpi_flow_struct *flow) {
+			      struct ndpi_flow_struct *flow, u_int8_t reply_expected) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   const u_int8_t *payload = packet->payload;
   u_int32_t payload_len = packet->payload_packet_len, kerberos_len;
@@ -588,6 +666,26 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(flow->metadata.kerberos_buf.pktbuf != NULL) {
     u_int missing = flow->metadata.kerberos_buf.pktbuf_maxlen - flow->metadata.kerberos_buf.pktbuf_currlen;
+
+    if(flow->metadata.kerberos_buf.prefix) {
+      /* Beginning of a reply: whatever exceeds the buffer is not needed */
+      u_int len = ndpi_min(payload_len, missing);
+      u_int8_t final;
+
+      memcpy(&flow->metadata.kerberos_buf.pktbuf[flow->metadata.kerberos_buf.pktbuf_currlen], payload, len);
+      flow->metadata.kerberos_buf.pktbuf_currlen += len;
+      final = (flow->metadata.kerberos_buf.pktbuf_currlen == flow->metadata.kerberos_buf.pktbuf_maxlen);
+
+      msg_type = krb_parse(ndpi_struct, flow,
+                           (const u_int8_t *)&flow->metadata.kerberos_buf.pktbuf[4],
+                           flow->metadata.kerberos_buf.pktbuf_currlen - 4,
+                           final ? KRB_PARSE_PREFIX_FINAL : KRB_PARSE_PREFIX);
+      if(msg_type == 0)
+	return 0;
+
+      krb_free_buf(flow);
+      return msg_type;
+    }
 
     if(payload_len <= missing) {
       memcpy(&flow->metadata.kerberos_buf.pktbuf[flow->metadata.kerberos_buf.pktbuf_currlen], payload, payload_len);
@@ -624,7 +722,30 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
     printf("[Kerberos] [Kerberos len: %u][available: %u]\n", kerberos_len, payload_len);
 #endif
 
-    if(kerberos_len >= KRB_MAX_MSG_LEN || kerberos_len < payload_len)
+    if(kerberos_len < payload_len)
+      return -1;
+
+    if(reply_expected && kerberos_len > payload_len) {
+      if(kerberos_len >= KRB_MAX_REPLY_LEN)
+	return -1;
+
+      /* Usually the first segment is enough */
+      msg_type = krb_parse(ndpi_struct, flow, payload, payload_len, KRB_PARSE_PREFIX);
+      if(msg_type != 0)
+	return msg_type;
+
+      flow->metadata.kerberos_buf.pktbuf_maxlen = ndpi_min(kerberos_len, KRB_MAX_PREFIX_LEN) + 4;
+      flow->metadata.kerberos_buf.pktbuf = (char*)ndpi_malloc(flow->metadata.kerberos_buf.pktbuf_maxlen);
+      if(flow->metadata.kerberos_buf.pktbuf == NULL)
+	return -1;
+
+      flow->metadata.kerberos_buf.prefix = 1;
+      memcpy(flow->metadata.kerberos_buf.pktbuf, payload-4, payload_len+4);
+      flow->metadata.kerberos_buf.pktbuf_currlen = payload_len+4;
+      return 0;
+    }
+
+    if(kerberos_len >= KRB_MAX_MSG_LEN)
       return -1;
 
     if(kerberos_len > payload_len) {
@@ -641,6 +762,7 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
 	return -1;
 
       flow->metadata.kerberos_buf.pktbuf_maxlen = kerberos_len+4;
+      flow->metadata.kerberos_buf.prefix = 0;
       memcpy(flow->metadata.kerberos_buf.pktbuf, payload-4, payload_len+4);
       flow->metadata.kerberos_buf.pktbuf_currlen = payload_len+4;
 #ifdef KERBEROS_DEBUG
@@ -650,7 +772,7 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  msg_type = krb_parse(ndpi_struct, flow, payload, payload_len);
+  msg_type = krb_parse(ndpi_struct, flow, payload, payload_len, KRB_PARSE_FULL);
 
 #ifdef KERBEROS_DEBUG
   printf("[Kerberos] [msg-type: %d]\n", msg_type);
@@ -664,7 +786,7 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
 static void krb_message_found(struct ndpi_flow_struct *flow, int msg_type) {
   if(krb_is_request(msg_type)) {
     /* Looking for the reply */
-    flow->core.max_extra_packets_to_check = 5; /* Reply may be split into multiple segments */
+    flow->core.max_extra_packets_to_check = KRB_MAX_EXTRA_PACKETS; /* Reply may be split into multiple segments */
     flow->core.extra_packets_func = ndpi_search_kerberos_extra;
   } else {
     /* Nothing else to do; stop dissecting this flow */
@@ -686,7 +808,7 @@ static void ndpi_search_kerberos(struct ndpi_detection_module_struct *ndpi_struc
 
   NDPI_LOG_DBG(ndpi_struct, "search KERBEROS\n");
 
-  msg_type = krb_process_packet(ndpi_struct, flow);
+  msg_type = krb_process_packet(ndpi_struct, flow, 0);
   if(msg_type < 0) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
@@ -715,7 +837,7 @@ static int ndpi_search_kerberos_extra(struct ndpi_detection_module_struct *ndpi_
     return 1;
 
   /* Possibly dissect the reply */
-  msg_type = krb_process_packet(ndpi_struct, flow);
+  msg_type = krb_process_packet(ndpi_struct, flow, 1);
   if(msg_type > 0)
     krb_message_found(flow, msg_type);
 

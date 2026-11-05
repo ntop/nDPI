@@ -1864,6 +1864,7 @@ struct ndpi_flow_metadata_struct {
   struct {
     char *pktbuf;
     u_int16_t pktbuf_maxlen, pktbuf_currlen;
+    u_int8_t prefix; /* Only the beginning of the message is buffered */
   } kerberos_buf;
 
   struct {
