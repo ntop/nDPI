@@ -1,0 +1,44 @@
+DPI Packets (TCP):	36	(4.00 pkts/flow)
+Confidence DPI              : 9 (flows)
+Num dissector calls: 9 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/9/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   18/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   18/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     9/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Kerberos	237	126589	9
+
+Acceptable                     237 126589        9            
+
+Network                        237 126589        9            
+
+	1	TCP 10.0.0.42:52102 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][22 pkts/1387 bytes <-> 35 pkts/49890 bytes][Goodput ratio: 14/96][0.03 sec][corp.local][Request: TGS-REQ][bytes ratio: -0.946 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 63/1425 253/1514 41/339][Risk: ** Malicious Fingerprint **][Risk Score: 100][Risk Info: Massive scanner detected (probably zmap)][TCP Fingerprint: 2_64_65535_00000000/Unknown][MSS: 0][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,95,0,0]
+	2	TCP 10.0.0.42:52107 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][11 pkts/793 bytes <-> 13 pkts/16702 bytes][Goodput ratio: 25/96][0.01 sec][corp.local][Request: TGS-REQ][bytes ratio: -0.909 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 72/1285 253/1514 57/525][Risk: ** Malicious Fingerprint **][Risk Score: 100][Risk Info: Massive scanner detected (probably zmap)][TCP Fingerprint: 2_64_65535_00000000/Unknown][MSS: 0][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,83,0,0]
+	3	TCP 10.0.0.42:52108 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][10 pkts/739 bytes <-> 11 pkts/12694 bytes][Goodput ratio: 27/95][0.01 sec][corp.local][Request: TGS-REQ][bytes ratio: -0.890 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 74/1154 253/1514 60/597][Risk: ** Malicious Fingerprint **][Risk Score: 100][Risk Info: Massive scanner detected (probably zmap)][TCP Fingerprint: 2_64_65535_00000000/Unknown][MSS: 0][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,0,0,10,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,80,0,0]
+	4	TCP 10.0.0.42:52103 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][5 pkts/469 bytes <-> 11 pkts/12694 bytes][Goodput ratio: 42/95][0.01 sec][corp.local][Request: TGS-REQ][bytes ratio: -0.929 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 0/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 94/1154 253/1514 80/597][Risk: ** Malicious Fingerprint **][Risk Score: 100][Risk Info: Massive scanner detected (probably zmap)][TCP Fingerprint: 2_64_65535_00000000/Unknown][MSS: 0][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,0,0,10,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,80,0,0]
+	5	TCP 10.0.0.42:52106 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][8 pkts/631 bytes <-> 8 pkts/9132 bytes][Goodput ratio: 31/95][0.01 sec][corp.local][Request: TGS-REQ][bytes ratio: -0.871 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 79/1142 253/1514 66/628][Risk: ** Malicious Fingerprint **][Risk Score: 100][Risk Info: Massive scanner detected (probably zmap)][TCP Fingerprint: 2_64_65535_00000000/Unknown][MSS: 0][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,71,0,0]
+	6	TCP 10.0.0.42:52101 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][8 pkts/631 bytes <-> 7 pkts/7678 bytes][Goodput ratio: 31/95][0.01 sec][corp.local][Request: TGS-REQ][bytes ratio: -0.848 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 79/1097 253/1514 66/660][Risk: ** Malicious Fingerprint **][Risk Score: 100][Risk Info: Massive scanner detected (probably zmap)][TCP Fingerprint: 2_64_65535_00000000/Unknown][MSS: 0][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,83,0,0]
+	7	TCP 10.0.0.42:52104 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][8 pkts/631 bytes <-> 7 pkts/6178 bytes][Goodput ratio: 31/94][0.01 sec][corp.local][Request: TGS-REQ][bytes ratio: -0.815 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 79/883 253/1514 66/717][Risk: ** Malicious Fingerprint **][Risk Score: 100][Risk Info: Massive scanner detected (probably zmap)][TCP Fingerprint: 2_64_65535_00000000/Unknown][MSS: 0][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 16,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,51,0,0]
+	8	TCP 10.0.0.42:52105 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][24 pkts/1495 bytes <-> 40 pkts/2760 bytes][Goodput ratio: 13/22][0.03 sec][corp.local][Request: TGS-REQ][bytes ratio: -0.297 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/0 1/0 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 62/69 253/70 40/4][Risk: ** Malicious Fingerprint **][Risk Score: 100][Risk Info: Massive scanner detected (probably zmap)][TCP Fingerprint: 2_64_65535_00000000/Unknown][MSS: 0][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 97,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	9	TCP 10.0.0.42:52100 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 4][cat: Network/14][Breed: Acceptable][6 pkts/523 bytes <-> 3 pkts/1562 bytes][Goodput ratio: 38/90][0.00 sec][corp.local][Request: TGS-REQ][bytes ratio: -0.498 (Download)][IAT c2s/s2c min/avg/max/stddev: 0/1 1/1 1/1 0/0][Pkt Len c2s/s2c min/avg/max/stddev: 54/54 87/521 253/1454 74/660][Risk: ** Malicious Fingerprint **][Risk Score: 100][Risk Info: Massive scanner detected (probably zmap)][TCP Fingerprint: 2_64_65535_00000000/Unknown][MSS: 0][PLAIN TEXT (CORP.LOCAL)][Plen Bins: 0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0]

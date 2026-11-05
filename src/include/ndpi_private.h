@@ -359,6 +359,8 @@ struct ndpi_detection_module_config_struct {
 
   int smb_max_packets_extra_dissection;
 
+  int kerberos_max_packets_extra_dissection;
+
   int rtp_search_for_stun;
 
   int openvpn_heuristics;

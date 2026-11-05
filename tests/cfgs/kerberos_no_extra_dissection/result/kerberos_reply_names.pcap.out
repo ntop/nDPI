@@ -1,0 +1,42 @@
+DPI Packets (UDP):	7	(1.00 pkts/flow)
+Confidence DPI              : 7 (flows)
+Num dissector calls: 7 (1.00 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/0/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   14/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     0/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    0/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Kerberos	14	2875	7
+
+Acceptable                      14 2875          7            
+
+Network                         14 2875          7            
+
+	1	UDP 10.0.0.42:50005 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/194 bytes <-> 1 pkts/292 bytes][Goodput ratio: 78/85][0.01 sec][corp.local][Name type: 3 (NT-SRV-HST)][Request: AS-REQ][PLAIN TEXT (server.corp.local)][Plen Bins: 0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	UDP 10.0.0.42:50006 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/160 bytes <-> 1 pkts/290 bytes][Goodput ratio: 73/85][0.01 sec][corp\dave][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][PLAIN TEXT (krbtgt)][Plen Bins: 0,0,0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 10.0.0.42:50001 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/170 bytes <-> 1 pkts/275 bytes][Goodput ratio: 75/84][0.01 sec][corp\alice@corp.com][Name type: 10 (NT-ENTERPRISE)][Request: AS-REQ][PLAIN TEXT (Alice@corp.com)][Plen Bins: 0,0,0,0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 10.0.0.42:50004 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/161 bytes <-> 1 pkts/274 bytes][Goodput ratio: 73/84][0.01 sec][corp\carol][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][PLAIN TEXT (krbtgt)][Plen Bins: 0,0,0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 10.0.0.42:50003 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/160 bytes <-> 1 pkts/274 bytes][Goodput ratio: 73/84][0.01 sec][corp\ws1][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][PLAIN TEXT (krbtgt)][Plen Bins: 0,0,0,50,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	6	UDP 10.0.0.42:50007 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/200 bytes <-> 1 pkts/133 bytes][Goodput ratio: 79/68][0.01 sec][corp.local][Name type: 2 (NT-SRV-INST)][Request: AS-REQ][PLAIN TEXT (MSSQLSv)][Plen Bins: 0,0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	7	UDP 10.0.0.42:50002 <-> 10.0.0.5:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/159 bytes <-> 1 pkts/133 bytes][Goodput ratio: 73/68][0.01 sec][corp\bob][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][PLAIN TEXT (krbtgt)][Plen Bins: 0,0,50,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

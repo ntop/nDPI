@@ -1,0 +1,40 @@
+DPI Packets (TCP):	10	(5.00 pkts/flow)
+DPI Packets (UDP):	2	(1.00 pkts/flow)
+Confidence DPI              : 4 (flows)
+Num dissector calls: 334 (83.50 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/2/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   4/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   8/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     2/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    2/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Kerberos	26	11842	4
+
+Acceptable                      26 11842         4            
+
+Network                         26 11842         4            
+
+	1	TCP 10.5.2.2:1114 <-> 10.5.3.1:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Network/14][Breed: Acceptable][6 pkts/2613 bytes <-> 6 pkts/1866 bytes][Goodput ratio: 87/81][0.02 sec][denydc.com][S4U2Proxy][Request: TGS-REQ][bytes ratio: 0.167 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 0/0 5/6 20/15 8/6][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 436/311 1514/1514 563/538][TCP Fingerprint: 2_128_16384_f22bb562/Unknown][MSS: 1460][PLAIN TEXT (DENYDC.COM)][Plen Bins: 0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0]
+	2	TCP 10.5.2.2:1112 <-> 10.5.3.1:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Network/14][Breed: Acceptable][5 pkts/2517 bytes <-> 5 pkts/427 bytes][Goodput ratio: 88/31][0.07 sec][denydc.com][S4U2Proxy][Request: TGS-REQ][bytes ratio: 0.710 (Upload)][IAT c2s/s2c min/avg/max/stddev: 0/7 10/13 30/22 12/6][Pkt Len c2s/s2c min/avg/max/stddev: 60/60 503/85 1514/185 585/50][TCP Fingerprint: 2_128_16384_f22bb562/Unknown][MSS: 1460][PLAIN TEXT (DENYDC.COM)][Plen Bins: 0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0]
+	3	UDP 10.5.12.12:1201 <-> 10.5.3.1:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/1357 bytes <-> 1 pkts/1334 bytes][Goodput ratio: 97/97][0.04 sec][denydc.com][Request: TGS-REQ][PLAIN TEXT (DENYDC.COM)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,50,0,0,0,0,0,0]
+	4	UDP 10.5.12.12:1200 <-> 10.5.3.1:88 [proto: 111/Kerberos][Stack: Kerberos][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 111/Kerberos, Confidence: DPI][DPI packets: 1][cat: Network/14][Breed: Acceptable][1 pkts/351 bytes <-> 1 pkts/1377 bytes][Goodput ratio: 88/97][0.06 sec][denydc.com\administrator][Name type: 1 (NT-PRINCIPAL)][Request: AS-REQ][PLAIN TEXT (Administrator)][Plen Bins: 0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0]
