@@ -33,19 +33,21 @@
 
 #define KERBEROS_PORT 88
 
-#define KRB_MAX_MSG_LEN 12000
-
 /*
-  Replies: only the beginning of the message, up to the client name, is
-  needed. It is before the ticket (that can be very large, e.g. with the PAC
-  of a user in many groups) and usually in the first TCP segment, but it can
-  be in the next ones (e.g. a large padata, as with PKINIT, small segments or
-  the record marker in its own segment)
+  Max bytes of a message buffered per flow, when it is split in several TCP
+  segments:
+  - requests: the whole message is needed; longer ones are not reassembled
+  - replies: only the beginning of the message, up to the client name, is
+    needed (replies of any size are accepted). It is before the ticket (that
+    can be very large, e.g. with the PAC of a user in many groups) and usually
+    in the first TCP segment, but it can be in the next ones (e.g. a large
+    padata, as with PKINIT, small segments or the record marker in its own
+    segment)
 */
-#define KRB_MAX_PREFIX_LEN    8192
+#define KRB_MAX_BUF_LEN       12000
 #define KRB_MAX_REPLY_LEN     (1 << 20) /* Sanity check of the record marker */
 /* Packets to wait for the reply, including the ACKs of the client: enough for
-   a prefix of KRB_MAX_PREFIX_LEN bytes with delayed ACKs (MSS 1460) */
+   KRB_MAX_BUF_LEN bytes with delayed ACKs (MSS 1460: 9 segments + 5 ACKs) */
 #define KRB_MAX_EXTRA_PACKETS 16
 
 /* krb_parse() modes */
@@ -734,7 +736,7 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
       if(msg_type != 0)
 	return msg_type;
 
-      flow->metadata.kerberos_buf.pktbuf_maxlen = ndpi_min(kerberos_len, KRB_MAX_PREFIX_LEN) + 4;
+      flow->metadata.kerberos_buf.pktbuf_maxlen = ndpi_min(kerberos_len, KRB_MAX_BUF_LEN) + 4;
       flow->metadata.kerberos_buf.pktbuf = (char*)ndpi_malloc(flow->metadata.kerberos_buf.pktbuf_maxlen);
       if(flow->metadata.kerberos_buf.pktbuf == NULL)
 	return -1;
@@ -745,7 +747,7 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
       return 0;
     }
 
-    if(kerberos_len >= KRB_MAX_MSG_LEN)
+    if(kerberos_len >= KRB_MAX_BUF_LEN)
       return -1;
 
     if(kerberos_len > payload_len) {
