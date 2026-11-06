@@ -2980,9 +2980,10 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
          ja.server.num_key_share_groups > 0 &&
          ndpi_tls_key_share_group_is_pq(ja.server.key_share_group[0]) == 0) {
         char risk_info[64];
+        char unknown_group[8];
         snprintf(risk_info, sizeof(risk_info),
-                 "TLS 1.3 negotiated non-PQ group 0x%04X",
-                 ja.server.key_share_group[0]);
+                 "TLS 1.3 negotiated non-PQ group: %s",
+                 ndpi_tls_key_share_group2str(ja.server.key_share_group[0], unknown_group));
         ndpi_set_risk(ndpi_struct, &flow->core, NDPI_NON_PQC_FLOW, risk_info);
       }
 
