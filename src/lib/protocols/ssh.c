@@ -119,30 +119,58 @@ static void ssh_analyze_signature_version(struct ndpi_detection_module_struct *n
   
 /* ************************************************************************ */
 
+/* Check for an exact, comma-delimited algorithm name. */
+static int ssh_algorithm_list_contains(const char *list,
+                                       const char *algorithm,
+                                       size_t algorithm_len) {
+  const char *token = list;
+
+  if(!list || !algorithm)
+    return 0;
+
+  while(*token != '\0') {
+    const char *separator = strchr(token, ',');
+    size_t token_len = separator ? (size_t)(separator - token) : strlen(token);
+
+    if(token_len == algorithm_len &&
+       memcmp(token, algorithm, algorithm_len) == 0)
+      return 1;
+
+    if(!separator)
+      break;
+    token = separator + 1;
+  }
+
+  return 0;
+}
+
 /* Returns a newly allocated string with the first algo from client_list that
    also appears in server_list (SSH negotiation rule, RFC 4253 §7.1), or NULL. */
 static char* ssh_negotiate_algorithm(const char *client_list, const char *server_list) {
-  if(!client_list || !server_list) return NULL;
+  const char *token = client_list;
 
-  u_int off = 0;
-  while(client_list[off] != '\0') {
-    u_int len = 0, new_off = off;
-    while(client_list[new_off] != ',' && client_list[new_off] != '\0')
-      new_off++, len++;
+  if(!client_list || !server_list)
+    return NULL;
 
-    if(len > 0) {
-      char entry[128];
-      len = ndpi_min(sizeof(entry) - 1, len);
-      strncpy(entry, &client_list[off], len);
-      entry[len] = '\0';
-      if(strstr(server_list, entry) != NULL)
-        return ndpi_strdup(entry);
+  while(*token != '\0') {
+    const char *separator = strchr(token, ',');
+    size_t token_len = separator ? (size_t)(separator - token) : strlen(token);
+
+    if(token_len > 0 && ssh_algorithm_list_contains(server_list, token, token_len)) {
+      char *negotiated = (char*)ndpi_malloc(token_len + 1);
+
+      if(!negotiated)
+        return NULL;
+      memcpy(negotiated, token, token_len);
+      negotiated[token_len] = '\0';
+      return negotiated;
     }
 
-    off += len;
-    if(client_list[off] == ',') off++;
-    else break;
+    if(!separator)
+      break;
+    token = separator + 1;
   }
+
   return NULL;
 }
 
@@ -296,33 +324,9 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
     if(flow->metadata.protos.ssh.client_key_exchange_algorithms
        && flow->metadata.protos.ssh.server_key_exchange_algorithms) {
       /* Compute the negotiated key exchange algorithm */
-      u_int offset = 0;
-      char *csv_string = flow->metadata.protos.ssh.client_key_exchange_algorithms;
-      char buf[64];
-      
-      while(csv_string[offset] != '\0') {
-	u_int len = 0, new_offset = offset;
-	
-	while((csv_string[new_offset] != ',')
-	      && (csv_string[new_offset] != '\0'))
-	  new_offset++, len++;
-
-	len = ndpi_min(sizeof(buf)-1, len);	
-	strncpy(buf, &csv_string[offset], len);
-	buf[len] = '\0';
-	
-	if(strstr(flow->metadata.protos.ssh.server_key_exchange_algorithms, buf) != NULL) {
-	  flow->metadata.protos.ssh.key_exchange_method = ndpi_strdup(buf);
-	  break; /* Found what we looked for */
-	}
-	
-	offset += len;
-	
-	if(csv_string[offset] == ',')
-	  offset++;
-	else
-	  break;	
-      }
+      flow->metadata.protos.ssh.key_exchange_method =
+        ssh_negotiate_algorithm(flow->metadata.protos.ssh.client_key_exchange_algorithms,
+                                flow->metadata.protos.ssh.server_key_exchange_algorithms);
     }
   }
 
