@@ -38,8 +38,8 @@ static void ndpi_search_among_us(struct ndpi_detection_module_struct *ndpi_struc
 
   /* handshake packet */
   if (packet->payload_packet_len > 9 &&
-      ntohl(*(u_int32_t*)&packet->payload[0]) == 0x08000100 &&
-      ntohl(*(u_int32_t*)&packet->payload[4]) == 0x80d90203)
+      ntohl(get_u_int32_t(packet->payload, 0)) == 0x08000100 &&
+      ntohl(get_u_int32_t(packet->payload, 4)) == 0x80d90203)
   {
     ndpi_int_among_us_add_connection(ndpi_struct, flow);
   } else {

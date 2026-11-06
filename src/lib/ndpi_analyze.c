@@ -2308,7 +2308,7 @@ void ndpi_print_ranking(ndpi_ranking *rank) {
     ndpi_ranking_epoch_entry *this_entries = (ndpi_ranking_epoch_entry*)&rank->epochs[i*epoch_len + sizeof(epoch->epoch)];
     u_int32_t j;
 
-    fprintf(stdout, "\t[epoch %u @ %u]\n", i, epoch->epoch);
+    fprintf(stdout, "\t[epoch %u @ %llu]\n", i, (long long unsigned int)epoch->epoch);
 
     for(j=0; j<rank->header.max_num_entries; j++) {
       fprintf(stdout, "\t\t[%2d] %u - %llu\n", j,
@@ -2351,7 +2351,7 @@ u_int16_t ndpi_ranking_add_epoch(ndpi_ranking *rank,
 
   qsort(entries, num_epoch_entries, sizeof(ndpi_ranking_epoch_entry), _comp);
 
-  epoch_len = (sizeof(ndpi_ranking_epoch_entry) * rank->header.max_num_entries) + sizeof(u_int32_t /* epoch */);
+  epoch_len = (sizeof(ndpi_ranking_epoch_entry) * rank->header.max_num_entries) + sizeof(this_epoch->epoch);
   offset = epoch_len * rank->header.next_epoch_id;
   this_epoch = (ndpi_ranking_epoch*)&rank->epochs[offset];
 
