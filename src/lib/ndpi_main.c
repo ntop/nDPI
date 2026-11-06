@@ -10778,10 +10778,14 @@ static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct
 
   /* Exceptions:
       * STUN has a default port (used for TURN) but all p2p traffic is on random ports
+      * Bittorrent has some default ports (used mainly for the trackers) but all "real"
+        p2p traffic might be on random ports
       * OOkla aggressive detection is over TLS but on port 8080 (which is not a default port)
    */
   if(proto.master_protocol == NDPI_PROTOCOL_STUN ||
      proto.app_protocol == NDPI_PROTOCOL_STUN)
+    return;
+  if(proto.app_protocol == NDPI_PROTOCOL_BITTORRENT)
     return;
   if(proto.app_protocol == NDPI_PROTOCOL_OOKLA &&
      flow->core.confidence == NDPI_CONFIDENCE_DPI_AGGRESSIVE)
