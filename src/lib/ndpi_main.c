@@ -10597,6 +10597,28 @@ static int check_protocol_port_mismatch_exceptions(default_ports_tree_node_t *ex
     }
   }
 
+  /*
+    STARTTLS: a plaintext mail protocol upgraded to TLS on its own port
+    (e.g. SMTP on 25/587, IMAP on 143, POP3 on 110)
+  */
+  switch(expected_proto->proto_idx) {
+  case NDPI_PROTOCOL_MAIL_SMTP:
+    if(returned_proto->master_protocol == NDPI_PROTOCOL_MAIL_SMTPS ||
+       returned_proto->app_protocol == NDPI_PROTOCOL_MAIL_SMTPS)
+      return(1);
+    break;
+  case NDPI_PROTOCOL_MAIL_IMAP:
+    if(returned_proto->master_protocol == NDPI_PROTOCOL_MAIL_IMAPS ||
+       returned_proto->app_protocol == NDPI_PROTOCOL_MAIL_IMAPS)
+      return(1);
+    break;
+  case NDPI_PROTOCOL_MAIL_POP:
+    if(returned_proto->master_protocol == NDPI_PROTOCOL_MAIL_POPS ||
+       returned_proto->app_protocol == NDPI_PROTOCOL_MAIL_POPS)
+      return(1);
+    break;
+  }
+
   return(0);
 }
 
