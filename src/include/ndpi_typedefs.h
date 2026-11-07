@@ -785,6 +785,7 @@ typedef enum {
   NDPI_AUTOMA_TLS_CERT,
   NDPI_AUTOMA_RISK_MASK,
   NDPI_AUTOMA_COMMON_ALPNS,
+  NDPI_AUTOMA_AI_ENDPOINT,
 
   NDPI_AUTOMA_MAX	/* Last one! */
 } automa_type;
@@ -819,6 +820,7 @@ typedef enum {
   NDPI_LRUCACHE_MINING,
   NDPI_LRUCACHE_MSTEAMS,
   NDPI_LRUCACHE_FPC_DNS, /* FPC DNS cache */
+  NDPI_LRUCACHE_AI_ENDPOINT, /* AI endpoint DNS cache (IP -> ai_endpoint) */
   NDPI_LRUCACHE_SIGNAL,
   NDPI_LRUCACHE_MAX	/* Last one! */
 } lru_cache_type;
@@ -1734,6 +1736,11 @@ struct ndpi_flow_core_struct {
 
   u_int16_t num_dissector_calls;
   ndpi_confidence_t confidence; /* ndpi_confidence_t */
+
+  /* Specific AI endpoint (hosted provider or self-hosted engine) when the flow
+   * is classified as NDPI_PROTOCOL_AI. 0 (NDPI_AI_ENDPOINT_NONE) otherwise.
+   * See ndpi_ai.h. */
+  u_int16_t ai_endpoint;
 
   /* First Packet Classification info */
   struct ndpi_fpc_info fpc;

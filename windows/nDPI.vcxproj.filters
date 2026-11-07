@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\src\lib\protocols\afp.c" />
@@ -160,6 +160,7 @@
     <ClCompile Include="..\src\lib\protocols\glbp.c" />
     <ClCompile Include="src\getopt.c" />
     <ClCompile Include="src\win-gettimeofday.c" />
+    <ClCompile Include="..\src\lib\ndpi_ai.c" />
     <ClCompile Include="..\src\lib\ndpi_analyze.c" />
     <ClCompile Include="..\src\lib\ndpi_bitmap.c" />
     <ClCompile Include="..\src\lib\ndpi_classify.c" />
@@ -295,6 +296,7 @@
     <ClInclude Include="arpa\inet.h" />
     <ClInclude Include="src\getopt.h" />
     <ClInclude Include="src\dirent.h" />
+    <ClInclude Include="..\src\include\ndpi_ai.h" />
     <ClInclude Include="..\src\include\ndpi_encryption.h" />
     <ClInclude Include="..\src\include\ndpi_main.h" />
     <ClInclude Include="..\src\lib\third_party\include\gcrypt_light.h" />
