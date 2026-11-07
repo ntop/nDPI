@@ -39,10 +39,12 @@ static void ftp_data_set_detected(struct ndpi_detection_module_struct *ndpi_stru
 /* FTP data port is TCP/20 */
 static int ftp_data_on_known_port(struct ndpi_detection_module_struct *ndpi_struct) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
-
+  u_int16_t std_dport = htons(20);
+  
   if(packet->tcp &&
-     (packet->tcp->dest == htons(20) || packet->tcp->source == htons(20)))
+     (packet->tcp->dest == std_dport || packet->tcp->source == std_dport))
     return 1;
+  
   return 0;
 }
 
@@ -171,7 +173,9 @@ static void ndpi_check_ftp_data(struct ndpi_detection_module_struct *ndpi_struct
                                 struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
-  if(ndpi_seen_flow_beginning(flow) && packet->payload_packet_len > 0) {
+  if(ndpi_seen_flow_beginning(flow)
+     && (packet->payload_packet_len > 0)
+     && (ntohs(packet->tcp->dest) >= 1024) /* Passive FTP */) {
     if(ftp_data_matches_file_magic(ndpi_struct)  ||
        ftp_data_is_directory_listing(ndpi_struct) ||
        ftp_data_on_known_port(ndpi_struct)) {
