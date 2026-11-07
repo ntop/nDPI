@@ -5,8 +5,8 @@
 
 ## What is nDPI ?
 
-nDPI® is an open source LGPLv3 library for deep-packet inspection. Some dissectors are released
-under a dual-license: please refer to README.license.md for more information.
+nDPI® is an open source library for deep-packet inspection. Some dissectors (e.g. TLS and DNS) are released
+under a dual-license while the rest of the library is LGPLv3: please refer to README.license.md for more information.
 
 A generic FAQ about nDPI is available [here](https://github.com/ntop/nDPI/blob/dev/doc/FAQ.rst)
 
