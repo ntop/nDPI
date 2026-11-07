@@ -427,7 +427,8 @@ struct ndpi_detection_module_struct {
   /* HTTP/DNS/HTTPS/QUIC host matching */
   ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
     risky_domain_automa, tls_cert_subject_automa,
-    host_risk_mask_automa, common_alpns_automa;
+    host_risk_mask_automa, common_alpns_automa,
+    ai_endpoint_automa;                        /* AI endpoint (provider/engine) name matching, see ndpi_ai.h */
   /* IMPORTANT: please, whenever you add a new automa:
    * update ndpi_finalize_initialization()
    * update automa_type above
