@@ -243,7 +243,10 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
   if ((protobuf_elements >= PROTOBUF_REQUIRED_ELEMENTS && protobuf_len_elements > 0 &&
        /* (On UDP) this packet might be also a RTP/RTCP one. Wait for the next one */
        (flow->core.packet_counter > 1 || flow->core.l4_proto == IPPROTO_TCP || flow->metadata.rtp.rtp_stage == 0))
-      || (flow->core.packet_counter >= PROTOBUF_MIN_PACKETS && protobuf_elements >= PROTOBUF_MIN_ELEMENTS))
+      || (flow->core.packet_counter >= PROTOBUF_MIN_PACKETS && protobuf_elements >= PROTOBUF_MIN_ELEMENTS &&
+          /* The whole payload must have been parsed (i.e. we didn't stop because of PROTOBUF_MAX_ELEMENTS):
+             with few/short elements, lots of random/text payloads look like valid protobuf */
+          bytes_parsed >= packet->payload_packet_len))
   {
 #ifdef DEBUG_PROTOBUF
     printf("Protobuf found after %u packets.\n", flow->core.packet_counter);
