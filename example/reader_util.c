@@ -2571,7 +2571,7 @@ struct ndpi_proto ndpi_workflow_process_packet(struct ndpi_workflow * workflow,
 
     /* Linux Cooked Capture v2 - 276 */
   case LINKTYPE_LINUX_SLL2:
-    type = (packet[eth_offset+10] << 8) + packet[eth_offset+11];
+    type = (packet[eth_offset] << 8) + packet[eth_offset+1];
     ip_offset = 20 + eth_offset;
     break;
 
