@@ -3377,8 +3377,12 @@ References: `Wireshark DCE/RPC wiki: <https://wiki.wireshark.org/DCE/RPC>`_
 `NDPI_PROTOCOL_PROFINET_IO`
 ============================
 PROFINET/IO is a field bus protocol based on connectionless DCE/RPC.
+nDPI detects the acyclic/context management traffic (PNIO-CM: connect, read, write, control, release, ...) over UDP,
+by looking at the PROFINET/IO object and interface UUIDs, and the Endpoint Mapper lookups for PROFINET/IO interfaces.
+UDP port 34964 is used only by the first requests: responses and following calls use dynamic ports.
+The real time traffic (PROFINET/RT, DCP, ...) is directly over Ethernet and it is not handled.
 
-References: `PROFINET specs: <https://www.profibus.com/download/profinet-specification>`_
+References: `PROFINET specs: <https://www.profibus.com/download/profinet-specification>`_, `Wireshark PROFINET/IO wiki: <https://wiki.wireshark.org/PROFINET/IO>`_
 
 
 .. _Proto_372:

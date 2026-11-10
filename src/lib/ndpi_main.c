@@ -2655,14 +2655,10 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
 			  ndpi_build_default_ports(ports_a, 135, 0, 0, 0, 0) /* TCP */,
 			  ndpi_build_default_ports(ports_b, 135, 0, 0, 0, 0) /* UDP */,
 			  0, 0 /* protocol classification cannot change if partial */);
-  ndpi_set_proto_subprotocols(ndpi_str, NDPI_PROTOCOL_DCERPC,
-			      NDPI_PROTOCOL_PROFINET_IO,
-			      NDPI_PROTOCOL_MATCHED_BY_CONTENT,
-			      NDPI_PROTOCOL_NO_MORE_SUBPROTOCOLS);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_PROFINET_IO,
 			  "PROFINET_IO", NDPI_PROTOCOL_CATEGORY_IOT_SCADA, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
 			  ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
-			  ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+			  ndpi_build_default_ports(ports_b, 34964, 0, 0, 0, 0) /* UDP */,
 			  0, 0 /* protocol classification cannot change if partial */);
   ndpi_set_proto_defaults(ndpi_str, 1 /* cleartext */, 0 /* nw proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_HISLIP,
 			  "HiSLIP", NDPI_PROTOCOL_CATEGORY_IOT_SCADA, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
@@ -7436,8 +7432,6 @@ static int dissectors_init(struct ndpi_detection_module_struct *ndpi_str) {
   /* Monero Protocol */
   init_monero_dissector(ndpi_str);
 
-  /* PROFINET/IO */
-  init_profinet_io_dissector(ndpi_str);
 
   /* HiSLIP */
   init_hislip_dissector(ndpi_str);
@@ -10830,11 +10824,15 @@ static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct
       * Bittorrent has some default ports (used mainly for the trackers) but all "real"
         p2p traffic might be on random ports
       * OOkla aggressive detection is over TLS but on port 8080 (which is not a default port)
+      * PROFINET/IO has a default port (34964), but it is used only by the first requests
+        (connect, implicit read, EPM): responses and all the following calls use dynamic ports
    */
   if(proto.master_protocol == NDPI_PROTOCOL_STUN ||
      proto.app_protocol == NDPI_PROTOCOL_STUN)
     return;
   if(proto.app_protocol == NDPI_PROTOCOL_BITTORRENT)
+    return;
+  if(proto.app_protocol == NDPI_PROTOCOL_PROFINET_IO)
     return;
   if(proto.app_protocol == NDPI_PROTOCOL_OOKLA &&
      flow->core.confidence == NDPI_CONFIDENCE_DPI_AGGRESSIVE)
