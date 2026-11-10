@@ -361,6 +361,8 @@ struct ndpi_detection_module_config_struct {
 
   int kerberos_max_packets_extra_dissection;
 
+  int dcerpc_max_packets_extra_dissection;
+
   int rtp_search_for_stun;
 
   int openvpn_heuristics;
@@ -1077,7 +1079,6 @@ void init_beckhoff_ads_dissector(struct ndpi_detection_module_struct *ndpi_struc
 void init_iso9506_1_mms_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_ieee_c37118_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_ethersbus_dissector(struct ndpi_detection_module_struct *ndpi_struct);
-void init_profinet_io_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_hislip_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_uftp_dissector(struct ndpi_detection_module_struct *ndpi_struct);
 void init_openflow_dissector(struct ndpi_detection_module_struct *ndpi_struct);
