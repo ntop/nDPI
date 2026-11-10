@@ -50,17 +50,17 @@ static void ndpi_search_discord(struct ndpi_detection_module_struct *ndpi_struct
     return;
   }
 
-  if (packet->payload_packet_len == 74)
+  /* Note: do not rely on the exact packet position (request packet 1, response packet 2)
+   * as the request may be retransmitted before the response. */
+  if (packet->payload_packet_len == 74 && flow->core.packet_counter <= 4)
   {
-    if (flow->core.packet_counter == 1 &&
-        ntohl(get_u_int32_t(packet->payload, 0)) == 0x00010046)
+    if (ntohl(get_u_int32_t(packet->payload, 0)) == 0x00010046)
     {
-      /* Wait for the next packet, hopefully beeing able to dissect the client IP. */
+      /* Wait for the response, hopefully being able to dissect the client IP. */
       return;
     }
 
-    if (flow->core.packet_counter == 2 &&
-        ntohl(get_u_int32_t(packet->payload, 0)) == 0x00020046)
+    if (ntohl(get_u_int32_t(packet->payload, 0)) == 0x00020046)
     {
       /* Dissect client IP. */
       size_t len = sizeof(flow->metadata.protos.discord.client_ip) - 1;
