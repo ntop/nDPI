@@ -667,7 +667,8 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
 			     ndpi_get_current_time(&flow->core))) {
         ndpi_master_app_protocol proto;
 
-	ndpi_set_detected_protocol(ndpi_struct, &flow->core, cached_proto, ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI_CACHE);
+	ndpi_set_detected_protocol(ndpi_struct, &flow->core, cached_proto,
+				   ndpi_get_master_proto(ndpi_struct, flow), NDPI_CONFIDENCE_DPI_CACHE);
 	proto.master_protocol = ndpi_get_master_proto(ndpi_struct, flow);
 	proto.app_protocol = cached_proto;
 	flow->core.category = get_proto_category(ndpi_struct, proto);
@@ -1288,6 +1289,24 @@ static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
 			       u_int16_t block_len) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
 
+  if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_TLS)) {
+    if(flow->core.l4_proto == IPPROTO_TCP) {
+      printf("[TLS] [content_type: %u:%u][len: %u]\n", record_type, handshake_type, block_len);
+
+      if(flow->metadata.monit == NULL)
+	flow->metadata.monit = ndpi_calloc(1, sizeof(struct ndpi_metadata_monitoring));
+
+      if(flow->metadata.monit) {
+	if(flow->metadata.monit->protos.tls_quic.num_blocks < MAX_NUM_TLS_MONITORED_BLOCKS) {
+	  struct ndpi_tls_block_core b = { record_type, block_len };
+
+	  if(packet->packet_direction == 1 /* srv -> cli */) b.len *= -1;
+	  flow->metadata.monit->protos.tls_quic.blocks[flow->metadata.monit->protos.tls_quic.num_blocks++] = b;
+	}
+      }
+    }
+  }
+
   if(flow->core.l4_proto == IPPROTO_TCP &&
      ndpi_struct->cfg.tls_max_num_blocks_to_analyze != 0) {
     if(flow->metadata.l4.tcp.tls.tls_blocks == NULL) {
@@ -1298,7 +1317,6 @@ static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
 
     if((flow->metadata.l4.tcp.tls.tls_blocks != NULL)
        && (flow->metadata.l4.tcp.tls.num_tls_blocks < ndpi_struct->cfg.tls_max_num_blocks_to_analyze)) {
-
       int32_t blen;
       u_int32_t tdelta;
       u_int16_t enc_block_type;
@@ -1316,12 +1334,13 @@ static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
       flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks].len = blen,
          flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks].msec_delta =
         (tdelta > 0xFFFF) ?  0xFFFF : (u_int16_t)tdelta,
-        flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks].same_pkt = same_packet ? 1 : 0;
+        flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks].same_pkt = (*same_packet) ? 1 : 0;
       flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks++].block_type = enc_block_type;
 
       flow->metadata.l4.tcp.tls.last_tls_block_time_ms = ndpi_struct->packet.current_time_ms;
     }
   }
+
   if(*same_packet == false)
     *same_packet = true;
 }
