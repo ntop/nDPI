@@ -1301,14 +1301,14 @@ void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
       if(ndpi_struct->cfg.tls_blocks_show_timing)
 	ret = snprintf(&buf[idx], sizeof(buf)-idx-1, "%s%s=%d@%u",
 		       (idx > 0) ? "," : "",
-		       ndpi_print_encoded_tls_block_type(flow->metadata.l4.tcp.tls.tls_blocks[i].block_type, true),
-		       flow->metadata.l4.tcp.tls.tls_blocks[i].len,
+		       ndpi_print_encoded_tls_block_type(flow->metadata.l4.tcp.tls.tls_blocks[i].core.block_type, true),
+		       flow->metadata.l4.tcp.tls.tls_blocks[i].core.len,
 		       flow->metadata.l4.tcp.tls.tls_blocks[i].msec_delta);
       else
 	ret = snprintf(&buf[idx], sizeof(buf)-idx-1, "%s%s=%d",
 		       (idx > 0) ? "," : "",
-		       ndpi_print_encoded_tls_block_type(flow->metadata.l4.tcp.tls.tls_blocks[i].block_type, true),
-		       flow->metadata.l4.tcp.tls.tls_blocks[i].len);
+		       ndpi_print_encoded_tls_block_type(flow->metadata.l4.tcp.tls.tls_blocks[i].core.block_type, true),
+		       flow->metadata.l4.tcp.tls.tls_blocks[i].core.len);
 
       if(ret > 0) idx += ret; else break;
     } /* for */
@@ -5549,9 +5549,9 @@ u_char* ndpi_encode_tls_blocks(struct ndpi_tls_block *tls_blocks,
   if(sizeof(buf) < expected_len) return(0); /* Buffer too short */
 
   for(i=0; i<num_tls_blocks; i++) {
-    buf[offset++] = (tls_blocks[i].block_type & 0x7F) + (tls_blocks[i].same_pkt << 7);
-    buf[offset++] = tls_blocks[i].len >> 8;
-    buf[offset++] = tls_blocks[i].len & 0xFF;
+    buf[offset++] = (tls_blocks[i].core.block_type & 0x7F) + (tls_blocks[i].same_pkt << 7);
+    buf[offset++] = tls_blocks[i].core.len >> 8;
+    buf[offset++] = tls_blocks[i].core.len & 0xFF;
   }
 
   return(ndpi_hex_encode(buf, expected_len));
@@ -5589,9 +5589,9 @@ struct ndpi_tls_block* ndpi_decode_tls_blocks(const u_char *encoded_blocks,
   if(tls_blocks == NULL) { ndpi_free(buf); return(NULL); }
 
   for(i=0, offset=0; i<*num_tls_blocks; i++) {
-    tls_blocks[i].block_type = buf[offset] & 0x7F;
+    tls_blocks[i].core.block_type = buf[offset] & 0x7F;
     tls_blocks[i].same_pkt   = (buf[offset] & 0x80) ? 1 : 0;
-    tls_blocks[i].len = (buf[offset+1] << 8) + buf[offset+2];
+    tls_blocks[i].core.len = (buf[offset+1] << 8) + buf[offset+2];
     offset += 3;
   }
 
@@ -6394,10 +6394,10 @@ float ndpi_tls_blocks_len_compare(struct ndpi_tls_block *a,
   u_int8_t n;
 
   for(n=0; n<num_tls_blocks; n++) {
-    if(a[n].block_type != b[n].block_type)
+    if(a[n].core.block_type != b[n].core.block_type)
       return(999999.);
     else {
-      int diff = a[n].len - b[n].len;
+      int diff = a[n].core.len - b[n].core.len;
 
       if((diff != 0) && (n < 2 /* C/S Hello */))
 	return(999999.);

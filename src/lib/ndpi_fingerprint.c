@@ -182,8 +182,8 @@ static char* ndpi_compute_tls_blocks_flow_fingerprint(struct ndpi_flow_struct *f
 
     ret = snprintf(&fp_buf[idx], avail, "%s%u=%d",
 		   (i > 0) ? "," : "",
-		   flow->metadata.l4.tcp.tls.tls_blocks[i].block_type,
-		   flow->metadata.l4.tcp.tls.tls_blocks[i].len);
+		   flow->metadata.l4.tcp.tls.tls_blocks[i].core.block_type,
+		   flow->metadata.l4.tcp.tls.tls_blocks[i].core.len);
 
     if(ret <= 0)
       break;

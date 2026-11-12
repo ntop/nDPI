@@ -2324,9 +2324,9 @@ static void checkTlsBlocksDecode(const u_char *encoded, size_t encoded_len,
   assert(num_blocks == expected_num_blocks);
 
   for(i = 0; i < num_blocks; i++) {
-    assert(decoded[i].block_type == expected_blocks[i].block_type);
+    assert(decoded[i].core.block_type == expected_blocks[i].core.block_type);
     assert(decoded[i].same_pkt == expected_blocks[i].same_pkt);
-    assert(decoded[i].len == expected_blocks[i].len);
+    assert(decoded[i].core.len == expected_blocks[i].core.len);
   }
 
   ndpi_free(decoded);
@@ -2384,9 +2384,9 @@ static void hexDecodeUnitTest(void) {
 
 static void tlsBlocksUnitTest(void) {
   struct ndpi_tls_block expected_blocks[] = {
-    { .block_type = tls_handshake_client_hello, .len = 0x0000, .same_pkt = 1 },
-    { .block_type = tls_application_data, .len = 0xFFFF, .same_pkt = 0 },
-    { .block_type = tls_application_data, .len = 0x00AF, .same_pkt = 1 }
+    { { .block_type = tls_handshake_client_hello, .len = 0x0000}, .same_pkt = 1 },
+    { { .block_type = tls_application_data, .len = 0xFFFF}, .same_pkt = 0 },
+    { { .block_type = tls_application_data, .len = 0x00AF}, .same_pkt = 1 }
   };
   static const u_char truncated_tls_blocks[] = { '0', '0', '0', '1' };
   static const u_char invalid_tls_blocks[] = { '0', 'g', '0', '0', '0', '0' };

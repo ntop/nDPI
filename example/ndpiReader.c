@@ -2755,8 +2755,8 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 
       for(i=0; i<flow->tls.num_blocks; i++)
 	fprintf(out, "%s%s=%d", (i > 0) ? "," : "",
-		ndpi_print_encoded_tls_block_type(flow->tls.blocks[i].block_type, true),
-		flow->tls.blocks[i].len);
+		ndpi_print_encoded_tls_block_type(flow->tls.blocks[i].core.block_type, true),
+		flow->tls.blocks[i].core.len);
 
       fprintf(out, "][%s]", enc ? (char*)enc : "");
 

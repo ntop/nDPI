@@ -11527,11 +11527,12 @@ void ndpi_set_detected_protocol_keeping_master(struct ndpi_detection_module_stru
 
 /* ********************************************************************************* */
 
-void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str,
-				struct ndpi_flow_core_struct *core,
-				u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
-				ndpi_confidence_t confidence) {
-
+void ndpi_set_detected_protocol_internal(struct ndpi_detection_module_struct *ndpi_str,
+					 struct ndpi_flow_core_struct *core,
+					 u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
+					 ndpi_confidence_t confidence,
+					 bool update_stack) {
+  
   if(core->state == NDPI_STATE_MONITORING) {
     NDPI_LOG_ERR(ndpi_str, "Impossible to update classification while in monitoring state! %d/%d->%d/%d\n",
                  core->detected_protocol_stack[1], core->detected_protocol_stack[0],
@@ -11543,10 +11544,24 @@ void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str,
 			   lower_detected_protocol, confidence);
   ndpi_reconcile_protocols(ndpi_str, core);
 
-  proto_stack_update(&core->protocol_stack,
-		     core->detected_protocol_stack[1], core->detected_protocol_stack[0]);
-
+  if(update_stack)
+    proto_stack_update(&core->protocol_stack,
+		       core->detected_protocol_stack[1], core->detected_protocol_stack[0]);
+  else
+    core->protocol_stack.protos_num = 1, core->protocol_stack.protos[1] = NDPI_PROTOCOL_UNKNOWN;;
+  
   core->state = NDPI_STATE_PARTIAL;
+}
+
+/* ********************************************************************************* */
+
+void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_str,
+				struct ndpi_flow_core_struct *core,
+				u_int16_t upper_detected_protocol, u_int16_t lower_detected_protocol,
+				ndpi_confidence_t confidence) {
+
+  ndpi_set_detected_protocol_internal(ndpi_str, core, upper_detected_protocol, lower_detected_protocol,
+				      confidence, true /*  update_stack */);  
 }
 
 /* ********************************************************************************* */

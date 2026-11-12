@@ -52,6 +52,16 @@ void ndpi_search_http_tcp(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* *********************************************** */
 
+static bool http_ok_reply(struct ndpi_flow_struct *flow) {
+  if(flow->metadata.http.response_status_code >= 400
+     && (flow->metadata.http.response_status_code <= 599))    
+    return(false);
+  else
+    return(true);
+}
+
+/* *********************************************** */
+
 static char* forge_attempt_msg(struct ndpi_flow_struct *flow, char *msg, char *buf, u_int buf_len) {
   if((flow->metadata.http.response_status_code >= 200) && (flow->metadata.http.response_status_code < 300))
     return(msg);
@@ -77,7 +87,7 @@ static void ndpi_set_binary_application_transfer(struct ndpi_detection_module_st
 						 struct ndpi_flow_struct *flow,
 						 char *msg) {
   if(flow->core.host_server_name == NULL) return;
-  
+
   /*
     Check known exceptions
     https://learn.microsoft.com/en-us/windows/privacy/windows-endpoints-1909-non-enterprise-editions
@@ -1090,7 +1100,7 @@ static void ndpi_check_http_url_subprotocol(struct ndpi_detection_module_struct 
     if(ndpi_struct->http_url_hashmap) {
       u_int64_t id;
       u_int16_t proto, category, breed;
-      
+
       /* This protocol has been defined in protos.txt-like files */
       if(ndpi_hash_find_entry(ndpi_struct->http_url_hashmap,
 			      flow->metadata.http.url, strlen(flow->metadata.http.url),
@@ -1575,7 +1585,7 @@ static void parse_response_code(struct ndpi_detection_module_struct *ndpi_struct
   char buf[4];
   char ec[48];
 
-  if(packet->payload_packet_len >= 12) {    
+  if(packet->payload_packet_len >= 12) {
     /* Set server HTTP response code */
     strncpy(buf, (char*)&packet->payload[9], 3);
     buf[3] = '\0';
@@ -1605,6 +1615,17 @@ static void parse_response_code(struct ndpi_detection_module_struct *ndpi_struct
 	  snprintf(str, sizeof(str), "Possible Wordpress Exploit [%s]", slash);
           ndpi_set_risk(ndpi_struct, &flow->core, NDPI_POSSIBLE_EXPLOIT, str);
 	}
+      }
+    }
+
+    if(http_ok_reply(flow) == false) {
+      NDPI_LOG_DBG2(ndpi_struct, "Skip sub-protocol classification due to non positive HTTP reply");
+
+      if(flow->core.detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN) {
+	ndpi_set_detected_protocol_internal(ndpi_struct, &flow->core, NDPI_PROTOCOL_UNKNOWN,
+					    flow->core.detected_protocol_stack[1],
+					    NDPI_CONFIDENCE_DPI, false);
+	update_category_and_breed(ndpi_struct, flow);
       }
     }
   }

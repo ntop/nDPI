@@ -1780,7 +1780,7 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 	ndpi_reset_bin(&flow->payload_len_bin);
 
 	for(i=0; i<flow->ndpi_flow->metadata.l4.tcp.tls.num_tls_blocks; i++) {
-	  u_int16_t len = abs(flow->ndpi_flow->metadata.l4.tcp.tls.tls_blocks[i].len);
+	  u_int16_t len = abs(flow->ndpi_flow->metadata.l4.tcp.tls.tls_blocks[i].core.len);
 
 	  /* printf("[TLS_LEN] %u\n", len); */
 	  ndpi_inc_bin(&flow->payload_len_bin, plen2slot(len), 1);

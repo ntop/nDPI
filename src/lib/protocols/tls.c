@@ -1329,11 +1329,11 @@ static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
 
       if(packet->packet_direction == 1 /* srv -> cli */) blen *= -1;
 
-      flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks].len = blen,
+      flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks].core.len = blen,
          flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks].msec_delta =
         (tdelta > 0xFFFF) ?  0xFFFF : (u_int16_t)tdelta,
         flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks].same_pkt = (*same_packet) ? 1 : 0;
-      flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks++].block_type = enc_block_type;
+      flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks++].core.block_type = enc_block_type;
 
       flow->metadata.l4.tcp.tls.last_tls_block_time_ms = ndpi_struct->packet.current_time_ms;
     }
@@ -3279,7 +3279,7 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 		    if(extension_id == 0x0 /* SNI */)
 		      ; /* Nothing to do as already handled by (***) */
 		    else
-		      flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks-1].len -= extension_len + 4 /* id + len */;
+		      flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks-1].core.len -= extension_len + 4 /* id + len */;
 		  }
 
 		  ja.client.tls_extension[ja.client.num_tls_extensions++] = extension_id;
@@ -3319,9 +3319,9 @@ int processClientServerHello(struct ndpi_detection_module_struct *ndpi_struct,
 			measurement regardless of the SNI being used
 		      */
 		      if(ndpi_struct->cfg.tls_ndpifp_ignore_sni_extension)
-			flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks-1].len -= extension_len + 4 /* id + len */;
+			flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks-1].core.len -= extension_len + 4 /* id + len */;
 		      else
-			flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks-1].len -= sni_len; /* (***) */
+			flow->metadata.l4.tcp.tls.tls_blocks[flow->metadata.l4.tcp.tls.num_tls_blocks-1].core.len -= sni_len; /* (***) */
 		    }
 
 		    if(ndpi_is_valid_hostname((char *)&packet->payload[offset+extension_offset+5], len) == 0) {

@@ -20,9 +20,9 @@ LRU cache fpc_dns:    14/37/13 (insert/search/found)
 Automa host:          247/70 (search/found)
 Automa domain:        156/0 (search/found)
 Automa tls cert:      0/0 (search/found)
-Automa risk mask:     10/0 (search/found)
+Automa risk mask:     12/0 (search/found)
 Automa common alpns:  0/0 (search/found)
-Patricia risk mask:   14/0 (search/found)
+Patricia risk mask:   18/0 (search/found)
 Patricia risk mask IPv6: 6/0 (search/found)
 Patricia risk:        3/0 (search/found)
 Patricia risk IPv6:   25/0 (search/found)
@@ -38,14 +38,14 @@ Hash url custom protos:    85/0 (search/found)
 
 Unknown	19	5564	9	144	28664	20	(*)
 DNS	17	1719	6	17	1719	6
-HTTP	253	357994	35	161	336025	27	(*)
+HTTP	260	360530	37	161	336025	27	(*)
 MDNS	1	82	1	1	82	1
 NTP	1	90	1	1	90	1
 NetBIOS	26	2392	6	26	2392	6
 SSDP	143	36951	13	143	36951	13
 SMBv1	5	1197	2	5	1197	2
 DHCP	24	8208	5	24	8208	5
-QQ	30	6617	3	30	6617	3
+QQ	27	5792	2	30	6617	3	(*)
 TLS	124	28754	9	19	6840	2	(*)
 DHCPV6	10	980	3	10	980	3
 Google	24	50551	2	27	50727	3	(*)
@@ -54,24 +54,24 @@ PlayStore	2	1359	1	2	1359	1
 GoogleServices	17	30330	1	17	30330	1
 Alibaba	0	0	0	46	13173	2	(*)
 MpegDash	1	299	1	1	299	1
-1kxun	902	1968236	44	902	1968236	44
+1kxun	898	1966525	43	902	1968236	44	(*)
 Line	28	18656	2	51	26090	3	(*)
 Mikrotik	5	864	5	5	864	5
 
 Unrated                         19 5564          9            
 Safe                           126 30113         10           
-Acceptable                     614 462930        125          
-Fun                            935 1977419       49           
+Acceptable                     621 465466        127          
+Fun                            928 1974883       47           
 Dangerous                        5 1197          2            
 Tracker_Ads                     24 50551         2            
 
 Unspecified                     19 5564          9            
 Media                           13 4318          2            
-Web                            380 410792        43           
+Web                            387 413328        45           
 Download                         2 553           1            
-Chat                            58 25273         5            
+Chat                            55 24448         4            
 Network                        148 18784         68           
-Streaming                      902 1969950       44           
+Streaming                      898 1968239       43           
 System                         175 40630         22           
 SoftwareUpdate                   2 1359          1            
 Advertisement                   24 50551         2            
@@ -158,7 +158,7 @@ JA Host Stats:
 	75	TCP 192.168.2.126:50164 <-> 161.117.13.29:80 [proto: 7.295/HTTP.1kxun][Stack: HTTP.1kxun][IP: 274/Alibaba][ClearText][Confidence: DPI][FPC: 7.295/HTTP.1kxun, Confidence: DPI][DPI packets: 2][cat: Streaming/17][Breed: Fun][1 pkts/1184 bytes <-> 1 pkts/574 bytes][Goodput ratio: 94/88][0.18 sec][Hostname/SNI: mangaweb.1kxun.mobi][URL: mangaweb.1kxun.mobi/images/readpage_revision/more_white.png][StatusCode: 200][Content-Type: image/png][Server: openresty/1.13.6.1][User-Agent: Mozilla/5.0 (Linux; Android 11; sdk_gphone_x86 Build/RSR1.201013.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.106 Mobile Safari/537.36][PLAIN TEXT (GET /images/readpage)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	76	UDP 192.168.101.33:55485 -> 239.255.255.250:1900 [proto: 12/SSDP][Stack: SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Acceptable][10 pkts/1750 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][49.87 sec][Hostname/SNI: 239.255.255.250][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2969/0 5541/0 19870/0 5205/0][Pkt Len c2s/s2c min/avg/max/stddev: 175/0 175/0 175/0 0/0][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	77	TCP 192.168.2.126:41940 <-> 18.64.79.50:80 [proto: 7/HTTP][Stack: HTTP][IP: 464/AWS_Cloudfront][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Acceptable][1 pkts/1315 bytes <-> 1 pkts/419 bytes][Goodput ratio: 95/84][0.04 sec][Hostname/SNI: tknet-cdn.rayjump.com][URL: tknet-cdn.rayjump.com/ad/log/play?k=629bea20a4e5410001f01c7x&mp=fURPDr5tiUStf7V2fajMiaveHUveDAJ96aiPfU5IiARTfnHIGal9i%2BMefbMefAEeGn3TfaiFfnRPGnEe6jxc6aRAGaxIi%2BMPfdMei%2BewDke6Go9bWUxIi099WUR%2Fi%2BegYFKgY75IhFx8%2BFJML7K%2FH5K9GaHIinhPfdleialM6azIHkPIG][StatusCode: 200][Content-Type: text/plain][Server: nginx][User-Agent: Mozilla/5.0 (Linux; Android 11; sdk_gphone_x86 Build/RSR1.201013.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.106 Mobile Safari/537.36][PLAIN TEXT (GET /ad/log/play)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0]
-	78	TCP 192.168.2.126:49242 <-> 172.104.119.80:80 [proto: 7.295/HTTP.1kxun][Stack: HTTP.1kxun][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7.295/HTTP.1kxun, Confidence: DPI][DPI packets: 2][cat: Streaming/17][Breed: Fun][2 pkts/1129 bytes <-> 2 pkts/582 bytes][Goodput ratio: 88/77][2.16 sec][Hostname/SNI: android.yingshi.tcclick.1kxun.com][URL: android.yingshi.tcclick.1kxun.com/api/upload.php][StatusCode: 500][Req Content-Type: application/octet-stream][Content-Type: text/html][Server: openresty/1.11.2.5][User-Agent: okhttp/3.10.0][Risk: ** Error Code **][Risk Score: 10][Risk Info: HTTP Error Code 500][PLAIN TEXT (aPOST /api/upload.php HTTP/1.1)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	78	TCP 192.168.2.126:49242 <-> 172.104.119.80:80 [proto: 7/HTTP][Stack: HTTP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7.295/HTTP.1kxun, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Acceptable][2 pkts/1129 bytes <-> 2 pkts/582 bytes][Goodput ratio: 88/77][2.16 sec][Hostname/SNI: android.yingshi.tcclick.1kxun.com][URL: android.yingshi.tcclick.1kxun.com/api/upload.php][StatusCode: 500][Req Content-Type: application/octet-stream][Content-Type: text/html][Server: openresty/1.11.2.5][User-Agent: okhttp/3.10.0][Risk: ** Error Code **][Risk Score: 10][Risk Info: HTTP Error Code 500][PLAIN TEXT (aPOST /api/upload.php HTTP/1.1)][Plen Bins: 0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	79	TCP 192.168.2.126:56104 <-> 3.72.69.158:80 [proto: 7/HTTP][Stack: HTTP][IP: 461/AWS_EC2][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Acceptable][1 pkts/896 bytes <-> 1 pkts/721 bytes][Goodput ratio: 93/91][0.02 sec][Hostname/SNI: setting.rayjump.com][URL: setting.rayjump.com/rewardsetting?app_id=32456&sign=3c28ded04e0f4090229968618244b583&unit_ids=%5B8881%5D&channel=&platform=1&os_version=11&package_name=com.sceneway.kankan&app_version_name=2.8.2.1&app_version_code=146&orientation=2&model=sdk_gphone_x86&br][StatusCode: 200][Content-Type: text/plain][User-Agent: Apache-HttpClient/UNAVAILABLE (java 1.4)][PLAIN TEXT (GET /rewardsetting)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	80	UDP 192.168.5.49:51704 -> 239.255.255.250:1900 [proto: 12/SSDP][Stack: SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Acceptable][9 pkts/1611 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][45.06 sec][Hostname/SNI: 239.255.255.250][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2965/0 5631/0 15155/0 3855/0][Pkt Len c2s/s2c min/avg/max/stddev: 179/0 179/0 179/0 0/0][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	81	UDP 192.168.5.50:64674 -> 239.255.255.250:1900 [proto: 12/SSDP][Stack: SSDP][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 12/SSDP, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Acceptable][9 pkts/1611 bytes -> 0 pkts/0 bytes][Goodput ratio: 76/0][57.02 sec][Hostname/SNI: 239.255.255.250][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 2949/0 7126/0 24065/0 7503/0][Pkt Len c2s/s2c min/avg/max/stddev: 179/0 179/0 179/0 0/0][PLAIN TEXT (SEARCH )][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -186,7 +186,7 @@ JA Host Stats:
 	103	TCP 192.168.2.126:60972 <-> 172.104.93.92:1234 [proto: 7.295/HTTP.1kxun][Stack: HTTP.1kxun][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7.295/HTTP.1kxun, Confidence: DPI][DPI packets: 2][cat: Streaming/17][Breed: Fun][1 pkts/604 bytes <-> 1 pkts/255 bytes][Goodput ratio: 89/74][0.24 sec][Hostname/SNI: ws.1kxun.mobi][URL: ws.1kxun.mobi:1234/?_brand=Google&_model=sdk_gphone_x86&_ov=Android11&_cpu=i686&_resolution=1080%2C1794&_package=com.sceneway.kankan&_v=2.8.2.1&_channel=1kxun&_carrier=310260&_android_id=b9e28776354d259e&_network=wifi&_aid=5ac6a0ff-8d18-47bc-a902-2812cf0c][StatusCode: 101][Server: swoole-websocket-server][User-Agent: okhttp/3.10.0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 80][PLAIN TEXT (Google)][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	104	TCP 192.168.2.126:60984 <-> 172.104.93.92:1234 [proto: 7.295/HTTP.1kxun][Stack: HTTP.1kxun][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 7.295/HTTP.1kxun, Confidence: DPI][DPI packets: 2][cat: Streaming/17][Breed: Fun][1 pkts/604 bytes <-> 1 pkts/255 bytes][Goodput ratio: 89/74][0.27 sec][Hostname/SNI: ws.1kxun.mobi][URL: ws.1kxun.mobi:1234/?_brand=Google&_model=sdk_gphone_x86&_ov=Android11&_cpu=i686&_resolution=1080%2C1794&_package=com.sceneway.kankan&_v=2.8.2.1&_channel=1kxun&_carrier=310260&_android_id=b9e28776354d259e&_network=wifi&_aid=5ac6a0ff-8d18-47bc-a902-2812cf0c][StatusCode: 101][Server: swoole-websocket-server][User-Agent: okhttp/3.10.0][Risk: ** Known Proto on Non Std Port **][Risk Score: 50][Risk Info: Expected on port 80][PLAIN TEXT (Google)][Plen Bins: 0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	105	TCP 192.168.2.126:41134 <-> 129.226.107.77:80 [proto: 7.48/HTTP.QQ][Stack: HTTP.QQ][IP: 285/Tencent][ClearText][Confidence: DPI][FPC: 7.48/HTTP.QQ, Confidence: DPI][DPI packets: 2][cat: Chat/9][Breed: Fun][1 pkts/324 bytes <-> 1 pkts/518 bytes][Goodput ratio: 83/89][0.19 sec][Hostname/SNI: cgi.connect.qq.com][URL: cgi.connect.qq.com/qqconnectopen/openapi/policy_conf?status_os=11&status_version=30&status_machine=sdk_gphone_x86&sdkp=a&sdkv=3.1.0.lite&appid=100258135][StatusCode: 302][Content-Type: text/html][Server: stgw][User-Agent: AndroidSDK_30_generic_x86_arm_11][PLAIN TEXT (GET /qq)][Plen Bins: 0,0,0,0,0,0,0,0,50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	106	TCP 192.168.2.126:38834 <-> 119.45.78.184:80 [proto: 7.48/HTTP.QQ][Stack: HTTP.QQ][IP: 285/Tencent][ClearText][Confidence: DPI][FPC: 7.48/HTTP.QQ, Confidence: DPI][DPI packets: 3][cat: Chat/9][Breed: Fun][2 pkts/655 bytes <-> 1 pkts/170 bytes][Goodput ratio: 80/61][0.31 sec][Hostname/SNI: pingma.qq.com][URL: pingma.qq.com:80/mstat/report][StatusCode: 404][Risk: ** HTTP Susp User-Agent **** Error Code **][Risk Score: 110][Risk Info: HTTP Error Code 404;Empty or missing User-Agent][PLAIN TEXT (POST /mstat/report HTTP/1.1)][Plen Bins: 0,0,0,33,33,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	106	TCP 192.168.2.126:38834 <-> 119.45.78.184:80 [proto: 7/HTTP][Stack: HTTP][IP: 285/Tencent][ClearText][Confidence: DPI][FPC: 7.48/HTTP.QQ, Confidence: DPI][DPI packets: 3][cat: Web/5][Breed: Acceptable][2 pkts/655 bytes <-> 1 pkts/170 bytes][Goodput ratio: 80/61][0.31 sec][Hostname/SNI: pingma.qq.com][URL: pingma.qq.com:80/mstat/report][StatusCode: 404][Risk: ** HTTP Susp User-Agent **** Error Code **][Risk Score: 110][Risk Info: HTTP Error Code 404;Empty or missing User-Agent][PLAIN TEXT (POST /mstat/report HTTP/1.1)][Plen Bins: 0,0,0,33,33,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	107	UDP 192.168.5.45:138 -> 192.168.255.255:138 [proto: 10.16/NetBIOS.SMBv1][Stack: NetBIOS.SMBv1][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 10.16/NetBIOS.SMBv1, Confidence: DPI][DPI packets: 1][cat: System/18][Breed: Dangerous][3 pkts/648 bytes -> 0 pkts/0 bytes][Goodput ratio: 80/0][0.00 sec][Hostname/SNI: macbookair-e1d0][PLAIN TEXT ( ENEBEDECEPEPELEBEJ)][Plen Bins: 0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	108	TCP 192.168.2.126:54810 <-> 18.233.123.55:80 [proto: 7/HTTP][Stack: HTTP][IP: 461/AWS_EC2][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 2][cat: Web/5][Breed: Acceptable][1 pkts/490 bytes <-> 1 pkts/141 bytes][Goodput ratio: 86/53][0.11 sec][Hostname/SNI: impression-east.liftoff.io][URL: impression-east.liftoff.io/mintegral/beacon?ad_group_id=143845&channel_id=117&creative_id=253640&auction_id=f84f54bf-31cd-43ff-bd27-526ccc6457da&origin=haggler-mintegral021][StatusCode: 200][User-Agent: Mozilla/5.0 (Linux; Android 11; sdk_gphone_x86 Build/RSR1.201013.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.106 Mobile Safari/537.36][PLAIN TEXT (GET /mintegral/beacon)][Plen Bins: 0,0,50,0,0,0,0,0,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	109	TCP 192.168.2.126:51888 -> 119.28.164.143:80 [proto: 7/HTTP][Stack: HTTP][IP: 285/Tencent][ClearText][Confidence: DPI][FPC: 7/HTTP, Confidence: DPI][DPI packets: 1][cat: Web/5][Breed: Acceptable][1 pkts/571 bytes -> 0 pkts/0 bytes][Goodput ratio: 90/0][< 1 sec][Hostname/SNI: qzonestyle.gtimg.cn][URL: qzonestyle.gtimg.cn/qzone/openapi/qc-1.0.1.js][User-Agent: Mozilla/5.0 (Linux; Android 11; sdk_gphone_x86 Build/RSR1.201013.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.106 Mobile Safari/537.36][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (GET /qzone/openapi/qc)][Plen Bins: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

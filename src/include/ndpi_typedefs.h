@@ -899,8 +899,6 @@ struct ndpi_tls_block_core {
 
 struct ndpi_tls_block {
   struct ndpi_tls_block_core core;
-  u_int8_t block_type /* ndpi_tls_block_type */;
-  int16_t len; /* + = src->dst, - = dst->src */
   /* Optional, leave it at the end */
   u_int8_t same_pkt:1, _unused:7;
   u_int16_t msec_delta; /* Used to store protocol_id in ja4 hash */
