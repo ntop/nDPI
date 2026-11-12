@@ -183,7 +183,7 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
 
   char *rem;
   char *cipher;
-  u_int found_obsolete_cipher = 0;
+  int found_obsolete_cipher = -1;
   char *cipher_copy;
   /*
     List of obsolete ciphers can be found at
@@ -211,12 +211,12 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
 
   cipher = strtok_r(cipher_copy, ",", &rem);
 
-  while(cipher && !found_obsolete_cipher) {
+  while(cipher && found_obsolete_cipher < 0) {
     u_int i;
     
     for(i = 0; obsolete_ciphers[i]; i++) {
       if(strcmp(cipher, obsolete_ciphers[i]) == 0) {
-        found_obsolete_cipher = i;
+        found_obsolete_cipher = (int)i;
 #ifdef SSH_DEBUG
 	printf("[SSH] [SSH obsolete %s cipher][%s]\n",
 	       is_client_signature ? "client" : "server",
@@ -229,7 +229,7 @@ static void ssh_analyse_cipher(struct ndpi_detection_module_struct *ndpi_struct,
     cipher = strtok_r(NULL, ",", &rem);
   }
 
-  if(found_obsolete_cipher) {
+  if(found_obsolete_cipher >= 0) {
     char str[64];
 
     snprintf(str, sizeof(str), "Found cipher %s", obsolete_ciphers[found_obsolete_cipher]);
@@ -321,8 +321,10 @@ static u_int16_t concat_hash_string(struct ndpi_detection_module_struct *ndpi_st
         flow->metadata.protos.ssh.server_key_exchange_algorithms = ndpi_strdup(buf);
     }
 
+    /* The first KEXINIT lists are retained; compute this metadata only once. */
     if(flow->metadata.protos.ssh.client_key_exchange_algorithms
-       && flow->metadata.protos.ssh.server_key_exchange_algorithms) {
+       && flow->metadata.protos.ssh.server_key_exchange_algorithms
+       && !flow->metadata.protos.ssh.key_exchange_method) {
       /* Compute the negotiated key exchange algorithm */
       flow->metadata.protos.ssh.key_exchange_method =
         ssh_negotiate_algorithm(flow->metadata.protos.ssh.client_key_exchange_algorithms,
