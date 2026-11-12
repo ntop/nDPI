@@ -10514,6 +10514,7 @@ static void ndpi_reset_packet_line_info(struct ndpi_packet_struct *packet) {
     packet->man.ptr = NULL, packet->man.len = 0;
     packet->mx.ptr = NULL, packet->mx.len = 0;
     packet->st.ptr = NULL, packet->st.len = 0;
+    packet->transfer_encoding_line.ptr = NULL, packet->transfer_encoding_line.len = 0;
 }
 
 /* ********************************************************************************* */
@@ -11276,6 +11277,8 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
   struct header_line headers_n[] = { { "NT:", &packet->nt },
                                      { "NTS:", &packet->nts },
                                      { NULL, NULL}};
+  struct header_line headers_t[] = { { "Transfer-Encoding:", &packet->transfer_encoding_line },
+                                     { NULL, NULL}};
 
   line = &packet->line[packet->parsed_lines];
   if(line->len == 0)
@@ -11347,6 +11350,10 @@ static void parse_single_packet_line(struct ndpi_detection_module_struct *ndpi_s
   case 'n':
   case 'N':
     hs = headers_n;
+    break;
+  case 't':
+  case 'T':
+    hs = headers_t;
     break;
   default:
     return;

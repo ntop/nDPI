@@ -227,6 +227,72 @@ static void ndpi_http_check_human_redeable_content(struct ndpi_detection_module_
 
 /* *********************************************** */
 
+/* Check if the current packet has a "Transfer-Encoding: chunked" header */
+static int ndpi_http_is_chunked(struct ndpi_packet_struct *packet) {
+  const char *value = (const char *)packet->transfer_encoding_line.ptr;
+  u_int16_t value_len = packet->transfer_encoding_line.len, i;
+
+  for(i = 0; value && i + 7 <= value_len; i++) {
+    if(strncasecmp(&value[i], "chunked", 7) == 0)
+      return(1);
+  }
+
+  return(0);
+}
+
+/* *********************************************** */
+
+/*
+  Skip the chunk-size line ("<hex>[;ext]\r\n") at the beginning of a chunked body.
+  On success, content and content_len are updated to point to the first chunk data,
+  limited to the chunk size, and 1 is returned. 0 is returned otherwise
+*/
+static int ndpi_http_skip_chunk_header(const u_int8_t **content, u_int *content_len) {
+  const u_int8_t *p = *content;
+  u_int len = *content_len, i = 0, num_digits = 0;
+  u_int32_t chunk_size = 0;
+
+  while(i < len) {
+    u_int8_t c = p[i], v;
+
+    if(ndpi_isdigit(c))
+      v = c - '0';
+    else if(c >= 'a' && c <= 'f')
+      v = c - 'a' + 10;
+    else if(c >= 'A' && c <= 'F')
+      v = c - 'A' + 10;
+    else
+      break;
+
+    if(++num_digits > 8) /* Way too big */
+      return(0);
+    chunk_size = (chunk_size << 4) | v;
+    i++;
+  }
+
+  if(num_digits == 0)
+    return(0);
+
+  /* Skip optional chunk extensions and look for the CRLF */
+  while(i + 1 < len && !(p[i] == '\r' && p[i + 1] == '\n'))
+    i++;
+
+  if(i + 1 >= len)
+    return(0);
+
+  i += 2;
+
+  if(chunk_size == 0) /* Last chunk: no data */
+    return(0);
+
+  *content = &p[i];
+  *content_len = ((len - i) < chunk_size) ? (len - i) : chunk_size;
+
+  return(1);
+}
+
+/* *********************************************** */
+
 static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi_struct,
 				       struct ndpi_flow_struct *flow) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
@@ -248,13 +314,21 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
       packet->http_check_content = 1;
 
       if(len >= 8 /* 4 chars for \r\n\r\n and at least 4 charts for content guess */) {
+	int content_ok = 1;
+
 	double_ret += 4;
 	len -= 4;
 
-	ndpi_http_check_human_redeable_content(ndpi_struct, flow, double_ret, len);
-	if(ndpi_struct->cfg.compute_entropy &&
-	   flow->core.skip_entropy_check == 0) {
-	  flow->metadata.entropy = ndpi_entropy(double_ret, len);
+	/* With chunked encoding, the body starts with the chunk-size line: skip it */
+	if(ndpi_http_is_chunked(packet))
+	  content_ok = ndpi_http_skip_chunk_header(&double_ret, &len);
+
+	if(content_ok) {
+	  ndpi_http_check_human_redeable_content(ndpi_struct, flow, double_ret, len);
+	  if(ndpi_struct->cfg.compute_entropy &&
+	     flow->core.skip_entropy_check == 0) {
+	    flow->metadata.entropy = ndpi_entropy(double_ret, len);
+	  }
 	}
       }
     }
