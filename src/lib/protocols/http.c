@@ -203,6 +203,19 @@ static int ndpi_http_is_print(char c) {
 static void ndpi_http_check_human_redeable_content(struct ndpi_detection_module_struct *ndpi_struct,
 						   struct ndpi_flow_struct *flow,
 						   const u_int8_t *content, u_int16_t content_len) {
+  /* Byte Order Marks */
+  if(content_len >= 3 &&
+     content[0] == 0xEF && content[1] == 0xBB && content[2] == 0xBF) {
+    /* UTF-8 BOM: skip it and check the actual text */
+    content += 3;
+    content_len -= 3;
+  } else if(content_len >= 2 &&
+            ((content[0] == 0xFF && content[1] == 0xFE) ||
+             (content[0] == 0xFE && content[1] == 0xFF))) {
+    /* UTF-16 (LE/BE) BOM: text is not ASCII and can't be validated with the check below */
+    return;
+  }
+
   if(content_len >= 4) {
     NDPI_LOG_DBG(ndpi_struct, " [len: %u] [%02X %02X %02X %02X][%c%c%c%c]", content_len,
 	   content[0], content[1], content[2], content[3],
