@@ -1997,8 +1997,9 @@ static void automataDomainsUnitTest() {
 /* *********************************************** */
 
 static void blocksUnitTest() {
-  struct ndpi_tls_block a[] = { { .block_type = 4, .len = 1590 }, { .block_type = 5, .len = -1212 }, { .block_type = 1, .len = -1 }, { .block_type = 16, .len = -42 }, { .block_type = 16, .len = -53 }  };
-  struct ndpi_tls_block b[] = { { .block_type = 4, .len = 1590 }, { .block_type = 5, .len = -1212 }, { .block_type = 1, .len = -1 }, { .block_type = 16, .len = -42 }, { .block_type = 16, .len = -52 }  };
+  struct ndpi_tls_block a[] = { { { 4, 1590}, 0, 1, 0}, { {5, -1212}, 0, 1, 0}, { {1, -1}, 0, 1, 0}, { {16, -42}, 0, 1, 0}, { {16, -53}, 0, 1, 0}  };
+    struct ndpi_tls_block b[] = { { { 4, 1590}, 0, 1, 0}, { {5, -1212}, 0, 1, 0}, { {1, -1}, 0, 1, 0}, { {16, -42}, 0, 1, 0}, { {16, -52}, 0, 1, 0}  };
+    
   float ret = ndpi_tls_blocks_len_compare(a, b, 5 /* num_blocks */);
 
   assert(ret == 1.0);
