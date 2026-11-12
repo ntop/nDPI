@@ -2190,7 +2190,9 @@ static void checkExtensions(struct ndpi_detection_module_struct *ndpi_struct,
       /* ALPS */
       17513, 17613,
       /* draft-ietf-tls-trust-anchor-ids */
-      51764
+      51764,
+      /* server_padding from BoringSSL */
+      4832,
   };
   size_t const allowed_non_iana_extensions_size = sizeof(allowed_non_iana_extensions) /
     sizeof(allowed_non_iana_extensions[0]);
