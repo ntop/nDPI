@@ -1291,8 +1291,6 @@ static void handleTLSBlockStat(struct ndpi_detection_module_struct *ndpi_struct,
 
   if(is_monitoring_enabled(ndpi_struct, NDPI_PROTOCOL_TLS)) {
     if(flow->core.l4_proto == IPPROTO_TCP) {
-      printf("[TLS] [content_type: %u:%u][len: %u]\n", record_type, handshake_type, block_len);
-
       if(flow->metadata.monit == NULL)
 	flow->metadata.monit = ndpi_calloc(1, sizeof(struct ndpi_metadata_monitoring));
 
