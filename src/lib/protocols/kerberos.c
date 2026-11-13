@@ -772,8 +772,9 @@ static int krb_process_packet(struct ndpi_detection_module_struct *ndpi_struct,
 	return -1;
 
       flow->metadata.kerberos_buf.prefix = 1;
-      memcpy(flow->metadata.kerberos_buf.pktbuf, payload-4, payload_len+4);
-      flow->metadata.kerberos_buf.pktbuf_currlen = payload_len+4;
+      /* Only copy what fits: payload_len+4 may exceed pktbuf_maxlen */
+      flow->metadata.kerberos_buf.pktbuf_currlen = ndpi_min(payload_len + 4, flow->metadata.kerberos_buf.pktbuf_maxlen);
+      memcpy(flow->metadata.kerberos_buf.pktbuf, payload-4, flow->metadata.kerberos_buf.pktbuf_currlen);
       return 0;
     }
 
