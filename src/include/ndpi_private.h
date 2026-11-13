@@ -430,7 +430,8 @@ struct ndpi_detection_module_struct {
   /* HTTP/DNS/HTTPS/QUIC host matching */
   ndpi_automa host_automa,                     /* Used for DNS/HTTPS */
     risky_domain_automa, tls_cert_subject_automa,
-    host_risk_mask_automa, common_alpns_automa;
+    host_risk_mask_automa, common_alpns_automa,
+    ai_endpoint_automa;                        /* AI endpoint (provider/engine) name matching, see ndpi_ai.h */
   /* IMPORTANT: please, whenever you add a new automa:
    * update ndpi_finalize_initialization()
    * update automa_type above
@@ -483,6 +484,10 @@ struct ndpi_detection_module_struct {
 
   /* FPC DNS cache */
   struct ndpi_lru_cache *fpc_dns_cache;
+
+  /* AI endpoint DNS cache: IP -> ndpi_ai_endpoint, for ECH-protected flows
+   * whose SNI is the CDN name (see ndpi_ai.h). Reuses the fpc_dns_cache config. */
+  struct ndpi_lru_cache *ai_endpoint_dns_cache;
 
   /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
 
