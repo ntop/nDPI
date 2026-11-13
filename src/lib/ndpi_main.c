@@ -66,6 +66,7 @@
 #include <sys/endian.h>
 #endif
 
+#include "ndpi_ai.h"
 #include "ndpi_content_match.c.inc"
 #include "ndpi_dga_match.c.inc"
 #include "inc_generated/ndpi_akamai_match.c.inc"
@@ -3056,6 +3057,17 @@ static void init_protocol_defaults(struct ndpi_detection_module_struct *ndpi_str
                           ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
                           0, 0 /* protocol classification cannot change if partial */);
 
+  /*
+    Generic AI marker. No port is registered: AI traffic is identified by the peer
+    name (hosted providers) or the wire signature (self-hosted engines), and the
+    specific endpoint is carried by flow->ai_endpoint (see ndpi_ai.h).
+  */
+  ndpi_set_proto_defaults(ndpi_str, 0 /* encrypted */, 1 /* app proto */, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_AI,
+                          "AI", NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE, NDPI_PROTOCOL_QOE_CATEGORY_UNSPECIFIED,
+                          ndpi_build_default_ports(ports_a, 0, 0, 0, 0, 0) /* TCP */,
+                          ndpi_build_default_ports(ports_b, 0, 0, 0, 0, 0) /* UDP */,
+                          0, 0 /* protocol classification cannot change if partial */);
+
   /* calling function for host and content matched protocols */
   init_string_based_protocols(ndpi_str);
 }
@@ -4921,6 +4933,9 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
       ac_automata_finalize((AC_AUTOMATA_t *) a->ac_automa);
   }
 
+  /* AI endpoint module (segregated, see ndpi_ai.h): builds the SNI/Host automaton. */
+  ndpi_ai_init(ndpi_str);
+
   if(ndpi_str->cfg.track_payload_enabled)
     ndpi_str->max_payload_track_len = 1024; /* track up to X payload bytes */
 
@@ -5031,6 +5046,10 @@ int ndpi_get_automa_stats(struct ndpi_detection_module_struct *ndpi_struct,
 
   case NDPI_AUTOMA_COMMON_ALPNS:
     ndpi_automa_get_stats(ndpi_struct->common_alpns_automa.ac_automa, stats);
+    return 0;
+
+  case NDPI_AUTOMA_AI_ENDPOINT:
+    ndpi_automa_get_stats(ndpi_struct->ai_endpoint_automa.ac_automa, stats);
     return 0;
 
   default:
@@ -5321,6 +5340,8 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->common_alpns_automa.ac_automa != NULL)
       ac_automata_release((AC_AUTOMATA_t *) ndpi_str->common_alpns_automa.ac_automa,
 			  1 /* free patterns strings memory */);
+
+    ndpi_ai_cleanup(ndpi_str);
 
     if(ndpi_str->trusted_issuer_dn) {
       ndpi_list *head = ndpi_str->trusted_issuer_dn;
@@ -12838,6 +12859,28 @@ int ndpi_match_hostname_protocol(struct ndpi_detection_module_struct *ndpi_struc
 
   subproto = ndpi_match_host_subprotocol(ndpi_struct, &flow->core, what, what_len,
 					 &ret_match, master_protocol, 1);
+
+  /*
+    AI endpoint identification (segregated namespace, see ndpi_ai.h). Independent of
+    the host sub-protocol match above: a flow to a known AI provider is classified
+    as NDPI_PROTOCOL_AI (category ARTIFICIAL_INTELLIGENCE) with flow->ai_endpoint
+    set to the specific provider/engine. The SNI/Host check is in ndpi_ai.c.
+
+    Primary evidence is the peer name (SNI/Host). Under ECH the SNI is the CDN's
+    name, not the provider's, so fall back to the DNS answer the client itself
+    resolved (cached by peer IP, see ndpi_ai_by_ip in ndpi_ai.h).
+  */
+  {
+    u_int16_t ai_ep = ndpi_ai_check_hostname(ndpi_struct, what, what_len);
+    if(!ndpi_ai_endpoint_is_valid(ai_ep))
+      ai_ep = ndpi_ai_by_ip(ndpi_struct, flow);
+    if(ndpi_ai_endpoint_is_valid(ai_ep)) {
+      ndpi_set_detected_protocol(ndpi_struct, &flow->core, NDPI_PROTOCOL_AI,
+                                 master_protocol, NDPI_CONFIDENCE_DPI);
+      flow->core.ai_endpoint = ai_ep;
+      flow->core.category = NDPI_PROTOCOL_CATEGORY_ARTIFICIAL_INTELLIGENCE;
+    }
+  }
 
   if(subproto != NDPI_PROTOCOL_UNKNOWN) {
     return(1);

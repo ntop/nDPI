@@ -4544,3 +4544,10 @@ References: `JanitorAI official site: <https://janitorai.com>`_
 Layer 2 Tunneling Protocol (L2TP) is a tunneling protocol used to support virtual private networks (VPNs) or as part of the delivery of services by ISPs.
 
 References: `Wikipedia: <https://en.wikipedia.org/wiki/Layer_2_Tunneling_Protocol>`_
+
+
+.. _Proto_499:
+
+`NDPI_PROTOCOL_AI`
+==================
+Generic marker for traffic to AI services: hosted model providers (e.g. OpenAI, Anthropic, Google Gemini, DeepSeek, Mistral) and self-hosted inference engines (e.g. Ollama, vLLM, llama.cpp). It is a single protocol id; the specific endpoint (e.g. openai, anthropic, ollama) is reported separately in the flow's `ai_endpoint` field. Endpoints are identified from cleartext names (TLS SNI, HTTP Host header, DNS answers), so detection does not require decryption.

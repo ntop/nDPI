@@ -32,6 +32,7 @@
 #include "ndpi_includes.h"
 #include "ndpi_encryption.h"
 #include "ndpi_private.h"
+#include "ndpi_ai.h"
 
 #include "ahocorasick.h"
 #include "libcache.h"
@@ -2311,6 +2312,10 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
 
   ndpi_serialize_string_uint32(serializer, "ip", ip_version);
 
+  if(flow->core.ai_endpoint != NDPI_AI_ENDPOINT_NONE)
+    ndpi_serialize_string_string(serializer, "ai_endpoint",
+                                 ndpi_get_ai_endpoint_name(flow->core.ai_endpoint));
+
   if(flow->metadata.l4.tcp.fingerprint)
     ndpi_serialize_string_string(serializer, "tcp_fingerprint", flow->metadata.l4.tcp.fingerprint);
 
@@ -2320,6 +2325,8 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
   if(flow->metadata.l4.tcp.fingerprint) {
     ndpi_serialize_string_uint32(serializer, "tcp_mss", flow->metadata.l4.tcp.mss);
     ndpi_serialize_string_uint32(serializer, "tcp_fastopen", flow->metadata.l4.tcp.fastopen);
+    ndpi_serialize_string_string(serializer, "tcp_os",
+				 ndpi_print_os_hint(flow->metadata.l4.tcp.os_hint));
   }
 
   if(flow->metadata.ndpi.client_fingerprint || flow->metadata.ndpi.server_fingerprint) {
@@ -4641,7 +4648,7 @@ const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx)
 {
   const char *names[NDPI_LRUCACHE_MAX] = { "ookla", "bittorrent", "stun",
                                            "tls_cert", "mining", "msteams",
-                                           "fpc_dns", "signal" };
+                                           "fpc_dns", "ai_endpoint", "signal" };
 
   if(idx < 0 || idx >= NDPI_LRUCACHE_MAX)
     return "unknown";
