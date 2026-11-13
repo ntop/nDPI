@@ -10765,38 +10765,38 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
 
 /* ********************************************************************************* */
 
-static char* ndpi_expected_ports_str(ndpi_port_range *default_ports, char *str, u_int str_len) {
-  int rc;
+static char* ndpi_expected_ports_str(struct ndpi_detection_module_struct *ndpi_str,
+                                     struct ndpi_flow_struct *flow,
+                                     u_int16_t proto_id,
+                                     ndpi_port_range *default_ports,
+                                     char *str, u_int str_len) {
+  u_int8_t i, num_ports = 0;
+  int offset, rc;
 
-  str[0] = '\0';
+  offset = snprintf(str, str_len, "%s expected on port ", ndpi_get_proto_name(ndpi_str, proto_id));
 
-  if(default_ports[0].port_low != 0) {
-    u_int8_t i, offset;
+  for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i].port_low != 0) && (offset < (int)str_len); i++) {
+    if(default_ports[i].is_custom)
+      continue;
 
-    offset = snprintf(str, str_len, "Expected on port ");
+    if(default_ports[i].port_low == default_ports[i].port_high)
+      rc = snprintf(&str[offset], str_len-offset, "%s%u",
+                    (num_ports > 0) ? "," : "",
+                    default_ports[i].port_low);
+    else
+      rc = snprintf(&str[offset], str_len-offset, "%s%u-%u",
+                    (num_ports > 0) ? "," : "",
+                    default_ports[i].port_low,
+                    default_ports[i].port_high);
 
-    for(i=0; (i<MAX_DEFAULT_PORTS) && (default_ports[i].port_low != 0); i++) {
-      if(default_ports[i].is_custom)
-        continue;
+    if(rc <= 0)
+      break;
 
-      if(default_ports[i].port_low == default_ports[i].port_high)
-        rc = snprintf(&str[offset], str_len-offset, "%s%u",
-		      (i > 0) ? "," : "",
-		      default_ports[i].port_low);
-      else
-        rc = snprintf(&str[offset], str_len-offset, "%s%u-%u",
-                      (i > 0) ? "," : "",
-                      default_ports[i].port_low,
-                      default_ports[i].port_high);
-
-      if(rc > 0)
-	offset += rc;
-      else
-	break;
-    }
-
-    str[offset] = '\0';
+    offset += rc, num_ports++;
   }
+
+  if(offset < (int)str_len)
+    snprintf(&str[offset], str_len-offset, ", using port %u", ntohs(flow->core.s_port));
 
   return(str);
 }
@@ -10882,7 +10882,7 @@ static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct
         if((r == NULL)
            || ((r->proto_idx != proto.app_protocol) && (r->proto_idx != proto.master_protocol))) {
           if(default_ports && (default_ports[0].port_low != 0)) {
-            char str[64];
+            char str[128];
             int only_custom = 1;
 
             /* "Default ports" set via custom rules are ignored */
@@ -10892,7 +10892,9 @@ static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct
 
             if(!only_custom)
               ndpi_set_risk(ndpi_str, &flow->core, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,
-                            ndpi_expected_ports_str(default_ports, str, sizeof(str)));
+                            ndpi_expected_ports_str(ndpi_str, flow,
+                                                    proto.master_protocol ? proto.master_protocol : proto.app_protocol,
+                                                    default_ports, str, sizeof(str)));
           }
         }
       }
@@ -10939,7 +10941,7 @@ static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct
             default_ports = NULL;
 
           if(default_ports && (default_ports[0].port_low != 0)) {
-            char str[64];
+            char str[128];
             int only_custom = 1;
 
             /* "Default ports" set via custom rules are ignored */
@@ -10949,7 +10951,9 @@ static void check_proto_on_non_std_port_risk(struct ndpi_detection_module_struct
 
             if(!only_custom)
               ndpi_set_risk(ndpi_str, &flow->core, NDPI_KNOWN_PROTOCOL_ON_NON_STANDARD_PORT,
-                            ndpi_expected_ports_str(default_ports, str, sizeof(str)));
+                            ndpi_expected_ports_str(ndpi_str, flow,
+                                                    proto.master_protocol ? proto.master_protocol : proto.app_protocol,
+                                                    default_ports, str, sizeof(str)));
           }
         }
       }
