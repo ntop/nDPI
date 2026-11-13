@@ -298,4 +298,6 @@ static inline u_int64_t get_u_int64_t(const u_int8_t* X, int O)
 
 #define FILE_EXTENSION_LEN    4
 
+#define MAX_NUM_TLS_MONITORED_BLOCKS 8
+
 #endif /* __NDPI_DEFINE_INCLUDE_FILE__ */

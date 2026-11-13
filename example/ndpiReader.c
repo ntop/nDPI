@@ -1047,9 +1047,9 @@ static void help(u_int long_help) {
   if(long_help) {
     printf("\n\n"
 	   "Size of nDPI Flow structure:      %u\n"
-           "Size of nDPI Flow protocol union: %zu\n",
+           "Size of nDPI Flow protocol union: %llu\n",
            ndpi_detection_get_sizeof_ndpi_flow_struct(),
-           sizeof(((struct ndpi_flow_struct *)0)->metadata.protos));
+           (unsigned long long)sizeof(((struct ndpi_flow_struct *)0)->metadata.protos));
 
     printf("\n\nnDPI supported protocols:\n");
     printf("%3s %8s %-26s %-10s %-8s %-21s %-18s %-31s %-31s %6s\n",
