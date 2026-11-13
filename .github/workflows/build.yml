@@ -107,6 +107,7 @@ jobs:
             pcre: "--with-pcre2"
             maxminddb: "--with-maxminddb"
             msan: "--with-sanitizer"
+            cflags: "-fno-sanitize-recover=all"
           - compiler: "cc"
             os: macOS-latest
             pcre: "--with-pcre2"
