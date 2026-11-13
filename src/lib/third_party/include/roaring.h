@@ -1120,7 +1120,7 @@ static inline bool bitset_for_each(const bitset_t *b, bitset_iterator iterator,
 static inline void bitset_print(const bitset_t *b) {
     printf("{");
     for (size_t i = 0; bitset_next_set_bit(b, &i); i++) {
-        printf("%zu, ", i);
+        printf("%llu, ", (unsigned long long)i);
     }
     printf("}");
 }
