@@ -376,7 +376,8 @@ static void ndpi_validate_http_content(struct ndpi_detection_module_struct *ndpi
     NDPI_LOG_DBG(ndpi_struct, "\n");
   }
 
-  if((flow->metadata.http.user_agent == NULL) || (flow->metadata.http.user_agent[0] == '\0'))
+  if(flow->core.category != NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK && /* It is common to have ConnChecks without useragent */
+     ((flow->metadata.http.user_agent == NULL) || (flow->metadata.http.user_agent[0] == '\0')))
     ndpi_set_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_USER_AGENT, "Empty or missing User-Agent");
 }
 
@@ -1506,6 +1507,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
       if(ndpi_ends_with(ndpi_struct, (char *)flow->metadata.http.url, "/generate_204") ||
          ndpi_ends_with(ndpi_struct, (char *)flow->metadata.http.url, "/generate204")) {
         flow->core.category = NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK;
+        /* It is common to have ConnChecks without any user agent */
+        if(flow->metadata.http.user_agent == NULL)
+          ndpi_unset_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_USER_AGENT);
       }
     }
   }
@@ -1712,8 +1716,9 @@ static void process_request(struct ndpi_detection_module_struct *ndpi_struct,
   ndpi_int_http_add_connection(ndpi_struct, flow, master_protocol);
   check_content_type_and_change_protocol(ndpi_struct, flow);
 
-  if(flow->metadata.http.user_agent == NULL ||
-     flow->metadata.http.user_agent[0] == '\0') {
+  if(flow->core.category != NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK && /* It is common to have ConnChecks without useragent */
+     (flow->metadata.http.user_agent == NULL ||
+      flow->metadata.http.user_agent[0] == '\0')) {
     ndpi_set_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_USER_AGENT, "Empty or missing User-Agent");
   }
 }

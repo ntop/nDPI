@@ -998,6 +998,7 @@ static ndpi_protocol_match host_match[] =
    { "cdn.snapcraftcontent.com",            "Canonical",        NDPI_PROTOCOL_CANONICAL, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "launchpadcontent.net",                "Canonical",        NDPI_PROTOCOL_CANONICAL, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "launchpad.net",                       "Canonical",        NDPI_PROTOCOL_CANONICAL, NDPI_PROTOCOL_CATEGORY_CLOUD, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
+   { "connectivity-check.ubuntu.com",       "Canonical",        NDPI_PROTOCOL_CANONICAL, NDPI_PROTOCOL_CATEGORY_CONNECTIVITY_CHECK, NDPI_PROTOCOL_SAFE, NDPI_PROTOCOL_DEFAULT_LEVEL },
 
    { "signal.org",                            "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
    { "whispersystems.org",                    "Signal",           NDPI_PROTOCOL_SIGNAL, NDPI_PROTOCOL_CATEGORY_CHAT, NDPI_PROTOCOL_ACCEPTABLE, NDPI_PROTOCOL_DEFAULT_LEVEL },
