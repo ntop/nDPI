@@ -128,51 +128,39 @@ static int isLLMNRMulticastAddress(struct ndpi_packet_struct *const packet)
 
 /* *********************************************** */
 
-static u_int16_t checkPort(struct ndpi_packet_struct * packet,
-			   bool is_src_port,
-			   u_int16_t port, bool is_response) {
-  /* Multicast addresses are used only for requests */
+/*
+  Classification is based on the current packet only (not on the flow
+  client/server ports, that are a guess and can be wrong, i.e. on
+  response-only flows or with queries sent from port 53):
+  * queries: the multicast group is authoritative; otherwise the
+    responder (i.e. destination) port. Unicast queries are allowed both
+    by MDNS (RFC6762 5.5) and by LLMNR (RFC4795 2.4, also over TCP)
+  * responses: the responder (i.e. source) port is authoritative
+*/
+static u_int16_t checkDNSSubprotocol(struct ndpi_packet_struct *packet,
+				     bool is_response) {
+  u_int16_t responder_port = 0;
 
-  switch(port) {
-  case DNS_PORT:
-    return(NDPI_PROTOCOL_DNS);
-  case LLMNR_PORT:
-    if(is_response || isLLMNRMulticastAddress(packet)) {
-      if(is_response && is_src_port && (port == 53))
-	return(NDPI_PROTOCOL_DNS);
-      else
-	return(NDPI_PROTOCOL_LLMNR);
-    }
-    break;
-  case MDNS_PORT:
-    if(is_response || isMDNSMulticastAddress(packet)) {
-      if(is_response && is_src_port && (port == 53))
-	return(NDPI_PROTOCOL_DNS);
-      else
-	return(NDPI_PROTOCOL_MDNS);
-    }
+  if(!is_response) {
+    if(isMDNSMulticastAddress(packet))
+      return(NDPI_PROTOCOL_MDNS);
+    if(isLLMNRMulticastAddress(packet))
+      return(NDPI_PROTOCOL_LLMNR);
   }
 
-  return(0);
-}
+  if(packet->udp)
+    responder_port = ntohs(is_response ? packet->udp->source : packet->udp->dest);
+  else if(packet->tcp)
+    responder_port = ntohs(is_response ? packet->tcp->source : packet->tcp->dest);
 
-/* *********************************************** */
-
-static u_int16_t checkDNSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct,
-				     struct ndpi_packet_struct * packet,
-                                     u_int16_t sport, u_int16_t dport,
-				     bool is_response) {
-  u_int16_t rc = checkPort(packet, true, sport, is_response);
-
-  if(rc == 0)
-    rc = checkPort(packet, false, dport, is_response);
-
-  if(rc == 0 && ndpi_struct->cfg.dns_custom_port != 0 &&
-     (sport == (u_int16_t)ndpi_struct->cfg.dns_custom_port ||
-      dport == (u_int16_t)ndpi_struct->cfg.dns_custom_port))
-    return NDPI_PROTOCOL_DNS;
-
-  return rc == 0 ? NDPI_PROTOCOL_DNS : rc;
+  switch(responder_port) {
+  case MDNS_PORT:
+    return(NDPI_PROTOCOL_MDNS);
+  case LLMNR_PORT:
+    return(NDPI_PROTOCOL_LLMNR);
+  default:
+    return(NDPI_PROTOCOL_DNS);
+  }
 }
 
 /* *********************************************** */
@@ -750,7 +738,6 @@ static int process_additionals(struct ndpi_detection_module_struct *ndpi_struct,
 /* *********************************************** */
 
 static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
-			struct ndpi_flow_core_struct *core,
 			struct ndpi_dns_packet_header *dns_header,
 			u_int payload_offset, u_int8_t *is_query) {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
@@ -795,7 +782,7 @@ static int is_valid_dns(struct ndpi_detection_module_struct *ndpi_struct,
     }
   } else {
     if(((dns_header->num_queries > 0 && dns_header->num_queries <= NDPI_MAX_DNS_REQUESTS) || /* Don't assume that num_queries must be zero */
-        (checkDNSSubprotocol(ndpi_struct, packet, ntohs(core->c_port), ntohs(core->s_port), true) == NDPI_PROTOCOL_MDNS && dns_header->num_queries == 0)) &&
+        (checkDNSSubprotocol(packet, true) == NDPI_PROTOCOL_MDNS && dns_header->num_queries == 0)) &&
        ((dns_header->num_answers > 0 && dns_header->num_answers <= NDPI_MAX_DNS_REQUESTS) ||
         (dns_header->authority_rrs > 0 && dns_header->authority_rrs <= NDPI_MAX_DNS_REQUESTS) ||
         (dns_header->additional_rrs > 0 && dns_header->additional_rrs <= NDPI_MAX_DNS_REQUESTS) ||
@@ -1079,7 +1066,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
   char invalid_character = 0;
   struct ndpi_flow_core_struct *core = &flow->core;
 
-  proto->master_protocol = checkDNSSubprotocol(ndpi_struct, packet, ntohs(core->s_port), ntohs(core->c_port), is_response);
+  proto->master_protocol = checkDNSSubprotocol(packet, is_response);
   proto->app_protocol = core->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN ? core->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN;
 
   /* We try to get hostname only from "standard" query/answer */
@@ -1181,7 +1168,7 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
     payload_offset = 2;
   }
 
-  if(!is_valid_dns(ndpi_struct, core, &dns_header, payload_offset, &is_query)) {
+  if(!is_valid_dns(ndpi_struct, &dns_header, payload_offset, &is_query)) {
 #ifdef DNS_DEBUG
     printf("[DNS] invalid packet\n");
 #endif
@@ -1362,24 +1349,9 @@ bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_
 
   NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
 
-  if(packet->udp != NULL && packet->payload_packet_len >= 4) {
-    bool is_query = ((packet->payload[2] & 0x80) == 0x0000) ? true : false;
-
+  if(packet->udp != NULL) {
     s_port = ntohs(packet->udp->source);
     d_port = ntohs(packet->udp->dest);
-
-    if(is_query) {
-      /* For MDNS/LLMNR: If the packet is not a response, dest addr needs to be multicast. */
-      if ((d_port == MDNS_PORT && isMDNSMulticastAddress(packet) == 0) ||
-	  (d_port == LLMNR_PORT && isLLMNRMulticastAddress(packet) == 0)) {
-	if (packet->payload_packet_len > 5 &&
-	    ntohs(get_u_int16_t(packet->payload, 2)) != 0 &&
-	    ntohs(get_u_int16_t(packet->payload, 4)) != 0) {
-	  NDPI_EXCLUDE_CORE_DISSECTOR(ndpi_struct, core);
-	  return(false);
-	}
-      }
-    }
   } else if(packet->tcp != NULL) {
     s_port = ntohs(packet->tcp->source);
     d_port = ntohs(packet->tcp->dest);
