@@ -143,6 +143,7 @@ static u_int16_t checkPort(struct ndpi_packet_struct * packet,
       else
 	return(NDPI_PROTOCOL_LLMNR);
     }
+    break;
   case MDNS_PORT:
     if(is_response || isMDNSMulticastAddress(packet)) {
       if(is_response && is_src_port && (port == 53))
@@ -1078,7 +1079,7 @@ static int process_hostname(struct ndpi_detection_module_struct *ndpi_struct,
   char invalid_character = 0;
   struct ndpi_flow_core_struct *core = &flow->core;
 
-  proto->master_protocol = checkDNSSubprotocol(ndpi_struct, packet, ntohs(core->c_port), ntohs(core->s_port), is_response);
+  proto->master_protocol = checkDNSSubprotocol(ndpi_struct, packet, ntohs(core->s_port), ntohs(core->c_port), is_response);
   proto->app_protocol = core->detected_protocol_stack[1] != NDPI_PROTOCOL_UNKNOWN ? core->detected_protocol_stack[0] : NDPI_PROTOCOL_UNKNOWN;
 
   /* We try to get hostname only from "standard" query/answer */
@@ -1361,7 +1362,7 @@ bool ndpi_search_dns_tcp_udp_internal(struct ndpi_detection_module_struct *ndpi_
 
   NDPI_LOG_DBG(ndpi_struct, "search DNS\n");
 
-  if(packet->udp != NULL) {
+  if(packet->udp != NULL && packet->payload_packet_len >= 4) {
     bool is_query = ((packet->payload[2] & 0x80) == 0x0000) ? true : false;
 
     s_port = ntohs(packet->udp->source);
