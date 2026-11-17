@@ -36,5 +36,5 @@ All funds collected from commercial nDPI licensing fees will be directly reinves
 We deeply value the developers who help make nDPI better. To recognize their work, ntop reserves the right to fully waive licensing fees for code contributors who are actively developing and maintaining the library. If you actively give back to the project through high-quality code and extensions, we want to support you in return.
 
 ## Questions?
-Please mail license@ntop.org
+Please mail ndpi-license@ntop.org
 
