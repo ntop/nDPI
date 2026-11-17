@@ -2100,20 +2100,13 @@ static void tlsCheckUncommonALPN(struct ndpi_detection_module_struct *ndpi_struc
 
     if(!is_a_common_alpn(ndpi_struct, alpn_start, alpn_len)) {
       if(is_flowrisk_info_enabled(ndpi_struct, NDPI_TLS_UNCOMMON_ALPN)) {
-        char str[64];
-        size_t str_len;
+        char str[96];
 
 #ifdef DEBUG_TLS
         printf("TLS uncommon ALPN found: %.*s\n", (int)alpn_len, alpn_start);
 #endif
 
-        str[0] = '\0';
-        str_len = ndpi_min(alpn_len, sizeof(str));
-        if(str_len > 0) {
-          strncpy(str, alpn_start, str_len);
-          str[str_len - 1] = '\0';
-        }
-
+        snprintf(str, sizeof(str), "Uncommon ALPN: %.*s", (int)alpn_len, alpn_start);
         ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_UNCOMMON_ALPN, str);
       } else {
         ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_UNCOMMON_ALPN, NULL);
