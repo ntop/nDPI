@@ -204,8 +204,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        # macos-14,15 and 26 are on **ARM64**
-        os: ["ubuntu-22.04", "ubuntu-24.04", "ubuntu-26.04", "macos-15-intel", "macOS-14", "macOS-15", "macOS-26", "ubuntu-22.04-arm", "ubuntu-24.04-arm", "ubuntu-26.04-arm"]
+        # macos-15 and 26 are on **ARM64**
+        os: ["ubuntu-22.04", "ubuntu-24.04", "ubuntu-26.04", "macos-15-intel", "macOS-15", "macOS-26", "ubuntu-22.04-arm", "ubuntu-24.04-arm", "ubuntu-26.04-arm"]
         gcrypt: ["", "--with-local-libgcrypt"]
     steps:
       - uses: actions/checkout@v6
@@ -256,7 +256,7 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: git mingw-w64-x86_64-toolchain automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap mingw-w64-x86_64-libgcrypt parallel
+          install: git mingw-w64-x86_64-toolchain mingw-w64-x86_64-pkgconf automake1.16 automake-wrapper autoconf libtool make mingw-w64-x86_64-json-c mingw-w64-x86_64-crt-git mingw-w64-x86_64-pcre mingw-w64-x86_64-libpcap mingw-w64-x86_64-libgcrypt parallel
       - name: Configure nDPI on Windows msys2
         run: |
           msys2 -c './autogen.sh && ./configure --enable-option-checking=fatal --enable-debug-messages --disable-npcap --with-local-libgcrypt'
@@ -282,14 +282,14 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        compiler: ["gcc-14", "clang-18"] # "Newest" gcc/clang easily available
+        compiler: ["gcc-15", "clang-22"] # "Newest" gcc/clang easily available
         include:
-          - compiler: "gcc-14"
+          - compiler: "gcc-15"
             ar: "ar"
             ranlib: "ranlib"
-          - compiler: "clang-18"
-            ar: "llvm-ar-18"
-            ranlib: "llvm-ranlib-18"
+          - compiler: "clang-22"
+            ar: "llvm-ar-22"
+            ranlib: "llvm-ranlib-22"
     steps:
       - uses: actions/checkout@v6
         with:
@@ -297,7 +297,7 @@ jobs:
       - name: Install Ubuntu Prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install autoconf automake debhelper libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev parallel
+          sudo apt-get install autoconf automake debhelper libtool pkg-config gettext libjson-c-dev flex bison libpcap-dev rrdtool librrd-dev parallel binutils-gold
       - name: Configure nDPI
         run: |
           ./autogen.sh && AR=${{ matrix.ar }} RANLIB=${{ matrix.ranlib }} ./configure --enable-option-checking=fatal --enable-debug-messages --with-sanitizer --with-lto-and-gold-linker
@@ -388,15 +388,9 @@ jobs:
       - name: Build nDPI
         run: |
           make -j $(nproc) all
-      - name: Build bpftool
-        run: |
-          # Temporary workaround: some 6.14 kernels don't have bpftool (and perf) in their packages
-          # See: https://bugs.launchpad.net/ubuntu/+source/linux-hwe-6.14/+bug/2117147
-          # See: https://gist.github.com/karlivory/9111f906f4eb06370b2b237c62a6b00e
-          curl -L -O https://gist.githubusercontent.com/karlivory/9111f906f4eb06370b2b237c62a6b00e/raw/dbd24228dda79e05815531a1db643d0709301838/build-perf.sh
-          sudo bash build-perf.sh
       - name: Generate header file for bpftrace
         run: |
+          bpftool --version
           pahole -J src/lib/libndpi.so
           pahole -J example/ndpiReader
           bpftool btf dump file example/ndpiReader format c > ndpi_types.h

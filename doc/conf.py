@@ -27,10 +27,6 @@ extensions = [
     # 'myst_parser'
 ]
 
-# Workaround for platforms where swaggerdoc is not available
-if not os.environ.get("PYTHON_SKIP_SWAGGERDOC"):
-    extensions.append('sphinxcontrib.swaggerdoc')
-
 breathe_projects = { "apidoc" : "doxygen/xml/" }
 breathe_default_project = "apidoc"
 
