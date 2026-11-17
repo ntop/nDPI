@@ -25,6 +25,7 @@
 #endif
 
 #include "ndpi_api.h"
+#include "ndpi_ai.h"
 #include "../src/lib/third_party/include/uthash.h"
 #include "../src/lib/third_party/include/ahocorasick.h"
 
@@ -2368,6 +2369,13 @@ static void printFlow(u_int32_t id, struct ndpi_flow_info *flow, u_int16_t threa
 	      ndpi_category_get_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
 				     flow->detected_protocol.category),
 	      (unsigned int)flow->detected_protocol.category);
+
+    if(flow->host_server_name[0] != '\0') {
+      u_int16_t ai_ep = ndpi_get_ai_endpoint_by_name(ndpi_thread_info[thread_id].workflow->ndpi_struct,
+                                                    flow->host_server_name, strlen(flow->host_server_name));
+      if(ai_ep != NDPI_AI_ENDPOINT_NONE)
+        fprintf(out, "[ai_endpoint: %s]", ndpi_get_ai_endpoint_name(ai_ep));
+    }
 
     breed = flow->detected_protocol.breed;
     fprintf(out, "[Breed: %s]", ndpi_get_proto_breed_name(breed));
