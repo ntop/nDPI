@@ -9681,21 +9681,23 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
 
 static void check_tcp_flags(struct ndpi_detection_module_struct *ndpi_struct, struct ndpi_flow_struct *flow) {
   // printf("[TOTAL] %u / %u [tot: %u]\n", flow->core.packet_direction_complete_counter[0], flow->core.packet_direction_complete_counter[1], flow->core.all_packets_counter);
-  bool is_probing = false;
+  const char *issue = NULL, *reason = NULL;
 
   if((flow->metadata.l4.tcp.cli2srv_tcp_flags & TH_SYN)
      && (flow->metadata.l4.tcp.srv2cli_tcp_flags & TH_RST)
      && (flow->core.packet_counter == 0 /* Ignore connections terminated by RST but that exchanged data (3WH + RST) */))
-    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TCP_ISSUES, "Connection refused (server)"), is_probing = true;
+    issue = "Connection refused (server)", reason = "Server answered the SYN with a RST, no data exchanged";
   else if((flow->metadata.l4.tcp.cli2srv_tcp_flags & TH_SYN)
 	  && (flow->metadata.l4.tcp.cli2srv_tcp_flags & TH_RST)
 	  && (flow->core.packet_counter == 0 /* Ignore connections terminated by RST but that exchanged data (3WH + RST) */))
-    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TCP_ISSUES, "Connection refused (client)"), is_probing = true;
+    issue = "Connection refused (client)", reason = "Client sent SYN then RST, no data exchanged";
   else if((flow->metadata.l4.tcp.srv2cli_tcp_flags & TH_RST) && (flow->core.packet_direction_complete_counter[1 /* server -> client */] == 1))
-    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TCP_ISSUES, "Connection refused"), is_probing = true;
+    issue = "Connection refused", reason = "Server replied only with a RST";
 
-  if(is_probing)
-    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_PROBING_ATTEMPT, "TCP probing attempt");
+  if(reason) {
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TCP_ISSUES, (char*)issue);
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_PROBING_ATTEMPT, (char*)reason);
+  }
 }
 
 /* ******************************************************************** */
@@ -9749,7 +9751,7 @@ static void check_probing_attempt(struct ndpi_detection_module_struct *ndpi_str,
 	switch(flow->core.detected_protocol_stack[0]) {
 	case NDPI_PROTOCOL_SSH:
 	  if(flow->metadata.protos.ssh.hassh_server[0] == '\0')
-	    ndpi_set_risk(ndpi_str, &flow->core, NDPI_PROBING_ATTEMPT, "SSH Probing");
+	    ndpi_set_risk(ndpi_str, &flow->core, NDPI_PROBING_ATTEMPT, "SSH probing: SSH session without server key exchange (no HASSH)");
 	  break;
 
 	case NDPI_PROTOCOL_TLS:
@@ -9758,7 +9760,7 @@ static void check_probing_attempt(struct ndpi_detection_module_struct *ndpi_str,
 	case NDPI_PROTOCOL_MAIL_IMAPS:
 	case NDPI_PROTOCOL_DTLS:
 	  if(flow->core.host_server_name == NULL)
-	    ndpi_set_risk(ndpi_str, &flow->core, NDPI_PROBING_ATTEMPT, "TLS Probing");
+	    ndpi_set_risk(ndpi_str, &flow->core, NDPI_PROBING_ATTEMPT, "TLS probing: TLS session without server name (no SNI)");
 	  break;
 	}
       }
