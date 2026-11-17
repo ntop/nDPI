@@ -9695,8 +9695,8 @@ static void check_tcp_flags(struct ndpi_detection_module_struct *ndpi_struct, st
     issue = "Connection refused", reason = "Server replied only with a RST";
 
   if(reason) {
-    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TCP_ISSUES, issue);
-    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_PROBING_ATTEMPT, reason);
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TCP_ISSUES, (char*)issue);
+    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_PROBING_ATTEMPT, (char*)reason);
   }
 }
 
