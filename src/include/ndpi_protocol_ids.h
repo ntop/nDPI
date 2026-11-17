@@ -528,6 +528,7 @@ typedef enum {
   NDPI_PROTOCOL_POWERSHELL            = 496,
   NDPI_PROTOCOL_JANITORAI             = 497,
   NDPI_PROTOCOL_L2TP                  = 498,
+   NDPI_PROTOCOL_AI                    = 499, /* Generic AI marker. The specific endpoint (hosted provider or self-hosted engine) is carried by flow->ai_endpoint, see ndpi_ai.h */
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 
