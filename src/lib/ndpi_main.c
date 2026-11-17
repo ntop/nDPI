@@ -10027,9 +10027,19 @@ static void internal_giveup(struct ndpi_detection_module_struct *ndpi_struct,
       }
     }
 
-    if(trigger_risk)
-      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MISMATCHING_PROTOCOL_WITH_IP,
-		    "nDPI protocol does not match the server IP address");
+    if(trigger_risk) {
+      char buf[128];
+      char *detected = ndpi_get_proto_name(ndpi_struct, flow->core.detected_protocol_stack[0]);
+
+      if(flow->core.guessed_protocol_id_by_ip == NDPI_PROTOCOL_UNKNOWN)
+	snprintf(buf, sizeof(buf), "%s protocol detected but server IP is not a known %s address",
+		 detected, detected);
+      else
+	snprintf(buf, sizeof(buf), "%s protocol detected but server IP belongs to %s",
+		 detected, ndpi_get_proto_name(ndpi_struct, flow->core.guessed_protocol_id_by_ip));
+
+      ndpi_set_risk(ndpi_struct, &flow->core, NDPI_MISMATCHING_PROTOCOL_WITH_IP, buf);
+    }
   }
 
   NDPI_DTRACE5(flow_classified,
