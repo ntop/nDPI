@@ -106,6 +106,8 @@ fi
 sep
 info "Installing cross-compilation toolchain (${TARGET_TRIPLE})"
 
+sudo apt-get update -q
+
 COMMON_PKGS=(autoconf automake libtool make file pkgconf parallel)
 
 # crossbuild-essential-s390x is available on Ubuntu 18.04+
@@ -162,23 +164,17 @@ EOF
             ok "${ports_file} already exists."
         fi
 
-        # Add 'Architectures: amd64 i386' to each stanza in ubuntu.sources
-        # that doesn't already have an Architectures field, so apt stops
-        # requesting s390x indices from archive.ubuntu.com.
-        if ! grep -q "^Architectures:" /etc/apt/sources.list.d/ubuntu.sources; then
-            info "Restricting ubuntu.sources to amd64 i386"
-            local tmpfile
-            tmpfile="$(mktemp)"
-            python3 -c "
-import re, sys
-content = open('/etc/apt/sources.list.d/ubuntu.sources').read()
-# Insert 'Architectures: amd64 i386' after every 'Components:' line
-content = re.sub(r'(Components:[^\n]+)', r'\1\nArchitectures: amd64 i386', content)
-sys.stdout.write(content)
-" >"${tmpfile}"
-            sudo cp "${tmpfile}" /etc/apt/sources.list.d/ubuntu.sources
-            rm -f "${tmpfile}"
-            ok "Restricted ubuntu.sources to amd64 i386."
+        # Add 'Architectures-Remove: s390x' to each stanza of ubuntu.sources, so
+        # apt stops requesting s390x indices from archive.ubuntu.com.
+        # Don't whitelist architectures (e.g. 'Architectures: amd64 i386'):
+        # that would also drop the architecture variants enabled on the host
+        # (e.g. amd64v3 on Ubuntu 26.04 GitHub runners); apt would then see the
+        # installed packages as coming from nowhere and try to downgrade them.
+        if ! grep -q "^Architectures" /etc/apt/sources.list.d/ubuntu.sources; then
+            info "Excluding s390x from ubuntu.sources"
+            sudo sed -i '/^Components:/a Architectures-Remove: s390x' \
+                /etc/apt/sources.list.d/ubuntu.sources
+            ok "Excluded s390x from ubuntu.sources."
         else
             ok "ubuntu.sources already has Architectures field."
         fi
@@ -465,14 +461,25 @@ if [[ -n "${READER}" ]]; then
     sep
     info "QEMU smoke test: ndpiReader -H"
 
-    QEMU_BIN=""
-    if command -v qemu-s390x-static &>/dev/null; then
-        QEMU_BIN="qemu-s390x-static"
-    else
-        info "qemu-user-static not installed; installing now..."
-        sudo apt-get install -y --no-install-recommends qemu-user-static
-        QEMU_BIN="qemu-s390x-static"
+    # Since QEMU 9.1 (e.g. Ubuntu 26.04) 'qemu-user-static' is only a virtual
+    # package: the static binaries ship in 'qemu-user' as qemu-s390x (no
+    # '-static' suffix) and binfmt registration is in 'qemu-user-binfmt'.
+    find_qemu() {
+        local b
+        for b in qemu-s390x-static qemu-s390x; do
+            if command -v "${b}" &>/dev/null; then echo "${b}"; return 0; fi
+        done
+        return 1
+    }
+
+    QEMU_BIN="$(find_qemu || true)"
+    if [[ -z "${QEMU_BIN}" ]]; then
+        info "QEMU user-mode emulation not installed; installing now..."
+        sudo apt-get install -y --no-install-recommends qemu-user-static \
+            || sudo apt-get install -y --no-install-recommends qemu-user-binfmt
+        QEMU_BIN="$(find_qemu)" || die "QEMU user-mode binary for s390x not found after install."
     fi
+    ok "QEMU: $(command -v "${QEMU_BIN}")"
 
     # Verify the s390x dynamic linker is accessible.  s390x ELFs embed the
     # interpreter as /lib/ld64.so.1; Ubuntu multiarch installs it at
@@ -501,9 +508,14 @@ if [[ -n "${READER}" ]]; then
         echo
         info "Running: QEMU_LD_PREFIX=/ LD_LIBRARY_PATH=${READER_LIB_DIR} ${QEMU_BIN} ${READER} -H"
         echo "----------------------------------------------------------------------"
+        # 'ndpiReader -H' prints the long help and exits with 0: any other
+        # exit code (crash, missing library, bad interpreter...) is a failure.
+        SMOKE_RC=0
         QEMU_LD_PREFIX=/ LD_LIBRARY_PATH="${READER_LIB_DIR:-.}" \
-            "${QEMU_BIN}" "${READER}" -H 2>&1 || true
+            "${QEMU_BIN}" "${READER}" -H 2>&1 || SMOKE_RC=$?
         echo "----------------------------------------------------------------------"
+        [[ "${SMOKE_RC}" -eq 0 ]] \
+            || die "ndpiReader -H failed under QEMU (exit code ${SMOKE_RC})."
         ok "ndpiReader -H executed successfully under QEMU."
     fi
 fi
@@ -580,6 +592,6 @@ echo "  ${TARGET_TRIPLE}-nm      '${LIB}' | head -20"
 echo
 if [[ -n "${READER}" ]]; then
 echo "To run the binary again:"
-echo "  QEMU_LD_PREFIX=/ LD_LIBRARY_PATH='${READER_LIB_DIR:-${BUILD_DIR}/src/lib}' qemu-s390x-static '${READER}' -H"
+echo "  QEMU_LD_PREFIX=/ LD_LIBRARY_PATH='${READER_LIB_DIR:-${BUILD_DIR}/src/lib}' ${QEMU_BIN:-qemu-s390x-static} '${READER}' -H"
 echo
 fi
