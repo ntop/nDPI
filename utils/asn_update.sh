@@ -215,6 +215,11 @@ DEST=../src/lib/inc_generated/ndpi_asn_imo.c.inc
 create_list NDPI_PROTOCOL_IMO $DEST "" "AS36131" "AS212879"
 echo "(3) IMO IPs are available in $DEST"
 
+echo "(1) Downloading Anthropic..."
+DEST=../src/lib/inc_generated/ndpi_asn_anthropic.c.inc
+create_list NDPI_PROTOCOL_ANTHROPIC $DEST "" "AS399358"
+echo "(3) Anthropic IPs are available in $DEST"
+
 if [ ${TOTAL_ASN} -eq 0 ] || [ ${TOTAL_ASN} -eq ${FAILED_ASN} ]; then
 	printf '%s: %s\n' "${0}" "All download(s) failed, ./get_routes_by_asn.sh broken?"
 	exit 1
