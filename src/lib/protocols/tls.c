@@ -3902,7 +3902,10 @@ compute_ja4c:
 		while(item != NULL) {
 		  if(item[0] == 'h') {
 		    /* Example 'h2' */
-		    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_ALPN_SNI_MISMATCH, item);
+		    char str[64];
+
+		    snprintf(str, sizeof(str), "HTTP ALPN '%s' advertised without SNI", item);
+		    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_ALPN_SNI_MISMATCH, str);
 		    break;
 		  } else
 		    item = strtok_r(NULL, ",", &tmp);
