@@ -32,6 +32,7 @@
 #include "ndpi_includes.h"
 #include "ndpi_encryption.h"
 #include "ndpi_private.h"
+#include "ndpi_ai.h"
 
 #include "ahocorasick.h"
 #include "libcache.h"
@@ -2310,6 +2311,10 @@ int ndpi_flow2json(struct ndpi_detection_module_struct *ndpi_struct,
   if(dst_port) ndpi_serialize_string_uint32(serializer, "dst_port", ntohs(dst_port));
 
   ndpi_serialize_string_uint32(serializer, "ip", ip_version);
+
+  if(flow->core.ai_endpoint != NDPI_AI_ENDPOINT_NONE)
+    ndpi_serialize_string_string(serializer, "ai_endpoint",
+                                 ndpi_get_ai_endpoint_name(flow->core.ai_endpoint));
 
   if(flow->metadata.l4.tcp.fingerprint)
     ndpi_serialize_string_string(serializer, "tcp_fingerprint", flow->metadata.l4.tcp.fingerprint);
