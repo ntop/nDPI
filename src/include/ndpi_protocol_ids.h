@@ -528,6 +528,7 @@ typedef enum {
   NDPI_PROTOCOL_POWERSHELL            = 496,
   NDPI_PROTOCOL_JANITORAI             = 497,
   NDPI_PROTOCOL_L2TP                  = 498,
+  NDPI_PROTOCOL_ANTHROPIC             = 499,
 
   /* If you add a new protocol, please update the documentation at doc/protocols.rst, too! */
 

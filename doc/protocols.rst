@@ -4544,3 +4544,12 @@ References: `JanitorAI official site: <https://janitorai.com>`_
 Layer 2 Tunneling Protocol (L2TP) is a tunneling protocol used to support virtual private networks (VPNs) or as part of the delivery of services by ISPs.
 
 References: `Wikipedia: <https://en.wikipedia.org/wiki/Layer_2_Tunneling_Protocol>`_
+
+
+.. _Proto_499:
+
+`NDPI_PROTOCOL_ANTHROPIC`
+=========================
+Anthropic is an AI safety and research company. This protocol covers its services, including the Claude AI assistant (claude.ai, claude.com), the Claude API (api.anthropic.com) and related content domains.
+
+References: `Anthropic official site: <https://www.anthropic.com/>`_
