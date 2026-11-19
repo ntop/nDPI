@@ -1062,7 +1062,7 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	      if(is_flowrisk_info_enabled(ndpi_struct, NDPI_TLS_CERTIFICATE_MISMATCH)) {
 	        char str[128];
 
-	        snprintf(str, sizeof(str), "%s vs %s", flow->core.host_server_name ? flow->core.host_server_name : "",
+	        snprintf(str, sizeof(str), "Requested %s (SNI) but certificate is for %s", flow->core.host_server_name ? flow->core.host_server_name : "",
 			 flow->metadata.protos.tls_quic.server_names);
 	        ndpi_set_risk(ndpi_struct, &flow->core, NDPI_TLS_CERTIFICATE_MISMATCH, str); /* Certificate mismatch */
 	      } else {
