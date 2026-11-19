@@ -1018,6 +1018,9 @@ struct ndpi_flow_tcp_struct {
   /* NDPI_PROTOCOL_RDP */
   u_int8_t rdp_protocol_detected:1;
 
+  /* NDPI_PROTOCOL_MQTT */
+  u_int8_t mqtt_weak_match:1;
+
   /* Reserved for future use */
   u_int64_t reserved:21;
 
