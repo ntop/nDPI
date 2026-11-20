@@ -694,6 +694,11 @@ int current_pkt_from_server_to_client(const struct ndpi_detection_module_struct 
 
 int ndpi_seen_flow_beginning(const struct ndpi_flow_struct *flow);
 
+/* Protobuf: shared with other dissectors (i.e. Meshtastic) */
+size_t ndpi_protobuf_dissect(unsigned char const * const buffer, size_t const size,
+                             size_t * const protobuf_elements,
+                             size_t * const protobuf_len_elements);
+
 void ndpi_set_detected_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 				struct ndpi_flow_core_struct *core,
 				u_int16_t upper_detected_protocol,

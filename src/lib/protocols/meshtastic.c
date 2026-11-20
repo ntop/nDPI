@@ -36,10 +36,6 @@ struct meshtastic_header {
   uint16_t length_be;
 } PACK_OFF;
 
-extern size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
-                               size_t * const protobuf_elements,
-                               size_t * const protobuf_len_elements);
-
 static void ndpi_int_meshtastic_add_connection(struct ndpi_detection_module_struct * const ndpi_struct,
                                                struct ndpi_flow_struct * const flow)
 {
@@ -84,8 +80,8 @@ static void ndpi_search_meshtastic(struct ndpi_detection_module_struct *ndpi_str
   size_t protobuf_elements = 0;
   size_t protobuf_len_elements = 0;
   if (protobuf_len > 0
-      && protobuf_dissect(&packet->payload[sizeof(*mhdr)], protobuf_len,
-                          &protobuf_elements, &protobuf_len_elements) != protobuf_len)
+      && ndpi_protobuf_dissect(&packet->payload[sizeof(*mhdr)], protobuf_len,
+                               &protobuf_elements, &protobuf_len_elements) != protobuf_len)
   {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
