@@ -1274,7 +1274,9 @@ void ndpi_hw_reset(struct ndpi_hw_struct *hw) {
 
   if(hw->y)
     memset(hw->y, 0, (hw->params.num_season_periods * sizeof(u_int64_t)));
-  else /* y is freed when the learning phase ends (see ndpi_hw_add_value): learning restarts now */
+  else if(hw->s)
+    /* y is freed when the learning phase ends (see ndpi_hw_add_value): learning restarts now.
+       s is NULL only if ndpi_hw_init() failed: there is nothing to restart then */
     hw->y = (u_int64_t*)ndpi_calloc(hw->params.num_season_periods, sizeof(u_int64_t));
   if(hw->s)
     memset(hw->s, 0, (hw->params.num_season_periods * sizeof(double)));

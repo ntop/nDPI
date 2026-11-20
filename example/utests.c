@@ -480,6 +480,11 @@ static void hwResetUnitTest() {
 
   ndpi_hw_free(&hw);
   ndpi_hw_free(&fresh);
+
+  /* ndpi_hw_reset() after a failed ndpi_hw_init() must not allocate anything */
+  assert(ndpi_hw_init(&hw, 65535, 1 /* additive */, 0.9, 0.9, 0.1, 0.05) != 0);
+  ndpi_hw_reset(&hw);
+  assert(hw.y == NULL && hw.s == NULL);
 }
 
 /* *********************************************** */
