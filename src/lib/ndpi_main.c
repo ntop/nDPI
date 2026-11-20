@@ -8284,10 +8284,18 @@ void ndpi_free_flow_core_data(struct ndpi_flow_core_struct *core) {
       ndpi_free(core->tls_quic.message[0].buffer);
       core->tls_quic.message[0].buffer = NULL;
     }
+    if(core->tls_quic.message[0].handshake_buffer) {
+      ndpi_free(core->tls_quic.message[0].handshake_buffer);
+      core->tls_quic.message[0].handshake_buffer = NULL;
+    }
 
     if(core->tls_quic.message[1].buffer) {
       ndpi_free(core->tls_quic.message[1].buffer);
       core->tls_quic.message[1].buffer = NULL;
+    }
+    if(core->tls_quic.message[1].handshake_buffer) {
+      ndpi_free(core->tls_quic.message[1].handshake_buffer);
+      core->tls_quic.message[1].handshake_buffer = NULL;
     }
 
     if(core->tls_quic.obfuscated_heur_state) {
