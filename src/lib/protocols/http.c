@@ -1481,9 +1481,9 @@ static void check_content_type_and_change_protocol(struct ndpi_detection_module_
           if(is_flowrisk_info_enabled(ndpi_struct, NDPI_HTTP_SUSPICIOUS_HEADER)) {
             char buf[64], msg[128];
 
-	    snprintf(msg, sizeof(msg), "Expected %s, found %s",
-		     ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)),
-		     flow->core.host_server_name);
+	    snprintf(msg, sizeof(msg), "HTTP Host header IP %s does not match server IP %s",
+		     flow->core.host_server_name,
+		     ndpi_intoav4(ntohl(ndpi_struct->packet.iph->daddr), buf, sizeof(buf)));
 	    ndpi_set_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_HEADER, msg);
           } else {
             ndpi_set_risk(ndpi_struct, &flow->core, NDPI_HTTP_SUSPICIOUS_HEADER, NULL);
