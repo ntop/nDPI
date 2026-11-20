@@ -2518,7 +2518,8 @@ int ndpi_serialize_end_of_list(ndpi_serializer *_serializer) {
 
     serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_LIST;
   } else {
-    if(serializer->status.buffer.size_used == serializer->buffer.size)
+    if(serializer->status.buffer.size_used == serializer->buffer.size &&
+       ndpi_extend_serializer_buffer(&serializer->buffer, 1) < 0)
       return(-1);
     serializer->buffer.data[serializer->status.buffer.size_used++] = ndpi_serialization_end_of_list;
   }
