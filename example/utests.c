@@ -451,6 +451,44 @@ static void desUnitStressTest() {
 
 /* *********************************************** */
 
+/* ndpi_hw_reset() after the learning phase: the structure must behave as a new one */
+static void hwResetUnitTest() {
+  struct ndpi_hw_struct hw, fresh;
+  u_int64_t v[] = { 10, 14, 8, 25, 16, 22, 14, 35 };
+  u_int i, num = sizeof(v) / sizeof(v[0]);
+  u_int num_learning_points = 4;
+
+  assert(ndpi_hw_init(&hw, num_learning_points, 1 /* additive */, 0.9, 0.9, 0.1, 0.05) == 0);
+  assert(ndpi_hw_init(&fresh, num_learning_points, 1 /* additive */, 0.9, 0.9, 0.1, 0.05) == 0);
+
+  /* Go past the learning phase, then reset */
+  for(i=0; i<num; i++) {
+    double prediction, confidence_band;
+
+    ndpi_hw_add_value(&hw, v[i], &prediction, &confidence_band);
+  }
+  ndpi_hw_reset(&hw);
+
+  for(i=0; i<num; i++) {
+    double p1, c1, p2, c2;
+    int rc1 = ndpi_hw_add_value(&hw, v[i], &p1, &c1);
+    int rc2 = ndpi_hw_add_value(&fresh, v[i], &p2, &c2);
+
+    assert(rc1 == rc2);
+    assert(p1 == p2 && c1 == c2);
+  }
+
+  ndpi_hw_free(&hw);
+  ndpi_hw_free(&fresh);
+
+  /* ndpi_hw_reset() after a failed ndpi_hw_init() must not allocate anything */
+  assert(ndpi_hw_init(&hw, 65535, 1 /* additive */, 0.9, 0.9, 0.1, 0.05) != 0);
+  ndpi_hw_reset(&hw);
+  assert(hw.y == NULL && hw.s == NULL);
+}
+
+/* *********************************************** */
+
 static void hwUnitTest3() {
   struct ndpi_hw_struct hw;
   u_int num_learning_points = 3;
@@ -2497,6 +2535,7 @@ void run_unit_tests() {
   blocksUnitTest();
   binUnitTest();
   hwUnitTest();
+  hwResetUnitTest();
   jitterUnitTest();
   rsiUnitTest();
   strHashMapUnitTest();
