@@ -13,8 +13,14 @@ is_str_empty "${DOMAINS}" "Please check gambling sites URL and sed REGEX."
 
 printf '(2) %s\n' "Downloading Gambling Sites (Poland)"
 DOMAINS_PL="$(curl -L -s https://hazard.mf.gov.pl/api/Register)"
-DOMAINS_PL="$(echo "${DOMAINS_PL}" | xmllint --xpath "/*[local-name(.)='Rejestr']/*[local-name(.)='PozycjaRejestru']/*[local-name(.)='AdresDomeny']/text()" - || true)"
-is_str_empty "${DOMAINS_PL}" "Please check gambling sites URL and XPath."
+DOMAINS_PL="$(echo "${DOMAINS_PL}" | xmllint --xpath "/*[local-name(.)='Rejestr']/*[local-name(.)='PozycjaRejestru']/*[local-name(.)='AdresDomeny']/text()" - 2>/dev/null || true)"
+if [ -z "${DOMAINS_PL}" ]; then
+    if [ -s "${LIST}" ]; then
+        printf '%s\n' "Warning: Polish gambling list unavailable; keeping existing ${LIST}" >&2
+        exit 0
+    fi
+    is_str_empty "${DOMAINS_PL}" "Please check gambling sites URL and XPath."
+fi
 
 echo "${DOMAINS}" "${DOMAINS_PL}" | sort | uniq >${LIST}
 
