@@ -1603,12 +1603,25 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
     flow->dns.transaction_id = flow->ndpi_flow->metadata.protos.dns.transaction_id;
 
-    if(flow->ndpi_flow->metadata.protos.dns.cnames) {
-      flow->dns.num_cnames = flow->ndpi_flow->metadata.protos.dns.cnames->num_cnames;
-      for (int i = 0; i < flow->dns.num_cnames && i < MAX_NUM_DNS_CNAMES; ++i) {
-        strcpy(flow->dns.cname_domain_names[i], flow->ndpi_flow->metadata.protos.dns.cnames->cname_domain_names[i]);
-        flow->dns.cname_ttls[i] = flow->ndpi_flow->metadata.protos.dns.cnames->cname_ttls[i];
-      }
+    if (flow->ndpi_flow->metadata.protos.dns.cnames != NULL) {
+        struct ndpi_dns_cname_info *cnames =
+            flow->ndpi_flow->metadata.protos.dns.cnames;
+
+        flow->dns.num_cnames = cnames->num_cnames;
+        if (flow->dns.num_cnames > MAX_NUM_DNS_CNAMES)
+            flow->dns.num_cnames = MAX_NUM_DNS_CNAMES;
+
+        for (int i = 0; i < flow->dns.num_cnames; ++i) {
+            const char *src = cnames->cname_domain_names[i];
+
+            flow->dns.cname_domain_names[i][0] = '\0';
+            if (src != NULL)
+                snprintf(flow->dns.cname_domain_names[i],
+                        sizeof(flow->dns.cname_domain_names[i]),
+                        "%s", src);
+
+            flow->dns.cname_ttls[i] = cnames->cname_ttls[i];
+        }
     }
 
 #if 0
