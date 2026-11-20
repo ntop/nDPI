@@ -262,6 +262,40 @@ int serializerUnitTest() {
 
 /* *********************************************** */
 
+/* JSON: a tiny initial buffer must not change the output */
+int serializerJsonSmallBufferUnitTest(void)
+{
+  ndpi_serializer serializer, ref;
+  u_int32_t buffer_len, ref_len;
+  char *buffer, *ref_buffer;
+
+  assert(ndpi_init_serializer_ll(&ref, ndpi_serialization_format_json, 256) != -1);
+  assert(ndpi_serialize_string_uint32(&ref, "a", 1) != -1);
+  assert(ndpi_serialize_string_string(&ref, "b", "x") != -1);
+  assert(ndpi_serialize_end_of_record(&ref) != -1);
+  ref_buffer = ndpi_serializer_get_buffer(&ref, &ref_len);
+
+  assert(ndpi_init_serializer_ll(&serializer, ndpi_serialization_format_json, 3) != -1);
+  assert(ndpi_serialize_string_uint32(&serializer, "a", 1) != -1);
+  assert(ndpi_serialize_string_string(&serializer, "b", "x") != -1);
+  assert(ndpi_serialize_end_of_record(&serializer) != -1);
+  buffer = ndpi_serializer_get_buffer(&serializer, &buffer_len);
+
+  if(buffer_len != ref_len || memcmp(buffer, ref_buffer, ref_len) != 0) {
+    printf("%s: ERROR: output with a 3 bytes initial buffer: %.*s, expected: %.*s\n",
+           __func__, (int)buffer_len, buffer, (int)ref_len, ref_buffer);
+    return -1;
+  }
+
+  ndpi_term_serializer(&serializer);
+  ndpi_term_serializer(&ref);
+
+  printf("%30s                      OK\n", __func__);
+  return 0;
+}
+
+/* *********************************************** */
+
 /* The CSV fast path of ndpi_serialize_string_string_len() used to size the
    buffer growth request in u_int16_t: a value of exactly 65535 bytes wrapped
    "value_len + 1" to 0, skipping the growth, and the following needed-- re-wrapped
@@ -569,6 +603,7 @@ int main(int argc, char **argv) {
   /* Tests */
   if (serializerUnitTest() != 0) return -1;
   if (serializerCsvMaxLengthUnitTest() != 0) return -1;
+  if (serializerJsonSmallBufferUnitTest() != 0) return -1;
   if (serializerResetUnitTest() != 0) return -1;
   if (serializeProtoUnitTest() != 0) return -1;
 
