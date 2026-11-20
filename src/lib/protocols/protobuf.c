@@ -44,10 +44,6 @@ enum protobuf_type {
   PT_I32
 };
 
-size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
-                        size_t * const protobuf_elements,
-                        size_t * const protobuf_len_elements);
-
 static void ndpi_int_protobuf_add_connection(struct ndpi_detection_module_struct *ndpi_struct,
                                              struct ndpi_flow_struct *flow)
 {
@@ -100,9 +96,9 @@ protobuf_dissect_varint(unsigned char const * const buffer, size_t size,
   return 0;
 }
 
-size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
-                        size_t * const protobuf_elements,
-                        size_t * const protobuf_len_elements)
+size_t ndpi_protobuf_dissect(unsigned char const * const buffer, size_t const size,
+                             size_t * const protobuf_elements,
+                             size_t * const protobuf_len_elements)
 {
   *protobuf_elements = 0;
   *protobuf_len_elements = 0;
@@ -158,7 +154,8 @@ size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
           uint64_t as_u64;
           double as_double;
         } value;
-        value.as_u64 = le64toh(*(uint64_t *)&buffer[offset]);
+        memcpy(&value.as_u64, &buffer[offset], sizeof(value.as_u64));
+        value.as_u64 = le64toh(value.as_u64);
         printf("[I64: %lld / %llu / %lf]", (long long int)value.as_i64,
                (unsigned long long int)value.as_u64, value.as_double);
 #endif
@@ -203,7 +200,8 @@ size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
           uint32_t as_u32;
           float as_float;
         } value;
-        value.as_u32 = le32toh(*(uint32_t *)&buffer[offset]);
+        memcpy(&value.as_u32, &buffer[offset], sizeof(value.as_u32));
+        value.as_u32 = le32toh(value.as_u32);
         printf("[I32: %d / %u / %f]", value.as_i32, value.as_u32, value.as_float);
 #endif
         offset += 4;
@@ -217,10 +215,27 @@ size_t protobuf_dissect(unsigned char const * const buffer, size_t const size,
 #ifdef DEBUG_PROTOBUF
   printf(" [offset: %llu][length: %zu][elems: %llu][len_elems: %llu]\n",
          (unsigned long long int)offset, size,
-         (unsigned long long int)protobuf_elements,
-         (unsigned long long int)protobuf_len_elements);
+         (unsigned long long int)*protobuf_elements,
+         (unsigned long long int)*protobuf_len_elements);
 #endif
   return offset;
+}
+
+/* Printable ASCII text, CR/LF/TAB included (i.e. lines of a text based protocol).
+   A real protobuf message is hardly ever made only of these bytes: tags of fields 1-3,
+   lengths < 32 and most varint values are not printable */
+static int protobuf_is_text(unsigned char const * const buffer, size_t const size)
+{
+  size_t i;
+
+  for (i = 0; i < size; ++i)
+  {
+    if (ndpi_isprint(buffer[i]) == 0 && buffer[i] != '\r' && buffer[i] != '\n' && buffer[i] != '\t')
+    {
+      return 0;
+    }
+  }
+  return 1;
 }
 
 static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struct,
@@ -232,21 +247,33 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
 
   size_t protobuf_elements = 0;
   size_t protobuf_len_elements = 0;
-  size_t bytes_parsed = protobuf_dissect(packet->payload, packet->payload_packet_len,
-                                         &protobuf_elements, &protobuf_len_elements);
+  size_t bytes_parsed = ndpi_protobuf_dissect(packet->payload, packet->payload_packet_len,
+                                              &protobuf_elements, &protobuf_len_elements);
 
   if (bytes_parsed == 0) {
     NDPI_EXCLUDE_DISSECTOR(ndpi_struct, flow);
     return;
   }
 
-  if ((protobuf_elements >= PROTOBUF_REQUIRED_ELEMENTS && protobuf_len_elements > 0 &&
-       /* (On UDP) this packet might be also a RTP/RTCP one. Wait for the next one */
-       (flow->core.packet_counter > 1 || flow->core.l4_proto == IPPROTO_TCP || flow->metadata.rtp.rtp_stage == 0))
-      || (flow->core.packet_counter >= PROTOBUF_MIN_PACKETS && protobuf_elements >= PROTOBUF_MIN_ELEMENTS &&
-          /* The whole payload must have been parsed (i.e. we didn't stop because of PROTOBUF_MAX_ELEMENTS):
-             with few/short elements, lots of random/text payloads look like valid protobuf */
-          bytes_parsed >= packet->payload_packet_len))
+  /* Lots of text payloads (i.e. SMTP/FTP banners) look like valid protobuf: every printable
+     byte is a valid tag for about half of the values and a leading LEN element (i.e. the '2'
+     of a "220 ..." reply) skips most of the payload.
+     For the "strong" path, the parsing must not go beyond the payload (i.e. a LEN element
+     longer than the remaining bytes) and must cover the whole payload, unless we stopped
+     because of PROTOBUF_MAX_ELEMENTS */
+  int const fully_parsed = (bytes_parsed == packet->payload_packet_len) ||
+                           (bytes_parsed < packet->payload_packet_len &&
+                            protobuf_elements >= PROTOBUF_MAX_ELEMENTS);
+  int const is_text = protobuf_is_text(packet->payload, packet->payload_packet_len);
+
+  if (!is_text &&
+      ((protobuf_elements >= PROTOBUF_REQUIRED_ELEMENTS && protobuf_len_elements > 0 && fully_parsed &&
+        /* (On UDP) this packet might be also a RTP/RTCP one. Wait for the next one */
+        (flow->core.packet_counter > 1 || flow->core.l4_proto == IPPROTO_TCP || flow->metadata.rtp.rtp_stage == 0))
+       || (flow->core.packet_counter >= PROTOBUF_MIN_PACKETS && protobuf_elements >= PROTOBUF_MIN_ELEMENTS &&
+           /* The whole payload must have been parsed (i.e. we didn't stop because of PROTOBUF_MAX_ELEMENTS):
+              with few/short elements, lots of random/text payloads look like valid protobuf */
+           bytes_parsed >= packet->payload_packet_len)))
   {
 #ifdef DEBUG_PROTOBUF
     printf("Protobuf found after %u packets.\n", flow->core.packet_counter);
@@ -255,8 +282,9 @@ static void ndpi_search_protobuf(struct ndpi_detection_module_struct *ndpi_struc
     return;
   }
 
-  if (packet->payload_packet_len >= bytes_parsed
-      && protobuf_elements > 0
+  /* Note that bytes_parsed > payload_packet_len (the last LEN element continues in the next
+     TCP segments) is not a reason to exclude the protocol */
+  if (protobuf_elements > 0
       && flow->core.packet_counter <= PROTOBUF_MAX_PACKETS)
   {
     return; // We probably need more packets to dissect.
