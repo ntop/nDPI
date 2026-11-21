@@ -1022,11 +1022,68 @@ static int dns_tcp_process(struct ndpi_detection_module_struct *ndpi_struct,
 
 /* *********************************************** */
 
+static int dns_pending_transaction_find(const struct ndpi_flow_struct_dns_metadata *dns,
+                                       u_int16_t transaction_id)
+{
+  u_int8_t i;
+
+  for(i = 0; i < dns->num_pending_transactions; i++) {
+    if(dns->pending_transaction_id[i] == transaction_id)
+      return i;
+  }
+
+  return -1;
+}
+
+/* *********************************************** */
+
+static void dns_pending_transaction_add(struct ndpi_flow_struct_dns_metadata *dns,
+                                        u_int16_t transaction_id,
+                                        u_int16_t query_type)
+{
+  int i = dns_pending_transaction_find(dns, transaction_id);
+
+  if(i >= 0) {
+    dns->pending_query_type[i] = query_type;
+    return;
+  }
+
+  if(dns->num_pending_transactions == NDPI_MAX_DNS_TRANSACTIONS) {
+    memmove(&dns->pending_transaction_id[0], &dns->pending_transaction_id[1],
+            (NDPI_MAX_DNS_TRANSACTIONS - 1) * sizeof(dns->pending_transaction_id[0]));
+    memmove(&dns->pending_query_type[0], &dns->pending_query_type[1],
+            (NDPI_MAX_DNS_TRANSACTIONS - 1) * sizeof(dns->pending_query_type[0]));
+    dns->num_pending_transactions--;
+  }
+
+  i = dns->num_pending_transactions++;
+  dns->pending_transaction_id[i] = transaction_id;
+  dns->pending_query_type[i] = query_type;
+}
+
+/* *********************************************** */
+
+static void dns_pending_transaction_remove(struct ndpi_flow_struct_dns_metadata *dns,
+                                           u_int8_t index)
+{
+  if(index + 1 < dns->num_pending_transactions) {
+    memmove(&dns->pending_transaction_id[index], &dns->pending_transaction_id[index + 1],
+            (dns->num_pending_transactions - index - 1) * sizeof(dns->pending_transaction_id[0]));
+    memmove(&dns->pending_query_type[index], &dns->pending_query_type[index + 1],
+            (dns->num_pending_transactions - index - 1) * sizeof(dns->pending_query_type[0]));
+  }
+
+  dns->num_pending_transactions--;
+}
+
+/* *********************************************** */
+
 static int keep_extra_dissection(struct ndpi_flow_struct_dns_metadata *dns)
 {
-  /* As a general rule, we wait for a valid response
-     (in the ideal world, we want to process the request/response pair) */
-  return !(!dns->is_query && dns->num_answers != 0);
+  /* Keep looking while there are requests whose responses may still arrive.
+     A response with answers is not sufficient: several DNS transactions can
+     be outstanding on the same UDP flow and responses may arrive out of order. */
+  return dns->num_pending_transactions != 0;
 }
 
 /* *********************************************** */
@@ -1160,6 +1217,9 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
   u_int8_t valid_query_fields = 1;
   ndpi_master_app_protocol proto;
   int rc, strict_questions_end = -1;
+  int pending_transaction = -1;
+  int process_response = 0;
+  u_int16_t pending_query_type = 0;
   struct ndpi_flow_core_struct *core = &flow->core;
 
   if(packet->udp != NULL) {
@@ -1196,11 +1256,24 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
     }
   }
 
-  process_hostname(ndpi_struct, flow, &dns_header, &proto, !is_query);
+  if(!is_query) {
+    pending_transaction = dns_pending_transaction_find(dns, dns_header.tr_id);
+    if(pending_transaction >= 0)
+      pending_query_type = dns->pending_query_type[pending_transaction];
+    process_response = pending_transaction >= 0 || dns->num_pending_transactions == 0;
+  }
+
+  if(is_query || process_response)
+    process_hostname(ndpi_struct, flow, &dns_header, &proto, !is_query);
+  else {
+    proto.master_protocol = checkDNSSubprotocol(packet, true);
+    proto.app_protocol = NDPI_PROTOCOL_UNKNOWN;
+  }
 
   if(is_query) {
     dns->is_query = 1;
     dns->transaction_id = dns_header.tr_id;
+    dns->query_type = 0;
 
     if(strict_geometry) {
       rc = strict_questions_end;
@@ -1213,19 +1286,22 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
     if(rc == -1)
       printf("[DNS] Error queries (query msg)\n");
 #endif
+    if(rc != -1)
+      dns_pending_transaction_add(dns, dns_header.tr_id, dns->query_type);
   } else {
     dns->is_query = 0;
-    dns->transaction_id = dns_header.tr_id;
-    dns->reply_code = dns_header.flags & 0x0F;
-    dns->num_queries = dns_header.num_queries;
-    dns->num_answers = dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs;
+    if(process_response) {
+      dns->reply_code = dns_header.flags & 0x0F;
+      dns->num_queries = dns_header.num_queries;
+      dns->num_answers = dns_header.num_answers + dns_header.authority_rrs + dns_header.additional_rrs;
+    }
 
-    if(dns->reply_code != 0) {
+    if((dns_header.flags & 0x0F) != 0) {
       if(is_flowrisk_info_enabled(ndpi_struct, NDPI_ERROR_CODE_DETECTED)) {
         char str[32], buf[16];
 
         snprintf(str, sizeof(str), "DNS Error Code %s",
-                 dns_error_code2string(dns->reply_code, buf, sizeof(buf)));
+                 dns_error_code2string(dns_header.flags & 0x0F, buf, sizeof(buf)));
         ndpi_set_risk(ndpi_struct, core, NDPI_ERROR_CODE_DETECTED, str);
       } else {
         ndpi_set_risk(ndpi_struct, core, NDPI_ERROR_CODE_DETECTED, NULL);
@@ -1236,12 +1312,16 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
       }
     }
 
-    if(strict_geometry) {
-      rc = strict_questions_end;
-      if(dns->query_type == 0)
-        dns->query_type = strict_query_type;
+    if(process_response) {
+      if(strict_geometry) {
+        rc = strict_questions_end;
+        dns->query_type = pending_transaction >= 0 ? pending_query_type : strict_query_type;
+      } else {
+        dns->query_type = pending_transaction >= 0 ? pending_query_type : 0;
+        rc = process_queries(ndpi_struct, core, dns, &dns_header, off, NULL, NULL);
+      }
     } else {
-      rc = process_queries(ndpi_struct, core, dns, &dns_header, off, NULL, NULL);
+      rc = 0;
     }
     if(rc == -1) {
 #ifdef DNS_DEBUG
@@ -1249,13 +1329,19 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
     } else {
       off = rc;
-      rc = process_answers(ndpi_struct, core, dns, &dns_header, off, &proto);
+      if(process_response) {
+        dns->transaction_id = dns_header.tr_id;
+        dns->num_rsp_addr = 0;
+        rc = process_answers(ndpi_struct, core, dns, &dns_header, off, &proto);
+      } else {
+        rc = 0;
+      }
 
       if(rc == -1) {
 #ifdef DNS_DEBUG
         printf("[DNS] Error answers\n");
 #endif
-      } else {
+      } else if(process_response) {
         off = rc;
         rc = process_additionals(ndpi_struct, dns, &dns_header, off);
 #ifdef DNS_DEBUG
@@ -1264,6 +1350,9 @@ static void search_dns_tcp_udp(struct ndpi_detection_module_struct *ndpi_struct,
 #endif
       }
     }
+
+    if(pending_transaction >= 0)
+      dns_pending_transaction_remove(dns, pending_transaction);
 
     if(proto.master_protocol == NDPI_PROTOCOL_DNS &&
        /* TODO: add support to RFC6891 to avoid some false positives */
