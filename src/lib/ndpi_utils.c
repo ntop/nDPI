@@ -1291,6 +1291,8 @@ void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_list(serializer, "tls_blocks");
 
     for(i=0; i< flow->metadata.l4.tcp.tls.num_tls_blocks; i++) {
+      u_int avail;
+
       if(!flow->metadata.l4.tcp.tls.tls_blocks[i].same_pkt) {
 	if(idx > 0) {
 	  ndpi_serialize_string_string(serializer, "", buf);
@@ -1298,19 +1300,33 @@ void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
 	}
       }
 
+      avail = sizeof(buf) - idx - 1;
       if(ndpi_struct->cfg.tls_blocks_show_timing)
-	ret = snprintf(&buf[idx], sizeof(buf)-idx-1, "%s%s=%d@%u",
+	ret = snprintf(&buf[idx], avail, "%s%s=%d@%u",
 		       (idx > 0) ? "," : "",
 		       ndpi_print_encoded_tls_block_type(flow->metadata.l4.tcp.tls.tls_blocks[i].core.block_type, true),
 		       flow->metadata.l4.tcp.tls.tls_blocks[i].core.len,
 		       flow->metadata.l4.tcp.tls.tls_blocks[i].msec_delta);
       else
-	ret = snprintf(&buf[idx], sizeof(buf)-idx-1, "%s%s=%d",
+	ret = snprintf(&buf[idx], avail, "%s%s=%d",
 		       (idx > 0) ? "," : "",
 		       ndpi_print_encoded_tls_block_type(flow->metadata.l4.tcp.tls.tls_blocks[i].core.block_type, true),
 		       flow->metadata.l4.tcp.tls.tls_blocks[i].core.len);
 
-      if(ret > 0) idx += ret; else break;
+      if(ret <= 0)
+	break;
+
+      if((u_int)ret >= avail) {
+	/*
+	  truncated buffer: any remaining blocks are
+	  intentionally dropped rather than overrun
+	  the buffer
+	*/
+	idx = sizeof(buf) - 1;
+	break;
+      }
+
+      idx += ret;
     } /* for */
 
     if(idx > 0)
@@ -1401,7 +1417,7 @@ void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
       /* **************************** */
 
       ndpi_serialize_start_of_list(serializer, "key_share_group_ids");
-      
+
       for(i=0; i<c->num_key_share_groups; i++)
 	ndpi_serialize_string_uint32(serializer, "", c->key_share_group[i]);
 
@@ -1474,11 +1490,11 @@ void ndpi_serialize_tls_blocks(struct ndpi_detection_module_struct *ndpi_struct,
 
       ndpi_serialize_end_of_list(serializer);
 
-      
+
       /* **************************** */
 
       ndpi_serialize_start_of_list(serializer, "key_share_group_ids");
-      
+
       for(i=0; i<s->num_key_share_groups; i++)
 	ndpi_serialize_string_uint32(serializer, "", s->key_share_group[i]);
 
@@ -1539,7 +1555,7 @@ static void ndpi_tls2json(struct ndpi_detection_module_struct *ndpi_struct, ndpi
 
       if(flow->metadata.protos.tls_quic.ja3_server[0] !='\0')
 	ndpi_serialize_string_string(serializer, "ja3s", flow->metadata.protos.tls_quic.ja3_server);
-      
+
       ndpi_serialize_string_string(serializer, "ja4", flow->metadata.protos.tls_quic.ja4_client);
       ndpi_serialize_string_string(serializer, "tlsfp", flow->metadata.protos.tls_quic.tlsfp_client);
       ndpi_serialize_string_uint32(serializer, "unsafe_cipher", flow->metadata.protos.tls_quic.server_unsafe_cipher);
@@ -1743,7 +1759,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
     ndpi_serialize_start_of_block(serializer, "ntp");
     for (i = 0; i < 2; i++) {
       char timestamp[64];
-      
+
       ndpi_serialize_start_of_block_uint32(serializer,i);
       ndpi_serialize_string_uint32(serializer, "leap_indicator", flow->metadata.protos.ntp[i].leap_indicator);
       ndpi_serialize_string_uint32(serializer, "version", flow->metadata.protos.ntp[i].version);
@@ -2134,8 +2150,8 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	 || flow->metadata.protos.ipsec.proposal[NDPI_IKEV2_RESPONSE_PROPOSAL].proto_id) {
 	u_int8_t i;
 	ndpi_serializer sub_serializer, sub_sub_serializer;
-	
-	if(ndpi_init_serializer(&sub_serializer, ndpi_serialization_format_json) == -1)	
+
+	if(ndpi_init_serializer(&sub_serializer, ndpi_serialization_format_json) == -1)
 	  ;
 	else {
 	  ndpi_serializer *ser, *sser;
@@ -2145,7 +2161,7 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 	  for(i=0; i<2; i++) {
 	    struct ndpi_ipsec_proposal *p = &flow->metadata.protos.ipsec.proposal[i];
 	    int j;
-	    
+
 	    ndpi_serialize_string_string(ser, "type", (i == NDPI_IKEV2_REQUEST_PROPOSAL) ? "request" : "response");
 	    ndpi_serialize_string_uint32(ser, "protocol_id", p->proto_id);
 	    ndpi_serialize_string_uint32(ser, "num_transforms", p->num_transforms);
@@ -2166,16 +2182,16 @@ int ndpi_dpi2json(struct ndpi_detection_module_struct *ndpi_struct,
 		ndpi_serialize_string_uint32(sser, "transform_id",   p->transforms[j].transform_id);
 		ndpi_serialize_end_of_record(sser);
 	      }
-	      
+
 	      ndpi_serialize_end_of_record(sser);
-	      
+
 	      buffer = ndpi_serializer_get_buffer(sser, &buffer_len);
 	      if(buffer && (buffer_len > 0))
 		ndpi_serialize_string_raw(ser, "additional_key_exchanges", buffer, buffer_len);
 
 	      ndpi_term_serializer(sser);
 	    } /* if */
-	    
+
 	    ndpi_serialize_end_of_record(ser);
 	  } /* for */
 
@@ -5922,7 +5938,7 @@ const char* ndpi_tls_signature_algo2str(u_int16_t algo_id, char unknown_algo[8])
 
     // ECDSA_branchy (historical, not in standards)
   case 0x080F: return "ecdsa_branchy";
-  
+
     // ML-DSA schemes FIPS 204
   case 0x0904: return " ml_dsa_44";
   case 0x0905: return " ml_dsa_65";
