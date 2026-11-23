@@ -11,78 +11,38 @@ DEST_EC2=../src/lib/inc_generated/ndpi_amazon_aws_ec2_match.c.inc
 DEST_S3=../src/lib/inc_generated/ndpi_amazon_aws_s3_match.c.inc
 DEST_CLOUDFRONT=../src/lib/inc_generated/ndpi_amazon_aws_cloudfront_match.c.inc
 DEST_DYNAMODB=../src/lib/inc_generated/ndpi_amazon_aws_dynamodb_match.c.inc
-TMP=/tmp/aws.json
-LIST=/tmp/aws.list
-LIST6=/tmp/aws.list6
-LIST_MERGED=/tmp/aws.list_m
-LIST6_MERGED=/tmp/aws.list6_m
+TMP=$(mktemp)
+LIST_DIR=$(mktemp -d)
 ORIGIN=https://ip-ranges.amazonaws.com/ip-ranges.json
 
+cleanup() {
+    rm -f "${TMP}"
+    rm -rf "${LIST_DIR}"
+}
+trap cleanup EXIT
 
 echo "(1) Downloading file..."
-http_response=$(curl -L -s -o $TMP -w "%{http_code}" ${ORIGIN})
+http_response=$(curl --proto '=https' --proto-redir '=https' -L -s -o "${TMP}" -w "%{http_code}" "${ORIGIN}")
 check_http_response "${http_response}"
 is_file_empty "${TMP}"
 
 echo "(2) Processing IP addresses..."
+./aws_ip_addresses.py "${TMP}" "${LIST_DIR}"
 
-#API_GATEWAY
-jq -r '.prefixes[] | select(.service=="API_GATEWAY") | .ip_prefix' $TMP > $LIST
-./mergeipaddrlist.py $LIST > $LIST_MERGED
-jq -r '.ipv6_prefixes[] | select(.service=="API_GATEWAY") | .ipv6_prefix' $TMP > $LIST6
-./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
-./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_AWS_API_GATEWAY $LIST6_MERGED > $DEST_API_GATEWAY
+./ipaddr2list.py "${LIST_DIR}/API_GATEWAY" NDPI_PROTOCOL_AWS_API_GATEWAY "${LIST_DIR}/API_GATEWAY6" > "${DEST_API_GATEWAY}"
 is_file_empty "${DEST_API_GATEWAY}"
-
-#KINESIS
-jq -r '.prefixes[] | select(.service=="KINESIS_VIDEO_STREAMS") | .ip_prefix' $TMP > $LIST
-./mergeipaddrlist.py $LIST > $LIST_MERGED
-jq -r '.ipv6_prefixes[] | select(.service=="KINESIS_VIDEO_STREAMS") | .ipv6_prefix' $TMP > $LIST6
-./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
-./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_AWS_KINESIS $LIST6_MERGED > $DEST_KINESIS
+./ipaddr2list.py "${LIST_DIR}/KINESIS_VIDEO_STREAMS" NDPI_PROTOCOL_AWS_KINESIS "${LIST_DIR}/KINESIS_VIDEO_STREAMS6" > "${DEST_KINESIS}"
 is_file_empty "${DEST_KINESIS}"
-
-#EC2
-jq -r '.prefixes[] | select(.service=="EC2_INSTANCE_CONNECT" or .service=="EC2") | .ip_prefix' $TMP > $LIST
-./mergeipaddrlist.py $LIST > $LIST_MERGED
-jq -r '.ipv6_prefixes[] | select(.service=="EC2_INSTANCE_CONNECT" or .service=="EC2") | .ipv6_prefix' $TMP > $LIST6
-./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
-./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_AWS_EC2 $LIST6_MERGED > $DEST_EC2
+./ipaddr2list.py "${LIST_DIR}/EC2" NDPI_PROTOCOL_AWS_EC2 "${LIST_DIR}/EC26" > "${DEST_EC2}"
 is_file_empty "${DEST_EC2}"
-
-#S3
-jq -r '.prefixes[] | select(.service=="S3") | .ip_prefix' $TMP > $LIST
-./mergeipaddrlist.py $LIST > $LIST_MERGED
-jq -r '.ipv6_prefixes[] | select(.service=="S3") | .ipv6_prefix' $TMP > $LIST6
-./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
-./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_AWS_S3 $LIST6_MERGED > $DEST_S3
+./ipaddr2list.py "${LIST_DIR}/S3" NDPI_PROTOCOL_AWS_S3 "${LIST_DIR}/S36" > "${DEST_S3}"
 is_file_empty "${DEST_S3}"
-
-#CLOUDFRONT
-jq -r '.prefixes[] | select(.service=="CLOUDFRONT") | .ip_prefix' $TMP > $LIST
-./mergeipaddrlist.py $LIST > $LIST_MERGED
-jq -r '.ipv6_prefixes[] | select(.service=="CLOUDFRONT") | .ipv6_prefix' $TMP > $LIST6
-./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
-./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_AWS_CLOUDFRONT $LIST6_MERGED > $DEST_CLOUDFRONT
+./ipaddr2list.py "${LIST_DIR}/CLOUDFRONT" NDPI_PROTOCOL_AWS_CLOUDFRONT "${LIST_DIR}/CLOUDFRONT6" > "${DEST_CLOUDFRONT}"
 is_file_empty "${DEST_CLOUDFRONT}"
-
-#DYNAMODB
-jq -r '.prefixes[] | select(.service=="DYNAMODB") | .ip_prefix' $TMP > $LIST
-./mergeipaddrlist.py $LIST > $LIST_MERGED
-jq -r '.ipv6_prefixes[] | select(.service=="DYNAMODB") | .ipv6_prefix' $TMP > $LIST6
-./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
-./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_AWS_DYNAMODB $LIST6_MERGED > $DEST_DYNAMODB
+./ipaddr2list.py "${LIST_DIR}/DYNAMODB" NDPI_PROTOCOL_AWS_DYNAMODB "${LIST_DIR}/DYNAMODB6" > "${DEST_DYNAMODB}"
 is_file_empty "${DEST_DYNAMODB}"
-
-#Generic
-jq -r '.prefixes[] | select(.service | IN("API_GATEWAY","KINESIS_VIDEO_STREAMS","EC2_INSTANCE_CONNECT","EC2","S3","CLOUDFRONT","DYNAMODB") | not) | .ip_prefix' $TMP > $LIST
-./mergeipaddrlist.py $LIST > $LIST_MERGED
-jq -r '.ipv6_prefixes[] | select(.service | IN("API_GATEWAY","KINESIS_VIDEO_STREAMS","EC2_INSTANCE_CONNECT","EC2","S3","CLOUDFRONT","DYNAMODB") | not) | .ipv6_prefix' $TMP > $LIST6
-./mergeipaddrlist.py $LIST6 > $LIST6_MERGED
-./ipaddr2list.py $LIST_MERGED NDPI_PROTOCOL_AMAZON_AWS $LIST6_MERGED > $DEST
+./ipaddr2list.py "${LIST_DIR}/AMAZON_AWS" NDPI_PROTOCOL_AMAZON_AWS "${LIST_DIR}/AMAZON_AWS6" > "${DEST}"
 is_file_empty "${DEST}"
 
-rm -f ${TMP} ${LIST} ${LIST6} ${LIST_MERGED} ${LIST6_MERGED}
-
-echo "(3) Amazon AWS IPs are available in $DEST, $DEST_API_GATEWAY, $DEST_KINESIS, $DEST_EC2, $DEST_S3, $DEST_CLOUDFRONT, $DEST_DYNAMODB"
+echo "(3) Amazon AWS IPs are available in ${DEST}, ${DEST_API_GATEWAY}, ${DEST_KINESIS}, ${DEST_EC2}, ${DEST_S3}, ${DEST_CLOUDFRONT}, ${DEST_DYNAMODB}"
 exit 0
