@@ -261,6 +261,8 @@ u_int64_t ndpi_compare_flow_tls_blocks(struct ndpi_detection_module_struct *ndpi
 
 char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *ndpi_str,
 					 struct ndpi_flow_struct *flow) {
+  char *tcp_fp = (flow->core.l4_proto == IPPROTO_TCP) ? flow->metadata.l4.tcp.fingerprint : NULL;
+
   if(ndpi_str->cfg.ndpi_fingerprint_enabled &&
      (flow->metadata.ndpi.client_fingerprint == NULL) &&
      ndpi_stack_is_tls_like(&flow->core.protocol_stack) &&
@@ -272,7 +274,7 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
 	* no fingerprint for mid-flows
 	TODO: is that what we really want?
      */
-     (flow->metadata.l4.tcp.fingerprint || flow->metadata.protos.tls_quic.ja4_ndpi_client[0] != '\0')) {
+     (tcp_fp || flow->metadata.protos.tls_quic.ja4_ndpi_client[0] != '\0')) {
     char *l4_fp = "no_l4_fp";
     char *l7_pf = "no_app_fp_cli";
     char *l7_pf_tls_blocks = "";
@@ -283,8 +285,8 @@ char* ndpi_compute_ndpi_flow_fingerprint(struct ndpi_detection_module_struct *nd
     char l7_pf_tls_blocks_buf[256];
 
     if((!ndpi_str->cfg.tls_ndpifp_ignore_tcp_fingerprint)
-       && (flow->metadata.l4.tcp.fingerprint != NULL))
-      l4_fp = flow->metadata.l4.tcp.fingerprint;
+       && (tcp_fp != NULL))
+      l4_fp = tcp_fp;
 
     if(flow->metadata.protos.tls_quic.ja4_ndpi_client[0] != '\0')
       l7_pf = flow->metadata.protos.tls_quic.ja4_ndpi_client;

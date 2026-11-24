@@ -1820,7 +1820,8 @@ void process_ndpi_collected_info(struct ndpi_workflow * workflow, struct ndpi_fl
 
   flow->multimedia_flow_types |= flow->ndpi_flow->metadata.flow_multimedia_types;
 
-  if(flow->ndpi_flow->metadata.l4.tcp.fingerprint) {
+  if(flow->ndpi_flow->core.l4_proto == IPPROTO_TCP &&
+     flow->ndpi_flow->metadata.l4.tcp.fingerprint) {
     char buf[128];
 
     snprintf(buf, sizeof(buf), "%s/%s", flow->ndpi_flow->metadata.l4.tcp.fingerprint,
