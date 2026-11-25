@@ -785,7 +785,7 @@ int ndpi_serialize_raw_record(ndpi_serializer *_serializer,
   }
 
   if(serializer->fmt == ndpi_serialization_format_json) {
-    if (!serializer->multiline_json_array) {
+    if (!serializer->multiline_json_array && serializer->status.buffer.size_used > 0) {
       if (add_comma)
         serializer->buffer.data[serializer->status.buffer.size_used-1] = ',';
       else
@@ -906,7 +906,8 @@ static inline void ndpi_serialize_json_pre(ndpi_private_serializer *serializer,
     if(serializer->multiline_json_array) {
       serializer->buffer.data[serializer->status.buffer.size_used++] = '\n';
     } else {
-      serializer->status.buffer.size_used--; /* Remove ']' */
+      if(serializer->status.buffer.size_used > 0)
+        serializer->status.buffer.size_used--; /* Remove ']' */
       serializer->buffer.data[serializer->status.buffer.size_used++] = ',';
     }
     if (!serializer->inner_json)
@@ -914,15 +915,15 @@ static inline void ndpi_serialize_json_pre(ndpi_private_serializer *serializer,
 
   } else {
     if(!serializer->multiline_json_array) {
-      if(serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY)
+      if((serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY) && serializer->status.buffer.size_used > 0)
         serializer->status.buffer.size_used--; /* Remove ']' */
     }
 
-    if (!serializer->inner_json)
+    if (!serializer->inner_json && serializer->status.buffer.size_used > 0)
       serializer->status.buffer.size_used--; /* Remove '}' */
 
     if(serializer->status.flags & NDPI_SERIALIZER_STATUS_LIST) {
-      if(!serializer->multiline_json_array)
+      if(!serializer->multiline_json_array && serializer->status.buffer.size_used > 0)
         serializer->status.buffer.size_used--; /* Remove ']' */
       if(serializer->status.flags & NDPI_SERIALIZER_STATUS_SOL)
         serializer->status.flags &= ~NDPI_SERIALIZER_STATUS_SOL;
@@ -2654,7 +2655,7 @@ void ndpi_serializer_rollback_snapshot(ndpi_serializer *_serializer) {
     memcpy(&serializer->status, &serializer->snapshot, sizeof(ndpi_private_serializer_status));
     serializer->has_snapshot = 0;
 
-    if(serializer->fmt == ndpi_serialization_format_json) {
+    if(serializer->fmt == ndpi_serialization_format_json && serializer->status.buffer.size_used > 0) {
       if(serializer->status.flags & NDPI_SERIALIZER_STATUS_ARRAY) {
         if (!serializer->multiline_json_array)
           serializer->buffer.data[serializer->status.buffer.size_used-1] = ']';

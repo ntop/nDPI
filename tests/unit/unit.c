@@ -337,6 +337,55 @@ int serializerCsvMaxLengthUnitTest(void)
 
 /* *********************************************** */
 
+/* JSON: writing after ndpi_serializer_set_buffer_len(s, 0) must stay inside the buffer */
+int serializerJsonSetBufferLenUnitTest(void)
+{
+  ndpi_serialization_format fmts[] = { ndpi_serialization_format_json, ndpi_serialization_format_multiline_json };
+  ndpi_serializer serializer;
+  u_int32_t buffer_len;
+  u_int i;
+
+  for(i = 0; i < sizeof(fmts) / sizeof(fmts[0]); i++) {
+    /* Key/value write */
+    assert(ndpi_init_serializer(&serializer, fmts[i]) != -1);
+    assert(ndpi_serializer_set_buffer_len(&serializer, 0) == 0);
+    assert(ndpi_serialize_string_uint32(&serializer, "a", 1) != -1);
+    ndpi_serializer_get_buffer(&serializer, &buffer_len);
+    if(buffer_len > ndpi_serializer_get_internal_buffer_size(&serializer)) {
+      printf("%s: ERROR: bad buffer len %u after set_buffer_len(0)\n", __func__, buffer_len);
+      return -1;
+    }
+    ndpi_term_serializer(&serializer);
+  }
+
+  /* Raw record */
+  assert(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) != -1);
+  assert(ndpi_serializer_set_buffer_len(&serializer, 0) == 0);
+  assert(ndpi_serialize_raw_record(&serializer, (u_char *)"{}", 2) != -1);
+  ndpi_serializer_get_buffer(&serializer, &buffer_len);
+  if(buffer_len > ndpi_serializer_get_internal_buffer_size(&serializer)) {
+    printf("%s: ERROR: bad buffer len %u after raw record\n", __func__, buffer_len);
+    return -1;
+  }
+  ndpi_term_serializer(&serializer);
+
+  /* Snapshot and rollback */
+  assert(ndpi_init_serializer(&serializer, ndpi_serialization_format_json) != -1);
+  assert(ndpi_serializer_set_buffer_len(&serializer, 0) == 0);
+  ndpi_serializer_create_snapshot(&serializer);
+  ndpi_serializer_rollback_snapshot(&serializer);
+  if(ndpi_serializer_get_buffer_len(&serializer) != 0) {
+    printf("%s: ERROR: bad buffer len after rollback\n", __func__);
+    return -1;
+  }
+  ndpi_term_serializer(&serializer);
+
+  printf("%30s                      OK\n", __func__);
+  return 0;
+}
+
+/* *********************************************** */
+
 /* ndpi_reset_serializer() must bring the serializer back to its initial state */
 int serializerResetUnitTest(void)
 {
@@ -568,6 +617,7 @@ int main(int argc, char **argv) {
     
   /* Tests */
   if (serializerUnitTest() != 0) return -1;
+  if (serializerJsonSetBufferLenUnitTest() != 0) return -1;
   if (serializerCsvMaxLengthUnitTest() != 0) return -1;
   if (serializerResetUnitTest() != 0) return -1;
   if (serializeProtoUnitTest() != 0) return -1;
