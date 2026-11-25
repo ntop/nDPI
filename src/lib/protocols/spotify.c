@@ -40,10 +40,9 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
 {
   struct ndpi_packet_struct *packet = &ndpi_struct->packet;
   u_int32_t payload_len = packet->payload_packet_len;
+  u_int16_t spotify_port = htons(57621);
 
   if(packet->udp != NULL) {
-    u_int16_t spotify_port = htons(57621);
-
     if((packet->udp->source == spotify_port)
        && (packet->udp->dest == spotify_port)) {
       if(payload_len >= 7) {
@@ -56,10 +55,14 @@ static void ndpi_check_spotify(struct ndpi_detection_module_struct *ndpi_struct,
     }
   } else if(packet->tcp != NULL) {
 
-    if(payload_len >= 9 && packet->payload[0] == 0x00 && packet->payload[1] == 0x04 &&
-       packet->payload[2] == 0x00 && packet->payload[3] == 0x00&&
+    if( ( payload_len >= 9 && packet->payload[0] == 0x00 && packet->payload[1] == 0x04 &&
+       packet->payload[2] == 0x00 && packet->payload[3] == 0x00 &&
        packet->payload[6] == 0x52 && (packet->payload[7] == 0x0e || packet->payload[7] == 0x0f) &&
-       packet->payload[8] == 0x50 ) {
+       packet->payload[8] == 0x50 ) ||
+      ( payload_len >= 8 && packet->payload[0] == 0x42 && packet->payload[1] == 0x6f &&
+         packet->payload[2] == 0x69 && packet->payload[3] == 0x6e && packet->payload[4] == 0x6b &&
+         packet->payload[5] == 0x52 && packet->payload[6] == 0x50 && packet->payload[7] == 0x43 )
+      ) {
       NDPI_LOG_INFO(ndpi_struct, "found spotify tcp dissector\n");
       ndpi_int_spotify_add_connection(ndpi_struct, flow);
     }
