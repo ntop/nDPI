@@ -1,7 +1,7 @@
 Guessed flow protos:	14
 
 DPI Packets (TCP):	179	(4.71 pkts/flow)
-DPI Packets (UDP):	36	(2.77 pkts/flow)
+DPI Packets (UDP):	38	(2.92 pkts/flow)
 DPI Packets (other):	1	(1.00 pkts/flow)
 Confidence Match by port    : 13 (flows)
 Confidence DPI              : 38 (flows)
@@ -14,8 +14,8 @@ LRU cache tls_cert:   0/0/0 (insert/search/found)
 LRU cache mining:     0/14/0 (insert/search/found)
 LRU cache msteams:    0/0/0 (insert/search/found)
 LRU cache fpc_dns:    5/42/14 (insert/search/found)
-Automa host:          53/29 (search/found)
-Automa domain:        41/0 (search/found)
+Automa host:          57/29 (search/found)
+Automa domain:        43/0 (search/found)
 Automa tls cert:      0/0 (search/found)
 Automa risk mask:     3/3 (search/found)
 Automa common alpns:  0/0 (search/found)
@@ -28,7 +28,7 @@ Patricia protocols IPv6: 0/0 (search/found)
 Hash malicious ja4:        0/0 (search/found)
 Hash malicious sha1:       0/0 (search/found)
 Hash TCP fingerprints:     22/1 (search/found)
-Hash public domain suffix: 344/199 (search/found)
+Hash public domain suffix: 356/207 (search/found)
 Hash ja4 custom protos:    11/0 (search/found)
 Hash fp custom protos:     0/0 (search/found)
 Hash url custom protos:    20/0 (search/found)
@@ -78,9 +78,9 @@ Advertisement                    9 1299          1
 	21	TCP 192.168.1.100:3512 <-> 12.129.222.54:80 [proto: 7.76/HTTP.WorldOfWarcraft][Stack: HTTP.WorldOfWarcraft][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 6][cat: Game/8][Breed: Fun][5 pkts/367 bytes <-> 4 pkts/513 bytes][Goodput ratio: 23/53][0.60 sec][Hostname/SNI: us.scan.worldofwarcraft.com][bytes ratio: -0.166 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 9/0 148/102 198/203 80/102][Pkt Len c2s/s2c min/avg/max/stddev: 54/60 73/128 139/327 33/115][URL: us.scan.worldofwarcraft.com/update/Launcher.txt][StatusCode: 200][Content-Type: text/plain][Server: Apache/2.2.3 (CentOS)][Risk: ** HTTP Susp User-Agent **** HTTP Obsolete Server **][Risk Score: 150][Risk Info: Obsolete Apache server 2.2.3;Empty or missing User-Agent][TCP Fingerprint: 2_128_8192_47466ece/Unknown][MSS: 1460][PLAIN TEXT (GET /update/Launcher.txt HTTP/1)][Plen Bins: 0,0,50,0,0,0,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	22	UDP 192.168.1.100:55468 <-> 192.168.1.254:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 3][cat: Network/14][Breed: Acceptable][2 pkts/168 bytes <-> 2 pkts/388 bytes][Goodput ratio: 50/78][0.09 sec][Hostname/SNI: bnetcmsus-a.akamaihd.net][2.228.46.112][DNS Id: 0x9a2b][PLAIN TEXT (bnetcmsus)][Plen Bins: 0,50,0,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	23	UDP 173.194.40.22:443 <-> 192.168.1.100:53568 [proto: 188/QUIC][Stack: QUIC][IP: 126/Google][Encrypted][Confidence: Match by port][FPC: 126/Google, Confidence: IP address][DPI packets: 6][cat: Web/5][Breed: Acceptable][3 pkts/243 bytes <-> 3 pkts/232 bytes][Goodput ratio: 48/45][28.94 sec][bytes ratio: 0.023 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 13855/13940 14457/14457 15059/14974 602/517][Pkt Len c2s/s2c min/avg/max/stddev: 77/66 81/77 83/83 3/8][Risk: ** Susp Entropy **][Risk Score: 10][Risk Info: Entropy: 5.072 (Executable?)][Plen Bins: 16,83,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	24	UDP 192.168.1.100:58851 <-> 192.168.1.254:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 3][cat: Network/14][Breed: Acceptable][2 pkts/173 bytes <-> 2 pkts/282 bytes][Goodput ratio: 51/70][0.05 sec][Hostname/SNI: 110.212.58.216.in-addr.arpa][0.0.0.0][DNS Id: 0x95c4][DNS Ptr: mil01s25-in-f110.1e100.net][Plen Bins: 0,50,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	24	UDP 192.168.1.100:58851 <-> 192.168.1.254:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 4][cat: Network/14][Breed: Acceptable][2 pkts/173 bytes <-> 2 pkts/282 bytes][Goodput ratio: 51/70][0.05 sec][Hostname/SNI: 22.40.194.173.in-addr.arpa][0.0.0.0][DNS Id: 0xcbd2][DNS Ptr: mil02s06-in-f22.1e100.net][Plen Bins: 0,50,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	25	UDP 192.168.1.100:60026 <-> 192.168.1.254:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 3][cat: Network/14][Breed: Acceptable][2 pkts/154 bytes <-> 2 pkts/288 bytes][Goodput ratio: 45/71][0.08 sec][Hostname/SNI: llnw.blizzard.com][87.248.221.254][DNS Id: 0x0176][PLAIN TEXT (blizzard)][Plen Bins: 0,50,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	26	UDP 192.168.1.100:58818 <-> 192.168.1.254:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 3][cat: Network/14][Breed: Acceptable][2 pkts/172 bytes <-> 2 pkts/260 bytes][Goodput ratio: 51/67][0.06 sec][Hostname/SNI: 100.1.168.192.in-addr.arpa][0.0.0.0][DNS Id: 0xe88f][DNS Ptr: nb-win][Risk: ** Minor Issues **][Risk Score: 10][Risk Info: DNS Record with zero TTL][PLAIN TEXT (dynect)][Plen Bins: 0,50,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	26	UDP 192.168.1.100:58818 <-> 192.168.1.254:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 4][cat: Network/14][Breed: Acceptable][2 pkts/172 bytes <-> 2 pkts/260 bytes][Goodput ratio: 51/67][0.06 sec][Hostname/SNI: 91.252.30.192.in-addr.arpa][0.0.0.0][DNS Id: 0x2e6c][DNS Ptr: nb-win][Risk: ** Error Code **** Minor Issues **][Risk Score: 20][Risk Info: DNS Record with zero TTL;DNS Error Code NXDOMAIN][PLAIN TEXT (dynect)][Plen Bins: 0,50,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	27	UDP 192.168.1.100:58831 <-> 192.168.1.254:53 [proto: 5/DNS][Stack: DNS][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 5/DNS, Confidence: DPI][DPI packets: 4][cat: Network/14][Breed: Acceptable][2 pkts/172 bytes <-> 2 pkts/245 bytes][Goodput ratio: 51/65][0.17 sec][Hostname/SNI: 26.186.239.80.in-addr.arpa][0.0.0.0][DNS Id: 0x353d][DNS Ptr: signup.wow-europe.com][Risk: ** Error Code **][Risk Score: 10][Risk Info: DNS Error Code NXDOMAIN][PLAIN TEXT (signup)][Plen Bins: 0,75,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	28	TCP 192.168.1.100:3532 <-> 2.228.46.112:80 [proto: 7.213/HTTP.Blizzard][Stack: HTTP.Blizzard][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 213/Blizzard, Confidence: DNS][DPI packets: 4][cat: Game/8][Breed: Fun][3 pkts/320 bytes <-> 1 pkts/66 bytes][Goodput ratio: 45/0][0.04 sec][Hostname/SNI: bnetcmsus-a.akamaihd.net][URL: bnetcmsus-a.akamaihd.net/cms/bnet_header/78/78XH2UNU4JYK1434560551687.jpg][User-Agent: Battle.net Web Client][TCP Fingerprint: 2_128_8192_47466ece/Unknown][MSS: 1460][PLAIN TEXT (GET /cms/bnet)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	29	TCP 192.168.1.100:3533 <-> 2.228.46.112:80 [proto: 7.213/HTTP.Blizzard][Stack: HTTP.Blizzard][IP: 0/Unknown][ClearText][Confidence: DPI][FPC: 213/Blizzard, Confidence: DNS][DPI packets: 4][cat: Game/8][Breed: Fun][3 pkts/320 bytes <-> 1 pkts/66 bytes][Goodput ratio: 45/0][0.04 sec][Hostname/SNI: bnetcmsus-a.akamaihd.net][URL: bnetcmsus-a.akamaihd.net/cms/bnet_header/mf/MFTH8TS42HKX1430183778319.jpg][User-Agent: Battle.net Web Client][TCP Fingerprint: 2_128_8192_47466ece/Unknown][MSS: 1460][PLAIN TEXT (GET /cms/bnet)][Plen Bins: 0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
