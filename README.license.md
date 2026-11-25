@@ -19,6 +19,10 @@ On top of the core library, ntop has created additional components released unde
     *   LGPLv3 Only: You may choose to use *only* the core LGPLv3 nDPI components.
     *   Commercial License: If you wish to use the extra dual-licensed ntop components within your business project, you must sign a commercial license agreement with ntop.
 
+To request a license for the dual licensed components, submit the [nDPI license request](https://www.ntop.org/ndpi-license-request/) form once per project. Choose *Evaluation license* if you plan to evaluate these components for integration into a commercial product or service. Choose Commercial license if you have already integrated them or deployed the product or service. If you are unsure which terms apply, choose *Licensing guidance*.
+
+The form asks for your name, email, organization, project name, intended use, and a brief description. A general overview is enough for confidential projects.
+
 ---
 
 ## Rationale Behind the Dual-License Model
