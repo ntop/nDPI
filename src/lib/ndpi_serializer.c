@@ -339,6 +339,10 @@ int ndpi_init_serializer_ll(ndpi_serializer *_serializer,
 
   serializer->fmt = fmt;
 
+  /* JSON starts with " {}": make room for it and the terminating NUL written by ndpi_snprintf() */
+  if(serializer->fmt == ndpi_serialization_format_json && buffer_size < 4)
+    buffer_size = 4;
+
   if (buffer_size < 3 ||
       ndpi_init_serializer_buffer(&serializer->buffer, buffer_size) != 0)
     return(-1);
