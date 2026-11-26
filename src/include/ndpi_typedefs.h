@@ -811,16 +811,22 @@ struct ndpi_str_hash_stats {
   u_int64_t n_found;
 };
 
+/*
+  To add a new LRU cache:
+   * add a new entry here (append only: values are part of the API)
+   * add its name in ndpi_lru_cache_idx_to_name()
+   * add its "lru.<name>.{size,ttl,scope}" options in ndpi_config.c
+*/
 typedef enum {
-  NDPI_LRUCACHE_OOKLA = 0,
-  NDPI_LRUCACHE_BITTORRENT,
-  NDPI_LRUCACHE_STUN,
-  NDPI_LRUCACHE_TLS_CERT,
-  NDPI_LRUCACHE_MINING,
-  NDPI_LRUCACHE_MSTEAMS,
-  NDPI_LRUCACHE_FPC_DNS, /* FPC DNS cache */
-  NDPI_LRUCACHE_SIGNAL,
-  NDPI_LRUCACHE_MAX	/* Last one! */
+  NDPI_LRUCACHE_OOKLA = 0,	/* NDPI_PROTOCOL_OOKLA */
+  NDPI_LRUCACHE_BITTORRENT,	/* NDPI_PROTOCOL_BITTORRENT */
+  NDPI_LRUCACHE_STUN,		/* NDPI_PROTOCOL_STUN and subprotocols */
+  NDPI_LRUCACHE_TLS_CERT,	/* NDPI_PROTOCOL_TLS and subprotocols */
+  NDPI_LRUCACHE_MINING,		/* NDPI_PROTOCOL_MINING and subprotocols */
+  NDPI_LRUCACHE_MSTEAMS,	/* NDPI_PROTOCOL_MSTEAMS */
+  NDPI_LRUCACHE_FPC_DNS,	/* FPC DNS cache */
+  NDPI_LRUCACHE_SIGNAL,		/* NDPI_PROTOCOL_SIGNAL (on top of STUN) */
+  NDPI_LRUCACHE_MAX		/* Last one! */
 } lru_cache_type;
 
 typedef enum {

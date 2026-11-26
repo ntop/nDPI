@@ -555,8 +555,8 @@ static int process_answers(struct ndpi_detection_module_struct *ndpi_struct,
           if(ndpi_struct->cfg.fpc_enabled &&
              proto->app_protocol != NDPI_PROTOCOL_UNKNOWN &&
              proto->app_protocol != proto->master_protocol &&
-             ndpi_struct->fpc_dns_cache) {
-            ndpi_lru_add_to_cache(ndpi_struct->fpc_dns_cache,
+             ndpi_struct->lru_caches[NDPI_LRUCACHE_FPC_DNS]) {
+            ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_FPC_DNS],
                                   fpc_dns_cache_key_from_packet(packet->payload + x, data_len),
                                   proto->app_protocol,
                                   ndpi_get_current_time(core));

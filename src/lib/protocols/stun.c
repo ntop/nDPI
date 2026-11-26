@@ -145,9 +145,9 @@ static u_int16_t search_into_cache(struct ndpi_detection_module_struct *ndpi_str
   u_int64_t key;
   int rc;
 
-  if(ndpi_struct->stun_cache) {
+  if(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN]) {
     key = get_stun_lru_key(flow, 0);
-    rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto,
+    rc = ndpi_lru_find_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN], key, &proto,
 			     0 /* Don't remove it as it can be used for other connections */,
 			     ndpi_get_current_time(&flow->core));
 #ifdef DEBUG_LRU
@@ -156,7 +156,7 @@ static u_int16_t search_into_cache(struct ndpi_detection_module_struct *ndpi_str
 
     if(!rc) {
       key = get_stun_lru_key(flow, 1);
-      rc = ndpi_lru_find_cache(ndpi_struct->stun_cache, key, &proto,
+      rc = ndpi_lru_find_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN], key, &proto,
 			       0 /* Don't remove it as it can be used for other connections */,
 			       ndpi_get_current_time(&flow->core));
 #ifdef DEBUG_LRU
@@ -191,11 +191,11 @@ static void add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
 {
   u_int64_t key, key_rev;
 
-  if(ndpi_struct->stun_cache) {
+  if(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN]) {
     key = get_stun_lru_key(flow, 0);
-    ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key, app_proto, ndpi_get_current_time(&flow->core));
+    ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN], key, app_proto, ndpi_get_current_time(&flow->core));
     key_rev = get_stun_lru_key(flow, 1);
-    ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key_rev, app_proto, ndpi_get_current_time(&flow->core));
+    ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN], key_rev, app_proto, ndpi_get_current_time(&flow->core));
 
 #ifdef DEBUG_LRU
     printf("[LRU] ADDING 0x%llx 0x%llx app %u [%u -> %u]\n",
@@ -302,11 +302,11 @@ static void parse_xor_ip_port_attribute(struct ndpi_detection_module_struct *ndp
                      inet_ntop(AF_INET, &ip, buf, sizeof(buf)), port,
                      flow->core.detected_protocol_stack[0]);
 
-        if(ndpi_struct->stun_cache &&
+        if(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN] &&
            is_subclassification_real(flow)) {
           u_int64_t key = get_stun_lru_key_raw4(ip, port);
 
-          ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
+          ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN], key,
 				flow->core.detected_protocol_stack[0],
 				ndpi_get_current_time(&flow->core));
 #ifdef DEBUG_LRU
@@ -343,11 +343,11 @@ static void parse_xor_ip_port_attribute(struct ndpi_detection_module_struct *ndp
                      inet_ntop(AF_INET6, &ip, buf, sizeof(buf)), port,
                      flow->core.detected_protocol_stack[0]);
 
-        if(ndpi_struct->stun_cache &&
+        if(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN] &&
            is_subclassification_real(flow)) {
           u_int64_t key = get_stun_lru_key_raw6((u_int8_t *)ip, port);
 
-          ndpi_lru_add_to_cache(ndpi_struct->stun_cache, key,
+          ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_STUN], key,
                                 flow->core.detected_protocol_stack[0],
                                 ndpi_get_current_time(&flow->core));
 #ifdef DEBUG_LRU
@@ -1357,10 +1357,10 @@ int signal_search_into_cache(struct ndpi_detection_module_struct *ndpi_struct,
   u_int64_t key;
   u_int16_t dummy;
 
-  if(ndpi_struct->signal_cache) {
+  if(ndpi_struct->lru_caches[NDPI_LRUCACHE_SIGNAL]) {
     key = get_signal_key(flow);
 
-    if(ndpi_lru_find_cache(ndpi_struct->signal_cache, key,
+    if(ndpi_lru_find_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_SIGNAL], key,
                            &dummy, 0 /* Don't remove it as it can be used for other connections */,
 			   ndpi_get_current_time(&flow->core))) {
 #ifdef DEBUG_SIGNAL_LRU
@@ -1384,12 +1384,12 @@ void signal_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
 {
   u_int64_t key;
 
-  if(ndpi_struct->signal_cache) {
+  if(ndpi_struct->lru_caches[NDPI_LRUCACHE_SIGNAL]) {
     key = get_signal_key(flow);
 #ifdef DEBUG_SIGNAL_LRU
     printf("[LRU SIGNAL] ADDING %lu [%u <-> %u]\n", key, ntohs(flow->core.c_port), ntohs(flow->core.s_port));
 #endif
-    ndpi_lru_add_to_cache(ndpi_struct->signal_cache, key, 1 /* dummy */,
+    ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_SIGNAL], key, 1 /* dummy */,
                           ndpi_get_current_time(&flow->core));
   }
 }

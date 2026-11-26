@@ -4657,11 +4657,18 @@ int ndpi_str_endswith(const char *s, const char *suffix) {
 
 const char *ndpi_lru_cache_idx_to_name(lru_cache_type idx)
 {
-  const char *names[NDPI_LRUCACHE_MAX] = { "ookla", "bittorrent", "stun",
-                                           "tls_cert", "mining", "msteams",
-                                           "fpc_dns", "signal" };
+  static const char * const names[NDPI_LRUCACHE_MAX] = {
+    [NDPI_LRUCACHE_OOKLA]      = "ookla",
+    [NDPI_LRUCACHE_BITTORRENT] = "bittorrent",
+    [NDPI_LRUCACHE_STUN]       = "stun",
+    [NDPI_LRUCACHE_TLS_CERT]   = "tls_cert",
+    [NDPI_LRUCACHE_MINING]     = "mining",
+    [NDPI_LRUCACHE_MSTEAMS]    = "msteams",
+    [NDPI_LRUCACHE_FPC_DNS]    = "fpc_dns",
+    [NDPI_LRUCACHE_SIGNAL]     = "signal",
+  };
 
-  if(idx < 0 || idx >= NDPI_LRUCACHE_MAX)
+  if(idx < 0 || idx >= NDPI_LRUCACHE_MAX || names[idx] == NULL)
     return "unknown";
   return names[idx];
 }

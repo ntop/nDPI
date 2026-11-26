@@ -198,17 +198,17 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     flow->core.extra_packets_func = search_bittorrent_again;
   }
   
-  if(ndpi_struct->bittorrent_cache) {
+  if(ndpi_struct->lru_caches[NDPI_LRUCACHE_BITTORRENT]) {
     u_int64_t key, key1, key2, i;
 
     key = make_bittorrent_peers_key(flow);
     key1 = make_bittorrent_host_key(flow, 1, 0), key2 = make_bittorrent_host_key(flow, 0, 0);
 
-    ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key1, NDPI_PROTOCOL_BITTORRENT, ndpi_get_current_time(&flow->core));
-    ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key2, NDPI_PROTOCOL_BITTORRENT, ndpi_get_current_time(&flow->core));
+    ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_BITTORRENT], key1, NDPI_PROTOCOL_BITTORRENT, ndpi_get_current_time(&flow->core));
+    ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_BITTORRENT], key2, NDPI_PROTOCOL_BITTORRENT, ndpi_get_current_time(&flow->core));
 
     /* Now add hosts as twins */
-    ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache,
+    ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_BITTORRENT],
 			  key,
 			  NDPI_PROTOCOL_BITTORRENT,
 			  ndpi_get_current_time(&flow->core));
@@ -217,7 +217,7 @@ static void ndpi_add_connection_as_bittorrent(struct ndpi_detection_module_struc
     for(i=0; i<2; i++) {
       key1 = make_bittorrent_host_key(flow, 1, 1 + i);
 
-      ndpi_lru_add_to_cache(ndpi_struct->bittorrent_cache, key1, NDPI_PROTOCOL_BITTORRENT, ndpi_get_current_time(&flow->core));
+      ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_BITTORRENT], key1, NDPI_PROTOCOL_BITTORRENT, ndpi_get_current_time(&flow->core));
     }
     
 #ifdef BITTORRENT_CACHE_DEBUG
