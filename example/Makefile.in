@@ -20,7 +20,7 @@ AM_CFLAGS=-fPIC -DPIC
 else
 AM_CFLAGS=
 endif
-AM_CFLAGS+=-I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @PCAP_INC@ @GPROF_CFLAGS@
+AM_CFLAGS+=-I$(SRCHOME)/include -I$(top_builddir)/src/include @NDPI_CFLAGS@ @PCAP_INC@ @GPROF_CFLAGS@ @CUSTOM_NDPI@
 AM_LDFLAGS=@NDPI_LDFLAGS@
 ENABLE_STATIC        = @enable_static@
 ifeq ($(ENABLE_STATIC),yes)

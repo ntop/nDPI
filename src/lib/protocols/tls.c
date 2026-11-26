@@ -39,6 +39,12 @@ static void ndpi_search_tls_wrapper(struct ndpi_detection_module_struct *ndpi_st
 
 /* **************************************** */
 
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../../ndpi-pro/nDPI-custom/protocols/tls_extn.c"
+#endif
+
+/* **************************************** */
+
 /*
   JA3
   https://engineering.salesforce.com/tls-fingerprinting-with-ja3-and-ja3s-247362855967
@@ -1660,6 +1666,10 @@ int ndpi_search_tls_tcp_internal(struct ndpi_detection_module_struct *ndpi_struc
 #ifdef DEBUG_TLS
       printf("[TLS] Processing Application Data [certificate_processed: %u][block_len: %u]\n",
 	     tls->certificate_processed, block_len);
+#endif
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+#include "../../../../ndpi-pro/nDPI-custom/protocols/tls_process.c"
 #endif
 
       /* Let's do a quick check to make sure this really looks like TLS */
@@ -3994,4 +4004,8 @@ void init_tls_dissector(struct ndpi_detection_module_struct *ndpi_struct) {
                      2,
                      NDPI_PROTOCOL_TLS,
                      NDPI_PROTOCOL_DTLS);
+
+#ifdef CUSTOM_NDPI_PROTOCOLS
+  #include "../../../../ndpi-pro/nDPI-custom/protocols/tls_init.c"
+#endif
 }
