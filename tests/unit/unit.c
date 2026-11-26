@@ -496,6 +496,42 @@ int serializerResetUnitTest(void)
 
 /* *********************************************** */
 
+/* TLV: ndpi_serialize_end_of_list() must succeed when the buffer is exactly full */
+int serializerTlvEndOfListUnitTest(void)
+{
+  ndpi_serializer serializer;
+  u_char record[512];
+  u_int32_t size, used;
+
+  memset(record, 'a', sizeof(record));
+  assert(ndpi_init_serializer(&serializer, ndpi_serialization_format_tlv) != -1);
+  assert(ndpi_serialize_start_of_list(&serializer, "l") != -1);
+  assert(ndpi_serialize_uint32_uint32(&serializer, 1, 1) != -1);
+
+  /* Fill the buffer up to its last byte (a TLV raw record takes one more byte) */
+  size = ndpi_serializer_get_internal_buffer_size(&serializer);
+  used = ndpi_serializer_get_buffer_len(&serializer);
+  assert(size > used + 1 && size - used - 1 <= sizeof(record));
+  assert(ndpi_serialize_raw_record(&serializer, record, size - used - 1) != -1);
+  assert(ndpi_serializer_get_buffer_len(&serializer) == ndpi_serializer_get_internal_buffer_size(&serializer));
+
+  if(ndpi_serialize_end_of_list(&serializer) != 0) {
+    printf("%s: ERROR: end_of_list failed on a full buffer\n", __func__);
+    return -1;
+  }
+  if(ndpi_serializer_get_buffer_len(&serializer) != size + 1) {
+    printf("%s: ERROR: end_of_list not written\n", __func__);
+    return -1;
+  }
+
+  ndpi_term_serializer(&serializer);
+
+  printf("%30s                      OK\n", __func__);
+  return 0;
+}
+
+/* *********************************************** */
+
 int serializeProtoUnitTest(void)
 {
   ndpi_serializer serializer;
@@ -655,6 +691,7 @@ int main(int argc, char **argv) {
   if (serializerCsvMaxLengthUnitTest() != 0) return -1;
   if (serializerJsonSmallBufferUnitTest() != 0) return -1;
   if (serializerResetUnitTest() != 0) return -1;
+  if (serializerTlvEndOfListUnitTest() != 0) return -1;
   if (serializeProtoUnitTest() != 0) return -1;
 
   return 0;
