@@ -719,6 +719,9 @@ typedef struct message {
   u_int8_t *buffer;
   u_int buffer_len, buffer_used;
   u_int32_t next_seq;
+  u_int8_t *handshake_buffer;
+  u_int handshake_buffer_len, handshake_buffer_used;
+  u_int32_t handshake_message_len;
 } message_t;
 
 /* NDPI_PROTOCOL_TINC */

@@ -1481,6 +1481,102 @@ static int check_tls_type_and_version(const u_int8_t *buf, u_int16_t buf_len)
 
 /* **************************************** */
 
+#define NDPI_TLS_MAX_HANDSHAKE_MESSAGE_LEN (1024 * 1024)
+
+static int process_tls_handshake_fragments(struct ndpi_detection_module_struct *ndpi_struct,
+                                           struct ndpi_flow_struct *flow,
+                                           message_t *message,
+                                           const u_int8_t *payload, u_int payload_len,
+                                           bool *same_packet)
+{
+  struct ndpi_packet_struct *packet = &ndpi_struct->packet;
+
+  while(payload_len > 0) {
+    u_int needed, copy_len;
+
+    if(message->handshake_message_len == 0) {
+      needed = 4 - message->handshake_buffer_used;
+      copy_len = ndpi_min(needed, payload_len);
+
+      if(message->handshake_buffer_used > NDPI_TLS_MAX_HANDSHAKE_MESSAGE_LEN - copy_len)
+        return -1;
+
+      if(message->handshake_buffer_len < message->handshake_buffer_used + copy_len) {
+        u_int new_len = message->handshake_buffer_len ? message->handshake_buffer_len * 2 : 256;
+
+        if(new_len < message->handshake_buffer_used + copy_len)
+          new_len = message->handshake_buffer_used + copy_len;
+        if(new_len > NDPI_TLS_MAX_HANDSHAKE_MESSAGE_LEN)
+          new_len = NDPI_TLS_MAX_HANDSHAKE_MESSAGE_LEN;
+
+        u_int8_t *new_buffer = ndpi_realloc(message->handshake_buffer, new_len);
+        if(new_buffer == NULL)
+          return -1;
+        message->handshake_buffer = new_buffer;
+        message->handshake_buffer_len = new_len;
+      }
+
+      memcpy(&message->handshake_buffer[message->handshake_buffer_used], payload, copy_len);
+      message->handshake_buffer_used += copy_len;
+      payload += copy_len;
+      payload_len -= copy_len;
+
+      if(message->handshake_buffer_used < 4)
+        continue;
+
+      message->handshake_message_len = 4 +
+        ((message->handshake_buffer[1] << 16) |
+         (message->handshake_buffer[2] << 8) |
+         message->handshake_buffer[3]);
+      if(message->handshake_message_len > NDPI_TLS_MAX_HANDSHAKE_MESSAGE_LEN)
+        return -1;
+    }
+
+    needed = message->handshake_message_len - message->handshake_buffer_used;
+    copy_len = ndpi_min(needed, payload_len);
+    if(message->handshake_buffer_used > NDPI_TLS_MAX_HANDSHAKE_MESSAGE_LEN - copy_len)
+      return -1;
+
+    if(message->handshake_buffer_len < message->handshake_buffer_used + copy_len) {
+      u_int new_len = message->handshake_buffer_len ? message->handshake_buffer_len * 2 : 256;
+
+      if(new_len < message->handshake_buffer_used + copy_len)
+        new_len = message->handshake_buffer_used + copy_len;
+      if(new_len > NDPI_TLS_MAX_HANDSHAKE_MESSAGE_LEN)
+        new_len = NDPI_TLS_MAX_HANDSHAKE_MESSAGE_LEN;
+
+      u_int8_t *new_buffer = ndpi_realloc(message->handshake_buffer, new_len);
+      if(new_buffer == NULL)
+        return -1;
+      message->handshake_buffer = new_buffer;
+      message->handshake_buffer_len = new_len;
+    }
+
+    memcpy(&message->handshake_buffer[message->handshake_buffer_used], payload, copy_len);
+    message->handshake_buffer_used += copy_len;
+    payload += copy_len;
+    payload_len -= copy_len;
+
+    if(message->handshake_buffer_used < message->handshake_message_len)
+      continue;
+
+    packet->payload = message->handshake_buffer;
+    packet->payload_packet_len = message->handshake_message_len;
+    handleTLSBlockStat(ndpi_struct, flow, same_packet, 0x16,
+                       message->handshake_buffer[0],
+                       message->handshake_message_len - 4);
+    processHandshakeTLSBlock(ndpi_struct, flow);
+    ndpi_looks_like_tls(ndpi_struct, flow);
+
+    message->handshake_buffer_used = 0;
+    message->handshake_message_len = 0;
+  }
+
+  return 0;
+}
+
+/* **************************************** */
+
 int ndpi_search_tls_tcp_internal(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow,
 				 struct ndpi_flow_tls_quic_metadata_struct *tls) {
@@ -1566,6 +1662,12 @@ int ndpi_search_tls_tcp_internal(struct ndpi_detection_module_struct *ndpi_struc
     printf("[TLS] content_type=0x%02X\n", content_type);
 #endif
 
+    if(message->handshake_buffer_used > 0 && content_type != 0x16 /* Handshake */) {
+      /* A handshake message cannot cross a record type or key change. */
+      something_went_wrong = 1;
+      goto tls_record_done;
+    }
+
     if(content_type == 0x14 /* Change Cipher Spec */) {
       if(len == 6 &&
          message->buffer[1] == 0x03 && /* TLS >= 1.0 */
@@ -1615,50 +1717,26 @@ int ndpi_search_tls_tcp_internal(struct ndpi_detection_module_struct *ndpi_struc
       if(alert_len == (u_int32_t)message->buffer_used - 5)
 	ndpi_int_tls_add_connection(ndpi_struct, flow);
     } else if(content_type == 0x16 /* Handshake */) {
-      /* Split the element in blocks */
-      u_int32_t processed = 5;
-
-      if(len >= 9) {
-        while((processed+4) <= len) {
-          const u_int8_t *block = (const u_int8_t *)&message->buffer[processed];
-          u_int32_t block_len   = (block[1] << 16) + (block[2] << 8) + block[3];
-
-          if((current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
-              flow->core.tls_quic.change_cipher_from_client == 1) ||
-             (!current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
-              flow->core.tls_quic.change_cipher_from_server == 1)) {
+      if((current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
+          flow->core.tls_quic.change_cipher_from_client == 1) ||
+         (!current_pkt_from_client_to_server(ndpi_struct, &flow->core) &&
+          flow->core.tls_quic.change_cipher_from_server == 1)) {
+        if(message->handshake_buffer_used > 0) {
+          something_went_wrong = 1;
+          goto tls_record_done;
+        }
 #ifdef DEBUG_TLS_MEMORY
-            printf("[TLS Mem] Encrypted Handshake msg. Skip\n");
+        printf("[TLS Mem] Encrypted Handshake msg. Skip\n");
 #endif
 
-            handleTLSBlockStat(ndpi_struct, flow, &same_packet, 0x16, 0, len - 5);
+        handleTLSBlockStat(ndpi_struct, flow, &same_packet, 0x16, 0, len - 5);
 
-	    /* We don't have block len, so ignore the entire record */
-            processed += len - 5;
-            break;
-          }
-
-          if(/* (block_len == 0) || */ /* Note blocks can have zero lenght */
-             (block_len > len) || ((block[1] != 0x0))) {
-            something_went_wrong = 1;
-            break;
-          }
-
-          packet->payload = block;
-          packet->payload_packet_len = ndpi_min(block_len+4, message->buffer_used);
-
-          if((processed+packet->payload_packet_len) > len) {
-            something_went_wrong = 1;
-            break;
-          }
-
-          handleTLSBlockStat(ndpi_struct, flow, &same_packet, 0x16, block[0], block_len);
-
-	  processHandshakeTLSBlock(ndpi_struct, flow);
-          ndpi_looks_like_tls(ndpi_struct, flow);
-
-          processed += packet->payload_packet_len;
-        }
+        /* We don't have block len, so ignore the entire record. */
+      } else if(len < 6 ||
+                process_tls_handshake_fragments(ndpi_struct, flow, message,
+                                                &message->buffer[5], len - 5,
+                                                &same_packet) != 0) {
+        something_went_wrong = 1;
       }
     } else if(content_type == 0x17 /* Application Data */) {
       u_int32_t block_len   = (message->buffer[3] << 8) + (message->buffer[4]);
@@ -1686,6 +1764,7 @@ int ndpi_search_tls_tcp_internal(struct ndpi_detection_module_struct *ndpi_struc
 	flow->core.tls_quic.certificate_processed = 1;
     }
 
+tls_record_done:
     packet->payload = p;
     packet->payload_packet_len = p_len; /* Restore */
     message->buffer_used -= len;
@@ -2012,9 +2091,13 @@ void switch_extra_dissection_to_tls(struct ndpi_detection_module_struct *ndpi_st
   /* Reset reassemblers */
   if(flow->core.tls_quic.message[0].buffer)
     ndpi_free(flow->core.tls_quic.message[0].buffer);
+  if(flow->core.tls_quic.message[0].handshake_buffer)
+    ndpi_free(flow->core.tls_quic.message[0].handshake_buffer);
   memset(&flow->core.tls_quic.message[0], '\0', sizeof(flow->core.tls_quic.message[0]));
   if(flow->core.tls_quic.message[1].buffer)
     ndpi_free(flow->core.tls_quic.message[1].buffer);
+  if(flow->core.tls_quic.message[1].handshake_buffer)
+    ndpi_free(flow->core.tls_quic.message[1].handshake_buffer);
   memset(&flow->core.tls_quic.message[1], '\0', sizeof(flow->core.tls_quic.message[1]));
 
   flow->core.tls_quic.from_opportunistic_tls = 1;
@@ -2035,9 +2118,13 @@ void switch_to_tls(struct ndpi_detection_module_struct *ndpi_struct,
     /* Reset reassemblers */
     if(flow->core.tls_quic.message[0].buffer)
       ndpi_free(flow->core.tls_quic.message[0].buffer);
+    if(flow->core.tls_quic.message[0].handshake_buffer)
+      ndpi_free(flow->core.tls_quic.message[0].handshake_buffer);
     memset(&flow->core.tls_quic.message[0], '\0', sizeof(flow->core.tls_quic.message[0]));
     if(flow->core.tls_quic.message[1].buffer)
       ndpi_free(flow->core.tls_quic.message[1].buffer);
+    if(flow->core.tls_quic.message[1].handshake_buffer)
+      ndpi_free(flow->core.tls_quic.message[1].handshake_buffer);
     memset(&flow->core.tls_quic.message[1], '\0', sizeof(flow->core.tls_quic.message[1]));
 
     /* We will not check obfuscated heuristic (anymore) because we have been
