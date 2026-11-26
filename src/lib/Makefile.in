@@ -32,7 +32,7 @@ AM_CFLAGS  = -fPIC -DPIC
 else
 AM_CFLAGS  =
 endif
-AM_CFLAGS += -I$(srcdir) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include -I$(srcdir)/third_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @CUSTOM_NDPI@ @ADDITIONAL_INCS@
+AM_CFLAGS += -I$(srcdir) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include -I$(srcdir)/third_party/include -DNDPI_LIB_COMPILATION @NDPI_CFLAGS@ @GPROF_CFLAGS@ @ADDITIONAL_INCS@
 CFLAGS_ndpi_bitmap.c := -Wno-unused-function
 CFLAGS_ndpi_bitmap64_fuse.c := -Wno-unused-function
 CFLAGS_gcrypt_light.c := -Wno-unused-function -Wno-unused-parameter

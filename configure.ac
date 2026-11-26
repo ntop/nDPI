@@ -425,16 +425,6 @@ else
    AC_MSG_RESULT(no)
 fi
 
-CUSTOM_NDPI=
-
-AC_ARG_WITH(ndpi-pro, AS_HELP_STRING([--with-ndpi-pro], [Build with ndpi-pro (if present)]))
-AS_IF([test "${with_ndpi_pro+set}" = set],[
-if test -d ${srcdir}/../ndpi-pro/nDPI-custom; then :
-   CUSTOM_NDPI="-DCUSTOM_NDPI_PROTOCOLS"
-   AC_MSG_RESULT([Compiling with custom nDPI protocols])
-fi
-])
-
 case "$host" in
    *-*-mingw32*|*-*-msys)
       PCAP_INC=""
@@ -648,7 +638,6 @@ AC_SUBST(ADDITIONAL_LIBS)
 AC_SUBST(DL_LIB)
 AC_SUBST(DPDK_TARGET)
 AC_SUBST(HAVE_PTHREAD_SETAFFINITY_NP)
-AC_SUBST(CUSTOM_NDPI)
 AC_SUBST(NDPI_API_VERSION)
 AC_SUBST(EXTRA_TARGETS)
 AC_SUBST(BUILD_MINGW)
@@ -798,12 +787,6 @@ AS_IF([test "x${enable_oldcroaring}" = "xyes"],
   CRoaring version:        v4 (C11 atomics)"],
     [SUMMARY="${SUMMARY}
   CRoaring version:        legacy (autodetected)"])])
-
-AS_IF([test "x${CUSTOM_NDPI}" = "x-DCUSTOM_NDPI_PROTOCOLS"],
-  [SUMMARY="${SUMMARY}
-  Custom protocols:        yes (../nDPI-custom)"],
-  [SUMMARY="${SUMMARY}
-  Custom protocols:        no"])
 
 AS_IF([test "x${enable_usdt_probes}" = "xyes"],
   [SUMMARY="${SUMMARY}
