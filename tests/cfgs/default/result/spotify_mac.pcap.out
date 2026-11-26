@@ -1,0 +1,41 @@
+DPI Packets (TCP):	10	(5.00 pkts/flow)
+DPI Packets (UDP):	3	(1.00 pkts/flow)
+Confidence DPI              : 5 (flows)
+Num dissector calls: 196 (39.20 diss/flow)
+LRU cache ookla:      0/0/0 (insert/search/found)
+LRU cache bittorrent: 0/0/0 (insert/search/found)
+LRU cache stun:       0/0/0 (insert/search/found)
+LRU cache tls_cert:   0/0/0 (insert/search/found)
+LRU cache mining:     0/0/0 (insert/search/found)
+LRU cache msteams:    0/0/0 (insert/search/found)
+LRU cache fpc_dns:    0/2/0 (insert/search/found)
+Automa host:          0/0 (search/found)
+Automa domain:        0/0 (search/found)
+Automa tls cert:      0/0 (search/found)
+Automa risk mask:     0/0 (search/found)
+Automa common alpns:  0/0 (search/found)
+Patricia risk mask:   0/0 (search/found)
+Patricia risk mask IPv6: 0/0 (search/found)
+Patricia risk:        0/0 (search/found)
+Patricia risk IPv6:   0/0 (search/found)
+Patricia protocols:   10/0 (search/found)
+Patricia protocols IPv6: 0/0 (search/found)
+Hash malicious ja4:        0/0 (search/found)
+Hash malicious sha1:       0/0 (search/found)
+Hash TCP fingerprints:     2/0 (search/found)
+Hash public domain suffix: 0/0 (search/found)
+Hash ja4 custom protos:    2/0 (search/found)
+Hash fp custom protos:     0/0 (search/found)
+Hash url custom protos:    0/0 (search/found)
+
+Spotify	69	6183	5
+
+Fun                             69 6183          5            
+
+Music                           69 6183          5            
+
+	1	TCP 10.0.0.124:39942 <-> 10.0.0.74:57621 [proto: 156/Spotify][Stack: Spotify][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Music/25][Breed: Fun][10 pkts/981 bytes <-> 13 pkts/1099 bytes][Goodput ratio: 29/20][180.41 sec][bytes ratio: -0.057 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/0 17206/15050 120378/120255 42120/39764][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 98/85 193/213 41/42][TCP Fingerprint: 2_64_65535_17041470/Unknown][MSS: 1460][PLAIN TEXT (BoinkRPC)][Plen Bins: 37,0,37,12,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	2	TCP 10.0.0.124:47658 <-> 10.0.0.74:57621 [proto: 156/Spotify][Stack: Spotify][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 0/Unknown, Confidence: Unknown][DPI packets: 5][cat: Music/25][Breed: Fun][9 pkts/915 bytes <-> 11 pkts/972 bytes][Goodput ratio: 32/23][121.12 sec][bytes ratio: -0.030 (Mixed)][IAT c2s/s2c min/avg/max/stddev: 4/0 17302/13456 121071/120721 42364/37924][Pkt Len c2s/s2c min/avg/max/stddev: 66/66 102/88 193/213 42/44][TCP Fingerprint: 2_64_65535_17041470/Unknown][MSS: 1460][PLAIN TEXT (BoinkRPC)][Plen Bins: 44,0,33,11,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	3	UDP 10.0.0.74:57621 -> 10.0.0.255:57621 [proto: 156/Spotify][Stack: Spotify][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 156/Spotify, Confidence: DPI][DPI packets: 1][cat: Music/25][Breed: Fun][18 pkts/1544 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][442.27 sec][bytes ratio: 1.000 (Upload)][IAT c2s/s2c min/avg/max/stddev: 101/0 25766/0 35035/0 11005/0][Pkt Len c2s/s2c min/avg/max/stddev: 82/0 86/0 86/0 1/0][PLAIN TEXT (SpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	4	UDP 10.0.0.74:57621 -> 10.0.0.124:57621 [proto: 156/Spotify][Stack: Spotify][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 156/Spotify, Confidence: DPI][DPI packets: 1][cat: Music/25][Breed: Fun][4 pkts/344 bytes -> 0 pkts/0 bytes][Goodput ratio: 51/0][335.23 sec][Risk: ** Unidirectional Traffic **][Risk Score: 10][Risk Info: No server to client traffic][PLAIN TEXT (OjSpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	5	UDP 10.0.0.124:57621 -> 10.0.0.255:57621 [proto: 156/Spotify][Stack: Spotify][IP: 0/Unknown][Encrypted][Confidence: DPI][FPC: 156/Spotify, Confidence: DPI][DPI packets: 1][cat: Music/25][Breed: Fun][4 pkts/328 bytes -> 0 pkts/0 bytes][Goodput ratio: 49/0][335.23 sec][PLAIN TEXT (SpotUdp)][Plen Bins: 0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
