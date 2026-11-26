@@ -1185,6 +1185,9 @@ void ndpi_hw_free(struct ndpi_hw_struct *hw) {
 */
 int ndpi_hw_add_value(struct ndpi_hw_struct *hw, const u_int64_t _value, double *forecast,  double *confidence_band) {
   if(hw->num_values < hw->params.num_season_periods) {
+    if(hw->y == NULL)
+      return(-1); /* ndpi_hw_reset() could not allocate the learning buffer */
+
     hw->y[hw->num_values++] = _value;
 
     *forecast = 0;
@@ -1271,6 +1274,10 @@ void ndpi_hw_reset(struct ndpi_hw_struct *hw) {
 
   if(hw->y)
     memset(hw->y, 0, (hw->params.num_season_periods * sizeof(u_int64_t)));
+  else if(hw->s)
+    /* y is freed when the learning phase ends (see ndpi_hw_add_value): learning restarts now.
+       s is NULL only if ndpi_hw_init() failed: there is nothing to restart then */
+    hw->y = (u_int64_t*)ndpi_calloc(hw->params.num_season_periods, sizeof(u_int64_t));
   if(hw->s)
     memset(hw->s, 0, (hw->params.num_season_periods * sizeof(double)));
 }
