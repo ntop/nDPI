@@ -39,8 +39,8 @@ enum ether_disc_packet_type {
 
 static void ndpi_ether_cache_connection(struct ndpi_detection_module_struct *ndpi_struct,
 				 struct ndpi_flow_struct *flow) {
-  if(ndpi_struct->mining_cache)
-    ndpi_lru_add_to_cache(ndpi_struct->mining_cache, mining_make_lru_cache_key(flow),
+  if(ndpi_struct->lru_caches[NDPI_LRUCACHE_MINING])
+    ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_MINING], mining_make_lru_cache_key(flow),
 			  NDPI_PROTOCOL_ETHEREUM, ndpi_get_current_time(&flow->core));
 }
 

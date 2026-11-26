@@ -161,57 +161,24 @@ int ndpi_get_lru_cache_stats(struct ndpi_global_context *g_ctx,
 			     lru_cache_type cache_type,
 			     struct ndpi_lru_cache_stats *stats)
 {
-  int scope, is_local = 1;
-  char param[64], buf[8], *rc;
+  struct ndpi_lru_cache *cache;
 
   if(!stats || (!ndpi_struct && !g_ctx))
     return -1;
-  if(!ndpi_struct) {
-    is_local = 0;
-  } else {
-    snprintf(param, sizeof(param), "lru.%s.scope", ndpi_lru_cache_idx_to_name(cache_type));
-    rc = ndpi_get_config(ndpi_struct, NULL, param, buf, sizeof(buf));
-
-    if(rc == NULL)
-      return -1;
-
-    scope = atoi(buf);
-
-    if(scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      is_local = 0;
-      if(!g_ctx)
-        return -1;
-    }
-  }
-
-  switch(cache_type) {
-  case NDPI_LRUCACHE_OOKLA:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->ookla_cache : g_ctx->ookla_global_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_BITTORRENT:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->bittorrent_cache : g_ctx->bittorrent_global_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_STUN:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->stun_cache : g_ctx->stun_global_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_TLS_CERT:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->tls_cert_cache : g_ctx->tls_cert_global_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_MINING:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->mining_cache : g_ctx->mining_global_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_MSTEAMS:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->msteams_cache : g_ctx->msteams_global_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_FPC_DNS:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->fpc_dns_cache : g_ctx->fpc_dns_global_cache, stats);
-    return 0;
-  case NDPI_LRUCACHE_SIGNAL:
-    ndpi_lru_get_stats(is_local ? ndpi_struct->signal_cache : g_ctx->signal_global_cache, stats);
-    return 0;
-  default:
+  if(cache_type < 0 || cache_type >= NDPI_LRUCACHE_MAX)
     return -1;
+
+  if(ndpi_struct &&
+     ndpi_struct->cfg.lru[cache_type].scope == NDPI_LRUCACHE_SCOPE_LOCAL) {
+    cache = ndpi_struct->lru_caches[cache_type];
+  } else {
+    if(!g_ctx)
+      return -1;
+    cache = g_ctx->lru_global_caches[cache_type];
   }
+
+  ndpi_lru_get_stats(cache, stats);
+  return 0;
 }
 
 /* ******************************************************************** */

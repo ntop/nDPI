@@ -161,35 +161,17 @@ typedef struct {
 
 struct ndpi_global_context {
 
-  /* LRU caches */
-
-  /* NDPI_PROTOCOL_OOKLA */
-  int ookla_cache_is_global;
-  struct ndpi_lru_cache *ookla_global_cache;
-
-  /* NDPI_PROTOCOL_BITTORRENT */
-  struct ndpi_lru_cache *bittorrent_global_cache;
-
-  /* NDPI_PROTOCOL_STUN and subprotocols */
-  struct ndpi_lru_cache *stun_global_cache;
-
-  /* NDPI_PROTOCOL_TLS and subprotocols */
-  struct ndpi_lru_cache *tls_cert_global_cache;
-
-  /* NDPI_PROTOCOL_MINING and subprotocols */
-  struct ndpi_lru_cache *mining_global_cache;
-
-  /* NDPI_PROTOCOL_MSTEAMS */
-  struct ndpi_lru_cache *msteams_global_cache;
-
-  /* FPC DNS cache */
-  struct ndpi_lru_cache *fpc_dns_global_cache;
-
-  /* Signal STUN cache */
-  struct ndpi_lru_cache *signal_global_cache;
+  /* LRU caches with global scope (indexed by lru_cache_type) */
+  struct ndpi_lru_cache *lru_global_caches[NDPI_LRUCACHE_MAX];
 };
 
 #define CFG_MAX_LEN	256
+
+struct ndpi_lru_cache_config {
+  int num_entries;
+  int ttl;
+  int scope;
+};
 
 
   /*
@@ -251,30 +233,7 @@ struct ndpi_detection_module_config_struct {
 
   /* LRU caches */
 
-  int ookla_cache_num_entries;
-  int ookla_cache_ttl;
-  int ookla_cache_scope;
-  int bittorrent_cache_num_entries;
-  int bittorrent_cache_ttl;
-  int bittorrent_cache_scope;
-  int stun_cache_num_entries;
-  int stun_cache_ttl;
-  int stun_cache_scope;
-  int tls_cert_cache_num_entries;
-  int tls_cert_cache_ttl;
-  int tls_cert_cache_scope;
-  int mining_cache_num_entries;
-  int mining_cache_ttl;
-  int mining_cache_scope;
-  int msteams_cache_num_entries;
-  int msteams_cache_ttl;
-  int msteams_cache_scope;
-  int fpc_dns_cache_num_entries;
-  int fpc_dns_cache_ttl;
-  int fpc_dns_cache_scope;
-  int signal_cache_num_entries;
-  int signal_cache_ttl;
-  int signal_cache_scope;
+  struct ndpi_lru_cache_config lru[NDPI_LRUCACHE_MAX];
 
   /* Protocols */
 
@@ -460,31 +419,10 @@ struct ndpi_detection_module_struct {
   /* NDPI_PROTOCOL_TINC */
   struct cache *tinc_cache;
 
-  /* NDPI_PROTOCOL_OOKLA */
-  struct ndpi_lru_cache *ookla_cache;
-
-  /* NDPI_PROTOCOL_SIGNAL */
-  struct ndpi_lru_cache *signal_cache;
-
-  /* NDPI_PROTOCOL_BITTORRENT */
-  struct ndpi_lru_cache *bittorrent_cache;
-
-  /* NDPI_PROTOCOL_STUN and subprotocols */
-  struct ndpi_lru_cache *stun_cache;
-
-  /* NDPI_PROTOCOL_TLS and subprotocols */
-  struct ndpi_lru_cache *tls_cert_cache;
-
-  /* NDPI_PROTOCOL_MINING and subprotocols */
-  struct ndpi_lru_cache *mining_cache;
-
-  /* NDPI_PROTOCOL_MSTEAMS */
-  struct ndpi_lru_cache *msteams_cache;
-
-  /* FPC DNS cache */
-  struct ndpi_lru_cache *fpc_dns_cache;
-
-  /* *** If you add a new LRU cache, please update lru_cache_type above! *** */
+  /* LRU caches (indexed by lru_cache_type). With global scope, the
+     pointer is shared with g_ctx->lru_global_caches[] and must not be
+     freed here */
+  struct ndpi_lru_cache *lru_caches[NDPI_LRUCACHE_MAX];
 
   u_int16_t *ndpi_to_user_proto_id; /* custom protocolId mapping */
   u_int16_t ndpi_to_user_proto_id_num_allocated;

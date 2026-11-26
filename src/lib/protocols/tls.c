@@ -656,13 +656,13 @@ static void checkTLSSubprotocol(struct ndpi_detection_module_struct *ndpi_struct
      flow->core.detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) {
     /* Subprotocol not yet set */
 
-    if(ndpi_struct->tls_cert_cache) {
+    if(ndpi_struct->lru_caches[NDPI_LRUCACHE_TLS_CERT]) {
       u_int16_t cached_proto;
       u_int64_t key;
 
       key = make_tls_cert_key(packet, is_from_client);
 
-      if(ndpi_lru_find_cache(ndpi_struct->tls_cert_cache, key,
+      if(ndpi_lru_find_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_TLS_CERT], key,
 			     &cached_proto, 0 /* Don't remove it as it can be used for other connections */,
 			     ndpi_get_current_time(&flow->core))) {
         ndpi_master_app_protocol proto;
@@ -1099,10 +1099,10 @@ void processCertificateElements(struct ndpi_detection_module_struct *ndpi_struct
 	ndpi_check_subprotocol_risk(ndpi_struct, flow, proto_id);
 	ndpi_unset_risk(ndpi_struct, &flow->core, NDPI_NUMERIC_IP_HOST);
 
-	if(ndpi_struct->tls_cert_cache) {
+	if(ndpi_struct->lru_caches[NDPI_LRUCACHE_TLS_CERT]) {
 	  u_int64_t key = make_tls_cert_key(packet, 0 /* from the server */);
 
-	  ndpi_lru_add_to_cache(ndpi_struct->tls_cert_cache, key, proto_id, ndpi_get_current_time(&flow->core));
+	  ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_TLS_CERT], key, proto_id, ndpi_get_current_time(&flow->core));
 	}
       }
     }

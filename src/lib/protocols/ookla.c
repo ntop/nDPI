@@ -46,10 +46,10 @@ int ookla_search_into_cache(struct ndpi_detection_module_struct *ndpi_struct,
   u_int64_t key;
   u_int16_t dummy;
 
-  if(ndpi_struct->ookla_cache) {
+  if(ndpi_struct->lru_caches[NDPI_LRUCACHE_OOKLA]) {
     key = get_ookla_key(&flow->core);
 
-    if(ndpi_lru_find_cache(ndpi_struct->ookla_cache, key,
+    if(ndpi_lru_find_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_OOKLA], key,
                            &dummy, 0 /* Don't remove it as it can be used for other connections */,
 			   ndpi_get_current_time(&flow->core))) {
 #ifdef DEBUG_OOKLA_LRU
@@ -73,12 +73,12 @@ void ookla_add_to_cache(struct ndpi_detection_module_struct *ndpi_struct,
 {
   u_int64_t key;
 
-  if(ndpi_struct->ookla_cache) {
+  if(ndpi_struct->lru_caches[NDPI_LRUCACHE_OOKLA]) {
     key = get_ookla_key(core);
 #ifdef DEBUG_OOKLA_LRU
     printf("[LRU OOKLA] ADDING %lu [%u <-> %u]\n", key, ntohs(core->c_port), ntohs(core->s_port));
 #endif
-    ndpi_lru_add_to_cache(ndpi_struct->ookla_cache, key, 1 /* dummy */,
+    ndpi_lru_add_to_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_OOKLA], key, 1 /* dummy */,
                           ndpi_get_current_time(core));
   }
 }

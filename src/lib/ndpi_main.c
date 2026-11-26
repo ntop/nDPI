@@ -4216,6 +4216,7 @@ struct ndpi_global_context *ndpi_global_init(void) {
 /* ******************************************************************** */
 
 void ndpi_global_deinit(struct ndpi_global_context *g_ctx) {
+  int i;
 
   /*  Note that we don't have yet an easy way to log from this function */
 
@@ -4224,22 +4225,10 @@ void ndpi_global_deinit(struct ndpi_global_context *g_ctx) {
     /* Global caches are freed here, so that we are able to get statistics even
        after the uninitialization of all the local contexts */
 
-    if(g_ctx->ookla_global_cache)
-      ndpi_lru_free_cache(g_ctx->ookla_global_cache);
-    if(g_ctx->bittorrent_global_cache)
-      ndpi_lru_free_cache(g_ctx->bittorrent_global_cache);
-    if(g_ctx->stun_global_cache)
-      ndpi_lru_free_cache(g_ctx->stun_global_cache);
-    if(g_ctx->tls_cert_global_cache)
-      ndpi_lru_free_cache(g_ctx->tls_cert_global_cache);
-    if(g_ctx->mining_global_cache)
-      ndpi_lru_free_cache(g_ctx->mining_global_cache);
-    if(g_ctx->msteams_global_cache)
-      ndpi_lru_free_cache(g_ctx->msteams_global_cache);
-    if(g_ctx->fpc_dns_global_cache)
-      ndpi_lru_free_cache(g_ctx->fpc_dns_global_cache);
-    if(g_ctx->signal_global_cache)
-      ndpi_lru_free_cache(g_ctx->signal_global_cache);
+    for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+      if(g_ctx->lru_global_caches[i])
+        ndpi_lru_free_cache(g_ctx->lru_global_caches[i]);
+    }
 
     ndpi_free(g_ctx);
   }
@@ -4781,136 +4770,22 @@ int ndpi_finalize_initialization(struct ndpi_detection_module_struct *ndpi_str) 
 
   ndpi_load_tcp_fingerprints(ndpi_str);
 
-  if(ndpi_str->cfg.ookla_cache_num_entries > 0) {
-    if(ndpi_str->cfg.ookla_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      if(!ndpi_str->g_ctx->ookla_global_cache) {
-        ndpi_str->g_ctx->ookla_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.ookla_cache_num_entries,
-                                                                  ndpi_str->cfg.ookla_cache_ttl, 1);
-      }
-      ndpi_str->ookla_cache = ndpi_str->g_ctx->ookla_global_cache;
-    } else {
-      ndpi_str->ookla_cache = ndpi_lru_cache_init(ndpi_str->cfg.ookla_cache_num_entries,
-                                                  ndpi_str->cfg.ookla_cache_ttl, 0);
-    }
-    if(!ndpi_str->ookla_cache) {
-      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->cfg.ookla_cache_num_entries);
-    }
-  }
+  for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+    const struct ndpi_lru_cache_config *c = &ndpi_str->cfg.lru[i];
 
-  if(ndpi_str->cfg.signal_cache_num_entries > 0) {
-    if(ndpi_str->cfg.signal_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      if(!ndpi_str->g_ctx->signal_global_cache) {
-        ndpi_str->g_ctx->signal_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.signal_cache_num_entries,
-                                                                  ndpi_str->cfg.signal_cache_ttl, 1);
-      }
-      ndpi_str->signal_cache = ndpi_str->g_ctx->signal_global_cache;
-    } else {
-      ndpi_str->signal_cache = ndpi_lru_cache_init(ndpi_str->cfg.signal_cache_num_entries,
-                                                  ndpi_str->cfg.signal_cache_ttl, 0);
-    }
-    if(!ndpi_str->signal_cache) {
-      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->cfg.signal_cache_num_entries);
-    }
-  }
+    if(c->num_entries == 0)
+      continue;
 
-  if(ndpi_str->cfg.bittorrent_cache_num_entries > 0) {
-    if(ndpi_str->cfg.bittorrent_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      if(!ndpi_str->g_ctx->bittorrent_global_cache) {
-        ndpi_str->g_ctx->bittorrent_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.bittorrent_cache_num_entries,
-                                                                       ndpi_str->cfg.bittorrent_cache_ttl, 1);
-      }
-      ndpi_str->bittorrent_cache = ndpi_str->g_ctx->bittorrent_global_cache;
+    if(c->scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
+      if(!ndpi_str->g_ctx->lru_global_caches[i])
+        ndpi_str->g_ctx->lru_global_caches[i] = ndpi_lru_cache_init(c->num_entries, c->ttl, 1);
+      ndpi_str->lru_caches[i] = ndpi_str->g_ctx->lru_global_caches[i];
     } else {
-      ndpi_str->bittorrent_cache = ndpi_lru_cache_init(ndpi_str->cfg.bittorrent_cache_num_entries,
-                                                       ndpi_str->cfg.bittorrent_cache_ttl, 0);
+      ndpi_str->lru_caches[i] = ndpi_lru_cache_init(c->num_entries, c->ttl, 0);
     }
-    if(!ndpi_str->bittorrent_cache) {
-      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->cfg.bittorrent_cache_num_entries);
-    }
-  }
-  if(ndpi_str->cfg.stun_cache_num_entries > 0) {
-    if(ndpi_str->cfg.stun_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      if(!ndpi_str->g_ctx->stun_global_cache) {
-        ndpi_str->g_ctx->stun_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_cache_num_entries,
-                                                                 ndpi_str->cfg.stun_cache_ttl, 1);
-      }
-      ndpi_str->stun_cache = ndpi_str->g_ctx->stun_global_cache;
-    } else {
-      ndpi_str->stun_cache = ndpi_lru_cache_init(ndpi_str->cfg.stun_cache_num_entries,
-                                                 ndpi_str->cfg.stun_cache_ttl, 0);
-    }
-    if(!ndpi_str->stun_cache) {
-      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->cfg.stun_cache_num_entries);
-    }
-  }
-  if(ndpi_str->cfg.tls_cert_cache_num_entries > 0) {
-    if(ndpi_str->cfg.tls_cert_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      if(!ndpi_str->g_ctx->tls_cert_global_cache) {
-        ndpi_str->g_ctx->tls_cert_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.tls_cert_cache_num_entries,
-                                                                     ndpi_str->cfg.tls_cert_cache_ttl, 1);
-      }
-      ndpi_str->tls_cert_cache = ndpi_str->g_ctx->tls_cert_global_cache;
-    } else {
-      ndpi_str->tls_cert_cache = ndpi_lru_cache_init(ndpi_str->cfg.tls_cert_cache_num_entries,
-                                                     ndpi_str->cfg.tls_cert_cache_ttl, 0);
-    }
-    if(!ndpi_str->tls_cert_cache) {
-      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->cfg.tls_cert_cache_num_entries);
-    }
-  }
-  if(ndpi_str->cfg.mining_cache_num_entries > 0) {
-    if(ndpi_str->cfg.mining_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      if(!ndpi_str->g_ctx->mining_global_cache) {
-        ndpi_str->g_ctx->mining_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.mining_cache_num_entries,
-                                                                   ndpi_str->cfg.mining_cache_ttl, 1);
-      }
-      ndpi_str->mining_cache = ndpi_str->g_ctx->mining_global_cache;
-    } else {
-      ndpi_str->mining_cache = ndpi_lru_cache_init(ndpi_str->cfg.mining_cache_num_entries,
-                                                   ndpi_str->cfg.mining_cache_ttl, 0);
-    }
-    if(!ndpi_str->mining_cache) {
-      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->cfg.mining_cache_num_entries);
-    }
-  }
-  if(ndpi_str->cfg.msteams_cache_num_entries > 0) {
-    if(ndpi_str->cfg.msteams_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      if(!ndpi_str->g_ctx->msteams_global_cache) {
-        ndpi_str->g_ctx->msteams_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.msteams_cache_num_entries,
-                                                                    ndpi_str->cfg.msteams_cache_ttl, 1);
-      }
-      ndpi_str->msteams_cache = ndpi_str->g_ctx->msteams_global_cache;
-    } else {
-      ndpi_str->msteams_cache = ndpi_lru_cache_init(ndpi_str->cfg.msteams_cache_num_entries,
-                                                    ndpi_str->cfg.msteams_cache_ttl, 0);
-    }
-    if(!ndpi_str->msteams_cache) {
-      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache (num_entries %u)\n",
-                   ndpi_str->cfg.msteams_cache_num_entries);
-    }
-  }
-
-  if(ndpi_str->cfg.fpc_dns_cache_num_entries > 0) {
-    if(ndpi_str->cfg.fpc_dns_cache_scope == NDPI_LRUCACHE_SCOPE_GLOBAL) {
-      if(!ndpi_str->g_ctx->fpc_dns_global_cache) {
-        ndpi_str->g_ctx->fpc_dns_global_cache = ndpi_lru_cache_init(ndpi_str->cfg.fpc_dns_cache_num_entries,
-                                                                    ndpi_str->cfg.fpc_dns_cache_ttl, 1);
-      }
-      ndpi_str->fpc_dns_cache = ndpi_str->g_ctx->fpc_dns_global_cache;
-    } else {
-      ndpi_str->fpc_dns_cache = ndpi_lru_cache_init(ndpi_str->cfg.fpc_dns_cache_num_entries,
-                                                    ndpi_str->cfg.fpc_dns_cache_ttl, 0);
-    }
-    if(!ndpi_str->fpc_dns_cache) {
-      NDPI_LOG_ERR(ndpi_str, "Error allocating lru fpc_dns_cache (num_entries %u)\n",
-                   ndpi_str->cfg.fpc_dns_cache_num_entries);
-
+    if(!ndpi_str->lru_caches[i]) {
+      NDPI_LOG_ERR(ndpi_str, "Error allocating lru cache %s (num_entries %u)\n",
+                   ndpi_lru_cache_idx_to_name((lru_cache_type)i), c->num_entries);
     }
   }
 
@@ -5245,37 +5120,11 @@ void ndpi_exit_detection_module(struct ndpi_detection_module_struct *ndpi_str) {
     if(ndpi_str->tinc_cache)
       cache_free((cache_t)(ndpi_str->tinc_cache));
 
-    if(!ndpi_str->cfg.ookla_cache_scope &&
-       ndpi_str->ookla_cache)
-      ndpi_lru_free_cache(ndpi_str->ookla_cache);
-
-    if(!ndpi_str->cfg.signal_cache_scope &&
-       ndpi_str->signal_cache)
-      ndpi_lru_free_cache(ndpi_str->signal_cache);
-
-    if(!ndpi_str->cfg.bittorrent_cache_scope &&
-       ndpi_str->bittorrent_cache)
-      ndpi_lru_free_cache(ndpi_str->bittorrent_cache);
-
-    if(!ndpi_str->cfg.stun_cache_scope &&
-       ndpi_str->stun_cache)
-      ndpi_lru_free_cache(ndpi_str->stun_cache);
-
-    if(!ndpi_str->cfg.tls_cert_cache_scope &&
-       ndpi_str->tls_cert_cache)
-      ndpi_lru_free_cache(ndpi_str->tls_cert_cache);
-
-    if(!ndpi_str->cfg.mining_cache_scope &&
-       ndpi_str->mining_cache)
-      ndpi_lru_free_cache(ndpi_str->mining_cache);
-
-    if(!ndpi_str->cfg.msteams_cache_scope &&
-       ndpi_str->msteams_cache)
-      ndpi_lru_free_cache(ndpi_str->msteams_cache);
-
-    if(!ndpi_str->cfg.fpc_dns_cache_scope &&
-       ndpi_str->fpc_dns_cache)
-      ndpi_lru_free_cache(ndpi_str->fpc_dns_cache);
+    for(i = 0; i < NDPI_LRUCACHE_MAX; i++) {
+      if(ndpi_str->cfg.lru[i].scope == NDPI_LRUCACHE_SCOPE_LOCAL &&
+         ndpi_str->lru_caches[i])
+        ndpi_lru_free_cache(ndpi_str->lru_caches[i]);
+    }
 
     if(ndpi_str->protocols)    ndpi_ptree_destroy(ndpi_str->protocols);
     if(ndpi_str->ip_risk_mask) ndpi_ptree_destroy(ndpi_str->ip_risk_mask);
@@ -9450,8 +9299,8 @@ static void ndpi_reconcile_msteams_udp(struct ndpi_detection_module_struct *ndpi
 			       /* Keep the same confidence */
 			       core->confidence);
 
-      if(ndpi_str->msteams_cache)
-	ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
+      if(ndpi_str->lru_caches[NDPI_LRUCACHE_MSTEAMS])
+	ndpi_lru_add_to_cache(ndpi_str->lru_caches[NDPI_LRUCACHE_MSTEAMS],
 			      make_msteams_key(core, s_match ? 0 /* server */ : 1 /* client */),
 			      0 /* dummy */,
 			      ndpi_get_current_time(core));
@@ -9536,8 +9385,8 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       if(core->l4_proto == IPPROTO_TCP) {
         // printf("====>> NDPI_PROTOCOL_MSTEAMS\n");
 
-        if(ndpi_str->msteams_cache)
-          ndpi_lru_add_to_cache(ndpi_str->msteams_cache,
+        if(ndpi_str->lru_caches[NDPI_LRUCACHE_MSTEAMS])
+          ndpi_lru_add_to_cache(ndpi_str->lru_caches[NDPI_LRUCACHE_MSTEAMS],
                                 make_msteams_key(core, 1 /* client */),
                                 0 /* dummy */,
                                 ndpi_get_current_time(core));
@@ -9556,11 +9405,11 @@ static void ndpi_reconcile_protocols(struct ndpi_detection_module_struct *ndpi_s
       */
       if((core->guessed_protocol_id_by_ip == NDPI_PROTOCOL_MICROSOFT_AZURE)
          && (core->detected_protocol_stack[1] == NDPI_PROTOCOL_UNKNOWN) /* No master */
-         && ndpi_str->msteams_cache
+         && ndpi_str->lru_caches[NDPI_LRUCACHE_MSTEAMS]
          ) {
         u_int16_t dummy;
 
-        if(ndpi_lru_find_cache(ndpi_str->msteams_cache,
+        if(ndpi_lru_find_cache(ndpi_str->lru_caches[NDPI_LRUCACHE_MSTEAMS],
                                make_msteams_key(core, 1 /* client */),
                                &dummy, 0 /* Don't remove it as it can be used for other connections */,
                                ndpi_get_current_time(core))) {
@@ -9653,7 +9502,7 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
   if(flow->metadata.bt_check_performed /* Do the check once */)
     return(0);
 
-  if(ndpi_struct->bittorrent_cache) {
+  if(ndpi_struct->lru_caches[NDPI_LRUCACHE_BITTORRENT]) {
     u_int16_t cached_proto;
     u_int8_t found = 0;
     u_int64_t key, key1, key2;
@@ -9665,9 +9514,9 @@ int search_into_bittorrent_cache(struct ndpi_detection_module_struct *ndpi_struc
     key1 = make_bittorrent_host_key(flow, 1, 0), key2 = make_bittorrent_host_key(flow, 0, 0);
 
     found =
-      ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key, &cached_proto, 0 /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(&flow->core))
-      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key1, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(&flow->core))
-      || ndpi_lru_find_cache(ndpi_struct->bittorrent_cache, key2, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(&flow->core));
+      ndpi_lru_find_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_BITTORRENT], key, &cached_proto, 0 /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(&flow->core))
+      || ndpi_lru_find_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_BITTORRENT], key1, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(&flow->core))
+      || ndpi_lru_find_cache(ndpi_struct->lru_caches[NDPI_LRUCACHE_BITTORRENT], key2, &cached_proto, 0     /* Don't remove it as it can be used for other connections */, ndpi_get_current_time(&flow->core));
 
 #ifdef BITTORRENT_CACHE_DEBUG
     printf("[BitTorrent] *** [%s] SEARCHING ports %u / %u [0x%llx][0x%llx][0x%llx][found: %u]\n",
@@ -10096,8 +9945,8 @@ static void ndpi_internal_detection_giveup(struct ndpi_detection_module_struct *
   }
   /* Does it looks like some Mining protocols? */
   if(flow->core.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN &&
-     ndpi_str->mining_cache &&
-     ndpi_lru_find_cache(ndpi_str->mining_cache, mining_make_lru_cache_key(flow),
+     ndpi_str->lru_caches[NDPI_LRUCACHE_MINING] &&
+     ndpi_lru_find_cache(ndpi_str->lru_caches[NDPI_LRUCACHE_MINING], mining_make_lru_cache_key(flow),
 			 &cached_proto, 0 /* Don't remove it as it can be used for other connections */,
 			 ndpi_get_current_time(&flow->core))) {
     ndpi_set_detected_protocol(ndpi_str, &flow->core, cached_proto, NDPI_PROTOCOL_UNKNOWN, NDPI_CONFIDENCE_DPI_PARTIAL_CACHE);
@@ -10763,8 +10612,8 @@ static void fpc_check_eval(struct ndpi_detection_module_struct *ndpi_str,
   }
 
   /* Check via fpc DNS cache */
-  if(ndpi_str->fpc_dns_cache &&
-     ndpi_lru_find_cache(ndpi_str->fpc_dns_cache, fpc_dns_cache_key_from_flow(flow),
+  if(ndpi_str->lru_caches[NDPI_LRUCACHE_FPC_DNS] &&
+     ndpi_lru_find_cache(ndpi_str->lru_caches[NDPI_LRUCACHE_FPC_DNS], fpc_dns_cache_key_from_flow(flow),
                          &fpc_dns_cached_proto, 0 /* Don't remove it as it can be used for other connections */,
                          ndpi_get_current_time(&flow->core))) {
     fpc_update(ndpi_str, flow, NDPI_PROTOCOL_UNKNOWN,
