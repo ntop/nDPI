@@ -1,0 +1,95 @@
+{
+ "sidebar": [
+  {
+   "text": "User's Guide",
+   "items": [
+    {
+     "text": "What is nDPI",
+     "link": "/what_is_ndpi"
+    },
+    {
+     "text": "FAQ",
+     "link": "/FAQ"
+    }
+   ]
+  },
+  {
+   "text": "Developer's Guide",
+   "items": [
+    {
+     "text": "Configuration Knobs",
+     "link": "/configuration_parameters"
+    },
+    {
+     "text": "Library Initialization",
+     "link": "/library_initialization"
+    },
+    {
+     "text": "Monitoring",
+     "link": "/monitoring"
+    },
+    {
+     "text": "nDPI Protocols List",
+     "link": "/protocols"
+    },
+    {
+     "text": "nDPI Flow Risks",
+     "link": "/flow_risks"
+    },
+    {
+     "text": "USDT Probes",
+     "link": "/usdt"
+    }
+   ]
+  }
+ ],
+ "external": [
+  {
+   "text": "ntopng",
+   "link": "https://www.ntop.org/guides/ntopng/"
+  },
+  {
+   "text": "nProbe",
+   "link": "https://www.ntop.org/guides/nprobe/"
+  },
+  {
+   "text": "nProbe Cento",
+   "link": "https://www.ntop.org/guides/cento/"
+  },
+  {
+   "text": "n2disk",
+   "link": "https://www.ntop.org/guides/n2disk/"
+  },
+  {
+   "text": "PF_RING",
+   "link": "https://www.ntop.org/guides/pf_ring/"
+  },
+  {
+   "text": "nEdge",
+   "link": "https://www.ntop.org/guides/nedge/"
+  },
+  {
+   "text": "nScrub",
+   "link": "https://www.ntop.org/guides/nscrub/"
+  },
+  {
+   "text": "nBox",
+   "link": "https://www.ntop.org/guides/nbox/"
+  },
+  {
+   "text": "nTap",
+   "link": "https://www.ntop.org/guides/ntap/"
+  }
+ ],
+ "pages": {
+  "FAQ": "FAQ",
+  "configuration_parameters": "Configuration Knobs",
+  "flow_risks": "nDPI Flow Risks",
+  "index": "nDPI Documentation",
+  "library_initialization": "Library Initialization",
+  "monitoring": "Monitoring",
+  "protocols": "nDPI Protocols List",
+  "usdt": "USDT Probes",
+  "what_is_ndpi": "What is nDPI"
+ }
+}
