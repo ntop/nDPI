@@ -147,6 +147,4 @@ make dist      # build the static site into doc/dist (runs npm install if needed
 make serve     # build, then serve it at http://localhost:4173/guides/nDPI/   (PORT=8080 make serve)
 ```
 
-To publish, copy the result where the guide is served from, e.g.
-`rsync -a --delete dist/ user@server:/var/www/ntop.org/guides/nDPI/`.
 For live reload while editing a page use `npm run dev` (http://localhost:5173/guides/nDPI/).
