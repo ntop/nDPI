@@ -50,6 +50,8 @@ export default defineConfig({
   },
   vite: { plugins: [llmstxt({ domain: `${HOST}${BASE}` }) as any] },
   head: [
+    // light by default: the visitor's choice (theme toggle) is kept in localStorage and wins over the system setting
+    ['script', {}, "try{if(!localStorage.getItem('vitepress-theme-appearance'))localStorage.setItem('vitepress-theme-appearance','light')}catch(e){}"],
     ['link', { rel: 'icon', href: `${BASE}logo.png` }],
     ['meta', { name: 'theme-color', content: '#0f6bbd' }],
     ['meta', { name: 'author', content: 'ntop.org' }],
