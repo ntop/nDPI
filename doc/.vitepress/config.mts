@@ -94,11 +94,10 @@ export default defineConfig({
   },
   themeConfig: {
     logo: { src: '/logo.png', alt: 'ntop' },
-    siteTitle: TITLE,
+    siteTitle: SITE,
     nav: [
-      ...P.nav,
+      ...P.nav.filter((item) => item.text !== "User's Guide"),
       { text: 'ntop Guides', items: other.filter(([, l]) => l !== BASE).map(([text, link]) => ({ text, link: HOST + link })) },
-      { text: `v${VERSION}`, link: `https://github.com/ntop/${P.repo}/releases` },
     ],
     sidebar,
     search: {
